@@ -61,3 +61,40 @@ try:
     pprint.pprint(client.getObject())
 except Exception, e:
     print e
+
+
+# For a more complex example we’ll retrieve a support ticket with id 123456
+# along with the ticket’s updates, the user it’s assigned to, the servers
+# attached to it, and the datacenter those servers are in. We’ll retrieve our
+# extra information using a nested object mask. After we have the ticket we’ll
+# update it with the text ‘Hello!’.
+
+# Declare an API client to connect to the SoftLayer_Ticket API service.
+client = SoftLayer.API.Client('SoftLayer_Ticket', 12345, api_username, api_key)
+
+# Assign an object mask to our API client:
+client.set_object_mask({
+    'updates' : {},
+    'assignedUser' : {},
+    'attachedHardware' : {
+        'datacenter' : {}
+    },
+})
+
+# Retrieve the ticket record.
+ticket = None
+try:
+    ticket = client.getObject()
+except Exception, e:
+    print "Unable to retrieve ticket record: %", e
+
+# Now update the ticket.
+update = {
+    'entry' : 'Hello!',
+}
+
+try:
+    update = client.addUpdate(update)
+    print "Update ticket 123456. The new update's id is %.", update{'id'}
+except Exception, e:
+    print "Unable to update ticket: %", e
