@@ -70,7 +70,7 @@ except Exception, e:
 # update it with the text ‘Hello!’.
 
 # Declare an API client to connect to the SoftLayer_Ticket API service.
-client = SoftLayer.API.Client('SoftLayer_Ticket', 12345, api_username, api_key)
+client = SoftLayer.API.Client('SoftLayer_Ticket', 123456, api_username, api_key)
 
 # Assign an object mask to our API client:
 client.set_object_mask({
