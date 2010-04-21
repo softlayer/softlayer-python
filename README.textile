@@ -62,7 +62,7 @@ import SoftLayer.API
 api_username = 'set me'
 api_key = 'set me too'
 
-client = SoftLayer('SoftLayer_Ticket', 123456, api_username, api_key)
+client = SoftLayer.API.Client('SoftLayer_Ticket', 123456, api_username, api_key)
 
 # Assign an object mask to our API client:
 client.set_object_mask({
