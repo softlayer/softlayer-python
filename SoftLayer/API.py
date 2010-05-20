@@ -31,7 +31,7 @@ import xmlrpclib
 @var API_USERNAME: Your API username, if you wish to hardcode all API calls to
 a single user.
 
-@type API_KET: C{str}
+@type API_KEY: C{str}
 @var API_KEY: Your API key, if you wish to hardcode all API calls to a single
 user.
 
