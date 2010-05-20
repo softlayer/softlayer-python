@@ -52,7 +52,7 @@ client = SoftLayer.API.Client('SoftLayer_Account', None, api_username, api_key)
 #
 # This example calls the getObject() method in the SoftLayer_Account API
 # service. <http://sldn.softlayer.com/wiki/index.php/SoftLayer_Account::getObject>
-# It retrieved basic account information, and is a great way to test your API
+# It retrieves basic account information, and is a great way to test your API
 # account and connectivity.
 #
 # If you're using Python 3.x then you'll need to change these except and

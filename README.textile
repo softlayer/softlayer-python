@@ -12,13 +12,13 @@ Making API calls using the SoftLayer.API.Client class is done in the following s
 # Define and add optional headers to the client, such as object masks and result limits.
 # Call the API method you wish to call as if it were local to your client object. This class throws exceptions if it's unable to execute a query, so it's best to place API method calls in try / except statements for proper error handling.
 
-Once your method is done executed you may continue using the same client if you need to conenct to the same service or define another client  object if you wish to work with multiple services at once.
+Once your method is done executed you may continue using the same client if you need to conenct to the same service or define another client object if you wish to work with multiple services at once.
 
 The most up to date version of this library can be found on the SoftLayer github public repositories: "http://github.com/softlayer/":http://github.com/softlayer/ . Please post to the SoftLayer forums <"http://forums.softlayer.com/":http://forums.softlayer.com/> or open a support ticket in the SoftLayer customer portal if you have any questions regarding use of this library.
 
 h2. System Requirements
 
-This library has been tested to work in Pyhton 2.4 - 3.1 on POSIX compliant and Windows operating systems.
+This library has been tested to work in Python 2.4 - 3.1 on POSIX compliant and Windows operating systems.
 
 A network connection is required for installation, and a connection to the SoftLayer private network and a valid SoftLayer API username and key are required to call the SoftLayer API.
 
@@ -28,15 +28,15 @@ Change directory to your downloaded project root directory and run the following
 
 @python ./setup.py install@
 
+This installs the SoftLayer.API package into your Python installation's @site-packages@ directory. SoftLayer.API contains a Client class that handles API method calls per service.
+
 Add @--help@ to the end of this command to view installation options.
 
 h2. Usage
 
-This installs the SoftLayer.API package into your Python installation's @site-packages@ directory. SoftLayer.API contains a Client class that handles API method calls per service.
-
 These examples are written for Python 2.x. Python 3.x users will need to modify print() usage and change how exceptions are caught.
 
-Here's a simple usage example that retrieves account information by calling the "getObject()":http://sldn.softlayer.com/wiki/index.php/SoftLayer_Account::getObject  method in the "SoftLayer_Account":http://sldn.softlayer.com/wiki/index.php/SoftLayer_Account service:
+Here's a simple usage example that retrieves account information by calling the "getObject()":http://sldn.softlayer.com/wiki/index.php/SoftLayer_Account::getObject method in the "SoftLayer_Account":http://sldn.softlayer.com/wiki/index.php/SoftLayer_Account service:
 
 <pre><code>
 import SoftLayer.API
