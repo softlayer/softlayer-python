@@ -89,7 +89,7 @@ ticket = None
 try:
     ticket = client.getObject()
 except Exception, e:
-    print "Unable to retrieve ticket record: %", e
+    print "Unable to retrieve ticket record: ", e
 
 # Now update the ticket.
 update = {
@@ -98,6 +98,6 @@ update = {
 
 try:
     update = client.addUpdate(update)
-    print "Update ticket 123456. The new update's id is %.", update{'id'}
+    print "Update ticket 123456. The new update's id is %s." % update['id']
 except Exception, e:
-    print "Unable to update ticket: %", e
+    print "Unable to update ticket: ", e
