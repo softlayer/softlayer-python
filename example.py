@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
 # Copyright (c) 2010, SoftLayer Technologies, Inc. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
