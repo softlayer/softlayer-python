@@ -4,11 +4,9 @@ h2. Overview
 
 SoftLayer.API.Client provides a simple method for connecting to and making calls from the SoftLayer XML-RPC API and provides support for many of the SoftLayer API's features. XML-RPC method calls and client management are handled by Python's built-in xmlrpc client class.
 
-Currently the SoftLayer API only allows connections from within the SoftLayer private network. The system using this class must be either directly connected to the SoftLayer private network (eg. purchased from SoftLayer) or has access to the SoftLayer private network via a VPN connection.
-
 Making API calls using the SoftLayer.API.Client class is done in the following steps:
 
-# Instantiate a new SoftLayer.API.Client object. Provide the name of the service that you wish to query, an optional id number of the object that you wish to instantiate, your SoftLayer API username, and your SoftLayer API key.
+# Instantiate a new @SoftLayer.API.Client@ object. Provide the name of the service that you wish to query, an optional id number of the object that you wish to instantiate, your SoftLayer API username, and your SoftLayer API key. The client class defaults to connect over the public Internet. Enter @API_PRIVATE_ENDPOINT@ or @API_PRIVATE_ENDPOINT@ to connect to the API over SoftLayer’s private network. The system making API calls must be connected to SoftLayer’s private network (eg. purchased from SoftLayer or connected via VPN) in order to use the private network API endpoints.
 # Define and add optional headers to the client, such as object masks and result limits.
 # Call the API method you wish to call as if it were local to your client object. This class throws exceptions if it's unable to execute a query, so it's best to place API method calls in try / except statements for proper error handling.
 
@@ -20,7 +18,7 @@ h2. System Requirements
 
 This library has been tested to work in Python 2.4 - 3.1 on POSIX compliant and Windows operating systems.
 
-A network connection is required for installation, and a connection to the SoftLayer private network and a valid SoftLayer API username and key are required to call the SoftLayer API.
+A network connection is required for installation, and a valid SoftLayer API username and key are required to call the SoftLayer API. A connection to the SoftLayer private network is required to connect to SoftLayer’s private network API endpopints.
 
 h2. Installation
 

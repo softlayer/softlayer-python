@@ -35,13 +35,23 @@ a single user.
 @var API_KEY: Your API key, if you wish to hardcode all API calls to a single
 user.
 
+@type API_PUBLIC_ENDPOINT: C{str}
+@var API_PUBLIC_ENDPOINT: The base URL of the SoftLayer API's XML-RPC
+endpoints over the public Internet.
+
+@type API_PRIVATE_ENDPOINT: C{str}
+@var API_PRIVATE_ENDPOINT: The base URL of the SoftLayer API's XML-RPC
+endpoints over SoftLayer's private network.
+
 @type API_BASE_URL: C{str}
 @var API_BASE_URL: The base URL for the SoftLayer API's XML-RPC endpoints.
 """
 
 API_USERNAME = None
 API_KEY = None
-API_BASE_URL = 'http://api.service.softlayer.com/xmlrpc/v3/'
+API_PUBLIC_ENDPOINT = 'https://api.softlayer.com/xmlrpc/v3/'
+API_PRIVATE_ENDPOINT = 'http://api.service.softlayer.com/xmlrpc/v3/'
+API_BASE_URL = API_PUBLIC_ENDPOINT
 
 
 class Client:
@@ -52,15 +62,18 @@ class Client:
     made to that service.
 
     @ivar _service_name: The name of the SoftLayer API service to query
+    @ivar _endpoint_url: The base URL to the SoftLayer API's endpoints being
+    used by this client.
     @ivar _headers: The headers to send to an API call
     @ivar _client: The xmlrpc client used to make calls
     """
 
     _service_name = None
+    _endpoint_url = None
     _headers = {}
     _xmlrpc_client = None
 
-    def __init__(self, service_name, id=None, username=None, api_key=None):
+    def __init__(self, service_name, id=None, username=None, api_key=None, endpoint_url=None):
         """
         Create a SoftLayer API client
 
@@ -79,6 +92,11 @@ class Client:
         @type api_key: C{str}
         @param api_key: An optional API key if you wish to bypass the package's
         built in API key.
+
+        @type endpoint_url: C{str}
+        @param endpoint_url: The API endpoint base URL you wish to connect to.
+        Set this to API_PRIVATE_ENDPOINT to connect via SoftLayer's private
+        network.
         """
 
         service_name = service_name.strip()
@@ -108,13 +126,24 @@ class Client:
 
         self.set_authentication(user,key)
 
+        # Default to use the public network API endpoint, otherwise use the
+        # endpoint defined in API_PUBLIC_ENDPOINT, otherwise use the one
+        # provided by the user.
+        if endpoint_url is not None and endpoint_url  is not '':
+            endpoint_url = endpoint_url.strip()
+            self._endpoint_url = endpoint_url
+        elif API_BASE_URL is not None and API_BASE_URL is not '':
+            self._endpoint_url = API_BASE_URL
+        else:
+            self._endpoint_url = API_PUBLIC_ENDPOINT
+
         # Set a call initialization parameter if we need to.
         if id is not None:
             self.set_init_parameter(int(id))
 
         # Finally, make an xmlrpc client. We'll use this for all API calls made
         # against this client instance.
-        self._xmlrpc_client = xmlrpclib.ServerProxy(API_BASE_URL
+        self._xmlrpc_client = xmlrpclib.ServerProxy(self._endpoint_url
                                                     + self._service_name)
     def add_header(self, name, value):
         """
