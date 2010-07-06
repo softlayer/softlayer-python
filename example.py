@@ -98,6 +98,6 @@ update = {
 
 try:
     update = client.addUpdate(update)
-    print "Update ticket 123456. The new update's id is %s." % update['id']
+    print "Update ticket 123456. The new update's id is %s." % update[0]['id']
 except Exception, e:
     print "Unable to update ticket: ", e
