@@ -308,8 +308,8 @@ class Client:
         """
         init_param_key = "%sInitParameters" % (self._service_name,)
         if init_param_key in self._headers and "id" in self._headers[init_param_key]:            
-            return "<%s Instance [ID: %s]>" % (self._service_name,
+            return "<%r Instance [ID: %r]>" % (self._service_name,
                                           self._headers[init_param_key]['id'],)
         else:
-            return "<%s Instance>" % (self._service_name,)
+            return "<%r Instance>" % (self._service_name,)
 
