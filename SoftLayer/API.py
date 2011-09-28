@@ -303,8 +303,8 @@ class Client:
        
         We want to have a string representation of the object that
         is meaningful and gives as much information as possible so that comandline
-        operations make since, and so that the client does not throw needless 
-        exceptions on str()
+        operations make sense, and so that the client does not throw needless 
+        exceptions on repr()
         """
         init_param_key = "%sInitParameters" % (self._service_name,)
         if init_param_key in self._headers and "id" in self._headers[init_param_key]:            
