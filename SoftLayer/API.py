@@ -233,24 +233,26 @@ class Client:
         Set an object mask to a SoftLayer API call
 
         Use an object mask to retrieve data related your API call's result.
-        Object masks are skeleton objects that define nested relational
+        Object masks are skeleton objects, or strings that define nested relational
         properties to retrieve along with an object's local properties. See
-        U{http://sldn.softlayer.com/wiki/index.php/Using_Object_Masks_in_the_SoftLayer_API}
+        U{http://sldn.softlayer.com/article/Using-Object-Masks-SoftLayer-API}
         for more information.
 
         @type mask: C{dict}
         @param mask: The object mask you wish to define
         """
 
+        header = 'SoftLayer_ObjectMask'
+
         if isinstance(mask, dict):
-            self.add_header(self._service_name + 'ObjectMask', {
-                'mask' : mask
-            })
+            header =  '%sObjectMask' % self._service_name
+
+        self.add_header(header, { 'mask': mask })
 
     def set_result_limit(self, limit, offset=0):
         """
         Set a result limit on a SoftLayer API call
-        
+
         Many SoftLayer API methods return a group of results. These methods
         support a way to limit the number of results retrieved from the
         SoftLayer API in a way akin to an SQL LIMIT statement.
@@ -300,14 +302,14 @@ class Client:
     def __repr__(self):
         """
         Define __repr__
-       
+
         We want to have a string representation of the object that
         is meaningful and gives as much information as possible so that comandline
-        operations make sense, and so that the client does not throw needless 
+        operations make sense, and so that the client does not throw needless
         exceptions on repr()
         """
         init_param_key = "%sInitParameters" % (self._service_name,)
-        if init_param_key in self._headers and "id" in self._headers[init_param_key]:            
+        if init_param_key in self._headers and "id" in self._headers[init_param_key]:
             return "<%r Instance [ID: %r]>" % (self._service_name,
                                           self._headers[init_param_key]['id'],)
         else:
