@@ -24,7 +24,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from urllib import splittype
+import socket
+import httplib
 import xmlrpclib
+import sys
 
 """
 @type API_USERNAME: C{str}
@@ -50,8 +54,12 @@ endpoints over SoftLayer's private network.
 API_USERNAME = None
 API_KEY = None
 API_PUBLIC_ENDPOINT = 'https://api.softlayer.com/xmlrpc/v3/'
-API_PRIVATE_ENDPOINT = 'http://api.service.softlayer.com/xmlrpc/v3/'
+API_PRIVATE_ENDPOINT = 'https://api.service.softlayer.com/xmlrpc/v3/'
 API_BASE_URL = API_PUBLIC_ENDPOINT
+
+
+class SoftLayerError(Exception):
+    pass
 
 
 class Client:
@@ -67,13 +75,12 @@ class Client:
     @ivar _headers: The headers to send to an API call
     @ivar _client: The xmlrpc client used to make calls
     """
-
     _service_name = None
     _endpoint_url = None
     _headers = {}
     _xmlrpc_client = None
 
-    def __init__(self, service_name, id=None, username=None, api_key=None, endpoint_url=None):
+    def __init__(self, service_name, id=None, username=None, api_key=None, endpoint_url=None, timeout=None):
         """
         Create a SoftLayer API client
 
@@ -98,17 +105,16 @@ class Client:
         Set this to API_PRIVATE_ENDPOINT to connect via SoftLayer's private
         network.
         """
-
         service_name = service_name.strip()
 
         if service_name is None or service_name is '':
-            raise Exception('Please specify a service name.')
+            raise SoftLayerError('Please specify a service name.')
 
         if username is None and API_USERNAME is None:
-            raise Exception('Please provide a username.')
+            raise SoftLayerError('Please provide a username.')
 
         if api_key is None and API_KEY is None:
-            raise Exception('Please provide an API key.')
+            raise SoftLayerError('Please provide an API key.')
 
         # Assign local variables
         self._service_name = service_name
@@ -124,7 +130,7 @@ class Client:
         else:
             key = API_KEY.strip()
 
-        self.set_authentication(user,key)
+        self.set_authentication(user, key)
 
         # Default to use the public network API endpoint, otherwise use the
         # endpoint defined in API_PUBLIC_ENDPOINT, otherwise use the one
@@ -141,10 +147,24 @@ class Client:
         if id is not None:
             self.set_init_parameter(int(id))
 
+        http_protocol, uri = splittype(self._endpoint_url)
+
+        if http_protocol == "https":
+            self.transport = SecureProxyTransport()
+        else:
+            self.transport = ProxyTransport()
+
+        if timeout and int(timeout) > 0:
+            self.transport.set_timeout(int(timeout))
+
         # Finally, make an xmlrpc client. We'll use this for all API calls made
         # against this client instance.
         self._xmlrpc_client = xmlrpclib.ServerProxy(self._endpoint_url
-                                                    + self._service_name)
+                                                    + self._service_name, transport=self.transport)
+
+    def add_raw_header(self, name, value):
+        self.transport.raw_headers[name] = value
+
     def add_header(self, name, value):
         """
         Set a SoftLayer API call header
@@ -163,7 +183,7 @@ class Client:
         name = name.strip()
 
         if name is None or name is '':
-            raise Exception('Please specify a header name.')
+            raise SoftLayerError('Please specify a header name.')
 
         self._headers[name] = value
 
@@ -203,8 +223,8 @@ class Client:
         api_key = api_key.strip()
 
         self.add_header('authenticate', {
-            'username' : username,
-            'apiKey' : api_key,
+            'username': username,
+            'apiKey': api_key,
         })
 
     def set_init_parameter(self, id):
@@ -245,9 +265,9 @@ class Client:
         header = 'SoftLayer_ObjectMask'
 
         if isinstance(mask, dict):
-            header =  '%sObjectMask' % self._service_name
+            header = '%sObjectMask' % self._service_name
 
-        self.add_header(header, { 'mask': mask })
+        self.add_header(header, {'mask': mask})
 
     def set_result_limit(self, limit, offset=0):
         """
@@ -266,8 +286,8 @@ class Client:
         """
 
         self.add_header('resultLimit', {
-            'limit' : int(limit),
-            'offset' : int(offset)
+            'limit': int(limit),
+            'offset': int(offset)
         })
 
     def __getattr__(self, name):
@@ -295,7 +315,7 @@ class Client:
                 try:
                     return self._xmlrpc_client.__getattr__(name)(call_headers, *args)
                 except xmlrpclib.Fault, e:
-                    raise Exception(e.faultString)
+                    raise SoftLayerError(e.faultString)
 
             return call_handler
 
@@ -315,3 +335,44 @@ class Client:
         else:
             return "<%r Instance>" % (self._service_name,)
 
+
+class ProxyTransport(xmlrpclib.Transport):
+    timeout = 15
+    __extra_headers = {}
+
+    def send_content(self, connection, request_body):
+        for k, v in self.__extra_headers:
+            connection.putheader(k, v)
+        connection.putheader("Content-Type", "text/xml")
+        connection.putheader("Content-Length", str(len(request_body)))
+        connection.endheaders()
+        if request_body:
+            connection.send(request_body)
+
+    def set_timeout(self, timeout):
+        self.timeout = timeout
+
+
+class SecureProxyTransport(xmlrpclib.SafeTransport, ProxyTransport):
+    def make_connection(self, host):
+        try:
+            if self._connection and host == self._connection[0]:
+                return self._connection[1]
+            # create a HTTPS connection object from a host descriptor
+            # host may be a string, or a (host, x509-dict) tuple
+            HTTPS = httplib.HTTPSConnection
+            chost, self._extra_headers, x509 = self.get_host_info(host)
+            self._connection = host, HTTPS(chost, None, **(x509 or {}))
+            return self._connection[1]
+        except AttributeError:
+            host, extra_headers, x509 = self.get_host_info(host)
+            try:
+                HTTPS = httplib.HTTPS
+            except AttributeError:
+                raise NotImplementedError(
+                    "your version of httplib doesn't support HTTPS"
+                    )
+            else:
+                client = HTTPS(host, None, **(x509 or {}))
+                client._conn.timeout = self.timeout
+                return client
