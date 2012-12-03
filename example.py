@@ -33,7 +33,7 @@ import SoftLayer.API
 # Used for pretty printing output.
 import pprint
 
-# It's possible to define your SoftLayer API username and key diredtly in the
+# It's possible to define your SoftLayer API username and key directly in the
 # package, but it's far easier to define them before creating your API client.
 api_username = 'set me'
 api_key = 'set me too'
