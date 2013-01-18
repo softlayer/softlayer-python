@@ -18,9 +18,7 @@ setup(
     description="A library to contact SoftLayer's backend services",
     author='SoftLayer Technologies, Inc.',
     author_email='sldn@softlayer.com',
-    packages=[
-        'SoftLayer', 'tests'
-    ],
+    packages=['SoftLayer'],
     license='The BSD License',
     url='http://github.com/softlayer/softlayer-api-python-client',
     classifiers=[
