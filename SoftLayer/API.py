@@ -24,6 +24,12 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+"""
+SoftLayer API bindings
+
+See U{http://sldn.softlayer.com/article/Python}
+"""
+
 from urllib import splittype
 import socket
 import httplib
@@ -80,7 +86,8 @@ class Client:
     _headers = {}
     _xmlrpc_client = None
 
-    def __init__(self, service_name, id=None, username=None, api_key=None, endpoint_url=None, timeout=None):
+    def __init__(self, service_name, id=None, username=None, api_key=None,
+            endpoint_url=None, timeout=None):
         """
         Create a SoftLayer API client
 
@@ -135,7 +142,7 @@ class Client:
         # Default to use the public network API endpoint, otherwise use the
         # endpoint defined in API_PUBLIC_ENDPOINT, otherwise use the one
         # provided by the user.
-        if endpoint_url is not None and endpoint_url  is not '':
+        if endpoint_url is not None and endpoint_url is not '':
             endpoint_url = endpoint_url.strip()
             self._endpoint_url = endpoint_url
         elif API_BASE_URL is not None and API_BASE_URL is not '':
@@ -159,8 +166,9 @@ class Client:
 
         # Finally, make an xmlrpc client. We'll use this for all API calls made
         # against this client instance.
-        self._xmlrpc_client = xmlrpclib.ServerProxy(self._endpoint_url
-                                                    + self._service_name, transport=self.transport)
+        uri = ''.join(self._endpoint_url, self._service_name)
+        self._xmlrpc_client = xmlrpclib.ServerProxy(uri,
+                                                    transport=self.transport)
 
     def add_raw_header(self, name, value):
         self.transport.raw_headers[name] = value
@@ -237,7 +245,7 @@ class Client:
         of 1234 in the SoftLayer_Hardware_Server Service instructs the API to
         act on server record 1234 in your method calls.
 
-        See U{http://sldn.softlayer.com/wiki/index.php/Using_Initialization_Parameters_in_the_SoftLayer_API}
+        See U{http://sldn.softlayer.com/article/Using-Initialization-Parameters-SoftLayer-API}
         for more information.
 
         @type id: C{int}
@@ -253,8 +261,9 @@ class Client:
         Set an object mask to a SoftLayer API call
 
         Use an object mask to retrieve data related your API call's result.
-        Object masks are skeleton objects, or strings that define nested relational
-        properties to retrieve along with an object's local properties. See
+        Object masks are skeleton objects, or strings that define nested
+        relational properties to retrieve along with an object's local
+        properties. See
         U{http://sldn.softlayer.com/article/Using-Object-Masks-SoftLayer-API}
         for more information.
 
@@ -324,12 +333,13 @@ class Client:
         Define __repr__
 
         We want to have a string representation of the object that
-        is meaningful and gives as much information as possible so that comandline
-        operations make sense, and so that the client does not throw needless
-        exceptions on repr()
+        is meaningful and gives as much information as possible so that
+        comandline operations make sense, and so that the client does not
+        throw needless exceptions on repr()
         """
         init_param_key = "%sInitParameters" % (self._service_name,)
-        if init_param_key in self._headers and "id" in self._headers[init_param_key]:
+        if (init_param_key in self._headers and
+            "id" in self._headers[init_param_key]):
             return "<%r Instance [ID: %r]>" % (self._service_name,
                                           self._headers[init_param_key]['id'],)
         else:
