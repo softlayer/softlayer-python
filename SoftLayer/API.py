@@ -80,7 +80,8 @@ class Client:
     _headers = {}
     _xmlrpc_client = None
 
-    def __init__(self, service_name, id=None, username=None, api_key=None, endpoint_url=None, timeout=None):
+    def __init__(self, service_name, id=None, username=None, api_key=None,
+            endpoint_url=None, timeout=None, verbose=False):
         """
         Create a SoftLayer API client
 
@@ -159,8 +160,10 @@ class Client:
 
         # Finally, make an xmlrpc client. We'll use this for all API calls made
         # against this client instance.
-        self._xmlrpc_client = xmlrpclib.ServerProxy(self._endpoint_url
-                                                    + self._service_name, transport=self.transport)
+        self._xmlrpc_client = xmlrpclib.ServerProxy(
+            self._endpoint_url + self._service_name,
+            transport=self.transport,
+            verbose=verbose)
 
     def add_raw_header(self, name, value):
         self.transport.raw_headers[name] = value
