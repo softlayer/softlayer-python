@@ -17,6 +17,7 @@ setup(
     ],
     license='The BSD License',
     url='http://github.com/softlayer/softlayer-api-python-client',
+    install_requires=['distribute'],
     classifiers=[
         'Environment :: Console',
         'Environment :: Web Environment',
