@@ -14,7 +14,7 @@ if sys.version_info >= (3,):
 
 setup(
     name='SoftLayer',
-    version='1.1',
+    version='2.0',
     description="A library to contact SoftLayer's backend services",
     author='SoftLayer Technologies, Inc.',
     author_email='sldn@softlayer.com',
