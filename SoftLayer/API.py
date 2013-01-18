@@ -166,7 +166,7 @@ class Client:
 
         # Finally, make an xmlrpc client. We'll use this for all API calls made
         # against this client instance.
-        uri = ''.join(self._endpoint_url, self._service_name)
+        uri = ''.join([self._endpoint_url, self._service_name])
         self._xmlrpc_client = xmlrpclib.ServerProxy(uri,
             transport=self.transport, verbose=verbose)
 
