@@ -1,9 +1,3 @@
-try:
-    import distribute_setup
-    distribute_setup.use_setuptools()
-except ImportError:
-    pass
-
 from setuptools import setup
 import sys
 
