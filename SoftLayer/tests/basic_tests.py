@@ -6,6 +6,13 @@ except ImportError:
 import os
 
 
+NO_CREDS_TEXT = 'SL_USERNAME and SL_API_KEY environmental variables not set'
+HAS_CREDS = True
+for key in 'SL_USERNAME SL_API_KEY'.split():
+    if key not in os.environ:
+        HAS_CREDS = False
+        break
+
 def get_creds():
     return {
         'username': os.environ['SL_USERNAME'],
@@ -22,7 +29,7 @@ class UnauthedUser(unittest.TestCase):
             timeout=20)
         self.assertRaises(SoftLayer.API.SoftLayerError, client.getPortalLoginToken)
 
-
+@unittest.skipIf(not HAS_CREDS, NO_CREDS_TEXT)
 class AuthedUser(unittest.TestCase):
     def test_result_types(self):
         creds = get_creds()
