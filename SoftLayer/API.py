@@ -82,9 +82,7 @@ class Client:
     @ivar _headers: The headers to send to an API call
     @ivar _client: The xmlrpc client used to make calls
     """
-    _service_name = None
-    _endpoint_url = None
-    _headers = {}
+    _prefix = "SoftLayer_"
 
     def __init__(self, service_name=None, id=None, username=None, api_key=None,
                  endpoint_url=None, timeout=None, verbose=False):
@@ -115,6 +113,7 @@ class Client:
 
         self.verbose = verbose
         self._service_name = service_name
+        self._headers = {}
 
         # Set authentication
         self.username = username or API_USERNAME or os.environ.get('SL_USERNAME')
@@ -271,6 +270,14 @@ class Client:
         })
 
     def __getitem__(self, name):
+        """
+        Get a SoftLayer Service
+
+        @type name: C{str}
+        @param name: The name of the service. E.G. SoftLayer_Account
+        """
+        if not name.startswith(self._prefix):
+            name = self._prefix + name
         return Service(self, name)
 
     def __call__(self, service, method, *args, **kwargs):
@@ -281,11 +288,10 @@ class Client:
         try:
             uri = '/'.join([self._endpoint_url, service])
             proxy = xmlrpclib.ServerProxy(uri, transport=self.transport,
-                                           verbose=self.verbose)
+                                          verbose=self.verbose)
             return proxy.__getattr__(method)({'headers': headers}, *args)
         except xmlrpclib.Fault, e:
             raise SoftLayerError(e.faultString)
-
 
     def __getattr__(self, name):
         """
@@ -306,14 +312,6 @@ class Client:
             return call_handler
 
     def __repr__(self):
-        """
-        Define __repr__
-
-        We want to have a string representation of the object that
-        is meaningful and gives as much information as possible so that
-        comandline operations make sense, and so that the client does not
-        throw needless exceptions on repr()
-        """
         key = "%sInitParameters" % (self._service_name,)
         if key in self._headers and "id" in self._headers[key]:
             return "<%r Instance [ID: %r]>" % (self._service_name,
@@ -368,8 +366,7 @@ class Service:
             return call_handler
 
     def __repr__(self):
-        return "<Service: %s>" % (self.name,)
-
+        return "<SoftLayer Service: %s>" % (self.name,)
 
 
 class ProxyTransport(xmlrpclib.Transport):
