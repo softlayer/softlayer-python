@@ -1,9 +1,3 @@
-try:
-    import distribute_setup
-    distribute_setup.use_setuptools()
-except ImportError:
-    pass
-
 from setuptools import setup
 import sys
 
@@ -21,6 +15,7 @@ setup(
     packages=['SoftLayer'],
     license='The BSD License',
     url='http://github.com/softlayer/softlayer-api-python-client',
+    install_requires=['distribute'],
     classifiers=[
         'Environment :: Console',
         'Environment :: Web Environment',
