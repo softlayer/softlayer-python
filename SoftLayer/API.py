@@ -267,7 +267,7 @@ class Client:
             uri = '/'.join([self._endpoint_url, service])
             self.transport.__extra_headers = self._raw_headers
             proxy = xmlrpclib.ServerProxy(uri, transport=self.transport,
-                                          verbose=self.verbose)
+                                          verbose=self.verbose, allow_none=True)
             return proxy.__getattr__(method)({'headers': headers}, *args)
         except xmlrpclib.Fault, e:
             raise SoftLayerError(e.faultString)
