@@ -130,6 +130,7 @@ class Transport(unittest.TestCase):
         m.putheader.assert_any_call('RAW', 'HEADER')
         m.putheader.assert_any_call('User-Agent', 'SoftLayer Python 2.0.0')
 
+
 class APICalls(unittest.TestCase):
     @patch('SoftLayer.API.Client._server_proxy')
     def test_old_api(self, m):
