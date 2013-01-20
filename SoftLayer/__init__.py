@@ -39,9 +39,10 @@ usage:
     'Your Company'
 
 """
+from SoftLayer.consts import VERSION
 
 __title__ = 'SoftLayer'
-__version__ = '2.0'
+__version__ = VERSION
 __author__ = 'SoftLayer Technologies, Inc.'
 __license__ = 'The BSD License'
 __copyright__ = 'Copyright 2013 SoftLayer Technologies, Inc.'

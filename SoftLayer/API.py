@@ -31,14 +31,14 @@ See U{http://sldn.softlayer.com/article/Python}
 """
 
 from urlparse import urlparse
+from SoftLayer.consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT
+from SoftLayer.transport import ProxyTransport, SecureProxyTransport
 import socket
 import xmlrpclib
 import os
 
 API_USERNAME = None
 API_KEY = None
-API_PUBLIC_ENDPOINT = 'https://api.softlayer.com/xmlrpc/v3/'
-API_PRIVATE_ENDPOINT = 'https://api.service.softlayer.com/xmlrpc/v3/'
 API_BASE_URL = API_PUBLIC_ENDPOINT
 
 
@@ -46,7 +46,7 @@ class SoftLayerError(Exception):
     pass
 
 
-class Client:
+class Client(object):
     """A SoftLayer API client
     Clients are intended to be declared once per service and used for all calls
     made to that service.
@@ -75,20 +75,20 @@ class Client:
 
     """
     _prefix = "SoftLayer_"
+    _server_proxy = xmlrpclib.ServerProxy
 
     def __init__(self, service_name=None, id=None, username=None, api_key=None,
                  endpoint_url=None, timeout=None, verbose=False):
         self.verbose = verbose
         self._service_name = service_name
         self._headers = {}
-        self._raw_headers = {}
 
         self.username = username or API_USERNAME or os.environ.get('SL_USERNAME')
         self.api_key = api_key or API_KEY or os.environ.get('SL_API_KEY')
 
         if not all((self.username, self.api_key)):
             raise SoftLayerError(
-                'Must supply username, api_key and service_name')
+                'Must supply username and api_key')
 
         self.set_authentication(self.username, self.api_key)
 
@@ -104,10 +104,10 @@ class Client:
         else:
             self.transport = ProxyTransport()
 
-        self._timeout = timeout
+        self.timeout = timeout
 
     def add_raw_header(self, name, value):
-        self._raw_headers[name] = value
+        self.transport.set_raw_header(name, value)
 
     def add_header(self, name, value):
         """ Set a SoftLayer API call header; deprecated
@@ -214,6 +214,15 @@ class Client:
             name = self._prefix + name
         return Service(self, name)
 
+    def __format_filter_dict(self, d):
+        for key, value in d.iteritems():
+            if isinstance(value, dict):
+                d[key] = self.__format_filter_dict(value)
+                return d
+            else:
+                d[key] = {'operation': value}
+                return d
+
     def __call__(self, service, method, *args, **kwargs):
         """ Place a SoftLayer API call """
         objectid = kwargs.get('id')
@@ -240,42 +249,29 @@ class Client:
             headers[mheader] = {'mask': objectmask}
 
         if objectfilter is not None:
-            _objectfilter = {}
-            for name, value in objectfilter.items():
-                parts = name.split('.')
-                _type = parts.pop(0)
-                _filter = {}
-                _working = _filter
-                for i, part in enumerate(parts):
-                    if part not in _working:
-                        if i == len(parts) - 1:
-                            _working[part] = {'operation': value}
-                        else:
-                            _working[part] = {}
-                    _working = _working[part]
-                _objectfilter[_type] = _filter
-            headers['%sObjectFilter' % service] = _objectfilter
+            headers['%sObjectFilter' % service] = \
+                self.__format_filter_dict(objectfilter)
 
         if limit:
             headers['resultLimit'] = {
                     'limit': int(limit),
                     'offset': int(offset)
                 }
-        _old_timeout = socket.getdefaulttimeout()
-        socket.setdefaulttimeout(self._timeout)
+
+        __prevDefaultTimeout = socket.getdefaulttimeout()
         try:
             uri = '/'.join([self._endpoint_url, service])
-            self.transport.__extra_headers = self._raw_headers
-            proxy = xmlrpclib.ServerProxy(uri, transport=self.transport,
+            socket.setdefaulttimeout(self.timeout)
+            print "HEADERS123", headers
+            proxy = self._server_proxy(uri, transport=self.transport,
                                           verbose=self.verbose, allow_none=True)
-            return proxy.__getattr__(method)({'headers': headers}, *args)
+            return getattr(proxy, method)({'headers': headers}, *args)
         except xmlrpclib.Fault, e:
             raise SoftLayerError(e.faultString)
         finally:
-            self._raw_headers = {}
-            socket.setdefaulttimeout(_old_timeout)
+            socket.setdefaulttimeout(__prevDefaultTimeout)
 
-    def __getattr__(self, name):
+    def __getattribute__(self, name):
         """ Attempt a SoftLayer API call
 
         Use this as a catch-all so users can call SoftLayer API methods
@@ -284,8 +280,9 @@ class Client:
         attempting a SoftLayer API call and return a simple function that makes
         an XML-RPC call.
         """
+        if name == '__name__': raise AttributeError  # for help(self)
         try:
-            return object.__getattr__(self, name)
+            return object.__getattribute__(self, name)
         except AttributeError:
             def call_handler(*args, **kwargs):
                 return self(self._service_name, name, *args,
@@ -297,7 +294,7 @@ class Client:
             % (self._endpoint_url, self.username)
 
 
-class Service:
+class Service(object):
     def __init__(self, client, name):
         self.client = client
         self.name = name
@@ -305,9 +302,10 @@ class Service:
     def __call__(self, name, *args, **kwargs):
         return self.client(self.name, name, *args, **kwargs)
 
-    def __getattr__(self, name):
+    def __getattribute__(self, name):
+        if name == '__name__': raise AttributeError  # for help(self)
         try:
-            return object.__getattr__(self, name)
+            return object.__getattribute__(self, name)
         except AttributeError:
             def call_handler(*args, **kwargs):
                 return self(name, *args, **kwargs)
@@ -315,21 +313,4 @@ class Service:
 
     def __repr__(self):
         return "<Service: %s>" % (self.name,)
-
-
-class ProxyTransport(xmlrpclib.Transport):
-    __extra_headers = {}
-
-    def send_content(self, connection, request_body):
-        for k, v in self.__extra_headers:
-            connection.putheader(k, v)
-
-        connection.putheader("Content-Type", "text/xml")
-        connection.putheader("Content-Length", str(len(request_body)))
-        connection.endheaders()
-        if request_body:
-            connection.send(request_body)
-
-class SecureProxyTransport(xmlrpclib.SafeTransport, ProxyTransport):
-    pass
 

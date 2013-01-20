@@ -8,12 +8,13 @@ if sys.version_info >= (3,):
 
 setup(
     name='SoftLayer',
-    version='2.0',
+    version='2.0.0',
     description="A library to contact SoftLayer's backend services",
     author='SoftLayer Technologies, Inc.',
     author_email='sldn@softlayer.com',
-    packages=['SoftLayer'],
+    packages=['SoftLayer', 'SoftLayer.tests'],
     license='The BSD License',
+    zip_safe=False,
     url='http://github.com/softlayer/softlayer-api-python-client',
     install_requires=['distribute'],
     classifiers=[
