@@ -22,9 +22,11 @@ A network connection is required for installation, and a valid SoftLayer API use
 
 h2. Installation
 
-Change directory to your downloaded project root directory and run the following command to install this pagkage:
+@pip install softlayer@
 
-@python ./setup.py install@
+Or to install via source, download the source and change directory to your downloaded project root directory. Then run the following command to install this pagkage:
+
+@python setup.py install@
 
 This installs the SoftLayer.API package into your Python installation's @site-packages@ directory. SoftLayer.API contains a Client class that handles API method calls per service.
 
