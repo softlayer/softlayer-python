@@ -284,7 +284,52 @@ class Client:
         """
         Place a SoftLayer API call
         """
-        headers = kwargs.get('headers', {})
+        _id = kwargs.get('id')
+        objectmask = kwargs.get('mask')
+        objectfilter = kwargs.get('filter')
+        headers = kwargs.get('headers')
+        limit = kwargs.get('limit')
+        offset = kwargs.get('offset', 0)
+
+        if headers is None:
+            headers = {
+                'authenticate': {
+                    'username': self.username,
+                    'apiKey': self.api_key,
+                }}
+
+        if _id is not None:
+            headers[service + 'InitParameters'] = {'id': int(_id)}
+
+        if objectmask is not None:
+            mheader = self._prefix + 'ObjectMask'
+            if isinstance(objectmask, dict):
+                mheader = '%sObjectMask' % service
+            headers[mheader] = {'mask': objectmask}
+
+        if objectfilter is not None:
+            _objectfilter = {}
+            for name, value in objectfilter.items():
+                parts = name.split('.')
+                _type = parts.pop(0)
+                _filter = {}
+                _working = _filter
+                for i, part in enumerate(parts):
+                    if part not in _working:
+                        if i == len(parts) - 1:
+                            _working[part] = {'operation': value}
+                        else:
+                            _working[part] = {}
+                    _working = _working[part]
+                _objectfilter[_type] = _filter
+            headers['%sObjectFilter' % service] = _objectfilter
+
+        if limit:
+            headers['resultLimit'] = {
+                    'limit': int(limit),
+                    'offset': int(offset)
+                }
+
         try:
             uri = '/'.join([self._endpoint_url, service])
             proxy = xmlrpclib.ServerProxy(uri, transport=self.transport,
@@ -306,9 +351,9 @@ class Client:
         try:
             return object.__getattr__(self, name)
         except AttributeError:
-            def call_handler(*args):
+            def call_handler(*args, **kwargs):
                 return self(self._service_name, name, *args,
-                    headers=self._headers)
+                    headers=self._headers, **kwargs)
             return call_handler
 
     def __repr__(self):
@@ -326,36 +371,7 @@ class Service:
         self.name = name
 
     def __call__(self, name, *args, **kwargs):
-        id = kwargs.get('id')
-        mask = kwargs.get('mask')
-        headers = kwargs.get('headers')
-        limit = kwargs.get('limit')
-        offset = kwargs.get('offset', 0)
-
-        if headers is None:
-            headers = {
-                'authenticate': {
-                    'username': self.client.username,
-                    'apiKey': self.client.api_key,
-                }}
-
-        if id is not None:
-            headers[self.name + 'InitParameters'] = {'id': int(id)}
-
-        if mask is not None:
-            mheader = 'SoftLayer_ObjectMask'
-            if isinstance(mask, dict):
-                mheader = '%sObjectMask' % self.name
-            headers[mheader] = {'mask': mask}
-
-
-        if limit:
-            headers['resultLimit'] = {
-                    'limit': int(limit),
-                    'offset': int(offset)
-                }
-
-        return self.client(self.name, name, headers=headers, *args)
+        return self.client(self.name, name, *args, **kwargs)
 
     def __getattr__(self, name):
         try:

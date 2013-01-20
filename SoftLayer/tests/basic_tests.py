@@ -1,11 +1,12 @@
 import SoftLayer
+import SoftLayer.API
 import xmlrpclib
 try:
     import unittest2 as unittest
 except ImportError:
     import unittest
 import os
-from mock import patch
+from mock import patch, MagicMock
 
 
 NO_CREDS_TEXT = 'SL_USERNAME and SL_API_KEY environmental variables not set'
@@ -63,6 +64,77 @@ class Inititialization(unittest.TestCase):
         self.assertEquals(client._headers,
             {'authenticate':
                 {'username': 'test_user', 'apiKey': 'test_api_key'}})
+
+
+class APICalls(unittest.TestCase):
+    @patch('xmlrpclib.ServerProxy')
+    def test_old_api(self, m):
+        client = SoftLayer.API.Client(
+            'SoftLayer_Account', None, 'doesnotexist', 'issurelywrong')
+
+        return_value = client.METHOD()
+        m.return_value.METHOD.assert_called_with({
+            'headers': {
+                'authenticate': 
+                    {'username': 'doesnotexist', 'apiKey': 'issurelywrong'}}})
+        self.assertEquals(m.return_value.METHOD(), return_value)
+
+    @patch('xmlrpclib.ServerProxy')
+    def test_complex_old_api(self, m):
+        client = SoftLayer.API.Client(
+            'SoftLayer_Account', None, 'doesnotexist', 'issurelywrong')
+
+        client.set_result_limit(9, offset=10)
+        client.set_object_mask({'object': {'attribute': ''}})
+
+        return_value = client['SERVICE'].METHOD(1234,
+            mask={'object': {'attribute': ''}},
+            filter={'TYPE.obj.attribute': '^= prefix'}, limit=9, offset=10)
+        m.return_value.METHOD.assert_called_with({
+            'headers': {
+                'SoftLayer_SERVICEObjectMask': {
+                    'mask': {'object': {'attribute': ''}}},
+                'SoftLayer_SERVICEObjectFilter': {
+                    'TYPE': {
+                        'obj': {'attribute': {'operation': '^= prefix'}}}},
+                'authenticate': {
+                    'username': 'doesnotexist', 'apiKey': 'issurelywrong'},
+                'resultLimit': {'limit': 9, 'offset': 10}}}, 1234)
+
+        self.assertEquals(m.return_value.METHOD(), return_value)
+
+    @patch('xmlrpclib.ServerProxy')
+    def test_simple_call(self, m):
+        client = SoftLayer.Client(username='doesnotexist',
+            api_key='issurelywrong')
+
+        return_value = client['SERVICE'].METHOD()
+        m.return_value.METHOD.assert_called_with({
+            'headers': {
+                'authenticate': 
+                    {'username': 'doesnotexist', 'apiKey': 'issurelywrong'}}})
+        self.assertEquals(m.return_value.METHOD(), return_value)
+
+    @patch('xmlrpclib.ServerProxy')
+    def test_complex(self, m):
+        client = SoftLayer.Client(username='doesnotexist',
+            api_key='issurelywrong')
+
+        return_value = client['SERVICE'].METHOD(1234,
+            mask={'object': {'attribute': ''}},
+            filter={'TYPE.obj.attribute': '^= prefix'}, limit=9, offset=10)
+        m.return_value.METHOD.assert_called_with({
+            'headers': {
+                'SoftLayer_SERVICEObjectMask': {
+                    'mask': {'object': {'attribute': ''}}},
+                'SoftLayer_SERVICEObjectFilter': {
+                    'TYPE': {
+                        'obj': {'attribute': {'operation': '^= prefix'}}}},
+                'authenticate': {
+                    'username': 'doesnotexist', 'apiKey': 'issurelywrong'},
+                'resultLimit': {'limit': 9, 'offset': 10}}}, 1234)
+
+        self.assertEquals(m.return_value.METHOD(), return_value)
 
 
 class UnauthedUser(unittest.TestCase):
