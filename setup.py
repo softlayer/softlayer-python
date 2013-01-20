@@ -6,10 +6,18 @@ extra = {}
 if sys.version_info >= (3,):
     extra['use_2to3'] = True
 
+description = "A library to contact SoftLayer's backend services"
+
+try:
+    long_description = read('README.md')
+except:
+    long_description = description
+
 setup(
     name='SoftLayer',
     version='2.0.0',
-    description="A library to contact SoftLayer's backend services",
+    description=description,
+    long_description=long_description,
     author='SoftLayer Technologies, Inc.',
     author_email='sldn@softlayer.com',
     packages=['SoftLayer', 'SoftLayer.tests'],
