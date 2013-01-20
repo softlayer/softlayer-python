@@ -94,4 +94,4 @@ This software is written by the SoftLayer Development Team <"sldn@softlayer.com"
 
 h2. Copyright
 
-This software is Copyright (c) 2010 "SoftLayer Technologies, Inc":http://www.softlayer.com/. See the bundled LICENSE.textile file for more information.
+This software is Copyright (c) 2013 "SoftLayer Technologies, Inc":http://www.softlayer.com/. See the bundled LICENSE.textile file for more information.
