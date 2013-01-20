@@ -26,17 +26,19 @@
 """
 SoftLayer Python API Client
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A library to contact SoftLayer's backend services through the XML-RPC interface.
+See U{http://sldn.softlayer.com/article/Python}
 
-A library to contact SoftLayer's backend services through the XML-RPC interface
+
 usage:
 
     >>> import SoftLayer
     >>> client = SoftLayer.Client(username="username", api_key="api_key")
-    >>> client['SoftLayer_Account'].getObject()['companyName']
+    >>> resp = client['SoftLayer_Account'].getObject()
+    >>> resp['companyName']
     'Your Company'
 
 """
-
 
 __title__ = 'SoftLayer'
 __version__ = '2.0'
