@@ -262,7 +262,6 @@ class Client(object):
         try:
             uri = '/'.join([self._endpoint_url, service])
             socket.setdefaulttimeout(self.timeout)
-            print "HEADERS123", headers
             proxy = self._server_proxy(uri, transport=self.transport,
                                           verbose=self.verbose, allow_none=True)
             return getattr(proxy, method)({'headers': headers}, *args)
