@@ -1,6 +1,6 @@
 SoftLayer API Python Client
 ===========================
-[![Build Status](https://travis-ci.org/sudorandom/softlayer-api-python-client.png?branch=master)](https://travis-ci.org/sudorandom/softlayer-api-python-client)
+[![Build Status](https://travis-ci.org/sudorandom/softlayer-api-python-client.png)](https://travis-ci.org/sudorandom/softlayer-api-python-client)
 
 This code provides a simple Python library to use the [SoftLayer API](http://sldn.softlayer.com/reference/softlayerapi).
 
