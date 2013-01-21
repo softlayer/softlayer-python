@@ -28,9 +28,9 @@ The most up to date version of this library can be found on the SoftLayer github
 System Requirements
 -------------------
 
-** This library has been tested on Python 2.5, 2.6, 2.7, 3.2 and 3.3.
-** A valid SoftLayer API username and key are required to call SoftLayer's API
-** A connection to SoftLayer's private network is required to connect to SoftLayer’s private network API endpoints.
+* This library has been tested on Python 2.5, 2.6, 2.7, 3.2 and 3.3.
+* A valid SoftLayer API username and key are required to call SoftLayer's API
+* A connection to SoftLayer's private network is required to connect to SoftLayer’s private network API endpoints.
 
 ## Getting Started
 You can pass in your username and api_key when creating a SoftLayer client instance. However, you can set these in the environmental variables 'SL_USERNAME' and 'SL_API_KEY'
