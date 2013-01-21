@@ -1,6 +1,6 @@
 SoftLayer API Python Client
 ===========================
-[![Build Status](https://travis-ci.org/sudorandom/softlayer-api-python-client.png)](https://travis-ci.org/sudorandom/softlayer-api-python-client)
+[![Build Status](https://travis-ci.org/sudorandom/softlayer-api-python-client.png)](https://travis-ci.org/softlayer/softlayer-api-python-client)
 
 This code provides a simple Python library to use the [SoftLayer API](http://sldn.softlayer.com/reference/softlayerapi).
 
@@ -32,8 +32,7 @@ System Requirements
 * A valid SoftLayer API username and key are required to call SoftLayer's API
 * A connection to SoftLayer's private network is required to connect to SoftLayer’s private network API endpoints.
 
-Getting Started
----------------
+## Getting Started
 You can pass in your username and api_key when creating a SoftLayer client instance. However, you can set these in the environmental variables 'SL_USERNAME' and 'SL_API_KEY'
 
 Here's a simple usage example that retrieves account information by calling the [getObject](http://sldn.softlayer.com/wiki/index.php/SoftLayer_Account::getObject) method on the [SoftLayer_Account](http://sldn.softlayer.com/wiki/index.php/SoftLayer_Account) service.
@@ -104,10 +103,34 @@ client['Virtual_Guest'].createObject({
     })
 ```
 
-Author
-------
-This software is written by the SoftLayer Development Team [sldn@softlayer.com](mailto:sldn@softlayer.com).
+Backwards Compatability
+-----------------------
+If you've been using the older Python client, you'll be happy to know that the old API is still currently working. However, you should deprecate use of the old stuff. Below is an example of the old API converted to the new one.
+```python
+import SoftLayer.API
+client = SoftLayer.API.Client('SoftLayer_Account', None, 'username', 'api_key')
+client.set_object_mask({...})
+client.set_result_limit(10, offset=0)
+client.getObject()
+```
+changes to 
+```python
+import SoftLayer
+client = SoftLayer.Client(username='username', api_key='api_key')
+client['Account'].getObject(mask={..}, limit=10, offset=0)
+```
+
+### Deprecated APIs
+* SoftLayer.API.Client.__init__ parameters: service_name, id => SoftLayer.API.Client['SERVICE'].METHOD(id=...)
+* SoftLayer.API.Client.add_header() => SoftLayer.API.Client['SERVICE'].METHOD(headers={...})
+* SoftLayer.API.Client.remove_header() => SoftLayer.API.Client['SERVICE'].METHOD(headers={...})
+* SoftLayer.API.Client.set_authentication() => _
+* SoftLayer.API.Client.set_init_parameter() => SoftLayer.API.Client['SERVICE'].METHOD(id=...)
+* SoftLayer.API.Client.set_object_mask() => SoftLayer.API.Client['SERVICE'].METHOD(mask={...})
+* SoftLayer.API.Client.set_result_limit() => SoftLayer.API.Client['SERVICE'].METHOD(limit=..., offset=...)
+* SoftLayer.API.Client.METHOD() => SoftLayer.API.Client['SERVICE'].METHOD()
+
 
 Copyright
 ---------
-This software is Copyright (c) 2013 [SoftLayer Technologies, Inc](http://www.softlayer.com/). See the bundled LICENSE.md file for more information.
+This software is Copyright (c) 2013 [SoftLayer Technologies, Inc](http://www.softlayer.com/). See the bundled LICENSE file for more information.
