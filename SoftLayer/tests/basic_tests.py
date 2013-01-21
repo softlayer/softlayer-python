@@ -77,7 +77,9 @@ class Inititialization(unittest.TestCase):
         self.assertIsInstance(client.transport, 
             SoftLayer.API.ProxyTransport)
 
-    def test_set_raw_header(self):
+
+class ClientMethods(unittest.TestCase):
+    def test_set_raw_header_old(self):
         client = SoftLayer.Client(
                 username='doesnotexist',
                 api_key='issurelywrong'
@@ -191,11 +193,15 @@ class APICalls(unittest.TestCase):
         client = SoftLayer.Client(username='doesnotexist',
             api_key='issurelywrong')
 
+        client.transport = MagicMock()
+
         return_value = client['SERVICE'].METHOD(1234,
             id=5678,
             mask={'object': {'attribute': ''}},
+            raw_headers={'RAW': 'HEADER'},
             filter={'TYPE': {'obj': {'attribute': '^= prefix'}}},
             limit=9, offset=10)
+
         m.return_value.METHOD.assert_called_with({
             'headers': {
                 'SoftLayer_SERVICEObjectMask': {
@@ -209,6 +215,7 @@ class APICalls(unittest.TestCase):
                 'resultLimit': {'limit': 9, 'offset': 10}}}, 1234)
 
         self.assertEquals(m.return_value.METHOD(), return_value)
+        client.transport.set_raw_header.assert_called_with("RAW", "HEADER")
 
 
 class UnauthedUser(unittest.TestCase):

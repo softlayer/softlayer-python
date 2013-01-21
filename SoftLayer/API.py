@@ -48,8 +48,6 @@ class SoftLayerError(Exception):
 
 class Client(object):
     """A SoftLayer API client
-    Clients are intended to be declared once per service and used for all calls
-    made to that service.
 
     :param service_name: The name of the SoftLayer API service to query.
     :param id: An optional object if if you're instantiating a particular
@@ -107,10 +105,14 @@ class Client(object):
         self.timeout = timeout
 
     def add_raw_header(self, name, value):
+        """ Set HTTP headers for API calls
+        ..  deprecated:: 2.0.0
+        """
         self.transport.set_raw_header(name, value)
 
     def add_header(self, name, value):
-        """ Set a SoftLayer API call header; deprecated
+        """ Set a SoftLayer API call header
+        ..  deprecated:: 2.0.0
 
         :param name: The name of the header to add
         :param value: The header to add.
@@ -123,7 +125,8 @@ class Client(object):
         self._headers[name] = value
 
     def remove_header(self, name):
-        """ Remove a SoftLayer API call header; deprecated
+        """ Remove a SoftLayer API call header
+        ..  deprecated:: 2.0.0
 
         :param name: The name of the header to remove.
         """
@@ -133,6 +136,7 @@ class Client(object):
 
     def set_authentication(self, username, api_key):
         """ Set user and key to authenticate a SoftLayer API call
+        ..  deprecated:: 2.0.0
 
         Use this method if you wish to bypass the API_USER and API_KEY class
         constants and set custom authentication per API call.
@@ -150,7 +154,8 @@ class Client(object):
         })
 
     def set_init_parameter(self, id):
-        """ Set an initialization parameter header; deprecated
+        """ Set an initialization parameter header
+        ..  deprecated:: 2.0.0
 
         Initialization parameters instantiate a SoftLayer API service object to
         act upon during your API method call. For instance, if your account has
@@ -169,7 +174,8 @@ class Client(object):
         })
 
     def set_object_mask(self, mask):
-        """ Set an object mask to a SoftLayer API call; deprecated
+        """ Set an object mask to a SoftLayer API call
+        ..  deprecated:: 2.0.0
 
         Use an object mask to retrieve data related your API call's result.
         Object masks are skeleton objects, or strings that define nested
@@ -189,7 +195,8 @@ class Client(object):
         self.add_header(header, {'mask': mask})
 
     def set_result_limit(self, limit, offset=0):
-        """ Set a result limit on a SoftLayer API call; deprecated
+        """ Set a result limit on a SoftLayer API call
+        ..  deprecated:: 2.0.0
 
         Many SoftLayer API methods return a group of results. These methods
         support a way to limit the number of results retrieved from the
@@ -229,6 +236,7 @@ class Client(object):
         objectmask = kwargs.get('mask')
         objectfilter = kwargs.get('filter')
         headers = kwargs.get('headers')
+        raw_headers = kwargs.get('raw_headers')
         limit = kwargs.get('limit')
         offset = kwargs.get('offset', 0)
 
@@ -238,6 +246,10 @@ class Client(object):
                     'username': self.username,
                     'apiKey': self.api_key,
                 }}
+
+        if raw_headers:
+            for name, value in raw_headers.items():
+                self.transport.set_raw_header(name, value)
 
         if objectid is not None:
             headers[service + 'InitParameters'] = {'id': int(objectid)}
@@ -272,6 +284,7 @@ class Client(object):
 
     def __getattribute__(self, name):
         """ Attempt a SoftLayer API call
+        ..  deprecated:: 2.0.0
 
         Use this as a catch-all so users can call SoftLayer API methods
         directly against their client object. If the property or method

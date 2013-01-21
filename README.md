@@ -157,6 +157,33 @@ service = client['Account']
 service.getObject()
 ```
 
+**Setting Object Mask**
+```python
+# Old
+client.set_object_mask({'updates' : None})
+
+# New
+client['Account'].getObject(mask={'updates' : None})
+```
+
+**Using Init Parameter**
+```python
+# Old
+client.set_init_parameter(1234)
+
+# New
+client['Account'].getObject(id=1234)
+```
+
+**Setting Result Limit and Offset**
+```python
+# Old
+client.set_result_limit(10, offset=10)
+
+# New
+client['Account'].getObject(limit=10, offset=10)
+```
+
 **Adding Additional Headers**
 ```python
 # Old
@@ -177,6 +204,15 @@ client.remove_header('header')
 client['Account'].getObject()
 ```
 
+**Adding Additional HTTP Headers**
+```python
+# Old
+client.add_raw_header('header', 'value')
+
+# New
+client['Account'].getObject(raw_headers={'header': 'value'})
+```
+
 **Changing Authentication Credentials**
 ```python
 # Old
@@ -185,33 +221,6 @@ client.set_authentication('username', 'api_key')
 # New
 client.username = 'username'
 client.api_key = 'api_key'
-```
-
-**Using Init Parameter**
-```python
-# Old
-client.set_init_parameter(1234)
-
-# New
-client['Account'].getObject(id=1234)
-```
-
-**Setting Object Mask**
-```python
-# Old
-client.set_object_mask({'updates' : None})
-
-# New
-client['Account'].getObject(mask={'updates' : None})
-```
-
-**Setting Result Limit and Offset**
-```python
-# Old
-client.set_result_limit(10, offset=10)
-
-# New
-client['Account'].getObject(limit=10, offset=10)
 ```
 
 
