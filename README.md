@@ -28,9 +28,9 @@ The most up to date version of this library can be found on the SoftLayer github
 System Requirements
 -------------------
 
-* This library has been tested on Python 2.5, 2.6, 2.7, 3.2 and 3.3.
-* A valid SoftLayer API username and key are required to call SoftLayer's API
-* A connection to SoftLayer's private network is required to connect to SoftLayer’s private network API endpoints.
+** This library has been tested on Python 2.5, 2.6, 2.7, 3.2 and 3.3.
+** A valid SoftLayer API username and key are required to call SoftLayer's API
+** A connection to SoftLayer's private network is required to connect to SoftLayer’s private network API endpoints.
 
 ## Getting Started
 You can pass in your username and api_key when creating a SoftLayer client instance. However, you can set these in the environmental variables 'SL_USERNAME' and 'SL_API_KEY'
@@ -109,26 +109,110 @@ If you've been using the older Python client, you'll be happy to know that the o
 ```python
 import SoftLayer.API
 client = SoftLayer.API.Client('SoftLayer_Account', None, 'username', 'api_key')
-client.set_object_mask({...})
-client.set_result_limit(10, offset=0)
+client.set_object_mask({'updates' : None})
+client.set_result_limit(10, offset=10)
 client.getObject()
 ```
-changes to 
+... changes to ...
 ```python
 import SoftLayer
 client = SoftLayer.Client(username='username', api_key='api_key')
-client['Account'].getObject(mask={..}, limit=10, offset=0)
+client['Account'].getObject(mask={'updates' : None}, limit=10, offset=0)
 ```
 
 ### Deprecated APIs
-* SoftLayer.API.Client.__init__ parameters: service_name, id => SoftLayer.API.Client['SERVICE'].METHOD(id=...)
-* SoftLayer.API.Client.add_header() => SoftLayer.API.Client['SERVICE'].METHOD(headers={...})
-* SoftLayer.API.Client.remove_header() => SoftLayer.API.Client['SERVICE'].METHOD(headers={...})
-* SoftLayer.API.Client.set_authentication() => _
-* SoftLayer.API.Client.set_init_parameter() => SoftLayer.API.Client['SERVICE'].METHOD(id=...)
-* SoftLayer.API.Client.set_object_mask() => SoftLayer.API.Client['SERVICE'].METHOD(mask={...})
-* SoftLayer.API.Client.set_result_limit() => SoftLayer.API.Client['SERVICE'].METHOD(limit=..., offset=...)
-* SoftLayer.API.Client.METHOD() => SoftLayer.API.Client['SERVICE'].METHOD()
+Below are examples of how the old API maps to the new API.
+
+**Importing the module**
+```python
+# Old
+import SoftLayer.API
+
+# New
+import SoftLayer
+```
+
+**Creating a client instance**
+```python
+# Old
+client = SoftLayer.API.Client('SoftLayer_Account', None, 'username', 'api_key')
+
+# New
+client = SoftLayer.Client(username='username', api_key='api_key')
+service = client['Account']
+```
+
+**Making an API call**
+```python
+# Old
+client = SoftLayer.API.Client('SoftLayer_Account', None, 'username', 'api_key')
+client.getObject()
+
+# New
+client = SoftLayer.Client(username='username', api_key='api_key')
+client['Account'].getObject()
+
+# Optionally
+service = client['Account']
+service.getObject()
+```
+
+**Adding Additional Headers**
+```python
+# Old
+# These headers are persisted accross API calls
+client.add_header('header', 'value')
+
+# New
+# These headers are NOT persisted accross API calls
+client['Account'].getObject(headers={'header': 'value'})
+```
+
+**Removing Additional Headers**
+```python
+# Old
+client.remove_header('header')
+
+# New
+client['Account'].getObject()
+```
+
+**Changing Authentication Credentials**
+```python
+# Old
+client.set_authentication('username', 'api_key')
+
+# New
+client.username = 'username'
+client.api_key = 'api_key'
+```
+
+**Using Init Parameter**
+```python
+# Old
+client.set_init_parameter(1234)
+
+# New
+client['Account'].getObject(id=1234)
+```
+
+**Setting Object Mask**
+```python
+# Old
+client.set_object_mask({'updates' : None})
+
+# New
+client['Account'].getObject(mask={'updates' : None})
+```
+
+**Setting Result Limit and Offset**
+```python
+# Old
+client.set_result_limit(10, offset=10)
+
+# New
+client['Account'].getObject(limit=10, offset=10)
+```
 
 
 Copyright
