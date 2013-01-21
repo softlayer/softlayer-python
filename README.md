@@ -28,7 +28,7 @@ The most up to date version of this library can be found on the SoftLayer github
 System Requirements
 -------------------
 
-* This library has been tested on Python 2.6, 2.7, 3.2 and 3.3.
+* This library has been tested on Python 2.5, 2.6, 2.7, 3.2 and 3.3.
 * A valid SoftLayer API username and key are required to call SoftLayer's API
 * A connection to SoftLayer's private network is required to connect to SoftLayer’s private network API endpoints.
 
@@ -81,14 +81,14 @@ update = client['Ticket'].addUpdate({'entry' : 'Hello!'}, id=123456)
 
 Let's get a listing of virtual guests using the domain example.com
 ```
-c['Account'].getVirtualGuests(
+client['Account'].getVirtualGuests(
     filter={'virtualGuests': {'domain': 'example.com'}})
 ```
 
 SoftLayer's XML-RPC API also allows for pagination.
 ```
-c['Account'].getVirtualGuests(limit=10, offset=0)  # Page 1
-c['Account'].getVirtualGuests(limit=10, offset=10)  # Page 2
+client['Account'].getVirtualGuests(limit=10, offset=0)  # Page 1
+client['Account'].getVirtualGuests(limit=10, offset=10)  # Page 2
 ```
 
 Here's how to create a new [Cloud Compute Instance](http://sldn.softlayer.com/blog/phil/Simplified-CCI-Creation). Be warned, this call actually creates an hourly CCI so this does have billing implications.

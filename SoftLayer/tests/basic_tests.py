@@ -9,16 +9,14 @@ import os
 from mock import patch, MagicMock
 
 
-NO_CREDS_TEXT = 'SL_USERNAME and SL_API_KEY environmental variables not set'
-HAS_CREDS = True
-for key in 'SL_USERNAME SL_API_KEY'.split():
-    if key not in os.environ:
-        HAS_CREDS = False
-        break
-
 def get_creds():
+    for key in 'SL_USERNAME SL_API_KEY'.split():
+        if key not in os.environ:
+            raise unittest.SkipTest(
+                'SL_USERNAME and SL_API_KEY environmental variables not set')
+
     return {
-        'endpoint': os.environ['SL_API_ENDPOINT'] or \
+        'endpoint': os.environ.get('SL_API_ENDPOINT') or \
             SoftLayer.API_PUBLIC_ENDPOINT,
         'username': os.environ['SL_USERNAME'],
         'api_key': os.environ['SL_API_KEY']
@@ -221,9 +219,7 @@ class UnauthedUser(unittest.TestCase):
             client.getPortalLoginToken)
 
 
-@unittest.skipIf(not HAS_CREDS, NO_CREDS_TEXT)
 class AuthedUser(unittest.TestCase):
-
     def test_dns(self):
         creds = get_creds()
         client = SoftLayer.Client(
@@ -247,3 +243,4 @@ class AuthedUser(unittest.TestCase):
         self.assertIsInstance(result[0]['question'], str)
         self.assertIsInstance(result[0]['id'], int)
         self.assertIsInstance(result[0]['displayOrder'], int)
+
