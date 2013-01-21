@@ -91,6 +91,19 @@ c['Account'].getVirtualGuests(limit=10, offset=0)  # Page 1
 c['Account'].getVirtualGuests(limit=10, offset=10)  # Page 2
 ```
 
+Here's how to create a new [Cloud Compute Instance](http://sldn.softlayer.com/blog/phil/Simplified-CCI-Creation). Be warned, this call actually creates an hourly CCI so this does have billing implications.
+```
+client['Virtual_Guest'].createObject({
+        'hostname': 'myhostname',
+        'domain': 'example.com',
+        'startCpus': 1,
+        'maxMemory': 1024,
+        'hourlyBillingFlag': 'true',
+        'operatingSystemReferenceCode': 'UBUNTU_LATEST',
+        'localDiskFlag': 'false'
+    })
+```
+
 Author
 ------
 This software is written by the SoftLayer Development Team [sldn@softlayer.com](mailto:sldn@softlayer.com).
