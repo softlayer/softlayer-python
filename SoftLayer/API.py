@@ -284,6 +284,8 @@ class Client(object):
             return object.__getattribute__(self, name)
         except AttributeError:
             def call_handler(*args, **kwargs):
+                if self._service_name is None:
+                    raise SoftLayerError("Service is not set on Client instance.")
                 return self(self._service_name, name, *args,
                     headers=self._headers, **kwargs)
             return call_handler

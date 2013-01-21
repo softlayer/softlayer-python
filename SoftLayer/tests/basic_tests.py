@@ -171,6 +171,11 @@ class APICalls(unittest.TestCase):
 
         self.assertEquals(m.return_value.METHOD(), return_value)
 
+    def test_old_api_no_service(self):
+        client = SoftLayer.Client(username='doesnotexist',
+            api_key='issurelywrong')
+        self.assertRaises(SoftLayer.SoftLayerError, client.METHOD)
+
     @patch('SoftLayer.API.Client._server_proxy')
     def test_simple_call(self, m):
         client = SoftLayer.Client(username='doesnotexist',
