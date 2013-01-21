@@ -38,13 +38,13 @@ You can pass in your username and api_key when creating a SoftLayer client insta
 Here's a simple usage example that retrieves account information by calling the [getObject](http://sldn.softlayer.com/wiki/index.php/SoftLayer_Account::getObject) method on the [SoftLayer_Account](http://sldn.softlayer.com/wiki/index.php/SoftLayer_Account) service.
 
 Creating a client instance
-```
+```python
 import SoftLayer
 client = SoftLayer.Client(username='YOUR_USERNAME', api_key='YOUR_API_KEY')
 ```
 
 Creating a client instance with more options. This will create a client with the private API endpoint (only accessable from the SoftLayer network), a timeout of 2 minutes, and with verbose mode on (prints out more than you ever wanted to know about the HTTP requests to stdout).
-```
+```python
 client = SoftLayer.Client(
         username='YOUR_USERNAME',
         api_key='YOUR_API_KEY'
@@ -55,14 +55,14 @@ client = SoftLayer.Client(
 ```
 
 Okay, we have a client. Let's do something with it. The best API call to make is 
-```
+```python
 client['Account'].getObject()
 ```
 
 For a more complex example we'll retrieve a support ticket with id 123456 along with the ticket's updates, the user it's assigned to, the servers attached to it, and the datacenter those servers are in. We'll retrieve our extra information using a nested object mask.
 
 Retreive a ticket using Object Masks.
-```
+```python
 ticket = client['Ticket'].getObject(id=123456,
     mask={
         'updates' : None,
@@ -74,24 +74,24 @@ ticket = client['Ticket'].getObject(id=123456,
 ```
 
 Now add an update to the ticket.
-```
+```python
 update = client['Ticket'].addUpdate({'entry' : 'Hello!'}, id=123456)
 ```
 
 Let's get a listing of virtual guests using the domain example.com
-```
+```python
 client['Account'].getVirtualGuests(
     filter={'virtualGuests': {'domain': 'example.com'}})
 ```
 
 SoftLayer's XML-RPC API also allows for pagination.
-```
+```python
 client['Account'].getVirtualGuests(limit=10, offset=0)  # Page 1
 client['Account'].getVirtualGuests(limit=10, offset=10)  # Page 2
 ```
 
 Here's how to create a new [Cloud Compute Instance](http://sldn.softlayer.com/blog/phil/Simplified-CCI-Creation). Be warned, this call actually creates an hourly CCI so this does have billing implications.
-```
+```python
 client['Virtual_Guest'].createObject({
         'hostname': 'myhostname',
         'domain': 'example.com',
