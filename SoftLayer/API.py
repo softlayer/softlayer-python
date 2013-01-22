@@ -108,8 +108,7 @@ class Client(object):
         :param value: The header to add.
         """
         name = name.strip()
-
-        if name is None or name is '':
+        if name is None or name == '':
             raise SoftLayerError('Please specify a header name.')
 
         self._headers[name] = value
