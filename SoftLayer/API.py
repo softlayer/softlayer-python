@@ -29,21 +29,17 @@ SoftLayer API bindings
 
 See U{http://sldn.softlayer.com/article/Python}
 """
-
-from urlparse import urlparse
-from SoftLayer.consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT
-from SoftLayer.transport import ProxyTransport, SecureProxyTransport
-import socket
+from SoftLayer.consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT, \
+    USER_AGENT
+from SoftLayer.transport import make_api_call
+from SoftLayer.exceptions import SoftLayerError
 import xmlrpclib
 import os
+import sys
 
 API_USERNAME = None
 API_KEY = None
 API_BASE_URL = API_PUBLIC_ENDPOINT
-
-
-class SoftLayerError(Exception):
-    pass
 
 
 class Client(object):
@@ -73,15 +69,16 @@ class Client(object):
 
     """
     _prefix = "SoftLayer_"
-    _server_proxy = xmlrpclib.ServerProxy
 
     def __init__(self, service_name=None, id=None, username=None, api_key=None,
                  endpoint_url=None, timeout=None, verbose=False):
-        self.verbose = verbose
         self._service_name = service_name
+        self.verbose = verbose
         self._headers = {}
+        self._raw_headers = {}
 
-        self.username = username or API_USERNAME or os.environ.get('SL_USERNAME')
+        self.username = username or API_USERNAME or \
+            os.environ.get('SL_USERNAME')
         self.api_key = api_key or API_KEY or os.environ.get('SL_API_KEY')
 
         if not all((self.username, self.api_key)):
@@ -93,22 +90,15 @@ class Client(object):
         if id is not None:
             self.set_init_parameter(int(id))
 
-        self._endpoint_url = (endpoint_url or API_BASE_URL or \
-            API_PUBLIC_ENDPOINT).rstrip('/')
-        http_protocol = urlparse(self._endpoint_url).scheme
-
-        if http_protocol == "https":
-            self.transport = SecureProxyTransport()
-        else:
-            self.transport = ProxyTransport()
-
+        self._endpoint_url = (endpoint_url or API_BASE_URL or
+                              API_PUBLIC_ENDPOINT).rstrip('/')
         self.timeout = timeout
 
     def add_raw_header(self, name, value):
         """ Set HTTP headers for API calls
         ..  deprecated:: 2.0.0
         """
-        self.transport.set_raw_header(name, value)
+        self._raw_headers[name] = value
 
     def add_header(self, name, value):
         """ Set a SoftLayer API call header
@@ -247,9 +237,16 @@ class Client(object):
                     'apiKey': self.api_key,
                 }}
 
+        http_headers = {
+            'User-Agent': USER_AGENT,
+            'Content-Type': 'application/xml',
+        }
+        if self._raw_headers:
+            for name, value in self._raw_headers.items():
+                http_headers[name] = value
         if raw_headers:
             for name, value in raw_headers.items():
-                self.transport.set_raw_header(name, value)
+                http_headers[name] = value
 
         if objectid is not None:
             headers[service + 'InitParameters'] = {'id': int(objectid)}
@@ -266,23 +263,15 @@ class Client(object):
 
         if limit:
             headers['resultLimit'] = {
-                    'limit': int(limit),
-                    'offset': int(offset)
-                }
+                'limit': int(limit),
+                'offset': int(offset)
+            }
+        uri = '/'.join([self._endpoint_url, service])
+        return make_api_call(uri, method, args, headers=headers,
+                             http_headers=http_headers, timeout=self.timeout,
+                             verbose=self.verbose)
 
-        __prevDefaultTimeout = socket.getdefaulttimeout()
-        try:
-            uri = '/'.join([self._endpoint_url, service])
-            socket.setdefaulttimeout(self.timeout)
-            proxy = self._server_proxy(uri, transport=self.transport,
-                                          verbose=self.verbose, allow_none=True)
-            return getattr(proxy, method)({'headers': headers}, *args)
-        except xmlrpclib.Fault, e:
-            raise SoftLayerError(e.faultString)
-        finally:
-            socket.setdefaulttimeout(__prevDefaultTimeout)
-
-    def __getattribute__(self, name):
+    def __getattr__(self, name):
         """ Attempt a SoftLayer API call
         ..  deprecated:: 2.0.0
 
@@ -292,20 +281,22 @@ class Client(object):
         attempting a SoftLayer API call and return a simple function that makes
         an XML-RPC call.
         """
-        if name == '__name__': raise AttributeError  # for help(self)
-        try:
-            return object.__getattribute__(self, name)
-        except AttributeError:
-            def call_handler(*args, **kwargs):
-                if self._service_name is None:
-                    raise SoftLayerError("Service is not set on Client instance.")
-                kwargs['headers'] = self._headers
-                return self(self._service_name, name, *args, **kwargs)
-            return call_handler
+        if name in ["__name__", "__bases__"]:
+            raise AttributeError("'Obj' object has no attribute '%s'" % name)
+
+        def call_handler(*args, **kwargs):
+            if self._service_name is None:
+                raise SoftLayerError(
+                    "Service is not set on Client instance.")
+            kwargs['headers'] = self._headers
+            return self(self._service_name, name, *args, **kwargs)
+        return call_handler
 
     def __repr__(self):
         return "<Client: endpoint=%s, user=%s>" \
             % (self._endpoint_url, self.username)
+
+    __str__ = __repr__
 
 
 class Service(object):
@@ -316,15 +307,15 @@ class Service(object):
     def __call__(self, name, *args, **kwargs):
         return self.client(self.name, name, *args, **kwargs)
 
-    def __getattribute__(self, name):
-        if name == '__name__': raise AttributeError  # for help(self)
-        try:
-            return object.__getattribute__(self, name)
-        except AttributeError:
-            def call_handler(*args, **kwargs):
-                return self(name, *args, **kwargs)
-            return call_handler
+    def __getattr__(self, name):
+        if name in ["__name__", "__bases__"]:
+            raise AttributeError("'Obj' object has no attribute '%s'" % name)
+
+        def call_handler(*args, **kwargs):
+            return self(name, *args, **kwargs)
+        return call_handler
 
     def __repr__(self):
         return "<Service: %s>" % (self.name,)
 
+    __str__ = __repr__

@@ -6,6 +6,10 @@ extra = {}
 if sys.version_info >= (3,):
     extra['use_2to3'] = True
 
+requires = ['distribute']
+if sys.version_info >= (2, 6):
+    requires.append('requests')
+
 description = "A library to contact SoftLayer's backend services"
 
 try:
@@ -20,11 +24,11 @@ setup(
     long_description=long_description,
     author='SoftLayer Technologies, Inc.',
     author_email='sldn@softlayer.com',
-    packages=['SoftLayer', 'SoftLayer.tests'],
+    packages=['SoftLayer', 'SoftLayer.tests', 'SoftLayer.transport'],
     license='The BSD License',
     zip_safe=False,
     url='http://github.com/softlayer/softlayer-api-python-client',
-    install_requires=['distribute'],
+    install_requires=requires,
     classifiers=[
         'Environment :: Console',
         'Environment :: Web Environment',

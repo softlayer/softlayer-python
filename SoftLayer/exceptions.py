@@ -1,0 +1,4 @@
+
+
+class SoftLayerError(Exception):
+    pass

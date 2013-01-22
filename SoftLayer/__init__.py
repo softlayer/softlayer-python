@@ -26,7 +26,7 @@
 """
 SoftLayer Python API Client
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-A library to contact SoftLayer's backend services through the XML-RPC interface.
+A library to contact SoftLayer's backend services through the XML-RPC interface
 See U{http://sldn.softlayer.com/article/Python}
 
 
@@ -49,5 +49,5 @@ __copyright__ = 'Copyright 2013 SoftLayer Technologies, Inc.'
 __all__ = ['Client', 'SoftLayerError', 'API_PUBLIC_ENDPOINT',
            'API_PRIVATE_ENDPOINT']
 
-from API import Client, SoftLayerError, API_PUBLIC_ENDPOINT, \
-    API_PRIVATE_ENDPOINT
+from API import Client, API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT
+from SoftLayer.exceptions import SoftLayerError
