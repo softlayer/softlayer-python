@@ -1,0 +1,98 @@
+#!/usr/bin/env python
+
+from importlib import import_module
+from pkgutil import iter_modules
+from argparse import ArgumentParser
+from sys import exit
+from types import ClassType
+
+import SoftLayer.CLI
+from SoftLayer import Client
+from SoftLayer.CLI import CLIRunnable
+
+
+def cli_client(cli_args):
+    client = Client()
+    parser = ArgumentParser(add_help=False)
+
+    action_list = []
+
+    action_list = [
+        action[1]
+        for action in iter_modules(SoftLayer.CLI.__path__)]
+
+    parser.add_argument(
+        'module',
+        help="Module name, try help or list",
+        choices=[
+            'help',
+            'list',
+        ] + action_list)
+
+    parsed_args = parser.parse_known_args(args=cli_args)[0]
+    mod = parsed_args.module.lower()
+
+    if mod == 'help':
+        parser.print_help()
+        exit(1)
+    elif mod == 'list':
+        for m in action_list:
+            h = load_module(m)
+            print("{0:>15} {1:<}".format(
+                m, h.__doc__))
+        exit(0)
+
+    parser = ArgumentParser()
+    parser.add_argument(mod)
+
+    module = load_module(mod)
+
+    parser.add_argument(
+        '--config', '-C',
+        help='Config file')
+    parser.add_argument(
+        '--really', '-y',
+        help='Confirm all prompt actions',
+        action='store_true',
+        default=False)
+
+    methods = filter(
+        lambda m: isinstance(getattr(module, m), ClassType) and
+        issubclass(getattr(module, m), CLIRunnable) and
+        m != 'CLIRunnable',
+        dir(module))
+
+    action_parser = parser.add_subparsers(dest='action')
+
+    for method in methods:
+        m = getattr(module, method)
+        subparser = action_parser.add_parser(
+            m.action,
+            help=m.__doc__
+        )
+        m.add_additional_args(subparser)
+
+    parsed_args = parser.parse_args(args=cli_args)
+    action = parsed_args.action
+
+    try:
+        call = filter(
+            lambda m: getattr(module, m).action == action,
+            methods)[0]
+    except KeyError:
+        raise ValueError("No such method exists: %s" % action)
+
+    getattr(module, call).execute(client, parsed_args)
+
+
+def load_module(mod):
+    try:
+        return import_module('SoftLayer.CLI.%s' % mod)
+    except ImportError:
+        print("Error: Module '%s' does not exist!" % mod)
+        exit(1)
+
+
+if __name__ == "__main__":
+    import sys
+    cli_client(sys.argv[1:])
