@@ -33,9 +33,7 @@ from SoftLayer.consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT, \
     USER_AGENT
 from SoftLayer.transport import make_api_call
 from SoftLayer.exceptions import SoftLayerError
-import xmlrpclib
 import os
-import sys
 
 API_USERNAME = None
 API_KEY = None

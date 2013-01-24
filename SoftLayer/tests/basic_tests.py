@@ -5,11 +5,8 @@ try:
     import unittest2 as unittest
 except ImportError:
     import unittest
-import xmlrpclib
 import os
 from mock import patch, MagicMock
-
-XMLRPCNAME = xmlrpclib.__name__
 
 
 class Inititialization(unittest.TestCase):

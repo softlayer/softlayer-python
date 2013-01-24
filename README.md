@@ -63,14 +63,8 @@ For a more complex example we'll retrieve a support ticket with id 123456 along 
 
 Retreive a ticket using Object Masks.
 ```python
-ticket = client['Ticket'].getObject(id=123456,
-    mask={
-        'updates' : None,
-        'assignedUser' : None,
-        'attachedHardware' : {
-            'datacenter' : None
-        },
-    })
+ticket = client['Ticket'].getObject(
+    id=123456, mask="mask[updates, assignedUser, attachedHardware.datacenter]")
 ```
 
 Now add an update to the ticket.
@@ -117,7 +111,7 @@ client.getObject()
 ```python
 import SoftLayer
 client = SoftLayer.Client(username='username', api_key='api_key')
-client['Account'].getObject(mask={'updates' : None}, limit=10, offset=0)
+client['Account'].getObject(mask="mask[ipAddresses]", limit=10, offset=0)
 ```
 
 ### Deprecated APIs
@@ -163,7 +157,7 @@ service.getObject()
 client.set_object_mask({'updates' : None})
 
 # New
-client['Account'].getObject(mask={'updates' : None})
+client['Account'].getObject(mask="mask[ipAddresses]")
 ```
 
 **Using Init Parameter**
