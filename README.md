@@ -103,7 +103,7 @@ If you've been using the older Python client, you'll be happy to know that the o
 ```python
 import SoftLayer.API
 client = SoftLayer.API.Client('SoftLayer_Account', None, 'username', 'api_key')
-client.set_object_mask({'updates' : None})
+client.set_object_mask({'ipAddresses' : None})
 client.set_result_limit(10, offset=10)
 client.getObject()
 ```
@@ -154,7 +154,7 @@ service.getObject()
 **Setting Object Mask**
 ```python
 # Old
-client.set_object_mask({'updates' : None})
+client.set_object_mask({'ipAddresses' : None})
 
 # New
 client['Account'].getObject(mask="mask[ipAddresses]")
