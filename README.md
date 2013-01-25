@@ -5,7 +5,7 @@ This code provides a simple Python library to use the [SoftLayer API](http://sld
 Overview
 --------
 
-This library provides a simple interface to interact with SoftLayer's XML-RPC API and provides support for many of SoftLayer API's features like [object masks](http://sldn.softlayer.com/article/Using-Object-Masks-SoftLayer-API).
+This library provides a simple interface to interact with SoftLayer's XML-RPC API and provides support for many of SoftLayer API's features like [object masks](http://sldn.softlayer.com/article/Using-Object-Masks-SoftLayerrAPI).
 
 Installation
 ------------
@@ -33,7 +33,7 @@ System Requirements
 ## Getting Started
 You can pass in your username and api_key when creating a SoftLayer client instance. However, you can set these in the environmental variables 'SL_USERNAME' and 'SL_API_KEY'
 
-Here's a simple usage example that retrieves account information by calling the [getObject](http://sldn.softlayer.com/wiki/index.php/SoftLayer_Account::getObject) method on the [SoftLayer_Account](http://sldn.softlayer.com/wiki/index.php/SoftLayer_Account) service.
+Here's a simple usage example that retrieves account information by calling the [getObject](http://sldn.softlayer.com/reference/services/SoftLayer_Account/getObject) method on the [SoftLayer_Account](http://sldn.softlayer.com/reference/services/SoftLayer_Account) service.
 
 Creating a client instance
 ```python
