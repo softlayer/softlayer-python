@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2010, SoftLayer Technologies, Inc. All rights reserved.
+# Copyright (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -28,43 +28,25 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 # The SoftLayer API client package is here:
-import SoftLayer.API
-
-# Used for pretty printing output.
+import SoftLayer
 import pprint
 
-# It's possible to define your SoftLayer API username and key directly in the
-# package, but it's far easier to define them before creating your API client.
-api_username = 'set me'
-api_key = 'set me too'
-
 # Usage:
-# SoftLayer.API.Client([API Service], <object id>, [username], [API key])
+# SoftLayer.Client(username=[username], api_key=[API key])
 #
-# API Service: The name of the API service you wish to connect to.
-# id:          An optional id to initialize your API service with, if you're
-#              interacting with a specific object. If you don't need to specify
-#              an id then pass None to the client.
 # username:    Your SoftLayer API username.
 # API key:     Your SoftLayer API key,
-client = SoftLayer.API.Client('SoftLayer_Account', None, api_username, api_key)
+client = SoftLayer.Client(username=api_username, api_key=api_key)
 
 # Once your client object is created you can call API methods for that service
-# directly against your client object. A call may throw an exception on error,
-# so it's best to try your call and catch exceptions.
+# directly against your client object. Each call may throw an raise a
+# SoftLayerError exception.
 #
 # This example calls the getObject() method in the SoftLayer_Account API
 # service. <http://sldn.softlayer.com/wiki/index.php/SoftLayer_Account::getObject>
 # It retrieves basic account information, and is a great way to test your API
 # account and connectivity.
-#
-# If you're using Python 3.x then you'll need to change these except and
-# print() statements accordingly.
-try:
-    pprint.pprint(client.getObject())
-except Exception, e:
-    print e
-
+pprint.pprint(client['Account'].getObject())
 
 # For a more complex example we’ll retrieve a support ticket with id 123456
 # along with the ticket’s updates, the user it’s assigned to, the servers
@@ -72,32 +54,17 @@ except Exception, e:
 # extra information using a nested object mask. After we have the ticket we’ll
 # update it with the text ‘Hello!’.
 
-# Declare an API client to connect to the SoftLayer_Ticket API service.
-client = SoftLayer.API.Client('SoftLayer_Ticket', 123456, api_username, api_key)
-
-# Assign an object mask to our API client:
-client.set_object_mask({
-    'updates' : {},
-    'assignedUser' : {},
-    'attachedHardware' : {
-        'datacenter' : {}
-    },
-})
-
 # Retrieve the ticket record.
-ticket = None
-try:
-    ticket = client.getObject()
-except Exception, e:
-    print "Unable to retrieve ticket record: ", e
+ticket = client['Ticket'].getObject(id=123456,
+    mask={
+        'updates' : None,
+        'assignedUser' : None,
+        'attachedHardware' : {
+            'datacenter' : None
+        },
+    })
+pprint.pprint(ticket)
 
 # Now update the ticket.
-update = {
-    'entry' : 'Hello!',
-}
-
-try:
-    update = client.addUpdate(update)
-    print "Update ticket 123456. The new update's id is %s." % update[0]['id']
-except Exception, e:
-    print "Unable to update ticket: ", e
+update = client['Ticket'].addUpdate(id=123456, {'entry' : 'Hello!'})
+pprint.pprint(update)

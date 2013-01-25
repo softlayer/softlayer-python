@@ -1,4 +1,4 @@
-# Copyright (c) 2010, SoftLayer Technologies, Inc. All rights reserved.
+# Copyright (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -23,7 +23,31 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+"""
+SoftLayer Python API Client
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A library to contact SoftLayer's backend services through the XML-RPC interface
+See U{http://sldn.softlayer.com/article/Python}
 
-__all__ = ['API']
 
-from API import *
+usage:
+
+    >>> import SoftLayer
+    >>> client = SoftLayer.Client(username="username", api_key="api_key")
+    >>> resp = client['SoftLayer_Account'].getObject()
+    >>> resp['companyName']
+    'Your Company'
+
+"""
+from SoftLayer.consts import VERSION
+
+__title__ = 'SoftLayer'
+__version__ = VERSION
+__author__ = 'SoftLayer Technologies, Inc.'
+__license__ = 'The BSD License'
+__copyright__ = 'Copyright 2013 SoftLayer Technologies, Inc.'
+__all__ = ['Client', 'SoftLayerError', 'API_PUBLIC_ENDPOINT',
+           'API_PRIVATE_ENDPOINT']
+
+from API import Client, API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT
+from SoftLayer.exceptions import SoftLayerError
