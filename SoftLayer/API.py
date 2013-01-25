@@ -1,4 +1,4 @@
-# Copyright (c) 2010, SoftLayer Technologies, Inc. All rights reserved.
+# Copyright (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -29,190 +29,101 @@ SoftLayer API bindings
 
 See U{http://sldn.softlayer.com/article/Python}
 """
-
-from urllib import splittype
-import socket
-import httplib
-import xmlrpclib
-import sys
-
-"""
-@type API_USERNAME: C{str}
-@var API_USERNAME: Your API username, if you wish to hardcode all API calls to
-a single user.
-
-@type API_KEY: C{str}
-@var API_KEY: Your API key, if you wish to hardcode all API calls to a single
-user.
-
-@type API_PUBLIC_ENDPOINT: C{str}
-@var API_PUBLIC_ENDPOINT: The base URL of the SoftLayer API's XML-RPC
-endpoints over the public Internet.
-
-@type API_PRIVATE_ENDPOINT: C{str}
-@var API_PRIVATE_ENDPOINT: The base URL of the SoftLayer API's XML-RPC
-endpoints over SoftLayer's private network.
-
-@type API_BASE_URL: C{str}
-@var API_BASE_URL: The base URL for the SoftLayer API's XML-RPC endpoints.
-"""
+from SoftLayer.consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT, \
+    USER_AGENT
+from SoftLayer.transport import make_api_call
+from SoftLayer.exceptions import SoftLayerError
+import os
 
 API_USERNAME = None
 API_KEY = None
-API_PUBLIC_ENDPOINT = 'https://api.softlayer.com/xmlrpc/v3/'
-API_PRIVATE_ENDPOINT = 'https://api.service.softlayer.com/xmlrpc/v3/'
 API_BASE_URL = API_PUBLIC_ENDPOINT
 
 
-class SoftLayerError(Exception):
-    pass
+class Client(object):
+    """A SoftLayer API client
 
-
-class Client:
-    """
-    A SoftLayer API client
-
-    Clients are intended to be declared once per service and used for all calls
-    made to that service.
-
-    @ivar _service_name: The name of the SoftLayer API service to query
-    @ivar _endpoint_url: The base URL to the SoftLayer API's endpoints being
-    used by this client.
-    @ivar _headers: The headers to send to an API call
-    @ivar _client: The xmlrpc client used to make calls
-    """
-    _service_name = None
-    _endpoint_url = None
-    _headers = {}
-    _xmlrpc_client = None
-
-    def __init__(self, service_name, id=None, username=None, api_key=None,
-            endpoint_url=None, timeout=None, verbose=False):
-        """
-        Create a SoftLayer API client
-
-        @type service_name: C{str}
-        @param service:name: The name of the SoftLayer API service to query.
-
-        @type id: C{int}
-        @param id: An optional object if if you're instantiating a particular
+    :param service_name: The name of the SoftLayer API service to query.
+    :param id: An optional object if if you're instantiating a particular
         SoftLayer_API object. Setting an id defines this client's
         initialization parameter.
-
-        @type username: C{str}
-        @param username: An optional API username if you wish to bypass the
+    :param username: An optional API username if you wish to bypass the
         package's built-in username.
-
-        @type api_key: C{str}
-        @param api_key: An optional API key if you wish to bypass the package's
+    :param api_key: An optional API key if you wish to bypass the package's
         built in API key.
-
-        @type endpoint_url: C{str}
-        @param endpoint_url: The API endpoint base URL you wish to connect to.
+    :param endpoint_url: The API endpoint base URL you wish to connect to.
         Set this to API_PRIVATE_ENDPOINT to connect via SoftLayer's private
         network.
-        """
-        service_name = service_name.strip()
+    :param timeout: Timeout for API requests
+    :param verbose: When true, prints details about every HTTP request.
 
-        if service_name is None or service_name is '':
-            raise SoftLayerError('Please specify a service name.')
+    Usage::
 
-        if username is None and API_USERNAME is None:
-            raise SoftLayerError('Please provide a username.')
+        >>> import SoftLayer
+        >>> client = SoftLayer.Client(username="username", api_key="api_key")
+        >>> resp = client['SoftLayer_Account'].getObject()
+        >>> resp['companyName']
+        'Your Company'
 
-        if api_key is None and API_KEY is None:
-            raise SoftLayerError('Please provide an API key.')
+    """
+    _prefix = "SoftLayer_"
 
-        # Assign local variables
+    def __init__(self, service_name=None, id=None, username=None, api_key=None,
+                 endpoint_url=None, timeout=None, verbose=False):
         self._service_name = service_name
+        self.verbose = verbose
+        self._headers = {}
+        self._raw_headers = {}
 
-        # Set authentication
-        if API_USERNAME is None or API_USERNAME is '':
-            user = username.strip()
-        else:
-            user = API_USERNAME.strip()
+        self.username = username or API_USERNAME or \
+            os.environ.get('SL_USERNAME')
+        self.api_key = api_key or API_KEY or os.environ.get('SL_API_KEY')
 
-        if API_KEY is None or API_KEY is '':
-            key = api_key.strip()
-        else:
-            key = API_KEY.strip()
+        if not all((self.username, self.api_key)):
+            raise SoftLayerError(
+                'Must supply username and api_key')
 
-        self.set_authentication(user, key)
+        self.set_authentication(self.username, self.api_key)
 
-        # Default to use the public network API endpoint, otherwise use the
-        # endpoint defined in API_PUBLIC_ENDPOINT, otherwise use the one
-        # provided by the user.
-        if endpoint_url is not None and endpoint_url is not '':
-            endpoint_url = endpoint_url.strip()
-            self._endpoint_url = endpoint_url
-        elif API_BASE_URL is not None and API_BASE_URL is not '':
-            self._endpoint_url = API_BASE_URL
-        else:
-            self._endpoint_url = API_PUBLIC_ENDPOINT
-
-        # Set a call initialization parameter if we need to.
         if id is not None:
             self.set_init_parameter(int(id))
 
-        http_protocol, uri = splittype(self._endpoint_url)
-
-        if http_protocol == "https":
-            self.transport = SecureProxyTransport()
-        else:
-            self.transport = ProxyTransport()
-
-        if timeout and int(timeout) > 0:
-            self.transport.set_timeout(int(timeout))
-
-        # Finally, make an xmlrpc client. We'll use this for all API calls made
-        # against this client instance.
-        uri = ''.join([self._endpoint_url, self._service_name])
-        self._xmlrpc_client = xmlrpclib.ServerProxy(uri,
-            transport=self.transport, verbose=verbose)
+        self._endpoint_url = (endpoint_url or API_BASE_URL or
+                              API_PUBLIC_ENDPOINT).rstrip('/')
+        self.timeout = timeout
 
     def add_raw_header(self, name, value):
-        self.transport.raw_headers[name] = value
+        """ Set HTTP headers for API calls
+        ..  deprecated:: 2.0.0
+        """
+        self._raw_headers[name] = value
 
     def add_header(self, name, value):
-        """
-        Set a SoftLayer API call header
+        """ Set a SoftLayer API call header
+        ..  deprecated:: 2.0.0
 
-        Every header defines a customization specific to a SoftLayer API call.
-        Most API calls require authentication and initialization parameter
-        headers, but can also include optional headers such as object masks and
-        result limits if they're supported by the API method you're calling.
-
-        @type name: C{str}
-        @param name: The name of the header to add
-
-        @type value: C{dict}
-        @param value: The header to add.
+        :param name: The name of the header to add
+        :param value: The header to add.
         """
         name = name.strip()
-
-        if name is None or name is '':
+        if name is None or name == '':
             raise SoftLayerError('Please specify a header name.')
 
         self._headers[name] = value
 
     def remove_header(self, name):
+        """ Remove a SoftLayer API call header
+        ..  deprecated:: 2.0.0
+
+        :param name: The name of the header to remove.
         """
-        Remove a SoftLayer API call header
-
-        Removing headers may cause API queries to fail.
-
-        @type name: C{str}
-        @param name: The name of the header to remove.
-        """
-
-        name = name.strip()
 
         if name in self._headers:
-            del self._headers[name]
+            del self._headers[name.strip()]
 
     def set_authentication(self, username, api_key):
-        """
-        Set a user and key to authenticate a SoftLayer API call
+        """ Set user and key to authenticate a SoftLayer API call
+        ..  deprecated:: 2.0.0
 
         Use this method if you wish to bypass the API_USER and API_KEY class
         constants and set custom authentication per API call.
@@ -220,24 +131,18 @@ class Client:
         See U{https://manage.softlayer.com/Administrative/apiKeychain} for more
         information.
 
-        @type username: C{str}
-        @param username: The username to authenticate an API call.
-
-        @type api_key: C{str}
-        @param api_key: The user's API key.
+        :param username: The username to authenticate an API call.
+        :param api_key: The user's API key.
         """
 
-        username = username.strip()
-        api_key = api_key.strip()
-
         self.add_header('authenticate', {
-            'username': username,
-            'apiKey': api_key,
+            'username': username.strip(),
+            'apiKey': api_key.strip(),
         })
 
     def set_init_parameter(self, id):
-        """
-        Set an initialization parameter header on a SoftLayer API call
+        """ Set an initialization parameter header
+        ..  deprecated:: 2.0.0
 
         Initialization parameters instantiate a SoftLayer API service object to
         act upon during your API method call. For instance, if your account has
@@ -248,8 +153,7 @@ class Client:
         See U{http://sldn.softlayer.com/article/Using-Initialization-Parameters-SoftLayer-API}
         for more information.
 
-        @type id: C{int}
-        @param id: The id number of the SoftLayer API object to instantiate
+        :param id: The id number of the SoftLayer API object to instantiate
         """
 
         self.add_header(self._service_name + 'InitParameters', {
@@ -257,8 +161,8 @@ class Client:
         })
 
     def set_object_mask(self, mask):
-        """
-        Set an object mask to a SoftLayer API call
+        """ Set an object mask to a SoftLayer API call
+        ..  deprecated:: 2.0.0
 
         Use an object mask to retrieve data related your API call's result.
         Object masks are skeleton objects, or strings that define nested
@@ -267,8 +171,7 @@ class Client:
         U{http://sldn.softlayer.com/article/Using-Object-Masks-SoftLayer-API}
         for more information.
 
-        @type mask: C{dict}
-        @param mask: The object mask you wish to define
+        :param mask: The object mask you wish to define
         """
 
         header = 'SoftLayer_ObjectMask'
@@ -279,18 +182,15 @@ class Client:
         self.add_header(header, {'mask': mask})
 
     def set_result_limit(self, limit, offset=0):
-        """
-        Set a result limit on a SoftLayer API call
+        """ Set a result limit on a SoftLayer API call
+        ..  deprecated:: 2.0.0
 
         Many SoftLayer API methods return a group of results. These methods
         support a way to limit the number of results retrieved from the
         SoftLayer API in a way akin to an SQL LIMIT statement.
 
-        @type limit: C{int}
-        @param limit: The number of results to limit a SoftLayer API call to.
-
-        @type offset: C{int}
-        @param offset: An optional offset to begin a SoftLayer API call's
+        :param limit: The number of results to limit a SoftLayer API call to.
+        :param offset: An optional offset to begin a SoftLayer API call's
         returned result at.
         """
 
@@ -299,9 +199,78 @@ class Client:
             'offset': int(offset)
         })
 
-    def __getattr__(self, name):
+    def __getitem__(self, name):
+        """ Get a SoftLayer Service
+
+        :param name: The name of the service. E.G. SoftLayer_Account
         """
-        Attempt a SoftLayer API call
+        if not name.startswith(self._prefix):
+            name = self._prefix + name
+        return Service(self, name)
+
+    def __format_filter_dict(self, d):
+        for key, value in d.iteritems():
+            if isinstance(value, dict):
+                d[key] = self.__format_filter_dict(value)
+                return d
+            else:
+                d[key] = {'operation': value}
+                return d
+
+    def __call__(self, service, method, *args, **kwargs):
+        """ Place a SoftLayer API call """
+        objectid = kwargs.get('id')
+        objectmask = kwargs.get('mask')
+        objectfilter = kwargs.get('filter')
+        headers = kwargs.get('headers')
+        raw_headers = kwargs.get('raw_headers')
+        limit = kwargs.get('limit')
+        offset = kwargs.get('offset', 0)
+
+        if headers is None:
+            headers = {
+                'authenticate': {
+                    'username': self.username,
+                    'apiKey': self.api_key,
+                }}
+
+        http_headers = {
+            'User-Agent': USER_AGENT,
+            'Content-Type': 'application/xml',
+        }
+        if self._raw_headers:
+            for name, value in self._raw_headers.items():
+                http_headers[name] = value
+        if raw_headers:
+            for name, value in raw_headers.items():
+                http_headers[name] = value
+
+        if objectid is not None:
+            headers[service + 'InitParameters'] = {'id': int(objectid)}
+
+        if objectmask is not None:
+            mheader = self._prefix + 'ObjectMask'
+            if isinstance(objectmask, dict):
+                mheader = '%sObjectMask' % service
+            headers[mheader] = {'mask': objectmask}
+
+        if objectfilter is not None:
+            headers['%sObjectFilter' % service] = \
+                self.__format_filter_dict(objectfilter)
+
+        if limit:
+            headers['resultLimit'] = {
+                'limit': int(limit),
+                'offset': int(offset)
+            }
+        uri = '/'.join([self._endpoint_url, service])
+        return make_api_call(uri, method, args, headers=headers,
+                             http_headers=http_headers, timeout=self.timeout,
+                             verbose=self.verbose)
+
+    def __getattr__(self, name):
+        """ Attempt a SoftLayer API call
+        ..  deprecated:: 2.0.0
 
         Use this as a catch-all so users can call SoftLayer API methods
         directly against their client object. If the property or method
@@ -309,80 +278,41 @@ class Client:
         attempting a SoftLayer API call and return a simple function that makes
         an XML-RPC call.
         """
-        try:
-            return object.__getattr__(self, name)
-        except AttributeError:
-            def call_handler(*args, **kwargs):
-                """
-                Place a SoftLayer API call
-                """
+        if name in ["__name__", "__bases__"]:
+            raise AttributeError("'Obj' object has no attribute '%s'" % name)
 
-                call_headers = {
-                    'headers': self._headers,
-                }
-
-                try:
-                    return self._xmlrpc_client.__getattr__(name)(call_headers, *args)
-                except xmlrpclib.Fault, e:
-                    raise SoftLayerError(e.faultString)
-
-            return call_handler
+        def call_handler(*args, **kwargs):
+            if self._service_name is None:
+                raise SoftLayerError(
+                    "Service is not set on Client instance.")
+            kwargs['headers'] = self._headers
+            return self(self._service_name, name, *args, **kwargs)
+        return call_handler
 
     def __repr__(self):
-        """
-        Define __repr__
+        return "<Client: endpoint=%s, user=%s>" \
+            % (self._endpoint_url, self.username)
 
-        We want to have a string representation of the object that
-        is meaningful and gives as much information as possible so that
-        comandline operations make sense, and so that the client does not
-        throw needless exceptions on repr()
-        """
-        init_param_key = "%sInitParameters" % (self._service_name,)
-        if (init_param_key in self._headers and
-            "id" in self._headers[init_param_key]):
-            return "<%r Instance [ID: %r]>" % (self._service_name,
-                                          self._headers[init_param_key]['id'],)
-        else:
-            return "<%r Instance>" % (self._service_name,)
+    __str__ = __repr__
 
 
-class ProxyTransport(xmlrpclib.Transport):
-    timeout = 15
-    __extra_headers = {}
+class Service(object):
+    def __init__(self, client, name):
+        self.client = client
+        self.name = name
 
-    def send_content(self, connection, request_body):
-        for k, v in self.__extra_headers:
-            connection.putheader(k, v)
-        connection.putheader("Content-Type", "text/xml")
-        connection.putheader("Content-Length", str(len(request_body)))
-        connection.endheaders()
-        if request_body:
-            connection.send(request_body)
+    def __call__(self, name, *args, **kwargs):
+        return self.client(self.name, name, *args, **kwargs)
 
-    def set_timeout(self, timeout):
-        self.timeout = timeout
+    def __getattr__(self, name):
+        if name in ["__name__", "__bases__"]:
+            raise AttributeError("'Obj' object has no attribute '%s'" % name)
 
+        def call_handler(*args, **kwargs):
+            return self(name, *args, **kwargs)
+        return call_handler
 
-class SecureProxyTransport(xmlrpclib.SafeTransport, ProxyTransport):
-    def make_connection(self, host):
-        try:
-            if self._connection and host == self._connection[0]:
-                return self._connection[1]
-            # create a HTTPS connection object from a host descriptor
-            # host may be a string, or a (host, x509-dict) tuple
-            HTTPS = httplib.HTTPSConnection
-            chost, self._extra_headers, x509 = self.get_host_info(host)
-            self._connection = host, HTTPS(chost, None, **(x509 or {}))
-            return self._connection[1]
-        except AttributeError:
-            host, extra_headers, x509 = self.get_host_info(host)
-            try:
-                HTTPS = httplib.HTTPS
-            except AttributeError:
-                raise NotImplementedError(
-                    "your version of httplib doesn't support HTTPS"
-                    )
-            else:
-                client = HTTPS(host, None, **(x509 or {}))
-                client._conn.timeout = self.timeout
-                return client
+    def __repr__(self):
+        return "<Service: %s>" % (self.name,)
+
+    __str__ = __repr__

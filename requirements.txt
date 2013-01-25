@@ -1,1 +1,4 @@
 tox
+nose
+mock
+coverage
