@@ -5,7 +5,7 @@ This code provides a simple Python library to use the [SoftLayer API](http://sld
 Overview
 --------
 
-This library provides a simple interface to interact with SoftLayer's XML-RPC API and provides support for many of SoftLayer API's features like [object masks](http://sldn.softlayer.com/article/Using-Object-Masks-SoftLayerrAPI).
+This library provides a simple interface to interact with SoftLayer's XML-RPC API and provides support for many of SoftLayer API's features like [object masks](http://sldn.softlayer.com/article/Using-Object-Masks-SoftLayer-API).
 
 Installation
 ------------
