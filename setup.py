@@ -1,5 +1,6 @@
 from setuptools import setup
 import sys
+import os
 
 # Python 3 conversion
 extra = {}
@@ -12,9 +13,13 @@ if sys.version_info >= (2, 6):
 
 description = "A library to contact SoftLayer's backend services"
 
-try:
-    long_description = read('README.md')
-except:
+if os.path.exists('README.md'):
+    f = open('README.md')
+    try:
+        long_description = f.read()
+    finally:
+        f.close()
+else:
     long_description = description
 
 setup(
