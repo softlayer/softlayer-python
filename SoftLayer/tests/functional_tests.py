@@ -28,7 +28,7 @@ class UnauthedUser(unittest.TestCase):
         client = SoftLayer.Client(
             'SoftLayer_User_Customer', None, 'doesnotexist', 'issurelywrong',
             timeout=20)
-        self.assertRaises(SoftLayer.SoftLayerError,
+        self.assertRaises(SoftLayer.SoftLayerAPIError,
                           client.getPortalLoginToken)
 
     @patch('SoftLayer.API.make_api_call', xmlrpclib_transport.make_api_call)
@@ -36,8 +36,33 @@ class UnauthedUser(unittest.TestCase):
         client = SoftLayer.Client(
             'SoftLayer_User_Customer', None, 'doesnotexist', 'issurelywrong',
             timeout=20)
-        self.assertRaises(SoftLayer.SoftLayerError,
+        self.assertRaises(SoftLayer.SoftLayerAPIError,
                           client.getPortalLoginToken)
+
+    def test_404(self):
+        client = SoftLayer.Client(
+            'SoftLayer_User_Customer', None, 'doesnotexist', 'issurelywrong',
+            timeout=20, endpoint_url='http://httpbin.org/status/404')
+
+        try:
+            client.doSomething()
+        except SoftLayer.SoftLayerAPIError, e:
+            self.assertEqual(e.faultCode, 404)
+            self.assertEqual(e.faultString, 'NOT FOUND')
+            self.assertEqual(e.faultString, 'NOT FOUND')
+
+    @patch('SoftLayer.API.make_api_call', xmlrpclib_transport.make_api_call)
+    def test_404_with_xmlrpc_transport(self):
+        client = SoftLayer.Client(
+            'SoftLayer_User_Customer', None, 'doesnotexist', 'issurelywrong',
+            timeout=20, endpoint_url='http://httpbin.org/status/404')
+
+        try:
+            client.doSomething()
+        except SoftLayer.SoftLayerAPIError, e:
+            self.assertEqual(e.faultCode, 404)
+            self.assertEqual(e.faultString, 'NOT FOUND')
+            self.assertEqual(e.faultString, 'NOT FOUND')
 
 
 class AuthedUser(unittest.TestCase):
@@ -48,8 +73,13 @@ class AuthedUser(unittest.TestCase):
             api_key=creds['api_key'],
             endpoint_url=creds['endpoint'],
             timeout=20)
-        self.assertRaises(SoftLayer.SoftLayerError,
-                          client["SoftLayer_DOESNOTEXIST"].getObject)
+
+        try:
+            client["SoftLayer_DOESNOTEXIST"].getObject()
+        except SoftLayer.SoftLayerAPIError, e:
+            self.assertEqual(e.faultCode, '-32601')
+            self.assertEqual(e.faultString, 'Service does not exist')
+            self.assertEqual(e.faultString, 'Service does not exist')
 
     def test_dns(self):
         creds = get_creds()
