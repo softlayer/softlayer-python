@@ -1,6 +1,7 @@
 from SoftLayer.exceptions import (
-    SoftLayerAPIError, ParseError, ServerError, ApplicationError,
-    RemoteSystemError, TransportError)
+    SoftLayerAPIError, NotWellFormed, UnsupportedEncoding, InvalidCharacter,
+    SpecViolation, MethodNotFound, InvalidMethodParameters, InternalError,
+    ApplicationError, RemoteSystemError, TransportError)
 import xmlrpclib
 import requests
 
@@ -27,13 +28,13 @@ def make_api_call(uri, method, args, headers=None,
         # These exceptions are formed from the XML-RPC spec
         # http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
         error_mapping = {
-            '-32700': ParseError,
-            '-32701': ParseError,
-            '-32702': ParseError,
-            '-32600': ServerError,
-            '-32601': ServerError,
-            '-32602': ServerError,
-            '-32603': ServerError,
+            '-32700': NotWellFormed,
+            '-32701': UnsupportedEncoding,
+            '-32702': InvalidCharacter,
+            '-32600': SpecViolation,
+            '-32601': MethodNotFound,
+            '-32602': InvalidMethodParameters,
+            '-32603': InternalError,
             '-32500': ApplicationError,
             '-32400': RemoteSystemError,
             '-32300': TransportError,

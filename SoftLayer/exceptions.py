@@ -42,3 +42,31 @@ class RemoteSystemError(SoftLayerAPIError):
 
 class TransportError(SoftLayerAPIError):
     " Transport Error "
+
+
+class NotWellFormed(ParseError):
+    pass
+
+
+class UnsupportedEncoding(ParseError):
+    pass
+
+
+class InvalidCharacter(ParseError):
+    pass
+
+
+class SpecViolation(ServerError):
+    pass
+
+
+class MethodNotFound(ServerError):
+    pass
+
+
+class InvalidMethodParameters(ServerError):
+    pass
+
+
+class InternalError(ServerError):
+    pass
