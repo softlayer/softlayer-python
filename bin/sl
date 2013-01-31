@@ -111,20 +111,22 @@ def parse_config(files):
 
     cp = SafeConfigParser()
     cp.read(config_files)
+    config = {}
 
     try:
         username = cp.get('softlayer', 'username')
         password = cp.get('softlayer', 'api_key')
-    except NoSectionError:
-        raise ValueError(
-            "The specified config file is missing section 'softlayer'")
-    except NoOptionError:
-        raise ValueError(
-            "Specified config missing either username or api_key")
-    except:
-        return {}
+    except (NoSectionError, NoOptionError):
+        pass
+    else:
+        config.update({"username": username, "api_key": password})
 
-    return {"username": username, "api_key": password}
+    try:
+        config['endpoint_url'] = cp.get('softlayer', 'endpoint_url')
+    except (NoOptionError, NoSectionError):
+        pass
+
+    return config
 
 
 def load_module(mod):
