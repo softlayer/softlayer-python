@@ -7,7 +7,7 @@ extra = {}
 if sys.version_info >= (3,):
     extra['use_2to3'] = True
 
-requires = ['distribute']
+requires = ['distribute', 'prettytable']
 if sys.version_info >= (2, 6):
     requires.append('requests')
 
@@ -24,15 +24,20 @@ else:
 
 setup(
     name='SoftLayer',
-    version='2.0.0',
+    version='2.1.0',
     description=description,
     long_description=long_description,
     author='SoftLayer Technologies, Inc.',
     author_email='sldn@softlayer.com',
-    packages=['SoftLayer', 'SoftLayer.tests', 'SoftLayer.transport'],
+    packages=[
+        'SoftLayer',
+        'SoftLayer.tests',
+        'SoftLayer.transport',
+        'SoftLayer.CLI'],
     license='The BSD License',
     zip_safe=False,
     url='http://github.com/softlayer/softlayer-api-python-client',
+    scripts=['bin/sl'],
     install_requires=requires,
     classifiers=[
         'Environment :: Console',
