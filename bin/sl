@@ -5,14 +5,14 @@ from pkgutil import iter_modules
 from argparse import ArgumentParser
 from sys import exit
 from types import ClassType
+from ConfigParser import SafeConfigParser, NoOptionError, NoSectionError
 
 import SoftLayer.CLI
-from SoftLayer import Client
+from SoftLayer import Client, SoftLayerError
 from SoftLayer.CLI import CLIRunnable
 
 
 def cli_client(cli_args):
-    client = Client()
     parser = ArgumentParser(add_help=False)
 
     action_list = []
@@ -82,7 +82,49 @@ def cli_client(cli_args):
     except KeyError:
         raise ValueError("No such method exists: %s" % action)
 
-    getattr(module, call).execute(client, parsed_args)
+    client_params = {}
+    config_files = []
+    config_files.append("~/.softlayer")
+
+    if parsed_args.config:
+        config_files.append(parsed_args.config)
+
+    try:
+        client_params = parse_config(config_files)
+    except ValueError, e:
+        if parsed_args.config:
+            print(e)
+
+    try:
+        client = Client(**client_params)
+    except SoftLayerError, e:
+        print(e)
+        exit(1)
+    else:
+        getattr(module, call).execute(client, parsed_args)
+
+
+def parse_config(files):
+    import os.path
+
+    config_files = [os.path.expanduser(f) for f in files]
+
+    cp = SafeConfigParser()
+    cp.read(config_files)
+
+    try:
+        username = cp.get('softlayer', 'username')
+        password = cp.get('softlayer', 'api_key')
+    except NoSectionError:
+        raise ValueError(
+            "The specified config file is missing section 'softlayer'")
+    except NoOptionError:
+        raise ValueError(
+            "Specified config missing either username or api_key")
+    except:
+        return {}
+
+    return {"username": username, "api_key": password}
 
 
 def load_module(mod):
