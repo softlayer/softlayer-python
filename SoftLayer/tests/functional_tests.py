@@ -73,10 +73,8 @@ class UnauthedUser(unittest.TestCase):
                 'http://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab.com', 'getObject')
         except SoftLayer.SoftLayerAPIError, e:
             self.assertEqual(e.faultCode, 0)
-            self.assertIn(
-                'nodename nor servname provided, or not known', e.faultString)
-            self.assertIn(
-                'nodename nor servname provided, or not known', e.reason)
+            self.assertIn('not known', e.faultString)
+            self.assertIn('not known', e.reason)
         except:
             self.fail('No Exception Raised')
 
@@ -87,10 +85,8 @@ class UnauthedUser(unittest.TestCase):
                 'http://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab.com', 'getObject')
         except SoftLayer.SoftLayerAPIError, e:
             self.assertEqual(e.faultCode, 0)
-            self.assertIn(
-                'nodename nor servname provided, or not known', e.faultString)
-            self.assertIn(
-                'nodename nor servname provided, or not known', e.reason)
+            self.assertIn('not known', e.faultString)
+            self.assertIn('not known', e.reason)
         except:
             self.fail('No Exception Raised')
 
