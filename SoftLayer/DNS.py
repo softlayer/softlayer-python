@@ -1,5 +1,5 @@
 from time import strftime
-from SoftLayer import SoftLayerError
+from SoftLayer.exceptions import SoftLayerError
 
 
 __all__ = ["DNSZoneNotFound", "DNSManager"]
@@ -23,7 +23,7 @@ class DNSManager(object):
 
     def list_zones(self):
         account = self.client['Account']
-        acc = account.getObject(mask={'domains': {}})
+        acc = account.getObject(mask='mask.domains')
         return acc['domains']
 
     def get_zone(self, domain):

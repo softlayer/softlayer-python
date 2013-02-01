@@ -1,9 +1,8 @@
 #!/usr/bin/env python
+"""Manages DNS"""
 
 from SoftLayer.CLI import CLIRunnable, no_going_back
 from SoftLayer.DNS import DNSManager
-
-__doc__ = "Manages DNS"
 
 
 def add_zone_arguments(parser):

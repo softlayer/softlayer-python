@@ -1,8 +1,9 @@
 #!/usr/bin/env python
+"""Manage, delete, order Compute instances"""
+
 from SoftLayer.CLI import CLIRunnable, Table, no_going_back, confirm
 from functools import partial
 
-__doc__ = "Manage, delete, order Compute instances"
 
 class ListCCIs(CLIRunnable):
     """ List all CCI's on the account"""

@@ -33,8 +33,7 @@ class Table(PrettyTable):
 
 
 def valid_response(prompt, *valid):
-    while True:
-        ans = raw_input(prompt).lower()
+    ans = raw_input(prompt).lower()
 
     if ans in valid:
         return True
