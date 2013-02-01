@@ -33,9 +33,9 @@ System Requirements
 Suggested Reading
 -----------------
 
-* [Our wiki](https://github.com/softlayer/softlayer-api-python-client/wiki)
-* [The API](https://github.com/softlayer/softlayer-api-python-client/wiki/API-Usage)
-* [CLI tool](https://github.com/softlayer/softlayer-api-python-client/wiki/Cli)
+* [Our wiki](https://github.com/CrackerJackMack/softlayer-api-python-client/wiki)
+* [The API](https://github.com/CrackerJackMack/softlayer-api-python-client/wiki/API-Usage)
+* [CLI tool](https://github.com/CrackerJackMack/softlayer-api-python-client/wiki/Cli)
 
 
 Copyright
