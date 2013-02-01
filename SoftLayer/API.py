@@ -80,8 +80,7 @@ class Client(object):
         self.api_key = api_key or API_KEY or os.environ.get('SL_API_KEY')
 
         if not all((self.username, self.api_key)):
-            raise SoftLayerError(
-                'Must supply username and api_key')
+            raise SoftLayerError('Must supply username and api_key')
 
         self.set_authentication(self.username, self.api_key)
 
@@ -208,15 +207,6 @@ class Client(object):
             name = self._prefix + name
         return Service(self, name)
 
-    def __format_filter_dict(self, d):
-        for key, value in d.iteritems():
-            if isinstance(value, dict):
-                d[key] = self.__format_filter_dict(value)
-                return d
-            else:
-                d[key] = {'operation': value}
-                return d
-
     def __call__(self, service, method, *args, **kwargs):
         """ Place a SoftLayer API call """
         objectid = kwargs.get('id')
@@ -249,10 +239,7 @@ class Client(object):
             headers[service + 'InitParameters'] = {'id': int(objectid)}
 
         if objectmask is not None:
-            mheader = self._prefix + 'ObjectMask'
-            if isinstance(objectmask, dict):
-                mheader = '%sObjectMask' % service
-            headers[mheader] = {'mask': objectmask}
+            headers.update(self.__format_object_mask(objectmask, service))
 
         if objectfilter is not None:
             headers['%sObjectFilter' % service] = \
@@ -267,6 +254,35 @@ class Client(object):
         return make_api_call(uri, method, args, headers=headers,
                              http_headers=http_headers, timeout=self.timeout,
                              verbose=self.verbose)
+
+    def __format_object_mask(self, objectmask, service):
+        """  Formats new and old style object masks into proper headers. """
+        if isinstance(objectmask, dict):
+            mheader = '%sObjectMask' % service
+        else:
+            mheader = self._prefix + 'ObjectMask'
+
+            objectmask = objectmask.strip()
+            if objectmask.startswith('mask'):
+                objectmask = objectmask[4:]
+                if objectmask[0] == '.':
+                    objectmask = objectmask[1:]
+                elif objectmask[0] == '[' and objectmask[-1] == ']':
+                    objectmask = objectmask[1:-1]
+                else:
+                    raise SoftLayerError('Malformed Mask: %s' % objectmask)
+            objectmask = "mask[%s]" % objectmask
+        return {mheader: {'mask': objectmask}}
+
+    def __format_filter_dict(self, d):
+        """  Formats given filters to the SL-API header """
+        for key, value in d.iteritems():
+            if isinstance(value, dict):
+                d[key] = self.__format_filter_dict(value)
+                return d
+            else:
+                d[key] = {'operation': value}
+                return d
 
     def __getattr__(self, name):
         """ Attempt a SoftLayer API call

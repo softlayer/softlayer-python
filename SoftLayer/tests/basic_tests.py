@@ -225,6 +225,46 @@ class APICalls(unittest.TestCase):
                 'User-Agent': USER_AGENT,
             })
 
+    @patch('SoftLayer.API.make_api_call')
+    def test_mask_call_v2(self, make_api_call):
+        client = SoftLayer.Client(
+            username='doesnotexist', api_key='issurelywrong',
+            endpoint_url="ENDPOINT")
+
+        return_value = client['SERVICE'].METHOD(mask="mask[something[nested]]")
+        make_api_call.assert_called_with(
+            'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
+            headers={
+                'authenticate': {
+                    'username': 'doesnotexist', 'apiKey': 'issurelywrong'},
+                'SoftLayer_ObjectMask': {'mask': 'mask[something[nested]]'}},
+            verbose=False,
+            timeout=None,
+            http_headers={
+                'Content-Type': 'application/xml',
+                'User-Agent': USER_AGENT,
+            })
+
+    @patch('SoftLayer.API.make_api_call')
+    def test_mask_call_v2_dot(self, make_api_call):
+        client = SoftLayer.Client(
+            username='doesnotexist', api_key='issurelywrong',
+            endpoint_url="ENDPOINT")
+
+        return_value = client['SERVICE'].METHOD(mask="mask[something.nested]")
+        make_api_call.assert_called_with(
+            'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
+            headers={
+                'authenticate': {
+                    'username': 'doesnotexist', 'apiKey': 'issurelywrong'},
+                'SoftLayer_ObjectMask': {'mask': 'mask[something.nested]'}},
+            verbose=False,
+            timeout=None,
+            http_headers={
+                'Content-Type': 'application/xml',
+                'User-Agent': USER_AGENT,
+            })
+
 
 class TestExceptions(unittest.TestCase):
     def test_softlayer_api_error(self):
