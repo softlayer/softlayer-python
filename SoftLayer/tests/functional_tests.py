@@ -68,9 +68,9 @@ class UnauthedUser(unittest.TestCase):
 
     def test_no_hostname(self):
         try:
-            # This test will fail when 'duckvoid.com' becomes a thing
+            # This test will fail if 'notvalidsoftlayer.com' becomes a thing
             r = SoftLayer.API.make_api_call(
-                'http://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab.com', 'getObject')
+                'http://notvalidsoftlayer.com', 'getObject')
         except SoftLayer.SoftLayerAPIError, e:
             self.assertEqual(e.faultCode, 0)
             self.assertIn('not known', e.faultString)
@@ -80,9 +80,9 @@ class UnauthedUser(unittest.TestCase):
 
     def test_no_hostname_with_xmlrpc_transport(self):
         try:
-            # This test will fail when 'duckvoid.com' becomes a thing
+            # This test will fail if 'notvalidsoftlayer.com' becomes a thing
             r = xmlrpclib_transport.make_api_call(
-                'http://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab.com', 'getObject')
+                'http://notvalidsoftlayer.com', 'getObject')
         except SoftLayer.SoftLayerAPIError, e:
             self.assertEqual(e.faultCode, 0)
             self.assertIn('not known', e.faultString)
