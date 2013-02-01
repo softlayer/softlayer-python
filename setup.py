@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 import sys
 import os
 
@@ -29,11 +29,7 @@ setup(
     long_description=long_description,
     author='SoftLayer Technologies, Inc.',
     author_email='sldn@softlayer.com',
-    packages=[
-        'SoftLayer',
-        'SoftLayer.tests',
-        'SoftLayer.transport',
-        'SoftLayer.CLI'],
+    packages=find_packages(),
     license='The BSD License',
     zip_safe=False,
     url='http://github.com/softlayer/softlayer-api-python-client',
