@@ -111,6 +111,11 @@ class ClientMethods(unittest.TestCase):
 
 
 class APICalls(unittest.TestCase):
+    def setUp(self):
+        self.client = SoftLayer.Client(
+            username='doesnotexist', api_key='issurelywrong',
+            endpoint_url="ENDPOINT")
+
     @patch('SoftLayer.API.make_api_call')
     def test_old_api(self, make_api_call):
         client = SoftLayer.API.Client(
@@ -174,11 +179,7 @@ class APICalls(unittest.TestCase):
 
     @patch('SoftLayer.API.make_api_call')
     def test_simple_call(self, make_api_call):
-        client = SoftLayer.Client(
-            username='doesnotexist', api_key='issurelywrong',
-            endpoint_url="ENDPOINT")
-
-        return_value = client['SERVICE'].METHOD()
+        return_value = self.client['SERVICE'].METHOD()
         make_api_call.assert_called_with(
             'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
             headers={
@@ -193,11 +194,7 @@ class APICalls(unittest.TestCase):
 
     @patch('SoftLayer.API.make_api_call')
     def test_complex(self, make_api_call):
-        client = SoftLayer.Client(username='doesnotexist',
-                                  api_key='issurelywrong',
-                                  endpoint_url="ENDPOINT")
-
-        return_value = client['SERVICE'].METHOD(
+        return_value = self.client['SERVICE'].METHOD(
             1234,
             id=5678,
             mask={'object': {'attribute': ''}},
@@ -227,11 +224,8 @@ class APICalls(unittest.TestCase):
 
     @patch('SoftLayer.API.make_api_call')
     def test_mask_call_v2(self, make_api_call):
-        client = SoftLayer.Client(
-            username='doesnotexist', api_key='issurelywrong',
-            endpoint_url="ENDPOINT")
-
-        return_value = client['SERVICE'].METHOD(mask="mask[something[nested]]")
+        return_value = self.client['SERVICE'].METHOD(
+            mask="mask[something[nested]]")
         make_api_call.assert_called_with(
             'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
             headers={
@@ -247,11 +241,8 @@ class APICalls(unittest.TestCase):
 
     @patch('SoftLayer.API.make_api_call')
     def test_mask_call_v2_dot(self, make_api_call):
-        client = SoftLayer.Client(
-            username='doesnotexist', api_key='issurelywrong',
-            endpoint_url="ENDPOINT")
-
-        return_value = client['SERVICE'].METHOD(mask="mask[something.nested]")
+        return_value = self.client['SERVICE'].METHOD(
+            mask="mask.something.nested")
         make_api_call.assert_called_with(
             'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
             headers={
@@ -264,6 +255,15 @@ class APICalls(unittest.TestCase):
                 'Content-Type': 'application/xml',
                 'User-Agent': USER_AGENT,
             })
+
+    @patch('SoftLayer.API.make_api_call')
+    def test_mask_call_invalid_mask(self, make_api_call):
+        try:
+            self.client['SERVICE'].METHOD(mask="mask[something.nested")
+        except SoftLayer.SoftLayerError, e:
+            self.assertIn('Malformed Mask', str(e))
+        else:
+            self.fail('No exception raised')
 
 
 class TestExceptions(unittest.TestCase):

@@ -272,6 +272,7 @@ class Client(object):
                 else:
                     raise SoftLayerError('Malformed Mask: %s' % objectmask)
             objectmask = "mask[%s]" % objectmask
+
         return {mheader: {'mask': objectmask}}
 
     def __format_filter_dict(self, d):
