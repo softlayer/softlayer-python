@@ -48,8 +48,10 @@ class UnauthedUser(unittest.TestCase):
             client.doSomething()
         except SoftLayer.SoftLayerAPIError, e:
             self.assertEqual(e.faultCode, 404)
-            self.assertEqual(e.faultString, 'NOT FOUND')
-            self.assertEqual(e.faultString, 'NOT FOUND')
+            self.assertIn('NOT FOUND', e.faultString)
+            self.assertIn('NOT FOUND', e.reason)
+        except:
+            self.fail('No Exception Raised')
 
     @patch('SoftLayer.API.make_api_call', xmlrpclib_transport.make_api_call)
     def test_404_with_xmlrpc_transport(self):
@@ -61,8 +63,32 @@ class UnauthedUser(unittest.TestCase):
             client.doSomething()
         except SoftLayer.SoftLayerAPIError, e:
             self.assertEqual(e.faultCode, 404)
-            self.assertEqual(e.faultString, 'NOT FOUND')
-            self.assertEqual(e.faultString, 'NOT FOUND')
+            self.assertIn('NOT FOUND', e.faultString)
+            self.assertIn('NOT FOUND', e.reason)
+
+    def test_no_hostname(self):
+        try:
+            # This test will fail if 'notvalidsoftlayer.com' becomes a thing
+            r = SoftLayer.API.make_api_call(
+                'http://notvalidsoftlayer.com', 'getObject')
+        except SoftLayer.SoftLayerAPIError, e:
+            self.assertEqual(e.faultCode, 0)
+            self.assertIn('not known', e.faultString)
+            self.assertIn('not known', e.reason)
+        except:
+            self.fail('No Exception Raised')
+
+    def test_no_hostname_with_xmlrpc_transport(self):
+        try:
+            # This test will fail if 'notvalidsoftlayer.com' becomes a thing
+            r = xmlrpclib_transport.make_api_call(
+                'http://notvalidsoftlayer.com', 'getObject')
+        except SoftLayer.SoftLayerAPIError, e:
+            self.assertEqual(e.faultCode, 0)
+            self.assertIn('not known', e.faultString)
+            self.assertIn('not known', e.reason)
+        except:
+            self.fail('No Exception Raised')
 
 
 class AuthedUser(unittest.TestCase):
@@ -79,7 +105,9 @@ class AuthedUser(unittest.TestCase):
         except SoftLayer.SoftLayerAPIError, e:
             self.assertEqual(e.faultCode, '-32601')
             self.assertEqual(e.faultString, 'Service does not exist')
-            self.assertEqual(e.faultString, 'Service does not exist')
+            self.assertEqual(e.reason, 'Service does not exist')
+        except:
+            self.fail('No Exception Raised')
 
     def test_dns(self):
         creds = get_creds()
