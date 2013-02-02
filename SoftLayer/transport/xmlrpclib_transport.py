@@ -8,8 +8,10 @@ import xmlrpclib
 import socket
 
 
-def make_api_call(uri, method, args, headers=None, http_headers=None,
+def make_api_call(uri, method, args=None, headers=None, http_headers=None,
                   timeout=None, verbose=False):
+    if args is None:
+        args = tuple()
     http_protocol = urlparse(uri).scheme
 
     if http_protocol == "https":
@@ -45,7 +47,9 @@ def make_api_call(uri, method, args, headers=None, http_headers=None,
         raise error_mapping.get(e.faultCode, SoftLayerAPIError)(
             e.faultCode, e.faultString)
     except xmlrpclib.ProtocolError, e:
-        raise SoftLayerAPIError(e.errcode, e.errmsg)
+        raise TransportError(e.errcode, e.errmsg)
+    except socket.error, e:
+        raise TransportError(0, str(e))
     finally:
         socket.setdefaulttimeout(__prevDefaultTimeout)
 

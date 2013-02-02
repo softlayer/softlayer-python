@@ -6,8 +6,10 @@ import xmlrpclib
 import requests
 
 
-def make_api_call(uri, method, args, headers=None,
+def make_api_call(uri, method, args=None, headers=None,
                   http_headers=None, timeout=None, verbose=False):
+    if args is None:
+        args = tuple()
     try:
         largs = list(args)
         largs.insert(0, {'headers': headers})
@@ -19,12 +21,9 @@ def make_api_call(uri, method, args, headers=None,
                                  headers=http_headers,
                                  timeout=timeout)
 
-        if response.status_code == 200:
-            result = xmlrpclib.loads(response.content,)[0][0]
-            return result
-        else:
-            # Some error occurred
-            raise SoftLayerAPIError(response.status_code, response.reason)
+        response.raise_for_status()
+        result = xmlrpclib.loads(response.content,)[0][0]
+        return result
     except xmlrpclib.Fault, e:
         # These exceptions are formed from the XML-RPC spec
         # http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
@@ -42,3 +41,7 @@ def make_api_call(uri, method, args, headers=None,
         }
         raise error_mapping.get(e.faultCode, SoftLayerAPIError)(
             e.faultCode, e.faultString)
+    except requests.HTTPError, e:
+        raise TransportError(e.response.status_code, str(e))
+    except requests.RequestException, e:
+        raise TransportError(0, str(e))
