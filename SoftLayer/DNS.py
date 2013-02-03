@@ -31,8 +31,9 @@ class DNSManager(object):
 
             domain - str"""
         domain = domain.lower()
-        results = self.domain.getByDomainName(domain,
-                mask={'resourceRecords': {}})
+        results = self.domain.getByDomainName(
+            domain,
+            mask={'resourceRecords': {}})
         matches = filter(lambda x: x['name'].lower() == domain, results)
 
         try:
@@ -45,7 +46,8 @@ class DNSManager(object):
 
             domain - str
             serial - int (default strftime(%Y%m%d01))"""
-        return self.domain.createObject({'name': domain,
+        return self.domain.createObject({
+            'name': domain,
             'serial': serial or strftime('%Y%m%d01')})
 
     def delete_zone(self, domid):
