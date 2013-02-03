@@ -53,7 +53,7 @@ class DNSManager(object):
         return self.domain.deleteObject(id=domid)
 
     def edit_zone(self, zone):
-        self.zone.editObject(zone)
+        self.domain.editObject(zone)
 
     def create_record(self, domid, record, type, data, ttl=60):
         """ create_record - create a resource record on a domain
