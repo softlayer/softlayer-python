@@ -1,4 +1,5 @@
 import SoftLayer
+import sys
 
 try:
     import unittest2 as unittest
@@ -7,10 +8,15 @@ except ImportError:
 from mock import patch
 import SoftLayer.CLI
 
+if sys.version_info >= (3,):
+    raw_input_path = 'builtins.input'
+else:
+    raw_input_path = '__builtin__.raw_input'
+
 
 class PromptTests(unittest.TestCase):
 
-    @patch('__builtin__.raw_input')
+    @patch(raw_input_path)
     def test_invalid_response(self, raw_input_mock):
         raw_input_mock.return_value = 'y'
         result = SoftLayer.CLI.valid_response('test', 'n')
@@ -27,7 +33,7 @@ class PromptTests(unittest.TestCase):
         raw_input_mock.assert_called_with('test')
         self.assertEqual(result, None)
 
-    @patch('__builtin__.raw_input')
+    @patch(raw_input_path)
     def test_valid_response(self, raw_input_mock):
         raw_input_mock.return_value = 'n'
         result = SoftLayer.CLI.valid_response('test', 'n')
@@ -45,7 +51,7 @@ class PromptTests(unittest.TestCase):
         self.assertEqual(t.vertical_char, ':')
         self.assertEqual(t.junction_char, ':')
 
-    @patch('__builtin__.raw_input')
+    @patch(raw_input_path)
     def test_do_or_die(self, raw_input_mock):
         confirmed = '37347373737'
         raw_input_mock.return_value = confirmed
@@ -63,7 +69,7 @@ class PromptTests(unittest.TestCase):
         res = SoftLayer.CLI.CLIRunnable.execute(None, None)
         self.assertEqual(res, None)
 
-    @patch('__builtin__.raw_input')
+    @patch(raw_input_path)
     def test_confirmation(self, raw_input_mock):
         raw_input_mock.return_value = 'Y'
         res = SoftLayer.CLI.confirm(allow_empty=False, default=False)
