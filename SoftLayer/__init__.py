@@ -43,7 +43,7 @@ from SoftLayer.consts import VERSION
 
 from API import Client, API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT
 from DNS import DNSManager
-from SoftLayer.exceptions import * # NOQA
+from SoftLayer.exceptions import *  # NOQA
 
 __title__ = 'SoftLayer'
 __version__ = VERSION
