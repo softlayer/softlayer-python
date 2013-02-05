@@ -19,6 +19,7 @@ class CCIManager(object):
         self.guest = client['Virtual_Guest']
 
     def list_instances(self, restrict='virtualGuests'):
+        """ virtualGuests,virtualHourlyGuests,virtualMonthlyGuests"""
         items = set([
             'id',
             'globalIdentifier',
@@ -112,11 +113,11 @@ class CCIManager(object):
 
         if public_vlan:
             data["primaryNetworkCompnent"]["networkVlan"]["id"] = \
-                    int(public_vlan)
+                int(public_vlan)
 
         if private_vlan:
             data["primaryBackendNetworkCompnent"]["networkVlan"]["id"] = \
-                    int(private_vlan)
+                int(private_vlan)
 
         return data
 
