@@ -13,3 +13,6 @@ install:
   - "if [[ $TRAVIS_PYTHON_VERSION = 2.6 || $TRAVIS_PYTHON_VERSION = 2.5 ]]; then pip install unittest2 --use-mirrors; fi"
 # command to run tests
 script: python setup.py nosetests
+before_install: if [ "$TRAVIS_PYTHON_VERSION" == "jython" ]; then sudo apt-get install jython; fi
+before_script: if [ "$TRAVIS_PYTHON_VERSION" == "jython" ]; then export PYTHON_EXE=jython; jython -c "print ''"; else export PYTHON_EXE=python; fi
+
