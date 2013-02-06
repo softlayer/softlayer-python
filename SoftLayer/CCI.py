@@ -94,7 +94,7 @@ class CCIManager(object):
 
         for me in mutually_exclusive:
             if all(me.values()):
-                raise CCICreateMutuallyExclusive(*me.key())
+                raise CCICreateMutuallyExclusive(*me.keys())
 
         data = {
             "startCpus": int(cpus),
@@ -119,12 +119,13 @@ class CCIManager(object):
             data["datacenter"] = {"name": datacenter}
 
         if public_vlan:
-            data["primaryNetworkCompnent"]["networkVlan"]["id"] = \
-                int(public_vlan)
-
+            data.update({
+                'primaryNetworkCompnent':
+                    {"networkVlan": {"id": int(public_vlan)}}})
         if private_vlan:
-            data["primaryBackendNetworkCompnent"]["networkVlan"]["id"] = \
-                int(private_vlan)
+            data.update({
+                "primaryBackendNetworkCompnent":
+                    {"networkVlan": {"id": int(private_vlan)}}})
 
         return data
 
