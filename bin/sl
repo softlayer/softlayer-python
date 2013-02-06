@@ -68,7 +68,8 @@ def cli_client(cli_args):
         m = getattr(module, method)
         subparser = action_parser.add_parser(
             m.action,
-            help=m.__doc__
+            help=m.__doc__,
+            description=m.__doc__,
         )
         m.add_additional_args(subparser)
 

@@ -253,7 +253,8 @@ class CreateOptionsCCI(CLIRunnable):
 
 
 class CreateCCI(CLIRunnable):
-    """ Order and create a CCI """
+    """ Order and create a CCI
+    (see `sl cci options` for choices)"""
 
     action = 'create'
 
