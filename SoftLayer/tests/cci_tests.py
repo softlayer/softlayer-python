@@ -4,7 +4,7 @@ try:
     import unittest2 as unittest
 except ImportError:
     import unittest
-from mock import MagicMock
+from mock import MagicMock, ANY
 
 
 class CCITests_unittests(unittest.TestCase):
@@ -32,9 +32,9 @@ class CCITests_unittests(unittest.TestCase):
     def test_get_instance(self):
         self.client.__getitem__().getObject.return_value = {
             'hourlyVirtualGuests': "this is unique"}
-        result = self.cci.get_instance(1)
+        self.cci.get_instance(1)
         self.client.__getitem__().getObject.assert_called_once_with(
-            id=1)
+            id=1, mask=ANY)
 
 #    def test_init_exercise(self):
 #        self.assertTrue(hasattr(self.dns_client, 'domain'))

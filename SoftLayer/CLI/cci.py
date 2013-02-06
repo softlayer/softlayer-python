@@ -3,7 +3,6 @@
 
 from SoftLayer.CCI import CCIManager
 from SoftLayer.CLI import CLIRunnable, Table, no_going_back, confirm
-from functools import partial
 
 
 class ListCCIs(CLIRunnable):
@@ -22,20 +21,12 @@ class ListCCIs(CLIRunnable):
             help='List only monthly CCI\'s',
             action='store_true', default=False)
 
-        group = parser.add_mutually_exclusive_group()
-
-        sorter = partial(
-            group.add_argument,
-            dest='sortby',
-            action='store_const',
+        parser.add_argument(
+            '--sortby',
+            help="Sort table",
+            choices=['id', 'dc', 'host', 'cores', 'memory',
+                     'primary_ip', 'backend_ip'],
             default='host')
-        sorter('--id', const='id', help='Sort by id')
-        sorter('--dc', const='datacenter', help='Sort by datacenter')
-        sorter('--host', const='host', help='Sort by hostname')
-        sorter('--cores', const='cores', help='Sort by cores')
-        sorter('--memory', const='memory', help='Sort by memory')
-        sorter('--ip', const='primary_ip', help='Sort by primary ip')
-        sorter('--bip', const='backend_ip', help='Sort by backend ip')
 
     @staticmethod
     def execute(client, args):
