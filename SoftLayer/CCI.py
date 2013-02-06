@@ -67,7 +67,7 @@ class CCIManager(object):
             'billingItem.recurringFee',
         ])
 
-        mask = "mask[{0}]".format(','.join(items))
+        mask = "mask[%s]" % ','.join(items)
 
         return self.guest.getObject(mask=mask, id=id)
 

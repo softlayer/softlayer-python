@@ -14,17 +14,19 @@ class CCITests_unittests(unittest.TestCase):
         self.cci = SoftLayer.CCIManager(self.client)
 
     def test_list_instances(self):
-        self.cci.list_instances(hourly=False, monthly=True)
-        self.cci.list_instances(hourly=True, monthly=True)
-        self.cci.list_instances(hourly=True, monthly=False)
-        self.cci.list_instances(hourly=False, monthly=False)
 
         all_guests = [call(mask=ANY), call(mask=ANY)]
         other_guests = [call(mask=ANY)]
-        self.client.__getitem__().getVirtualGuests.assert_has_calls(all_guests)
-        self.client.__getitem__().getMonthlyVirtualGuests.assert_has_calls(other_guests)
-        self.client.__getitem__().getHourlyVirtualGuests.assert_has_calls(other_guests)
 
+        self.cci.list_instances(hourly=True, monthly=True)
+        self.cci.list_instances(hourly=False, monthly=False)
+        self.client.__getitem__().getVirtualGuests.assert_has_calls(all_guests)
+
+        self.cci.list_instances(hourly=False, monthly=True)
+        self.client.__getitem__().getMonthlyVirtualGuests.assert_has_calls(other_guests)
+
+        self.cci.list_instances(hourly=True, monthly=False)
+        self.client.__getitem__().getHourlyVirtualGuests.assert_has_calls(other_guests)
 
     def test_get_instance(self):
         self.client.__getitem__().getObject.return_value = {
