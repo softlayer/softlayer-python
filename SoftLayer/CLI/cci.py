@@ -3,6 +3,7 @@
 
 from SoftLayer.CCI import CCIManager
 from SoftLayer.CLI import CLIRunnable, Table, no_going_back, confirm
+from argparse import FileType
 
 
 class ListCCIs(CLIRunnable):
@@ -47,8 +48,8 @@ class ListCCIs(CLIRunnable):
                 guest['fullyQualifiedDomainName'],
                 guest['maxCpu'],
                 guest['maxMemory'],
-                guest['primaryIpAddress'],
-                guest['primaryBackendIpAddress'],
+                guest.get('primaryIpAddress', '???'),
+                guest.get('primaryBackendIpAddress', '???'),
                 guest.get('activeTransaction', {}).get(
                     'transactionStatus', {}).get('friendlyName', '')
             ])
@@ -324,6 +325,17 @@ class CreateCCI(CLIRunnable):
             action='store_true',
             default=False)
 
+        g = parser.add_mutually_exclusive_group()
+        g.add_argument(
+            '--userdata', '-u',
+            help="user defined metadata string",
+            type=str,
+            default=None)
+        g.add_argument(
+            '--userfile', '-F',
+            help="read userdata from file",
+            type=FileType('r'))
+
         parser.add_argument(
             '--test', '--dryrun', '--dry-run',
             help='Do not create CCI, just get a quote',
@@ -369,12 +381,17 @@ class CreateCCI(CLIRunnable):
         if args.datacenter:
             data["datacenter"] = args.datacenter
 
+        if args.userdata:
+            data['userdata'] = args.userdata
+        elif args.userfile:
+            data['userdata'] = args.userfile.read()
+
         if args.test:
             result = cci.verify_create_instance(**data)
             print("Test: Success!")
         elif args.really or confirm(
                 prompt_str="This action will incur charges on "
-                "your account. Continue?", allow_blank=True):
+                "your account. Continue?", allow_empty=True):
             result = cci.create_instance(**data)
             print("Success!")
 

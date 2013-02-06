@@ -81,7 +81,8 @@ class CCIManager(object):
             self, cpus=None, memory=None, hourly=True,
             hostname=None, domain=None, local_disk=True,
             datacenter=None, os_code=None, image_id=None,
-            private=False, public_vlan=None, private_vlan=None):
+            private=False, public_vlan=None, private_vlan=None,
+            userdata=None):
 
         required = [cpus, memory, hostname, domain]
 
@@ -126,6 +127,9 @@ class CCIManager(object):
             data.update({
                 "primaryBackendNetworkCompnent":
                     {"networkVlan": {"id": int(private_vlan)}}})
+
+        if userdata:
+            data['userData'] = [{'value': userdata}, ]
 
         return data
 

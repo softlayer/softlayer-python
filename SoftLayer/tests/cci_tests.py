@@ -237,3 +237,26 @@ class CCITests_unittests(unittest.TestCase):
         }
 
         self.assertEqual(data, assert_data)
+
+    def test_generate_userdata(self):
+        data = self.cci._generate_create_dict(
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='example.com',
+            os_code="STRING",
+            userdata="ICANHAZCCI",
+        )
+
+        assert_data = {
+            'startCpus': 1,
+            'maxMemory': 1,
+            'hostname': 'test',
+            'domain': 'example.com',
+            'localDiskFlag': True,
+            'operatingSystemReferenceCode': "STRING",
+            'hourlyBillingFlag': True,
+            'userData': [{'value': "ICANHAZCCI"}],
+        }
+
+        self.assertEqual(data, assert_data)
