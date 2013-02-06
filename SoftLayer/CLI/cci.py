@@ -32,14 +32,7 @@ class ListCCIs(CLIRunnable):
     def execute(client, args):
         cci = CCIManager(client)
 
-        guest_type = 'virtualGuests'
-
-        if args.hourly:
-            guest_type = 'hourlyVirtualGuests'
-        elif args.monthly:
-            guest_type = 'monthlyVirtualGuests'
-
-        guests = cci.list_instances(restrict=guest_type)
+        guests = cci.list_instances(hourly=args.hourly, monthly=args.monthly)
 
         t = Table([
             'id', 'datacenter', 'host',

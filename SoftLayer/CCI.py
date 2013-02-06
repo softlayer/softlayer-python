@@ -18,8 +18,7 @@ class CCIManager(object):
         self.account = client['Account']
         self.guest = client['Virtual_Guest']
 
-    def list_instances(self, restrict='virtualGuests'):
-        """ virtualGuests,virtualHourlyGuests,virtualMonthlyGuests"""
+    def list_instances(self, hourly=True, monthly=True):
         items = set([
             'id',
             'globalIdentifier',
@@ -35,9 +34,17 @@ class CCIManager(object):
             'status.name',
         ])
 
-        mask = "mask.{0}[{1}]".format(restrict, ','.join(items))
+        call = 'getVirtualGuests'
+        if not all([hourly, monthly]):
+            if hourly:
+                call = 'getHourlyVirtualGuests'
+            elif monthly:
+                call = 'getMonthlyVirtualGuests'
 
-        return self.account.getObject(mask=mask)[restrict]
+        mask = "mask[%s]" % ','.join(items)
+
+        func = getattr(self.account, call)
+        return func(mask=mask)
 
     def get_instance(self, id):
         items = set([
