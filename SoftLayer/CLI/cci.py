@@ -24,7 +24,7 @@ class ListCCIs(CLIRunnable):
         parser.add_argument(
             '--sortby',
             help="Sort table",
-            choices=['id', 'dc', 'host', 'cores', 'memory',
+            choices=['id', 'datacenter', 'host', 'cores', 'memory',
                      'primary_ip', 'backend_ip'],
             default='host')
 
