@@ -59,12 +59,12 @@ def cli_client(cli_args):
 
     fmt_default = 'raw'
     if sys.stdout.isatty():
-        fmt_default = 'prettytable'
+        fmt_default = 'table'
 
     parser.add_argument(
         '--format',
         help='output format',
-        choices=['prettytable', 'raw'],
+        choices=['table', 'raw'],
         default=fmt_default,
         dest='fmt')
 

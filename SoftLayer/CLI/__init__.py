@@ -33,7 +33,7 @@ class Table(PrettyTable):
 
 
 def format_output(data, args):
-    if args.fmt == 'prettytable':
+    if args.fmt == 'table':
         return format_prettytable(data)
     elif args.fmt == 'raw':
         return format_no_tty(data)

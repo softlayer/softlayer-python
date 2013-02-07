@@ -104,7 +104,7 @@ class PromptTests(unittest.TestCase):
         class fake(object):
             pass
         args = fake()
-        args.fmt = 'prettytable'
+        args.fmt = 'table'
 
         t = SoftLayer.CLI.Table(['nothing'])
         t.align['nothing'] = 'c'
