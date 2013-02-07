@@ -84,21 +84,32 @@ class PromptTests(unittest.TestCase):
         res = SoftLayer.CLI.confirm(allow_empty=True, default=True)
         self.assertTrue(res)
 
-    @patch('sys.stdout.isatty')
-    def test_tty_detection(self, tty_mock):
-        tty_mock.return_value = True
+    def test_no_tty(self):
+        class fake(object):
+            pass
+        args = fake()
+        args.fmt = 'raw'
+
         t = SoftLayer.CLI.Table(['nothing'])
         t.align['nothing'] = 'c'
         t.hrules = prettytable.FRAME
+        ret = SoftLayer.CLI.format_output(t, args)
 
-        ret = SoftLayer.CLI.format_output(t, None)
-
-        self.assertEqual(ret.hrules, t.hrules)
-        self.assertEqual(ret.align, t.align)
-
-        tty_mock.return_value = False
-        ret = SoftLayer.CLI.format_output(t, None)
         self.assertFalse(ret.border)
         self.assertFalse(ret.header)
         self.assertNotEqual(ret.hrules, t.hrules)
         self.assertNotEqual(ret.align, t.align)
+
+    def test_prettytable(self):
+        class fake(object):
+            pass
+        args = fake()
+        args.fmt = 'prettytable'
+
+        t = SoftLayer.CLI.Table(['nothing'])
+        t.align['nothing'] = 'c'
+        t.hrules = prettytable.FRAME
+        ret = SoftLayer.CLI.format_output(t, args)
+
+        self.assertEqual(ret.hrules, t.hrules)
+        self.assertEqual(ret.align, t.align)
