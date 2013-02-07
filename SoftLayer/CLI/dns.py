@@ -25,7 +25,7 @@ class DumpZone(CLIRunnable):
     @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
-        return manager.dump_zone(manager.get_zone(args.domain)['id'])
+        print(manager.dump_zone(manager.get_zone(args.domain)['id']))
 
 
 class CreateZone(CLIRunnable):
