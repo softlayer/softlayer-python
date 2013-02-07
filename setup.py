@@ -8,7 +8,10 @@ if sys.version_info >= (3,):
     extra['use_2to3'] = True
 
 requires = ['distribute', 'prettytable']
-if sys.version_info >= (2, 6):
+
+if sys.version_info <= (2, 6):
+    requires.append('argparse')
+elif sys.version_info >= (2, 6):
     requires.append('requests')
 
 description = "A library to contact SoftLayer's backend services"

@@ -7,6 +7,7 @@ except ImportError:
     import unittest
 from mock import patch
 import SoftLayer.CLI
+import prettytable
 
 if sys.version_info >= (3,):
     raw_input_path = 'builtins.input'
@@ -82,3 +83,22 @@ class PromptTests(unittest.TestCase):
         raw_input_mock.return_value = ''
         res = SoftLayer.CLI.confirm(allow_empty=True, default=True)
         self.assertTrue(res)
+
+    @patch('sys.stdout.isatty')
+    def test_tty_detection(self, tty_mock):
+        tty_mock.return_value = True
+        t = SoftLayer.CLI.Table(['nothing'])
+        t.align['nothing'] = 'c'
+        t.hrules = prettytable.FRAME
+
+        ret = SoftLayer.CLI.format_output(t, None)
+
+        self.assertEqual(ret.hrules, t.hrules)
+        self.assertEqual(ret.align, t.align)
+
+        tty_mock.return_value = False
+        ret = SoftLayer.CLI.format_output(t, None)
+        self.assertFalse(ret.border)
+        self.assertFalse(ret.header)
+        self.assertNotEqual(ret.hrules, t.hrules)
+        self.assertNotEqual(ret.align, t.align)

@@ -40,6 +40,7 @@ class ListCCIs(CLIRunnable):
             'cores', 'memory', 'primary_ip',
             'backend_ip', 'provisioning',
         ])
+        t.sortby = args.sortby
 
         for guest in guests:
             t.add_row([
@@ -54,8 +55,7 @@ class ListCCIs(CLIRunnable):
                     'transactionStatus', {}).get('friendlyName', '')
             ])
 
-        t.sortby = args.sortby
-        print t
+        return t
 
 
 class CCIDetails(CLIRunnable):
@@ -129,7 +129,7 @@ class CCIDetails(CLIRunnable):
                 t2.add_row([item['username'], item['password']])
             t.add_row(['users', t2])
 
-        print t
+        return t
 
 
 class CreateOptionsCCI(CLIRunnable):
@@ -250,7 +250,7 @@ class CreateOptionsCCI(CLIRunnable):
 
             t.add_row(['nic', ','.join(speeds)])
 
-        print t
+        return t
 
 
 class CreateCCI(CLIRunnable):
@@ -395,7 +395,7 @@ class CreateCCI(CLIRunnable):
             result = cci.create_instance(**data)
             print("Success!")
 
-        print(result)
+        return result
 
 
 class CancelCCI(CLIRunnable):
