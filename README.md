@@ -33,7 +33,6 @@ System Requirements
 Suggested Reading
 -----------------
 
-<<<<<<< HEAD
 * [Our wiki](https://github.com/softlayer/softlayer-api-python-client/wiki)
 * [The API](https://github.com/softlayer/softlayer-api-python-client/wiki/API-Usage)
 * [CLI tool](https://github.com/softlayer/softlayer-api-python-client/wiki/Cli)
