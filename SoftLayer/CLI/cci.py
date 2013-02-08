@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-from SoftLayer.CLI import CLIRunnable, Table, no_going_back, confirm
-from functools import partial
+"""Manage, delete, order Compute instances"""
 
-__doc__ = "Manage, delete, order Compute instances"
+from SoftLayer.CCI import CCIManager
+from SoftLayer.CLI import CLIRunnable, Table, no_going_back, confirm
+from argparse import FileType
+
 
 class ListCCIs(CLIRunnable):
     """ List all CCI's on the account"""
@@ -20,56 +22,25 @@ class ListCCIs(CLIRunnable):
             help='List only monthly CCI\'s',
             action='store_true', default=False)
 
-        group = parser.add_mutually_exclusive_group()
-
-        sorter = partial(
-            group.add_argument,
-            dest='sortby',
-            action='store_const',
+        parser.add_argument(
+            '--sortby',
+            help="Sort table",
+            choices=['id', 'datacenter', 'host', 'cores', 'memory',
+                     'primary_ip', 'backend_ip'],
             default='host')
-        sorter('--id', const='id', help='Sort by id')
-        sorter('--dc', const='datacenter', help='Sort by datacenter')
-        sorter('--host', const='host', help='Sort by hostname')
-        sorter('--cores', const='cores', help='Sort by cores')
-        sorter('--memory', const='memory', help='Sort by memory')
-        sorter('--ip', const='primary_ip', help='Sort by primary ip')
-        sorter('--bip', const='backend_ip', help='Sort by backend ip')
 
     @staticmethod
     def execute(client, args):
-        account = client['Account']
-        guest_type = 'virtualGuests'
+        cci = CCIManager(client)
 
-        if args.hourly:
-            guest_type = 'hourlyVirtualGuests'
-        elif args.monthly:
-            guest_type = 'monthlyVirtualGuests'
-
-        items = set([
-            'id',
-            'globalIdentifier',
-            'fullyQualifiedDomainName',
-            'primaryBackendIpAddress',
-            'primaryIpAddress',
-            'lastKnownPowerState.name',
-            'powerState.name',
-            'maxCpu',
-            'maxMemory',
-            'datacenter.name',
-            'activeTransaction.transactionStatus[friendlyName,name]',
-            'status.name',
-        ])
+        guests = cci.list_instances(hourly=args.hourly, monthly=args.monthly)
 
         t = Table([
             'id', 'datacenter', 'host',
             'cores', 'memory', 'primary_ip',
             'backend_ip', 'provisioning',
         ])
-
-        mask = "mask.{0}[{1}]".format(guest_type, ','.join(items))
-
-        result = account.getObject(mask=mask)
-        guests = result[guest_type]
+        t.sortby = args.sortby
 
         for guest in guests:
             t.add_row([
@@ -78,14 +49,13 @@ class ListCCIs(CLIRunnable):
                 guest['fullyQualifiedDomainName'],
                 guest['maxCpu'],
                 guest['maxMemory'],
-                guest['primaryIpAddress'],
-                guest['primaryBackendIpAddress'],
+                guest.get('primaryIpAddress', '???'),
+                guest.get('primaryBackendIpAddress', '???'),
                 guest.get('activeTransaction', {}).get(
                     'transactionStatus', {}).get('friendlyName', '')
             ])
 
-        t.sortby = args.sortby
-        print t
+        return t
 
 
 class CCIDetails(CLIRunnable):
@@ -121,27 +91,11 @@ class CCIDetails(CLIRunnable):
 
     @staticmethod
     def execute(client, args):
+        cci = CCIManager(client)
+
         t = Table(['Name', 'Value'])
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
-
-        items = set([
-            'id',
-            'globalIdentifier',
-            'fullyQualifiedDomainName',
-            'primaryBackendIpAddress',
-            'primaryIpAddress',
-            'lastKnownPowerState.name',
-            'powerState.name',
-            'maxCpu',
-            'maxMemory',
-            'datacenter.name',
-            'activeTransaction.id',
-            'blockDeviceTemplateGroup[id, name]',
-            'status.name',
-            'operatingSystem.softwareLicense.'
-            'softwareDescription[manufacturer,name, version]',
-        ])
 
         output = [
             ("id", "{0[id]}",),
@@ -157,17 +111,7 @@ class CCIDetails(CLIRunnable):
                 "[softwareDescription][name]} "),
         ]
 
-        if args.passwords:
-            items.add('operatingSystem.passwords[username,password]')
-
-        if args.price:
-            items.add('billingItem.recurringFee')
-
-        mask = "mask[{0}]".format(','.join(items))
-
-        guest = client['Virtual_Guest']
-
-        result = guest.getObject(mask=mask, id=args.id)
+        result = cci.get_instance(args.id)
 
         for o in output:
             t.add_row([o[0], o[1].format(result)])
@@ -185,7 +129,7 @@ class CCIDetails(CLIRunnable):
                 t2.add_row([item['username'], item['password']])
             t.add_row(['users', t2])
 
-        print t
+        return t
 
 
 class CreateOptionsCCI(CLIRunnable):
@@ -211,8 +155,8 @@ class CreateOptionsCCI(CLIRunnable):
 
     @staticmethod
     def execute(client, args):
-        guest = client['Virtual_Guest']
-        result = guest.getCreateObjectOptions()
+        cci = CCIManager(client)
+        result = cci.get_create_options()
 
         t = Table(['Name', 'Value'])
         t.align['Name'] = 'r'
@@ -306,11 +250,12 @@ class CreateOptionsCCI(CLIRunnable):
 
             t.add_row(['nic', ','.join(speeds)])
 
-        print t
+        return t
 
 
 class CreateCCI(CLIRunnable):
-    """ Order and create a CCI """
+    """ Order and create a CCI
+    (see `sl cci options` for choices)"""
 
     action = 'create'
 
@@ -368,7 +313,9 @@ class CreateCCI(CLIRunnable):
         # Optional arguments
         parser.add_argument(
             '--datacenter', '--dc', '-d',
-            help='datacenter shortname',
+            help='datacenter shortname (sng01, dal05, ...). '
+            'Note: Omitting this value defaults to the first '
+            'available datacenter',
             type=str,
             default='')
 
@@ -378,6 +325,17 @@ class CreateCCI(CLIRunnable):
             action='store_true',
             default=False)
 
+        g = parser.add_mutually_exclusive_group()
+        g.add_argument(
+            '--userdata', '-u',
+            help="user defined metadata string",
+            type=str,
+            default=None)
+        g.add_argument(
+            '--userfile', '-F',
+            help="read userdata from file",
+            type=FileType('r'))
+
         parser.add_argument(
             '--test', '--dryrun', '--dry-run',
             help='Do not create CCI, just get a quote',
@@ -386,13 +344,15 @@ class CreateCCI(CLIRunnable):
 
     @staticmethod
     def execute(client, args):
+        cci = CCIManager(client)
+
         data = {
-            "hourlyBillingFlag": args.hourly,
-            "startCpus": args.cpu,
+            "hourly": args.hourly,
+            "cpus": args.cpu,
             "domain": args.domain,
             "hostname": args.hostname,
-            "dedicatedAccountHostOnlyFlag": args.private,
-            "localDiskFlag": True,
+            "private": args.private,
+            "local_disk": True,
         }
 
         try:
@@ -407,30 +367,35 @@ class CreateCCI(CLIRunnable):
             if unit in ['T', 'r']:
                 memory = memory * 1024 * 1024
 
-        data["maxMemory"] = memory
+        data["memory"] = memory
 
         if args.monthly:
-            data["hourlyBillingFlag"] = False
+            data["hourly"] = False
 
         if args.os:
-            data["operatingSystemReferenceCode"] = args.os
+            data["os_code"] = args.os
 
         if args.image:
-            data["blockDeviceTemplateGroup"] = {"globalIdentifier": args.image}
+            data["image_id"] = args.image
 
         if args.datacenter:
-            data["datacenter"] = {"name": args.datacenter}
+            data["datacenter"] = args.datacenter
+
+        if args.userdata:
+            data['userdata'] = args.userdata
+        elif args.userfile:
+            data['userdata'] = args.userfile.read()
 
         if args.test:
-            result = client['Virtual_Guest'].generateOrderTemplate(data)
+            result = cci.verify_create_instance(**data)
             print("Test: Success!")
         elif args.really or confirm(
                 prompt_str="This action will incur charges on "
-                "your account. Continue?", allow_blank=True):
-            result = client['Virtual_Guest'].createObject(data)
+                "your account. Continue?", allow_empty=True):
+            result = cci.create_instance(**data)
             print("Success!")
 
-        print(result)
+        return result
 
 
 class CancelCCI(CLIRunnable):
@@ -444,7 +409,8 @@ class CancelCCI(CLIRunnable):
 
     @staticmethod
     def execute(client, args):
+        cci = CCIManager(client)
         if args.really or no_going_back(args.id):
-            client['Virtual_Guest'].deleteObject(id=args.id)
+            cci.cancel_instance(args.id)
         else:
             print "Aborted."

@@ -10,6 +10,7 @@ from ConfigParser import SafeConfigParser, NoOptionError, NoSectionError
 import SoftLayer.CLI
 from SoftLayer import Client, SoftLayerError
 from SoftLayer.CLI import CLIRunnable
+from SoftLayer.CLI import format_output
 
 
 def cli_client(cli_args):
@@ -56,6 +57,17 @@ def cli_client(cli_args):
         action='store_true',
         default=False)
 
+    fmt_default = 'raw'
+    if sys.stdout.isatty():
+        fmt_default = 'table'
+
+    parser.add_argument(
+        '--format',
+        help='output format',
+        choices=['table', 'raw'],
+        default=fmt_default,
+        dest='fmt')
+
     methods = filter(
         lambda m: isinstance(getattr(module, m), ClassType) and
         issubclass(getattr(module, m), CLIRunnable) and
@@ -68,7 +80,8 @@ def cli_client(cli_args):
         m = getattr(module, method)
         subparser = action_parser.add_parser(
             m.action,
-            help=m.__doc__
+            help=m.__doc__,
+            description=m.__doc__,
         )
         m.add_additional_args(subparser)
 
@@ -97,11 +110,13 @@ def cli_client(cli_args):
 
     try:
         client = Client(**client_params)
+        data = getattr(module, call).execute(client, parsed_args)
     except SoftLayerError, e:
         print(e)
         exit(1)
-    else:
-        getattr(module, call).execute(client, parsed_args)
+
+    if data:
+        print(format_output(data, parsed_args))
 
 
 def parse_config(files):

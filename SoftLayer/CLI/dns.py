@@ -1,9 +1,8 @@
 #!/usr/bin/env python
+"""Manages DNS"""
 
-from SoftLayer.CLI import CLIRunnable, no_going_back
+from SoftLayer.CLI import CLIRunnable, no_going_back, Table
 from SoftLayer.DNS import DNSManager
-
-__doc__ = "Manages DNS"
 
 
 def add_zone_arguments(parser):
@@ -41,7 +40,7 @@ class CreateZone(CLIRunnable):
     def execute(client, args):
         manager = DNSManager(client)
         manager.create_zone(args.domain)
-        print "Created zone:", args.domain
+        print("Created zone:", args.domain)
 
 
 class DeleteZone(CLIRunnable):
@@ -57,9 +56,9 @@ class DeleteZone(CLIRunnable):
         manager = DNSManager(client)
         if args.really or no_going_back(args.domain):
             manager.delete_zone(args.domain)
-            print "Deleted zone:", args.domain
+            print("Deleted zone:", args.domain)
         else:
-            print "Aborted."
+            print("Aborted.")
 
 
 class ListZones(CLIRunnable):
@@ -70,13 +69,24 @@ class ListZones(CLIRunnable):
     def execute(client, args):
         manager = DNSManager(client)
         zones = manager.list_zones()
-        print "{0:.^10}|{1:.^30}|{2:.^10}|{3:.^30}".format(
-            'id', 'zone', 'serial', 'last updated')
-        fmt = (
-            "{0[id]:<10d} {0[name]:<30s} {0[serial]:^10d} "
-            "{0[updateDate]:^30}")
+        t = Table([
+            "id",
+            "zone",
+            "serial",
+            "updated",
+        ])
+        t.align['serial'] = 'c'
+        t.align['updated'] = 'c'
+
         for z in zones:
-            print fmt.format(z)
+            t.add_row([
+                z['id'],
+                z['name'],
+                z['serial'],
+                z['updateDate'],
+            ])
+
+        return t
 
 
 class AddRecord(CLIRunnable):
@@ -147,14 +157,24 @@ class RecordSearch(CLIRunnable):
             args.domain,
             args.record)
 
-        print "Results for {0}.{1}".format(
-            args.record,
-            args.domain)
-        print "{0:.^10}|{1:.<4}|{2:.^7}|{3:.^70}".format(
-            'id', 'type', 'ttl', 'data')
-        fmt = "{0[id]:<10} {0[type]:<4} {0[ttl]:^7} {0[data]:<}"
+        t = Table([
+            'id',
+            'type',
+            'ttl',
+            'data',
+        ])
+
+        t.align['ttl'] = 'c'
+
         for r in results:
-            print fmt.format(r)
+            t.add_row([
+                r['id'],
+                r['type'],
+                r['ttl'],
+                r['data'],
+            ])
+
+        return t
 
 
 class RecordRemove(CLIRunnable):
@@ -169,17 +189,21 @@ class RecordRemove(CLIRunnable):
     @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
-        records = manager.search_record(
-            args.domain,
-            args.record)
 
-        if not args.id:
-            print "Deleting %d records" % len(records)
+        if args.id:
+            records = [{'id': args.id}]
+        else:
+            records = manager.search_record(
+                args.domain,
+                args.record)
 
         if args.really or no_going_back('yes'):
+            t = Table(['record'])
             for r in records:
                 if not args.id or args.id == r['id']:
                     manager.delete_record(r['id'])
-                    print "Deleted %s" % r
+                    t.add_row(r['id'])
+
+            return t
         else:
-            print "Aborted."
+            print("Aborted.")

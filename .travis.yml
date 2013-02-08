@@ -12,3 +12,4 @@ install:
   - "if [[ $TRAVIS_PYTHON_VERSION = 2.6 || $TRAVIS_PYTHON_VERSION = 2.5 ]]; then pip install unittest2 --use-mirrors; fi"
 # command to run tests
 script: python setup.py nosetests
+

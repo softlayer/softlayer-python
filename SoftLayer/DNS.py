@@ -1,5 +1,5 @@
 from time import strftime
-from SoftLayer import SoftLayerError
+from SoftLayer.exceptions import SoftLayerError
 
 
 __all__ = ["DNSZoneNotFound", "DNSManager"]
@@ -23,7 +23,7 @@ class DNSManager(object):
 
     def list_zones(self):
         account = self.client['Account']
-        acc = account.getObject(mask={'domains': {}})
+        acc = account.getObject(mask='mask.domains')
         return acc['domains']
 
     def get_zone(self, domain):
@@ -31,8 +31,9 @@ class DNSManager(object):
 
             domain - str"""
         domain = domain.lower()
-        results = self.domain.getByDomainName(domain,
-                mask={'resourceRecords': {}})
+        results = self.domain.getByDomainName(
+            domain,
+            mask={'resourceRecords': {}})
         matches = filter(lambda x: x['name'].lower() == domain, results)
 
         try:
@@ -45,7 +46,8 @@ class DNSManager(object):
 
             domain - str
             serial - int (default strftime(%Y%m%d01))"""
-        return self.domain.createObject({'name': domain,
+        return self.domain.createObject({
+            'name': domain,
             'serial': serial or strftime('%Y%m%d01')})
 
     def delete_zone(self, domid):
@@ -53,7 +55,7 @@ class DNSManager(object):
         return self.domain.deleteObject(id=domid)
 
     def edit_zone(self, zone):
-        self.zone.editObject(zone)
+        self.domain.editObject(zone)
 
     def create_record(self, domid, record, type, data, ttl=60):
         """ create_record - create a resource record on a domain
