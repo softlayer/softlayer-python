@@ -42,6 +42,9 @@ setup(
             'sl = SoftLayer.CLI:main',
         ],
     },
+    package_data={
+        'SoftLayer': ['tests/fixtures/*'],
+    },
     install_requires=requires,
     classifiers=[
         'Environment :: Console',

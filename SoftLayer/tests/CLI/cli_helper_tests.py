@@ -1,12 +1,12 @@
 import sys
 import os
+import os.path
 try:
     import unittest2 as unittest
 except ImportError:
     import unittest
 from mock import patch
 from argparse import ArgumentParser
-import tempfile
 
 import SoftLayer.CLI
 import prettytable
@@ -15,6 +15,9 @@ if sys.version_info >= (3,):
     raw_input_path = 'builtins.input'
 else:
     raw_input_path = '__builtin__.raw_input'
+
+
+FIXTURE_PATH = os.path.abspath(os.path.join(__file__, '..', '..', 'fixtures'))
 
 
 class PromptTests(unittest.TestCase):
@@ -146,46 +149,28 @@ class PromptTests(unittest.TestCase):
 
 
 class TestParseConfig(unittest.TestCase):
-    def create_tmp_file(self, data):
-        fh, path = tempfile.mkstemp()
-        f = os.fdopen(fh, 'w')
-        f.write(data)
-        return path
-
     def test_parse_config_no_files(self):
         config = SoftLayer.CLI.parse_config([])
         self.assertEqual({}, config)
 
     def test_parse_config_no_softlayer_section(self):
-        path = self.create_tmp_file("")
-        try:
-            config = SoftLayer.CLI.parse_config([path])
-            self.assertEqual({}, config)
-        finally:
-            os.remove(path)
+        path = os.path.join(FIXTURE_PATH, 'empty.conf')
+        config = SoftLayer.CLI.parse_config([path])
+        self.assertEqual({}, config)
 
     def test_parse_config_empty(self):
-        path = self.create_tmp_file("[softlayer]")
-        try:
-            config = SoftLayer.CLI.parse_config([path])
-            self.assertEqual({}, config)
-        finally:
-            os.remove(path)
+        path = os.path.join(FIXTURE_PATH, 'no_options.conf')
+        config = SoftLayer.CLI.parse_config([path])
+        self.assertEqual({}, config)
 
-    def test_parse_config_some(self):
-        path = self.create_tmp_file("""[softlayer]
-username=myusername
-api_key=myapi_key
-endpoint_url=myendpoint_url""")
-        try:
-            config = SoftLayer.CLI.parse_config([path])
-            self.assertEqual({
-                'username': 'myusername',
-                'api_key': 'myapi_key',
-                'endpoint_url': 'myendpoint_url'
-            }, config)
-        finally:
-            os.remove(path)
+    def test_parse_config(self):
+        path = os.path.join(FIXTURE_PATH, 'full.conf')
+        config = SoftLayer.CLI.parse_config([path])
+        self.assertEqual({
+            'username': 'myusername',
+            'api_key': 'myapi_key',
+            'endpoint_url': 'myendpoint_url'
+        }, config)
 
 
 class DynamicImportTests(unittest.TestCase):
