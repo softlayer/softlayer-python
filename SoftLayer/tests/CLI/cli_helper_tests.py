@@ -168,9 +168,7 @@ class TestParseConfig(unittest.TestCase):
         path = self.create_tmp_file("[softlayer]")
         try:
             config = SoftLayer.CLI.parse_config([path])
-            self.assertEqual(
-                {'username': None, 'api_key': None, 'endpoint_url': None},
-                config)
+            self.assertEqual({}, config)
         finally:
             os.remove(path)
 
@@ -201,4 +199,4 @@ class DynamicImportTests(unittest.TestCase):
         class TestCommand(SoftLayer.CLI.CLIRunnable):
             action = 'test'
         self.assertEqual(
-            SoftLayer.CLI.plugins, {'cli_basic_tests': {'test': TestCommand}})
+            SoftLayer.CLI.plugins, {'cli_helper_tests': {'test': TestCommand}})

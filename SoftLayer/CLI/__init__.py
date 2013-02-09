@@ -244,9 +244,9 @@ def parse_config(files):
     config_files = [os.path.expanduser(f) for f in files]
 
     cp = SafeConfigParser({
-        'username': None,
-        'api_key': None,
-        'endpoint_url': None
+        'username': '',
+        'api_key': '',
+        'endpoint_url': '',
     })
     cp.read(config_files)
     config = {}
@@ -254,7 +254,8 @@ def parse_config(files):
     if not cp.has_section('softlayer'):
         return config
 
-    config['username'] = cp.get('softlayer', 'username')
-    config['api_key'] = cp.get('softlayer', 'api_key')
-    config['endpoint_url'] = cp.get('softlayer', 'endpoint_url')
+    for config_name in ['username', 'api_key', 'endpoint_url']:
+        if cp.get('softlayer', config_name):
+            config[config_name] = cp.get('softlayer', config_name)
+
     return config
