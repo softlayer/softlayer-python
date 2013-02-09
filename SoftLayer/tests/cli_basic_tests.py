@@ -1,11 +1,11 @@
-import SoftLayer
 import sys
-
 try:
     import unittest2 as unittest
 except ImportError:
     import unittest
 from mock import patch
+from argparse import ArgumentParser
+
 import SoftLayer.CLI
 import prettytable
 
@@ -113,3 +113,17 @@ class PromptTests(unittest.TestCase):
 
         self.assertEqual(ret.hrules, t.hrules)
         self.assertEqual(ret.align, t.align)
+
+    def test_add_really_argument(self):
+        parser = ArgumentParser()
+        SoftLayer.CLI.add_really_argument(parser)
+        args = parser.parse_args(['--really'])
+        self.assertTrue(args.really)
+
+
+class DynamicImportTests(unittest.TestCase):
+
+    def test_action_list(self):
+        actions = SoftLayer.CLI.action_list()
+        self.assertIn('cci', actions)
+        self.assertIn('dns', actions)

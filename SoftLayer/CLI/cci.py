@@ -2,7 +2,8 @@
 """Manage, delete, order Compute instances"""
 
 from SoftLayer.CCI import CCIManager
-from SoftLayer.CLI import CLIRunnable, Table, no_going_back, confirm
+from SoftLayer.CLI import (
+    CLIRunnable, Table, no_going_back, confirm, add_really_argument)
 from argparse import FileType
 
 
@@ -21,7 +22,6 @@ class ListCCIs(CLIRunnable):
             '--monthly',
             help='List only monthly CCI\'s',
             action='store_true', default=False)
-
         parser.add_argument(
             '--sortby',
             help="Sort table",
@@ -341,6 +341,7 @@ class CreateCCI(CLIRunnable):
             help='Do not create CCI, just get a quote',
             action='store_true',
             default=False)
+        add_really_argument(parser)
 
     @staticmethod
     def execute(client, args):
@@ -406,6 +407,7 @@ class CancelCCI(CLIRunnable):
     @staticmethod
     def add_additional_args(parser):
         parser.add_argument('id', help='The ID of the CCI to cancel')
+        add_really_argument(parser)
 
     @staticmethod
     def execute(client, args):

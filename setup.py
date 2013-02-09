@@ -9,8 +9,9 @@ if sys.version_info >= (3,):
 
 requires = ['distribute', 'prettytable']
 
-if sys.version_info <= (2, 6):
+if sys.version_info < (2, 7):
     requires.append('argparse')
+    requires.append('importlib')
 elif sys.version_info >= (2, 6):
     requires.append('requests')
 

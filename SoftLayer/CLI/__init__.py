@@ -1,4 +1,6 @@
 from prettytable import PrettyTable, FRAME, NONE
+from pkgutil import iter_modules
+from importlib import import_module
 from copy import deepcopy
 
 __all__ = [
@@ -12,7 +14,6 @@ __doc__ = "CLI utilities"
 
 
 class CLIRunnable():
-
     action = None
 
     @staticmethod
@@ -90,3 +91,24 @@ def no_going_back(confirmation):
         'This action cannot be undone! '
         'Type in "%s" or press Enter to abort.' % confirmation,
         confirmation)
+
+
+def add_really_argument(parser):
+    parser.add_argument(
+        '--really', '-y',
+        help='Confirm all prompt actions',
+        action='store_true',
+        default=False)
+
+
+def action_list():
+    actions = [action[1] for action in iter_modules(__path__)]
+    return actions
+
+
+def load_module(mod):  # pragma: no cover
+    try:
+        return import_module('SoftLayer.CLI.%s' % mod)
+    except ImportError:
+        print("Error: Module '%s' does not exist!" % mod)
+        exit(1)
