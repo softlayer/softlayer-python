@@ -1,9 +1,8 @@
 #!/usr/bin/env python
+"""Firewall rule and security management"""
 
 from SoftLayer.CLI import CLIRunnable
 from SoftLayer.firewall import FirewallManager
-
-__doc__ = "Firewall rule and security management"
 
 
 class FWList(CLIRunnable):

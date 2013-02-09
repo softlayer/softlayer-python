@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 import sys
 import os
 
@@ -8,7 +8,10 @@ if sys.version_info >= (3,):
     extra['use_2to3'] = True
 
 requires = ['distribute', 'prettytable']
-if sys.version_info >= (2, 6):
+
+if sys.version_info <= (2, 6):
+    requires.append('argparse')
+elif sys.version_info >= (2, 6):
     requires.append('requests')
 
 description = "A library to contact SoftLayer's backend services"
@@ -29,11 +32,7 @@ setup(
     long_description=long_description,
     author='SoftLayer Technologies, Inc.',
     author_email='sldn@softlayer.com',
-    packages=[
-        'SoftLayer',
-        'SoftLayer.tests',
-        'SoftLayer.transport',
-        'SoftLayer.CLI'],
+    packages=find_packages(),
     license='The BSD License',
     zip_safe=False,
     url='http://github.com/softlayer/softlayer-api-python-client',

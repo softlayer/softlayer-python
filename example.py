@@ -56,15 +56,15 @@ pprint.pprint(client['Account'].getObject())
 
 # Retrieve the ticket record.
 ticket = client['Ticket'].getObject(id=123456,
-    mask={
-        'updates' : None,
-        'assignedUser' : None,
-        'attachedHardware' : {
-            'datacenter' : None
-        },
-    })
+                                    mask={
+                                    'updates': None,
+                                    'assignedUser': None,
+                                    'attachedHardware': {
+                                        'datacenter': None
+                                    },
+                                    })
 pprint.pprint(ticket)
 
 # Now update the ticket.
-update = client['Ticket'].addUpdate(id=123456, {'entry' : 'Hello!'})
+update = client['Ticket'].addUpdate(id=123456, {'entry': 'Hello!'})
 pprint.pprint(update)

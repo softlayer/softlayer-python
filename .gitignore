@@ -4,3 +4,9 @@ Thumbs.db
 .svn
 ._*
 *.pyc
+.coverage
+cover/*
+.tox
+build/*
+dist/*
+*.egg-info

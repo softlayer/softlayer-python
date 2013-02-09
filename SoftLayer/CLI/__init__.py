@@ -1,4 +1,5 @@
-from prettytable import PrettyTable, FRAME
+from prettytable import PrettyTable, FRAME, NONE
+from copy import deepcopy
 
 __all__ = [
     'CLIRunnable',
@@ -26,15 +27,37 @@ class CLIRunnable():
 class Table(PrettyTable):
     def __init__(self, *args, **kwargs):
         super(Table, self).__init__(*args, **kwargs)
-        self.hrules = FRAME
         self.horizontal_char = '.'
         self.vertical_char = ':'
         self.junction_char = ':'
 
 
+def format_output(data, args):
+    if args.fmt == 'table':
+        return format_prettytable(data)
+    elif args.fmt == 'raw':
+        return format_no_tty(data)
+
+
+def format_prettytable(table):
+    t = deepcopy(table)
+    t.hrules = FRAME
+
+    return t
+
+
+def format_no_tty(table):
+    notty = deepcopy(table)
+    notty.hrules = NONE
+    notty.border = False
+    notty.header = False
+    for k in notty.align.keys():
+        notty.align[k] = 'l'
+    return notty
+
+
 def valid_response(prompt, *valid):
-    while True:
-        ans = raw_input(prompt).lower()
+    ans = raw_input(prompt).lower()
 
     if ans in valid:
         return True
