@@ -1,7 +1,15 @@
-from prettytable import PrettyTable, FRAME, NONE
+"CLI utilities"
+import sys
+import os.path
 from pkgutil import iter_modules
 from importlib import import_module
 from copy import deepcopy
+from argparse import ArgumentParser, SUPPRESS
+from ConfigParser import SafeConfigParser
+
+from prettytable import PrettyTable, FRAME, NONE
+
+from SoftLayer import Client, SoftLayerError
 
 __all__ = [
     'CLIRunnable',
@@ -10,10 +18,22 @@ __all__ = [
     'no_going_back',
 ]
 
-__doc__ = "CLI utilities"
+plugins = {}
 
 
-class CLIRunnable():
+class CLIRunnableType(type):
+    def __init__(cls, name, bases, attrs):
+        super(CLIRunnableType, cls).__init__(name, bases, attrs)
+        # print cls, name, bases, attrs
+        if name != 'CLIRunnable':
+            command = cls.__module__.split('.')[-1]
+            if command not in plugins:
+                plugins[command] = {}
+            plugins[command][cls.action] = cls
+
+
+class CLIRunnable(object):
+    __metaclass__ = CLIRunnableType
     action = None
 
     @staticmethod
@@ -101,6 +121,19 @@ def add_really_argument(parser):
         default=False)
 
 
+def add_fmt_argument(parser):
+    fmt_default = 'raw'
+    if sys.stdout.isatty():
+        fmt_default = 'table'
+
+    parser.add_argument(
+        '--format',
+        help='output format',
+        choices=['table', 'raw'],
+        default=fmt_default,
+        dest='fmt')
+
+
 def action_list():
     actions = [action[1] for action in iter_modules(__path__)]
     return actions
@@ -108,7 +141,120 @@ def action_list():
 
 def load_module(mod):  # pragma: no cover
     try:
-        return import_module('SoftLayer.CLI.%s' % mod)
+        m = import_module('SoftLayer.CLI.%s' % mod)
+        return m
     except ImportError:
         print("Error: Module '%s' does not exist!" % mod)
-        exit(1)
+        sys.exit(1)
+
+
+def main():  # pragma: no cover
+    cli_args = sys.argv[1:]
+    # Set up the primary parser. e.g. sl command
+    parser = ArgumentParser(
+        add_help=False,
+        description='SoftLayer Command-line Client')
+    actions = action_list()
+    parser.add_argument(
+        'module',
+        help="Module name, try help or list",
+        choices=[
+            'help',
+            'list',
+        ] + actions, nargs='?')
+    parser.add_argument('aux', nargs='*', help=SUPPRESS)
+    add_fmt_argument(parser)
+
+    parent_args, aux_args = parser.parse_known_args(args=cli_args)
+    if parent_args.module is None:
+        mod = 'help'
+    else:
+        mod = parent_args.module.lower()
+
+    if mod == 'help':
+        parser.print_help()
+        sys.exit(1)
+
+    module = load_module(mod)
+
+    # If there are no command actions, run execute() on the module if it exists
+    if len(parent_args.aux) == 0:
+        try:
+            data = module.execute(parent_args)
+            if data:
+                print(format_output(data, parent_args))
+            sys.exit(0)
+        except AttributeError:
+            pass
+
+    # Set up sub-command parser. e.g. sl command action
+    parser = ArgumentParser(description=module.__doc__)
+    parser.add_argument(mod)
+
+    parser.add_argument('--config', '-C', help='Config file')
+    add_fmt_argument(parser)
+
+    methods = plugins[mod]
+
+    if len(methods) > 0:
+        action_parser = parser.add_subparsers(
+            dest='action', description=module.__doc__)
+
+        for keys, method in methods.iteritems():
+            subparser = action_parser.add_parser(
+                method.action,
+                help=method.__doc__,
+                description=method.__doc__,
+            )
+            method.add_additional_args(subparser)
+
+    parsed_args = parser.parse_args(args=cli_args)
+    action = parsed_args.action
+
+    if action not in methods:
+        raise ValueError("No such method exists: %s" % action)
+
+    # Get config
+    client_params = {}
+    config_files = ["~/.softlayer"]
+
+    if parsed_args.config:
+        config_files.append(parsed_args.config)
+
+    try:
+        client_params = parse_config(config_files)
+    except ValueError, e:
+        if parsed_args.config:
+            print(e)
+
+    # Do the work
+    try:
+        client = Client(**client_params)
+        data = methods[action].execute(client, parsed_args)
+    except SoftLayerError, e:
+        print(e)
+        sys.exit(1)
+
+    # Format/Output data
+    if data:
+        print(format_output(data, parsed_args))
+
+
+def parse_config(files):
+    config_files = [os.path.expanduser(f) for f in files]
+
+    cp = SafeConfigParser({
+        'username': None,
+        'api_key': None,
+        'endpoint_url': None
+    })
+    cp.read(config_files)
+    config = {}
+
+    if not cp.has_section('softlayer'):
+        return config
+
+    config['username'] = cp.get('softlayer', 'username')
+    config['api_key'] = cp.get('softlayer', 'api_key')
+    config['endpoint_url'] = cp.get('softlayer', 'endpoint_url')
+    return config

@@ -37,7 +37,11 @@ setup(
     license='The BSD License',
     zip_safe=False,
     url='http://github.com/softlayer/softlayer-api-python-client',
-    scripts=['bin/sl'],
+    entry_points={
+        'console_scripts': [
+            'sl = SoftLayer.CLI:main',
+        ],
+    },
     install_requires=requires,
     classifiers=[
         'Environment :: Console',
