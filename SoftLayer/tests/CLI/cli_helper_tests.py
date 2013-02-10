@@ -5,7 +5,7 @@ try:
     import unittest2 as unittest
 except ImportError:
     import unittest
-from mock import patch
+from mock import patch, MagicMock
 from argparse import ArgumentParser, Namespace
 
 import SoftLayer
@@ -149,26 +149,92 @@ class PromptTests(unittest.TestCase):
         self.assertEqual('raw', args.fmt)
 
 
-class TestExecuteCommand(unittest.TestCase):
+class TestParseArgs(unittest.TestCase):
+    @patch('sys.stdout.isatty')
+    def test_primary(self, isatty):
+        isatty.return_value = False
+        module_name, parent_args, aux_args = SoftLayer.CLI.parse_primary_args(
+            ['module', 'module2'], ['module'])
 
-    @patch('SoftLayer.CLI.plugins')
-    def test_execute_command_table(self, plugins):
-        plugins.__getitem__().__getitem__().execute.return_value = \
-            SoftLayer.CLI.Table()
-        args = Namespace(fmt='raw')
-        SoftLayer.CLI.execute_action('testmodule', 'testaction', args=args)
-
-    @patch('SoftLayer.CLI.plugins')
-    def test_execute_command_none(self, plugins):
-        plugins.__getitem__().__getitem__().execute.return_value = None
-        SoftLayer.CLI.execute_action('testmodule', 'testaction')
+        self.assertEqual('module', module_name)
+        self.assertEqual([], aux_args)
 
     @patch('sys.exit')
-    @patch('SoftLayer.CLI.plugins')
-    def test_execute_command_exception(self, plugins, ext):
-        plugins.__getitem__().__getitem__().execute.side_effect = \
-            SoftLayer.SoftLayerError()
-        SoftLayer.CLI.execute_action('testmodule', 'testaction')
+    def test_primary_help(self, ext):
+        return_value = SoftLayer.CLI.parse_primary_args(
+            ['module', 'module2'], [])
+        ext.assert_called_with(1)
+        self.assertEqual(ext(), return_value)
+
+        return_value = SoftLayer.CLI.parse_primary_args(
+            ['module', 'module2'], ['--help'])
+        ext.assert_called_with(1)
+        self.assertEqual(ext(), return_value)
+
+    @patch('sys.exit')
+    def test_module_empty(self, ext):
+        # module, module_name, actions, posargs, argv
+        module = MagicMock()
+        module.__doc__ = 'some info'
+        action = MagicMock()
+        SoftLayer.CLI.parse_module_args(
+            module, 'module', {'action': action}, [], [])
+        ext.assert_called_with(2)
+
+    def test_module_action(self):
+        # module, module_name, actions, posargs, argv
+        module = MagicMock()
+        module.__doc__ = 'some info'
+        action = MagicMock()
+        args = SoftLayer.CLI.parse_module_args(
+            module, 'module', {'action': action}, ['action'], [])
+        self.assertEqual('action', args.action)
+        self.assertEqual(None, args.config)
+        self.assertEqual('raw', args.fmt)
+
+    def test_module_with_options(self):
+        # module, module_name, actions, posargs, argv
+        module = MagicMock()
+        module.__doc__ = 'some info'
+        action = MagicMock()
+        args = SoftLayer.CLI.parse_module_args(
+            module, 'module', {'action': action},
+            ['action'], ['--format=table', '--config=/path/to/config'])
+        self.assertEqual('action', args.action)
+        self.assertEqual('/path/to/config', args.config)
+        self.assertEqual('table', args.fmt)
+
+    def test_module_with_base(self):
+        # module, module_name, actions, posargs, argv
+        module = MagicMock()
+        module.__doc__ = 'some info'
+        action = MagicMock()
+        args = SoftLayer.CLI.parse_module_args(
+            module, 'module', {None: action}, [], [])
+        self.assertEqual(None, args.action)
+        self.assertEqual(None, args.config)
+        self.assertEqual('raw', args.fmt)
+
+
+class TestExecuteCommand(unittest.TestCase):
+
+    def test_execute_command_table(self):
+        f = MagicMock()
+        f.execute.return_value = \
+            SoftLayer.CLI.Table()
+        args = Namespace(fmt='raw')
+        SoftLayer.CLI.execute_action(f, args=args)
+
+    def test_execute_command_none(self):
+        f = MagicMock()
+        f.execute.return_value = None
+        SoftLayer.CLI.execute_action(f)
+
+    @patch('sys.exit')
+    def test_execute_command_exception(self, ext):
+        f = MagicMock()
+        f.execute.side_effect = SoftLayer.SoftLayerError()
+        SoftLayer.CLI.execute_action(f)
 
 
 class TestParseConfig(unittest.TestCase):

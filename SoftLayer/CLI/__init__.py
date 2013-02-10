@@ -18,18 +18,31 @@ __all__ = [
     'no_going_back',
 ]
 
+# plugins is a hash of module name to a dict of actions names to action classes
 plugins = {}
+
+
+def add_plugin(cls):
+    command = cls.__module__.split('.')[-1]
+    if command not in plugins:
+        plugins[command] = {}
+    plugins[command][cls.action] = cls
+
+
+def load_module(mod):  # pragma: no cover
+    try:
+        m = import_module('SoftLayer.CLI.%s' % mod)
+        return m
+    except ImportError:
+        print("Error: Module '%s' does not exist!" % mod)
+        sys.exit(1)
 
 
 class CLIRunnableType(type):
     def __init__(cls, name, bases, attrs):
         super(CLIRunnableType, cls).__init__(name, bases, attrs)
-        # print cls, name, bases, attrs
         if name != 'CLIRunnable':
-            command = cls.__module__.split('.')[-1]
-            if command not in plugins:
-                plugins[command] = {}
-            plugins[command][cls.action] = cls
+            add_plugin(cls)
 
 
 class CLIRunnable(object):
@@ -121,6 +134,10 @@ def add_really_argument(parser):
         default=False)
 
 
+def add_config_argument(parser):
+    parser.add_argument('--config', '-C', help='Config file', dest='config')
+
+
 def add_fmt_argument(parser):
     fmt_default = 'raw'
     if sys.stdout.isatty():
@@ -139,103 +156,95 @@ def action_list():
     return actions
 
 
-def load_module(mod):  # pragma: no cover
-    try:
-        m = import_module('SoftLayer.CLI.%s' % mod)
-        return m
-    except ImportError:
-        print("Error: Module '%s' does not exist!" % mod)
-        sys.exit(1)
-
-
-def parse_primary_args(argv):
+def parse_primary_args(modules, argv):
     # Set up the primary parser. e.g. sl command
+    description = 'SoftLayer Command-line Client'
     parser = ArgumentParser(
         add_help=False,
-        description='SoftLayer Command-line Client')
-    actions = action_list()
+        description=description)
     parser.add_argument(
         'module',
         help="Module name, try help or list",
-        choices=[
-            'help',
-            'list',
-        ] + actions, nargs='?')
+        choices=['help'] + modules,
+        default='help',
+        nargs='?')
     parser.add_argument('aux', nargs='*', help=SUPPRESS)
-    add_fmt_argument(parser)
 
     args, aux_args = parser.parse_known_args(args=argv)
+    module_name = args.module.lower()
 
-    if args.module is None:
-        module_name = 'help'
-    else:
-        module_name = args.module.lower()
-
-    load_module(module_name)
-    if len(args.aux) == 0 and None in plugins[module_name]:
-        plugins[module_name][None].add_additional_args(parser)
-        execute_action(module_name, None, client=None, args=args)
-        sys.exit(0)
-
-    aux_args = args.aux + ["--format=%s" % args.fmt] + aux_args
+    if module_name == 'help':
+        parser.print_help()
+        return sys.exit(1)
     return module_name, args, aux_args
 
 
-def parse_module_args(module_name, argv):
+def parse_module_args(module, module_name, actions, posargs, argv):
     # Set up sub-command parser. e.g. sl command action
-    module = load_module(module_name)
+    args = posargs + argv
+
     parser = ArgumentParser(
         description=module.__doc__,
         prog="%s %s" % (os.path.basename(sys.argv[0]), module_name),
     )
 
-    parser.add_argument('--config', '-C', help='Config file', dest='config')
-    action_parser = parser.add_subparsers(
-        dest='action', description=module.__doc__)
+    if len(posargs) == 0 and None in actions.keys():
+        # Work-around for add_subparsers() failings. You cannot define a
+        # default action. This section makes `sl list` work.
+        parser.add_argument('--action', default=None, help=SUPPRESS)
+        actions[None].add_additional_args(parser)
+        add_fmt_argument(parser)
+        add_config_argument(parser)
+    else:
+        action_parser = parser.add_subparsers(dest='action')
 
-    for action, method in plugins[module_name].iteritems():
-        if action:
-            subparser = action_parser.add_parser(
-                method.action,
-                help=method.__doc__,
-                description=method.__doc__,
-            )
-            method.add_additional_args(subparser)
-            add_fmt_argument(subparser)
+        for action_name, method in actions.iteritems():
+            if action_name:
+                subparser = action_parser.add_parser(
+                    action_name,
+                    help=method.__doc__,
+                    description=method.__doc__,
+                )
+                method.add_additional_args(subparser)
+                add_fmt_argument(subparser)
+                add_config_argument(subparser)
 
-    return parser.parse_args(args=argv)
+    return parser.parse_args(args=args)
 
 
 def main():  # pragma: no cover
+    # Parse Top-Level Arguments
     argv = sys.argv[1:]
-    module_name, parent_args, aux_args = parse_primary_args(argv)
-    parsed_args = parse_module_args(module_name, aux_args)
+    module_name, parent_args, aux_args = \
+        parse_primary_args(action_list(), argv)
 
+    module = load_module(module_name)
+
+    # Parse Module-Specific Arguments
+    parsed_args = parse_module_args(
+        module, module_name, plugins[module_name], parent_args.aux, aux_args)
     action = parsed_args.action
 
     if action not in plugins[module_name]:
         raise ValueError("No such method exists: %s" % action)
 
-    # Get config
-    client_params = {}
+    # Parse Config
     config_files = ["~/.softlayer"]
 
     if parsed_args.config:
         config_files.append(parsed_args.config)
 
-    try:
-        client_params = parse_config(config_files)
-    except ValueError, e:
-        if parsed_args.config:
-            print(e)
-
+    client_params = parse_config(config_files)
     client = Client(**client_params)
-    execute_action(module_name, action, client=client, args=parsed_args)
+
+    # Do the thing
+    f = plugins[module_name][action]
+    execute_action(f, client=client, args=parsed_args)
 
 
-def execute_action(module_name, action, client=None, args=None):
+def execute_action(f, client=None, args=None):
     try:
-        data = plugins[module_name][action].execute(client, args)
+        data = f.execute(client, args)
     except SoftLayerError, e:
         print(e)
         return sys.exit(1)
