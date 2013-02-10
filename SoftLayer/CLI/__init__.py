@@ -159,13 +159,12 @@ def action_list():
 def parse_primary_args(modules, argv):
     # Set up the primary parser. e.g. sl command
     description = 'SoftLayer Command-line Client'
-    parser = ArgumentParser(
-        add_help=False,
-        description=description)
+    parser = ArgumentParser(description=description)
+
     parser.add_argument(
         'module',
         help="Module name, try help or list",
-        choices=['help'] + modules,
+        choices=sorted(['help'] + modules),
         default='help',
         nargs='?')
     parser.add_argument('aux', nargs='*', help=SUPPRESS)
