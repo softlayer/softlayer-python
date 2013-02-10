@@ -514,3 +514,71 @@ class ManageCCI(CLIRunnable):
             result = vg.rebootDefault(id=args.instance)
 
         print result
+
+
+class NetworkCCI(CLIRunnable):
+    """ manage network settings """
+
+    action = 'network'
+
+    @staticmethod
+    def add_additional_args(parser):
+
+        def add_subparser(parser, arg, help, func):
+            sp = parser.add_parser(arg, help=help)
+            sp.add_argument(
+                'instance',
+                help='Instance ID')
+            g = sp.add_mutually_exclusive_group(required=True)
+            g.add_argument(
+                '--public',
+                help='Disable public port',
+                action='store_true')
+            g.add_argument(
+                '--private',
+                help='Disable private port',
+                action='store_true')
+
+            sp.set_defaults(func=func)
+            return sp
+
+        manage = parser.add_subparsers(dest='network')
+
+        add_subparser(
+            manage, 'details',
+            'Get network information',
+            NetworkCCI.exec_detail)
+
+        po = add_subparser(
+            manage, 'port',
+            'Set port speed or disable port',
+            NetworkCCI.exec_port)
+
+        po.add_argument(
+            '--speed',
+            type=int,
+            choices=[0, 10, 100, 1000, 10000],
+            help='Set port speed. 0 disables port',
+            required=True)
+
+    @staticmethod
+    def execute(client, args):
+        return args.func(client, args)
+
+    @staticmethod
+    def exec_port(client, args):
+        vg = client['Virtual_Guest']
+        if args.public:
+            func = vg.setPublicNetworkInterfaceSpeed
+        elif args.private:
+            func = vg.setPrivateNetworkInterfaceSpeed
+
+        result = func(args.speed, id=args.instance)
+        if result:
+            print "Success"
+        else:
+            print result
+
+    @staticmethod
+    def exec_detail(client, args):
+        pass  # TODO this should print out default gateway and stuff
