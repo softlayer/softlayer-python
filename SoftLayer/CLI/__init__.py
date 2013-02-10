@@ -148,8 +148,7 @@ def load_module(mod):  # pragma: no cover
         sys.exit(1)
 
 
-def main():  # pragma: no cover
-    cli_args = sys.argv[1:]
+def parse_primary_args(argv):
     # Set up the primary parser. e.g. sl command
     parser = ArgumentParser(
         add_help=False,
@@ -165,53 +164,55 @@ def main():  # pragma: no cover
     parser.add_argument('aux', nargs='*', help=SUPPRESS)
     add_fmt_argument(parser)
 
-    parent_args, aux_args = parser.parse_known_args(args=cli_args)
-    if parent_args.module is None:
-        mod = 'help'
+    args, aux_args = parser.parse_known_args(args=argv)
+
+    if args.module is None:
+        module_name = 'help'
     else:
-        mod = parent_args.module.lower()
+        module_name = args.module.lower()
 
-    if mod == 'help':
-        parser.print_help()
-        sys.exit(1)
+    load_module(module_name)
+    if len(args.aux) == 0 and None in plugins[module_name]:
+        plugins[module_name][None].add_additional_args(parser)
+        execute_action(module_name, None, client=None, args=args)
+        sys.exit(0)
 
-    module = load_module(mod)
+    return module_name, args, args.aux + aux_args
 
-    # If there are no command actions, run execute() on the module if it exists
-    if len(parent_args.aux) == 0:
-        try:
-            data = module.execute(parent_args)
-            if data:
-                print(format_output(data, parent_args))
-            sys.exit(0)
-        except AttributeError:
-            pass
 
+def parse_module_args(module_name, argv):
     # Set up sub-command parser. e.g. sl command action
-    parser = ArgumentParser(description=module.__doc__)
-    parser.add_argument(mod)
+    module = load_module(module_name)
+    parser = ArgumentParser(
+        description=module.__doc__,
+        prog="%s %s" % (os.path.basename(sys.argv[0]), module_name),
+    )
 
-    parser.add_argument('--config', '-C', help='Config file')
-    add_fmt_argument(parser)
+    parser.add_argument('--config', '-C', help='Config file', dest='config')
+    action_parser = parser.add_subparsers(
+        dest='action', description=module.__doc__)
 
-    methods = plugins[mod]
-
-    if len(methods) > 0:
-        action_parser = parser.add_subparsers(
-            dest='action', description=module.__doc__)
-
-        for keys, method in methods.iteritems():
+    for action, method in plugins[module_name].iteritems():
+        if action:
             subparser = action_parser.add_parser(
                 method.action,
                 help=method.__doc__,
                 description=method.__doc__,
             )
             method.add_additional_args(subparser)
+            add_fmt_argument(subparser)
 
-    parsed_args = parser.parse_args(args=cli_args)
+    return parser.parse_args(args=argv)
+
+
+def main():  # pragma: no cover
+    argv = sys.argv[1:]
+    module_name, parent_args, aux_args = parse_primary_args(argv)
+    parsed_args = parse_module_args(module_name, aux_args)
+
     action = parsed_args.action
 
-    if action not in methods:
+    if action not in plugins[module_name]:
         raise ValueError("No such method exists: %s" % action)
 
     # Get config
@@ -227,17 +228,20 @@ def main():  # pragma: no cover
         if parsed_args.config:
             print(e)
 
-    # Do the work
+    client = Client(**client_params)
+    execute_action(module_name, action, client=client, args=parsed_args)
+
+
+def execute_action(module_name, action, client=None, args=None):
     try:
-        client = Client(**client_params)
-        data = methods[action].execute(client, parsed_args)
+        data = plugins[module_name][action].execute(client, args)
     except SoftLayerError, e:
         print(e)
-        sys.exit(1)
+        return sys.exit(1)
 
     # Format/Output data
     if data:
-        print(format_output(data, parsed_args))
+        print(format_output(data, args))
 
 
 def parse_config(files):

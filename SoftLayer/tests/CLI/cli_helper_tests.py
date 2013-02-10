@@ -6,8 +6,9 @@ try:
 except ImportError:
     import unittest
 from mock import patch
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 
+import SoftLayer
 import SoftLayer.CLI
 import prettytable
 
@@ -148,7 +149,30 @@ class PromptTests(unittest.TestCase):
         self.assertEqual('raw', args.fmt)
 
 
+class TestExecuteCommand(unittest.TestCase):
+
+    @patch('SoftLayer.CLI.plugins')
+    def test_execute_command_table(self, plugins):
+        plugins.__getitem__().__getitem__().execute.return_value = \
+            SoftLayer.CLI.Table()
+        args = Namespace(fmt='raw')
+        SoftLayer.CLI.execute_action('testmodule', 'testaction', args=args)
+
+    @patch('SoftLayer.CLI.plugins')
+    def test_execute_command_none(self, plugins):
+        plugins.__getitem__().__getitem__().execute.return_value = None
+        SoftLayer.CLI.execute_action('testmodule', 'testaction')
+
+    @patch('sys.exit')
+    @patch('SoftLayer.CLI.plugins')
+    def test_execute_command_exception(self, plugins, ext):
+        plugins.__getitem__().__getitem__().execute.side_effect = \
+            SoftLayer.SoftLayerError()
+        SoftLayer.CLI.execute_action('testmodule', 'testaction')
+
+
 class TestParseConfig(unittest.TestCase):
+
     def test_parse_config_no_files(self):
         config = SoftLayer.CLI.parse_config([])
         self.assertEqual({}, config)

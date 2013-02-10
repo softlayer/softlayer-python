@@ -1,19 +1,24 @@
 #!/usr/bin/env python
 """Lists all available commands"""
-from SoftLayer.CLI import action_list, load_module, Table
+from SoftLayer.CLI import action_list, load_module, Table, CLIRunnable
 
 
-def execute(args):
-    actions = action_list()
-    t = Table([
-        "module",
-        "description",
-    ])
-    t.align['module'] = 'r'
-    t.align['description'] = 'l'
+class ListActions(CLIRunnable):
+    """ List active vlans with firewalls """
+    action = None
 
-    for action in actions:
-        m = load_module(action)
-        t.add_row([action, m.__doc__])
+    @staticmethod
+    def execute(client, args):
+        actions = action_list()
+        t = Table([
+            "module",
+            "description",
+        ])
+        t.align['module'] = 'r'
+        t.align['description'] = 'l'
 
-    return t
+        for action in actions:
+            m = load_module(action)
+            t.add_row([action, m.__doc__])
+
+        return t
