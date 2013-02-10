@@ -440,10 +440,22 @@ class ManageCCI(CLIRunnable):
         g = po.add_mutually_exclusive_group()
         g.add_argument(
             '--soft',
-            help='Request the instance to shutdown gracefully')
+            help='Request the instance to shutdown gracefully',
+            action='store_true')
+
+        po = add_subparser(
+            manage, 'reboot',
+            'Reboot the instance',
+            ManageCCI.exec_reboot)
+        g = po.add_mutually_exclusive_group()
         g.add_argument(
             '--cycle',
-            help='Power cycle the instance (off, then on)')
+            help='Power cycle the instance (off, then on)',
+            action='store_true')
+        g.add_argument(
+            '--soft',
+            help='Attempt to shutdown the guest',
+            action='store_true')
 
         add_subparser(
             manage, 'poweron',
@@ -462,29 +474,43 @@ class ManageCCI(CLIRunnable):
 
     @staticmethod
     def execute(client, args):
-        args.func(client, args)
+        return args.func(client, args)
 
     @staticmethod
     def exec_shutdown(client, args):
         vg = client['Virtual_Guest']
         if args.soft:
-            vg.powerOffSoft(args.instance)
+            result = vg.powerOffSoft(id=args.instance)
         elif args.cycle:
-            vg.powerCycle(args.instance)
+            result = vg.powerCycle(id=args.instance)
         else:
-            vg.powerOff(args.instance)
+            result = vg.powerOff(id=args.instance)
+
+        print result
 
     @staticmethod
     def exec_poweron(client, args):
         vg = client['Virtual_Guest']
-        vg.powerOn(args.instance)
+        print vg.powerOn(id=args.instance)
 
     @staticmethod
     def exec_pause(client, args):
         vg = client['Virtual_Guest']
-        vg.pause(args.instance)
+        print vg.pause(id=args.instance)
 
     @staticmethod
     def exec_resume(client, args):
         vg = client['Virtual_Guest']
-        vg.resume(args.instance)
+        print vg.resume(id=args.instance)
+
+    @staticmethod
+    def exec_reboot(client, args):
+        vg = client['Virtual_Guest']
+        if args.cycle:
+            result = vg.rebootHard(id=args.instance)
+        elif args.soft:
+            result = vg.rebootSoft(id=args.instance)
+        else:
+            result = vg.rebootDefault(id=args.instance)
+
+        print result
