@@ -175,7 +175,7 @@ def parse_primary_args(modules, argv):
 
     if module_name == 'help':
         parser.print_help()
-        return sys.exit(1)
+        return sys.exit(0)
     return module_name, args, aux_args
 
 
@@ -209,7 +209,12 @@ def parse_module_args(module, module_name, actions, posargs, argv):
                 add_fmt_argument(subparser)
                 add_config_argument(subparser)
 
-    return parser.parse_args(args=args)
+    parsed_args = parser.parse_args(args=args)
+    # Uh, this shouldn't actually happen...
+    if parsed_args.action is None and None not in actions.keys():
+        parser.print_help()
+        return sys.exit(2)
+    return parsed_args
 
 
 def main():  # pragma: no cover

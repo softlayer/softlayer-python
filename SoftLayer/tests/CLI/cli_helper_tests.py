@@ -163,26 +163,29 @@ class TestParseArgs(unittest.TestCase):
     def test_primary_help(self, ext):
         return_value = SoftLayer.CLI.parse_primary_args(
             ['module', 'module2'], [])
-        ext.assert_called_with(1)
+        ext.assert_called_with(0)
+        self.assertEqual(ext(), return_value)
+
+        return_value = SoftLayer.CLI.parse_primary_args(
+            ['module', 'module2'], ['help'])
+        ext.assert_called_with(0)
         self.assertEqual(ext(), return_value)
 
         return_value = SoftLayer.CLI.parse_primary_args(
             ['module', 'module2'], ['--help'])
-        ext.assert_called_with(1)
+        ext.assert_called_with(0)
         self.assertEqual(ext(), return_value)
 
     @patch('sys.exit')
     def test_module_empty(self, ext):
-        # module, module_name, actions, posargs, argv
         module = MagicMock()
         module.__doc__ = 'some info'
         action = MagicMock()
-        SoftLayer.CLI.parse_module_args(
+        print SoftLayer.CLI.parse_module_args(
             module, 'module', {'action': action}, [], [])
         ext.assert_called_with(2)
 
     def test_module_action(self):
-        # module, module_name, actions, posargs, argv
         module = MagicMock()
         module.__doc__ = 'some info'
         action = MagicMock()
@@ -193,7 +196,6 @@ class TestParseArgs(unittest.TestCase):
         self.assertEqual('raw', args.fmt)
 
     def test_module_with_options(self):
-        # module, module_name, actions, posargs, argv
         module = MagicMock()
         module.__doc__ = 'some info'
         action = MagicMock()
@@ -205,7 +207,6 @@ class TestParseArgs(unittest.TestCase):
         self.assertEqual('table', args.fmt)
 
     def test_module_with_base(self):
-        # module, module_name, actions, posargs, argv
         module = MagicMock()
         module.__doc__ = 'some info'
         action = MagicMock()
