@@ -177,7 +177,8 @@ def parse_primary_args(argv):
         execute_action(module_name, None, client=None, args=args)
         sys.exit(0)
 
-    return module_name, args, args.aux + aux_args
+    aux_args = args.aux + ["--format=%s" % args.fmt] + aux_args
+    return module_name, args, aux_args
 
 
 def parse_module_args(module_name, argv):
