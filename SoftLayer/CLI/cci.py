@@ -413,3 +413,78 @@ class CancelCCI(CLIRunnable):
             cci.cancel_instance(args.id)
         else:
             print "Aborted."
+
+
+class ManageCCI(CLIRunnable):
+    """ Manage active CCI"""
+
+    action = 'manage'
+
+    @staticmethod
+    def add_additional_args(parser):
+        manage = parser.add_subparsers(dest='manage')
+
+        def add_subparser(parser, arg, help, func):
+            sp = parser.add_parser(arg, help=help)
+            sp.add_argument(
+                'instance',
+                help='Instance ID')
+            sp.set_defaults(func=func)
+
+            return sp
+
+        po = add_subparser(
+            manage, 'poweroff',
+            'Power off instance',
+            ManageCCI.exec_shutdown)
+        g = po.add_mutually_exclusive_group()
+        g.add_argument(
+            '--soft',
+            help='Request the instance to shutdown gracefully')
+        g.add_argument(
+            '--cycle',
+            help='Power cycle the instance (off, then on)')
+
+        add_subparser(
+            manage, 'poweron',
+            'Power on instance',
+            ManageCCI.exec_poweron)
+
+        add_subparser(
+            manage, 'pause',
+            'Pause a running instance',
+            ManageCCI.exec_pause)
+
+        add_subparser(
+            manage, 'resume',
+            'Unpause a paused instance',
+            ManageCCI.exec_resume)
+
+    @staticmethod
+    def execute(client, args):
+        args.func(client, args)
+
+    @staticmethod
+    def exec_shutdown(client, args):
+        vg = client['Virtual_Guest']
+        if args.soft:
+            vg.powerOffSoft(args.instance)
+        elif args.cycle:
+            vg.powerCycle(args.instance)
+        else:
+            vg.powerOff(args.instance)
+
+    @staticmethod
+    def exec_poweron(client, args):
+        vg = client['Virtual_Guest']
+        vg.powerOn(args.instance)
+
+    @staticmethod
+    def exec_pause(client, args):
+        vg = client['Virtual_Guest']
+        vg.pause(args.instance)
+
+    @staticmethod
+    def exec_resume(client, args):
+        vg = client['Virtual_Guest']
+        vg.resume(args.instance)
