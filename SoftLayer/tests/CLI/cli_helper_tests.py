@@ -159,31 +159,26 @@ class TestParseArgs(unittest.TestCase):
         self.assertEqual('module', module_name)
         self.assertEqual([], aux_args)
 
-    @patch('sys.exit')
-    def test_primary_help(self, ext):
-        return_value = SoftLayer.CLI.parse_primary_args(
+    def test_primary_help(self):
+        self.assertRaises(
+            SystemExit, SoftLayer.CLI.parse_primary_args,
             ['module', 'module2'], [])
-        ext.assert_called_with(0)
-        self.assertEqual(ext(), return_value)
 
-        return_value = SoftLayer.CLI.parse_primary_args(
+        self.assertRaises(
+            SystemExit, SoftLayer.CLI.parse_primary_args,
             ['module', 'module2'], ['help'])
-        ext.assert_called_with(0)
-        self.assertEqual(ext(), return_value)
 
-        return_value = SoftLayer.CLI.parse_primary_args(
+        self.assertRaises(
+            SystemExit, SoftLayer.CLI.parse_primary_args,
             ['module', 'module2'], ['--help'])
-        ext.assert_called_with(0)
-        self.assertEqual(ext(), return_value)
 
-    @patch('sys.exit')
-    def test_module_empty(self, ext):
+    def test_module_empty(self):
         module = MagicMock()
         module.__doc__ = 'some info'
         action = MagicMock()
-        print SoftLayer.CLI.parse_module_args(
+        self.assertRaises(
+            SystemExit, SoftLayer.CLI.parse_module_args,
             module, 'module', {'action': action}, [], [])
-        ext.assert_called_with(2)
 
     def test_module_action(self):
         module = MagicMock()
@@ -230,20 +225,6 @@ class TestExecuteCommand(unittest.TestCase):
         f = MagicMock()
         f.execute.return_value = None
         SoftLayer.CLI.execute_action(f)
-
-    @patch('sys.exit')
-    def test_execute_command_exception(self, ext):
-        f = MagicMock()
-        f.execute.side_effect = SoftLayer.SoftLayerError()
-        SoftLayer.CLI.execute_action(f)
-        ext.assert_called_with(1)
-
-    @patch('sys.exit')
-    def test_execute_command_interrupt(self, ext):
-        f = MagicMock()
-        f.execute.side_effect = KeyboardInterrupt
-        SoftLayer.CLI.execute_action(f)
-        ext.assert_called_with(1)
 
 
 class TestParseConfig(unittest.TestCase):

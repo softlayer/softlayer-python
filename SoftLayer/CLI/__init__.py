@@ -35,7 +35,7 @@ def load_module(mod):  # pragma: no cover
         return m
     except ImportError:
         print("Error: Module '%s' does not exist!" % mod)
-        sys.exit(1)
+        raise CLIHalt(code=1)
 
 
 class CLIRunnableType(type):
@@ -174,7 +174,7 @@ def parse_primary_args(modules, argv):
 
     if module_name == 'help':
         parser.print_help()
-        return sys.exit(0)
+        raise CLIHalt(code=0)
     return module_name, args, aux_args
 
 
@@ -210,52 +210,63 @@ def parse_module_args(module, module_name, actions, posargs, argv):
 
     parsed_args = parser.parse_args(args=args)
     # Uh, this shouldn't actually happen...
-    if parsed_args.action is None and None not in actions.keys():
+    if (parsed_args.action is None and
+            None not in actions.keys()):  # pragma: no cover
         parser.print_help()
-        return sys.exit(2)
+        raise CLIHalt(code=2)
     return parsed_args
+
+
+class CLIHalt(SystemExit):
+    def __init__(self, code=0, *args):
+        super(CLIHalt, self).__init__(*args)
+        self.code = code
 
 
 def main():  # pragma: no cover
     # Parse Top-Level Arguments
     argv = sys.argv[1:]
-    module_name, parent_args, aux_args = \
-        parse_primary_args(action_list(), argv)
+    exit_status = 0
+    try:
+        module_name, parent_args, aux_args = \
+            parse_primary_args(action_list(), argv)
 
-    module = load_module(module_name)
+        module = load_module(module_name)
 
-    # Parse Module-Specific Arguments
-    parsed_args = parse_module_args(
-        module, module_name, plugins[module_name], parent_args.aux, aux_args)
-    action = parsed_args.action
+        # Parse Module-Specific Arguments
+        parsed_args = parse_module_args(
+            module, module_name, plugins[module_name], parent_args.aux,
+            aux_args)
+        action = parsed_args.action
 
-    if action not in plugins[module_name]:
-        raise ValueError("No such method exists: %s" % action)
+        if action not in plugins[module_name]:
+            raise ValueError("No such method exists: %s" % action)
 
-    # Parse Config
-    config_files = ["~/.softlayer"]
+        # Parse Config
+        config_files = ["~/.softlayer"]
 
-    if parsed_args.config:
-        config_files.append(parsed_args.config)
+        if parsed_args.config:
+            config_files.append(parsed_args.config)
 
-    client_params = parse_config(config_files)
-    client = Client(**client_params)
+        client_params = parse_config(config_files)
+        client = Client(**client_params)
 
-    # Do the thing
-    f = plugins[module_name][action]
-    execute_action(f, client=client, args=parsed_args)
+        # Do the thing
+        f = plugins[module_name][action]
+        execute_action(f, client=client, args=parsed_args)
+    except KeyboardInterrupt:
+        exit_status = 1
+    except SystemExit, e:
+        exit_status = e.code
+    except (SoftLayerError, Exception), e:
+        print(e)
+        exit_status = 1
+
+    sys.exit(exit_status)
 
 
 def execute_action(f, client=None, args=None):
-    try:
-        data = f.execute(client, args)
-    except SoftLayerError, e:
-        print(e)
-        return sys.exit(1)
-    except KeyboardInterrupt:
-        return sys.exit(1)
-
-    # Format/Output data
+    data = f.execute(client, args)
     if data:
         print(format_output(data, args))
 
