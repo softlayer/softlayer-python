@@ -18,31 +18,39 @@ __all__ = [
     'no_going_back',
 ]
 
-# plugins is a hash of module name to a dict of actions names to action classes
-plugins = {}
 
+class Environment(object):
 
-def add_plugin(cls):
-    command = cls.__module__.split('.')[-1]
-    if command not in plugins:
-        plugins[command] = {}
-    plugins[command][cls.action] = cls
+    # {'module_name': {'action': 'actionClass'}}
+    plugins = {}
 
+    def load_module(self, mod):  # pragma: no cover
+        try:
+            m = import_module('SoftLayer.CLI.%s' % mod)
+            return m
+        except ImportError:
+            print("Error: Module '%s' does not exist!" % mod)
+            raise CLIHalt(code=1)
 
-def load_module(mod):  # pragma: no cover
-    try:
-        m = import_module('SoftLayer.CLI.%s' % mod)
-        return m
-    except ImportError:
-        print("Error: Module '%s' does not exist!" % mod)
-        raise CLIHalt(code=1)
+    def add_plugin(self, cls):
+        command = cls.__module__.split('.')[-1]
+        if command not in self.plugins:
+            self.plugins[command] = {}
+        self.plugins[command][cls.action] = cls
+
+    def plugin_list(self):
+        actions = [action[1] for action in iter_modules(__path__)]
+        return actions
 
 
 class CLIRunnableType(type):
+
+    env = Environment()
+
     def __init__(cls, name, bases, attrs):
         super(CLIRunnableType, cls).__init__(name, bases, attrs)
-        if name != 'CLIRunnable':
-            add_plugin(cls)
+        if cls.env and name != 'CLIRunnable':
+            cls.env.add_plugin(cls)
 
 
 class CLIRunnable(object):
@@ -151,11 +159,6 @@ def add_fmt_argument(parser):
         dest='fmt')
 
 
-def action_list():
-    actions = [action[1] for action in iter_modules(__path__)]
-    return actions
-
-
 def parse_primary_args(modules, argv):
     # Set up the primary parser. e.g. sl command
     description = 'SoftLayer Command-line Client'
@@ -223,24 +226,21 @@ class CLIHalt(SystemExit):
         self.code = code
 
 
-def main():  # pragma: no cover
+def main(args=sys.argv[1:], env=Environment()):
     # Parse Top-Level Arguments
-    argv = sys.argv[1:]
+    CLIRunnableType.env = env
     exit_status = 0
     try:
         module_name, parent_args, aux_args = \
-            parse_primary_args(action_list(), argv)
+            parse_primary_args(env.plugin_list(), args)
 
-        module = load_module(module_name)
+        module = env.load_module(module_name)
 
         # Parse Module-Specific Arguments
         parsed_args = parse_module_args(
-            module, module_name, plugins[module_name], parent_args.aux,
+            module, module_name, env.plugins[module_name], parent_args.aux,
             aux_args)
         action = parsed_args.action
-
-        if action not in plugins[module_name]:
-            raise ValueError("No such method exists: %s" % action)
 
         # Parse Config
         config_files = ["~/.softlayer"]
@@ -252,8 +252,11 @@ def main():  # pragma: no cover
         client = Client(**client_params)
 
         # Do the thing
-        f = plugins[module_name][action]
-        execute_action(f, client=client, args=parsed_args)
+        f = env.plugins[module_name][action]
+        data = f.execute(client, parsed_args)
+        if data:
+            print(format_output(data, parsed_args))
+
     except KeyboardInterrupt:
         exit_status = 1
     except SystemExit, e:
@@ -263,12 +266,6 @@ def main():  # pragma: no cover
         exit_status = 1
 
     sys.exit(exit_status)
-
-
-def execute_action(f, client=None, args=None):
-    data = f.execute(client, args)
-    if data:
-        print(format_output(data, args))
 
 
 def parse_config(files):

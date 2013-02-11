@@ -6,7 +6,7 @@ try:
 except ImportError:
     import unittest
 from mock import patch, MagicMock
-from argparse import ArgumentParser, Namespace
+from argparse import ArgumentParser
 
 import SoftLayer
 import SoftLayer.CLI
@@ -212,21 +212,6 @@ class TestParseArgs(unittest.TestCase):
         self.assertEqual('raw', args.fmt)
 
 
-class TestExecuteCommand(unittest.TestCase):
-
-    def test_execute_command_table(self):
-        f = MagicMock()
-        f.execute.return_value = \
-            SoftLayer.CLI.Table()
-        args = Namespace(fmt='raw')
-        SoftLayer.CLI.execute_action(f, args=args)
-
-    def test_execute_command_none(self):
-        f = MagicMock()
-        f.execute.return_value = None
-        SoftLayer.CLI.execute_action(f)
-
-
 class TestParseConfig(unittest.TestCase):
 
     def test_parse_config_no_files(self):
@@ -253,15 +238,52 @@ class TestParseConfig(unittest.TestCase):
         }, config)
 
 
-class DynamicImportTests(unittest.TestCase):
+class EnvironmentTests(unittest.TestCase):
 
-    def test_action_list(self):
-        actions = SoftLayer.CLI.action_list()
+    def test_plugin_list(self):
+        env = SoftLayer.CLI.Environment()
+        actions = env.plugin_list()
         self.assertIn('cci', actions)
         self.assertIn('dns', actions)
+
+
+class CLIRunnableTypeTests(unittest.TestCase):
 
     def test_runnable_type(self):
         class TestCommand(SoftLayer.CLI.CLIRunnable):
             action = 'test'
         self.assertEqual(
-            SoftLayer.CLI.plugins, {'cli_helper_tests': {'test': TestCommand}})
+            SoftLayer.CLI.CLIRunnableType.env.plugins,
+            {'cli_helper_tests': {'test': TestCommand}})
+
+
+class CommandLineTests(unittest.TestCase):
+    def setUp(self):
+        self.env = MagicMock()
+        self.env.plugin_list.return_value = ['plugin']
+        self.env.plugins = {'plugin': {'action': MagicMock()}}
+
+    def test_normal_path(self):
+        self.assertRaises(
+            SystemExit, SoftLayer.CLI.main, args=['--help'], env=self.env)
+        self.assertRaises(
+            SystemExit, SoftLayer.CLI.main,
+            args=['plugin', 'action', '--config=path/to/config'], env=self.env)
+        self.assertRaises(
+            SystemExit, SoftLayer.CLI.main, args=['plugin'], env=self.env)
+        self.assertRaises(
+            SystemExit, SoftLayer.CLI.main,
+            args=['plugin', 'action'], env=self.env)
+        self.assertRaises(
+            SystemExit, SoftLayer.CLI.main,
+            args=['plugin', 'doesntexist'], env=self.env)
+
+    def test_keyboard_interrupt(self):
+        self.env.plugin_list.side_effect = KeyboardInterrupt
+        self.assertRaises(
+            SystemExit, SoftLayer.CLI.main, args=['--help'], env=self.env)
+
+    def test_softlayer_error(self):
+        self.env.plugin_list.side_effect = SoftLayer.SoftLayerError
+        self.assertRaises(
+            SystemExit, SoftLayer.CLI.main, args=['--help'], env=self.env)
