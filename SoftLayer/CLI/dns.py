@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 """Manages DNS"""
 
-from SoftLayer.CLI import CLIRunnable, no_going_back, Table
+from SoftLayer.CLI import (
+    CLIRunnable, no_going_back, Table, add_really_argument)
 from SoftLayer.DNS import DNSManager
 
 
@@ -49,6 +50,7 @@ class DeleteZone(CLIRunnable):
 
     @staticmethod
     def add_additional_args(parser):
+        add_really_argument(parser)
         return add_zone_arguments(parser)
 
     @staticmethod
@@ -184,6 +186,7 @@ class RecordRemove(CLIRunnable):
     @staticmethod
     def add_additional_args(parser):
         add_record_arguments(parser)
+        add_really_argument(parser)
         parser.add_argument('--id', type=int, default=None)
 
     @staticmethod
