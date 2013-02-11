@@ -236,6 +236,14 @@ class TestExecuteCommand(unittest.TestCase):
         f = MagicMock()
         f.execute.side_effect = SoftLayer.SoftLayerError()
         SoftLayer.CLI.execute_action(f)
+        ext.assert_called_with(1)
+
+    @patch('sys.exit')
+    def test_execute_command_interrupt(self, ext):
+        f = MagicMock()
+        f.execute.side_effect = KeyboardInterrupt
+        SoftLayer.CLI.execute_action(f)
+        ext.assert_called_with(1)
 
 
 class TestParseConfig(unittest.TestCase):
