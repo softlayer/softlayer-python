@@ -449,12 +449,12 @@ class ManageCCI(CLIRunnable):
             ManageCCI.exec_reboot)
         g = po.add_mutually_exclusive_group()
         g.add_argument(
-            '--cycle',
+            '--cycle', '--hard',
             help='Power cycle the instance (off, then on)',
             action='store_true')
         g.add_argument(
             '--soft',
-            help='Attempt to shutdown the guest',
+            help='Attempts to safely reboot the instance',
             action='store_true')
 
         add_subparser(
