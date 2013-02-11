@@ -136,11 +136,11 @@ class CreateOptionsCCI(CLIRunnable):
     """ Output available available options when creating a CCI """
 
     action = 'options'
-    filters = ['all', 'datacenter', 'cpu', 'nic', 'disk', 'os', 'memory']
 
-    @classmethod
-    def add_additional_args(cls, parser):
-        for f in cls.filters:
+    @staticmethod
+    def add_additional_args(parser):
+        filters = ['all', 'datacenter', 'cpu', 'nic', 'disk', 'os', 'memory']
+        for f in filters:
             parser.add_argument(
                 '--%s' % f,
                 help="show %s options" % f,
@@ -149,8 +149,8 @@ class CreateOptionsCCI(CLIRunnable):
                 action='append_const',
                 const=f)
 
-    @classmethod
-    def execute(cls, client, args):
+    @staticmethod
+    def execute(client, args):
         cci = CCIManager(client)
         result = cci.get_create_options()
         show_all = False
