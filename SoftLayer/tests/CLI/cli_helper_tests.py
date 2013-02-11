@@ -201,15 +201,12 @@ class TestParseArgs(unittest.TestCase):
         self.assertEqual('/path/to/config', args.config)
         self.assertEqual('table', args.fmt)
 
-    def test_module_with_base(self):
+    def test_module_no_action(self):
         module = MagicMock()
         module.__doc__ = 'some info'
-        action = MagicMock()
-        args = SoftLayer.CLI.parse_module_args(
-            module, 'module', {None: action}, [], [])
-        self.assertEqual(None, args.action)
-        self.assertEqual(None, args.config)
-        self.assertEqual('raw', args.fmt)
+        self.assertRaises(
+            SystemExit, SoftLayer.CLI.parse_module_args,
+            module, 'module', {}, [], [])
 
 
 class TestExecuteCommand(unittest.TestCase):

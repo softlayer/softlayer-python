@@ -187,34 +187,24 @@ def parse_module_args(module, module_name, actions, posargs, argv):
         prog="%s %s" % (os.path.basename(sys.argv[0]), module_name),
     )
 
-    if len(posargs) == 0 and None in actions.keys():
-        # Work-around for add_subparsers() failings. You cannot define a
-        # default action. This section makes `sl list` work.
-        parser.add_argument('--action', default=None, help=SUPPRESS)
-        actions[None].add_additional_args(parser)
-        add_fmt_argument(parser)
-        add_config_argument(parser)
-    else:
-        action_parser = parser.add_subparsers(dest='action')
+    action_parser = parser.add_subparsers(dest='action')
 
-        for action_name, method in actions.iteritems():
-            if action_name:
-                subparser = action_parser.add_parser(
-                    action_name,
-                    help=method.__doc__,
-                    description=method.__doc__,
-                )
-                method.add_additional_args(subparser)
-                add_fmt_argument(subparser)
-                add_config_argument(subparser)
+    for action_name, method in actions.iteritems():
+        if action_name:
+            subparser = action_parser.add_parser(
+                action_name,
+                help=method.__doc__,
+                description=method.__doc__,
+            )
+            method.add_additional_args(subparser)
+            add_fmt_argument(subparser)
+            add_config_argument(subparser)
 
-    parsed_args = parser.parse_args(args=args)
-    # Uh, this shouldn't actually happen...
-    if (parsed_args.action is None and
-            None not in actions.keys()):  # pragma: no cover
+    if len(posargs) == 0:
         parser.print_help()
-        raise CLIHalt(code=2)
-    return parsed_args
+        raise CLIHalt(code=0)
+
+    return parser.parse_args(args=args)
 
 
 class CLIHalt(SystemExit):
