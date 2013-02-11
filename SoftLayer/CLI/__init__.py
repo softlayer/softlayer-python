@@ -252,6 +252,8 @@ def execute_action(f, client=None, args=None):
     except SoftLayerError, e:
         print(e)
         return sys.exit(1)
+    except KeyboardInterrupt:
+        return sys.exit(1)
 
     # Format/Output data
     if data:
