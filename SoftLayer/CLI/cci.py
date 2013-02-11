@@ -413,3 +413,172 @@ class CancelCCI(CLIRunnable):
             cci.cancel_instance(args.id)
         else:
             print "Aborted."
+
+
+class ManageCCI(CLIRunnable):
+    """ Manage active CCI"""
+
+    action = 'manage'
+
+    @staticmethod
+    def add_additional_args(parser):
+        manage = parser.add_subparsers(dest='manage')
+
+        def add_subparser(parser, arg, help, func):
+            sp = parser.add_parser(arg, help=help)
+            sp.add_argument(
+                'instance',
+                help='Instance ID')
+            sp.set_defaults(func=func)
+
+            return sp
+
+        po = add_subparser(
+            manage, 'poweroff',
+            'Power off instance',
+            ManageCCI.exec_shutdown)
+        g = po.add_mutually_exclusive_group()
+        g.add_argument(
+            '--soft',
+            help='Request the instance to shutdown gracefully',
+            action='store_true')
+
+        po = add_subparser(
+            manage, 'reboot',
+            'Reboot the instance',
+            ManageCCI.exec_reboot)
+        g = po.add_mutually_exclusive_group()
+        g.add_argument(
+            '--cycle', '--hard',
+            help='Power cycle the instance (off, then on)',
+            action='store_true')
+        g.add_argument(
+            '--soft',
+            help='Attempts to safely reboot the instance',
+            action='store_true')
+
+        add_subparser(
+            manage, 'poweron',
+            'Power on instance',
+            ManageCCI.exec_poweron)
+
+        add_subparser(
+            manage, 'pause',
+            'Pause a running instance',
+            ManageCCI.exec_pause)
+
+        add_subparser(
+            manage, 'resume',
+            'Unpause a paused instance',
+            ManageCCI.exec_resume)
+
+    @staticmethod
+    def execute(client, args):
+        return args.func(client, args)
+
+    @staticmethod
+    def exec_shutdown(client, args):
+        vg = client['Virtual_Guest']
+        if args.soft:
+            result = vg.powerOffSoft(id=args.instance)
+        elif args.cycle:
+            result = vg.powerCycle(id=args.instance)
+        else:
+            result = vg.powerOff(id=args.instance)
+
+        print result
+
+    @staticmethod
+    def exec_poweron(client, args):
+        vg = client['Virtual_Guest']
+        print vg.powerOn(id=args.instance)
+
+    @staticmethod
+    def exec_pause(client, args):
+        vg = client['Virtual_Guest']
+        print vg.pause(id=args.instance)
+
+    @staticmethod
+    def exec_resume(client, args):
+        vg = client['Virtual_Guest']
+        print vg.resume(id=args.instance)
+
+    @staticmethod
+    def exec_reboot(client, args):
+        vg = client['Virtual_Guest']
+        if args.cycle:
+            result = vg.rebootHard(id=args.instance)
+        elif args.soft:
+            result = vg.rebootSoft(id=args.instance)
+        else:
+            result = vg.rebootDefault(id=args.instance)
+
+        print result
+
+
+class NetworkCCI(CLIRunnable):
+    """ manage network settings """
+
+    action = 'network'
+
+    @staticmethod
+    def add_additional_args(parser):
+
+        def add_subparser(parser, arg, help, func):
+            sp = parser.add_parser(arg, help=help)
+            sp.add_argument(
+                'instance',
+                help='Instance ID')
+            g = sp.add_mutually_exclusive_group(required=True)
+            g.add_argument(
+                '--public',
+                help='Disable public port',
+                action='store_true')
+            g.add_argument(
+                '--private',
+                help='Disable private port',
+                action='store_true')
+
+            sp.set_defaults(func=func)
+            return sp
+
+        manage = parser.add_subparsers(dest='network')
+
+        add_subparser(
+            manage, 'details',
+            'Get network information',
+            NetworkCCI.exec_detail)
+
+        po = add_subparser(
+            manage, 'port',
+            'Set port speed or disable port',
+            NetworkCCI.exec_port)
+
+        po.add_argument(
+            '--speed',
+            type=int,
+            choices=[0, 10, 100, 1000, 10000],
+            help='Set port speed. 0 disables port',
+            required=True)
+
+    @staticmethod
+    def execute(client, args):
+        return args.func(client, args)
+
+    @staticmethod
+    def exec_port(client, args):
+        vg = client['Virtual_Guest']
+        if args.public:
+            func = vg.setPublicNetworkInterfaceSpeed
+        elif args.private:
+            func = vg.setPrivateNetworkInterfaceSpeed
+
+        result = func(args.speed, id=args.instance)
+        if result:
+            print "Success"
+        else:
+            print result
+
+    @staticmethod
+    def exec_detail(client, args):
+        pass  # TODO this should print out default gateway and stuff
