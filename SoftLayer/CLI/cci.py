@@ -136,7 +136,7 @@ class CreateOptionsCCI(CLIRunnable):
     """ Output available available options when creating a CCI """
 
     action = 'options'
-    filters = {'all', 'datacenter', 'cpu', 'nic', 'disk', 'os', 'memory'}
+    filters = ['all', 'datacenter', 'cpu', 'nic', 'disk', 'os', 'memory']
 
     @classmethod
     def add_additional_args(cls, parser):
