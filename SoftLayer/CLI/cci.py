@@ -133,42 +133,41 @@ class CCIDetails(CLIRunnable):
 
 
 class CreateOptionsCCI(CLIRunnable):
-    """ Output every valid option available for creating a CCI"""
+    """ Output available available options when creating a CCI """
 
     action = 'options'
 
     @staticmethod
     def add_additional_args(parser):
-        g = parser.add_mutually_exclusive_group(required=True)
-        g.add_argument(
-            '--all',
-            default=False,
-            action='store_true')
-
-        filters = ['datacenter', 'cpu', 'nic', 'disk', 'os', 'memory']
-
-        for d in filters:
-            g.add_argument(
-                '--%s' % d,
-                default=False,
-                action='store_true')
+        filters = ['all', 'datacenter', 'cpu', 'nic', 'disk', 'os', 'memory']
+        for f in filters:
+            parser.add_argument(
+                '--%s' % f,
+                help="show %s options" % f,
+                dest='filters',
+                default=[],
+                action='append_const',
+                const=f)
 
     @staticmethod
     def execute(client, args):
         cci = CCIManager(client)
         result = cci.get_create_options()
+        show_all = False
+        if len(args.filters) == 0 or 'all' in args.filters:
+            show_all = True
 
         t = Table(['Name', 'Value'])
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
 
-        if args.datacenter or args.all:
+        if 'datacenter' in args.filters or show_all:
             datacenters = ','.join(
                 dc['template']['datacenter']['name']
                 for dc in result['datacenters'])
             t.add_row(['datacenter', datacenters])
 
-        if args.cpu or args.all:
+        if 'cpu' in args.filters or show_all:
             standard_cpu = filter(
                 lambda x: not x['template'].get(
                     'dedicatedAccountHostOnlyFlag', False),
@@ -189,12 +188,12 @@ class CreateOptionsCCI(CLIRunnable):
             cpus_row(ded_cpu, 'private')
             cpus_row(standard_cpu, 'standard')
 
-        if args.memory or args.all:
+        if 'memory' in args.filters or show_all:
             memory = [
                 str(m['template']['maxMemory']) for m in result['memory']]
             t.add_row(['memory', ','.join(memory)])
 
-        if args.os or args.all:
+        if 'os' in args.filters or show_all:
             os = [
                 o['template']['operatingSystemReferenceCode'] for o in
                 result['operatingSystems']]
@@ -210,7 +209,7 @@ class CreateOptionsCCI(CLIRunnable):
                     sorted(filter(lambda x: x[0:len(s)] == s, os))
                 )])
 
-        if args.disk or args.all:
+        if 'disk' in args.filters or show_all:
             local_disks = filter(
                 lambda x: x['template'].get('localDiskFlag', False),
                 result['blockDevices'])
@@ -240,7 +239,7 @@ class CreateOptionsCCI(CLIRunnable):
             block_rows(local_disks, 'local')
             block_rows(san_disks, 'san')
 
-        if args.nic or args.all:
+        if 'nic' in args.filters or show_all:
             speeds = []
             for x in result['networkComponents']:
                 speed = x['template']['networkComponents'][0]['maxSpeed']
