@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Manage, delete, order Compute instances"""
+""" Manages compute and flex images"""
 
 from SoftLayer.CLI import CLIRunnable, Table
 
