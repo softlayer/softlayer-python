@@ -7,6 +7,10 @@ from SoftLayer.CLI import (
 from argparse import FileType
 
 
+def format_byte_size(s):
+    return "%sG" % (int(s) / 1024)
+
+
 class ListCCIs(CLIRunnable):
     """ List all CCI's on the account"""
     action = 'list'
@@ -41,6 +45,7 @@ class ListCCIs(CLIRunnable):
             'backend_ip', 'provisioning',
         ])
         t.sortby = args.sortby
+        t.format['memory'] = format_byte_size
 
         for guest in guests:
             t.add_row([
@@ -104,7 +109,7 @@ class CCIDetails(CLIRunnable):
             ("state", "{0[powerState][name]}",),
             ("datacenter", "{0[datacenter][name]}",),
             ("cores", "{0[maxCpu]}",),
-            ("memory", "{0[maxMemory]}MB",),
+            ("memory", "{0[maxMemory]}",),
             ("public_ip", "{0[primaryIpAddress]}",),
             ("private_ip", "{0[primaryBackendIpAddress]}",),
             ("os", "{0[operatingSystem][softwareLicense]"
@@ -114,20 +119,22 @@ class CCIDetails(CLIRunnable):
         result = cci.get_instance(args.id)
 
         for o in output:
-            t.add_row([o[0], o[1].format(result)])
+            if o[0] == 'memory':
+                t.add_row(
+                    [o[0], o[1].format(result)],
+                    formatters={1: format_byte_size})
+            else:
+                t.add_row([o[0], o[1].format(result)])
 
         if args.price:
             t.add_row(['price rate', result['billingItem']['recurringFee']])
 
         if args.passwords:
-            t2 = Table(['username', 'password'])
-            t2.border = False
-            t2.header = False
-            t2.align['username'] = 'r'
-            t2.align['password'] = 'l'
+            user_strs = []
             for item in result['operatingSystem']['passwords']:
-                t2.add_row([item['username'], item['password']])
-            t.add_row(['users', t2])
+                user_strs.append(
+                    "%s %s" % (item['username'], item['password']))
+            t.add_row(['users', '\n'.join(user_strs)])
 
         return t
 
