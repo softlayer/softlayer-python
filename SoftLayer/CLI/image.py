@@ -45,6 +45,7 @@ class ListImages(CLIRunnable):
         t = Table([
             'id',
             'account',
+            'type',
             'name',
             'guid',
         ])
@@ -55,6 +56,7 @@ class ListImages(CLIRunnable):
             t.add_row([
                 image['id'],
                 image.get('accountId', '???'),
+                image.get('type', '???'),
                 image['name'],
                 image.get('globalIdentifier', '???'),
             ])
