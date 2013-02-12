@@ -9,8 +9,9 @@ if sys.version_info >= (3,):
 
 requires = ['distribute', 'prettytable']
 
-if sys.version_info <= (2, 6):
+if sys.version_info < (2, 7):
     requires.append('argparse')
+    requires.append('importlib')
 elif sys.version_info >= (2, 6):
     requires.append('requests')
 
@@ -36,7 +37,14 @@ setup(
     license='The BSD License',
     zip_safe=False,
     url='http://github.com/softlayer/softlayer-api-python-client',
-    scripts=['bin/sl'],
+    entry_points={
+        'console_scripts': [
+            'sl = SoftLayer.CLI:main',
+        ],
+    },
+    package_data={
+        'SoftLayer': ['tests/fixtures/*'],
+    },
     install_requires=requires,
     classifiers=[
         'Environment :: Console',
