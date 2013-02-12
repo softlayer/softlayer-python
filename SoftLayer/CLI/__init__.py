@@ -3,7 +3,6 @@ import sys
 import os.path
 from pkgutil import iter_modules
 from importlib import import_module
-from copy import deepcopy
 from argparse import ArgumentParser, SUPPRESS
 from ConfigParser import SafeConfigParser
 
@@ -66,36 +65,83 @@ class CLIRunnable(object):
         pass
 
 
-class Table(PrettyTable):
-    def __init__(self, *args, **kwargs):
-        super(Table, self).__init__(*args, **kwargs)
-        self.horizontal_char = '.'
-        self.vertical_char = ':'
-        self.junction_char = ':'
+class Table(object):
+    def __init__(self, columns):
+        self.columns = columns
+        self.rows = []
+        self.align = {}
+        self.format = {}
+        self.sortby = None
+
+    def add_row(self, row, **kwargs):
+        self.rows.append(TableRow(row, **kwargs))
+
+    def _col_format_mapping(self):
+        " Generate mapping of column index to formatter for that column "
+        format_col_map = {}
+        for col, fmter in self.format.items():
+            if col in self.columns:
+                format_col_map[self.columns.index(col)] = fmter
+        return format_col_map
+
+    def prettytable(self, format=True):
+        " Returns a new prettytable instance"
+        t = PrettyTable(self.columns)
+        if format and self.sortby:
+            t.sortby = self.sortby
+        if format:
+            for a_col, alignment in self.align.items():
+                t.align[a_col] = alignment
+
+            # Generate mapping of column_id to formatter
+            format_col_map = self._col_format_mapping()
+        # Adding rows
+        for row in self.rows:
+            _row = list(row.items)
+
+            if format:
+                # format based on column formatters
+                for fmt_i, fmter in row.formatters.items():
+                    _row[fmt_i] = fmter(_row[fmt_i])
+
+                # format based on row-specific formatters
+                for fmt_i, fmter in format_col_map.items():
+                    _row[fmt_i] = fmter(_row[fmt_i])
+
+            t.add_row(_row)
+        return t
 
 
-def format_output(data, args):
-    if args.fmt == 'table':
+class TableRow(object):
+    def __init__(self, items, formatters=None):
+        self.items = items
+        self.formatters = formatters or {}
+
+
+def format_output(data, fmt='table'):
+    if fmt == 'table':
         return format_prettytable(data)
-    elif args.fmt == 'raw':
+    elif fmt == 'raw':
         return format_no_tty(data)
 
 
 def format_prettytable(table):
-    t = deepcopy(table)
+    t = table.prettytable(format=True)
     t.hrules = FRAME
-
+    t.horizontal_char = '.'
+    t.vertical_char = ':'
+    t.junction_char = ':'
     return t
 
 
 def format_no_tty(table):
-    notty = deepcopy(table)
-    notty.hrules = NONE
-    notty.border = False
-    notty.header = False
-    for k in notty.align.keys():
-        notty.align[k] = 'l'
-    return notty
+    t = table.prettytable(format=False)
+    for col in table.columns:
+        t.align[col] = 'l'
+    t.hrules = NONE
+    t.border = False
+    t.header = False
+    return t
 
 
 def valid_response(prompt, *valid):
@@ -245,7 +291,7 @@ def main(args=sys.argv[1:], env=Environment()):
         f = env.plugins[module_name][action]
         data = f.execute(client, parsed_args)
         if data:
-            print(format_output(data, parsed_args))
+            print(format_output(data, fmt=parsed_args.fmt))
 
     except KeyboardInterrupt:
         exit_status = 1

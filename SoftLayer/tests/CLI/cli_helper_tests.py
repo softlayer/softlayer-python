@@ -10,7 +10,6 @@ from argparse import ArgumentParser
 
 import SoftLayer
 import SoftLayer.CLI
-import prettytable
 
 if sys.version_info >= (3,):
     raw_input_path = 'builtins.input'
@@ -52,12 +51,6 @@ class PromptTests(unittest.TestCase):
         raw_input_mock.assert_called_with('test')
         self.assertTrue(result)
 
-    def test_prettytable_helper(self):
-        t = SoftLayer.CLI.Table(['one', 'two'])
-        self.assertEqual(t.horizontal_char, '.')
-        self.assertEqual(t.vertical_char, ':')
-        self.assertEqual(t.junction_char, ':')
-
     @patch(raw_input_path)
     def test_do_or_die(self, raw_input_mock):
         confirmed = '37347373737'
@@ -90,35 +83,50 @@ class PromptTests(unittest.TestCase):
         res = SoftLayer.CLI.confirm(allow_empty=True, default=True)
         self.assertTrue(res)
 
-    def test_no_tty(self):
-        class fake(object):
-            pass
-        args = fake()
-        args.fmt = 'raw'
-
+    def test_format_output_raw(self):
         t = SoftLayer.CLI.Table(['nothing'])
         t.align['nothing'] = 'c'
-        t.hrules = prettytable.FRAME
-        ret = SoftLayer.CLI.format_output(t, args)
+        t.add_row(['testdata'])
+        t.sortby = 'nothing'
+        ret = SoftLayer.CLI.format_output(t, 'raw')
 
-        self.assertFalse(ret.border)
-        self.assertFalse(ret.header)
-        self.assertNotEqual(ret.hrules, t.hrules)
-        # self.assertNotEqual(ret.align, t.argslign)
+        self.assertNotIn('nothing', str(ret))
+        self.assertIn('testdata', str(ret))
 
-    def test_prettytable(self):
-        class fake(object):
-            pass
-        args = fake()
-        args.fmt = 'table'
-
+    def test_format_output_table(self):
         t = SoftLayer.CLI.Table(['nothing'])
         t.align['nothing'] = 'c'
-        t.hrules = prettytable.FRAME
-        ret = SoftLayer.CLI.format_output(t, args)
+        t.add_row(['testdata'])
+        t.sortby = 'nothing'
+        ret = SoftLayer.CLI.format_output(t, 'table')
 
-        self.assertEqual(ret.hrules, t.hrules)
-        self.assertEqual(ret.align, t.align)
+        self.assertIn('nothing', str(ret))
+        self.assertIn('testdata', str(ret))
+
+    def test_format_output_table_row_formatting(self):
+        def test_formatter(s):
+            return 'formatted_text'
+        t = SoftLayer.CLI.Table(['nothing'])
+        t.align['nothing'] = 'c'
+        t.add_row(['testdata'], formatters={0: test_formatter})
+        t.sortby = 'nothing'
+        ret = SoftLayer.CLI.format_output(t, 'table')
+
+        self.assertIn('nothing', str(ret))
+        self.assertIn('formatted_text', str(ret))
+
+    def test_format_output_table_col_formatting(self):
+        def test_formatter(s):
+            return 'formatted_text'
+        t = SoftLayer.CLI.Table(['nothing'])
+        t.align['nothing'] = 'c'
+        t.format['nothing'] = test_formatter
+        t.add_row(['testdata'])
+        t.sortby = 'nothing'
+        ret = SoftLayer.CLI.format_output(t, 'table')
+
+        self.assertIn('nothing', str(ret))
+        self.assertIn('formatted_text', str(ret))
 
     def test_add_really_argument(self):
         parser = ArgumentParser()
