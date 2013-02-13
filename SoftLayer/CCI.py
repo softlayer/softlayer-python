@@ -32,6 +32,7 @@ class CCIManager(object):
             'datacenter.name',
             'activeTransaction.transactionStatus[friendlyName,name]',
             'status.name',
+            'tagReferences[id,tag[name,id]]',
         ])
 
         call = 'getVirtualGuests'
@@ -65,6 +66,7 @@ class CCIManager(object):
             'softwareDescription[manufacturer,name, version]',
             'operatingSystem.passwords[username,password]',
             'billingItem.recurringFee',
+            'tagReferences[id,tag[name,id]]',
         ])
 
         mask = "mask[%s]" % ','.join(items)
