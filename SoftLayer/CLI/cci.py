@@ -26,6 +26,7 @@ class ListCCIs(CLIRunnable):
             '--monthly',
             help='List only monthly CCI\'s',
             action='store_true', default=False)
+
         parser.add_argument(
             '--sortby',
             help="Sort table",
@@ -33,11 +34,18 @@ class ListCCIs(CLIRunnable):
                      'primary_ip', 'backend_ip'],
             default='host')
 
+        parser.add_argument(
+            '--tags',
+            help="Filter by tag",
+            nargs="+",
+            required=False,
+        )
+
     @staticmethod
     def execute(client, args):
         cci = CCIManager(client)
 
-        guests = cci.list_instances(hourly=args.hourly, monthly=args.monthly)
+        results = cci.list_instances(hourly=args.hourly, monthly=args.monthly)
 
         t = Table([
             'id', 'datacenter', 'host',
@@ -46,6 +54,15 @@ class ListCCIs(CLIRunnable):
         ])
         t.sortby = args.sortby
         t.format['memory'] = format_byte_size
+
+        if args.tags:
+            guests = []
+            for g in results:
+                tags = [x['tag']['name'] for x in g['tagReferences']]
+                if any(_tag in args.tags for _tag in tags):
+                    guests.append(g)
+        else:
+            guests = results
 
         for guest in guests:
             t.add_row([
@@ -57,7 +74,7 @@ class ListCCIs(CLIRunnable):
                 guest.get('primaryIpAddress', '???'),
                 guest.get('primaryBackendIpAddress', '???'),
                 guest.get('activeTransaction', {}).get(
-                    'transactionStatus', {}).get('friendlyName', '')
+                    'transactionStatus', {}).get('friendlyName', ''),
             ])
 
         return t
@@ -135,6 +152,11 @@ class CCIDetails(CLIRunnable):
                 user_strs.append(
                     "%s %s" % (item['username'], item['password']))
             t.add_row(['users', '\n'.join(user_strs)])
+
+        tag_row = []
+        for tag in result['tagReferences']:
+            tag_row.append(tag['tag']['name'])
+        t.add_row(['tags', ','.join(tag_row)])
 
         return t
 
