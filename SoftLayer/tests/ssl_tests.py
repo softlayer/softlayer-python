@@ -43,7 +43,7 @@ class SSLTests_unittests(unittest.TestCase):
         self.client.__getitem__() \
             .deleteObject.assert_called_once_with(id=self.test_id)
 
-    def test_get_certificate(self):
+    def test_edit_certificate(self):
         test_cert = {
             'id': self.test_id,
             'certificate': 'cert',
@@ -58,3 +58,9 @@ class SSLTests_unittests(unittest.TestCase):
                 'privateKey': 'key'
             },
             id=self.test_id)
+
+    def test_get_certificate(self):
+        self.ssl.get_certificate(self.test_id)
+        self.client.__getitem__().getObject.assert_called_once_with(
+            id=self.test_id)
+
