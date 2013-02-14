@@ -152,6 +152,9 @@ def main(args=sys.argv[1:], env=Environment()):
     except KeyboardInterrupt:
         exit_status = 1
     except SystemExit, e:
+        if hasattr(e, 'message') and e.message:
+            sys.stderr.write(e.message)
+            sys.stderr.write("\n")
         exit_status = e.code
     except (SoftLayerError, Exception), e:
         print(e)

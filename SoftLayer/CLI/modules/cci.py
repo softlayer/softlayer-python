@@ -150,7 +150,15 @@ class CCIDetails(CLIRunnable):
         tag_row = []
         for tag in result['tagReferences']:
             tag_row.append(tag['tag']['name'])
-        t.add_row(['tags', listing(tag_row, separator=',')])
+
+        if tag_row:
+            t.add_row(['tags', listing(tag_row, separator=',')])
+
+        ptr_domains = client['Virtual_Guest'].\
+            getReverseDomainRecords(id=args.id)[0]
+
+        for ptr in ptr_domains['resourceRecords']:
+            t.add_row(['ptr', ptr['data']])
 
         return t
 
