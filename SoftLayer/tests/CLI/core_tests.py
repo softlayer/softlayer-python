@@ -149,6 +149,11 @@ class TestFormatOutput(unittest.TestCase):
         self.assertNotIn('nothing', str(ret))
         self.assertIn('testdata', str(ret))
 
+    def test_format_output_formatted_item(self):
+        item = cli.FormattedItem('test', 'test_formatted')
+        ret = cli.core.format_output(item, 'raw')
+        self.assertEqual('test_formatted', ret)
+
     def test_format_output_table(self):
         t = cli.Table(['nothing'])
         t.align['nothing'] = 'c'
@@ -158,31 +163,6 @@ class TestFormatOutput(unittest.TestCase):
 
         self.assertIn('nothing', str(ret))
         self.assertIn('testdata', str(ret))
-
-    def test_format_output_table_row_formatting(self):
-        def test_formatter(s):
-            return 'formatted_text'
-        t = cli.Table(['nothing'])
-        t.align['nothing'] = 'c'
-        t.add_row(['testdata'], formatters={0: test_formatter})
-        t.sortby = 'nothing'
-        ret = cli.core.format_output(t, 'table')
-
-        self.assertIn('nothing', str(ret))
-        self.assertIn('formatted_text', str(ret))
-
-    def test_format_output_table_col_formatting(self):
-        def test_formatter(s):
-            return 'formatted_text'
-        t = cli.Table(['nothing'])
-        t.align['nothing'] = 'c'
-        t.format['nothing'] = test_formatter
-        t.add_row(['testdata'])
-        t.sortby = 'nothing'
-        ret = cli.core.format_output(t, 'table')
-
-        self.assertIn('nothing', str(ret))
-        self.assertIn('formatted_text', str(ret))
 
     @patch('sys.stdout.isatty')
     def test_add_fmt_argument_isatty(self, isatty):

@@ -2,8 +2,23 @@
 from SoftLayer.CLI.environment import CLIRunnableType
 from prettytable import PrettyTable
 
-__all__ = ['Table', 'CLIRunnable', 'valid_response', 'add_really_argument',
-           'confirm', 'no_going_back']
+__all__ = ['Table', 'CLIRunnable', 'FormattedItem', 'valid_response',
+           'add_really_argument', 'confirm', 'no_going_back', 'mb_to_gb']
+
+
+class FormattedItem(object):
+    def __init__(self, original, formatted):
+        self.original = original
+        self.formatted = formatted
+
+    def __str__(self):
+        return str(self.original)
+
+    __repr__ = __str__
+
+
+def mb_to_gb(megabytes):
+    return FormattedItem(megabytes, "%dG" % (float(megabytes) / 1024))
 
 
 class CLIRunnable(object):
@@ -82,46 +97,18 @@ class Table(object):
         self.format = {}
         self.sortby = None
 
-    def add_row(self, row, **kwargs):
-        self.rows.append(TableRow(row, **kwargs))
+    def add_row(self, row):
+        self.rows.append(row)
 
-    def _col_format_mapping(self):
-        " Generate mapping of column index to formatter for that column "
-        format_col_map = {}
-        for col, fmter in self.format.items():
-            if col in self.columns:
-                format_col_map[self.columns.index(col)] = fmter
-        return format_col_map
-
-    def prettytable(self, format=True):
+    def prettytable(self):
         " Returns a new prettytable instance"
         t = PrettyTable(self.columns)
-        if format and self.sortby:
+        if self.sortby:
             t.sortby = self.sortby
-        if format:
-            for a_col, alignment in self.align.items():
-                t.align[a_col] = alignment
+        for a_col, alignment in self.align.items():
+            t.align[a_col] = alignment
 
-            # Generate mapping of column_id to formatter
-            format_col_map = self._col_format_mapping()
         # Adding rows
         for row in self.rows:
-            _row = list(row.items)
-
-            if format:
-                # format based on column formatters
-                for fmt_i, fmter in row.formatters.items():
-                    _row[fmt_i] = fmter(_row[fmt_i])
-
-                # format based on row-specific formatters
-                for fmt_i, fmter in format_col_map.items():
-                    _row[fmt_i] = fmter(_row[fmt_i])
-
-            t.add_row(_row)
+            t.add_row(row)
         return t
-
-
-class TableRow(object):
-    def __init__(self, items, formatters=None):
-        self.items = items
-        self.formatters = formatters or {}

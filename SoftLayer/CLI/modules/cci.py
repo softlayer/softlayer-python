@@ -3,12 +3,9 @@
 
 from SoftLayer.CCI import CCIManager
 from SoftLayer.CLI import (
-    CLIRunnable, Table, no_going_back, confirm, add_really_argument)
+    CLIRunnable, Table, no_going_back, confirm, add_really_argument,
+    mb_to_gb)
 from argparse import FileType
-
-
-def format_byte_size(s):
-    return "%sG" % (int(s) / 1024)
 
 
 class ListCCIs(CLIRunnable):
@@ -53,7 +50,6 @@ class ListCCIs(CLIRunnable):
             'backend_ip', 'provisioning',
         ])
         t.sortby = args.sortby
-        t.format['memory'] = format_byte_size
 
         if args.tags:
             guests = []
@@ -70,7 +66,7 @@ class ListCCIs(CLIRunnable):
                 guest.get('datacenter', {}).get('name', 'unknown'),
                 guest['fullyQualifiedDomainName'],
                 guest['maxCpu'],
-                guest['maxMemory'],
+                mb_to_gb(guest['maxMemory']),
                 guest.get('primaryIpAddress', '???'),
                 guest.get('primaryBackendIpAddress', '???'),
                 guest.get('activeTransaction', {}).get(
@@ -137,9 +133,7 @@ class CCIDetails(CLIRunnable):
 
         for o in output:
             if o[0] == 'memory':
-                t.add_row(
-                    [o[0], o[1].format(result)],
-                    formatters={1: format_byte_size})
+                t.add_row([o[0], mb_to_gb(o[1].format(result))])
             else:
                 t.add_row([o[0], o[1].format(result)])
 
