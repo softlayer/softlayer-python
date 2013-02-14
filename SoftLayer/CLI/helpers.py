@@ -3,7 +3,8 @@ from SoftLayer.CLI.environment import CLIRunnableType
 from prettytable import PrettyTable
 
 __all__ = ['Table', 'CLIRunnable', 'FormattedItem', 'valid_response',
-           'add_really_argument', 'confirm', 'no_going_back', 'mb_to_gb']
+           'add_really_argument', 'confirm', 'no_going_back', 'mb_to_gb',
+           'listing']
 
 
 class FormattedItem(object):
@@ -19,6 +20,11 @@ class FormattedItem(object):
 
 def mb_to_gb(megabytes):
     return FormattedItem(megabytes, "%dG" % (float(megabytes) / 1024))
+
+
+def listing(item, separator=','):
+    l = separator.join(item)
+    return FormattedItem(l, l)
 
 
 class CLIRunnable(object):

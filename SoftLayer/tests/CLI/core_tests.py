@@ -151,8 +151,13 @@ class TestFormatOutput(unittest.TestCase):
 
     def test_format_output_formatted_item(self):
         item = cli.FormattedItem('test', 'test_formatted')
-        ret = cli.core.format_output(item, 'raw')
+        ret = cli.core.format_output(item, 'table')
         self.assertEqual('test_formatted', ret)
+
+    def test_format_output_list(self):
+        item = ['this', 'is', 'a', 'list']
+        ret = cli.core.format_output(item, 'table')
+        self.assertEqual(os.linesep.join(item), ret)
 
     def test_format_output_table(self):
         t = cli.Table(['nothing'])

@@ -4,7 +4,7 @@
 from SoftLayer.CCI import CCIManager
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, add_really_argument,
-    mb_to_gb)
+    mb_to_gb, listing)
 from argparse import FileType
 
 
@@ -145,12 +145,12 @@ class CCIDetails(CLIRunnable):
             for item in result['operatingSystem']['passwords']:
                 user_strs.append(
                     "%s %s" % (item['username'], item['password']))
-            t.add_row(['users', '\n'.join(user_strs)])
+            t.add_row(['users', listing(user_strs, separator='\n')])
 
         tag_row = []
         for tag in result['tagReferences']:
             tag_row.append(tag['tag']['name'])
-        t.add_row(['tags', ','.join(tag_row)])
+        t.add_row(['tags', listing(tag_row, separator=',')])
 
         return t
 
@@ -185,10 +185,9 @@ class CreateOptionsCCI(CLIRunnable):
         t.align['Value'] = 'l'
 
         if 'datacenter' in args.filters or show_all:
-            datacenters = ','.join(
-                dc['template']['datacenter']['name']
-                for dc in result['datacenters'])
-            t.add_row(['datacenter', datacenters])
+            datacenters = [dc['template']['datacenter']['name']
+                           for dc in result['datacenters']]
+            t.add_row(['datacenter', listing(datacenters, separator=',')])
 
         if 'cpu' in args.filters or show_all:
             standard_cpu = filter(
@@ -206,7 +205,7 @@ class CreateOptionsCCI(CLIRunnable):
                 for x in c:
                     cpus.append(str(x['template']['startCpus']))
 
-                t.add_row(['cpus (%s)' % name, ','.join(cpus)])
+                t.add_row(['cpus (%s)' % name, listing(cpus, separator=',')])
 
             cpus_row(ded_cpu, 'private')
             cpus_row(standard_cpu, 'standard')
@@ -214,7 +213,7 @@ class CreateOptionsCCI(CLIRunnable):
         if 'memory' in args.filters or show_all:
             memory = [
                 str(m['template']['maxMemory']) for m in result['memory']]
-            t.add_row(['memory', ','.join(memory)])
+            t.add_row(['memory', listing(memory, separator=',')])
 
         if 'os' in args.filters or show_all:
             os = [
@@ -256,7 +255,7 @@ class CreateOptionsCCI(CLIRunnable):
                 for b in sorted(simple.keys()):
                     t.add_row([
                         '%s disk(%s)' % (name, b),
-                        ','.join(simple[b])]
+                        listing(simple[b], separator=',')]
                     )
 
             block_rows(local_disks, 'local')
@@ -270,7 +269,7 @@ class CreateOptionsCCI(CLIRunnable):
 
             speeds = sorted(speeds)
 
-            t.add_row(['nic', ','.join(speeds)])
+            t.add_row(['nic', listing(speeds, separator=',')])
 
         return t
 

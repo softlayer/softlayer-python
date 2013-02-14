@@ -1,11 +1,12 @@
 "CLI utilities"
 import sys
+import os
 import os.path
 from argparse import ArgumentParser, SUPPRESS
 from ConfigParser import SafeConfigParser
 
 from SoftLayer import Client, SoftLayerError
-from SoftLayer.CLI.helpers import Table, CLIHalt, FormattedItem
+from SoftLayer.CLI.helpers import Table, CLIHalt, FormattedItem, listing
 from SoftLayer.CLI.environment import Environment, CLIRunnableType
 
 from prettytable import FRAME, NONE
@@ -19,15 +20,18 @@ def format_output(data, fmt='table'):
             return format_prettytable(data)
         elif fmt == 'raw':
             return format_no_tty(data)
-    if isinstance(data, FormattedItem):
+    if fmt != 'raw' and isinstance(data, FormattedItem):
         return data.formatted
+    if isinstance(data, list) or isinstance(data, tuple):
+        return format_output(listing(data, separator=os.linesep))
+
     return str(data)
 
 
 def format_prettytable(table):
     for i, row in enumerate(table.rows):
         for j, item in enumerate(row):
-            table.rows[i][j] = format_output(item, fmt='raw')
+            table.rows[i][j] = format_output(item)
     t = table.prettytable()
     t.hrules = FRAME
     t.horizontal_char = '.'
