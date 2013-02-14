@@ -46,8 +46,8 @@ class ListCerts(CLIRunnable):
                 certificate['validityDays'],
                 certificate.get('notes', None)
             ])
-            t.sortby = args.sortby
-            print t
+        t.sortby = args.sortby
+        return t
 
 
 class AddCertificate(CLIRunnable):

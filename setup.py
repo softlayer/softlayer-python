@@ -39,7 +39,7 @@ setup(
     url='http://github.com/softlayer/softlayer-api-python-client',
     entry_points={
         'console_scripts': [
-            'sl = SoftLayer.CLI:main',
+            'sl = SoftLayer.CLI.core:main',
         ],
     },
     package_data={
