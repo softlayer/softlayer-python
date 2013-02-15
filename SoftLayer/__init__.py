@@ -44,6 +44,7 @@ from SoftLayer.consts import VERSION
 from API import Client, API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT
 from DNS import DNSManager
 from CCI import CCIManager
+from metadata import MetadataManager
 from SoftLayer.exceptions import *  # NOQA
 
 __title__ = 'SoftLayer'
@@ -53,4 +54,4 @@ __license__ = 'The BSD License'
 __copyright__ = 'Copyright 2013 SoftLayer Technologies, Inc.'
 __all__ = ['Client', 'SoftLayerError', 'SoftLayerAPIError',
            'API_PUBLIC_ENDPOINT', 'API_PRIVATE_ENDPOINT',
-           'DNSManager', 'CCIManager']
+           'DNSManager', 'CCIManager', 'MetadataManager']

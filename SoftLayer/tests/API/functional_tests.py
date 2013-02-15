@@ -4,7 +4,7 @@ import os
 try:
     import unittest2 as unittest
 except ImportError:
-    import unittest
+    import unittest # NOQA
 from mock import patch
 from SoftLayer.transport import xmlrpclib_transport
 
@@ -69,7 +69,7 @@ class UnauthedUser(unittest.TestCase):
     def test_no_hostname(self):
         try:
             # This test will fail if 'notvalidsoftlayer.com' becomes a thing
-            r = SoftLayer.API.make_api_call(
+            SoftLayer.API.make_api_call(
                 'http://notvalidsoftlayer.com', 'getObject')
         except SoftLayer.SoftLayerAPIError, e:
             self.assertEqual(e.faultCode, 0)
@@ -81,7 +81,7 @@ class UnauthedUser(unittest.TestCase):
     def test_no_hostname_with_xmlrpc_transport(self):
         try:
             # This test will fail if 'notvalidsoftlayer.com' becomes a thing
-            r = xmlrpclib_transport.make_api_call(
+            xmlrpclib_transport.make_api_call(
                 'http://notvalidsoftlayer.com', 'getObject')
         except SoftLayer.SoftLayerAPIError, e:
             self.assertEqual(e.faultCode, 0)

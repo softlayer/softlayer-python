@@ -2,7 +2,7 @@ import sys
 try:
     import unittest2 as unittest
 except ImportError:
-    import unittest
+    import unittest # NOQA
 from mock import patch
 from argparse import ArgumentParser
 
