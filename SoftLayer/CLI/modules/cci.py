@@ -5,7 +5,8 @@ from os import linesep
 from SoftLayer.CCI import CCIManager
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, add_really_argument,
-    mb_to_gb, listing, FormattedItem, CLIAbort)
+    mb_to_gb, listing, FormattedItem)
+from SoftLayer.CLI.helpers import CLIAbort
 from argparse import FileType
 
 
