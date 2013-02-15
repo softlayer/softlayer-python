@@ -5,6 +5,7 @@ from SoftLayer.CCI import CCIManager
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, add_really_argument,
     mb_to_gb, listing)
+from SoftLayer.CLI.helpers import CLIAbort
 from argparse import FileType
 
 
@@ -150,7 +151,15 @@ class CCIDetails(CLIRunnable):
         tag_row = []
         for tag in result['tagReferences']:
             tag_row.append(tag['tag']['name'])
-        t.add_row(['tags', listing(tag_row, separator=',')])
+
+        if tag_row:
+            t.add_row(['tags', listing(tag_row, separator=',')])
+
+        ptr_domains = client['Virtual_Guest'].\
+            getReverseDomainRecords(id=args.id)[0]
+
+        for ptr in ptr_domains['resourceRecords']:
+            t.add_row(['ptr', ptr['data']])
 
         return t
 
@@ -605,4 +614,125 @@ class NetworkCCI(CLIRunnable):
 
     @staticmethod
     def exec_detail(client, args):
-        pass  # TODO this should print out default gateway and stuff
+        print "TODO"  # TODO this should print out default gateway and stuff
+
+
+class CCIDNS(CLIRunnable):
+    """ DNS related actions to a CCI"""
+
+    action = 'dns'
+
+    @staticmethod
+    def add_additional_args(parser):
+        manage = parser.add_subparsers(dest='dns')
+
+        def add_subparser(parser, arg, help, func):
+            sp = parser.add_parser(arg, help=help, description=help)
+            sp.add_argument(
+                'instance',
+                help='Instance ID')
+            sp.set_defaults(func=func)
+
+            return sp
+
+        po = add_subparser(
+            manage, 'sync',
+            'Sync hostname to A and PTR records',
+            CCIDNS.exec_sync)
+        po.add_argument(
+            '--a', '--A',
+            help='Sync only the A record',
+            default=[],
+            action='append_const',
+            const='a',
+            dest='sync')
+        po.add_argument(
+            '--ptr', '--PTR',
+            help='Sync only the PTR record',
+            default=[],
+            action='append_const',
+            const='ptr',
+            dest='sync')
+
+        add_really_argument(po)
+
+    @staticmethod
+    def execute(client, args):
+        return args.func(client, args)
+
+    @staticmethod
+    def exec_sync(client, args):
+        from SoftLayer.DNS import DNSManager, DNSZoneNotFound
+        dns = DNSManager(client)
+        cci = CCIManager(client)
+
+        def sync_a_record():
+            #hostname = instance['fullyQualifiedDomainName']
+            records = dns.search_record(
+                instance['domain'],
+                instance['hostname'],
+            )
+
+            if not records:
+                # don't have a record, lets add one to the base zone
+                dns.create_record(
+                    zone['id'],
+                    instance['hostname'],
+                    'a',
+                    instance['primaryIpAddress'],
+                    ttl=7200)
+            else:
+                recs = filter(lambda x: x['type'].lower() == 'a', records)
+                if len(recs) != 1:
+                    raise CLIAbort("Aborting A record sync, found %d "
+                            "A record exists!" % len(recs))
+                rec = recs[0]
+                rec['data'] = instance['primaryIpAddress']
+                dns.edit_record(rec)
+
+        def sync_ptr_record():
+            host_rec = instance['primaryIpAddress'].split('.')[-1]
+            ptr_domains = client['Virtual_Guest'].\
+                getReverseDomainRecords(id=instance['id'])[0]
+            edit_ptr = None
+            for ptr in ptr_domains['resourceRecords']:
+                if ptr['host'] == host_rec:
+                    edit_ptr = ptr
+                    break
+
+            if edit_ptr:
+                edit_ptr['data'] = instance['fullyQualifiedDomainName']
+                dns.edit_record(edit_ptr)
+            else:
+                dns.create_record(
+                    ptr_domains['id'],
+                    host_rec,
+                    'ptr',
+                    instance['fullyQualifiedDomainName'],
+                    ttl=7200)
+
+        instance = cci.get_instance(args.instance)
+
+        if not instance['primaryIpAddress']:
+            raise CLIAbort('No primary IP address associated with this CCI')
+
+        try:
+            zone = dns.get_zone(instance['domain'])
+        except DNSZoneNotFound:
+            raise CLIAbort("Unable to create A record, "
+                "no zone found matching: %s" % instance['domain'])
+
+        go_for_it = args.really or confirm(
+            "Attempt to update DNS records for %s"
+                % instance['fullyQualifiedDomainName'])
+
+        if not go_for_it:
+            raise CLIAbort("Aborting DNS sync")
+
+        both = len(args.sync) == 0
+
+        if both or 'a' in args.sync:
+            sync_a_record()
+
+        if both or 'ptr' in args.sync:
+            sync_ptr_record()
