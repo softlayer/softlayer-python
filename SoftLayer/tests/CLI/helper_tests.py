@@ -113,8 +113,9 @@ class FormattedItemTests(unittest.TestCase):
 class CLIAbortTests(unittest.TestCase):
 
     def test_init(self):
-        e = cli.helpers.CLIAbort()
+        e = cli.helpers.CLIAbort("something")
         self.assertEqual(2, e.code)
+        self.assertEqual("something", e.message)
         self.assertIsInstance(e, cli.helpers.CLIHalt)
 
 
