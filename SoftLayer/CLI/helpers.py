@@ -91,8 +91,9 @@ class CLIHalt(SystemExit):
 
 
 class CLIAbort(CLIHalt):
-    def __init__(self, *args):
+    def __init__(self, msg, *args):
         super(CLIAbort, self).__init__(code=2, *args)
+        self.message = msg
 
 
 class Table(object):

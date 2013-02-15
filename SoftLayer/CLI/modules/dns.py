@@ -123,7 +123,7 @@ class EditRecord(CLIRunnable):
     action = 'edit'
 
     @staticmethod
-    def add_record_arguments(parser):
+    def add_additional_args(parser):
         add_record_arguments(parser)
         parser.add_argument('--data', default=None)
         parser.add_argument('--ttl', default=None)

@@ -52,6 +52,8 @@ class CCIManager(object):
             'id',
             'globalIdentifier',
             'fullyQualifiedDomainName',
+            'hostname',
+            'domain',
             'primaryBackendIpAddress',
             'primaryIpAddress',
             'lastKnownPowerState.name',
