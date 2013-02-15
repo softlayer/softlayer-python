@@ -76,12 +76,8 @@ class Client(object):
         self._raw_headers = {}
 
         self.username = username or API_USERNAME or \
-            os.environ.get('SL_USERNAME')
-        self.api_key = api_key or API_KEY or os.environ.get('SL_API_KEY')
-
-        if not all((self.username, self.api_key)):
-            raise SoftLayerError('Must supply username and api_key')
-
+            os.environ.get('SL_USERNAME') or ''
+        self.api_key = api_key or API_KEY or os.environ.get('SL_API_KEY') or ''
         self.set_authentication(self.username, self.api_key)
 
         if id is not None:
@@ -149,7 +145,7 @@ class Client(object):
         of 1234 in the SoftLayer_Hardware_Server Service instructs the API to
         act on server record 1234 in your method calls.
 
-        See U{http://sldn.softlayer.com/article/Using-Initialization-Parameters-SoftLayer-API}
+        See U{http://sldn.softlayer.com/article/Using-Initialization-Parameters-SoftLayer-API}  # NOQA
         for more information.
 
         :param id: The id number of the SoftLayer API object to instantiate

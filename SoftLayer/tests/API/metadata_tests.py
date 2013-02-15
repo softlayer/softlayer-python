@@ -6,6 +6,14 @@ except ImportError:
     import unittest # NOQA
 from mock import patch, MagicMock
 import urllib2
+import sys
+
+if sys.version_info >= (3,):
+    REQ_PATH = 'urllib.request.Request'
+    URLOPEN_PATH = 'urllib.request.urlopen'
+else:
+    REQ_PATH = 'urllib2.Request'
+    URLOPEN_PATH = 'urllib2.urlopen'
 
 
 class MetadataTests(unittest.TestCase):
@@ -27,12 +35,43 @@ class MetadataTests(unittest.TestCase):
         self.make_request.assert_called_with("Vlans/1:2:3:4:5.json")
         self.assertEqual([123], r)
 
+    def test_return_none(self):
+        self.make_request.return_value = None
+        r = self.metadata.get('datacenter')
+        self.make_request.assert_called_with("Datacenter.json")
+        self.assertEqual(None, r)
+
     def test_w_param_error(self):
         self.assertRaises(SoftLayer.SoftLayerError, self.metadata.get, 'vlans')
 
     def test_not_exists(self):
         self.assertRaises(
             SoftLayer.SoftLayerError, self.metadata.get, 'something')
+
+    def test_networks_not_exist(self):
+        self.make_request.return_value = '[]'
+        r = self.metadata.public_network()
+        self.assertEqual({'mac_addresses': []}, r)
+
+    def test_networks(self):
+        resp = '["list", "of", "stuff"]'
+        resp_list = ['list', 'of', 'stuff']
+        self.make_request.return_value = resp
+        r = self.metadata.public_network()
+        self.assertEqual({
+            'vlan_ids': resp_list,
+            'routers': resp_list,
+            'vlans': resp_list,
+            'mac_addresses': resp_list
+        }, r)
+
+        r = self.metadata.private_network()
+        self.assertEqual({
+            'vlan_ids': resp_list,
+            'routers': resp_list,
+            'vlans': resp_list,
+            'mac_addresses': resp_list
+        }, r)
 
 
 class MetadataTestsMakeRequest(unittest.TestCase):
@@ -44,26 +83,15 @@ class MetadataTestsMakeRequest(unittest.TestCase):
             'SoftLayer_Resource_Metadata',
             'something.json'])
 
-    @patch('urllib2.Request')
-    @patch('urllib2.urlopen')
+    @patch(REQ_PATH)
+    @patch(URLOPEN_PATH)
     def test_basic(self, urlopen, req):
         r = self.metadata.make_request('something.json')
         req.assert_called_with(self.url)
         self.assertEqual(r, urlopen().read())
 
-    @patch('urllib2.Request')
-    @patch('urllib2.urlopen')
-    def test_raise_httperror(self, urlopen, req):
-        e = urllib2.HTTPError(
-            'http://somewhere.com', 404, 'Error', {}, None)
-        e.reason = 'Not Found'
-        urlopen.side_effect = e
-        self.assertRaises(
-            SoftLayer.SoftLayerAPIError,
-            self.metadata.make_request, 'something.json')
-
-    @patch('urllib2.Request')
-    @patch('urllib2.urlopen')
+    @patch(REQ_PATH)
+    @patch(URLOPEN_PATH)
     def test_raise_urlerror(self, urlopen, req):
         urlopen.side_effect = urllib2.URLError('Error')
         self.assertRaises(

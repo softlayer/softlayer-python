@@ -3,7 +3,7 @@ import os.path
 try:
     import unittest2 as unittest
 except ImportError:
-    import unittest # NOQA
+    import unittest  # NOQA
 from argparse import ArgumentParser
 from mock import patch, MagicMock
 
