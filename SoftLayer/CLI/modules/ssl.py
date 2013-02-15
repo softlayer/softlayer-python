@@ -82,8 +82,9 @@ class AddCertificate(CLIRunnable):
 
         manager = SSLManager(client)
         cert = manager.add_certificate(template)
-        print("Created certificate:", cert['commonName'])
-        print("Created certificate:", cert['name'])
+        return (
+            "Created certificate: %s" % cert['commonName'],
+            "Created certificate: %s" % cert['name'],)
 
 
 class EditCertificate(CLIRunnable):
@@ -128,9 +129,8 @@ class RemoveCertificate(CLIRunnable):
         manager = SSLManager(client)
         if args.really or no_going_back('yes'):
             manager.remove_certificate(args.id)
-            print("Deleted certificate:", args.id)
-        else:
-            print("Aborted.")
+            return "Deleted certificate: %s" % args.id)
+        raise CLIAbort("Aborted.")
 
 
 class DownloadCertificate(CLIRunnable):

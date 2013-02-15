@@ -157,7 +157,8 @@ def main(args=sys.argv[1:], env=Environment()):
             sys.stderr.write("\n")
         exit_status = e.code
     except (SoftLayerError, Exception), e:
-        print(e)
+        sys.stderr.write(str(e))
+        sys.stderr.write(os.linesep)
         exit_status = 1
 
     sys.exit(exit_status)

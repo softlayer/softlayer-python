@@ -8,9 +8,12 @@ __all__ = ['Table', 'CLIRunnable', 'FormattedItem', 'valid_response',
 
 
 class FormattedItem(object):
-    def __init__(self, original, formatted):
+    def __init__(self, original, formatted=None):
         self.original = original
-        self.formatted = formatted
+        if formatted:
+            self.formatted = formatted
+        else:
+            self.formatted = self.original
 
     def __str__(self):
         return str(self.original)
