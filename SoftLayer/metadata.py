@@ -39,6 +39,7 @@ class MetadataManager(object):
         url = '/'.join([self.url, 'SoftLayer_Resource_Metadata', path])
         req = urllib2.Request(url)
         req.add_header('User-Agent', USER_AGENT)
+
         try:
             resp = urllib2.urlopen(req)
         except urllib2.HTTPError, e:  # pragma: no cover
@@ -53,6 +54,7 @@ class MetadataManager(object):
     def get(self, name, param=None):
         if name not in self.attribs:
             raise SoftLayerError('Metadata Attribute not known.')
+
         call_details = self.attribs[name]
         if call_details.get('param_req'):
             if not param:
@@ -61,6 +63,7 @@ class MetadataManager(object):
             url = "%s/%s.json" % (self.attribs[name]['call'], param)
         else:
             url = "%s.json" % self.attribs[name]['call']
+
         data = self.make_request(url)
         if data:
             return json.loads(data)
@@ -70,12 +73,16 @@ class MetadataManager(object):
         network = {}
         macs = self.get('%s_mac' % kind)
         network['mac_addresses'] = macs
+
         if len(macs) == 0:
             return network
+
         if routers:
             network['routers'] = self.get('router', macs[0])
+
         if vlans:
             network['vlans'] = self.get('vlans', macs[0])
+
         if vlan_ids:
             network['vlan_ids'] = self.get('vlan_ids', macs[0])
 
