@@ -52,12 +52,6 @@ class Inititialization(unittest.TestCase):
             'authenticate': {
                 'username': 'test_user', 'apiKey': 'test_api_key'}})
 
-    @patch('SoftLayer.API.API_USERNAME', None)
-    @patch('SoftLayer.API.API_KEY', None)
-    @patch.dict('os.environ', {'SL_USERNAME': '', 'SL_API_KEY': ''})
-    def test_no_username(self):
-        self.assertRaises(SoftLayer.SoftLayerError, SoftLayer.Client)
-
 
 class ClientMethods(unittest.TestCase):
     def test_help(self):

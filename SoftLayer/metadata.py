@@ -1,6 +1,6 @@
 try:
     import simplejson as json
-except:  # pragma: no cover
+except ImportError:  # pragma: no cover
     import json # NOQA
 import urllib2
 
@@ -17,7 +17,7 @@ class MetadataManager(object):
         'datacenter': {'call': 'Datacenter'},
         'datacenter_id': {'call': 'DatacenterId'},
         'domain': {'call': 'Domain'},
-        'frontent_mac': {'call': 'FrontendMacAddresses'},
+        'frontend_mac': {'call': 'FrontendMacAddresses'},
         'fqdn': {'call': 'FullyQualifiedDomainName'},
         'hostname': {'call': 'Hostname'},
         'id': {'call': 'Id'},
@@ -41,7 +41,9 @@ class MetadataManager(object):
         req.add_header('User-Agent', USER_AGENT)
         try:
             resp = urllib2.urlopen(req)
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError, e:  # pragma: no cover
+            if e.code == 404:
+                return None
             raise SoftLayerAPIError(e.code, e.reason)
         except urllib2.URLError, e:
             raise SoftLayerAPIError(0, e.reason)
@@ -59,4 +61,28 @@ class MetadataManager(object):
             url = "%s/%s.json" % (self.attribs[name]['call'], param)
         else:
             url = "%s.json" % self.attribs[name]['call']
-        return json.loads(self.make_request(url))
+        data = self.make_request(url)
+        if data:
+            return json.loads(data)
+        return data
+
+    def _get_network(self, kind, routers=True, vlans=True, vlan_ids=True):
+        network = {}
+        macs = self.get('%s_mac' % kind)
+        network['mac_addresses'] = macs
+        if len(macs) == 0:
+            return network
+        if routers:
+            network['routers'] = self.get('router', macs[0])
+        if vlans:
+            network['vlans'] = self.get('vlans', macs[0])
+        if vlan_ids:
+            network['vlan_ids'] = self.get('vlan_ids', macs[0])
+
+        return network
+
+    def public_network(self, **kwargs):
+        return self._get_network('frontend', **kwargs)
+
+    def private_network(self, **kwargs):
+        return self._get_network('backend', **kwargs)

@@ -3,7 +3,7 @@ from SoftLayer.SSL import SSLManager
 try:
     import unittest2 as unittest
 except ImportError:
-    import unittest
+    import unittest  # NOQA
 from mock import MagicMock, ANY
 
 
@@ -63,4 +63,3 @@ class SSLTests_unittests(unittest.TestCase):
         self.ssl.get_certificate(self.test_id)
         self.client.__getitem__().getObject.assert_called_once_with(
             id=self.test_id)
-

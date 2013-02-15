@@ -26,7 +26,7 @@ def mb_to_gb(megabytes):
 
 
 def listing(item, separator=','):
-    l = separator.join(item)
+    l = separator.join((str(i) for i in item))
     return FormattedItem(l, l)
 
 
