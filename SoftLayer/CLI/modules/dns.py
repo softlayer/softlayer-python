@@ -2,7 +2,7 @@
 """Manages DNS"""
 
 from SoftLayer.CLI import (
-    CLIRunnable, no_going_back, Table, add_really_argument)
+    CLIRunnable, no_going_back, Table, add_really_argument, CLIAbort)
 from SoftLayer.DNS import DNSManager
 
 
@@ -26,7 +26,7 @@ class DumpZone(CLIRunnable):
     @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
-        print(manager.dump_zone(manager.get_zone(args.domain)['id']))
+        return manager.dump_zone(manager.get_zone(args.domain)['id'])
 
 
 class CreateZone(CLIRunnable):
@@ -41,7 +41,7 @@ class CreateZone(CLIRunnable):
     def execute(client, args):
         manager = DNSManager(client)
         manager.create_zone(args.domain)
-        print("Created zone:", args.domain)
+        return "Created zone: %s" % args.domain
 
 
 class DeleteZone(CLIRunnable):
@@ -58,9 +58,8 @@ class DeleteZone(CLIRunnable):
         manager = DNSManager(client)
         if args.really or no_going_back(args.domain):
             manager.delete_zone(args.domain)
-            print("Deleted zone:", args.domain)
-        else:
-            print("Aborted.")
+            return "Deleted zone: %s" % args.domain
+        raise CLIAbort("Aborted.")
 
 
 class ListZones(CLIRunnable):
@@ -208,5 +207,4 @@ class RecordRemove(CLIRunnable):
                     t.add_row(r['id'])
 
             return t
-        else:
-            print("Aborted.")
+        raise CLIAbort("Aborted.")

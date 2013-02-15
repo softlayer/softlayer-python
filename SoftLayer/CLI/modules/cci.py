@@ -4,7 +4,7 @@
 from SoftLayer.CCI import CCIManager
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, add_really_argument,
-    mb_to_gb, listing)
+    mb_to_gb, listing, FormattedItem, CLIAbort)
 from SoftLayer.CLI.helpers import CLIAbort
 from argparse import FileType
 
@@ -419,14 +419,16 @@ class CreateCCI(CLIRunnable):
 
         if args.test:
             result = cci.verify_create_instance(**data)
-            print("Test: Success!")
+            output = FormattedItem("Test: Success!")
         elif args.really or confirm(
                 prompt_str="This action will incur charges on "
                 "your account. Continue?", allow_empty=True):
             result = cci.create_instance(**data)
-            print("Success!")
+            output = FormattedItem('Order placed successfully')
+        else:
+            raise CLIAbort('Aborting CCI order.')
 
-        return result
+        return result, output
 
 
 class CancelCCI(CLIRunnable):
@@ -445,7 +447,7 @@ class CancelCCI(CLIRunnable):
         if args.really or no_going_back(args.id):
             cci.cancel_instance(args.id)
         else:
-            print "Aborted."
+            CLIAbort('Aborted')
 
 
 class ManageCCI(CLIRunnable):
@@ -519,22 +521,22 @@ class ManageCCI(CLIRunnable):
         else:
             result = vg.powerOff(id=args.instance)
 
-        print result
+        return FormattedItem(result)
 
     @staticmethod
     def exec_poweron(client, args):
         vg = client['Virtual_Guest']
-        print vg.powerOn(id=args.instance)
+        return vg.powerOn(id=args.instance)
 
     @staticmethod
     def exec_pause(client, args):
         vg = client['Virtual_Guest']
-        print vg.pause(id=args.instance)
+        return vg.pause(id=args.instance)
 
     @staticmethod
     def exec_resume(client, args):
         vg = client['Virtual_Guest']
-        print vg.resume(id=args.instance)
+        return vg.resume(id=args.instance)
 
     @staticmethod
     def exec_reboot(client, args):
@@ -546,7 +548,7 @@ class ManageCCI(CLIRunnable):
         else:
             result = vg.rebootDefault(id=args.instance)
 
-        print result
+        return result
 
 
 class NetworkCCI(CLIRunnable):
@@ -608,9 +610,9 @@ class NetworkCCI(CLIRunnable):
 
         result = func(args.speed, id=args.instance)
         if result:
-            print "Success"
+            return "Success"
         else:
-            print result
+            return result
 
     @staticmethod
     def exec_detail(client, args):

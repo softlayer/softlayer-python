@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Firewall rule and security management"""
 
-from SoftLayer.CLI import CLIRunnable
+from SoftLayer.CLI import CLIRunnable, Table, listing
 from SoftLayer.firewall import FirewallManager
 
 
@@ -12,28 +12,22 @@ class FWList(CLIRunnable):
     @staticmethod
     def execute(client, args):
         f = FirewallManager(client)
-        vlans = f.list()['networkVlans']
-        fwvlans = filter(has_firewall, vlans)
+        fwvlans = f.get_firewalls()
+        t = Table(['vlan', 'type', 'features'])
 
-        if any(lambda x: x['dedicatedFirewallFlag'] for x in fwvlans):
-            print "Dedicated firewalls"
-            for vlan in filter(
-                    lambda x: x['dedicatedFirewallFlag'], fwvlans):
-                print("{0[vlanNumber]} "
-                      "HA:{0[highAvailabilityFirewallFlag]}".format(vlan))
+        dedicatedfws = filter(lambda x: x['dedicatedFirewallFlag'], fwvlans)
+        for vlan in dedicatedfws:
+            features = []
+            if vlan['highAvailabilityFirewallFlag']:
+                features.append('HA')
+            t.add_row([
+                vlan['vlanNumber'],
+                'dedicated',
+                listing(features, separator=','),
+            ])
 
         shared_vlan = filter(lambda x: not x['dedicatedFirewallFlag'], fwvlans)
-        if shared_vlan:
-            print "Shared firewall vlans"
-            for vlan in shared_vlan:
-                print("{0[vlanNumber]} ".format(vlan))
+        for vlan in shared_vlan:
+            t.add_row([vlan['vlanNumber'], 'standard', ''])
 
-
-def has_firewall(vlan):
-    return bool(
-        vlan['dedicatedFirewallFlag'] or
-        vlan['highAvailabilityFirewallFlag'] or
-        vlan['firewallInterfaces'] or
-        vlan['firewallNetworkComponents'] or
-        vlan['firewallGuestNetworkComponents']
-    )
+        return t
