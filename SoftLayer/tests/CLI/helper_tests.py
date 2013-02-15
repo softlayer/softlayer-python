@@ -85,7 +85,33 @@ class PromptTests(unittest.TestCase):
         self.assertTrue(args.really)
 
 
+class FormattedItemTests(unittest.TestCase):
+
+    def test_init(self):
+        item = cli.FormattedItem('test', 'test_formatted')
+
+        self.assertEqual('test', item.original)
+        self.assertEqual('test_formatted', item.formatted)
+        self.assertEqual('test', str(item))
+
+    def test_mb_to_gb(self):
+        item = cli.mb_to_gb(1024)
+        self.assertEqual(1024, item.original)
+        self.assertEqual('1G', item.formatted)
+
+        item = cli.mb_to_gb('1024')
+        self.assertEqual('1024', item.original)
+        self.assertEqual('1G', item.formatted)
+
+        item = cli.mb_to_gb('1025.0')
+        self.assertEqual('1025.0', item.original)
+        self.assertEqual('1G', item.formatted)
+
+        self.assertRaises(ValueError, cli.mb_to_gb, '1024string')
+
+
 class CLIAbortTests(unittest.TestCase):
+
     def test_init(self):
         e = cli.helpers.CLIAbort()
         self.assertEqual(2, e.code)
