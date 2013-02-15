@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 """Manage, delete, order Compute instances"""
 
+from os import linesep
 from SoftLayer.CCI import CCIManager
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, add_really_argument,
     mb_to_gb, listing, FormattedItem, CLIAbort)
-from SoftLayer.CLI.helpers import CLIAbort
 from argparse import FileType
 
 
@@ -146,7 +146,7 @@ class CCIDetails(CLIRunnable):
             for item in result['operatingSystem']['passwords']:
                 user_strs.append(
                     "%s %s" % (item['username'], item['password']))
-            t.add_row(['users', listing(user_strs, separator='\n')])
+            t.add_row(['users', listing(user_strs)])
 
         tag_row = []
         for tag in result['tagReferences']:
@@ -236,7 +236,7 @@ class CreateOptionsCCI(CLIRunnable):
                 os_summary.add(o[0:o.find('_')])
 
             for s in sorted(os_summary):
-                t.add_row(['os (%s)' % s, "\n".join(
+                t.add_row(['os (%s)' % linesep.join(
                     sorted(filter(lambda x: x[0:len(s)] == s, os))
                 )])
 
