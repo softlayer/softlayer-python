@@ -236,9 +236,9 @@ class CreateOptionsCCI(CLIRunnable):
             for o in os:
                 os_summary.add(o[0:o.find('_')])
 
-            for s in sorted(os_summary):
-                t.add_row(['os (%s)' % linesep.join(
-                    sorted(filter(lambda x: x[0:len(s)] == s, os))
+            for summary in sorted(os_summary):
+                t.add_row(['os (%s)' % summary, linesep.join(
+                    sorted(filter(lambda x: x[0:len(summary)] == summary, os))
                 )])
 
         if 'disk' in args.filters or show_all:
