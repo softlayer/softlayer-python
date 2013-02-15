@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """ Find details about this machine """
 from SoftLayer import MetadataManager
-from SoftLayer.CLI import CLIRunnable, Table, listing
+from SoftLayer.CLI import CLIRunnable, Table, listing, CLIAbort
 
 
 class BackendMacAddresses(CLIRunnable):
@@ -109,7 +109,11 @@ class UserMetadata(CLIRunnable):
 
     @staticmethod
     def execute(client, args):
-        return MetadataManager().get('user_data')
+        userdata = MetadataManager().get('user_data')
+        if userdata:
+            return userdata
+        else:
+            raise CLIAbort("No user metadata.")
 
 
 class Network(CLIRunnable):
