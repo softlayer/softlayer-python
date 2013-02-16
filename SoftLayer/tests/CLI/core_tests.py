@@ -12,9 +12,6 @@ import SoftLayer.CLI as cli
 from SoftLayer.CLI.helpers import CLIAbort
 
 
-FIXTURE_PATH = os.path.abspath(os.path.join(__file__, '..', '..', 'fixtures'))
-
-
 class CommandLineTests(unittest.TestCase):
     def setUp(self):
         self.env = MagicMock()
@@ -110,32 +107,6 @@ class TestParseArgs(unittest.TestCase):
         self.assertRaises(
             SystemExit, cli.core.parse_module_args,
             module, 'module', {}, [], [])
-
-
-class TestParseConfig(unittest.TestCase):
-
-    def test_parse_config_no_files(self):
-        config = cli.core.parse_config([])
-        self.assertEqual({}, config)
-
-    def test_parse_config_no_softlayer_section(self):
-        path = os.path.join(FIXTURE_PATH, 'empty.conf')
-        config = cli.core.parse_config([path])
-        self.assertEqual({}, config)
-
-    def test_parse_config_empty(self):
-        path = os.path.join(FIXTURE_PATH, 'no_options.conf')
-        config = cli.core.parse_config([path])
-        self.assertEqual({}, config)
-
-    def test_parse_config(self):
-        path = os.path.join(FIXTURE_PATH, 'full.conf')
-        config = cli.core.parse_config([path])
-        self.assertEqual({
-            'username': 'myusername',
-            'api_key': 'myapi_key',
-            'endpoint_url': 'myendpoint_url'
-        }, config)
 
 
 class TestFormatOutput(unittest.TestCase):

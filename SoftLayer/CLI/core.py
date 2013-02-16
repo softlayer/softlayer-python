@@ -3,11 +3,10 @@ import sys
 import os
 import os.path
 from argparse import ArgumentParser, SUPPRESS
-from ConfigParser import SafeConfigParser
 
 from SoftLayer import Client, SoftLayerError
 from SoftLayer.CLI.helpers import (
-    Table, CLIHalt, FormattedItem, listing, CLIAbort)
+    Table, CLIHalt, CLIAbort, FormattedItem, listing)
 from SoftLayer.CLI.environment import Environment, CLIRunnableType
 
 from prettytable import FRAME, NONE
@@ -16,17 +15,20 @@ from prettytable import FRAME, NONE
 def format_output(data, fmt='table'):
     if isinstance(data, basestring):
         return data
+
     if isinstance(data, Table):
         if fmt == 'table':
             return format_prettytable(data)
         elif fmt == 'raw':
             return format_no_tty(data)
+
     if fmt != 'raw' and isinstance(data, FormattedItem):
         return data.formatted
+
     if isinstance(data, list) or isinstance(data, tuple):
         return format_output(listing(data, separator=os.linesep))
 
-    return str(data)
+    return data
 
 
 def format_prettytable(table):
@@ -71,7 +73,13 @@ def add_fmt_argument(parser):
 def parse_primary_args(modules, argv):
     # Set up the primary parser. e.g. sl command
     description = 'SoftLayer Command-line Client'
-    parser = ArgumentParser(description=description, add_help=False)
+    epilog = ('To use most functions of this interface, your SoftLayer '
+              'username and api_key need to be configured. The easiest way to '
+              'do that is to use: \'sl config setup\'')
+    parser = ArgumentParser(
+        description=description,
+        epilog=epilog,
+        add_help=False,)
 
     parser.add_argument(
         'module',
@@ -141,47 +149,28 @@ def main(args=sys.argv[1:], env=Environment()):
         if parsed_args.config:
             config_files.append(parsed_args.config)
 
-        client_params = parse_config(config_files)
-        client = Client(**client_params)
+        env.load_config(config_files)
+        client = Client(
+            username=env.config.get('username'),
+            api_key=env.config.get('api_key'),
+            endpoint_url=env.config.get('endpoint_url'))
 
         # Do the thing
         f = env.plugins[module_name][action]
+        f.env = env
         data = f.execute(client, parsed_args)
         if data:
-            print(format_output(data, fmt=parsed_args.fmt))
+            env.out(str(format_output(data, fmt=parsed_args.fmt)))
 
     except KeyboardInterrupt:
         exit_status = 1
     except CLIAbort, e:
-        sys.stderr.write(str(e.message))
-        sys.stderr.write(os.linesep)
+        env.out(str(e.message))
         exit_status = e.code
     except SystemExit, e:
         exit_status = e.code
     except (SoftLayerError, Exception), e:
-        sys.stderr.write(str(e))
-        sys.stderr.write(os.linesep)
+        env.out(str(e))
         exit_status = 1
 
     sys.exit(exit_status)
-
-
-def parse_config(files):
-    config_files = [os.path.expanduser(f) for f in files]
-
-    cp = SafeConfigParser({
-        'username': '',
-        'api_key': '',
-        'endpoint_url': '',
-    })
-    cp.read(config_files)
-    config = {}
-
-    if not cp.has_section('softlayer'):
-        return config
-
-    for config_name in ['username', 'api_key', 'endpoint_url']:
-        if cp.get('softlayer', config_name):
-            config[config_name] = cp.get('softlayer', config_name)
-
-    return config

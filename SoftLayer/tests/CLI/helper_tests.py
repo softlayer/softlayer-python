@@ -123,15 +123,6 @@ class CLIAbortTests(unittest.TestCase):
         self.assertIsInstance(e, cli.helpers.CLIHalt)
 
 
-class EnvironmentTests(unittest.TestCase):
-
-    def test_plugin_list(self):
-        env = cli.environment.Environment()
-        actions = env.plugin_list()
-        self.assertIn('cci', actions)
-        self.assertIn('dns', actions)
-
-
 class CLIRunnableTypeTests(unittest.TestCase):
 
     def test_runnable_type(self):

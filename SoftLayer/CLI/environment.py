@@ -1,12 +1,20 @@
 from importlib import import_module
+from ConfigParser import SafeConfigParser
+import sys
+import os
+import os.path
 
 from SoftLayer.CLI.modules import get_module_list
+from SoftLayer import API_PUBLIC_ENDPOINT
 
 
 class Environment(object):
 
     # {'module_name': {'action': 'actionClass'}}
     plugins = {}
+    config = {}
+    stdout = sys.stdout
+    stderr = sys.stderr
 
     def load_module(self, mod):  # pragma: no cover
         return import_module('SoftLayer.CLI.modules.%s' % mod)
@@ -19,6 +27,40 @@ class Environment(object):
 
     def plugin_list(self):
         return get_module_list()
+
+    def out(self, s, nl=True):
+        self.stdout.write(s)
+        if nl:
+            self.stdout.write(os.linesep)
+
+    def err(self, s, nl=True):
+        self.stderr.write(s)
+        if nl:
+            self.stderr.write(os.linesep)
+
+    def input(self, prompt):
+        return raw_input(prompt)
+
+    def load_config(self, files):
+        config_files = [os.path.expanduser(f) for f in files]
+
+        cp = SafeConfigParser({
+            'username': os.environ.get('SL_USERNAME') or '',
+            'api_key': os.environ.get('SL_API_KEY') or '',
+            'endpoint_url': API_PUBLIC_ENDPOINT,
+        })
+        cp.read(config_files)
+        config = {}
+
+        if not cp.has_section('softlayer'):
+            self.config = config
+            return
+
+        for config_name in ['username', 'api_key', 'endpoint_url']:
+            if cp.get('softlayer', config_name):
+                config[config_name] = cp.get('softlayer', config_name)
+
+        self.config = config
 
 
 class CLIRunnableType(type):
