@@ -60,7 +60,7 @@ class MetadataTests(unittest.TestCase):
         r = self.metadata.public_network()
         self.assertEqual({
             'vlan_ids': resp_list,
-            'routers': resp_list,
+            'router': resp_list,
             'vlans': resp_list,
             'mac_addresses': resp_list
         }, r)
@@ -68,7 +68,7 @@ class MetadataTests(unittest.TestCase):
         r = self.metadata.private_network()
         self.assertEqual({
             'vlan_ids': resp_list,
-            'routers': resp_list,
+            'router': resp_list,
             'vlans': resp_list,
             'mac_addresses': resp_list
         }, r)

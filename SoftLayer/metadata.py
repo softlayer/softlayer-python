@@ -69,7 +69,7 @@ class MetadataManager(object):
             return json.loads(data)
         return data
 
-    def _get_network(self, kind, routers=True, vlans=True, vlan_ids=True):
+    def _get_network(self, kind, router=True, vlans=True, vlan_ids=True):
         network = {}
         macs = self.get('%s_mac' % kind)
         network['mac_addresses'] = macs
@@ -77,8 +77,8 @@ class MetadataManager(object):
         if len(macs) == 0:
             return network
 
-        if routers:
-            network['routers'] = self.get('router', macs[0])
+        if router:
+            network['router'] = self.get('router', macs[0])
 
         if vlans:
             network['vlans'] = self.get('vlans', macs[0])

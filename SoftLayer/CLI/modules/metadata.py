@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """ Find details about this machine """
-from SoftLayer import MetadataManager
+from SoftLayer.metadata import MetadataManager
 from SoftLayer.CLI import CLIRunnable, Table, listing, CLIAbort
 
 
@@ -133,24 +133,35 @@ class Network(CLIRunnable):
     def execute(client, args):
         meta = MetadataManager()
         if args.network_type == 'public':
-            t = Table(['mac addresses', 'routers', 'vlans', 'vlan_ids'])
+            t = Table(['Name', 'Value'])
+            t.align['Name'] = 'r'
+            t.align['Value'] = 'l'
             network = meta.public_network()
             t.add_row([
-                network['mac_addresses'],
-                network['routers'],
-                network['vlans'],
-                network['vlan_ids'],
-            ])
+                'mac addresses',
+                listing(network['mac_addresses'], separator=',')])
+            t.add_row([
+                'router', network['routers']])
+            t.add_row([
+                'vlans', listing(network['vlans'], separator=',')])
+            t.add_row([
+                'vlan ids',
+                listing(network['vlan_ids'], separator=',')])
             return t
 
         if args.network_type == 'private':
-            t = Table(['mac addresses', 'routers', 'vlans', 'vlan_ids'])
+            t = Table(['Name', 'Value'])
+            t.align['Name'] = 'r'
+            t.align['Value'] = 'l'
             network = meta.private_network()
             t.add_row([
-                network['mac_addresses'],
-                network['routers'],
-                network['vlans'],
-                network['vlan_ids'],
-            ])
-
+                'mac addresses',
+                listing(network['mac_addresses'], separator=',')])
+            t.add_row([
+                'router', network['routers']])
+            t.add_row([
+                'vlans', listing(network['vlans'], separator=',')])
+            t.add_row([
+                'vlan ids',
+                listing(network['vlan_ids'], separator=',')])
             return t
