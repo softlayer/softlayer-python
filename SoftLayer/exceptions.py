@@ -20,7 +20,7 @@ class SoftLayerAPIError(SoftLayerError):
             (self.__class__.__name__, self.faultCode, self.faultString)
 
     def __str__(self):
-        return '<%s(%s): %s>' % \
+        return '%s(%s): %s' % \
             (self.__class__.__name__, self.faultCode, self.faultString)
 
 

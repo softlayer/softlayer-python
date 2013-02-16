@@ -6,7 +6,8 @@ from argparse import ArgumentParser, SUPPRESS
 from ConfigParser import SafeConfigParser
 
 from SoftLayer import Client, SoftLayerError
-from SoftLayer.CLI.helpers import Table, CLIHalt, FormattedItem, listing
+from SoftLayer.CLI.helpers import (
+    Table, CLIHalt, FormattedItem, listing, CLIAbort)
 from SoftLayer.CLI.environment import Environment, CLIRunnableType
 
 from prettytable import FRAME, NONE
@@ -127,11 +128,11 @@ def main(args=sys.argv[1:], env=Environment()):
             parse_primary_args(env.plugin_list(), args)
 
         module = env.load_module(module_name)
+        actions = env.plugins[module_name]
 
         # Parse Module-Specific Arguments
         parsed_args = parse_module_args(
-            module, module_name, env.plugins[module_name], parent_args.aux,
-            aux_args)
+            module, module_name, actions, parent_args.aux, aux_args)
         action = parsed_args.action
 
         # Parse Config
@@ -151,10 +152,11 @@ def main(args=sys.argv[1:], env=Environment()):
 
     except KeyboardInterrupt:
         exit_status = 1
+    except CLIAbort, e:
+        sys.stderr.write(str(e.message))
+        sys.stderr.write(os.linesep)
+        exit_status = e.code
     except SystemExit, e:
-        if hasattr(e, 'message') and str(e.message):
-            sys.stderr.write(str(e.message))
-            sys.stderr.write(os.linesep)
         exit_status = e.code
     except (SoftLayerError, Exception), e:
         sys.stderr.write(str(e))

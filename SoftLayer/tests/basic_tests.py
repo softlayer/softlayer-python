@@ -1,7 +1,7 @@
 try:
     import unittest2 as unittest
 except ImportError:
-    import unittest
+    import unittest  # NOQA
 
 import SoftLayer
 
@@ -15,7 +15,7 @@ class TestExceptions(unittest.TestCase):
         self.assertEquals(
             repr(e), "<SoftLayerAPIError(fault code): fault string>")
         self.assertEquals(
-            str(e), "<SoftLayerAPIError(fault code): fault string>")
+            str(e), "SoftLayerAPIError(fault code): fault string")
 
     def test_parse_error(self):
         e = SoftLayer.ParseError('fault code', 'fault string')
@@ -25,4 +25,4 @@ class TestExceptions(unittest.TestCase):
         self.assertEquals(
             repr(e), "<ParseError(fault code): fault string>")
         self.assertEquals(
-            str(e), "<ParseError(fault code): fault string>")
+            str(e), "ParseError(fault code): fault string")

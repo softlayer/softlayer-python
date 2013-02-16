@@ -2,7 +2,7 @@ import sys
 try:
     import unittest2 as unittest
 except ImportError:
-    import unittest
+    import unittest # NOQA
 from mock import patch
 from argparse import ArgumentParser
 
@@ -89,9 +89,13 @@ class FormattedItemTests(unittest.TestCase):
 
     def test_init(self):
         item = cli.FormattedItem('test', 'test_formatted')
-
         self.assertEqual('test', item.original)
         self.assertEqual('test_formatted', item.formatted)
+        self.assertEqual('test', str(item))
+
+        item = cli.FormattedItem('test')
+        self.assertEqual('test', item.original)
+        self.assertEqual('test', item.formatted)
         self.assertEqual('test', str(item))
 
     def test_mb_to_gb(self):

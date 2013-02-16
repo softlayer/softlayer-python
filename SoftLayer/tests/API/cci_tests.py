@@ -4,7 +4,7 @@ import SoftLayer.CCI
 try:
     import unittest2 as unittest
 except ImportError:
-    import unittest
+    import unittest # NOQA
 from mock import MagicMock, ANY, call, patch
 
 
