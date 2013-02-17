@@ -3,12 +3,14 @@ import os.path
 try:
     import unittest2 as unittest
 except ImportError:
-    import unittest
+    import unittest  # NOQA
 from argparse import ArgumentParser
 from mock import patch, MagicMock
 
 import SoftLayer
 import SoftLayer.CLI as cli
+from SoftLayer.CLI.helpers import CLIAbort
+
 
 FIXTURE_PATH = os.path.abspath(os.path.join(__file__, '..', '..', 'fixtures'))
 
@@ -36,6 +38,11 @@ class CommandLineTests(unittest.TestCase):
 
     def test_keyboard_interrupt(self):
         self.env.plugin_list.side_effect = KeyboardInterrupt
+        self.assertRaises(
+            SystemExit, cli.core.main, args=['--help'], env=self.env)
+
+    def test_abort(self):
+        self.env.plugin_list.side_effect = CLIAbort('exit!')
         self.assertRaises(
             SystemExit, cli.core.main, args=['--help'], env=self.env)
 

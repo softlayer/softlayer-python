@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from SoftLayer.CLI import CLIRunnable, no_going_back, Table
+from SoftLayer.CLI import CLIRunnable, no_going_back, Table, CLIAbort
 from SoftLayer.SSL import SSLManager
 
 __doc__ = "Manages SSL"
@@ -129,7 +129,7 @@ class RemoveCertificate(CLIRunnable):
         manager = SSLManager(client)
         if args.really or no_going_back('yes'):
             manager.remove_certificate(args.id)
-            return "Deleted certificate: %s" % args.id)
+            return "Deleted certificate: %s" % args.id
         raise CLIAbort("Aborted.")
 
 

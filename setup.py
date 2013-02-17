@@ -14,6 +14,8 @@ if sys.version_info < (2, 7):
     requires.append('importlib')
 elif sys.version_info >= (2, 6):
     requires.append('requests')
+if sys.version_info <= (2, 6):
+    requires.append('simplejson')
 
 description = "A library to contact SoftLayer's backend services"
 

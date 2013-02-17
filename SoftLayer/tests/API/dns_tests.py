@@ -1,28 +1,13 @@
 import SoftLayer
-import os
 
 try:
     import unittest2 as unittest
 except ImportError:
-    import unittest
+    import unittest # NOQA
 from mock import MagicMock
 
 
-def get_creds():
-    for key in 'SL_USERNAME SL_API_KEY'.split():
-        if key not in os.environ:
-            raise unittest.SkipTest(
-                'SL_USERNAME and SL_API_KEY environmental variables not set')
-
-    return {
-        'endpoint': (os.environ.get('SL_API_ENDPOINT') or
-                     SoftLayer.API_PUBLIC_ENDPOINT),
-        'username': os.environ['SL_USERNAME'],
-        'api_key': os.environ['SL_API_KEY']
-    }
-
-
-class DNSTests_unittests(unittest.TestCase):
+class DNSTests(unittest.TestCase):
 
     def setUp(self):
         self.client = MagicMock()

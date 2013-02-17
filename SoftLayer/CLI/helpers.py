@@ -4,7 +4,7 @@ from prettytable import PrettyTable
 
 __all__ = ['Table', 'CLIRunnable', 'FormattedItem', 'valid_response',
            'add_really_argument', 'confirm', 'no_going_back', 'mb_to_gb',
-           'listing']
+           'listing', 'CLIAbort']
 
 
 class FormattedItem(object):
@@ -26,7 +26,7 @@ def mb_to_gb(megabytes):
 
 
 def listing(item, separator=','):
-    l = separator.join(item)
+    l = separator.join((str(i) for i in item))
     return FormattedItem(l, l)
 
 
