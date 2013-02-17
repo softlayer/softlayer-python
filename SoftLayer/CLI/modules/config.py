@@ -1,5 +1,12 @@
-#!/usr/bin/env python
-""" View and edit configuration """
+"""
+usage: sl config <command> [<args>...] [options]
+
+View and edit configuration
+
+The available commands are:
+  setup  Setup configuration
+  show   Show current configuration
+"""
 import os.path
 
 from SoftLayer.CLI import CLIRunnable, CLIAbort, Table, confirm
@@ -7,7 +14,11 @@ import ConfigParser
 
 
 class Setup(CLIRunnable):
-    """ Setup configuration """
+    """
+usage: sl config setup [options]
+
+Setup configuration
+"""
     action = 'setup'
 
     @classmethod
@@ -17,8 +28,8 @@ class Setup(CLIRunnable):
         endpoint_url = cls.env.input('Endpoint URL: ')
 
         path = '~/.softlayer'
-        if args.config:
-            path = args.config
+        if args.get('--config'):
+            path = args.get('--config')
 
         config_path = os.path.expanduser(path)
         c = confirm(
@@ -46,7 +57,11 @@ class Setup(CLIRunnable):
 
 
 class Show(CLIRunnable):
-    """ Show configuration values """
+    """
+usage: sl config show [options]
+
+Show current configuration
+"""
     action = 'show'
 
     @classmethod

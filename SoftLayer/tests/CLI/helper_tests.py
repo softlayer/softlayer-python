@@ -4,7 +4,6 @@ try:
 except ImportError:
     import unittest # NOQA
 from mock import patch
-from argparse import ArgumentParser
 
 
 import SoftLayer.CLI as cli
@@ -77,12 +76,6 @@ class PromptTests(unittest.TestCase):
         raw_input_mock.return_value = ''
         res = cli.confirm(allow_empty=True, default=True)
         self.assertTrue(res)
-
-    def test_add_really_argument(self):
-        parser = ArgumentParser()
-        cli.helpers.add_really_argument(parser)
-        args = parser.parse_args(['--really'])
-        self.assertTrue(args.really)
 
 
 class FormattedItemTests(unittest.TestCase):

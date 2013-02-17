@@ -1,6 +1,6 @@
+import sys
 from importlib import import_module
 from ConfigParser import SafeConfigParser
-import sys
 import os
 import os.path
 
@@ -12,9 +12,18 @@ class Environment(object):
 
     # {'module_name': {'action': 'actionClass'}}
     plugins = {}
+    aliases = {
+        'meta': 'metadata',
+        'me': 'metadata',
+    }
     config = {}
     stdout = sys.stdout
     stderr = sys.stderr
+
+    def get_module_name(self, module_name):
+        if module_name in self.aliases:
+            return self.aliases[module_name]
+        return module_name
 
     def load_module(self, mod):  # pragma: no cover
         return import_module('SoftLayer.CLI.modules.%s' % mod)

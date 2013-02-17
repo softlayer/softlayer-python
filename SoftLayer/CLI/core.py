@@ -1,15 +1,35 @@
-"CLI utilities"
+"""
+usage: sl <command> [<args>...]
+       sl help <command>
+       sl [-h | --help]
+
+SoftLayer Command-line Client
+
+The available commands are:
+  firewall  Firewall rule and security management
+  image     Manages compute and flex images
+  ssl       Manages SSL
+  cci       Manage, delete, order compute instances
+  dns       Manage DNS
+  config    View and edit configuration for this tool
+  metadata  Get details about this machine. Also available with 'me' and 'meta'
+
+See 'sl help <command>' for more information on a specific command.
+
+To use most commands your SoftLayer username and api_key need to be
+configured. The easiest way to do that is to use: 'sl config setup'
+"""
 import sys
 import os
 import os.path
-from argparse import ArgumentParser, SUPPRESS
-
-from SoftLayer import Client, SoftLayerError
-from SoftLayer.CLI.helpers import (
-    Table, CLIHalt, CLIAbort, FormattedItem, listing)
-from SoftLayer.CLI.environment import Environment, CLIRunnableType
 
 from prettytable import FRAME, NONE
+from docopt import docopt
+
+from SoftLayer import Client, SoftLayerError
+from SoftLayer.consts import VERSION
+from SoftLayer.CLI.helpers import Table, CLIAbort, FormattedItem, listing
+from SoftLayer.CLI.environment import Environment, CLIRunnableType
 
 
 def format_output(data, fmt='table'):
@@ -53,78 +73,35 @@ def format_no_tty(table):
     return t
 
 
-def add_config_argument(parser):
-    parser.add_argument('--config', '-C', help='Config file', dest='config')
+def parse_main_args(args=sys.argv[1:]):
+    arguments = docopt(__doc__, version=VERSION, argv=args, options_first=True)
+    return arguments
 
 
-def add_fmt_argument(parser):
-    fmt_default = 'raw'
+def parse_module_args(module, args):
+
+    arg_doc = module.__doc__ + """
+Standard Options:
+  -h --help  Show this screen
+"""
+    arguments = docopt(
+        arg_doc, version=VERSION, argv=args, options_first=True)
+    return arguments
+
+
+def parse_submodule_args(submodule, args):
+    default_format = 'raw'
     if sys.stdout.isatty():
-        fmt_default = 'table'
+        default_format = 'table'
+    arg_doc = submodule.__doc__ + """
+Standard Options:
+  --format=ARG           Output format. [Options: table, raw] [Default: %s]
+  -c FILE --config=FILE  Config file location [Default: ~/.softlayer]
+  -h --help              Show this screen
+""" % default_format
 
-    parser.add_argument(
-        '--format',
-        help='output format',
-        choices=['table', 'raw'],
-        default=fmt_default,
-        dest='fmt')
-
-
-def parse_primary_args(modules, argv):
-    # Set up the primary parser. e.g. sl command
-    description = 'SoftLayer Command-line Client'
-    epilog = ('To use most functions of this interface, your SoftLayer '
-              'username and api_key need to be configured. The easiest way to '
-              'do that is to use: \'sl config setup\'')
-    parser = ArgumentParser(
-        description=description,
-        epilog=epilog,
-        add_help=False,)
-
-    parser.add_argument(
-        'module',
-        help="Module name",
-        choices=sorted(['help'] + modules),
-        default='help',
-        nargs='?')
-    parser.add_argument('aux', nargs='*', help=SUPPRESS)
-
-    args, aux_args = parser.parse_known_args(args=argv)
-    module_name = args.module.lower()
-
-    if module_name == 'help':
-        parser.print_help()
-        raise CLIHalt(code=0)
-    return module_name, args, aux_args
-
-
-def parse_module_args(module, module_name, actions, posargs, argv):
-    # Set up sub-command parser. e.g. sl command action
-    args = posargs + argv
-
-    parser = ArgumentParser(
-        description=module.__doc__,
-        prog="%s %s" % (os.path.basename(sys.argv[0]), module_name),
-    )
-
-    action_parser = parser.add_subparsers(dest='action')
-
-    for action_name, method in actions.iteritems():
-        if action_name:
-            subparser = action_parser.add_parser(
-                action_name,
-                help=method.__doc__,
-                description=method.__doc__,
-            )
-            method.add_additional_args(subparser)
-            add_fmt_argument(subparser)
-            add_config_argument(subparser)
-
-    if len(posargs) == 0:
-        parser.print_help()
-        raise CLIHalt(code=0)
-
-    return parser.parse_args(args=args)
+    arguments = docopt(arg_doc, version=VERSION, argv=args)
+    return arguments
 
 
 def main(args=sys.argv[1:], env=Environment()):
@@ -132,22 +109,39 @@ def main(args=sys.argv[1:], env=Environment()):
     CLIRunnableType.env = env
     exit_status = 0
     try:
-        module_name, parent_args, aux_args = \
-            parse_primary_args(env.plugin_list(), args)
+        # handle `sl ...`
+        main_args = parse_main_args(args)
+        module_name = env.get_module_name(main_args['<command>'])
+
+        # handle `sl help <command>`
+        if module_name == 'help' and len(main_args['<args>']) > 0:
+            module = env.load_module(main_args['<args>'][0])
+            parse_module_args(module, ['--help', main_args['<args>'][0]])
+
+        # handle `sl --help` and `sl invalidcommand`
+        if module_name not in env.plugin_list():
+            parse_main_args(['--help'])
 
         module = env.load_module(module_name)
         actions = env.plugins[module_name]
 
-        # Parse Module-Specific Arguments
-        parsed_args = parse_module_args(
-            module, module_name, actions, parent_args.aux, aux_args)
-        action = parsed_args.action
+        # handle `sl <command> ...`
+        module_args = parse_module_args(
+            module, [module_name] + main_args['<args>'])
+        action = module_args['<command>']
+
+        # handle `sl <command> invalidcommand`
+        if action not in actions:
+            parse_module_args(module, ['--help', module_name, action])
+
+        # handle `sl <command> <subcommand> ...`
+        submodule_args = parse_submodule_args(actions[action], args)
 
         # Parse Config
         config_files = ["~/.softlayer"]
 
-        if parsed_args.config:
-            config_files.append(parsed_args.config)
+        if submodule_args.get('--config'):
+            config_files.append(submodule_args.get('--config'))
 
         env.load_config(config_files)
         client = Client(
@@ -158,9 +152,10 @@ def main(args=sys.argv[1:], env=Environment()):
         # Do the thing
         f = env.plugins[module_name][action]
         f.env = env
-        data = f.execute(client, parsed_args)
+        data = f.execute(client, submodule_args)
         if data:
-            env.out(str(format_output(data, fmt=parsed_args.fmt)))
+            format = submodule_args.get('--format')
+            env.out(str(format_output(data, fmt=format)))
 
     except KeyboardInterrupt:
         exit_status = 1

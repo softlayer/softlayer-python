@@ -68,3 +68,11 @@ class EnvironmentTests(unittest.TestCase):
             'api_key': 'myapi_key',
             'endpoint_url': 'myendpoint_url'
         }, self.env.config)
+
+    def test_get_module_name(self):
+        self.env.aliases = {'aliasname': 'realname'}
+        r = self.env.get_module_name('aliasname')
+        self.assertEqual(r, 'realname')
+
+        r = self.env.get_module_name('realname')
+        self.assertEqual(r, 'realname')

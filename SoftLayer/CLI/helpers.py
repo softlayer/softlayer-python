@@ -3,8 +3,7 @@ from SoftLayer.CLI.environment import CLIRunnableType
 from prettytable import PrettyTable
 
 __all__ = ['Table', 'CLIRunnable', 'FormattedItem', 'valid_response',
-           'add_really_argument', 'confirm', 'no_going_back', 'mb_to_gb',
-           'listing', 'CLIAbort']
+           'confirm', 'no_going_back', 'mb_to_gb', 'listing', 'CLIAbort']
 
 
 class FormattedItem(object):
@@ -52,14 +51,6 @@ def valid_response(prompt, *valid):
         return None
 
     return False
-
-
-def add_really_argument(parser):
-    parser.add_argument(
-        '--really', '-y',
-        help='Confirm all prompt actions',
-        action='store_true',
-        default=False)
 
 
 def confirm(prompt_str="", allow_empty=False, default=False):

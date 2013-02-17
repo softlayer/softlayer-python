@@ -1,63 +1,64 @@
-#!/usr/bin/env python
-"""Manage, delete, order Compute instances"""
+"""
+usage: sl cci <command> [<args>...] [options]
+
+Manage, delete, order compute instances
+
+The available commands are:
+  network         Manage network settings
+  create-options  Order and create a CCI
+                    (see `sl cci create-options` for choices)
+  manage          Manage active CCI
+  list            List CCI's on the account
+  detail          Output details about a CCI
+  dns             DNS related actions to a CCI
+  cancel          Cancel a running CCI
+  options         Output available available options when creating a CCI
+"""
 
 from os import linesep
 from SoftLayer.CCI import CCIManager
 from SoftLayer.CLI import (
-    CLIRunnable, Table, no_going_back, confirm, add_really_argument,
-    mb_to_gb, listing, FormattedItem)
+    CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
+    FormattedItem)
 from SoftLayer.CLI.helpers import CLIAbort
-from argparse import FileType
 
 
 class ListCCIs(CLIRunnable):
-    """ List all CCI's on the account"""
+    """
+usage: sl cci list [--hourly | --monthly] [--sortby=SORT_COLUMN] [--tags=TAGS]
+                   [options]
+
+List CCIs
+
+Options:
+  --hourly                   Show hourly instances
+  --monthly                  Show monthly instances
+  --sortby=ARG               Column to sort by. options: id, datacenter, host,
+                             Cores, memory, primary_ip, backend_ip
+  --tags=ARG                 Only show instances that have one of these tags
+"""
     action = 'list'
-
-    @staticmethod
-    def add_additional_args(parser):
-        group = parser.add_mutually_exclusive_group()
-        group.add_argument(
-            '--hourly',
-            help='List only hourly CCI\'s',
-            action='store_true', default=False)
-        group.add_argument(
-            '--monthly',
-            help='List only monthly CCI\'s',
-            action='store_true', default=False)
-
-        parser.add_argument(
-            '--sortby',
-            help="Sort table",
-            choices=['id', 'datacenter', 'host', 'cores', 'memory',
-                     'primary_ip', 'backend_ip'],
-            default='host')
-
-        parser.add_argument(
-            '--tags',
-            help="Filter by tag",
-            nargs="+",
-            required=False,
-        )
 
     @staticmethod
     def execute(client, args):
         cci = CCIManager(client)
 
-        results = cci.list_instances(hourly=args.hourly, monthly=args.monthly)
+        results = cci.list_instances(
+            hourly=args.get('--hourly'), monthly=args.get('--monthly'))
 
         t = Table([
             'id', 'datacenter', 'host',
             'cores', 'memory', 'primary_ip',
             'backend_ip', 'provisioning',
         ])
-        t.sortby = args.sortby
+        t.sortby = args.get('--sortby') or 'host'
 
-        if args.tags:
+        if args.get('--tags'):
+            tags = [tag.strip() for tag in args.get('--tags').split(',')]
             guests = []
             for g in results:
                 tags = [x['tag']['name'] for x in g['tagReferences']]
-                if any(_tag in args.tags for _tag in tags):
+                if any(_tag in tags for _tag in tags):
                     guests.append(g)
         else:
             guests = results
@@ -79,35 +80,20 @@ class ListCCIs(CLIRunnable):
 
 
 class CCIDetails(CLIRunnable):
+    """
+usage: sl cci detail (--id=ID | --name=NAME | --public-ip=PUBLIC_IP)
+                     [--passwords] [--price] [options]
 
+Get details for a CCI
+
+Options:
+  --id ID                    id of CCI
+  --name NAME                the fully qualified domain name
+  --public-ip PUBLIC_IP      public ip of CCI
+  --passwords                show passwords (check over your shoulder!)
+  --price                    show associated prices
+"""
     action = 'detail'
-
-    @staticmethod
-    def add_additional_args(parser):
-        group = parser.add_mutually_exclusive_group(required=True)
-        group.add_argument(
-            '--id',
-            help='id of CCI')
-
-        group.add_argument(
-            '--name',
-            help='Fully qualified domain name')
-
-        group.add_argument(
-            '--public-ip',
-            help='public ip of CCI',
-            dest='public_ip'
-        )
-
-        parser.add_argument(
-            "--passwords",
-            help='Show passwords (check over your shoulder!)',
-            action='store_true', default=False)
-
-        parser.add_argument(
-            '--price',
-            help='Show associated prices',
-            action='store_true', default=False)
 
     @staticmethod
     def execute(client, args):
@@ -131,7 +117,7 @@ class CCIDetails(CLIRunnable):
                 "[softwareDescription][name]} "),
         ]
 
-        result = cci.get_instance(args.id)
+        result = cci.get_instance(args.get('--id'))
 
         for o in output:
             if o[0] == 'memory':
@@ -139,10 +125,10 @@ class CCIDetails(CLIRunnable):
             else:
                 t.add_row([o[0], o[1].format(result)])
 
-        if args.price:
+        if args.get('--price'):
             t.add_row(['price rate', result['billingItem']['recurringFee']])
 
-        if args.passwords:
+        if args.get('--passwords'):
             user_strs = []
             for item in result['operatingSystem']['passwords']:
                 user_strs.append(
@@ -157,7 +143,7 @@ class CCIDetails(CLIRunnable):
             t.add_row(['tags', listing(tag_row, separator=',')])
 
         ptr_domains = client['Virtual_Guest'].\
-            getReverseDomainRecords(id=args.id)[0]
+            getReverseDomainRecords(id=args.get('--id'))[0]
 
         for ptr in ptr_domains['resourceRecords']:
             t.add_row(['ptr', ptr['data']])
@@ -166,40 +152,47 @@ class CCIDetails(CLIRunnable):
 
 
 class CreateOptionsCCI(CLIRunnable):
-    """ Output available available options when creating a CCI """
+    """
+usage: sl cci create-options [options]
 
-    action = 'options'
+Output available available options when creating a CCI
 
-    @staticmethod
-    def add_additional_args(parser):
-        filters = ['all', 'datacenter', 'cpu', 'nic', 'disk', 'os', 'memory']
-        for f in filters:
-            parser.add_argument(
-                '--%s' % f,
-                help="show %s options" % f,
-                dest='filters',
-                default=[],
-                action='append_const',
-                const=f)
+Options:
+  --all         Show all options. default if no other option provided
+  --datacenter  Show datacenter options
+  --cpu         Show CPU options
+  --nic         Show NIC speed options
+  --disk        Show disk options
+  --os          Show operating system options
+  --memory      Show memory size options
+"""
+    action = 'create-options'
+    options = ['datacenter', 'cpu', 'nic', 'disk', 'os', 'memory']
 
-    @staticmethod
-    def execute(client, args):
+    @classmethod
+    def execute(cls, client, args):
         cci = CCIManager(client)
         result = cci.get_create_options()
-        show_all = False
-        if len(args.filters) == 0 or 'all' in args.filters:
+        show_all = True
+
+        for opt_name, _ in args.iteritems():
+            if '--%s' % opt_name in cls.options:
+                show_all = False
+                break
+
+        if args['--all']:
             show_all = True
 
         t = Table(['Name', 'Value'])
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
 
-        if 'datacenter' in args.filters or show_all:
+        if args['--datacenter'] or show_all:
             datacenters = [dc['template']['datacenter']['name']
                            for dc in result['datacenters']]
             t.add_row(['datacenter', listing(datacenters, separator=',')])
 
-        if 'cpu' in args.filters or show_all:
+        if args['--cpu'] or show_all:
             standard_cpu = filter(
                 lambda x: not x['template'].get(
                     'dedicatedAccountHostOnlyFlag', False),
@@ -220,12 +213,12 @@ class CreateOptionsCCI(CLIRunnable):
             cpus_row(ded_cpu, 'private')
             cpus_row(standard_cpu, 'standard')
 
-        if 'memory' in args.filters or show_all:
+        if args['--memory'] or show_all:
             memory = [
                 str(m['template']['maxMemory']) for m in result['memory']]
             t.add_row(['memory', listing(memory, separator=',')])
 
-        if 'os' in args.filters or show_all:
+        if args['--os'] or show_all:
             os = [
                 o['template']['operatingSystemReferenceCode'] for o in
                 result['operatingSystems']]
@@ -241,7 +234,7 @@ class CreateOptionsCCI(CLIRunnable):
                     sorted(filter(lambda x: x[0:len(summary)] == summary, os))
                 )])
 
-        if 'disk' in args.filters or show_all:
+        if args['--disk'] or show_all:
             local_disks = filter(
                 lambda x: x['template'].get('localDiskFlag', False),
                 result['blockDevices'])
@@ -271,7 +264,7 @@ class CreateOptionsCCI(CLIRunnable):
             block_rows(local_disks, 'local')
             block_rows(san_disks, 'san')
 
-        if 'nic' in args.filters or show_all:
+        if args['--nic'] or show_all:
             speeds = []
             for x in result['networkComponents']:
                 speed = x['template']['networkComponents'][0]['maxSpeed']
@@ -285,115 +278,54 @@ class CreateOptionsCCI(CLIRunnable):
 
 
 class CreateCCI(CLIRunnable):
-    """ Order and create a CCI
-    (see `sl cci options` for choices)"""
+    """
+usage: sl cci create --hostname=HOST --domain=DOMAIN --cpu=CPU --memory=MEMORY
+                     (--os=OS | --image=GUID) (--hourly | --monthly)
+                     [--userdata=DATA | --userfile=FILE]
+                     [--dry-run | --test] [options]
 
+Order/create a CCI. See 'sl cci create-options' for choices
+
+Options:
+  -H --hostname=HOST        Host portion of the FQDN. example: server
+  -D --domain=DOMAIN        Domain portion of the FQDN example: example.com
+  -c --cpu=CPU              Number of CPU cores
+  -m --memory=MEMORY        Memory in mebibytes (n * 1024)
+  -o OS, --os=OS            OS install code. Tip: you can specify <OS>_LATEST
+  --image=GUID              Image GUID
+  --hourly                  Hourly rate instance type
+  --monthly                 Monthly rate instance type
+  --dc DC, --datacenter=DC  datacenter shortname (sng01, dal05, ...)
+                            Note: Omitting this value defaults to the first
+                                  available datacenter
+  --private                 Allocate a private CCI
+  -u --userdata=DATA        User defined metadata string
+  -F --userfile=FILE        Read userdata from file"
+  --dry-run, --test         Do not create CCI, just get a quote
+  -y, --really              Confirm all prompt actions
+"""
     action = 'create'
-
-    @staticmethod
-    def add_additional_args(parser):
-        # Required options
-        parser.add_argument(
-            '--hostname', '-H',
-            help='Host portion of the FQDN',
-            type=str,
-            required=True,
-            metavar='server1')
-
-        parser.add_argument(
-            '--domain', '-D',
-            help='Domain portion of the FQDN',
-            type=str,
-            required=True,
-            metavar='example.com')
-
-        parser.add_argument(
-            '--cpu', '-c',
-            help='Number of CPU cores',
-            type=int,
-            required=True,
-            metavar='#')
-
-        parser.add_argument(
-            '--memory', '-m',
-            help='Memory in mebibytes (n * 1024)',
-            type=str,
-            required=True)
-
-        install = parser.add_mutually_exclusive_group(required=True)
-        install.add_argument(
-            '--os', '-o',
-            help='OS install code. Tip: you can also specify <OS>_LATEST',
-            type=str)
-        install.add_argument(
-            '--image',
-            help='Image GUID',
-            type=str,
-            metavar='GUID')
-
-        billable = parser.add_mutually_exclusive_group(required=True)
-        billable.add_argument(
-            '--hourly',
-            help='Hourly rate instance type',
-            action='store_true')
-        billable.add_argument(
-            '--monthly',
-            help='Monthly rate instance type',
-            action='store_true')
-
-        # Optional arguments
-        parser.add_argument(
-            '--datacenter', '--dc', '-d',
-            help='datacenter shortname (sng01, dal05, ...). '
-            'Note: Omitting this value defaults to the first '
-            'available datacenter',
-            type=str,
-            default='')
-
-        parser.add_argument(
-            '--private',
-            help='Allocate a private CCI',
-            action='store_true',
-            default=False)
-
-        g = parser.add_mutually_exclusive_group()
-        g.add_argument(
-            '--userdata', '-u',
-            help="user defined metadata string",
-            type=str,
-            default=None)
-        g.add_argument(
-            '--userfile', '-F',
-            help="read userdata from file",
-            type=FileType('r'))
-
-        parser.add_argument(
-            '--test', '--dryrun', '--dry-run',
-            help='Do not create CCI, just get a quote',
-            action='store_true',
-            default=False)
-        add_really_argument(parser)
 
     @staticmethod
     def execute(client, args):
         cci = CCIManager(client)
 
         data = {
-            "hourly": args.hourly,
-            "cpus": args.cpu,
-            "domain": args.domain,
-            "hostname": args.hostname,
-            "private": args.private,
+            "hourly": args['--hourly'],
+            "cpus": args['--cpu'],
+            "domain": args['--domain'],
+            "hostname": args['--hostname'],
+            "private": args['--private'],
             "local_disk": True,
         }
 
         try:
-            memory = int(args.memory)
+            memory = int(args['--memory'])
             if memory < 1024:
                 memory = memory * 1024
         except ValueError:
-            unit = args.memory[-1]
-            memory = int(args.memory[0:-1])
+            unit = args['--memory'][-1]
+            memory = int(args['--memory'][0:-1])
             if unit in ['G', 'g']:
                 memory = memory * 1024
             if unit in ['T', 'r']:
@@ -401,27 +333,31 @@ class CreateCCI(CLIRunnable):
 
         data["memory"] = memory
 
-        if args.monthly:
-            data["hourly"] = False
+        if args['--monthly']:
+            data["--hourly"] = False
 
-        if args.os:
-            data["os_code"] = args.os
+        if args.get('--os'):
+            data["os_code"] = args['--os']
 
-        if args.image:
-            data["image_id"] = args.image
+        if args.get('--image'):
+            data["image_id"] = args['--image']
 
-        if args.datacenter:
-            data["datacenter"] = args.datacenter
+        if args.get('--datacenter'):
+            data["datacenter"] = args['--datacenter']
 
-        if args.userdata:
-            data['userdata'] = args.userdata
-        elif args.userfile:
-            data['userdata'] = args.userfile.read()
+        if args.get('--userdata'):
+            data['userdata'] = args['--userdata']
+        elif args.get('userfile'):
+            f = open(args['--userfile'], 'r')
+            try:
+                data['userdata'] = f.read()
+            finally:
+                f.close()
 
-        if args.test:
+        if args.get('--test'):
             result = cci.verify_create_instance(**data)
             output = FormattedItem("Test: Success!")
-        elif args.really or confirm(
+        elif args['--really'] or confirm(
                 prompt_str="This action will incur charges on "
                 "your account. Continue?", allow_empty=True):
             result = cci.create_instance(**data)
@@ -433,183 +369,130 @@ class CreateCCI(CLIRunnable):
 
 
 class CancelCCI(CLIRunnable):
-    """ Cancel a running CCI """
+    """
+usage: sl cci cancel <id> [options]
+
+Cancel a CCI
+
+Options:
+  -y, --really  Confirm all prompt actions
+"""
 
     action = 'cancel'
 
     @staticmethod
-    def add_additional_args(parser):
-        parser.add_argument('id', help='The ID of the CCI to cancel')
-        add_really_argument(parser)
-
-    @staticmethod
     def execute(client, args):
         cci = CCIManager(client)
-        if args.really or no_going_back(args.id):
-            cci.cancel_instance(args.id)
+        if args['--really'] or no_going_back(args['<id>']):
+            cci.cancel_instance(args['<id>'])
         else:
             CLIAbort('Aborted')
 
 
 class ManageCCI(CLIRunnable):
-    """ Manage active CCI"""
+    """
+usage: sl cci manage poweroff <id> [--cycle | --soft] [options]
+       sl cci manage reboot <id> [--cycle | --soft] [options]
+       sl cci manage poweron <id> [options]
+       sl cci manage pause <id> [options]
+       sl cci manage resume <id> [options]
 
+Manage active CCI
+
+Options:
+  -y, --really  Confirm all prompt actions
+"""
     action = 'manage'
 
-    @staticmethod
-    def add_additional_args(parser):
-        manage = parser.add_subparsers(dest='manage')
+    @classmethod
+    def execute(cls, client, args):
+        if args['poweroff']:
+            return cls.exec_shutdown(client, args)
 
-        def add_subparser(parser, arg, help, func):
-            sp = parser.add_parser(arg, help=help)
-            sp.add_argument(
-                'instance',
-                help='Instance ID')
-            sp.set_defaults(func=func)
+        if args['reboot']:
+            return cls.exec_reboot(client, args)
 
-            return sp
+        if args['poweron']:
+            return cls.exec_poweron(client, args)
 
-        po = add_subparser(
-            manage, 'poweroff',
-            'Power off instance',
-            ManageCCI.exec_shutdown)
-        g = po.add_mutually_exclusive_group()
-        g.add_argument(
-            '--soft',
-            help='Request the instance to shutdown gracefully',
-            action='store_true')
+        if args['pause']:
+            return cls.exec_pause(client, args)
 
-        po = add_subparser(
-            manage, 'reboot',
-            'Reboot the instance',
-            ManageCCI.exec_reboot)
-        g = po.add_mutually_exclusive_group()
-        g.add_argument(
-            '--cycle', '--hard',
-            help='Power cycle the instance (off, then on)',
-            action='store_true')
-        g.add_argument(
-            '--soft',
-            help='Attempts to safely reboot the instance',
-            action='store_true')
-
-        add_subparser(
-            manage, 'poweron',
-            'Power on instance',
-            ManageCCI.exec_poweron)
-
-        add_subparser(
-            manage, 'pause',
-            'Pause a running instance',
-            ManageCCI.exec_pause)
-
-        add_subparser(
-            manage, 'resume',
-            'Unpause a paused instance',
-            ManageCCI.exec_resume)
-
-    @staticmethod
-    def execute(client, args):
-        return args.func(client, args)
+        if args['resume']:
+            return cls.exec_resume(client, args)
 
     @staticmethod
     def exec_shutdown(client, args):
         vg = client['Virtual_Guest']
-        if args.soft:
-            result = vg.powerOffSoft(id=args.instance)
-        elif args.cycle:
-            result = vg.powerCycle(id=args.instance)
+        if args['--soft']:
+            result = vg.powerOffSoft(id=args['<id>'])
+        elif args['--cycle']:
+            result = vg.powerCycle(id=args['<id>'])
         else:
-            result = vg.powerOff(id=args.instance)
+            result = vg.powerOff(id=args['<id>'])
 
         return FormattedItem(result)
 
     @staticmethod
     def exec_poweron(client, args):
         vg = client['Virtual_Guest']
-        return vg.powerOn(id=args.instance)
+        return vg.powerOn(id=args['<id>'])
 
     @staticmethod
     def exec_pause(client, args):
         vg = client['Virtual_Guest']
-        return vg.pause(id=args.instance)
+        return vg.pause(id=args['<id>'])
 
     @staticmethod
     def exec_resume(client, args):
         vg = client['Virtual_Guest']
-        return vg.resume(id=args.instance)
+        return vg.resume(id=args['<id>'])
 
     @staticmethod
     def exec_reboot(client, args):
         vg = client['Virtual_Guest']
-        if args.cycle:
-            result = vg.rebootHard(id=args.instance)
-        elif args.soft:
-            result = vg.rebootSoft(id=args.instance)
+        if args['--cycle']:
+            result = vg.rebootHard(id=args['<id>'])
+        elif args['--soft']:
+            result = vg.rebootSoft(id=args['<id>'])
         else:
-            result = vg.rebootDefault(id=args.instance)
+            result = vg.rebootDefault(id=args['<id>'])
 
         return result
 
 
 class NetworkCCI(CLIRunnable):
-    """ manage network settings """
+    """
+usage: sl cci network details <id> [options]
+       sl cci network port <id> --speed=SPEED (--public | --private) [options]
 
+Manage network settings
+
+Options:
+    --speed=SPEED  Port speed. 0 disables the port.
+                   [Options: 0, 10, 100, 1000, 10000]
+    --public       Public network
+    --private      Private network
+"""
     action = 'network'
 
-    @staticmethod
-    def add_additional_args(parser):
+    @classmethod
+    def execute(cls, client, args):
+        if args['port']:
+            return cls.exec_port(client, args)
 
-        def add_subparser(parser, arg, help, func):
-            sp = parser.add_parser(arg, help=help)
-            sp.add_argument(
-                'instance',
-                help='Instance ID')
-            g = sp.add_mutually_exclusive_group(required=True)
-            g.add_argument(
-                '--public',
-                help='Disable public port',
-                action='store_true')
-            g.add_argument(
-                '--private',
-                help='Disable private port',
-                action='store_true')
-
-            sp.set_defaults(func=func)
-            return sp
-
-        manage = parser.add_subparsers(dest='network')
-
-        add_subparser(
-            manage, 'details',
-            'Get network information',
-            NetworkCCI.exec_detail)
-
-        po = add_subparser(
-            manage, 'port',
-            'Set port speed or disable port',
-            NetworkCCI.exec_port)
-
-        po.add_argument(
-            '--speed',
-            type=int,
-            choices=[0, 10, 100, 1000, 10000],
-            help='Set port speed. 0 disables port',
-            required=True)
-
-    @staticmethod
-    def execute(client, args):
-        return args.func(client, args)
+        if args['detail']:
+            return cls.exec_detail(client, args)
 
     @staticmethod
     def exec_port(client, args):
         vg = client['Virtual_Guest']
-        if args.public:
+        if args['--public']:
             func = vg.setPublicNetworkInterfaceSpeed
-        elif args.private:
+        elif args['--private']:
             func = vg.setPrivateNetworkInterfaceSpeed
 
-        result = func(args.speed, id=args.instance)
+        result = func(args['--speed'], id=args['<id>'])
         if result:
             return "Success"
         else:
@@ -621,50 +504,20 @@ class NetworkCCI(CLIRunnable):
 
 
 class CCIDNS(CLIRunnable):
-    """ DNS related actions to a CCI"""
+    """
+usage: sl cci dns-sync <id> [options]
 
-    action = 'dns'
+DNS related actions for a CCI
 
-    @staticmethod
-    def add_additional_args(parser):
-        manage = parser.add_subparsers(dest='dns')
-
-        def add_subparser(parser, arg, help, func):
-            sp = parser.add_parser(arg, help=help, description=help)
-            sp.add_argument(
-                'instance',
-                help='Instance ID')
-            sp.set_defaults(func=func)
-
-            return sp
-
-        po = add_subparser(
-            manage, 'sync',
-            'Sync hostname to A and PTR records',
-            CCIDNS.exec_sync)
-        po.add_argument(
-            '--a', '--A',
-            help='Sync only the A record',
-            default=[],
-            action='append_const',
-            const='a',
-            dest='sync')
-        po.add_argument(
-            '--ptr', '--PTR',
-            help='Sync only the PTR record',
-            default=[],
-            action='append_const',
-            const='ptr',
-            dest='sync')
-
-        add_really_argument(po)
+Options:
+  -a, -A        Sync only the A record
+  --ptr, --PTR  Sync only the PTR record
+  -y, --really  Confirm all prompt actions
+"""
+    action = 'dns-sync'
 
     @staticmethod
     def execute(client, args):
-        return args.func(client, args)
-
-    @staticmethod
-    def exec_sync(client, args):
         from SoftLayer.DNS import DNSManager, DNSZoneNotFound
         dns = DNSManager(client)
         cci = CCIManager(client)
@@ -688,7 +541,7 @@ class CCIDNS(CLIRunnable):
                 recs = filter(lambda x: x['type'].lower() == 'a', records)
                 if len(recs) != 1:
                     raise CLIAbort("Aborting A record sync, found %d "
-                            "A record exists!" % len(recs))
+                                   "A record exists!" % len(recs))
                 rec = recs[0]
                 rec['data'] = instance['primaryIpAddress']
                 dns.edit_record(rec)
@@ -714,7 +567,7 @@ class CCIDNS(CLIRunnable):
                     instance['fullyQualifiedDomainName'],
                     ttl=7200)
 
-        instance = cci.get_instance(args.instance)
+        instance = cci.get_instance(args['<id>'])
 
         if not instance['primaryIpAddress']:
             raise CLIAbort('No primary IP address associated with this CCI')
@@ -723,19 +576,21 @@ class CCIDNS(CLIRunnable):
             zone = dns.get_zone(instance['domain'])
         except DNSZoneNotFound:
             raise CLIAbort("Unable to create A record, "
-                "no zone found matching: %s" % instance['domain'])
+                           "no zone found matching: %s" % instance['domain'])
 
-        go_for_it = args.really or confirm(
+        go_for_it = args['really'] or confirm(
             "Attempt to update DNS records for %s"
-                % instance['fullyQualifiedDomainName'])
+            % instance['fullyQualifiedDomainName'])
 
         if not go_for_it:
             raise CLIAbort("Aborting DNS sync")
 
-        both = len(args.sync) == 0
+        both = False
+        if args['--PTR'] and args['--A']:
+            both = True
 
-        if both or 'a' in args.sync:
+        if both or args['--A']:
             sync_a_record()
 
-        if both or 'ptr' in args.sync:
+        if both or args['--PTR']:
             sync_ptr_record()
