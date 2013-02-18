@@ -31,6 +31,7 @@ def listing(item, separator=','):
 
 class CLIRunnable(object):
     __metaclass__ = CLIRunnableType
+    options = []
     action = None
 
     @staticmethod

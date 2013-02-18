@@ -14,7 +14,7 @@ class Environment(object):
     plugins = {}
     aliases = {
         'meta': 'metadata',
-        'me': 'metadata',
+        'my': 'metadata',
     }
     config = {}
     stdout = sys.stdout

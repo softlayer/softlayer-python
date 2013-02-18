@@ -23,6 +23,7 @@ class MetadataManager(object):
         'id': {'call': 'Id'},
         'primary_backend_ip': {'call': 'PrimaryBackendIpAddress'},
         'primary_ip': {'call': 'PrimaryIpAddress'},
+        'primary_frontend_ip': {'call': 'PrimaryIpAddress'},
         'provision_state': {'call': 'ProvisionState'},
         'router': {'call': 'Router', 'param_req': True},
         'tags': {'call': 'Tags'},
@@ -32,8 +33,11 @@ class MetadataManager(object):
         'vlans': {'call': 'Vlans', 'param_req': True},
     }
 
-    def __init__(self, client=None):
+    def __init__(self, client=None, timeout=None):
         self.url = API_PRIVATE_ENDPOINT_REST.rstrip('/')
+        self.timeout = timeout
+        if self.timeout is None:
+            self.timeout = 5
 
     def make_request(self, path):
         url = '/'.join([self.url, 'SoftLayer_Resource_Metadata', path])
@@ -41,7 +45,7 @@ class MetadataManager(object):
         req.add_header('User-Agent', USER_AGENT)
 
         try:
-            resp = urllib2.urlopen(req)
+            resp = urllib2.urlopen(req, timeout=self.timeout)
         except urllib2.HTTPError, e:  # pragma: no cover
             if e.code == 404:
                 return None

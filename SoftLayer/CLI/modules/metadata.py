@@ -1,13 +1,15 @@
 """
 usage: sl metadata <command> [<args>...] [options]
 
-Find details about this machine
+Find details about this machine. These commands only work on devices on the
+backend SoftLayer network. This allows for self-discovery for newly provisioned
+resources.
 
 The available commands are:
   datacenter          Datacenter name
   backend_mac         Backend mac addresses
-  primary_ip          Primary ip address
-  primary_backend_ip  Primary backend ip address
+  ip                  Primary ip address
+  backend_ip          Primary backend ip address
   tags                Tags
   hostname            Hostname
   fqdn                Fully qualified domain name
@@ -115,11 +117,11 @@ Get id
 
 class PrimaryBackendIpAddress(CLIRunnable):
     """
-usage: sl metadata primary_backend_ip [options]
+usage: sl metadata backend_ip [options]
 
-Get primary backend ip
+Get primary backend ip address
 """
-    action = 'primary_backend_ip'
+    action = 'backend_ip'
 
     @staticmethod
     def execute(client, args):
@@ -128,11 +130,11 @@ Get primary backend ip
 
 class PrimaryIpAddress(CLIRunnable):
     """
-usage: sl metadata primary_ip [options]
+usage: sl metadata ip [options]
 
 Get primary ip address
 """
-    action = 'primary_ip'
+    action = 'ip'
 
     @staticmethod
     def execute(client, args):

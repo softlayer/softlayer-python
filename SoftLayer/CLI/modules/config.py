@@ -70,7 +70,7 @@ Show current configuration
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
         config = cls.env.config
-        t.add_row(['Username', config['username']])
-        t.add_row(['API Key', config['api_key']])
-        t.add_row(['Endpoint URL', config['endpoint_url']])
+        t.add_row(['Username', config.get('username', 'none set')])
+        t.add_row(['API Key', config.get('api_kye', 'none set')])
+        t.add_row(['Endpoint URL', config.get('endpoint_url', 'none set')])
         return t

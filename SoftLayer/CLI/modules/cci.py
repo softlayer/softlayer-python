@@ -302,9 +302,9 @@ Options:
   -u --userdata=DATA        User defined metadata string
   -F --userfile=FILE        Read userdata from file"
   --dry-run, --test         Do not create CCI, just get a quote
-  -y, --really              Confirm all prompt actions
 """
     action = 'create'
+    options = ['confirm']
 
     @staticmethod
     def execute(client, args):
@@ -373,12 +373,10 @@ class CancelCCI(CLIRunnable):
 usage: sl cci cancel <id> [options]
 
 Cancel a CCI
-
-Options:
-  -y, --really  Confirm all prompt actions
 """
 
     action = 'cancel'
+    options = ['confirm']
 
     @staticmethod
     def execute(client, args):
@@ -398,11 +396,9 @@ usage: sl cci manage poweroff <id> [--cycle | --soft] [options]
        sl cci manage resume <id> [options]
 
 Manage active CCI
-
-Options:
-  -y, --really  Confirm all prompt actions
 """
     action = 'manage'
+    options = ['confirm']
 
     @classmethod
     def execute(cls, client, args):
@@ -512,9 +508,9 @@ DNS related actions for a CCI
 Options:
   -a, -A        Sync only the A record
   --ptr, --PTR  Sync only the PTR record
-  -y, --really  Confirm all prompt actions
 """
     action = 'dns-sync'
+    options = ['confirm']
 
     @staticmethod
     def execute(client, args):
@@ -578,7 +574,7 @@ Options:
             raise CLIAbort("Unable to create A record, "
                            "no zone found matching: %s" % instance['domain'])
 
-        go_for_it = args['really'] or confirm(
+        go_for_it = args['--really'] or confirm(
             "Attempt to update DNS records for %s"
             % instance['fullyQualifiedDomainName'])
 

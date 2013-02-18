@@ -129,11 +129,9 @@ class RemoveCertificate(CLIRunnable):
 usage: sl ssl remove <id> [options]
 
 Remove SSL certificate
-
-Options:
-  -y, --really  Confirm all prompt actions
 """
     action = 'remove'
+    options = ['confirm']
 
     @staticmethod
     def execute(client, args):

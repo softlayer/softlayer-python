@@ -60,11 +60,9 @@ class DeleteZone(CLIRunnable):
 usage: sl dns delete <domain> <zone> [options]
 
 Delete zone
-
-Options:
-  -y, --really              Confirm all prompt actions
 """
     action = 'delete'
+    options = ['confirm']
 
     @staticmethod
     def execute(client, args):
@@ -189,15 +187,15 @@ Look for a resource record by exact name
 
 class RecordRemove(CLIRunnable):
     """
-usage: sl dns remove <domain> <record> [--id] [--really] [options]
+usage: sl dns remove <domain> <record> [--id] [options]
 
 Remove resource records
 
 Options:
   --id=ID       Remove only the given ID
-  -y, --really  Confirm all prompt actions
 """
     action = 'remove'
+    options = ['confirm']
 
     @staticmethod
     def execute(client, args):
