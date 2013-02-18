@@ -105,7 +105,7 @@ Prompt Options:
     arg_doc += """
 Standard Options:
   --format=ARG           Output format. [Options: table, raw] [Default: %s]
-  -c FILE --config=FILE  Config file location [Default: ~/.softlayer]
+  -C FILE --config=FILE  Config file location. [Default: ~/.softlayer]
   -h --help              Show this screen
 """ % default_format
 

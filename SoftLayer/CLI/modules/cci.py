@@ -16,11 +16,12 @@ The available commands are:
 """
 
 from os import linesep
+import os.path
 from SoftLayer.CCI import CCIManager
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
     FormattedItem)
-from SoftLayer.CLI.helpers import CLIAbort
+from SoftLayer.CLI.helpers import CLIAbort, ArgumentError
 
 
 class ListCCIs(CLIRunnable):
@@ -219,20 +220,23 @@ Options:
             t.add_row(['memory', listing(memory, separator=',')])
 
         if args['--os'] or show_all:
-            os = [
+            op_sys = [
                 o['template']['operatingSystemReferenceCode'] for o in
                 result['operatingSystems']]
 
-            os = sorted(os)
+            op_sys = sorted(op_sys)
             os_summary = set()
 
-            for o in os:
+            for o in op_sys:
                 os_summary.add(o[0:o.find('_')])
 
             for summary in sorted(os_summary):
-                t.add_row(['os (%s)' % summary, linesep.join(
-                    sorted(filter(lambda x: x[0:len(summary)] == summary, os))
-                )])
+                t.add_row([
+                    'os (%s)' % summary,
+                    linesep.join(sorted(filter(
+                        lambda x: x[0:len(summary)] == summary, op_sys))
+                    )
+                ])
 
         if args['--disk'] or show_all:
             local_disks = filter(
@@ -280,28 +284,31 @@ Options:
 class CreateCCI(CLIRunnable):
     """
 usage: sl cci create --hostname=HOST --domain=DOMAIN --cpu=CPU --memory=MEMORY
-                     (--os=OS | --image=GUID) (--hourly | --monthly)
-                     [--userdata=DATA | --userfile=FILE]
-                     [--dry-run | --test] [options]
+                     (--os=OS | --image=GUID) (--hourly | --monthly) [options]
 
-Order/create a CCI. See 'sl cci create-options' for choices
+Order/create a CCI. See 'sl cci create-options' for valid values
 
-Options:
-  -H --hostname=HOST        Host portion of the FQDN. example: server
-  -D --domain=DOMAIN        Domain portion of the FQDN example: example.com
-  -c --cpu=CPU              Number of CPU cores
-  -m --memory=MEMORY        Memory in mebibytes (n * 1024)
-  -o OS, --os=OS            OS install code. Tip: you can specify <OS>_LATEST
-  --image=GUID              Image GUID
-  --hourly                  Hourly rate instance type
-  --monthly                 Monthly rate instance type
-  --dc DC, --datacenter=DC  datacenter shortname (sng01, dal05, ...)
-                            Note: Omitting this value defaults to the first
-                                  available datacenter
-  --private                 Allocate a private CCI
-  -u --userdata=DATA        User defined metadata string
-  -F --userfile=FILE        Read userdata from file"
-  --dry-run, --test         Do not create CCI, just get a quote
+Required:
+  -H --hostname=HOST      Host portion of the FQDN. example: server
+  -D --domain=DOMAIN      Domain portion of the FQDN example: example.com
+  -c --cpu=CPU            Number of CPU cores
+  -m --memory=MEMORY      Memory in mebibytes (n * 1024)
+
+  -o OS, --os=OS          OS install code. Tip: you can specify <OS>_LATEST
+  --image=GUID            Image GUID. See: 'sl image list' for reference
+
+  --hourly                Hourly rate instance type
+  --monthly               Monthly rate instance type
+
+Optional:
+  -d DC, --datacenter=DC  datacenter shortname (sng01, dal05, ...)
+                          Note: Omitting this value defaults to the first
+                                available datacenter
+  --private               Allocate a private CCI
+  --dry-run, --test       Do not create CCI, just get a quote
+
+  -u --userdata=DATA      User defined metadata string
+  -F --userfile=FILE      Read userdata from file
 """
     action = 'create'
     options = ['confirm']
@@ -309,6 +316,15 @@ Options:
     @staticmethod
     def execute(client, args):
         cci = CCIManager(client)
+
+        if args['--userdata'] and args['--userfile']:
+            raise ArgumentError('[-u | --userdata] not allowed with '
+                                '[-F | --userfile]')
+        if args['--userfile']:
+            if not os.path.exists(args['--userfile']):
+                raise ArgumentError(
+                    'File does not exist [-u | --userfile] = %s'
+                    % args['--userfile'])
 
         data = {
             "hourly": args['--hourly'],

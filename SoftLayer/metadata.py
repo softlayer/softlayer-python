@@ -33,11 +33,9 @@ class MetadataManager(object):
         'vlans': {'call': 'Vlans', 'param_req': True},
     }
 
-    def __init__(self, client=None, timeout=None):
+    def __init__(self, client=None, timeout=5):
         self.url = API_PRIVATE_ENDPOINT_REST.rstrip('/')
         self.timeout = timeout
-        if self.timeout is None:
-            self.timeout = 5
 
     def make_request(self, path):
         url = '/'.join([self.url, 'SoftLayer_Resource_Metadata', path])

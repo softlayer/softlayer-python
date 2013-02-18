@@ -91,6 +91,12 @@ class CLIAbort(CLIHalt):
         self.message = msg
 
 
+class ArgumentError(CLIAbort):
+    def __init__(self, msg, *args):
+        super(CLIAbort, self).__init__(code=2, *args)
+        self.message = "Argument Error: %s" % msg
+
+
 class Table(object):
     def __init__(self, columns):
         self.columns = columns
