@@ -25,6 +25,8 @@ usage: sl cci list [options]
 Options:
   --hourly                   Show hourly instances
 """
+    options = []
+
     @staticmethod
     def execute(client, args):
         return "test"
@@ -72,6 +74,15 @@ class CommandLineTests(unittest.TestCase):
         self.env.get_module_name.side_effect = SoftLayer.SoftLayerError
         self.assertRaises(
             SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
+
+    def test_value_key_errors(self):
+        self.env.get_module_name.side_effect = ValueError
+        self.assertRaises(
+            ValueError, cli.core.main, args=['cci', 'list'], env=self.env)
+
+        self.env.get_module_name.side_effect = KeyError
+        self.assertRaises(
+            KeyError, cli.core.main, args=['cci', 'list'], env=self.env)
 
 
 class TestParseMainArgs(unittest.TestCase):
