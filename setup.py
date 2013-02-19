@@ -7,10 +7,9 @@ extra = {}
 if sys.version_info >= (3,):
     extra['use_2to3'] = True
 
-requires = ['distribute', 'prettytable']
+requires = ['distribute', 'prettytable', 'docopt==0.6.1']
 
 if sys.version_info < (2, 7):
-    requires.append('argparse')
     requires.append('importlib')
 elif sys.version_info >= (2, 6):
     requires.append('requests')

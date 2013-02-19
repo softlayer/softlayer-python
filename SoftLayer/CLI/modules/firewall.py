@@ -1,12 +1,21 @@
-#!/usr/bin/env python
-"""Firewall rule and security management"""
+"""
+usage: sl firewall [<command>] [<args>...] [options]
 
+Firewall rule and security management
+
+The available commands are:
+  list  List active vlans with firewalls
+"""
 from SoftLayer.CLI import CLIRunnable, Table, listing
 from SoftLayer.firewall import FirewallManager
 
 
 class FWList(CLIRunnable):
-    """ List active vlans with firewalls """
+    """
+usage: sl firewall list [options]
+
+List active vlans with firewalls
+"""
     action = 'list'
 
     @staticmethod
