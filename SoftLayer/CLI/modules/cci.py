@@ -517,7 +517,8 @@ Options:
 
 class CCIDNS(CLIRunnable):
     """
-usage: sl cci dns-sync <id> [options]
+usage: sl cci dns sync <id> [options]
+       sl cci dns doppleganger <id> [options]
 
 DNS related actions for a CCI
 
@@ -525,11 +526,18 @@ Options:
   -a, -A        Sync only the A record
   --ptr, --PTR  Sync only the PTR record
 """
-    action = 'dns-sync'
+    action = 'dns'
     options = ['confirm']
 
+    @classmethod
+    def execute(cls, client, args):
+        if args['sync']:
+            return cls.dns_sync(client, args)
+
+        raise CLIAbort('Not implemented')
+
     @staticmethod
-    def execute(client, args):
+    def dns_sync(client, args):
         from SoftLayer.DNS import DNSManager, DNSZoneNotFound
         dns = DNSManager(client)
         cci = CCIManager(client)
@@ -598,11 +606,11 @@ Options:
             raise CLIAbort("Aborting DNS sync")
 
         both = False
-        if args['--PTR'] and args['--A']:
+        if not args.get('--PTR') and not args.get('-A'):
             both = True
 
-        if both or args['--A']:
+        if both or args.get('-A'):
             sync_a_record()
 
-        if both or args['--PTR']:
+        if both or args.get('--PTR'):
             sync_ptr_record()
