@@ -107,7 +107,7 @@ List zones
 
 class AddRecord(CLIRunnable):
     """
-usage: sl dns add <type> <record> <data> [--ttl=TTL] [options]
+usage: sl dns add <domain> <record> <type> <data> [--ttl=TTL] [options]
 
 Add resource record
 
@@ -137,8 +137,6 @@ usage: sl dns edit <domain> <record> [--data=DATA] [--ttl=TTL] [--id=ID]
 Update resource records (bulk/single)
 
 Options:
-  type         Record type
-                   [Options: A, AAAA, CNAME, MX, NS, PTR, SPF, SRV, TXT]
   --data=DATA
   --ttl=TTL    Time to live [default: 7200]
   --id=ID      Modify only the given ID
@@ -187,7 +185,7 @@ Look for a resource record by exact name
 
 class RecordRemove(CLIRunnable):
     """
-usage: sl dns remove <domain> <record> [--id] [options]
+usage: sl dns remove <domain> <record> [--id=ID] [options]
 
 Remove resource records
 
@@ -211,9 +209,10 @@ Options:
         if args['--really'] or no_going_back('yes'):
             t = Table(['record'])
             for r in records:
-                if not args['--id'] or args['--id'] == r['id']:
-                    manager.delete_record(r['id'])
-                    t.add_row(r['id'])
+                if args.get('--id') and args['--id'] != r['id']:
+                    continue
+                manager.delete_record(r['id'])
+                t.add_row([r['id']])
 
             return t
         raise CLIAbort("Aborted.")

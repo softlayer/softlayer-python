@@ -12,12 +12,12 @@ from SoftLayer.CLI import CLIRunnable, Table
 
 class ListImages(CLIRunnable):
     """
-usage: sl image list (--public | --private) [options]
+usage: sl image list [--public | --private] [options]
 
 List images on the account
 
 Options:
-  --public  Display only public images
+  --public   Display only public images
   --private  Display only private images
 """
     action = 'list'
@@ -26,7 +26,7 @@ Options:
     def execute(client, args):
         account = client['Account']
 
-        neither = not any(args['--private'], args['--public'])
+        neither = not any([args['--private'], args['--public']])
 
         result = []
         if args['--private'] or neither:
@@ -51,7 +51,7 @@ Options:
                 image['id'],
                 image.get('accountId', '???'),
                 image.get('type', '???'),
-                image['name'],
+                image['name'].strip(),
                 image.get('globalIdentifier', '???'),
             ])
 
