@@ -5,14 +5,14 @@ Manage, delete, order compute instances
 
 The available commands are:
   network         Manage network settings
-  create-options  Order and create a CCI
+  create          Order and create a CCI
                     (see `sl cci create-options` for choices)
   manage          Manage active CCI
   list            List CCI's on the account
   detail          Output details about a CCI
   dns             DNS related actions to a CCI
   cancel          Cancel a running CCI
-  options         Output available available options when creating a CCI
+  create-options  Output available available options when creating a CCI
 """
 
 from os import linesep
@@ -45,9 +45,8 @@ Options:
     def execute(client, args):
         cci = CCIManager(client)
 
-        results = force_list(cci.list_instances(
-            hourly=args.get('--hourly'), monthly=args.get('--monthly'),
-            limit=args['--limit'], offset=args['--offset']))
+        results = cci.list_instances(
+            hourly=args.get('--hourly'), monthly=args.get('--monthly'))
 
         t = Table([
             'id', 'datacenter', 'host',
@@ -494,7 +493,7 @@ Options:
         if args['port']:
             return cls.exec_port(client, args)
 
-        if args['detail']:
+        if args['details']:
             return cls.exec_detail(client, args)
 
     @staticmethod
