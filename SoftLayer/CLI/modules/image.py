@@ -1,5 +1,5 @@
 """
-usage: sl image <command> [<args>...] [options]
+usage: sl image [<command>] [<args>...] [options]
 
 Manage compute and flex images
 

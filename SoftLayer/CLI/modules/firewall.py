@@ -1,5 +1,5 @@
 """
-usage: sl firewall <command> [<args>...] [options]
+usage: sl firewall [<command>] [<args>...] [options]
 
 Firewall rule and security management
 

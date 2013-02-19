@@ -1,24 +1,24 @@
 """
-usage: sl metadata <command> [<args>...] [options]
+usage: sl metadata [<command>] [<args>...] [options]
 
 Find details about this machine. These commands only work on devices on the
 backend SoftLayer network. This allows for self-discovery for newly provisioned
 resources.
 
 The available commands are:
-  datacenter          Datacenter name
-  backend_mac         Backend mac addresses
-  ip                  Primary ip address
-  backend_ip          Primary backend ip address
-  tags                Tags
-  hostname            Hostname
-  fqdn                Fully qualified domain name
-  user_data           User-defined data
-  datacenter_id       Datacenter id
-  frontend_mac        Frontend mac addresses
-  provision_state     Provision state
-  id                  Id
-  network             Details about either the public or private network
+  datacenter       Datacenter name
+  backend_mac      Backend mac addresses
+  ip               Primary ip address
+  backend_ip       Primary backend ip address
+  tags             Tags
+  hostname         Hostname
+  fqdn             Fully qualified domain name
+  user_data        User-defined data
+  datacenter_id    Datacenter id
+  frontend_mac     Frontend mac addresses
+  provision_state  Provision state
+  id               Id
+  network          Details about either the public or private network
 """
 from SoftLayer.metadata import MetadataManager
 from SoftLayer.CLI import CLIRunnable, Table, listing, CLIAbort

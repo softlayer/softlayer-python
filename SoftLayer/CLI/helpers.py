@@ -54,16 +54,15 @@ def valid_response(prompt, *valid):
     return False
 
 
-def confirm(prompt_str="", allow_empty=False, default=False):
-    fmt = (prompt_str, 'y', 'n') if default else (prompt_str, 'n', 'y')
-    if allow_empty:
-        prompt = '%s [%s]|%s: ' % fmt
+def confirm(prompt_str, default=False):
+    if default:
+        prompt = '%s [Y/n]: ' % prompt_str
     else:
-        prompt = '%s %s|%s: ' % fmt
+        prompt = '%s [y/N]: ' % prompt_str
 
-    response = valid_response(prompt, 'y', 'yes')
+    response = valid_response(prompt, 'y', 'yes', 'yeah', 'yup', 'yolo')
 
-    if response is None and allow_empty:
+    if response is None:
         return default
 
     return response

@@ -1,5 +1,5 @@
 """
-usage: sl config <command> [<args>...] [options]
+usage: sl config [<command>] [<args>...] [options]
 
 View and edit configuration
 
@@ -25,7 +25,10 @@ Setup configuration
     def execute(cls, client, args):
         username = cls.env.input('Username: ')
         api_key = cls.env.input('API Key: ')
-        endpoint_url = cls.env.input('Endpoint URL: ')
+        endpoint_url = cls.env.input(
+            'Endpoint URL [%s]: ' % cls.env.config['endpoint_url'])
+        if not endpoint_url:
+            endpoint_url = cls.env.config['endpoint_url']
 
         path = '~/.softlayer'
         if args.get('--config'):

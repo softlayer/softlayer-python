@@ -1,5 +1,5 @@
 """
-usage: sl dns <command> [<args>...] [options]
+usage: sl dns [<command>] [<args>...] [options]
 
 Manage DNS
 
@@ -192,7 +192,7 @@ usage: sl dns remove <domain> <record> [--id] [options]
 Remove resource records
 
 Options:
-  --id=ID       Remove only the given ID
+  --id=ID  Remove only the given ID
 """
     action = 'remove'
     options = ['confirm']

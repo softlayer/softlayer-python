@@ -1,5 +1,5 @@
 """
-usage: sl ssl <command> [<args>...] [options]
+usage: sl ssl [<command>] [<args>...] [options]
        sl ssl [-h | --help]
 
 Manage SSL
@@ -11,7 +11,7 @@ The available commands are:
   list      List ssl certificates
   remove    Remove ssl certificate
 """
-from SoftLayer.CLI import CLIRunnable, no_going_back, Table, CLIAbort
+from SoftLayer.CLI.helpers import CLIRunnable, no_going_back, Table, CLIAbort
 from SoftLayer.SSL import SSLManager
 
 

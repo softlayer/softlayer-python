@@ -66,15 +66,15 @@ class PromptTests(unittest.TestCase):
     @patch(raw_input_path)
     def test_confirmation(self, raw_input_mock):
         raw_input_mock.return_value = 'Y'
-        res = cli.confirm(allow_empty=False, default=False)
+        res = cli.confirm('Confirm?', default=False)
         self.assertTrue(res)
 
         raw_input_mock.return_value = 'N'
-        res = cli.confirm(allow_empty=False, default=False)
+        res = cli.confirm('Confirm?', default=False)
         self.assertFalse(res)
 
         raw_input_mock.return_value = ''
-        res = cli.confirm(allow_empty=True, default=True)
+        res = cli.confirm('Confirm?', default=True)
         self.assertTrue(res)
 
 

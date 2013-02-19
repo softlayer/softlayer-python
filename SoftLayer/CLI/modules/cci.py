@@ -1,5 +1,5 @@
 """
-usage: sl cci <command> [<args>...] [options]
+usage: sl cci [<command>] [<args>...] [options]
 
 Manage, delete, order compute instances
 
@@ -32,20 +32,22 @@ usage: sl cci list [--hourly | --monthly] [--sortby=SORT_COLUMN] [--tags=TAGS]
 List CCIs
 
 Options:
-  --hourly                   Show hourly instances
-  --monthly                  Show monthly instances
-  --sortby=ARG               Column to sort by. options: id, datacenter, host,
-                             Cores, memory, primary_ip, backend_ip
-  --tags=ARG                 Only show instances that have one of these tags
+  --hourly      Show hourly instances
+  --monthly     Show monthly instances
+  --sortby=ARG  Column to sort by. options: id, datacenter, host,
+                Cores, memory, primary_ip, backend_ip
+  --tags=ARG    Only show instances that have one of these tags
 """
     action = 'list'
+    options = ['listing']
 
     @staticmethod
     def execute(client, args):
         cci = CCIManager(client)
 
-        results = cci.list_instances(
-            hourly=args.get('--hourly'), monthly=args.get('--monthly'))
+        results = force_list(cci.list_instances(
+            hourly=args.get('--hourly'), monthly=args.get('--monthly'),
+            limit=args['--limit'], offset=args['--offset']))
 
         t = Table([
             'id', 'datacenter', 'host',
@@ -88,11 +90,11 @@ usage: sl cci detail (--id=ID | --name=NAME | --public-ip=PUBLIC_IP)
 Get details for a CCI
 
 Options:
-  --id ID                    id of CCI
-  --name NAME                the fully qualified domain name
-  --public-ip PUBLIC_IP      public ip of CCI
-  --passwords                show passwords (check over your shoulder!)
-  --price                    show associated prices
+  --id ID                id of CCI
+  --name NAME            the fully qualified domain name
+  --public-ip PUBLIC_IP  public ip of CCI
+  --passwords            show passwords (check over your shoulder!)
+  --price                show associated prices
 """
     action = 'detail'
 
@@ -286,7 +288,7 @@ class CreateCCI(CLIRunnable):
 usage: sl cci create --hostname=HOST --domain=DOMAIN --cpu=CPU --memory=MEMORY
                      (--os=OS | --image=GUID) (--hourly | --monthly) [options]
 
-Order/create a CCI. See 'sl cci create-options' for valid values
+Order/create a CCI. See 'sl cci create-options' for valid options
 
 Required:
   -H --hostname=HOST      Host portion of the FQDN. example: server
@@ -374,8 +376,7 @@ Optional:
             result = cci.verify_create_instance(**data)
             output = FormattedItem("Test: Success!")
         elif args['--really'] or confirm(
-                prompt_str="This action will incur charges on "
-                "your account. Continue?", allow_empty=True):
+                "This action will incur charges on your account. Continue?"):
             result = cci.create_instance(**data)
             output = FormattedItem('Order placed successfully')
         else:

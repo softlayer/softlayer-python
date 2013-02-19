@@ -180,6 +180,7 @@ def main(args=sys.argv[1:], env=Environment()):
     except (ValueError, KeyError):
         raise
     except KeyboardInterrupt:
+        env.out('')
         exit_status = 1
     except CLIAbort, e:
         env.err(str(e.message))
