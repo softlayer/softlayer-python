@@ -4,7 +4,6 @@ try:
 except ImportError:
     import unittest # NOQA
 from mock import patch
-from argparse import ArgumentParser
 
 
 import SoftLayer.CLI as cli
@@ -67,22 +66,16 @@ class PromptTests(unittest.TestCase):
     @patch(raw_input_path)
     def test_confirmation(self, raw_input_mock):
         raw_input_mock.return_value = 'Y'
-        res = cli.confirm(allow_empty=False, default=False)
+        res = cli.confirm('Confirm?', default=False)
         self.assertTrue(res)
 
         raw_input_mock.return_value = 'N'
-        res = cli.confirm(allow_empty=False, default=False)
+        res = cli.confirm('Confirm?', default=False)
         self.assertFalse(res)
 
         raw_input_mock.return_value = ''
-        res = cli.confirm(allow_empty=True, default=True)
+        res = cli.confirm('Confirm?', default=True)
         self.assertTrue(res)
-
-    def test_add_really_argument(self):
-        parser = ArgumentParser()
-        cli.helpers.add_really_argument(parser)
-        args = parser.parse_args(['--really'])
-        self.assertTrue(args.really)
 
 
 class FormattedItemTests(unittest.TestCase):
@@ -121,15 +114,6 @@ class CLIAbortTests(unittest.TestCase):
         self.assertEqual(2, e.code)
         self.assertEqual("something", e.message)
         self.assertIsInstance(e, cli.helpers.CLIHalt)
-
-
-class EnvironmentTests(unittest.TestCase):
-
-    def test_plugin_list(self):
-        env = cli.environment.Environment()
-        actions = env.plugin_list()
-        self.assertIn('cci', actions)
-        self.assertIn('dns', actions)
 
 
 class CLIRunnableTypeTests(unittest.TestCase):

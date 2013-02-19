@@ -1,11 +1,35 @@
-#!/usr/bin/env python
-""" Find details about this machine """
+"""
+usage: sl metadata [<command>] [<args>...] [options]
+
+Find details about this machine. These commands only work on devices on the
+backend SoftLayer network. This allows for self-discovery for newly provisioned
+resources.
+
+The available commands are:
+  datacenter       Datacenter name
+  backend_mac      Backend mac addresses
+  ip               Primary ip address
+  backend_ip       Primary backend ip address
+  tags             Tags
+  hostname         Hostname
+  fqdn             Fully qualified domain name
+  user_data        User-defined data
+  datacenter_id    Datacenter id
+  frontend_mac     Frontend mac addresses
+  provision_state  Provision state
+  id               Id
+  network          Details about either the public or private network
+"""
 from SoftLayer.metadata import MetadataManager
 from SoftLayer.CLI import CLIRunnable, Table, listing, CLIAbort
 
 
 class BackendMacAddresses(CLIRunnable):
-    """ backend mac addresses """
+    """
+usage: sl metadata backend_mac [options]
+
+List backend mac addresses
+"""
     action = 'backend_mac'
 
     @staticmethod
@@ -14,7 +38,11 @@ class BackendMacAddresses(CLIRunnable):
 
 
 class Datacenter(CLIRunnable):
-    """ datacenter name """
+    """
+usage: sl metadata name [options]
+
+Get datacenter name
+"""
     action = 'datacenter'
 
     @staticmethod
@@ -23,7 +51,11 @@ class Datacenter(CLIRunnable):
 
 
 class DatacenterId(CLIRunnable):
-    """ datacenter id """
+    """
+usage: sl metadata id [options]
+
+Get datacenter id
+"""
     action = 'datacenter_id'
 
     @staticmethod
@@ -32,7 +64,11 @@ class DatacenterId(CLIRunnable):
 
 
 class FrontendMacAddresses(CLIRunnable):
-    """ frontend mac addresses """
+    """
+usage: sl metadata frontend_mac [options]
+
+List frontend mac addresses
+"""
     action = 'frontend_mac'
 
     @staticmethod
@@ -41,7 +77,11 @@ class FrontendMacAddresses(CLIRunnable):
 
 
 class FullyQualifiedDomainName(CLIRunnable):
-    """ fully qualified domain name """
+    """
+usage: sl metadata fqdn [options]
+
+Get fully qualified domain name
+"""
     action = 'fqdn'
 
     @staticmethod
@@ -50,7 +90,11 @@ class FullyQualifiedDomainName(CLIRunnable):
 
 
 class Hostname(CLIRunnable):
-    """ hostname """
+    """
+usage: sl metadata hostname [options]
+
+Get hostname
+"""
     action = 'hostname'
 
     @staticmethod
@@ -59,7 +103,11 @@ class Hostname(CLIRunnable):
 
 
 class Id(CLIRunnable):
-    """ id """
+    """
+usage: sl metadata id
+
+Get id
+"""
     action = 'id'
 
     @staticmethod
@@ -68,8 +116,12 @@ class Id(CLIRunnable):
 
 
 class PrimaryBackendIpAddress(CLIRunnable):
-    """ primary backend ip address """
-    action = 'primary_backend_ip'
+    """
+usage: sl metadata backend_ip [options]
+
+Get primary backend ip address
+"""
+    action = 'backend_ip'
 
     @staticmethod
     def execute(client, args):
@@ -77,8 +129,12 @@ class PrimaryBackendIpAddress(CLIRunnable):
 
 
 class PrimaryIpAddress(CLIRunnable):
-    """ primary ip address """
-    action = 'primary_ip'
+    """
+usage: sl metadata ip [options]
+
+Get primary ip address
+"""
+    action = 'ip'
 
     @staticmethod
     def execute(client, args):
@@ -86,7 +142,11 @@ class PrimaryIpAddress(CLIRunnable):
 
 
 class ProvisionState(CLIRunnable):
-    """ provision state """
+    """
+usage: sl metadata provision_state [options]
+
+Get provision state
+"""
     action = 'provision_state'
 
     @staticmethod
@@ -95,7 +155,11 @@ class ProvisionState(CLIRunnable):
 
 
 class Tags(CLIRunnable):
-    """ tags """
+    """
+usage: sl metadata tags [options]
+
+List tags
+"""
     action = 'tags'
 
     @staticmethod
@@ -104,7 +168,11 @@ class Tags(CLIRunnable):
 
 
 class UserMetadata(CLIRunnable):
-    """ user-defined data """
+    """
+usage: sl metadata user_data [options]
+
+Get user-defined data
+"""
     action = 'user_data'
 
     @staticmethod
@@ -117,22 +185,18 @@ class UserMetadata(CLIRunnable):
 
 
 class Network(CLIRunnable):
+    """
+usage: sl metadata network (<public> | <private>) [options]
+
+Get details about the public or private network
+"""
     """ details about either the public or private network """
     action = 'network'
 
     @staticmethod
-    def add_additional_args(parser):
-        parser.add_argument(
-            'network_type',
-            help="Which type of network to get the details for",
-            default='public',
-            choices=['public', 'private']
-        )
-
-    @staticmethod
     def execute(client, args):
         meta = MetadataManager()
-        if args.network_type == 'public':
+        if args['<public>']:
             t = Table(['Name', 'Value'])
             t.align['Name'] = 'r'
             t.align['Value'] = 'l'
@@ -149,7 +213,7 @@ class Network(CLIRunnable):
                 listing(network['vlan_ids'], separator=',')])
             return t
 
-        if args.network_type == 'private':
+        if args['<private>']:
             t = Table(['Name', 'Value'])
             t.align['Name'] = 'r'
             t.align['Value'] = 'l'

@@ -3,8 +3,7 @@ from SoftLayer.CLI.environment import CLIRunnableType
 from prettytable import PrettyTable
 
 __all__ = ['Table', 'CLIRunnable', 'FormattedItem', 'valid_response',
-           'add_really_argument', 'confirm', 'no_going_back', 'mb_to_gb',
-           'listing', 'CLIAbort']
+           'confirm', 'no_going_back', 'mb_to_gb', 'listing', 'CLIAbort']
 
 
 class FormattedItem(object):
@@ -32,6 +31,7 @@ def listing(item, separator=','):
 
 class CLIRunnable(object):
     __metaclass__ = CLIRunnableType
+    options = []
     action = None
 
     @staticmethod
@@ -54,24 +54,15 @@ def valid_response(prompt, *valid):
     return False
 
 
-def add_really_argument(parser):
-    parser.add_argument(
-        '--really', '-y',
-        help='Confirm all prompt actions',
-        action='store_true',
-        default=False)
-
-
-def confirm(prompt_str="", allow_empty=False, default=False):
-    fmt = (prompt_str, 'y', 'n') if default else (prompt_str, 'n', 'y')
-    if allow_empty:
-        prompt = '%s [%s]|%s: ' % fmt
+def confirm(prompt_str, default=False):
+    if default:
+        prompt = '%s [Y/n]: ' % prompt_str
     else:
-        prompt = '%s %s|%s: ' % fmt
+        prompt = '%s [y/N]: ' % prompt_str
 
-    response = valid_response(prompt, 'y', 'yes')
+    response = valid_response(prompt, 'y', 'yes', 'yeah', 'yup', 'yolo')
 
-    if response is None and allow_empty:
+    if response is None:
         return default
 
     return response
@@ -97,6 +88,12 @@ class CLIAbort(CLIHalt):
     def __init__(self, msg, *args):
         super(CLIAbort, self).__init__(code=2, *args)
         self.message = msg
+
+
+class ArgumentError(CLIAbort):
+    def __init__(self, msg, *args):
+        super(CLIAbort, self).__init__(code=2, *args)
+        self.message = "Argument Error: %s" % msg
 
 
 class Table(object):

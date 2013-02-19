@@ -4,138 +4,133 @@ try:
     import unittest2 as unittest
 except ImportError:
     import unittest  # NOQA
-from argparse import ArgumentParser
-from mock import patch, MagicMock
+from mock import MagicMock, patch
 
 import SoftLayer
 import SoftLayer.CLI as cli
 from SoftLayer.CLI.helpers import CLIAbort
 
 
-FIXTURE_PATH = os.path.abspath(os.path.join(__file__, '..', '..', 'fixtures'))
+def module_fixture():
+    """
+usage: sl cci <command> [<args>...] [options]
+       sl cci [-h | --help]
+"""
+
+
+class submodule_fixture(object):
+    """
+usage: sl cci list [options]
+
+Options:
+  --hourly                   Show hourly instances
+"""
+    options = []
+
+    @staticmethod
+    def execute(client, args):
+        return "test"
 
 
 class CommandLineTests(unittest.TestCase):
     def setUp(self):
         self.env = MagicMock()
-        self.env.plugin_list.return_value = ['plugin']
-        self.env.plugins = {'plugin': {'action': MagicMock()}}
+        self.env.plugin_list.return_value = ['cci']
+        self.env.plugins = {'cci': {'list': submodule_fixture}}
+        self.env.load_module.return_value = module_fixture
 
     def test_normal_path(self):
-        self.assertRaises(
-            SystemExit, cli.core.main, args=['--help'], env=self.env)
-        self.assertRaises(
-            SystemExit, cli.core.main,
-            args=['plugin', 'action', '--config=path/to/config'], env=self.env)
-        self.assertRaises(
-            SystemExit, cli.core.main, args=['plugin'], env=self.env)
+        self.env.get_module_name.return_value = 'cci'
         self.assertRaises(
             SystemExit, cli.core.main,
-            args=['plugin', 'action'], env=self.env)
+            args=['cci', 'list', '--config=path/to/config'], env=self.env)
         self.assertRaises(
             SystemExit, cli.core.main,
-            args=['plugin', 'doesntexist'], env=self.env)
+            args=['cci', 'nope', '--config=path/to/config'], env=self.env)
+
+    def test_invalid_module(self):
+        self.env.get_module_name.return_value = 'nope'
+        self.assertRaises(
+            SystemExit, cli.core.main,
+            args=['nope', 'list', '--config=path/to/config'], env=self.env)
+
+    def test_help(self):
+        self.env.get_module_name.return_value = 'help'
+        self.assertRaises(
+            SystemExit, cli.core.main,
+            args=['help', 'cci', '--config=path/to/config'], env=self.env)
 
     def test_keyboard_interrupt(self):
-        self.env.plugin_list.side_effect = KeyboardInterrupt
+        self.env.get_module_name.side_effect = KeyboardInterrupt
         self.assertRaises(
-            SystemExit, cli.core.main, args=['--help'], env=self.env)
+            SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
 
     def test_abort(self):
-        self.env.plugin_list.side_effect = CLIAbort('exit!')
+        self.env.get_module_name.side_effect = CLIAbort('exit!')
         self.assertRaises(
-            SystemExit, cli.core.main, args=['--help'], env=self.env)
+            SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
 
     def test_softlayer_error(self):
-        self.env.plugin_list.side_effect = SoftLayer.SoftLayerError
+        self.env.get_module_name.side_effect = SoftLayer.SoftLayerError
         self.assertRaises(
-            SystemExit, cli.core.main, args=['--help'], env=self.env)
+            SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
+
+    def test_value_key_errors(self):
+        self.env.get_module_name.side_effect = ValueError
+        self.assertRaises(
+            ValueError, cli.core.main, args=['cci', 'list'], env=self.env)
+
+        self.env.get_module_name.side_effect = KeyError
+        self.assertRaises(
+            KeyError, cli.core.main, args=['cci', 'list'], env=self.env)
 
 
-class TestParseArgs(unittest.TestCase):
-    @patch('sys.stdout.isatty')
-    def test_primary(self, isatty):
-        isatty.return_value = False
-        module_name, parent_args, aux_args = cli.core.parse_primary_args(
-            ['module', 'module2'], ['module'])
+class TestParseMainArgs(unittest.TestCase):
+    def test_main(self,):
+        args = cli.core.parse_main_args(
+            args=['cci', 'list'])
 
-        self.assertEqual('module', module_name)
-        self.assertEqual([], aux_args)
+        self.assertEqual(args['help'], False)
+        self.assertEqual(args['<command>'], 'cci')
+        self.assertEqual(args['<args>'], ['list'])
 
     def test_primary_help(self):
-        self.assertRaises(
-            SystemExit, cli.core.parse_primary_args,
-            ['module', 'module2'], [])
-
-        self.assertRaises(
-            SystemExit, cli.core.parse_primary_args,
-            ['module', 'module2'], ['help'])
-
-        self.assertRaises(
-            SystemExit, cli.core.parse_primary_args,
-            ['module', 'module2'], ['--help'])
-
-    def test_module_empty(self):
-        module = MagicMock()
-        module.__doc__ = 'some info'
-        action = MagicMock()
-        self.assertRaises(
-            SystemExit, cli.core.parse_module_args,
-            module, 'module', {'action': action}, [], [])
-
-    def test_module_action(self):
-        module = MagicMock()
-        module.__doc__ = 'some info'
-        action = MagicMock()
-        args = cli.core.parse_module_args(
-            module, 'module', {'action': action}, ['action'], [])
-        self.assertEqual('action', args.action)
-        self.assertEqual(None, args.config)
-        self.assertEqual('raw', args.fmt)
-
-    def test_module_with_options(self):
-        module = MagicMock()
-        module.__doc__ = 'some info'
-        action = MagicMock()
-        args = cli.core.parse_module_args(
-            module, 'module', {'action': action},
-            ['action'], ['--format=table', '--config=/path/to/config'])
-        self.assertEqual('action', args.action)
-        self.assertEqual('/path/to/config', args.config)
-        self.assertEqual('table', args.fmt)
-
-    def test_module_no_action(self):
-        module = MagicMock()
-        module.__doc__ = 'some info'
-        self.assertRaises(
-            SystemExit, cli.core.parse_module_args,
-            module, 'module', {}, [], [])
-
-
-class TestParseConfig(unittest.TestCase):
-
-    def test_parse_config_no_files(self):
-        config = cli.core.parse_config([])
-        self.assertEqual({}, config)
-
-    def test_parse_config_no_softlayer_section(self):
-        path = os.path.join(FIXTURE_PATH, 'empty.conf')
-        config = cli.core.parse_config([path])
-        self.assertEqual({}, config)
-
-    def test_parse_config_empty(self):
-        path = os.path.join(FIXTURE_PATH, 'no_options.conf')
-        config = cli.core.parse_config([path])
-        self.assertEqual({}, config)
-
-    def test_parse_config(self):
-        path = os.path.join(FIXTURE_PATH, 'full.conf')
-        config = cli.core.parse_config([path])
+        args = cli.core.parse_main_args(args=[])
         self.assertEqual({
-            'username': 'myusername',
-            'api_key': 'myapi_key',
-            'endpoint_url': 'myendpoint_url'
-        }, config)
+            '--help': False,
+            '-h': False,
+            '<args>': [],
+            '<command>': None,
+            'help': False,
+        }, args)
+
+        args = cli.core.parse_main_args(args=['help'])
+        self.assertEqual({
+            '--help': False,
+            '-h': False,
+            '<args>': [],
+            '<command>': 'help',
+            'help': False,
+        }, args)
+
+        args = cli.core.parse_main_args(args=['help', 'module'])
+        self.assertEqual({
+            '--help': False,
+            '-h': False,
+            '<args>': ['module'],
+            '<command>': 'help',
+            'help': False,
+        }, args)
+
+        self.assertRaises(
+            SystemExit, cli.core.parse_main_args, args=['--help'])
+
+
+class TestParseSubmoduleArgs(unittest.TestCase):
+    @patch('sys.stdout.isatty', return_value=True)
+    def test_tty(self, tty):
+        self.assertRaises(
+            SystemExit, cli.core.parse_submodule_args, submodule_fixture, [])
 
 
 class TestFormatOutput(unittest.TestCase):
@@ -176,24 +171,6 @@ class TestFormatOutput(unittest.TestCase):
         self.assertIn('nothing', str(ret))
         self.assertIn('testdata', str(ret))
 
-    @patch('sys.stdout.isatty')
-    def test_add_fmt_argument_isatty(self, isatty):
-        isatty.return_value = True
-        parser = ArgumentParser()
-        cli.core.add_fmt_argument(parser)
-        args = parser.parse_args(['--format=raw'])
-        self.assertEqual('raw', args.fmt)
-
-        args = parser.parse_args([])
-        self.assertEqual('table', args.fmt)
-
-    @patch('sys.stdout.isatty')
-    def test_add_fmt_argument(self, isatty):
-        isatty.return_value = False
-        parser = ArgumentParser()
-        cli.core.add_fmt_argument(parser)
-        args = parser.parse_args(['--format=raw'])
-        self.assertEqual('raw', args.fmt)
-
-        args = parser.parse_args([])
-        self.assertEqual('raw', args.fmt)
+    def test_unknown(self):
+        t = cli.core.format_output({}, 'raw')
+        self.assertEqual({}, t)

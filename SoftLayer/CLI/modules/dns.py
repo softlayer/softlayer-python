@@ -1,8 +1,19 @@
-#!/usr/bin/env python
-"""Manages DNS"""
+"""
+usage: sl dns [<command>] [<args>...] [options]
 
-from SoftLayer.CLI import (
-    CLIRunnable, no_going_back, Table, add_really_argument, CLIAbort)
+Manage DNS
+
+The available commands are:
+  search  Look for a resource record by exact name
+  edit    Update resource records (bulk/single)
+  create  Create zone
+  list    List zones
+  remove  Remove resource records
+  add     Add resource record
+  print   Print zone in BIND format
+  delete  Delete zone
+"""
+from SoftLayer.CLI import CLIRunnable, no_going_back, Table, CLIAbort
 from SoftLayer.DNS import DNSManager
 
 
@@ -16,54 +27,58 @@ def add_record_arguments(parser):
 
 
 class DumpZone(CLIRunnable):
-    """ print zone in BIND format"""
+    """
+usage: sl dns print <domain> [options]
+
+print zone in BIND format
+"""
     action = "print"
 
     @staticmethod
-    def add_additional_args(parser):
-        return add_zone_arguments(parser)
-
-    @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
-        return manager.dump_zone(manager.get_zone(args.domain)['id'])
+        return manager.dump_zone(manager.get_zone(args['<domain>'])['id'])
 
 
 class CreateZone(CLIRunnable):
-    """ create zone """
+    """
+usage: sl dns create <domain> [options]
+
+Create a zone
+"""
     action = 'create'
 
     @staticmethod
-    def add_additional_args(parser):
-        return add_zone_arguments(parser)
-
-    @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
-        manager.create_zone(args.domain)
-        return "Created zone: %s" % args.domain
+        manager.create_zone(args['<domain>'])
+        return "Created zone: %s" % args['<domain>']
 
 
 class DeleteZone(CLIRunnable):
-    """ delete zone"""
-    action = 'delete'
+    """
+usage: sl dns delete <domain> <zone> [options]
 
-    @staticmethod
-    def add_additional_args(parser):
-        add_really_argument(parser)
-        return add_zone_arguments(parser)
+Delete zone
+"""
+    action = 'delete'
+    options = ['confirm']
 
     @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
-        if args.really or no_going_back(args.domain):
-            manager.delete_zone(args.domain)
-            return "Deleted zone: %s" % args.domain
+        if args['--really'] or no_going_back(args['<domain>']):
+            manager.delete_zone(args['<domain>'])
+            return "Deleted zone: %s" % args['<domain>']
         raise CLIAbort("Aborted.")
 
 
 class ListZones(CLIRunnable):
-    """ list zones """
+    """
+usage: sl dns list [options]
+
+List zones
+"""
     action = 'list'
 
     @staticmethod
@@ -91,118 +106,112 @@ class ListZones(CLIRunnable):
 
 
 class AddRecord(CLIRunnable):
-    """ add resource record"""
+    """
+usage: sl dns add <type> <record> <data> [--ttl=TTL] [options]
+
+Add resource record
+
+Options:
+  type       Record type. [Options: A, AAAA, CNAME, MX, NS, PTR, SPF, SRV, TXT]
+  --ttl=TTL  Time to live [default: 7200]
+"""
     action = 'add'
 
     @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
-        zone = manager.get_zone(args.domain)['id']
+        zone = manager.get_zone(args['<domain>'])['id']
         manager.create_record(
             zone,
-            args.record,
-            args.type,
-            args.data,
-            ttl=args.ttl)
-
-    @staticmethod
-    def add_additional_args(parser):
-        add_record_arguments(parser)
-        parser.add_argument(
-            'type',
-            choices=['A', 'AAAA', 'CNAME', 'MX', 'NS',
-                     'PTR', 'SPF', 'SRV', 'TXT'],
-        )
-        parser.add_argument('data')
-        parser.add_argument('--ttl', default=7200)
+            args['<record>'],
+            args['<type>'],
+            args['<data>'],
+            ttl=args['--ttl'])
 
 
 class EditRecord(CLIRunnable):
-    """ update resource records (bulk/single)"""
-    action = 'edit'
+    """
+usage: sl dns edit <domain> <record> [--data=DATA] [--ttl=TTL] [--id=ID]
+                   [options]
 
-    @staticmethod
-    def add_additional_args(parser):
-        add_record_arguments(parser)
-        parser.add_argument('--data', default=None)
-        parser.add_argument('--ttl', default=None)
-        parser.add_argument('--id', type=int, default=None)
+Update resource records (bulk/single)
+
+Options:
+  type         Record type
+                   [Options: A, AAAA, CNAME, MX, NS, PTR, SPF, SRV, TXT]
+  --data=DATA
+  --ttl=TTL    Time to live [default: 7200]
+  --id=ID      Modify only the given ID
+"""
+    action = 'edit'
 
     @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
         results = manager.search_record(
-            args.domain,
-            args.record)
+            args['<domain>'],
+            args['<record>'])
 
         for r in results:
-            if args.id and r['id'] != args.id:
+            if args['--id'] and r['id'] != args['--id']:
                 continue
-            r['data'] = args.data or r['data']
-            r['ttl'] = args.ttl or r['ttl']
+            r['data'] = args['--data'] or r['data']
+            r['ttl'] = args['--ttl'] or r['ttl']
             manager.edit_record(r)
 
 
 class RecordSearch(CLIRunnable):
-    """ look for a resource record by exact name"""
-    action = 'search'
+    """
+usage: sl dns search <domain> <record> [options]
 
-    @staticmethod
-    def add_additional_args(parser):
-        add_record_arguments(parser)
+Look for a resource record by exact name
+"""
+    action = 'search'
 
     @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
         results = manager.search_record(
-            args.domain,
-            args.record)
+            args['<domain>'],
+            args['<record>'])
 
-        t = Table([
-            'id',
-            'type',
-            'ttl',
-            'data',
-        ])
+        t = Table(['id', 'type', 'ttl', 'data'])
 
         t.align['ttl'] = 'c'
 
         for r in results:
-            t.add_row([
-                r['id'],
-                r['type'],
-                r['ttl'],
-                r['data'],
-            ])
+            t.add_row([r['id'], r['type'], r['ttl'], r['data']])
 
         return t
 
 
 class RecordRemove(CLIRunnable):
-    """ remove resource records"""
-    action = 'remove'
+    """
+usage: sl dns remove <domain> <record> [--id] [options]
 
-    @staticmethod
-    def add_additional_args(parser):
-        add_record_arguments(parser)
-        add_really_argument(parser)
-        parser.add_argument('--id', type=int, default=None)
+Remove resource records
+
+Options:
+  --id=ID  Remove only the given ID
+"""
+    action = 'remove'
+    options = ['confirm']
 
     @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
 
-        if args.id:
-            records = [{'id': args.id}]
+        if args['--id']:
+            records = [{'id': args['--id']}]
         else:
             records = manager.search_record(
-                args.domain,
-                args.record)
+                args['<domain>'],
+                args['<record>'])
 
-        if args.really or no_going_back('yes'):
+        if args['--really'] or no_going_back('yes'):
             t = Table(['record'])
             for r in records:
-                if not args.id or args.id == r['id']:
+                if not args['--id'] or args['--id'] == r['id']:
                     manager.delete_record(r['id'])
                     t.add_row(r['id'])
 
