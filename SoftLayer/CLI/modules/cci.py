@@ -59,8 +59,8 @@ Options:
             tags = [tag.strip() for tag in args.get('--tags').split(',')]
             guests = []
             for g in results:
-                tags = [x['tag']['name'] for x in g['tagReferences']]
-                if any(_tag in tags for _tag in tags):
+                guest_tags = [x['tag']['name'] for x in g['tagReferences']]
+                if any(_tag in tags for _tag in guest_tags):
                     guests.append(g)
         else:
             guests = results
