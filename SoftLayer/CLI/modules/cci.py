@@ -290,26 +290,27 @@ usage: sl cci create --hostname=HOST --domain=DOMAIN --cpu=CPU --memory=MEMORY
 Order/create a CCI. See 'sl cci create-options' for valid options
 
 Required:
-  -H --hostname=HOST      Host portion of the FQDN. example: server
-  -D --domain=DOMAIN      Domain portion of the FQDN example: example.com
-  -c --cpu=CPU            Number of CPU cores
-  -m --memory=MEMORY      Memory in mebibytes (n * 1024)
+  -H --hostname=HOST       Host portion of the FQDN. example: server
+  -D --domain=DOMAIN       Domain portion of the FQDN example: example.com
+  -c --cpu=CPU             Number of CPU cores
+  -m --memory=MEMORY       Memory in mebibytes (n * 1024)
 
-  -o OS, --os=OS          OS install code. Tip: you can specify <OS>_LATEST
-  --image=GUID            Image GUID. See: 'sl image list' for reference
+  -o OS, --os=OS           OS install code. Tip: you can specify <OS>_LATEST
+  --image=GUID             Image GUID. See: 'sl image list' for reference
 
-  --hourly                Hourly rate instance type
-  --monthly               Monthly rate instance type
+  --hourly                 Hourly rate instance type
+  --monthly                Monthly rate instance type
 
 Optional:
-  -d DC, --datacenter=DC  datacenter shortname (sng01, dal05, ...)
-                          Note: Omitting this value defaults to the first
-                                available datacenter
-  --private               Allocate a private CCI
-  --dry-run, --test       Do not create CCI, just get a quote
+  -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
+                           Note: Omitting this value defaults to the first
+                                 available datacenter
+  -n MBPS, --network=MBPS  Network port speed in Mbps
+  --private                Allocate a private CCI
+  --dry-run, --test        Do not create CCI, just get a quote
 
-  -u --userdata=DATA      User defined metadata string
-  -F --userfile=FILE      Read userdata from file
+  -u --userdata=DATA       User defined metadata string
+  -F --userfile=FILE       Read userdata from file
 """
     action = 'create'
     options = ['confirm']
@@ -351,7 +352,7 @@ Optional:
         data["memory"] = memory
 
         if args['--monthly']:
-            data["--hourly"] = False
+            data["hourly"] = False
 
         if args.get('--os'):
             data["os_code"] = args['--os']
@@ -361,6 +362,9 @@ Optional:
 
         if args.get('--datacenter'):
             data["datacenter"] = args['--datacenter']
+
+        if args.get('--network'):
+            data['nic_speed'] = args.get('--network')
 
         if args.get('--userdata'):
             data['userdata'] = args['--userdata']
@@ -381,7 +385,8 @@ Optional:
         else:
             raise CLIAbort('Aborting CCI order.')
 
-        return result, output
+        from pprint import pformat  # temporary
+        return pformat(result), output
 
 
 class CancelCCI(CLIRunnable):

@@ -86,7 +86,7 @@ class CCIManager(object):
             hostname=None, domain=None, local_disk=True,
             datacenter=None, os_code=None, image_id=None,
             private=False, public_vlan=None, private_vlan=None,
-            userdata=None):
+            userdata=None, nic_speed=None):
 
         required = [cpus, memory, hostname, domain]
 
@@ -109,8 +109,7 @@ class CCIManager(object):
             "localDiskFlag": local_disk,
         }
 
-        if hourly:
-            data["hourlyBillingFlag"] = hourly
+        data["hourlyBillingFlag"] = hourly
 
         if private:
             data["dedicatedAccountHostOnlyFlag"] = private
@@ -134,6 +133,9 @@ class CCIManager(object):
 
         if userdata:
             data['userData'] = [{'value': userdata}, ]
+
+        if nic_speed:
+            data['networkComponents'] = [{'maxSpeed': nic_speed}]
 
         return data
 
