@@ -115,6 +115,7 @@ class CCITests_unittests(unittest.TestCase):
         )
 
         assert_data = {
+            'hourlyBillingFlag': False,
             'startCpus': 1,
             'maxMemory': 1,
             'hostname': 'test',
@@ -257,6 +258,29 @@ class CCITests_unittests(unittest.TestCase):
             'operatingSystemReferenceCode': "STRING",
             'hourlyBillingFlag': True,
             'userData': [{'value': "ICANHAZCCI"}],
+        }
+
+        self.assertEqual(data, assert_data)
+
+    def test_generate_network(self):
+        data = self.cci._generate_create_dict(
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='example.com',
+            os_code="STRING",
+            nic_speed=9001,
+        )
+
+        assert_data = {
+            'startCpus': 1,
+            'maxMemory': 1,
+            'hostname': 'test',
+            'domain': 'example.com',
+            'localDiskFlag': True,
+            'operatingSystemReferenceCode': "STRING",
+            'hourlyBillingFlag': True,
+            'networkComponents': [{'maxSpeed': 9001}],
         }
 
         self.assertEqual(data, assert_data)
