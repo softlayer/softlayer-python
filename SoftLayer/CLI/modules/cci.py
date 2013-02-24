@@ -105,27 +105,29 @@ Options:
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
 
-        output = [
-            ("id", "{0[id]}",),
-            ("hostname", "{0[fullyQualifiedDomainName]}",),
-            ("status", "{0[status][name]}",),
-            ("state", "{0[powerState][name]}",),
-            ("datacenter", "{0[datacenter][name]}",),
-            ("cores", "{0[maxCpu]}",),
-            ("memory", "{0[maxMemory]}",),
-            ("public_ip", "{0[primaryIpAddress]}",),
-            ("private_ip", "{0[primaryBackendIpAddress]}",),
-            ("os", "{0[operatingSystem][softwareLicense]"
-                "[softwareDescription][name]} "),
-        ]
-
         result = cci.get_instance(args.get('--id'))
 
-        for o in output:
-            if o[0] == 'memory':
-                t.add_row([o[0], mb_to_gb(o[1].format(result))])
-            else:
-                t.add_row([o[0], o[1].format(result)])
+        t.add_row(['id', result['id']])
+        t.add_row(['hostname', result['fullyQualifiedDomainName']])
+        t.add_row(['status', result['status']['name']])
+        t.add_row(['state', result['powerState']['name']])
+        t.add_row(['datacenter', result['datacenter']['name']])
+        t.add_row(['cores', result['maxCpu']])
+        t.add_row(['memory', mb_to_gb(result['maxMemory'])])
+        t.add_row(['public_ip', result['primaryIpAddress']])
+        t.add_row(['private_ip', result['primaryBackendIpAddress']])
+        t.add_row([
+            'os',
+            FormattedItem(
+                result['operatingSystem']['softwareLicense']
+                ['softwareDescription']['referenceCode'],
+                result['operatingSystem']['softwareLicense']
+                ['softwareDescription']['name']
+            )])
+        t.add_row(['private_only', result['privateNetworkOnlyFlag']])
+        t.add_row(['private_cpu', result['dedicatedAccountHostOnlyFlag']])
+        t.add_row(['created', result['createDate']])
+        t.add_row(['modified', result['modifyDate']])
 
         if args.get('--price'):
             t.add_row(['price rate', result['billingItem']['recurringFee']])
