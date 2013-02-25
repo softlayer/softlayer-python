@@ -16,8 +16,8 @@ The available commands are:
 
 See 'sl help <command>' for more information on a specific command.
 
-To use most commands your SoftLayer username and api_key need to be
-configured. The easiest way to do that is to use: 'sl config setup'
+To use most commands your SoftLayer username and api_key need to be configured.
+The easiest way to do that is to use: 'sl config setup'
 """
 import sys
 import os
@@ -28,7 +28,8 @@ from docopt import docopt
 
 from SoftLayer import Client, SoftLayerError
 from SoftLayer.consts import VERSION
-from SoftLayer.CLI.helpers import Table, CLIAbort, FormattedItem, listing
+from SoftLayer.CLI.helpers import (
+    Table, CLIAbort, FormattedItem, listing, ArgumentError)
 from SoftLayer.CLI.environment import Environment, CLIRunnableType
 
 
@@ -175,7 +176,11 @@ def main(args=sys.argv[1:], env=Environment()):
         data = action.execute(client, submodule_args)
         if data:
             format = submodule_args.get('--format')
-            env.out(str(format_output(data, fmt=format)))
+            if format not in ['raw', 'table']:
+                raise ArgumentError('Invalid Format "%s"' % format)
+            s = str(format_output(data, fmt=format))
+            if s:
+                env.out(s)
 
     except (ValueError, KeyError):
         raise
