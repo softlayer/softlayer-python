@@ -377,18 +377,44 @@ Optional:
             finally:
                 f.close()
 
+        t = Table(['Item', 'cost'])
+        t.align['Item'] = 'r'
+        t.align['cost'] = 'l'
+
         if args.get('--test'):
             result = cci.verify_create_instance(**data)
-            output = FormattedItem("Test: Success!")
+            total_monthly = 0
+            total_hourly = 0
+            for price in result['prices']:
+                total_monthly += float(price.get('recurringFee', 0.0))
+                total_hourly += float(price.get('hourlyRecurringFee', 0.0))
+                if args.get('--hourly'):
+                    rate = float(price['hourlyRecurringFee'])
+                else:
+                    rate = float(price['recurringFee'])
+
+                t.add_row([price['item']['description'], rate])
+
+            if args.get('--hourly'):
+                total = total_hourly
+            else:
+                total = total_monthly
+            t.add_row(['Total cost', total])
+
         elif args['--really'] or confirm(
                 "This action will incur charges on your account. Continue?"):
             result = cci.create_instance(**data)
-            output = FormattedItem('Order placed successfully')
+
+            t = Table(['name', 'value'])
+            t.align['name'] = 'r'
+            t.align['value'] = 'l'
+            t.add_row(['id', result['id']])
+            t.add_row(['created', result['createDate']])
+            t.add_row(['guid', result['globalIdentifier']])
         else:
             raise CLIAbort('Aborting CCI order.')
 
-        from pprint import pformat  # temporary
-        return pformat(result), output
+        return t
 
 
 class CancelCCI(CLIRunnable):
