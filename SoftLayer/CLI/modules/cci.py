@@ -379,19 +379,19 @@ Optional:
 
         t = Table(['Item', 'cost'])
         t.align['Item'] = 'r'
-        t.align['cost'] = 'l'
+        t.align['cost'] = 'r'
 
         if args.get('--test'):
             result = cci.verify_create_instance(**data)
-            total_monthly = 0
-            total_hourly = 0
+            total_monthly = 0.0
+            total_hourly = 0.0
             for price in result['prices']:
                 total_monthly += float(price.get('recurringFee', 0.0))
                 total_hourly += float(price.get('hourlyRecurringFee', 0.0))
                 if args.get('--hourly'):
-                    rate = float(price['hourlyRecurringFee'])
+                    rate = "%.2f" % float(price['hourlyRecurringFee'])
                 else:
-                    rate = float(price['recurringFee'])
+                    rate = "%.2f" % float(price['recurringFee'])
 
                 t.add_row([price['item']['description'], rate])
 
@@ -399,7 +399,11 @@ Optional:
                 total = total_hourly
             else:
                 total = total_monthly
-            t.add_row(['Total cost', total])
+
+            billing_rate = 'monthly'
+            if args.get('--hourly'):
+                billing_rate = 'hourly'
+            t.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
 
         elif args['--really'] or confirm(
                 "This action will incur charges on your account. Continue?"):
