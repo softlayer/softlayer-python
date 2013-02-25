@@ -47,6 +47,9 @@ class CommandLineTests(unittest.TestCase):
         self.assertRaises(
             SystemExit, cli.core.main,
             args=['cci', 'nope', '--config=path/to/config'], env=self.env)
+        self.assertRaises(
+            SystemExit, cli.core.main,
+            args=['cci', 'list', '--format=totallynotvalid'], env=self.env)
 
     def test_invalid_module(self):
         self.env.get_module_name.return_value = 'nope'
@@ -131,6 +134,13 @@ class TestParseSubmoduleArgs(unittest.TestCase):
     def test_tty(self, tty):
         self.assertRaises(
             SystemExit, cli.core.parse_submodule_args, submodule_fixture, [])
+
+    def test_confirm(self):
+        submodule = MagicMock()
+        submodule.options = ['confirm']
+        submodule.__doc__ = 'usage: sl cci list [options]'
+        self.assertRaises(
+            SystemExit, cli.core.parse_submodule_args, submodule, [''])
 
 
 class TestFormatOutput(unittest.TestCase):
