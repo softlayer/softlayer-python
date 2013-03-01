@@ -9,7 +9,7 @@ __all__ = ['Table', 'CLIRunnable', 'FormattedItem', 'valid_response',
 class FormattedItem(object):
     def __init__(self, original, formatted=None):
         self.original = original
-        if formatted:
+        if formatted is not None:
             self.formatted = formatted
         else:
             self.formatted = self.original
