@@ -206,15 +206,6 @@ class TestFormatOutput(unittest.TestCase):
         n['test_set'] = 1
         self.assertEqual(n['test_set'], 1)
 
-        n = cli.helpers.NestedDict()
-        n['test']['add'] += 101
-        self.assertEqual(n['test']['add'], 101)
-
-        n = cli.helpers.NestedDict()
-        n['test']['sub'] -= 199
-        self.assertEqual(n['test']['sub'], -199)
-
-    def test_convert_nesteddict(self):
         d = {
             'test': {
                 'nested': 1
@@ -223,5 +214,10 @@ class TestFormatOutput(unittest.TestCase):
         n = cli.helpers.NestedDict(d)
         self.assertEqual(d, n)
         self.assertEqual(n['test']['nested'], 1)
+
+        # new default top level elements should return a new NestedDict()
         self.assertEqual(n['not']['nested'], cli.helpers.NestedDict())
+
+        # NestedDict doesn't convert dict children, just the top level dict
+        # so assuming this behavior down inside of a dict is not plausible
         self.assertRaises(KeyError, lambda: n['test']['not']['nested'])
