@@ -49,10 +49,10 @@ Options:
         for image in images:
             t.add_row([
                 image['id'],
-                image.get('accountId', '???'),
-                image.get('type', '???'),
+                image.get('accountId', '-'),
+                image.get('type', '-'),
                 image['name'].strip(),
-                image.get('globalIdentifier', '???'),
+                image.get('globalIdentifier', '-'),
             ])
 
         return t

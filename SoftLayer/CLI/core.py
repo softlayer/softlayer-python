@@ -29,7 +29,7 @@ from docopt import docopt
 from SoftLayer import Client, SoftLayerError
 from SoftLayer.consts import VERSION
 from SoftLayer.CLI.helpers import (
-    Table, CLIAbort, FormattedItem, listing, ArgumentError)
+    Table, CLIAbort, FormattedItem, listing, ArgumentError, SequentialOutput)
 from SoftLayer.CLI.environment import Environment, CLIRunnableType
 
 
@@ -39,17 +39,24 @@ def format_output(data, fmt='table'):
 
     if isinstance(data, Table):
         if fmt == 'table':
-            return format_prettytable(data)
+            return str(format_prettytable(data))
         elif fmt == 'raw':
-            return format_no_tty(data)
+            return str(format_no_tty(data))
 
     if fmt != 'raw' and isinstance(data, FormattedItem):
-        return data.formatted
+        return str(data.formatted)
+
+    if isinstance(data, SequentialOutput):
+        output = [format_output(d, fmt=fmt) for d in data]
+        if not data.blanks:
+            output = [x for x in output if len(x)]
+        return format_output(output, fmt=fmt)
 
     if isinstance(data, list) or isinstance(data, tuple):
-        return format_output(listing(data, separator=os.linesep))
+        output = [format_output(d, fmt=fmt) for d in data]
+        return format_output(listing(output, separator=os.linesep))
 
-    return data
+    return str(data)
 
 
 def format_prettytable(table):
@@ -178,7 +185,7 @@ def main(args=sys.argv[1:], env=Environment()):
             format = submodule_args.get('--format')
             if format not in ['raw', 'table']:
                 raise ArgumentError('Invalid Format "%s"' % format)
-            s = str(format_output(data, fmt=format))
+            s = format_output(data, fmt=format)
             if s:
                 env.out(s)
 

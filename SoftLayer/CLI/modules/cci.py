@@ -21,7 +21,8 @@ from SoftLayer.CCI import CCIManager
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
     FormattedItem)
-from SoftLayer.CLI.helpers import CLIAbort, ArgumentError
+from SoftLayer.CLI.helpers import (
+    CLIAbort, ArgumentError, SequentialOutput, NestedDict)
 
 
 class ListCCIs(CLIRunnable):
@@ -72,8 +73,8 @@ Options:
                 guest['fullyQualifiedDomainName'],
                 guest['maxCpu'],
                 mb_to_gb(guest['maxMemory']),
-                guest.get('primaryIpAddress', '???'),
-                guest.get('primaryBackendIpAddress', '???'),
+                guest.get('primaryIpAddress', '-'),
+                guest.get('primaryBackendIpAddress', '-'),
                 guest.get('activeTransaction', {}).get(
                     'transactionStatus', {}).get('friendlyName', ''),
             ])
@@ -105,27 +106,37 @@ Options:
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
 
-        output = [
-            ("id", "{0[id]}",),
-            ("hostname", "{0[fullyQualifiedDomainName]}",),
-            ("status", "{0[status][name]}",),
-            ("state", "{0[powerState][name]}",),
-            ("datacenter", "{0[datacenter][name]}",),
-            ("cores", "{0[maxCpu]}",),
-            ("memory", "{0[maxMemory]}",),
-            ("public_ip", "{0[primaryIpAddress]}",),
-            ("private_ip", "{0[primaryBackendIpAddress]}",),
-            ("os", "{0[operatingSystem][softwareLicense]"
-                "[softwareDescription][name]} "),
-        ]
+        # make this cci.resolve_id capable
+        cci_id = args.get('--id')
 
-        result = cci.get_instance(args.get('--id'))
+        result = cci.get_instance(cci_id)
 
-        for o in output:
-            if o[0] == 'memory':
-                t.add_row([o[0], mb_to_gb(o[1].format(result))])
-            else:
-                t.add_row([o[0], o[1].format(result)])
+        result = NestedDict(result)
+
+        t.add_row(['id', result['id']])
+        t.add_row(['hostname', result['fullyQualifiedDomainName']])
+        t.add_row(['status', result['status']['name']])
+        t.add_row(['state', result['powerState']['name']])
+        t.add_row(['datacenter', result['datacenter'].get('name', '-')])
+        t.add_row(['cores', result['maxCpu']])
+        t.add_row(['memory', mb_to_gb(result['maxMemory'])])
+        t.add_row(['public_ip', result.get('primaryIpAddress', '-')])
+        t.add_row(['private_ip', result.get('primaryBackendIpAddress', '-')])
+        t.add_row([
+            'os',
+            FormattedItem(
+                result['operatingSystem']['softwareLicense']
+                ['softwareDescription'].get('referenceCode', '-'),
+                result['operatingSystem']['softwareLicense']
+                ['softwareDescription'].get('name', '-')
+            )])
+        t.add_row(['private_only', result['privateNetworkOnlyFlag']])
+        t.add_row(['private_cpu', result['dedicatedAccountHostOnlyFlag']])
+        t.add_row(['created', result['createDate']])
+        t.add_row(['modified', result['modifyDate']])
+
+        if result.get('notes'):
+            t.add_row(['notes', result['notes']])
 
         if args.get('--price'):
             t.add_row(['price rate', result['billingItem']['recurringFee']])
@@ -145,10 +156,11 @@ Options:
             t.add_row(['tags', listing(tag_row, separator=',')])
 
         ptr_domains = client['Virtual_Guest'].\
-            getReverseDomainRecords(id=args.get('--id'))[0]
+            getReverseDomainRecords(id=cci_id)
 
-        for ptr in ptr_domains['resourceRecords']:
-            t.add_row(['ptr', ptr['data']])
+        for ptr_domain in ptr_domains:
+            for ptr in ptr_domain['resourceRecords']:
+                t.add_row(['ptr', ptr['data']])
 
         return t
 
@@ -375,18 +387,55 @@ Optional:
             finally:
                 f.close()
 
+        t = Table(['Item', 'cost'])
+        t.align['Item'] = 'r'
+        t.align['cost'] = 'r'
+
         if args.get('--test'):
             result = cci.verify_create_instance(**data)
-            output = FormattedItem("Test: Success!")
+            total_monthly = 0.0
+            total_hourly = 0.0
+            for price in result['prices']:
+                total_monthly += float(price.get('recurringFee', 0.0))
+                total_hourly += float(price.get('hourlyRecurringFee', 0.0))
+                if args.get('--hourly'):
+                    rate = "%.2f" % float(price['hourlyRecurringFee'])
+                else:
+                    rate = "%.2f" % float(price['recurringFee'])
+
+                t.add_row([price['item']['description'], rate])
+
+            if args.get('--hourly'):
+                total = total_hourly
+            else:
+                total = total_monthly
+
+            billing_rate = 'monthly'
+            if args.get('--hourly'):
+                billing_rate = 'hourly'
+            t.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
+            output = SequentialOutput(blanks=False)
+            output.append(t)
+            output.append(FormattedItem('',
+                    ' -- ! Prices reflected here are retail and do not '
+                    'take account level discounts and are not guarenteed.')
+            )
+
         elif args['--really'] or confirm(
                 "This action will incur charges on your account. Continue?"):
             result = cci.create_instance(**data)
-            output = FormattedItem('Order placed successfully')
+
+            t = Table(['name', 'value'])
+            t.align['name'] = 'r'
+            t.align['value'] = 'l'
+            t.add_row(['id', result['id']])
+            t.add_row(['created', result['createDate']])
+            t.add_row(['guid', result['globalIdentifier']])
+            output = t
         else:
             raise CLIAbort('Aborting CCI order.')
 
-        from pprint import pformat  # temporary
-        return pformat(result), output
+        return output
 
 
 class CancelCCI(CLIRunnable):
