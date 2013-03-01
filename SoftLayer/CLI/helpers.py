@@ -119,3 +119,8 @@ class Table(object):
         for row in self.rows:
             t.add_row(row)
         return t
+
+
+class SequentialOutput(list):
+    def __init__(self, blanks=True, *args, **kwargs):
+        self.blanks = blanks

@@ -29,7 +29,7 @@ from docopt import docopt
 from SoftLayer import Client, SoftLayerError
 from SoftLayer.consts import VERSION
 from SoftLayer.CLI.helpers import (
-    Table, CLIAbort, FormattedItem, listing, ArgumentError)
+    Table, CLIAbort, FormattedItem, listing, ArgumentError, SequentialOutput)
 from SoftLayer.CLI.environment import Environment, CLIRunnableType
 
 
@@ -45,6 +45,12 @@ def format_output(data, fmt='table'):
 
     if fmt != 'raw' and isinstance(data, FormattedItem):
         return str(data.formatted)
+
+    if isinstance(data, SequentialOutput):
+        output = [format_output(d, fmt=fmt) for d in data]
+        if not data.blanks:
+            output = [x for x in output if len(x)]
+        return format_output(output, fmt=fmt)
 
     if isinstance(data, list) or isinstance(data, tuple):
         output = [format_output(d, fmt=fmt) for d in data]

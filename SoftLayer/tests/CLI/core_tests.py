@@ -183,4 +183,17 @@ class TestFormatOutput(unittest.TestCase):
 
     def test_unknown(self):
         t = cli.core.format_output({}, 'raw')
-        self.assertEqual({}, t)
+        self.assertEqual('{}', t)
+
+    def test_sequentialoutput(self):
+        t = cli.core.SequentialOutput(blanks=False)
+        self.assertTrue(hasattr(t, 'append'))
+        t.append('This is a test')
+        t.append('')
+        t.append('More tests')
+        output = cli.core.format_output(t)
+        self.assertEqual("This is a test\nMore tests", output)
+
+        t.blanks = True
+        output = cli.core.format_output(t)
+        self.assertEqual("This is a test\n\nMore tests", output)
