@@ -73,8 +73,8 @@ Options:
                 guest['fullyQualifiedDomainName'],
                 guest['maxCpu'],
                 mb_to_gb(guest['maxMemory']),
-                guest.get('primaryIpAddress', '???'),
-                guest.get('primaryBackendIpAddress', '???'),
+                guest.get('primaryIpAddress', '-'),
+                guest.get('primaryBackendIpAddress', '-'),
                 guest.get('activeTransaction', {}).get(
                     'transactionStatus', {}).get('friendlyName', ''),
             ])
@@ -117,18 +117,18 @@ Options:
         t.add_row(['hostname', result['fullyQualifiedDomainName']])
         t.add_row(['status', result['status']['name']])
         t.add_row(['state', result['powerState']['name']])
-        t.add_row(['datacenter', result['datacenter'].get('name', '???')])
+        t.add_row(['datacenter', result['datacenter'].get('name', '-')])
         t.add_row(['cores', result['maxCpu']])
         t.add_row(['memory', mb_to_gb(result['maxMemory'])])
-        t.add_row(['public_ip', result.get('primaryIpAddress', '???')])
-        t.add_row(['private_ip', result.get('primaryBackendIpAddress', '???')])
+        t.add_row(['public_ip', result.get('primaryIpAddress', '-')])
+        t.add_row(['private_ip', result.get('primaryBackendIpAddress', '-')])
         t.add_row([
             'os',
             FormattedItem(
                 result['operatingSystem']['softwareLicense']
-                ['softwareDescription'].get('referenceCode', '???'),
+                ['softwareDescription'].get('referenceCode', '-'),
                 result['operatingSystem']['softwareLicense']
-                ['softwareDescription'].get('name', '???')
+                ['softwareDescription'].get('name', '-')
             )])
         t.add_row(['private_only', result['privateNetworkOnlyFlag']])
         t.add_row(['private_cpu', result['dedicatedAccountHostOnlyFlag']])
