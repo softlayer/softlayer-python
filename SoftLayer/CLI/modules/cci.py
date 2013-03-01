@@ -21,7 +21,8 @@ from SoftLayer.CCI import CCIManager
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
     FormattedItem)
-from SoftLayer.CLI.helpers import CLIAbort, ArgumentError, SequentualOutput
+from SoftLayer.CLI.helpers import (
+    CLIAbort, ArgumentError, SequentialOutput, NestedDict)
 
 
 class ListCCIs(CLIRunnable):
@@ -110,35 +111,31 @@ Options:
 
         result = cci.get_instance(cci_id)
 
+        result = NestedDict(result)
+
         t.add_row(['id', result['id']])
         t.add_row(['hostname', result['fullyQualifiedDomainName']])
         t.add_row(['status', result['status']['name']])
         t.add_row(['state', result['powerState']['name']])
-        t.add_row(['datacenter',
-                    result.get('datacenter', {'name': 'Unassigned'})['name']])
+        t.add_row(['datacenter', result['datacenter'].get('name', '???')])
         t.add_row(['cores', result['maxCpu']])
         t.add_row(['memory', mb_to_gb(result['maxMemory'])])
-        t.add_row(['public_ip',
-                    result.get('primaryIpAddress', 'Unassigned')])
-        t.add_row(['private_ip',
-                    result.get('primaryBackendIpAddress', 'Unassigned')])
-        if result.get('operatingSystem', None):
-            t.add_row([
-                'os',
-                FormattedItem(
-                    result['operatingSystem']['softwareLicense']
-                    ['softwareDescription']['referenceCode'],
-                    result['operatingSystem']['softwareLicense']
-                    ['softwareDescription']['name']
-                )])
-        else:
-            t.add_row(['os', 'Unassigned'])
+        t.add_row(['public_ip', result.get('primaryIpAddress', '???')])
+        t.add_row(['private_ip', result.get('primaryBackendIpAddress', '???')])
+        t.add_row([
+            'os',
+            FormattedItem(
+                result['operatingSystem']['softwareLicense']
+                ['softwareDescription'].get('referenceCode', '???'),
+                result['operatingSystem']['softwareLicense']
+                ['softwareDescription'].get('name', '???')
+            )])
         t.add_row(['private_only', result['privateNetworkOnlyFlag']])
         t.add_row(['private_cpu', result['dedicatedAccountHostOnlyFlag']])
         t.add_row(['created', result['createDate']])
         t.add_row(['modified', result['modifyDate']])
 
-        if result.get('notes', None):
+        if result.get('notes'):
             t.add_row(['notes', result['notes']])
 
         if args.get('--price'):
@@ -417,7 +414,7 @@ Optional:
             if args.get('--hourly'):
                 billing_rate = 'hourly'
             t.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
-            output = SequentualOutput(blanks=False)
+            output = SequentialOutput(blanks=False)
             output.append(t)
             output.append(FormattedItem('',
                     ' -- ! Prices reflected here are retail and do not '
