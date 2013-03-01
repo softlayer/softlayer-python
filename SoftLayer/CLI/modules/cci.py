@@ -21,7 +21,7 @@ from SoftLayer.CCI import CCIManager
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
     FormattedItem)
-from SoftLayer.CLI.helpers import CLIAbort, ArgumentError
+from SoftLayer.CLI.helpers import CLIAbort, ArgumentError, SequentualOutput
 
 
 class ListCCIs(CLIRunnable):
@@ -105,29 +105,41 @@ Options:
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
 
-        result = cci.get_instance(args.get('--id'))
+        # make this cci.resolve_id capable
+        cci_id = args.get('--id')
+
+        result = cci.get_instance(cci_id)
 
         t.add_row(['id', result['id']])
         t.add_row(['hostname', result['fullyQualifiedDomainName']])
         t.add_row(['status', result['status']['name']])
         t.add_row(['state', result['powerState']['name']])
-        t.add_row(['datacenter', result['datacenter']['name']])
+        t.add_row(['datacenter',
+                    result.get('datacenter', {'name': 'Unassigned'})['name']])
         t.add_row(['cores', result['maxCpu']])
         t.add_row(['memory', mb_to_gb(result['maxMemory'])])
-        t.add_row(['public_ip', result['primaryIpAddress']])
-        t.add_row(['private_ip', result['primaryBackendIpAddress']])
-        t.add_row([
-            'os',
-            FormattedItem(
-                result['operatingSystem']['softwareLicense']
-                ['softwareDescription']['referenceCode'],
-                result['operatingSystem']['softwareLicense']
-                ['softwareDescription']['name']
-            )])
+        t.add_row(['public_ip',
+                    result.get('primaryIpAddress', 'Unassigned')])
+        t.add_row(['private_ip',
+                    result.get('primaryBackendIpAddress', 'Unassigned')])
+        if result.get('operatingSystem', None):
+            t.add_row([
+                'os',
+                FormattedItem(
+                    result['operatingSystem']['softwareLicense']
+                    ['softwareDescription']['referenceCode'],
+                    result['operatingSystem']['softwareLicense']
+                    ['softwareDescription']['name']
+                )])
+        else:
+            t.add_row(['os', 'Unassigned'])
         t.add_row(['private_only', result['privateNetworkOnlyFlag']])
         t.add_row(['private_cpu', result['dedicatedAccountHostOnlyFlag']])
         t.add_row(['created', result['createDate']])
         t.add_row(['modified', result['modifyDate']])
+
+        if result.get('notes', None):
+            t.add_row(['notes', result['notes']])
 
         if args.get('--price'):
             t.add_row(['price rate', result['billingItem']['recurringFee']])
@@ -147,10 +159,11 @@ Options:
             t.add_row(['tags', listing(tag_row, separator=',')])
 
         ptr_domains = client['Virtual_Guest'].\
-            getReverseDomainRecords(id=args.get('--id'))[0]
+            getReverseDomainRecords(id=cci_id)
 
-        for ptr in ptr_domains['resourceRecords']:
-            t.add_row(['ptr', ptr['data']])
+        for ptr_domain in ptr_domains:
+            for ptr in ptr_domain['resourceRecords']:
+                t.add_row(['ptr', ptr['data']])
 
         return t
 
@@ -404,6 +417,12 @@ Optional:
             if args.get('--hourly'):
                 billing_rate = 'hourly'
             t.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
+            output = SequentualOutput(blanks=False)
+            output.append(t)
+            output.append(FormattedItem('',
+                    ' -- ! Prices reflected here are retail and do not '
+                    'take account level discounts and are not guarenteed.')
+            )
 
         elif args['--really'] or confirm(
                 "This action will incur charges on your account. Continue?"):
@@ -415,10 +434,11 @@ Optional:
             t.add_row(['id', result['id']])
             t.add_row(['created', result['createDate']])
             t.add_row(['guid', result['globalIdentifier']])
+            output = t
         else:
             raise CLIAbort('Aborting CCI order.')
 
-        return t
+        return output
 
 
 class CancelCCI(CLIRunnable):
