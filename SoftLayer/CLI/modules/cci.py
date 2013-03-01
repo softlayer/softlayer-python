@@ -175,10 +175,10 @@ Options:
     def execute(cls, client, args):
         cci = CCIManager(client)
         result = cci.get_create_options()
-        show_all = True
 
+        show_all = True
         for opt_name, _ in args.iteritems():
-            if '--%s' % opt_name in cls.options:
+            if opt_name.lstrip('-') in cls.options:
                 show_all = False
                 break
 
