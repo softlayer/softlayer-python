@@ -124,3 +124,17 @@ class Table(object):
 class SequentialOutput(list):
     def __init__(self, blanks=True, *args, **kwargs):
         self.blanks = blanks
+
+
+class NestedDict(dict):
+
+    def __getitem__(self, key):
+        if key in self:
+            return self.get(key)
+        return self.setdefault(key, NestedDict())
+
+    def __add__(self, other):
+        return other
+
+    def __sub__(self, other):
+        return other
