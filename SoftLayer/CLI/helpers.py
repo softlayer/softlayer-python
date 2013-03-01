@@ -132,9 +132,3 @@ class NestedDict(dict):
         if key in self:
             return self.get(key)
         return self.setdefault(key, NestedDict())
-
-    def __add__(self, other):
-        return other
-
-    def __sub__(self, other):
-        return other

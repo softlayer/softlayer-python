@@ -197,3 +197,31 @@ class TestFormatOutput(unittest.TestCase):
         t.blanks = True
         output = cli.core.format_output(t)
         self.assertEqual("This is a test\n\nMore tests", output)
+
+    def test_nesteddict(self):
+        n = cli.helpers.NestedDict()
+
+        self.assertEqual(n['test'], cli.helpers.NestedDict())
+
+        n['test_set'] = 1
+        self.assertEqual(n['test_set'], 1)
+
+        n = cli.helpers.NestedDict()
+        n['test']['add'] += 101
+        self.assertEqual(n['test']['add'], 101)
+
+        n = cli.helpers.NestedDict()
+        n['test']['sub'] -= 199
+        self.assertEqual(n['test']['sub'], -199)
+
+    def test_convert_nesteddict(self):
+        d = {
+            'test': {
+                'nested': 1
+            }}
+
+        n = cli.helpers.NestedDict(d)
+        self.assertEqual(d, n)
+        self.assertEqual(n['test']['nested'], 1)
+        self.assertEqual(n['not']['nested'], cli.helpers.NestedDict())
+        self.assertRaises(KeyError, lambda: n['test']['not']['nested'])
