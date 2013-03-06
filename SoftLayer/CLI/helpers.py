@@ -9,7 +9,7 @@ __all__ = ['Table', 'CLIRunnable', 'FormattedItem', 'valid_response',
 class FormattedItem(object):
     def __init__(self, original, formatted=None):
         self.original = original
-        if formatted:
+        if formatted is not None:
             self.formatted = formatted
         else:
             self.formatted = self.original
@@ -119,3 +119,16 @@ class Table(object):
         for row in self.rows:
             t.add_row(row)
         return t
+
+
+class SequentialOutput(list):
+    def __init__(self, blanks=True, *args, **kwargs):
+        self.blanks = blanks
+
+
+class NestedDict(dict):
+
+    def __getitem__(self, key):
+        if key in self:
+            return self.get(key)
+        return self.setdefault(key, NestedDict())
