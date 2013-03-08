@@ -13,6 +13,7 @@ The available commands are:
   dns             DNS related actions to a CCI
   cancel          Cancel a running CCI
   create-options  Output available available options when creating a CCI
+  reload          Reload the OS on a CCI based on its current configuration
 """
 
 from os import linesep
@@ -387,6 +388,25 @@ Optional:
 
         from pprint import pformat  # temporary
         return pformat(result), output
+
+
+class ReloadCCI(CLIRunnable):
+    """
+usage: sl cci reload <id> [options]
+
+Reload the OS on a CCI based on its current configuration
+"""
+
+    action = 'reload'
+    options = ['confirm']
+
+    @staticmethod
+    def execute(client, args):
+        cci = CCIManager(client)
+        if args['--really'] or no_going_back(args['<id>']):
+            cci.reload_instance(args['<id>'])
+        else:
+            CLIAbort('Aborted')
 
 
 class CancelCCI(CLIRunnable):
