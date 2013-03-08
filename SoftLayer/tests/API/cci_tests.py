@@ -211,7 +211,7 @@ class CCITests_unittests(unittest.TestCase):
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
             'hourlyBillingFlag': True,
-            'primaryNetworkCompnent': {"networkVlan": {"id": 1}},
+            'primaryNetworkComponent': {"networkVlan": {"id": 1}},
         }
 
         self.assertEqual(data, assert_data)
@@ -234,7 +234,7 @@ class CCITests_unittests(unittest.TestCase):
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
             'hourlyBillingFlag': True,
-            'primaryBackendNetworkCompnent': {"networkVlan": {"id": 1}},
+            'primaryBackendNetworkComponent': {"networkVlan": {"id": 1}},
         }
 
         self.assertEqual(data, assert_data)
