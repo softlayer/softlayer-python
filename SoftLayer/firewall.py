@@ -1,4 +1,3 @@
-
 __all__ = ['FirewallManager']
 
 
@@ -14,9 +13,10 @@ def has_firewall(vlan):
 
 class FirewallManager(object):
     def __init__(self, client):
-        """ Firewall manager
+        """ Manages firewalls.
 
-        :param client: SoftLayer.API.Client
+        :param SoftLayer.API.Client client: the API client instance
+
         """
         self.client = client
 
