@@ -5,10 +5,10 @@ class SoftLayerError(StandardError):
 
 
 class SoftLayerAPIError(SoftLayerError):
-    """ SoftLayerAPIError is the exception that is raised whenever an error is
-        returned from the API
+    """ SoftLayerAPIError is an exception raised whenever an error is returned
+    from the API.
 
-        Provides faultCode and faultString properties
+    Provides faultCode and faultString properties.
     """
     def __init__(self, faultCode, faultString, *args):
         SoftLayerError.__init__(self, faultString, *args)

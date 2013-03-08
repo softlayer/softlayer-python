@@ -26,7 +26,7 @@
 """
 SoftLayer Python API Client
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-A library to contact SoftLayer's backend services through the XML-RPC interface
+A library to use SoftLayer's API through the XML-RPC interface.
 See U{http://sldn.softlayer.com/article/Python}
 
 

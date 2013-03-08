@@ -12,13 +12,19 @@ class CCICreateMutuallyExclusive(SoftLayerError):
 
 
 class CCIManager(object):
-    """ Manage CCI's """
+    """ Manage CCIs """
     def __init__(self, client):
         self.client = client
         self.account = client['Account']
         self.guest = client['Virtual_Guest']
 
     def list_instances(self, hourly=True, monthly=True):
+        """ Retrieve a list of all CCIs on the account.
+
+        :param boolean hourly: include hourly instances
+        :param boolean monthly: include monthly instances
+
+        """
         items = set([
             'id',
             'globalIdentifier',
@@ -84,11 +90,19 @@ class CCIManager(object):
         return self.guest.getCreateObjectOptions()
 
     def cancel_instance(self, id):
+        """ Cancel an instance immediately, deleting all its data.
+
+        :param integer id: the instance ID to cancel
+
+        """
         return self.guest.deleteObject(id=id)
 
     def reload_instance(self, id):
-        """ Performs an OS reload of an instance with its current
-        configuration. """
+        """ Perform an OS reload of an instance with its current configuration.
+
+        :param integer id: the instance ID to reload
+
+        """
         return self.guest.reloadCurrentOperatingSystemConfiguration(id=id)
 
     def _generate_create_dict(
@@ -150,11 +164,11 @@ class CCIManager(object):
         return data
 
     def verify_create_instance(self, **kwargs):
-        """ see _generate_create_dict """
+        """ see _generate_create_dict """  # TODO: document this
         create_options = self._generate_create_dict(**kwargs)
         return self.guest.generateOrderTemplate(create_options)
 
     def create_instance(self, **kwargs):
-        """ see _generate_create_dict """
+        """ see _generate_create_dict """  # TODO: document this
         create_options = self._generate_create_dict(**kwargs)
         return self.guest.createObject(create_options)

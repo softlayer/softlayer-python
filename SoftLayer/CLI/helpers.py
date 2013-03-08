@@ -1,4 +1,3 @@
-
 from SoftLayer.CLI.environment import CLIRunnableType
 from prettytable import PrettyTable
 
@@ -74,7 +73,7 @@ def no_going_back(confirmation):
 
     return valid_response(
         'This action cannot be undone! '
-        'Type in "%s" or press Enter to abort.' % confirmation,
+        'Type "%s" or press Enter to abort: ' % confirmation,
         confirmation)
 
 
@@ -108,7 +107,7 @@ class Table(object):
         self.rows.append(row)
 
     def prettytable(self):
-        " Returns a new prettytable instance"
+        """ Returns a new prettytable instance. """
         t = PrettyTable(self.columns)
         if self.sortby:
             t.sortby = self.sortby
