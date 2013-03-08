@@ -86,6 +86,11 @@ class CCIManager(object):
     def cancel_instance(self, id):
         return self.guest.deleteObject(id=id)
 
+    def reload_instance(self, id):
+        """ Performs an OS reload of an instance with its current
+        configuration. """
+        return self.guest.reloadCurrentOperatingSystemConfiguration(id=id)
+
     def _generate_create_dict(
             self, cpus=None, memory=None, hourly=True,
             hostname=None, domain=None, local_disk=True,
