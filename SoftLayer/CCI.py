@@ -148,11 +148,11 @@ class CCIManager(object):
 
         if public_vlan:
             data.update({
-                'primaryNetworkCompnent':
+                'primaryNetworkComponent':
                     {"networkVlan": {"id": int(public_vlan)}}})
         if private_vlan:
             data.update({
-                "primaryBackendNetworkCompnent":
+                "primaryBackendNetworkComponent":
                     {"networkVlan": {"id": int(private_vlan)}}})
 
         if userdata:
