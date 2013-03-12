@@ -13,6 +13,8 @@ The available commands are:
   dns       Manage DNS
   config    View and edit configuration for this tool
   metadata  Get details about this machine. Also available with 'my' and 'meta'
+  nas       View NAS details
+  iscsi     View iSCSI details
 
 See 'sl help <command>' for more information on a specific command.
 
