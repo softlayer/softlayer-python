@@ -145,7 +145,8 @@ class APICalls(unittest.TestCase):
             1234,
             id=5678,
             mask={'object': {'attribute': ''}},
-            filter={'TYPE': {'obj': {'attribute': '^= prefix'}}},
+            filter={
+                'TYPE': {'obj': {'attribute': {'operation': '^= prefix'}}}},
             limit=9, offset=10)
 
         make_api_call.assert_called_with(
@@ -195,7 +196,8 @@ class APICalls(unittest.TestCase):
             id=5678,
             mask={'object': {'attribute': ''}},
             raw_headers={'RAW': 'HEADER'},
-            filter={'TYPE': {'obj': {'attribute': '^= prefix'}}},
+            filter={
+                'TYPE': {'obj': {'attribute': {'operation': '^= prefix'}}}},
             limit=9, offset=10)
 
         make_api_call.assert_called_with(
