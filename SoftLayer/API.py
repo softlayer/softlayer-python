@@ -251,8 +251,7 @@ class Client(object):
             headers.update(self.__format_object_mask(objectmask, service))
 
         if objectfilter is not None:
-            headers['%sObjectFilter' % service] = \
-                self.__format_filter_dict(objectfilter)
+            headers['%sObjectFilter' % service] = objectfilter
 
         if limit:
             headers['resultLimit'] = {
@@ -288,20 +287,6 @@ class Client(object):
             objectmask = "mask[%s]" % objectmask
 
         return {mheader: {'mask': objectmask}}
-
-    def __format_filter_dict(self, d):
-        """ Format given filters to the SL-API header.
-
-        :param d: a dict of filters
-
-        """
-        for key, value in d.iteritems():
-            if isinstance(value, dict):
-                d[key] = self.__format_filter_dict(value)
-                return d
-            else:
-                d[key] = {'operation': value}
-                return d
 
     def __getattr__(self, name):
         """ Attempt a SoftLayer API call.
