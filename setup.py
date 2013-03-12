@@ -16,7 +16,7 @@ elif sys.version_info >= (2, 6):
 if sys.version_info <= (2, 6):
     requires.append('simplejson')
 
-description = "A library to contact SoftLayer's backend services"
+description = "A library to use SoftLayer's API"
 
 if os.path.exists('README.md'):
     f = open('README.md')

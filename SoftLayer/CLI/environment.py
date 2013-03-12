@@ -9,7 +9,6 @@ from SoftLayer import API_PUBLIC_ENDPOINT
 
 
 class Environment(object):
-
     # {'module_name': {'action': 'actionClass'}}
     plugins = {}
     aliases = {

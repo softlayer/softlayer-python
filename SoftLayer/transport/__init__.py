@@ -1,4 +1,3 @@
-
 try:
     from SoftLayer.transport.requests_transport import make_api_call
 except ImportError:  # pragma: no cover

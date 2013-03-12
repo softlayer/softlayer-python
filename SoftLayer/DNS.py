@@ -10,26 +10,30 @@ class DNSZoneNotFound(SoftLayerError):
 
 
 class DNSManager(object):
+    """ Manage DNS zones. """
 
     def __init__(self, client):
-        """ DNSManager
+        """ DNSManager initialization.
 
-            :param client: SoftLayer.API.Client
+        :param SoftLayer.API.Client client: the client instance
+
         """
-
         self.client = client
         self.domain = self.client['Dns_Domain']
         self.record = self.client['Dns_Domain_ResourceRecord']
 
     def list_zones(self):
+        """ Get a list of all DNS zones. """
         account = self.client['Account']
         acc = account.getObject(mask='mask.domains')
         return acc['domains']
 
     def get_zone(self, domain):
-        """ get_zone - get a domain and it's records
+        """ Get a domain/zone and its records.
 
-            domain - str"""
+        :param domain: the domain/zone name
+
+        """
         domain = domain.lower()
         results = self.domain.getByDomainName(
             domain,
@@ -42,53 +46,86 @@ class DNSManager(object):
             raise DNSZoneNotFound(domain)
 
     def create_zone(self, domain, serial=None):
-        """ create_zone - create a zone using a string
+        """ Create a zone for the specified domain.
 
-            domain - str
-            serial - int (default strftime(%Y%m%d01))"""
+        :param domain: the domain/zone name to create
+        :param serial: serial value on the zone (default: strftime(%Y%m%d01))
+
+        """
         return self.domain.createObject({
             'name': domain,
             'serial': serial or strftime('%Y%m%d01')})
 
-    def delete_zone(self, domid):
-        """ delete_zone - delete a zone by it's ID """
-        return self.domain.deleteObject(id=domid)
+    def delete_zone(self, id):
+        """ Delete a zone by its ID.
+
+        :param integer id: the zone ID to delete
+
+        """
+        return self.domain.deleteObject(id=id)
 
     def edit_zone(self, zone):
+        """ Update an existing zone with the options provided. The provided
+        dict must include an 'id' key and value corresponding to the zone that
+        should be updated.
+
+        :param dict zone: the zone to update
+
+        """
         self.domain.editObject(zone)
 
-    def create_record(self, domid, record, type, data, ttl=60):
-        """ create_record - create a resource record on a domain
+    def create_record(self, id, record, type, data, ttl=60):
+        """ Create a resource record on a domain.
 
-            domid - int
-            record - str
-            type - str (A, AAAA, MX, ...)
-            data - str
-            ttl = int (default 60)"""
+        :param integer id: the domain's ID
+        :param record: the name of the record to add
+        :param type: the type of record (A, AAAA, CNAME, MX, SRV, TXT, etc.)
+        :param data: the record's value
+        :param integer ttl: the TTL or time-to-live value (default: 60)
+
+        """
         self.record.createObject({
-            'domainId': domid,
+            'domainId': id,
             'ttl': ttl,
             'host': record,
             'type': type,
             'data': data})
 
     def delete_record(self, recordid):
-        """ delete_record - delete resource record by ID"""
+        """ Delete a resource record by its ID.
+
+        :param integer id: the record's ID
+
+        """
         self.record.deleteObject(id=recordid)
 
     def search_record(self, domain, record):
-        """ search_record - search for all records on a domain given a specific
-        name.  Good for validating records
+        """ Search for records on a domain that match a specific name.
+        Useful for validating whether a record exists or that it has the
+        correct value.
 
-        domain - str
-        record - str"""
+        :param domain: the domain/zone name in which to search.
+        :param record: the record name to search for
+
+        """
         rrs = self.get_zone(domain)['resourceRecords']
         records = filter(lambda x: x['host'].lower() == record.lower(), rrs)
         return records
 
     def edit_record(self, record):
+        """ Update an existing record with the options provided. The provided
+        dict must include an 'id' key and value corresponding to the record
+        that should be updated.
+
+        :param dict record: the record to update
+
+        """
         self.record.editObject(record, id=record['id'])
 
-    def dump_zone(self, domid):
-        """ dump_zone - get zone in BIND format"""
-        return self.domain.getZoneFileContents(id=domid)
+    def dump_zone(self, id):
+        """ Retrieve a zone dump in BIND format.
+
+        :param integer id: The zone/domain ID to dump
+
+        """
+        return self.domain.getZoneFileContents(id=id)

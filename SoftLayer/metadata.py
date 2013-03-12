@@ -1,7 +1,7 @@
 try:
     import simplejson as json
 except ImportError:  # pragma: no cover
-    import json # NOQA
+    import json  # NOQA
 import urllib2
 
 from SoftLayer.consts import API_PRIVATE_ENDPOINT_REST, USER_AGENT
@@ -11,7 +11,8 @@ __all__ = ["MetadataManager"]
 
 
 class MetadataManager(object):
-    " MetadataManager "
+    """ Manages metadata. """
+
     attribs = {
         'backend_mac': {'call': 'BackendMacAddresses'},
         'datacenter': {'call': 'Datacenter'},
@@ -55,13 +56,13 @@ class MetadataManager(object):
 
     def get(self, name, param=None):
         if name not in self.attribs:
-            raise SoftLayerError('Metadata Attribute not known.')
+            raise SoftLayerError('Unknown metadata attribute.')
 
         call_details = self.attribs[name]
         if call_details.get('param_req'):
             if not param:
                 raise SoftLayerError(
-                    'Parameter required to fetch this attribute')
+                    'Parameter required to get this attribute.')
             url = "%s/%s.json" % (self.attribs[name]['call'], param)
         else:
             url = "%s.json" % self.attribs[name]['call']
