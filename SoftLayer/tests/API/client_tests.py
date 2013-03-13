@@ -3,7 +3,7 @@ try:
 except ImportError:
     import unittest # NOQA
 
-from mock import patch, MagicMock
+from mock import patch, MagicMock, call
 
 import SoftLayer
 import SoftLayer.API
@@ -262,3 +262,69 @@ class APICalls(unittest.TestCase):
             self.assertIn('Malformed Mask', str(e))
         else:
             self.fail('No exception raised')
+
+    @patch('SoftLayer.API.Client.call')
+    def test_iterate(self, _call):
+        # chunk=100, no limit
+        _call.side_effect = [range(100), range(100, 125)]
+        result = list(self.client['SERVICE'].METHOD(iter=True))
+
+        self.assertEquals(range(125), result)
+        _call.assert_has_calls([
+            call('SoftLayer_SERVICE', 'METHOD',
+                 limit=100, iter=True, offset=0),
+            call('SoftLayer_SERVICE', 'METHOD',
+                 limit=100, iter=True, offset=100),
+        ])
+        _call.reset_mock()
+
+        # chunk=100, no limit. Requires one extra request.
+        _call.side_effect = [range(100), range(100, 200), []]
+        result = list(self.client['SERVICE'].METHOD(iter=True))
+        self.assertEquals(range(200), result)
+        _call.assert_has_calls([
+            call('SoftLayer_SERVICE', 'METHOD',
+                 limit=100, iter=True, offset=0),
+            call('SoftLayer_SERVICE', 'METHOD',
+                 limit=100, iter=True, offset=100),
+            call('SoftLayer_SERVICE', 'METHOD',
+                 limit=100, iter=True, offset=200),
+        ])
+        _call.reset_mock()
+
+        # chunk=25, limit=30
+        _call.side_effect = [range(0, 25), range(25, 30)]
+        result = list(
+            self.client['SERVICE'].METHOD(iter=True, limit=30, chunk=25))
+        self.assertEquals(range(30), result)
+        _call.assert_has_calls([
+            call('SoftLayer_SERVICE', 'METHOD', iter=True, limit=25, offset=0),
+            call('SoftLayer_SERVICE', 'METHOD', iter=True, limit=5, offset=25),
+        ])
+        _call.reset_mock()
+
+        # A non-list was returned
+        _call.side_effect = ["test"]
+        result = list(self.client['SERVICE'].METHOD(iter=True))
+        self.assertEquals(["test"], result)
+        _call.assert_has_calls([
+            call('SoftLayer_SERVICE', 'METHOD',
+                 iter=True, limit=100, offset=0),
+        ])
+        _call.reset_mock()
+
+        # chunk=25, limit=30, offset=12
+        _call.side_effect = [range(0, 25), range(25, 30)]
+        result = list(self.client['SERVICE'].METHOD(
+            iter=True, limit=30, chunk=25, offset=12))
+        self.assertEquals(range(30), result)
+        _call.assert_has_calls([
+            call('SoftLayer_SERVICE', 'METHOD',
+                 iter=True, limit=25, offset=12),
+            call('SoftLayer_SERVICE', 'METHOD', iter=True, limit=5, offset=37),
+        ])
+
+        # Chunk size of 0 is invalid
+        self.assertRaises(
+            AttributeError,
+            lambda: list(self.client['SERVICE'].METHOD(iter=True, chunk=0)))
