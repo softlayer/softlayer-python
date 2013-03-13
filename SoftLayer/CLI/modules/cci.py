@@ -53,7 +53,7 @@ Options:
         t = Table([
             'id', 'datacenter', 'host',
             'cores', 'memory', 'primary_ip',
-            'backend_ip', 'provisioning',
+            'backend_ip', 'active_transaction',
         ])
         t.sortby = args.get('--sortby') or 'host'
 
@@ -77,7 +77,7 @@ Options:
                 guest.get('primaryIpAddress', '-'),
                 guest.get('primaryBackendIpAddress', '-'),
                 guest.get('activeTransaction', {}).get(
-                    'transactionStatus', {}).get('friendlyName', ''),
+                    'transactionStatus', {}).get('friendlyName', '<None>'),
             ])
 
         return t
