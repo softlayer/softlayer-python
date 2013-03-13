@@ -209,7 +209,7 @@ class Client(object):
             name = self._prefix + name
         return Service(self, name)
 
-    def __call__(self, service, method, *args, **kwargs):
+    def __call__(self, *args, **kwargs):
         """ Perform a SoftLayer API call.
 
         :param service: the name of the SoftLayer API service
@@ -218,6 +218,12 @@ class Client(object):
         :param dict **kwargs: response-level arguments (limit, offset, etc.)
 
         """
+        if kwargs.get('iter'):
+            return self.iter_call(*args, **kwargs)
+        else:
+            return self.call(*args, **kwargs)
+
+    def call(self, service, method, *args, **kwargs):
         objectid = kwargs.get('id')
         objectmask = kwargs.get('mask')
         objectfilter = kwargs.get('filter')
@@ -262,6 +268,46 @@ class Client(object):
         return make_api_call(uri, method, args, headers=headers,
                              http_headers=http_headers, timeout=self.timeout,
                              verbose=self.verbose)
+
+    def iter_call(self, service, method,
+                  chunk=100, limit=None, offset=0, *args, **kwargs):
+        if chunk <= 0:
+            raise AttributeError("Chunk size should be greater than zero.")
+
+        if limit:
+            chunk = min(chunk, limit)
+
+        result_count = 0
+        while True:
+            if limit:
+                # We've reached the end of the results
+                if result_count >= limit:
+                    break
+
+                # Don't over-fetch past the given limit
+                if chunk + result_count > limit:
+                    chunk = limit - result_count
+            results = self.call(service, method,
+                                offset=offset, limit=chunk, *args, **kwargs)
+
+            # It looks like we ran out results
+            if not results:
+                break
+
+            # Apparently this method doesn't return a list.
+            # Why are you even iterating over this?
+            if not isinstance(results, list):
+                yield results
+                break
+
+            for item in results:
+                yield item
+                result_count += 1
+
+            offset += chunk
+
+            if len(results) < chunk:
+                break
 
     def __format_object_mask(self, objectmask, service):
         """ Format new and old style object masks into proper headers.
