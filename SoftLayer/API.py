@@ -263,6 +263,33 @@ class Client(object):
                              http_headers=http_headers, timeout=self.timeout,
                              verbose=self.verbose)
 
+    def iter_call(self, service, method,
+                  chunk=100, limit=None, offset=0, **kwargs):
+        if chunk <= 0:
+            raise AttributeError("Chunk size should be greater than zero.")
+
+        if limit:
+            chunk = min(chunk, limit)
+
+        while True:
+            results = self(service, method,
+                           offset=offset, limit=chunk, **kwargs)
+            if not results:
+                break
+
+            if not isinstance(results, list):
+                yield results
+                break
+
+            for item in results:
+                yield item
+                offset += 1
+                if offset > limit:
+                    break
+
+            if offset >= limit:
+                break
+
     def __format_object_mask(self, objectmask, service):
         """ Format new and old style object masks into proper headers.
 
@@ -304,12 +331,16 @@ class Client(object):
         if name in ["__name__", "__bases__"]:
             raise AttributeError("'Obj' object has no attribute '%s'" % name)
 
-        def call_handler(*args, **kwargs):
+        def call_handler(iter=False, *args, **kwargs):
             if self._service_name is None:
                 raise SoftLayerError(
                     "Service is not set on Client instance.")
             kwargs['headers'] = self._headers
-            return self(self._service_name, name, *args, **kwargs)
+            if iter:
+                return self.iter_call(self._service_name, name,
+                                      *args, **kwargs)
+            else:
+                return self(self._service_name, name, *args, **kwargs)
         return call_handler
 
     def __repr__(self):
