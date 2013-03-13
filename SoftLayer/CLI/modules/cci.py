@@ -336,16 +336,17 @@ usage: sl cci create --hostname=HOST --domain=DOMAIN --cpu=CPU --memory=MEMORY
 Order/create a CCI. See 'sl cci create-options' for valid options
 
 Required:
-  -H --hostname=HOST       Host portion of the FQDN. example: server
-  -D --domain=DOMAIN       Domain portion of the FQDN example: example.com
-  -c --cpu=CPU             Number of CPU cores
-  -m --memory=MEMORY       Memory in mebibytes (n * 1024)
+  -H --hostname=HOST  Host portion of the FQDN. example: server
+  -D --domain=DOMAIN  Domain portion of the FQDN example: example.com
+  -c --cpu=CPU        Number of CPU cores
+  -m --memory=MEMORY  Memory in mebibytes (n * 1024)
 
-  -o OS, --os=OS           OS install code. Tip: you can specify <OS>_LATEST
-  --image=GUID             Image GUID. See: 'sl image list' for reference
+  -o OS, --os=OS      OS install code. Tip: you can specify <OS>_LATEST
+  --image=GUID        Image GUID. See: 'sl image list' for reference
 
-  --hourly                 Hourly rate instance type
-  --monthly                Monthly rate instance type
+  --hourly            Hourly rate instance type
+  --monthly           Monthly rate instance type
+
 
 Optional:
   -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
