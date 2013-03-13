@@ -61,12 +61,10 @@ class Environment(object):
         config = {}
 
         if not cp.has_section('softlayer'):
-            self.config = config
-            return
+            cp.add_section('softlayer')
 
         for config_name in ['username', 'api_key', 'endpoint_url']:
-            if cp.get('softlayer', config_name):
-                config[config_name] = cp.get('softlayer', config_name)
+            config[config_name] = cp.get('softlayer', config_name)
 
         self.config = config
 
