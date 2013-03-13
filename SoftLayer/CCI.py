@@ -125,6 +125,7 @@ class CCIManager(IdentifierMixin, object):
         :param integer id: the instance ID
 
         """
+
         if 'mask' not in kwargs:
             items = set([
                 'id',

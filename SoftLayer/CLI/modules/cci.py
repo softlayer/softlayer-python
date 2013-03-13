@@ -14,6 +14,7 @@ The available commands are:
   cancel          Cancel a running CCI
   create-options  Output available available options when creating a CCI
   reload          Reload the OS on a CCI based on its current configuration
+  ready           Check if a CCI has finished provisioning
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: BSD, see LICENSE for more details.
@@ -42,6 +43,24 @@ def resolve_id(cci_manager, identifier):
             (identifier, ', '.join([str(_id) for _id in cci_ids])))
 
     return cci_ids[0]
+
+
+def wait_for_transaction(manager, id, limit):
+    from time import sleep
+    from itertools import repeat
+
+    limit = int(limit)
+
+    for count, new_instance in enumerate(repeat(id)):
+        instance = NestedDict(manager.get_instance(new_instance))
+        if not instance['activeTransaction']['id'] and \
+                instance['provisionDate']:
+            return True
+
+        if count >= limit:
+            return False
+
+        sleep(1)
 
 
 class ListCCIs(CLIRunnable):
@@ -358,6 +377,8 @@ Optional:
 
   -u --userdata=DATA       User defined metadata string
   -F --userfile=FILE       Read userdata from file
+  --wait=600               Block until CCI is finished provisioning
+                             for up to X seconds before returning.
 """
     action = 'create'
     options = ['confirm']
@@ -470,7 +491,39 @@ Optional:
         else:
             raise CLIAbort('Aborting CCI order.')
 
+        if args.get('--wait') and not args.get('--test'):
+            ready = wait_for_transaction(
+                cci, result['id'], int(args.get('--wait', 1)))
+            t.add_row(['ready', ready])
+
         return output
+
+
+class ReadyCCI(CLIRunnable):
+    """
+usage: sl cci ready <id> [options]
+
+Check if a CCI is ready.
+
+Required:
+  <id>  Instance ID
+
+Optional:
+  --wait=600               Block until CCI is finished provisioning
+                             for up to X seconds before returning.
+"""
+    action = 'ready'
+
+    @staticmethod
+    def execute(client, args):
+        cci = CCIManager(client)
+
+        ready = wait_for_transaction(cci, args['<id>'], args.get('--wait', 0))
+
+        if ready:
+            return "READY"
+        else:
+            raise CLIAbort("Instance %s not ready" % args['<id>'])
 
 
 class ReloadCCI(CLIRunnable):
