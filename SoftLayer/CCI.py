@@ -23,6 +23,8 @@ class CCIManager(object):
 
         :param boolean hourly: include hourly instances
         :param boolean monthly: include monthly instances
+        :param list tags: filter based on tags
+        :param dict **kwargs: response-level arguments (limit, offset, etc.)
 
         """
         items = set([
