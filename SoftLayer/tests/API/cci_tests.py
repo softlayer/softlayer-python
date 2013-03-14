@@ -15,19 +15,20 @@ class CCITests_unittests(unittest.TestCase):
         self.cci = SoftLayer.CCIManager(self.client)
 
     def test_list_instances(self):
-
-        all_guests = [call(mask=ANY), call(mask=ANY)]
-        other_guests = [call(mask=ANY)]
+        mcall = call(mask=ANY, filter=None)
+        service = self.client.__getitem__()
 
         self.cci.list_instances(hourly=True, monthly=True)
+        service.getVirtualGuests.assert_has_calls(mcall)
+
         self.cci.list_instances(hourly=False, monthly=False)
-        self.client.__getitem__().getVirtualGuests.assert_has_calls(all_guests)
+        service.getVirtualGuests.assert_has_calls(mcall)
 
         self.cci.list_instances(hourly=False, monthly=True)
-        self.client.__getitem__().getMonthlyVirtualGuests.assert_has_calls(other_guests)
+        service.getMonthlyVirtualGuests.assert_has_calls(mcall)
 
         self.cci.list_instances(hourly=True, monthly=False)
-        self.client.__getitem__().getHourlyVirtualGuests.assert_has_calls(other_guests)
+        service.getHourlyVirtualGuests.assert_has_calls(mcall)
 
     def test_get_instance(self):
         self.client.__getitem__().getObject.return_value = {
