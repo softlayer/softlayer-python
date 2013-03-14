@@ -45,24 +45,6 @@ def resolve_id(cci_manager, identifier):
     return cci_ids[0]
 
 
-def wait_for_transaction(manager, id, limit):
-    from time import sleep
-    from itertools import repeat
-
-    limit = int(limit)
-
-    for count, new_instance in enumerate(repeat(id)):
-        instance = NestedDict(manager.get_instance(new_instance))
-        if not instance['activeTransaction']['id'] and \
-                instance['provisionDate']:
-            return True
-
-        if count >= limit:
-            return False
-
-        sleep(1)
-
-
 class ListCCIs(CLIRunnable):
     """
 usage: sl cci list [--hourly | --monthly] [--sortby=SORT_COLUMN] [--tags=TAGS]
@@ -492,8 +474,8 @@ Optional:
             raise CLIAbort('Aborting CCI order.')
 
         if args.get('--wait') and not args.get('--test'):
-            ready = wait_for_transaction(
-                cci, result['id'], int(args.get('--wait', 1)))
+            ready = cci.wait_for_transaction(
+                result['id'], int(args.get('--wait', 1)))
             t.add_row(['ready', ready])
 
         return output
@@ -518,7 +500,8 @@ Optional:
     def execute(client, args):
         cci = CCIManager(client)
 
-        ready = wait_for_transaction(cci, args['<id>'], args.get('--wait', 0))
+        ready = cci.wait_for_transaction(
+            args['<id>'], int(args.get('--wait', 0)))
 
         if ready:
             return "READY"

@@ -10,6 +10,8 @@ import socket
 
 from SoftLayer.exceptions import SoftLayerError
 from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
+from time import sleep
+from itertools import repeat
 
 
 class CCICreateMissingRequired(SoftLayerError):
@@ -264,3 +266,15 @@ class CCIManager(IdentifierMixin, object):
         results = self.list_instances(private_ip=ip, mask="id")
         if results:
             return [result['id'] for result in results]
+
+    def wait_for_transaction(self, id, limit):
+        for count, new_instance in enumerate(repeat(id)):
+            instance = self.get_instance(new_instance)
+            if not instance['activeTransaction']['id'] and \
+                    instance['provisionDate']:
+                return True
+
+            if count >= limit:
+                return False
+
+            sleep(1)
