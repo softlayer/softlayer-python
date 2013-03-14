@@ -22,11 +22,13 @@ class DNSManager(object):
         self.domain = self.client['Dns_Domain']
         self.record = self.client['Dns_Domain_ResourceRecord']
 
-    def list_zones(self):
-        """ Get a list of all DNS zones. """
-        account = self.client['Account']
-        acc = account.getObject(mask='mask.domains')
-        return acc['domains']
+    def list_zones(self, **kwargs):
+        """ Retrieve a list of all DNS zones.
+
+        :param dict **kwargs: response-level arguments (limit, offset, etc.)
+
+        """
+        return self.client['Account'].getDomains(**kwargs)
 
     def get_zone(self, domain):
         """ Get a domain/zone and its records.
