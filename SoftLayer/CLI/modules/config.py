@@ -43,6 +43,7 @@ Setup configuration
 
         config = ConfigParser.RawConfigParser()
         config.add_section('softlayer')
+
         if username:
             config.set('softlayer', 'username', username)
 
@@ -74,6 +75,6 @@ Show current configuration
         t.align['Value'] = 'l'
         config = cls.env.config
         t.add_row(['Username', config.get('username', 'none set')])
-        t.add_row(['API Key', config.get('api_kye', 'none set')])
+        t.add_row(['API Key', config.get('api_key', 'none set')])
         t.add_row(['Endpoint URL', config.get('endpoint_url', 'none set')])
         return t
