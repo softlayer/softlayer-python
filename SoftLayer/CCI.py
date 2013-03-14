@@ -18,11 +18,13 @@ class CCIManager(object):
         self.account = client['Account']
         self.guest = client['Virtual_Guest']
 
-    def list_instances(self, hourly=True, monthly=True):
+    def list_instances(self, hourly=True, monthly=True, tags=None, **kwargs):
         """ Retrieve a list of all CCIs on the account.
 
         :param boolean hourly: include hourly instances
         :param boolean monthly: include monthly instances
+        :param list tags: filter based on tags
+        :param dict **kwargs: response-level arguments (limit, offset, etc.)
 
         """
         items = set([
@@ -50,8 +52,21 @@ class CCIManager(object):
 
         mask = "mask[%s]" % ','.join(items)
 
+        _filter = None
+        if tags:
+            _filter = {
+                'virtualGuests': {
+                    'tagReferences': {
+                        'tag': {'name': {
+                            'operation': 'in',
+                            'options': {'name': 'data', 'value': tags}
+                        }}
+                    }
+                }
+            }
+
         func = getattr(self.account, call)
-        return func(mask=mask)
+        return func(mask=mask, filter=_filter)
 
     def get_instance(self, id):
         items = set([

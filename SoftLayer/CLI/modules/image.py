@@ -28,31 +28,32 @@ Options:
 
         neither = not any([args['--private'], args['--public']])
 
-        result = []
+        results = []
         if args['--private'] or neither:
             account = client['Account']
-            private = "privateBlockDeviceTemplateGroups"
-            mask = (
-                private +
-                '[id,accountId,name,globalIdentifier,blockDevices,parentId]')
+            mask = 'id,accountId,name,globalIdentifier,blockDevices,parentId'
+            r = account.getPrivateBlockDeviceTemplateGroups(mask=mask)
 
-            result += account.getObject(mask=mask)[private]
+            results.append(r)
 
         if args['--public'] or neither:
             vgbd = client['Virtual_Guest_Block_Device_Template_Group']
-            result += vgbd.getPublicImages()
+            r = vgbd.getPublicImages()
+
+            results.append(r)
 
         t = Table(['id', 'account', 'type', 'name', 'guid', ])
         t.sortby = 'name'
 
-        images = filter(lambda x: x['parentId'] == '', result)
-        for image in images:
-            t.add_row([
-                image['id'],
-                image.get('accountId', '-'),
-                image.get('type', '-'),
-                image['name'].strip(),
-                image.get('globalIdentifier', '-'),
-            ])
+        for result in results:
+            images = filter(lambda x: x['parentId'] == '', result)
+            for image in images:
+                t.add_row([
+                    image['id'],
+                    image.get('accountId', '-'),
+                    image.get('type', '-'),
+                    image['name'].strip(),
+                    image.get('globalIdentifier', '-'),
+                ])
 
         return t

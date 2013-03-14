@@ -19,8 +19,7 @@ class DNSTests(unittest.TestCase):
 
     def test_list_zones(self):
         zone_list = ['test']
-        self.client.__getitem__().getObject.return_value = {
-            'domains': zone_list}
+        self.client.__getitem__().getDomains.return_value = zone_list
         zones = self.dns_client.list_zones()
         self.assertEqual(zones, zone_list)
 
