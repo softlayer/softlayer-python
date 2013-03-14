@@ -10,7 +10,7 @@ The available commands are:
 # :license: BSD, see LICENSE for more details.
 
 from SoftLayer.CLI import CLIRunnable, Table, FormattedItem
-from SoftLayer.CLI.helpers import NestedDict
+from SoftLayer.CLI.helpers import NestedDict, blank
 
 
 class ListNAS(CLIRunnable):
@@ -37,11 +37,11 @@ Options:
         for n in nas:
             t.add_row([
                 n['id'],
-                n['serviceResource']['datacenter'].get('name', '-'),
-                FormattedItem(n.get('capacityGb', '-'),
+                n['serviceResource']['datacenter'].get('name', blank()),
+                FormattedItem(n.get('capacityGb', blank()),
                     "%dGB" % n.get('capacityGb', 0)),
-                n.get('username', '-'),
-                n.get('password', '-'),
-                n.get('serviceResourceBackendIpAddress', '-')])
+                n.get('username', blank()),
+                n.get('password', blank()),
+                n.get('serviceResourceBackendIpAddress', blank())])
 
         return t
