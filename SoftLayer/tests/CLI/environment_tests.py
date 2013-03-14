@@ -46,19 +46,23 @@ class EnvironmentTests(unittest.TestCase):
 
     def test_parse_config_no_files(self):
         self.env.load_config([])
-        self.assertEqual({}, self.env.config)
+        self.assertEqual({'endpoint_url': API_PUBLIC_ENDPOINT,
+            'username': '', 'api_key': ''}, self.env.config)
 
     def test_parse_config_no_softlayer_section(self):
         path = os.path.join(FIXTURE_PATH, 'empty.conf')
         self.env.load_config([path])
-        self.assertEqual({}, self.env.config)
+        self.assertEqual({'endpoint_url': API_PUBLIC_ENDPOINT,
+            'username': '', 'api_key': ''}, self.env.config)
 
     @patch('os.environ', {})
     def test_parse_config_empty(self):
         path = os.path.join(FIXTURE_PATH, 'no_options.conf')
         self.env.load_config([path])
         self.assertEqual(
-            {'endpoint_url': API_PUBLIC_ENDPOINT}, self.env.config)
+            {'endpoint_url': API_PUBLIC_ENDPOINT,
+                'username': '',
+                'api_key': ''}, self.env.config)
 
     def test_parse_config(self):
         path = os.path.join(FIXTURE_PATH, 'full.conf')
