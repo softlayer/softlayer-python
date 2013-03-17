@@ -22,7 +22,7 @@ class CCITests_unittests(unittest.TestCase):
         self.cci = SoftLayer.CCIManager(self.client)
 
     def test_list_instances(self):
-        mcall = call(mask=ANY, filter=None)
+        mcall = call(mask=ANY, filter={})
         service = self.client.__getitem__()
 
         self.cci.list_instances(hourly=True, monthly=True)
@@ -36,6 +36,61 @@ class CCITests_unittests(unittest.TestCase):
 
         self.cci.list_instances(hourly=True, monthly=False)
         service.getHourlyVirtualGuests.assert_has_calls(mcall)
+
+    def test_list_instances_with_filters(self):
+        self.cci.list_instances(
+            hourly=True,
+            monthly=True,
+            tags=['tag1', 'tag2'],
+            cpus=2,
+            memory=1024,
+            hostname='hostname',
+            domain='example.com',
+            local_disk=True,
+            datacenter='dal05',
+            private=True,
+            nic_speed=100,
+        )
+
+        service = self.client.__getitem__()
+        service.getVirtualGuests.assert_has_calls(call(
+            filter={
+                'virtualGuests': {
+                    'datacenter': {
+                        'name': {'operation': 'dal05'}},
+                    'domain': {'operation': 'example.com'},
+                    'tagReferences': {
+                        'tag': {'name': {
+                            'operation': 'in',
+                            'options': [{
+                                'name': 'data', 'value': ['tag1', 'tag2']}]}}},
+                    'maxCpu': {'operation': 2},
+                    'localDiskFlag': {'operation': True},
+                    'maxMemory': {'operation': 1024},
+                    'hostname': {'operation': 'hostname'},
+                    'dedicatedAccountHostOnlyFlag': {'operation': True},
+                    'networkComponents': {'maxSpeed': {'operation': 100}}}},
+            mask=ANY,
+        ))
+
+    def test_query_filter(self):
+        result = SoftLayer.CCI.query_filter('test')
+        self.assertEqual({'operation': 'test'}, result)
+
+        result = SoftLayer.CCI.query_filter('*test')
+        self.assertEqual({'operation': '$= test'}, result)
+
+        result = SoftLayer.CCI.query_filter('test*')
+        self.assertEqual({'operation': '^= test'}, result)
+
+        result = SoftLayer.CCI.query_filter('*test*')
+        self.assertEqual({'operation': '~ test'}, result)
+
+        result = SoftLayer.CCI.query_filter('> 10')
+        self.assertEqual({'operation': '> 10'}, result)
+
+        result = SoftLayer.CCI.query_filter(10)
+        self.assertEqual({'operation': 10}, result)
 
     def test_get_instance(self):
         self.client.__getitem__().getObject.return_value = {
