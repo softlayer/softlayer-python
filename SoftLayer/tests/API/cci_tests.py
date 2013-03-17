@@ -48,7 +48,6 @@ class CCITests_unittests(unittest.TestCase):
             domain='example.com',
             local_disk=True,
             datacenter='dal05',
-            private=True,
             nic_speed=100,
         )
 
@@ -68,7 +67,6 @@ class CCITests_unittests(unittest.TestCase):
                     'localDiskFlag': {'operation': True},
                     'maxMemory': {'operation': 1024},
                     'hostname': {'operation': 'hostname'},
-                    'dedicatedAccountHostOnlyFlag': {'operation': True},
                     'networkComponents': {'maxSpeed': {'operation': 100}}}},
             mask=ANY,
         ))
