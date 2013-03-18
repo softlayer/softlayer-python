@@ -1,3 +1,10 @@
+"""
+    SoftLayer.tests.API.ssl_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
 from SoftLayer.SSL import SSLManager
 
 try:

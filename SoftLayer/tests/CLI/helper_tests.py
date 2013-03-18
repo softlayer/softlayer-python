@@ -1,3 +1,10 @@
+"""
+    SoftLayer.tests.CLI.helper_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
 import sys
 try:
     import unittest2 as unittest

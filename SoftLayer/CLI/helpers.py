@@ -1,3 +1,11 @@
+"""
+    SoftLayer.helpers
+    ~~~~~~~~~~~~~~~~~
+    Helpers to be used in CLI modules in SoftLayer.CLI.modules.*
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
 from SoftLayer.CLI.environment import CLIRunnableType
 from prettytable import PrettyTable
 

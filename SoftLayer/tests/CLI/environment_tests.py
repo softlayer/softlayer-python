@@ -1,3 +1,10 @@
+"""
+    SoftLayer.tests.CLI.environment_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
 import sys
 import os
 try:
@@ -44,16 +51,22 @@ class EnvironmentTests(unittest.TestCase):
         raw_input_mock.assert_called_with('input')
         self.assertEqual(raw_input_mock(), r)
 
+    @patch('os.environ', {})
     def test_parse_config_no_files(self):
         self.env.load_config([])
-        self.assertEqual({'endpoint_url': API_PUBLIC_ENDPOINT,
-            'username': '', 'api_key': ''}, self.env.config)
+        self.assertEqual({
+            'endpoint_url': API_PUBLIC_ENDPOINT,
+            'username': '', 'api_key': ''
+        }, self.env.config)
 
+    @patch('os.environ', {})
     def test_parse_config_no_softlayer_section(self):
         path = os.path.join(FIXTURE_PATH, 'empty.conf')
         self.env.load_config([path])
-        self.assertEqual({'endpoint_url': API_PUBLIC_ENDPOINT,
-            'username': '', 'api_key': ''}, self.env.config)
+        self.assertEqual({
+            'endpoint_url': API_PUBLIC_ENDPOINT,
+            'username': '', 'api_key': ''
+        }, self.env.config)
 
     @patch('os.environ', {})
     def test_parse_config_empty(self):

@@ -1,3 +1,10 @@
+"""
+    SoftLayer.tests.API.cci_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
 import SoftLayer
 import SoftLayer.CCI
 
@@ -39,19 +46,25 @@ class CCITests_unittests(unittest.TestCase):
 
     def test_get_create_options(self):
         self.cci.get_create_options()
-        self.client.__getitem__().getCreateObjectOptions.assert_called_once_with()
+        f = self.client.__getitem__().getCreateObjectOptions
+        f.assert_called_once_with()
 
     def test_cancel_instance(self):
         self.cci.cancel_instance(id=1)
         self.client.__getitem__().deleteObject.assert_called_once_with(id=1)
+
+    def test_reload_instance(self):
+        self.cci.reload_instance(id=1)
+        f = self.client.__getitem__().reloadCurrentOperatingSystemConfiguration
+        f.assert_called_once_with(id=1)
 
     @patch('SoftLayer.CCI.CCIManager._generate_create_dict')
     def test_create_verify(self, create_dict):
         create_dict.return_value = {'test': 1, 'verify': 1}
         self.cci.verify_create_instance(test=1, verify=1)
         create_dict.assert_called_once_with(test=1, verify=1)
-        self.client.__getitem__().generateOrderTemplate.assert_called_once_with(
-            {'test': 1, 'verify': 1})
+        f = self.client.__getitem__().generateOrderTemplate
+        f.assert_called_once_with({'test': 1, 'verify': 1})
 
     @patch('SoftLayer.CCI.CCIManager._generate_create_dict')
     def test_create_instance(self, create_dict):
