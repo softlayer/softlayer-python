@@ -12,10 +12,10 @@ The available commands are:
   add     Add resource record
   print   Print zone in BIND format
   delete  Delete zone
-
-    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
-    :license: BSD, see LICENSE for more details.
 """
+# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+# :license: BSD, see LICENSE for more details.
+
 from SoftLayer.CLI import CLIRunnable, no_going_back, Table, CLIAbort
 from SoftLayer.DNS import DNSManager
 

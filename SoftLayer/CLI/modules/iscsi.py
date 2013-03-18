@@ -5,10 +5,9 @@ Manage iSCSI targets
 
 The available commands are:
   list  List NAS accounts
-
-    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
-    :license: BSD, see LICENSE for more details.
 """
+# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+# :license: BSD, see LICENSE for more details.
 
 from SoftLayer.CLI import CLIRunnable, Table, FormattedItem
 from SoftLayer.CLI.helpers import NestedDict
