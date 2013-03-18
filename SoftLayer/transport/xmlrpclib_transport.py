@@ -1,3 +1,12 @@
+"""
+    SoftLayer.transport.requests_transport
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    XML-RPC transport layer that uses the built-in xmlrpclib library. This
+    exists to support Python 2.5.
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
 from SoftLayer.exceptions import (
     SoftLayerAPIError, NotWellFormed, UnsupportedEncoding, InvalidCharacter,
     SpecViolation, MethodNotFound, InvalidMethodParameters, InternalError,

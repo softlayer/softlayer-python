@@ -1,3 +1,11 @@
+"""
+    SoftLayer.metadata
+    ~~~~~~~~~~~~~~~~~~
+    Metadata Manager/helpers
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
 try:
     import simplejson as json
 except ImportError:  # pragma: no cover

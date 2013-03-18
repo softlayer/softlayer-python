@@ -1,2 +1,12 @@
+"""
+    SoftLayer.CLI
+    ~~~~~~~~~~~~~~
+    Contains all code related to the CLI interface
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
+
+
 import SoftLayer.CLI.core
 from SoftLayer.CLI.helpers import *

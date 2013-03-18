@@ -5,6 +5,9 @@ Manage NAS accounts
 
 The available commands are:
   list  List NAS accounts
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
 """
 
 from SoftLayer.CLI import CLIRunnable, Table, FormattedItem

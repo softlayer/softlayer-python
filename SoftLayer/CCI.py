@@ -1,3 +1,11 @@
+"""
+    SoftLayer.CCI
+    ~~~~~~~~~~~~~
+    CCI Manager/helpers
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
 from SoftLayer.exceptions import SoftLayerError
 
 

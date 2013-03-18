@@ -14,7 +14,11 @@ The available commands are:
   cancel          Cancel a running CCI
   create-options  Output available available options when creating a CCI
   reload          Reload the OS on a CCI based on its current configuration
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
 """
+
 
 from os import linesep
 import os.path
