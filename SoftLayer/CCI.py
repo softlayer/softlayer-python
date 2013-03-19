@@ -7,6 +7,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from SoftLayer.exceptions import SoftLayerError
+from SoftLayer.utils import NestedDict, query_filter
 
 
 class CCICreateMissingRequired(SoftLayerError):
@@ -26,12 +27,22 @@ class CCIManager(object):
         self.account = client['Account']
         self.guest = client['Virtual_Guest']
 
-    def list_instances(self, hourly=True, monthly=True, tags=None, **kwargs):
+    def list_instances(self, hourly=True, monthly=True, tags=None, cpus=None,
+                       memory=None, hostname=None, domain=None,
+                       local_disk=None, datacenter=None, nic_speed=None,
+                       **kwargs):
         """ Retrieve a list of all CCIs on the account.
 
         :param boolean hourly: include hourly instances
         :param boolean monthly: include monthly instances
         :param list tags: filter based on tags
+        :param integer cpus: filter based on number of CPUS
+        :param integer memory: filter based on amount of memory
+        :param string hostname: filter based on hostname
+        :param string domain: filter based on domain
+        :param string local_disk: filter based on local_disk
+        :param string datacenter: filter based on datacenter
+        :param integer nic_speed: filter based on network speed (in MBPS)
         :param dict **kwargs: response-level arguments (limit, offset, etc.)
 
         """
@@ -60,23 +71,47 @@ class CCIManager(object):
 
         mask = "mask[%s]" % ','.join(items)
 
-        _filter = None
+        _filter = NestedDict(kwargs.get('filter') or {})
         if tags:
-            _filter = {
-                'virtualGuests': {
-                    'tagReferences': {
-                        'tag': {'name': {
-                            'operation': 'in',
-                            'options': {'name': 'data', 'value': tags}
-                        }}
-                    }
-                }
+            _filter['virtualGuests']['tagReferences']['tag']['name'] = {
+                'operation': 'in',
+                'options': [{'name': 'data', 'value': tags}],
             }
 
+        if cpus:
+            _filter['virtualGuests']['maxCpu'] = query_filter(cpus)
+
+        if memory:
+            _filter['virtualGuests']['maxMemory'] = query_filter(memory)
+
+        if hostname:
+            _filter['virtualGuests']['hostname'] = query_filter(hostname)
+
+        if domain:
+            _filter['virtualGuests']['domain'] = query_filter(domain)
+
+        if local_disk is not None:
+            _filter['virtualGuests']['localDiskFlag'] = \
+                query_filter(bool(local_disk))
+
+        if datacenter:
+            _filter['virtualGuests']['datacenter']['name'] = \
+                query_filter(datacenter)
+
+        if nic_speed:
+            _filter['virtualGuests']['networkComponents']['maxSpeed'] = \
+                query_filter(nic_speed)
+
+        kwargs['filter'] = _filter.to_dict()
         func = getattr(self.account, call)
-        return func(mask=mask, filter=_filter)
+        return func(mask=mask, **kwargs)
 
     def get_instance(self, id):
+        """ Get details about a CCI instance
+
+        :param integer id: the instance ID
+
+        """
         items = set([
             'id',
             'globalIdentifier',
@@ -171,12 +206,12 @@ class CCIManager(object):
 
         if public_vlan:
             data.update({
-                'primaryNetworkComponent':
-                    {"networkVlan": {"id": int(public_vlan)}}})
+                'primaryNetworkComponent': {
+                    "networkVlan": {"id": int(public_vlan)}}})
         if private_vlan:
             data.update({
-                "primaryBackendNetworkComponent":
-                    {"networkVlan": {"id": int(private_vlan)}}})
+                "primaryBackendNetworkComponent": {
+                    "networkVlan": {"id": int(private_vlan)}}})
 
         if userdata:
             data['userData'] = [{'value': userdata}, ]
