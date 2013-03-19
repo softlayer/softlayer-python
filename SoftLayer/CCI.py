@@ -46,13 +46,13 @@ class CCIManager(IdentifierMixin, object):
         :param string hostname: filter based on hostname
         :param string domain: filter based on domain
         :param string local_disk: filter based on local_disk
-        :param string datacenter: filter based on datacenter
-        :param integer nic_speed: filter based on network speed (in MBPS)
-        :param string public_ip: filter based on public ip address
-        :param string private_ip: filter based on private ip address
-        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+    :param string datacenter: filter based on datacenter
+    :param integer nic_speed: filter based on network speed (in MBPS)
+    :param string public_ip: filter based on public ip address
+    :param string private_ip: filter based on private ip address
+    :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
 
-        """
+    """
         if 'mask' not in kwargs:
             items = set([
                 'id',
@@ -180,11 +180,11 @@ class CCIManager(IdentifierMixin, object):
         return self.guest.reloadCurrentOperatingSystemConfiguration(id=id)
 
     def _generate_create_dict(
-            self, cpus=None, memory=None, hourly=True,
-            hostname=None, domain=None, local_disk=True,
-            datacenter=None, os_code=None, image_id=None,
-            private=False, public_vlan=None, private_vlan=None,
-            userdata=None, nic_speed=None):
+        self, cpus=None, memory=None, hourly=True,
+        hostname=None, domain=None, local_disk=True,
+        datacenter=None, os_code=None, image_id=None,
+        private=False, public_vlan=None, private_vlan=None,
+        userdata=None, nic_speed=None):
 
         required = [cpus, memory, hostname, domain]
 
@@ -237,6 +237,18 @@ class CCIManager(IdentifierMixin, object):
 
         return data
 
+    def wait_for_transaction(self, id, limit, delay=1):
+        for count, new_instance in enumerate(repeat(id)):
+            instance = self.get_instance(new_instance)
+            if not instance['activeTransaction']['id'] and \
+                    instance['provisionDate']:
+                return True
+
+            if count >= limit:
+                return False
+
+            sleep(delay)
+
     def verify_create_instance(self, **kwargs):
         """ see _generate_create_dict """  # TODO: document this
         create_options = self._generate_create_dict(**kwargs)
@@ -266,15 +278,3 @@ class CCIManager(IdentifierMixin, object):
         results = self.list_instances(private_ip=ip, mask="id")
         if results:
             return [result['id'] for result in results]
-
-    def wait_for_transaction(self, id, limit):
-        for count, new_instance in enumerate(repeat(id)):
-            instance = self.get_instance(new_instance)
-            if not instance['activeTransaction']['id'] and \
-                    instance['provisionDate']:
-                return True
-
-            if count >= limit:
-                return False
-
-            sleep(1)
