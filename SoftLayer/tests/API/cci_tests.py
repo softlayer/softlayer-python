@@ -56,8 +56,8 @@ class CCITests_unittests(unittest.TestCase):
             filter={
                 'virtualGuests': {
                     'datacenter': {
-                        'name': {'operation': 'dal05'}},
-                    'domain': {'operation': 'example.com'},
+                        'name': {'operation': '_= dal05'}},
+                    'domain': {'operation': '_= example.com'},
                     'tagReferences': {
                         'tag': {'name': {
                             'operation': 'in',
@@ -66,7 +66,7 @@ class CCITests_unittests(unittest.TestCase):
                     'maxCpu': {'operation': 2},
                     'localDiskFlag': {'operation': True},
                     'maxMemory': {'operation': 1024},
-                    'hostname': {'operation': 'hostname'},
+                    'hostname': {'operation': '_= hostname'},
                     'networkComponents': {'maxSpeed': {'operation': 100}}}},
             mask=ANY,
         ))

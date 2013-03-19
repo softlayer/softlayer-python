@@ -22,18 +22,28 @@ def query_filter(query):
     """ Translate a query-style string to a 'filter'. Query can be the
     following formats:
 
-    * 'query' - exact query
-    * 'query*' - prefix
-    * '*query' - postfix
-    * '*query*' - matches
-    * '> query' '>= query' - greater-than/greater-than or equal
-    * '< query' '<= query' - less-than/less-than or equal
+    Case Insensitive
+      'value'   Exact value match
+      'value*'  Begins with value
+      '*value'  Ends with value
+      '*value*' Contains value
+
+    Case Sensitive
+      '~ value'   Exact value match
+      '> value'   Greater than value
+      '< value'   Less than value
+      '>= value'  Greater than or equal to value
+      '<= value'  Less than or equal to value
 
     :param string query: query string
 
     """
     if isinstance(query, basestring):
         query = query.strip()
+        for op in KNOWN_OPERATIONS:
+            if query.startswith(op):
+                query = "%s %s" % (op, query[len(op):].strip())
+                return {'operation': query}
         if query.startswith('*') and query.endswith('*'):
             query = "~ %s" % query.strip('*')
         elif query.startswith('*'):
@@ -41,9 +51,6 @@ def query_filter(query):
         elif query.endswith('*'):
             query = "^= %s" % query.strip('*')
         else:
-            for op in KNOWN_OPERATIONS:
-                if query.startswith(op):
-                    query = "%s %s" % (op, query[len(op):].strip())
-                    break
+            query = "_= %s" % query
 
     return {'operation': query}

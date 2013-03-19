@@ -41,7 +41,10 @@ class TestUtils(unittest.TestCase):
 
     def test_query_filter(self):
         result = SoftLayer.utils.query_filter('test')
-        self.assertEqual({'operation': 'test'}, result)
+        self.assertEqual({'operation': '_= test'}, result)
+
+        result = SoftLayer.utils.query_filter('~ test')
+        self.assertEqual({'operation': '~ test'}, result)
 
         result = SoftLayer.utils.query_filter('*test')
         self.assertEqual({'operation': '$= test'}, result)
