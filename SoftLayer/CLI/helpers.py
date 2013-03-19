@@ -33,8 +33,8 @@ def mb_to_gb(megabytes):
 
 def blank():
     """ Returns FormatedItem to make pretty output use a dash
-    and raw formatting to use <None>"""
-    return FormattedItem('<None>', '-')
+    and raw formatting to use NULL"""
+    return FormattedItem('NULL', '-')
 
 
 def listing(item, separator=','):
