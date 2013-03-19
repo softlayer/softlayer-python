@@ -1,3 +1,11 @@
+"""
+    SoftLayer.DNS
+    ~~~~~~~~~~~~~
+    DNS Manager/helpers
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
 from time import strftime
 from SoftLayer.exceptions import SoftLayerError
 

@@ -1,3 +1,11 @@
+"""
+    SoftLayer.tests.basic_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Tests shared code
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
 try:
     import unittest2 as unittest
 except ImportError:

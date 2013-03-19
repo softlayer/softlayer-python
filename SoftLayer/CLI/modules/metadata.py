@@ -20,6 +20,9 @@ The available commands are:
   id               Id
   network          Details about either the public or private network
 """
+# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+# :license: BSD, see LICENSE for more details.
+
 from SoftLayer.metadata import MetadataManager
 from SoftLayer.CLI import CLIRunnable, Table, listing, CLIAbort
 
