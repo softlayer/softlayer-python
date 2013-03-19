@@ -1,3 +1,4 @@
+KNOWN_OPERATIONS = ['<=', '>=', '<', '>', '~', '*=', '^=', '$=', '_=', '!~']
 
 
 class NestedDict(dict):
@@ -39,5 +40,10 @@ def query_filter(query):
             query = "$= %s" % query.strip('*')
         elif query.endswith('*'):
             query = "^= %s" % query.strip('*')
+        else:
+            for op in KNOWN_OPERATIONS:
+                if query.startswith(op):
+                    query = "%s %s" % (op, query[len(op):].strip())
+                    break
 
     return {'operation': query}

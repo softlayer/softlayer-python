@@ -36,6 +36,16 @@ usage: sl cci list [--hourly | --monthly] [--sortby=SORT_COLUMN] [--tags=TAGS]
 
 List CCIs
 
+Examples:
+    sl cci list --datacenter=dal05
+    sl cci list --network=100 --cpu=2
+    sl cci list --memory='>= 2048'
+    sl cci list --tags=production,db
+
+Options:
+  --sortby=ARG  Column to sort by. options: id, datacenter, host,
+                Cores, memory, primary_ip, backend_ip
+
 Filters:
   --hourly                 Show hourly instances
   --monthly                Show monthly instances
@@ -45,17 +55,10 @@ Filters:
   -m --memory=MEMORY       Memory in mebibytes (n * 1024)
   -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
   -n MBPS, --network=MBPS  Network port speed in Mbps
-  --tags=ARG               Only show instances that have one of these tags
+  --tags=ARG               Only show instances that have one of these tags.
+                           Comma-separated. (production,db)
 
-Options:
-  --sortby=ARG  Column to sort by. options: id, datacenter, host,
-                Cores, memory, primary_ip, backend_ip
-
-Examples:
-    sl cci list --datacenter=dal05
-    sl cci list --network=100 --cpu=2
-    sl cci list --memory='>= 2048'
-    sl cci list --tags=production,db
+For more on filters see 'sl help filters'
 """
     action = 'list'
 
@@ -140,8 +143,8 @@ Options:
         t.add_row(['cores', result['maxCpu']])
         t.add_row(['memory', mb_to_gb(result['maxMemory'])])
         t.add_row(['public_ip', result.get('primaryIpAddress', blank())])
-        t.add_row(['private_ip',
-            result.get('primaryBackendIpAddress', blank())])
+        t.add_row(
+            ['private_ip', result.get('primaryBackendIpAddress', blank())])
         t.add_row([
             'os',
             FormattedItem(

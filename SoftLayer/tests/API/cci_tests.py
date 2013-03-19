@@ -71,25 +71,6 @@ class CCITests_unittests(unittest.TestCase):
             mask=ANY,
         ))
 
-    def test_query_filter(self):
-        result = SoftLayer.CCI.query_filter('test')
-        self.assertEqual({'operation': 'test'}, result)
-
-        result = SoftLayer.CCI.query_filter('*test')
-        self.assertEqual({'operation': '$= test'}, result)
-
-        result = SoftLayer.CCI.query_filter('test*')
-        self.assertEqual({'operation': '^= test'}, result)
-
-        result = SoftLayer.CCI.query_filter('*test*')
-        self.assertEqual({'operation': '~ test'}, result)
-
-        result = SoftLayer.CCI.query_filter('> 10')
-        self.assertEqual({'operation': '> 10'}, result)
-
-        result = SoftLayer.CCI.query_filter(10)
-        self.assertEqual({'operation': 10}, result)
-
     def test_get_instance(self):
         self.client.__getitem__().getObject.return_value = {
             'hourlyVirtualGuests': "this is unique"}
