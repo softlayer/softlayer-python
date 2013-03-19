@@ -83,6 +83,8 @@ def format_no_tty(table):
     t.hrules = NONE
     t.border = False
     t.header = False
+    t.left_padding_width = 0
+    t.right_padding_width = 2
     return t
 
 
