@@ -357,3 +357,57 @@ class CCITests_unittests(unittest.TestCase):
         }
 
         self.assertEqual(data, assert_data)
+
+    @patch('SoftLayer.CCI.sleep')
+    def test_wait(self, _sleep):
+        guestObject = self.client.__getitem__().getObject
+
+        # test 4 iterations with only 3 sleeps being called
+        guestObject.side_effect = [
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'provisionDate': 'aaa'},
+            {'provisionDate': 'aaa'}
+        ]
+
+        value = self.cci.wait_for_transaction(1, 4)
+        self.assertTrue(value)
+        _sleep.assert_has_calls([call(1), call(1), call(1)])
+
+        # test 2 iterations, with no matches
+        _sleep.reset_mock()
+        guestObject.reset_mock()
+
+        guestObject.side_effect = [
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'provisionDate': 'aaa'}
+        ]
+        value = self.cci.wait_for_transaction(1, 2)
+        self.assertFalse(value)
+        _sleep.assert_has_calls([call(1), call(1)])
+
+        # 10 iterations at 10 second sleeps with no
+        # matching values.
+        _sleep.reset_mock()
+        guestObject.reset_mock()
+        guestObject.side_effect = [
+            {},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}}
+        ]
+        value = self.cci.wait_for_transaction(1, 10, 10)
+        self.assertFalse(value)
+        _sleep.assert_has_calls([
+            call(10), call(10), call(10), call(10), call(10),
+            call(10), call(10), call(10), call(10), call(10)])

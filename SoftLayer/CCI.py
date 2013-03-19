@@ -240,8 +240,8 @@ class CCIManager(IdentifierMixin, object):
     def wait_for_transaction(self, id, limit, delay=1):
         for count, new_instance in enumerate(repeat(id)):
             instance = self.get_instance(new_instance)
-            if not instance['activeTransaction']['id'] and \
-                    instance['provisionDate']:
+            if not instance.get('activeTransaction', {}).get('id') and \
+                    instance.get('provisionDate'):
                 return True
 
             if count >= limit:
