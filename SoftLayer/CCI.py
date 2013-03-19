@@ -109,6 +109,11 @@ class CCIManager(object):
 
         return self.guest.getObject(mask=mask, id=id)
 
+    def get_instance_passwords(self, id):
+        """ Returns a list of passwords for an instance. """
+        os_info = self.guest.getOperatingSystem(mask='mask.passwords', id=id)
+        return os_info['passwords'] if 'passwords' in os_info else []
+
     def get_create_options(self):
         return self.guest.getCreateObjectOptions()
 

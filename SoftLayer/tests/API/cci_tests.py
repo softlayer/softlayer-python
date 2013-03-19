@@ -58,6 +58,11 @@ class CCITests_unittests(unittest.TestCase):
         f = self.client.__getitem__().reloadCurrentOperatingSystemConfiguration
         f.assert_called_once_with(id=1)
 
+    def test_get_instance_passwords(self):
+        self.cci.get_instance_passwords(id=1)
+        f = self.client.__getitem__().getOperatingSystem
+        f.assert_called_once_with(mask='mask.passwords', id=1)
+
     @patch('SoftLayer.CCI.CCIManager._generate_create_dict')
     def test_create_verify(self, create_dict):
         create_dict.return_value = {'test': 1, 'verify': 1}
