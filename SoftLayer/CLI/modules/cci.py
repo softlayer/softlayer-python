@@ -80,7 +80,7 @@ Options:
                 guest.get('primaryIpAddress', blank()),
                 guest.get('primaryBackendIpAddress', blank()),
                 guest.get('activeTransaction', {}).get(
-                    'transactionStatus', {}).get('friendlyName', '<None>'),
+                    'transactionStatus', {}).get('friendlyName', blank()),
             ])
 
         return t
