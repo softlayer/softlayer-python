@@ -7,10 +7,12 @@
     :license: BSD, see LICENSE for more details.
 """
 from SoftLayer.CLI.environment import CLIRunnableType
+from SoftLayer.utils import NestedDict
 from prettytable import PrettyTable
 
 __all__ = ['Table', 'CLIRunnable', 'FormattedItem', 'valid_response',
-           'confirm', 'no_going_back', 'mb_to_gb', 'listing', 'CLIAbort']
+           'confirm', 'no_going_back', 'mb_to_gb', 'listing', 'CLIAbort',
+           'NestedDict']
 
 
 class FormattedItem(object):
@@ -137,11 +139,3 @@ class Table(object):
 class SequentialOutput(list):
     def __init__(self, blanks=True, *args, **kwargs):
         self.blanks = blanks
-
-
-class NestedDict(dict):
-
-    def __getitem__(self, key):
-        if key in self:
-            return self.get(key)
-        return self.setdefault(key, NestedDict())

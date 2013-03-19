@@ -157,7 +157,7 @@ def main(args=sys.argv[1:], env=Environment()):
             parse_main_args(['--help'])
 
         module = env.load_module(module_name)
-        actions = env.plugins[module_name]
+        actions = env.plugins.get(module_name) or []
 
         # handle `sl <command> ...`
         module_args = parse_module_args(
