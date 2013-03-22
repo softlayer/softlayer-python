@@ -103,3 +103,39 @@ class TestNestedDict(unittest.TestCase):
         self.assertEqual(dict, type(d['test']['test1']))
         self.assertEqual(dict, type(d['test']['test1']['test2']))
         self.assertEqual(dict, type(d['test']['test1']['test2']['test3']))
+
+
+def is_a(string):
+    if string == 'a':
+        return ['this', 'is', 'a']
+
+
+def is_b(string):
+    if string == 'b':
+        return ['this', 'is', 'b']
+
+
+class IdentifierFixture(SoftLayer.utils.IdentifierMixin):
+    resolvers = [is_a, is_b]
+
+
+class TestIdentifierMixin(unittest.TestCase):
+
+    def setUp(self):
+        self.fixture = IdentifierFixture()
+
+    def test_integer(self):
+        ids = self.fixture.resolve_ids(1234)
+        self.assertEqual(ids, [1234])
+
+    def test_a(self):
+        ids = self.fixture.resolve_ids('a')
+        self.assertEqual(ids, ['this', 'is', 'a'])
+
+    def test_b(self):
+        ids = self.fixture.resolve_ids('b')
+        self.assertEqual(ids, ['this', 'is', 'b'])
+
+    def test_not_found(self):
+        ids = self.fixture.resolve_ids('something')
+        self.assertEqual(ids, [])
