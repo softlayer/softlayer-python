@@ -9,7 +9,7 @@
 import socket
 
 from SoftLayer.exceptions import SoftLayerError
-from SoftLayer.utils import NestedDict, query_filter
+from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
 
 
 class CCICreateMissingRequired(SoftLayerError):
@@ -22,12 +22,13 @@ class CCICreateMutuallyExclusive(SoftLayerError):
         self.message = "Can only specify one of:", ','.join(args)
 
 
-class CCIManager(object):
+class CCIManager(object, IdentifierMixin):
     """ Manage CCIs """
     def __init__(self, client):
         self.client = client
         self.account = client['Account']
         self.guest = client['Virtual_Guest']
+        self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
 
     def list_instances(self, hourly=True, monthly=True, tags=None, cpus=None,
                        memory=None, hostname=None, domain=None,
@@ -45,6 +46,8 @@ class CCIManager(object):
         :param string local_disk: filter based on local_disk
         :param string datacenter: filter based on datacenter
         :param integer nic_speed: filter based on network speed (in MBPS)
+        :param string public_ip: filter based on public ip address
+        :param string private_ip: filter based on private ip address
         :param dict **kwargs: response-level arguments (limit, offset, etc.)
 
         """
@@ -241,11 +244,11 @@ class CCIManager(object):
         create_options = self._generate_create_dict(**kwargs)
         return self.guest.createObject(create_options)
 
-    def get_ids_from_hostname(self, hostname):
+    def _get_ids_from_hostname(self, hostname):
         results = self.list_instances(hostname=hostname, mask="id")
         return [result['id'] for result in results]
 
-    def get_ids_from_ip(self, ip):
+    def _get_ids_from_ip(self, ip):
         try:
             # Does it look like an ip address?
             socket.inet_aton(ip)
@@ -260,25 +263,3 @@ class CCIManager(object):
         results = self.list_instances(private_ip=ip, mask="id")
         if results:
             return [result['id'] for result in results]
-
-    def resolve_ids(self, identifier):
-        """ Takes a string and tries to guess which CCI the user wants. It
-        accepts a CCI id, hostname, public/private ip address
-
-        :param string identifier: a string that identifies a CCI
-
-        """
-        # Before doing anything, let's see if this is an integer
-        try:
-            return [int(identifier)]
-        except ValueError:
-            pass  # It was worth a shot
-
-        resolvers = [self.get_ids_from_ip, self.get_ids_from_hostname]
-
-        for resolver in resolvers:
-            ids = resolver(identifier)
-            if ids:
-                return ids
-
-        return []

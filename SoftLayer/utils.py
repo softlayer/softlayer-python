@@ -54,3 +54,29 @@ def query_filter(query):
             query = "_= %s" % query
 
     return {'operation': query}
+
+
+class IdentifierMixin:
+    """ This mixin provides an interface to provide multiple methods for
+        converting an 'indentifier' to an id """
+    resolvers = []
+
+    def resolve_ids(self, identifier):
+        """ Takes a string and tries to resolve to a list of matching ids. What
+            exactly 'identifier' can be depends on the resolvers
+
+        :param string identifier: identifying string
+
+        """
+        # Before doing anything, let's see if this is an integer
+        try:
+            return [int(identifier)]
+        except ValueError:
+            pass  # It was worth a shot
+
+        for resolver in self.resolvers:
+            ids = resolver(identifier)
+            if ids:
+                return ids
+
+        return []

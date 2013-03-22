@@ -76,32 +76,25 @@ class CCITests_unittests(unittest.TestCase):
             mask=ANY,
         ))
 
-    def test_resolve_ids(self):
-        _id = self.cci.resolve_ids(1)
-        self.assertEqual(_id, [1])
-
-    def test_resolve_ids_public_ip(self):
+    def test_resolve_ids_ip(self):
         self.client.__getitem__().getVirtualGuests.return_value = \
             [{'id': '1234'}]
-        _id = self.cci.resolve_ids('1.2.3.4')
+        _id = self.cci._get_ids_from_ip('1.2.3.4')
         self.assertEqual(_id, ['1234'])
 
-    def test_resolve_ids_private_ip(self):
         self.client.__getitem__().getVirtualGuests.side_effect = \
             [[], [{'id': '4321'}]]
-        _id = self.cci.resolve_ids('4.3.2.1')
+        _id = self.cci._get_ids_from_ip('4.3.2.1')
         self.assertEqual(_id, ['4321'])
+
+        _id = self.cci._get_ids_from_ip('nope')
+        self.assertEqual(_id, [])
 
     def test_resolve_ids_hostname(self):
         self.client.__getitem__().getVirtualGuests.return_value = \
             [{'id': '1234'}]
-        _id = self.cci.resolve_ids('hostname')
+        _id = self.cci._get_ids_from_hostname('hostname')
         self.assertEqual(_id, ['1234'])
-
-    def test_resolve_ids_not_found(self):
-        self.client.__getitem__().getVirtualGuests.return_value = []
-        _id = self.cci.resolve_ids('hostname')
-        self.assertEqual(_id, [])
 
     def test_get_instance(self):
         self.client.__getitem__().getObject.return_value = {
