@@ -22,7 +22,7 @@ class CCICreateMutuallyExclusive(SoftLayerError):
         self.message = "Can only specify one of:", ','.join(args)
 
 
-class CCIManager(object, IdentifierMixin):
+class CCIManager(IdentifierMixin, object):
     """ Manage CCIs """
     def __init__(self, client):
         self.client = client
