@@ -49,6 +49,8 @@ class CCITests_unittests(unittest.TestCase):
             local_disk=True,
             datacenter='dal05',
             nic_speed=100,
+            public_ip='1.2.3.4',
+            private_ip='4.3.2.1',
         )
 
         service = self.client.__getitem__()
@@ -67,9 +69,32 @@ class CCITests_unittests(unittest.TestCase):
                     'localDiskFlag': {'operation': True},
                     'maxMemory': {'operation': 1024},
                     'hostname': {'operation': '_= hostname'},
-                    'networkComponents': {'maxSpeed': {'operation': 100}}}},
+                    'networkComponents': {'maxSpeed': {'operation': 100}},
+                    'primaryIpAddress': {'operation': '_= 1.2.3.4'},
+                    'primaryBackendIpAddress': {'operation': '_= 4.3.2.1'}
+                }},
             mask=ANY,
         ))
+
+    def test_resolve_ids_ip(self):
+        self.client.__getitem__().getVirtualGuests.return_value = \
+            [{'id': '1234'}]
+        _id = self.cci._get_ids_from_ip('1.2.3.4')
+        self.assertEqual(_id, ['1234'])
+
+        self.client.__getitem__().getVirtualGuests.side_effect = \
+            [[], [{'id': '4321'}]]
+        _id = self.cci._get_ids_from_ip('4.3.2.1')
+        self.assertEqual(_id, ['4321'])
+
+        _id = self.cci._get_ids_from_ip('nope')
+        self.assertEqual(_id, [])
+
+    def test_resolve_ids_hostname(self):
+        self.client.__getitem__().getVirtualGuests.return_value = \
+            [{'id': '1234'}]
+        _id = self.cci._get_ids_from_hostname('hostname')
+        self.assertEqual(_id, ['1234'])
 
     def test_get_instance(self):
         self.client.__getitem__().getObject.return_value = {

@@ -20,6 +20,7 @@ The available commands are:
 
 from os import linesep
 import os.path
+
 from SoftLayer.CCI import CCIManager
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
@@ -27,6 +28,20 @@ from SoftLayer.CLI import (
 from SoftLayer.CLI.helpers import (
     CLIAbort, ArgumentError, SequentialOutput,
     NestedDict, blank)
+
+
+def resolve_id(cci_manager, identifier):
+    cci_ids = cci_manager.resolve_ids(identifier)
+
+    if len(cci_ids) == 0:
+        raise CLIAbort("Error: Unable to find CCI '%s'" % identifier)
+
+    if len(cci_ids) > 1:
+        raise CLIAbort(
+            "Error: Multiple CCIs found for '%s': %s" %
+            (identifier, ', '.join([str(_id) for _id in cci_ids])))
+
+    return cci_ids[0]
 
 
 class ListCCIs(CLIRunnable):
@@ -106,15 +121,14 @@ For more on filters see 'sl help filters'
 
 class CCIDetails(CLIRunnable):
     """
-usage: sl cci detail (--id=ID | --name=NAME | --public-ip=PUBLIC_IP)
-                     [--passwords] [--price] [options]
+usage: sl cci detail [--passwords] [--price] <identifier> [options]
 
 Get details for a CCI
 
+Positional Arguments:
+  <identifier>  This can be the id, hostname or ip address
+
 Options:
-  --id ID                id of CCI
-  --name NAME            the fully qualified domain name
-  --public-ip PUBLIC_IP  public ip of CCI
   --passwords            show passwords (check over your shoulder!)
   --price                show associated prices
 """
@@ -128,11 +142,8 @@ Options:
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
 
-        # make this cci.resolve_id capable
-        cci_id = args.get('--id')
-
+        cci_id = resolve_id(cci, args.get('<identifier>'))
         result = cci.get_instance(cci_id)
-
         result = NestedDict(result)
 
         t.add_row(['id', result['id']])
@@ -463,7 +474,7 @@ Optional:
 
 class ReloadCCI(CLIRunnable):
     """
-usage: sl cci reload <id> [options]
+usage: sl cci reload <identifier> [options]
 
 Reload the OS on a CCI based on its current configuration
 """
@@ -474,15 +485,16 @@ Reload the OS on a CCI based on its current configuration
     @staticmethod
     def execute(client, args):
         cci = CCIManager(client)
-        if args['--really'] or no_going_back(args['<id>']):
-            cci.reload_instance(args['<id>'])
+        cci_id = resolve_id(cci, args.get('<identifier>'))
+        if args['--really'] or no_going_back(cci_id):
+            cci.reload_instance(cci_id)
         else:
             CLIAbort('Aborted')
 
 
 class CancelCCI(CLIRunnable):
     """
-usage: sl cci cancel <id> [options]
+usage: sl cci cancel <identifier> [options]
 
 Cancel a CCI
 """
@@ -493,19 +505,20 @@ Cancel a CCI
     @staticmethod
     def execute(client, args):
         cci = CCIManager(client)
-        if args['--really'] or no_going_back(args['<id>']):
-            cci.cancel_instance(args['<id>'])
+        cci_id = resolve_id(cci, args.get('<identifier>'))
+        if args['--really'] or no_going_back(cci_id):
+            cci.cancel_instance(cci_id)
         else:
             CLIAbort('Aborted')
 
 
 class ManageCCI(CLIRunnable):
     """
-usage: sl cci manage poweroff <id> [--cycle | --soft] [options]
-       sl cci manage reboot <id> [--cycle | --soft] [options]
-       sl cci manage poweron <id> [options]
-       sl cci manage pause <id> [options]
-       sl cci manage resume <id> [options]
+usage: sl cci manage poweroff <identifier> [--cycle | --soft] [options]
+       sl cci manage reboot <identifier> [--cycle | --soft] [options]
+       sl cci manage poweron <identifier> [options]
+       sl cci manage pause <identifier> [options]
+       sl cci manage resume <identifier> [options]
 
 Manage active CCI
 """
@@ -532,47 +545,58 @@ Manage active CCI
     @staticmethod
     def exec_shutdown(client, args):
         vg = client['Virtual_Guest']
+        cci = CCIManager(client)
+        cci_id = resolve_id(cci, args.get('<identifier>'))
         if args['--soft']:
-            result = vg.powerOffSoft(id=args['<id>'])
+            result = vg.powerOffSoft(id=cci_id)
         elif args['--cycle']:
-            result = vg.powerCycle(id=args['<id>'])
+            result = vg.powerCycle(id=cci_id)
         else:
-            result = vg.powerOff(id=args['<id>'])
+            result = vg.powerOff(id=cci_id)
 
         return FormattedItem(result)
 
     @staticmethod
     def exec_poweron(client, args):
         vg = client['Virtual_Guest']
-        return vg.powerOn(id=args['<id>'])
+        cci = CCIManager(client)
+        cci_id = resolve_id(cci, args.get('<identifier>'))
+        return vg.powerOn(id=cci_id)
 
     @staticmethod
     def exec_pause(client, args):
         vg = client['Virtual_Guest']
-        return vg.pause(id=args['<id>'])
+        cci = CCIManager(client)
+        cci_id = resolve_id(cci, args.get('<identifier>'))
+        return vg.pause(id=cci_id)
 
     @staticmethod
     def exec_resume(client, args):
         vg = client['Virtual_Guest']
-        return vg.resume(id=args['<id>'])
+        cci = CCIManager(client)
+        cci_id = resolve_id(cci, args.get('<identifier>'))
+        return vg.resume(id=cci_id)
 
     @staticmethod
     def exec_reboot(client, args):
         vg = client['Virtual_Guest']
+        cci = CCIManager(client)
+        cci_id = resolve_id(cci, args.get('<identifier>'))
         if args['--cycle']:
-            result = vg.rebootHard(id=args['<id>'])
+            result = vg.rebootHard(id=cci_id)
         elif args['--soft']:
-            result = vg.rebootSoft(id=args['<id>'])
+            result = vg.rebootSoft(id=cci_id)
         else:
-            result = vg.rebootDefault(id=args['<id>'])
+            result = vg.rebootDefault(id=cci_id)
 
         return result
 
 
 class NetworkCCI(CLIRunnable):
     """
-usage: sl cci network details <id> [options]
-       sl cci network port <id> --speed=SPEED (--public | --private) [options]
+usage: sl cci network details <identifier> [options]
+       sl cci network port <identifier> --speed=SPEED (--public | --private)
+                           [options]
 
 Manage network settings
 
@@ -600,7 +624,10 @@ Options:
         elif args['--private']:
             func = vg.setPrivateNetworkInterfaceSpeed
 
-        result = func(args['--speed'], id=args['<id>'])
+        cci = CCIManager(client)
+        cci_id = resolve_id(cci, args.get('<identifier>'))
+
+        result = func(args['--speed'], id=cci_id)
         if result:
             return "Success"
         else:
@@ -613,8 +640,8 @@ Options:
 
 class CCIDNS(CLIRunnable):
     """
-usage: sl cci dns sync <id> [options]
-       sl cci dns doppleganger <id> [options]
+usage: sl cci dns sync <identifier> [options]
+       sl cci dns doppleganger <identifier> [options]
 
 DNS related actions for a CCI
 
@@ -683,7 +710,8 @@ Options:
                     instance['fullyQualifiedDomainName'],
                     ttl=7200)
 
-        instance = cci.get_instance(args['<id>'])
+        cci_id = resolve_id(cci, args.get('<identifier>'))
+        instance = cci.get_instance(cci_id)
 
         if not instance['primaryIpAddress']:
             raise CLIAbort('No primary IP address associated with this CCI')

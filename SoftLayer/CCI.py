@@ -6,8 +6,10 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
+import socket
+
 from SoftLayer.exceptions import SoftLayerError
-from SoftLayer.utils import NestedDict, query_filter
+from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
 
 
 class CCICreateMissingRequired(SoftLayerError):
@@ -20,17 +22,18 @@ class CCICreateMutuallyExclusive(SoftLayerError):
         self.message = "Can only specify one of:", ','.join(args)
 
 
-class CCIManager(object):
+class CCIManager(IdentifierMixin, object):
     """ Manage CCIs """
     def __init__(self, client):
         self.client = client
         self.account = client['Account']
         self.guest = client['Virtual_Guest']
+        self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
 
     def list_instances(self, hourly=True, monthly=True, tags=None, cpus=None,
                        memory=None, hostname=None, domain=None,
                        local_disk=None, datacenter=None, nic_speed=None,
-                       **kwargs):
+                       public_ip=None, private_ip=None, **kwargs):
         """ Retrieve a list of all CCIs on the account.
 
         :param boolean hourly: include hourly instances
@@ -43,24 +46,28 @@ class CCIManager(object):
         :param string local_disk: filter based on local_disk
         :param string datacenter: filter based on datacenter
         :param integer nic_speed: filter based on network speed (in MBPS)
+        :param string public_ip: filter based on public ip address
+        :param string private_ip: filter based on private ip address
         :param dict **kwargs: response-level arguments (limit, offset, etc.)
 
         """
-        items = set([
-            'id',
-            'globalIdentifier',
-            'fullyQualifiedDomainName',
-            'primaryBackendIpAddress',
-            'primaryIpAddress',
-            'lastKnownPowerState.name',
-            'powerState.name',
-            'maxCpu',
-            'maxMemory',
-            'datacenter.name',
-            'activeTransaction.transactionStatus[friendlyName,name]',
-            'status.name',
-            'tagReferences[id,tag[name,id]]',
-        ])
+        if 'mask' not in kwargs:
+            items = set([
+                'id',
+                'globalIdentifier',
+                'fullyQualifiedDomainName',
+                'primaryBackendIpAddress',
+                'primaryIpAddress',
+                'lastKnownPowerState.name',
+                'powerState.name',
+                'maxCpu',
+                'maxMemory',
+                'datacenter.name',
+                'activeTransaction.transactionStatus[friendlyName,name]',
+                'status.name',
+                'tagReferences[id,tag[name,id]]',
+            ])
+            kwargs['mask'] = "mask[%s]" % ','.join(items)
 
         call = 'getVirtualGuests'
         if not all([hourly, monthly]):
@@ -68,8 +75,6 @@ class CCIManager(object):
                 call = 'getHourlyVirtualGuests'
             elif monthly:
                 call = 'getMonthlyVirtualGuests'
-
-        mask = "mask[%s]" % ','.join(items)
 
         _filter = NestedDict(kwargs.get('filter') or {})
         if tags:
@@ -102,47 +107,55 @@ class CCIManager(object):
             _filter['virtualGuests']['networkComponents']['maxSpeed'] = \
                 query_filter(nic_speed)
 
+        if public_ip:
+            _filter['virtualGuests']['primaryIpAddress'] = \
+                query_filter(public_ip)
+
+        if private_ip:
+            _filter['virtualGuests']['primaryBackendIpAddress'] = \
+                query_filter(private_ip)
+
         kwargs['filter'] = _filter.to_dict()
         func = getattr(self.account, call)
-        return func(mask=mask, **kwargs)
+        return func(**kwargs)
 
-    def get_instance(self, id):
+    def get_instance(self, id, **kwargs):
         """ Get details about a CCI instance
 
         :param integer id: the instance ID
 
         """
-        items = set([
-            'id',
-            'globalIdentifier',
-            'fullyQualifiedDomainName',
-            'hostname',
-            'domain',
-            'createDate',
-            'modifyDate',
-            'notes',
-            'dedicatedAccountHostOnlyFlag',
-            'privateNetworkOnlyFlag',
-            'primaryBackendIpAddress',
-            'primaryIpAddress',
-            'lastKnownPowerState.name',
-            'powerState.name',
-            'maxCpu',
-            'maxMemory',
-            'datacenter.name',
-            'activeTransaction.id',
-            'blockDeviceTemplateGroup[id, name]',
-            'status.name',
-            'operatingSystem.softwareLicense.'
-            'softwareDescription[manufacturer,name,version,referenceCode]',
-            'operatingSystem.passwords[username,password]',
-            'billingItem.recurringFee',
-            'tagReferences[id,tag[name,id]]',
-        ])
+        if 'mask' not in kwargs:
+            items = set([
+                'id',
+                'globalIdentifier',
+                'fullyQualifiedDomainName',
+                'hostname',
+                'domain',
+                'createDate',
+                'modifyDate',
+                'notes',
+                'dedicatedAccountHostOnlyFlag',
+                'privateNetworkOnlyFlag',
+                'primaryBackendIpAddress',
+                'primaryIpAddress',
+                'lastKnownPowerState.name',
+                'powerState.name',
+                'maxCpu',
+                'maxMemory',
+                'datacenter.name',
+                'activeTransaction.id',
+                'blockDeviceTemplateGroup[id, name]',
+                'status.name',
+                'operatingSystem.softwareLicense.'
+                'softwareDescription[manufacturer,name,version,referenceCode]',
+                'operatingSystem.passwords[username,password]',
+                'billingItem.recurringFee',
+                'tagReferences[id,tag[name,id]]',
+            ])
+            kwargs['mask'] = "mask[%s]" % ','.join(items)
 
-        mask = "mask[%s]" % ','.join(items)
-
-        return self.guest.getObject(mask=mask, id=id)
+        return self.guest.getObject(id=id, **kwargs)
 
     def get_create_options(self):
         return self.guest.getCreateObjectOptions()
@@ -230,3 +243,23 @@ class CCIManager(object):
         """ see _generate_create_dict """  # TODO: document this
         create_options = self._generate_create_dict(**kwargs)
         return self.guest.createObject(create_options)
+
+    def _get_ids_from_hostname(self, hostname):
+        results = self.list_instances(hostname=hostname, mask="id")
+        return [result['id'] for result in results]
+
+    def _get_ids_from_ip(self, ip):
+        try:
+            # Does it look like an ip address?
+            socket.inet_aton(ip)
+        except socket.error:
+            return []
+
+        # Find the CCI via ip address. First try public ip, then private
+        results = self.list_instances(public_ip=ip, mask="id")
+        if results:
+            return [result['id'] for result in results]
+
+        results = self.list_instances(private_ip=ip, mask="id")
+        if results:
+            return [result['id'] for result in results]
