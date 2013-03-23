@@ -3,18 +3,18 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
     SoftLayer API bindings
 
-    usage:
+    Usage:
 
         >>> import SoftLayer
         >>> client = SoftLayer.Client(username="username", api_key="api_key")
-        >>> resp = client['SoftLayer_Account'].getObject()
+        >>> resp = client['Account'].getObject()
         >>> resp['companyName']
         'Your Company'
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
+    :website: http://sldn.softlayer.com/article/Python
 
-    See U{http://sldn.softlayer.com/article/Python}
 """
 from SoftLayer.consts import VERSION
 
