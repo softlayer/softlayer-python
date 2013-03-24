@@ -33,7 +33,7 @@ class DNSManager(object):
     def list_zones(self, **kwargs):
         """ Retrieve a list of all DNS zones.
 
-        :param dict **kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
 
         """
         return self.client['Account'].getDomains(**kwargs)
