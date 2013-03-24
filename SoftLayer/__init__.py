@@ -13,8 +13,6 @@
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
-    :website: http://sldn.softlayer.com/article/Python
-
 """
 from SoftLayer.consts import VERSION
 

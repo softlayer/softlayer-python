@@ -5,8 +5,6 @@
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
-    :website: http://sldn.softlayer.com/article/Python
-
 """
 from SoftLayer.consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT, \
     USER_AGENT
@@ -109,7 +107,7 @@ class Client(object):
         Use this method if you wish to bypass the API_USER and API_KEY class
         constants and set custom authentication per API call.
 
-        See U{https://manage.softlayer.com/Administrative/apiKeychain} for more
+        See https://manage.softlayer.com/Administrative/apiKeychain for more
         information.
 
         :param username: the username to authenticate with
@@ -132,7 +130,7 @@ class Client(object):
         of 1234 in the SoftLayer_Hardware_Server Service instructs the API to
         act on server record 1234 in your method calls.
 
-        See U{http://sldn.softlayer.com/article/Using-Initialization-Parameters-SoftLayer-API}  # NOQA
+        See http://sldn.softlayer.com/article/Using-Initialization-Parameters-SoftLayer-API  # NOQA
         for more information.
 
         :param id: the ID of the SoftLayer API object to instantiate
@@ -151,7 +149,7 @@ class Client(object):
         Object masks are skeleton objects, or strings that define nested
         relational properties to retrieve along with an object's local
         properties. See
-        U{http://sldn.softlayer.com/article/Using-Object-Masks-SoftLayer-API}
+        http://sldn.softlayer.com/article/Using-Object-Masks-SoftLayer-API
         for more information.
 
         :param mask: the object mask you wish to define
@@ -200,15 +198,12 @@ class Client(object):
 
         :param service: the name of the SoftLayer API service
         :param method: the method to call on the service
-        :param *args: same optional arguments that ``Client.call`` takes
-        :param **kwargs: same optional keyword arguments that ``Client.call``
-                         takes
+        :param \*args: same optional arguments that ``Client.call`` takes
+        :param \*\*kwargs: same optional keyword arguments that ``Client.call``
+                           takes
 
         """
-        if kwargs.get('iter'):
-            return self.iter_call(*args, **kwargs)
-        else:
-            return self.call(*args, **kwargs)
+        return self.call(*args, **kwargs)
 
     def call(self, service, method, *args, **kwargs):
         """ Make a SoftLayer API call
@@ -223,12 +218,17 @@ class Client(object):
         :param dict raw_headers: (optional) HTTP transport headers
         :param int limit: (optional) return at most this many results
         :param int offset: (optional) offset results by this many
+        :param boolean iter: (optional) if True, returns a generator with the
+                             results
 
         Usage:
             >>> client['Account'].getVirtualGuests(mask="id", limit=10)
             [...]
 
         """
+        if kwargs.get('iter'):
+            return self.iter_call(service, method, *args, **kwargs)
+
         objectid = kwargs.get('id')
         objectmask = kwargs.get('mask')
         objectfilter = kwargs.get('filter')
@@ -276,6 +276,16 @@ class Client(object):
 
     def iter_call(self, service, method,
                   chunk=100, limit=None, offset=0, *args, **kwargs):
+        """ A generator that deals with paginating through results.
+
+        :param service: the name of the SoftLayer API service
+        :param method: the method to call on the service
+        :param integer chunk: result size for each API call
+        :param \*args: same optional arguments that ``Client.call`` takes
+        :param \*\*kwargs: same optional keyword arguments that ``Client.call``
+                           takes
+
+        """
         if chunk <= 0:
             raise AttributeError("Chunk size should be greater than zero.")
 
@@ -283,6 +293,7 @@ class Client(object):
             chunk = min(chunk, limit)
 
         result_count = 0
+        kwargs['iter'] = False
         while True:
             if limit:
                 # We've reached the end of the results
@@ -361,7 +372,7 @@ class Client(object):
                 raise SoftLayerError(
                     "Service is not set on Client instance.")
             kwargs['headers'] = self._headers
-            return self(self._service_name, name, *args, **kwargs)
+            return self.call(self._service_name, name, *args, **kwargs)
         return call_handler
 
     def __repr__(self):
@@ -389,7 +400,27 @@ class Service(object):
             [...]
 
         """
-        return self.client(self.name, name, *args, **kwargs)
+        return self.client.call(self.name, name, *args, **kwargs)
+
+    def iter_call(self, name, *args, **kwargs):
+        """ A generator that deals with paginating through results.
+
+        :param method: the method to call on the service
+        :param integer chunk: result size for each API call
+        :param \*args: same optional arguments that ``Client.call`` takes
+        :param \*\*kwargs: same optional keyword arguments that ``Client.call``
+                           takes
+
+        Usage:
+            >>> gen = client['Account'].getVirtualGuests(iter=True)
+            >>> for virtual_guest in gen:
+            ...     virtual_guest['id']
+            ...
+            1234
+            4321
+
+        """
+        return self.client.iter_call(self.name, name, *args, **kwargs)
 
     __call__ = call
 
