@@ -273,12 +273,12 @@ class APICalls(unittest.TestCase):
     @patch('SoftLayer.API.Client.iter_call')
     def test_iterate(self, _iter_call):
         self.client['SERVICE'].METHOD(iter=True)
-        _iter_call.assert_called_with('SoftLayer_SERVICE', 'METHOD', iter=True)
+        _iter_call.assert_called_with('SERVICE', 'METHOD', iter=True)
 
     @patch('SoftLayer.API.Client.iter_call')
     def test_service_iter_call(self, _iter_call):
         self.client['SERVICE'].iter_call('METHOD')
-        _iter_call.assert_called_with('SoftLayer_SERVICE', 'METHOD')
+        _iter_call.assert_called_with('SERVICE', 'METHOD')
 
     @patch('SoftLayer.API.Client.call')
     def test_iter_call(self, _call):
