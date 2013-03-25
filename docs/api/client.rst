@@ -5,8 +5,8 @@ Developer Interface
 ===================
 This is the primary API client to make API calls. It deals with constructing and executing XML-RPC calls against the SoftLayer API.
 
-Client setup
-------------
+Getting Started
+---------------
 You can pass in your username and api_key when creating a SoftLayer client instance. However, you can set these in the environmental variables 'SL_USERNAME' and 'SL_API_KEY'
 
 Creating a client instance by passing in the username/api_key:

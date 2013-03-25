@@ -14,7 +14,7 @@ def publish_docs():
         with lcd('_build/html'):
             local('touch .nojekyll')
             local('git add .nojekyll')
-            local('git add -u')
+            local('git add -A')
             local('git commit -m "Documentation Build"')
             local('git push origin gh-pages')
 
