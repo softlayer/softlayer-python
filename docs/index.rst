@@ -8,12 +8,6 @@ Release v\ |version|. (:ref:`Installation <install>`)
 
 API Documentation
 -----------------
-.. toctree::
-   :maxdepth: 2
-
-   install
-   api/client
-
 ::
 
 	>>> import SoftLayer
@@ -22,8 +16,22 @@ API Documentation
 	>>> resp['companyName']
 	'Your Company'
 
+.. toctree::
+   :maxdepth: 2
+
+   install
+   api/client
+
+
 Managers
 --------
+::
+
+	>>> from SoftLayer.CCI import CCIManager
+	>>> cci = CCIManager(client)
+	>>> cci.list_instances()
+	[...]
+
 Managers mask out a lot of the complexities of using the API into classes that provide a simpler interface to various services.
 
 .. toctree::
@@ -32,12 +40,23 @@ Managers mask out a lot of the complexities of using the API into classes that p
 
    api/managers/*
 
+
+Command-Line Interface
+----------------------
 ::
 
-	>>> from SoftLayer.CCI import CCIManager
-	>>> cci = CCIManager(client)
-	>>> cci.list_instances()
-	[...]
+	$ sl cci list
+	:.........:............:....................:.......:........:................:..............:....................:
+	:    id   : datacenter :       host         : cores : memory :   primary_ip   :  backend_ip  : active_transaction :
+	:.........:............:....................:.......:........:................:..............:....................:
+	: 1234567 :   dal05    :  test.example.com  :   4   :   4G   :    12.34.56    :   65.43.21   :         -          :
+	:.........:............:....................:.......:........:................:..............:....................:
+
+.. toctree::
+   :maxdepth: 2
+
+   cli
+   cli/dev
 
 Indices and tables
 ==================

@@ -186,24 +186,14 @@ class Client(object):
     def __getitem__(self, name):
         """ Get a SoftLayer Service.
 
-        :param name: The name of the service. E.G. SoftLayer_Account
+        :param name: The name of the service. E.G. Account
+
+        Usage:
+            >>> client['Account']
+            <Service: Account>
 
         """
-        if not name.startswith(self._prefix):
-            name = self._prefix + name
         return Service(self, name)
-
-    def __call__(self, *args, **kwargs):
-        """ Perform a SoftLayer API call.
-
-        :param service: the name of the SoftLayer API service
-        :param method: the method to call on the service
-        :param \*args: same optional arguments that ``Client.call`` takes
-        :param \*\*kwargs: same optional keyword arguments that ``Client.call``
-                           takes
-
-        """
-        return self.call(*args, **kwargs)
 
     def call(self, service, method, *args, **kwargs):
         """ Make a SoftLayer API call
@@ -228,6 +218,9 @@ class Client(object):
         """
         if kwargs.get('iter'):
             return self.iter_call(service, method, *args, **kwargs)
+
+        if not service.startswith(self._prefix):
+            service = self._prefix + service
 
         objectid = kwargs.get('id')
         objectmask = kwargs.get('mask')
@@ -273,6 +266,8 @@ class Client(object):
         return make_api_call(uri, method, args, headers=headers,
                              http_headers=http_headers, timeout=self.timeout,
                              verbose=self.verbose)
+
+    __call__ = call
 
     def iter_call(self, service, method,
                   chunk=100, limit=None, offset=0, *args, **kwargs):
@@ -402,6 +397,8 @@ class Service(object):
         """
         return self.client.call(self.name, name, *args, **kwargs)
 
+    __call__ = call
+
     def iter_call(self, name, *args, **kwargs):
         """ A generator that deals with paginating through results.
 
@@ -421,8 +418,6 @@ class Service(object):
 
         """
         return self.client.iter_call(self.name, name, *args, **kwargs)
-
-    __call__ = call
 
     def __getattr__(self, name):
         if name in ["__name__", "__bases__"]:
