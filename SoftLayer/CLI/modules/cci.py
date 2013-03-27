@@ -223,8 +223,8 @@ Options:
         result = cci.get_create_options()
 
         show_all = True
-        for opt_name, _ in args.iteritems():
-            if opt_name.lstrip('-') in cls.options:
+        for opt_name in cls.options:
+            if args.get("--" + opt_name):
                 show_all = False
                 break
 
