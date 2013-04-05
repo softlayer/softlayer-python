@@ -109,7 +109,7 @@ class MetadataManager(object):
             url = "%s%s" % (self.attribs[name]['call'], extension)
 
         data = self.make_request(url)
-        if data:
+        if data and extension == '.json':
             return json.loads(data)
         return data
 
