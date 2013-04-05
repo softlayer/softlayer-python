@@ -72,6 +72,13 @@ class MetadataManager(object):
         except urllib2.HTTPError, e:  # pragma: no cover
             if e.code == 404:
                 return None
+
+            try:
+                content = json.loads(e.read())
+                raise SoftLayerAPIError(content['code'], content['error'])
+            except (ValueError, KeyError):
+                pass
+
             raise SoftLayerAPIError(e.code, e.reason)
         except urllib2.URLError, e:
             raise SoftLayerAPIError(0, e.reason)
@@ -89,13 +96,17 @@ class MetadataManager(object):
             raise SoftLayerError('Unknown metadata attribute.')
 
         call_details = self.attribs[name]
+        extension = '.json'
+        if self.attribs[name]['call'] == 'UserMetadata':
+            extension = '.txt'
+
         if call_details.get('param_req'):
             if not param:
                 raise SoftLayerError(
                     'Parameter required to get this attribute.')
-            url = "%s/%s.json" % (self.attribs[name]['call'], param)
+            url = "%s/%s%s" % (self.attribs[name]['call'], param, extension)
         else:
-            url = "%s.json" % self.attribs[name]['call']
+            url = "%s%s" % (self.attribs[name]['call'], extension)
 
         data = self.make_request(url)
         if data:
