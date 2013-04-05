@@ -20,49 +20,49 @@ from SoftLayer.CLI import CLIRunnable, no_going_back, Table, CLIAbort
 from SoftLayer.DNS import DNSManager
 
 
-def add_zone_arguments(parser):
-    parser.add_argument('domain')
-
-
-def add_record_arguments(parser):
-    add_zone_arguments(parser)
-    parser.add_argument('record')
-
-
 class DumpZone(CLIRunnable):
     """
-usage: sl dns print <domain> [options]
+usage: sl dns print <zone> [options]
 
 print zone in BIND format
+
+Arguments:
+  <zone>    Zone name (softlayer.com)
 """
     action = "print"
 
     @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
-        return manager.dump_zone(manager.get_zone(args['<domain>'])['id'])
+        return manager.dump_zone(manager.get_zone(args['<zone>'])['id'])
 
 
 class CreateZone(CLIRunnable):
     """
-usage: sl dns create <domain> [options]
+usage: sl dns create <zone> [options]
 
 Create a zone
+
+Arguments:
+  <zone>    Zone name (softlayer.com)
 """
     action = 'create'
 
     @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
-        manager.create_zone(args['<domain>'])
-        return "Created zone: %s" % args['<domain>']
+        manager.create_zone(args['<zone>'])
+        return "Created zone: %s" % args['<zone>']
 
 
 class DeleteZone(CLIRunnable):
     """
-usage: sl dns delete <domain> <zone> [options]
+usage: sl dns delete <zone> [options]
 
 Delete zone
+
+Arguments:
+  <zone>    Zone name (softlayer.com)
 """
     action = 'delete'
     options = ['confirm']
@@ -70,9 +70,9 @@ Delete zone
     @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
-        if args['--really'] or no_going_back(args['<domain>']):
-            manager.delete_zone(args['<domain>'])
-            return "Deleted zone: %s" % args['<domain>']
+        if args['--really'] or no_going_back(args['<zone>']):
+            manager.delete_zone(args['<zone>'])
+            return "Deleted zone: %s" % args['<zone>']
         raise CLIAbort("Aborted.")
 
 
@@ -110,12 +110,18 @@ List zones
 
 class AddRecord(CLIRunnable):
     """
-usage: sl dns add <domain> <record> <type> <data> [--ttl=TTL] [options]
+usage: sl dns add <zone> <record> <type> <data> [--ttl=TTL] [options]
 
 Add resource record
 
+Arguments:
+  <zone>    Zone name (softlayer.com)
+  <record>  Resource record (www)
+  <type>    Record type. [Options: A, AAAA,
+              CNAME, MX, NS, PTR, SPF, SRV, TXT]
+  <data>    Record data. NOTE: only minor validation is done
+
 Options:
-  type       Record type. [Options: A, AAAA, CNAME, MX, NS, PTR, SPF, SRV, TXT]
   --ttl=TTL  Time to live [default: 7200]
 """
     action = 'add'
@@ -123,7 +129,7 @@ Options:
     @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
-        zone = manager.get_zone(args['<domain>'])['id']
+        zone = manager.get_zone(args['<zone>'])['id']
         manager.create_record(
             zone,
             args['<record>'],
@@ -134,10 +140,14 @@ Options:
 
 class EditRecord(CLIRunnable):
     """
-usage: sl dns edit <domain> <record> [--data=DATA] [--ttl=TTL] [--id=ID]
+usage: sl dns edit <zone> <record> [--data=DATA] [--ttl=TTL] [--id=ID]
                    [options]
 
 Update resource records (bulk/single)
+
+Arguments:
+  <zone>    Zone name (softlayer.com)
+  <record>  Resource record (www)
 
 Options:
   --data=DATA
@@ -150,7 +160,7 @@ Options:
     def execute(client, args):
         manager = DNSManager(client)
         results = manager.search_record(
-            args['<domain>'],
+            args['<zone>'],
             args['<record>'])
 
         for r in results:
@@ -163,9 +173,13 @@ Options:
 
 class RecordSearch(CLIRunnable):
     """
-usage: sl dns search <domain> <record> [options]
+usage: sl dns search <zone> <record> [options]
 
 Look for a resource record by exact name
+
+Arguments:
+  <zone>    Zone name (softlayer.com)
+  <record>  Resource record (www)
 """
     action = 'search'
 
@@ -173,7 +187,7 @@ Look for a resource record by exact name
     def execute(client, args):
         manager = DNSManager(client)
         results = manager.search_record(
-            args['<domain>'],
+            args['<zone>'],
             args['<record>'])
 
         t = Table(['id', 'type', 'ttl', 'data'])
@@ -188,9 +202,13 @@ Look for a resource record by exact name
 
 class RecordRemove(CLIRunnable):
     """
-usage: sl dns remove <domain> <record> [--id=ID] [options]
+usage: sl dns remove <zone> <record> [--id=ID] [options]
 
 Remove resource records
+
+Arguments:
+  <zone>    Zone name (softlayer.com)
+  <record>  Resource record (www)
 
 Options:
   --id=ID  Remove only the given ID
@@ -206,7 +224,7 @@ Options:
             records = [{'id': args['--id']}]
         else:
             records = manager.search_record(
-                args['<domain>'],
+                args['<zone>'],
                 args['<record>'])
 
         if args['--really'] or no_going_back('yes'):
