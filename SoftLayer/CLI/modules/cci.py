@@ -14,6 +14,7 @@ The available commands are:
   cancel          Cancel a running CCI
   create-options  Output available available options when creating a CCI
   reload          Reload the OS on a CCI based on its current configuration
+  ready           Check if a CCI has finished provisioning
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: BSD, see LICENSE for more details.
@@ -336,16 +337,17 @@ usage: sl cci create --hostname=HOST --domain=DOMAIN --cpu=CPU --memory=MEMORY
 Order/create a CCI. See 'sl cci create-options' for valid options
 
 Required:
-  -H --hostname=HOST       Host portion of the FQDN. example: server
-  -D --domain=DOMAIN       Domain portion of the FQDN example: example.com
-  -c --cpu=CPU             Number of CPU cores
-  -m --memory=MEMORY       Memory in mebibytes (n * 1024)
+  -H --hostname=HOST  Host portion of the FQDN. example: server
+  -D --domain=DOMAIN  Domain portion of the FQDN example: example.com
+  -c --cpu=CPU        Number of CPU cores
+  -m --memory=MEMORY  Memory in mebibytes (n * 1024)
 
-  -o OS, --os=OS           OS install code. Tip: you can specify <OS>_LATEST
-  --image=GUID             Image GUID. See: 'sl image list' for reference
+  -o OS, --os=OS      OS install code. Tip: you can specify <OS>_LATEST
+  --image=GUID        Image GUID. See: 'sl image list' for reference
 
-  --hourly                 Hourly rate instance type
-  --monthly                Monthly rate instance type
+  --hourly            Hourly rate instance type
+  --monthly           Monthly rate instance type
+
 
 Optional:
   -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
@@ -357,6 +359,8 @@ Optional:
 
   -u --userdata=DATA       User defined metadata string
   -F --userfile=FILE       Read userdata from file
+  --wait=SECONDS           Block until CCI is finished provisioning
+                           for up to X seconds before returning.
 """
     action = 'create'
     options = ['confirm']
@@ -450,9 +454,10 @@ Optional:
             t.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
             output = SequentialOutput(blanks=False)
             output.append(t)
-            output.append(FormattedItem('',
-                    ' -- ! Prices reflected here are retail and do not '
-                    'take account level discounts and are not guarenteed.')
+            output.append(FormattedItem(
+                '',
+                ' -- ! Prices reflected here are retail and do not '
+                'take account level discounts and are not guarenteed.')
             )
 
         elif args['--really'] or confirm(
@@ -469,7 +474,40 @@ Optional:
         else:
             raise CLIAbort('Aborting CCI order.')
 
+        if args.get('--wait') or 0 and not args.get('--test'):
+            ready = cci.wait_for_transaction(
+                result['id'], int(args.get('--wait') or 1))
+            t.add_row(['ready', ready])
+
         return output
+
+
+class ReadyCCI(CLIRunnable):
+    """
+usage: sl cci ready <identifier> [options]
+
+Check if a CCI is ready.
+
+Required:
+  <identifier>  Instance ID
+
+Optional:
+  --wait=SECONDS  Block until CCI is finished provisioning
+                  for up to X seconds before returning.
+"""
+    action = 'ready'
+
+    @staticmethod
+    def execute(client, args):
+        cci = CCIManager(client)
+
+        cci_id = resolve_id(cci, args.get('<identifier>'))
+        ready = cci.wait_for_transaction(cci_id, int(args.get('--wait') or 0))
+
+        if ready:
+            return "READY"
+        else:
+            raise CLIAbort("Instance %s not ready" % cci_id)
 
 
 class ReloadCCI(CLIRunnable):

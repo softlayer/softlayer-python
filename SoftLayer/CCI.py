@@ -10,6 +10,8 @@ import socket
 
 from SoftLayer.exceptions import SoftLayerError
 from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
+from time import sleep
+from itertools import repeat
 
 
 class CCICreateMissingRequired(SoftLayerError):
@@ -125,6 +127,7 @@ class CCIManager(IdentifierMixin, object):
         :param integer id: the instance ID
 
         """
+
         if 'mask' not in kwargs:
             items = set([
                 'id',
@@ -134,6 +137,7 @@ class CCIManager(IdentifierMixin, object):
                 'domain',
                 'createDate',
                 'modifyDate',
+                'provisionDate',
                 'notes',
                 'dedicatedAccountHostOnlyFlag',
                 'privateNetworkOnlyFlag',
@@ -177,11 +181,11 @@ class CCIManager(IdentifierMixin, object):
         return self.guest.reloadCurrentOperatingSystemConfiguration(id=id)
 
     def _generate_create_dict(
-            self, cpus=None, memory=None, hourly=True,
-            hostname=None, domain=None, local_disk=True,
-            datacenter=None, os_code=None, image_id=None,
-            private=False, public_vlan=None, private_vlan=None,
-            userdata=None, nic_speed=None):
+        self, cpus=None, memory=None, hourly=True,
+        hostname=None, domain=None, local_disk=True,
+        datacenter=None, os_code=None, image_id=None,
+        private=False, public_vlan=None, private_vlan=None,
+        userdata=None, nic_speed=None):
 
         required = [cpus, memory, hostname, domain]
 
@@ -233,6 +237,18 @@ class CCIManager(IdentifierMixin, object):
             data['networkComponents'] = [{'maxSpeed': nic_speed}]
 
         return data
+
+    def wait_for_transaction(self, id, limit, delay=1):
+        for count, new_instance in enumerate(repeat(id)):
+            instance = self.get_instance(new_instance)
+            if not instance.get('activeTransaction', {}).get('id') and \
+                    instance.get('provisionDate'):
+                return True
+
+            if count >= limit:
+                return False
+
+            sleep(delay)
 
     def verify_create_instance(self, **kwargs):
         """ see _generate_create_dict """  # TODO: document this
