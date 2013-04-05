@@ -362,21 +362,7 @@ class CCITests_unittests(unittest.TestCase):
     def test_wait(self, _sleep):
         guestObject = self.client.__getitem__().getObject
 
-        mask = (
-            'mask[domain,modifyDate,maxCpu,maxMemory,status.name,'
-            'primaryIpAddress,privateNetworkOnlyFlag,globalIdentifier,'
-            'dedicatedAccountHostOnlyFlag,operatingSystem.'
-            'softwareLicense.software'
-            'Description[manufacturer,name,version,referenceCode],'
-            'lastKnownPowerState.name,createDate,hostname,id,'
-            'blockDeviceTemplateGroup[id, name],datacenter.name,'
-            'primaryBackendIpAddress,billingItem.recurringFee,'
-            'operatingSystem.passwords[username,password],'
-            'fullyQualifiedDomainName,'
-            'powerState.name,activeTransaction.id,notes,'
-            'tagReferences[id,tag[name,id]]]')
-
-        # test 4 iterations with only 3 sleeps being called
+        # test 4 iterations with positive match
         guestObject.side_effect = [
             {'activeTransaction': {'id': 1}},
             {'activeTransaction': {'id': 1}},
@@ -389,8 +375,8 @@ class CCITests_unittests(unittest.TestCase):
         self.assertTrue(value)
         _sleep.assert_has_calls([call(1), call(1), call(1)])
         guestObject.assert_has_calls([
-            call(id=1, mask=mask), call(id=1, mask=mask),
-            call(id=1, mask=mask), call(id=1, mask=mask)
+            call(id=1, mask=ANY), call(id=1, mask=ANY),
+            call(id=1, mask=ANY), call(id=1, mask=ANY),
         ])
 
         # test 2 iterations, with no matches
@@ -407,8 +393,8 @@ class CCITests_unittests(unittest.TestCase):
         self.assertFalse(value)
         _sleep.assert_has_calls([call(1), call(1)])
         guestObject.assert_has_calls([
-            call(id=1, mask=mask), call(id=1, mask=mask),
-            call(id=1, mask=mask)
+            call(id=1, mask=ANY), call(id=1, mask=ANY),
+            call(id=1, mask=ANY)
         ])
 
         # 10 iterations at 10 second sleeps with no
@@ -431,12 +417,12 @@ class CCITests_unittests(unittest.TestCase):
         value = self.cci.wait_for_transaction(1, 10, 10)
         self.assertFalse(value)
         guestObject.assert_has_calls([
-            call(id=1, mask=mask), call(id=1, mask=mask),
-            call(id=1, mask=mask), call(id=1, mask=mask),
-            call(id=1, mask=mask), call(id=1, mask=mask),
-            call(id=1, mask=mask), call(id=1, mask=mask),
-            call(id=1, mask=mask), call(id=1, mask=mask),
-            call(id=1, mask=mask)
+            call(id=1, mask=ANY), call(id=1, mask=ANY),
+            call(id=1, mask=ANY), call(id=1, mask=ANY),
+            call(id=1, mask=ANY), call(id=1, mask=ANY),
+            call(id=1, mask=ANY), call(id=1, mask=ANY),
+            call(id=1, mask=ANY), call(id=1, mask=ANY),
+            call(id=1, mask=ANY)
         ])
         _sleep.assert_has_calls([
             call(10), call(10), call(10), call(10), call(10),

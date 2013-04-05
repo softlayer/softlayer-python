@@ -137,6 +137,7 @@ class CCIManager(IdentifierMixin, object):
                 'domain',
                 'createDate',
                 'modifyDate',
+                'provisionDate',
                 'notes',
                 'dedicatedAccountHostOnlyFlag',
                 'privateNetworkOnlyFlag',

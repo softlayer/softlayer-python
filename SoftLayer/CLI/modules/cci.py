@@ -359,8 +359,8 @@ Optional:
 
   -u --userdata=DATA       User defined metadata string
   -F --userfile=FILE       Read userdata from file
-  --wait=600               Block until CCI is finished provisioning
-                             for up to X seconds before returning.
+  --wait=SECONDS           Block until CCI is finished provisioning
+                           for up to X seconds before returning.
 """
     action = 'create'
     options = ['confirm']
@@ -454,9 +454,10 @@ Optional:
             t.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
             output = SequentialOutput(blanks=False)
             output.append(t)
-            output.append(FormattedItem('',
-                    ' -- ! Prices reflected here are retail and do not '
-                    'take account level discounts and are not guarenteed.')
+            output.append(FormattedItem(
+                '',
+                ' -- ! Prices reflected here are retail and do not '
+                'take account level discounts and are not guarenteed.')
             )
 
         elif args['--really'] or confirm(
@@ -473,9 +474,9 @@ Optional:
         else:
             raise CLIAbort('Aborting CCI order.')
 
-        if args.get('--wait') and not args.get('--test'):
+        if args.get('--wait') or 0 and not args.get('--test'):
             ready = cci.wait_for_transaction(
-                result['id'], int(args.get('--wait', 1)))
+                result['id'], int(args.get('--wait') or 1))
             t.add_row(['ready', ready])
 
         return output
@@ -483,16 +484,16 @@ Optional:
 
 class ReadyCCI(CLIRunnable):
     """
-usage: sl cci ready <id> [options]
+usage: sl cci ready <identifier> [options]
 
 Check if a CCI is ready.
 
 Required:
-  <id>  Instance ID
+  <identifier>  Instance ID
 
 Optional:
-  --wait=600               Block until CCI is finished provisioning
-                             for up to X seconds before returning.
+  --wait=SECONDS  Block until CCI is finished provisioning
+                  for up to X seconds before returning.
 """
     action = 'ready'
 
@@ -500,13 +501,13 @@ Optional:
     def execute(client, args):
         cci = CCIManager(client)
 
-        ready = cci.wait_for_transaction(
-            args['<id>'], int(args.get('--wait', 0)))
+        cci_id = resolve_id(cci, args.get('<identifier>'))
+        ready = cci.wait_for_transaction(cci_id, int(args.get('--wait') or 0))
 
         if ready:
             return "READY"
         else:
-            raise CLIAbort("Instance %s not ready" % args['<id>'])
+            raise CLIAbort("Instance %s not ready" % cci_id)
 
 
 class ReloadCCI(CLIRunnable):
