@@ -46,13 +46,13 @@ class CCIManager(IdentifierMixin, object):
         :param string hostname: filter based on hostname
         :param string domain: filter based on domain
         :param string local_disk: filter based on local_disk
-    :param string datacenter: filter based on datacenter
-    :param integer nic_speed: filter based on network speed (in MBPS)
-    :param string public_ip: filter based on public ip address
-    :param string private_ip: filter based on private ip address
-    :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+        :param string datacenter: filter based on datacenter
+        :param integer nic_speed: filter based on network speed (in MBPS)
+        :param string public_ip: filter based on public ip address
+        :param string private_ip: filter based on private ip address
+        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
 
-    """
+        """
         if 'mask' not in kwargs:
             items = set([
                 'id',
