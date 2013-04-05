@@ -18,8 +18,6 @@ class ListISCSI(CLIRunnable):
 usage: sl iscsi list [options]
 
 List iSCSI accounts
-
-Options:
 """
     action = 'list'
 
@@ -31,14 +29,21 @@ Options:
             mask='eventCount,serviceResource[datacenter.name]')
         iscsi = [NestedDict(n) for n in iscsi]
 
-        t = Table(['id', 'datacenter', 'size', 'username',
-            'password', 'server'])
+        t = Table([
+            'id',
+            'datacenter',
+            'size',
+            'username',
+            'password',
+            'server'
+        ])
 
         for n in iscsi:
             t.add_row([
                 n['id'],
                 n['serviceResource']['datacenter'].get('name', blank()),
-                FormattedItem(n.get('capacityGb', blank()),
+                FormattedItem(
+                    n.get('capacityGb', blank()),
                     "%dGB" % n.get('capacityGb', 0)),
                 n.get('username', blank()),
                 n.get('password', blank()),
