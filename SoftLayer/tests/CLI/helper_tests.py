@@ -113,6 +113,11 @@ class FormattedItemTests(unittest.TestCase):
 
         self.assertRaises(ValueError, cli.mb_to_gb, '1024string')
 
+    def test_blank(self):
+        item = cli.helpers.blank()
+        self.assertEqual('NULL', item.original)
+        self.assertEqual('-', item.formatted)
+
 
 class CLIAbortTests(unittest.TestCase):
 

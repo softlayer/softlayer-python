@@ -357,3 +357,73 @@ class CCITests_unittests(unittest.TestCase):
         }
 
         self.assertEqual(data, assert_data)
+
+    @patch('SoftLayer.CCI.sleep')
+    def test_wait(self, _sleep):
+        guestObject = self.client.__getitem__().getObject
+
+        # test 4 iterations with positive match
+        guestObject.side_effect = [
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'provisionDate': 'aaa'},
+            {'provisionDate': 'aaa'}
+        ]
+
+        value = self.cci.wait_for_transaction(1, 4)
+        self.assertTrue(value)
+        _sleep.assert_has_calls([call(1), call(1), call(1)])
+        guestObject.assert_has_calls([
+            call(id=1, mask=ANY), call(id=1, mask=ANY),
+            call(id=1, mask=ANY), call(id=1, mask=ANY),
+        ])
+
+        # test 2 iterations, with no matches
+        _sleep.reset_mock()
+        guestObject.reset_mock()
+
+        guestObject.side_effect = [
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'provisionDate': 'aaa'}
+        ]
+        value = self.cci.wait_for_transaction(1, 2)
+        self.assertFalse(value)
+        _sleep.assert_has_calls([call(1), call(1)])
+        guestObject.assert_has_calls([
+            call(id=1, mask=ANY), call(id=1, mask=ANY),
+            call(id=1, mask=ANY)
+        ])
+
+        # 10 iterations at 10 second sleeps with no
+        # matching values.
+        _sleep.reset_mock()
+        guestObject.reset_mock()
+        guestObject.side_effect = [
+            {},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}}
+        ]
+        value = self.cci.wait_for_transaction(1, 10, 10)
+        self.assertFalse(value)
+        guestObject.assert_has_calls([
+            call(id=1, mask=ANY), call(id=1, mask=ANY),
+            call(id=1, mask=ANY), call(id=1, mask=ANY),
+            call(id=1, mask=ANY), call(id=1, mask=ANY),
+            call(id=1, mask=ANY), call(id=1, mask=ANY),
+            call(id=1, mask=ANY), call(id=1, mask=ANY),
+            call(id=1, mask=ANY)
+        ])
+        _sleep.assert_has_calls([
+            call(10), call(10), call(10), call(10), call(10),
+            call(10), call(10), call(10), call(10), call(10)])
