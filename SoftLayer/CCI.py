@@ -242,6 +242,8 @@ class CCIManager(IdentifierMixin, object):
             ]
 
             # disk 1 is reservered for swap
+            # XXX: enumerate(iterator, start=0) was added in 2.6. work around
+            # for 2.5 by adding 2 to the enumerated value
             for dev_id, disk in enumerate(disks[1:]):
                 data['blockDevices'].append(
                     {
