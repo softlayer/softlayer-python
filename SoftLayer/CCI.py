@@ -185,7 +185,7 @@ class CCIManager(IdentifierMixin, object):
         hostname=None, domain=None, local_disk=True,
         datacenter=None, os_code=None, image_id=None,
         private=False, public_vlan=None, private_vlan=None,
-        userdata=None, nic_speed=None):
+        userdata=None, nic_speed=None, disks=None):
 
         required = [cpus, memory, hostname, domain]
 
@@ -235,6 +235,17 @@ class CCIManager(IdentifierMixin, object):
 
         if nic_speed:
             data['networkComponents'] = [{'maxSpeed': nic_speed}]
+
+        if isinstance(disks, list):
+            data['blockDevices'] = [
+                {"device": "0", "diskImage": {"capacity": disks[0]}}
+            ]
+
+            # disk 1 is reservered for swap
+            for dev_id, disk in enumerate(disks[1:], 2):
+                data['blockDevices'].append(
+                    {"device": str(dev_id), "diskImage": {"capacity": disk}}
+                )
 
         return data
 
