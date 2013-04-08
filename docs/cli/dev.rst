@@ -97,6 +97,7 @@ A minimal implementation for `sl example print` would look like this:
 
 Which in turn, works like this:
 ::
+
   $ sl example print
   EXAMPLE!
   $ sl example print -h
