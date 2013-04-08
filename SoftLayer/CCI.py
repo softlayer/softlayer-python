@@ -242,9 +242,12 @@ class CCIManager(IdentifierMixin, object):
             ]
 
             # disk 1 is reservered for swap
-            for dev_id, disk in enumerate(disks[1:], 2):
+            for dev_id, disk in enumerate(disks[1:]):
                 data['blockDevices'].append(
-                    {"device": str(dev_id), "diskImage": {"capacity": disk}}
+                    {
+                        "device": str(dev_id + 2),
+                        "diskImage": {"capacity": disk}
+                    }
                 )
 
         return data
