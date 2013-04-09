@@ -2,6 +2,10 @@
 
 Installation
 ============
+
+Using Pip
+---------
+
 Install via pip: ::
 
 	$ pip install softlayer
@@ -13,9 +17,8 @@ Install from source gia pip (requires git): ::
 The most up to date version of this library can be found on the SoftLayer GitHub public repositories: http://github.com/softlayer. Please post to the SoftLayer forums http://forums.softlayer.com/ or open a support ticket in the SoftLayer customer portal if you have any questions regarding use of this library.
 
 
-
-Get the Code
-------------
+From Source
+-----------
 
 The project is developed on GitHub, at `github.com/softlayer/softlayer-api-python-client <https://github.com/softlayer/softlayer-api-python-client>`_.
 
