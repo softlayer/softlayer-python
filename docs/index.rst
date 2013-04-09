@@ -1,10 +1,18 @@
 .. SoftLayer API Python Client documentation
 
-SoftLayer API Python Client
-===========================
+SoftLayer API Python Client |version|
+========================================
 This is the documentation to SoftLayer's Python API Bindings. These bindings use SoftLayer's `XML-RPC interface <http://sldn.softlayer.com/article/XML-RPC>`_ in order to manage SoftLayer services.
 
-Release v\ |version|. (:ref:`Installation <install>`)
+.. toctree::
+   :maxdepth: 2
+
+   install
+   SoftLayer API Documentation <http://sldn.softlayer.com/reference/softlayerapi>
+   Source on Github <https://github.com/softlayer/softlayer-api-python-client>
+   SoftLayer Developer Network <http://sldn.softlayer.com/>
+   Twitter <https://twitter.com/SoftLayerDevs>
+
 
 API Documentation
 -----------------
@@ -19,26 +27,8 @@ API Documentation
 .. toctree::
    :maxdepth: 2
 
-   install
    api/client
-
-
-Managers
---------
-::
-
-	>>> from SoftLayer.CCI import CCIManager
-	>>> cci = CCIManager(client)
-	>>> cci.list_instances()
-	[...]
-
-Managers mask out a lot of the complexities of using the API into classes that provide a simpler interface to various services.
-
-.. toctree::
-   :maxdepth: 1
-   :glob:
-
-   api/managers/*
+   api/managers
 
 
 Command-Line Interface
@@ -57,6 +47,7 @@ Command-Line Interface
 
    cli
    cli/dev
+
 
 Indices and tables
 ==================

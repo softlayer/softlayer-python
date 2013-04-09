@@ -15,6 +15,9 @@ The available commands are:
   create-options  Output available available options when creating a CCI
   reload          Reload the OS on a CCI based on its current configuration
   ready           Check if a CCI has finished provisioning
+
+For several commands, <identifier> will be asked for. This can be the id,
+hostname or the ip address for a CCI.
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: BSD, see LICENSE for more details.
@@ -66,7 +69,7 @@ Filters:
   --hourly                 Show hourly instances
   --monthly                Show monthly instances
   -H --hostname=HOST       Host portion of the FQDN. example: server
-  -D --domain=DOMAIN       Domain portion of the FQDN example: example.com
+  -D --domain=DOMAIN       Domain portion of the FQDN. example: example.com
   -c --cpu=CPU             Number of CPU cores
   -m --memory=MEMORY       Memory in mebibytes (n * 1024)
   -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
@@ -126,12 +129,9 @@ usage: sl cci detail [--passwords] [--price] <identifier> [options]
 
 Get details for a CCI
 
-Positional Arguments:
-  <identifier>  This can be the id, hostname or ip address
-
 Options:
-  --passwords            show passwords (check over your shoulder!)
-  --price                show associated prices
+  --passwords  Show passwords (check over your shoulder!)
+  --price      Show associated prices
 """
     action = 'detail'
 
@@ -352,15 +352,15 @@ Required:
 Optional:
   -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
                            Note: Omitting this value defaults to the first
-                                 available datacenter
+                             available datacenter
   -n MBPS, --network=MBPS  Network port speed in Mbps
   --private                Allocate a private CCI
   --dry-run, --test        Do not create CCI, just get a quote
 
   -u --userdata=DATA       User defined metadata string
   -F --userfile=FILE       Read userdata from file
-  --wait=SECONDS           Block until CCI is finished provisioning
-                           for up to X seconds before returning.
+  --wait=SECONDS           Block until CCI is finished provisioning for up to X
+                             seconds before returning.
 """
     action = 'create'
     options = ['confirm']
@@ -488,12 +488,9 @@ usage: sl cci ready <identifier> [options]
 
 Check if a CCI is ready.
 
-Required:
-  <identifier>  Instance ID
-
 Optional:
-  --wait=SECONDS  Block until CCI is finished provisioning
-                  for up to X seconds before returning.
+  --wait=SECONDS  Block until CCI is finished provisioning for up to X seconds
+                    before returning.
 """
     action = 'ready'
 
@@ -632,8 +629,7 @@ Manage active CCI
 
 class NetworkCCI(CLIRunnable):
     """
-usage: sl cci network details <identifier> [options]
-       sl cci network port <identifier> --speed=SPEED (--public | --private)
+usage: sl cci network port <identifier> --speed=SPEED (--public | --private)
                            [options]
 
 Manage network settings
@@ -673,13 +669,13 @@ Options:
 
     @staticmethod
     def exec_detail(client, args):
-        print "TODO"  # TODO this should print out default gateway and stuff
+        # TODO this should print out default gateway and stuff
+        raise CLIAbort('Not implemented')
 
 
 class CCIDNS(CLIRunnable):
     """
 usage: sl cci dns sync <identifier> [options]
-       sl cci dns doppleganger <identifier> [options]
 
 DNS related actions for a CCI
 
@@ -694,8 +690,6 @@ Options:
     def execute(cls, client, args):
         if args['sync']:
             return cls.dns_sync(client, args)
-
-        raise CLIAbort('Not implemented')
 
     @staticmethod
     def dns_sync(client, args):
