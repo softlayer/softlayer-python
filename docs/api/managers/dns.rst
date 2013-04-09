@@ -2,4 +2,5 @@
 
 .. automodule:: SoftLayer.DNS
    :members:
+   :inherited-members:
    :undoc-members:

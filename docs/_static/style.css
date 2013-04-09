@@ -1,0 +1,7 @@
+@import url("nature.css");
+
+p.deprecated {
+    background-color: #ffe4e4;
+    border: 1px solid #f66;
+    padding: 0.2em;
+}

@@ -200,16 +200,11 @@ class Client(object):
 
         :param service: the name of the SoftLayer API service
         :param method: the method to call on the service
-        :param \*args: (optional) arguments for the remote call
-        :param id: (optional) id for the resource
-        :param mask: (optional) object mask
-        :param dict filter: (optional) filter dict
-        :param dict headers: (optional) optional XML-RPC headers
-        :param dict raw_headers: (optional) HTTP transport headers
-        :param int limit: (optional) return at most this many results
-        :param int offset: (optional) offset results by this many
-        :param boolean iter: (optional) if True, returns a generator with the
-                             results
+        :param \*args: same optional arguments that ``Service.call`` takes
+        :param \*\*kwargs: same optional keyword arguments that
+                           ``Service.call`` takes
+
+        :param service: the name of the SoftLayer API service
 
         Usage:
             >>> client['Account'].getVirtualGuests(mask="id", limit=10)
@@ -276,9 +271,9 @@ class Client(object):
         :param service: the name of the SoftLayer API service
         :param method: the method to call on the service
         :param integer chunk: result size for each API call
-        :param \*args: same optional arguments that ``Client.call`` takes
-        :param \*\*kwargs: same optional keyword arguments that ``Client.call``
-                           takes
+        :param \*args: same optional arguments that ``Service.call`` takes
+        :param \*\*kwargs: same optional keyword arguments that
+                           ``Service.call`` takes
 
         """
         if chunk <= 0:
@@ -386,9 +381,16 @@ class Service(object):
         """ Make a SoftLayer API call
 
         :param method: the method to call on the service
-        :param \*args: same optional arguments that ``Client.call`` takes
-        :param \*\*kwargs: same optional keyword arguments that ``Client.call``
-                         takes
+        :param \*args: (optional) arguments for the remote call
+        :param id: (optional) id for the resource
+        :param mask: (optional) object mask
+        :param dict filter: (optional) filter dict
+        :param dict headers: (optional) optional XML-RPC headers
+        :param dict raw_headers: (optional) HTTP transport headers
+        :param int limit: (optional) return at most this many results
+        :param int offset: (optional) offset results by this many
+        :param boolean iter: (optional) if True, returns a generator with the
+                             results
 
         Usage:
             >>> client['Account'].getVirtualGuests(mask="id", limit=10)
@@ -404,9 +406,9 @@ class Service(object):
 
         :param method: the method to call on the service
         :param integer chunk: result size for each API call
-        :param \*args: same optional arguments that ``Client.call`` takes
-        :param \*\*kwargs: same optional keyword arguments that ``Client.call``
-                           takes
+        :param \*args: same optional arguments that ``Service.call`` takes
+        :param \*\*kwargs: same optional keyword arguments that
+                           ``Service.call`` takes
 
         Usage:
             >>> gen = client['Account'].getVirtualGuests(iter=True)

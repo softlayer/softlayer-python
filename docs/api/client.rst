@@ -53,7 +53,7 @@ Retreive a ticket using Object Masks.
         id=123456, mask="mask[updates, assignedUser, attachedHardware.datacenter]")
 
 
-Now add an update to the ticket.
+Now add an update to the ticket with `Ticket.addUpdate <http://sldn.softlayer.com/reference/services/SoftLayer_Ticket/addUpdate>`_. This uses a parameter, which translate to positional arguments in the order that they appear in the API docs.
 ::
 
     update = client['Ticket'].addUpdate({'entry' : 'Hello!'}, id=123456)
