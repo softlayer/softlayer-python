@@ -149,6 +149,7 @@ class CCIManager(IdentifierMixin, object):
                 'maxMemory',
                 'datacenter.name',
                 'activeTransaction.id',
+                'blockDevices',
                 'blockDeviceTemplateGroup[id, name]',
                 'status.name',
                 'operatingSystem.softwareLicense.'
