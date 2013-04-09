@@ -1,0 +1,15 @@
+2.2.0
+
+    * Consistency changes/bug fixes
+
+    * Added sphinx documentation
+ 
+    * CCI: Adds Support for Additional Disks
+ 
+    * CCI: Adds a way to block until transactions are done on a CCI
+ 
+    * CLI(CCI): For most commands, you can specify id, hostname, private ip or public ip as <identifier>
+ 
+    * CLI(CCI): Adds the ability to filter list results for CCIs
+ 
+    * API: Adds generator to transparently chunk SoftLayer requests into reasonable chunks
