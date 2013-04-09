@@ -358,6 +358,55 @@ class CCITests_unittests(unittest.TestCase):
 
         self.assertEqual(data, assert_data)
 
+    def test_generate_no_disks(self):
+        data = self.cci._generate_create_dict(
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='example.com',
+            os_code="STRING"
+        )
+
+        self.assertEqual(data.get('blockDevices'), None)
+
+    def test_generate_single_disk(self):
+        data = self.cci._generate_create_dict(
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='example.com',
+            os_code="STRING",
+            disks=[50]
+        )
+
+        assert_data = {
+            'blockDevices': [
+                {"device": "0", "diskImage":{"capacity": 50}}]
+        }
+
+        self.assertTrue(data.get('blockDevices'))
+        self.assertEqual(data['blockDevices'], assert_data['blockDevices'])
+
+    def test_generate_multi_disk(self):
+        data = self.cci._generate_create_dict(
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='example.com',
+            os_code="STRING",
+            disks=[50, 70, 100]
+        )
+
+        assert_data = {
+            'blockDevices': [
+                {"device": "0", "diskImage":{"capacity": 50}},
+                {"device": "2", "diskImage":{"capacity": 70}},
+                {"device": "3", "diskImage":{"capacity": 100}}]
+        }
+
+        self.assertTrue(data.get('blockDevices'))
+        self.assertEqual(data['blockDevices'], assert_data['blockDevices'])
+
     @patch('SoftLayer.CCI.sleep')
     def test_wait(self, _sleep):
         guestObject = self.client.__getitem__().getObject
