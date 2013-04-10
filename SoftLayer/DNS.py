@@ -27,7 +27,7 @@ class DNSManager(object):
 
         """
         self.client = client
-        self.domain = self.client['Dns_Domain']
+        self.service = self.client['Dns_Domain']
         self.record = self.client['Dns_Domain_ResourceRecord']
 
     def list_zones(self, **kwargs):
@@ -38,32 +38,32 @@ class DNSManager(object):
         """
         return self.client['Account'].getDomains(**kwargs)
 
-    def get_zone(self, domain):
-        """ Get a domain/zone and its records.
+    def get_zone(self, zone):
+        """ Get a zone and its records.
 
-        :param domain: the domain/zone name
+        :param zone: the zone name
 
         """
-        domain = domain.lower()
-        results = self.domain.getByDomainName(
-            domain,
+        zone = zone.lower()
+        results = self.service.getByDomainName(
+            zone,
             mask={'resourceRecords': {}})
-        matches = filter(lambda x: x['name'].lower() == domain, results)
+        matches = filter(lambda x: x['name'].lower() == zone, results)
 
         try:
             return matches[0]
         except IndexError:
-            raise DNSZoneNotFound(domain)
+            raise DNSZoneNotFound(zone)
 
-    def create_zone(self, domain, serial=None):
-        """ Create a zone for the specified domain.
+    def create_zone(self, zone, serial=None):
+        """ Create a zone for the specified zone.
 
-        :param domain: the domain/zone name to create
+        :param zone: the zone name to create
         :param serial: serial value on the zone (default: strftime(%Y%m%d01))
 
         """
-        return self.domain.createObject({
-            'name': domain,
+        return self.service.createObject({
+            'name': zone,
             'serial': serial or strftime('%Y%m%d01')})
 
     def delete_zone(self, id):
@@ -72,7 +72,7 @@ class DNSManager(object):
         :param integer id: the zone ID to delete
 
         """
-        return self.domain.deleteObject(id=id)
+        return self.service.deleteObject(id=id)
 
     def edit_zone(self, zone):
         """ Update an existing zone with the options provided. The provided
@@ -82,12 +82,12 @@ class DNSManager(object):
         :param dict zone: the zone to update
 
         """
-        self.domain.editObject(zone)
+        self.service.editObject(zone)
 
     def create_record(self, id, record, type, data, ttl=60):
         """ Create a resource record on a domain.
 
-        :param integer id: the domain's ID
+        :param integer id: the zone's ID
         :param record: the name of the record to add
         :param type: the type of record (A, AAAA, CNAME, MX, SRV, TXT, etc.)
         :param data: the record's value
@@ -109,16 +109,16 @@ class DNSManager(object):
         """
         self.record.deleteObject(id=recordid)
 
-    def search_record(self, domain, record):
-        """ Search for records on a domain that match a specific name.
+    def search_record(self, zone, record):
+        """ Search for records on a zone that match a specific name.
         Useful for validating whether a record exists or that it has the
         correct value.
 
-        :param domain: the domain/zone name in which to search.
+        :param zone: the zone name in which to search.
         :param record: the record name to search for
 
         """
-        rrs = self.get_zone(domain)['resourceRecords']
+        rrs = self.get_zone(zone)['resourceRecords']
         records = filter(lambda x: x['host'].lower() == record.lower(), rrs)
         return records
 
@@ -135,7 +135,7 @@ class DNSManager(object):
     def dump_zone(self, id):
         """ Retrieve a zone dump in BIND format.
 
-        :param integer id: The zone/domain ID to dump
+        :param integer id: The zone ID to dump
 
         """
-        return self.domain.getZoneFileContents(id=id)
+        return self.service.getZoneFileContents(id=id)
