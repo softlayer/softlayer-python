@@ -15,6 +15,7 @@ The available commands are:
 # :license: BSD, see LICENSE for more details.
 
 from SoftLayer.CLI.helpers import CLIRunnable, no_going_back, Table, CLIAbort
+from SoftLayer.CLI.helpers import blank
 from SoftLayer.SSL import SSLManager
 
 
@@ -44,7 +45,7 @@ Options:
                 certificate['id'],
                 certificate['commonName'],
                 certificate['validityDays'],
-                certificate.get('notes', None)
+                certificate.get('notes', blank())
             ])
         t.sortby = args['--sortby']
         return t
@@ -54,7 +55,7 @@ class AddCertificate(CLIRunnable):
     """
 usage: sl ssl add --crt=FILE --key=FILE [options]
 
-Add SSL certificate
+Add and upload SSL certificate details
 
 Options:
   --crt=FILE     Certificate file
@@ -96,7 +97,7 @@ Options:
 
 class EditCertificate(CLIRunnable):
     """
-usage: sl ssl edit [options]
+usage: sl ssl edit <id> [options]
 
 Edit SSL certificate
 
