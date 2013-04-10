@@ -21,7 +21,7 @@ class DNSTests(unittest.TestCase):
         self.dns_client = SoftLayer.DNSManager(self.client)
 
     def test_init_exercise(self):
-        self.assertTrue(hasattr(self.dns_client, 'domain'))
+        self.assertTrue(hasattr(self.dns_client, 'service'))
         self.assertTrue(hasattr(self.dns_client, 'record'))
 
     def test_list_zones(self):
