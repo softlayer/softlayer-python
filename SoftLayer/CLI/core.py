@@ -209,5 +209,4 @@ def main(args=sys.argv[1:], env=Environment()):
     except (SoftLayerError, Exception), e:
         env.err(str(e))
         exit_status = 1
-
     sys.exit(exit_status)
