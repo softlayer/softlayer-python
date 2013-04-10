@@ -11,6 +11,9 @@ The available commands are:
   list      List ssl certificates
   remove    Remove ssl certificate
 """
+# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+# :license: BSD, see LICENSE for more details.
+
 from SoftLayer.CLI.helpers import CLIRunnable, no_going_back, Table, CLIAbort
 from SoftLayer.SSL import SSLManager
 

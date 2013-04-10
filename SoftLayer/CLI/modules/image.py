@@ -6,8 +6,11 @@ Manage compute and flex images
 The available commands are:
   list  List active vlans with firewalls
 """
+# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+# :license: BSD, see LICENSE for more details.
 
 from SoftLayer.CLI import CLIRunnable, Table
+from SoftLayer.CLI.helpers import blank
 
 
 class ListImages(CLIRunnable):
@@ -50,10 +53,10 @@ Options:
             for image in images:
                 t.add_row([
                     image['id'],
-                    image.get('accountId', '-'),
-                    image.get('type', '-'),
+                    image.get('accountId', blank()),
+                    image.get('type', blank()),
                     image['name'].strip(),
-                    image.get('globalIdentifier', '-'),
+                    image.get('globalIdentifier', blank()),
                 ])
 
         return t

@@ -1,3 +1,10 @@
+"""
+    SoftLayer.tests.CLI.core_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
 import os
 import os.path
 try:
@@ -197,27 +204,3 @@ class TestFormatOutput(unittest.TestCase):
         t.blanks = True
         output = cli.core.format_output(t)
         self.assertEqual("This is a test\n\nMore tests", output)
-
-    def test_nesteddict(self):
-        n = cli.helpers.NestedDict()
-
-        self.assertEqual(n['test'], cli.helpers.NestedDict())
-
-        n['test_set'] = 1
-        self.assertEqual(n['test_set'], 1)
-
-        d = {
-            'test': {
-                'nested': 1
-            }}
-
-        n = cli.helpers.NestedDict(d)
-        self.assertEqual(d, n)
-        self.assertEqual(n['test']['nested'], 1)
-
-        # new default top level elements should return a new NestedDict()
-        self.assertEqual(n['not']['nested'], cli.helpers.NestedDict())
-
-        # NestedDict doesn't convert dict children, just the top level dict
-        # so assuming this behavior down inside of a dict is not plausible
-        self.assertRaises(KeyError, lambda: n['test']['not']['nested'])

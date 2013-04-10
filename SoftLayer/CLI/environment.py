@@ -1,3 +1,11 @@
+"""
+    SoftLayer.environment
+    ~~~~~~~~~~~~~~~~~~~~~
+    Abstracts everything related to the user's environment when running the CLI
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
 import sys
 from importlib import import_module
 from ConfigParser import SafeConfigParser

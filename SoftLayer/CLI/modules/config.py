@@ -7,6 +7,9 @@ The available commands are:
   setup  Setup configuration
   show   Show current configuration
 """
+# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+# :license: BSD, see LICENSE for more details.
+
 import os.path
 
 from SoftLayer.CLI import CLIRunnable, CLIAbort, Table, confirm

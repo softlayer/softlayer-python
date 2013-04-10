@@ -1,3 +1,10 @@
+"""
+    SoftLayer.tests.API.client_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
 try:
     import unittest2 as unittest
 except ImportError:
@@ -263,68 +270,72 @@ class APICalls(unittest.TestCase):
         else:
             self.fail('No exception raised')
 
+    @patch('SoftLayer.API.Client.iter_call')
+    def test_iterate(self, _iter_call):
+        self.client['SERVICE'].METHOD(iter=True)
+        _iter_call.assert_called_with('SERVICE', 'METHOD', iter=True)
+
+    @patch('SoftLayer.API.Client.iter_call')
+    def test_service_iter_call(self, _iter_call):
+        self.client['SERVICE'].iter_call('METHOD')
+        _iter_call.assert_called_with('SERVICE', 'METHOD')
+
     @patch('SoftLayer.API.Client.call')
-    def test_iterate(self, _call):
+    def test_iter_call(self, _call):
         # chunk=100, no limit
         _call.side_effect = [range(100), range(100, 125)]
-        result = list(self.client['SERVICE'].METHOD(iter=True))
+        result = list(self.client.iter_call('SERVICE', 'METHOD', iter=True))
 
         self.assertEquals(range(125), result)
         _call.assert_has_calls([
-            call('SoftLayer_SERVICE', 'METHOD',
-                 limit=100, iter=True, offset=0),
-            call('SoftLayer_SERVICE', 'METHOD',
-                 limit=100, iter=True, offset=100),
+            call('SERVICE', 'METHOD', limit=100, iter=False, offset=0),
+            call('SERVICE', 'METHOD', limit=100, iter=False, offset=100),
         ])
         _call.reset_mock()
 
         # chunk=100, no limit. Requires one extra request.
         _call.side_effect = [range(100), range(100, 200), []]
-        result = list(self.client['SERVICE'].METHOD(iter=True))
+        result = list(self.client.iter_call('SERVICE', 'METHOD', iter=True))
         self.assertEquals(range(200), result)
         _call.assert_has_calls([
-            call('SoftLayer_SERVICE', 'METHOD',
-                 limit=100, iter=True, offset=0),
-            call('SoftLayer_SERVICE', 'METHOD',
-                 limit=100, iter=True, offset=100),
-            call('SoftLayer_SERVICE', 'METHOD',
-                 limit=100, iter=True, offset=200),
+            call('SERVICE', 'METHOD', limit=100, iter=False, offset=0),
+            call('SERVICE', 'METHOD', limit=100, iter=False, offset=100),
+            call('SERVICE', 'METHOD', limit=100, iter=False, offset=200),
         ])
         _call.reset_mock()
 
         # chunk=25, limit=30
         _call.side_effect = [range(0, 25), range(25, 30)]
-        result = list(
-            self.client['SERVICE'].METHOD(iter=True, limit=30, chunk=25))
+        result = list(self.client.iter_call(
+            'SERVICE', 'METHOD', iter=True, limit=30, chunk=25))
         self.assertEquals(range(30), result)
         _call.assert_has_calls([
-            call('SoftLayer_SERVICE', 'METHOD', iter=True, limit=25, offset=0),
-            call('SoftLayer_SERVICE', 'METHOD', iter=True, limit=5, offset=25),
+            call('SERVICE', 'METHOD', iter=False, limit=25, offset=0),
+            call('SERVICE', 'METHOD', iter=False, limit=5, offset=25),
         ])
         _call.reset_mock()
 
         # A non-list was returned
         _call.side_effect = ["test"]
-        result = list(self.client['SERVICE'].METHOD(iter=True))
+        result = list(self.client.iter_call('SERVICE', 'METHOD', iter=True))
         self.assertEquals(["test"], result)
         _call.assert_has_calls([
-            call('SoftLayer_SERVICE', 'METHOD',
-                 iter=True, limit=100, offset=0),
+            call('SERVICE', 'METHOD', iter=False, limit=100, offset=0),
         ])
         _call.reset_mock()
 
         # chunk=25, limit=30, offset=12
         _call.side_effect = [range(0, 25), range(25, 30)]
-        result = list(self.client['SERVICE'].METHOD(
-            iter=True, limit=30, chunk=25, offset=12))
+        result = list(self.client.iter_call(
+            'SERVICE', 'METHOD', iter=True, limit=30, chunk=25, offset=12))
         self.assertEquals(range(30), result)
         _call.assert_has_calls([
-            call('SoftLayer_SERVICE', 'METHOD',
-                 iter=True, limit=25, offset=12),
-            call('SoftLayer_SERVICE', 'METHOD', iter=True, limit=5, offset=37),
+            call('SERVICE', 'METHOD', iter=False, limit=25, offset=12),
+            call('SERVICE', 'METHOD', iter=False, limit=5, offset=37),
         ])
 
         # Chunk size of 0 is invalid
         self.assertRaises(
             AttributeError,
-            lambda: list(self.client['SERVICE'].METHOD(iter=True, chunk=0)))
+            lambda: list(self.client.iter_call(
+                'SERVICE', 'METHOD', iter=True, chunk=0)))

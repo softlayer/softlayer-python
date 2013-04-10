@@ -1,3 +1,10 @@
+"""
+    SoftLayer.tests.CLI.helper_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
 import sys
 try:
     import unittest2 as unittest
@@ -105,6 +112,11 @@ class FormattedItemTests(unittest.TestCase):
         self.assertEqual('1G', item.formatted)
 
         self.assertRaises(ValueError, cli.mb_to_gb, '1024string')
+
+    def test_blank(self):
+        item = cli.helpers.blank()
+        self.assertEqual('NULL', item.original)
+        self.assertEqual('-', item.formatted)
 
 
 class CLIAbortTests(unittest.TestCase):

@@ -1,0 +1,15 @@
+2.2.0
+
+    * Consistency changes/bug fixes
+
+    * Added sphinx documentation. See it here: http://softlayer.github.com/softlayer-api-python-client
+ 
+    * CCI: Adds Support for Additional Disks
+ 
+    * CCI: Adds a way to block until transactions are done on a CCI
+ 
+    * CLI(CCI): For most commands, you can specify id, hostname, private ip or public ip as <identifier>
+ 
+    * CLI(CCI): Adds the ability to filter list results for CCIs
+ 
+    * API: for large result sets, requests can now be chunked into smaller batches on the server side. Using service.iter_call('getObjects', ...) or service.getObjects(..., iter=True) will return a generator regardless of the results returned. offset and limit can be passed in like normal. An additional named parameter of 'chunk' is used to limit the number of items coming back in a single request, defaults to 100.

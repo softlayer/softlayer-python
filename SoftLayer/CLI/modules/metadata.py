@@ -20,6 +20,9 @@ The available commands are:
   id               Id
   network          Details about either the public or private network
 """
+# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+# :license: BSD, see LICENSE for more details.
+
 from SoftLayer.metadata import MetadataManager
 from SoftLayer.CLI import CLIRunnable, Table, listing, CLIAbort
 
@@ -39,7 +42,7 @@ List backend mac addresses
 
 class Datacenter(CLIRunnable):
     """
-usage: sl metadata name [options]
+usage: sl metadata datacenter [options]
 
 Get datacenter name
 """
@@ -52,7 +55,7 @@ Get datacenter name
 
 class DatacenterId(CLIRunnable):
     """
-usage: sl metadata id [options]
+usage: sl metadata datacenter_id [options]
 
 Get datacenter id
 """
@@ -205,7 +208,7 @@ Get details about the public or private network
                 'mac addresses',
                 listing(network['mac_addresses'], separator=',')])
             t.add_row([
-                'router', network['routers']])
+                'router', network['router']])
             t.add_row([
                 'vlans', listing(network['vlans'], separator=',')])
             t.add_row([
@@ -222,7 +225,7 @@ Get details about the public or private network
                 'mac addresses',
                 listing(network['mac_addresses'], separator=',')])
             t.add_row([
-                'router', network['routers']])
+                'router', network['router']])
             t.add_row([
                 'vlans', listing(network['vlans'], separator=',')])
             t.add_row([

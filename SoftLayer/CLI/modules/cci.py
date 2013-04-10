@@ -14,16 +14,38 @@ The available commands are:
   cancel          Cancel a running CCI
   create-options  Output available available options when creating a CCI
   reload          Reload the OS on a CCI based on its current configuration
+  ready           Check if a CCI has finished provisioning
+
+For several commands, <identifier> will be asked for. This can be the id,
+hostname or the ip address for a CCI.
 """
+# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+# :license: BSD, see LICENSE for more details.
 
 from os import linesep
 import os.path
+
 from SoftLayer.CCI import CCIManager
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
     FormattedItem)
 from SoftLayer.CLI.helpers import (
-    CLIAbort, ArgumentError, SequentialOutput, NestedDict)
+    CLIAbort, ArgumentError, SequentialOutput,
+    NestedDict, blank)
+
+
+def resolve_id(cci_manager, identifier):
+    cci_ids = cci_manager.resolve_ids(identifier)
+
+    if len(cci_ids) == 0:
+        raise CLIAbort("Error: Unable to find CCI '%s'" % identifier)
+
+    if len(cci_ids) > 1:
+        raise CLIAbort(
+            "Error: Multiple CCIs found for '%s': %s" %
+            (identifier, ', '.join([str(_id) for _id in cci_ids])))
+
+    return cci_ids[0]
 
 
 class ListCCIs(CLIRunnable):
@@ -33,39 +55,57 @@ usage: sl cci list [--hourly | --monthly] [--sortby=SORT_COLUMN] [--tags=TAGS]
 
 List CCIs
 
+Examples:
+    sl cci list --datacenter=dal05
+    sl cci list --network=100 --cpu=2
+    sl cci list --memory='>= 2048'
+    sl cci list --tags=production,db
+
 Options:
-  --hourly      Show hourly instances
-  --monthly     Show monthly instances
   --sortby=ARG  Column to sort by. options: id, datacenter, host,
                 Cores, memory, primary_ip, backend_ip
-  --tags=ARG    Only show instances that have one of these tags
+
+Filters:
+  --hourly                 Show hourly instances
+  --monthly                Show monthly instances
+  -H --hostname=HOST       Host portion of the FQDN. example: server
+  -D --domain=DOMAIN       Domain portion of the FQDN. example: example.com
+  -c --cpu=CPU             Number of CPU cores
+  -m --memory=MEMORY       Memory in mebibytes (n * 1024)
+  -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
+  -n MBPS, --network=MBPS  Network port speed in Mbps
+  --tags=ARG               Only show instances that have one of these tags.
+                           Comma-separated. (production,db)
+
+For more on filters see 'sl help filters'
 """
     action = 'list'
-    options = ['listing']
 
     @staticmethod
     def execute(client, args):
         cci = CCIManager(client)
 
-        results = cci.list_instances(
-            hourly=args.get('--hourly'), monthly=args.get('--monthly'))
+        tags = None
+        if args.get('--tags'):
+            tags = [tag.strip() for tag in args.get('--tags').split(',')]
+
+        guests = cci.list_instances(
+            hourly=args.get('--hourly'),
+            monthly=args.get('--monthly'),
+            hostname=args.get('--hostname'),
+            domain=args.get('--domain'),
+            cpus=args.get('--cpu'),
+            memory=args.get('--memory'),
+            datacenter=args.get('--datacenter'),
+            nic_speed=args.get('--network'),
+            tags=tags)
 
         t = Table([
             'id', 'datacenter', 'host',
             'cores', 'memory', 'primary_ip',
-            'backend_ip', 'provisioning',
+            'backend_ip', 'active_transaction',
         ])
         t.sortby = args.get('--sortby') or 'host'
-
-        if args.get('--tags'):
-            tags = [tag.strip() for tag in args.get('--tags').split(',')]
-            guests = []
-            for g in results:
-                guest_tags = [x['tag']['name'] for x in g['tagReferences']]
-                if any(_tag in tags for _tag in guest_tags):
-                    guests.append(g)
-        else:
-            guests = results
 
         for guest in guests:
             t.add_row([
@@ -74,10 +114,10 @@ Options:
                 guest['fullyQualifiedDomainName'],
                 guest['maxCpu'],
                 mb_to_gb(guest['maxMemory']),
-                guest.get('primaryIpAddress', '-'),
-                guest.get('primaryBackendIpAddress', '-'),
+                guest.get('primaryIpAddress', blank()),
+                guest.get('primaryBackendIpAddress', blank()),
                 guest.get('activeTransaction', {}).get(
-                    'transactionStatus', {}).get('friendlyName', ''),
+                    'transactionStatus', {}).get('friendlyName', blank()),
             ])
 
         return t
@@ -85,17 +125,13 @@ Options:
 
 class CCIDetails(CLIRunnable):
     """
-usage: sl cci detail (--id=ID | --name=NAME | --public-ip=PUBLIC_IP)
-                     [--passwords] [--price] [options]
+usage: sl cci detail [--passwords] [--price] <identifier> [options]
 
 Get details for a CCI
 
 Options:
-  --id ID                id of CCI
-  --name NAME            the fully qualified domain name
-  --public-ip PUBLIC_IP  public ip of CCI
-  --passwords            show passwords (check over your shoulder!)
-  --price                show associated prices
+  --passwords  Show passwords (check over your shoulder!)
+  --price      Show associated prices
 """
     action = 'detail'
 
@@ -107,29 +143,27 @@ Options:
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
 
-        # make this cci.resolve_id capable
-        cci_id = args.get('--id')
-
+        cci_id = resolve_id(cci, args.get('<identifier>'))
         result = cci.get_instance(cci_id)
-
         result = NestedDict(result)
 
         t.add_row(['id', result['id']])
         t.add_row(['hostname', result['fullyQualifiedDomainName']])
         t.add_row(['status', result['status']['name']])
         t.add_row(['state', result['powerState']['name']])
-        t.add_row(['datacenter', result['datacenter'].get('name', '-')])
+        t.add_row(['datacenter', result['datacenter'].get('name', blank())])
         t.add_row(['cores', result['maxCpu']])
         t.add_row(['memory', mb_to_gb(result['maxMemory'])])
-        t.add_row(['public_ip', result.get('primaryIpAddress', '-')])
-        t.add_row(['private_ip', result.get('primaryBackendIpAddress', '-')])
+        t.add_row(['public_ip', result.get('primaryIpAddress', blank())])
+        t.add_row(
+            ['private_ip', result.get('primaryBackendIpAddress', blank())])
         t.add_row([
             'os',
             FormattedItem(
                 result['operatingSystem']['softwareLicense']
-                ['softwareDescription'].get('referenceCode', '-'),
+                ['softwareDescription'].get('referenceCode', blank()),
                 result['operatingSystem']['softwareLicense']
-                ['softwareDescription'].get('name', '-')
+                ['softwareDescription'].get('name', blank())
             )])
         t.add_row(['private_only', result['privateNetworkOnlyFlag']])
         t.add_row(['private_cpu', result['dedicatedAccountHostOnlyFlag']])
@@ -190,8 +224,8 @@ Options:
         result = cci.get_create_options()
 
         show_all = True
-        for opt_name, _ in args.iteritems():
-            if opt_name.lstrip('-') in cls.options:
+        for opt_name in cls.options:
+            if args.get("--" + opt_name):
                 show_all = False
                 break
 
@@ -303,27 +337,30 @@ usage: sl cci create --hostname=HOST --domain=DOMAIN --cpu=CPU --memory=MEMORY
 Order/create a CCI. See 'sl cci create-options' for valid options
 
 Required:
-  -H --hostname=HOST       Host portion of the FQDN. example: server
-  -D --domain=DOMAIN       Domain portion of the FQDN example: example.com
-  -c --cpu=CPU             Number of CPU cores
-  -m --memory=MEMORY       Memory in mebibytes (n * 1024)
+  -H --hostname=HOST  Host portion of the FQDN. example: server
+  -D --domain=DOMAIN  Domain portion of the FQDN example: example.com
+  -c --cpu=CPU        Number of CPU cores
+  -m --memory=MEMORY  Memory in mebibytes (n * 1024)
 
-  -o OS, --os=OS           OS install code. Tip: you can specify <OS>_LATEST
-  --image=GUID             Image GUID. See: 'sl image list' for reference
+  -o OS, --os=OS      OS install code. Tip: you can specify <OS>_LATEST
+  --image=GUID        Image GUID. See: 'sl image list' for reference
 
-  --hourly                 Hourly rate instance type
-  --monthly                Monthly rate instance type
+  --hourly            Hourly rate instance type
+  --monthly           Monthly rate instance type
+
 
 Optional:
   -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
                            Note: Omitting this value defaults to the first
-                                 available datacenter
+                             available datacenter
   -n MBPS, --network=MBPS  Network port speed in Mbps
   --private                Allocate a private CCI
   --dry-run, --test        Do not create CCI, just get a quote
 
   -u --userdata=DATA       User defined metadata string
   -F --userfile=FILE       Read userdata from file
+  --wait=SECONDS           Block until CCI is finished provisioning for up to X
+                             seconds before returning.
 """
     action = 'create'
     options = ['confirm']
@@ -417,9 +454,10 @@ Optional:
             t.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
             output = SequentialOutput(blanks=False)
             output.append(t)
-            output.append(FormattedItem('',
-                    ' -- ! Prices reflected here are retail and do not '
-                    'take account level discounts and are not guarenteed.')
+            output.append(FormattedItem(
+                '',
+                ' -- ! Prices reflected here are retail and do not '
+                'take account level discounts and are not guarenteed.')
             )
 
         elif args['--really'] or confirm(
@@ -436,12 +474,42 @@ Optional:
         else:
             raise CLIAbort('Aborting CCI order.')
 
+        if args.get('--wait') or 0 and not args.get('--test'):
+            ready = cci.wait_for_transaction(
+                result['id'], int(args.get('--wait') or 1))
+            t.add_row(['ready', ready])
+
         return output
+
+
+class ReadyCCI(CLIRunnable):
+    """
+usage: sl cci ready <identifier> [options]
+
+Check if a CCI is ready.
+
+Optional:
+  --wait=SECONDS  Block until CCI is finished provisioning for up to X seconds
+                    before returning.
+"""
+    action = 'ready'
+
+    @staticmethod
+    def execute(client, args):
+        cci = CCIManager(client)
+
+        cci_id = resolve_id(cci, args.get('<identifier>'))
+        ready = cci.wait_for_transaction(cci_id, int(args.get('--wait') or 0))
+
+        if ready:
+            return "READY"
+        else:
+            raise CLIAbort("Instance %s not ready" % cci_id)
 
 
 class ReloadCCI(CLIRunnable):
     """
-usage: sl cci reload <id> [options]
+usage: sl cci reload <identifier> [options]
 
 Reload the OS on a CCI based on its current configuration
 """
@@ -452,15 +520,16 @@ Reload the OS on a CCI based on its current configuration
     @staticmethod
     def execute(client, args):
         cci = CCIManager(client)
-        if args['--really'] or no_going_back(args['<id>']):
-            cci.reload_instance(args['<id>'])
+        cci_id = resolve_id(cci, args.get('<identifier>'))
+        if args['--really'] or no_going_back(cci_id):
+            cci.reload_instance(cci_id)
         else:
             CLIAbort('Aborted')
 
 
 class CancelCCI(CLIRunnable):
     """
-usage: sl cci cancel <id> [options]
+usage: sl cci cancel <identifier> [options]
 
 Cancel a CCI
 """
@@ -471,19 +540,20 @@ Cancel a CCI
     @staticmethod
     def execute(client, args):
         cci = CCIManager(client)
-        if args['--really'] or no_going_back(args['<id>']):
-            cci.cancel_instance(args['<id>'])
+        cci_id = resolve_id(cci, args.get('<identifier>'))
+        if args['--really'] or no_going_back(cci_id):
+            cci.cancel_instance(cci_id)
         else:
             CLIAbort('Aborted')
 
 
 class ManageCCI(CLIRunnable):
     """
-usage: sl cci manage poweroff <id> [--cycle | --soft] [options]
-       sl cci manage reboot <id> [--cycle | --soft] [options]
-       sl cci manage poweron <id> [options]
-       sl cci manage pause <id> [options]
-       sl cci manage resume <id> [options]
+usage: sl cci manage poweroff <identifier> [--cycle | --soft] [options]
+       sl cci manage reboot <identifier> [--cycle | --soft] [options]
+       sl cci manage poweron <identifier> [options]
+       sl cci manage pause <identifier> [options]
+       sl cci manage resume <identifier> [options]
 
 Manage active CCI
 """
@@ -510,47 +580,57 @@ Manage active CCI
     @staticmethod
     def exec_shutdown(client, args):
         vg = client['Virtual_Guest']
+        cci = CCIManager(client)
+        cci_id = resolve_id(cci, args.get('<identifier>'))
         if args['--soft']:
-            result = vg.powerOffSoft(id=args['<id>'])
+            result = vg.powerOffSoft(id=cci_id)
         elif args['--cycle']:
-            result = vg.powerCycle(id=args['<id>'])
+            result = vg.powerCycle(id=cci_id)
         else:
-            result = vg.powerOff(id=args['<id>'])
+            result = vg.powerOff(id=cci_id)
 
         return FormattedItem(result)
 
     @staticmethod
     def exec_poweron(client, args):
         vg = client['Virtual_Guest']
-        return vg.powerOn(id=args['<id>'])
+        cci = CCIManager(client)
+        cci_id = resolve_id(cci, args.get('<identifier>'))
+        return vg.powerOn(id=cci_id)
 
     @staticmethod
     def exec_pause(client, args):
         vg = client['Virtual_Guest']
-        return vg.pause(id=args['<id>'])
+        cci = CCIManager(client)
+        cci_id = resolve_id(cci, args.get('<identifier>'))
+        return vg.pause(id=cci_id)
 
     @staticmethod
     def exec_resume(client, args):
         vg = client['Virtual_Guest']
-        return vg.resume(id=args['<id>'])
+        cci = CCIManager(client)
+        cci_id = resolve_id(cci, args.get('<identifier>'))
+        return vg.resume(id=cci_id)
 
     @staticmethod
     def exec_reboot(client, args):
         vg = client['Virtual_Guest']
+        cci = CCIManager(client)
+        cci_id = resolve_id(cci, args.get('<identifier>'))
         if args['--cycle']:
-            result = vg.rebootHard(id=args['<id>'])
+            result = vg.rebootHard(id=cci_id)
         elif args['--soft']:
-            result = vg.rebootSoft(id=args['<id>'])
+            result = vg.rebootSoft(id=cci_id)
         else:
-            result = vg.rebootDefault(id=args['<id>'])
+            result = vg.rebootDefault(id=cci_id)
 
         return result
 
 
 class NetworkCCI(CLIRunnable):
     """
-usage: sl cci network details <id> [options]
-       sl cci network port <id> --speed=SPEED (--public | --private) [options]
+usage: sl cci network port <identifier> --speed=SPEED (--public | --private)
+                           [options]
 
 Manage network settings
 
@@ -578,7 +658,10 @@ Options:
         elif args['--private']:
             func = vg.setPrivateNetworkInterfaceSpeed
 
-        result = func(args['--speed'], id=args['<id>'])
+        cci = CCIManager(client)
+        cci_id = resolve_id(cci, args.get('<identifier>'))
+
+        result = func(args['--speed'], id=cci_id)
         if result:
             return "Success"
         else:
@@ -586,13 +669,13 @@ Options:
 
     @staticmethod
     def exec_detail(client, args):
-        print "TODO"  # TODO this should print out default gateway and stuff
+        # TODO this should print out default gateway and stuff
+        raise CLIAbort('Not implemented')
 
 
 class CCIDNS(CLIRunnable):
     """
-usage: sl cci dns sync <id> [options]
-       sl cci dns doppleganger <id> [options]
+usage: sl cci dns sync <identifier> [options]
 
 DNS related actions for a CCI
 
@@ -607,8 +690,6 @@ Options:
     def execute(cls, client, args):
         if args['sync']:
             return cls.dns_sync(client, args)
-
-        raise CLIAbort('Not implemented')
 
     @staticmethod
     def dns_sync(client, args):
@@ -661,7 +742,8 @@ Options:
                     instance['fullyQualifiedDomainName'],
                     ttl=7200)
 
-        instance = cci.get_instance(args['<id>'])
+        cci_id = resolve_id(cci, args.get('<identifier>'))
+        instance = cci.get_instance(cci_id)
 
         if not instance['primaryIpAddress']:
             raise CLIAbort('No primary IP address associated with this CCI')

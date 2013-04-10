@@ -6,6 +6,9 @@ Firewall rule and security management
 The available commands are:
   list  List active vlans with firewalls
 """
+# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+# :license: BSD, see LICENSE for more details.
+
 from SoftLayer.CLI import CLIRunnable, Table, listing
 from SoftLayer.firewall import FirewallManager
 

@@ -1,3 +1,11 @@
+"""
+    SoftLayer.DNS
+    ~~~~~~~~~~~~~
+    DNS Manager/helpers
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
 from time import strftime
 from SoftLayer.exceptions import SoftLayerError
 
@@ -25,7 +33,7 @@ class DNSManager(object):
     def list_zones(self, **kwargs):
         """ Retrieve a list of all DNS zones.
 
-        :param dict **kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
 
         """
         return self.client['Account'].getDomains(**kwargs)

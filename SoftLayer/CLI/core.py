@@ -21,6 +21,9 @@ See 'sl help <command>' for more information on a specific command.
 To use most commands your SoftLayer username and api_key need to be configured.
 The easiest way to do that is to use: 'sl config setup'
 """
+# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+# :license: BSD, see LICENSE for more details.
+
 import sys
 import os
 import os.path
@@ -80,6 +83,8 @@ def format_no_tty(table):
     t.hrules = NONE
     t.border = False
     t.header = False
+    t.left_padding_width = 0
+    t.right_padding_width = 2
     return t
 
 
@@ -152,7 +157,7 @@ def main(args=sys.argv[1:], env=Environment()):
             parse_main_args(['--help'])
 
         module = env.load_module(module_name)
-        actions = env.plugins[module_name]
+        actions = env.plugins.get(module_name) or []
 
         # handle `sl <command> ...`
         module_args = parse_module_args(

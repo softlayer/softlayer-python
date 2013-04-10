@@ -1,3 +1,10 @@
+"""
+    SoftLayer.tests.API.metadata_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
 import SoftLayer
 
 try:
@@ -34,6 +41,12 @@ class MetadataTests(unittest.TestCase):
         r = self.metadata.get('vlans', '1:2:3:4:5')
         self.make_request.assert_called_with("Vlans/1:2:3:4:5.json")
         self.assertEqual([123], r)
+
+    def test_user_data(self):
+        self.make_request.return_value = 'user_data'
+        r = self.metadata.get('user_data')
+        self.make_request.assert_called_with("UserMetadata.txt")
+        self.assertEqual('user_data', r)
 
     def test_return_none(self):
         self.make_request.return_value = None
