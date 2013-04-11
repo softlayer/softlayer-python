@@ -35,7 +35,7 @@ List active vlans with firewalls
                 features.append('HA')
 
             if features:
-                listing(features, separator=',')
+                feature_list = listing(features, separator=',')
             else:
                 feature_list = blank()
 
