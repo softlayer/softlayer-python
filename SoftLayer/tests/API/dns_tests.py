@@ -11,7 +11,7 @@ try:
     import unittest2 as unittest
 except ImportError:
     import unittest # NOQA
-from mock import MagicMock
+from mock import MagicMock, ANY
 
 
 class DNSTests(unittest.TestCase):
@@ -54,6 +54,10 @@ class DNSTests(unittest.TestCase):
             {'name': 'example.com'}
 
         res = self.dns_client.create_zone('example.com')
+
+        self.client.__getitem__().createObject.assert_called_once_with(
+                {'name': 'example.com', "resourceRecords": {}, "serial": ANY})
+
         self.assertEqual(res, {'name': 'example.com'})
 
     def test_delete_zone(self):

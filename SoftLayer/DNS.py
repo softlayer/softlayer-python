@@ -64,7 +64,8 @@ class DNSManager(object):
         """
         return self.service.createObject({
             'name': zone,
-            'serial': serial or strftime('%Y%m%d01')})
+            'serial': serial or strftime('%Y%m%d01'),
+            "resourceRecords": {}})
 
     def delete_zone(self, id):
         """ Delete a zone by its ID.
