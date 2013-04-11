@@ -59,6 +59,12 @@ class PromptTests(unittest.TestCase):
         result = cli.no_going_back(confirmed)
         self.assertTrue(result)
 
+        # no_going_back should cast int's to str()
+        confirmed = '4712309182309'
+        raw_input_mock.return_value = confirmed
+        result = cli.no_going_back(int(confirmed))
+        self.assertTrue(result)
+
         confirmed = None
         raw_input_mock.return_value = ''
         result = cli.no_going_back(confirmed)

@@ -90,7 +90,7 @@ def no_going_back(confirmation):
     return valid_response(
         'This action cannot be undone! '
         'Type "%s" or press Enter to abort: ' % confirmation,
-        confirmation)
+        str(confirmation))
 
 
 class CLIHalt(SystemExit):
