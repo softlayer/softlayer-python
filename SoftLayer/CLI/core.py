@@ -117,7 +117,8 @@ Prompt Options:
   -y, --really  Confirm all prompt actions
 """
 
-    arg_doc += """
+    if '[options]' in arg_doc:
+        arg_doc += """
 Standard Options:
   --format=ARG           Output format. [Options: table, raw] [Default: %s]
   -C FILE --config=FILE  Config file location. [Default: ~/.softlayer]
