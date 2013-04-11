@@ -10,6 +10,7 @@ The available commands are:
 # :license: BSD, see LICENSE for more details.
 
 from SoftLayer.CLI import CLIRunnable, Table, listing
+from SoftLayer.CLI.helpers import blank
 from SoftLayer.firewall import FirewallManager
 
 
@@ -32,14 +33,20 @@ List active vlans with firewalls
             features = []
             if vlan['highAvailabilityFirewallFlag']:
                 features.append('HA')
+
+            if features:
+                listing(features, separator=',')
+            else:
+                feature_list = blank()
+
             t.add_row([
                 vlan['vlanNumber'],
                 'dedicated',
-                listing(features, separator=','),
+                feature_list,
             ])
 
         shared_vlan = filter(lambda x: not x['dedicatedFirewallFlag'], fwvlans)
         for vlan in shared_vlan:
-            t.add_row([vlan['vlanNumber'], 'standard', ''])
+            t.add_row([vlan['vlanNumber'], 'standard', blank()])
 
         return t

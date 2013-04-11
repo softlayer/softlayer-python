@@ -77,22 +77,18 @@ Options:
             template['certificate'] = open(args['--crt']).read()
             template['privateKey'] = open(args['--key']).read()
             if args['--csr']:
-                template['intermediateCertificate'] = \
+                template['certificateSigningRequest'] = \
                     open(args['--csr']).read()
 
             if args['--icc']:
-                template['certificateSigningRequest'] = \
+                template['intermediateCertificate'] = \
                     open(args['--icc']).read()
 
         except IOError:
-            raise ValueError("File does not exist")
-            exit(1)
+            raise CLIAbort("File does not exist")
 
         manager = SSLManager(client)
-        cert = manager.add_certificate(template)
-        return (
-            "Created certificate: %s" % cert['commonName'],
-            "Created certificate: %s" % cert['name'])
+        manager.add_certificate(template)
 
 
 class EditCertificate(CLIRunnable):
@@ -118,9 +114,9 @@ Options:
         if args['--key']:
             template['privateKey'] = open(args['--key']).read()
         if args['--csr']:
-            template['intermediateCertificate'] = open(args['--csr']).read()
+            template['certificateSigningRequest'] = open(args['--csr']).read()
         if args['--icc']:
-            template['certificateSigningRequest'] = open(args['--icc']).read()
+            template['intermediateCertificate'] = open(args['--icc']).read()
         if args['--notes']:
             template['notes'] = args['--notes']
 
@@ -142,7 +138,6 @@ Remove SSL certificate
         manager = SSLManager(client)
         if args['--really'] or no_going_back('yes'):
             manager.remove_certificate(args['<id>'])
-            return "Deleted certificate: %s" % args['<id>']
         raise CLIAbort("Aborted.")
 
 
