@@ -189,7 +189,7 @@ def main(args=sys.argv[1:], env=Environment()):
         # Do the thing
         data = action.execute(client, submodule_args)
         if data:
-            format = submodule_args.get('--format')
+            format = submodule_args.get('--format', 'table')
             if format not in ['raw', 'table']:
                 raise ArgumentError('Invalid Format "%s"' % format)
             s = format_output(data, fmt=format)
