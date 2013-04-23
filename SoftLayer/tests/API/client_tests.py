@@ -339,3 +339,25 @@ class APICalls(unittest.TestCase):
             AttributeError,
             lambda: list(self.client.iter_call(
                 'SERVICE', 'METHOD', iter=True, chunk=0)))
+
+
+class TestBasicAuthentication(unittest.TestCase):
+    def setUp(self):
+        self.auth = SoftLayer.BasicAuthentication('USERNAME', 'APIKEY')
+
+    def test_attribs(self):
+        self.assertEquals(self.auth.username, 'USERNAME')
+        self.assertEquals(self.auth.api_key, 'APIKEY')
+
+    def test_get_headers(self):
+        self.assertEquals(self.auth.get_headers(), {
+            'authenticate': {
+                'username': 'USERNAME',
+                'apiKey': 'APIKEY',
+            }
+        })
+
+    def test_repr(self):
+        s = repr(self.auth)
+        self.assertIn('BasicAuthentication', s)
+        self.assertIn('USERNAME', s)

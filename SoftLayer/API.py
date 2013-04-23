@@ -17,6 +17,23 @@ API_KEY = None
 API_BASE_URL = API_PUBLIC_ENDPOINT
 
 
+class BasicAuthentication(object):
+    def __init__(self, username, api_key):
+        self.username = username
+        self.api_key = api_key
+
+    def get_headers(self):
+        return {
+            'authenticate': {
+                'username': self.username,
+                'apiKey': self.api_key,
+            }
+        }
+
+    def __repr__(self):
+        return "<BasicAuthentication: %s>" % (self.username)
+
+
 class Client(object):
     """ A SoftLayer API client.
 
@@ -33,6 +50,8 @@ class Client(object):
         network.
     :param integer timeout: timeout for API requests
     :param boolean verbose: prints details about every HTTP request if true
+    :param auth: an object which responds to get_headers() to be inserted into
+        the xml-rpc headers. Example: `BasicAuthentication`
 
     Usage:
 
@@ -46,16 +65,19 @@ class Client(object):
     _prefix = "SoftLayer_"
 
     def __init__(self, service_name=None, id=None, username=None, api_key=None,
-                 endpoint_url=None, timeout=None, verbose=False):
+                 endpoint_url=None, timeout=None, verbose=False, auth=None):
         self._service_name = service_name
         self.verbose = verbose
         self._headers = {}
         self._raw_headers = {}
 
-        self.username = username or API_USERNAME or \
-            os.environ.get('SL_USERNAME') or ''
-        self.api_key = api_key or API_KEY or os.environ.get('SL_API_KEY') or ''
-        self.set_authentication(self.username, self.api_key)
+        self.auth = auth
+        if self.auth is None:
+            username = username or API_USERNAME or \
+                os.environ.get('SL_USERNAME') or ''
+            api_key = api_key or API_KEY or os.environ.get('SL_API_KEY') or ''
+            self.auth = BasicAuthentication(username, api_key)
+            self.set_authentication(username, api_key)
 
         if id is not None:
             self.set_init_parameter(int(id))
@@ -226,11 +248,7 @@ class Client(object):
         offset = kwargs.get('offset', 0)
 
         if headers is None:
-            headers = {
-                'authenticate': {
-                    'username': self.username,
-                    'apiKey': self.api_key,
-                }}
+            headers = self.auth.get_headers()
 
         http_headers = {
             'User-Agent': USER_AGENT,
@@ -366,8 +384,8 @@ class Client(object):
         return call_handler
 
     def __repr__(self):
-        return "<Client: endpoint=%s, user=%s>" \
-            % (self._endpoint_url, self.username)
+        return "<Client: endpoint=%s, user=%r>" \
+            % (self._endpoint_url, self.auth)
 
     __str__ = __repr__
 
