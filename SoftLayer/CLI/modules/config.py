@@ -56,7 +56,8 @@ Setup configuration
         if endpoint_url:
             config.set('softlayer', 'endpoint_url', endpoint_url)
 
-        f = open(config_path, 'w')
+        f = os.fdopen(
+            os.open(config_path, os.O_WRONLY | os.O_CREAT, 0600), 'w')
         try:
             config.write(f)
         finally:
