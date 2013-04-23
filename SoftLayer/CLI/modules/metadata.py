@@ -6,19 +6,19 @@ backend SoftLayer network. This allows for self-discovery for newly provisioned
 resources.
 
 The available commands are:
-  datacenter       Datacenter name
-  backend_mac      Backend mac addresses
-  ip               Primary ip address
   backend_ip       Primary backend ip address
-  tags             Tags
-  hostname         Hostname
-  fqdn             Fully qualified domain name
-  user_data        User-defined data
+  backend_mac      Backend mac addresses
+  datacenter       Datacenter name
   datacenter_id    Datacenter id
+  fqdn             Fully qualified domain name
   frontend_mac     Frontend mac addresses
-  provision_state  Provision state
+  hostname         Hostname
   id               Id
+  ip               Primary ip address
   network          Details about either the public or private network
+  provision_state  Provision state
+  tags             Tags
+  user_data        User-defined data
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: BSD, see LICENSE for more details.
