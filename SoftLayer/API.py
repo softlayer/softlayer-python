@@ -17,7 +17,12 @@ API_KEY = None
 API_BASE_URL = API_PUBLIC_ENDPOINT
 
 
-class BasicAuthentication(object):
+class AuthenticationBase(object):
+    def get_headers(self):
+        raise NotImplementedError
+
+
+class BasicAuthentication(AuthenticationBase):
     def __init__(self, username, api_key):
         self.username = username
         self.api_key = api_key

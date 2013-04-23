@@ -341,6 +341,12 @@ class APICalls(unittest.TestCase):
                 'SERVICE', 'METHOD', iter=True, chunk=0)))
 
 
+class TestAuthenticationBase(unittest.TestCase):
+    def test_get_headers(self):
+        auth = SoftLayer.API.AuthenticationBase()
+        self.assertRaises(NotImplementedError, auth.get_headers)
+
+
 class TestBasicAuthentication(unittest.TestCase):
     def setUp(self):
         self.auth = SoftLayer.BasicAuthentication('USERNAME', 'APIKEY')
