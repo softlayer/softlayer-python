@@ -11,7 +11,7 @@ from SoftLayer.utils import NestedDict
 from prettytable import PrettyTable
 
 __all__ = ['Table', 'CLIRunnable', 'FormattedItem', 'valid_response',
-           'confirm', 'no_going_back', 'mb_to_gb', 'listing', 'CLIAbort',
+           'confirm', 'no_going_back', 'mb_to_gb', 'gb', 'listing', 'CLIAbort',
            'NestedDict']
 
 
@@ -31,6 +31,10 @@ class FormattedItem(object):
 
 def mb_to_gb(megabytes):
     return FormattedItem(megabytes, "%dG" % (float(megabytes) / 1024))
+
+
+def gb(gigabytes):
+    return FormattedItem(gigabytes, "%dG" % float(gigabytes))
 
 
 def blank():
