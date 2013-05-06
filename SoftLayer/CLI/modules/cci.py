@@ -110,7 +110,7 @@ For more on filters see 'sl help filters'
         for guest in guests:
             t.add_row([
                 guest['id'],
-                guest.get('datacenter', {}).get('name', 'unknown'),
+                guest.get('datacenter', {}).get('name', blank()),
                 guest['fullyQualifiedDomainName'],
                 guest['maxCpu'],
                 mb_to_gb(guest['maxMemory']),

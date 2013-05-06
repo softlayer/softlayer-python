@@ -55,7 +55,7 @@ List hardware servers on the acount
         for server in servers:
             t.add_row([
                 server['id'],
-                server.get('datacenter', {}).get('name', 'unknown'),
+                server.get('datacenter', {}).get('name', blank()),
                 server['fullyQualifiedDomainName'],
                 server['processorCoreAmount'],
                 gb(server['memoryCapacity']),
