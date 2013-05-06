@@ -7,11 +7,11 @@
     :license: BSD, see LICENSE for more details.
 """
 import socket
+from time import sleep
+from itertools import repeat
 
 from SoftLayer.exceptions import SoftLayerError
 from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
-from time import sleep
-from itertools import repeat
 
 
 class CCICreateMissingRequired(SoftLayerError):
@@ -67,7 +67,6 @@ class CCIManager(IdentifierMixin, object):
                 'datacenter.name',
                 'activeTransaction.transactionStatus[friendlyName,name]',
                 'status.name',
-                'tagReferences[id,tag[name,id]]',
             ])
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
@@ -182,11 +181,11 @@ class CCIManager(IdentifierMixin, object):
         return self.guest.reloadCurrentOperatingSystemConfiguration(id=id)
 
     def _generate_create_dict(
-        self, cpus=None, memory=None, hourly=True,
-        hostname=None, domain=None, local_disk=True,
-        datacenter=None, os_code=None, image_id=None,
-        private=False, public_vlan=None, private_vlan=None,
-        userdata=None, nic_speed=None, disks=None):
+            self, cpus=None, memory=None, hourly=True,
+            hostname=None, domain=None, local_disk=True,
+            datacenter=None, os_code=None, image_id=None,
+            private=False, public_vlan=None, private_vlan=None,
+            userdata=None, nic_speed=None, disks=None):
 
         required = [cpus, memory, hostname, domain]
 

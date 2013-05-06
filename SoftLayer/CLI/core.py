@@ -6,15 +6,16 @@ usage: sl <command> [<args>...]
 SoftLayer Command-line Client
 
 The available commands are:
-  firewall  Firewall rule and security management
-  image     Manages compute and flex images
-  ssl       Manages SSL
   cci       Manage, delete, order compute instances
-  dns       Manage DNS
   config    View and edit configuration for this tool
+  dns       Manage DNS
+  firewall  Firewall rule and security management
+  hardware  View hardware details
+  iscsi     View iSCSI details
+  image     Manages compute and flex images
   metadata  Get details about this machine. Also available with 'my' and 'meta'
   nas       View NAS details
-  iscsi     View iSCSI details
+  ssl       Manages SSL
 
 See 'sl help <command>' for more information on a specific command.
 
