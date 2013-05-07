@@ -9,7 +9,7 @@ import sys
 try:
     import unittest2 as unittest
 except ImportError:
-    import unittest # NOQA
+    import unittest  # NOQA
 from mock import patch
 
 
@@ -118,6 +118,19 @@ class FormattedItemTests(unittest.TestCase):
         self.assertEqual('1G', item.formatted)
 
         self.assertRaises(ValueError, cli.mb_to_gb, '1024string')
+
+    def test_gb(self):
+        item = cli.gb(2)
+        self.assertEqual(2, item.original)
+        self.assertEqual('2G', item.formatted)
+
+        item = cli.gb('2')
+        self.assertEqual('2', item.original)
+        self.assertEqual('2G', item.formatted)
+
+        item = cli.gb('2.0')
+        self.assertEqual('2.0', item.original)
+        self.assertEqual('2G', item.formatted)
 
     def test_blank(self):
         item = cli.helpers.blank()

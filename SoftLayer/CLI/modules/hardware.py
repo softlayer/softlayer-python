@@ -7,9 +7,27 @@ Manage hardware
 The available commands are:
   list      List hardware devices
   detail    Retrieve hardware details
+
+For several commands, <identifier> will be asked for. This can be the id,
+hostname or the ip address for a piece of hardware.
 """
-from SoftLayer.CLI.helpers import CLIRunnable, Table, FormattedItem, NestedDict, blank, listing
+from SoftLayer.CLI.helpers import (
+    CLIRunnable, Table, FormattedItem, NestedDict, CLIAbort, blank, listing, gb)
 from SoftLayer.hardware import HardwareManager
+
+
+def resolve_id(manager, identifier):
+    ids = manager.resolve_ids(identifier)
+
+    if len(ids) == 0:
+        raise CLIAbort("Error: Unable to find hardware '%s'" % identifier)
+
+    if len(ids) > 1:
+        raise CLIAbort(
+            "Error: Multiple hardware found for '%s': %s" %
+            (identifier, ', '.join([str(_id) for _id in ids])))
+
+    return ids[0]
 
 
 class ListHardware(CLIRunnable):
@@ -25,12 +43,24 @@ List hardware servers on the acount
         manager = HardwareManager(client)
 
         servers = manager.list_hardware()
-        t = Table(['id', 'hostname', 'domain'])
+        t = Table([
+            'id',
+            'datacenter',
+            'host',
+            'cores',
+            'memory',
+            'primary_ip',
+            'backend_ip'
+        ])
         for server in servers:
             t.add_row([
                 server['id'],
-                server['hostname'],
-                server['domain']
+                server.get('datacenter', {}).get('name', blank()),
+                server['fullyQualifiedDomainName'],
+                server['processorCoreAmount'],
+                gb(server['memoryCapacity']),
+                server.get('primaryIpAddress', blank()),
+                server.get('primaryBackendIpAddress', blank()),
             ])
 
         return t
@@ -56,17 +86,21 @@ Options:
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
 
-        hardware_id = hardware, args.get('<identifier>')
-        result = hardware.get_hardware(hardware_id[1])
+        hardware_id = resolve_id(hardware, args.get('<identifier>'))
+        result = hardware.get_hardware(hardware_id)
         result = NestedDict(result)
 
         t.add_row(['id', result['id']])
         t.add_row(['hostname', result['fullyQualifiedDomainName']])
+        t.add_row(['status', result['hardwareStatus']['status']])
         t.add_row(['datacenter', result['datacenter'].get('name', blank())])
+        t.add_row(['cores', result['processorCoreAmount']])
+        t.add_row(['memory', result['memoryCapacity']])
         t.add_row(['provisionDate', result['provisionDate']])
         t.add_row(['public_ip', result.get('primaryIpAddress', blank())])
         t.add_row(
             ['private_ip', result.get('primaryBackendIpAddress', blank())])
+
         t.add_row([
             'os',
             FormattedItem(
@@ -95,8 +129,8 @@ Options:
         if tag_row:
             t.add_row(['tags', listing(tag_row, separator=',')])
 
-        ptr_domains = client['Hardware_Server'].\
-            getReverseDomainRecords(id=hardware_id[1])
+        ptr_domains = client['Hardware_Server'].getReverseDomainRecords(
+            id=hardware_id)
 
         for ptr_domain in ptr_domains:
             for ptr in ptr_domain['resourceRecords']:

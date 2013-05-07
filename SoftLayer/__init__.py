@@ -21,6 +21,7 @@ from API import (
 from DNS import DNSManager
 from CCI import CCIManager
 from metadata import MetadataManager
+from hardware import HardwareManager
 from SoftLayer.exceptions import *  # NOQA
 
 __title__ = 'SoftLayer'
@@ -30,4 +31,4 @@ __license__ = 'The BSD License'
 __copyright__ = 'Copyright 2013 SoftLayer Technologies, Inc.'
 __all__ = ['Client', 'BasicAuthentication', 'SoftLayerError',
            'SoftLayerAPIError', 'API_PUBLIC_ENDPOINT', 'API_PRIVATE_ENDPOINT',
-           'DNSManager', 'CCIManager', 'MetadataManager']
+           'DNSManager', 'CCIManager', 'MetadataManager', 'HardwareManager']
