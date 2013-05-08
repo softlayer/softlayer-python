@@ -108,16 +108,17 @@ For more on filters see 'sl help filters'
         t.sortby = args.get('--sortby') or 'host'
 
         for guest in guests:
+            guest = NestedDict(guest)
             t.add_row([
                 guest['id'],
-                guest.get('datacenter', {}).get('name', blank()),
+                guest['datacenter']['name'] or blank(),
                 guest['fullyQualifiedDomainName'],
                 guest['maxCpu'],
                 mb_to_gb(guest['maxMemory']),
-                guest.get('primaryIpAddress', blank()),
-                guest.get('primaryBackendIpAddress', blank()),
-                guest.get('activeTransaction', {}).get(
-                    'transactionStatus', {}).get('friendlyName', blank()),
+                guest['primaryIpAddress'] or blank(),
+                guest['primaryBackendIpAddress'] or blank(),
+                guest['activeTransaction']['transactionStatus']
+                ['friendlyName'] or blank(),
             ])
 
         return t
@@ -151,19 +152,18 @@ Options:
         t.add_row(['hostname', result['fullyQualifiedDomainName']])
         t.add_row(['status', result['status']['name']])
         t.add_row(['state', result['powerState']['name']])
-        t.add_row(['datacenter', result['datacenter'].get('name', blank())])
+        t.add_row(['datacenter', result['datacenter']['name'] or blank()])
         t.add_row(['cores', result['maxCpu']])
         t.add_row(['memory', mb_to_gb(result['maxMemory'])])
-        t.add_row(['public_ip', result.get('primaryIpAddress', blank())])
-        t.add_row(
-            ['private_ip', result.get('primaryBackendIpAddress', blank())])
+        t.add_row(['public_ip', result['primaryIpAddress'] or blank()])
+        t.add_row(['private_ip', result['primaryBackendIpAddress'] or blank()])
         t.add_row([
             'os',
             FormattedItem(
                 result['operatingSystem']['softwareLicense']
-                ['softwareDescription'].get('referenceCode', blank()),
+                ['softwareDescription']['referenceCode'] or blank(),
                 result['operatingSystem']['softwareLicense']
-                ['softwareDescription'].get('name', blank())
+                ['softwareDescription']['name'] or blank()
             )])
         t.add_row(['private_only', result['privateNetworkOnlyFlag']])
         t.add_row(['private_cpu', result['dedicatedAccountHostOnlyFlag']])
