@@ -34,7 +34,8 @@ def mb_to_gb(megabytes):
 
 
 def gb(gigabytes):
-    return FormattedItem(gigabytes, "%dG" % float(gigabytes))
+    return FormattedItem(int(float(gigabytes)) * 1024,
+                         "%dG" % int(float(gigabytes)))
 
 
 def blank():

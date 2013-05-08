@@ -53,14 +53,15 @@ List hardware servers on the acount
             'backend_ip'
         ])
         for server in servers:
+            server = NestedDict(server)
             t.add_row([
                 server['id'],
-                server.get('datacenter', {}).get('name', blank()),
+                server['datacenter']['name'] or blank(),
                 server['fullyQualifiedDomainName'],
                 server['processorCoreAmount'],
                 gb(server['memoryCapacity']),
-                server.get('primaryIpAddress', blank()),
-                server.get('primaryBackendIpAddress', blank()),
+                server['primaryIpAddress'] or blank(),
+                server['primaryBackendIpAddress'] or blank(),
             ])
 
         return t
@@ -93,22 +94,21 @@ Options:
         t.add_row(['id', result['id']])
         t.add_row(['hostname', result['fullyQualifiedDomainName']])
         t.add_row(['status', result['hardwareStatus']['status']])
-        t.add_row(['datacenter', result['datacenter'].get('name', blank())])
+        t.add_row(['datacenter', result['datacenter']['name'] or blank()])
         t.add_row(['cores', result['processorCoreAmount']])
-        t.add_row(['memory', result['memoryCapacity']])
-        t.add_row(['provisionDate', result['provisionDate']])
-        t.add_row(['public_ip', result.get('primaryIpAddress', blank())])
+        t.add_row(['memory', gb(result['memoryCapacity'])])
+        t.add_row(['public_ip', result['primaryIpAddress'] or blank()])
         t.add_row(
-            ['private_ip', result.get('primaryBackendIpAddress', blank())])
-
+            ['private_ip', result['primaryBackendIpAddress'] or blank()])
         t.add_row([
             'os',
             FormattedItem(
                 result['operatingSystem']['softwareLicense']
-                ['softwareDescription'].get('referenceCode', blank()),
+                ['softwareDescription']['referenceCode'] or blank(),
                 result['operatingSystem']['softwareLicense']
-                ['softwareDescription'].get('name', blank())
+                ['softwareDescription']['name'] or blank()
             )])
+        t.add_row(['created', result['provisionDate']])
         if result.get('notes'):
             t.add_row(['notes', result['notes']])
 

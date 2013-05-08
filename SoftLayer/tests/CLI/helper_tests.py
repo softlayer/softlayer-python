@@ -121,15 +121,15 @@ class FormattedItemTests(unittest.TestCase):
 
     def test_gb(self):
         item = cli.gb(2)
-        self.assertEqual(2, item.original)
+        self.assertEqual(2048, item.original)
         self.assertEqual('2G', item.formatted)
 
         item = cli.gb('2')
-        self.assertEqual('2', item.original)
+        self.assertEqual(2048, item.original)
         self.assertEqual('2G', item.formatted)
 
         item = cli.gb('2.0')
-        self.assertEqual('2.0', item.original)
+        self.assertEqual(2048, item.original)
         self.assertEqual('2G', item.formatted)
 
     def test_blank(self):
