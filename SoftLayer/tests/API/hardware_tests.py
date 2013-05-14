@@ -70,3 +70,8 @@ class HardwareTests_unittests(unittest.TestCase):
         self.cci.get_hardware(1)
         self.client.__getitem__().getObject.assert_called_once_with(
             id=1, mask=ANY)
+
+    def test_reload(self):
+        self.cci.reload(id=1)
+        f = self.client.__getitem__().reloadCurrentOperatingSystemConfiguration
+        f.assert_called_once_with(id=1, token='FORCE')
