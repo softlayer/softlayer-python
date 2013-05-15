@@ -7,12 +7,14 @@ Manage hardware
 The available commands are:
   list      List hardware devices
   detail    Retrieve hardware details
+  reload    Perform an OS reload
 
 For several commands, <identifier> will be asked for. This can be the id,
 hostname or the ip address for a piece of hardware.
 """
 from SoftLayer.CLI.helpers import (
-    CLIRunnable, Table, FormattedItem, NestedDict, CLIAbort, blank, listing, gb)
+    CLIRunnable, Table, FormattedItem, NestedDict, CLIAbort, blank, listing,
+    gb, no_going_back)
 from SoftLayer.hardware import HardwareManager
 
 
@@ -137,3 +139,23 @@ Options:
                 t.add_row(['ptr', ptr['data']])
 
         return t
+
+
+class HardwareReload(CLIRunnable):
+    """
+usage: sl hardware reload <identifier> [options]
+
+Reload the OS on a hardware server based on its current configuration
+"""
+
+    action = 'reload'
+    options = ['confirm']
+
+    @staticmethod
+    def execute(client, args):
+        hardware = HardwareManager(client)
+        hardware_id = resolve_id(hardware, args.get('<identifier>'))
+        if args['--really'] or no_going_back(hardware_id):
+            hardware.reload(hardware_id)
+        else:
+            CLIAbort('Aborted')

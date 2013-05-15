@@ -83,6 +83,16 @@ class HardwareManager(IdentifierMixin, object):
 
         return self.hardware.getObject(id=id, **kwargs)
 
+    def reload(self, id):
+        """ Perform an OS reload of a server with its current configuration.
+
+        :param integer id: the instance ID to reload
+
+        """
+
+        return self.hardware.reloadCurrentOperatingSystemConfiguration(id=id,
+            token='FORCE')
+
     def _get_ids_from_hostname(self, hostname):
         results = self.list_hardware(hostname=hostname, mask="id")
         return [result['id'] for result in results]
