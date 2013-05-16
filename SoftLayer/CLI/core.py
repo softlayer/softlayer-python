@@ -30,7 +30,7 @@ import os
 import os.path
 
 from prettytable import FRAME, NONE
-from docopt import docopt
+from docopt import docopt, DocoptExit
 
 from SoftLayer import Client, SoftLayerError
 from SoftLayer.consts import VERSION
@@ -200,6 +200,11 @@ def main(args=sys.argv[1:], env=Environment()):
 
     except (ValueError, KeyError):
         raise
+    except DocoptExit, e:
+        env.err(e.message)
+        env.err(
+            '\nUnknown argument(s), use -h or --help for available options')
+        exit_status = 127
     except KeyboardInterrupt:
         env.out('')
         exit_status = 1
