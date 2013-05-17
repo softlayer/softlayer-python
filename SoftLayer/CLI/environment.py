@@ -13,7 +13,24 @@ import os
 import os.path
 
 from SoftLayer.CLI.modules import get_module_list
-from SoftLayer import API_PUBLIC_ENDPOINT
+from SoftLayer import API_PUBLIC_ENDPOINT, SoftLayerError
+
+
+class InvalidCommand(SoftLayerError):
+    " Raised when trying to use a command that does not exist "
+    def __init__(self, module_name, command_name, *args):
+        self.module_name = module_name
+        self.command_name = command_name
+        error = 'Invalid command: "%s".' % self.command_name
+        SoftLayerError.__init__(self, error, *args)
+
+
+class InvalidModule(SoftLayerError):
+    " Raised when trying to use a module that does not exist "
+    def __init__(self, module_name, *args):
+        self.module_name = module_name
+        error = 'Invalid module: "%s".' % self.module_name
+        SoftLayerError.__init__(self, error, *args)
 
 
 class Environment(object):
@@ -27,13 +44,24 @@ class Environment(object):
     stdout = sys.stdout
     stderr = sys.stderr
 
+    def get_command(self, module_name, command_name):
+        actions = self.plugins.get(module_name) or {}
+        if command_name in actions:
+            return actions[command_name]
+        if None in actions:
+            return actions[None]
+        raise InvalidCommand(module_name, command_name)
+
     def get_module_name(self, module_name):
         if module_name in self.aliases:
             return self.aliases[module_name]
         return module_name
 
-    def load_module(self, mod):  # pragma: no cover
-        return import_module('SoftLayer.CLI.modules.%s' % mod)
+    def load_module(self, module_name):  # pragma: no cover
+        try:
+            return import_module('SoftLayer.CLI.modules.%s' % module_name)
+        except ImportError:
+            raise InvalidModule(module_name)
 
     def add_plugin(self, cls):
         command = cls.__module__.split('.')[-1]
@@ -75,6 +103,9 @@ class Environment(object):
             config[config_name] = cp.get('softlayer', config_name)
 
         self.config = config
+
+    def exit(self, code=0):
+        sys.exit(code)
 
 
 class CLIRunnableType(type):

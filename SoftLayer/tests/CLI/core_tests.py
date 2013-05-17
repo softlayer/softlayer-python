@@ -16,6 +16,7 @@ from mock import MagicMock, patch
 import SoftLayer
 import SoftLayer.CLI as cli
 from SoftLayer.CLI.helpers import CLIAbort
+from SoftLayer.CLI.environment import Environment, InvalidModule
 
 
 def module_fixture():
@@ -39,12 +40,25 @@ Options:
         return "test"
 
 
+class EnvironmentFixture(Environment):
+    plugins = {'cci': {'list': submodule_fixture}}
+    aliases = {
+        'meta': 'metadata',
+        'my': 'metadata',
+    }
+    config = {}
+
+    def load_module(self, *args, **kwargs):
+        return module_fixture
+
+    def plugin_list(self, *args, **kwargs):
+        return self.plugins.keys()
+
+
 class CommandLineTests(unittest.TestCase):
     def setUp(self):
-        self.env = MagicMock()
-        self.env.plugin_list.return_value = ['cci']
-        self.env.plugins = {'cci': {'list': submodule_fixture}}
-        self.env.load_module.return_value = module_fixture
+        self.env = EnvironmentFixture()
+        self.env.get_module_name = MagicMock()
 
     def test_normal_path(self):
         self.env.get_module_name.return_value = 'cci'
@@ -80,8 +94,18 @@ class CommandLineTests(unittest.TestCase):
         self.assertRaises(
             SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
 
+    def test_invalid_module_error(self):
+        self.env.get_module_name.side_effect = InvalidModule('cci')
+        self.assertRaises(
+            SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
+
     def test_softlayer_error(self):
         self.env.get_module_name.side_effect = SoftLayer.SoftLayerError
+        self.assertRaises(
+            SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
+
+    def test_system_exit_error(self):
+        self.env.get_module_name.side_effect = SystemExit
         self.assertRaises(
             SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
 
@@ -95,59 +119,67 @@ class CommandLineTests(unittest.TestCase):
             KeyError, cli.core.main, args=['cci', 'list'], env=self.env)
 
 
-class TestParseMainArgs(unittest.TestCase):
+class TestCommandParser(unittest.TestCase):
+    def setUp(self):
+        self.env = EnvironmentFixture()
+        self.parser = cli.core.CommandParser(self.env)
+
     def test_main(self,):
-        args = cli.core.parse_main_args(
+        args = self.parser.parse_main_args(
             args=['cci', 'list'])
+        print args
 
         self.assertEqual(args['help'], False)
-        self.assertEqual(args['<command>'], 'cci')
+        self.assertEqual(args['<module>'], 'cci')
         self.assertEqual(args['<args>'], ['list'])
 
     def test_primary_help(self):
-        args = cli.core.parse_main_args(args=[])
+        args = self.parser.parse_main_args(args=[])
         self.assertEqual({
             '--help': False,
             '-h': False,
             '<args>': [],
+            '<module>': None,
             '<command>': None,
             'help': False,
         }, args)
 
-        args = cli.core.parse_main_args(args=['help'])
+        args = self.parser.parse_main_args(args=['help'])
         self.assertEqual({
             '--help': False,
             '-h': False,
             '<args>': [],
-            '<command>': 'help',
+            '<module>': 'help',
+            '<command>': None,
             'help': False,
         }, args)
 
-        args = cli.core.parse_main_args(args=['help', 'module'])
+        args = self.parser.parse_main_args(args=['help', 'module'])
         self.assertEqual({
             '--help': False,
             '-h': False,
             '<args>': ['module'],
-            '<command>': 'help',
+            '<module>': 'help',
+            '<command>': None,
             'help': False,
         }, args)
 
         self.assertRaises(
-            SystemExit, cli.core.parse_main_args, args=['--help'])
+            SystemExit, self.parser.parse_main_args, args=['--help'])
 
-
-class TestParseSubmoduleArgs(unittest.TestCase):
     @patch('sys.stdout.isatty', return_value=True)
     def test_tty(self, tty):
         self.assertRaises(
-            SystemExit, cli.core.parse_submodule_args, submodule_fixture, [])
+            SystemExit, self.parser.parse_command_args, 'cci', 'list', [])
 
     def test_confirm(self):
-        submodule = MagicMock()
-        submodule.options = ['confirm']
-        submodule.__doc__ = 'usage: sl cci list [options]'
+        command = MagicMock()
+        command.options = ['confirm']
+        command.__doc__ = 'usage: sl cci list [options]'
+        self.env.get_command = MagicMock()
+        self.env.get_command.return_value = command
         self.assertRaises(
-            SystemExit, cli.core.parse_submodule_args, submodule, [''])
+            SystemExit, self.parser.parse_command_args, 'cci', 'list', [])
 
 
 class TestFormatOutput(unittest.TestCase):

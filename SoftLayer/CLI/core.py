@@ -1,23 +1,25 @@
 """
-usage: sl <command> [<args>...]
-       sl help <command>
+usage: sl <module> [<args>...]
+       sl help <module>
+       sl help <module> <command>
        sl [-h | --help]
 
 SoftLayer Command-line Client
 
-The available commands are:
+The available modules are:
   cci       Manage, delete, order compute instances
   config    View and edit configuration for this tool
   dns       Manage DNS
   firewall  Firewall rule and security management
   hardware  View hardware details
+  help      Show help
   iscsi     View iSCSI details
   image     Manages compute and flex images
   metadata  Get details about this machine. Also available with 'my' and 'meta'
   nas       View NAS details
   ssl       Manages SSL
 
-See 'sl help <command>' for more information on a specific command.
+See 'sl help <module>' for more information on a specific module.
 
 To use most commands your SoftLayer username and api_key need to be configured.
 The easiest way to do that is to use: 'sl config setup'
@@ -36,7 +38,8 @@ from SoftLayer import Client, SoftLayerError
 from SoftLayer.consts import VERSION
 from SoftLayer.CLI.helpers import (
     Table, CLIAbort, FormattedItem, listing, ArgumentError, SequentialOutput)
-from SoftLayer.CLI.environment import Environment, CLIRunnableType
+from SoftLayer.CLI.environment import (
+    Environment, CLIRunnableType, InvalidCommand, InvalidModule)
 
 
 def format_output(data, fmt='table'):
@@ -89,98 +92,104 @@ def format_no_tty(table):
     return t
 
 
-def parse_main_args(args=sys.argv[1:]):
-    arguments = docopt(__doc__, version=VERSION, argv=args, options_first=True)
-    return arguments
+class CommandParser(object):
+    def __init__(self, env):
+        self.env = env
 
+    def get_main_help(self):
+        return __doc__.strip()
 
-def parse_module_args(module, args):
-
-    arg_doc = module.__doc__ + """
+    def get_module_help(self, module_name):
+        module = self.env.load_module(module_name)
+        arg_doc = module.__doc__ + """
 Standard Options:
   -h --help  Show this screen
 """
-    arguments = docopt(
-        arg_doc, version=VERSION, argv=args, options_first=True)
-    return arguments
+        return arg_doc.strip()
 
+    def get_command_help(self, module_name, command_name):
+        command = self.env.get_command(module_name, command_name)
 
-def parse_submodule_args(submodule, args):
-    default_format = 'raw'
-    if sys.stdout.isatty():
-        default_format = 'table'
+        default_format = 'raw'
+        if sys.stdout.isatty():
+            default_format = 'table'
 
-    arg_doc = submodule.__doc__
+        arg_doc = command.__doc__
 
-    if 'confirm' in submodule.options:
-        arg_doc += """
+        if 'confirm' in command.options:
+            arg_doc += """
 Prompt Options:
   -y, --really  Confirm all prompt actions
 """
 
-    if '[options]' in arg_doc:
-        arg_doc += """
+        if '[options]' in arg_doc:
+            arg_doc += """
 Standard Options:
   --format=ARG           Output format. [Options: table, raw] [Default: %s]
   -C FILE --config=FILE  Config file location. [Default: ~/.softlayer]
   -h --help              Show this screen
 """ % default_format
+        return arg_doc.strip()
 
-    arguments = docopt(arg_doc, version=VERSION, argv=args)
-    return arguments
+    def parse_main_args(self, args):
+        main_help = self.get_main_help()
+        arguments = docopt(
+            main_help,
+            version=VERSION,
+            argv=args,
+            options_first=True)
+        arguments['<module>'] = self.env.get_module_name(arguments['<module>'])
+        return arguments
+
+    def parse_module_args(self, module_name, args):
+        arg_doc = self.get_module_help(module_name)
+        arguments = docopt(
+            arg_doc,
+            version=VERSION,
+            argv=[module_name] + args,
+            options_first=True)
+        module = self.env.load_module(module_name)
+        return module, arguments
+
+    def parse_command_args(self, module_name, command_name, args):
+        command = self.env.get_command(module_name, command_name)
+        arg_doc = self.get_command_help(module_name, command_name)
+        arguments = docopt(arg_doc, version=VERSION, argv=[module_name] + args)
+        return command, arguments
+
+    def parse(self, args):
+        # handle `sl ...`
+        main_args = self.parse_main_args(args)
+        module_name = main_args['<module>']
+
+        # handle `sl <module> ...`
+        module, module_args = self.parse_module_args(
+            module_name, main_args['<args>'])
+        command_name = module_args['<command>']
+
+        # handle `sl <module> <command> ...`
+        return self.parse_command_args(
+            module_name,
+            command_name,
+            main_args['<args>'])
 
 
 def main(args=sys.argv[1:], env=Environment()):
     """
-    Handle conditions in this order:
-
-    sl [help] [(-h | --help)]                -> show main help
-    sl help <command>                        -> show command-specific help
-    sl <command> [(-h | --help)]             -> show command-specific help
-    sl invalid_command                       -> show main help
-    sl <command> <subcommand> (-h | --help)  -> show subcommand-specific help
-    sl <command> <subcommand> [options]      -> execute subcommand
+    Entry point for the command-line client.
     """
     # Parse Top-Level Arguments
     CLIRunnableType.env = env
     exit_status = 0
+    resolver = CommandParser(env)
     try:
-        # handle `sl ...`
-        main_args = parse_main_args(args)
-        module_name = env.get_module_name(main_args['<command>'])
-
-        # handle `sl help <command>`
-        if module_name == 'help' and len(main_args['<args>']) > 0:
-            module = env.load_module(main_args['<args>'][0])
-            parse_module_args(module, ['--help', main_args['<args>'][0]])
-
-        # handle `sl --help` and `sl invalidcommand`
-        if module_name not in env.plugin_list():
-            parse_main_args(['--help'])
-
-        module = env.load_module(module_name)
-        actions = env.plugins.get(module_name) or []
-
-        # handle `sl <command> ...`
-        module_args = parse_module_args(
-            module, [module_name] + main_args['<args>'])
-        action_name = module_args['<command>']
-
-        # handle `sl <command> invalidcommand`
-        if action_name not in actions:
-            parse_module_args(module, ['--help', module_name, action_name])
-
-        action = actions[action_name]
-
-        # handle `sl <command> <subcommand> ...`
-        submodule_args = parse_submodule_args(
-            action, [module_name] + main_args['<args>'])
+        command, command_args = resolver.parse(args)
 
         # Parse Config
         config_files = ["~/.softlayer"]
 
-        if submodule_args.get('--config'):
-            config_files.append(submodule_args.get('--config'))
+        if command_args.get('--config'):
+            config_files.append(command_args.get('--config'))
 
         env.load_config(config_files)
         client = Client(
@@ -189,15 +198,27 @@ def main(args=sys.argv[1:], env=Environment()):
             endpoint_url=env.config.get('endpoint_url'))
 
         # Do the thing
-        data = action.execute(client, submodule_args)
+        data = command.execute(client, command_args)
         if data:
-            format = submodule_args.get('--format', 'table')
+            format = command_args.get('--format', 'table')
             if format not in ['raw', 'table']:
-                raise ArgumentError('Invalid Format "%s"' % format)
+                raise ArgumentError('Invalid format "%s"' % format)
             s = format_output(data, fmt=format)
             if s:
                 env.out(s)
 
+    except InvalidCommand, e:
+        env.err(resolver.get_module_help(e.module_name))
+        if e.command_name:
+            env.err('')
+            env.err(str(e))
+            exit_status = 1
+    except InvalidModule, e:
+        env.err(resolver.get_main_help())
+        if e.module_name:
+            env.err('')
+            env.err(str(e))
+        exit_status = 1
     except (ValueError, KeyError):
         raise
     except DocoptExit, e:
