@@ -16,9 +16,19 @@ class HardwareManager(IdentifierMixin, object):
         self.account = self.client['Account']
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
 
-    def list_hardware(self, hostname=None, public_ip=None, private_ip=None,
-                      **kwargs):
+    def list_hardware(self, tags=None, hostname=None, domain=None,
+                      datacenter=None, nic_speed=None, public_ip=None,
+                      private_ip=None, **kwargs):
         """ List all hardware.
+
+        :param list tags: filter based on tags
+        :param string hostname: filter based on hostname
+        :param string domain: filter based on domain
+        :param string datacenter: filter based on datacenter
+        :param integer nic_speed: filter based on network speed (in MBPS)
+        :param string public_ip: filter based on public ip address
+        :param string private_ip: filter based on private ip address
+        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
 
         """
         if 'mask' not in kwargs:
@@ -36,8 +46,25 @@ class HardwareManager(IdentifierMixin, object):
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
         _filter = NestedDict(kwargs.get('filter') or {})
+        if tags:
+            _filter['hardware']['tagReferences']['tag']['name'] = {
+                'operation': 'in',
+                'options': [{'name': 'data', 'value': tags}],
+            }
+
         if hostname:
             _filter['hardware']['hostname'] = query_filter(hostname)
+
+        if domain:
+            _filter['hardware']['domain'] = query_filter(domain)
+
+        if datacenter:
+            _filter['hardware']['datacenter']['name'] = \
+                query_filter(datacenter)
+
+        if nic_speed:
+            _filter['hardware']['networkComponents']['maxSpeed'] = \
+                query_filter(nic_speed)
 
         if public_ip:
             _filter['hardware']['primaryIpAddress'] = \
@@ -90,7 +117,8 @@ class HardwareManager(IdentifierMixin, object):
 
         """
 
-        return self.hardware.reloadCurrentOperatingSystemConfiguration(id=id,
+        return self.hardware.reloadCurrentOperatingSystemConfiguration(
+            id=id,
             token='FORCE')
 
     def _get_ids_from_hostname(self, hostname):
