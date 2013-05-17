@@ -36,6 +36,8 @@ class ListHardware(CLIRunnable):
     """
 usage: sl hardware list [options]
 
+List hardware servers on the acount
+
 Examples:
     sl hardware list --datacenter=dal05
     sl hardware list --network=100 --domain=example.com
@@ -54,7 +56,6 @@ Filters:
                            Comma-separated. (production,db)
 
 For more on filters see 'sl help filters'
-List hardware servers on the acount
 """
     action = 'list'
 
