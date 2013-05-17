@@ -127,7 +127,6 @@ class TestCommandParser(unittest.TestCase):
     def test_main(self,):
         args = self.parser.parse_main_args(
             args=['cci', 'list'])
-        print args
 
         self.assertEqual(args['help'], False)
         self.assertEqual(args['<module>'], 'cci')
