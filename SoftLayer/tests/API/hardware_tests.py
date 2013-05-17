@@ -30,19 +30,32 @@ class HardwareTests_unittests(unittest.TestCase):
 
     def test_list_hardware_with_filters(self):
         self.hardware.list_hardware(
+            tags=['tag1', 'tag2'],
             hostname='hostname',
+            domain='example.com',
+            datacenter='dal05',
+            nic_speed=100,
             public_ip='1.2.3.4',
             private_ip='4.3.2.1',
         )
-
         service = self.client.__getitem__()
         service.getHardware.assert_has_calls(call(
             filter={
                 'hardware': {
+                    'datacenter': {'name': {'operation': '_= dal05'}},
+                    'domain': {'operation': '_= example.com'},
+                    'tagReferences': {
+                        'tag': {'name': {
+                            'operation': 'in',
+                            'options': [
+                                {'name': 'data', 'value': ['tag1', 'tag2']}]
+                        }}
+                    },
                     'hostname': {'operation': '_= hostname'},
                     'primaryIpAddress': {'operation': '_= 1.2.3.4'},
-                    'primaryBackendIpAddress': {'operation': '_= 4.3.2.1'}
-                }},
+                    'networkComponents': {'maxSpeed': {'operation': 100}},
+                    'primaryBackendIpAddress': {'operation': '_= 4.3.2.1'}}
+            },
             mask=ANY,
         ))
 
