@@ -23,6 +23,6 @@ class Show(CLIRunnable):
         cls.env.load_module(args['<module>'])
         if args['<command>']:
             return parser.get_command_help(args['<module>'], args['<command>'])
-        elif args['<module']:
+        elif args['<module>']:
             return parser.get_module_help(args['<module>'])
         return parser.get_main_help()
