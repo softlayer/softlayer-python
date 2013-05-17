@@ -222,7 +222,7 @@ def main(args=sys.argv[1:], env=Environment()):
     except (ValueError, KeyError):
         raise
     except DocoptExit, e:
-        env.err(e.message)
+        env.err(e.usage)
         env.err(
             '\nUnknown argument(s), use -h or --help for available options')
         exit_status = 127
