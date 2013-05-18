@@ -37,6 +37,25 @@ class ListHardware(CLIRunnable):
 usage: sl hardware list [options]
 
 List hardware servers on the acount
+
+Examples:
+    sl hardware list --datacenter=dal05
+    sl hardware list --network=100 --domain=example.com
+    sl hardware list --tags=production,db
+
+Options:
+  --sortby=ARG  Column to sort by. options: id, datacenter, host, cores,
+                  memory, primary_ip, backend_ip
+
+Filters:
+  -H --hostname=HOST       Host portion of the FQDN. example: server
+  -D --domain=DOMAIN       Domain portion of the FQDN. example: example.com
+  -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
+  -n MBPS, --network=MBPS  Network port speed in Mbps
+  --tags=ARG               Only show instances that have one of these tags.
+                           Comma-separated. (production,db)
+
+For more on filters see 'sl help filters'
 """
     action = 'list'
 
@@ -44,7 +63,17 @@ List hardware servers on the acount
     def execute(client, args):
         manager = HardwareManager(client)
 
-        servers = manager.list_hardware()
+        tags = None
+        if args.get('--tags'):
+            tags = [tag.strip() for tag in args.get('--tags').split(',')]
+
+        servers = manager.list_hardware(
+            hostname=args.get('--hostname'),
+            domain=args.get('--domain'),
+            datacenter=args.get('--datacenter'),
+            nic_speed=args.get('--network'),
+            tags=tags)
+
         t = Table([
             'id',
             'datacenter',
@@ -54,6 +83,8 @@ List hardware servers on the acount
             'primary_ip',
             'backend_ip'
         ])
+        t.sortby = args.get('--sortby') or 'host'
+
         for server in servers:
             server = NestedDict(server)
             t.add_row([
