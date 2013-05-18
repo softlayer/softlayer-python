@@ -10,11 +10,11 @@ import os
 try:
     import unittest2 as unittest
 except ImportError:
-    import unittest # NOQA
+    import unittest  # NOQA
 from mock import patch, MagicMock
 
 from SoftLayer import API_PUBLIC_ENDPOINT
-import SoftLayer.CLI as cli
+from SoftLayer.CLI.environment import Environment, InvalidCommand
 
 if sys.version_info >= (3,):
     raw_input_path = 'builtins.input'
@@ -26,7 +26,7 @@ FIXTURE_PATH = os.path.abspath(os.path.join(__file__, '..', '..', 'fixtures'))
 class EnvironmentTests(unittest.TestCase):
 
     def setUp(self):
-        self.env = cli.environment.Environment()
+        self.env = Environment()
 
     def test_plugin_list(self):
         actions = self.env.plugin_list()
@@ -93,3 +93,22 @@ class EnvironmentTests(unittest.TestCase):
 
         r = self.env.get_module_name('realname')
         self.assertEqual(r, 'realname')
+
+    def test_get_command_invalid(self):
+        self.assertRaises(InvalidCommand, self.env.get_command, 'cci', 'list')
+
+    def test_get_command(self):
+        self.env.plugins = {'cci': {'list': 'something'}}
+        command = self.env.get_command('cci', 'list')
+        self.assertEqual(command, 'something')
+
+    def test_get_command_none(self):
+        # If None is in the action list, anything that doesn't exist as a
+        # command will return the value of the None key. This is to support
+        # sl help any_module_name
+        self.env.plugins = {'cci': {None: 'something'}}
+        command = self.env.get_command('cci', 'something else')
+        self.assertEqual(command, 'something')
+
+    def test_exit(self):
+        self.assertRaises(SystemExit, self.env.exit, 1)
