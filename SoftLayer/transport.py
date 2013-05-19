@@ -1,6 +1,6 @@
 """
-    SoftLayer.transport.requests_transport
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    SoftLayer.transport
+    ~~~~~~~~~~~~~~~~~~~
     XML-RPC transport layer that uses the requests library.
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
@@ -12,10 +12,20 @@ from SoftLayer.exceptions import (
     ApplicationError, RemoteSystemError, TransportError)
 import xmlrpclib
 import requests
+import json
 
 
-def make_api_call(uri, method, args=None, headers=None,
-                  http_headers=None, timeout=None, verbose=False):
+def make_xml_rpc_api_call(uri, method, args=None, headers=None,
+                          http_headers=None, timeout=None, verbose=False):
+    """ Makes a SoftLayer API call against the XML-RPC endpoint
+
+    :param string uri: endpoint URL
+    :param string method: method to call E.G.: 'getObject'
+    :param dict headers: XML-RPC headers to use for the request
+    :param dict http_headers: HTTP headers to use for the request
+    :param int timeout: number of seconds to use as a timeout
+    :param bool verbose: verbosity
+    """
     if args is None:
         args = tuple()
     try:
@@ -24,7 +34,6 @@ def make_api_call(uri, method, args=None, headers=None,
 
         payload = xmlrpclib.dumps(tuple(largs), methodname=method,
                                   allow_none=True)
-
         response = requests.post(uri, data=payload,
                                  headers=http_headers,
                                  timeout=timeout)
@@ -53,3 +62,29 @@ def make_api_call(uri, method, args=None, headers=None,
         raise TransportError(e.response.status_code, str(e))
     except requests.RequestException, e:
         raise TransportError(0, str(e))
+
+
+def make_rest_api_call(method, url, http_headers=None, timeout=None):
+    """ Makes a SoftLayer API call against the REST endpoint
+
+    :param string method: HTTP method: GET, POST, PUT, DELETE
+    :param string url: endpoint URL
+    :param dict http_headers: HTTP headers to use for the request
+    :param int timeout: number of seconds to use as a timeout
+    """
+    resp = requests.request(method, url, headers=http_headers, timeout=timeout)
+    try:
+        resp.raise_for_status()
+    except requests.HTTPError, e:
+        if url.endswith('.json'):
+            content = json.loads(e.response.content)
+            raise SoftLayerAPIError(e.response.status_code, content['error'])
+        else:
+            raise SoftLayerAPIError(e.response.status_code, e.response.text)
+    except requests.RequestException, e:
+        raise TransportError(0, str(e))
+
+    if url.endswith('.json'):
+        return json.loads(resp.content)
+    else:
+        return resp.text

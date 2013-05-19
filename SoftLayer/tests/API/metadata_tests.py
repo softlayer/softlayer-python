@@ -10,17 +10,8 @@ import SoftLayer
 try:
     import unittest2 as unittest
 except ImportError:
-    import unittest # NOQA
+    import unittest  # NOQA
 from mock import patch, MagicMock
-import urllib2
-import sys
-
-if sys.version_info >= (3,):
-    REQ_PATH = 'urllib.request.Request'
-    URLOPEN_PATH = 'urllib.request.urlopen'
-else:
-    REQ_PATH = 'urllib2.Request'
-    URLOPEN_PATH = 'urllib2.urlopen'
 
 
 class MetadataTests(unittest.TestCase):
@@ -96,17 +87,26 @@ class MetadataTestsMakeRequest(unittest.TestCase):
             'SoftLayer_Resource_Metadata',
             'something.json'])
 
-    @patch(REQ_PATH)
-    @patch(URLOPEN_PATH)
-    def test_basic(self, urlopen, req):
+    @patch('SoftLayer.metadata.make_rest_api_call')
+    def test_basic(self, make_api_call):
         r = self.metadata.make_request('something.json')
-        req.assert_called_with(self.url)
-        self.assertEqual(r, urlopen().read())
+        make_api_call.assert_called_with(
+            'GET', self.url,
+            timeout=5,
+            http_headers={'User-Agent': 'SoftLayer Python v2.2.0'})
+        self.assertEqual(make_api_call(), r)
 
-    @patch(REQ_PATH)
-    @patch(URLOPEN_PATH)
-    def test_raise_urlerror(self, urlopen, req):
-        urlopen.side_effect = urllib2.URLError('Error')
+    @patch('SoftLayer.metadata.make_rest_api_call')
+    def test_raise_error(self, make_api_call):
+        make_api_call.side_effect = SoftLayer.SoftLayerAPIError(
+            'faultCode', 'faultString')
         self.assertRaises(
             SoftLayer.SoftLayerAPIError,
             self.metadata.make_request, 'something.json')
+
+    @patch('SoftLayer.metadata.make_rest_api_call')
+    def test_raise_404_error(self, make_api_call):
+        make_api_call.side_effect = SoftLayer.SoftLayerAPIError(
+            404, 'faultString')
+        r = self.metadata.make_request('something.json')
+        self.assertEqual(r, None)
