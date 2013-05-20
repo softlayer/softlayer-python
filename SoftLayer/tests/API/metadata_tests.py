@@ -22,13 +22,13 @@ class MetadataTests(unittest.TestCase):
         self.metadata.make_request = self.make_request
 
     def test_no_param(self):
-        self.make_request.return_value = '"dal01"'
+        self.make_request.return_value = 'dal01'
         r = self.metadata.get('datacenter')
         self.make_request.assert_called_with("Datacenter.json")
         self.assertEqual('dal01', r)
 
     def test_w_param(self):
-        self.make_request.return_value = '[123]'
+        self.make_request.return_value = [123]
         r = self.metadata.get('vlans', '1:2:3:4:5')
         self.make_request.assert_called_with("Vlans/1:2:3:4:5.json")
         self.assertEqual([123], r)
@@ -53,28 +53,27 @@ class MetadataTests(unittest.TestCase):
             SoftLayer.SoftLayerError, self.metadata.get, 'something')
 
     def test_networks_not_exist(self):
-        self.make_request.return_value = '[]'
+        self.make_request.return_value = []
         r = self.metadata.public_network()
         self.assertEqual({'mac_addresses': []}, r)
 
     def test_networks(self):
-        resp = '["list", "of", "stuff"]'
-        resp_list = ['list', 'of', 'stuff']
+        resp = ['list', 'of', 'stuff']
         self.make_request.return_value = resp
         r = self.metadata.public_network()
         self.assertEqual({
-            'vlan_ids': resp_list,
-            'router': resp_list,
-            'vlans': resp_list,
-            'mac_addresses': resp_list
+            'vlan_ids': resp,
+            'router': resp,
+            'vlans': resp,
+            'mac_addresses': resp
         }, r)
 
         r = self.metadata.private_network()
         self.assertEqual({
-            'vlan_ids': resp_list,
-            'router': resp_list,
-            'vlans': resp_list,
-            'mac_addresses': resp_list
+            'vlan_ids': resp,
+            'router': resp,
+            'vlans': resp,
+            'mac_addresses': resp
         }, r)
 
 

@@ -6,8 +6,6 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
-import json
-
 from SoftLayer.transport import make_rest_api_call
 from SoftLayer.consts import API_PRIVATE_ENDPOINT_REST, USER_AGENT
 from SoftLayer.exceptions import SoftLayerAPIError, SoftLayerError
@@ -93,10 +91,7 @@ class MetadataManager(object):
         else:
             path = "%s%s" % (self.attribs[name]['call'], extension)
 
-        data = self.make_request(path)
-        if data and extension == '.json':
-            return json.loads(data)
-        return data
+        return self.make_request(path)
 
     def _get_network(self, kind, router=True, vlans=True, vlan_ids=True):
         network = {}
