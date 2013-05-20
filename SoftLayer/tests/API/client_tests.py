@@ -8,7 +8,7 @@
 try:
     import unittest2 as unittest
 except ImportError:
-    import unittest # NOQA
+    import unittest  # NOQA
 
 from mock import patch, MagicMock, call
 
@@ -118,15 +118,15 @@ class APICalls(unittest.TestCase):
             username='doesnotexist', api_key='issurelywrong',
             endpoint_url="ENDPOINT")
 
-    @patch('SoftLayer.API.make_api_call')
-    def test_old_api(self, make_api_call):
+    @patch('SoftLayer.API.make_xml_rpc_api_call')
+    def test_old_api(self, make_xml_rpc_api_call):
         client = SoftLayer.API.Client(
             'SoftLayer_SERVICE', None, 'doesnotexist', 'issurelywrong',
             endpoint_url="ENDPOINT")
 
         client.METHOD()
 
-        make_api_call.assert_called_with(
+        make_xml_rpc_api_call.assert_called_with(
             'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
             headers={
                 'authenticate': {
@@ -138,8 +138,8 @@ class APICalls(unittest.TestCase):
                 'User-Agent': USER_AGENT,
             })
 
-    @patch('SoftLayer.API.make_api_call')
-    def test_complex_old_api(self, make_api_call):
+    @patch('SoftLayer.API.make_xml_rpc_api_call')
+    def test_complex_old_api(self, make_xml_rpc_api_call):
         client = SoftLayer.API.Client(
             'SoftLayer_SERVICE', None, 'doesnotexist', 'issurelywrong',
             endpoint_url="ENDPOINT")
@@ -156,7 +156,7 @@ class APICalls(unittest.TestCase):
                 'TYPE': {'obj': {'attribute': {'operation': '^= prefix'}}}},
             limit=9, offset=10)
 
-        make_api_call.assert_called_with(
+        make_xml_rpc_api_call.assert_called_with(
             'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (1234, ),
             headers={
                 'SoftLayer_SERVICEObjectMask': {
@@ -181,10 +181,10 @@ class APICalls(unittest.TestCase):
                                   api_key='issurelywrong')
         self.assertRaises(SoftLayer.SoftLayerError, client.METHOD)
 
-    @patch('SoftLayer.API.make_api_call')
-    def test_simple_call(self, make_api_call):
+    @patch('SoftLayer.API.make_xml_rpc_api_call')
+    def test_simple_call(self, make_xml_rpc_api_call):
         self.client['SERVICE'].METHOD()
-        make_api_call.assert_called_with(
+        make_xml_rpc_api_call.assert_called_with(
             'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
             headers={
                 'authenticate': {
@@ -196,8 +196,8 @@ class APICalls(unittest.TestCase):
                 'User-Agent': USER_AGENT,
             })
 
-    @patch('SoftLayer.API.make_api_call')
-    def test_complex(self, make_api_call):
+    @patch('SoftLayer.API.make_xml_rpc_api_call')
+    def test_complex(self, make_xml_rpc_api_call):
         self.client['SERVICE'].METHOD(
             1234,
             id=5678,
@@ -207,7 +207,7 @@ class APICalls(unittest.TestCase):
                 'TYPE': {'obj': {'attribute': {'operation': '^= prefix'}}}},
             limit=9, offset=10)
 
-        make_api_call.assert_called_with(
+        make_xml_rpc_api_call.assert_called_with(
             'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (1234, ),
             headers={
                 'SoftLayer_SERVICEObjectMask': {
@@ -227,11 +227,11 @@ class APICalls(unittest.TestCase):
                 'User-Agent': USER_AGENT,
             })
 
-    @patch('SoftLayer.API.make_api_call')
-    def test_mask_call_v2(self, make_api_call):
+    @patch('SoftLayer.API.make_xml_rpc_api_call')
+    def test_mask_call_v2(self, make_xml_rpc_api_call):
         self.client['SERVICE'].METHOD(
             mask="mask[something[nested]]")
-        make_api_call.assert_called_with(
+        make_xml_rpc_api_call.assert_called_with(
             'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
             headers={
                 'authenticate': {
@@ -244,11 +244,11 @@ class APICalls(unittest.TestCase):
                 'User-Agent': USER_AGENT,
             })
 
-    @patch('SoftLayer.API.make_api_call')
-    def test_mask_call_v2_dot(self, make_api_call):
+    @patch('SoftLayer.API.make_xml_rpc_api_call')
+    def test_mask_call_v2_dot(self, make_xml_rpc_api_call):
         self.client['SERVICE'].METHOD(
             mask="mask.something.nested")
-        make_api_call.assert_called_with(
+        make_xml_rpc_api_call.assert_called_with(
             'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
             headers={
                 'authenticate': {
@@ -261,8 +261,8 @@ class APICalls(unittest.TestCase):
                 'User-Agent': USER_AGENT,
             })
 
-    @patch('SoftLayer.API.make_api_call')
-    def test_mask_call_invalid_mask(self, make_api_call):
+    @patch('SoftLayer.API.make_xml_rpc_api_call')
+    def test_mask_call_invalid_mask(self, make_xml_rpc_api_call):
         try:
             self.client['SERVICE'].METHOD(mask="mask[something.nested")
         except SoftLayer.SoftLayerError, e:

@@ -12,7 +12,6 @@ except ImportError:
     import unittest  # NOQA
 from mock import patch
 
-
 import SoftLayer.CLI as cli
 
 if sys.version_info >= (3,):

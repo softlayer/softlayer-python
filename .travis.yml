@@ -1,6 +1,5 @@
 language: python
 python:
-  - "2.5"
   - "2.6"
   - "2.7"
   - "3.2"
@@ -9,7 +8,7 @@ python:
 # command to install dependencies
 install:
   - "pip install -r requirements.txt --use-mirrors"
-  - "if [[ $TRAVIS_PYTHON_VERSION = 2.6 || $TRAVIS_PYTHON_VERSION = 2.5 ]]; then pip install unittest2 --use-mirrors; fi"
+  - "if [[ $TRAVIS_PYTHON_VERSION = 2.6 ]]; then pip install unittest2 --use-mirrors; fi"
 # command to run tests
 script: python setup.py nosetests
 

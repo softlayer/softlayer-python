@@ -8,7 +8,7 @@
 """
 from SoftLayer.consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT, \
     USER_AGENT
-from SoftLayer.transport import make_api_call
+from SoftLayer.transport import make_xml_rpc_api_call
 from SoftLayer.exceptions import SoftLayerError
 import os
 
@@ -281,9 +281,11 @@ class Client(object):
                 'offset': int(offset)
             }
         uri = '/'.join([self._endpoint_url, service])
-        return make_api_call(uri, method, args, headers=headers,
-                             http_headers=http_headers, timeout=self.timeout,
-                             verbose=self.verbose)
+        return make_xml_rpc_api_call(uri, method, args,
+                                     headers=headers,
+                                     http_headers=http_headers,
+                                     timeout=self.timeout,
+                                     verbose=self.verbose)
 
     __call__ = call
 
