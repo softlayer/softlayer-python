@@ -17,8 +17,8 @@ if sys.version_info >= (3,):
 
 requires = [
     'distribute',
-    'prettytable',
-    'docopt==0.6.1',
+    'prettytable >= 0.7.0',
+    'docopt == 0.6.1',
     'requests'
 ]
 
