@@ -6,12 +6,7 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
-try:
-    import simplejson as json
-except ImportError:  # pragma: no cover
-    import json  # NOQA
-import urllib2
-
+from SoftLayer.transport import make_rest_api_call
 from SoftLayer.consts import API_PRIVATE_ENDPOINT_REST, USER_AGENT
 from SoftLayer.exceptions import SoftLayerAPIError, SoftLayerError
 
@@ -64,26 +59,14 @@ class MetadataManager(object):
 
     def make_request(self, path):
         url = '/'.join([self.url, 'SoftLayer_Resource_Metadata', path])
-        req = urllib2.Request(url)
-        req.add_header('User-Agent', USER_AGENT)
-
         try:
-            resp = urllib2.urlopen(req, timeout=self.timeout)
-        except urllib2.HTTPError, e:  # pragma: no cover
-            if e.code == 404:
+            return make_rest_api_call('GET', url,
+                                      http_headers={'User-Agent': USER_AGENT},
+                                      timeout=self.timeout)
+        except SoftLayerAPIError, e:
+            if e.faultCode == 404:
                 return None
-
-            try:
-                content = json.loads(e.read())
-                raise SoftLayerAPIError(content['code'], content['error'])
-            except (ValueError, KeyError):
-                pass
-
-            raise SoftLayerAPIError(e.code, e.reason)
-        except urllib2.URLError, e:
-            raise SoftLayerAPIError(0, e.reason)
-        else:
-            return resp.read()
+            raise e
 
     def get(self, name, param=None):
         """ Retreive a metadata attribute
@@ -104,14 +87,11 @@ class MetadataManager(object):
             if not param:
                 raise SoftLayerError(
                     'Parameter required to get this attribute.')
-            url = "%s/%s%s" % (self.attribs[name]['call'], param, extension)
+            path = "%s/%s%s" % (self.attribs[name]['call'], param, extension)
         else:
-            url = "%s%s" % (self.attribs[name]['call'], extension)
+            path = "%s%s" % (self.attribs[name]['call'], extension)
 
-        data = self.make_request(url)
-        if data and extension == '.json':
-            return json.loads(data)
-        return data
+        return self.make_request(path)
 
     def _get_network(self, kind, router=True, vlans=True, vlan_ids=True):
         network = {}
