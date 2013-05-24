@@ -10,18 +10,7 @@ import socket
 from time import sleep
 from itertools import repeat
 
-from SoftLayer.exceptions import SoftLayerError
 from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
-
-
-class CCICreateMissingRequired(SoftLayerError):
-    def __init__(self):
-        self.message = "cpu, memory, hostname, and domain are required"
-
-
-class CCICreateMutuallyExclusive(SoftLayerError):
-    def __init__(self, *args):
-        self.message = "Can only specify one of:", ','.join(args)
 
 
 class CCIManager(IdentifierMixin, object):
@@ -194,11 +183,12 @@ class CCIManager(IdentifierMixin, object):
         ]
 
         if not all(required):
-            raise CCICreateMissingRequired()
+            raise ValueError("cpu, memory, hostname, and domain are required")
 
         for me in mutually_exclusive:
             if all(me.values()):
-                raise CCICreateMutuallyExclusive(*me.keys())
+                raise ValueError(
+                    'Can only specify one of: %s' % (','.join(me.keys())))
 
         data = {
             "startCpus": int(cpus),

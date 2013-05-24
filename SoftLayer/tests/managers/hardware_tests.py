@@ -1,12 +1,11 @@
 """
-    SoftLayer.tests.API.hardware_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    SoftLayer.tests.managers.hardware_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
-import SoftLayer
-import SoftLayer.hardware
+from SoftLayer import HardwareManager
 
 try:
     import unittest2 as unittest
@@ -15,11 +14,11 @@ except ImportError:
 from mock import MagicMock, ANY, call
 
 
-class HardwareTests_unittests(unittest.TestCase):
+class HardwareTests(unittest.TestCase):
 
     def setUp(self):
         self.client = MagicMock()
-        self.hardware = SoftLayer.HardwareManager(self.client)
+        self.hardware = HardwareManager(self.client)
 
     def test_list_hardware(self):
         mcall = call(mask=ANY, filter={})

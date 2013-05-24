@@ -25,7 +25,7 @@ hostname or the ip address for a CCI.
 from os import linesep
 import os.path
 
-from SoftLayer.CCI import CCIManager
+from SoftLayer import CCIManager
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
     FormattedItem)
@@ -693,7 +693,7 @@ Options:
 
     @staticmethod
     def dns_sync(client, args):
-        from SoftLayer.DNS import DNSManager, DNSZoneNotFound
+        from SoftLayer import DNSManager, DNSZoneNotFound
         dns = DNSManager(client)
         cci = CCIManager(client)
 

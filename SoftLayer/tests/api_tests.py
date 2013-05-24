@@ -1,6 +1,6 @@
 """
-    SoftLayer.tests.API.client_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    SoftLayer.tests.api_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
@@ -112,11 +112,7 @@ class ClientMethods(unittest.TestCase):
         self.assertIn("Service", repr(client['SERVICE']))
 
 
-class APICalls(unittest.TestCase):
-    def setUp(self):
-        self.client = SoftLayer.Client(
-            username='doesnotexist', api_key='issurelywrong',
-            endpoint_url="ENDPOINT")
+class OldAPIClient(unittest.TestCase):
 
     @patch('SoftLayer.API.make_xml_rpc_api_call')
     def test_old_api(self, make_xml_rpc_api_call):
@@ -180,6 +176,13 @@ class APICalls(unittest.TestCase):
         client = SoftLayer.Client(username='doesnotexist',
                                   api_key='issurelywrong')
         self.assertRaises(SoftLayer.SoftLayerError, client.METHOD)
+
+
+class APIClient(unittest.TestCase):
+    def setUp(self):
+        self.client = SoftLayer.Client(
+            username='doesnotexist', api_key='issurelywrong',
+            endpoint_url="ENDPOINT")
 
     @patch('SoftLayer.API.make_xml_rpc_api_call')
     def test_simple_call(self, make_xml_rpc_api_call):

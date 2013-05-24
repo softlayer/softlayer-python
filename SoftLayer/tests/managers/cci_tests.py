@@ -1,29 +1,28 @@
 """
-    SoftLayer.tests.API.cci_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    SoftLayer.tests.managers.cci_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
-import SoftLayer
-import SoftLayer.CCI
+from SoftLayer import CCIManager
 
 try:
     import unittest2 as unittest
 except ImportError:
-    import unittest # NOQA
+    import unittest  # NOQA
 from mock import MagicMock, ANY, call, patch
 
 
-class CCITests_unittests(unittest.TestCase):
+class CCITests(unittest.TestCase):
 
     def setUp(self):
         self.client = MagicMock()
-        self.cci = SoftLayer.CCIManager(self.client)
+        self.cci = CCIManager(self.client)
 
     def test_list_instances(self):
         mcall = call(mask=ANY, filter={})
-        service = self.client.__getitem__()
+        service = self.client['Account']
 
         self.cci.list_instances(hourly=True, monthly=True)
         service.getVirtualGuests.assert_has_calls(mcall)
@@ -53,7 +52,7 @@ class CCITests_unittests(unittest.TestCase):
             private_ip='4.3.2.1',
         )
 
-        service = self.client.__getitem__()
+        service = self.client['Account']
         service.getVirtualGuests.assert_has_calls(call(
             filter={
                 'virtualGuests': {
@@ -77,13 +76,13 @@ class CCITests_unittests(unittest.TestCase):
         ))
 
     def test_resolve_ids_ip(self):
-        self.client.__getitem__().getVirtualGuests.return_value = \
-            [{'id': '1234'}]
+        self.client['Account'].getVirtualGuests.return_value = [{'id': '1234'}]
         _id = self.cci._get_ids_from_ip('1.2.3.4')
         self.assertEqual(_id, ['1234'])
 
-        self.client.__getitem__().getVirtualGuests.side_effect = \
-            [[], [{'id': '4321'}]]
+        self.client['Account'].getVirtualGuests.side_effect = [
+            [], [{'id': '4321'}]
+        ]
         _id = self.cci._get_ids_from_ip('4.3.2.1')
         self.assertEqual(_id, ['4321'])
 
@@ -91,51 +90,52 @@ class CCITests_unittests(unittest.TestCase):
         self.assertEqual(_id, [])
 
     def test_resolve_ids_hostname(self):
-        self.client.__getitem__().getVirtualGuests.return_value = \
+        self.client['Account'].getVirtualGuests.return_value = \
             [{'id': '1234'}]
         _id = self.cci._get_ids_from_hostname('hostname')
         self.assertEqual(_id, ['1234'])
 
     def test_get_instance(self):
-        self.client.__getitem__().getObject.return_value = {
+        self.client['Virtual_Guest'].getObject.return_value = {
             'hourlyVirtualGuests': "this is unique"}
         self.cci.get_instance(1)
-        self.client.__getitem__().getObject.assert_called_once_with(
+        self.client['Virtual_Guest'].getObject.assert_called_once_with(
             id=1, mask=ANY)
 
     def test_get_create_options(self):
         self.cci.get_create_options()
-        f = self.client.__getitem__().getCreateObjectOptions
+        f = self.client['Virtual_Guest'].getCreateObjectOptions
         f.assert_called_once_with()
 
     def test_cancel_instance(self):
         self.cci.cancel_instance(id=1)
-        self.client.__getitem__().deleteObject.assert_called_once_with(id=1)
+        self.client['Virtual_Guest'].deleteObject.assert_called_once_with(id=1)
 
     def test_reload_instance(self):
         self.cci.reload_instance(id=1)
-        f = self.client.__getitem__().reloadCurrentOperatingSystemConfiguration
+        service = self.client['Virtual_Guest']
+        f = service.reloadCurrentOperatingSystemConfiguration
         f.assert_called_once_with(id=1)
 
-    @patch('SoftLayer.CCI.CCIManager._generate_create_dict')
+    @patch('SoftLayer.managers.cci.CCIManager._generate_create_dict')
     def test_create_verify(self, create_dict):
         create_dict.return_value = {'test': 1, 'verify': 1}
         self.cci.verify_create_instance(test=1, verify=1)
         create_dict.assert_called_once_with(test=1, verify=1)
-        f = self.client.__getitem__().generateOrderTemplate
+        f = self.client['Virtual_Guest'].generateOrderTemplate
         f.assert_called_once_with({'test': 1, 'verify': 1})
 
-    @patch('SoftLayer.CCI.CCIManager._generate_create_dict')
+    @patch('SoftLayer.managers.cci.CCIManager._generate_create_dict')
     def test_create_instance(self, create_dict):
         create_dict.return_value = {'test': 1, 'verify': 1}
         self.cci.create_instance(test=1, verify=1)
         create_dict.assert_called_once_with(test=1, verify=1)
-        self.client.__getitem__().createObject.assert_called_once_with(
+        self.client['Virtual_Guest'].createObject.assert_called_once_with(
             {'test': 1, 'verify': 1})
 
     def test_generate_os_and_image(self):
         self.assertRaises(
-            SoftLayer.CCI.CCICreateMutuallyExclusive,
+            ValueError,
             self.cci._generate_create_dict,
             cpus=1,
             memory=1,
@@ -146,15 +146,8 @@ class CCITests_unittests(unittest.TestCase):
         )
 
     def test_generate_missing(self):
-        self.assertRaises(
-            SoftLayer.CCI.CCICreateMissingRequired,
-            self.cci._generate_create_dict,
-        )
-        self.assertRaises(
-            SoftLayer.CCI.CCICreateMissingRequired,
-            self.cci._generate_create_dict,
-            cpus=1
-        )
+        self.assertRaises(ValueError, self.cci._generate_create_dict)
+        self.assertRaises(ValueError, self.cci._generate_create_dict, cpus=1)
 
     def test_generate_basic(self):
         data = self.cci._generate_create_dict(
@@ -381,7 +374,7 @@ class CCITests_unittests(unittest.TestCase):
 
         assert_data = {
             'blockDevices': [
-                {"device": "0", "diskImage":{"capacity": 50}}]
+                {"device": "0", "diskImage": {"capacity": 50}}]
         }
 
         self.assertTrue(data.get('blockDevices'))
@@ -399,17 +392,17 @@ class CCITests_unittests(unittest.TestCase):
 
         assert_data = {
             'blockDevices': [
-                {"device": "0", "diskImage":{"capacity": 50}},
-                {"device": "2", "diskImage":{"capacity": 70}},
-                {"device": "3", "diskImage":{"capacity": 100}}]
+                {"device": "0", "diskImage": {"capacity": 50}},
+                {"device": "2", "diskImage": {"capacity": 70}},
+                {"device": "3", "diskImage": {"capacity": 100}}]
         }
 
         self.assertTrue(data.get('blockDevices'))
         self.assertEqual(data['blockDevices'], assert_data['blockDevices'])
 
-    @patch('SoftLayer.CCI.sleep')
+    @patch('SoftLayer.managers.cci.sleep')
     def test_wait(self, _sleep):
-        guestObject = self.client.__getitem__().getObject
+        guestObject = self.client['Virtual_Guest'].getObject
 
         # test 4 iterations with positive match
         guestObject.side_effect = [

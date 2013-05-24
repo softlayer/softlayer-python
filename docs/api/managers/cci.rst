@@ -1,6 +1,6 @@
 .. _cci:
 
-.. automodule:: SoftLayer.CCI
+.. automodule:: SoftLayer.managers.cci
    :members:
    :inherited-members:
    :undoc-members:

@@ -4,7 +4,8 @@ Managers
 --------
 ::
 
-	>>> from SoftLayer.CCI import CCIManager
+	>>> from SoftLayer import CCIManager, Client
+	>>> client = Client(...)
 	>>> cci = CCIManager(client)
 	>>> cci.list_instances()
 	[...]

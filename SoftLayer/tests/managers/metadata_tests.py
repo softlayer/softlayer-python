@@ -1,11 +1,12 @@
 """
-    SoftLayer.tests.API.metadata_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    SoftLayer.tests.managers.metadata_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
-import SoftLayer
+from SoftLayer import MetadataManager, SoftLayerError, SoftLayerAPIError
+from SoftLayer.consts import API_PRIVATE_ENDPOINT_REST
 
 try:
     import unittest2 as unittest
@@ -17,7 +18,7 @@ from mock import patch, MagicMock
 class MetadataTests(unittest.TestCase):
 
     def setUp(self):
-        self.metadata = SoftLayer.MetadataManager()
+        self.metadata = MetadataManager()
         self.make_request = MagicMock()
         self.metadata.make_request = self.make_request
 
@@ -46,11 +47,10 @@ class MetadataTests(unittest.TestCase):
         self.assertEqual(None, r)
 
     def test_w_param_error(self):
-        self.assertRaises(SoftLayer.SoftLayerError, self.metadata.get, 'vlans')
+        self.assertRaises(SoftLayerError, self.metadata.get, 'vlans')
 
     def test_not_exists(self):
-        self.assertRaises(
-            SoftLayer.SoftLayerError, self.metadata.get, 'something')
+        self.assertRaises(SoftLayerError, self.metadata.get, 'something')
 
     def test_networks_not_exist(self):
         self.make_request.return_value = []
@@ -80,13 +80,13 @@ class MetadataTests(unittest.TestCase):
 class MetadataTestsMakeRequest(unittest.TestCase):
 
     def setUp(self):
-        self.metadata = SoftLayer.MetadataManager()
+        self.metadata = MetadataManager()
         self.url = '/'.join([
-            SoftLayer.consts.API_PRIVATE_ENDPOINT_REST.rstrip('/'),
+            API_PRIVATE_ENDPOINT_REST.rstrip('/'),
             'SoftLayer_Resource_Metadata',
             'something.json'])
 
-    @patch('SoftLayer.metadata.make_rest_api_call')
+    @patch('SoftLayer.managers.metadata.make_rest_api_call')
     def test_basic(self, make_api_call):
         r = self.metadata.make_request('something.json')
         make_api_call.assert_called_with(
@@ -95,17 +95,16 @@ class MetadataTestsMakeRequest(unittest.TestCase):
             http_headers={'User-Agent': 'SoftLayer Python v2.2.0'})
         self.assertEqual(make_api_call(), r)
 
-    @patch('SoftLayer.metadata.make_rest_api_call')
+    @patch('SoftLayer.managers.metadata.make_rest_api_call')
     def test_raise_error(self, make_api_call):
-        make_api_call.side_effect = SoftLayer.SoftLayerAPIError(
+        make_api_call.side_effect = SoftLayerAPIError(
             'faultCode', 'faultString')
         self.assertRaises(
-            SoftLayer.SoftLayerAPIError,
+            SoftLayerAPIError,
             self.metadata.make_request, 'something.json')
 
-    @patch('SoftLayer.metadata.make_rest_api_call')
+    @patch('SoftLayer.managers.metadata.make_rest_api_call')
     def test_raise_404_error(self, make_api_call):
-        make_api_call.side_effect = SoftLayer.SoftLayerAPIError(
-            404, 'faultString')
+        make_api_call.side_effect = SoftLayerAPIError(404, 'faultString')
         r = self.metadata.make_request('something.json')
         self.assertEqual(r, None)
