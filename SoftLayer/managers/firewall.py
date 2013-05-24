@@ -6,7 +6,6 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
-__all__ = ['FirewallManager']
 
 
 def has_firewall(vlan):
@@ -29,16 +28,18 @@ class FirewallManager(object):
         self.client = client
 
     def get_firewalls(self):
-        results = filter(has_firewall, self.client['Account'].getObject(
-            mask={'networkVlans': {
-                'firewallNetworkComponents': None,
-                'networkVlanFirewall': None,
-                'dedicatedFirewallFlag': None,
-                'firewallGuestNetworkComponents': None,
-                'firewallInterfaces': {},
-                'firewallRules': None,
-                'highAvailabilityFirewallFlag': None,
-                #'primarySubnet': None,
-            }})['networkVlans'])
+        results = self.client['Account'].getObject(
+            mask={
+                'networkVlans': {
+                    'firewallNetworkComponents': None,
+                    'networkVlanFirewall': None,
+                    'dedicatedFirewallFlag': None,
+                    'firewallGuestNetworkComponents': None,
+                    'firewallInterfaces': {},
+                    'firewallRules': None,
+                    'highAvailabilityFirewallFlag': None,
+                    #'primarySubnet': None,
+                }
+            })['networkVlans']
 
-        return results
+        return filter(has_firewall, results)

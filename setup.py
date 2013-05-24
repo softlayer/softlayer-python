@@ -47,9 +47,10 @@ setup(
         'SoftLayer',
         'SoftLayer.CLI',
         'SoftLayer.CLI.modules',
+        'SoftLayer.managers',
         'SoftLayer.tests',
-        'SoftLayer.tests.API',
-        'SoftLayer.tests.CLI'
+        'SoftLayer.tests.CLI',
+        'SoftLayer.tests.managers',
     ],
     license='The BSD License',
     zip_safe=False,

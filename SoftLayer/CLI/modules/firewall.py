@@ -11,7 +11,7 @@ The available commands are:
 
 from SoftLayer.CLI import CLIRunnable, Table, listing
 from SoftLayer.CLI.helpers import blank
-from SoftLayer.firewall import FirewallManager
+from SoftLayer import FirewallManager
 
 
 class FWList(CLIRunnable):

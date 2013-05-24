@@ -17,7 +17,7 @@ The available commands are:
 # :license: BSD, see LICENSE for more details.
 
 from SoftLayer.CLI import CLIRunnable, no_going_back, Table, CLIAbort
-from SoftLayer.DNS import DNSManager, DNSZoneNotFound
+from SoftLayer import DNSManager, DNSZoneNotFound
 
 
 class DumpZone(CLIRunnable):
