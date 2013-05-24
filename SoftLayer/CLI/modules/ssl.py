@@ -16,7 +16,7 @@ The available commands are:
 
 from SoftLayer.CLI.helpers import CLIRunnable, no_going_back, Table, CLIAbort
 from SoftLayer.CLI.helpers import blank
-from SoftLayer.SSL import SSLManager
+from SoftLayer import SSLManager
 
 
 class ListCerts(CLIRunnable):

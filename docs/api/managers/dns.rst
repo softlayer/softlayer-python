@@ -1,6 +1,6 @@
 .. _dns:
 
-.. automodule:: SoftLayer.DNS
+.. automodule:: SoftLayer.managers.dns
    :members:
    :inherited-members:
    :undoc-members:

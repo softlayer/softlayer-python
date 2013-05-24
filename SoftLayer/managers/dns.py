@@ -7,14 +7,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from time import strftime
-from SoftLayer.exceptions import SoftLayerError
-
-
-__all__ = ["DNSZoneNotFound", "DNSManager"]
-
-
-class DNSZoneNotFound(SoftLayerError):
-    pass
+from SoftLayer.exceptions import DNSZoneNotFound
 
 
 class DNSManager(object):

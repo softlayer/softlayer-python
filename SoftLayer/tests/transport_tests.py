@@ -1,3 +1,10 @@
+"""
+    SoftLayer.tests.transport_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
 try:
     import unittest2 as unittest
 except ImportError:
