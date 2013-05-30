@@ -4,9 +4,9 @@ usage: sl messaging [<command>] [<args>...] [options]
 Manage SoftLayer Message Queue
 
 The available commands are:
-  account  List all queue accounts
-  queue    Queue-related commands
-  topic    Topic-related commands
+  list-accounts  List all queue accounts
+  queue          Queue-related commands
+  topic          Topic-related commands
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: BSD, see LICENSE for more details.
