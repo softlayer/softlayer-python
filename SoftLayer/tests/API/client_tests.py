@@ -340,6 +340,11 @@ class APICalls(unittest.TestCase):
             lambda: list(self.client.iter_call(
                 'SERVICE', 'METHOD', iter=True, chunk=0)))
 
+    def test_call_invalid_arguments(self):
+        self.assertRaises(
+            TypeError,
+            self.client.call, 'SERVICE', 'METHOD', invalid_kwarg='invalid')
+
 
 class TestAuthenticationBase(unittest.TestCase):
     def test_get_headers(self):

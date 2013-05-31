@@ -118,8 +118,7 @@ class HardwareManager(IdentifierMixin, object):
         """
 
         return self.hardware.reloadCurrentOperatingSystemConfiguration(
-            id=id,
-            token='FORCE')
+            'FORCE', id=id)
 
     def _get_ids_from_hostname(self, hostname):
         results = self.list_hardware(hostname=hostname, mask="id")
