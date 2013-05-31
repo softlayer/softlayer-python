@@ -87,4 +87,4 @@ class HardwareTests_unittests(unittest.TestCase):
     def test_reload(self):
         self.hardware.reload(id=1)
         f = self.client.__getitem__().reloadCurrentOperatingSystemConfiguration
-        f.assert_called_once_with(id=1, token='FORCE')
+        f.assert_called_once_with('FORCE', id=1)

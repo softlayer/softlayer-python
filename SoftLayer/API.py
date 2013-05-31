@@ -15,6 +15,15 @@ import os
 API_USERNAME = None
 API_KEY = None
 API_BASE_URL = API_PUBLIC_ENDPOINT
+VALID_CALL_ARGS = set([
+    'id',
+    'mask',
+    'filter',
+    'headers',
+    'raw_headers',
+    'limit',
+    'offset',
+])
 
 
 class AuthenticationBase(object):
@@ -240,6 +249,11 @@ class Client(object):
         """
         if kwargs.get('iter'):
             return self.iter_call(service, method, *args, **kwargs)
+
+        invalid_kwargs = set(kwargs.keys()) - VALID_CALL_ARGS
+        if invalid_kwargs:
+            raise TypeError(
+                'Invalid keyword arguments: %s' % ','.join(invalid_kwargs))
 
         if not service.startswith(self._prefix):
             service = self._prefix + service
