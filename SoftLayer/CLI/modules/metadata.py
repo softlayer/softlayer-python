@@ -23,7 +23,7 @@ The available commands are:
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: BSD, see LICENSE for more details.
 
-from SoftLayer.metadata import MetadataManager
+from SoftLayer import MetadataManager
 from SoftLayer.CLI import CLIRunnable, Table, listing, CLIAbort
 
 

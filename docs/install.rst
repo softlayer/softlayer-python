@@ -25,7 +25,7 @@ The project is developed on GitHub, at `github.com/softlayer/softlayer-api-pytho
 
 You can clone the public repository::
 
-    git clone git://github.com/softlayer/softlayer-api-python-client.git
+    $ git clone git://github.com/softlayer/softlayer-api-python-client.git
 
 Or, Download the `tarball <https://github.com/softlayer/softlayer-api-python-client/tarball/master>`_::
 

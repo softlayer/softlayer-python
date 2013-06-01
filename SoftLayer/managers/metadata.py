@@ -10,7 +10,6 @@ from SoftLayer.transport import make_rest_api_call
 from SoftLayer.consts import API_PRIVATE_ENDPOINT_REST, USER_AGENT
 from SoftLayer.exceptions import SoftLayerAPIError, SoftLayerError
 
-__all__ = ["MetadataManager"]
 
 METADATA_MAPPING = {
     'backend_mac': {'call': 'BackendMacAddresses'},

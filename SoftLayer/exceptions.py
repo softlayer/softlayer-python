@@ -78,3 +78,7 @@ class InvalidMethodParameters(ServerError):
 
 class InternalError(ServerError):
     pass
+
+
+class DNSZoneNotFound(SoftLayerError):
+    pass
