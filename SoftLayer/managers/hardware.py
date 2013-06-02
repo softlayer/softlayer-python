@@ -1,3 +1,12 @@
+"""
+    SoftLayer.hardware
+    ~~~~~~~~~~~~~~~~~~
+    Hardware Manager/helpers
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
+
 import socket
 from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
 

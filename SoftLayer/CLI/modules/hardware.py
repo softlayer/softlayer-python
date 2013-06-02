@@ -15,7 +15,7 @@ hostname or the ip address for a piece of hardware.
 from SoftLayer.CLI.helpers import (
     CLIRunnable, Table, FormattedItem, NestedDict, CLIAbort, blank, listing,
     gb, no_going_back)
-from SoftLayer.hardware import HardwareManager
+from SoftLayer import HardwareManager
 
 
 def resolve_id(manager, identifier):

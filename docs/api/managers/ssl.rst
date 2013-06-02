@@ -1,6 +1,6 @@
 .. _ssl:
 
-.. automodule:: SoftLayer.SSL
+.. automodule:: SoftLayer.managers.ssl
    :members:
    :inherited-members:
    :undoc-members:
