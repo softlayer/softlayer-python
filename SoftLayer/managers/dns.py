@@ -148,7 +148,7 @@ class DNSManager(object):
                 zone,
                 mask='resourceRecords',
                 )[0]['resourceRecords']
-        except IndexError:
+        except (IndexError, KeyError, TypeError):
             raise DNSZoneNotFound(zone)
 
         # Make sure all requested filters are truthful
