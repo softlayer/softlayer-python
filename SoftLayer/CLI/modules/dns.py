@@ -73,7 +73,8 @@ Arguments:
     def execute(client, args):
         manager = DNSManager(client)
         if args['--really'] or no_going_back(args['<zone>']):
-            manager.delete_zone(args['<zone>'])
+            zone_id = manager.get_zone(args['<zone>'])
+            manager.delete_zone(zone_id)
         raise CLIAbort("Aborted.")
 
 
