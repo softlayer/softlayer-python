@@ -7,7 +7,7 @@ The available commands are:
   search  Look for a resource record by exact name
   edit    Update resource records (bulk/single)
   create  Create zone
-  list    List zones
+  list    List zones or a zone's records
   remove  Remove resource records
   add     Add resource record
   print   Print zone in BIND format
@@ -80,14 +80,61 @@ Arguments:
 
 class ListZones(CLIRunnable):
     """
-usage: sl dns list [options]
+usage: sl dns list [<zone>] [options]
 
-List zones
+List zones and optionally, records
+
+Filters:
+  --type=TYPE    Record type, such as A or CNAME
+  --data=DATA    Record data, such as an IP address
+  --record=HOST  Host record, such as www
+  --ttl=TTL      TTL value in seconds, such as 86400
 """
     action = 'list'
 
+    @classmethod
+    def execute(cls, client, args):
+        if args['<zone>']:
+            return cls.list_zone(client, args['<zone>'], args)
+
+        return cls.list_zones()
+
     @staticmethod
-    def execute(client, args):
+    def list_zone(client, zone, args):
+        manager = DNSManager(client)
+        t = Table([
+            "record",
+            "type",
+            "ttl",
+            "value",
+        ])
+
+        t.align['ttl'] = 'l'
+        t.align['record'] = 'r'
+        t.align['value'] = 'l'
+
+        try:
+            records = manager.get_records(args['<zone>'],
+                    type=args.get('--type'),
+                    host=args.get('--record'),
+                    ttl=args.get('--ttl'),
+                    data=args.get('--data'),
+                )
+        except DNSZoneNotFound:
+            raise CLIAbort("No zone found matching: %s" % args['<zone>'])
+
+        for rr in records:
+            t.add_row([
+                rr['host'],
+                rr['type'].upper(),
+                rr['ttl'],
+                rr['data']
+            ])
+
+        return t
+
+    @staticmethod
+    def list_zones(client):
         manager = DNSManager(client)
         zones = manager.list_zones()
         t = Table([
