@@ -47,13 +47,13 @@ The only required fields are `username` and `api_key`. You can optionally also/e
 	[softlayer]
 	username = username
 	api_key = oyVmeipYQCNrjVS4rF9bHWV7D75S6pa1fghFl384v7mwRCbHTfuJ8qRORIqoVnha
-	endpoint_url = http://api.softlayer.com/xmlrpc/v3/
+	endpoint_url = https://api.softlayer.com/xmlrpc/v3/
 
 *exclusive url*
 ::
 
 	[softlayer]
-	endpoint_url = http://api.softlayer.com/xmlrpc/v3/
+	endpoint_url = https://api.softlayer.com/xmlrpc/v3/
 
 
 Usage Examples
