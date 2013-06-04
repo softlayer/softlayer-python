@@ -7,6 +7,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from time import strftime
+
 from SoftLayer.exceptions import DNSZoneNotFound
 
 
@@ -115,6 +116,45 @@ class DNSManager(object):
         rrs = self.get_zone(zone)['resourceRecords']
         records = filter(lambda x: x['host'].lower() == record.lower(), rrs)
         return records
+
+    def get_records(self, zone, ttl=None, data=None, host=None,
+                    type=None, **kwargs):
+        """ List, and optionally filter, records within a zone.
+
+        :param zone: the zone name in which to search.
+        :param int ttl: optionally, time in seconds:
+        :param data: optionally, the records data
+        :param host: optionally, record's host
+        :param type: optionally, the type of record:
+
+        :returns iterator:
+        """
+        check = []
+
+        if ttl:
+            check.append(lambda x: x['ttl'] == ttl)
+
+        if host:
+            check.append(lambda x: x['record'] == host)
+
+        if data:
+            check.append(lambda x: x['data'] == data)
+
+        if type:
+            check.append(lambda x: x['type'] == type.lower())
+
+        try:
+            results = self.service.getByDomainName(
+                zone,
+                mask='resourceRecords',
+                )[0]['resourceRecords']
+        except IndexError:
+            raise DNSZoneNotFound(zone)
+
+        # Make sure all requested filters are truthful
+        filter_results = lambda x: all(v(x) for v in check)
+
+        return filter(filter_results, results)
 
     def edit_record(self, record):
         """ Update an existing record with the options provided. The provided
