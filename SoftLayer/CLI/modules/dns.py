@@ -97,7 +97,7 @@ Filters:
         if args['<zone>']:
             return cls.list_zone(client, args['<zone>'], args)
 
-        return cls.list_zones()
+        return cls.list_zones(client)
 
     @staticmethod
     def list_zone(client, zone, args):
