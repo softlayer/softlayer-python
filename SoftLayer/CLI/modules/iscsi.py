@@ -4,7 +4,7 @@ usage: sl iscsi [<command>] [<args>...] [options]
 Manage iSCSI targets
 
 The available commands are:
-  list  List NAS accounts
+  list  List iSCSI targets
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: BSD, see LICENSE for more details.
