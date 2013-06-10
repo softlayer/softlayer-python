@@ -108,11 +108,11 @@ class HardwareManager(IdentifierMixin, object):
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
                 'datacenter.name',
-                'networkComponents[status, maxSpeed, name, ipmiMacAddress,' \
-                'ipmiIpAddress, macAddress, primaryIpAddress, port,' \
-                'primarySubnet]',
-                'networkComponents.primarySubnet[netmask, broadcastAddress,' \
-                'networkIdentifier, gateway]',
+                'networkComponents[id, status, maxSpeed, name,' \
+                'ipmiMacAddress, ipmiIpAddress, macAddress, primaryIpAddress,'\
+                'port, primarySubnet]',
+                'networkComponents.primarySubnet[id, netmask,' \
+                'broadcastAddress, networkIdentifier, gateway]',
                 'activeTransaction.id',
                 'operatingSystem.softwareLicense.'
                 'softwareDescription[manufacturer,name,version,referenceCode]',
