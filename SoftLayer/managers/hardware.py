@@ -109,7 +109,7 @@ class HardwareManager(IdentifierMixin, object):
                 'primaryIpAddress',
                 'datacenter.name',
                 'networkComponents[status, maxSpeed, name, ipmiMacAddress,' \
-                'ipmiIpAddress]',
+                'ipmiIpAddress, macAddress, primaryIpAddress]',
                 'activeTransaction.id',
                 'operatingSystem.softwareLicense.'
                 'softwareDescription[manufacturer,name,version,referenceCode]',
