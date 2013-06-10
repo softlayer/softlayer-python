@@ -108,6 +108,8 @@ class HardwareManager(IdentifierMixin, object):
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
                 'datacenter.name',
+                'networkComponents[status, maxSpeed, name, ipmiMacAddress,' \
+                'ipmiIpAddress]',
                 'activeTransaction.id',
                 'operatingSystem.softwareLicense.'
                 'softwareDescription[manufacturer,name,version,referenceCode]',
