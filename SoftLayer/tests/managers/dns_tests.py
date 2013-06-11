@@ -133,31 +133,31 @@ class DNSTests(unittest.TestCase):
     def test_get_records_good_results(self):
         f = self.client['Dns_Domain'].getByDomainName
         f.return_value = [{'resourceRecords': [
-            {'ttl': 7200, 'data': 'd', 'record': 'a', 'type': 'cname'},
-            {'ttl': 900, 'data': '1', 'record': 'b', 'type': 'a'},
-            {'ttl': 900, 'data': 'x', 'record': 'c', 'type': 'ptr'},
-            {'ttl': 86400, 'data': 'b', 'record': 'd', 'type': 'txt'},
-            {'ttl': 86400, 'data': 'b', 'record': 'e', 'type': 'txt'},
-            {'ttl': 600, 'data': 'b', 'record': 'f', 'type': 'txt'},
+            {'ttl': 7200, 'data': 'd', 'host': 'a', 'type': 'cname'},
+            {'ttl': 900, 'data': '1', 'host': 'b', 'type': 'a'},
+            {'ttl': 900, 'data': 'x', 'host': 'c', 'type': 'ptr'},
+            {'ttl': 86400, 'data': 'b', 'host': 'd', 'type': 'txt'},
+            {'ttl': 86400, 'data': 'b', 'host': 'e', 'type': 'txt'},
+            {'ttl': 600, 'data': 'b', 'host': 'f', 'type': 'txt'},
         ]}]
 
         # simple 1/4 matches
         results = self.dns_client.get_records('z', host='b')
         self.assertEqual(results,
-                [{'ttl': 900, 'data': '1', 'record': 'b', 'type': 'a'}])
+                [{'ttl': 900, 'data': '1', 'host': 'b', 'type': 'a'}])
 
         results = self.dns_client.get_records('z', type='ptr')
         self.assertEqual(results,
-                [{'ttl': 900, 'data': 'x', 'record': 'c', 'type': 'ptr'}])
+                [{'ttl': 900, 'data': 'x', 'host': 'c', 'type': 'ptr'}])
 
         results = self.dns_client.get_records('z', ttl=900)
         self.assertEqual(results, [
-            {'ttl': 900, 'data': '1', 'record': 'b', 'type': 'a'},
-            {'ttl': 900, 'data': 'x', 'record': 'c', 'type': 'ptr'}])
+            {'ttl': 900, 'data': '1', 'host': 'b', 'type': 'a'},
+            {'ttl': 900, 'data': 'x', 'host': 'c', 'type': 'ptr'}])
 
         results = self.dns_client.get_records('z', data='x')
         self.assertEqual(results, [
-            {'ttl': 900, 'data': 'x', 'record': 'c', 'type': 'ptr'}
+            {'ttl': 900, 'data': 'x', 'host': 'c', 'type': 'ptr'}
         ])
 
     def test_get_records_strict_results(self):

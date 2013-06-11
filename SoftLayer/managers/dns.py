@@ -6,6 +6,7 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
+import re
 from time import strftime
 
 from SoftLayer.exceptions import DNSZoneNotFound
@@ -135,7 +136,8 @@ class DNSManager(object):
             check.append(lambda x: x['ttl'] == ttl)
 
         if host:
-            check.append(lambda x: x['record'] == host)
+            check.append(lambda x: re.search(self._translate_filter(host),
+                                             x['host']))
 
         if data:
             check.append(lambda x: x['data'] == data)
@@ -173,3 +175,23 @@ class DNSManager(object):
 
         """
         return self.service.getZoneFileContents(id=id)
+
+    def _translate_filter(self, query):
+        """ This function takes command line query syntax and changes it into
+        regular expressions.
+
+        This is a temporary workaround until the API supports zone filtering.
+
+        :param string query: The query string to translate.
+        """
+        if isinstance(query, basestring):
+            if query.startswith('*') and query.endswith('*'):
+                query = "^.*%s.*$" % query.strip('*')
+            elif query.startswith('*'):
+                query = "^.*%s$" % query.strip('*')
+            elif query.endswith('*'):
+                query = "^%s.*$" % query.strip('*')
+            else:
+                query = "^%s$" % query.strip('*')
+
+        return query
