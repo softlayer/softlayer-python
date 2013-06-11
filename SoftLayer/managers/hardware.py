@@ -44,6 +44,7 @@ class HardwareManager(IdentifierMixin, object):
             items = set([
                 'id',
                 'hostname',
+                'domain',
                 'globalIdentifier',
                 'fullyQualifiedDomainName',
                 'processorCoreAmount',
@@ -108,6 +109,11 @@ class HardwareManager(IdentifierMixin, object):
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
                 'datacenter.name',
+                'networkComponents[id, status, maxSpeed, name,' \
+                'ipmiMacAddress, ipmiIpAddress, macAddress, primaryIpAddress,'\
+                'port, primarySubnet]',
+                'networkComponents.primarySubnet[id, netmask,' \
+                'broadcastAddress, networkIdentifier, gateway]',
                 'activeTransaction.id',
                 'operatingSystem.softwareLicense.'
                 'softwareDescription[manufacturer,name,version,referenceCode]',
