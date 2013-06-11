@@ -44,6 +44,7 @@ class HardwareManager(IdentifierMixin, object):
             items = set([
                 'id',
                 'hostname',
+                'domain',
                 'globalIdentifier',
                 'fullyQualifiedDomainName',
                 'processorCoreAmount',
