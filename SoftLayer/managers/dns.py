@@ -24,7 +24,7 @@ class DNSManager(object):
         self.client = client
         self.service = self.client['Dns_Domain']
         self.record = self.client['Dns_Domain_ResourceRecord']
-        
+
     def list_zones(self, **kwargs):
         """ Retrieve a list of all DNS zones.
 
@@ -32,7 +32,7 @@ class DNSManager(object):
 
         """
         return self.client['Account'].getDomains(**kwargs)
-        
+
     def get_zone(self, zone):
         """ Get a zone and its records.
 
@@ -49,7 +49,7 @@ class DNSManager(object):
             return matches[0]
         except IndexError:
             raise DNSZoneNotFound(zone)
-            
+
     def create_zone(self, zone, serial=None):
         """ Create a zone for the specified zone.
 
@@ -61,7 +61,7 @@ class DNSManager(object):
             'name': zone,
             'serial': serial or strftime('%Y%m%d01'),
             "resourceRecords": {}})
-        
+
     def delete_zone(self, id):
         """ Delete a zone by its ID.
 
@@ -79,7 +79,7 @@ class DNSManager(object):
 
         """
         self.service.editObject(zone)
-        
+
     def create_record(self, id, record, type, data, ttl=60):
         """ Create a resource record on a domain.
 
@@ -96,7 +96,7 @@ class DNSManager(object):
             'host': record,
             'type': type,
             'data': data})
-        
+
     def delete_record(self, recordid):
         """ Delete a resource record by its ID.
 
@@ -104,7 +104,7 @@ class DNSManager(object):
 
         """
         self.record.deleteObject(id=recordid)
-        
+
     def search_record(self, zone, record):
         """ Search for records on a zone that match a specific name.
         Useful for validating whether a record exists or that it has the
@@ -117,7 +117,7 @@ class DNSManager(object):
         rrs = self.get_zone(zone)['resourceRecords']
         records = filter(lambda x: x['host'].lower() == record.lower(), rrs)
         return records
-        
+
     def get_records(self, zone, ttl=None, data=None, host=None,
                     type=None, **kwargs):
         """ List, and optionally filter, records within a zone.
@@ -157,7 +157,7 @@ class DNSManager(object):
         filter_results = lambda x: all(v(x) for v in check)
 
         return filter(filter_results, results)
-        
+
     def edit_record(self, record):
         """ Update an existing record with the options provided. The provided
         dict must include an 'id' key and value corresponding to the record
@@ -167,7 +167,7 @@ class DNSManager(object):
 
         """
         self.record.editObject(record, id=record['id'])
-        
+
     def dump_zone(self, id):
         """ Retrieve a zone dump in BIND format.
 
@@ -175,7 +175,7 @@ class DNSManager(object):
 
         """
         return self.service.getZoneFileContents(id=id)
-        
+
     def _translate_filter(self, query):
         """ This function takes command line query syntax and changes it into
         regular expressions.
