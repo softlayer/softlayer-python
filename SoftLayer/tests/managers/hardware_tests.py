@@ -30,6 +30,8 @@ class HardwareTests(unittest.TestCase):
     def test_list_hardware_with_filters(self):
         self.hardware.list_hardware(
             tags=['tag1', 'tag2'],
+            cpus=2,
+            memory=1,
             hostname='hostname',
             domain='example.com',
             datacenter='dal05',
@@ -50,6 +52,8 @@ class HardwareTests(unittest.TestCase):
                                 {'name': 'data', 'value': ['tag1', 'tag2']}]
                         }}
                     },
+                    'memoryCapacity': {'operation': 1},
+                    'processorCoreAmount': {'operation': 2},
                     'hostname': {'operation': '_= hostname'},
                     'primaryIpAddress': {'operation': '_= 1.2.3.4'},
                     'networkComponents': {'maxSpeed': {'operation': 100}},

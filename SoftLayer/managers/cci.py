@@ -46,6 +46,8 @@ class CCIManager(IdentifierMixin, object):
             items = set([
                 'id',
                 'globalIdentifier',
+                'hostname',
+                'domain',
                 'fullyQualifiedDomainName',
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
