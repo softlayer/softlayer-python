@@ -95,6 +95,137 @@ class HardwareManager(IdentifierMixin, object):
         kwargs['filter'] = _filter.to_dict()
         return self.account.getHardware(**kwargs)
 
+    def get_bare_metal_create_options(self):
+        """ Retrieves the available options for creating a bare metal server.
+
+        The information for ordering bare metal instances comes from multiple
+        API calls. In order to make the process easier, this function will
+        make those calls and reformat the results into a dictionary that's
+        easier to manage. It's recommended that you cache these results with a
+        reasonable lifetime for performance reasons.
+        """
+        hw_id = self._get_bare_metal_package_id()
+
+        if not hw_id:
+            return None
+
+        package = self.client['Product_Package']
+
+        results = {
+            'categories': {},
+            'locations': []
+        }
+
+        # First pull the list of available locations. We do it with the
+        # getObject() call so that we get access to the delivery time info.
+        object_data = package.getRegions(id=hw_id)
+
+        for loc in object_data:
+            details = loc['location']['locationPackageDetails'][0]
+
+            results['locations'].append({
+                'delivery_information': details.get('deliveryTimeInformation'),
+                'keyname': loc['keyname'],
+                'long_name': loc['description'],
+            })
+
+        for config in package.getConfiguration(id=hw_id,
+                                               mask='mask[itemCategory]'):
+            category = {
+                'sort': config['sort'],
+                'step': config['orderStepId'],
+                'is_required': config['isRequired'],
+                'name': config['itemCategory']['name'],
+                'items': [],
+            }
+
+            results['categories'][config['itemCategory']['categoryCode']] = category
+
+        # Now pull in the available package item
+        for item in package.getItems(id=hw_id, mask='mask[itemCategory]'):
+            category_code = item['itemCategory']['categoryCode']
+
+            if category_code not in results['categories']:
+                results['categories'][category_code] = {'name': category_code,
+                                                        'items': []}
+            results['categories'][category_code]['items'].append({
+                'id': item['id'],
+                'description': item['description'],
+                # TODO - Deal with multiple prices properly'
+                'prices': item['prices'],
+                'sort': item['prices'][0]['sort'],
+                'price_id': item['prices'][0]['id'],
+                'capacity': int(item.get('capacity') or 0),
+            })
+
+        return results
+
+    def get_dedicated_server_create_options(self):
+        packages = self.client['Product_Package'].getAllObjects(
+            mask='mask[id, name]')
+
+        hw_id = 0
+
+        print self.account.getActivePackages()
+#        for package in packages:
+#            print package
+            
+        hw_id = self._get_bare_metal_package_id()
+
+        if not hw_id:
+            return None
+
+        package = self.client['Product_Package']
+
+        results = {
+            'categories': {},
+            'locations': []
+        }
+
+        # First pull the list of available locations. We do it with the
+        # getObject() call so that we get access to the delivery time info.
+        object_data = package.getRegions(id=hw_id)
+
+        for loc in object_data:
+            details = loc['location']['locationPackageDetails'][0]
+
+            results['locations'].append({
+                'delivery_information': details.get('deliveryTimeInformation'),
+                'keyname': loc['keyname'],
+                'long_name': loc['description'],
+            })
+
+        for config in package.getConfiguration(id=hw_id,
+                                               mask='mask[itemCategory]'):
+            category = {
+                'sort': config['sort'],
+                'step': config['orderStepId'],
+                'is_required': config['isRequired'],
+                'name': config['itemCategory']['name'],
+                'items': [],
+            }
+
+            results['categories'][config['itemCategory']['categoryCode']] = category
+
+        # Now pull in the available package item
+        for item in package.getItems(id=hw_id, mask='mask[itemCategory]'):
+            category_code = item['itemCategory']['categoryCode']
+
+            if category_code not in results['categories']:
+                results['categories'][category_code] = {'name': category_code,
+                                                        'items': []}
+            results['categories'][category_code]['items'].append({
+                'id': item['id'],
+                'description': item['description'],
+                # TODO - Deal with multiple prices properly'
+                'prices': item['prices'],
+                'sort': item['prices'][0]['sort'],
+                'price_id': item['prices'][0]['id'],
+                'capacity': int(item.get('capacity') or 0),
+            })
+
+        return results
+        
     def get_hardware(self, id, **kwargs):
         """ Get details about a hardware device
 
@@ -143,6 +274,88 @@ class HardwareManager(IdentifierMixin, object):
         return self.hardware.reloadCurrentOperatingSystemConfiguration(
             'FORCE', id=id)
 
+    def place_order(self, **kwargs):
+        create_options = self._generate_create_dict(**kwargs)
+        return self.client['Product_Order'].placeOrder(create_options)
+
+    def verify_order(self, **kwargs):
+        create_options = self._generate_create_dict(**kwargs)
+        return self.client['Product_Order'].verifyOrder(create_options)
+        
+    def _generate_create_dict(
+            self, server_core=None, hourly=True,
+            hostname=None, domain=None, disk0=None,
+            location=None, os=None, image_id=None,
+            private=False, pri_ip_addresses=None, bandwidth=None,
+            userdata=None, monitoring=None, port_speed=None,
+            vulnerability_scanner=None, response=None,
+            vpn_management=None, remote_management=None,
+            notification=None, bare_metal=True, database=None):
+
+        order = {
+            'hardware': [{
+                'bareMetalInstanceFlag': bare_metal,
+                'hostname': hostname,
+                'domain': domain,
+            }],
+            'location': location,
+            'prices': [
+            ],
+        }
+
+        if bare_metal:
+            order['packageId'] = self._get_bare_metal_package_id()
+        
+        if server_core:
+            order['prices'].append({'id': int(server_core)})
+
+        if disk0:
+            order['prices'].append({'id': int(disk0)})
+
+        if os:
+            order['prices'].append({'id': int(os)})
+
+        if pri_ip_addresses:
+            order['prices'].append({'id': int(pri_ip_addresses)})
+
+        if bandwidth:
+            order['prices'].append({'id': int(bandwidth)})
+
+        if monitoring:
+            order['prices'].append({'id': int(monitoring)})
+
+        if port_speed:
+            order['prices'].append({'id': int(port_speed)})
+            
+        if vulnerability_scanner:
+            order['prices'].append({'id': int(vulnerability_scanner)})
+
+        if response:
+            order['prices'].append({'id': int(response)})
+
+        if vpn_management:
+            order['prices'].append({'id': int(vpn_management)})
+
+        if remote_management:
+            order['prices'].append({'id': int(remote_management)})
+
+        if notification:
+            order['prices'].append({'id': int(notification)})
+            
+        return order
+
+    def _get_bare_metal_package_id(self):
+        packages = self.client['Product_Package'].getAllObjects(
+            mask='mask[id, name]')
+
+        hw_id = 0
+        for package in packages:
+            if 'Bare Metal Instance' == package['name']:
+                hw_id = package['id']
+                break
+
+        return hw_id
+        
     def _get_ids_from_hostname(self, hostname):
         results = self.list_hardware(hostname=hostname, mask="id")
         return [result['id'] for result in results]
