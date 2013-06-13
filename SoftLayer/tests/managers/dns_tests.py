@@ -37,11 +37,12 @@ class DNSTests(unittest.TestCase):
         ]
 
         # match
-        self.client['Dns_Domain'].getByDomainName.return_value = zone_list
+        self.client['Account'].getDomains.return_value = [zone_list[1]]
         res = self.dns_client.get_zone('example.com')
         self.assertEqual(res, zone_list[1])
 
         # no match
+        self.client['Account'].getDomains.return_value = []
         self.assertRaises(
             DNSZoneNotFound,
             self.dns_client.get_zone,
@@ -88,7 +89,7 @@ class DNSTests(unittest.TestCase):
 
     def test_search_record(self):
 
-        self.client['Dns_Domain'].getByDomainName.return_value = [{
+        self.client['Account'].getDomains.return_value = [{
             'name': 'example.com',
             'resourceRecords': [
                 {'host': 'TEST1'},
@@ -114,79 +115,64 @@ class DNSTests(unittest.TestCase):
         self.dns_client.dump_zone(1)
         f.assert_called_once_with(id=1)
 
-    def test_get_records_bad_results(self):
-        f = self.client['Dns_Domain'].getByDomainName
-        f.return_value = None
-
-        # handle all of the bad return values from the API
-        self.assertRaises(DNSZoneNotFound,
-                self.dns_client.get_records, 'non-existent')
-
-        f.return_value = []
-        self.assertRaises(DNSZoneNotFound,
-                self.dns_client.get_records, 'non-existent')
-
-        f.return_value = [{}]
-        self.assertRaises(DNSZoneNotFound,
-                self.dns_client.get_records, 'non-existent')
-
-    def test_get_records_good_results(self):
-        f = self.client['Dns_Domain'].getByDomainName
-        f.return_value = [{'resourceRecords': [
+    def test_get_record(self):
+        domain = {'id': 12345, 'name': 'example.com'}
+        records = [
             {'ttl': 7200, 'data': 'd', 'host': 'a', 'type': 'cname'},
             {'ttl': 900, 'data': '1', 'host': 'b', 'type': 'a'},
             {'ttl': 900, 'data': 'x', 'host': 'c', 'type': 'ptr'},
             {'ttl': 86400, 'data': 'b', 'host': 'd', 'type': 'txt'},
             {'ttl': 86400, 'data': 'b', 'host': 'e', 'type': 'txt'},
             {'ttl': 600, 'data': 'b', 'host': 'f', 'type': 'txt'},
-        ]}]
+        ]
 
-        # simple 1/4 matches
-        results = self.dns_client.get_records('z', host='b')
-        self.assertEqual(results,
-                [{'ttl': 900, 'data': '1', 'host': 'b', 'type': 'a'}])
+        A = self.client['Account'].getDomains
+        D = self.client['Dns_Domain'].getResourceRecords
 
-        results = self.dns_client.get_records('z', type='ptr')
-        self.assertEqual(results,
-                [{'ttl': 900, 'data': 'x', 'host': 'c', 'type': 'ptr'}])
+        # Invalid domain
+        A.return_value = []
+        self.assertRaises(DNSZoneNotFound,
+                          self.dns_client.get_records,
+                          'example-not.com')
 
-        results = self.dns_client.get_records('z', ttl=900)
-        self.assertEqual(results, [
-            {'ttl': 900, 'data': '1', 'host': 'b', 'type': 'a'},
-            {'ttl': 900, 'data': 'x', 'host': 'c', 'type': 'ptr'}])
+        # valid domain, but no records matching
+        A.return_value = [domain]
+        D.return_value = []
+        self.assertEqual(self.dns_client.get_records('example.com'),
+                         [])
 
-        results = self.dns_client.get_records('z', data='x')
-        self.assertEqual(results, [
-            {'ttl': 900, 'data': 'x', 'host': 'c', 'type': 'ptr'}
-        ])
+        D.reset_mock()
+        A.return_value = [domain]
+        D.return_value = [records[1]]
+        self.dns_client.get_records('example.com', type='a')
+        D.assert_called_once_with(
+                id=domain['id'],
+                filter={'resourceRecords': {'type': {"operation": "_= a"}}},
+                mask=ANY)
 
-    def test_get_records_strict_results(self):
-        f = self.client['Dns_Domain'].getByDomainName
-        f.return_value = [{'resourceRecords': [
-            {'ttl': 7200, 'data': 'd', 'record': 'a', 'type': 'cname'},
-            {'ttl': 900, 'data': '1', 'record': 'b', 'type': 'a'},
-            {'ttl': 900, 'data': 'x', 'record': 'c', 'type': 'ptr'},
-            {'ttl': 86400, 'data': 'b', 'record': 'd', 'type': 'txt'},
-            {'ttl': 86400, 'data': 'b', 'record': 'e', 'type': 'txt'},
-            {'ttl': 600, 'data': 'b', 'record': 'f', 'type': 'txt'},
-        ]}]
+        D.reset_mock()
+        A.return_value = [domain]
+        D.return_value = [records[0]]
+        self.dns_client.get_records('example.com', host='a')
+        D.assert_called_once_with(
+                id=domain['id'],
+                filter={'resourceRecords': {'host': {"operation": "_= a"}}},
+                mask=ANY)
 
-        # 2/4 match
-        results = self.dns_client.get_records('z', data='b', type='txt')
-        self.assertEqual(results, [
-            {'ttl': 86400, 'data': 'b', 'record': 'd', 'type': 'txt'},
-            {'ttl': 86400, 'data': 'b', 'record': 'e', 'type': 'txt'},
-            {'ttl': 600, 'data': 'b', 'record': 'f', 'type': 'txt'},
-        ])
+        D.reset_mock()
+        A.return_value = [domain]
+        D.return_value = records[3:5]
+        self.dns_client.get_records('example.com', data='a')
+        D.assert_called_once_with(
+                id=domain['id'],
+                filter={'resourceRecords': {'data': {"operation": "_= a"}}},
+                mask=ANY)
 
-        # 3/4 match
-        results = self.dns_client.get_records('z',
-                data='b', type='txt', ttl=600)
-        self.assertEqual(results, [
-            {'ttl': 600, 'data': 'b', 'record': 'f', 'type': 'txt'},
-        ])
-
-        # 2/4 match, 1 non-matching
-        results = self.dns_client.get_records('z',
-                data='1', type='a', ttl=600)
-        self.assertEqual(results, [])
+        D.reset_mock()
+        A.return_value = [domain]
+        D.return_value = records[3:5]
+        self.dns_client.get_records('example.com', ttl='86400')
+        D.assert_called_once_with(
+                id=domain['id'],
+                filter={'resourceRecords': {'ttl': {"operation": 86400}}},
+                mask=ANY)

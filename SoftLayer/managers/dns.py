@@ -6,10 +6,10 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
-import re
 from time import strftime
 
 from SoftLayer.exceptions import DNSZoneNotFound
+from SoftLayer.utils import NestedDict, query_filter
 
 
 class DNSManager(object):
@@ -33,20 +33,22 @@ class DNSManager(object):
         """
         return self.client['Account'].getDomains(**kwargs)
 
-    def get_zone(self, zone):
+    def get_zone(self, zone, records=True):
         """ Get a zone and its records.
 
         :param zone: the zone name
 
         """
         zone = zone.lower()
-        results = self.service.getByDomainName(
-            zone,
-            mask={'resourceRecords': {}})
-        matches = filter(lambda x: x['name'].lower() == zone, results)
+        mask = {}
+        if records:
+            mask = {'resourceRecords': {}}
+        results = self.client['Account'].getDomains(
+            filter={"domains": {"name": query_filter(zone)}},
+            mask=mask)
 
         try:
-            return matches[0]
+            return results[0]
         except IndexError:
             raise DNSZoneNotFound(zone)
 
@@ -128,35 +130,32 @@ class DNSManager(object):
         :param host: optionally, record's host
         :param type: optionally, the type of record:
 
-        :returns iterator:
+        :returns list:
         """
-        check = []
+        _filter = NestedDict()
 
         if ttl:
-            check.append(lambda x: x['ttl'] == ttl)
+            _filter['resourceRecords']['ttl'] = query_filter(ttl)
 
         if host:
-            check.append(lambda x: re.search(self._translate_filter(host),
-                                             x['host']))
+            _filter['resourceRecords']['host'] = query_filter(host)
 
         if data:
-            check.append(lambda x: x['data'] == data)
+            _filter['resourceRecords']['data'] = query_filter(data)
 
         if type:
-            check.append(lambda x: x['type'] == type.lower())
+            _filter['resourceRecords']['type'] = \
+                    query_filter(type.lower())
 
-        try:
-            results = self.service.getByDomainName(
-                zone,
-                mask='resourceRecords',
-                )[0]['resourceRecords']
-        except (IndexError, KeyError, TypeError):
-            raise DNSZoneNotFound(zone)
+        domain = self.get_zone(zone, records=False)
+        results = self.service.getResourceRecords(
+            id=domain['id'],
+            mask='id,expire,domainId,host,minimum,refresh,retry,'
+            'mxPriority,ttl,type,data,responsiblePerson',
+            filter=_filter.to_dict(),
+            )
 
-        # Make sure all requested filters are truthful
-        filter_results = lambda x: all(v(x) for v in check)
-
-        return filter(filter_results, results)
+        return results
 
     def edit_record(self, record):
         """ Update an existing record with the options provided. The provided
@@ -175,23 +174,3 @@ class DNSManager(object):
 
         """
         return self.service.getZoneFileContents(id=id)
-
-    def _translate_filter(self, query):
-        """ This function takes command line query syntax and changes it into
-        regular expressions.
-
-        This is a temporary workaround until the API supports zone filtering.
-
-        :param string query: The query string to translate.
-        """
-        if isinstance(query, basestring):
-            if query.startswith('*') and query.endswith('*'):
-                query = "^.*%s.*$" % query.strip('*')
-            elif query.startswith('*'):
-                query = "^.*%s$" % query.strip('*')
-            elif query.endswith('*'):
-                query = "^%s.*$" % query.strip('*')
-            else:
-                query = "^%s$" % query.strip('*')
-
-        return query
