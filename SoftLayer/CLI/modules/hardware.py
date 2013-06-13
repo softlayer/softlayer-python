@@ -50,6 +50,8 @@ Options:
 Filters:
   -H --hostname=HOST       Host portion of the FQDN. example: server
   -D --domain=DOMAIN       Domain portion of the FQDN. example: example.com
+  -c --cpu=CPU             Number of CPU cores
+  -m --memory=MEMORY       Memory in gigabytes
   -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
   -n MBPS, --network=MBPS  Network port speed in Mbps
   --tags=ARG               Only show instances that have one of these tags.
@@ -70,6 +72,8 @@ For more on filters see 'sl help filters'
         servers = manager.list_hardware(
             hostname=args.get('--hostname'),
             domain=args.get('--domain'),
+            cpus=args.get('--cpu'),
+            memory=args.get('--memory'),
             datacenter=args.get('--datacenter'),
             nic_speed=args.get('--network'),
             tags=tags)

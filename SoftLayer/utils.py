@@ -47,6 +47,11 @@ def query_filter(query):
     :param string query: query string
 
     """
+    try:
+        query = int(query)
+    except ValueError:
+        pass
+
     if isinstance(query, basestring):
         query = query.strip()
         for op in KNOWN_OPERATIONS:

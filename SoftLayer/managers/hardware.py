@@ -25,12 +25,14 @@ class HardwareManager(IdentifierMixin, object):
         self.account = self.client['Account']
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
 
-    def list_hardware(self, tags=None, hostname=None, domain=None,
-                      datacenter=None, nic_speed=None, public_ip=None,
-                      private_ip=None, **kwargs):
+    def list_hardware(self, tags=None, cpus=None, memory=None, hostname=None,
+                      domain=None, datacenter=None, nic_speed=None,
+                      public_ip=None, private_ip=None, **kwargs):
         """ List all hardware.
 
         :param list tags: filter based on tags
+        :param integer cpus: filter based on number of CPUS
+        :param integer memory: filter based on amount of memory in gigabytes
         :param string hostname: filter based on hostname
         :param string domain: filter based on domain
         :param string datacenter: filter based on datacenter
@@ -61,6 +63,12 @@ class HardwareManager(IdentifierMixin, object):
                 'operation': 'in',
                 'options': [{'name': 'data', 'value': tags}],
             }
+
+        if cpus:
+            _filter['hardware']['processorCoreAmount'] = query_filter(cpus)
+
+        if memory:
+            _filter['hardware']['memoryCapacity'] = query_filter(memory)
 
         if hostname:
             _filter['hardware']['hostname'] = query_filter(hostname)
