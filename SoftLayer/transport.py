@@ -11,8 +11,11 @@ from SoftLayer.exceptions import (
     SpecViolation, MethodNotFound, InvalidMethodParameters, InternalError,
     ApplicationError, RemoteSystemError, TransportError)
 import xmlrpclib
+import logging
 import requests
 import json
+
+log = logging.getLogger(__name__)
 
 
 def make_xml_rpc_api_call(uri, method, args=None, headers=None,
@@ -34,10 +37,12 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
 
         payload = xmlrpclib.dumps(tuple(largs), methodname=method,
                                   allow_none=True)
+        log.info('POST %s' % (uri))
+        log.debug(payload)
         response = requests.post(uri, data=payload,
                                  headers=http_headers,
                                  timeout=timeout)
-
+        log.debug(response.content)
         response.raise_for_status()
         result = xmlrpclib.loads(response.content,)[0][0]
         return result
@@ -72,6 +77,7 @@ def make_rest_api_call(method, url, http_headers=None, timeout=None):
     :param dict http_headers: HTTP headers to use for the request
     :param int timeout: number of seconds to use as a timeout
     """
+    log.info('%s %s' % (method, url))
     resp = requests.request(method, url, headers=http_headers, timeout=timeout)
     try:
         resp.raise_for_status()
@@ -84,6 +90,7 @@ def make_rest_api_call(method, url, http_headers=None, timeout=None):
     except requests.RequestException, e:
         raise TransportError(0, str(e))
 
+    log.debug(resp.content)
     if url.endswith('.json'):
         return json.loads(resp.content)
     else:

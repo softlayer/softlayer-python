@@ -118,6 +118,18 @@ class CommandLineTests(unittest.TestCase):
         self.assertRaises(
             KeyError, cli.core.main, args=['cci', 'list'], env=self.env)
 
+    @patch('traceback.format_exc')
+    def test_uncaught_error(self, m):
+        # Exceptions not caught should just Exit
+        errors = [TypeError, RuntimeError, NameError, OSError, SystemError]
+        for err in errors:
+            m.reset_mock()
+            m.return_value = 'testing'
+            self.env.get_module_name.side_effect = err
+            self.assertRaises(
+                SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
+            m.assert_called_once_with()
+
 
 class TestCommandParser(unittest.TestCase):
     def setUp(self):
