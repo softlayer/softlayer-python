@@ -4,7 +4,6 @@ usage: sl dns [<command>] [<args>...] [options]
 Manage DNS
 
 The available commands are:
-  search  Look for a resource record by exact name
   edit    Update resource records (bulk/single)
   create  Create zone
   list    List zones or a zone's records
@@ -18,6 +17,18 @@ The available commands are:
 
 from SoftLayer.CLI import CLIRunnable, no_going_back, Table, CLIAbort
 from SoftLayer import DNSManager, DNSZoneNotFound
+
+
+def resolve_zone_id(dns_manager, name):
+    zone_ids = dns_manager.resolve_ids(name)
+    if len(zone_ids) == 0:
+        raise CLIAbort("Error: Unable to find zone '%s'" % name)
+
+    if len(zone_ids) > 1:
+        raise CLIAbort("Error: More than one zone found for '%s': %s" %
+                name, ', '.join([str(_id) for _id in zone_ids]))
+
+    return zone_ids[0]
 
 
 class DumpZone(CLIRunnable):
@@ -72,6 +83,9 @@ Arguments:
     @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
+
+        zone_id = resolve_zone_id(manager, args['<zone>'])
+
         if args['--really'] or no_going_back(args['<zone>']):
             zone_id = manager.get_zone(args['<zone>'])
             manager.delete_zone(zone_id)
@@ -97,7 +111,7 @@ Filters:
         if args['<zone>']:
             return cls.list_zone(client, args['<zone>'], args)
 
-        return cls.list_zones(client)
+        return cls.list_all_zones(client)
 
     @staticmethod
     def list_zone(client, zone, args):
@@ -113,8 +127,10 @@ Filters:
         t.align['record'] = 'r'
         t.align['value'] = 'l'
 
+        zone_id = resolve_zone_id(manager, args['<zone>'])
+
         try:
-            records = manager.get_records(args['<zone>'],
+            records = manager.get_records(zone_id,
                     type=args.get('--type'),
                     host=args.get('--record'),
                     ttl=args.get('--ttl'),
@@ -134,7 +150,7 @@ Filters:
         return t
 
     @staticmethod
-    def list_zones(client):
+    def list_all_zones(client):
         manager = DNSManager(client)
         zones = manager.list_zones()
         t = Table([
@@ -178,12 +194,11 @@ Options:
     @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
-        try:
-            zone = manager.get_zone(args['<zone>'])['id']
-        except DNSZoneNotFound:
-            raise CLIAbort("No zone found matching: %s" % args['<zone>'])
+
+        zone_id = resolve_zone_id(manager, args['<zone>'])
+
         manager.create_record(
-            zone,
+            zone_id,
             args['<record>'],
             args['<type>'],
             args['<data>'],
@@ -211,9 +226,12 @@ Options:
     @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
+
+        zone_id = resolve_zone_id(manager, args['<zone>'])
+
         try:
             results = manager.search_record(
-                args['<zone>'],
+                zone_id,
                 args['<record>'])
         except DNSZoneNotFound:
             raise CLIAbort("No zone found matching: %s" % args['<zone>'])
@@ -224,39 +242,6 @@ Options:
             r['data'] = args['--data'] or r['data']
             r['ttl'] = args['--ttl'] or r['ttl']
             manager.edit_record(r)
-
-
-class RecordSearch(CLIRunnable):
-    """
-usage: sl dns search <zone> <record> [options]
-
-Look for a resource record by exact name
-
-Arguments:
-  <zone>    Zone name (softlayer.com)
-  <record>  Resource record (www)
-"""
-    action = 'search'
-
-    @staticmethod
-    def execute(client, args):
-        manager = DNSManager(client)
-        results = []
-        try:
-            results = manager.search_record(
-                args['<zone>'],
-                args['<record>'])
-        except DNSZoneNotFound:
-            raise CLIAbort("No zone found matching: %s" % args['<zone>'])
-
-        t = Table(['id', 'type', 'ttl', 'data'])
-
-        t.align['ttl'] = 'c'
-
-        for r in results:
-            t.add_row([r['id'], r['type'], r['ttl'], r['data']])
-
-        return t
 
 
 class RecordRemove(CLIRunnable):
@@ -279,12 +264,14 @@ Options:
     def execute(client, args):
         manager = DNSManager(client)
 
+        zone_id = resolve_zone_id(manager, args['<zone>'])
+
         if args['--id']:
             records = [{'id': args['--id']}]
         else:
             try:
                 records = manager.search_record(
-                    args['<zone>'],
+                    zone_id,
                     args['<record>'])
             except DNSZoneNotFound:
                 raise CLIAbort("No zone found matching: %s" % args['<zone>'])
