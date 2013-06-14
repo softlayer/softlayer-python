@@ -9,8 +9,7 @@
 from time import strftime
 
 from SoftLayer.exceptions import DNSZoneNotFound
-from SoftLayer.utils import (NestedDict, query_filter,
-                             IdentifierMixin)
+from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
 
 
 class DNSManager(IdentifierMixin, object):
@@ -135,15 +134,14 @@ class DNSManager(IdentifierMixin, object):
             _filter['resourceRecords']['data'] = query_filter(data)
 
         if type:
-            _filter['resourceRecords']['type'] = \
-                    query_filter(type.lower())
+            _filter['resourceRecords']['type'] = query_filter(type.lower())
 
         results = self.service.getResourceRecords(
             id=zone_id,
             mask='id,expire,domainId,host,minimum,refresh,retry,'
             'mxPriority,ttl,type,data,responsiblePerson',
             filter=_filter.to_dict(),
-            )
+        )
 
         return results
 

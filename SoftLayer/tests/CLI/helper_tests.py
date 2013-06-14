@@ -156,3 +156,22 @@ class CLIRunnableTypeTests(unittest.TestCase):
         self.assertEqual(
             cli.environment.CLIRunnableType.env.plugins,
             {'helper_tests': {'test': TestCommand}})
+
+
+class ResolveIdTests(unittest.TestCase):
+
+    def test_resolve_id_one(self):
+        resolver = lambda r: [12345]
+        id = cli.helpers.resolve_id(resolver, 'test')
+
+        self.assertEqual(id, 12345)
+
+    def test_resolve_id_none(self):
+        resolver = lambda r: []
+        self.assertRaises(
+            cli.helpers.CLIAbort, cli.helpers.resolve_id, resolver, 'test')
+
+    def test_resolve_id_multiple(self):
+        resolver = lambda r: [12345, 54321]
+        self.assertRaises(
+            cli.helpers.CLIAbort, cli.helpers.resolve_id, resolver, 'test')

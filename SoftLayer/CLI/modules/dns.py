@@ -15,20 +15,9 @@ The available commands are:
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: BSD, see LICENSE for more details.
 
-from SoftLayer.CLI import CLIRunnable, no_going_back, Table, CLIAbort
+from SoftLayer.CLI import (
+    CLIRunnable, no_going_back, Table, CLIAbort, resolve_id)
 from SoftLayer import DNSManager, DNSZoneNotFound
-
-
-def resolve_zone_id(dns_manager, name):
-    zone_ids = dns_manager.resolve_ids(name)
-    if len(zone_ids) == 0:
-        raise CLIAbort("Error: Unable to find zone '%s'" % name)
-
-    if len(zone_ids) > 1:
-        raise CLIAbort("Error: More than one zone found for '%s': %s" %
-                name, ', '.join([str(_id) for _id in zone_ids]))
-
-    return zone_ids[0]
 
 
 class DumpZone(CLIRunnable):
@@ -45,8 +34,9 @@ Arguments:
     @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
+        zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
         try:
-            return manager.dump_zone(manager.get_zone(args['<zone>'])['id'])
+            return manager.dump_zone(zone_id)
         except DNSZoneNotFound:
             raise CLIAbort("No zone found matching: %s" % args['<zone>'])
 
@@ -83,11 +73,9 @@ Arguments:
     @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
-
-        zone_id = resolve_zone_id(manager, args['<zone>'])
+        zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
 
         if args['--really'] or no_going_back(args['<zone>']):
-            zone_id = manager.get_zone(args['<zone>'])
             manager.delete_zone(zone_id)
         raise CLIAbort("Aborted.")
 
@@ -127,15 +115,16 @@ Filters:
         t.align['record'] = 'r'
         t.align['value'] = 'l'
 
-        zone_id = resolve_zone_id(manager, args['<zone>'])
+        zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
 
         try:
-            records = manager.get_records(zone_id,
-                    type=args.get('--type'),
-                    host=args.get('--record'),
-                    ttl=args.get('--ttl'),
-                    data=args.get('--data'),
-                )
+            records = manager.get_records(
+                zone_id,
+                type=args.get('--type'),
+                host=args.get('--record'),
+                ttl=args.get('--ttl'),
+                data=args.get('--data'),
+            )
         except DNSZoneNotFound:
             raise CLIAbort("No zone found matching: %s" % args['<zone>'])
 
@@ -195,7 +184,7 @@ Options:
     def execute(client, args):
         manager = DNSManager(client)
 
-        zone_id = resolve_zone_id(manager, args['<zone>'])
+        zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
 
         manager.create_record(
             zone_id,
@@ -226,8 +215,7 @@ Options:
     @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
-
-        zone_id = resolve_zone_id(manager, args['<zone>'])
+        zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
 
         try:
             results = manager.search_record(
@@ -263,8 +251,7 @@ Options:
     @staticmethod
     def execute(client, args):
         manager = DNSManager(client)
-
-        zone_id = resolve_zone_id(manager, args['<zone>'])
+        zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
 
         if args['--id']:
             records = [{'id': args['--id']}]
