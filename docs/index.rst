@@ -46,6 +46,7 @@ Command-Line Interface
    :maxdepth: 2
 
    cli
+   cli/cci
    cli/dev
 
 

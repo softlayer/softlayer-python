@@ -234,8 +234,12 @@ def main(args=sys.argv[1:], env=Environment()):
         exit_status = e.code
     except SystemExit, e:
         exit_status = e.code
-    except (SoftLayerError, Exception), e:
+    except SoftLayerError, e:
         env.err(str(e))
+        exit_status = 1
+    except Exception, e:
+        import traceback
+        env.err(traceback.format_exc())
         exit_status = 1
 
     sys.exit(exit_status)
