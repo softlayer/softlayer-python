@@ -32,20 +32,49 @@ class DNSTests(unittest.TestCase):
 
     def test_get_zone(self):
         zone_list = [
-            {'name': 'test-example.com'},
-            {'name': 'example.com'},
+            {'id': 98765, 'name': 'test-example.com'},
+            {'id': 12345, 'name': 'example.com', "resourceRecords": ["test"]},
         ]
 
-        # match
-        self.client['Dns_Domain'].getByDomainName.return_value = zone_list
-        res = self.dns_client.get_zone('example.com')
+        # match, with defaults
+        self.client['Account'].getObject.return_value = [zone_list[1]]
+        res = self.dns_client.get_zone(12345)
         self.assertEqual(res, zone_list[1])
+        self.client['Account'].getObject.assert_called_once_with(
+            id=12345,
+            mask='resourceRecords')
 
         # no match
+        self.client['Account'].getObject.return_value = []
         self.assertRaises(
             DNSZoneNotFound,
             self.dns_client.get_zone,
-            'shouldnt-match.com')
+            5)
+
+        # No records masked in
+        self.client['Account'].getObject.reset_mock()
+        self.client['Account'].getObject.return_value = [zone_list[1]]
+        self.dns_client.get_zone(12345, records=False)
+        self.client['Account'].getObject.assert_called_once_with(
+            id=12345,
+            mask=None)
+
+    def test_resolve_zone_name(self):
+        zone_list = [{'name': 'example.com', 'id': 12345}]
+        # matching domain
+        self.client['Account'].getDomains.return_value = zone_list
+        res = self.dns_client._get_zone_id_from_name('example.com')
+        self.assertEqual([12345], res)
+        self.client['Account'].getDomains.assert_called_once_with(
+                filter={"domains": {"name": {"operation": "_= example.com"}}})
+
+        # no matches
+        self.client['Account'].getDomains.reset_mock()
+        self.client['Account'].getDomains.return_value = []
+        res = self.dns_client._get_zone_id_from_name('example.com')
+        self.assertEqual([], res)
+        self.client['Account'].getDomains.assert_called_once_with(
+                filter={"domains": {"name": {"operation": "_= example.com"}}})
 
     def test_create_zone(self):
         call = self.client['Dns_Domain'].createObject
@@ -86,20 +115,6 @@ class DNSTests(unittest.TestCase):
         f = self.client['Dns_Domain_ResourceRecord'].deleteObject
         f.assert_called_once_with(id=1)
 
-    def test_search_record(self):
-
-        self.client['Dns_Domain'].getByDomainName.return_value = [{
-            'name': 'example.com',
-            'resourceRecords': [
-                {'host': 'TEST1'},
-                {'host': 'test2'},
-                {'host': 'test3'},
-            ]
-        }]
-
-        res = self.dns_client.search_record('example.com', 'test1')
-        self.assertEqual(res, [{'host': 'TEST1'}])
-
     def test_edit_record(self):
         self.dns_client.edit_record({'id': 1, 'name': 'test'})
         f = self.client['Dns_Domain_ResourceRecord'].editObject
@@ -114,79 +129,51 @@ class DNSTests(unittest.TestCase):
         self.dns_client.dump_zone(1)
         f.assert_called_once_with(id=1)
 
-    def test_get_records_bad_results(self):
-        f = self.client['Dns_Domain'].getByDomainName
-        f.return_value = None
-
-        # handle all of the bad return values from the API
-        self.assertRaises(DNSZoneNotFound,
-                self.dns_client.get_records, 'non-existent')
-
-        f.return_value = []
-        self.assertRaises(DNSZoneNotFound,
-                self.dns_client.get_records, 'non-existent')
-
-        f.return_value = [{}]
-        self.assertRaises(DNSZoneNotFound,
-                self.dns_client.get_records, 'non-existent')
-
-    def test_get_records_good_results(self):
-        f = self.client['Dns_Domain'].getByDomainName
-        f.return_value = [{'resourceRecords': [
+    def test_get_record(self):
+        records = [
             {'ttl': 7200, 'data': 'd', 'host': 'a', 'type': 'cname'},
             {'ttl': 900, 'data': '1', 'host': 'b', 'type': 'a'},
             {'ttl': 900, 'data': 'x', 'host': 'c', 'type': 'ptr'},
             {'ttl': 86400, 'data': 'b', 'host': 'd', 'type': 'txt'},
             {'ttl': 86400, 'data': 'b', 'host': 'e', 'type': 'txt'},
             {'ttl': 600, 'data': 'b', 'host': 'f', 'type': 'txt'},
-        ]}]
+        ]
 
-        # simple 1/4 matches
-        results = self.dns_client.get_records('z', host='b')
-        self.assertEqual(results,
-                [{'ttl': 900, 'data': '1', 'host': 'b', 'type': 'a'}])
+        D = self.client['Dns_Domain'].getResourceRecords
 
-        results = self.dns_client.get_records('z', type='ptr')
-        self.assertEqual(results,
-                [{'ttl': 900, 'data': 'x', 'host': 'c', 'type': 'ptr'}])
+        # maybe valid domain, but no records matching
+        D.return_value = []
+        self.assertEqual(self.dns_client.get_records(12345),
+                         [])
 
-        results = self.dns_client.get_records('z', ttl=900)
-        self.assertEqual(results, [
-            {'ttl': 900, 'data': '1', 'host': 'b', 'type': 'a'},
-            {'ttl': 900, 'data': 'x', 'host': 'c', 'type': 'ptr'}])
+        D.reset_mock()
+        D.return_value = [records[1]]
+        self.dns_client.get_records(12345, type='a')
+        D.assert_called_once_with(
+                id=12345,
+                filter={'resourceRecords': {'type': {"operation": "_= a"}}},
+                mask=ANY)
 
-        results = self.dns_client.get_records('z', data='x')
-        self.assertEqual(results, [
-            {'ttl': 900, 'data': 'x', 'host': 'c', 'type': 'ptr'}
-        ])
+        D.reset_mock()
+        D.return_value = [records[0]]
+        self.dns_client.get_records(12345, host='a')
+        D.assert_called_once_with(
+                id=12345,
+                filter={'resourceRecords': {'host': {"operation": "_= a"}}},
+                mask=ANY)
 
-    def test_get_records_strict_results(self):
-        f = self.client['Dns_Domain'].getByDomainName
-        f.return_value = [{'resourceRecords': [
-            {'ttl': 7200, 'data': 'd', 'record': 'a', 'type': 'cname'},
-            {'ttl': 900, 'data': '1', 'record': 'b', 'type': 'a'},
-            {'ttl': 900, 'data': 'x', 'record': 'c', 'type': 'ptr'},
-            {'ttl': 86400, 'data': 'b', 'record': 'd', 'type': 'txt'},
-            {'ttl': 86400, 'data': 'b', 'record': 'e', 'type': 'txt'},
-            {'ttl': 600, 'data': 'b', 'record': 'f', 'type': 'txt'},
-        ]}]
+        D.reset_mock()
+        D.return_value = records[3:5]
+        self.dns_client.get_records(12345, data='a')
+        D.assert_called_once_with(
+                id=12345,
+                filter={'resourceRecords': {'data': {"operation": "_= a"}}},
+                mask=ANY)
 
-        # 2/4 match
-        results = self.dns_client.get_records('z', data='b', type='txt')
-        self.assertEqual(results, [
-            {'ttl': 86400, 'data': 'b', 'record': 'd', 'type': 'txt'},
-            {'ttl': 86400, 'data': 'b', 'record': 'e', 'type': 'txt'},
-            {'ttl': 600, 'data': 'b', 'record': 'f', 'type': 'txt'},
-        ])
-
-        # 3/4 match
-        results = self.dns_client.get_records('z',
-                data='b', type='txt', ttl=600)
-        self.assertEqual(results, [
-            {'ttl': 600, 'data': 'b', 'record': 'f', 'type': 'txt'},
-        ])
-
-        # 2/4 match, 1 non-matching
-        results = self.dns_client.get_records('z',
-                data='1', type='a', ttl=600)
-        self.assertEqual(results, [])
+        D.reset_mock()
+        D.return_value = records[3:5]
+        self.dns_client.get_records(12345, ttl='86400')
+        D.assert_called_once_with(
+                id=12345,
+                filter={'resourceRecords': {'ttl': {"operation": 86400}}},
+                mask=ANY)

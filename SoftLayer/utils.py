@@ -81,16 +81,29 @@ class IdentifierMixin:
 
         :param string identifier: identifying string
 
+        :returns list:
         """
-        # Before doing anything, let's see if this is an integer
-        try:
-            return [int(identifier)]
-        except ValueError:
-            pass  # It was worth a shot
 
-        for resolver in self.resolvers:
-            ids = resolver(identifier)
-            if ids:
-                return ids
+        return resolve_ids(identifier, self.resolvers)
 
-        return []
+
+def resolve_ids(identifier, resolvers):
+    """ Resolves IDs given a list of functions
+
+    :param string identifier: identifier string
+    :param list resolvers: a list of functions
+    :returns list:
+    """
+
+    # Before doing anything, let's see if this is an integer
+    try:
+        return [int(identifier)]
+    except ValueError:
+        pass  # It was worth a shot
+
+    for resolver in resolvers:
+        ids = resolver(identifier)
+        if ids:
+            return ids
+
+    return []
