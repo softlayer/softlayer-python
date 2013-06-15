@@ -16,8 +16,7 @@
 """
 from SoftLayer.consts import VERSION
 
-from API import (
-    Client, BasicAuthentication, API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT)
+from API import *  # NOQA
 from managers import *  # NOQA
 from SoftLayer.exceptions import *  # NOQA
 

@@ -12,6 +12,9 @@ from SoftLayer.transport import make_xml_rpc_api_call
 from SoftLayer.exceptions import SoftLayerError
 import os
 
+__all__ = ['Client', 'BasicAuthentication', 'TokenAuthentication',
+           'API_PUBLIC_ENDPOINT', 'API_PRIVATE_ENDPOINT']
+
 API_USERNAME = None
 API_KEY = None
 API_BASE_URL = API_PUBLIC_ENDPOINT
@@ -29,6 +32,24 @@ VALID_CALL_ARGS = set([
 class AuthenticationBase(object):
     def get_headers(self):
         raise NotImplementedError
+
+
+class TokenAuthentication(AuthenticationBase):
+    def __init__(self, user_id, auth_token):
+        self.user_id = user_id
+        self.auth_token = auth_token
+
+    def get_headers(self):
+        return {
+            'authenticate': {
+                'complexType': 'PortalLoginToken',
+                'userId': self.user_id,
+                'authToken': self.auth_token,
+            }
+        }
+
+    def __repr__(self):
+        return "<TokenAuthentication: %s %s>" % (self.user_id, self.auth_token)
 
 
 class BasicAuthentication(AuthenticationBase):
@@ -90,8 +111,9 @@ class Client(object):
             username = username or API_USERNAME or \
                 os.environ.get('SL_USERNAME') or ''
             api_key = api_key or API_KEY or os.environ.get('SL_API_KEY') or ''
-            self.auth = BasicAuthentication(username, api_key)
-            self.set_authentication(username, api_key)
+            if username and api_key:
+                self.auth = BasicAuthentication(username, api_key)
+                self.set_authentication(username, api_key)
 
         if id is not None:
             self.set_init_parameter(int(id))
@@ -99,6 +121,26 @@ class Client(object):
         self._endpoint_url = (endpoint_url or API_BASE_URL or
                               API_PUBLIC_ENDPOINT).rstrip('/')
         self.timeout = timeout
+
+    def authenticate_with_password(self, username, password,
+                                   security_question_id=None,
+                                   security_question_answer=None):
+        """ Performs Username/Password Authentication and gives back an auth
+            handler to use to create a client that uses token-based auth.
+
+        :param string username: your SoftLayer username
+        :param string password: your SoftLayer password
+        :param int security_question_id: The security question id to answer
+        :param string security_question_answer: The answer to the security
+                                                question
+
+        """
+        res = self['User_Customer'].getPortalLoginToken(
+            username,
+            password,
+            security_question_id,
+            security_question_answer)
+        self.auth = TokenAuthentication(res['userId'], res['hash'])
 
     def add_raw_header(self, name, value):
         """ Set HTTP headers for API calls.
@@ -261,12 +303,12 @@ class Client(object):
         objectid = kwargs.get('id')
         objectmask = kwargs.get('mask')
         objectfilter = kwargs.get('filter')
-        headers = kwargs.get('headers')
+        headers = kwargs.get('headers', {})
         raw_headers = kwargs.get('raw_headers')
         limit = kwargs.get('limit')
         offset = kwargs.get('offset', 0)
 
-        if headers is None:
+        if not headers and self.auth:
             headers = self.auth.get_headers()
 
         http_headers = {
