@@ -47,6 +47,7 @@ class HardwareManager(IdentifierMixin, object):
                 'id',
                 'hostname',
                 'domain',
+                'hardwareStatusId',
                 'globalIdentifier',
                 'fullyQualifiedDomainName',
                 'processorCoreAmount',
