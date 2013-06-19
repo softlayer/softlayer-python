@@ -353,8 +353,10 @@ class UnauthenticatedAPIClient(unittest.TestCase):
     def setUp(self):
         self.client = SoftLayer.Client(endpoint_url="ENDPOINT")
 
+    @patch.dict('os.environ', {'SL_USERNAME': '', 'SL_API_KEY': ''})
     def test_init(self):
-        self.assertIsNone(self.client.auth)
+        client = SoftLayer.Client()
+        self.assertIsNone(client.auth)
 
     @patch('SoftLayer.API.Client.call')
     def test_authenticate_with_password(self, _call):
