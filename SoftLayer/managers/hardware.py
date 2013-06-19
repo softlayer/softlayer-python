@@ -131,6 +131,7 @@ class HardwareManager(IdentifierMixin, object):
 
         for config in package.getConfiguration(id=hw_id,
                                                mask='mask[itemCategory]'):
+            code = config['itemCategory']['categoryCode']
             category = {
                 'sort': config['sort'],
                 'step': config['orderStepId'],
@@ -139,7 +140,7 @@ class HardwareManager(IdentifierMixin, object):
                 'items': [],
             }
 
-            results['categories'][config['itemCategory']['categoryCode']] = category
+            results['categories'][code] = category
 
         # Now pull in the available package item
         for item in package.getItems(id=hw_id, mask='mask[itemCategory]'):
@@ -151,7 +152,7 @@ class HardwareManager(IdentifierMixin, object):
             results['categories'][category_code]['items'].append({
                 'id': item['id'],
                 'description': item['description'],
-                # TODO - Deal with multiple prices properly'
+                # TODO - Deal with multiple prices properly.
                 'prices': item['prices'],
                 'sort': item['prices'][0]['sort'],
                 'price_id': item['prices'][0]['id'],
@@ -160,72 +161,6 @@ class HardwareManager(IdentifierMixin, object):
 
         return results
 
-    def get_dedicated_server_create_options(self):
-        packages = self.client['Product_Package'].getAllObjects(
-            mask='mask[id, name]')
-
-        hw_id = 0
-
-        print self.account.getActivePackages()
-#        for package in packages:
-#            print package
-            
-        hw_id = self._get_bare_metal_package_id()
-
-        if not hw_id:
-            return None
-
-        package = self.client['Product_Package']
-
-        results = {
-            'categories': {},
-            'locations': []
-        }
-
-        # First pull the list of available locations. We do it with the
-        # getObject() call so that we get access to the delivery time info.
-        object_data = package.getRegions(id=hw_id)
-
-        for loc in object_data:
-            details = loc['location']['locationPackageDetails'][0]
-
-            results['locations'].append({
-                'delivery_information': details.get('deliveryTimeInformation'),
-                'keyname': loc['keyname'],
-                'long_name': loc['description'],
-            })
-
-        for config in package.getConfiguration(id=hw_id,
-                                               mask='mask[itemCategory]'):
-            category = {
-                'sort': config['sort'],
-                'step': config['orderStepId'],
-                'is_required': config['isRequired'],
-                'name': config['itemCategory']['name'],
-                'items': [],
-            }
-
-            results['categories'][config['itemCategory']['categoryCode']] = category
-
-        # Now pull in the available package item
-        for item in package.getItems(id=hw_id, mask='mask[itemCategory]'):
-            category_code = item['itemCategory']['categoryCode']
-
-            if category_code not in results['categories']:
-                results['categories'][category_code] = {'name': category_code,
-                                                        'items': []}
-            results['categories'][category_code]['items'].append({
-                'id': item['id'],
-                'description': item['description'],
-                # TODO - Deal with multiple prices properly'
-                'prices': item['prices'],
-                'sort': item['prices'][0]['sort'],
-                'price_id': item['prices'][0]['id'],
-                'capacity': int(item.get('capacity') or 0),
-            })
-
-        return results
-        
     def get_hardware(self, id, **kwargs):
         """ Get details about a hardware device
 
@@ -249,10 +184,10 @@ class HardwareManager(IdentifierMixin, object):
                 'primaryIpAddress',
                 'datacenter.name',
                 'networkComponents[id, status, maxSpeed, name,' \
-                'ipmiMacAddress, ipmiIpAddress, macAddress, primaryIpAddress,'\
-                'port, primarySubnet]',
+                    'ipmiMacAddress, ipmiIpAddress, macAddress,' \
+                    'primaryIpAddress, port, primarySubnet]',
                 'networkComponents.primarySubnet[id, netmask,' \
-                'broadcastAddress, networkIdentifier, gateway]',
+                    'broadcastAddress, networkIdentifier, gateway]',
                 'activeTransaction.id',
                 'operatingSystem.softwareLicense.'
                 'softwareDescription[manufacturer,name,version,referenceCode]',
@@ -286,7 +221,7 @@ class HardwareManager(IdentifierMixin, object):
             self, server_core=None, hourly=True,
             hostname=None, domain=None, disk0=None,
             location=None, os=None, image_id=None,
-            private=False, pri_ip_addresses=None, bandwidth=None,
+            pri_ip_addresses=None, bandwidth=None,
             userdata=None, monitoring=None, port_speed=None,
             vulnerability_scanner=None, response=None,
             vpn_management=None, remote_management=None,
