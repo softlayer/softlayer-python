@@ -176,7 +176,7 @@ class CCIManager(IdentifierMixin, object):
             hostname=None, domain=None, local_disk=True,
             datacenter=None, os_code=None, image_id=None,
             private=False, public_vlan=None, private_vlan=None,
-            userdata=None, nic_speed=None, disks=None):
+            userdata=None, nic_speed=None, disks=None, post_uri=None):
 
         required = [cpus, memory, hostname, domain]
 
@@ -243,6 +243,9 @@ class CCIManager(IdentifierMixin, object):
                         "diskImage": {"capacity": disk}
                     }
                 )
+
+        if post_uri:
+            data['postInstallScriptUri'] = post_uri
 
         return data
 

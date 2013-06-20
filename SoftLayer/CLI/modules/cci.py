@@ -358,6 +358,8 @@ Optional:
 
   -u --userdata=DATA       User defined metadata string
   -F --userfile=FILE       Read userdata from file
+  -i --postinstall=URI     Post-install script to download
+                             (Only HTTPS executes, HTTP leaves file in /root)
   --wait=SECONDS           Block until CCI is finished provisioning for up to X
                              seconds before returning.
 """
@@ -401,16 +403,16 @@ Optional:
         data["memory"] = memory
 
         if args['--monthly']:
-            data["hourly"] = False
+            data['hourly'] = False
 
         if args.get('--os'):
-            data["os_code"] = args['--os']
+            data['os_code'] = args['--os']
 
         if args.get('--image'):
-            data["image_id"] = args['--image']
+            data['image_id'] = args['--image']
 
         if args.get('--datacenter'):
-            data["datacenter"] = args['--datacenter']
+            data['datacenter'] = args['--datacenter']
 
         if args.get('--network'):
             data['nic_speed'] = args.get('--network')
@@ -423,6 +425,9 @@ Optional:
                 data['userdata'] = f.read()
             finally:
                 f.close()
+
+        if args.get('--postinstall'):
+            data['post_uri'] = args.get('--postinstall')
 
         t = Table(['Item', 'cost'])
         t.align['Item'] = 'r'

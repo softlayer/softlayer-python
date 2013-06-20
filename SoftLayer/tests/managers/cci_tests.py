@@ -351,6 +351,29 @@ class CCITests(unittest.TestCase):
 
         self.assertEqual(data, assert_data)
 
+    def test_generate_post_uri(self):
+        data = self.cci._generate_create_dict(
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='example.com',
+            os_code="STRING",
+            post_uri='https://example.com/boostrap.sh',
+        )
+
+        assert_data = {
+            'startCpus': 1,
+            'maxMemory': 1,
+            'hostname': 'test',
+            'domain': 'example.com',
+            'localDiskFlag': True,
+            'operatingSystemReferenceCode': "STRING",
+            'hourlyBillingFlag': True,
+            'postInstallScriptUri': 'https://example.com/boostrap.sh',
+        }
+
+        self.assertEqual(data, assert_data)
+
     def test_generate_no_disks(self):
         data = self.cci._generate_create_dict(
             cpus=1,
