@@ -30,6 +30,7 @@ The easiest way to do that is to use: 'sl config setup'
 import sys
 import os
 import os.path
+import logging
 
 from prettytable import FRAME, NONE
 from docopt import docopt, DocoptExit
@@ -40,6 +41,14 @@ from SoftLayer.CLI.helpers import (
     Table, CLIAbort, FormattedItem, listing, ArgumentError, SequentialOutput)
 from SoftLayer.CLI.environment import (
     Environment, CLIRunnableType, InvalidCommand, InvalidModule)
+
+
+DEBUG_LOGGING_MAP = {
+    '0': logging.CRITICAL,
+    '1': logging.WARNING,
+    '2': logging.INFO,
+    '3': logging.DEBUG
+}
 
 
 def format_output(data, fmt='table'):
@@ -101,10 +110,7 @@ class CommandParser(object):
 
     def get_module_help(self, module_name):
         module = self.env.load_module(module_name)
-        arg_doc = module.__doc__ + """
-Standard Options:
-  -h --help  Show this screen
-"""
+        arg_doc = module.__doc__
         return arg_doc.strip()
 
     def get_command_help(self, module_name, command_name):
@@ -127,6 +133,8 @@ Prompt Options:
 Standard Options:
   --format=ARG           Output format. [Options: table, raw] [Default: %s]
   -C FILE --config=FILE  Config file location. [Default: ~/.softlayer]
+  --debug=LEVEL          Specifies the debug noise level
+                           1=warn, 2=info, 3=debug
   -h --help              Show this screen
 """ % default_format
         return arg_doc.strip()
@@ -184,6 +192,14 @@ def main(args=sys.argv[1:], env=Environment()):
     resolver = CommandParser(env)
     try:
         command, command_args = resolver.parse(args)
+
+        # Set logging level
+        debug_level = command_args.get('--debug')
+        if debug_level:
+            logger = logging.getLogger()
+            h = logging.StreamHandler()
+            logger.addHandler(h)
+            logger.setLevel(DEBUG_LOGGING_MAP.get(debug_level, logging.DEBUG))
 
         # Parse Config
         config_files = ["~/.softlayer"]

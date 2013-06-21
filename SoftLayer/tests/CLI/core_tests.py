@@ -64,13 +64,25 @@ class CommandLineTests(unittest.TestCase):
         self.env.get_module_name.return_value = 'cci'
         self.assertRaises(
             SystemExit, cli.core.main,
-            args=['cci', 'list', '--config=path/to/config'], env=self.env)
+            args=['cci', 'list', '--config=path/to/config'],
+            env=self.env)
         self.assertRaises(
             SystemExit, cli.core.main,
             args=['cci', 'nope', '--config=path/to/config'], env=self.env)
         self.assertRaises(
             SystemExit, cli.core.main,
             args=['cci', 'list', '--format=totallynotvalid'], env=self.env)
+
+    @patch('logging.getLogger')
+    @patch('logging.StreamHandler')
+    def test_with_debug(self, stream_handler, logger):
+        self.env.get_module_name.return_value = 'cci'
+        self.assertRaises(
+            SystemExit, cli.core.main,
+            args=['cci', 'list', '--debug=3'],
+            env=self.env)
+        logger().setLevel.assert_called_with(10)
+        logger().addHandler.assert_called_with(stream_handler())
 
     def test_invalid_module(self):
         self.env.get_module_name.return_value = 'nope'
