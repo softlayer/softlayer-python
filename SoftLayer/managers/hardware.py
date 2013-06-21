@@ -282,7 +282,8 @@ class HardwareManager(IdentifierMixin, object):
 
     def _get_bare_metal_package_id(self):
         packages = self.client['Product_Package'].getAllObjects(
-            mask='mask[id, name]')
+            mask='mask[id, name]',
+            filter={'name': query_filter('Bare Metal Instance')})
 
         hw_id = 0
         for package in packages:
