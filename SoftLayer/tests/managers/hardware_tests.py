@@ -91,16 +91,16 @@ class HardwareTests(unittest.TestCase):
         self.hardware.reload(id=1)
         f = self.client.__getitem__().reloadCurrentOperatingSystemConfiguration
         f.assert_called_once_with('FORCE', id=1)
-    
+
     def test_get_bare_metal_create_options_returns_none_on_error(self):
         self.client['Product_Package'].getAllObjects.return_value = [
             {'name': 'No Matching Instances', 'id': 0}]
-        
+
         self.assertIsNone(self.hardware.get_bare_metal_create_options())
-        
+
     def test_get_bare_metal_create_options(self):
         package_id = 50
-        
+
         self.client['Product_Package'].getAllObjects.return_value = [
             {'name': 'Bare Metal Instance', 'id': package_id}]
 
@@ -136,7 +136,7 @@ class HardwareTests(unittest.TestCase):
             'capacity': 0,
         }]
         self.hardware.get_bare_metal_create_options()
-        
+
         f1 = self.client['Product_Package'].getRegions
         f1.assert_called_once_with(id=package_id)
 
@@ -148,7 +148,7 @@ class HardwareTests(unittest.TestCase):
 
     def test_generate_create_dict_with_all_options(self):
         package_id = 50
-        
+
         self.client['Product_Package'].getAllObjects.return_value = [
             {'name': 'Bare Metal Instance', 'id': package_id}]
 
@@ -200,9 +200,9 @@ class HardwareTests(unittest.TestCase):
         }
 
         data = self.hardware._generate_create_dict(**args)
-        
+
         self.assertEqual(data, assert_data)
-        
+
     @patch('SoftLayer.managers.hardware.HardwareManager._generate_create_dict')
     def test_verify_order(self, create_dict):
         create_dict.return_value = {'test': 1, 'verify': 1}
@@ -218,4 +218,23 @@ class HardwareTests(unittest.TestCase):
         create_dict.assert_called_once_with(test=1, verify=1)
         f = self.client['Product_Order'].placeOrder
         f.assert_called_once_with({'test': 1, 'verify': 1})
-        
+
+    def test_cancel_hardware_immediately(self):
+        b_id = 5678
+        self.client.__getitem__().getObject.return_value = {'id': '1234',
+                                                            'billingItem': {
+                                                                'id': b_id,
+                                                            }}
+        self.hardware.cancel_hardware(b_id, True)
+        f = self.client['Billing_Item'].cancelService
+        f.assert_called_once_with(id=b_id)
+
+    def test_cancel_hardware_on_anniversary(self):
+        b_id = 5678
+        self.client.__getitem__().getObject.return_value = {'id': '1234',
+                                                            'billingItem': {
+                                                                'id': b_id,
+                                                            }}
+        self.hardware.cancel_hardware(b_id, False)
+        f = self.client['Billing_Item'].cancelServiceOnAnniversaryDate
+        f.assert_called_once_with(id=b_id)
