@@ -59,7 +59,7 @@ Options:
 
         if args['--datacenter'] or show_all:
             results = cls.get_create_options(bmi_options, 'datacenter')[0]
-            
+
             t.add_row([results[0], listing(sorted(results[1]))])
 
         if args['--cpu'] or args['--memory'] or show_all:
@@ -81,8 +81,8 @@ Options:
             results = cls.get_create_options(bmi_options, 'disk')[0]
 
             t.add_row([results[0], listing(
-                    item[0] for item in sorted(results[1],
-                                               key=lambda x: int(x[0])))])
+                item[0] for item in sorted(results[1],
+                                           key=lambda x: int(x[0])))])
 
         if args['--nic'] or show_all:
             results = cls.get_create_options(bmi_options, 'nic')
@@ -94,13 +94,13 @@ Options:
 
         if args['--bandwidth'] or show_all:
             results = cls.get_create_options(bmi_options, 'bandwidth')[0]
-            
+
             t.add_row([results[0], listing(
-                    item[0] for item in sorted(results[1],
-                                               key=lambda x: x[0]))])
-                
+                item[0] for item in sorted(results[1],
+                                           key=lambda x: x[0]))])
+
         return t
-        
+
     @classmethod
     def get_create_options(cls, bmi_options, section, pretty=True):
         """ This method can be used to parse the bare metal instance creation
@@ -122,7 +122,7 @@ Options:
             mem_options = {}
             cpu_regex = re.compile('(\d+) x ')
             memory_regex = re.compile(' - (\d+) GB Ram', re.I)
-            
+
             for item in bmi_options['categories']['server_core']['items']:
                 cpu = cpu_regex.search(item['description']).group(1)
                 memory = memory_regex.search(item['description']).group(1)
@@ -152,12 +152,12 @@ Options:
                 name = name.replace(' Linux', '')
                 name = name.replace('Enterprise', '')
                 name = name.replace('GNU/Linux', '')
-                
+
                 os_code = name.strip().replace(' ', '_').upper()
 
                 if os_code == 'RED_HAT':
                     os_code = 'REDHAT'
-                
+
                 if 'UBUNTU' in os_code:
                     version = re.sub('\.\d+', '', version)
 
@@ -191,17 +191,17 @@ Options:
                     os_code += '-R2'
                 elif 'ith Hyper-V' in description:
                     os_code += '-HYPERV'
-                    
+
                 bit_check = re.search('\((\d+)\s*bit', description)
                 if bit_check:
                     os_code += '_' + bit_check.group(1)
-                    
+
                 return os_code
 
             # Loop through the operating systems and get their OS codes
             os_list = {}
             flat_list = []
-            
+
             for os in bmi_options['categories']['os']['items']:
                 if 'Windows Server' in os['description']:
                     os_code = _generate_windows_code(os['description'])
@@ -211,13 +211,14 @@ Options:
                     version = os_results.group(2)
                     bits = bit_regex.search(os['description'])
                     extra_info = extra_regex.search(os['description'])
-                    
+
                     if bits:
                         bits = bits.group(1)
                     if extra_info:
                         extra_info = extra_info.group(1)
-                    
-                    os_code = _generate_os_code(name, version, bits, extra_info)
+
+                    os_code = _generate_os_code(name, version, bits,
+                                                extra_info)
 
                 name = os_code.split('_')[0]
 
@@ -235,7 +236,7 @@ Options:
                 return results
             else:
                 return [('os', flat_list)]
-                
+
         elif 'disk' == section:
             disks = []
             for disk in bmi_options['categories']['disk0']['items']:
@@ -267,10 +268,11 @@ Options:
 
 class CreateBMetalInstance(CLIRunnable):
     """
-usage: sl bmetal create --hostname=HOST --domain=DOMAIN --cpu=CPU --memory=MEMORY
-                     --os=OS (--hourly | --monthly) [options]
+usage: sl bmetal create --hostname=HOST --domain=DOMAIN --cpu=CPU
+                       --memory=MEMORY --os=OS (--hourly | --monthly) [options]
 
-Order/create a bare metal instance. See 'sl bmetal create-options' for valid options
+Order/create a bare metal instance. See 'sl bmetal create-options' for valid
+options
 
 Required:
   -H --hostname=HOST  Host portion of the FQDN. example: server
@@ -279,8 +281,9 @@ Required:
   -m --memory=MEMORY  Memory in mebibytes (n * 1024)
 
                       NOTE: Due to hardware configurations, the CPU and memory
-                            must match appropriately. See create-options for options.
-    
+                            must match appropriately. See create-options for
+                            options.
+
   -o OS, --os=OS      OS install code.
 
   --hourly            Hourly rate instance type
@@ -312,7 +315,6 @@ Optional:
             'domain': args['--domain'],
             'bare_metal': True,
         }
-
 
         # Validate the CPU/Memory combination and get the price ID
         server_core = cls._get_cpu_and_memory_price_ids(bmi_options,
@@ -397,13 +399,14 @@ Optional:
                                                            'pri_ip_addresses')
 
         order['monitoring'] = cls._get_default_value(bmi_options, 'monitoring')
-        order['vulnerability_scanner'] = cls._get_default_value(bmi_options,
-                                                                'vulnerability_scanner')
+        vuln_scanner = cls._get_default_value(bmi_options,
+                                              'vulnerability_scanner')
+        order['vulnerability_scanner'] = vuln_scanner
         order['response'] = cls._get_default_value(bmi_options, 'response')
         order['vpn_management'] = cls._get_default_value(bmi_options,
                                                          'vpn_management')
-        order['remote_management'] = cls._get_default_value(bmi_options,
-                                                            'remote_management')
+        remote_mgmt = cls._get_default_value(bmi_options, 'remote_management')
+        order['remote_management'] = remote_mgmt
         order['notification'] = cls._get_default_value(bmi_options,
                                                        'notification')
 
@@ -481,17 +484,17 @@ Optional:
     def _get_default_value(cls, bmi_options, option):
         if bmi_options['categories'].get(option):
             for item in bmi_options['categories'][option]['items']:
-                if not any([float(item['prices'][0].get('setupFee', 0)),
-                            float(item['prices'][0].get('recurringFee', 0)),
-                            float(item['prices'][0].get('hourlyRecurringFee',
-                                                        0)),
-                            float(item['prices'][0].get('oneTimeFee', 0)),
-                            float(item['prices'][0].get('laborFee', 0)),
-                        ]):
+                if not any([
+                        float(item['prices'][0].get('setupFee', 0)),
+                        float(item['prices'][0].get('recurringFee', 0)),
+                        float(item['prices'][0].get('hourlyRecurringFee', 0)),
+                        float(item['prices'][0].get('oneTimeFee', 0)),
+                        float(item['prices'][0].get('laborFee', 0)),
+                ]):
                     return item['price_id']
 
         return None
-        
+
     @classmethod
     def _get_price_id_from_options(cls, bmi_options, option, value):
         bmi_obj = BMetalCreateOptions()

@@ -184,11 +184,11 @@ class HardwareManager(IdentifierMixin, object):
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
                 'datacenter.name',
-                'networkComponents[id, status, maxSpeed, name,' \
-                    'ipmiMacAddress, ipmiIpAddress, macAddress,' \
-                    'primaryIpAddress, port, primarySubnet]',
-                'networkComponents.primarySubnet[id, netmask,' \
-                    'broadcastAddress, networkIdentifier, gateway]',
+                'networkComponents[id, status, maxSpeed, name,'
+                'ipmiMacAddress, ipmiIpAddress, macAddress,'
+                'primaryIpAddress, port, primarySubnet]',
+                'networkComponents.primarySubnet[id, netmask,'
+                'broadcastAddress, networkIdentifier, gateway]',
                 'activeTransaction.id',
                 'operatingSystem.softwareLicense.'
                 'softwareDescription[manufacturer,name,version,referenceCode]',
@@ -217,7 +217,7 @@ class HardwareManager(IdentifierMixin, object):
     def verify_order(self, **kwargs):
         create_options = self._generate_create_dict(**kwargs)
         return self.client['Product_Order'].verifyOrder(create_options)
-        
+
     def _generate_create_dict(
             self, server_core=None, hourly=True,
             hostname=None, domain=None, disk0=None,
@@ -241,7 +241,7 @@ class HardwareManager(IdentifierMixin, object):
 
         if bare_metal:
             order['packageId'] = self._get_bare_metal_package_id()
-        
+
         if server_core:
             order['prices'].append({'id': int(server_core)})
 
@@ -262,7 +262,7 @@ class HardwareManager(IdentifierMixin, object):
 
         if port_speed:
             order['prices'].append({'id': int(port_speed)})
-            
+
         if vulnerability_scanner:
             order['prices'].append({'id': int(vulnerability_scanner)})
 
@@ -277,7 +277,7 @@ class HardwareManager(IdentifierMixin, object):
 
         if notification:
             order['prices'].append({'id': int(notification)})
-            
+
         return order
 
     def _get_bare_metal_package_id(self):
@@ -292,7 +292,7 @@ class HardwareManager(IdentifierMixin, object):
                 break
 
         return hw_id
-        
+
     def _get_ids_from_hostname(self, hostname):
         results = self.list_hardware(hostname=hostname, mask="id")
         return [result['id'] for result in results]
