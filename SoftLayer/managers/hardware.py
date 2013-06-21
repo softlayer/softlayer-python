@@ -36,11 +36,10 @@ class HardwareManager(IdentifierMixin, object):
         """
 
         reasons = self.get_cancellation_reasons()
+        reason = reasons['unneeded']
 
         if reason in reasons:
             reason = reasons[reason]
-        else:
-            reason = reasons['unneeded']
 
         # Arguments per SLDN:
         # attachmentId - Hardware ID

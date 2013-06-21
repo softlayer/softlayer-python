@@ -150,10 +150,11 @@ Options:
 
             results = []
             for memory in sorted(mem_options.keys(), key=int):
+                key = memory
+
                 if pretty:
                     key = 'cpus (%s gb ram)' % memory
-                else:
-                    key = memory
+
                 results.append((key, mem_options[memory]))
 
             return results
@@ -341,10 +342,7 @@ Optional:
         else:
             raise CLIAbort('Invalid CPU/memory combination specified.')
 
-        if args['--monthly']:
-            order['hourly'] = False
-        else:
-            order['hourly'] = True
+        order['hourly'] = args['--hourly']
 
         # Convert the OS code back into a price ID
         os_price = cls._get_price_id_from_options(bmi_options, 'os',
