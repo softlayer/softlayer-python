@@ -238,3 +238,27 @@ class HardwareTests(unittest.TestCase):
         self.hardware.cancel_metal(b_id, False)
         f = self.client['Billing_Item'].cancelServiceOnAnniversaryDate
         f.assert_called_once_with(id=b_id)
+
+    def test_cancel_hardware_without_reason(self):
+        hw_id = 987
+
+        self.hardware.cancel_hardware(hw_id)
+
+        reasons = self.hardware.get_cancellation_reasons()
+        
+        f = self.client['Ticket'].createCancelServerTicket
+        f.assert_called_once_with(hw_id, reasons['unneeded'], '', True,
+                                  'HARDWARE')
+
+    def test_cancel_hardware_with_reason_and_comment(self):
+        hw_id = 987
+        reason = 'sales'
+        comment = 'Test Comment'
+
+        self.hardware.cancel_hardware(hw_id, reason, comment)
+
+        reasons = self.hardware.get_cancellation_reasons()
+        
+        f = self.client['Ticket'].createCancelServerTicket
+        f.assert_called_once_with(hw_id, reasons[reason], comment, True,
+                                  'HARDWARE')        

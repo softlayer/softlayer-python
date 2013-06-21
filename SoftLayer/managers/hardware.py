@@ -25,6 +25,33 @@ class HardwareManager(IdentifierMixin, object):
         self.account = self.client['Account']
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
 
+    def cancel_hardware(self, id, reason='unneeded', comment=''):
+        """ Cancels the specified dedicated server.
+
+        :param int id: The ID of the hardware to be cancelled.
+        :param bool immediate: If true, the hardware will be cancelled
+                               immediately. Otherwise, it will be
+                               scheduled to cancel on the anniversary date.
+        :param string reason: The reason code for the cancellation.
+        """
+
+        reasons = self.get_cancellation_reasons()
+
+        if reason in reasons:
+            reason = reasons[reason]
+        else:
+            reason = reasons['unneeded']
+
+        # Arguments per SLDN:
+        # attachmentId - Hardware ID
+        # Reason
+        # content - Comment about the cancellation
+        # cancelAssociatedItems
+        # attachmentType - Only option is HARDWARE
+        return self.client['Ticket'].createCancelServerTicket(id, reason,
+                                                              comment, True,
+                                                              'HARDWARE')
+
     def cancel_metal(self, id, immediate=False):
         """ Cancels the specified bare metal instance.
 
@@ -237,6 +264,20 @@ class HardwareManager(IdentifierMixin, object):
     def verify_order(self, **kwargs):
         create_options = self._generate_create_dict(**kwargs)
         return self.client['Product_Order'].verifyOrder(create_options)
+
+    def get_cancellation_reasons(self):
+        return {
+            'unneeded': 'No longer needed',
+            'closing': 'Business closing down',
+            'cost': 'Server / Upgrade Costs',
+            'migrate_larger': 'Migrating to larger server',
+            'migrate_smaller': 'Migrating to smaller server',
+            'datacenter': 'Migrating to a different SoftLayer datacenter',
+            'performance': 'Network performance / latency',
+            'support': 'Support response / timing',
+            'sales': 'Sales process / upgrades',
+            'moving': 'Moving to competitor',
+        }
 
     def _generate_create_dict(
             self, server_core=None, hourly=True,
