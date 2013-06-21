@@ -8,6 +8,7 @@ The available commands are:
   list      List hardware devices
   detail    Retrieve hardware details
   reload    Perform an OS reload
+  cancel    Cancel a running server
 
 For several commands, <identifier> will be asked for. This can be the id,
 hostname or the ip address for a piece of hardware.
@@ -192,5 +193,32 @@ Reload the OS on a hardware server based on its current configuration
         hardware_id = resolve_id(hardware, args.get('<identifier>'))
         if args['--really'] or no_going_back(hardware_id):
             hardware.reload(hardware_id)
+        else:
+            CLIAbort('Aborted')
+
+
+class CancelHardware(CLIRunnable):
+    """
+usage: sl hardware cancel <identifier> [options]
+
+Cancel a server
+
+Options:
+  --immediate  Cancels the server immediately (instead of on the billing
+               anniversary).
+"""
+
+    action = 'cancel'
+    options = ['confirm']
+
+    @staticmethod
+    def execute(client, args):
+        hw = HardwareManager(client)
+        hw_id = resolve_id(hw, args.get('<identifier>'))
+
+        immediate = args.get('--immediate', False)
+
+        if args['--really'] or no_going_back(hw_id):
+            hw.cancel_hardware(hw_id, immediate)
         else:
             CLIAbort('Aborted')
