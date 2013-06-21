@@ -355,10 +355,7 @@ Optional:
         else:
             raise CLIAbort('Invalid operating system specified.')
 
-        if args.get('--datacenter'):
-            order['location'] = args['--datacenter']
-        else:
-            order['location'] = 'FIRST_AVAILABLE'
+        order['location'] = args['--datacenter'] or 'FIRST_AVAILABLE'
 
         # Set the disk size
         if args.get('--disk'):
@@ -373,10 +370,7 @@ Optional:
             raise CLIAbort('Invalid disk size specified.')
 
         # Set the port speed
-        if args.get('--network'):
-            port_speed = args.get('--network')
-        else:
-            port_speed = 10
+        port_speed = args.get('--network') or 10
 
         nic_price = cls._get_price_id_from_options(bmi_options, 'nic',
                                                    port_speed)
