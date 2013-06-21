@@ -7,6 +7,7 @@ Manage bare metal instances
 The available commands are:
   create-options  Output available available options when creating a server
   create    Create a new bare metal instance
+  cancel    Cancels a bare metal instance
 
 For several commands, <identifier> will be asked for. This can be the id,
 hostname or the ip address for a piece of hardware.
@@ -17,6 +18,20 @@ from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, listing, FormattedItem)
 from SoftLayer.CLI.helpers import (CLIAbort, SequentialOutput)
 from SoftLayer import HardwareManager
+
+
+def resolve_id(manager, identifier):
+    ids = manager.resolve_ids(identifier)
+
+    if len(ids) == 0:
+        raise CLIAbort("Error: Unable to find hardware '%s'" % identifier)
+
+    if len(ids) > 1:
+        raise CLIAbort(
+            "Error: Multiple hardware found for '%s': %s" %
+            (identifier, ', '.join([str(_id) for _id in ids])))
+
+    return ids[0]
 
 
 class BMetalCreateOptions(CLIRunnable):
@@ -506,3 +521,30 @@ Optional:
                     price_id = item_options[1]
 
         return price_id
+
+
+class CancelInstance(CLIRunnable):
+    """
+usage: sl bmetal cancel <identifier> [options]
+
+Cancel a bare metal instance
+
+Options:
+  --immediate  Cancels the instance immediately (instead of on the billing
+               anniversary).
+"""
+
+    action = 'cancel'
+    options = ['confirm']
+
+    @staticmethod
+    def execute(client, args):
+        hw = HardwareManager(client)
+        hw_id = resolve_id(hw, args.get('<identifier>'))
+
+        immediate = args.get('--immediate', False)
+
+        if args['--really'] or no_going_back(hw_id):
+            hw.cancel_metal(hw_id, immediate)
+        else:
+            CLIAbort('Aborted')

@@ -219,22 +219,22 @@ class HardwareTests(unittest.TestCase):
         f = self.client['Product_Order'].placeOrder
         f.assert_called_once_with({'test': 1, 'verify': 1})
 
-    def test_cancel_hardware_immediately(self):
+    def test_cancel_metal_immediately(self):
         b_id = 5678
         self.client.__getitem__().getObject.return_value = {'id': '1234',
                                                             'billingItem': {
                                                                 'id': b_id,
                                                             }}
-        self.hardware.cancel_hardware(b_id, True)
+        self.hardware.cancel_metal(b_id, True)
         f = self.client['Billing_Item'].cancelService
         f.assert_called_once_with(id=b_id)
 
-    def test_cancel_hardware_on_anniversary(self):
+    def test_cancel_metal_on_anniversary(self):
         b_id = 5678
         self.client.__getitem__().getObject.return_value = {'id': '1234',
                                                             'billingItem': {
                                                                 'id': b_id,
                                                             }}
-        self.hardware.cancel_hardware(b_id, False)
+        self.hardware.cancel_metal(b_id, False)
         f = self.client['Billing_Item'].cancelServiceOnAnniversaryDate
         f.assert_called_once_with(id=b_id)

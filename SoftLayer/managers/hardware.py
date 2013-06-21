@@ -25,12 +25,12 @@ class HardwareManager(IdentifierMixin, object):
         self.account = self.client['Account']
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
 
-    def cancel_hardware(self, id, immediate=False):
-        """ Cancels the specify hardware instance.
+    def cancel_metal(self, id, immediate=False):
+        """ Cancels the specified bare metal instance.
 
-        :param int id: The ID of the hardware to be cancelled.
-        :param bool immediate: If true, the hardware will be cancelled
-                               immediately. Otherwise, it will be
+        :param int id: The ID of the bare metal instance to be cancelled.
+        :param bool immediate: If true, the bare metal instance will be
+                               cancelled immediately. Otherwise, it will be
                                scheduled to cancel on the anniversary date.
         """
         hw_billing = self.get_hardware(id=id,
