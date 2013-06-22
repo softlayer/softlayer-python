@@ -117,10 +117,10 @@ class HardwareManager(IdentifierMixin, object):
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
                 'datacenter.name',
-                'networkComponents[id, status, maxSpeed, name,' \
-                'ipmiMacAddress, ipmiIpAddress, macAddress, primaryIpAddress,'\
+                'networkComponents[id, status, maxSpeed, name,'
+                'ipmiMacAddress, ipmiIpAddress, macAddress, primaryIpAddress,'
                 'port, primarySubnet]',
-                'networkComponents.primarySubnet[id, netmask,' \
+                'networkComponents.primarySubnet[id, netmask,'
                 'broadcastAddress, networkIdentifier, gateway]',
                 'activeTransaction.id',
                 'operatingSystem.softwareLicense.'

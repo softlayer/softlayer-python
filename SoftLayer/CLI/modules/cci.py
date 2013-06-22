@@ -30,22 +30,7 @@ from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
     FormattedItem)
 from SoftLayer.CLI.helpers import (
-    CLIAbort, ArgumentError, SequentialOutput,
-    NestedDict, blank)
-
-
-def resolve_id(cci_manager, identifier):
-    cci_ids = cci_manager.resolve_ids(identifier)
-
-    if len(cci_ids) == 0:
-        raise CLIAbort("Error: Unable to find CCI '%s'" % identifier)
-
-    if len(cci_ids) > 1:
-        raise CLIAbort(
-            "Error: Multiple CCIs found for '%s': %s" %
-            (identifier, ', '.join([str(_id) for _id in cci_ids])))
-
-    return cci_ids[0]
+    CLIAbort, ArgumentError, SequentialOutput, NestedDict, blank, resolve_id)
 
 
 class ListCCIs(CLIRunnable):
@@ -143,7 +128,7 @@ Options:
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
 
-        cci_id = resolve_id(cci, args.get('<identifier>'))
+        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         result = cci.get_instance(cci_id)
         result = NestedDict(result)
 
@@ -502,7 +487,7 @@ Optional:
     def execute(client, args):
         cci = CCIManager(client)
 
-        cci_id = resolve_id(cci, args.get('<identifier>'))
+        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         ready = cci.wait_for_transaction(cci_id, int(args.get('--wait') or 0))
 
         if ready:
@@ -524,7 +509,7 @@ Reload the OS on a CCI based on its current configuration
     @staticmethod
     def execute(client, args):
         cci = CCIManager(client)
-        cci_id = resolve_id(cci, args.get('<identifier>'))
+        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         if args['--really'] or no_going_back(cci_id):
             cci.reload_instance(cci_id)
         else:
@@ -544,7 +529,7 @@ Cancel a CCI
     @staticmethod
     def execute(client, args):
         cci = CCIManager(client)
-        cci_id = resolve_id(cci, args.get('<identifier>'))
+        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         if args['--really'] or no_going_back(cci_id):
             cci.cancel_instance(cci_id)
         else:
@@ -585,7 +570,7 @@ Manage active CCI
     def exec_shutdown(client, args):
         vg = client['Virtual_Guest']
         cci = CCIManager(client)
-        cci_id = resolve_id(cci, args.get('<identifier>'))
+        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         if args['--soft']:
             result = vg.powerOffSoft(id=cci_id)
         elif args['--cycle']:
@@ -599,28 +584,28 @@ Manage active CCI
     def exec_poweron(client, args):
         vg = client['Virtual_Guest']
         cci = CCIManager(client)
-        cci_id = resolve_id(cci, args.get('<identifier>'))
+        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         return vg.powerOn(id=cci_id)
 
     @staticmethod
     def exec_pause(client, args):
         vg = client['Virtual_Guest']
         cci = CCIManager(client)
-        cci_id = resolve_id(cci, args.get('<identifier>'))
+        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         return vg.pause(id=cci_id)
 
     @staticmethod
     def exec_resume(client, args):
         vg = client['Virtual_Guest']
         cci = CCIManager(client)
-        cci_id = resolve_id(cci, args.get('<identifier>'))
+        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         return vg.resume(id=cci_id)
 
     @staticmethod
     def exec_reboot(client, args):
         vg = client['Virtual_Guest']
         cci = CCIManager(client)
-        cci_id = resolve_id(cci, args.get('<identifier>'))
+        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         if args['--cycle']:
             result = vg.rebootHard(id=cci_id)
         elif args['--soft']:
@@ -663,7 +648,7 @@ Options:
             func = vg.setPrivateNetworkInterfaceSpeed
 
         cci = CCIManager(client)
-        cci_id = resolve_id(cci, args.get('<identifier>'))
+        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
 
         result = func(args['--speed'], id=cci_id)
         if result:
@@ -746,7 +731,7 @@ Options:
                     instance['fullyQualifiedDomainName'],
                     ttl=7200)
 
-        cci_id = resolve_id(cci, args.get('<identifier>'))
+        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         instance = cci.get_instance(cci_id)
 
         if not instance['primaryIpAddress']:
