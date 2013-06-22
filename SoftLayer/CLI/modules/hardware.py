@@ -14,22 +14,8 @@ hostname or the ip address for a piece of hardware.
 """
 from SoftLayer.CLI.helpers import (
     CLIRunnable, Table, FormattedItem, NestedDict, CLIAbort, blank, listing,
-    gb, no_going_back)
+    gb, no_going_back, resolve_id)
 from SoftLayer import HardwareManager
-
-
-def resolve_id(manager, identifier):
-    ids = manager.resolve_ids(identifier)
-
-    if len(ids) == 0:
-        raise CLIAbort("Error: Unable to find hardware '%s'" % identifier)
-
-    if len(ids) > 1:
-        raise CLIAbort(
-            "Error: Multiple hardware found for '%s': %s" %
-            (identifier, ', '.join([str(_id) for _id in ids])))
-
-    return ids[0]
 
 
 class ListHardware(CLIRunnable):
@@ -124,7 +110,8 @@ Options:
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
 
-        hardware_id = resolve_id(hardware, args.get('<identifier>'))
+        hardware_id = resolve_id(
+            hardware.resolve_ids, args.get('<identifier>'), 'hardware')
         result = hardware.get_hardware(hardware_id)
         result = NestedDict(result)
 
@@ -189,7 +176,8 @@ Reload the OS on a hardware server based on its current configuration
     @staticmethod
     def execute(client, args):
         hardware = HardwareManager(client)
-        hardware_id = resolve_id(hardware, args.get('<identifier>'))
+        hardware_id = resolve_id(
+            hardware.resolve_ids, args.get('<identifier>'), 'hardware')
         if args['--really'] or no_going_back(hardware_id):
             hardware.reload(hardware_id)
         else:

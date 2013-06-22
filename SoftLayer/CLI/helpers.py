@@ -12,7 +12,7 @@ from prettytable import PrettyTable
 
 __all__ = ['Table', 'CLIRunnable', 'FormattedItem', 'valid_response',
            'confirm', 'no_going_back', 'mb_to_gb', 'gb', 'listing', 'CLIAbort',
-           'NestedDict']
+           'NestedDict', 'resolve_id']
 
 
 class FormattedItem(object):
@@ -27,6 +27,29 @@ class FormattedItem(object):
         return str(self.original)
 
     __repr__ = __str__
+
+
+def resolve_id(resolver, identifier, name='object'):
+    """ Resolves a single id using an id resolver function which returns a list
+        of ids.
+
+    :param resolver: function that resolves ids. Should return None or a list
+                     of ids.
+    :param string identifier: a string identifier used to resolve ids
+    :param string name: the object type, to be used in error messages
+
+    """
+    ids = resolver(identifier)
+
+    if len(ids) == 0:
+        raise CLIAbort("Error: Unable to find %s '%s'" % (name, identifier))
+
+    if len(ids) > 1:
+        raise CLIAbort(
+            "Error: Multiple %s found for '%s': %s" %
+            (name, identifier, ', '.join([str(_id) for _id in ids])))
+
+    return ids[0]
 
 
 def mb_to_gb(megabytes):
