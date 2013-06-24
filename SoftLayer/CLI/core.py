@@ -12,6 +12,7 @@ The available modules are:
   dns       Manage DNS
   firewall  Firewall rule and security management
   hardware  View hardware details
+  bmetal    Interact with bare metal instances
   help      Show help
   iscsi     View iSCSI details
   image     Manages compute and flex images
