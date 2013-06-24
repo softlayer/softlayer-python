@@ -36,10 +36,10 @@ class HardwareManager(IdentifierMixin, object):
         """
 
         reasons = self.get_cancellation_reasons()
-        reason = reasons['unneeded']
+        cancel_reason = reasons['unneeded']
 
         if reason in reasons:
-            reason = reasons[reason]
+            cancel_reason = reasons[reason]
 
         # Arguments per SLDN:
         # attachmentId - Hardware ID
@@ -47,7 +47,7 @@ class HardwareManager(IdentifierMixin, object):
         # content - Comment about the cancellation
         # cancelAssociatedItems
         # attachmentType - Only option is HARDWARE
-        return self.client['Ticket'].createCancelServerTicket(id, reason,
+        return self.client['Ticket'].createCancelServerTicket(id, cancel_reason,
                                                               comment, True,
                                                               'HARDWARE')
 
