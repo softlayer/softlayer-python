@@ -133,6 +133,8 @@ class CCIManager(IdentifierMixin, object):
                 'privateNetworkOnlyFlag',
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
+                'networkComponents[id, status, speed, maxSpeed, name,'
+                'macAddress, primaryIpAddress, port, primarySubnet]',
                 'lastKnownPowerState.name',
                 'powerState.name',
                 'maxCpu',
@@ -271,6 +273,18 @@ class CCIManager(IdentifierMixin, object):
         create_options = self._generate_create_dict(**kwargs)
         return self.guest.createObject(create_options)
 
+    def change_port_speed(self, id, nic, speed):
+        if nic not in ['eth0', 'eth1']:
+            raise ValueError('Can only change speeds on eth0 or eth1')
+
+        if 'eth1' == nic:
+            func = self.guest.setPublicNetworkInterfaceSpeed
+        else:
+            func = self.guest.setPrivateNetworkInterfaceSpeed
+
+        return func(speed, id=id)
+        
+        
     def _get_ids_from_hostname(self, hostname):
         results = self.list_instances(hostname=hostname, mask="id")
         return [result['id'] for result in results]

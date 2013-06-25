@@ -641,16 +641,15 @@ Options:
 
     @staticmethod
     def exec_port(client, args):
-        vg = client['Virtual_Guest']
         if args['--public']:
-            func = vg.setPublicNetworkInterfaceSpeed
+            nic = 'eth1'
         elif args['--private']:
-            func = vg.setPrivateNetworkInterfaceSpeed
+            nic = 'eth0'
 
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
 
-        result = func(args['--speed'], id=cci_id)
+        result = cci.change_port_speed(cci_id, nic, args['--speed'])
         if result:
             return "Success"
         else:
