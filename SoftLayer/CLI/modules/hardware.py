@@ -8,6 +8,8 @@ The available commands are:
   list      List hardware devices
   detail    Retrieve hardware details
   reload    Perform an OS reload
+  cancel    Cancel a dedicated server.
+  cancel-reasons  Provides the list of possible cancellation reasons
 
 For several commands, <identifier> will be asked for. This can be the id,
 hostname or the ip address for a piece of hardware.
@@ -182,3 +184,57 @@ Reload the OS on a hardware server based on its current configuration
             hardware.reload(hardware_id)
         else:
             CLIAbort('Aborted')
+
+
+class CancelHardware(CLIRunnable):
+    """
+usage: sl hardware cancel <identifier> [options]
+
+Cancel a dedicated server
+
+Options:
+  --reason   An optional cancellation reason. See cancel-reasons for a list of
+             available options.
+"""
+
+    action = 'cancel'
+    options = ['confirm']
+
+    @staticmethod
+    def execute(client, args):
+        hw = HardwareManager(client)
+        hw_id = resolve_id(hw, args.get('<identifier>'))
+
+        print "(Optional) Add a cancellation comment:",
+        comment = raw_input()
+
+        reason = args.get('--reason')
+
+        if args['--really'] or no_going_back(hw_id):
+            hw.cancel_hardware(hw_id, reason, comment)
+        else:
+            CLIAbort('Aborted')
+
+
+class HardwareCancelReasons(CLIRunnable):
+    """
+usage: sl hardware cancel-reasons
+
+Display a list of cancellation reasons
+"""
+
+    action = 'cancel-reasons'
+
+    @staticmethod
+    def execute(client, args):
+        t = Table(['Code', 'Reason'])
+        t.align['Code'] = 'r'
+        t.align['Reason'] = 'l'
+
+        mgr = HardwareManager(client)
+        reasons = mgr.get_cancellation_reasons().iteritems()
+
+        for code, reason in reasons:
+            t.add_row([code, reason])
+
+        return t
