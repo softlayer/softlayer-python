@@ -10,6 +10,7 @@ The available commands are:
   reload    Perform an OS reload
   cancel    Cancel a dedicated server.
   cancel-reasons  Provides the list of possible cancellation reasons
+  network   Manage network settings
 
 For several commands, <identifier> will be asked for. This can be the id,
 hostname or the ip address for a piece of hardware.
@@ -238,3 +239,50 @@ Display a list of cancellation reasons
             t.add_row([code, reason])
 
         return t
+
+
+class NetworkHardware(CLIRunnable):
+    """
+usage: sl hardware network port <identifier> --speed=SPEED
+                                (--public | --private) [options]
+
+Manage network settings
+
+Options:
+    --speed=SPEED  Port speed. 0 disables the port.
+                   [Options: 0, 10, 100, 1000, 10000]
+    --public       Public network
+    --private      Private network
+"""
+    action = 'network'
+
+    @classmethod
+    def execute(cls, client, args):
+        if args['port']:
+            return cls.exec_port(client, args)
+
+        if args['details']:
+            return cls.exec_detail(client, args)
+
+    @staticmethod
+    def exec_port(client, args):
+        if args['--public']:
+            nic = 'eth1'
+        elif args['--private']:
+            nic = 'eth0'
+
+        mgr = HardwareManager(client)
+        hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
+                           'hardware')
+
+        result = mgr.change_port_speed(hw_id, nic, args['--speed'])
+        if result:
+            return "Success"
+        else:
+            return result
+
+    @staticmethod
+    def exec_detail(client, args):
+        # TODO this should print out default gateway and stuff
+        raise CLIAbort('Not implemented')
+        

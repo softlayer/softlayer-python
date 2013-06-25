@@ -231,7 +231,7 @@ class HardwareManager(IdentifierMixin, object):
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
                 'datacenter.name',
-                'networkComponents[id, status, maxSpeed, name,'
+                'networkComponents[id, status, speed, maxSpeed, name,'
                 'ipmiMacAddress, ipmiIpAddress, macAddress, primaryIpAddress,'
                 'port, primarySubnet]',
                 'networkComponents.primarySubnet[id, netmask,'
@@ -256,6 +256,17 @@ class HardwareManager(IdentifierMixin, object):
 
         return self.hardware.reloadCurrentOperatingSystemConfiguration(
             'FORCE', id=id)
+
+    def change_port_speed(self, id, nic, speed):
+        if nic not in ['eth0', 'eth1']:
+            raise ValueError('Can only change speeds on eth0 or eth1')
+
+        if 'eth1' == nic:
+            func = self.hardware.setPublicNetworkInterfaceSpeed
+        else:
+            func = self.hardware.setPrivateNetworkInterfaceSpeed
+
+        return func(speed, id=id)
 
     def place_order(self, **kwargs):
         create_options = self._generate_create_dict(**kwargs)

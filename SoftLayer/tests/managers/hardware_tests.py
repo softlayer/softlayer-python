@@ -262,3 +262,24 @@ class HardwareTests(unittest.TestCase):
         f = self.client['Ticket'].createCancelServerTicket
         f.assert_called_once_with(hw_id, reasons[reason], comment, True,
                                   'HARDWARE')
+
+    def test_change_port_speed_public(self):
+        hw_id = 1
+        speed = 100
+        self.hardware.change_port_speed(hw_id, 'eth1', speed)
+
+        service = self.client['Hardware_Server']
+        f = service.setPublicNetworkInterfaceSpeed
+        f.assert_called_once_with(speed, id=hw_id)
+
+    def test_change_port_speed_private(self):
+        hw_id = 2
+        speed = 10
+        self.hardware.change_port_speed(hw_id, 'eth0', speed)
+
+        service = self.client['Hardware_Server']
+        f = service.setPrivateNetworkInterfaceSpeed
+        f.assert_called_once_with(speed, id=hw_id)
+
+    def test_change_port_speed_errors_with_invalid_nic(self):
+       self.assertRaises(ValueError, self.hardware.change_port_speed, 3, 'mgmt0', 100)
