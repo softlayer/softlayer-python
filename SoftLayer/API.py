@@ -247,7 +247,7 @@ class Client(object):
             [...]
 
         """
-        if kwargs.get('iter'):
+        if kwargs.pop('iter', False):
             return self.iter_call(service, method, *args, **kwargs)
 
         invalid_kwargs = set(kwargs.keys()) - VALID_CALL_ARGS

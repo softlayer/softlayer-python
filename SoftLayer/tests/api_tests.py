@@ -276,7 +276,7 @@ class APIClient(unittest.TestCase):
     @patch('SoftLayer.API.Client.iter_call')
     def test_iterate(self, _iter_call):
         self.client['SERVICE'].METHOD(iter=True)
-        _iter_call.assert_called_with('SERVICE', 'METHOD', iter=True)
+        _iter_call.assert_called_with('SERVICE', 'METHOD')
 
     @patch('SoftLayer.API.Client.iter_call')
     def test_service_iter_call(self, _iter_call):
