@@ -492,3 +492,21 @@ class CCITests(unittest.TestCase):
         _sleep.assert_has_calls([
             call(10), call(10), call(10), call(10), call(10),
             call(10), call(10), call(10), call(10), call(10)])
+
+    def test_change_port_speed_public(self):
+        cci_id = 1
+        speed = 100
+        self.cci.change_port_speed(cci_id, True, speed)
+
+        service = self.client['Virtual_Guest']
+        f = service.setPublicNetworkInterfaceSpeed
+        f.assert_called_once_with(speed, id=cci_id)
+
+    def test_change_port_speed_private(self):
+        cci_id = 2
+        speed = 10
+        self.cci.change_port_speed(cci_id, False, speed)
+
+        service = self.client['Virtual_Guest']
+        f = service.setPrivateNetworkInterfaceSpeed
+        f.assert_called_once_with(speed, id=cci_id)
