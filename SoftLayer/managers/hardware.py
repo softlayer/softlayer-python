@@ -257,11 +257,8 @@ class HardwareManager(IdentifierMixin, object):
         return self.hardware.reloadCurrentOperatingSystemConfiguration(
             'FORCE', id=id)
 
-    def change_port_speed(self, id, nic, speed):
-        if nic not in ['eth0', 'eth1']:
-            raise ValueError('Can only change speeds on eth0 or eth1')
-
-        if 'eth1' == nic:
+    def change_port_speed(self, id, public, speed):
+        if public:
             func = self.hardware.setPublicNetworkInterfaceSpeed
         else:
             func = self.hardware.setPrivateNetworkInterfaceSpeed
