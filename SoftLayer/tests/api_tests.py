@@ -349,6 +349,34 @@ class APIClient(unittest.TestCase):
             self.client.call, 'SERVICE', 'METHOD', invalid_kwarg='invalid')
 
 
+class UnauthenticatedAPIClient(unittest.TestCase):
+    def setUp(self):
+        self.client = SoftLayer.Client(endpoint_url="ENDPOINT")
+
+    @patch.dict('os.environ', {'SL_USERNAME': '', 'SL_API_KEY': ''})
+    def test_init(self):
+        client = SoftLayer.Client()
+        self.assertIsNone(client.auth)
+
+    @patch('SoftLayer.API.Client.call')
+    def test_authenticate_with_password(self, _call):
+        _call.return_value = {
+            'userId': 12345,
+            'hash': 'TOKEN',
+        }
+        self.client.authenticate_with_password('USERNAME', 'PASSWORD')
+        _call.assert_called_with(
+            'User_Customer',
+            'getPortalLoginToken',
+            'USERNAME',
+            'PASSWORD',
+            None,
+            None)
+        self.assertIsNotNone(self.client.auth)
+        self.assertEquals(self.client.auth.user_id, 12345)
+        self.assertEquals(self.client.auth.auth_token, 'TOKEN')
+
+
 class TestAuthenticationBase(unittest.TestCase):
     def test_get_headers(self):
         auth = SoftLayer.API.AuthenticationBase()
@@ -375,3 +403,27 @@ class TestBasicAuthentication(unittest.TestCase):
         s = repr(self.auth)
         self.assertIn('BasicAuthentication', s)
         self.assertIn('USERNAME', s)
+
+
+class TestTokenAuthentication(unittest.TestCase):
+    def setUp(self):
+        self.auth = SoftLayer.TokenAuthentication(12345, 'TOKEN')
+
+    def test_attribs(self):
+        self.assertEquals(self.auth.user_id, 12345)
+        self.assertEquals(self.auth.auth_token, 'TOKEN')
+
+    def test_get_headers(self):
+        self.assertEquals(self.auth.get_headers(), {
+            'authenticate': {
+                'complexType': 'PortalLoginToken',
+                'userId': 12345,
+                'authToken': 'TOKEN',
+            }
+        })
+
+    def test_repr(self):
+        s = repr(self.auth)
+        self.assertIn('TokenAuthentication', s)
+        self.assertIn('12345', s)
+        self.assertIn('TOKEN', s)
