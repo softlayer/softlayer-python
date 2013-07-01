@@ -266,16 +266,15 @@ Options:
 
     @staticmethod
     def exec_port(client, args):
-        if args['--public']:
-            nic = 'eth1'
-        elif args['--private']:
-            nic = 'eth0'
+        public = True
+        if args['--private']:
+            public = False
 
         mgr = HardwareManager(client)
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
                            'hardware')
 
-        result = mgr.change_port_speed(hw_id, nic, args['--speed'])
+        result = mgr.change_port_speed(hw_id, public, args['--speed'])
         if result:
             return "Success"
         else:

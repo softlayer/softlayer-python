@@ -641,15 +641,14 @@ Options:
 
     @staticmethod
     def exec_port(client, args):
-        if args['--public']:
-            nic = 'eth1'
-        elif args['--private']:
-            nic = 'eth0'
+        public = True
+        if args['--private']:
+            public = False
 
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
 
-        result = cci.change_port_speed(cci_id, nic, args['--speed'])
+        result = cci.change_port_speed(cci_id, public, args['--speed'])
         if result:
             return "Success"
         else:
