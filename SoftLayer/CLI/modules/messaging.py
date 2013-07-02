@@ -21,8 +21,8 @@ from SoftLayer.CLI.helpers import CLIAbort, listing, ArgumentError, blank
 
 
 COMMON_MESSAGING_ARGS = """Service Options:
-  --endpoint=NAME  Endpoint name
-  --network=TYPE   Network type, [Options: public, private]
+  --datacenter=NAME  Datacenter, E.G.: dal05
+  --network=TYPE     Network type, [Options: public, private]
 """
 
 
@@ -98,7 +98,7 @@ Ping the SoftLayer Message Queue service
     def execute(client, args):
         manager = MessagingManager(client)
         ok = manager.ping(
-            endpoint_name=args['--endpoint'], network=args['--network'])
+            endpoint_name=args['--datacenter'], network=args['--network'])
         if ok:
             return 'OK'
         else:
