@@ -157,58 +157,44 @@ class HardwareManager(IdentifierMixin, object):
         if not hw_id:
             return None
 
-        package = self.client['Product_Package']
+        return self._parse_package_data(hw_id)
 
-        results = {
-            'categories': {},
-            'locations': []
-        }
+    def get_available_dedicated_server_packages(self):
+        """ Retrieves a list of packages that are available for ordering
+        dedicated servers.
 
-        # First pull the list of available locations. We do it with the
-        # getObject() call so that we get access to the delivery time info.
-        object_data = package.getRegions(id=hw_id)
+        Note - This currently returns a hard coded list until the API is updated
+        to allow filtering on packages to just those for ordering servers.
+        """
+        package_ids = [13, 15, 23, 25, 26, 27, 29, 32, 41, 42, 43, 44, 49, 51,
+                       52, 53, 54, 55, 56, 57, 126, 140, 141, 142, 143, 144,
+                       145, 146, 147, 148, 158]
 
-        for loc in object_data:
-            details = loc['location']['locationPackageDetails'][0]
+        package_obj = self.client['Product_Package']
+        packages = []
 
-            results['locations'].append({
-                'delivery_information': details.get('deliveryTimeInformation'),
-                'keyname': loc['keyname'],
-                'long_name': loc['description'],
-            })
+        for package_id in package_ids:
+            package = package_obj.getObject(id=package_id,
+                                            mask='mask[id, name, description]')
 
-        for config in package.getConfiguration(id=hw_id,
-                                               mask='mask[itemCategory]'):
-            code = config['itemCategory']['categoryCode']
-            category = {
-                'sort': config['sort'],
-                'step': config['orderStepId'],
-                'is_required': config['isRequired'],
-                'name': config['itemCategory']['name'],
-                'items': [],
-            }
+            if (package.get('name')):
+                packages.append((package['id'], package['name'],
+                                 package['description']))
+        
+        return packages
+        
+    def get_dedicated_server_create_options(self, package_id):
+        """ Retrieves the available options for creating a dedicated server in
+        a specific chassis (based on package ID).
 
-            results['categories'][code] = category
-
-        # Now pull in the available package item
-        for item in package.getItems(id=hw_id, mask='mask[itemCategory]'):
-            category_code = item['itemCategory']['categoryCode']
-
-            if category_code not in results['categories']:
-                results['categories'][category_code] = {'name': category_code,
-                                                        'items': []}
-            results['categories'][category_code]['items'].append({
-                'id': item['id'],
-                'description': item['description'],
-                # TODO - Deal with multiple prices properly.
-                'prices': item['prices'],
-                'sort': item['prices'][0]['sort'],
-                'price_id': item['prices'][0]['id'],
-                'capacity': int(item.get('capacity') or 0),
-            })
-
-        return results
-
+        The information for ordering dedicated servers comes from multiple
+        API calls. In order to make the process easier, this function will
+        make those calls and reformat the results into a dictionary that's
+        easier to manage. It's recommended that you cache these results with a
+        reasonable lifetime for performance reasons.
+        """
+        return self._parse_package_data(package_id)
+        
     def get_hardware(self, id, **kwargs):
         """ Get details about a hardware device
 
@@ -295,7 +281,9 @@ class HardwareManager(IdentifierMixin, object):
             userdata=None, monitoring=None, port_speed=None,
             vulnerability_scanner=None, response=None,
             vpn_management=None, remote_management=None,
-            notification=None, bare_metal=True, database=None):
+            notification=None, bare_metal=True, database=None,
+            package_id=None, firewall=None, server=None, ram=None,
+            disk_controller=None, lockbox=None, **kwargs):
 
         order = {
             'hardware': [{
@@ -310,9 +298,13 @@ class HardwareManager(IdentifierMixin, object):
 
         if bare_metal:
             order['packageId'] = self._get_bare_metal_package_id()
+        else:
+            order['packageId'] = package_id
 
         if server_core:
             order['prices'].append({'id': int(server_core)})
+        elif server:
+            order['prices'].append({'id': int(server)})
 
         if disk0:
             order['prices'].append({'id': int(disk0)})
@@ -347,6 +339,24 @@ class HardwareManager(IdentifierMixin, object):
         if notification:
             order['prices'].append({'id': int(notification)})
 
+        if firewall:
+            order['prices'].append({'id': int(firewall)})
+
+        if ram:
+            order['prices'].append({'id': int(ram)})
+
+        if disk_controller:
+            order['prices'].append({'id': int(disk_controller)})
+
+        if lockbox:
+            order['prices'].append({'id': int(lockbox)})
+
+        # TODO - This is not a good idea.
+        if kwargs:
+            for key, price_id in kwargs.iteritems():
+                if price_id:
+                    order['prices'].append({'id': int(price_id)})
+                
         return order
 
     def _get_bare_metal_package_id(self):
@@ -381,3 +391,61 @@ class HardwareManager(IdentifierMixin, object):
         results = self.list_hardware(private_ip=ip, mask="id")
         if results:
             return [result['id'] for result in results]
+
+    def _parse_package_data(self, id):
+        package = self.client['Product_Package']
+
+        results = {
+            'categories': {},
+            'locations': []
+        }
+
+        # First pull the list of available locations. We do it with the
+        # getObject() call so that we get access to the delivery time info.
+        object_data = package.getRegions(id=id)
+
+        for loc in object_data:
+            details = loc['location']['locationPackageDetails'][0]
+
+            results['locations'].append({
+                'delivery_information': details.get('deliveryTimeInformation'),
+                'keyname': loc['keyname'],
+                'long_name': loc['description'],
+            })
+
+        mask = 'mask[itemCategory[group]]'
+        
+        for config in package.getConfiguration(id=id, mask=mask):
+            code = config['itemCategory']['categoryCode']
+            group = NestedDict(config['itemCategory']) or {}
+            category = {
+                'sort': config['sort'],
+                'step': config['orderStepId'],
+                'is_required': config['isRequired'],
+                'name': config['itemCategory']['name'],
+                'group': group['group']['name'],
+                'items': [],
+            }
+
+            results['categories'][code] = category
+
+        # Now pull in the available package item
+        for item in package.getItems(id=id, mask='mask[itemCategory]'):
+            category_code = item['itemCategory']['categoryCode']
+
+            if category_code not in results['categories']:
+                results['categories'][category_code] = {'name': category_code,
+                                                        'items': []}
+            results['categories'][category_code]['items'].append({
+                'id': item['id'],
+                'description': item['description'],
+                'prices': item['prices'],
+                'sort': item['prices'][0]['sort'],
+                'price_id': item['prices'][0]['id'],
+                'recurring_fee': float(item['prices'][0].get('recurringFee',
+                                                               0)),
+                'capacity': float(item.get('capacity') or 0),
+            })
+
+        return results
+        
