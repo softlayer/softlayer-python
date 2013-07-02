@@ -268,6 +268,7 @@ class Client(object):
         :param name: The name of the service. E.G. Account
 
         Usage:
+            >>> client = SoftLayer.Client()
             >>> client['Account']
             <Service: Account>
 
@@ -286,6 +287,7 @@ class Client(object):
         :param service: the name of the SoftLayer API service
 
         Usage:
+            >>> client = SoftLayer.Client()
             >>> client['Account'].getVirtualGuests(mask="id", limit=10)
             [...]
 
