@@ -16,8 +16,6 @@ from mock import MagicMock, ANY, call, patch
 
 class HardwareTests(unittest.TestCase):
 
-    maxDiff = None
-    
     def setUp(self):
         self.client = MagicMock()
         self.hardware = HardwareManager(self.client)
@@ -268,7 +266,7 @@ class HardwareTests(unittest.TestCase):
         data = self.hardware._generate_create_dict(**args)
 
         self.assertEqual(data, assert_data)
-        
+
     @patch('SoftLayer.managers.hardware.HardwareManager._generate_create_dict')
     def test_verify_order(self, create_dict):
         create_dict.return_value = {'test': 1, 'verify': 1}
@@ -349,7 +347,7 @@ class HardwareTests(unittest.TestCase):
 
     def test_get_available_dedicated_server_packages(self):
         self.hardware.get_available_dedicated_server_packages()
-        
+
         service = self.client['Product_Package']
         f = service.getObject
         f.assert_has_calls([call(id=13, mask='mask[id, name, description]')])
@@ -400,4 +398,3 @@ class HardwareTests(unittest.TestCase):
         f3 = self.client['Product_Package'].getItems
         f3.assert_called_once_with(id=package_id,
                                    mask='mask[itemCategory]')
-        

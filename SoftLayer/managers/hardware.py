@@ -163,8 +163,9 @@ class HardwareManager(IdentifierMixin, object):
         """ Retrieves a list of packages that are available for ordering
         dedicated servers.
 
-        Note - This currently returns a hard coded list until the API is updated
-        to allow filtering on packages to just those for ordering servers.
+        Note - This currently returns a hard coded list until the API is
+        updated to allow filtering on packages to just those for ordering
+        servers.
         """
         package_ids = [13, 15, 23, 25, 26, 27, 29, 32, 41, 42, 43, 44, 49, 51,
                        52, 53, 54, 55, 56, 57, 126, 140, 141, 142, 143, 144,
@@ -180,9 +181,9 @@ class HardwareManager(IdentifierMixin, object):
             if (package.get('name')):
                 packages.append((package['id'], package['name'],
                                  package['description']))
-        
+
         return packages
-        
+
     def get_dedicated_server_create_options(self, package_id):
         """ Retrieves the available options for creating a dedicated server in
         a specific chassis (based on package ID).
@@ -194,7 +195,7 @@ class HardwareManager(IdentifierMixin, object):
         reasonable lifetime for performance reasons.
         """
         return self._parse_package_data(package_id)
-        
+
     def get_hardware(self, id, **kwargs):
         """ Get details about a hardware device
 
@@ -368,7 +369,7 @@ class HardwareManager(IdentifierMixin, object):
             for key, price_id in kwargs.iteritems():
                 if key in known_args and price_id:
                     order['prices'].append({'id': int(price_id)})
-                
+
         return order
 
     def _get_bare_metal_package_id(self):
@@ -426,7 +427,7 @@ class HardwareManager(IdentifierMixin, object):
             })
 
         mask = 'mask[itemCategory[group]]'
-        
+
         for config in package.getConfiguration(id=id, mask=mask):
             code = config['itemCategory']['categoryCode']
             group = NestedDict(config['itemCategory']) or {}
@@ -455,9 +456,8 @@ class HardwareManager(IdentifierMixin, object):
                 'sort': item['prices'][0]['sort'],
                 'price_id': item['prices'][0]['id'],
                 'recurring_fee': float(item['prices'][0].get('recurringFee',
-                                                               0)),
+                                                             0)),
                 'capacity': float(item.get('capacity') or 0),
             })
 
         return results
-        
