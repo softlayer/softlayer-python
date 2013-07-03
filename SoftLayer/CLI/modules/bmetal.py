@@ -38,7 +38,7 @@ class BMetalCreateOptions(CLIRunnable):
     """
 usage: sl bmetal create-options [options]
 
-Output available available options when creating a server
+Output available available options when creating a bare metal instance.
 
 Options:
   --all         Show all options. default if no other option provided
@@ -312,10 +312,7 @@ Optional:
                              available datacenter
   -n MBPS, --network=MBPS  Network port speed in Mbps
   -b MBPS, --bandwith=MBPS Outbound bandwidth in Mbps
-  --dry-run, --test        Do not create CCI, just get a quote
-
-  --wait=SECONDS           Block until CCI is finished provisioning for up to X
-                             seconds before returning.
+  --dry-run, --test        Do not create the instance, just get a quote
 """
     action = 'create'
     options = ['confirm']

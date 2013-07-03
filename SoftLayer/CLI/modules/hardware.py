@@ -11,13 +11,18 @@ The available commands are:
   cancel    Cancel a dedicated server.
   cancel-reasons  Provides the list of possible cancellation reasons
   network   Manage network settings
+  list-chassis    Provide a list of all chassis available for ordering
+  create-options  Display a list of creation options for a specific chassis
+  create    Create a new dedicated server
 
 For several commands, <identifier> will be asked for. This can be the id,
 hostname or the ip address for a piece of hardware.
 """
+import re
+from os import linesep
 from SoftLayer.CLI.helpers import (
     CLIRunnable, Table, FormattedItem, NestedDict, CLIAbort, blank, listing,
-    gb, no_going_back, resolve_id)
+    SequentialOutput, gb, no_going_back, resolve_id)
 from SoftLayer import HardwareManager
 
 
@@ -284,4 +289,530 @@ Options:
     def exec_detail(client, args):
         # TODO this should print out default gateway and stuff
         raise CLIAbort('Not implemented')
-        
+
+
+class ListChassisHardware(CLIRunnable):
+    """
+usage: sl hardware list-chassis
+
+Display a list of chassis available for ordering dedicated servers.
+"""
+    action = 'list-chassis'
+
+    @staticmethod
+    def execute(client, args):
+        t = Table(['Code', 'Chassis'])
+        t.align['Code'] = 'r'
+        t.align['Chassis'] = 'l'
+
+        mgr = HardwareManager(client)
+        chassis = mgr.get_available_dedicated_server_chassis()
+
+        for chassis in chassis:
+            t.add_row([chassis[0], chassis[1]])
+
+        return t
+
+
+class HardwareCreateOptions(CLIRunnable):
+    """
+usage: sl hardware create-options <chassis_id> [options]
+
+Output available available options when creating a dedicated server with the
+specified chassis.
+
+Options:
+  --all         Show all options. default if no other option provided
+  --datacenter  Show datacenter options
+  --cpu         Show CPU options
+  --nic         Show NIC speed options
+  --disk        Show disk options
+  --os          Show operating system options
+  --memory      Show memory size options
+  --bandwidth   Show bandwidth options
+  --controller  Show disk controller options
+"""
+
+    action = 'create-options'
+    options = ['datacenter', 'cpu', 'memory', 'os', 'disk', 'nic', 'bandwidth',
+               'controller']
+
+    @classmethod
+    def execute(cls, client, args):
+        mgr = HardwareManager(client)
+
+        t = Table(['Name', 'Value'])
+        t.align['Name'] = 'r'
+        t.align['Value'] = 'l'
+
+        chassis_id = args.get('<chassis_id>')
+
+        ds_options = mgr.get_dedicated_server_create_options(chassis_id)
+
+        show_all = True
+        for opt_name in cls.options:
+            if args.get("--" + opt_name):
+                show_all = False
+                break
+
+        if args['--all']:
+            show_all = True
+
+        if args['--datacenter'] or show_all:
+            results = cls.get_create_options(ds_options, 'datacenter')[0]
+
+            t.add_row([results[0], listing(sorted(results[1]))])
+
+        if args['--cpu'] or show_all:
+            results = cls.get_create_options(ds_options, 'cpu')
+
+            for result in results:
+                t.add_row([result[0], listing(
+                    item[0] for item in sorted(result[1],
+                                               key=lambda x: x[0]))])
+
+        if args['--memory'] or show_all:
+            results = cls.get_create_options(ds_options, 'memory')[0]
+
+            t.add_row([results[0], listing(
+                item[0] for item in sorted(results[1],
+                                           key=lambda x: int(x[0])))])
+
+        if args['--os'] or show_all:
+            results = cls.get_create_options(ds_options, 'os')
+
+            for result in results:
+                t.add_row([result[0], linesep.join(
+                    item[0] for item in sorted(result[1]))])
+
+        if args['--disk'] or show_all:
+            results = cls.get_create_options(ds_options, 'disk')[0]
+
+            t.add_row([results[0], linesep.join(
+                item[0] for item in sorted(results[1],
+                                           key=lambda x: x[0]))])
+
+        if args['--nic'] or show_all:
+            results = cls.get_create_options(ds_options, 'nic')
+
+            for result in results:
+                t.add_row([result[0], listing(
+                    item[0] for item in sorted(result[1],
+                                               key=lambda x: x[0]))])
+
+        if args['--bandwidth'] or show_all:
+            results = cls.get_create_options(ds_options, 'bandwidth')[0]
+
+            t.add_row([results[0], listing(
+                item[0] for item in sorted(results[1],
+                                           key=lambda x: x[0]))])
+
+        if args['--controller'] or show_all:
+            results = cls.get_create_options(ds_options, 'disk_controller')[0]
+
+            t.add_row([results[0], listing(
+                item[0] for item in sorted(results[1],
+                                           key=lambda x: x[0]))])
+
+        return t
+
+    @classmethod
+    def get_create_options(cls, ds_options, section, pretty=True):
+        """ This method can be used to parse the bare metal instance creation
+        options into different sections. This can be useful for data validation
+        as well as printing the options on a help screen.
+
+        :param dict ds_options: The instance options to parse. Must come from
+                                 the .get_bare_metal_create_options() function
+                                 in the HardwareManager.
+        :param string section: The section to parse out.
+        :param bool pretty: If true, it will return the results in a 'pretty'
+                            format that's easier to print.
+        """
+        if 'datacenter' == section:
+            datacenters = [loc['keyname']
+                           for loc in ds_options['locations']]
+            return [('datacenter', datacenters)]
+        elif 'cpu' == section:
+            results = []
+            cpu_regex = re.compile('\s(\w+)\s(\d+)\s+\-\s+([\d\.]+GHz)'
+                                   '\s+\(\w+\)\s+\-\s+(.+)$')
+
+            for item in ds_options['categories']['server']['items']:
+                cpu = cpu_regex.search(item['description'])
+                text = 'cpu: ' + cpu.group(1) + ' ' + cpu.group(2) + ' (' \
+                       + cpu.group(3) + ', ' + cpu.group(4) + ')'
+
+                if cpu:
+                    results.append((text, [(cpu.group(2), item['price_id'])]))
+
+            return results
+        elif 'memory' == section:
+            ram = []
+            for option in ds_options['categories']['ram']['items']:
+                ram.append((int(option['capacity']), option['price_id']))
+
+            return [('memory', ram)]
+        elif 'os' == section:
+            os_regex = re.compile('(^[A-Za-z\s\/\-]+) ([\d\.]+)')
+            bit_regex = re.compile(' \((\d+)\s*bit')
+            extra_regex = re.compile(' - (.+)\(')
+
+            # Encapsulate the code for generating the operating system code
+            def _generate_os_code(name, version, bits, extra_info):
+                name = name.replace(' Linux', '')
+                name = name.replace('Enterprise', '')
+                name = name.replace('GNU/Linux', '')
+
+                os_code = name.strip().replace(' ', '_').upper()
+
+                if os_code.startswith('RED_HAT'):
+                    os_code = 'REDHAT'
+
+                if 'UBUNTU' in os_code:
+                    version = re.sub('\.\d+', '', version)
+
+                os_code += '_' + version.replace('.0', '')
+
+                if bits:
+                    os_code += '_' + bits
+
+                if extra_info:
+                    garbage = ['Install', '(32 bit)', '(64 bit)']
+
+                    for g in garbage:
+                        extra_info = extra_info.replace(g, '')
+
+                    os_code += '_' + \
+                               extra_info.strip().replace(' ', '_').upper()
+
+                return os_code
+
+            # Also separate out the code for generating the Windows OS code
+            # since it's significantly different from the rest.
+            def _generate_windows_code(description):
+                version_check = re.search('Windows Server (\d+)', description)
+                version = version_check.group(1)
+
+                os_code = 'WIN_' + version
+
+                if 'Datacenter' in description:
+                    os_code += '-DC'
+                elif 'Enterprise' in description:
+                    os_code += '-ENT'
+                else:
+                    os_code += '-STD'
+
+                if 'ith R2' in description:
+                    os_code += '-R2'
+                elif 'ith Hyper-V' in description:
+                    os_code += '-HYPERV'
+
+                bit_check = re.search('\((\d+)\s*bit', description)
+                if bit_check:
+                    os_code += '_' + bit_check.group(1)
+
+                return os_code
+
+            # Loop through the operating systems and get their OS codes
+            os_list = {}
+            flat_list = []
+
+            for os in ds_options['categories']['os']['items']:
+                if 'Windows Server' in os['description']:
+                    os_code = _generate_windows_code(os['description'])
+                else:
+                    os_results = os_regex.search(os['description'])
+                    name = os_results.group(1)
+                    version = os_results.group(2)
+                    bits = bit_regex.search(os['description'])
+                    extra_info = extra_regex.search(os['description'])
+
+                    if bits:
+                        bits = bits.group(1)
+                    if extra_info:
+                        extra_info = extra_info.group(1)
+
+                    os_code = _generate_os_code(name, version, bits,
+                                                extra_info)
+
+                name = os_code.split('_')[0]
+
+                if name not in os_list:
+                    os_list[name] = []
+
+                os_list[name].append((os_code, os['price_id']))
+                flat_list.append((os_code, os['price_id']))
+
+            if pretty:
+                results = []
+                for os in sorted(os_list.keys()):
+                    results.append(('os (%s)' % os, os_list[os]))
+
+                return results
+            else:
+                return [('os', flat_list)]
+
+        elif 'disk' == section:
+            disks = []
+            type_regex = re.compile('^[\d\.]+[GT]B\s+(.+)$')
+            for disk in ds_options['categories']['disk0']['items']:
+                disk_type = 'SATA'
+                disk_type = type_regex.match(disk['description']).group(1)
+
+                disk_type = disk_type.replace('RPM', '').strip()
+                disk_type = disk_type.replace(' ', '_').upper()
+
+                #if 'SCSI' in disk['description']:
+                #    disk_type = 'SCSI'
+
+                disk_type = str(int(disk['capacity'])) + '_' + disk_type
+                disks.append((disk_type, disk['price_id']))
+
+            return [('disk(0)', disks)]
+        elif 'nic' == section:
+            single = []
+            dual = []
+
+            for item in ds_options['categories']['port_speed']['items']:
+                if 'dual' in item['description'].lower():
+                    dual.append((str(int(item['capacity'])) + '_DUAL',
+                                 item['price_id']))
+                else:
+                    single.append((int(item['capacity']), item['price_id']))
+
+            return [('single nic', single), ('dual nic', dual)]
+        elif 'bandwidth' == section:
+            options = []
+            for item in ds_options['categories']['bandwidth']['items']:
+                if item['capacity']:
+                    options.append((int(item['capacity']), item['price_id']))
+
+            return [('bandwidth', options)]
+        elif 'disk_controller' == section:
+            options = []
+            for item in ds_options['categories']['disk_controller']['items']:
+                text = item['description'].replace(' ', '')
+
+                if 'Non-RAID' == text:
+                    text = 'None'
+
+                options.append((text, item['price_id']))
+
+            return [('disk_controllers', options)]
+
+        return []
+
+
+class CreateHardware(CLIRunnable):
+    """
+usage: sl hardware create [options]
+
+Order/create a dedicated server. See 'sl hardware list-chassis' and
+'sl hardware create-options' for valid options
+
+Required:
+  -H --hostname=HOST  Host portion of the FQDN. example: server
+  -D --domain=DOMAIN  Domain portion of the FQDN example: example.com
+  --chassis=CHASSIS   The chassis to use for the new server
+  -c --cpu=CPU        Number of CPU cores
+  -o OS, --os=OS      OS install code.
+  -m --memory=MEMORY  Memory in mebibytes (n * 1024)
+
+                      NOTE: Due to hardware configurations, the CPU and memory
+                            must match appropriately. See create-options for
+                            options.
+
+
+Optional:
+  -d DC, --datacenter=DC   datacenter name
+                           Note: Omitting this value defaults to the first
+                             available datacenter
+  -n MBPS, --network=MBPS  Network port speed in Mbps
+  -b MBPS, --bandwith=MBPS Outbound bandwidth in Mbps
+  -d0, --disk0=SIZE        Specify the size of the first disk. Defaults to
+                             the lowest cost.
+  -d1, --disk1=SIZE        Size of the second disk.
+  -d2, --disk2=SIZE        Size of the third disk.
+  -d3, --disk3=SIZE        Size of the fourth disk.
+  --controller=RAID        The RAID configuration for the server.
+                             Defaults to None.
+  --dry-run, --test        Do not create the server, just get a quote
+"""
+    action = 'create'
+
+    @classmethod
+    def execute(cls, client, args):
+        mgr = HardwareManager(client)
+
+        ds_options = mgr.get_dedicated_server_create_options(args['--chassis'])
+
+        order = {
+            'hostname': args['--hostname'],
+            'domain': args['--domain'],
+            'bare_metal': False,
+            'package_id': args['--chassis'],
+        }
+
+        # Convert the OS code back into a price ID
+        os_price = cls._get_price_id_from_options(ds_options, 'os',
+                                                  args['--os'])
+
+        if os_price:
+            order['os'] = os_price
+        else:
+            raise CLIAbort('Invalid operating system specified.')
+
+        order['location'] = args['--datacenter'] or 'FIRST_AVAILABLE'
+        order['server'] = cls._get_price_id_from_options(ds_options, 'cpu',
+                                                         args['--cpu'])
+        order['ram'] = cls._get_price_id_from_options(ds_options, 'memory',
+                                                      int(args['--memory']))
+        # Set the disk sizes
+        has_disks = False
+        for key in args.keys():
+            if key != 'disk_controller' and key.startswith('--disk'):
+                disk_price = cls._get_price_id_from_options(ds_options, 'disk',
+                                                            args.get(key))
+
+                if disk_price:
+                    order[key.replace('--', '')] = disk_price
+                    has_disks = True
+
+        if not has_disks:
+            disk_price = cls._get_default_value(ds_options, 'disk0')
+
+        # Set the disk controller price
+        if args.get('--controller'):
+            dc_price = cls._get_price_id_from_options(ds_options,
+                                                      'disk_controller',
+                                                      args.get('--controller'))
+        else:
+            dc_price = cls._get_price_id_from_options(ds_options,
+                                                      'disk_controller',
+                                                      'None')
+
+        order['disk_controller'] = dc_price
+
+        # Set the port speed
+        port_speed = args.get('--network') or 10
+
+        nic_price = cls._get_price_id_from_options(ds_options, 'nic',
+                                                   port_speed)
+
+        if nic_price:
+            order['port_speed'] = nic_price
+        else:
+            raise CLIAbort('Invalid NIC speed specified.')
+
+        # Get the bandwidth limit and convert it to a price ID.
+        # Yes, these should be multiplied by 1000, not 1024.
+        if not args.get('--bandwidth'):
+            bw_price = cls._get_default_value(ds_options, 'bandwidth')
+        else:
+            try:
+                bandwidth = int(args.get('--bandwidth', 0))
+                if bandwidth < 1000:
+                    bandwidth = bandwidth * 1000
+            except ValueError:
+                unit = args['--bandwidth'][-1]
+                bandwidth = int(args['--bandwidth'][0:-1])
+                if unit in ['G', 'g']:
+                    bandwidth = bandwidth * 1000
+
+            bw_price = cls._get_price_id_from_options(ds_options, 'bandwidth',
+                                                      bandwidth)
+
+        if bw_price:
+            order['bandwidth'] = bw_price
+        else:
+            raise CLIAbort('Invalid bandwidth cap specified.')
+
+        # Now add in the other required values that the user did not specify.
+        # TODO - Does this need to be generic? What if stuff costs money?
+        order['pri_ip_addresses'] = cls._get_default_value(ds_options,
+                                                           'pri_ip_addresses')
+
+        order['monitoring'] = cls._get_default_value(ds_options, 'monitoring')
+        vuln_scanner = cls._get_default_value(ds_options,
+                                              'vulnerability_scanner')
+        order['vulnerability_scanner'] = vuln_scanner
+        order['response'] = cls._get_default_value(ds_options, 'response')
+        order['vpn_management'] = cls._get_default_value(ds_options,
+                                                         'vpn_management')
+        remote_mgmt = cls._get_default_value(ds_options, 'remote_management')
+        order['remote_management'] = remote_mgmt
+        order['notification'] = cls._get_default_value(ds_options,
+                                                       'notification')
+        order['lockbox'] = cls._get_default_value(ds_options, 'lockbox')
+
+        # Begin output
+        t = Table(['Item', 'cost'])
+        t.align['Item'] = 'r'
+        t.align['cost'] = 'r'
+
+        if args.get('--test'):
+            result = mgr.verify_order(**order)
+
+            total = 0.0
+            for price in result['prices']:
+                total += float(price.get('recurringFee', 0.0))
+                if args.get('--hourly'):
+                    rate = "%.2f" % float(price['hourlyRecurringFee'])
+                else:
+                    rate = "%.2f" % float(price['recurringFee'])
+
+                t.add_row([price['item']['description'], rate])
+
+            billing_rate = 'monthly'
+            if args.get('--hourly'):
+                billing_rate = 'hourly'
+            t.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
+            output = SequentialOutput(blanks=False)
+            output.append(t)
+            output.append(FormattedItem(
+                '',
+                ' -- ! Prices reflected here are retail and do not '
+                'take account level discounts and are not guarenteed.')
+            )
+        elif args['--really'] or confirm(
+                "This action will incur charges on your account. Continue?"):
+            result = mgr.place_order(**order)
+
+            t = Table(['name', 'value'])
+            t.align['name'] = 'r'
+            t.align['value'] = 'l'
+            t.add_row(['id', result['orderId']])
+            t.add_row(['created', result['orderDate']])
+            output = t
+        else:
+            raise CLIAbort('Aborting bare metal instance order.')
+
+        return output
+
+    @classmethod
+    def _get_default_value(cls, ds_options, option):
+        if ds_options['categories'].get(option):
+            for item in ds_options['categories'][option]['items']:
+                if not any([
+                        float(item['prices'][0].get('setupFee', 0)),
+                        float(item['prices'][0].get('recurringFee', 0)),
+                        float(item['prices'][0].get('hourlyRecurringFee', 0)),
+                        float(item['prices'][0].get('oneTimeFee', 0)),
+                        float(item['prices'][0].get('laborFee', 0)),
+                ]):
+                    return item['price_id']
+
+        return None
+
+    @classmethod
+    def _get_price_id_from_options(cls, ds_options, option, value):
+        ds_obj = HardwareCreateOptions()
+        price_id = None
+
+        for k, v in ds_obj.get_create_options(ds_options, option, False):
+            for item_options in v:
+                if item_options[0] == value:
+                    price_id = item_options[1]
+
+        return price_id
