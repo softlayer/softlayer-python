@@ -15,6 +15,8 @@ from mock import MagicMock, ANY, call, patch
 
 
 class HardwareTests(unittest.TestCase):
+
+    maxDiff = None
     
     def setUp(self):
         self.client = MagicMock()
@@ -231,7 +233,7 @@ class HardwareTests(unittest.TestCase):
             'ram': 1400,
             'disk_controller': 1500,
             'lockbox': 1600,
-            'other': 9999,
+            'nas': 9999,
         }
 
         assert_data = {
@@ -259,7 +261,7 @@ class HardwareTests(unittest.TestCase):
                 {'id': args['ram']},
                 {'id': args['disk_controller']},
                 {'id': args['lockbox']},
-                {'id': args['other']},
+                {'id': args['nas']},
             ],
         }
 

@@ -274,16 +274,28 @@ class HardwareManager(IdentifierMixin, object):
         }
 
     def _generate_create_dict(
-            self, server_core=None, hourly=True,
-            hostname=None, domain=None, disk0=None,
-            location=None, os=None, image_id=None,
-            pri_ip_addresses=None, bandwidth=None,
-            userdata=None, monitoring=None, port_speed=None,
-            vulnerability_scanner=None, response=None,
-            vpn_management=None, remote_management=None,
-            notification=None, bare_metal=True, database=None,
-            package_id=None, firewall=None, server=None, ram=None,
-            disk_controller=None, lockbox=None, **kwargs):
+            self, server=None, server_core=None, hostname=None, domain=None,
+            location=None, os=None, disk0=None, pri_ip_addresses=None,
+            bandwidth=None, port_speed=None, vulnerability_scanner=None,
+            response=None, vpn_management=None, remote_management=None,
+            notification=None, bare_metal=None, database=None, monitoring=None,
+            ram=None, package_id=None, firewall=None, disk_controller=None,
+            lockbox=None, **kwargs):
+
+        known_args = ['intrusion_protection', 'os_addon', 'plesk_billing',
+                      'control_panel', 'web_analytics', 'disk1', 'premium',
+                      'disk2', 'disk3', 'response', 'nas', 'cdp_backup',
+                      'static_ipv6_addresses', 'managed_resource',
+                      'evault_plugin', 'evault', 'virtuozzo', 'bc_insurance',
+                      'database', 'sec_ip_addresses', 'pri_ipv6_addresses',
+                      'av_spyware_protection', 'iscsi', 'monitoring_package',
+                      'disk8', 'disk9', 'disk4', 'disk5', 'disk6', 'disk7',
+                      'disk10', 'disk11', 'power_supply', 'disk12', 'disk13',
+                      'disk16', 'disk17', 'disk14', 'disk15', 'disk34',
+                      'disk35', 'disk18', 'disk19', 'disk30', 'disk32',
+                      'disk33', 'disk31', 'disk27', 'disk29', 'disk28',
+                      'disk23', 'disk22', 'disk21', 'disk20', 'disk26',
+                      'disk25', 'disk24', 'gpu0', 'gpu1']
 
         order = {
             'hardware': [{
@@ -351,10 +363,10 @@ class HardwareManager(IdentifierMixin, object):
         if lockbox:
             order['prices'].append({'id': int(lockbox)})
 
-        # TODO - This is not a good idea.
+        # This is a compromise to prevent a truly massive argument list.
         if kwargs:
             for key, price_id in kwargs.iteritems():
-                if price_id:
+                if key in known_args and price_id:
                     order['prices'].append({'id': int(price_id)})
                 
         return order
