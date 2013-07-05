@@ -620,10 +620,6 @@ Required:
   -o OS, --os=OS      OS install code.
   -m --memory=MEMORY  Memory in mebibytes (n * 1024)
 
-                      NOTE: Due to hardware configurations, the CPU and memory
-                            must match appropriately. See create-options for
-                            options.
-
 
 Optional:
   -d DC, --datacenter=DC   datacenter name
