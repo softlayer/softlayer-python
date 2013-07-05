@@ -22,7 +22,7 @@ import re
 from os import linesep
 from SoftLayer.CLI.helpers import (
     CLIRunnable, Table, FormattedItem, NestedDict, CLIAbort, blank, listing,
-    SequentialOutput, gb, no_going_back, resolve_id)
+    SequentialOutput, gb, no_going_back, resolve_id, confirm)
 from SoftLayer import HardwareManager
 
 
@@ -569,7 +569,7 @@ Options:
                 disk_type = str(int(disk['capacity'])) + '_' + disk_type
                 disks.append((disk_type, disk['price_id']))
 
-            return [('disk(0)', disks)]
+            return [('disk', disks)]
         elif 'nic' == section:
             single = []
             dual = []
@@ -606,7 +606,8 @@ Options:
 
 class CreateHardware(CLIRunnable):
     """
-usage: sl hardware create [options]
+usage: sl hardware create --hostname=HOST --domain=DOMAIN --cpu=CPU
+    --memory=MEMORY --os=OS --disk=SIZE... [options]
 
 Order/create a dedicated server. See 'sl hardware list-chassis' and
 'sl hardware create-options' for valid options
@@ -615,7 +616,7 @@ Required:
   -H --hostname=HOST  Host portion of the FQDN. example: server
   -D --domain=DOMAIN  Domain portion of the FQDN example: example.com
   --chassis=CHASSIS   The chassis to use for the new server
-  -c --cpu=CPU        Number of CPU cores
+  -c --cpu=CPU        CPU model
   -o OS, --os=OS      OS install code.
   -m --memory=MEMORY  Memory in mebibytes (n * 1024)
 
@@ -630,11 +631,6 @@ Optional:
                              available datacenter
   -n MBPS, --network=MBPS  Network port speed in Mbps
   -b MBPS, --bandwith=MBPS Outbound bandwidth in Mbps
-  -d0, --disk0=SIZE        Specify the size of the first disk. Defaults to
-                             the lowest cost.
-  -d1, --disk1=SIZE        Size of the second disk.
-  -d2, --disk2=SIZE        Size of the third disk.
-  -d3, --disk3=SIZE        Size of the fourth disk.
   --controller=RAID        The RAID configuration for the server.
                              Defaults to None.
   --dry-run, --test        Do not create the server, just get a quote
@@ -670,14 +666,15 @@ Optional:
                                                       int(args['--memory']))
         # Set the disk sizes
         has_disks = False
-        for key in args.keys():
-            if key != 'disk_controller' and key.startswith('--disk'):
-                disk_price = cls._get_price_id_from_options(ds_options, 'disk',
-                                                            args.get(key))
+        disk_count = 0
+        for disk in args.get('--disk'):
+            disk_price = cls._get_price_id_from_options(ds_options, 'disk',
+                                                        disk)
 
-                if disk_price:
-                    order[key.replace('--', '')] = disk_price
-                    has_disks = True
+            if disk_price:
+                order['disk' + str(disk_count)] = disk_price
+                disk_count += 1
+                has_disks = True
 
         if not has_disks:
             disk_price = cls._get_default_value(ds_options, 'disk0')
@@ -775,7 +772,7 @@ Optional:
                 ' -- ! Prices reflected here are retail and do not '
                 'take account level discounts and are not guarenteed.')
             )
-        elif args['--really'] or confirm(
+        elif args.get('--really') or confirm(
                 "This action will incur charges on your account. Continue?"):
             result = mgr.place_order(**order)
 
@@ -786,7 +783,7 @@ Optional:
             t.add_row(['created', result['orderDate']])
             output = t
         else:
-            raise CLIAbort('Aborting bare metal instance order.')
+            raise CLIAbort('Aborting dedicated server order.')
 
         return output
 
