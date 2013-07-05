@@ -401,8 +401,8 @@ Options:
                     item[0] for item in sorted(result[1],
                                                key=lambda x: x[0]))])
 
-        if (args['--gpus'] or show_all) \
-           and ds_options['categories'].get('gpu0'):
+        gpu_categories = ds_options['categories'].get('gpu0')
+        if (args['--gpus'] or show_all) and gpu_categories:
             results = cls.get_create_options(ds_options, 'gpus')
 
             for result in results:
@@ -710,7 +710,7 @@ Optional:
             gpu1_price = cls._get_price_id_from_options(ds_options, 'gpus',
                                                         args.get('--gpu1'))
             order['gpu1'] = gpu1_price
-            
+
         # Set the port speed
         port_speed = args.get('--network') or 10
 
@@ -769,7 +769,7 @@ Optional:
         if ps and ps['is_required']:
             order['power_supply'] = cls._get_default_value(ds_options,
                                                            'power_supply')
-        
+
         # Begin output
         t = Table(['Item', 'cost'])
         t.align['Item'] = 'r'
