@@ -607,7 +607,7 @@ Options:
 class CreateHardware(CLIRunnable):
     """
 usage: sl hardware create --hostname=HOST --domain=DOMAIN --cpu=CPU
-    --memory=MEMORY --os=OS --disk=SIZE... [options]
+    --chassis=CHASSIS --memory=MEMORY --os=OS --disk=SIZE... [options]
 
 Order/create a dedicated server. See 'sl hardware list-chassis' and
 'sl hardware create-options' for valid options
