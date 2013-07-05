@@ -306,7 +306,7 @@ Display a list of chassis available for ordering dedicated servers.
         t.align['Chassis'] = 'l'
 
         mgr = HardwareManager(client)
-        chassis = mgr.get_available_dedicated_server_chassis()
+        chassis = mgr.get_available_dedicated_server_packages()
 
         for chassis in chassis:
             t.add_row([chassis[0], chassis[1]])
@@ -329,13 +329,14 @@ Options:
   --disk        Show disk options
   --os          Show operating system options
   --memory      Show memory size options
+  --gpus        Show GPU options (if any)
   --bandwidth   Show bandwidth options
   --controller  Show disk controller options
 """
 
     action = 'create-options'
     options = ['datacenter', 'cpu', 'memory', 'os', 'disk', 'nic', 'bandwidth',
-               'controller']
+               'gpus', 'ps', 'controller']
 
     @classmethod
     def execute(cls, client, args):
@@ -400,6 +401,13 @@ Options:
                     item[0] for item in sorted(result[1],
                                                key=lambda x: x[0]))])
 
+        if (args['--gpus'] or show_all) \
+           and ds_options['categories'].get('gpu0'):
+            results = cls.get_create_options(ds_options, 'gpus')
+
+            for result in results:
+                t.add_row([result[0], listing(item[0] for item in result[1])])
+
         if args['--bandwidth'] or show_all:
             results = cls.get_create_options(ds_options, 'bandwidth')[0]
 
@@ -436,7 +444,7 @@ Options:
         elif 'cpu' == section:
             results = []
             cpu_regex = re.compile('\s(\w+)\s(\d+)\s+\-\s+([\d\.]+GHz)'
-                                   '\s+\(\w+\)\s+\-\s+(.+)$')
+                                   '\s+\([\w ]+\)\s+\-\s+(.+)$')
 
             for item in ds_options['categories']['server']['items']:
                 cpu = cpu_regex.search(item['description'])
@@ -562,10 +570,6 @@ Options:
 
                 disk_type = disk_type.replace('RPM', '').strip()
                 disk_type = disk_type.replace(' ', '_').upper()
-
-                #if 'SCSI' in disk['description']:
-                #    disk_type = 'SCSI'
-
                 disk_type = str(int(disk['capacity'])) + '_' + disk_type
                 disks.append((disk_type, disk['price_id']))
 
@@ -582,6 +586,14 @@ Options:
                     single.append((int(item['capacity']), item['price_id']))
 
             return [('single nic', single), ('dual nic', dual)]
+        elif 'gpus' == section:
+            results = []
+
+            for item in ds_options['categories']['gpu0']['items']:
+                text = 'gpu: ' + item['description']
+                results.append((text, [(str(item['id']), item['price_id'])]))
+
+            return results
         elif 'bandwidth' == section:
             options = []
             for item in ds_options['categories']['bandwidth']['items']:
@@ -626,7 +638,9 @@ Optional:
                            Note: Omitting this value defaults to the first
                              available datacenter
   -n MBPS, --network=MBPS  Network port speed in Mbps
-  -b MBPS, --bandwith=MBPS Outbound bandwidth in Mbps
+  -b MBPS, --bandwidth=MBPS Outbound bandwidth in Mbps
+  --gpu0=GPU               First GPU option for chassis that support them.
+  --gpu1=GPU               Second GPU option for chassis that support them.
   --controller=RAID        The RAID configuration for the server.
                              Defaults to None.
   --dry-run, --test        Do not create the server, just get a quote
@@ -687,6 +701,16 @@ Optional:
 
         order['disk_controller'] = dc_price
 
+        if args.get('--gpu0'):
+            gpu0_price = cls._get_price_id_from_options(ds_options, 'gpus',
+                                                        args.get('--gpu0'))
+            order['gpu0'] = gpu0_price
+
+        if args.get('--gpu1'):
+            gpu1_price = cls._get_price_id_from_options(ds_options, 'gpus',
+                                                        args.get('--gpu1'))
+            order['gpu1'] = gpu1_price
+            
         # Set the port speed
         port_speed = args.get('--network') or 10
 
@@ -739,6 +763,13 @@ Optional:
                                                        'notification')
         order['lockbox'] = cls._get_default_value(ds_options, 'lockbox')
 
+        # Add in additional required values for this chassis.
+        ps = ds_options['categories'].get('power_supply')
+
+        if ps and ps['is_required']:
+            order['power_supply'] = cls._get_default_value(ds_options,
+                                                           'power_supply')
+        
         # Begin output
         t = Table(['Item', 'cost'])
         t.align['Item'] = 'r'
