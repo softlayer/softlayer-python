@@ -586,7 +586,7 @@ Options:
 
 class CreateHardware(CLIRunnable):
     """
-usage: sl hardware create --hostname=HOST --domain=DOMAIN --cpu=CPU
+usage: sl hardware create --hostname=HOST --domain=DOMAIN --cpu=CPU 
     --chassis=CHASSIS --memory=MEMORY --os=OS --disk=SIZE... [options]
 
 Order/create a dedicated server. See 'sl hardware list-chassis' and
@@ -649,8 +649,10 @@ Optional:
                 disk_prices.append(disk_price)
 
         if not disk_prices:
-            disk_price = cls._get_default_value(ds_options, 'disk0')
+            disk_prices.append(cls._get_default_value(ds_options, 'disk0'))
 
+        order['disks'] = disk_prices
+            
         # Set the disk controller price
         if args.get('--controller'):
             dc_price = cls._get_price_id_from_options(ds_options,

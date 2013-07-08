@@ -346,7 +346,9 @@ Optional:
                 disk_prices.append(disk_price)
 
         if not disk_prices:
-            disk_price = cls._get_default_value(bmi_options, 'disk0')
+            disk_prices.append(cls._get_default_value(bmi_options, 'disk0'))
+
+        order['disks'] = disk_prices
 
         # Set the port speed
         port_speed = args.get('--network') or 10
@@ -399,7 +401,6 @@ Optional:
                 "This action will incur charges on your account. Continue?"):
             result = mgr.place_order(**order)
 
-            print result
             t = Table(['name', 'value'])
             t.align['name'] = 'r'
             t.align['value'] = 'l'
