@@ -225,7 +225,7 @@ class HardwareTests(unittest.TestCase):
                 {'id': args['disks'][0]},
                 {'id': args['os']},
                 {'id': args['port_speed']},
-                {'id': prices[0]['price_id']},
+                {'id': prices[0]['id']},
             ],
         }
 
