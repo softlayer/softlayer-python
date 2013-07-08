@@ -329,14 +329,11 @@ Options:
   --disk        Show disk options
   --os          Show operating system options
   --memory      Show memory size options
-  --gpus        Show GPU options (if any)
-  --bandwidth   Show bandwidth options
   --controller  Show disk controller options
 """
 
     action = 'create-options'
-    options = ['datacenter', 'cpu', 'memory', 'os', 'disk', 'nic', 'bandwidth',
-               'gpus', 'ps', 'controller']
+    options = ['datacenter', 'cpu', 'memory', 'os', 'disk', 'nic', 'controller']
 
     @classmethod
     def execute(cls, client, args):
@@ -400,20 +397,6 @@ Options:
                 t.add_row([result[0], listing(
                     item[0] for item in sorted(result[1],
                                                key=lambda x: x[0]))])
-
-        gpu_categories = ds_options['categories'].get('gpu0')
-        if (args['--gpus'] or show_all) and gpu_categories:
-            results = cls.get_create_options(ds_options, 'gpus')
-
-            for result in results:
-                t.add_row([result[0], listing(item[0] for item in result[1])])
-
-        if args['--bandwidth'] or show_all:
-            results = cls.get_create_options(ds_options, 'bandwidth')[0]
-
-            t.add_row([results[0], listing(
-                item[0] for item in sorted(results[1],
-                                           key=lambda x: x[0]))])
 
         if args['--controller'] or show_all:
             results = cls.get_create_options(ds_options, 'disk_controller')[0]
@@ -586,21 +569,6 @@ Options:
                     single.append((int(item['capacity']), item['price_id']))
 
             return [('single nic', single), ('dual nic', dual)]
-        elif 'gpus' == section:
-            results = []
-
-            for item in ds_options['categories']['gpu0']['items']:
-                text = 'gpu: ' + item['description']
-                results.append((text, [(str(item['id']), item['price_id'])]))
-
-            return results
-        elif 'bandwidth' == section:
-            options = []
-            for item in ds_options['categories']['bandwidth']['items']:
-                if item['capacity']:
-                    options.append((int(item['capacity']), item['price_id']))
-
-            return [('bandwidth', options)]
         elif 'disk_controller' == section:
             options = []
             for item in ds_options['categories']['disk_controller']['items']:
@@ -638,9 +606,6 @@ Optional:
                            Note: Omitting this value defaults to the first
                              available datacenter
   -n MBPS, --network=MBPS  Network port speed in Mbps
-  -b MBPS, --bandwidth=MBPS Outbound bandwidth in Mbps
-  --gpu0=GPU               First GPU option for chassis that support them.
-  --gpu1=GPU               Second GPU option for chassis that support them.
   --controller=RAID        The RAID configuration for the server.
                              Defaults to None.
   --dry-run, --test        Do not create the server, just get a quote
@@ -675,18 +640,15 @@ Optional:
         order['ram'] = cls._get_price_id_from_options(ds_options, 'memory',
                                                       int(args['--memory']))
         # Set the disk sizes
-        has_disks = False
-        disk_count = 0
+        disk_prices = []
         for disk in args.get('--disk'):
             disk_price = cls._get_price_id_from_options(ds_options, 'disk',
                                                         disk)
 
             if disk_price:
-                order['disk' + str(disk_count)] = disk_price
-                disk_count += 1
-                has_disks = True
+                disk_prices.append(disk_price)
 
-        if not has_disks:
+        if not disk_prices:
             disk_price = cls._get_default_value(ds_options, 'disk0')
 
         # Set the disk controller price
@@ -701,16 +663,6 @@ Optional:
 
         order['disk_controller'] = dc_price
 
-        if args.get('--gpu0'):
-            gpu0_price = cls._get_price_id_from_options(ds_options, 'gpus',
-                                                        args.get('--gpu0'))
-            order['gpu0'] = gpu0_price
-
-        if args.get('--gpu1'):
-            gpu1_price = cls._get_price_id_from_options(ds_options, 'gpus',
-                                                        args.get('--gpu1'))
-            order['gpu1'] = gpu1_price
-
         # Set the port speed
         port_speed = args.get('--network') or 10
 
@@ -721,54 +673,6 @@ Optional:
             order['port_speed'] = nic_price
         else:
             raise CLIAbort('Invalid NIC speed specified.')
-
-        # Get the bandwidth limit and convert it to a price ID.
-        # Yes, these should be multiplied by 1000, not 1024.
-        if not args.get('--bandwidth'):
-            bw_price = cls._get_default_value(ds_options, 'bandwidth')
-        else:
-            try:
-                bandwidth = int(args.get('--bandwidth', 0))
-                if bandwidth < 1000:
-                    bandwidth = bandwidth * 1000
-            except ValueError:
-                unit = args['--bandwidth'][-1]
-                bandwidth = int(args['--bandwidth'][0:-1])
-                if unit in ['G', 'g']:
-                    bandwidth = bandwidth * 1000
-
-            bw_price = cls._get_price_id_from_options(ds_options, 'bandwidth',
-                                                      bandwidth)
-
-        if bw_price:
-            order['bandwidth'] = bw_price
-        else:
-            raise CLIAbort('Invalid bandwidth cap specified.')
-
-        # Now add in the other required values that the user did not specify.
-        # TODO - Does this need to be generic? What if stuff costs money?
-        order['pri_ip_addresses'] = cls._get_default_value(ds_options,
-                                                           'pri_ip_addresses')
-
-        order['monitoring'] = cls._get_default_value(ds_options, 'monitoring')
-        vuln_scanner = cls._get_default_value(ds_options,
-                                              'vulnerability_scanner')
-        order['vulnerability_scanner'] = vuln_scanner
-        order['response'] = cls._get_default_value(ds_options, 'response')
-        order['vpn_management'] = cls._get_default_value(ds_options,
-                                                         'vpn_management')
-        remote_mgmt = cls._get_default_value(ds_options, 'remote_management')
-        order['remote_management'] = remote_mgmt
-        order['notification'] = cls._get_default_value(ds_options,
-                                                       'notification')
-        order['lockbox'] = cls._get_default_value(ds_options, 'lockbox')
-
-        # Add in additional required values for this chassis.
-        ps = ds_options['categories'].get('power_supply')
-
-        if ps and ps['is_required']:
-            order['power_supply'] = cls._get_default_value(ds_options,
-                                                           'power_supply')
 
         # Begin output
         t = Table(['Item', 'cost'])

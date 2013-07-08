@@ -275,29 +275,14 @@ class HardwareManager(IdentifierMixin, object):
         }
 
     def _generate_create_dict(
-            self, server=None, server_core=None, hostname=None, domain=None,
-            location=None, os=None, disk0=None, pri_ip_addresses=None,
-            bandwidth=None, port_speed=None, vulnerability_scanner=None,
-            response=None, vpn_management=None, remote_management=None,
-            notification=None, bare_metal=None, database=None, monitoring=None,
-            ram=None, package_id=None, firewall=None, disk_controller=None,
-            lockbox=None, **kwargs):
+            self, server=None, hostname=None, domain=None, hourly=False,
+            location=None, os=None, disks=None, port_speed=None,
+            bare_metal=None, ram=None, package_id=None, disk_controller=None):
 
-        known_args = ['intrusion_protection', 'os_addon', 'plesk_billing',
-                      'control_panel', 'web_analytics', 'disk1', 'premium',
-                      'disk2', 'disk3', 'response', 'nas', 'cdp_backup',
-                      'static_ipv6_addresses', 'managed_resource',
-                      'evault_plugin', 'evault', 'virtuozzo', 'bc_insurance',
-                      'database', 'sec_ip_addresses', 'pri_ipv6_addresses',
-                      'av_spyware_protection', 'iscsi', 'monitoring_package',
-                      'disk8', 'disk9', 'disk4', 'disk5', 'disk6', 'disk7',
-                      'disk10', 'disk11', 'power_supply', 'disk12', 'disk13',
-                      'disk16', 'disk17', 'disk14', 'disk15', 'disk34',
-                      'disk35', 'disk18', 'disk19', 'disk30', 'disk32',
-                      'disk33', 'disk31', 'disk27', 'disk29', 'disk28',
-                      'disk23', 'disk22', 'disk21', 'disk20', 'disk26',
-                      'disk25', 'disk24', 'gpu0', 'gpu1']
-
+        arguments = ['server', 'hostname', 'domain', 'location', 'os', 'disks',
+                     'port_speed', 'bare_metal', 'ram', 'package_id',
+                     'disk_controller', 'server_core']
+        
         order = {
             'hardware': [{
                 'bareMetalInstanceFlag': bare_metal,
@@ -311,49 +296,24 @@ class HardwareManager(IdentifierMixin, object):
 
         if bare_metal:
             order['packageId'] = self._get_bare_metal_package_id()
+            order['prices'].append({'id': int(server)})
+            p_options = self.get_bare_metal_create_options()
+            if hourly:
+                order['hourlyBillingFlag'] = True
         else:
             order['packageId'] = package_id
-
-        if server_core:
-            order['prices'].append({'id': int(server_core)})
-        elif server:
             order['prices'].append({'id': int(server)})
+            p_options = self.get_dedicated_server_create_options(package_id)
 
-        if disk0:
-            order['prices'].append({'id': int(disk0)})
+        if disks:
+            for disk in disks:
+                order['prices'].append({'id': int(disk)})
 
         if os:
             order['prices'].append({'id': int(os)})
 
-        if pri_ip_addresses:
-            order['prices'].append({'id': int(pri_ip_addresses)})
-
-        if bandwidth:
-            order['prices'].append({'id': int(bandwidth)})
-
-        if monitoring:
-            order['prices'].append({'id': int(monitoring)})
-
         if port_speed:
             order['prices'].append({'id': int(port_speed)})
-
-        if vulnerability_scanner:
-            order['prices'].append({'id': int(vulnerability_scanner)})
-
-        if response:
-            order['prices'].append({'id': int(response)})
-
-        if vpn_management:
-            order['prices'].append({'id': int(vpn_management)})
-
-        if remote_management:
-            order['prices'].append({'id': int(remote_management)})
-
-        if notification:
-            order['prices'].append({'id': int(notification)})
-
-        if firewall:
-            order['prices'].append({'id': int(firewall)})
 
         if ram:
             order['prices'].append({'id': int(ram)})
@@ -361,14 +321,15 @@ class HardwareManager(IdentifierMixin, object):
         if disk_controller:
             order['prices'].append({'id': int(disk_controller)})
 
-        if lockbox:
-            order['prices'].append({'id': int(lockbox)})
+        # Find all remaining required categories so we can auto-default them
+        required_fields = []
+        for category, data in p_options['categories'].iteritems():
+            if data.get('is_required') and category not in arguments:
+                required_fields.append(category)
 
-        # This is a compromise to prevent a truly massive argument list.
-        if kwargs:
-            for key, price_id in kwargs.iteritems():
-                if key in known_args and price_id:
-                    order['prices'].append({'id': int(price_id)})
+        for category in required_fields:
+            price = self._get_default_value(p_options, category)
+            order['prices'].append({'id': price})
 
         return order
 
@@ -384,6 +345,20 @@ class HardwareManager(IdentifierMixin, object):
                 break
 
         return hw_id
+
+    def _get_default_value(self, package_options, category):
+        if package_options['categories'].get(category):
+            for item in package_options['categories'][category]['items']:
+                if not any([
+                        float(item['prices'][0].get('setupFee', 0)),
+                        float(item['prices'][0].get('recurringFee', 0)),
+                        float(item['prices'][0].get('hourlyRecurringFee', 0)),
+                        float(item['prices'][0].get('oneTimeFee', 0)),
+                        float(item['prices'][0].get('laborFee', 0)),
+                ]):
+                    return item['price_id']
+
+        return None
 
     def _get_ids_from_hostname(self, hostname):
         results = self.list_hardware(hostname=hostname, mask="id")
