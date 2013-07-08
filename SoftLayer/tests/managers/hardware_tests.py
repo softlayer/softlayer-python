@@ -151,8 +151,52 @@ class HardwareTests(unittest.TestCase):
     def test_generate_create_dict_with_all_bare_metal_options(self):
         package_id = 50
 
+        prices = [{
+            'id': 888,
+            'price_id': 1888,
+            'sort': 0,
+            'setupFee': 0,
+            'recurringFee': 0,
+            'hourlyRecurringFee': 0,
+            'oneTimeFee': 0,
+            'laborFee': 0,
+        }]
+        
         self.client['Product_Package'].getAllObjects.return_value = [
             {'name': 'Bare Metal Instance', 'id': package_id}]
+
+        self.client['Product_Package'].getRegions.return_value = [{
+            'location': {
+                'locationPackageDetails': [{
+                    'deliveryTimeInformation': 'Typically 2-4 hours',
+                }],
+            },
+            'keyname': 'RANDOM_LOCATION',
+            'description': 'Random unit testing location',
+        }]
+
+        self.client['Product_Package'].getConfiguration.return_value = [{
+            'itemCategory': {
+                'categoryCode': 'random',
+                'name': 'Random Category',
+            },
+            'sort': 0,
+            'orderStepId': 1,
+            'isRequired': 1,
+            'prices': prices,
+        }]
+
+        self.client['Product_Package'].getItems.return_value = [{
+            'itemCategory': {
+                'categoryCode': 'random',
+                'name': 'Random Category',
+            },
+            'id': 1000,
+            'description': 'Astronaut Sloths',
+            'prices': prices,
+            'capacity': 0,
+            'isRequired': 1,
+        }]
 
         args = {
             'server': 100,
@@ -164,6 +208,7 @@ class HardwareTests(unittest.TestCase):
             'os': 200,
             'port_speed': 600,
             'bare_metal': True,
+            'hourly': True,
         }
 
         assert_data = {
@@ -174,11 +219,13 @@ class HardwareTests(unittest.TestCase):
             }],
             'location': args['location'],
             'packageId': package_id,
+            'hourlyBillingFlag': True,
             'prices': [
                 {'id': args['server']},
                 {'id': args['disks'][0]},
                 {'id': args['os']},
                 {'id': args['port_speed']},
+                {'id': prices[0]['price_id']},
             ],
         }
 
