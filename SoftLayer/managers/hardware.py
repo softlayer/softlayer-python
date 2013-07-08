@@ -281,7 +281,7 @@ class HardwareManager(IdentifierMixin, object):
 
         arguments = ['server', 'hostname', 'domain', 'location', 'os', 'disks',
                      'port_speed', 'bare_metal', 'ram', 'package_id',
-                     'disk_controller', 'server_core']
+                     'disk_controller', 'server_core', 'disk0']
         
         order = {
             'hardware': [{
