@@ -717,18 +717,18 @@ Optional:
 
     @classmethod
     def _get_default_value(cls, ds_options, option):
-        if ds_options['categories'].get(option):
-            for item in ds_options['categories'][option]['items']:
-                if not any([
-                        float(item['prices'][0].get('setupFee', 0)),
-                        float(item['prices'][0].get('recurringFee', 0)),
-                        float(item['prices'][0].get('hourlyRecurringFee', 0)),
-                        float(item['prices'][0].get('oneTimeFee', 0)),
-                        float(item['prices'][0].get('laborFee', 0)),
-                ]):
-                    return item['price_id']
-
-        return None
+        if option not in ds_options['categories']:
+            return
+            
+        for item in ds_options['categories'][option]['items']:
+            if not any([
+                    float(item['prices'][0].get('setupFee', 0)),
+                    float(item['prices'][0].get('recurringFee', 0)),
+                    float(item['prices'][0].get('hourlyRecurringFee', 0)),
+                    float(item['prices'][0].get('oneTimeFee', 0)),
+                    float(item['prices'][0].get('laborFee', 0)),
+            ]):
+                return item['price_id']
 
     @classmethod
     def _get_price_id_from_options(cls, ds_options, option, value):

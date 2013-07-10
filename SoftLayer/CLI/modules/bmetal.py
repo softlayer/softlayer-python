@@ -429,18 +429,18 @@ Optional:
 
     @classmethod
     def _get_default_value(cls, bmi_options, option):
-        if bmi_options['categories'].get(option):
-            for item in bmi_options['categories'][option]['items']:
-                if not any([
-                        float(item['prices'][0].get('setupFee', 0)),
-                        float(item['prices'][0].get('recurringFee', 0)),
-                        float(item['prices'][0].get('hourlyRecurringFee', 0)),
-                        float(item['prices'][0].get('oneTimeFee', 0)),
-                        float(item['prices'][0].get('laborFee', 0)),
-                ]):
-                    return item['price_id']
+        if option not in bmi_options['categories']:
+            return
 
-        return None
+        for item in bmi_options['categories'][option]['items']:
+            if not any([
+                    float(item['prices'][0].get('setupFee', 0)),
+                    float(item['prices'][0].get('recurringFee', 0)),
+                    float(item['prices'][0].get('hourlyRecurringFee', 0)),
+                    float(item['prices'][0].get('oneTimeFee', 0)),
+                    float(item['prices'][0].get('laborFee', 0)),
+            ]):
+                return item['price_id']
 
     @classmethod
     def _get_price_id_from_options(cls, bmi_options, option, value):

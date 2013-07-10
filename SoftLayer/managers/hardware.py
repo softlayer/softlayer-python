@@ -347,18 +347,18 @@ class HardwareManager(IdentifierMixin, object):
         return hw_id
 
     def _get_default_value(self, package_options, category):
-        if package_options['categories'].get(category):
-            for item in package_options['categories'][category]['items']:
-                if not any([
-                        float(item['prices'][0].get('setupFee', 0)),
-                        float(item['prices'][0].get('recurringFee', 0)),
-                        float(item['prices'][0].get('hourlyRecurringFee', 0)),
-                        float(item['prices'][0].get('oneTimeFee', 0)),
-                        float(item['prices'][0].get('laborFee', 0)),
-                ]):
-                    return item['price_id']
-
-        return None
+        if category not in package_options['categories']:
+            return
+            
+        for item in package_options['categories'][category]['items']:
+            if not any([
+                    float(item['prices'][0].get('setupFee', 0)),
+                    float(item['prices'][0].get('recurringFee', 0)),
+                    float(item['prices'][0].get('hourlyRecurringFee', 0)),
+                    float(item['prices'][0].get('oneTimeFee', 0)),
+                    float(item['prices'][0].get('laborFee', 0)),
+            ]):
+                return item['price_id']
 
     def _get_ids_from_hostname(self, hostname):
         results = self.list_hardware(hostname=hostname, mask="id")
@@ -432,7 +432,7 @@ class HardwareManager(IdentifierMixin, object):
                 'price_id': item['prices'][0]['id'],
                 'recurring_fee': float(item['prices'][0].get('recurringFee',
                                                              0)),
-                'capacity': float(item.get('capacity') or 0),
+                'capacity': float(item.get('capacity', 0)),
             })
 
         return results
