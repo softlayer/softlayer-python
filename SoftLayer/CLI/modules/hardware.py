@@ -364,17 +364,15 @@ Options:
         if args['--cpu'] or show_all:
             results = cls.get_create_options(ds_options, 'cpu')
 
-            for result in results:
+            for result in sorted(results):
                 t.add_row([result[0], listing(
-                    item[0] for item in sorted(result[1],
-                                               key=lambda x: x[0]))])
+                    item[0] for item in sorted(result[1]))])
 
         if args['--memory'] or show_all:
             results = cls.get_create_options(ds_options, 'memory')[0]
 
             t.add_row([results[0], listing(
-                item[0] for item in sorted(results[1],
-                                           key=lambda x: int(x[0])))])
+                item[0] for item in sorted(results[1]))])
 
         if args['--os'] or show_all:
             results = cls.get_create_options(ds_options, 'os')
@@ -387,23 +385,20 @@ Options:
             results = cls.get_create_options(ds_options, 'disk')[0]
 
             t.add_row([results[0], linesep.join(
-                item[0] for item in sorted(results[1],
-                                           key=lambda x: x[0]))])
+                item[0] for item in sorted(results[1],))])
 
         if args['--nic'] or show_all:
             results = cls.get_create_options(ds_options, 'nic')
 
             for result in results:
                 t.add_row([result[0], listing(
-                    item[0] for item in sorted(result[1],
-                                               key=lambda x: x[0]))])
+                    item[0] for item in sorted(result[1],))])
 
         if args['--controller'] or show_all:
             results = cls.get_create_options(ds_options, 'disk_controller')[0]
 
             t.add_row([results[0], listing(
-                item[0] for item in sorted(results[1],
-                                           key=lambda x: x[0]))])
+                item[0] for item in sorted(results[1],))])
 
         return t
 

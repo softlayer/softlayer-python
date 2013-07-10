@@ -95,16 +95,14 @@ Options:
             results = cls.get_create_options(bmi_options, 'disk')[0]
 
             t.add_row([results[0], listing(
-                item[0] for item in sorted(results[1],
-                                           key=lambda x: int(x[0])))])
+                item[0] for item in sorted(results[1]))])
 
         if args['--nic'] or show_all:
             results = cls.get_create_options(bmi_options, 'nic')
 
             for result in results:
                 t.add_row([result[0], listing(
-                    item[0] for item in sorted(result[1],
-                                               key=lambda x: x[0]))])
+                    item[0] for item in sorted(result[1],))])
 
         return t
 
@@ -257,10 +255,10 @@ Options:
 
             for item in bmi_options['categories']['port_speed']['items']:
                 if 'dual' in item['description'].lower():
-                    dual.append((str(item['capacity']) + '_DUAL',
+                    dual.append((str(int(item['capacity'])) + '_DUAL',
                                  item['price_id']))
                 else:
-                    single.append((item['capacity'], item['price_id']))
+                    single.append((int(item['capacity']), item['price_id']))
 
             return [('single nic', single), ('dual nic', dual)]
 
