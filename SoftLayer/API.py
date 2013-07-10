@@ -141,6 +141,7 @@ class Client(object):
             security_question_id,
             security_question_answer)
         self.auth = TokenAuthentication(res['userId'], res['hash'])
+        return (res['userId'], res['hash'])
 
     def add_raw_header(self, name, value):
         """ Set HTTP headers for API calls.
