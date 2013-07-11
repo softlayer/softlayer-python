@@ -38,7 +38,7 @@ class BMetalCreateOptions(CLIRunnable):
     """
 usage: sl bmetal create-options [options]
 
-Output available available options when creating a server
+Output available available options when creating a bare metal instance.
 
 Options:
   --all         Show all options. default if no other option provided
@@ -48,10 +48,9 @@ Options:
   --disk        Show disk options
   --os          Show operating system options
   --memory      Show memory size options
-  --bandwidth   Show bandwidth options
 """
     action = 'create-options'
-    options = ['datacenter', 'cpu', 'memory', 'os', 'disk', 'nic', 'bandwidth']
+    options = ['datacenter', 'cpu', 'memory', 'os', 'disk', 'nic']
 
     @classmethod
     def execute(cls, client, args):
@@ -96,23 +95,14 @@ Options:
             results = cls.get_create_options(bmi_options, 'disk')[0]
 
             t.add_row([results[0], listing(
-                item[0] for item in sorted(results[1],
-                                           key=lambda x: int(x[0])))])
+                item[0] for item in sorted(results[1]))])
 
         if args['--nic'] or show_all:
             results = cls.get_create_options(bmi_options, 'nic')
 
             for result in results:
                 t.add_row([result[0], listing(
-                    item[0] for item in sorted(result[1],
-                                               key=lambda x: x[0]))])
-
-        if args['--bandwidth'] or show_all:
-            results = cls.get_create_options(bmi_options, 'bandwidth')[0]
-
-            t.add_row([results[0], listing(
-                item[0] for item in sorted(results[1],
-                                           key=lambda x: x[0]))])
+                    item[0] for item in sorted(result[1],))])
 
         return t
 
@@ -256,35 +246,28 @@ Options:
         elif 'disk' == section:
             disks = []
             for disk in bmi_options['categories']['disk0']['items']:
-                disks.append((disk['capacity'], disk['price_id']))
+                disks.append((int(disk['capacity']), disk['price_id']))
 
-            return [('disk(0)', disks)]
+            return [('disks', disks)]
         elif 'nic' == section:
             single = []
             dual = []
 
             for item in bmi_options['categories']['port_speed']['items']:
                 if 'dual' in item['description'].lower():
-                    dual.append((str(item['capacity']) + '_DUAL',
+                    dual.append((str(int(item['capacity'])) + '_DUAL',
                                  item['price_id']))
                 else:
-                    single.append((item['capacity'], item['price_id']))
+                    single.append((int(item['capacity']), item['price_id']))
 
             return [('single nic', single), ('dual nic', dual)]
-        elif 'bandwidth' == section:
-            options = []
-            for item in bmi_options['categories']['bandwidth']['items']:
-                if item['capacity']:
-                    options.append((item['capacity'], item['price_id']))
-
-            return [('bandwidth', options)]
 
         return []
 
 
 class CreateBMetalInstance(CLIRunnable):
     """
-usage: sl bmetal create --hostname=HOST --domain=DOMAIN --cpu=CPU
+usage: sl bmetal create --hostname=HOST --domain=DOMAIN --cpu=CPU --disk=DISK...
                        --memory=MEMORY --os=OS (--hourly | --monthly) [options]
 
 Order/create a bare metal instance. See 'sl bmetal create-options' for valid
@@ -311,11 +294,7 @@ Optional:
                            Note: Omitting this value defaults to the first
                              available datacenter
   -n MBPS, --network=MBPS  Network port speed in Mbps
-  -b MBPS, --bandwith=MBPS Outbound bandwidth in Mbps
-  --dry-run, --test        Do not create CCI, just get a quote
-
-  --wait=SECONDS           Block until CCI is finished provisioning for up to X
-                             seconds before returning.
+  --dry-run, --test        Do not create the instance, just get a quote
 """
     action = 'create'
     options = ['confirm']
@@ -338,7 +317,7 @@ Optional:
                                                         args['--memory'])
 
         if server_core:
-            order['server_core'] = server_core
+            order['server'] = server_core
         else:
             raise CLIAbort('Invalid CPU/memory combination specified.')
 
@@ -356,16 +335,18 @@ Optional:
         order['location'] = args['--datacenter'] or 'FIRST_AVAILABLE'
 
         # Set the disk size
-        if args.get('--disk'):
+        disk_prices = []
+        for disk in args.get('--disk'):
             disk_price = cls._get_price_id_from_options(bmi_options, 'disk',
-                                                        args.get('--disk'))
-        else:
-            disk_price = cls._get_default_value(bmi_options, 'disk0')
+                                                        disk)
 
-        if disk_price:
-            order['disk0'] = disk_price
-        else:
-            raise CLIAbort('Invalid disk size specified.')
+            if disk_price:
+                disk_prices.append(disk_price)
+
+        if not disk_prices:
+            disk_prices.append(cls._get_default_value(bmi_options, 'disk0'))
+
+        order['disks'] = disk_prices
 
         # Set the port speed
         port_speed = args.get('--network') or 10
@@ -377,45 +358,6 @@ Optional:
             order['port_speed'] = nic_price
         else:
             raise CLIAbort('Invalid NIC speed specified.')
-
-        # Get the bandwidth limit and convert it to a price ID.
-        # Yes, these should be multiplied by 1000, not 1024.
-        if not args.get('--bandwidth'):
-            bw_price = cls._get_default_value(bmi_options, 'bandwidth')
-        else:
-            try:
-                bandwidth = int(args.get('--bandwidth', 0))
-                if bandwidth < 1000:
-                    bandwidth = bandwidth * 1000
-            except ValueError:
-                unit = args['--bandwidth'][-1]
-                bandwidth = int(args['--bandwidth'][0:-1])
-                if unit in ['G', 'g']:
-                    bandwidth = bandwidth * 1000
-
-            bw_price = cls._get_price_id_from_options(bmi_options, 'bandwidth',
-                                                      bandwidth)
-
-        if bw_price:
-            order['bandwidth'] = bw_price
-        else:
-            raise CLIAbort('Invalid bandwidth cap specified.')
-
-        # Now add in the other required values that the user did not specify.
-        order['pri_ip_addresses'] = cls._get_default_value(bmi_options,
-                                                           'pri_ip_addresses')
-
-        order['monitoring'] = cls._get_default_value(bmi_options, 'monitoring')
-        vuln_scanner = cls._get_default_value(bmi_options,
-                                              'vulnerability_scanner')
-        order['vulnerability_scanner'] = vuln_scanner
-        order['response'] = cls._get_default_value(bmi_options, 'response')
-        order['vpn_management'] = cls._get_default_value(bmi_options,
-                                                         'vpn_management')
-        remote_mgmt = cls._get_default_value(bmi_options, 'remote_management')
-        order['remote_management'] = remote_mgmt
-        order['notification'] = cls._get_default_value(bmi_options,
-                                                       'notification')
 
         # Begin output
         t = Table(['Item', 'cost'])
@@ -457,7 +399,6 @@ Optional:
                 "This action will incur charges on your account. Continue?"):
             result = mgr.place_order(**order)
 
-            print result
             t = Table(['name', 'value'])
             t.align['name'] = 'r'
             t.align['value'] = 'l'
@@ -488,18 +429,18 @@ Optional:
 
     @classmethod
     def _get_default_value(cls, bmi_options, option):
-        if bmi_options['categories'].get(option):
-            for item in bmi_options['categories'][option]['items']:
-                if not any([
-                        float(item['prices'][0].get('setupFee', 0)),
-                        float(item['prices'][0].get('recurringFee', 0)),
-                        float(item['prices'][0].get('hourlyRecurringFee', 0)),
-                        float(item['prices'][0].get('oneTimeFee', 0)),
-                        float(item['prices'][0].get('laborFee', 0)),
-                ]):
-                    return item['price_id']
+        if option not in bmi_options['categories']:
+            return
 
-        return None
+        for item in bmi_options['categories'][option]['items']:
+            if not any([
+                    float(item['prices'][0].get('setupFee', 0)),
+                    float(item['prices'][0].get('recurringFee', 0)),
+                    float(item['prices'][0].get('hourlyRecurringFee', 0)),
+                    float(item['prices'][0].get('oneTimeFee', 0)),
+                    float(item['prices'][0].get('laborFee', 0)),
+            ]):
+                return item['price_id']
 
     @classmethod
     def _get_price_id_from_options(cls, bmi_options, option, value):

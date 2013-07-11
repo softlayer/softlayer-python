@@ -141,38 +141,74 @@ class HardwareTests(unittest.TestCase):
         f1.assert_called_once_with(id=package_id)
 
         f2 = self.client['Product_Package'].getConfiguration
-        f2.assert_called_once_with(id=package_id, mask='mask[itemCategory]')
+        f2.assert_called_once_with(id=package_id,
+                                   mask='mask[itemCategory[group]]')
 
         f3 = self.client['Product_Package'].getItems
-        f3.assert_called_once_with(id=package_id, mask='mask[itemCategory]')
+        f3.assert_called_once_with(id=package_id,
+                                   mask='mask[itemCategory]')
 
-    def test_generate_create_dict_with_all_options(self):
+    def test_generate_create_dict_with_all_bare_metal_options(self):
         package_id = 50
 
+        prices = [{
+            'id': 888,
+            'price_id': 1888,
+            'sort': 0,
+            'setupFee': 0,
+            'recurringFee': 0,
+            'hourlyRecurringFee': 0,
+            'oneTimeFee': 0,
+            'laborFee': 0,
+        }]
+        
         self.client['Product_Package'].getAllObjects.return_value = [
             {'name': 'Bare Metal Instance', 'id': package_id}]
 
+        self.client['Product_Package'].getRegions.return_value = [{
+            'location': {
+                'locationPackageDetails': [{
+                    'deliveryTimeInformation': 'Typically 2-4 hours',
+                }],
+            },
+            'keyname': 'RANDOM_LOCATION',
+            'description': 'Random unit testing location',
+        }]
+
+        self.client['Product_Package'].getConfiguration.return_value = [{
+            'itemCategory': {
+                'categoryCode': 'random',
+                'name': 'Random Category',
+            },
+            'sort': 0,
+            'orderStepId': 1,
+            'isRequired': 1,
+            'prices': prices,
+        }]
+
+        self.client['Product_Package'].getItems.return_value = [{
+            'itemCategory': {
+                'categoryCode': 'random',
+                'name': 'Random Category',
+            },
+            'id': 1000,
+            'description': 'Astronaut Sloths',
+            'prices': prices,
+            'capacity': 0,
+            'isRequired': 1,
+        }]
+
         args = {
-            'server_core': 100,
+            'server': 100,
             'hourly': False,
             'hostname': 'unicorn',
             'domain': 'giggles.woo',
-            'disk0': 500,
+            'disks': [500],
             'location': 'Wyrmshire',
             'os': 200,
-            'image_id': None,
-            'pri_ip_addresses': 300,
-            'bandwidth': 400,
-            'userdata': None,
-            'monitoring': 500,
             'port_speed': 600,
-            'vulnerability_scanner': 700,
-            'response': 800,
-            'vpn_management': 900,
-            'remote_management': 1000,
-            'notification': 1100,
             'bare_metal': True,
-            'database': 1200,
+            'hourly': True,
         }
 
         assert_data = {
@@ -183,19 +219,50 @@ class HardwareTests(unittest.TestCase):
             }],
             'location': args['location'],
             'packageId': package_id,
+            'hourlyBillingFlag': True,
             'prices': [
-                {'id': args['server_core']},
-                {'id': args['disk0']},
+                {'id': args['server']},
+                {'id': args['disks'][0]},
                 {'id': args['os']},
-                {'id': args['pri_ip_addresses']},
-                {'id': args['bandwidth']},
-                {'id': args['monitoring']},
                 {'id': args['port_speed']},
-                {'id': args['vulnerability_scanner']},
-                {'id': args['response']},
-                {'id': args['vpn_management']},
-                {'id': args['remote_management']},
-                {'id': args['notification']},
+                {'id': prices[0]['id']},
+            ],
+        }
+
+        data = self.hardware._generate_create_dict(**args)
+
+        self.assertEqual(data, assert_data)
+
+    def test_generate_create_dict_with_all_dedicated_server_options(self):
+        args = {
+            'server': 100,
+            'hostname': 'unicorn',
+            'domain': 'giggles.woo',
+            'disks': [500],
+            'location': 'Wyrmshire',
+            'os': 200,
+            'port_speed': 600,
+            'bare_metal': False,
+            'package_id': 13,
+            'ram': 1400,
+            'disk_controller': 1500,
+        }
+
+        assert_data = {
+            'hardware': [{
+                'bareMetalInstanceFlag': args['bare_metal'],
+                'hostname': args['hostname'],
+                'domain': args['domain'],
+            }],
+            'location': args['location'],
+            'packageId': 13,
+            'prices': [
+                {'id': args['server']},
+                {'id': args['disks'][0]},
+                {'id': args['os']},
+                {'id': args['port_speed']},
+                {'id': args['ram']},
+                {'id': args['disk_controller']},
             ],
         }
 
@@ -280,3 +347,57 @@ class HardwareTests(unittest.TestCase):
         service = self.client['Hardware_Server']
         f = service.setPrivateNetworkInterfaceSpeed
         f.assert_called_once_with(speed, id=hw_id)
+
+    def test_get_available_dedicated_server_packages(self):
+        self.hardware.get_available_dedicated_server_packages()
+
+        service = self.client['Product_Package']
+        f = service.getObject
+        f.assert_has_calls([call(id=13, mask='mask[id, name, description]')])
+
+    def test_get_dedicated_server_options(self):
+        package_id = 13
+
+        self.client['Product_Package'].getRegions.return_value = [{
+            'location': {
+                'locationPackageDetails': [{
+                    'deliveryTimeInformation': 'Typically 2-4 hours',
+                }],
+            },
+            'keyname': 'RANDOM_LOCATION',
+            'description': 'Random unit testing location',
+        }]
+
+        self.client['Product_Package'].getConfiguration.return_value = [{
+            'itemCategory': {
+                'categoryCode': 'random',
+                'name': 'Random Category',
+            },
+            'sort': 0,
+            'orderStepId': 1,
+            'isRequired': 0,
+        }]
+
+        prices = [{'sort': 0, 'id': 999}]
+        self.client['Product_Package'].getItems.return_value = [{
+            'itemCategory': {
+                'categoryCode': 'random2',
+                'name': 'Another Category',
+            },
+            'id': 1000,
+            'description': 'Astronaut Sloths',
+            'prices': prices,
+            'capacity': 0,
+        }]
+        self.hardware.get_dedicated_server_create_options(package_id)
+
+        f1 = self.client['Product_Package'].getRegions
+        f1.assert_called_once_with(id=package_id)
+
+        f2 = self.client['Product_Package'].getConfiguration
+        f2.assert_called_once_with(id=package_id,
+                                   mask='mask[itemCategory[group]]')
+
+        f3 = self.client['Product_Package'].getItems
+        f3.assert_called_once_with(id=package_id,
+                                   mask='mask[itemCategory]')
