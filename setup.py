@@ -63,6 +63,7 @@ setup(
     package_data={
         'SoftLayer': ['tests/fixtures/*'],
     },
+    test_suite = 'nose.collector',
     install_requires=requires,
     classifiers=[
         'Environment :: Console',
