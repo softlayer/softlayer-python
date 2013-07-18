@@ -404,7 +404,7 @@ Optional:
 
         if args.get('--userdata'):
             data['userdata'] = args['--userdata']
-        elif args.get('userfile'):
+        elif args.get('--userfile'):
             f = open(args['--userfile'], 'r')
             try:
                 data['userdata'] = f.read()
