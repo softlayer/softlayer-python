@@ -31,14 +31,15 @@ Options:
             mask='eventCount,serviceResource[datacenter.name]')
         nas = [NestedDict(n) for n in nas]
 
-        t = Table(['id', 'datacenter', 'size', 'username',
-            'password', 'server'])
+        t = Table(['id', 'datacenter', 'size', 'username', 'password',
+                   'server'])
 
         for n in nas:
             t.add_row([
                 n['id'],
                 n['serviceResource']['datacenter'].get('name', blank()),
-                FormattedItem(n.get('capacityGb', blank()),
+                FormattedItem(
+                    n.get('capacityGb', blank()),
                     "%dGB" % n.get('capacityGb', 0)),
                 n.get('username', blank()),
                 n.get('password', blank()),

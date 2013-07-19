@@ -66,7 +66,7 @@ class DNSTests(unittest.TestCase):
         res = self.dns_client._get_zone_id_from_name('example.com')
         self.assertEqual([12345], res)
         self.client['Account'].getDomains.assert_called_once_with(
-                filter={"domains": {"name": {"operation": "_= example.com"}}})
+            filter={"domains": {"name": {"operation": "_= example.com"}}})
 
         # no matches
         self.client['Account'].getDomains.reset_mock()
@@ -74,7 +74,7 @@ class DNSTests(unittest.TestCase):
         res = self.dns_client._get_zone_id_from_name('example.com')
         self.assertEqual([], res)
         self.client['Account'].getDomains.assert_called_once_with(
-                filter={"domains": {"name": {"operation": "_= example.com"}}})
+            filter={"domains": {"name": {"operation": "_= example.com"}}})
 
     def test_create_zone(self):
         call = self.client['Dns_Domain'].createObject
@@ -150,30 +150,30 @@ class DNSTests(unittest.TestCase):
         D.return_value = [records[1]]
         self.dns_client.get_records(12345, type='a')
         D.assert_called_once_with(
-                id=12345,
-                filter={'resourceRecords': {'type': {"operation": "_= a"}}},
-                mask=ANY)
+            id=12345,
+            filter={'resourceRecords': {'type': {"operation": "_= a"}}},
+            mask=ANY)
 
         D.reset_mock()
         D.return_value = [records[0]]
         self.dns_client.get_records(12345, host='a')
         D.assert_called_once_with(
-                id=12345,
-                filter={'resourceRecords': {'host': {"operation": "_= a"}}},
-                mask=ANY)
+            id=12345,
+            filter={'resourceRecords': {'host': {"operation": "_= a"}}},
+            mask=ANY)
 
         D.reset_mock()
         D.return_value = records[3:5]
         self.dns_client.get_records(12345, data='a')
         D.assert_called_once_with(
-                id=12345,
-                filter={'resourceRecords': {'data': {"operation": "_= a"}}},
-                mask=ANY)
+            id=12345,
+            filter={'resourceRecords': {'data': {"operation": "_= a"}}},
+            mask=ANY)
 
         D.reset_mock()
         D.return_value = records[3:5]
         self.dns_client.get_records(12345, ttl='86400')
         D.assert_called_once_with(
-                id=12345,
-                filter={'resourceRecords': {'ttl': {"operation": 86400}}},
-                mask=ANY)
+            id=12345,
+            filter={'resourceRecords': {'ttl': {"operation": 86400}}},
+            mask=ANY)
