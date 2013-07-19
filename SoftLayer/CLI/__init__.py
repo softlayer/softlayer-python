@@ -8,5 +8,5 @@
 """
 
 
-import SoftLayer.CLI.core
-from SoftLayer.CLI.helpers import *
+import SoftLayer.CLI.core  # NOQA
+from SoftLayer.CLI.helpers import *  # NOQA
