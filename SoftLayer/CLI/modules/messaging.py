@@ -4,29 +4,31 @@ usage: sl messaging [<command>] [<args>...] [options]
 Manage SoftLayer Message Queue
 
 The available commands are:
-  list-accounts  List all queue accounts
-  queue          Queue-related commands
-  topic          Topic-related commands
+  list-accounts   List all queue accounts
+  list-endpoints  List all service endpoints
+  ping            Ping the service
+  queue           Queue-related commands
+  topic           Topic-related commands
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: BSD, see LICENSE for more details.
 # from SoftLayer import NetworkManager
 import sys
 
+from SoftLayer import MessagingManager
 from SoftLayer.CLI import CLIRunnable, Table
-from SoftLayer.CLI.helpers import CLIAbort, listing, ArgumentError
-
-try:
-    import softlayer_messaging
-except ImportError:
-    raise CLIAbort("""This functionality requires the softlayer_messaging package.
-Run 'pip install softlayer_messaging' to install.""")
+from SoftLayer.CLI.helpers import CLIAbort, listing, ArgumentError, blank
 
 
-def get_mq_client(account_id, env):
-    client = softlayer_messaging.get_client(account_id)
-    client.authenticate(env.config.get('username'), env.config.get('api_key'))
-    return client
+COMMON_MESSAGING_ARGS = """Service Options:
+  --datacenter=NAME  Datacenter, E.G.: dal05
+  --network=TYPE     Network type, [Options: public, private]
+"""
+
+
+def get_mq_client(manager, account_id, env):
+    return manager.get_connection(
+        account_id, env.config.get('username'), env.config.get('api_key'))
 
 
 class ListAccounts(CLIRunnable):
@@ -40,8 +42,8 @@ List SoftLayer Message Queue Accounts
 
     @staticmethod
     def execute(client, args):
-        accounts = client['Account'].getMessageQueueAccounts(
-            mask='id,name,status,nodes')
+        manager = MessagingManager(client)
+        accounts = manager.list_accounts()
 
         t = Table([
             'id', 'name', 'status'
@@ -54,6 +56,53 @@ List SoftLayer Message Queue Accounts
             ])
 
         return t
+
+
+class ListEndpoints(CLIRunnable):
+    """
+usage: sl messaging list-endpoints [options]
+
+List SoftLayer Message Queue Endpoints
+
+"""
+    action = 'list-endpoints'
+
+    @staticmethod
+    def execute(client, args):
+        manager = MessagingManager(client)
+        regions = manager.get_endpoints()
+
+        t = Table([
+            'name', 'public', 'private'
+        ])
+        for region, endpoints in regions.items():
+            t.add_row([
+                region,
+                endpoints.get('public') or blank(),
+                endpoints.get('private') or blank(),
+            ])
+
+        return t
+
+
+class Ping(CLIRunnable):
+    __doc__ = """
+usage: sl messaging ping [options]
+
+Ping the SoftLayer Message Queue service
+
+""" + COMMON_MESSAGING_ARGS
+    action = 'ping'
+
+    @staticmethod
+    def execute(client, args):
+        manager = MessagingManager(client)
+        ok = manager.ping(
+            endpoint_name=args['--datacenter'], network=args['--network'])
+        if ok:
+            return 'OK'
+        else:
+            CLIAbort('Ping failed')
 
 
 def queue_table(queue):
@@ -106,7 +155,7 @@ def subscription_table(sub):
 
 
 class Queue(CLIRunnable):
-    """
+    __doc__ = """
 usage: sl messaging queue list <account_id> [options]
        sl messaging queue detail <account_id> <queue_name> [options]
        sl messaging queue create <account_id> <queue_name> [options]
@@ -127,17 +176,20 @@ Queue Delete Options:
   --force  Flag to force the deletion of the queue even when there are messages
 
 Pop Options:
-  --count=NUM  Count of messages to pop
-"""
+  --count=NUM     Count of messages to pop
+  --delete-after  Remove popped messages from the queue
+
+""" + COMMON_MESSAGING_ARGS
     action = 'queue'
 
     @classmethod
     def execute(cls, client, args):
-        mq_client = get_mq_client(args['<account_id>'], cls.env)
+        manager = MessagingManager(client)
+        mq_client = get_mq_client(manager, args['<account_id>'], cls.env)
 
         # list
         if args['list']:
-            queues = mq_client.queues()['items']
+            queues = mq_client.get_queues()['items']
 
             t = Table([
                 'name', 'message_count', 'visible_message_count'
@@ -151,7 +203,7 @@ Pop Options:
             return t
         # detail
         elif args['detail']:
-            queue = mq_client.queue(args['<queue_name>']).detail()
+            queue = mq_client.get_queue(args['<queue_name>'])
             return queue_table(queue)
         # create
         elif args['create'] or args['modify']:
@@ -169,10 +221,12 @@ Pop Options:
         # delete
         elif args['delete']:
             if args['<message_id>']:
-                messages = mq_client.queue(args['<queue_name>']).message(
-                    args['<message_id>']).delete()
+                messages = mq_client.delete_message(
+                    args['<queue_name>'],
+                    ['<message_id>'])
             else:
-                mq_client.queue(args['<queue_name>']).delete(
+                mq_client.delete_queue(
+                    args['<queue_name>'],
                     args.get('--force'))
         # push message
         elif args['push']:
@@ -183,21 +237,28 @@ Pop Options:
             else:
                 body = sys.stdin.read()
             return message_table(
-                mq_client.queue(args['<queue_name>']).push(body))
+                mq_client.push_queue_message(args['<queue_name>'], body))
         # pop message
         elif args['pop']:
-            messages = mq_client.queue(args['<queue_name>']).pop(
+            messages = mq_client.pop_message(
+                args['<queue_name>'],
                 args.get('--count') or 1)
             formatted_messages = []
             for message in messages['items']:
                 formatted_messages.append(message_table(message))
+
+            if args.get('--delete-after'):
+                for message in messages['items']:
+                    mq_client.delete_message(
+                        args['<queue_name>'],
+                        message['id'])
             return formatted_messages
         else:
             raise CLIAbort('Invalid command')
 
 
 class Topic(CLIRunnable):
-    """
+    __doc__ = """
 usage: sl messaging topic list <account_id> [options]
        sl messaging topic detail <account_id> <topic_name> [options]
        sl messaging topic create <account_id> <topic_name> [options]
@@ -217,16 +278,17 @@ Topic/Subscription Create Options:
 Topic Delete Options:
   --force  Flag to force the deletion of the topic even when there are subscriptions
 
-"""
+""" + COMMON_MESSAGING_ARGS
     action = 'topic'
 
     @classmethod
     def execute(cls, client, args):
-        mq_client = get_mq_client(args['<account_id>'], cls.env)
+        manager = MessagingManager(client)
+        mq_client = get_mq_client(manager, args['<account_id>'], cls.env)
 
         # list
         if args['list']:
-            topics = mq_client.topics()['items']
+            topics = mq_client.get_topics()['items']
 
             t = Table(['name'])
             for topic in topics:
@@ -234,8 +296,8 @@ Topic Delete Options:
             return t
         # detail
         elif args['detail']:
-            topic = mq_client.topic(args['<topic_name>']).detail()
-            subscriptions = mq_client.topic(args['<topic_name>']).subscriptions()
+            topic = mq_client.get_topic(args['<topic_name>'])
+            subscriptions = mq_client.get_subscriptions(args['<topic_name>'])
             tables = []
             for sub in subscriptions['items']:
                 tables.append(subscription_table(sub))
@@ -243,14 +305,15 @@ Topic Delete Options:
         # create
         elif args['create']:
             if args['--subscription']:
-                topic = mq_client.topic(args['<topic_name>'])
                 if args['--type'] == 'queue':
-                    subscription = topic.create_subscription(
+                    subscription = mq_client.create_subscription(
+                        args['<topic_name>'],
                         'queue',
                         queue_name=args['--queue-name'],
                     )
                 elif args['--type'] == 'http':
-                    subscription = topic.create_subscription(
+                    subscription = mq_client.create_subscription(
+                        args['<topic_name>'],
                         'http',
                         method=args['--http-method'] or 'GET',
                         url=args['--http-url'],
@@ -275,10 +338,12 @@ Topic Delete Options:
         # delete
         elif args['delete']:
             if args['<subscription_id>']:
-                messages = mq_client.topic(args['<topic_name>']).subscription(
-                    args['<subscription_id>']).delete()
+                mq_client.delete_subscription(
+                    args['<topic_name>'],
+                    args['<subscription_id>'])
             else:
-                mq_client.topic(args['<topic_name>']).delete(
+                mq_client.delete_topic(
+                    args['<topic_name>'],
                     args.get('--force'))
         # push message
         elif args['push']:
@@ -289,14 +354,6 @@ Topic Delete Options:
             else:
                 body = sys.stdin.read()
             return message_table(
-                mq_client.topic(args['<topic_name>']).push(body))
-        # pop message
-        elif args['pop']:
-            messages = mq_client.topic(args['<topic_name>']).pop(
-                args.get('--count') or 1)
-            formatted_messages = []
-            for message in messages['items']:
-                formatted_messages.append(message_table(message))
-            return formatted_messages
+                mq_client.push_topic_message(args['<topic_name>'], body))
         else:
             raise CLIAbort('Invalid command')

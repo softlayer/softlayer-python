@@ -12,6 +12,10 @@ class SoftLayerError(StandardError):
     " The base SoftLayer error. "
 
 
+class Unauthenticated(StandardError):
+    " Unauthenticated "
+
+
 class SoftLayerAPIError(SoftLayerError):
     """ SoftLayerAPIError is an exception raised whenever an error is returned
     from the API.
