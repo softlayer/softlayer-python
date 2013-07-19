@@ -22,7 +22,10 @@ class DeprecatedClientMixin():
             self.set_init_parameter(int(id))
 
         if username and api_key:
-            self.set_authentication(username, api_key)
+            self._headers['authenticate'] = {
+                'username': username.strip(),
+                'apiKey': api_key.strip(),
+            }
 
     def __getattr__(self, name):
         """ Attempt a SoftLayer API call.
@@ -105,6 +108,7 @@ class DeprecatedClientMixin():
         ..  deprecated:: 2.0.0
 
         """
+        warn("deprecated", DeprecationWarning)
         self.add_header('authenticate', {
             'username': username.strip(),
             'apiKey': api_key.strip(),
