@@ -255,6 +255,14 @@ class HardwareManager(IdentifierMixin, object):
                                                    id=id)
 
     def change_port_speed(self, id, public, speed):
+        """ Allows you to change the port speed of a server's NICs.
+
+        :param int id: The ID of the server
+        :param bool public: Flag to indicate which interface to change.
+                           True (default) means the public interface.
+                           False indicates the private interface.
+        :param int speed: The port speed to set.
+        """
         if public:
             func = self.hardware.setPublicNetworkInterfaceSpeed
         else:
@@ -263,10 +271,16 @@ class HardwareManager(IdentifierMixin, object):
         return func(speed, id=id)
 
     def place_order(self, **kwargs):
+        """ Places an order for a piece of hardware. See _generate_create_dict
+        for a list of available options.
+        """
         create_options = self._generate_create_dict(**kwargs)
         return self.client['Product_Order'].placeOrder(create_options)
 
     def verify_order(self, **kwargs):
+        """ Verifies an order for a piece of hardware without actually placing
+        it. See _generate_create_dict for a list of available options.
+        """
         create_options = self._generate_create_dict(**kwargs)
         return self.client['Product_Order'].verifyOrder(create_options)
 
@@ -288,7 +302,34 @@ class HardwareManager(IdentifierMixin, object):
             self, server=None, hostname=None, domain=None, hourly=False,
             location=None, os=None, disks=None, port_speed=None,
             bare_metal=None, ram=None, package_id=None, disk_controller=None):
+        """
+        Translates a list of arguments into a dictionary necessary for creating
+        a server. NOTE - All items here must be price IDs, NOT quantities!
 
+        :param string server: The identification string for the server to order.
+                              This will either be the CPU/Memory combination ID
+                              for bare metal instances or the CPU model for
+                              dedicated servers.
+        :param string hostname: The hostname to use for the new server.
+        :param string domain: The domain to use for the new server.
+        :param bool hourly: Flag to indicate if this server should be billed
+                            hourly (default) or monthly. Only applies to bare
+                            metal instances.
+        :param string location: The location string (data center) for the server
+        :param int os: The operating system to use
+        :param array disks: An array of disks for the server. Disks will be
+                            added in the order specified.
+        :param int port_speed: The port speed for the server.
+        :param bool bare_metal: Flag to indicate if this is a bare metal server
+                                or a dedicated server (default).
+        :param int ram: The amount of RAM to order. Only applies to dedicated
+                        servers.
+        :param int package_id: The package_id to use for the server. This should
+                               either be a chassis ID for dedicated servers or
+                               the bare metal instance package ID, which can be
+                               obtained by calling _get_bare_metal_package_id
+        :param int disk_controller: The disk controller to use.
+        """
         arguments = ['server', 'hostname', 'domain', 'location', 'os', 'disks',
                      'port_speed', 'bare_metal', 'ram', 'package_id',
                      'disk_controller', 'server_core', 'disk0']
