@@ -306,16 +306,17 @@ class HardwareManager(IdentifierMixin, object):
         Translates a list of arguments into a dictionary necessary for creating
         a server. NOTE - All items here must be price IDs, NOT quantities!
 
-        :param string server: The identification string for the server to order.
-                              This will either be the CPU/Memory combination ID
-                              for bare metal instances or the CPU model for
-                              dedicated servers.
+        :param string server: The identification string for the server to
+                              order. This will either be the CPU/Memory
+                              combination ID for bare metal instances or the
+                              CPU model for dedicated servers.
         :param string hostname: The hostname to use for the new server.
         :param string domain: The domain to use for the new server.
         :param bool hourly: Flag to indicate if this server should be billed
                             hourly (default) or monthly. Only applies to bare
                             metal instances.
-        :param string location: The location string (data center) for the server
+        :param string location: The location string (data center) for the
+                                server
         :param int os: The operating system to use
         :param array disks: An array of disks for the server. Disks will be
                             added in the order specified.
@@ -324,10 +325,11 @@ class HardwareManager(IdentifierMixin, object):
                                 or a dedicated server (default).
         :param int ram: The amount of RAM to order. Only applies to dedicated
                         servers.
-        :param int package_id: The package_id to use for the server. This should
-                               either be a chassis ID for dedicated servers or
-                               the bare metal instance package ID, which can be
-                               obtained by calling _get_bare_metal_package_id
+        :param int package_id: The package_id to use for the server. This
+                               should either be a chassis ID for dedicated
+                               servers or the bare metal instance package ID,
+                               which can be obtained by calling
+                               _get_bare_metal_package_id
         :param int disk_controller: The disk controller to use.
         """
         arguments = ['server', 'hostname', 'domain', 'location', 'os', 'disks',
