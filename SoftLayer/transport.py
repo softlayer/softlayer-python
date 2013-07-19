@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 
 
 def make_xml_rpc_api_call(uri, method, args=None, headers=None,
-                          http_headers=None, timeout=None, verbose=False):
+                          http_headers=None, timeout=None):
     """ Makes a SoftLayer API call against the XML-RPC endpoint
 
     :param string uri: endpoint URL
@@ -27,7 +27,6 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
     :param dict headers: XML-RPC headers to use for the request
     :param dict http_headers: HTTP headers to use for the request
     :param int timeout: number of seconds to use as a timeout
-    :param bool verbose: verbosity
     """
     if args is None:
         args = tuple()

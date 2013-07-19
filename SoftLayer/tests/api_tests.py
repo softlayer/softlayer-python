@@ -127,7 +127,6 @@ class OldAPIClient(unittest.TestCase):
             headers={
                 'authenticate': {
                     'username': 'doesnotexist', 'apiKey': 'issurelywrong'}},
-            verbose=False,
             timeout=None,
             http_headers={
                 'Content-Type': 'application/xml',
@@ -164,7 +163,6 @@ class OldAPIClient(unittest.TestCase):
                     'username': 'doesnotexist', 'apiKey': 'issurelywrong'},
                 'SoftLayer_SERVICEInitParameters': {'id': 5678},
                 'resultLimit': {'limit': 9, 'offset': 10}},
-            verbose=False,
             timeout=None,
             http_headers={
                 'RAW': 'HEADER',
@@ -192,7 +190,6 @@ class APIClient(unittest.TestCase):
             headers={
                 'authenticate': {
                     'username': 'doesnotexist', 'apiKey': 'issurelywrong'}},
-            verbose=False,
             timeout=None,
             http_headers={
                 'Content-Type': 'application/xml',
@@ -222,7 +219,6 @@ class APIClient(unittest.TestCase):
                     'username': 'doesnotexist', 'apiKey': 'issurelywrong'},
                 'SoftLayer_SERVICEInitParameters': {'id': 5678},
                 'resultLimit': {'limit': 9, 'offset': 10}},
-            verbose=False,
             timeout=None,
             http_headers={
                 'RAW': 'HEADER',
@@ -240,7 +236,6 @@ class APIClient(unittest.TestCase):
                 'authenticate': {
                     'username': 'doesnotexist', 'apiKey': 'issurelywrong'},
                 'SoftLayer_ObjectMask': {'mask': 'mask[something[nested]]'}},
-            verbose=False,
             timeout=None,
             http_headers={
                 'Content-Type': 'application/xml',
@@ -257,7 +252,6 @@ class APIClient(unittest.TestCase):
                 'authenticate': {
                     'username': 'doesnotexist', 'apiKey': 'issurelywrong'},
                 'SoftLayer_ObjectMask': {'mask': 'mask[something.nested]'}},
-            verbose=False,
             timeout=None,
             http_headers={
                 'Content-Type': 'application/xml',

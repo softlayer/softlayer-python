@@ -125,6 +125,10 @@ Backwards Compatibility
 -----------------------
 If you've been using the older Python client (<2.0), you'll be happy to know that the old API is still currently working. However, you should deprecate use of the old stuff. Below is an example of the old API converted to the new one.
 
+.. automodule:: SoftLayer.deprecated
+   :members:
+   :undoc-members:
+
 ::
 
 	import SoftLayer.API
