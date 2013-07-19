@@ -165,13 +165,24 @@ class CCIManager(IdentifierMixin, object):
         """
         return self.guest.deleteObject(id=id)
 
-    def reload_instance(self, id):
+    def reload_instance(self, id, post_uri=None):
         """ Perform an OS reload of an instance with its current configuration.
 
         :param integer id: the instance ID to reload
+        :param string post_url: The URI of the post-install script to run
+                                after reload
 
         """
-        return self.guest.reloadCurrentOperatingSystemConfiguration(id=id)
+        payload = {
+            'token': 'FORCE',
+            'config': {},
+        }
+
+        if post_uri:
+            payload['config']['customProvisionScriptUri'] = post_uri
+
+        return self.guest.reloadOperatingSystem('FORCE', payload['config'],
+                                                id=id)
 
     def _generate_create_dict(
             self, cpus=None, memory=None, hourly=True,
@@ -280,8 +291,7 @@ class CCIManager(IdentifierMixin, object):
             func = self.guest.setPrivateNetworkInterfaceSpeed
 
         return func(speed, id=id)
-        
-        
+
     def _get_ids_from_hostname(self, hostname):
         results = self.list_instances(hostname=hostname, mask="id")
         return [result['id'] for result in results]

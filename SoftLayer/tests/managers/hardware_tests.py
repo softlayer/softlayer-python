@@ -6,6 +6,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from SoftLayer import HardwareManager
+from SoftLayer.managers.hardware import get_default_value
 
 try:
     import unittest2 as unittest
@@ -88,9 +89,11 @@ class HardwareTests(unittest.TestCase):
             id=1, mask=ANY)
 
     def test_reload(self):
-        self.hardware.reload(id=1)
-        f = self.client.__getitem__().reloadCurrentOperatingSystemConfiguration
-        f.assert_called_once_with('FORCE', id=1)
+        post_uri = 'http://test.sftlyr.ws/test.sh'
+        self.hardware.reload(id=1, post_uri=post_uri)
+        f = self.client.__getitem__().reloadOperatingSystem
+        f.assert_called_once_with('FORCE',
+                                  {'customProvisionScriptUri': post_uri}, id=1)
 
     def test_get_bare_metal_create_options_returns_none_on_error(self):
         self.client['Product_Package'].getAllObjects.return_value = [
@@ -161,7 +164,7 @@ class HardwareTests(unittest.TestCase):
             'oneTimeFee': 0,
             'laborFee': 0,
         }]
-        
+
         self.client['Product_Package'].getAllObjects.return_value = [
             {'name': 'Bare Metal Instance', 'id': package_id}]
 
@@ -401,3 +404,24 @@ class HardwareTests(unittest.TestCase):
         f3 = self.client['Product_Package'].getItems
         f3.assert_called_once_with(id=package_id,
                                    mask='mask[itemCategory]')
+
+    def test_get_default_value_returns_none_for_unknown_category(self):
+        package_options = {'categories': ['Cat1', 'Cat2']}
+
+        self.assertEqual(None, get_default_value(package_options,
+                                                 'Unknown Category'))
+
+    def test_get_default_value(self):
+        price_id = 9876
+        package_options = {'categories':
+                           {'Cat1': {
+                               'items': [{
+                                   'prices': [{
+                                       'setupFee': 0,
+                                       'recurringFee': 0,
+                                   }],
+                                   'price_id': price_id,
+                               }]
+                           }}}
+
+        self.assertEqual(price_id, get_default_value(package_options, 'Cat1'))

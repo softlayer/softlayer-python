@@ -112,10 +112,12 @@ class CCITests(unittest.TestCase):
         self.client['Virtual_Guest'].deleteObject.assert_called_once_with(id=1)
 
     def test_reload_instance(self):
-        self.cci.reload_instance(id=1)
+        post_uri = 'http://test.sftlyr.ws/test.sh'
+        self.cci.reload_instance(id=1, post_uri=post_uri)
         service = self.client['Virtual_Guest']
-        f = service.reloadCurrentOperatingSystemConfiguration
-        f.assert_called_once_with(id=1)
+        f = service.reloadOperatingSystem
+        f.assert_called_once_with('FORCE',
+                                  {'customProvisionScriptUri': post_uri}, id=1)
 
     @patch('SoftLayer.managers.cci.CCIManager._generate_create_dict')
     def test_create_verify(self, create_dict):

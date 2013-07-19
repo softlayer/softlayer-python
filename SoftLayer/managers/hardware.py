@@ -234,15 +234,25 @@ class HardwareManager(IdentifierMixin, object):
 
         return self.hardware.getObject(id=id, **kwargs)
 
-    def reload(self, id):
+    def reload(self, id, post_uri=None):
         """ Perform an OS reload of a server with its current configuration.
 
         :param integer id: the instance ID to reload
+        :param string post_url: The URI of the post-install script to run
+                                after reload
 
         """
 
-        return self.hardware.reloadCurrentOperatingSystemConfiguration(
-            'FORCE', id=id)
+        payload = {
+            'token': 'FORCE',
+            'config': {},
+        }
+
+        if post_uri:
+            payload['config']['customProvisionScriptUri'] = post_uri
+
+        return self.hardware.reloadOperatingSystem('FORCE', payload['config'],
+                                                   id=id)
 
     def change_port_speed(self, id, public, speed):
         if public:
@@ -282,7 +292,7 @@ class HardwareManager(IdentifierMixin, object):
         arguments = ['server', 'hostname', 'domain', 'location', 'os', 'disks',
                      'port_speed', 'bare_metal', 'ram', 'package_id',
                      'disk_controller', 'server_core', 'disk0']
-        
+
         order = {
             'hardware': [{
                 'bareMetalInstanceFlag': bare_metal,
@@ -328,7 +338,7 @@ class HardwareManager(IdentifierMixin, object):
                 required_fields.append(category)
 
         for category in required_fields:
-            price = self._get_default_value(p_options, category)
+            price = get_default_value(p_options, category)
             order['prices'].append({'id': price})
 
         return order
@@ -345,20 +355,6 @@ class HardwareManager(IdentifierMixin, object):
                 break
 
         return hw_id
-
-    def _get_default_value(self, package_options, category):
-        if category not in package_options['categories']:
-            return
-            
-        for item in package_options['categories'][category]['items']:
-            if not any([
-                    float(item['prices'][0].get('setupFee', 0)),
-                    float(item['prices'][0].get('recurringFee', 0)),
-                    float(item['prices'][0].get('hourlyRecurringFee', 0)),
-                    float(item['prices'][0].get('oneTimeFee', 0)),
-                    float(item['prices'][0].get('laborFee', 0)),
-            ]):
-                return item['price_id']
 
     def _get_ids_from_hostname(self, hostname):
         results = self.list_hardware(hostname=hostname, mask="id")
@@ -436,3 +432,18 @@ class HardwareManager(IdentifierMixin, object):
             })
 
         return results
+
+
+def get_default_value(package_options, category):
+    if category not in package_options['categories']:
+        return
+
+    for item in package_options['categories'][category]['items']:
+        if not any([
+                float(item['prices'][0].get('setupFee', 0)),
+                float(item['prices'][0].get('recurringFee', 0)),
+                float(item['prices'][0].get('hourlyRecurringFee', 0)),
+                float(item['prices'][0].get('oneTimeFee', 0)),
+                float(item['prices'][0].get('laborFee', 0)),
+        ]):
+            return item['price_id']

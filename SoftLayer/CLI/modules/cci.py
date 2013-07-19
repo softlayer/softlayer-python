@@ -501,6 +501,10 @@ class ReloadCCI(CLIRunnable):
 usage: sl cci reload <identifier> [options]
 
 Reload the OS on a CCI based on its current configuration
+
+Optional:
+    -i, --postinstall=URI   Post-install script to download
+                             (Only HTTPS executes, HTTP leaves file in /root)
 """
 
     action = 'reload'
@@ -511,7 +515,7 @@ Reload the OS on a CCI based on its current configuration
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         if args['--really'] or no_going_back(cci_id):
-            cci.reload_instance(cci_id)
+            cci.reload_instance(cci_id, args['--postinstall'])
         else:
             CLIAbort('Aborted')
 
