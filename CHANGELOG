@@ -1,3 +1,26 @@
+2.3.0
+
+    * Several bug fixes and improvements
+
+    * Removed Python 2.5 support. Some stuff MIGHT work with 2.5 but it is no longer tested
+
+    * API: Refactored managers into their own module to not clutter the top level
+
+    * CLI+API: Added much more hardware support: Filters for hardware listing, dedicated server/bare metal cloud ordering, hardware cancellation
+
+    * CLI+API: Added DNS Zone filtering (server side)
+
+    * CLI+API: Added Post Install script support for CCIs and hardware
+
+    * CLI: Added Message queue functionality
+
+    * CLI: Added --debug option to CLI commands
+
+    * API: Added more logging
+
+    * API: Added token-based auth so you can use the API bindings with your username/password if you want. (It's still highly recommended to use your API key instead of your password)
+
+
 2.2.0
 
     * Consistency changes/bug fixes
@@ -8,8 +31,8 @@
  
     * CCI: Adds a way to block until transactions are done on a CCI
  
-    * CLI(CCI): For most commands, you can specify id, hostname, private ip or public ip as <identifier>
+    * CLI: For most CCI commands, you can specify id, hostname, private ip or public ip as <identifier>
  
-    * CLI(CCI): Adds the ability to filter list results for CCIs
+    * CLI: Adds the ability to filter list results for CCIs
  
-    * API: for large result sets, requests can now be chunked into smaller batches on the server side. Using service.iter_call('getObjects', ...) or service.getObjects(..., iter=True) will return a generator regardless of the results returned. offset and limit can be passed in like normal. An additional named parameter of 'chunk' is used to limit the number of items coming back in a single request, defaults to 100.
+    * API: for large result sets, requests can now be chunked into smaller batches on the server side. Using service.iter_call('getObjects', ...) or service.getObjects(..., iter=True) will return a generator regardless of the results returned. offset and limit can be passed in like normal. An additional named parameter of 'chunk' is used to limit the number of items coming back in a single request, defaults to 100
