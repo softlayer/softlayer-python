@@ -102,7 +102,8 @@ For more on filters see 'sl help filters'
                 mb_to_gb(guest['maxMemory']),
                 guest['primaryIpAddress'] or blank(),
                 guest['primaryBackendIpAddress'] or blank(),
-                guest['activeTransaction']['transactionStatus'].get('friendlyName') or blank(),
+                guest['activeTransaction']['transactionStatus'].get(
+                    'friendlyName') or blank(),
             ])
 
         return t

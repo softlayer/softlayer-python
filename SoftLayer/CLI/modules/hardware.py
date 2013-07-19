@@ -337,7 +337,8 @@ Options:
 """
 
     action = 'create-options'
-    options = ['datacenter', 'cpu', 'memory', 'os', 'disk', 'nic', 'controller']
+    options = ['datacenter', 'cpu', 'memory', 'os', 'disk', 'nic',
+               'controller']
 
     @classmethod
     def execute(cls, client, args):
@@ -585,7 +586,7 @@ Options:
 
 class CreateHardware(CLIRunnable):
     """
-usage: sl hardware create --hostname=HOST --domain=DOMAIN --cpu=CPU 
+usage: sl hardware create --hostname=HOST --domain=DOMAIN --cpu=CPU
     --chassis=CHASSIS --memory=MEMORY --os=OS --disk=SIZE... [options]
 
 Order/create a dedicated server. See 'sl hardware list-chassis' and
@@ -651,7 +652,7 @@ Optional:
             disk_prices.append(cls._get_default_value(ds_options, 'disk0'))
 
         order['disks'] = disk_prices
-            
+
         # Set the disk controller price
         if args.get('--controller'):
             dc_price = cls._get_price_id_from_options(ds_options,
@@ -723,7 +724,7 @@ Optional:
     def _get_default_value(cls, ds_options, option):
         if option not in ds_options['categories']:
             return
-            
+
         for item in ds_options['categories'][option]['items']:
             if not any([
                     float(item['prices'][0].get('setupFee', 0)),

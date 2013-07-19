@@ -267,8 +267,9 @@ Options:
 
 class CreateBMetalInstance(CLIRunnable):
     """
-usage: sl bmetal create --hostname=HOST --domain=DOMAIN --cpu=CPU --disk=DISK...
-                       --memory=MEMORY --os=OS (--hourly | --monthly) [options]
+usage: sl bmetal create --hostname=HOST --domain=DOMAIN --cpu=CPU --os=OS
+                       --memory=MEMORY --disk=DISK... (--hourly | --monthly)
+                       [options]
 
 Order/create a bare metal instance. See 'sl bmetal create-options' for valid
 options

@@ -61,7 +61,8 @@ class TestRestAPICall(unittest.TestCase):
     @patch('SoftLayer.transport.requests.request')
     def test_json(self, request):
         request().content = '{}'
-        resp = make_rest_api_call('GET', 'http://something.com/path/to/resource.json')
+        resp = make_rest_api_call(
+            'GET', 'http://something.com/path/to/resource.json')
         self.assertEqual(resp, {})
         request.assert_called_with(
             'GET', 'http://something.com/path/to/resource.json',
@@ -87,7 +88,8 @@ class TestRestAPICall(unittest.TestCase):
     @patch('SoftLayer.transport.requests.request')
     def test_text(self, request):
         request().text = 'content'
-        resp = make_rest_api_call('GET', 'http://something.com/path/to/resource.txt')
+        resp = make_rest_api_call(
+            'GET', 'http://something.com/path/to/resource.txt')
         self.assertEqual(resp, 'content')
         request.assert_called_with(
             'GET', 'http://something.com/path/to/resource.txt',
