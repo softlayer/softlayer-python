@@ -176,6 +176,10 @@ class HardwareReload(CLIRunnable):
 usage: sl hardware reload <identifier> [options]
 
 Reload the OS on a hardware server based on its current configuration
+
+Optional:
+    -i, --postinstall=URI   Post-install script to download
+                             (Only HTTPS executes, HTTP leaves file in /root)
 """
 
     action = 'reload'
@@ -187,7 +191,7 @@ Reload the OS on a hardware server based on its current configuration
         hardware_id = resolve_id(
             hardware.resolve_ids, args.get('<identifier>'), 'hardware')
         if args['--really'] or no_going_back(hardware_id):
-            hardware.reload(hardware_id)
+            hardware.reload(hardware_id, args['--postinstall'])
         else:
             CLIAbort('Aborted')
 
