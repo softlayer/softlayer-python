@@ -12,8 +12,47 @@ The available commands are:
 
 import os.path
 
-from SoftLayer.CLI import CLIRunnable, CLIAbort, Table, confirm
+from SoftLayer import Client, SoftLayerAPIError
+from SoftLayer.CLI import CLIRunnable, CLIAbort, Table, confirm, format_output
 import ConfigParser
+
+
+def config_table(env):
+    t = Table(['Name', 'Value'])
+    t.align['Name'] = 'r'
+    t.align['Value'] = 'l'
+    config = env.config
+    t.add_row(['Username', config.get('username', 'none set')])
+    t.add_row(['API Key', config.get('api_key', 'none set')])
+    t.add_row(['Endpoint URL', config.get('endpoint_url', 'none set')])
+    return t
+
+
+def get_api_key(username, secret, endpoint_url=None):
+
+    # Try to use a client with username/api key
+    try:
+        client = Client(
+            username=username,
+            api_key=secret,
+            endpoint_url=endpoint_url)
+
+        client['Account'].getCurrentUser()
+        return secret
+    except SoftLayerAPIError as e:
+        if 'invalid api token' not in e.faultString.lower():
+            raise
+
+    # Try to use a client with username/password
+    client = Client(endpoint_url=endpoint_url)
+    client.authenticate_with_password(username, secret)
+
+    account = client['Account'].getCurrentUser(
+        mask='apiAuthenticationKeys')
+    api_keys = account['apiAuthenticationKeys']
+    if len(api_keys) == 0:
+        return client['User_Customer'].addApiAuthenticationKey()
+    return api_keys[0]['authenticationKey']
 
 
 class Setup(CLIRunnable):
@@ -27,7 +66,7 @@ Setup configuration
     @classmethod
     def execute(cls, client, args):
         username = cls.env.input('Username: ')
-        api_key = cls.env.input('API Key: ')
+        secret = cls.env.getpass('API Key or Password: ')
         endpoint_url = cls.env.input(
             'Endpoint URL [%s]: ' % cls.env.config['endpoint_url'])
         if not endpoint_url:
@@ -36,25 +75,26 @@ Setup configuration
         path = '~/.softlayer'
         if args.get('--config'):
             path = args.get('--config')
-
         config_path = os.path.expanduser(path)
-        c = confirm(
-            'Are you sure you want to write settings to "%s"?' % config_path)
 
-        if not c:
+        api_key = get_api_key(username, secret, endpoint_url=endpoint_url)
+
+        cls.env.config['username'] = username
+        cls.env.config['api_key'] = api_key
+        cls.env.config['endpoint_url'] = endpoint_url
+
+        cls.env.out(format_output(config_table(cls.env)))
+
+        if not confirm('Are you sure you want to write settings to "%s"?'
+                       % config_path, default=True):
             raise CLIAbort('Aborted.')
 
         config = ConfigParser.RawConfigParser()
         config.add_section('softlayer')
 
-        if username:
-            config.set('softlayer', 'username', username)
-
-        if api_key:
-            config.set('softlayer', 'api_key', api_key)
-
-        if endpoint_url:
-            config.set('softlayer', 'endpoint_url', endpoint_url)
+        config.set('softlayer', 'username', cls.env.config['username'])
+        config.set('softlayer', 'api_key', cls.env.config['api_key'])
+        config.set('softlayer', 'endpoint_url', cls.env.config['endpoint_url'])
 
         f = os.fdopen(
             os.open(config_path, os.O_WRONLY | os.O_CREAT, 0600), 'w')
@@ -74,11 +114,4 @@ Show current configuration
 
     @classmethod
     def execute(cls, client, args):
-        t = Table(['Name', 'Value'])
-        t.align['Name'] = 'r'
-        t.align['Value'] = 'l'
-        config = cls.env.config
-        t.add_row(['Username', config.get('username', 'none set')])
-        t.add_row(['API Key', config.get('api_key', 'none set')])
-        t.add_row(['Endpoint URL', config.get('endpoint_url', 'none set')])
-        return t
+        return config_table(cls.env)

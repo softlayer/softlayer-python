@@ -6,13 +6,65 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
+import os
+
 from SoftLayer.CLI.environment import CLIRunnableType
 from SoftLayer.utils import NestedDict
-from prettytable import PrettyTable
+from prettytable import PrettyTable, FRAME, NONE
 
 __all__ = ['Table', 'CLIRunnable', 'FormattedItem', 'valid_response',
            'confirm', 'no_going_back', 'mb_to_gb', 'gb', 'listing', 'CLIAbort',
-           'NestedDict', 'resolve_id']
+           'NestedDict', 'resolve_id', 'format_output']
+
+
+def format_output(data, fmt='table'):
+    if isinstance(data, basestring):
+        return data
+
+    if isinstance(data, Table):
+        if fmt == 'table':
+            return str(format_prettytable(data))
+        elif fmt == 'raw':
+            return str(format_no_tty(data))
+
+    if fmt != 'raw' and isinstance(data, FormattedItem):
+        return str(data.formatted)
+
+    if isinstance(data, SequentialOutput):
+        output = [format_output(d, fmt=fmt) for d in data]
+        if not data.blanks:
+            output = [x for x in output if len(x)]
+        return format_output(output, fmt=fmt)
+
+    if isinstance(data, list) or isinstance(data, tuple):
+        output = [format_output(d, fmt=fmt) for d in data]
+        return format_output(listing(output, separator=os.linesep))
+
+    return str(data)
+
+
+def format_prettytable(table):
+    for i, row in enumerate(table.rows):
+        for j, item in enumerate(row):
+            table.rows[i][j] = format_output(item)
+    t = table.prettytable()
+    t.hrules = FRAME
+    t.horizontal_char = '.'
+    t.vertical_char = ':'
+    t.junction_char = ':'
+    return t
+
+
+def format_no_tty(table):
+    t = table.prettytable()
+    for col in table.columns:
+        t.align[col] = 'l'
+    t.hrules = NONE
+    t.border = False
+    t.header = False
+    t.left_padding_width = 0
+    t.right_padding_width = 2
+    return t
 
 
 class FormattedItem(object):

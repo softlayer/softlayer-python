@@ -51,6 +51,12 @@ class EnvironmentTests(unittest.TestCase):
         raw_input_mock.assert_called_with('input')
         self.assertEqual(raw_input_mock(), r)
 
+    @patch('getpass.getpass')
+    def test_getpass(self, getpass):
+        r = self.env.getpass('input')
+        getpass.assert_called_with('input')
+        self.assertEqual(getpass(), r)
+
     @patch('os.environ', {})
     def test_parse_config_no_files(self):
         self.env.load_config([])
