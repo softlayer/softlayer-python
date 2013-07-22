@@ -5,8 +5,6 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
-import os
-import os.path
 try:
     import unittest2 as unittest
 except ImportError:
@@ -116,6 +114,19 @@ class CommandLineTests(unittest.TestCase):
         self.assertRaises(
             SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
 
+    def test_softlayer_api_error(self):
+        error = SoftLayer.SoftLayerAPIError('Exception', 'Exception Text')
+        self.env.get_module_name.side_effect = error
+        self.assertRaises(
+            SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
+
+    def test_softlayer_api_error_authentication_error(self):
+        error = SoftLayer.SoftLayerAPIError('SoftLayerException',
+                                            'Invalid API Token')
+        self.env.get_module_name.side_effect = error
+        self.assertRaises(
+            SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
+
     def test_system_exit_error(self):
         self.env.get_module_name.side_effect = SystemExit
         self.assertRaises(
@@ -203,59 +214,3 @@ class TestCommandParser(unittest.TestCase):
         self.env.get_command.return_value = command
         self.assertRaises(
             SystemExit, self.parser.parse_command_args, 'cci', 'list', [])
-
-
-class TestFormatOutput(unittest.TestCase):
-    def test_format_output_string(self):
-        t = cli.core.format_output('just a string', 'raw')
-        self.assertEqual('just a string', t)
-
-        t = cli.core.format_output(u'just a string', 'raw')
-        self.assertEqual(u'just a string', t)
-
-    def test_format_output_raw(self):
-        t = cli.Table(['nothing'])
-        t.align['nothing'] = 'c'
-        t.add_row(['testdata'])
-        t.sortby = 'nothing'
-        ret = cli.core.format_output(t, 'raw')
-
-        self.assertNotIn('nothing', str(ret))
-        self.assertIn('testdata', str(ret))
-
-    def test_format_output_formatted_item(self):
-        item = cli.FormattedItem('test', 'test_formatted')
-        ret = cli.core.format_output(item, 'table')
-        self.assertEqual('test_formatted', ret)
-
-    def test_format_output_list(self):
-        item = ['this', 'is', 'a', 'list']
-        ret = cli.core.format_output(item, 'table')
-        self.assertEqual(os.linesep.join(item), ret)
-
-    def test_format_output_table(self):
-        t = cli.Table(['nothing'])
-        t.align['nothing'] = 'c'
-        t.add_row(['testdata'])
-        t.sortby = 'nothing'
-        ret = cli.core.format_output(t, 'table')
-
-        self.assertIn('nothing', str(ret))
-        self.assertIn('testdata', str(ret))
-
-    def test_unknown(self):
-        t = cli.core.format_output({}, 'raw')
-        self.assertEqual('{}', t)
-
-    def test_sequentialoutput(self):
-        t = cli.core.SequentialOutput(blanks=False)
-        self.assertTrue(hasattr(t, 'append'))
-        t.append('This is a test')
-        t.append('')
-        t.append('More tests')
-        output = cli.core.format_output(t)
-        self.assertEqual("This is a test\nMore tests", output)
-
-        t.blanks = True
-        output = cli.core.format_output(t)
-        self.assertEqual("This is a test\n\nMore tests", output)
