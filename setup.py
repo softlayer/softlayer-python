@@ -1,9 +1,12 @@
+import sys
+import os
+
 try:
     from setuptools import setup
 except ImportError:
-    from distutils.core import setup  # NOQA
-import sys
-import os
+    print("Distribute is required for install:")
+    print("    http://python-distribute.org/distribute_setup.py")
+    sys.exit(1)
 
 # Not supported for Python versions < 2.6
 if sys.version_info <= (2, 6):
@@ -16,7 +19,6 @@ if sys.version_info >= (3,):
     extra['use_2to3'] = True
 
 requires = [
-    'distribute',
     'prettytable >= 0.7.0',
     'docopt == 0.6.1',
     'requests'
