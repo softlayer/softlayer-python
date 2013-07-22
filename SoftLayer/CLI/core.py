@@ -29,17 +29,13 @@ The easiest way to do that is to use: 'sl config setup'
 # :license: BSD, see LICENSE for more details.
 
 import sys
-import os
-import os.path
 import logging
 
-from prettytable import FRAME, NONE
 from docopt import docopt, DocoptExit
 
-from SoftLayer import Client, SoftLayerError
+from SoftLayer import Client, SoftLayerError, SoftLayerAPIError
 from SoftLayer.consts import VERSION
-from SoftLayer.CLI.helpers import (
-    Table, CLIAbort, FormattedItem, listing, ArgumentError, SequentialOutput)
+from SoftLayer.CLI.helpers import CLIAbort, ArgumentError, format_output
 from SoftLayer.CLI.environment import (
     Environment, CLIRunnableType, InvalidCommand, InvalidModule)
 
@@ -50,56 +46,6 @@ DEBUG_LOGGING_MAP = {
     '2': logging.INFO,
     '3': logging.DEBUG
 }
-
-
-def format_output(data, fmt='table'):
-    if isinstance(data, basestring):
-        return data
-
-    if isinstance(data, Table):
-        if fmt == 'table':
-            return str(format_prettytable(data))
-        elif fmt == 'raw':
-            return str(format_no_tty(data))
-
-    if fmt != 'raw' and isinstance(data, FormattedItem):
-        return str(data.formatted)
-
-    if isinstance(data, SequentialOutput):
-        output = [format_output(d, fmt=fmt) for d in data]
-        if not data.blanks:
-            output = [x for x in output if len(x)]
-        return format_output(output, fmt=fmt)
-
-    if isinstance(data, list) or isinstance(data, tuple):
-        output = [format_output(d, fmt=fmt) for d in data]
-        return format_output(listing(output, separator=os.linesep))
-
-    return str(data)
-
-
-def format_prettytable(table):
-    for i, row in enumerate(table.rows):
-        for j, item in enumerate(row):
-            table.rows[i][j] = format_output(item)
-    t = table.prettytable()
-    t.hrules = FRAME
-    t.horizontal_char = '.'
-    t.vertical_char = ':'
-    t.junction_char = ':'
-    return t
-
-
-def format_no_tty(table):
-    t = table.prettytable()
-    for col in table.columns:
-        t.align[col] = 'l'
-    t.hrules = NONE
-    t.border = False
-    t.header = False
-    t.left_padding_width = 0
-    t.right_padding_width = 2
-    return t
 
 
 class CommandParser(object):
@@ -238,7 +184,7 @@ def main(args=sys.argv[1:], env=Environment()):
         exit_status = 1
     except (ValueError, KeyError):
         raise
-    except DocoptExit, e:
+    except DocoptExit as e:
         env.err(e.usage)
         env.err(
             '\nUnknown argument(s), use -h or --help for available options')
@@ -246,15 +192,22 @@ def main(args=sys.argv[1:], env=Environment()):
     except KeyboardInterrupt:
         env.out('')
         exit_status = 1
-    except CLIAbort, e:
+    except CLIAbort as e:
         env.err(str(e.message))
         exit_status = e.code
-    except SystemExit, e:
+    except SystemExit as e:
         exit_status = e.code
-    except SoftLayerError, e:
+    except SoftLayerAPIError as e:
+        if 'invalid api token' in e.faultString.lower():
+            env.out("Authentication Failed: To update your credentials, use "
+                    "'sl config setup'")
+        else:
+            env.err(str(e))
+            exit_status = 1
+    except SoftLayerError as e:
         env.err(str(e))
         exit_status = 1
-    except Exception, e:
+    except Exception as e:
         import traceback
         env.err(traceback.format_exc())
         exit_status = 1

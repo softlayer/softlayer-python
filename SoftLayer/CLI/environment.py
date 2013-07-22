@@ -7,6 +7,7 @@
     :license: BSD, see LICENSE for more details.
 """
 import sys
+import getpass
 from importlib import import_module
 from ConfigParser import SafeConfigParser
 import os
@@ -84,6 +85,9 @@ class Environment(object):
 
     def input(self, prompt):
         return raw_input(prompt)
+
+    def getpass(self, prompt):
+        return getpass.getpass(prompt)
 
     def load_config(self, files):
         config_files = [os.path.expanduser(f) for f in files]

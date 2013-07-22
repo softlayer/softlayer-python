@@ -6,6 +6,7 @@
     :license: BSD, see LICENSE for more details.
 """
 import sys
+import os
 try:
     import unittest2 as unittest
 except ImportError:
@@ -175,3 +176,59 @@ class ResolveIdTests(unittest.TestCase):
         resolver = lambda r: [12345, 54321]
         self.assertRaises(
             cli.helpers.CLIAbort, cli.helpers.resolve_id, resolver, 'test')
+
+
+class TestFormatOutput(unittest.TestCase):
+    def test_format_output_string(self):
+        t = cli.helpers.format_output('just a string', 'raw')
+        self.assertEqual('just a string', t)
+
+        t = cli.helpers.format_output(u'just a string', 'raw')
+        self.assertEqual(u'just a string', t)
+
+    def test_format_output_raw(self):
+        t = cli.Table(['nothing'])
+        t.align['nothing'] = 'c'
+        t.add_row(['testdata'])
+        t.sortby = 'nothing'
+        ret = cli.helpers.format_output(t, 'raw')
+
+        self.assertNotIn('nothing', str(ret))
+        self.assertIn('testdata', str(ret))
+
+    def test_format_output_formatted_item(self):
+        item = cli.FormattedItem('test', 'test_formatted')
+        ret = cli.helpers.format_output(item, 'table')
+        self.assertEqual('test_formatted', ret)
+
+    def test_format_output_list(self):
+        item = ['this', 'is', 'a', 'list']
+        ret = cli.helpers.format_output(item, 'table')
+        self.assertEqual(os.linesep.join(item), ret)
+
+    def test_format_output_table(self):
+        t = cli.Table(['nothing'])
+        t.align['nothing'] = 'c'
+        t.add_row(['testdata'])
+        t.sortby = 'nothing'
+        ret = cli.helpers.format_output(t, 'table')
+
+        self.assertIn('nothing', str(ret))
+        self.assertIn('testdata', str(ret))
+
+    def test_unknown(self):
+        t = cli.helpers.format_output({}, 'raw')
+        self.assertEqual('{}', t)
+
+    def test_sequentialoutput(self):
+        t = cli.helpers.SequentialOutput(blanks=False)
+        self.assertTrue(hasattr(t, 'append'))
+        t.append('This is a test')
+        t.append('')
+        t.append('More tests')
+        output = cli.helpers.format_output(t)
+        self.assertEqual("This is a test\nMore tests", output)
+
+        t.blanks = True
+        output = cli.helpers.format_output(t)
+        self.assertEqual("This is a test\n\nMore tests", output)
