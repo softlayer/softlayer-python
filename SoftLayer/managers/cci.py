@@ -143,6 +143,7 @@ class CCIManager(IdentifierMixin, object):
                 'activeTransaction.id',
                 'blockDevices',
                 'blockDeviceTemplateGroup[id, name]',
+                'userData',
                 'status.name',
                 'operatingSystem.softwareLicense.'
                 'softwareDescription[manufacturer,name,version,referenceCode]',
@@ -311,3 +312,22 @@ class CCIManager(IdentifierMixin, object):
         results = self.list_instances(private_ip=ip, mask="id")
         if results:
             return [result['id'] for result in results]
+
+    def edit(self, id, userdata=None, hostname=None, domain=None, notes=None):
+        obj = {}
+        if userdata:
+            self.guest.setUserMetadata([userdata], id=id)
+
+        if hostname:
+            obj['hostname'] = hostname
+
+        if domain:
+            obj['domain'] = domain
+
+        if notes:
+            obj['notes'] = notes
+
+        if not obj:
+            return True
+
+        return self.guest.editObject(obj, id=id)
