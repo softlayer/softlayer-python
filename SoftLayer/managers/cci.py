@@ -143,6 +143,7 @@ class CCIManager(IdentifierMixin, object):
                 'activeTransaction.id',
                 'blockDevices',
                 'blockDeviceTemplateGroup[id, name]',
+                'userData',
                 'status.name',
                 'operatingSystem.softwareLicense.'
                 'softwareDescription[manufacturer,name,version,referenceCode]',
@@ -311,3 +312,35 @@ class CCIManager(IdentifierMixin, object):
         results = self.list_instances(private_ip=ip, mask="id")
         if results:
             return [result['id'] for result in results]
+
+    def edit(self, id, userdata=None, hostname=None, domain=None, notes=None):
+        """ Edit hostname, domain name, notes, and/or the user data of a CCI
+
+        Parameters set to None will be ignored and not attempted to be updated.
+
+        :param integer id: the instance ID to edit
+        :param string userdata: user data on CCI to edit.
+                                If none exist it will be created
+        :param string hostname: valid hostname
+        :param string domain: valid domain namem
+        :param string notes: notes about this particular CCI
+
+        """
+
+        obj = {}
+        if userdata:
+            self.guest.setUserMetadata([userdata], id=id)
+
+        if hostname:
+            obj['hostname'] = hostname
+
+        if domain:
+            obj['domain'] = domain
+
+        if notes:
+            obj['notes'] = notes
+
+        if not obj:
+            return True
+
+        return self.guest.editObject(obj, id=id)

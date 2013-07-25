@@ -19,10 +19,11 @@ For several commands, <identifier> will be asked for. This can be the id,
 hostname or the ip address for a piece of hardware.
 """
 import re
+import os
 from os import linesep
 from SoftLayer.CLI.helpers import (
     CLIRunnable, Table, FormattedItem, NestedDict, CLIAbort, blank, listing,
-    SequentialOutput, gb, no_going_back, resolve_id, confirm)
+    SequentialOutput, gb, no_going_back, resolve_id, confirm, ArgumentError)
 from SoftLayer import HardwareManager
 
 
@@ -746,3 +747,49 @@ Optional:
                     price_id = item_options[1]
 
         return price_id
+
+
+class EditHardware(CLIRunnable):
+    """
+usage: sl hardware edit <identifier> [options]
+
+Edit hardware details
+
+Options:
+  -H --hostname=HOST  Host portion of the FQDN. example: server
+  -D --domain=DOMAIN  Domain portion of the FQDN example: example.com
+  -u --userdata=DATA  User defined metadata string
+  -F --userfile=FILE  Read userdata from file
+"""
+    action = 'edit'
+
+    @staticmethod
+    def execute(client, args):
+        data = {}
+
+        if args['--userdata'] and args['--userfile']:
+            raise ArgumentError('[-u | --userdata] not allowed with '
+                                '[-F | --userfile]')
+        if args['--userfile']:
+            if not os.path.exists(args['--userfile']):
+                raise ArgumentError(
+                    'File does not exist [-u | --userfile] = %s'
+                    % args['--userfile'])
+
+        if args.get('--userdata'):
+            data['userdata'] = args['--userdata']
+        elif args.get('--userfile'):
+            f = open(args['--userfile'], 'r')
+            try:
+                data['userdata'] = f.read()
+            finally:
+                f.close()
+
+        data['hostname'] = args.get('--hostname')
+        data['domain'] = args.get('--domain')
+
+        hw = HardwareManager(client)
+        hw_id = resolve_id(hw.resolve_ids, args.get('<identifier>'),
+                           'hardware')
+        if not hw.edit(hw_id, **data):
+            raise CLIAbort("Failed to update hardware")
