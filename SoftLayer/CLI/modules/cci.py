@@ -5,6 +5,7 @@ Manage, delete, order compute instances
 
 The available commands are:
   network         Manage network settings
+  edit            Edit details of a CCI
   create          Order and create a CCI
                     (see `sl cci create-options` for choices)
   manage          Manage active CCI
@@ -762,3 +763,48 @@ Options:
 
         if both or args.get('--PTR'):
             sync_ptr_record()
+
+
+class EditCCI(CLIRunnable):
+    """
+usage: sl cci edit <identifier> [options]
+
+Edit CCI details
+
+Options:
+  -H --hostname=HOST  Host portion of the FQDN. example: server
+  -D --domain=DOMAIN  Domain portion of the FQDN example: example.com
+  -u --userdata=DATA  User defined metadata string
+  -F --userfile=FILE  Read userdata from file
+"""
+    action = 'edit'
+
+    @staticmethod
+    def execute(client, args):
+        data = {}
+
+        if args['--userdata'] and args['--userfile']:
+            raise ArgumentError('[-u | --userdata] not allowed with '
+                                '[-F | --userfile]')
+        if args['--userfile']:
+            if not os.path.exists(args['--userfile']):
+                raise ArgumentError(
+                    'File does not exist [-u | --userfile] = %s'
+                    % args['--userfile'])
+
+        if args.get('--userdata'):
+            data['userdata'] = args['--userdata']
+        elif args.get('--userfile'):
+            f = open(args['--userfile'], 'r')
+            try:
+                data['userdata'] = f.read()
+            finally:
+                f.close()
+
+        data['hostname'] = args.get('--hostname')
+        data['domain'] = args.get('--domain')
+
+        cci = CCIManager(client)
+        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
+        if not cci.edit(cci_id, **data):
+            raise CLIAbort("Failed to update CCI")
