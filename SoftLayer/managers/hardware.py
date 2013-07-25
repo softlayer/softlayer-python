@@ -217,6 +217,7 @@ class HardwareManager(IdentifierMixin, object):
                 'notes',
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
+                'userData',
                 'datacenter.name',
                 'networkComponents[id, status, speed, maxSpeed, name,'
                 'ipmiMacAddress, ipmiIpAddress, macAddress, primaryIpAddress,'
@@ -475,6 +476,39 @@ class HardwareManager(IdentifierMixin, object):
             })
 
         return results
+
+    def edit(self, id, userdata=None, hostname=None, domain=None, notes=None):
+        """ Edit hostname, domain name, notes, and/or the
+            user data of the hardware
+
+        Parameters set to None will be ignored and not attempted to be updated.
+
+        :param integer id: the instance ID to edit
+        :param string userdata: user data on the hardware to edit.
+                                If none exist it will be created
+        :param string hostname: valid hostname
+        :param string domain: valid domain namem
+        :param string notes: notes about this particular hardware
+
+        """
+
+        obj = {}
+        if userdata:
+            self.hardware.setUserMetadata([userdata], id=id)
+
+        if hostname:
+            obj['hostname'] = hostname
+
+        if domain:
+            obj['domain'] = domain
+
+        if notes:
+            obj['notes'] = notes
+
+        if not obj:
+            return True
+
+        return self.hardware.editObject(obj, id=id)
 
 
 def get_default_value(package_options, category):
