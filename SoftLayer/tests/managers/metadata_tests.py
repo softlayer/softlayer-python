@@ -92,7 +92,7 @@ class MetadataTestsMakeRequest(unittest.TestCase):
         make_api_call.assert_called_with(
             'GET', self.url,
             timeout=5,
-            http_headers={'User-Agent': 'SoftLayer Python v2.3.0'})
+            http_headers={'User-Agent': 'SoftLayer Python v2.3.1'})
         self.assertEqual(make_api_call(), r)
 
     @patch('SoftLayer.managers.metadata.make_rest_api_call')
