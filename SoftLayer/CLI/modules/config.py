@@ -76,20 +76,23 @@ Setup configuration
             'API Key or Password [%s]: ' % cls.env.config['api_key']) \
             or cls.env.config['api_key']
 
-        endpoint_type = cls.env.input('Endpoint (public|private|custom): ')
-        endpoint_type = endpoint_type.lower()
-        if endpoint_type == 'public':
-            endpoint_url = API_PUBLIC_ENDPOINT
-        elif endpoint_type == 'private':
-            endpoint_url = API_PRIVATE_ENDPOINT
-        elif endpoint_type == 'custom' or not endpoint_type:
-            endpoint_url = API_PRIVATE_ENDPOINT
-            endpoint_url = cls.env.input(
-                'Endpoint URL [%s]: ' % cls.env.config['endpoint_url']
-            ) or cls.env.config['endpoint_url']
-        else:
-            raise CLIAbort(
-                'Public, Private and Custom are the only valid options.')
+        while True:
+            endpoint_type = cls.env.input('Endpoint (public|private|custom): ')
+            endpoint_type = endpoint_type.lower()
+            if not endpoint_type:
+                endpoint_url = API_PUBLIC_ENDPOINT
+                break
+            if endpoint_type == 'public':
+                endpoint_url = API_PUBLIC_ENDPOINT
+                break
+            elif endpoint_type == 'private':
+                endpoint_url = API_PRIVATE_ENDPOINT
+                break
+            elif endpoint_type == 'custom':
+                endpoint_url = cls.env.input(
+                    'Endpoint URL [%s]: ' % cls.env.config['endpoint_url']
+                ) or cls.env.config['endpoint_url']
+                break
 
         path = '~/.softlayer'
         if args.get('--config'):
