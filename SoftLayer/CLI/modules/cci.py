@@ -98,8 +98,7 @@ For more on filters see 'sl help filters'
             guest = NestedDict(guest)
             t.add_row([
                 guest['id'],
-                FormattedItem(guest['datacenter']['name'],
-                              guest['datacenter']['longName']),
+                guest['datacenter']['name'],
                 guest['fullyQualifiedDomainName'],
                 guest['maxCpu'],
                 mb_to_gb(guest['maxMemory']),
@@ -141,8 +140,7 @@ Options:
             result['status']['keyName'], result['status']['name'])])
         t.add_row(['state', FormattedItem(
             result['powerState']['keyName'], result['powerState']['name'])])
-        t.add_row(['datacenter', FormattedItem(
-            result['datacenter']['name'], result['datacenter']['longName'])])
+        t.add_row(['datacenter', result['datacenter']['name']])
         t.add_row(['cores', result['maxCpu']])
         t.add_row(['memory', mb_to_gb(result['maxMemory'])])
         t.add_row(['public_ip', result['primaryIpAddress'] or blank()])
