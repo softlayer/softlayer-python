@@ -101,7 +101,7 @@ class HardwareManager(IdentifierMixin, object):
                 'memoryCapacity',
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
-                'datacenter.name',
+                'datacenter',
             ])
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
@@ -218,7 +218,7 @@ class HardwareManager(IdentifierMixin, object):
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
                 'userData',
-                'datacenter.name',
+                'datacenter',
                 'networkComponents[id, status, speed, maxSpeed, name,'
                 'ipmiMacAddress, ipmiIpAddress, macAddress, primaryIpAddress,'
                 'port, primarySubnet]',

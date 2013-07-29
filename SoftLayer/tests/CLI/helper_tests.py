@@ -7,6 +7,7 @@
 """
 import sys
 import os
+import json
 try:
     import unittest2 as unittest
 except ImportError:
@@ -19,6 +20,22 @@ if sys.version_info >= (3,):
     raw_input_path = 'builtins.input'
 else:
     raw_input_path = '__builtin__.raw_input'
+
+
+class CLIJSONEncoderTest(unittest.TestCase):
+    def test_default(self):
+        out = json.dumps({
+            'formattedItem': cli.helpers.FormattedItem('normal', 'formatted')
+        }, cls=cli.helpers.CLIJSONEncoder)
+        self.assertEqual(out, '{"formattedItem": "normal"}')
+
+        out = json.dumps({'normal': 'string'}, cls=cli.helpers.CLIJSONEncoder)
+        self.assertEqual(out, '{"normal": "string"}')
+
+    def test_fail(self):
+        self.assertRaises(
+            TypeError,
+            json.dumps, {'test': object()}, cls=cli.helpers.CLIJSONEncoder)
 
 
 class PromptTests(unittest.TestCase):
@@ -134,8 +151,37 @@ class FormattedItemTests(unittest.TestCase):
 
     def test_blank(self):
         item = cli.helpers.blank()
-        self.assertEqual('NULL', item.original)
+        self.assertEqual(None, item.original)
         self.assertEqual('-', item.formatted)
+        self.assertEqual('NULL', str(item))
+
+
+class FormattedListTests(unittest.TestCase):
+    def test_init(self):
+        l = cli.listing([1, 'two'], separator=':')
+        self.assertEqual([1, 'two'], list(l))
+        self.assertEqual(':', l.separator)
+
+        l = cli.listing([])
+        self.assertEqual(',', l.separator)
+
+    def test_to_python(self):
+        l = cli.listing([1, 'two'])
+        result = l.to_python()
+        self.assertEqual([1, 'two'], result)
+
+        l = cli.listing(x for x in [1, 'two'])
+        result = l.to_python()
+        self.assertEqual([1, 'two'], result)
+
+    def test_str(self):
+        l = cli.listing([1, 'two'])
+        result = str(l)
+        self.assertEqual('1,two', result)
+
+        l = cli.listing((x for x in [1, 'two']), separator=':')
+        result = str(l)
+        self.assertEqual('1:two', result)
 
 
 class CLIAbortTests(unittest.TestCase):
@@ -196,6 +242,31 @@ class TestFormatOutput(unittest.TestCase):
         self.assertNotIn('nothing', str(ret))
         self.assertIn('testdata', str(ret))
 
+    def test_format_output_json(self):
+        t = cli.Table(['nothing'])
+        t.align['nothing'] = 'c'
+        t.add_row(['testdata'])
+        t.add_row([cli.helpers.blank()])
+        t.sortby = 'nothing'
+        ret = cli.helpers.format_output(t, 'json')
+        self.assertEqual('''[
+    {
+        "nothing": "testdata"
+    }, 
+    {
+        "nothing": null
+    }
+]''', ret)
+
+    def test_format_output_json_keyvaluetable(self):
+        t = cli.KeyValueTable(['key', 'value'])
+        t.add_row(['nothing', cli.helpers.blank()])
+        t.sortby = 'nothing'
+        ret = cli.helpers.format_output(t, 'json')
+        self.assertEqual('''{
+    "nothing": null
+}''', ret)
+
     def test_format_output_formatted_item(self):
         item = cli.FormattedItem('test', 'test_formatted')
         ret = cli.helpers.format_output(item, 'table')
@@ -221,7 +292,7 @@ class TestFormatOutput(unittest.TestCase):
         self.assertEqual('{}', t)
 
     def test_sequentialoutput(self):
-        t = cli.helpers.SequentialOutput(blanks=False)
+        t = cli.helpers.SequentialOutput()
         self.assertTrue(hasattr(t, 'append'))
         t.append('This is a test')
         t.append('')
@@ -229,6 +300,6 @@ class TestFormatOutput(unittest.TestCase):
         output = cli.helpers.format_output(t)
         self.assertEqual("This is a test\nMore tests", output)
 
-        t.blanks = True
+        t.separator = ','
         output = cli.helpers.format_output(t)
-        self.assertEqual("This is a test\n\nMore tests", output)
+        self.assertEqual("This is a test,More tests", output)
