@@ -4,7 +4,7 @@ usage: sl image [<command>] [<args>...] [options]
 Manage compute and flex images
 
 The available commands are:
-  list  List active vlans with firewalls
+  list  List images
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: BSD, see LICENSE for more details.
@@ -17,7 +17,7 @@ class ListImages(CLIRunnable):
     """
 usage: sl image list [--public | --private] [options]
 
-List images on the account
+List images
 
 Options:
   --public   Display only public images

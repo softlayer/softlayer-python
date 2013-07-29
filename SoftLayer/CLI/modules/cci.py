@@ -31,7 +31,8 @@ from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
     FormattedItem)
 from SoftLayer.CLI.helpers import (
-    CLIAbort, ArgumentError, SequentialOutput, NestedDict, blank, resolve_id)
+    CLIAbort, ArgumentError, SequentialOutput, NestedDict, blank, resolve_id,
+    KeyValueTable)
 
 
 class ListCCIs(CLIRunnable):
@@ -97,7 +98,8 @@ For more on filters see 'sl help filters'
             guest = NestedDict(guest)
             t.add_row([
                 guest['id'],
-                guest['datacenter']['name'] or blank(),
+                FormattedItem(guest['datacenter']['name'],
+                              guest['datacenter']['longName']),
                 guest['fullyQualifiedDomainName'],
                 guest['maxCpu'],
                 mb_to_gb(guest['maxMemory']),
@@ -125,8 +127,7 @@ Options:
     @staticmethod
     def execute(client, args):
         cci = CCIManager(client)
-
-        t = Table(['Name', 'Value'])
+        t = KeyValueTable(['Name', 'Value'])
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
 
@@ -136,9 +137,12 @@ Options:
 
         t.add_row(['id', result['id']])
         t.add_row(['hostname', result['fullyQualifiedDomainName']])
-        t.add_row(['status', result['status']['name']])
-        t.add_row(['state', result['powerState']['name']])
-        t.add_row(['datacenter', result['datacenter']['name'] or blank()])
+        t.add_row(['status', FormattedItem(
+            result['status']['keyName'], result['status']['name'])])
+        t.add_row(['state', FormattedItem(
+            result['powerState']['keyName'], result['powerState']['name'])])
+        t.add_row(['datacenter', FormattedItem(
+            result['datacenter']['name'], result['datacenter']['longName'])])
         t.add_row(['cores', result['maxCpu']])
         t.add_row(['memory', mb_to_gb(result['maxMemory'])])
         t.add_row(['public_ip', result['primaryIpAddress'] or blank()])
@@ -163,11 +167,10 @@ Options:
             t.add_row(['price rate', result['billingItem']['recurringFee']])
 
         if args.get('--passwords'):
-            user_strs = []
+            pass_table = Table(['username', 'password'])
             for item in result['operatingSystem']['passwords']:
-                user_strs.append(
-                    "%s %s" % (item['username'], item['password']))
-            t.add_row(['users', listing(user_strs)])
+                pass_table.add_row([item['username'], item['password']])
+            t.add_row(['users', pass_table])
 
         tag_row = []
         for tag in result['tagReferences']:
@@ -218,7 +221,7 @@ Options:
         if args['--all']:
             show_all = True
 
-        t = Table(['Name', 'Value'])
+        t = KeyValueTable(['Name', 'Value'])
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
 
@@ -443,7 +446,7 @@ Optional:
             if args.get('--hourly'):
                 billing_rate = 'hourly'
             t.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
-            output = SequentialOutput(blanks=False)
+            output = SequentialOutput()
             output.append(t)
             output.append(FormattedItem(
                 '',
@@ -455,7 +458,7 @@ Optional:
                 "This action will incur charges on your account. Continue?"):
             result = cci.create_instance(**data)
 
-            t = Table(['name', 'value'])
+            t = KeyValueTable(['name', 'value'])
             t.align['name'] = 'r'
             t.align['value'] = 'l'
             t.add_row(['id', result['id']])

@@ -47,6 +47,8 @@ DEBUG_LOGGING_MAP = {
     '3': logging.DEBUG
 }
 
+VALID_FORMATS = ['raw', 'table', 'json']
+
 
 class CommandParser(object):
     def __init__(self, env):
@@ -164,7 +166,7 @@ def main(args=sys.argv[1:], env=Environment()):
         data = command.execute(client, command_args)
         if data:
             format = command_args.get('--format', 'table')
-            if format not in ['raw', 'table']:
+            if format not in VALID_FORMATS:
                 raise ArgumentError('Invalid format "%s"' % format)
             s = format_output(data, fmt=format)
             if s:

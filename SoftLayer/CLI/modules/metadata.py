@@ -24,7 +24,7 @@ The available commands are:
 # :license: BSD, see LICENSE for more details.
 
 from SoftLayer import MetadataManager
-from SoftLayer.CLI import CLIRunnable, Table, listing, CLIAbort
+from SoftLayer.CLI import CLIRunnable, KeyValueTable, listing, CLIAbort
 
 
 class BackendMacAddresses(CLIRunnable):
@@ -200,7 +200,7 @@ Get details about the public or private network
     def execute(client, args):
         meta = MetadataManager()
         if args['<public>']:
-            t = Table(['Name', 'Value'])
+            t = KeyValueTable(['Name', 'Value'])
             t.align['Name'] = 'r'
             t.align['Value'] = 'l'
             network = meta.public_network()
@@ -217,7 +217,7 @@ Get details about the public or private network
             return t
 
         if args['<private>']:
-            t = Table(['Name', 'Value'])
+            t = KeyValueTable(['Name', 'Value'])
             t.align['Name'] = 'r'
             t.align['Value'] = 'l'
             network = meta.private_network()

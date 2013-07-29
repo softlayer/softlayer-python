@@ -7,39 +7,60 @@
     :license: BSD, see LICENSE for more details.
 """
 import os
+import json
 
 from SoftLayer.CLI.environment import CLIRunnableType
 from SoftLayer.utils import NestedDict
 from prettytable import PrettyTable, FRAME, NONE
 
-__all__ = ['Table', 'CLIRunnable', 'FormattedItem', 'valid_response',
-           'confirm', 'no_going_back', 'mb_to_gb', 'gb', 'listing', 'CLIAbort',
-           'NestedDict', 'resolve_id', 'format_output']
+__all__ = ['Table', 'KeyValueTable', 'CLIRunnable', 'FormattedItem',
+           'valid_response', 'confirm', 'no_going_back', 'mb_to_gb', 'gb',
+           'listing', 'CLIAbort', 'NestedDict', 'resolve_id', 'format_output']
 
 
 def format_output(data, fmt='table'):
+    """ Given some data, will format it for output
+
+    :param data: One of: String, Table, FormattedItem, List, Tuple,
+                 SequentialOutput
+    :param string fmt (optional): One of: table, raw, json, python
+    """
     if isinstance(data, basestring):
         return data
 
-    if isinstance(data, Table):
+    # responds to .prettytable()
+    if hasattr(data, 'prettytable'):
         if fmt == 'table':
             return str(format_prettytable(data))
         elif fmt == 'raw':
             return str(format_no_tty(data))
 
-    if fmt != 'raw' and isinstance(data, FormattedItem):
-        return str(data.formatted)
+    # responds to .to_python()
+    if hasattr(data, 'to_python'):
+        if fmt == 'json':
+            return json.dumps(
+                format_output(data, fmt='python'),
+                indent=4,
+                cls=CLIJSONEncoder)
+        elif fmt == 'python':
+            return data.to_python()
 
-    if isinstance(data, SequentialOutput):
-        output = [format_output(d, fmt=fmt) for d in data]
-        if not data.blanks:
-            output = [x for x in output if len(x)]
-        return format_output(output, fmt=fmt)
+    # responds to .formatted
+    if hasattr(data, 'formatted'):
+        if fmt == 'table':
+            return str(data.formatted)
 
+    # responds to .separator
+    if hasattr(data, 'separator'):
+        output = [format_output(d, fmt=fmt) for d in data if d]
+        return str(SequentialOutput(data.separator, output))
+
+    # is iterable
     if isinstance(data, list) or isinstance(data, tuple):
         output = [format_output(d, fmt=fmt) for d in data]
         return format_output(listing(output, separator=os.linesep))
 
+    # fallback, convert this odd object to a string
     return str(data)
 
 
@@ -56,6 +77,9 @@ def format_prettytable(table):
 
 
 def format_no_tty(table):
+    for i, row in enumerate(table.rows):
+        for j, item in enumerate(row):
+            table.rows[i][j] = format_output(item, fmt='raw')
     t = table.prettytable()
     for col in table.columns:
         t.align[col] = 'l'
@@ -75,10 +99,65 @@ class FormattedItem(object):
         else:
             self.formatted = self.original
 
+    def to_python(self):
+        return self.original
+
     def __str__(self):
+        if self.original is None:
+            return 'NULL'
         return str(self.original)
 
     __repr__ = __str__
+
+
+def mb_to_gb(megabytes):
+    """ Takes in the number of megabytes and returns a FormattedItem that
+        displays gigabytes.
+
+    :param int megabytes: number of megabytes
+    """
+    return FormattedItem(megabytes, "%dG" % (float(megabytes) / 1024))
+
+
+def gb(gigabytes):
+    """ Takes in the number of gigabytes and returns a FormattedItem that
+        displays gigabytes.
+
+    :param int gigabytes: number of gigabytes
+    """
+    return FormattedItem(int(float(gigabytes)) * 1024,
+                         "%dG" % int(float(gigabytes)))
+
+
+def blank():
+    """ Returns FormatedItem to make pretty output use a dash
+        and raw formatting to use NULL
+    """
+    return FormattedItem(None, '-')
+
+
+def listing(items, separator=','):
+    """ Given an iterable, returns a FormatedItem which display a list of
+        items
+
+        :param items: An iterable that outputs strings
+        :param string separator: the separator to use
+    """
+    return SequentialOutput(separator, items)
+
+
+class CLIRunnable(object):
+    __metaclass__ = CLIRunnableType
+    options = []
+    action = None
+
+    @staticmethod
+    def add_additional_args(parser):
+        pass
+
+    @staticmethod
+    def execute(client, args):
+        pass
 
 
 def resolve_id(resolver, identifier, name='object'):
@@ -102,40 +181,6 @@ def resolve_id(resolver, identifier, name='object'):
             (name, identifier, ', '.join([str(_id) for _id in ids])))
 
     return ids[0]
-
-
-def mb_to_gb(megabytes):
-    return FormattedItem(megabytes, "%dG" % (float(megabytes) / 1024))
-
-
-def gb(gigabytes):
-    return FormattedItem(int(float(gigabytes)) * 1024,
-                         "%dG" % int(float(gigabytes)))
-
-
-def blank():
-    """ Returns FormatedItem to make pretty output use a dash
-    and raw formatting to use NULL"""
-    return FormattedItem('NULL', '-')
-
-
-def listing(item, separator=','):
-    l = separator.join((str(i) for i in item))
-    return FormattedItem(l, l)
-
-
-class CLIRunnable(object):
-    __metaclass__ = CLIRunnableType
-    options = []
-    action = None
-
-    @staticmethod
-    def add_additional_args(parser):
-        pass
-
-    @staticmethod
-    def execute(client, args):
-        pass
 
 
 def valid_response(prompt, *valid):
@@ -202,6 +247,19 @@ class Table(object):
     def add_row(self, row):
         self.rows.append(row)
 
+    def _format_python_value(self, value):
+        if hasattr(value, 'to_python'):
+            return value.to_python()
+        return value
+
+    def to_python(self):
+        # Adding rows
+        l = []
+        for row in self.rows:
+            formatted_row = [self._format_python_value(v) for v in row]
+            l.append(dict(zip(self.columns, formatted_row)))
+        return l
+
     def prettytable(self):
         """ Returns a new prettytable instance. """
         t = PrettyTable(self.columns)
@@ -216,6 +274,28 @@ class Table(object):
         return t
 
 
+class KeyValueTable(Table):
+    def to_python(self):
+        d = {}
+        for row in self.rows:
+            d[row[0]] = self._format_python_value(row[1])
+        return d
+
+
 class SequentialOutput(list):
-    def __init__(self, blanks=True, *args, **kwargs):
-        self.blanks = blanks
+    def __init__(self, separator=os.linesep, *args, **kwargs):
+        self.separator = separator
+        super(SequentialOutput, self).__init__(*args, **kwargs)
+
+    def to_python(self):
+        return self
+
+    def __str__(self):
+        return self.separator.join(str(x) for x in self)
+
+
+class CLIJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, FormattedItem):
+            return obj.to_python()
+        return super(CLIJSONEncoder, self).default(obj)
