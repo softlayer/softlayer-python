@@ -36,7 +36,8 @@ def get_api_key(username, secret, endpoint_url=None):
         client = Client(
             username=username,
             api_key=secret,
-            endpoint_url=endpoint_url)
+            endpoint_url=endpoint_url,
+            timeout=5)
 
         client['Account'].getCurrentUser()
         return secret
@@ -45,7 +46,7 @@ def get_api_key(username, secret, endpoint_url=None):
             raise
 
     # Try to use a client with username/password
-    client = Client(endpoint_url=endpoint_url)
+    client = Client(endpoint_url=endpoint_url, timeout=5)
     client.authenticate_with_password(username, secret)
 
     user_record = client['Account'].getCurrentUser(
@@ -75,20 +76,20 @@ Setup configuration
             'API Key or Password [%s]: ' % cls.env.config['api_key']) \
             or cls.env.config['api_key']
 
-        cls.env.out("Endpoint URL specifies which endpoint will be used "
-                    "during communication with the SLAPI. The default address "
-                    "is accessible over the internet and will work in most "
-                    "cases. You may also type 'private' to use the private "
-                    "network or specify a custom URL.")
-        endpoint_url = cls.env.input(
-            'Endpoint URL [%s]: '
-            % cls.env.config['endpoint_url']) or cls.env.config['endpoint_url']
-        if not endpoint_url:
-            endpoint_url = cls.env.config['endpoint_url']
-        if endpoint_url == 'public':
+        endpoint_type = cls.env.input('Endpoint (public|private|custom): ')
+        endpoint_type = endpoint_type.lower()
+        if endpoint_type == 'public':
             endpoint_url = API_PUBLIC_ENDPOINT
-        elif endpoint_url == 'private':
+        elif endpoint_type == 'private':
             endpoint_url = API_PRIVATE_ENDPOINT
+        elif endpoint_type == 'custom' or not endpoint_type:
+            endpoint_url = API_PRIVATE_ENDPOINT
+            endpoint_url = cls.env.input(
+                'Endpoint URL [%s]: ' % cls.env.config['endpoint_url']
+            ) or cls.env.config['endpoint_url']
+        else:
+            raise CLIAbort(
+                'Public, Private and Custom are the only valid options.')
 
         path = '~/.softlayer'
         if args.get('--config'):

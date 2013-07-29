@@ -182,8 +182,6 @@ def main(args=sys.argv[1:], env=Environment()):
             env.err('')
             env.err(str(e))
         exit_status = 1
-    except (ValueError, KeyError):
-        raise
     except DocoptExit as e:
         env.err(e.usage)
         env.err(
