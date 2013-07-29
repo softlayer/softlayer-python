@@ -22,8 +22,9 @@ import re
 import os
 from os import linesep
 from SoftLayer.CLI.helpers import (
-    CLIRunnable, Table, FormattedItem, NestedDict, CLIAbort, blank, listing,
-    SequentialOutput, gb, no_going_back, resolve_id, confirm, ArgumentError)
+    CLIRunnable, Table, KeyValueTable, FormattedItem, NestedDict, CLIAbort,
+    blank, listing, SequentialOutput, gb, no_going_back, resolve_id, confirm,
+    ArgumentError)
 from SoftLayer import HardwareManager
 
 
@@ -88,7 +89,8 @@ For more on filters see 'sl help filters'
             server = NestedDict(server)
             t.add_row([
                 server['id'],
-                server['datacenter']['name'] or blank(),
+                FormattedItem(server['datacenter']['name'],
+                              server['datacenter']['longName']),
                 server['fullyQualifiedDomainName'],
                 server['processorCoreAmount'],
                 gb(server['memoryCapacity']),
@@ -115,7 +117,7 @@ Options:
     def execute(client, args):
         hardware = HardwareManager(client)
 
-        t = Table(['Name', 'Value'])
+        t = KeyValueTable(['Name', 'Value'])
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
 
@@ -127,7 +129,9 @@ Options:
         t.add_row(['id', result['id']])
         t.add_row(['hostname', result['fullyQualifiedDomainName']])
         t.add_row(['status', result['hardwareStatus']['status']])
-        t.add_row(['datacenter', result['datacenter']['name'] or blank()])
+        t.add_row(['datacenter',
+                   FormattedItem(result['datacenter']['name'],
+                                 result['datacenter']['longName'])])
         t.add_row(['cores', result['processorCoreAmount']])
         t.add_row(['memory', gb(result['memoryCapacity'])])
         t.add_row(['public_ip', result['primaryIpAddress'] or blank()])
@@ -141,7 +145,7 @@ Options:
                 result['operatingSystem']['softwareLicense']
                 ['softwareDescription']['name'] or blank()
             )])
-        t.add_row(['created', result['provisionDate']])
+        t.add_row(['created', result['provisionDate'] or blank()])
         if result.get('notes'):
             t.add_row(['notes', result['notes']])
 
@@ -211,12 +215,12 @@ Options:
     action = 'cancel'
     options = ['confirm']
 
-    @staticmethod
-    def execute(client, args):
+    @classmethod
+    def execute(cls, client, args):
         hw = HardwareManager(client)
         hw_id = resolve_id(hw, args.get('<identifier>'))
 
-        print "(Optional) Add a cancellation comment:",
+        cls.env.out("(Optional) Add a cancellation comment:", nl=False)
         comment = raw_input()
 
         reason = args.get('--reason')
@@ -345,7 +349,7 @@ Options:
     def execute(cls, client, args):
         mgr = HardwareManager(client)
 
-        t = Table(['Name', 'Value'])
+        t = KeyValueTable(['Name', 'Value'])
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
 
@@ -370,9 +374,10 @@ Options:
         if args['--cpu'] or show_all:
             results = cls.get_create_options(ds_options, 'cpu')
 
+            cpu_table = Table(['id', 'description'])
             for result in sorted(results):
-                t.add_row([result[0], listing(
-                    item[0] for item in sorted(result[1]))])
+                cpu_table.add_row([result[1], result[0]])
+            t.add_row(['cpu', cpu_table])
 
         if args['--memory'] or show_all:
             results = cls.get_create_options(ds_options, 'memory')[0]
@@ -384,14 +389,22 @@ Options:
             results = cls.get_create_options(ds_options, 'os')
 
             for result in results:
-                t.add_row([result[0], linesep.join(
-                    item[0] for item in sorted(result[1]))])
+                t.add_row([
+                    result[0],
+                    listing(
+                        [item[0] for item in sorted(result[1])],
+                        separator=linesep
+                    )])
 
         if args['--disk'] or show_all:
             results = cls.get_create_options(ds_options, 'disk')[0]
 
-            t.add_row([results[0], linesep.join(
-                item[0] for item in sorted(results[1],))])
+            t.add_row([
+                results[0],
+                listing(
+                    [item[0] for item in sorted(results[1])],
+                    separator=linesep
+                )])
 
         if args['--nic'] or show_all:
             results = cls.get_create_options(ds_options, 'nic')
@@ -427,16 +440,12 @@ Options:
             return [('datacenter', datacenters)]
         elif 'cpu' == section:
             results = []
-            cpu_regex = re.compile('\s(\w+)\s(\d+)\s+\-\s+([\d\.]+GHz)'
-                                   '\s+\([\w ]+\)\s+\-\s+(.+)$')
 
             for item in ds_options['categories']['server']['items']:
-                cpu = cpu_regex.search(item['description'])
-                text = 'cpu: ' + cpu.group(1) + ' ' + cpu.group(2) + ' (' \
-                       + cpu.group(3) + ', ' + cpu.group(4) + ')'
-
-                if cpu:
-                    results.append((text, [(cpu.group(2), item['price_id'])]))
+                results.append((
+                    item['description'],
+                    item['price_id']
+                ))
 
             return results
         elif 'memory' == section:
@@ -612,6 +621,7 @@ Optional:
   --dry-run, --test        Do not create the server, just get a quote
 """
     action = 'create'
+    options = ['confirm']
 
     @classmethod
     def execute(cls, client, args):
@@ -699,7 +709,7 @@ Optional:
             if args.get('--hourly'):
                 billing_rate = 'hourly'
             t.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
-            output = SequentialOutput(blanks=False)
+            output = SequentialOutput()
             output.append(t)
             output.append(FormattedItem(
                 '',
@@ -710,7 +720,7 @@ Optional:
                 "This action will incur charges on your account. Continue?"):
             result = mgr.place_order(**order)
 
-            t = Table(['name', 'value'])
+            t = KeyValueTable(['name', 'value'])
             t.align['name'] = 'r'
             t.align['value'] = 'l'
             t.add_row(['id', result['orderId']])

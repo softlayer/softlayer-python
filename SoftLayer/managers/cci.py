@@ -52,12 +52,12 @@ class CCIManager(IdentifierMixin, object):
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
                 'lastKnownPowerState.name',
-                'powerState.name',
+                'powerState',
                 'maxCpu',
                 'maxMemory',
-                'datacenter.name',
+                'datacenter',
                 'activeTransaction.transactionStatus[friendlyName,name]',
-                'status.name',
+                'status',
             ])
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
@@ -136,15 +136,14 @@ class CCIManager(IdentifierMixin, object):
                 'networkComponents[id, status, speed, maxSpeed, name,'
                 'macAddress, primaryIpAddress, port, primarySubnet]',
                 'lastKnownPowerState.name',
-                'powerState.name',
+                'powerState',
                 'maxCpu',
                 'maxMemory',
-                'datacenter.name',
+                'datacenter',
                 'activeTransaction.id',
                 'blockDevices',
                 'blockDeviceTemplateGroup[id, name]',
                 'userData',
-                'status.name',
                 'operatingSystem.softwareLicense.'
                 'softwareDescription[manufacturer,name,version,referenceCode]',
                 'operatingSystem.passwords[username,password]',

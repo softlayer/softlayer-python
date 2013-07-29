@@ -15,7 +15,8 @@ hostname or the ip address for a piece of hardware.
 import re
 from os import linesep
 from SoftLayer.CLI import (
-    CLIRunnable, Table, no_going_back, confirm, listing, FormattedItem)
+    CLIRunnable, Table, KeyValueTable, no_going_back, confirm, listing,
+    FormattedItem)
 from SoftLayer.CLI.helpers import (CLIAbort, SequentialOutput)
 from SoftLayer import HardwareManager
 
@@ -54,7 +55,7 @@ Options:
 
     @classmethod
     def execute(cls, client, args):
-        t = Table(['Name', 'Value'])
+        t = KeyValueTable(['Name', 'Value'])
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
 
@@ -78,31 +79,39 @@ Options:
 
         if args['--cpu'] or args['--memory'] or show_all:
             results = cls.get_create_options(bmi_options, 'cpu')
-
+            memory_cpu_table = Table(['memory', 'cpu'])
             for result in results:
-                t.add_row([result[0], listing(
-                    item[0] for item in sorted(result[1],
-                                               key=lambda x: int(x[0])))])
+                memory_cpu_table.add_row([
+                    result[0],
+                    listing(
+                        [item[0] for item in sorted(
+                            result[1], key=lambda x: int(x[0])
+                        )])])
+            t.add_row(['memory/cpu', memory_cpu_table])
 
         if args['--os'] or show_all:
             results = cls.get_create_options(bmi_options, 'os')
 
             for result in results:
-                t.add_row([result[0], linesep.join(
-                    item[0] for item in sorted(result[1]))])
+                t.add_row([
+                    result[0],
+                    listing(
+                        [item[0] for item in sorted(result[1])],
+                        separator=linesep
+                    )])
 
         if args['--disk'] or show_all:
             results = cls.get_create_options(bmi_options, 'disk')[0]
 
             t.add_row([results[0], listing(
-                item[0] for item in sorted(results[1]))])
+                [item[0] for item in sorted(results[1])])])
 
         if args['--nic'] or show_all:
             results = cls.get_create_options(bmi_options, 'nic')
 
             for result in results:
                 t.add_row([result[0], listing(
-                    item[0] for item in sorted(result[1],))])
+                    [item[0] for item in sorted(result[1],)])])
 
         return t
 
@@ -143,7 +152,7 @@ Options:
                 key = memory
 
                 if pretty:
-                    key = 'cpus (%s gb ram)' % memory
+                    key = memory
 
                 results.append((key, mem_options[memory]))
 
@@ -389,7 +398,7 @@ Optional:
             if args.get('--hourly'):
                 billing_rate = 'hourly'
             t.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
-            output = SequentialOutput(blanks=False)
+            output = SequentialOutput()
             output.append(t)
             output.append(FormattedItem(
                 '',
@@ -400,7 +409,7 @@ Optional:
                 "This action will incur charges on your account. Continue?"):
             result = mgr.place_order(**order)
 
-            t = Table(['name', 'value'])
+            t = KeyValueTable(['name', 'value'])
             t.align['name'] = 'r'
             t.align['value'] = 'l'
             t.add_row(['id', result['orderId']])

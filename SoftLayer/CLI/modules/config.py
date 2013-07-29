@@ -14,12 +14,13 @@ import os.path
 
 from SoftLayer import (
     Client, SoftLayerAPIError, API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT)
-from SoftLayer.CLI import CLIRunnable, CLIAbort, Table, confirm, format_output
+from SoftLayer.CLI import (
+    CLIRunnable, CLIAbort, KeyValueTable, confirm, format_output)
 import ConfigParser
 
 
 def config_table(env):
-    t = Table(['Name', 'Value'])
+    t = KeyValueTable(['Name', 'Value'])
     t.align['Name'] = 'r'
     t.align['Value'] = 'l'
     config = env.config
