@@ -14,7 +14,9 @@ from SoftLayer.managers.firewall import FirewallManager
 from SoftLayer.managers.hardware import HardwareManager
 from SoftLayer.managers.messaging import MessagingManager
 from SoftLayer.managers.metadata import MetadataManager
+from SoftLayer.managers.network import NetworkManager
 from SoftLayer.managers.ssl import SSLManager
 
 __all__ = ['CCIManager', 'DNSManager', 'FirewallManager', 'HardwareManager',
-           'MessagingManager', 'MetadataManager', 'SSLManager']
+           'MessagingManager', 'MetadataManager', 'NetworkManager',
+           'SSLManager']
