@@ -25,13 +25,13 @@ class NetworkManager(IdentifierMixin, object):
 
         if vlan_number:
             _filter['networkVlans']['vlanNumber'] = query_filter(vlan_number)
-            
+
         if datacenter:
             _filter['networkVlans']['primaryRouter']['datacenter']['name'] = \
                 query_filter(datacenter)
 
         kwargs['filter'] = _filter.to_dict()
-        
+
         return self._get_vlans(**kwargs)
 
     def summary_by_datacenter(self):
@@ -56,13 +56,14 @@ class NetworkManager(IdentifierMixin, object):
             datacenters[name]['primaryIpCount'] += \
                 vlan['totalPrimaryIpAddressCount']
             datacenters[name]['subnetCount'] += len(vlan['subnets'])
-            datacenters[name]['virtualGuestCount'] += len(vlan['virtualGuests'])
+            datacenters[name]['virtualGuestCount'] += \
+                len(vlan['virtualGuests'])
 
         return datacenters
 
     def _get_vlans(self, **kwargs):
-#        print kwargs
-        return self.account.getNetworkVlans(mask=self._get_vlan_mask(), **kwargs)
+        return self.account.getNetworkVlans(mask=self._get_vlan_mask(),
+                                            **kwargs)
 
     @staticmethod
     def _get_vlan_mask():
@@ -70,7 +71,6 @@ class NetworkManager(IdentifierMixin, object):
             'firewallInterfaces',
             'hardware',
             'networkComponents',
-#            'networkVlanFirewall',
             'primaryRouter[id, fullyQualifiedDomainName, datacenter]',
             'subnets',
             'totalPrimaryIpAddressCount',

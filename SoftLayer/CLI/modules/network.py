@@ -97,7 +97,8 @@ Filters:
             subnet_table.add_row(['netmask', subnet['netmask']])
             subnet_table.add_row(['gateway', subnet['gateway']])
             subnet_table.add_row(['type', subnet['subnetType']])
-            subnet_table.add_row(['usable ips', subnet['usableIpAddressCount']])
+            subnet_table.add_row(['usable ips',
+                                  subnet['usableIpAddressCount']])
             subnets.append(subnet_table)
 
         t.add_row(['subnets', subnets])
