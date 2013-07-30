@@ -11,16 +11,33 @@ from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
 
 
 class NetworkManager(IdentifierMixin, object):
-    """ Manage Networkss """
+    """ Manage Networks """
     def __init__(self, client):
         self.client = client
         self.account = client['Account']
         self.vlan = client['Network_Vlan']
 
     def get_vlan(self, id):
+        """ Returns information about a single VLAN.
+
+        :param int id: The unique identifier for the VLAN
+
+        """
         return self.vlan.getObject(id=id, mask=self._get_vlan_mask())
 
     def list_vlans(self, datacenter=None, vlan_number=None, **kwargs):
+        """ Display a list of all VLANs on the account.
+
+        This provides a quick overview of all VLANs including information about
+        data center residence and the number of devices attached.
+
+        :param string datacenter: If specified, the list will only contain
+                                  VLANs in the specified data center.
+        :param int vlan_number: If specified, the list will only contain the
+                                VLAN matching this VLAN number.
+        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+
+        """
         _filter = NestedDict(kwargs.get('filter') or {})
 
         if vlan_number:
@@ -35,6 +52,10 @@ class NetworkManager(IdentifierMixin, object):
         return self._get_vlans(**kwargs)
 
     def summary_by_datacenter(self):
+        """ Provides a dictionary with a summary of all network information on
+        the account, grouped by data center.
+
+        """
         datacenters = {}
         for vlan in self._get_vlans():
             dc = vlan['primaryRouter']['datacenter']
@@ -62,11 +83,23 @@ class NetworkManager(IdentifierMixin, object):
         return datacenters
 
     def _get_vlans(self, **kwargs):
+        """ Returns a list of VLANs.
+
+        Wrapper method for preventing duplicated code.
+
+        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+
+        """
         return self.account.getNetworkVlans(mask=self._get_vlan_mask(),
                                             **kwargs)
 
     @staticmethod
     def _get_vlan_mask():
+        """ Returns the standard VLAN object mask.
+
+        Wrapper method for preventing duplicated code.
+
+        """
         mask = [
             'firewallInterfaces',
             'hardware',
