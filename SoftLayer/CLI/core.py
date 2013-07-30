@@ -13,6 +13,7 @@ The available modules are:
   firewall  Firewall rule and security management
   hardware  View hardware details
   bmetal    Interact with bare metal instances
+  network   Perform various network operations
   help      Show help
   iscsi     View iSCSI details
   image     Manages compute and flex images
