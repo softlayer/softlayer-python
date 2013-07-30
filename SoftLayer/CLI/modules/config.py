@@ -30,7 +30,6 @@ def config_table(env):
 
 
 def get_api_key(username, secret, endpoint_url=None):
-
     # Try to use a client with username/api key
     try:
         client = Client(
@@ -69,12 +68,19 @@ Setup configuration
     @classmethod
     def execute(cls, client, args):
         # User Input
-        username = cls.env.input(
-            'Username [%s]: ' % cls.env.config['username']) \
-            or cls.env.config['username']
-        secret = cls.env.getpass(
-            'API Key or Password [%s]: ' % cls.env.config['api_key']) \
-            or cls.env.config['api_key']
+        while True:
+            username = cls.env.input(
+                'Username [%s]: ' % cls.env.config['username']) \
+                or cls.env.config['username']
+            if username:
+                break
+
+        while True:
+            secret = cls.env.getpass(
+                'API Key or Password [%s]: ' % cls.env.config['api_key']) \
+                or cls.env.config['api_key']
+            if secret:
+                break
 
         while True:
             endpoint_type = cls.env.input('Endpoint (public|private|custom): ')
@@ -94,16 +100,16 @@ Setup configuration
                 ) or cls.env.config['endpoint_url']
                 break
 
-        path = '~/.softlayer'
-        if args.get('--config'):
-            path = args.get('--config')
-        config_path = os.path.expanduser(path)
-
         api_key = get_api_key(username, secret, endpoint_url=endpoint_url)
 
         cls.env.config['username'] = username
         cls.env.config['api_key'] = api_key
         cls.env.config['endpoint_url'] = endpoint_url
+
+        path = '~/.softlayer'
+        if args.get('--config'):
+            path = args.get('--config')
+        config_path = os.path.expanduser(path)
 
         cls.env.out(format_output(config_table(cls.env)))
 
