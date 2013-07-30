@@ -84,7 +84,7 @@ class NetworkTests(unittest.TestCase):
             'virtualGuestCount': 0,
             'vlanCount': 1
         }}
-        
+
         result = self.network.summary_by_datacenter()
 
         service.getNetworkVlans.assert_has_calls(mcall)
