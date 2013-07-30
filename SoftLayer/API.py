@@ -10,7 +10,6 @@ from SoftLayer.consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT, \
     USER_AGENT
 from SoftLayer.transport import make_xml_rpc_api_call
 from SoftLayer.exceptions import SoftLayerError
-from SoftLayer.deprecated import DeprecatedClientMixin
 import os
 
 
@@ -71,13 +70,9 @@ class BasicAuthentication(AuthenticationBase):
         return "<BasicAuthentication: %s>" % (self.username)
 
 
-class Client(DeprecatedClientMixin, object):
+class Client(object):
     """ A SoftLayer API client.
 
-    :param service_name: the name of the SoftLayer API service to query
-    :param integer id: an optional object ID if you're instantiating a
-        particular SoftLayer_API object. Setting an ID defines this client's
-        initialization parameter.
     :param username: an optional API username if you wish to bypass the
         package's built-in username
     :param api_key: an optional API key if you wish to bypass the package's
@@ -100,11 +95,8 @@ class Client(DeprecatedClientMixin, object):
     """
     _prefix = "SoftLayer_"
 
-    def __init__(self, service_name=None, id=None, username=None, api_key=None,
+    def __init__(self, username=None, api_key=None,
                  endpoint_url=None, timeout=None, auth=None):
-        self._service_name = service_name
-        self._headers = {}
-        self._raw_headers = {}
 
         self.auth = auth
         if self.auth is None:
@@ -117,11 +109,6 @@ class Client(DeprecatedClientMixin, object):
         self._endpoint_url = (endpoint_url or API_BASE_URL or
                               API_PUBLIC_ENDPOINT).rstrip('/')
         self.timeout = timeout
-
-        super(Client, self).__init__(
-            service_name=service_name, id=id, username=username,
-            api_key=api_key, endpoint_url=endpoint_url, timeout=timeout,
-            auth=auth)
 
     def authenticate_with_password(self, username, password,
                                    security_question_id=None,
@@ -193,19 +180,8 @@ class Client(DeprecatedClientMixin, object):
         limit = kwargs.get('limit')
         offset = kwargs.get('offset', 0)
 
-        if not headers and self.auth:
-            headers = self.auth.get_headers()
-
-        http_headers = {
-            'User-Agent': USER_AGENT,
-            'Content-Type': 'application/xml',
-        }
-        if self._raw_headers:
-            for name, value in self._raw_headers.items():
-                http_headers[name] = value
-        if raw_headers:
-            for name, value in raw_headers.items():
-                http_headers[name] = value
+        if self.auth:
+            headers.update(self.auth.get_headers())
 
         if objectid is not None:
             headers[service + 'InitParameters'] = {'id': int(objectid)}
@@ -221,6 +197,14 @@ class Client(DeprecatedClientMixin, object):
                 'limit': int(limit),
                 'offset': int(offset)
             }
+
+        http_headers = {
+            'User-Agent': USER_AGENT,
+            'Content-Type': 'application/xml',
+        }
+        if raw_headers:
+            http_headers.update(raw_headers)
+
         uri = '/'.join([self._endpoint_url, service])
         return make_xml_rpc_api_call(uri, method, args,
                                      headers=headers,
