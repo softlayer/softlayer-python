@@ -31,18 +31,18 @@ def get_creds():
 class UnauthedUser(unittest.TestCase):
     def test_failed_auth(self):
         client = SoftLayer.Client(
-            'SoftLayer_User_Customer', None, 'doesnotexist', 'issurelywrong',
-            timeout=20)
-        self.assertRaises(SoftLayer.SoftLayerAPIError,
-                          client.getPortalLoginToken)
+            username='doesnotexist', api_key='issurelywrong', timeout=20)
+        self.assertRaises(
+            SoftLayer.SoftLayerAPIError,
+            client['SoftLayer_User_Customer'].getPortalLoginToken)
 
     def test_404(self):
         client = SoftLayer.Client(
-            'SoftLayer_User_Customer', None, 'doesnotexist', 'issurelywrong',
-            timeout=20, endpoint_url='http://httpbin.org/status/404')
+            username='doesnotexist', api_key='issurelywrong', timeout=20,
+            endpoint_url='http://httpbin.org/status/404')
 
         try:
-            client.doSomething()
+            client['SoftLayer_User_Customer'].doSomething()
         except SoftLayer.SoftLayerAPIError, e:
             self.assertEqual(e.faultCode, 404)
             self.assertIn('NOT FOUND', e.faultString)
@@ -93,12 +93,11 @@ class AuthedUser(unittest.TestCase):
     def test_result_types(self):
         creds = get_creds()
         client = SoftLayer.Client(
-            'SoftLayer_User_Security_Question',
             username=creds['username'],
             api_key=creds['api_key'],
             endpoint_url=creds['endpoint'],
             timeout=20)
-        result = client.getAllObjects()
+        result = client['SoftLayer_User_Security_Question'].getAllObjects()
         self.assertIsInstance(result, list)
         self.assertIsInstance(result[0], dict)
         self.assertIsInstance(result[0]['viewable'], int)
