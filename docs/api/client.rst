@@ -1,9 +1,23 @@
 .. _client:
 
 
-Developer Interface
-===================
-This is the primary API client to make API calls. It deals with constructing and executing XML-RPC calls against the SoftLayer API.
+API Documentation
+=================
+This is the primary API client to make API calls. It deals with constructing and executing XML-RPC calls against the SoftLayer API. Below are some links that will help to use the SoftLayer API.
+
+.. toctree::
+
+   SoftLayer API Documentation <http://sldn.softlayer.com/reference/softlayerapi>
+   Source on Github <https://github.com/softlayer/softlayer-api-python-client>
+
+::
+
+	>>> import SoftLayer
+	>>> client = SoftLayer.Client(username="username", api_key="api_key")
+	>>> resp = client['Account'].getObject()
+	>>> resp['companyName']
+	'Your Company'
+
 
 Getting Started
 ---------------
@@ -121,32 +135,43 @@ API Reference
    :undoc-members:
 
 
-Backwards Compatibility
------------------------
-If you've been using the older Python client (<2.0), you'll be happy to know that the old API is still currently working. However, you should deprecate use of the old stuff. Below is an example of the old API converted to the new one.
-
-.. automodule:: SoftLayer.deprecated
-   :members:
-   :undoc-members:
-
+Managers
+--------
 ::
 
+	>>> from SoftLayer import CCIManager, Client
+	>>> client = Client(...)
+	>>> cci = CCIManager(client)
+	>>> cci.list_instances()
+	[...]
+
+Managers mask out a lot of the complexities of using the API into classes that provide a simpler interface to various services. These are higher-level interfaces to the SoftLayer API.
+
+.. toctree::
+   :maxdepth: 2
+   :glob:
+
+   managers/*
+
+
+Backwards Compatibility
+-----------------------
+As of 3.0, the old API methods and parameters no longer work. Below are examples of converting the old API to the new one.
+
+**Get the IP address for an account**
+::
+
+	# Old
 	import SoftLayer.API
 	client = SoftLayer.API.Client('SoftLayer_Account', None, 'username', 'api_key')
 	client.set_object_mask({'ipAddresses' : None})
 	client.set_result_limit(10, offset=10)
 	client.getObject()
 
-... changes to ...
-::
-
+	# New
 	import SoftLayer
 	client = SoftLayer.Client(username='username', api_key='api_key')
 	client['Account'].getObject(mask="mask[ipAddresses]", limit=10, offset=0)
-
-Deprecated APIs
-^^^^^^^^^^^^^^^
-Below are examples of how the old usages to the new API.
 
 **Importing the module**
 ::

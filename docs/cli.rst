@@ -3,7 +3,13 @@
 Command-line Interface
 ======================
 
-The SoftLayer command line interface is available via the `sl` command available in your `PATH`.  The `sl` command is a reference implementation of SoftLayer API bindings for python and how to efficiently make API calls.
+The SoftLayer command line interface is available via the `sl` command available in your `PATH`.  The `sl` command is a reference implementation of SoftLayer API bindings for python and how to efficiently make API calls. See the :ref:`usage-examples` section to see how to discover all of the functionality not fully documented here.
+
+.. toctree::
+   :maxdepth: 2
+
+   cli/cci
+   cli/dev
 
 
 Configuration Setup
@@ -55,6 +61,7 @@ The only required fields are `username` and `api_key`. You can optionally also/e
 	[softlayer]
 	endpoint_url = https://api.softlayer.com/xmlrpc/v3/
 
+.. _usage-examples:
 
 Usage Examples
 --------------
