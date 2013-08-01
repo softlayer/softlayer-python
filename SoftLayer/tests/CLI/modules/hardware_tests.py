@@ -35,8 +35,10 @@ class HardwareCLITests(unittest.TestCase):
         self.assertEqual(expected, t.call_args_list)
 
     @patch('SoftLayer.HardwareManager.get_dedicated_server_create_options')
+    @patch('SoftLayer.CLI.modules.hardware.KeyValueTable')
     @patch('SoftLayer.CLI.modules.hardware.Table')
-    def test_HardwareCreateOptions(self, table, create_options):
+    def test_HardwareCreateOptions(
+            self, cpu_table, option_table, create_options):
         args = {
             '<chassis_id>': 999,
             '--all': True,
@@ -55,14 +57,16 @@ class HardwareCLITests(unittest.TestCase):
 
         create_options.return_value = test_data
 
-        table.mock_add_spec(['align', 'add_row'], True)
+        cpu_table.mock_add_spec(['align', 'add_row'], True)
+        option_table.mock_add_spec(['align', 'add_row'], True)
 
         HardwareCreateOptions.execute(self.client, args)
 
-        table_expected = [
+        cpu_table_expected = [
+            call().add_row([1, 'CPU Core'])
+        ]
+        option_table_expected = [
             call().add_row(['datacenter', ['FIRST_AVAILABLE', 'TEST00']]),
-            call(['id', 'description']),
-            call().add_row([1, 'CPU Core']),
             call().add_row(['memory', [2, 4]]),
             call().add_row(['os (CLOUDLINUX)', ['CLOUDLINUX_5_32']]),
             call().add_row(['os (UBUNTU)', ['UBUNTU_10_32']]),
@@ -73,7 +77,8 @@ class HardwareCLITests(unittest.TestCase):
             call().add_row(['disk_controllers', ['RAID5']]),
         ]
 
-        table.assert_has_calls(table_expected, any_order=True)
+        cpu_table.assert_has_calls(cpu_table_expected, any_order=True)
+        option_table.assert_has_calls(option_table_expected, any_order=True)
 
     @staticmethod
     def get_create_options_data():

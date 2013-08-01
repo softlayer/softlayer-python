@@ -353,7 +353,7 @@ Options:
     def execute(cls, client, args):
         mgr = HardwareManager(client)
 
-        t = Table(['Name', 'Value'])
+        t = KeyValueTable(['Name', 'Value'])
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
 
