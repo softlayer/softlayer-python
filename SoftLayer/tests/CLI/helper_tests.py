@@ -193,18 +193,6 @@ class CLIAbortTests(unittest.TestCase):
         self.assertIsInstance(e, cli.helpers.CLIHalt)
 
 
-class CLIRunnableTypeTests(unittest.TestCase):
-
-    def test_runnable_type(self):
-        cli.environment.CLIRunnableType.env = cli.environment.Environment()
-
-        class TestCommand(cli.CLIRunnable):
-            action = 'test'
-        self.assertEqual(
-            cli.environment.CLIRunnableType.env.plugins,
-            {'helper_tests': {'test': TestCommand}})
-
-
 class ResolveIdTests(unittest.TestCase):
 
     def test_resolve_id_one(self):
