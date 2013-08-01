@@ -421,7 +421,7 @@ class HardwareManager(IdentifierMixin, object):
         if results:
             return [result['id'] for result in results]
 
-    def _parse_package_data(self, id):
+    def _parse_package_data(self, package_id):
         package = self.client['Product_Package']
 
         results = {
@@ -431,7 +431,7 @@ class HardwareManager(IdentifierMixin, object):
 
         # First pull the list of available locations. We do it with the
         # getObject() call so that we get access to the delivery time info.
-        object_data = package.getRegions(id=id)
+        object_data = package.getRegions(id=package_id)
 
         for loc in object_data:
             details = loc['location']['locationPackageDetails'][0]
@@ -444,7 +444,7 @@ class HardwareManager(IdentifierMixin, object):
 
         mask = 'mask[itemCategory[group]]'
 
-        for config in package.getConfiguration(id=id, mask=mask):
+        for config in package.getConfiguration(id=package_id, mask=mask):
             code = config['itemCategory']['categoryCode']
             group = NestedDict(config['itemCategory']) or {}
             category = {
@@ -459,22 +459,22 @@ class HardwareManager(IdentifierMixin, object):
             results['categories'][code] = category
 
         # Now pull in the available package item
-        for item in package.getItems(id=id, mask='mask[itemCategory]'):
-            category_code = item['itemCategory']['categoryCode']
+        for category in package.getCategories(id=package_id):
+            code = category['categoryCode']
+            items = []
 
-            if category_code not in results['categories']:
-                results['categories'][category_code] = {'name': category_code,
-                                                        'items': []}
-            results['categories'][category_code]['items'].append({
-                'id': item['id'],
-                'description': item['description'],
-                'prices': item['prices'],
-                'sort': item['prices'][0]['sort'],
-                'price_id': item['prices'][0]['id'],
-                'recurring_fee': float(item['prices'][0].get('recurringFee',
-                                                             0)),
-                'capacity': float(item.get('capacity', 0)),
-            })
+            for group in category['groups']:
+                for price in group['prices']:
+                    items.append({
+                        'id': price['itemId'],
+                        'description': price['item']['description'],
+                        'sort': price['sort'],
+                        'price_id': price['id'],
+                        'recurring_fee': price['recurringFee'],
+                        'capacity': float(price['item'].get('capacity', 0)),
+                    })
+
+            results['categories'][code]['items'] = items
 
         return results
 
