@@ -32,7 +32,7 @@ class HardwareCLITests(unittest.TestCase):
         for code, reason in test_data.iteritems():
             expected.append(call([code, reason]))
 
-        self.assertEqual(expected, t.call_args_list)
+        t.assert_has_calls(expected)
 
     @patch('SoftLayer.HardwareManager.get_dedicated_server_create_options')
     @patch('SoftLayer.CLI.modules.hardware.KeyValueTable')
@@ -79,6 +79,51 @@ class HardwareCLITests(unittest.TestCase):
 
         cpu_table.assert_has_calls(cpu_table_expected, any_order=True)
         option_table.assert_has_calls(option_table_expected, any_order=True)
+
+    @patch('SoftLayer.HardwareManager.list_hardware')
+    @patch('SoftLayer.CLI.helpers.Table.add_row')
+    @patch('SoftLayer.CLI.modules.hardware.gb')
+    def test_ListHardware(self, gb, t, list_hardware):
+        hw_data = [
+            {
+                'id': 1,
+                'datacenter': {'name': 'TEST00',
+                               'description': 'Test Data Center'},
+                'fullyQualifiedDomainName': 'test1.sftlyr.ws',
+                'processorCoreAmount': 2,
+                'memoryCapacity': 2,
+                'primaryIpAddress': '10.0.0.2',
+                'primaryBackendIpAddress': '10.1.0.2',
+            },
+            {
+                'id': 2,
+                'datacenter': {'name': 'TEST00',
+                               'description': 'Test Data Center'},
+                'fullyQualifiedDomainName': 'test2.sftlyr.ws',
+                'processorCoreAmount': 4,
+                'memoryCapacity': 4,
+                'primaryIpAddress': '10.0.0.3',
+                'primaryBackendIpAddress': '10.1.0.3',
+            }
+        ]
+        list_hardware.return_value = hw_data
+        gb.side_effect = lambda x: x * 1024
+
+        ListHardware.execute(self.client, {})
+        expected = []
+        for server in hw_data:
+            expected.append(call([
+                server['id'],
+                server['datacenter']['name'],
+                server['fullyQualifiedDomainName'],
+                server['processorCoreAmount'],
+                server['memoryCapacity'] * 1024,
+                server['primaryIpAddress'],
+                server['primaryBackendIpAddress'],
+            ]))
+
+        t.assert_has_calls(expected)
+        self.assertTrue(gb.called)
 
     @staticmethod
     def get_create_options_data():
