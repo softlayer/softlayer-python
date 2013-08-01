@@ -24,6 +24,13 @@ usage: sl cci <command> [<args>...] [options]
 """
 
 
+def module_no_command_fixture():
+    """
+usage: sl cci [<args>...] [options]
+       sl cci [-h | --help]
+"""
+
+
 class submodule_fixture(object):
     """
 usage: sl cci list [options]
@@ -87,6 +94,17 @@ class CommandLineTests(unittest.TestCase):
         self.assertRaises(
             SystemExit, cli.core.main,
             args=['nope', 'list', '--config=path/to/config'], env=self.env)
+
+    def test_module_with_no_command(self):
+        self.env.plugins = {
+            'cci': {'list': submodule_fixture, None: submodule_fixture}
+        }
+        self.env.get_module_name.return_value = 'cci'
+        self.env.load_module = MagicMock()
+        self.env.load_module.return_value = module_no_command_fixture
+        resolver = cli.core.CommandParser(self.env)
+        command, command_args = resolver.parse(['cci', 'list'])
+        self.assertEqual(submodule_fixture, command)
 
     def test_help(self):
         self.env.get_module_name.return_value = 'help'

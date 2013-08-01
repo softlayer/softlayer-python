@@ -123,7 +123,9 @@ Standard Options:
         # handle `sl <module> ...`
         module, module_args = self.parse_module_args(
             module_name, main_args['<args>'])
-        command_name = module_args['<command>']
+
+        # get the command argument
+        command_name = module_args.get('<command>')
 
         # handle `sl <module> <command> ...`
         return self.parse_command_args(
