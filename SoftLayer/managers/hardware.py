@@ -470,7 +470,12 @@ class HardwareManager(IdentifierMixin, object):
                         'description': price['item']['description'],
                         'sort': price['sort'],
                         'price_id': price['id'],
-                        'recurring_fee': price['recurringFee'],
+                        'recurring_fee': price.get('recurringFee', 0),
+                        'setup_fee': price.get('setupFee', 0),
+                        'hourly_recurring_fee': price.get('hourlyRecurringFee',
+                                                          0),
+                        'one_time_fee': price.get('oneTimeFee', 0),
+                        'labor_fee': price.get('laborFee', 0),
                         'capacity': float(price['item'].get('capacity', 0)),
                     })
 
@@ -518,10 +523,10 @@ def get_default_value(package_options, category):
 
     for item in package_options['categories'][category]['items']:
         if not any([
-            float(item['prices'][0].get('setupFee', 0)),
-            float(item['prices'][0].get('recurringFee', 0)),
-            float(item['prices'][0].get('hourlyRecurringFee', 0)),
-            float(item['prices'][0].get('oneTimeFee', 0)),
-            float(item['prices'][0].get('laborFee', 0)),
+            float(item.get('setupFee', 0)),
+            float(item.get('recurringFee', 0)),
+            float(item.get('hourlyRecurringFee', 0)),
+            float(item.get('oneTimeFee', 0)),
+            float(item.get('laborFee', 0)),
         ]):
             return item['price_id']

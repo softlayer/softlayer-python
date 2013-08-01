@@ -568,7 +568,7 @@ Options:
                 disk_type = disk_type.replace('RPM', '').strip()
                 disk_type = disk_type.replace(' ', '_').upper()
                 disk_type = str(int(disk['capacity'])) + '_' + disk_type
-                disks.append((disk_type, disk['price_id']))
+                disks.append((disk_type, disk['price_id'], disk['id']))
 
             return [('disk', disks)]
         elif 'nic' == section:
@@ -650,16 +650,15 @@ Optional:
             raise CLIAbort('Invalid operating system specified.')
 
         order['location'] = args['--datacenter'] or 'FIRST_AVAILABLE'
-        order['server'] = cls._get_price_id_from_options(ds_options, 'cpu',
-                                                         args['--cpu'])
+        order['server'] = args['--cpu']
         order['ram'] = cls._get_price_id_from_options(ds_options, 'memory',
                                                       int(args['--memory']))
         # Set the disk sizes
         disk_prices = []
+        disk_number = 0
         for disk in args.get('--disk'):
-            disk_price = cls._get_price_id_from_options(ds_options, 'disk',
-                                                        disk)
-
+            disk_price = cls._get_disk_price(ds_options, disk, disk_number)
+            disk_number += 1
             if disk_price:
                 disk_prices.append(disk_price)
 
@@ -751,16 +750,29 @@ Optional:
                 return item['price_id']
 
     @classmethod
-    def _get_price_id_from_options(cls, ds_options, option, value):
+    def _get_disk_price(cls, ds_options, value, number):
+        if not number:
+            return cls._get_price_id_from_options(ds_options, 'disk', value)
+        # This will get the item ID for the matching identifier string, which
+        # we can then use to get the price ID for our specific disk
+        item_id = cls._get_price_id_from_options(ds_options, 'disk', value, True)
+        key = 'disk' + str(number)
+        if key in ds_options['categories']:
+            for item in ds_options['categories'][key]['items']:
+                if item['id'] == item_id:
+                    return item['price_id']
+
+    @classmethod
+    def _get_price_id_from_options(cls, ds_options, option, value,
+                                   item_id=False):
         ds_obj = HardwareCreateOptions()
-        price_id = None
 
         for k, v in ds_obj.get_create_options(ds_options, option, False):
             for item_options in v:
                 if item_options[0] == value:
-                    price_id = item_options[1]
-
-        return price_id
+                    if not item_id:
+                        return item_options[1]
+                    return item_options[2]
 
 
 class EditHardware(CLIRunnable):
