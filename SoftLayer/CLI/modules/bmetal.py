@@ -473,7 +473,7 @@ Cancel a bare metal instance
 
 Options:
   --immediate  Cancels the instance immediately (instead of on the billing
-               anniversary).
+                 anniversary).
 """
 
     action = 'cancel'

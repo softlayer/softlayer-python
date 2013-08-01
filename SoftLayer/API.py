@@ -6,15 +6,14 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
-from SoftLayer.consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT, \
-    USER_AGENT
-from SoftLayer.transport import make_xml_rpc_api_call
-from SoftLayer.exceptions import SoftLayerError
+from consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT, USER_AGENT
+from transport import make_xml_rpc_api_call
+from exceptions import SoftLayerError
+from auth import BasicAuthentication, TokenAuthentication
 import os
 
 
-__all__ = ['Client', 'BasicAuthentication', 'TokenAuthentication',
-           'API_PUBLIC_ENDPOINT', 'API_PRIVATE_ENDPOINT']
+__all__ = ['Client', 'API_PUBLIC_ENDPOINT', 'API_PRIVATE_ENDPOINT']
 
 API_USERNAME = None
 API_KEY = None
@@ -28,46 +27,6 @@ VALID_CALL_ARGS = set([
     'limit',
     'offset',
 ])
-
-
-class AuthenticationBase(object):
-    def get_headers(self):
-        raise NotImplementedError
-
-
-class TokenAuthentication(AuthenticationBase):
-    def __init__(self, user_id, auth_token):
-        self.user_id = user_id
-        self.auth_token = auth_token
-
-    def get_headers(self):
-        return {
-            'authenticate': {
-                'complexType': 'PortalLoginToken',
-                'userId': self.user_id,
-                'authToken': self.auth_token,
-            }
-        }
-
-    def __repr__(self):
-        return "<TokenAuthentication: %s %s>" % (self.user_id, self.auth_token)
-
-
-class BasicAuthentication(AuthenticationBase):
-    def __init__(self, username, api_key):
-        self.username = username
-        self.api_key = api_key
-
-    def get_headers(self):
-        return {
-            'authenticate': {
-                'username': self.username,
-                'apiKey': self.api_key,
-            }
-        }
-
-    def __repr__(self):
-        return "<BasicAuthentication: %s>" % (self.username)
 
 
 class Client(object):

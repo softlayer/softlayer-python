@@ -5,15 +5,15 @@ usage: sl hardware [<command>] [<args>...] [options]
 Manage hardware
 
 The available commands are:
-  list      List hardware devices
-  detail    Retrieve hardware details
-  reload    Perform an OS reload
-  cancel    Cancel a dedicated server.
+  list            List hardware devices
+  detail          Retrieve hardware details
+  reload          Perform an OS reload
+  cancel          Cancel a dedicated server.
   cancel-reasons  Provides the list of possible cancellation reasons
-  network   Manage network settings
+  network         Manage network settings
   list-chassis    Provide a list of all chassis available for ordering
   create-options  Display a list of creation options for a specific chassis
-  create    Create a new dedicated server
+  create          Create a new dedicated server
 
 For several commands, <identifier> will be asked for. This can be the id,
 hostname or the ip address for a piece of hardware.
@@ -35,9 +35,9 @@ usage: sl hardware list [options]
 List hardware servers on the acount
 
 Examples:
-    sl hardware list --datacenter=dal05
-    sl hardware list --network=100 --domain=example.com
-    sl hardware list --tags=production,db
+  sl hardware list --datacenter=dal05
+  sl hardware list --network=100 --domain=example.com
+  sl hardware list --tags=production,db
 
 Options:
   --sortby=ARG  Column to sort by. options: id, datacenter, host, cores,
@@ -180,8 +180,8 @@ usage: sl hardware reload <identifier> [options]
 Reload the OS on a hardware server based on its current configuration
 
 Optional:
-    -i, --postinstall=URI   Post-install script to download
-                             (Only HTTPS executes, HTTP leaves file in /root)
+  -i, --postinstall=URI  Post-install script to download
+                           (Only HTTPS executes, HTTP leaves file in /root)
 """
 
     action = 'reload'
@@ -261,7 +261,7 @@ Manage network settings
 
 Options:
     --speed=SPEED  Port speed. 0 disables the port.
-                   [Options: 0, 10, 100, 1000, 10000]
+                     [Options: 0, 10, 100, 1000, 10000]
     --public       Public network
     --private      Private network
 """

@@ -3,14 +3,16 @@ usage: sl dns [<command>] [<args>...] [options]
 
 Manage DNS
 
-The available commands are:
-  edit    Update resource records (bulk/single)
+The available zone commands are:
   create  Create zone
-  list    List zones or a zone's records
-  remove  Remove resource records
-  add     Add resource record
-  print   Print zone in BIND format
   delete  Delete zone
+  list    List zones or a zone's records
+  print   Print zone in BIND format
+
+The available record commands are:
+  add     Add resource record
+  edit    Update resource records (bulk/single)
+  remove  Remove resource records
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: BSD, see LICENSE for more details.
