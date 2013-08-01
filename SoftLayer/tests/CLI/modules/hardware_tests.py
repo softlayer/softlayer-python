@@ -80,32 +80,50 @@ class HardwareCLITests(unittest.TestCase):
         cpu_table.assert_has_calls(cpu_table_expected, any_order=True)
         option_table.assert_has_calls(option_table_expected, any_order=True)
 
+    @patch('SoftLayer.HardwareManager.get_hardware')
+    @patch('SoftLayer.CLI.helpers.Table.add_row')
+    @patch('SoftLayer.CLI.modules.hardware.FormattedItem')
+    @patch('SoftLayer.CLI.modules.hardware.resolve_id')
+    @patch('SoftLayer.CLI.modules.hardware.gb')
+    def test_HardwareDetails(
+            self, gb, resolve_id, formatted_item, t, get_hardware):
+        hw_id = 1234
+
+        def resolve_mock(resolver, identifier, name='object'):
+            return hw_id
+
+        def formatted_item_mock(short_name, long_name):
+            return short_name
+
+        resolve_id.side_effect = resolve_mock
+        formatted_item.side_effect = formatted_item_mock
+        gb.side_effect = lambda x: x * 1024
+        servers = self.get_server_mocks()
+        get_hardware.return_value = servers[0]
+
+        HardwareDetails.execute(self.client, {'<identifier>': hw_id})
+
+        expected = [
+            call(['id', 1]),
+            call(['hostname', 'test1.sftlyr.ws']),
+            call(['status', 'ACTIVE']),
+            call(['datacenter', 'TEST00']),
+            call(['cores', 2]),
+            call(['memory', 2048]),
+            call(['public_ip', '10.0.0.2']),
+            call(['private_ip', '10.1.0.2']),
+            call(['os', 'Ubuntu']),
+            call(['created', '2013-08-01 15:23:45']),
+            call(['notes', 'These are test notes.'])
+        ]
+
+        t.assert_has_calls(expected)
+
     @patch('SoftLayer.HardwareManager.list_hardware')
     @patch('SoftLayer.CLI.helpers.Table.add_row')
     @patch('SoftLayer.CLI.modules.hardware.gb')
     def test_ListHardware(self, gb, t, list_hardware):
-        hw_data = [
-            {
-                'id': 1,
-                'datacenter': {'name': 'TEST00',
-                               'description': 'Test Data Center'},
-                'fullyQualifiedDomainName': 'test1.sftlyr.ws',
-                'processorCoreAmount': 2,
-                'memoryCapacity': 2,
-                'primaryIpAddress': '10.0.0.2',
-                'primaryBackendIpAddress': '10.1.0.2',
-            },
-            {
-                'id': 2,
-                'datacenter': {'name': 'TEST00',
-                               'description': 'Test Data Center'},
-                'fullyQualifiedDomainName': 'test2.sftlyr.ws',
-                'processorCoreAmount': 4,
-                'memoryCapacity': 4,
-                'primaryIpAddress': '10.0.0.3',
-                'primaryBackendIpAddress': '10.1.0.3',
-            }
-        ]
+        hw_data = self.get_server_mocks()
         list_hardware.return_value = hw_data
         gb.side_effect = lambda x: x * 1024
 
@@ -215,7 +233,7 @@ class HardwareCLITests(unittest.TestCase):
                             'price_id': 33,
                             'recurring_fee': 0.0,
                             'capacity': 0.0,
-                        }                        
+                        }
                     ],
                 },
                 'disk0': {
@@ -278,4 +296,42 @@ class HardwareCLITests(unittest.TestCase):
                     ],
                 }
             }
-        }        
+        }
+
+    @staticmethod
+    def get_server_mocks():
+        return [
+            {
+                'id': 1,
+                'datacenter': {'name': 'TEST00',
+                               'description': 'Test Data Center'},
+                'fullyQualifiedDomainName': 'test1.sftlyr.ws',
+                'processorCoreAmount': 2,
+                'memoryCapacity': 2,
+                'primaryIpAddress': '10.0.0.2',
+                'primaryBackendIpAddress': '10.1.0.2',
+                'hardwareStatus': {'status': 'ACTIVE'},
+                'provisionDate': '2013-08-01 15:23:45',
+                'notes': 'These are test notes.',
+                'operatingSystem': {
+                    'softwareLicense': {
+                        'softwareDescription': {
+                            'referenceCode': 'Ubuntu',
+                            'name': 'Ubuntu 12.04 LTS',
+                        }
+                    }
+                }
+            },
+            {
+                'id': 2,
+                'datacenter': {'name': 'TEST00',
+                               'description': 'Test Data Center'},
+                'fullyQualifiedDomainName': 'test2.sftlyr.ws',
+                'processorCoreAmount': 4,
+                'memoryCapacity': 4,
+                'primaryIpAddress': '10.0.0.3',
+                'primaryBackendIpAddress': '10.1.0.3',
+                'hardwareStatus': {'status': 'ACTIVE'},
+                'provisionDate': '2013-08-03 07:15:22',
+            }
+        ]
