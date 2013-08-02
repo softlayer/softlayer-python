@@ -8,6 +8,7 @@
 """
 import os
 import json
+import ConfigParser
 
 from SoftLayer.CLI.environment import CLIRunnableType
 from SoftLayer.utils import NestedDict
@@ -15,7 +16,10 @@ from prettytable import PrettyTable, FRAME, NONE
 
 __all__ = ['Table', 'KeyValueTable', 'CLIRunnable', 'FormattedItem',
            'valid_response', 'confirm', 'no_going_back', 'mb_to_gb', 'gb',
-           'listing', 'CLIAbort', 'NestedDict', 'resolve_id', 'format_output']
+           'listing', 'CLIAbort', 'NestedDict', 'resolve_id', 'format_output',
+           'update_with_template_args', 'FALSE_VALUES']
+
+FALSE_VALUES = ['0', 'false', 'FALSE', 'no', 'False']
 
 
 def format_output(data, fmt='table'):
@@ -181,6 +185,36 @@ def resolve_id(resolver, identifier, name='object'):
             (name, identifier, ', '.join([str(_id) for _id in ids])))
 
     return ids[0]
+
+
+class NoSectionConfigFile(object):
+    def __init__(self, fp):
+        self.fp = fp
+        self.sent_header = False
+
+    def readline(self):
+        if not self.sent_header:
+            self.sent_header = True
+            return '[settings]\n'
+        else:
+            return self.fp.readline()
+
+
+def update_with_template_args(args):
+    if args.get('--template'):
+        if not os.path.exists(args['--template']):
+            raise ArgumentError(
+                'File does not exist [-t | --template] = %s'
+                % args['--template'])
+
+        config = ConfigParser.ConfigParser()
+        config.readfp(NoSectionConfigFile(
+            open(os.path.expanduser(args.get('--template')))))
+
+        for key, value in config.items('settings'):
+            option_key = '--%s' % key
+            if args.get(option_key) in [None, False]:
+                args[option_key] = value
 
 
 def valid_response(prompt, *valid):

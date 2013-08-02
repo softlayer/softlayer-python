@@ -8,10 +8,12 @@
 import sys
 import os
 import json
-from mock import patch
+import StringIO
 
 import SoftLayer.CLI as cli
-from SoftLayer.tests import unittest
+from SoftLayer.tests import FIXTURE_PATH, unittest
+from mock import patch
+
 
 if sys.version_info >= (3,):
     raw_input_path = 'builtins.input'
@@ -288,3 +290,49 @@ class TestFormatOutput(unittest.TestCase):
         t.separator = ','
         output = cli.helpers.format_output(t)
         self.assertEqual("This is a test,More tests", output)
+
+
+class TestNoSectionConfigFile(unittest.TestCase):
+    def test_readline(self):
+        fd = StringIO.StringIO('line1\nline2')
+        config_file = cli.helpers.NoSectionConfigFile(fd)
+        self.assertEqual(config_file.readline(), '[settings]\n')
+        self.assertEqual(config_file.readline(), 'line1\n')
+        self.assertEqual(config_file.readline(), 'line2')
+
+
+class TestTemplateArgs(unittest.TestCase):
+
+    def test_no_template_option(self):
+        args = {'key': 'value'}
+        cli.helpers.update_with_template_args(args)
+        self.assertEqual(args, {'key': 'value'})
+
+    def test_template_not_exists(self):
+        path = os.path.join(FIXTURE_PATH, 'sample_template_not_exists.conf')
+        self.assertRaises(cli.helpers.ArgumentError,
+                          cli.helpers.update_with_template_args,
+                          {'--template': path})
+
+    def test_template_options(self):
+        path = os.path.join(FIXTURE_PATH, 'sample_template.conf')
+        args = {
+            'key': 'value',
+            '--cpu': None,
+            '--memory': '32',
+            '--template': path
+        }
+        cli.helpers.update_with_template_args(args)
+        self.assertEqual(args, {
+            '--cpu': '4',
+            '--datacenter': 'dal05',
+            '--domain': 'example.com',
+            '--hostname': 'myhost',
+            '--hourly': 'true',
+            '--memory': '32',
+            '--monthly': 'false',
+            '--network': '100',
+            '--os': 'DEBIAN_7_64',
+            '--template': path,
+            'key': 'value',
+        })

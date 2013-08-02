@@ -32,7 +32,7 @@ from SoftLayer.CLI import (
     FormattedItem)
 from SoftLayer.CLI.helpers import (
     CLIAbort, ArgumentError, SequentialOutput, NestedDict, blank, resolve_id,
-    KeyValueTable)
+    KeyValueTable, update_with_template_args, FALSE_VALUES)
 
 
 class ListCCIs(CLIRunnable):
@@ -326,8 +326,7 @@ Options:
 
 class CreateCCI(CLIRunnable):
     """
-usage: sl cci create --hostname=HOST --domain=DOMAIN --cpu=CPU --memory=MEMORY
-                     (--os=OS | --image=GUID) (--hourly | --monthly) [options]
+usage: sl cci create [options]
 
 Order/create a CCI. See 'sl cci create-options' for valid options
 
@@ -345,7 +344,7 @@ Required:
 
 
 Optional:
-  -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
+  -d DC, --datacenter=DC   Datacenter shortname (sng01, dal05, ...)
                            Note: Omitting this value defaults to the first
                              available datacenter
   -n MBPS, --network=MBPS  Network port speed in Mbps
@@ -359,26 +358,21 @@ Optional:
   -k KEY, --key=KEY        The SSH key to add to the root user
   --private                Forces the CCI to only have access the private
                              network.
-  -k KEY, --key=KEY        The SSH key to add to the root user
+  -t, --template=FILE      A template file that defaults the command-line
+                            options using the long name in INI format.
   --wait=SECONDS           Block until CCI is finished provisioning for up to X
                              seconds before returning.
 """
     action = 'create'
     options = ['confirm']
+    required_params = ['--hostname', '--domain', '--cpu', '--memory']
 
-    @staticmethod
-    def execute(client, args):
+    @classmethod
+    def execute(cls, client, args):
+        update_with_template_args(args)
+        cls._validate_args(args)
+
         cci = CCIManager(client)
-
-        if args['--userdata'] and args['--userfile']:
-            raise ArgumentError('[-u | --userdata] not allowed with '
-                                '[-F | --userfile]')
-        if args['--userfile']:
-            if not os.path.exists(args['--userfile']):
-                raise ArgumentError(
-                    'File does not exist [-u | --userfile] = %s'
-                    % args['--userfile'])
-
         data = {
             "hourly": args['--hourly'],
             "cpus": args['--cpu'],
@@ -482,15 +476,51 @@ Optional:
             t.add_row(['created', result['createDate']])
             t.add_row(['guid', result['globalIdentifier']])
             output = t
+
+            if args.get('--wait'):
+                ready = cci.wait_for_transaction(
+                    result['id'], int(args.get('--wait') or 1))
+                t.add_row(['ready', ready])
         else:
             raise CLIAbort('Aborting CCI order.')
 
-        if args.get('--wait') or 0 and not args.get('--test'):
-            ready = cci.wait_for_transaction(
-                result['id'], int(args.get('--wait') or 1))
-            t.add_row(['ready', ready])
-
         return output
+
+    @classmethod
+    def _validate_args(cls, args):
+        invalid_args = [k for k in cls.required_params if args.get(k) is None]
+        if invalid_args:
+            raise ArgumentError('Missing required options: %s'
+                                % ','.join(invalid_args))
+
+        if all([args['--userdata'], args['--userfile']]):
+            raise ArgumentError('[-u | --userdata] not allowed with '
+                                '[-F | --userfile]')
+
+        if args['--hourly'] in FALSE_VALUES:
+            args['--hourly'] = False
+
+        if args['--monthly'] in FALSE_VALUES:
+            args['--monthly'] = False
+
+        if all([args['--hourly'], args['--monthly']]):
+            raise ArgumentError('[--hourly] not allowed with [--monthly]')
+
+        if not any([args['--hourly'], args['--monthly']]):
+            raise ArgumentError('One of [--hourly | --monthly] is required')
+
+        image_args = [args['--os'], args['--image']]
+        if all(image_args):
+            raise ArgumentError('[-o | --os] not allowed with [--image]')
+
+        if not any(image_args):
+            raise ArgumentError('One of [--os | --image] is required')
+
+        if args['--userfile']:
+            if not os.path.exists(args['--userfile']):
+                raise ArgumentError(
+                    'File does not exist [-u | --userfile] = %s'
+                    % args['--userfile'])
 
 
 class ReadyCCI(CLIRunnable):
