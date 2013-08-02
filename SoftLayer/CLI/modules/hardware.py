@@ -143,6 +143,13 @@ Options:
                 ['softwareDescription']['name'] or blank()
             )])
         t.add_row(['created', result['provisionDate'] or blank()])
+
+        vlan_table = Table(['type', 'number', 'id'])
+        for vlan in result['networkVlans']:
+            vlan_table.add_row([
+                vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
+        t.add_row(['vlans', vlan_table])
+
         if result.get('notes'):
             t.add_row(['notes', result['notes']])
 

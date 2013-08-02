@@ -137,6 +137,7 @@ class CCIManager(IdentifierMixin, object):
                 'macAddress, primaryIpAddress, port, primarySubnet]',
                 'lastKnownPowerState.name',
                 'powerState',
+                'status',
                 'maxCpu',
                 'maxMemory',
                 'datacenter',
@@ -149,6 +150,7 @@ class CCIManager(IdentifierMixin, object):
                 'operatingSystem.passwords[username,password]',
                 'billingItem.recurringFee',
                 'tagReferences[id,tag[name,id]]',
+                'networkVlans[id,vlanNumber,networkSpace]',
             ])
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
