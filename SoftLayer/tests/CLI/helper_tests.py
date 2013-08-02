@@ -292,15 +292,6 @@ class TestFormatOutput(unittest.TestCase):
         self.assertEqual("This is a test,More tests", output)
 
 
-class TestNoSectionConfigFile(unittest.TestCase):
-    def test_readline(self):
-        fd = StringIO.StringIO('line1\nline2')
-        config_file = cli.helpers.NoSectionConfigFile(fd)
-        self.assertEqual(config_file.readline(), '[settings]\n')
-        self.assertEqual(config_file.readline(), 'line1\n')
-        self.assertEqual(config_file.readline(), 'line2')
-
-
 class TestTemplateArgs(unittest.TestCase):
 
     def test_no_template_option(self):

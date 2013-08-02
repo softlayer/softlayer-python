@@ -9,6 +9,7 @@
 import os
 import json
 import ConfigParser
+import StringIO
 
 from SoftLayer.CLI.environment import CLIRunnableType
 from SoftLayer.utils import NestedDict
@@ -187,19 +188,6 @@ def resolve_id(resolver, identifier, name='object'):
     return ids[0]
 
 
-class NoSectionConfigFile(object):
-    def __init__(self, fp):
-        self.fp = fp
-        self.sent_header = False
-
-    def readline(self):
-        if not self.sent_header:
-            self.sent_header = True
-            return '[settings]\n'
-        else:
-            return self.fp.readline()
-
-
 def update_with_template_args(args):
     if args.get('--template'):
         if not os.path.exists(args['--template']):
@@ -208,8 +196,10 @@ def update_with_template_args(args):
                 % args['--template'])
 
         config = ConfigParser.ConfigParser()
-        config.readfp(NoSectionConfigFile(
-            open(os.path.expanduser(args.get('--template')))))
+        ini_str = '[settings]\n' + open(
+            os.path.expanduser(args.get('--template')), 'r').read()
+        ini_fp = StringIO.StringIO(ini_str)
+        config.readfp(ini_fp)
 
         for key, value in config.items('settings'):
             option_key = '--%s' % key
