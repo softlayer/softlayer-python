@@ -301,7 +301,7 @@ Options:
     @staticmethod
     def exec_detail(client, args):
         # TODO this should print out default gateway and stuff
-        raise CLIAbort('Not implemented')
+        CLIAbort('Not implemented')
 
 
 class ListChassisHardware(CLIRunnable):
@@ -596,8 +596,6 @@ Options:
 
             return [('disk_controllers', options)]
 
-        return []
-
 
 class CreateHardware(CLIRunnable):
     """
@@ -742,11 +740,11 @@ Optional:
 
         for item in ds_options['categories'][option]['items']:
             if not any([
-                    float(item['prices'][0].get('setupFee', 0)),
-                    float(item['prices'][0].get('recurringFee', 0)),
-                    float(item['prices'][0].get('hourlyRecurringFee', 0)),
-                    float(item['prices'][0].get('oneTimeFee', 0)),
-                    float(item['prices'][0].get('laborFee', 0)),
+                    float(item.get('setupFee', 0)),
+                    float(item.get('recurringFee', 0)),
+                    float(item.get('hourlyRecurringFee', 0)),
+                    float(item.get('oneTimeFee', 0)),
+                    float(item.get('laborFee', 0)),
             ]):
                 return item['price_id']
 

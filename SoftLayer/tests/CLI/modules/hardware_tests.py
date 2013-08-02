@@ -63,7 +63,7 @@ class HardwareCLITests(unittest.TestCase):
             'datacenter': ['FIRST_AVAILABLE', 'TEST00'],
             'dual nic': ['100_DUAL'],
             'disk_controllers': ['RAID5'],
-            'os (CLOUDLINUX)': ['CLOUDLINUX_5_32'],
+            'os (CLOUDLINUX)': ['CLOUDLINUX_5_32_MINIMAL'],
             'os (WIN)': ['WIN_2012-DC-HYPERV_64'],
             'memory': [2, 4],
             'disk': ['100_SATA'],
@@ -195,6 +195,127 @@ class HardwareCLITests(unittest.TestCase):
         abort_mock.assert_called()
         env_mock.assert_called()
 
+    @patch('SoftLayer.CLI.modules.hardware.CLIAbort')
+    @patch('SoftLayer.HardwareManager.change_port_speed')
+    @patch('SoftLayer.CLI.modules.hardware.resolve_id')
+    def test_NetworkHardware(
+            self, resolve_mock, port_mock, abort_mock):
+        hw_id = 12345
+        resolve_mock.return_value = hw_id
+
+        # Check the details case first
+        args = {'port': False, 'details': True}
+        NetworkHardware.execute(self.client, args)
+        abort_mock.assert_called()
+
+        # Now test updating the port
+        args['port'] = True
+        args['detail'] = False
+        args['--private'] = True
+        args['--speed'] = 100
+
+        port_mock.side_effect = [True, False]
+
+        # First call simulates a success
+        NetworkHardware.execute(self.client, args)
+        port_mock.assert_called_with(hw_id, False, 100)
+
+        # Second call simulates an error
+        self.assertFalse(NetworkHardware.execute(self.client, args))
+
+    @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
+    def test_ListChassisHardware(self, packages):
+        test_data = [
+            (1, 'Chassis 1'),
+            (2, 'Chassis 2')
+        ]
+        packages.return_value = test_data
+
+        output = ListChassisHardware.execute(self.client, {})
+
+        expected = [
+            {'Chassis': 'Chassis 1', 'Code': 1},
+            {'Chassis': 'Chassis 2', 'Code': 2}
+        ]
+
+        self.assertEqual(expected, format_output(output, 'python'))
+
+    @patch('SoftLayer.HardwareManager.get_dedicated_server_create_options')
+    def test_CreateHardware(self, create_options):
+        args = {
+            '--chassis': 999,
+            '--hostname': 'test',
+            '--domain': 'example.com',
+            '--datacenter': 'TEST00',
+            '--cpu': False,
+            '--network': '100',
+            '--disk': ['100_SATA', '100_SATA'],
+            '--os': 'CLOUDLINUX_5_32_MINIMAL',
+            '--memory': False,
+            '--controller': False,
+            '--test': True,
+        }
+
+        # This test data represents the structure of the information returned
+        # by HardwareManager.get_dedicated_server_create_options.
+        test_data = self.get_create_options_data()
+
+        create_options.return_value = test_data
+
+        # First, test the --test flag
+        with patch('SoftLayer.HardwareManager.verify_order') as verify_mock:
+            verify_mock.return_value = {
+                'prices': [
+                    {
+                        'recurringFee': 0.0,
+                        'setupFee': 0.0,
+                        'item': {'description': 'First Item'},
+                    },
+                    {
+                        'recurringFee': 25.0,
+                        'setupFee': 0.0,
+                        'item': {'description': 'Second Item'},
+                    }
+                ]
+            }
+            output = CreateHardware.execute(self.client, args)
+
+            # This test is fragile. We need to figure out why format 'python'
+            # doesn't work here in the CLI code.
+            expected = """:....................:.......:
+:               Item :  cost :
+:....................:.......:
+:         First Item :  0.00 :
+:        Second Item : 25.00 :
+: Total monthly cost : 25.00 :
+:....................:.......:
+ -- ! Prices reflected here are retail and do not take account level discounts and are not guarenteed."""
+            self.assertEqual(expected, format_output(output, 'table'))
+
+        # Now test ordering
+        with patch('SoftLayer.HardwareManager.place_order') as order_mock:
+            order_mock.return_value = {
+                'orderId': 98765,
+                'orderDate': '2013-08-02 15:23:47'
+            }
+
+            args['--test'] = False
+            args['--really'] = True
+
+            output = CreateHardware.execute(self.client, args)
+
+            expected = {'id': 98765, 'created': '2013-08-02 15:23:47'}
+            self.assertEqual(expected, format_output(output, 'python'))
+
+        # Finally, test cancelling the process
+        with patch('SoftLayer.CLI.modules.hardware.confirm') as confirm:
+            confirm.return_value = False
+
+            args['--really'] = False
+
+            self.assertRaises(CLIAbort,
+                              CreateHardware.execute, self.client, args)
+
     @staticmethod
     def get_create_options_data():
         return {
@@ -262,7 +383,8 @@ class HardwareCLITests(unittest.TestCase):
                     'items': [
                         {
                             'id': 31,
-                            'description': 'CloudLinux 5 (32 bit)',
+                            'description': 'CloudLinux 5 - Minimal Install ' +
+                            '(32 bit)',
                             'sort': 0,
                             'price_id': 31,
                             'recurring_fee': 0.0,
@@ -270,7 +392,7 @@ class HardwareCLITests(unittest.TestCase):
                         },
                         {
                             'id': 32,
-                            'description': 'Windows Server 2012 Datacenter ' +
+                            'description': 'Windows Server 2012 Datacenter' +
                             'Edition With Hyper-V (64bit)',
                             'sort': 0,
                             'price_id': 32,
@@ -301,6 +423,23 @@ class HardwareCLITests(unittest.TestCase):
                             'sort': 0,
                             'price_id': 4,
                             'recurring_fee': 0.0,
+                            'capacity': 100.0,
+                        }
+                    ],
+                },
+                'disk1': {
+                    'sort': 3,
+                    'step': 0,
+                    'is_required': 1,
+                    'name': 'Disk',
+                    'group': 'Key Components',
+                    'items': [
+                        {
+                            'id': 4,
+                            'description': '100GB SATA',
+                            'sort': 0,
+                            'price_id': 4,
+                            'recurring_fee': 10.0,
                             'capacity': 100.0,
                         }
                     ],
