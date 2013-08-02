@@ -150,15 +150,6 @@ class CommandLineTests(unittest.TestCase):
         self.assertRaises(
             SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
 
-    def test_value_key_errors(self):
-        self.env.get_module_name.side_effect = ValueError
-        self.assertRaises(
-            ValueError, cli.core.main, args=['cci', 'list'], env=self.env)
-
-        self.env.get_module_name.side_effect = KeyError
-        self.assertRaises(
-            KeyError, cli.core.main, args=['cci', 'list'], env=self.env)
-
     @patch('traceback.format_exc')
     def test_uncaught_error(self, m):
         # Exceptions not caught should just Exit

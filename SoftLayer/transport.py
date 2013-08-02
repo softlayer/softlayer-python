@@ -45,7 +45,7 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
         response.raise_for_status()
         result = xmlrpclib.loads(response.content,)[0][0]
         return result
-    except xmlrpclib.Fault, e:
+    except xmlrpclib.Fault as e:
         # These exceptions are formed from the XML-RPC spec
         # http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
         error_mapping = {
@@ -62,9 +62,9 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
         }
         raise error_mapping.get(e.faultCode, SoftLayerAPIError)(
             e.faultCode, e.faultString)
-    except requests.HTTPError, e:
+    except requests.HTTPError as e:
         raise TransportError(e.response.status_code, str(e))
-    except requests.RequestException, e:
+    except requests.RequestException as e:
         raise TransportError(0, str(e))
 
 
@@ -77,20 +77,20 @@ def make_rest_api_call(method, url, http_headers=None, timeout=None):
     :param int timeout: number of seconds to use as a timeout
     """
     log.info('%s %s' % (method, url))
-    resp = requests.request(method, url, headers=http_headers, timeout=timeout)
     try:
+        resp = requests.request(
+            method, url, headers=http_headers, timeout=timeout)
         resp.raise_for_status()
-    except requests.HTTPError, e:
+        log.debug(resp.content)
+        if url.endswith('.json'):
+            return json.loads(resp.content)
+        else:
+            return resp.text
+    except requests.HTTPError as e:
         if url.endswith('.json'):
             content = json.loads(e.response.content)
             raise SoftLayerAPIError(e.response.status_code, content['error'])
         else:
             raise SoftLayerAPIError(e.response.status_code, e.response.text)
-    except requests.RequestException, e:
+    except requests.RequestException as e:
         raise TransportError(0, str(e))
-
-    log.debug(resp.content)
-    if url.endswith('.json'):
-        return json.loads(resp.content)
-    else:
-        return resp.text

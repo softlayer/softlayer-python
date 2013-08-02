@@ -31,13 +31,13 @@ def config_table(env):
 
 
 def get_api_key(username, secret, endpoint_url=None):
-
     # Try to use a client with username/api key
     try:
         client = Client(
             username=username,
             api_key=secret,
-            endpoint_url=endpoint_url)
+            endpoint_url=endpoint_url,
+            timeout=5)
 
         client['Account'].getCurrentUser()
         return secret
@@ -46,7 +46,7 @@ def get_api_key(username, secret, endpoint_url=None):
             raise
 
     # Try to use a client with username/password
-    client = Client(endpoint_url=endpoint_url)
+    client = Client(endpoint_url=endpoint_url, timeout=5)
     client.authenticate_with_password(username, secret)
 
     user_record = client['Account'].getCurrentUser(
@@ -69,38 +69,48 @@ Setup configuration
     @classmethod
     def execute(cls, client, args):
         # User Input
-        username = cls.env.input(
-            'Username [%s]: ' % cls.env.config['username']) \
-            or cls.env.config['username']
-        secret = cls.env.getpass(
-            'API Key or Password [%s]: ' % cls.env.config['api_key']) \
-            or cls.env.config['api_key']
+        while True:
+            username = cls.env.input(
+                'Username [%s]: ' % cls.env.config['username']) \
+                or cls.env.config['username']
+            if username:
+                break
 
-        cls.env.out("Endpoint URL specifies which endpoint will be used "
-                    "during communication with the SLAPI. The default address "
-                    "is accessible over the internet and will work in most "
-                    "cases. You may also type 'private' to use the private "
-                    "network or specify a custom URL.")
-        endpoint_url = cls.env.input(
-            'Endpoint URL [%s]: '
-            % cls.env.config['endpoint_url']) or cls.env.config['endpoint_url']
-        if not endpoint_url:
-            endpoint_url = cls.env.config['endpoint_url']
-        if endpoint_url == 'public':
-            endpoint_url = API_PUBLIC_ENDPOINT
-        elif endpoint_url == 'private':
-            endpoint_url = API_PRIVATE_ENDPOINT
+        while True:
+            secret = cls.env.getpass(
+                'API Key or Password [%s]: ' % cls.env.config['api_key']) \
+                or cls.env.config['api_key']
+            if secret:
+                break
 
-        path = '~/.softlayer'
-        if args.get('--config'):
-            path = args.get('--config')
-        config_path = os.path.expanduser(path)
+        while True:
+            endpoint_type = cls.env.input('Endpoint (public|private|custom): ')
+            endpoint_type = endpoint_type.lower()
+            if not endpoint_type:
+                endpoint_url = API_PUBLIC_ENDPOINT
+                break
+            if endpoint_type == 'public':
+                endpoint_url = API_PUBLIC_ENDPOINT
+                break
+            elif endpoint_type == 'private':
+                endpoint_url = API_PRIVATE_ENDPOINT
+                break
+            elif endpoint_type == 'custom':
+                endpoint_url = cls.env.input(
+                    'Endpoint URL [%s]: ' % cls.env.config['endpoint_url']
+                ) or cls.env.config['endpoint_url']
+                break
 
         api_key = get_api_key(username, secret, endpoint_url=endpoint_url)
 
         cls.env.config['username'] = username
         cls.env.config['api_key'] = api_key
         cls.env.config['endpoint_url'] = endpoint_url
+
+        path = '~/.softlayer'
+        if args.get('--config'):
+            path = args.get('--config')
+        config_path = os.path.expanduser(path)
 
         cls.env.out(format_output(config_table(cls.env)))
 
