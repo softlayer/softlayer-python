@@ -195,24 +195,19 @@ class HardwareCLITests(unittest.TestCase):
         abort_mock.assert_called()
         env_mock.assert_called()
 
-    @patch('SoftLayer.CLI.modules.hardware.CLIAbort')
     @patch('SoftLayer.HardwareManager.change_port_speed')
     @patch('SoftLayer.CLI.modules.hardware.resolve_id')
     def test_NetworkHardware(
-            self, resolve_mock, port_mock, abort_mock):
+            self, resolve_mock, port_mock):
         hw_id = 12345
         resolve_mock.return_value = hw_id
 
-        # Check the details case first
-        args = {'port': False, 'details': True}
-        NetworkHardware.execute(self.client, args)
-        abort_mock.assert_called()
-
-        # Now test updating the port
-        args['port'] = True
-        args['detail'] = False
-        args['--private'] = True
-        args['--speed'] = 100
+        # Test updating the port
+        args = {
+            'port': True,
+            '--private': True,
+            '--speed': 100
+        }
 
         port_mock.side_effect = [True, False]
 

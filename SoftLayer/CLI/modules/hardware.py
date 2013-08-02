@@ -279,9 +279,6 @@ Options:
         if args['port']:
             return cls.exec_port(client, args)
 
-        if args['details']:
-            return cls.exec_detail(client, args)
-
     @staticmethod
     def exec_port(client, args):
         public = True
@@ -297,11 +294,6 @@ Options:
             return "Success"
         else:
             return result
-
-    @staticmethod
-    def exec_detail(client, args):
-        # TODO this should print out default gateway and stuff
-        CLIAbort('Not implemented')
 
 
 class ListChassisHardware(CLIRunnable):
