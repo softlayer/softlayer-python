@@ -4,18 +4,18 @@ usage: sl cci [<command>] [<args>...] [options]
 Manage, delete, order compute instances
 
 The available commands are:
-  network         Manage network settings
-  edit            Edit details of a CCI
-  create          Order and create a CCI
-                    (see `sl cci create-options` for choices)
-  manage          Manage active CCI
-  list            List CCI's on the account
+  cancel          Cancel a running CCI
+  create          Order and create a CCI 
+                  (see `sl cci create-options` for choices)
+  create-options  Output available available options when creating a CCI
   detail          Output details about a CCI
   dns             DNS related actions to a CCI
-  cancel          Cancel a running CCI
-  create-options  Output available available options when creating a CCI
-  reload          Reload the OS on a CCI based on its current configuration
+  edit            Edit details of a CCI
+  list            List CCI's on the account
+  manage          Manage active CCI
+  network         Manage network settings
   ready           Check if a CCI has finished provisioning
+  reload          Reload the OS on a CCI based on its current configuration
 
 For several commands, <identifier> will be asked for. This can be the id,
 hostname or the ip address for a CCI.

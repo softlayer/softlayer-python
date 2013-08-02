@@ -1,13 +1,13 @@
 """
-usage: sl bmetal [<command>] [<args>...] [options]
-       sl bmetal [-h | --help]
+usage: sl bmc [<command>] [<args>...] [options]
+       sl bmc [-h | --help]
 
 Manage bare metal instances
 
 The available commands are:
-  create-options  Output available available options when creating a server
-  create    Create a new bare metal instance
   cancel    Cancels a bare metal instance
+  create    Create a new bare metal instance
+  create-options  Output available available options when creating a server
 
 For several commands, <identifier> will be asked for. This can be the id,
 hostname or the ip address for a piece of hardware.
@@ -35,9 +35,9 @@ def resolve_id(manager, identifier):
     return ids[0]
 
 
-class BMetalCreateOptions(CLIRunnable):
+class bmcCreateOptions(CLIRunnable):
     """
-usage: sl bmetal create-options [options]
+usage: sl bmc create-options [options]
 
 Output available available options when creating a bare metal instance.
 
@@ -274,13 +274,13 @@ Options:
         return []
 
 
-class CreateBMetalInstance(CLIRunnable):
+class CreateBmcInstance(CLIRunnable):
     """
-usage: sl bmetal create --hostname=HOST --domain=DOMAIN --cpu=CPU --os=OS
+usage: sl bmc create --hostname=HOST --domain=DOMAIN --cpu=CPU --os=OS
                        --memory=MEMORY --disk=DISK... (--hourly | --monthly)
                        [options]
 
-Order/create a bare metal instance. See 'sl bmetal create-options' for valid
+Order/create a bare metal instance. See 'sl bmc create-options' for valid
 options
 
 Required:
@@ -423,7 +423,7 @@ Optional:
     @classmethod
     def _get_cpu_and_memory_price_ids(cls, bmi_options, cpu_value,
                                       memory_value):
-        bmi_obj = BMetalCreateOptions()
+        bmi_obj = bmcCreateOptions()
         price_id = None
 
         cpu_regex = re.compile('(\d+)')
@@ -454,7 +454,7 @@ Optional:
 
     @classmethod
     def _get_price_id_from_options(cls, bmi_options, option, value):
-        bmi_obj = BMetalCreateOptions()
+        bmi_obj = bmcCreateOptions()
         price_id = None
 
         for k, v in bmi_obj.get_create_options(bmi_options, option, False):
@@ -467,7 +467,7 @@ Optional:
 
 class CancelInstance(CLIRunnable):
     """
-usage: sl bmetal cancel <identifier> [options]
+usage: sl bmc cancel <identifier> [options]
 
 Cancel a bare metal instance
 

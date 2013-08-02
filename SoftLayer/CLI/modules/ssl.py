@@ -5,9 +5,9 @@ usage: sl ssl [<command>] [<args>...] [options]
 Manage SSL
 
 The available commands are:
-  edit      Edit ssl certificate
-  download  Download certificate & key file
   add       Add ssl certificate
+  download  Download certificate & key file
+  edit      Edit ssl certificate
   list      List ssl certificates
   remove    Remove ssl certificate
 """

@@ -20,11 +20,11 @@ Available Operations:
     '<= value'  Less than or equal to value
 
 Examples:
-    sl hardware list --datacenter=dal05
-    sl hardware list --hostname='prod*'
     sl cci list --network=100 --cpu=2
     sl cci list --network='< 100' --cpu=2
     sl cci list --memory='>= 2048'
+    sl server list --datacenter=dal05
+    sl server list --hostname='prod*'
 
 Note: Comparison operators (>, <, >=, <=) can be used with integers, floats,
       and strings.
