@@ -343,6 +343,11 @@ class HardwareManager(IdentifierMixin, object):
                 'bareMetalInstanceFlag': bare_metal,
                 'hostname': hostname,
                 'domain': domain,
+                # TODO - It would be nice if we could get this working too.
+                # VLAN number doesn't appear to work.
+                #'networkVlans': [
+                #    {'vlanNumber': 1836}, {'vlanNumber': 1126}
+                #],
             }],
             'location': location,
             'prices': [
@@ -380,6 +385,12 @@ class HardwareManager(IdentifierMixin, object):
         required_fields = []
         for category, data in p_options['categories'].iteritems():
             if data.get('is_required') and category not in arguments:
+                if 'disk' in category:
+                    # This block makes sure that we can default unspecified
+                    # disks if the user hasn't specified enough.
+                    disk_count = int(category.replace('disk', ''))
+                    if len(disks) >= disk_count + 1:
+                        continue
                 required_fields.append(category)
 
         for category in required_fields:

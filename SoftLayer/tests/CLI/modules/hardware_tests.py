@@ -72,7 +72,7 @@ class HardwareCLITests(unittest.TestCase):
             call().add_row(['os (UBUNTU)', ['UBUNTU_10_32']]),
             call().add_row(['os (WIN)', ['WIN_2012-DC-HYPERV_64']]),
             call().add_row(['disk', ['100_SATA']]),
-            call().add_row(['single nic', [100]]),
+            call().add_row(['single nic', ['100']]),
             call().add_row(['dual nic', ['100_DUAL']]),
             call().add_row(['disk_controllers', ['RAID5']]),
         ]
