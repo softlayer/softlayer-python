@@ -230,6 +230,7 @@ class HardwareManager(IdentifierMixin, object):
                 'operatingSystem.passwords[username,password]',
                 'billingItem.recurringFee',
                 'tagReferences[id,tag[name,id]]',
+                'networkVlans[id,vlanNumber,networkSpace]',
             ])
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 

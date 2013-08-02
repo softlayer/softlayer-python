@@ -137,14 +137,12 @@ Options:
         t.add_row(['id', result['id']])
         t.add_row(['hostname', result['fullyQualifiedDomainName']])
         t.add_row(['status', FormattedItem(
-            result['status']['keyName'], result['status']['name'])])
+            result['status']['keyName'] or blank(),
+            result['status']['name'] or blank()
+        )])
         t.add_row(['state', FormattedItem(
             result['powerState']['keyName'], result['powerState']['name'])])
         t.add_row(['datacenter', result['datacenter']['name']])
-        t.add_row(['cores', result['maxCpu']])
-        t.add_row(['memory', mb_to_gb(result['maxMemory'])])
-        t.add_row(['public_ip', result['primaryIpAddress'] or blank()])
-        t.add_row(['private_ip', result['primaryBackendIpAddress'] or blank()])
         t.add_row([
             'os',
             FormattedItem(
@@ -153,10 +151,20 @@ Options:
                 result['operatingSystem']['softwareLicense']
                 ['softwareDescription']['name'] or blank()
             )])
+        t.add_row(['cores', result['maxCpu']])
+        t.add_row(['memory', mb_to_gb(result['maxMemory'])])
+        t.add_row(['public_ip', result['primaryIpAddress'] or blank()])
+        t.add_row(['private_ip', result['primaryBackendIpAddress'] or blank()])
         t.add_row(['private_only', result['privateNetworkOnlyFlag']])
         t.add_row(['private_cpu', result['dedicatedAccountHostOnlyFlag']])
         t.add_row(['created', result['createDate']])
         t.add_row(['modified', result['modifyDate']])
+
+        vlan_table = Table(['type', 'number', 'id'])
+        for vlan in result['networkVlans']:
+            vlan_table.add_row([
+                vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
+        t.add_row(['vlans', vlan_table])
 
         if result.get('notes'):
             t.add_row(['notes', result['notes']])
