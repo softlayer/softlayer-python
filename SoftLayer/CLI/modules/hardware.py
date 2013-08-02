@@ -222,10 +222,10 @@ Options:
     @classmethod
     def execute(cls, client, args):
         hw = HardwareManager(client)
-        hw_id = resolve_id(hw, args.get('<identifier>'))
+        hw_id = resolve_id(
+            hw.resolve_ids, args.get('<identifier>'), 'hardware')
 
-        cls.env.out("(Optional) Add a cancellation comment:", nl=False)
-        comment = raw_input()
+        comment = cls.env.input("(Optional) Add a cancellation comment:")
 
         reason = args.get('--reason')
 
@@ -756,7 +756,8 @@ Optional:
             return cls._get_price_id_from_options(ds_options, 'disk', value)
         # This will get the item ID for the matching identifier string, which
         # we can then use to get the price ID for our specific disk
-        item_id = cls._get_price_id_from_options(ds_options, 'disk', value, True)
+        item_id = cls._get_price_id_from_options(ds_options, 'disk',
+                                                 value, True)
         key = 'disk' + str(number)
         if key in ds_options['categories']:
             for item in ds_options['categories'][key]['items']:

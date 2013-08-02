@@ -12,7 +12,7 @@ try:
     import unittest2 as unittest
 except ImportError:
     import unittest  # NOQA
-from mock import MagicMock, patch, call
+from mock import Mock, MagicMock, patch
 
 from SoftLayer.CLI.helpers import format_output
 from SoftLayer.CLI.modules.hardware import *
@@ -81,7 +81,17 @@ class HardwareCLITests(unittest.TestCase):
         servers = self.get_server_mocks()
         get_hardware.return_value = servers[0]
 
-        output = HardwareDetails.execute(self.client, {'<identifier>': hw_id})
+        dns_mock = Mock()
+        dns_mock.getReverseDomainRecords = Mock()
+        dns_mock.getReverseDomainRecords.return_value = [{
+            'resourceRecords': [{'data': '2.0.0.10.in-addr.arpa'}]
+        }]
+        client = Mock()
+        client.__getitem__ = Mock()
+        client.__getitem__.return_value = dns_mock
+
+        args = {'<identifier>': hw_id, '--passwords': True}
+        output = HardwareDetails.execute(client, args)
 
         expected = {
             'status': 'ACTIVE',
@@ -93,9 +103,9 @@ class HardwareCLITests(unittest.TestCase):
             'private_ip': '10.1.0.2',
             'memory': 2048,
             'cores': 2,
-            'vlans': [],
-            'os':
-            'Ubuntu', 'id': 1,
+            'ptr': '2.0.0.10.in-addr.arpa',
+            'os': 'Ubuntu', 'id': 1,
+            'users': ['root abc123'],
             'vlans': [{'id': 9653, 'number': 1800, 'type': 'PRIVATE'},
                       {'id': 19082, 'number': 3672, 'type': 'PUBLIC'}]
         }
@@ -131,6 +141,59 @@ class HardwareCLITests(unittest.TestCase):
         ]
 
         self.assertEqual(expected, format_output(output, 'python'))
+
+    @patch('SoftLayer.CLI.modules.hardware.CLIAbort')
+    @patch('SoftLayer.CLI.modules.hardware.no_going_back')
+    @patch('SoftLayer.HardwareManager.reload')
+    @patch('SoftLayer.CLI.modules.hardware.resolve_id')
+    def test_HardwareReload(
+            self, resolve_mock, reload_mock, ngb_mock, abort_mock):
+        hw_id = 12345
+        resolve_mock.return_value = hw_id
+        ngb_mock.return_value = False
+
+        # Check the positive case
+        args = {'--really': True, '--postinstall': None}
+        HardwareReload.execute(self.client, args)
+
+        reload_mock.assert_called_with(hw_id, args['--postinstall'])
+
+        # Now check to make sure we properly call CLIAbort in the negative case
+        args['--really'] = False
+
+        HardwareReload.execute(self.client, args)
+        abort_mock.assert_called()
+
+    @patch('SoftLayer.CLI.modules.hardware.CLIAbort')
+    @patch('SoftLayer.CLI.modules.hardware.no_going_back')
+    @patch('SoftLayer.HardwareManager.cancel_hardware')
+    @patch('SoftLayer.CLI.modules.hardware.resolve_id')
+    def test_CancelHardware(
+            self, resolve_mock, cancel_mock, ngb_mock, abort_mock):
+        hw_id = 12345
+        resolve_mock.return_value = hw_id
+        ngb_mock.return_value = False
+
+        env_mock = Mock()
+        env_mock.input = Mock()
+        env_mock.input.return_value = 'Comment'
+
+        CancelHardware.env = env_mock
+        env_mock.assert_called()
+
+        # Check the positive case
+        args = {'--really': True, '--reason': 'Test'}
+        CancelHardware.execute(self.client, args)
+
+        cancel_mock.assert_called_with(hw_id, args['--reason'], 'Comment')
+
+        # Now check to make sure we properly call CLIAbort in the negative case
+        env_mock.reset_mock()
+        args['--really'] = False
+
+        CancelHardware.execute(self.client, args)
+        abort_mock.assert_called()
+        env_mock.assert_called()
 
     @staticmethod
     def get_create_options_data():
@@ -308,7 +371,10 @@ class HardwareCLITests(unittest.TestCase):
                             'referenceCode': 'Ubuntu',
                             'name': 'Ubuntu 12.04 LTS',
                         }
-                    }
+                    },
+                    'passwords': [
+                        {'username': 'root', 'password': 'abc123'}
+                    ],
                 },
                 'networkVlans': [
                     {
