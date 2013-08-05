@@ -69,24 +69,29 @@ To discover the available commands, simply type `sl`.
 ::
 
 	$ sl
-	usage: sl <command> [<args>...]
-	       sl help <command>
+	usage: sl <module> [<args>...]
+	       sl help <module>
+	       sl help <module> <command>
 	       sl [-h | --help]
-
+	
 	SoftLayer Command-line Client
-
-	The available commands are:
-	  firewall  Firewall rule and security management
-	  image     Manages compute and flex images
-	  ssl       Manages SSL
+	
+	The available modules are:
 	  cci       Manage, delete, order compute instances
-	  dns       Manage DNS
 	  config    View and edit configuration for this tool
+	  dns       Manage DNS
+	  firewall  Firewall rule and security management
+	  hardware  View hardware details
+	  bmetal    Interact with bare metal instances
+	  network   Perform various network operations
+	  help      Show help
+	  iscsi     View iSCSI details
+	  image     Manages compute and flex images
 	  metadata  Get details about this machine. Also available with 'my' and 'meta'
 	  nas       View NAS details
-	  iscsi     View iSCSI details
+	  ssl       Manages SSL
 
-	See 'sl help <command>' for more information on a specific command.
+	See 'sl help <module>' for more information on a specific module.
 
 	To use most commands your SoftLayer username and api_key need to be configured.
 	The easiest way to do that is to use: 'sl config setup'
