@@ -61,6 +61,15 @@ For day to day operation, most users will find the managers to be the most conve
 	>>> cci.list_instances()
 	[...]
 
+Available Managers:
+~~~~~~~~~~~~~~~~~~~
+
+.. toctree::
+   :maxdepth: 2
+   :glob:
+
+   managers/*
+
 If you need more power or functionality than the managers provide, you can make direct API calls as well.
 
 
@@ -148,13 +157,6 @@ API Reference
 .. automodule:: SoftLayer.exceptions
    :members:
    :undoc-members:
-
-
-.. toctree::
-   :maxdepth: 2
-   :glob:
-
-   managers/*
 
 
 Backwards Compatibility
