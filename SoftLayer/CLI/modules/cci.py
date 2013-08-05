@@ -397,6 +397,7 @@ Optional:
                 '--network': like_details['networkComponents'][0]['maxSpeed'],
                 '--user-data': like_details['userData'] or None,
                 '--postinstall': like_details.get('postInstallScriptUri'),
+                '--private': like_details['dedicatedAccountHostOnlyFlag'],
             }
 
             # Merge like CCI options with the options passed in

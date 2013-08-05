@@ -337,7 +337,7 @@ class TestTemplateArgs(unittest.TestCase):
 class TestExportToTemplate(unittest.TestCase):
     def test_export_to_template(self):
         with patch(open_path, mock_open(), create=True) as open_:
-            args = cli.helpers.export_to_template('filename', {
+            cli.helpers.export_to_template('filename', {
                 '--os': None,
                 '--datacenter': 'ams01',
                 # The following gets stripped out
@@ -348,7 +348,6 @@ class TestExportToTemplate(unittest.TestCase):
                 # exclude list
                 '--test': 'test',
             }, exclude=['--test'])
-            print args
             open_.assert_called_with('filename', 'w')
             open_().write.assert_has_calls(
                 call('datacenter=ams01\n'),
