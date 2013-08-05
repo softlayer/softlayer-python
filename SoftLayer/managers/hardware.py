@@ -29,10 +29,12 @@ class HardwareManager(IdentifierMixin, object):
         """ Cancels the specified dedicated server.
 
         :param int id: The ID of the hardware to be cancelled.
-        :param bool immediate: If true, the hardware will be cancelled
-                               immediately. Otherwise, it will be
-                               scheduled to cancel on the anniversary date.
-        :param string reason: The reason code for the cancellation.
+        :param string reason: The reason code for the cancellation. This should
+                              come from :func:`get_cancellation_reasons`.
+        :param string comment: An optional comment to include with the
+                               cancellation.
+
+        >>> cancel_hardware(123)
         """
 
         reasons = self.get_cancellation_reasons()
