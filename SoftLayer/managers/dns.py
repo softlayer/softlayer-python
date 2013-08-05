@@ -1,5 +1,5 @@
 """
-    SoftLayer.DNS
+    SoftLayer.dns
     ~~~~~~~~~~~~~
     DNS Manager/helpers
 
@@ -22,9 +22,17 @@ class DNSManager(IdentifierMixin, object):
 
         """
         self.client = client
+        """ A valid `SoftLayer.API.Client` object that will be used for all
+        actions. """
         self.service = self.client['Dns_Domain']
+        """ Reference to the SoftLayer_Dns_Domain API object. """
         self.record = self.client['Dns_Domain_ResourceRecord']
+        """ Reference to the SoftLayer.Dns_Domain_ResourceRecord
+        API object. """
         self.resolvers = [self._get_zone_id_from_name]
+        """ A list of resolver functions. Used primarily by the CLI to provide
+        a variety of methods for uniquely identifying an object such as zone
+        name """
 
     def _get_zone_id_from_name(self, name):
             results = self.client['Account'].getDomains(
@@ -35,6 +43,7 @@ class DNSManager(IdentifierMixin, object):
         """ Retrieve a list of all DNS zones.
 
         :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+        :returns: A list of dictionaries representing the matching zones.
 
         """
         return self.client['Account'].getDomains(**kwargs)
@@ -43,6 +52,8 @@ class DNSManager(IdentifierMixin, object):
         """ Get a zone and its records.
 
         :param zone: the zone name
+        :returns: A dictionary containing a large amount of information about
+                  the specified zone.
 
         """
         mask = None
@@ -120,7 +131,8 @@ class DNSManager(IdentifierMixin, object):
         :param host: optionally, record's host
         :param type: optionally, the type of record:
 
-        :returns list:
+        :returns: A list of dictionaries representing the matching records
+                  within the specified zone.
         """
         _filter = NestedDict()
 

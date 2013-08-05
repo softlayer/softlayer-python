@@ -47,8 +47,7 @@ class CCIManager(IdentifierMixin, object):
         :param string public_ip: filter based on public ip address
         :param string private_ip: filter based on private ip address
         :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
-        :returns: Returns an array of dictionaries representing the matching
-                  CCIs.
+        :returns: Returns a list of dictionaries representing the matching CCIs
 
         ::
 
