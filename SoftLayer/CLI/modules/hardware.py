@@ -222,10 +222,10 @@ Options:
     @classmethod
     def execute(cls, client, args):
         hw = HardwareManager(client)
-        hw_id = resolve_id(hw, args.get('<identifier>'))
+        hw_id = resolve_id(
+            hw.resolve_ids, args.get('<identifier>'), 'hardware')
 
-        cls.env.out("(Optional) Add a cancellation comment:", nl=False)
-        comment = raw_input()
+        comment = cls.env.input("(Optional) Add a cancellation comment:")
 
         reason = args.get('--reason')
 
@@ -279,9 +279,6 @@ Options:
         if args['port']:
             return cls.exec_port(client, args)
 
-        if args['details']:
-            return cls.exec_detail(client, args)
-
     @staticmethod
     def exec_port(client, args):
         public = True
@@ -297,11 +294,6 @@ Options:
             return "Success"
         else:
             return result
-
-    @staticmethod
-    def exec_detail(client, args):
-        # TODO this should print out default gateway and stuff
-        raise CLIAbort('Not implemented')
 
 
 class ListChassisHardware(CLIRunnable):
@@ -568,7 +560,7 @@ Options:
                 disk_type = disk_type.replace('RPM', '').strip()
                 disk_type = disk_type.replace(' ', '_').upper()
                 disk_type = str(int(disk['capacity'])) + '_' + disk_type
-                disks.append((disk_type, disk['price_id']))
+                disks.append((disk_type, disk['price_id'], disk['id']))
 
             return [('disk', disks)]
         elif 'nic' == section:
@@ -580,7 +572,8 @@ Options:
                     dual.append((str(int(item['capacity'])) + '_DUAL',
                                  item['price_id']))
                 else:
-                    single.append((int(item['capacity']), item['price_id']))
+                    single.append((str(int(item['capacity'])),
+                                   item['price_id']))
 
             return [('single nic', single), ('dual nic', dual)]
         elif 'disk_controller' == section:
@@ -595,8 +588,6 @@ Options:
 
             return [('disk_controllers', options)]
 
-        return []
-
 
 class CreateHardware(CLIRunnable):
     """
@@ -604,7 +595,8 @@ usage: sl hardware create --hostname=HOST --domain=DOMAIN --cpu=CPU
     --chassis=CHASSIS --memory=MEMORY --os=OS --disk=SIZE... [options]
 
 Order/create a dedicated server. See 'sl hardware list-chassis' and
-'sl hardware create-options' for valid options
+'sl hardware create-options' for valid options. --disk can be repeated to
+order multiple disks.
 
 Required:
   -H --hostname=HOST  Host portion of the FQDN. example: server
@@ -612,7 +604,7 @@ Required:
   --chassis=CHASSIS   The chassis to use for the new server
   -c --cpu=CPU        CPU model
   -o OS, --os=OS      OS install code.
-  -m --memory=MEMORY  Memory in mebibytes (n * 1024)
+  -m --memory=MEMORY  Memory in gigabytes
 
 
 Optional:
@@ -650,16 +642,15 @@ Optional:
             raise CLIAbort('Invalid operating system specified.')
 
         order['location'] = args['--datacenter'] or 'FIRST_AVAILABLE'
-        order['server'] = cls._get_price_id_from_options(ds_options, 'cpu',
-                                                         args['--cpu'])
+        order['server'] = args['--cpu']
         order['ram'] = cls._get_price_id_from_options(ds_options, 'memory',
                                                       int(args['--memory']))
         # Set the disk sizes
         disk_prices = []
+        disk_number = 0
         for disk in args.get('--disk'):
-            disk_price = cls._get_price_id_from_options(ds_options, 'disk',
-                                                        disk)
-
+            disk_price = cls._get_disk_price(ds_options, disk, disk_number)
+            disk_number += 1
             if disk_price:
                 disk_prices.append(disk_price)
 
@@ -681,7 +672,7 @@ Optional:
         order['disk_controller'] = dc_price
 
         # Set the port speed
-        port_speed = args.get('--network') or 10
+        port_speed = args.get('--network') or '100'
 
         nic_price = cls._get_price_id_from_options(ds_options, 'nic',
                                                    port_speed)
@@ -742,25 +733,39 @@ Optional:
 
         for item in ds_options['categories'][option]['items']:
             if not any([
-                    float(item['prices'][0].get('setupFee', 0)),
-                    float(item['prices'][0].get('recurringFee', 0)),
-                    float(item['prices'][0].get('hourlyRecurringFee', 0)),
-                    float(item['prices'][0].get('oneTimeFee', 0)),
-                    float(item['prices'][0].get('laborFee', 0)),
+                    float(item.get('setupFee', 0)),
+                    float(item.get('recurringFee', 0)),
+                    float(item.get('hourlyRecurringFee', 0)),
+                    float(item.get('oneTimeFee', 0)),
+                    float(item.get('laborFee', 0)),
             ]):
                 return item['price_id']
 
     @classmethod
-    def _get_price_id_from_options(cls, ds_options, option, value):
+    def _get_disk_price(cls, ds_options, value, number):
+        if not number:
+            return cls._get_price_id_from_options(ds_options, 'disk', value)
+        # This will get the item ID for the matching identifier string, which
+        # we can then use to get the price ID for our specific disk
+        item_id = cls._get_price_id_from_options(ds_options, 'disk',
+                                                 value, True)
+        key = 'disk' + str(number)
+        if key in ds_options['categories']:
+            for item in ds_options['categories'][key]['items']:
+                if item['id'] == item_id:
+                    return item['price_id']
+
+    @classmethod
+    def _get_price_id_from_options(cls, ds_options, option, value,
+                                   item_id=False):
         ds_obj = HardwareCreateOptions()
-        price_id = None
 
         for k, v in ds_obj.get_create_options(ds_options, option, False):
             for item_options in v:
                 if item_options[0] == value:
-                    price_id = item_options[1]
-
-        return price_id
+                    if not item_id:
+                        return item_options[1]
+                    return item_options[2]
 
 
 class EditHardware(CLIRunnable):
