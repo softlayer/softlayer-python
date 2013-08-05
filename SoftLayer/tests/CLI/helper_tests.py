@@ -12,13 +12,15 @@ import StringIO
 
 import SoftLayer.CLI as cli
 from SoftLayer.tests import FIXTURE_PATH, unittest
-from mock import patch
+from mock import patch, mock_open, call
 
 
 if sys.version_info >= (3,):
     raw_input_path = 'builtins.input'
+    open_path = 'builtins.open'
 else:
     raw_input_path = '__builtin__.raw_input'
+    open_path = '__builtin__.open'
 
 
 class CLIJSONEncoderTest(unittest.TestCase):
@@ -245,6 +247,9 @@ class TestFormatOutput(unittest.TestCase):
     }
 ]''', ret)
 
+        ret = cli.helpers.format_output('test', 'json')
+        self.assertEqual('"test"', ret)
+
     def test_format_output_json_keyvaluetable(self):
         t = cli.KeyValueTable(['key', 'value'])
         t.add_row(['nothing', cli.helpers.blank()])
@@ -325,6 +330,26 @@ class TestTemplateArgs(unittest.TestCase):
             '--monthly': 'false',
             '--network': '100',
             '--os': 'DEBIAN_7_64',
-            '--template': path,
             'key': 'value',
         })
+
+
+class TestExportToTemplate(unittest.TestCase):
+    def test_export_to_template(self):
+        with patch(open_path, mock_open(), create=True) as open_:
+            args = cli.helpers.export_to_template('filename', {
+                '--os': None,
+                '--datacenter': 'ams01',
+                # The following gets stripped out
+                '--config': 'no',
+                '--really': 'no',
+                '--format': 'no',
+                '--debug': 'no',
+                # exclude list
+                '--test': 'test',
+            }, exclude=['--test'])
+            print args
+            open_.assert_called_with('filename', 'w')
+            open_().write.assert_has_calls(
+                call('datacenter=ams01\n'),
+            )

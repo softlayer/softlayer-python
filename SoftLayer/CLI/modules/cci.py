@@ -27,12 +27,13 @@ from os import linesep
 import os.path
 
 from SoftLayer import CCIManager, SshKeyManager
+from SoftLayer.utils import lookup
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
     FormattedItem)
 from SoftLayer.CLI.helpers import (
-    CLIAbort, ArgumentError, SequentialOutput, NestedDict, blank, resolve_id,
-    KeyValueTable, update_with_template_args, FALSE_VALUES)
+    CLIAbort, ArgumentError, NestedDict, blank, resolve_id, KeyValueTable,
+    update_with_template_args, FALSE_VALUES, export_to_template)
 
 
 class ListCCIs(CLIRunnable):
@@ -143,14 +144,17 @@ Options:
         t.add_row(['state', FormattedItem(
             result['powerState']['keyName'], result['powerState']['name'])])
         t.add_row(['datacenter', result['datacenter']['name']])
+        operating_system = lookup(result,
+                                  'operatingSystem',
+                                  'softwareLicense',
+                                  'softwareDescription')
         t.add_row([
             'os',
             FormattedItem(
-                result['operatingSystem']['softwareLicense']
-                ['softwareDescription']['referenceCode'] or blank(),
-                result['operatingSystem']['softwareLicense']
-                ['softwareDescription']['name'] or blank()
+                operating_system['version'] or blank(),
+                operating_system['name'] or blank()
             )])
+        t.add_row(['os_version', operating_system['version'] or blank()])
         t.add_row(['cores', result['maxCpu']])
         t.add_row(['memory', mb_to_gb(result['maxMemory'])])
         t.add_row(['public_ip', result['primaryIpAddress'] or blank()])
@@ -359,9 +363,11 @@ Optional:
   --private                Forces the CCI to only have access the private
                              network.
   -t, --template=FILE      A template file that defaults the command-line
-                            options using the long name in INI format.
+                            options using the long name in INI format
+  --like=IDENTIFIER        Use the configuration from an existing CCI
+  --export=FILE            Exports options to a template file
   --wait=SECONDS           Block until CCI is finished provisioning for up to X
-                             seconds before returning.
+                             seconds before returning
 """
     action = 'create'
     options = ['confirm']
@@ -370,60 +376,40 @@ Optional:
     @classmethod
     def execute(cls, client, args):
         update_with_template_args(args)
-        cls._validate_args(args)
 
         cci = CCIManager(client)
-        data = {
-            "hourly": args['--hourly'],
-            "cpus": args['--cpu'],
-            "domain": args['--domain'],
-            "hostname": args['--hostname'],
-            "dedicated": args['--dedicated'],
-            "local_disk": True,
-            "private": args['--private']
-        }
+        if args['--like']:
+            cci_id = resolve_id(cci.resolve_ids, args.pop('--like'), 'CCI')
+            like_details = cci.get_instance(cci_id)
+            like_args = {
+                '--hostname': like_details['hostname'],
+                '--domain': like_details['domain'],
+                '--cpu': like_details['maxCpu'],
+                '--memory': like_details['maxMemory'],
+                '--os': lookup(like_details,
+                               'operatingSystem',
+                               'softwareLicense',
+                               'softwareDescription',
+                               'referenceCode'),
+                '--hourly': like_details['hourlyBillingFlag'],
+                '--monthly': not like_details['hourlyBillingFlag'],
+                '--datacenter': like_details['datacenter']['name'],
+                '--network': like_details['networkComponents'][0]['maxSpeed'],
+                '--user-data': like_details['userData'] or None,
+                '--postinstall': like_details.get('postInstallScriptUri'),
+            }
 
-        try:
-            memory = int(args['--memory'])
-            if memory < 1024:
-                memory = memory * 1024
-        except ValueError:
-            unit = args['--memory'][-1]
-            memory = int(args['--memory'][0:-1])
-            if unit in ['G', 'g']:
-                memory = memory * 1024
-            if unit in ['T', 'r']:
-                memory = memory * 1024 * 1024
+            # Merge like CCI options with the options passed in
+            for key, value in like_args.items():
+                if args.get(key) in [None, False]:
+                    args[key] = value
 
-        data["memory"] = memory
+        cls._validate_args(args)
 
-        if args['--monthly']:
-            data['hourly'] = False
+        # Do not create CCI with --test or --export
+        do_create = not (args['--export'] or args['--test'])
 
-        if args.get('--os'):
-            data['os_code'] = args['--os']
-
-        if args.get('--image'):
-            data['image_id'] = args['--image']
-
-        if args.get('--datacenter'):
-            data['datacenter'] = args['--datacenter']
-
-        if args.get('--network'):
-            data['nic_speed'] = args.get('--network')
-
-        if args.get('--userdata'):
-            data['userdata'] = args['--userdata']
-        elif args.get('--userfile'):
-            f = open(args['--userfile'], 'r')
-            try:
-                data['userdata'] = f.read()
-            finally:
-                f.close()
-
-        if args.get('--postinstall'):
-            data['post_uri'] = args.get('--postinstall')
-
+<<<<<<< HEAD
         # Get the SSH key
         if args.get('--key'):
             key_id = resolve_id(SshKeyManager(client).resolve_ids,
@@ -433,11 +419,20 @@ Optional:
         t = Table(['Item', 'cost'])
         t.align['Item'] = 'r'
         t.align['cost'] = 'r'
+=======
+        data = parse_create_args(args)
+>>>>>>> Adds --like and --export to CCI creation
 
+        output = []
         if args.get('--test'):
             result = cci.verify_create_instance(**data)
             total_monthly = 0.0
             total_hourly = 0.0
+
+            t = Table(['Item', 'cost'])
+            t.align['Item'] = 'r'
+            t.align['cost'] = 'r'
+
             for price in result['prices']:
                 total_monthly += float(price.get('recurringFee', 0.0))
                 total_hourly += float(price.get('hourlyRecurringFee', 0.0))
@@ -457,32 +452,38 @@ Optional:
             if args.get('--hourly'):
                 billing_rate = 'hourly'
             t.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
-            output = SequentialOutput()
             output.append(t)
             output.append(FormattedItem(
-                '',
+                None,
                 ' -- ! Prices reflected here are retail and do not '
                 'take account level discounts and are not guarenteed.')
             )
 
-        elif args['--really'] or confirm(
-                "This action will incur charges on your account. Continue?"):
-            result = cci.create_instance(**data)
+        if args['--export']:
+            export_file = args.pop('--export')
+            export_to_template(export_file, args, exclude=['--wait'])
+            return 'Successfully exported options to a template file.'
 
-            t = KeyValueTable(['name', 'value'])
-            t.align['name'] = 'r'
-            t.align['value'] = 'l'
-            t.add_row(['id', result['id']])
-            t.add_row(['created', result['createDate']])
-            t.add_row(['guid', result['globalIdentifier']])
-            output = t
+        if do_create:
+            if args['--really'] or confirm(
+                    "This action will incur charges on your account. "
+                    "Continue?"):
+                result = cci.create_instance(**data)
 
-            if args.get('--wait'):
-                ready = cci.wait_for_transaction(
-                    result['id'], int(args.get('--wait') or 1))
-                t.add_row(['ready', ready])
-        else:
-            raise CLIAbort('Aborting CCI order.')
+                t = KeyValueTable(['name', 'value'])
+                t.align['name'] = 'r'
+                t.align['value'] = 'l'
+                t.add_row(['id', result['id']])
+                t.add_row(['created', result['createDate']])
+                t.add_row(['guid', result['globalIdentifier']])
+                output.append(t)
+
+                if args.get('--wait'):
+                    ready = cci.wait_for_transaction(
+                        result['id'], int(args.get('--wait') or 1))
+                    t.add_row(['ready', ready])
+            else:
+                raise CLIAbort('Aborting CCI order.')
 
         return output
 
@@ -858,3 +859,59 @@ Options:
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         if not cci.edit(cci_id, **data):
             raise CLIAbort("Failed to update CCI")
+
+
+def parse_create_args(args):
+
+    data = {
+        "hourly": args['--hourly'],
+        "cpus": args['--cpu'],
+        "domain": args['--domain'],
+        "hostname": args['--hostname'],
+        "dedicated": args['--dedicated'],
+        "local_disk": True,
+        "private": args['--private']
+    }
+
+    try:
+        memory = int(args['--memory'])
+        if memory < 1024:
+            memory = memory * 1024
+    except ValueError:
+        unit = args['--memory'][-1]
+        memory = int(args['--memory'][0:-1])
+        if unit in ['G', 'g']:
+            memory = memory * 1024
+        if unit in ['T', 'r']:
+            memory = memory * 1024 * 1024
+
+    data["memory"] = memory
+
+    if args['--monthly']:
+        data['hourly'] = False
+
+    if args.get('--os'):
+        data['os_code'] = args['--os']
+
+    if args.get('--image'):
+        data['image_id'] = args['--image']
+
+    if args.get('--datacenter'):
+        data['datacenter'] = args['--datacenter']
+
+    if args.get('--network'):
+        data['nic_speed'] = args.get('--network')
+
+    if args.get('--userdata'):
+        data['userdata'] = args['--userdata']
+    elif args.get('--userfile'):
+        f = open(args['--userfile'], 'r')
+        try:
+            data['userdata'] = f.read()
+        finally:
+            f.close()
+
+    if args.get('--postinstall'):
+        data['post_uri'] = args.get('--postinstall')
+
+    return data

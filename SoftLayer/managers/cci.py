@@ -167,10 +167,12 @@ class CCIManager(IdentifierMixin, object):
                 'activeTransaction.id',
                 'blockDevices',
                 'blockDeviceTemplateGroup[id, name]',
+                'postInstallScriptUri',
                 'userData',
                 'operatingSystem.softwareLicense.'
                 'softwareDescription[manufacturer,name,version,referenceCode]',
                 'operatingSystem.passwords[username,password]',
+                'hourlyBillingFlag',
                 'billingItem.recurringFee',
                 'tagReferences[id,tag[name,id]]',
                 'networkVlans[id,vlanNumber,networkSpace]',

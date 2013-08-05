@@ -31,6 +31,8 @@ def format_output(data, fmt='table'):
     :param string fmt (optional): One of: table, raw, json, python
     """
     if isinstance(data, basestring):
+        if fmt == 'json':
+            return json.dumps(data)
         return data
 
     # responds to .prettytable()
@@ -189,15 +191,20 @@ def resolve_id(resolver, identifier, name='object'):
 
 
 def update_with_template_args(args):
+    """ Populates arguments with arguments from the template file, if provided.
+
+    :param dict args: command-line arguments
+    """
     if args.get('--template'):
-        if not os.path.exists(args['--template']):
+        template_path = args.pop('--template')
+        if not os.path.exists(template_path):
             raise ArgumentError(
                 'File does not exist [-t | --template] = %s'
-                % args['--template'])
+                % template_path)
 
         config = ConfigParser.ConfigParser()
         ini_str = '[settings]\n' + open(
-            os.path.expanduser(args.get('--template')), 'r').read()
+            os.path.expanduser(template_path), 'r').read()
         ini_fp = StringIO.StringIO(ini_str)
         config.readfp(ini_fp)
 
@@ -206,6 +213,26 @@ def update_with_template_args(args):
             option_key = '--%s' % key
             if args.get(option_key) in [None, False]:
                 args[option_key] = value
+
+
+def export_to_template(filename, args, exclude=None):
+    """ Exports given options to the given filename in INI format
+
+    :param filename: Filename to save options to
+    :param dict args: Arguments to export
+    :param list exclude (optional): Exclusion list for options that should not
+                                    be exported
+    """
+    exclude = exclude or []
+    exclude.append('--config')
+    exclude.append('--really')
+    exclude.append('--format')
+    exclude.append('--debug')
+
+    with open(filename, "w") as f:
+        for k, v in args.items():
+            if v and k.startswith('-') and k not in exclude:
+                f.write('%s=%s\n' % (k.lstrip('-'), v))
 
 
 def valid_response(prompt, *valid):
