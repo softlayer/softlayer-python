@@ -595,7 +595,8 @@ usage: sl hardware create --hostname=HOST --domain=DOMAIN --cpu=CPU
     --chassis=CHASSIS --memory=MEMORY --os=OS --disk=SIZE... [options]
 
 Order/create a dedicated server. See 'sl hardware list-chassis' and
-'sl hardware create-options' for valid options
+'sl hardware create-options' for valid options. --disk can be repeated to
+order multiple disks.
 
 Required:
   -H --hostname=HOST  Host portion of the FQDN. example: server
@@ -603,7 +604,7 @@ Required:
   --chassis=CHASSIS   The chassis to use for the new server
   -c --cpu=CPU        CPU model
   -o OS, --os=OS      OS install code.
-  -m --memory=MEMORY  Memory in mebibytes (n * 1024)
+  -m --memory=MEMORY  Memory in gigabytes
 
 
 Optional:
@@ -671,7 +672,7 @@ Optional:
         order['disk_controller'] = dc_price
 
         # Set the port speed
-        port_speed = args.get('--network') or 10
+        port_speed = args.get('--network') or '100'
 
         nic_price = cls._get_price_id_from_options(ds_options, 'nic',
                                                    port_speed)
