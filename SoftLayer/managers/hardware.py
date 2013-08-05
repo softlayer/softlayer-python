@@ -21,9 +21,16 @@ class HardwareManager(IdentifierMixin, object):
 
         """
         self.client = client
+        """ A valid `SoftLayer.API.Client` object that will be used for all
+        actions. """
         self.hardware = self.client['Hardware_Server']
+        """ Reference to the SoftLayer_Hardware_Server API object. """
         self.account = self.client['Account']
+        """ Reference to the SoftLayer_Account API object. """
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
+        """ A list of resolver functions. Used primarily by the CLI to provide
+        a variety of methods for uniquely identifying an object such as
+        hostname and IP address."""
 
     def cancel_hardware(self, id, reason='unneeded', comment=''):
         """ Cancels the specified dedicated server.
@@ -33,8 +40,6 @@ class HardwareManager(IdentifierMixin, object):
                               come from :func:`get_cancellation_reasons`.
         :param string comment: An optional comment to include with the
                                cancellation.
-
-        >>> cancel_hardware(123)
         """
 
         reasons = self.get_cancellation_reasons()
@@ -77,7 +82,7 @@ class HardwareManager(IdentifierMixin, object):
     def list_hardware(self, tags=None, cpus=None, memory=None, hostname=None,
                       domain=None, datacenter=None, nic_speed=None,
                       public_ip=None, private_ip=None, **kwargs):
-        """ List all hardware.
+        """ List all hardware (servers and bare metal computing instances).
 
         :param list tags: filter based on tags
         :param integer cpus: filter based on number of CPUS
@@ -89,6 +94,9 @@ class HardwareManager(IdentifierMixin, object):
         :param string public_ip: filter based on public ip address
         :param string private_ip: filter based on private ip address
         :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+        :returns: Returns an array of dictionaries representing the matching
+                  hardware. This list will contain both dedicated servers and
+                  bare metal computing instances
 
         """
         if 'mask' not in kwargs:
@@ -148,11 +156,17 @@ class HardwareManager(IdentifierMixin, object):
     def get_bare_metal_create_options(self):
         """ Retrieves the available options for creating a bare metal server.
 
-        The information for ordering bare metal instances comes from multiple
-        API calls. In order to make the process easier, this function will
-        make those calls and reformat the results into a dictionary that's
-        easier to manage. It's recommended that you cache these results with a
-        reasonable lifetime for performance reasons.
+        :returns: A dictionary of creation options. The categories to order are
+                  contained within the 'categories' key. See
+                  :func:`_parse_package_data` for detailed information.
+
+        .. note::
+
+           The information for ordering bare metal instances comes from
+           multiple API calls. In order to make the process easier, this
+           function will make those calls and reformat the results into a
+           dictionary that's easier to manage. It's recommended that you cache
+           these results with a reasonable lifetime for performance reasons.
         """
         hw_id = self._get_bare_metal_package_id()
 
@@ -165,10 +179,13 @@ class HardwareManager(IdentifierMixin, object):
         """ Retrieves a list of packages that are available for ordering
         dedicated servers.
 
-        Note - This currently returns a hard coded list until the API is
-        updated to allow filtering on packages to just those for ordering
-        servers.
+        :returns: A list of tuples of available dedicated server packages in
+                  the form (id, name, description)
         """
+
+        # Note - This currently returns a hard coded list until the API is
+        # updated to allow filtering on packages to just those for ordering
+        # servers.
         package_ids = [13, 15, 23, 25, 26, 27, 29, 32, 41, 42, 43, 44, 49, 51,
                        52, 53, 54, 55, 56, 57, 126, 140, 141, 142, 143, 144,
                        145, 146, 147, 148, 158]
@@ -190,11 +207,20 @@ class HardwareManager(IdentifierMixin, object):
         """ Retrieves the available options for creating a dedicated server in
         a specific chassis (based on package ID).
 
-        The information for ordering dedicated servers comes from multiple
-        API calls. In order to make the process easier, this function will
-        make those calls and reformat the results into a dictionary that's
-        easier to manage. It's recommended that you cache these results with a
-        reasonable lifetime for performance reasons.
+        :param int package_id: The package ID to retrieve the creation options
+                               for. This should come from
+                               :func:`get_available_dedicated_server_packages`.
+        :returns: A dictionary of creation options. The categories to order are
+                  contained within the 'categories' key. See
+                  :func:`_parse_package_data` for detailed information.
+
+        .. note::
+
+           The information for ordering dedicated servers comes from multiple
+           API calls. In order to make the process simpler, this function will
+           make those calls and reformat the results into a dictionary that's
+           easier to manage. It's recommended that you cache these results with
+           a reasonable lifetime for performance reasons.
         """
         return self._parse_package_data(package_id)
 
@@ -202,6 +228,8 @@ class HardwareManager(IdentifierMixin, object):
         """ Get details about a hardware device
 
         :param integer id: the hardware ID
+        :returns: A dictionary containing a large amount of information about
+                  the specified server.
 
         """
 
@@ -275,20 +303,84 @@ class HardwareManager(IdentifierMixin, object):
         return func(speed, id=id)
 
     def place_order(self, **kwargs):
-        """ Places an order for a piece of hardware. See _generate_create_dict
-        for a list of available options.
+        """ Places an order for a piece of hardware. See
+        :func:`_generate_create_dict` for a list of available options.
+
+        .. warning::
+           Due to how the ordering structure currently works, all ordering
+           takes place using price IDs rather than quantities. See the
+           following sample for an example of using HardwareManager functions
+           for ordering a basic server.
+
+        .. code-block:: python
+
+           # client is assumed to be an initialized SoftLayer.API.Client object
+           mgr = HardwareManager(client)
+
+           # Package ID 32 corresponds to the 'Quad Processor, Quad Core Intel'
+           # package. This information can be obtained from the
+           # :func:`get_available_dedicated_server_packages` function.
+           options = mgr.get_dedicated_server_create_options(32)
+
+           # Review the contents of options to find the information that
+           # applies to your order. For the sake of this example, we assume
+           # that your selections are a series of item IDs for each category
+           # organized into a key-value dictionary.
+
+           # This contains selections for all required categories
+           selections = {
+               'server': 542, # Quad Processor Quad Core Intel 7310 - 1.60GHz
+               'pri_ip_addresses': 15, # 1 IP Address
+               'notification': 51, # Email and Ticket
+               'ram': 280, # 16 GB FB-DIMM Registered 533/667
+               'bandwidth': 173, # 5000 GB Bandwidth
+               'lockbox': 45, # 1 GB Lockbox
+               'monitoring': 49, # Host Ping
+               'disk0': 14, # 500GB SATA II (for the first disk)
+               'response': 52, # Automated Notification
+               'port_speed': 187, # 100 Mbps Public & Private Networks
+               'power_supply': 469, # Redundant Power Supplies
+               'disk_controller': 487, # Non-RAID
+               'vulnerability_scanner': 307, # Nessus
+               'vpn_management': 309, # Unlimited SSL VPN Users
+               'remote_management': 504, # Reboot / KVM over IP
+               'os': 4166, # Ubuntu Linux 12.04 LTS Precise Pangolin (64 bit)
+           }
+
+           args = {
+               'location': 'FIRST_AVAILABLE', # Pick the first available DC
+               'disks': [],
+           }
+
+           for category, item_id in selections:
+               for item in options['categories'][category]['items']:
+                   if item['id'] == item_id:
+                       if 'disk' not in category and \
+                        'disk_controller' != category:
+                           args[category] = item['price_id']
+                       else:
+                           args['disks'].append(item['price_id'])
+
+           # You can call :func:`verify_order` here to test the order instead
+           # of actually placing it if you prefer.
+           result = mgr.place_order(**args)
+
         """
         create_options = self._generate_create_dict(**kwargs)
         return self.client['Product_Order'].placeOrder(create_options)
 
     def verify_order(self, **kwargs):
         """ Verifies an order for a piece of hardware without actually placing
-        it. See _generate_create_dict for a list of available options.
+        it. See :func:`_generate_create_dict` for a list of available options.
         """
         create_options = self._generate_create_dict(**kwargs)
         return self.client['Product_Order'].verifyOrder(create_options)
 
     def get_cancellation_reasons(self):
+        """
+        Returns a dictionary of valid cancellation reasons that can be used
+        when cancelling a dedicated server via :func:`cancel_hardware`.
+        """
         return {
             'unneeded': 'No longer needed',
             'closing': 'Business closing down',
@@ -308,7 +400,10 @@ class HardwareManager(IdentifierMixin, object):
             bare_metal=None, ram=None, package_id=None, disk_controller=None):
         """
         Translates a list of arguments into a dictionary necessary for creating
-        a server. NOTE - All items here must be price IDs, NOT quantities!
+        a server.
+
+        .. warning::
+           All items here must be price IDs, NOT quantities!
 
         :param string server: The identification string for the server to
                               order. This will either be the CPU/Memory
@@ -423,7 +518,49 @@ class HardwareManager(IdentifierMixin, object):
         if results:
             return [result['id'] for result in results]
 
-    def _parse_package_data(self, id):
+    def _parse_package_data(self, package_id):
+        """
+        Parses data from the specified package into a consistent dictionary.
+
+        The data returned by the API varies significantly from one package
+        to another, which means that consuming it can make your program more
+        complicated than desired. This function will make all necessary API
+        calls for the specified package ID and build the results into a
+        consistently formatted dictionary like so:
+
+        result = {
+            'locations': [{'delivery_information': <string>,
+                           'keyname': <string>,
+                           'long_name': <string>}],
+            'categories': {
+                'category_code': {
+                    'sort': <int>,
+                    'step': <int>,
+                    'is_required': <bool>,
+                    'name': <string>,
+                    'group': <string>,
+                    'items': [
+                        {
+                            'id': <int>,
+                            'description': <string>,
+                            'sort': <int>,
+                            'price_id': <int>,
+                            'recurring_fee': <float>,
+                            'setup_fee': <float>,
+                            'hourly_recurring_fee': <float>,
+                            'one_time_fee': <float>,
+                            'labor_fee': <float>,
+                            'capacity': <float>,
+                        }
+                    ]
+                }
+            }
+        }
+
+        Your code can rely upon each of those elements always being present.
+        Each list will contain at least one entry as well, though most will
+        contain more than one.
+        """
         package = self.client['Product_Package']
 
         results = {
@@ -433,7 +570,7 @@ class HardwareManager(IdentifierMixin, object):
 
         # First pull the list of available locations. We do it with the
         # getObject() call so that we get access to the delivery time info.
-        object_data = package.getRegions(id=id)
+        object_data = package.getRegions(id=package_id)
 
         for loc in object_data:
             details = loc['location']['locationPackageDetails'][0]
@@ -446,7 +583,7 @@ class HardwareManager(IdentifierMixin, object):
 
         mask = 'mask[itemCategory[group]]'
 
-        for config in package.getConfiguration(id=id, mask=mask):
+        for config in package.getConfiguration(id=package_id, mask=mask):
             code = config['itemCategory']['categoryCode']
             group = NestedDict(config['itemCategory']) or {}
             category = {
@@ -461,7 +598,7 @@ class HardwareManager(IdentifierMixin, object):
             results['categories'][code] = category
 
         # Now pull in the available package item
-        for item in package.getItems(id=id, mask='mask[itemCategory]'):
+        for item in package.getItems(id=package_id, mask='mask[itemCategory]'):
             category_code = item['itemCategory']['categoryCode']
 
             if category_code not in results['categories']:
@@ -481,8 +618,8 @@ class HardwareManager(IdentifierMixin, object):
         return results
 
     def edit(self, id, userdata=None, hostname=None, domain=None, notes=None):
-        """ Edit hostname, domain name, notes, and/or the
-            user data of the hardware
+        """ Edit hostname, domain name, notes, and/or the user data of the
+        hardware
 
         Parameters set to None will be ignored and not attempted to be updated.
 
@@ -515,6 +652,21 @@ class HardwareManager(IdentifierMixin, object):
 
 
 def get_default_value(package_options, category):
+    """ Returns the default price ID for the specified category.
+
+    This determination is made by parsing the items in the package_options
+    argument and finding the first item that has zero specified for every fee
+    field.
+
+    .. note::
+       If the category has multiple items with no fee, this will return the
+       first it finds and then short circuit. This may not match the default
+       value presented on the SoftLayer ordering portal. Additionally, this
+       method will return None if there are no free items in the category.
+
+    :returns: Returns the price ID of the first free item it finds or None
+              if there are no free items.
+    """
     if category not in package_options['categories']:
         return
 
