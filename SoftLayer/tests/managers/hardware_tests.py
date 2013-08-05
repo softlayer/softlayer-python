@@ -104,40 +104,8 @@ class HardwareTests(unittest.TestCase):
     def test_get_bare_metal_create_options(self):
         package_id = 50
 
-        self.client['Product_Package'].getAllObjects.return_value = [
-            {'name': 'Bare Metal Instance', 'id': package_id}]
+        self._setup_package_mocks(package_id)
 
-        self.client['Product_Package'].getRegions.return_value = [{
-            'location': {
-                'locationPackageDetails': [{
-                    'deliveryTimeInformation': 'Typically 2-4 hours',
-                }],
-            },
-            'keyname': 'RANDOM_LOCATION',
-            'description': 'Random unit testing location',
-        }]
-
-        self.client['Product_Package'].getConfiguration.return_value = [{
-            'itemCategory': {
-                'categoryCode': 'random',
-                'name': 'Random Category',
-            },
-            'sort': 0,
-            'orderStepId': 1,
-            'isRequired': 0,
-        }]
-
-        prices = [{'sort': 0, 'id': 999}]
-        self.client['Product_Package'].getItems.return_value = [{
-            'itemCategory': {
-                'categoryCode': 'random2',
-                'name': 'Another Category',
-            },
-            'id': 1000,
-            'description': 'Astronaut Sloths',
-            'prices': prices,
-            'capacity': 0,
-        }]
         self.hardware.get_bare_metal_create_options()
 
         f1 = self.client['Product_Package'].getRegions
@@ -147,63 +115,16 @@ class HardwareTests(unittest.TestCase):
         f2.assert_called_once_with(id=package_id,
                                    mask='mask[itemCategory[group]]')
 
-        f3 = self.client['Product_Package'].getItems
-        f3.assert_called_once_with(id=package_id,
-                                   mask='mask[itemCategory]')
+        f3 = self.client['Product_Package'].getCategories
+        f3.assert_called_once_with(id=package_id)
 
     def test_generate_create_dict_with_all_bare_metal_options(self):
         package_id = 50
 
-        prices = [{
-            'id': 888,
-            'price_id': 1888,
-            'sort': 0,
-            'setupFee': 0,
-            'recurringFee': 0,
-            'hourlyRecurringFee': 0,
-            'oneTimeFee': 0,
-            'laborFee': 0,
-        }]
-
-        self.client['Product_Package'].getAllObjects.return_value = [
-            {'name': 'Bare Metal Instance', 'id': package_id}]
-
-        self.client['Product_Package'].getRegions.return_value = [{
-            'location': {
-                'locationPackageDetails': [{
-                    'deliveryTimeInformation': 'Typically 2-4 hours',
-                }],
-            },
-            'keyname': 'RANDOM_LOCATION',
-            'description': 'Random unit testing location',
-        }]
-
-        self.client['Product_Package'].getConfiguration.return_value = [{
-            'itemCategory': {
-                'categoryCode': 'random',
-                'name': 'Random Category',
-            },
-            'sort': 0,
-            'orderStepId': 1,
-            'isRequired': 1,
-            'prices': prices,
-        }]
-
-        self.client['Product_Package'].getItems.return_value = [{
-            'itemCategory': {
-                'categoryCode': 'random',
-                'name': 'Random Category',
-            },
-            'id': 1000,
-            'description': 'Astronaut Sloths',
-            'prices': prices,
-            'capacity': 0,
-            'isRequired': 1,
-        }]
+        self._setup_package_mocks(package_id)
 
         args = {
             'server': 100,
-            'hourly': False,
             'hostname': 'unicorn',
             'domain': 'giggles.woo',
             'disks': [500],
@@ -228,7 +149,6 @@ class HardwareTests(unittest.TestCase):
                 {'id': args['disks'][0]},
                 {'id': args['os']},
                 {'id': args['port_speed']},
-                {'id': prices[0]['id']},
             ],
         }
 
@@ -361,37 +281,8 @@ class HardwareTests(unittest.TestCase):
     def test_get_dedicated_server_options(self):
         package_id = 13
 
-        self.client['Product_Package'].getRegions.return_value = [{
-            'location': {
-                'locationPackageDetails': [{
-                    'deliveryTimeInformation': 'Typically 2-4 hours',
-                }],
-            },
-            'keyname': 'RANDOM_LOCATION',
-            'description': 'Random unit testing location',
-        }]
+        self._setup_package_mocks(package_id)
 
-        self.client['Product_Package'].getConfiguration.return_value = [{
-            'itemCategory': {
-                'categoryCode': 'random',
-                'name': 'Random Category',
-            },
-            'sort': 0,
-            'orderStepId': 1,
-            'isRequired': 0,
-        }]
-
-        prices = [{'sort': 0, 'id': 999}]
-        self.client['Product_Package'].getItems.return_value = [{
-            'itemCategory': {
-                'categoryCode': 'random2',
-                'name': 'Another Category',
-            },
-            'id': 1000,
-            'description': 'Astronaut Sloths',
-            'prices': prices,
-            'capacity': 0,
-        }]
         self.hardware.get_dedicated_server_create_options(package_id)
 
         f1 = self.client['Product_Package'].getRegions
@@ -401,9 +292,8 @@ class HardwareTests(unittest.TestCase):
         f2.assert_called_once_with(id=package_id,
                                    mask='mask[itemCategory[group]]')
 
-        f3 = self.client['Product_Package'].getItems
-        f3.assert_called_once_with(id=package_id,
-                                   mask='mask[itemCategory]')
+        f3 = self.client['Product_Package'].getCategories
+        f3.assert_called_once_with(id=package_id)
 
     def test_get_default_value_returns_none_for_unknown_category(self):
         package_options = {'categories': ['Cat1', 'Cat2']}
@@ -425,3 +315,56 @@ class HardwareTests(unittest.TestCase):
                            }}}
 
         self.assertEqual(price_id, get_default_value(package_options, 'Cat1'))
+
+    def _setup_package_mocks(self, package_id):
+        self.client['Product_Package'].getAllObjects.return_value = [
+            {'name': 'Bare Metal Instance', 'id': package_id}]
+
+        self.client['Product_Package'].getRegions.return_value = [{
+            'location': {
+                'locationPackageDetails': [{
+                    'deliveryTimeInformation': 'Typically 2-4 hours',
+                }],
+            },
+            'keyname': 'RANDOM_LOCATION',
+            'description': 'Random unit testing location',
+        }]
+
+        self.client['Product_Package'].getConfiguration.return_value = [{
+            'itemCategory': {
+                'categoryCode': 'random',
+                'name': 'Random Category',
+            },
+            'sort': 0,
+            'orderStepId': 1,
+            'isRequired': 0,
+        }]
+
+        prices = [{
+            'itemId': 888,
+            'id': 1888,
+            'sort': 0,
+            'setupFee': 0,
+            'recurringFee': 0,
+            'hourlyRecurringFee': 0,
+            'oneTimeFee': 0,
+            'laborFee': 0,
+            'item': {
+                'id': 888,
+                'description': 'Some item',
+                'capacity': 0,
+            }
+        }]
+
+        self.client['Product_Package'].getCategories.return_value = [{
+            'categoryCode': 'random',
+            'name': 'Random Category',
+            'id': 1000,
+            'groups': [{
+                'sort': 0,
+                'prices': prices,
+                'itemCategoryId': 1000,
+                'packageId': package_id,
+            }],
+        }]
+        

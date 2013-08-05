@@ -343,6 +343,11 @@ class HardwareManager(IdentifierMixin, object):
                 'bareMetalInstanceFlag': bare_metal,
                 'hostname': hostname,
                 'domain': domain,
+                # TODO - It would be nice if we could get this working too.
+                # VLAN number doesn't appear to work.
+                #'networkVlans': [
+                #    {'vlanNumber': 1836}, {'vlanNumber': 1126}
+                #],
             }],
             'location': location,
             'prices': [
@@ -380,6 +385,12 @@ class HardwareManager(IdentifierMixin, object):
         required_fields = []
         for category, data in p_options['categories'].iteritems():
             if data.get('is_required') and category not in arguments:
+                if 'disk' in category:
+                    # This block makes sure that we can default unspecified
+                    # disks if the user hasn't specified enough.
+                    disk_count = int(category.replace('disk', ''))
+                    if len(disks) >= disk_count + 1:
+                        continue
                 required_fields.append(category)
 
         for category in required_fields:
@@ -421,7 +432,7 @@ class HardwareManager(IdentifierMixin, object):
         if results:
             return [result['id'] for result in results]
 
-    def _parse_package_data(self, id):
+    def _parse_package_data(self, package_id):
         package = self.client['Product_Package']
 
         results = {
@@ -431,7 +442,7 @@ class HardwareManager(IdentifierMixin, object):
 
         # First pull the list of available locations. We do it with the
         # getObject() call so that we get access to the delivery time info.
-        object_data = package.getRegions(id=id)
+        object_data = package.getRegions(id=package_id)
 
         for loc in object_data:
             details = loc['location']['locationPackageDetails'][0]
@@ -444,7 +455,7 @@ class HardwareManager(IdentifierMixin, object):
 
         mask = 'mask[itemCategory[group]]'
 
-        for config in package.getConfiguration(id=id, mask=mask):
+        for config in package.getConfiguration(id=package_id, mask=mask):
             code = config['itemCategory']['categoryCode']
             group = NestedDict(config['itemCategory']) or {}
             category = {
@@ -459,22 +470,27 @@ class HardwareManager(IdentifierMixin, object):
             results['categories'][code] = category
 
         # Now pull in the available package item
-        for item in package.getItems(id=id, mask='mask[itemCategory]'):
-            category_code = item['itemCategory']['categoryCode']
+        for category in package.getCategories(id=package_id):
+            code = category['categoryCode']
+            items = []
 
-            if category_code not in results['categories']:
-                results['categories'][category_code] = {'name': category_code,
-                                                        'items': []}
-            results['categories'][category_code]['items'].append({
-                'id': item['id'],
-                'description': item['description'],
-                'prices': item['prices'],
-                'sort': item['prices'][0]['sort'],
-                'price_id': item['prices'][0]['id'],
-                'recurring_fee': float(item['prices'][0].get('recurringFee',
-                                                             0)),
-                'capacity': float(item.get('capacity', 0)),
-            })
+            for group in category['groups']:
+                for price in group['prices']:
+                    items.append({
+                        'id': price['itemId'],
+                        'description': price['item']['description'],
+                        'sort': price['sort'],
+                        'price_id': price['id'],
+                        'recurring_fee': price.get('recurringFee', 0),
+                        'setup_fee': price.get('setupFee', 0),
+                        'hourly_recurring_fee': price.get('hourlyRecurringFee',
+                                                          0),
+                        'one_time_fee': price.get('oneTimeFee', 0),
+                        'labor_fee': price.get('laborFee', 0),
+                        'capacity': float(price['item'].get('capacity', 0)),
+                    })
+
+            results['categories'][code]['items'] = items
 
         return results
 
@@ -518,10 +534,10 @@ def get_default_value(package_options, category):
 
     for item in package_options['categories'][category]['items']:
         if not any([
-            float(item['prices'][0].get('setupFee', 0)),
-            float(item['prices'][0].get('recurringFee', 0)),
-            float(item['prices'][0].get('hourlyRecurringFee', 0)),
-            float(item['prices'][0].get('oneTimeFee', 0)),
-            float(item['prices'][0].get('laborFee', 0)),
+            float(item.get('setupFee', 0)),
+            float(item.get('recurringFee', 0)),
+            float(item.get('hourlyRecurringFee', 0)),
+            float(item.get('oneTimeFee', 0)),
+            float(item.get('laborFee', 0)),
         ]):
             return item['price_id']

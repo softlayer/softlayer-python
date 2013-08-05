@@ -444,11 +444,11 @@ Optional:
 
         for item in bmi_options['categories'][option]['items']:
             if not any([
-                    float(item['prices'][0].get('setupFee', 0)),
-                    float(item['prices'][0].get('recurringFee', 0)),
-                    float(item['prices'][0].get('hourlyRecurringFee', 0)),
-                    float(item['prices'][0].get('oneTimeFee', 0)),
-                    float(item['prices'][0].get('laborFee', 0)),
+                    float(item.get('setupFee', 0)),
+                    float(item.get('recurringFee', 0)),
+                    float(item.get('hourlyRecurringFee', 0)),
+                    float(item.get('oneTimeFee', 0)),
+                    float(item.get('laborFee', 0)),
             ]):
                 return item['price_id']
 
