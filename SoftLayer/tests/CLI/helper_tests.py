@@ -311,7 +311,8 @@ class TestTemplateArgs(unittest.TestCase):
             'key': 'value',
             '--cpu': None,
             '--memory': '32',
-            '--template': path
+            '--template': path,
+            '--hourly': False,
         }
         cli.helpers.update_with_template_args(args)
         self.assertEqual(args, {

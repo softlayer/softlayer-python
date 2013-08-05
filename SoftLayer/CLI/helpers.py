@@ -201,6 +201,7 @@ def update_with_template_args(args):
         ini_fp = StringIO.StringIO(ini_str)
         config.readfp(ini_fp)
 
+        # Merge template options with the options passed in
         for key, value in config.items('settings'):
             option_key = '--%s' % key
             if args.get(option_key) in [None, False]:
