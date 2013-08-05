@@ -49,9 +49,24 @@ Below is an example of creating a client instance with more options. This will c
             verbose=True,
         )
 
+Managers
+--------
+::
+For day to day operation, most users will find the managers to be the most convenient means for interacting with the API. Managers mask out a lot of the complexities of using the API into classes that provide a simpler interface to various services. These are higher-level interfaces to the SoftLayer API.
+
+
+	>>> from SoftLayer import CCIManager, Client
+	>>> client = Client(...)
+	>>> cci = CCIManager(client)
+	>>> cci.list_instances()
+	[...]
+
+If you need more power or functionality than the managers provide, you can make direct API calls as well.
+
+
 Making API Calls
 ----------------
-The SoftLayer API client for python leverages SoftLayer's XML-RPC API. It supports authentication, object masks, object filters, limits, offsets, and retrieving objects by id. The following section assumes you have a initialized client named 'client'.
+For full control over your account and services, you can directly call the SoftLayer API. The SoftLayer API client for python leverages SoftLayer's XML-RPC API. It supports authentication, object masks, object filters, limits, offsets, and retrieving objects by id. The following section assumes you have a initialized client named 'client'.
 
 The best way to test our setup is to call the `getObject <http://sldn.softlayer.com/reference/services/SoftLayer_Account/getObject>`_ method on the `SoftLayer_Account <http://sldn.softlayer.com/reference/services/SoftLayer_Account>`_ service.
 ::
@@ -134,18 +149,6 @@ API Reference
    :members:
    :undoc-members:
 
-
-Managers
---------
-::
-
-	>>> from SoftLayer import CCIManager, Client
-	>>> client = Client(...)
-	>>> cci = CCIManager(client)
-	>>> cci.list_instances()
-	[...]
-
-Managers mask out a lot of the complexities of using the API into classes that provide a simpler interface to various services. These are higher-level interfaces to the SoftLayer API.
 
 .. toctree::
    :maxdepth: 2
