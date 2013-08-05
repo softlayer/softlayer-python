@@ -291,8 +291,8 @@ class HardwareManager(IdentifierMixin, object):
 
         :param int id: The ID of the server
         :param bool public: Flag to indicate which interface to change.
-                           True (default) means the public interface.
-                           False indicates the private interface.
+                            True (default) means the public interface.
+                            False indicates the private interface.
         :param int speed: The port speed to set.
         """
         if public:
@@ -312,7 +312,7 @@ class HardwareManager(IdentifierMixin, object):
            following sample for an example of using HardwareManager functions
            for ordering a basic server.
 
-        .. code-block:: python
+        ::
 
            # client is assumed to be an initialized SoftLayer.API.Client object
            mgr = HardwareManager(client)
@@ -405,10 +405,10 @@ class HardwareManager(IdentifierMixin, object):
         .. warning::
            All items here must be price IDs, NOT quantities!
 
-        :param string server: The identification string for the server to
-                              order. This will either be the CPU/Memory
-                              combination ID for bare metal instances or the
-                              CPU model for dedicated servers.
+        :param int server: The identification string for the server to
+                           order. This will either be the CPU/Memory
+                           combination ID for bare metal instances or the
+                           CPU model for dedicated servers.
         :param string hostname: The hostname to use for the new server.
         :param string domain: The domain to use for the new server.
         :param bool hourly: Flag to indicate if this server should be billed
