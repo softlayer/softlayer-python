@@ -166,7 +166,7 @@ class CCIManager(IdentifierMixin, object):
                 'datacenter',
                 'activeTransaction.id',
                 'blockDevices',
-                'blockDeviceTemplateGroup[id, name]',
+                'blockDeviceTemplateGroup[id, name, globalIdentifier]',
                 'postInstallScriptUri',
                 'userData',
                 'operatingSystem.softwareLicense.'
