@@ -13,26 +13,25 @@ from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
 
 
 class DNSManager(IdentifierMixin, object):
-    """ Manage DNS zones. """
+    """ DNSManager initialization.
+
+    :param SoftLayer.API.Client client: the client instance
+
+    """
 
     def __init__(self, client):
-        """ DNSManager initialization.
-
-        :param SoftLayer.API.Client client: the client instance
-
-        """
+        #: A valid `SoftLayer.API.Client` object that will be used for all
+        #: actions.
         self.client = client
-        """ A valid `SoftLayer.API.Client` object that will be used for all
-        actions. """
+        #: Reference to the SoftLayer_Dns_Domain API object.
         self.service = self.client['Dns_Domain']
-        """ Reference to the SoftLayer_Dns_Domain API object. """
+        #: Reference to the SoftLayer.Dns_Domain_ResourceRecord
+        #: API object.
         self.record = self.client['Dns_Domain_ResourceRecord']
-        """ Reference to the SoftLayer.Dns_Domain_ResourceRecord
-        API object. """
+        #: A list of resolver functions. Used primarily by the CLI to provide
+        #: a variety of methods for uniquely identifying an object such as zone
+        #: name.
         self.resolvers = [self._get_zone_id_from_name]
-        """ A list of resolver functions. Used primarily by the CLI to provide
-        a variety of methods for uniquely identifying an object such as zone
-        name """
 
     def _get_zone_id_from_name(self, name):
             results = self.client['Account'].getDomains(

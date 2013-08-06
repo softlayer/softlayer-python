@@ -9,19 +9,18 @@
 
 
 class SSLManager(object):
-    """ Manages SSL certificates. """
+    """
+    Manages SSL certificates.
+
+    :param SoftLayer.API.Client client: an API client instance
+    """
 
     def __init__(self, client):
-        """ SSLManager initialization.
-
-        :param SoftLayer.API.Client client: an API client instance
-
-        """
+        #: A valid `SoftLayer.API.Client` object that will be used for all
+        #: actions.
         self.client = client
-        """ A valid `SoftLayer.API.Client` object that will be used for all
-        actions. """
+        #: Reference to the SoftLayer_Security_Certificate API object.
         self.ssl = self.client['Security_Certificate']
-        """ Reference to the SoftLayer_Security_Certificate API object. """
 
     def list_certs(self, method='all'):
         """ List all certificates.

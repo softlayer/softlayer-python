@@ -24,15 +24,15 @@ def has_firewall(vlan):
 
 
 class FirewallManager(object):
+    """ Manages firewalls.
+
+    :param SoftLayer.API.Client client: the API client instance
+
+    """
     def __init__(self, client):
-        """ Manages firewalls.
-
-        :param SoftLayer.API.Client client: the API client instance
-
-        """
+        #: A valid `SoftLayer.API.Client` object that will be used for all
+        #: actions.
         self.client = client
-        """ A valid `SoftLayer.API.Client` object that will be used for all
-        actions. """
 
     def get_firewalls(self):
         """ Returns a list of all firewalls on the account.

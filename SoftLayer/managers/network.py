@@ -13,13 +13,13 @@ from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
 class NetworkManager(IdentifierMixin, object):
     """ Manage Networks """
     def __init__(self, client):
+        #: A valid `SoftLayer.API.Client` object that will be used for all
+        #: actions.
         self.client = client
-        """ A valid `SoftLayer.API.Client` object that will be used for all
-        actions. """
+        #: Reference to the SoftLayer_Account API object.
         self.account = client['Account']
-        """ Reference to the SoftLayer_Account API object. """
+        #: Reference to the SoftLayer_Network_Vlan object.
         self.vlan = client['Network_Vlan']
-        """ Reference to the SoftLayer_Network_Vlan object. """
 
     def get_vlan(self, id):
         """ Returns information about a single VLAN.

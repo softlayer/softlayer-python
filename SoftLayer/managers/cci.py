@@ -16,17 +16,17 @@ from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
 class CCIManager(IdentifierMixin, object):
     """ Manage CCIs """
     def __init__(self, client):
+        #: A valid `SoftLayer.API.Client` object that will be used for all
+        #: actions.
         self.client = client
-        """ A valid `SoftLayer.API.Client` object that will be used for all
-        actions. """
+        #: Reference to the SoftLayer_Account API object.
         self.account = client['Account']
-        """ Reference to the SoftLayer_Account API object. """
+        #: Reference to the SoftLayer_Virtual_Guest API object.
         self.guest = client['Virtual_Guest']
-        """ Reference to the SoftLayer_Virtual_Guest API object. """
+        #: A list of resolver functions. Used primarily by the CLI to provide
+        #: a variety of methods for uniquely identifying an object such as
+        #: hostname and IP address.
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
-        """ A list of resolver functions. Used primarily by the CLI to provide
-        a variety of methods for uniquely identifying an object such as
-        hostname and IP address."""
 
     def list_instances(self, hourly=True, monthly=True, tags=None, cpus=None,
                        memory=None, hostname=None, domain=None,

@@ -12,25 +12,24 @@ from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
 
 
 class HardwareManager(IdentifierMixin, object):
-    """ Manages hardware devices. """
+    """
+    Manages hardware devices.
+
+    :param SoftLayer.API.Client client: an API client instance
+    """
 
     def __init__(self, client):
-        """ HardwareManager initialization.
-
-        :param SoftLayer.API.Client client: an API client instance
-
-        """
+        #: A valid `SoftLayer.API.Client` object that will be used for all
+        #: actions.
         self.client = client
-        """ A valid `SoftLayer.API.Client` object that will be used for all
-        actions. """
+        #: Reference to the SoftLayer_Hardware_Server API object.
         self.hardware = self.client['Hardware_Server']
-        """ Reference to the SoftLayer_Hardware_Server API object. """
+        #: Reference to the SoftLayer_Account API object.
         self.account = self.client['Account']
-        """ Reference to the SoftLayer_Account API object. """
+        #: A list of resolver functions. Used primarily by the CLI to provide
+        #: a variety of methods for uniquely identifying an object such as
+        #: hostname and IP address.
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
-        """ A list of resolver functions. Used primarily by the CLI to provide
-        a variety of methods for uniquely identifying an object such as
-        hostname and IP address."""
 
     def cancel_hardware(self, id, reason='unneeded', comment=''):
         """ Cancels the specified dedicated server.
