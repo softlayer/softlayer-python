@@ -5,7 +5,10 @@ Perform various network operations
 
 The available commands are:
   summary         Provide a summary view of the network
-  vlan            Manage VLAN options
+  subnet-detail   Display detailed information about a subnet
+  subnet-list     Show a list of all subnets on the network
+  vlan-detail     Display detailed information about a VLAN
+  vlan-list       Show a list of all VLANs on the network
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: BSD, see LICENSE for more details.
@@ -53,6 +56,117 @@ Options:
                 dc['networkingCount'],
                 dc['hardwareCount'],
                 dc['virtualGuestCount'],
+            ])
+
+        return t
+
+
+class SubnetDetail(CLIRunnable):
+    """
+usage: sl network subnet-detail <identifier> [options]
+
+Get detailed information about objects assigned to a particular subnet
+
+Filters:
+  --no-cci         Hide CCI listing
+  --no-hardware    Hide hardware listing
+"""
+    action = 'subnet-detail'
+
+    @staticmethod
+    def execute(client, args):
+        mgr = NetworkManager(client)
+
+        subnet = mgr.get_subnet(args.get('<identifier>'))
+
+        t = Table(['Name', 'Value'])
+        t.align['Name'] = 'r'
+        t.align['Value'] = 'l'
+
+        t.add_row(['id', subnet['id']])
+        t.add_row(['identifier', subnet['networkIdentifier']])
+        t.add_row(['subnet type', subnet['subnetType']])
+        t.add_row(['gateway', subnet['gateway']])
+        t.add_row(['broadcast', subnet['broadcastAddress']])
+        t.add_row(['datacenter', subnet['datacenter']['name']])
+        t.add_row(['usable ips', subnet['usableIpAddressCount']])
+
+        if not args.get('--no-cci'):
+            if subnet['virtualGuests']:
+                cci_table = Table(['Hostname', 'Domain', 'IP'])
+                cci_table.align['Hostname'] = 'r'
+                cci_table.align['IP'] = 'l'
+                for cci in subnet['virtualGuests']:
+                    cci_table.add_row([cci['hostname'],
+                                       cci['domain'],
+                                       cci['primaryIpAddress']])
+                t.add_row(['ccis', cci_table])
+            else:
+                t.add_row(['cci', 'none'])
+
+        if not args.get('--no-hardware'):
+            if subnet['hardware']:
+                hw_table = Table(['Hostname', 'Domain', 'IP'])
+                hw_table.align['Hostname'] = 'r'
+                hw_table.align['IP'] = 'l'
+                for hw in subnet['hardware']:
+                    hw_table.add_row([hw['hostname'],
+                                      hw['domain'],
+                                      hw['primaryIpAddress']])
+                t.add_row(['hardware', hw_table])
+            else:
+                t.add_row(['hardware', 'none'])
+
+        return t
+
+
+class SubnetList(CLIRunnable):
+    """
+usage: sl network subnet-list [options]
+
+Displays a list of subnets
+
+Options:
+  --sortby=ARG  Column to sort by. options: id, number, datacenter, IPs,
+    hardware, ccis, networking
+
+Filters:
+  -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
+  --v4                     Display only IPV4 subnets
+  --v6                     Display only IPV6 subnets
+"""
+    action = 'subnet-list'
+
+    @staticmethod
+    def execute(client, args):
+        mgr = NetworkManager(client)
+
+        t = Table([
+            'id', 'identifier', 'datacenter', 'vlan id', 'IPs', 'hardware',
+            'ccis',
+        ])
+        t.sortby = args.get('--sortby') or 'id'
+
+        version = 0
+        if args.get('--v4'):
+            version = 4
+        elif args.get('--v6'):
+            version = 6
+
+        subnets = mgr.list_subnets(
+            datacenter=args.get('--datacenter'),
+            version=version,
+        )
+
+        for subnet in subnets:
+            t.add_row([
+                subnet['id'],
+                subnet['networkIdentifier'],
+                subnet['datacenter']['name'],
+                subnet['networkVlanId'],
+                subnet['ipAddressCount'],
+                len(subnet['hardware']),
+                len(subnet['virtualGuests']),
             ])
 
         return t
