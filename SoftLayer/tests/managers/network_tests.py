@@ -16,6 +16,14 @@ class NetworkTests(unittest.TestCase):
         self.client = MagicMock()
         self.network = NetworkManager(self.client)
 
+    def test_ip_lookup(self):
+        ip = '10.0.1.37'
+        mcall = call(ip, mask=ANY)
+        service = self.client['Network_Subnet_IpAddress']
+
+        self.network.ip_lookup(ip)
+        service.getByIpAddress.assert_has_calls(mcall)
+
     def test_get_subnet(self):
         id = 9876
         mcall = call(id=id, mask=ANY)

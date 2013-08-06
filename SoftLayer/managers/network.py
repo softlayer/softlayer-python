@@ -24,6 +24,21 @@ class NetworkManager(IdentifierMixin, object):
         self.subnet = client['Network_Subnet']
         self.subnet_resolvers = [self._get_subnet_by_identifier]
 
+    def ip_lookup(self, ip):
+        """ Looks up an IP address and returns network information about it.
+
+        :param string ip: An IP address. Can be IPv4 or IPv6
+        :returns: A dictionary of information about the IP
+
+        """
+        mask = [
+            'hardware',
+            'virtualGuest'
+        ]
+        mask = 'mask[%s]' % ','.join(mask)
+        obj = self.client['Network_Subnet_IpAddress']
+        return obj.getByIpAddress(ip, mask=mask)
+
     def get_vlan(self, id):
         """ Returns information about a single VLAN.
 

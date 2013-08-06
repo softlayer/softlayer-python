@@ -4,6 +4,7 @@ usage: sl network [<command>] [<args>...] [options]
 Perform various network operations
 
 The available commands are:
+  ip-lookup       Find information about a specific IP
   summary         Provide a summary view of the network
   subnet-detail   Display detailed information about a subnet
   subnet-list     Show a list of all subnets on the network
@@ -13,15 +14,63 @@ The available commands are:
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: BSD, see LICENSE for more details.
 
-from os import linesep
-import os.path
-
 from SoftLayer import NetworkManager
-from SoftLayer.CLI import (
-    CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
-    FormattedItem)
-from SoftLayer.CLI.helpers import (
-    CLIAbort, ArgumentError, SequentialOutput, NestedDict, blank, resolve_id)
+from SoftLayer.CLI import (CLIRunnable, Table, KeyValueTable)
+
+
+class NetworkFindIp(CLIRunnable):
+    """
+usage: sl network ip-lookup <ip>
+
+Finds an IP address on the network and displays its subnet and VLAN
+information.
+
+"""
+    action = 'ip-lookup'
+
+    @staticmethod
+    def execute(client, args):
+        mgr = NetworkManager(client)
+
+        ip = mgr.ip_lookup(args['<ip>'])
+
+        if not ip:
+            return 'Not found'
+
+        t = KeyValueTable(['Name', 'Value'])
+        t.align['Name'] = 'r'
+        t.align['Value'] = 'l'
+
+        t.add_row(['id', ip['id']])
+        t.add_row(['ip', ip['ipAddress']])
+
+        subnet_table = KeyValueTable(['Name', 'Value'])
+        subnet_table.align['Name'] = 'r'
+        subnet_table.align['Value'] = 'l'
+        subnet_table.add_row(['id', ip['subnet']['id']])
+        subnet_table.add_row(['identifier', ip['subnet']['networkIdentifier']])
+        subnet_table.add_row(['netmask', ip['subnet']['netmask']])
+        if ip['subnet'].get('gateway'):
+            subnet_table.add_row(['gateway', ip['subnet']['gateway']])
+        subnet_table.add_row(['type', ip['subnet']['subnetType']])
+
+        t.add_row(['subnet', subnet_table])
+
+        if ip.get('virtualGuest') or ip.get('hardware'):
+            device_table = KeyValueTable(['Name', 'Value'])
+            device_table.align['Name'] = 'r'
+            device_table.align['Value'] = 'l'
+            if ip.get('virtualGuest'):
+                device = ip['virtualGuest']
+                device_type = 'cci'
+            else:
+                device = ip['hardware']
+                device_type = 'server'
+            device_table.add_row(['id', device['id']])
+            device_table.add_row(['name', device['fullyQualifiedDomainName']])
+            device_table.add_row(['type', device_type])
+            t.add_row(['device', device_table])
+        return t
 
 
 class NetworkSummary(CLIRunnable):
@@ -79,7 +128,7 @@ Filters:
 
         subnet = mgr.get_subnet(args.get('<identifier>'))
 
-        t = Table(['Name', 'Value'])
+        t = KeyValueTable(['Name', 'Value'])
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
 
@@ -190,7 +239,7 @@ Filters:
 
         vlan = mgr.get_vlan(args.get('<identifier>'))
 
-        t = Table(['Name', 'Value'])
+        t = KeyValueTable(['Name', 'Value'])
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
 
@@ -203,7 +252,7 @@ Filters:
         t.add_row(['firewall', 'Yes' if vlan['firewallInterfaces'] else 'No'])
         subnets = []
         for subnet in vlan['subnets']:
-            subnet_table = Table(['Name', 'Value'])
+            subnet_table = KeyValueTable(['Name', 'Value'])
             subnet_table.align['Name'] = 'r'
             subnet_table.align['Value'] = 'l'
             subnet_table.add_row(['id', subnet['id']])
@@ -219,7 +268,7 @@ Filters:
 
         if not args.get('--no-cci'):
             if vlan['virtualGuests']:
-                cci_table = Table(['Hostname', 'Domain', 'IP'])
+                cci_table = KeyValueTable(['Hostname', 'Domain', 'IP'])
                 cci_table.align['Hostname'] = 'r'
                 cci_table.align['IP'] = 'l'
                 for cci in vlan['virtualGuests']:
