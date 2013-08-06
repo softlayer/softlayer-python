@@ -377,13 +377,12 @@ Optional:
     def execute(cls, client, args):
         update_with_template_args(args)
         cci = CCIManager(client)
-        update_with_like_args(cci, args)
+        cls._update_with_like_args(cci, args)
         cls._validate_args(args)
 
         # Do not create CCI with --test or --export
         do_create = not (args['--export'] or args['--test'])
 
-<<<<<<< HEAD
         # Get the SSH key
         if args.get('--key'):
             key_id = resolve_id(SshKeyManager(client).resolve_ids,
@@ -393,9 +392,7 @@ Optional:
         t = Table(['Item', 'cost'])
         t.align['Item'] = 'r'
         t.align['cost'] = 'r'
-=======
-        data = parse_create_args(args)
->>>>>>> Adds --like and --export to CCI creation
+        data = cls._parse_create_args(args)
 
         output = []
         if args.get('--test'):
@@ -496,6 +493,114 @@ Optional:
                 raise ArgumentError(
                     'File does not exist [-u | --userfile] = %s'
                     % args['--userfile'])
+
+    @staticmethod
+    def _update_with_like_args(cci, args):
+        """ Update arguments with options taken from a currently running CCI.
+
+        :param CCIManager args: A CCIManager
+        :param dict args: CLI arguments
+        """
+        if args['--like']:
+            cci_id = resolve_id(cci.resolve_ids, args.pop('--like'), 'CCI')
+            like_details = cci.get_instance(cci_id)
+            like_args = {
+                '--hostname': like_details['hostname'],
+                '--domain': like_details['domain'],
+                '--cpu': like_details['maxCpu'],
+                '--memory': like_details['maxMemory'],
+                '--hourly': like_details['hourlyBillingFlag'],
+                '--monthly': not like_details['hourlyBillingFlag'],
+                '--datacenter': like_details['datacenter']['name'],
+                '--network': like_details['networkComponents'][0]['maxSpeed'],
+                '--user-data': like_details['userData'] or None,
+                '--postinstall': like_details.get('postInstallScriptUri'),
+                '--private': like_details['dedicatedAccountHostOnlyFlag'],
+            }
+
+            # Handle mutually exclusive options
+            like_image = lookup(like_details,
+                                'blockDeviceTemplateGroup',
+                                'globalIdentifier')
+            like_os = lookup(like_details,
+                             'operatingSystem',
+                             'softwareLicense',
+                             'softwareDescription',
+                             'referenceCode')
+            if like_image and not args.get('--os'):
+                like_args['--image'] = like_image
+            elif like_os and not args.get('--image'):
+                like_args['--os'] = like_os
+
+            if args.get('--hourly'):
+                like_args['--monthly'] = False
+
+            if args.get('--monthly'):
+                like_args['--hourly'] = False
+
+            # Merge like CCI options with the options passed in
+            for key, value in like_args.items():
+                if args.get(key) in [None, False]:
+                    args[key] = value
+
+    @staticmethod
+    def _parse_create_args(args):
+        """ Converts CLI arguments to arguments that can be passed into
+            CCIManager.create_instance.
+
+        :param dict args: CLI arguments
+        """
+        data = {
+            "hourly": args['--hourly'],
+            "cpus": args['--cpu'],
+            "domain": args['--domain'],
+            "hostname": args['--hostname'],
+            "private": args['--private'],
+            "local_disk": True,
+        }
+
+        try:
+            memory = int(args['--memory'])
+            if memory < 1024:
+                memory = memory * 1024
+        except ValueError:
+            unit = args['--memory'][-1]
+            memory = int(args['--memory'][0:-1])
+            if unit in ['G', 'g']:
+                memory = memory * 1024
+            if unit in ['T', 'r']:
+                memory = memory * 1024 * 1024
+
+        data["memory"] = memory
+
+        if args['--monthly']:
+            data['hourly'] = False
+
+        if args.get('--os'):
+            data['os_code'] = args['--os']
+
+        if args.get('--image'):
+            data['image_id'] = args['--image']
+
+        if args.get('--datacenter'):
+            data['datacenter'] = args['--datacenter']
+
+        if args.get('--network'):
+            data['nic_speed'] = args.get('--network')
+
+        if args.get('--userdata'):
+            data['userdata'] = args['--userdata']
+        elif args.get('--userfile'):
+            f = open(args['--userfile'], 'r')
+            try:
+                data['userdata'] = f.read()
+            finally:
+                f.close()
+
+        if args.get('--postinstall'):
+            data['post_uri'] = args.get('--postinstall')
+
+        return data
 
 
 class ReadyCCI(CLIRunnable):
@@ -833,112 +938,3 @@ Options:
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         if not cci.edit(cci_id, **data):
             raise CLIAbort("Failed to update CCI")
-
-
-def update_with_like_args(cci, args):
-    """ Update arguments with options taken from a currently running CCI.
-
-    :param CCIManager args: A CCIManager
-    :param dict args: CLI arguments
-    """
-    if args['--like']:
-        cci_id = resolve_id(cci.resolve_ids, args.pop('--like'), 'CCI')
-        like_details = cci.get_instance(cci_id)
-        like_args = {
-            '--hostname': like_details['hostname'],
-            '--domain': like_details['domain'],
-            '--cpu': like_details['maxCpu'],
-            '--memory': like_details['maxMemory'],
-            '--hourly': like_details['hourlyBillingFlag'],
-            '--monthly': not like_details['hourlyBillingFlag'],
-            '--datacenter': like_details['datacenter']['name'],
-            '--network': like_details['networkComponents'][0]['maxSpeed'],
-            '--user-data': like_details['userData'] or None,
-            '--postinstall': like_details.get('postInstallScriptUri'),
-            '--private': like_details['dedicatedAccountHostOnlyFlag'],
-        }
-
-        # Handle mutually exclusive options
-        like_image = lookup(like_details,
-                            'blockDeviceTemplateGroup',
-                            'globalIdentifier')
-        like_os = lookup(like_details,
-                         'operatingSystem',
-                         'softwareLicense',
-                         'softwareDescription',
-                         'referenceCode')
-        if like_image and not args.get('--os'):
-            like_args['--image'] = like_image
-        elif like_os and not args.get('--image'):
-            like_args['--os'] = like_os
-
-        if args.get('--hourly'):
-            like_args['--monthly'] = False
-
-        if args.get('--monthly'):
-            like_args['--hourly'] = False
-
-        # Merge like CCI options with the options passed in
-        for key, value in like_args.items():
-            if args.get(key) in [None, False]:
-                args[key] = value
-
-
-def parse_create_args(args):
-    """ Converts CLI arguments to arguments that can be passed into
-        CCIManager.create_instance.
-
-    :param dict args: CLI arguments
-    """
-    data = {
-        "hourly": args['--hourly'],
-        "cpus": args['--cpu'],
-        "domain": args['--domain'],
-        "hostname": args['--hostname'],
-        "dedicated": args['--dedicated'],
-        "local_disk": True,
-        "private": args['--private']
-    }
-
-    try:
-        memory = int(args['--memory'])
-        if memory < 1024:
-            memory = memory * 1024
-    except ValueError:
-        unit = args['--memory'][-1]
-        memory = int(args['--memory'][0:-1])
-        if unit in ['G', 'g']:
-            memory = memory * 1024
-        if unit in ['T', 'r']:
-            memory = memory * 1024 * 1024
-
-    data["memory"] = memory
-
-    if args['--monthly']:
-        data['hourly'] = False
-
-    if args.get('--os'):
-        data['os_code'] = args['--os']
-
-    if args.get('--image'):
-        data['image_id'] = args['--image']
-
-    if args.get('--datacenter'):
-        data['datacenter'] = args['--datacenter']
-
-    if args.get('--network'):
-        data['nic_speed'] = args.get('--network')
-
-    if args.get('--userdata'):
-        data['userdata'] = args['--userdata']
-    elif args.get('--userfile'):
-        f = open(args['--userfile'], 'r')
-        try:
-            data['userdata'] = f.read()
-        finally:
-            f.close()
-
-    if args.get('--postinstall'):
-        data['post_uri'] = args.get('--postinstall')
-
-    return data
