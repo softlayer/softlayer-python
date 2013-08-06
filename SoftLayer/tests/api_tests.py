@@ -5,15 +5,11 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest  # NOQA
-
 from mock import patch, call
 
 import SoftLayer
 import SoftLayer.API
+from SoftLayer.tests import unittest
 from SoftLayer.consts import USER_AGENT
 
 

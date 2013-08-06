@@ -5,14 +5,11 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest  # NOQA
 from mock import patch, MagicMock
 
 from SoftLayer import SoftLayerAPIError, TransportError
 from SoftLayer.transport import make_rest_api_call, make_xml_rpc_api_call
+from SoftLayer.tests import unittest
 from requests import HTTPError, RequestException
 
 

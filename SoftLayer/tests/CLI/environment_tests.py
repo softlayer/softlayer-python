@@ -7,13 +7,10 @@
 """
 import sys
 import os
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest  # NOQA
 from mock import patch, MagicMock
 
 from SoftLayer import API_PUBLIC_ENDPOINT
+from SoftLayer.tests import unittest
 from SoftLayer.CLI.environment import Environment, InvalidCommand
 
 if sys.version_info >= (3,):
