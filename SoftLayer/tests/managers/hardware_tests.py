@@ -7,11 +7,8 @@
 """
 from SoftLayer import HardwareManager
 from SoftLayer.managers.hardware import get_default_value
+from SoftLayer.tests import unittest
 
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest  # NOQA
 from mock import MagicMock, ANY, call, patch
 
 
@@ -367,4 +364,3 @@ class HardwareTests(unittest.TestCase):
                 'packageId': package_id,
             }],
         }]
-        

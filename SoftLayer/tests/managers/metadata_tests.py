@@ -7,11 +7,8 @@
 """
 from SoftLayer import MetadataManager, SoftLayerError, SoftLayerAPIError
 from SoftLayer.consts import API_PRIVATE_ENDPOINT_REST
+from SoftLayer.tests import unittest
 
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest  # NOQA
 from mock import patch, MagicMock
 
 

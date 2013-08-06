@@ -175,7 +175,7 @@ def main(args=sys.argv[1:], env=Environment()):
             if s:
                 env.out(s)
 
-    except InvalidCommand, e:
+    except InvalidCommand as e:
         env.err(resolver.get_module_help(e.module_name))
         if e.command_name:
             env.err('')

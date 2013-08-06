@@ -1,5 +1,5 @@
 """
-    SoftLayer.Network
+    SoftLayer.network
     ~~~~~~~~~~~~~~~~~
     Network Manager/helpers
 
@@ -13,14 +13,20 @@ from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
 class NetworkManager(IdentifierMixin, object):
     """ Manage Networks """
     def __init__(self, client):
+        #: A valid `SoftLayer.API.Client` object that will be used for all
+        #: actions.
         self.client = client
+        #: Reference to the SoftLayer_Account API object.
         self.account = client['Account']
+        #: Reference to the SoftLayer_Network_Vlan object.
         self.vlan = client['Network_Vlan']
 
     def get_vlan(self, id):
         """ Returns information about a single VLAN.
 
         :param int id: The unique identifier for the VLAN
+        :returns: A dictionary containing a large amount of information about
+                  the specified VLAN.
 
         """
         return self.vlan.getObject(id=id, mask=self._get_vlan_mask())
@@ -54,6 +60,14 @@ class NetworkManager(IdentifierMixin, object):
     def summary_by_datacenter(self):
         """ Provides a dictionary with a summary of all network information on
         the account, grouped by data center.
+
+        The resultant dictionary is primarily useful for statistical purposes.
+        It contains count information rather than raw data. If you want raw
+        information, see the :func:`list_vlans` method instead.
+
+        :returns: A dictionary keyed by data center with the data containing a
+                  series of counts for hardware, subnets, CCIs, and other
+                  objects residing within that data center.
 
         """
         datacenters = {}

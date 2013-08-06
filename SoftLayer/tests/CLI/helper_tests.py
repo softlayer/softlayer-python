@@ -8,13 +8,10 @@
 import sys
 import os
 import json
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest  # NOQA
 from mock import patch
 
 import SoftLayer.CLI as cli
+from SoftLayer.tests import unittest
 
 if sys.version_info >= (3,):
     raw_input_path = 'builtins.input'

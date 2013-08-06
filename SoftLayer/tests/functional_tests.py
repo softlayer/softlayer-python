@@ -5,13 +5,10 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
-import SoftLayer
 import os
 
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest  # NOQA
+import SoftLayer
+from SoftLayer.tests import unittest
 
 
 def get_creds():
@@ -47,7 +44,7 @@ class UnauthedUser(unittest.TestCase):
             self.assertEqual(e.faultCode, 404)
             self.assertIn('NOT FOUND', e.faultString)
             self.assertIn('NOT FOUND', e.reason)
-        except:
+        else:
             self.fail('No Exception Raised')
 
     def test_no_hostname(self):
@@ -59,7 +56,7 @@ class UnauthedUser(unittest.TestCase):
             self.assertEqual(e.faultCode, 0)
             self.assertIn('not known', e.faultString)
             self.assertIn('not known', e.reason)
-        except:
+        else:
             self.fail('No Exception Raised')
 
 
@@ -78,7 +75,7 @@ class AuthedUser(unittest.TestCase):
             self.assertEqual(e.faultCode, '-32601')
             self.assertEqual(e.faultString, 'Service does not exist')
             self.assertEqual(e.reason, 'Service does not exist')
-        except:
+        else:
             self.fail('No Exception Raised')
 
     def test_dns(self):
