@@ -12,15 +12,24 @@ The SoftLayer command line interface is available via the `sl` command available
    cli/dev
 
 
+.. _config_setup:
+
 Configuration Setup
 -------------------
-To check the configuration, you can use `sl config show`.
+To update the configuration, you can use `sl config setup`.
 ::
 
 	$ sl config setup
-	Username: username
-	API Key: oyVmeipYQCNrjVS4rF9bHWV7D75S6pa1fghFl384v7mwRCbHTfuJ8qRORIqoVnha
-	Endpoint URL [https://api.softlayer.com/xmlrpc/v3/]: 
+	Username []: username
+	API Key or Password []:
+	Endpoint (public|private|custom): public
+	:..............:..................................................................:
+	:         Name : Value                                                            :
+	:..............:..................................................................:
+	:     Username : username                                                         :
+	:      API Key : oyVmeipYQCNrjVS4rF9bHWV7D75S6pa1fghFl384v7mwRCbHTfuJ8qRORIqoVnha :
+	: Endpoint URL : https://api.softlayer.com/xmlrpc/v3/                             :
+	:..............:..................................................................:
 	Are you sure you want to write settings to "/path/to/home/.softlayer"? [y/N]: y
 
 To check the configuration, you can use `sl config show`.
@@ -36,30 +45,7 @@ To check the configuration, you can use `sl config show`.
 	:..............:..................................................................:
 
 
-Configuration File Details
---------------------------
-The CLI loads your settings from a number of different locations.
-
-* Enviorment variables (SL_USERNAME, SL_API_KEY)
-* Config file (~/.softlayer)
-* Or argument (-C/path/to/config or --config=/path/to/config)
-
-The configuration file is INI based and requires the `softlayer` section to be present. 
-The only required fields are `username` and `api_key`. You can optionally also/exclusively supply the `endpoint_url` as well.
-
-*Full config*
-::
-
-	[softlayer]
-	username = username
-	api_key = oyVmeipYQCNrjVS4rF9bHWV7D75S6pa1fghFl384v7mwRCbHTfuJ8qRORIqoVnha
-	endpoint_url = https://api.softlayer.com/xmlrpc/v3/
-
-*exclusive url*
-::
-
-	[softlayer]
-	endpoint_url = https://api.softlayer.com/xmlrpc/v3/
+To see more about the config file format, see :ref:`config_file`.
 
 .. _usage-examples:
 

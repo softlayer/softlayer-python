@@ -5,13 +5,9 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest  # NOQA
-
 from SoftLayer.auth import (
     AuthenticationBase, BasicAuthentication, TokenAuthentication)
+from SoftLayer.tests import unittest
 
 
 class TestAuthenticationBase(unittest.TestCase):
