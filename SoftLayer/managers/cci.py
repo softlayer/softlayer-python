@@ -1,5 +1,5 @@
 """
-    SoftLayer.CCI
+    SoftLayer.cci
     ~~~~~~~~~~~~~
     CCI Manager/helpers
 
@@ -17,9 +17,16 @@ class CCIManager(IdentifierMixin, object):
     """ Manage CCIs """
     def __init__(self, client):
         self.client = client
+        """ A valid `SoftLayer.API.Client` object that will be used for all
+        actions. """
         self.account = client['Account']
+        """ Reference to the SoftLayer_Account API object. """
         self.guest = client['Virtual_Guest']
+        """ Reference to the SoftLayer_Virtual_Guest API object. """
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
+        """ A list of resolver functions. Used primarily by the CLI to provide
+        a variety of methods for uniquely identifying an object such as
+        hostname and IP address."""
 
     def list_instances(self, hourly=True, monthly=True, tags=None, cpus=None,
                        memory=None, hostname=None, domain=None,
@@ -40,6 +47,20 @@ class CCIManager(IdentifierMixin, object):
         :param string public_ip: filter based on public ip address
         :param string private_ip: filter based on private ip address
         :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+        :returns: Returns a list of dictionaries representing the matching CCIs
+
+        ::
+
+           # Print out a list of all hourly CCIs in the DAL05 data center.
+           # env variables
+           # SL_USERNAME = YOUR_USERNAME
+           # SL_API_KEY = YOUR_API_KEY
+           import SoftLayer
+           client = SoftLayer.Client()
+
+           mgr = SoftLayer.CCIManager(client)
+           for cci in mgr.list_instances(hourly=True, datacenter='dal05'):
+               print cci['fullyQualifiedDomainName'], cci['primaryIpAddress']
 
         """
         if 'mask' not in kwargs:
@@ -115,6 +136,8 @@ class CCIManager(IdentifierMixin, object):
         """ Get details about a CCI instance
 
         :param integer id: the instance ID
+        :returns: A dictionary containing a large amount of information about
+                  the specified instance.
 
         """
 
@@ -157,6 +180,11 @@ class CCIManager(IdentifierMixin, object):
         return self.guest.getObject(id=id, **kwargs)
 
     def get_create_options(self):
+        """ Retrieves the available options for creating a CCI.
+
+        :returns: A dictionary of creation options.
+
+        """
         return self.guest.getCreateObjectOptions()
 
     def cancel_instance(self, id):
@@ -192,6 +220,37 @@ class CCIManager(IdentifierMixin, object):
             datacenter=None, os_code=None, image_id=None,
             private=False, public_vlan=None, private_vlan=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None):
+        """
+        Translates a list of arguments into a dictionary necessary for creating
+        a CCI.
+
+        :param int cpus: The number of virtual CPUs to include in the instance.
+        :param int memory: The amount of RAM to order.
+        :param bool hourly: Flag to indicate if this server should be billed
+                            hourly (default) or monthly.
+        :param string hostname: The hostname to use for the new server.
+        :param string domain: The domain to use for the new server.
+        :param bool local_disk: Flag to indicate if this should be a local disk
+                                (default) or a SAN disk.
+        :param string datacenter: The short name of the data center in which
+                                  the CCI should reside.
+        :param string os_code: The operating system to use. Cannot be specified
+                               if image_id is specified.
+        :param int image_id: The ID of the image to load onto the server.
+                             Cannot be specified if os_code is specified.
+        :param bool private: Flag to indicate if this should be housed on a
+                             private or shared host (default). This will incur
+                             a fee on your account.
+        :param int public_vlan: The ID of the public VLAN on which you want
+                                this CCI placed.
+        :param int private_vlan: The ID of the public VLAN on which you want
+                                 this CCI placed.
+        :param bool bare_metal: Flag to indicate if this is a bare metal server
+                                or a dedicated server (default).
+        :param list disks: A list of disk capacities for this server.
+        :param string post_url: The URI of the post-install script to run
+                                after reload
+        """
 
         required = [cpus, memory, hostname, domain]
 
@@ -265,6 +324,13 @@ class CCIManager(IdentifierMixin, object):
         return data
 
     def wait_for_transaction(self, id, limit, delay=1):
+        """ Waits on a CCI transaction for the specified amount of time.
+
+        :param int id: The instance ID with the pending transaction
+        :param int limit: The maximum amount of time to wait.
+        :param int delay: The number of seconds to sleep before checks.
+                          Defaults to 1.
+        """
         for count, new_instance in enumerate(repeat(id)):
             instance = self.get_instance(new_instance)
             if not instance.get('activeTransaction', {}).get('id') and \
@@ -277,16 +343,27 @@ class CCIManager(IdentifierMixin, object):
             sleep(delay)
 
     def verify_create_instance(self, **kwargs):
-        """ see _generate_create_dict """  # TODO: document this
+        """ Verifies an instance creation command without actually placing an
+        order. See :func:`_generate_create_dict` for a list of available
+        options. """
         create_options = self._generate_create_dict(**kwargs)
         return self.guest.generateOrderTemplate(create_options)
 
     def create_instance(self, **kwargs):
-        """ see _generate_create_dict """  # TODO: document this
+        """ Orders a new instance. See :func:`_generate_create_dict` for
+        a list of available options. """
         create_options = self._generate_create_dict(**kwargs)
         return self.guest.createObject(create_options)
 
     def change_port_speed(self, id, public, speed):
+        """ Allows you to change the port speed of a CCI's NICs.
+
+        :param int id: The ID of the CCI
+        :param bool public: Flag to indicate which interface to change.
+                            True (default) means the public interface.
+                            False indicates the private interface.
+        :param int speed: The port speed to set.
+        """
         if public:
             func = self.guest.setPublicNetworkInterfaceSpeed
         else:
