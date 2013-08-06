@@ -376,38 +376,8 @@ Optional:
     @classmethod
     def execute(cls, client, args):
         update_with_template_args(args)
-
         cci = CCIManager(client)
-        if args['--like']:
-            cci_id = resolve_id(cci.resolve_ids, args.pop('--like'), 'CCI')
-            like_details = cci.get_instance(cci_id)
-            like_args = {
-                '--hostname': like_details['hostname'],
-                '--domain': like_details['domain'],
-                '--cpu': like_details['maxCpu'],
-                '--memory': like_details['maxMemory'],
-                '--os': lookup(like_details,
-                               'operatingSystem',
-                               'softwareLicense',
-                               'softwareDescription',
-                               'referenceCode'),
-                '--image': lookup(like_details,
-                                  'blockDeviceTemplateGroup',
-                                  'globalIdentifier'),
-                '--hourly': like_details['hourlyBillingFlag'],
-                '--monthly': not like_details['hourlyBillingFlag'],
-                '--datacenter': like_details['datacenter']['name'],
-                '--network': like_details['networkComponents'][0]['maxSpeed'],
-                '--user-data': like_details['userData'] or None,
-                '--postinstall': like_details.get('postInstallScriptUri'),
-                '--private': like_details['dedicatedAccountHostOnlyFlag'],
-            }
-
-            # Merge like CCI options with the options passed in
-            for key, value in like_args.items():
-                if args.get(key) in [None, False]:
-                    args[key] = value
-
+        update_with_like_args(cci, args)
         cls._validate_args(args)
 
         # Do not create CCI with --test or --export
@@ -865,8 +835,61 @@ Options:
             raise CLIAbort("Failed to update CCI")
 
 
-def parse_create_args(args):
+def update_with_like_args(cci, args):
+    """ Update arguments with options taken from a currently running CCI.
 
+    :param CCIManager args: A CCIManager
+    :param dict args: CLI arguments
+    """
+    if args['--like']:
+        cci_id = resolve_id(cci.resolve_ids, args.pop('--like'), 'CCI')
+        like_details = cci.get_instance(cci_id)
+        like_args = {
+            '--hostname': like_details['hostname'],
+            '--domain': like_details['domain'],
+            '--cpu': like_details['maxCpu'],
+            '--memory': like_details['maxMemory'],
+            '--hourly': like_details['hourlyBillingFlag'],
+            '--monthly': not like_details['hourlyBillingFlag'],
+            '--datacenter': like_details['datacenter']['name'],
+            '--network': like_details['networkComponents'][0]['maxSpeed'],
+            '--user-data': like_details['userData'] or None,
+            '--postinstall': like_details.get('postInstallScriptUri'),
+            '--private': like_details['dedicatedAccountHostOnlyFlag'],
+        }
+
+        # Handle mutually exclusive options
+        like_image = lookup(like_details,
+                            'blockDeviceTemplateGroup',
+                            'globalIdentifier')
+        like_os = lookup(like_details,
+                         'operatingSystem',
+                         'softwareLicense',
+                         'softwareDescription',
+                         'referenceCode')
+        if like_image and not args.get('--os'):
+            like_args['--image'] = like_image
+        elif like_os and not args.get('--image'):
+            like_args['--os'] = like_os
+
+        if args.get('--hourly'):
+            like_args['--monthly'] = False
+
+        if args.get('--monthly'):
+            like_args['--hourly'] = False
+
+        # Merge like CCI options with the options passed in
+        for key, value in like_args.items():
+            if args.get(key) in [None, False]:
+                args[key] = value
+
+
+def parse_create_args(args):
+    """ Converts CLI arguments to arguments that can be passed into
+        CCIManager.create_instance.
+
+    :param dict args: CLI arguments
+    """
     data = {
         "hourly": args['--hourly'],
         "cpus": args['--cpu'],
