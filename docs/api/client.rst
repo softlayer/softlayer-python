@@ -51,9 +51,8 @@ Below is an example of creating a client instance with more options. This will c
 
 Managers
 --------
-::
 For day to day operation, most users will find the managers to be the most convenient means for interacting with the API. Managers mask out a lot of the complexities of using the API into classes that provide a simpler interface to various services. These are higher-level interfaces to the SoftLayer API.
-
+::
 
 	>>> from SoftLayer import CCIManager, Client
 	>>> client = Client(...)
