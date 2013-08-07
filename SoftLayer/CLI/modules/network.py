@@ -173,10 +173,7 @@ Options:
         total = 0.0
         for price in result['prices']:
             total += float(price.get('recurringFee', 0.0))
-            if args.get('--hourly'):
-                rate = "%.2f" % float(price['hourlyRecurringFee'])
-            else:
-                rate = "%.2f" % float(price['recurringFee'])
+            rate = "%.2f" % float(price['recurringFee'])
 
             t.add_row([price['item']['description'], rate])
 
