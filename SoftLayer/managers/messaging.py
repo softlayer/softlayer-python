@@ -161,7 +161,8 @@ class MessagingConnection(object):
         :param api_key: SoftLayer API Key
         :param auth_token: (optional) Starting auth token
         """
-        auth_endpoint = '/'.join((self.endpoint, 'v1', self.account_id, 'auth'))
+        auth_endpoint = '/'.join((self.endpoint, 'v1',
+                                  self.account_id, 'auth'))
         auth = QueueAuth(auth_endpoint, username, api_key,
                          auth_token=auth_token)
         auth.auth()
@@ -239,7 +240,7 @@ class MessagingConnection(object):
         message = {'body': body}
         message.update(kwargs)
         r = self._make_request('post', 'queues/%s/messages' % queue_name,
-                              data=json.dumps(message))
+                               data=json.dumps(message))
         return json.loads(r.content)
 
     def pop_message(self, queue_name, count=1):
@@ -249,7 +250,7 @@ class MessagingConnection(object):
         :param count: (optional) number of messages to retrieve
         """
         r = self._make_request('get', 'queues/%s/messages' % queue_name,
-                              params={'batch': count})
+                               params={'batch': count})
         return json.loads(r.content)
 
     def delete_message(self, queue_name, message_id):
@@ -259,7 +260,7 @@ class MessagingConnection(object):
         :param message_id: Message id
         """
         self._make_request('delete', 'queues/%s/messages/%s'
-                          % (queue_name, message_id))
+                           % (queue_name, message_id))
         return True
 
     # TOPIC METHODS
@@ -324,7 +325,7 @@ class MessagingConnection(object):
         message = {'body': body}
         message.update(kwargs)
         r = self._make_request('post', 'topics/%s/messages' % topic_name,
-                              data=json.dumps(message))
+                               data=json.dumps(message))
         return json.loads(r.content)
 
     def get_subscriptions(self, topic_name):
@@ -356,4 +357,3 @@ class MessagingConnection(object):
         self._make_request('delete', 'topics/%s/subscriptions/%s' %
                           (topic_name, subscription_id))
         return True
-

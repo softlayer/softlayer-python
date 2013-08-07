@@ -2,4 +2,3 @@ tox
 nose
 mock
 coverage
-sphinx

@@ -8,12 +8,9 @@
 from SoftLayer import MessagingManager, Unauthenticated
 import SoftLayer.managers.messaging
 from SoftLayer.consts import USER_AGENT
+from SoftLayer.tests import unittest
 
 import json
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest  # NOQA
 from mock import MagicMock, patch, ANY
 
 QUEUE_1 = {
@@ -43,7 +40,6 @@ SUBSCRIPTION_1 = {
     'id': 'd344a01133b61181f57d9950a85704d4',
     'message': 'Object created'}
 SUBSCRIPTION_LIST = {'item_count': 1, 'items': [SUBSCRIPTION_1]}
-
 
 
 def mocked_auth_call(self):
@@ -115,7 +111,6 @@ class QueueAuthTests(unittest.TestCase):
         request.register_hook.assert_called_with(
             'response', self.auth.handle_error)
         self.assertEqual(request.headers, {'X-Auth-Token': 'NEW_AUTH_TOKEN'})
-
 
 
 class MessagingManagerTests(unittest.TestCase):
@@ -224,7 +219,7 @@ class MessagingConnectionTests(unittest.TestCase):
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
     def test_stats(self, make_request):
         content = {
-            'notifications': [{'key': [2012, 7, 27, 14, 31], 'value': 2}], 
+            'notifications': [{'key': [2012, 7, 27, 14, 31], 'value': 2}],
             'requests': [{'key': [2012, 7, 27, 14, 31], 'value': 11}]}
         make_request().content = json.dumps(content)
         result = self.conn.stats()

@@ -5,14 +5,11 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest  # NOQA
 from mock import MagicMock, patch
 
 import SoftLayer
 import SoftLayer.CLI as cli
+from SoftLayer.tests import unittest
 from SoftLayer.CLI.helpers import CLIAbort
 from SoftLayer.CLI.environment import Environment, InvalidModule
 

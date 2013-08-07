@@ -1,5 +1,5 @@
 """
-    SoftLayer.SSL
+    SoftLayer.ssl
     ~~~~~~~~~~~~~
     SSL Manager/helpers
 
@@ -9,21 +9,25 @@
 
 
 class SSLManager(object):
-    """ Manages SSL certificates. """
+    """
+    Manages SSL certificates.
+
+    :param SoftLayer.API.Client client: an API client instance
+    """
 
     def __init__(self, client):
-        """ SSLManager initialization.
-
-        :param SoftLayer.API.Client client: an API client instance
-
-        """
+        #: A valid `SoftLayer.API.Client` object that will be used for all
+        #: actions.
         self.client = client
+        #: Reference to the SoftLayer_Security_Certificate API object.
         self.ssl = self.client['Security_Certificate']
 
     def list_certs(self, method='all'):
         """ List all certificates.
 
-        :param method:  # TODO: explain this param
+        :param string method: The type of certificates to list. Options are
+                              'all', 'expired', and 'valid'.
+        :returns: A list of dictionaries representing the requested SSL certs.
 
         """
         ssl = self.client['Account']
@@ -40,7 +44,8 @@ class SSLManager(object):
     def add_certificate(self, certificate):
         """ Creates a new certificate.
 
-        :param certificate:  # TODO: is this a dict?
+        :param dict certificate: A dictionary representing the parts of the
+                                 certificate. See SLDN for more information.
 
         """
         return self.ssl.createObject(certificate)
@@ -54,9 +59,10 @@ class SSLManager(object):
         return self.ssl.deleteObject(id=id)
 
     def edit_certificate(self, certificate):
-        """ Updates a certificate with the included options. The provided dict
-        must include an 'id' key and value corresponding to the certificate ID
-        that should be updated.
+        """ Updates a certificate with the included options.
+
+        The provided dict must include an 'id' key and value corresponding to
+        the certificate ID that should be updated.
 
         :param dict certificate: the certificate to update.
 

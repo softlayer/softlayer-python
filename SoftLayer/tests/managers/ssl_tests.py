@@ -6,11 +6,8 @@
     :license: BSD, see LICENSE for more details.
 """
 from SoftLayer import SSLManager
+from SoftLayer.tests import unittest
 
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest  # NOQA
 from mock import MagicMock, ANY
 
 
