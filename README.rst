@@ -13,8 +13,8 @@ This library provides a simple interface to interact with SoftLayer's XML-RPC AP
 
 Documentation
 -------------
-Documentation is available at http://softlayer.github.com/softlayer-api-python-client
-	
+Documentation is available at https://softlayer-api-python-client.readthedocs.org/
+
 Installation
 ------------
 Install via pip:
