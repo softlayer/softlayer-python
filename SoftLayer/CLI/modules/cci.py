@@ -26,7 +26,7 @@ hostname or the ip address for a CCI.
 from os import linesep
 import os.path
 
-from SoftLayer import CCIManager
+from SoftLayer import CCIManager, SshKeyManager
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
     FormattedItem)
@@ -356,6 +356,7 @@ Optional:
   -F --userfile=FILE       Read userdata from file
   -i --postinstall=URI     Post-install script to download
                              (Only HTTPS executes, HTTP leaves file in /root)
+  -k KEY, --key=KEY        The SSH key to add to the root user
   --wait=SECONDS           Block until CCI is finished provisioning for up to X
                              seconds before returning.
 """
@@ -424,6 +425,12 @@ Optional:
 
         if args.get('--postinstall'):
             data['post_uri'] = args.get('--postinstall')
+
+        # Get the SSH key
+        if args.get('--key'):
+            key_id = resolve_id(SshKeyManager(client).resolve_ids,
+                                args.get('--key'), 'SshKey')
+            data['ssh_key'] = key_id
 
         t = Table(['Item', 'cost'])
         t.align['Item'] = 'r'
