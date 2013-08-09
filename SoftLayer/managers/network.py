@@ -74,8 +74,6 @@ class NetworkManager(IdentifierMixin, object):
 
         if type != 'global':
             order['endPointVlanId'] = vlan_id
-#            vlan = self.get_vlan(vlan_id)
-#            order['location'] = vlan['primaryRouter']['datacenter']['id']
 
         if not price_id:
             return None
