@@ -24,66 +24,53 @@ class NetworkManager(IdentifierMixin, object):
         self.subnet = client['Network_Subnet']
         self.subnet_resolvers = [self._get_subnet_by_identifier]
 
-    def add_subnet(self, type, quantity=None, vlan_id=None, version=4,
-                   test_order=False):
-        package = self.client['Product_Package']
-#        ip_categories = [
-#            'global_ipv4',
-#            'global_ipv6',
-#            'sov_sec_ip_addresses_priv',
-#            'sov_sec_ip_addresses_pub',
-#            'static_ipv6_addresses',
-#            'static_sec_ip_addresses',
-#        ]
-        category = 'sov_sec_ip_addresses_priv'
-        if version == 4:
-            if type == 'global':
-                quantity = 0
-                category = 'global_ipv4'
-            elif type == 'public':
-                category = 'sov_sec_ip_addresses_pub'
-        else:
-            category = 'static_ipv6_addresses'
-            if type == 'global':
-                quantity = 0
-                category = 'global_ipv6'
-                desc = 'Global'
-            elif type == 'public':
-                desc = 'Portable'
+    # Temporarily removing due to a bug in the API not allowing subnet ordering
+    # def add_subnet(self, type, quantity=None, vlan_id=None, version=4,
+    #                test_order=False):
+    #     package = self.client['Product_Package']
+    #     category = 'sov_sec_ip_addresses_priv'
+    #     if version == 4:
+    #         if type == 'global':
+    #             quantity = 0
+    #             category = 'global_ipv4'
+    #         elif type == 'public':
+    #             category = 'sov_sec_ip_addresses_pub'
+    #     else:
+    #         category = 'static_ipv6_addresses'
+    #         if type == 'global':
+    #             quantity = 0
+    #             category = 'global_ipv6'
+    #             desc = 'Global'
+    #         elif type == 'public':
+    #             desc = 'Portable'
 
-        # Filters don't appear to work for Product_Package either
-#        _filter = {'itemCategory': {}}
-#        _filter['itemCategory']['categoryCode'] = {
-#            'operation': 'in',
-#            'options': [{'name': 'data', 'value': ip_categories}],
-#        }
-        price_id = None
-        quantity = str(quantity)
-        for item in package.getItems(id=0, mask='mask[itemCategory]'):
-            category_code = item.get('itemCategory', {}).get('categoryCode')
-            if category_code == category and item['capacity'] == quantity:
-                if version == 4 or (version == 6
-                                    and desc in item['description']):
-                    price_id = item['prices'][0]['id']
+    #     price_id = None
+    #     quantity = str(quantity)
+    #     for item in package.getItems(id=0, mask='mask[itemCategory]'):
+    #         category_code = item.get('itemCategory', {}).get('categoryCode')
+    #         if category_code == category and item['capacity'] == quantity:
+    #             if version == 4 or (version == 6
+    #                                 and desc in item['description']):
+    #                 price_id = item['prices'][0]['id']
 
-        order = {
-            'packageId': 0,
-            'prices': [{'id': price_id}],
-            'quantity': 1,
-        }
+    #     order = {
+    #         'packageId': 0,
+    #         'prices': [{'id': price_id}],
+    #         'quantity': 1,
+    #     }
 
-        if type != 'global':
-            order['endPointVlanId'] = vlan_id
+    #     if type != 'global':
+    #         order['endPointVlanId'] = vlan_id
 
-        if not price_id:
-            return None
+    #     if not price_id:
+    #         return None
 
-        func = 'placeOrder'
-        if test_order:
-            func = 'verifyOrder'
-        func = getattr(self.client['Product_Order'], func)
+    #     func = 'placeOrder'
+    #     if test_order:
+    #         func = 'verifyOrder'
+    #     func = getattr(self.client['Product_Order'], func)
 
-        return func(order)
+    #     return func(order)
 
     def ip_lookup(self, ip):
         """ Looks up an IP address and returns network information about it.
