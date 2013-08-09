@@ -142,7 +142,9 @@ Options:
             result['status']['name'] or blank()
         )])
         t.add_row(['state', FormattedItem(
-            result['powerState']['keyName'], result['powerState']['name'])])
+            lookup(result, 'powerState', 'keyName'),
+            lookup(result, 'powerState', 'name'),
+        )])
         t.add_row(['datacenter', result['datacenter']['name']])
         operating_system = lookup(result,
                                   'operatingSystem',
@@ -432,7 +434,7 @@ Optional:
 
         if args['--export']:
             export_file = args.pop('--export')
-            export_to_template(export_file, args, exclude=['--wait'])
+            export_to_template(export_file, args, exclude=['--wait', '--test'])
             return 'Successfully exported options to a template file.'
 
         if do_create:

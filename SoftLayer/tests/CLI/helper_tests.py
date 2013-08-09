@@ -27,16 +27,17 @@ class CLIJSONEncoderTest(unittest.TestCase):
     def test_default(self):
         out = json.dumps({
             'formattedItem': cli.helpers.FormattedItem('normal', 'formatted')
-        }, cls=cli.helpers.CLIJSONEncoder)
+        }, cls=cli.formatting.CLIJSONEncoder)
         self.assertEqual(out, '{"formattedItem": "normal"}')
 
-        out = json.dumps({'normal': 'string'}, cls=cli.helpers.CLIJSONEncoder)
+        out = json.dumps({'normal': 'string'},
+                         cls=cli.formatting.CLIJSONEncoder)
         self.assertEqual(out, '{"normal": "string"}')
 
     def test_fail(self):
         self.assertRaises(
             TypeError,
-            json.dumps, {'test': object()}, cls=cli.helpers.CLIJSONEncoder)
+            json.dumps, {'test': object()}, cls=cli.formatting.CLIJSONEncoder)
 
 
 class PromptTests(unittest.TestCase):
@@ -214,6 +215,7 @@ class ResolveIdTests(unittest.TestCase):
 
 
 class TestFormatOutput(unittest.TestCase):
+
     def test_format_output_string(self):
         t = cli.helpers.format_output('just a string', 'raw')
         self.assertEqual('just a string', t)
@@ -281,7 +283,7 @@ class TestFormatOutput(unittest.TestCase):
 
     def test_unknown(self):
         t = cli.helpers.format_output({}, 'raw')
-        self.assertEqual('{}', t)
+        self.assertEqual({}, t)
 
     def test_sequentialoutput(self):
         t = cli.helpers.SequentialOutput()
@@ -295,6 +297,23 @@ class TestFormatOutput(unittest.TestCase):
         t.separator = ','
         output = cli.helpers.format_output(t)
         self.assertEqual("This is a test,More tests", output)
+
+    def test_format_output_python(self):
+        t = cli.helpers.format_output('just a string', 'python')
+        self.assertEqual('just a string', t)
+
+        t = cli.helpers.format_output(['just a string'], 'python')
+        self.assertEqual(['just a string'], t)
+
+        t = cli.helpers.format_output({'test_key': 'test_value'}, 'python')
+        self.assertEqual({'test_key': 'test_value'}, t)
+
+    def test_format_output_python_keyvaluetable(self):
+        t = cli.KeyValueTable(['key', 'value'])
+        t.add_row(['nothing', cli.helpers.blank()])
+        t.sortby = 'nothing'
+        ret = cli.helpers.format_output(t, 'python')
+        self.assertEqual({'nothing': None}, ret)
 
 
 class TestTemplateArgs(unittest.TestCase):
@@ -340,7 +359,8 @@ class TestExportToTemplate(unittest.TestCase):
             cli.helpers.export_to_template('filename', {
                 '--os': None,
                 '--datacenter': 'ams01',
-                # The following gets stripped out
+                '--disk': ['disk1', 'disk2'],
+                # The following should get stripped out
                 '--config': 'no',
                 '--really': 'no',
                 '--format': 'no',
@@ -348,7 +368,9 @@ class TestExportToTemplate(unittest.TestCase):
                 # exclude list
                 '--test': 'test',
             }, exclude=['--test'])
+
             open_.assert_called_with('filename', 'w')
-            open_().write.assert_has_calls(
+            open_().write.assert_has_calls([
                 call('datacenter=ams01\n'),
-            )
+                call('disk=disk1,disk2\n'),
+            ])

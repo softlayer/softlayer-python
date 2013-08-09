@@ -23,8 +23,8 @@ import os
 from os import linesep
 from SoftLayer.CLI.helpers import (
     CLIRunnable, Table, KeyValueTable, FormattedItem, NestedDict, CLIAbort,
-    blank, listing, SequentialOutput, gb, no_going_back, resolve_id, confirm,
-    ArgumentError)
+    blank, listing, gb, no_going_back, resolve_id, confirm, ArgumentError,
+    update_with_template_args, export_to_template)
 from SoftLayer import HardwareManager, SshKeyManager
 
 
@@ -298,7 +298,7 @@ Options:
 
 class ListChassisHardware(CLIRunnable):
     """
-usage: sl hardware list-chassis
+usage: sl hardware list-chassis [options]
 
 Display a list of chassis available for ordering dedicated servers.
 """
@@ -591,8 +591,7 @@ Options:
 
 class CreateHardware(CLIRunnable):
     """
-usage: sl hardware create --hostname=HOST --domain=DOMAIN --cpu=CPU
-    --chassis=CHASSIS --memory=MEMORY --os=OS --disk=SIZE... [options]
+usage: sl hardware create [--disk=SIZE...] [options]
 
 Order/create a dedicated server. See 'sl hardware list-chassis' and
 'sl hardware create-options' for valid options. --disk can be repeated to
@@ -612,17 +611,30 @@ Optional:
                            Note: Omitting this value defaults to the first
                              available datacenter
   -n MBPS, --network=MBPS  Network port speed in Mbps
+  -d, --disk=SIZE...       Disks. Can be specified multiple times.
   --controller=RAID        The RAID configuration for the server.
                              Defaults to None.
   -k KEY, --key=KEY        The SSH key to assign to the root user
   --dry-run, --test        Do not create the server, just get a quote
+  -t, --template=FILE      A template file that defaults the command-line
+                            options using the long name in INI format
+  --export=FILE            Exports options to a template file
 """
     action = 'create'
     options = ['confirm']
+    required_params = ['--hostname', '--domain', '--chassis', '--cpu',
+                       '--memory', '--os']
 
     @classmethod
     def execute(cls, client, args):
+        update_with_template_args(args)
         mgr = HardwareManager(client)
+
+        # Disks will be a comma-separated list. Let's make it a real list.
+        if isinstance(args.get('--disk'), str):
+            args['--disk'] = args.get('--disk').split(',')
+
+        cls._validate_args(args)
 
         ds_options = mgr.get_dedicated_server_create_options(args['--chassis'])
 
@@ -689,49 +701,61 @@ Optional:
                                 args.get('--key'), 'SshKey')
             order['ssh_key'] = key_id
 
-        # Begin output
-        t = Table(['Item', 'cost'])
-        t.align['Item'] = 'r'
-        t.align['cost'] = 'r'
+        # Do not create hardware server with --test or --export
+        do_create = not (args['--export'] or args['--test'])
 
+        output = None
         if args.get('--test'):
             result = mgr.verify_order(**order)
+
+            t = Table(['Item', 'cost'])
+            t.align['Item'] = 'r'
+            t.align['cost'] = 'r'
 
             total = 0.0
             for price in result['prices']:
                 total += float(price.get('recurringFee', 0.0))
-                if args.get('--hourly'):
-                    rate = "%.2f" % float(price['hourlyRecurringFee'])
-                else:
-                    rate = "%.2f" % float(price['recurringFee'])
+                rate = "%.2f" % float(price['recurringFee'])
 
                 t.add_row([price['item']['description'], rate])
 
-            billing_rate = 'monthly'
-            if args.get('--hourly'):
-                billing_rate = 'hourly'
-            t.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
-            output = SequentialOutput()
+            t.add_row(['Total monthly cost', "%.2f" % total])
+            output = []
             output.append(t)
             output.append(FormattedItem(
                 '',
                 ' -- ! Prices reflected here are retail and do not '
                 'take account level discounts and are not guarenteed.')
             )
-        elif args.get('--really') or confirm(
-                "This action will incur charges on your account. Continue?"):
-            result = mgr.place_order(**order)
 
-            t = KeyValueTable(['name', 'value'])
-            t.align['name'] = 'r'
-            t.align['value'] = 'l'
-            t.add_row(['id', result['orderId']])
-            t.add_row(['created', result['orderDate']])
-            output = t
-        else:
-            raise CLIAbort('Aborting dedicated server order.')
+        if args['--export']:
+            export_file = args.pop('--export')
+            export_to_template(export_file, args, exclude=['--wait', '--test'])
+            return 'Successfully exported options to a template file.'
+
+        if do_create:
+            if args['--really'] or confirm(
+                    "This action will incur charges on your account. "
+                    "Continue?"):
+                result = mgr.place_order(**order)
+
+                t = KeyValueTable(['name', 'value'])
+                t.align['name'] = 'r'
+                t.align['value'] = 'l'
+                t.add_row(['id', result['orderId']])
+                t.add_row(['created', result['orderDate']])
+                output = t
+            else:
+                raise CLIAbort('Aborting dedicated server order.')
 
         return output
+
+    @classmethod
+    def _validate_args(cls, args):
+        invalid_args = [k for k in cls.required_params if args.get(k) is None]
+        if invalid_args:
+            raise ArgumentError('Missing required options: %s'
+                                % ','.join(invalid_args))
 
     @classmethod
     def _get_default_value(cls, ds_options, option):

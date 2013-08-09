@@ -253,11 +253,13 @@ class HardwareManager(IdentifierMixin, object):
                 'port, primarySubnet]',
                 'networkComponents.primarySubnet[id, netmask,'
                 'broadcastAddress, networkIdentifier, gateway]',
+                'hardwareChassis[id,name]',
                 'activeTransaction.id',
                 'operatingSystem.softwareLicense.'
                 'softwareDescription[manufacturer,name,version,referenceCode]',
                 'operatingSystem.passwords[username,password]',
                 'billingItem.recurringFee',
+                'hourlyBillingFlag',
                 'tagReferences[id,tag[name,id]]',
                 'networkVlans[id,vlanNumber,networkSpace]',
             ])
