@@ -349,13 +349,15 @@ Optional:
                            Note: Omitting this value defaults to the first
                              available datacenter
   -n MBPS, --network=MBPS  Network port speed in Mbps
-  --private                Allocate a private CCI
+  --dedicated              Allocate a dedicated CCI (non-shared host)
   --dry-run, --test        Do not create CCI, just get a quote
 
   -u --userdata=DATA       User defined metadata string
   -F --userfile=FILE       Read userdata from file
   -i --postinstall=URI     Post-install script to download
                              (Only HTTPS executes, HTTP leaves file in /root)
+  --private                Forces the CCI to only have access the private
+                             network.
   --wait=SECONDS           Block until CCI is finished provisioning for up to X
                              seconds before returning.
 """
@@ -380,8 +382,9 @@ Optional:
             "cpus": args['--cpu'],
             "domain": args['--domain'],
             "hostname": args['--hostname'],
-            "private": args['--private'],
+            "dedicated": args['--dedicated'],
             "local_disk": True,
+            "private": args['--private']
         }
 
         try:
