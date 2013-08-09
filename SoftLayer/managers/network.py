@@ -7,7 +7,8 @@
     :license: BSD, see LICENSE for more details.
 """
 
-from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
+from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin, \
+    resolve_ids
 
 
 class NetworkManager(IdentifierMixin, object):
@@ -20,6 +21,23 @@ class NetworkManager(IdentifierMixin, object):
         self.account = client['Account']
         #: Reference to the SoftLayer_Network_Vlan object.
         self.vlan = client['Network_Vlan']
+        self.subnet = client['Network_Subnet']
+        self.subnet_resolvers = [self._get_subnet_by_identifier]
+
+    def ip_lookup(self, ip):
+        """ Looks up an IP address and returns network information about it.
+
+        :param string ip: An IP address. Can be IPv4 or IPv6
+        :returns: A dictionary of information about the IP
+
+        """
+        mask = [
+            'hardware',
+            'virtualGuest'
+        ]
+        mask = 'mask[%s]' % ','.join(mask)
+        obj = self.client['Network_Subnet_IpAddress']
+        return obj.getByIpAddress(ip, mask=mask)
 
     def get_vlan(self, id):
         """ Returns information about a single VLAN.
@@ -30,6 +48,17 @@ class NetworkManager(IdentifierMixin, object):
 
         """
         return self.vlan.getObject(id=id, mask=self._get_vlan_mask())
+
+    def get_subnet(self, id):
+        """ Returns information about a single subnet.
+
+        :param string id: Either the ID for the subnet or its network
+                          identifier
+        :returns: A dictionary of information about the subnet
+        """
+        id = resolve_ids(id, self.subnet_resolvers)[0]
+        return self.subnet.getObject(id=id, mask='mask[%s]' %
+                                     ','.join(self._get_subnet_mask()))
 
     def list_vlans(self, datacenter=None, vlan_number=None, **kwargs):
         """ Display a list of all VLANs on the account.
@@ -56,6 +85,48 @@ class NetworkManager(IdentifierMixin, object):
         kwargs['filter'] = _filter.to_dict()
 
         return self._get_vlans(**kwargs)
+
+    def list_subnets(self, identifier=None, datacenter=None, version=0,
+                     **kwargs):
+        """ Display a list of all subnets on the account.
+
+        This provides a quick overview of all subnets including information
+        about data center residence and the number of devices attached.
+
+        :param string datacenter: If specified, the list will only contain
+                                  subnets in the specified data center.
+        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+
+        """
+        if 'mask' not in kwargs:
+            mask = self._get_subnet_mask()
+            kwargs['mask'] = 'mask[%s]' % ','.join(mask)
+
+        _filter = NestedDict(kwargs.get('filter') or {})
+
+        # TODO - I don't think filtering works on subnets in the API
+        #if identifier:
+        #    _filter['networkIdentifier'] = query_filter(identifier)
+        #if datacenter:
+        #    _filter['networkVlans']['primaryRouter']['datacenter']['name'] = \
+        #        query_filter(datacenter)
+        # if version:
+        #     _filter['version'] = query_filter(version)
+
+        kwargs['filter'] = _filter.to_dict()
+
+        results = self.account.getSubnets(**kwargs)
+
+        if any([version, identifier, datacenter]):
+            if version:
+                results = filter(lambda x: x['version'] == version, results)
+            if identifier:
+                results = filter(lambda x: x['networkIdentifier'] ==
+                                 identifier, results)
+            if datacenter:
+                results = filter(lambda x: x['datacenter']['name'] ==
+                                 datacenter, results)
+        return results
 
     def summary_by_datacenter(self):
         """ Provides a dictionary with a summary of all network information on
@@ -96,6 +167,15 @@ class NetworkManager(IdentifierMixin, object):
 
         return datacenters
 
+    def _get_subnet_by_identifier(self, identifier):
+        """ Returns the ID of the subnet matching the specified identifier.
+
+        :param string identifier: The identifier to look up
+        :returns: The ID of the matching subnet or None
+        """
+        results = self.list_subnets(identifier=identifier, mask='id')
+        return [result['id'] for result in results]
+
     def _get_vlans(self, **kwargs):
         """ Returns a list of VLANs.
 
@@ -106,6 +186,20 @@ class NetworkManager(IdentifierMixin, object):
         """
         return self.account.getNetworkVlans(mask=self._get_vlan_mask(),
                                             **kwargs)
+
+    @staticmethod
+    def _get_subnet_mask():
+        """ Returns the standard subnet object mask.
+
+        Wrapper method to prevent duplicated code.
+
+        """
+        return [
+            'hardware',
+            'datacenter',
+            'ipAddressCount',
+            'virtualGuests',
+        ]
 
     @staticmethod
     def _get_vlan_mask():
