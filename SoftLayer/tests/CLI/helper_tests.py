@@ -8,7 +8,6 @@
 import sys
 import os
 import json
-import StringIO
 
 import SoftLayer.CLI as cli
 from SoftLayer.tests import FIXTURE_PATH, unittest
@@ -373,4 +372,4 @@ class TestExportToTemplate(unittest.TestCase):
             open_().write.assert_has_calls([
                 call('datacenter=ams01\n'),
                 call('disk=disk1,disk2\n'),
-            ])
+            ], any_order=False)  # Order isn't really guarenteed
