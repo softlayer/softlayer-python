@@ -1,6 +1,6 @@
 """
     SoftLayer.sshkey
-    ~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~
     SSH Key Manager/helpers
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
