@@ -220,7 +220,7 @@ class CCIManager(IdentifierMixin, object):
             datacenter=None, os_code=None, image_id=None,
             private=False, public_vlan=None, private_vlan=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
-            ssh_key=None):
+            private=False, ssh_key=None):
         """
         Translates a list of arguments into a dictionary necessary for creating
         a CCI.
@@ -239,9 +239,9 @@ class CCIManager(IdentifierMixin, object):
                                if image_id is specified.
         :param int image_id: The ID of the image to load onto the server.
                              Cannot be specified if os_code is specified.
-        :param bool private: Flag to indicate if this should be housed on a
-                             private or shared host (default). This will incur
-                             a fee on your account.
+        :param bool dedicated: Flag to indicate if this should be housed on a
+                               dedicated or shared host (default). This will
+                               incur a fee on your account.
         :param int public_vlan: The ID of the public VLAN on which you want
                                 this CCI placed.
         :param int private_vlan: The ID of the public VLAN on which you want
@@ -251,6 +251,8 @@ class CCIManager(IdentifierMixin, object):
         :param list disks: A list of disk capacities for this server.
         :param string post_url: The URI of the post-install script to run
                                 after reload
+        :param bool private: If true, the CCI will be provisioned only with
+                             access to the private network. Defaults to false
         :param string ssh_key: The SSH key to add to the root user
         """
 
@@ -278,8 +280,11 @@ class CCIManager(IdentifierMixin, object):
 
         data["hourlyBillingFlag"] = hourly
 
+        if dedicated:
+            data["dedicatedAccountHostOnlyFlag"] = dedicated
+
         if private:
-            data["dedicatedAccountHostOnlyFlag"] = private
+            data['privateNetworkOnlyFlag'] = private
 
         if image_id:
             data["blockDeviceTemplateGroup"] = {"globalIdentifier": image_id}

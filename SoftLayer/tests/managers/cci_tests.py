@@ -228,14 +228,14 @@ class CCITests(unittest.TestCase):
 
         self.assertEqual(data, assert_data)
 
-    def test_generate_private(self):
+    def test_generate_dedicated(self):
         data = self.cci._generate_create_dict(
             cpus=1,
             memory=1,
             hostname='test',
             domain='example.com',
             os_code="STRING",
-            private=True,
+            dedicated=True,
         )
 
         assert_data = {
@@ -360,6 +360,31 @@ class CCITests(unittest.TestCase):
             'domain': 'example.com',
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
+            'hourlyBillingFlag': True,
+            'networkComponents': [{'maxSpeed': 9001}],
+        }
+
+        self.assertEqual(data, assert_data)
+
+    def test_generate_private_network_only(self):
+        data = self.cci._generate_create_dict(
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='example.com',
+            os_code="STRING",
+            nic_speed=9001,
+            private=True
+        )
+
+        assert_data = {
+            'startCpus': 1,
+            'maxMemory': 1,
+            'hostname': 'test',
+            'domain': 'example.com',
+            'localDiskFlag': True,
+            'operatingSystemReferenceCode': "STRING",
+            'privateNetworkOnlyFlag': True,
             'hourlyBillingFlag': True,
             'networkComponents': [{'maxSpeed': 9001}],
         }
