@@ -19,7 +19,7 @@ The available modules are:
   image     Manages compute and flex images
   metadata  Get details about this machine. Also available with 'my' and 'meta'
   nas       View NAS details
-  sshkey   Manage SSH keys on your account
+  sshkey    Manage SSH keys on your account
   ssl       Manages SSL
 
 See 'sl help <module>' for more information on a specific module.
