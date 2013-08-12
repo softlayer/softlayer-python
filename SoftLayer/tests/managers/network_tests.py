@@ -61,12 +61,6 @@ class NetworkTests(unittest.TestCase):
                 'datacenter': {'name': 'dal00'},
                 'version': 4,
             },
-            {
-                'id': 101,
-                'networkIdentifier': '10.0.1.1',
-                'datacenter': {'name': 'dal05'},
-                'version': 4,
-            },
         ]
 
         result = self.network.list_subnets(
@@ -143,20 +137,14 @@ class NetworkTests(unittest.TestCase):
 
     def test_resolve_ids_ip(self):
         service = self.client['Account']
-        service.getSubnets.return_value = [
+        service.getSubnets.side_effect = [[
             {
                 'id': '100',
                 'networkIdentifier': '10.0.0.1',
                 'datacenter': {'name': 'dal00'},
                 'version': 4,
             },
-            {
-                'id': '101',
-                'networkIdentifier': '10.0.1.1',
-                'datacenter': {'name': 'dal05'},
-                'version': 4,
-            },
-        ]
+        ], []]
 
         _id = self.network._get_subnet_by_identifier('10.0.0.1')
         self.assertEqual(_id, ['100'])
