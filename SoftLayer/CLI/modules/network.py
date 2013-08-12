@@ -22,7 +22,7 @@ from SoftLayer.CLI import (CLIRunnable, Table, KeyValueTable, FormattedItem,
 from SoftLayer.CLI.helpers import (CLIAbort, SequentialOutput)
 
 
-class NetworkFindIp(CLIRunnable):
+class NetworkLookupIp(CLIRunnable):
     """
 usage: sl network ip-lookup <ip>
 
@@ -139,10 +139,10 @@ Filters:
         t.add_row(['id', subnet['id']])
         t.add_row(['identifier', subnet['networkIdentifier']])
         t.add_row(['subnet type', subnet['subnetType']])
-        t.add_row(['gateway', subnet['gateway']])
-        t.add_row(['broadcast', subnet['broadcastAddress']])
+        t.add_row(['gateway', subnet.get('gateway', '-')])
+        t.add_row(['broadcast', subnet.get('broadcastAddress', '-')])
         t.add_row(['datacenter', subnet['datacenter']['name']])
-        t.add_row(['usable ips', subnet['usableIpAddressCount']])
+        t.add_row(['usable ips', subnet.get('usableIpAddressCount', '-')])
 
         if not args.get('--no-cci'):
             if subnet['virtualGuests']:
@@ -152,7 +152,7 @@ Filters:
                 for cci in subnet['virtualGuests']:
                     cci_table.add_row([cci['hostname'],
                                        cci['domain'],
-                                       cci['primaryIpAddress']])
+                                       cci.get('primaryIpAddress')])
                 t.add_row(['ccis', cci_table])
             else:
                 t.add_row(['cci', 'none'])
@@ -165,7 +165,7 @@ Filters:
                 for hw in subnet['hardware']:
                     hw_table.add_row([hw['hostname'],
                                       hw['domain'],
-                                      hw['primaryIpAddress']])
+                                      hw.get('primaryIpAddress')])
                 t.add_row(['hardware', hw_table])
             else:
                 t.add_row(['hardware', 'none'])
@@ -262,7 +262,7 @@ Filters:
             subnet_table.add_row(['id', subnet['id']])
             subnet_table.add_row(['identifier', subnet['networkIdentifier']])
             subnet_table.add_row(['netmask', subnet['netmask']])
-            subnet_table.add_row(['gateway', subnet['gateway']])
+            subnet_table.add_row(['gateway', subnet.get('gateway', '-')])
             subnet_table.add_row(['type', subnet['subnetType']])
             subnet_table.add_row(['usable ips',
                                   subnet['usableIpAddressCount']])
@@ -278,7 +278,7 @@ Filters:
                 for cci in vlan['virtualGuests']:
                     cci_table.add_row([cci['hostname'],
                                        cci['domain'],
-                                       cci['primaryIpAddress']])
+                                       cci.get('primaryIpAddress')])
                 t.add_row(['ccis', cci_table])
             else:
                 t.add_row(['cci', 'none'])
@@ -291,7 +291,7 @@ Filters:
                 for hw in vlan['hardware']:
                     hw_table.add_row([hw['hostname'],
                                       hw['domain'],
-                                      hw['primaryIpAddress']])
+                                      hw.get('primaryIpAddress')])
                 t.add_row(['hardware', hw_table])
             else:
                 t.add_row(['hardware', 'none'])
