@@ -187,6 +187,7 @@ Filters:
   -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
   --v4                     Display only IPV4 subnets
   --v6                     Display only IPV6 subnets
+  --identifier=ID          Filter by identifier
 """
     action = 'subnet-list'
 
@@ -209,6 +210,7 @@ Filters:
         subnets = mgr.list_subnets(
             datacenter=args.get('--datacenter'),
             version=version,
+            identifier=args.get('--identifier'),
         )
 
         for subnet in subnets:

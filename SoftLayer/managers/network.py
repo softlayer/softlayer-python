@@ -104,28 +104,17 @@ class NetworkManager(IdentifierMixin, object):
 
         _filter = NestedDict(kwargs.get('filter') or {})
 
-        # TODO - I don't think filtering works on subnets in the API
-        #if identifier:
-        #    _filter['networkIdentifier'] = query_filter(identifier)
-        #if datacenter:
-        #    _filter['networkVlans']['primaryRouter']['datacenter']['name'] = \
-        #        query_filter(datacenter)
-        # if version:
-        #     _filter['version'] = query_filter(version)
+        if identifier:
+            _filter['subnets']['networkIdentifier'] = query_filter(identifier)
+        if datacenter:
+            _filter['subnets']['datacenter']['name'] = \
+                query_filter(datacenter)
+        if version:
+            _filter['subnets']['version'] = query_filter(version)
 
         kwargs['filter'] = _filter.to_dict()
 
         results = self.account.getSubnets(**kwargs)
-
-        if any([version, identifier, datacenter]):
-            if version:
-                results = filter(lambda x: x['version'] == version, results)
-            if identifier:
-                results = filter(lambda x: x['networkIdentifier'] ==
-                                 identifier, results)
-            if datacenter:
-                results = filter(lambda x: x['datacenter']['name'] ==
-                                 datacenter, results)
         return results
 
     def summary_by_datacenter(self):
