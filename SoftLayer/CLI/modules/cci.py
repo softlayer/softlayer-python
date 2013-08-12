@@ -517,7 +517,8 @@ Optional:
                 '--network': like_details['networkComponents'][0]['maxSpeed'],
                 '--user-data': like_details['userData'] or None,
                 '--postinstall': like_details.get('postInstallScriptUri'),
-                '--private': like_details['dedicatedAccountHostOnlyFlag'],
+                '--dedicated': like_details['dedicatedAccountHostOnlyFlag'],
+                '--private': like_details['privateNetworkOnlyFlag'],
             }
 
             # Handle mutually exclusive options
@@ -558,6 +559,7 @@ Optional:
             "domain": args['--domain'],
             "hostname": args['--hostname'],
             "private": args['--private'],
+            "dedicated": args['--dedicated'],
             "local_disk": True,
         }
 
