@@ -13,16 +13,11 @@ The available commands are:
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: BSD, see LICENSE for more details.
 
-from os import linesep
-import os.path
+from os.path import expanduser
 
 from SoftLayer import SshKeyManager
-from SoftLayer.CLI import (
-    CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
-    FormattedItem)
-from SoftLayer.CLI.helpers import (
-    CLIAbort, ArgumentError, SequentialOutput, NestedDict, blank, resolve_id,
-    KeyValueTable)
+from SoftLayer.CLI import (CLIRunnable, Table, no_going_back)
+from SoftLayer.CLI.helpers import (CLIAbort, resolve_id, KeyValueTable)
 
 
 class AddSshKey(CLIRunnable):
@@ -48,7 +43,7 @@ Required:
         if args.get('--key'):
             key = args['--key']
         else:
-            f = open(args['--file'], 'rU')
+            f = open(expanduser(args['--file']), 'rU')
             key = f.read().strip()
             f.close()
 
@@ -161,7 +156,7 @@ Options:
         key = mgr.get_key(key_id)
 
         if args.get('--file'):
-            f = open(args['--file'], 'w')
+            f = open(expanduser(args['--file']), 'w')
             f.write(key['key'])
             f.close()
 
