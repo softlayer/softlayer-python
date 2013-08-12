@@ -25,7 +25,7 @@ from SoftLayer.CLI.helpers import (
     CLIRunnable, Table, KeyValueTable, FormattedItem, NestedDict, CLIAbort,
     blank, listing, SequentialOutput, gb, no_going_back, resolve_id, confirm,
     ArgumentError)
-from SoftLayer import HardwareManager
+from SoftLayer import HardwareManager, SshKeyManager
 
 
 class ListHardware(CLIRunnable):
@@ -614,6 +614,7 @@ Optional:
   -n MBPS, --network=MBPS  Network port speed in Mbps
   --controller=RAID        The RAID configuration for the server.
                              Defaults to None.
+  -k KEY, --key=KEY        The SSH key to assign to the root user
   --dry-run, --test        Do not create the server, just get a quote
 """
     action = 'create'
@@ -681,6 +682,12 @@ Optional:
             order['port_speed'] = nic_price
         else:
             raise CLIAbort('Invalid NIC speed specified.')
+
+        # Get the SSH key
+        if args.get('--key'):
+            key_id = resolve_id(SshKeyManager(client).resolve_ids,
+                                args.get('--key'), 'SshKey')
+            order['ssh_key'] = key_id
 
         # Begin output
         t = Table(['Item', 'cost'])
