@@ -22,19 +22,22 @@ from SoftLayer.CLI.helpers import (CLIAbort, resolve_id, KeyValueTable)
 
 class AddSshKey(CLIRunnable):
     """
-usage: sl sshkey add <label> (--file=FILE | --key=KEY )[options]
+usage: sl sshkey add <label> (--file=FILE | --key=KEY ) [options]
 
 Add a new SSH key to your account
 
 Required:
-  <label>                 The label for your SSH key. will appear in various
-                            interfaces to help you easily identify this key.
-                            You can enclose multiple words in quotation marks
-                            "like this" if desired.
-  -f FILE, --file=FILE    The id_rsa.pub file to import for this key. Mutually
-                            exclusive with --key
-  -k KEY, --key=KEY       The actual SSH key. Mutually exclusive with --file.
-                            Should be enclosed within quotation marks.
+  <label>                  The label for your SSH key. will appear in various
+                             interfaces to help you easily identify this key.
+                             You can enclose multiple words in quotation marks
+                             "like this" if desired.
+  -f FILE, --file=FILE     The id_rsa.pub file to import for this key. Mutually
+                             exclusive with --key
+  -k KEY, --key=KEY        The actual SSH key. Mutually exclusive with --file.
+                             Should be enclosed within quotation marks.
+
+Optional:
+  -n NOTES, --notes=NOTES  Any notes you want to add to the SSH key.
 """
     action = 'add'
 
@@ -48,7 +51,7 @@ Required:
             f.close()
 
         mgr = SshKeyManager(client)
-        result = mgr.add_key(key, args['<label>'])
+        result = mgr.add_key(key, args['<label>'], args.get('--notes'))
 
         if type(result) is dict and result.get('fingerprint'):
             return "SSH key added."
