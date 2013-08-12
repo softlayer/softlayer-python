@@ -359,6 +359,7 @@ Optional:
   -k KEY, --key=KEY        The SSH key to add to the root user
   --private                Forces the CCI to only have access the private
                              network.
+  -k KEY, --key=KEY        The SSH key to add to the root user
   --wait=SECONDS           Block until CCI is finished provisioning for up to X
                              seconds before returning.
 """
