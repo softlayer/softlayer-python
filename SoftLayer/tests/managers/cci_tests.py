@@ -132,6 +132,22 @@ class CCITests(unittest.TestCase):
         self.client['Virtual_Guest'].createObject.assert_called_once_with(
             {'test': 1, 'verify': 1})
 
+    @patch('SoftLayer.managers.cci.CCIManager._generate_create_dict')
+    def test_create_instance_with_ssh_key(self, create_dict):
+        create_dict.return_value = {'test': 1, 'verify': 1}
+        f = self.client['Virtual_Guest'].generateOrderTemplate
+        f.return_value = {
+            'prices': [100, 200]
+        }
+
+        self.cci.create_instance(test=1, verify=1, ssh_key=30)
+
+        create_dict.assert_called_once_with(test=1, verify=1, ssh_key=30)
+        f.assert_called_once_with({'test': 1, 'verify': 1})
+        self.client['Product_Order'].placeOrder.assert_called_once_with(
+            {'prices': [100, 200], 'sshKeys': [{'sshKeyIds': [30]}]}
+        )
+
     def test_generate_os_and_image(self):
         self.assertRaises(
             ValueError,
