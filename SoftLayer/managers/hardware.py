@@ -396,7 +396,8 @@ class HardwareManager(IdentifierMixin, object):
     def _generate_create_dict(
             self, server=None, hostname=None, domain=None, hourly=False,
             location=None, os=None, disks=None, port_speed=None,
-            bare_metal=None, ram=None, package_id=None, disk_controller=None):
+            bare_metal=None, ram=None, package_id=None, disk_controller=None,
+            ssh_key=None):
         """
         Translates a list of arguments into a dictionary necessary for creating
         a server.
@@ -449,6 +450,9 @@ class HardwareManager(IdentifierMixin, object):
             'prices': [
             ],
         }
+
+        if ssh_key:
+            order['sshKeys'] = [{'sshKeyIds': [ssh_key]}]
 
         if bare_metal:
             order['packageId'] = self._get_bare_metal_package_id()

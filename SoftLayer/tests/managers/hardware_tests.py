@@ -132,33 +132,36 @@ class HardwareTests(unittest.TestCase):
             'hourly': True,
         }
 
-        assert_data = {
-            'hardware': [{
-                'bareMetalInstanceFlag': args['bare_metal'],
-                'hostname': args['hostname'],
-                'domain': args['domain'],
-            }],
-            'location': args['location'],
-            'packageId': package_id,
-            'hourlyBillingFlag': True,
+        expected = {
+            'hardware': [
+                {'domain': 'giggles.woo',
+                 'bareMetalInstanceFlag': True,
+                 'hostname': 'unicorn'}],
             'prices': [
-                {'id': args['server']},
-                {'id': args['disks'][0]},
-                {'id': args['os']},
-                {'id': args['port_speed']},
+                {'id': 100},
+                {'id': 500},
+                {'id': 200},
+                {'id': 600},
+                {'id': 12000}
             ],
+            'hourlyBillingFlag': True,
+            'location': 'Wyrmshire', 'packageId': 50
         }
 
         data = self.hardware._generate_create_dict(**args)
 
-        self.assertEqual(data, assert_data)
+        self.assertEqual(expected, data)
 
     def test_generate_create_dict_with_all_dedicated_server_options(self):
+        package_id = 13
+
+        self._setup_package_mocks(package_id)
+
         args = {
             'server': 100,
             'hostname': 'unicorn',
             'domain': 'giggles.woo',
-            'disks': [500],
+            'disks': [1000, 1000, 1000, 1000],
             'location': 'Wyrmshire',
             'os': 200,
             'port_speed': 600,
@@ -166,29 +169,31 @@ class HardwareTests(unittest.TestCase):
             'package_id': 13,
             'ram': 1400,
             'disk_controller': 1500,
+            'ssh_key': 3000,
         }
 
-        assert_data = {
-            'hardware': [{
-                'bareMetalInstanceFlag': args['bare_metal'],
-                'hostname': args['hostname'],
-                'domain': args['domain'],
-            }],
-            'location': args['location'],
-            'packageId': 13,
+        expected = {
+            'hardware': [
+                {'domain': 'giggles.woo',
+                 'bareMetalInstanceFlag': False,
+                 'hostname':
+                 'unicorn'}],
             'prices': [
-                {'id': args['server']},
-                {'id': args['disks'][0]},
-                {'id': args['os']},
-                {'id': args['port_speed']},
-                {'id': args['ram']},
-                {'id': args['disk_controller']},
-            ],
+                {'id': 100},
+                {'id': 1000},
+                {'id': 1000},
+                {'id': 1000},
+                {'id': 1000},
+                {'id': 200},
+                {'id': 600},
+                {'id': 1400},
+                {'id': 1500}],
+            'sshKeys': [{'sshKeyIds': [3000]}],
+            'location': 'Wyrmshire', 'packageId': 13
         }
 
         data = self.hardware._generate_create_dict(**args)
-
-        self.assertEqual(data, assert_data)
+        self.assertEqual(expected, data)
 
     @patch('SoftLayer.managers.hardware.HardwareManager._generate_create_dict')
     def test_verify_order(self, create_dict):
@@ -327,15 +332,35 @@ class HardwareTests(unittest.TestCase):
             'description': 'Random unit testing location',
         }]
 
-        self.client['Product_Package'].getConfiguration.return_value = [{
-            'itemCategory': {
-                'categoryCode': 'random',
-                'name': 'Random Category',
+        self.client['Product_Package'].getConfiguration.return_value = [
+            {
+                'itemCategory': {
+                    'categoryCode': 'random',
+                    'name': 'Random Category',
+                },
+                'sort': 0,
+                'orderStepId': 1,
+                'isRequired': 0,
             },
-            'sort': 0,
-            'orderStepId': 1,
-            'isRequired': 0,
-        }]
+            {
+                'itemCategory': {
+                    'categoryCode': 'disk0',
+                    'name': 'First Disk',
+                },
+                'sort': 0,
+                'orderStepId': 1,
+                'isRequired': 1,
+            },
+            {
+                'itemCategory': {
+                    'categoryCode': 'disk1',
+                    'name': 'Second Disk',
+                },
+                'sort': 0,
+                'orderStepId': 1,
+                'isRequired': 1,
+            }
+        ]
 
         prices = [{
             'itemId': 888,
@@ -353,14 +378,71 @@ class HardwareTests(unittest.TestCase):
             }
         }]
 
-        self.client['Product_Package'].getCategories.return_value = [{
-            'categoryCode': 'random',
-            'name': 'Random Category',
-            'id': 1000,
-            'groups': [{
-                'sort': 0,
-                'prices': prices,
-                'itemCategoryId': 1000,
-                'packageId': package_id,
-            }],
+        disk0_prices = [{
+            'itemId': 2000,
+            'id': 12000,
+            'sort': 0,
+            'setupFee': 0,
+            'recurringFee': 0,
+            'hourlyRecurringFee': 0,
+            'oneTimeFee': 0,
+            'laborFee': 0,
+            'item': {
+                'id': 2000,
+                'description': '1TB Drive',
+                'capacity': 1000,
+            }
         }]
+
+        disk1_prices = [{
+            'itemId': 2000,
+            'id': 12000,
+            'sort': 0,
+            'setupFee': 0,
+            'recurringFee': 25.0,
+            'hourlyRecurringFee': 0,
+            'oneTimeFee': 0,
+            'laborFee': 0,
+            'item': {
+                'id': 2000,
+                'description': '1TB Drive',
+                'capacity': 1000,
+            }
+        }]
+        self.client['Product_Package'].getCategories.return_value = [
+            {
+                'categoryCode': 'random',
+                'name': 'Random Category',
+                'id': 1000,
+                'groups': [{
+                    'sort': 0,
+                    'prices': prices,
+                    'itemCategoryId': 1000,
+                    'packageId': package_id,
+                }],
+            },
+            {
+                'categoryCode': 'disk0',
+                'name': 'First Disk',
+                'isRequired': 1,
+                'id': 1001,
+                'groups': [{
+                    'sort': 0,
+                    'prices': disk0_prices,
+                    'itemCategoryId': 1001,
+                    'packageId': package_id,
+                }],
+            },
+            {
+                'categoryCode': 'disk1',
+                'name': 'Second Disk',
+                'isRequired': 1,
+                'id': 1002,
+                'groups': [{
+                    'sort': 0,
+                    'prices': disk1_prices,
+                    'itemCategoryId': 1002,
+                    'packageId': package_id,
+                }],
+            }
+        ]

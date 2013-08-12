@@ -220,7 +220,7 @@ class CCIManager(IdentifierMixin, object):
             datacenter=None, os_code=None, image_id=None,
             dedicated=False, public_vlan=None, private_vlan=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
-            private=False):
+            private=False, ssh_key=None):
         """
         Translates a list of arguments into a dictionary necessary for creating
         a CCI.
@@ -253,6 +253,7 @@ class CCIManager(IdentifierMixin, object):
                                 after reload
         :param bool private: If true, the CCI will be provisioned only with
                              access to the private network. Defaults to false
+        :param string ssh_key: The SSH key to add to the root user
         """
 
         required = [cpus, memory, hostname, domain]
@@ -327,6 +328,9 @@ class CCIManager(IdentifierMixin, object):
         if post_uri:
             data['postInstallScriptUri'] = post_uri
 
+        if ssh_key:
+            data['ssh_key'] = ssh_key
+
         return data
 
     def wait_for_transaction(self, id, limit, delay=1):
@@ -359,7 +363,15 @@ class CCIManager(IdentifierMixin, object):
         """ Orders a new instance. See :func:`_generate_create_dict` for
         a list of available options. """
         create_options = self._generate_create_dict(**kwargs)
-        return self.guest.createObject(create_options)
+
+        # createObject doesn't support SSH keys yet, so if we want to add an
+        # SSH key, we need to do something a bit more awkward
+        if kwargs.get('ssh_key'):
+            order = self.guest.generateOrderTemplate(create_options)
+            order['sshKeys'] = [{'sshKeyIds': [kwargs.get('ssh_key')]}]
+            return self.client['Product_Order'].placeOrder(order)
+        else:
+            return self.guest.createObject(create_options)
 
     def change_port_speed(self, id, public, speed):
         """ Allows you to change the port speed of a CCI's NICs.
