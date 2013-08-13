@@ -1,5 +1,5 @@
 """
-    SoftLayer.tests.api_tests
+    tests.api_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
@@ -9,7 +9,7 @@ from mock import patch, call, Mock
 
 import SoftLayer
 import SoftLayer.API
-from SoftLayer.tests import unittest
+from tests import unittest
 from SoftLayer.consts import USER_AGENT
 
 

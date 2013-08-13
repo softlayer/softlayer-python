@@ -1,5 +1,5 @@
 """
-    SoftLayer.tests.auth_tests
+    tests.auth_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
@@ -7,7 +7,7 @@
 """
 from SoftLayer.auth import (
     AuthenticationBase, BasicAuthentication, TokenAuthentication)
-from SoftLayer.tests import unittest
+from tests import unittest
 
 
 class TestAuthenticationBase(unittest.TestCase):

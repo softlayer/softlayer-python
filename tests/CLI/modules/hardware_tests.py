@@ -1,5 +1,5 @@
 """
-    SoftLayer.tests.CLI.modules.hardware_tests
+    tests.CLI.modules.hardware_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     This is a series of integration tests designed to test the complete
@@ -16,6 +16,8 @@ from mock import Mock, MagicMock, patch
 
 from SoftLayer.CLI.helpers import format_output, CLIAbort
 from SoftLayer.CLI.modules import server
+#from SoftLayer.CLI.modules.hardware import *
+from tests.mocks import account_mock
 
 
 class HardwareCLITests(unittest.TestCase):

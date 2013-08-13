@@ -1,5 +1,5 @@
 """
-    SoftLayer.tests.transport_tests
+    tests.transport_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
@@ -9,7 +9,7 @@ from mock import patch, MagicMock
 
 from SoftLayer import SoftLayerAPIError, TransportError
 from SoftLayer.transport import make_rest_api_call, make_xml_rpc_api_call
-from SoftLayer.tests import unittest
+from tests import unittest
 from requests import HTTPError, RequestException
 
 

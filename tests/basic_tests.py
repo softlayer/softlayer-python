@@ -1,5 +1,5 @@
 """
-    SoftLayer.tests.basic_tests
+    tests.basic_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Tests shared code
 
@@ -7,7 +7,7 @@
     :license: BSD, see LICENSE for more details.
 """
 import SoftLayer
-from SoftLayer.tests import unittest
+from tests import unittest
 
 
 class TestExceptions(unittest.TestCase):

@@ -1,5 +1,5 @@
 """
-    SoftLayer.tests.CLI.environment_tests
+    tests.CLI.environment_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
@@ -9,7 +9,7 @@ import sys
 import os
 from mock import patch, MagicMock
 
-from SoftLayer.tests import unittest
+from tests import unittest
 from SoftLayer.CLI.environment import Environment, InvalidCommand
 
 if sys.version_info >= (3,):

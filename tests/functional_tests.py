@@ -1,5 +1,5 @@
 """
-    SoftLayer.tests.functional_tests
+    tests.functional_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
@@ -8,7 +8,7 @@
 import os
 
 import SoftLayer
-from SoftLayer.tests import unittest
+from tests import unittest
 
 
 def get_creds():

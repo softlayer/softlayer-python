@@ -1,4 +1,4 @@
-from SoftLayer.tests.mocks import hardware_mock
+from tests.mocks import hardware_mock
 from mock import MagicMock
 
 

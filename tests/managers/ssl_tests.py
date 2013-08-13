@@ -1,12 +1,12 @@
 """
-    SoftLayer.tests.managers.ssl_tests
+    tests.managers.ssl_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
 from SoftLayer import SSLManager
-from SoftLayer.tests import unittest
+from tests import unittest
 
 from mock import MagicMock, ANY
 
