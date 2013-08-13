@@ -27,12 +27,13 @@ from os import linesep
 import os.path
 
 from SoftLayer import CCIManager, SshKeyManager
+from SoftLayer.utils import lookup
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
     FormattedItem)
 from SoftLayer.CLI.helpers import (
-    CLIAbort, ArgumentError, SequentialOutput, NestedDict, blank, resolve_id,
-    KeyValueTable)
+    CLIAbort, ArgumentError, NestedDict, blank, resolve_id, KeyValueTable,
+    update_with_template_args, FALSE_VALUES, export_to_template)
 
 
 class ListCCIs(CLIRunnable):
@@ -141,16 +142,21 @@ Options:
             result['status']['name'] or blank()
         )])
         t.add_row(['state', FormattedItem(
-            result['powerState']['keyName'], result['powerState']['name'])])
+            lookup(result, 'powerState', 'keyName'),
+            lookup(result, 'powerState', 'name'),
+        )])
         t.add_row(['datacenter', result['datacenter']['name']])
+        operating_system = lookup(result,
+                                  'operatingSystem',
+                                  'softwareLicense',
+                                  'softwareDescription')
         t.add_row([
             'os',
             FormattedItem(
-                result['operatingSystem']['softwareLicense']
-                ['softwareDescription']['referenceCode'] or blank(),
-                result['operatingSystem']['softwareLicense']
-                ['softwareDescription']['name'] or blank()
+                operating_system['version'] or blank(),
+                operating_system['name'] or blank()
             )])
+        t.add_row(['os_version', operating_system['version'] or blank()])
         t.add_row(['cores', result['maxCpu']])
         t.add_row(['memory', mb_to_gb(result['maxMemory'])])
         t.add_row(['public_ip', result['primaryIpAddress'] or blank()])
@@ -326,8 +332,7 @@ Options:
 
 class CreateCCI(CLIRunnable):
     """
-usage: sl cci create --hostname=HOST --domain=DOMAIN --cpu=CPU --memory=MEMORY
-                     (--os=OS | --image=GUID) (--hourly | --monthly) [options]
+usage: sl cci create [options]
 
 Order/create a CCI. See 'sl cci create-options' for valid options
 
@@ -345,7 +350,7 @@ Required:
 
 
 Optional:
-  -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
+  -d DC, --datacenter=DC   Datacenter shortname (sng01, dal05, ...)
                            Note: Omitting this value defaults to the first
                              available datacenter
   -n MBPS, --network=MBPS  Network port speed in Mbps
@@ -359,34 +364,198 @@ Optional:
   -k KEY, --key=KEY        The SSH key to add to the root user
   --private                Forces the CCI to only have access the private
                              network.
-  -k KEY, --key=KEY        The SSH key to add to the root user
+  -t, --template=FILE      A template file that defaults the command-line
+                            options using the long name in INI format
+  --like=IDENTIFIER        Use the configuration from an existing CCI
+  --export=FILE            Exports options to a template file
   --wait=SECONDS           Block until CCI is finished provisioning for up to X
-                             seconds before returning.
+                             seconds before returning
 """
     action = 'create'
     options = ['confirm']
+    required_params = ['--hostname', '--domain', '--cpu', '--memory']
 
-    @staticmethod
-    def execute(client, args):
+    @classmethod
+    def execute(cls, client, args):
+        update_with_template_args(args)
         cci = CCIManager(client)
+        cls._update_with_like_args(cci, args)
+        cls._validate_args(args)
 
-        if args['--userdata'] and args['--userfile']:
+        # Do not create CCI with --test or --export
+        do_create = not (args['--export'] or args['--test'])
+
+        t = Table(['Item', 'cost'])
+        t.align['Item'] = 'r'
+        t.align['cost'] = 'r'
+        data = cls._parse_create_args(client, args)
+
+        output = []
+        if args.get('--test'):
+            result = cci.verify_create_instance(**data)
+            total_monthly = 0.0
+            total_hourly = 0.0
+
+            t = Table(['Item', 'cost'])
+            t.align['Item'] = 'r'
+            t.align['cost'] = 'r'
+
+            for price in result['prices']:
+                total_monthly += float(price.get('recurringFee', 0.0))
+                total_hourly += float(price.get('hourlyRecurringFee', 0.0))
+                if args.get('--hourly'):
+                    rate = "%.2f" % float(price['hourlyRecurringFee'])
+                else:
+                    rate = "%.2f" % float(price['recurringFee'])
+
+                t.add_row([price['item']['description'], rate])
+
+            if args.get('--hourly'):
+                total = total_hourly
+            else:
+                total = total_monthly
+
+            billing_rate = 'monthly'
+            if args.get('--hourly'):
+                billing_rate = 'hourly'
+            t.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
+            output.append(t)
+            output.append(FormattedItem(
+                None,
+                ' -- ! Prices reflected here are retail and do not '
+                'take account level discounts and are not guarenteed.')
+            )
+
+        if args['--export']:
+            export_file = args.pop('--export')
+            export_to_template(export_file, args, exclude=['--wait', '--test'])
+            return 'Successfully exported options to a template file.'
+
+        if do_create:
+            if args['--really'] or confirm(
+                    "This action will incur charges on your account. "
+                    "Continue?"):
+                result = cci.create_instance(**data)
+
+                t = KeyValueTable(['name', 'value'])
+                t.align['name'] = 'r'
+                t.align['value'] = 'l'
+                t.add_row(['id', result['id']])
+                t.add_row(['created', result['createDate']])
+                t.add_row(['guid', result['globalIdentifier']])
+                output.append(t)
+
+                if args.get('--wait'):
+                    ready = cci.wait_for_transaction(
+                        result['id'], int(args.get('--wait') or 1))
+                    t.add_row(['ready', ready])
+            else:
+                raise CLIAbort('Aborting CCI order.')
+
+        return output
+
+    @classmethod
+    def _validate_args(cls, args):
+        invalid_args = [k for k in cls.required_params if args.get(k) is None]
+        if invalid_args:
+            raise ArgumentError('Missing required options: %s'
+                                % ','.join(invalid_args))
+
+        if all([args['--userdata'], args['--userfile']]):
             raise ArgumentError('[-u | --userdata] not allowed with '
                                 '[-F | --userfile]')
+
+        if args['--hourly'] in FALSE_VALUES:
+            args['--hourly'] = False
+
+        if args['--monthly'] in FALSE_VALUES:
+            args['--monthly'] = False
+
+        if all([args['--hourly'], args['--monthly']]):
+            raise ArgumentError('[--hourly] not allowed with [--monthly]')
+
+        if not any([args['--hourly'], args['--monthly']]):
+            raise ArgumentError('One of [--hourly | --monthly] is required')
+
+        image_args = [args['--os'], args['--image']]
+        if all(image_args):
+            raise ArgumentError('[-o | --os] not allowed with [--image]')
+
+        if not any(image_args):
+            raise ArgumentError('One of [--os | --image] is required')
+
         if args['--userfile']:
             if not os.path.exists(args['--userfile']):
                 raise ArgumentError(
                     'File does not exist [-u | --userfile] = %s'
                     % args['--userfile'])
 
+    @staticmethod
+    def _update_with_like_args(cci, args):
+        """ Update arguments with options taken from a currently running CCI.
+
+        :param CCIManager args: A CCIManager
+        :param dict args: CLI arguments
+        """
+        if args['--like']:
+            cci_id = resolve_id(cci.resolve_ids, args.pop('--like'), 'CCI')
+            like_details = cci.get_instance(cci_id)
+            like_args = {
+                '--hostname': like_details['hostname'],
+                '--domain': like_details['domain'],
+                '--cpu': like_details['maxCpu'],
+                '--memory': like_details['maxMemory'],
+                '--hourly': like_details['hourlyBillingFlag'],
+                '--monthly': not like_details['hourlyBillingFlag'],
+                '--datacenter': like_details['datacenter']['name'],
+                '--network': like_details['networkComponents'][0]['maxSpeed'],
+                '--user-data': like_details['userData'] or None,
+                '--postinstall': like_details.get('postInstallScriptUri'),
+                '--dedicated': like_details['dedicatedAccountHostOnlyFlag'],
+                '--private': not any(vlan['networkSpace'] == 'PUBLIC'
+                                     for vlan in like_details['networkVlans']),
+            }
+
+            # Handle mutually exclusive options
+            like_image = lookup(like_details,
+                                'blockDeviceTemplateGroup',
+                                'globalIdentifier')
+            like_os = lookup(like_details,
+                             'operatingSystem',
+                             'softwareLicense',
+                             'softwareDescription',
+                             'referenceCode')
+            if like_image and not args.get('--os'):
+                like_args['--image'] = like_image
+            elif like_os and not args.get('--image'):
+                like_args['--os'] = like_os
+
+            if args.get('--hourly'):
+                like_args['--monthly'] = False
+
+            if args.get('--monthly'):
+                like_args['--hourly'] = False
+
+            # Merge like CCI options with the options passed in
+            for key, value in like_args.items():
+                if args.get(key) in [None, False]:
+                    args[key] = value
+
+    @staticmethod
+    def _parse_create_args(client, args):
+        """ Converts CLI arguments to arguments that can be passed into
+            CCIManager.create_instance.
+
+        :param dict args: CLI arguments
+        """
         data = {
             "hourly": args['--hourly'],
             "cpus": args['--cpu'],
             "domain": args['--domain'],
             "hostname": args['--hostname'],
+            "private": args['--private'],
             "dedicated": args['--dedicated'],
             "local_disk": True,
-            "private": args['--private']
         }
 
         try:
@@ -436,61 +605,7 @@ Optional:
                                 args.get('--key'), 'SshKey')
             data['ssh_key'] = key_id
 
-        t = Table(['Item', 'cost'])
-        t.align['Item'] = 'r'
-        t.align['cost'] = 'r'
-
-        if args.get('--test'):
-            result = cci.verify_create_instance(**data)
-            total_monthly = 0.0
-            total_hourly = 0.0
-            for price in result['prices']:
-                total_monthly += float(price.get('recurringFee', 0.0))
-                total_hourly += float(price.get('hourlyRecurringFee', 0.0))
-                if args.get('--hourly'):
-                    rate = "%.2f" % float(price['hourlyRecurringFee'])
-                else:
-                    rate = "%.2f" % float(price['recurringFee'])
-
-                t.add_row([price['item']['description'], rate])
-
-            if args.get('--hourly'):
-                total = total_hourly
-            else:
-                total = total_monthly
-
-            billing_rate = 'monthly'
-            if args.get('--hourly'):
-                billing_rate = 'hourly'
-            t.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
-            output = SequentialOutput()
-            output.append(t)
-            output.append(FormattedItem(
-                '',
-                ' -- ! Prices reflected here are retail and do not '
-                'take account level discounts and are not guarenteed.')
-            )
-
-        elif args['--really'] or confirm(
-                "This action will incur charges on your account. Continue?"):
-            result = cci.create_instance(**data)
-
-            t = KeyValueTable(['name', 'value'])
-            t.align['name'] = 'r'
-            t.align['value'] = 'l'
-            t.add_row(['id', result['id']])
-            t.add_row(['created', result['createDate']])
-            t.add_row(['guid', result['globalIdentifier']])
-            output = t
-        else:
-            raise CLIAbort('Aborting CCI order.')
-
-        if args.get('--wait') or 0 and not args.get('--test'):
-            ready = cci.wait_for_transaction(
-                result['id'], int(args.get('--wait') or 1))
-            t.add_row(['ready', ready])
-
-        return output
+        return data
 
 
 class ReadyCCI(CLIRunnable):

@@ -17,22 +17,10 @@ from os import linesep
 from SoftLayer.CLI import (
     CLIRunnable, Table, KeyValueTable, no_going_back, confirm, listing,
     FormattedItem)
-from SoftLayer.CLI.helpers import (CLIAbort, SequentialOutput)
+from SoftLayer.CLI.helpers import (
+    ArgumentError, CLIAbort, SequentialOutput, update_with_template_args,
+    FALSE_VALUES, resolve_id)
 from SoftLayer import HardwareManager
-
-
-def resolve_id(manager, identifier):
-    ids = manager.resolve_ids(identifier)
-
-    if len(ids) == 0:
-        raise CLIAbort("Error: Unable to find hardware '%s'" % identifier)
-
-    if len(ids) > 1:
-        raise CLIAbort(
-            "Error: Multiple hardware found for '%s': %s" %
-            (identifier, ', '.join([str(_id) for _id in ids])))
-
-    return ids[0]
 
 
 class BMetalCreateOptions(CLIRunnable):
@@ -276,9 +264,7 @@ Options:
 
 class CreateBMetalInstance(CLIRunnable):
     """
-usage: sl bmetal create --hostname=HOST --domain=DOMAIN --cpu=CPU --os=OS
-                       --memory=MEMORY --disk=DISK... (--hourly | --monthly)
-                       [options]
+usage: sl bmetal create [--disk=DISK...] [options]
 
 Order/create a bare metal instance. See 'sl bmetal create-options' for valid
 options
@@ -305,13 +291,24 @@ Optional:
                              available datacenter
   -n MBPS, --network=MBPS  Network port speed in Mbps
   --dry-run, --test        Do not create the instance, just get a quote
+  -t, --template=FILE      A template file that defaults the command-line
+                            options using the long name in INI format
+  --export=FILE            Exports options to a template file
 """
     action = 'create'
     options = ['confirm']
+    required_params = ['--hostname', '--domain', '--cpu', '--memory', '--os']
 
     @classmethod
     def execute(cls, client, args):
+        update_with_template_args(args)
         mgr = HardwareManager(client)
+
+        # Disks will be a comma-separated list. Let's make it a real list.
+        if isinstance(args.get('--disk'), str):
+            args['--disk'] = args.get('--disk').split(',')
+
+        cls._validate_args(args)
 
         bmi_options = mgr.get_bare_metal_create_options()
 
@@ -421,6 +418,25 @@ Optional:
         return output
 
     @classmethod
+    def _validate_args(cls, args):
+        invalid_args = [k for k in cls.required_params if args.get(k) is None]
+        if invalid_args:
+            raise ArgumentError('Missing required options: %s'
+                                % ','.join(invalid_args))
+
+        if args['--hourly'] in FALSE_VALUES:
+            args['--hourly'] = False
+
+        if args['--monthly'] in FALSE_VALUES:
+            args['--monthly'] = False
+
+        if all([args['--hourly'], args['--monthly']]):
+            raise ArgumentError('[--hourly] not allowed with [--monthly]')
+
+        if not any([args['--hourly'], args['--monthly']]):
+            raise ArgumentError('One of [--hourly | --monthly] is required')
+
+    @classmethod
     def _get_cpu_and_memory_price_ids(cls, bmi_options, cpu_value,
                                       memory_value):
         bmi_obj = BMetalCreateOptions()
@@ -482,7 +498,8 @@ Options:
     @staticmethod
     def execute(client, args):
         hw = HardwareManager(client)
-        hw_id = resolve_id(hw, args.get('<identifier>'))
+        hw_id = resolve_id(
+            hw.resolve_ids, args.get('<identifier>'), 'hardware')
 
         immediate = args.get('--immediate', False)
 

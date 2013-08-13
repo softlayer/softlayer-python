@@ -101,6 +101,23 @@ class TestNestedDict(unittest.TestCase):
         self.assertEqual(dict, type(d['test']['test1']['test2']['test3']))
 
 
+class TestLookup(unittest.TestCase):
+
+    def test_lookup(self):
+        d = {'test': {'nested': 1}}
+        val = SoftLayer.utils.lookup(d, 'test')
+        self.assertEqual(val, {'nested': 1})
+
+        val = SoftLayer.utils.lookup(d, 'test', 'nested')
+        self.assertEqual(val, 1)
+
+        val = SoftLayer.utils.lookup(d, 'test1')
+        self.assertEqual(val, None)
+
+        val = SoftLayer.utils.lookup(d, 'test1', 'nested1')
+        self.assertEqual(val, None)
+
+
 def is_a(string):
     if string == 'a':
         return ['this', 'is', 'a']

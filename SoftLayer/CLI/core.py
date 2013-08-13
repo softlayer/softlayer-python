@@ -37,8 +37,8 @@ from docopt import docopt, DocoptExit
 
 from SoftLayer import Client, SoftLayerError, SoftLayerAPIError
 from SoftLayer.consts import VERSION
-from SoftLayer.CLI.helpers import CLIAbort, ArgumentError, format_output
-from SoftLayer.CLI.environment import (
+from helpers import CLIAbort, ArgumentError, format_output
+from environment import (
     Environment, CLIRunnableType, InvalidCommand, InvalidModule)
 
 

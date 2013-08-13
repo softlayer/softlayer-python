@@ -8,31 +8,35 @@
 import sys
 import os
 import json
-from mock import patch
 
 import SoftLayer.CLI as cli
-from SoftLayer.tests import unittest
+from SoftLayer.tests import FIXTURE_PATH, unittest
+from mock import patch, mock_open, call
+
 
 if sys.version_info >= (3,):
     raw_input_path = 'builtins.input'
+    open_path = 'builtins.open'
 else:
     raw_input_path = '__builtin__.raw_input'
+    open_path = '__builtin__.open'
 
 
 class CLIJSONEncoderTest(unittest.TestCase):
     def test_default(self):
         out = json.dumps({
             'formattedItem': cli.helpers.FormattedItem('normal', 'formatted')
-        }, cls=cli.helpers.CLIJSONEncoder)
+        }, cls=cli.formatting.CLIJSONEncoder)
         self.assertEqual(out, '{"formattedItem": "normal"}')
 
-        out = json.dumps({'normal': 'string'}, cls=cli.helpers.CLIJSONEncoder)
+        out = json.dumps({'normal': 'string'},
+                         cls=cli.formatting.CLIJSONEncoder)
         self.assertEqual(out, '{"normal": "string"}')
 
     def test_fail(self):
         self.assertRaises(
             TypeError,
-            json.dumps, {'test': object()}, cls=cli.helpers.CLIJSONEncoder)
+            json.dumps, {'test': object()}, cls=cli.formatting.CLIJSONEncoder)
 
 
 class PromptTests(unittest.TestCase):
@@ -210,6 +214,7 @@ class ResolveIdTests(unittest.TestCase):
 
 
 class TestFormatOutput(unittest.TestCase):
+
     def test_format_output_string(self):
         t = cli.helpers.format_output('just a string', 'raw')
         self.assertEqual('just a string', t)
@@ -243,6 +248,9 @@ class TestFormatOutput(unittest.TestCase):
     }
 ]''', ret)
 
+        ret = cli.helpers.format_output('test', 'json')
+        self.assertEqual('"test"', ret)
+
     def test_format_output_json_keyvaluetable(self):
         t = cli.KeyValueTable(['key', 'value'])
         t.add_row(['nothing', cli.helpers.blank()])
@@ -274,7 +282,7 @@ class TestFormatOutput(unittest.TestCase):
 
     def test_unknown(self):
         t = cli.helpers.format_output({}, 'raw')
-        self.assertEqual('{}', t)
+        self.assertEqual({}, t)
 
     def test_sequentialoutput(self):
         t = cli.helpers.SequentialOutput()
@@ -288,3 +296,80 @@ class TestFormatOutput(unittest.TestCase):
         t.separator = ','
         output = cli.helpers.format_output(t)
         self.assertEqual("This is a test,More tests", output)
+
+    def test_format_output_python(self):
+        t = cli.helpers.format_output('just a string', 'python')
+        self.assertEqual('just a string', t)
+
+        t = cli.helpers.format_output(['just a string'], 'python')
+        self.assertEqual(['just a string'], t)
+
+        t = cli.helpers.format_output({'test_key': 'test_value'}, 'python')
+        self.assertEqual({'test_key': 'test_value'}, t)
+
+    def test_format_output_python_keyvaluetable(self):
+        t = cli.KeyValueTable(['key', 'value'])
+        t.add_row(['nothing', cli.helpers.blank()])
+        t.sortby = 'nothing'
+        ret = cli.helpers.format_output(t, 'python')
+        self.assertEqual({'nothing': None}, ret)
+
+
+class TestTemplateArgs(unittest.TestCase):
+
+    def test_no_template_option(self):
+        args = {'key': 'value'}
+        cli.helpers.update_with_template_args(args)
+        self.assertEqual(args, {'key': 'value'})
+
+    def test_template_not_exists(self):
+        path = os.path.join(FIXTURE_PATH, 'sample_template_not_exists.conf')
+        self.assertRaises(cli.helpers.ArgumentError,
+                          cli.helpers.update_with_template_args,
+                          {'--template': path})
+
+    def test_template_options(self):
+        path = os.path.join(FIXTURE_PATH, 'sample_cci_template.conf')
+        args = {
+            'key': 'value',
+            '--cpu': None,
+            '--memory': '32',
+            '--template': path,
+            '--hourly': False,
+        }
+        cli.helpers.update_with_template_args(args)
+        self.assertEqual(args, {
+            '--cpu': '4',
+            '--datacenter': 'dal05',
+            '--domain': 'example.com',
+            '--hostname': 'myhost',
+            '--hourly': 'true',
+            '--memory': '32',
+            '--monthly': 'false',
+            '--network': '100',
+            '--os': 'DEBIAN_7_64',
+            'key': 'value',
+        })
+
+
+class TestExportToTemplate(unittest.TestCase):
+    def test_export_to_template(self):
+        with patch(open_path, mock_open(), create=True) as open_:
+            cli.helpers.export_to_template('filename', {
+                '--os': None,
+                '--datacenter': 'ams01',
+                '--disk': ['disk1', 'disk2'],
+                # The following should get stripped out
+                '--config': 'no',
+                '--really': 'no',
+                '--format': 'no',
+                '--debug': 'no',
+                # exclude list
+                '--test': 'test',
+            }, exclude=['--test'])
+
+            open_.assert_called_with('filename', 'w')
+            open_().write.assert_has_calls([
+                call('datacenter=ams01\n'),
+                call('disk=disk1,disk2\n'),
+            ], any_order=False)  # Order isn't really guarenteed

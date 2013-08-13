@@ -12,12 +12,12 @@ from mock import patch, MagicMock
 from SoftLayer import API_PUBLIC_ENDPOINT
 from SoftLayer.tests import unittest
 from SoftLayer.CLI.environment import Environment, InvalidCommand
+from SoftLayer.tests import FIXTURE_PATH
 
 if sys.version_info >= (3,):
     raw_input_path = 'builtins.input'
 else:
     raw_input_path = '__builtin__.raw_input'
-FIXTURE_PATH = os.path.abspath(os.path.join(__file__, '..', '..', 'fixtures'))
 
 
 class EnvironmentTests(unittest.TestCase):
