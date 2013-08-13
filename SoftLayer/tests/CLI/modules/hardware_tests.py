@@ -249,6 +249,8 @@ class HardwareCLITests(unittest.TestCase):
             '--memory': False,
             '--controller': False,
             '--test': True,
+            '--export': None,
+            '--template': None,
         }
 
         # This test data represents the structure of the information returned

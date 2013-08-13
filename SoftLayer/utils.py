@@ -10,6 +10,13 @@
 KNOWN_OPERATIONS = ['<=', '>=', '<', '>', '~', '*=', '^=', '$=', '_=', '!~']
 
 
+# Code from http://stackoverflow.com/questions/11700798/python-accessing-values-nested-within-dictionaries  # NOQA
+def lookup(dic, key, *keys):
+    if keys:
+        return lookup(dic.get(key, {}), *keys)
+    return dic.get(key)
+
+
 class NestedDict(dict):
 
     def __getitem__(self, key):

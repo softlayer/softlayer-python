@@ -1,6 +1,6 @@
 """
-    SoftLayer.environment
-    ~~~~~~~~~~~~~~~~~~~~~
+    SoftLayer.CLI.environment
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
     Abstracts everything related to the user's environment when running the CLI
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
@@ -120,3 +120,17 @@ class CLIRunnableType(type):
         super(CLIRunnableType, cls).__init__(name, bases, attrs)
         if cls.env and name != 'CLIRunnable':
             cls.env.add_plugin(cls)
+
+
+class CLIRunnable(object):
+    __metaclass__ = CLIRunnableType
+    options = []
+    action = None
+
+    @staticmethod
+    def add_additional_args(parser):
+        pass
+
+    @staticmethod
+    def execute(client, args):
+        pass
