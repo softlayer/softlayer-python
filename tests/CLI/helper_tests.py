@@ -372,4 +372,4 @@ class TestExportToTemplate(unittest.TestCase):
             open_().write.assert_has_calls([
                 call('datacenter=ams01\n'),
                 call('disk=disk1,disk2\n'),
-            ], any_order=False)  # Order isn't really guaranteed
+            ], any_order=True)  # Order isn't really guaranteed
