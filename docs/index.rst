@@ -7,7 +7,7 @@ SoftLayer API Python Client |version|
 `Issues <https://github.com/softlayer/softlayer-api-python-client/issues>`_ ``|``
 `PyPI <https://pypi.python.org/pypi/softlayer/>`_ ``|``
 `Twitter <https://twitter.com/SoftLayerDevs>`_ ``|``
-irc:#softlayer
+`#softlayer on freenode <irc://irc.freenode.net/#softlayer>`_
 
 
 This is the documentation to SoftLayer's Python API Bindings. These bindings use SoftLayer's `XML-RPC interface <http://sldn.softlayer.com/article/XML-RPC>`_ in order to manage SoftLayer services.
