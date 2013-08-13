@@ -385,16 +385,10 @@ Optional:
         # Do not create CCI with --test or --export
         do_create = not (args['--export'] or args['--test'])
 
-        # Get the SSH key
-        if args.get('--key'):
-            key_id = resolve_id(SshKeyManager(client).resolve_ids,
-                                args.get('--key'), 'SshKey')
-            data['ssh_key'] = key_id
-
         t = Table(['Item', 'cost'])
         t.align['Item'] = 'r'
         t.align['cost'] = 'r'
-        data = cls._parse_create_args(args)
+        data = cls._parse_create_args(client, args)
 
         output = []
         if args.get('--test'):
@@ -518,7 +512,8 @@ Optional:
                 '--user-data': like_details['userData'] or None,
                 '--postinstall': like_details.get('postInstallScriptUri'),
                 '--dedicated': like_details['dedicatedAccountHostOnlyFlag'],
-                '--private': like_details['privateNetworkOnlyFlag'],
+                '--private': not any(vlan['networkSpace'] == 'PUBLIC'
+                                     for vlan in like_details['networkVlans']),
             }
 
             # Handle mutually exclusive options
@@ -547,7 +542,7 @@ Optional:
                     args[key] = value
 
     @staticmethod
-    def _parse_create_args(args):
+    def _parse_create_args(client, args):
         """ Converts CLI arguments to arguments that can be passed into
             CCIManager.create_instance.
 
@@ -603,6 +598,12 @@ Optional:
 
         if args.get('--postinstall'):
             data['post_uri'] = args.get('--postinstall')
+
+        # Get the SSH key
+        if args.get('--key'):
+            key_id = resolve_id(SshKeyManager(client).resolve_ids,
+                                args.get('--key'), 'SshKey')
+            data['ssh_key'] = key_id
 
         return data
 
