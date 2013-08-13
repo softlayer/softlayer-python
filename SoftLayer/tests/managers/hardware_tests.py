@@ -67,7 +67,7 @@ class HardwareTests(unittest.TestCase):
     def test_resolve_ids_ip(self):
         service = self.client['Account']
         service.getHardware = account_mock.getHardware_Mock(1000)
-        _id = self.hardware._get_ids_from_ip('10.0.1.100')
+        _id = self.hardware._get_ids_from_ip('172.16.1.100')
         self.assertEqual(_id, [1000])
 
         _id = self.hardware._get_ids_from_ip('nope')

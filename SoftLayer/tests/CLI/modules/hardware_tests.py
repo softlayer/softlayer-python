@@ -112,10 +112,9 @@ class HardwareCLITests(unittest.TestCase):
 
         self.assertEqual(expected, format_output(output, 'python'))
 
-    @patch('SoftLayer.HardwareManager.list_hardware')
-    def test_ListHardware(self, list_hardware):
-        hw_data = self.get_server_mocks()
-        list_hardware.return_value = hw_data
+#    @patch('SoftLayer.HardwareManager.list_hardware')
+    def test_ListHardware(self):
+        self.client['Account'].getHardware = account_mock.getHardware_Mock()
 
         output = server.ListServers.execute(
             self.client, {'--tags': 'openstack'})
@@ -123,20 +122,20 @@ class HardwareCLITests(unittest.TestCase):
         expected = [
             {
                 'datacenter': 'TEST00',
-                'primary_ip': '10.0.0.2',
-                'host': 'test1.sftlyr.ws',
+                'primary_ip': '172.16.1.100',
+                'host': 'hardware-test1.test.sftlyr.ws',
                 'memory': 2048,
                 'cores': 2,
-                'id': 1,
+                'id': 1000,
                 'backend_ip': '10.1.0.2'
             },
             {
                 'datacenter': 'TEST00',
-                'primary_ip': '10.0.0.3',
-                'host': 'test2.sftlyr.ws',
+                'primary_ip': '172.16.4.94',
+                'host': 'hardware-test2.test.sftlyr.ws',
                 'memory': 4096,
                 'cores': 4,
-                'id': 2,
+                'id': 1001,
                 'backend_ip': '10.1.0.3'
             }
         ]
