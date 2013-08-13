@@ -147,8 +147,7 @@ class APIClient(unittest.TestCase):
                 'User-Agent': USER_AGENT,
             })
 
-    @patch('SoftLayer.API.make_xml_rpc_api_call')
-    def test_mask_call_invalid_mask(self, make_xml_rpc_api_call):
+    def test_mask_call_invalid_mask(self):
         try:
             self.client['SERVICE'].METHOD(mask="mask[something.nested")
         except SoftLayer.SoftLayerError, e:

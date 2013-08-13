@@ -78,14 +78,20 @@ class AuthedUser(unittest.TestCase):
         else:
             self.fail('No Exception Raised')
 
-    def test_dns(self):
+    def test_get_users(self):
         creds = get_creds()
         client = SoftLayer.Client(
             username=creds['username'],
             api_key=creds['api_key'],
             endpoint_url=creds['endpoint'],
             timeout=20)
-        client["SoftLayer_Dns_Domain"].getByDomainName('p.sftlyr.ws')
+
+        found = False
+        results = client["Account"].getUsers()
+        for user in results:
+            if user.get('username') == creds['username']:
+                found = True
+        self.assertTrue(found)
 
     def test_result_types(self):
         creds = get_creds()

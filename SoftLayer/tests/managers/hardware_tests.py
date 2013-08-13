@@ -8,6 +8,8 @@
 from SoftLayer import HardwareManager
 from SoftLayer.managers.hardware import get_default_value
 from SoftLayer.tests import unittest
+from SoftLayer.tests.mocks import account_mock, hardware_mock, \
+    product_package_mock
 
 from mock import MagicMock, ANY, call, patch
 
@@ -20,12 +22,15 @@ class HardwareTests(unittest.TestCase):
 
     def test_list_hardware(self):
         mcall = call(mask=ANY, filter={})
-        service = self.client.__getitem__()
+        service = self.client['Account']
+        service.getHardware = account_mock.getHardware_Mock()
 
         self.hardware.list_hardware()
         service.getHardware.assert_has_calls(mcall)
 
     def test_list_hardware_with_filters(self):
+        service = self.client['Account']
+        service.getHardware = account_mock.getHardware_Mock()
         self.hardware.list_hardware(
             tags=['tag1', 'tag2'],
             cpus=2,
@@ -37,7 +42,6 @@ class HardwareTests(unittest.TestCase):
             public_ip='1.2.3.4',
             private_ip='4.3.2.1',
         )
-        service = self.client.__getitem__()
         service.getHardware.assert_has_calls(call(
             filter={
                 'hardware': {
@@ -61,29 +65,28 @@ class HardwareTests(unittest.TestCase):
         ))
 
     def test_resolve_ids_ip(self):
-        self.client.__getitem__().getHardware.return_value = [{'id': '1234'}]
-        _id = self.hardware._get_ids_from_ip('1.2.3.4')
-        self.assertEqual(_id, ['1234'])
-
-        self.client.__getitem__().getHardware.side_effect = \
-            [[], [{'id': '4321'}]]
-        _id = self.hardware._get_ids_from_ip('4.3.2.1')
-        self.assertEqual(_id, ['4321'])
+        service = self.client['Account']
+        service.getHardware = account_mock.getHardware_Mock(1000)
+        _id = self.hardware._get_ids_from_ip('10.0.1.100')
+        self.assertEqual(_id, [1000])
 
         _id = self.hardware._get_ids_from_ip('nope')
         self.assertEqual(_id, [])
 
     def test_resolve_ids_hostname(self):
-        self.client.__getitem__().getHardware.return_value = [{'id': '1234'}]
-        _id = self.hardware._get_ids_from_hostname('hostname')
-        self.assertEqual(_id, ['1234'])
+        service = self.client['Account']
+        service.getHardware = account_mock.getHardware_Mock(1000)
+        _id = self.hardware._get_ids_from_hostname('hardware-test1')
+        self.assertEqual(_id, [1000])
 
     def test_get_hardware(self):
-        self.client.__getitem__().getObject.return_value = {
-            'hourlyVirtualGuests': "this is unique"}
-        self.hardware.get_hardware(1)
-        self.client.__getitem__().getObject.assert_called_once_with(
-            id=1, mask=ANY)
+        service = self.client['Hardware']
+        service.getObject = hardware_mock.getObject_Mock(1000)
+        result = self.hardware.get_hardware(1000)
+        self.client['Hardware'].getObject.assert_called_once_with(
+            id=1000, mask=ANY)
+        expected = hardware_mock.get_raw_hardware_mocks()[1000]
+        self.assertEqual(expected, result)
 
     def test_reload(self):
         post_uri = 'http://test.sftlyr.ws/test.sh'
@@ -212,21 +215,17 @@ class HardwareTests(unittest.TestCase):
         f.assert_called_once_with({'test': 1, 'verify': 1})
 
     def test_cancel_metal_immediately(self):
-        b_id = 5678
-        self.client.__getitem__().getObject.return_value = {'id': '1234',
-                                                            'billingItem': {
-                                                                'id': b_id,
-                                                            }}
+        b_id = 6327
+        self.client['Hardware'].getObject = hardware_mock.getObject_Mock(1000)
+
         self.hardware.cancel_metal(b_id, True)
         f = self.client['Billing_Item'].cancelService
         f.assert_called_once_with(id=b_id)
 
     def test_cancel_metal_on_anniversary(self):
-        b_id = 5678
-        self.client.__getitem__().getObject.return_value = {'id': '1234',
-                                                            'billingItem': {
-                                                                'id': b_id,
-                                                            }}
+        b_id = 6327
+        self.client['Hardware'].getObject = hardware_mock.getObject_Mock(1000)
+
         self.hardware.cancel_metal(b_id, False)
         f = self.client['Billing_Item'].cancelServiceOnAnniversaryDate
         f.assert_called_once_with(id=b_id)
@@ -319,130 +318,8 @@ class HardwareTests(unittest.TestCase):
         self.assertEqual(price_id, get_default_value(package_options, 'Cat1'))
 
     def _setup_package_mocks(self, package_id):
-        self.client['Product_Package'].getAllObjects.return_value = [
-            {'name': 'Bare Metal Instance', 'id': package_id}]
-
-        self.client['Product_Package'].getRegions.return_value = [{
-            'location': {
-                'locationPackageDetails': [{
-                    'deliveryTimeInformation': 'Typically 2-4 hours',
-                }],
-            },
-            'keyname': 'RANDOM_LOCATION',
-            'description': 'Random unit testing location',
-        }]
-
-        self.client['Product_Package'].getConfiguration.return_value = [
-            {
-                'itemCategory': {
-                    'categoryCode': 'random',
-                    'name': 'Random Category',
-                },
-                'sort': 0,
-                'orderStepId': 1,
-                'isRequired': 0,
-            },
-            {
-                'itemCategory': {
-                    'categoryCode': 'disk0',
-                    'name': 'First Disk',
-                },
-                'sort': 0,
-                'orderStepId': 1,
-                'isRequired': 1,
-            },
-            {
-                'itemCategory': {
-                    'categoryCode': 'disk1',
-                    'name': 'Second Disk',
-                },
-                'sort': 0,
-                'orderStepId': 1,
-                'isRequired': 1,
-            }
-        ]
-
-        prices = [{
-            'itemId': 888,
-            'id': 1888,
-            'sort': 0,
-            'setupFee': 0,
-            'recurringFee': 0,
-            'hourlyRecurringFee': 0,
-            'oneTimeFee': 0,
-            'laborFee': 0,
-            'item': {
-                'id': 888,
-                'description': 'Some item',
-                'capacity': 0,
-            }
-        }]
-
-        disk0_prices = [{
-            'itemId': 2000,
-            'id': 12000,
-            'sort': 0,
-            'setupFee': 0,
-            'recurringFee': 0,
-            'hourlyRecurringFee': 0,
-            'oneTimeFee': 0,
-            'laborFee': 0,
-            'item': {
-                'id': 2000,
-                'description': '1TB Drive',
-                'capacity': 1000,
-            }
-        }]
-
-        disk1_prices = [{
-            'itemId': 2000,
-            'id': 12000,
-            'sort': 0,
-            'setupFee': 0,
-            'recurringFee': 25.0,
-            'hourlyRecurringFee': 0,
-            'oneTimeFee': 0,
-            'laborFee': 0,
-            'item': {
-                'id': 2000,
-                'description': '1TB Drive',
-                'capacity': 1000,
-            }
-        }]
-        self.client['Product_Package'].getCategories.return_value = [
-            {
-                'categoryCode': 'random',
-                'name': 'Random Category',
-                'id': 1000,
-                'groups': [{
-                    'sort': 0,
-                    'prices': prices,
-                    'itemCategoryId': 1000,
-                    'packageId': package_id,
-                }],
-            },
-            {
-                'categoryCode': 'disk0',
-                'name': 'First Disk',
-                'isRequired': 1,
-                'id': 1001,
-                'groups': [{
-                    'sort': 0,
-                    'prices': disk0_prices,
-                    'itemCategoryId': 1001,
-                    'packageId': package_id,
-                }],
-            },
-            {
-                'categoryCode': 'disk1',
-                'name': 'Second Disk',
-                'isRequired': 1,
-                'id': 1002,
-                'groups': [{
-                    'sort': 0,
-                    'prices': disk1_prices,
-                    'itemCategoryId': 1002,
-                    'packageId': package_id,
-                }],
-            }
-        ]
+        package = self.client['Product_Package']
+        package.getAllObjects = product_package_mock.getAllObjects_Mock()
+        package.getConfiguration = product_package_mock.getConfiguration_Mock()
+        package.getCategories = product_package_mock.getCategories_Mock()
+        package.getRegions = product_package_mock.getRegions_Mock()
