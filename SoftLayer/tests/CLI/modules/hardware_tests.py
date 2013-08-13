@@ -112,7 +112,6 @@ class HardwareCLITests(unittest.TestCase):
 
         self.assertEqual(expected, format_output(output, 'python'))
 
-#    @patch('SoftLayer.HardwareManager.list_hardware')
     def test_ListHardware(self):
         self.client['Account'].getHardware = account_mock.getHardware_Mock()
 
