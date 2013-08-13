@@ -1,5 +1,7 @@
 SoftLayer API Python Client
 ===========================
+.. image:: https://api.travis-ci.org/softlayer/softlayer-api-python-client.png
+    :target: https://travis-ci.org/softlayer/softlayer-api-python-client
 
 .. image:: https://badge.fury.io/py/SoftLayer.png
     :target: http://badge.fury.io/py/SoftLayer
