@@ -104,7 +104,7 @@ class HardwareTests(unittest.TestCase):
     def test_get_bare_metal_create_options(self):
         package_id = 50
 
-        self._setup_package_mocks(package_id)
+        self._setup_package_mocks()
 
         self.hardware.get_bare_metal_create_options()
 
@@ -121,7 +121,7 @@ class HardwareTests(unittest.TestCase):
     def test_generate_create_dict_with_all_bare_metal_options(self):
         package_id = 50
 
-        self._setup_package_mocks(package_id)
+        self._setup_package_mocks()
 
         args = {
             'server': 100,
@@ -158,7 +158,7 @@ class HardwareTests(unittest.TestCase):
     def test_generate_create_dict_with_all_dedicated_server_options(self):
         package_id = 13
 
-        self._setup_package_mocks(package_id)
+        self._setup_package_mocks()
 
         args = {
             'server': 100,
@@ -282,7 +282,7 @@ class HardwareTests(unittest.TestCase):
     def test_get_dedicated_server_options(self):
         package_id = 13
 
-        self._setup_package_mocks(package_id)
+        self._setup_package_mocks()
 
         self.hardware.get_dedicated_server_create_options(package_id)
 
@@ -317,7 +317,7 @@ class HardwareTests(unittest.TestCase):
 
         self.assertEqual(price_id, get_default_value(package_options, 'Cat1'))
 
-    def _setup_package_mocks(self, package_id):
+    def _setup_package_mocks(self):
         package = self.client['Product_Package']
         package.getAllObjects = product_package_mock.getAllObjects_Mock()
         package.getConfiguration = product_package_mock.getConfiguration_Mock()
