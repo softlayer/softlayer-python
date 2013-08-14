@@ -114,6 +114,18 @@ class NetworkTests(unittest.TestCase):
 
         self.assertEqual(expected, result)
 
+    def test_cancel_subnet(self):
+        id = 9876
+        mcall = call(id=1056)
+        service = self.client['Billing_Item']
+
+        self.client['Network_Subnet'].getObject.return_value = {
+            'id': id,
+            'billingItem': {'id': 1056}
+        }
+        self.network.cancel_subnet(id)
+        service.cancelService.assert_has_calls(mcall)
+
     def test_get_subnet(self):
         id = 9876
         mcall = call(id=id, mask=ANY)

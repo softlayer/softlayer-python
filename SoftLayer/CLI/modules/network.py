@@ -6,6 +6,7 @@ Perform various network operations
 The available commands are:
   ip-lookup       Find information about a specific IP
   subnet-add      Create a new subnet
+  subnet-cancel   Cancel a subnet
   subnet-detail   Display detailed information about a subnet
   subnet-list     Show a list of all subnets on the network
   summary         Provide a summary view of the network
@@ -16,7 +17,9 @@ The available commands are:
 # :license: BSD, see LICENSE for more details.
 
 from SoftLayer import NetworkManager
-from SoftLayer.CLI import CLIRunnable, Table, KeyValueTable
+from SoftLayer.CLI import CLIRunnable, Table, KeyValueTable, FormattedItem, \
+    confirm, no_going_back
+from SoftLayer.CLI.helpers import CLIAbort, SequentialOutput
 
 
 class NetworkLookupIp(CLIRunnable):
@@ -184,6 +187,27 @@ Options:
             'take account level discounts and are not guarenteed.')
         )
         return t
+
+
+class SubnetCancel(CLIRunnable):
+    """
+usage: sl network subnet-cancel <identifier> [options]
+
+Cancel a subnet
+"""
+
+    action = 'subnet-cancel'
+    options = ['confirm']
+
+    @staticmethod
+    def execute(client, args):
+        mgr = NetworkManager(client)
+        subnet = mgr.get_subnet(args.get('<identifier>'))
+
+        if args['--really'] or no_going_back(subnet['id']):
+            mgr.cancel_subnet(subnet['id'])
+        else:
+            CLIAbort('Aborted')
 
 
 class SubnetDetail(CLIRunnable):

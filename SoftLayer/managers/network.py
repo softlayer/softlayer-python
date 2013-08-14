@@ -75,6 +75,17 @@ class NetworkManager(IdentifierMixin, object):
             'SoftLayer_Container_Product_Order_Network_Subnet'
         return func(order)
 
+    def cancel_subnet(self, id):
+        """ Cancels the specified subnet.
+
+        :param int id: The ID of the subnet to be cancelled.
+        """
+        subnet = self.get_subnet(id=id, mask='mask[id, billingItem.id]')
+        billing_id = subnet['billingItem']['id']
+
+        billing_item = self.client['Billing_Item']
+        return billing_item.cancelService(id=billing_id)
+
     def ip_lookup(self, ip):
         """ Looks up an IP address and returns network information about it.
 
@@ -100,16 +111,18 @@ class NetworkManager(IdentifierMixin, object):
         """
         return self.vlan.getObject(id=id, mask=self._get_vlan_mask())
 
-    def get_subnet(self, id):
+    def get_subnet(self, id, **kwargs):
         """ Returns information about a single subnet.
 
         :param string id: Either the ID for the subnet or its network
                           identifier
         :returns: A dictionary of information about the subnet
         """
+        if 'mask' not in kwargs:
+            kwargs['mask'] = 'mask[%s]' % ','.join(self._get_subnet_mask())
+
         id = resolve_ids(id, self.subnet_resolvers)[0]
-        return self.subnet.getObject(id=id, mask='mask[%s]' %
-                                     ','.join(self._get_subnet_mask()))
+        return self.subnet.getObject(id=id, **kwargs)
 
     def list_vlans(self, datacenter=None, vlan_number=None, **kwargs):
         """ Display a list of all VLANs on the account.
