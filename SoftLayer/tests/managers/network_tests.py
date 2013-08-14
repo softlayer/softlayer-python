@@ -130,7 +130,6 @@ class NetworkTests(unittest.TestCase):
         self.client['Account'].getRwhoisData.return_value = {'id': 954}
 
         expected = {
-            'id': 954,
             'abuseEmail': 'abuse@test.foo',
             'address1': '123 Test Street',
             'address2': 'Apt. #31',
@@ -158,7 +157,7 @@ class NetworkTests(unittest.TestCase):
             state='TX')
 
         f = self.client['Network_Subnet_Rwhois_Data'].editObject
-        f.assert_called_with(expected)
+        f.assert_called_with(expected, id=954)
 
     def test_get_rwhois(self):
         self.network.get_rwhois()

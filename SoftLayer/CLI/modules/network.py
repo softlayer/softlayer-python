@@ -124,18 +124,19 @@ Updates the RWhois information on your account. Only the fields you
 specify will be changed. To clear a value, specify an empty string like: ""
 
 Options:
-  --abuse=EMAIL         Set the abuse email
-  --address1=ADDR       Update the address 1 field
-  --address2=ADDR       Update the address 2 field
-  --city=CITY           Set the city information
-  --country=COUNTRY     Set the country information. Use the two-letter
-                          abbreviation.
-  --firstname=NAME      Update the first name field
-  --lastname=NAME       Update the last name field
-  --postal=CODE         Set the postal code field
-  (--private|--public)  Flags the address as a private residence or not
-  --state=STATE         Set the state information. Use the two-letter
-                          abbreviation.
+  --abuse=EMAIL      Set the abuse email
+  --address1=ADDR    Update the address 1 field
+  --address2=ADDR    Update the address 2 field
+  --city=CITY        Set the city information
+  --country=COUNTRY  Set the country information. Use the two-letter
+                       abbreviation.
+  --firstname=NAME   Update the first name field
+  --lastname=NAME    Update the last name field
+  --postal=CODE      Set the postal code field
+  --private          Flags the address as a private residence.
+  --public           Flags the address as a public residence.
+  --state=STATE      Set the state information. Use the two-letter
+                       abbreviation.
 """
     action = 'rwhois-edit'
 

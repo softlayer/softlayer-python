@@ -117,8 +117,8 @@ class NetworkManager(IdentifierMixin, object):
 
         if update:
             rwhois = self.get_rwhois()
-            update['id'] = rwhois['id']
-            self.client['Network_Subnet_Rwhois_Data'].editObject(update)
+            self.client['Network_Subnet_Rwhois_Data'].editObject(
+                update, id=rwhois['id'])
 
     def ip_lookup(self, ip):
         """ Looks up an IP address and returns network information about it.
