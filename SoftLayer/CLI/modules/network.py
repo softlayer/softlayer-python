@@ -5,6 +5,7 @@ Perform various network operations
 
 The available commands are:
   ip-lookup       Find information about a specific IP
+  rwhois-show     Show the RWhois data on the account
   subnet-add      Create a new subnet
   subnet-cancel   Cancel a subnet
   subnet-detail   Display detailed information about a subnet
@@ -110,6 +111,36 @@ Options:
                 dc['hardwareCount'],
                 dc['virtualGuestCount'],
             ])
+
+        return t
+
+
+class RWhoisShow(CLIRunnable):
+    """
+usage: sl network rwhois-show [options]
+
+Display the RWhois information for your account.
+"""
+    action = 'rwhois-show'
+
+    @staticmethod
+    def execute(client, args):
+        mgr = NetworkManager(client)
+        result = mgr.get_rwhois()
+
+        t = KeyValueTable(['Name', 'Value'])
+        t.align['Name'] = 'r'
+        t.align['Value'] = 'l'
+        t.add_row(['Name', result['firstName'] + ' ' + result['lastName']])
+        t.add_row(['Company', result['companyName']])
+        t.add_row(['Abuse Email', result['abuseEmail']])
+        t.add_row(['Address 1', result['address1']])
+        if result.get('address2'):
+            t.add_row(['Address 2', result['address2']])
+        t.add_row(['City', result['city']])
+        t.add_row(['State', result.get('state', '-')])
+        t.add_row(['Postal Code', result.get('postalCode', '-')])
+        t.add_row(['Country', result['country']])
 
         return t
 

@@ -126,6 +126,10 @@ class NetworkTests(unittest.TestCase):
         self.network.cancel_subnet(id)
         service.cancelService.assert_has_calls(mcall)
 
+    def test_get_rwhois(self):
+        self.network.get_rwhois()
+        self.client['Account'].getRwhoisData.assert_called()
+
     def test_get_subnet(self):
         id = 9876
         mcall = call(id=id, mask=ANY)

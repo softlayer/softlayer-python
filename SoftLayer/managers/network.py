@@ -101,15 +101,12 @@ class NetworkManager(IdentifierMixin, object):
         obj = self.client['Network_Subnet_IpAddress']
         return obj.getByIpAddress(ip, mask=mask)
 
-    def get_vlan(self, id):
-        """ Returns information about a single VLAN.
+    def get_rwhois(self):
+        """ Returns the RWhois information about the current account.
 
-        :param int id: The unique identifier for the VLAN
-        :returns: A dictionary containing a large amount of information about
-                  the specified VLAN.
-
+        :returns: A dictionary containing the account's RWhois information.
         """
-        return self.vlan.getObject(id=id, mask=self._get_vlan_mask())
+        return self.account.getRwhoisData()
 
     def get_subnet(self, id, **kwargs):
         """ Returns information about a single subnet.
@@ -123,6 +120,16 @@ class NetworkManager(IdentifierMixin, object):
 
         id = resolve_ids(id, self.subnet_resolvers)[0]
         return self.subnet.getObject(id=id, **kwargs)
+
+    def get_vlan(self, id):
+        """ Returns information about a single VLAN.
+
+        :param int id: The unique identifier for the VLAN
+        :returns: A dictionary containing a large amount of information about
+                  the specified VLAN.
+
+        """
+        return self.vlan.getObject(id=id, mask=self._get_vlan_mask())
 
     def list_vlans(self, datacenter=None, vlan_number=None, **kwargs):
         """ Display a list of all VLANs on the account.
