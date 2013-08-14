@@ -5,6 +5,7 @@ Perform various network operations
 
 The available commands are:
   ip-lookup       Find information about a specific IP
+  rwhois-edit     Edit the RWhois data on the account
   rwhois-show     Show the RWhois data on the account
   subnet-add      Create a new subnet
   subnet-cancel   Cancel a subnet
@@ -113,6 +114,57 @@ Options:
             ])
 
         return t
+
+
+class RWhoisEdit(CLIRunnable):
+    """
+usage: sl network rwhois-edit [options]
+
+Updates the RWhois information on your account. Only the fields you
+specify will be changed. To clear a value, specify an empty string like: ""
+
+Options:
+  --abuse=EMAIL         Set the abuse email
+  --address1=ADDR       Update the address 1 field
+  --address2=ADDR       Update the address 2 field
+  --city=CITY           Set the city information
+  --country=COUNTRY     Set the country information. Use the two-letter
+                          abbreviation.
+  --firstname=NAME      Update the first name field
+  --lastname=NAME       Update the last name field
+  --postal=CODE         Set the postal code field
+  (--private|--public)  Flags the address as a private residence or not
+  --state=STATE         Set the state information. Use the two-letter
+                          abbreviation.
+"""
+    action = 'rwhois-edit'
+
+    @staticmethod
+    def execute(client, args):
+        mgr = NetworkManager(client)
+
+        update = {
+            'abuse_email': args.get('--abuse'),
+            'address1': args.get('--address1'),
+            'address2': args.get('--address2'),
+            'city': args.get('--city'),
+            'country': args.get('--country'),
+            'first_name': args.get('--firstname'),
+            'last_name': args.get('--lastname'),
+            'postal_code': args.get('--postal'),
+            'state': args.get('--state')
+        }
+
+        if args.get('--private'):
+            update['private_residence'] = False
+        elif args.get('--public'):
+            update['private_residence'] = True
+
+        check = [x for x in update.values() if x is not None]
+        if not check:
+            raise CLIAbort("You must specify at least one field to update.")
+
+        mgr.edit_rwhois(**update)
 
 
 class RWhoisShow(CLIRunnable):

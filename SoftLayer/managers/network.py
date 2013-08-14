@@ -86,6 +86,40 @@ class NetworkManager(IdentifierMixin, object):
         billing_item = self.client['Billing_Item']
         return billing_item.cancelService(id=billing_id)
 
+    def edit_rwhois(self, abuse_email=None, address1=None, address2=None,
+                    city=None, company_name=None, country=None,
+                    first_name=None, last_name=None, postal_code=None,
+                    private_residence=None, state=None):
+        update = {}
+
+        if abuse_email is not None:
+            update['abuseEmail'] = abuse_email
+        if address1 is not None:
+            update['address1'] = address1
+        if address2 is not None:
+            update['address2'] = address2
+        if city is not None:
+            update['city'] = city
+        if company_name is not None:
+            update['companyName'] = company_name
+        if country is not None:
+            update['country'] = country
+        if first_name is not None:
+            update['firstName'] = first_name
+        if last_name is not None:
+            update['lastName'] = last_name
+        if postal_code is not None:
+            update['postalCode'] = postal_code
+        if private_residence is not None:
+            update['privateResidenceFlag'] = private_residence
+        if state is not None:
+            update['state'] = state
+
+        if update:
+            rwhois = self.get_rwhois()
+            update['id'] = rwhois['id']
+            self.client['Network_Subnet_Rwhois_Data'].editObject(update)
+
     def ip_lookup(self, ip):
         """ Looks up an IP address and returns network information about it.
 

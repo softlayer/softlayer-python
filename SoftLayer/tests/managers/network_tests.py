@@ -126,6 +126,40 @@ class NetworkTests(unittest.TestCase):
         self.network.cancel_subnet(id)
         service.cancelService.assert_has_calls(mcall)
 
+    def test_edit_rwhois(self):
+        self.client['Account'].getRwhoisData.return_value = {'id': 954}
+
+        expected = {
+            'id': 954,
+            'abuseEmail': 'abuse@test.foo',
+            'address1': '123 Test Street',
+            'address2': 'Apt. #31',
+            'city': 'Anywhere',
+            'companyName': 'TestLayer',
+            'country': 'US',
+            'firstName': 'Bob',
+            'lastName': 'Bobinson',
+            'postalCode': '9ba62',
+            'privateResidenceFlag': False,
+            'state': 'TX',
+        }
+
+        self.network.edit_rwhois(
+            abuse_email='abuse@test.foo',
+            address1='123 Test Street',
+            address2='Apt. #31',
+            city='Anywhere',
+            company_name='TestLayer',
+            country='US',
+            first_name='Bob',
+            last_name='Bobinson',
+            postal_code='9ba62',
+            private_residence=False,
+            state='TX')
+
+        f = self.client['Network_Subnet_Rwhois_Data'].editObject
+        f.assert_called_with(expected)
+
     def test_get_rwhois(self):
         self.network.get_rwhois()
         self.client['Account'].getRwhoisData.assert_called()
