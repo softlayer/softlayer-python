@@ -5,14 +5,13 @@ Perform various network operations
 
 The available commands are:
   ip-lookup       Find information about a specific IP
+  subnet-add      Create a new subnet
   subnet-detail   Display detailed information about a subnet
   subnet-list     Show a list of all subnets on the network
   summary         Provide a summary view of the network
   vlan-detail     Display detailed information about a VLAN
   vlan-list       Show a list of all VLANs on the network
 """
-# Removed the following line due to an API bug:
-#   subnet-add      Create a new subnet
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: BSD, see LICENSE for more details.
 
@@ -109,6 +108,81 @@ Options:
                 dc['virtualGuestCount'],
             ])
 
+        return t
+
+
+class SubnetAdd(CLIRunnable):
+    """
+usage:
+  sl network subnet-add (public|private) <quantity> <vlan> [options]
+  sl network subnet-add global [options]
+
+Add a new subnet to your account
+
+Required:
+  <quantity>           The number of IPs to include in the subnet.
+                         Valid quantities vary by type.
+
+                         Type    - Valid Quantities (IPv4)
+                         global  - 1
+                         public  - 4, 8, 16, 32
+                         private - 4, 8, 16, 32, 64
+
+                         Type    - Valid Quantities (IPv6)
+                         global  - 1
+                         public  - 64
+  <vlan>               The VLAN ID you want to attach this subnet to
+
+Options:
+  --v6                 Orders IPv6
+  --dry-run, --test    Do not order the subnet; just get a quote
+"""
+    action = 'subnet-add'
+    options = ['confirm']
+
+    @staticmethod
+    def execute(client, args):
+        mgr = NetworkManager(client)
+
+        _type = 'private'
+        if args['public']:
+            _type = 'public'
+        elif args['global']:
+            _type = 'global'
+
+        version = 4
+        if args.get('--v6'):
+            version = 6
+        if not args.get('--test') and not args['--really']:
+            if not confirm("This action will incur charges on your account."
+                           "Continue?"):
+                raise CLIAbort('Cancelling order.')
+        result = mgr.add_subnet(type=_type,
+                                quantity=args['<quantity>'],
+                                vlan_id=args['<vlan>'],
+                                version=version,
+                                test_order=args.get('--test'))
+        if not result:
+            return 'Unable to place order: No valid price IDs found.'
+        t = Table(['Item', 'cost'])
+        t.align['Item'] = 'r'
+        t.align['cost'] = 'r'
+
+        total = 0.0
+        for price in result['prices']:
+            total += float(price.get('recurringFee', 0.0))
+            rate = "%.2f" % float(price['recurringFee'])
+
+            t.add_row([price['item']['description'], rate])
+
+        t.add_row(['Total monthly cost', "%.2f" % total])
+        output = SequentialOutput()
+        output.append(t)
+        output.append(FormattedItem(
+            '',
+            ' -- ! Prices reflected here are retail and do not '
+            'take account level discounts and are not guarenteed.')
+        )
         return t
 
 

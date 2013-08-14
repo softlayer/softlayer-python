@@ -24,6 +24,57 @@ class NetworkManager(IdentifierMixin, object):
         self.subnet = client['Network_Subnet']
         self.subnet_resolvers = [self._get_subnet_by_identifier]
 
+    def add_subnet(self, type, quantity=None, vlan_id=None, version=4,
+                   test_order=False):
+        package = self.client['Product_Package']
+        category = 'sov_sec_ip_addresses_priv'
+        if version == 4:
+            if type == 'global':
+                quantity = 0
+                category = 'global_ipv4'
+            elif type == 'public':
+                category = 'sov_sec_ip_addresses_pub'
+        else:
+            category = 'static_ipv6_addresses'
+            if type == 'global':
+                quantity = 0
+                category = 'global_ipv6'
+                desc = 'Global'
+            elif type == 'public':
+                desc = 'Portable'
+
+        price_id = None
+        quantity = str(quantity)
+        for item in package.getItems(id=0, mask='mask[itemCategory]'):
+            category_code = item.get('itemCategory', {}).get('categoryCode')
+            if category_code == category and item['capacity'] == quantity:
+                if version == 4 or (version == 6
+                                    and desc in item['description']):
+                    price_id = item['prices'][0]['id']
+
+        order = {
+            'packageId': 0,
+            'prices': [{'id': price_id}],
+            'quantity': 1,
+        }
+
+        if type != 'global':
+            order['endPointVlanId'] = vlan_id
+
+        if not price_id:
+            return None
+
+        func = 'placeOrder'
+        if test_order:
+            func = 'verifyOrder'
+        func = getattr(self.client['Product_Order'], func)
+
+        # This is necessary in order for the XML-RPC endpoint to select the
+        # correct order container. Without this, placing the order will fail.
+        order['complexType'] = \
+            'SoftLayer_Container_Product_Order_Network_Subnet'
+        return func(order)
+
     def ip_lookup(self, ip):
         """ Looks up an IP address and returns network information about it.
 
