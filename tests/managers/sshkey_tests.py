@@ -1,13 +1,13 @@
 """
     tests.managers.sshkey_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
 from SoftLayer import SshKeyManager
 from tests import unittest
-from mock import MagicMock, ANY, call
+from mock import MagicMock, call
 
 
 class SshKeyTests(unittest.TestCase):

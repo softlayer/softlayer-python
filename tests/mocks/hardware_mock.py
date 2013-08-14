@@ -19,7 +19,7 @@ def get_raw_hardware_mocks():
         1000: {
             'id': 1000,
             # TODO - This needs to be moved to wherever data centers come from
-            'datacenter': {'name': 'TEST00',
+            'datacenter': {'id': 50, 'name': 'TEST00',
                            'description': 'Test Data Center'},
             'billingItem': {'id': 6327},
             'primaryIpAddress': '172.16.1.100',

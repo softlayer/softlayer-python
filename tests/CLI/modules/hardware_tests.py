@@ -1,6 +1,6 @@
 """
     tests.CLI.modules.hardware_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     This is a series of integration tests designed to test the complete
     command line interface.

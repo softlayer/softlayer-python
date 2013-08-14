@@ -1,6 +1,6 @@
 """
     tests.basic_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~
     Tests shared code
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
