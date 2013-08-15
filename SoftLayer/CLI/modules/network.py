@@ -4,18 +4,20 @@ usage: sl network [<command>] [<args>...] [options]
 Perform various network operations
 
 The available commands are:
-  globalip-add    Orders a new global IP address
-  globalip-list   Display a list of global IP addresses
-  ip-lookup       Find information about a specific IP
-  rwhois-edit     Edit the RWhois data on the account
-  rwhois-show     Show the RWhois data on the account
-  subnet-add      Create a new subnet
-  subnet-cancel   Cancel a subnet
-  subnet-detail   Display detailed information about a subnet
-  subnet-list     Show a list of all subnets on the network
-  summary         Provide a summary view of the network
-  vlan-detail     Display detailed information about a VLAN
-  vlan-list       Show a list of all VLANs on the network
+  globalip-add     Orders a new global IP address
+  globalip-assign  Assign a target to a global IP address
+  globalip-cancel  Cancels a global IP
+  globalip-list    Display a list of global IP addresses
+  ip-lookup        Find information about a specific IP
+  rwhois-edit      Edit the RWhois data on the account
+  rwhois-show      Show the RWhois data on the account
+  subnet-add       Create a new subnet
+  subnet-cancel    Cancel a subnet
+  subnet-detail    Display detailed information about a subnet
+  subnet-list      Show a list of all subnets on the network
+  summary          Provide a summary view of the network
+  vlan-detail      Display detailed information about a VLAN
+  vlan-list        Show a list of all VLANs on the network
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: BSD, see LICENSE for more details.
@@ -77,6 +79,27 @@ Options:
         return t
 
 
+class GlobalIpCancel(CLIRunnable):
+    """
+usage: sl network globalip-cancel <identifier> [options]
+
+Cancel a subnet
+"""
+
+    action = 'subnet-cancel'
+    options = ['confirm']
+
+    @staticmethod
+    def execute(client, args):
+        mgr = NetworkManager(client)
+        id = mgr.resolve_global_ip_ids(args.get('<identifier>'))
+
+        if args['--really'] or no_going_back(id):
+            mgr.cancel_global_ip(id)
+        else:
+            CLIAbort('Aborted')
+
+
 class GlobalIpList(CLIRunnable):
     """
 usage: sl network globalip-list [options]
@@ -94,7 +117,7 @@ Filters:
         mgr = NetworkManager(client)
 
         t = Table([
-            'id', 'ip', 'routed', 'target'
+            'id', 'ip', 'assigned', 'target'
         ])
         t.sortby = args.get('--sortby') or 'id'
 
@@ -107,11 +130,11 @@ Filters:
         ips = mgr.list_global_ips(version=version)
 
         for ip in ips:
-            routed = 'No'
+            assigned = 'No'
             target = 'None'
             if ip.get('destinationIpAddress'):
                 dest = ip['destinationIpAddress']
-                routed = 'Yes'
+                assigned = 'Yes'
                 target = dest['ipAddress']
                 if dest.get('virtualGuest'):
                     vg = dest['virtualGuest']
@@ -121,8 +144,31 @@ Filters:
                               dest['hardware']['fullyQualifiedDomainName'] + \
                               ')'
 
-            t.add_row([ip['id'], ip['ipAddress']['ipAddress'], routed, target])
+            t.add_row([ip['id'], ip['ipAddress']['ipAddress'], assigned, target])
         return t
+
+
+class GlobalIpAssign(CLIRunnable):
+    """
+usage: sl network globalip-assign <identifier> <target> [options]
+
+Assigns a global IP to a target.
+
+Required:
+  <identifier>  The ID or address of the global IP
+  <target>      The IP address to assign to the global IP
+"""
+    action = 'globalip-assign'
+
+    @staticmethod
+    def execute(client, args):
+        mgr = NetworkManager(client)
+
+        id = mgr.resolve_global_ip_ids(args.get('<identifier>'))
+        if not id:
+            raise CLIAbort("Unable to find global IP record for " +
+                           args['<identifier>'])
+        mgr.assign_global_ip(id, args['<target>'])
 
 
 class NetworkLookupIp(CLIRunnable):
@@ -382,10 +428,10 @@ Cancel a subnet
     @staticmethod
     def execute(client, args):
         mgr = NetworkManager(client)
-        subnet = mgr.get_subnet(args.get('<identifier>'))
+        subnet_id = mgr.resolve_subnet_ids(args.get('<identifier>'))
 
-        if args['--really'] or no_going_back(subnet['id']):
-            mgr.cancel_subnet(subnet['id'])
+        if args['--really'] or no_going_back(subnet_id):
+            mgr.cancel_subnet(subnet_id)
         else:
             CLIAbort('Aborted')
 
@@ -406,7 +452,8 @@ Filters:
     def execute(client, args):
         mgr = NetworkManager(client)
 
-        subnet = mgr.get_subnet(args.get('<identifier>'))
+        subnet_id = mgr.resolve_subnet_ids(args.get('<identifier>'))
+        subnet = mgr.get_subnet(subnet_id)
 
         t = KeyValueTable(['Name', 'Value'])
         t.align['Name'] = 'r'

@@ -22,6 +22,7 @@ class NetworkManager(IdentifierMixin, object):
         #: Reference to the SoftLayer_Network_Vlan object.
         self.vlan = client['Network_Vlan']
         self.subnet = client['Network_Subnet']
+        self.global_ip_resolvers = [self._get_global_ip_by_identifier]
         self.subnet_resolvers = [self._get_subnet_by_identifier]
 
     def add_global_ip(self, version=4, test_order=False):
@@ -86,6 +87,14 @@ class NetworkManager(IdentifierMixin, object):
         order['complexType'] = \
             'SoftLayer_Container_Product_Order_Network_Subnet'
         return func(order)
+
+    def cancel_global_ip(self, id):
+        """ Cancels the specified global IP address.
+
+        :param int id: The ID of the global IP to be cancelled.
+        """
+        # Global IPs are treated as subnets, so we'll just reuse cancel_subnet
+        return self.cancel_subnet(id)
 
     def cancel_subnet(self, id):
         """ Cancels the specified subnet.
@@ -164,7 +173,6 @@ class NetworkManager(IdentifierMixin, object):
         if 'mask' not in kwargs:
             kwargs['mask'] = 'mask[%s]' % ','.join(self._get_subnet_mask())
 
-        id = resolve_ids(id, self.subnet_resolvers)[0]
         return self.subnet.getObject(id=id, **kwargs)
 
     def get_vlan(self, id):
@@ -223,15 +231,20 @@ class NetworkManager(IdentifierMixin, object):
             _filter['subnets']['version'] = query_filter(version)
         if subnet_type:
             _filter['subnets']['subnetType'] = query_filter(subnet_type)
+        else:
+            # This filters out global IPs from the subnet listing.
+            _filter['subnets']['subnetType'] = {'operation': 'not null'}
 
         kwargs['filter'] = _filter.to_dict()
 
         results = []
 
-        # This should filter out global IPs
+        # Filtering out routed global IPs here. This is being done in code
+        # because of complications getting the object filter syntax working.
         for subnet in self.account.getSubnets(**kwargs):
-            if subnet.get('subnetType'):
+            if 'GLOBAL_IP' not in subnet['subnetType']:
                 results.append(subnet)
+
         return results
 
     def list_vlans(self, datacenter=None, vlan_number=None, **kwargs):
@@ -241,9 +254,9 @@ class NetworkManager(IdentifierMixin, object):
         data center residence and the number of devices attached.
 
         :param string datacenter: If specified, the list will only contain
-                                  VLANs in the specified data center.
+                                    VLANs in the specified data center.
         :param int vlan_number: If specified, the list will only contain the
-                                VLAN matching this VLAN number.
+                                  VLAN matching this VLAN number.
         :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
 
         """
@@ -260,6 +273,27 @@ class NetworkManager(IdentifierMixin, object):
 
         return self._get_vlans(**kwargs)
 
+    def assign_global_ip(self, id, target):
+        """ Assigns a global IP address to a specified target.
+
+        :param int id: The ID of the global IP being
+        :param string target: The IP address to assign
+        """
+        return self.client['Network_Subnet_IpAddress_Global'].route(target,
+                                                                    id=id)
+
+    def resolve_global_ip_ids(self, identifier):
+        results = resolve_ids(identifier, self.global_ip_resolvers)
+
+        if results:
+            return results[0]
+
+    def resolve_subnet_ids(self, identifier):
+        results = resolve_ids(identifier, self.subnet_resolvers)
+
+        if results:
+            return results[0]
+
     def summary_by_datacenter(self):
         """ Provides a dictionary with a summary of all network information on
         the account, grouped by data center.
@@ -269,8 +303,8 @@ class NetworkManager(IdentifierMixin, object):
         information, see the :func:`list_vlans` method instead.
 
         :returns: A dictionary keyed by data center with the data containing a
-                  series of counts for hardware, subnets, CCIs, and other
-                  objects residing within that data center.
+                    series of counts for hardware, subnets, CCIs, and other
+                    objects residing within that data center.
 
         """
         datacenters = {}
@@ -298,6 +332,18 @@ class NetworkManager(IdentifierMixin, object):
                 len(vlan['virtualGuests'])
 
         return datacenters
+
+    def _get_global_ip_by_identifier(self, identifier):
+        """ Returns the ID of the global IP matching the specified identifier.
+
+        :param string identifier: The identifier to look up
+        :returns: The ID of the matching subnet or None
+        """
+        results = []
+        for ip in self.list_global_ips():
+            if ip['ipAddress']['subnet']['networkIdentifier'] == identifier:
+                results.append(ip['id'])
+        return results
 
     def _get_subnet_by_identifier(self, identifier):
         """ Returns the ID of the subnet matching the specified identifier.
