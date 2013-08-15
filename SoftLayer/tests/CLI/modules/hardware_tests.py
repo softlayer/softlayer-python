@@ -198,7 +198,7 @@ class HardwareCLITests(unittest.TestCase):
 
     @patch('SoftLayer.HardwareManager.change_port_speed')
     @patch('SoftLayer.CLI.modules.server.resolve_id')
-    def test_NetworkHardware(
+    def test_NicEditServer(
             self, resolve_mock, port_mock):
         hw_id = 12345
         resolve_mock.return_value = hw_id
@@ -206,18 +206,19 @@ class HardwareCLITests(unittest.TestCase):
         # Test updating the port
         args = {
             'port': True,
-            '--private': True,
+            'public': False,
+            'private': True,
             '--speed': 100
         }
 
         port_mock.side_effect = [True, False]
 
         # First call simulates a success
-        server.NetworkServer.execute(self.client, args)
+        server.NicEditServer.execute(self.client, args)
         port_mock.assert_called_with(hw_id, False, 100)
 
         # Second call simulates an error
-        self.assertFalse(server.NetworkServer.execute(self.client, args))
+        self.assertFalse(server.NicEditServer.execute(self.client, args))
 
     @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
     def test_ListChassisServer(self, packages):

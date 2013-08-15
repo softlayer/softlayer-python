@@ -2,7 +2,7 @@
 usage: sl server [<command>] [<args>...] [options]
        sl server [-h | --help]
 
-Manage hardware
+Manage hardware servers
 
 The available commands are:
   cancel          Cancel a dedicated server.
@@ -12,7 +12,7 @@ The available commands are:
   detail          Retrieve hardware details
   list            List hardware devices
   list-chassis    Provide a list of all chassis available for ordering
-  network         Manage network settings
+  nic-edit        Edit NIC settings
   reload          Perform an OS reload
 
 For several commands, <identifier> will be asked for. This can be the id,
@@ -259,31 +259,22 @@ Display a list of cancellation reasons
         return t
 
 
-class NetworkServer(CLIRunnable):
+class NicEditServer(CLIRunnable):
     """
-usage: sl server network port <identifier> --speed=SPEED
-                                (--public | --private) [options]
+usage: sl server nic-edit <identifier> (public | private) --speed=SPEED
+                          [options]
 
-Manage network settings
+Manage NIC settings
 
 Options:
-    --private      Private network
-    --public       Public network
     --speed=SPEED  Port speed. 0 disables the port.
                      [Options: 0, 10, 100, 1000, 10000]
 """
-    action = 'network'
+    action = 'nic-edit'
 
     @classmethod
     def execute(cls, client, args):
-        if args['port']:
-            return cls.exec_port(client, args)
-
-    @staticmethod
-    def exec_port(client, args):
-        public = True
-        if args['--private']:
-            public = False
+        public = args['public']
 
         mgr = HardwareManager(client)
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
