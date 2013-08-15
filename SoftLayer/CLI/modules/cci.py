@@ -12,10 +12,14 @@ The available commands are:
   dns             DNS related actions to a CCI
   edit            Edit details of a CCI
   list            List CCI's on the account
-  manage          Manage active CCI
-  network         Manage network settings
+  nic-edit        Edit NIC settings
+  pause           Pauses an active CCI
+  power-off       Powers off a running CCI
+  power-on        Boots up a CCI
   ready           Check if a CCI has finished provisioning
+  reboot          Reboots a running CCI
   reload          Reload the OS on a CCI based on its current configuration
+  resume          Resumes a paused CCI
 
 For several commands, <identifier> will be asked for. This can be the id,
 hostname or the ip address for a CCI.
@@ -638,7 +642,7 @@ usage: sl cci reload <identifier> [options]
 Reload the OS on a CCI based on its current configuration
 
 Optional:
-    -i, --postinstall=URI   Post-install script to download
+    -i, --postinstall=URI  Post-install script to download
                              (Only HTTPS executes, HTTP leaves file in /root)
 """
 
@@ -675,114 +679,136 @@ Cancel a CCI
             CLIAbort('Aborted')
 
 
-class ManageCCI(CLIRunnable):
+class CCIPowerOff(CLIRunnable):
     """
-usage: sl cci manage poweroff <identifier> [--cycle | --soft] [options]
-       sl cci manage reboot <identifier> [--cycle | --soft] [options]
-       sl cci manage poweron <identifier> [options]
-       sl cci manage pause <identifier> [options]
-       sl cci manage resume <identifier> [options]
+usage: sl cci power-off <identifier> [--hard] [options]
 
-Manage active CCI
+Power off an active CCI
+
+Optional:
+    --hard  Perform a hard shutdown
 """
-    action = 'manage'
+    action = 'power-off'
     options = ['confirm']
 
     @classmethod
     def execute(cls, client, args):
-        if args['poweroff']:
-            return cls.exec_shutdown(client, args)
-
-        if args['reboot']:
-            return cls.exec_reboot(client, args)
-
-        if args['poweron']:
-            return cls.exec_poweron(client, args)
-
-        if args['pause']:
-            return cls.exec_pause(client, args)
-
-        if args['resume']:
-            return cls.exec_resume(client, args)
-
-    @staticmethod
-    def exec_shutdown(client, args):
         vg = client['Virtual_Guest']
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
-        if args['--soft']:
-            result = vg.powerOffSoft(id=cci_id)
-        elif args['--cycle']:
-            result = vg.powerCycle(id=cci_id)
+        if args['--really'] or confirm('This will power off the CCI with id '
+                                       '%s. Continue?' % cci_id):
+            if args['--hard']:
+                result = vg.powerOff(id=cci_id)
+            else:
+                result = vg.powerOffSoft(id=cci_id)
+
+            return FormattedItem(result)
         else:
-            result = vg.powerOff(id=cci_id)
+            raise CLIAbort('Aborted.')
 
-        return FormattedItem(result)
 
-    @staticmethod
-    def exec_poweron(client, args):
+class CCIReboot(CLIRunnable):
+    """
+usage: sl cci reboot <identifier> [--hard | --soft] [options]
+
+Reboot an active CCI
+
+Optional:
+    --hard  Perform an abrupt reboot
+    --sort  Perform a graceful reboot
+"""
+    action = 'reboot'
+    options = ['confirm']
+
+    @classmethod
+    def execute(cls, client, args):
+        vg = client['Virtual_Guest']
+        cci = CCIManager(client)
+        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
+        if args['--really'] or confirm('This will reboot the CCI with id '
+                                       '%s. Continue?' % cci_id):
+            if args['--hard']:
+                result = vg.rebootHard(id=cci_id)
+            elif args['--soft']:
+                result = vg.rebootSoft(id=cci_id)
+            else:
+                result = vg.rebootDefault(id=cci_id)
+        else:
+            raise CLIAbort('Aborted.')
+
+        return result
+
+
+class CCIPowerOn(CLIRunnable):
+    """
+usage: sl cci power-on <identifier> [options]
+
+Power on a CCI
+"""
+    action = 'power-on'
+
+    @classmethod
+    def execute(cls, client, args):
         vg = client['Virtual_Guest']
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         return vg.powerOn(id=cci_id)
 
-    @staticmethod
-    def exec_pause(client, args):
+
+class CCIPause(CLIRunnable):
+    """
+usage: sl cci pause <identifier> [options]
+
+Pauses an active CCI
+"""
+    action = 'pause'
+    options = ['confirm']
+
+    @classmethod
+    def execute(cls, client, args):
         vg = client['Virtual_Guest']
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
-        return vg.pause(id=cci_id)
 
-    @staticmethod
-    def exec_resume(client, args):
+        if args['--really'] or confirm('This will pause the CCI with id '
+                                       '%s. Continue?' % cci_id):
+            return vg.pause(id=cci_id)
+        else:
+            raise CLIAbort('Aborted.')
+
+
+class CCIResume(CLIRunnable):
+    """
+usage: sl cci resume <identifier> [options]
+
+Resumes a paused CCI
+"""
+    action = 'resume'
+
+    @classmethod
+    def execute(cls, client, args):
         vg = client['Virtual_Guest']
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         return vg.resume(id=cci_id)
 
-    @staticmethod
-    def exec_reboot(client, args):
-        vg = client['Virtual_Guest']
-        cci = CCIManager(client)
-        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
-        if args['--cycle']:
-            result = vg.rebootHard(id=cci_id)
-        elif args['--soft']:
-            result = vg.rebootSoft(id=cci_id)
-        else:
-            result = vg.rebootDefault(id=cci_id)
 
-        return result
-
-
-class NetworkCCI(CLIRunnable):
+class NicEditCCI(CLIRunnable):
     """
-usage: sl cci network port <identifier> --speed=SPEED (--public | --private)
-                           [options]
+usage: sl cci nic-edit <identifier> (public | private) --speed=SPEED [options]
 
-Manage network settings
+Manage NIC settings
 
 Options:
-    --public       Public network
-    --private      Private network
     --speed=SPEED  Port speed. 0 disables the port.
                      [Options: 0, 10, 100, 1000, 10000]
 """
-    action = 'network'
+    action = 'nic-edit'
 
     @classmethod
     def execute(cls, client, args):
-        if args['port']:
-            return cls.exec_port(client, args)
-
-        if args['details']:
-            return cls.exec_detail(client, args)
-
-    @staticmethod
-    def exec_port(client, args):
-        public = True
-        if args['--private']:
-            public = False
+        public = args['public']
 
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
@@ -792,11 +818,6 @@ Options:
             return "Success"
         else:
             return result
-
-    @staticmethod
-    def exec_detail(client, args):
-        # TODO this should print out default gateway and stuff
-        raise CLIAbort('Not implemented')
 
 
 class CCIDNS(CLIRunnable):
