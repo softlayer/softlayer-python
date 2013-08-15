@@ -9,7 +9,6 @@ The SoftLayer command line interface is available via the `sl` command available
    :maxdepth: 2
 
    cli/cci
-   cli/dev
 
 
 .. _config_setup:

@@ -5,10 +5,9 @@ API Documentation
 =================
 This is the primary API client to make API calls. It deals with constructing and executing XML-RPC calls against the SoftLayer API. Below are some links that will help to use the SoftLayer API.
 
-.. toctree::
 
-   SoftLayer API Documentation <http://sldn.softlayer.com/reference/softlayerapi>
-   Source on Github <https://github.com/softlayer/softlayer-api-python-client>
+* `SoftLayer API Documentation <http://sldn.softlayer.com/reference/softlayerapi>`_
+* `Source on Github <https://github.com/softlayer/softlayer-api-python-client>`_
 
 ::
 
@@ -38,7 +37,7 @@ Creating a client instance with environmental variables set:
     import SoftLayer
     client = SoftLayer.Client()
 
-Below is an example of creating a client instance with more options. This will create a client with the private API endpoint (only accessable from the SoftLayer network), a timeout of 2 minutes, and with verbose mode on (prints out more than you ever wanted to know about the HTTP requests to stdout).
+Below is an example of creating a client instance with more options. This will create a client with the private API endpoint (only accessable from the SoftLayer network) and a timeout of 2 minutes.
 ::
 
     client = SoftLayer.Client(
@@ -46,7 +45,6 @@ Below is an example of creating a client instance with more options. This will c
             api_key='YOUR_API_KEY'
             endpoint_url=SoftLayer.API_PRIVATE_ENDPOINT,
             timeout=240,
-            verbose=True,
         )
 
 Managers

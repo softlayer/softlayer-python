@@ -5,9 +5,9 @@ Perform various network operations
 
 The available commands are:
   ip-lookup       Find information about a specific IP
-  summary         Provide a summary view of the network
   subnet-detail   Display detailed information about a subnet
   subnet-list     Show a list of all subnets on the network
+  summary         Provide a summary view of the network
   vlan-detail     Display detailed information about a VLAN
   vlan-list       Show a list of all VLANs on the network
 """
@@ -17,9 +17,7 @@ The available commands are:
 # :license: BSD, see LICENSE for more details.
 
 from SoftLayer import NetworkManager
-from SoftLayer.CLI import (CLIRunnable, Table, KeyValueTable, FormattedItem,
-                           confirm)
-from SoftLayer.CLI.helpers import (CLIAbort, SequentialOutput)
+from SoftLayer.CLI import CLIRunnable, Table, KeyValueTable
 
 
 class NetworkLookupIp(CLIRunnable):
@@ -185,9 +183,9 @@ Options:
 
 Filters:
   -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
+  --identifier=ID          Filter by identifier
   --v4                     Display only IPV4 subnets
   --v6                     Display only IPV6 subnets
-  --identifier=ID          Filter by identifier
 """
     action = 'subnet-list'
 

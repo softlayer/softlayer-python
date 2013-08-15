@@ -4,18 +4,18 @@ usage: sl cci [<command>] [<args>...] [options]
 Manage, delete, order compute instances
 
 The available commands are:
-  network         Manage network settings
-  edit            Edit details of a CCI
+  cancel          Cancel a running CCI
   create          Order and create a CCI
                     (see `sl cci create-options` for choices)
-  manage          Manage active CCI
-  list            List CCI's on the account
+  create-options  Output available available options when creating a CCI
   detail          Output details about a CCI
   dns             DNS related actions to a CCI
-  cancel          Cancel a running CCI
-  create-options  Output available available options when creating a CCI
-  reload          Reload the OS on a CCI based on its current configuration
+  edit            Edit details of a CCI
+  list            List CCI's on the account
+  manage          Manage active CCI
+  network         Manage network settings
   ready           Check if a CCI has finished provisioning
+  reload          Reload the OS on a CCI based on its current configuration
 
 For several commands, <identifier> will be asked for. This can be the id,
 hostname or the ip address for a CCI.
@@ -54,16 +54,16 @@ Options:
                 Cores, memory, primary_ip, backend_ip
 
 Filters:
+  -c --cpu=CPU             Number of CPU cores
+  -D --domain=DOMAIN       Domain portion of the FQDN. example: example.com
+  -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
+  -H --hostname=HOST       Host portion of the FQDN. example: server
+  -m --memory=MEMORY       Memory in mebibytes
+  -n MBPS, --network=MBPS  Network port speed in Mbps
   --hourly                 Show hourly instances
   --monthly                Show monthly instances
-  -H --hostname=HOST       Host portion of the FQDN. example: server
-  -D --domain=DOMAIN       Domain portion of the FQDN. example: example.com
-  -c --cpu=CPU             Number of CPU cores
-  -m --memory=MEMORY       Memory in mebibytes (n * 1024)
-  -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
-  -n MBPS, --network=MBPS  Network port speed in Mbps
   --tags=ARG               Only show instances that have one of these tags.
-                           Comma-separated. (production,db)
+                             Comma-separated. (production,db)
 
 For more on filters see 'sl help filters'
 """
@@ -209,12 +209,12 @@ Output available available options when creating a CCI
 
 Options:
   --all         Show all options. default if no other option provided
-  --datacenter  Show datacenter options
   --cpu         Show CPU options
-  --nic         Show NIC speed options
+  --datacenter  Show datacenter options
   --disk        Show disk options
-  --os          Show operating system options
   --memory      Show memory size options
+  --nic         Show NIC speed options
+  --os          Show operating system options
 """
     action = 'create-options'
     options = ['datacenter', 'cpu', 'nic', 'disk', 'os', 'memory']
@@ -337,39 +337,37 @@ usage: sl cci create [options]
 Order/create a CCI. See 'sl cci create-options' for valid options
 
 Required:
-  -H --hostname=HOST  Host portion of the FQDN. example: server
-  -D --domain=DOMAIN  Domain portion of the FQDN example: example.com
-  -c --cpu=CPU        Number of CPU cores
-  -m --memory=MEMORY  Memory in mebibytes (n * 1024)
-
-  -o OS, --os=OS      OS install code. Tip: you can specify <OS>_LATEST
-  --image=GUID        Image GUID. See: 'sl image list' for reference
+  -c, --cpu=CPU        Number of CPU cores
+  -D, --domain=DOMAIN  Domain portion of the FQDN. example: example.com
+  -H, --hostname=HOST  Host portion of the FQDN. example: server
+  --image=GUID         Image GUID. See: 'sl image list' for reference
+  -m, --memory=MEMORY  Memory in mebibytes. example: 2048
+  -o, --os=OS          OS install code. Tip: you can specify <OS>_LATEST
 
   --hourly            Hourly rate instance type
   --monthly           Monthly rate instance type
 
 
 Optional:
-  -d DC, --datacenter=DC   Datacenter shortname (sng01, dal05, ...)
-                           Note: Omitting this value defaults to the first
-                             available datacenter
-  -n MBPS, --network=MBPS  Network port speed in Mbps
-  --dedicated              Allocate a dedicated CCI (non-shared host)
-  --dry-run, --test        Do not create CCI, just get a quote
-
-  -u --userdata=DATA       User defined metadata string
-  -F --userfile=FILE       Read userdata from file
-  -i --postinstall=URI     Post-install script to download
-                             (Only HTTPS executes, HTTP leaves file in /root)
-  -k KEY, --key=KEY        The SSH key to add to the root user
-  --private                Forces the CCI to only have access the private
-                             network.
-  -t, --template=FILE      A template file that defaults the command-line
-                            options using the long name in INI format
-  --like=IDENTIFIER        Use the configuration from an existing CCI
-  --export=FILE            Exports options to a template file
-  --wait=SECONDS           Block until CCI is finished provisioning for up to X
-                             seconds before returning
+  -d, --datacenter=DC    Datacenter shortname (sng01, dal05, ...)
+                         Note: Omitting this value defaults to the first
+                           available datacenter
+  --dedicated            Allocate a dedicated CCI (non-shared host)
+  --dry-run, --test      Do not create CCI, just get a quote
+  --export=FILE          Exports options to a template file
+  -F, --userfile=FILE       Read userdata from file
+                            (Only HTTPS executes, HTTP leaves file in /root)
+  -i, --postinstall=URI  Post-install script to download
+  -k, --key=KEY          The SSH key to add to the root user
+  --like=IDENTIFIER      Use the configuration from an existing CCI
+  -n, --network=MBPS     Network port speed in Mbps
+  --private              Forces the CCI to only have access the private
+                           network
+  -t, --template=FILE    A template file that defaults the command-line
+                           options using the long name in INI format
+  -u, --userdata=DATA    User defined metadata string
+  --wait=SECONDS         Block until CCI is finished provisioning for up to X
+                           seconds before returning
 """
     action = 'create'
     options = ['confirm']
@@ -423,7 +421,7 @@ Optional:
             output.append(FormattedItem(
                 None,
                 ' -- ! Prices reflected here are retail and do not '
-                'take account level discounts and are not guarenteed.')
+                'take account level discounts and are not guaranteed.')
             )
 
         if args['--export']:
@@ -765,10 +763,10 @@ usage: sl cci network port <identifier> --speed=SPEED (--public | --private)
 Manage network settings
 
 Options:
-    --speed=SPEED  Port speed. 0 disables the port.
-                   [Options: 0, 10, 100, 1000, 10000]
     --public       Public network
     --private      Private network
+    --speed=SPEED  Port speed. 0 disables the port.
+                     [Options: 0, 10, 100, 1000, 10000]
 """
     action = 'network'
 
@@ -907,10 +905,10 @@ usage: sl cci edit <identifier> [options]
 Edit CCI details
 
 Options:
-  -H --hostname=HOST  Host portion of the FQDN. example: server
   -D --domain=DOMAIN  Domain portion of the FQDN example: example.com
-  -u --userdata=DATA  User defined metadata string
   -F --userfile=FILE  Read userdata from file
+  -H --hostname=HOST  Host portion of the FQDN. example: server
+  -u --userdata=DATA  User defined metadata string
 """
     action = 'edit'
 

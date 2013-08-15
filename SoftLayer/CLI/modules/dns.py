@@ -89,10 +89,10 @@ usage: sl dns list [<zone>] [options]
 List zones and optionally, records
 
 Filters:
-  --type=TYPE    Record type, such as A or CNAME
   --data=DATA    Record data, such as an IP address
   --record=HOST  Host record, such as www
   --ttl=TTL      TTL value in seconds, such as 86400
+  --type=TYPE    Record type, such as A or CNAME
 """
     action = 'list'
 
@@ -209,8 +209,8 @@ Arguments:
 
 Options:
   --data=DATA
-  --ttl=TTL    Time to live [default: 7200]
   --id=ID      Modify only the given ID
+  --ttl=TTL    Time to live [default: 7200]
 """
     action = 'edit'
 

@@ -1,13 +1,13 @@
 """
-usage: sl bmetal [<command>] [<args>...] [options]
-       sl bmetal [-h | --help]
+usage: sl bmc [<command>] [<args>...] [options]
+       sl bmc [-h | --help]
 
 Manage bare metal instances
 
 The available commands are:
-  create-options  Output available available options when creating a server
-  create    Create a new bare metal instance
   cancel    Cancels a bare metal instance
+  create    Create a new bare metal instance
+  create-options  Output available available options when creating a server
 
 For several commands, <identifier> will be asked for. This can be the id,
 hostname or the ip address for a piece of hardware.
@@ -23,20 +23,20 @@ from SoftLayer.CLI.helpers import (
 from SoftLayer import HardwareManager
 
 
-class BMetalCreateOptions(CLIRunnable):
+class BMCCreateOptions(CLIRunnable):
     """
-usage: sl bmetal create-options [options]
+usage: sl bmc create-options [options]
 
 Output available available options when creating a bare metal instance.
 
 Options:
   --all         Show all options. default if no other option provided
-  --datacenter  Show datacenter options
   --cpu         Show CPU options
-  --nic         Show NIC speed options
+  --datacenter  Show datacenter options
   --disk        Show disk options
-  --os          Show operating system options
   --memory      Show memory size options
+  --nic         Show NIC speed options
+  --os          Show operating system options
 """
     action = 'create-options'
     options = ['datacenter', 'cpu', 'memory', 'os', 'disk', 'nic']
@@ -262,38 +262,35 @@ Options:
         return []
 
 
-class CreateBMetalInstance(CLIRunnable):
+class CreateBMCInstance(CLIRunnable):
     """
-usage: sl bmetal create [--disk=DISK...] [options]
+usage: sl bmc create [--disk=DISK...] [options]
 
-Order/create a bare metal instance. See 'sl bmetal create-options' for valid
+Order/create a bare metal instance. See 'sl bmc create-options' for valid
 options
 
+NOTE: Due to hardware configurations, the CPU and memory must match
+      appropriately. See create-options for options
+
 Required:
-  -H --hostname=HOST  Host portion of the FQDN. example: server
-  -D --domain=DOMAIN  Domain portion of the FQDN example: example.com
   -c --cpu=CPU        Number of CPU cores
-  -m --memory=MEMORY  Memory in mebibytes (n * 1024)
-
-                      NOTE: Due to hardware configurations, the CPU and memory
-                            must match appropriately. See create-options for
-                            options.
-
-  -o OS, --os=OS      OS install code.
-
+  -D --domain=DOMAIN  Domain portion of the FQDN example: example.com
+  -H --hostname=HOST  Host portion of the FQDN. example: server
+  -m --memory=MEMORY  Memory in mebibytes. Example: 2048
+  -o OS, --os=OS      OS install code
   --hourly            Hourly rate instance type
   --monthly           Monthly rate instance type
 
 
 Optional:
-  -d DC, --datacenter=DC   datacenter name
-                           Note: Omitting this value defaults to the first
-                             available datacenter
-  -n MBPS, --network=MBPS  Network port speed in Mbps
+  -d DC, --datacenter=DC   datacenter name Note: Omitting this value defaults
+                             to the first available datacenter
   --dry-run, --test        Do not create the instance, just get a quote
+  --export=FILE            Exports options to a template file
+  -n MBPS, --network=MBPS  Network port speed in Mbps
   -t, --template=FILE      A template file that defaults the command-line
                             options using the long name in INI format
-  --export=FILE            Exports options to a template file
+
 """
     action = 'create'
     options = ['confirm']
@@ -400,7 +397,7 @@ Optional:
             output.append(FormattedItem(
                 '',
                 ' -- ! Prices reflected here are retail and do not '
-                'take account level discounts and are not guarenteed.')
+                'take account level discounts and are not guaranteed.')
             )
         elif args['--really'] or confirm(
                 "This action will incur charges on your account. Continue?"):
@@ -439,7 +436,7 @@ Optional:
     @classmethod
     def _get_cpu_and_memory_price_ids(cls, bmi_options, cpu_value,
                                       memory_value):
-        bmi_obj = BMetalCreateOptions()
+        bmi_obj = BMCCreateOptions()
         price_id = None
 
         cpu_regex = re.compile('(\d+)')
@@ -470,7 +467,7 @@ Optional:
 
     @classmethod
     def _get_price_id_from_options(cls, bmi_options, option, value):
-        bmi_obj = BMetalCreateOptions()
+        bmi_obj = BMCCreateOptions()
         price_id = None
 
         for k, v in bmi_obj.get_create_options(bmi_options, option, False):
@@ -483,13 +480,13 @@ Optional:
 
 class CancelInstance(CLIRunnable):
     """
-usage: sl bmetal cancel <identifier> [options]
+usage: sl bmc cancel <identifier> [options]
 
 Cancel a bare metal instance
 
 Options:
   --immediate  Cancels the instance immediately (instead of on the billing
-                 anniversary).
+                 anniversary)
 """
 
     action = 'cancel'
