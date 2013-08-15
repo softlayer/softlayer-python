@@ -20,8 +20,8 @@ usage: sl image list [--public | --private] [options]
 List images
 
 Options:
-  --public   Display only public images
   --private  Display only private images
+  --public   Display only public images
 """
     action = 'list'
 

@@ -14,8 +14,8 @@ except ImportError:
     import unittest  # NOQA
 from mock import Mock, MagicMock, patch
 
-from SoftLayer.CLI.helpers import format_output
-from SoftLayer.CLI.modules.hardware import *
+from SoftLayer.CLI.helpers import format_output, CLIAbort
+from SoftLayer.CLI.modules import server
 
 
 class HardwareCLITests(unittest.TestCase):
@@ -30,7 +30,7 @@ class HardwareCLITests(unittest.TestCase):
         }
         reasons.return_value = test_data
 
-        output = HardwareCancelReasons.execute(self.client, {})
+        output = server.ServerCancelReasons.execute(self.client, {})
 
         expected = [{'Reason': 'Reason 1', 'Code': 'code1'},
                     {'Reason': 'Reason 2', 'Code': 'code2'}]
@@ -57,7 +57,7 @@ class HardwareCLITests(unittest.TestCase):
 
         create_options.return_value = test_data
 
-        output = HardwareCreateOptions.execute(self.client, args)
+        output = server.ServerCreateOptions.execute(self.client, args)
 
         expected = {
             'datacenter': ['FIRST_AVAILABLE', 'TEST00'],
@@ -91,7 +91,7 @@ class HardwareCLITests(unittest.TestCase):
         client.__getitem__.return_value = dns_mock
 
         args = {'<identifier>': hw_id, '--passwords': True}
-        output = HardwareDetails.execute(client, args)
+        output = server.ServerDetails.execute(client, args)
 
         expected = {
             'status': 'ACTIVE',
@@ -117,7 +117,8 @@ class HardwareCLITests(unittest.TestCase):
         hw_data = self.get_server_mocks()
         list_hardware.return_value = hw_data
 
-        output = ListHardware.execute(self.client, {'--tags': 'openstack'})
+        output = server.ListServers.execute(
+            self.client, {'--tags': 'openstack'})
 
         expected = [
             {
@@ -142,10 +143,10 @@ class HardwareCLITests(unittest.TestCase):
 
         self.assertEqual(expected, format_output(output, 'python'))
 
-    @patch('SoftLayer.CLI.modules.hardware.CLIAbort')
-    @patch('SoftLayer.CLI.modules.hardware.no_going_back')
+    @patch('SoftLayer.CLI.modules.server.CLIAbort')
+    @patch('SoftLayer.CLI.modules.server.no_going_back')
     @patch('SoftLayer.HardwareManager.reload')
-    @patch('SoftLayer.CLI.modules.hardware.resolve_id')
+    @patch('SoftLayer.CLI.modules.server.resolve_id')
     def test_HardwareReload(
             self, resolve_mock, reload_mock, ngb_mock, abort_mock):
         hw_id = 12345
@@ -154,21 +155,21 @@ class HardwareCLITests(unittest.TestCase):
 
         # Check the positive case
         args = {'--really': True, '--postinstall': None}
-        HardwareReload.execute(self.client, args)
+        server.ServerReload.execute(self.client, args)
 
         reload_mock.assert_called_with(hw_id, args['--postinstall'])
 
         # Now check to make sure we properly call CLIAbort in the negative case
         args['--really'] = False
 
-        HardwareReload.execute(self.client, args)
+        server.ServerReload.execute(self.client, args)
         abort_mock.assert_called()
 
-    @patch('SoftLayer.CLI.modules.hardware.CLIAbort')
-    @patch('SoftLayer.CLI.modules.hardware.no_going_back')
+    @patch('SoftLayer.CLI.modules.server.CLIAbort')
+    @patch('SoftLayer.CLI.modules.server.no_going_back')
     @patch('SoftLayer.HardwareManager.cancel_hardware')
-    @patch('SoftLayer.CLI.modules.hardware.resolve_id')
-    def test_CancelHardware(
+    @patch('SoftLayer.CLI.modules.server.resolve_id')
+    def test_CancelServer(
             self, resolve_mock, cancel_mock, ngb_mock, abort_mock):
         hw_id = 12345
         resolve_mock.return_value = hw_id
@@ -178,12 +179,12 @@ class HardwareCLITests(unittest.TestCase):
         env_mock.input = Mock()
         env_mock.input.return_value = 'Comment'
 
-        CancelHardware.env = env_mock
+        server.CancelServer.env = env_mock
         env_mock.assert_called()
 
         # Check the positive case
         args = {'--really': True, '--reason': 'Test'}
-        CancelHardware.execute(self.client, args)
+        server.CancelServer.execute(self.client, args)
 
         cancel_mock.assert_called_with(hw_id, args['--reason'], 'Comment')
 
@@ -191,12 +192,12 @@ class HardwareCLITests(unittest.TestCase):
         env_mock.reset_mock()
         args['--really'] = False
 
-        CancelHardware.execute(self.client, args)
+        server.CancelServer.execute(self.client, args)
         abort_mock.assert_called()
         env_mock.assert_called()
 
     @patch('SoftLayer.HardwareManager.change_port_speed')
-    @patch('SoftLayer.CLI.modules.hardware.resolve_id')
+    @patch('SoftLayer.CLI.modules.server.resolve_id')
     def test_NetworkHardware(
             self, resolve_mock, port_mock):
         hw_id = 12345
@@ -212,21 +213,21 @@ class HardwareCLITests(unittest.TestCase):
         port_mock.side_effect = [True, False]
 
         # First call simulates a success
-        NetworkHardware.execute(self.client, args)
+        server.NetworkServer.execute(self.client, args)
         port_mock.assert_called_with(hw_id, False, 100)
 
         # Second call simulates an error
-        self.assertFalse(NetworkHardware.execute(self.client, args))
+        self.assertFalse(server.NetworkServer.execute(self.client, args))
 
     @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
-    def test_ListChassisHardware(self, packages):
+    def test_ListChassisServer(self, packages):
         test_data = [
             (1, 'Chassis 1'),
             (2, 'Chassis 2')
         ]
         packages.return_value = test_data
 
-        output = ListChassisHardware.execute(self.client, {})
+        output = server.ListChassisServer.execute(self.client, {})
 
         expected = [
             {'Chassis': 'Chassis 1', 'Code': 1},
@@ -275,7 +276,7 @@ class HardwareCLITests(unittest.TestCase):
                     }
                 ]
             }
-            output = CreateHardware.execute(self.client, args)
+            output = server.CreateServer.execute(self.client, args)
 
             # This test is fragile. We need to figure out why format 'python'
             # doesn't work here in the CLI code.
@@ -286,7 +287,7 @@ class HardwareCLITests(unittest.TestCase):
 :        Second Item : 25.00 :
 : Total monthly cost : 25.00 :
 :....................:.......:
- -- ! Prices reflected here are retail and do not take account level discounts and are not guarenteed."""
+ -- ! Prices reflected here are retail and do not take account level discounts and are not guaranteed."""
             self.assertEqual(expected, format_output(output, 'table'))
 
         # Now test ordering
@@ -299,19 +300,19 @@ class HardwareCLITests(unittest.TestCase):
             args['--test'] = False
             args['--really'] = True
 
-            output = CreateHardware.execute(self.client, args)
+            output = server.CreateServer.execute(self.client, args)
 
             expected = {'id': 98765, 'created': '2013-08-02 15:23:47'}
             self.assertEqual(expected, format_output(output, 'python'))
 
         # Finally, test cancelling the process
-        with patch('SoftLayer.CLI.modules.hardware.confirm') as confirm:
+        with patch('SoftLayer.CLI.modules.server.confirm') as confirm:
             confirm.return_value = False
 
             args['--really'] = False
 
             self.assertRaises(CLIAbort,
-                              CreateHardware.execute, self.client, args)
+                              server.CreateServer.execute, self.client, args)
 
     @staticmethod
     def get_create_options_data():

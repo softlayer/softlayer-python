@@ -30,14 +30,14 @@ Required:
   <label>                  The label for your SSH key. will appear in various
                              interfaces to help you easily identify this key.
                              You can enclose multiple words in quotation marks
-                             "like this" if desired.
+                             "like this" if desired
   -f FILE, --file=FILE     The id_rsa.pub file to import for this key. Mutually
                              exclusive with --key
   -k KEY, --key=KEY        The actual SSH key. Mutually exclusive with --file.
-                             Should be enclosed within quotation marks.
+                             Should be enclosed within quotation marks
 
 Optional:
-  -n NOTES, --notes=NOTES  Any notes you want to add to the SSH key.
+  -n NOTES, --notes=NOTES  Any notes you want to add to the SSH key
 """
     action = 'add'
 
@@ -61,10 +61,10 @@ class DeleteSshKey(CLIRunnable):
     """
 usage: sl sshkey delete <identifier> [options]
 
-Permanently deletes an SSH key from your account.
+Permanently deletes an SSH key from your account
 
 Required:
-  <identifier>   The ID or label for the SSH key to be deleted.
+  <identifier>   The ID or label for the SSH key to be deleted
 
 """
 
@@ -118,8 +118,8 @@ usage: sl sshkey list [options]
 Display a list of SSH keys on your account
 
 Options:
-  --sortby=ARG  Column to sort by. options: datacenter, vlans,
-                subnets, IPs, networking, hardware, ccis, firewall
+  --sortby=ARG  Column to sort by. options: datacenter, vlans, subnets, IPs,
+                  networking, hardware, ccis, firewall
 """
     action = 'list'
 
@@ -145,7 +145,7 @@ Prints out an SSH key to the screen
 
 Options:
   -f FILE, --file=FILE  If specified, the public SSH key will be written to
-                          this file.
+                          this file
 """
     action = 'print'
 

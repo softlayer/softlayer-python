@@ -17,8 +17,18 @@ This is the documentation to SoftLayer's Python API Bindings. These bindings use
    :glob:
 
    install
-   api/client
+   api/*
    cli
+
+
+Contributing
+------------
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   dev/index
+   dev/cli
 
 
 External Links
@@ -30,3 +40,4 @@ External Links
    Issues <https://github.com/softlayer/softlayer-api-python-client/issues>
    PyPI <https://pypi.python.org/pypi/softlayer/>
    Twitter <https://twitter.com/SoftLayerDevs>
+   #softlayer on freenode <irc://irc.freenode.net/#softlayer>

@@ -1,19 +1,19 @@
 """
-usage: sl hardware [<command>] [<args>...] [options]
-       sl hardware [-h | --help]
+usage: sl server [<command>] [<args>...] [options]
+       sl server [-h | --help]
 
 Manage hardware
 
 The available commands are:
-  list            List hardware devices
-  detail          Retrieve hardware details
-  reload          Perform an OS reload
   cancel          Cancel a dedicated server.
   cancel-reasons  Provides the list of possible cancellation reasons
-  network         Manage network settings
-  list-chassis    Provide a list of all chassis available for ordering
-  create-options  Display a list of creation options for a specific chassis
   create          Create a new dedicated server
+  create-options  Display a list of creation options for a specific chassis
+  detail          Retrieve hardware details
+  list            List hardware devices
+  list-chassis    Provide a list of all chassis available for ordering
+  network         Manage network settings
+  reload          Perform an OS reload
 
 For several commands, <identifier> will be asked for. This can be the id,
 hostname or the ip address for a piece of hardware.
@@ -28,30 +28,30 @@ from SoftLayer.CLI.helpers import (
 from SoftLayer import HardwareManager, SshKeyManager
 
 
-class ListHardware(CLIRunnable):
+class ListServers(CLIRunnable):
     """
-usage: sl hardware list [options]
+usage: sl server list [options]
 
 List hardware servers on the acount
 
 Examples:
-  sl hardware list --datacenter=dal05
-  sl hardware list --network=100 --domain=example.com
-  sl hardware list --tags=production,db
+  sl server list --datacenter=dal05
+  sl server list --network=100 --domain=example.com
+  sl server list --tags=production,db
 
 Options:
   --sortby=ARG  Column to sort by. options: id, datacenter, host, cores,
                   memory, primary_ip, backend_ip
 
 Filters:
-  -H --hostname=HOST       Host portion of the FQDN. example: server
-  -D --domain=DOMAIN       Domain portion of the FQDN. example: example.com
-  -c --cpu=CPU             Number of CPU cores
-  -m --memory=MEMORY       Memory in gigabytes
-  -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
-  -n MBPS, --network=MBPS  Network port speed in Mbps
-  --tags=ARG               Only show instances that have one of these tags.
-                           Comma-separated. (production,db)
+  -c, --cpu=CPU        Number of CPU cores
+  -D, --domain=DOMAIN  Domain portion of the FQDN. example: example.com
+  -d, --datacenter=DC  Datacenter shortname (sng01, dal05, ...)
+  -H, --hostname=HOST  Host portion of the FQDN. example: server
+  -m, --memory=MEMORY  Memory in gigabytes
+  -n, --network=MBPS   Network port speed in Mbps
+  --tags=ARG           Only show instances that have one of these tags.
+                         Comma-separated. (production,db)
 
 For more on filters see 'sl help filters'
 """
@@ -100,9 +100,9 @@ For more on filters see 'sl help filters'
         return t
 
 
-class HardwareDetails(CLIRunnable):
+class ServerDetails(CLIRunnable):
     """
-usage: sl hardware detail [--passwords] [--price] <identifier> [options]
+usage: sl server detail [--passwords] [--price] <identifier> [options]
 
 Get details for a hardware device
 
@@ -170,7 +170,7 @@ Options:
         if tag_row:
             t.add_row(['tags', listing(tag_row, separator=',')])
 
-        ptr_domains = client['Hardware_Server'].getReverseDomainRecords(
+        ptr_domains = client['Server_Server'].getReverseDomainRecords(
             id=hardware_id)
 
         for ptr_domain in ptr_domains:
@@ -180,9 +180,9 @@ Options:
         return t
 
 
-class HardwareReload(CLIRunnable):
+class ServerReload(CLIRunnable):
     """
-usage: sl hardware reload <identifier> [options]
+usage: sl server reload <identifier> [options]
 
 Reload the OS on a hardware server based on its current configuration
 
@@ -205,15 +205,15 @@ Optional:
             CLIAbort('Aborted')
 
 
-class CancelHardware(CLIRunnable):
+class CancelServer(CLIRunnable):
     """
-usage: sl hardware cancel <identifier> [options]
+usage: sl server cancel <identifier> [options]
 
 Cancel a dedicated server
 
 Options:
-  --reason   An optional cancellation reason. See cancel-reasons for a list of
-             available options.
+  --reason  An optional cancellation reason. See cancel-reasons for a list of
+              available options
 """
 
     action = 'cancel'
@@ -235,9 +235,9 @@ Options:
             CLIAbort('Aborted')
 
 
-class HardwareCancelReasons(CLIRunnable):
+class ServerCancelReasons(CLIRunnable):
     """
-usage: sl hardware cancel-reasons
+usage: sl server cancel-reasons
 
 Display a list of cancellation reasons
 """
@@ -259,18 +259,18 @@ Display a list of cancellation reasons
         return t
 
 
-class NetworkHardware(CLIRunnable):
+class NetworkServer(CLIRunnable):
     """
-usage: sl hardware network port <identifier> --speed=SPEED
+usage: sl server network port <identifier> --speed=SPEED
                                 (--public | --private) [options]
 
 Manage network settings
 
 Options:
+    --private      Private network
+    --public       Public network
     --speed=SPEED  Port speed. 0 disables the port.
                      [Options: 0, 10, 100, 1000, 10000]
-    --public       Public network
-    --private      Private network
 """
     action = 'network'
 
@@ -296,9 +296,9 @@ Options:
             return result
 
 
-class ListChassisHardware(CLIRunnable):
+class ListChassisServer(CLIRunnable):
     """
-usage: sl hardware list-chassis [options]
+usage: sl server list-chassis [options]
 
 Display a list of chassis available for ordering dedicated servers.
 """
@@ -319,22 +319,22 @@ Display a list of chassis available for ordering dedicated servers.
         return t
 
 
-class HardwareCreateOptions(CLIRunnable):
+class ServerCreateOptions(CLIRunnable):
     """
-usage: sl hardware create-options <chassis_id> [options]
+usage: sl server create-options <chassis_id> [options]
 
 Output available available options when creating a dedicated server with the
 specified chassis.
 
 Options:
   --all         Show all options. default if no other option provided
-  --datacenter  Show datacenter options
-  --cpu         Show CPU options
-  --nic         Show NIC speed options
-  --disk        Show disk options
-  --os          Show operating system options
-  --memory      Show memory size options
   --controller  Show disk controller options
+  --cpu         Show CPU options
+  --datacenter  Show datacenter options
+  --disk        Show disk options
+  --memory      Show memory size options
+  --nic         Show NIC speed options
+  --os          Show operating system options
 """
 
     action = 'create-options'
@@ -589,36 +589,36 @@ Options:
             return [('disk_controllers', options)]
 
 
-class CreateHardware(CLIRunnable):
+class CreateServer(CLIRunnable):
     """
-usage: sl hardware create [--disk=SIZE...] [options]
+usage: sl server create [--disk=SIZE...] [options]
 
-Order/create a dedicated server. See 'sl hardware list-chassis' and
-'sl hardware create-options' for valid options. --disk can be repeated to
+Order/create a dedicated server. See 'sl server list-chassis' and
+'sl server create-options' for valid options. --disk can be repeated to
 order multiple disks.
 
 Required:
   -H --hostname=HOST  Host portion of the FQDN. example: server
-  -D --domain=DOMAIN  Domain portion of the FQDN example: example.com
+  -D --domain=DOMAIN  Domain portion of the FQDN. example: example.com
   --chassis=CHASSIS   The chassis to use for the new server
   -c --cpu=CPU        CPU model
   -o OS, --os=OS      OS install code.
-  -m --memory=MEMORY  Memory in gigabytes
+  -m --memory=MEMORY  Memory in gigabytes. example: 4
 
 
 Optional:
-  -d DC, --datacenter=DC   datacenter name
-                           Note: Omitting this value defaults to the first
-                             available datacenter
-  -n MBPS, --network=MBPS  Network port speed in Mbps
-  -d, --disk=SIZE...       Disks. Can be specified multiple times.
-  --controller=RAID        The RAID configuration for the server.
-                             Defaults to None.
-  -k KEY, --key=KEY        The SSH key to assign to the root user
-  --dry-run, --test        Do not create the server, just get a quote
-  -t, --template=FILE      A template file that defaults the command-line
-                            options using the long name in INI format
-  --export=FILE            Exports options to a template file
+  -d, --datacenter=DC  datacenter name
+                         Note: Omitting this value defaults to the first
+                         available datacenter
+  -n, --network=MBPS   Network port speed in Mbps
+  -d, --disk=SIZE...   Disks. Can be specified multiple times
+  --controller=RAID    The RAID configuration for the server.
+                         Defaults to None.
+  -k KEY, --key=KEY    The SSH key to assign to the root user
+  --dry-run, --test    Do not create the server, just get a quote
+  -t, --template=FILE  A template file that defaults the command-line
+                         options using the long name in INI format
+  --export=FILE        Exports options to a template file
 """
     action = 'create'
     options = ['confirm']
@@ -725,7 +725,7 @@ Optional:
             output.append(FormattedItem(
                 '',
                 ' -- ! Prices reflected here are retail and do not '
-                'take account level discounts and are not guarenteed.')
+                'take account level discounts and are not guaranteed.')
             )
 
         if args['--export']:
@@ -789,7 +789,7 @@ Optional:
     @classmethod
     def _get_price_id_from_options(cls, ds_options, option, value,
                                    item_id=False):
-        ds_obj = HardwareCreateOptions()
+        ds_obj = ServerCreateOptions()
 
         for k, v in ds_obj.get_create_options(ds_options, option, False):
             for item_options in v:
@@ -799,17 +799,17 @@ Optional:
                     return item_options[2]
 
 
-class EditHardware(CLIRunnable):
+class EditServer(CLIRunnable):
     """
-usage: sl hardware edit <identifier> [options]
+usage: sl server edit <identifier> [options]
 
 Edit hardware details
 
 Options:
-  -H --hostname=HOST  Host portion of the FQDN. example: server
   -D --domain=DOMAIN  Domain portion of the FQDN example: example.com
-  -u --userdata=DATA  User defined metadata string
   -F --userfile=FILE  Read userdata from file
+  -H --hostname=HOST  Host portion of the FQDN. example: server
+  -u --userdata=DATA  User defined metadata string
 """
     action = 'edit'
 

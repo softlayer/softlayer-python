@@ -5,9 +5,9 @@ usage: sl ssl [<command>] [<args>...] [options]
 Manage SSL
 
 The available commands are:
-  edit      Edit ssl certificate
-  download  Download certificate & key file
   add       Add ssl certificate
+  download  Download certificate & key file
+  edit      Edit ssl certificate
   list      List ssl certificates
   remove    Remove ssl certificate
 """
@@ -59,9 +59,9 @@ Add and upload SSL certificate details
 
 Options:
   --crt=FILE     Certificate file
-  --key=FILE     Private Key file
-  --icc=FILE     Intermediate Certificate file
   --csr=FILE     Certificate Signing Request file
+  --icc=FILE     Intermediate Certificate file
+  --key=FILE     Private Key file
   --notes=NOTES  Additional notes
 """
     action = 'add'
@@ -99,9 +99,9 @@ Edit SSL certificate
 
 Options:
   --crt=FILE     Certificate file
-  --key=FILE     Private Key file
-  --icc=FILE     Intermediate Certificate file
   --csr=FILE     Certificate Signing Request file
+  --icc=FILE     Intermediate Certificate file
+  --key=FILE     Private Key file
   --notes=NOTES  Additional notes
 """
     action = 'edit'
