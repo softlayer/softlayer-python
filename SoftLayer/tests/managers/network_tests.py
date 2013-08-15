@@ -199,6 +199,7 @@ class NetworkTests(unittest.TestCase):
                 'networkIdentifier': '10.0.0.1',
                 'datacenter': {'name': 'dal00'},
                 'version': 4,
+                'subnetType': 'PRIMARY',
             },
         ]
 
@@ -282,6 +283,7 @@ class NetworkTests(unittest.TestCase):
                 'networkIdentifier': '10.0.0.1',
                 'datacenter': {'name': 'dal00'},
                 'version': 4,
+                'subnetType': 'PRIMARY'
             },
         ], []]
 

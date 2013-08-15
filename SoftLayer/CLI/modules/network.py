@@ -4,6 +4,8 @@ usage: sl network [<command>] [<args>...] [options]
 Perform various network operations
 
 The available commands are:
+  globalip-add    Orders a new global IP address
+  globalip-list   Display a list of global IP addresses
   ip-lookup       Find information about a specific IP
   rwhois-edit     Edit the RWhois data on the account
   rwhois-show     Show the RWhois data on the account
@@ -22,6 +24,105 @@ from SoftLayer import NetworkManager
 from SoftLayer.CLI import CLIRunnable, Table, KeyValueTable, FormattedItem, \
     confirm, no_going_back
 from SoftLayer.CLI.helpers import CLIAbort, SequentialOutput
+
+
+class GlobalIpAdd(CLIRunnable):
+    """
+usage:
+  sl network globalip-add [options]
+
+Add a new global IP address to your account.
+
+Options:
+  --v6                 Orders IPv6
+  --dry-run, --test    Do not order the IP; just get a quote
+"""
+    action = 'globalip-add'
+    options = ['confirm']
+
+    @staticmethod
+    def execute(client, args):
+        mgr = NetworkManager(client)
+
+        version = 4
+        if args.get('--v6'):
+            version = 6
+        if not args.get('--test') and not args['--really']:
+            if not confirm("This action will incur charges on your account."
+                           "Continue?"):
+                raise CLIAbort('Cancelling order.')
+        result = mgr.add_global_ip(version=version,
+                                   test_order=args.get('--test'))
+        if not result:
+            return 'Unable to place order: No valid price IDs found.'
+        t = Table(['Item', 'cost'])
+        t.align['Item'] = 'r'
+        t.align['cost'] = 'r'
+
+        total = 0.0
+        for price in result['prices']:
+            total += float(price.get('recurringFee', 0.0))
+            rate = "%.2f" % float(price['recurringFee'])
+
+            t.add_row([price['item']['description'], rate])
+
+        t.add_row(['Total monthly cost', "%.2f" % total])
+        output = SequentialOutput()
+        output.append(t)
+        output.append(FormattedItem(
+            '',
+            ' -- ! Prices reflected here are retail and do not '
+            'take account level discounts and are not guarenteed.')
+        )
+        return t
+
+
+class GlobalIpList(CLIRunnable):
+    """
+usage: sl network globalip-list [options]
+
+Displays a list of global IPs
+
+Filters:
+  --v4                     Display only IPV4
+  --v6                     Display only IPV6
+"""
+    action = 'globalip-list'
+
+    @staticmethod
+    def execute(client, args):
+        mgr = NetworkManager(client)
+
+        t = Table([
+            'id', 'ip', 'routed', 'target'
+        ])
+        t.sortby = args.get('--sortby') or 'id'
+
+        version = 0
+        if args.get('--v4'):
+            version = 4
+        elif args.get('--v6'):
+            version = 6
+
+        ips = mgr.list_global_ips(version=version)
+
+        for ip in ips:
+            routed = 'No'
+            target = 'None'
+            if ip.get('destinationIpAddress'):
+                dest = ip['destinationIpAddress']
+                routed = 'Yes'
+                target = dest['ipAddress']
+                if dest.get('virtualGuest'):
+                    vg = dest['virtualGuest']
+                    target += ' (' + vg['fullyQualifiedDomainName'] + ')'
+                elif ip['destinationIpAddress'].get('hardware'):
+                    target += ' (' + \
+                              dest['hardware']['fullyQualifiedDomainName'] + \
+                              ')'
+
+            t.add_row([ip['id'], ip['ipAddress']['ipAddress'], routed, target])
+        return t
 
 
 class NetworkLookupIp(CLIRunnable):
@@ -58,7 +159,7 @@ information.
         subnet_table.add_row(['netmask', ip['subnet']['netmask']])
         if ip['subnet'].get('gateway'):
             subnet_table.add_row(['gateway', ip['subnet']['gateway']])
-        subnet_table.add_row(['type', ip['subnet']['subnetType']])
+        subnet_table.add_row(['type', ip['subnet'].get('subnetType')])
 
         t.add_row(['subnet', subnet_table])
 
@@ -202,7 +303,6 @@ class SubnetAdd(CLIRunnable):
     """
 usage:
   sl network subnet-add (public|private) <quantity> <vlan> [options]
-  sl network subnet-add global [options]
 
 Add a new subnet to your account
 
@@ -211,12 +311,10 @@ Required:
                          Valid quantities vary by type.
 
                          Type    - Valid Quantities (IPv4)
-                         global  - 1
                          public  - 4, 8, 16, 32
                          private - 4, 8, 16, 32, 64
 
                          Type    - Valid Quantities (IPv6)
-                         global  - 1
                          public  - 64
   <vlan>               The VLAN ID you want to attach this subnet to
 
@@ -234,8 +332,6 @@ Options:
         _type = 'private'
         if args['public']:
             _type = 'public'
-        elif args['global']:
-            _type = 'global'
 
         version = 4
         if args.get('--v6'):
@@ -366,6 +462,7 @@ Options:
 Filters:
   -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
   --identifier=ID          Filter by identifier
+  -t TYPE, --type=TYPE     Filter by subnet type
   --v4                     Display only IPV4 subnets
   --v6                     Display only IPV6 subnets
 """
@@ -376,8 +473,8 @@ Filters:
         mgr = NetworkManager(client)
 
         t = Table([
-            'id', 'identifier', 'datacenter', 'vlan id', 'IPs', 'hardware',
-            'ccis',
+            'id', 'identifier', 'type', 'datacenter', 'vlan id', 'IPs',
+            'hardware', 'ccis',
         ])
         t.sortby = args.get('--sortby') or 'id'
 
@@ -391,12 +488,14 @@ Filters:
             datacenter=args.get('--datacenter'),
             version=version,
             identifier=args.get('--identifier'),
+            subnet_type=args.get('--type'),
         )
 
         for subnet in subnets:
             t.add_row([
                 subnet['id'],
                 subnet['networkIdentifier'],
+                subnet.get('subnetType', '-'),
                 subnet['datacenter']['name'],
                 subnet['networkVlanId'],
                 subnet['ipAddressCount'],

@@ -24,6 +24,18 @@ class NetworkManager(IdentifierMixin, object):
         self.subnet = client['Network_Subnet']
         self.subnet_resolvers = [self._get_subnet_by_identifier]
 
+    def add_global_ip(self, version=4, test_order=False):
+        """ Adds a global IP address to the account.
+
+        :param int version: Specifies whether this is IPv4 or IPv6
+        :param bool test_order: If true, this will only verify the order.
+        """
+        # This method is here to improve the public interface from a user's
+        # perspective since ordering a single global IP through the subnet
+        # interface is not intuitive.
+        return self.add_subnet(type='global', version=version,
+                               test_order=test_order)
+
     def add_subnet(self, type, quantity=None, vlan_id=None, version=4,
                    test_order=False):
         package = self.client['Product_Package']
@@ -165,6 +177,63 @@ class NetworkManager(IdentifierMixin, object):
         """
         return self.vlan.getObject(id=id, mask=self._get_vlan_mask())
 
+    def list_global_ips(self, version=0):
+        """ Returns a list of all global IP address records on the account.
+
+        :param int version: Only returns IPs of this version (4 or 6).
+        """
+        mask = ['destinationIpAddress[hardware, virtualGuest]', 'ipAddress']
+        mask = 'mask[%s]' % ','.join(mask)
+        _filter = NestedDict({})
+        if version:
+            v = query_filter(version)
+            _filter['globalIpRecords']['ipAddress']['subnet']['version'] = v
+        _filter = _filter.to_dict()
+        return self.account.getGlobalIpRecords(filter=_filter, mask=mask)
+
+    def list_subnets(self, identifier=None, datacenter=None, version=0,
+                     subnet_type=None, **kwargs):
+        """ Display a list of all subnets on the account.
+
+        This provides a quick overview of all subnets including information
+        about data center residence and the number of devices attached.
+
+        :param string identifier: If specified, the list will only contain the
+                                    subnet matching this network identifier.
+        :param string datacenter: If specified, the list will only contain
+                                    subnets in the specified data center.
+        :param int version: Only returns subnets of this version (4 or 6).
+        :param string subnet_type: If specified, it will only returns subnets
+                                     of this type.
+        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+
+        """
+        if 'mask' not in kwargs:
+            mask = self._get_subnet_mask()
+            kwargs['mask'] = 'mask[%s]' % ','.join(mask)
+
+        _filter = NestedDict(kwargs.get('filter') or {})
+
+        if identifier:
+            _filter['subnets']['networkIdentifier'] = query_filter(identifier)
+        if datacenter:
+            _filter['subnets']['datacenter']['name'] = \
+                query_filter(datacenter)
+        if version:
+            _filter['subnets']['version'] = query_filter(version)
+        if subnet_type:
+            _filter['subnets']['subnetType'] = query_filter(subnet_type)
+
+        kwargs['filter'] = _filter.to_dict()
+
+        results = []
+
+        # This should filter out global IPs
+        for subnet in self.account.getSubnets(**kwargs):
+            if subnet.get('subnetType'):
+                results.append(subnet)
+        return results
+
     def list_vlans(self, datacenter=None, vlan_number=None, **kwargs):
         """ Display a list of all VLANs on the account.
 
@@ -190,37 +259,6 @@ class NetworkManager(IdentifierMixin, object):
         kwargs['filter'] = _filter.to_dict()
 
         return self._get_vlans(**kwargs)
-
-    def list_subnets(self, identifier=None, datacenter=None, version=0,
-                     **kwargs):
-        """ Display a list of all subnets on the account.
-
-        This provides a quick overview of all subnets including information
-        about data center residence and the number of devices attached.
-
-        :param string datacenter: If specified, the list will only contain
-                                  subnets in the specified data center.
-        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
-
-        """
-        if 'mask' not in kwargs:
-            mask = self._get_subnet_mask()
-            kwargs['mask'] = 'mask[%s]' % ','.join(mask)
-
-        _filter = NestedDict(kwargs.get('filter') or {})
-
-        if identifier:
-            _filter['subnets']['networkIdentifier'] = query_filter(identifier)
-        if datacenter:
-            _filter['subnets']['datacenter']['name'] = \
-                query_filter(datacenter)
-        if version:
-            _filter['subnets']['version'] = query_filter(version)
-
-        kwargs['filter'] = _filter.to_dict()
-
-        results = self.account.getSubnets(**kwargs)
-        return results
 
     def summary_by_datacenter(self):
         """ Provides a dictionary with a summary of all network information on
