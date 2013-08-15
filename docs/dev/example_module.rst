@@ -2,6 +2,9 @@
 
 :orphan:
 
+Example CLI Module
+==================
+
 ::
 
     """
@@ -10,9 +13,9 @@
     Example implementation of a CLI module
 
     Available commands are:
-      print    print example
-      pretty   formatted print example
-      parse  parsing args example
+      parse   parsing args example
+      pretty  formatted print example
+      print   print example
     """
 
     from SoftLayer.CLI import (
@@ -91,3 +94,4 @@
 
             if args.get('--that'):
                 print "you dont have", args['--that']
+    

@@ -1,5 +1,6 @@
 .. _config_file:
 
+
 CLI Configuration File
 ======================
 The CLI loads your settings from a number of different locations.

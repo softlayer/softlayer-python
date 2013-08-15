@@ -50,9 +50,6 @@ setup(
         'SoftLayer.CLI',
         'SoftLayer.CLI.modules',
         'SoftLayer.managers',
-        'SoftLayer.tests',
-        'SoftLayer.tests.CLI',
-        'SoftLayer.tests.managers',
     ],
     license='The BSD License',
     zip_safe=False,
@@ -65,7 +62,7 @@ setup(
     package_data={
         'SoftLayer': ['tests/fixtures/*'],
     },
-    test_suite = 'nose.collector',
+    test_suite='nose.collector',
     install_requires=requires,
     classifiers=[
         'Environment :: Console',

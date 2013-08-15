@@ -1,4 +1,4 @@
-.. _dev:
+.. _cli_dev:
 
 .. note::
   
@@ -28,33 +28,22 @@ A module is a python module residing in `SoftLayer/CLI/modules/<module>.py`.  Th
   Example implementation of a CLI module
 
   Available commands are:
-    print    print example
-    pretty   formatted print example
-    parse  parsing args example
+    parse   Parsing args example
+    pretty  Formatted print example
+    print   Print example
   """
 
-  from SoftLayer.CLI import (
-      CLIRunnable, Table, no_going_back, confirm)
+There are some tenants for styling the doc blocks
+ * These are parsed with `docopt <http://docopt.org/>`_ so conform to the spec.
+ * Two spaces before commands in a command list and options in an option list. 
+ * Align the descriptions two spaces after the loggest command/option
+ * If a description has to take up more than one line, indent two spaces past the current indention for all additional lines.
+ * Alphabetize all commands/option listings. For options, use the long name to judge ordering.
 
-
-::
-
-  $ sl example
-  usage: sl example [<command>] [<args>...] [options]
-
-  Example implementation of a CLI module
-
-  Available commands are:
-    print    print example
-    pretty   formatted print example
-    parse  parsing args example
-
-  Standard Options:
-    -h --help  Show this screen
 
 Action
 ------
-Actions are implemented using classes in the module that subclass `CLIRunnable`.  The actual class name is irrelevant for the implementation details as it isn't used anywhere.  The docblock is used as the arguement parser as well.  Unlike the modules docblock, additional, common, arguments are added to the end as well; i.e. `--config` and `--format`.
+Actions are implemented using classes in the module that subclass `SoftLayer.CLI.CLIRunnable`.  The actual class name is irrelevant for the implementation details as it isn't used anywhere.  The docblock is used as the arguement parser as well.  Unlike the modules docblock, additional, common, arguments are added to the end as well; i.e. `--config` and `--format`.
 
 ::
 
@@ -72,7 +61,7 @@ Actions are implemented using classes in the module that subclass `CLIRunnable`.
 The required interfaces are:
 
 * The docblock (__doc__) for docopt
-* action
+* action class attribute
 * def execute(client, args)
 
   - Don't forget the @staticmethod annotation!

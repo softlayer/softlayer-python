@@ -40,6 +40,9 @@ class Environment(object):
     aliases = {
         'meta': 'metadata',
         'my': 'metadata',
+        'vm': 'cci',
+        'hardware': 'server',
+        'bmetal': 'bmc',
     }
     config = {}
     stdout = sys.stdout
