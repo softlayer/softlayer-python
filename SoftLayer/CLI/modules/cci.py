@@ -703,7 +703,7 @@ Optional:
             else:
                 result = vg.powerOffSoft(id=cci_id)
 
-            return FormattedItem(result)
+            return result
         else:
             raise CLIAbort('Aborted.')
 

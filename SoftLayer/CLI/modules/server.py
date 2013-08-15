@@ -13,6 +13,10 @@ The available commands are:
   list            List hardware devices
   list-chassis    Provide a list of all chassis available for ordering
   nic-edit        Edit NIC settings
+  power-cycle     Issues power cycle to server
+  power-off       Powers off a running server
+  power-on        Boots up a server
+  reboot          Reboots a running server
   reload          Perform an OS reload
 
 For several commands, <identifier> will be asked for. This can be the id,
@@ -257,6 +261,103 @@ Display a list of cancellation reasons
             t.add_row([code, reason])
 
         return t
+
+
+class ServerPowerOff(CLIRunnable):
+    """
+usage: sl server power-off <identifier> [options]
+
+Power off an active server
+"""
+    action = 'power-off'
+    options = ['confirm']
+
+    @classmethod
+    def execute(cls, client, args):
+        hw = client['Hardware_Server']
+        mgr = HardwareManager(client)
+        hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
+                           'hardware')
+        if args['--really'] or confirm('This will power off the server with '
+                                       'id %s. Continue?' % hw_id):
+            result = hw.powerOff(id=hw_id)
+
+            return result
+        else:
+            raise CLIAbort('Aborted.')
+
+
+class ServerReboot(CLIRunnable):
+    """
+usage: sl server reboot <identifier> [--hard | --soft] [options]
+
+Reboot an active server
+
+Optional:
+    --hard  Perform an abrupt reboot
+    --sort  Perform a graceful reboot
+"""
+    action = 'reboot'
+    options = ['confirm']
+
+    @classmethod
+    def execute(cls, client, args):
+        hw = client['Hardware_Server']
+        mgr = HardwareManager(client)
+        hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
+                           'hardware')
+        if args['--really'] or confirm('This will power off the server with '
+                                       'id %s. Continue?' % hw_id):
+            if args['--hard']:
+                result = hw.rebootHard(id=hw_id)
+            elif args['--soft']:
+                result = hw.rebootSoft(id=hw_id)
+            else:
+                result = hw.rebootDefault(id=hw_id)
+        else:
+            raise CLIAbort('Aborted.')
+
+        return result
+
+
+class ServerPowerOn(CLIRunnable):
+    """
+usage: sl server power-on <identifier> [options]
+
+Power on a server
+"""
+    action = 'power-on'
+
+    @classmethod
+    def execute(cls, client, args):
+        hw = client['Hardware_Server']
+        mgr = HardwareManager(client)
+        hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
+                           'hardware')
+        return hw.powerOn(id=hw_id)
+
+
+class ServerPowerCycle(CLIRunnable):
+    """
+usage: sl server power-cycle <identifier> [options]
+
+Issues power cycle to server via the power strip
+"""
+    action = 'power-cycle'
+    options = ['confirm']
+
+    @classmethod
+    def execute(cls, client, args):
+        hw = client['Hardware_Server']
+        mgr = HardwareManager(client)
+        hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
+                           'hardware')
+
+        if args['--really'] or confirm('This will power off the server with '
+                                       'id %s. Continue?' % hw_id):
+            return hw.powerCycle(id=hw_id)
+        else:
+            raise CLIAbort('Aborted.')
 
 
 class NicEditServer(CLIRunnable):
