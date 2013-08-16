@@ -88,6 +88,15 @@ class NetworkManager(IdentifierMixin, object):
             'SoftLayer_Container_Product_Order_Network_Subnet'
         return func(order)
 
+    def assign_global_ip(self, id, target):
+        """ Assigns a global IP address to a specified target.
+
+        :param int id: The ID of the global IP being assigned
+        :param string target: The IP address to assign
+        """
+        return self.client['Network_Subnet_IpAddress_Global'].route(target,
+                                                                    id=id)
+
     def cancel_global_ip(self, id):
         """ Cancels the specified global IP address.
 
@@ -273,15 +282,6 @@ class NetworkManager(IdentifierMixin, object):
 
         return self._get_vlans(**kwargs)
 
-    def assign_global_ip(self, id, target):
-        """ Assigns a global IP address to a specified target.
-
-        :param int id: The ID of the global IP being
-        :param string target: The IP address to assign
-        """
-        return self.client['Network_Subnet_IpAddress_Global'].route(target,
-                                                                    id=id)
-
     def resolve_global_ip_ids(self, identifier):
         results = resolve_ids(identifier, self.global_ip_resolvers)
 
@@ -332,6 +332,13 @@ class NetworkManager(IdentifierMixin, object):
                 len(vlan['virtualGuests'])
 
         return datacenters
+
+    def unassign_global_ip(self, id):
+        """ Unassigns a global IP address from a target.
+
+        :param int id: The ID of the global IP being unassigned
+        """
+        return self.client['Network_Subnet_IpAddress_Global'].unroute(id=id)
 
     def _get_global_ip_by_identifier(self, identifier):
         """ Returns the ID of the global IP matching the specified identifier.

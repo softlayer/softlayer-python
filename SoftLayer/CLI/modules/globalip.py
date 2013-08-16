@@ -4,10 +4,11 @@ usage: sl globalip [<command>] [<args>...] [options]
 Orders or configures global IP addresses
 
 The available commands are:
-  assign  Assign a target to a global IP address
-  cancel  Cancels a global IP
-  create  Orders a new global IP address
-  list    Display a list of global IP addresses
+  assign    Assign a target to a global IP address
+  cancel    Cancels a global IP
+  create    Orders a new global IP address
+  list      Display a list of global IP addresses
+  unassign  Unassigns a global IP
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: BSD, see LICENSE for more details.
@@ -160,3 +161,28 @@ Filters:
             t.add_row([ip['id'], ip['ipAddress']['ipAddress'], assigned,
                        target])
         return t
+
+
+class GlobalIpUnassign(CLIRunnable):
+    """
+usage: sl globalip unassign <identifier> [options]
+
+Unassigns a global IP from a target.
+
+Required:
+  <identifier>  The ID or address of the global IP
+"""
+    action = 'unassign'
+
+    @staticmethod
+    def execute(client, args):
+        mgr = NetworkManager(client)
+
+        id = mgr.resolve_global_ip_ids(args.get('<identifier>'))
+        if not id:
+            raise CLIAbort("Unable to find global IP record for " +
+                           args['<identifier>'])
+        mgr.unassign_global_ip(id)
+
+
+        

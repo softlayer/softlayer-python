@@ -29,15 +29,29 @@ class NetworkTests(unittest.TestCase):
 
         self.assertEqual(None, self.network.add_subnet(type='bad'))
 
+    def test_add_global_ip(self):
+        self._setup_add_subnet_mocks()
+        # Test a global IPv4 order
+        expected = {'packageId': 0,
+                    'prices': [{
+                        'categories': [{
+                            'categoryCode': 'global_ipv4'}],
+                        'id': 11,
+                        'item': {'capacity': '0',
+                                 'description': 'Global IPv4',
+                                 'id': 10},
+                        'itemId': 10,
+                        'recurringFee': '0'}]}
+
+        result = self.network.add_global_ip(test_order=True)
+
+        self.assertEqual(expected, result)
+
     def test_add_subnet_for_ipv4(self):
         self._setup_add_subnet_mocks()
 
         # Test a four public address IPv4 order
-        expected = {'location': 12340,
-                    'locationObject': {'id': 12340,
-                                       'longName': 'Test Data Center',
-                                       'name': 'test00'},
-                    'packageId': 0,
+        expected = {'packageId': 0,
                     'prices': [{
                         'categories': [{
                             'categoryCode': 'sov_sec_ip_addresses_pub'}],
@@ -55,6 +69,8 @@ class NetworkTests(unittest.TestCase):
                                          version=4,
                                          test_order=True)
 
+        self.assertEqual(expected, result)
+
         # Test a global IPv4 order
         expected = {'packageId': 0,
                     'prices': [{
@@ -70,15 +86,13 @@ class NetworkTests(unittest.TestCase):
         result = self.network.add_subnet(type='global',
                                          test_order=True)
 
+        self.assertEqual(expected, result)
+
     def test_add_subnet_for_ipv6(self):
         self._setup_add_subnet_mocks()
 
         # Test a public IPv6 order
         expected = {
-            'location': 456780,
-            'locationObject': {'id': 456780,
-                               'longName': 'Test Data Center',
-                               'name': 'test00'},
             'packageId': 0,
             'prices': [{
                 'categories': [{'categoryCode': 'static_ipv6_addresses'}],
@@ -95,6 +109,8 @@ class NetworkTests(unittest.TestCase):
                                          vlan_id=45678,
                                          version=6,
                                          test_order=True)
+
+        self.assertEqual(expected, result)
 
         # Test a global IPv6 order
         expected = {'packageId': 0,
@@ -113,6 +129,27 @@ class NetworkTests(unittest.TestCase):
                                          test_order=True)
 
         self.assertEqual(expected, result)
+
+    def test_assign_global_ip(self):
+        id = 9876
+        target = '172.16.24.76'
+
+        self.network.assign_global_ip(id, target)
+
+        service = self.client['Network_Subnet_IpAddress_Global']
+        service.route.assert_called_with(target, id=id)
+
+    def test_cancel_global_ip(self):
+        id = 9876
+        mcall = call(id=1056)
+        service = self.client['Billing_Item']
+
+        self.client['Network_Subnet'].getObject.return_value = {
+            'id': id,
+            'billingItem': {'id': 1056}
+        }
+        self.network.cancel_global_ip(id)
+        service.cancelService.assert_has_calls(mcall)
 
     def test_cancel_subnet(self):
         id = 9876
@@ -221,6 +258,7 @@ class NetworkTests(unittest.TestCase):
     def test_list_subnets_with_filters(self):
         identifier = '10.0.0.1'
         datacenter = 'dal00'
+        subnet_type = 'PRIMARY'
         version = 4
 
         service = self.client['Account']
@@ -237,10 +275,22 @@ class NetworkTests(unittest.TestCase):
         result = self.network.list_subnets(
             identifier=identifier,
             datacenter=datacenter,
+            subnet_type=subnet_type,
             version=version,
         )
 
-        service.getSubnets.assert_called()
+        _filter = {
+            'subnets': {
+                'datacenter': {
+                    'name': {'operation': '_= dal00'}
+                },
+                'version': {'operation': 4},
+                'subnetType': {'operation': '_= PRIMARY'},
+                'networkIdentifier': {'operation': '_= 10.0.0.1'}
+            }
+        }
+        mask = 'mask[hardware,datacenter,ipAddressCount,virtualGuests]'
+        service.getSubnets.assert_called_with(filter=_filter, mask=mask)
 
         self.assertEqual([service.getSubnets.return_value[0]], result)
 
@@ -343,6 +393,14 @@ class NetworkTests(unittest.TestCase):
         _id = self.network.resolve_subnet_ids('nope')
         self.assertEqual(_id, None)
 
+    def test_unassign_global_ip(self):
+        id = 9876
+
+        self.network.unassign_global_ip(id)
+
+        service = self.client['Network_Subnet_IpAddress_Global']
+        service.unroute.assert_called_with(id=id)
+
     def _setup_add_subnet_mocks(self):
         package_mock = self.client['Product_Package']
         package_mock.getItems.return_value = [
@@ -404,6 +462,7 @@ class NetworkTests(unittest.TestCase):
         vlan_mock.getObject.side_effect = vlan_return_mock
 
         def order_return_mock(order):
+            print order
             mock_item = {}
             for item in package_mock.getItems.return_value:
                 if item['prices'][0]['id'] == order['prices'][0]['id']:
@@ -428,14 +487,6 @@ class NetworkTests(unittest.TestCase):
                     }
                 ],
             }
-
-            if order.get('location'):
-                result['locationObject'] = {
-                    'id': order['location'],
-                    'name': 'test00',
-                    'longName': 'Test Data Center'
-                }
-                result['location'] = order['location']
 
             return result
 
