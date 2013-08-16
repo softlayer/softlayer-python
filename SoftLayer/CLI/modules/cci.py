@@ -703,7 +703,7 @@ Optional:
             else:
                 result = vg.powerOffSoft(id=cci_id)
 
-            return FormattedItem(result)
+            return result
         else:
             raise CLIAbort('Aborted.')
 
@@ -716,7 +716,7 @@ Reboot an active CCI
 
 Optional:
     --hard  Perform an abrupt reboot
-    --sort  Perform a graceful reboot
+    --soft  Perform a graceful reboot
 """
     action = 'reboot'
     options = ['confirm']

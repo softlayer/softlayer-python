@@ -196,6 +196,85 @@ class HardwareCLITests(unittest.TestCase):
         abort_mock.assert_called()
         env_mock.assert_called()
 
+    @patch('SoftLayer.CLI.modules.server.confirm')
+    def test_ServerPowerOff(self, confirm_mock):
+        hw_id = 12345
+
+        # Check the positive case
+        args = {'--really': True, '<identifier>': '12345'}
+
+        server.ServerPowerOff.execute(self.client, args)
+
+        self.client['Hardware_Server'].powerOff.assert_called_with(id=hw_id)
+
+        # Now check to make sure we properly call CLIAbort in the negative case
+        confirm_mock.return_value = False
+        args['--really'] = False
+        self.assertRaises(CLIAbort,
+                          server.ServerPowerOff.execute, self.client, args)
+
+    @patch('SoftLayer.CLI.modules.server.confirm')
+    def test_ServerReboot(self, confirm_mock):
+        hw_id = 12345
+
+        # Check the positive case
+        args = {
+            '--really': True,
+            '<identifier>': '12345',
+            '--hard': False,
+            '--soft': False,
+        }
+
+        server.ServerReboot.execute(self.client, args)
+        self.client['Hardware_Server'].rebootDefault.assert_called_with(
+            id=hw_id)
+
+        args['--soft'] = True
+        args['--hard'] = False
+        server.ServerReboot.execute(self.client, args)
+        self.client['Hardware_Server'].rebootSoft.assert_called_with(id=hw_id)
+
+        args['--soft'] = False
+        args['--hard'] = True
+        server.ServerReboot.execute(self.client, args)
+        self.client['Hardware_Server'].rebootHard.assert_called_with(id=hw_id)
+
+        # Now check to make sure we properly call CLIAbort in the negative case
+        confirm_mock.return_value = False
+        args['--really'] = False
+        self.assertRaises(CLIAbort,
+                          server.ServerReboot.execute, self.client, args)
+
+    def test_ServerPowerOn(self):
+        hw_id = 12345
+
+        # Check the positive case
+        args = {
+            '<identifier>': '12345',
+        }
+
+        server.ServerPowerOn.execute(self.client, args)
+        self.client['Hardware_Server'].powerOn.assert_called_with(id=hw_id)
+
+    @patch('SoftLayer.CLI.modules.server.confirm')
+    def test_ServerPowerCycle(self, confirm_mock):
+        hw_id = 12345
+
+        # Check the positive case
+        args = {
+            '<identifier>': '12345',
+            '--really': True,
+        }
+
+        server.ServerPowerCycle.execute(self.client, args)
+        self.client['Hardware_Server'].powerCycle.assert_called_with(id=hw_id)
+
+        # Now check to make sure we properly call CLIAbort in the negative case
+        confirm_mock.return_value = False
+        args['--really'] = False
+        self.assertRaises(CLIAbort,
+                          server.ServerPowerCycle.execute, self.client, args)
+
     @patch('SoftLayer.HardwareManager.change_port_speed')
     @patch('SoftLayer.CLI.modules.server.resolve_id')
     def test_NicEditServer(
