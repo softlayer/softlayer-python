@@ -26,7 +26,7 @@ Filters:
   --no-cci         Hide CCI listing
   --no-hardware    Hide hardware listing
 """
-    action = 'vlan-detail'
+    action = 'detail'
 
     @staticmethod
     def execute(client, args):
@@ -104,7 +104,7 @@ Filters:
   -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
   -n NUM, --number=NUM     VLAN number
 """
-    action = 'vlan-list'
+    action = 'list'
 
     @staticmethod
     def execute(client, args):

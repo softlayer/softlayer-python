@@ -38,7 +38,7 @@ Options:
   --state=STATE      Set the state information. Use the two-letter
                        abbreviation.
 """
-    action = 'rwhois-edit'
+    action = 'edit'
 
     @staticmethod
     def execute(client, args):
@@ -74,7 +74,7 @@ usage: sl rwhois show [options]
 
 Display the RWhois information for your account.
 """
-    action = 'rwhois-show'
+    action = 'show'
 
     @staticmethod
     def execute(client, args):

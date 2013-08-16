@@ -29,7 +29,7 @@ Required:
   <identifier>  The ID or address of the global IP
   <target>      The IP address to assign to the global IP
 """
-    action = 'globalip-assign'
+    action = 'assign'
 
     @staticmethod
     def execute(client, args):
