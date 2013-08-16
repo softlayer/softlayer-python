@@ -295,7 +295,7 @@ Reboot an active server
 
 Optional:
     --hard  Perform an abrupt reboot
-    --sort  Perform a graceful reboot
+    --soft  Perform a graceful reboot
 """
     action = 'reboot'
     options = ['confirm']
