@@ -179,8 +179,39 @@ class NetworkTests(unittest.TestCase):
         self.network.get_vlan(id)
         service.getObject.assert_has_calls(mcall)
 
+    def test_list_global_ips_default(self):
+        mask = 'mask[destinationIpAddress[hardware, virtualGuest],ipAddress]'
+        mcall = call(filter={}, mask=mask)
+        service = self.client['Account']
+
+        self.network.list_global_ips()
+
+        service.getGlobalIpRecords.assert_has_calls(mcall)
+
+    def test_list_global_ips_with_filter(self):
+        mask = 'mask[destinationIpAddress[hardware, virtualGuest],ipAddress]'
+        _filter = {
+            'globalIpRecords': {
+                'ipAddress': {
+                    'subnet': {
+                        'version': {'operation': 4},
+                    }
+                }
+            }
+        }
+
+        mcall = call(filter=_filter, mask=mask)
+        service = self.client['Account']
+
+        self.network.list_global_ips(version=4)
+
+        service.getGlobalIpRecords.assert_has_calls(mcall)
+
     def test_list_subnets_default(self):
-        mcall = call(filter={}, mask=ANY)
+        _filter = {'subnets': {'subnetType': {'operation': 'not null'}}}
+        mask = 'mask[hardware,datacenter,ipAddressCount,virtualGuests]'
+        mcall = call(filter=_filter,
+                     mask=mask)
         service = self.client['Account']
 
         self.network.list_subnets()
@@ -275,7 +306,26 @@ class NetworkTests(unittest.TestCase):
         service.getNetworkVlans.assert_has_calls(mcall)
         self.assertEqual(expected, result)
 
-    def test_resolve_ids_ip(self):
+    def test_resolve_global_ip_ids(self):
+        service = self.client['Account']
+        service.getGlobalIpRecords.side_effect = [[
+            {
+                'id': '200',
+                'ipAddress': {
+                    'subnet': {
+                        'networkIdentifier': '10.0.0.1',
+                    },
+                },
+            },
+        ], []]
+
+        _id = self.network.resolve_global_ip_ids('10.0.0.1')
+        self.assertEqual(_id, '200')
+
+        _id = self.network.resolve_global_ip_ids('nope')
+        self.assertEqual(_id, None)
+
+    def test_resolve_subnet_ids(self):
         service = self.client['Account']
         service.getSubnets.side_effect = [[
             {
@@ -287,11 +337,11 @@ class NetworkTests(unittest.TestCase):
             },
         ], []]
 
-        _id = self.network._get_subnet_by_identifier('10.0.0.1')
-        self.assertEqual(_id, ['100'])
+        _id = self.network.resolve_subnet_ids('10.0.0.1')
+        self.assertEqual(_id, '100')
 
-        _id = self.network._get_subnet_by_identifier('nope')
-        self.assertEqual(_id, [])
+        _id = self.network.resolve_subnet_ids('nope')
+        self.assertEqual(_id, None)
 
     def _setup_add_subnet_mocks(self):
         package_mock = self.client['Product_Package']
