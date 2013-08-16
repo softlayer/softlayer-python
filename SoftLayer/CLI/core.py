@@ -7,20 +7,31 @@ usage: sl <module> [<args>...]
 SoftLayer Command-line Client
 
 The available modules are:
-  bmc       Interact with bare metal instances
-  cci       Manage, delete, order compute instances. Also available with 'vm'
-  config    View and edit configuration for this tool
-  dns       Manage DNS
-  firewall  Firewall rule and security management
-  help      Show help
+
+Compute:
+  bmc       Bare Metal Cloud
+  cci       Cloud Compute Instances
   image     Manages compute and flex images
-  iscsi     View iSCSI details
   metadata  Get details about this machine. Also available with 'my' and 'meta'
-  nas       View NAS details
-  network   Perform various network operations
-  server    Manage hardware servers
+  server    Hardware servers
   sshkey    Manage SSH keys on your account
+
+Networking:
+  dns       Domain Name System
+  firewall  Firewall rule and security management
+  globalip  Global IP address management
+  rwhois    RWhoIs operations
   ssl       Manages SSL
+  subnet    Subnet ordering and management
+  vlan      Manage VLANs on your account
+
+Storage:
+  iscsi     View iSCSI details
+  nas       View NAS details
+
+General:
+  config    View and edit configuration for this tool
+  help      Show help
 
 See 'sl help <module>' for more information on a specific module.
 
