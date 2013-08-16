@@ -64,6 +64,70 @@ def getCategories_Mock():
         }
     }]
 
+    centos_prices = [
+        {
+            'itemId': 3907,
+            'setupFee': '0',
+            'recurringFee': '0',
+            'laborFee': '0',
+            'oneTimeFee': '0',
+            'sort': 0,
+            'item': {
+                'description': 'CentOS 6.0 (64 bit)',
+                'id': 3907
+            },
+            'id': 13942,
+        },
+    ]
+
+    debian_prices = [
+        {
+            'itemId': 3967,
+            'setupFee': '0',
+            'recurringFee': '0',
+            'laborFee': '0',
+            'oneTimeFee': '0',
+            'sort': 6,
+            'item': {
+                'description': 'Debian GNU/Linux 6.0 Squeeze/Stable (32 bit)',
+                'id': 3967
+            },
+            'id': 14046,
+        },
+    ]
+
+    ubuntu_prices = [
+        {
+            'itemId': 4170,
+            'setupFee': '0',
+            'recurringFee': '0',
+            'hourlyRecurringFee': '0',
+            'oneTimeFee': '0',
+            'id': 17438,
+            'sort': 9,
+            'item': {
+                'description': 'Ubuntu Linux 12.04 LTS Precise Pangolin - '
+                'Minimal Install (64 bit)',
+                'id': 4170
+            },
+            'laborFee': '0',
+        },
+        {
+            'itemId': 4166,
+            'setupFee': '0',
+            'recurringFee': '0',
+            'laborFee': '0',
+            'oneTimeFee': '0',
+            'sort': 9,
+            'item': {
+                'description': 'Ubuntu Linux 12.04 LTS Precise Pangolin '
+                '(64 bit)',
+                'id': 4166
+            },
+            'id': 17430,
+        },
+    ]
+
     ram_prices = [
         {
             'itemId': 254,
@@ -121,6 +185,68 @@ def getCategories_Mock():
                 'id': 303
             },
             'id': 724,
+        }
+    ]
+
+    nic_prices = [
+        {
+            'itemId': 187,
+            'setupFee': '0',
+            'recurringFee': '0',
+            'hourlyRecurringFee': '0',
+            'oneTimeFee': '0',
+            'id': 273,
+            'sort': 0,
+            'item': {
+                'capacity': '100',
+                'description': '100 Mbps Public & Private Networks',
+                'id': 187
+            },
+            'laborFee': '0',
+        },
+        {
+            'itemId': 188,
+            'setupFee': '0',
+            'recurringFee': '20',
+            'hourlyRecurringFee': '.04',
+            'oneTimeFee': '0',
+            'id': 274,
+            'sort': 0,
+            'item': {
+                'capacity': '1000',
+                'description': '1 Gbps Public & Private Networks',
+                'id': 188
+            },
+            'laborFee': '0',
+        }
+    ]
+
+    controller_prices = [
+        {
+            'itemId': 487,
+            'setupFee': '0',
+            'recurringFee': '0',
+            'laborFee': '0',
+            'oneTimeFee': '0',
+            'sort': 0,
+            'item': {
+                'description': 'Non-RAID',
+                'id': 487
+            },
+            'id': 876,
+        },
+        {
+            'itemId': 488,
+            'setupFee': '0',
+            'recurringFee': '50',
+            'laborFee': '0',
+            'oneTimeFee': '0',
+            'sort': 0,
+            'item': {
+                'description': 'RAID 0',
+                'id': 488
+            },
+            'id': 877,
         }
     ]
 
@@ -182,7 +308,56 @@ def getCategories_Mock():
                 'itemCategoryId': 1002,
                 'packageId': 50,
             }],
-        }
+        },
+        {
+            'categoryCode': 'os',
+            'id': 12,
+            'name': 'Operating System',
+            'groups': [
+                {
+                    'sort': 0,
+                    'prices': centos_prices,
+                    'itemCategoryId': 12,
+                    'packageId': 50,
+                    'title': 'CentOS',
+                },
+                {
+                    'sort': 0,
+                    'prices': debian_prices,
+                    'itemCategoryId': 12,
+                    'packageId': 50,
+                    'title': 'Debian',
+                },
+                {
+                    'sort': 0,
+                    'prices': ubuntu_prices,
+                    'itemCategoryId': 12,
+                    'packageId': 50,
+                    'title': 'Ubuntu',
+                },
+            ],
+        },
+        {
+            'categoryCode': 'port_speed',
+            'id': 26,
+            'name': 'Uplink Port Speeds',
+            'groups': [{
+                'sort': 0,
+                'prices': nic_prices,
+                'itemCategoryId': 26,
+                'packageId': 50
+            }],
+        },
+        {
+            'categoryCode': 'disk_controller',
+            'id': 11,
+            'groups': [{
+                'sort': 0,
+                'prices': controller_prices,
+                'itemCategoryId': 11,
+                'packageId': 50}],
+            'name': 'Disk Controller'
+        },
     ]
 
     return mock
@@ -196,24 +371,6 @@ def getConfiguration_Mock():
             'sort': 0,
             'orderStepId': 1,
             'isRequired': 0,
-        },
-        {
-            'itemCategory': {
-                'categoryCode': 'server',
-                'name': 'Server',
-            },
-            'sort': 2,
-            'orderStepId': 1,
-            'isRequired': 1,
-        },
-        {
-            'itemCategory': {
-                'categoryCode': 'ram',
-                'name': 'RAM',
-            },
-            'sort': 2,
-            'orderStepId': 1,
-            'isRequired': 1,
         },
         {
             'itemCategory': {
@@ -232,7 +389,52 @@ def getConfiguration_Mock():
             'sort': 0,
             'orderStepId': 1,
             'isRequired': 1,
-        }
+        },
+        {
+            'itemCategory': {
+                'categoryCode': 'os',
+                'name': 'Operating System',
+            },
+            'sort': 0,
+            'orderStepId': 1,
+            'isRequired': 1,
+        },
+        {
+            'itemCategory': {
+                'categoryCode': 'port_speed',
+                'name': 'Uplink Port Speeds',
+            },
+            'sort': 2,
+            'orderStepId': 1,
+            'isRequired': 1,
+        },
+        {
+            'itemCategory': {
+                'categoryCode': 'ram',
+                'name': 'RAM',
+            },
+            'sort': 2,
+            'orderStepId': 1,
+            'isRequired': 1,
+        },
+        {
+            'itemCategory': {
+                'categoryCode': 'disk_controller',
+                'name': 'Disk Controller',
+            },
+            'sort': 2,
+            'orderStepId': 1,
+            'isRequired': 1,
+        },
+        {
+            'itemCategory': {
+                'categoryCode': 'server',
+                'name': 'Server',
+            },
+            'sort': 2,
+            'orderStepId': 1,
+            'isRequired': 1,
+        },
     ]
 
     return mock

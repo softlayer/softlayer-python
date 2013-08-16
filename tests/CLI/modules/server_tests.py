@@ -56,16 +56,21 @@ class ServerCLITests(unittest.TestCase):
         output = server.ServerCreateOptions.execute(client, args)
 
         expected = {
-            'datacenter': ['FIRST_AVAILABLE', 'TEST00'],
-            'dual nic': ['100_DUAL'],
-            'disk_controllers': ['RAID5'],
-            'os (CLOUDLINUX)': ['CLOUDLINUX_5_32_MINIMAL'],
-            'os (WIN)': ['WIN_2012-DC-HYPERV_64'],
-            'memory': [2, 4],
-            'disk': ['100_SATA'],
-            'single nic': ['100'],
-            'cpu': [{'id': 1, 'description': 'CPU Core'}],
-            'os (UBUNTU)': ['UBUNTU_10_32']
+            'datacenter': ['RANDOM_LOCATION'],
+            'dual nic': [],
+            'disk_controllers': ['None', 'RAID0'],
+            'os (CENTOS)': ['CENTOS_6_64'],
+            'os (DEBIAN)': ['DEBIAN_6_32'],
+            'os (UBUNTU)': ['UBUNTU_12_64', 'UBUNTU_12_64_MINIMAL'],
+            'memory': [4, 6],
+            'disk': ['1000_DRIVE'],
+            'single nic': ['100', '1000'],
+            'cpu': [
+                {'description': 'Dual Quad Core Pancake 200 - 1.60GHz',
+                 'id': 723},
+                {'description': 'Dual Quad Core Pancake 200 - 1.80GHz',
+                 'id': 724}
+            ],
         }
 
         self.assertEqual(expected, format_output(output, 'python'))
@@ -73,13 +78,8 @@ class ServerCLITests(unittest.TestCase):
     def test_ServerDetails(self):
         hw_id = 1234
 
-#        dns_mock = Mock()
-#        dns_mock.return_value = [{
-#            'resourceRecords': [{'data': '2.0.0.10.in-addr.arpa'}]
-#        }]
         client = Mock()
         client.__getitem__ = Mock()
-#        client.__getitem__.return_value = dns_mock
         service = client['Hardware_Server']
         service.getObject = hardware_mock.getObject_Mock(1000)
         dns_mock = hardware_mock.getReverseDomainRecords_Mock(1000)
@@ -312,8 +312,7 @@ class ServerCLITests(unittest.TestCase):
 
         self.assertEqual(expected, format_output(output, 'python'))
 
-    @patch('SoftLayer.HardwareManager.get_dedicated_server_create_options')
-    def test_CreateServer(self, create_options):
+    def test_CreateServer(self):
         args = {
             '--chassis': 999,
             '--hostname': 'test',
@@ -321,8 +320,8 @@ class ServerCLITests(unittest.TestCase):
             '--datacenter': 'TEST00',
             '--cpu': False,
             '--network': '100',
-            '--disk': ['100_SATA', '100_SATA'],
-            '--os': 'CLOUDLINUX_5_32_MINIMAL',
+            '--disk': ['1000_DRIVE', '1000_DRIVE'],
+            '--os': 'UBUNTU_12_64_MINIMAL',
             '--memory': False,
             '--controller': False,
             '--test': True,
@@ -330,11 +329,7 @@ class ServerCLITests(unittest.TestCase):
             '--template': None,
         }
 
-        # This test data represents the structure of the information returned
-        # by HardwareManager.get_dedicated_server_create_options.
-        test_data = self.get_create_options_data()
-
-        create_options.return_value = test_data
+        client = self._setup_package_mocks(self.client)
 
         # First, test the --test flag
         with patch('SoftLayer.HardwareManager.verify_order') as verify_mock:
@@ -352,19 +347,18 @@ class ServerCLITests(unittest.TestCase):
                     }
                 ]
             }
-            output = server.CreateServer.execute(self.client, args)
+            output = server.CreateServer.execute(client, args)
 
-            # This test is fragile. We need to figure out why format 'python'
-            # doesn't work here in the CLI code.
-            expected = """:....................:.......:
-:               Item :  cost :
-:....................:.......:
-:         First Item :  0.00 :
-:        Second Item : 25.00 :
-: Total monthly cost : 25.00 :
-:....................:.......:
- -- ! Prices reflected here are retail and do not take account level discounts and are not guaranteed."""
-            self.assertEqual(expected, format_output(output, 'table'))
+            expected = [
+                [
+                    {'Item': 'First Item', 'cost': '0.00'},
+                    {'Item': 'Second Item', 'cost': '25.00'},
+                    {'Item': 'Total monthly cost', 'cost': '25.00'}
+                ],
+                ''
+            ]
+
+            self.assertEqual(expected, format_output(output, 'python'))
 
         # Now test ordering
         with patch('SoftLayer.HardwareManager.place_order') as order_mock:
@@ -389,179 +383,6 @@ class ServerCLITests(unittest.TestCase):
 
             self.assertRaises(CLIAbort,
                               server.CreateServer.execute, self.client, args)
-
-    @staticmethod
-    def get_create_options_data():
-        return {
-            'locations': [
-                {
-                    'delivery_information': 'Delivery within 2-4 hours',
-                    'keyname': 'TEST00',
-                    'long_name': 'Test Data Center'
-                },
-                {
-                    'delivery_information': '',
-                    'keyname': 'FIRST_AVAILABLE',
-                    'long_name': 'First Available'
-                }
-            ],
-            'categories': {
-                'server': {
-                    'sort': 0,
-                    'step': 0,
-                    'is_required': 1,
-                    'name': 'Server',
-                    'group': 'Key Components',
-                    'items': [
-                        {
-                            'id': 1,
-                            'description': 'CPU Core',
-                            'sort': 0,
-                            'price_id': 1,
-                            'recurring_fee': 0.0,
-                            'capacity': 0.0,
-                        }
-                    ],
-                },
-                'ram': {
-                    'sort': 1,
-                    'step': 0,
-                    'is_required': 1,
-                    'name': 'Memory',
-                    'group': 'Key Components',
-                    'items': [
-                        {
-                            'id': 21,
-                            'description': '2GB',
-                            'sort': 0,
-                            'price_id': 21,
-                            'recurring_fee': 0.0,
-                            'capacity': 2,
-                        },
-                        {
-                            'id': 22,
-                            'description': '4GB',
-                            'sort': 1,
-                            'price_id': 22,
-                            'recurring_fee': 0.0,
-                            'capacity': 4,
-                        }
-                    ],
-                },
-                'os': {
-                    'sort': 2,
-                    'step': 0,
-                    'is_required': 1,
-                    'name': 'Operating Systems',
-                    'group': 'Key Components',
-                    'items': [
-                        {
-                            'id': 31,
-                            'description': 'CloudLinux 5 - Minimal Install ' +
-                            '(32 bit)',
-                            'sort': 0,
-                            'price_id': 31,
-                            'recurring_fee': 0.0,
-                            'capacity': 0.0,
-                        },
-                        {
-                            'id': 32,
-                            'description': 'Windows Server 2012 Datacenter' +
-                            'Edition With Hyper-V (64bit)',
-                            'sort': 0,
-                            'price_id': 32,
-                            'recurring_fee': 0.0,
-                            'capacity': 0.0,
-                        },
-                        {
-                            'id': 33,
-                            'description': 'Ubuntu Linux 10.04 LTS Lucid ' +
-                            'Lynx (32 bit)',
-                            'sort': 0,
-                            'price_id': 33,
-                            'recurring_fee': 0.0,
-                            'capacity': 0.0,
-                        }
-                    ],
-                },
-                'disk0': {
-                    'sort': 3,
-                    'step': 0,
-                    'is_required': 1,
-                    'name': 'Disk',
-                    'group': 'Key Components',
-                    'items': [
-                        {
-                            'id': 4,
-                            'description': '100GB SATA',
-                            'sort': 0,
-                            'price_id': 4,
-                            'recurring_fee': 0.0,
-                            'capacity': 100.0,
-                        }
-                    ],
-                },
-                'disk1': {
-                    'sort': 3,
-                    'step': 0,
-                    'is_required': 1,
-                    'name': 'Disk',
-                    'group': 'Key Components',
-                    'items': [
-                        {
-                            'id': 4,
-                            'description': '100GB SATA',
-                            'sort': 0,
-                            'price_id': 4,
-                            'recurring_fee': 10.0,
-                            'capacity': 100.0,
-                        }
-                    ],
-                },
-                'port_speed': {
-                    'sort': 4,
-                    'step': 0,
-                    'is_required': 1,
-                    'name': 'NIC',
-                    'group': 'Key Components',
-                    'items': [
-                        {
-                            'id': 51,
-                            'description': '100 Mbps',
-                            'sort': 0,
-                            'price_id': 51,
-                            'recurring_fee': 0.0,
-                            'capacity': 100.0,
-                        },
-                        {
-                            'id': 52,
-                            'description': '100 Mbps dual',
-                            'sort': 0,
-                            'price_id': 52,
-                            'recurring_fee': 0.0,
-                            'capacity': 100.0,
-                        }
-                    ],
-                },
-                'disk_controller': {
-                    'sort': 5,
-                    'step': 0,
-                    'is_required': 1,
-                    'name': 'Disk Controller',
-                    'group': 'Key Components',
-                    'items': [
-                        {
-                            'id': 6,
-                            'description': 'RAID 5',
-                            'sort': 0,
-                            'price_id': 6,
-                            'recurring_fee': 0.0,
-                            'capacity': 0.0,
-                        }
-                    ],
-                }
-            }
-        }
 
     @staticmethod
     def _setup_package_mocks(client):
