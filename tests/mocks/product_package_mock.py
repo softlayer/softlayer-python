@@ -64,6 +64,66 @@ def getCategories_Mock():
         }
     }]
 
+    ram_prices = [
+        {
+            'itemId': 254,
+            'setupFee': '0',
+            'recurringFee': '0',
+            'laborFee': '0',
+            'oneTimeFee': '0',
+            'sort': 0,
+            'item': {
+                'capacity': '4', 'description': '4 GB DIMM Registered 533/667',
+                'id': 254
+            },
+            'id': 1023,
+        },
+        {
+            'itemId': 255,
+            'setupFee': '0',
+            'recurringFee': '30',
+            'laborFee': '0',
+            'oneTimeFee': '0',
+            'sort': 0,
+            'item': {
+                'capacity': '6',
+                'description': '6 GB DIMM Registered 533/667',
+                'id': 255
+            },
+            'id': 702,
+        }]
+
+    server_prices = [
+        {
+            'itemId': 300,
+            'setupFee': '0',
+            'recurringFee': '125',
+            'laborFee': '0',
+            'oneTimeFee': '0',
+            'currentPriceFlag': '',
+            'sort': 2,
+            'item': {
+                'description': 'Dual Quad Core Pancake 200 - 1.60GHz',
+                'id': 300
+            },
+            'id': 723
+        },
+        {
+            'itemId': 303,
+            'setupFee': '0',
+            'recurringFee': '279',
+            'laborFee': '0',
+            'oneTimeFee': '0',
+            'currentPriceFlag': '',
+            'sort': 2,
+            'item': {
+                'description': 'Dual Quad Core Pancake 200 - 1.80GHz',
+                'id': 303
+            },
+            'id': 724,
+        }
+    ]
+
     category = _get_mock_category()
     mock.return_value = [
         {
@@ -75,6 +135,28 @@ def getCategories_Mock():
                 'prices': prices,
                 'itemCategoryId': 1000,
                 'packageId': 50,
+            }],
+        },
+        {
+            'categoryCode': 'ram',
+            'id': 3,
+            'name': 'Ram',
+            'groups': [{
+                'sort': 0,
+                'prices': ram_prices,
+                'itemCategoryId': 3,
+                'packageId': 50
+            }],
+        },
+        {
+            'categoryCode': 'server',
+            'id': 1,
+            'name': 'Server',
+            'groups': [{
+                'sort': 2,
+                'prices': server_prices,
+                'itemCategoryId': 1,
+                'packageId': 50
             }],
         },
         {
@@ -114,6 +196,24 @@ def getConfiguration_Mock():
             'sort': 0,
             'orderStepId': 1,
             'isRequired': 0,
+        },
+        {
+            'itemCategory': {
+                'categoryCode': 'server',
+                'name': 'Server',
+            },
+            'sort': 2,
+            'orderStepId': 1,
+            'isRequired': 1,
+        },
+        {
+            'itemCategory': {
+                'categoryCode': 'ram',
+                'name': 'RAM',
+            },
+            'sort': 2,
+            'orderStepId': 1,
+            'isRequired': 1,
         },
         {
             'itemCategory': {

@@ -14,6 +14,21 @@ def getObject_Mock(hw_id):
     return mock
 
 
+def getReverseDomainRecords_Mock(hw_id):
+    hardware = getObject_Mock(hw_id)
+
+    mock = MagicMock()
+
+    if hardware:
+        hardware = hardware.return_value
+        ip_parts = hardware['primaryBackendIpAddress'].split('.')
+        ip_parts.reverse()
+        reverse = '.'.join(ip_parts) + '.in-addr.arpa'
+        mock.return_value = [{'resourceRecords': [{'data': reverse}]}]
+
+    return mock
+
+
 def get_raw_hardware_mocks():
     return {
         1000: {
@@ -21,7 +36,7 @@ def get_raw_hardware_mocks():
             # TODO - This needs to be moved to wherever data centers come from
             'datacenter': {'id': 50, 'name': 'TEST00',
                            'description': 'Test Data Center'},
-            'billingItem': {'id': 6327},
+            'billingItem': {'id': 6327, 'recurringFee': 1.54},
             'primaryIpAddress': '172.16.1.100',
             'hostname': 'hardware-test1',
             'domain': 'test.sftlyr.ws',
@@ -54,6 +69,9 @@ def get_raw_hardware_mocks():
                     'vlanNumber': 3672,
                     'id': 19082
                 },
+            ],
+            'tagReferences': [
+                {'tag': {'name': 'test_tag'}}
             ],
         },
         1001: {

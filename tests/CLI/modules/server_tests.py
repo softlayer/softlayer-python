@@ -16,7 +16,7 @@ from mock import Mock, MagicMock, patch
 
 from SoftLayer.CLI.helpers import format_output, CLIAbort
 from SoftLayer.CLI.modules import server
-from tests.mocks import account_mock
+from tests.mocks import account_mock, hardware_mock, product_package_mock
 
 
 class ServerCLITests(unittest.TestCase):
@@ -38,8 +38,7 @@ class ServerCLITests(unittest.TestCase):
 
         self.assertEqual(expected, format_output(output, 'python'))
 
-    @patch('SoftLayer.HardwareManager.get_dedicated_server_create_options')
-    def test_ServerCreateOptions(self, create_options):
+    def test_ServerCreateOptions(self):
         args = {
             '<chassis_id>': 999,
             '--all': True,
@@ -52,13 +51,9 @@ class ServerCLITests(unittest.TestCase):
             '--controller': False,
         }
 
-        # This test data represents the structure of the information returned
-        # by HardwareManager.get_dedicated_server_create_options.
-        test_data = self.get_create_options_data()
+        client = self._setup_package_mocks(self.client)
 
-        create_options.return_value = test_data
-
-        output = server.ServerCreateOptions.execute(self.client, args)
+        output = server.ServerCreateOptions.execute(client, args)
 
         expected = {
             'datacenter': ['FIRST_AVAILABLE', 'TEST00'],
@@ -75,23 +70,22 @@ class ServerCLITests(unittest.TestCase):
 
         self.assertEqual(expected, format_output(output, 'python'))
 
-    @patch('SoftLayer.HardwareManager.get_hardware')
-    def test_ServerDetails(self, get_hardware):
+    def test_ServerDetails(self):
         hw_id = 1234
 
-        servers = self.get_server_mocks()
-        get_hardware.return_value = servers[0]
-
-        dns_mock = Mock()
-        dns_mock.getReverseDomainRecords = Mock()
-        dns_mock.getReverseDomainRecords.return_value = [{
-            'resourceRecords': [{'data': '2.0.0.10.in-addr.arpa'}]
-        }]
+#        dns_mock = Mock()
+#        dns_mock.return_value = [{
+#            'resourceRecords': [{'data': '2.0.0.10.in-addr.arpa'}]
+#        }]
         client = Mock()
         client.__getitem__ = Mock()
-        client.__getitem__.return_value = dns_mock
+#        client.__getitem__.return_value = dns_mock
+        service = client['Hardware_Server']
+        service.getObject = hardware_mock.getObject_Mock(1000)
+        dns_mock = hardware_mock.getReverseDomainRecords_Mock(1000)
+        service.getReverseDomainRecords = dns_mock
 
-        args = {'<identifier>': hw_id, '--passwords': True}
+        args = {'<identifier>': hw_id, '--passwords': True, '--price': True}
         output = server.ServerDetails.execute(client, args)
 
         expected = {
@@ -99,13 +93,16 @@ class ServerCLITests(unittest.TestCase):
             'datacenter': 'TEST00',
             'created': '2013-08-01 15:23:45',
             'notes': 'These are test notes.',
-            'hostname': 'test1.sftlyr.ws',
-            'public_ip': '10.0.0.2',
+            'hostname': 'hardware-test1.test.sftlyr.ws',
+            'public_ip': '172.16.1.100',
             'private_ip': '10.1.0.2',
+            'price rate': 1.54,
             'memory': 2048,
             'cores': 2,
-            'ptr': '2.0.0.10.in-addr.arpa',
-            'os': 'Ubuntu', 'id': 1,
+            'ptr': '2.0.1.10.in-addr.arpa',
+            'os': 'Ubuntu',
+            'id': 1000,
+            'tags': ['test_tag'],
             'users': ['root abc123'],
             'vlans': [{'id': 9653, 'number': 1800, 'type': 'PRIVATE'},
                       {'id': 19082, 'number': 3672, 'type': 'PUBLIC'}]
@@ -567,74 +564,11 @@ class ServerCLITests(unittest.TestCase):
         }
 
     @staticmethod
-    def get_server_mocks():
-        return [
-            {
-                'id': 1,
-                'datacenter': {'name': 'TEST00',
-                               'description': 'Test Data Center'},
-                'fullyQualifiedDomainName': 'test1.sftlyr.ws',
-                'processorCoreAmount': 2,
-                'memoryCapacity': 2,
-                'primaryIpAddress': '10.0.0.2',
-                'primaryBackendIpAddress': '10.1.0.2',
-                'hardwareStatus': {'status': 'ACTIVE'},
-                'provisionDate': '2013-08-01 15:23:45',
-                'notes': 'These are test notes.',
-                'operatingSystem': {
-                    'softwareLicense': {
-                        'softwareDescription': {
-                            'referenceCode': 'Ubuntu',
-                            'name': 'Ubuntu 12.04 LTS',
-                        }
-                    },
-                    'passwords': [
-                        {'username': 'root', 'password': 'abc123'}
-                    ],
-                },
-                'networkVlans': [
-                    {
-                        'networkSpace': 'PRIVATE',
-                        'vlanNumber': 1800,
-                        'id': 9653
-                    },
-                    {
-                        'networkSpace': 'PUBLIC',
-                        'vlanNumber': 3672,
-                        'id': 19082
-                    },
-                ]
-            },
-            {
-                'id': 2,
-                'datacenter': {'name': 'TEST00',
-                               'description': 'Test Data Center'},
-                'fullyQualifiedDomainName': 'test2.sftlyr.ws',
-                'processorCoreAmount': 4,
-                'memoryCapacity': 4,
-                'primaryIpAddress': '10.0.0.3',
-                'primaryBackendIpAddress': '10.1.0.3',
-                'hardwareStatus': {'status': 'ACTIVE'},
-                'provisionDate': '2013-08-03 07:15:22',
-                'operatingSystem': {
-                    'softwareLicense': {
-                        'softwareDescription': {
-                            'referenceCode': 'Ubuntu',
-                            'name': 'Ubuntu 12.04 LTS',
-                        }
-                    }
-                },
-                'networkVlans': [
-                    {
-                        'networkSpace': 'PRIVATE',
-                        'vlanNumber': 1800,
-                        'id': 9653
-                    },
-                    {
-                        'networkSpace': 'PUBLIC',
-                        'vlanNumber': 3672,
-                        'id': 19082
-                    },
-                ]
-            }
-        ]
+    def _setup_package_mocks(client):
+        package = client['Product_Package']
+        package.getAllObjects = product_package_mock.getAllObjects_Mock()
+        package.getConfiguration = product_package_mock.getConfiguration_Mock()
+        package.getCategories = product_package_mock.getCategories_Mock()
+        package.getRegions = product_package_mock.getRegions_Mock()
+
+        return client

@@ -174,7 +174,7 @@ Options:
         if tag_row:
             t.add_row(['tags', listing(tag_row, separator=',')])
 
-        ptr_domains = client['Server_Server'].getReverseDomainRecords(
+        ptr_domains = client['Hardware_Server'].getReverseDomainRecords(
             id=hardware_id)
 
         for ptr_domain in ptr_domains:
