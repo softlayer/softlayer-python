@@ -12,7 +12,6 @@ The available commands are:
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: BSD, see LICENSE for more details.
-# from SoftLayer import NetworkManager
 import sys
 
 from SoftLayer import MessagingManager
@@ -276,7 +275,8 @@ Topic/Subscription Create Options:
   --http-body=BODY      HTTP Body template to use if --type is http
 
 Topic Delete Options:
-  --force  Flag to force the deletion of the topic even when there are subscriptions
+  --force  Flag to force the deletion of the topic even when there are
+             subscriptions
 
 """ + COMMON_MESSAGING_ARGS
     action = 'topic'
@@ -326,11 +326,13 @@ Topic Delete Options:
             else:
                 tags = None
                 if args.get('--tags'):
-                    tags = [tag.strip() for tag in args.get('--tags').split(',')]
+                    tags = [
+                        tag.strip() for tag in args.get('--tags').split(',')]
 
                 topic = mq_client.create_topic(
                     args['<topic_name>'],
-                    visibility_interval=int(args.get('--visibility_interval') or 30),
+                    visibility_interval=int(
+                        args.get('--visibility_interval') or 30),
                     expiration=int(args.get('--expiration') or 604800),
                     tags=tags,
                 )

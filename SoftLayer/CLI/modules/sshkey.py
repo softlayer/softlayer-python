@@ -5,7 +5,7 @@ Manage SSH keys
 
 The available commands are:
   add     Add a new SSH key to your account
-  delete  Removes an SSH key
+  remove  Removes an SSH key
   edit    Edits information about the SSH key
   list    Display a list of SSH keys on your account
   print   Prints out an SSH key
@@ -57,18 +57,18 @@ Optional:
             return "SSH key added."
 
 
-class DeleteSshKey(CLIRunnable):
+class RemoveSshKey(CLIRunnable):
     """
-usage: sl sshkey delete <identifier> [options]
+usage: sl sshkey remove <identifier> [options]
 
-Permanently deletes an SSH key from your account
+Permanently removes an SSH key from your account
 
 Required:
-  <identifier>   The ID or label for the SSH key to be deleted
+  <identifier>   The ID or label for the SSH key to be removed
 
 """
 
-    action = 'delete'
+    action = 'remove'
     options = ['confirm']
 
     @staticmethod
