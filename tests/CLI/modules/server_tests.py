@@ -1,6 +1,6 @@
 """
-    tests.CLI.modules.hardware_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    tests.CLI.modules.server_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     This is a series of integration tests designed to test the complete
     command line interface.
@@ -16,16 +16,15 @@ from mock import Mock, MagicMock, patch
 
 from SoftLayer.CLI.helpers import format_output, CLIAbort
 from SoftLayer.CLI.modules import server
-#from SoftLayer.CLI.modules.hardware import *
 from tests.mocks import account_mock
 
 
-class HardwareCLITests(unittest.TestCase):
+class ServerCLITests(unittest.TestCase):
     def setUp(self):
         self.client = MagicMock()
 
     @patch('SoftLayer.HardwareManager.get_cancellation_reasons')
-    def test_HardwareCancelReasons(self, reasons):
+    def test_ServerCancelReasons(self, reasons):
         test_data = {
             'code1': 'Reason 1',
             'code2': 'Reason 2'
@@ -40,7 +39,7 @@ class HardwareCLITests(unittest.TestCase):
         self.assertEqual(expected, format_output(output, 'python'))
 
     @patch('SoftLayer.HardwareManager.get_dedicated_server_create_options')
-    def test_HardwareCreateOptions(self, create_options):
+    def test_ServerCreateOptions(self, create_options):
         args = {
             '<chassis_id>': 999,
             '--all': True,
@@ -77,7 +76,7 @@ class HardwareCLITests(unittest.TestCase):
         self.assertEqual(expected, format_output(output, 'python'))
 
     @patch('SoftLayer.HardwareManager.get_hardware')
-    def test_HardwareDetails(self, get_hardware):
+    def test_ServerDetails(self, get_hardware):
         hw_id = 1234
 
         servers = self.get_server_mocks()
@@ -114,7 +113,7 @@ class HardwareCLITests(unittest.TestCase):
 
         self.assertEqual(expected, format_output(output, 'python'))
 
-    def test_ListHardware(self):
+    def test_ListServers(self):
         self.client['Account'].getHardware = account_mock.getHardware_Mock()
 
         output = server.ListServers.execute(
@@ -147,7 +146,7 @@ class HardwareCLITests(unittest.TestCase):
     @patch('SoftLayer.CLI.modules.server.no_going_back')
     @patch('SoftLayer.HardwareManager.reload')
     @patch('SoftLayer.CLI.modules.server.resolve_id')
-    def test_HardwareReload(
+    def test_ServerReload(
             self, resolve_mock, reload_mock, ngb_mock, abort_mock):
         hw_id = 12345
         resolve_mock.return_value = hw_id
@@ -317,7 +316,7 @@ class HardwareCLITests(unittest.TestCase):
         self.assertEqual(expected, format_output(output, 'python'))
 
     @patch('SoftLayer.HardwareManager.get_dedicated_server_create_options')
-    def test_CreateHardware(self, create_options):
+    def test_CreateServer(self, create_options):
         args = {
             '--chassis': 999,
             '--hostname': 'test',
