@@ -87,7 +87,7 @@ class QueueAuthTests(unittest.TestCase):
         self.auth.handle_error(request)
 
         self.assertEqual(self.auth.auth_token, 'auth_token')
-        request.request.send.assert_called_with(anyway=True)
+        request.connection.send.assert_called_with(request.request)
 
     @patch('SoftLayer.managers.messaging.QueueAuth.auth', mocked_auth_call)
     def test_handle_error_401(self):
@@ -98,7 +98,7 @@ class QueueAuthTests(unittest.TestCase):
         self.auth.handle_error(request)
 
         self.assertEqual(self.auth.auth_token, 'NEW_AUTH_TOKEN')
-        request.request.send.assert_called_with(anyway=True)
+        request.connection.send.assert_called_with(request.request)
 
     @patch('SoftLayer.managers.messaging.QueueAuth.auth', mocked_auth_call)
     def test_call_unauthed(self):
