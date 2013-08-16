@@ -175,7 +175,7 @@ class SequentialOutput(list):
 
 class CLIJSONEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, FormattedItem):
+        if hasattr(obj, 'to_python'):
             return obj.to_python()
         return super(CLIJSONEncoder, self).default(obj)
 
