@@ -42,11 +42,11 @@ class QueueAuth(requests.auth.AuthBase):
         """ Handle errors """
         r.request.deregister_hook('response', self.handle_error)
         if r.status_code == 503:
-            r.request.send(anyway=True)
+            r.connection.send(r.request)
         elif r.status_code == 401:
             self.auth()
             r.request.headers['X-Auth-Token'] = self.auth_token
-            r.request.send(anyway=True)
+            r.connection.send(r.request)
 
     def __call__(self, r):
         """ Attach auth token to the request. Do authentication if an auth
