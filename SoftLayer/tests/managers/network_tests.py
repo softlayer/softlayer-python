@@ -462,7 +462,6 @@ class NetworkTests(unittest.TestCase):
         vlan_mock.getObject.side_effect = vlan_return_mock
 
         def order_return_mock(order):
-            print order
             mock_item = {}
             for item in package_mock.getItems.return_value:
                 if item['prices'][0]['id'] == order['prices'][0]['id']:
