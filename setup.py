@@ -40,7 +40,7 @@ else:
 
 setup(
     name='SoftLayer',
-    version='2.3.1',
+    version='3.0.0',
     description=description,
     long_description=long_description,
     author='SoftLayer Technologies, Inc.',
