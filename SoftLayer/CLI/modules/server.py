@@ -216,8 +216,8 @@ usage: sl server cancel <identifier> [options]
 Cancel a dedicated server
 
 Options:
-  --reason  An optional cancellation reason. See cancel-reasons for a list of
-              available options
+  --reason=REASON  An optional cancellation reason. See cancel-reasons for a
+                     list of available options
 """
 
     action = 'cancel'
