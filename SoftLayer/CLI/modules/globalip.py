@@ -14,8 +14,8 @@ The available commands are:
 # :license: BSD, see LICENSE for more details.
 
 from SoftLayer import NetworkManager
-from SoftLayer.CLI import CLIRunnable, Table, FormattedItem, confirm, \
-    no_going_back
+from SoftLayer.CLI import (
+    CLIRunnable, Table, FormattedItem, confirm, no_going_back)
 from SoftLayer.CLI.helpers import CLIAbort, SequentialOutput
 
 
@@ -183,6 +183,3 @@ Required:
             raise CLIAbort("Unable to find global IP record for " +
                            args['<identifier>'])
         mgr.unassign_global_ip(id)
-
-
-        

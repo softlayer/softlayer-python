@@ -16,8 +16,8 @@ The available commands are:
 from os.path import expanduser
 
 from SoftLayer import SshKeyManager
-from SoftLayer.CLI import (CLIRunnable, Table, no_going_back)
-from SoftLayer.CLI.helpers import (CLIAbort, resolve_id, KeyValueTable)
+from SoftLayer.CLI import CLIRunnable, Table, no_going_back
+from SoftLayer.CLI.helpers import CLIAbort, resolve_id, KeyValueTable
 
 
 class AddSshKey(CLIRunnable):

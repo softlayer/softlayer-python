@@ -14,8 +14,8 @@ The available commands are:
 # :license: BSD, see LICENSE for more details.
 
 from SoftLayer import NetworkManager
-from SoftLayer.CLI import CLIRunnable, Table, KeyValueTable, FormattedItem, \
-    confirm, no_going_back
+from SoftLayer.CLI import (
+    CLIRunnable, Table, KeyValueTable, FormattedItem, confirm, no_going_back)
 from SoftLayer.CLI.helpers import CLIAbort, SequentialOutput
 
 
@@ -280,4 +280,3 @@ information.
             device_table.add_row(['type', device_type])
             t.add_row(['device', device_table])
         return t
-        

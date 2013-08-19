@@ -11,9 +11,7 @@ The available commands are:
 # :license: BSD, see LICENSE for more details.
 
 from SoftLayer import NetworkManager
-from SoftLayer.CLI import CLIRunnable, Table, KeyValueTable, FormattedItem, \
-    confirm, no_going_back
-from SoftLayer.CLI.helpers import CLIAbort, SequentialOutput
+from SoftLayer.CLI import CLIRunnable, Table, KeyValueTable
 
 
 class VlanDetail(CLIRunnable):
