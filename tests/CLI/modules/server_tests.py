@@ -23,18 +23,24 @@ class ServerCLITests(unittest.TestCase):
     def setUp(self):
         self.client = MagicMock()
 
-    @patch('SoftLayer.HardwareManager.get_cancellation_reasons')
-    def test_ServerCancelReasons(self, reasons):
-        test_data = {
-            'code1': 'Reason 1',
-            'code2': 'Reason 2'
-        }
-        reasons.return_value = test_data
-
+    def test_ServerCancelReasons(self):
         output = server.ServerCancelReasons.execute(self.client, {})
 
-        expected = [{'Reason': 'Reason 1', 'Code': 'code1'},
-                    {'Reason': 'Reason 2', 'Code': 'code2'}]
+        expected = [
+            {'Code': 'datacenter',
+             'Reason': 'Migrating to a different SoftLayer datacenter'},
+            {'Code': 'cost', 'Reason': 'Server / Upgrade Costs'},
+            {'Code': 'moving', 'Reason': 'Moving to competitor'},
+            {'Code': 'migrate_smaller',
+             'Reason': 'Migrating to smaller server'},
+            {'Code': 'sales', 'Reason': 'Sales process / upgrades'},
+            {'Code': 'performance',
+             'Reason': 'Network performance / latency'},
+            {'Code': 'unneeded', 'Reason': 'No longer needed'},
+            {'Code': 'support', 'Reason': 'Support response / timing'},
+            {'Code': 'closing', 'Reason': 'Business closing down'},
+            {'Code': 'migrate_larger', 'Reason': 'Migrating to larger server'}
+        ]
 
         self.assertEqual(expected, format_output(output, 'python'))
 
@@ -62,9 +68,40 @@ class ServerCLITests(unittest.TestCase):
             'os (CENTOS)': ['CENTOS_6_64'],
             'os (DEBIAN)': ['DEBIAN_6_32'],
             'os (UBUNTU)': ['UBUNTU_12_64', 'UBUNTU_12_64_MINIMAL'],
+            'os (WIN)': ['WIN_2008-DC-HYPERV_64', 'WIN_2008-ENT_64',
+                         'WIN_2008-STD_64'],
             'memory': [4, 6],
             'disk': ['1000_DRIVE'],
             'single nic': ['100', '1000'],
+            'cpu': [
+                {'description': 'Dual Quad Core Pancake 200 - 1.60GHz',
+                 'id': 723},
+                {'description': 'Dual Quad Core Pancake 200 - 1.80GHz',
+                 'id': 724}
+            ],
+        }
+
+        self.assertEqual(expected, format_output(output, 'python'))
+
+    def test_ServerCreateOptions_with_cpu_only(self):
+        self.maxDiff = None
+        args = {
+            '<chassis_id>': 999,
+            '--all': False,
+            '--datacenter': False,
+            '--cpu': True,
+            '--nic': False,
+            '--disk': False,
+            '--os': False,
+            '--memory': False,
+            '--controller': False,
+        }
+
+        client = self._setup_package_mocks(self.client)
+
+        output = server.ServerCreateOptions.execute(client, args)
+
+        expected = {
             'cpu': [
                 {'description': 'Dual Quad Core Pancake 200 - 1.60GHz',
                  'id': 723},
@@ -327,6 +364,7 @@ class ServerCLITests(unittest.TestCase):
             '--test': True,
             '--export': None,
             '--template': None,
+            '--key': 1234,
         }
 
         client = self._setup_package_mocks(self.client)
@@ -347,6 +385,22 @@ class ServerCLITests(unittest.TestCase):
                     }
                 ]
             }
+            output = server.CreateServer.execute(client, args)
+
+            expected = [
+                [
+                    {'Item': 'First Item', 'cost': '0.00'},
+                    {'Item': 'Second Item', 'cost': '25.00'},
+                    {'Item': 'Total monthly cost', 'cost': '25.00'}
+                ],
+                ''
+            ]
+
+            self.assertEqual(expected, format_output(output, 'python'))
+
+            # Make sure we can order without specifying the disk as well
+            args['--disk'] = []
+
             output = server.CreateServer.execute(client, args)
 
             expected = [
@@ -383,6 +437,35 @@ class ServerCLITests(unittest.TestCase):
 
             self.assertRaises(CLIAbort,
                               server.CreateServer.execute, self.client, args)
+
+    def test_CreateServer_failures(self):
+        # This contains an invalid network argument
+        args = {
+            '--chassis': 999,
+            '--hostname': 'test',
+            '--domain': 'example.com',
+            '--datacenter': 'TEST00',
+            '--cpu': False,
+            '--network': 9999,
+            '--disk': ['1000_DRIVE', '1000_DRIVE'],
+            '--os': 'UBUNTU_12_64_MINIMAL',
+            '--memory': False,
+            '--controller': False,
+            '--test': True,
+            '--export': None,
+            '--template': None,
+        }
+
+        client = self._setup_package_mocks(self.client)
+
+        # Verify that CLIAbort is properly raised on error
+        self.assertRaises(CLIAbort,
+                          server.CreateServer.execute, client, args)
+
+    def test_get_default_value_returns_none_for_unknown_category(self):
+        option_mock = {'categories': {'cat1': []}}
+        output = server.CreateServer._get_default_value(option_mock, 'nope')
+        self.assertEqual(None, output)
 
     @staticmethod
     def _setup_package_mocks(client):

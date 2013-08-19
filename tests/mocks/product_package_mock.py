@@ -128,6 +128,52 @@ def getCategories_Mock():
         },
     ]
 
+    windows_prices = [
+        {
+            'itemId': 977,
+            'setupFee': '0',
+            'recurringFee': '40',
+            'laborFee': '0',
+            'oneTimeFee': '0',
+            'sort': 15,
+            'item': {
+                'description': 'Windows Server 2008 R2 Standard Edition '
+                '(64bit)',
+                'id': 977
+            },
+            'id': 1858,
+        },
+        {
+            'itemId': 978,
+            'setupFee': '0',
+            'recurringFee': '100',
+            'laborFee': '0',
+            'oneTimeFee': '0',
+            'sort': 15,
+            'item': {
+                'description': 'Windows Server 2008 R2 Enterprise Edition '
+                '(64bit)',
+                'id': 978
+            },
+            'id': 1861,
+        },
+        {
+            'itemId': 980,
+            'setupFee': '0',
+            'recurringFee': '150',
+            'hourlyRecurringFee': '.21',
+            'oneTimeFee': '0',
+            'id': 1867,
+            'sort': 15,
+            'item': {
+                'description': 'Windows Server 2008 R2 Datacenter Edition '
+                'With Hyper-V (64bit)',
+                'id': 980
+            },
+            'laborFee': '0',
+        },
+    ]
+
     ram_prices = [
         {
             'itemId': 254,
@@ -137,7 +183,8 @@ def getCategories_Mock():
             'oneTimeFee': '0',
             'sort': 0,
             'item': {
-                'capacity': '4', 'description': '4 GB DIMM Registered 533/667',
+                'capacity': '4',
+                'description': '4 GB DIMM Registered 533/667',
                 'id': 254
             },
             'id': 1023,
@@ -334,6 +381,13 @@ def getCategories_Mock():
                     'itemCategoryId': 12,
                     'packageId': 50,
                     'title': 'Ubuntu',
+                },
+                {
+                    'sort': 0,
+                    'prices': windows_prices,
+                    'itemCategoryId': 12,
+                    'packageId': 50,
+                    'title': 'Microsoft',
                 },
             ],
         },
