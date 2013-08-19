@@ -6,7 +6,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from SoftLayer import MetadataManager, SoftLayerError, SoftLayerAPIError
-from SoftLayer.consts import API_PRIVATE_ENDPOINT_REST
+from SoftLayer.consts import API_PRIVATE_ENDPOINT_REST, USER_AGENT
 from SoftLayer.tests import unittest
 
 from mock import patch, MagicMock
@@ -89,7 +89,7 @@ class MetadataTestsMakeRequest(unittest.TestCase):
         make_api_call.assert_called_with(
             'GET', self.url,
             timeout=5,
-            http_headers={'User-Agent': 'SoftLayer Python v2.3.1'})
+            http_headers={'User-Agent': USER_AGENT})
         self.assertEqual(make_api_call(), r)
 
     @patch('SoftLayer.managers.metadata.make_rest_api_call')
