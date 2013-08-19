@@ -57,7 +57,6 @@ class ServerCLITests(unittest.TestCase):
             '--controller': False,
         }
 
-        self.maxDiff = None
         client = self._setup_package_mocks(self.client)
 
         output = server.ServerCreateOptions.execute(client, args)
@@ -404,15 +403,6 @@ class ServerCLITests(unittest.TestCase):
 
             output = server.CreateServer.execute(client, args)
 
-            expected = [
-                [
-                    {'Item': 'First Item', 'cost': '0.00'},
-                    {'Item': 'Second Item', 'cost': '25.00'},
-                    {'Item': 'Total monthly cost', 'cost': '25.00'}
-                ],
-                ''
-            ]
-
             self.assertEqual(expected, format_output(output, 'python'))
 
             # And make sure we can pass in disk as a comma separated string,
@@ -421,30 +411,12 @@ class ServerCLITests(unittest.TestCase):
 
             output = server.CreateServer.execute(client, args)
 
-            expected = [
-                [
-                    {'Item': 'First Item', 'cost': '0.00'},
-                    {'Item': 'Second Item', 'cost': '25.00'},
-                    {'Item': 'Total monthly cost', 'cost': '25.00'}
-                ],
-                ''
-            ]
-
             self.assertEqual(expected, format_output(output, 'python'))
 
             # Test explicitly setting a RAID configuration
             args['--controller'] = 'RAID0'
 
             output = server.CreateServer.execute(client, args)
-
-            expected = [
-                [
-                    {'Item': 'First Item', 'cost': '0.00'},
-                    {'Item': 'Second Item', 'cost': '25.00'},
-                    {'Item': 'Total monthly cost', 'cost': '25.00'}
-                ],
-                ''
-            ]
 
             self.assertEqual(expected, format_output(output, 'python'))
 
