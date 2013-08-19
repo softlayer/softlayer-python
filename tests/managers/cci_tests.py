@@ -99,6 +99,11 @@ class CCITests(unittest.TestCase):
         _id = self.cci._get_ids_from_ip('nope')
         self.assertEqual(_id, [])
 
+        # Now simulate a private IP test
+        service.getVirtualGuests.side_effect = [[], [{'id': 99}]]
+        _id = self.cci._get_ids_from_ip('10.0.1.87')
+        self.assertEqual(_id, [99])
+
     def test_resolve_ids_hostname(self):
         service = self.client['Account']
         service.getVirtualGuests = account_mock.getVirtualGuests_Mock(100)
@@ -594,3 +599,24 @@ class CCITests(unittest.TestCase):
         service = self.client['Virtual_Guest']
         f = service.setPrivateNetworkInterfaceSpeed
         f.assert_called_once_with(speed, id=cci_id)
+
+    def test_edit(self):
+        # Test editing user data
+        service = self.client['Virtual_Guest']
+
+        self.cci.edit(100, userdata='my data')
+
+        service.setUserMetadata.assert_called_once_with(['my data'], id=100)
+
+        # Now test a blank edit
+        self.assertTrue(self.cci.edit, 100)
+
+        # Finally, test a full edit
+        args = {
+            'hostname': 'new-host',
+            'domain': 'new.sftlyr.ws',
+            'notes': 'random notes',
+        }
+
+        self.cci.edit(100, **args)
+        service.editObject.assert_called_once_with(args, id=100)

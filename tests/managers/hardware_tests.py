@@ -72,6 +72,11 @@ class HardwareTests(unittest.TestCase):
         _id = self.hardware._get_ids_from_ip('nope')
         self.assertEqual(_id, [])
 
+        # Now simulate a private IP test
+        service.getHardware.side_effect = [[], [{'id': 99}]]
+        _id = self.hardware._get_ids_from_ip('10.0.1.87')
+        self.assertEqual(_id, [99])
+
     def test_resolve_ids_hostname(self):
         service = self.client['Account']
         service.getHardware = account_mock.getHardware_Mock(1000)
@@ -315,6 +320,27 @@ class HardwareTests(unittest.TestCase):
                            }}}
 
         self.assertEqual(price_id, get_default_value(package_options, 'Cat1'))
+
+    def test_edit(self):
+        # Test editing user data
+        service = self.client['Hardware_Server']
+
+        self.hardware.edit(100, userdata='my data')
+
+        service.setUserMetadata.assert_called_once_with(['my data'], id=100)
+
+        # Now test a blank edit
+        self.assertTrue(self.hardware.edit, 100)
+
+        # Finally, test a full edit
+        args = {
+            'hostname': 'new-host',
+            'domain': 'new.sftlyr.ws',
+            'notes': 'random notes',
+        }
+
+        self.hardware.edit(100, **args)
+        service.editObject.assert_called_once_with(args, id=100)
 
     def _setup_package_mocks(self):
         package = self.client['Product_Package']
