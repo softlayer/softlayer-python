@@ -14,7 +14,7 @@ except ImportError:
     import unittest  # NOQA
 from mock import Mock, MagicMock, patch
 
-from SoftLayer.CLI.helpers import format_output, CLIAbort
+from SoftLayer.CLI.helpers import format_output, CLIAbort, ArgumentError
 from SoftLayer.CLI.modules import server
 from tests.mocks import account_mock, hardware_mock, product_package_mock
 
@@ -57,19 +57,21 @@ class ServerCLITests(unittest.TestCase):
             '--controller': False,
         }
 
+        self.maxDiff = None
         client = self._setup_package_mocks(self.client)
 
         output = server.ServerCreateOptions.execute(client, args)
 
         expected = {
             'datacenter': ['RANDOM_LOCATION'],
-            'dual nic': [],
+            'dual nic': ['100_DUAL', '10_DUAL'],
             'disk_controllers': ['None', 'RAID0'],
             'os (CENTOS)': ['CENTOS_6_64'],
             'os (DEBIAN)': ['DEBIAN_6_32'],
+            'os (REDHAT)': ['REDHAT_6_64_6'],
             'os (UBUNTU)': ['UBUNTU_12_64', 'UBUNTU_12_64_MINIMAL'],
-            'os (WIN)': ['WIN_2008-DC-HYPERV_64', 'WIN_2008-ENT_64',
-                         'WIN_2008-STD_64'],
+            'os (WIN)': ['WIN_2003-STD-R2_64', 'WIN_2008-DC-HYPERV_64',
+                         'WIN_2008-ENT_64', 'WIN_2008-STD_64'],
             'memory': [4, 6],
             'disk': ['1000_DRIVE'],
             'single nic': ['100', '1000'],
@@ -84,7 +86,6 @@ class ServerCLITests(unittest.TestCase):
         self.assertEqual(expected, format_output(output, 'python'))
 
     def test_ServerCreateOptions_with_cpu_only(self):
-        self.maxDiff = None
         args = {
             '<chassis_id>': 999,
             '--all': False,
@@ -414,6 +415,39 @@ class ServerCLITests(unittest.TestCase):
 
             self.assertEqual(expected, format_output(output, 'python'))
 
+            # And make sure we can pass in disk as a comma separated string,
+            # which is what templates do
+            args['--disk'] = '1000_DRIVE,1000_DRIVE'
+
+            output = server.CreateServer.execute(client, args)
+
+            expected = [
+                [
+                    {'Item': 'First Item', 'cost': '0.00'},
+                    {'Item': 'Second Item', 'cost': '25.00'},
+                    {'Item': 'Total monthly cost', 'cost': '25.00'}
+                ],
+                ''
+            ]
+
+            self.assertEqual(expected, format_output(output, 'python'))
+
+            # Test explicitly setting a RAID configuration
+            args['--controller'] = 'RAID0'
+
+            output = server.CreateServer.execute(client, args)
+
+            expected = [
+                [
+                    {'Item': 'First Item', 'cost': '0.00'},
+                    {'Item': 'Second Item', 'cost': '25.00'},
+                    {'Item': 'Total monthly cost', 'cost': '25.00'}
+                ],
+                ''
+            ]
+
+            self.assertEqual(expected, format_output(output, 'python'))
+
         # Now test ordering
         with patch('SoftLayer.HardwareManager.place_order') as order_mock:
             order_mock.return_value = {
@@ -439,14 +473,14 @@ class ServerCLITests(unittest.TestCase):
                               server.CreateServer.execute, self.client, args)
 
     def test_CreateServer_failures(self):
-        # This contains an invalid network argument
+        client = self._setup_package_mocks(self.client)
+
+        # This is missing a required argument
         args = {
-            '--chassis': 999,
             '--hostname': 'test',
             '--domain': 'example.com',
             '--datacenter': 'TEST00',
             '--cpu': False,
-            '--network': 9999,
             '--disk': ['1000_DRIVE', '1000_DRIVE'],
             '--os': 'UBUNTU_12_64_MINIMAL',
             '--memory': False,
@@ -456,11 +490,124 @@ class ServerCLITests(unittest.TestCase):
             '--template': None,
         }
 
-        client = self._setup_package_mocks(self.client)
+        # Verify that ArgumentError is properly raised on error
+        self.assertRaises(ArgumentError,
+                          server.CreateServer.execute, client, args)
+
+        # This contains an invalid network argument
+        args['--chassis'] = 999
+        args['--network'] = 9999
 
         # Verify that CLIAbort is properly raised on error
         self.assertRaises(CLIAbort,
                           server.CreateServer.execute, client, args)
+
+        # This contains an invalid operating system argument
+        args['--network'] = '100'
+        args['--os'] = 'nope'
+
+        # Verify that CLIAbort is properly raised on error
+        self.assertRaises(CLIAbort,
+                          server.CreateServer.execute, client, args)
+
+    @patch('SoftLayer.CLI.modules.server.export_to_template')
+    def test_CreateServer_with_export(self, export_to_template):
+        args = {
+            '--chassis': 999,
+            '--hostname': 'test',
+            '--domain': 'example.com',
+            '--datacenter': 'TEST00',
+            '--cpu': False,
+            '--network': '100',
+            '--disk': ['1000_DRIVE', '1000_DRIVE'],
+            '--os': 'UBUNTU_12_64_MINIMAL',
+            '--memory': False,
+            '--controller': False,
+            '--test': True,
+            '--template': None,
+            '--key': 1234,
+            '--export': 'test_file.txt',
+        }
+
+        client = self._setup_package_mocks(self.client)
+
+        expected = args.copy()
+        del(expected['--export'])
+
+        server.CreateServer.execute(client, args)
+
+        export_to_template.assert_called_with('test_file.txt', expected,
+                                              exclude=['--wait', '--test'])
+
+    def test_EditServer(self):
+        # Test both userdata and userfile at once
+        args = {
+            '<identifier>': 1000,
+            '--hostname': 'hardware-test1',
+            '--domain': 'test.sftlyr.ws',
+            '--userdata': 'My data',
+            '--userfile': 'my_file.txt',
+        }
+
+        self.assertRaises(ArgumentError,
+                          server.EditServer.execute, self.client, args)
+
+        # Simulate a missing file error
+        args['--userdata'] = None
+
+        with patch('os.path.exists') as exists:
+            exists.return_value = False
+
+            self.assertRaises(ArgumentError,
+                              server.EditServer.execute, self.client, args)
+
+        # Test a successful edit with user data
+        args['--userdata'] = 'My data'
+        args['--userfile'] = None
+
+        expected = {
+            'userdata': 'My data',
+            'domain': 'test.sftlyr.ws',
+            'hostname': 'hardware-test1',
+        }
+
+        with patch('SoftLayer.HardwareManager.edit') as edit_mock:
+            edit_mock.return_value = True
+
+            server.EditServer.execute(self.client, args)
+
+            edit_mock.assert_called_with(1000, **expected)
+
+            # Now check for a CLIAbort if there's an error
+            edit_mock.return_value = False
+
+            self.assertRaises(CLIAbort,
+                              server.EditServer.execute, self.client, args)
+
+        # Test a successful edit with a user file
+        args['--userdata'] = None
+        args['--userfile'] = 'my_file.txt'
+
+        expected = {
+            'userdata': 'My data',
+            'domain': 'test.sftlyr.ws',
+            'hostname': 'hardware-test1',
+        }
+
+        with patch('os.path.exists') as exists:
+            exists.return_value = True
+            with patch('__builtin__.open') as file_mock:
+                file_mock.return_value.__enter__ = lambda s: s
+                file_mock.return_value.__exit__ = Mock()
+                file_mock.return_value.read.return_value = 'some data'
+
+                with patch('SoftLayer.HardwareManager.edit') as edit_mock:
+                    edit_mock.return_value = True
+                    expected['userdata'] = 'some data'
+
+                    server.EditServer.execute(self.client, args)
+
+                    edit_mock.assert_called_with(1000, **expected)
 
     def test_get_default_value_returns_none_for_unknown_category(self):
         option_mock = {'categories': {'cat1': []}}

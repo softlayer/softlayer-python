@@ -172,6 +172,36 @@ def getCategories_Mock():
             },
             'laborFee': '0',
         },
+        {
+            'itemId': 422,
+            'setupFee': '0',
+            'recurringFee': '40',
+            'laborFee': '0',
+            'oneTimeFee': '0',
+            'sort': 18,
+            'item': {
+                'description': 'Windows Server 2003 Standard SP2 with R2 '
+                '(64 bit)',
+                'id': 422
+            },
+            'id': 692,
+        },
+    ]
+
+    redhat_prices = [
+        {
+            'itemId': 3841,
+            'setupFee': '0',
+            'recurringFee': '0',
+            'laborFee': '0',
+            'oneTimeFee': '0',
+            'sort': 10,
+            'item': {
+                'description': 'Red Hat Enterprise Linux - 6 (64 bit)',
+                'id': 3841
+            },
+            'id': 13800,
+        }
     ]
 
     ram_prices = [
@@ -235,7 +265,7 @@ def getCategories_Mock():
         }
     ]
 
-    nic_prices = [
+    single_nic_prices = [
         {
             'itemId': 187,
             'setupFee': '0',
@@ -263,6 +293,41 @@ def getCategories_Mock():
                 'capacity': '1000',
                 'description': '1 Gbps Public & Private Networks',
                 'id': 188
+            },
+            'laborFee': '0',
+        }
+    ]
+
+    dual_nic_prices = [
+        {
+            'itemId': 4332,
+            'setupFee': '0',
+            'recurringFee': '10',
+            'hourlyRecurringFee': '.02',
+            'oneTimeFee': '0',
+            'id': 21509,
+            'sort': 5,
+            'item': {
+                'capacity': '10',
+                'description': '10 Mbps Dual Public & Private Networks '
+                '(up to 20 Mbps)',
+                'id': 4332
+            },
+            'laborFee': '0',
+        },
+        {
+            'itemId': 4336,
+            'setupFee': '0',
+            'recurringFee': '20',
+            'hourlyRecurringFee': '.03',
+            'oneTimeFee': '0',
+            'id': 21513,
+            'sort': 5,
+            'item': {
+                'capacity': '100',
+                'description': '100 Mbps Dual Public & Private Networks '
+                '(up to 200 Mbps)',
+                'id': 4336
             },
             'laborFee': '0',
         }
@@ -389,18 +454,33 @@ def getCategories_Mock():
                     'packageId': 50,
                     'title': 'Microsoft',
                 },
+                {
+                    'sort': 10,
+                    'prices': redhat_prices,
+                    'itemCategoryId': 12,
+                    'packageId': 50,
+                    'title': 'Redhat'
+                },
             ],
         },
         {
             'categoryCode': 'port_speed',
             'id': 26,
             'name': 'Uplink Port Speeds',
-            'groups': [{
-                'sort': 0,
-                'prices': nic_prices,
-                'itemCategoryId': 26,
-                'packageId': 50
-            }],
+            'groups': [
+                {
+                    'sort': 0,
+                    'prices': single_nic_prices,
+                    'itemCategoryId': 26,
+                    'packageId': 50,
+                },
+                {
+                    'sort': 5,
+                    'prices': dual_nic_prices,
+                    'itemCategoryId': 26,
+                    'packageId': 50,
+                },
+            ],
         },
         {
             'categoryCode': 'disk_controller',
