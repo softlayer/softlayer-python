@@ -46,6 +46,10 @@ setup(
     author='SoftLayer Technologies, Inc.',
     author_email='sldn@softlayer.com',
     packages=[
+        'SoftLayer',
+        'SoftLayer.CLI',
+        'SoftLayer.CLI.modules',
+        'SoftLayer.managers',
         'tests',
         'tests.CLI',
         'tests.CLI.modules',

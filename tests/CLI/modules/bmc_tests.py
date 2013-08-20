@@ -12,11 +12,11 @@ try:
     import unittest2 as unittest
 except ImportError:
     import unittest  # NOQA
-from mock import Mock, MagicMock, patch
+from mock import MagicMock, patch
 
 from SoftLayer.CLI.helpers import format_output, CLIAbort, ArgumentError
 from SoftLayer.CLI.modules import bmc
-from tests.mocks import account_mock, hardware_mock, product_package_mock
+from tests.mocks import product_package_mock
 
 
 class BMCCLITests(unittest.TestCase):

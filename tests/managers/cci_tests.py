@@ -128,7 +128,12 @@ class CCITests(unittest.TestCase):
 
         expected = ['processors', 'memory', 'blockDevices', 'operatingSystems',
                     'networkComponents', 'datacenters']
-        self.assertEqual(expected, results.keys())
+        method = 'assertItemsEqual'
+        if not hasattr(self, method):
+            # For Python 3.3 compatibility
+            method = 'assertCountEqual'
+        f = getattr(self, method)
+        f(expected, results.keys())
 
     def test_cancel_instance(self):
         self.cci.cancel_instance(id=1)

@@ -13,6 +13,12 @@ try:
 except ImportError:
     import unittest  # NOQA
 from mock import Mock, MagicMock, patch
+try:
+    # Python 3.3 compatibility
+    import builtins
+    use_builtins = True
+except ImportError:
+    use_builtins = False
 
 from SoftLayer.CLI.helpers import format_output, CLIAbort, ArgumentError
 from SoftLayer.CLI.modules import server
@@ -42,7 +48,13 @@ class ServerCLITests(unittest.TestCase):
             {'Code': 'migrate_larger', 'Reason': 'Migrating to larger server'}
         ]
 
-        self.assertEqual(expected, format_output(output, 'python'))
+        method = 'assertItemsEqual'
+        if not hasattr(self, method):
+            # For Python 3.3 compatibility
+            method = 'assertCountEqual'
+
+        f = getattr(self, method)
+        f(expected, format_output(output, 'python'))
 
     def test_ServerCreateOptions(self):
         args = {
@@ -568,7 +580,10 @@ class ServerCLITests(unittest.TestCase):
 
         with patch('os.path.exists') as exists:
             exists.return_value = True
-            with patch('__builtin__.open') as file_mock:
+            open_name = '__builtin__.open'
+            if use_builtins:
+                open_name = 'builtins.open'
+            with patch(open_name) as file_mock:
                 file_mock.return_value.__enter__ = lambda s: s
                 file_mock.return_value.__exit__ = Mock()
                 file_mock.return_value.read.return_value = 'some data'
