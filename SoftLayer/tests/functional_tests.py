@@ -1,6 +1,6 @@
 """
-    tests.functional_tests
-    ~~~~~~~~~~~~~~~~~~~~~~
+    SoftLayer.tests.functional_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
@@ -8,7 +8,7 @@
 import os
 
 import SoftLayer
-from tests import unittest
+from SoftLayer.tests import unittest
 
 
 def get_creds():
@@ -40,7 +40,7 @@ class UnauthedUser(unittest.TestCase):
 
         try:
             client['SoftLayer_User_Customer'].doSomething()
-        except SoftLayer.SoftLayerAPIError, e:
+        except SoftLayer.SoftLayerAPIError as e:
             self.assertEqual(e.faultCode, 404)
             self.assertIn('NOT FOUND', e.faultString)
             self.assertIn('NOT FOUND', e.reason)
@@ -52,7 +52,7 @@ class UnauthedUser(unittest.TestCase):
             # This test will fail if 'notvalidsoftlayer.com' becomes a thing
             SoftLayer.API.make_xml_rpc_api_call(
                 'http://notvalidsoftlayer.com', 'getObject')
-        except SoftLayer.SoftLayerAPIError, e:
+        except SoftLayer.SoftLayerAPIError as e:
             self.assertEqual(e.faultCode, 0)
             self.assertIn('not known', e.faultString)
             self.assertIn('not known', e.reason)
@@ -71,7 +71,7 @@ class AuthedUser(unittest.TestCase):
 
         try:
             client["SoftLayer_DOESNOTEXIST"].getObject()
-        except SoftLayer.SoftLayerAPIError, e:
+        except SoftLayer.SoftLayerAPIError as e:
             self.assertEqual(e.faultCode, '-32601')
             self.assertEqual(e.faultString, 'Service does not exist')
             self.assertEqual(e.reason, 'Service does not exist')

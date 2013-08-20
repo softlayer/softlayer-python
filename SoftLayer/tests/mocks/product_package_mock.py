@@ -1,3 +1,12 @@
+"""
+    SoftLayer.tests.mocks.product_package_mock
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Mocks API calls documented at
+    http://sldn.softlayer.com/reference/services/SoftLayer_Account
+
+    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
+    :license: BSD, see LICENSE for more details.
+"""
 from mock import MagicMock
 
 

@@ -1,12 +1,12 @@
 """
-    tests.managers.sshkey_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    SoftLayer.tests.managers.sshkey_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
 from SoftLayer import SshKeyManager
-from tests import unittest
+from SoftLayer.tests import unittest
 from mock import MagicMock, call
 
 

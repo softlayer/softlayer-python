@@ -1,13 +1,13 @@
 """
-    tests.basic_tests
-    ~~~~~~~~~~~~~~~~~
+    SoftLayer.tests.basic_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Tests shared code
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
 import SoftLayer
-from tests import unittest
+from SoftLayer.tests import unittest
 
 
 class TestExceptions(unittest.TestCase):

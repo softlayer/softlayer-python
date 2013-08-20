@@ -1,6 +1,6 @@
 """
-    tests.managers.cci_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~
+    SoftLayer.tests.managers.cci_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
@@ -8,7 +8,7 @@
 from SoftLayer import MessagingManager, Unauthenticated
 import SoftLayer.managers.messaging
 from SoftLayer.consts import USER_AGENT
-from tests import unittest
+from SoftLayer.tests import unittest
 
 import json
 from mock import MagicMock, patch, ANY

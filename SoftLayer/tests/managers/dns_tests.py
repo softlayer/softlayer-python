@@ -1,12 +1,12 @@
 """
-    tests.managers.dns_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~
+    SoftLayer.tests.managers.dns_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
 from SoftLayer import DNSManager, DNSZoneNotFound
-from tests import unittest
+from SoftLayer.tests import unittest
 
 from mock import MagicMock, ANY
 

@@ -1,13 +1,13 @@
 """
-    tests.managers.metadata_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    SoftLayer.tests.managers.metadata_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
 from SoftLayer import MetadataManager, SoftLayerError, SoftLayerAPIError
 from SoftLayer.consts import API_PRIVATE_ENDPOINT_REST, USER_AGENT
-from tests import unittest
+from SoftLayer.tests import unittest
 
 from mock import patch, MagicMock
 

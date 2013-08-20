@@ -1,6 +1,6 @@
 """
-    tests.CLI.modules.bmc_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    SoftLayer.tests.CLI.modules.bmc_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     This is a series of integration tests designed to test the complete
     command line interface.
@@ -16,7 +16,7 @@ from mock import MagicMock, patch
 
 from SoftLayer.CLI.helpers import format_output, CLIAbort, ArgumentError
 from SoftLayer.CLI.modules import bmc
-from tests.mocks import product_package_mock
+from SoftLayer.tests.mocks import product_package_mock
 
 
 class BMCCLITests(unittest.TestCase):

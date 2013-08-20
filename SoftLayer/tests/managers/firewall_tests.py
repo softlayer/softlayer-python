@@ -1,12 +1,12 @@
 """
-    tests.managers.firewall_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    SoftLayer.tests.managers.firewall_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
 from SoftLayer import FirewallManager
-from tests import unittest
+from SoftLayer.tests import unittest
 
 from mock import MagicMock, ANY
 
@@ -26,5 +26,5 @@ class FirewallTests(unittest.TestCase):
 
         firewalls = self.firewall.get_firewalls()
 
-        self.assertEquals([vlan], firewalls)
+        self.assertEqual([vlan], firewalls)
         call.assert_called_once_with(mask=ANY)

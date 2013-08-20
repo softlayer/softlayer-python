@@ -1,6 +1,6 @@
 """
-    tests.CLI.helper_tests
-    ~~~~~~~~~~~~~~~~~~~~~~
+    SoftLayer.tests.CLI.helper_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
@@ -10,7 +10,7 @@ import os
 import json
 
 import SoftLayer.CLI as cli
-from tests import FIXTURE_PATH, unittest
+from SoftLayer.tests import FIXTURE_PATH, unittest
 from mock import patch, mock_open, call
 
 

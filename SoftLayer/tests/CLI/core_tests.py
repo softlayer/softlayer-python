@@ -1,6 +1,6 @@
 """
-    tests.CLI.core_tests
-    ~~~~~~~~~~~~~~~~~~~~
+    SoftLayer.tests.CLI.core_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
@@ -9,7 +9,7 @@ from mock import MagicMock, patch
 
 import SoftLayer
 import SoftLayer.CLI as cli
-from tests import unittest
+from SoftLayer.tests import unittest
 from SoftLayer.CLI.helpers import CLIAbort
 from SoftLayer.CLI.environment import Environment, InvalidModule
 

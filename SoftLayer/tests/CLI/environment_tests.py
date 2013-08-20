@@ -1,6 +1,6 @@
 """
-    tests.CLI.environment_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    SoftLayer.tests.CLI.environment_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
@@ -9,7 +9,8 @@ import sys
 import os
 from mock import patch, MagicMock
 
-from tests import unittest
+from SoftLayer import API_PUBLIC_ENDPOINT
+from SoftLayer.tests import FIXTURE_PATH, unittest
 from SoftLayer.CLI.environment import Environment, InvalidCommand
 
 if sys.version_info >= (3,):

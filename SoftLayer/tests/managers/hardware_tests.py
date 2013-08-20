@@ -1,14 +1,15 @@
 """
-    tests.managers.hardware_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    SoftLayer.tests.managers.hardware_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
 from SoftLayer import HardwareManager
 from SoftLayer.managers.hardware import get_default_value
-from tests import unittest
-from tests.mocks import account_mock, hardware_mock, product_package_mock
+from SoftLayer.tests import unittest
+from SoftLayer.tests.mocks import account_mock, hardware_mock, \
+    product_package_mock
 
 from mock import MagicMock, ANY, call, patch
 
