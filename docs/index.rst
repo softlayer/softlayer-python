@@ -17,6 +17,7 @@ This is the documentation to SoftLayer's Python API Bindings. These bindings use
    :glob:
 
    install
+   config_file
    api/*
    cli
 

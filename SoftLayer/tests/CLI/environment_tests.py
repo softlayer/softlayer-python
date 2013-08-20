@@ -9,10 +9,8 @@ import sys
 import os
 from mock import patch, MagicMock
 
-from SoftLayer import API_PUBLIC_ENDPOINT
 from SoftLayer.tests import unittest
 from SoftLayer.CLI.environment import Environment, InvalidCommand
-from SoftLayer.tests import FIXTURE_PATH
 
 if sys.version_info >= (3,):
     raw_input_path = 'builtins.input'
@@ -53,41 +51,6 @@ class EnvironmentTests(unittest.TestCase):
         r = self.env.getpass('input')
         getpass.assert_called_with('input')
         self.assertEqual(getpass(), r)
-
-    @patch('os.environ', {})
-    def test_parse_config_no_files(self):
-        self.env.load_config([])
-        self.assertEqual({
-            'endpoint_url': API_PUBLIC_ENDPOINT,
-            'username': '', 'api_key': ''
-        }, self.env.config)
-
-    @patch('os.environ', {})
-    def test_parse_config_no_softlayer_section(self):
-        path = os.path.join(FIXTURE_PATH, 'empty.conf')
-        self.env.load_config([path])
-        self.assertEqual({
-            'endpoint_url': API_PUBLIC_ENDPOINT,
-            'username': '', 'api_key': ''
-        }, self.env.config)
-
-    @patch('os.environ', {})
-    def test_parse_config_empty(self):
-        path = os.path.join(FIXTURE_PATH, 'no_options.conf')
-        self.env.load_config([path])
-        self.assertEqual(
-            {'endpoint_url': API_PUBLIC_ENDPOINT,
-                'username': '',
-                'api_key': ''}, self.env.config)
-
-    def test_parse_config(self):
-        path = os.path.join(FIXTURE_PATH, 'full.conf')
-        self.env.load_config([path])
-        self.assertEqual({
-            'username': 'myusername',
-            'api_key': 'myapi_key',
-            'endpoint_url': 'myendpoint_url'
-        }, self.env.config)
 
     def test_get_module_name(self):
         self.env.aliases = {'aliasname': 'realname'}

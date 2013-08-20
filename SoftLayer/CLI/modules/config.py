@@ -19,14 +19,34 @@ from SoftLayer.CLI import (
 import ConfigParser
 
 
-def config_table(env):
+def get_settings_from_client(client):
+    """ Pull out settings from a SoftLayer.Client instance.
+
+    :param client: SoftLayer.Client instance
+    """
+    settings = {
+        'username': '',
+        'api_key': '',
+        'timeout': client.timeout or '',
+        'endpoint_url': client.endpoint_url,
+    }
+    try:
+        settings['username'] = client.auth.username
+        settings['api_key'] = client.auth.api_key
+    except AttributeError:
+        pass
+
+    return settings
+
+
+def config_table(settings):
     t = KeyValueTable(['Name', 'Value'])
     t.align['Name'] = 'r'
     t.align['Value'] = 'l'
-    config = env.config
-    t.add_row(['Username', config.get('username', 'none set')])
-    t.add_row(['API Key', config.get('api_key', 'none set')])
-    t.add_row(['Endpoint URL', config.get('endpoint_url', 'none set')])
+    t.add_row(['Username', settings['username'] or 'not set'])
+    t.add_row(['API Key', settings['api_key'] or 'not set'])
+    t.add_row(['Endpoint URL', settings['endpoint_url'] or 'not set'])
+    t.add_row(['Timeout', settings['timeout'] or 'not set'])
     return t
 
 
@@ -68,21 +88,26 @@ Setup configuration
 
     @classmethod
     def execute(cls, client, args):
+        settings = get_settings_from_client(client)
+
         # User Input
+        # Ask for username
         while True:
             username = cls.env.input(
-                'Username [%s]: ' % cls.env.config['username']) \
-                or cls.env.config['username']
+                'Username [%s]: ' % settings['username']) \
+                or settings['username']
             if username:
                 break
 
+        # Ask for 'secret' which can be api_key or their password
         while True:
             secret = cls.env.getpass(
-                'API Key or Password [%s]: ' % cls.env.config['api_key']) \
-                or cls.env.config['api_key']
+                'API Key or Password [%s]: ' % settings['api_key']) \
+                or settings['api_key']
             if secret:
                 break
 
+        # Ask for which endpoint they want to use
         while True:
             endpoint_type = cls.env.input('Endpoint (public|private|custom): ')
             endpoint_type = endpoint_type.lower()
@@ -97,33 +122,39 @@ Setup configuration
                 break
             elif endpoint_type == 'custom':
                 endpoint_url = cls.env.input(
-                    'Endpoint URL [%s]: ' % cls.env.config['endpoint_url']
-                ) or cls.env.config['endpoint_url']
+                    'Endpoint URL [%s]: ' % settings['endpoint_url']
+                ) or settings['endpoint_url']
                 break
 
         api_key = get_api_key(username, secret, endpoint_url=endpoint_url)
 
-        cls.env.config['username'] = username
-        cls.env.config['api_key'] = api_key
-        cls.env.config['endpoint_url'] = endpoint_url
+        settings['username'] = username
+        settings['api_key'] = api_key
+        settings['endpoint_url'] = endpoint_url
 
         path = '~/.softlayer'
         if args.get('--config'):
             path = args.get('--config')
         config_path = os.path.expanduser(path)
 
-        cls.env.out(format_output(config_table(cls.env)))
+        cls.env.out(format_output(config_table(settings)))
 
         if not confirm('Are you sure you want to write settings to "%s"?'
                        % config_path, default=True):
             raise CLIAbort('Aborted.')
 
+        # Persist the config file. Read the target config file in before
+        # setting the values to avoid clobbering settings
         config = ConfigParser.RawConfigParser()
-        config.add_section('softlayer')
+        config.read(config_path)
+        try:
+            config.add_section('softlayer')
+        except ConfigParser.DuplicateSectionError:
+            pass
 
-        config.set('softlayer', 'username', cls.env.config['username'])
-        config.set('softlayer', 'api_key', cls.env.config['api_key'])
-        config.set('softlayer', 'endpoint_url', cls.env.config['endpoint_url'])
+        config.set('softlayer', 'username', settings['username'])
+        config.set('softlayer', 'api_key', settings['api_key'])
+        config.set('softlayer', 'endpoint_url', settings['endpoint_url'])
 
         f = os.fdopen(
             os.open(config_path, os.O_WRONLY | os.O_CREAT, 0600), 'w')
@@ -145,4 +176,5 @@ Show current configuration
 
     @classmethod
     def execute(cls, client, args):
-        return config_table(cls.env)
+        settings = get_settings_from_client(client)
+        return config_table(settings)

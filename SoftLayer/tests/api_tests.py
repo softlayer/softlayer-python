@@ -5,7 +5,7 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
-from mock import patch, call
+from mock import patch, call, Mock
 
 import SoftLayer
 import SoftLayer.API
@@ -20,22 +20,23 @@ class Inititialization(unittest.TestCase):
 
         self.assertEquals(client.auth.username, 'doesnotexist')
         self.assertEquals(client.auth.api_key, 'issurelywrong')
-        self.assertEquals(client._endpoint_url,
+        self.assertEquals(client.endpoint_url,
                           SoftLayer.API_PUBLIC_ENDPOINT.rstrip('/'))
+        self.assertEquals(client.timeout, 10)
 
-    @patch.dict('os.environ', {
-        'SL_USERNAME': 'test_user', 'SL_API_KEY': 'test_api_key'})
-    def test_env(self):
+    @patch('SoftLayer.API.get_client_settings')
+    def test_env(self, get_client_settings):
+        auth = Mock()
+        get_client_settings.return_value = {
+            'auth': auth,
+            'timeout': 10,
+            'endpoint_url': 'http://endpoint_url/',
+        }
         client = SoftLayer.Client()
-        self.assertEquals(client.auth.username, 'test_user')
-        self.assertEquals(client.auth.api_key, 'test_api_key')
-
-    @patch('SoftLayer.API.API_USERNAME', 'test_user')
-    @patch('SoftLayer.API.API_KEY', 'test_api_key')
-    def test_globals(self):
-        client = SoftLayer.Client()
-        self.assertEquals(client.auth.username, 'test_user')
-        self.assertEquals(client.auth.api_key, 'test_api_key')
+        self.assertEquals(client.auth.username, auth.username)
+        self.assertEquals(client.auth.api_key, auth.api_key)
+        self.assertEquals(client.timeout, 10)
+        self.assertEquals(client.endpoint_url, 'http://endpoint_url')
 
 
 class ClientMethods(unittest.TestCase):
@@ -235,8 +236,9 @@ class UnauthenticatedAPIClient(unittest.TestCase):
     def setUp(self):
         self.client = SoftLayer.Client(endpoint_url="ENDPOINT")
 
-    @patch.dict('os.environ', {'SL_USERNAME': '', 'SL_API_KEY': ''})
-    def test_init(self):
+    @patch('SoftLayer.API.get_client_settings')
+    def test_init(self, get_client_settings):
+        get_client_settings.return_value = {}
         client = SoftLayer.Client()
         self.assertIsNone(client.auth)
 
