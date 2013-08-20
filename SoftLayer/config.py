@@ -47,7 +47,7 @@ def get_client_settings_config_file(**kwargs):
 
         :param \*\*kwargs: Arguments that are passed into the client instance
     """
-    config_files = ['/etc/softlayer.cfg', '~/.softlayer']
+    config_files = ['/etc/softlayer.conf', '~/.softlayer']
     if kwargs.get('config_file'):
         config_files.append(kwargs.get('config_file'))
     config_files = [os.path.expanduser(f) for f in config_files]
