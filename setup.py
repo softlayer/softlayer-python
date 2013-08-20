@@ -69,7 +69,6 @@ setup(
     },
     test_suite='nose.collector',
     install_requires=requires,
-#    tests_require=['coverage'],
     classifiers=[
         'Environment :: Console',
         'Environment :: Web Environment',
