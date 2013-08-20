@@ -165,17 +165,7 @@ def main(args=sys.argv[1:], env=Environment()):
             logger.addHandler(h)
             logger.setLevel(DEBUG_LOGGING_MAP.get(debug_level, logging.DEBUG))
 
-        # Parse Config
-        config_files = ["~/.softlayer"]
-
-        if command_args.get('--config'):
-            config_files.append(command_args.get('--config'))
-
-        env.load_config(config_files)
-        client = Client(
-            username=env.config.get('username'),
-            api_key=env.config.get('api_key'),
-            endpoint_url=env.config.get('endpoint_url'))
+        client = Client(config_file=command_args.get('--config'))
 
         # Do the thing
         data = command.execute(client, command_args)

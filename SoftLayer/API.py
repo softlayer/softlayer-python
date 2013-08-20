@@ -9,15 +9,12 @@
 from consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT, USER_AGENT
 from transport import make_xml_rpc_api_call
 from exceptions import SoftLayerError
-from auth import BasicAuthentication, TokenAuthentication
-import os
+from auth import TokenAuthentication
+from config import get_client_settings
 
 
 __all__ = ['Client', 'API_PUBLIC_ENDPOINT', 'API_PRIVATE_ENDPOINT']
 
-API_USERNAME = None
-API_KEY = None
-API_BASE_URL = API_PUBLIC_ENDPOINT
 VALID_CALL_ARGS = set([
     'id',
     'mask',
@@ -42,6 +39,7 @@ class Client(object):
     :param integer timeout: timeout for API requests
     :param auth: an object which responds to get_headers() to be inserted into
         the xml-rpc headers. Example: `BasicAuthentication`
+    :param config_file: A path to a configuration file used to load settings
 
     Usage:
 
@@ -54,20 +52,21 @@ class Client(object):
     """
     _prefix = "SoftLayer_"
 
-    def __init__(self, username=None, api_key=None,
-                 endpoint_url=None, timeout=None, auth=None):
+    def __init__(self, username=None, api_key=None, endpoint_url=None,
+                 timeout=None, auth=None, config_file=None):
 
-        self.auth = auth
-        if self.auth is None:
-            username = username or API_USERNAME or \
-                os.environ.get('SL_USERNAME') or ''
-            api_key = api_key or API_KEY or os.environ.get('SL_API_KEY') or ''
-            if username and api_key:
-                self.auth = BasicAuthentication(username, api_key)
-
-        self._endpoint_url = (endpoint_url or API_BASE_URL or
-                              API_PUBLIC_ENDPOINT).rstrip('/')
-        self.timeout = timeout
+        settings = get_client_settings(username=username,
+                                       api_key=api_key,
+                                       endpoint_url=endpoint_url,
+                                       timeout=timeout,
+                                       auth=auth,
+                                       config_file=config_file)
+        self.auth = settings.get('auth')
+        self.endpoint_url = (
+            settings.get('endpoint_url') or API_PUBLIC_ENDPOINT).rstrip('/')
+        self.timeout = None
+        if settings.get('timeout'):
+            self.timeout = float(settings.get('timeout'))
 
     def authenticate_with_password(self, username, password,
                                    security_question_id=None,
@@ -82,6 +81,7 @@ class Client(object):
                                                 question
 
         """
+        self.auth = None
         res = self['User_Customer'].getPortalLoginToken(
             username,
             password,
@@ -96,6 +96,7 @@ class Client(object):
         :param name: The name of the service. E.G. Account
 
         Usage:
+            >>> import SoftLayer
             >>> client = SoftLayer.Client()
             >>> client['Account']
             <Service: Account>
@@ -115,6 +116,7 @@ class Client(object):
         :param service: the name of the SoftLayer API service
 
         Usage:
+            >>> import SoftLayer
             >>> client = SoftLayer.Client()
             >>> client['Account'].getVirtualGuests(mask="id", limit=10)
             [...]
@@ -164,7 +166,7 @@ class Client(object):
         if raw_headers:
             http_headers.update(raw_headers)
 
-        uri = '/'.join([self._endpoint_url, service])
+        uri = '/'.join([self.endpoint_url, service])
         return make_xml_rpc_api_call(uri, method, args,
                                      headers=headers,
                                      http_headers=http_headers,
@@ -250,7 +252,7 @@ class Client(object):
 
     def __repr__(self):
         return "<Client: endpoint=%s, user=%r>" \
-            % (self._endpoint_url, self.auth)
+            % (self.endpoint_url, self.auth)
 
     __str__ = __repr__
 
@@ -276,6 +278,8 @@ class Service(object):
                              results
 
         Usage:
+            >>> import SoftLayer
+            >>> client = SoftLayer.Client()
             >>> client['Account'].getVirtualGuests(mask="id", limit=10)
             [...]
 
@@ -294,6 +298,8 @@ class Service(object):
                            ``Service.call`` takes
 
         Usage:
+            >>> import SoftLayer
+            >>> client = SoftLayer.Client()
             >>> gen = client['Account'].getVirtualGuests(iter=True)
             >>> for virtual_guest in gen:
             ...     virtual_guest['id']
