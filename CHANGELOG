@@ -1,3 +1,36 @@
+3.0.0
+
+    * Many bug fixes and consistency improvements
+
+    * API: Removes old API client interfaces which have been deprecated in the v2. See link for more details: https://softlayer-api-python-client.readthedocs.org/en/latest/api/client/#backwards-compatibility
+
+    * CLI+API: Improved dedicated server ordering. Adds power management for hardware servers: power-on, power-off, power-cycle, reboot
+
+    * CLI+API: Adds a networking manager and adds several network-related CLI modules. This includes the ability to:
+        
+        * list, create, cancel and assign global IPs
+
+        * list, create, cancel and detail subnets. Also has the ability to lookup details about an IP address with 'sl subnet lookup'
+
+        * list, detail VLANs
+
+        * show and edit RWhois data
+
+    * CLI+API: Adds SoftLayer Message Queue Service bindings (as a manager) and a CLI counterpart. With this you can interact with existing message queue accounts
+
+    * CLI+API: Ability to manage SSH Keys with a manager and a CLI module
+
+    * CLI+API: Adds the ability to create CCIs with the following options: metadata, post-install script, SSH key
+
+    * CLI: Adds templating for creating CCIs and hardware nodes which can be used to create more CCIs and hardware with the same settings
+
+    * CLI+API: Adds the ability to create hardware servers with a default SSH key
+
+    * CLI: Adds a --debug option to print out debugging information. --debug=3 is the highest log level which prints full HTTP request/responses including the body
+
+    * CLI: The commands in the main help are now organized into categories
+
+
 2.3.0
 
     * Several bug fixes and improvements
@@ -25,7 +58,7 @@
 
     * Consistency changes/bug fixes
 
-    * Added sphinx documentation. See it here: http://softlayer.github.com/softlayer-api-python-client
+    * Added sphinx documentation. See it here: https://softlayer-api-python-client.readthedocs.org
  
     * CCI: Adds Support for Additional Disks
  
