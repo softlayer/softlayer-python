@@ -9,12 +9,11 @@
 import sys
 import getpass
 from importlib import import_module
-from ConfigParser import SafeConfigParser
 import os
 import os.path
 
 from SoftLayer.CLI.modules import get_module_list
-from SoftLayer import API_PUBLIC_ENDPOINT, SoftLayerError
+from SoftLayer import SoftLayerError
 
 
 class InvalidCommand(SoftLayerError):
@@ -44,7 +43,6 @@ class Environment(object):
         'hardware': 'server',
         'bmetal': 'bmc',
     }
-    config = {}
     stdout = sys.stdout
     stderr = sys.stderr
 
@@ -91,25 +89,6 @@ class Environment(object):
 
     def getpass(self, prompt):
         return getpass.getpass(prompt)
-
-    def load_config(self, files):
-        config_files = [os.path.expanduser(f) for f in files]
-
-        cp = SafeConfigParser({
-            'username': os.environ.get('SL_USERNAME') or '',
-            'api_key': os.environ.get('SL_API_KEY') or '',
-            'endpoint_url': API_PUBLIC_ENDPOINT,
-        })
-        cp.read(config_files)
-        config = {}
-
-        if not cp.has_section('softlayer'):
-            cp.add_section('softlayer')
-
-        for config_name in ['username', 'api_key', 'endpoint_url']:
-            config[config_name] = cp.get('softlayer', config_name)
-
-        self.config = config
 
     def exit(self, code=0):
         sys.exit(code)
