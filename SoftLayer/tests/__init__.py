@@ -6,4 +6,3 @@ except ImportError:
 import os.path
 
 FIXTURE_PATH = os.path.abspath(os.path.join(__file__, '..', 'fixtures'))
-

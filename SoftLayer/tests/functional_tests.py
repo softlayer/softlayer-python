@@ -40,7 +40,7 @@ class UnauthedUser(unittest.TestCase):
 
         try:
             client['SoftLayer_User_Customer'].doSomething()
-        except SoftLayer.SoftLayerAPIError, e:
+        except SoftLayer.SoftLayerAPIError as e:
             self.assertEqual(e.faultCode, 404)
             self.assertIn('NOT FOUND', e.faultString)
             self.assertIn('NOT FOUND', e.reason)
@@ -52,7 +52,7 @@ class UnauthedUser(unittest.TestCase):
             # This test will fail if 'notvalidsoftlayer.com' becomes a thing
             SoftLayer.API.make_xml_rpc_api_call(
                 'http://notvalidsoftlayer.com', 'getObject')
-        except SoftLayer.SoftLayerAPIError, e:
+        except SoftLayer.SoftLayerAPIError as e:
             self.assertEqual(e.faultCode, 0)
             self.assertIn('not known', e.faultString)
             self.assertIn('not known', e.reason)
@@ -71,21 +71,27 @@ class AuthedUser(unittest.TestCase):
 
         try:
             client["SoftLayer_DOESNOTEXIST"].getObject()
-        except SoftLayer.SoftLayerAPIError, e:
+        except SoftLayer.SoftLayerAPIError as e:
             self.assertEqual(e.faultCode, '-32601')
             self.assertEqual(e.faultString, 'Service does not exist')
             self.assertEqual(e.reason, 'Service does not exist')
         else:
             self.fail('No Exception Raised')
 
-    def test_dns(self):
+    def test_get_users(self):
         creds = get_creds()
         client = SoftLayer.Client(
             username=creds['username'],
             api_key=creds['api_key'],
             endpoint_url=creds['endpoint'],
             timeout=20)
-        client["SoftLayer_Dns_Domain"].getByDomainName('p.sftlyr.ws')
+
+        found = False
+        results = client["Account"].getUsers()
+        for user in results:
+            if user.get('username') == creds['username']:
+                found = True
+        self.assertTrue(found)
 
     def test_result_types(self):
         creds = get_creds()

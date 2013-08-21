@@ -7,7 +7,7 @@
 """
 from SoftLayer import SshKeyManager
 from SoftLayer.tests import unittest
-from mock import MagicMock, ANY, call
+from mock import MagicMock, call
 
 
 class SshKeyTests(unittest.TestCase):
