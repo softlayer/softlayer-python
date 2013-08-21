@@ -13,9 +13,9 @@ from mock import Mock, MagicMock, patch
 try:
     # Python 3.x compatibility
     import builtins
-    use_builtins = True
+    builtins_name = 'builtins'
 except ImportError:
-    use_builtins = False
+    builtins_name = '__builtin__'
 
 from SoftLayer.CLI.helpers import format_output, CLIAbort, ArgumentError
 from SoftLayer.CLI.modules import server
@@ -578,10 +578,7 @@ class ServerCLITests(unittest.TestCase):
 
         with patch('os.path.exists') as exists:
             exists.return_value = True
-            open_name = '__builtin__.open'
-            if use_builtins:
-                open_name = 'builtins.open'
-            with patch(open_name) as file_mock:
+            with patch(builtins_name + '.open') as file_mock:
                 file_mock.return_value.__enter__ = lambda s: s
                 file_mock.return_value.__exit__ = Mock()
                 file_mock.return_value.read.return_value = 'some data'
