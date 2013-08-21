@@ -399,7 +399,7 @@ class HardwareManager(IdentifierMixin, object):
             self, server=None, hostname=None, domain=None, hourly=False,
             location=None, os=None, disks=None, port_speed=None,
             bare_metal=None, ram=None, package_id=None, disk_controller=None,
-            ssh_key=None):
+            ssh_keys=[]):
         """
         Translates a list of arguments into a dictionary necessary for creating
         a server.
@@ -432,6 +432,7 @@ class HardwareManager(IdentifierMixin, object):
                                which can be obtained by calling
                                _get_bare_metal_package_id
         :param int disk_controller: The disk controller to use.
+        :param list ssh_keys: The SSH keys to add to the root user
         """
         arguments = ['server', 'hostname', 'domain', 'location', 'os', 'disks',
                      'port_speed', 'bare_metal', 'ram', 'package_id',
@@ -453,8 +454,8 @@ class HardwareManager(IdentifierMixin, object):
             ],
         }
 
-        if ssh_key:
-            order['sshKeys'] = [{'sshKeyIds': [ssh_key]}]
+        if ssh_keys:
+            order['sshKeys'] = [{'sshKeyIds': ssh_keys}]
 
         if bare_metal:
             order['packageId'] = self._get_bare_metal_package_id()

@@ -336,7 +336,7 @@ Options:
 
 class CreateCCI(CLIRunnable):
     """
-usage: sl cci create [options]
+usage: sl cci create [--key=KEY...] [options]
 
 Order/create a CCI. See 'sl cci create-options' for valid options
 
@@ -359,10 +359,11 @@ Optional:
   --dedicated            Allocate a dedicated CCI (non-shared host)
   --dry-run, --test      Do not create CCI, just get a quote
   --export=FILE          Exports options to a template file
-  -F, --userfile=FILE       Read userdata from file
-                            (Only HTTPS executes, HTTP leaves file in /root)
+  -F, --userfile=FILE    Read userdata from file
+                           (Only HTTPS executes, HTTP leaves file in /root)
   -i, --postinstall=URI  Post-install script to download
-  -k, --key=KEY          The SSH key to add to the root user
+  -k, --key=KEY          SSH keys to add to the root user. Can be specified
+                           multiple times
   --like=IDENTIFIER      Use the configuration from an existing CCI
   -n, --network=MBPS     Network port speed in Mbps
   --private              Forces the CCI to only have access the private
@@ -382,6 +383,11 @@ Optional:
         update_with_template_args(args)
         cci = CCIManager(client)
         cls._update_with_like_args(cci, args)
+
+        # SSH keys may be a comma-separated list. Let's make it a real list.
+        if isinstance(args.get('--key'), str):
+            args['--key'] = args.get('--key').split(',')
+
         cls._validate_args(args)
 
         # Do not create CCI with --test or --export
@@ -601,11 +607,14 @@ Optional:
         if args.get('--postinstall'):
             data['post_uri'] = args.get('--postinstall')
 
-        # Get the SSH key
+        # Get the SSH keys
         if args.get('--key'):
-            key_id = resolve_id(SshKeyManager(client).resolve_ids,
-                                args.get('--key'), 'SshKey')
-            data['ssh_key'] = key_id
+            keys = []
+            for key in args.get('--key'):
+                key_id = resolve_id(SshKeyManager(client).resolve_ids, key,
+                                    'SshKey')
+                keys.append(key_id)
+            data['ssh_keys'] = keys
 
         return data
 

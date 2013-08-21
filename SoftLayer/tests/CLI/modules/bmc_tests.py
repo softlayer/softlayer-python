@@ -100,6 +100,7 @@ class BMCCLITests(unittest.TestCase):
             '--template': None,
             '--hourly': True,
             '--monthly': False,
+            '--key': [1234, 456],
         }
 
         client = self._setup_package_mocks(self.client)

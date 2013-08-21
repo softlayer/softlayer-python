@@ -177,7 +177,7 @@ class HardwareTests(unittest.TestCase):
             'package_id': 13,
             'ram': 1400,
             'disk_controller': 1500,
-            'ssh_key': 3000,
+            'ssh_keys': [3000, 3001],
         }
 
         expected = {
@@ -196,7 +196,7 @@ class HardwareTests(unittest.TestCase):
                 {'id': 600},
                 {'id': 1400},
                 {'id': 1500}],
-            'sshKeys': [{'sshKeyIds': [3000]}],
+            'sshKeys': [{'sshKeyIds': [3000, 3001]}],
             'location': 'Wyrmshire', 'packageId': 13
         }
 
