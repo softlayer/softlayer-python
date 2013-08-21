@@ -8,13 +8,10 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest  # NOQA
+from SoftLayer.tests import unittest
 from mock import Mock, MagicMock, patch
 try:
-    # Python 3.3 compatibility
+    # Python 3.x compatibility
     import builtins
     use_builtins = True
 except ImportError:
