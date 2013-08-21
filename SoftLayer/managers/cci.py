@@ -222,7 +222,7 @@ class CCIManager(IdentifierMixin, object):
             datacenter=None, os_code=None, image_id=None,
             dedicated=False, public_vlan=None, private_vlan=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
-            private=False, ssh_keys=[]):
+            private=False, ssh_keys=None):
         """
         Translates a list of arguments into a dictionary necessary for creating
         a CCI.

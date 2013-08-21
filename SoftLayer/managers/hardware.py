@@ -399,7 +399,7 @@ class HardwareManager(IdentifierMixin, object):
             self, server=None, hostname=None, domain=None, hourly=False,
             location=None, os=None, disks=None, port_speed=None,
             bare_metal=None, ram=None, package_id=None, disk_controller=None,
-            ssh_keys=[]):
+            ssh_keys=None):
         """
         Translates a list of arguments into a dictionary necessary for creating
         a server.
