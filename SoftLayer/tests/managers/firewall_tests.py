@@ -26,5 +26,5 @@ class FirewallTests(unittest.TestCase):
 
         firewalls = self.firewall.get_firewalls()
 
-        self.assertEquals([vlan], firewalls)
+        self.assertEqual([vlan], firewalls)
         call.assert_called_once_with(mask=ANY)

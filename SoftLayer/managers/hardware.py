@@ -525,7 +525,7 @@ class HardwareManager(IdentifierMixin, object):
         except socket.error:
             return []
 
-        # Find the CCI via ip address. First try public ip, then private
+        # Find the server via ip address. First try public ip, then private
         results = self.list_hardware(public_ip=ip, mask="id")
         if results:
             return [result['id'] for result in results]

@@ -1,12 +1,13 @@
 """
     SoftLayer.tests.managers.cci_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
 from SoftLayer import CCIManager
 from SoftLayer.tests import unittest
+from SoftLayer.tests.mocks import account_mock, virtual_guest_mock
 
 from mock import MagicMock, ANY, call, patch
 
@@ -20,18 +21,35 @@ class CCITests(unittest.TestCase):
     def test_list_instances(self):
         mcall = call(mask=ANY, filter={})
         service = self.client['Account']
+        service.getVirtualGuests = account_mock.getVirtualGuests_Mock()
+        hourly_mock = account_mock.getHourlyVirtualGuests_Mock()
+        service.getHourlyVirtualGuests = hourly_mock
+        monthly_mock = account_mock.getMonthlyVirtualGuests_Mock()
+        service.getMonthlyVirtualGuests = monthly_mock
 
-        self.cci.list_instances(hourly=True, monthly=True)
+        list_expected_ids = [100, 104]
+        hourly_expected_ids = [104]
+        monthly_expected_ids = [100]
+
+        results = self.cci.list_instances(hourly=True, monthly=True)
         service.getVirtualGuests.assert_has_calls(mcall)
+        for result in results:
+            self.assertIn(result['id'], list_expected_ids)
 
-        self.cci.list_instances(hourly=False, monthly=False)
+        result = self.cci.list_instances(hourly=False, monthly=False)
         service.getVirtualGuests.assert_has_calls(mcall)
+        for result in results:
+            self.assertIn(result['id'], list_expected_ids)
 
-        self.cci.list_instances(hourly=False, monthly=True)
+        results = self.cci.list_instances(hourly=False, monthly=True)
         service.getMonthlyVirtualGuests.assert_has_calls(mcall)
+        for result in results:
+            self.assertIn(result['id'], monthly_expected_ids)
 
-        self.cci.list_instances(hourly=True, monthly=False)
+        results = self.cci.list_instances(hourly=True, monthly=False)
         service.getHourlyVirtualGuests.assert_has_calls(mcall)
+        for result in results:
+            self.assertIn(result['id'], hourly_expected_ids)
 
     def test_list_instances_with_filters(self):
         self.cci.list_instances(
@@ -73,36 +91,49 @@ class CCITests(unittest.TestCase):
         ))
 
     def test_resolve_ids_ip(self):
-        self.client['Account'].getVirtualGuests.return_value = [{'id': '1234'}]
-        _id = self.cci._get_ids_from_ip('1.2.3.4')
-        self.assertEqual(_id, ['1234'])
-
-        self.client['Account'].getVirtualGuests.side_effect = [
-            [], [{'id': '4321'}]
-        ]
-        _id = self.cci._get_ids_from_ip('4.3.2.1')
-        self.assertEqual(_id, ['4321'])
+        service = self.client['Account']
+        service.getVirtualGuests = account_mock.getVirtualGuests_Mock(100)
+        _id = self.cci._get_ids_from_ip('172.16.240.2')
+        self.assertEqual(_id, [100])
 
         _id = self.cci._get_ids_from_ip('nope')
         self.assertEqual(_id, [])
 
+        # Now simulate a private IP test
+        service.getVirtualGuests.side_effect = [[], [{'id': 99}]]
+        _id = self.cci._get_ids_from_ip('10.0.1.87')
+        self.assertEqual(_id, [99])
+
     def test_resolve_ids_hostname(self):
-        self.client['Account'].getVirtualGuests.return_value = \
-            [{'id': '1234'}]
-        _id = self.cci._get_ids_from_hostname('hostname')
-        self.assertEqual(_id, ['1234'])
+        service = self.client['Account']
+        service.getVirtualGuests = account_mock.getVirtualGuests_Mock(100)
+        _id = self.cci._get_ids_from_hostname('cci-test1')
+        self.assertEqual(_id, [100])
 
     def test_get_instance(self):
-        self.client['Virtual_Guest'].getObject.return_value = {
-            'hourlyVirtualGuests': "this is unique"}
-        self.cci.get_instance(1)
+        service = self.client['Virtual_Guest']
+        service.getObject = virtual_guest_mock.getObject_Mock(100)
+        result = self.cci.get_instance(100)
         self.client['Virtual_Guest'].getObject.assert_called_once_with(
-            id=1, mask=ANY)
+            id=100, mask=ANY)
+        expected = virtual_guest_mock.get_raw_cci_mocks()[100]
+        self.assertEqual(expected, result)
 
     def test_get_create_options(self):
-        self.cci.get_create_options()
-        f = self.client['Virtual_Guest'].getCreateObjectOptions
-        f.assert_called_once_with()
+        service = self.client['Virtual_Guest']
+        function_mock = virtual_guest_mock.getCreateObjectOptions_Mock()
+        service.getCreateObjectOptions = function_mock
+        results = self.cci.get_create_options()
+        function_mock.assert_called_once_with()
+
+        expected = ['processors', 'memory', 'blockDevices', 'operatingSystems',
+                    'networkComponents', 'datacenters']
+        method = 'assertItemsEqual'
+        if not hasattr(self, method):
+            # For Python 3.3 compatibility
+            method = 'assertCountEqual'
+        f = getattr(self, method)
+        f(expected, results.keys())
 
     def test_cancel_instance(self):
         self.cci.cancel_instance(id=1)
@@ -414,6 +445,29 @@ class CCITests(unittest.TestCase):
 
         self.assertEqual(data, assert_data)
 
+    def test_generate_sshkey(self):
+        data = self.cci._generate_create_dict(
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='example.com',
+            os_code="STRING",
+            ssh_key=543,
+        )
+
+        assert_data = {
+            'startCpus': 1,
+            'maxMemory': 1,
+            'hostname': 'test',
+            'domain': 'example.com',
+            'localDiskFlag': True,
+            'operatingSystemReferenceCode': "STRING",
+            'hourlyBillingFlag': True,
+            'ssh_key': 543,
+        }
+
+        self.assertEqual(data, assert_data)
+
     def test_generate_no_disks(self):
         data = self.cci._generate_create_dict(
             cpus=1,
@@ -550,3 +604,24 @@ class CCITests(unittest.TestCase):
         service = self.client['Virtual_Guest']
         f = service.setPrivateNetworkInterfaceSpeed
         f.assert_called_once_with(speed, id=cci_id)
+
+    def test_edit(self):
+        # Test editing user data
+        service = self.client['Virtual_Guest']
+
+        self.cci.edit(100, userdata='my data')
+
+        service.setUserMetadata.assert_called_once_with(['my data'], id=100)
+
+        # Now test a blank edit
+        self.assertTrue(self.cci.edit, 100)
+
+        # Finally, test a full edit
+        args = {
+            'hostname': 'new-host',
+            'domain': 'new.sftlyr.ws',
+            'notes': 'random notes',
+        }
+
+        self.cci.edit(100, **args)
+        service.editObject.assert_called_once_with(args, id=100)
