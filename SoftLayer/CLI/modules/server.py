@@ -683,7 +683,7 @@ Options:
 
 class CreateServer(CLIRunnable):
     """
-usage: sl server create [--disk=SIZE...] [options]
+usage: sl server create [--disk=SIZE...] [--key=KEY...] [options]
 
 Order/create a dedicated server. See 'sl server list-chassis' and
 'sl server create-options' for valid options. --disk can be repeated to
@@ -706,7 +706,8 @@ Optional:
   -d, --disk=SIZE...   Disks. Can be specified multiple times
   --controller=RAID    The RAID configuration for the server.
                          Defaults to None.
-  -k KEY, --key=KEY    The SSH key to assign to the root user
+  -k KEY, --key=KEY    SSH keys to assign to the root user. Can be specified
+                         multiple times.
   --dry-run, --test    Do not create the server, just get a quote
   -t, --template=FILE  A template file that defaults the command-line
                          options using the long name in INI format
@@ -725,6 +726,10 @@ Optional:
         # Disks will be a comma-separated list. Let's make it a real list.
         if isinstance(args.get('--disk'), str):
             args['--disk'] = args.get('--disk').split(',')
+
+        # Do the same thing for SSH keys
+        if isinstance(args.get('--key'), str):
+            args['--key'] = args.get('--key').split(',')
 
         cls._validate_args(args)
 
@@ -787,11 +792,14 @@ Optional:
         else:
             raise CLIAbort('Invalid NIC speed specified.')
 
-        # Get the SSH key
+        # Get the SSH keys
         if args.get('--key'):
-            key_id = resolve_id(SshKeyManager(client).resolve_ids,
-                                args.get('--key'), 'SshKey')
-            order['ssh_key'] = key_id
+            keys = []
+            for key in args.get('--key'):
+                key_id = resolve_id(SshKeyManager(client).resolve_ids, key,
+                                    'SshKey')
+                keys.append(key_id)
+            order['ssh_keys'] = keys
 
         # Do not create hardware server with --test or --export
         do_create = not (args['--export'] or args['--test'])
