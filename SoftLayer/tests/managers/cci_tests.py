@@ -34,22 +34,22 @@ class CCITests(unittest.TestCase):
         results = self.cci.list_instances(hourly=True, monthly=True)
         service.getVirtualGuests.assert_has_calls(mcall)
         for result in results:
-            assert result['id'] in list_expected_ids
+            self.assertIn(result['id'], list_expected_ids)
 
         result = self.cci.list_instances(hourly=False, monthly=False)
         service.getVirtualGuests.assert_has_calls(mcall)
         for result in results:
-            assert result['id'] in list_expected_ids
+            self.assertIn(result['id'], list_expected_ids)
 
         results = self.cci.list_instances(hourly=False, monthly=True)
         service.getMonthlyVirtualGuests.assert_has_calls(mcall)
         for result in results:
-            assert result['id'] in monthly_expected_ids
+            self.assertIn(result['id'], monthly_expected_ids)
 
         results = self.cci.list_instances(hourly=True, monthly=False)
         service.getHourlyVirtualGuests.assert_has_calls(mcall)
         for result in results:
-            assert result['id'] in hourly_expected_ids
+            self.assertIn(result['id'], hourly_expected_ids)
 
     def test_list_instances_with_filters(self):
         self.cci.list_instances(

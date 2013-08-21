@@ -320,8 +320,7 @@ class ServerCLITests(unittest.TestCase):
 
     @patch('SoftLayer.HardwareManager.change_port_speed')
     @patch('SoftLayer.CLI.modules.server.resolve_id')
-    def test_NicEditServer(
-            self, resolve_mock, port_mock):
+    def test_NicEditServer(self, resolve_mock, port_mock):
         hw_id = 12345
         resolve_mock.return_value = hw_id
 
