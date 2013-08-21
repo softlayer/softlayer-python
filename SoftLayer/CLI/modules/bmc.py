@@ -20,7 +20,7 @@ from SoftLayer.CLI import (
 from SoftLayer.CLI.helpers import (
     ArgumentError, CLIAbort, SequentialOutput, update_with_template_args,
     FALSE_VALUES, resolve_id)
-from SoftLayer import HardwareManager
+from SoftLayer import HardwareManager, SshKeyManager
 
 
 class BMCCreateOptions(CLIRunnable):
@@ -264,7 +264,7 @@ Options:
 
 class CreateBMCInstance(CLIRunnable):
     """
-usage: sl bmc create [--disk=DISK...] [options]
+usage: sl bmc create [--disk=DISK...] [--key=KEY...] [options]
 
 Order/create a bare metal instance. See 'sl bmc create-options' for valid
 options
@@ -287,6 +287,8 @@ Optional:
                              to the first available datacenter
   --dry-run, --test        Do not create the instance, just get a quote
   --export=FILE            Exports options to a template file
+  -k KEY, --key=KEY        SSH keys to assign to the root user. Can be
+                             specified multiple times.
   -n MBPS, --network=MBPS  Network port speed in Mbps
   -t, --template=FILE      A template file that defaults the command-line
                             options using the long name in INI format
@@ -304,6 +306,10 @@ Optional:
         # Disks will be a comma-separated list. Let's make it a real list.
         if isinstance(args.get('--disk'), str):
             args['--disk'] = args.get('--disk').split(',')
+
+        # Do the same thing for SSH keys
+        if isinstance(args.get('--key'), str):
+            args['--key'] = args.get('--key').split(',')
 
         cls._validate_args(args)
 
@@ -362,6 +368,15 @@ Optional:
             order['port_speed'] = nic_price
         else:
             raise CLIAbort('Invalid NIC speed specified.')
+
+        # Get the SSH keys
+        if args.get('--key'):
+            keys = []
+            for key in args.get('--key'):
+                key_id = resolve_id(SshKeyManager(client).resolve_ids, key,
+                                    'SshKey')
+                keys.append(key_id)
+            order['ssh_keys'] = keys
 
         # Begin output
         t = Table(['Item', 'cost'])

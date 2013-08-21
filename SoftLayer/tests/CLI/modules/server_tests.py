@@ -373,7 +373,7 @@ class ServerCLITests(unittest.TestCase):
             '--test': True,
             '--export': None,
             '--template': None,
-            '--key': 1234,
+            '--key': [1234, 456],
         }
 
         client = self._setup_package_mocks(self.client)
@@ -506,7 +506,7 @@ class ServerCLITests(unittest.TestCase):
             '--controller': False,
             '--test': True,
             '--template': None,
-            '--key': 1234,
+            '--key': [1234],
             '--export': 'test_file.txt',
         }
 

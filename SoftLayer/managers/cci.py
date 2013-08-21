@@ -222,7 +222,7 @@ class CCIManager(IdentifierMixin, object):
             datacenter=None, os_code=None, image_id=None,
             dedicated=False, public_vlan=None, private_vlan=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
-            private=False, ssh_key=None):
+            private=False, ssh_keys=None):
         """
         Translates a list of arguments into a dictionary necessary for creating
         a CCI.
@@ -255,7 +255,7 @@ class CCIManager(IdentifierMixin, object):
                                 after reload
         :param bool private: If true, the CCI will be provisioned only with
                              access to the private network. Defaults to false
-        :param string ssh_key: The SSH key to add to the root user
+        :param list ssh_keys: The SSH keys to add to the root user
         """
 
         required = [cpus, memory, hostname, domain]
@@ -330,8 +330,8 @@ class CCIManager(IdentifierMixin, object):
         if post_uri:
             data['postInstallScriptUri'] = post_uri
 
-        if ssh_key:
-            data['ssh_key'] = ssh_key
+        if ssh_keys:
+            data['ssh_keys'] = ssh_keys
 
         return data
 
@@ -368,9 +368,9 @@ class CCIManager(IdentifierMixin, object):
 
         # createObject doesn't support SSH keys yet, so if we want to add an
         # SSH key, we need to do something a bit more awkward
-        if kwargs.get('ssh_key'):
+        if kwargs.get('ssh_keys'):
             order = self.guest.generateOrderTemplate(create_options)
-            order['sshKeys'] = [{'sshKeyIds': [kwargs.get('ssh_key')]}]
+            order['sshKeys'] = [{'sshKeyIds': kwargs.get('ssh_keys')}]
             return self.client['Product_Order'].placeOrder(order)
         else:
             return self.guest.createObject(create_options)
