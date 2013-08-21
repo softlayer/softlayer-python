@@ -37,7 +37,7 @@ Creating a client instance with environmental variables set:
     import SoftLayer
     client = SoftLayer.Client()
 
-Below is an example of creating a client instance with more options. This will create a client with the private API endpoint (only accessable from the SoftLayer network) and a timeout of 2 minutes.
+Below is an example of creating a client instance with more options. This will create a client with the private API endpoint (only accessable from the SoftLayer network) and a timeout of 4 minutes.
 ::
 
     client = SoftLayer.Client(
