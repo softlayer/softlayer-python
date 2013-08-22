@@ -58,8 +58,7 @@ For day to day operation, most users will find the managers to be the most conve
 	>>> cci.list_instances()
 	[...]
 
-Available Managers:
-~~~~~~~~~~~~~~~~~~~
+**Available managers**:
 
 .. toctree::
    :maxdepth: 2
