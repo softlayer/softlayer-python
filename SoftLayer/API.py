@@ -263,9 +263,16 @@ class Client(object):
 
 
 class TimedClient(Client):
+    """ Subclass of Client()
+
+    Using this class will time every call to the API and store it in an
+    internal list. This will have a slight impact on your client's memory
+    usage and performance. You should only use this for debugging.
+    """
     last_calls = []
 
     def call(self, service, method, *args, **kwargs):
+        """ See Client.call for documentation. """
         start_time = datetime.datetime.now()
         result = super(TimedClient, self).call(service, method, args, **kwargs)
         end_time = datetime.datetime.now()
@@ -274,6 +281,11 @@ class TimedClient(Client):
         return result
 
     def get_last_calls(self):
+        """ Retrieves the last_calls property.
+
+        This property will contain a list of tuples in the form
+        ('SERVICE.METHOD', execution_time)
+        """
         last_calls = self.last_calls
         self.last_calls = []
         return last_calls
