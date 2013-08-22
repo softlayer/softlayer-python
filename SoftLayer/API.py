@@ -7,7 +7,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT, USER_AGENT
-from transport import make_xml_rpc_api_call
+from transports import make_xml_rpc_api_call
 from exceptions import SoftLayerError
 from auth import TokenAuthentication
 from config import get_client_settings
