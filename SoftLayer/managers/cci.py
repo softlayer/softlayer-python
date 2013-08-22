@@ -371,7 +371,8 @@ class CCIManager(IdentifierMixin, object):
         if kwargs.get('ssh_keys'):
             order = self.guest.generateOrderTemplate(create_options)
             order['sshKeys'] = [{'sshKeyIds': kwargs.get('ssh_keys')}]
-            return self.client['Product_Order'].placeOrder(order)
+            result = self.client['Product_Order'].placeOrder(order)
+            return result['orderDetails']['virtualGuests'][0]
         else:
             return self.guest.createObject(create_options)
 
