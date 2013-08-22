@@ -6,6 +6,8 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
+import datetime
+
 from consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT, USER_AGENT
 from transports import make_xml_rpc_api_call
 from exceptions import SoftLayerError
@@ -13,7 +15,8 @@ from auth import TokenAuthentication
 from config import get_client_settings
 
 
-__all__ = ['Client', 'API_PUBLIC_ENDPOINT', 'API_PRIVATE_ENDPOINT']
+__all__ = ['Client', 'TimedClient', 'API_PUBLIC_ENDPOINT',
+           'API_PRIVATE_ENDPOINT']
 
 VALID_CALL_ARGS = set([
     'id',
@@ -53,7 +56,7 @@ class Client(object):
     _prefix = "SoftLayer_"
 
     def __init__(self, username=None, api_key=None, endpoint_url=None,
-                 timeout=None, auth=None, config_file=None):
+                 timeout=None, auth=None, config_file=None, time_calls=False):
 
         settings = get_client_settings(username=username,
                                        api_key=api_key,
@@ -65,6 +68,8 @@ class Client(object):
         self.endpoint_url = (
             settings.get('endpoint_url') or API_PUBLIC_ENDPOINT).rstrip('/')
         self.timeout = None
+        self.time_calls = time_calls
+        self.last_calls = []
         if settings.get('timeout'):
             self.timeout = float(settings.get('timeout'))
 
@@ -255,6 +260,23 @@ class Client(object):
             % (self.endpoint_url, self.auth)
 
     __str__ = __repr__
+
+
+class TimedClient(Client):
+    last_calls = []
+
+    def call(self, service, method, *args, **kwargs):
+        start_time = datetime.datetime.now()
+        result = super(TimedClient, self).call(service, method, args, **kwargs)
+        end_time = datetime.datetime.now()
+        diff = end_time - start_time
+        self.last_calls.append((service + '.' + method, diff.total_seconds()))
+        return result
+
+    def get_last_calls(self):
+        last_calls = self.last_calls
+        self.last_calls = []
+        return last_calls
 
 
 class Service(object):
