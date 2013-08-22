@@ -8,14 +8,14 @@
 from mock import patch, MagicMock
 
 from SoftLayer import SoftLayerAPIError, TransportError
-from SoftLayer.transport import make_rest_api_call, make_xml_rpc_api_call
+from SoftLayer.transports import make_rest_api_call, make_xml_rpc_api_call
 from SoftLayer.tests import unittest
 from requests import HTTPError, RequestException
 
 
 class TestXmlRpcAPICall(unittest.TestCase):
 
-    @patch('SoftLayer.transport.requests.post')
+    @patch('SoftLayer.transports.requests.post')
     def test_call(self, post):
         post().content = '''<?xml version="1.0" encoding="utf-8"?>
 <params>
@@ -55,7 +55,7 @@ class TestXmlRpcAPICall(unittest.TestCase):
 
 class TestRestAPICall(unittest.TestCase):
 
-    @patch('SoftLayer.transport.requests.request')
+    @patch('SoftLayer.transports.requests.request')
     def test_json(self, request):
         request().content = '{}'
         resp = make_rest_api_call(
@@ -82,7 +82,7 @@ class TestRestAPICall(unittest.TestCase):
             'GET',
             'http://something.com/path/to/resource.json')
 
-    @patch('SoftLayer.transport.requests.request')
+    @patch('SoftLayer.transports.requests.request')
     def test_text(self, request):
         request().text = 'content'
         resp = make_rest_api_call(
@@ -106,7 +106,7 @@ class TestRestAPICall(unittest.TestCase):
             'GET',
             'http://something.com/path/to/resource.txt')
 
-    @patch('SoftLayer.transport.requests.request')
+    @patch('SoftLayer.transports.requests.request')
     def test_unknown_error(self, request):
         e = RequestException('error')
         e.response = MagicMock()
