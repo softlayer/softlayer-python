@@ -2,7 +2,7 @@ import json
 import requests.auth
 
 from SoftLayer.consts import USER_AGENT
-from SoftLayer.exceptions import Unauthenticated
+from SoftLayer.exceptions import Unauthenticated, SoftLayerError
 
 ENDPOINTS = {
     "dal05": {
@@ -101,19 +101,24 @@ class MessagingManager(object):
         """ Get all known message queue endpoints """
         return ENDPOINTS
 
-    def get_connection(self, id, username, api_key, datacenter=None,
-                       network=None):
+    def get_connection(self, id, datacenter=None, network=None):
         """ Get connection to Message Queue Service
 
         :param id: Message Queue Account id
-        :param username: SoftLayer username
-        :param api_key: SoftLayer API key
         :param datacenter: Datacenter code
         :param network: network ('public' or 'private')
         """
+        if not self.client.auth \
+                or not getattr(self.client.auth, 'username', None) \
+                or not getattr(self.client.auth, 'api_key', None):
+            raise SoftLayerError(
+                'Client instance auth must be BasicAuthentication.')
+
+        print self.client.auth.username, self.client.auth.api_key
         client = MessagingConnection(
             id, endpoint=self.get_endpoint(datacenter, network))
-        client.authenticate(username, api_key)
+        client.authenticate(self.client.auth.username,
+                            self.client.auth.api_key)
         return client
 
     def ping(self, datacenter=None, network=None):

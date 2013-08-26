@@ -5,7 +5,7 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
-from SoftLayer import MessagingManager, Unauthenticated
+from SoftLayer import MessagingManager, Unauthenticated, SoftLayerError
 import SoftLayer.managers.messaging
 from SoftLayer.consts import USER_AGENT
 from SoftLayer.tests import unittest
@@ -161,16 +161,29 @@ class MessagingManagerTests(unittest.TestCase):
             TypeError,
             self.manager.get_endpoint, network='doesnotexist')
 
-    # MessagingConnection
     @patch('SoftLayer.managers.messaging.MessagingConnection')
     def test_get_connection(self, conn):
-        queue_conn = self.manager.get_connection(
-            'QUEUE_ACCOUNT_ID', 'USERNAME', 'API_KEY')
+        queue_conn = self.manager.get_connection('QUEUE_ACCOUNT_ID')
         conn.assert_called_with(
             'QUEUE_ACCOUNT_ID', endpoint='https://dal05.mq.softlayer.net')
         conn().authenticate.assert_called_with(
-            'USERNAME', 'API_KEY')
+            self.client.auth.username, self.client.auth.api_key)
         self.assertEqual(queue_conn, conn())
+
+    def test_get_connection_no_auth(self):
+        self.client.auth = None
+        self.assertRaises(SoftLayerError,
+                          self.manager.get_connection, 'QUEUE_ACCOUNT_ID')
+
+    def test_get_connection_no_username(self):
+        self.client.auth.username = None
+        self.assertRaises(SoftLayerError,
+                          self.manager.get_connection, 'QUEUE_ACCOUNT_ID')
+
+    def test_get_connection_no_api_key(self):
+        self.client.auth.api_key = None
+        self.assertRaises(SoftLayerError,
+                          self.manager.get_connection, 'QUEUE_ACCOUNT_ID')
 
     @patch('SoftLayer.managers.messaging.requests.get')
     def test_ping(self, get):
