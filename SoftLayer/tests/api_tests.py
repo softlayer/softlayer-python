@@ -252,7 +252,7 @@ class APITimedClient(unittest.TestCase):
         delta_mock.strftime.return_value = 1000
         now_mock = MagicMock()
         now_mock.return_value = delta_mock
-        datetime_mock.now = now_mock
+        datetime_mock.utcnow = now_mock
 
         result = list(self.client.call('SERVICE', 'METHOD'))
 

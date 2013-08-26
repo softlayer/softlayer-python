@@ -272,10 +272,10 @@ class TimedClient(Client):
 
     def call(self, service, method, *args, **kwargs):
         """ See Client.call for documentation. """
-        start_time = datetime.datetime.now()
+        start_time = datetime.datetime.utcnow()
         result = super(TimedClient, self).call(service, method, *args,
                                                **kwargs)
-        end_time = datetime.datetime.now()
+        end_time = datetime.datetime.utcnow()
         diff = end_time - start_time
         self.last_calls.append((service + '.' + method,
                                 start_time.strftime('%s'),
@@ -286,7 +286,7 @@ class TimedClient(Client):
         """ Retrieves the last_calls property.
 
         This property will contain a list of tuples in the form
-        ('SERVICE.METHOD', initiated_timestamp, execution_time)
+        ('SERVICE.METHOD', initiated_utc_timestamp, execution_time)
         """
         last_calls = self.last_calls
         self.last_calls = []
