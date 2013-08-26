@@ -248,6 +248,8 @@ class APITimedClient(unittest.TestCase):
         delta_mock = MagicMock()
         delta_mock.__sub__ = Mock()
         delta_mock.__sub__.return_value = total_seconds_mock
+        delta_mock.strftime = Mock()
+        delta_mock.strftime.return_value = 1000
         now_mock = MagicMock()
         now_mock.return_value = delta_mock
         datetime_mock.now = now_mock
@@ -256,7 +258,7 @@ class APITimedClient(unittest.TestCase):
 
         self.assertEqual(range(10), result)
 
-        expected_calls = [('SERVICE.METHOD', 1)]
+        expected_calls = [('SERVICE.METHOD', 1000, 1)]
         self.assertEqual(expected_calls, self.client.get_last_calls())
 
 

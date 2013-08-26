@@ -155,7 +155,6 @@ def main(args=sys.argv[1:], env=Environment()):
     CLIRunnableType.env = env
     exit_status = 0
     resolver = CommandParser(env)
-    command_args = {}
     try:
         command, command_args = resolver.parse(args)
 
@@ -181,6 +180,16 @@ def main(args=sys.argv[1:], env=Environment()):
             s = format_output(data, fmt=format)
             if s:
                 env.out(s)
+
+        if command_args.get('--timings'):
+            format = command_args.get('--format', 'table')
+            api_calls = client.get_last_calls()
+            t = KeyValueTable(['call', 'time'])
+
+            for call, initiated, duration in api_calls:
+                t.add_row([call, duration])
+
+            env.out(format_output(t, fmt=format))
 
     except InvalidCommand as e:
         env.err(resolver.get_module_help(e.module_name))
@@ -221,15 +230,5 @@ def main(args=sys.argv[1:], env=Environment()):
         import traceback
         env.err(traceback.format_exc())
         exit_status = 1
-
-    if command_args.get('--timings'):
-        format = command_args.get('--format', 'table')
-        api_calls = client.get_last_calls()
-        t = KeyValueTable(['call', 'time'])
-
-        for call, initiated, duration in api_calls:
-            t.add_row([call, duration])
-
-        env.out(format_output(t, fmt=format))
 
     sys.exit(exit_status)
