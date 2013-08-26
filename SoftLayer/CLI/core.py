@@ -227,7 +227,7 @@ def main(args=sys.argv[1:], env=Environment()):
         api_calls = client.get_last_calls()
         t = KeyValueTable(['call', 'time'])
 
-        for call, duration in api_calls:
+        for call, initiated, duration in api_calls:
             t.add_row([call, duration])
 
         env.out(format_output(t, fmt=format))

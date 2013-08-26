@@ -276,14 +276,16 @@ class TimedClient(Client):
         result = super(TimedClient, self).call(service, method, args, **kwargs)
         end_time = datetime.datetime.now()
         diff = end_time - start_time
-        self.last_calls.append((service + '.' + method, diff.total_seconds()))
+        self.last_calls.append((service + '.' + method,
+                                start_time.strftime('%s'),
+                                diff.total_seconds()))
         return result
 
     def get_last_calls(self):
         """ Retrieves the last_calls property.
 
         This property will contain a list of tuples in the form
-        ('SERVICE.METHOD', execution_time)
+        ('SERVICE.METHOD', initiated_timestamp, execution_time)
         """
         last_calls = self.last_calls
         self.last_calls = []
