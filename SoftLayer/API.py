@@ -273,7 +273,8 @@ class TimedClient(Client):
     def call(self, service, method, *args, **kwargs):
         """ See Client.call for documentation. """
         start_time = datetime.datetime.now()
-        result = super(TimedClient, self).call(service, method, args, **kwargs)
+        result = super(TimedClient, self).call(service, method, *args,
+                                               **kwargs)
         end_time = datetime.datetime.now()
         diff = end_time - start_time
         self.last_calls.append((service + '.' + method,
