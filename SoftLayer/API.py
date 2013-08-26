@@ -56,7 +56,7 @@ class Client(object):
     _prefix = "SoftLayer_"
 
     def __init__(self, username=None, api_key=None, endpoint_url=None,
-                 timeout=None, auth=None, config_file=None, time_calls=False):
+                 timeout=None, auth=None, config_file=None):
 
         settings = get_client_settings(username=username,
                                        api_key=api_key,
@@ -68,7 +68,6 @@ class Client(object):
         self.endpoint_url = (
             settings.get('endpoint_url') or API_PUBLIC_ENDPOINT).rstrip('/')
         self.timeout = None
-        self.time_calls = time_calls
         self.last_calls = []
         if settings.get('timeout'):
             self.timeout = float(settings.get('timeout'))
