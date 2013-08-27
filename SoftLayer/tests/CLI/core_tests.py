@@ -75,6 +75,16 @@ class CommandLineTests(unittest.TestCase):
             SystemExit, cli.core.main,
             args=['cci', 'list', '--format=totallynotvalid'], env=self.env)
 
+    @patch('SoftLayer.TimedClient.get_last_calls')
+    def test_normal_path_with_timings(self, calls_mock):
+        calls_mock.return_value = [('SERVICE.METHOD', 1000, 0.25)]
+        self.env.get_module_name.return_value = 'cci'
+        self.assertRaises(
+            SystemExit, cli.core.main,
+            args=['cci', 'list', '--config=path/to/config', '--timings'],
+            env=self.env)
+        calls_mock.assert_called()
+
     @patch('logging.getLogger')
     @patch('logging.StreamHandler')
     def test_with_debug(self, stream_handler, logger):

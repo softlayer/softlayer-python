@@ -6,6 +6,8 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: BSD, see LICENSE for more details.
 """
+import datetime
+
 from consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT, USER_AGENT
 from transports import make_xml_rpc_api_call
 from exceptions import SoftLayerError
@@ -13,7 +15,8 @@ from auth import TokenAuthentication
 from config import get_client_settings
 
 
-__all__ = ['Client', 'API_PUBLIC_ENDPOINT', 'API_PRIVATE_ENDPOINT']
+__all__ = ['Client', 'TimedClient', 'API_PUBLIC_ENDPOINT',
+           'API_PRIVATE_ENDPOINT']
 
 VALID_CALL_ARGS = set([
     'id',
@@ -65,6 +68,7 @@ class Client(object):
         self.endpoint_url = (
             settings.get('endpoint_url') or API_PUBLIC_ENDPOINT).rstrip('/')
         self.timeout = None
+        self.last_calls = []
         if settings.get('timeout'):
             self.timeout = float(settings.get('timeout'))
 
@@ -255,6 +259,38 @@ class Client(object):
             % (self.endpoint_url, self.auth)
 
     __str__ = __repr__
+
+
+class TimedClient(Client):
+    """ Subclass of Client()
+
+    Using this class will time every call to the API and store it in an
+    internal list. This will have a slight impact on your client's memory
+    usage and performance. You should only use this for debugging.
+    """
+    last_calls = []
+
+    def call(self, service, method, *args, **kwargs):
+        """ See Client.call for documentation. """
+        start_time = datetime.datetime.utcnow()
+        result = super(TimedClient, self).call(service, method, *args,
+                                               **kwargs)
+        end_time = datetime.datetime.utcnow()
+        diff = end_time - start_time
+        self.last_calls.append((service + '.' + method,
+                                start_time.strftime('%s'),
+                                diff.total_seconds()))
+        return result
+
+    def get_last_calls(self):
+        """ Retrieves the last_calls property.
+
+        This property will contain a list of tuples in the form
+        ('SERVICE.METHOD', initiated_utc_timestamp, execution_time)
+        """
+        last_calls = self.last_calls
+        self.last_calls = []
+        return last_calls
 
 
 class Service(object):

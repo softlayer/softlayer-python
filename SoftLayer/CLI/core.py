@@ -46,9 +46,9 @@ import logging
 
 from docopt import docopt, DocoptExit
 
-from SoftLayer import Client, SoftLayerError, SoftLayerAPIError
+from SoftLayer import Client, TimedClient, SoftLayerError, SoftLayerAPIError
 from SoftLayer.consts import VERSION
-from helpers import CLIAbort, ArgumentError, format_output
+from helpers import CLIAbort, ArgumentError, format_output, KeyValueTable
 from environment import (
     Environment, CLIRunnableType, InvalidCommand, InvalidModule)
 
@@ -97,6 +97,7 @@ Standard Options:
   -C FILE --config=FILE  Config file location. [Default: ~/.softlayer]
   --debug=LEVEL          Specifies the debug noise level
                            1=warn, 2=info, 3=debug
+  --timings              Time each API call and display after results
   -h --help              Show this screen
 """ % default_format
         return arg_doc.strip()
@@ -165,7 +166,10 @@ def main(args=sys.argv[1:], env=Environment()):
             logger.addHandler(h)
             logger.setLevel(DEBUG_LOGGING_MAP.get(debug_level, logging.DEBUG))
 
-        client = Client(config_file=command_args.get('--config'))
+        if command_args.get('--timings'):
+            client = TimedClient(config_file=command_args.get('--config'))
+        else:
+            client = Client(config_file=command_args.get('--config'))
 
         # Do the thing
         data = command.execute(client, command_args)
@@ -176,6 +180,16 @@ def main(args=sys.argv[1:], env=Environment()):
             s = format_output(data, fmt=format)
             if s:
                 env.out(s)
+
+        if command_args.get('--timings'):
+            format = command_args.get('--format', 'table')
+            api_calls = client.get_last_calls()
+            t = KeyValueTable(['call', 'time'])
+
+            for call, initiated, duration in api_calls:
+                t.add_row([call, duration])
+
+            env.out(format_output(t, fmt=format))
 
     except InvalidCommand as e:
         env.err(resolver.get_module_help(e.module_name))
