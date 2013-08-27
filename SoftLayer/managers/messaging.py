@@ -114,7 +114,6 @@ class MessagingManager(object):
             raise SoftLayerError(
                 'Client instance auth must be BasicAuthentication.')
 
-        print self.client.auth.username, self.client.auth.api_key
         client = MessagingConnection(
             id, endpoint=self.get_endpoint(datacenter, network))
         client.authenticate(self.client.auth.username,
