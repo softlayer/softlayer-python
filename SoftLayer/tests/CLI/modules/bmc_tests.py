@@ -159,9 +159,10 @@ class BMCCLITests(unittest.TestCase):
 
             self.assertEqual(expected, format_output(output, 'table'))
 
-            # And make sure we can pass in disk as a comma separated string,
-            # which is what templates do
+            # And make sure we can pass in disk and SSH keys as comma separated
+            # strings, which is what templates do
             args['--disk'] = '1000_DRIVE,1000_DRIVE'
+            args['--key'] = '123,456'
 
             output = bmc.CreateBMCInstance.execute(client, args)
 

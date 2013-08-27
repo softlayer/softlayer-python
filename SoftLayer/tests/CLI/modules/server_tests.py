@@ -218,21 +218,19 @@ class ServerCLITests(unittest.TestCase):
         resolve_mock.return_value = hw_id
         ngb_mock.return_value = False
 
+        # Check the positive case
+        args = {'--really': True, '--reason': 'Test'}
+        server.CancelServer.execute(self.client, args)
+
+        cancel_mock.assert_called_with(hw_id, args['--reason'], None)
+
+        # Now check to make sure we properly call CLIAbort in the negative case
         env_mock = Mock()
         env_mock.input = Mock()
         env_mock.input.return_value = 'Comment'
 
         server.CancelServer.env = env_mock
-        env_mock.assert_called()
 
-        # Check the positive case
-        args = {'--really': True, '--reason': 'Test'}
-        server.CancelServer.execute(self.client, args)
-
-        cancel_mock.assert_called_with(hw_id, args['--reason'], 'Comment')
-
-        # Now check to make sure we properly call CLIAbort in the negative case
-        env_mock.reset_mock()
         args['--really'] = False
 
         server.CancelServer.execute(self.client, args)
@@ -414,9 +412,10 @@ class ServerCLITests(unittest.TestCase):
 
             self.assertEqual(expected, format_output(output, 'python'))
 
-            # And make sure we can pass in disk as a comma separated string,
-            # which is what templates do
+            # And make sure we can pass in disk and SSH keys as comma separated
+            # strings, which is what templates do
             args['--disk'] = '1000_DRIVE,1000_DRIVE'
+            args['--key'] = '123,456'
 
             output = server.CreateServer.execute(client, args)
 
