@@ -372,6 +372,8 @@ class ServerCLITests(unittest.TestCase):
             '--export': None,
             '--template': None,
             '--key': [1234, 456],
+            '--vlan_public': 10234,
+            '--vlan_private': 20468,
         }
 
         client = self._setup_package_mocks(self.client)

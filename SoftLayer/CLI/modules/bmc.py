@@ -290,6 +290,10 @@ Optional:
   -k KEY, --key=KEY        SSH keys to assign to the root user. Can be
                              specified multiple times.
   -n MBPS, --network=MBPS  Network port speed in Mbps
+  --vlan_public=VLAN       The ID of the public VLAN on which you want the CCI
+                             placed.
+  --vlan_private=VLAN      The ID of the private VLAN on which you want the CCI
+                             placed.
   -t, --template=FILE      A template file that defaults the command-line
                             options using the long name in INI format
 
@@ -377,6 +381,12 @@ Optional:
                                     'SshKey')
                 keys.append(key_id)
             order['ssh_keys'] = keys
+
+        if args.get('--vlan_public'):
+            order['public_vlan'] = args['--vlan_public']
+
+        if args.get('--vlan_private'):
+            order['private_vlan'] = args['--vlan_private']
 
         # Begin output
         t = Table(['Item', 'cost'])

@@ -371,6 +371,10 @@ Optional:
   -t, --template=FILE    A template file that defaults the command-line
                            options using the long name in INI format
   -u, --userdata=DATA    User defined metadata string
+  --vlan_public=VLAN     The ID of the public VLAN on which you want the CCI
+                           placed.
+  --vlan_private=VLAN    The ID of the private VLAN on which you want the CCI
+                           placed.
   --wait=SECONDS         Block until CCI is finished provisioning for up to X
                            seconds before returning
 """
@@ -615,6 +619,12 @@ Optional:
                                     'SshKey')
                 keys.append(key_id)
             data['ssh_keys'] = keys
+
+        if args.get('--vlan_public'):
+            data['public_vlan'] = args['--vlan_public']
+
+        if args.get('--vlan_private'):
+            data['private_vlan'] = args['--vlan_private']
 
         return data
 
