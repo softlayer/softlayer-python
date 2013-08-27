@@ -216,8 +216,9 @@ usage: sl server cancel <identifier> [options]
 Cancel a dedicated server
 
 Options:
-  --reason=REASON  An optional cancellation reason. See cancel-reasons for a
-                     list of available options
+  --comment=COMMENT  An optional comment to add to the cancellation ticket
+  --reason=REASON    An optional cancellation reason. See cancel-reasons for a
+                       list of available options
 """
 
     action = 'cancel'
@@ -229,7 +230,10 @@ Options:
         hw_id = resolve_id(
             hw.resolve_ids, args.get('<identifier>'), 'hardware')
 
-        comment = cls.env.input("(Optional) Add a cancellation comment:")
+        comment = args.get('--comment')
+
+        if not comment and not args['--really']:
+            comment = cls.env.input("(Optional) Add a cancellation comment:")
 
         reason = args.get('--reason')
 
