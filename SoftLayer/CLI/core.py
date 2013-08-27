@@ -189,7 +189,7 @@ def main(args=sys.argv[1:], env=Environment()):
             for call, initiated, duration in api_calls:
                 t.add_row([call, duration])
 
-            env.out(format_output(t, fmt=format))
+            env.err(format_output(t, fmt=format))
 
     except InvalidCommand as e:
         env.err(resolver.get_module_help(e.module_name))

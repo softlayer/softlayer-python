@@ -138,13 +138,22 @@ class HardwareTests(unittest.TestCase):
             'port_speed': 600,
             'bare_metal': True,
             'hourly': True,
+            'public_vlan': 10234,
+            'private_vlan': 20468,
         }
 
         expected = {
             'hardware': [
-                {'domain': 'giggles.woo',
-                 'bareMetalInstanceFlag': True,
-                 'hostname': 'unicorn'}],
+                {
+                    'domain': 'giggles.woo',
+                    'bareMetalInstanceFlag': True,
+                    'hostname': 'unicorn',
+                    'primaryBackendNetworkComponent':
+                    {'networkVlan': {'id': 20468}},
+                    'primaryNetworkComponent':
+                    {'networkVlan': {'id': 10234}},
+                }
+            ],
             'prices': [
                 {'id': 100},
                 {'id': 500},
@@ -178,14 +187,22 @@ class HardwareTests(unittest.TestCase):
             'ram': 1400,
             'disk_controller': 1500,
             'ssh_keys': [3000, 3001],
+            'public_vlan': 10234,
+            'private_vlan': 20468,
         }
 
         expected = {
             'hardware': [
-                {'domain': 'giggles.woo',
-                 'bareMetalInstanceFlag': False,
-                 'hostname':
-                 'unicorn'}],
+                {
+                    'domain': 'giggles.woo',
+                    'bareMetalInstanceFlag': False,
+                    'hostname': 'unicorn',
+                    'primaryBackendNetworkComponent':
+                    {'networkVlan': {'id': 20468}},
+                    'primaryNetworkComponent':
+                    {'networkVlan': {'id': 10234}},
+                }
+            ],
             'prices': [
                 {'id': 100},
                 {'id': 1000},
