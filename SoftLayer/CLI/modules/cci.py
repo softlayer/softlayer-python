@@ -828,7 +828,7 @@ Options:
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
 
-        result = cci.change_port_speed(cci_id, public, args['--speed'])
+        cci.change_port_speed(cci_id, public, args['--speed'])
 
 
 class CCIDNS(CLIRunnable):
