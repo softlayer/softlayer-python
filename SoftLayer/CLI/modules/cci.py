@@ -721,8 +721,6 @@ Optional:
                 result = vg.powerOff(id=cci_id)
             else:
                 result = vg.powerOffSoft(id=cci_id)
-
-            return result
         else:
             raise CLIAbort('Aborted.')
 
@@ -748,15 +746,13 @@ Optional:
         if args['--really'] or confirm('This will reboot the CCI with id '
                                        '%s. Continue?' % cci_id):
             if args['--hard']:
-                result = vg.rebootHard(id=cci_id)
+                vg.rebootHard(id=cci_id)
             elif args['--soft']:
-                result = vg.rebootSoft(id=cci_id)
+                vg.rebootSoft(id=cci_id)
             else:
-                result = vg.rebootDefault(id=cci_id)
+                vg.rebootDefault(id=cci_id)
         else:
             raise CLIAbort('Aborted.')
-
-        return result
 
 
 class CCIPowerOn(CLIRunnable):
@@ -772,7 +768,7 @@ Power on a CCI
         vg = client['Virtual_Guest']
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
-        return vg.powerOn(id=cci_id)
+        vg.powerOn(id=cci_id)
 
 
 class CCIPause(CLIRunnable):
@@ -792,7 +788,7 @@ Pauses an active CCI
 
         if args['--really'] or confirm('This will pause the CCI with id '
                                        '%s. Continue?' % cci_id):
-            return vg.pause(id=cci_id)
+            vg.pause(id=cci_id)
         else:
             raise CLIAbort('Aborted.')
 
@@ -810,7 +806,7 @@ Resumes a paused CCI
         vg = client['Virtual_Guest']
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
-        return vg.resume(id=cci_id)
+        vg.resume(id=cci_id)
 
 
 class NicEditCCI(CLIRunnable):
@@ -832,11 +828,7 @@ Options:
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
 
-        result = cci.change_port_speed(cci_id, public, args['--speed'])
-        if result:
-            return "Success"
-        else:
-            return result
+        cci.change_port_speed(cci_id, public, args['--speed'])
 
 
 class CCIDNS(CLIRunnable):
@@ -863,11 +855,14 @@ Options:
         dns = DNSManager(client)
         cci = CCIManager(client)
 
+        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
+        instance = cci.get_instance(cci_id)
+        zone_id = resolve_id(dns.resolve_ids, instance['domain'], name='zone')
+
         def sync_a_record():
-            #hostname = instance['fullyQualifiedDomainName']
-            records = dns.search_record(
-                instance['domain'],
-                instance['hostname'],
+            records = dns.get_records(
+                zone_id,
+                host=instance['hostname'],
             )
 
             if not records:
@@ -908,14 +903,11 @@ Options:
                     instance['fullyQualifiedDomainName'],
                     ttl=7200)
 
-        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
-        instance = cci.get_instance(cci_id)
-
         if not instance['primaryIpAddress']:
             raise CLIAbort('No primary IP address associated with this CCI')
 
         try:
-            zone = dns.get_zone(instance['domain'])
+            zone = dns.get_zone(zone_id)
         except DNSZoneNotFound:
             raise CLIAbort("Unable to create A record, "
                            "no zone found matching: %s" % instance['domain'])

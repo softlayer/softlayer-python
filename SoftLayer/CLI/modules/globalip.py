@@ -97,7 +97,7 @@ Options:
         t.align['cost'] = 'r'
 
         total = 0.0
-        for price in result['prices']:
+        for price in result['orderDetails']['prices']:
             total += float(price.get('recurringFee', 0.0))
             rate = "%.2f" % float(price['recurringFee'])
 

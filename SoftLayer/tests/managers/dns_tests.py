@@ -34,19 +34,12 @@ class DNSTests(unittest.TestCase):
         ]
 
         # match, with defaults
-        self.client['Account'].getObject.return_value = [zone_list[1]]
+        self.client['Account'].getObject.return_value = zone_list[1]
         res = self.dns_client.get_zone(12345)
         self.assertEqual(res, zone_list[1])
         self.client['Account'].getObject.assert_called_once_with(
             id=12345,
             mask='resourceRecords')
-
-        # no match
-        self.client['Account'].getObject.return_value = []
-        self.assertRaises(
-            DNSZoneNotFound,
-            self.dns_client.get_zone,
-            5)
 
         # No records masked in
         self.client['Account'].getObject.reset_mock()

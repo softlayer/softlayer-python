@@ -31,6 +31,7 @@ Storage:
 
 General:
   config    View and edit configuration for this tool
+  summary   Display an overall summary of your account
   help      Show help
 
 See 'sl help <module>' for more information on a specific module.
