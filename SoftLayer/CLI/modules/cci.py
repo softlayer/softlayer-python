@@ -863,11 +863,14 @@ Options:
         dns = DNSManager(client)
         cci = CCIManager(client)
 
+        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
+        instance = cci.get_instance(cci_id)
+        zone_id = resolve_id(dns.resolve_ids, instance['domain'], name='zone')
+
         def sync_a_record():
-            #hostname = instance['fullyQualifiedDomainName']
-            records = dns.search_record(
-                instance['domain'],
-                instance['hostname'],
+            records = dns.get_records(
+                zone_id,
+                host=instance['hostname'],
             )
 
             if not records:
@@ -908,14 +911,11 @@ Options:
                     instance['fullyQualifiedDomainName'],
                     ttl=7200)
 
-        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
-        instance = cci.get_instance(cci_id)
-
         if not instance['primaryIpAddress']:
             raise CLIAbort('No primary IP address associated with this CCI')
 
         try:
-            zone = dns.get_zone(instance['domain'])
+            zone = dns.get_zone(zone_id)
         except DNSZoneNotFound:
             raise CLIAbort("Unable to create A record, "
                            "no zone found matching: %s" % instance['domain'])

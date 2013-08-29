@@ -61,7 +61,7 @@ class DNSManager(IdentifierMixin, object):
         results = self.service.getObject(id=zone_id, mask=mask)
 
         try:
-            return results[0]
+            return results
         except IndexError:
             raise DNSZoneNotFound(zone_id)
 
