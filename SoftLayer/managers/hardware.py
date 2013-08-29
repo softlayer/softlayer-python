@@ -399,7 +399,7 @@ class HardwareManager(IdentifierMixin, object):
             self, server=None, hostname=None, domain=None, hourly=False,
             location=None, os=None, disks=None, port_speed=None,
             bare_metal=None, ram=None, package_id=None, disk_controller=None,
-            ssh_keys=None):
+            ssh_keys=None, public_vlan=None, private_vlan=None):
         """
         Translates a list of arguments into a dictionary necessary for creating
         a server.
@@ -433,22 +433,30 @@ class HardwareManager(IdentifierMixin, object):
                                _get_bare_metal_package_id
         :param int disk_controller: The disk controller to use.
         :param list ssh_keys: The SSH keys to add to the root user
+        :param int public_vlan: The ID of the public VLAN on which you want
+                                this server placed.
+        :param int private_vlan: The ID of the public VLAN on which you want
+                                 this server placed.
         """
         arguments = ['server', 'hostname', 'domain', 'location', 'os', 'disks',
                      'port_speed', 'bare_metal', 'ram', 'package_id',
                      'disk_controller', 'server_core', 'disk0']
 
+        hardware = {
+            'bareMetalInstanceFlag': bare_metal,
+            'hostname': hostname,
+            'domain': domain,
+        }
+
+        if public_vlan:
+            hardware['primaryNetworkComponent'] = {
+                "networkVlan": {"id": int(public_vlan)}}
+        if private_vlan:
+            hardware['primaryBackendNetworkComponent'] = {
+                "networkVlan": {"id": int(private_vlan)}}
+
         order = {
-            'hardware': [{
-                'bareMetalInstanceFlag': bare_metal,
-                'hostname': hostname,
-                'domain': domain,
-                # TODO - It would be nice if we could get this working too.
-                # VLAN number doesn't appear to work.
-                #'networkVlans': [
-                #    {'vlanNumber': 1836}, {'vlanNumber': 1126}
-                #],
-            }],
+            'hardware': [hardware],
             'location': location,
             'prices': [
             ],
