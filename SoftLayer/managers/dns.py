@@ -58,12 +58,7 @@ class DNSManager(IdentifierMixin, object):
         mask = None
         if records:
             mask = 'resourceRecords'
-        results = self.service.getObject(id=zone_id, mask=mask)
-
-        try:
-            return results
-        except IndexError:
-            raise DNSZoneNotFound(zone_id)
+        return self.service.getObject(id=zone_id, mask=mask)
 
     def create_zone(self, zone, serial=None):
         """ Create a zone for the specified zone.
