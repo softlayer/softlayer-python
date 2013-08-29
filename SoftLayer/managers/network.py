@@ -102,8 +102,12 @@ class NetworkManager(IdentifierMixin, object):
 
         :param int id: The ID of the global IP to be cancelled.
         """
-        # Global IPs are treated as subnets, so we'll just reuse cancel_subnet
-        return self.cancel_subnet(id)
+        service = self.client['Network_Subnet_IpAddress_Global']
+        ip = service.getObject(id=id, mask='mask[billingItem]')
+        billing_id = ip['billingItem']['id']
+
+        billing_item = self.client['Billing_Item']
+        return billing_item.cancelService(id=billing_id)
 
     def cancel_subnet(self, id):
         """ Cancels the specified subnet.
