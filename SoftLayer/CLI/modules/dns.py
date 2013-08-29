@@ -79,7 +79,8 @@ Arguments:
 
         if args['--really'] or no_going_back(args['<zone>']):
             manager.delete_zone(zone_id)
-        raise CLIAbort("Aborted.")
+        else:
+            raise CLIAbort("Aborted.")
 
 
 class ListZones(CLIRunnable):
@@ -220,9 +221,9 @@ Options:
         zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
 
         try:
-            results = manager.search_record(
+            results = manager.get_records(
                 zone_id,
-                args['<record>'])
+                host=args['<record>'])
         except DNSZoneNotFound:
             raise CLIAbort("No zone found matching: %s" % args['<zone>'])
 
@@ -259,9 +260,9 @@ Options:
             records = [{'id': args['--id']}]
         else:
             try:
-                records = manager.search_record(
+                records = manager.get_records(
                     zone_id,
-                    args['<record>'])
+                    host=args['<record>'])
             except DNSZoneNotFound:
                 raise CLIAbort("No zone found matching: %s" % args['<zone>'])
 
