@@ -79,7 +79,8 @@ Arguments:
 
         if args['--really'] or no_going_back(args['<zone>']):
             manager.delete_zone(zone_id)
-        raise CLIAbort("Aborted.")
+        else:
+            raise CLIAbort("Aborted.")
 
 
 class ListZones(CLIRunnable):
