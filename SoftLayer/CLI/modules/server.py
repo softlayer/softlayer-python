@@ -284,9 +284,7 @@ Power off an active server
                            'hardware')
         if args['--really'] or confirm('This will power off the server with '
                                        'id %s. Continue?' % hw_id):
-            result = hw.powerOff(id=hw_id)
-
-            return result
+            hw.powerOff(id=hw_id)
         else:
             raise CLIAbort('Aborted.')
 
@@ -313,15 +311,13 @@ Optional:
         if args['--really'] or confirm('This will power off the server with '
                                        'id %s. Continue?' % hw_id):
             if args['--hard']:
-                result = hw.rebootHard(id=hw_id)
+                hw.rebootHard(id=hw_id)
             elif args['--soft']:
-                result = hw.rebootSoft(id=hw_id)
+                hw.rebootSoft(id=hw_id)
             else:
-                result = hw.rebootDefault(id=hw_id)
+                hw.rebootDefault(id=hw_id)
         else:
             raise CLIAbort('Aborted.')
-
-        return result
 
 
 class ServerPowerOn(CLIRunnable):
@@ -338,7 +334,7 @@ Power on a server
         mgr = HardwareManager(client)
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
                            'hardware')
-        return hw.powerOn(id=hw_id)
+        hw.powerOn(id=hw_id)
 
 
 class ServerPowerCycle(CLIRunnable):
@@ -359,7 +355,7 @@ Issues power cycle to server via the power strip
 
         if args['--really'] or confirm('This will power off the server with '
                                        'id %s. Continue?' % hw_id):
-            return hw.powerCycle(id=hw_id)
+            hw.powerCycle(id=hw_id)
         else:
             raise CLIAbort('Aborted.')
 
@@ -385,11 +381,7 @@ Options:
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
                            'hardware')
 
-        result = mgr.change_port_speed(hw_id, public, args['--speed'])
-        if result:
-            return "Success"
-        else:
-            return result
+        mgr.change_port_speed(hw_id, public, args['--speed'])
 
 
 class ListChassisServer(CLIRunnable):
