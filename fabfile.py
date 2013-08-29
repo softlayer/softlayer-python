@@ -9,7 +9,6 @@ def make_html():
 
 def upload():
     "Upload distribution to PyPi"
-    puts("Uploading to PyPI")
     local('python setup.py sdist register upload')
 
 
