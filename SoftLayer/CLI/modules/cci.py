@@ -524,8 +524,7 @@ Optional:
                 '--user-data': like_details['userData'] or None,
                 '--postinstall': like_details.get('postInstallScriptUri'),
                 '--dedicated': like_details['dedicatedAccountHostOnlyFlag'],
-                '--private': not any(vlan['networkSpace'] == 'PUBLIC'
-                                     for vlan in like_details['networkVlans']),
+                '--private': like_details['privateNetworkOnlyFlag'],
             }
 
             # Handle mutually exclusive options
@@ -718,9 +717,9 @@ Optional:
         if args['--really'] or confirm('This will power off the CCI with id '
                                        '%s. Continue?' % cci_id):
             if args['--hard']:
-                result = vg.powerOff(id=cci_id)
+                vg.powerOff(id=cci_id)
             else:
-                result = vg.powerOffSoft(id=cci_id)
+                vg.powerOffSoft(id=cci_id)
         else:
             raise CLIAbort('Aborted.')
 
