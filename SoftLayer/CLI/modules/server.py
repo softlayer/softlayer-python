@@ -174,12 +174,13 @@ Options:
         if tag_row:
             t.add_row(['tags', listing(tag_row, separator=',')])
 
-        ptr_domains = client['Hardware_Server'].getReverseDomainRecords(
-            id=hardware_id)
+        if not result['privateNetworkOnlyFlag']:
+            ptr_domains = client['Hardware_Server'].getReverseDomainRecords(
+                id=hardware_id)
 
-        for ptr_domain in ptr_domains:
-            for ptr in ptr_domain['resourceRecords']:
-                t.add_row(['ptr', ptr['data']])
+            for ptr_domain in ptr_domains:
+                for ptr in ptr_domain['resourceRecords']:
+                    t.add_row(['ptr', ptr['data']])
 
         return t
 
