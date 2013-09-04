@@ -106,7 +106,7 @@ class HardwareManager(IdentifierMixin, object):
                 'hardwareStatusId',
                 'globalIdentifier',
                 'fullyQualifiedDomainName',
-                'processorCoreAmount',
+                'processorPhysicalCoreAmount',
                 'memoryCapacity',
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
@@ -122,7 +122,8 @@ class HardwareManager(IdentifierMixin, object):
             }
 
         if cpus:
-            _filter['hardware']['processorCoreAmount'] = query_filter(cpus)
+            _filter['hardware']['processorPhysicalCoreAmount'] = \
+                query_filter(cpus)
 
         if memory:
             _filter['hardware']['memoryCapacity'] = query_filter(memory)
@@ -241,7 +242,7 @@ class HardwareManager(IdentifierMixin, object):
                 'domain',
                 'provisionDate',
                 'hardwareStatus',
-                'processorCoreAmount',
+                'processorPhysicalCoreAmount',
                 'memoryCapacity',
                 'notes',
                 'primaryBackendIpAddress',

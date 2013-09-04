@@ -95,7 +95,7 @@ For more on filters see 'sl help filters'
                 server['id'],
                 server['datacenter']['name'],
                 server['fullyQualifiedDomainName'],
-                server['processorCoreAmount'],
+                server['processorPhysicalCoreAmount'],
                 gb(server['memoryCapacity']),
                 server['primaryIpAddress'] or blank(),
                 server['primaryBackendIpAddress'] or blank(),
@@ -133,7 +133,7 @@ Options:
         t.add_row(['hostname', result['fullyQualifiedDomainName']])
         t.add_row(['status', result['hardwareStatus']['status']])
         t.add_row(['datacenter', result['datacenter']['name']])
-        t.add_row(['cores', result['processorCoreAmount']])
+        t.add_row(['cores', result['processorPhysicalCoreAmount']])
         t.add_row(['memory', gb(result['memoryCapacity'])])
         t.add_row(['public_ip', result['primaryIpAddress'] or blank()])
         t.add_row(

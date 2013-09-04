@@ -55,7 +55,7 @@ class HardwareTests(unittest.TestCase):
                         }}
                     },
                     'memoryCapacity': {'operation': 1},
-                    'processorCoreAmount': {'operation': 2},
+                    'processorPhysicalCoreAmount': {'operation': 2},
                     'hostname': {'operation': '_= hostname'},
                     'primaryIpAddress': {'operation': '_= 1.2.3.4'},
                     'networkComponents': {'maxSpeed': {'operation': 100}},
