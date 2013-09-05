@@ -245,6 +245,7 @@ class HardwareManager(IdentifierMixin, object):
                 'processorPhysicalCoreAmount',
                 'memoryCapacity',
                 'notes',
+                'privateNetworkOnlyFlag',
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
                 'userData',
