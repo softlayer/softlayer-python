@@ -164,7 +164,7 @@ class CCIManager(IdentifierMixin, object):
                 'maxCpu',
                 'maxMemory',
                 'datacenter',
-                'activeTransaction.id',
+                'activeTransaction[id, transactionStatus[friendlyName,name]]',
                 'blockDevices',
                 'blockDeviceTemplateGroup[id, name, globalIdentifier]',
                 'postInstallScriptUri',
