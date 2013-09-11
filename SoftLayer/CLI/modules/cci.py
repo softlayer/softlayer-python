@@ -838,8 +838,8 @@ usage: sl cci dns sync <identifier> [options]
 DNS related actions for a CCI
 
 Options:
-  -a, -A        Sync only the A record
-  --ptr, --PTR  Sync only the PTR record
+  -a     Sync only the A record
+  --ptr  Sync only the PTR record
 """
     action = 'dns'
     options = ['confirm']
@@ -920,13 +920,13 @@ Options:
             raise CLIAbort("Aborting DNS sync")
 
         both = False
-        if not args.get('--PTR') and not args.get('-A'):
+        if not args['--ptr'] and not args['-a']:
             both = True
 
-        if both or args.get('-A'):
+        if both or args['-a']:
             sync_a_record()
 
-        if both or args.get('--PTR'):
+        if both or args['--ptr']:
             sync_ptr_record()
 
 
