@@ -838,8 +838,8 @@ usage: sl cci dns sync <identifier> [options]
 DNS related actions for a CCI
 
 Options:
-  -a     Sync only the A record
-  --ptr  Sync only the PTR record
+  -a     Sync the A record for the host
+  --ptr  Sync the PTR record for the host
 """
     action = 'dns'
     options = ['confirm']
