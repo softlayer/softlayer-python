@@ -835,7 +835,10 @@ class CCIDNS(CLIRunnable):
     """
 usage: sl cci dns sync <identifier> [options]
 
-DNS related actions for a CCI
+Attempts to update DNS for the specified CCI. If you don't specify any
+arguments, it will attempt to update both the A and PTR records. If you don't
+want to update both records, you may use the -a or --ptr arguments to limit
+the records updated.
 
 Options:
   -a     Sync the A record for the host
