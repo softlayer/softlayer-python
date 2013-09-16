@@ -4,7 +4,7 @@
     Tests shared code
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
-    :license: BSD, see LICENSE for more details.
+    :license: MIT, see LICENSE for more details.
 """
 import SoftLayer
 from SoftLayer.tests import unittest
