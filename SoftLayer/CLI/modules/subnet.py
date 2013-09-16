@@ -11,7 +11,7 @@ The available commands are:
   lookup  Find an IP address and display its subnet and device info
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
-# :license: BSD, see LICENSE for more details.
+# :license: MIT, see LICENSE for more details.
 
 from SoftLayer import NetworkManager
 from SoftLayer.CLI import (

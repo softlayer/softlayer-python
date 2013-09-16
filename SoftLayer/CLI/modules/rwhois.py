@@ -8,7 +8,7 @@ The available commands are:
   show  Show the RWhois data on the account
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
-# :license: BSD, see LICENSE for more details.
+# :license: MIT, see LICENSE for more details.
 
 from SoftLayer import NetworkManager
 from SoftLayer.CLI import CLIRunnable, KeyValueTable

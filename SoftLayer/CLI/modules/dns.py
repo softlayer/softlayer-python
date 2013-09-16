@@ -15,7 +15,7 @@ The available record commands are:
   remove  Remove resource records
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
-# :license: BSD, see LICENSE for more details.
+# :license: MIT, see LICENSE for more details.
 
 from SoftLayer.CLI import (
     CLIRunnable, no_going_back, Table, CLIAbort, resolve_id)

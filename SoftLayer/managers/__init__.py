@@ -6,7 +6,7 @@
     higher-level interfaces to the SoftLayer API.
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
-    :license: BSD, see LICENSE for more details.
+    :license: MIT, see LICENSE for more details.
 """
 from SoftLayer.managers.cci import CCIManager
 from SoftLayer.managers.dns import DNSManager
