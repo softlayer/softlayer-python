@@ -41,6 +41,7 @@ class Environment(object):
         'my': 'metadata',
         'vm': 'cci',
         'hardware': 'server',
+        'hw': 'server',
         'bmetal': 'bmc',
     }
     stdout = sys.stdout
