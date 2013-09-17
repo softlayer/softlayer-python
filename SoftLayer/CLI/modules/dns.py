@@ -179,7 +179,7 @@ Arguments:
   <data>    Record data. NOTE: only minor validation is done
 
 Options:
-  --ttl=TTL  Time to live [default: 7200]
+  --ttl=TTL  Time to live
 """
     action = 'add'
 
@@ -188,6 +188,7 @@ Options:
         manager = DNSManager(client)
 
         zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
+        args['--ttl'] = args['--ttl'] or DNSManager.DEFAULT_TTL
 
         manager.create_record(
             zone_id,
@@ -211,7 +212,7 @@ Arguments:
 Options:
   --data=DATA
   --id=ID      Modify only the given ID
-  --ttl=TTL    Time to live [default: 7200]
+  --ttl=TTL    Time to live
 """
     action = 'edit'
 

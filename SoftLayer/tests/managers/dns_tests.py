@@ -106,10 +106,10 @@ class DNSTests(unittest.TestCase):
         f.assert_called_once_with(id=1)
 
     def test_edit_record(self):
-        self.dns_client.edit_record({'id': 1, 'name': 'test'})
+        self.dns_client.edit_record({'id': 1, 'name': 'test', 'ttl': '1800'})
         f = self.client['Dns_Domain_ResourceRecord'].editObject
         f.assert_called_once_with(
-            {'id': 1, 'name': 'test'},
+            {'id': 1, 'name': 'test', 'ttl': '1800'},
             id=1
         )
 

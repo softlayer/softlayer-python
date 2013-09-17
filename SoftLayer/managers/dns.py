@@ -12,6 +12,9 @@ from SoftLayer.exceptions import DNSZoneNotFound
 from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
 
 
+DEFAULT_TTL = 7200
+
+
 class DNSManager(IdentifierMixin, object):
     """ DNSManager initialization.
 
