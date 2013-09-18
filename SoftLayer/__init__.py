@@ -12,7 +12,7 @@
         'Your Company'
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
-    :license: BSD, see LICENSE for more details.
+    :license: MIT, see LICENSE for more details.
 """
 from SoftLayer.consts import VERSION
 
@@ -24,7 +24,7 @@ from auth import *  # NOQA
 __title__ = 'SoftLayer'
 __version__ = VERSION
 __author__ = 'SoftLayer Technologies, Inc.'
-__license__ = 'The BSD License'
+__license__ = 'MIT'
 __copyright__ = 'Copyright 2013 SoftLayer Technologies, Inc.'
 __all__ = ['Client', 'BasicAuthentication', 'SoftLayerError',
            'SoftLayerAPIError', 'API_PUBLIC_ENDPOINT', 'API_PRIVATE_ENDPOINT']

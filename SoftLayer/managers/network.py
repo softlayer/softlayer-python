@@ -4,7 +4,7 @@
     Network Manager/helpers
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
-    :license: BSD, see LICENSE for more details.
+    :license: MIT, see LICENSE for more details.
 """
 
 from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin, \

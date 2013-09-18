@@ -40,7 +40,7 @@ To use most commands your SoftLayer username and api_key need to be configured.
 The easiest way to do that is to use: 'sl config setup'
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
-# :license: BSD, see LICENSE for more details.
+# :license: MIT, see LICENSE for more details.
 
 import sys
 import logging
