@@ -355,12 +355,11 @@ class HardwareManager(IdentifierMixin, object):
                'disks': [],
            }
 
-           for category, item_id in selections:
-               for item in options['categories'][category]['items']:
+           for cat, item_id in selections:
+               for item in options['categories'][cat]['items'].items():
                    if item['id'] == item_id:
-                       if 'disk' not in category and \
-                        'disk_controller' != category:
-                           args[category] = item['price_id']
+                       if 'disk' not in cat or 'disk_controller' == cat:
+                           args[cat] = item['price_id']
                        else:
                            args['disks'].append(item['price_id'])
 
