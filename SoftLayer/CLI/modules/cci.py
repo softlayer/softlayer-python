@@ -25,12 +25,12 @@ For several commands, <identifier> will be asked for. This can be the id,
 hostname or the ip address for a CCI.
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
-# :license: BSD, see LICENSE for more details.
+# :license: MIT, see LICENSE for more details.
 
 from os import linesep
 import os.path
 
-from SoftLayer import CCIManager, SshKeyManager
+from SoftLayer import CCIManager, SshKeyManager, DNSManager
 from SoftLayer.utils import lookup
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
@@ -835,17 +835,22 @@ class CCIDNS(CLIRunnable):
     """
 usage: sl cci dns sync <identifier> [options]
 
-DNS related actions for a CCI
+Attempts to update DNS for the specified CCI. If you don't specify any
+arguments, it will attempt to update both the A and PTR records. If you don't
+want to update both records, you may use the -a or --ptr arguments to limit
+the records updated.
 
 Options:
-  -a     Sync only the A record
-  --ptr  Sync only the PTR record
+  -a         Sync the A record for the host
+  --ptr      Sync the PTR record for the host
+  --ttl=TTL  Sets the TTL for the A and/or PTR records
 """
     action = 'dns'
     options = ['confirm']
 
     @classmethod
     def execute(cls, client, args):
+        args['--ttl'] = args['--ttl'] or DNSManager.DEFAULT_TTL
         if args['sync']:
             return cls.dns_sync(client, args)
 
@@ -872,7 +877,7 @@ Options:
                     instance['hostname'],
                     'a',
                     instance['primaryIpAddress'],
-                    ttl=7200)
+                    ttl=args['--ttl'])
             else:
                 recs = filter(lambda x: x['type'].lower() == 'a', records)
                 if len(recs) != 1:
@@ -880,6 +885,7 @@ Options:
                                    "A record exists!" % len(recs))
                 rec = recs[0]
                 rec['data'] = instance['primaryIpAddress']
+                rec['ttl'] = args['--ttl']
                 dns.edit_record(rec)
 
         def sync_ptr_record():
@@ -889,6 +895,7 @@ Options:
             edit_ptr = None
             for ptr in ptr_domains['resourceRecords']:
                 if ptr['host'] == host_rec:
+                    ptr['ttl'] = args['--ttl']
                     edit_ptr = ptr
                     break
 
@@ -901,7 +908,7 @@ Options:
                     host_rec,
                     'ptr',
                     instance['fullyQualifiedDomainName'],
-                    ttl=7200)
+                    ttl=args['--ttl'])
 
         if not instance['primaryIpAddress']:
             raise CLIAbort('No primary IP address associated with this CCI')

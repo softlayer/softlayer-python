@@ -5,7 +5,7 @@
     http://sldn.softlayer.com/reference/services/SoftLayer_Account
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
-    :license: BSD, see LICENSE for more details.
+    :license: MIT, see LICENSE for more details.
 """
 from SoftLayer.tests.mocks import hardware_mock, virtual_guest_mock
 from mock import MagicMock

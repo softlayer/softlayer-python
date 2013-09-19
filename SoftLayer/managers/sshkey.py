@@ -4,10 +4,10 @@
     SSH Key Manager/helpers
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
-    :license: BSD, see LICENSE for more details.
+    :license: MIT, see LICENSE for more details.
 """
 
-from SoftLayer.utils import IdentifierMixin
+from SoftLayer.utils import IdentifierMixin, NestedDict, query_filter
 
 
 class SshKeyManager(IdentifierMixin, object):
@@ -77,9 +77,17 @@ class SshKeyManager(IdentifierMixin, object):
         """
         return self.sshkey.getObject(id=id)
 
-    def list_keys(self):
-        """ Lists all SSH keys on the account. """
-        return self.client['Account'].getSshKeys()
+    def list_keys(self, label=None):
+        """ Lists all SSH keys on the account.
+
+        :param string label: Filter list based on SSH key label
+        :returns: A list of dictionaries with information about each key
+        """
+        _filter = NestedDict({})
+        if label:
+            _filter['sshKeys']['label'] = query_filter(label)
+
+        return self.client['Account'].getSshKeys(filter=_filter.to_dict())
 
     def _get_ids_from_label(self, label):
         keys = self.list_keys()

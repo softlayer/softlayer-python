@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
-    :license: BSD, see LICENSE for more details.
+    :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import SshKeyManager
 from SoftLayer.tests import unittest
@@ -65,9 +65,10 @@ class SshKeyTests(unittest.TestCase):
 
     def test_list_keys(self):
         service = self.client['Account']
-
-        self.sshkey.list_keys()
-        service.getSshKeys.assert_called()
+        mcall = call(filter={
+            'sshKeys': {'label': {'operation': '_= some label'}}})
+        self.sshkey.list_keys(label='some label')
+        service.getSshKeys.assert_has_calls(mcall)
 
     def test_resolve_ids_label(self):
         service = self.client['Account']
