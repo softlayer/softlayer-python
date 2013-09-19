@@ -4,7 +4,7 @@
     Contains constants used throughout the library
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
-    :license: BSD, see LICENSE for more details.
+    :license: MIT, see LICENSE for more details.
 """
 VERSION = 'v3.0.0'
 API_PUBLIC_ENDPOINT = 'https://api.softlayer.com/xmlrpc/v3/'

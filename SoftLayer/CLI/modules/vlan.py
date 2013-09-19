@@ -8,7 +8,7 @@ The available commands are:
   list    Show a list of all VLANs on the network
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
-# :license: BSD, see LICENSE for more details.
+# :license: MIT, see LICENSE for more details.
 
 from SoftLayer import NetworkManager
 from SoftLayer.CLI import CLIRunnable, Table, KeyValueTable

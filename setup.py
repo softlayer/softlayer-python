@@ -56,7 +56,7 @@ setup(
         'SoftLayer.tests.managers',
         'SoftLayer.tests.mocks',
     ],
-    license='The BSD License',
+    license='MIT',
     zip_safe=False,
     url='http://github.com/softlayer/softlayer-api-python-client',
     entry_points={
@@ -74,7 +74,7 @@ setup(
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
-        'License :: OSI Approved :: BSD License',
+        'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Programming Language :: Python :: 3',

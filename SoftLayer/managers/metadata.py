@@ -4,7 +4,7 @@
     Metadata Manager/helpers
 
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
-    :license: BSD, see LICENSE for more details.
+    :license: MIT, see LICENSE for more details.
 """
 from SoftLayer.transports import make_rest_api_call
 from SoftLayer.consts import API_PRIVATE_ENDPOINT_REST, USER_AGENT

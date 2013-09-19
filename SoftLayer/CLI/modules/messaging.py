@@ -27,7 +27,7 @@ The available commands are:
 
 """
 # :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
-# :license: BSD, see LICENSE for more details.
+# :license: MIT, see LICENSE for more details.
 import sys
 
 from SoftLayer import MessagingManager
