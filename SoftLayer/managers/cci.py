@@ -331,7 +331,7 @@ class CCIManager(IdentifierMixin, object):
             data['postInstallScriptUri'] = post_uri
 
         if ssh_keys:
-            data['ssh_keys'] = ssh_keys
+            data['sshKeys'] = [{'id': key_id} for key_id in ssh_keys]
 
         return data
 
@@ -365,16 +365,7 @@ class CCIManager(IdentifierMixin, object):
         """ Orders a new instance. See :func:`_generate_create_dict` for
         a list of available options. """
         create_options = self._generate_create_dict(**kwargs)
-
-        # createObject doesn't support SSH keys yet, so if we want to add an
-        # SSH key, we need to do something a bit more awkward
-        if kwargs.get('ssh_keys'):
-            order = self.guest.generateOrderTemplate(create_options)
-            order['sshKeys'] = [{'sshKeyIds': kwargs.get('ssh_keys')}]
-            result = self.client['Product_Order'].placeOrder(order)
-            return result['orderDetails']['virtualGuests'][0]
-        else:
-            return self.guest.createObject(create_options)
+        return self.guest.createObject(create_options)
 
     def change_port_speed(self, id, public, speed):
         """ Allows you to change the port speed of a CCI's NICs.
