@@ -171,10 +171,18 @@ class Client(object):
             http_headers.update(raw_headers)
 
         uri = '/'.join([self.endpoint_url, service])
-        return make_xml_rpc_api_call(uri, method, args,
-                                     headers=headers,
-                                     http_headers=http_headers,
-                                     timeout=self.timeout)
+        results = make_xml_rpc_api_call(uri, method, args,
+                                        headers=headers,
+                                        http_headers=http_headers,
+                                        timeout=self.timeout)
+
+        # For some calls, the SL-API returns listings as an object instead of
+        # a list when the limit is set to 1.
+        if limit and int(limit) == 1:
+            if not isinstance(results, list):
+                results = [results]
+
+        return results
 
     __call__ = call
 

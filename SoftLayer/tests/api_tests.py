@@ -6,7 +6,6 @@
     :license: MIT, see LICENSE for more details.
 """
 from mock import patch, call, Mock, MagicMock
-import datetime
 
 import SoftLayer
 import SoftLayer.API
@@ -230,6 +229,18 @@ class APIClient(unittest.TestCase):
         self.assertRaises(
             TypeError,
             self.client.call, 'SERVICE', 'METHOD', invalid_kwarg='invalid')
+
+    @patch('SoftLayer.API.make_xml_rpc_api_call')
+    def test_limit_1_call(self, make_xml_rpc_api_call):
+        # The SL API returns objects instead of a list of objects for listing
+        # calls with limit = 1
+        make_xml_rpc_api_call.return_value = {'id': 1234}
+        results = self.client['SERVICE'].METHOD(limit=1)
+        self.assertEquals([{'id': 1234}], results)
+
+        make_xml_rpc_api_call.return_value = [{'id': 1234}]
+        results = self.client['SERVICE'].METHOD(limit=1)
+        self.assertEquals([{'id': 1234}], results)
 
 
 class APITimedClient(unittest.TestCase):
