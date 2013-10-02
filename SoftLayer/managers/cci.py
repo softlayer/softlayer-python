@@ -197,13 +197,13 @@ class CCIManager(IdentifierMixin, object):
         """
         return self.guest.deleteObject(id=id)
 
-    def reload_instance(self, id, post_uri=None):
+    def reload_instance(self, id, post_uri=None, ssh_keys=None):
         """ Perform an OS reload of an instance with its current configuration.
 
         :param integer id: the instance ID to reload
         :param string post_url: The URI of the post-install script to run
                                 after reload
-
+        :param list ssh_keys: The SSH keys to add to the root user
         """
         payload = {
             'token': 'FORCE',
@@ -212,6 +212,9 @@ class CCIManager(IdentifierMixin, object):
 
         if post_uri:
             payload['config']['customProvisionScriptUri'] = post_uri
+
+        if ssh_keys:
+            payload['config']['sshKeyIds'] = [key_id for key_id in ssh_keys]
 
         return self.guest.reloadOperatingSystem('FORCE', payload['config'],
                                                 id=id)

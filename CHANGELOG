@@ -1,3 +1,9 @@
+3.0.1
+
+    * CLI: Fixed an error message about pricing information that appeared when ordering a new private subnet.
+
+    * CLI+API: Added ability to specify SSH keys when reloading CCIs and servers.
+
 3.0.0
 
     * Many bug fixes and consistency improvements
@@ -7,7 +13,7 @@
     * CLI+API: Improved dedicated server ordering. Adds power management for hardware servers: power-on, power-off, power-cycle, reboot
 
     * CLI+API: Adds a networking manager and adds several network-related CLI modules. This includes the ability to:
-        
+
         * list, create, cancel and assign global IPs
 
         * list, create, cancel and detail subnets. Also has the ability to lookup details about an IP address with 'sl subnet lookup'
