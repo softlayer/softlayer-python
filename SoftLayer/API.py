@@ -149,7 +149,7 @@ class Client(object):
             headers.update(self.auth.get_headers())
 
         if objectid is not None:
-            headers[service + 'InitParameters'] = {'id': int(objectid)}
+            headers[service + 'InitParameters'] = {'id': objectid}
 
         if objectmask is not None:
             headers.update(self.__format_object_mask(objectmask, service))
@@ -159,8 +159,8 @@ class Client(object):
 
         if limit:
             headers['resultLimit'] = {
-                'limit': int(limit),
-                'offset': int(offset)
+                'limit': limit,
+                'offset': offset,
             }
 
         http_headers = {
