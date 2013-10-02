@@ -656,13 +656,15 @@ Optional:
 
 class ReloadCCI(CLIRunnable):
     """
-usage: sl cci reload <identifier> [options]
+usage: sl cci reload <identifier> [--key=KEY...] [options]
 
 Reload the OS on a CCI based on its current configuration
 
 Optional:
-    -i, --postinstall=URI  Post-install script to download
-                             (Only HTTPS executes, HTTP leaves file in /root)
+  -i, --postinstall=URI  Post-install script to download
+                           (Only HTTPS executes, HTTP leaves file in /root)
+  -k, --key=KEY          SSH keys to add to the root user. Can be specified
+                           multiple times
 """
 
     action = 'reload'
@@ -672,8 +674,14 @@ Optional:
     def execute(client, args):
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
+        keys = []
+        if args.get('--key'):
+            for key in args.get('--key'):
+                key_id = resolve_id(SshKeyManager(client).resolve_ids, key,
+                                    'SshKey')
+                keys.append(key_id)
         if args['--really'] or no_going_back(cci_id):
-            cci.reload_instance(cci_id, args['--postinstall'])
+            cci.reload_instance(cci_id, args['--postinstall'], keys)
         else:
             CLIAbort('Aborted')
 

@@ -197,10 +197,10 @@ class ServerCLITests(unittest.TestCase):
         ngb_mock.return_value = False
 
         # Check the positive case
-        args = {'--really': True, '--postinstall': None}
+        args = {'--really': True, '--postinstall': None, '--key': [12345]}
         server.ServerReload.execute(self.client, args)
 
-        reload_mock.assert_called_with(hw_id, args['--postinstall'])
+        reload_mock.assert_called_with(hw_id, args['--postinstall'], [12345])
 
         # Now check to make sure we properly call CLIAbort in the negative case
         args['--really'] = False

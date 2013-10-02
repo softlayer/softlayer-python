@@ -141,11 +141,12 @@ class CCITests(unittest.TestCase):
 
     def test_reload_instance(self):
         post_uri = 'http://test.sftlyr.ws/test.sh'
-        self.cci.reload_instance(id=1, post_uri=post_uri)
+        self.cci.reload_instance(id=1, post_uri=post_uri, ssh_keys=[1701])
         service = self.client['Virtual_Guest']
         f = service.reloadOperatingSystem
         f.assert_called_once_with('FORCE',
-                                  {'customProvisionScriptUri': post_uri}, id=1)
+                                  {'customProvisionScriptUri': post_uri,
+                                   'sshKeyIds': [1701]}, id=1)
 
     @patch('SoftLayer.managers.cci.CCIManager._generate_create_dict')
     def test_create_verify(self, create_dict):
