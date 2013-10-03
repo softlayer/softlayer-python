@@ -189,13 +189,15 @@ Options:
 
 class ServerReload(CLIRunnable):
     """
-usage: sl server reload <identifier> [options]
+usage: sl server reload <identifier> [--key=KEY...] [options]
 
 Reload the OS on a hardware server based on its current configuration
 
 Optional:
   -i, --postinstall=URI  Post-install script to download
                            (Only HTTPS executes, HTTP leaves file in /root)
+  -k, --key=KEY          SSH keys to add to the root user. Can be specified
+                           multiple times
 """
 
     action = 'reload'
@@ -206,8 +208,14 @@ Optional:
         hardware = HardwareManager(client)
         hardware_id = resolve_id(
             hardware.resolve_ids, args.get('<identifier>'), 'hardware')
+        keys = []
+        if args.get('--key'):
+            for key in args.get('--key'):
+                key_id = resolve_id(SshKeyManager(client).resolve_ids, key,
+                                    'SshKey')
+                keys.append(key_id)
         if args['--really'] or no_going_back(hardware_id):
-            hardware.reload(hardware_id, args['--postinstall'])
+            hardware.reload(hardware_id, args['--postinstall'], keys)
         else:
             CLIAbort('Aborted')
 

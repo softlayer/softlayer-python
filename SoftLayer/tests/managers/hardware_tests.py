@@ -95,10 +95,11 @@ class HardwareTests(unittest.TestCase):
 
     def test_reload(self):
         post_uri = 'http://test.sftlyr.ws/test.sh'
-        self.hardware.reload(id=1, post_uri=post_uri)
+        self.hardware.reload(id=1, post_uri=post_uri, ssh_keys=[1701])
         f = self.client.__getitem__().reloadOperatingSystem
         f.assert_called_once_with('FORCE',
-                                  {'customProvisionScriptUri': post_uri}, id=1)
+                                  {'customProvisionScriptUri': post_uri,
+                                   'sshKeyIds': [1701]}, id=1)
 
     def test_get_bare_metal_create_options_returns_none_on_error(self):
         self.client['Product_Package'].getAllObjects.return_value = [
