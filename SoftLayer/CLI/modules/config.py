@@ -156,8 +156,8 @@ Setup configuration
         config.set('softlayer', 'api_key', settings['api_key'])
         config.set('softlayer', 'endpoint_url', settings['endpoint_url'])
 
-        f = os.fdopen(
-            os.open(config_path, os.O_WRONLY | os.O_CREAT, 0600), 'w')
+        f = os.fdopen(os.open(
+            config_path, (os.O_WRONLY | os.O_CREAT), 0600), 'w')
         try:
             config.write(f)
         finally:

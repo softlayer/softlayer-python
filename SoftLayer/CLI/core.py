@@ -198,7 +198,7 @@ def main(args=sys.argv[1:], env=Environment()):
             env.err('')
             env.err(str(e))
             exit_status = 1
-    except InvalidModule, e:
+    except InvalidModule as e:
         env.err(resolver.get_main_help())
         if e.module_name:
             env.err('')

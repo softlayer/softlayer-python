@@ -64,7 +64,7 @@ class MetadataManager(object):
             return make_rest_api_call('GET', url,
                                       http_headers={'User-Agent': USER_AGENT},
                                       timeout=self.timeout)
-        except SoftLayerAPIError, e:
+        except SoftLayerAPIError as e:
             if e.faultCode == 404:
                 return None
             raise e

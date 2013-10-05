@@ -6,7 +6,6 @@
     :license: MIT, see LICENSE for more details.
 """
 from mock import patch, call, Mock, MagicMock
-import datetime
 
 import SoftLayer
 import SoftLayer.API
@@ -151,7 +150,7 @@ class APIClient(unittest.TestCase):
     def test_mask_call_invalid_mask(self):
         try:
             self.client['SERVICE'].METHOD(mask="mask[something.nested")
-        except SoftLayer.SoftLayerError, e:
+        except SoftLayer.SoftLayerError as e:
             self.assertIn('Malformed Mask', str(e))
         else:
             self.fail('No exception raised')

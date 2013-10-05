@@ -309,7 +309,7 @@ class CCIManager(IdentifierMixin, object):
                     "networkVlan": {"id": int(private_vlan)}}})
 
         if userdata:
-            data['userData'] = [{'value': userdata}, ]
+            data['userData'] = [{'value': userdata}]
 
         if nic_speed:
             data['networkComponents'] = [{'maxSpeed': nic_speed}]
