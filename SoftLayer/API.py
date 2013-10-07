@@ -10,7 +10,6 @@ import datetime
 
 from consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT, USER_AGENT
 from transports import make_xml_rpc_api_call
-from exceptions import SoftLayerError
 from auth import TokenAuthentication
 from config import get_client_settings
 
@@ -242,15 +241,9 @@ class Client(object):
             mheader = self._prefix + 'ObjectMask'
 
             objectmask = objectmask.strip()
-            if objectmask.startswith('mask'):
-                objectmask = objectmask[4:]
-                if objectmask[0] == '.':
-                    objectmask = objectmask[1:]
-                elif objectmask[0] == '[' and objectmask[-1] == ']':
-                    objectmask = objectmask[1:-1]
-                else:
-                    raise SoftLayerError('Malformed Mask: %s' % objectmask)
-            objectmask = "mask[%s]" % objectmask
+            if not objectmask.startswith('mask') \
+                    and not objectmask.startswith('['):
+                objectmask = "mask[%s]" % objectmask
 
         return {mheader: {'mask': objectmask}}
 

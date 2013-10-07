@@ -140,20 +140,27 @@ class APIClient(unittest.TestCase):
             headers={
                 'authenticate': {
                     'username': 'doesnotexist', 'apiKey': 'issurelywrong'},
-                'SoftLayer_ObjectMask': {'mask': 'mask[something.nested]'}},
+                'SoftLayer_ObjectMask': {'mask': 'mask.something.nested'}},
             timeout=None,
             http_headers={
                 'Content-Type': 'application/xml',
                 'User-Agent': USER_AGENT,
             })
 
-    def test_mask_call_invalid_mask(self):
-        try:
-            self.client['SERVICE'].METHOD(mask="mask[something.nested")
-        except SoftLayer.SoftLayerError as e:
-            self.assertIn('Malformed Mask', str(e))
-        else:
-            self.fail('No exception raised')
+    @patch('SoftLayer.API.make_xml_rpc_api_call')
+    def test_mask_call_no_mask_prefix(self, make_xml_rpc_api_call):
+        self.client['SERVICE'].METHOD(mask="something.nested")
+        make_xml_rpc_api_call.assert_called_with(
+            'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
+            headers={
+                'authenticate': {
+                    'username': 'doesnotexist', 'apiKey': 'issurelywrong'},
+                'SoftLayer_ObjectMask': {'mask': 'mask[something.nested]'}},
+            timeout=None,
+            http_headers={
+                'Content-Type': 'application/xml',
+                'User-Agent': USER_AGENT,
+            })
 
     @patch('SoftLayer.API.Client.iter_call')
     def test_iterate(self, _iter_call):
