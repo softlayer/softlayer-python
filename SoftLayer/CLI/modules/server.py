@@ -29,8 +29,8 @@ import os
 from os import linesep
 from SoftLayer.CLI.helpers import (
     CLIRunnable, Table, KeyValueTable, FormattedItem, NestedDict, CLIAbort,
-    blank, listing, gb, no_going_back, resolve_id, confirm, ArgumentError,
-    update_with_template_args, export_to_template)
+    blank, listing, gb, active_txn, no_going_back, resolve_id, confirm,
+    ArgumentError, update_with_template_args, export_to_template)
 from SoftLayer import HardwareManager, SshKeyManager
 
 
@@ -87,7 +87,8 @@ For more on filters see 'sl help filters'
             'cores',
             'memory',
             'primary_ip',
-            'backend_ip'
+            'backend_ip',
+            'active_transaction'
         ])
         t.sortby = args.get('--sortby') or 'host'
 
@@ -101,6 +102,7 @@ For more on filters see 'sl help filters'
                 gb(server['memoryCapacity']),
                 server['primaryIpAddress'] or blank(),
                 server['primaryBackendIpAddress'] or blank(),
+                active_txn(server),
             ])
 
         return t
