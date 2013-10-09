@@ -171,7 +171,8 @@ class ServerCLITests(unittest.TestCase):
                 'memory': 2048,
                 'cores': 2,
                 'id': 1000,
-                'backend_ip': '10.1.0.2'
+                'backend_ip': '10.1.0.2',
+                'active_transaction': 'TXN_NAME'
             },
             {
                 'datacenter': 'TEST00',
@@ -180,7 +181,8 @@ class ServerCLITests(unittest.TestCase):
                 'memory': 4096,
                 'cores': 4,
                 'id': 1001,
-                'backend_ip': '10.1.0.3'
+                'backend_ip': '10.1.0.3',
+                'active_transaction': None
             }
         ]
 

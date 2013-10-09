@@ -126,6 +126,21 @@ def listing(items, separator=','):
     return SequentialOutput(separator, items)
 
 
+def active_txn(item):
+    """ Returns a FormattedItem describing the active transaction (if any) on
+        the given object. If no active transaction is running, returns a blank
+        FormattedItem.
+
+        :param item: An object capable of having an active transaction
+    """
+    if not item['activeTransaction']['transactionStatus']:
+        return blank()
+
+    return FormattedItem(
+        item['activeTransaction']['transactionStatus'].get('name'),
+        item['activeTransaction']['transactionStatus'].get('friendlyName'))
+
+
 def valid_response(prompt, *valid):
     ans = raw_input(prompt).lower()
 

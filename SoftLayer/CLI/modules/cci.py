@@ -37,7 +37,8 @@ from SoftLayer.CLI import (
     FormattedItem)
 from SoftLayer.CLI.helpers import (
     CLIAbort, ArgumentError, NestedDict, blank, resolve_id, KeyValueTable,
-    update_with_template_args, FALSE_VALUES, export_to_template)
+    update_with_template_args, FALSE_VALUES, export_to_template,
+    active_txn)
 
 
 class ListCCIs(CLIRunnable):
@@ -109,8 +110,7 @@ For more on filters see 'sl help filters'
                 mb_to_gb(guest['maxMemory']),
                 guest['primaryIpAddress'] or blank(),
                 guest['primaryBackendIpAddress'] or blank(),
-                guest['activeTransaction']['transactionStatus'].get(
-                    'friendlyName') or blank(),
+                active_txn(guest),
             ])
 
         return t
@@ -145,6 +145,7 @@ Options:
             result['status']['keyName'] or blank(),
             result['status']['name'] or blank()
         )])
+        t.add_row(['active_transaction', active_txn(result)])
         t.add_row(['state', FormattedItem(
             lookup(result, 'powerState', 'keyName'),
             lookup(result, 'powerState', 'name'),
