@@ -82,6 +82,13 @@ def get_raw_hardware_mocks():
             'tagReferences': [
                 {'tag': {'name': 'test_tag'}}
             ],
+            'activeTransaction': {
+                'transactionStatus': {
+                    'name': 'TXN_NAME',
+                    'friendlyName': 'Friendly Transaction Name',
+                    'id': 6660
+                }
+            }
         },
         1001: {
             'id': 1001,
