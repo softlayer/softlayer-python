@@ -99,7 +99,7 @@ class HardwareManager(IdentifierMixin, object):
 
         """
         if 'mask' not in kwargs:
-            items = set([
+            hw_items = set([
                 'id',
                 'hostname',
                 'domain',
@@ -112,7 +112,14 @@ class HardwareManager(IdentifierMixin, object):
                 'primaryIpAddress',
                 'datacenter',
             ])
-            kwargs['mask'] = "mask[%s]" % ','.join(items)
+            server_items = set([
+                'activeTransaction[id, transactionStatus[friendlyName,name]]',
+            ])
+
+            kwargs['mask'] = '[mask[%s],' \
+                             ' mask(SoftLayer_Hardware_Server)[%s]]' % \
+                             (','.join(hw_items),
+                              ','.join(server_items))
 
         _filter = NestedDict(kwargs.get('filter') or {})
         if tags:
@@ -256,7 +263,7 @@ class HardwareManager(IdentifierMixin, object):
                 'networkComponents.primarySubnet[id, netmask,'
                 'broadcastAddress, networkIdentifier, gateway]',
                 'hardwareChassis[id,name]',
-                'activeTransaction.id',
+                'activeTransaction[id, transactionStatus[friendlyName,name]]',
                 'operatingSystem.softwareLicense.'
                 'softwareDescription[manufacturer,name,version,referenceCode]',
                 'operatingSystem.passwords[username,password]',
