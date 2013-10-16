@@ -257,7 +257,7 @@ Options:
                     dual.append((str(int(item['capacity'])) + '_DUAL',
                                  item['price_id']))
                 else:
-                    single.append((int(item['capacity']), item['price_id']))
+                    single.append((str(int(item['capacity'])), item['price_id']))
 
             return [('single nic', single), ('dual nic', dual)]
 
