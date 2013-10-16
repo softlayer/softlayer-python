@@ -33,7 +33,6 @@ class BMCCLITests(unittest.TestCase):
         }
 
         client = self._setup_package_mocks(self.client)
-
         output = bmc.BMCCreateOptions.execute(client, args)
 
         expected = {
@@ -46,7 +45,7 @@ class BMCCLITests(unittest.TestCase):
                          'WIN_2008-STD-R2_64', 'WIN_2008-STD_64',
                          'WIN_2012-DC-HYPERV_64'],
             'disks': [250, 500],
-            'single nic': [100, 1000],
+            'single nic': ['100', '1000'],
             'memory/cpu': [
                 {'cpu': ['2'], 'memory': '2'},
                 {'cpu': ['4'], 'memory': '4'}
@@ -90,7 +89,7 @@ class BMCCLITests(unittest.TestCase):
             '--domain': 'example.com',
             '--datacenter': 'TEST00',
             '--cpu': '2',
-            '--network': 100,
+            '--network': '100',
             '--disk': [250, 250],
             '--os': 'UBUNTU_12_64_MINIMAL',
             '--memory': '2',
