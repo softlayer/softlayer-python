@@ -59,6 +59,9 @@ List SoftLayer Message Queue Accounts
             'id', 'name', 'status'
         ])
         for account in accounts:
+            if not account['nodes']:
+                continue
+
             t.add_row([
                 account['nodes'][0]['accountName'],
                 account['name'],

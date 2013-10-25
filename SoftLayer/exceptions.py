@@ -12,7 +12,7 @@ class SoftLayerError(StandardError):
     " The base SoftLayer error. "
 
 
-class Unauthenticated(StandardError):
+class Unauthenticated(SoftLayerError):
     " Unauthenticated "
 
 
