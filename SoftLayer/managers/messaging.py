@@ -44,7 +44,8 @@ class QueueAuth(requests.auth.AuthBase):
         if resp.ok:
             self.auth_token = resp.headers['X-Auth-Token']
         else:
-            raise Unauthenticated("Error while authenticating", resp)
+            raise Unauthenticated("Error while authenticating: %s"
+                                  % resp.status_code)
 
     def handle_error(self, r, **kwargs):
         """ Handle errors """

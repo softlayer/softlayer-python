@@ -17,13 +17,14 @@ Compute:
   sshkey    Manage SSH keys on your account
 
 Networking:
-  dns       Domain Name System
-  firewall  Firewall rule and security management
-  globalip  Global IP address management
-  rwhois    RWhoIs operations
-  ssl       Manages SSL
-  subnet    Subnet ordering and management
-  vlan      Manage VLANs on your account
+  dns        Domain Name System
+  firewall   Firewall rule and security management
+  globalip   Global IP address management
+  messaging  Message Queue Service
+  rwhois     RWhoIs operations
+  ssl        Manages SSL
+  subnet     Subnet ordering and management
+  vlan       Manage VLANs on your account
 
 Storage:
   iscsi     View iSCSI details
