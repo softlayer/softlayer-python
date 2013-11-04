@@ -312,6 +312,10 @@ class NetworkManager(IdentifierMixin, object):
 
         """
         datacenters = {}
+        unique_vms = []
+        unique_servers = []
+        unique_network = []
+
         for vlan in self._get_vlans():
             dc = vlan['primaryRouter']['datacenter']
             name = dc['name']
@@ -326,14 +330,25 @@ class NetworkManager(IdentifierMixin, object):
                 }
 
             datacenters[name]['vlanCount'] += 1
-            datacenters[name]['hardwareCount'] += len(vlan['hardware'])
-            datacenters[name]['networkingCount'] += \
-                len(vlan['networkComponents'])
+
+            for hw in vlan['hardware']:
+                if hw['id'] not in unique_servers:
+                    datacenters[name]['hardwareCount'] += 1
+                    unique_servers.append(hw['id'])
+
+            for net in vlan['networkComponents']:
+                if net['id'] not in unique_network:
+                    datacenters[name]['networkingCount'] += 1
+                    unique_network.append(net['id'])
+
+            for vm in vlan['virtualGuests']:
+                if vm['id'] not in unique_vms:
+                    datacenters[name]['virtualGuestCount'] += 1
+                    unique_vms.append(vm['id'])
+
             datacenters[name]['primaryIpCount'] += \
                 vlan['totalPrimaryIpAddressCount']
             datacenters[name]['subnetCount'] += len(vlan['subnets'])
-            datacenters[name]['virtualGuestCount'] += \
-                len(vlan['virtualGuests'])
 
         return datacenters
 
