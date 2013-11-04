@@ -331,23 +331,23 @@ class NetworkTests(unittest.TestCase):
         service.getNetworkVlans.return_value = [
             {
                 'name': 'dal00',
-                'hardware': [],
-                'networkComponents': [],
+                'hardware': [{'id': 1}],
+                'networkComponents': [{'id': 2}],
                 'primaryRouter': {
                     'datacenter': {'name': 'dal00'}
                 },
                 'totalPrimaryIpAddressCount': 3,
                 'subnets': [],
-                'virtualGuests': []
+                'virtualGuests': [{'id': 3}]
             }
         ]
 
         expected = {'dal00': {
-            'hardwareCount': 0,
-            'networkingCount': 0,
+            'hardwareCount': 1,
+            'networkingCount': 1,
             'primaryIpCount': 3,
             'subnetCount': 0,
-            'virtualGuestCount': 0,
+            'virtualGuestCount': 1,
             'vlanCount': 1
         }}
 
