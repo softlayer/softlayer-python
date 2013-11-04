@@ -312,7 +312,6 @@ class NetworkManager(IdentifierMixin, object):
 
         """
         datacenters = {}
-        datacenters = {}
         unique_vms = []
         unique_servers = []
         unique_network = []
