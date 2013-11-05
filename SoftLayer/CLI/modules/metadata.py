@@ -193,7 +193,6 @@ usage: sl metadata network (<public> | <private>) [options]
 
 Get details about the public or private network
 """
-    """ details about either the public or private network """
     action = 'network'
 
     @staticmethod
