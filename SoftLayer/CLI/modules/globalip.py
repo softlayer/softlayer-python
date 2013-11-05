@@ -32,7 +32,7 @@ Required:
     action = 'assign'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         mgr = NetworkManager(client)
 
         id = mgr.resolve_global_ip_ids(args.get('<identifier>'))
@@ -53,7 +53,7 @@ Cancel a subnet
     options = ['confirm']
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         mgr = NetworkManager(client)
         id = mgr.resolve_global_ip_ids(args.get('<identifier>'))
 
@@ -78,7 +78,7 @@ Options:
     options = ['confirm']
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         mgr = NetworkManager(client)
 
         version = 4
@@ -127,7 +127,7 @@ Filters:
     action = 'list'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         mgr = NetworkManager(client)
 
         t = Table([
@@ -175,7 +175,7 @@ Required:
     action = 'unassign'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         mgr = NetworkManager(client)
 
         id = mgr.resolve_global_ip_ids(args.get('<identifier>'))

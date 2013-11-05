@@ -27,7 +27,7 @@ Filters:
     action = 'detail'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         mgr = NetworkManager(client)
 
         vlan = mgr.get_vlan(args.get('<identifier>'))
@@ -105,7 +105,7 @@ Filters:
     action = 'list'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         mgr = NetworkManager(client)
 
         t = Table([

@@ -44,7 +44,7 @@ Options:
     options = ['datacenter', 'cpu', 'memory', 'os', 'disk', 'nic']
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         t = KeyValueTable(['Name', 'Value'])
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
@@ -305,7 +305,7 @@ Optional:
     required_params = ['--hostname', '--domain', '--cpu', '--memory', '--os']
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         update_with_template_args(args)
         mgr = HardwareManager(client)
 
@@ -520,7 +520,7 @@ Options:
     options = ['confirm']
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         hw = HardwareManager(client)
         hw_id = resolve_id(
             hw.resolve_ids, args.get('<identifier>'), 'hardware')

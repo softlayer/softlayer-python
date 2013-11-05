@@ -51,7 +51,7 @@ List SoftLayer Message Queue Accounts
     action = 'accounts-list'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         manager = MessagingManager(client)
         accounts = manager.list_accounts()
 
@@ -81,7 +81,7 @@ List SoftLayer Message Queue Endpoints
     action = 'endpoints-list'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         manager = MessagingManager(client)
         regions = manager.get_endpoints()
 
@@ -108,7 +108,7 @@ Ping the SoftLayer Message Queue service
     action = 'ping'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         manager = MessagingManager(client)
         ok = manager.ping(
             datacenter=args['--datacenter'], network=args['--network'])
@@ -177,7 +177,7 @@ List all queues on an account
     action = 'queue-list'
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         manager = MessagingManager(client)
         mq_client = manager.get_connection(args['<account_id>'])
 
@@ -205,7 +205,7 @@ Detail a queue
     action = 'queue-detail'
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         manager = MessagingManager(client)
         mq_client = manager.get_connection(args['<account_id>'])
         queue = mq_client.get_queue(args['<queue_name>'])
@@ -228,7 +228,7 @@ Options:
     action = 'queue-add'
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         manager = MessagingManager(client)
         mq_client = manager.get_connection(args['<account_id>'])
         tags = None
@@ -260,7 +260,7 @@ Options:
     action = 'queue-edit'
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         manager = MessagingManager(client)
         mq_client = manager.get_connection(args['<account_id>'])
         tags = None
@@ -290,7 +290,7 @@ Options:
     action = 'queue-remove'
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         manager = MessagingManager(client)
         mq_client = manager.get_connection(args['<account_id>'])
 
@@ -315,7 +315,7 @@ Options:
     action = 'queue-push'
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         manager = MessagingManager(client)
         mq_client = manager.get_connection(args['<account_id>'])
         body = ''
@@ -341,7 +341,7 @@ Options:
     action = 'queue-pop'
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         manager = MessagingManager(client)
         mq_client = manager.get_connection(args['<account_id>'])
 
@@ -370,7 +370,7 @@ List all topics on an account
     action = 'topic-list'
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         manager = MessagingManager(client)
         mq_client = manager.get_connection(args['<account_id>'])
         topics = mq_client.get_topics()['items']
@@ -391,7 +391,7 @@ Detail a topic
     action = 'topic-detail'
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         manager = MessagingManager(client)
         mq_client = manager.get_connection(args['<account_id>'])
         topic = mq_client.get_topic(args['<topic_name>'])
@@ -412,7 +412,7 @@ Create a new topic
     action = 'topic-add'
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         manager = MessagingManager(client)
         mq_client = manager.get_connection(args['<account_id>'])
         tags = None
@@ -442,7 +442,7 @@ Options:
     action = 'topic-remove'
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         manager = MessagingManager(client)
         mq_client = manager.get_connection(args['<account_id>'])
         mq_client.delete_topic(args['<topic_name>'], args.get('--force'))
@@ -465,7 +465,7 @@ Options:
     action = 'topic-subscribe'
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         manager = MessagingManager(client)
         mq_client = manager.get_connection(args['<account_id>'])
         if args['--type'] == 'queue':
@@ -499,7 +499,7 @@ Remove a subscription on a topic
     action = 'topic-unsubscribe'
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         manager = MessagingManager(client)
         mq_client = manager.get_connection(args['<account_id>'])
 
@@ -519,7 +519,7 @@ Push a message into a topic
     action = 'topic-push'
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         manager = MessagingManager(client)
         mq_client = manager.get_connection(args['<account_id>'])
 

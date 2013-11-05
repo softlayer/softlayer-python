@@ -42,7 +42,7 @@ Optional:
     action = 'add'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         if args.get('--key'):
             key = args['--key']
         else:
@@ -72,7 +72,7 @@ Required:
     options = ['confirm']
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         mgr = SshKeyManager(client)
 
         key_id = resolve_id(mgr.resolve_ids,
@@ -95,7 +95,7 @@ Options:
     action = 'edit'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         mgr = SshKeyManager(client)
 
         key_id = resolve_id(mgr.resolve_ids,
@@ -124,7 +124,7 @@ Options:
     action = 'list'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         mgr = SshKeyManager(client)
         keys = mgr.list_keys()
 
@@ -150,7 +150,7 @@ Options:
     action = 'print'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         mgr = SshKeyManager(client)
 
         key_id = resolve_id(mgr.resolve_ids,

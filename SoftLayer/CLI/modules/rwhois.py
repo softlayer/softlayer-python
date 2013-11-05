@@ -40,7 +40,7 @@ Options:
     action = 'edit'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         mgr = NetworkManager(client)
 
         update = {
@@ -76,7 +76,7 @@ Display the RWhois information for your account.
     action = 'show'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         mgr = NetworkManager(client)
         result = mgr.get_rwhois()
 
