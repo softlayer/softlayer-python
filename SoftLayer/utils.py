@@ -77,7 +77,7 @@ def query_filter(query):
     return {'operation': query}
 
 
-class IdentifierMixin:
+class IdentifierMixin(object):
     """ This mixin provides an interface to provide multiple methods for
         converting an 'indentifier' to an id """
     resolvers = []

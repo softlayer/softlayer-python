@@ -36,7 +36,7 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
 
         payload = xmlrpclib.dumps(tuple(largs), methodname=method,
                                   allow_none=True)
-        log.info('POST %s' % (uri))
+        log.info('POST %s', uri)
         log.debug(payload)
         response = requests.post(uri, data=payload,
                                  headers=http_headers,
@@ -76,7 +76,7 @@ def make_rest_api_call(method, url, http_headers=None, timeout=None):
     :param dict http_headers: HTTP headers to use for the request
     :param int timeout: number of seconds to use as a timeout
     """
-    log.info('%s %s' % (method, url))
+    log.info('%s %s', method, url)
     try:
         resp = requests.request(
             method, url, headers=http_headers, timeout=timeout)
