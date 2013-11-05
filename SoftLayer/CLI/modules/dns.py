@@ -188,7 +188,7 @@ Options:
         manager = DNSManager(client)
 
         zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
-        args['--ttl'] = args['--ttl'] or DNSManager.DEFAULT_TTL
+        args['--ttl'] = args['--ttl'] or 7200
 
         manager.create_record(
             zone_id,
