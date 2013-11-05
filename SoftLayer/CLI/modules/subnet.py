@@ -30,7 +30,7 @@ Cancel a subnet
     options = ['confirm']
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         mgr = NetworkManager(client)
         subnet_id = mgr.resolve_subnet_ids(args.get('<identifier>'))
 
@@ -67,7 +67,7 @@ Options:
     options = ['confirm']
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         mgr = NetworkManager(client)
 
         _type = 'private'
@@ -123,7 +123,7 @@ Filters:
     action = 'detail'
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         mgr = NetworkManager(client)
 
         subnet_id = mgr.resolve_subnet_ids(args.get('<identifier>'))
@@ -190,7 +190,7 @@ Filters:
     action = 'list'
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         mgr = NetworkManager(client)
 
         t = Table([
@@ -238,7 +238,7 @@ information.
     action = 'lookup'
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         mgr = NetworkManager(client)
 
         ip = mgr.ip_lookup(args['<ip>'])

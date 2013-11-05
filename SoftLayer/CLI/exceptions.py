@@ -22,5 +22,5 @@ class CLIAbort(CLIHalt):
 
 class ArgumentError(CLIAbort):
     def __init__(self, msg, *args):
-        super(CLIAbort, self).__init__(code=2, *args)
+        super(ArgumentError, self).__init__(msg, *args)
         self.message = "Argument Error: %s" % msg
