@@ -75,7 +75,7 @@ For more on filters see 'sl help filters'
     action = 'list'
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         cci = CCIManager(client)
 
         tags = None
@@ -129,7 +129,7 @@ Options:
     action = 'detail'
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         cci = CCIManager(client)
         t = KeyValueTable(['Name', 'Value'])
         t.align['Name'] = 'r'
@@ -226,7 +226,7 @@ Options:
     options = ['datacenter', 'cpu', 'nic', 'disk', 'os', 'memory']
 
     @classmethod
-    def execute(cls, client, args):
+    def execute(cls, client, args, env):
         cci = CCIManager(client)
         result = cci.get_create_options()
 
@@ -385,7 +385,7 @@ Optional:
     required_params = ['--hostname', '--domain', '--cpu', '--memory']
 
     @classmethod
-    def execute(cls, client, args):
+    def execute(cls, client, args, env):
         update_with_template_args(args)
         cci = CCIManager(client)
         cls._update_with_like_args(cci, args)
@@ -643,7 +643,7 @@ Optional:
     action = 'ready'
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         cci = CCIManager(client)
 
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
@@ -672,7 +672,7 @@ Optional:
     options = ['confirm']
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         keys = []
@@ -698,7 +698,7 @@ Cancel a CCI
     options = ['confirm']
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         if args['--really'] or no_going_back(cci_id):
@@ -720,7 +720,7 @@ Optional:
     options = ['confirm']
 
     @classmethod
-    def execute(cls, client, args):
+    def execute(cls, client, args, env):
         vg = client['Virtual_Guest']
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
@@ -748,7 +748,7 @@ Optional:
     options = ['confirm']
 
     @classmethod
-    def execute(cls, client, args):
+    def execute(cls, client, args, env):
         vg = client['Virtual_Guest']
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
@@ -773,7 +773,7 @@ Power on a CCI
     action = 'power-on'
 
     @classmethod
-    def execute(cls, client, args):
+    def execute(cls, client, args, env):
         vg = client['Virtual_Guest']
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
@@ -790,7 +790,7 @@ Pauses an active CCI
     options = ['confirm']
 
     @classmethod
-    def execute(cls, client, args):
+    def execute(cls, client, args, env):
         vg = client['Virtual_Guest']
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
@@ -811,7 +811,7 @@ Resumes a paused CCI
     action = 'resume'
 
     @classmethod
-    def execute(cls, client, args):
+    def execute(cls, client, args, env):
         vg = client['Virtual_Guest']
         cci = CCIManager(client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
@@ -831,7 +831,7 @@ Options:
     action = 'nic-edit'
 
     @classmethod
-    def execute(cls, client, args):
+    def execute(cls, client, args, env):
         public = args['public']
 
         cci = CCIManager(client)
@@ -858,7 +858,7 @@ Options:
     options = ['confirm']
 
     @classmethod
-    def execute(cls, client, args):
+    def execute(cls, client, args, env):
         args['--ttl'] = args['--ttl'] or DNSManager.DEFAULT_TTL
         if args['sync']:
             return cls.dns_sync(client, args)
@@ -961,7 +961,7 @@ Options:
     action = 'edit'
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         data = {}
 
         if args['--userdata'] and args['--userfile']:

@@ -38,7 +38,7 @@ Options:
     options = []
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         return "test"
 
 
@@ -112,6 +112,15 @@ class CommandLineTests(unittest.TestCase):
         resolver = cli.core.CommandParser(self.env)
         command, command_args = resolver.parse(['cci', 'list'])
         self.assertEqual(submodule_fixture, command)
+
+    def test_main(self):
+        self.env.plugins = {
+            'cci': {'list': submodule_fixture}
+        }
+        self.assertRaises(
+            SystemExit, cli.core.main,
+            args=['cci', 'list'],
+            env=self.env)
 
     def test_help(self):
         self.env.get_module_name.return_value = 'help'

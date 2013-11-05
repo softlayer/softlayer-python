@@ -17,10 +17,10 @@ class Show(CLIRunnable):
     __doc__ = __doc__
     action = None
 
-    @classmethod
-    def execute(cls, client, args):
-        parser = CommandParser(cls.env)
-        cls.env.load_module(args['<module>'])
+    @staticmethod
+    def execute(client, args, env):
+        parser = CommandParser(env)
+        env.load_module(args['<module>'])
         if args['<command>']:
             return parser.get_command_help(args['<module>'], args['<command>'])
         elif args['<module>']:

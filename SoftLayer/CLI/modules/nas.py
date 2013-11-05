@@ -24,7 +24,7 @@ Options:
     action = 'list'
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         account = client['Account']
 
         nas = account.getNasNetworkStorage(

@@ -34,7 +34,7 @@ Options:
     action = 'list'
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         manager = SSLManager(client)
 
         certificates = manager.list_certs(args['--status'])
@@ -67,7 +67,7 @@ Options:
     action = 'add'
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         template = {
             'intermediateCertificate': '',
             'certificateSigningRequest': '',
@@ -107,7 +107,7 @@ Options:
     action = 'edit'
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         template = {'id': args['<id>']}
         if args['--crt']:
             template['certificate'] = open(args['--crt']).read()
@@ -134,7 +134,7 @@ Remove SSL certificate
     options = ['confirm']
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         manager = SSLManager(client)
         if args['--really'] or no_going_back('yes'):
             manager.remove_certificate(args['<id>'])
@@ -150,7 +150,7 @@ Download SSL certificate and key file
     action = 'download'
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         def write_cert(filename, content):
             try:
                 fo = open(filename, 'w')

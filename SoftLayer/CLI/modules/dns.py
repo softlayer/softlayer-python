@@ -34,7 +34,7 @@ Arguments:
     action = "print"
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         manager = DNSManager(client)
         zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
         try:
@@ -55,7 +55,7 @@ Arguments:
     action = 'create'
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         manager = DNSManager(client)
         manager.create_zone(args['<zone>'])
 
@@ -73,7 +73,7 @@ Arguments:
     options = ['confirm']
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         manager = DNSManager(client)
         zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
 
@@ -98,7 +98,7 @@ Filters:
     action = 'list'
 
     @classmethod
-    def execute(cls, client, args):
+    def execute(cls, client, args, env):
         if args['<zone>']:
             return cls.list_zone(client, args['<zone>'], args)
 
@@ -184,7 +184,7 @@ Options:
     action = 'add'
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         manager = DNSManager(client)
 
         zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
@@ -217,7 +217,7 @@ Options:
     action = 'edit'
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         manager = DNSManager(client)
         zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
 
@@ -253,7 +253,7 @@ Options:
     options = ['confirm']
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         manager = DNSManager(client)
         zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
 

@@ -22,7 +22,7 @@ List iSCSI accounts
     action = 'list'
 
     @staticmethod
-    def execute(client, args):
+    def execute(client, args, env):
         account = client['Account']
 
         iscsi = account.getIscsiNetworkStorage(

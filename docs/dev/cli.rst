@@ -55,17 +55,17 @@ Actions are implemented using classes in the module that subclass `SoftLayer.CLI
           pass
 
       @staticmethod
-      def execute(client, args):
+      def execute(client, args, env):
           pass
 
 The required interfaces are:
 
 * The docblock (__doc__) for docopt
 * action class attribute
-* def execute(client, args)
+* def execute(client, args, env)
 
   - Don't forget the @staticmethod annotation!
-  - you can also use @classmethod and use execute(cls, client, args) if you plan on dispatching instead of executing a simple task.
+  - you can also use @classmethod and use execute(cls, client, args, env) if you plan on dispatching instead of executing a simple task.
 
 A minimal implementation for `sl example print` would look like this:
 ::
@@ -80,7 +80,7 @@ A minimal implementation for `sl example print` would look like this:
       action = 'print'
 
       @staticmethod
-      def execute(client, args):
+      def execute(client, args, env):
           print "EXAMPLE!"
 
 
@@ -115,7 +115,7 @@ The `execute()` method is expected to return either `None` or an instance of `So
       action = 'pretty'
 
       @staticmethod
-      def execute(client, args):
+      def execute(client, args, env):
           # create a table with two columns: col1, col2
           t = Table(['col1', 'col2'])
 
@@ -169,7 +169,7 @@ Refer to docopt for more complete documentation
       action = 'parse'
 
       @staticmethod
-      def execute(client, args):
+      def execute(client, args, env):
           if args.get('--test'):
               print "Just testing, move along..."
           else:
@@ -213,7 +213,7 @@ All confirmations should be easily bypassed by checking for `args['--really']`. 
       options = ['confirm']  # confirm adds the '-y|--really' options and help
 
       @staticmethod
-      def execute(client, args):
+      def execute(client, args, env):
           pass
 
 There are two primary confirmation prompts that both leverage `SoftLayer.CLI.valid_response`:

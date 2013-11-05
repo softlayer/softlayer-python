@@ -115,5 +115,5 @@ class CLIRunnable(object):
         pass
 
     @staticmethod
-    def execute(client, args):
+    def execute(*args):
         pass
