@@ -64,7 +64,7 @@ For more on filters see 'sl help filters'
     action = 'list'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         manager = HardwareManager(client)
 
         tags = None
@@ -121,7 +121,7 @@ Options:
     action = 'detail'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         hardware = HardwareManager(client)
 
         t = KeyValueTable(['Name', 'Value'])
@@ -206,7 +206,7 @@ Optional:
     options = ['confirm']
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         hardware = HardwareManager(client)
         hardware_id = resolve_id(
             hardware.resolve_ids, args.get('<identifier>'), 'hardware')
@@ -237,8 +237,8 @@ Options:
     action = 'cancel'
     options = ['confirm']
 
-    @staticmethod
-    def execute(client, args, env):
+    @classmethod
+    def execute(cls, client, args):
         hw = HardwareManager(client)
         hw_id = resolve_id(
             hw.resolve_ids, args.get('<identifier>'), 'hardware')
@@ -246,7 +246,7 @@ Options:
         comment = args.get('--comment')
 
         if not comment and not args['--really']:
-            comment = env.input("(Optional) Add a cancellation comment:")
+            comment = cls.env.input("(Optional) Add a cancellation comment:")
 
         reason = args.get('--reason')
 
@@ -266,7 +266,7 @@ Display a list of cancellation reasons
     action = 'cancel-reasons'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         t = Table(['Code', 'Reason'])
         t.align['Code'] = 'r'
         t.align['Reason'] = 'l'
@@ -289,8 +289,8 @@ Power off an active server
     action = 'power-off'
     options = ['confirm']
 
-    @staticmethod
-    def execute(client, args, env):
+    @classmethod
+    def execute(cls, client, args):
         hw = client['Hardware_Server']
         mgr = HardwareManager(client)
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
@@ -315,8 +315,8 @@ Optional:
     action = 'reboot'
     options = ['confirm']
 
-    @staticmethod
-    def execute(client, args, env):
+    @classmethod
+    def execute(cls, client, args):
         hw = client['Hardware_Server']
         mgr = HardwareManager(client)
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
@@ -342,7 +342,7 @@ Power on a server
     action = 'power-on'
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         hw = client['Hardware_Server']
         mgr = HardwareManager(client)
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
@@ -360,7 +360,7 @@ Issues power cycle to server via the power strip
     options = ['confirm']
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         hw = client['Hardware_Server']
         mgr = HardwareManager(client)
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
@@ -387,7 +387,7 @@ Options:
     action = 'nic-edit'
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         public = args['public']
 
         mgr = HardwareManager(client)
@@ -406,7 +406,7 @@ Display a list of chassis available for ordering dedicated servers.
     action = 'list-chassis'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         t = Table(['Code', 'Chassis'])
         t.align['Code'] = 'r'
         t.align['Chassis'] = 'l'
@@ -443,7 +443,7 @@ Options:
                'controller']
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         mgr = HardwareManager(client)
 
         t = KeyValueTable(['Name', 'Value'])
@@ -732,7 +732,7 @@ Optional:
                        '--memory', '--os']
 
     @classmethod
-    def execute(cls, client, args, env):
+    def execute(cls, client, args):
         update_with_template_args(args)
         mgr = HardwareManager(client)
 
@@ -933,7 +933,7 @@ Options:
     action = 'edit'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         data = {}
 
         if args['--userdata'] and args['--userfile']:

@@ -23,7 +23,7 @@ Options:
     action = None
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         mgr = NetworkManager(client)
         datacenters = mgr.summary_by_datacenter()
 

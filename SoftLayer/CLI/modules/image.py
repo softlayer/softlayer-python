@@ -26,7 +26,7 @@ Options:
     action = 'list'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         account = client['Account']
 
         neither = not any([args['--private'], args['--public']])

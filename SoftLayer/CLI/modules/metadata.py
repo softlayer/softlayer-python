@@ -36,7 +36,7 @@ List backend mac addresses
     action = 'backend_mac'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         return listing(MetadataManager().get('backend_mac'), separator=',')
 
 
@@ -49,7 +49,7 @@ Get datacenter name
     action = 'datacenter'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         return MetadataManager().get('datacenter')
 
 
@@ -62,7 +62,7 @@ Get datacenter id
     action = 'datacenter_id'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         return MetadataManager().get('datacenter_id')
 
 
@@ -75,7 +75,7 @@ List frontend mac addresses
     action = 'frontend_mac'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         return listing(MetadataManager().get('frontend_mac'), separator=',')
 
 
@@ -88,7 +88,7 @@ Get fully qualified domain name
     action = 'fqdn'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         return MetadataManager().get('fqdn')
 
 
@@ -101,7 +101,7 @@ Get hostname
     action = 'hostname'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         return MetadataManager().get('hostname')
 
 
@@ -114,7 +114,7 @@ Get id
     action = 'id'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         return MetadataManager().get('id')
 
 
@@ -127,7 +127,7 @@ Get primary backend ip address
     action = 'backend_ip'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         return MetadataManager().get('primary_backend_ip')
 
 
@@ -140,7 +140,7 @@ Get primary ip address
     action = 'ip'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         return MetadataManager().get('primary_ip')
 
 
@@ -153,7 +153,7 @@ Get provision state
     action = 'provision_state'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         return MetadataManager().get('provision_state')
 
 
@@ -166,7 +166,7 @@ List tags
     action = 'tags'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         return listing(MetadataManager().get('tags'), separator=',')
 
 
@@ -179,7 +179,7 @@ Get user-defined data
     action = 'user_data'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         userdata = MetadataManager().get('user_data')
         if userdata:
             return userdata
@@ -193,11 +193,10 @@ usage: sl metadata network (<public> | <private>) [options]
 
 Get details about the public or private network
 """
-    """ details about either the public or private network """
     action = 'network'
 
     @staticmethod
-    def execute(client, args, env):
+    def execute(client, args):
         meta = MetadataManager()
         if args['<public>']:
             t = KeyValueTable(['Name', 'Value'])
