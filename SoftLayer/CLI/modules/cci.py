@@ -30,7 +30,7 @@ hostname or the ip address for a CCI.
 from os import linesep
 import os.path
 
-from SoftLayer import CCIManager, SshKeyManager, DNSManager
+from SoftLayer import CCIManager, SshKeyManager, DNSManager, DNSZoneNotFound
 from SoftLayer.utils import lookup
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
@@ -859,13 +859,12 @@ Options:
 
     @classmethod
     def execute(cls, client, args, env):
-        args['--ttl'] = args['--ttl'] or DNSManager.DEFAULT_TTL
+        args['--ttl'] = args['--ttl'] or 7200
         if args['sync']:
             return cls.dns_sync(client, args)
 
     @staticmethod
     def dns_sync(client, args):
-        from SoftLayer import DNSManager, DNSZoneNotFound
         dns = DNSManager(client)
         cci = CCIManager(client)
 
