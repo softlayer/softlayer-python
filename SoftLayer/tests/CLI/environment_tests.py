@@ -28,6 +28,14 @@ class EnvironmentTests(unittest.TestCase):
         self.assertIn('cci', actions)
         self.assertIn('dns', actions)
 
+    def test_add_plugin(self):
+        m = MagicMock()
+        m.action = 'add_plugin_action_test'
+        self.env.add_plugin(m)
+
+        self.assertEqual(self.env.plugins,
+                         {'mock': {'add_plugin_action_test': m}})
+
     def test_out(self):
         self.env.stdout = MagicMock()
         self.env.out('TEXT OUTPUT')
