@@ -39,9 +39,8 @@ Options:
 """
     action = 'edit'
 
-    @staticmethod
-    def execute(client, args):
-        mgr = NetworkManager(client)
+    def execute(self, args):
+        mgr = NetworkManager(self.client)
 
         update = {
             'abuse_email': args.get('--abuse'),
@@ -75,9 +74,8 @@ Display the RWhois information for your account.
 """
     action = 'show'
 
-    @staticmethod
-    def execute(client, args):
-        mgr = NetworkManager(client)
+    def execute(self, args):
+        mgr = NetworkManager(self.client)
         result = mgr.get_rwhois()
 
         t = KeyValueTable(['Name', 'Value'])

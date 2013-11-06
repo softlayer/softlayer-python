@@ -29,9 +29,8 @@ Cancel a subnet
     action = 'cancel'
     options = ['confirm']
 
-    @staticmethod
-    def execute(client, args):
-        mgr = NetworkManager(client)
+    def execute(self, args):
+        mgr = NetworkManager(self.client)
         subnet_id = mgr.resolve_subnet_ids(args.get('<identifier>'))
 
         if args['--really'] or no_going_back(subnet_id):
@@ -66,9 +65,8 @@ Options:
     action = 'create'
     options = ['confirm']
 
-    @staticmethod
-    def execute(client, args):
-        mgr = NetworkManager(client)
+    def execute(self, args):
+        mgr = NetworkManager(self.client)
 
         _type = 'private'
         if args['public']:
@@ -81,7 +79,7 @@ Options:
             if not confirm("This action will incur charges on your account."
                            "Continue?"):
                 raise CLIAbort('Cancelling order.')
-        result = mgr.add_subnet(type=_type,
+        result = mgr.add_subnet(_type,
                                 quantity=args['<quantity>'],
                                 vlan_id=args['<vlan>'],
                                 version=version,
@@ -122,9 +120,8 @@ Filters:
 """
     action = 'detail'
 
-    @staticmethod
-    def execute(client, args):
-        mgr = NetworkManager(client)
+    def execute(self, args):
+        mgr = NetworkManager(self.client)
 
         subnet_id = mgr.resolve_subnet_ids(args.get('<identifier>'))
         subnet = mgr.get_subnet(subnet_id)
@@ -189,9 +186,8 @@ Filters:
 """
     action = 'list'
 
-    @staticmethod
-    def execute(client, args):
-        mgr = NetworkManager(client)
+    def execute(self, args):
+        mgr = NetworkManager(self.client)
 
         t = Table([
             'id', 'identifier', 'type', 'datacenter', 'vlan id', 'IPs',
@@ -237,9 +233,8 @@ information.
 """
     action = 'lookup'
 
-    @staticmethod
-    def execute(client, args):
-        mgr = NetworkManager(client)
+    def execute(self, args):
+        mgr = NetworkManager(self.client)
 
         ip = mgr.ip_lookup(args['<ip>'])
 

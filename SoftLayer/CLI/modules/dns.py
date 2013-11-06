@@ -33,9 +33,8 @@ Arguments:
 """
     action = "print"
 
-    @staticmethod
-    def execute(client, args):
-        manager = DNSManager(client)
+    def execute(self, args):
+        manager = DNSManager(self.client)
         zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
         try:
             return manager.dump_zone(zone_id)
@@ -54,9 +53,8 @@ Arguments:
 """
     action = 'create'
 
-    @staticmethod
-    def execute(client, args):
-        manager = DNSManager(client)
+    def execute(self, args):
+        manager = DNSManager(self.client)
         manager.create_zone(args['<zone>'])
 
 
@@ -72,9 +70,8 @@ Arguments:
     action = 'delete'
     options = ['confirm']
 
-    @staticmethod
-    def execute(client, args):
-        manager = DNSManager(client)
+    def execute(self, args):
+        manager = DNSManager(self.client)
         zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
 
         if args['--really'] or no_going_back(args['<zone>']):
@@ -97,16 +94,14 @@ Filters:
 """
     action = 'list'
 
-    @classmethod
-    def execute(cls, client, args):
+    def execute(self, args):
         if args['<zone>']:
-            return cls.list_zone(client, args['<zone>'], args)
+            return self.list_zone(args)
 
-        return cls.list_all_zones(client)
+        return self.list_all_zones()
 
-    @staticmethod
-    def list_zone(client, zone, args):
-        manager = DNSManager(client)
+    def list_zone(self, args):
+        manager = DNSManager(self.client)
         t = Table([
             "record",
             "type",
@@ -123,7 +118,7 @@ Filters:
         try:
             records = manager.get_records(
                 zone_id,
-                type=args.get('--type'),
+                record_type=args.get('--type'),
                 host=args.get('--record'),
                 ttl=args.get('--ttl'),
                 data=args.get('--data'),
@@ -141,9 +136,8 @@ Filters:
 
         return t
 
-    @staticmethod
-    def list_all_zones(client):
-        manager = DNSManager(client)
+    def list_all_zones(self):
+        manager = DNSManager(self.client)
         zones = manager.list_zones()
         t = Table([
             "id",
@@ -183,9 +177,8 @@ Options:
 """
     action = 'add'
 
-    @staticmethod
-    def execute(client, args):
-        manager = DNSManager(client)
+    def execute(self, args):
+        manager = DNSManager(self.client)
 
         zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
         args['--ttl'] = args['--ttl'] or 7200
@@ -216,9 +209,8 @@ Options:
 """
     action = 'edit'
 
-    @staticmethod
-    def execute(client, args):
-        manager = DNSManager(client)
+    def execute(self, args):
+        manager = DNSManager(self.client)
         zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
 
         try:
@@ -252,9 +244,8 @@ Options:
     action = 'remove'
     options = ['confirm']
 
-    @staticmethod
-    def execute(client, args):
-        manager = DNSManager(client)
+    def execute(self, args):
+        manager = DNSManager(self.client)
         zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
 
         if args['--id']:

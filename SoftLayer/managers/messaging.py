@@ -47,7 +47,7 @@ class QueueAuth(requests.auth.AuthBase):
             raise Unauthenticated("Error while authenticating: %s"
                                   % resp.status_code)
 
-    def handle_error(self, r, **kwargs):
+    def handle_error(self, r, **_):
         """ Handle errors """
         r.request.deregister_hook('response', self.handle_error)
         if r.status_code == 503:
@@ -110,10 +110,10 @@ class MessagingManager(object):
         """ Get all known message queue endpoints """
         return ENDPOINTS
 
-    def get_connection(self, id, datacenter=None, network=None):
+    def get_connection(self, account_id, datacenter=None, network=None):
         """ Get connection to Message Queue Service
 
-        :param id: Message Queue Account id
+        :param account_id: Message Queue Account id
         :param datacenter: Datacenter code
         :param network: network ('public' or 'private')
         """
@@ -124,7 +124,7 @@ class MessagingManager(object):
                 'Client instance auth must be BasicAuthentication.')
 
         client = MessagingConnection(
-            id, endpoint=self.get_endpoint(datacenter, network))
+            account_id, endpoint=self.get_endpoint(datacenter, network))
         client.authenticate(self.client.auth.username,
                             self.client.auth.api_key)
         return client
@@ -139,11 +139,11 @@ class MessagingManager(object):
 class MessagingConnection(object):
     """ Message Queue Service Connection
 
-    :param id: Message Queue Account id
+    :param account_id: Message Queue Account id
     :param endpoint: Endpoint URL
     """
-    def __init__(self, id, endpoint=None):
-        self.account_id = id
+    def __init__(self, account_id, endpoint=None):
+        self.account_id = account_id
         self.endpoint = endpoint
         self.auth = None
 
@@ -349,16 +349,17 @@ class MessagingConnection(object):
         r = self._make_request('get', 'topics/%s/subscriptions' % topic_name)
         return json.loads(r.content)
 
-    def create_subscription(self, topic_name, type, **kwargs):
+    def create_subscription(self, topic_name, subscription_type, **kwargs):
         """ Create Subscription
 
         :param topic_name: Topic Name
-        :param type: type ('queue' or 'http')
+        :param subscription_type: type ('queue' or 'http')
         :param dict \*\*kwargs: Subscription options
         """
         r = self._make_request(
             'post', 'topics/%s/subscriptions' % topic_name,
-            data=json.dumps({'endpoint_type': type, 'endpoint': kwargs}))
+            data=json.dumps({
+                'endpoint_type': subscription_type, 'endpoint': kwargs}))
         return json.loads(r.content)
 
     def delete_subscription(self, topic_name, subscription_id):

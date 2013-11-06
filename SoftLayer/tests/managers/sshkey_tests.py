@@ -52,7 +52,7 @@ class SshKeyTests(unittest.TestCase):
         mcall = call(data, id=id)
         service = self.client['Security_Ssh_Key']
 
-        self.sshkey.edit_key(id=id, label=label, notes=notes)
+        self.sshkey.edit_key(id, label=label, notes=notes)
         service.editObject.assert_has_calls(mcall)
 
     def test_get_key(self):

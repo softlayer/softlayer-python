@@ -41,8 +41,7 @@ Optional:
 """
     action = 'add'
 
-    @staticmethod
-    def execute(client, args):
+    def execute(self, args):
         if args.get('--key'):
             key = args['--key']
         else:
@@ -50,7 +49,7 @@ Optional:
             key = f.read().strip()
             f.close()
 
-        mgr = SshKeyManager(client)
+        mgr = SshKeyManager(self.client)
         result = mgr.add_key(key, args['<label>'], args.get('--notes'))
 
         if type(result) is dict and result.get('fingerprint'):
@@ -71,9 +70,8 @@ Required:
     action = 'remove'
     options = ['confirm']
 
-    @staticmethod
-    def execute(client, args):
-        mgr = SshKeyManager(client)
+    def execute(self, args):
+        mgr = SshKeyManager(self.client)
 
         key_id = resolve_id(mgr.resolve_ids,
                             args.get('<identifier>'), 'SshKey')
@@ -94,9 +92,8 @@ Options:
 
     action = 'edit'
 
-    @staticmethod
-    def execute(client, args):
-        mgr = SshKeyManager(client)
+    def execute(self, args):
+        mgr = SshKeyManager(self.client)
 
         key_id = resolve_id(mgr.resolve_ids,
                             args.get('<identifier>'), 'SshKey')
@@ -123,9 +120,8 @@ Options:
 """
     action = 'list'
 
-    @staticmethod
-    def execute(client, args):
-        mgr = SshKeyManager(client)
+    def execute(self, args):
+        mgr = SshKeyManager(self.client)
         keys = mgr.list_keys()
 
         t = Table(['id', 'label', 'fingerprint', 'notes'])
@@ -149,9 +145,8 @@ Options:
 """
     action = 'print'
 
-    @staticmethod
-    def execute(client, args):
-        mgr = SshKeyManager(client)
+    def execute(self, args):
+        mgr = SshKeyManager(self.client)
 
         key_id = resolve_id(mgr.resolve_ids,
                             args.get('<identifier>'), 'SshKey')

@@ -95,7 +95,7 @@ class HardwareTests(unittest.TestCase):
 
     def test_reload(self):
         post_uri = 'http://test.sftlyr.ws/test.sh'
-        self.hardware.reload(id=1, post_uri=post_uri, ssh_keys=[1701])
+        self.hardware.reload(1, post_uri=post_uri, ssh_keys=[1701])
         f = self.client.__getitem__().reloadOperatingSystem
         f.assert_called_once_with('FORCE',
                                   {'customProvisionScriptUri': post_uri,
@@ -125,7 +125,6 @@ class HardwareTests(unittest.TestCase):
         f3.assert_called_once_with(id=package_id)
 
     def test_generate_create_dict_with_all_bare_metal_options(self):
-        package_id = 50
 
         self._setup_package_mocks()
 
@@ -171,7 +170,6 @@ class HardwareTests(unittest.TestCase):
         self.assertEqual(expected, data)
 
     def test_generate_create_dict_with_all_dedicated_server_options(self):
-        package_id = 13
 
         self._setup_package_mocks()
 

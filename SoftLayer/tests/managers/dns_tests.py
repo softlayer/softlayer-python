@@ -5,7 +5,7 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import DNSManager, DNSZoneNotFound
+from SoftLayer import DNSManager
 from SoftLayer.tests import unittest
 
 from mock import MagicMock, ANY
@@ -138,7 +138,7 @@ class DNSTests(unittest.TestCase):
 
         D.reset_mock()
         D.return_value = [records[1]]
-        self.dns_client.get_records(12345, type='a')
+        self.dns_client.get_records(12345, record_type='a')
         D.assert_called_once_with(
             id=12345,
             filter={'resourceRecords': {'type': {"operation": "_= a"}}},

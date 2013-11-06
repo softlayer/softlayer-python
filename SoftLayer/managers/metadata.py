@@ -57,6 +57,7 @@ class MetadataManager(object):
     def __init__(self, client=None, timeout=5):
         self.url = API_PRIVATE_ENDPOINT_REST.rstrip('/')
         self.timeout = timeout
+        self.client = client
 
     def make_request(self, path):
         url = '/'.join([self.url, 'SoftLayer_Resource_Metadata', path])

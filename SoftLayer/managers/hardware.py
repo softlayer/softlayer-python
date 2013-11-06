@@ -31,10 +31,10 @@ class HardwareManager(IdentifierMixin, object):
         #: hostname and IP address.
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
 
-    def cancel_hardware(self, id, reason='unneeded', comment=''):
+    def cancel_hardware(self, hardware_id, reason='unneeded', comment=''):
         """ Cancels the specified dedicated server.
 
-        :param int id: The ID of the hardware to be cancelled.
+        :param int hardware_id: The ID of the hardware to be cancelled.
         :param string reason: The reason code for the cancellation. This should
                               come from :func:`get_cancellation_reasons`.
         :param string comment: An optional comment to include with the
@@ -54,11 +54,10 @@ class HardwareManager(IdentifierMixin, object):
         # cancelAssociatedItems
         # attachmentType - Only option is HARDWARE
         ticket_obj = self.client['Ticket']
-        return ticket_obj.createCancelServerTicket(id, cancel_reason,
-                                                   comment, True,
-                                                   'HARDWARE')
+        return ticket_obj.createCancelServerTicket(hardware_id, cancel_reason,
+                                                   comment, True, 'HARDWARE')
 
-    def cancel_metal(self, id, immediate=False):
+    def cancel_metal(self, hardware_id, immediate=False):
         """ Cancels the specified bare metal instance.
 
         :param int id: The ID of the bare metal instance to be cancelled.
@@ -66,7 +65,7 @@ class HardwareManager(IdentifierMixin, object):
                                cancelled immediately. Otherwise, it will be
                                scheduled to cancel on the anniversary date.
         """
-        hw_billing = self.get_hardware(id=id,
+        hw_billing = self.get_hardware(hardware_id,
                                        mask='mask[id, billingItem.id]')
 
         billing_id = hw_billing['billingItem']['id']
@@ -231,7 +230,7 @@ class HardwareManager(IdentifierMixin, object):
         """
         return self._parse_package_data(package_id)
 
-    def get_hardware(self, id, **kwargs):
+    def get_hardware(self, hardware_id, **kwargs):
         """ Get details about a hardware device
 
         :param integer id: the hardware ID
@@ -274,12 +273,12 @@ class HardwareManager(IdentifierMixin, object):
             ])
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
-        return self.hardware.getObject(id=id, **kwargs)
+        return self.hardware.getObject(id=hardware_id, **kwargs)
 
-    def reload(self, id, post_uri=None, ssh_keys=None):
+    def reload(self, hardware_id, post_uri=None, ssh_keys=None):
         """ Perform an OS reload of a server with its current configuration.
 
-        :param integer id: the instance ID to reload
+        :param integer hardware_id: the instance ID to reload
         :param string post_url: The URI of the post-install script to run
                                 after reload
         :param list ssh_keys: The SSH keys to add to the root user
@@ -297,12 +296,12 @@ class HardwareManager(IdentifierMixin, object):
             payload['config']['sshKeyIds'] = [key_id for key_id in ssh_keys]
 
         return self.hardware.reloadOperatingSystem('FORCE', payload['config'],
-                                                   id=id)
+                                                   id=hardware_id)
 
-    def change_port_speed(self, id, public, speed):
+    def change_port_speed(self, hardware_id, public, speed):
         """ Allows you to change the port speed of a server's NICs.
 
-        :param int id: The ID of the server
+        :param int hardware_id: The ID of the server
         :param bool public: Flag to indicate which interface to change.
                             True (default) means the public interface.
                             False indicates the private interface.
@@ -313,7 +312,7 @@ class HardwareManager(IdentifierMixin, object):
         else:
             func = self.hardware.setPrivateNetworkInterfaceSpeed
 
-        return func(speed, id=id)
+        return func(speed, id=hardware_id)
 
     def place_order(self, **kwargs):
         """ Places an order for a piece of hardware. See
@@ -658,13 +657,13 @@ class HardwareManager(IdentifierMixin, object):
 
         return results
 
-    def edit(self, id, userdata=None, hostname=None, domain=None, notes=None):
+    def edit(self, hardware_id, userdata=None, hostname=None, domain=None, notes=None):
         """ Edit hostname, domain name, notes, and/or the user data of the
         hardware
 
         Parameters set to None will be ignored and not attempted to be updated.
 
-        :param integer id: the instance ID to edit
+        :param integer hardware_id: the instance ID to edit
         :param string userdata: user data on the hardware to edit.
                                 If none exist it will be created
         :param string hostname: valid hostname
@@ -675,7 +674,7 @@ class HardwareManager(IdentifierMixin, object):
 
         obj = {}
         if userdata:
-            self.hardware.setUserMetadata([userdata], id=id)
+            self.hardware.setUserMetadata([userdata], id=hardware_id)
 
         if hostname:
             obj['hostname'] = hostname
@@ -689,7 +688,7 @@ class HardwareManager(IdentifierMixin, object):
         if not obj:
             return True
 
-        return self.hardware.editObject(obj, id=id)
+        return self.hardware.editObject(obj, id=hardware_id)
 
 
 def get_default_value(package_options, category):

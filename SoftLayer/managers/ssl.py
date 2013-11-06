@@ -50,13 +50,13 @@ class SSLManager(object):
         """
         return self.ssl.createObject(certificate)
 
-    def remove_certificate(self, id):
+    def remove_certificate(self, cert_id):
         """ Removes a certificate.
 
-        :param integer id: a certificate ID to remove
+        :param integer cert_id: a certificate ID to remove
 
         """
-        return self.ssl.deleteObject(id=id)
+        return self.ssl.deleteObject(id=cert_id)
 
     def edit_certificate(self, certificate):
         """ Updates a certificate with the included options.
@@ -69,10 +69,10 @@ class SSLManager(object):
         """
         return self.ssl.editObject(certificate, id=certificate['id'])
 
-    def get_certificate(self, id):
+    def get_certificate(self, cert_id):
         """ Gets a certificate with the ID specified.
 
-        :param integer id: the certificate ID to retrieve
+        :param integer cert_id: the certificate ID to retrieve
 
         """
-        return self.ssl.getObject(id=id)
+        return self.ssl.getObject(id=cert_id)

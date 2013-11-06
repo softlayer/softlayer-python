@@ -25,22 +25,21 @@ Options:
 """
     action = 'list'
 
-    @staticmethod
-    def execute(client, args):
-        account = client['Account']
+    def execute(self, args):
+        account = self.client['Account']
 
         neither = not any([args['--private'], args['--public']])
 
         results = []
         if args['--private'] or neither:
-            account = client['Account']
+            account = self.client['Account']
             mask = 'id,accountId,name,globalIdentifier,blockDevices,parentId'
             r = account.getPrivateBlockDeviceTemplateGroups(mask=mask)
 
             results.append(r)
 
         if args['--public'] or neither:
-            vgbd = client['Virtual_Guest_Block_Device_Template_Group']
+            vgbd = self.client['Virtual_Guest_Block_Device_Template_Group']
             r = vgbd.getPublicImages()
 
             results.append(r)

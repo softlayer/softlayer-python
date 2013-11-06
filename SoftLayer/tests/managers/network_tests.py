@@ -27,7 +27,7 @@ class NetworkTests(unittest.TestCase):
     def test_add_subnet_returns_none_on_failure(self):
         self._setup_add_subnet_mocks()
 
-        self.assertEqual(None, self.network.add_subnet(type='bad'))
+        self.assertEqual(None, self.network.add_subnet('bad'))
 
     def test_add_global_ip(self):
         self._setup_add_subnet_mocks()
@@ -63,7 +63,7 @@ class NetworkTests(unittest.TestCase):
                         'itemId': 4440,
                         'recurringFee': '0'}]}
 
-        result = self.network.add_subnet(type='public',
+        result = self.network.add_subnet('public',
                                          quantity=4,
                                          vlan_id=1234,
                                          version=4,
@@ -83,7 +83,7 @@ class NetworkTests(unittest.TestCase):
                         'itemId': 10,
                         'recurringFee': '0'}]}
 
-        result = self.network.add_subnet(type='global',
+        result = self.network.add_subnet('global',
                                          test_order=True)
 
         self.assertEqual(expected, result)
@@ -104,7 +104,7 @@ class NetworkTests(unittest.TestCase):
                 'itemId': 66464,
                 'recurringFee': '0'}]}
 
-        result = self.network.add_subnet(type='public',
+        result = self.network.add_subnet('public',
                                          quantity=64,
                                          vlan_id=45678,
                                          version=6,
@@ -124,7 +124,7 @@ class NetworkTests(unittest.TestCase):
                         'itemId': 610,
                         'recurringFee': '0'}]}
 
-        result = self.network.add_subnet(type='global',
+        result = self.network.add_subnet('global',
                                          version=6,
                                          test_order=True)
 

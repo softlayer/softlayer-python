@@ -63,9 +63,8 @@ For more on filters see 'sl help filters'
 """
     action = 'list'
 
-    @staticmethod
-    def execute(client, args):
-        manager = HardwareManager(client)
+    def execute(self, args):
+        manager = HardwareManager(self.client)
 
         tags = None
         if args.get('--tags'):
@@ -120,9 +119,8 @@ Options:
 """
     action = 'detail'
 
-    @staticmethod
-    def execute(client, args):
-        hardware = HardwareManager(client)
+    def execute(self, args):
+        hardware = HardwareManager(self.client)
 
         t = KeyValueTable(['Name', 'Value'])
         t.align['Name'] = 'r'
@@ -179,8 +177,8 @@ Options:
             t.add_row(['tags', listing(tag_row, separator=',')])
 
         if not result['privateNetworkOnlyFlag']:
-            ptr_domains = client['Hardware_Server'].getReverseDomainRecords(
-                id=hardware_id)
+            ptr_domains = self.client['Hardware_Server']\
+                .getReverseDomainRecords(id=hardware_id)
 
             for ptr_domain in ptr_domains:
                 for ptr in ptr_domain['resourceRecords']:
@@ -205,16 +203,15 @@ Optional:
     action = 'reload'
     options = ['confirm']
 
-    @staticmethod
-    def execute(client, args):
-        hardware = HardwareManager(client)
+    def execute(self, args):
+        hardware = HardwareManager(self.client)
         hardware_id = resolve_id(
             hardware.resolve_ids, args.get('<identifier>'), 'hardware')
         keys = []
         if args.get('--key'):
             for key in args.get('--key'):
-                key_id = resolve_id(SshKeyManager(client).resolve_ids, key,
-                                    'SshKey')
+                key_id = resolve_id(SshKeyManager(self.client).resolve_ids,
+                                    key, 'SshKey')
                 keys.append(key_id)
         if args['--really'] or no_going_back(hardware_id):
             hardware.reload(hardware_id, args['--postinstall'], keys)
@@ -237,16 +234,15 @@ Options:
     action = 'cancel'
     options = ['confirm']
 
-    @classmethod
-    def execute(cls, client, args):
-        hw = HardwareManager(client)
+    def execute(self, args):
+        hw = HardwareManager(self.client)
         hw_id = resolve_id(
             hw.resolve_ids, args.get('<identifier>'), 'hardware')
 
         comment = args.get('--comment')
 
         if not comment and not args['--really']:
-            comment = cls.env.input("(Optional) Add a cancellation comment:")
+            comment = self.env.input("(Optional) Add a cancellation comment:")
 
         reason = args.get('--reason')
 
@@ -265,13 +261,12 @@ Display a list of cancellation reasons
 
     action = 'cancel-reasons'
 
-    @staticmethod
-    def execute(client, args):
+    def execute(self, args):
         t = Table(['Code', 'Reason'])
         t.align['Code'] = 'r'
         t.align['Reason'] = 'l'
 
-        mgr = HardwareManager(client)
+        mgr = HardwareManager(self.client)
         reasons = mgr.get_cancellation_reasons().iteritems()
 
         for code, reason in reasons:
@@ -289,10 +284,9 @@ Power off an active server
     action = 'power-off'
     options = ['confirm']
 
-    @classmethod
-    def execute(cls, client, args):
-        hw = client['Hardware_Server']
-        mgr = HardwareManager(client)
+    def execute(self, args):
+        hw = self.client['Hardware_Server']
+        mgr = HardwareManager(self.client)
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
                            'hardware')
         if args['--really'] or confirm('This will power off the server with '
@@ -315,10 +309,9 @@ Optional:
     action = 'reboot'
     options = ['confirm']
 
-    @classmethod
-    def execute(cls, client, args):
-        hw = client['Hardware_Server']
-        mgr = HardwareManager(client)
+    def execute(self, args):
+        hw = self.client['Hardware_Server']
+        mgr = HardwareManager(self.client)
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
                            'hardware')
         if args['--really'] or confirm('This will power off the server with '
@@ -341,10 +334,9 @@ Power on a server
 """
     action = 'power-on'
 
-    @classmethod
-    def execute(cls, client, args):
-        hw = client['Hardware_Server']
-        mgr = HardwareManager(client)
+    def execute(self, args):
+        hw = self.client['Hardware_Server']
+        mgr = HardwareManager(self.client)
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
                            'hardware')
         hw.powerOn(id=hw_id)
@@ -359,10 +351,9 @@ Issues power cycle to server via the power strip
     action = 'power-cycle'
     options = ['confirm']
 
-    @classmethod
-    def execute(cls, client, args):
-        hw = client['Hardware_Server']
-        mgr = HardwareManager(client)
+    def execute(self, args):
+        hw = self.client['Hardware_Server']
+        mgr = HardwareManager(self.client)
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
                            'hardware')
 
@@ -386,11 +377,10 @@ Options:
 """
     action = 'nic-edit'
 
-    @classmethod
-    def execute(cls, client, args):
+    def execute(self, args):
         public = args['public']
 
-        mgr = HardwareManager(client)
+        mgr = HardwareManager(self.client)
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
                            'hardware')
 
@@ -405,13 +395,12 @@ Display a list of chassis available for ordering dedicated servers.
 """
     action = 'list-chassis'
 
-    @staticmethod
-    def execute(client, args):
+    def execute(self, args):
         t = Table(['Code', 'Chassis'])
         t.align['Code'] = 'r'
         t.align['Chassis'] = 'l'
 
-        mgr = HardwareManager(client)
+        mgr = HardwareManager(self.client)
         chassis = mgr.get_available_dedicated_server_packages()
 
         for chassis in chassis:
@@ -442,9 +431,8 @@ Options:
     options = ['datacenter', 'cpu', 'memory', 'os', 'disk', 'nic',
                'controller']
 
-    @classmethod
-    def execute(cls, client, args):
-        mgr = HardwareManager(client)
+    def execute(self, args):
+        mgr = HardwareManager(self.client)
 
         t = KeyValueTable(['Name', 'Value'])
         t.align['Name'] = 'r'
@@ -455,7 +443,7 @@ Options:
         ds_options = mgr.get_dedicated_server_create_options(chassis_id)
 
         show_all = True
-        for opt_name in cls.options:
+        for opt_name in self.options:
             if args.get("--" + opt_name):
                 show_all = False
                 break
@@ -464,12 +452,12 @@ Options:
             show_all = True
 
         if args['--datacenter'] or show_all:
-            results = cls.get_create_options(ds_options, 'datacenter')[0]
+            results = self.get_create_options(ds_options, 'datacenter')[0]
 
             t.add_row([results[0], listing(sorted(results[1]))])
 
         if args['--cpu'] or show_all:
-            results = cls.get_create_options(ds_options, 'cpu')
+            results = self.get_create_options(ds_options, 'cpu')
 
             cpu_table = Table(['id', 'description'])
             for result in sorted(results):
@@ -477,13 +465,13 @@ Options:
             t.add_row(['cpu', cpu_table])
 
         if args['--memory'] or show_all:
-            results = cls.get_create_options(ds_options, 'memory')[0]
+            results = self.get_create_options(ds_options, 'memory')[0]
 
             t.add_row([results[0], listing(
                 item[0] for item in sorted(results[1]))])
 
         if args['--os'] or show_all:
-            results = cls.get_create_options(ds_options, 'os')
+            results = self.get_create_options(ds_options, 'os')
 
             for result in results:
                 t.add_row([
@@ -494,7 +482,7 @@ Options:
                     )])
 
         if args['--disk'] or show_all:
-            results = cls.get_create_options(ds_options, 'disk')[0]
+            results = self.get_create_options(ds_options, 'disk')[0]
 
             t.add_row([
                 results[0],
@@ -504,22 +492,21 @@ Options:
                 )])
 
         if args['--nic'] or show_all:
-            results = cls.get_create_options(ds_options, 'nic')
+            results = self.get_create_options(ds_options, 'nic')
 
             for result in results:
                 t.add_row([result[0], listing(
                     item[0] for item in sorted(result[1],))])
 
         if args['--controller'] or show_all:
-            results = cls.get_create_options(ds_options, 'disk_controller')[0]
+            results = self.get_create_options(ds_options, 'disk_controller')[0]
 
             t.add_row([results[0], listing(
                 item[0] for item in sorted(results[1],))])
 
         return t
 
-    @classmethod
-    def get_create_options(cls, ds_options, section, pretty=True):
+    def get_create_options(self, ds_options, section, pretty=True):
         """ This method can be used to parse the bare metal instance creation
         options into different sections. This can be useful for data validation
         as well as printing the options on a help screen.
@@ -731,10 +718,9 @@ Optional:
     required_params = ['--hostname', '--domain', '--chassis', '--cpu',
                        '--memory', '--os']
 
-    @classmethod
-    def execute(cls, client, args):
+    def execute(self, args):
         update_with_template_args(args)
-        mgr = HardwareManager(client)
+        mgr = HardwareManager(self.client)
 
         # Disks will be a comma-separated list. Let's make it a real list.
         if isinstance(args.get('--disk'), str):
@@ -744,7 +730,7 @@ Optional:
         if isinstance(args.get('--key'), str):
             args['--key'] = args.get('--key').split(',')
 
-        cls._validate_args(args)
+        self._validate_args(args)
 
         ds_options = mgr.get_dedicated_server_create_options(args['--chassis'])
 
@@ -756,8 +742,8 @@ Optional:
         }
 
         # Convert the OS code back into a price ID
-        os_price = cls._get_price_id_from_options(ds_options, 'os',
-                                                  args['--os'])
+        os_price = self._get_price_id_from_options(ds_options, 'os',
+                                                   args['--os'])
 
         if os_price:
             order['os'] = os_price
@@ -766,39 +752,38 @@ Optional:
 
         order['location'] = args['--datacenter'] or 'FIRST_AVAILABLE'
         order['server'] = args['--cpu']
-        order['ram'] = cls._get_price_id_from_options(ds_options, 'memory',
-                                                      int(args['--memory']))
+        order['ram'] = self._get_price_id_from_options(ds_options, 'memory',
+                                                       int(args['--memory']))
         # Set the disk sizes
         disk_prices = []
         disk_number = 0
         for disk in args.get('--disk'):
-            disk_price = cls._get_disk_price(ds_options, disk, disk_number)
+            disk_price = self._get_disk_price(ds_options, disk, disk_number)
             disk_number += 1
             if disk_price:
                 disk_prices.append(disk_price)
 
         if not disk_prices:
-            disk_prices.append(cls._get_default_value(ds_options, 'disk0'))
+            disk_prices.append(self._get_default_value(ds_options, 'disk0'))
 
         order['disks'] = disk_prices
 
         # Set the disk controller price
         if args.get('--controller'):
-            dc_price = cls._get_price_id_from_options(ds_options,
-                                                      'disk_controller',
-                                                      args.get('--controller'))
+            dc_price = self._get_price_id_from_options(
+                ds_options, 'disk_controller', args.get('--controller'))
         else:
-            dc_price = cls._get_price_id_from_options(ds_options,
-                                                      'disk_controller',
-                                                      'None')
+            dc_price = self._get_price_id_from_options(ds_options,
+                                                       'disk_controller',
+                                                       'None')
 
         order['disk_controller'] = dc_price
 
         # Set the port speed
         port_speed = args.get('--network') or '100'
 
-        nic_price = cls._get_price_id_from_options(ds_options, 'nic',
-                                                   port_speed)
+        nic_price = self._get_price_id_from_options(ds_options, 'nic',
+                                                    port_speed)
 
         if nic_price:
             order['port_speed'] = nic_price
@@ -809,8 +794,8 @@ Optional:
         if args.get('--key'):
             keys = []
             for key in args.get('--key'):
-                key_id = resolve_id(SshKeyManager(client).resolve_ids, key,
-                                    'SshKey')
+                key_id = resolve_id(SshKeyManager(self.client).resolve_ids,
+                                    key, 'SshKey')
                 keys.append(key_id)
             order['ssh_keys'] = keys
 
@@ -869,15 +854,13 @@ Optional:
 
         return output
 
-    @classmethod
-    def _validate_args(cls, args):
-        invalid_args = [k for k in cls.required_params if args.get(k) is None]
+    def _validate_args(self, args):
+        invalid_args = [k for k in self.required_params if args.get(k) is None]
         if invalid_args:
             raise ArgumentError('Missing required options: %s'
                                 % ','.join(invalid_args))
 
-    @classmethod
-    def _get_default_value(cls, ds_options, option):
+    def _get_default_value(self, ds_options, option):
         if option not in ds_options['categories']:
             return
 
@@ -891,26 +874,24 @@ Optional:
             ]):
                 return item['price_id']
 
-    @classmethod
-    def _get_disk_price(cls, ds_options, value, number):
+    def _get_disk_price(self, ds_options, value, number):
         if not number:
-            return cls._get_price_id_from_options(ds_options, 'disk', value)
+            return self._get_price_id_from_options(ds_options, 'disk', value)
         # This will get the item ID for the matching identifier string, which
         # we can then use to get the price ID for our specific disk
-        item_id = cls._get_price_id_from_options(ds_options, 'disk',
-                                                 value, True)
+        item_id = self._get_price_id_from_options(ds_options, 'disk',
+                                                  value, True)
         key = 'disk' + str(number)
         if key in ds_options['categories']:
             for item in ds_options['categories'][key]['items']:
                 if item['id'] == item_id:
                     return item['price_id']
 
-    @classmethod
-    def _get_price_id_from_options(cls, ds_options, option, value,
+    def _get_price_id_from_options(self, ds_options, option, value,
                                    item_id=False):
         ds_obj = ServerCreateOptions()
 
-        for k, v in ds_obj.get_create_options(ds_options, option, False):
+        for _, v in ds_obj.get_create_options(ds_options, option, False):
             for item_options in v:
                 if item_options[0] == value:
                     if not item_id:
@@ -932,8 +913,7 @@ Options:
 """
     action = 'edit'
 
-    @staticmethod
-    def execute(client, args):
+    def execute(self, args):
         data = {}
 
         if args['--userdata'] and args['--userfile']:
@@ -957,7 +937,7 @@ Options:
         data['hostname'] = args.get('--hostname')
         data['domain'] = args.get('--domain')
 
-        hw = HardwareManager(client)
+        hw = HardwareManager(self.client)
         hw_id = resolve_id(hw.resolve_ids, args.get('<identifier>'),
                            'hardware')
         if not hw.edit(hw_id, **data):

@@ -136,12 +136,12 @@ class CCITests(unittest.TestCase):
         f(expected, results.keys())
 
     def test_cancel_instance(self):
-        self.cci.cancel_instance(id=1)
+        self.cci.cancel_instance(1)
         self.client['Virtual_Guest'].deleteObject.assert_called_once_with(id=1)
 
     def test_reload_instance(self):
         post_uri = 'http://test.sftlyr.ws/test.sh'
-        self.cci.reload_instance(id=1, post_uri=post_uri, ssh_keys=[1701])
+        self.cci.reload_instance(1, post_uri=post_uri, ssh_keys=[1701])
         service = self.client['Virtual_Guest']
         f = service.reloadOperatingSystem
         f.assert_called_once_with('FORCE',

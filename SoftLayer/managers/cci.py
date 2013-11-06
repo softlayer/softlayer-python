@@ -132,10 +132,10 @@ class CCIManager(IdentifierMixin, object):
         func = getattr(self.account, call)
         return func(**kwargs)
 
-    def get_instance(self, id, **kwargs):
+    def get_instance(self, instance_id, **kwargs):
         """ Get details about a CCI instance
 
-        :param integer id: the instance ID
+        :param integer instance_id: the instance ID
         :returns: A dictionary containing a large amount of information about
                   the specified instance.
 
@@ -179,7 +179,7 @@ class CCIManager(IdentifierMixin, object):
             ])
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
-        return self.guest.getObject(id=id, **kwargs)
+        return self.guest.getObject(id=instance_id, **kwargs)
 
     def get_create_options(self):
         """ Retrieves the available options for creating a CCI.
@@ -189,18 +189,18 @@ class CCIManager(IdentifierMixin, object):
         """
         return self.guest.getCreateObjectOptions()
 
-    def cancel_instance(self, id):
+    def cancel_instance(self, instance_id):
         """ Cancel an instance immediately, deleting all its data.
 
-        :param integer id: the instance ID to cancel
+        :param integer instance_id: the instance ID to cancel
 
         """
-        return self.guest.deleteObject(id=id)
+        return self.guest.deleteObject(id=instance_id)
 
-    def reload_instance(self, id, post_uri=None, ssh_keys=None):
+    def reload_instance(self, instance_id, post_uri=None, ssh_keys=None):
         """ Perform an OS reload of an instance with its current configuration.
 
-        :param integer id: the instance ID to reload
+        :param integer instance_id: the instance ID to reload
         :param string post_url: The URI of the post-install script to run
                                 after reload
         :param list ssh_keys: The SSH keys to add to the root user
@@ -217,7 +217,7 @@ class CCIManager(IdentifierMixin, object):
             payload['config']['sshKeyIds'] = [key_id for key_id in ssh_keys]
 
         return self.guest.reloadOperatingSystem('FORCE', payload['config'],
-                                                id=id)
+                                                id=instance_id)
 
     def _generate_create_dict(
             self, cpus=None, memory=None, hourly=True,
@@ -338,15 +338,15 @@ class CCIManager(IdentifierMixin, object):
 
         return data
 
-    def wait_for_transaction(self, id, limit, delay=1):
+    def wait_for_transaction(self, instance_id, limit, delay=1):
         """ Waits on a CCI transaction for the specified amount of time.
 
-        :param int id: The instance ID with the pending transaction
+        :param int instance_id: The instance ID with the pending transaction
         :param int limit: The maximum amount of time to wait.
         :param int delay: The number of seconds to sleep before checks.
                           Defaults to 1.
         """
-        for count, new_instance in enumerate(repeat(id)):
+        for count, new_instance in enumerate(repeat(instance_id)):
             instance = self.get_instance(new_instance)
             if not instance.get('activeTransaction', {}).get('id') and \
                     instance.get('provisionDate'):
@@ -370,10 +370,10 @@ class CCIManager(IdentifierMixin, object):
         create_options = self._generate_create_dict(**kwargs)
         return self.guest.createObject(create_options)
 
-    def change_port_speed(self, id, public, speed):
+    def change_port_speed(self, instance_id, public, speed):
         """ Allows you to change the port speed of a CCI's NICs.
 
-        :param int id: The ID of the CCI
+        :param int instance_id: The ID of the CCI
         :param bool public: Flag to indicate which interface to change.
                             True (default) means the public interface.
                             False indicates the private interface.
@@ -384,7 +384,7 @@ class CCIManager(IdentifierMixin, object):
         else:
             func = self.guest.setPrivateNetworkInterfaceSpeed
 
-        return func(speed, id=id)
+        return func(speed, id=instance_id)
 
     def _get_ids_from_hostname(self, hostname):
         results = self.list_instances(hostname=hostname, mask="id")
@@ -406,12 +406,13 @@ class CCIManager(IdentifierMixin, object):
         if results:
             return [result['id'] for result in results]
 
-    def edit(self, id, userdata=None, hostname=None, domain=None, notes=None):
+    def edit(self, instance_id, userdata=None, hostname=None, domain=None,
+             notes=None):
         """ Edit hostname, domain name, notes, and/or the user data of a CCI
 
         Parameters set to None will be ignored and not attempted to be updated.
 
-        :param integer id: the instance ID to edit
+        :param integer instance_id: the instance ID to edit
         :param string userdata: user data on CCI to edit.
                                 If none exist it will be created
         :param string hostname: valid hostname
@@ -422,7 +423,7 @@ class CCIManager(IdentifierMixin, object):
 
         obj = {}
         if userdata:
-            self.guest.setUserMetadata([userdata], id=id)
+            self.guest.setUserMetadata([userdata], id=instance_id)
 
         if hostname:
             obj['hostname'] = hostname
@@ -436,4 +437,4 @@ class CCIManager(IdentifierMixin, object):
         if not obj:
             return True
 
-        return self.guest.editObject(obj, id=id)
+        return self.guest.editObject(obj, id=instance_id)

@@ -11,7 +11,7 @@ import SoftLayer
 import SoftLayer.CLI as cli
 from SoftLayer.tests import unittest
 from SoftLayer.CLI.helpers import CLIAbort
-from SoftLayer.CLI.environment import Environment, InvalidModule
+from SoftLayer.CLI.environment import Environment, InvalidModule, CLIRunnable
 
 
 def module_fixture():
@@ -28,17 +28,16 @@ usage: sl cci [<args>...] [options]
 """
 
 
-class submodule_fixture(object):
+class submodule_fixture(CLIRunnable):
     """
 usage: sl cci list [options]
 
 Options:
-  --hourly                   Show hourly instances
+  --hourly  Show hourly instances
 """
     options = []
 
-    @staticmethod
-    def execute(client, args):
+    def execute(self, args):
         return "test"
 
 
@@ -112,6 +111,16 @@ class CommandLineTests(unittest.TestCase):
         resolver = cli.core.CommandParser(self.env)
         command, command_args = resolver.parse(['cci', 'list'])
         self.assertEqual(submodule_fixture, command)
+
+    def test_main(self):
+        self.env.get_module_name.return_value = 'cci'
+        self.env.plugins = {
+            'cci': {'list': submodule_fixture}
+        }
+        self.assertRaises(
+            SystemExit, cli.core.main,
+            args=['cci', 'list'],
+            env=self.env)
 
     def test_help(self):
         self.env.get_module_name.return_value = 'help'

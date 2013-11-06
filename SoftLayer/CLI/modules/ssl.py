@@ -33,9 +33,8 @@ Options:
 """
     action = 'list'
 
-    @staticmethod
-    def execute(client, args):
-        manager = SSLManager(client)
+    def execute(self, args):
+        manager = SSLManager(self.client)
 
         certificates = manager.list_certs(args['--status'])
 
@@ -66,8 +65,7 @@ Options:
 """
     action = 'add'
 
-    @staticmethod
-    def execute(client, args):
+    def execute(self, args):
         template = {
             'intermediateCertificate': '',
             'certificateSigningRequest': '',
@@ -87,7 +85,7 @@ Options:
         except IOError:
             raise CLIAbort("File does not exist")
 
-        manager = SSLManager(client)
+        manager = SSLManager(self.client)
         manager.add_certificate(template)
 
 
@@ -106,8 +104,7 @@ Options:
 """
     action = 'edit'
 
-    @staticmethod
-    def execute(client, args):
+    def execute(self, args):
         template = {'id': args['<id>']}
         if args['--crt']:
             template['certificate'] = open(args['--crt']).read()
@@ -120,7 +117,7 @@ Options:
         if args['--notes']:
             template['notes'] = args['--notes']
 
-        manager = SSLManager(client)
+        manager = SSLManager(self.client)
         manager.edit_certificate(template)
 
 
@@ -133,9 +130,8 @@ Remove SSL certificate
     action = 'remove'
     options = ['confirm']
 
-    @staticmethod
-    def execute(client, args):
-        manager = SSLManager(client)
+    def execute(self, args):
+        manager = SSLManager(self.client)
         if args['--really'] or no_going_back('yes'):
             manager.remove_certificate(args['<id>'])
         raise CLIAbort("Aborted.")
@@ -149,8 +145,7 @@ Download SSL certificate and key file
 """
     action = 'download'
 
-    @staticmethod
-    def execute(client, args):
+    def execute(self, args):
         def write_cert(filename, content):
             try:
                 fo = open(filename, 'w')
@@ -158,7 +153,7 @@ Download SSL certificate and key file
             finally:
                 fo.close()
 
-        manager = SSLManager(client)
+        manager = SSLManager(self.client)
         certificate = manager.get_certificate(args['<id>'])
 
         write_cert(

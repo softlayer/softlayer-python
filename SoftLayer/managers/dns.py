@@ -8,7 +8,6 @@
 """
 from time import strftime
 
-from SoftLayer.exceptions import DNSZoneNotFound
 from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
 
 
@@ -34,9 +33,9 @@ class DNSManager(IdentifierMixin, object):
         self.resolvers = [self._get_zone_id_from_name]
 
     def _get_zone_id_from_name(self, name):
-            results = self.client['Account'].getDomains(
-                filter={"domains": {"name": query_filter(name)}})
-            return [x['id'] for x in results]
+        results = self.client['Account'].getDomains(
+            filter={"domains": {"name": query_filter(name)}})
+        return [x['id'] for x in results]
 
     def list_zones(self, **kwargs):
         """ Retrieve a list of all DNS zones.
@@ -72,13 +71,13 @@ class DNSManager(IdentifierMixin, object):
             'serial': serial or strftime('%Y%m%d01'),
             "resourceRecords": {}})
 
-    def delete_zone(self, id):
+    def delete_zone(self, zone_id):
         """ Delete a zone by its ID.
 
-        :param integer id: the zone ID to delete
+        :param integer zone_id: the zone ID to delete
 
         """
-        return self.service.deleteObject(id=id)
+        return self.service.deleteObject(id=zone_id)
 
     def edit_zone(self, zone):
         """ Update an existing zone with the options provided. The provided
@@ -90,12 +89,12 @@ class DNSManager(IdentifierMixin, object):
         """
         self.service.editObject(zone)
 
-    def create_record(self, zone_id, record, type, data, ttl=60):
+    def create_record(self, zone_id, record, record_type, data, ttl=60):
         """ Create a resource record on a domain.
 
         :param integer id: the zone's ID
         :param record: the name of the record to add
-        :param type: the type of record (A, AAAA, CNAME, MX, SRV, TXT, etc.)
+        :param record_type: the type of record (A, AAAA, CNAME, MX, TXT, etc.)
         :param data: the record's value
         :param integer ttl: the TTL or time-to-live value (default: 60)
 
@@ -104,7 +103,7 @@ class DNSManager(IdentifierMixin, object):
             'domainId': zone_id,
             'ttl': ttl,
             'host': record,
-            'type': type,
+            'type': record_type,
             'data': data})
 
     def delete_record(self, record_id):
@@ -116,14 +115,14 @@ class DNSManager(IdentifierMixin, object):
         self.record.deleteObject(id=record_id)
 
     def get_records(self, zone_id, ttl=None, data=None, host=None,
-                    type=None, **kwargs):
+                    record_type=None):
         """ List, and optionally filter, records within a zone.
 
         :param zone: the zone name in which to search.
         :param int ttl: optionally, time in seconds:
         :param data: optionally, the records data
         :param host: optionally, record's host
-        :param type: optionally, the type of record:
+        :param record_type: optionally, the type of record:
 
         :returns: A list of dictionaries representing the matching records
                   within the specified zone.
@@ -139,8 +138,9 @@ class DNSManager(IdentifierMixin, object):
         if data:
             _filter['resourceRecords']['data'] = query_filter(data)
 
-        if type:
-            _filter['resourceRecords']['type'] = query_filter(type.lower())
+        if record_type:
+            _filter['resourceRecords']['type'] = query_filter(
+                record_type.lower())
 
         results = self.service.getResourceRecords(
             id=zone_id,
