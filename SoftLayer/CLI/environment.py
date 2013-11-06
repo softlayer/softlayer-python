@@ -6,11 +6,12 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
-import sys
 import getpass
 from importlib import import_module
+import inspect
 import os
 import os.path
+import sys
 
 from SoftLayer.CLI.modules import get_module_list
 from SoftLayer import SoftLayerError
@@ -62,7 +63,12 @@ class Environment(object):
 
     def load_module(self, module_name):  # pragma: no cover
         try:
-            return import_module('SoftLayer.CLI.modules.%s' % module_name)
+            module = import_module('SoftLayer.CLI.modules.%s' % module_name)
+            for name, obj in inspect.getmembers(module):
+                if inspect.isclass(obj) and issubclass(obj, CLIRunnable):
+                    obj.env = self
+                    self.add_plugin(obj)
+            return module
         except ImportError:
             raise InvalidModule(module_name)
 
@@ -95,20 +101,11 @@ class Environment(object):
         sys.exit(code)
 
 
-class CLIRunnableType(type):
-
-    env = Environment()
-
-    def __init__(cls, name, bases, attrs):
-        super(CLIRunnableType, cls).__init__(name, bases, attrs)
-        if cls.env and name != 'CLIRunnable':
-            cls.env.add_plugin(cls)
-
-
 class CLIRunnable(object):
-    __metaclass__ = CLIRunnableType
-    options = []
-    action = None
+    options = []  # set by subclass
+    action = None  # set by subclass
+
+    env = None  # gets set later by Environment.load_module()
 
     @staticmethod
     def add_additional_args(parser):

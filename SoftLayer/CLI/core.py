@@ -51,8 +51,7 @@ from docopt import docopt, DocoptExit
 from SoftLayer import Client, TimedClient, SoftLayerError, SoftLayerAPIError
 from SoftLayer.consts import VERSION
 from helpers import CLIAbort, ArgumentError, format_output, KeyValueTable
-from environment import (
-    Environment, CLIRunnableType, InvalidCommand, InvalidModule)
+from environment import Environment, InvalidCommand, InvalidModule
 
 
 DEBUG_LOGGING_MAP = {
@@ -154,7 +153,6 @@ def main(args=sys.argv[1:], env=Environment()):
     Entry point for the command-line client.
     """
     # Parse Top-Level Arguments
-    CLIRunnableType.env = env
     exit_status = 0
     resolver = CommandParser(env)
     try:
