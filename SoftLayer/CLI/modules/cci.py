@@ -384,7 +384,7 @@ Optional:
     def execute(self, args):
         update_with_template_args(args)
         cci = CCIManager(self.client)
-        self._update_with_like_args(cci, args)
+        self._update_with_like_args(args)
 
         # SSH keys may be a comma-separated list. Let's make it a real list.
         if isinstance(args.get('--key'), str):
@@ -398,7 +398,7 @@ Optional:
         t = Table(['Item', 'cost'])
         t.align['Item'] = 'r'
         t.align['cost'] = 'r'
-        data = self._parse_create_args(self.client, args)
+        data = self._parse_create_args(args)
 
         output = []
         if args.get('--test'):
@@ -845,7 +845,7 @@ Options:
     def execute(self, args):
         args['--ttl'] = args['--ttl'] or 7200
         if args['sync']:
-            return self.dns_sync(self.client, args)
+            return self.dns_sync(args)
 
     def dns_sync(self, args):
         dns = DNSManager(self.client)
