@@ -499,13 +499,14 @@ Optional:
                     'File does not exist [-u | --userfile] = %s'
                     % args['--userfile'])
 
-    def _update_with_like_args(self, cci, args):
+    def _update_with_like_args(self, args):
         """ Update arguments with options taken from a currently running CCI.
 
         :param CCIManager args: A CCIManager
         :param dict args: CLI arguments
         """
         if args['--like']:
+            cci = CCIManager(self.client)
             cci_id = resolve_id(cci.resolve_ids, args.pop('--like'), 'CCI')
             like_details = cci.get_instance(cci_id)
             like_args = {
@@ -548,7 +549,7 @@ Optional:
                 if args.get(key) in [None, False]:
                     args[key] = value
 
-    def _parse_create_args(self, client, args):
+    def _parse_create_args(self, args):
         """ Converts CLI arguments to arguments that can be passed into
             CCIManager.create_instance.
 
@@ -609,8 +610,8 @@ Optional:
         if args.get('--key'):
             keys = []
             for key in args.get('--key'):
-                key_id = resolve_id(SshKeyManager(client).resolve_ids, key,
-                                    'SshKey')
+                key_id = resolve_id(SshKeyManager(self.client).resolve_ids,
+                                    key, 'SshKey')
                 keys.append(key_id)
             data['ssh_keys'] = keys
 
@@ -846,9 +847,9 @@ Options:
         if args['sync']:
             return self.dns_sync(self.client, args)
 
-    def dns_sync(self, client, args):
-        dns = DNSManager(client)
-        cci = CCIManager(client)
+    def dns_sync(self, args):
+        dns = DNSManager(self.client)
+        cci = CCIManager(self.client)
 
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         instance = cci.get_instance(cci_id)
@@ -880,7 +881,7 @@ Options:
 
         def sync_ptr_record():
             host_rec = instance['primaryIpAddress'].split('.')[-1]
-            ptr_domains = client['Virtual_Guest'].\
+            ptr_domains = self.client['Virtual_Guest'].\
                 getReverseDomainRecords(id=instance['id'])[0]
             edit_ptr = None
             for ptr in ptr_domains['resourceRecords']:
