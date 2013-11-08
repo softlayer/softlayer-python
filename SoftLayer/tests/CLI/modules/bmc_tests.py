@@ -18,7 +18,7 @@ from SoftLayer.tests.mocks import product_package_mock
 
 class BMCCLITests(unittest.TestCase):
     def setUp(self):
-        self.client = MagicMock()
+        self.client = self._setup_package_mocks(MagicMock())
 
     def test_BMCCreateOptions(self):
         args = {
@@ -32,8 +32,7 @@ class BMCCLITests(unittest.TestCase):
             '--controller': False,
         }
 
-        client = self._setup_package_mocks(self.client)
-        output = bmc.BMCCreateOptions.execute(client, args)
+        output = bmc.BMCCreateOptions(client=self.client).execute(args)
 
         expected = {
             'datacenter': ['RANDOM_LOCATION'],
@@ -55,8 +54,8 @@ class BMCCLITests(unittest.TestCase):
         self.assertEqual(expected, format_output(output, 'python'))
 
         # Check get_create_options() with invalid input
-        self.assertEqual([], bmc.BMCCreateOptions.get_create_options([],
-                                                                     'nope'))
+        self.assertEqual(
+            [], bmc.BMCCreateOptions().get_create_options([], 'nope'))
 
     def test_BMCCreateOptions_with_cpu_only(self):
         args = {
@@ -70,9 +69,7 @@ class BMCCLITests(unittest.TestCase):
             '--controller': False,
         }
 
-        client = self._setup_package_mocks(self.client)
-
-        output = bmc.BMCCreateOptions.execute(client, args)
+        output = bmc.BMCCreateOptions(client=self.client).execute(args)
 
         expected = {
             'memory/cpu': [
@@ -104,8 +101,6 @@ class BMCCLITests(unittest.TestCase):
             '--vlan_private': 20468,
         }
 
-        client = self._setup_package_mocks(self.client)
-
         # First, test the --test flag
         with patch('SoftLayer.HardwareManager.verify_order') as verify_mock:
             verify_mock.return_value = {
@@ -124,7 +119,7 @@ class BMCCLITests(unittest.TestCase):
                     }
                 ]
             }
-            output = bmc.CreateBMCInstance.execute(client, args)
+            output = bmc.CreateBMCInstance(client=self.client).execute(args)
 
             expected = """:...................:......:
 :              Item : cost :
@@ -140,7 +135,7 @@ class BMCCLITests(unittest.TestCase):
             args['--hourly'] = False
             args['--monthly'] = True
 
-            output = bmc.CreateBMCInstance.execute(client, args)
+            output = bmc.CreateBMCInstance(client=self.client).execute(args)
 
             expected = """:....................:.......:
 :               Item :  cost :
@@ -156,7 +151,7 @@ class BMCCLITests(unittest.TestCase):
             # Make sure we can order without specifying the disk as well
             args['--disk'] = []
 
-            output = bmc.CreateBMCInstance.execute(client, args)
+            output = bmc.CreateBMCInstance(client=self.client).execute(args)
 
             self.assertEqual(expected, format_output(output, 'table'))
 
@@ -165,14 +160,14 @@ class BMCCLITests(unittest.TestCase):
             args['--disk'] = '1000_DRIVE,1000_DRIVE'
             args['--key'] = '123,456'
 
-            output = bmc.CreateBMCInstance.execute(client, args)
+            output = bmc.CreateBMCInstance(client=self.client).execute(args)
 
             self.assertEqual(expected, format_output(output, 'table'))
 
             # Test explicitly setting a RAID configuration
             args['--controller'] = 'RAID0'
 
-            output = bmc.CreateBMCInstance.execute(client, args)
+            output = bmc.CreateBMCInstance(client=self.client).execute(args)
 
             self.assertEqual(expected, format_output(output, 'table'))
 
@@ -186,7 +181,7 @@ class BMCCLITests(unittest.TestCase):
             args['--test'] = False
             args['--really'] = True
 
-            output = bmc.CreateBMCInstance.execute(self.client, args)
+            output = bmc.CreateBMCInstance(client=self.client).execute(args)
 
             expected = {'id': 98765, 'created': '2013-08-02 15:23:47'}
             self.assertEqual(expected, format_output(output, 'python'))
@@ -197,12 +192,11 @@ class BMCCLITests(unittest.TestCase):
 
             args['--really'] = False
 
-            self.assertRaises(CLIAbort,
-                              bmc.CreateBMCInstance.execute, self.client, args)
+            self.assertRaises(
+                CLIAbort,
+                bmc.CreateBMCInstance(client=self.client).execute, args)
 
     def test_CreateBMCInstance_failures(self):
-        client = self._setup_package_mocks(self.client)
-
         # This is missing a required argument
         args = {
             '--domain': 'example.com',
@@ -220,46 +214,41 @@ class BMCCLITests(unittest.TestCase):
             '--monthly': '0',
         }
 
+        runnable = bmc.CreateBMCInstance(client=self.client)
+
         # Verify that ArgumentError is properly raised on error
-        self.assertRaises(ArgumentError,
-                          bmc.CreateBMCInstance.execute, client, args)
+        self.assertRaises(ArgumentError, runnable.execute, args)
 
         # Sending strange values for hourly and monthly
         args['--hostname'] = 'bmc-test'
-        self.assertRaises(ArgumentError,
-                          bmc.CreateBMCInstance.execute, client, args)
+        self.assertRaises(ArgumentError, runnable.execute, args)
 
         # Send both hourly and monthly
         args['--hourly'] = True
         args['--monthly'] = True
-        self.assertRaises(ArgumentError,
-                          bmc.CreateBMCInstance.execute, client, args)
+        self.assertRaises(ArgumentError, runnable.execute, args)
 
         # Send neither hourly nor monthly
         args['--hourly'] = False
         args['--monthly'] = False
-        self.assertRaises(ArgumentError,
-                          bmc.CreateBMCInstance.execute, client, args)
+        self.assertRaises(ArgumentError, runnable.execute, args)
 
         # This is missing a server_core combo
         args['--monthly'] = True
         args['--cpu'] = 100
-        self.assertRaises(CLIAbort,
-                          bmc.CreateBMCInstance.execute, client, args)
+        self.assertRaises(CLIAbort, runnable.execute, args)
 
         # This section is missing an OS code
         args['--cpu'] = '2'
         args['--os'] = 'nope'
 
-        self.assertRaises(CLIAbort,
-                          bmc.CreateBMCInstance.execute, client, args)
+        self.assertRaises(CLIAbort, runnable.execute, args)
 
         # This section is missing a NIC speed
         args['--os'] = 'UBUNTU_12_64_MINIMAL'
         args['--network'] = 'nope'
 
-        self.assertRaises(CLIAbort,
-                          bmc.CreateBMCInstance.execute, client, args)
+        self.assertRaises(CLIAbort, runnable.execute, args)
 
     @patch('SoftLayer.CLI.modules.bmc.CLIAbort')
     @patch('SoftLayer.CLI.modules.bmc.no_going_back')
@@ -273,19 +262,20 @@ class BMCCLITests(unittest.TestCase):
 
         # Check the positive case
         args = {'--really': True, '--immediate': False}
-        bmc.CancelInstance.execute(self.client, args)
+        bmc.CancelInstance(client=self.client).execute(args)
 
         cancel_mock.assert_called_with(hw_id, False)
 
         # Now check to make sure we properly call CLIAbort in the negative case
         args['--really'] = False
 
-        bmc.CancelInstance.execute(self.client, args)
+        bmc.CancelInstance(client=self.client).execute(args)
         abort_mock.assert_called()
 
     def test_get_default_value_returns_none_for_unknown_category(self):
         option_mock = {'categories': {'cat1': []}}
-        output = bmc.CreateBMCInstance._get_default_value(option_mock, 'nope')
+        runnable = bmc.CreateBMCInstance(client=self.client)
+        output = runnable._get_default_value(option_mock, 'nope')
         self.assertEqual(None, output)
 
     @staticmethod

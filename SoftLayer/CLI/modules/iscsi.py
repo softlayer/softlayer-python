@@ -21,9 +21,8 @@ List iSCSI accounts
 """
     action = 'list'
 
-    @staticmethod
-    def execute(client, args):
-        account = client['Account']
+    def execute(self, args):
+        account = self.client['Account']
 
         iscsi = account.getIscsiNetworkStorage(
             mask='eventCount,serviceResource[datacenter.name]')

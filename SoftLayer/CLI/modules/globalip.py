@@ -31,15 +31,14 @@ Required:
 """
     action = 'assign'
 
-    @staticmethod
-    def execute(client, args):
-        mgr = NetworkManager(client)
+    def execute(self, args):
+        mgr = NetworkManager(self.client)
 
-        id = mgr.resolve_global_ip_ids(args.get('<identifier>'))
-        if not id:
+        global_ip_id = mgr.resolve_global_ip_ids(args.get('<identifier>'))
+        if not global_ip_id:
             raise CLIAbort("Unable to find global IP record for " +
                            args['<identifier>'])
-        mgr.assign_global_ip(id, args['<target>'])
+        mgr.assign_global_ip(global_ip_id, args['<target>'])
 
 
 class GlobalIpCancel(CLIRunnable):
@@ -52,13 +51,12 @@ Cancel a subnet
     action = 'cancel'
     options = ['confirm']
 
-    @staticmethod
-    def execute(client, args):
-        mgr = NetworkManager(client)
-        id = mgr.resolve_global_ip_ids(args.get('<identifier>'))
+    def execute(self, args):
+        mgr = NetworkManager(self.client)
+        global_ip_id = mgr.resolve_global_ip_ids(args.get('<identifier>'))
 
-        if args['--really'] or no_going_back(id):
-            mgr.cancel_global_ip(id)
+        if args['--really'] or no_going_back(global_ip_id):
+            mgr.cancel_global_ip(global_ip_id)
         else:
             CLIAbort('Aborted')
 
@@ -77,9 +75,8 @@ Options:
     action = 'create'
     options = ['confirm']
 
-    @staticmethod
-    def execute(client, args):
-        mgr = NetworkManager(client)
+    def execute(self, args):
+        mgr = NetworkManager(self.client)
 
         version = 4
         if args.get('--v6'):
@@ -126,9 +123,8 @@ Filters:
 """
     action = 'list'
 
-    @staticmethod
-    def execute(client, args):
-        mgr = NetworkManager(client)
+    def execute(self, args):
+        mgr = NetworkManager(self.client)
 
         t = Table([
             'id', 'ip', 'assigned', 'target'
@@ -174,12 +170,11 @@ Required:
 """
     action = 'unassign'
 
-    @staticmethod
-    def execute(client, args):
-        mgr = NetworkManager(client)
+    def execute(self, args):
+        mgr = NetworkManager(self.client)
 
-        id = mgr.resolve_global_ip_ids(args.get('<identifier>'))
-        if not id:
+        global_ip_id = mgr.resolve_global_ip_ids(args.get('<identifier>'))
+        if not global_ip_id:
             raise CLIAbort("Unable to find global IP record for " +
                            args['<identifier>'])
-        mgr.unassign_global_ip(id)
+        mgr.unassign_global_ip(global_ip_id)

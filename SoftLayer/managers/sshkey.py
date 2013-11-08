@@ -43,18 +43,18 @@ class SshKeyManager(IdentifierMixin, object):
 
         return self.sshkey.createObject(order)
 
-    def delete_key(self, id):
+    def delete_key(self, key_id):
         """ Permanently deletes an SSH key from the account.
 
-        :param int id: The ID of the key to delete
+        :param int key_id: The ID of the key to delete
 
         """
-        return self.sshkey.deleteObject(id=id)
+        return self.sshkey.deleteObject(id=key_id)
 
-    def edit_key(self, id, label=None, notes=None):
+    def edit_key(self, key_id, label=None, notes=None):
         """ Edits information about an SSH key.
 
-        :param int id: The ID of the key to edit
+        :param int key_id: The ID of the key to edit
         :param string label: The new label for the key
         :param string notes: Notes to set or change on the key
         :returns: A Boolean indicating success or failure
@@ -67,15 +67,15 @@ class SshKeyManager(IdentifierMixin, object):
         if notes:
             data['notes'] = notes
 
-        return self.sshkey.editObject(data, id=id)
+        return self.sshkey.editObject(data, id=key_id)
 
-    def get_key(self, id):
+    def get_key(self, key_id):
         """ Returns full information about a single SSH key.
 
-        :param int id: The ID of the key to retrieve
+        :param int key_id: The ID of the key to retrieve
         :returns: A dictionary of information about the key
         """
-        return self.sshkey.getObject(id=id)
+        return self.sshkey.getObject(id=key_id)
 
     def list_keys(self, label=None):
         """ Lists all SSH keys on the account.

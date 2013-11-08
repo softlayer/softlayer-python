@@ -26,9 +26,8 @@ Filters:
 """
     action = 'detail'
 
-    @staticmethod
-    def execute(client, args):
-        mgr = NetworkManager(client)
+    def execute(self, args):
+        mgr = NetworkManager(self.client)
 
         vlan = mgr.get_vlan(args.get('<identifier>'))
 
@@ -104,9 +103,8 @@ Filters:
 """
     action = 'list'
 
-    @staticmethod
-    def execute(client, args):
-        mgr = NetworkManager(client)
+    def execute(self, args):
+        mgr = NetworkManager(self.client)
 
         t = Table([
             'id', 'number', 'datacenter', 'IPs', 'hardware', 'ccis',

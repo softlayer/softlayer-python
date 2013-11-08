@@ -89,9 +89,8 @@ class PromptTests(unittest.TestCase):
         self.assertFalse(result)
 
     def test_clirunnable_exercise(self):
-        res = cli.CLIRunnable.add_additional_args(None)
-        self.assertEqual(res, None)
-        res = cli.CLIRunnable.execute(None, None)
+        runnable = cli.CLIRunnable()
+        res = runnable.execute({})
         self.assertEqual(res, None)
 
     @patch(raw_input_path)

@@ -120,8 +120,7 @@ Standard Options:
             version=VERSION,
             argv=[module_name] + args,
             options_first=True)
-        module = self.env.load_module(module_name)
-        return module, arguments
+        return arguments
 
     def parse_command_args(self, module_name, command_name, args):
         command = self.env.get_command(module_name, command_name)
@@ -135,8 +134,7 @@ Standard Options:
         module_name = main_args['<module>']
 
         # handle `sl <module> ...`
-        module, module_args = self.parse_module_args(
-            module_name, main_args['<args>'])
+        module_args = self.parse_module_args(module_name, main_args['<args>'])
 
         # get the command argument
         command_name = module_args.get('<command>')
@@ -172,24 +170,25 @@ def main(args=sys.argv[1:], env=Environment()):
             client = Client(config_file=command_args.get('--config'))
 
         # Do the thing
-        data = command.execute(client, command_args)
+        runnable = command(client=client, env=env)
+        data = runnable.execute(command_args)
         if data:
-            format = command_args.get('--format', 'table')
-            if format not in VALID_FORMATS:
-                raise ArgumentError('Invalid format "%s"' % format)
-            s = format_output(data, fmt=format)
+            out_format = command_args.get('--format', 'table')
+            if out_format not in VALID_FORMATS:
+                raise ArgumentError('Invalid format "%s"' % out_format)
+            s = format_output(data, fmt=out_format)
             if s:
                 env.out(s)
 
         if command_args.get('--timings'):
-            format = command_args.get('--format', 'table')
+            out_format = command_args.get('--format', 'table')
             api_calls = client.get_last_calls()
             t = KeyValueTable(['call', 'time'])
 
-            for call, initiated, duration in api_calls:
+            for call, _, duration in api_calls:
                 t.add_row([call, duration])
 
-            env.err(format_output(t, fmt=format))
+            env.err(format_output(t, fmt=out_format))
 
     except InvalidCommand as e:
         env.err(resolver.get_module_help(e.module_name))

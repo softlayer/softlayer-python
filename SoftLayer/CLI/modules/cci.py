@@ -74,9 +74,8 @@ For more on filters see 'sl help filters'
 """
     action = 'list'
 
-    @staticmethod
-    def execute(client, args):
-        cci = CCIManager(client)
+    def execute(self, args):
+        cci = CCIManager(self.client)
 
         tags = None
         if args.get('--tags'):
@@ -128,9 +127,8 @@ Options:
 """
     action = 'detail'
 
-    @staticmethod
-    def execute(client, args):
-        cci = CCIManager(client)
+    def execute(self, args):
+        cci = CCIManager(self.client)
         t = KeyValueTable(['Name', 'Value'])
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
@@ -197,7 +195,7 @@ Options:
             t.add_row(['tags', listing(tag_row, separator=',')])
 
         if not result['privateNetworkOnlyFlag']:
-            ptr_domains = client['Virtual_Guest'].\
+            ptr_domains = self.client['Virtual_Guest'].\
                 getReverseDomainRecords(id=cci_id)
 
             for ptr_domain in ptr_domains:
@@ -225,13 +223,12 @@ Options:
     action = 'create-options'
     options = ['datacenter', 'cpu', 'nic', 'disk', 'os', 'memory']
 
-    @classmethod
-    def execute(cls, client, args):
-        cci = CCIManager(client)
+    def execute(self, args):
+        cci = CCIManager(self.client)
         result = cci.get_create_options()
 
         show_all = True
-        for opt_name in cls.options:
+        for opt_name in self.options:
             if args.get("--" + opt_name):
                 show_all = False
                 break
@@ -384,17 +381,16 @@ Optional:
     options = ['confirm']
     required_params = ['--hostname', '--domain', '--cpu', '--memory']
 
-    @classmethod
-    def execute(cls, client, args):
+    def execute(self, args):
         update_with_template_args(args)
-        cci = CCIManager(client)
-        cls._update_with_like_args(cci, args)
+        cci = CCIManager(self.client)
+        self._update_with_like_args(args)
 
         # SSH keys may be a comma-separated list. Let's make it a real list.
         if isinstance(args.get('--key'), str):
             args['--key'] = args.get('--key').split(',')
 
-        cls._validate_args(args)
+        self._validate_args(args)
 
         # Do not create CCI with --test or --export
         do_create = not (args['--export'] or args['--test'])
@@ -402,7 +398,7 @@ Optional:
         t = Table(['Item', 'cost'])
         t.align['Item'] = 'r'
         t.align['cost'] = 'r'
-        data = cls._parse_create_args(client, args)
+        data = self._parse_create_args(args)
 
         output = []
         if args.get('--test'):
@@ -468,9 +464,8 @@ Optional:
 
         return output
 
-    @classmethod
-    def _validate_args(cls, args):
-        invalid_args = [k for k in cls.required_params if args.get(k) is None]
+    def _validate_args(self, args):
+        invalid_args = [k for k in self.required_params if args.get(k) is None]
         if invalid_args:
             raise ArgumentError('Missing required options: %s'
                                 % ','.join(invalid_args))
@@ -504,14 +499,14 @@ Optional:
                     'File does not exist [-u | --userfile] = %s'
                     % args['--userfile'])
 
-    @staticmethod
-    def _update_with_like_args(cci, args):
+    def _update_with_like_args(self, args):
         """ Update arguments with options taken from a currently running CCI.
 
         :param CCIManager args: A CCIManager
         :param dict args: CLI arguments
         """
         if args['--like']:
+            cci = CCIManager(self.client)
             cci_id = resolve_id(cci.resolve_ids, args.pop('--like'), 'CCI')
             like_details = cci.get_instance(cci_id)
             like_args = {
@@ -554,8 +549,7 @@ Optional:
                 if args.get(key) in [None, False]:
                     args[key] = value
 
-    @staticmethod
-    def _parse_create_args(client, args):
+    def _parse_create_args(self, args):
         """ Converts CLI arguments to arguments that can be passed into
             CCIManager.create_instance.
 
@@ -616,8 +610,8 @@ Optional:
         if args.get('--key'):
             keys = []
             for key in args.get('--key'):
-                key_id = resolve_id(SshKeyManager(client).resolve_ids, key,
-                                    'SshKey')
+                key_id = resolve_id(SshKeyManager(self.client).resolve_ids,
+                                    key, 'SshKey')
                 keys.append(key_id)
             data['ssh_keys'] = keys
 
@@ -642,9 +636,8 @@ Optional:
 """
     action = 'ready'
 
-    @staticmethod
-    def execute(client, args):
-        cci = CCIManager(client)
+    def execute(self, args):
+        cci = CCIManager(self.client)
 
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         ready = cci.wait_for_transaction(cci_id, int(args.get('--wait') or 0))
@@ -671,15 +664,14 @@ Optional:
     action = 'reload'
     options = ['confirm']
 
-    @staticmethod
-    def execute(client, args):
-        cci = CCIManager(client)
+    def execute(self, args):
+        cci = CCIManager(self.client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         keys = []
         if args.get('--key'):
             for key in args.get('--key'):
-                key_id = resolve_id(SshKeyManager(client).resolve_ids, key,
-                                    'SshKey')
+                key_id = resolve_id(SshKeyManager(self.client).resolve_ids,
+                                    key, 'SshKey')
                 keys.append(key_id)
         if args['--really'] or no_going_back(cci_id):
             cci.reload_instance(cci_id, args['--postinstall'], keys)
@@ -697,9 +689,8 @@ Cancel a CCI
     action = 'cancel'
     options = ['confirm']
 
-    @staticmethod
-    def execute(client, args):
-        cci = CCIManager(client)
+    def execute(self, args):
+        cci = CCIManager(self.client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         if args['--really'] or no_going_back(cci_id):
             cci.cancel_instance(cci_id)
@@ -719,10 +710,9 @@ Optional:
     action = 'power-off'
     options = ['confirm']
 
-    @classmethod
-    def execute(cls, client, args):
-        vg = client['Virtual_Guest']
-        cci = CCIManager(client)
+    def execute(self, args):
+        vg = self.client['Virtual_Guest']
+        cci = CCIManager(self.client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         if args['--really'] or confirm('This will power off the CCI with id '
                                        '%s. Continue?' % cci_id):
@@ -747,10 +737,9 @@ Optional:
     action = 'reboot'
     options = ['confirm']
 
-    @classmethod
-    def execute(cls, client, args):
-        vg = client['Virtual_Guest']
-        cci = CCIManager(client)
+    def execute(self, args):
+        vg = self.client['Virtual_Guest']
+        cci = CCIManager(self.client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         if args['--really'] or confirm('This will reboot the CCI with id '
                                        '%s. Continue?' % cci_id):
@@ -772,10 +761,9 @@ Power on a CCI
 """
     action = 'power-on'
 
-    @classmethod
-    def execute(cls, client, args):
-        vg = client['Virtual_Guest']
-        cci = CCIManager(client)
+    def execute(self, args):
+        vg = self.client['Virtual_Guest']
+        cci = CCIManager(self.client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         vg.powerOn(id=cci_id)
 
@@ -789,10 +777,9 @@ Pauses an active CCI
     action = 'pause'
     options = ['confirm']
 
-    @classmethod
-    def execute(cls, client, args):
-        vg = client['Virtual_Guest']
-        cci = CCIManager(client)
+    def execute(self, args):
+        vg = self.client['Virtual_Guest']
+        cci = CCIManager(self.client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
 
         if args['--really'] or confirm('This will pause the CCI with id '
@@ -810,10 +797,9 @@ Resumes a paused CCI
 """
     action = 'resume'
 
-    @classmethod
-    def execute(cls, client, args):
-        vg = client['Virtual_Guest']
-        cci = CCIManager(client)
+    def execute(self, args):
+        vg = self.client['Virtual_Guest']
+        cci = CCIManager(self.client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         vg.resume(id=cci_id)
 
@@ -830,11 +816,10 @@ Options:
 """
     action = 'nic-edit'
 
-    @classmethod
-    def execute(cls, client, args):
+    def execute(self, args):
         public = args['public']
 
-        cci = CCIManager(client)
+        cci = CCIManager(self.client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
 
         cci.change_port_speed(cci_id, public, args['--speed'])
@@ -857,16 +842,14 @@ Options:
     action = 'dns'
     options = ['confirm']
 
-    @classmethod
-    def execute(cls, client, args, env):
+    def execute(self, args):
         args['--ttl'] = args['--ttl'] or 7200
         if args['sync']:
-            return cls.dns_sync(client, args)
+            return self.dns_sync(args)
 
-    @staticmethod
-    def dns_sync(client, args):
-        dns = DNSManager(client)
-        cci = CCIManager(client)
+    def dns_sync(self, args):
+        dns = DNSManager(self.client)
+        cci = CCIManager(self.client)
 
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         instance = cci.get_instance(cci_id)
@@ -898,7 +881,7 @@ Options:
 
         def sync_ptr_record():
             host_rec = instance['primaryIpAddress'].split('.')[-1]
-            ptr_domains = client['Virtual_Guest'].\
+            ptr_domains = self.client['Virtual_Guest'].\
                 getReverseDomainRecords(id=instance['id'])[0]
             edit_ptr = None
             for ptr in ptr_domains['resourceRecords']:
@@ -959,8 +942,7 @@ Options:
 """
     action = 'edit'
 
-    @staticmethod
-    def execute(client, args):
+    def execute(self, args):
         data = {}
 
         if args['--userdata'] and args['--userfile']:
@@ -984,7 +966,7 @@ Options:
         data['hostname'] = args.get('--hostname')
         data['domain'] = args.get('--domain')
 
-        cci = CCIManager(client)
+        cci = CCIManager(self.client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         if not cci.edit(cci_id, **data):
             raise CLIAbort("Failed to update CCI")

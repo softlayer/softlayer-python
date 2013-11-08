@@ -34,26 +34,26 @@ class NetworkManager(IdentifierMixin, object):
         # This method is here to improve the public interface from a user's
         # perspective since ordering a single global IP through the subnet
         # interface is not intuitive.
-        return self.add_subnet(type='global', version=version,
+        return self.add_subnet('global', version=version,
                                test_order=test_order)
 
-    def add_subnet(self, type, quantity=None, vlan_id=None, version=4,
+    def add_subnet(self, subnet_type, quantity=None, vlan_id=None, version=4,
                    test_order=False):
         package = self.client['Product_Package']
         category = 'sov_sec_ip_addresses_priv'
         if version == 4:
-            if type == 'global':
+            if subnet_type == 'global':
                 quantity = 0
                 category = 'global_ipv4'
-            elif type == 'public':
+            elif subnet_type == 'public':
                 category = 'sov_sec_ip_addresses_pub'
         else:
             category = 'static_ipv6_addresses'
-            if type == 'global':
+            if subnet_type == 'global':
                 quantity = 0
                 category = 'global_ipv6'
                 desc = 'Global'
-            elif type == 'public':
+            elif subnet_type == 'public':
                 desc = 'Portable'
 
         price_id = None
@@ -88,33 +88,33 @@ class NetworkManager(IdentifierMixin, object):
             'SoftLayer_Container_Product_Order_Network_Subnet'
         return func(order)
 
-    def assign_global_ip(self, id, target):
+    def assign_global_ip(self, global_ip_id, target):
         """ Assigns a global IP address to a specified target.
 
-        :param int id: The ID of the global IP being assigned
+        :param int global_ip_id: The ID of the global IP being assigned
         :param string target: The IP address to assign
         """
-        return self.client['Network_Subnet_IpAddress_Global'].route(target,
-                                                                    id=id)
+        return self.client['Network_Subnet_IpAddress_Global'].route(
+            target, id=global_ip_id)
 
-    def cancel_global_ip(self, id):
+    def cancel_global_ip(self, global_ip_id):
         """ Cancels the specified global IP address.
 
         :param int id: The ID of the global IP to be cancelled.
         """
         service = self.client['Network_Subnet_IpAddress_Global']
-        ip = service.getObject(id=id, mask='mask[billingItem]')
+        ip = service.getObject(id=global_ip_id, mask='mask[billingItem]')
         billing_id = ip['billingItem']['id']
 
         billing_item = self.client['Billing_Item']
         return billing_item.cancelService(id=billing_id)
 
-    def cancel_subnet(self, id):
+    def cancel_subnet(self, subnet_id):
         """ Cancels the specified subnet.
 
-        :param int id: The ID of the subnet to be cancelled.
+        :param int subnet_id: The ID of the subnet to be cancelled.
         """
-        subnet = self.get_subnet(id=id, mask='mask[id, billingItem.id]')
+        subnet = self.get_subnet(subnet_id, mask='mask[id, billingItem.id]')
         billing_id = subnet['billingItem']['id']
 
         billing_item = self.client['Billing_Item']
@@ -176,7 +176,7 @@ class NetworkManager(IdentifierMixin, object):
         """
         return self.account.getRwhoisData()
 
-    def get_subnet(self, id, **kwargs):
+    def get_subnet(self, subnet_id, **kwargs):
         """ Returns information about a single subnet.
 
         :param string id: Either the ID for the subnet or its network
@@ -186,9 +186,9 @@ class NetworkManager(IdentifierMixin, object):
         if 'mask' not in kwargs:
             kwargs['mask'] = 'mask[%s]' % ','.join(self._get_subnet_mask())
 
-        return self.subnet.getObject(id=id, **kwargs)
+        return self.subnet.getObject(id=subnet_id, **kwargs)
 
-    def get_vlan(self, id):
+    def get_vlan(self, vlan_id):
         """ Returns information about a single VLAN.
 
         :param int id: The unique identifier for the VLAN
@@ -196,7 +196,7 @@ class NetworkManager(IdentifierMixin, object):
                   the specified VLAN.
 
         """
-        return self.vlan.getObject(id=id, mask=self._get_vlan_mask())
+        return self.vlan.getObject(id=vlan_id, mask=self._get_vlan_mask())
 
     def list_global_ips(self, version=0):
         """ Returns a list of all global IP address records on the account.
@@ -352,12 +352,13 @@ class NetworkManager(IdentifierMixin, object):
 
         return datacenters
 
-    def unassign_global_ip(self, id):
+    def unassign_global_ip(self, global_ip_id):
         """ Unassigns a global IP address from a target.
 
         :param int id: The ID of the global IP being unassigned
         """
-        return self.client['Network_Subnet_IpAddress_Global'].unroute(id=id)
+        return self.client['Network_Subnet_IpAddress_Global'].unroute(
+            id=global_ip_id)
 
     def _get_global_ip_by_identifier(self, identifier):
         """ Returns the ID of the global IP matching the specified identifier.
@@ -392,8 +393,7 @@ class NetworkManager(IdentifierMixin, object):
         return self.account.getNetworkVlans(mask=self._get_vlan_mask(),
                                             **kwargs)
 
-    @staticmethod
-    def _get_subnet_mask():
+    def _get_subnet_mask(self):
         """ Returns the standard subnet object mask.
 
         Wrapper method to prevent duplicated code.
@@ -406,8 +406,7 @@ class NetworkManager(IdentifierMixin, object):
             'virtualGuests',
         ]
 
-    @staticmethod
-    def _get_vlan_mask():
+    def _get_vlan_mask(self):
         """ Returns the standard VLAN object mask.
 
         Wrapper method for preventing duplicated code.

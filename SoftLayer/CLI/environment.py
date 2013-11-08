@@ -64,9 +64,8 @@ class Environment(object):
     def load_module(self, module_name):  # pragma: no cover
         try:
             module = import_module('SoftLayer.CLI.modules.%s' % module_name)
-            for name, obj in inspect.getmembers(module):
+            for _, obj in inspect.getmembers(module):
                 if inspect.isclass(obj) and issubclass(obj, CLIRunnable):
-                    obj.env = self
                     self.add_plugin(obj)
             return module
         except ImportError:
@@ -105,12 +104,9 @@ class CLIRunnable(object):
     options = []  # set by subclass
     action = None  # set by subclass
 
-    env = None  # gets set later by Environment.load_module()
+    def __init__(self, client=None, env=None):
+        self.client = client
+        self.env = env
 
-    @staticmethod
-    def add_additional_args(parser):
-        pass
-
-    @staticmethod
-    def execute(client, args):
+    def execute(self, args):
         pass

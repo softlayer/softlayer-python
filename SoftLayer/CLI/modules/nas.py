@@ -23,9 +23,8 @@ Options:
 """
     action = 'list'
 
-    @staticmethod
-    def execute(client, args):
-        account = client['Account']
+    def execute(self, args):
+        account = self.client['Account']
 
         nas = account.getNasNetworkStorage(
             mask='eventCount,serviceResource[datacenter.name]')

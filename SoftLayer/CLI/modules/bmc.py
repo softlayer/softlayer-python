@@ -43,19 +43,18 @@ Options:
     action = 'create-options'
     options = ['datacenter', 'cpu', 'memory', 'os', 'disk', 'nic']
 
-    @classmethod
-    def execute(cls, client, args):
+    def execute(self, args):
         t = KeyValueTable(['Name', 'Value'])
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
 
         show_all = True
-        for opt_name in cls.options:
+        for opt_name in self.options:
             if args.get("--" + opt_name):
                 show_all = False
                 break
 
-        mgr = HardwareManager(client)
+        mgr = HardwareManager(self.client)
 
         bmi_options = mgr.get_bare_metal_create_options()
 
@@ -63,12 +62,12 @@ Options:
             show_all = True
 
         if args['--datacenter'] or show_all:
-            results = cls.get_create_options(bmi_options, 'datacenter')[0]
+            results = self.get_create_options(bmi_options, 'datacenter')[0]
 
             t.add_row([results[0], listing(sorted(results[1]))])
 
         if args['--cpu'] or args['--memory'] or show_all:
-            results = cls.get_create_options(bmi_options, 'cpu')
+            results = self.get_create_options(bmi_options, 'cpu')
             memory_cpu_table = Table(['memory', 'cpu'])
             for result in results:
                 memory_cpu_table.add_row([
@@ -80,7 +79,7 @@ Options:
             t.add_row(['memory/cpu', memory_cpu_table])
 
         if args['--os'] or show_all:
-            results = cls.get_create_options(bmi_options, 'os')
+            results = self.get_create_options(bmi_options, 'os')
 
             for result in results:
                 t.add_row([
@@ -91,13 +90,13 @@ Options:
                     )])
 
         if args['--disk'] or show_all:
-            results = cls.get_create_options(bmi_options, 'disk')[0]
+            results = self.get_create_options(bmi_options, 'disk')[0]
 
             t.add_row([results[0], listing(
                 [item[0] for item in sorted(results[1])])])
 
         if args['--nic'] or show_all:
-            results = cls.get_create_options(bmi_options, 'nic')
+            results = self.get_create_options(bmi_options, 'nic')
 
             for result in results:
                 t.add_row([result[0], listing(
@@ -105,8 +104,7 @@ Options:
 
         return t
 
-    @classmethod
-    def get_create_options(cls, bmi_options, section, pretty=True):
+    def get_create_options(self, bmi_options, section, pretty=True):
         """ This method can be used to parse the bare metal instance creation
         options into different sections. This can be useful for data validation
         as well as printing the options on a help screen.
@@ -257,7 +255,8 @@ Options:
                     dual.append((str(int(item['capacity'])) + '_DUAL',
                                  item['price_id']))
                 else:
-                    single.append((str(int(item['capacity'])), item['price_id']))
+                    single.append((str(int(item['capacity'])),
+                                  item['price_id']))
 
             return [('single nic', single), ('dual nic', dual)]
 
@@ -304,10 +303,9 @@ Optional:
     options = ['confirm']
     required_params = ['--hostname', '--domain', '--cpu', '--memory', '--os']
 
-    @classmethod
-    def execute(cls, client, args):
+    def execute(self, args):
         update_with_template_args(args)
-        mgr = HardwareManager(client)
+        mgr = HardwareManager(self.client)
 
         # Disks will be a comma-separated list. Let's make it a real list.
         if isinstance(args.get('--disk'), str):
@@ -317,7 +315,7 @@ Optional:
         if isinstance(args.get('--key'), str):
             args['--key'] = args.get('--key').split(',')
 
-        cls._validate_args(args)
+        self._validate_args(args)
 
         bmi_options = mgr.get_bare_metal_create_options()
 
@@ -328,9 +326,9 @@ Optional:
         }
 
         # Validate the CPU/Memory combination and get the price ID
-        server_core = cls._get_cpu_and_memory_price_ids(bmi_options,
-                                                        args['--cpu'],
-                                                        args['--memory'])
+        server_core = self._get_cpu_and_memory_price_ids(bmi_options,
+                                                         args['--cpu'],
+                                                         args['--memory'])
 
         if server_core:
             order['server'] = server_core
@@ -340,8 +338,8 @@ Optional:
         order['hourly'] = args['--hourly']
 
         # Convert the OS code back into a price ID
-        os_price = cls._get_price_id_from_options(bmi_options, 'os',
-                                                  args['--os'])
+        os_price = self._get_price_id_from_options(bmi_options, 'os',
+                                                   args['--os'])
 
         if os_price:
             order['os'] = os_price
@@ -353,22 +351,22 @@ Optional:
         # Set the disk size
         disk_prices = []
         for disk in args.get('--disk'):
-            disk_price = cls._get_price_id_from_options(bmi_options, 'disk',
-                                                        disk)
+            disk_price = self._get_price_id_from_options(bmi_options, 'disk',
+                                                         disk)
 
             if disk_price:
                 disk_prices.append(disk_price)
 
         if not disk_prices:
-            disk_prices.append(cls._get_default_value(bmi_options, 'disk0'))
+            disk_prices.append(self._get_default_value(bmi_options, 'disk0'))
 
         order['disks'] = disk_prices
 
         # Set the port speed
         port_speed = args.get('--network') or 10
 
-        nic_price = cls._get_price_id_from_options(bmi_options, 'nic',
-                                                   port_speed)
+        nic_price = self._get_price_id_from_options(bmi_options, 'nic',
+                                                    port_speed)
 
         if nic_price:
             order['port_speed'] = nic_price
@@ -379,8 +377,8 @@ Optional:
         if args.get('--key'):
             keys = []
             for key in args.get('--key'):
-                key_id = resolve_id(SshKeyManager(client).resolve_ids, key,
-                                    'SshKey')
+                key_id = resolve_id(SshKeyManager(self.client).resolve_ids,
+                                    key, 'SshKey')
                 keys.append(key_id)
             order['ssh_keys'] = keys
 
@@ -441,9 +439,8 @@ Optional:
 
         return output
 
-    @classmethod
-    def _validate_args(cls, args):
-        invalid_args = [k for k in cls.required_params if args.get(k) is None]
+    def _validate_args(self, args):
+        invalid_args = [k for k in self.required_params if args.get(k) is None]
         if invalid_args:
             raise ArgumentError('Missing required options: %s'
                                 % ','.join(invalid_args))
@@ -460,8 +457,7 @@ Optional:
         if not any([args['--hourly'], args['--monthly']]):
             raise ArgumentError('One of [--hourly | --monthly] is required')
 
-    @classmethod
-    def _get_cpu_and_memory_price_ids(cls, bmi_options, cpu_value,
+    def _get_cpu_and_memory_price_ids(self, bmi_options, cpu_value,
                                       memory_value):
         bmi_obj = BMCCreateOptions()
         price_id = None
@@ -477,8 +473,7 @@ Optional:
 
         return price_id
 
-    @classmethod
-    def _get_default_value(cls, bmi_options, option):
+    def _get_default_value(self, bmi_options, option):
         if option not in bmi_options['categories']:
             return
 
@@ -492,12 +487,11 @@ Optional:
             ]):
                 return item['price_id']
 
-    @classmethod
-    def _get_price_id_from_options(cls, bmi_options, option, value):
+    def _get_price_id_from_options(self, bmi_options, option, value):
         bmi_obj = BMCCreateOptions()
         price_id = None
 
-        for k, v in bmi_obj.get_create_options(bmi_options, option, False):
+        for _, v in bmi_obj.get_create_options(bmi_options, option, False):
             for item_options in v:
                 if item_options[0] == value:
                     price_id = item_options[1]
@@ -519,9 +513,8 @@ Options:
     action = 'cancel'
     options = ['confirm']
 
-    @staticmethod
-    def execute(client, args):
-        hw = HardwareManager(client)
+    def execute(self, args):
+        hw = HardwareManager(self.client)
         hw_id = resolve_id(
             hw.resolve_ids, args.get('<identifier>'), 'hardware')
 

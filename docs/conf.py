@@ -42,7 +42,9 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'SoftLayer API Python Client'
-copyright = u'2013, SoftLayer Technologies, Inc.'
+# Hack to avoid the "Redefining built-in 'copyright'" error from static
+# analysis tools
+globals()['copyright'] = u'2013, SoftLayer Technologies, Inc.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

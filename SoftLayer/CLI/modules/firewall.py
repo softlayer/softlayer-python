@@ -22,9 +22,8 @@ List active vlans with firewalls
 """
     action = 'list'
 
-    @staticmethod
-    def execute(client, args):
-        f = FirewallManager(client)
+    def execute(self, args):
+        f = FirewallManager(self.client)
         fwvlans = f.get_firewalls()
         t = Table(['vlan', 'type', 'features'])
 

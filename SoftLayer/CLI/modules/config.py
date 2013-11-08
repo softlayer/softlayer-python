@@ -86,14 +86,13 @@ Setup configuration
 """
     action = 'setup'
 
-    @classmethod
-    def execute(cls, client, args):
-        settings = get_settings_from_client(client)
+    def execute(self, args):
+        settings = get_settings_from_client(self.client)
 
         # User Input
         # Ask for username
         while True:
-            username = cls.env.input(
+            username = self.env.input(
                 'Username [%s]: ' % settings['username']) \
                 or settings['username']
             if username:
@@ -101,7 +100,7 @@ Setup configuration
 
         # Ask for 'secret' which can be api_key or their password
         while True:
-            secret = cls.env.getpass(
+            secret = self.env.getpass(
                 'API Key or Password [%s]: ' % settings['api_key']) \
                 or settings['api_key']
             if secret:
@@ -109,7 +108,8 @@ Setup configuration
 
         # Ask for which endpoint they want to use
         while True:
-            endpoint_type = cls.env.input('Endpoint (public|private|custom): ')
+            endpoint_type = self.env.input(
+                'Endpoint (public|private|custom): ')
             endpoint_type = endpoint_type.lower()
             if not endpoint_type:
                 endpoint_url = API_PUBLIC_ENDPOINT
@@ -121,7 +121,7 @@ Setup configuration
                 endpoint_url = API_PRIVATE_ENDPOINT
                 break
             elif endpoint_type == 'custom':
-                endpoint_url = cls.env.input(
+                endpoint_url = self.env.input(
                     'Endpoint URL [%s]: ' % settings['endpoint_url']
                 ) or settings['endpoint_url']
                 break
@@ -137,7 +137,7 @@ Setup configuration
             path = args.get('--config')
         config_path = os.path.expanduser(path)
 
-        cls.env.out(format_output(config_table(settings)))
+        self.env.out(format_output(config_table(settings)))
 
         if not confirm('Are you sure you want to write settings to "%s"?'
                        % config_path, default=True):
@@ -174,7 +174,6 @@ Show current configuration
 """
     action = 'show'
 
-    @classmethod
-    def execute(cls, client, args):
-        settings = get_settings_from_client(client)
+    def execute(self, args):
+        settings = get_settings_from_client(self.client)
         return config_table(settings)

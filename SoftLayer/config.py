@@ -30,7 +30,7 @@ def get_client_settings_args(**kwargs):
     return settings
 
 
-def get_client_settings_env(**kwargs):
+def get_client_settings_env(**_):
     """ Retreive client settings from environment settings
 
         :param \*\*kwargs: Arguments that are passed into the client instance

@@ -50,9 +50,8 @@ List SoftLayer Message Queue Accounts
 """
     action = 'accounts-list'
 
-    @staticmethod
-    def execute(client, args):
-        manager = MessagingManager(client)
+    def execute(self, args):
+        manager = MessagingManager(self.client)
         accounts = manager.list_accounts()
 
         t = Table([
@@ -80,9 +79,8 @@ List SoftLayer Message Queue Endpoints
 """
     action = 'endpoints-list'
 
-    @staticmethod
-    def execute(client, args):
-        manager = MessagingManager(client)
+    def execute(self, args):
+        manager = MessagingManager(self.client)
         regions = manager.get_endpoints()
 
         t = Table([
@@ -107,9 +105,8 @@ Ping the SoftLayer Message Queue service
 """ + COMMON_MESSAGING_ARGS
     action = 'ping'
 
-    @staticmethod
-    def execute(client, args):
-        manager = MessagingManager(client)
+    def execute(self, args):
+        manager = MessagingManager(self.client)
         ok = manager.ping(
             datacenter=args['--datacenter'], network=args['--network'])
         if ok:
@@ -176,9 +173,8 @@ List all queues on an account
 """ + COMMON_MESSAGING_ARGS
     action = 'queue-list'
 
-    @classmethod
-    def execute(cls, client, args):
-        manager = MessagingManager(client)
+    def execute(self, args):
+        manager = MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
 
         queues = mq_client.get_queues()['items']
@@ -204,9 +200,8 @@ Detail a queue
 """ + COMMON_MESSAGING_ARGS
     action = 'queue-detail'
 
-    @classmethod
-    def execute(cls, client, args):
-        manager = MessagingManager(client)
+    def execute(self, args):
+        manager = MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
         queue = mq_client.get_queue(args['<queue_name>'])
         return queue_table(queue)
@@ -227,9 +222,8 @@ Options:
 """ + COMMON_MESSAGING_ARGS
     action = 'queue-add'
 
-    @classmethod
-    def execute(cls, client, args):
-        manager = MessagingManager(client)
+    def execute(self, args):
+        manager = MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
         tags = None
         if args.get('--tags'):
@@ -259,9 +253,8 @@ Options:
 """ + COMMON_MESSAGING_ARGS
     action = 'queue-edit'
 
-    @classmethod
-    def execute(cls, client, args):
-        manager = MessagingManager(client)
+    def execute(self, args):
+        manager = MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
         tags = None
         if args.get('--tags'):
@@ -289,9 +282,8 @@ Options:
 """ + COMMON_MESSAGING_ARGS
     action = 'queue-remove'
 
-    @classmethod
-    def execute(cls, client, args):
-        manager = MessagingManager(client)
+    def execute(self, args):
+        manager = MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
 
         if args['<message_id>']:
@@ -314,9 +306,8 @@ Options:
 """ + COMMON_MESSAGING_ARGS
     action = 'queue-push'
 
-    @classmethod
-    def execute(cls, client, args):
-        manager = MessagingManager(client)
+    def execute(self, args):
+        manager = MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
         body = ''
         if args['<message>'] is not None:
@@ -340,9 +331,8 @@ Options:
 """ + COMMON_MESSAGING_ARGS
     action = 'queue-pop'
 
-    @classmethod
-    def execute(cls, client, args):
-        manager = MessagingManager(client)
+    def execute(self, args):
+        manager = MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
 
         messages = mq_client.pop_message(
@@ -369,9 +359,8 @@ List all topics on an account
 """ + COMMON_MESSAGING_ARGS
     action = 'topic-list'
 
-    @classmethod
-    def execute(cls, client, args):
-        manager = MessagingManager(client)
+    def execute(self, args):
+        manager = MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
         topics = mq_client.get_topics()['items']
 
@@ -390,9 +379,8 @@ Detail a topic
 """ + COMMON_MESSAGING_ARGS
     action = 'topic-detail'
 
-    @classmethod
-    def execute(cls, client, args):
-        manager = MessagingManager(client)
+    def execute(self, args):
+        manager = MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
         topic = mq_client.get_topic(args['<topic_name>'])
         subscriptions = mq_client.get_subscriptions(args['<topic_name>'])
@@ -411,9 +399,8 @@ Create a new topic
 """ + COMMON_MESSAGING_ARGS
     action = 'topic-add'
 
-    @classmethod
-    def execute(cls, client, args):
-        manager = MessagingManager(client)
+    def execute(self, args):
+        manager = MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
         tags = None
         if args.get('--tags'):
@@ -441,9 +428,8 @@ Options:
 """ + COMMON_MESSAGING_ARGS
     action = 'topic-remove'
 
-    @classmethod
-    def execute(cls, client, args):
-        manager = MessagingManager(client)
+    def execute(self, args):
+        manager = MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
         mq_client.delete_topic(args['<topic_name>'], args.get('--force'))
 
@@ -464,9 +450,8 @@ Options:
 """ + COMMON_MESSAGING_ARGS
     action = 'topic-subscribe'
 
-    @classmethod
-    def execute(cls, client, args):
-        manager = MessagingManager(client)
+    def execute(self, args):
+        manager = MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
         if args['--type'] == 'queue':
             subscription = mq_client.create_subscription(
@@ -498,9 +483,8 @@ Remove a subscription on a topic
 """ + COMMON_MESSAGING_ARGS
     action = 'topic-unsubscribe'
 
-    @classmethod
-    def execute(cls, client, args):
-        manager = MessagingManager(client)
+    def execute(self, args):
+        manager = MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
 
         mq_client.delete_subscription(
@@ -518,9 +502,8 @@ Push a message into a topic
 """ + COMMON_MESSAGING_ARGS
     action = 'topic-push'
 
-    @classmethod
-    def execute(cls, client, args):
-        manager = MessagingManager(client)
+    def execute(self, args):
+        manager = MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
 
         # the message body comes from the positional argument or stdin

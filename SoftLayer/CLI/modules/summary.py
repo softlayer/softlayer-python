@@ -22,9 +22,8 @@ Options:
 """
     action = None
 
-    @staticmethod
-    def execute(client, args):
-        mgr = NetworkManager(client)
+    def execute(self, args):
+        mgr = NetworkManager(self.client)
         datacenters = mgr.summary_by_datacenter()
 
         t = Table([
