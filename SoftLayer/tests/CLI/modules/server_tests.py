@@ -19,8 +19,8 @@ except ImportError:
 
 from SoftLayer.CLI.helpers import format_output, CLIAbort, ArgumentError
 from SoftLayer.CLI.modules import server
-from SoftLayer.tests.mocks import account_mock, hardware_mock, \
-    product_package_mock
+from SoftLayer.tests.mocks import (
+    account_mock, hardware_mock, product_package_mock)
 
 
 class ServerCLITests(unittest.TestCase):
@@ -147,6 +147,7 @@ class ServerCLITests(unittest.TestCase):
             'hostname': 'hardware-test1.test.sftlyr.ws',
             'public_ip': '172.16.1.100',
             'private_ip': '10.1.0.2',
+            'ipmi_ip': '10.1.0.3',
             'price rate': 1.54,
             'memory': 2048,
             'cores': 2,

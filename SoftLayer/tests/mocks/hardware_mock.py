@@ -53,6 +53,7 @@ def get_raw_hardware_mocks():
             'processorPhysicalCoreAmount': 2,
             'memoryCapacity': 2,
             'primaryBackendIpAddress': '10.1.0.2',
+            'networkManagementIpAddress': '10.1.0.3',
             'hardwareStatus': {'status': 'ACTIVE'},
             'provisionDate': '2013-08-01 15:23:45',
             'notes': 'These are test notes.',
