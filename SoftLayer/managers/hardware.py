@@ -254,6 +254,7 @@ class HardwareManager(IdentifierMixin, object):
                 'privateNetworkOnlyFlag',
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
+                'networkManagementIpAddress',
                 'userData',
                 'datacenter',
                 'networkComponents[id, status, speed, maxSpeed, name,'
@@ -657,7 +658,8 @@ class HardwareManager(IdentifierMixin, object):
 
         return results
 
-    def edit(self, hardware_id, userdata=None, hostname=None, domain=None, notes=None):
+    def edit(self, hardware_id, userdata=None, hostname=None, domain=None,
+             notes=None):
         """ Edit hostname, domain name, notes, and/or the user data of the
         hardware
 

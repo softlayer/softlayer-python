@@ -140,6 +140,8 @@ Options:
         t.add_row(['public_ip', result['primaryIpAddress'] or blank()])
         t.add_row(
             ['private_ip', result['primaryBackendIpAddress'] or blank()])
+        t.add_row(['ipmi_ip',
+                   result['networkManagementIpAddress'] or blank()])
         t.add_row([
             'os',
             FormattedItem(
