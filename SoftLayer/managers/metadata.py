@@ -43,7 +43,7 @@ class MetadataManager(object):
 
             >>> import SoftLayer
             >>> client = SoftLayer.Client()
-            >>> from SoftLayer.metadata import MetadataManager
+            >>> from SoftLayer import MetadataManager
             >>> meta = MetadataManager(client)
             >>> meta.get('datacenter')
             'dal05'
