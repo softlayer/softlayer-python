@@ -103,7 +103,7 @@ For more on filters see 'sl help filters'
             guest = NestedDict(guest)
             t.add_row([
                 guest['id'],
-                guest['datacenter']['name'],
+                guest['datacenter']['name'] or blank(),
                 guest['fullyQualifiedDomainName'],
                 guest['maxCpu'],
                 mb_to_gb(guest['maxMemory']),
@@ -148,7 +148,7 @@ Options:
             lookup(result, 'powerState', 'keyName'),
             lookup(result, 'powerState', 'name'),
         )])
-        t.add_row(['datacenter', result['datacenter']['name']])
+        t.add_row(['datacenter', result['datacenter']['name'] or blank()])
         operating_system = lookup(result,
                                   'operatingSystem',
                                   'softwareLicense',
