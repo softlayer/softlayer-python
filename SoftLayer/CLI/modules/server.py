@@ -95,7 +95,7 @@ For more on filters see 'sl help filters'
             server = NestedDict(server)
             t.add_row([
                 server['id'],
-                server['datacenter']['name'],
+                server['datacenter']['name'] or blank(),
                 server['fullyQualifiedDomainName'],
                 server['processorPhysicalCoreAmount'],
                 gb(server['memoryCapacity']),
@@ -134,7 +134,7 @@ Options:
         t.add_row(['id', result['id']])
         t.add_row(['hostname', result['fullyQualifiedDomainName']])
         t.add_row(['status', result['hardwareStatus']['status']])
-        t.add_row(['datacenter', result['datacenter']['name']])
+        t.add_row(['datacenter', result['datacenter']['name'] or blank()])
         t.add_row(['cores', result['processorPhysicalCoreAmount']])
         t.add_row(['memory', gb(result['memoryCapacity'])])
         t.add_row(['public_ip', result['primaryIpAddress'] or blank()])
