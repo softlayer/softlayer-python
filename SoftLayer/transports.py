@@ -36,12 +36,12 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
 
         payload = xmlrpclib.dumps(tuple(largs), methodname=method,
                                   allow_none=True)
-        log.info('POST %s', uri)
-        log.debug(payload)
+        log.info('REQ POST %s', uri)
+        log.debug('REQ: %s', payload)
         response = requests.post(uri, data=payload,
                                  headers=http_headers,
                                  timeout=timeout)
-        log.debug(response.content)
+        log.debug('RESP: %s', response.content)
         response.raise_for_status()
         result = xmlrpclib.loads(response.content,)[0][0]
         return result

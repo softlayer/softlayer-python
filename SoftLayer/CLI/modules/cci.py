@@ -335,7 +335,7 @@ Options:
 
 class CreateCCI(CLIRunnable):
     """
-usage: sl cci create [--key=KEY...] [options]
+usage: sl cci create [--disk=SIZE...] [--key=KEY...] [options]
 
 Order/create a CCI. See 'sl cci create-options' for valid options
 
@@ -365,6 +365,7 @@ Optional:
                            multiple times
   --like=IDENTIFIER      Use the configuration from an existing CCI
   -n, --network=MBPS     Network port speed in Mbps
+  -d, --disk=SIZE...     Disks. Can be specified multiple times
   --private              Forces the CCI to only have access the private
                            network
   -t, --template=FILE    A template file that defaults the command-line
@@ -385,6 +386,10 @@ Optional:
         update_with_template_args(args)
         cci = CCIManager(self.client)
         self._update_with_like_args(args)
+
+        # Disks will be a comma-separated list. Let's make it a real list.
+        if isinstance(args.get('--disk'), str):
+            args['--disk'] = args.get('--disk').split(',')
 
         # SSH keys may be a comma-separated list. Let's make it a real list.
         if isinstance(args.get('--key'), str):
@@ -562,6 +567,7 @@ Optional:
             "hostname": args['--hostname'],
             "private": args['--private'],
             "dedicated": args['--dedicated'],
+            "disks": args['--disk'],
             "local_disk": True,
         }
 
