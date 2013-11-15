@@ -2,12 +2,15 @@ SoftLayer API Python Client
 ===========================
 .. image:: https://api.travis-ci.org/softlayer/softlayer-api-python-client.png
     :target: https://travis-ci.org/softlayer/softlayer-api-python-client
+        
+.. image:: https://landscape.io/github/softlayer/softlayer-api-python-client/master/landscape.png
+    :target: https://landscape.io/github/softlayer/softlayer-api-python-client/master
 
 .. image:: https://badge.fury.io/py/SoftLayer.png
     :target: http://badge.fury.io/py/SoftLayer
 
 .. image:: https://pypip.in/d/SoftLayer/badge.png
-        :target: https://crate.io/packages/SoftLayer
+    :target: https://crate.io/packages/SoftLayer
 
 SoftLayer API bindings for Python. For use with `SoftLayer's API <http://sldn.softlayer.com/reference/softlayerapi>`_.
 
