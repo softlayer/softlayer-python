@@ -5,7 +5,7 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
-from mock import patch, call, Mock
+from mock import patch, call, Mock, ANY
 
 import SoftLayer
 import SoftLayer.API
@@ -257,6 +257,31 @@ class APITimedClient(unittest.TestCase):
 
         expected_calls = [('SERVICE.METHOD', 1121362200, 400000)]
         self.assertEqual(expected_calls, self.client.get_last_calls())
+
+    @patch('SoftLayer.API.make_xml_rpc_api_call')
+    def test_call_compression_disabled(self, make_xml_rpc_api_call):
+        self.client['SERVICE'].METHOD(compress=False)
+        make_xml_rpc_api_call.assert_called_with(
+            'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
+            headers=ANY,
+            timeout=None,
+            http_headers={
+                'Content-Type': 'application/xml',
+                'User-Agent': USER_AGENT,
+                'Accept-Encoding': ''
+            })
+
+    @patch('SoftLayer.API.make_xml_rpc_api_call')
+    def test_call_compression_enabled(self, make_xml_rpc_api_call):
+        self.client['SERVICE'].METHOD(compress=True)
+        make_xml_rpc_api_call.assert_called_with(
+            'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
+            headers=ANY,
+            timeout=None,
+            http_headers={
+                'Content-Type': 'application/xml',
+                'User-Agent': USER_AGENT,
+            })
 
 
 class UnauthenticatedAPIClient(unittest.TestCase):
