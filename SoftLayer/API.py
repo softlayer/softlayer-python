@@ -22,6 +22,7 @@ VALID_CALL_ARGS = set([
     'mask',
     'filter',
     'headers',
+    'compress',
     'raw_headers',
     'limit',
     'offset',
@@ -140,6 +141,7 @@ class Client(object):
         objectmask = kwargs.get('mask')
         objectfilter = kwargs.get('filter')
         headers = kwargs.get('headers', {})
+        compress = kwargs.get('compress', True)
         raw_headers = kwargs.get('raw_headers')
         limit = kwargs.get('limit')
         offset = kwargs.get('offset', 0)
@@ -166,6 +168,10 @@ class Client(object):
             'User-Agent': USER_AGENT,
             'Content-Type': 'application/xml',
         }
+
+        if compress:
+            http_headers['Accept-Encoding'] = 'deflate, compress, gzip'
+
         if raw_headers:
             http_headers.update(raw_headers)
 
@@ -298,6 +304,7 @@ class Service(object):
         :param mask: (optional) object mask
         :param dict filter: (optional) filter dict
         :param dict headers: (optional) optional XML-RPC headers
+        :param boolean compress: (optional) Enable/Disable HTTP compression
         :param dict raw_headers: (optional) HTTP transport headers
         :param int limit: (optional) return at most this many results
         :param int offset: (optional) offset results by this many
