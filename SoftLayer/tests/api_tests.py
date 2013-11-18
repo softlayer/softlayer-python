@@ -283,6 +283,22 @@ class APITimedClient(unittest.TestCase):
                 'User-Agent': USER_AGENT,
             })
 
+    @patch('SoftLayer.API.make_xml_rpc_api_call')
+    def test_call_compression_override(self, make_xml_rpc_api_call):
+        # raw_headers should override compress=False
+        self.client['SERVICE'].METHOD(
+            compress=False,
+            raw_headers={'Accept-Encoding': 'gzip'})
+        make_xml_rpc_api_call.assert_called_with(
+            'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
+            headers=ANY,
+            timeout=None,
+            http_headers={
+                'Content-Type': 'application/xml',
+                'User-Agent': USER_AGENT,
+                'Accept-Encoding': 'gzip',
+            })
+
 
 class UnauthenticatedAPIClient(unittest.TestCase):
     def setUp(self):
