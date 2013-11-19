@@ -37,6 +37,9 @@ class MetaRunnable(CLIRunnable):
                 'this command is being ran from a device on the backend '
                 'network.')
 
+    def _execute(self, _):
+        pass
+
 
 class BackendMacAddresses(MetaRunnable):
     """
@@ -46,7 +49,7 @@ List backend mac addresses
 """
     action = 'backend_mac'
 
-    def _execute(self, args):
+    def _execute(self, _):
         return listing(MetadataManager().get('backend_mac'), separator=',')
 
 
@@ -58,7 +61,7 @@ Get datacenter name
 """
     action = 'datacenter'
 
-    def _execute(self, args):
+    def _execute(self, _):
         return MetadataManager().get('datacenter')
 
 
@@ -70,7 +73,7 @@ Get datacenter id
 """
     action = 'datacenter_id'
 
-    def _execute(self, args):
+    def _execute(self, _):
         return MetadataManager().get('datacenter_id')
 
 
@@ -82,7 +85,7 @@ List frontend mac addresses
 """
     action = 'frontend_mac'
 
-    def _execute(self, args):
+    def _execute(self, _):
         return listing(MetadataManager().get('frontend_mac'), separator=',')
 
 
@@ -94,7 +97,7 @@ Get fully qualified domain name
 """
     action = 'fqdn'
 
-    def _execute(self, args):
+    def _execute(self, _):
         return MetadataManager().get('fqdn')
 
 
@@ -106,7 +109,7 @@ Get hostname
 """
     action = 'hostname'
 
-    def _execute(self, args):
+    def _execute(self, _):
         return MetadataManager().get('hostname')
 
 
@@ -118,7 +121,7 @@ Get id
 """
     action = 'id'
 
-    def _execute(self, args):
+    def _execute(self, _):
         return MetadataManager().get('id')
 
 
@@ -130,7 +133,7 @@ Get primary backend ip address
 """
     action = 'backend_ip'
 
-    def _execute(self, args):
+    def _execute(self, _):
         return MetadataManager().get('primary_backend_ip')
 
 
@@ -142,7 +145,7 @@ Get primary ip address
 """
     action = 'ip'
 
-    def _execute(self, args):
+    def _execute(self, _):
         return MetadataManager().get('primary_ip')
 
 
@@ -154,7 +157,7 @@ Get provision state
 """
     action = 'provision_state'
 
-    def _execute(self, args):
+    def _execute(self, _):
         return MetadataManager().get('provision_state')
 
 
@@ -166,7 +169,7 @@ List tags
 """
     action = 'tags'
 
-    def _execute(self, args):
+    def _execute(self, _):
         return listing(MetadataManager().get('tags'), separator=',')
 
 
@@ -178,7 +181,7 @@ Get user-defined data
 """
     action = 'user_data'
 
-    def _execute(self, args):
+    def _execute(self, _):
         userdata = MetadataManager().get('user_data')
         if userdata:
             return userdata
