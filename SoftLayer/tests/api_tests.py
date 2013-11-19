@@ -5,7 +5,7 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
-from mock import patch, call, Mock, MagicMock
+from mock import patch, call, Mock
 
 import SoftLayer
 import SoftLayer.API
@@ -239,32 +239,23 @@ class APIClient(unittest.TestCase):
 
 
 class APITimedClient(unittest.TestCase):
+
     def setUp(self):
         self.client = SoftLayer.TimedClient(
             username='doesnotexist', api_key='issurelywrong',
             endpoint_url="ENDPOINT")
 
-    @patch('datetime.datetime')
+    @patch('SoftLayer.API.time.time')
     @patch('SoftLayer.API.Client.call')
-    def test_overriden_call_times_methods(self, _call, datetime_mock):
+    def test_overriden_call_times_methods(self, _call, _time):
         _call.side_effect = [range(10)]
-        total_seconds_mock = Mock()
-        total_seconds_mock.total_seconds = Mock()
-        total_seconds_mock.total_seconds.return_value = 1
-        delta_mock = MagicMock()
-        delta_mock.__sub__ = Mock()
-        delta_mock.__sub__.return_value = total_seconds_mock
-        delta_mock.strftime = Mock()
-        delta_mock.strftime.return_value = 1000
-        now_mock = MagicMock()
-        now_mock.return_value = delta_mock
-        datetime_mock.utcnow = now_mock
+        _time.side_effect = [1121362200, 1121762200]
 
         result = list(self.client.call('SERVICE', 'METHOD'))
 
         self.assertEqual(range(10), result)
 
-        expected_calls = [('SERVICE.METHOD', 1000, 1)]
+        expected_calls = [('SERVICE.METHOD', 1121362200, 400000)]
         self.assertEqual(expected_calls, self.client.get_last_calls())
 
 
