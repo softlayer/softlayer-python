@@ -83,6 +83,8 @@ class APIClient(unittest.TestCase):
             http_headers={
                 'Content-Type': 'application/xml',
                 'User-Agent': USER_AGENT,
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate, compress',
             })
 
     @patch('SoftLayer.API.make_xml_rpc_api_call')
@@ -113,6 +115,8 @@ class APIClient(unittest.TestCase):
                 'RAW': 'HEADER',
                 'Content-Type': 'application/xml',
                 'User-Agent': USER_AGENT,
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate, compress',
             })
 
     @patch('SoftLayer.API.make_xml_rpc_api_call')
@@ -129,6 +133,8 @@ class APIClient(unittest.TestCase):
             http_headers={
                 'Content-Type': 'application/xml',
                 'User-Agent': USER_AGENT,
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate, compress',
             })
 
     @patch('SoftLayer.API.make_xml_rpc_api_call')
@@ -145,6 +151,8 @@ class APIClient(unittest.TestCase):
             http_headers={
                 'Content-Type': 'application/xml',
                 'User-Agent': USER_AGENT,
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate, compress',
             })
 
     @patch('SoftLayer.API.make_xml_rpc_api_call')
@@ -160,6 +168,8 @@ class APIClient(unittest.TestCase):
             http_headers={
                 'Content-Type': 'application/xml',
                 'User-Agent': USER_AGENT,
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate, compress',
             })
 
     @patch('SoftLayer.API.Client.iter_call')
@@ -268,7 +278,6 @@ class APITimedClient(unittest.TestCase):
             http_headers={
                 'Content-Type': 'application/xml',
                 'User-Agent': USER_AGENT,
-                'Accept-Encoding': ''
             })
 
     @patch('SoftLayer.API.make_xml_rpc_api_call')
@@ -281,6 +290,8 @@ class APITimedClient(unittest.TestCase):
             http_headers={
                 'Content-Type': 'application/xml',
                 'User-Agent': USER_AGENT,
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate, compress',
             })
 
     @patch('SoftLayer.API.make_xml_rpc_api_call')

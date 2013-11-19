@@ -5,7 +5,7 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
-from mock import patch, MagicMock
+from mock import patch, MagicMock, ANY
 
 from SoftLayer import SoftLayerAPIError, TransportError
 from SoftLayer.transports import make_rest_api_call, make_xml_rpc_api_call
@@ -15,9 +15,9 @@ from requests import HTTPError, RequestException
 
 class TestXmlRpcAPICall(unittest.TestCase):
 
-    @patch('SoftLayer.transports.requests.post')
-    def test_call(self, post):
-        post().content = '''<?xml version="1.0" encoding="utf-8"?>
+    @patch('SoftLayer.transports.requests.Session.send')
+    def test_call(self, send):
+        send().content = '''<?xml version="1.0" encoding="utf-8"?>
 <params>
 <param>
  <value>
@@ -45,12 +45,13 @@ class TestXmlRpcAPICall(unittest.TestCase):
 '''
         resp = make_xml_rpc_api_call(
             'http://something.com/path/to/resource', 'getObject')
+        args = send.call_args
+        self.assertIsNotNone(args)
+        args, kwargs = args
+
+        send.assert_called_with(ANY, timeout=None)
         self.assertEqual(resp, [])
-        post.assert_called_with(
-            'http://something.com/path/to/resource',
-            data=data,
-            headers=None,
-            timeout=None,)
+        self.assertEquals(args[0].body, data)
 
 
 class TestRestAPICall(unittest.TestCase):

@@ -169,8 +169,9 @@ class Client(object):
             'Content-Type': 'application/xml',
         }
 
-        if not compress:
-            http_headers['Accept-Encoding'] = ''
+        if compress:
+            http_headers['Accept'] = '*/*'
+            http_headers['Accept-Encoding'] = 'gzip, deflate, compress'
 
         if raw_headers:
             http_headers.update(raw_headers)
