@@ -6,7 +6,7 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
-import datetime
+import time
 
 from consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT, USER_AGENT
 from transports import make_xml_rpc_api_call
@@ -265,14 +265,12 @@ class TimedClient(Client):
 
     def call(self, service, method, *args, **kwargs):
         """ See Client.call for documentation. """
-        start_time = datetime.datetime.utcnow()
+        start_time = time.time()
         result = super(TimedClient, self).call(service, method, *args,
                                                **kwargs)
-        end_time = datetime.datetime.utcnow()
+        end_time = time.time()
         diff = end_time - start_time
-        self.last_calls.append((service + '.' + method,
-                                start_time.strftime('%s'),
-                                diff.total_seconds()))
+        self.last_calls.append((service + '.' + method, start_time, diff))
         return result
 
     def get_last_calls(self):
