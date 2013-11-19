@@ -684,8 +684,7 @@ class CreateServer(CLIRunnable):
 usage: sl server create [--disk=SIZE...] [--key=KEY...] [options]
 
 Order/create a dedicated server. See 'sl server list-chassis' and
-'sl server create-options' for valid options. --disk can be repeated to
-order multiple disks.
+'sl server create-options' for valid options.
 
 Required:
   -H --hostname=HOST  Host portion of the FQDN. example: server
