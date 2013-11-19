@@ -37,8 +37,7 @@ from SoftLayer.CLI import (
     FormattedItem)
 from SoftLayer.CLI.helpers import (
     CLIAbort, ArgumentError, NestedDict, blank, resolve_id, KeyValueTable,
-    update_with_template_args, FALSE_VALUES, export_to_template,
-    active_txn)
+    update_with_template_args, export_to_template, active_txn)
 
 
 class ListCCIs(CLIRunnable):
@@ -381,6 +380,7 @@ Optional:
     action = 'create'
     options = ['confirm']
     required_params = ['--hostname', '--domain', '--cpu', '--memory']
+    required_params_either = [('--hourly', '--monthly'), ('--os', '--image')]
 
     def execute(self, args):
         update_with_template_args(args)
@@ -470,33 +470,26 @@ Optional:
         return output
 
     def _validate_args(self, args):
-        invalid_args = [k for k in self.required_params if args.get(k) is None]
-        if invalid_args:
+        invalid = []
+
+        for param in self.required_params:
+            if not args.get(param):
+                invalid.append(param)
+
+        for params in self.required_params_either:
+            present = [args.get(p) for p in params]
+            message = ' or '.join(params)
+
+            if not any(present) or all(present):
+                invalid.append(message)
+
+        if invalid:
             raise ArgumentError('Missing required options: %s'
-                                % ','.join(invalid_args))
+                                % ', '.join(invalid))
 
         if all([args['--userdata'], args['--userfile']]):
             raise ArgumentError('[-u | --userdata] not allowed with '
                                 '[-F | --userfile]')
-
-        if args['--hourly'] in FALSE_VALUES:
-            args['--hourly'] = False
-
-        if args['--monthly'] in FALSE_VALUES:
-            args['--monthly'] = False
-
-        if all([args['--hourly'], args['--monthly']]):
-            raise ArgumentError('[--hourly] not allowed with [--monthly]')
-
-        if not any([args['--hourly'], args['--monthly']]):
-            raise ArgumentError('One of [--hourly | --monthly] is required')
-
-        image_args = [args['--os'], args['--image']]
-        if all(image_args):
-            raise ArgumentError('[-o | --os] not allowed with [--image]')
-
-        if not any(image_args):
-            raise ArgumentError('One of [--os | --image] is required')
 
         if args['--userfile']:
             if not os.path.exists(args['--userfile']):
