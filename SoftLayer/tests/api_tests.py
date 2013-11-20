@@ -5,7 +5,7 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
-from mock import patch, call, Mock
+from mock import patch, call, Mock, MagicMock, ANY
 
 import SoftLayer
 import SoftLayer.API
@@ -83,6 +83,8 @@ class APIClient(unittest.TestCase):
             http_headers={
                 'Content-Type': 'application/xml',
                 'User-Agent': USER_AGENT,
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate, compress',
             })
 
     @patch('SoftLayer.API.make_xml_rpc_api_call')
@@ -113,6 +115,8 @@ class APIClient(unittest.TestCase):
                 'RAW': 'HEADER',
                 'Content-Type': 'application/xml',
                 'User-Agent': USER_AGENT,
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate, compress',
             })
 
     @patch('SoftLayer.API.make_xml_rpc_api_call')
@@ -129,6 +133,8 @@ class APIClient(unittest.TestCase):
             http_headers={
                 'Content-Type': 'application/xml',
                 'User-Agent': USER_AGENT,
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate, compress',
             })
 
     @patch('SoftLayer.API.make_xml_rpc_api_call')
@@ -145,6 +151,8 @@ class APIClient(unittest.TestCase):
             http_headers={
                 'Content-Type': 'application/xml',
                 'User-Agent': USER_AGENT,
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate, compress',
             })
 
     @patch('SoftLayer.API.make_xml_rpc_api_call')
@@ -160,6 +168,8 @@ class APIClient(unittest.TestCase):
             http_headers={
                 'Content-Type': 'application/xml',
                 'User-Agent': USER_AGENT,
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate, compress',
             })
 
     @patch('SoftLayer.API.Client.iter_call')
@@ -237,9 +247,50 @@ class APIClient(unittest.TestCase):
             TypeError,
             self.client.call, 'SERVICE', 'METHOD', invalid_kwarg='invalid')
 
+    @patch('SoftLayer.API.make_xml_rpc_api_call')
+    def test_call_compression_disabled(self, make_xml_rpc_api_call):
+        self.client['SERVICE'].METHOD(compress=False)
+        make_xml_rpc_api_call.assert_called_with(
+            'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
+            headers=ANY,
+            timeout=None,
+            http_headers={
+                'Content-Type': 'application/xml',
+                'User-Agent': USER_AGENT,
+            })
+
+    @patch('SoftLayer.API.make_xml_rpc_api_call')
+    def test_call_compression_enabled(self, make_xml_rpc_api_call):
+        self.client['SERVICE'].METHOD(compress=True)
+        make_xml_rpc_api_call.assert_called_with(
+            'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
+            headers=ANY,
+            timeout=None,
+            http_headers={
+                'Content-Type': 'application/xml',
+                'User-Agent': USER_AGENT,
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate, compress',
+            })
+
+    @patch('SoftLayer.API.make_xml_rpc_api_call')
+    def test_call_compression_override(self, make_xml_rpc_api_call):
+        # raw_headers should override compress=False
+        self.client['SERVICE'].METHOD(
+            compress=False,
+            raw_headers={'Accept-Encoding': 'gzip'})
+        make_xml_rpc_api_call.assert_called_with(
+            'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
+            headers=ANY,
+            timeout=None,
+            http_headers={
+                'Content-Type': 'application/xml',
+                'User-Agent': USER_AGENT,
+                'Accept-Encoding': 'gzip',
+            })
+
 
 class APITimedClient(unittest.TestCase):
-
     def setUp(self):
         self.client = SoftLayer.TimedClient(
             username='doesnotexist', api_key='issurelywrong',
