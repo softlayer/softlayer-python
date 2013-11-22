@@ -379,10 +379,7 @@ class NetworkManager(IdentifierMixin, object):
         :returns: The ID of the matching subnet or None
         """
 
-        index = identifier.find('/')
-
-        if index != -1:
-            identifier = identifier[0:index]
+        identifier = identifier.split('/', 1)[0]
 
         results = self.list_subnets(identifier=identifier,
                                     mask='id,subnetType')
