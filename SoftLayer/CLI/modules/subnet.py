@@ -131,7 +131,8 @@ Filters:
         t.align['Value'] = 'l'
 
         t.add_row(['id', subnet['id']])
-        t.add_row(['identifier', subnet['networkIdentifier']])
+        t.add_row(['identifier',
+                   subnet['networkIdentifier']+'/'+str(subnet['cidr'])])
         t.add_row(['subnet type', subnet['subnetType']])
         t.add_row(['gateway', subnet.get('gateway', '-')])
         t.add_row(['broadcast', subnet.get('broadcastAddress', '-')])
@@ -211,7 +212,7 @@ Filters:
         for subnet in subnets:
             t.add_row([
                 subnet['id'],
-                subnet['networkIdentifier'],
+                subnet['networkIdentifier'] + '/' + str(subnet['cidr']),
                 subnet.get('subnetType', '-'),
                 subnet['datacenter']['name'],
                 subnet['networkVlanId'],
@@ -252,7 +253,8 @@ information.
         subnet_table.align['Name'] = 'r'
         subnet_table.align['Value'] = 'l'
         subnet_table.add_row(['id', ip['subnet']['id']])
-        subnet_table.add_row(['identifier', ip['subnet']['networkIdentifier']])
+        subnet_table.add_row(['identifier', ip['subnet']['networkIdentifier']
+                              + '/' + str(ip['subnet']['cidr'])])
         subnet_table.add_row(['netmask', ip['subnet']['netmask']])
         if ip['subnet'].get('gateway'):
             subnet_table.add_row(['gateway', ip['subnet']['gateway']])

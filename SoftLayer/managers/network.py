@@ -378,6 +378,9 @@ class NetworkManager(IdentifierMixin, object):
         :param string identifier: The identifier to look up
         :returns: The ID of the matching subnet or None
         """
+
+        identifier = identifier.split('/', 1)[0]
+
         results = self.list_subnets(identifier=identifier,
                                     mask='id,subnetType')
         return [result['id'] for result in results]

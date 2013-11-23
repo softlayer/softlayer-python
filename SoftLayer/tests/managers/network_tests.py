@@ -387,7 +387,7 @@ class NetworkTests(unittest.TestCase):
             },
         ], []]
 
-        _id = self.network.resolve_subnet_ids('10.0.0.1')
+        _id = self.network.resolve_subnet_ids('10.0.0.1/29')
         self.assertEqual(_id, '100')
 
         _id = self.network.resolve_subnet_ids('nope')
