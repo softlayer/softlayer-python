@@ -38,7 +38,7 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
                                   allow_none=True)
         session = requests.Session()
         req = requests.Request('POST', uri, data=payload,
-                                 headers=http_headers).prepare()
+                               headers=http_headers).prepare()
         log.debug("=== REQUEST ===")
         log.info('POST %s', uri)
         log.debug(req.headers)
