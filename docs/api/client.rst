@@ -84,7 +84,7 @@ Retreive a ticket using Object Masks.
 ::
 
     ticket = client['Ticket'].getObject(
-        id=123456, mask="mask[updates, assignedUser, attachedHardware.datacenter]")
+        id=123456, mask="updates, assignedUser, attachedHardware.datacenter")
 
 
 Now add an update to the ticket with `Ticket.addUpdate <http://sldn.softlayer.com/reference/services/SoftLayer_Ticket/addUpdate>`_. This uses a parameter, which translate to positional arguments in the order that they appear in the API docs.
@@ -172,7 +172,7 @@ As of 3.0, the old API methods and parameters no longer work. Below are examples
 	# New
 	import SoftLayer
 	client = SoftLayer.Client(username='username', api_key='api_key')
-	client['Account'].getObject(mask="mask[ipAddresses]", limit=10, offset=0)
+	client['Account'].getObject(mask="ipAddresses", limit=10, offset=0)
 
 **Importing the module**
 ::
@@ -215,7 +215,7 @@ As of 3.0, the old API methods and parameters no longer work. Below are examples
 	client.set_object_mask({'ipAddresses' : None})
 
 	# New
-	client['Account'].getObject(mask="mask[ipAddresses]")
+	client['Account'].getObject(mask="ipAddresses")
 
 **Using Init Parameter**
 ::
