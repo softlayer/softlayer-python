@@ -367,7 +367,7 @@ Optional:
         port_speed = args.get('--network') or 10
 
         nic_price = self._get_price_id_from_options(bmi_options, 'nic',
-                                                    port_speed)
+                                                    int(port_speed))
 
         if nic_price:
             order['port_speed'] = nic_price
