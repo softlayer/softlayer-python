@@ -314,7 +314,7 @@ class CCIManager(IdentifierMixin, object):
         if nic_speed:
             data['networkComponents'] = [{'maxSpeed': nic_speed}]
 
-        if isinstance(disks, list):
+        if disks and isinstance(disks, list):
             data['blockDevices'] = [
                 {"device": "0", "diskImage": {"capacity": disks[0]}}
             ]

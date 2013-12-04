@@ -152,12 +152,12 @@ Options:
         operating_system = lookup(result,
                                   'operatingSystem',
                                   'softwareLicense',
-                                  'softwareDescription')
+                                  'softwareDescription') or {}
         t.add_row([
             'os',
             FormattedItem(
-                operating_system['version'] or blank(),
-                operating_system['name'] or blank()
+                operating_system.get('version') or blank(),
+                operating_system.get('name') or blank()
             )])
         t.add_row(['os_version', operating_system['version'] or blank()])
         t.add_row(['cores', result['maxCpu']])
