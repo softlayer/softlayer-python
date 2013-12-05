@@ -706,10 +706,10 @@ Optional:
   -k KEY, --key=KEY    SSH keys to assign to the root user. Can be specified
                          multiple times.
   --dry-run, --test    Do not create the server, just get a quote
-  --vlan_public=VLAN   The ID of the public VLAN on which you want the CCI
-                         placed.
-  --vlan_private=VLAN  The ID of the private VLAN on which you want the CCI
-                         placed.
+  --vlan_public=VLAN   The ID of the public VLAN on which you want the hardware
+                         placed
+  --vlan_private=VLAN  The ID of the private VLAN on which you want the
+                         hardware placed
   -t, --template=FILE  A template file that defaults the command-line
                          options using the long name in INI format
   --export=FILE        Exports options to a template file
