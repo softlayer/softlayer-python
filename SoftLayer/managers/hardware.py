@@ -469,8 +469,7 @@ class HardwareManager(IdentifierMixin, object):
         order = {
             'hardware': [hardware],
             'location': location,
-            'prices': [
-            ],
+            'prices': [],
         }
 
         if ssh_keys:
