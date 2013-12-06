@@ -1,3 +1,23 @@
+3.0.2
+
+    * CLI+API: Simplified object mask reformatting and added support for more complex masks.
+    
+    * CLI: Fixed the sl bmc create --network argument.
+    
+    * CLI+API: Improved output of the message queue feature and fixed some minor bugs.
+    
+    * CLI: Fixed an error when using --test and ordering a non-private subnet.
+    
+    * API: Fix to prevent double counting results in summary_by_datacenter().
+    
+    * CLI+API: Added IPMI IP address to hardware details.
+    
+    * CLI: Added support for ordering multiple disks when creating a CCI.
+    
+    * API: Added flag to disable compression on HTTP requests.
+    
+    * CLI: Added CIDR information to subnet displays.
+
 3.0.1
 
     * CLI: Fixed an error message about pricing information that appeared when ordering a new private subnet.
