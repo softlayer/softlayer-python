@@ -5,17 +5,11 @@
     :license: MIT, see LICENSE for more details.
 """
 from mock import patch, Mock, ANY
-# import sys
 
 from SoftLayer.config import (
     get_client_settings_args, get_client_settings_env,
     get_client_settings_config_file, get_client_settings)
 from SoftLayer.tests import unittest
-
-# if sys.version_info >= (3,):
-#     config_parser_path = 'configparser'
-# else:
-#     config_parser_path = 'ConfigParser'
 
 
 class TestGetClientSettings(unittest.TestCase):

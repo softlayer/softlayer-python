@@ -12,14 +12,6 @@ import SoftLayer.CLI as cli
 from SoftLayer.tests import FIXTURE_PATH, unittest
 from mock import patch, mock_open, call
 
-
-# if sys.version_info >= (3,):
-#     raw_input_path = 'builtins.input'
-#     open_path = 'builtins.open'
-# else:
-#     raw_input_path = '__builtin__.raw_input'
-#     open_path = '__builtin__.open'
-
 if sys.version_info >= (3,):
     open_path = 'builtins.open'
 else:
