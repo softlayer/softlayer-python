@@ -13,11 +13,16 @@ from SoftLayer.tests import FIXTURE_PATH, unittest
 from mock import patch, mock_open, call
 
 
+# if sys.version_info >= (3,):
+#     raw_input_path = 'builtins.input'
+#     open_path = 'builtins.open'
+# else:
+#     raw_input_path = '__builtin__.raw_input'
+#     open_path = '__builtin__.open'
+
 if sys.version_info >= (3,):
-    raw_input_path = 'builtins.input'
     open_path = 'builtins.open'
 else:
-    raw_input_path = '__builtin__.raw_input'
     open_path = '__builtin__.open'
 
 
@@ -40,7 +45,7 @@ class CLIJSONEncoderTest(unittest.TestCase):
 
 class PromptTests(unittest.TestCase):
 
-    @patch(raw_input_path)
+    @patch('six.moves.input')
     def test_invalid_response(self, raw_input_mock):
         raw_input_mock.return_value = 'y'
         result = cli.helpers.valid_response('test', 'n')
@@ -57,7 +62,7 @@ class PromptTests(unittest.TestCase):
         raw_input_mock.assert_called_with('test')
         self.assertEqual(result, None)
 
-    @patch(raw_input_path)
+    @patch('six.moves.input')
     def test_valid_response(self, raw_input_mock):
         raw_input_mock.return_value = 'n'
         result = cli.helpers.valid_response('test', 'n')
@@ -69,7 +74,7 @@ class PromptTests(unittest.TestCase):
         raw_input_mock.assert_called_with('test')
         self.assertTrue(result)
 
-    @patch(raw_input_path)
+    @patch('six.moves.input')
     def test_do_or_die(self, raw_input_mock):
         confirmed = '37347373737'
         raw_input_mock.return_value = confirmed
@@ -92,7 +97,7 @@ class PromptTests(unittest.TestCase):
         res = runnable.execute({})
         self.assertEqual(res, None)
 
-    @patch(raw_input_path)
+    @patch('six.moves.input')
     def test_confirmation(self, raw_input_mock):
         raw_input_mock.return_value = 'Y'
         res = cli.confirm('Confirm?', default=False)
@@ -217,8 +222,8 @@ class TestFormatOutput(unittest.TestCase):
         t = cli.helpers.format_output('just a string', 'raw')
         self.assertEqual('just a string', t)
 
-        t = cli.helpers.format_output(u'just a string', 'raw')
-        self.assertEqual(u'just a string', t)
+        t = cli.helpers.format_output(b'just a string', 'raw')
+        self.assertEqual(b'just a string', t)
 
     def test_format_output_raw(self):
         t = cli.Table(['nothing'])

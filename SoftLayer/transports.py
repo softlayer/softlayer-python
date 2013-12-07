@@ -9,7 +9,10 @@ from SoftLayer.exceptions import (
     SoftLayerAPIError, NotWellFormed, UnsupportedEncoding, InvalidCharacter,
     SpecViolation, MethodNotFound, InvalidMethodParameters, InternalError,
     ApplicationError, RemoteSystemError, TransportError)
-import xmlrpclib
+try:
+    from xmlrpc.client import dumps, loads, Fault
+except ImportError:  # pragma nocover
+    from xmlrpclib import dumps, loads, Fault
 import logging
 import requests
 import json
@@ -33,8 +36,7 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
         largs = list(args)
         largs.insert(0, {'headers': headers})
 
-        payload = xmlrpclib.dumps(tuple(largs), methodname=method,
-                                  allow_none=True)
+        payload = dumps(tuple(largs), methodname=method, allow_none=True)
         session = requests.Session()
         req = requests.Request('POST', uri, data=payload,
                                headers=http_headers).prepare()
@@ -48,9 +50,9 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
         log.debug(response.headers)
         log.debug(response.content)
         response.raise_for_status()
-        result = xmlrpclib.loads(response.content,)[0][0]
+        result = loads(response.content,)[0][0]
         return result
-    except xmlrpclib.Fault as e:
+    except Fault as e:
         # These exceptions are formed from the XML-RPC spec
         # http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
         error_mapping = {

@@ -5,17 +5,17 @@
     :license: MIT, see LICENSE for more details.
 """
 from mock import patch, Mock, ANY
-import sys
+# import sys
 
 from SoftLayer.config import (
     get_client_settings_args, get_client_settings_env,
     get_client_settings_config_file, get_client_settings)
 from SoftLayer.tests import unittest
 
-if sys.version_info >= (3,):
-    config_parser_path = 'configparser'
-else:
-    config_parser_path = 'ConfigParser'
+# if sys.version_info >= (3,):
+#     config_parser_path = 'configparser'
+# else:
+#     config_parser_path = 'ConfigParser'
 
 
 class TestGetClientSettings(unittest.TestCase):
@@ -96,7 +96,7 @@ class TestGetClientSettingsEnv(unittest.TestCase):
 
 class TestGetClientSettingsConfigFile(unittest.TestCase):
 
-    @patch('%s.RawConfigParser' % config_parser_path)
+    @patch('six.moves.configparser.RawConfigParser')
     def test_username_api_key(self, config_parser):
         result = get_client_settings_config_file()
 
@@ -105,14 +105,14 @@ class TestGetClientSettingsConfigFile(unittest.TestCase):
         self.assertEqual(result['auth'].username, config_parser().get())
         self.assertEqual(result['auth'].api_key, config_parser().get())
 
-    @patch('%s.RawConfigParser' % config_parser_path)
+    @patch('six.moves.configparser.RawConfigParser')
     def test_no_section(self, config_parser):
         config_parser().has_section.return_value = False
         result = get_client_settings_config_file()
 
         self.assertIsNone(result)
 
-    @patch('%s.RawConfigParser' % config_parser_path)
+    @patch('six.moves.configparser.RawConfigParser')
     def test_config_file(self, config_parser):
         get_client_settings_config_file(config_file='path/to/config')
         config_parser().read.assert_called_with([ANY, ANY, 'path/to/config'])

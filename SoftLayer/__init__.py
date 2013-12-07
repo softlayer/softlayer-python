@@ -15,10 +15,10 @@
 """
 from SoftLayer.consts import VERSION
 
-from API import *  # NOQA
-from managers import *  # NOQA
-from exceptions import *  # NOQA
-from auth import *  # NOQA
+from .API import *  # NOQA
+from .managers import *  # NOQA
+from .exceptions import *  # NOQA
+from .auth import *  # NOQA
 
 __title__ = 'SoftLayer'
 __version__ = VERSION

@@ -52,4 +52,4 @@ class FirewallManager(object):
                 }
             })['networkVlans']
 
-        return filter(has_firewall, results)
+        return list(filter(has_firewall, results))

@@ -191,10 +191,10 @@ class APIClient(unittest.TestCase):
     @patch('SoftLayer.API.Client.call')
     def test_iter_call(self, _call):
         # chunk=100, no limit
-        _call.side_effect = [range(100), range(100, 125)]
+        _call.side_effect = [list(range(100)), list(range(100, 125))]
         result = list(self.client.iter_call('SERVICE', 'METHOD', iter=True))
 
-        self.assertEquals(range(125), result)
+        self.assertEquals(list(range(125)), result)
         _call.assert_has_calls([
             call('SERVICE', 'METHOD', limit=100, iter=False, offset=0),
             call('SERVICE', 'METHOD', limit=100, iter=False, offset=100),
@@ -202,9 +202,9 @@ class APIClient(unittest.TestCase):
         _call.reset_mock()
 
         # chunk=100, no limit. Requires one extra request.
-        _call.side_effect = [range(100), range(100, 200), []]
+        _call.side_effect = [list(range(100)), list(range(100, 200)), []]
         result = list(self.client.iter_call('SERVICE', 'METHOD', iter=True))
-        self.assertEquals(range(200), result)
+        self.assertEquals(list(range(200)), result)
         _call.assert_has_calls([
             call('SERVICE', 'METHOD', limit=100, iter=False, offset=0),
             call('SERVICE', 'METHOD', limit=100, iter=False, offset=100),
@@ -213,10 +213,10 @@ class APIClient(unittest.TestCase):
         _call.reset_mock()
 
         # chunk=25, limit=30
-        _call.side_effect = [range(0, 25), range(25, 30)]
+        _call.side_effect = [list(range(0, 25)), list(range(25, 30))]
         result = list(self.client.iter_call(
             'SERVICE', 'METHOD', iter=True, limit=30, chunk=25))
-        self.assertEquals(range(30), result)
+        self.assertEquals(list(range(30)), result)
         _call.assert_has_calls([
             call('SERVICE', 'METHOD', iter=False, limit=25, offset=0),
             call('SERVICE', 'METHOD', iter=False, limit=5, offset=25),
@@ -233,10 +233,10 @@ class APIClient(unittest.TestCase):
         _call.reset_mock()
 
         # chunk=25, limit=30, offset=12
-        _call.side_effect = [range(0, 25), range(25, 30)]
+        _call.side_effect = [list(range(0, 25)), list(range(25, 30))]
         result = list(self.client.iter_call(
             'SERVICE', 'METHOD', iter=True, limit=30, chunk=25, offset=12))
-        self.assertEquals(range(30), result)
+        self.assertEquals(list(range(30)), result)
         _call.assert_has_calls([
             call('SERVICE', 'METHOD', iter=False, limit=25, offset=12),
             call('SERVICE', 'METHOD', iter=False, limit=5, offset=37),
@@ -305,12 +305,12 @@ class APITimedClient(unittest.TestCase):
     @patch('SoftLayer.API.time.time')
     @patch('SoftLayer.API.Client.call')
     def test_overriden_call_times_methods(self, _call, _time):
-        _call.side_effect = [range(10)]
+        _call.side_effect = [list(range(10))]
         _time.side_effect = [1121362200, 1121762200]
 
         result = list(self.client.call('SERVICE', 'METHOD'))
 
-        self.assertEqual(range(10), result)
+        self.assertEqual(list(range(10)), result)
 
         expected_calls = [('SERVICE.METHOD', 1121362200, 400000)]
         self.assertEqual(expected_calls, self.client.get_last_calls())

@@ -7,7 +7,7 @@
 """
 
 
-class SoftLayerError(StandardError):
+class SoftLayerError(Exception):
     " The base SoftLayer error. "
 
 

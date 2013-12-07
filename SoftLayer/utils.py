@@ -6,6 +6,7 @@
     :license: MIT, see LICENSE for more details.
 """
 import re
+import six
 
 UUID_RE = re.compile('^[0-9a-f\-]{36}$', re.I)
 KNOWN_OPERATIONS = ['<=', '>=', '<', '>', '~', '*=', '^=', '$=', '_=', '!~']
@@ -60,7 +61,7 @@ def query_filter(query):
     except ValueError:
         pass
 
-    if isinstance(query, basestring):
+    if isinstance(query, six.string_types):
         query = query.strip()
         for op in KNOWN_OPERATIONS:
             if query.startswith(op):
