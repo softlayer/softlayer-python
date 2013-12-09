@@ -606,8 +606,7 @@ class ServerCLITests(unittest.TestCase):
         output = runnable._get_default_value(option_mock, 'nope')
         self.assertEqual(None, output)
 
-    @staticmethod
-    def _setup_package_mocks(client):
+    def _setup_package_mocks(self, client):
         package = client['Product_Package']
         package.getAllObjects = product_package_mock.getAllObjects_Mock()
         package.getConfiguration = product_package_mock.getConfiguration_Mock()

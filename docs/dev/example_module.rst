@@ -31,8 +31,7 @@ Example CLI Module
 
         action = 'print'
 
-        @staticmethod
-        def execute(client, args):
+        def execute(self, args):
             print "EXAMPLE!"
 
 
@@ -45,8 +44,7 @@ Example CLI Module
 
         action = 'pretty'
 
-        @staticmethod
-        def execute(client, args):
+        def execute(self, args):
             # create a table with two columns: col1, col2
             t = Table(['col1', 'col2'])
 
@@ -77,8 +75,7 @@ Example CLI Module
         action = 'parse'
         options = ['confirm']
 
-        @staticmethod
-        def execute(client, args):
+        def execute(self, args):
             if args.get('--test'):
                 print "Just testing, move along..."
             else:

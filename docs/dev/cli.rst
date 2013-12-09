@@ -43,29 +43,26 @@ There are some tenants for styling the doc blocks
 
 Action
 ------
-Actions are implemented using classes in the module that subclass `SoftLayer.CLI.CLIRunnable`.  The actual class name is irrelevant for the implementation details as it isn't used anywhere.  The docblock is used as the arguement parser as well.  Unlike the modules docblock, additional, common, arguments are added to the end as well; i.e. `--config` and `--format`.
+Actions are implemented using classes in the module that subclass `SoftLayer.CLI.CLIRunnable`.  The actual class name is irrelevant for the implementation details as it isn't referenced anywhere.  The docblock is used as the arguement parser as well.  Unlike the modules docblock extra, common-used arguments are added to the end as well; i.e. `--config` and `--format`.
 
 ::
 
   class CLIRunnable(object):
-      action = None
+      options = []  # set by subclass
+      action = None  # set by subclass
 
-      @staticmethod
-      def add_additional_args(parser):
-          pass
+      def __init__(self, client=None, env=None):
+          self.client = client
+          self.env = env
 
-      @staticmethod
-      def execute(client, args):
+      def execute(self, args):
           pass
 
 The required interfaces are:
 
 * The docblock (__doc__) for docopt
 * action class attribute
-* def execute(client, args)
-
-  - Don't forget the @staticmethod annotation!
-  - you can also use @classmethod and use execute(cls, client, args) if you plan on dispatching instead of executing a simple task.
+* def execute(self, args):
 
 A minimal implementation for `sl example print` would look like this:
 ::
@@ -79,8 +76,7 @@ A minimal implementation for `sl example print` would look like this:
 
       action = 'print'
 
-      @staticmethod
-      def execute(client, args):
+      def execute(self, args):
           print "EXAMPLE!"
 
 
@@ -114,8 +110,7 @@ The `execute()` method is expected to return either `None` or an instance of `So
 
       action = 'pretty'
 
-      @staticmethod
-      def execute(client, args):
+      execute(self, args):
           # create a table with two columns: col1, col2
           t = Table(['col1', 'col2'])
 
@@ -168,8 +163,7 @@ Refer to docopt for more complete documentation
 
       action = 'parse'
 
-      @staticmethod
-      def execute(client, args):
+      def execute(self, args):
           if args.get('--test'):
               print "Just testing, move along..."
           else:
@@ -189,7 +183,7 @@ Refer to docopt for more complete documentation
 Accessing the API
 -----------------
 
-API access is available via the first argument of `execute` which will be an initialized copy of `SoftLayer.API.Client`.  Please refer to [using the api](API-Usage) for further details on howto use the `Client` object.
+API access is available via an attribute of the CLIRunnable instance called. In execute(), for example, you can refer to `self.client` to access an instanciated instance of `SoftLayer.API.Client`.  Please refer to [using the api](API-Usage) for further details on howto use the `Client` object.
 
 Confirmations
 -------------
@@ -212,8 +206,7 @@ All confirmations should be easily bypassed by checking for `args['--really']`. 
       action = 'parse'
       options = ['confirm']  # confirm adds the '-y|--really' options and help
 
-      @staticmethod
-      def execute(client, args):
+      def execute(self, args):
           pass
 
 There are two primary confirmation prompts that both leverage `SoftLayer.CLI.valid_response`:

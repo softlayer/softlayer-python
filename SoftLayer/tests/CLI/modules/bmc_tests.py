@@ -278,8 +278,7 @@ class BMCCLITests(unittest.TestCase):
         output = runnable._get_default_value(option_mock, 'nope')
         self.assertEqual(None, output)
 
-    @staticmethod
-    def _setup_package_mocks(client):
+    def _setup_package_mocks(self, client):
         p = client['Product_Package']
         p.getAllObjects = product_package_mock.getAllObjects_Mock()
         p.getConfiguration = product_package_mock.getConfiguration_Mock(True)
