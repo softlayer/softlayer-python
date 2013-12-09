@@ -19,8 +19,9 @@ This library provides a simple interface to interact with SoftLayer's XML-RPC AP
 Documentation
 -------------
 Documentation is available at https://softlayer-api-python-client.readthedocs.org
- * API Client: https://softlayer-api-python-client.readthedocs.org/en/latest/api/client
- * Command-line Interface: https://softlayer-api-python-client.readthedocs.org/en/latest/cli
+
+* API Client: https://softlayer-api-python-client.readthedocs.org/en/latest/api/client
+* Command-line Interface: https://softlayer-api-python-client.readthedocs.org/en/latest/cli
 
 Installation
 ------------
