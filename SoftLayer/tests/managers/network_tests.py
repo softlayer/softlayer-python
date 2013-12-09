@@ -24,10 +24,10 @@ class NetworkTests(unittest.TestCase):
         self.network.ip_lookup(ip)
         service.getByIpAddress.assert_has_calls(mcall)
 
-    def test_add_subnet_returns_none_on_failure(self):
+    def test_add_subnet_raises_exception_on_failure(self):
         self._setup_add_subnet_mocks()
 
-        self.assertEqual(None, self.network.add_subnet('bad'))
+        self.assertRaises(TypeError, self.network.add_subnet, ('bad'))
 
     def test_add_global_ip(self):
         self._setup_add_subnet_mocks()

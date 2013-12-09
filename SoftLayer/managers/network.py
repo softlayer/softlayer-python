@@ -7,8 +7,8 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin, \
-    resolve_ids
+from SoftLayer.utils import (NestedDict, query_filter, IdentifierMixin,
+                             resolve_ids, lookup)
 
 
 class NetworkManager(IdentifierMixin, object):
@@ -41,6 +41,7 @@ class NetworkManager(IdentifierMixin, object):
                    test_order=False):
         package = self.client['Product_Package']
         category = 'sov_sec_ip_addresses_priv'
+        desc = ''
         if version == 4:
             if subnet_type == 'global':
                 quantity = 0
@@ -58,12 +59,18 @@ class NetworkManager(IdentifierMixin, object):
 
         price_id = None
         quantity = str(quantity)
+        # In the API, every non-server item is contained within package ID 0.
+        # This means that we need to get all of the items and loop through them
+        # looking for the items we need based upon the category, quantity, and
+        # item description.
         for item in package.getItems(id=0, mask='mask[itemCategory]'):
-            category_code = item.get('itemCategory', {}).get('categoryCode')
-            if category_code == category and item['capacity'] == quantity:
-                if version == 4 or (version == 6
-                                    and desc in item['description']):
-                    price_id = item['prices'][0]['id']
+            category_code = lookup(item, 'itemCategory', 'categoryCode')
+            if all([category_code == category,
+                    item.get('capacity') == quantity,
+                    version == 4 or (version == 6 and
+                                     desc in item['description'])]):
+                price_id = item['prices'][0]['id']
+                break
 
         order = {
             'packageId': 0,
@@ -71,11 +78,12 @@ class NetworkManager(IdentifierMixin, object):
             'quantity': 1,
         }
 
-        if type != 'global':
+        if subnet_type != 'global':
             order['endPointVlanId'] = vlan_id
 
         if not price_id:
-            return None
+            raise TypeError('Invalid combination specified for ordering a'
+                            ' subnet.')
 
         func = 'placeOrder'
         if test_order:
