@@ -1,3 +1,6 @@
+import os.path
+import shutil
+
 from fabric.api import local, lcd, puts, abort
 
 
@@ -12,6 +15,14 @@ def upload():
     local('python setup.py sdist register upload')
 
 
+def clean():
+    puts("* Cleaning Repo")
+    dirs = ['.tox', 'SoftLayer.egg-info', 'build', 'dist']
+    for d in dirs:
+        if os.path.exists(d) and os.path.isdir(d):
+            shutil.rmtree(d)
+
+
 def release(version, force=False):
     """Perform a release. Example:
 
@@ -21,6 +32,8 @@ def release(version, force=False):
     if version.startswith("v"):
         abort("Version should not start with 'v'")
     version_str = "v%s" % version
+
+    clean()
 
     puts(" * Tagging Version %s" % version_str)
     f = 'f' if force else ''
