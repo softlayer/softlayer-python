@@ -461,18 +461,15 @@ Optional:
     def _get_cpu_and_memory_price_ids(self, bmi_options, cpu_value,
                                       memory_value):
         bmi_obj = BMCCreateOptions()
-        price_id = None
 
-        cpu_regex = re.compile('(\d+)')
-        for k, v in bmi_obj.get_create_options(bmi_options, 'cpu'):
-            cpu = cpu_regex.search(k).group(1)
+        for memory, mem_options in bmi_obj.get_create_options(bmi_options,
+                                                              'cpu'):
+            if memory == memory_value:
+                for cpu_size, price_id in mem_options:
+                    if cpu_size == cpu_value:
+                        return price_id
 
-            if cpu == cpu_value:
-                for mem_options in v:
-                    if mem_options[0] == memory_value:
-                        price_id = mem_options[1]
-
-        return price_id
+        return None
 
     def _get_default_value(self, bmi_options, option):
         if option not in bmi_options['categories']:

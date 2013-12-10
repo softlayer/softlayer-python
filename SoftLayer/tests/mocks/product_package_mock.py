@@ -548,6 +548,22 @@ def get_bmc_categories_mock():
                 'id': 1014
             },
             'laborFee': '0',
+        },
+        {
+            'itemId': 1015,
+            'setupFee': '0',
+            'recurringFee': '149',
+            'hourlyRecurringFee': '.75',
+            'oneTimeFee': '0',
+            'id': 1923,
+            'sort': 0,
+            'item': {
+                'capacity': '2',
+                'description': '2 x 2.0 GHz Core Bare Metal Instance - '
+                '4 GB Ram',
+                'id': 1014
+            },
+            'laborFee': '0',
         }
     ]
 
