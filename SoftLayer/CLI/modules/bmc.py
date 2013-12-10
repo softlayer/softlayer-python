@@ -364,15 +364,14 @@ Optional:
         order['disks'] = disk_prices
 
         # Set the port speed
-        port_speed = args.get('--network') or 10
+        network_option = args.get('--network') or 10
 
         nic_price = self._get_price_id_from_options(bmi_options, 'nic',
-                                                    port_speed)
-
+                                                    network_option)
         if nic_price:
             order['port_speed'] = nic_price
         else:
-            raise CLIAbort('Invalid NIC speed specified.')
+            raise CLIAbort('Invalid network speed specified.')
 
         # Get the SSH keys
         if args.get('--key'):
@@ -486,10 +485,10 @@ Optional:
     def _get_price_id_from_options(self, bmi_options, option, value):
         bmi_obj = BMCCreateOptions()
         price_id = None
-
+        from pprint import pprint as pp
         for _, v in bmi_obj.get_create_options(bmi_options, option, False):
             for item_options in v:
-                if item_options[0] == value:
+                if str(item_options[0]) == value:
                     price_id = item_options[1]
 
         return price_id
