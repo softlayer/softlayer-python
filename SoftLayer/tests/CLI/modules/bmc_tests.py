@@ -47,7 +47,7 @@ class BMCCLITests(unittest.TestCase):
             'single nic': ['100', '1000'],
             'memory/cpu': [
                 {'cpu': ['2'], 'memory': '2'},
-                {'cpu': ['4'], 'memory': '4'}
+                {'cpu': ['2', '4'], 'memory': '4'}
             ],
         }
 
@@ -74,7 +74,7 @@ class BMCCLITests(unittest.TestCase):
         expected = {
             'memory/cpu': [
                 {'cpu': ['2'], 'memory': '2'},
-                {'cpu': ['4'], 'memory': '4'}
+                {'cpu': ['2', '4'], 'memory': '4'}
             ],
         }
 
