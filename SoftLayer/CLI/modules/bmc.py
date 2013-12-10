@@ -469,8 +469,6 @@ Optional:
                     if cpu_size == cpu_value:
                         return price_id
 
-        return None
-
     def _get_default_value(self, bmi_options, option):
         if option not in bmi_options['categories']:
             return
