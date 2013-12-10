@@ -364,10 +364,10 @@ Optional:
         order['disks'] = disk_prices
 
         # Set the port speed
-        port_speed = args.get('--network') or 10
+        port_speed = args.get('--network') or 100
 
         nic_price = self._get_price_id_from_options(bmi_options, 'nic',
-                                                    port_speed)
+                                                    str(port_speed))
 
         if nic_price:
             order['port_speed'] = nic_price
