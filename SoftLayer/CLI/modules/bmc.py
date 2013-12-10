@@ -291,7 +291,7 @@ Optional:
   -d, --disk=SIZE...       Disks. Can be specified multiple times
   -k KEY, --key=KEY        SSH keys to assign to the root user. Can be
                              specified multiple times.
-  -n MBPS, --network=MBPS  Network port speed in Mbps
+  -n MBPS, --network=MBPS  Network port speed in Mbps. Defaults to 100 Mbps.
   --vlan_public=VLAN       The ID of the public VLAN on which you want the
                              hardware placed.
   --vlan_private=VLAN      The ID of the private VLAN on which you want the
@@ -372,7 +372,7 @@ Optional:
         if nic_price:
             order['port_speed'] = nic_price
         else:
-            raise CLIAbort('Invalid NIC speed specified.')
+            raise CLIAbort('Invalid network speed specified.')
 
         # Get the SSH keys
         if args.get('--key'):
