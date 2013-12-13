@@ -362,6 +362,7 @@ class HardwareManager(IdentifierMixin, object):
 
            args = {
                'location': 'FIRST_AVAILABLE', # Pick the first available DC
+               'packageId': 32, # From above
                'disks': [],
            }
 
