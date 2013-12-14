@@ -3,7 +3,7 @@ getPrivateBlockDeviceTemplateGroups = [{
     'accountId': 1234,
     'blockDevices': [],
     'createDate': '2013-12-05T21:53:03-06:00',
-    'globalIdentifier': '0B5DEAF4-643D-46CA-A695-CECBE8832C9D',
+    'globalIdentifier': 'E6DBD73B-1651-4B28-BCBA-A11DF7C9D79E',
     'id': 200,
     'name': 'test_image',
     'parentId': ''
@@ -11,7 +11,7 @@ getPrivateBlockDeviceTemplateGroups = [{
     'accountId': 1234,
     'blockDevices': [],
     'createDate': '2013-12-05T21:53:03-06:00',
-    'globalIdentifier': 'EB38414C-2AB3-47F3-BBBD-56A5F689620B',
+    'globalIdentifier': 'F9329795-4220-4B0A-B970-C86B950667FA',
     'id': 201,
     'name': 'private_image2',
     'parentId': ''
