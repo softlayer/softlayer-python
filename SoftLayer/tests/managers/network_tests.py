@@ -140,7 +140,7 @@ class NetworkTests(unittest.TestCase):
         service.getObject.assert_has_calls(mcall)
 
     def test_list_global_ips_default(self):
-        mask = 'mask[destinationIpAddress[hardware, virtualGuest],ipAddress]'
+        mask = 'destinationIpAddress[hardware, virtualGuest],ipAddress'
         mcall = call(filter={}, mask=mask)
         service = self.client['Account']
 
@@ -149,7 +149,7 @@ class NetworkTests(unittest.TestCase):
         service.getGlobalIpRecords.assert_has_calls(mcall)
 
     def test_list_global_ips_with_filter(self):
-        mask = 'mask[destinationIpAddress[hardware, virtualGuest],ipAddress]'
+        mask = 'destinationIpAddress[hardware, virtualGuest],ipAddress'
         _filter = {
             'globalIpRecords': {
                 'ipAddress': {
@@ -168,8 +168,8 @@ class NetworkTests(unittest.TestCase):
         service.getGlobalIpRecords.assert_has_calls(mcall)
 
     def test_list_subnets_default(self):
-        _filter = {'subnets': {'subnetType': {'operation': 'not null'}}}
-        mask = 'mask[hardware,datacenter,ipAddressCount,virtualGuests]'
+        _filter = {'subnets': {'subnetType': {'operation': '!= GLOBAL_IP'}}}
+        mask = 'hardware,datacenter,ipAddressCount,virtualGuests'
         mcall = call(filter=_filter,
                      mask=mask)
         service = self.client['Account']
@@ -212,7 +212,7 @@ class NetworkTests(unittest.TestCase):
                 'networkIdentifier': {'operation': '_= 10.0.0.1'}
             }
         }
-        mask = 'mask[hardware,datacenter,ipAddressCount,virtualGuests]'
+        mask = 'hardware,datacenter,ipAddressCount,virtualGuests'
         service.getSubnets.assert_called_with(filter=_filter, mask=mask)
 
         self.assertEqual([service.getSubnets.return_value[0]], result)
@@ -226,11 +226,10 @@ class NetworkTests(unittest.TestCase):
         service.getNetworkVlans.assert_has_calls(mcall)
 
     def test_list_vlans_with_filters(self):
-        number = 5
-        datacenter = 'dal00'
         self.network.list_vlans(
-            vlan_number=number,
-            datacenter=datacenter,
+            vlan_number=5,
+            datacenter='dal00',
+            vlan_name='primary-vlan',
         )
 
         service = self.client['Account']
@@ -239,16 +238,17 @@ class NetworkTests(unittest.TestCase):
                 'networkVlans': {
                     'primaryRouter': {
                         'datacenter': {
-                            'name': {'operation': '_= ' + datacenter}},
+                            'name': {'operation': '_= dal00'}},
                     },
-                    'vlanNumber': {'operation': number},
+                    'vlanNumber': {'operation': 5},
+                    'name': {'operation': '_= primary-vlan'},
                 },
             },
             mask=ANY
         ))
 
     def test_summary_by_datacenter(self):
-        mcall = call(mask=ANY)
+        mcall = call(mask=ANY, filter=ANY)
         service = self.client['Account']
 
         service.getNetworkVlans.return_value = [
@@ -281,23 +281,32 @@ class NetworkTests(unittest.TestCase):
 
     def test_resolve_global_ip_ids(self):
         service = self.client['Account']
-
         _id = self.network.resolve_global_ip_ids('10.0.0.1')
-        self.assertEqual(_id, '200')
+        self.assertEqual(_id, ['200'])
 
         service.getGlobalIpRecords.return_value = []
         _id = self.network.resolve_global_ip_ids('nope')
-        self.assertEqual(_id, None)
+        self.assertEqual(_id, [])
 
     def test_resolve_subnet_ids(self):
         service = self.client['Account']
 
         _id = self.network.resolve_subnet_ids('10.0.0.1/29')
-        self.assertEqual(_id, '100')
+        self.assertEqual(_id, ['100'])
 
         service.getSubnets.return_value = []
         _id = self.network.resolve_subnet_ids('nope')
-        self.assertEqual(_id, None)
+        self.assertEqual(_id, [])
+
+    def test_resolve_vlan_ids(self):
+        service = self.client['Account']
+        service.getNetworkVlans.side_effect = [[{'id': '100'}], []]
+
+        _id = self.network.resolve_vlan_ids('vlan_name')
+        self.assertEqual(_id, ['100'])
+
+        _id = self.network.resolve_vlan_ids('nope')
+        self.assertEqual(_id, [])
 
     def test_unassign_global_ip(self):
         id = 9876

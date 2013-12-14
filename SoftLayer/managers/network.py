@@ -7,11 +7,10 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from SoftLayer.utils import (NestedDict, query_filter, IdentifierMixin,
-                             resolve_ids, lookup)
+from SoftLayer.utils import NestedDict, query_filter, resolve_ids, lookup
 
 
-class NetworkManager(IdentifierMixin, object):
+class NetworkManager(object):
     """ Manage Networks """
     def __init__(self, client):
         #: A valid `SoftLayer.API.Client` object that will be used for all
@@ -22,8 +21,6 @@ class NetworkManager(IdentifierMixin, object):
         #: Reference to the SoftLayer_Network_Vlan object.
         self.vlan = client['Network_Vlan']
         self.subnet = client['Network_Subnet']
-        self.global_ip_resolvers = [self._get_global_ip_by_identifier]
-        self.subnet_resolvers = [self._get_subnet_by_identifier]
 
     def add_global_ip(self, version=4, test_order=False):
         """ Adds a global IP address to the account.
@@ -63,7 +60,7 @@ class NetworkManager(IdentifierMixin, object):
         # This means that we need to get all of the items and loop through them
         # looking for the items we need based upon the category, quantity, and
         # item description.
-        for item in package.getItems(id=0, mask='mask[itemCategory]'):
+        for item in package.getItems(id=0, mask='itemCategory'):
             category_code = lookup(item, 'itemCategory', 'categoryCode')
             if all([category_code == category,
                     item.get('capacity') == quantity,
@@ -111,7 +108,7 @@ class NetworkManager(IdentifierMixin, object):
         :param int id: The ID of the global IP to be cancelled.
         """
         service = self.client['Network_Subnet_IpAddress_Global']
-        ip = service.getObject(id=global_ip_id, mask='mask[billingItem]')
+        ip = service.getObject(id=global_ip_id, mask='billingItem')
         billing_id = ip['billingItem']['id']
 
         billing_item = self.client['Billing_Item']
@@ -122,7 +119,7 @@ class NetworkManager(IdentifierMixin, object):
 
         :param int subnet_id: The ID of the subnet to be cancelled.
         """
-        subnet = self.get_subnet(subnet_id, mask='mask[id, billingItem.id]')
+        subnet = self.get_subnet(subnet_id, mask='id, billingItem.id')
         billing_id = subnet['billingItem']['id']
 
         billing_item = self.client['Billing_Item']
@@ -133,30 +130,21 @@ class NetworkManager(IdentifierMixin, object):
                     first_name=None, last_name=None, postal_code=None,
                     private_residence=None, state=None):
         update = {}
+        for key, value in [('abuseEmail', abuse_email),
+                           ('address1', address1),
+                           ('address2', address2),
+                           ('city', city),
+                           ('companyName', company_name),
+                           ('country', country),
+                           ('firstName', first_name),
+                           ('lastName', last_name),
+                           ('privateResidenceFlag', private_residence),
+                           ('state', state),
+                           ('postalCode', postal_code)]:
+            if key is not None:
+                update[key] = value
 
-        if abuse_email is not None:
-            update['abuseEmail'] = abuse_email
-        if address1 is not None:
-            update['address1'] = address1
-        if address2 is not None:
-            update['address2'] = address2
-        if city is not None:
-            update['city'] = city
-        if company_name is not None:
-            update['companyName'] = company_name
-        if country is not None:
-            update['country'] = country
-        if first_name is not None:
-            update['firstName'] = first_name
-        if last_name is not None:
-            update['lastName'] = last_name
-        if postal_code is not None:
-            update['postalCode'] = postal_code
-        if private_residence is not None:
-            update['privateResidenceFlag'] = private_residence
-        if state is not None:
-            update['state'] = state
-
+        # If there's anything to update, update it
         if update:
             rwhois = self.get_rwhois()
             self.client['Network_Subnet_Rwhois_Data'].editObject(
@@ -169,13 +157,8 @@ class NetworkManager(IdentifierMixin, object):
         :returns: A dictionary of information about the IP
 
         """
-        mask = [
-            'hardware',
-            'virtualGuest'
-        ]
-        mask = 'mask[%s]' % ','.join(mask)
         obj = self.client['Network_Subnet_IpAddress']
-        return obj.getByIpAddress(ip, mask=mask)
+        return obj.getByIpAddress(ip, mask='hardware, virtualGuest')
 
     def get_rwhois(self):
         """ Returns the RWhois information about the current account.
@@ -192,7 +175,7 @@ class NetworkManager(IdentifierMixin, object):
         :returns: A dictionary of information about the subnet
         """
         if 'mask' not in kwargs:
-            kwargs['mask'] = 'mask[%s]' % ','.join(self._get_subnet_mask())
+            kwargs['mask'] = ','.join(self._get_subnet_mask())
 
         return self.subnet.getObject(id=subnet_id, **kwargs)
 
@@ -206,19 +189,30 @@ class NetworkManager(IdentifierMixin, object):
         """
         return self.vlan.getObject(id=vlan_id, mask=self._get_vlan_mask())
 
-    def list_global_ips(self, version=0):
+    def list_global_ips(self, version=None, identifier=None, **kwargs):
         """ Returns a list of all global IP address records on the account.
 
-        :param int version: Only returns IPs of this version (4 or 6).
+        :param int version: Only returns IPs of this version (4 or 6)
+        :param string identifier: If specified, the list will only contain the
+                                  global ips matching this network identifier.
         """
-        mask = ['destinationIpAddress[hardware, virtualGuest]', 'ipAddress']
-        mask = 'mask[%s]' % ','.join(mask)
+        if 'mask' not in kwargs:
+            mask = ['destinationIpAddress[hardware, virtualGuest]',
+                    'ipAddress']
+            kwargs['mask'] = ','.join(mask)
+
         _filter = NestedDict({})
+
         if version:
             v = query_filter(version)
             _filter['globalIpRecords']['ipAddress']['subnet']['version'] = v
-        _filter = _filter.to_dict()
-        return self.account.getGlobalIpRecords(filter=_filter, mask=mask)
+
+        if identifier:
+            subnet_filter = _filter['globalIpRecords']['ipAddress']['subnet']
+            subnet_filter['networkIdentifier'] = query_filter(identifier)
+
+        kwargs['filter'] = _filter.to_dict()
+        return self.account.getGlobalIpRecords(**kwargs)
 
     def list_subnets(self, identifier=None, datacenter=None, version=0,
                      subnet_type=None, **kwargs):
@@ -238,8 +232,7 @@ class NetworkManager(IdentifierMixin, object):
 
         """
         if 'mask' not in kwargs:
-            mask = self._get_subnet_mask()
-            kwargs['mask'] = 'mask[%s]' % ','.join(mask)
+            kwargs['mask'] = ','.join(self._get_subnet_mask())
 
         _filter = NestedDict(kwargs.get('filter') or {})
 
@@ -254,21 +247,14 @@ class NetworkManager(IdentifierMixin, object):
             _filter['subnets']['subnetType'] = query_filter(subnet_type)
         else:
             # This filters out global IPs from the subnet listing.
-            _filter['subnets']['subnetType'] = {'operation': 'not null'}
+            _filter['subnets']['subnetType'] = {'operation': '!= GLOBAL_IP'}
 
         kwargs['filter'] = _filter.to_dict()
 
-        results = []
+        return self.account.getSubnets(**kwargs)
 
-        # Filtering out routed global IPs here. This is being done in code
-        # because of complications getting the object filter syntax working.
-        for subnet in self.account.getSubnets(**kwargs):
-            if 'GLOBAL_IP' not in subnet['subnetType']:
-                results.append(subnet)
-
-        return results
-
-    def list_vlans(self, datacenter=None, vlan_number=None, **kwargs):
+    def list_vlans(self, datacenter=None, vlan_number=None, vlan_name=None,
+                   **kwargs):
         """ Display a list of all VLANs on the account.
 
         This provides a quick overview of all VLANs including information about
@@ -278,6 +264,8 @@ class NetworkManager(IdentifierMixin, object):
                                     VLANs in the specified data center.
         :param int vlan_number: If specified, the list will only contain the
                                   VLAN matching this VLAN number.
+        :param int vlan_name: If specified, the list will only contain the
+                                  VLAN matching this VLAN name.
         :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
 
         """
@@ -286,25 +274,28 @@ class NetworkManager(IdentifierMixin, object):
         if vlan_number:
             _filter['networkVlans']['vlanNumber'] = query_filter(vlan_number)
 
+        if vlan_name:
+            _filter['networkVlans']['name'] = query_filter(vlan_name)
+
         if datacenter:
             _filter['networkVlans']['primaryRouter']['datacenter']['name'] = \
                 query_filter(datacenter)
 
         kwargs['filter'] = _filter.to_dict()
 
-        return self._get_vlans(**kwargs)
+        if 'mask' not in kwargs:
+            kwargs['mask'] = self._get_vlan_mask()
+
+        return self.account.getNetworkVlans(**kwargs)
 
     def resolve_global_ip_ids(self, identifier):
-        results = resolve_ids(identifier, self.global_ip_resolvers)
-
-        if results:
-            return results[0]
+        return resolve_ids(identifier, [self._list_global_ips_by_identifier])
 
     def resolve_subnet_ids(self, identifier):
-        results = resolve_ids(identifier, self.subnet_resolvers)
+        return resolve_ids(identifier, [self._list_subnets_by_identifier])
 
-        if results:
-            return results[0]
+    def resolve_vlan_ids(self, identifier):
+        return resolve_ids(identifier, [self._list_vlans_by_name])
 
     def summary_by_datacenter(self):
         """ Provides a dictionary with a summary of all network information on
@@ -324,7 +315,7 @@ class NetworkManager(IdentifierMixin, object):
         unique_servers = []
         unique_network = []
 
-        for vlan in self._get_vlans():
+        for vlan in self.list_vlans():
             dc = vlan['primaryRouter']['datacenter']
             name = dc['name']
             if name not in datacenters:
@@ -368,41 +359,31 @@ class NetworkManager(IdentifierMixin, object):
         return self.client['Network_Subnet_IpAddress_Global'].unroute(
             id=global_ip_id)
 
-    def _get_global_ip_by_identifier(self, identifier):
-        """ Returns the ID of the global IP matching the specified identifier.
+    def _list_global_ips_by_identifier(self, identifier):
+        """ Returns a list of IDs of the global IP matching the specified
+            network identifier
 
         :param string identifier: The identifier to look up
         :returns: The ID of the matching subnet or None
         """
-        results = []
-        for ip in self.list_global_ips():
-            if ip['ipAddress']['subnet']['networkIdentifier'] == identifier:
-                results.append(ip['id'])
-        return results
-
-    def _get_subnet_by_identifier(self, identifier):
-        """ Returns the ID of the subnet matching the specified identifier.
-
-        :param string identifier: The identifier to look up
-        :returns: The ID of the matching subnet or None
-        """
-
-        identifier = identifier.split('/', 1)[0]
-
-        results = self.list_subnets(identifier=identifier,
-                                    mask='id,subnetType')
+        results = self.list_global_ips(identifier=identifier, mask='id')
         return [result['id'] for result in results]
 
-    def _get_vlans(self, **kwargs):
-        """ Returns a list of VLANs.
+    def _list_subnets_by_identifier(self, identifier):
+        """ Returns a list of IDs of the subnet matching the specified
+            network identifier
 
-        Wrapper method for preventing duplicated code.
-
-        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
-
+        :param string identifier: The identifier to look up
+        :returns: The ID of the matching subnet or None
         """
-        return self.account.getNetworkVlans(mask=self._get_vlan_mask(),
-                                            **kwargs)
+        identifier = identifier.split('/', 1)[0]
+
+        results = self.list_subnets(identifier=identifier, mask='id')
+        return [result['id'] for result in results]
+
+    def _list_vlans_by_name(self, name):
+        results = self.list_vlans(vlan_name=name, mask='id')
+        return [result['id'] for result in results]
 
     def _get_subnet_mask(self):
         """ Returns the standard subnet object mask.
@@ -433,4 +414,4 @@ class NetworkManager(IdentifierMixin, object):
             'virtualGuests',
         ]
 
-        return 'mask[%s]' % ','.join(mask)
+        return ','.join(mask)

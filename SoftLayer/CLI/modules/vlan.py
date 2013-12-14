@@ -11,7 +11,7 @@ The available commands are:
 # :license: MIT, see LICENSE for more details.
 
 from SoftLayer import NetworkManager
-from SoftLayer.CLI import CLIRunnable, Table, KeyValueTable
+from SoftLayer.CLI import CLIRunnable, Table, KeyValueTable, blank, resolve_id
 
 
 class VlanDetail(CLIRunnable):
@@ -29,7 +29,10 @@ Filters:
     def execute(self, args):
         mgr = NetworkManager(self.client)
 
-        vlan = mgr.get_vlan(args.get('<identifier>'))
+        vlan_id = resolve_id(mgr.resolve_vlan_ids,
+                             args.get('<identifier>'),
+                             'VLAN')
+        vlan = mgr.get_vlan(vlan_id)
 
         t = KeyValueTable(['Name', 'Value'])
         t.align['Name'] = 'r'
@@ -98,8 +101,9 @@ Options:
     hardware, ccis, networking
 
 Filters:
-  -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
-  -n NUM, --number=NUM     VLAN number
+  -d DC, --datacenter=DC  datacenter shortname (sng01, dal05, ...)
+  -n NUM, --number=NUM    VLAN number
+  --name=NAME             VLAN name
 """
     action = 'list'
 
@@ -107,20 +111,22 @@ Filters:
         mgr = NetworkManager(self.client)
 
         t = Table([
-            'id', 'number', 'datacenter', 'IPs', 'hardware', 'ccis',
+            'id', 'number', 'datacenter', 'name', 'IPs', 'hardware', 'ccis',
             'networking', 'firewall'
         ])
         t.sortby = args.get('--sortby') or 'id'
 
         vlans = mgr.list_vlans(
             datacenter=args.get('--datacenter'),
-            vlan_number=args.get('--number')
+            vlan_number=args.get('--number'),
+            vlan_name=args.get('--name'),
         )
         for vlan in vlans:
             t.add_row([
                 vlan['id'],
                 vlan['vlanNumber'],
                 vlan['primaryRouter']['datacenter']['name'],
+                vlan.get('name') or blank(),
                 vlan['totalPrimaryIpAddressCount'],
                 len(vlan['hardware']),
                 len(vlan['virtualGuests']),
