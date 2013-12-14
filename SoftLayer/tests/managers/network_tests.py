@@ -43,6 +43,14 @@ class NetworkTests(unittest.TestCase):
 
         self.assertEqual(Product_Order.verifyOrder, result)
 
+        result = self.network.add_subnet('public',
+                                         quantity=4,
+                                         vlan_id=1234,
+                                         version=4,
+                                         test_order=False)
+
+        self.assertEqual(Product_Order.verifyOrder, result)
+
         result = self.network.add_subnet('global',
                                          test_order=True)
 

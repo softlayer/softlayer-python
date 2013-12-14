@@ -36,6 +36,14 @@ class NetworkManager(object):
 
     def add_subnet(self, subnet_type, quantity=None, vlan_id=None, version=4,
                    test_order=False):
+        """ Adds a global IP address to the account.
+
+        :param str subnet_type: Type of subnet to add: private, public, global
+        :param int quantity: Number of IPs in the subnet
+        :param int vlan_id: VLAN id for the subnet to be placed into
+        :param int version: 4 for IPv4, 6 for IPv6
+        :param bool test_order: If true, this will only verify the order.
+        """
         package = self.client['Product_Package']
         category = 'sov_sec_ip_addresses_priv'
         desc = ''
@@ -54,44 +62,40 @@ class NetworkManager(object):
             elif subnet_type == 'public':
                 desc = 'Portable'
 
-        price_id = None
-        quantity = str(quantity)
         # In the API, every non-server item is contained within package ID 0.
         # This means that we need to get all of the items and loop through them
         # looking for the items we need based upon the category, quantity, and
         # item description.
+        price_id = None
         for item in package.getItems(id=0, mask='itemCategory'):
             category_code = lookup(item, 'itemCategory', 'categoryCode')
             if all([category_code == category,
-                    item.get('capacity') == quantity,
+                    item.get('capacity') == str(quantity),
                     version == 4 or (version == 6 and
                                      desc in item['description'])]):
                 price_id = item['prices'][0]['id']
                 break
 
+        if not price_id:
+            raise TypeError('Invalid combination specified for ordering a'
+                            ' subnet.')
+
         order = {
             'packageId': 0,
             'prices': [{'id': price_id}],
             'quantity': 1,
+            # This is necessary in order for the XML-RPC endpoint to select the
+            # correct order container
+            'complexType': 'SoftLayer_Container_Product_Order_Network_Subnet',
         }
 
         if subnet_type != 'global':
             order['endPointVlanId'] = vlan_id
 
-        if not price_id:
-            raise TypeError('Invalid combination specified for ordering a'
-                            ' subnet.')
-
-        func = 'placeOrder'
         if test_order:
-            func = 'verifyOrder'
-        func = getattr(self.client['Product_Order'], func)
-
-        # This is necessary in order for the XML-RPC endpoint to select the
-        # correct order container. Without this, placing the order will fail.
-        order['complexType'] = \
-            'SoftLayer_Container_Product_Order_Network_Subnet'
-        return func(order)
+            return self.client['Product_Order'].verifyOrder(order)
+        else:
+            return self.client['Product_Order'].placeOrder(order)
 
     def assign_global_ip(self, global_ip_id, target):
         """ Assigns a global IP address to a specified target.
@@ -111,8 +115,7 @@ class NetworkManager(object):
         ip = service.getObject(id=global_ip_id, mask='billingItem')
         billing_id = ip['billingItem']['id']
 
-        billing_item = self.client['Billing_Item']
-        return billing_item.cancelService(id=billing_id)
+        return self.client['Billing_Item'].cancelService(id=billing_id)
 
     def cancel_subnet(self, subnet_id):
         """ Cancels the specified subnet.
@@ -122,8 +125,7 @@ class NetworkManager(object):
         subnet = self.get_subnet(subnet_id, mask='id, billingItem.id')
         billing_id = subnet['billingItem']['id']
 
-        billing_item = self.client['Billing_Item']
-        return billing_item.cancelService(id=billing_id)
+        return self.client['Billing_Item'].cancelService(id=billing_id)
 
     def edit_rwhois(self, abuse_email=None, address1=None, address2=None,
                     city=None, company_name=None, country=None,
