@@ -1,4 +1,4 @@
-.. _cci:
+.. _cci_user_docs:
   
 Working with Cloud Compute Instances
 ====================================
