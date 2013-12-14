@@ -67,10 +67,11 @@ class NetworkManager(object):
         # looking for the items we need based upon the category, quantity, and
         # item description.
         price_id = None
+        quantity_str = str(quantity)
         for item in package.getItems(id=0, mask='itemCategory'):
             category_code = lookup(item, 'itemCategory', 'categoryCode')
             if all([category_code == category,
-                    item.get('capacity') == str(quantity),
+                    item.get('capacity') == quantity_str,
                     version == 4 or (version == 6 and
                                      desc in item['description'])]):
                 price_id = item['prices'][0]['id']
