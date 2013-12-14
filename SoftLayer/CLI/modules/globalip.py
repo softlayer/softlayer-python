@@ -56,7 +56,7 @@ Cancel a subnet
         mgr = NetworkManager(self.client)
         global_ip_id = resolve_id(mgr.resolve_global_ip_ids,
                                   args.get('<identifier>'),
-                                  name='global ip')(args.get('<identifier>'))
+                                  name='global ip')
 
         if args['--really'] or no_going_back(global_ip_id):
             mgr.cancel_global_ip(global_ip_id)
