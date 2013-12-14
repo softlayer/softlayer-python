@@ -237,7 +237,7 @@ class NetworkTests(unittest.TestCase):
         self.network.list_vlans(
             vlan_number=5,
             datacenter='dal00',
-            vlan_name='primary-vlan',
+            name='primary-vlan',
         )
 
         service = self.client['Account']

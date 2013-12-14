@@ -256,7 +256,7 @@ class NetworkManager(object):
 
         return self.account.getSubnets(**kwargs)
 
-    def list_vlans(self, datacenter=None, vlan_number=None, vlan_name=None,
+    def list_vlans(self, datacenter=None, vlan_number=None, name=None,
                    **kwargs):
         """ Display a list of all VLANs on the account.
 
@@ -267,7 +267,7 @@ class NetworkManager(object):
                                     VLANs in the specified data center.
         :param int vlan_number: If specified, the list will only contain the
                                   VLAN matching this VLAN number.
-        :param int vlan_name: If specified, the list will only contain the
+        :param int name: If specified, the list will only contain the
                                   VLAN matching this VLAN name.
         :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
 
@@ -277,8 +277,8 @@ class NetworkManager(object):
         if vlan_number:
             _filter['networkVlans']['vlanNumber'] = query_filter(vlan_number)
 
-        if vlan_name:
-            _filter['networkVlans']['name'] = query_filter(vlan_name)
+        if name:
+            _filter['networkVlans']['name'] = query_filter(name)
 
         if datacenter:
             _filter['networkVlans']['primaryRouter']['datacenter']['name'] = \
@@ -385,7 +385,7 @@ class NetworkManager(object):
         return [result['id'] for result in results]
 
     def _list_vlans_by_name(self, name):
-        results = self.list_vlans(vlan_name=name, mask='id')
+        results = self.list_vlans(name=name, mask='id')
         return [result['id'] for result in results]
 
     def _get_subnet_mask(self):

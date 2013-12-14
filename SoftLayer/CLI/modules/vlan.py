@@ -119,7 +119,7 @@ Filters:
         vlans = mgr.list_vlans(
             datacenter=args.get('--datacenter'),
             vlan_number=args.get('--number'),
-            vlan_name=args.get('--name'),
+            name=args.get('--name'),
         )
         for vlan in vlans:
             t.add_row([
