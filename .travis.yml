@@ -13,4 +13,4 @@ install:
 # command to run tests
 script:
   - "python setup.py nosetests"
-  - "flake8 --max-complexity=36 --ignore=E501,W291 --statistics SoftLayer"
+  - "if [[ $TRAVIS_PYTHON_VERSION = 2.7 ]]; then flake8 --max-complexity=36 --ignore=E501,W291 --statistics SoftLayer; fi"
