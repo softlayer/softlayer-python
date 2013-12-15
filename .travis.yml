@@ -10,4 +10,6 @@ install:
   - "pip install -r requirements.txt --use-mirrors"
   - "if [[ $TRAVIS_PYTHON_VERSION = 2.6 ]]; then pip install unittest2 --use-mirrors; fi"
 # command to run tests
-script: python setup.py nosetests
+script:
+  - "python setup.py nosetests"
+  - "flake8 --max-complexity=36 --ignore=E501,W291 --statistics SoftLayer"
