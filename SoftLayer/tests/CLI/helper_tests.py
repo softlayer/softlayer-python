@@ -238,14 +238,14 @@ class TestFormatOutput(unittest.TestCase):
         t.add_row([cli.helpers.blank()])
         t.sortby = 'nothing'
         ret = cli.helpers.format_output(t, 'json')
-        self.assertEqual('''[
-    {
-        "nothing": "testdata"
-    }, 
-    {
-        "nothing": null
-    }
-]''', ret)
+        self.assertEqual('[\n'
+                         '    {\n'
+                         '        "nothing": "testdata"\n'
+                         '    }, \n'
+                         '    {\n'
+                         '        "nothing": null\n'
+                         '    }\n'
+                         ']', ret)
 
         ret = cli.helpers.format_output('test', 'json')
         self.assertEqual('"test"', ret)
