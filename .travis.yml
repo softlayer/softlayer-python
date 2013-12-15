@@ -7,6 +7,7 @@ python:
   - "pypy"
 # command to install dependencies
 install:
+  - "pip install flake8 --use-mirrors"
   - "pip install -r requirements.txt --use-mirrors"
   - "if [[ $TRAVIS_PYTHON_VERSION = 2.6 ]]; then pip install unittest2 --use-mirrors; fi"
 # command to run tests
