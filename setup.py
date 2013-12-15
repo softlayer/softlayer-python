@@ -27,7 +27,7 @@ requires = [
 if sys.version_info < (2, 7):
     requires.append('importlib')
 
-description = "A library to use SoftLayer's API"
+description = "A library for SoftLayer's API"
 
 if os.path.exists('README.rst'):
     f = open('README.rst')
