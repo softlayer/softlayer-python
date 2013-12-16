@@ -10,7 +10,7 @@ import socket
 from time import sleep
 from itertools import repeat
 
-from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
+from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin, lookup
 
 
 class CCIManager(IdentifierMixin, object):
@@ -346,15 +346,18 @@ class CCIManager(IdentifierMixin, object):
         """
         for count, new_instance in enumerate(repeat(instance_id)):
             instance = self.get_instance(new_instance)
-            last_reload = instance.get(
-                                  'lastOperatingSystemReload', {}).get('id')
-            active_transaction = instance.get(
-                                'activeTransaction', {}).get('id')
-            not_reloading = (
-                all((last_reload, active_transaction,)),
-                last_reload != active_transaction
-            )
-            if instance.get('provisionDate') and not_reloading:
+            last_reload = lookup(instance, 'lastOperatingSystemReload', 'id')
+            active_transaction = lookup(instance, 'activeTransaction', 'id')
+
+            reloading = all((
+                active_transaction,
+                last_reload,
+                last_reload == active_transaction
+            ))
+
+            # return True if the instance has only if the instance has
+            # finished provisioning and isn't currently reloading the OS.
+            if instance.get('provisionDate') and not reloading:
                 return True
 
             if count >= limit:
