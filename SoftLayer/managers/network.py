@@ -36,7 +36,7 @@ class NetworkManager(object):
 
     def add_subnet(self, subnet_type, quantity=None, vlan_id=None, version=4,
                    test_order=False):
-        """ Adds a global IP address to the account.
+        """ Orders a new subnet
 
         :param str subnet_type: Type of subnet to add: private, public, global
         :param int quantity: Number of IPs in the subnet
