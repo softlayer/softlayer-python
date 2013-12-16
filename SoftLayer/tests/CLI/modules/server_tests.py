@@ -12,7 +12,7 @@ from SoftLayer.tests import unittest
 from mock import Mock, MagicMock, patch
 try:
     # Python 3.x compatibility
-    import builtins
+    import builtins  # NOQA
     builtins_name = 'builtins'
 except ImportError:
     builtins_name = '__builtin__'

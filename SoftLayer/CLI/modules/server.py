@@ -605,15 +605,15 @@ Options:
             os_list = {}
             flat_list = []
 
-            for os in ds_options['categories']['os']['items']:
-                if 'Windows Server' in os['description']:
-                    os_code = _generate_windows_code(os['description'])
+            for opsys in ds_options['categories']['os']['items']:
+                if 'Windows Server' in opsys['description']:
+                    os_code = _generate_windows_code(opsys['description'])
                 else:
-                    os_results = os_regex.search(os['description'])
+                    os_results = os_regex.search(opsys['description'])
                     name = os_results.group(1)
                     version = os_results.group(2)
-                    bits = bit_regex.search(os['description'])
-                    extra_info = extra_regex.search(os['description'])
+                    bits = bit_regex.search(opsys['description'])
+                    extra_info = extra_regex.search(opsys['description'])
 
                     if bits:
                         bits = bits.group(1)
@@ -628,13 +628,13 @@ Options:
                 if name not in os_list:
                     os_list[name] = []
 
-                os_list[name].append((os_code, os['price_id']))
-                flat_list.append((os_code, os['price_id']))
+                os_list[name].append((os_code, opsys['price_id']))
+                flat_list.append((os_code, opsys['price_id']))
 
             if pretty:
                 results = []
-                for os in sorted(os_list.keys()):
-                    results.append(('os (%s)' % os, os_list[os]))
+                for opsys in sorted(os_list.keys()):
+                    results.append(('os (%s)' % opsys, os_list[opsys]))
 
                 return results
             else:

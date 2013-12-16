@@ -132,7 +132,7 @@ Filters:
 
         t.add_row(['id', subnet['id']])
         t.add_row(['identifier',
-                   subnet['networkIdentifier']+'/'+str(subnet['cidr'])])
+                   subnet['networkIdentifier'] + '/' + str(subnet['cidr'])])
         t.add_row(['subnet type', subnet['subnetType']])
         t.add_row(['gateway', subnet.get('gateway', '-')])
         t.add_row(['broadcast', subnet.get('broadcastAddress', '-')])
