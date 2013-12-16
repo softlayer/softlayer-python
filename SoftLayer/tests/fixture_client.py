@@ -25,7 +25,7 @@ class FixtureService(object):
 
     def __init__(self, name):
         try:
-            self.module = import_module('SoftLayer.tests.mocks.%s' % name)
+            self.module = import_module('SoftLayer.tests.fixtures.%s' % name)
         except ImportError:
             self.module = None
 

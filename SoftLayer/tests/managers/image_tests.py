@@ -7,7 +7,7 @@
 """
 from SoftLayer import ImageManager
 from SoftLayer.tests import unittest, FixtureClient
-from SoftLayer.tests.mocks import (
+from SoftLayer.tests.fixtures import (
     Virtual_Guest_Block_Device_Template_Group, Account)
 
 from mock import ANY
