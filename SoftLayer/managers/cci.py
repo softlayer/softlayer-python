@@ -165,6 +165,7 @@ class CCIManager(IdentifierMixin, object):
                 'maxMemory',
                 'datacenter',
                 'activeTransaction[id, transactionStatus[friendlyName,name]]',
+                'lastOperatingSystemReload.id',
                 'blockDevices',
                 'blockDeviceTemplateGroup[id, name, globalIdentifier]',
                 'postInstallScriptUri',
@@ -345,8 +346,15 @@ class CCIManager(IdentifierMixin, object):
         """
         for count, new_instance in enumerate(repeat(instance_id)):
             instance = self.get_instance(new_instance)
-            if not instance.get('activeTransaction', {}).get('id') and \
-                    instance.get('provisionDate'):
+            last_reload = instance.get(
+                                  'lastOperatingSystemReload', {}).get('id')
+            active_transaction = instance.get(
+                                'activeTransaction', {}).get('id')
+            not_reloading = (
+                all((last_reload, active_transaction,)),
+                last_reload != active_transaction
+            )
+            if instance.get('provisionDate') and not_reloading:
                 return True
 
             if count >= limit:
