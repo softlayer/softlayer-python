@@ -53,9 +53,11 @@ class HardwareManager(IdentifierMixin, object):
         # content - Comment about the cancellation
         # cancelAssociatedItems
         # attachmentType - Only option is HARDWARE
-        ticket_obj = self.client['Ticket']
-        return ticket_obj.createCancelServerTicket(hardware_id, cancel_reason,
-                                                   comment, True, 'HARDWARE')
+        return self.client['Ticket'].createCancelServerTicket(hardware_id,
+                                                              cancel_reason,
+                                                              comment,
+                                                              True,
+                                                              'HARDWARE')
 
     def cancel_metal(self, hardware_id, immediate=False):
         """ Cancels the specified bare metal instance.
@@ -653,7 +655,6 @@ class HardwareManager(IdentifierMixin, object):
                         'labor_fee': price.get('laborFee', 0),
                         'capacity': float(price['item'].get('capacity', 0)),
                     })
-
             results['categories'][code]['items'] = items
 
         return results

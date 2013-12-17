@@ -8,17 +8,16 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.tests import unittest
-from mock import MagicMock, patch
+from SoftLayer.tests import unittest, FixtureClient
+from mock import patch
 
 from SoftLayer.CLI.helpers import format_output, CLIAbort, ArgumentError
 from SoftLayer.CLI.modules import bmc
-from SoftLayer.tests.mocks import product_package_mock
 
 
 class BMCCLITests(unittest.TestCase):
     def setUp(self):
-        self.client = self._setup_package_mocks(MagicMock())
+        self.client = FixtureClient()
 
     def test_BMCCreateOptions(self):
         args = {
@@ -277,12 +276,3 @@ class BMCCLITests(unittest.TestCase):
         runnable = bmc.CreateBMCInstance(client=self.client)
         output = runnable._get_default_value(option_mock, 'nope')
         self.assertEqual(None, output)
-
-    def _setup_package_mocks(self, client):
-        p = client['Product_Package']
-        p.getAllObjects = product_package_mock.getAllObjects_Mock()
-        p.getConfiguration = product_package_mock.getConfiguration_Mock(True)
-        p.getCategories = product_package_mock.getCategories_Mock(True)
-        p.getRegions = product_package_mock.getRegions_Mock()
-
-        return client

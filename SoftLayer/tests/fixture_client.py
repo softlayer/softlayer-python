@@ -31,6 +31,7 @@ class FixtureClient(object):
 class FixtureService(object):
 
     def __init__(self, name):
+        self.name = name
         try:
             self.module = import_module('SoftLayer.tests.fixtures.%s' % name)
         except ImportError:
@@ -40,12 +41,12 @@ class FixtureService(object):
         self.loaded_methods = {}
 
     def __getattr__(self, name):
-        if self.loaded_methods.get(name):
+        if name in self.loaded_methods:
             return self.loaded_methods[name]
 
         call_handler = MagicMock()
         fixture = getattr(self.module, name, None)
-        if fixture:
+        if fixture is not None:
             call_handler.return_value = fixture
 
         self.loaded_methods[name] = call_handler
