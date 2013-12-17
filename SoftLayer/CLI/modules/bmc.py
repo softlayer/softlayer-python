@@ -288,7 +288,7 @@ Optional:
                              to the first available datacenter
   --dry-run, --test        Do not create the instance, just get a quote
   --export=FILE            Exports options to a template file
-  -d, --disk=SIZE...       Disks. Can be specified multiple times
+  --disk=SIZE...           Disks. Can be specified multiple times
   -k KEY, --key=KEY        SSH keys to assign to the root user. Can be
                              specified multiple times.
   -n MBPS, --network=MBPS  Network port speed in Mbps. Defaults to 100 Mbps.

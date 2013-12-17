@@ -367,7 +367,7 @@ Optional:
                            multiple times
   --like=IDENTIFIER      Use the configuration from an existing CCI
   -n, --network=MBPS     Network port speed in Mbps
-  -d, --disk=SIZE...     Disks. Can be specified multiple times
+  --disk=SIZE...         Disks. Can be specified multiple times
   --private              Forces the CCI to only have access the private
                            network
   -t, --template=FILE    A template file that defaults the command-line
