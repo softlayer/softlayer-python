@@ -356,6 +356,8 @@ Optional:
                          Note: Omitting this value defaults to the first
                            available datacenter
   --dedicated            Allocate a dedicated CCI (non-shared host)
+  --san                  Use SAN storage instead of local disk. Applies to
+                           all disks specified with --disk.
   --dry-run, --test      Do not create CCI, just get a quote
   --export=FILE          Exports options to a template file
   -F, --userfile=FILE    Read userdata from file
@@ -568,7 +570,7 @@ Optional:
             "private": args['--private'],
             "dedicated": args['--dedicated'],
             "disks": args['--disk'],
-            "local_disk": True,
+            "local_disk": not args['--san'],
         }
 
         try:
