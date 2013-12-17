@@ -55,7 +55,7 @@ def query_filter(query):
 
     """
     try:
-        query = int(query)
+        return {'operation': int(query)}
     except ValueError:
         pass
 

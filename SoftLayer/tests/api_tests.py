@@ -64,6 +64,13 @@ class ClientMethods(unittest.TestCase):
         )
         self.assertIn("Service", repr(client['SERVICE']))
 
+    def test_len(self):
+        client = SoftLayer.Client(
+            username='doesnotexist',
+            api_key='issurelywrong'
+        )
+        self.assertEqual(len(client), 0)
+
 
 class APIClient(unittest.TestCase):
     def setUp(self):
