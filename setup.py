@@ -55,6 +55,7 @@ setup(
         'SoftLayer.tests.CLI.modules',
         'SoftLayer.tests.managers',
         'SoftLayer.tests.mocks',
+        'SoftLayer.tests.fixtures',
     ],
     license='MIT',
     zip_safe=False,
