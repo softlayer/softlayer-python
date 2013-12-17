@@ -700,7 +700,7 @@ Optional:
                          Note: Omitting this value defaults to the first
                          available datacenter
   -n, --network=MBPS   Network port speed in Mbps
-  -d, --disk=SIZE...   Disks. Can be specified multiple times
+  --disk=SIZE...       Disks. Can be specified multiple times
   --controller=RAID    The RAID configuration for the server.
                          Defaults to None.
   -k KEY, --key=KEY    SSH keys to assign to the root user. Can be specified
