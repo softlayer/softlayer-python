@@ -1,37 +1,137 @@
-"""
-    SoftLayer.tests.mocks.product_package_mock
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Mocks API calls documented at
-    http://sldn.softlayer.com/reference/services/SoftLayer_Account
+getAllObjects = [
+    {'id': 13, 'name': 'Mock Testing Package'},
+    {'id': 27, 'name': 'An additional testing category'},
+    {'id': 50, 'name': 'Bare Metal Instance'},
+]
 
-    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
-    :license: MIT, see LICENSE for more details.
-"""
-from mock import MagicMock
+getConfiguration = [
+    {
+        'sort': 1,
+        'orderStepId': 1,
+        'itemCategory': {
+            'categoryCode': 'server_core',
+            'name': 'Bare Metal Instance'
+        },
+        'isRequired': 0,
+    },
+    {
+        'itemCategory': {
+            'categoryCode': 'os',
+            'name': 'Operating System',
+        },
+        'sort': 0,
+        'orderStepId': 1,
+        'isRequired': 1,
+    },
+    {
+        'itemCategory': {
+            'categoryCode': 'disk0',
+            'name': 'First Hard Drive',
+        },
+        'sort': 0,
+        'orderStepId': 1,
+        'isRequired': 1,
+    },
+    {
+        'itemCategory': {
+            'categoryCode': 'port_speed',
+            'name': 'Uplink Port Speeds'
+        },
+        'sort': 0,
+        'orderStepId': 1,
+        'isRequired': 1,
+    },
+] + [
+    {
+        'itemCategory': {
+            'categoryCode': 'random',
+            'name': 'Random Category',
+        },
+        'sort': 0,
+        'orderStepId': 1,
+        'isRequired': 0,
+    },
+    {
+        'itemCategory': {
+            'categoryCode': 'disk0',
+            'name': 'First Disk',
+        },
+        'sort': 0,
+        'orderStepId': 1,
+        'isRequired': 1,
+    },
+    {
+        'itemCategory': {
+            'categoryCode': 'disk1',
+            'name': 'Second Disk',
+        },
+        'sort': 0,
+        'orderStepId': 1,
+        'isRequired': 1,
+    },
+    {
+        'itemCategory': {
+            'categoryCode': 'os',
+            'name': 'Operating System',
+        },
+        'sort': 0,
+        'orderStepId': 1,
+        'isRequired': 1,
+    },
+    {
+        'itemCategory': {
+            'categoryCode': 'port_speed',
+            'name': 'Uplink Port Speeds',
+        },
+        'sort': 2,
+        'orderStepId': 1,
+        'isRequired': 1,
+    },
+    {
+        'itemCategory': {
+            'categoryCode': 'ram',
+            'name': 'RAM',
+        },
+        'sort': 2,
+        'orderStepId': 1,
+        'isRequired': 1,
+    },
+    {
+        'itemCategory': {
+            'categoryCode': 'disk_controller',
+            'name': 'Disk Controller',
+        },
+        'sort': 2,
+        'orderStepId': 1,
+        'isRequired': 1,
+    },
+    {
+        'itemCategory': {
+            'categoryCode': 'server',
+            'name': 'Server',
+        },
+        'sort': 2,
+        'orderStepId': 1,
+        'isRequired': 1,
+    },
+]
+getRegions = [{
+    'location': {
+        'locationPackageDetails': [{
+            'deliveryTimeInformation': 'Typically 2-4 hours',
+        }],
+    },
+    'keyname': 'RANDOM_LOCATION',
+    'description': 'Random unit testing location',
+}]
 
-
-def getAllObjects_Mock():
-    mock = MagicMock()
-
-    mock.return_value = [
-        {'id': 13, 'name': 'Mock Testing Package'},
-        {'id': 27, 'name': 'An additional testing category'},
-        {'id': 50, 'name': 'Bare Metal Instance'},
-    ]
-
-    return mock
-
-
-def getCategories_Mock(bmc=False):
-    if bmc:
-        return get_bmc_categories_mock()
-    else:
-        return get_server_categories_mock()
+CATEGORY = {
+    'categoryCode': 'random',
+    'name': 'Random Category',
+}
 
 
 def get_server_categories_mock():
-    mock = MagicMock()
-
     prices = [{
         'itemId': 888,
         'id': 1888,
@@ -378,11 +478,10 @@ def get_server_categories_mock():
         }
     ]
 
-    category = _get_mock_category()
-    mock.return_value = [
+    return [
         {
-            'categoryCode': category['categoryCode'],
-            'name': category['name'],
+            'categoryCode': CATEGORY['categoryCode'],
+            'name': CATEGORY['name'],
             'id': 1000,
             'groups': [{
                 'sort': 0,
@@ -510,12 +609,8 @@ def get_server_categories_mock():
         },
     ]
 
-    return mock
-
 
 def get_bmc_categories_mock():
-    mock = MagicMock()
-
     server_core_prices = [
         {
             'itemId': 1013,
@@ -861,7 +956,7 @@ def get_bmc_categories_mock():
         }
     ]
 
-    mock.return_value = [
+    return [
         {
             'categoryCode': 'server_core',
             'id': 110,
@@ -924,156 +1019,4 @@ def get_bmc_categories_mock():
         },
     ]
 
-    return mock
-
-
-def getConfiguration_Mock(bmc=False):
-    if bmc:
-        return get_bmc_configuration_mock()
-    else:
-        return get_server_configuration_mock()
-
-
-def get_bmc_configuration_mock():
-    mock = MagicMock()
-    mock.return_value = [
-        {
-            'sort': 1,
-            'orderStepId': 1,
-            'itemCategory': {
-                'categoryCode': 'server_core',
-                'name': 'Bare Metal Instance'
-            },
-            'isRequired': 0,
-        },
-        {
-            'itemCategory': {
-                'categoryCode': 'os',
-                'name': 'Operating System',
-            },
-            'sort': 0,
-            'orderStepId': 1,
-            'isRequired': 1,
-        },
-        {
-            'itemCategory': {
-                'categoryCode': 'disk0',
-                'name': 'First Hard Drive',
-            },
-            'sort': 0,
-            'orderStepId': 1,
-            'isRequired': 1,
-        },
-        {
-            'itemCategory': {
-                'categoryCode': 'port_speed',
-                'name': 'Uplink Port Speeds'
-            },
-            'sort': 0,
-            'orderStepId': 1,
-            'isRequired': 1,
-        },
-    ]
-
-    return mock
-
-
-def get_server_configuration_mock():
-    mock = MagicMock()
-    mock.return_value = [
-        {
-            'itemCategory': _get_mock_category(),
-            'sort': 0,
-            'orderStepId': 1,
-            'isRequired': 0,
-        },
-        {
-            'itemCategory': {
-                'categoryCode': 'disk0',
-                'name': 'First Disk',
-            },
-            'sort': 0,
-            'orderStepId': 1,
-            'isRequired': 1,
-        },
-        {
-            'itemCategory': {
-                'categoryCode': 'disk1',
-                'name': 'Second Disk',
-            },
-            'sort': 0,
-            'orderStepId': 1,
-            'isRequired': 1,
-        },
-        {
-            'itemCategory': {
-                'categoryCode': 'os',
-                'name': 'Operating System',
-            },
-            'sort': 0,
-            'orderStepId': 1,
-            'isRequired': 1,
-        },
-        {
-            'itemCategory': {
-                'categoryCode': 'port_speed',
-                'name': 'Uplink Port Speeds',
-            },
-            'sort': 2,
-            'orderStepId': 1,
-            'isRequired': 1,
-        },
-        {
-            'itemCategory': {
-                'categoryCode': 'ram',
-                'name': 'RAM',
-            },
-            'sort': 2,
-            'orderStepId': 1,
-            'isRequired': 1,
-        },
-        {
-            'itemCategory': {
-                'categoryCode': 'disk_controller',
-                'name': 'Disk Controller',
-            },
-            'sort': 2,
-            'orderStepId': 1,
-            'isRequired': 1,
-        },
-        {
-            'itemCategory': {
-                'categoryCode': 'server',
-                'name': 'Server',
-            },
-            'sort': 2,
-            'orderStepId': 1,
-            'isRequired': 1,
-        },
-    ]
-
-    return mock
-
-
-def getRegions_Mock():
-    mock = MagicMock()
-
-    mock.return_value = [{
-        'location': {
-            'locationPackageDetails': [{
-                'deliveryTimeInformation': 'Typically 2-4 hours',
-            }],
-        },
-        'keyname': 'RANDOM_LOCATION',
-        'description': 'Random unit testing location',
-    }]
-
-    return mock
-
-
-def _get_mock_category():
-    # TODO - This might get moved into another mock module
-    return {
-        'categoryCode': 'random',
-        'name': 'Random Category',
-    }
+getCategories = get_server_categories_mock() + get_bmc_categories_mock()
