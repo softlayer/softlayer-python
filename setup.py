@@ -55,6 +55,7 @@ setup(
         'SoftLayer.tests.CLI.modules',
         'SoftLayer.tests.managers',
         'SoftLayer.tests.mocks',
+        'SoftLayer.tests.fixtures',
     ],
     license='MIT',
     zip_safe=False,
@@ -65,7 +66,7 @@ setup(
         ],
     },
     package_data={
-        'SoftLayer': ['tests/fixtures/*'],
+        'SoftLayer': ['tests/fixtures/*.conf'],
     },
     test_suite='nose.collector',
     install_requires=requires,
