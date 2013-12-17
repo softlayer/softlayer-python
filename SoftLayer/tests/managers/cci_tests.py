@@ -502,9 +502,101 @@ class CCITests(unittest.TestCase):
         self.assertTrue(data.get('blockDevices'))
         self.assertEqual(data['blockDevices'], assert_data['blockDevices'])
 
-    @patch('SoftLayer.managers.cci.sleep')
-    def test_wait(self, _sleep):
+    @patch('SoftLayer.managers.cci.CCIManager.wait_for_ready')
+    def test_wait(self, ready):
+        # verify interface to wait_for_ready is intact
+        self.cci.wait_for_transaction(1, 1)
+        ready.assert_called_once_with(1, 1, delay=1, pending=True)
+
+    def test_ready_permutations(self):
         guestObject = self.client['Virtual_Guest'].getObject
+
+        # active transaction and no provision date should be false
+        guestObject.side_effect = [
+            {'activeTransaction': {'id': 1}},
+        ]
+        value = self.cci.wait_for_ready(1, 1)
+        self.assertFalse(value)
+        guestObject.reset_mock()
+
+        # active transaction and provision date should be True
+        guestObject.side_effect = [
+            {'activeTransaction': {'id': 1},
+             'provisionDate': 'aaa'},
+        ]
+        value = self.cci.wait_for_ready(1, 1)
+        self.assertTrue(value)
+        guestObject.reset_mock()
+
+        # active transaction and provision date
+        # and pending should be false
+        guestObject.side_effect = [
+            {'activeTransaction': {'id': 1},
+             'provisionDate': 'aaa'},
+        ]
+        value = self.cci.wait_for_ready(1, 1, pending=True)
+        self.assertFalse(value)
+        guestObject.reset_mock()
+
+        # actively running reload
+        guestObject.side_effect = [
+            {
+                'activeTransaction': {'id': 1},
+                'provisionDate': 'aaa',
+                'lastOperatingSystemReload': {'id': 1},
+            },
+        ]
+        value = self.cci.wait_for_ready(1, 1)
+        self.assertFalse(value)
+        guestObject.reset_mock()
+
+        # reload complete, maintance transactions
+        guestObject.side_effect = [
+            {
+                'activeTransaction': {'id': 2},
+                'provisionDate': 'aaa',
+                'lastOperatingSystemReload': {'id': 1},
+            },
+        ]
+        value = self.cci.wait_for_ready(1, 1)
+        self.assertTrue(value)
+        guestObject.reset_mock()
+
+        # reload complete, pending maintance transactions
+        guestObject.side_effect = [
+            {
+                'activeTransaction': {'id': 2},
+                'provisionDate': 'aaa',
+                'lastOperatingSystemReload': {'id': 1},
+            },
+        ]
+        value = self.cci.wait_for_ready(1, 1, pending=True)
+        self.assertFalse(value)
+        guestObject.reset_mock()
+
+    @patch('SoftLayer.managers.cci.sleep')
+    def test_ready_delay_iterations(self, _sleep):
+        guestObject = self.client['Virtual_Guest'].getObject
+
+        # no iteration, false
+        guestObject.side_effect = [
+            {'activeTransaction': {'id': 1}},
+        ]
+        value = self.cci.wait_for_ready(1, 1)
+        self.assertFalse(value)
+        self.assertFalse(_sleep.called)
+        _sleep.reset_mock()
+        guestObject.reset_mock()
+
+        # no iteration, true
+        guestObject.side_effect = [
+            {'provisionDate': 'aaa'},
+        ]
+        value = self.cci.wait_for_ready(1, 1)
+        self.assertTrue(value)
+        self.assertFalse(_sleep.called)
+        _sleep.reset_mock()
+        guestObject.reset_mock()
 
         # test 4 iterations with positive match
         guestObject.side_effect = [
@@ -512,10 +604,9 @@ class CCITests(unittest.TestCase):
             {'activeTransaction': {'id': 1}},
             {'activeTransaction': {'id': 1}},
             {'provisionDate': 'aaa'},
-            {'provisionDate': 'aaa'}
         ]
 
-        value = self.cci.wait_for_transaction(1, 4)
+        value = self.cci.wait_for_ready(1, 4)
         self.assertTrue(value)
         _sleep.assert_has_calls([call(1), call(1), call(1)])
         guestObject.assert_has_calls([
@@ -530,15 +621,13 @@ class CCITests(unittest.TestCase):
         guestObject.side_effect = [
             {'activeTransaction': {'id': 1}},
             {'activeTransaction': {'id': 1}},
-            {'activeTransaction': {'id': 1}},
             {'provisionDate': 'aaa'}
         ]
-        value = self.cci.wait_for_transaction(1, 2)
+        value = self.cci.wait_for_ready(1, 2)
         self.assertFalse(value)
-        _sleep.assert_has_calls([call(1), call(1)])
+        _sleep.assert_called_once_with(1)
         guestObject.assert_has_calls([
             call(id=1, mask=ANY), call(id=1, mask=ANY),
-            call(id=1, mask=ANY)
         ])
 
         # 10 iterations at 10 second sleeps with no
@@ -556,9 +645,8 @@ class CCITests(unittest.TestCase):
             {'activeTransaction': {'id': 1}},
             {'activeTransaction': {'id': 1}},
             {'activeTransaction': {'id': 1}},
-            {'activeTransaction': {'id': 1}}
         ]
-        value = self.cci.wait_for_transaction(1, 10, 10)
+        value = self.cci.wait_for_ready(1, 10, 10)
         self.assertFalse(value)
         guestObject.assert_has_calls([
             call(id=1, mask=ANY), call(id=1, mask=ANY),
@@ -566,11 +654,12 @@ class CCITests(unittest.TestCase):
             call(id=1, mask=ANY), call(id=1, mask=ANY),
             call(id=1, mask=ANY), call(id=1, mask=ANY),
             call(id=1, mask=ANY), call(id=1, mask=ANY),
-            call(id=1, mask=ANY)
         ])
+        # should only be 9 calls to sleep, last iteration
+        # should return a value and skip the sleep
         _sleep.assert_has_calls([
             call(10), call(10), call(10), call(10), call(10),
-            call(10), call(10), call(10), call(10), call(10)])
+            call(10), call(10), call(10), call(10)])
 
     def test_change_port_speed_public(self):
         cci_id = 1

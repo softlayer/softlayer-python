@@ -367,7 +367,7 @@ class CCIManager(IdentifierMixin, object):
         :param bool pending: Wait for pending transactions not related to
                              provisioning or reloads such as monitoring.
         """
-        for count, new_instance in enumerate(repeat(instance_id)):
+        for count, new_instance in enumerate(repeat(instance_id), start=1):
             instance = self.get_instance(new_instance)
             last_reload = lookup(instance, 'lastOperatingSystemReload', 'id')
             active_transaction = lookup(instance, 'activeTransaction', 'id')
