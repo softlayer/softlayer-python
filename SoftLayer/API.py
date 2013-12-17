@@ -260,6 +260,9 @@ class Client(object):
 
     __str__ = __repr__
 
+    def __len__(self):
+        return 0
+
 
 class TimedClient(Client):
     """ Subclass of Client()
