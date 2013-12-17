@@ -353,7 +353,12 @@ class CCIManager(IdentifierMixin, object):
 
     def wait_for_ready(self, instance_id, limit, delay=1, pending=False):
         """ Determine if a CCI is ready and available.  In some cases
-        though, that can mean that no transactions are running.
+        though, that can mean that no transactions are running. The default
+        arguments imply a CCI is usable from an operational and
+        ready for use: having network connectivity and remote access is
+        available.  Setting ``pending=True`` will ensure future API calls
+        against this instance will not error out due to pending
+        transactions such as OS Reloads and cancellations.
 
         :param int instance_id: The instance ID with the pending transaction
         :param int limit: The maximum amount of time to wait.
