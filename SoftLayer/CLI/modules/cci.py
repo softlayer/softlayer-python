@@ -463,7 +463,7 @@ Optional:
                 output.append(t)
 
                 if args.get('--wait'):
-                    ready = cci.wait_for_transaction(
+                    ready = cci.wait_for_ready(
                         result['id'], int(args.get('--wait') or 1))
                     t.add_row(['ready', ready])
             else:
@@ -648,7 +648,7 @@ Optional:
         cci = CCIManager(self.client)
 
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
-        ready = cci.wait_for_transaction(cci_id, int(args.get('--wait') or 0))
+        ready = cci.wait_for_ready(cci_id, int(args.get('--wait') or 0))
 
         if ready:
             return "READY"

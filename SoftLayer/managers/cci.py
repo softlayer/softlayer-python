@@ -338,11 +338,29 @@ class CCIManager(IdentifierMixin, object):
 
     def wait_for_transaction(self, instance_id, limit, delay=1):
         """ Waits on a CCI transaction for the specified amount of time.
+        is really just a wrapper for wait_for_ready(pending=True).
+        Provided for backwards compatibility.
+
 
         :param int instance_id: The instance ID with the pending transaction
         :param int limit: The maximum amount of time to wait.
         :param int delay: The number of seconds to sleep before checks.
                           Defaults to 1.
+        """
+
+        return self.wait_for_ready(instance_id, limit, delay=delay,
+                                   pending=True)
+
+    def wait_for_ready(self, instance_id, limit, delay=1, pending=False):
+        """ Determine if a CCI is ready and available.  In some cases
+        though, that can mean that no transactions are running.
+
+        :param int instance_id: The instance ID with the pending transaction
+        :param int limit: The maximum amount of time to wait.
+        :param int delay: The number of seconds to sleep before checks.
+                          Defaults to 1.
+        :param bool pending: Wait for pending transactions not related to
+                             provisioning or reloads such as monitoring.
         """
         for count, new_instance in enumerate(repeat(instance_id)):
             instance = self.get_instance(new_instance)
@@ -355,9 +373,15 @@ class CCIManager(IdentifierMixin, object):
                 last_reload == active_transaction
             ))
 
+            # only check for outstanding transactions if requested
+            outstanding = False
+            if pending:
+                outstanding = active_transaction
+
             # return True if the instance has only if the instance has
             # finished provisioning and isn't currently reloading the OS.
-            if instance.get('provisionDate') and not reloading:
+            if instance.get('provisionDate') \
+                    and not reloading and not outstanding:
                 return True
 
             if count >= limit:
