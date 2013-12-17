@@ -354,8 +354,8 @@ class CCIManager(IdentifierMixin, object):
     def wait_for_ready(self, instance_id, limit, delay=1, pending=False):
         """ Determine if a CCI is ready and available.  In some cases
         though, that can mean that no transactions are running. The default
-        arguments imply a CCI is operational and ready for use by having 
-        network connectivity and remote access is available.  Setting 
+        arguments imply a CCI is operational and ready for use by having
+        network connectivity and remote access is available.  Setting
         ``pending=True`` will ensure future API calls
         against this instance will not error due to pending
         transactions such as OS Reloads and cancellations.
