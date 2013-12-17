@@ -65,7 +65,7 @@ setup(
         ],
     },
     package_data={
-        'SoftLayer': ['tests/fixtures/*'],
+        'SoftLayer': ['tests/fixtures/*.conf'],
     },
     test_suite='nose.collector',
     install_requires=requires,

@@ -319,13 +319,10 @@ class CCIManager(IdentifierMixin, object):
                 {"device": "0", "diskImage": {"capacity": disks[0]}}
             ]
 
-            # disk 1 is reservered for swap
-            # XXX: enumerate(iterator, start=0) was added in 2.6. work around
-            # for 2.5 by adding 2 to the enumerated value
-            for dev_id, disk in enumerate(disks[1:]):
+            for dev_id, disk in enumerate(disks[1:], start=2):
                 data['blockDevices'].append(
                     {
-                        "device": str(dev_id + 2),
+                        "device": str(dev_id),
                         "diskImage": {"capacity": disk}
                     }
                 )
