@@ -6,7 +6,9 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
+import re
 
+UUID_RE = re.compile('^[0-9a-f\-]{36}$', re.I)
 KNOWN_OPERATIONS = ['<=', '>=', '<', '>', '~', '*=', '^=', '$=', '_=', '!~']
 
 
@@ -107,6 +109,10 @@ def resolve_ids(identifier, resolvers):
         return [int(identifier)]
     except ValueError:
         pass  # It was worth a shot
+
+    # This looks like a globalIdentifier (UUID)
+    if len(identifier) == 36 and UUID_RE.match(identifier):
+        return [identifier]
 
     for resolver in resolvers:
         ids = resolver(identifier)

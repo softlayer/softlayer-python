@@ -9,7 +9,7 @@ from SoftLayer import CCIManager
 from SoftLayer.tests import unittest, FixtureClient
 from SoftLayer.tests.fixtures import Virtual_Guest
 
-from mock import ANY, call, patch
+from mock import MagicMock, ANY, call, patch
 
 
 class CCITests(unittest.TestCase):
@@ -666,7 +666,7 @@ class CCIWaitReadyGoTests(unittest.TestCase):
             {'activeTransaction': {'id': 1}},
             {'activeTransaction': {'id': 1}},
         ]
-        value = self.cci.wait_for_ready(1, 10, 10)
+        value = self.cci.wait_for_ready(1, 10, delay=10)
         self.assertFalse(value)
         self.guestObject.assert_has_calls([
             call(id=1, mask=ANY), call(id=1, mask=ANY),

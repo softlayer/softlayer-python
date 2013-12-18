@@ -187,3 +187,12 @@ getCreateObjectOptions = {
         {'template': {'datacenter': {'name': 'dal05'}}},
     ],
 }
+
+editObject = True
+deleteObject = True
+setPrivateNetworkInterfaceSpeed = True
+setPublicNetworkInterfaceSpeed = True
+createObject = getObject
+generateOrderTemplate = {}
+setUserMetadata = ['meta']
+reloadOperatingSystem = 'OK'

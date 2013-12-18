@@ -75,20 +75,10 @@ class ImageTests(unittest.TestCase):
         self.assertEqual(
             results, Virtual_Guest_Block_Device_Template_Group.getPublicImages)
 
-    def test_resolve_ids_guid_public(self):
-        self.vgbdtg.getPublicImages.return_value = [{'id': 100}]
-        self.account.getPrivateBlockDeviceTemplateGroups.return_value = []
+    def test_resolve_ids_guid(self):
         result = self.image.resolve_ids('3C1F3C68-0B67-4F5E-8907-D0FC84BF3F12')
 
-        self.assertEquals([100], result)
-
-    def test_resolve_ids_guid_private(self):
-        self.vgbdtg.getPublicImages.return_value = []
-        self.account.getPrivateBlockDeviceTemplateGroups.return_value = \
-            [{'id': 100}]
-        result = self.image.resolve_ids('3C1F3C68-0B67-4F5E-8907-D0FC84BF3F12')
-
-        self.assertEquals([100], result)
+        self.assertEquals(['3C1F3C68-0B67-4F5E-8907-D0FC84BF3F12'], result)
 
     def test_resolve_ids_name_public(self):
         self.vgbdtg.getPublicImages.return_value = [{'id': 100}]

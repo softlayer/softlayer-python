@@ -1,8 +1,10 @@
 getAllObjects = [
-    {'id': 13, 'name': 'Mock Testing Package'},
+    {'id': 13, 'name': 'Mock Testing Package', 'description': 'a thing'},
     {'id': 27, 'name': 'An additional testing category'},
     {'id': 50, 'name': 'Bare Metal Instance'},
 ]
+
+getObject = getAllObjects[0]
 
 getConfiguration = [
     {

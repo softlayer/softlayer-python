@@ -48,7 +48,16 @@ getObject = {
         }
     }
 }
-
-reloadOperatingSystem = 'string?'
+editObject = True
+setPrivateNetworkInterfaceSpeed = True
+setPublicNetworkInterfaceSpeed = True
+powerOff = True
+powerOn = True
+powerCycle = True
+rebootSoft = True
+rebootDefault = True
+rebootHard = True
+setUserMetadata = ['meta']
+reloadOperatingSystem = 'OK'
 getReverseDomainRecords = [
     {'resourceRecords': [{'data': '2.0.1.10.in-addr.arpa'}]}]
