@@ -9,7 +9,7 @@ from SoftLayer import CCIManager
 from SoftLayer.tests import unittest, FixtureClient
 from SoftLayer.tests.fixtures import Virtual_Guest
 
-from mock import MagicMock, ANY, call, patch
+from mock import ANY, call, patch
 
 
 class CCITests(unittest.TestCase):
