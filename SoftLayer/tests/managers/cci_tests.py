@@ -502,7 +502,6 @@ class CCITests(unittest.TestCase):
         self.assertTrue(data.get('blockDevices'))
         self.assertEqual(data['blockDevices'], assert_data['blockDevices'])
 
-
     def test_change_port_speed_public(self):
         cci_id = 1
         speed = 100
@@ -541,6 +540,7 @@ class CCITests(unittest.TestCase):
 
         self.cci.edit(100, **args)
         service.editObject.assert_called_once_with(args, id=100)
+
 
 class CCIWaitReadyGoTests(unittest.TestCase):
 
@@ -703,4 +703,3 @@ class CCIWaitReadyGoTests(unittest.TestCase):
         _sleep.assert_has_calls([
             call(10), call(10), call(10), call(10), call(10),
             call(10), call(10), call(10), call(10)])
-
