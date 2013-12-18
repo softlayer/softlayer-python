@@ -857,7 +857,7 @@ def get_bmc_categories_mock():
 
     disk_prices2 = [
         {
-            'itemId': 13,
+            'itemId': 2000,
             'setupFee': '0',
             'recurringFee': '0',
             'hourlyRecurringFee': '0',
@@ -867,7 +867,7 @@ def get_bmc_categories_mock():
             'item': {
                 'capacity': '250',
                 'description': '250GB SATA II',
-                'id': 13
+                'id': 2000
             },
             'laborFee': '0',
         }
