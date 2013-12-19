@@ -9,9 +9,6 @@ SoftLayer API Python Client
 .. image:: https://badge.fury.io/py/SoftLayer.png
     :target: http://badge.fury.io/py/SoftLayer
 
-.. image:: https://pypip.in/d/SoftLayer/badge.png
-    :target: https://crate.io/packages/SoftLayer
-
 SoftLayer API bindings for Python. For use with `SoftLayer's API <http://sldn.softlayer.com/reference/softlayerapi>`_.
 
 This library provides a simple interface to interact with SoftLayer's XML-RPC API and provides support for many of SoftLayer API's features like `object masks <http://sldn.softlayer.com/article/Using-Object-Masks-SoftLayerAPI>`_ and includes a command-line interface that can be used to manage various SoftLayer services.
