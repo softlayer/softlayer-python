@@ -1,10 +1,10 @@
 SoftLayer API Python Client
 ===========================
-.. image:: https://api.travis-ci.org/softlayer/softlayer-api-python-client.png
-    :target: https://travis-ci.org/softlayer/softlayer-api-python-client
+.. image:: https://api.travis-ci.org/softlayer/softlayer-python.png
+    :target: https://travis-ci.org/softlayer/softlayer-python
         
-.. image:: https://landscape.io/github/softlayer/softlayer-api-python-client/master/landscape.png
-    :target: https://landscape.io/github/softlayer/softlayer-api-python-client/master
+.. image:: https://landscape.io/github/softlayer/softlayer-python/master/landscape.png
+    :target: https://landscape.io/github/softlayer/softlayer-python/master
 
 .. image:: https://badge.fury.io/py/SoftLayer.png
     :target: http://badge.fury.io/py/SoftLayer
@@ -17,8 +17,8 @@ Documentation
 -------------
 Documentation is available at https://softlayer-api-python-client.readthedocs.org
 
-* API Client: https://softlayer-api-python-client.readthedocs.org/en/latest/api/client
-* Command-line Interface: https://softlayer-api-python-client.readthedocs.org/en/latest/cli
+* API Client: https://softlayer-python.readthedocs.org/en/latest/api/client.html
+* Command-line Interface: https://softlayer-python.readthedocs.org/en/latest/cli.html
 
 Installation
 ------------
