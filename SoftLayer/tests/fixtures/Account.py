@@ -141,3 +141,63 @@ getHardware = [{
         },
     ]
 }]
+getDomains = [{'name': 'example.com', 'id': 12345}]
+
+getObject = {
+    'networkVlans': [{
+        'firewallNetworkComponents': [{'id': 1234}],
+        'networkVlanFirewall': [{'id': 1234}],
+        'dedicatedFirewallFlag': True,
+        'firewallGuestNetworkComponents': [{'id': 1234}],
+        'firewallInterfaces': [{'id': 1234}],
+        'firewallRules': [{'id': 1234}],
+        'highAvailabilityFirewallFlag': True,
+    }]
+}
+
+getRwhoisData = {
+    'abuseEmail': 'abuseEmail',
+    'accountId': 1234,
+    'address1': 'address1',
+    'address2': 'address2',
+    'city': 'city',
+    'companyName': 'companyName',
+    'country': 'country',
+    'createDate': 'createDate',
+    'firstName': 'firstName',
+    'id': 'id',
+    'lastName': 'lastName',
+    'modifyDate': 'modifyDate',
+    'postalCode': 'postalCode',
+    'privateResidenceFlag': 'privateResidenceFlag',
+}
+
+getGlobalIpRecords = [
+    {
+        'id': '200',
+        'ipAddress': {
+            'subnet': {
+                'networkIdentifier': '10.0.0.1',
+            },
+        },
+    }]
+
+getSubnets = [
+    {
+        'id': '100',
+        'networkIdentifier': '10.0.0.1',
+        'datacenter': {'name': 'dal00'},
+        'version': 4,
+        'subnetType': 'PRIMARY'
+    }]
+
+getNetworkVlans = {'id': 1234}
+
+getSshKeys = [{'id': '100', 'label': 'Test 1'},
+              {'id': '101', 'label': 'Test 2', 'notes': 'Test notes'}]
+
+getSecurityCertificates = [{'certificate': '1234',
+                            'commonName': 'cert',
+                            'id': 1234}]
+getExpiredSecurityCertificates = getSecurityCertificates
+getValidSecurityCertificates = getSecurityCertificates

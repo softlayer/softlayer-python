@@ -1,5 +1,4 @@
 getAllObjects = [
-
     {'id': 13, 'name': 'Mock Testing Package', 'description': 'a thing'},
     {'id': 27, 'name': 'An additional testing category'},
     {'id': 50, 'name': 'Bare Metal Instance'},
@@ -1022,3 +1021,53 @@ def get_bmc_categories_mock():
     ]
 
 getCategories = get_server_categories_mock() + get_bmc_categories_mock()
+getItems = [
+    {
+        'id': 4440,
+        'capacity': '4',
+        'description': '4 Portable Public IP Addresses',
+        'itemCategory': {'categoryCode': 'sov_sec_ip_addresses_pub'},
+        'prices': [{'id': 4444}],
+    },
+    {
+        'id': 8880,
+        'capacity': '8',
+        'description': '8 Portable Public IP Addresses',
+        'itemCategory': {'categoryCode': 'sov_sec_ip_addresses_pub'},
+        'prices': [{'id': 8888}],
+    },
+    {
+        'id': 44400,
+        'capacity': '4',
+        'description': '4 Portable Private IP Addresses',
+        'itemCategory': {'categoryCode': 'sov_sec_ip_addresses_priv'},
+        'prices': [{'id': 44441}],
+    },
+    {
+        'id': 88800,
+        'capacity': '8',
+        'description': '8 Portable Private IP Addresses',
+        'itemCategory': {'categoryCode': 'sov_sec_ip_addresses_priv'},
+        'prices': [{'id': 88881}],
+    },
+    {
+        'id': 10,
+        'capacity': '0',
+        'description': 'Global IPv4',
+        'itemCategory': {'categoryCode': 'global_ipv4'},
+        'prices': [{'id': 11}],
+    },
+    {
+        'id': 66464,
+        'capacity': '64',
+        'description': '/64 Block Portable Public IPv6 Addresses',
+        'itemCategory': {'categoryCode': 'static_ipv6_addresses'},
+        'prices': [{'id': 664641}],
+    },
+    {
+        'id': 610,
+        'capacity': '0',
+        'description': 'Global IPv6',
+        'itemCategory': {'categoryCode': 'global_ipv6'},
+        'prices': [{'id': 611}],
+    }]

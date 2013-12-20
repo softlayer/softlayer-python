@@ -13,6 +13,12 @@ getObject = {
     'globalIdentifier': '1a2b3c-1701',
     'primaryBackendIpAddress': '10.45.19.37',
     'hourlyBillingFlag': False,
+    'createDate': '2013-08-01 15:23:45',
+    'operatingSystem': {
+        'softwareLicense': {
+            'softwareDescription': {'version': '12.04-64 Minimal for CCI',
+                                    'name': 'Ubuntu'}}
+    }
 }
 
 getCreateObjectOptions = {
@@ -187,6 +193,15 @@ getCreateObjectOptions = {
         {'template': {'datacenter': {'name': 'dal05'}}},
     ],
 }
+
+getReverseDomainRecords = [{
+    'networkAddress': '12.34.56.78',
+    'name': '12.34.56.78.in-addr.arpa',
+    'resourceRecords': [{'data': 'test.softlayer.com.', 'id': 987654}],
+    'updateDate': '2013-09-11T14:36:57-07:00',
+    'serial': 1234665663,
+    'id': 123456,
+}]
 
 editObject = True
 deleteObject = True

@@ -6,14 +6,14 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import SshKeyManager
-from SoftLayer.tests import unittest
-from mock import MagicMock, call
+from SoftLayer.tests import unittest, FixtureClient
+from mock import call
 
 
 class SshKeyTests(unittest.TestCase):
 
     def setUp(self):
-        self.client = MagicMock()
+        self.client = FixtureClient()
         self.sshkey = SshKeyManager(self.client)
 
     def test_add_key(self):
@@ -65,25 +65,11 @@ class SshKeyTests(unittest.TestCase):
 
     def test_list_keys(self):
         service = self.client['Account']
-        mcall = call(filter={
-            'sshKeys': {'label': {'operation': '_= some label'}}})
         self.sshkey.list_keys(label='some label')
-        service.getSshKeys.assert_has_calls(mcall)
+        service.getSshKeys.assert_called_with(
+            filter={'sshKeys': {'label': {'operation': '_= some label'}}})
 
     def test_resolve_ids_label(self):
-        service = self.client['Account']
-        service.getSshKeys.return_value = [
-            {
-                'id': '100',
-                'label': 'Test 1',
-            },
-            {
-                'id': '101',
-                'label': 'Test 2',
-                'notes': 'Test notes'
-            },
-        ]
-
         _id = self.sshkey._get_ids_from_label('Test 1')
         self.assertEqual(_id, ['100'])
 
