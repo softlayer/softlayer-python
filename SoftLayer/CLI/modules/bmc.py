@@ -400,12 +400,15 @@ Optional:
             total_monthly = 0.0
             total_hourly = 0.0
             for price in result['prices']:
-                total_monthly += float(price.get('recurringFee', 0.0))
-                total_hourly += float(price.get('hourlyRecurringFee', 0.0))
+                monthly_fee = float(price.get('recurringFee', 0.0))
+                hourly_fee = float(price.get('hourlyRecurringFee', 0.0))
+
+                total_monthly += monthly_fee
+                total_hourly += hourly_fee
                 if args.get('--hourly'):
-                    rate = "%.2f" % float(price['hourlyRecurringFee'])
+                    rate = "%.2f" % hourly_fee
                 else:
-                    rate = "%.2f" % float(price['recurringFee'])
+                    rate = "%.2f" % monthly_fee
 
                 t.add_row([price['item']['description'], rate])
 
