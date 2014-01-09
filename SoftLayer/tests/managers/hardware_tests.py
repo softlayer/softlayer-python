@@ -161,7 +161,7 @@ class HardwareTests(unittest.TestCase):
                 {'id': 600},
                 {'id': 12000}
             ],
-            'hourlyBillingFlag': True,
+            'useHourlyPricing': True,
             'location': 'Wyrmshire', 'packageId': 50
         }
 

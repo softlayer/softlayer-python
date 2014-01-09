@@ -481,7 +481,7 @@ class HardwareManager(IdentifierMixin, object):
             order['prices'].append({'id': int(server)})
             p_options = self.get_bare_metal_create_options()
             if hourly:
-                order['hourlyBillingFlag'] = True
+                order['useHourlyPricing'] = True
         else:
             order['packageId'] = package_id
             order['prices'].append({'id': int(server)})
