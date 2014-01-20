@@ -15,7 +15,8 @@ The available commands are:
 
 from SoftLayer import NetworkManager
 from SoftLayer.CLI import (
-    CLIRunnable, Table, KeyValueTable, FormattedItem, confirm, no_going_back)
+    CLIRunnable, Table, KeyValueTable, FormattedItem, confirm, no_going_back,
+    resolve_id)
 from SoftLayer.CLI.helpers import CLIAbort, SequentialOutput
 
 
@@ -31,7 +32,9 @@ Cancel a subnet
 
     def execute(self, args):
         mgr = NetworkManager(self.client)
-        subnet_id = mgr.resolve_subnet_ids(args.get('<identifier>'))
+        subnet_id = resolve_id(mgr.resolve_subnet_ids,
+                               args.get('<identifier>'),
+                               name='subnet')
 
         if args['--really'] or no_going_back(subnet_id):
             mgr.cancel_subnet(subnet_id)
@@ -122,8 +125,9 @@ Filters:
 
     def execute(self, args):
         mgr = NetworkManager(self.client)
-
-        subnet_id = mgr.resolve_subnet_ids(args.get('<identifier>'))
+        subnet_id = resolve_id(mgr.resolve_subnet_ids,
+                               args.get('<identifier>'),
+                               name='subnet')
         subnet = mgr.get_subnet(subnet_id)
 
         t = KeyValueTable(['Name', 'Value'])

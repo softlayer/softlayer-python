@@ -15,7 +15,7 @@ The available commands are:
 
 from SoftLayer import NetworkManager
 from SoftLayer.CLI import (
-    CLIRunnable, Table, FormattedItem, confirm, no_going_back)
+    CLIRunnable, Table, FormattedItem, confirm, no_going_back, resolve_id)
 from SoftLayer.CLI.helpers import CLIAbort, SequentialOutput
 
 
@@ -33,8 +33,9 @@ Required:
 
     def execute(self, args):
         mgr = NetworkManager(self.client)
-
-        global_ip_id = mgr.resolve_global_ip_ids(args.get('<identifier>'))
+        global_ip_id = resolve_id(mgr.resolve_global_ip_ids,
+                                  args.get('<identifier>'),
+                                  name='global ip')
         if not global_ip_id:
             raise CLIAbort("Unable to find global IP record for " +
                            args['<identifier>'])
@@ -53,7 +54,9 @@ Cancel a subnet
 
     def execute(self, args):
         mgr = NetworkManager(self.client)
-        global_ip_id = mgr.resolve_global_ip_ids(args.get('<identifier>'))
+        global_ip_id = resolve_id(mgr.resolve_global_ip_ids,
+                                  args.get('<identifier>'),
+                                  name='global ip')
 
         if args['--really'] or no_going_back(global_ip_id):
             mgr.cancel_global_ip(global_ip_id)
@@ -172,8 +175,9 @@ Required:
 
     def execute(self, args):
         mgr = NetworkManager(self.client)
-
-        global_ip_id = mgr.resolve_global_ip_ids(args.get('<identifier>'))
+        global_ip_id = resolve_id(mgr.resolve_global_ip_ids,
+                                  args.get('<identifier>'),
+                                  name='global ip')
         if not global_ip_id:
             raise CLIAbort("Unable to find global IP record for " +
                            args['<identifier>'])
