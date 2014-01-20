@@ -7,31 +7,28 @@
 """
 from SoftLayer import HardwareManager
 from SoftLayer.managers.hardware import get_default_value
-from SoftLayer.tests import unittest
-from SoftLayer.tests.mocks import account_mock, hardware_mock, \
-    product_package_mock
+from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests.fixtures import (
+    Hardware_Server, Account, Billing_Item, Ticket)
 
-from mock import MagicMock, ANY, call, patch
+from mock import ANY, call, patch
 
 
 class HardwareTests(unittest.TestCase):
 
     def setUp(self):
-        self.client = MagicMock()
+        self.client = FixtureClient()
         self.hardware = HardwareManager(self.client)
 
     def test_list_hardware(self):
         mcall = call(mask=ANY, filter={})
-        service = self.client['Account']
-        service.getHardware = account_mock.getHardware_Mock()
 
-        self.hardware.list_hardware()
-        service.getHardware.assert_has_calls(mcall)
+        results = self.hardware.list_hardware()
+        self.client['Account'].getHardware.assert_has_calls(mcall)
+        self.assertEqual(results, Account.getHardware)
 
     def test_list_hardware_with_filters(self):
-        service = self.client['Account']
-        service.getHardware = account_mock.getHardware_Mock()
-        self.hardware.list_hardware(
+        results = self.hardware.list_hardware(
             tags=['tag1', 'tag2'],
             cpus=2,
             memory=1,
@@ -42,7 +39,7 @@ class HardwareTests(unittest.TestCase):
             public_ip='1.2.3.4',
             private_ip='4.3.2.1',
         )
-        service.getHardware.assert_has_calls(call(
+        self.client['Account'].getHardware.assert_has_calls(call(
             filter={
                 'hardware': {
                     'datacenter': {'name': {'operation': '_= dal05'}},
@@ -63,40 +60,35 @@ class HardwareTests(unittest.TestCase):
             },
             mask=ANY,
         ))
+        self.assertEqual(results, Account.getHardware)
 
     def test_resolve_ids_ip(self):
-        service = self.client['Account']
-        service.getHardware = account_mock.getHardware_Mock(1000)
         _id = self.hardware._get_ids_from_ip('172.16.1.100')
-        self.assertEqual(_id, [1000])
+        self.assertEqual(_id, [1000, 1001])
 
         _id = self.hardware._get_ids_from_ip('nope')
         self.assertEqual(_id, [])
 
         # Now simulate a private IP test
-        service.getHardware.side_effect = [[], [{'id': 99}]]
+        self.client['Account'].getHardware.side_effect = [[], [{'id': 99}]]
         _id = self.hardware._get_ids_from_ip('10.0.1.87')
         self.assertEqual(_id, [99])
 
     def test_resolve_ids_hostname(self):
-        service = self.client['Account']
-        service.getHardware = account_mock.getHardware_Mock(1000)
         _id = self.hardware._get_ids_from_hostname('hardware-test1')
-        self.assertEqual(_id, [1000])
+        self.assertEqual(_id, [1000, 1001])
 
     def test_get_hardware(self):
-        service = self.client['Hardware']
-        service.getObject = hardware_mock.getObject_Mock(1000)
         result = self.hardware.get_hardware(1000)
-        self.client['Hardware'].getObject.assert_called_once_with(
+
+        self.client['Hardware_Server'].getObject.assert_called_once_with(
             id=1000, mask=ANY)
-        expected = hardware_mock.get_raw_hardware_mocks()[1000]
-        self.assertEqual(expected, result)
+        self.assertEqual(Hardware_Server.getObject, result)
 
     def test_reload(self):
         post_uri = 'http://test.sftlyr.ws/test.sh'
         self.hardware.reload(1, post_uri=post_uri, ssh_keys=[1701])
-        f = self.client.__getitem__().reloadOperatingSystem
+        f = self.client['Hardware_Server'].reloadOperatingSystem
         f.assert_called_once_with('FORCE',
                                   {'customProvisionScriptUri': post_uri,
                                    'sshKeyIds': [1701]}, id=1)
@@ -109,9 +101,6 @@ class HardwareTests(unittest.TestCase):
 
     def test_get_bare_metal_create_options(self):
         package_id = 50
-
-        self._setup_package_mocks()
-
         self.hardware.get_bare_metal_create_options()
 
         f1 = self.client['Product_Package'].getRegions
@@ -125,9 +114,6 @@ class HardwareTests(unittest.TestCase):
         f3.assert_called_once_with(id=package_id)
 
     def test_generate_create_dict_with_all_bare_metal_options(self):
-
-        self._setup_package_mocks()
-
         args = {
             'server': 100,
             'hostname': 'unicorn',
@@ -170,9 +156,6 @@ class HardwareTests(unittest.TestCase):
         self.assertEqual(expected, data)
 
     def test_generate_create_dict_with_all_dedicated_server_options(self):
-
-        self._setup_package_mocks()
-
         args = {
             'server': 100,
             'hostname': 'unicorn',
@@ -237,30 +220,29 @@ class HardwareTests(unittest.TestCase):
 
     def test_cancel_metal_immediately(self):
         b_id = 6327
-        self.client['Hardware'].getObject = hardware_mock.getObject_Mock(1000)
 
-        self.hardware.cancel_metal(b_id, True)
+        result = self.hardware.cancel_metal(b_id, immediate=True)
         f = self.client['Billing_Item'].cancelService
         f.assert_called_once_with(id=b_id)
+        self.assertEqual(result, Billing_Item.cancelService)
 
     def test_cancel_metal_on_anniversary(self):
         b_id = 6327
-        self.client['Hardware'].getObject = hardware_mock.getObject_Mock(1000)
 
-        self.hardware.cancel_metal(b_id, False)
+        result = self.hardware.cancel_metal(b_id, False)
         f = self.client['Billing_Item'].cancelServiceOnAnniversaryDate
         f.assert_called_once_with(id=b_id)
+        self.assertEqual(result, Billing_Item.cancelServiceOnAnniversaryDate)
 
     def test_cancel_hardware_without_reason(self):
         hw_id = 987
-
-        self.hardware.cancel_hardware(hw_id)
+        result = self.hardware.cancel_hardware(hw_id)
 
         reasons = self.hardware.get_cancellation_reasons()
-
         f = self.client['Ticket'].createCancelServerTicket
         f.assert_called_once_with(hw_id, reasons['unneeded'], '', True,
                                   'HARDWARE')
+        self.assertEqual(result, Ticket.createCancelServerTicket)
 
     def test_cancel_hardware_with_reason_and_comment(self):
         hw_id = 987
@@ -280,8 +262,7 @@ class HardwareTests(unittest.TestCase):
         speed = 100
         self.hardware.change_port_speed(hw_id, True, speed)
 
-        service = self.client['Hardware_Server']
-        f = service.setPublicNetworkInterfaceSpeed
+        f = self.client['Hardware_Server'].setPublicNetworkInterfaceSpeed
         f.assert_called_once_with(speed, id=hw_id)
 
     def test_change_port_speed_private(self):
@@ -289,22 +270,17 @@ class HardwareTests(unittest.TestCase):
         speed = 10
         self.hardware.change_port_speed(hw_id, False, speed)
 
-        service = self.client['Hardware_Server']
-        f = service.setPrivateNetworkInterfaceSpeed
+        f = self.client['Hardware_Server'].setPrivateNetworkInterfaceSpeed
         f.assert_called_once_with(speed, id=hw_id)
 
     def test_get_available_dedicated_server_packages(self):
         self.hardware.get_available_dedicated_server_packages()
 
-        service = self.client['Product_Package']
-        f = service.getObject
+        f = self.client['Product_Package'].getObject
         f.assert_has_calls([call(id=13, mask='mask[id, name, description]')])
 
     def test_get_dedicated_server_options(self):
         package_id = 13
-
-        self._setup_package_mocks()
-
         self.hardware.get_dedicated_server_create_options(package_id)
 
         f1 = self.client['Product_Package'].getRegions
@@ -340,10 +316,9 @@ class HardwareTests(unittest.TestCase):
 
     def test_edit(self):
         # Test editing user data
-        service = self.client['Hardware_Server']
-
         self.hardware.edit(100, userdata='my data')
 
+        service = self.client['Hardware_Server']
         service.setUserMetadata.assert_called_once_with(['my data'], id=100)
 
         # Now test a blank edit
@@ -358,10 +333,3 @@ class HardwareTests(unittest.TestCase):
 
         self.hardware.edit(100, **args)
         service.editObject.assert_called_once_with(args, id=100)
-
-    def _setup_package_mocks(self):
-        package = self.client['Product_Package']
-        package.getAllObjects = product_package_mock.getAllObjects_Mock()
-        package.getConfiguration = product_package_mock.getConfiguration_Mock()
-        package.getCategories = product_package_mock.getCategories_Mock()
-        package.getRegions = product_package_mock.getRegions_Mock()

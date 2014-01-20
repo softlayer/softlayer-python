@@ -8,8 +8,8 @@
     :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.tests import unittest
-from mock import Mock, MagicMock, patch
+from SoftLayer.tests import unittest, FixtureClient
+from mock import Mock, patch
 try:
     # Python 3.x compatibility
     import builtins  # NOQA
@@ -19,13 +19,11 @@ except ImportError:
 
 from SoftLayer.CLI.helpers import format_output, CLIAbort, ArgumentError
 from SoftLayer.CLI.modules import server
-from SoftLayer.tests.mocks import (
-    account_mock, hardware_mock, product_package_mock)
 
 
 class ServerCLITests(unittest.TestCase):
     def setUp(self):
-        self.client = MagicMock()
+        self.client = FixtureClient()
 
     def test_ServerCancelReasons(self):
         runnable = server.ServerCancelReasons(client=self.client)
@@ -68,31 +66,31 @@ class ServerCLITests(unittest.TestCase):
             '--controller': False,
         }
 
-        client = self._setup_package_mocks(self.client)
-        runnable = server.ServerCreateOptions(client=client)
+        runnable = server.ServerCreateOptions(client=self.client)
 
         output = runnable.execute(args)
 
         expected = {
-            'datacenter': ['RANDOM_LOCATION'],
-            'dual nic': ['100_DUAL', '10_DUAL'],
-            'disk_controllers': ['None', 'RAID0'],
-            'os (CENTOS)': ['CENTOS_6_64'],
-            'os (DEBIAN)': ['DEBIAN_6_32'],
-            'os (REDHAT)': ['REDHAT_6_64_6'],
-            'os (UBUNTU)': ['UBUNTU_12_64', 'UBUNTU_12_64_MINIMAL'],
-            'os (WIN)': ['WIN_2003-STD-R2_64', 'WIN_2008-DC-HYPERV_64',
-                         'WIN_2008-ENT_64', 'WIN_2008-STD_64'],
-            'memory': [4, 6],
-            'disk': ['1000_DRIVE'],
-            'single nic': ['100', '1000'],
             'cpu': [
                 {'description': 'Dual Quad Core Pancake 200 - 1.60GHz',
                  'id': 723},
                 {'description': 'Dual Quad Core Pancake 200 - 1.80GHz',
-                 'id': 724}
-            ],
-        }
+                 'id': 724}],
+            'datacenter': ['RANDOM_LOCATION'],
+            'disk': ['250_SATA_II', '500_SATA_II'],
+            'disk_controllers': ['None', 'RAID0'],
+            'dual nic': ['1000_DUAL', '100_DUAL', '10_DUAL'],
+            'memory': [4, 6],
+            'os (CENTOS)': ['CENTOS_6_64_LAMP', 'CENTOS_6_64_MINIMAL'],
+            'os (REDHAT)': ['REDHAT_6_64_LAMP', 'REDHAT_6_64_MINIMAL'],
+            'os (UBUNTU)': ['UBUNTU_12_64_LAMP', 'UBUNTU_12_64_MINIMAL'],
+            'os (WIN)': [
+                'WIN_2008-DC_64',
+                'WIN_2008-ENT_64',
+                'WIN_2008-STD-R2_64',
+                'WIN_2008-STD_64',
+                'WIN_2012-DC-HYPERV_64'],
+            'single nic': ['100', '1000']}
 
         self.assertEqual(expected, format_output(output, 'python'))
 
@@ -109,8 +107,7 @@ class ServerCLITests(unittest.TestCase):
             '--controller': False,
         }
 
-        client = self._setup_package_mocks(self.client)
-        runnable = server.ServerCreateOptions(client=client)
+        runnable = server.ServerCreateOptions(client=self.client)
 
         output = runnable.execute(args)
 
@@ -128,13 +125,7 @@ class ServerCLITests(unittest.TestCase):
     def test_ServerDetails(self):
         hw_id = 1234
 
-        client = Mock()
-        client.__getitem__ = Mock()
-        service = client['Hardware_Server']
-        service.getObject = hardware_mock.getObject_Mock(1000)
-        dns_mock = hardware_mock.getReverseDomainRecords_Mock(1000)
-        service.getReverseDomainRecords = dns_mock
-        runnable = server.ServerDetails(client=client)
+        runnable = server.ServerDetails(client=self.client)
 
         args = {'<identifier>': hw_id, '--passwords': True, '--price': True}
         output = runnable.execute(args)
@@ -163,7 +154,6 @@ class ServerCLITests(unittest.TestCase):
         self.assertEqual(expected, format_output(output, 'python'))
 
     def test_ListServers(self):
-        self.client['Account'].getHardware = account_mock.getHardware_Mock()
         runnable = server.ListServers(client=self.client)
 
         output = runnable.execute({'--tags': 'openstack'})
@@ -375,7 +365,7 @@ class ServerCLITests(unittest.TestCase):
             '--datacenter': 'TEST00',
             '--cpu': False,
             '--network': '100',
-            '--disk': ['1000_DRIVE', '1000_DRIVE'],
+            '--disk': ['250_SATA_II', '250_SATA_II'],
             '--os': 'UBUNTU_12_64_MINIMAL',
             '--memory': False,
             '--controller': False,
@@ -387,8 +377,7 @@ class ServerCLITests(unittest.TestCase):
             '--vlan_private': 20468,
         }
 
-        client = self._setup_package_mocks(self.client)
-        runnable = server.CreateServer(client=client)
+        runnable = server.CreateServer(client=self.client)
 
         # First, test the --test flag
         with patch('SoftLayer.HardwareManager.verify_order') as verify_mock:
@@ -466,7 +455,6 @@ class ServerCLITests(unittest.TestCase):
             self.assertRaises(CLIAbort, runnable.execute, args)
 
     def test_CreateServer_failures(self):
-        client = self._setup_package_mocks(self.client)
 
         # This is missing a required argument
         args = {
@@ -483,7 +471,7 @@ class ServerCLITests(unittest.TestCase):
             '--template': None,
         }
 
-        runnable = server.CreateServer(client=client)
+        runnable = server.CreateServer(client=self.client)
 
         # Verify that ArgumentError is properly raised on error
         self.assertRaises(ArgumentError, runnable.execute, args)
@@ -521,8 +509,7 @@ class ServerCLITests(unittest.TestCase):
             '--export': 'test_file.txt',
         }
 
-        client = self._setup_package_mocks(self.client)
-        runnable = server.CreateServer(client=client)
+        runnable = server.CreateServer(client=self.client)
 
         expected = args.copy()
         del(expected['--export'])
@@ -605,12 +592,3 @@ class ServerCLITests(unittest.TestCase):
         runnable = server.CreateServer()
         output = runnable._get_default_value(option_mock, 'nope')
         self.assertEqual(None, output)
-
-    def _setup_package_mocks(self, client):
-        package = client['Product_Package']
-        package.getAllObjects = product_package_mock.getAllObjects_Mock()
-        package.getConfiguration = product_package_mock.getConfiguration_Mock()
-        package.getCategories = product_package_mock.getCategories_Mock()
-        package.getRegions = product_package_mock.getRegions_Mock()
-
-        return client

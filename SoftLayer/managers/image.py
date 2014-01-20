@@ -29,9 +29,7 @@ class ImageManager(IdentifierMixin, object):
         self.vgbdtg = self.client['Virtual_Guest_Block_Device_Template_Group']
         #: A list of resolver functions. Used primarily by the CLI to provide
         #: a variety of methods for uniquely identifying an object such as guid
-        self.resolvers = [self._get_ids_from_guid_public,
-                          self._get_ids_from_guid_private,
-                          self._get_ids_from_name_public,
+        self.resolvers = [self._get_ids_from_name_public,
                           self._get_ids_from_name_private]
 
     def get_image(self, image_id, **kwargs):
@@ -103,16 +101,4 @@ class ImageManager(IdentifierMixin, object):
 
     def _get_ids_from_name_private(self, name):
         results = self.list_private_images(name=name)
-        return [result['id'] for result in results]
-
-    def _get_ids_from_guid_public(self, guid):
-        if len(guid) != 36:
-            return
-        results = self.list_public_images(guid=guid)
-        return [result['id'] for result in results]
-
-    def _get_ids_from_guid_private(self, guid):
-        if len(guid) != 36:
-            return
-        results = self.list_private_images(guid=guid)
         return [result['id'] for result in results]

@@ -152,3 +152,11 @@ class TestIdentifierMixin(unittest.TestCase):
     def test_not_found(self):
         ids = self.fixture.resolve_ids('something')
         self.assertEqual(ids, [])
+
+    def test_globalidentifier(self):
+        ids = self.fixture.resolve_ids('9d888bc2-7c9a-4dba-bbd8-6bd688687bae')
+        self.assertEqual(ids, ['9d888bc2-7c9a-4dba-bbd8-6bd688687bae'])
+
+    def test_globalidentifier_upper(self):
+        ids = self.fixture.resolve_ids('B534EF96-55C4-4891-B51A-63866411B58E')
+        self.assertEqual(ids, ['B534EF96-55C4-4891-B51A-63866411B58E'])

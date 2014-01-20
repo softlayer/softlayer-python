@@ -6,15 +6,15 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import SSLManager
-from SoftLayer.tests import unittest
+from SoftLayer.tests import unittest, FixtureClient
 
-from mock import MagicMock, ANY
+from mock import ANY
 
 
 class SSLTests(unittest.TestCase):
 
     def setUp(self):
-        self.client = MagicMock()
+        self.client = FixtureClient()
         self.ssl = SSLManager(self.client)
         self.test_id = 10
 

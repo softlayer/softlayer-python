@@ -6,8 +6,8 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import CCIManager
-from SoftLayer.tests import unittest
-from SoftLayer.tests.mocks import account_mock, virtual_guest_mock
+from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests.fixtures import Virtual_Guest
 
 from mock import MagicMock, ANY, call, patch
 
@@ -15,17 +15,12 @@ from mock import MagicMock, ANY, call, patch
 class CCITests(unittest.TestCase):
 
     def setUp(self):
-        self.client = MagicMock()
+        self.client = FixtureClient()
         self.cci = CCIManager(self.client)
 
     def test_list_instances(self):
         mcall = call(mask=ANY, filter={})
         service = self.client['Account']
-        service.getVirtualGuests = account_mock.getVirtualGuests_Mock()
-        hourly_mock = account_mock.getHourlyVirtualGuests_Mock()
-        service.getHourlyVirtualGuests = hourly_mock
-        monthly_mock = account_mock.getMonthlyVirtualGuests_Mock()
-        service.getMonthlyVirtualGuests = monthly_mock
 
         list_expected_ids = [100, 104]
         hourly_expected_ids = [104]
@@ -92,9 +87,8 @@ class CCITests(unittest.TestCase):
 
     def test_resolve_ids_ip(self):
         service = self.client['Account']
-        service.getVirtualGuests = account_mock.getVirtualGuests_Mock(100)
         _id = self.cci._get_ids_from_ip('172.16.240.2')
-        self.assertEqual(_id, [100])
+        self.assertEqual(_id, [100, 104])
 
         _id = self.cci._get_ids_from_ip('nope')
         self.assertEqual(_id, [])
@@ -105,35 +99,18 @@ class CCITests(unittest.TestCase):
         self.assertEqual(_id, [99])
 
     def test_resolve_ids_hostname(self):
-        service = self.client['Account']
-        service.getVirtualGuests = account_mock.getVirtualGuests_Mock(100)
         _id = self.cci._get_ids_from_hostname('cci-test1')
-        self.assertEqual(_id, [100])
+        self.assertEqual(_id, [100, 104])
 
     def test_get_instance(self):
-        service = self.client['Virtual_Guest']
-        service.getObject = virtual_guest_mock.getObject_Mock(100)
         result = self.cci.get_instance(100)
         self.client['Virtual_Guest'].getObject.assert_called_once_with(
             id=100, mask=ANY)
-        expected = virtual_guest_mock.get_raw_cci_mocks()[100]
-        self.assertEqual(expected, result)
+        self.assertEqual(Virtual_Guest.getObject, result)
 
     def test_get_create_options(self):
-        service = self.client['Virtual_Guest']
-        function_mock = virtual_guest_mock.getCreateObjectOptions_Mock()
-        service.getCreateObjectOptions = function_mock
         results = self.cci.get_create_options()
-        function_mock.assert_called_once_with()
-
-        expected = ['processors', 'memory', 'blockDevices', 'operatingSystems',
-                    'networkComponents', 'datacenters']
-        method = 'assertItemsEqual'
-        if not hasattr(self, method):
-            # For Python 3.3 compatibility
-            method = 'assertCountEqual'
-        f = getattr(self, method)
-        f(expected, results.keys())
+        self.assertEqual(Virtual_Guest.getCreateObjectOptions, results)
 
     def test_cancel_instance(self):
         self.cci.cancel_instance(1)
@@ -689,7 +666,7 @@ class CCIWaitReadyGoTests(unittest.TestCase):
             {'activeTransaction': {'id': 1}},
             {'activeTransaction': {'id': 1}},
         ]
-        value = self.cci.wait_for_ready(1, 10, 10)
+        value = self.cci.wait_for_ready(1, 10, delay=10)
         self.assertFalse(value)
         self.guestObject.assert_has_calls([
             call(id=1, mask=ANY), call(id=1, mask=ANY),

@@ -6,15 +6,16 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import DNSManager
-from SoftLayer.tests import unittest
+from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests.fixtures import Dns_Domain, Account
 
-from mock import MagicMock, ANY
+from mock import ANY
 
 
 class DNSTests(unittest.TestCase):
 
     def setUp(self):
-        self.client = MagicMock()
+        self.client = FixtureClient()
         self.dns_client = DNSManager(self.client)
 
     def test_init_exercise(self):
@@ -22,37 +23,26 @@ class DNSTests(unittest.TestCase):
         self.assertTrue(hasattr(self.dns_client, 'record'))
 
     def test_list_zones(self):
-        zone_list = ['test']
-        self.client['Account'].getDomains.return_value = zone_list
         zones = self.dns_client.list_zones()
-        self.assertEqual(zones, zone_list)
+        self.assertEqual(zones, Account.getDomains)
 
     def test_get_zone(self):
-        zone_list = [
-            {'id': 98765, 'name': 'test-example.com'},
-            {'id': 12345, 'name': 'example.com', "resourceRecords": ["test"]},
-        ]
-
         # match, with defaults
-        self.client['Account'].getObject.return_value = zone_list[1]
         res = self.dns_client.get_zone(12345)
-        self.assertEqual(res, zone_list[1])
-        self.client['Account'].getObject.assert_called_once_with(
+        self.assertEqual(res, Dns_Domain.getObject)
+        self.client['Dns_Domain'].getObject.assert_called_once_with(
             id=12345,
             mask='resourceRecords')
 
         # No records masked in
-        self.client['Account'].getObject.reset_mock()
-        self.client['Account'].getObject.return_value = [zone_list[1]]
+        self.client['Dns_Domain'].getObject.reset_mock()
         self.dns_client.get_zone(12345, records=False)
-        self.client['Account'].getObject.assert_called_once_with(
+        self.client['Dns_Domain'].getObject.assert_called_once_with(
             id=12345,
             mask=None)
 
     def test_resolve_zone_name(self):
-        zone_list = [{'name': 'example.com', 'id': 12345}]
         # matching domain
-        self.client['Account'].getDomains.return_value = zone_list
         res = self.dns_client._get_zone_id_from_name('example.com')
         self.assertEqual([12345], res)
         self.client['Account'].getDomains.assert_called_once_with(
@@ -67,12 +57,9 @@ class DNSTests(unittest.TestCase):
             filter={"domains": {"name": {"operation": "_= example.com"}}})
 
     def test_create_zone(self):
-        call = self.client['Dns_Domain'].createObject
-        call.return_value = {'name': 'example.com'}
-
         res = self.dns_client.create_zone('example.com')
 
-        call.assert_called_once_with({
+        self.client['Dns_Domain'].createObject.assert_called_once_with({
             'name': 'example.com', "resourceRecords": {}, "serial": ANY
         })
 
@@ -115,21 +102,12 @@ class DNSTests(unittest.TestCase):
 
     def test_dump_zone(self):
         f = self.client['Dns_Domain'].getZoneFileContents
-        f.return_value = 'lots of text'
         self.dns_client.dump_zone(1)
         f.assert_called_once_with(id=1)
 
     def test_get_record(self):
-        records = [
-            {'ttl': 7200, 'data': 'd', 'host': 'a', 'type': 'cname'},
-            {'ttl': 900, 'data': '1', 'host': 'b', 'type': 'a'},
-            {'ttl': 900, 'data': 'x', 'host': 'c', 'type': 'ptr'},
-            {'ttl': 86400, 'data': 'b', 'host': 'd', 'type': 'txt'},
-            {'ttl': 86400, 'data': 'b', 'host': 'e', 'type': 'txt'},
-            {'ttl': 600, 'data': 'b', 'host': 'f', 'type': 'txt'},
-        ]
-
         D = self.client['Dns_Domain'].getResourceRecords
+        records = Dns_Domain.getResourceRecords
 
         # maybe valid domain, but no records matching
         D.return_value = []
