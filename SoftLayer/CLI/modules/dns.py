@@ -102,7 +102,7 @@ Filters:
     def list_zone(self, args):
         manager = DNSManager(self.client)
         t = Table([
-			"id",
+            "id",
             "record",
             "type",
             "ttl",
@@ -128,7 +128,7 @@ Filters:
 
         for rr in records:
             t.add_row([
-				rr['id'],
+                rr['id'],
                 rr['host'],
                 rr['type'].upper(),
                 rr['ttl'],
