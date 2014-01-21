@@ -5,7 +5,6 @@ usage: sl help [options]
 
 View help on a module or command.
 """
-# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: MIT, see LICENSE for more details.
 
 from SoftLayer.CLI.core import CommandParser

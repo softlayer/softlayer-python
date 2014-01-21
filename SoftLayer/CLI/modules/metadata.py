@@ -20,7 +20,6 @@ The available commands are:
   tags             Tags
   user_data        User-defined data
 """
-# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: MIT, see LICENSE for more details.
 
 from SoftLayer import MetadataManager, TransportError

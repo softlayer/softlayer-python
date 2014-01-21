@@ -3,7 +3,6 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~
     Exceptions to be used in the CLI modules.
 
-    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
 

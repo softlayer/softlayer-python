@@ -3,7 +3,6 @@
     ~~~~~~~~~~~~~~~
     Image Manager/helpers
 
-    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
 

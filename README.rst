@@ -52,5 +52,5 @@ System Requirements
 
 Copyright
 ---------
-This software is Copyright (c) 2013 SoftLayer Technologies, Inc.
+This software is Copyright (c) 2014 SoftLayer Technologies, Inc.
 See the bundled LICENSE file for more information.

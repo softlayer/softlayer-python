@@ -3,7 +3,6 @@
     ~~~~~~~~~~~~~~~~
     Contains constants used throughout the library
 
-    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
 VERSION = 'v3.0.2'

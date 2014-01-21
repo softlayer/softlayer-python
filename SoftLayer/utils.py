@@ -3,7 +3,6 @@
     ~~~~~~~~~~~~~~~
     Utility function/classes
 
-    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
 import re

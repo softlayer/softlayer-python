@@ -5,7 +5,6 @@
     This is a series of integration tests designed to test the complete
     command line interface.
 
-    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer.tests import unittest, FixtureClient

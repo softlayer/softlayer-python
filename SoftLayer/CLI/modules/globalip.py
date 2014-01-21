@@ -10,7 +10,6 @@ The available commands are:
   list      Display a list of global IP addresses
   unassign  Unassigns a global IP
 """
-# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: MIT, see LICENSE for more details.
 
 from SoftLayer import NetworkManager

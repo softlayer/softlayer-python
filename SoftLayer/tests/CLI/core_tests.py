@@ -2,7 +2,6 @@
     SoftLayer.tests.CLI.core_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
 from mock import MagicMock, patch

@@ -10,7 +10,6 @@ The available commands are:
   list    Show a list of all subnets on the network
   lookup  Find an IP address and display its subnet and device info
 """
-# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: MIT, see LICENSE for more details.
 
 from SoftLayer import NetworkManager
