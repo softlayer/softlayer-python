@@ -102,6 +102,7 @@ Filters:
     def list_zone(self, args):
         manager = DNSManager(self.client)
         t = Table([
+			"id",
             "record",
             "type",
             "ttl",
@@ -127,6 +128,7 @@ Filters:
 
         for rr in records:
             t.add_row([
+				rr['id'],
                 rr['host'],
                 rr['type'].upper(),
                 rr['ttl'],
@@ -220,7 +222,7 @@ Options:
             raise CLIAbort("No zone found matching: %s" % args['<zone>'])
 
         for r in results:
-            if args['--id'] and r['id'] != args['--id']:
+            if args['--id'] and str(r['id']) != args['--id']:
                 continue
             r['data'] = args['--data'] or r['data']
             r['ttl'] = args['--ttl'] or r['ttl']
