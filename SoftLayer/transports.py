@@ -3,7 +3,6 @@
     ~~~~~~~~~~~~~~~~~~~~
     XML-RPC transport layer that uses the requests library.
 
-    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer.exceptions import (

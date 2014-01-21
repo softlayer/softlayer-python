@@ -7,7 +7,6 @@ The available commands are:
   detail  Display detailed information about a VLAN
   list    Show a list of all VLANs on the network
 """
-# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: MIT, see LICENSE for more details.
 
 from SoftLayer import NetworkManager

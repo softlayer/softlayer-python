@@ -26,7 +26,6 @@ The available commands are:
   topic-unsubscribe  Remove a subscription on a topic
 
 """
-# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: MIT, see LICENSE for more details.
 import sys
 

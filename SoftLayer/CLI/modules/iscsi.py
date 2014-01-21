@@ -6,7 +6,6 @@ Manage iSCSI targets
 The available commands are:
   list  List iSCSI targets
 """
-# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: MIT, see LICENSE for more details.
 
 from SoftLayer.CLI import CLIRunnable, Table, FormattedItem

@@ -24,7 +24,6 @@ The available commands are:
 For several commands, <identifier> will be asked for. This can be the id,
 hostname or the ip address for a CCI.
 """
-# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: MIT, see LICENSE for more details.
 
 from os import linesep

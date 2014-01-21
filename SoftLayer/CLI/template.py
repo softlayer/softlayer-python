@@ -5,7 +5,6 @@
     files are used for storing CLI arguments in the form of a file to be used
     later with the --template option.
 
-    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
 import os.path

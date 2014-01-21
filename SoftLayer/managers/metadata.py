@@ -3,7 +3,6 @@
     ~~~~~~~~~~~~~~~~~~
     Metadata Manager/helpers
 
-    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer.transports import make_rest_api_call

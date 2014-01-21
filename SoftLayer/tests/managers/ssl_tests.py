@@ -2,7 +2,6 @@
     SoftLayer.tests.managers.ssl_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import SSLManager

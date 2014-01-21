@@ -5,7 +5,6 @@
     that provide a simpler interface to various services. These are
     higher-level interfaces to the SoftLayer API.
 
-    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer.managers.cci import CCIManager

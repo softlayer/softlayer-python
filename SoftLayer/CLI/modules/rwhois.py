@@ -7,7 +7,6 @@ The available commands are:
   edit  Edit the RWhois data on the account
   show  Show the RWhois data on the account
 """
-# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: MIT, see LICENSE for more details.
 
 from SoftLayer import NetworkManager

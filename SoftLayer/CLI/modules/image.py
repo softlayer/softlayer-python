@@ -8,7 +8,6 @@ The available commands are:
   detail  Output details about an image
   list    List images
 """
-# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: MIT, see LICENSE for more details.
 
 from SoftLayer import ImageManager

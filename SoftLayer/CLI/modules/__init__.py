@@ -3,7 +3,6 @@
     ~~~~~~~~~~~~~~~~~~~~~
     Contains all plugable modules for the CLI interface
 
-    :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
     :license: MIT, see LICENSE for more details.
 """
 

@@ -40,7 +40,6 @@ See 'sl help <module>' for more information on a specific module.
 To use most commands your SoftLayer username and api_key need to be configured.
 The easiest way to do that is to use: 'sl config setup'
 """
-# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: MIT, see LICENSE for more details.
 
 import sys

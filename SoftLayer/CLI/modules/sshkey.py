@@ -10,7 +10,6 @@ The available commands are:
   list    Display a list of SSH keys on your account
   print   Prints out an SSH key
 """
-# :copyright: (c) 2013, SoftLayer Technologies, Inc. All rights reserved.
 # :license: MIT, see LICENSE for more details.
 
 from os.path import expanduser
