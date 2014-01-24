@@ -101,7 +101,7 @@ class Environment(object):
 
 class CLIRunnable(object):
     options = []  # set by subclass
-    action = None  # set by subclass
+    action = 'not set'  # set by subclass
 
     def __init__(self, client=None, env=None):
         self.client = client
