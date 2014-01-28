@@ -517,7 +517,7 @@ class HardwareManager(IdentifierMixin, object):
                 required_fields.append(category)
 
         for category in required_fields:
-            price = get_default_value(p_options, category)
+            price = get_default_value(p_options, category, hourly=hourly)
             order['prices'].append({'id': price})
 
         return order
@@ -646,12 +646,12 @@ class HardwareManager(IdentifierMixin, object):
                         'description': price['item']['description'],
                         'sort': price['sort'],
                         'price_id': price['id'],
-                        'recurring_fee': price.get('recurringFee', 0),
-                        'setup_fee': price.get('setupFee', 0),
-                        'hourly_recurring_fee': price.get('hourlyRecurringFee',
-                                                          0),
-                        'one_time_fee': price.get('oneTimeFee', 0),
-                        'labor_fee': price.get('laborFee', 0),
+                        'recurring_fee': price.get('recurringFee'),
+                        'setup_fee': price.get('setupFee'),
+                        'hourly_recurring_fee':
+                        price.get('hourlyRecurringFee'),
+                        'one_time_fee': price.get('oneTimeFee'),
+                        'labor_fee': price.get('laborFee'),
                         'capacity': float(price['item'].get('capacity', 0)),
                     })
             results['categories'][code]['items'] = items
@@ -693,7 +693,7 @@ class HardwareManager(IdentifierMixin, object):
         return self.hardware.editObject(obj, id=hardware_id)
 
 
-def get_default_value(package_options, category):
+def get_default_value(package_options, category, hourly=False):
     """ Returns the default price ID for the specified category.
 
     This determination is made by parsing the items in the package_options
@@ -713,11 +713,16 @@ def get_default_value(package_options, category):
         return
 
     for item in package_options['categories'][category]['items']:
-        if not any([
-            float(item.get('setupFee', 0)),
-            float(item.get('recurringFee', 0)),
-            float(item.get('hourlyRecurringFee', 0)),
-            float(item.get('oneTimeFee', 0)),
-            float(item.get('laborFee', 0)),
-        ]):
+        if hourly:
+            if item.get('hourly_recurring_fee') is None:
+                continue
+        else:
+            if item.get('recurring_fee') is None:
+                continue
+
+        if not any([float(item.get('setup_fee') or 0),
+                    float(item.get('recurring_fee') or 0),
+                    float(item.get('hourly_recurring_fee') or 0),
+                    float(item.get('one_time_fee') or 0),
+                    float(item.get('labor_fee') or 0)]):
             return item['price_id']

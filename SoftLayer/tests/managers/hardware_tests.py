@@ -302,16 +302,68 @@ class HardwareTests(unittest.TestCase):
         price_id = 9876
         package_options = {'categories':
                            {'Cat1': {
-                               'items': [{
-                                   'prices': [{
-                                       'setupFee': 0,
-                                       'recurringFee': 0,
-                                   }],
-                                   'price_id': price_id,
-                               }]
+                               'items': [{'setup_fee': 0,
+                                          'recurring_fee': 0,
+                                          'hourly_recurring_fee': 0,
+                                          'one_time_fee': 0,
+                                          'labor_fee': 0,
+                                          'price_id': price_id}]
                            }}}
 
         self.assertEqual(price_id, get_default_value(package_options, 'Cat1'))
+
+    def test_get_default_value_none_free(self):
+        package_options = {'categories': {}}
+        self.assertEqual(None, get_default_value(package_options, 'Cat1'))
+
+        package_options = {'categories':
+                           {'Cat1': {
+                               'items': [{'setup_fee': 10,
+                                          'recurring_fee': 0,
+                                          'hourly_recurring_fee': 0,
+                                          'one_time_fee': 0,
+                                          'labor_fee': 0,
+                                          'price_id': 1234}]
+                           }}}
+        self.assertEqual(None, get_default_value(package_options, 'Cat1'))
+
+    def test_get_default_value_hourly(self):
+        package_options = {'categories':
+                           {'Cat1': {
+                               'items': [{'setup_fee': 0,
+                                          'recurring_fee': 0,
+                                          'hourly_recurring_fee': None,
+                                          'one_time_fee': 0,
+                                          'labor_fee': 0,
+                                          'price_id': 1234},
+                                         {'setup_fee': 0,
+                                          'recurring_fee': None,
+                                          'hourly_recurring_fee': 0,
+                                          'one_time_fee': 0,
+                                          'labor_fee': 0,
+                                          'price_id': 4321}]
+                           }}}
+        result = get_default_value(package_options, 'Cat1', hourly=True)
+        self.assertEqual(4321, result)
+
+    def test_get_default_value_monthly(self):
+        package_options = {'categories':
+                           {'Cat1': {
+                               'items': [{'setup_fee': 0,
+                                          'recurring_fee': None,
+                                          'hourly_recurring_fee': 0,
+                                          'one_time_fee': 0,
+                                          'labor_fee': 0,
+                                          'price_id': 4321},
+                                         {'setup_fee': 0,
+                                          'recurring_fee': 0,
+                                          'hourly_recurring_fee': None,
+                                          'one_time_fee': 0,
+                                          'labor_fee': 0,
+                                          'price_id': 1234}]
+                           }}}
+        result = get_default_value(package_options, 'Cat1', hourly=False)
+        self.assertEqual(1234, result)
 
     def test_edit(self):
         # Test editing user data

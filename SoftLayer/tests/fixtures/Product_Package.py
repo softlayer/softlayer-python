@@ -170,7 +170,7 @@ def get_server_categories_mock():
         'id': 12000,
         'sort': 0,
         'setupFee': 0,
-        'recurringFee': 25.0,
+        'recurringFee': 0,
         'hourlyRecurringFee': 0,
         'oneTimeFee': 0,
         'laborFee': 0,
