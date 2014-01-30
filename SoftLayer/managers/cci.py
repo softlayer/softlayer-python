@@ -476,16 +476,15 @@ class CCIManager(IdentifierMixin, object):
         return self.guest.editObject(obj, id=instance_id)
 
     def capture(self, instance_id, name, additional_disks=False, notes=None):
-        """ Edit hostname, domain name, notes, and/or the user data of a CCI
+        """ Capture one or all disks from a CCI to a SoftLayer image.
 
         Parameters set to None will be ignored and not attempted to be updated.
 
         :param integer instance_id: the instance ID to edit
-        :param string userdata: user data on CCI to edit.
-                                If none exist it will be created
-        :param string hostname: valid hostname
-        :param string domain: valid domain namem
-        :param string notes: notes about this particular CCI
+        :param string name: name assigned to the image
+        :param string additional_disks: set to true to include all additional
+                                        attached storage devices
+        :param string notes: notes about this particular image
 
         """
         cci = self.get_instance(instance_id)

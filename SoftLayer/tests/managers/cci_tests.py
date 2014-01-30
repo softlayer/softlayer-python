@@ -519,14 +519,6 @@ class CCITests(unittest.TestCase):
 
     def test_captures(self):
         archive = self.client['Virtual_Guest'].createArchiveTransaction
-        getObject = self.client['Virtual_Guest'].getObject
-        getObject.side_effect = {
-            'blockDevices': [
-                {"device": 0, "uuid": 1},
-                {"device": 1},
-                {"device": 2, "uuid": 2},
-            ]
-        }
 
         # capture only the OS disk
         self.cci.capture(1, 'a')

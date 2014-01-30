@@ -14,6 +14,9 @@ getObject = {
     'primaryBackendIpAddress': '10.45.19.37',
     'hourlyBillingFlag': False,
     'createDate': '2013-08-01 15:23:45',
+    'blockDevices': [{"device": 0, "uuid": 1},
+                     {"device": 1},
+                     {"device": 2, "uuid": 2}],
     'operatingSystem': {
         'softwareLicense': {
             'softwareDescription': {'version': '12.04-64 Minimal for CCI',
@@ -211,3 +214,5 @@ createObject = getObject
 generateOrderTemplate = {}
 setUserMetadata = ['meta']
 reloadOperatingSystem = 'OK'
+
+createArchiveTransaction = {}

@@ -977,3 +977,41 @@ Options:
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         if not cci.edit(cci_id, **data):
             raise CLIAbort("Failed to update CCI")
+
+
+class CaptureCCI(CLIRunnable):
+    """
+usage: sl cci capture <identifier> [options]
+
+Capture one or all disks from a CCI to a SoftLayer image.
+
+Required:
+  -n --name=NAME        Name of the image
+
+Optional:
+  --all                  Capture all disks belonging to the CCI
+  --note=NOTE            Add a note to be associated with the image
+"""
+    action = 'caputre'
+
+    def execute(self, args):
+        data = {}
+
+        cci = CCIManager(self.client)
+
+        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
+
+        if args['--all']:
+            additional_disks = True
+        else:
+            additional_disks = False
+
+        data['name'] = args.get('--name')
+        data['note'] = args.get('--note')
+
+        capture = cci.CaptureCCI(cci_id,
+                                 data['name'],
+                                 additional_disks,
+                                 data['note'])
+
+        return capture
