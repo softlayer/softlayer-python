@@ -474,3 +474,27 @@ class CCIManager(IdentifierMixin, object):
             return True
 
         return self.guest.editObject(obj, id=instance_id)
+
+    def capture(self, instance_id, name, additional_disks=False, notes=None):
+        """ Edit hostname, domain name, notes, and/or the user data of a CCI
+
+        Parameters set to None will be ignored and not attempted to be updated.
+
+        :param integer instance_id: the instance ID to edit
+        :param string userdata: user data on CCI to edit.
+                                If none exist it will be created
+        :param string hostname: valid hostname
+        :param string domain: valid domain namem
+        :param string notes: notes about this particular CCI
+
+        """
+        cci = self.get_instance(instance_id)
+
+        disk_filter = lambda x: x['device'] == '0'
+        if additional_disks:
+            disk_filter = lambda x: x['device'] != '1'
+
+        disks = filter(disk_filter, cci['blockDevices'])
+
+        return self.guest.createArchiveTransaction(
+            name, disks, notes, id=instance_id)
