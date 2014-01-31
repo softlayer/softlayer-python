@@ -133,7 +133,7 @@ def active_txn(item):
 
         :param item: An object capable of having an active transaction
     """
-    if not item['activeTransaction']['transactionStatus']:
+    if not item['activeTransaction'].get('transactionStatus'):
         return blank()
 
     return FormattedItem(

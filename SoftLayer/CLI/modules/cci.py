@@ -1010,8 +1010,6 @@ Optional:
         data['name'] = args.get('--name')
         data['note'] = args.get('--note')
 
-        #print cci_id, data['name'], additional_disks, data['note']
-
         capture = cci.capture(cci_id,
                               data['name'],
                               additional_disks,
