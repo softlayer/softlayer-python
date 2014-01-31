@@ -4,7 +4,7 @@ usage: sl cci [<command>] [<args>...] [options]
 Manage, delete, order compute instances
 
 The available commands are:
-  cancel          Cancel a running
+  cancel          Cancel a running CCI
   capture         Create an image the disk(s) of a CCI
   create          Order and create a CCI
                     (see `sl cci create-options` for choices)
@@ -996,8 +996,6 @@ Optional:
     action = 'capture'
 
     def execute(self, args):
-        data = {}
-
         cci = CCIManager(self.client)
 
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
@@ -1007,13 +1005,10 @@ Optional:
         else:
             additional_disks = False
 
-        data['name'] = args.get('--name')
-        data['note'] = args.get('--note')
-
         capture = cci.capture(cci_id,
-                              data['name'],
+                              args.get('--name'),
                               additional_disks,
-                              data['note'])
+                              args.get('--note'))
 
         t = KeyValueTable(['Name', 'Value'])
         t.align['Name'] = 'r'

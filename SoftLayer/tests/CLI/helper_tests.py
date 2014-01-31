@@ -198,6 +198,8 @@ class FormatedTxnTests(unittest.TestCase):
         }
 
         result = cli.active_txn(truthful)
+        self.assertEquals(result.original, 'a')
+        self.assertEquals(result.formatted, 'b')
         self.assertIsInstance(result, cli.FormattedItem)
 
     def test_active_txn_missing(self):
@@ -222,7 +224,8 @@ class FormatedTxnTests(unittest.TestCase):
         }
 
         result = cli.transaction_status(truthful)
-
+        self.assertEquals(result.original, 'a')
+        self.assertEquals(result.formatted, 'b')
         self.assertIsInstance(result, cli.FormattedItem)
 
     def test_transaction_status_missing(self):
