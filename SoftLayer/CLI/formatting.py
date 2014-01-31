@@ -141,6 +141,20 @@ def active_txn(item):
         item['activeTransaction']['transactionStatus'].get('friendlyName'))
 
 
+def transaction_status(transaction):
+    """ Returns a FormattedItem describing the transaction status (if any) on
+        the given object. If there is no status, returns a blank FormattedItem.
+
+        :param item: An object capable of having an active transaction
+    """
+    if not transaction.get('transactionStatus'):
+        return blank()
+
+    return FormattedItem(
+        transaction['transactionStatus'].get('name'),
+        transaction['transactionStatus'].get('friendlyName'))
+
+
 def valid_response(prompt, *valid):
     ans = raw_input(prompt).lower()
 

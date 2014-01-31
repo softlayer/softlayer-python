@@ -12,7 +12,7 @@ from exceptions import CLIHalt, CLIAbort, ArgumentError
 from formatting import (
     Table, KeyValueTable, FormattedItem, SequentialOutput, confirm,
     no_going_back, mb_to_gb, gb, listing, blank, format_output,
-    active_txn, valid_response)
+    active_txn, valid_response, transaction_status)
 from template import update_with_template_args, export_to_template
 
 __all__ = [
@@ -23,7 +23,7 @@ __all__ = [
     # Formatting
     'Table', 'KeyValueTable', 'FormattedItem', 'SequentialOutput',
     'valid_response', 'confirm', 'no_going_back', 'mb_to_gb', 'gb',
-    'listing', 'format_output', 'blank', 'active_txn',
+    'listing', 'format_output', 'blank', 'active_txn', 'transaction_status',
     # Template
     'update_with_template_args', 'export_to_template',
 ]

@@ -4,7 +4,8 @@ usage: sl cci [<command>] [<args>...] [options]
 Manage, delete, order compute instances
 
 The available commands are:
-  cancel          Cancel a running CCI
+  cancel          Cancel a running 
+  capture         Create an image the disk(s) of a CCI
   create          Order and create a CCI
                     (see `sl cci create-options` for choices)
   create-options  Output available available options when creating a CCI
@@ -37,7 +38,7 @@ from SoftLayer.CLI import (
 from SoftLayer.CLI.helpers import (
     CLIAbort, ArgumentError, NestedDict, blank, resolve_id, KeyValueTable,
     update_with_template_args, FALSE_VALUES, export_to_template,
-    active_txn)
+    active_txn, transaction_status)
 
 
 class ListCCIs(CLIRunnable):
@@ -986,13 +987,13 @@ usage: sl cci capture <identifier> [options]
 Capture one or all disks from a CCI to a SoftLayer image.
 
 Required:
-  -n --name=NAME        Name of the image
+  -n --name=NAME         Name of the image
 
 Optional:
   --all                  Capture all disks belonging to the CCI
   --note=NOTE            Add a note to be associated with the image
 """
-    action = 'caputre'
+    action = 'capture'
 
     def execute(self, args):
         data = {}
@@ -1009,9 +1010,21 @@ Optional:
         data['name'] = args.get('--name')
         data['note'] = args.get('--note')
 
-        capture = cci.CaptureCCI(cci_id,
-                                 data['name'],
-                                 additional_disks,
-                                 data['note'])
+        #print cci_id, data['name'], additional_disks, data['note']
 
-        return capture
+        capture = cci.capture(cci_id,
+                              data['name'],
+                              additional_disks,
+                              data['note'])
+
+        t = KeyValueTable(['Name', 'Value'])
+        t.align['Name'] = 'r'
+        t.align['Value'] = 'l'
+
+        t.add_row(['cci_id', capture['guestId']])
+        t.add_row(['date', capture['createDate'][:10]])
+        t.add_row(['time', capture['createDate'][11:19]])
+        t.add_row(['transaction', transaction_status(capture)])
+        t.add_row(['transaction_id', capture['id']])
+        t.add_row(['all_disks', additional_disks])
+        return t
