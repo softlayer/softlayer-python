@@ -4,7 +4,7 @@ usage: sl cci [<command>] [<args>...] [options]
 Manage, delete, order compute instances
 
 The available commands are:
-  cancel          Cancel a running 
+  cancel          Cancel a running
   capture         Create an image the disk(s) of a CCI
   create          Order and create a CCI
                     (see `sl cci create-options` for choices)
