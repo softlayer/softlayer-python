@@ -10,9 +10,9 @@
 import os
 import json
 
-import six
-
 from prettytable import PrettyTable, FRAME, NONE
+
+from SoftLayer.utils import string_types, input
 
 
 def format_output(data, fmt='table'):
@@ -22,7 +22,7 @@ def format_output(data, fmt='table'):
                  SequentialOutput
     :param string fmt (optional): One of: table, raw, json, python
     """
-    if isinstance(data, six.string_types):
+    if isinstance(data, string_types):
         if fmt == 'json':
             return json.dumps(data)
         return data
@@ -144,7 +144,7 @@ def active_txn(item):
 
 
 def valid_response(prompt, *valid):
-    ans = six.moves.input(prompt).lower()
+    ans = input(prompt).lower()
 
     if ans in valid:
         return True

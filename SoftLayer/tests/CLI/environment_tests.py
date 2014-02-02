@@ -4,17 +4,11 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import sys
 import os
 from mock import patch, MagicMock
 
 from SoftLayer.tests import unittest
 from SoftLayer.CLI.environment import Environment, InvalidCommand
-
-if sys.version_info >= (3,):
-    raw_input_path = 'builtins.input'
-else:
-    raw_input_path = '__builtin__.raw_input'
 
 
 class EnvironmentTests(unittest.TestCase):
@@ -47,7 +41,7 @@ class EnvironmentTests(unittest.TestCase):
         self.env.stderr.write.assert_any_call('TEXT OUTPUT')
         self.env.stderr.write.assert_any_call(os.linesep)
 
-    @patch(raw_input_path)
+    @patch('SoftLayer.CLI.environment.input')
     def test_input(self, raw_input_mock):
         r = self.env.input('input')
         raw_input_mock.assert_called_with('input')

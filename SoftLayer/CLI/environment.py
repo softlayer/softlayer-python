@@ -12,9 +12,8 @@ import os
 import os.path
 import sys
 
-import six
-
 from SoftLayer.CLI.modules import get_module_list
+from SoftLayer.utils import input
 from SoftLayer import SoftLayerError
 
 
@@ -92,7 +91,7 @@ class Environment(object):
             self.stderr.write(os.linesep)
 
     def input(self, prompt):
-        return six.moves.input(prompt)
+        return input(prompt)
 
     def getpass(self, prompt):
         return getpass.getpass(prompt)

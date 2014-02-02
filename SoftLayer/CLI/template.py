@@ -8,9 +8,9 @@
     :license: MIT, see LICENSE for more details.
 """
 import os.path
-import six
 
 from .exceptions import ArgumentError
+from SoftLayer.utils import configparser, StringIO
 
 
 def update_with_template_args(args):
@@ -25,10 +25,10 @@ def update_with_template_args(args):
                 'File does not exist [-t | --template] = %s'
                 % template_path)
 
-        config = six.moves.configparser.ConfigParser()
+        config = configparser.ConfigParser()
         ini_str = '[settings]\n' + open(
             os.path.expanduser(template_path), 'r').read()
-        ini_fp = six.StringIO(ini_str)
+        ini_fp = StringIO(ini_str)
         config.readfp(ini_fp)
 
         # Merge template options with the options passed in

@@ -11,12 +11,11 @@ The available commands are:
 
 import os.path
 
-import six
-
 from SoftLayer import (
     Client, SoftLayerAPIError, API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT)
 from SoftLayer.CLI import (
     CLIRunnable, CLIAbort, KeyValueTable, confirm, format_output)
+from SoftLayer.utils import configparser
 
 
 def get_settings_from_client(client):
@@ -145,11 +144,11 @@ Setup configuration
 
         # Persist the config file. Read the target config file in before
         # setting the values to avoid clobbering settings
-        config = six.moves.configparser.RawConfigParser()
+        config = configparser.RawConfigParser()
         config.read(config_path)
         try:
             config.add_section('softlayer')
-        except six.moves.configparser.DuplicateSectionError:
+        except configparser.DuplicateSectionError:
             pass
 
         config.set('softlayer', 'username', settings['username'])
