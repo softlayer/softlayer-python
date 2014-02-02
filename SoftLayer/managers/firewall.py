@@ -29,8 +29,6 @@ class FirewallManager(object):
 
     """
     def __init__(self, client):
-        #: A valid `SoftLayer.API.Client` object that will be used for all
-        #: actions.
         self.client = client
 
     def get_firewalls(self):

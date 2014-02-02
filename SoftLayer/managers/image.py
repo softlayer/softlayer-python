@@ -20,14 +20,8 @@ class ImageManager(IdentifierMixin, object):
     """
 
     def __init__(self, client):
-        #: A valid `SoftLayer.API.Client` object that will be used for all
-        #: actions.
         self.client = client
-        #: Reference to the Virtual_Guest_Block_Device_Template_Group API
-        #: object.
         self.vgbdtg = self.client['Virtual_Guest_Block_Device_Template_Group']
-        #: A list of resolver functions. Used primarily by the CLI to provide
-        #: a variety of methods for uniquely identifying an object such as guid
         self.resolvers = [self._get_ids_from_name_public,
                           self._get_ids_from_name_private]
 

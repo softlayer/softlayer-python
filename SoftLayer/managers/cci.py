@@ -15,16 +15,9 @@ from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin, lookup
 class CCIManager(IdentifierMixin, object):
     """ Manage CCIs """
     def __init__(self, client):
-        #: A valid `SoftLayer.API.Client` object that will be used for all
-        #: actions.
         self.client = client
-        #: Reference to the SoftLayer_Account API object.
         self.account = client['Account']
-        #: Reference to the SoftLayer_Virtual_Guest API object.
         self.guest = client['Virtual_Guest']
-        #: A list of resolver functions. Used primarily by the CLI to provide
-        #: a variety of methods for uniquely identifying an object such as
-        #: hostname and IP address.
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
 
     def list_instances(self, hourly=True, monthly=True, tags=None, cpus=None,
@@ -226,41 +219,6 @@ class CCIManager(IdentifierMixin, object):
             dedicated=False, public_vlan=None, private_vlan=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
             private=False, ssh_keys=None):
-        """
-        Translates a list of arguments into a dictionary necessary for creating
-        a CCI.
-
-        :param int cpus: The number of virtual CPUs to include in the instance.
-        :param int memory: The amount of RAM to order.
-        :param bool hourly: Flag to indicate if this server should be billed
-                            hourly (default) or monthly.
-        :param string hostname: The hostname to use for the new server.
-        :param string domain: The domain to use for the new server.
-        :param bool local_disk: Flag to indicate if this should be a local disk
-                                (default) or a SAN disk.
-        :param string datacenter: The short name of the data center in which
-                                  the CCI should reside.
-        :param string os_code: The operating system to use. Cannot be specified
-                               if image_id is specified.
-        :param int image_id: The ID of the image to load onto the server.
-                             Cannot be specified if os_code is specified.
-        :param bool dedicated: Flag to indicate if this should be housed on a
-                               dedicated or shared host (default). This will
-                               incur a fee on your account.
-        :param int public_vlan: The ID of the public VLAN on which you want
-                                this CCI placed.
-        :param int private_vlan: The ID of the public VLAN on which you want
-                                 this CCI placed.
-        :param bool bare_metal: Flag to indicate if this is a bare metal server
-                                or a dedicated server (default).
-        :param list disks: A list of disk capacities for this server.
-        :param string post_uri: The URI of the post-install script to run
-                                after reload
-        :param bool private: If true, the CCI will be provisioned only with
-                             access to the private network. Defaults to false
-        :param list ssh_keys: The SSH keys to add to the root user
-        """
-
         required = [cpus, memory, hostname, domain]
 
         mutually_exclusive = [
@@ -395,14 +353,45 @@ class CCIManager(IdentifierMixin, object):
 
     def verify_create_instance(self, **kwargs):
         """ Verifies an instance creation command without actually placing an
-        order. See :func:`_generate_create_dict` for a list of available
+        order. See :func:`create_instance` for a list of available
         options. """
         create_options = self._generate_create_dict(**kwargs)
         return self.guest.generateOrderTemplate(create_options)
 
     def create_instance(self, **kwargs):
-        """ Orders a new instance. See :func:`_generate_create_dict` for
-        a list of available options. """
+        """
+        Creates a new CCI instance
+
+        :param int cpus: The number of virtual CPUs to include in the instance.
+        :param int memory: The amount of RAM to order.
+        :param bool hourly: Flag to indicate if this server should be billed
+                            hourly (default) or monthly.
+        :param string hostname: The hostname to use for the new server.
+        :param string domain: The domain to use for the new server.
+        :param bool local_disk: Flag to indicate if this should be a local disk
+                                (default) or a SAN disk.
+        :param string datacenter: The short name of the data center in which
+                                  the CCI should reside.
+        :param string os_code: The operating system to use. Cannot be specified
+                               if image_id is specified.
+        :param int image_id: The ID of the image to load onto the server.
+                             Cannot be specified if os_code is specified.
+        :param bool dedicated: Flag to indicate if this should be housed on a
+                               dedicated or shared host (default). This will
+                               incur a fee on your account.
+        :param int public_vlan: The ID of the public VLAN on which you want
+                                this CCI placed.
+        :param int private_vlan: The ID of the public VLAN on which you want
+                                 this CCI placed.
+        :param bool bare_metal: Flag to indicate if this is a bare metal server
+                                or a dedicated server (default).
+        :param list disks: A list of disk capacities for this server.
+        :param string post_uri: The URI of the post-install script to run
+                                after reload
+        :param bool private: If true, the CCI will be provisioned only with
+                             access to the private network. Defaults to false
+        :param list ssh_keys: The SSH keys to add to the root user
+        """
         create_options = self._generate_create_dict(**kwargs)
         return self.guest.createObject(create_options)
 

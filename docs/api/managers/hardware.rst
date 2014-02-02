@@ -3,4 +3,3 @@
 .. automodule:: SoftLayer.managers.hardware
    :members:
    :inherited-members:
-   :undoc-members:
