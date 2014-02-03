@@ -412,7 +412,7 @@ class HardwareManager(IdentifierMixin, object):
             self, server=None, hostname=None, domain=None, hourly=False,
             location=None, os=None, disks=None, port_speed=None,
             bare_metal=None, ram=None, package_id=None, disk_controller=None,
-            ssh_keys=None, public_vlan=None, private_vlan=None):
+            ssh_keys=None, public_vlan=None, private_vlan=None, post_uri=None):
         """
         Translates a list of arguments into a dictionary necessary for creating
         a server.
@@ -450,6 +450,8 @@ class HardwareManager(IdentifierMixin, object):
                                 this server placed.
         :param int private_vlan: The ID of the public VLAN on which you want
                                  this server placed.
+        :param string post_uri: The URI of the post-install script to run
+                                after reload
         """
         arguments = ['server', 'hostname', 'domain', 'location', 'os', 'disks',
                      'port_speed', 'bare_metal', 'ram', 'package_id',
@@ -473,6 +475,9 @@ class HardwareManager(IdentifierMixin, object):
             'location': location,
             'prices': [],
         }
+
+        if post_uri:
+            order['provisionScripts'] = [post_uri]
 
         if ssh_keys:
             order['sshKeys'] = [{'sshKeyIds': ssh_keys}]
