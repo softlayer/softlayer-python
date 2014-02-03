@@ -245,15 +245,13 @@ Options:
             t.add_row(['datacenter', listing(datacenters, separator=',')])
 
         if args['--cpu'] or show_all:
-            standard_cpu = filter(
-                lambda x: not x['template'].get(
-                    'dedicatedAccountHostOnlyFlag', False),
-                result['processors'])
+            standard_cpu = [x for x in result['processors']
+                            if not x['template'].get(
+                                'dedicatedAccountHostOnlyFlag', False)]
 
-            ded_cpu = filter(
-                lambda x: x['template'].get(
-                    'dedicatedAccountHostOnlyFlag', False),
-                result['processors'])
+            ded_cpu = [x for x in result['processors']
+                       if x['template'].get('dedicatedAccountHostOnlyFlag',
+                                            False)]
 
             def cpus_row(c, name):
                 cpus = []
@@ -284,19 +282,16 @@ Options:
             for summary in sorted(os_summary):
                 t.add_row([
                     'os (%s)' % summary,
-                    linesep.join(sorted(filter(
-                        lambda x: x[0:len(summary)] == summary, op_sys))
-                    )
+                    linesep.join(sorted([x for x in op_sys
+                                         if x[0:len(summary)] == summary]))
                 ])
 
         if args['--disk'] or show_all:
-            local_disks = filter(
-                lambda x: x['template'].get('localDiskFlag', False),
-                result['blockDevices'])
+            local_disks = [x for x in result['blockDevices']
+                           if x['template'].get('localDiskFlag', False)]
 
-            san_disks = filter(
-                lambda x: not x['template'].get('localDiskFlag', False),
-                result['blockDevices'])
+            san_disks = [x for x in result['blockDevices']
+                         if not x['template'].get('localDiskFlag', False)]
 
             def block_rows(blocks, name):
                 simple = {}
@@ -877,7 +872,7 @@ Options:
                     instance['primaryIpAddress'],
                     ttl=args['--ttl'])
             else:
-                recs = filter(lambda x: x['type'].lower() == 'a', records)
+                recs = [x for x in records if x['type'].lower() == 'a']
                 if len(recs) != 1:
                     raise CLIAbort("Aborting A record sync, found %d "
                                    "A record exists!" % len(recs))

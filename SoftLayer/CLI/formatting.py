@@ -12,6 +12,8 @@ import json
 
 from prettytable import PrettyTable, FRAME, NONE
 
+from SoftLayer.utils import string_types, console_input
+
 
 def format_output(data, fmt='table'):
     """ Given some data, will format it for output
@@ -20,7 +22,7 @@ def format_output(data, fmt='table'):
                  SequentialOutput
     :param string fmt (optional): One of: table, raw, json, python
     """
-    if isinstance(data, basestring):
+    if isinstance(data, string_types):
         if fmt == 'json':
             return json.dumps(data)
         return data
@@ -142,7 +144,7 @@ def active_txn(item):
 
 
 def valid_response(prompt, *valid):
-    ans = raw_input(prompt).lower()
+    ans = console_input(prompt).lower()
 
     if ans in valid:
         return True

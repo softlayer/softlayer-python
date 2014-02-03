@@ -7,10 +7,10 @@
 """
 import time
 
-from consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT, USER_AGENT
-from transports import make_xml_rpc_api_call
-from auth import TokenAuthentication
-from config import get_client_settings
+from .consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT, USER_AGENT
+from .transports import make_xml_rpc_api_call
+from .auth import TokenAuthentication
+from .config import get_client_settings
 
 
 __all__ = ['Client', 'TimedClient', 'API_PUBLIC_ENDPOINT',

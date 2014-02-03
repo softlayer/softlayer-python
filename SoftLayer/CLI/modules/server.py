@@ -268,9 +268,8 @@ Display a list of cancellation reasons
         t.align['Reason'] = 'l'
 
         mgr = HardwareManager(self.client)
-        reasons = mgr.get_cancellation_reasons().iteritems()
 
-        for code, reason in reasons:
+        for code, reason in mgr.get_cancellation_reasons().items():
             t.add_row([code, reason])
 
         return t

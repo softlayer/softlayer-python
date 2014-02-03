@@ -13,6 +13,7 @@ import os.path
 import sys
 
 from SoftLayer.CLI.modules import get_module_list
+from SoftLayer.utils import console_input
 from SoftLayer import SoftLayerError
 
 
@@ -90,7 +91,7 @@ class Environment(object):
             self.stderr.write(os.linesep)
 
     def input(self, prompt):
-        return raw_input(prompt)
+        return console_input(prompt)
 
     def getpass(self, prompt):
         return getpass.getpass(prompt)

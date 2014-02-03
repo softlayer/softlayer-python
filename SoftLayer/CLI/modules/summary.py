@@ -31,7 +31,7 @@ Options:
         ])
         t.sortby = args.get('--sortby') or 'datacenter'
 
-        for name, dc in datacenters.iteritems():
+        for name, dc in datacenters.items():
             t.add_row([
                 name,
                 dc['vlanCount'],

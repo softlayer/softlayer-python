@@ -13,15 +13,13 @@ if sys.version_info <= (2, 6):
     print("Python 2.6 or greater is required.")
     sys.exit(1)
 
-# Python 3 conversion
 extra = {}
-if sys.version_info >= (3,):
-    extra['use_2to3'] = True
 
 requires = [
+    'six >= 1.1.0',
     'prettytable >= 0.7.0',
     'docopt == 0.6.1',
-    'requests'
+    'requests',
 ]
 
 if sys.version_info < (2, 7):
@@ -50,11 +48,6 @@ setup(
         'SoftLayer.CLI',
         'SoftLayer.CLI.modules',
         'SoftLayer.managers',
-        'SoftLayer.tests',
-        'SoftLayer.tests.CLI',
-        'SoftLayer.tests.CLI.modules',
-        'SoftLayer.tests.managers',
-        'SoftLayer.tests.fixtures',
     ],
     license='MIT',
     zip_safe=False,

@@ -511,7 +511,7 @@ class HardwareManager(IdentifierMixin, object):
 
         # Find all remaining required categories so we can auto-default them
         required_fields = []
-        for category, data in p_options['categories'].iteritems():
+        for category, data in p_options['categories'].items():
             if data.get('is_required') and category not in arguments:
                 if 'disk' in category:
                     # This block makes sure that we can default unspecified

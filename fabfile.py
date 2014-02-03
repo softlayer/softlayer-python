@@ -12,7 +12,8 @@ def make_html():
 
 def upload():
     "Upload distribution to PyPi"
-    local('python setup.py sdist register upload')
+    local('python setup.py sdist upload')
+    local('python setup.py bdist_wheel upload')
 
 
 def clean():
@@ -38,6 +39,8 @@ def release(version, force=False):
     puts(" * Tagging Version %s" % version_str)
     f = 'f' if force else ''
     local("git tag -%sam \"%s\" %s" % (f, version_str, version_str))
+
+    local("pip install wheel")
 
     puts(" * Uploading to PyPI")
     upload()
