@@ -12,7 +12,7 @@ UUID_RE = re.compile('^[0-9a-f\-]{36}$', re.I)
 KNOWN_OPERATIONS = ['<=', '>=', '<', '>', '~', '*=', '^=', '$=', '_=', '!~']
 
 configparser = six.moves.configparser  # pylint: disable=E1101
-input = six.moves.input  # pylint: disable=E1101
+console_input = six.moves.input  # pylint: disable=E1101
 string_types = six.string_types
 StringIO = six.StringIO
 

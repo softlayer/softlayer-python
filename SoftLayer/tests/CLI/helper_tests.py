@@ -37,7 +37,7 @@ class CLIJSONEncoderTest(unittest.TestCase):
 
 class PromptTests(unittest.TestCase):
 
-    @patch('SoftLayer.CLI.formatting.input')
+    @patch('SoftLayer.CLI.formatting.console_input')
     def test_invalid_response(self, raw_input_mock):
         raw_input_mock.return_value = 'y'
         result = cli.helpers.valid_response('test', 'n')
@@ -54,7 +54,7 @@ class PromptTests(unittest.TestCase):
         raw_input_mock.assert_called_with('test')
         self.assertEqual(result, None)
 
-    @patch('SoftLayer.CLI.formatting.input')
+    @patch('SoftLayer.CLI.formatting.console_input')
     def test_valid_response(self, raw_input_mock):
         raw_input_mock.return_value = 'n'
         result = cli.helpers.valid_response('test', 'n')
@@ -66,7 +66,7 @@ class PromptTests(unittest.TestCase):
         raw_input_mock.assert_called_with('test')
         self.assertTrue(result)
 
-    @patch('SoftLayer.CLI.formatting.input')
+    @patch('SoftLayer.CLI.formatting.console_input')
     def test_do_or_die(self, raw_input_mock):
         confirmed = '37347373737'
         raw_input_mock.return_value = confirmed
@@ -89,7 +89,7 @@ class PromptTests(unittest.TestCase):
         res = runnable.execute({})
         self.assertEqual(res, None)
 
-    @patch('SoftLayer.CLI.formatting.input')
+    @patch('SoftLayer.CLI.formatting.console_input')
     def test_confirmation(self, raw_input_mock):
         raw_input_mock.return_value = 'Y'
         res = cli.confirm('Confirm?', default=False)

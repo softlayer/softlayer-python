@@ -12,7 +12,7 @@ import json
 
 from prettytable import PrettyTable, FRAME, NONE
 
-from SoftLayer.utils import string_types, input
+from SoftLayer.utils import string_types, console_input
 
 
 def format_output(data, fmt='table'):
@@ -144,7 +144,7 @@ def active_txn(item):
 
 
 def valid_response(prompt, *valid):
-    ans = input(prompt).lower()
+    ans = console_input(prompt).lower()
 
     if ans in valid:
         return True

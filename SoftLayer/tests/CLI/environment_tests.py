@@ -41,7 +41,7 @@ class EnvironmentTests(unittest.TestCase):
         self.env.stderr.write.assert_any_call('TEXT OUTPUT')
         self.env.stderr.write.assert_any_call(os.linesep)
 
-    @patch('SoftLayer.CLI.environment.input')
+    @patch('SoftLayer.CLI.environment.console_input')
     def test_input(self, raw_input_mock):
         r = self.env.input('input')
         raw_input_mock.assert_called_with('input')
