@@ -294,7 +294,7 @@ Options:
 
 class QueuePush(CLIRunnable):
     __doc__ = """
-usage: sl messaging queue-push <account_id> <queue_name> (<message> | [-])
+usage: sl messaging queue-push <account_id> <queue_name> (<message> | -)
                                [options]
 
 Push a message into a queue
@@ -309,10 +309,10 @@ Options:
         manager = MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
         body = ''
-        if args['<message>'] is not None:
-            body = args['<message>']
-        else:
+        if args['<message>'] == '-':
             body = sys.stdin.read()
+        else:
+            body = args['<message>']
         return message_table(
             mq_client.push_queue_message(args['<queue_name>'], body))
 
@@ -493,7 +493,7 @@ Remove a subscription on a topic
 
 class TopicPush(CLIRunnable):
     __doc__ = """
-usage: sl messaging topic-push <account_id> <topic_name> (<message> | [-])
+usage: sl messaging topic-push <account_id> <topic_name> (<message> | -)
                                [options]
 
 Push a message into a topic
@@ -507,9 +507,9 @@ Push a message into a topic
 
         # the message body comes from the positional argument or stdin
         body = ''
-        if args['<message>'] is not None:
-            body = args['<message>']
-        else:
+        if args['<message>'] == '-':
             body = sys.stdin.read()
+        else:
+            body = args['<message>']
         return message_table(
             mq_client.push_topic_message(args['<topic_name>'], body))
