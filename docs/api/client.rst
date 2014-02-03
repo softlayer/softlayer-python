@@ -61,7 +61,7 @@ For day to day operation, most users will find the managers to be the most conve
 **Available managers**:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :glob:
 
    managers/*

@@ -3,4 +3,3 @@
 .. automodule:: SoftLayer.managers.image
    :members:
    :inherited-members:
-   :undoc-members:

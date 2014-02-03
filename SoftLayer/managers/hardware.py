@@ -18,16 +18,9 @@ class HardwareManager(IdentifierMixin, object):
     """
 
     def __init__(self, client):
-        #: A valid `SoftLayer.API.Client` object that will be used for all
-        #: actions.
         self.client = client
-        #: Reference to the SoftLayer_Hardware_Server API object.
         self.hardware = self.client['Hardware_Server']
-        #: Reference to the SoftLayer_Account API object.
         self.account = self.client['Account']
-        #: A list of resolver functions. Used primarily by the CLI to provide
-        #: a variety of methods for uniquely identifying an object such as
-        #: hostname and IP address.
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
 
     def cancel_hardware(self, hardware_id, reason='unneeded', comment=''):
@@ -317,8 +310,46 @@ class HardwareManager(IdentifierMixin, object):
         return func(speed, id=hardware_id)
 
     def place_order(self, **kwargs):
-        """ Places an order for a piece of hardware. See
-        :func:`_generate_create_dict` for a list of available options.
+        """ Places an order for a piece of hardware.
+
+        Translates a list of arguments into a dictionary necessary for creating
+        a server.
+
+        .. warning::
+           All items here must be price IDs, NOT quantities!
+
+        :param int server: The identification string for the server to
+                           order. This will either be the CPU/Memory
+                           combination ID for bare metal instances or the
+                           CPU model for dedicated servers.
+        :param string hostname: The hostname to use for the new server.
+        :param string domain: The domain to use for the new server.
+        :param bool hourly: Flag to indicate if this server should be billed
+                            hourly (default) or monthly. Only applies to bare
+                            metal instances.
+        :param string location: The location string (data center) for the
+                                server
+        :param int os: The operating system to use
+        :param array disks: An array of disks for the server. Disks will be
+                            added in the order specified.
+        :param int port_speed: The port speed for the server.
+        :param bool bare_metal: Flag to indicate if this is a bare metal server
+                                or a dedicated server (default).
+        :param int ram: The amount of RAM to order. Only applies to dedicated
+                        servers.
+        :param int package_id: The package_id to use for the server. This
+                               should either be a chassis ID for dedicated
+                               servers or the bare metal instance package ID,
+                               which can be obtained by calling
+                               _get_bare_metal_package_id
+        :param int disk_controller: The disk controller to use.
+        :param list ssh_keys: The SSH keys to add to the root user
+        :param int public_vlan: The ID of the public VLAN on which you want
+                                this server placed.
+        :param int private_vlan: The ID of the public VLAN on which you want
+                                 this server placed.
+        :param string post_uri: The URI of the post-install script to run
+                                after reload
 
         .. warning::
            Due to how the ordering structure currently works, all ordering
@@ -385,7 +416,7 @@ class HardwareManager(IdentifierMixin, object):
 
     def verify_order(self, **kwargs):
         """ Verifies an order for a piece of hardware without actually placing
-        it. See :func:`_generate_create_dict` for a list of available options.
+        it. See :func:`place_order` for a list of available options.
         """
         create_options = self._generate_create_dict(**kwargs)
         return self.client['Product_Order'].verifyOrder(create_options)
@@ -450,8 +481,6 @@ class HardwareManager(IdentifierMixin, object):
                                 this server placed.
         :param int private_vlan: The ID of the public VLAN on which you want
                                  this server placed.
-        :param string post_uri: The URI of the post-install script to run
-                                after reload
         """
         arguments = ['server', 'hostname', 'domain', 'location', 'os', 'disks',
                      'port_speed', 'bare_metal', 'ram', 'package_id',

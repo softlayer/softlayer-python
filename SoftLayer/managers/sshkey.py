@@ -17,14 +17,8 @@ class SshKeyManager(IdentifierMixin, object):
     """
 
     def __init__(self, client):
-        #: A valid `SoftLayer.API.Client` object that will be used for all
-        #: actions.
         self.client = client
-        #: Reference to the SoftLayer_Security_Ssh_Key API object.
         self.sshkey = client['Security_Ssh_Key']
-        #: A list of resolver functions. Used primarily by the CLI to provide
-        #: a variety of methods for uniquely identifying an object such as
-        #: label.
         self.resolvers = [self._get_ids_from_label]
 
     def add_key(self, key, label, notes=None):

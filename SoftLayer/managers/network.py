@@ -12,12 +12,8 @@ from SoftLayer.utils import NestedDict, query_filter, resolve_ids, lookup
 class NetworkManager(object):
     """ Manage Networks """
     def __init__(self, client):
-        #: A valid `SoftLayer.API.Client` object that will be used for all
-        #: actions.
         self.client = client
-        #: Reference to the SoftLayer_Account API object.
         self.account = client['Account']
-        #: Reference to the SoftLayer_Network_Vlan object.
         self.vlan = client['Network_Vlan']
         self.subnet = client['Network_Subnet']
 

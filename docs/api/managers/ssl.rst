@@ -3,4 +3,3 @@
 .. automodule:: SoftLayer.managers.ssl
    :members:
    :inherited-members:
-   :undoc-members:

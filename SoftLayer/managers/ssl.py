@@ -15,10 +15,7 @@ class SSLManager(object):
     """
 
     def __init__(self, client):
-        #: A valid `SoftLayer.API.Client` object that will be used for all
-        #: actions.
         self.client = client
-        #: Reference to the SoftLayer_Security_Certificate API object.
         self.ssl = self.client['Security_Certificate']
 
     def list_certs(self, method='all'):
