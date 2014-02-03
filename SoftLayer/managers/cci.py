@@ -254,7 +254,7 @@ class CCIManager(IdentifierMixin, object):
         :param bool bare_metal: Flag to indicate if this is a bare metal server
                                 or a dedicated server (default).
         :param list disks: A list of disk capacities for this server.
-        :param string post_url: The URI of the post-install script to run
+        :param string post_uri: The URI of the post-install script to run
                                 after reload
         :param bool private: If true, the CCI will be provisioned only with
                              access to the private network. Defaults to false

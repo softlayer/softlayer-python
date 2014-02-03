@@ -170,6 +170,7 @@ class HardwareTests(unittest.TestCase):
             'ssh_keys': [3000, 3001],
             'public_vlan': 10234,
             'private_vlan': 20468,
+            'post_uri': 'http://somescript.foo/myscript.sh',
         }
 
         expected = {
@@ -195,7 +196,8 @@ class HardwareTests(unittest.TestCase):
                 {'id': 1400},
                 {'id': 1500}],
             'sshKeys': [{'sshKeyIds': [3000, 3001]}],
-            'location': 'Wyrmshire', 'packageId': 13
+            'location': 'Wyrmshire', 'packageId': 13,
+            'provisionScripts': ['http://somescript.foo/myscript.sh'],
         }
 
         data = self.hardware._generate_create_dict(**args)

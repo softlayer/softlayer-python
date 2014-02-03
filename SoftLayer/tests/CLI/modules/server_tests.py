@@ -374,6 +374,7 @@ class ServerCLITests(unittest.TestCase):
             '--key': [1234, 456],
             '--vlan_public': 10234,
             '--vlan_private': 20468,
+            '--postinstall': 'http://somescript.foo/myscript.sh',
         }
 
         runnable = server.CreateServer(client=self.client)

@@ -695,23 +695,24 @@ Required:
 
 
 Optional:
-  -d, --datacenter=DC  datacenter name
-                         Note: Omitting this value defaults to the first
-                         available datacenter
-  -n, --network=MBPS   Network port speed in Mbps
-  --disk=SIZE...       Disks. Can be specified multiple times
-  --controller=RAID    The RAID configuration for the server.
-                         Defaults to None.
-  -k KEY, --key=KEY    SSH keys to assign to the root user. Can be specified
-                         multiple times.
-  --dry-run, --test    Do not create the server, just get a quote
-  --vlan_public=VLAN   The ID of the public VLAN on which you want the hardware
-                         placed
-  --vlan_private=VLAN  The ID of the private VLAN on which you want the
-                         hardware placed
-  -t, --template=FILE  A template file that defaults the command-line
-                         options using the long name in INI format
-  --export=FILE        Exports options to a template file
+  -d, --datacenter=DC    Datacenter name
+                           Note: Omitting this value defaults to the first
+                           available datacenter
+  -n, --network=MBPS     Network port speed in Mbps
+  --disk=SIZE...         Disks. Can be specified multiple times
+  --controller=RAID      The RAID configuration for the server.
+                           Defaults to None.
+  -i, --postinstall=URI  Post-install script to download
+  -k KEY, --key=KEY      SSH keys to assign to the root user. Can be specified
+                           multiple times.
+  --dry-run, --test      Do not create the server, just get a quote
+  --vlan_public=VLAN     The ID of the public VLAN on which you want the
+                           hardware placed
+  --vlan_private=VLAN    The ID of the private VLAN on which you want the
+                           hardware placed
+  -t, --template=FILE    A template file that defaults the command-line
+                           options using the long name in INI format
+  --export=FILE          Exports options to a template file
 """
     action = 'create'
     options = ['confirm']
@@ -789,6 +790,9 @@ Optional:
             order['port_speed'] = nic_price
         else:
             raise CLIAbort('Invalid NIC speed specified.')
+
+        if args.get('--postinstall'):
+            order['post_uri'] = args.get('--postinstall')
 
         # Get the SSH keys
         if args.get('--key'):
