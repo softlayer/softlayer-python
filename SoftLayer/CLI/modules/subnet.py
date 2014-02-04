@@ -17,7 +17,7 @@ from SoftLayer.utils import lookup
 from SoftLayer.CLI import (
     CLIRunnable, Table, KeyValueTable, FormattedItem, confirm, no_going_back,
     resolve_id)
-from SoftLayer.CLI.helpers import CLIAbort, SequentialOutput
+from SoftLayer.CLI.helpers import CLIAbort, SequentialOutput, blank
 
 
 class SubnetCancel(CLIRunnable):
@@ -138,10 +138,10 @@ Filters:
         t.add_row(['identifier',
                    subnet['networkIdentifier'] + '/' + str(subnet['cidr'])])
         t.add_row(['subnet type', subnet['subnetType']])
-        t.add_row(['gateway', subnet.get('gateway', '-')])
-        t.add_row(['broadcast', subnet.get('broadcastAddress', '-')])
+        t.add_row(['gateway', subnet.get('gateway', blank())])
+        t.add_row(['broadcast', subnet.get('broadcastAddress', blank())])
         t.add_row(['datacenter', subnet['datacenter']['name']])
-        t.add_row(['usable ips', subnet.get('usableIpAddressCount', '-')])
+        t.add_row(['usable ips', subnet.get('usableIpAddressCount', blank())])
 
         if not args.get('--no-cci'):
             if subnet['virtualGuests']:
@@ -217,8 +217,8 @@ Filters:
             t.add_row([
                 subnet['id'],
                 subnet['networkIdentifier'] + '/' + str(subnet['cidr']),
-                subnet.get('subnetType', '-'),
-                lookup(subnet, 'datacenter', 'name',) or '-',
+                subnet.get('subnetType', blank()),
+                lookup(subnet, 'datacenter', 'name',) or blank(),
                 subnet['networkVlanId'],
                 subnet['ipAddressCount'],
                 len(subnet['hardware']),
