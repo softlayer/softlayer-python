@@ -13,6 +13,7 @@ The available commands are:
 # :license: MIT, see LICENSE for more details.
 
 from SoftLayer import NetworkManager
+from SoftLayer.utils import lookup
 from SoftLayer.CLI import (
     CLIRunnable, Table, KeyValueTable, FormattedItem, confirm, no_going_back,
     resolve_id)
@@ -217,7 +218,7 @@ Filters:
                 subnet['id'],
                 subnet['networkIdentifier'] + '/' + str(subnet['cidr']),
                 subnet.get('subnetType', '-'),
-                subnet['datacenter']['name'],
+                lookup(subnet, 'datacenter', 'name',) or '-',
                 subnet['networkVlanId'],
                 subnet['ipAddressCount'],
                 len(subnet['hardware']),
