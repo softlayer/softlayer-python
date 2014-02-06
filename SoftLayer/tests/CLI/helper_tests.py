@@ -180,6 +180,55 @@ class FormattedListTests(unittest.TestCase):
         self.assertEqual('1:two', result)
 
 
+class FormatedTxnTests(unittest.TestCase):
+    def test_active_txn_empty(self):
+        self.assertRaises(KeyError, cli.active_txn, {})
+
+    def test_active_txn(self):
+        result = cli.active_txn({
+            'activeTransaction': {
+                'transactionStatus': {
+                    'name': 'a',
+                    'friendlyName': 'b'
+                }
+            }
+        })
+        self.assertEquals(result.original, 'a')
+        self.assertEquals(result.formatted, 'b')
+        self.assertIsInstance(result, cli.FormattedItem)
+
+    def test_active_txn_missing(self):
+        """ a dict with activeTransaction but not transactionStatus
+            should return blank() instead of raising an exception"""
+        b = cli.blank()
+
+        result = cli.active_txn({
+            'activeTransaction': {}
+        })
+        self.assertIsInstance(result, cli.FormattedItem)
+        self.assertEquals(result.original, b.original)
+
+    def test_transaction_status(self):
+        result = cli.transaction_status({
+            'transactionStatus': {
+                'name': 'a',
+                'friendlyName': 'b'
+            }
+        })
+        self.assertEquals(result.original, 'a')
+        self.assertEquals(result.formatted, 'b')
+        self.assertIsInstance(result, cli.FormattedItem)
+
+    def test_transaction_status_missing(self):
+        b = cli.blank()
+
+        result = cli.transaction_status({
+            'transactionStatus': {}
+        })
+        self.assertIsInstance(result, cli.FormattedItem)
+        self.assertEqual(result.original, b.original)
+
+
 class CLIAbortTests(unittest.TestCase):
 
     def test_init(self):

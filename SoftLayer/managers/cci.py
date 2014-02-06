@@ -463,3 +463,27 @@ class CCIManager(IdentifierMixin, object):
             return True
 
         return self.guest.editObject(obj, id=instance_id)
+
+    def capture(self, instance_id, name, additional_disks=False, notes=None):
+        """ Capture one or all disks from a CCI to a SoftLayer image.
+
+        Parameters set to None will be ignored and not attempted to be updated.
+
+        :param integer instance_id: the instance ID to edit
+        :param string name: name assigned to the image
+        :param string additional_disks: set to true to include all additional
+                                        attached storage devices
+        :param string notes: notes about this particular image
+
+        """
+        cci = self.get_instance(instance_id)
+
+        disk_filter = lambda x: x['device'] == '0'
+        #Disk 1 is swap partition.  Need to skip its capture.
+        if additional_disks:
+            disk_filter = lambda x: x['device'] != '1'
+
+        disks = filter(disk_filter, cci['blockDevices'])
+
+        return self.guest.createArchiveTransaction(
+            name, disks, notes, id=instance_id)
