@@ -188,16 +188,14 @@ class FormatedTxnTests(unittest.TestCase):
         self.assertRaises(KeyError, cli.active_txn, {})
 
     def test_active_txn(self):
-        truthful = {
+        result = cli.active_txn({
             'activeTransaction': {
                 'transactionStatus': {
                     'name': 'a',
                     'friendlyName': 'b'
                 }
             }
-        }
-
-        result = cli.active_txn(truthful)
+        })
         self.assertEquals(result.original, 'a')
         self.assertEquals(result.formatted, 'b')
         self.assertIsInstance(result, cli.FormattedItem)
@@ -205,25 +203,21 @@ class FormatedTxnTests(unittest.TestCase):
     def test_active_txn_missing(self):
         """ a dict with activeTransaction but not transactionStatus
             should return blank() instead of raising an exception"""
-
-        nottruthful = {
-            'activeTransaction': {}
-        }
         b = cli.blank()
 
-        result = cli.active_txn(nottruthful)
+        result = cli.active_txn({
+            'activeTransaction': {}
+        })
         self.assertIsInstance(result, cli.FormattedItem)
         self.assertEquals(result.original, b.original)
 
     def test_transaction_status(self):
-        truthful = {
+        result = cli.transaction_status({
             'transactionStatus': {
                 'name': 'a',
                 'friendlyName': 'b'
             }
-        }
-
-        result = cli.transaction_status(truthful)
+        })
         self.assertEquals(result.original, 'a')
         self.assertEquals(result.formatted, 'b')
         self.assertIsInstance(result, cli.FormattedItem)
@@ -231,12 +225,9 @@ class FormatedTxnTests(unittest.TestCase):
     def test_transaction_status_missing(self):
         b = cli.blank()
 
-        nottruthful = {
+        result = cli.transaction_status({
             'transactionStatus': {}
-        }
-
-        result = cli.transaction_status(nottruthful)
-
+        })
         self.assertIsInstance(result, cli.FormattedItem)
         self.assertEqual(result.original, b.original)
 
