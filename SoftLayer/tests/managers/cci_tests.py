@@ -517,6 +517,21 @@ class CCITests(unittest.TestCase):
         self.cci.edit(100, **args)
         service.editObject.assert_called_once_with(args, id=100)
 
+    def test_captures(self):
+        archive = self.client['Virtual_Guest'].createArchiveTransaction
+
+        # capture only the OS disk
+        self.cci.capture(1, 'a')
+        archive.called_once_with('a', [{"device": 0}], "", id=1)
+
+        archive.reset()
+
+        # capture all the disks, minus the swap
+        # make sure the data is carried along with it
+        self.cci.capture(1, 'a', additional_disks=True)
+        archive.called_once_with('a', [{"device": 0, "uuid": 1},
+                                 {"device": 2, "uuid": 2}], "", id=1)
+
 
 class CCIWaitReadyGoTests(unittest.TestCase):
 
