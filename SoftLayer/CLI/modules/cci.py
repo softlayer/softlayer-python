@@ -355,8 +355,8 @@ Optional:
   --dry-run, --test      Do not create CCI, just get a quote
   --export=FILE          Exports options to a template file
   -F, --userfile=FILE    Read userdata from file
-                           (Only HTTPS executes, HTTP leaves file in /root)
   -i, --postinstall=URI  Post-install script to download
+                           (Only HTTPS executes, HTTP leaves file in /root)
   -k, --key=KEY          SSH keys to add to the root user. Can be specified
                            multiple times
   --like=IDENTIFIER      Use the configuration from an existing CCI
