@@ -183,7 +183,7 @@ class TicketUtils:
         totalUpdates = len(result['updates'])
         count = min(totalUpdates, update_count)
         for index in range(0, count):
-            t.add_row(['Update %s' %(totalUpdates-index), TicketUtils.wrap_string(result['updates'][totalUpdates - 1 - index]['entry'])])
+            t.add_row(['Update %s' % (totalUpdates - index), TicketUtils.wrap_string(result['updates'][totalUpdates - 1 - index]['entry'])])
 
         return t
 
@@ -252,7 +252,7 @@ class CreateTicket(CLIRunnable):
     """
     usage: sl ticket create --subject=xxx [options]
 
-    Create a support ticket. 
+    Create a support ticket.
 
     Required:
       --title=TITLE  The title of the ticket
@@ -275,7 +275,7 @@ class CreateTicket(CLIRunnable):
         createdTicket = mgr.create_ticket(
             title=(args.get('--title')),
             body=body,
-            hardware=args.get('--hardware'),  #  not being used now
-            rootPassword=args.get('--rootPassword'),  #  not being used now
+            hardware=args.get('--hardware'),  # not being used now
+            rootPassword=args.get('--rootPassword'),  # not being used now
             subject=args.get('--subject'))
         return TicketUtils.get_ticket_results(mgr, createdTicket['id'], 1)
