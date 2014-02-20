@@ -16,22 +16,23 @@ The available commands are:
 import textwrap
 
 from SoftLayer import TicketManager
-from SoftLayer.CLI import CLIRunnable, formatting, Table, resolve_id, NestedDict, KeyValueTable
+from SoftLayer.CLI import CLIRunnable, Table, resolve_id, NestedDict, KeyValueTable
 
 """ Global variables for the status of the ticket - either open or closed """
 OPEN = 'open'
-CLOSED ='closed'
+CLOSED = 'closed'
+
 
 class ListTickets(CLIRunnable):
     """
-usage: sl ticket list [--status=open,closed]
+    usage: sl ticket list [--status=open,closed]
 
-List tickets
+    List tickets
 
-Options:
-  --status=open or closed  Display only opened or closed tickets, otherwise display both
-  
-"""
+    Options:
+      --status=open or closed  Display only opened or closed tickets, otherwise display both
+
+    """
     action = 'list'
 
     def execute(self, args):
@@ -72,16 +73,17 @@ Options:
                     ticket['createDate'],
                     ticket['lastEditDate']
                 ])
-        
+
         return t
-    
+
+
 class ListSubjectsTickets(CLIRunnable):
     """
-usage: sl ticket subjects 
+    usage: sl ticket subjects 
 
-List Subject Ids for ticket creation
+    List Subject Ids for ticket creation
 
-"""
+    """
     action = 'subjects'
 
     def execute(self, args):
@@ -94,17 +96,18 @@ List Subject Ids for ticket creation
                     subject['name']
                 ])
         return t    
+
     
 class UpdateTicket(CLIRunnable):
     """
-usage: sl ticket update <identifier> [options]
+    usage: sl ticket update <identifier> [options]
 
-Updates a certain ticket
+    Updates a certain ticket
 
-Options:
-  --body=BODY  The entry that will be appended to the ticket
+    Options:
+      --body=BODY  The entry that will be appended to the ticket
 
-"""
+    """
     action = 'update'
     options = ['--body']
 
@@ -113,21 +116,22 @@ Options:
 
         ticket_id = resolve_id(
             mgr.resolve_ids, args.get('<identifier>'), 'ticket')
-        
+
         body = args.get('--body')
         if (body is None):
             body = TicketUtils.open_editor(beg_msg = "***** Softlayer Ticket Content ******")
-        
+
         ticket = mgr.update_ticket(t_id=ticket_id, body=body)
         return "Ticket Updated!"    
-    
+
+
 class TicketsSummary(CLIRunnable):
     """
-usage: sl ticket summary 
+    usage: sl ticket summary 
 
-Give summary info about tickets
+    Give summary info about tickets
 
-"""
+    """
     action = 'summary'
 
     def execute(self, args):
@@ -144,59 +148,57 @@ Give summary info about tickets
         nested.add_row(['Total', accountObject['openTicketCount']])
         t.add_row(['Open', nested])
         t.add_row(['Closed', accountObject['closedTicketCount']])
-        
+
         return t    
 
 
 class TicketUtils:
     """
     TicketUtils class that is a helper for common methods within the Ticket module.
-
     """
-    
+
     @staticmethod
     def get_ticket_results(mgr, ticket_id, update_count=1, **kwargs):
         """ Get output about a ticket
-    
+
         :param integer id: the ticket ID
         :param integer update_count: the number of entries to retrieve from the ticket
         :returns: a KeyValue table containing the details of the ticket
-       
+
         """
         result = mgr.get_ticket(ticket_id)
         result = NestedDict(result)   
-    
+
         t = KeyValueTable(['Name', 'Value'])
         t.align['Name'] = 'r'
         t.align['Value'] = 'l'
-    
+
         t.add_row(['id', result['id']])
         t.add_row(['title', result['title']])
         if (result['assignedUser']):
             t.add_row(['assignedUser', result['assignedUser']['firstName'] + " " + result['assignedUser']['lastName']] )
         t.add_row(['createDate', result['createDate']])
         t.add_row(['lastEditDate', result['lastEditDate']])
-    
-    
+
         totalUpdates = len(result['updates'])
         count = min(totalUpdates, update_count)
         for index in range(0,count):
             t.add_row(['Update %s' %(totalUpdates-index), TicketUtils.wrap_string(result['updates'][totalUpdates-1-index]['entry'])])
-      
+
         return t
-    
+
     @staticmethod
     def open_editor(beg_msg, ending_msg=None):
         """ 
-    
+
         :param beg_msg: generic msg to be appended at the end of the file
         :param ending_msg: placeholder msg to be appended at the end of the file, like filesystem info, etc, not being used now
         :returns: the content the user has entered
-       
+
         """
         import tempfile,os
         from subprocess import call
-        
+
         #Let's get the default EDITOR of the environment, use nano if none is specified
         editor = os.environ.get('EDITOR','nano')
 
@@ -215,21 +217,22 @@ class TicketUtils:
             return data
 
         return
-    
+
     @staticmethod
     def wrap_string(input_str):
         #utility method to wrap the content of the ticket, as it can make the output messy
         return textwrap.wrap(input_str, 80)
-            
+
+
 class TicketDetails(CLIRunnable):
     """
-usage: sl ticket detail  <identifier> [options]
+    usage: sl ticket detail  <identifier> [options]
 
-Get details for a ticket
+    Get details for a ticket
 
-Options:
-  --updateCount=X  Show X count of updates, default is 1 
-"""
+    Options:
+      --updateCount=X  Show X count of updates, default is 1 
+    """
     action = 'detail'
 
     def execute(self, args):
@@ -237,27 +240,26 @@ Options:
 
         ticket_id = resolve_id(
             mgr.resolve_ids, args.get('<identifier>'), 'ticket')
-        
+
         count = args.get('--updateCount') 
         if not count:
             count = 1
         return TicketUtils.get_ticket_results(mgr, ticket_id, int(count))
 
-  
+
 class CreateTicket(CLIRunnable):
     """
-usage: sl ticket create --subject=xxx [options]
+    usage: sl ticket create --subject=xxx [options]
 
-Create a support ticket. 
+    Create a support ticket. 
 
-Required:
-  --title=TITLE  The title of the ticket
-  --subject=xxx The id of the subject to use for the ticket, issue 'sl ticket subjects' to get the list 
-  
+    Required:
+      --title=TITLE  The title of the ticket
+      --subject=xxx The id of the subject to use for the ticket, issue 'sl ticket subjects' to get the list 
 
-Optional:
-  --body the body text to attach to the ticket                         
-"""
+    Optional:
+      --body the body text to attach to the ticket                         
+    """
     action = 'create'
     required_params = ['--title, --subject']
 
@@ -267,13 +269,12 @@ Optional:
             return 'Please provide a valid title'
         body=args.get('--body')
         if (body is None):
-            body = TicketUtils.open_editor(beg_msg = "***** Softlayer Ticket Content ******")
-              
+            body = TicketUtils.open_editor(beg_msg="***** Softlayer Ticket Content ******")
+
         createdTicket = mgr.create_ticket(
-                    title=(args.get('--title')), 
-                    body=body, 
-                    hardware=args.get('--hardware'), #not being used now 
-                    rootPassword=args.get('--rootPassword'), #not being used now
-                    subject=args.get('--subject'))
+            title=(args.get('--title')), 
+            body=body,
+            hardware=args.get('--hardware'),#  not being used now 
+            rootPassword=args.get('--rootPassword'),#  not being used now
+            subject=args.get('--subject'))
         return TicketUtils.get_ticket_results(mgr, createdTicket['id'], 1)
-    
