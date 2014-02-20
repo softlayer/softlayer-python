@@ -17,7 +17,8 @@ from SoftLayer.managers.metadata import MetadataManager
 from SoftLayer.managers.network import NetworkManager
 from SoftLayer.managers.sshkey import SshKeyManager
 from SoftLayer.managers.ssl import SSLManager
+from SoftLayer.managers.ticket import TicketManager
 
 __all__ = ['CCIManager', 'DNSManager', 'FirewallManager', 'HardwareManager',
            'ImageManager', 'MessagingManager', 'MetadataManager',
-           'NetworkManager', 'SshKeyManager', 'SSLManager']
+           'NetworkManager', 'SshKeyManager', 'SSLManager', 'TicketManager']
