@@ -39,25 +39,25 @@ class ListTickets(CLIRunnable):
         ticket_mgr = TicketManager(self.client)
 
         mask = 'id,accountId,title,createDate,lastEditDate,assignedUser[firstName, lastName]'
-        
+
         """Determine what needs to be returned, either open tickets, closed tickets, or both"""
         neither = True
-        if ( args.get('--status') == OPEN) or (args.get('--status') == CLOSED) :
+        if (args.get('--status') == OPEN) or (args.get('--status') == CLOSED):
             neither = False
 
         tickets = []
-        if ( args.get('--status') == OPEN) or neither:
+        if (args.get('--status') == OPEN) or neither:
             for ticket in ticket_mgr.list_tickets(status=OPEN, mask=mask):
                 tickets.append(ticket)
 
         if (args.get('--status') == CLOSED) or neither:
-            for ticket in ticket_mgr.list_tickets(status=CLOSED,mask=mask):
+            for ticket in ticket_mgr.list_tickets(status=CLOSED, mask=mask):
                 tickets.append(ticket)
 
         t = Table(['id', 'assigned user', 'title', 'creation date', 'last edit date'])
 
         for ticket in tickets:
-            if ticket['assignedUser']:            
+            if ticket['assignedUser']:
                 t.add_row([
                     ticket['id'],
                     ticket['assignedUser']['firstName'] + " " + ticket['assignedUser']['lastName'],
@@ -79,7 +79,7 @@ class ListTickets(CLIRunnable):
 
 class ListSubjectsTickets(CLIRunnable):
     """
-    usage: sl ticket subjects 
+    usage: sl ticket subjects
 
     List Subject Ids for ticket creation
 
@@ -88,16 +88,16 @@ class ListSubjectsTickets(CLIRunnable):
 
     def execute(self, args):
         ticket_mgr = TicketManager(self.client)
-        
+
         t = Table(['id', 'subject'])
         for subject in ticket_mgr.list_subjects():
                 t.add_row([
                     subject['id'],
                     subject['name']
                 ])
-        return t    
+        return t
 
-    
+
 class UpdateTicket(CLIRunnable):
     """
     usage: sl ticket update <identifier> [options]
@@ -119,15 +119,15 @@ class UpdateTicket(CLIRunnable):
 
         body = args.get('--body')
         if (body is None):
-            body = TicketUtils.open_editor(beg_msg = "***** Softlayer Ticket Content ******")
+            body = TicketUtils.open_editor(beg_msg="***** Softlayer Ticket Content ******")
 
-        ticket = mgr.update_ticket(t_id=ticket_id, body=body)
-        return "Ticket Updated!"    
+        mgr.update_ticket(t_id=ticket_id, body=body)
+        return "Ticket Updated!"
 
 
 class TicketsSummary(CLIRunnable):
     """
-    usage: sl ticket summary 
+    usage: sl ticket summary
 
     Give summary info about tickets
 
@@ -149,7 +149,7 @@ class TicketsSummary(CLIRunnable):
         t.add_row(['Open', nested])
         t.add_row(['Closed', accountObject['closedTicketCount']])
 
-        return t    
+        return t
 
 
 class TicketUtils:
@@ -167,7 +167,7 @@ class TicketUtils:
 
         """
         result = mgr.get_ticket(ticket_id)
-        result = NestedDict(result)   
+        result = NestedDict(result)
 
         t = KeyValueTable(['Name', 'Value'])
         t.align['Name'] = 'r'
@@ -176,31 +176,32 @@ class TicketUtils:
         t.add_row(['id', result['id']])
         t.add_row(['title', result['title']])
         if (result['assignedUser']):
-            t.add_row(['assignedUser', result['assignedUser']['firstName'] + " " + result['assignedUser']['lastName']] )
+            t.add_row(['assignedUser', result['assignedUser']['firstName'] + " " + result['assignedUser']['lastName']])
         t.add_row(['createDate', result['createDate']])
         t.add_row(['lastEditDate', result['lastEditDate']])
 
         totalUpdates = len(result['updates'])
         count = min(totalUpdates, update_count)
-        for index in range(0,count):
-            t.add_row(['Update %s' %(totalUpdates-index), TicketUtils.wrap_string(result['updates'][totalUpdates-1-index]['entry'])])
+        for index in range(0, count):
+            t.add_row(['Update %s' %(totalUpdates-index), TicketUtils.wrap_string(result['updates'][totalUpdates - 1 - index]['entry'])])
 
         return t
 
     @staticmethod
     def open_editor(beg_msg, ending_msg=None):
-        """ 
+        """
 
         :param beg_msg: generic msg to be appended at the end of the file
         :param ending_msg: placeholder msg to be appended at the end of the file, like filesystem info, etc, not being used now
         :returns: the content the user has entered
 
         """
-        import tempfile,os
+        import tempfile
+        import os
         from subprocess import call
 
         #Let's get the default EDITOR of the environment, use nano if none is specified
-        editor = os.environ.get('EDITOR','nano')
+        editor = os.environ.get('EDITOR', 'nano')
 
         with tempfile.NamedTemporaryFile(suffix=".tmp") as tempfile:
             #populate the file with the baked messages
@@ -209,11 +210,11 @@ class TicketUtils:
             if (ending_msg):
                 tempfile.write("\n")
                 tempfile.write(ending_msg)
-            #flush the file and open it for editing    
+            #flush the file and open it for editing
             tempfile.flush()
             call([editor, tempfile.name])
             tempfile.seek(0)
-            data=tempfile.read()
+            data = tempfile.read()
             return data
 
         return
@@ -231,7 +232,7 @@ class TicketDetails(CLIRunnable):
     Get details for a ticket
 
     Options:
-      --updateCount=X  Show X count of updates, default is 1 
+      --updateCount=X  Show X count of updates, default is 1
     """
     action = 'detail'
 
@@ -241,7 +242,7 @@ class TicketDetails(CLIRunnable):
         ticket_id = resolve_id(
             mgr.resolve_ids, args.get('<identifier>'), 'ticket')
 
-        count = args.get('--updateCount') 
+        count = args.get('--updateCount')
         if not count:
             count = 1
         return TicketUtils.get_ticket_results(mgr, ticket_id, int(count))
@@ -255,10 +256,10 @@ class CreateTicket(CLIRunnable):
 
     Required:
       --title=TITLE  The title of the ticket
-      --subject=xxx The id of the subject to use for the ticket, issue 'sl ticket subjects' to get the list 
+      --subject=xxx The id of the subject to use for the ticket, issue 'sl ticket subjects' to get the list
 
     Optional:
-      --body the body text to attach to the ticket                         
+      --body the body text to attach to the ticket
     """
     action = 'create'
     required_params = ['--title, --subject']
@@ -267,14 +268,14 @@ class CreateTicket(CLIRunnable):
         mgr = TicketManager(self.client)
         if (args.get('--title') is None):
             return 'Please provide a valid title'
-        body=args.get('--body')
+        body = args.get('--body')
         if (body is None):
             body = TicketUtils.open_editor(beg_msg="***** Softlayer Ticket Content ******")
 
         createdTicket = mgr.create_ticket(
-            title=(args.get('--title')), 
+            title=(args.get('--title')),
             body=body,
-            hardware=args.get('--hardware'),#  not being used now 
-            rootPassword=args.get('--rootPassword'),#  not being used now
+            hardware=args.get('--hardware'),  #  not being used now
+            rootPassword=args.get('--rootPassword'),  #  not being used now
             subject=args.get('--subject'))
         return TicketUtils.get_ticket_results(mgr, createdTicket['id'], 1)

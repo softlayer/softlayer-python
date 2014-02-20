@@ -88,11 +88,11 @@ class TicketManager(IdentifierMixin, object):
             'assignedUserId': currentUser['id'],
             'title': title,
         }
-        if (hardware is None): 
+        if (hardware is None):
             created_ticket = self.ticket.createStandardTicket(new_ticket, body, **kwargs)
         else:
             created_ticket = self.ticket.createStandardTicket(new_ticket, body, hardware, rootPassword, **kwargs)
-        return created_ticket 
+        return created_ticket
 
     def update_ticket(self, t_id=None, body=None, **kwargs):
         """ Update a ticket
