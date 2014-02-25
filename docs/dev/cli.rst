@@ -1,7 +1,7 @@
 .. _cli_dev:
 
 .. note::
-  
+
   Full example module available :ref:`here <example_module>`
 
 Command-Line Interface Developer Guide
@@ -35,7 +35,7 @@ A module is a python module residing in `SoftLayer/CLI/modules/<module>.py`.  Th
 
 There are some tenants for styling the doc blocks
  * These are parsed with `docopt <http://docopt.org/>`_ so conform to the spec.
- * Two spaces before commands in a command list and options in an option list. 
+ * Two spaces before commands in a command list and options in an option list.
  * Align the descriptions two spaces after the loggest command/option
  * If a description has to take up more than one line, indent two spaces past the current indention for all additional lines.
  * Alphabetize all commands/option listings. For options, use the long name to judge ordering.
@@ -138,8 +138,8 @@ Which gives us
   :.......:.......:
 
   $ sl example pretty --format raw
-   test   test  
-   test2  test2 
+   test   test
+   test2  test2
 
 Formatting of the data represented in the table is actually controlled upstream from the CLIRunnable's making supporting more data formats in the future easier.
 
@@ -224,6 +224,26 @@ There are two primary confirmation prompts that both leverage `SoftLayer.CLI.val
 
   if confirmation:
       pass
+
+
+Object Name helpers
+-------------------
+
+There are two primary methods to help make your CLI module simple with regards to SLAPI object types:
+
+* `SoftLayer.CLI.helpers.formatting.get_simple_type`
+* `SoftLayer.CLI.helpers.formatting.get_api_type`
+
+`get_simple_type` accepts a single string parameter of a type returned from the SLAPI get the translated simple type name. If there is no translation for the name given the 'SoftLayer_' is removed from the parameter.
+
+`get_api_type` accepts a single string parameter of a simple type name (probably that was retrieved from an argument) and gets the proper type in the SLAPI. If there is no translation for the name given 'SoftLayer_' is added to the parameter.
+
+::
+
+  # `--type cci` was given by the user
+  if args.get('--type'):
+      # SoftLayer_Virtual_Guest is returned
+      type = get_api_type(args.get('--type'))
 
 
 Aborting execution

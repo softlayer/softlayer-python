@@ -1,5 +1,5 @@
 .. _cci_user_docs:
-  
+
 Working with Cloud Compute Instances
 ====================================
 Using the SoftLayer portal for ordering Cloud Compute Instances is fine but for a number of reasons it's sometimes to use the command-line. For this, you can use the SoftLayer command-line client to make administrative tasks quicker and easier. This page gives an intro to working with SoftLayer Cloud Compute Instances using the SoftLayer command-line client.
@@ -151,7 +151,7 @@ When the previous command returns, I know that the Cloud Compute Instance has fi
 There are many other commands to help manage Cloud Compute Instances. To see them all, use `sl help cci`.
 
 ::
-	
+
 	$ sl help cci
 	usage: sl cci [<command>] [<args>...] [options]
 
