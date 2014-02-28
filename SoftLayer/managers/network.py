@@ -241,7 +241,6 @@ class NetworkManager(object):
         :param string subnet_type: If specified, it will only returns subnets
                                      of this type.
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
-
         """
         if 'mask' not in kwargs:
             kwargs['mask'] = DEFAULT_SUBNET_MASK
@@ -278,7 +277,11 @@ class NetworkManager(object):
                                   VLAN matching this VLAN number.
         :param int name: If specified, the list will only contain the
                                   VLAN matching this VLAN name.
+<<<<<<< HEAD
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
+=======
+        :param dict \\*\\*kwargs: response-level arguments (limit, offset, etc.)
+>>>>>>> Adds pylint to tox. Fixes many pylint errors. Many more to go.
 
         """
         _filter = NestedDict(kwargs.get('filter') or {})

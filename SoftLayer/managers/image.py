@@ -48,7 +48,11 @@ class ImageManager(IdentifierMixin, object):
 
         :param string guid: filter based on GUID
         :param string name: filter based on name
+<<<<<<< HEAD
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
+=======
+        :param dict \\*\\*kwargs: response-level arguments (limit, offset, etc.)
+>>>>>>> Adds pylint to tox. Fixes many pylint errors. Many more to go.
         """
         if 'mask' not in kwargs:
             kwargs['mask'] = IMAGE_MASK
@@ -72,7 +76,11 @@ class ImageManager(IdentifierMixin, object):
 
         :param string guid: filter based on GUID
         :param string name: filter based on name
+<<<<<<< HEAD
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
+=======
+        :param dict \\*\\*kwargs: response-level arguments (limit, offset, etc.)
+>>>>>>> Adds pylint to tox. Fixes many pylint errors. Many more to go.
         """
         if 'mask' not in kwargs:
             kwargs['mask'] = IMAGE_MASK
