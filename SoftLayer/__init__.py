@@ -13,6 +13,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+# pylint: disable=w0401
 from SoftLayer.consts import VERSION
 
 from .API import *  # NOQA

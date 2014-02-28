@@ -15,7 +15,7 @@ from SoftLayer.utils import configparser
 def get_client_settings_args(**kwargs):
     """ Retreive client settings from user-supplied arguments
 
-        :param \*\*kwargs: Arguments that are passed into the client instance
+        :param \\*\\*kwargs: Arguments that are passed into the client instance
     """
     settings = {
         'endpoint_url': kwargs.get('endpoint_url'),
@@ -33,7 +33,7 @@ def get_client_settings_args(**kwargs):
 def get_client_settings_env(**_):
     """ Retreive client settings from environment settings
 
-        :param \*\*kwargs: Arguments that are passed into the client instance
+        :param \\*\\*kwargs: Arguments that are passed into the client instance
     """
     username = os.environ.get('SL_USERNAME')
     api_key = os.environ.get('SL_API_KEY')
@@ -48,7 +48,7 @@ def get_client_settings_env(**_):
 def get_client_settings_config_file(**kwargs):
     """ Retreive client settings from the possible config file locations
 
-        :param \*\*kwargs: Arguments that are passed into the client instance
+        :param \\*\\*kwargs: Arguments that are passed into the client instance
     """
     config_files = ['/etc/softlayer.conf', '~/.softlayer']
     if kwargs.get('config_file'):
@@ -77,7 +77,7 @@ def get_client_settings_config_file(**kwargs):
         settings['auth'] = BasicAuthentication(username, api_key)
     return settings
 
-setting_resolvers = [get_client_settings_args,
+SETTING_RESOLVERS = [get_client_settings_args,
                      get_client_settings_env,
                      get_client_settings_config_file]
 
@@ -88,10 +88,10 @@ def get_client_settings(**kwargs):
         settings. The settings currently come from explicit user arguments,
         environmental variables and config files.
 
-        :param \*\*kwargs: Arguments that are passed into the client instance
+        :param \\*\\*kwargs: Arguments that are passed into the client instance
     """
     all_settings = {}
-    for setting_method in setting_resolvers:
+    for setting_method in SETTING_RESOLVERS:
         settings = setting_method(**kwargs)
         if settings:
             settings.update((k, v) for k, v in all_settings.items() if v)

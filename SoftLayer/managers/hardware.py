@@ -85,7 +85,7 @@ class HardwareManager(IdentifierMixin, object):
         :param integer nic_speed: filter based on network speed (in MBPS)
         :param string public_ip: filter based on public ip address
         :param string private_ip: filter based on private ip address
-        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \\*\\*kwargs: response-level arguments (limit, offset, etc.)
         :returns: Returns a list of dictionaries representing the matching
                   hardware. This list will contain both dedicated servers and
                   bare metal computing instances
@@ -197,7 +197,7 @@ class HardwareManager(IdentifierMixin, object):
             package = package_obj.getObject(id=package_id,
                                             mask='mask[id, name, description]')
 
-            if (package.get('name')):
+            if package.get('name'):
                 packages.append((package['id'], package['name'],
                                  package['description']))
 

@@ -9,15 +9,13 @@ from SoftLayer.exceptions import (
     SoftLayerAPIError, NotWellFormed, UnsupportedEncoding, InvalidCharacter,
     SpecViolation, MethodNotFound, InvalidMethodParameters, InternalError,
     ApplicationError, RemoteSystemError, TransportError)
-try:
-    from xmlrpc.client import dumps, loads, Fault
-except ImportError:  # pragma nocover
-    from xmlrpclib import dumps, loads, Fault
+from SoftLayer.utils import xmlrpc_client
+
 import logging
 import requests
 import json
 
-log = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 def _proxies_dict(proxy):
@@ -42,23 +40,25 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
         largs = list(args)
         largs.insert(0, {'headers': headers})
 
-        payload = dumps(tuple(largs), methodname=method, allow_none=True)
+        payload = xmlrpc_client.dumps(tuple(largs),
+                                      methodname=method,
+                                      allow_none=True)
         session = requests.Session()
         req = requests.Request('POST', uri, data=payload,
                                headers=http_headers).prepare()
-        log.debug("=== REQUEST ===")
-        log.info('POST %s', uri)
-        log.debug(req.headers)
-        log.debug(payload)
+        LOGGER.debug("=== REQUEST ===")
+        LOGGER.info('POST %s', uri)
+        LOGGER.debug(req.headers)
+        LOGGER.debug(payload)
 
         response = session.send(req, timeout=timeout, proxies=_proxies_dict(proxy))
-        log.debug("=== RESPONSE ===")
-        log.debug(response.headers)
-        log.debug(response.content)
+        LOGGER.debug("=== RESPONSE ===")
+        LOGGER.debug(response.headers)
+        LOGGER.debug(response.content)
         response.raise_for_status()
-        result = loads(response.content,)[0][0]
+        result = xmlrpc_client.loads(response.content,)[0][0]
         return result
-    except Fault as e:
+    except xmlrpc_client.Fault as ex:
         # These exceptions are formed from the XML-RPC spec
         # http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
         error_mapping = {
@@ -73,12 +73,12 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
             '-32400': RemoteSystemError,
             '-32300': TransportError,
         }
-        raise error_mapping.get(e.faultCode, SoftLayerAPIError)(
-            e.faultCode, e.faultString)
-    except requests.HTTPError as e:
-        raise TransportError(e.response.status_code, str(e))
-    except requests.RequestException as e:
-        raise TransportError(0, str(e))
+        raise error_mapping.get(ex.faultCode, SoftLayerAPIError)(
+            ex.faultCode, ex.faultString)
+    except requests.HTTPError as ex:
+        raise TransportError(ex.response.status_code, str(ex))
+    except requests.RequestException as ex:
+        raise TransportError(0, str(ex))
 
 
 def make_rest_api_call(method, url, http_headers=None, timeout=None, proxy=None):
@@ -89,21 +89,21 @@ def make_rest_api_call(method, url, http_headers=None, timeout=None, proxy=None)
     :param dict http_headers: HTTP headers to use for the request
     :param int timeout: number of seconds to use as a timeout
     """
-    log.info('%s %s', method, url)
+    LOGGER.info('%s %s', method, url)
     try:
         resp = requests.request(
             method, url, headers=http_headers, timeout=timeout, proxies=_proxies_dict(proxy))
         resp.raise_for_status()
-        log.debug(resp.content)
+        LOGGER.debug(resp.content)
         if url.endswith('.json'):
             return json.loads(resp.content)
         else:
             return resp.text
-    except requests.HTTPError as e:
+    except requests.HTTPError as ex:
         if url.endswith('.json'):
-            content = json.loads(e.response.content)
-            raise SoftLayerAPIError(e.response.status_code, content['error'])
+            content = json.loads(ex.response.content)
+            raise SoftLayerAPIError(ex.response.status_code, content['error'])
         else:
-            raise SoftLayerAPIError(e.response.status_code, e.response.text)
-    except requests.RequestException as e:
-        raise TransportError(0, str(e))
+            raise SoftLayerAPIError(ex.response.status_code, ex.response.text)
+    except requests.RequestException as ex:
+        raise TransportError(0, str(ex))

@@ -95,7 +95,7 @@ class Client(object):
             security_question_id,
             security_question_answer)
         self.auth = TokenAuthentication(res['userId'], res['hash'])
-        return (res['userId'], res['hash'])
+        return res['userId'], res['hash']
 
     def __getitem__(self, name):
         """ Get a SoftLayer Service.
@@ -116,8 +116,8 @@ class Client(object):
 
         :param service: the name of the SoftLayer API service
         :param method: the method to call on the service
-        :param \*args: same optional arguments that ``Service.call`` takes
-        :param \*\*kwargs: same optional keyword arguments that
+        :param \\*args: same optional arguments that ``Service.call`` takes
+        :param \\*\\*kwargs: same optional keyword arguments that
                            ``Service.call`` takes
 
         :param service: the name of the SoftLayer API service
@@ -140,31 +140,25 @@ class Client(object):
         if not service.startswith(self._prefix):
             service = self._prefix + service
 
-        objectid = kwargs.get('id')
-        objectmask = kwargs.get('mask')
-        objectfilter = kwargs.get('filter')
         headers = kwargs.get('headers', {})
-        compress = kwargs.get('compress', True)
-        raw_headers = kwargs.get('raw_headers')
-        limit = kwargs.get('limit')
-        offset = kwargs.get('offset', 0)
 
         if self.auth:
             headers.update(self.auth.get_headers())
 
-        if objectid is not None:
-            headers[service + 'InitParameters'] = {'id': objectid}
+        if kwargs.get('id') is not None:
+            headers[service + 'InitParameters'] = {'id': kwargs.get('id')}
 
-        if objectmask is not None:
-            headers.update(self.__format_object_mask(objectmask, service))
+        if kwargs.get('mask') is not None:
+            headers.update(self.__format_object_mask(kwargs.get('mask'),
+                                                     service))
 
-        if objectfilter is not None:
-            headers['%sObjectFilter' % service] = objectfilter
+        if kwargs.get('filter') is not None:
+            headers['%sObjectFilter' % service] = kwargs.get('filter')
 
-        if limit:
+        if kwargs.get('limit'):
             headers['resultLimit'] = {
-                'limit': limit,
-                'offset': offset,
+                'limit': kwargs.get('limit'),
+                'offset': kwargs.get('offset', 0),
             }
 
         http_headers = {
@@ -172,12 +166,12 @@ class Client(object):
             'Content-Type': 'application/xml',
         }
 
-        if compress:
+        if kwargs.get('compress', True):
             http_headers['Accept'] = '*/*'
             http_headers['Accept-Encoding'] = 'gzip, deflate, compress'
 
-        if raw_headers:
-            http_headers.update(raw_headers)
+        if kwargs.get('raw_headers'):
+            http_headers.update(kwargs.get('raw_headers'))
 
         uri = '/'.join([self.endpoint_url, service])
         return make_xml_rpc_api_call(uri, method, args,
@@ -195,8 +189,8 @@ class Client(object):
         :param service: the name of the SoftLayer API service
         :param method: the method to call on the service
         :param integer chunk: result size for each API call
-        :param \*args: same optional arguments that ``Service.call`` takes
-        :param \*\*kwargs: same optional keyword arguments that
+        :param \\*args: same optional arguments that ``Service.call`` takes
+        :param \\*\\*kwargs: same optional keyword arguments that
                            ``Service.call`` takes
 
         """
@@ -302,6 +296,11 @@ class TimedClient(Client):
 
 
 class Service(object):
+    """ A SoftLayer Service.
+        :param client: A SoftLayer.API.Client instance
+        :param name str: The service name
+
+    """
     def __init__(self, client, name):
         self.client = client
         self.name = name
@@ -310,7 +309,7 @@ class Service(object):
         """ Make a SoftLayer API call
 
         :param method: the method to call on the service
-        :param \*args: (optional) arguments for the remote call
+        :param \\*args: (optional) arguments for the remote call
         :param id: (optional) id for the resource
         :param mask: (optional) object mask
         :param dict filter: (optional) filter dict
@@ -338,8 +337,8 @@ class Service(object):
 
         :param method: the method to call on the service
         :param integer chunk: result size for each API call
-        :param \*args: same optional arguments that ``Service.call`` takes
-        :param \*\*kwargs: same optional keyword arguments that
+        :param \\*args: same optional arguments that ``Service.call`` takes
+        :param \\*\\*kwargs: same optional keyword arguments that
                            ``Service.call`` takes
 
         Usage:
@@ -360,6 +359,7 @@ class Service(object):
             raise AttributeError("'Obj' object has no attribute '%s'" % name)
 
         def call_handler(*args, **kwargs):
+            " Handler that actually makes the API call "
             return self(name, *args, **kwargs)
         return call_handler
 

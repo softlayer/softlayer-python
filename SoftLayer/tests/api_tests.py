@@ -17,8 +17,9 @@ class Inititialization(unittest.TestCase):
         client = SoftLayer.Client(username='doesnotexist',
                                   api_key='issurelywrong', timeout=10)
 
-        self.assertEquals(client.auth.username, 'doesnotexist')
-        self.assertEquals(client.auth.api_key, 'issurelywrong')
+        auth_headers = {'authenticate': {'username': 'doesnotexist',
+                                         'apiKey': 'issurelywrong'}}
+        self.assertEquals(client.auth.get_headers(), auth_headers)
         self.assertEquals(client.endpoint_url,
                           SoftLayer.API_PUBLIC_ENDPOINT.rstrip('/'))
         self.assertEquals(client.timeout, 10)
@@ -32,8 +33,7 @@ class Inititialization(unittest.TestCase):
             'endpoint_url': 'http://endpoint_url/',
         }
         client = SoftLayer.Client()
-        self.assertEquals(client.auth.username, auth.username)
-        self.assertEquals(client.auth.api_key, auth.api_key)
+        self.assertEquals(client.auth.get_headers(), auth.get_headers())
         self.assertEquals(client.timeout, 10)
         self.assertEquals(client.endpoint_url, 'http://endpoint_url')
 

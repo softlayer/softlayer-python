@@ -75,7 +75,7 @@ class MessagingManager(object):
     def list_accounts(self, **kwargs):
         """ List message queue accounts
 
-        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \\*\\*kwargs: response-level arguments (limit, offset, etc.)
         """
         if 'mask' not in kwargs:
             items = set([
@@ -151,7 +151,7 @@ class MessagingConnection(object):
 
         :param method: HTTP Method
         :param path: resource Path
-        :param dict \*\*kwargs: extra request arguments
+        :param dict \\*\\*kwargs: extra request arguments
         """
         headers = {
             'Content-Type': 'application/json',
@@ -205,7 +205,7 @@ class MessagingConnection(object):
         """ Create Queue
 
         :param queue_name: Queue Name
-        :param dict \*\*kwargs: queue options
+        :param dict \\*\\*kwargs: queue options
         """
         queue = {}
         queue.update(kwargs)
@@ -217,7 +217,7 @@ class MessagingConnection(object):
         """ Modify Queue
 
         :param queue_name: Queue Name
-        :param dict \*\*kwargs: queue options
+        :param dict \\*\\*kwargs: queue options
         """
         return self.create_queue(queue_name, **kwargs)
 
@@ -247,7 +247,7 @@ class MessagingConnection(object):
 
         :param queue_name: Queue Name
         :param body: Message body
-        :param dict \*\*kwargs: Message options
+        :param dict \\*\\*kwargs: Message options
         """
         message = {'body': body}
         message.update(kwargs)
@@ -292,7 +292,7 @@ class MessagingConnection(object):
         """ Create Topic
 
         :param topic_name: Topic Name
-        :param dict \*\*kwargs: Topic options
+        :param dict \\*\\*kwargs: Topic options
         """
         data = json.dumps(kwargs)
         r = self._make_request('put', 'topics/%s' % topic_name, data=data)
@@ -302,7 +302,7 @@ class MessagingConnection(object):
         """ Modify Topic
 
         :param topic_name: Topic Name
-        :param dict \*\*kwargs: Topic options
+        :param dict \\*\\*kwargs: Topic options
         """
         return self.create_topic(topic_name, **kwargs)
 
@@ -332,7 +332,7 @@ class MessagingConnection(object):
 
         :param topic_name: Topic Name
         :param body: Message body
-        :param dict \*\*kwargs: Topic message options
+        :param dict \\*\\*kwargs: Topic message options
         """
         message = {'body': body}
         message.update(kwargs)
@@ -353,7 +353,7 @@ class MessagingConnection(object):
 
         :param topic_name: Topic Name
         :param subscription_type: type ('queue' or 'http')
-        :param dict \*\*kwargs: Subscription options
+        :param dict \\*\\*kwargs: Subscription options
         """
         r = self._make_request(
             'post', 'topics/%s/subscriptions' % topic_name,

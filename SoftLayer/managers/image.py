@@ -29,7 +29,7 @@ class ImageManager(IdentifierMixin, object):
         """ Get details about an image
 
         :param int image: The ID of the image.
-        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \\*\\*kwargs: response-level arguments (limit, offset, etc.)
         """
         if 'mask' not in kwargs:
             kwargs['mask'] = IMAGE_MASK
@@ -48,7 +48,7 @@ class ImageManager(IdentifierMixin, object):
 
         :param string guid: filter based on GUID
         :param string name: filter based on name
-        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \\*\\*kwargs: response-level arguments (limit, offset, etc.)
         """
         if 'mask' not in kwargs:
             kwargs['mask'] = IMAGE_MASK
@@ -72,7 +72,7 @@ class ImageManager(IdentifierMixin, object):
 
         :param string guid: filter based on GUID
         :param string name: filter based on name
-        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \\*\\*kwargs: response-level arguments (limit, offset, etc.)
         """
         if 'mask' not in kwargs:
             kwargs['mask'] = IMAGE_MASK

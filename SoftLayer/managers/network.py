@@ -226,7 +226,7 @@ class NetworkManager(object):
         :param int version: Only returns subnets of this version (4 or 6).
         :param string subnet_type: If specified, it will only returns subnets
                                      of this type.
-        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \\*\\*kwargs: response-level arguments (limit, offset, etc.)
 
         """
         if 'mask' not in kwargs:
@@ -264,7 +264,7 @@ class NetworkManager(object):
                                   VLAN matching this VLAN number.
         :param int name: If specified, the list will only contain the
                                   VLAN matching this VLAN name.
-        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \\*\\*kwargs: response-level arguments (limit, offset, etc.)
 
         """
         _filter = NestedDict(kwargs.get('filter') or {})
