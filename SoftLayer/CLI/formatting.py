@@ -15,7 +15,7 @@ from prettytable import PrettyTable, FRAME, NONE
 from SoftLayer.utils import string_types, console_input
 
 
-def format_output(data, fmt='table'):
+def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
     """ Given some data, will format it for output
 
     :param data: One of: String, Table, FormattedItem, List, Tuple,
@@ -66,30 +66,34 @@ def format_output(data, fmt='table'):
 
 
 def format_prettytable(table):
+    """ Takes a SoftLayer.CLI.formatting.Table instance and returns a formatted
+        prettytable """
     for i, row in enumerate(table.rows):
         for j, item in enumerate(row):
             table.rows[i][j] = format_output(item)
-    t = table.prettytable()
-    t.hrules = FRAME
-    t.horizontal_char = '.'
-    t.vertical_char = ':'
-    t.junction_char = ':'
-    return t
+    ptable = table.prettytable()
+    ptable.hrules = FRAME
+    ptable.horizontal_char = '.'
+    ptable.vertical_char = ':'
+    ptable.junction_char = ':'
+    return ptable
 
 
 def format_no_tty(table):
+    """ Takes a SoftLayer.CLI.formatting.Table instance and returns a formatted
+        prettytable that has as little formatting as possible """
     for i, row in enumerate(table.rows):
         for j, item in enumerate(row):
             table.rows[i][j] = format_output(item, fmt='raw')
-    t = table.prettytable()
+    ptable = table.prettytable()
     for col in table.columns:
-        t.align[col] = 'l'
-    t.hrules = NONE
-    t.border = False
-    t.header = False
-    t.left_padding_width = 0
-    t.right_padding_width = 2
-    return t
+        ptable.align[col] = 'l'
+    ptable.hrules = NONE
+    ptable.border = False
+    ptable.header = False
+    ptable.left_padding_width = 0
+    ptable.right_padding_width = 2
+    return ptable
 
 
 def mb_to_gb(megabytes):
@@ -158,6 +162,14 @@ def transaction_status(transaction):
 
 
 def valid_response(prompt, *valid):
+    """ Will display a prompt for a command-line user. If the input is in the
+        valid given valid list then it will return True. Otherwise, it will
+        return False. If no input is received from the user, None is returned
+        instead.
+
+    :param string prompt: string prompt to give to the user
+    :param string \\*valid: valid responses
+    """
     ans = console_input(prompt).lower()
 
     if ans in valid:
@@ -169,6 +181,11 @@ def valid_response(prompt, *valid):
 
 
 def confirm(prompt_str, default=False):
+    """ Show a confirmation prompt to a command-line user.
+
+    :param string prompt_str: prompt to give to the user
+    :param bool default: Default value to True or False
+    """
     if default:
         prompt = '%s [Y/n]: ' % prompt_str
     else:
@@ -183,6 +200,11 @@ def confirm(prompt_str, default=False):
 
 
 def no_going_back(confirmation):
+    """ Show a confirmation to a user.
+
+    :param confirmation str: the string the user has to enter in order to
+                             confirm their action.
+    """
     if not confirmation:
         confirmation = 'yes'
 
@@ -193,11 +215,17 @@ def no_going_back(confirmation):
 
 
 class SequentialOutput(list):
+    """ This object represents output in a sequence. The purpose is to
+        de-couple the separator from the output itself.
+
+    :param separator str: string to use as a default separator
+    """
     def __init__(self, separator=os.linesep, *args, **kwargs):
         self.separator = separator
         super(SequentialOutput, self).__init__(*args, **kwargs)
 
     def to_python(self):
+        """ returns itself, since it itself is a list """
         return self
 
     def __str__(self):
@@ -205,13 +233,21 @@ class SequentialOutput(list):
 
 
 class CLIJSONEncoder(json.JSONEncoder):
+    " A JSON encoder which is able to use a .to_python() method on objects. "
     def default(self, obj):
+        """ If the normal JSONEncoder doesn't understand, we have a chance to
+            encode the object into a native python type.
+        """
         if hasattr(obj, 'to_python'):
             return obj.to_python()
         return super(CLIJSONEncoder, self).default(obj)
 
 
 class Table(object):
+    """ A Table structure.
+
+    :param list columns: a list of column names
+    """
     def __init__(self, columns):
         self.columns = columns
         self.rows = []
@@ -220,44 +256,53 @@ class Table(object):
         self.sortby = None
 
     def add_row(self, row):
+        """ Add a row to the table
+
+        :param list row: the row of string to be added
+        """
         self.rows.append(row)
 
-    def _format_python_value(self, value):
-        if hasattr(value, 'to_python'):
-            return value.to_python()
-        return value
-
     def to_python(self):
+        """ Decode this Table object to standard Python types """
         # Adding rows
-        l = []
+        items = []
         for row in self.rows:
-            formatted_row = [self._format_python_value(v) for v in row]
-            l.append(dict(zip(self.columns, formatted_row)))
-        return l
+            formatted_row = [_format_python_value(v) for v in row]
+            items.append(dict(zip(self.columns, formatted_row)))
+        return items
 
     def prettytable(self):
         """ Returns a new prettytable instance. """
-        t = PrettyTable(self.columns)
+        table = PrettyTable(self.columns)
         if self.sortby:
-            t.sortby = self.sortby
+            table.sortby = self.sortby
         for a_col, alignment in self.align.items():
-            t.align[a_col] = alignment
+            table.align[a_col] = alignment
 
         # Adding rows
         for row in self.rows:
-            t.add_row(row)
-        return t
+            table.add_row(row)
+        return table
 
 
 class KeyValueTable(Table):
+    """ This is a Table which is intended to be used to display key-value
+        pairs. It expects there to be only two columns."""
     def to_python(self):
-        d = {}
+        """ Decode this KeyValueTable object to standard Python types """
+        mapping = {}
         for row in self.rows:
-            d[row[0]] = self._format_python_value(row[1])
-        return d
+            mapping[row[0]] = _format_python_value(row[1])
+        return mapping
 
 
 class FormattedItem(object):
+    """ This is an object which wraps a single value that is able to be
+        represented in a human readable and a machine-readable way.
+
+        :param original: raw (machine-readable) value
+        :param string formatted: human-readable value
+    """
     def __init__(self, original, formatted=None):
         self.original = original
         if formatted is not None:
@@ -266,11 +311,21 @@ class FormattedItem(object):
             self.formatted = self.original
 
     def to_python(self):
+        """ returns the original (raw) value """
         return self.original
 
     def __str__(self):
+        """ returns the formatted value """
+        # If the original value is None, represent this as 'NULL'
         if self.original is None:
             return 'NULL'
         return str(self.original)
 
     __repr__ = __str__
+
+
+def _format_python_value(value):
+    """ If the value has to_python() defined then return that """
+    if hasattr(value, 'to_python'):
+        return value.to_python()
+    return value

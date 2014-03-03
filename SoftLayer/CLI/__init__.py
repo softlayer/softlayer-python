@@ -5,7 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
-
+# pylint: disable=w0401
 
 import SoftLayer.CLI.core  # NOQA
 from SoftLayer.CLI.helpers import *  # NOQA

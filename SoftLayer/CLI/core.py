@@ -195,42 +195,42 @@ def main(args=sys.argv[1:], env=Environment()):
 
             env.err(format_output(t, fmt=out_format))
 
-    except InvalidCommand as e:
-        env.err(resolver.get_module_help(e.module_name))
-        if e.command_name:
+    except InvalidCommand as ex:
+        env.err(resolver.get_module_help(ex.module_name))
+        if ex.command_name:
             env.err('')
-            env.err(str(e))
+            env.err(str(ex))
             exit_status = 1
-    except InvalidModule as e:
+    except InvalidModule as ex:
         env.err(resolver.get_main_help())
-        if e.module_name:
+        if ex.module_name:
             env.err('')
-            env.err(str(e))
+            env.err(str(ex))
         exit_status = 1
-    except DocoptExit as e:
-        env.err(e.usage)
+    except DocoptExit as ex:
+        env.err(ex.usage)
         env.err(
             '\nUnknown argument(s), use -h or --help for available options')
         exit_status = 127
     except KeyboardInterrupt:
         env.out('')
         exit_status = 1
-    except CLIAbort as e:
-        env.err(str(e.message))
-        exit_status = e.code
-    except SystemExit as e:
-        exit_status = e.code
-    except SoftLayerAPIError as e:
-        if 'invalid api token' in e.faultString.lower():
+    except CLIAbort as ex:
+        env.err(str(ex.message))
+        exit_status = ex.code
+    except SystemExit as ex:
+        exit_status = ex.code
+    except SoftLayerAPIError as ex:
+        if 'invalid api token' in ex.faultString.lower():
             env.out("Authentication Failed: To update your credentials, use "
                     "'sl config setup'")
         else:
-            env.err(str(e))
+            env.err(str(ex))
             exit_status = 1
-    except SoftLayerError as e:
-        env.err(str(e))
+    except SoftLayerError as ex:
+        env.err(str(ex))
         exit_status = 1
-    except Exception as e:
+    except Exception:
         import traceback
         env.err(traceback.format_exc())
         exit_status = 1

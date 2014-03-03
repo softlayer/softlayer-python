@@ -38,7 +38,7 @@ class CCIManager(IdentifierMixin, object):
         :param integer nic_speed: filter based on network speed (in MBPS)
         :param string public_ip: filter based on public ip address
         :param string private_ip: filter based on private ip address
-        :param dict \\*\\*kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         :returns: Returns a list of dictionaries representing the matching CCIs
 
         ::
@@ -409,22 +409,24 @@ class CCIManager(IdentifierMixin, object):
         return func(speed, id=instance_id)
 
     def _get_ids_from_hostname(self, hostname):
+        """ List CCI ids which match the given hostname """
         results = self.list_instances(hostname=hostname, mask="id")
         return [result['id'] for result in results]
 
-    def _get_ids_from_ip(self, ip):
+    def _get_ids_from_ip(self, ip_address):
+        """ List CCI ids which match the given ip address """
         try:
             # Does it look like an ip address?
-            socket.inet_aton(ip)
+            socket.inet_aton(ip_address)
         except socket.error:
             return []
 
         # Find the CCI via ip address. First try public ip, then private
-        results = self.list_instances(public_ip=ip, mask="id")
+        results = self.list_instances(public_ip=ip_address, mask="id")
         if results:
             return [result['id'] for result in results]
 
-        results = self.list_instances(private_ip=ip, mask="id")
+        results = self.list_instances(private_ip=ip_address, mask="id")
         if results:
             return [result['id'] for result in results]
 
@@ -480,7 +482,8 @@ class CCIManager(IdentifierMixin, object):
         if additional_disks:
             disk_filter = lambda x: x['device'] != '1'
 
-        disks = filter(disk_filter, cci['blockDevices'])
+        disks = [block_device for block_device in cci['blockDevices']
+                 if disk_filter(block_device)]
 
         return self.guest.createArchiveTransaction(
             name, disks, notes, id=instance_id)

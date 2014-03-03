@@ -75,7 +75,7 @@ class MessagingManager(object):
     def list_accounts(self, **kwargs):
         """ List message queue accounts
 
-        :param dict \\*\\*kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         """
         if 'mask' not in kwargs:
             items = set([

@@ -31,7 +31,7 @@ class DNSManager(IdentifierMixin, object):
     def list_zones(self, **kwargs):
         """ Retrieve a list of all DNS zones.
 
-        :param dict \\*\\*kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         :returns: A list of dictionaries representing the matching zones.
 
         """

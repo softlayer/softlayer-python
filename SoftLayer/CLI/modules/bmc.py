@@ -121,8 +121,8 @@ Options:
             return [('datacenter', datacenters)]
         elif 'cpu' == section or 'memory' == section:
             mem_options = {}
-            cpu_regex = re.compile('(\d+) x ')
-            memory_regex = re.compile(' - (\d+) GB Ram', re.I)
+            cpu_regex = re.compile(r'(\d+) x ')
+            memory_regex = re.compile(r' - (\d+) GB Ram', re.I)
 
             for item in bmi_options['categories']['server_core']['items']:
                 cpu = cpu_regex.search(item['description']).group(1)
@@ -145,9 +145,9 @@ Options:
 
             return results
         elif 'os' == section:
-            os_regex = re.compile('(^[A-Za-z\s\/]+) ([\d\.]+)')
-            bit_regex = re.compile(' \((\d+)\s*bit')
-            extra_regex = re.compile(' - (.+)\(')
+            os_regex = re.compile(r'(^[A-Za-z\s\/]+) ([\d\.]+)')
+            bit_regex = re.compile(r' \((\d+)\s*bit')
+            extra_regex = re.compile(r' - (.+)\(')
 
             # Encapsulate the code for generating the operating system code
             def _generate_os_code(name, version, bits, extra_info):
