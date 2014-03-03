@@ -278,10 +278,14 @@ class NetworkManager(object):
         :param int name: If specified, the list will only contain the
                                   VLAN matching this VLAN name.
 <<<<<<< HEAD
+<<<<<<< HEAD
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
 =======
         :param dict \\*\\*kwargs: response-level arguments (limit, offset, etc.)
 >>>>>>> Adds pylint to tox. Fixes many pylint errors. Many more to go.
+=======
+        :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
+>>>>>>> Next Round of Pylint fixes
 
         """
         _filter = NestedDict(kwargs.get('filter') or {})
