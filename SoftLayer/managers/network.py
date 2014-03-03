@@ -241,6 +241,10 @@ class NetworkManager(object):
         :param string subnet_type: If specified, it will only returns subnets
                                      of this type.
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
+<<<<<<< HEAD
+=======
+
+>>>>>>> Next Round of Pylint fixes
         """
         if 'mask' not in kwargs:
             kwargs['mask'] = DEFAULT_SUBNET_MASK
