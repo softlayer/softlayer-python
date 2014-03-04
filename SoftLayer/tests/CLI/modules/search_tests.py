@@ -5,10 +5,10 @@
     This is a series of unit tests and integration tests designed to
     test the given module for the CLI application.
 
-    :license: MIT, see LICENSE for more details.
+   :license: MIT, see LICENSE for more details.
 """
 from SoftLayer.tests import unittest, FixtureClient
-from mock import Mock, patch, ANY
+from mock import patch, ANY
 try:
     # Python 3.x compatibility
     import builtins  # NOQA
@@ -26,18 +26,19 @@ class SearchCLITests(unittest.TestCase):
         self.client = FixtureClient()
 
     @patch('SoftLayer.CLI.modules.search.SearchManager.get_search_types')
+    def test_search_types_not_found(self, get_types_mock):
+        get_types_mock.return_value = []
+        self.assertRaises(CLIAbort, search.SearchTypes(client=self.client).execute, [{}])
+
+    @patch('SoftLayer.CLI.modules.search.SearchManager.get_search_types')
     def test_search_types(self, get_types_mock):
-        expected = [{'Type' : 'vlan'}, {'Type' : 'firewall'}]
+        expected = [{'Type': 'vlan'}, {'Type': 'firewall'}]
 
         get_types_mock.return_value = [
             'SoftLayer_Network_Vlan',
             'SoftLayer_Network_Vlan_Firewall',
             'SoftLayer_Event_Log'
         ]
-        result = search.SearchTypes(client=self.client).execute({})
-        self.assertEqual(expected, format_output(result, 'python'))
-
-        get_types_mock.return_value = ['SoftLayer_Network_Vlan', 'SoftLayer_Network_Vlan_Firewall']
         result = search.SearchTypes(client=self.client).execute({})
         self.assertEqual(expected, format_output(result, 'python'))
 
@@ -126,9 +127,9 @@ class SearchCLITests(unittest.TestCase):
         ]
 
         empty_name_expected_row = [{
-            'Id' : 123,
-            'Type' : 'cci',
-            'Name' : None
+            'Id': 123,
+            'Type': 'cci',
+            'Name': None
         }]
 
         result = search.Search(client=self.client).execute(args)
@@ -136,27 +137,13 @@ class SearchCLITests(unittest.TestCase):
 
         search_mock.return_value = self.client['Search'].search.return_value
         full_expected_rows = [
-            {'Id' : 123, 'Type' : 'cci','Name' : ['app1.example.com']},
-            {'Id' : 234, 'Type' : 'ip_address','Name' : ['173.192.125.114']},
+            {'Id': 123, 'Type': 'cci', 'Name': 'app1.example.com'},
+            {'Id': 234, 'Type': 'ip_address', 'Name': '173.192.125.114'},
             {
-                'Id' : 345,
-                'Type' : 'ticket',
-                'Name' : ['MONITORING: Network Monitor Alert A REALLY LONG TITLE FOR ME', '------------']}
+                'Id': 345,
+                'Type': 'ticket',
+                'Name': 'MONITORING: Network Monitor Alert A REALLY LONG TITLE FOR ME ------------'}
         ]
 
         result = search.Search(client=self.client).execute(args)
         self.assertEqual(full_expected_rows, format_output(result, 'python'))
-
-        raw_expected_rows = [
-            {'Id' : 123, 'Type' : 'cci','Name' : 'app1.example.com'},
-            {'Id' : 234, 'Type' : 'ip_address','Name' : '173.192.125.114'},
-            {
-                'Id' : 345,
-                'Type' : 'ticket',
-                'Name' : 'MONITORING: Network Monitor Alert A REALLY LONG TITLE FOR ME ------------'}
-        ]
-
-        args['--raw'] = True
-
-        result = search.Search(client=self.client).execute(args)
-        self.assertEqual(raw_expected_rows, format_output(result, 'python'))

@@ -28,7 +28,8 @@ from SoftLayer.CLI import (
     get_api_type,
     CLIAbort,
     NestedDict,
-    blank
+    blank,
+    FormattedItem
 )
 
 
@@ -44,15 +45,14 @@ Examples:
     sl search -t cci,hardware -s dal05
 
 Filters:
-  -s=SEARCH_STRING      The search string or query to use, must be within quotes.
-  -t --types=TYPES         Object types to search for, comma seperated.
+  -s=SEARCH_STRING  The search string or query to use, must be within quotes.
+  -t --types=TYPES  Object types to search for, comma seperated.
 
 Search SoftLayer API object data using plain language DSL. The primary objective
 is to make it easier to find something. If you just use 'sl search' it will prompt
 you for a search string to use to search against all available data types.
 """
     action = None
-    search_prompt = '\n Search String: '
     default_column_width = 60
     possible_name_properties = [
         'fullyQualifiedDomainName',
@@ -63,37 +63,29 @@ you for a search string to use to search against all available data types.
     ]
 
     def execute(self, args):
-        searchService = SearchManager(self.client)
+        service = SearchManager(self.client)
 
-        query = None
         if args.get('-s'):
             query = args.get('-s').strip()
         else:
-            query = console_input(self.search_prompt).strip()
+            query = console_input('\n Search String: ').strip()
 
-        types = None
         if args.get('--types'):
             simple_types = args.get('--types').split(',')
             types = [get_api_type(x) for x in simple_types]
         else:
-            types = searchService.get_search_types()
+            types = service.get_search_types()
             # Remove Event Logs, I want to support these in a seperate method
-            try:
-                types.index('SoftLayer_Event_Log')
-            except ValueError:
-                pass
-            else:
+            if 'SoftLayer_Event_Log' in types:
                 types.remove('SoftLayer_Event_Log')
 
         if not query:
             query = '*'
 
-        results = searchService.search(query, types)
+        results = service.search(query, types)
 
         if results:
-            results_table = Table([
-                'Id', 'Type', 'Name'
-            ])
+            results_table = Table(['Id', 'Type', 'Name'])
             results_table.align['Name'] = 'l'
 
             wrapper = TextWrapper(width=self.default_column_width, expand_tabs=False)
@@ -103,22 +95,16 @@ you for a search string to use to search against all available data types.
 
                 identifier = result['resource'].get('id') or blank()
                 resource_type = get_simple_type(result['resourceType'])
-                name = None
+
                 for field in self.possible_name_properties:
                     if result['resource'].get(field):
-                        name = result['resource'].get(field)
+                        value = result['resource'].get(field)
+                        name = FormattedItem(value, '\n'.join(wrapper.wrap(value)))
                         break
-
-                if name and not args.get('--raw'):
-                    name = wrapper.wrap(name)
-                elif not name:
+                else:
                     name = blank()
 
-                results_table.add_row([
-                    identifier,
-                    resource_type,
-                    name
-                ])
+                results_table.add_row([identifier, resource_type, name])
 
             return results_table
 
@@ -140,28 +126,20 @@ types to the 'sl search' command to narrow down results.
     action = 'types'
 
     def execute(self, args):
-        searchService = SearchManager(self.client)
+        service = SearchManager(self.client)
 
-        results = searchService.get_search_types()
+        results = service.get_search_types()
 
         if results:
-            results_table = Table([
-                'Type'
-            ])
+            results_table = Table(['Type'])
             results_table.align['Type'] = 'l'
 
             # Remove Event Logs, I want to support these in a seperate method
-            try:
-                results.index('SoftLayer_Event_Log')
-            except ValueError:
-                pass
-            else:
+            if 'SoftLayer_Event_Log' in results:
                 results.remove('SoftLayer_Event_Log')
 
             for result in results:
-                results_table.add_row([
-                    get_simple_type(result)
-                ])
+                results_table.add_row([get_simple_type(result)])
 
             return results_table
 
