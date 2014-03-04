@@ -6,9 +6,6 @@
 """
 from SoftLayer import SearchManager
 from SoftLayer.tests import unittest, FixtureClient
-from SoftLayer.tests.fixtures import Search
-
-from mock import MagicMock, ANY, call, patch
 
 
 class SearchTests(unittest.TestCase):
