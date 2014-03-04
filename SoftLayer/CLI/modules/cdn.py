@@ -90,8 +90,8 @@ Required:
 
     def execute(self, args):
         manager = CDNManager(self.client)
-        manager.load_content(args.get('<account>'),
-                             args.get('<content_url>'))
+        return str(manager.load_content(args.get('<account>'),
+                                        args.get('<content_url>')))
 
 
 class PurgeContent(CLIRunnable):

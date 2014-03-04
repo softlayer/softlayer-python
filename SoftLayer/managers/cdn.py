@@ -8,8 +8,13 @@
 from SoftLayer.utils import IdentifierMixin
 
 
+MAX_URLS_PER_LOAD = 5
+MAX_URLS_PER_PURGE = 5
+
+
 class CDNManager(IdentifierMixin, object):
     """ Manage CCIs """
+
     def __init__(self, client):
         self.client = client
         self.account = self.client['Network_ContentDelivery_Account']
@@ -50,21 +55,25 @@ class CDNManager(IdentifierMixin, object):
         return self.account.deleteOriginPullRule(origin_id, id=account_id)
 
     def load_content(self, account_id, urls):
-        max_urls_per_call = 5
-
         if isinstance(urls, basestring):
             urls = [urls]
 
-        while urls:
-            self.account.loadContent(urls[0:max_urls_per_call], id=account_id)
-            urls = urls[max_urls_per_call:]
+        for i in range(0, len(urls), MAX_URLS_PER_LOAD):
+            result = self.account.loadContent(urls[i:i + MAX_URLS_PER_LOAD],
+                                              id=account_id)
+            if not result:
+                return result
+
+        return True
 
     def purge_content(self, account_id, urls):
-        max_urls_per_call = 5
-
         if isinstance(urls, basestring):
             urls = [urls]
 
-        while urls:
-            self.account.purgeCache(urls[0:max_urls_per_call], id=account_id)
-            urls = urls[max_urls_per_call:]
+        for i in range(0, len(urls), MAX_URLS_PER_PURGE):
+            result = self.account.purgeContent(urls[i:i + MAX_URLS_PER_PURGE],
+                                               id=account_id)
+            if not result:
+                return result
+
+        return True
