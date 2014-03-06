@@ -201,3 +201,57 @@ getSecurityCertificates = [{'certificate': '1234',
                             'id': 1234}]
 getExpiredSecurityCertificates = getSecurityCertificates
 getValidSecurityCertificates = getSecurityCertificates
+
+getTickets = [
+    {
+        "accountId": 1234,
+        "assignedUserId": 12345,
+        "createDate": "2013-08-01T14:14:04-07:00",
+        "id": 100,
+        "lastEditDate": "2013-08-01T14:16:47-07:00",
+        "lastEditType": "AUTO",
+        "modifyDate": "2013-08-01T14:16:47-07:00",
+        "status": {
+            "id": 1002,
+            "name": "Closed"
+        },
+        "statusId": 1002,
+        "title": "Cloud Instance Cancellation - 08/01/13"
+    },
+    {
+        "accountId": 1234,
+        "assignedUserId": 12345,
+        "createDate": "2013-08-01T14:14:04-07:00",
+        "id": 101,
+        "lastEditDate": "2013-08-01T14:16:47-07:00",
+        "lastEditType": "AUTO",
+        "modifyDate": "2013-08-01T14:16:47-07:00",
+        "status": {
+            "id": 1002,
+            "name": "Closed"
+        },
+        "statusId": 1002,
+        "title": "Cloud Instance Cancellation - 08/01/13"
+    },
+    {
+        "accountId": 1234,
+        "assignedUserId": 12345,
+        "createDate": "2014-03-03T09:44:01-08:00",
+        "id": 102,
+        "lastEditDate": "2013-08-01T14:16:47-07:00",
+        "lastEditType": "AUTO",
+        "modifyDate": "2014-03-03T09:44:03-08:00",
+        "status": {
+            "id": 1001,
+            "name": "Open"
+        },
+        "statusId": 1001,
+        "title": "Cloud Instance Cancellation - 08/01/13"
+    }]
+
+getOpenTickets = [ticket for ticket in getTickets
+                           if ticket['statusId'] == 1001]
+getClosedTickets = [ticket for ticket in getTickets
+                          if ticket['statusId'] == 1002]
+
+getCurrentUser = {"id": 12345}

@@ -1,1 +1,25 @@
 createCancelServerTicket = {'id': 1234, 'title': 'Server Cancellation Request'}
+getObject = {
+        "accountId": 1234,
+        "assignedUserId": 12345,
+        "createDate": "2013-08-01T14:14:04-07:00",
+        "id": 100,
+        "lastEditDate": "2013-08-01T14:16:47-07:00",
+        "lastEditType": "AUTO",
+        "modifyDate": "2013-08-01T14:16:47-07:00",
+        "status": {
+            "id": 1002,
+            "name": "Closed"
+        },
+        "statusId": 1002,
+        "title": "Cloud Instance Cancellation - 08/01/13"
+    }
+
+createStandardTicket = {
+        "assignedUserId": 12345,
+        "id": 100,
+        "contents": "body",
+        "subjectId": 1004,
+        "title": "Cloud Instance Cancellation - 08/01/13"
+    }
+edit = True
