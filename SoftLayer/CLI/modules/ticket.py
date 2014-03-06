@@ -183,9 +183,9 @@ class TicketUtils:
         totalUpdates = len(result['updates'])
         count = min(totalUpdates, update_count)
         for index in range(0, count):
-            t.add_row(['Update %s' % (totalUpdates - index),
-                       TicketUtils.wrap_string(
-                       result['updates'][totalUpdates - 1 - index]['entry'])])
+            i = totalUpdates - index
+            update = TicketUtils.wrap_string(result['updates'][i - 1]['entry'])
+            t.add_row(['Update %s' % (i), update])
 
         return t
 
