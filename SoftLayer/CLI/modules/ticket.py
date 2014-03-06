@@ -38,13 +38,12 @@ class ListTickets(CLIRunnable):
     def execute(self, args):
         ticket_mgr = TicketManager(self.client)
 
-        mask = 'id,accountId,title,createDate,lastEditDate,'\
-            'assignedUser[firstName, lastName]'
+        # mask = 'id,accountId,title,createDate,lastEditDate,'\
+        #        'assignedUser[firstName, lastName]'
 
         tickets = ticket_mgr.list_tickets(
             open=args.get('--open'),
-            closed=args.get('--closed'),
-            mask=mask)
+            closed=args.get('--closed'))
 
         t = Table(['id', 'assigned user', 'title',
                    'creation date', 'last edit date'])

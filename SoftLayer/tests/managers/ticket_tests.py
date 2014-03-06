@@ -17,7 +17,7 @@ class TicketTests(unittest.TestCase):
         self.ticket = TicketManager(self.client)
 
     def test_list_tickets(self):
-        mcall = call(mask=ANY, filter={})
+        mcall = call(mask=ANY)
         service = self.client['Account']
 
         list_expected_ids = [100, 101, 102]
