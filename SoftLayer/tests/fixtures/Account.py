@@ -250,8 +250,8 @@ getTickets = [
     }]
 
 getOpenTickets = [ticket for ticket in getTickets
-                           if ticket['statusId'] == 1001]
+                  if ticket['statusId'] == 1001]
 getClosedTickets = [ticket for ticket in getTickets
-                          if ticket['statusId'] == 1002]
+                    if ticket['statusId'] == 1002]
 
 getCurrentUser = {"id": 12345}
