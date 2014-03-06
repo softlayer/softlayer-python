@@ -6,7 +6,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from SoftLayer.utils import query_filter, IdentifierMixin, NestedDict
+from SoftLayer.utils import IdentifierMixin
 
 
 class TicketManager(IdentifierMixin, object):
