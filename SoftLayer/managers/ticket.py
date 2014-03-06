@@ -37,8 +37,6 @@ class TicketManager(IdentifierMixin, object):
                        'lastEditDate',
                        'assignedUser[firstName, lastName]')
 
-
-
         if 'mask' not in kwargs:
             kwargs['mask'] = TICKET_MASK
 
@@ -112,4 +110,3 @@ class TicketManager(IdentifierMixin, object):
 
         ticket = self.ticket.getObject(id=t_id)
         return self.ticket.edit(ticket, body, id=t_id)
-

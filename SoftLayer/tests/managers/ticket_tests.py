@@ -6,8 +6,8 @@
 """
 from SoftLayer import TicketManager
 from SoftLayer.tests import unittest, FixtureClient
-from SoftLayer.tests.fixtures import Ticket, Account
-from mock import MagicMock, ANY, call, patch
+from SoftLayer.tests.fixtures import Ticket
+from mock import ANY, call
 
 
 class TicketTests(unittest.TestCase):
@@ -43,8 +43,6 @@ class TicketTests(unittest.TestCase):
             self.assertIn(result['id'], closed_expected_ids)
 
     def test_list_subjects(self):
-        mcall = call(mask=ANY, filter={})
-        service = self.client['Ticket_Subject']
         list_expected_ids = [1001, 1002, 1003, 1004, 1005]
 
         results = self.ticket.list_subjects()
