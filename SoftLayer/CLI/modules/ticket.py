@@ -19,8 +19,8 @@ import os
 from subprocess import call
 
 from SoftLayer import TicketManager
-from SoftLayer.CLI import CLIRunnable, Table, \
-    resolve_id, NestedDict, KeyValueTable
+from SoftLayer.CLI import (CLIRunnable, Table, resolve_id, NestedDict,
+                           KeyValueTable)
 
 TEMPLATE_MSG = "***** SoftLayer Ticket Content ******"
 
@@ -113,8 +113,8 @@ Options:
         ticket_mgr = TicketManager(self.client)
 
         tickets = ticket_mgr.list_tickets(
-            openStatus=args.get('--open'),
-            closedStatus=args.get('--closed'))
+            open_status=args.get('--open'),
+            closed_status=args.get('--closed'))
 
         t = Table(['id', 'assigned user', 'title',
                    'creation date', 'last edit date'])
@@ -185,7 +185,7 @@ Options:
         if body is None:
             body = open_editor(beg_msg=TEMPLATE_MSG)
 
-        mgr.update_ticket(t_id=ticket_id, body=body)
+        mgr.update_ticket(ticket_id=ticket_id, body=body)
         return "Ticket Updated!"
 
 
@@ -244,13 +244,13 @@ Options:
 
 class CreateTicket(CLIRunnable):
     """
-usage: sl ticket create --title=TITLE --subject=<subjectID> [options]
+usage: sl ticket create --title=TITLE --subject=ID [options]
 
 Create a support ticket.
 
 Required:
   --title=TITLE  The title of the ticket
-  --subject=xxx  The id of the subject to use for the ticket,
+  --subject=ID   The id of the subject to use for the ticket,
                  issue 'sl ticket subjects' to get the list
 
 Optional:

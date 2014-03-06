@@ -21,30 +21,27 @@ class TicketManager(IdentifierMixin, object):
         self.account = self.client['Account']
         self.ticket = self.client['Ticket']
 
-    def list_tickets(self, openStatus=True, closedStatus=True, userId=None):
+    def list_tickets(self, open_status=True, closed_status=True):
         """ List all tickets
 
-        :param boolean open: include open tickets
-        :param boolean closed: include closed tickets
-        :param string title: filter based on title
+        :param boolean open_status: include open tickets
+        :param boolean closed_status: include closed tickets
         """
         mask = ('mask[id, title, assignedUser[firstName, lastName],'
                 'createDate,lastEditDate,accountId]')
 
         call = 'getTickets'
-        if not all([openStatus, closedStatus]):
-            if openStatus:
+        if not all([open_status, closed_status]):
+            if open_status:
                 call = 'getOpenTickets'
-            elif closedStatus:
+            elif closed_status:
                 call = 'getClosedTickets'
 
         func = getattr(self.account, call)
         return func(mask=mask)
 
     def list_subjects(self):
-        """ List all tickets
-
-        """
+        """ List all tickets"""
         return self.client['Ticket_Subject'].getAllObjects()
 
     def get_ticket(self, ticket_id):
@@ -64,7 +61,7 @@ class TicketManager(IdentifierMixin, object):
 
         :param string title: title for the new ticket
         :param string body: body for the new ticket
-        :param string hardware: id of the hardware to be assigned to the ticket
+        :param integer subject: id of the subject to be assigned to the ticket
         """
 
         currentUser = self.account.getCurrentUser()
@@ -77,12 +74,12 @@ class TicketManager(IdentifierMixin, object):
         created_ticket = self.ticket.createStandardTicket(new_ticket, body)
         return created_ticket
 
-    def update_ticket(self, t_id=None, body=None):
+    def update_ticket(self, ticket_id=None, body=None):
         """ Update a ticket
 
-        :param string id: the id of the ticket to update
+        :param integer ticket_id: the id of the ticket to update
         :param string body: entry to update in the ticket
         """
 
-        ticket = self.ticket.getObject(id=t_id)
-        return self.ticket.edit(ticket, body, id=t_id)
+        ticket = self.ticket.getObject(id=ticket_id)
+        return self.ticket.edit(ticket, body, id=ticket_id)

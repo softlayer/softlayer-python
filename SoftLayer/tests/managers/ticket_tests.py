@@ -29,16 +29,16 @@ class TicketTests(unittest.TestCase):
         for result in results:
             self.assertIn(result['id'], list_expected_ids)
 
-        results = self.ticket.list_tickets(openStatus=True, closedStatus=True)
+        results = self.ticket.list_tickets(open_status=True, closed_status=True)
         service.getTickets.assert_has_calls(mcall)
         for result in results:
             self.assertIn(result['id'], list_expected_ids)
 
-        results = self.ticket.list_tickets(openStatus=True, closedStatus=False)
+        results = self.ticket.list_tickets(open_status=True, closed_status=False)
         for result in results:
             self.assertIn(result['id'], open_expected_ids)
 
-        results = self.ticket.list_tickets(openStatus=False, closedStatus=True)
+        results = self.ticket.list_tickets(open_status=False, closed_status=True)
         for result in results:
             self.assertIn(result['id'], closed_expected_ids)
 
