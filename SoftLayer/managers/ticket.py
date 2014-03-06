@@ -21,21 +21,21 @@ class TicketManager(IdentifierMixin, object):
         self.account = self.client['Account']
         self.ticket = self.client['Ticket']
 
-    def list_tickets(self, open=True, closed=True, userId=None):
+    def list_tickets(self, openStatus=True, closedStatus=True, userId=None):
         """ List all tickets
 
         :param boolean open: include open tickets
         :param boolean closed: include closed tickets
         :param string title: filter based on title
         """
-        mask = 'mask[id, title, assignedUser[firstName, lastName],'\
-               'createDate,lastEditDate,accountId]'
+        mask = ('mask[id, title, assignedUser[firstName, lastName],'
+                'createDate,lastEditDate,accountId]')
 
         call = 'getTickets'
-        if not all([open, closed]):
-            if open:
+        if not all([openStatus, closedStatus]):
+            if openStatus:
                 call = 'getOpenTickets'
-            elif closed:
+            elif closedStatus:
                 call = 'getClosedTickets'
 
         func = getattr(self.account, call)
@@ -55,12 +55,11 @@ class TicketManager(IdentifierMixin, object):
                   the specified ticket.
 
         """
-        mask = 'mask[id, title, assignedUser[firstName, lastName],'\
-               'createDate,lastEditDate,updates[entry],updateCount]'
+        mask = ('mask[id, title, assignedUser[firstName, lastName],'
+                'createDate,lastEditDate,updates[entry],updateCount]')
         return self.ticket.getObject(id=ticket_id, mask=mask)
 
-    def create_ticket(self, title=None, body=None,
-                      hardware=None, rootPassword=None, subject=None):
+    def create_ticket(self, title=None, body=None, subject=None):
         """ Create a new ticket
 
         :param string title: title for the new ticket
@@ -75,12 +74,7 @@ class TicketManager(IdentifierMixin, object):
             'assignedUserId': currentUser['id'],
             'title': title,
         }
-        # if (hardware is None):
         created_ticket = self.ticket.createStandardTicket(new_ticket, body)
-        # else:
-        #    created_ticket = \
-        #        self.ticket.createStandardTicket(new_ticket,
-        #                                         body, hardware, rootPassword)
         return created_ticket
 
     def update_ticket(self, t_id=None, body=None):
