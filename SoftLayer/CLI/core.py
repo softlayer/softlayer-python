@@ -65,18 +65,25 @@ VALID_FORMATS = ['raw', 'table', 'json']
 
 
 class CommandParser(object):
+    """ Helper class to parse commands
+
+    :param env: Environment instance
+    """
     def __init__(self, env):
         self.env = env
 
     def get_main_help(self):
+        """ Get main help text """
         return __doc__.strip()
 
     def get_module_help(self, module_name):
+        """ Get help text for a module """
         module = self.env.load_module(module_name)
         arg_doc = module.__doc__
         return arg_doc.strip()
 
     def get_command_help(self, module_name, command_name):
+        """ Get help text for a specific command """
         command = self.env.get_command(module_name, command_name)
 
         default_format = 'raw'
@@ -105,6 +112,7 @@ Standard Options:
         return arg_doc.strip()
 
     def parse_main_args(self, args):
+        """ Parse root arguments """
         main_help = self.get_main_help()
         arguments = docopt(
             main_help,
@@ -115,6 +123,7 @@ Standard Options:
         return arguments
 
     def parse_module_args(self, module_name, args):
+        """ Parse module arguments """
         arg_doc = self.get_module_help(module_name)
         arguments = docopt(
             arg_doc,
@@ -124,12 +133,14 @@ Standard Options:
         return arguments
 
     def parse_command_args(self, module_name, command_name, args):
+        """ Parse command arguments """
         command = self.env.get_command(module_name, command_name)
         arg_doc = self.get_command_help(module_name, command_name)
         arguments = docopt(arg_doc, version=VERSION, argv=[module_name] + args)
         return command, arguments
 
     def parse(self, args):
+        """ Parse entire tree of arguments """
         # handle `sl ...`
         main_args = self.parse_main_args(args)
         module_name = main_args['<module>']
@@ -161,8 +172,8 @@ def main(args=sys.argv[1:], env=Environment()):
         debug_level = command_args.get('--debug')
         if debug_level:
             logger = logging.getLogger()
-            h = logging.StreamHandler()
-            logger.addHandler(h)
+            handler = logging.StreamHandler()
+            logger.addHandler(handler)
             logger.setLevel(DEBUG_LOGGING_MAP.get(debug_level, logging.DEBUG))
 
         kwargs = {
@@ -181,19 +192,19 @@ def main(args=sys.argv[1:], env=Environment()):
             out_format = command_args.get('--format', 'table')
             if out_format not in VALID_FORMATS:
                 raise ArgumentError('Invalid format "%s"' % out_format)
-            s = format_output(data, fmt=out_format)
-            if s:
-                env.out(s)
+            output = format_output(data, fmt=out_format)
+            if output:
+                env.out(output)
 
         if command_args.get('--timings'):
             out_format = command_args.get('--format', 'table')
             api_calls = client.get_last_calls()
-            t = KeyValueTable(['call', 'time'])
+            timing_table = KeyValueTable(['call', 'time'])
 
             for call, _, duration in api_calls:
-                t.add_row([call, duration])
+                timing_table.add_row([call, duration])
 
-            env.err(format_output(t, fmt=out_format))
+            env.err(format_output(timing_table, fmt=out_format))
 
     except InvalidCommand as ex:
         env.err(resolver.get_module_help(ex.module_name))

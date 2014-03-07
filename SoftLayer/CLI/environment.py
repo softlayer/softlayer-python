@@ -16,6 +16,8 @@ from SoftLayer.CLI.modules import get_module_list
 from SoftLayer.utils import console_input
 from SoftLayer import SoftLayerError
 
+# pylint: disable=R0201
+
 
 class InvalidCommand(SoftLayerError):
     " Raised when trying to use a command that does not exist "

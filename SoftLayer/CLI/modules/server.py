@@ -539,9 +539,9 @@ Options:
 
             return [('memory', ram)]
         elif 'os' == section:
-            os_regex = re.compile('(^[A-Za-z\s\/\-]+) ([\d\.]+)')
-            bit_regex = re.compile(' \((\d+)\s*bit')
-            extra_regex = re.compile(' - (.+)\(')
+            os_regex = re.compile(r'(^[A-Za-z\s\/\-]+) ([\d\.]+)')
+            bit_regex = re.compile(r' \((\d+)\s*bit')
+            extra_regex = re.compile(r' - (.+)\(')
 
             # Encapsulate the code for generating the operating system code
             def _generate_os_code(name, version, bits, extra_info):
@@ -576,7 +576,7 @@ Options:
             # Also separate out the code for generating the Windows OS code
             # since it's significantly different from the rest.
             def _generate_windows_code(description):
-                version_check = re.search('Windows Server (\d+)', description)
+                version_check = re.search(r'Windows Server (\d+)', description)
                 version = version_check.group(1)
 
                 os_code = 'WIN_' + version
@@ -593,7 +593,7 @@ Options:
                 elif 'ith Hyper-V' in description:
                     os_code += '-HYPERV'
 
-                bit_check = re.search('\((\d+)\s*bit', description)
+                bit_check = re.search(r'\((\d+)\s*bit', description)
                 if bit_check:
                     os_code += '_' + bit_check.group(1)
 
@@ -640,7 +640,7 @@ Options:
 
         elif 'disk' == section:
             disks = []
-            type_regex = re.compile('^[\d\.]+[GT]B\s+(.+)$')
+            type_regex = re.compile(r'^[\d\.]+[GT]B\s+(.+)$')
             for disk in ds_options['categories']['disk0']['items']:
                 disk_type = 'SATA'
                 disk_type = type_regex.match(disk['description']).group(1)

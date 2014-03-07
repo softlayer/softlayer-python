@@ -177,7 +177,7 @@ Options:
             # Also separate out the code for generating the Windows OS code
             # since it's significantly different from the rest.
             def _generate_windows_code(description):
-                version_check = re.search('Windows Server (\d+)', description)
+                version_check = re.search(r'Windows Server (\d+)', description)
                 version = version_check.group(1)
 
                 os_code = 'WIN_' + version
@@ -194,7 +194,7 @@ Options:
                 elif 'ith Hyper-V' in description:
                     os_code += '-HYPERV'
 
-                bit_check = re.search('\((\d+)\s*bit', description)
+                bit_check = re.search(r'\((\d+)\s*bit', description)
                 if bit_check:
                     os_code += '_' + bit_check.group(1)
 

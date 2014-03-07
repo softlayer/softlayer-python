@@ -44,9 +44,9 @@ Optional:
         if args.get('--key'):
             key = args['--key']
         else:
-            f = open(expanduser(args['--file']), 'rU')
-            key = f.read().strip()
-            f.close()
+            key_file = open(expanduser(args['--file']), 'rU')
+            key = key_file.read().strip()
+            key_file.close()
 
         mgr = SshKeyManager(self.client)
         result = mgr.add_key(key, args['<label>'], args.get('--notes'))
@@ -123,13 +123,15 @@ Options:
         mgr = SshKeyManager(self.client)
         keys = mgr.list_keys()
 
-        t = Table(['id', 'label', 'fingerprint', 'notes'])
+        table = Table(['id', 'label', 'fingerprint', 'notes'])
 
         for key in keys:
-            t.add_row([key['id'], key['label'], key['fingerprint'],
-                       key.get('notes', '-')])
+            table.add_row([key['id'],
+                           key['label'],
+                           key['fingerprint'],
+                           key.get('notes', '-')])
 
-        return t
+        return table
 
 
 class PrintSshKey(CLIRunnable):

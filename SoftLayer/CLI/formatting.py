@@ -105,7 +105,7 @@ def mb_to_gb(megabytes):
     return FormattedItem(megabytes, "%dG" % (float(megabytes) / 1024))
 
 
-def gb(gigabytes):
+def gb(gigabytes):  # pylint: disable=C0103
     """ Takes in the number of gigabytes and returns a FormattedItem that
         displays gigabytes.
 
