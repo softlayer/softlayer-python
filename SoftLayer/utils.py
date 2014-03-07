@@ -14,6 +14,7 @@ KNOWN_OPERATIONS = ['<=', '>=', '<', '>', '~', '*=', '^=', '$=', '_=', '!~']
 configparser = six.moves.configparser  # pylint: disable=E1101
 console_input = six.moves.input  # pylint: disable=E1101
 string_types = six.string_types
+iteritems = six.iteritems
 StringIO = six.StringIO
 
 

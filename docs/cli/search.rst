@@ -12,7 +12,6 @@ to go. If you are having trouble finding the things or have to go through a lot 
 
 First, let's list the types of things we can search with `sl search types`.
 ::
-
 	$ sl search types
 	:..............:
 	: Type         :
@@ -29,9 +28,7 @@ First, let's list the types of things we can search with `sl search types`.
 Now, lets go through some common search scenarios.
 
 Search for hardware and cci in datacenter dal05.
-
 ::
-
 	$ sl search -t hardware,cci
 	 Search String: dal05
 	:.........:...........:......................:
@@ -44,9 +41,7 @@ Search for hardware and cci in datacenter dal05.
 
 
 But I wanted to do it in all one line!
-
 ::
-
 	$ sl search -t hardware,cci -s dal05
 	:.........:...........:......................:
 	:    Id   :   Type    : Name                 :
@@ -58,9 +53,7 @@ But I wanted to do it in all one line!
 
 
 Search for hosts with all the same domain.
-
 ::
-
 	$ sl search -t hardware,cci -s example.com
 	:.........:...........:......................:
 	:    Id   :   Type    : Name                 :
@@ -71,9 +64,7 @@ Search for hosts with all the same domain.
 	:.........:...........:......................:
 
 Search for anything associated with server app1.example.com
-
 ::
-
 	$ sl search -s app1.example.com
 	:.........:............:.........................................:
 	:    Id   :    Type    : Name                                    :
@@ -88,9 +79,7 @@ Search for anything associated with server app1.example.com
 We got back the server record (the cci), a public ip (171.102.122.254), a ipv6 ip (2327:ad10:123a:0201:0000:0000:0000:0002 ), a private ip (10.0.0.1 ), and a ticket.
 
 Search for any maintenance tickets.
-
 ::
-
 	$ sl search -t ticket -s maintenance
 	:.........:........:..............................................................:
 	:    Id   :  Type  : Name                                                         :
@@ -101,9 +90,7 @@ Search for any maintenance tickets.
 
 
 There are many other commands to help limit and search upon this data. To see them all, use `sl help search`.
-
 ::
-
 	$ usage: sl search [<command>] [<args>...] [options]
 
 	Search for API data objects

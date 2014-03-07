@@ -226,7 +226,7 @@ There are two primary confirmation prompts that both leverage `SoftLayer.CLI.val
       pass
 
 
-Object Name helpers
+API Type Name Helpers
 -------------------
 
 There are two primary methods to help make your CLI module simple with regards to SLAPI object types:
@@ -235,11 +235,8 @@ There are two primary methods to help make your CLI module simple with regards t
 * `SoftLayer.CLI.helpers.formatting.get_api_type`
 
 `get_simple_type` accepts a single string parameter of a type returned from the SLAPI get the translated simple type name. If there is no translation for the name given the 'SoftLayer_' is removed from the parameter.
-
 `get_api_type` accepts a single string parameter of a simple type name (probably that was retrieved from an argument) and gets the proper type in the SLAPI. If there is no translation for the name given 'SoftLayer_' is added to the parameter.
-
 ::
-
   # `--type cci` was given by the user
   if args.get('--type'):
       # SoftLayer_Virtual_Guest is returned

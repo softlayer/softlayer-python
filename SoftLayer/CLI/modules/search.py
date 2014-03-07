@@ -33,7 +33,7 @@ from SoftLayer.CLI import (
 )
 
 
-class Search(CLIRunnable):
+class SearchString(CLIRunnable):
     """
 usage: sl search [-s=SEARCH_STRING] [--types=TYPES] [options]
 
@@ -68,7 +68,7 @@ you for a search string to use to search against all available data types.
         if args.get('-s'):
             query = args.get('-s').strip()
         else:
-            query = console_input('\n Search String: ').strip()
+            query = self.env.input('\n Search String: ').strip()
 
         if args.get('--types'):
             simple_types = args.get('--types').split(',')

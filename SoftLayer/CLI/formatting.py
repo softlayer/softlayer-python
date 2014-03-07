@@ -12,9 +12,9 @@ import json
 
 from prettytable import PrettyTable, FRAME, NONE
 
-from SoftLayer.utils import string_types, console_input
+from SoftLayer.utils import string_types, console_input, iteritems
 
-API_TYPE_MAPPING = {
+SIMPLE_TYPE_MAP = {
     'hardware': 'SoftLayer_Hardware',
     'cci': 'SoftLayer_Virtual_Guest',
     'ticket': 'SoftLayer_Ticket',
@@ -23,6 +23,8 @@ API_TYPE_MAPPING = {
     'loadbalancer': 'SoftLayer_Network_Application_Delivery_Controller',
     'firewall': 'SoftLayer_Network_Vlan_Firewall'
 }
+
+API_TYPE_MAP = dict((v,k) for k, v in iteritems(SIMPLE_TYPE_MAP))
 
 
 def get_simple_type(api_type):
@@ -34,11 +36,8 @@ def get_simple_type(api_type):
                  translation the 'SoftLayer_' is removed from the
                  parameter.
     """
-    type = list(k for k, v in API_TYPE_MAPPING.iteritems() if v == api_type)
-    if type:
-        return type.pop(0)
-    else:
-        return api_type.replace('SoftLayer_', '')
+    return API_TYPE_MAP.get(api_type,
+                           api_type.replace('SoftLayer_', ''))
 
 
 def get_api_type(simple_type):
@@ -50,11 +49,8 @@ def get_api_type(simple_type):
                  If there is no translation the 'SoftLayer_' is added to the
                  parameter.
     """
-    type = list(API_TYPE_MAPPING.get(k) for k in API_TYPE_MAPPING.keys() if k == simple_type)
-    if type:
-        return type.pop(0)
-    else:
-        return '_'.join(['SoftLayer', simple_type])
+    return SIMPLE_TYPE_MAP.get(simple_type,
+                        'SoftLayer_{0}'.format(simple_type))
 
 
 def format_output(data, fmt='table'):
