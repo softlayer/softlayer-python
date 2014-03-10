@@ -9,7 +9,7 @@ import re
 import six
 
 UUID_RE = re.compile('^[0-9a-f\-]{36}$', re.I)
-KNOWN_OPERATIONS = ['<=', '>=', '<', '>', '~', '*=', '^=', '$=', '_=', '!~']
+KNOWN_OPERATIONS = ['<=', '>=', '<', '>', '~', '!~', '*=', '^=', '$=', '_=']
 
 configparser = six.moves.configparser  # pylint: disable=E1101
 console_input = six.moves.input  # pylint: disable=E1101
@@ -46,13 +46,14 @@ def query_filter(query):
     following formats:
 
     Case Insensitive
-      'value'   Exact value match
-      'value*'  Begins with value
-      '*value'  Ends with value
-      '*value*' Contains value
+      'value' OR '*= value'    Contains
+      'value*' OR '^= value'   Begins with value
+      '*value' OR '$= value'   Ends with value
+      '*value*' OR '_= value'  Contains value
 
     Case Sensitive
-      '~ value'   Exact value match
+      '~ value'   Contains
+      '!~ value'  Does not contain
       '> value'   Greater than value
       '< value'   Less than value
       '>= value'  Greater than or equal to value
@@ -73,7 +74,7 @@ def query_filter(query):
                 query = "%s %s" % (op, query[len(op):].strip())
                 return {'operation': query}
         if query.startswith('*') and query.endswith('*'):
-            query = "~ %s" % query.strip('*')
+            query = "*= %s" % query.strip('*')
         elif query.startswith('*'):
             query = "$= %s" % query.strip('*')
         elif query.endswith('*'):
