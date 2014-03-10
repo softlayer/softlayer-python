@@ -97,13 +97,9 @@ Options:
         key_id = resolve_id(mgr.resolve_ids,
                             args.get('<identifier>'), 'SshKey')
 
-        data = {}
-        if args.get('--label'):
-            data['label'] = args['--label']
-        if args.get('--notes'):
-            data['notes'] = args['--notes']
-
-        if not mgr.edit_key(key_id, **data):
+        if not mgr.edit_key(key_id,
+                            label=args['--label'],
+                            notes=args['--notes']):
             raise CLIAbort('Failed to edit SSH key')
 
 

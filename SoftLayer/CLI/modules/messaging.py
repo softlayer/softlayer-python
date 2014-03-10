@@ -53,20 +53,20 @@ List SoftLayer Message Queue Accounts
         manager = MessagingManager(self.client)
         accounts = manager.list_accounts()
 
-        t = Table([
+        table = Table([
             'id', 'name', 'status'
         ])
         for account in accounts:
             if not account['nodes']:
                 continue
 
-            t.add_row([
+            table.add_row([
                 account['nodes'][0]['accountName'],
                 account['name'],
                 account['status']['name'],
             ])
 
-        return t
+        return table
 
 
 class ListEndpoints(CLIRunnable):
@@ -82,17 +82,17 @@ List SoftLayer Message Queue Endpoints
         manager = MessagingManager(self.client)
         regions = manager.get_endpoints()
 
-        t = Table([
+        table = Table([
             'name', 'public', 'private'
         ])
         for region, endpoints in regions.items():
-            t.add_row([
+            table.add_row([
                 region,
                 endpoints.get('public') or blank(),
                 endpoints.get('private') or blank(),
             ])
 
-        return t
+        return table
 
 
 class Ping(CLIRunnable):
@@ -106,61 +106,65 @@ Ping the SoftLayer Message Queue service
 
     def execute(self, args):
         manager = MessagingManager(self.client)
-        ok = manager.ping(
+        okay = manager.ping(
             datacenter=args['--datacenter'], network=args['--network'])
-        if ok:
+        if okay:
             return 'OK'
         else:
             CLIAbort('Ping failed')
 
 
 def queue_table(queue):
-    t = Table(['property', 'value'])
-    t.align['property'] = 'r'
-    t.align['value'] = 'l'
+    """ Returns a table with details about a queue """
+    table = Table(['property', 'value'])
+    table.align['property'] = 'r'
+    table.align['value'] = 'l'
 
-    t.add_row(['name', queue['name']])
-    t.add_row(['message_count', queue['message_count']])
-    t.add_row(['visible_message_count', queue['visible_message_count']])
-    t.add_row(['tags', listing(queue['tags'] or [])])
-    t.add_row(['expiration', queue['expiration']])
-    t.add_row(['visibility_interval', queue['visibility_interval']])
-    return t
+    table.add_row(['name', queue['name']])
+    table.add_row(['message_count', queue['message_count']])
+    table.add_row(['visible_message_count', queue['visible_message_count']])
+    table.add_row(['tags', listing(queue['tags'] or [])])
+    table.add_row(['expiration', queue['expiration']])
+    table.add_row(['visibility_interval', queue['visibility_interval']])
+    return table
 
 
 def message_table(message):
-    t = Table(['property', 'value'])
-    t.align['property'] = 'r'
-    t.align['value'] = 'l'
+    """ Returns a table with details about a message """
+    table = Table(['property', 'value'])
+    table.align['property'] = 'r'
+    table.align['value'] = 'l'
 
-    t.add_row(['id', message['id']])
-    t.add_row(['initial_entry_time', message['initial_entry_time']])
-    t.add_row(['visibility_delay', message['visibility_delay']])
-    t.add_row(['visibility_interval', message['visibility_interval']])
-    t.add_row(['fields', message['fields']])
-    return [t, message['body']]
+    table.add_row(['id', message['id']])
+    table.add_row(['initial_entry_time', message['initial_entry_time']])
+    table.add_row(['visibility_delay', message['visibility_delay']])
+    table.add_row(['visibility_interval', message['visibility_interval']])
+    table.add_row(['fields', message['fields']])
+    return [table, message['body']]
 
 
 def topic_table(topic):
-    t = Table(['property', 'value'])
-    t.align['property'] = 'r'
-    t.align['value'] = 'l'
+    """ Returns a table with details about a topic """
+    table = Table(['property', 'value'])
+    table.align['property'] = 'r'
+    table.align['value'] = 'l'
 
-    t.add_row(['name', topic['name']])
-    t.add_row(['tags', listing(topic['tags'] or [])])
-    return t
+    table.add_row(['name', topic['name']])
+    table.add_row(['tags', listing(topic['tags'] or [])])
+    return table
 
 
 def subscription_table(sub):
-    t = Table(['property', 'value'])
-    t.align['property'] = 'r'
-    t.align['value'] = 'l'
+    """ Returns a table with details about a subscription """
+    table = Table(['property', 'value'])
+    table.align['property'] = 'r'
+    table.align['value'] = 'l'
 
-    t.add_row(['id', sub['id']])
-    t.add_row(['endpoint_type', sub['endpoint_type']])
-    for k, v in sub['endpoint'].items():
-        t.add_row([k, v])
-    return t
+    table.add_row(['id', sub['id']])
+    table.add_row(['endpoint_type', sub['endpoint_type']])
+    for key, val in sub['endpoint'].items():
+        table.add_row([key, val])
+    return table
 
 
 class QueueList(CLIRunnable):
@@ -178,16 +182,16 @@ List all queues on an account
 
         queues = mq_client.get_queues()['items']
 
-        t = Table([
+        table = Table([
             'name', 'message_count', 'visible_message_count'
         ])
         for queue in queues:
-            t.add_row([
+            table.add_row([
                 queue['name'],
                 queue['message_count'],
                 queue['visible_message_count'],
             ])
-        return t
+        return table
 
 
 class QueueDetail(CLIRunnable):
@@ -363,10 +367,10 @@ List all topics on an account
         mq_client = manager.get_connection(args['<account_id>'])
         topics = mq_client.get_topics()['items']
 
-        t = Table(['name'])
+        table = Table(['name'])
         for topic in topics:
-            t.add_row([topic['name']])
-        return t
+            table.add_row([topic['name']])
+        return table
 
 
 class TopicDetail(CLIRunnable):
