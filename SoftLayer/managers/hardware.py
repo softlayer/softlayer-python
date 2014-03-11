@@ -279,18 +279,15 @@ class HardwareManager(IdentifierMixin, object):
         :param list ssh_keys: The SSH keys to add to the root user
         """
 
-        payload = {
-            'token': 'FORCE',
-            'config': {},
-        }
-
+        config = {}
+        
         if post_uri:
-            payload['config']['customProvisionScriptUri'] = post_uri
+            config['customProvisionScriptUri'] = post_uri
 
         if ssh_keys:
-            payload['config']['sshKeyIds'] = [key_id for key_id in ssh_keys]
+            config['sshKeyIds'] = [key_id for key_id in ssh_keys]
 
-        return self.hardware.reloadOperatingSystem('FORCE', payload['config'],
+        return self.hardware.reloadOperatingSystem('FORCE', config,
                                                    id=hardware_id)
 
     def change_port_speed(self, hardware_id, public, speed):
