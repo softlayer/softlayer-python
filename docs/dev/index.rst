@@ -49,7 +49,7 @@ The project has a mix of functional and unit tests. Before submitting changes to
 
 In addition to testing different versions of Python, tox checks for common mistakes in the code using `Flake8 <https://pypi.python.org/pypi/flake8/2.0>`_. You should eliminate the simple errors reported by Flake8 before submitting your code.
 
-The project's configuration instructs tox to test against many different version of Python. A tox test will use as many of those as it can find on your local computer. Rather than installing all those versions, we recommend that you point the `Travis <https://travis-ci.org>`_ integration tool at your github fork.  Travis will run the test against the full suite of Python versions every time you push new code.
+The project's configuration instructs tox to test against many different versions of Python. A tox test will use as many of those as it can find on your local computer. Rather than installing all those versions, we recommend that you point the `Travis <https://travis-ci.org>`_ integration tool at your github fork.  Travis will run the test against the full suite of Python versions every time you push new code.
 
 Running the tests in multiple environments, using tox, is very time consuming. If you wish to quickly run the tests in your own environment, you may do so using `nose <https://nose.readthedocs.org>`_.  The command to do that is:
 
