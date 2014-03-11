@@ -20,7 +20,7 @@ Code Organization
 
 Setting Up A Dev Environment
 ----------------------------
-Before working with the SoftLayer Python API client source, we strongly recommend that you know how to use Python's virtualization environment, `virtualenv <https://pypi.python.org/pypi/virtualenv>`_. Virtualenv allows you to create Python setups that are individually tailored to particular develpment efforts. Each environment can have its own set of libraries, and even its own Python interpreter; each is isolated from the other environments so the possibilities difficulties arising from library conflicts is reduced.
+Before working with the SoftLayer Python API client source, we strongly recommend that you know how to use Python's virtualization environment, `virtualenv <https://pypi.python.org/pypi/virtualenv>`_. Virtualenv allows you to create Python setups that are individually tailored to particular develpment efforts. Each environment can have its own set of libraries and even its own Python interpreter. This keeps them isolated, reducing the possibility of library conflicts between different projects.
 
 After you have virtualenv, you should set up a virtual environment and activate it whenever you are working on softlayer-python. The commands needed to setup an environment and activate it might look something like this:
 
@@ -41,16 +41,22 @@ Once you have an appropriate environment, you will then download the SoftLayer A
 
 Testing
 -------
-The project have a mix of functional and unit tests. All the tests run using `nose <https://nose.readthedocs.org>`_. Some of the tests make use of the `mock <http://www.voidspace.org.uk/python/mock/>`_ package. To run the test suite, change into the base directory and run:
+The project has a mix of functional and unit tests. Before submitting changes to be integrated into the project, you should validate your code using `tox <https://pypi.python.org/pypi/tox>`_. Simply issue the tox command from the root of the source tree:
+
+::
+
+  tox
+
+In addition to testing different versions of Python, tox checks for common mistakes in the code using `Flake8 <https://pypi.python.org/pypi/flake8/2.0>`_. You should eliminate the simple errors reported by Flake8 before submitting your code.
+
+The project's configuration instructs tox to test against many different version of Python. A tox test will use as many of those as it can find on your local computer. Rather than installing all those versions, we recommend that you point the `Travis <https://travis-ci.org>`_ integration tool at your github fork.  Travis will run the test against the full suite of Python versions every time you push new code.
+
+Running the tests in multiple environments, using tox, is very time consuming. If you wish to quickly run the tests in your own environment, you may do so using `nose <https://nose.readthedocs.org>`_.  The command to do that is:
 
 ::
 
   python setup.py nosetests
-
-To test with all supported versions of Python, this project utilizes `tox <https://pypi.python.org/pypi/tox>`_.
-
-To avoid having to install those versions of Python locally, you can also set up `Travis <https://travis-ci.org>`_ on your fork. This can run all the required tests on every code push to github. This is highly recommended.
-
+  
 
 Documentation
 -------------
