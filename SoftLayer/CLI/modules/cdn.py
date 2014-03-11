@@ -82,7 +82,7 @@ Cache one or more files on all edge nodes
 
 Required:
   account      The CDN account ID to cache content in
-  content_url  The CDN URL or CDN CNAME-based URL for the content
+  content_url  The CDN URL(s) or CDN CNAME-based URL(s) for the content
                  you wish to cache (can be repeated)
 """
     action = 'load'
@@ -102,7 +102,7 @@ Purge one or more cached files from all edge nodes
 
 Required:
   account      The CDN account ID to purge content from
-  content_url  The CDN URL or CDN CNAME-based URL for the content
+  content_url  The CDN URL(s) or CDN CNAME-based URL(s) for the content
                  you wish to cache (can be repeated)
 """
     action = 'purge'
