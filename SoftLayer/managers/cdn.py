@@ -6,6 +6,7 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer.utils import IdentifierMixin
+from six import string_types
 
 
 MAX_URLS_PER_LOAD = 5
@@ -55,7 +56,7 @@ class CDNManager(IdentifierMixin, object):
         return self.account.deleteOriginPullRule(origin_id, id=account_id)
 
     def load_content(self, account_id, urls):
-        if isinstance(urls, basestring):
+        if isinstance(urls, string_types):
             urls = [urls]
 
         for i in range(0, len(urls), MAX_URLS_PER_LOAD):
@@ -67,7 +68,7 @@ class CDNManager(IdentifierMixin, object):
         return True
 
     def purge_content(self, account_id, urls):
-        if isinstance(urls, basestring):
+        if isinstance(urls, string_types):
             urls = [urls]
 
         for i in range(0, len(urls), MAX_URLS_PER_PURGE):
