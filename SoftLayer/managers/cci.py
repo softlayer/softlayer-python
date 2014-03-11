@@ -198,18 +198,15 @@ class CCIManager(IdentifierMixin, object):
                                 after reload
         :param list ssh_keys: The SSH keys to add to the root user
         """
-        payload = {
-            'token': 'FORCE',
-            'config': {},
-        }
+        config = {}
 
         if post_uri:
-            payload['config']['customProvisionScriptUri'] = post_uri
+            config['customProvisionScriptUri'] = post_uri
 
         if ssh_keys:
-            payload['config']['sshKeyIds'] = [key_id for key_id in ssh_keys]
+            config['sshKeyIds'] = [key_id for key_id in ssh_keys]
 
-        return self.guest.reloadOperatingSystem('FORCE', payload['config'],
+        return self.guest.reloadOperatingSystem('FORCE', config,
                                                 id=instance_id)
 
     def _generate_create_dict(
