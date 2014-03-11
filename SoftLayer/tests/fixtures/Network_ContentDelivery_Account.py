@@ -25,4 +25,10 @@ getOriginPullMappingInformation = [
     }
 ]
 
+createOriginPullMapping = True
+
 deleteOriginPullRule = True
+
+loadContent = True
+
+purgeContent = True
