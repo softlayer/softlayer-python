@@ -280,7 +280,7 @@ class HardwareManager(IdentifierMixin, object):
         """
 
         config = {}
-        
+
         if post_uri:
             config['customProvisionScriptUri'] = post_uri
 
