@@ -39,17 +39,20 @@ def get_settings_from_client(client):
 
 
 def config_table(settings):
-    t = KeyValueTable(['Name', 'Value'])
-    t.align['Name'] = 'r'
-    t.align['Value'] = 'l'
-    t.add_row(['Username', settings['username'] or 'not set'])
-    t.add_row(['API Key', settings['api_key'] or 'not set'])
-    t.add_row(['Endpoint URL', settings['endpoint_url'] or 'not set'])
-    t.add_row(['Timeout', settings['timeout'] or 'not set'])
-    return t
+    """ Returns a config table """
+    table = KeyValueTable(['Name', 'Value'])
+    table.align['Name'] = 'r'
+    table.align['Value'] = 'l'
+    table.add_row(['Username', settings['username'] or 'not set'])
+    table.add_row(['API Key', settings['api_key'] or 'not set'])
+    table.add_row(['Endpoint URL', settings['endpoint_url'] or 'not set'])
+    table.add_row(['Timeout', settings['timeout'] or 'not set'])
+    return table
 
 
 def get_api_key(username, secret, endpoint_url=None):
+    """ Tries API-Key and password auth to get (and potentially generate) an
+        API key. """
     # Try to use a client with username/api key
     try:
         client = Client(
@@ -60,8 +63,8 @@ def get_api_key(username, secret, endpoint_url=None):
 
         client['Account'].getCurrentUser()
         return secret
-    except SoftLayerAPIError as e:
-        if 'invalid api token' not in e.faultString.lower():
+    except SoftLayerAPIError as ex:
+        if 'invalid api token' not in ex.faultString.lower():
             raise
 
     # Try to use a client with username/password
@@ -155,12 +158,14 @@ Setup configuration
         config.set('softlayer', 'api_key', settings['api_key'])
         config.set('softlayer', 'endpoint_url', settings['endpoint_url'])
 
-        f = os.fdopen(os.open(
-            config_path, (os.O_WRONLY | os.O_CREAT), 0o600), 'w')
+        config_file = os.fdopen(os.open(config_path,
+                                        (os.O_WRONLY | os.O_CREAT),
+                                        0o600),
+                                'w')
         try:
-            config.write(f)
+            config.write(config_file)
         finally:
-            f.close()
+            config_file.close()
 
         return "Configuration Updated Successfully"
 

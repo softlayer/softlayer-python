@@ -62,7 +62,7 @@ Options:
         if not check:
             raise CLIAbort("You must specify at least one field to update.")
 
-        mgr.edit_rwhois(**update)
+        mgr.edit_rwhois(**update)  # pylint: disable=W0142
 
 
 class RWhoisShow(CLIRunnable):

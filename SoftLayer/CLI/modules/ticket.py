@@ -152,10 +152,10 @@ List Subject IDs for ticket creation
 
         table = Table(['id', 'subject'])
         for subject in ticket_mgr.list_subjects():
-                table.add_row([
-                    subject['id'],
-                    subject['name']
-                ])
+            table.add_row([
+                subject['id'],
+                subject['name']
+            ])
         return table
 
 

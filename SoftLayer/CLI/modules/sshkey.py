@@ -151,12 +151,11 @@ Options:
         key = mgr.get_key(key_id)
 
         if args.get('--file'):
-            f = open(expanduser(args['--file']), 'w')
-            f.write(key['key'])
-            f.close()
+            with open(expanduser(args['--file']), 'w') as pub_file:
+                pub_file.write(key['key'])
 
-        t = KeyValueTable(['Name', 'Value'])
-        t.add_row(['id', key['id']])
-        t.add_row(['label', key['label']])
-        t.add_row(['notes', key.get('notes', '-')])
-        return t
+        table = KeyValueTable(['Name', 'Value'])
+        table.add_row(['id', key['id']])
+        table.add_row(['label', key['label']])
+        table.add_row(['notes', key.get('notes', '-')])
+        return table

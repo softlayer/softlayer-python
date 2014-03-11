@@ -81,27 +81,26 @@ For more on filters see 'sl help filters'
         if args.get('--tags'):
             tags = [tag.strip() for tag in args.get('--tags').split(',')]
 
-        guests = cci.list_instances(
-            hourly=args.get('--hourly'),
-            monthly=args.get('--monthly'),
-            hostname=args.get('--hostname'),
-            domain=args.get('--domain'),
-            cpus=args.get('--cpu'),
-            memory=args.get('--memory'),
-            datacenter=args.get('--datacenter'),
-            nic_speed=args.get('--network'),
-            tags=tags)
+        guests = cci.list_instances(hourly=args.get('--hourly'),
+                                    monthly=args.get('--monthly'),
+                                    hostname=args.get('--hostname'),
+                                    domain=args.get('--domain'),
+                                    cpus=args.get('--cpu'),
+                                    memory=args.get('--memory'),
+                                    datacenter=args.get('--datacenter'),
+                                    nic_speed=args.get('--network'),
+                                    tags=tags)
 
-        t = Table([
+        table = Table([
             'id', 'datacenter', 'host',
             'cores', 'memory', 'primary_ip',
             'backend_ip', 'active_transaction',
         ])
-        t.sortby = args.get('--sortby') or 'host'
+        table.sortby = args.get('--sortby') or 'host'
 
         for guest in guests:
             guest = NestedDict(guest)
-            t.add_row([
+            table.add_row([
                 guest['id'],
                 guest['datacenter']['name'] or blank(),
                 guest['fullyQualifiedDomainName'],
@@ -112,7 +111,7 @@ For more on filters see 'sl help filters'
                 active_txn(guest),
             ])
 
-        return t
+        return table
 
 
 class CCIDetails(CLIRunnable):
@@ -129,70 +128,72 @@ Options:
 
     def execute(self, args):
         cci = CCIManager(self.client)
-        t = KeyValueTable(['Name', 'Value'])
-        t.align['Name'] = 'r'
-        t.align['Value'] = 'l'
+        table = KeyValueTable(['Name', 'Value'])
+        table.align['Name'] = 'r'
+        table.align['Value'] = 'l'
 
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         result = cci.get_instance(cci_id)
         result = NestedDict(result)
 
-        t.add_row(['id', result['id']])
-        t.add_row(['hostname', result['fullyQualifiedDomainName']])
-        t.add_row(['status', FormattedItem(
+        table.add_row(['id', result['id']])
+        table.add_row(['hostname', result['fullyQualifiedDomainName']])
+        table.add_row(['status', FormattedItem(
             result['status']['keyName'] or blank(),
             result['status']['name'] or blank()
         )])
-        t.add_row(['active_transaction', active_txn(result)])
-        t.add_row(['state', FormattedItem(
+        table.add_row(['active_transaction', active_txn(result)])
+        table.add_row(['state', FormattedItem(
             lookup(result, 'powerState', 'keyName'),
             lookup(result, 'powerState', 'name'),
         )])
-        t.add_row(['datacenter', result['datacenter']['name'] or blank()])
+        table.add_row(['datacenter', result['datacenter']['name'] or blank()])
         operating_system = lookup(result,
                                   'operatingSystem',
                                   'softwareLicense',
                                   'softwareDescription') or {}
-        t.add_row([
+        table.add_row([
             'os',
             FormattedItem(
                 operating_system.get('version') or blank(),
                 operating_system.get('name') or blank()
             )])
-        t.add_row(['os_version', operating_system['version'] or blank()])
-        t.add_row(['cores', result['maxCpu']])
-        t.add_row(['memory', mb_to_gb(result['maxMemory'])])
-        t.add_row(['public_ip', result['primaryIpAddress'] or blank()])
-        t.add_row(['private_ip', result['primaryBackendIpAddress'] or blank()])
-        t.add_row(['private_only', result['privateNetworkOnlyFlag']])
-        t.add_row(['private_cpu', result['dedicatedAccountHostOnlyFlag']])
-        t.add_row(['created', result['createDate']])
-        t.add_row(['modified', result['modifyDate']])
+        table.add_row(['os_version', operating_system['version'] or blank()])
+        table.add_row(['cores', result['maxCpu']])
+        table.add_row(['memory', mb_to_gb(result['maxMemory'])])
+        table.add_row(['public_ip', result['primaryIpAddress'] or blank()])
+        table.add_row(['private_ip',
+                       result['primaryBackendIpAddress'] or blank()])
+        table.add_row(['private_only', result['privateNetworkOnlyFlag']])
+        table.add_row(['private_cpu', result['dedicatedAccountHostOnlyFlag']])
+        table.add_row(['created', result['createDate']])
+        table.add_row(['modified', result['modifyDate']])
 
         vlan_table = Table(['type', 'number', 'id'])
         for vlan in result['networkVlans']:
             vlan_table.add_row([
                 vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
-        t.add_row(['vlans', vlan_table])
+        table.add_row(['vlans', vlan_table])
 
         if result.get('notes'):
-            t.add_row(['notes', result['notes']])
+            table.add_row(['notes', result['notes']])
 
         if args.get('--price'):
-            t.add_row(['price rate', result['billingItem']['recurringFee']])
+            table.add_row(['price rate',
+                           result['billingItem']['recurringFee']])
 
         if args.get('--passwords'):
             pass_table = Table(['username', 'password'])
             for item in result['operatingSystem']['passwords']:
                 pass_table.add_row([item['username'], item['password']])
-            t.add_row(['users', pass_table])
+            table.add_row(['users', pass_table])
 
         tag_row = []
         for tag in result['tagReferences']:
             tag_row.append(tag['tag']['name'])
 
         if tag_row:
-            t.add_row(['tags', listing(tag_row, separator=',')])
+            table.add_row(['tags', listing(tag_row, separator=',')])
 
         if not result['privateNetworkOnlyFlag']:
             ptr_domains = self.client['Virtual_Guest'].\
@@ -200,9 +201,9 @@ Options:
 
             for ptr_domain in ptr_domains:
                 for ptr in ptr_domain['resourceRecords']:
-                    t.add_row(['ptr', ptr['data']])
+                    table.add_row(['ptr', ptr['data']])
 
-        return t
+        return table
 
 
 class CreateOptionsCCI(CLIRunnable):
@@ -236,14 +237,14 @@ Options:
         if args['--all']:
             show_all = True
 
-        t = KeyValueTable(['Name', 'Value'])
-        t.align['Name'] = 'r'
-        t.align['Value'] = 'l'
+        table = KeyValueTable(['Name', 'Value'])
+        table.align['Name'] = 'r'
+        table.align['Value'] = 'l'
 
         if args['--datacenter'] or show_all:
             datacenters = [dc['template']['datacenter']['name']
                            for dc in result['datacenters']]
-            t.add_row(['datacenter', listing(datacenters, separator=',')])
+            table.add_row(['datacenter', listing(datacenters, separator=',')])
 
         if args['--cpu'] or show_all:
             standard_cpu = [x for x in result['processors']
@@ -254,12 +255,13 @@ Options:
                        if x['template'].get('dedicatedAccountHostOnlyFlag',
                                             False)]
 
-            def cpus_row(c, name):
+            def cpus_row(cpu_options, name):
                 cpus = []
-                for x in c:
-                    cpus.append(str(x['template']['startCpus']))
+                for cpu_option in cpu_options:
+                    cpus.append(str(cpu_option['template']['startCpus']))
 
-                t.add_row(['cpus (%s)' % name, listing(cpus, separator=',')])
+                table.add_row(['cpus (%s)' % name,
+                               listing(cpus, separator=',')])
 
             cpus_row(ded_cpu, 'private')
             cpus_row(standard_cpu, 'standard')
@@ -267,7 +269,7 @@ Options:
         if args['--memory'] or show_all:
             memory = [
                 str(m['template']['maxMemory']) for m in result['memory']]
-            t.add_row(['memory', listing(memory, separator=',')])
+            table.add_row(['memory', listing(memory, separator=',')])
 
         if args['--os'] or show_all:
             op_sys = [
@@ -277,11 +279,11 @@ Options:
             op_sys = sorted(op_sys)
             os_summary = set()
 
-            for o in op_sys:
-                os_summary.add(o[0:o.find('_')])
+            for operating_system in op_sys:
+                os_summary.add(operating_system[0:operating_system.find('_')])
 
             for summary in sorted(os_summary):
-                t.add_row([
+                table.add_row([
                     'os (%s)' % summary,
                     linesep.join(sorted([x for x in op_sys
                                          if x[0:len(summary)] == summary]))
@@ -294,38 +296,35 @@ Options:
             san_disks = [x for x in result['blockDevices']
                          if not x['template'].get('localDiskFlag', False)]
 
-            def block_rows(blocks, name):
+            def block_rows(disks, name):
                 simple = {}
-                for block in blocks:
-                    b = block['template']['blockDevices'][0]
-                    bid = b['device']
-                    size = b['diskImage']['capacity']
+                for disk in disks:
+                    block = block['template']['blockDevices'][0]
+                    bid = block['device']
 
                     if bid not in simple:
                         simple[bid] = []
 
-                    simple[bid].append(str(size))
+                    simple[bid].append(str(block['diskImage']['capacity']))
 
                 for b in sorted(simple.keys()):
-                    t.add_row([
-                        '%s disk(%s)' % (name, b),
-                        listing(simple[b], separator=',')]
-                    )
+                    table.add_row(['%s disk(%s)' % (name, b),
+                               listing(simple[b], separator=',')])
 
             block_rows(local_disks, 'local')
             block_rows(san_disks, 'san')
 
         if args['--nic'] or show_all:
             speeds = []
-            for x in result['networkComponents']:
-                speed = x['template']['networkComponents'][0]['maxSpeed']
+            for comp in result['networkComponents']:
+                speed = comp['template']['networkComponents'][0]['maxSpeed']
                 speeds.append(str(speed))
 
             speeds = sorted(speeds)
 
-            t.add_row(['nic', listing(speeds, separator=',')])
+            table.add_row(['nic', listing(speeds, separator=',')])
 
-        return t
+        return table
 
 
 class CreateCCI(CLIRunnable):
@@ -397,9 +396,9 @@ Optional:
         # Do not create CCI with --test or --export
         do_create = not (args['--export'] or args['--test'])
 
-        t = Table(['Item', 'cost'])
-        t.align['Item'] = 'r'
-        t.align['cost'] = 'r'
+        table = Table(['Item', 'cost'])
+        table.align['Item'] = 'r'
+        table.align['cost'] = 'r'
         data = self._parse_create_args(args)
 
         output = []
@@ -408,9 +407,9 @@ Optional:
             total_monthly = 0.0
             total_hourly = 0.0
 
-            t = Table(['Item', 'cost'])
-            t.align['Item'] = 'r'
-            t.align['cost'] = 'r'
+            table = Table(['Item', 'cost'])
+            table.align['Item'] = 'r'
+            table.align['cost'] = 'r'
 
             for price in result['prices']:
                 total_monthly += float(price.get('recurringFee', 0.0))
@@ -420,7 +419,7 @@ Optional:
                 else:
                     rate = "%.2f" % float(price['recurringFee'])
 
-                t.add_row([price['item']['description'], rate])
+                table.add_row([price['item']['description'], rate])
 
             if args.get('--hourly'):
                 total = total_hourly
@@ -430,8 +429,8 @@ Optional:
             billing_rate = 'monthly'
             if args.get('--hourly'):
                 billing_rate = 'hourly'
-            t.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
-            output.append(t)
+            table.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
+            output.append(table)
             output.append(FormattedItem(
                 None,
                 ' -- ! Prices reflected here are retail and do not '
@@ -449,18 +448,18 @@ Optional:
                     "Continue?"):
                 result = cci.create_instance(**data)
 
-                t = KeyValueTable(['name', 'value'])
-                t.align['name'] = 'r'
-                t.align['value'] = 'l'
-                t.add_row(['id', result['id']])
-                t.add_row(['created', result['createDate']])
-                t.add_row(['guid', result['globalIdentifier']])
-                output.append(t)
+                table = KeyValueTable(['name', 'value'])
+                table.align['name'] = 'r'
+                table.align['value'] = 'l'
+                table.add_row(['id', result['id']])
+                table.add_row(['created', result['createDate']])
+                table.add_row(['guid', result['globalIdentifier']])
+                output.append(table)
 
                 if args.get('--wait'):
                     ready = cci.wait_for_ready(
                         result['id'], int(args.get('--wait') or 1))
-                    t.add_row(['ready', ready])
+                    table.add_row(['ready', ready])
             else:
                 raise CLIAbort('Aborting CCI order.')
 
@@ -1005,14 +1004,14 @@ Optional:
                               additional_disks,
                               args.get('--note'))
 
-        t = KeyValueTable(['Name', 'Value'])
-        t.align['Name'] = 'r'
-        t.align['Value'] = 'l'
+        table = KeyValueTable(['Name', 'Value'])
+        table.align['Name'] = 'r'
+        table.align['Value'] = 'l'
 
-        t.add_row(['cci_id', capture['guestId']])
-        t.add_row(['date', capture['createDate'][:10]])
-        t.add_row(['time', capture['createDate'][11:19]])
-        t.add_row(['transaction', transaction_status(capture)])
-        t.add_row(['transaction_id', capture['id']])
-        t.add_row(['all_disks', additional_disks])
-        return t
+        table.add_row(['cci_id', capture['guestId']])
+        table.add_row(['date', capture['createDate'][:10]])
+        table.add_row(['time', capture['createDate'][11:19]])
+        table.add_row(['transaction', transaction_status(capture)])
+        table.add_row(['transaction_id', capture['id']])
+        table.add_row(['all_disks', additional_disks])
+        return table

@@ -555,7 +555,7 @@ Options:
                     os_code = 'REDHAT'
 
                 if 'UBUNTU' in os_code:
-                    version = re.sub('\.\d+', '', version)
+                    version = re.sub(r'\.\d+', '', version)
 
                 os_code += '_' + version.replace('.0', '')
 
