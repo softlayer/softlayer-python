@@ -46,25 +46,25 @@ class QueueAuth(requests.auth.AuthBase):
             raise Unauthenticated("Error while authenticating: %s"
                                   % resp.status_code)
 
-    def handle_error(self, r, **_):
+    def handle_error(self, resp, **_):
         """ Handle errors """
-        r.request.deregister_hook('response', self.handle_error)
-        if r.status_code == 503:
-            r.connection.send(r.request)
-        elif r.status_code == 401:
+        resp.request.deregister_hook('response', self.handle_error)
+        if resp.status_code == 503:
+            resp.connection.send(resp.request)
+        elif resp.status_code == 401:
             self.auth()
-            r.request.headers['X-Auth-Token'] = self.auth_token
-            r.connection.send(r.request)
+            resp.request.headers['X-Auth-Token'] = self.auth_token
+            resp.connection.send(resp.request)
 
-    def __call__(self, r):
+    def __call__(self, resp):
         """ Attach auth token to the request. Do authentication if an auth
             token isn't available
         """
         if not self.auth_token:
             self.auth()
-        r.register_hook('response', self.handle_error)
-        r.headers['X-Auth-Token'] = self.auth_token
-        return r
+        resp.register_hook('response', self.handle_error)
+        resp.headers['X-Auth-Token'] = self.auth_token
+        return resp
 
 
 class MessagingManager(object):
@@ -129,9 +129,10 @@ class MessagingManager(object):
         return client
 
     def ping(self, datacenter=None, network=None):
-        r = requests.get('%s/v1/ping' %
-                         self.get_endpoint(datacenter, network))
-        r.raise_for_status()
+        """ Ping a message queue endpoint """
+        resp = requests.get('%s/v1/ping' %
+                            self.get_endpoint(datacenter, network))
+        resp.raise_for_status()
         return True
 
 
@@ -162,9 +163,9 @@ class MessagingConnection(object):
         kwargs['auth'] = self.auth
 
         url = '/'.join((self.endpoint, 'v1', self.account_id, path))
-        r = requests.request(method, url, **kwargs)
-        r.raise_for_status()
-        return r
+        resp = requests.request(method, url, **kwargs)
+        resp.raise_for_status()
+        return resp
 
     def authenticate(self, username, api_key, auth_token=None):
         """ Make request. Generally not called directly
@@ -185,8 +186,8 @@ class MessagingConnection(object):
 
         :param period: 'hour', 'day', 'week', 'month'
         """
-        r = self._make_request('get', 'stats/%s' % period)
-        return json.loads(r.content)
+        resp = self._make_request('get', 'stats/%s' % period)
+        return json.loads(resp.content)
 
     # QUEUE METHODS
 
@@ -198,8 +199,8 @@ class MessagingConnection(object):
         params = {}
         if tags:
             params['tags'] = ','.join(tags)
-        r = self._make_request('get', 'queues', params=params)
-        return json.loads(r.content)
+        resp = self._make_request('get', 'queues', params=params)
+        return json.loads(resp.content)
 
     def create_queue(self, queue_name, **kwargs):
         """ Create Queue
@@ -210,8 +211,8 @@ class MessagingConnection(object):
         queue = {}
         queue.update(kwargs)
         data = json.dumps(queue)
-        r = self._make_request('put', 'queues/%s' % queue_name, data=data)
-        return json.loads(r.content)
+        resp = self._make_request('put', 'queues/%s' % queue_name, data=data)
+        return json.loads(resp.content)
 
     def modify_queue(self, queue_name, **kwargs):
         """ Modify Queue
@@ -226,8 +227,8 @@ class MessagingConnection(object):
 
         :param queue_name: Queue Name
         """
-        r = self._make_request('get', 'queues/%s' % queue_name)
-        return json.loads(r.content)
+        resp = self._make_request('get', 'queues/%s' % queue_name)
+        return json.loads(resp.content)
 
     def delete_queue(self, queue_name, force=False):
         """ Delete Queue
@@ -251,9 +252,9 @@ class MessagingConnection(object):
         """
         message = {'body': body}
         message.update(kwargs)
-        r = self._make_request('post', 'queues/%s/messages' % queue_name,
-                               data=json.dumps(message))
-        return json.loads(r.content)
+        resp = self._make_request('post', 'queues/%s/messages' % queue_name,
+                                  data=json.dumps(message))
+        return json.loads(resp.content)
 
     def pop_message(self, queue_name, count=1):
         """ Pop message from a queue
@@ -261,9 +262,9 @@ class MessagingConnection(object):
         :param queue_name: Queue Name
         :param count: (optional) number of messages to retrieve
         """
-        r = self._make_request('get', 'queues/%s/messages' % queue_name,
-                               params={'batch': count})
-        return json.loads(r.content)
+        resp = self._make_request('get', 'queues/%s/messages' % queue_name,
+                                  params={'batch': count})
+        return json.loads(resp.content)
 
     def delete_message(self, queue_name, message_id):
         """ Delete a message
@@ -285,8 +286,8 @@ class MessagingConnection(object):
         params = {}
         if tags:
             params['tags'] = ','.join(tags)
-        r = self._make_request('get', 'topics', params=params)
-        return json.loads(r.content)
+        resp = self._make_request('get', 'topics', params=params)
+        return json.loads(resp.content)
 
     def create_topic(self, topic_name, **kwargs):
         """ Create Topic
@@ -295,8 +296,8 @@ class MessagingConnection(object):
         :param dict \\*\\*kwargs: Topic options
         """
         data = json.dumps(kwargs)
-        r = self._make_request('put', 'topics/%s' % topic_name, data=data)
-        return json.loads(r.content)
+        resp = self._make_request('put', 'topics/%s' % topic_name, data=data)
+        return json.loads(resp.content)
 
     def modify_topic(self, topic_name, **kwargs):
         """ Modify Topic
@@ -311,8 +312,8 @@ class MessagingConnection(object):
 
         :param topic_name: Topic Name
         """
-        r = self._make_request('get', 'topics/%s' % topic_name)
-        return json.loads(r.content)
+        resp = self._make_request('get', 'topics/%s' % topic_name)
+        return json.loads(resp.content)
 
     def delete_topic(self, topic_name, force=False):
         """ Delete Topic
@@ -336,17 +337,18 @@ class MessagingConnection(object):
         """
         message = {'body': body}
         message.update(kwargs)
-        r = self._make_request('post', 'topics/%s/messages' % topic_name,
-                               data=json.dumps(message))
-        return json.loads(r.content)
+        resp = self._make_request('post', 'topics/%s/messages' % topic_name,
+                                  data=json.dumps(message))
+        return json.loads(resp.content)
 
     def get_subscriptions(self, topic_name):
         """ Listing of subscriptions on a topic
 
         :param topic_name: Topic Name
         """
-        r = self._make_request('get', 'topics/%s/subscriptions' % topic_name)
-        return json.loads(r.content)
+        resp = self._make_request('get',
+                                  'topics/%s/subscriptions' % topic_name)
+        return json.loads(resp.content)
 
     def create_subscription(self, topic_name, subscription_type, **kwargs):
         """ Create Subscription
@@ -355,11 +357,11 @@ class MessagingConnection(object):
         :param subscription_type: type ('queue' or 'http')
         :param dict \\*\\*kwargs: Subscription options
         """
-        r = self._make_request(
+        resp = self._make_request(
             'post', 'topics/%s/subscriptions' % topic_name,
             data=json.dumps({
                 'endpoint_type': subscription_type, 'endpoint': kwargs}))
-        return json.loads(r.content)
+        return json.loads(resp.content)
 
     def delete_subscription(self, topic_name, subscription_id):
         """ Delete a subscription

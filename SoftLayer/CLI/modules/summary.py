@@ -25,21 +25,21 @@ Options:
         mgr = NetworkManager(self.client)
         datacenters = mgr.summary_by_datacenter()
 
-        t = Table([
+        table = Table([
             'datacenter', 'vlans', 'subnets', 'IPs', 'networking',
             'hardware', 'ccis'
         ])
-        t.sortby = args.get('--sortby') or 'datacenter'
+        table.sortby = args.get('--sortby') or 'datacenter'
 
-        for name, dc in datacenters.items():
-            t.add_row([
+        for name, datacenter in datacenters.items():
+            table.add_row([
                 name,
-                dc['vlanCount'],
-                dc['subnetCount'],
-                dc['primaryIpCount'],
-                dc['networkingCount'],
-                dc['hardwareCount'],
-                dc['virtualGuestCount'],
+                datacenter['vlanCount'],
+                datacenter['subnetCount'],
+                datacenter['primaryIpCount'],
+                datacenter['networkingCount'],
+                datacenter['hardwareCount'],
+                datacenter['virtualGuestCount'],
             ])
 
-        return t
+        return table

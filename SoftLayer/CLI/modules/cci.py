@@ -299,7 +299,7 @@ Options:
             def block_rows(disks, name):
                 simple = {}
                 for disk in disks:
-                    block = block['template']['blockDevices'][0]
+                    block = disk['template']['blockDevices'][0]
                     bid = block['device']
 
                     if bid not in simple:
@@ -309,7 +309,7 @@ Options:
 
                 for b in sorted(simple.keys()):
                     table.add_row(['%s disk(%s)' % (name, b),
-                               listing(simple[b], separator=',')])
+                                   listing(simple[b], separator=',')])
 
             block_rows(local_disks, 'local')
             block_rows(san_disks, 'san')

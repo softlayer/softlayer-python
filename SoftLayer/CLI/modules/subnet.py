@@ -15,9 +15,8 @@ The available commands are:
 from SoftLayer import NetworkManager
 from SoftLayer.utils import lookup
 from SoftLayer.CLI import (
-    CLIRunnable, Table, KeyValueTable, FormattedItem, confirm, no_going_back,
-    resolve_id)
-from SoftLayer.CLI.helpers import CLIAbort, SequentialOutput, blank
+    CLIRunnable, Table, KeyValueTable, confirm, no_going_back, resolve_id)
+from SoftLayer.CLI.helpers import CLIAbort, blank
 
 
 class SubnetCancel(CLIRunnable):
@@ -89,26 +88,19 @@ Options:
                                 test_order=args.get('--test'))
         if not result:
             return 'Unable to place order: No valid price IDs found.'
-        t = Table(['Item', 'cost'])
-        t.align['Item'] = 'r'
-        t.align['cost'] = 'r'
+        table = Table(['Item', 'cost'])
+        table.align['Item'] = 'r'
+        table.align['cost'] = 'r'
 
         total = 0.0
         for price in result['prices']:
             total += float(price.get('recurringFee', 0.0))
             rate = "%.2f" % float(price['recurringFee'])
 
-            t.add_row([price['item']['description'], rate])
+            table.add_row([price['item']['description'], rate])
 
-        t.add_row(['Total monthly cost', "%.2f" % total])
-        output = SequentialOutput()
-        output.append(t)
-        output.append(FormattedItem(
-            '',
-            ' -- ! Prices reflected here are retail and do not '
-            'take account level discounts and are not guarenteed.')
-        )
-        return t
+        table.add_row(['Total monthly cost', "%.2f" % total])
+        return table
 
 
 class SubnetDetail(CLIRunnable):
@@ -130,18 +122,20 @@ Filters:
                                name='subnet')
         subnet = mgr.get_subnet(subnet_id)
 
-        t = KeyValueTable(['Name', 'Value'])
-        t.align['Name'] = 'r'
-        t.align['Value'] = 'l'
+        table = KeyValueTable(['Name', 'Value'])
+        table.align['Name'] = 'r'
+        table.align['Value'] = 'l'
 
-        t.add_row(['id', subnet['id']])
-        t.add_row(['identifier',
-                   subnet['networkIdentifier'] + '/' + str(subnet['cidr'])])
-        t.add_row(['subnet type', subnet['subnetType']])
-        t.add_row(['gateway', subnet.get('gateway', blank())])
-        t.add_row(['broadcast', subnet.get('broadcastAddress', blank())])
-        t.add_row(['datacenter', subnet['datacenter']['name']])
-        t.add_row(['usable ips', subnet.get('usableIpAddressCount', blank())])
+        table.add_row(['id', subnet['id']])
+        table.add_row(['identifier',
+                       '%s/%s' % (subnet['networkIdentifier'],
+                                  str(subnet['cidr']))])
+        table.add_row(['subnet type', subnet['subnetType']])
+        table.add_row(['gateway', subnet.get('gateway', blank())])
+        table.add_row(['broadcast', subnet.get('broadcastAddress', blank())])
+        table.add_row(['datacenter', subnet['datacenter']['name']])
+        table.add_row(['usable ips',
+                       subnet.get('usableIpAddressCount', blank())])
 
         if not args.get('--no-cci'):
             if subnet['virtualGuests']:
@@ -152,24 +146,24 @@ Filters:
                     cci_table.add_row([cci['hostname'],
                                        cci['domain'],
                                        cci.get('primaryIpAddress')])
-                t.add_row(['ccis', cci_table])
+                table.add_row(['ccis', cci_table])
             else:
-                t.add_row(['cci', 'none'])
+                table.add_row(['cci', 'none'])
 
         if not args.get('--no-hardware'):
             if subnet['hardware']:
                 hw_table = Table(['Hostname', 'Domain', 'IP'])
                 hw_table.align['Hostname'] = 'r'
                 hw_table.align['IP'] = 'l'
-                for hw in subnet['hardware']:
-                    hw_table.add_row([hw['hostname'],
-                                      hw['domain'],
-                                      hw.get('primaryIpAddress')])
-                t.add_row(['hardware', hw_table])
+                for hardware in subnet['hardware']:
+                    hw_table.add_row([hardware['hostname'],
+                                      hardware['domain'],
+                                      hardware.get('primaryIpAddress')])
+                table.add_row(['hardware', hw_table])
             else:
-                t.add_row(['hardware', 'none'])
+                table.add_row(['hardware', 'none'])
 
-        return t
+        return table
 
 
 class SubnetList(CLIRunnable):
@@ -194,11 +188,11 @@ Filters:
     def execute(self, args):
         mgr = NetworkManager(self.client)
 
-        t = Table([
+        table = Table([
             'id', 'identifier', 'type', 'datacenter', 'vlan id', 'IPs',
             'hardware', 'ccis',
         ])
-        t.sortby = args.get('--sortby') or 'id'
+        table.sortby = args.get('--sortby') or 'id'
 
         version = 0
         if args.get('--v4'):
@@ -214,9 +208,9 @@ Filters:
         )
 
         for subnet in subnets:
-            t.add_row([
+            table.add_row([
                 subnet['id'],
-                subnet['networkIdentifier'] + '/' + str(subnet['cidr']),
+                '%s/%s' % (subnet['networkIdentifier'], str(subnet['cidr'])),
                 subnet.get('subnetType', blank()),
                 lookup(subnet, 'datacenter', 'name',) or blank(),
                 subnet['networkVlanId'],
@@ -225,7 +219,7 @@ Filters:
                 len(subnet['virtualGuests']),
             ])
 
-        return t
+        return table
 
 
 class SubnetLookup(CLIRunnable):
@@ -246,12 +240,12 @@ information.
         if not ip:
             return 'Not found'
 
-        t = KeyValueTable(['Name', 'Value'])
-        t.align['Name'] = 'r'
-        t.align['Value'] = 'l'
+        table = KeyValueTable(['Name', 'Value'])
+        table.align['Name'] = 'r'
+        table.align['Value'] = 'l'
 
-        t.add_row(['id', ip['id']])
-        t.add_row(['ip', ip['ipAddress']])
+        table.add_row(['id', ip['id']])
+        table.add_row(['ip', ip['ipAddress']])
 
         subnet_table = KeyValueTable(['Name', 'Value'])
         subnet_table.align['Name'] = 'r'
@@ -264,7 +258,7 @@ information.
             subnet_table.add_row(['gateway', ip['subnet']['gateway']])
         subnet_table.add_row(['type', ip['subnet'].get('subnetType')])
 
-        t.add_row(['subnet', subnet_table])
+        table.add_row(['subnet', subnet_table])
 
         if ip.get('virtualGuest') or ip.get('hardware'):
             device_table = KeyValueTable(['Name', 'Value'])
@@ -279,5 +273,5 @@ information.
             device_table.add_row(['id', device['id']])
             device_table.add_row(['name', device['fullyQualifiedDomainName']])
             device_table.add_row(['type', device_type])
-            t.add_row(['device', device_table])
-        return t
+            table.add_row(['device', device_table])
+        return table

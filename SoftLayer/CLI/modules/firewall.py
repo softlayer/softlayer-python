@@ -22,11 +22,11 @@ List active vlans with firewalls
     action = 'list'
 
     def execute(self, args):
-        f = FirewallManager(self.client)
-        fwvlans = f.get_firewalls()
-        t = Table(['vlan', 'type', 'features'])
+        mgr = FirewallManager(self.client)
+        fwvlans = mgr.get_firewalls()
+        table = Table(['vlan', 'type', 'features'])
 
-        dedicatedfws = filter(lambda x: x['dedicatedFirewallFlag'], fwvlans)
+        dedicatedfws = [vlan['dedicatedFirewallFlag'] for vlan in fwvlans]
         for vlan in dedicatedfws:
             features = []
             if vlan['highAvailabilityFirewallFlag']:
@@ -37,14 +37,14 @@ List active vlans with firewalls
             else:
                 feature_list = blank()
 
-            t.add_row([
+            table.add_row([
                 vlan['vlanNumber'],
                 'dedicated',
                 feature_list,
             ])
 
-        shared_vlan = filter(lambda x: not x['dedicatedFirewallFlag'], fwvlans)
+        shared_vlan = [vlan['dedicatedFirewallFlag'] for vlan in fwvlans]
         for vlan in shared_vlan:
-            t.add_row([vlan['vlanNumber'], 'standard', blank()])
+            table.add_row([vlan['vlanNumber'], 'standard', blank()])
 
-        return t
+        return table
