@@ -4,13 +4,13 @@ usage: sl cdn [<command>] [<args>...] [options]
 Manage CDN accounts and configuration
 
 The available commands are:
-  list           List CDN accounts
   detail         Show details for a CDN account
+  list           List CDN accounts
   load           Cache one or more files on all edge nodes
-  purge          Purge one or more cached files from all edge nodes
-  origin-list    Show origin pull mappings on a CDN account
   origin-add     Add an origin pull mapping
+  origin-list    Show origin pull mappings on a CDN account
   origin-remove  Remove an origin pull mapping
+  purge          Purge one or more cached files from all edge nodes
 """
 # :license: MIT, see LICENSE for more details.
 
