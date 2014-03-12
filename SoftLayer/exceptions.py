@@ -8,11 +8,11 @@
 
 
 class SoftLayerError(Exception):
-    " The base SoftLayer error. "
+    """ The base SoftLayer error. """
 
 
 class Unauthenticated(SoftLayerError):
-    " Unauthenticated "
+    """ Unauthenticated """
 
 
 class SoftLayerAPIError(SoftLayerError):
@@ -36,61 +36,61 @@ class SoftLayerAPIError(SoftLayerError):
 
 
 class ParseError(SoftLayerAPIError):
-    " Parse Error "
+    """ Parse Error """
 
 
 class ServerError(SoftLayerAPIError):
-    " Server Error "
+    """ Server Error """
 
 
 class ApplicationError(SoftLayerAPIError):
-    " Application Error "
+    """ Application Error """
 
 
 class RemoteSystemError(SoftLayerAPIError):
-    " System Error "
+    """ System Error """
 
 
 class TransportError(SoftLayerAPIError):
-    " Transport Error "
+    """ Transport Error """
 
 
 # XMLRPC Errors
 class NotWellFormed(ParseError):
-    " Request was not well formed "
+    """ Request was not well formed """
     pass
 
 
 class UnsupportedEncoding(ParseError):
-    " Encoding not supported "
+    """ Encoding not supported """
     pass
 
 
 class InvalidCharacter(ParseError):
-    " There was an invalid character "
+    """ There was an invalid character """
     pass
 
 
 class SpecViolation(ServerError):
-    " There was a spec violation "
+    """ There was a spec violation """
     pass
 
 
 class MethodNotFound(ServerError):
-    " Method name not found "
+    """ Method name not found """
     pass
 
 
 class InvalidMethodParameters(ServerError):
-    " Invalid method paramters "
+    """ Invalid method paramters """
     pass
 
 
 class InternalError(ServerError):
-    " Internal Server Error "
+    """ Internal Server Error """
     pass
 
 
 class DNSZoneNotFound(SoftLayerError):
-    " DNS Zone was not found "
+    """ DNS Zone was not found """
     pass
