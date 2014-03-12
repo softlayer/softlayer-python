@@ -46,4 +46,4 @@ or install it into your site-packages easily::
 
     $ python setup.py install
 
-For more information about working with they source, or contributing to the project, please see the :ref:`Contribution Guide <api_dev>`.
+For more information about working with the source, or contributing to the project, please see the :ref:`Contribution Guide <api_dev>`.
