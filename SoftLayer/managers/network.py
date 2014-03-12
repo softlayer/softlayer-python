@@ -300,12 +300,15 @@ class NetworkManager(object):
         return self.account.getNetworkVlans(**kwargs)
 
     def resolve_global_ip_ids(self, identifier):
+        """ Resolve global ip ids """
         return resolve_ids(identifier, [self._list_global_ips_by_identifier])
 
     def resolve_subnet_ids(self, identifier):
+        """ Resolve subnet ids """
         return resolve_ids(identifier, [self._list_subnets_by_identifier])
 
     def resolve_vlan_ids(self, identifier):
+        """ Resolve VLAN ids """
         return resolve_ids(identifier, [self._list_vlans_by_name])
 
     def summary_by_datacenter(self):
@@ -375,7 +378,7 @@ class NetworkManager(object):
             network identifier
 
         :param string identifier: The identifier to look up
-        :returns: The ID of the matching subnet or None
+        :returns: List of matching IDs
         """
         results = self.list_global_ips(identifier=identifier, mask='id')
         return [result['id'] for result in results]
@@ -385,7 +388,7 @@ class NetworkManager(object):
             network identifier
 
         :param string identifier: The identifier to look up
-        :returns: The ID of the matching subnet or None
+        :returns: List of matching IDs
         """
         identifier = identifier.split('/', 1)[0]
 
@@ -393,5 +396,10 @@ class NetworkManager(object):
         return [result['id'] for result in results]
 
     def _list_vlans_by_name(self, name):
+        """ Returns a list of IDs of VLANs which match the given VLAN name.
+
+        :param string name: a VLAN name
+        :returns: List of matching IDs
+        """
         results = self.list_vlans(name=name, mask='id')
         return [result['id'] for result in results]

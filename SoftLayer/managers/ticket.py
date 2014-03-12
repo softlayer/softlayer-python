@@ -64,11 +64,11 @@ class TicketManager(IdentifierMixin, object):
         :param integer subject: id of the subject to be assigned to the ticket
         """
 
-        currentUser = self.account.getCurrentUser()
+        current_user = self.account.getCurrentUser()
         new_ticket = {
             'subjectId': subject,
             'contents': body,
-            'assignedUserId': currentUser['id'],
+            'assignedUserId': current_user['id'],
             'title': title,
         }
         created_ticket = self.ticket.createStandardTicket(new_ticket, body)

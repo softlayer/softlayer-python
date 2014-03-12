@@ -24,6 +24,7 @@ class DNSManager(IdentifierMixin, object):
         self.resolvers = [self._get_zone_id_from_name]
 
     def _get_zone_id_from_name(self, name):
+        """ Return zone ID based on a zone """
         results = self.client['Account'].getDomains(
             filter={"domains": {"name": query_filter(name)}})
         return [x['id'] for x in results]

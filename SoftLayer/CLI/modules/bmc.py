@@ -43,9 +43,9 @@ Options:
     options = ['datacenter', 'cpu', 'memory', 'os', 'disk', 'nic']
 
     def execute(self, args):
-        t = KeyValueTable(['Name', 'Value'])
-        t.align['Name'] = 'r'
-        t.align['Value'] = 'l'
+        table = KeyValueTable(['Name', 'Value'])
+        table.align['Name'] = 'r'
+        table.align['Value'] = 'l'
 
         show_all = True
         for opt_name in self.options:
@@ -63,7 +63,7 @@ Options:
         if args['--datacenter'] or show_all:
             results = self.get_create_options(bmi_options, 'datacenter')[0]
 
-            t.add_row([results[0], listing(sorted(results[1]))])
+            table.add_row([results[0], listing(sorted(results[1]))])
 
         if args['--cpu'] or args['--memory'] or show_all:
             results = self.get_create_options(bmi_options, 'cpu')
@@ -75,13 +75,13 @@ Options:
                         [item[0] for item in sorted(
                             result[1], key=lambda x: int(x[0])
                         )])])
-            t.add_row(['memory/cpu', memory_cpu_table])
+            table.add_row(['memory/cpu', memory_cpu_table])
 
         if args['--os'] or show_all:
             results = self.get_create_options(bmi_options, 'os')
 
             for result in results:
-                t.add_row([
+                table.add_row([
                     result[0],
                     listing(
                         [item[0] for item in sorted(result[1])],
@@ -91,17 +91,17 @@ Options:
         if args['--disk'] or show_all:
             results = self.get_create_options(bmi_options, 'disk')[0]
 
-            t.add_row([results[0], listing(
+            table.add_row([results[0], listing(
                 [item[0] for item in sorted(results[1])])])
 
         if args['--nic'] or show_all:
             results = self.get_create_options(bmi_options, 'nic')
 
             for result in results:
-                t.add_row([result[0], listing(
+                table.add_row([result[0], listing(
                     [item[0] for item in sorted(result[1],)])])
 
-        return t
+        return table
 
     def get_create_options(self, bmi_options, section, pretty=True):
         """ This method can be used to parse the bare metal instance creation
@@ -149,8 +149,10 @@ Options:
             bit_regex = re.compile(r' \((\d+)\s*bit')
             extra_regex = re.compile(r' - (.+)\(')
 
-            # Encapsulate the code for generating the operating system code
             def _generate_os_code(name, version, bits, extra_info):
+                """ Encapsulates the code for generating the operating system
+                    code.
+                """
                 name = name.replace(' Linux', '')
                 name = name.replace('Enterprise', '')
                 name = name.replace('GNU/Linux', '')
@@ -161,7 +163,7 @@ Options:
                     os_code = 'REDHAT'
 
                 if 'UBUNTU' in os_code:
-                    version = re.sub('\.\d+', '', version)
+                    version = re.sub(r'\.\d+', '', version)
 
                 os_code += '_' + version.replace('.0', '')
 
@@ -174,9 +176,10 @@ Options:
 
                 return os_code
 
-            # Also separate out the code for generating the Windows OS code
-            # since it's significantly different from the rest.
             def _generate_windows_code(description):
+                """ Separates the code for generating the Windows OS code
+                    since it's significantly different from the rest.
+                """
                 version_check = re.search(r'Windows Server (\d+)', description)
                 version = version_check.group(1)
 
@@ -204,15 +207,15 @@ Options:
             os_list = {}
             flat_list = []
 
-            for os in bmi_options['categories']['os']['items']:
-                if 'Windows Server' in os['description']:
-                    os_code = _generate_windows_code(os['description'])
+            for opsys in bmi_options['categories']['os']['items']:
+                if 'Windows Server' in opsys['description']:
+                    os_code = _generate_windows_code(opsys['description'])
                 else:
-                    os_results = os_regex.search(os['description'])
+                    os_results = os_regex.search(opsys['description'])
                     name = os_results.group(1)
                     version = os_results.group(2)
-                    bits = bit_regex.search(os['description'])
-                    extra_info = extra_regex.search(os['description'])
+                    bits = bit_regex.search(opsys['description'])
+                    extra_info = extra_regex.search(opsys['description'])
 
                     if bits:
                         bits = bits.group(1)
@@ -227,13 +230,13 @@ Options:
                 if name not in os_list:
                     os_list[name] = []
 
-                os_list[name].append((os_code, os['price_id']))
-                flat_list.append((os_code, os['price_id']))
+                os_list[name].append((os_code, opsys['price_id']))
+                flat_list.append((os_code, opsys['price_id']))
 
             if pretty:
                 results = []
-                for os in sorted(os_list.keys()):
-                    results.append(('os (%s)' % os, os_list[os]))
+                for opsys in sorted(os_list.keys()):
+                    results.append(('os (%s)' % opsys, os_list[opsys]))
 
                 return results
             else:
@@ -389,9 +392,9 @@ Optional:
             order['private_vlan'] = args['--vlan_private']
 
         # Begin output
-        t = Table(['Item', 'cost'])
-        t.align['Item'] = 'r'
-        t.align['cost'] = 'r'
+        table = Table(['Item', 'cost'])
+        table.align['Item'] = 'r'
+        table.align['cost'] = 'r'
 
         if args.get('--test'):
             result = mgr.verify_order(**order)
@@ -409,7 +412,7 @@ Optional:
                 else:
                     rate = "%.2f" % monthly_fee
 
-                t.add_row([price['item']['description'], rate])
+                table.add_row([price['item']['description'], rate])
 
             if args.get('--hourly'):
                 total = total_hourly
@@ -419,9 +422,9 @@ Optional:
             billing_rate = 'monthly'
             if args.get('--hourly'):
                 billing_rate = 'hourly'
-            t.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
+            table.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
             output = SequentialOutput()
-            output.append(t)
+            output.append(table)
             output.append(FormattedItem(
                 '',
                 ' -- ! Prices reflected here are retail and do not '
@@ -431,18 +434,19 @@ Optional:
                 "This action will incur charges on your account. Continue?"):
             result = mgr.place_order(**order)
 
-            t = KeyValueTable(['name', 'value'])
-            t.align['name'] = 'r'
-            t.align['value'] = 'l'
-            t.add_row(['id', result['orderId']])
-            t.add_row(['created', result['orderDate']])
-            output = t
+            table = KeyValueTable(['name', 'value'])
+            table.align['name'] = 'r'
+            table.align['value'] = 'l'
+            table.add_row(['id', result['orderId']])
+            table.add_row(['created', result['orderDate']])
+            output = table
         else:
             raise CLIAbort('Aborting bare metal instance order.')
 
         return output
 
     def _validate_args(self, args):
+        """ Raises an ArgumentError if the given arguments are not valid """
         invalid_args = [k for k in self.required_params if args.get(k) is None]
         if invalid_args:
             raise ArgumentError('Missing required options: %s'
@@ -462,6 +466,7 @@ Optional:
 
     def _get_cpu_and_memory_price_ids(self, bmi_options, cpu_value,
                                       memory_value):
+        """ Returns a price id for a cpu/memory pair """
         bmi_obj = BMCCreateOptions()
 
         for memory, mem_options in bmi_obj.get_create_options(bmi_options,
@@ -472,6 +477,7 @@ Optional:
                         return price_id
 
     def _get_default_value(self, bmi_options, option):
+        """ Returns a 'free' price id given an option """
         if option not in bmi_options['categories']:
             return
 
@@ -486,11 +492,14 @@ Optional:
                 return item['price_id']
 
     def _get_price_id_from_options(self, bmi_options, option, value):
+        """ Returns a price_id for a given option and value """
         bmi_obj = BMCCreateOptions()
         price_id = None
 
-        for _, v in bmi_obj.get_create_options(bmi_options, option, False):
-            for item_options in v:
+        for _, options in bmi_obj.get_create_options(bmi_options,
+                                                     option,
+                                                     False):
+            for item_options in options:
                 if item_options[0] == value:
                     price_id = item_options[1]
 
@@ -512,13 +521,13 @@ Options:
     options = ['confirm']
 
     def execute(self, args):
-        hw = HardwareManager(self.client)
+        mgr = HardwareManager(self.client)
         hw_id = resolve_id(
-            hw.resolve_ids, args.get('<identifier>'), 'hardware')
+            mgr.resolve_ids, args.get('<identifier>'), 'hardware')
 
         immediate = args.get('--immediate', False)
 
         if args['--really'] or no_going_back(hw_id):
-            hw.cancel_metal(hw_id, immediate)
+            mgr.cancel_metal(hw_id, immediate)
         else:
             CLIAbort('Aborted')

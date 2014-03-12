@@ -216,6 +216,9 @@ class CCIManager(IdentifierMixin, object):
             dedicated=False, public_vlan=None, private_vlan=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
             private=False, ssh_keys=None):
+        """ Returns a dict appropriate to pass into Virtual_Guest::createObject
+            See :func:`create_instance` for a list of available options.
+        """
         required = [cpus, memory, hostname, domain]
 
         mutually_exclusive = [
@@ -225,10 +228,10 @@ class CCIManager(IdentifierMixin, object):
         if not all(required):
             raise ValueError("cpu, memory, hostname, and domain are required")
 
-        for me in mutually_exclusive:
-            if all(me.values()):
+        for mu_ex in mutually_exclusive:
+            if all(mu_ex.values()):
                 raise ValueError(
-                    'Can only specify one of: %s' % (','.join(me.keys())))
+                    'Can only specify one of: %s' % (','.join(mu_ex.keys())))
 
         data = {
             "startCpus": int(cpus),

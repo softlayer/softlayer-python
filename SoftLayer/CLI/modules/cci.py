@@ -255,7 +255,8 @@ Options:
                        if x['template'].get('dedicatedAccountHostOnlyFlag',
                                             False)]
 
-            def cpus_row(cpu_options, name):
+            def add_cpus_row(cpu_options, name):
+                """ Add CPU rows to the table """
                 cpus = []
                 for cpu_option in cpu_options:
                     cpus.append(str(cpu_option['template']['startCpus']))
@@ -263,8 +264,8 @@ Options:
                 table.add_row(['cpus (%s)' % name,
                                listing(cpus, separator=',')])
 
-            cpus_row(ded_cpu, 'private')
-            cpus_row(standard_cpu, 'standard')
+            add_cpus_row(ded_cpu, 'private')
+            add_cpus_row(standard_cpu, 'standard')
 
         if args['--memory'] or show_all:
             memory = [
@@ -296,7 +297,8 @@ Options:
             san_disks = [x for x in result['blockDevices']
                          if not x['template'].get('localDiskFlag', False)]
 
-            def block_rows(disks, name):
+            def add_block_rows(disks, name):
+                """ Add block rows to the table """
                 simple = {}
                 for disk in disks:
                     block = disk['template']['blockDevices'][0]
@@ -307,12 +309,12 @@ Options:
 
                     simple[bid].append(str(block['diskImage']['capacity']))
 
-                for b in sorted(simple.keys()):
-                    table.add_row(['%s disk(%s)' % (name, b),
-                                   listing(simple[b], separator=',')])
+                for label in sorted(simple.keys()):
+                    table.add_row(['%s disk(%s)' % (name, label),
+                                   listing(simple[label], separator=',')])
 
-            block_rows(local_disks, 'local')
-            block_rows(san_disks, 'san')
+            add_block_rows(local_disks, 'local')
+            add_block_rows(san_disks, 'san')
 
         if args['--nic'] or show_all:
             speeds = []
@@ -466,6 +468,7 @@ Optional:
         return output
 
     def _validate_args(self, args):
+        """ Raises an ArgumentError if the given arguments are not valid """
         invalid_args = [k for k in self.required_params if args.get(k) is None]
         if invalid_args:
             raise ArgumentError('Missing required options: %s'
@@ -599,11 +602,8 @@ Optional:
         if args.get('--userdata'):
             data['userdata'] = args['--userdata']
         elif args.get('--userfile'):
-            f = open(args['--userfile'], 'r')
-            try:
-                data['userdata'] = f.read()
-            finally:
-                f.close()
+            with open(args['--userfile'], 'r') as userfile:
+                data['userdata'] = userfile.read()
 
         if args.get('--postinstall'):
             data['post_uri'] = args.get('--postinstall')
@@ -713,15 +713,15 @@ Optional:
     options = ['confirm']
 
     def execute(self, args):
-        vg = self.client['Virtual_Guest']
+        virtual_guest = self.client['Virtual_Guest']
         cci = CCIManager(self.client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         if args['--really'] or confirm('This will power off the CCI with id '
                                        '%s. Continue?' % cci_id):
             if args['--hard']:
-                vg.powerOff(id=cci_id)
+                virtual_guest.powerOff(id=cci_id)
             else:
-                vg.powerOffSoft(id=cci_id)
+                virtual_guest.powerOffSoft(id=cci_id)
         else:
             raise CLIAbort('Aborted.')
 
@@ -740,17 +740,17 @@ Optional:
     options = ['confirm']
 
     def execute(self, args):
-        vg = self.client['Virtual_Guest']
+        virtual_guest = self.client['Virtual_Guest']
         cci = CCIManager(self.client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
         if args['--really'] or confirm('This will reboot the CCI with id '
                                        '%s. Continue?' % cci_id):
             if args['--hard']:
-                vg.rebootHard(id=cci_id)
+                virtual_guest.rebootHard(id=cci_id)
             elif args['--soft']:
-                vg.rebootSoft(id=cci_id)
+                virtual_guest.rebootSoft(id=cci_id)
             else:
-                vg.rebootDefault(id=cci_id)
+                virtual_guest.rebootDefault(id=cci_id)
         else:
             raise CLIAbort('Aborted.')
 
@@ -764,10 +764,10 @@ Power on a CCI
     action = 'power-on'
 
     def execute(self, args):
-        vg = self.client['Virtual_Guest']
+        virtual_guest = self.client['Virtual_Guest']
         cci = CCIManager(self.client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
-        vg.powerOn(id=cci_id)
+        virtual_guest.powerOn(id=cci_id)
 
 
 class CCIPause(CLIRunnable):
@@ -780,13 +780,13 @@ Pauses an active CCI
     options = ['confirm']
 
     def execute(self, args):
-        vg = self.client['Virtual_Guest']
+        virtual_guest = self.client['Virtual_Guest']
         cci = CCIManager(self.client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
 
         if args['--really'] or confirm('This will pause the CCI with id '
                                        '%s. Continue?' % cci_id):
-            vg.pause(id=cci_id)
+            virtual_guest.pause(id=cci_id)
         else:
             raise CLIAbort('Aborted.')
 
@@ -800,10 +800,10 @@ Resumes a paused CCI
     action = 'resume'
 
     def execute(self, args):
-        vg = self.client['Virtual_Guest']
+        virtual_guest = self.client['Virtual_Guest']
         cci = CCIManager(self.client)
         cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
-        vg.resume(id=cci_id)
+        virtual_guest.resume(id=cci_id)
 
 
 class NicEditCCI(CLIRunnable):
@@ -850,6 +850,7 @@ Options:
             return self.dns_sync(args)
 
     def dns_sync(self, args):
+        """ Sync DNS records to match the FQDN of the CCI """
         dns = DNSManager(self.client)
         cci = CCIManager(self.client)
 
@@ -858,6 +859,7 @@ Options:
         zone_id = resolve_id(dns.resolve_ids, instance['domain'], name='zone')
 
         def sync_a_record():
+            """ Sync A record """
             records = dns.get_records(
                 zone_id,
                 host=instance['hostname'],
@@ -882,6 +884,7 @@ Options:
                 dns.edit_record(rec)
 
         def sync_ptr_record():
+            """ Sync PTR record """
             host_rec = instance['primaryIpAddress'].split('.')[-1]
             ptr_domains = self.client['Virtual_Guest'].\
                 getReverseDomainRecords(id=instance['id'])[0]
@@ -959,11 +962,8 @@ Options:
         if args.get('--userdata'):
             data['userdata'] = args['--userdata']
         elif args.get('--userfile'):
-            f = open(args['--userfile'], 'r')
-            try:
-                data['userdata'] = f.read()
-            finally:
-                f.close()
+            with open(args['--userfile'], 'r') as userfile:
+                data['userdata'] = userfile.read()
 
         data['hostname'] = args.get('--hostname')
         data['domain'] = args.get('--domain')

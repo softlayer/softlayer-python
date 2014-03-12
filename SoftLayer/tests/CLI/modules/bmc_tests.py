@@ -126,7 +126,8 @@ class BMCCLITests(unittest.TestCase):
 :       Second Item : 0.50 :
 : Total hourly cost : 0.50 :
 :...................:......:
- -- ! Prices reflected here are retail and do not take account level discounts and are not guaranteed."""
+ -- ! Prices reflected here are retail and do not take account level \
+discounts and are not guaranteed."""
 
             self.assertEqual(expected, format_output(output, 'table'))
 
@@ -142,7 +143,8 @@ class BMCCLITests(unittest.TestCase):
 :        Second Item : 25.00 :
 : Total monthly cost : 25.00 :
 :....................:.......:
- -- ! Prices reflected here are retail and do not take account level discounts and are not guaranteed."""
+ -- ! Prices reflected here are retail and do not take account level \
+discounts and are not guaranteed."""
 
             self.assertEqual(expected, format_output(output, 'table'))
 

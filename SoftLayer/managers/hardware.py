@@ -5,7 +5,8 @@
 
     :license: MIT, see LICENSE for more details.
 """
-
+# Invalid names are ignored due to long method names and short argument names
+# pylint: disable=C0103
 import socket
 from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
 
@@ -554,6 +555,7 @@ class HardwareManager(IdentifierMixin, object):
         return order
 
     def _get_bare_metal_package_id(self):
+        """ Return the bare metal package id """
         packages = self.client['Product_Package'].getAllObjects(
             mask='mask[id, name]',
             filter={'name': query_filter('Bare Metal Instance')})
@@ -567,10 +569,12 @@ class HardwareManager(IdentifierMixin, object):
         return hw_id
 
     def _get_ids_from_hostname(self, hostname):
+        """ Returns list of matching hardware IDs for a given hostname """
         results = self.list_hardware(hostname=hostname, mask="id")
         return [result['id'] for result in results]
 
     def _get_ids_from_ip(self, ip):
+        """ Returns list of matching hardware IDs for a given ip address """
         try:
             # Does it look like an ip address?
             socket.inet_aton(ip)

@@ -14,8 +14,8 @@ The available commands are:
 
 from SoftLayer import NetworkManager
 from SoftLayer.CLI import (
-    CLIRunnable, Table, FormattedItem, confirm, no_going_back, resolve_id)
-from SoftLayer.CLI.helpers import CLIAbort, SequentialOutput
+    CLIRunnable, Table, confirm, no_going_back, resolve_id)
+from SoftLayer.CLI.helpers import CLIAbort
 
 
 class GlobalIpAssign(CLIRunnable):
@@ -91,26 +91,19 @@ Options:
                                    test_order=args.get('--test'))
         if not result:
             return 'Unable to place order: No valid price IDs found.'
-        t = Table(['Item', 'cost'])
-        t.align['Item'] = 'r'
-        t.align['cost'] = 'r'
+        table = Table(['Item', 'cost'])
+        table.align['Item'] = 'r'
+        table.align['cost'] = 'r'
 
         total = 0.0
         for price in result['orderDetails']['prices']:
             total += float(price.get('recurringFee', 0.0))
             rate = "%.2f" % float(price['recurringFee'])
 
-            t.add_row([price['item']['description'], rate])
+            table.add_row([price['item']['description'], rate])
 
-        t.add_row(['Total monthly cost', "%.2f" % total])
-        output = SequentialOutput()
-        output.append(t)
-        output.append(FormattedItem(
-            '',
-            ' -- ! Prices reflected here are retail and do not '
-            'take account level discounts and are not guarenteed.')
-        )
-        return t
+        table.add_row(['Total monthly cost', "%.2f" % total])
+        return table
 
 
 class GlobalIpList(CLIRunnable):
@@ -128,10 +121,10 @@ Filters:
     def execute(self, args):
         mgr = NetworkManager(self.client)
 
-        t = Table([
+        table = Table([
             'id', 'ip', 'assigned', 'target'
         ])
-        t.sortby = args.get('--sortby') or 'id'
+        table.sortby = args.get('--sortby') or 'id'
 
         version = 0
         if args.get('--v4'):
@@ -141,24 +134,27 @@ Filters:
 
         ips = mgr.list_global_ips(version=version)
 
-        for ip in ips:
+        for ip_address in ips:
             assigned = 'No'
             target = 'None'
-            if ip.get('destinationIpAddress'):
-                dest = ip['destinationIpAddress']
+            if ip_address.get('destinationIpAddress'):
+                dest = ip_address['destinationIpAddress']
                 assigned = 'Yes'
                 target = dest['ipAddress']
-                if dest.get('virtualGuest'):
-                    vg = dest['virtualGuest']
-                    target += ' (' + vg['fullyQualifiedDomainName'] + ')'
-                elif ip['destinationIpAddress'].get('hardware'):
+                virtual_guest = dest.get('virtualGuest')
+                if virtual_guest:
+                    target += (' (%s)'
+                               % virtual_guest['fullyQualifiedDomainName'])
+                elif ip_address['destinationIpAddress'].get('hardware'):
                     target += ' (' + \
                               dest['hardware']['fullyQualifiedDomainName'] + \
                               ')'
 
-            t.add_row([ip['id'], ip['ipAddress']['ipAddress'], assigned,
-                       target])
-        return t
+            table.add_row([ip_address['id'],
+                           ip_address['ipAddress']['ipAddress'],
+                           assigned,
+                           target])
+        return table
 
 
 class GlobalIpUnassign(CLIRunnable):

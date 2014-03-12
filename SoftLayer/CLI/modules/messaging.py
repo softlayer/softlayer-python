@@ -27,6 +27,8 @@ The available commands are:
 
 """
 # :license: MIT, see LICENSE for more details.
+# Missing docstrings ignored due to __doc__ = __doc__ magic
+# pylint: disable=C0111
 import sys
 
 from SoftLayer import MessagingManager

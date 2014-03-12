@@ -235,40 +235,42 @@ information.
     def execute(self, args):
         mgr = NetworkManager(self.client)
 
-        ip = mgr.ip_lookup(args['<ip>'])
+        addr_info = mgr.ip_lookup(args['<ip>'])
 
-        if not ip:
+        if not addr_info:
             return 'Not found'
 
         table = KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
         table.align['Value'] = 'l'
 
-        table.add_row(['id', ip['id']])
-        table.add_row(['ip', ip['ipAddress']])
+        table.add_row(['id', addr_info['id']])
+        table.add_row(['ip', addr_info['ipAddress']])
 
         subnet_table = KeyValueTable(['Name', 'Value'])
         subnet_table.align['Name'] = 'r'
         subnet_table.align['Value'] = 'l'
-        subnet_table.add_row(['id', ip['subnet']['id']])
-        subnet_table.add_row(['identifier', ip['subnet']['networkIdentifier']
-                              + '/' + str(ip['subnet']['cidr'])])
-        subnet_table.add_row(['netmask', ip['subnet']['netmask']])
-        if ip['subnet'].get('gateway'):
-            subnet_table.add_row(['gateway', ip['subnet']['gateway']])
-        subnet_table.add_row(['type', ip['subnet'].get('subnetType')])
+        subnet_table.add_row(['id', addr_info['subnet']['id']])
+        subnet_table.add_row(['identifier',
+                              '%s/%s'
+                              % (addr_info['subnet']['networkIdentifier'],
+                                 str(addr_info['subnet']['cidr']))])
+        subnet_table.add_row(['netmask', addr_info['subnet']['netmask']])
+        if addr_info['subnet'].get('gateway'):
+            subnet_table.add_row(['gateway', addr_info['subnet']['gateway']])
+        subnet_table.add_row(['type', addr_info['subnet'].get('subnetType')])
 
         table.add_row(['subnet', subnet_table])
 
-        if ip.get('virtualGuest') or ip.get('hardware'):
+        if addr_info.get('virtualGuest') or addr_info.get('hardware'):
             device_table = KeyValueTable(['Name', 'Value'])
             device_table.align['Name'] = 'r'
             device_table.align['Value'] = 'l'
-            if ip.get('virtualGuest'):
-                device = ip['virtualGuest']
+            if addr_info.get('virtualGuest'):
+                device = addr_info['virtualGuest']
                 device_type = 'cci'
             else:
-                device = ip['hardware']
+                device = addr_info['hardware']
                 device_type = 'server'
             device_table.add_row(['id', device['id']])
             device_table.add_row(['name', device['fullyQualifiedDomainName']])

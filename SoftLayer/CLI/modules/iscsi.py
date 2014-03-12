@@ -23,11 +23,11 @@ List iSCSI accounts
     def execute(self, args):
         account = self.client['Account']
 
-        iscsi = account.getIscsiNetworkStorage(
+        iscsi_list = account.getIscsiNetworkStorage(
             mask='eventCount,serviceResource[datacenter.name]')
-        iscsi = [NestedDict(n) for n in iscsi]
+        iscsi_list = [NestedDict(iscsi) for iscsi in iscsi_list]
 
-        t = Table([
+        table = Table([
             'id',
             'datacenter',
             'size',
@@ -36,15 +36,15 @@ List iSCSI accounts
             'server'
         ])
 
-        for n in iscsi:
-            t.add_row([
-                n['id'],
-                n['serviceResource']['datacenter'].get('name', blank()),
+        for iscsi in iscsi_list:
+            table.add_row([
+                iscsi['id'],
+                iscsi['serviceResource']['datacenter'].get('name', blank()),
                 FormattedItem(
-                    n.get('capacityGb', blank()),
-                    "%dGB" % n.get('capacityGb', 0)),
-                n.get('username', blank()),
-                n.get('password', blank()),
-                n.get('serviceResourceBackendIpAddress', blank())])
+                    iscsi.get('capacityGb', blank()),
+                    "%dGB" % iscsi.get('capacityGb', 0)),
+                iscsi.get('username', blank()),
+                iscsi.get('password', blank()),
+                iscsi.get('serviceResourceBackendIpAddress', blank())])
 
-        return t
+        return table
