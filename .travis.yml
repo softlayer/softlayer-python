@@ -9,6 +9,3 @@ env:
   - TOX_ENV=pep8
 install: pip install tox --use-mirrors
 script: tox -e $TOX_ENV
-notifications:
-  irc:
-    - "chat.freenode.net#softlayer"

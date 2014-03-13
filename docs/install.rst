@@ -10,18 +10,24 @@ Install via pip: ::
 
 	$ pip install softlayer
 
-Install from source via pip (requires `git <http://git-scm.com>`_): ::
 
-	$ pip install git+git://github.com/softlayer/softlayer-python.git
+Debian/Ubuntu
+-------------
 
-The most up to date version of this library can be found on the `SoftLayer GitHub public repositories <https://github.com/softlayer>`_. Please post to the `SoftLayer Forums <https://forums.softlayer.com/>`_ or open a support ticket in the `SoftLayer Customer Portal <https://control.softlayer.com>`_ if you have any questions regarding use of this library.
+For Debian "jessie" (currently testing) and Ubuntu 14.04, official system packages are available::
+
+	$ sudo apt-get install python-softlayer
+
 
 .. _install_from_source:
-
 From Source
 -----------
 
 The project is developed on GitHub, at `https://github.com/softlayer/softlayer-python <https://github.com/softlayer/softlayer-python>`_.
+
+Install from source via pip (requires `git <http://git-scm.com>`_): ::
+
+	$ pip install git+git://github.com/softlayer/softlayer-python.git
 
 You can clone the public repository::
 
@@ -40,4 +46,4 @@ or install it into your site-packages easily::
 
     $ python setup.py install
 
-For more information about working with they source, or contributing to the project, please see the :ref:`Contribution Guide <api_dev>`.
+For more information about working with the source, or contributing to the project, please see the :ref:`Contribution Guide <api_dev>`.
