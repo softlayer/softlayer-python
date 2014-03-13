@@ -36,7 +36,7 @@ class CDNManager(IdentifierMixin, object):
         """ Retrieves a CDN account with the specified account ID.
 
         :param account_id int: the numeric ID associated with the CDN account.
-        :param dict \*\*kwargs: additional arguments to include in the object
+        :param dict \\*\\*kwargs: additional arguments to include in the object
                                 mask.
         """
 
@@ -51,7 +51,7 @@ class CDNManager(IdentifierMixin, object):
         account.
 
         :param account_id int: the numeric ID associated with the CDN account.
-        :param dict \*\*kwargs: additional arguments to include in the object
+        :param dict \\*\\*kwargs: additional arguments to include in the object
                                 mask.
         """
 

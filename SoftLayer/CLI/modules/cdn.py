@@ -34,9 +34,9 @@ Options:
         manager = CDNManager(self.client)
         accounts = manager.list_accounts()
 
-        t = Table(['id', 'account_name', 'type', 'created', 'notes'])
+        table = Table(['id', 'account_name', 'type', 'created', 'notes'])
         for account in accounts:
-            t.add_row([
+            table.add_row([
                 account['id'],
                 account['cdnAccountName'],
                 account['cdnSolutionName'],
@@ -44,8 +44,8 @@ Options:
                 account.get('cdnAccountNote', blank())
             ])
 
-        t.sortby = args['--sortby']
-        return t
+        table.sortby = args['--sortby']
+        return table
 
 
 class DetailAccount(CLIRunnable):
@@ -60,18 +60,18 @@ Show CDN account details
         manager = CDNManager(self.client)
         account = manager.get_account(args.get('<account>'))
 
-        t = KeyValueTable(['Name', 'Value'])
-        t.align['Name'] = 'r'
-        t.align['Value'] = 'l'
+        table = KeyValueTable(['Name', 'Value'])
+        table.align['Name'] = 'r'
+        table.align['Value'] = 'l'
 
-        t.add_row(['id', account['id']])
-        t.add_row(['account_name', account['cdnAccountName']])
-        t.add_row(['type', account['cdnSolutionName']])
-        t.add_row(['status', account['status']['name']])
-        t.add_row(['created', account['createDate']])
-        t.add_row(['notes', account.get('cdnAccountNote', blank())])
+        table.add_row(['id', account['id']])
+        table.add_row(['account_name', account['cdnAccountName']])
+        table.add_row(['type', account['cdnSolutionName']])
+        table.add_row(['status', account['status']['name']])
+        table.add_row(['created', account['createDate']])
+        table.add_row(['notes', account.get('cdnAccountNote', blank())])
 
-        return t
+        return table
 
 
 class LoadContent(CLIRunnable):
@@ -126,15 +126,15 @@ List origin pull mappings associated with a CDN account.
         manager = CDNManager(self.client)
         origins = manager.get_origins(args.get('<account>'))
 
-        t = Table(['id', 'media_type', 'cname', 'origin_url'])
+        table = Table(['id', 'media_type', 'cname', 'origin_url'])
 
         for origin in origins:
-            t.add_row([origin['id'],
-                       origin['mediaType'],
-                       origin.get('cname', blank()),
-                       origin['originUrl']])
+            table.add_row([origin['id'],
+                           origin['mediaType'],
+                           origin.get('cname', blank()),
+                           origin['originUrl']])
 
-        return t
+        return table
 
 
 class AddOrigin(CLIRunnable):
