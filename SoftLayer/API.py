@@ -38,8 +38,7 @@ class Client(object):
     :param endpoint_url: the API endpoint base URL you wish to connect to.
         Set this to API_PRIVATE_ENDPOINT to connect via SoftLayer's private
         network.
-    :param proxy_host: hostname of the proxy to use
-    :param proxy_port: port of the proxy to use
+    :param proxy: proxy to be used to make API calls
     :param integer timeout: timeout for API requests
     :param auth: an object which responds to get_headers() to be inserted into
         the xml-rpc headers. Example: `BasicAuthentication`
@@ -57,15 +56,14 @@ class Client(object):
     _prefix = "SoftLayer_"
 
     def __init__(self, username=None, api_key=None, endpoint_url=None,
-            timeout=None, auth=None, config_file=None, proxy_host=None, proxy_port=None):
+            timeout=None, auth=None, config_file=None, proxy=None):
 
         settings = get_client_settings(username=username,
                                        api_key=api_key,
                                        endpoint_url=endpoint_url,
                                        timeout=timeout,
                                        auth=auth,
-                                       proxy_host=proxy_host,
-                                       proxy_port=proxy_port,
+                                       proxy=proxy,
                                        config_file=config_file)
         self.auth = settings.get('auth')
         self.endpoint_url = (
@@ -74,12 +72,9 @@ class Client(object):
         self.last_calls = []
         if settings.get('timeout'):
             self.timeout = float(settings.get('timeout'))
-        self.proxy_host = None
-        if settings.get('proxy_host'):
-            self.proxy_host = settings.get('proxy_host')
-        self.proxy_port = None
-        if settings.get('proxy_port'):
-            self.proxy_port = settings.get('proxy_port')
+        self.proxy = None
+        if settings.get('proxy'):
+            self.proxy = settings.get('proxy')
 
     def authenticate_with_password(self, username, password,
                                    security_question_id=None,
@@ -190,8 +185,7 @@ class Client(object):
                                      headers=headers,
                                      http_headers=http_headers,
                                      timeout=self.timeout,
-                                     proxy_host=self.proxy_host,
-                                     proxy_port=self.proxy_port)
+                                     proxy=self.proxy)
 
 
     __call__ = call
