@@ -12,7 +12,45 @@ import json
 
 from prettytable import PrettyTable, FRAME, NONE
 
-from SoftLayer.utils import string_types, console_input
+from SoftLayer.utils import string_types, console_input, iteritems
+
+SIMPLE_TYPE_MAP = {
+    'hardware': 'SoftLayer_Hardware',
+    'cci': 'SoftLayer_Virtual_Guest',
+    'ticket': 'SoftLayer_Ticket',
+    'ip_address': 'SoftLayer_Network_Subnet_IpAddress',
+    'vlan': 'SoftLayer_Network_Vlan',
+    'loadbalancer': 'SoftLayer_Network_Application_Delivery_Controller',
+    'firewall': 'SoftLayer_Network_Vlan_Firewall'
+}
+
+API_TYPE_MAP = dict((v,k) for k, v in iteritems(SIMPLE_TYPE_MAP))
+
+
+def get_simple_type(api_type):
+    """ Given a type returned from the SLAPI get the translated simple type.
+        This should be used for consistent naming in the modules.
+
+    :param string api_type: The name of a object type returned from SLAPI.
+    :returns string: A string that is the simple type name. If there is no
+                 translation the 'SoftLayer_' is removed from the
+                 parameter.
+    """
+    return API_TYPE_MAP.get(api_type,
+                           api_type.replace('SoftLayer_', ''))
+
+
+def get_api_type(simple_type):
+    """ Given a translated simple type get the type used in the SLAPI.
+        This should be used for consistent naming in the modules.
+
+    :param string simple_type: The name of a simple type used in the modules.
+    :returns string: A string that is the name of an object type in the SLAPI.
+                 If there is no translation the 'SoftLayer_' is added to the
+                 parameter.
+    """
+    return SIMPLE_TYPE_MAP.get(simple_type,
+                        'SoftLayer_{0}'.format(simple_type))
 
 
 def format_output(data, fmt='table'):

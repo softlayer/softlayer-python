@@ -257,6 +257,25 @@ class ResolveIdTests(unittest.TestCase):
             cli.helpers.CLIAbort, cli.helpers.resolve_id, resolver, 'test')
 
 
+class TestTransledTypes(unittest.TestCase):
+
+    def test_get_simple_type_has_type(self):
+        t = cli.helpers.get_simple_type('SoftLayer_Ticket')
+        self.assertEqual('ticket', t)
+
+    def test_get_simple_type_not_has_type(self):
+        t = cli.helpers.get_simple_type('SoftLayer_Event_Log')
+        self.assertEqual('Event_Log', t)
+
+    def test_get_api_type_has_type(self):
+        t = cli.helpers.get_api_type('ticket')
+        self.assertEqual('SoftLayer_Ticket', t)
+
+    def test_get_api_type_not_has_type(self):
+        t = cli.helpers.get_api_type('Event_Log')
+        self.assertEqual('SoftLayer_Event_Log', t)
+
+
 class TestFormatOutput(unittest.TestCase):
 
     def test_format_output_string(self):
