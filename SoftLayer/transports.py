@@ -20,8 +20,11 @@ import json
 log = logging.getLogger(__name__)
 
 
+def _proxies_dict(schemes, proxy_host, proxy_port):
+    return {scheme: '%s://%s:%s' % (scheme, proxy_host, proxy_port) for scheme in schemes}
+
 def make_xml_rpc_api_call(uri, method, args=None, headers=None,
-                          http_headers=None, timeout=None):
+                          http_headers=None, timeout=None, proxy_host=None, proxy_port=None):
     """ Makes a SoftLayer API call against the XML-RPC endpoint
 
     :param string uri: endpoint URL
@@ -45,7 +48,15 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
         log.debug(req.headers)
         log.debug(payload)
 
-        response = session.send(req, timeout=timeout)
+        if proxy_host and proxy_port:
+            kwargs = {
+                'proxies': _proxies_dict(('http', 'https'), proxy_host, proxy_port),
+                'timeout': timeout
+            }
+        else:
+            kwargs = {'timeout': timeout}
+
+        response = session.send(req, **kwargs)
         log.debug("=== RESPONSE ===")
         log.debug(response.headers)
         log.debug(response.content)
