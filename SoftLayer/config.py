@@ -39,10 +39,11 @@ def get_client_settings_env(**_):
     api_key = os.environ.get('SL_API_KEY')
     proxy = os.environ.get('https_proxy')
 
-    config = {'proxy' : proxy}
+    config = {'proxy': proxy}
     if username and api_key:
         config['auth'] = BasicAuthentication(username, api_key)
     return config
+
 
 def get_client_settings_config_file(**kwargs):
     """ Retreive client settings from the possible config file locations

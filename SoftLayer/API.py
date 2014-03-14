@@ -29,6 +29,7 @@ VALID_CALL_ARGS = set([
 
 
 class Client(object):
+
     """ A SoftLayer API client.
 
     :param username: an optional API username if you wish to bypass the
@@ -56,7 +57,7 @@ class Client(object):
     _prefix = "SoftLayer_"
 
     def __init__(self, username=None, api_key=None, endpoint_url=None,
-            timeout=None, auth=None, config_file=None, proxy=None):
+                 timeout=None, auth=None, config_file=None, proxy=None):
 
         settings = get_client_settings(username=username,
                                        api_key=api_key,
@@ -187,7 +188,6 @@ class Client(object):
                                      timeout=self.timeout,
                                      proxy=self.proxy)
 
-
     __call__ = call
 
     def iter_call(self, service, method,
@@ -271,6 +271,7 @@ class Client(object):
 
 
 class TimedClient(Client):
+
     """ Subclass of Client()
 
     Using this class will time every call to the API and store it in an
@@ -301,6 +302,7 @@ class TimedClient(Client):
 
 
 class Service(object):
+
     def __init__(self, client, name):
         self.client = client
         self.name = name
