@@ -27,7 +27,7 @@ def _proxies_dict(proxy):
     if not re.match(r'^\w+://', proxy):
         log.error('Proxy should contain protocol to use. For example: http://localhost:3128')
         return None
-    return { proxy.split(':')[0] : proxy }
+    return { 'http' : proxy, 'https' : proxy}
 
 def make_xml_rpc_api_call(uri, method, args=None, headers=None,
                           http_headers=None, timeout=None, proxy=None):

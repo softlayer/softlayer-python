@@ -98,7 +98,7 @@ Standard Options:
   --debug=LEVEL           Specifies the debug noise level
                            1=warn, 2=info, 3=debug
   --timings               Time each API call and display after results
-  --proxy=PROTO:PROXY_URL Proxy to use to make API calls
+  --proxy=PROTO:PROXY_URL HTTP[s] proxy to be use to make API calls
   -h --help               Show this screen
 """ % default_format
         return arg_doc.strip()

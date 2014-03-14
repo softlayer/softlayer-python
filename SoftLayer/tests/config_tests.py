@@ -89,7 +89,8 @@ class TestGetClientSettingsEnv(unittest.TestCase):
     def test_no_auth(self):
         result = get_client_settings_env()
 
-        self.assertEqual(result, None)
+        # proxy might get ANY value depending on test env.
+        self.assertEqual(result, {'proxy': ANY})
 
 
 class TestGetClientSettingsConfigFile(unittest.TestCase):

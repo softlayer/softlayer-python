@@ -54,7 +54,6 @@ class TestXmlRpcAPICall(unittest.TestCase):
         self.assertEqual(resp, [])
         self.assertEquals(args[0].body, data)
 
-
     @patch('SoftLayer.transports.requests.Session.send')
     def test_proxy_without_protocol(self, send):
         send().content = self.send_content
@@ -62,18 +61,21 @@ class TestXmlRpcAPICall(unittest.TestCase):
             'http://something.com/path/to/resource', 'getObject', proxy='localhost:3128')
         send.assert_called_with(
             ANY,
-            proxies=None, # if no protocol is specified with proxy, it should be None
+            # if no protocol is specified with proxy, it should be None
+            proxies=None,
             timeout=None)
 
     @patch('SoftLayer.transports.requests.Session.send')
     def test_valid_proxy(self, send):
         send().content = self.send_content
         resp = make_xml_rpc_api_call(
-                'http://something.com/path/to/resource', 'getObject', proxy='http://localhost:3128')
+            'http://something.com/path/to/resource', 'getObject', proxy='http://localhost:3128')
         send.assert_called_with(
             ANY,
-            proxies={'http' : 'http://localhost:3128'},
+            proxies={'https': 'http://localhost:3128',
+                     'http': 'http://localhost:3128'},
             timeout=None)
+
 
 class TestRestAPICall(unittest.TestCase):
 
@@ -112,7 +114,8 @@ class TestRestAPICall(unittest.TestCase):
         request.assert_called_with(
             'GET', 'http://something.com/path/to/resource.txt',
             headers=None,
-            proxies=None, # if no protocol is specified with proxy, it should be None
+            # if no protocol is specified with proxy, it should be None
+            proxies=None,
             timeout=None)
 
     @patch('SoftLayer.transports.requests.request')
@@ -121,8 +124,9 @@ class TestRestAPICall(unittest.TestCase):
             'GET', 'http://something.com/path/to/resource.txt', proxy='http://localhost:3128')
         request.assert_called_with(
             'GET', 'http://something.com/path/to/resource.txt',
-            headers=None,
-            proxies={'http' : 'http://localhost:3128'},
+            headers=ANY,
+            proxies={'https': 'http://localhost:3128',
+                     'http': 'http://localhost:3128'},
             timeout=None)
 
     @patch('SoftLayer.transports.requests.request')
