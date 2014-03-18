@@ -16,7 +16,6 @@ except ImportError:  # pragma nocover
 import logging
 import requests
 import json
-import re
 
 log = logging.getLogger(__name__)
 
