@@ -56,11 +56,7 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
         log.debug(req.headers)
         log.debug(payload)
 
-        kwargs = {
-            'proxies': _proxies_dict(proxy),
-            'timeout': timeout
-        }
-        response = session.send(req, **kwargs)
+        response = session.send(req, timeout=timeout, proxies=_proxies_dict(proxy))
         log.debug("=== RESPONSE ===")
         log.debug(response.headers)
         log.debug(response.content)
