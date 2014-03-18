@@ -46,12 +46,14 @@ class TestGetClientSettingsArgs(unittest.TestCase):
         result = get_client_settings_args(username='username',
                                           api_key='api_key',
                                           endpoint_url='http://endpoint/',
-                                          timeout=10)
+                                          timeout=10,
+                                          proxy='https://localhost:3128')
 
         self.assertEqual(result['endpoint_url'], 'http://endpoint/')
         self.assertEqual(result['timeout'], 10)
         self.assertEqual(result['auth'].username, 'username')
         self.assertEqual(result['auth'].api_key, 'api_key')
+        self.assertEqual(result['proxy'], 'https://localhost:3128')
 
     def test_no_auth(self):
         result = get_client_settings_args()
@@ -59,6 +61,7 @@ class TestGetClientSettingsArgs(unittest.TestCase):
         self.assertEqual(result, {
             'endpoint_url': None,
             'timeout': None,
+            'proxy': None,
             'auth': None,
         })
 
@@ -74,7 +77,8 @@ class TestGetClientSettingsArgs(unittest.TestCase):
 class TestGetClientSettingsEnv(unittest.TestCase):
 
     @patch.dict('os.environ', {'SL_USERNAME': 'username',
-                               'SL_API_KEY': 'api_key'})
+                               'SL_API_KEY': 'api_key',
+                               'https_proxy': 'https://localhost:3128'})
     def test_username_api_key(self):
         result = get_client_settings_env()
 
@@ -85,7 +89,8 @@ class TestGetClientSettingsEnv(unittest.TestCase):
     def test_no_auth(self):
         result = get_client_settings_env()
 
-        self.assertIsNone(result)
+        # proxy might get ANY value depending on test env.
+        self.assertEqual(result, {'proxy': ANY})
 
 
 class TestGetClientSettingsConfigFile(unittest.TestCase):
@@ -96,6 +101,7 @@ class TestGetClientSettingsConfigFile(unittest.TestCase):
 
         self.assertEqual(result['endpoint_url'], config_parser().get())
         self.assertEqual(result['timeout'], config_parser().get())
+        self.assertEqual(result['proxy'], config_parser().get())
         self.assertEqual(result['auth'].username, config_parser().get())
         self.assertEqual(result['auth'].api_key, config_parser().get())
 

@@ -38,6 +38,7 @@ class Client(object):
     :param endpoint_url: the API endpoint base URL you wish to connect to.
         Set this to API_PRIVATE_ENDPOINT to connect via SoftLayer's private
         network.
+    :param proxy: proxy to be used to make API calls
     :param integer timeout: timeout for API requests
     :param auth: an object which responds to get_headers() to be inserted into
         the xml-rpc headers. Example: `BasicAuthentication`
@@ -55,13 +56,14 @@ class Client(object):
     _prefix = "SoftLayer_"
 
     def __init__(self, username=None, api_key=None, endpoint_url=None,
-                 timeout=None, auth=None, config_file=None):
+                 timeout=None, auth=None, config_file=None, proxy=None):
 
         settings = get_client_settings(username=username,
                                        api_key=api_key,
                                        endpoint_url=endpoint_url,
                                        timeout=timeout,
                                        auth=auth,
+                                       proxy=proxy,
                                        config_file=config_file)
         self.auth = settings.get('auth')
         self.endpoint_url = (
@@ -69,6 +71,9 @@ class Client(object):
         self.timeout = None
         if settings.get('timeout'):
             self.timeout = float(settings.get('timeout'))
+        self.proxy = None
+        if settings.get('proxy'):
+            self.proxy = settings.get('proxy')
 
     def authenticate_with_password(self, username, password,
                                    security_question_id=None,
@@ -178,7 +183,8 @@ class Client(object):
         return make_xml_rpc_api_call(uri, method, args,
                                      headers=headers,
                                      http_headers=http_headers,
-                                     timeout=self.timeout)
+                                     timeout=self.timeout,
+                                     proxy=self.proxy)
 
     __call__ = call
 

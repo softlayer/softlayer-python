@@ -85,6 +85,7 @@ class APIClient(unittest.TestCase):
             headers={
                 'authenticate': {
                     'username': 'doesnotexist', 'apiKey': 'issurelywrong'}},
+            proxy=None,
             timeout=None,
             http_headers={
                 'Content-Type': 'application/xml',
@@ -116,6 +117,7 @@ class APIClient(unittest.TestCase):
                     'username': 'doesnotexist', 'apiKey': 'issurelywrong'},
                 'SoftLayer_SERVICEInitParameters': {'id': 5678},
                 'resultLimit': {'limit': 9, 'offset': 10}},
+            proxy=None,
             timeout=None,
             http_headers={
                 'RAW': 'HEADER',
@@ -135,6 +137,7 @@ class APIClient(unittest.TestCase):
                 'authenticate': {
                     'username': 'doesnotexist', 'apiKey': 'issurelywrong'},
                 'SoftLayer_ObjectMask': {'mask': 'mask[something[nested]]'}},
+            proxy=None,
             timeout=None,
             http_headers={
                 'Content-Type': 'application/xml',
@@ -153,6 +156,7 @@ class APIClient(unittest.TestCase):
                 'authenticate': {
                     'username': 'doesnotexist', 'apiKey': 'issurelywrong'},
                 'SoftLayer_ObjectMask': {'mask': 'mask.something.nested'}},
+            proxy=None,
             timeout=None,
             http_headers={
                 'Content-Type': 'application/xml',
@@ -170,6 +174,7 @@ class APIClient(unittest.TestCase):
                 'authenticate': {
                     'username': 'doesnotexist', 'apiKey': 'issurelywrong'},
                 'SoftLayer_ObjectMask': {'mask': 'mask[something.nested]'}},
+            proxy=None,
             timeout=None,
             http_headers={
                 'Content-Type': 'application/xml',
@@ -259,6 +264,7 @@ class APIClient(unittest.TestCase):
         make_xml_rpc_api_call.assert_called_with(
             'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
             headers=ANY,
+            proxy=None,
             timeout=None,
             http_headers={
                 'Content-Type': 'application/xml',
@@ -271,6 +277,7 @@ class APIClient(unittest.TestCase):
         make_xml_rpc_api_call.assert_called_with(
             'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
             headers=ANY,
+            proxy=None,
             timeout=None,
             http_headers={
                 'Content-Type': 'application/xml',
@@ -288,6 +295,7 @@ class APIClient(unittest.TestCase):
         make_xml_rpc_api_call.assert_called_with(
             'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
             headers=ANY,
+            proxy=None,
             timeout=None,
             http_headers={
                 'Content-Type': 'application/xml',
@@ -325,6 +333,12 @@ class UnauthenticatedAPIClient(unittest.TestCase):
         get_client_settings.return_value = {}
         client = SoftLayer.Client()
         self.assertIsNone(client.auth)
+
+    @patch('SoftLayer.API.get_client_settings')
+    def test_init_with_proxy(self, get_client_settings):
+        get_client_settings.return_value = {'proxy': 'http://localhost:3128'}
+        client = SoftLayer.Client()
+        self.assertEqual(client.proxy, 'http://localhost:3128')
 
     @patch('SoftLayer.API.Client.call')
     def test_authenticate_with_password(self, _call):

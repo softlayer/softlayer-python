@@ -20,8 +20,14 @@ import json
 log = logging.getLogger(__name__)
 
 
+def _proxies_dict(proxy):
+    if not proxy:
+        return None
+    return {'http': proxy, 'https': proxy}
+
+
 def make_xml_rpc_api_call(uri, method, args=None, headers=None,
-                          http_headers=None, timeout=None):
+                          http_headers=None, timeout=None, proxy=None):
     """ Makes a SoftLayer API call against the XML-RPC endpoint
 
     :param string uri: endpoint URL
@@ -45,7 +51,7 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
         log.debug(req.headers)
         log.debug(payload)
 
-        response = session.send(req, timeout=timeout)
+        response = session.send(req, timeout=timeout, proxies=_proxies_dict(proxy))
         log.debug("=== RESPONSE ===")
         log.debug(response.headers)
         log.debug(response.content)
@@ -75,7 +81,7 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
         raise TransportError(0, str(e))
 
 
-def make_rest_api_call(method, url, http_headers=None, timeout=None):
+def make_rest_api_call(method, url, http_headers=None, timeout=None, proxy=None):
     """ Makes a SoftLayer API call against the REST endpoint
 
     :param string method: HTTP method: GET, POST, PUT, DELETE
@@ -86,7 +92,7 @@ def make_rest_api_call(method, url, http_headers=None, timeout=None):
     log.info('%s %s', method, url)
     try:
         resp = requests.request(
-            method, url, headers=http_headers, timeout=timeout)
+            method, url, headers=http_headers, timeout=timeout, proxies=_proxies_dict(proxy))
         resp.raise_for_status()
         log.debug(resp.content)
         if url.endswith('.json'):

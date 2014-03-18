@@ -94,12 +94,13 @@ Prompt Options:
         if '[options]' in arg_doc:
             arg_doc += """
 Standard Options:
-  --format=ARG           Output format. [Options: table, raw] [Default: %s]
-  -C FILE --config=FILE  Config file location. [Default: ~/.softlayer]
-  --debug=LEVEL          Specifies the debug noise level
+  --format=ARG            Output format. [Options: table, raw] [Default: %s]
+  -C FILE --config=FILE   Config file location. [Default: ~/.softlayer]
+  --debug=LEVEL           Specifies the debug noise level
                            1=warn, 2=info, 3=debug
-  --timings              Time each API call and display after results
-  -h --help              Show this screen
+  --timings               Time each API call and display after results
+  --proxy=PROTO:PROXY_URL HTTP[s] proxy to be use to make API calls
+  -h --help               Show this screen
 """ % default_format
         return arg_doc.strip()
 
@@ -164,10 +165,14 @@ def main(args=sys.argv[1:], env=Environment()):
             logger.addHandler(h)
             logger.setLevel(DEBUG_LOGGING_MAP.get(debug_level, logging.DEBUG))
 
+        kwargs = {
+            'proxy': command_args.get('--proxy'),
+            'config_file': command_args.get('--config')
+        }
         if command_args.get('--timings'):
-            client = TimedClient(config_file=command_args.get('--config'))
+            client = TimedClient(**kwargs)
         else:
-            client = Client(config_file=command_args.get('--config'))
+            client = Client(**kwargs)
 
         # Do the thing
         runnable = command(client=client, env=env)
