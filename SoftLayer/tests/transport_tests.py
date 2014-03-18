@@ -65,8 +65,9 @@ class TestXmlRpcAPICall(unittest.TestCase):
     @patch('SoftLayer.transports.requests.Session.send')
     def test_valid_proxy(self, send):
         send().content = self.send_content
-        make_xml_rpc_api_call(
-            'http://something.com/path/to/resource', 'getObject', proxy='http://localhost:3128')
+        make_xml_rpc_api_call('http://something.com/path/to/resource',
+                              'getObject',
+                              proxy='http://localhost:3128')
         send.assert_called_with(
             ANY,
             proxies={'https': 'http://localhost:3128',
@@ -114,8 +115,9 @@ class TestRestAPICall(unittest.TestCase):
 
     @patch('SoftLayer.transports.requests.request')
     def test_valid_proxy(self, request):
-        make_rest_api_call(
-            'GET', 'http://something.com/path/to/resource.txt', proxy='http://localhost:3128')
+        make_rest_api_call('GET',
+                           'http://something.com/path/to/resource.txt',
+                           proxy='http://localhost:3128')
         request.assert_called_with(
             'GET', 'http://something.com/path/to/resource.txt',
             headers=ANY,

@@ -19,6 +19,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 def _proxies_dict(proxy):
+    """ Makes a dict appropriate to pass to requests """
     if not proxy:
         return None
     return {'http': proxy, 'https': proxy}
@@ -51,7 +52,9 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
         LOGGER.debug(req.headers)
         LOGGER.debug(payload)
 
-        response = session.send(req, timeout=timeout, proxies=_proxies_dict(proxy))
+        response = session.send(req,
+                                timeout=timeout,
+                                proxies=_proxies_dict(proxy))
         LOGGER.debug("=== RESPONSE ===")
         LOGGER.debug(response.headers)
         LOGGER.debug(response.content)
@@ -81,7 +84,8 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
         raise TransportError(0, str(ex))
 
 
-def make_rest_api_call(method, url, http_headers=None, timeout=None, proxy=None):
+def make_rest_api_call(method, url,
+                       http_headers=None, timeout=None, proxy=None):
     """ Makes a SoftLayer API call against the REST endpoint
 
     :param string method: HTTP method: GET, POST, PUT, DELETE
@@ -91,8 +95,10 @@ def make_rest_api_call(method, url, http_headers=None, timeout=None, proxy=None)
     """
     LOGGER.info('%s %s', method, url)
     try:
-        resp = requests.request(
-            method, url, headers=http_headers, timeout=timeout, proxies=_proxies_dict(proxy))
+        resp = requests.request(method, url,
+                                headers=http_headers,
+                                timeout=timeout,
+                                proxies=_proxies_dict(proxy))
         resp.raise_for_status()
         LOGGER.debug(resp.content)
         if url.endswith('.json'):
