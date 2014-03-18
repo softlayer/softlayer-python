@@ -54,16 +54,13 @@ class TestXmlRpcAPICall(unittest.TestCase):
         self.assertEqual(resp, [])
         self.assertEquals(args[0].body, data)
 
-    @patch('SoftLayer.transports.requests.Session.send')
-    def test_proxy_without_protocol(self, send):
-        send().content = self.send_content
-        make_xml_rpc_api_call(
-            'http://something.com/path/to/resource', 'getObject', proxy='localhost:3128')
-        send.assert_called_with(
-            ANY,
-            # if no protocol is specified with proxy, it should be None
-            proxies=None,
-            timeout=None)
+    def test_proxy_without_protocol(self):
+        self.assertRaises(
+            TransportError,
+            make_xml_rpc_api_call,
+            'http://something.com/path/to/resource',
+            'getObject',
+            'localhost:3128')
 
     @patch('SoftLayer.transports.requests.Session.send')
     def test_valid_proxy(self, send):
@@ -107,16 +104,13 @@ class TestRestAPICall(unittest.TestCase):
             'GET',
             'http://something.com/path/to/resource.json')
 
-    @patch('SoftLayer.transports.requests.request')
-    def test_proxy_without_protocol(self, request):
-        make_rest_api_call(
-            'GET', 'http://something.com/path/to/resource.txt', proxy='localhost:3128')
-        request.assert_called_with(
-            'GET', 'http://something.com/path/to/resource.txt',
-            headers=None,
-            # if no protocol is specified with proxy, it should be None
-            proxies=None,
-            timeout=None)
+    def test_proxy_without_protocol(self):
+        self.assertRaises(
+            TransportError,
+            make_rest_api_call,
+            'GET'
+            'http://something.com/path/to/resource.txt',
+            'localhost:3128')
 
     @patch('SoftLayer.transports.requests.request')
     def test_valid_proxy(self, request):
