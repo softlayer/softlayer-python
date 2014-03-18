@@ -29,7 +29,6 @@ VALID_CALL_ARGS = set([
 
 
 class Client(object):
-
     """ A SoftLayer API client.
 
     :param username: an optional API username if you wish to bypass the
@@ -270,7 +269,6 @@ class Client(object):
 
 
 class TimedClient(Client):
-
     """ Subclass of Client()
 
     Using this class will time every call to the API and store it in an
@@ -304,7 +302,6 @@ class TimedClient(Client):
 
 
 class Service(object):
-
     def __init__(self, client, name):
         self.client = client
         self.name = name

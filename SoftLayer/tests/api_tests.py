@@ -13,7 +13,6 @@ from SoftLayer.consts import USER_AGENT
 
 
 class Inititialization(unittest.TestCase):
-
     def test_init(self):
         client = SoftLayer.Client(username='doesnotexist',
                                   api_key='issurelywrong', timeout=10)
@@ -40,7 +39,6 @@ class Inititialization(unittest.TestCase):
 
 
 class ClientMethods(unittest.TestCase):
-
     def test_help(self):
         help(SoftLayer)
         help(SoftLayer.Client)
@@ -74,7 +72,6 @@ class ClientMethods(unittest.TestCase):
 
 
 class APIClient(unittest.TestCase):
-
     def setUp(self):
         self.client = SoftLayer.Client(
             username='doesnotexist', api_key='issurelywrong',
@@ -308,7 +305,6 @@ class APIClient(unittest.TestCase):
 
 
 class APITimedClient(unittest.TestCase):
-
     def setUp(self):
         self.client = SoftLayer.TimedClient(
             username='doesnotexist', api_key='issurelywrong',
@@ -329,7 +325,6 @@ class APITimedClient(unittest.TestCase):
 
 
 class UnauthenticatedAPIClient(unittest.TestCase):
-
     def setUp(self):
         self.client = SoftLayer.Client(endpoint_url="ENDPOINT")
 
