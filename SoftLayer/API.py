@@ -70,7 +70,6 @@ class Client(object):
         self.endpoint_url = (
             settings.get('endpoint_url') or API_PUBLIC_ENDPOINT).rstrip('/')
         self.timeout = None
-        self.last_calls = []
         if settings.get('timeout'):
             self.timeout = float(settings.get('timeout'))
         self.proxy = None
@@ -278,7 +277,10 @@ class TimedClient(Client):
     internal list. This will have a slight impact on your client's memory
     usage and performance. You should only use this for debugging.
     """
-    last_calls = []
+
+    def __init__(self, *args, **kwargs):
+        self.last_calls = []
+        super(TimedClient, self).__init__(*args, **kwargs)
 
     def call(self, service, method, *args, **kwargs):
         """ See Client.call for documentation. """

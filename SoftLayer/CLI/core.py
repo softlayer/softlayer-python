@@ -17,6 +17,7 @@ Compute:
   sshkey    Manage SSH keys on your account
 
 Networking:
+  cdn        Content Delivery Network service management
   dns        Domain Name System
   firewall   Firewall rule and security management
   globalip   Global IP address management
