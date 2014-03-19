@@ -50,4 +50,4 @@ class FirewallManager(object):
                 }
             })['networkVlans']
 
-        return list(filter(has_firewall, results))
+        return [result for result in results if has_firewall(result)]

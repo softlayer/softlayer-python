@@ -14,7 +14,7 @@ from SoftLayer.tests import unittest
 
 class TestGetClientSettings(unittest.TestCase):
 
-    @patch('SoftLayer.config.setting_resolvers', [])
+    @patch('SoftLayer.config.SETTING_RESOLVERS', [])
     def test_no_resolvers(self):
         result = get_client_settings()
         self.assertEqual(result, {})
@@ -22,7 +22,7 @@ class TestGetClientSettings(unittest.TestCase):
     def test_resolve_one(self):
         resolvers = [Mock() for i in range(1)]
         resolvers[0].return_value = {'auth': 'AUTH HANDLER'}
-        with patch('SoftLayer.config.setting_resolvers', resolvers):
+        with patch('SoftLayer.config.SETTING_RESOLVERS', resolvers):
             result = get_client_settings()
             self.assertEqual(result, {'auth': 'AUTH HANDLER'})
 
@@ -35,7 +35,7 @@ class TestGetClientSettings(unittest.TestCase):
         resolvers[1].return_value = {'timeout': 10, 'auth': None}
         resolvers[2].return_value = None
         resolvers[3].return_value = {'auth': 'AUTH HANDLER'}
-        with patch('SoftLayer.config.setting_resolvers', resolvers):
+        with patch('SoftLayer.config.SETTING_RESOLVERS', resolvers):
             result = get_client_settings()
             self.assertEqual(result, {'auth': 'AUTH HANDLER', 'timeout': 20})
 

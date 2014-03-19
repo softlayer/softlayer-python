@@ -5,7 +5,8 @@
 
     :license: MIT, see LICENSE for more details.
 """
-
+# Invalid names are ignored due to long method names and short argument names
+# pylint: disable=C0103
 import socket
 from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
 
@@ -85,7 +86,7 @@ class HardwareManager(IdentifierMixin, object):
         :param integer nic_speed: filter based on network speed (in MBPS)
         :param string public_ip: filter based on public ip address
         :param string private_ip: filter based on private ip address
-        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         :returns: Returns a list of dictionaries representing the matching
                   hardware. This list will contain both dedicated servers and
                   bare metal computing instances
@@ -197,7 +198,7 @@ class HardwareManager(IdentifierMixin, object):
             package = package_obj.getObject(id=package_id,
                                             mask='mask[id, name, description]')
 
-            if (package.get('name')):
+            if package.get('name'):
                 packages.append((package['id'], package['name'],
                                  package['description']))
 
@@ -554,6 +555,7 @@ class HardwareManager(IdentifierMixin, object):
         return order
 
     def _get_bare_metal_package_id(self):
+        """ Return the bare metal package id """
         packages = self.client['Product_Package'].getAllObjects(
             mask='mask[id, name]',
             filter={'name': query_filter('Bare Metal Instance')})
@@ -567,10 +569,12 @@ class HardwareManager(IdentifierMixin, object):
         return hw_id
 
     def _get_ids_from_hostname(self, hostname):
+        """ Returns list of matching hardware IDs for a given hostname """
         results = self.list_hardware(hostname=hostname, mask="id")
         return [result['id'] for result in results]
 
     def _get_ids_from_ip(self, ip):
+        """ Returns list of matching hardware IDs for a given ip address """
         try:
             # Does it look like an ip address?
             socket.inet_aton(ip)

@@ -27,6 +27,8 @@ from SoftLayer.CLI import CLIRunnable, KeyValueTable, listing, CLIAbort
 
 
 class MetaRunnable(CLIRunnable):
+    """ A CLIRunnable that raises a nice error on connection issues because
+        the metadata service is only accessable on a SoftLayer device """
     def execute(self, args):
         try:
             return self._execute(args)
@@ -37,6 +39,7 @@ class MetaRunnable(CLIRunnable):
                 'network.')
 
     def _execute(self, _):
+        """ To be overridden exactly like the execute() method """
         pass
 
 
@@ -181,6 +184,7 @@ Get user-defined data
     action = 'user_data'
 
     def _execute(self, _):
+        """ Returns user metadata """
         userdata = MetadataManager().get('user_data')
         if userdata:
             return userdata
@@ -199,35 +203,35 @@ Get details about the public or private network
     def _execute(self, args):
         meta = MetadataManager()
         if args['<public>']:
-            t = KeyValueTable(['Name', 'Value'])
-            t.align['Name'] = 'r'
-            t.align['Value'] = 'l'
+            table = KeyValueTable(['Name', 'Value'])
+            table.align['Name'] = 'r'
+            table.align['Value'] = 'l'
             network = meta.public_network()
-            t.add_row([
+            table.add_row([
                 'mac addresses',
                 listing(network['mac_addresses'], separator=',')])
-            t.add_row([
+            table.add_row([
                 'router', network['router']])
-            t.add_row([
+            table.add_row([
                 'vlans', listing(network['vlans'], separator=',')])
-            t.add_row([
+            table.add_row([
                 'vlan ids',
                 listing(network['vlan_ids'], separator=',')])
-            return t
+            return table
 
         if args['<private>']:
-            t = KeyValueTable(['Name', 'Value'])
-            t.align['Name'] = 'r'
-            t.align['Value'] = 'l'
+            table = KeyValueTable(['Name', 'Value'])
+            table.align['Name'] = 'r'
+            table.align['Value'] = 'l'
             network = meta.private_network()
-            t.add_row([
+            table.add_row([
                 'mac addresses',
                 listing(network['mac_addresses'], separator=',')])
-            t.add_row([
+            table.add_row([
                 'router', network['router']])
-            t.add_row([
+            table.add_row([
                 'vlans', listing(network['vlans'], separator=',')])
-            t.add_row([
+            table.add_row([
                 'vlan ids',
                 listing(network['vlan_ids'], separator=',')])
-            return t
+            return table

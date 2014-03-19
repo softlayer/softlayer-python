@@ -33,17 +33,18 @@ Filters:
                              'VLAN')
         vlan = mgr.get_vlan(vlan_id)
 
-        t = KeyValueTable(['Name', 'Value'])
-        t.align['Name'] = 'r'
-        t.align['Value'] = 'l'
+        table = KeyValueTable(['Name', 'Value'])
+        table.align['Name'] = 'r'
+        table.align['Value'] = 'l'
 
-        t.add_row(['id', vlan['id']])
-        t.add_row(['number', vlan['vlanNumber']])
-        t.add_row(['datacenter',
-                   vlan['primaryRouter']['datacenter']['longName']])
-        t.add_row(['primary router',
-                   vlan['primaryRouter']['fullyQualifiedDomainName']])
-        t.add_row(['firewall', 'Yes' if vlan['firewallInterfaces'] else 'No'])
+        table.add_row(['id', vlan['id']])
+        table.add_row(['number', vlan['vlanNumber']])
+        table.add_row(['datacenter',
+                       vlan['primaryRouter']['datacenter']['longName']])
+        table.add_row(['primary router',
+                       vlan['primaryRouter']['fullyQualifiedDomainName']])
+        table.add_row(['firewall',
+                       'Yes' if vlan['firewallInterfaces'] else 'No'])
         subnets = []
         for subnet in vlan['subnets']:
             subnet_table = KeyValueTable(['Name', 'Value'])
@@ -58,7 +59,7 @@ Filters:
                                   subnet['usableIpAddressCount']])
             subnets.append(subnet_table)
 
-        t.add_row(['subnets', subnets])
+        table.add_row(['subnets', subnets])
 
         if not args.get('--no-cci'):
             if vlan['virtualGuests']:
@@ -69,24 +70,24 @@ Filters:
                     cci_table.add_row([cci['hostname'],
                                        cci['domain'],
                                        cci.get('primaryIpAddress')])
-                t.add_row(['ccis', cci_table])
+                table.add_row(['ccis', cci_table])
             else:
-                t.add_row(['cci', 'none'])
+                table.add_row(['cci', 'none'])
 
         if not args.get('--no-hardware'):
             if vlan['hardware']:
                 hw_table = Table(['Hostname', 'Domain', 'IP'])
                 hw_table.align['Hostname'] = 'r'
                 hw_table.align['IP'] = 'l'
-                for hw in vlan['hardware']:
-                    hw_table.add_row([hw['hostname'],
-                                      hw['domain'],
-                                      hw.get('primaryIpAddress')])
-                t.add_row(['hardware', hw_table])
+                for hardware in vlan['hardware']:
+                    hw_table.add_row([hardware['hostname'],
+                                      hardware['domain'],
+                                      hardware.get('primaryIpAddress')])
+                table.add_row(['hardware', hw_table])
             else:
-                t.add_row(['hardware', 'none'])
+                table.add_row(['hardware', 'none'])
 
-        return t
+        return table
 
 
 class VlanList(CLIRunnable):
@@ -109,11 +110,11 @@ Filters:
     def execute(self, args):
         mgr = NetworkManager(self.client)
 
-        t = Table([
+        table = Table([
             'id', 'number', 'datacenter', 'name', 'IPs', 'hardware', 'ccis',
             'networking', 'firewall'
         ])
-        t.sortby = args.get('--sortby') or 'id'
+        table.sortby = args.get('--sortby') or 'id'
 
         vlans = mgr.list_vlans(
             datacenter=args.get('--datacenter'),
@@ -121,7 +122,7 @@ Filters:
             name=args.get('--name'),
         )
         for vlan in vlans:
-            t.add_row([
+            table.add_row([
                 vlan['id'],
                 vlan['vlanNumber'],
                 vlan['primaryRouter']['datacenter']['name'],
@@ -133,4 +134,4 @@ Filters:
                 'Yes' if vlan['firewallInterfaces'] else 'No',
             ])
 
-        return t
+        return table

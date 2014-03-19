@@ -44,11 +44,15 @@ Options:
                 image['visibility'] = 'public'
                 images.append(image)
 
-        t = Table(['id', 'account', 'visibility', 'name', 'global_identifier'])
+        table = Table(['id',
+                       'account',
+                       'visibility',
+                       'name',
+                       'global_identifier'])
 
-        images = filter(lambda x: x['parentId'] == '', images)
+        images = [image for image in images if image['parentId'] == '']
         for image in images:
-            t.add_row([
+            table.add_row([
                 image['id'],
                 image.get('accountId', blank()),
                 image['visibility'],
@@ -56,7 +60,7 @@ Options:
                 image.get('globalIdentifier', blank()),
             ])
 
-        return t
+        return table
 
 
 class DetailImage(CLIRunnable):
@@ -75,17 +79,17 @@ Get details for an image
 
         image = image_mgr.get_image(image_id)
 
-        t = KeyValueTable(['Name', 'Value'])
-        t.align['Name'] = 'r'
-        t.align['Value'] = 'l'
+        table = KeyValueTable(['Name', 'Value'])
+        table.align['Name'] = 'r'
+        table.align['Value'] = 'l'
 
-        t.add_row(['id', image['id']])
-        t.add_row(['account', image.get('accountId', blank())])
-        t.add_row(['name', image['name'].strip()])
-        t.add_row(['global_identifier',
-                   image.get('globalIdentifier', blank())])
+        table.add_row(['id', image['id']])
+        table.add_row(['account', image.get('accountId', blank())])
+        table.add_row(['name', image['name'].strip()])
+        table.add_row(['global_identifier',
+                       image.get('globalIdentifier', blank())])
 
-        return t
+        return table
 
 
 class DeleteImage(CLIRunnable):

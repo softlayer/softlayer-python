@@ -83,6 +83,7 @@ class SshKeyManager(IdentifierMixin, object):
         return self.client['Account'].getSshKeys(filter=_filter.to_dict())
 
     def _get_ids_from_label(self, label):
+        """ Return sshkey IDs which match the given label """
         keys = self.list_keys()
         results = []
         for key in keys:

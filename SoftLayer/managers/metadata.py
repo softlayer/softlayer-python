@@ -59,20 +59,24 @@ class MetadataManager(object):
         self.client = client
 
     def make_request(self, path):
+        """ Make a request against the metadata service
+
+        :param string path: path to the specific metadata resource
+        """
         url = '/'.join([self.url, 'SoftLayer_Resource_Metadata', path])
         try:
             return make_rest_api_call('GET', url,
                                       http_headers={'User-Agent': USER_AGENT},
                                       timeout=self.timeout)
-        except SoftLayerAPIError as e:
-            if e.faultCode == 404:
+        except SoftLayerAPIError as ex:
+            if ex.faultCode == 404:
                 return None
-            raise e
+            raise ex
 
     def get(self, name, param=None):
         """ Retreive a metadata attribute
 
-        :param name: name of the attribute to retrieve. See `attribs`
+        :param string name: name of the attribute to retrieve. See `attribs`
         :param param: Required parameter for some attributes
 
         """
@@ -95,6 +99,14 @@ class MetadataManager(object):
         return self.make_request(path)
 
     def _get_network(self, kind, router=True, vlans=True, vlan_ids=True):
+        """ Wrapper for getting details about networks
+
+            :param string kind: network kind. Typically 'public' or 'private'
+            :param boolean router: flag to include router information
+            :param boolean vlans: flag to include vlan information
+            :param boolean vlan_ids: flag to include vlan_ids
+
+        """
         network = {}
         macs = self.get('%s_mac' % kind)
         network['mac_addresses'] = macs

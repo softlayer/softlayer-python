@@ -44,9 +44,9 @@ Optional:
         if args.get('--key'):
             key = args['--key']
         else:
-            f = open(expanduser(args['--file']), 'rU')
-            key = f.read().strip()
-            f.close()
+            key_file = open(expanduser(args['--file']), 'rU')
+            key = key_file.read().strip()
+            key_file.close()
 
         mgr = SshKeyManager(self.client)
         result = mgr.add_key(key, args['<label>'], args.get('--notes'))
@@ -97,13 +97,9 @@ Options:
         key_id = resolve_id(mgr.resolve_ids,
                             args.get('<identifier>'), 'SshKey')
 
-        data = {}
-        if args.get('--label'):
-            data['label'] = args['--label']
-        if args.get('--notes'):
-            data['notes'] = args['--notes']
-
-        if not mgr.edit_key(key_id, **data):
+        if not mgr.edit_key(key_id,
+                            label=args['--label'],
+                            notes=args['--notes']):
             raise CLIAbort('Failed to edit SSH key')
 
 
@@ -123,13 +119,15 @@ Options:
         mgr = SshKeyManager(self.client)
         keys = mgr.list_keys()
 
-        t = Table(['id', 'label', 'fingerprint', 'notes'])
+        table = Table(['id', 'label', 'fingerprint', 'notes'])
 
         for key in keys:
-            t.add_row([key['id'], key['label'], key['fingerprint'],
-                       key.get('notes', '-')])
+            table.add_row([key['id'],
+                           key['label'],
+                           key['fingerprint'],
+                           key.get('notes', '-')])
 
-        return t
+        return table
 
 
 class PrintSshKey(CLIRunnable):
@@ -153,12 +151,11 @@ Options:
         key = mgr.get_key(key_id)
 
         if args.get('--file'):
-            f = open(expanduser(args['--file']), 'w')
-            f.write(key['key'])
-            f.close()
+            with open(expanduser(args['--file']), 'w') as pub_file:
+                pub_file.write(key['key'])
 
-        t = KeyValueTable(['Name', 'Value'])
-        t.add_row(['id', key['id']])
-        t.add_row(['label', key['label']])
-        t.add_row(['notes', key.get('notes', '-')])
-        return t
+        table = KeyValueTable(['Name', 'Value'])
+        table.add_row(['id', key['id']])
+        table.add_row(['label', key['label']])
+        table.add_row(['notes', key.get('notes', '-')])
+        return table

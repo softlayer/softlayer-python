@@ -52,10 +52,10 @@ def export_to_template(filename, args, exclude=None):
     exclude.append('--format')
     exclude.append('--debug')
 
-    with open(filename, "w") as f:
-        for k, v in args.items():
-            if v and k.startswith('-') and k not in exclude:
+    with open(filename, "w") as template_file:
+        for k, val in args.items():
+            if val and k.startswith('-') and k not in exclude:
                 k = k.lstrip('-')
-                if isinstance(v, list):
-                    v = ','.join(v)
-                f.write('%s=%s\n' % (k, v))
+                if isinstance(val, list):
+                    val = ','.join(val)
+                template_file.write('%s=%s\n' % (k, val))

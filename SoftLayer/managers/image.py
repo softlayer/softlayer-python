@@ -29,7 +29,7 @@ class ImageManager(IdentifierMixin, object):
         """ Get details about an image
 
         :param int image: The ID of the image.
-        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         """
         if 'mask' not in kwargs:
             kwargs['mask'] = IMAGE_MASK
@@ -48,7 +48,7 @@ class ImageManager(IdentifierMixin, object):
 
         :param string guid: filter based on GUID
         :param string name: filter based on name
-        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         """
         if 'mask' not in kwargs:
             kwargs['mask'] = IMAGE_MASK
@@ -72,7 +72,7 @@ class ImageManager(IdentifierMixin, object):
 
         :param string guid: filter based on GUID
         :param string name: filter based on name
-        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         """
         if 'mask' not in kwargs:
             kwargs['mask'] = IMAGE_MASK
@@ -89,9 +89,11 @@ class ImageManager(IdentifierMixin, object):
         return self.vgbdtg.getPublicImages(**kwargs)
 
     def _get_ids_from_name_public(self, name):
+        """ Get public images which match the given name """
         results = self.list_public_images(name=name)
         return [result['id'] for result in results]
 
     def _get_ids_from_name_private(self, name):
+        """ Get private images which match the given name """
         results = self.list_private_images(name=name)
         return [result['id'] for result in results]

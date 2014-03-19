@@ -100,8 +100,9 @@ Filters:
         return self.list_all_zones()
 
     def list_zone(self, args):
+        """ list records for a particular zone """
         manager = DNSManager(self.client)
-        t = Table([
+        table = Table([
             "id",
             "record",
             "type",
@@ -109,9 +110,9 @@ Filters:
             "value",
         ])
 
-        t.align['ttl'] = 'l'
-        t.align['record'] = 'r'
-        t.align['value'] = 'l'
+        table.align['ttl'] = 'l'
+        table.align['record'] = 'r'
+        table.align['value'] = 'l'
 
         zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
 
@@ -126,38 +127,39 @@ Filters:
         except DNSZoneNotFound:
             raise CLIAbort("No zone found matching: %s" % args['<zone>'])
 
-        for rr in records:
-            t.add_row([
-                rr['id'],
-                rr['host'],
-                rr['type'].upper(),
-                rr['ttl'],
-                rr['data']
+        for record in records:
+            table.add_row([
+                record['id'],
+                record['host'],
+                record['type'].upper(),
+                record['ttl'],
+                record['data']
             ])
 
-        return t
+        return table
 
     def list_all_zones(self):
+        """ List all zones """
         manager = DNSManager(self.client)
         zones = manager.list_zones()
-        t = Table([
+        table = Table([
             "id",
             "zone",
             "serial",
             "updated",
         ])
-        t.align['serial'] = 'c'
-        t.align['updated'] = 'c'
+        table.align['serial'] = 'c'
+        table.align['updated'] = 'c'
 
-        for z in zones:
-            t.add_row([
-                z['id'],
-                z['name'],
-                z['serial'],
-                z['updateDate'],
+        for zone in zones:
+            table.add_row([
+                zone['id'],
+                zone['name'],
+                zone['serial'],
+                zone['updateDate'],
             ])
 
-        return t
+        return table
 
 
 class AddRecord(CLIRunnable):
@@ -221,12 +223,12 @@ Options:
         except DNSZoneNotFound:
             raise CLIAbort("No zone found matching: %s" % args['<zone>'])
 
-        for r in results:
-            if args['--id'] and str(r['id']) != args['--id']:
+        for result in results:
+            if args['--id'] and str(result['id']) != args['--id']:
                 continue
-            r['data'] = args['--data'] or r['data']
-            r['ttl'] = args['--ttl'] or r['ttl']
-            manager.edit_record(r)
+            result['data'] = args['--data'] or result['data']
+            result['ttl'] = args['--ttl'] or result['ttl']
+            manager.edit_record(result)
 
 
 class RecordRemove(CLIRunnable):
@@ -260,12 +262,12 @@ Options:
                 raise CLIAbort("No zone found matching: %s" % args['<zone>'])
 
         if args['--really'] or no_going_back('yes'):
-            t = Table(['record'])
-            for r in records:
-                if args.get('--id') and args['--id'] != r['id']:
+            table = Table(['record'])
+            for result in records:
+                if args.get('--id') and args['--id'] != result['id']:
                     continue
-                manager.delete_record(r['id'])
-                t.add_row([r['id']])
+                manager.delete_record(result['id'])
+                table.add_row([result['id']])
 
-            return t
+            return table
         raise CLIAbort("Aborted.")

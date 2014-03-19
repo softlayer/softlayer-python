@@ -16,6 +16,8 @@ from SoftLayer.CLI.modules import get_module_list
 from SoftLayer.utils import console_input
 from SoftLayer import SoftLayerError
 
+# pylint: disable=R0201
+
 
 class InvalidCommand(SoftLayerError):
     " Raised when trying to use a command that does not exist "
@@ -35,6 +37,7 @@ class InvalidModule(SoftLayerError):
 
 
 class Environment(object):
+    """ Provides access to the current CLI environment """
     # {'module_name': {'action': 'actionClass'}}
     plugins = {}
     aliases = {
@@ -49,6 +52,7 @@ class Environment(object):
     stderr = sys.stderr
 
     def get_command(self, module_name, command_name):
+        """ Based on the loaded modules, return a command """
         actions = self.plugins.get(module_name) or {}
         if command_name in actions:
             return actions[command_name]
@@ -57,11 +61,13 @@ class Environment(object):
         raise InvalidCommand(module_name, command_name)
 
     def get_module_name(self, module_name):
+        """ Returns the actual module name. Uses the alias mapping """
         if module_name in self.aliases:
             return self.aliases[module_name]
         return module_name
 
     def load_module(self, module_name):  # pragma: no cover
+        """ Loads module by name """
         try:
             module = import_module('SoftLayer.CLI.modules.%s' % module_name)
             for _, obj in inspect.getmembers(module):
@@ -72,35 +78,44 @@ class Environment(object):
             raise InvalidModule(module_name)
 
     def add_plugin(self, cls):
+        """ Add a CLIRunnable as a plugin to the environment """
         command = cls.__module__.split('.')[-1]
         if command not in self.plugins:
             self.plugins[command] = {}
         self.plugins[command][cls.action] = cls
 
     def plugin_list(self):
+        """ Returns the list of modules in SoftLayer.CLI.modules """
         return get_module_list()
 
-    def out(self, s, nl=True):
-        self.stdout.write(s)
-        if nl:
+    def out(self, output, newline=True):
+        """ Outputs a string to the console (stdout) """
+        self.stdout.write(output)
+        if newline:
             self.stdout.write(os.linesep)
 
-    def err(self, s, nl=True):
-        self.stderr.write(s)
-        if nl:
+    def err(self, output, newline=True):
+        """ Outputs an error string to the console (stderr) """
+        self.stderr.write(output)
+        if newline:
             self.stderr.write(os.linesep)
 
     def input(self, prompt):
+        """ Provide a command prompt """
         return console_input(prompt)
 
     def getpass(self, prompt):
+        """ Provide a password prompt """
         return getpass.getpass(prompt)
 
     def exit(self, code=0):
+        """ Exit """
         sys.exit(code)
 
 
 class CLIRunnable(object):
+    """ CLIRunnable is intended to be subclassed. It represents a descrete
+        command or action in the CLI. """
     options = []  # set by subclass
     action = 'not set'  # set by subclass
 
@@ -109,4 +124,6 @@ class CLIRunnable(object):
         self.env = env
 
     def execute(self, args):
+        """ Execute the command. This is intended to be overridden in a
+            subclass """
         pass

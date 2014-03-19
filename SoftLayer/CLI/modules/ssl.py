@@ -37,16 +37,16 @@ Options:
 
         certificates = manager.list_certs(args['--status'])
 
-        t = Table(['id', 'common_name', 'days_until_expire', 'notes'])
+        table = Table(['id', 'common_name', 'days_until_expire', 'notes'])
         for certificate in certificates:
-            t.add_row([
+            table.add_row([
                 certificate['id'],
                 certificate['commonName'],
                 certificate['validityDays'],
                 certificate.get('notes', blank())
             ])
-        t.sortby = args['--sortby']
-        return t
+        table.sortby = args['--sortby']
+        return table
 
 
 class AddCertificate(CLIRunnable):
@@ -146,11 +146,9 @@ Download SSL certificate and key file
 
     def execute(self, args):
         def write_cert(filename, content):
-            try:
-                fo = open(filename, 'w')
-                fo.write(content)
-            finally:
-                fo.close()
+            """ Writes certificate body to the given file path """
+            with open(filename, 'w') as cert_file:
+                cert_file.write(content)
 
         manager = SSLManager(self.client)
         certificate = manager.get_certificate(args['<id>'])

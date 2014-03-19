@@ -25,22 +25,23 @@ Options:
     def execute(self, args):
         account = self.client['Account']
 
-        nas = account.getNasNetworkStorage(
+        nas_accounts = account.getNasNetworkStorage(
             mask='eventCount,serviceResource[datacenter.name]')
-        nas = [NestedDict(n) for n in nas]
+        nas_accounts = [NestedDict(n) for n in nas_accounts]
 
-        t = Table(['id', 'datacenter', 'size', 'username', 'password',
-                   'server'])
+        table = Table(['id', 'datacenter', 'size', 'username', 'password',
+                       'server'])
 
-        for n in nas:
-            t.add_row([
-                n['id'],
-                n['serviceResource']['datacenter'].get('name', blank()),
+        for nas_account in nas_accounts:
+            table.add_row([
+                nas_account['id'],
+                nas_account['serviceResource']['datacenter'].get('name',
+                                                                 blank()),
                 FormattedItem(
-                    n.get('capacityGb', blank()),
-                    "%dGB" % n.get('capacityGb', 0)),
-                n.get('username', blank()),
-                n.get('password', blank()),
-                n.get('serviceResourceBackendIpAddress', blank())])
+                    nas_account.get('capacityGb', blank()),
+                    "%dGB" % nas_account.get('capacityGb', 0)),
+                nas_account.get('username', blank()),
+                nas_account.get('password', blank()),
+                nas_account.get('serviceResourceBackendIpAddress', blank())])
 
-        return t
+        return table

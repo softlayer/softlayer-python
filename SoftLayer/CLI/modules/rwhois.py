@@ -62,7 +62,7 @@ Options:
         if not check:
             raise CLIAbort("You must specify at least one field to update.")
 
-        mgr.edit_rwhois(**update)
+        mgr.edit_rwhois(**update)  # pylint: disable=W0142
 
 
 class RWhoisShow(CLIRunnable):
@@ -77,18 +77,18 @@ Display the RWhois information for your account.
         mgr = NetworkManager(self.client)
         result = mgr.get_rwhois()
 
-        t = KeyValueTable(['Name', 'Value'])
-        t.align['Name'] = 'r'
-        t.align['Value'] = 'l'
-        t.add_row(['Name', result['firstName'] + ' ' + result['lastName']])
-        t.add_row(['Company', result['companyName']])
-        t.add_row(['Abuse Email', result['abuseEmail']])
-        t.add_row(['Address 1', result['address1']])
+        table = KeyValueTable(['Name', 'Value'])
+        table.align['Name'] = 'r'
+        table.align['Value'] = 'l'
+        table.add_row(['Name', result['firstName'] + ' ' + result['lastName']])
+        table.add_row(['Company', result['companyName']])
+        table.add_row(['Abuse Email', result['abuseEmail']])
+        table.add_row(['Address 1', result['address1']])
         if result.get('address2'):
-            t.add_row(['Address 2', result['address2']])
-        t.add_row(['City', result['city']])
-        t.add_row(['State', result.get('state', '-')])
-        t.add_row(['Postal Code', result.get('postalCode', '-')])
-        t.add_row(['Country', result['country']])
+            table.add_row(['Address 2', result['address2']])
+        table.add_row(['City', result['city']])
+        table.add_row(['State', result.get('state', '-')])
+        table.add_row(['Postal Code', result.get('postalCode', '-')])
+        table.add_row(['Country', result['country']])
 
-        return t
+        return table

@@ -6,6 +6,8 @@ usage: sl help [options]
 View help on a module or command.
 """
 # :license: MIT, see LICENSE for more details.
+# Missing docstrings ignored due to __doc__ = __doc__ magic
+# pylint: disable=C0111
 
 from SoftLayer.CLI.core import CommandParser
 from SoftLayer.CLI import CLIRunnable

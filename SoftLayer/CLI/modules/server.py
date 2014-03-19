@@ -78,7 +78,7 @@ For more on filters see 'sl help filters'
             nic_speed=args.get('--network'),
             tags=tags)
 
-        t = Table([
+        table = Table([
             'id',
             'datacenter',
             'host',
@@ -88,11 +88,11 @@ For more on filters see 'sl help filters'
             'backend_ip',
             'active_transaction'
         ])
-        t.sortby = args.get('--sortby') or 'host'
+        table.sortby = args.get('--sortby') or 'host'
 
         for server in servers:
             server = NestedDict(server)
-            t.add_row([
+            table.add_row([
                 server['id'],
                 server['datacenter']['name'] or blank(),
                 server['fullyQualifiedDomainName'],
@@ -103,7 +103,7 @@ For more on filters see 'sl help filters'
                 active_txn(server),
             ])
 
-        return t
+        return table
 
 
 class ServerDetails(CLIRunnable):
@@ -121,27 +121,27 @@ Options:
     def execute(self, args):
         hardware = HardwareManager(self.client)
 
-        t = KeyValueTable(['Name', 'Value'])
-        t.align['Name'] = 'r'
-        t.align['Value'] = 'l'
+        table = KeyValueTable(['Name', 'Value'])
+        table.align['Name'] = 'r'
+        table.align['Value'] = 'l'
 
         hardware_id = resolve_id(
             hardware.resolve_ids, args.get('<identifier>'), 'hardware')
         result = hardware.get_hardware(hardware_id)
         result = NestedDict(result)
 
-        t.add_row(['id', result['id']])
-        t.add_row(['hostname', result['fullyQualifiedDomainName']])
-        t.add_row(['status', result['hardwareStatus']['status']])
-        t.add_row(['datacenter', result['datacenter']['name'] or blank()])
-        t.add_row(['cores', result['processorPhysicalCoreAmount']])
-        t.add_row(['memory', gb(result['memoryCapacity'])])
-        t.add_row(['public_ip', result['primaryIpAddress'] or blank()])
-        t.add_row(
+        table.add_row(['id', result['id']])
+        table.add_row(['hostname', result['fullyQualifiedDomainName']])
+        table.add_row(['status', result['hardwareStatus']['status']])
+        table.add_row(['datacenter', result['datacenter']['name'] or blank()])
+        table.add_row(['cores', result['processorPhysicalCoreAmount']])
+        table.add_row(['memory', gb(result['memoryCapacity'])])
+        table.add_row(['public_ip', result['primaryIpAddress'] or blank()])
+        table.add_row(
             ['private_ip', result['primaryBackendIpAddress'] or blank()])
-        t.add_row(['ipmi_ip',
-                   result['networkManagementIpAddress'] or blank()])
-        t.add_row([
+        table.add_row(['ipmi_ip',
+                       result['networkManagementIpAddress'] or blank()])
+        table.add_row([
             'os',
             FormattedItem(
                 result['operatingSystem']['softwareLicense']
@@ -149,33 +149,34 @@ Options:
                 result['operatingSystem']['softwareLicense']
                 ['softwareDescription']['name'] or blank()
             )])
-        t.add_row(['created', result['provisionDate'] or blank()])
+        table.add_row(['created', result['provisionDate'] or blank()])
 
         vlan_table = Table(['type', 'number', 'id'])
         for vlan in result['networkVlans']:
             vlan_table.add_row([
                 vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
-        t.add_row(['vlans', vlan_table])
+        table.add_row(['vlans', vlan_table])
 
         if result.get('notes'):
-            t.add_row(['notes', result['notes']])
+            table.add_row(['notes', result['notes']])
 
         if args.get('--price'):
-            t.add_row(['price rate', result['billingItem']['recurringFee']])
+            table.add_row(['price rate',
+                           result['billingItem']['recurringFee']])
 
         if args.get('--passwords'):
             user_strs = []
             for item in result['operatingSystem']['passwords']:
                 user_strs.append(
                     "%s %s" % (item['username'], item['password']))
-            t.add_row(['users', listing(user_strs)])
+            table.add_row(['users', listing(user_strs)])
 
         tag_row = []
         for tag in result['tagReferences']:
             tag_row.append(tag['tag']['name'])
 
         if tag_row:
-            t.add_row(['tags', listing(tag_row, separator=',')])
+            table.add_row(['tags', listing(tag_row, separator=',')])
 
         if not result['privateNetworkOnlyFlag']:
             ptr_domains = self.client['Hardware_Server']\
@@ -183,9 +184,9 @@ Options:
 
             for ptr_domain in ptr_domains:
                 for ptr in ptr_domain['resourceRecords']:
-                    t.add_row(['ptr', ptr['data']])
+                    table.add_row(['ptr', ptr['data']])
 
-        return t
+        return table
 
 
 class ServerReload(CLIRunnable):
@@ -236,9 +237,9 @@ Options:
     options = ['confirm']
 
     def execute(self, args):
-        hw = HardwareManager(self.client)
+        mgr = HardwareManager(self.client)
         hw_id = resolve_id(
-            hw.resolve_ids, args.get('<identifier>'), 'hardware')
+            mgr.resolve_ids, args.get('<identifier>'), 'hardware')
 
         comment = args.get('--comment')
 
@@ -248,7 +249,7 @@ Options:
         reason = args.get('--reason')
 
         if args['--really'] or no_going_back(hw_id):
-            hw.cancel_hardware(hw_id, reason, comment)
+            mgr.cancel_hardware(hw_id, reason, comment)
         else:
             CLIAbort('Aborted')
 
@@ -263,16 +264,16 @@ Display a list of cancellation reasons
     action = 'cancel-reasons'
 
     def execute(self, args):
-        t = Table(['Code', 'Reason'])
-        t.align['Code'] = 'r'
-        t.align['Reason'] = 'l'
+        table = Table(['Code', 'Reason'])
+        table.align['Code'] = 'r'
+        table.align['Reason'] = 'l'
 
         mgr = HardwareManager(self.client)
 
         for code, reason in mgr.get_cancellation_reasons().items():
-            t.add_row([code, reason])
+            table.add_row([code, reason])
 
-        return t
+        return table
 
 
 class ServerPowerOff(CLIRunnable):
@@ -285,13 +286,12 @@ Power off an active server
     options = ['confirm']
 
     def execute(self, args):
-        hw = self.client['Hardware_Server']
         mgr = HardwareManager(self.client)
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
                            'hardware')
         if args['--really'] or confirm('This will power off the server with '
                                        'id %s. Continue?' % hw_id):
-            hw.powerOff(id=hw_id)
+            self.client['Hardware_Server'].powerOff(id=hw_id)
         else:
             raise CLIAbort('Aborted.')
 
@@ -310,18 +310,18 @@ Optional:
     options = ['confirm']
 
     def execute(self, args):
-        hw = self.client['Hardware_Server']
+        hardware_server = self.client['Hardware_Server']
         mgr = HardwareManager(self.client)
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
                            'hardware')
         if args['--really'] or confirm('This will power off the server with '
                                        'id %s. Continue?' % hw_id):
             if args['--hard']:
-                hw.rebootHard(id=hw_id)
+                hardware_server.rebootHard(id=hw_id)
             elif args['--soft']:
-                hw.rebootSoft(id=hw_id)
+                hardware_server.rebootSoft(id=hw_id)
             else:
-                hw.rebootDefault(id=hw_id)
+                hardware_server.rebootDefault(id=hw_id)
         else:
             raise CLIAbort('Aborted.')
 
@@ -335,11 +335,10 @@ Power on a server
     action = 'power-on'
 
     def execute(self, args):
-        hw = self.client['Hardware_Server']
         mgr = HardwareManager(self.client)
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
                            'hardware')
-        hw.powerOn(id=hw_id)
+        self.client['Hardware_Server'].powerOn(id=hw_id)
 
 
 class ServerPowerCycle(CLIRunnable):
@@ -352,14 +351,13 @@ Issues power cycle to server via the power strip
     options = ['confirm']
 
     def execute(self, args):
-        hw = self.client['Hardware_Server']
         mgr = HardwareManager(self.client)
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
                            'hardware')
 
         if args['--really'] or confirm('This will power off the server with '
                                        'id %s. Continue?' % hw_id):
-            hw.powerCycle(id=hw_id)
+            self.client['Hardware_Server'].powerCycle(id=hw_id)
         else:
             raise CLIAbort('Aborted.')
 
@@ -396,17 +394,17 @@ Display a list of chassis available for ordering dedicated servers.
     action = 'list-chassis'
 
     def execute(self, args):
-        t = Table(['Code', 'Chassis'])
-        t.align['Code'] = 'r'
-        t.align['Chassis'] = 'l'
+        table = Table(['Code', 'Chassis'])
+        table.align['Code'] = 'r'
+        table.align['Chassis'] = 'l'
 
         mgr = HardwareManager(self.client)
         chassis = mgr.get_available_dedicated_server_packages()
 
         for chassis in chassis:
-            t.add_row([chassis[0], chassis[1]])
+            table.add_row([chassis[0], chassis[1]])
 
-        return t
+        return table
 
 
 class ServerCreateOptions(CLIRunnable):
@@ -434,9 +432,9 @@ Options:
     def execute(self, args):
         mgr = HardwareManager(self.client)
 
-        t = KeyValueTable(['Name', 'Value'])
-        t.align['Name'] = 'r'
-        t.align['Value'] = 'l'
+        table = KeyValueTable(['Name', 'Value'])
+        table.align['Name'] = 'r'
+        table.align['Value'] = 'l'
 
         chassis_id = args.get('<chassis_id>')
 
@@ -454,7 +452,7 @@ Options:
         if args['--datacenter'] or show_all:
             results = self.get_create_options(ds_options, 'datacenter')[0]
 
-            t.add_row([results[0], listing(sorted(results[1]))])
+            table.add_row([results[0], listing(sorted(results[1]))])
 
         if args['--cpu'] or show_all:
             results = self.get_create_options(ds_options, 'cpu')
@@ -462,19 +460,19 @@ Options:
             cpu_table = Table(['id', 'description'])
             for result in sorted(results):
                 cpu_table.add_row([result[1], result[0]])
-            t.add_row(['cpu', cpu_table])
+            table.add_row(['cpu', cpu_table])
 
         if args['--memory'] or show_all:
             results = self.get_create_options(ds_options, 'memory')[0]
 
-            t.add_row([results[0], listing(
+            table.add_row([results[0], listing(
                 item[0] for item in sorted(results[1]))])
 
         if args['--os'] or show_all:
             results = self.get_create_options(ds_options, 'os')
 
             for result in results:
-                t.add_row([
+                table.add_row([
                     result[0],
                     listing(
                         [item[0] for item in sorted(result[1])],
@@ -484,7 +482,7 @@ Options:
         if args['--disk'] or show_all:
             results = self.get_create_options(ds_options, 'disk')[0]
 
-            t.add_row([
+            table.add_row([
                 results[0],
                 listing(
                     [item[0] for item in sorted(results[1])],
@@ -495,16 +493,16 @@ Options:
             results = self.get_create_options(ds_options, 'nic')
 
             for result in results:
-                t.add_row([result[0], listing(
+                table.add_row([result[0], listing(
                     item[0] for item in sorted(result[1],))])
 
         if args['--controller'] or show_all:
             results = self.get_create_options(ds_options, 'disk_controller')[0]
 
-            t.add_row([results[0], listing(
+            table.add_row([results[0], listing(
                 item[0] for item in sorted(results[1],))])
 
-        return t
+        return table
 
     def get_create_options(self, ds_options, section, pretty=True):
         """ This method can be used to parse the bare metal instance creation
@@ -539,12 +537,14 @@ Options:
 
             return [('memory', ram)]
         elif 'os' == section:
-            os_regex = re.compile('(^[A-Za-z\s\/\-]+) ([\d\.]+)')
-            bit_regex = re.compile(' \((\d+)\s*bit')
-            extra_regex = re.compile(' - (.+)\(')
+            os_regex = re.compile(r'(^[A-Za-z\s\/\-]+) ([\d\.]+)')
+            bit_regex = re.compile(r' \((\d+)\s*bit')
+            extra_regex = re.compile(r' - (.+)\(')
 
-            # Encapsulate the code for generating the operating system code
             def _generate_os_code(name, version, bits, extra_info):
+                """ Encapsulates the code for generating the operating system
+                    code.
+                """
                 name = name.replace(' Linux', '')
                 name = name.replace('Enterprise', '')
                 name = name.replace('GNU/Linux', '')
@@ -555,7 +555,7 @@ Options:
                     os_code = 'REDHAT'
 
                 if 'UBUNTU' in os_code:
-                    version = re.sub('\.\d+', '', version)
+                    version = re.sub(r'\.\d+', '', version)
 
                 os_code += '_' + version.replace('.0', '')
 
@@ -565,8 +565,8 @@ Options:
                 if extra_info:
                     garbage = ['Install', '(32 bit)', '(64 bit)']
 
-                    for g in garbage:
-                        extra_info = extra_info.replace(g, '')
+                    for obj in garbage:
+                        extra_info = extra_info.replace(obj, '')
 
                     os_code += '_' + \
                                extra_info.strip().replace(' ', '_').upper()
@@ -576,7 +576,10 @@ Options:
             # Also separate out the code for generating the Windows OS code
             # since it's significantly different from the rest.
             def _generate_windows_code(description):
-                version_check = re.search('Windows Server (\d+)', description)
+                """ Separates the code for generating the Windows OS code
+                    since it's significantly different from the rest.
+                """
+                version_check = re.search(r'Windows Server (\d+)', description)
                 version = version_check.group(1)
 
                 os_code = 'WIN_' + version
@@ -593,7 +596,7 @@ Options:
                 elif 'ith Hyper-V' in description:
                     os_code += '-HYPERV'
 
-                bit_check = re.search('\((\d+)\s*bit', description)
+                bit_check = re.search(r'\((\d+)\s*bit', description)
                 if bit_check:
                     os_code += '_' + bit_check.group(1)
 
@@ -640,7 +643,7 @@ Options:
 
         elif 'disk' == section:
             disks = []
-            type_regex = re.compile('^[\d\.]+[GT]B\s+(.+)$')
+            type_regex = re.compile(r'^[\d\.]+[GT]B\s+(.+)$')
             for disk in ds_options['categories']['disk0']['items']:
                 disk_type = 'SATA'
                 disk_type = type_regex.match(disk['description']).group(1)
@@ -815,20 +818,20 @@ Optional:
         if args.get('--test'):
             result = mgr.verify_order(**order)
 
-            t = Table(['Item', 'cost'])
-            t.align['Item'] = 'r'
-            t.align['cost'] = 'r'
+            table = Table(['Item', 'cost'])
+            table.align['Item'] = 'r'
+            table.align['cost'] = 'r'
 
             total = 0.0
             for price in result['prices']:
                 total += float(price.get('recurringFee', 0.0))
                 rate = "%.2f" % float(price['recurringFee'])
 
-                t.add_row([price['item']['description'], rate])
+                table.add_row([price['item']['description'], rate])
 
-            t.add_row(['Total monthly cost', "%.2f" % total])
+            table.add_row(['Total monthly cost', "%.2f" % total])
             output = []
-            output.append(t)
+            output.append(table)
             output.append(FormattedItem(
                 '',
                 ' -- ! Prices reflected here are retail and do not '
@@ -846,24 +849,26 @@ Optional:
                     "Continue?"):
                 result = mgr.place_order(**order)
 
-                t = KeyValueTable(['name', 'value'])
-                t.align['name'] = 'r'
-                t.align['value'] = 'l'
-                t.add_row(['id', result['orderId']])
-                t.add_row(['created', result['orderDate']])
-                output = t
+                table = KeyValueTable(['name', 'value'])
+                table.align['name'] = 'r'
+                table.align['value'] = 'l'
+                table.add_row(['id', result['orderId']])
+                table.add_row(['created', result['orderDate']])
+                output = table
             else:
                 raise CLIAbort('Aborting dedicated server order.')
 
         return output
 
     def _validate_args(self, args):
+        """ Raises an ArgumentError if the given arguments are not valid """
         invalid_args = [k for k in self.required_params if args.get(k) is None]
         if invalid_args:
             raise ArgumentError('Missing required options: %s'
                                 % ','.join(invalid_args))
 
     def _get_default_value(self, ds_options, option):
+        """ Returns a 'free' price id given an option """
         if option not in ds_options['categories']:
             return
 
@@ -878,6 +883,7 @@ Optional:
                 return item['price_id']
 
     def _get_disk_price(self, ds_options, value, number):
+        """ Returns a price id that matches a given disk config """
         if not number:
             return self._get_price_id_from_options(ds_options, 'disk', value)
         # This will get the item ID for the matching identifier string, which
@@ -892,10 +898,11 @@ Optional:
 
     def _get_price_id_from_options(self, ds_options, option, value,
                                    item_id=False):
+        """ Returns a price_id for a given option and value """
         ds_obj = ServerCreateOptions()
 
-        for _, v in ds_obj.get_create_options(ds_options, option, False):
-            for item_options in v:
+        for _, options in ds_obj.get_create_options(ds_options, option, False):
+            for item_options in options:
                 if item_options[0] == value:
                     if not item_id:
                         return item_options[1]
@@ -931,17 +938,14 @@ Options:
         if args.get('--userdata'):
             data['userdata'] = args['--userdata']
         elif args.get('--userfile'):
-            f = open(args['--userfile'], 'r')
-            try:
-                data['userdata'] = f.read()
-            finally:
-                f.close()
+            with open(args['--userfile'], 'r') as userfile:
+                data['userdata'] = userfile.read()
 
         data['hostname'] = args.get('--hostname')
         data['domain'] = args.get('--domain')
 
-        hw = HardwareManager(self.client)
-        hw_id = resolve_id(hw.resolve_ids, args.get('<identifier>'),
+        mgr = HardwareManager(self.client)
+        hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
                            'hardware')
-        if not hw.edit(hw_id, **data):
+        if not mgr.edit(hw_id, **data):
             raise CLIAbort("Failed to update hardware")

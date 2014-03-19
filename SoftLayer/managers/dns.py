@@ -24,6 +24,7 @@ class DNSManager(IdentifierMixin, object):
         self.resolvers = [self._get_zone_id_from_name]
 
     def _get_zone_id_from_name(self, name):
+        """ Return zone ID based on a zone """
         results = self.client['Account'].getDomains(
             filter={"domains": {"name": query_filter(name)}})
         return [x['id'] for x in results]
@@ -31,7 +32,7 @@ class DNSManager(IdentifierMixin, object):
     def list_zones(self, **kwargs):
         """ Retrieve a list of all DNS zones.
 
-        :param dict \*\*kwargs: response-level arguments (limit, offset, etc.)
+        :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         :returns: A list of dictionaries representing the matching zones.
 
         """
