@@ -33,6 +33,7 @@ Storage:
 
 General:
   config    View and edit configuration for this tool
+  ticket    Mange account tickets
   summary   Display an overall summary of your account
   help      Show help
 

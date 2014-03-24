@@ -7,8 +7,9 @@
 from mock import MagicMock, patch
 
 import SoftLayer
-import SoftLayer.CLI as cli
+
 from SoftLayer.tests import unittest
+from SoftLayer.CLI import core
 from SoftLayer.CLI.helpers import CLIAbort
 from SoftLayer.CLI.environment import Environment, InvalidModule, CLIRunnable
 
@@ -63,14 +64,14 @@ class CommandLineTests(unittest.TestCase):
     def test_normal_path(self):
         self.env.get_module_name.return_value = 'cci'
         self.assertRaises(
-            SystemExit, cli.core.main,
+            SystemExit, core.main,
             args=['cci', 'list', '--config=path/to/config'],
             env=self.env)
         self.assertRaises(
-            SystemExit, cli.core.main,
+            SystemExit, core.main,
             args=['cci', 'nope', '--config=path/to/config'], env=self.env)
         self.assertRaises(
-            SystemExit, cli.core.main,
+            SystemExit, core.main,
             args=['cci', 'list', '--format=totallynotvalid'], env=self.env)
 
     @patch('SoftLayer.TimedClient.get_last_calls')
@@ -78,7 +79,7 @@ class CommandLineTests(unittest.TestCase):
         calls_mock.return_value = [('SERVICE.METHOD', 1000, 0.25)]
         self.env.get_module_name.return_value = 'cci'
         self.assertRaises(
-            SystemExit, cli.core.main,
+            SystemExit, core.main,
             args=['cci', 'list', '--config=path/to/config', '--timings'],
             env=self.env)
         calls_mock.assert_called()
@@ -88,7 +89,7 @@ class CommandLineTests(unittest.TestCase):
     def test_with_debug(self, stream_handler, logger):
         self.env.get_module_name.return_value = 'cci'
         self.assertRaises(
-            SystemExit, cli.core.main,
+            SystemExit, core.main,
             args=['cci', 'list', '--debug=3'],
             env=self.env)
         logger().setLevel.assert_called_with(10)
@@ -97,7 +98,7 @@ class CommandLineTests(unittest.TestCase):
     def test_invalid_module(self):
         self.env.get_module_name.return_value = 'nope'
         self.assertRaises(
-            SystemExit, cli.core.main,
+            SystemExit, core.main,
             args=['nope', 'list', '--config=path/to/config'], env=self.env)
 
     def test_module_with_no_command(self):
@@ -107,7 +108,7 @@ class CommandLineTests(unittest.TestCase):
         self.env.get_module_name.return_value = 'cci'
         self.env.load_module = MagicMock()
         self.env.load_module.return_value = module_no_command_fixture
-        resolver = cli.core.CommandParser(self.env)
+        resolver = core.CommandParser(self.env)
         command, command_args = resolver.parse(['cci', 'list'])
         self.assertEqual(submodule_fixture, command)
 
@@ -117,53 +118,53 @@ class CommandLineTests(unittest.TestCase):
             'cci': {'list': submodule_fixture}
         }
         self.assertRaises(
-            SystemExit, cli.core.main,
+            SystemExit, core.main,
             args=['cci', 'list'],
             env=self.env)
 
     def test_help(self):
         self.env.get_module_name.return_value = 'help'
         self.assertRaises(
-            SystemExit, cli.core.main,
+            SystemExit, core.main,
             args=['help', 'cci', '--config=path/to/config'], env=self.env)
 
     def test_keyboard_interrupt(self):
         self.env.get_module_name.side_effect = KeyboardInterrupt
         self.assertRaises(
-            SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
+            SystemExit, core.main, args=['cci', 'list'], env=self.env)
 
     def test_abort(self):
         self.env.get_module_name.side_effect = CLIAbort('exit!')
         self.assertRaises(
-            SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
+            SystemExit, core.main, args=['cci', 'list'], env=self.env)
 
     def test_invalid_module_error(self):
         self.env.get_module_name.side_effect = InvalidModule('cci')
         self.assertRaises(
-            SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
+            SystemExit, core.main, args=['cci', 'list'], env=self.env)
 
     def test_softlayer_error(self):
         self.env.get_module_name.side_effect = SoftLayer.SoftLayerError
         self.assertRaises(
-            SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
+            SystemExit, core.main, args=['cci', 'list'], env=self.env)
 
     def test_softlayer_api_error(self):
         error = SoftLayer.SoftLayerAPIError('Exception', 'Exception Text')
         self.env.get_module_name.side_effect = error
         self.assertRaises(
-            SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
+            SystemExit, core.main, args=['cci', 'list'], env=self.env)
 
     def test_softlayer_api_error_authentication_error(self):
         error = SoftLayer.SoftLayerAPIError('SoftLayerException',
                                             'Invalid API Token')
         self.env.get_module_name.side_effect = error
         self.assertRaises(
-            SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
+            SystemExit, core.main, args=['cci', 'list'], env=self.env)
 
     def test_system_exit_error(self):
         self.env.get_module_name.side_effect = SystemExit
         self.assertRaises(
-            SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
+            SystemExit, core.main, args=['cci', 'list'], env=self.env)
 
     @patch('traceback.format_exc')
     def test_uncaught_error(self, m):
@@ -174,14 +175,14 @@ class CommandLineTests(unittest.TestCase):
             m.return_value = 'testing'
             self.env.get_module_name.side_effect = err
             self.assertRaises(
-                SystemExit, cli.core.main, args=['cci', 'list'], env=self.env)
+                SystemExit, core.main, args=['cci', 'list'], env=self.env)
             m.assert_called_once_with()
 
 
 class TestCommandParser(unittest.TestCase):
     def setUp(self):
         self.env = EnvironmentFixture()
-        self.parser = cli.core.CommandParser(self.env)
+        self.parser = core.CommandParser(self.env)
 
     def test_main(self,):
         args = self.parser.parse_main_args(
