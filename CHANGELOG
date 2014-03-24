@@ -1,3 +1,18 @@
+3.1.0
+
+    * Adds CDN manager and CLI module
+
+    * Adds ticket manager and CLI module
+
+    * Adds image manager and improves image CLI module
+
+    * Adds the ability to specify a proxy URL for API bindings and the CLI
+
+    * six is now used to provide support for Python 2 and Python 3 with the same source
+
+    * Many bug fixes
+
+
 3.0.2
 
     * CLI+API: Simplified object mask reformatting and added support for more complex masks.
