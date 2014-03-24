@@ -1023,6 +1023,46 @@ def get_bmc_categories_mock():
 getCategories = get_server_categories_mock() + get_bmc_categories_mock()
 getItems = [
     {
+        'id': 1234,
+        'categories': [{'id': 26, 'name': 'Uplink Port Speeds'}],
+        'capacity': '1000',
+        'description': 'Public & Private Networks',
+        'itemCategory': {'categoryCode': 'Uplink Port Speeds'},
+        'prices': [{'id': 1122}],
+    },
+    {
+        'id': 2233,
+        'categories': [{'id': 26, 'name': 'Uplink Port Speeds'}],
+        'capacity': '1000',
+        'description': 'Public & Private Networks',
+        'itemCategory': {'categoryCode': 'Uplink Port Speeds'},
+        'prices': [{'id': 4477}],
+    },
+    {
+        'id': 1239,
+        'categories': [{'id': 3, 'name': 'RAM'}],
+        'capacity': '2',
+        'description': 'RAM',
+        'itemCategory': {'categoryCode': 'RAM'},
+        'prices': [{'id': 1133}],
+    },
+    {
+        'id': 1240,
+        'categories': [{'id': 80, 'name': 'Computing Instance'}],
+        'capacity': '4',
+        'description': 'Private Computing Instance',
+        'itemCategory': {'categoryCode': 'Computing Instance'},
+        'prices': [{'id': 1007}],
+    },
+    {
+        'id': 1250,
+        'categories': [{'id': 80, 'name': 'Computing Instance'}],
+        'capacity': '4',
+        'description': 'Computing Instance',
+        'itemCategory': {'categoryCode': 'Computing Instance'},
+        'prices': [{'id': 1144}],
+    },
+    {
         'id': 4440,
         'capacity': '4',
         'description': '4 Portable Public IP Addresses',

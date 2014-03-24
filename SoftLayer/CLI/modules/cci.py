@@ -21,6 +21,7 @@ The available commands are:
   reboot          Reboots a running CCI
   reload          Reload the OS on a CCI based on its current configuration
   resume          Resumes a paused CCI
+  upgrade         Upgrades parameters of a CCI
 
 For several commands, <identifier> will be asked for. This can be the id,
 hostname or the ip address for a CCI.
@@ -1015,3 +1016,65 @@ Optional:
         table.add_row(['transaction_id', capture['id']])
         table.add_row(['all_disks', additional_disks])
         return table
+
+
+class UpgradeCCI(CLIRunnable):
+    """
+usage: sl cci upgrade <identifier> [options]
+
+Upgrade parameters of an CCI
+
+Examples:
+    sl cci upgrade --cpus 2
+    sl cci upgrade --memory 2048 --network 1000
+Options:
+    --cpu=CPU          Number of CPU cores
+    --private          CPU core will be on a decicated host server.
+                       Default is Public.
+                       Public: Resources are in multi-tenant environment.
+    --memory=MEMORY    Memory in megabytes
+    --network=MBPS     Network port speed in Mbps
+
+Note: SoftLayer automatically reboots the CCI once upgrade request is placed.
+The CCI is halted untill the Upgrade transaction is completed.
+However for Network, no reboot is required.
+"""
+
+    action = 'upgrade'
+    options = ['confirm']
+
+    def execute(self, args):
+        cci = CCIManager(self.client)
+        data = {}
+        data['cpus'] = args.get('--cpu')
+        data['memory'] = args.get('--memory')
+        data['nic_speed'] = args.get('--network')
+        data['public'] = True
+        if args.get('--private'):
+            data['public'] = False
+        data = self.verify_upgrade_parameters(data)
+        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
+        if args['--really'] or confirm(
+                "This action will incur charges on your account. "
+                "Continue?"):
+            if not cci.upgrade(cci_id, **data):
+                raise CLIAbort('CCI Upgrade Failed')
+
+    def verify_upgrade_parameters(self, data):
+        """
+        param int cpus: The number of virtual CPUs to upgrade to
+                            of a CCI instance.
+        :param int memory: RAM of the CCI to be upgraded to.
+        :param int nic_speed: The port speed to set
+        """
+        try:
+            if data['memory']:
+                data['memory'] = int(data['memory']) / 1024
+            if data['cpus']:
+                data['cpus'] = int(data['cpus'])
+            if data['nic_speed']:
+                data['nic_speed'] = int(data['nic_speed'])
+            return data
+        except:
+            raise ValueError(
+                "One or more Values of CCI paramters are not correct")

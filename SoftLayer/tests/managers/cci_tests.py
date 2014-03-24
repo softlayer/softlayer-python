@@ -532,6 +532,33 @@ class CCITests(unittest.TestCase):
         archive.called_once_with('a', [{"device": 0, "uuid": 1},
                                  {"device": 2, "uuid": 2}], "", id=1)
 
+    def test_upgrade(self):
+        # Testing  Upgrade
+        orderClient = self.client['Product_Order']
+
+        # test single upgrade
+        self.cci.upgrade(1, cpus=4, public=False)
+        orderClient.placeOrder.called_once_with(1, cpus=4, public=False)
+
+        # Now test a blank upgrade
+        self.cci.upgrade(1)
+        self.assertTrue(self.cci.upgrade, 1)
+
+        # Testing all parameters Upgrade
+        self.cci.upgrade(1, cpus=4, memory=2, nic_speed=1000, public=True)
+        args = {'cpus': 4, 'memory': 2, 'nic_speed': 1000, 'public': 1000}
+        orderClient.placeOrder.called_once_with(1, **args)
+
+    def test_get_item_id_for_upgrade(self):
+        item_id = 0
+        package_items = self.client['Product_Package'].getItems(id=46)
+        for item in package_items:
+            if ((item['categories'][0]['id'] == 3)
+                    and (item.get('capacity') == '2')):
+                item_id = item['prices'][0]['id']
+                break
+        self.assertEqual(1133, item_id)
+
 
 class CCIWaitReadyGoTests(unittest.TestCase):
 
