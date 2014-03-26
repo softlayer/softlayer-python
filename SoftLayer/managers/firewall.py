@@ -5,6 +5,12 @@
 
     :license: MIT, see LICENSE for more details.
 """
+from SoftLayer.utils import IdentifierMixin, NestedDict, query_filter
+
+RULE_MASK = ('mask[orderValue,action,destinationIpAddress,'
+             'destinationIpSubnetMask,protocol,destinationPortRangeStart,'
+             'destinationPortRangeEnd,sourceIpAddress,sourceIpSubnetMask,'
+             'version]')
 
 
 def has_firewall(vlan):
@@ -22,21 +28,150 @@ def has_firewall(vlan):
     )
 
 
-class FirewallManager(object):
+class FirewallManager(IdentifierMixin, object):
+
     """ Manages firewalls.
 
     :param SoftLayer.API.Client client: the API client instance
 
     """
+
     def __init__(self, client):
         self.client = client
+        self.account = self.client['Account']
+        self.prod_pkg = self.client['Product_Package']
+
+    def get_std_fwl_pkg(self, server_id, is_cci=True):
+        """ Retrieves the standard firewall package for the CCI.
+
+        :param int server_id: The ID of the server to create the firewall for
+        :param bool is_cci: True if the id provided is for a CCI,
+                            False for a server
+        :returns: A dictionary containing the standard CCI firewall package
+        """
+        mask = ('mask[primaryNetworkComponent[speed]]')
+        if is_cci:
+            svc = self.client['Virtual_Guest']
+        else:
+            svc = self.client['Hardware_Server']
+
+        item = svc.getObject(mask=mask, id=server_id)
+
+        _filter = NestedDict({})
+        _value = "%s%s" % (item['primaryNetworkComponent']['speed'],
+                           "Mbps Hardware Firewall")
+        _filter['items']['description'] = query_filter(_value)
+
+        kwargs = NestedDict({})
+        kwargs['id'] = 0  # look at package id 0
+        kwargs['filter'] = _filter.to_dict()
+        call = 'getItems'
+        func = getattr(self.prod_pkg, call)
+        return func(**kwargs)
+
+    def get_dedicated_fwl_pkg(self, ha_enabled=False):
+        """ Retrieves the dedicated firewall package.
+
+        :param bool ha_enabled: True if HA is to be enabled on the firewall
+                                False for No HA
+        :returns: A dictionary containing the dedicated CCI firewall package
+        """
+
+        fwl_filter = 'Hardware Firewall (Dedicated)'
+        ha_fwl_filter = 'Hardware Firewall (High Availability)'
+        _filter = NestedDict({})
+        if ha_enabled:
+            _filter['items']['description'] = query_filter(ha_fwl_filter)
+        else:
+            _filter['items']['description'] = query_filter(fwl_filter)
+
+        kwargs = NestedDict({})
+        kwargs['id'] = 0  # look at package id 0
+        kwargs['filter'] = _filter.to_dict()
+        call = 'getItems'
+        func = getattr(self.prod_pkg, call)
+        return func(**kwargs)
+
+    def delete_firewall(self, fwl_id, dedicated=False):
+        """ Cancels the specified firewall.
+
+        :param int id: The ID of the firewall instance to be cancelled.
+        :param bool dedicated: If true, the firewall instance is dedicated,
+                               otherwise, the firewall instance is shared.
+        """
+        fwl_billing = self.get_fwl_billing_item(fwl_id, dedicated)
+        billing_id = fwl_billing['billingItem']['id']
+        billing_item = self.client['Billing_Item']
+        return billing_item.cancelService(id=billing_id)
+
+    def add_standard_firewall(self, server_id, is_cci=True):
+        """ Creates a firewall for the specified CCI/Server
+
+        :param int cci_id: The ID of the CCI to create the firewall for
+        :param bool is_cci: If false, will create the firewall for a server,
+                            otherwise for a CCI
+        :returns: A dictionary containing the standard CCI firewall order
+        """
+        package = self.get_std_fwl_pkg(server_id, is_cci)
+        if is_cci:
+            product_order = {
+                'complexType': 'SoftLayer_Container_Product_Order_Network_'
+                               'Protection_Firewall',
+                'quantity': 1,
+                'packageId': 0,
+                'virtualGuests': [{'id': server_id}],
+                'prices': [{'id': package[0]['prices'][0]['id']}]
+            }
+        else:
+            product_order = {
+                'complexType': 'SoftLayer_Container_Product_Order_Network_'
+                               'Protection_Firewall',
+                'quantity': 1,
+                'packageId': 0,
+                'hardware': [{'id': server_id}],
+                'prices': [{'id': package[0]['prices'][0]['id']}]
+            }
+        return self.client['Product_Order'].placeOrder(product_order)
+
+    def add_vlan_firewall(self, vlan_id, ha_enabled=False):
+        """ Creates a firewall for the specified vlan
+
+        :param int vlan_id: The ID of the vlan to create the firewall for
+        :param bool ha_enabled: If True, Ha firewall will be created
+
+        :returns: A dictionary containing the VLAN firewall order
+        """
+        package = self.get_dedicated_fwl_pkg(ha_enabled)
+        product_order = {
+            'complexType': 'SoftLayer_Container_Product_Order_Network_'
+                           'Protection_Firewall_Dedicated',
+            'quantity': 1,
+            'packageId': 0,
+            'vlanId': vlan_id,
+            'prices': [{'id': package[0]['prices'][0]['id']}]
+        }
+        return self.client['Product_Order'].placeOrder(product_order)
+
+    def get_fwl_billing_item(self, fwl_id, dedicated=False):
+        """ Retrieves the billing item of the firewall
+
+        :param int fwl_id: The ID of the firewall to get the billing item for
+        :param bool dedicated: whether the firewall is dedicated or standard
+        :returns: A dictionary of the firewall billing item.
+        """
+        mask = ('mask[id,billingItem[id]]')
+        if dedicated:
+            fwl_svc = self.client['Network_Vlan_Firewall']
+        else:
+            fwl_svc = self.client['Network_Component_Firewall']
+        return fwl_svc.getObject(id=fwl_id, mask=mask)
 
     def get_firewalls(self):
-        """ Returns a list of all firewalls on the account.
+        """ Returns a list of all hardware firewalls on the account.
 
-        :returns: A list of firewalls on the current account.
+        :returns: A list of hardware firewalls on the current account.
         """
-        results = self.client['Account'].getObject(
+        results = self.account.getObject(
             mask={
                 'networkVlans': {
                     'firewallNetworkComponents': None,
@@ -49,5 +184,63 @@ class FirewallManager(object):
                     # 'primarySubnet': None,
                 }
             })['networkVlans']
+        return list(filter(has_firewall, results))
 
-        return [result for result in results if has_firewall(result)]
+    def get_standard_fwl_rules(self, fwl_id):
+        """ Get the rules of a standard firewall
+
+        :param integer fwl_id: the instance ID of the standard firewall
+        :returns: A list of the rules.
+        """
+        svc = self.client['Network_Component_Firewall']
+        return svc.getRules(id=fwl_id, mask=RULE_MASK)
+
+    def get_dedicated_fwl_rules(self, fwl_id):
+        """ Get the rules of a dedicated firewall
+
+        :param integer fwl_id: the instance ID of the dedicated firewall
+        :returns: A list of the rules.
+        """
+        svc = self.client['Network_Vlan_Firewall']
+        return svc.getRules(id=fwl_id, mask=RULE_MASK)
+
+    def edit_dedicated_fwl_rules(self, fwl_id, rules):
+        """ Edit the rules for dedicated firewall
+
+        :param integer fwl_id: the instance ID of the dedicated firewall
+        :param dict rules: the rules to be pushed on the firewall
+        """
+        mask = ('mask[networkVlan[firewallInterfaces'
+                '[firewallContextAccessControlLists]]]')
+        svc = self.client['Network_Vlan_Firewall']
+        fwl = svc.getObject(id=fwl_id, mask=mask)
+        networkVlan = fwl['networkVlan']
+
+        for fwl1 in networkVlan['firewallInterfaces']:
+            if fwl1['name'] == 'inside':
+                continue
+            for controlList in fwl1['firewallContextAccessControlLists']:
+                if controlList['direction'] == 'out':
+                    continue
+                fwl_ctx_acl_id = controlList['id']
+
+        template = {
+            'firewallContextAccessControlListId': fwl_ctx_acl_id,
+            'rules': rules
+        }
+
+        svc = self.client['Network_Firewall_Update_Request']
+        return svc.createObject(template)
+
+    def edit_standard_fwl_rules(self, fwl_id, rules):
+        """ Edit the rules for standard firewall
+
+        :param integer fwl_id: the instance ID of the standard firewall
+        :param dict rules: the rules to be pushed on the firewall
+        """
+        rule_svc = self.client['Network_Firewall_Update_Request']
+        tempObject = {
+            "networkComponentFirewallId": fwl_id,
+            "rules": rules}
+
+        return rule_svc.createObject(tempObject)
