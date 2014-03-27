@@ -65,9 +65,7 @@ class FirewallManager(IdentifierMixin, object):
         kwargs = NestedDict({})
         kwargs['id'] = 0  # look at package id 0
         kwargs['filter'] = _filter.to_dict()
-        call = 'getItems'
-        func = getattr(self.prod_pkg, call)
-        return func(**kwargs)
+        return self.prod_pkg.getItems(**kwargs)
 
     def get_dedicated_fwl_pkg(self, ha_enabled=False):
         """ Retrieves the dedicated firewall package.
@@ -88,18 +86,16 @@ class FirewallManager(IdentifierMixin, object):
         kwargs = NestedDict({})
         kwargs['id'] = 0  # look at package id 0
         kwargs['filter'] = _filter.to_dict()
-        call = 'getItems'
-        func = getattr(self.prod_pkg, call)
-        return func(**kwargs)
+        return self.prod_pkg.getItems(**kwargs)
 
-    def delete_firewall(self, fwl_id, dedicated=False):
+    def delete_firewall(self, firewall_id, dedicated=False):
         """ Cancels the specified firewall.
 
-        :param int id: The ID of the firewall instance to be cancelled.
+        :param int firewall_id: Firewall ID to be cancelled.
         :param bool dedicated: If true, the firewall instance is dedicated,
                                otherwise, the firewall instance is shared.
         """
-        fwl_billing = self.get_fwl_billing_item(fwl_id, dedicated)
+        fwl_billing = self.get_fwl_billing_item(firewall_id, dedicated)
         billing_id = fwl_billing['billingItem']['id']
         billing_item = self.client['Billing_Item']
         return billing_item.cancelService(id=billing_id)
@@ -152,10 +148,10 @@ class FirewallManager(IdentifierMixin, object):
         }
         return self.client['Product_Order'].placeOrder(product_order)
 
-    def get_fwl_billing_item(self, fwl_id, dedicated=False):
+    def get_fwl_billing_item(self, firewall_id, dedicated=False):
         """ Retrieves the billing item of the firewall
 
-        :param int fwl_id: The ID of the firewall to get the billing item for
+        :param int firewall_id: Firewall ID to get the billing item for
         :param bool dedicated: whether the firewall is dedicated or standard
         :returns: A dictionary of the firewall billing item.
         """
@@ -164,7 +160,7 @@ class FirewallManager(IdentifierMixin, object):
             fwl_svc = self.client['Network_Vlan_Firewall']
         else:
             fwl_svc = self.client['Network_Component_Firewall']
-        return fwl_svc.getObject(id=fwl_id, mask=mask)
+        return fwl_svc.getObject(id=firewall_id, mask=mask)
 
     def get_firewalls(self):
         """ Returns a list of all hardware firewalls on the account.
@@ -186,34 +182,34 @@ class FirewallManager(IdentifierMixin, object):
             })['networkVlans']
         return list(filter(has_firewall, results))
 
-    def get_standard_fwl_rules(self, fwl_id):
+    def get_standard_fwl_rules(self, firewall_id):
         """ Get the rules of a standard firewall
 
-        :param integer fwl_id: the instance ID of the standard firewall
+        :param integer firewall_id: the instance ID of the standard firewall
         :returns: A list of the rules.
         """
         svc = self.client['Network_Component_Firewall']
-        return svc.getRules(id=fwl_id, mask=RULE_MASK)
+        return svc.getRules(id=firewall_id, mask=RULE_MASK)
 
-    def get_dedicated_fwl_rules(self, fwl_id):
+    def get_dedicated_fwl_rules(self, firewall_id):
         """ Get the rules of a dedicated firewall
 
-        :param integer fwl_id: the instance ID of the dedicated firewall
+        :param integer firewall_id: the instance ID of the dedicated firewall
         :returns: A list of the rules.
         """
         svc = self.client['Network_Vlan_Firewall']
-        return svc.getRules(id=fwl_id, mask=RULE_MASK)
+        return svc.getRules(id=firewall_id, mask=RULE_MASK)
 
-    def edit_dedicated_fwl_rules(self, fwl_id, rules):
+    def edit_dedicated_fwl_rules(self, firewall_id, rules):
         """ Edit the rules for dedicated firewall
 
-        :param integer fwl_id: the instance ID of the dedicated firewall
+        :param integer firewall_id: the instance ID of the dedicated firewall
         :param dict rules: the rules to be pushed on the firewall
         """
         mask = ('mask[networkVlan[firewallInterfaces'
                 '[firewallContextAccessControlLists]]]')
         svc = self.client['Network_Vlan_Firewall']
-        fwl = svc.getObject(id=fwl_id, mask=mask)
+        fwl = svc.getObject(id=firewall_id, mask=mask)
         networkVlan = fwl['networkVlan']
 
         for fwl1 in networkVlan['firewallInterfaces']:
@@ -232,15 +228,15 @@ class FirewallManager(IdentifierMixin, object):
         svc = self.client['Network_Firewall_Update_Request']
         return svc.createObject(template)
 
-    def edit_standard_fwl_rules(self, fwl_id, rules):
+    def edit_standard_fwl_rules(self, firewall_id, rules):
         """ Edit the rules for standard firewall
 
-        :param integer fwl_id: the instance ID of the standard firewall
+        :param integer firewall_id: the instance ID of the standard firewall
         :param dict rules: the rules to be pushed on the firewall
         """
         rule_svc = self.client['Network_Firewall_Update_Request']
         tempObject = {
-            "networkComponentFirewallId": fwl_id,
+            "networkComponentFirewallId": firewall_id,
             "rules": rules}
 
         return rule_svc.createObject(tempObject)

@@ -77,38 +77,25 @@ def get_formatted_rule(rule=None):
     :param dict rule: A dict containing one rule of the firewall
     :returns: a formatted string that get be pushed into the editor
     """
-    if rule is None:
-        # provide default rule template
-        return ('action: %s\n'
-                'protocol: %s\n'
-                'source_ip_address: %s\n'
-                'source_ip_subnet_mask: %s\n'
-                'destination_ip_address: %s\n'
-                'destination_ip_subnet_mask: %s\n'
-                'destination_port_range_start: %s\n'
-                'destination_port_range_end: %s\n'
-                'version: %s\n'
-                % ('permit', 'tcp', '0.0.0.0', '255.255.255.255',
-                   '0.0.0.0', '255.255.255.255', 1, 1, 4))
-    else:
-        return ('action: %s\n'
-                'protocol: %s\n'
-                'source_ip_address: %s\n'
-                'source_ip_subnet_mask: %s\n'
-                'destination_ip_address: %s\n'
-                'destination_ip_subnet_mask: %s\n'
-                'destination_port_range_start: %s\n'
-                'destination_port_range_end: %s\n'
-                'version: %s\n'
-                % (rule['action'],
-                   rule['protocol'],
-                   rule['sourceIpAddress'],
-                   rule['sourceIpSubnetMask'],
-                   rule['destinationIpAddress'],
-                   rule['destinationIpSubnetMask'],
-                   rule['destinationPortRangeStart'],
-                   rule['destinationPortRangeEnd'],
-                   rule['version']))
+    rule = rule or {}
+    return ('action: %s\n'
+            'protocol: %s\n'
+            'source_ip_address: %s\n'
+            'source_ip_subnet_mask: %s\n'
+            'destination_ip_address: %s\n'
+            'destination_ip_subnet_mask: %s\n'
+            'destination_port_range_start: %s\n'
+            'destination_port_range_end: %s\n'
+            'version: %s\n'
+            % (rule.get('action', 'permit'),
+               rule.get('protocol', 'tcp'),
+               rule.get('sourceIpAddress', 'any'),
+               rule.get('sourceIpSubnetMask', '255.255.255.255'),
+               rule.get('destinationIpAddress', 'any'),
+               rule.get('destinationIpSubnetMask', '255.255.255.255'),
+               rule.get('destinationPortRangeStart', 1),
+               rule.get('destinationPortRangeEnd', 1),
+               rule.get('version', 4)))
 
 
 def open_editor(rules=None, content=None):
@@ -139,7 +126,7 @@ def open_editor(rules=None, content=None):
             data = tfile.read()
             return data
 
-        if rules is None or len(rules) == 0:
+        if not rules:
             # if the firewall has no rules, provide a template
             tfile.write(DELIMITER)
             tfile.write(get_formatted_rule())
@@ -168,35 +155,37 @@ def parse_rules(content=None):
     parsed_rules = list()
     order = 1
     for rule in rules:
-        if rule.strip() != '':
-            parsed_rule = {}
-            lines = rule.split("\n")
-            parsed_rule['orderValue'] = order
-            order += 1
-            for line in lines:
-                if line.strip() != '':
-                    key_value = line.strip().split(':')
-                    key = key_value[0].strip()
-                    value = key_value[1].strip()
-                    if key == 'action':
-                        parsed_rule['action'] = value
-                    elif key == 'protocol':
-                        parsed_rule['protocol'] = value
-                    elif key == 'source_ip_address':
-                        parsed_rule['sourceIpAddress'] = value
-                    elif key == 'source_ip_subnet_mask':
-                        parsed_rule['sourceIpSubnetMask'] = value
-                    elif key == 'destination_ip_address':
-                        parsed_rule['destinationIpAddress'] = value
-                    elif key == 'destination_ip_subnet_mask':
-                        parsed_rule['destinationIpSubnetMask'] = value
-                    elif key == 'destination_port_range_start':
-                        parsed_rule['destinationPortRangeStart'] = int(value)
-                    elif key == 'destination_port_range_end':
-                        parsed_rule['destinationPortRangeEnd'] = int(value)
-                    elif key == 'version':
-                        parsed_rule['version'] = int(value)
-            parsed_rules.append(parsed_rule)
+        if rule.strip() == '':
+            continue
+        parsed_rule = {}
+        lines = rule.split("\n")
+        parsed_rule['orderValue'] = order
+        order += 1
+        for line in lines:
+            if line.strip() == '':
+                continue
+            key_value = line.strip().split(':')
+            key = key_value[0].strip()
+            value = key_value[1].strip()
+            if key == 'action':
+                parsed_rule['action'] = value
+            elif key == 'protocol':
+                parsed_rule['protocol'] = value
+            elif key == 'source_ip_address':
+                parsed_rule['sourceIpAddress'] = value
+            elif key == 'source_ip_subnet_mask':
+                parsed_rule['sourceIpSubnetMask'] = value
+            elif key == 'destination_ip_address':
+                parsed_rule['destinationIpAddress'] = value
+            elif key == 'destination_ip_subnet_mask':
+                parsed_rule['destinationIpSubnetMask'] = value
+            elif key == 'destination_port_range_start':
+                parsed_rule['destinationPortRangeStart'] = int(value)
+            elif key == 'destination_port_range_end':
+                parsed_rule['destinationPortRangeEnd'] = int(value)
+            elif key == 'version':
+                parsed_rule['version'] = int(value)
+        parsed_rules.append(parsed_rule)
     return parsed_rules
 
 
@@ -279,16 +268,16 @@ Options:
 
     def execute(self, args):
         mgr = FirewallManager(self.client)
-        fw_id = resolve_id(
+        firewall_id = resolve_id(
             mgr.resolve_ids, args.get('<identifier>'), 'firewall')
 
         if args['--really'] or confirm("This action will delete a firewall"
                                        " from your account. Continue?"):
             if args['--cci'] or args['--server']:
-                mgr.delete_firewall(fw_id, dedicated=False)
+                mgr.delete_firewall(firewall_id, dedicated=False)
             elif args['--vlan']:
-                mgr.delete_firewall(fw_id, dedicated=True)
-            return 'Firewall with id %s is being cancelled!' % fw_id
+                mgr.delete_firewall(firewall_id, dedicated=True)
+            return 'Firewall with id %s is being cancelled!' % firewall_id
         else:
             raise CLIAbort('Aborted.')
 
@@ -350,13 +339,13 @@ Options:
 
     def execute(self, args):
         mgr = FirewallManager(self.client)
-        fw_id = resolve_id(
+        firewall_id = resolve_id(
             mgr.resolve_ids, args.get('<identifier>'), 'firewall')
 
         if args['--vlan']:
-            rules = mgr.get_dedicated_fwl_rules(fw_id)
+            rules = mgr.get_dedicated_fwl_rules(firewall_id)
         else:
-            rules = mgr.get_standard_fwl_rules(fw_id)
+            rules = mgr.get_standard_fwl_rules(firewall_id)
 
         return get_rules_table(rules)
 
@@ -375,22 +364,22 @@ Options:
 
     def execute(self, args):
         mgr = FirewallManager(self.client)
-        fwl_id = resolve_id(
+        firewall_id = resolve_id(
             mgr.resolve_ids, args.get('<identifier>'), 'firewall')
 
         if args['--vlan']:
-            orig_rules = mgr.get_dedicated_fwl_rules(fwl_id)
+            orig_rules = mgr.get_dedicated_fwl_rules(firewall_id)
         else:
-            orig_rules = mgr.get_standard_fwl_rules(fwl_id)
+            orig_rules = mgr.get_standard_fwl_rules(firewall_id)
         # open an editor for the user to enter their rules
         edited_rules = open_editor(rules=orig_rules)
         while True:
             try:
                 rules = parse_rules(edited_rules)
                 if args['--vlan']:
-                    rules = mgr.edit_dedicated_fwl_rules(fwl_id, rules)
+                    rules = mgr.edit_dedicated_fwl_rules(firewall_id, rules)
                 else:
-                    rules = mgr.edit_standard_fwl_rules(fwl_id, rules)
+                    rules = mgr.edit_standard_fwl_rules(firewall_id, rules)
                 break
             except Exception as e:
                 print "Unexpected error({%s})" % (e)

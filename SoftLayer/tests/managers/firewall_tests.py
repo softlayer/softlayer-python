@@ -49,7 +49,8 @@ class FirewallTests(unittest.TestCase):
         # test standard firewalls
         call = self.client['Network_Component_Firewall'].getObject
         MASK = ('mask[id,billingItem[id]]')
-        item = self.firewall.get_fwl_billing_item(fwl_id=1234, dedicated=False)
+        item = self.firewall.get_fwl_billing_item(firewall_id=1234,
+                                                  dedicated=False)
         call.assert_called_once_with(id=1234, mask=MASK)
         billingItemId = 21370814
         self.assertEqual(item['billingItem']['id'], billingItemId)
@@ -57,7 +58,8 @@ class FirewallTests(unittest.TestCase):
         # test dedicated firewalls
         call = self.client['Network_Vlan_Firewall'].getObject
         MASK = ('mask[id,billingItem[id]]')
-        item = self.firewall.get_fwl_billing_item(fwl_id=12345, dedicated=True)
+        item = self.firewall.get_fwl_billing_item(firewall_id=12345,
+                                                  dedicated=True)
         call.assert_called_once_with(id=12345, mask=MASK)
         billingItemId = 21370815
         self.assertEqual(item['billingItem']['id'], billingItemId)
@@ -256,7 +258,8 @@ class FirewallTests(unittest.TestCase):
         rules = Network_Vlan_Firewall.getRules
         fwl_id = 1234
         fwl_ctx_acl_id = 3142
-        self.firewall.edit_dedicated_fwl_rules(fwl_id=fwl_id, rules=rules)
+        self.firewall.edit_dedicated_fwl_rules(firewall_id=fwl_id,
+                                               rules=rules)
         template = {
             'firewallContextAccessControlListId': fwl_ctx_acl_id,
             'rules': rules
@@ -269,7 +272,8 @@ class FirewallTests(unittest.TestCase):
         # test standard firewalls
         rules = Network_Component_Firewall.getRules
         fwl_id = 1234
-        self.firewall.edit_standard_fwl_rules(fwl_id=fwl_id, rules=rules)
+        self.firewall.edit_standard_fwl_rules(firewall_id=fwl_id,
+                                              rules=rules)
         tempObject = {
             "networkComponentFirewallId": fwl_id,
             "rules": rules}
