@@ -35,7 +35,7 @@ def print_package_info(package):
     return
 
 
-def has_firewallComponent(server):
+def has_firewall_component(server):
     """ Helper to determine whether or not a server has a firewall.
 
     :param dict server: A dictionary representing a server
@@ -226,7 +226,7 @@ List active firewalls
 
         shared_vlan = [vlan['dedicatedFirewallFlag'] for vlan in fwvlans]
         for vlan in shared_vlan:
-            fws = list(filter(has_firewallComponent,
+            fws = list(filter(has_firewall_component,
                               vlan['firewallGuestNetworkComponents']))
 
             for fw in fws:
@@ -237,7 +237,7 @@ List active firewalls
                     fw['guestNetworkComponent']['guest']['id']
                 ])
 
-            fws = list(filter(has_firewallComponent,
+            fws = list(filter(has_firewall_component,
                               vlan['firewallNetworkComponents']))
             for fw in fws:
                 t.add_row([

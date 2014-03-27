@@ -210,9 +210,9 @@ class FirewallManager(IdentifierMixin, object):
                 '[firewallContextAccessControlLists]]]')
         svc = self.client['Network_Vlan_Firewall']
         fwl = svc.getObject(id=firewall_id, mask=mask)
-        networkVlan = fwl['networkVlan']
+        network_vlan = fwl['networkVlan']
 
-        for fwl1 in networkVlan['firewallInterfaces']:
+        for fwl1 in network_vlan['firewallInterfaces']:
             if fwl1['name'] == 'inside':
                 continue
             for controlList in fwl1['firewallContextAccessControlLists']:
@@ -235,8 +235,8 @@ class FirewallManager(IdentifierMixin, object):
         :param dict rules: the rules to be pushed on the firewall
         """
         rule_svc = self.client['Network_Firewall_Update_Request']
-        tempObject = {
+        template = {
             "networkComponentFirewallId": firewall_id,
             "rules": rules}
 
-        return rule_svc.createObject(tempObject)
+        return rule_svc.createObject(template)
