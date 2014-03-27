@@ -120,11 +120,11 @@ class FirewallTests(unittest.TestCase):
             }
         f.assert_called_once_with(filter=_filter, id=0)
 
-    def test_delete_firewall(self):
+    def test_cancel_firewall(self):
         # test standard firewalls
         fwl_id = 6327
         billing_item_id = 21370814
-        result = self.firewall.delete_firewall(fwl_id, dedicated=False)
+        result = self.firewall.cancel_firewall(fwl_id, dedicated=False)
         f = self.client['Billing_Item'].cancelService
         f.assert_called_once_with(id=billing_item_id)
         self.assertEqual(result, Billing_Item.cancelService)
@@ -133,7 +133,7 @@ class FirewallTests(unittest.TestCase):
         call.assert_called_once_with(id=6327, mask=MASK)
         # test dedicated firewalls
         billing_item_id = 21370815
-        result = self.firewall.delete_firewall(fwl_id, dedicated=True)
+        result = self.firewall.cancel_firewall(fwl_id, dedicated=True)
         f = self.client['Billing_Item'].cancelService
         f.assert_called_twice_with(id=billing_item_id)
         self.assertEqual(result, Billing_Item.cancelService)

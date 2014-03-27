@@ -5,7 +5,7 @@ Firewall rule and security management
 
 The available commands are:
   add    Add a new firewall
-  delete Delete an existing firewall
+  cancel Cancel an existing firewall
   detail Provide details about a particular firewall
   edit   Edit the rules of a particular firewall
   list   List active firewalls - both dedicated and shared
@@ -250,11 +250,11 @@ List active firewalls
         return t
 
 
-class FWDelete(CLIRunnable):
+class FWCancel(CLIRunnable):
     """
-usage: sl firewall delete  <identifier> (--cci | --vlan | --server) [options]
+usage: sl firewall cancel  <identifier> (--cci | --vlan | --server) [options]
 
-Deletes a firewall of type either standard (cci or server) or dedicated(vlan)
+Cancels a firewall of type either standard (cci or server) or dedicated(vlan)
 
 Options:
   --cci        Creates a standard firewall for a CCI
@@ -263,20 +263,20 @@ Options:
   --really     Whether to skip the confirmation prompt
 
 """
-    action = 'delete'
-    options = ['really', 'immediate']
+    action = 'cancel'
+    options = ['really']
 
     def execute(self, args):
         mgr = FirewallManager(self.client)
         firewall_id = resolve_id(
             mgr.resolve_ids, args.get('<identifier>'), 'firewall')
 
-        if args['--really'] or confirm("This action will delete a firewall"
+        if args['--really'] or confirm("This action will cancel a firewall"
                                        " from your account. Continue?"):
             if args['--cci'] or args['--server']:
-                mgr.delete_firewall(firewall_id, dedicated=False)
+                mgr.cancel_firewall(firewall_id, dedicated=False)
             elif args['--vlan']:
-                mgr.delete_firewall(firewall_id, dedicated=True)
+                mgr.cancel_firewall(firewall_id, dedicated=True)
             return 'Firewall with id %s is being cancelled!' % firewall_id
         else:
             raise CLIAbort('Aborted.')

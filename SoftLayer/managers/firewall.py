@@ -88,7 +88,7 @@ class FirewallManager(IdentifierMixin, object):
         kwargs['filter'] = _filter.to_dict()
         return self.prod_pkg.getItems(**kwargs)
 
-    def delete_firewall(self, firewall_id, dedicated=False):
+    def cancel_firewall(self, firewall_id, dedicated=False):
         """ Cancels the specified firewall.
 
         :param int firewall_id: Firewall ID to be cancelled.
@@ -163,9 +163,9 @@ class FirewallManager(IdentifierMixin, object):
         return fwl_svc.getObject(id=firewall_id, mask=mask)
 
     def get_firewalls(self):
-        """ Returns a list of all hardware firewalls on the account.
+        """ Returns a list of all firewalls on the account.
 
-        :returns: A list of hardware firewalls on the current account.
+        :returns: A list of firewalls on the current account.
         """
         results = self.account.getObject(
             mask={
