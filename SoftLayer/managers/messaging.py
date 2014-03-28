@@ -370,5 +370,5 @@ class MessagingConnection(object):
         :param subscription_id: Subscription id
         """
         self._make_request('delete', 'topics/%s/subscriptions/%s' %
-                          (topic_name, subscription_id))
+                           (topic_name, subscription_id))
         return True
