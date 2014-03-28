@@ -1,2 +1,3 @@
 cancelService = {}
 cancelServiceOnAnniversaryDate = {}
+cancelItem = {}

@@ -1071,3 +1071,69 @@ getItems = [
         'itemCategory': {'categoryCode': 'global_ipv6'},
         'prices': [{'id': 611}],
     }]
+getItemPrices = [
+    {
+        'currentPriceFlag': '',
+        'id': 2152,
+        'item': {
+            'capacity': '1',
+            'description': '1 GB iSCSI SAN Storage',
+            'id': 1111,
+            'softwareDescriptionId': '',
+            'units': 'GB',
+            'upgradeItemId': 547},
+        'itemId': 1111,
+        'laborFee': '0',
+        'onSaleFlag': '',
+        'oneTimeFee': '0',
+        'packageReferences': [{'id': 46626,
+                               'itemPriceId': 2152, 'packageId': 0}],
+        'quantity': '',
+        'recurringFee': '.35',
+        'setupFee': '0',
+        'sort': 0
+    },
+    {
+        'currentPriceFlag': '',
+        'id': 22501,
+        'item': {'capacity': '1',
+                 'description': '1 GB iSCSI SAN Storage',
+                 'id': 1111,
+                 'softwareDescriptionId': '',
+                 'units': 'GB',
+                 'upgradeItemId': 547},
+        'itemId': 1111,
+        'laborFee': '0',
+        'onSaleFlag': '',
+        'oneTimeFee': '0',
+        'packageReferences': [{
+            'id': 252983,
+            'itemPriceId': 22501, 'packageId': 0
+        }],
+        'quantity': '',
+        'recurringFee': '0',
+        'setupFee': '0',
+        'sort': 0
+    },
+    {
+        'currentPriceFlag': '',
+        'id': 22441,
+        'item': {
+            'capacity': '1',
+            'description': '1 GB iSCSI SAN Storage',
+            'id': 1111,
+            'softwareDescriptionId': '',
+            'units': 'GB',
+            'upgradeItemId': 547
+        },
+        'itemId': 1111,
+        'laborFee': '0',
+        'onSaleFlag': '',
+        'oneTimeFee': '0',
+        'packageReferences': [{'id': 250326,
+                               'itemPriceId': 22441, 'packageId': 0}],
+        'quantity': '',
+        'recurringFee': '15',
+        'setupFee': '0',
+        'sort': 0
+    }]
