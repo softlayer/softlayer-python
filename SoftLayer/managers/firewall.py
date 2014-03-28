@@ -46,7 +46,7 @@ class FirewallManager(object):
                     'firewallInterfaces': {},
                     'firewallRules': None,
                     'highAvailabilityFirewallFlag': None,
-                    #'primarySubnet': None,
+                    # 'primarySubnet': None,
                 }
             })['networkVlans']
 

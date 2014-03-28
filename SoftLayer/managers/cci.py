@@ -481,7 +481,7 @@ class CCIManager(IdentifierMixin, object):
         cci = self.get_instance(instance_id)
 
         disk_filter = lambda x: x['device'] == '0'
-        #Disk 1 is swap partition.  Need to skip its capture.
+        # Disk 1 is swap partition.  Need to skip its capture.
         if additional_disks:
             disk_filter = lambda x: x['device'] != '1'
 
