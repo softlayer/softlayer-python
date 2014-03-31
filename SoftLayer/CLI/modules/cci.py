@@ -158,7 +158,8 @@ Options:
                 operating_system.get('version') or blank(),
                 operating_system.get('name') or blank()
             )])
-        table.add_row(['os_version', operating_system['version'] or blank()])
+        table.add_row(['os_version',
+                       operating_system.get('version') or blank()])
         table.add_row(['cores', result['maxCpu']])
         table.add_row(['memory', mb_to_gb(result['maxMemory'])])
         table.add_row(['public_ip', result['primaryIpAddress'] or blank()])
