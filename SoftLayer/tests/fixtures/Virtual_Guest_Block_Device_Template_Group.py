@@ -19,3 +19,5 @@ IMAGES = [{
 getObject = IMAGES[0]
 getPublicImages = IMAGES
 deleteObject = {}
+editObject = True
+setTags = True

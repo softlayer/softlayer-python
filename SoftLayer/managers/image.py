@@ -97,3 +97,25 @@ class ImageManager(IdentifierMixin, object):
         """ Get private images which match the given name """
         results = self.list_private_images(name=name)
         return [result['id'] for result in results]
+
+    def edit(self, image_id, name=None, note=None, tag=None):
+        """
+        Edit image related details
+        :param int image: The ID of the image
+        :param string name: Name of the Image.
+        :param string note: Note of the image.
+        :param string tag: Tags of the image to be updated to.
+        """
+        obj = {}
+        if name:
+            obj['name'] = name
+        if note:
+            obj['note'] = note
+        if obj:
+            self.vgbdtg.editObject(obj, id=image_id)
+        if tag:
+            self.vgbdtg.setTags(str(tag), id=image_id)
+        if name or note or tag:
+            return True
+        else:
+            return False
