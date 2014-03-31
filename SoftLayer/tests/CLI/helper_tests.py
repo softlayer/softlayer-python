@@ -283,14 +283,11 @@ class TestFormatOutput(unittest.TestCase):
         t.add_row([cli.helpers.blank()])
         t.sortby = 'nothing'
         ret = cli.helpers.format_output(t, 'json')
-        self.assertEqual('[\n'
-                         '    {\n'
-                         '        "nothing": "testdata"\n'
-                         '    }, \n'
-                         '    {\n'
-                         '        "nothing": null\n'
-                         '    }\n'
-                         ']', ret)
+        # This uses json.dumps due to slight changes in the output between
+        # py3.3 and py3.4
+        expected = json.dumps([{'nothing': 'testdata'}, {'nothing': None}],
+                              indent=4)
+        self.assertEqual(expected, ret)
 
         ret = cli.helpers.format_output('test', 'json')
         self.assertEqual('"test"', ret)
