@@ -214,6 +214,5 @@ createObject = getObject
 generateOrderTemplate = {}
 setUserMetadata = ['meta']
 reloadOperatingSystem = 'OK'
-rebootSoft = True
 
 createArchiveTransaction = {}

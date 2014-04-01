@@ -1022,21 +1022,21 @@ class UpgradeCCI(CLIRunnable):
     """
 usage: sl cci upgrade <identifier> [options]
 
-Upgrade parameters of an CCI
+Upgrade parameters of a CCI
 
 Examples:
     sl cci upgrade --cpus 2
     sl cci upgrade --memory 2048 --network 1000
 Options:
     --cpu=CPU          Number of CPU cores
-    --private          CPU core will be on a decicated host server.
+    --private          CPU core will be on a dedicated host server.
                        Default is Public.
                        Public: Resources are in multi-tenant environment.
     --memory=MEMORY    Memory in megabytes
     --network=MBPS     Network port speed in Mbps
 
 Note: SoftLayer automatically reboots the CCI once upgrade request is placed.
-The CCI is halted untill the Upgrade transaction is completed.
+The CCI is halted until the Upgrade transaction is completed.
 However for Network, no reboot is required.
 """
 
@@ -1077,4 +1077,4 @@ However for Network, no reboot is required.
             return data
         except:
             raise ValueError(
-                "One or more Values of CCI paramters are not correct")
+                "One or more Values of CCI parameters are not correct")
