@@ -257,9 +257,9 @@ usage: sl firewall cancel  <identifier> (--cci | --vlan | --server) [options]
 Cancels a firewall of type either standard (cci or server) or dedicated(vlan)
 
 Options:
-  --cci        Creates a standard firewall for a CCI
-  --vlan       Creates a dedicated firewall for a VLAN
-  --server     Creates a standard firewall for a server
+  --cci        Cancels a standard firewall for a CCI
+  --vlan       Cancels a dedicated firewall for a VLAN
+  --server     Cancels a standard firewall for a server
   --really     Whether to skip the confirmation prompt
 
 """
