@@ -63,7 +63,7 @@ class HardwareTests(unittest.TestCase):
 
     def test_resolve_ids_ip(self):
         _id = self.hardware._get_ids_from_ip('172.16.1.100')
-        self.assertEqual(_id, [1000, 1001])
+        self.assertEqual(_id, [1000, 1001, 1002])
 
         _id = self.hardware._get_ids_from_ip('nope')
         self.assertEqual(_id, [])
@@ -75,7 +75,7 @@ class HardwareTests(unittest.TestCase):
 
     def test_resolve_ids_hostname(self):
         _id = self.hardware._get_ids_from_hostname('hardware-test1')
-        self.assertEqual(_id, [1000, 1001])
+        self.assertEqual(_id, [1000, 1001, 1002])
 
     def test_get_hardware(self):
         result = self.hardware.get_hardware(1000)
