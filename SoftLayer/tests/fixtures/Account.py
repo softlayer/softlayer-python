@@ -140,6 +140,40 @@ getHardware = [{
             'id': 19082
         },
     ]
+}, {
+    'id': 1002,
+    'datacenter': {'name': 'TEST00',
+                   'description': 'Test Data Center'},
+    'billingItem': {'id': 7112},
+    'primaryIpAddress': '172.16.4.95',
+    'hostname': 'hardware-bad-memory',
+    'domain': 'test.sftlyr.ws',
+    'fullyQualifiedDomainName': 'hardware-bad-memory.test.sftlyr.ws',
+    'processorPhysicalCoreAmount': 4,
+    'memoryCapacity': None,
+    'primaryBackendIpAddress': '10.1.0.4',
+    'hardwareStatus': {'status': 'ACTIVE'},
+    'provisionDate': '2014-04-02 13:48:00',
+    'operatingSystem': {
+        'softwareLicense': {
+            'softwareDescription': {
+                'referenceCode': 'Ubuntu',
+                'name': 'Ubuntu 12.04 LTS',
+            }
+        }
+    },
+    'networkVlans': [
+        {
+            'networkSpace': 'PRIVATE',
+            'vlanNumber': 1800,
+            'id': 9653
+        },
+        {
+            'networkSpace': 'PUBLIC',
+            'vlanNumber': 3672,
+            'id': 19082
+        },
+    ]
 }]
 getDomains = [{'name': 'example.com', 'id': 12345}]
 
