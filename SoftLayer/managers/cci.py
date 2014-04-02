@@ -7,6 +7,7 @@
 """
 import socket
 from time import sleep
+import datetime
 from itertools import repeat
 
 from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin, lookup
@@ -490,3 +491,73 @@ class CCIManager(IdentifierMixin, object):
 
         return self.guest.createArchiveTransaction(
             name, disks, notes, id=instance_id)
+
+    def upgrade(self, instance_id, cpus=None, memory=None,
+                nic_speed=None, public=True):
+        """
+        Upgrades a CCI instance
+        :param int instance_id: Instance id of the CCI to be upgraded
+        :param int cpus: The number of virtual CPUs to upgrade to
+                            of a CCI instance.
+        :param bool public: CPU will be in Private/Public Node.
+        :param int memory: RAM of the CCI to be upgraded to.
+        :param int nic_speed: The port speed to set
+        """
+        package_items = self._get_package_items()
+        item_id = []
+        if cpus:
+            item_id.append({'id': self._get_item_id_for_upgrade(
+                            package_items, 'cpus', cpus, public)})
+        if memory:
+            item_id.append({'id': self._get_item_id_for_upgrade(
+                            package_items, 'memory', memory)})
+        if nic_speed:
+            item_id.append({'id': self._get_item_id_for_upgrade(
+                            package_items, 'nic_speed',
+                            nic_speed)})
+        order = {}
+        order['complexType'] = \
+            'SoftLayer_Container_Product_Order_Virtual_Guest_Upgrade'
+        order['virtualGuests'] = [{'id': int(instance_id)}]
+        order['prices'] = item_id
+        order['properties'] = [{'name': 'MAINTENANCE_WINDOW',
+                                        'value': str(datetime.datetime.now())}]
+        if cpus or memory or nic_speed:
+            self.client['Product_Order'].verifyOrder(order)
+            self.client['Product_Order'].placeOrder(order)
+            return True
+        return False
+
+    def _get_package_items(self):
+        """
+        Following Method gets all the item ids related to CCI
+        """
+        mask = "mask[description,capacity,prices.id,categories[name,id]]"
+        package = self.client['Product_Package']
+        return package.getItems(id=46, mask=mask)
+
+    def _get_item_id_for_upgrade(self, package_items, option, value,
+                                 public=True):
+        """
+        Find the item ids for the parameters you want to upgrade to.
+        :param list package_items: Contains all the items related to an CCI
+        :param string option: Describes type of parameter to be upgraded
+        :param int value: The value of the parameter to be upgraded
+        :param bool public: CPU will be in Private/Public Node.
+        """
+        cci_id = {'memory': 3, 'cpus': 80, 'nic_speed': 26}
+        for item in package_items:
+            for j in range(len(item['categories'])):
+                if not (item['categories'][j]['id'] == cci_id[option] and
+                        item['capacity'] == str(value)):
+                    continue
+                if option == 'cpus':
+                    if public and ('Private' not in item['description']):
+                        return item['prices'][0]['id']
+                    elif not public and ('Private' in item['description']):
+                        return item['prices'][0]['id']
+                elif option == 'nic_speed':
+                    if 'Public' in item['description']:
+                        return item['prices'][0]['id']
+                else:
+                    return item['prices'][0]['id']
