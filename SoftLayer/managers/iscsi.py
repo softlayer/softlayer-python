@@ -73,6 +73,12 @@ class ISCSIManager(IdentifierMixin, object):
 
     def create_iscsi(self, size=None, location=None, zero_recurring=False):
         """Places an order for iSCSI volume
+        :param integer size: size of iSCSI volume to create
+        :param string location: datacenter to use to create volume in
+        :param boolean zero_recurring: Prefer <$1 recurring fee.
+            Even if API shows <$1 volumes, many users are not
+            allowed order them. Those who are allowed to order
+            the <$1 volumes, can use this flag.
         """
         item_price = self._find_item_prices(size,
                                             zero_recurring=zero_recurring,
