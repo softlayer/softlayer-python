@@ -22,7 +22,6 @@ class ImageTests(unittest.TestCase):
 
     def test_get_image(self):
         result = self.image.get_image(100)
-
         self.vgbdtg.getObject.assert_called_once_with(id=100, mask=ANY)
         self.assertEqual(result,
                          Virtual_Guest_Block_Device_Template_Group.getObject)

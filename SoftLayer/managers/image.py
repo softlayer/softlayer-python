@@ -31,9 +31,11 @@ class ImageManager(IdentifierMixin, object):
         :param int image: The ID of the image.
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         """
+        image_mask = ('id,accountId,name,globalIdentifier,blockDevices,'
+                      'parentId,createDate,note,status,tagReferences[tag],'
+                      'children[blockDevices[diskImage[type]],datacenter]')
         if 'mask' not in kwargs:
-            kwargs['mask'] = IMAGE_MASK
-
+            kwargs['mask'] = image_mask
         return self.vgbdtg.getObject(id=image_id, **kwargs)
 
     def delete_image(self, image_id):
