@@ -78,7 +78,7 @@ Get details for an image
                               'image')
 
         image = image_mgr.get_image(image_id)
-
+        data = self.parmateter_parsing(image)
         table = KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
         table.align['Value'] = 'l'
@@ -90,6 +90,44 @@ Get details for an image
                        image.get('globalIdentifier', blank())])
 
         return table
+
+    def parmateter_parsing(self, image):
+        data = {}
+        data['note'] = image.get('note')
+        data['tag'] = []
+        for i in range(len(image['tagReferences'])):
+            data['tag'].append(image['tagReferences'][i]['tag']['name'])
+        data['status'] = image['status']['name']
+        import pdb'pdb.set_trace() 
+        data['capacity'] = [[] for i in range(len(image['children'][0]['blockDevices']))]
+        data['capacity_unit'] = [[] for i in range(len(image['children'][0]['blockDevices']))]
+        data['size_on_disk'] = [[] for i in range(len(image['children'][0]['blockDevices']))]
+        data['size_on_disk_unit'] = [[] for i in range(len(image['children'][0]['blockDevices']))]
+        for i in range(len(image['children'][0]['blockDevices']))]:
+            if i ==1:
+                continue 
+            data['capacity'][i] = image['children'][0]['blockDevices'][
+                i]['diskImage']['capacity']
+            data['capacity_unit'][i] = image['children'][0]['blockDevices'][
+                i]['diskImage']['units']
+            data['size_on_disk'][i] = float(image['children'][
+                i]['blockDevices'][0]['diskSpace'])
+            data['size_on_disk_unit'][i] = image['children'][0]['blockDevices'][
+                i]['units']
+            while data['size_on_disk'][i] >= 1:
+                if (data['size_on_disk'][i]/1024 > 1):
+                    data['size_on_disk'][i] = data['size_on_disk'][i]/1024
+                    if data['size_on_disk_unit'][i] == 'B':
+                        data['size_on_disk_unit'][i] = 'KB'
+                    elif data['size_on_disk_unit'][i] == 'KB':
+                        data['size_on_disk_unit'][i] = 'MB'
+                    elif data['size_on_disk_unit'][i] == 'MB':
+                        data['size_on_disk_unit'][i] = 'GB'
+                    elif data['size_on_disk_unit'][i] == 'GB':
+                        data['size_on_disk_unit'][i] = 'TB'
+                else:
+                    break
+        return data
 
 
 class DeleteImage(CLIRunnable):
