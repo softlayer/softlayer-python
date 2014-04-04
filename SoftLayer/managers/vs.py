@@ -53,8 +53,8 @@ class VSManager(IdentifierMixin, object):
            client = SoftLayer.Client()
 
            mgr = SoftLayer.VSManager(client)
-           for vs in mgr.list_instances(hourly=True, datacenter='dal05'):
-               print vs['fullyQualifiedDomainName'], vs['primaryIpAddress']
+           for vsi in mgr.list_instances(hourly=True, datacenter='dal05'):
+               print vsi['fullyQualifiedDomainName'], vs['primaryIpAddress']
 
         """
         if 'mask' not in kwargs:
@@ -480,14 +480,14 @@ class VSManager(IdentifierMixin, object):
         :param string notes: notes about this particular image
 
         """
-        vs = self.get_instance(instance_id)
+        vsi = self.get_instance(instance_id)
 
         disk_filter = lambda x: x['device'] == '0'
         # Disk 1 is swap partition.  Need to skip its capture.
         if additional_disks:
             disk_filter = lambda x: x['device'] != '1'
 
-        disks = [block_device for block_device in vs['blockDevices']
+        disks = [block_device for block_device in vsi['blockDevices']
                  if disk_filter(block_device)]
 
         return self.guest.createArchiveTransaction(

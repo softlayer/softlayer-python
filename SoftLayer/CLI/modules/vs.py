@@ -76,21 +76,21 @@ For more on filters see 'sl help filters'
     action = 'list'
 
     def execute(self, args):
-        vs = VSManager(self.client)
+        vsi = VSManager(self.client)
 
         tags = None
         if args.get('--tags'):
             tags = [tag.strip() for tag in args.get('--tags').split(',')]
 
-        guests = vs.list_instances(hourly=args.get('--hourly'),
-                                   monthly=args.get('--monthly'),
-                                   hostname=args.get('--hostname'),
-                                   domain=args.get('--domain'),
-                                   cpus=args.get('--cpu'),
-                                   memory=args.get('--memory'),
-                                   datacenter=args.get('--datacenter'),
-                                   nic_speed=args.get('--network'),
-                                   tags=tags)
+        guests = vsi.list_instances(hourly=args.get('--hourly'),
+                                    monthly=args.get('--monthly'),
+                                    hostname=args.get('--hostname'),
+                                    domain=args.get('--domain'),
+                                    cpus=args.get('--cpu'),
+                                    memory=args.get('--memory'),
+                                    datacenter=args.get('--datacenter'),
+                                    nic_speed=args.get('--network'),
+                                    tags=tags)
 
         table = Table([
             'id', 'datacenter', 'host',
@@ -128,13 +128,13 @@ Options:
     action = 'detail'
 
     def execute(self, args):
-        vs = VSManager(self.client)
+        vsi = VSManager(self.client)
         table = KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
         table.align['Value'] = 'l'
 
-        vs_id = resolve_id(vs.resolve_ids, args.get('<identifier>'), 'VS')
-        result = vs.get_instance(vs_id)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        result = vsi.get_instance(vs_id)
         result = NestedDict(result)
 
         table.add_row(['id', result['id']])
@@ -227,8 +227,8 @@ Options:
     options = ['datacenter', 'cpu', 'nic', 'disk', 'os', 'memory']
 
     def execute(self, args):
-        vs = VSManager(self.client)
-        result = vs.get_create_options()
+        vsi = VSManager(self.client)
+        result = vsi.get_create_options()
 
         show_all = True
         for opt_name in self.options:
@@ -383,7 +383,7 @@ Optional:
 
     def execute(self, args):
         update_with_template_args(args)
-        vs = VSManager(self.client)
+        vsi = VSManager(self.client)
         self._update_with_like_args(args)
 
         # Disks will be a comma-separated list. Let's make it a real list.
@@ -406,7 +406,7 @@ Optional:
 
         output = []
         if args.get('--test'):
-            result = vs.verify_create_instance(**data)
+            result = vsi.verify_create_instance(**data)
             total_monthly = 0.0
             total_hourly = 0.0
 
@@ -449,7 +449,7 @@ Optional:
             if args['--really'] or confirm(
                     "This action will incur charges on your account. "
                     "Continue?"):
-                result = vs.create_instance(**data)
+                result = vsi.create_instance(**data)
 
                 table = KeyValueTable(['name', 'value'])
                 table.align['name'] = 'r'
@@ -460,7 +460,7 @@ Optional:
                 output.append(table)
 
                 if args.get('--wait'):
-                    ready = vs.wait_for_ready(
+                    ready = vsi.wait_for_ready(
                         result['id'], int(args.get('--wait') or 1))
                     table.add_row(['ready', ready])
             else:
@@ -511,9 +511,9 @@ Optional:
         :param dict args: CLI arguments
         """
         if args['--like']:
-            vs = VSManager(self.client)
-            vs_id = resolve_id(vs.resolve_ids, args.pop('--like'), 'VS')
-            like_details = vs.get_instance(vs_id)
+            vsi = VSManager(self.client)
+            vs_id = resolve_id(vsi.resolve_ids, args.pop('--like'), 'VS')
+            like_details = vsi.get_instance(vs_id)
             like_args = {
                 '--hostname': like_details['hostname'],
                 '--domain': like_details['domain'],
@@ -640,10 +640,10 @@ Optional:
     action = 'ready'
 
     def execute(self, args):
-        vs = VSManager(self.client)
+        vsi = VSManager(self.client)
 
-        vs_id = resolve_id(vs.resolve_ids, args.get('<identifier>'), 'VS')
-        ready = vs.wait_for_ready(vs_id, int(args.get('--wait') or 0))
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        ready = vsi.wait_for_ready(vs_id, int(args.get('--wait') or 0))
 
         if ready:
             return "READY"
@@ -668,8 +668,8 @@ Optional:
     options = ['confirm']
 
     def execute(self, args):
-        vs = VSManager(self.client)
-        vs_id = resolve_id(vs.resolve_ids, args.get('<identifier>'), 'VS')
+        vsi = VSManager(self.client)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
         keys = []
         if args.get('--key'):
             for key in args.get('--key'):
@@ -677,7 +677,7 @@ Optional:
                                     key, 'SshKey')
                 keys.append(key_id)
         if args['--really'] or no_going_back(vs_id):
-            vs.reload_instance(vs_id, args['--postinstall'], keys)
+            vsi.reload_instance(vs_id, args['--postinstall'], keys)
         else:
             CLIAbort('Aborted')
 
@@ -693,10 +693,10 @@ Cancel a virtual server
     options = ['confirm']
 
     def execute(self, args):
-        vs = VSManager(self.client)
-        vs_id = resolve_id(vs.resolve_ids, args.get('<identifier>'), 'VS')
+        vsi = VSManager(self.client)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
         if args['--really'] or no_going_back(vs_id):
-            vs.cancel_instance(vs_id)
+            vsi.cancel_instance(vs_id)
         else:
             CLIAbort('Aborted')
 
@@ -715,8 +715,8 @@ Optional:
 
     def execute(self, args):
         virtual_guest = self.client['Virtual_Guest']
-        vs = VSManager(self.client)
-        vs_id = resolve_id(vs.resolve_ids, args.get('<identifier>'), 'VS')
+        vsi = VSManager(self.client)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
         if args['--really'] or confirm('This will power off the VS with id '
                                        '%s. Continue?' % vs_id):
             if args['--hard']:
@@ -742,8 +742,8 @@ Optional:
 
     def execute(self, args):
         virtual_guest = self.client['Virtual_Guest']
-        vs = VSManager(self.client)
-        vs_id = resolve_id(vs.resolve_ids, args.get('<identifier>'), 'VS')
+        vsi = VSManager(self.client)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
         if args['--really'] or confirm('This will reboot the VS with id '
                                        '%s. Continue?' % vs_id):
             if args['--hard']:
@@ -766,8 +766,8 @@ Power on a virtual server
 
     def execute(self, args):
         virtual_guest = self.client['Virtual_Guest']
-        vs = VSManager(self.client)
-        vs_id = resolve_id(vs.resolve_ids, args.get('<identifier>'), 'VS')
+        vsi = VSManager(self.client)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
         virtual_guest.powerOn(id=vs_id)
 
 
@@ -782,8 +782,8 @@ Pauses an active virtual server
 
     def execute(self, args):
         virtual_guest = self.client['Virtual_Guest']
-        vs = VSManager(self.client)
-        vs_id = resolve_id(vs.resolve_ids, args.get('<identifier>'), 'VS')
+        vsi = VSManager(self.client)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
 
         if args['--really'] or confirm('This will pause the VS with id '
                                        '%s. Continue?' % vs_id):
@@ -802,8 +802,8 @@ Resumes a paused virtual server
 
     def execute(self, args):
         virtual_guest = self.client['Virtual_Guest']
-        vs = VSManager(self.client)
-        vs_id = resolve_id(vs.resolve_ids, args.get('<identifier>'), 'VS')
+        vsi = VSManager(self.client)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
         virtual_guest.resume(id=vs_id)
 
 
@@ -822,10 +822,10 @@ Options:
     def execute(self, args):
         public = args['public']
 
-        vs = VSManager(self.client)
-        vs_id = resolve_id(vs.resolve_ids, args.get('<identifier>'), 'VS')
+        vsi = VSManager(self.client)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
 
-        vs.change_port_speed(vs_id, public, args['--speed'])
+        vsi.change_port_speed(vs_id, public, args['--speed'])
 
 
 class VSDNS(CLIRunnable):
@@ -853,10 +853,10 @@ Options:
     def dns_sync(self, args):
         """ Sync DNS records to match the FQDN of the virtual server """
         dns = DNSManager(self.client)
-        vs = VSManager(self.client)
+        vsi = VSManager(self.client)
 
-        vs_id = resolve_id(vs.resolve_ids, args.get('<identifier>'), 'VS')
-        instance = vs.get_instance(vs_id)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        instance = vsi.get_instance(vs_id)
         zone_id = resolve_id(dns.resolve_ids, instance['domain'], name='zone')
 
         def sync_a_record():
@@ -969,9 +969,9 @@ Options:
         data['hostname'] = args.get('--hostname')
         data['domain'] = args.get('--domain')
 
-        vs = VSManager(self.client)
-        vs_id = resolve_id(vs.resolve_ids, args.get('<identifier>'), 'VS')
-        if not vs.edit(vs_id, **data):
+        vsi = VSManager(self.client)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        if not vsi.edit(vs_id, **data):
             raise CLIAbort("Failed to update virtual server")
 
 
@@ -991,19 +991,19 @@ Optional:
     action = 'capture'
 
     def execute(self, args):
-        vs = VSManager(self.client)
+        vsi = VSManager(self.client)
 
-        vs_id = resolve_id(vs.resolve_ids, args.get('<identifier>'), 'VS')
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
 
         if args['--all']:
             additional_disks = True
         else:
             additional_disks = False
 
-        capture = vs.capture(vs_id,
-                             args.get('--name'),
-                             additional_disks,
-                             args.get('--note'))
+        capture = vsi.capture(vs_id,
+                              args.get('--name'),
+                              additional_disks,
+                              args.get('--note'))
 
         table = KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
@@ -1044,7 +1044,7 @@ However for Network, no reboot is required.
     options = ['confirm']
 
     def execute(self, args):
-        vs = VSManager(self.client)
+        vsi = VSManager(self.client)
         data = {}
         data['cpus'] = args.get('--cpu')
         data['memory'] = args.get('--memory')
@@ -1053,11 +1053,11 @@ However for Network, no reboot is required.
         if args.get('--private'):
             data['public'] = False
         data = self.verify_upgrade_parameters(data)
-        vs_id = resolve_id(vs.resolve_ids, args.get('<identifier>'), 'VS')
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
         if args['--really'] or confirm(
                 "This action will incur charges on your account. "
                 "Continue?"):
-            if not vs.upgrade(vs_id, **data):
+            if not vsi.upgrade(vs_id, **data):
                 raise CLIAbort('VS Upgrade Failed')
 
     def verify_upgrade_parameters(self, data):
