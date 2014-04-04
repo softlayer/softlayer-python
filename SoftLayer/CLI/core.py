@@ -10,11 +10,11 @@ The available modules are:
 
 Compute:
   bmc       Bare Metal Cloud
-  cci       Cloud Compute Instances
   image     Manages compute and flex images
   metadata  Get details about this machine. Also available with 'my' and 'meta'
   server    Hardware servers
   sshkey    Manage SSH keys on your account
+  vs        Virtual Servers (formerly CCIs)
 
 Networking:
   cdn        Content Delivery Network service management
