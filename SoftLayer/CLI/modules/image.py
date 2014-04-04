@@ -77,8 +77,8 @@ Get details for an image
                               args.get('<identifier>'),
                               'image')
 
-        image = image_mgr.get_image(image_id)
-        data = self.parmateter_parsing(image)
+        image, data = image_mgr.get_image(image_id)
+
         table = KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
         table.align['Value'] = 'l'
@@ -88,46 +88,13 @@ Get details for an image
         table.add_row(['name', image['name'].strip()])
         table.add_row(['global_identifier',
                        image.get('globalIdentifier', blank())])
+        table.add_row(['note', data.get('note', blank())])
+        table.add_row(['tag', data.get('tag', blank())])
+        table.add_row(['status', data.get('status', blank())])
+        table.add_row(['Disk Utilized', data.get('size_value', blank())])
+        table.add_row(['Disk Capacity', data.get('capacity_value', blank())])
 
         return table
-
-    def parmateter_parsing(self, image):
-        data = {}
-        data['note'] = image.get('note')
-        data['tag'] = []
-        for i in range(len(image['tagReferences'])):
-            data['tag'].append(image['tagReferences'][i]['tag']['name'])
-        data['status'] = image['status']['name']
-        import pdb'pdb.set_trace() 
-        data['capacity'] = [[] for i in range(len(image['children'][0]['blockDevices']))]
-        data['capacity_unit'] = [[] for i in range(len(image['children'][0]['blockDevices']))]
-        data['size_on_disk'] = [[] for i in range(len(image['children'][0]['blockDevices']))]
-        data['size_on_disk_unit'] = [[] for i in range(len(image['children'][0]['blockDevices']))]
-        for i in range(len(image['children'][0]['blockDevices']))]:
-            if i ==1:
-                continue 
-            data['capacity'][i] = image['children'][0]['blockDevices'][
-                i]['diskImage']['capacity']
-            data['capacity_unit'][i] = image['children'][0]['blockDevices'][
-                i]['diskImage']['units']
-            data['size_on_disk'][i] = float(image['children'][
-                i]['blockDevices'][0]['diskSpace'])
-            data['size_on_disk_unit'][i] = image['children'][0]['blockDevices'][
-                i]['units']
-            while data['size_on_disk'][i] >= 1:
-                if (data['size_on_disk'][i]/1024 > 1):
-                    data['size_on_disk'][i] = data['size_on_disk'][i]/1024
-                    if data['size_on_disk_unit'][i] == 'B':
-                        data['size_on_disk_unit'][i] = 'KB'
-                    elif data['size_on_disk_unit'][i] == 'KB':
-                        data['size_on_disk_unit'][i] = 'MB'
-                    elif data['size_on_disk_unit'][i] == 'MB':
-                        data['size_on_disk_unit'][i] = 'GB'
-                    elif data['size_on_disk_unit'][i] == 'GB':
-                        data['size_on_disk_unit'][i] = 'TB'
-                else:
-                    break
-        return data
 
 
 class DeleteImage(CLIRunnable):
