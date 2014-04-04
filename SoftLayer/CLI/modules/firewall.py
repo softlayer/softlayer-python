@@ -218,7 +218,7 @@ List active firewalls
                 feature_list = blank()
 
             t.add_row([
-                vlan['networkVlanFirewall']['id'],
+                'vlan:%s' % vlan['networkVlanFirewall']['id'],
                 'VLAN - dedicated',
                 feature_list,
                 vlan['id']
@@ -231,7 +231,7 @@ List active firewalls
 
             for fw in fws:
                 t.add_row([
-                    fw['id'],
+                    'cci:%s' % fw['id'],
                     'CCI - standard',
                     '',
                     fw['guestNetworkComponent']['guest']['id']
@@ -241,7 +241,7 @@ List active firewalls
                               vlan['firewallNetworkComponents']))
             for fw in fws:
                 t.add_row([
-                    fw['id'],
+                    'server:%s' % fw['id'],
                     'Server - standard',
                     '',
                     fw['networkComponent']['downlinkComponent']['hardwareId']
@@ -252,14 +252,11 @@ List active firewalls
 
 class FWCancel(CLIRunnable):
     """
-usage: sl firewall cancel  <identifier> (--cci | --vlan | --server) [options]
+usage: sl firewall cancel <identifier> [options]
 
-Cancels a firewall of type either standard (cci or server) or dedicated(vlan)
+Cancels a firewall
 
 Options:
-  --cci        Cancels a standard firewall for a CCI
-  --vlan       Cancels a dedicated firewall for a VLAN
-  --server     Cancels a standard firewall for a server
   --really     Whether to skip the confirmation prompt
 
 """
@@ -268,16 +265,17 @@ Options:
 
     def execute(self, args):
         mgr = FirewallManager(self.client)
-        firewall_id = resolve_id(
-            mgr.resolve_ids, args.get('<identifier>'), 'firewall')
+        input_id = args.get('<identifier>')
+        key_value = input_id.split(':')
+        firewall_id = int(key_value[1])
 
         if args['--really'] or confirm("This action will cancel a firewall"
                                        " from your account. Continue?"):
-            if args['--cci'] or args['--server']:
+            if key_value[0] in ['cci', 'server']:
                 mgr.cancel_firewall(firewall_id, dedicated=False)
-            elif args['--vlan']:
+            elif key_value[0] == 'vlan':
                 mgr.cancel_firewall(firewall_id, dedicated=True)
-            return 'Firewall with id %s is being cancelled!' % firewall_id
+            return 'Firewall with id %s is being cancelled!' % input_id
         else:
             raise CLIAbort('Aborted.')
 
@@ -327,47 +325,40 @@ Options:
 
 class FWDetails(CLIRunnable):
     """
-usage: sl firewall detail <identifier> (--cci | --vlan | --server) [options]
+usage: sl firewall detail <identifier> [options]
 
 Get firewall details
-Options:
-  --cci     return details about standard firewall for a CCI
-  --vlan    return details about dedicated firewall for a VLAN
-  --server  return details about standard firewall for a server
 """
     action = 'detail'
 
     def execute(self, args):
         mgr = FirewallManager(self.client)
-        firewall_id = resolve_id(
-            mgr.resolve_ids, args.get('<identifier>'), 'firewall')
+        firewall_id = args.get('<identifier>')
 
-        if args['--vlan']:
-            rules = mgr.get_dedicated_fwl_rules(firewall_id)
+        key_value = firewall_id.split(':')
+        if key_value[0] == 'vlan':
+            rules = mgr.get_dedicated_fwl_rules(key_value[1])
         else:
-            rules = mgr.get_standard_fwl_rules(firewall_id)
+            rules = mgr.get_standard_fwl_rules(key_value[1])
 
         return get_rules_table(rules)
 
 
 class FWEdit(CLIRunnable):
     """
-usage: sl firewall edit <identifier> (--cci | --vlan | --server) [options]
+usage: sl firewall edit <identifier> [options]
 
 Edit the rules for a firewall
-Options:
-  --cci     specify standard firewall for a CCI
-  --vlan    specify dedicated firewall for a VLAN
-  --server  specify standard firewall for a server
 """
     action = 'edit'
 
     def execute(self, args):
         mgr = FirewallManager(self.client)
-        firewall_id = resolve_id(
-            mgr.resolve_ids, args.get('<identifier>'), 'firewall')
+        input_id = args.get('<identifier>')
 
-        if args['--vlan']:
+        key_value = input_id.split(':')
+        firewall_id = int(key_value[1])
+        if key_value[0] == 'vlan':
             orig_rules = mgr.get_dedicated_fwl_rules(firewall_id)
         else:
             orig_rules = mgr.get_standard_fwl_rules(firewall_id)
@@ -376,7 +367,7 @@ Options:
         while True:
             try:
                 rules = parse_rules(edited_rules)
-                if args['--vlan']:
+                if key_value[0] == 'vlan':
                     rules = mgr.edit_dedicated_fwl_rules(firewall_id, rules)
                 else:
                     rules = mgr.edit_standard_fwl_rules(firewall_id, rules)
