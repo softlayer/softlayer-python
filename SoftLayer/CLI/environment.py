@@ -48,6 +48,7 @@ class Environment(object):
         'hardware': 'server',
         'hw': 'server',
         'bmetal': 'bmc',
+        'virtual': 'vs',
     }
     stdout = sys.stdout
     stderr = sys.stderr
