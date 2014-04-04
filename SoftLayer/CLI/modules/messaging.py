@@ -340,7 +340,7 @@ Options:
         manager = MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
 
-        messages = mq_client.pop_message(
+        messages = mq_client.pop_messages(
             args['<queue_name>'],
             args.get('--count') or 1)
         formatted_messages = []
