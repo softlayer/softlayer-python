@@ -19,7 +19,8 @@ from SoftLayer.managers.sshkey import SshKeyManager
 from SoftLayer.managers.ssl import SSLManager
 from SoftLayer.managers.ticket import TicketManager
 from SoftLayer.managers.iscsi import ISCSIManager
+from SoftLayer.managers.vs import VSManager
 __all__ = ['CCIManager', 'DNSManager', 'FirewallManager', 'HardwareManager',
            'ImageManager', 'MessagingManager', 'MetadataManager',
-           'NetworkManager', 'SshKeyManager', 'SSLManager',
-           'TicketManager', 'ISCSIManager']
+           'NetworkManager', 'SshKeyManager', 'SSLManager', 'TicketManager',
+           'VSManager', 'ISCSIManager']

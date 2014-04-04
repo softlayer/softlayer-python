@@ -636,7 +636,7 @@ class CCIWaitReadyGoTests(unittest.TestCase):
         value = self.cci.wait_for_ready(1, 1, pending=True)
         self.assertFalse(value)
 
-    @patch('SoftLayer.managers.cci.sleep')
+    @patch('SoftLayer.managers.vs.sleep')
     def test_ready_iter_once_incomplete(self, _sleep):
         self.guestObject = self.client['Virtual_Guest'].getObject
 
@@ -648,7 +648,7 @@ class CCIWaitReadyGoTests(unittest.TestCase):
         self.assertFalse(value)
         self.assertFalse(_sleep.called)
 
-    @patch('SoftLayer.managers.cci.sleep')
+    @patch('SoftLayer.managers.vs.sleep')
     def test_iter_once_complete(self, _sleep):
         # no iteration, true
         self.guestObject.side_effect = [
@@ -658,7 +658,7 @@ class CCIWaitReadyGoTests(unittest.TestCase):
         self.assertTrue(value)
         self.assertFalse(_sleep.called)
 
-    @patch('SoftLayer.managers.cci.sleep')
+    @patch('SoftLayer.managers.vs.sleep')
     def test_iter_four_complete(self, _sleep):
         # test 4 iterations with positive match
         self.guestObject.side_effect = [
@@ -676,7 +676,7 @@ class CCIWaitReadyGoTests(unittest.TestCase):
             call(id=1, mask=ANY), call(id=1, mask=ANY),
         ])
 
-    @patch('SoftLayer.managers.cci.sleep')
+    @patch('SoftLayer.managers.vs.sleep')
     def test_iter_two_incomplete(self, _sleep):
         # test 2 iterations, with no matches
         self.guestObject.side_effect = [
@@ -691,7 +691,7 @@ class CCIWaitReadyGoTests(unittest.TestCase):
             call(id=1, mask=ANY), call(id=1, mask=ANY),
         ])
 
-    @patch('SoftLayer.managers.cci.sleep')
+    @patch('SoftLayer.managers.vs.sleep')
     def test_iter_ten_incomplete(self, _sleep):
         # 10 iterations at 10 second sleeps with no
         # matching values.
