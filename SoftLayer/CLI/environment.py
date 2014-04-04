@@ -44,7 +44,8 @@ class Environment(object):
         self.aliases = {
             'meta': 'metadata',
             'my': 'metadata',
-            'vm': 'cci',
+            'vm': 'vs',
+            'cci': 'vs',
             'hardware': 'server',
             'hw': 'server',
             'bmetal': 'bmc',
