@@ -457,8 +457,11 @@ Options:
         if args['--cpu'] or show_all:
             results = self.get_create_options(ds_options, 'cpu')
 
-            cpu_table = Table(['id', 'description'])
-            for result in sorted(results):
+            cpu_table = Table(['ID', 'Description'])
+            cpu_table.align['ID'] = 'r'
+            cpu_table.align['Description'] = 'l'
+
+            for result in sorted(results, key=lambda x: x[1]):
                 cpu_table.add_row([result[1], result[0]])
             table.add_row(['cpu', cpu_table])
 
@@ -520,7 +523,7 @@ Options:
             datacenters = [loc['keyname']
                            for loc in ds_options['locations']]
             return [('datacenter', datacenters)]
-        elif 'cpu' == section:
+        elif 'cpu' == section and 'server' in ds_options['categories']:
             results = []
 
             for item in ds_options['categories']['server']['items']:
@@ -530,7 +533,7 @@ Options:
                 ))
 
             return results
-        elif 'memory' == section:
+        elif 'memory' == section and 'ram' in ds_options['categories']:
             ram = []
             for option in ds_options['categories']['ram']['items']:
                 ram.append((int(option['capacity']), option['price_id']))

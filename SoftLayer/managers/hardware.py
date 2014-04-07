@@ -184,21 +184,25 @@ class HardwareManager(IdentifierMixin, object):
                   the form (id, name, description)
         """
 
-        # Note - This currently returns a hard coded list until the API is
-        # updated to allow filtering on packages to just those for ordering
-        # servers.
-        package_ids = [13, 15, 23, 25, 26, 27, 29, 32, 41, 42, 43, 44, 49, 51,
-                       52, 53, 54, 55, 56, 57, 126, 140, 141, 142, 143, 144,
-                       145, 146, 147, 148, 158]
-
         package_obj = self.client['Product_Package']
         packages = []
 
-        for package_id in package_ids:
-            package = package_obj.getObject(id=package_id,
-                                            mask='mask[id, name, description]')
+        # Pull back only server packages
+        mask = 'id,name,description,type'
+        _filter = {
+            'type': {
+                'keyName': {
+                    'operation': 'in',
+                    'options': [{'name': 'data', 'value': ['BARE_METAL_CPU']}],
+                },
+            },
+        }
 
-            if package.get('name'):
+        for package in package_obj.getAllObjects(mask=mask, filter=_filter):
+            # Filter out packages without a name or that are designated as
+            # 'OUTlET.' The outlet packages are missing some necessary data
+            # and their orders will fail.
+            if package.get('name') and 'OUTLET' not in package['description']:
                 packages.append((package['id'], package['name'],
                                  package['description']))
 
