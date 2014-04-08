@@ -6,7 +6,6 @@ getObject = {
     'primaryIpAddress': '172.16.1.100',
     'hostname': 'hardware-test1',
     'domain': 'test.sftlyr.ws',
-    'bareMetalInstanceFlag': True,
     'fullyQualifiedDomainName': 'hardware-test1.test.sftlyr.ws',
     'processorPhysicalCoreAmount': 2,
     'memoryCapacity': 2,
