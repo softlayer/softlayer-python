@@ -33,6 +33,13 @@ class HardwareManager(IdentifierMixin, object):
         :param string comment: An optional comment to include with the
                                cancellation.
         """
+        # Check to see if this is actually a pre-configured server (BMC). They
+        # require a different cancellation call.
+        server = self.get_hardware(hardware_id,
+                                   mask='id,bareMetalInstanceFlag')
+
+        if server.get('bareMetalInstanceFlag'):
+            return self.cancel_metal(hardware_id)
 
         reasons = self.get_cancellation_reasons()
         cancel_reason = reasons['unneeded']

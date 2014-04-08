@@ -71,10 +71,10 @@ class ServerCLITests(unittest.TestCase):
 
         expected = {
             'cpu': [
-                {'description': 'Dual Quad Core Pancake 200 - 1.60GHz',
-                 'id': 723},
-                {'description': 'Dual Quad Core Pancake 200 - 1.80GHz',
-                 'id': 724}],
+                {'Description': 'Dual Quad Core Pancake 200 - 1.60GHz',
+                 'ID': 723},
+                {'Description': 'Dual Quad Core Pancake 200 - 1.80GHz',
+                 'ID': 724}],
             'datacenter': ['RANDOM_LOCATION'],
             'disk': ['250_SATA_II', '500_SATA_II'],
             'disk_controllers': ['None', 'RAID0'],
@@ -112,10 +112,10 @@ class ServerCLITests(unittest.TestCase):
 
         expected = {
             'cpu': [
-                {'description': 'Dual Quad Core Pancake 200 - 1.60GHz',
-                 'id': 723},
-                {'description': 'Dual Quad Core Pancake 200 - 1.80GHz',
-                 'id': 724}
+                {'Description': 'Dual Quad Core Pancake 200 - 1.60GHz',
+                 'ID': 723},
+                {'Description': 'Dual Quad Core Pancake 200 - 1.80GHz',
+                 'ID': 724}
             ],
         }
 
