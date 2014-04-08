@@ -300,7 +300,7 @@ class HardwareTests(unittest.TestCase):
                     'operation': 'in',
                     'options': [{
                         'name': 'data',
-                        'value': ['BARE_METAL_CPU']
+                        'value': ['BARE_METAL_CPU', 'BARE_METAL_CORE']
                     }]
                 }
             }
