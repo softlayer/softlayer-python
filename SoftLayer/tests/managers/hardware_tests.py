@@ -237,6 +237,10 @@ class HardwareTests(unittest.TestCase):
 
     def test_cancel_hardware_without_reason(self):
         hw_id = 987
+        self.client['Hardware_Server'].getObject.return_value = {
+            'id': hw_id,
+            'bareMetalInstanceFlag': False,
+        }
         result = self.hardware.cancel_hardware(hw_id)
 
         reasons = self.hardware.get_cancellation_reasons()
@@ -247,6 +251,10 @@ class HardwareTests(unittest.TestCase):
 
     def test_cancel_hardware_with_reason_and_comment(self):
         hw_id = 987
+        self.client['Hardware_Server'].getObject.return_value = {
+            'id': hw_id,
+            'bareMetalInstanceFlag': False,
+        }
         reason = 'sales'
         comment = 'Test Comment'
 
@@ -257,6 +265,14 @@ class HardwareTests(unittest.TestCase):
         f = self.client['Ticket'].createCancelServerTicket
         f.assert_called_once_with(hw_id, reasons[reason], comment, True,
                                   'HARDWARE')
+
+    def test_cancel_hardware_on_bmc(self):
+        hw_id = 6327
+
+        result = self.hardware.cancel_hardware(hw_id)
+        f = self.client['Billing_Item'].cancelServiceOnAnniversaryDate
+        f.assert_called_once_with(id=hw_id)
+        self.assertEqual(result, Billing_Item.cancelServiceOnAnniversaryDate)
 
     def test_change_port_speed_public(self):
         hw_id = 1
