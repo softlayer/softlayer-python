@@ -47,8 +47,9 @@ class Environment(object):
         'cci': 'vs',
         'hardware': 'server',
         'hw': 'server',
-        'bmetal': 'bmc',
+        'bmetal': 'server',
         'virtual': 'vs',
+        'bmc': 'server',
     }
     stdout = sys.stdout
     stderr = sys.stderr
