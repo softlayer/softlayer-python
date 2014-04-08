@@ -176,12 +176,26 @@ class HardwareManager(IdentifierMixin, object):
            dictionary that's easier to manage. It's recommended that you cache
            these results with a reasonable lifetime for performance reasons.
         """
-        hw_id = self._get_bare_metal_package_id()
+        hw_id = self.get_bare_metal_package_id()
 
         if not hw_id:
             return None
 
         return self._parse_package_data(hw_id)
+
+    def get_bare_metal_package_id(self):
+        """ Return the bare metal package id """
+        packages = self.client['Product_Package'].getAllObjects(
+            mask='mask[id, name]',
+            filter={'name': query_filter('Bare Metal Instance')})
+
+        hw_id = 0
+        for package in packages:
+            if 'Bare Metal Instance' == package['name']:
+                hw_id = package['id']
+                break
+
+        return hw_id
 
     def get_available_dedicated_server_packages(self):
         """ Retrieves a list of packages that are available for ordering
@@ -200,14 +214,17 @@ class HardwareManager(IdentifierMixin, object):
             'type': {
                 'keyName': {
                     'operation': 'in',
-                    'options': [{'name': 'data', 'value': ['BARE_METAL_CPU']}],
+                    'options': [
+                        {'name': 'data',
+                         'value': ['BARE_METAL_CPU', 'BARE_METAL_CORE']}
+                    ],
                 },
             },
         }
 
         for package in package_obj.getAllObjects(mask=mask, filter=_filter):
             # Filter out packages without a name or that are designated as
-            # 'OUTlET.' The outlet packages are missing some necessary data
+            # 'OUTLET.' The outlet packages are missing some necessary data
             # and their orders will fail.
             if package.get('name') and 'OUTLET' not in package['description']:
                 packages.append((package['id'], package['name'],
@@ -350,7 +367,7 @@ class HardwareManager(IdentifierMixin, object):
                                should either be a chassis ID for dedicated
                                servers or the bare metal instance package ID,
                                which can be obtained by calling
-                               _get_bare_metal_package_id
+                               get_bare_metal_package_id
         :param int disk_controller: The disk controller to use.
         :param list ssh_keys: The SSH keys to add to the root user
         :param int public_vlan: The ID of the public VLAN on which you want
@@ -483,7 +500,7 @@ class HardwareManager(IdentifierMixin, object):
                                should either be a chassis ID for dedicated
                                servers or the bare metal instance package ID,
                                which can be obtained by calling
-                               _get_bare_metal_package_id
+                               get_bare_metal_package_id
         :param int disk_controller: The disk controller to use.
         :param list ssh_keys: The SSH keys to add to the root user
         :param int public_vlan: The ID of the public VLAN on which you want
@@ -521,7 +538,7 @@ class HardwareManager(IdentifierMixin, object):
             order['sshKeys'] = [{'sshKeyIds': ssh_keys}]
 
         if bare_metal:
-            order['packageId'] = self._get_bare_metal_package_id()
+            order['packageId'] = self.get_bare_metal_package_id()
             order['prices'].append({'id': int(server)})
             p_options = self.get_bare_metal_create_options()
             if hourly:
@@ -564,20 +581,6 @@ class HardwareManager(IdentifierMixin, object):
             order['prices'].append({'id': price})
 
         return order
-
-    def _get_bare_metal_package_id(self):
-        """ Return the bare metal package id """
-        packages = self.client['Product_Package'].getAllObjects(
-            mask='mask[id, name]',
-            filter={'name': query_filter('Bare Metal Instance')})
-
-        hw_id = 0
-        for package in packages:
-            if 'Bare Metal Instance' == package['name']:
-                hw_id = package['id']
-                break
-
-        return hw_id
 
     def _get_ids_from_hostname(self, hostname):
         """ Returns list of matching hardware IDs for a given hostname """
