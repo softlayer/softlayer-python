@@ -1,7 +1,9 @@
 getAllObjects = [
     {'id': 13, 'name': 'Mock Testing Package', 'description': 'a thing'},
-    {'id': 27, 'name': 'An additional testing category'},
-    {'id': 50, 'name': 'Bare Metal Instance'},
+    {'id': 27, 'name': 'An additional testing category',
+     'description': 'Another thing - OUTLET'},
+    {'id': 50, 'name': 'Bare Metal Instance',
+     'description': 'Bare Metal Instance'},
 ]
 getObject = getAllObjects[0]
 

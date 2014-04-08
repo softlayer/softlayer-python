@@ -237,6 +237,10 @@ class HardwareTests(unittest.TestCase):
 
     def test_cancel_hardware_without_reason(self):
         hw_id = 987
+        self.client['Hardware_Server'].getObject.return_value = {
+            'id': hw_id,
+            'bareMetalInstanceFlag': False,
+        }
         result = self.hardware.cancel_hardware(hw_id)
 
         reasons = self.hardware.get_cancellation_reasons()
@@ -250,6 +254,11 @@ class HardwareTests(unittest.TestCase):
         reason = 'sales'
         comment = 'Test Comment'
 
+        self.client['Hardware_Server'].getObject.return_value = {
+            'id': hw_id,
+            'bareMetalInstanceFlag': False,
+        }
+
         self.hardware.cancel_hardware(hw_id, reason, comment)
 
         reasons = self.hardware.get_cancellation_reasons()
@@ -257,6 +266,14 @@ class HardwareTests(unittest.TestCase):
         f = self.client['Ticket'].createCancelServerTicket
         f.assert_called_once_with(hw_id, reasons[reason], comment, True,
                                   'HARDWARE')
+
+    def test_cancel_hardware_on_bmc(self):
+        hw_id = 6327
+
+        result = self.hardware.cancel_hardware(hw_id)
+        f = self.client['Billing_Item'].cancelServiceOnAnniversaryDate
+        f.assert_called_once_with(id=hw_id)
+        self.assertEqual(result, Billing_Item.cancelServiceOnAnniversaryDate)
 
     def test_change_port_speed_public(self):
         hw_id = 1
@@ -277,8 +294,20 @@ class HardwareTests(unittest.TestCase):
     def test_get_available_dedicated_server_packages(self):
         self.hardware.get_available_dedicated_server_packages()
 
-        f = self.client['Product_Package'].getObject
-        f.assert_has_calls([call(id=13, mask='mask[id, name, description]')])
+        filter_mock = {
+            'type': {
+                'keyName': {
+                    'operation': 'in',
+                    'options': [{
+                        'name': 'data',
+                        'value': ['BARE_METAL_CPU']
+                    }]
+                }
+            }
+        }
+        f = self.client['Product_Package'].getAllObjects
+        f.assert_has_calls([call(mask='id,name,description,type',
+                                 filter=filter_mock)])
 
     def test_get_dedicated_server_options(self):
         package_id = 13
