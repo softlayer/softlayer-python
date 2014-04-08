@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~
     ISCSI Manager/helpers
 """
-from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
+from SoftLayer.utils import IdentifierMixin
 
 
 class ISCSIManager(IdentifierMixin, object):
@@ -16,33 +16,20 @@ class ISCSIManager(IdentifierMixin, object):
         self.iscsi_svc = self.client['Network_Storage_Iscsi']
         self.product_order = self.client['Product_Order']
 
-    def _find_item_prices(self, size, query='', zero_recurring=False):
+    def _find_item_prices(self, size, categorycode=''):
         """ Retrieves the Item Price IDs
         """
-
-        item_prices = []
-        _filter = NestedDict({})
-        _filter[
-            'itemPrices'][
-            'item'][
-            'description'] = query_filter(
-            query)
-        _filter['itemPrices']['item']['capacity'] = query_filter('%s' % size)
-
-        if not zero_recurring:
-            _filter['itemPrices']['recurringFee'] = query_filter('>1')
-
-        iscsi_item_prices = self.client['Product_Package'].getItemPrices(
+        item_prices = self.client['Product_Package'].getItems(
             id=0,
-            filter=_filter.to_dict())
-        iscsi_item_prices = sorted(
-            iscsi_item_prices,
-            key=lambda x:
-            (float(x['item']['capacity']),
-                float(x.get('recurringFee', 0))))
-        for price in iscsi_item_prices:
-            item_prices.append(price['id'])
-        return item_prices
+            mask='id,capacity,prices[id]',
+            filter={
+                'items': {
+                    'capacity': {'operation': int(size)},
+                    'categories': {
+                        'categoryCode': {'operation': categorycode}
+                    }}})
+        item_price = item_prices[0]['prices'][0]['id']
+        return item_price
 
     def _build_order(self, item_price, location):
         """ Returns a dict appropriate to pass into Product_Order::placeOrder()
@@ -54,7 +41,7 @@ class ISCSIManager(IdentifierMixin, object):
             'SoftLayer_Container_Product_Order_Network_Storage_Iscsi',
             'location': location_id,
             'packageId': 0,  # storage package
-            'prices': [{'id': item_price[0]}],
+            'prices': [{'id': item_price}],
             'quantity': 1
         }
         return order
@@ -66,23 +53,18 @@ class ISCSIManager(IdentifierMixin, object):
         loc_svc = self.client['Location_Datacenter']
         datacenters = loc_svc.getDatacenters(mask='mask[longName,id,name]')
         for datacenter in datacenters:
-            if datacenter['name'] == location[0]:
+            if datacenter['name'] == location:
                 location = datacenter['id']
                 return location
         raise ValueError('Invalid datacenter name specified.')
 
-    def create_iscsi(self, size=None, location=None, zero_recurring=False):
+    def create_iscsi(self, size=None, location=None):
         """Places an order for iSCSI volume
         :param integer size: size of iSCSI volume to create
         :param string location: datacenter to use to create volume in
-        :param boolean zero_recurring: Prefer <$1 recurring fee.
-            Even if API shows <$1 volumes, many users are not
-            allowed order them. Those who are allowed to order
-            the <$1 volumes, can use this flag.
         """
-        item_price = self._find_item_prices(size,
-                                            zero_recurring=zero_recurring,
-                                            query='~GB iSCSI SAN Storage')
+        item_price = self._find_item_prices(int(size),
+                                            categorycode='iscsi')
         iscsi_order = self._build_order(item_price, location)
         self.product_order.verifyOrder(iscsi_order)
         self.product_order.placeOrder(iscsi_order)
@@ -145,7 +127,7 @@ class ISCSIManager(IdentifierMixin, object):
         :param integer capacity: capacity in ~GB
         """
         item_price = self._find_item_prices(
-            int(capacity), query='~iSCSI SAN Snapshot Space')
+            int(capacity), categorycode='iscsi_snapshot_space')
         result = self.get_iscsi(
             volume_id, mask='mask[id,capacityGb,serviceResource[datacenter]]')
         snapshotspaceorder = {
@@ -154,7 +136,7 @@ class ISCSIManager(IdentifierMixin, object):
 Network_Storage_Iscsi_SnapshotSpace',
             'location': result['serviceResource']['datacenter']['id'],
             'packageId': 0,
-            'prices': [{'id': item_price[0]}],
+            'prices': [{'id': item_price}],
             'quantity': 1,
             'volumeId': volume_id}
         self.product_order.verifyOrder(snapshotspaceorder)

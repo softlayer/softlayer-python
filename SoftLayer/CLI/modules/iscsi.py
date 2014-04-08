@@ -60,29 +60,32 @@ List iSCSI accounts
 class CreateISCSI(CLIRunnable):
 
     """
-    usage: sl iscsi create --size=SIZE --dc=DC [options]
+    usage: sl iscsi create [options]
 
     Order/create an iSCSI storage.
 
     Required:
-     --size=SIZE       Size of the iSCSI volume to create
-     --dc=DC           Datacenter to use to create volume in
-    Optional:
-     --zero-recurring  Prefer <$1 recurring fee
+     -s, --size=SIZE       Size of the iSCSI volume to create
+     -d, --datacenter=DC   Datacenter shortname (sng01, dal05, ...)
      """
     action = 'create'
     options = ['confirm']
-    required_params = ['--size', '--dc']
+    required_params = ['--size', '--datacenter']
 
     def execute(self, args):
         iscsi_mgr = ISCSIManager(self.client)
-
         self._validate_create_args(args)
-        size = int(args.get('--size')),
-        location = str(args.get('--dc')),
-        zero_recurring = args.get('--zero-recurring', False)
-        iscsi_mgr.create_iscsi(size=size, location=location,
-                               zero_recurring=zero_recurring)
+        size, location = self._parse_create_args(args)
+        iscsi_mgr.create_iscsi(size=size, location=location)
+
+    def _parse_create_args(self, args):
+        """ Converts CLI arguments to arguments that can be passed into
+            ISCSIManager.create_iscsi.
+        :param dict args: CLI arguments
+        """
+        size = int(args['--size'])
+        location = str(args['--datacenter'])
+        return size, location
 
     def _validate_create_args(self, args):
         """ Raises an ArgumentError if the given arguments are not valid """

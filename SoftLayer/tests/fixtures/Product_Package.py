@@ -1023,6 +1023,13 @@ def get_bmc_categories_mock():
 getCategories = get_server_categories_mock() + get_bmc_categories_mock()
 getItems = [
     {
+        'id': 4439,
+        'capacity': '1',
+        'description': '1 GB iSCSI Storage',
+        'itemCategory': {'categoryCode': 'iscsi'},
+        'prices': [{'id': 2222}],
+    },
+    {
         'id': 4440,
         'capacity': '4',
         'description': '4 Portable Public IP Addresses',

@@ -46,11 +46,10 @@ class ISCSITests(unittest.TestCase):
                           size=10, location='foo')
 
     def test_create_iscsi_without_recurringFee(self):
-        self.iscsi.create_iscsi(size=1, location=['dal05'],
-                                zero_recurring=True)
+        self.iscsi.create_iscsi(size=1, location='dal05')
         f = self.client['Product_Order'].placeOrder
         f.assert_called_once_with(
-            {'prices': [{'id': 22501}],
+            {'prices': [{'id': 2222}],
              'quantity': 1,
              'location': 0,
              'packageId': 0,
@@ -80,7 +79,7 @@ class ISCSITests(unittest.TestCase):
              'complexType':
              'SoftLayer_Container_\
 Product_Order_Network_Storage_Iscsi_SnapshotSpace',
-             'prices': [{'id': 22501}],
+             'prices': [{'id': 2222}],
              'quantity': 1
              })
 
