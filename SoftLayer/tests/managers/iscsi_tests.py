@@ -45,7 +45,16 @@ class ISCSITests(unittest.TestCase):
                           self.iscsi.create_iscsi,
                           size=10, location='foo')
 
-    def test_create_iscsi_without_recurringFee(self):
+    def test_create_iscsi(self):
+        getItems = self.client['Product_Package'].getItems
+        getItems.return_value = [
+            {
+                'id': 4439,
+                'capacity': '1',
+                'description': '1 GB iSCSI Storage',
+                'itemCategory': {'categoryCode': 'iscsi'},
+                'prices': [{'id': 2222}]
+            }]
         self.iscsi.create_iscsi(size=1, location='dal05')
         f = self.client['Product_Order'].placeOrder
         f.assert_called_once_with(
@@ -68,6 +77,15 @@ class ISCSITests(unittest.TestCase):
         f.assert_called_once_with('unNeeded', id=iscsi_id)
 
     def test_create_snapshot_space(self):
+        getItems = self.client['Product_Package'].getItems
+        getItems.return_value = [
+            {
+                'id': 1121,
+                'capacity': '20',
+                'description': '20 GB iSCSI snapshot',
+                'itemCategory': {'categoryCode': 'iscsi_snapshot_space'},
+                'prices': [{'id': 2014}]
+            }]
         iscsi_id = 100
         capacity = 20
         self.iscsi.create_snapshot_space(iscsi_id, capacity)
@@ -79,7 +97,7 @@ class ISCSITests(unittest.TestCase):
              'complexType':
              'SoftLayer_Container_\
 Product_Order_Network_Storage_Iscsi_SnapshotSpace',
-             'prices': [{'id': 2222}],
+             'prices': [{'id': 2014}],
              'quantity': 1
              })
 
