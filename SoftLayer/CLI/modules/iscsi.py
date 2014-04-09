@@ -1,16 +1,16 @@
 """
 usage: sl iscsi [<command>] [<args>...] [options]
 
-Manage iSCSI targets
+Manage, order, delete iSCSI targets
 
 The available commands are:
-  cancel  Cancel iSCSI target
-  create  Create iSCSI target
-  detail  Output details about iSCSI
-  list    List iSCSI targets
+  cancel  Cancel an existing iSCSI target
+  create  Order and create an iSCSI target
+  detail  Output details about an iSCSI
+  list    List iSCSI targets on the account
 
-For several commands, <identifier> will be asked for. This can be the id
-for iSCSI.
+For several commands, <identifier> will be asked for. This will be the id
+for iSCSI target.
 """
 from SoftLayer.CLI import (CLIRunnable, Table, no_going_back, FormattedItem)
 from SoftLayer.CLI.helpers import (
@@ -18,12 +18,12 @@ from SoftLayer.CLI.helpers import (
 from SoftLayer import ISCSIManager
 
 
-class ListISCSI(CLIRunnable):
+class ListISCSIs(CLIRunnable):
 
     """
-    usage: sl iscsi list [options]
+usage: sl iscsi list [options]
 
-List iSCSI accounts
+List iSCSI targets
 """
     action = 'list'
 
@@ -60,14 +60,19 @@ List iSCSI accounts
 class CreateISCSI(CLIRunnable):
 
     """
-    usage: sl iscsi create [options]
+usage: sl iscsi create [options]
 
-    Order/create an iSCSI storage.
+Orders and creates an iSCSI target.
 
-    Required:
-     -s, --size=SIZE       Size of the iSCSI volume to create
-     -d, --datacenter=DC   Datacenter shortname (sng01, dal05, ...)
-     """
+Examples:
+    sl iscsi create --size=1 --datacenter=dal05
+    sl iscsi create --size 1 -d dal05
+    sl iscsi create -s 1 -d dal05
+
+Required:
+  -s, --size=SIZE       Size of the iSCSI volume to create
+  -d, --datacenter=DC   Datacenter shortname (sng01, dal05, ...)
+"""
     action = 'create'
     options = ['confirm']
     required_params = ['--size', '--datacenter']
@@ -83,9 +88,9 @@ class CreateISCSI(CLIRunnable):
             ISCSIManager.create_iscsi.
         :param dict args: CLI arguments
         """
-        size = int(args['--size'])
-        location = str(args['--datacenter'])
-        return size, location
+        size = args['--size']
+        location = args['--datacenter']
+        return int(size), str(location)
 
     def _validate_create_args(self, args):
         """ Raises an ArgumentError if the given arguments are not valid """
@@ -100,13 +105,17 @@ class CancelISCSI(CLIRunnable):
     """
 usage: sl iscsi cancel <identifier> [options]
 
-Cancel iSCSI Storage
+Cancel existing iSCSI
+
+Examples:
+    sl iscsi cancel 12345
+    sl iscsi cancel 12345 --immediate
+    sl iscsi cancel 12345 --immediate --reason='no longer needed'
 
 options :
---immediate    Cancels the iSCSI immediately (instead of on the billing
-             anniversary)
---reason=REASON    An optional cancellation reason.
-
+  --immediate    Cancels the iSCSI immediately (instead of on the billing
+                    anniversary)
+  --reason=REASON    An optional reason for cancellation.
 """
     action = 'cancel'
     options = ['confirm']
@@ -132,12 +141,14 @@ class ISCSIDetails(CLIRunnable):
     """
 usage: sl iscsi detail [--password] <identifier> [options]
 
-Get details for a iSCSI
+Get details for an iSCSI
+
+Examples:
+    sl iscsi detail 12345
+    sl iscsi detail 12345 --password
 
 Options:
-  --password  Show password
-
-
+  --password  Show credentials to access the iSCSI target
 """
     action = 'detail'
 

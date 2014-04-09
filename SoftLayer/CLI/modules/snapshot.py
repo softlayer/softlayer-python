@@ -1,15 +1,17 @@
 """
 usage: sl snapshot [<command>] [<args>...] [options]
 
-Manage iSCSI snapshots
+Manage, order, delete iSCSI snapshots
 
 The available commands are:
-  create          Create snapshot of iSCSI
-  create_space    Orders space for snapshots
-  delete          Delete iSCSI snapshot
+  cancel          Cancel an iSCSI snapshot
+  create          Create a snapshot of given iSCSI volume
+  create-space    Orders space for storing snapshots
   list            List snpshots of given iSCSI
-  restore_volume  Restores volume from existing snapshot
+  restore-volume  Restores volume from existing snapshot
 
+For several commands <identifier> will be asked for.This can be the id
+of iSCSI volume or iSCSI snapshot.
 """
 from SoftLayer.CLI import (CLIRunnable, Table)
 from SoftLayer.CLI.helpers import (
@@ -18,15 +20,19 @@ from SoftLayer.CLI.helpers import (
 from SoftLayer import ISCSIManager
 
 
-class ISCSICreateSnapshot(CLIRunnable):
+class CreateSnapshot(CLIRunnable):
 
     """
 usage: sl snapshot create <identifier> [options]
 
-create an iSCSI snapshot.
+Create a snapshot of the iSCSI volume.
+
+Examples:
+    sl snapshot create 123456 --note='Backup'
+    sl snapshot create 123456
 
 Options:
-  --notes=NOTE    An optional note
+  --notes=NOTE    An optional snapshot's note
 
 """
     action = 'create'
@@ -41,18 +47,21 @@ Options:
         iscsi_mgr.create_snapshot(iscsi_id, notes)
 
 
-class CreateIscsiSpace(CLIRunnable):
+class CreateSnapshotSpace(CLIRunnable):
 
     """
-usage: sl snapshot create_space <identifier> [options]
+usage: sl snapshot create-space <identifier> [options]
 
-Orders iSCSI snapshot space.
+Orders snapshot space for given iSCSI.
+
+Examples:
+    sl snapshot create-space 123456 --capacity=20
 
 Required :
-  --capacity=Capacity Snapshot Capacity
+  --capacity=CAPACITY Size of snapshot space to create
 """
 
-    action = 'create_space'
+    action = 'create-space'
     required_params = ['--capacity']
 
     def execute(self, args):
@@ -69,15 +78,15 @@ Required :
         iscsi_mgr.create_snapshot_space(iscsi_id, capacity)
 
 
-class ISCSIDeleteSnapshot(CLIRunnable):
+class CancelSnapshot(CLIRunnable):
 
     """
-usage: sl snapshot delete <identifier> [options]
+usage: sl snapshot cancel <identifier> [options]
 
-Delete iSCSI snapshot.
+Cancel/Delete iSCSI snapshot.
 
 """
-    action = 'delete'
+    action = 'cancel'
 
     def execute(self, args):
         iscsi_mgr = ISCSIManager(self.client)
@@ -91,12 +100,12 @@ Delete iSCSI snapshot.
 class RestoreVolumeFromSnapshot(CLIRunnable):
 
     """
-usage: sl snapshot restore_volume <volume_identifier> <snapshot_identifier>
+usage: sl snapshot restore-volume <volume_identifier> <snapshot_identifier>
 
 restores volume from existing snapshot.
 
 """
-    action = 'restore_volume'
+    action = 'restore-volume'
 
     def execute(self, args):
         iscsi_mgr = ISCSIManager(self.client)
@@ -109,7 +118,7 @@ restores volume from existing snapshot.
         iscsi_mgr.restore_from_snapshot(volume_id, snapshot_id)
 
 
-class ListISCSISnapshots(CLIRunnable):
+class ListSnapshots(CLIRunnable):
 
     """
 usage: sl snapshot list <identifier>
