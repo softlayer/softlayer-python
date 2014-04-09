@@ -177,6 +177,16 @@ class ServerCLITests(unittest.TestCase):
                 'id': 1001,
                 'backend_ip': '10.1.0.3',
                 'active_transaction': None
+            },
+            {
+                'datacenter': 'TEST00',
+                'primary_ip': '172.16.4.95',
+                'host': 'hardware-bad-memory.test.sftlyr.ws',
+                'memory': 0,
+                'cores': 4,
+                'id': 1002,
+                'backend_ip': '10.1.0.4',
+                'active_transaction': None
             }
         ]
 

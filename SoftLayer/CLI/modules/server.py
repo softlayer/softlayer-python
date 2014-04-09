@@ -97,7 +97,7 @@ For more on filters see 'sl help filters'
                 server['datacenter']['name'] or blank(),
                 server['fullyQualifiedDomainName'],
                 server['processorPhysicalCoreAmount'],
-                gb(server['memoryCapacity']),
+                gb(server['memoryCapacity'] or 0),
                 server['primaryIpAddress'] or blank(),
                 server['primaryBackendIpAddress'] or blank(),
                 active_txn(server),

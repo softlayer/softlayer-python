@@ -28,6 +28,14 @@ MESSAGE_1 = {
     'message': 'Object created',
     'visibility_delay': 0,
     'visibility_interval': 30000}
+MESSAGE_POP = {
+    'item_count': 1,
+    'items': [MESSAGE_1],
+}
+MESSAGE_POP_EMPTY = {
+    'item_count': 0,
+    'items': []
+}
 
 TOPIC_1 = {'name': 'example_topic', 'tags': ['tag1', 'tag2', 'tag3']}
 TOPIC_LIST = {'item_count': 1, 'items': [TOPIC_1]}
@@ -304,13 +312,31 @@ class MessagingConnectionTests(unittest.TestCase):
         self.assertEqual(MESSAGE_1, result)
 
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    def test_pop_messages(self, make_request):
+        make_request().content = json.dumps(MESSAGE_POP)
+        result = self.conn.pop_messages('example_queue')
+
+        make_request.assert_called_with(
+            'get', 'queues/example_queue/messages', params={'batch': 1})
+        self.assertEqual(MESSAGE_POP, result)
+
+    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
     def test_pop_message(self, make_request):
-        make_request().content = json.dumps(MESSAGE_1)
+        make_request().content = json.dumps(MESSAGE_POP)
         result = self.conn.pop_message('example_queue')
 
         make_request.assert_called_with(
             'get', 'queues/example_queue/messages', params={'batch': 1})
         self.assertEqual(MESSAGE_1, result)
+
+    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    def test_pop_message_empty(self, make_request):
+        make_request().content = json.dumps(MESSAGE_POP_EMPTY)
+        result = self.conn.pop_message('example_queue')
+
+        make_request.assert_called_with(
+            'get', 'queues/example_queue/messages', params={'batch': 1})
+        self.assertEqual(None, result)
 
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
     def test_delete_message(self, make_request):

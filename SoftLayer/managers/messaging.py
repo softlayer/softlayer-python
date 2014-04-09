@@ -256,8 +256,8 @@ class MessagingConnection(object):
                                   data=json.dumps(message))
         return json.loads(resp.content)
 
-    def pop_message(self, queue_name, count=1):
-        """ Pop message from a queue
+    def pop_messages(self, queue_name, count=1):
+        """ Pop messages from a queue
 
         :param queue_name: Queue Name
         :param count: (optional) number of messages to retrieve
@@ -265,6 +265,18 @@ class MessagingConnection(object):
         resp = self._make_request('get', 'queues/%s/messages' % queue_name,
                                   params={'batch': count})
         return json.loads(resp.content)
+
+    def pop_message(self, queue_name):
+        """ Pop a single message from a queue. If no messages are returned
+            this returns None
+
+        :param queue_name: Queue Name
+        """
+        messages = self.pop_messages(queue_name, count=1)
+        if messages['item_count'] > 0:
+            return messages['items'][0]
+        else:
+            return None
 
     def delete_message(self, queue_name, message_id):
         """ Delete a message
