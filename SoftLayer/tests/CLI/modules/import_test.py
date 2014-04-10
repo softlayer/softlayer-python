@@ -16,5 +16,5 @@ class TestImportCLIModules(unittest.TestCase):
         modules = get_module_list()
         for module in modules:
             module_path = 'SoftLayer.CLI.modules.' + module
-
+            print("Importing %s" % module_path)
             import_module(module_path)
