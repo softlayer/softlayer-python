@@ -199,7 +199,7 @@ List active firewalls
 
     def execute(self, args):
         mgr = FirewallManager(self.client)
-        t = Table(['firewall id',
+        table = Table(['firewall id',
                    'type',
                    'features',
                    'server/vlan id'])
@@ -217,7 +217,7 @@ List active firewalls
             else:
                 feature_list = blank()
 
-            t.add_row([
+            table.add_row([
                 'vlan:%s' % vlan['networkVlanFirewall']['id'],
                 'VLAN - dedicated',
                 feature_list,
@@ -230,7 +230,7 @@ List active firewalls
                               vlan['firewallGuestNetworkComponents']))
 
             for fw in fws:
-                t.add_row([
+                table.add_row([
                     'cci:%s' % fw['id'],
                     'CCI - standard',
                     '',
@@ -240,14 +240,14 @@ List active firewalls
             fws = list(filter(has_firewall_component,
                               vlan['firewallNetworkComponents']))
             for fw in fws:
-                t.add_row([
+                table.add_row([
                     'server:%s' % fw['id'],
                     'Server - standard',
                     '',
                     fw['networkComponent']['downlinkComponent']['hardwareId']
                 ])
 
-        return t
+        return table
 
 
 class FWCancel(CLIRunnable):
