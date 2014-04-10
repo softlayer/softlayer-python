@@ -37,10 +37,11 @@ class LoadBalancerManager(IdentifierMixin, object):
         kwargs['id'] = 0  # look at package id 0
         kwargs['filter'] = _filter.to_dict()
         packages = self.prod_pkg.getItems(**kwargs)
+        pkgs = []
         for package in packages:
-            if package['description'].startswith('Global'):
-                packages.remove(package)
-        return packages
+            if not package['description'].startswith('Global'):
+                pkgs.append(package)
+        return pkgs
 
     def get_ip_address(self, ip_address=None):
         """ Retrieves the IP address object given the ip address itself
