@@ -53,11 +53,11 @@ def get_rules_table(rules):
     :param list rules: A list containing the rules of the firewall
     :returns: a formatted table of the firewall rules
     """
-    t = Table(['#', 'action', 'protocol', 'src_ip', 'src_mask', 'dest',
-               'dest_mask'])
-    t.sortby = '#'
+    table = Table(['#', 'action', 'protocol', 'src_ip', 'src_mask', 'dest',
+                   'dest_mask'])
+    table.sortby = '#'
     for rule in rules:
-        t.add_row([
+        table.add_row([
             rule['orderValue'],
             rule['action'],
             rule['protocol'],
@@ -67,7 +67,7 @@ def get_rules_table(rules):
                           rule['destinationPortRangeStart'],
                           rule['destinationPortRangeEnd']),
             rule['destinationIpSubnetMask']])
-    return t
+    return table
 
 
 def get_formatted_rule(rule=None):
@@ -226,25 +226,25 @@ List active firewalls
 
         shared_vlan = filter(lambda x: not x['dedicatedFirewallFlag'], fwvlans)
         for vlan in shared_vlan:
-            fws = list(filter(has_firewall_component,
-                              vlan['firewallGuestNetworkComponents']))
+            firewalls = list(filter(has_firewall_component,
+                                    vlan['firewallGuestNetworkComponents']))
 
-            for fw in fws:
+            for firewall in firewalls:
                 table.add_row([
-                    'cci:%s' % fw['id'],
+                    'cci:%s' % firewall['id'],
                     'CCI - standard',
                     '',
-                    fw['guestNetworkComponent']['guest']['id']
+                    firewall['guestNetworkComponent']['guest']['id']
                 ])
 
-            fws = list(filter(has_firewall_component,
-                              vlan['firewallNetworkComponents']))
-            for fw in fws:
+            firewalls = list(filter(has_firewall_component,
+                                    vlan['firewallNetworkComponents']))
+            for fwl in firewalls:
                 table.add_row([
-                    'server:%s' % fw['id'],
+                    'server:%s' % fwl['id'],
                     'Server - standard',
                     '',
-                    fw['networkComponent']['downlinkComponent']['hardwareId']
+                    fwl['networkComponent']['downlinkComponent']['hardwareId']
                 ])
 
         return table
@@ -299,10 +299,10 @@ Options:
         mgr = FirewallManager(self.client)
         input_id = resolve_id(
             mgr.resolve_ids, args.get('<identifier>'), 'firewall')
-        ha = args.get('--ha', False)
+        ha_support = args.get('--ha', False)
         if not args['--really']:
             if args['--vlan']:
-                pkg = mgr.get_dedicated_fwl_pkg(ha_enabled=ha)
+                pkg = mgr.get_dedicated_fwl_pkg(ha_enabled=ha_support)
             elif args['--cci']:
                 pkg = mgr.get_std_fwl_pkg(input_id)
             elif args['--server']:
@@ -314,7 +314,7 @@ Options:
                 raise CLIAbort('Aborted.')
 
         if args['--vlan']:
-            mgr.add_vlan_firewall(input_id, ha_enabled=ha)
+            mgr.add_vlan_firewall(input_id, ha_enabled=ha_support)
         elif args['--cci']:
             mgr.add_standard_firewall(input_id, is_cci=True)
         elif args['--server']:
@@ -372,8 +372,8 @@ Edit the rules for a firewall
                 else:
                     rules = mgr.edit_standard_fwl_rules(firewall_id, rules)
                 break
-            except Exception as e:
-                print "Unexpected error({%s})" % (e)
+            except Exception as error:
+                print "Unexpected error({%s})" % (error)
                 if confirm("Would you like to continue editing the rules. "
                            "Continue?"):
                     edited_rules = open_editor(content=edited_rules)

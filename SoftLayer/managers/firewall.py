@@ -215,10 +215,10 @@ class FirewallManager(IdentifierMixin, object):
         for fwl1 in network_vlan['firewallInterfaces']:
             if fwl1['name'] == 'inside':
                 continue
-            for controlList in fwl1['firewallContextAccessControlLists']:
-                if controlList['direction'] == 'out':
+            for control_list in fwl1['firewallContextAccessControlLists']:
+                if control_list['direction'] == 'out':
                     continue
-                fwl_ctx_acl_id = controlList['id']
+                fwl_ctx_acl_id = control_list['id']
 
         template = {
             'firewallContextAccessControlListId': fwl_ctx_acl_id,
