@@ -66,7 +66,7 @@ def get_rules_table(rules):
             '%s:%s-%s' % (rule['destinationIpAddress'],
                           rule['destinationPortRangeStart'],
                           rule['destinationPortRangeEnd']),
-                          rule['destinationIpSubnetMask']])
+            rule['destinationIpSubnetMask']])
     return t
 
 
