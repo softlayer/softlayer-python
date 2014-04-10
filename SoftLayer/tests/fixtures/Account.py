@@ -353,3 +353,5 @@ getNetworkVlans = [{
     'subnets': [],
     'virtualGuests': [{'id': 3}]
 }]
+
+getAdcLoadBalancers = []

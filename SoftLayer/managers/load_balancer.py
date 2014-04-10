@@ -38,7 +38,7 @@ class LoadBalancerManager(IdentifierMixin, object):
         kwargs['filter'] = _filter.to_dict()
         packages = self.prod_pkg.getItems(**kwargs)
         for package in packages:
-            if package['description'].startsWith('Global'):
+            if package['description'].startswith('Global'):
                 packages.remove(package)
         return packages
 
@@ -193,7 +193,6 @@ class LoadBalancerManager(IdentifierMixin, object):
 
         virtual_servers = self.lb_svc.getVirtualServers(id=loadbal_id,
                                                         **kwargs)
-
         for service in virtual_servers[0]['serviceGroups'][0]['services']:
             if service['id'] == service_id:
                 if enabled != -1:
