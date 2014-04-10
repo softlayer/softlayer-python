@@ -180,7 +180,8 @@ class FirewallManager(IdentifierMixin, object):
                     # 'primarySubnet': None,
                 }
             })['networkVlans']
-        return list(filter(has_firewall, results))
+        return [firewall for firewall in results
+                if has_firewall(firewall)]
 
     def get_standard_fwl_rules(self, firewall_id):
         """ Get the rules of a standard firewall

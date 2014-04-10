@@ -28,6 +28,7 @@ def print_package_info(package):
 
     :param dict package: A dictionary representing the firewall package
     """
+    print package
     print "******************"
     print "Product: %s" % package[0]['description']
     print "Price: %s$ monthly" % package[0]['prices'][0]['recurringFee']
@@ -205,7 +206,8 @@ List active firewalls
                        'server/vlan id'])
 
         fwvlans = mgr.get_firewalls()
-        dedicatedfws = filter(lambda x: x['dedicatedFirewallFlag'], fwvlans)
+        dedicatedfws = [firewall for firewall in fwvlans
+                        if firewall['dedicatedFirewallFlag']]
 
         for vlan in dedicatedfws:
             features = []
@@ -224,26 +226,28 @@ List active firewalls
                 vlan['id']
             ])
 
-        shared_vlan = filter(lambda x: not x['dedicatedFirewallFlag'], fwvlans)
+        shared_vlan = [firewall for firewall in fwvlans
+                       if not firewall['dedicatedFirewallFlag']]
         for vlan in shared_vlan:
-            firewalls = list(filter(has_firewall_component,
-                                    vlan['firewallGuestNetworkComponents']))
+            fwls = [guest for guest in vlan['firewallGuestNetworkComponents']
+                    if has_firewall_component(guest)]
 
-            for firewall in firewalls:
+            for firewall in fwls:
                 table.add_row([
                     'cci:%s' % firewall['id'],
                     'CCI - standard',
-                    '',
+                    '-',
                     firewall['guestNetworkComponent']['guest']['id']
                 ])
 
-            firewalls = list(filter(has_firewall_component,
-                                    vlan['firewallNetworkComponents']))
-            for fwl in firewalls:
+            fwls = [server for server in vlan['firewallNetworkComponents']
+                    if has_firewall_component(server)]
+
+            for fwl in fwls:
                 table.add_row([
                     'server:%s' % fwl['id'],
                     'Server - standard',
-                    '',
+                    '-',
                     fwl['networkComponent']['downlinkComponent']['hardwareId']
                 ])
 
@@ -307,6 +311,9 @@ Options:
                 pkg = mgr.get_std_fwl_pkg(input_id)
             elif args['--server']:
                 pkg = mgr.get_std_fwl_pkg(input_id, is_cci=False)
+
+            if not pkg:
+                return "Unable to add firewall - Is network public enabled?"
             print_package_info(pkg)
 
             if not confirm("This action will incur charges on your account. "
