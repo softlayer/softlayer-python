@@ -200,9 +200,9 @@ List active firewalls
     def execute(self, args):
         mgr = FirewallManager(self.client)
         table = Table(['firewall id',
-                   'type',
-                   'features',
-                   'server/vlan id'])
+                       'type',
+                       'features',
+                       'server/vlan id'])
 
         fwvlans = mgr.get_firewalls()
         dedicatedfws = filter(lambda x: x['dedicatedFirewallFlag'], fwvlans)
