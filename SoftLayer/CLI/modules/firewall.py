@@ -28,11 +28,10 @@ def print_package_info(package):
 
     :param dict package: A dictionary representing the firewall package
     """
-    print package
-    print "******************"
-    print "Product: %s" % package[0]['description']
-    print "Price: %s$ monthly" % package[0]['prices'][0]['recurringFee']
-    print "******************"
+    print("******************")
+    print("Product: %s" % package[0]['description'])
+    print("Price: %s$ monthly" % package[0]['prices'][0]['recurringFee'])
+    print("******************")
     return
 
 
@@ -371,19 +370,26 @@ Edit the rules for a firewall
             orig_rules = mgr.get_standard_fwl_rules(firewall_id)
         # open an editor for the user to enter their rules
         edited_rules = open_editor(rules=orig_rules)
-        while True:
-            try:
-                rules = parse_rules(edited_rules)
-                if key_value[0] == 'vlan':
-                    rules = mgr.edit_dedicated_fwl_rules(firewall_id, rules)
-                else:
-                    rules = mgr.edit_standard_fwl_rules(firewall_id, rules)
-                break
-            except Exception as error:
-                print "Unexpected error({%s})" % (error)
-                if confirm("Would you like to continue editing the rules. "
-                           "Continue?"):
-                    edited_rules = open_editor(content=edited_rules)
-                else:
-                    raise CLIAbort('Aborted.')
-        return 'Firewall updated!'
+        print(edited_rules)
+        if confirm("Would you like to submit the rules. "
+                   "Continue?"):
+            while True:
+                try:
+                    rules = parse_rules(edited_rules)
+                    if key_value[0] == 'vlan':
+                        rules = mgr.edit_dedicated_fwl_rules(firewall_id,
+                                                             rules)
+                    else:
+                        rules = mgr.edit_standard_fwl_rules(firewall_id,
+                                                            rules)
+                    break
+                except Exception as error:
+                    print("Unexpected error({%s})" % (error))
+                    if confirm("Would you like to continue editing the rules"
+                               ". Continue?"):
+                        edited_rules = open_editor(content=edited_rules)
+                    else:
+                        raise CLIAbort('Aborted.')
+                    return 'Firewall updated!'
+        else:
+            raise CLIAbort('Aborted.')
