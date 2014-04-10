@@ -1,8 +1,8 @@
 getObject = {
     'id': 100,
-    'hostname': 'cci-test1',
+    'hostname': 'vs-test1',
     'domain': 'test.sftlyr.ws',
-    'fullyQualifiedDomainName': 'cci-test1.test.sftlyr.ws',
+    'fullyQualifiedDomainName': 'vs-test1.test.sftlyr.ws',
     'status': {'keyName': 'ACTIVE', 'name': 'Active'},
     'datacenter': {'id': 50, 'name': 'TEST00',
                    'description': 'Test Data Center'},

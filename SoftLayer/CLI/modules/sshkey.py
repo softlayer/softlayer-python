@@ -109,8 +109,7 @@ usage: sl sshkey list [options]
 Display a list of SSH keys on your account
 
 Options:
-  --sortby=ARG  Column to sort by. options: datacenter, vlans, subnets, IPs,
-                  networking, hardware, ccis, firewall
+  --sortby=ARG  Column to sort by. options: label, fingerprint, notes
 """
     action = 'list'
 

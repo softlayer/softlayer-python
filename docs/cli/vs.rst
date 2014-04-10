@@ -1,28 +1,28 @@
-.. _cci_user_docs:
+.. _vs_user_docs:
   
-Working with Cloud Compute Instances
-====================================
-Using the SoftLayer portal for ordering Cloud Compute Instances is fine but for a number of reasons it's sometimes to use the command-line. For this, you can use the SoftLayer command-line client to make administrative tasks quicker and easier. This page gives an intro to working with SoftLayer Cloud Compute Instances using the SoftLayer command-line client.
+Working with Virtual Servers
+============================
+Using the SoftLayer portal for ordering virtual servers is fine, but for a number of reasons it's sometimes to use the command-line. For this, you can use the SoftLayer command-line client to make administrative tasks quicker and easier. This page gives an intro to working with SoftLayer virtual servers using the SoftLayer command-line client.
 
 .. note::
 
 	The following assumes that the client is already :ref:`configured with valid SoftLayer credentials<cli>`.
 
 
-First, let's list the current Cloud Compute Instances with `sl cci list`.
+First, let's list the current virtual servers with `sl vs list`.
 ::
 
-	$ sl cci list
+	$ sl vs list
 	:....:............:......:.......:........:............:............:....................:
 	: id : datacenter : host : cores : memory : primary_ip : backend_ip : active_transaction :
 	:....:............:......:.......:........:............:............:....................:
 	:....:............:......:.......:........:............:............:....................:
 
-We don't have any Cloud Compute Instances! Let's fix that. Before we can create a CCI, we need to know what options are available to me: RAM, CPU, operating systems, disk sizes, disk types, datacenters. Luckily, there's a simple command to do that, `sl cci create-options`.
+We don't have any virtual servers! Let's fix that. Before we can create a VS, we need to know what options are available to me: RAM, CPU, operating systems, disk sizes, disk types, datacenters. Luckily, there's a simple command to do that, `sl vs create-options`.
 
 ::
 
-	$ sl cci create-options
+	$ sl vs create-options
 	:.................:..............................................................................................:
 	:            Name : Value                                                                                        :
 	:.................:..............................................................................................:
@@ -85,11 +85,11 @@ We don't have any Cloud Compute Instances! Let's fix that. Before we can create 
 	:             nic : 10,100,1000                                                                                  :
 	:.................:..............................................................................................:
 
-Here's the command to create a 2-core, 1G memory, Ubuntu 12.04 hourly instance in the San Jose datacenter using the command `sl cci create`.
+Here's the command to create a 2-core, 1G memory, Ubuntu 12.04 hourly instance in the San Jose datacenter using the command `sl vs create`.
 
 ::
 
-	$ sl cci create --host=example --domain=softlayer.com -c 2 -m 1024 -o UBUNTU_12_64 --hourly --datacenter sjc01
+	$ sl vs create --host=example --domain=softlayer.com -c 2 -m 1024 -o UBUNTU_12_64 --hourly --datacenter sjc01
 	This action will incur charges on your account. Continue? [y/N]: y
 	:.........:......................................:
 	:    name : value                                :
@@ -100,11 +100,11 @@ Here's the command to create a 2-core, 1G memory, Ubuntu 12.04 hourly instance i
 	:.........:......................................:
 
 
-With the last command, the Cloud Compute Instance has begun being created. It should instantly appear in your listing now.
+With the last command, the virtual server has begun being created. It should instantly appear in your listing now.
 
 ::
 
-	$ sl cci list
+	$ sl vs list
 	:.........:............:.......................:.......:........:................:..............:....................:
 	:    id   : datacenter :          host         : cores : memory :   primary_ip   :  backend_ip  : active_transaction :
 	:.........:............:.......................:.......:........:................:..............:....................:
@@ -115,18 +115,18 @@ Cool. You may ask "It's creating... but how do I know when it's done?". Well, he
 
 ::
 
-	$ sl cci ready 'example' --wait=600
+	$ sl vs ready 'example' --wait=600
 	READY
 
-When the previous command returns, I know that the Cloud Compute Instance has finished the provisioning process and is ready to use. This is *very* useful for chaining commands together. Now that you have your Cloud Compute Instance, let's get access to it. To do that, use the `sl cci detail` command. From the example below, you can see that the username is 'root' and password is 'ABCDEFGH'.
+When the previous command returns, I know that the virtual server has finished the provisioning process and is ready to use. This is *very* useful for chaining commands together. Now that you have your virtual server, let's get access to it. To do that, use the `sl vs detail` command. From the example below, you can see that the username is 'root' and password is 'ABCDEFGH'.
 
 .. warning::
 
-	Be careful when using the `--passwords` flag. This will print the password to the Cloud Compute Instance onto the screen. Make sure no one is looking over your shoulder. It's also advisable to change your root password soon after creating your Cloud Compute Instance.
+	Be careful when using the `--passwords` flag. This will print the password to the virtual server onto the screen. Make sure no one is looking over your shoulder. It's also advisable to change your root password soon after creating your virtual server.
 
 ::
 
-	$ sl cci detail example --passwords
+	$ sl vs detail example --passwords
 	:..............:...........................:
 	:         Name : Value                     :
 	:..............:...........................:
@@ -148,30 +148,37 @@ When the previous command returns, I know that the Cloud Compute Instance has fi
 	:..............:...........................:
 
 
-There are many other commands to help manage Cloud Compute Instances. To see them all, use `sl help cci`.
+There are many other commands to help manage virtual servers. To see them all, use `sl help vs`.
 
 ::
 	
-	$ sl help cci
-	usage: sl cci [<command>] [<args>...] [options]
+	$ sl help vs
+	usage: sl vs [<command>] [<args>...] [options]
 
 	Manage, delete, order compute instances
 
 	The available commands are:
-	  network         Manage network settings
-	  create          Order and create a CCI
-	                    (see `sl cci create-options` for choices)
-	  manage          Manage active CCI
-	  list            List CCI's on the account
-	  detail          Output details about a CCI
-	  dns             DNS related actions to a CCI
-	  cancel          Cancel a running CCI
-	  create-options  Output available available options when creating a CCI
-	  reload          Reload the OS on a CCI based on its current configuration
-	  ready           Check if a CCI has finished provisioning
+	  cancel          Cancel a running virtual server
+	  capture         Create an image the disk(s) of a virtual server
+	  create          Order and create a virtual server
+	                    (see sl vs create-options for choices)
+	  create-options  Output available available options when creating a VS
+	  detail          Output details about a virtual server
+	  dns             DNS related actions to a virtual server
+	  edit            Edit details of a virtual server
+	  list            List virtual servers on the account
+	  nic-edit        Edit NIC settings
+	  pause           Pauses an active virtual server
+	  power-off       Powers off a running virtual server
+	  power-on        Boots up a virtual server
+	  ready           Check if a virtual server has finished provisioning
+	  reboot          Reboots a running virtual server
+	  reload          Reload the OS on a VS based on its current configuration
+	  resume          Resumes a paused virtual server
+	  upgrade         Upgrades parameters of a virtual server
 
 	For several commands, <identifier> will be asked for. This can be the id,
-	hostname or the ip address for a CCI.
+	hostname or the ip address for a virtual server.
 
 	Standard Options:
 	  -h --help  Show this screen

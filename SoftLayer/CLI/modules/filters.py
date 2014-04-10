@@ -22,9 +22,9 @@ Available Operations:
 Examples:
     sl server list --datacenter=dal05
     sl server list --hostname='prod*'
-    sl cci list --network=100 --cpu=2
-    sl cci list --network='< 100' --cpu=2
-    sl cci list --memory='>= 2048'
+    sl vs list --network=100 --cpu=2
+    sl vs list --network='< 100' --cpu=2
+    sl vs list --memory='>= 2048'
 
 Note: Comparison operators (>, <, >=, <=) can be used with integers, floats,
       and strings.

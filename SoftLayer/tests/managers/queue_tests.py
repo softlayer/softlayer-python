@@ -1,6 +1,6 @@
 """
-    SoftLayer.tests.managers.cci_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    SoftLayer.tests.managers.queue_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :license: MIT, see LICENSE for more details.
 """
