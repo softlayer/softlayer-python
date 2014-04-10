@@ -48,6 +48,7 @@ class Environment(object):
             'hardware': 'server',
             'hw': 'server',
             'bmetal': 'bmc',
+            'lb': 'loadbal',
         }
         self.stdout = sys.stdout
         self.stderr = sys.stderr

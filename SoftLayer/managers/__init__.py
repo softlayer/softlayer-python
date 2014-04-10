@@ -12,6 +12,7 @@ from SoftLayer.managers.dns import DNSManager
 from SoftLayer.managers.firewall import FirewallManager
 from SoftLayer.managers.hardware import HardwareManager
 from SoftLayer.managers.image import ImageManager
+from SoftLayer.managers.load_balancer import LoadBalancerManager
 from SoftLayer.managers.messaging import MessagingManager
 from SoftLayer.managers.metadata import MetadataManager
 from SoftLayer.managers.network import NetworkManager
@@ -22,4 +23,5 @@ from SoftLayer.managers.iscsi import ISCSIManager
 __all__ = ['CCIManager', 'DNSManager', 'FirewallManager', 'HardwareManager',
            'ImageManager', 'MessagingManager', 'MetadataManager',
            'NetworkManager', 'SshKeyManager', 'SSLManager',
-           'TicketManager', 'ISCSIManager']
+           'TicketManager', 'ISCSIManager', 'LoadBalancerManager']
+
