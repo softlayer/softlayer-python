@@ -1,9 +1,6 @@
 """
-    SoftLayer.tests.CLI.modules.bmc_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    This is a series of integration tests designed to test the complete
-    command line interface.
+    SoftLayer.tests.CLI.modules.import_test
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :license: MIT, see LICENSE for more details.
 """
