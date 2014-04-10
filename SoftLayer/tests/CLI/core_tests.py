@@ -16,21 +16,21 @@ from SoftLayer.CLI.environment import Environment, InvalidModule, CLIRunnable
 
 def module_fixture():
     """
-usage: sl cci <command> [<args>...] [options]
-       sl cci [-h | --help]
+usage: sl vs <command> [<args>...] [options]
+       sl vs [-h | --help]
 """
 
 
 def module_no_command_fixture():
     """
-usage: sl cci [<args>...] [options]
-       sl cci [-h | --help]
+usage: sl vs [<args>...] [options]
+       sl vs [-h | --help]
 """
 
 
 class submodule_fixture(CLIRunnable):
     """
-usage: sl cci list [options]
+usage: sl vs list [options]
 
 Options:
   --hourly  Show hourly instances
@@ -42,7 +42,7 @@ Options:
 
 
 class EnvironmentFixture(Environment):
-    plugins = {'cci': {'list': submodule_fixture}}
+    plugins = {'vs': {'list': submodule_fixture}}
     aliases = {
         'meta': 'metadata',
         'my': 'metadata',
@@ -62,35 +62,35 @@ class CommandLineTests(unittest.TestCase):
         self.env.get_module_name = MagicMock()
 
     def test_normal_path(self):
-        self.env.get_module_name.return_value = 'cci'
+        self.env.get_module_name.return_value = 'vs'
         self.assertRaises(
             SystemExit, core.main,
-            args=['cci', 'list', '--config=path/to/config'],
+            args=['vs', 'list', '--config=path/to/config'],
             env=self.env)
         self.assertRaises(
             SystemExit, core.main,
-            args=['cci', 'nope', '--config=path/to/config'], env=self.env)
+            args=['vs', 'nope', '--config=path/to/config'], env=self.env)
         self.assertRaises(
             SystemExit, core.main,
-            args=['cci', 'list', '--format=totallynotvalid'], env=self.env)
+            args=['vs', 'list', '--format=totallynotvalid'], env=self.env)
 
     @patch('SoftLayer.TimedClient.get_last_calls')
     def test_normal_path_with_timings(self, calls_mock):
         calls_mock.return_value = [('SERVICE.METHOD', 1000, 0.25)]
-        self.env.get_module_name.return_value = 'cci'
+        self.env.get_module_name.return_value = 'vs'
         self.assertRaises(
             SystemExit, core.main,
-            args=['cci', 'list', '--config=path/to/config', '--timings'],
+            args=['vs', 'list', '--config=path/to/config', '--timings'],
             env=self.env)
         calls_mock.assert_called()
 
     @patch('logging.getLogger')
     @patch('logging.StreamHandler')
     def test_with_debug(self, stream_handler, logger):
-        self.env.get_module_name.return_value = 'cci'
+        self.env.get_module_name.return_value = 'vs'
         self.assertRaises(
             SystemExit, core.main,
-            args=['cci', 'list', '--debug=3'],
+            args=['vs', 'list', '--debug=3'],
             env=self.env)
         logger().setLevel.assert_called_with(10)
         logger().addHandler.assert_called_with(stream_handler())
@@ -103,68 +103,68 @@ class CommandLineTests(unittest.TestCase):
 
     def test_module_with_no_command(self):
         self.env.plugins = {
-            'cci': {'list': submodule_fixture, None: submodule_fixture}
+            'vs': {'list': submodule_fixture, None: submodule_fixture}
         }
-        self.env.get_module_name.return_value = 'cci'
+        self.env.get_module_name.return_value = 'vs'
         self.env.load_module = MagicMock()
         self.env.load_module.return_value = module_no_command_fixture
         resolver = core.CommandParser(self.env)
-        command, command_args = resolver.parse(['cci', 'list'])
+        command, command_args = resolver.parse(['vs', 'list'])
         self.assertEqual(submodule_fixture, command)
 
     def test_main(self):
-        self.env.get_module_name.return_value = 'cci'
+        self.env.get_module_name.return_value = 'vs'
         self.env.plugins = {
-            'cci': {'list': submodule_fixture}
+            'vs': {'list': submodule_fixture}
         }
         self.assertRaises(
             SystemExit, core.main,
-            args=['cci', 'list'],
+            args=['vs', 'list'],
             env=self.env)
 
     def test_help(self):
         self.env.get_module_name.return_value = 'help'
         self.assertRaises(
             SystemExit, core.main,
-            args=['help', 'cci', '--config=path/to/config'], env=self.env)
+            args=['help', 'vs', '--config=path/to/config'], env=self.env)
 
     def test_keyboard_interrupt(self):
         self.env.get_module_name.side_effect = KeyboardInterrupt
         self.assertRaises(
-            SystemExit, core.main, args=['cci', 'list'], env=self.env)
+            SystemExit, core.main, args=['vs', 'list'], env=self.env)
 
     def test_abort(self):
         self.env.get_module_name.side_effect = CLIAbort('exit!')
         self.assertRaises(
-            SystemExit, core.main, args=['cci', 'list'], env=self.env)
+            SystemExit, core.main, args=['vs', 'list'], env=self.env)
 
     def test_invalid_module_error(self):
-        self.env.get_module_name.side_effect = InvalidModule('cci')
+        self.env.get_module_name.side_effect = InvalidModule('vs')
         self.assertRaises(
-            SystemExit, core.main, args=['cci', 'list'], env=self.env)
+            SystemExit, core.main, args=['vs', 'list'], env=self.env)
 
     def test_softlayer_error(self):
         self.env.get_module_name.side_effect = SoftLayer.SoftLayerError
         self.assertRaises(
-            SystemExit, core.main, args=['cci', 'list'], env=self.env)
+            SystemExit, core.main, args=['vs', 'list'], env=self.env)
 
     def test_softlayer_api_error(self):
         error = SoftLayer.SoftLayerAPIError('Exception', 'Exception Text')
         self.env.get_module_name.side_effect = error
         self.assertRaises(
-            SystemExit, core.main, args=['cci', 'list'], env=self.env)
+            SystemExit, core.main, args=['vs', 'list'], env=self.env)
 
     def test_softlayer_api_error_authentication_error(self):
         error = SoftLayer.SoftLayerAPIError('SoftLayerException',
                                             'Invalid API Token')
         self.env.get_module_name.side_effect = error
         self.assertRaises(
-            SystemExit, core.main, args=['cci', 'list'], env=self.env)
+            SystemExit, core.main, args=['vs', 'list'], env=self.env)
 
     def test_system_exit_error(self):
         self.env.get_module_name.side_effect = SystemExit
         self.assertRaises(
-            SystemExit, core.main, args=['cci', 'list'], env=self.env)
+            SystemExit, core.main, args=['vs', 'list'], env=self.env)
 
     @patch('traceback.format_exc')
     def test_uncaught_error(self, m):
@@ -175,7 +175,7 @@ class CommandLineTests(unittest.TestCase):
             m.return_value = 'testing'
             self.env.get_module_name.side_effect = err
             self.assertRaises(
-                SystemExit, core.main, args=['cci', 'list'], env=self.env)
+                SystemExit, core.main, args=['vs', 'list'], env=self.env)
             m.assert_called_once_with()
 
 
@@ -186,10 +186,10 @@ class TestCommandParser(unittest.TestCase):
 
     def test_main(self,):
         args = self.parser.parse_main_args(
-            args=['cci', 'list'])
+            args=['vs', 'list'])
 
         self.assertEqual(args['help'], False)
-        self.assertEqual(args['<module>'], 'cci')
+        self.assertEqual(args['<module>'], 'vs')
         self.assertEqual(args['<args>'], ['list'])
 
     def test_primary_help(self):
@@ -229,13 +229,13 @@ class TestCommandParser(unittest.TestCase):
     @patch('sys.stdout.isatty', return_value=True)
     def test_tty(self, tty):
         self.assertRaises(
-            SystemExit, self.parser.parse_command_args, 'cci', 'list', [])
+            SystemExit, self.parser.parse_command_args, 'vs', 'list', [])
 
     def test_confirm(self):
         command = MagicMock()
         command.options = ['confirm']
-        command.__doc__ = 'usage: sl cci list [options]'
+        command.__doc__ = 'usage: sl vs list [options]'
         self.env.get_command = MagicMock()
         self.env.get_command.return_value = command
         self.assertRaises(
-            SystemExit, self.parser.parse_command_args, 'cci', 'list', [])
+            SystemExit, self.parser.parse_command_args, 'vs', 'list', [])

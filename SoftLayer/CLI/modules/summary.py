@@ -17,7 +17,7 @@ Display summary information about the account
 
 Options:
   --sortby=ARG  Column to sort by. options: datacenter, vlans,
-                subnets, IPs, networking, hardware, ccis, firewall
+                subnets, IPs, networking, hardware, vs
 """
     action = None
 
@@ -27,7 +27,7 @@ Options:
 
         table = Table([
             'datacenter', 'vlans', 'subnets', 'IPs', 'networking',
-            'hardware', 'ccis'
+            'hardware', 'vs'
         ])
         table.sortby = args.get('--sortby') or 'datacenter'
 

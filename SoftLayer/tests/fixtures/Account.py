@@ -19,9 +19,9 @@ getPrivateBlockDeviceTemplateGroups = [{
 
 getVirtualGuests = [{
     'id': 100,
-    'hostname': 'cci-test1',
+    'hostname': 'vs-test1',
     'domain': 'test.sftlyr.ws',
-    'fullyQualifiedDomainName': 'cci-test1.test.sftlyr.ws',
+    'fullyQualifiedDomainName': 'vs-test1.test.sftlyr.ws',
     'status': {'keyName': 'ACTIVE', 'name': 'Active'},
     # TODO - This needs to come from wherever data centers come from
     'datacenter': {'id': 50, 'name': 'TEST00',
@@ -35,9 +35,9 @@ getVirtualGuests = [{
     'hourlyBillingFlag': False,
 }, {
     'id': 104,
-    'hostname': 'cci-test2',
+    'hostname': 'vs-test2',
     'domain': 'test.sftlyr.ws',
-    'fullyQualifiedDomainName': 'cci-test2.test.sftlyr.ws',
+    'fullyQualifiedDomainName': 'vs-test2.test.sftlyr.ws',
     'status': {'keyName': 'ACTIVE', 'name': 'Active'},
     # TODO - This needs to come from wherever data centers come from
     'datacenter': {'id': 50, 'name': 'TEST00',
@@ -51,10 +51,10 @@ getVirtualGuests = [{
     'hourlyBillingFlag': True,
 }]
 
-getMonthlyVirtualGuests = [cci for cci in getVirtualGuests
-                           if not cci['hourlyBillingFlag']]
-getHourlyVirtualGuests = [cci for cci in getVirtualGuests
-                          if cci['hourlyBillingFlag']]
+getMonthlyVirtualGuests = [vs for vs in getVirtualGuests
+                           if not vs['hourlyBillingFlag']]
+getHourlyVirtualGuests = [vs for vs in getVirtualGuests
+                          if vs['hourlyBillingFlag']]
 
 
 getHardware = [{

@@ -8,7 +8,7 @@ The SoftLayer command line interface is available via the `sl` command available
 .. toctree::
    :maxdepth: 2
 
-   cli/cci
+   cli/vs
 
 
 .. _config_setup:
@@ -61,20 +61,33 @@ To discover the available commands, simply type `sl`.
 	
 	SoftLayer Command-line Client
 	
-	The available modules are:
-	  cci       Manage, delete, order compute instances
-	  config    View and edit configuration for this tool
-	  dns       Manage DNS
-	  firewall  Firewall rule and security management
-	  hardware  View hardware details
-	  bmetal    Interact with bare metal instances
-	  network   Perform various network operations
-	  help      Show help
-	  iscsi     View iSCSI details
+	Compute:
 	  image     Manages compute and flex images
 	  metadata  Get details about this machine. Also available with 'my' and 'meta'
+	  server    Bare metal servers
+	  sshkey    Manage SSH keys on your account
+	  vs        Virtual Servers (formerly CCIs)
+
+	Networking:
+	  cdn        Content Delivery Network service management
+	  dns        Domain Name System
+	  firewall   Firewall rule and security management
+	  globalip   Global IP address management
+	  messaging  Message Queue Service
+	  rwhois     RWhoIs operations
+	  ssl        Manages SSL
+	  subnet     Subnet ordering and management
+	  vlan       Manage VLANs on your account
+
+	Storage:
+	  iscsi     View iSCSI details
 	  nas       View NAS details
-	  ssl       Manages SSL
+
+	General:
+	  config    View and edit configuration for this tool
+	  ticket    Manage account tickets
+	  summary   Display an overall summary of your account
+	  help      Show help
 
 	See 'sl help <module>' for more information on a specific module.
 
@@ -84,31 +97,36 @@ To discover the available commands, simply type `sl`.
 As you can see, there are a number of commands. To look at the list of subcommands for Cloud Compute Instances, type `sl <command>`. For example:
 ::
 
-	$ sl cci
-	usage: sl cci [<command>] [<args>...] [options]
+	$ sl vs
+	usage: sl vs [<command>] [<args>...] [options]
 
 	Manage, delete, order compute instances
 
 	The available commands are:
-	  network         Manage network settings
-	  create          Order and create a CCI
-	                    (see `sl cci create-options` for choices)
-	  manage          Manage active CCI
-	  list            List CCI's on the account
-	  detail          Output details about a CCI
-	  dns             DNS related actions to a CCI
-	  cancel          Cancel a running CCI
-	  create-options  Output available available options when creating a CCI
-	  reload          Reload the OS on a CCI based on its current configuration
+	  cancel          Cancel a running virtual server
+	  capture         Create an image the disk(s) of a virtual server
+	  create          Order and create a virtual server
+	                    (see sl vs create-options for choices)
+	  create-options  Output available available options when creating a VS
+	  detail          Output details about a virtual server
+	  dns             DNS related actions to a virtual server
+	  edit            Edit details of a virtual server
+	  list            List virtual servers on the account
+	  nic-edit        Edit NIC settings
+	  pause           Pauses an active virtual server
+	  power-off       Powers off a running virtual server
+	  power-on        Boots up a virtual server
+	  ready           Check if a virtual server has finished provisioning
+	  reboot          Reboots a running virtual server
+	  reload          Reload the OS on a VS based on its current configuration
+	  resume          Resumes a paused virtual server
+	  upgrade         Upgrades parameters of a virtual server
 
-	Standard Options:
-	  -h --help  Show this screen
-
-Finally, we can make an actual call. Let's list out the CCIs on our account using `sl cci list`.
+Finally, we can make an actual call. Let's list out the virtual servers on our account using `sl vs list`.
 
 ::
 
-	$ sl cci list
+	$ sl vs list
 	:.........:............:....................:.......:........:................:..............:....................:
 	:    id   : datacenter :       host         : cores : memory :   primary_ip   :  backend_ip  : active_transaction :
 	:.........:............:....................:.......:........:................:..............:....................:
@@ -118,17 +136,17 @@ Finally, we can make an actual call. Let's list out the CCIs on our account usin
 Most commands will take in additional options/arguments. To see all available actions, use `--help`.
 ::
 
-	$ sl cci list --help
-	usage: sl cci list [--hourly | --monthly] [--sortby=SORT_COLUMN] [--tags=TAGS]
-	                   [options]
+	$ sl vs list --help
+	usage: sl vs list [--hourly | --monthly] [--sortby=SORT_COLUMN] [--tags=TAGS]
+	                  [options]
 
-	List CCIs
+	List virtual servers
 
 	Examples:
-	    sl cci list --datacenter=dal05
-	    sl cci list --network=100 --cpu=2
-	    sl cci list --memory='>= 2048'
-	    sl cci list --tags=production,db
+	    sl vs list --datacenter=dal05
+	    sl vs list --network=100 --cpu=2
+	    sl vs list --memory='>= 2048'
+	    sl vs list --tags=production,db
 
 	Options:
 	  --sortby=ARG  Column to sort by. options: id, datacenter, host,

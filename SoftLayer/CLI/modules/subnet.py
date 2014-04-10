@@ -110,8 +110,8 @@ usage: sl subnet detail <identifier> [options]
 Get detailed information about objects assigned to a particular subnet
 
 Filters:
-  --no-cci         Hide CCI listing
-  --no-hardware    Hide hardware listing
+  --no-vs, --no-cci  Hide virtual server listing
+  --no-hardware      Hide hardware listing
 """
     action = 'detail'
 
@@ -137,18 +137,18 @@ Filters:
         table.add_row(['usable ips',
                        subnet.get('usableIpAddressCount', blank())])
 
-        if not args.get('--no-cci'):
+        if not args.get('--no-vs'):
             if subnet['virtualGuests']:
-                cci_table = Table(['Hostname', 'Domain', 'IP'])
-                cci_table.align['Hostname'] = 'r'
-                cci_table.align['IP'] = 'l'
-                for cci in subnet['virtualGuests']:
-                    cci_table.add_row([cci['hostname'],
-                                       cci['domain'],
-                                       cci.get('primaryIpAddress')])
-                table.add_row(['ccis', cci_table])
+                vs_table = Table(['Hostname', 'Domain', 'IP'])
+                vs_table.align['Hostname'] = 'r'
+                vs_table.align['IP'] = 'l'
+                for vsi in subnet['virtualGuests']:
+                    vs_table.add_row([vsi['hostname'],
+                                      vsi['domain'],
+                                      vsi.get('primaryIpAddress')])
+                table.add_row(['vs', vs_table])
             else:
-                table.add_row(['cci', 'none'])
+                table.add_row(['vs', 'none'])
 
         if not args.get('--no-hardware'):
             if subnet['hardware']:
@@ -173,8 +173,8 @@ usage: sl subnet list [options]
 Displays a list of subnets
 
 Options:
-  --sortby=ARG  Column to sort by. options: id, number, datacenter, IPs,
-    hardware, ccis, networking
+  --sortby=ARG  Column to sort by. options: id, identifier, type, datacenter,
+    vlan id, IPs, hardware, vs
 
 Filters:
   -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
@@ -190,7 +190,7 @@ Filters:
 
         table = Table([
             'id', 'identifier', 'type', 'datacenter', 'vlan id', 'IPs',
-            'hardware', 'ccis',
+            'hardware', 'vs',
         ])
         table.sortby = args.get('--sortby') or 'id'
 
@@ -268,7 +268,7 @@ information.
             device_table.align['Value'] = 'l'
             if addr_info.get('virtualGuest'):
                 device = addr_info['virtualGuest']
-                device_type = 'cci'
+                device_type = 'vs'
             else:
                 device = addr_info['hardware']
                 device_type = 'server'
