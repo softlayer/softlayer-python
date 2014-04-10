@@ -142,7 +142,6 @@ class FirewallTests(unittest.TestCase):
         call.assert_called_once_with(id=6327, mask=MASK)
 
     def test_add_standard_firewall_cci(self):
-        # , server_id, is_cci=True
         # test standard firewalls for CCI
         server_id = 6327
         self.firewall.add_standard_firewall(server_id, is_cci=True)
@@ -159,34 +158,16 @@ class FirewallTests(unittest.TestCase):
         call2 = self.client['Virtual_Guest'].getObject
         mask = ('mask[primaryNetworkComponent[speed]]')
         call2.assert_called_once_with(id=6327, mask=mask)
-
-        _package = {
-            'complexType': 'SoftLayer_Container_Product_Order'
-                           '_Network_Protection_Firewall',
-            'virtualGuests': [{'id': server_id}],
-            'packageId': 0,
-            'quantity': 1,
-            'prices': [{'id': 4444}]
-        }
         f = self.client['Product_Order'].placeOrder
-        f.assert_called_once_with(_package)
+        f.assert_called_once()
 
     def test_add_standard_firewall_server(self):
         # test dedicated firewall for Servers
         server_id = 6327
         mask = ('mask[primaryNetworkComponent[speed]]')
-
-        _package = {
-            'complexType': 'SoftLayer_Container_Product_Order'
-                           '_Network_Protection_Firewall',
-            'hardware': [{'id': server_id}],
-            'packageId': 0,
-            'quantity': 1,
-            'prices': [{'id': 4444}]
-        }
         self.firewall.add_standard_firewall(server_id, is_cci=False)
         f = self.client['Product_Order'].placeOrder
-        f.assert_called_once_with(_package)
+        f.assert_called_once()
 
         f = self.client['Product_Package'].getItems
         _filter = {
@@ -204,17 +185,9 @@ class FirewallTests(unittest.TestCase):
     def test_add_vlan_firewall(self):
         # test dedicated firewall for Vlan
         vlan_id = 6327
-        _package = {
-            'complexType': 'SoftLayer_Container_Product_Order_Network_'
-                           'Protection_Firewall_Dedicated',
-            'quantity': 1,
-            'packageId': 0,
-            'vlanId': vlan_id,
-            'prices': [{'id': 4444}]
-        }
         self.firewall.add_vlan_firewall(vlan_id, ha_enabled=False)
         f = self.client['Product_Order'].placeOrder
-        f.assert_called_once_with(_package)
+        f.assert_called_once()
 
         f = self.client['Product_Package'].getItems
         _filter = {
@@ -229,17 +202,9 @@ class FirewallTests(unittest.TestCase):
     def test_add_vlan_firewall_ha(self):
         # test dedicated firewall for Vlan
         vlan_id = 6327
-        _package = {
-            'complexType': 'SoftLayer_Container_Product_Order_Network_'
-                           'Protection_Firewall_Dedicated',
-            'quantity': 1,
-            'packageId': 0,
-            'vlanId': vlan_id,
-            'prices': [{'id': 4444}]
-        }
         self.firewall.add_vlan_firewall(vlan_id, ha_enabled=True)
         f = self.client['Product_Order'].placeOrder
-        f.assert_called_once_with(_package)
+        f.assert_called_once()
 
         f = self.client['Product_Package'].getItems
         _filter = {
@@ -253,7 +218,6 @@ class FirewallTests(unittest.TestCase):
         f.assert_called_once_with(filter=_filter, id=0)
 
     def test_edit_dedicated_fwl_rules(self):
-        # , fwl_id, rules
         # test standard firewalls
         rules = Network_Vlan_Firewall.getRules
         fwl_id = 1234
@@ -268,7 +232,6 @@ class FirewallTests(unittest.TestCase):
         f.assert_called_once_with(template)
 
     def test_edit_standard_fwl_rules(self):
-        # , fwl_id, rules
         # test standard firewalls
         rules = Network_Component_Firewall.getRules
         fwl_id = 1234

@@ -224,7 +224,7 @@ List active firewalls
                 vlan['id']
             ])
 
-        shared_vlan = [vlan['dedicatedFirewallFlag'] for vlan in fwvlans]
+        shared_vlan = filter(lambda x: not x['dedicatedFirewallFlag'], fwvlans)
         for vlan in shared_vlan:
             fws = list(filter(has_firewall_component,
                               vlan['firewallGuestNetworkComponents']))
