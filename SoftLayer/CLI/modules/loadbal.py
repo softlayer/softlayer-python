@@ -37,40 +37,40 @@ def get_local_lbs_table(load_balancers):
     :param dict load_balancers: A dictionary representing the load_balancers
     :returns: A table containing the local load balancers
     """
-    t = Table(['ID',
-               'VIP Address',
-               'Location',
-               'SSL Offload',
-               'Connections/second',
-               'Type'])
+    table = Table(['ID',
+                   'VIP Address',
+                   'Location',
+                   'SSL Offload',
+                   'Connections/second',
+                   'Type'])
 
-    t.align['VIP Address'] = 'r'
-    t.align['Location'] = 'r'
-    t.align['Connections/second'] = 'r'
-    t.align['Connections/second'] = 'r'
-    t.align['Type'] = 'r'
+    table.align['VIP Address'] = 'r'
+    table.align['Location'] = 'r'
+    table.align['Connections/second'] = 'r'
+    table.align['Connections/second'] = 'r'
+    table.align['Type'] = 'r'
 
     for load_balancer in load_balancers:
-        sslSupport = 'Not Supported'
+        ssl_support = 'Not Supported'
         if load_balancer['sslEnabledFlag']:
             if load_balancer['sslActiveFlag']:
-                sslSupport = 'On'
+                ssl_support = 'On'
             else:
-                sslSupport = 'Off'
+                ssl_support = 'Off'
         lb_type = 'Standard'
         if load_balancer['dedicatedFlag']:
             lb_type = 'Dedicated'
         elif load_balancer['highAvailabilityFlag']:
             lb_type = 'HA'
-        t.add_row([
+        table.add_row([
             'local:%s' % load_balancer['id'],
             load_balancer['ipAddress']['ipAddress'],
             load_balancer['loadBalancerHardware'][0]['datacenter']['name'],
-            sslSupport,
+            ssl_support,
             load_balancer['connectionLimit'],
             lb_type
         ])
-    return t
+    return table
 
 
 def get_local_lb_table(load_balancer):
@@ -79,29 +79,29 @@ def get_local_lb_table(load_balancer):
     :param dict load_balancer: A dictionary representing the loadbal
     :returns: A table containing the local loadbal details
     """
-    t = KeyValueTable(['Name', 'Value'])
-    t.align['Name'] = 'l'
-    t.align['Value'] = 'l'
-    t.add_row(['General properties', '----------'])
-    t.add_row([' ID', 'local:%s' % load_balancer['id']])
-    t.add_row([' IP Address', load_balancer['ipAddress']['ipAddress']])
-    t.add_row([' Datacenter',
-               load_balancer['loadBalancerHardware'][0]['datacenter']['name']])
-    t.add_row([' Connections limit', load_balancer['connectionLimit']])
-    t.add_row([' Dedicated', load_balancer['dedicatedFlag']])
-    t.add_row([' HA', load_balancer['highAvailabilityFlag']])
-    t.add_row([' SSL Enabled', load_balancer['sslEnabledFlag']])
-    t.add_row([' SSL Active', load_balancer['sslActiveFlag']])
+    table = KeyValueTable(['Name', 'Value'])
+    table.align['Name'] = 'l'
+    table.align['Value'] = 'l'
+    table.add_row(['General properties', '----------'])
+    table.add_row([' ID', 'local:%s' % load_balancer['id']])
+    table.add_row([' IP Address', load_balancer['ipAddress']['ipAddress']])
+    name = load_balancer['loadBalancerHardware'][0]['datacenter']['name']
+    table.add_row([' Datacenter', name])
+    table.add_row([' Connections limit', load_balancer['connectionLimit']])
+    table.add_row([' Dedicated', load_balancer['dedicatedFlag']])
+    table.add_row([' HA', load_balancer['highAvailabilityFlag']])
+    table.add_row([' SSL Enabled', load_balancer['sslEnabledFlag']])
+    table.add_row([' SSL Active', load_balancer['sslActiveFlag']])
     index0 = 1
     for virtual_server in load_balancer['virtualServers']:
-        t.add_row(['Service group %s' % index0,
-                   '**************'])
+        table.add_row(['Service group %s' % index0,
+                       '**************'])
         index0 += 1
-        t2 = Table(['Service group ID', 'Port', 'Allocation', 'Routing type',
-                    'Routing Method'])
+        table2 = Table(['Service group ID', 'Port', 'Allocation',
+                        'Routing type', 'Routing Method'])
 
         for group in virtual_server['serviceGroups']:
-            t2.add_row([
+            table2.add_row([
                 '%s:%s' % (load_balancer['id'], virtual_server['id']),
                 virtual_server['port'],
                 '%s %%' % virtual_server['allocation'],
@@ -111,24 +111,24 @@ def get_local_lb_table(load_balancer):
                            group['routingMethod']['name'])
             ])
 
-            t.add_row([' Group Properties', t2])
+            table.add_row([' Group Properties', table2])
 
-            t3 = Table(['Service_ID', 'IP Address', 'Port', 'Health Check',
-                        'Weight', 'Enabled', 'Status'])
+            table3 = Table(['Service_ID', 'IP Address', 'Port',
+                            'Health Check', 'Weight', 'Enabled', 'Status'])
             for service in group['services']:
-                healthCheck = service['healthChecks'][0]
-                t3.add_row([
+                health_check = service['healthChecks'][0]
+                table3.add_row([
                     '%s:%s' % (load_balancer['id'], service['id']),
                     service['ipAddress']['ipAddress'],
                     service['port'],
-                    '%s:%s' % (healthCheck['healthCheckTypeId'],
-                               healthCheck['type']['name']),
+                    '%s:%s' % (health_check['healthCheckTypeId'],
+                               health_check['type']['name']),
                     service['groupReferences'][0]['weight'],
                     service['enabled'],
                     service['status']
                 ])
-            t.add_row([' Services', t3])
-    return t
+            table.add_row([' Services', table3])
+    return table
 
 
 class LoadBalancerList(CLIRunnable):
@@ -159,13 +159,13 @@ List load balancer service health check types that can be used
         mgr = LoadBalancerManager(self.client)
 
         hc_types = mgr.get_hc_types()
-        t = KeyValueTable(['ID', 'Name'])
-        t.align['ID'] = 'l'
-        t.align['Name'] = 'l'
-        t.sortby = 'ID'
+        table = KeyValueTable(['ID', 'Name'])
+        table.align['ID'] = 'l'
+        table.align['Name'] = 'l'
+        table.sortby = 'ID'
         for hc_type in hc_types:
-            t.add_row([hc_type['id'], hc_type['name']])
-        return t
+            table.add_row([hc_type['id'], hc_type['name']])
+        return table
 
 
 class LoadBalancerRoutingMethods(CLIRunnable):
@@ -180,13 +180,13 @@ List load balancers routing methods that can be used
         mgr = LoadBalancerManager(self.client)
 
         routing_methods = mgr.get_routing_methods()
-        t = KeyValueTable(['ID', 'Name'])
-        t.align['ID'] = 'l'
-        t.align['Name'] = 'l'
-        t.sortby = 'ID'
+        table = KeyValueTable(['ID', 'Name'])
+        table.align['ID'] = 'l'
+        table.align['Name'] = 'l'
+        table.sortby = 'ID'
         for routing_method in routing_methods:
-            t.add_row([routing_method['id'], routing_method['name']])
-        return t
+            table.add_row([routing_method['id'], routing_method['name']])
+        return table
 
 
 class LoadBalancerRoutingTypes(CLIRunnable):
@@ -201,13 +201,13 @@ List load balancers routing types that can be used
         mgr = LoadBalancerManager(self.client)
 
         routing_types = mgr.get_routing_types()
-        t = KeyValueTable(['ID', 'Name'])
-        t.align['ID'] = 'l'
-        t.align['Name'] = 'l'
-        t.sortby = 'ID'
+        table = KeyValueTable(['ID', 'Name'])
+        table.align['ID'] = 'l'
+        table.align['Name'] = 'l'
+        table.sortby = 'ID'
         for routing_type in routing_types:
-            t.add_row([routing_type['id'], routing_type['name']])
-        return t
+            table.add_row([routing_type['id'], routing_type['name']])
+        return table
 
 
 class LoadBalancerDetails(CLIRunnable):
@@ -275,12 +275,11 @@ Options:
         input_id = args.get('<identifier>')
 
         key_value = input_id.split(':')
-        loadbal_id = int(key_value[0])
         service_id = int(key_value[1])
 
         if args['--really'] or confirm("This action will cancel a service "
                                        "from your load balancer. Continue?"):
-            mgr.delete_service(loadbal_id, service_id)
+            mgr.delete_service(service_id)
             return 'Load balancer service %s is being cancelled!' % input_id
         else:
             raise CLIAbort('Aborted.')
@@ -303,12 +302,11 @@ Options:
         input_id = args.get('<identifier>')
 
         key_value = input_id.split(':')
-        loadbal_id = int(key_value[0])
         service_id = int(key_value[1])
 
         if args['--really'] or confirm("This action will toggle the service "
                                        "status on the service. Continue?"):
-            mgr.toggle_service_status(loadbal_id, service_id)
+            mgr.toggle_service_status(service_id)
             return 'Load balancer service %s status updated!' % input_id
         else:
             raise CLIAbort('Aborted.')
@@ -363,8 +361,8 @@ Options:
 
 class LoadBalancerServiceAdd(CLIRunnable):
     """
-usage: sl loadbal service-add <identifier> --ip=IP --port=PORT --weight=WEIGHT \
---hc_type=HCTYPE --enabled=ENABLED [options]
+usage: sl loadbal service-add <identifier> --ip=IP --port=PORT \
+--weight=WEIGHT --hc_type=HCTYPE --enabled=ENABLED [options]
 
 Adds a new load_balancer service
 Required:
@@ -419,12 +417,11 @@ Options:
         input_id = args.get('<identifier>')
 
         key_value = input_id.split(':')
-        loadbal_id = int(key_value[0])
         group_id = int(key_value[1])
 
         if args['--really'] or confirm("This action will cancel a service"
                                        " group. Continue?"):
-            mgr.delete_service_group(loadbal_id, group_id)
+            mgr.delete_service_group(group_id)
             return 'Service group %s is being deleted!' % input_id
         else:
             raise CLIAbort('Aborted.')
@@ -559,21 +556,21 @@ Output available options when adding a new load balancer
     def execute(self, args):
         mgr = LoadBalancerManager(self.client)
 
-        t = Table(['id', 'capacity', 'description', 'price'])
+        table = Table(['id', 'capacity', 'description', 'price'])
 
-        t.sortby = 'price'
-        t.align['price'] = 'r'
-        t.align['capacity'] = 'r'
-        t.align['id'] = 'r'
+        table.sortby = 'price'
+        table.align['price'] = 'r'
+        table.align['capacity'] = 'r'
+        table.align['id'] = 'r'
 
         packages = mgr.get_lb_pkgs()
 
         for package in packages:
-            t.add_row([
+            table.add_row([
                 package['prices'][0]['id'],
                 package.get('capacity'),
                 package['description'],
                 format(float(package['prices'][0]['recurringFee']), '.2f')
             ])
 
-        return t
+        return table

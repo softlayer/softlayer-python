@@ -7,6 +7,7 @@
 """
 from SoftLayer.utils import IdentifierMixin, NestedDict, query_filter
 
+
 class LoadBalancerManager(IdentifierMixin, object):
 
     """ Manages load balancers.
@@ -83,7 +84,6 @@ class LoadBalancerManager(IdentifierMixin, object):
 
         :returns: the location id of the given datacenter
         """
-        _filter = NestedDict({})
         dcenters = self.client['Location'].getDataCenters()
         for dcenter in dcenters:
             if dcenter['name'] == datacenter:
@@ -142,10 +142,9 @@ class LoadBalancerManager(IdentifierMixin, object):
 
         return self.lb_svc.getObject(id=loadbal_id, **kwargs)
 
-    def delete_service(self, loadbal_id, service_id):
+    def delete_service(self, service_id):
         """ Deletes a service from the loadbal_id
 
-        :param int loadbal_id: The id of the loadbal where the service resides
         :param int service_id: The id of the service to delete
         """
         svc = self.client['Network_Application_Delivery_Controller_'
@@ -153,10 +152,9 @@ class LoadBalancerManager(IdentifierMixin, object):
 
         return svc.deleteObject(id=service_id)
 
-    def delete_service_group(self, loadbal_id, group_id):
+    def delete_service_group(self, group_id):
         """ Deletes a service group from the loadbal_id
 
-        :param int loadbal_id: The id of the loadbal where the service resides
         :param int group_id: The id of the service group to delete
         """
         svc = self.client['Network_Application_Delivery_Controller_'
@@ -164,10 +162,9 @@ class LoadBalancerManager(IdentifierMixin, object):
 
         return svc.deleteObject(id=group_id)
 
-    def toggle_service_status(self, loadbal_id, service_id):
+    def toggle_service_status(self, service_id):
         """ Toggles the service status
 
-        :param int loadbal_id: The id of the loadbal where the service resides
         :param int service_id: The id of the service to delete
         """
         svc = self.client['Network_Application_Delivery_Controller_'
