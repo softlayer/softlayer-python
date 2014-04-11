@@ -252,7 +252,10 @@ getSubnets = [
 getNetworkVlans = {'id': 1234}
 
 getSshKeys = [{'id': '100', 'label': 'Test 1'},
-              {'id': '101', 'label': 'Test 2', 'notes': 'Test notes'}]
+              {'id': '101', 'label': 'Test 2',
+               'notes': 'Test notes',
+               'finterprint': 'aa:bb:cc:dd',
+               'notes': 'my key'}]
 
 getSecurityCertificates = [{'certificate': '1234',
                             'commonName': 'cert',
