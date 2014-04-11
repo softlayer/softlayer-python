@@ -289,8 +289,8 @@ class LoadBalancerManager(IdentifierMixin, object):
         :param int routing_method: The routing method to set on the group
         """
         kwargs = NestedDict({})
-        kwargs['mask'] = 'mask[virtualServers[serviceGroups' \
-                         '[services[groupReferences]]]]'
+        kwargs['mask'] = ('mask[virtualServers[serviceGroups'
+                         '[services[groupReferences]]]]')
 
         load_balancer = self.lb_svc.getObject(id=loadbal_id, **kwargs)
         virtual_servers = load_balancer['virtualServers']
@@ -305,9 +305,10 @@ class LoadBalancerManager(IdentifierMixin, object):
                     service_group['routingTypeId'] = routing_type
                 if routing_method != 0:
                     service_group['routingMethodId'] = routing_method
+                break
         return self.lb_svc.editObject(load_balancer, id=loadbal_id)
 
-    def reset_service_group(self, loadbal_id, group_id=None):
+    def reset_service_group(self, loadbal_id, group_id):
         """ Resets all the connections on the service group
         :param int loadbal_id: The id of the loadbal
         :param int group_id: The id of the service group to reset
