@@ -315,7 +315,8 @@ getOpenTickets = [ticket for ticket in getTickets
 getClosedTickets = [ticket for ticket in getTickets
                     if ticket['statusId'] == 1002]
 
-getCurrentUser = {"id": 12345}
+getCurrentUser = {'id': 12345,
+                  'apiAuthenticationKeys': [{'authenticationKey': 'A' * 64}]}
 
 getCdnAccounts = [
     {
