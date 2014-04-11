@@ -7,7 +7,6 @@
 from SoftLayer import LoadBalancerManager
 from SoftLayer.tests import unittest, FixtureClient
 from SoftLayer.tests.fixtures import Billing_Item
-from mock import ANY
 
 
 class LoadBalancerTests(unittest.TestCase):
