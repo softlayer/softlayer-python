@@ -23,6 +23,6 @@ class SummaryTests(unittest.TestCase):
                      'subnets': 0,
                      'hardware': 1,
                      'IPs': 3,
-                     'ccis': 1,
+                     'vs': 1,
                      'vlans': 1}]
         self.assertEqual(expected, format_output(output, 'python'))
