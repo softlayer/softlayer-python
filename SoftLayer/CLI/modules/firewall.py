@@ -306,11 +306,11 @@ Options:
         ha_support = args.get('--ha', False)
         if not args['--really']:
             if args['--vlan']:
-                pkg = mgr.get_dedicated_fwl_pkg(ha_enabled=ha_support)
+                pkg = mgr.get_dedicated_package(ha_enabled=ha_support)
             elif args['--cci']:
-                pkg = mgr.get_std_fwl_pkg(input_id)
+                pkg = mgr.get_standard_package(input_id)
             elif args['--server']:
-                pkg = mgr.get_std_fwl_pkg(input_id, is_cci=False)
+                pkg = mgr.get_standard_package(input_id, is_cci=False)
 
             if not pkg:
                 return "Unable to add firewall - Is network public enabled?"

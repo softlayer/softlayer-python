@@ -44,29 +44,9 @@ class FirewallTests(unittest.TestCase):
         call.assert_called_once_with(id=1234, mask=MASK)
         self.assertEqual(rules, Network_Vlan_Firewall.getRules)
 
-    def test_get_fwl_billing_item(self):
-
+    def test_get_standard_package(self):
         # test standard firewalls
-        call = self.client['Network_Component_Firewall'].getObject
-        MASK = ('mask[id,billingItem[id]]')
-        item = self.firewall.get_fwl_billing_item(firewall_id=1234,
-                                                  dedicated=False)
-        call.assert_called_once_with(id=1234, mask=MASK)
-        billingItemId = 21370814
-        self.assertEqual(item['billingItem']['id'], billingItemId)
-
-        # test dedicated firewalls
-        call = self.client['Network_Vlan_Firewall'].getObject
-        MASK = ('mask[id,billingItem[id]]')
-        item = self.firewall.get_fwl_billing_item(firewall_id=12345,
-                                                  dedicated=True)
-        call.assert_called_once_with(id=12345, mask=MASK)
-        billingItemId = 21370815
-        self.assertEqual(item['billingItem']['id'], billingItemId)
-
-    def test_get_std_fwl_pkg(self):
-        # test standard firewalls
-        self.firewall.get_std_fwl_pkg(server_id=1234, is_cci=True)
+        self.firewall.get_standard_package(server_id=1234, is_cci=True)
         call2 = self.client['Virtual_Guest'].getObject
         mask = ('mask[primaryNetworkComponent[speed]]')
         f = self.client['Product_Package'].getItems
@@ -80,7 +60,7 @@ class FirewallTests(unittest.TestCase):
         f.assert_called_once_with(filter=_filter, id=0)
         call2.assert_called_once_with(id=1234, mask=mask)
 
-        self.firewall.get_std_fwl_pkg(server_id=1234, is_cci=False)
+        self.firewall.get_standard_package(server_id=1234, is_cci=False)
         call2 = self.client['Hardware_Server'].getObject
         mask = ('mask[primaryNetworkComponent[speed]]')
         f = self.client['Product_Package'].getItems
@@ -94,9 +74,9 @@ class FirewallTests(unittest.TestCase):
         f.assert_called_twice_with(filter=_filter, id=0)
         call2.assert_called_once_with(id=1234, mask=mask)
 
-    def test_get_dedicated_fwl_pkg_ha(self):
+    def test_get_dedicated_package_ha(self):
         # test dedicated HA firewalls
-        self.firewall.get_dedicated_fwl_pkg(ha_enabled=True)
+        self.firewall.get_dedicated_package(ha_enabled=True)
         f = self.client['Product_Package'].getItems
         _filter = {
             'items': {
@@ -107,9 +87,9 @@ class FirewallTests(unittest.TestCase):
             }
         f.assert_called_once_with(filter=_filter, id=0)
 
-    def test_get_dedicated_fwl_pkg(self):
+    def test_get_dedicated_package_pkg(self):
         # test dedicated HA firewalls
-        self.firewall.get_dedicated_fwl_pkg(ha_enabled=False)
+        self.firewall.get_dedicated_package(ha_enabled=False)
         f = self.client['Product_Package'].getItems
         _filter = {
             'items': {

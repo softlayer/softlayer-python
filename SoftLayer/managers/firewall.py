@@ -41,7 +41,7 @@ class FirewallManager(IdentifierMixin, object):
         self.account = self.client['Account']
         self.prod_pkg = self.client['Product_Package']
 
-    def get_std_fwl_pkg(self, server_id, is_cci=True):
+    def get_standard_package(self, server_id, is_cci=True):
         """ Retrieves the standard firewall package for the CCI.
 
         :param int server_id: The ID of the server to create the firewall for
@@ -67,7 +67,7 @@ class FirewallManager(IdentifierMixin, object):
         kwargs['filter'] = _filter.to_dict()
         return self.prod_pkg.getItems(**kwargs)
 
-    def get_dedicated_fwl_pkg(self, ha_enabled=False):
+    def get_dedicated_package(self, ha_enabled=False):
         """ Retrieves the dedicated firewall package.
 
         :param bool ha_enabled: True if HA is to be enabled on the firewall
@@ -95,7 +95,7 @@ class FirewallManager(IdentifierMixin, object):
         :param bool dedicated: If true, the firewall instance is dedicated,
                                otherwise, the firewall instance is shared.
         """
-        fwl_billing = self.get_fwl_billing_item(firewall_id, dedicated)
+        fwl_billing = self._get_fwl_billing_item(firewall_id, dedicated)
         billing_id = fwl_billing['billingItem']['id']
         billing_item = self.client['Billing_Item']
         return billing_item.cancelService(id=billing_id)
@@ -108,7 +108,7 @@ class FirewallManager(IdentifierMixin, object):
                             otherwise for a CCI
         :returns: A dictionary containing the standard CCI firewall order
         """
-        package = self.get_std_fwl_pkg(server_id, is_cci)
+        package = self.get_standard_package(server_id, is_cci)
         if is_cci:
             product_order = {
                 'complexType': 'SoftLayer_Container_Product_Order_Network_'
@@ -137,7 +137,7 @@ class FirewallManager(IdentifierMixin, object):
 
         :returns: A dictionary containing the VLAN firewall order
         """
-        package = self.get_dedicated_fwl_pkg(ha_enabled)
+        package = self.get_dedicated_package(ha_enabled)
         product_order = {
             'complexType': 'SoftLayer_Container_Product_Order_Network_'
                            'Protection_Firewall_Dedicated',
@@ -148,7 +148,7 @@ class FirewallManager(IdentifierMixin, object):
         }
         return self.client['Product_Order'].placeOrder(product_order)
 
-    def get_fwl_billing_item(self, firewall_id, dedicated=False):
+    def _get_fwl_billing_item(self, firewall_id, dedicated=False):
         """ Retrieves the billing item of the firewall
 
         :param int firewall_id: Firewall ID to get the billing item for
