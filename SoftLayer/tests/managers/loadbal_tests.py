@@ -109,7 +109,7 @@ class LoadBalancerTests(unittest.TestCase):
         service_id = 1234
         self.lb_mgr.delete_service(service_id)
         call = self.client['Network_Application_Delivery_Controller_'
-                          'LoadBalancer_Service'].deleteObject
+                           'LoadBalancer_Service'].deleteObject
 
         call.assert_called_once_with(id=service_id)
 
@@ -117,7 +117,7 @@ class LoadBalancerTests(unittest.TestCase):
         service_group = 1234
         self.lb_mgr.delete_service_group(service_group)
         call = self.client['Network_Application_Delivery_Controller_'
-                          'LoadBalancer_VirtualServer'].deleteObject
+                           'LoadBalancer_VirtualServer'].deleteObject
 
         call.assert_called_once_with(id=service_group)
 
@@ -125,7 +125,7 @@ class LoadBalancerTests(unittest.TestCase):
         service_id = 1234
         self.lb_mgr.toggle_service_status(service_id)
         call = self.client['Network_Application_Delivery_Controller_'
-                          'LoadBalancer_Service'].toggleStatus
+                           'LoadBalancer_Service'].toggleStatus
 
         call.assert_called_once_with(id=service_id)
 
@@ -140,7 +140,7 @@ class LoadBalancerTests(unittest.TestCase):
         self.lb_mgr.edit_service(loadbal_id, service_id, ip_address,
                                  port, enabled, hc_type, weight)
         call = self.client['Network_Application_Delivery_Controller_'
-                          'LoadBalancer_VirtualIpAddress'].getVirtualServers
+                           'LoadBalancer_VirtualIpAddress'].getVirtualServers
         _filter = {
             'virtualServers': {
                 'serviceGroups': {
@@ -168,16 +168,16 @@ class LoadBalancerTests(unittest.TestCase):
         hc_type = 21
         weight = 1
         self.lb_mgr.add_service(loadbal_id, group_id, ip_address_id,
-                                 port, enabled, hc_type, weight)
+                                port, enabled, hc_type, weight)
         call = self.client['Network_Application_Delivery_Controller_'
-                          'LoadBalancer_VirtualIpAddress'].getObject
+                           'LoadBalancer_VirtualIpAddress'].getObject
 
         mask = ('mask[virtualServers[serviceGroups'
                 '[services[groupReferences]]]]')
         call.assert_called_once_with(mask=mask, id=loadbal_id)
 
         call = self.client['Network_Application_Delivery_Controller_'
-                   'LoadBalancer_VirtualIpAddress'].editObject
+                           'LoadBalancer_VirtualIpAddress'].editObject
         call.assert_called_once()
 
     def test_edit_service_group(self):
@@ -193,14 +193,14 @@ class LoadBalancerTests(unittest.TestCase):
                                        routing_type=routing_type,
                                        routing_method=routing_method)
         call = self.client['Network_Application_Delivery_Controller_'
-                          'LoadBalancer_VirtualIpAddress'].getObject
+                           'LoadBalancer_VirtualIpAddress'].getObject
 
         mask = ('mask[virtualServers[serviceGroups'
                 '[services[groupReferences]]]]')
         call.assert_called_once_with(mask=mask, id=loadbal_id)
 
         call = self.client['Network_Application_Delivery_Controller_'
-                   'LoadBalancer_VirtualIpAddress'].editObject
+                           'LoadBalancer_VirtualIpAddress'].editObject
         call.assert_called_once()
 
     def test_add_service_group(self):
@@ -212,14 +212,14 @@ class LoadBalancerTests(unittest.TestCase):
         self.lb_mgr.add_service_group(loadbal_id, allocation, port,
                                       routing_type, routing_method)
         call = self.client['Network_Application_Delivery_Controller_'
-                          'LoadBalancer_VirtualIpAddress'].getObject
+                           'LoadBalancer_VirtualIpAddress'].getObject
 
         mask = ('mask[virtualServers[serviceGroups'
                 '[services[groupReferences]]]]')
         call.assert_called_once_with(mask=mask, id=loadbal_id)
 
         call = self.client['Network_Application_Delivery_Controller_'
-                   'LoadBalancer_VirtualIpAddress'].editObject
+                           'LoadBalancer_VirtualIpAddress'].editObject
         call.assert_called_once()
 
     def test_reset_service_group(self):
@@ -227,12 +227,12 @@ class LoadBalancerTests(unittest.TestCase):
         group_id = 50718
         self.lb_mgr.reset_service_group(loadbal_id, group_id=group_id)
         call = self.client['Network_Application_Delivery_Controller_'
-                          'LoadBalancer_VirtualIpAddress'].getVirtualServers
+                           'LoadBalancer_VirtualIpAddress'].getVirtualServers
 
         _filter = {'virtualServers': {'id': {'operation': group_id}}}
         mask = 'mask[serviceGroups]'
         call.assert_called_once_with(filter=_filter, mask=mask, id=loadbal_id)
 
         call = self.client['Network_Application_Delivery_Controller_'
-                   'LoadBalancer_Service_Group'].kickAllConnections
+                           'LoadBalancer_Service_Group'].kickAllConnections
         call.assert_called_once_with(id=51758)
