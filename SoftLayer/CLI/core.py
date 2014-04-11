@@ -30,6 +30,7 @@ Networking:
 Storage:
   iscsi     View iSCSI details
   nas       View NAS details
+  snapshot  iSCSI snapshots
 
 General:
   config    View and edit configuration for this tool

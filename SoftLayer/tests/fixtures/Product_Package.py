@@ -1063,6 +1063,20 @@ getItems = [
         'prices': [{'id': 1144}],
     },
     {
+        'id': 4439,
+        'capacity': '1',
+        'description': '1 GB iSCSI Storage',
+        'itemCategory': {'categoryCode': 'iscsi'},
+        'prices': [{'id': 2222}],
+    },
+    {
+        'id': 1121,
+        'capacity': '20',
+        'description': '20 GB iSCSI snapshot',
+        'itemCategory': {'categoryCode': 'iscsi_snapshot_space'},
+        'prices': [{'id': 2014}],
+    },
+    {
         'id': 4440,
         'capacity': '4',
         'description': '4 Portable Public IP Addresses',
@@ -1110,4 +1124,70 @@ getItems = [
         'description': 'Global IPv6',
         'itemCategory': {'categoryCode': 'global_ipv6'},
         'prices': [{'id': 611}],
+    }]
+getItemPrices = [
+    {
+        'currentPriceFlag': '',
+        'id': 2152,
+        'item': {
+            'capacity': '1',
+            'description': '1 GB iSCSI SAN Storage',
+            'id': 1111,
+            'softwareDescriptionId': '',
+            'units': 'GB',
+            'upgradeItemId': 547},
+        'itemId': 1111,
+        'laborFee': '0',
+        'onSaleFlag': '',
+        'oneTimeFee': '0',
+        'packageReferences': [{'id': 46626,
+                               'itemPriceId': 2152, 'packageId': 0}],
+        'quantity': '',
+        'recurringFee': '.35',
+        'setupFee': '0',
+        'sort': 0
+    },
+    {
+        'currentPriceFlag': '',
+        'id': 22501,
+        'item': {'capacity': '1',
+                 'description': '1 GB iSCSI SAN Storage',
+                 'id': 1111,
+                 'softwareDescriptionId': '',
+                 'units': 'GB',
+                 'upgradeItemId': 547},
+        'itemId': 1111,
+        'laborFee': '0',
+        'onSaleFlag': '',
+        'oneTimeFee': '0',
+        'packageReferences': [{
+            'id': 252983,
+            'itemPriceId': 22501, 'packageId': 0
+        }],
+        'quantity': '',
+        'recurringFee': '0',
+        'setupFee': '0',
+        'sort': 0
+    },
+    {
+        'currentPriceFlag': '',
+        'id': 22441,
+        'item': {
+            'capacity': '1',
+            'description': '1 GB iSCSI SAN Storage',
+            'id': 1111,
+            'softwareDescriptionId': '',
+            'units': 'GB',
+            'upgradeItemId': 547
+        },
+        'itemId': 1111,
+        'laborFee': '0',
+        'onSaleFlag': '',
+        'oneTimeFee': '0',
+        'packageReferences': [{'id': 250326,
+                               'itemPriceId': 22441, 'packageId': 0}],
+        'quantity': '',
+        'recurringFee': '15',
+        'setupFee': '0',
+        'sort': 0
     }]
