@@ -26,6 +26,7 @@ Options:
   --address1=ADDR    Update the address 1 field
   --address2=ADDR    Update the address 2 field
   --city=CITY        Set the city information
+  --company=NAME     Set the company name
   --country=COUNTRY  Set the country information. Use the two-letter
                        abbreviation.
   --firstname=NAME   Update the first name field
@@ -45,6 +46,7 @@ Options:
             'abuse_email': args.get('--abuse'),
             'address1': args.get('--address1'),
             'address2': args.get('--address2'),
+            'company_name': args.get('--company'),
             'city': args.get('--city'),
             'country': args.get('--country'),
             'first_name': args.get('--firstname'),

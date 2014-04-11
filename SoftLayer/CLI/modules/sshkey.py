@@ -51,8 +51,7 @@ Optional:
         mgr = SshKeyManager(self.client)
         result = mgr.add_key(key, args['<label>'], args.get('--notes'))
 
-        if type(result) is dict and result.get('fingerprint'):
-            return "SSH key added."
+        return "SSH key added: %s" % result.get('fingerprint')
 
 
 class RemoveSshKey(CLIRunnable):
@@ -77,7 +76,7 @@ Required:
         if args['--really'] or no_going_back(key_id):
             mgr.delete_key(key_id)
         else:
-            CLIAbort('Aborted')
+            raise CLIAbort('Aborted')
 
 
 class EditSshKey(CLIRunnable):
@@ -123,8 +122,8 @@ Options:
 
         for key in keys:
             table.add_row([key['id'],
-                           key['label'],
-                           key['fingerprint'],
+                           key.get('label'),
+                           key.get('fingerprint'),
                            key.get('notes', '-')])
 
         return table
@@ -156,6 +155,6 @@ Options:
 
         table = KeyValueTable(['Name', 'Value'])
         table.add_row(['id', key['id']])
-        table.add_row(['label', key['label']])
+        table.add_row(['label', key.get('label')])
         table.add_row(['notes', key.get('notes', '-')])
         return table
