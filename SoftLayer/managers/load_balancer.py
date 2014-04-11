@@ -290,7 +290,7 @@ class LoadBalancerManager(IdentifierMixin, object):
         """
         kwargs = NestedDict({})
         kwargs['mask'] = ('mask[virtualServers[serviceGroups'
-                         '[services[groupReferences]]]]')
+                          '[services[groupReferences]]]]')
 
         load_balancer = self.lb_svc.getObject(id=loadbal_id, **kwargs)
         virtual_servers = load_balancer['virtualServers']

@@ -314,7 +314,6 @@ getClosedTickets = [ticket for ticket in getTickets
 
 getCurrentUser = {"id": 12345}
 
-
 getCdnAccounts = [
     {
         "cdnAccountName": "1234a",

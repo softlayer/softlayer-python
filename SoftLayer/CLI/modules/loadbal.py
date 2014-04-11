@@ -4,8 +4,6 @@ usage: sl loadbal [<command>] [<args>...] [options]
 Local LoadBalancer management
 
 The available commands are:
-
-
   cancel           Cancel an existing load balancer
   create           Create a new load balancer
   create-options   Lists the different packages for load balancers
