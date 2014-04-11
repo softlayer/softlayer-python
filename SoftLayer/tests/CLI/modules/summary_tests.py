@@ -10,11 +10,11 @@ from SoftLayer.CLI.environment import Environment
 from SoftLayer.CLI.helpers import format_output
 
 
-class HelpTests(unittest.TestCase):
+class SummaryTests(unittest.TestCase):
     def setUp(self):
         self.client = FixtureClient()
 
-    def test_help(self):
+    def test_summary(self):
         command = summary.Summary(client=self.client, env=Environment())
 
         output = command.execute({})
