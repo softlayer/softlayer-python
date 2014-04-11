@@ -153,7 +153,7 @@ class NetworkManager(object):
                            ('privateResidenceFlag', private_residence),
                            ('state', state),
                            ('postalCode', postal_code)]:
-            if key is not None:
+            if value is not None:
                 update[key] = value
 
         # If there's anything to update, update it

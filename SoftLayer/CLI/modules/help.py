@@ -20,9 +20,12 @@ class Show(CLIRunnable):
 
     def execute(self, args):
         parser = CommandParser(self.env)
+        if not any([args['<command>'], args['<module>']]):
+            return parser.get_module_help('help')
+
         self.env.load_module(args['<module>'])
+
         if args['<command>']:
             return parser.get_command_help(args['<module>'], args['<command>'])
         elif args['<module>']:
             return parser.get_module_help(args['<module>'])
-        return parser.get_main_help()

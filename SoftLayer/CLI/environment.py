@@ -38,18 +38,19 @@ class InvalidModule(SoftLayerError):
 
 class Environment(object):
     """ Provides access to the current CLI environment """
-    # {'module_name': {'action': 'actionClass'}}
-    plugins = {}
-    aliases = {
-        'meta': 'metadata',
-        'my': 'metadata',
-        'vm': 'cci',
-        'hardware': 'server',
-        'hw': 'server',
-        'bmetal': 'bmc',
-    }
-    stdout = sys.stdout
-    stderr = sys.stderr
+    def __init__(self):
+        # {'module_name': {'action': 'actionClass'}}
+        self.plugins = {}
+        self.aliases = {
+            'meta': 'metadata',
+            'my': 'metadata',
+            'vm': 'cci',
+            'hardware': 'server',
+            'hw': 'server',
+            'bmetal': 'bmc',
+        }
+        self.stdout = sys.stdout
+        self.stderr = sys.stderr
 
     def get_command(self, module_name, command_name):
         """ Based on the loaded modules, return a command """
