@@ -24,4 +24,3 @@ __all__ = ['CCIManager', 'DNSManager', 'FirewallManager', 'HardwareManager',
            'ImageManager', 'MessagingManager', 'MetadataManager',
            'NetworkManager', 'SshKeyManager', 'SSLManager',
            'TicketManager', 'ISCSIManager', 'LoadBalancerManager']
-
