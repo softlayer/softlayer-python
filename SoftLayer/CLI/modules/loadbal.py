@@ -251,7 +251,7 @@ Options:
         if args['--really'] or confirm("This action will cancel a load "
                                        "balancer. Continue?"):
             mgr.cancel_lb(loadbal_id)
-            return 'Load Balancer with id %s is being cancelled!' % loadbal_id
+            return 'Load Balancer with id %s is being cancelled!' % input_id
         else:
             raise CLIAbort('Aborted.')
 
@@ -260,7 +260,7 @@ class LoadBalancerServiceDelete(CLIRunnable):
     """
 usage: sl loadbal service-delete <identifier> [options]
 
-Cancels an existing load_balancer service
+Deletes an existing load_balancer service
 Options:
    --really     Whether to skip the confirmation prompt
 
@@ -402,7 +402,7 @@ class LoadBalancerServiceGroupDelete(CLIRunnable):
     """
 usage: sl loadbal group-delete <identifier> [options]
 
-Cancels an existing load_balancer service group
+Deletes an existing load_balancer service group
 Options:
   --really     Whether to skip the confirmation prompt
 
@@ -430,8 +430,8 @@ class LoadBalancerServiceGroupEdit(CLIRunnable):
 usage: sl loadbal group-edit <identifier> [options]
 
 Edits an existing load_balancer service group
-Required:
---allocation=ALLOC       Change the allocated number of connections
+Options:
+--allocation=ALLOC       Change the allocated % of connections
 --port=PORT              Change the port
 --routing_type=TYPE      Change the port routing type
 --routing_method=METHOD  Change the routing method
@@ -446,6 +446,12 @@ Required:
         key_value = input_id.split(':')
         loadbal_id = int(key_value[0])
         group_id = int(key_value[1])
+
+        # check if any input is provided
+        if not (args['--allocation'] or args['--port']
+                or args['--routing_type'] or args['--routing_method']):
+            return 'At least one property is required to be changed!'
+
         routing_type = args.get('--routing_type')
         routing_method = args.get('--routing_method')
 
@@ -500,9 +506,6 @@ Required:
         input_id = args.get('<identifier>')
         key_value = input_id.split(':')
 
-        if key_value[0] != 'local':
-            return 'This CLI is only valid for local load balancers'
-
         loadbal_id = int(key_value[1])
 
         mgr.add_service_group(loadbal_id,
@@ -520,12 +523,10 @@ usage: sl loadbal create <identifier> (--datacenter=DC) [options]
 
 Adds a load_balancer given the billing id returned from create-options
 
-Required:
+Options:
   -d, --datacenter=DC    Datacenter shortname (sng01, dal05, ...)
                          Note: Omitting this value defaults to the first
                            available datacenter
-
-Options:
   --really     Whether to skip the confirmation prompt
 """
     action = 'create'
