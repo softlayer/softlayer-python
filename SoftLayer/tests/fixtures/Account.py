@@ -314,7 +314,6 @@ getClosedTickets = [ticket for ticket in getTickets
 
 getCurrentUser = {"id": 12345}
 
-
 getCdnAccounts = [
     {
         "cdnAccountName": "1234a",
@@ -339,3 +338,15 @@ getCdnAccounts = [
         "accountId": 1234
     }
 ]
+
+getNetworkVlans = [{
+    'name': 'dal00',
+    'hardware': [{'id': 1}],
+    'networkComponents': [{'id': 2}],
+    'primaryRouter': {
+        'datacenter': {'name': 'dal00'}
+    },
+    'totalPrimaryIpAddressCount': 3,
+    'subnets': [],
+    'virtualGuests': [{'id': 3}]
+}]

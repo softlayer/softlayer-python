@@ -73,28 +73,36 @@ class NetworkTests(unittest.TestCase):
         self.assertEqual(Product_Order.verifyOrder, result)
 
     def test_assign_global_ip(self):
-        id = 9876
-        target = '172.16.24.76'
-
-        self.network.assign_global_ip(id, target)
+        self.network.assign_global_ip(9876, '172.16.24.76')
 
         service = self.client['Network_Subnet_IpAddress_Global']
-        service.route.assert_called_with(target, id=id)
+        service.route.assert_called_with('172.16.24.76', id=9876)
 
     def test_cancel_global_ip(self):
-        service = self.client['Billing_Item']
-
         self.network.cancel_global_ip(1234)
+
+        service = self.client['Billing_Item']
         service.cancelService.assert_called_with(id=1234)
 
     def test_cancel_subnet(self):
-        service = self.client['Billing_Item']
-
         self.network.cancel_subnet(1234)
+
+        service = self.client['Billing_Item']
         service.cancelService.assert_called_with(id=1056)
 
     def test_edit_rwhois(self):
-        self.client['Account'].getRwhoisData.return_value = {'id': 954}
+        self.network.edit_rwhois(
+            abuse_email='abuse@test.foo',
+            address1='123 Test Street',
+            address2='Apt. #31',
+            city='Anywhere',
+            company_name='TestLayer',
+            country='US',
+            first_name='Bob',
+            last_name='Bobinson',
+            postal_code='9ba62',
+            private_residence=False,
+            state='TX')
 
         expected = {
             'abuseEmail': 'abuse@test.foo',
@@ -109,53 +117,36 @@ class NetworkTests(unittest.TestCase):
             'privateResidenceFlag': False,
             'state': 'TX',
         }
-
-        self.network.edit_rwhois(
-            abuse_email='abuse@test.foo',
-            address1='123 Test Street',
-            address2='Apt. #31',
-            city='Anywhere',
-            company_name='TestLayer',
-            country='US',
-            first_name='Bob',
-            last_name='Bobinson',
-            postal_code='9ba62',
-            private_residence=False,
-            state='TX')
-
         f = self.client['Network_Subnet_Rwhois_Data'].editObject
-        f.assert_called_with(expected, id=954)
+        f.assert_called_with(expected, id='id')
 
     def test_get_rwhois(self):
         self.network.get_rwhois()
         self.client['Account'].getRwhoisData.assert_called()
 
     def test_get_subnet(self):
-        id = 9876
-        mcall = call(id=id, mask=ANY)
+        mcall = call(id=9876, mask=ANY)
         service = self.client['Network_Subnet']
 
-        self.network.get_subnet(id)
+        self.network.get_subnet(9876)
         service.getObject.assert_has_calls(mcall)
 
     def test_get_vlan(self):
-        id = 1234
-        mcall = call(id=id, mask=ANY)
         service = self.client['Network_Vlan']
 
-        self.network.get_vlan(id)
-        service.getObject.assert_has_calls(mcall)
+        self.network.get_vlan(1234)
+        service.getObject.assert_has_calls(call(id=1234, mask=ANY))
 
     def test_list_global_ips_default(self):
-        mask = 'destinationIpAddress[hardware, virtualGuest],ipAddress'
-        mcall = call(filter={}, mask=mask)
-        service = self.client['Account']
-
         self.network.list_global_ips()
 
-        service.getGlobalIpRecords.assert_has_calls(mcall)
+        mask = 'destinationIpAddress[hardware, virtualGuest],ipAddress'
+        service = self.client['Account']
+        service.getGlobalIpRecords.assert_has_calls(call(filter={}, mask=mask))
 
     def test_list_global_ips_with_filter(self):
+        self.network.list_global_ips(version=4)
+
         mask = 'destinationIpAddress[hardware, virtualGuest],ipAddress'
         _filter = {
             'globalIpRecords': {
@@ -166,47 +157,25 @@ class NetworkTests(unittest.TestCase):
                 }
             }
         }
-
-        mcall = call(filter=_filter, mask=mask)
         service = self.client['Account']
-
-        self.network.list_global_ips(version=4)
-
-        service.getGlobalIpRecords.assert_has_calls(mcall)
+        service.getGlobalIpRecords.assert_has_calls(call(filter=_filter,
+                                                         mask=mask))
 
     def test_list_subnets_default(self):
         _filter = {'subnets': {'subnetType': {'operation': '!= GLOBAL_IP'}}}
         mask = 'hardware,datacenter,ipAddressCount,virtualGuests'
-        mcall = call(filter=_filter,
-                     mask=mask)
         service = self.client['Account']
 
         self.network.list_subnets()
 
-        service.getSubnets.assert_has_calls(mcall)
+        service.getSubnets.assert_has_calls(call(filter=_filter, mask=mask))
 
     def test_list_subnets_with_filters(self):
-        identifier = '10.0.0.1'
-        datacenter = 'dal00'
-        subnet_type = 'PRIMARY'
-        version = 4
-
-        service = self.client['Account']
-        service.getSubnets.return_value = [
-            {
-                'id': 100,
-                'networkIdentifier': '10.0.0.1',
-                'datacenter': {'name': 'dal00'},
-                'version': 4,
-                'subnetType': 'PRIMARY',
-            },
-        ]
-
         result = self.network.list_subnets(
-            identifier=identifier,
-            datacenter=datacenter,
-            subnet_type=subnet_type,
-            version=version,
+            identifier='10.0.0.1',
+            datacenter='dal00',
+            subnet_type='PRIMARY',
+            version=4,
         )
 
         _filter = {
@@ -220,17 +189,16 @@ class NetworkTests(unittest.TestCase):
             }
         }
         mask = 'hardware,datacenter,ipAddressCount,virtualGuests'
-        service.getSubnets.assert_called_with(filter=_filter, mask=mask)
-
-        self.assertEqual([service.getSubnets.return_value[0]], result)
+        self.client['Account'].getSubnets.assert_called_with(filter=_filter,
+                                                             mask=mask)
+        self.assertEqual(self.client['Account'].getSubnets.return_value,
+                         result)
 
     def test_list_vlans_default(self):
-        mcall = call(filter={}, mask=ANY)
         service = self.client['Account']
 
         self.network.list_vlans()
-
-        service.getNetworkVlans.assert_has_calls(mcall)
+        service.getNetworkVlans.assert_has_calls(call(filter={}, mask=ANY))
 
     def test_list_vlans_with_filters(self):
         self.network.list_vlans(
@@ -255,35 +223,17 @@ class NetworkTests(unittest.TestCase):
         ))
 
     def test_summary_by_datacenter(self):
-        mcall = call(mask=ANY, filter=ANY)
-        service = self.client['Account']
-
-        service.getNetworkVlans.return_value = [
-            {
-                'name': 'dal00',
-                'hardware': [{'id': 1}],
-                'networkComponents': [{'id': 2}],
-                'primaryRouter': {
-                    'datacenter': {'name': 'dal00'}
-                },
-                'totalPrimaryIpAddressCount': 3,
-                'subnets': [],
-                'virtualGuests': [{'id': 3}]
-            }
-        ]
-
-        expected = {'dal00': {
-            'hardwareCount': 1,
-            'networkingCount': 1,
-            'primaryIpCount': 3,
-            'subnetCount': 0,
-            'virtualGuestCount': 1,
-            'vlanCount': 1
-        }}
-
         result = self.network.summary_by_datacenter()
 
-        service.getNetworkVlans.assert_has_calls(mcall)
+        expected = {
+            'dal00': {
+                'hardwareCount': 1,
+                'networkingCount': 1,
+                'primaryIpCount': 3,
+                'subnetCount': 0,
+                'virtualGuestCount': 1,
+                'vlanCount': 1
+            }}
         self.assertEqual(expected, result)
 
     def test_resolve_global_ip_ids(self):
@@ -316,9 +266,7 @@ class NetworkTests(unittest.TestCase):
         self.assertEqual(_id, [])
 
     def test_unassign_global_ip(self):
-        id = 9876
-
-        self.network.unassign_global_ip(id)
+        self.network.unassign_global_ip(9876)
 
         service = self.client['Network_Subnet_IpAddress_Global']
-        service.unroute.assert_called_with(id=id)
+        service.unroute.assert_called_with(id=9876)

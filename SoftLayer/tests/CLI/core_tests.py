@@ -42,12 +42,14 @@ Options:
 
 
 class EnvironmentFixture(Environment):
-    plugins = {'cci': {'list': submodule_fixture}}
-    aliases = {
-        'meta': 'metadata',
-        'my': 'metadata',
-    }
-    config = {}
+    def __init__(self):
+        super(EnvironmentFixture, self).__init__()
+        self.plugins = {'cci': {'list': submodule_fixture}}
+        self.aliases = {
+            'meta': 'metadata',
+            'my': 'metadata',
+        }
+        self.config = {}
 
     def load_module(self, *args, **kwargs):
         return module_fixture
