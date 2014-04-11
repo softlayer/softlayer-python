@@ -13,7 +13,8 @@ The available commands are:
 """
 # :license: MIT, see LICENSE for more details.
 
-from SoftLayer import FirewallManager
+from __future__ import print_function
+from SoftLayer import FirewallManager, SoftLayerError
 from SoftLayer.CLI import CLIRunnable, Table, listing, resolve_id, confirm
 from SoftLayer.CLI.helpers import blank, CLIAbort
 from subprocess import call
@@ -383,11 +384,17 @@ Edit the rules for a firewall
                         rules = mgr.edit_standard_fwl_rules(firewall_id,
                                                             rules)
                     break
-                except Exception as error:
+                except (SoftLayerError, ValueError) as error:
                     print("Unexpected error({%s})" % (error))
                     if confirm("Would you like to continue editing the rules"
                                ". Continue?"):
                         edited_rules = open_editor(content=edited_rules)
+                        print(edited_rules)
+                        if confirm("Would you like to submit the rules. "
+                                   "Continue?"):
+                            continue
+                        else:
+                            raise CLIAbort('Aborted.')
                     else:
                         raise CLIAbort('Aborted.')
                     return 'Firewall updated!'
