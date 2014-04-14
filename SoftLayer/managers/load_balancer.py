@@ -11,9 +11,7 @@ from SoftLayer.utils import IdentifierMixin, NestedDict, query_filter
 class LoadBalancerManager(IdentifierMixin, object):
 
     """ Manages load balancers.
-
     :param SoftLayer.API.Client client: the API client instance
-
     """
 
     def __init__(self, client):
