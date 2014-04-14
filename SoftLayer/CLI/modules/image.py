@@ -7,12 +7,13 @@ The available commands are:
   delete  Delete an image
   detail  Output details about an image
   list    List images
+  edit    Edit an image
 """
 # :license: MIT, see LICENSE for more details.
 
 from SoftLayer import ImageManager
-
 from SoftLayer.CLI import CLIRunnable, Table, KeyValueTable, blank, resolve_id
+from SoftLayer.CLI.helpers import CLIAbort
 
 
 class ListImages(CLIRunnable):
@@ -107,3 +108,33 @@ Get details for an image
                               'image')
 
         image_mgr.delete_image(image_id)
+
+
+class EditImage(CLIRunnable):
+    """
+usage: sl image edit <identifier> [--tag=Tag...] [options]
+
+Edit Details for an image
+
+Options:
+    --name=Name     Name of the Image
+    --note=Note     Note of the Image
+    --tag=TAG...    Tags of the Image. Can be specified multiple times.
+
+Note: Image to be edited must be private
+"""
+    action = 'edit'
+
+    def execute(self, args):
+        image_mgr = ImageManager(self.client)
+        data = {}
+        if args.get('--name'):
+            data['name'] = args.get('--name')
+        if args.get('--note'):
+            data['note'] = args.get('--note')
+        if args.get('--tag'):
+            data['tag'] = args.get('--tag')
+        image_id = resolve_id(image_mgr.resolve_ids,
+                              args.get('<identifier>'), 'image')
+        if not image_mgr.edit(image_id, **data):
+            raise CLIAbort("Failed to Edit Image")

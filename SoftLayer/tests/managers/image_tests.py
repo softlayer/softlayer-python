@@ -100,3 +100,20 @@ class ImageTests(unittest.TestCase):
         result = self.image.resolve_ids('unknown_name')
 
         self.assertEquals([], result)
+
+    def test_edit(self):
+        # Test updating tags
+        self.image.edit(1, tag="tag1,tag2")
+        self.vgbdtg.setTags.assert_called_once_with("tag1,tag2", id=1)
+
+        # Test a blank edit
+        self.image.edit(1)
+        self.assertTrue(self.image.edit, 1)
+
+        # Finally test a full edit
+        args = {
+            'name': 'abc',
+            'note': 'xyz'
+        }
+        self.image.edit(1, **args)
+        self.vgbdtg.editObject.assert_called_once_with(args, id=1)
