@@ -78,7 +78,7 @@ Get details for an image
                               args.get('<identifier>'),
                               'image')
 
-        image = image_mgr.get_image(image_id)
+        image, data = image_mgr.get_image(image_id)
 
         table = KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
@@ -89,6 +89,12 @@ Get details for an image
         table.add_row(['name', image['name'].strip()])
         table.add_row(['global_identifier',
                        image.get('globalIdentifier', blank())])
+        table.add_row(['note', data.get('note', blank())])
+        table.add_row(['tag', data.get('tag', blank())])
+        table.add_row(['datacentre', data.get('location', blank())])
+        table.add_row(['status', data.get('status', blank())])
+        table.add_row(['Disk Utilized', data.get('size_value', blank())])
+        table.add_row(['Disk Capacity', data.get('capacity_value', blank())])
 
         return table
 

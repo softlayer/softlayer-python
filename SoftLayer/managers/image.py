@@ -7,6 +7,7 @@
 """
 
 from SoftLayer.utils import query_filter, NestedDict, IdentifierMixin
+from SoftLayer.utils import converter
 
 IMAGE_MASK = ('id,accountId,name,globalIdentifier,blockDevices,parentId,'
               'createDate')
@@ -31,10 +32,60 @@ class ImageManager(IdentifierMixin, object):
         :param int image: The ID of the image.
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         """
+        image_mask = ('id,accountId,name,globalIdentifier,blockDevices,'
+                      'parentId,createDate,note,status,tagReferences[tag],'
+                      'children[blockDevices[diskImage[type]],datacenter]')
         if 'mask' not in kwargs:
-            kwargs['mask'] = IMAGE_MASK
+            kwargs['mask'] = image_mask
+        image = self.vgbdtg.getObject(id=image_id, **kwargs)
+        data = self._parmateter_parsing(image)
 
-        return self.vgbdtg.getObject(id=image_id, **kwargs)
+        return image, data
+
+    def _parmateter_parsing(self, image):
+        """
+        Parsing the data to get the required information
+        param image: contains image related data
+        """
+        data = {}
+        data['note'] = image.get('note')
+        data['tag'] = []
+        for i in range(len(image['tagReferences'])):
+            data['tag'].append(image['tagReferences'][i]['tag']['name'])
+        data['status'] = image['status']['name']
+        data['location'] = ""
+        for i in range(len(image['children'])):
+            data['location'] = data['location'] + "" + \
+                str((image['children'][i]['datacenter']['longName'])) + ", "
+        data['location'] = data['location'][0:-2]
+        totalblockdevices = image['children'][0]['blockDevices']
+        blockdevices_length = len(totalblockdevices)
+        capacity = [[] for i in range(blockdevices_length)]
+        capacity_unit = list(capacity)
+        size_on_disk = list(capacity)
+        size_on_disk_unit = list(capacity)
+        for i in range(blockdevices_length):
+            if totalblockdevices[i]['diskImage']['type']['name'] == 'Swap':
+                continue
+            capacity[i] = totalblockdevices[i]['diskImage']['capacity']
+            capacity_unit[i] = totalblockdevices[i]['diskImage']['units']
+            size_on_disk[i] = float(totalblockdevices[i]['diskSpace'])
+            size_on_disk_unit[i] = totalblockdevices[i]['units']
+            size_on_disk[i], size_on_disk_unit[i] = \
+                converter(size_on_disk[i], size_on_disk_unit[i])
+        capacity.remove([])
+        capacity_unit.remove([])
+        size_on_disk.remove([])
+        size_on_disk_unit.remove([])
+        data['size_value'] = ""
+        data['capacity_value'] = ""
+        for i in range(blockdevices_length - 1):
+            data['size_value'] = data['size_value'] + str(size_on_disk[i])[
+                :5] + " " + str(size_on_disk_unit[i]) + "    "
+
+            data['capacity_value'] = data['capacity_value'] + "   " + \
+                str(capacity[i]) + " " + str(capacity_unit[i]) + " "
+        return data
 
     def delete_image(self, image_id):
         """ deletes the specified image.

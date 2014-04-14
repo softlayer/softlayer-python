@@ -146,3 +146,23 @@ def resolve_ids(identifier, resolvers):
             return ids
 
     return []
+
+
+def converter(value, unit):
+    """converts value and unit into human readable form
+
+    :param value: Value to be cionverted
+    :param unit: Unit to be converted
+    : return list
+    """
+    while value >= 1024:
+        value = value/1024
+        if unit == 'B':
+            unit = 'KB'
+        elif unit == 'KB':
+            unit = 'MB'
+        elif unit == 'MB':
+            unit = 'GB'
+        elif unit == 'GB':
+            unit = 'TB'
+    return [value, unit]
