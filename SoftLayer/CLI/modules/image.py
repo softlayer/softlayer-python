@@ -90,6 +90,7 @@ Get details for an image
                        image.get('globalIdentifier', blank())])
         table.add_row(['note', data.get('note', blank())])
         table.add_row(['tag', data.get('tag', blank())])
+        table.add_row(['datacentre', data.get('location', blank())])
         table.add_row(['status', data.get('status', blank())])
         table.add_row(['Disk Utilized', data.get('size_value', blank())])
         table.add_row(['Disk Capacity', data.get('capacity_value', blank())])

@@ -12,7 +12,8 @@ IMAGES = [{
     'children': [{'blockDevices': [{'diskImage': {'capacity': 25,
                                     'units': 'GB', 'type': {'name': 'System'}},
                                     'diskSpace': 1232423421234, 'units': 'B'},
-                                   {'diskImage': {'type': {'name': 'Swap'}}}]}]
+                                   {'diskImage': {'type': {'name': 'Swap'}}}],
+                 'datacenter': {'id': 138124, 'longName': 'Dallas 5'}}]
 }, {
     'accountId': 1234,
     'blockDevices': [],

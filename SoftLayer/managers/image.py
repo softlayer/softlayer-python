@@ -34,7 +34,7 @@ class ImageManager(IdentifierMixin, object):
         """
         image_mask = ('id,accountId,name,globalIdentifier,blockDevices,'
                       'parentId,createDate,note,status,tagReferences[tag],'
-                      'children[blockDevices[diskImage[type]]]')
+                      'children[blockDevices[diskImage[type]],datacenter]')
         if 'mask' not in kwargs:
             kwargs['mask'] = image_mask
         image = self.vgbdtg.getObject(id=image_id, **kwargs)
@@ -53,6 +53,11 @@ class ImageManager(IdentifierMixin, object):
         for i in range(len(image['tagReferences'])):
             data['tag'].append(image['tagReferences'][i]['tag']['name'])
         data['status'] = image['status']['name']
+        data['location'] = ""
+        for i in range(len(image['children'])):
+            data['location'] = data['location'] + "" + \
+                str((image['children'][i]['datacenter']['longName'])) + ", "
+        data['location'] = data['location'][0:-2]
         totalblockdevices = image['children'][0]['blockDevices']
         blockdevices_length = len(totalblockdevices)
         capacity = [[] for i in range(blockdevices_length)]
@@ -74,7 +79,7 @@ class ImageManager(IdentifierMixin, object):
         size_on_disk_unit.remove([])
         data['size_value'] = ""
         data['capacity_value'] = ""
-        for i in range(blockdevices_length-1):
+        for i in range(blockdevices_length - 1):
             data['size_value'] = data['size_value'] + str(size_on_disk[i])[
                 :5] + " " + str(size_on_disk_unit[i]) + "    "
 
