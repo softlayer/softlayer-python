@@ -44,10 +44,12 @@ class Environment(object):
         self.aliases = {
             'meta': 'metadata',
             'my': 'metadata',
-            'vm': 'cci',
+            'vm': 'vs',
+            'cci': 'vs',
             'hardware': 'server',
             'hw': 'server',
             'bmetal': 'bmc',
+            'virtual': 'vs',
         }
         self.stdout = sys.stdout
         self.stderr = sys.stderr

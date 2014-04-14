@@ -52,10 +52,10 @@ Managers
 For day to day operation, most users will find the managers to be the most convenient means for interacting with the API. Managers mask out a lot of the complexities of using the API into classes that provide a simpler interface to various services. These are higher-level interfaces to the SoftLayer API.
 ::
 
-	>>> from SoftLayer import CCIManager, Client
+	>>> from SoftLayer import VSManager, Client
 	>>> client = Client(...)
-	>>> cci = CCIManager(client)
-	>>> cci.list_instances()
+	>>> vs = VSManager(client)
+	>>> vs.list_instances()
 	[...]
 
 **Available managers**:
@@ -121,7 +121,7 @@ SoftLayer's XML-RPC API also allows for pagination.
     client['Account'].getVirtualGuests(limit=10, offset=0)  # Page 1
     client['Account'].getVirtualGuests(limit=10, offset=10)  # Page 2
 
-Here's how to create a new Cloud Compute Instance using `SoftLayer_Virtual_Guest.createObject <http://sldn.softlayer.com/reference/services/SoftLayer_Virtual_Guest/createObject>`_. Be warned, this call actually creates an hourly CCI so this does have billing implications.
+Here's how to create a new Cloud Compute Instance using `SoftLayer_Virtual_Guest.createObject <http://sldn.softlayer.com/reference/services/SoftLayer_Virtual_Guest/createObject>`_. Be warned, this call actually creates an hourly virtual server so this does have billing implications.
 ::
 
     client['Virtual_Guest'].createObject({

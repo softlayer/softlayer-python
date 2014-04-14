@@ -1,37 +1,37 @@
 """
-usage: sl cci [<command>] [<args>...] [options]
+usage: sl vs [<command>] [<args>...] [options]
 
 Manage, delete, order compute instances
 
 The available commands are:
-  cancel          Cancel a running CCI
-  capture         Create an image the disk(s) of a CCI
-  create          Order and create a CCI
-                    (see `sl cci create-options` for choices)
-  create-options  Output available available options when creating a CCI
-  detail          Output details about a CCI
-  dns             DNS related actions to a CCI
-  edit            Edit details of a CCI
-  list            List CCI's on the account
+  cancel          Cancel a running virtual server
+  capture         Create an image the disk(s) of a virtual server
+  create          Order and create a virtual server
+                    (see `sl vs create-options` for choices)
+  create-options  Output available available options when creating a VS
+  detail          Output details about a virtual server
+  dns             DNS related actions to a virtual server
+  edit            Edit details of a virtual server
+  list            List virtual servers on the account
   nic-edit        Edit NIC settings
-  pause           Pauses an active CCI
-  power-off       Powers off a running CCI
-  power-on        Boots up a CCI
-  ready           Check if a CCI has finished provisioning
-  reboot          Reboots a running CCI
-  reload          Reload the OS on a CCI based on its current configuration
-  resume          Resumes a paused CCI
-  upgrade         Upgrades parameters of a CCI
+  pause           Pauses an active virtual server
+  power-off       Powers off a running virtual server
+  power-on        Boots up a virtual server
+  ready           Check if a virtual server has finished provisioning
+  reboot          Reboots a running virtual server
+  reload          Reload the OS on a VS based on its current configuration
+  resume          Resumes a paused virtual server
+  upgrade         Upgrades parameters of a virtual server
 
 For several commands, <identifier> will be asked for. This can be the id,
-hostname or the ip address for a CCI.
+hostname or the ip address for a virtual server.
 """
 # :license: MIT, see LICENSE for more details.
 
 from os import linesep
 import os.path
 
-from SoftLayer import CCIManager, SshKeyManager, DNSManager, DNSZoneNotFound
+from SoftLayer import VSManager, SshKeyManager, DNSManager, DNSZoneNotFound
 from SoftLayer.utils import lookup
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
@@ -42,18 +42,18 @@ from SoftLayer.CLI.helpers import (
     active_txn, transaction_status)
 
 
-class ListCCIs(CLIRunnable):
+class ListVSIs(CLIRunnable):
     """
-usage: sl cci list [--hourly | --monthly] [--sortby=SORT_COLUMN] [--tags=TAGS]
-                   [options]
+usage: sl vs list [--hourly | --monthly] [--sortby=SORT_COLUMN] [--tags=TAGS]
+                  [options]
 
-List CCIs
+List virtual servers
 
 Examples:
-    sl cci list --datacenter=dal05
-    sl cci list --network=100 --cpu=2
-    sl cci list --memory='>= 2048'
-    sl cci list --tags=production,db
+    sl vs list --datacenter=dal05
+    sl vs list --network=100 --cpu=2
+    sl vs list --memory='>= 2048'
+    sl vs list --tags=production,db
 
 Options:
   --sortby=ARG  Column to sort by. options: id, datacenter, host,
@@ -76,13 +76,13 @@ For more on filters see 'sl help filters'
     action = 'list'
 
     def execute(self, args):
-        cci = CCIManager(self.client)
+        vsi = VSManager(self.client)
 
         tags = None
         if args.get('--tags'):
             tags = [tag.strip() for tag in args.get('--tags').split(',')]
 
-        guests = cci.list_instances(hourly=args.get('--hourly'),
+        guests = vsi.list_instances(hourly=args.get('--hourly'),
                                     monthly=args.get('--monthly'),
                                     hostname=args.get('--hostname'),
                                     domain=args.get('--domain'),
@@ -115,11 +115,11 @@ For more on filters see 'sl help filters'
         return table
 
 
-class CCIDetails(CLIRunnable):
+class VSDetails(CLIRunnable):
     """
-usage: sl cci detail [--passwords] [--price] <identifier> [options]
+usage: sl vs detail [--passwords] [--price] <identifier> [options]
 
-Get details for a CCI
+Get details for a virtual server
 
 Options:
   --passwords  Show passwords (check over your shoulder!)
@@ -128,13 +128,13 @@ Options:
     action = 'detail'
 
     def execute(self, args):
-        cci = CCIManager(self.client)
+        vsi = VSManager(self.client)
         table = KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
         table.align['Value'] = 'l'
 
-        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
-        result = cci.get_instance(cci_id)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        result = vsi.get_instance(vs_id)
         result = NestedDict(result)
 
         table.add_row(['id', result['id']])
@@ -199,7 +199,7 @@ Options:
 
         if not result['privateNetworkOnlyFlag']:
             ptr_domains = self.client['Virtual_Guest'].\
-                getReverseDomainRecords(id=cci_id)
+                getReverseDomainRecords(id=vs_id)
 
             for ptr_domain in ptr_domains:
                 for ptr in ptr_domain['resourceRecords']:
@@ -208,11 +208,11 @@ Options:
         return table
 
 
-class CreateOptionsCCI(CLIRunnable):
+class CreateOptionsVS(CLIRunnable):
     """
-usage: sl cci create-options [options]
+usage: sl vs create-options [options]
 
-Output available available options when creating a CCI
+Output available available options when creating a virtual server
 
 Options:
   --all         Show all options. default if no other option provided
@@ -227,8 +227,8 @@ Options:
     options = ['datacenter', 'cpu', 'nic', 'disk', 'os', 'memory']
 
     def execute(self, args):
-        cci = CCIManager(self.client)
-        result = cci.get_create_options()
+        vsi = VSManager(self.client)
+        result = vsi.get_create_options()
 
         show_all = True
         for opt_name in self.options:
@@ -331,11 +331,11 @@ Options:
         return table
 
 
-class CreateCCI(CLIRunnable):
+class CreateVS(CLIRunnable):
     """
-usage: sl cci create [--disk=SIZE...] [--key=KEY...] [options]
+usage: sl vs create [--disk=SIZE...] [--key=KEY...] [options]
 
-Order/create a CCI. See 'sl cci create-options' for valid options
+Order/create a VS. See 'sl vs create-options' for valid options
 
 Required:
   -c, --cpu=CPU        Number of CPU cores
@@ -353,29 +353,28 @@ Optional:
   -d, --datacenter=DC    Datacenter shortname (sng01, dal05, ...)
                          Note: Omitting this value defaults to the first
                            available datacenter
-  --dedicated            Allocate a dedicated CCI (non-shared host)
+  --dedicated            Create a dedicated VS (Virtual Server (Private Node))
   --san                  Use SAN storage instead of local disk. Applies to
                            all disks specified with --disk.
-  --dry-run, --test      Do not create CCI, just get a quote
+  --dry-run, --test      Do not create VS, just get a quote
   --export=FILE          Exports options to a template file
   -F, --userfile=FILE    Read userdata from file
   -i, --postinstall=URI  Post-install script to download
                            (Only HTTPS executes, HTTP leaves file in /root)
   -k, --key=KEY          SSH keys to add to the root user. Can be specified
                            multiple times
-  --like=IDENTIFIER      Use the configuration from an existing CCI
+  --like=IDENTIFIER      Use the configuration from an existing VS
   -n, --network=MBPS     Network port speed in Mbps
   --disk=SIZE...         Disks. Can be specified multiple times
-  --private              Forces the CCI to only have access the private
-                           network
+  --private              Forces the VS to only have access the private network
   -t, --template=FILE    A template file that defaults the command-line
                            options using the long name in INI format
   -u, --userdata=DATA    User defined metadata string
-  --vlan_public=VLAN     The ID of the public VLAN on which you want the CCI
+  --vlan_public=VLAN     The ID of the public VLAN on which you want the VS
                            placed.
-  --vlan_private=VLAN    The ID of the private VLAN on which you want the CCI
+  --vlan_private=VLAN    The ID of the private VLAN on which you want the VS
                            placed.
-  --wait=SECONDS         Block until CCI is finished provisioning for up to X
+  --wait=SECONDS         Block until VS is finished provisioning for up to X
                            seconds before returning
 """
     action = 'create'
@@ -384,7 +383,7 @@ Optional:
 
     def execute(self, args):
         update_with_template_args(args)
-        cci = CCIManager(self.client)
+        vsi = VSManager(self.client)
         self._update_with_like_args(args)
 
         # Disks will be a comma-separated list. Let's make it a real list.
@@ -397,7 +396,7 @@ Optional:
 
         self._validate_args(args)
 
-        # Do not create CCI with --test or --export
+        # Do not create a virtual server with --test or --export
         do_create = not (args['--export'] or args['--test'])
 
         table = Table(['Item', 'cost'])
@@ -407,7 +406,7 @@ Optional:
 
         output = []
         if args.get('--test'):
-            result = cci.verify_create_instance(**data)
+            result = vsi.verify_create_instance(**data)
             total_monthly = 0.0
             total_hourly = 0.0
 
@@ -450,7 +449,7 @@ Optional:
             if args['--really'] or confirm(
                     "This action will incur charges on your account. "
                     "Continue?"):
-                result = cci.create_instance(**data)
+                result = vsi.create_instance(**data)
 
                 table = KeyValueTable(['name', 'value'])
                 table.align['name'] = 'r'
@@ -461,11 +460,11 @@ Optional:
                 output.append(table)
 
                 if args.get('--wait'):
-                    ready = cci.wait_for_ready(
+                    ready = vsi.wait_for_ready(
                         result['id'], int(args.get('--wait') or 1))
                     table.add_row(['ready', ready])
             else:
-                raise CLIAbort('Aborting CCI order.')
+                raise CLIAbort('Aborting virtual server order.')
 
         return output
 
@@ -506,15 +505,15 @@ Optional:
                     % args['--userfile'])
 
     def _update_with_like_args(self, args):
-        """ Update arguments with options taken from a currently running CCI.
+        """ Update arguments with options taken from a currently running VS.
 
-        :param CCIManager args: A CCIManager
+        :param VSManager args: A VSManager
         :param dict args: CLI arguments
         """
         if args['--like']:
-            cci = CCIManager(self.client)
-            cci_id = resolve_id(cci.resolve_ids, args.pop('--like'), 'CCI')
-            like_details = cci.get_instance(cci_id)
+            vsi = VSManager(self.client)
+            vs_id = resolve_id(vsi.resolve_ids, args.pop('--like'), 'VS')
+            like_details = vsi.get_instance(vs_id)
             like_args = {
                 '--hostname': like_details['hostname'],
                 '--domain': like_details['domain'],
@@ -550,14 +549,14 @@ Optional:
             if args.get('--monthly'):
                 like_args['--hourly'] = False
 
-            # Merge like CCI options with the options passed in
+            # Merge like VS options with the options passed in
             for key, value in like_args.items():
                 if args.get(key) in [None, False]:
                     args[key] = value
 
     def _parse_create_args(self, args):
         """ Converts CLI arguments to arguments that can be passed into
-            CCIManager.create_instance.
+            VSManager.create_instance.
 
         :param dict args: CLI arguments
         """
@@ -628,35 +627,35 @@ Optional:
         return data
 
 
-class ReadyCCI(CLIRunnable):
+class ReadyVS(CLIRunnable):
     """
-usage: sl cci ready <identifier> [options]
+usage: sl vs ready <identifier> [options]
 
-Check if a CCI is ready.
+Check if a virtual server is ready.
 
 Optional:
-  --wait=SECONDS  Block until CCI is finished provisioning for up to X seconds
+  --wait=SECONDS  Block until VS is finished provisioning for up to X seconds
                     before returning.
 """
     action = 'ready'
 
     def execute(self, args):
-        cci = CCIManager(self.client)
+        vsi = VSManager(self.client)
 
-        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
-        ready = cci.wait_for_ready(cci_id, int(args.get('--wait') or 0))
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        ready = vsi.wait_for_ready(vs_id, int(args.get('--wait') or 0))
 
         if ready:
             return "READY"
         else:
-            raise CLIAbort("Instance %s not ready" % cci_id)
+            raise CLIAbort("Instance %s not ready" % vs_id)
 
 
-class ReloadCCI(CLIRunnable):
+class ReloadVS(CLIRunnable):
     """
-usage: sl cci reload <identifier> [--key=KEY...] [options]
+usage: sl vs reload <identifier> [--key=KEY...] [options]
 
-Reload the OS on a CCI based on its current configuration
+Reload the OS on a virtual server based on its current configuration
 
 Optional:
   -i, --postinstall=URI  Post-install script to download
@@ -669,44 +668,44 @@ Optional:
     options = ['confirm']
 
     def execute(self, args):
-        cci = CCIManager(self.client)
-        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
+        vsi = VSManager(self.client)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
         keys = []
         if args.get('--key'):
             for key in args.get('--key'):
                 key_id = resolve_id(SshKeyManager(self.client).resolve_ids,
                                     key, 'SshKey')
                 keys.append(key_id)
-        if args['--really'] or no_going_back(cci_id):
-            cci.reload_instance(cci_id, args['--postinstall'], keys)
+        if args['--really'] or no_going_back(vs_id):
+            vsi.reload_instance(vs_id, args['--postinstall'], keys)
         else:
             CLIAbort('Aborted')
 
 
-class CancelCCI(CLIRunnable):
+class CancelVS(CLIRunnable):
     """
-usage: sl cci cancel <identifier> [options]
+usage: sl vs cancel <identifier> [options]
 
-Cancel a CCI
+Cancel a virtual server
 """
 
     action = 'cancel'
     options = ['confirm']
 
     def execute(self, args):
-        cci = CCIManager(self.client)
-        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
-        if args['--really'] or no_going_back(cci_id):
-            cci.cancel_instance(cci_id)
+        vsi = VSManager(self.client)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        if args['--really'] or no_going_back(vs_id):
+            vsi.cancel_instance(vs_id)
         else:
             CLIAbort('Aborted')
 
 
-class CCIPowerOff(CLIRunnable):
+class VSPowerOff(CLIRunnable):
     """
-usage: sl cci power-off <identifier> [--hard] [options]
+usage: sl vs power-off <identifier> [--hard] [options]
 
-Power off an active CCI
+Power off an active virtual server
 
 Optional:
     --hard  Perform a hard shutdown
@@ -716,23 +715,23 @@ Optional:
 
     def execute(self, args):
         virtual_guest = self.client['Virtual_Guest']
-        cci = CCIManager(self.client)
-        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
-        if args['--really'] or confirm('This will power off the CCI with id '
-                                       '%s. Continue?' % cci_id):
+        vsi = VSManager(self.client)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        if args['--really'] or confirm('This will power off the VS with id '
+                                       '%s. Continue?' % vs_id):
             if args['--hard']:
-                virtual_guest.powerOff(id=cci_id)
+                virtual_guest.powerOff(id=vs_id)
             else:
-                virtual_guest.powerOffSoft(id=cci_id)
+                virtual_guest.powerOffSoft(id=vs_id)
         else:
             raise CLIAbort('Aborted.')
 
 
-class CCIReboot(CLIRunnable):
+class VSReboot(CLIRunnable):
     """
-usage: sl cci reboot <identifier> [--hard | --soft] [options]
+usage: sl vs reboot <identifier> [--hard | --soft] [options]
 
-Reboot an active CCI
+Reboot an active virtual server
 
 Optional:
     --hard  Perform an abrupt reboot
@@ -743,74 +742,74 @@ Optional:
 
     def execute(self, args):
         virtual_guest = self.client['Virtual_Guest']
-        cci = CCIManager(self.client)
-        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
-        if args['--really'] or confirm('This will reboot the CCI with id '
-                                       '%s. Continue?' % cci_id):
+        vsi = VSManager(self.client)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        if args['--really'] or confirm('This will reboot the VS with id '
+                                       '%s. Continue?' % vs_id):
             if args['--hard']:
-                virtual_guest.rebootHard(id=cci_id)
+                virtual_guest.rebootHard(id=vs_id)
             elif args['--soft']:
-                virtual_guest.rebootSoft(id=cci_id)
+                virtual_guest.rebootSoft(id=vs_id)
             else:
-                virtual_guest.rebootDefault(id=cci_id)
+                virtual_guest.rebootDefault(id=vs_id)
         else:
             raise CLIAbort('Aborted.')
 
 
-class CCIPowerOn(CLIRunnable):
+class VSPowerOn(CLIRunnable):
     """
-usage: sl cci power-on <identifier> [options]
+usage: sl vs power-on <identifier> [options]
 
-Power on a CCI
+Power on a virtual server
 """
     action = 'power-on'
 
     def execute(self, args):
         virtual_guest = self.client['Virtual_Guest']
-        cci = CCIManager(self.client)
-        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
-        virtual_guest.powerOn(id=cci_id)
+        vsi = VSManager(self.client)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        virtual_guest.powerOn(id=vs_id)
 
 
-class CCIPause(CLIRunnable):
+class VSPause(CLIRunnable):
     """
-usage: sl cci pause <identifier> [options]
+usage: sl vs pause <identifier> [options]
 
-Pauses an active CCI
+Pauses an active virtual server
 """
     action = 'pause'
     options = ['confirm']
 
     def execute(self, args):
         virtual_guest = self.client['Virtual_Guest']
-        cci = CCIManager(self.client)
-        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
+        vsi = VSManager(self.client)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
 
-        if args['--really'] or confirm('This will pause the CCI with id '
-                                       '%s. Continue?' % cci_id):
-            virtual_guest.pause(id=cci_id)
+        if args['--really'] or confirm('This will pause the VS with id '
+                                       '%s. Continue?' % vs_id):
+            virtual_guest.pause(id=vs_id)
         else:
             raise CLIAbort('Aborted.')
 
 
-class CCIResume(CLIRunnable):
+class VSResume(CLIRunnable):
     """
-usage: sl cci resume <identifier> [options]
+usage: sl vs resume <identifier> [options]
 
-Resumes a paused CCI
+Resumes a paused virtual server
 """
     action = 'resume'
 
     def execute(self, args):
         virtual_guest = self.client['Virtual_Guest']
-        cci = CCIManager(self.client)
-        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
-        virtual_guest.resume(id=cci_id)
+        vsi = VSManager(self.client)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        virtual_guest.resume(id=vs_id)
 
 
-class NicEditCCI(CLIRunnable):
+class NicEditVS(CLIRunnable):
     """
-usage: sl cci nic-edit <identifier> (public | private) --speed=SPEED [options]
+usage: sl vs nic-edit <identifier> (public | private) --speed=SPEED [options]
 
 Manage NIC settings
 
@@ -823,17 +822,17 @@ Options:
     def execute(self, args):
         public = args['public']
 
-        cci = CCIManager(self.client)
-        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
+        vsi = VSManager(self.client)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
 
-        cci.change_port_speed(cci_id, public, args['--speed'])
+        vsi.change_port_speed(vs_id, public, args['--speed'])
 
 
-class CCIDNS(CLIRunnable):
+class VSDNS(CLIRunnable):
     """
-usage: sl cci dns sync <identifier> [options]
+usage: sl vs dns sync <identifier> [options]
 
-Attempts to update DNS for the specified CCI. If you don't specify any
+Attempts to update DNS for the specified VS. If you don't specify any
 arguments, it will attempt to update both the A and PTR records. If you don't
 want to update both records, you may use the -a or --ptr arguments to limit
 the records updated.
@@ -852,12 +851,12 @@ Options:
             return self.dns_sync(args)
 
     def dns_sync(self, args):
-        """ Sync DNS records to match the FQDN of the CCI """
+        """ Sync DNS records to match the FQDN of the virtual server """
         dns = DNSManager(self.client)
-        cci = CCIManager(self.client)
+        vsi = VSManager(self.client)
 
-        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
-        instance = cci.get_instance(cci_id)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        instance = vsi.get_instance(vs_id)
         zone_id = resolve_id(dns.resolve_ids, instance['domain'], name='zone')
 
         def sync_a_record():
@@ -909,7 +908,7 @@ Options:
                     ttl=args['--ttl'])
 
         if not instance['primaryIpAddress']:
-            raise CLIAbort('No primary IP address associated with this CCI')
+            raise CLIAbort('No primary IP address associated with this VS')
 
         try:
             zone = dns.get_zone(zone_id)
@@ -935,11 +934,11 @@ Options:
             sync_ptr_record()
 
 
-class EditCCI(CLIRunnable):
+class EditVS(CLIRunnable):
     """
-usage: sl cci edit <identifier> [options]
+usage: sl vs edit <identifier> [options]
 
-Edit CCI details
+Edit a virtual server's details
 
 Options:
   -D --domain=DOMAIN  Domain portion of the FQDN example: example.com
@@ -970,38 +969,38 @@ Options:
         data['hostname'] = args.get('--hostname')
         data['domain'] = args.get('--domain')
 
-        cci = CCIManager(self.client)
-        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
-        if not cci.edit(cci_id, **data):
-            raise CLIAbort("Failed to update CCI")
+        vsi = VSManager(self.client)
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        if not vsi.edit(vs_id, **data):
+            raise CLIAbort("Failed to update virtual server")
 
 
-class CaptureCCI(CLIRunnable):
+class CaptureVS(CLIRunnable):
     """
-usage: sl cci capture <identifier> [options]
+usage: sl vs capture <identifier> [options]
 
-Capture one or all disks from a CCI to a SoftLayer image.
+Capture one or all disks from a virtual server to a SoftLayer image.
 
 Required:
   -n --name=NAME         Name of the image
 
 Optional:
-  --all                  Capture all disks belonging to the CCI
+  --all                  Capture all disks belonging to the VS
   --note=NOTE            Add a note to be associated with the image
 """
     action = 'capture'
 
     def execute(self, args):
-        cci = CCIManager(self.client)
+        vsi = VSManager(self.client)
 
-        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
 
         if args['--all']:
             additional_disks = True
         else:
             additional_disks = False
 
-        capture = cci.capture(cci_id,
+        capture = vsi.capture(vs_id,
                               args.get('--name'),
                               additional_disks,
                               args.get('--note'))
@@ -1010,7 +1009,7 @@ Optional:
         table.align['Name'] = 'r'
         table.align['Value'] = 'l'
 
-        table.add_row(['cci_id', capture['guestId']])
+        table.add_row(['vs_id', capture['guestId']])
         table.add_row(['date', capture['createDate'][:10]])
         table.add_row(['time', capture['createDate'][11:19]])
         table.add_row(['transaction', transaction_status(capture)])
@@ -1019,15 +1018,15 @@ Optional:
         return table
 
 
-class UpgradeCCI(CLIRunnable):
+class UpgradeVS(CLIRunnable):
     """
-usage: sl cci upgrade <identifier> [options]
+usage: sl vs upgrade <identifier> [options]
 
-Upgrade parameters of a CCI
+Upgrade parameters of a virtual server
 
 Examples:
-    sl cci upgrade --cpus 2
-    sl cci upgrade --memory 2048 --network 1000
+    sl vs upgrade --cpus 2
+    sl vs upgrade --memory 2048 --network 1000
 Options:
     --cpu=CPU          Number of CPU cores
     --private          CPU core will be on a dedicated host server.
@@ -1036,8 +1035,8 @@ Options:
     --memory=MEMORY    Memory in megabytes
     --network=MBPS     Network port speed in Mbps
 
-Note: SoftLayer automatically reboots the CCI once upgrade request is placed.
-The CCI is halted until the Upgrade transaction is completed.
+Note: SoftLayer automatically reboots the VS once upgrade request is placed.
+The VS is halted until the Upgrade transaction is completed.
 However for Network, no reboot is required.
 """
 
@@ -1045,7 +1044,7 @@ However for Network, no reboot is required.
     options = ['confirm']
 
     def execute(self, args):
-        cci = CCIManager(self.client)
+        vsi = VSManager(self.client)
         data = {}
         data['cpus'] = args.get('--cpu')
         data['memory'] = args.get('--memory')
@@ -1054,18 +1053,18 @@ However for Network, no reboot is required.
         if args.get('--private'):
             data['public'] = False
         data = self.verify_upgrade_parameters(data)
-        cci_id = resolve_id(cci.resolve_ids, args.get('<identifier>'), 'CCI')
+        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
         if args['--really'] or confirm(
                 "This action will incur charges on your account. "
                 "Continue?"):
-            if not cci.upgrade(cci_id, **data):
-                raise CLIAbort('CCI Upgrade Failed')
+            if not vsi.upgrade(vs_id, **data):
+                raise CLIAbort('VS Upgrade Failed')
 
     def verify_upgrade_parameters(self, data):
         """
         param int cpus: The number of virtual CPUs to upgrade to
-                            of a CCI instance.
-        :param int memory: RAM of the CCI to be upgraded to.
+                            of a virtual server.
+        :param int memory: RAM of the VS to be upgraded to.
         :param int nic_speed: The port speed to set
         """
         try:
@@ -1078,4 +1077,4 @@ However for Network, no reboot is required.
             return data
         except:
             raise ValueError(
-                "One or more Values of CCI parameters are not correct")
+                "One or more Values of VS parameters are not correct")

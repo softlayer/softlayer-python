@@ -370,7 +370,7 @@ class TestTemplateArgs(unittest.TestCase):
                           {'--template': path})
 
     def test_template_options(self):
-        path = os.path.join(FIXTURE_PATH, 'sample_cci_template.conf')
+        path = os.path.join(FIXTURE_PATH, 'sample_vs_template.conf')
         args = {
             'key': 'value',
             '--cpu': None,

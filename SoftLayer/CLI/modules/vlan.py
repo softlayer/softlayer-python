@@ -20,8 +20,8 @@ usage: sl vlan detail <identifier> [options]
 Get detailed information about objects assigned to a particular VLAN
 
 Filters:
-  --no-cci         Hide CCI listing
-  --no-hardware    Hide hardware listing
+  --no-vs, --no-cci  Hide virtual server listing
+  --no-hardware      Hide hardware listing
 """
     action = 'detail'
 
@@ -61,18 +61,18 @@ Filters:
 
         table.add_row(['subnets', subnets])
 
-        if not args.get('--no-cci'):
+        if not args.get('--no-vs'):
             if vlan['virtualGuests']:
-                cci_table = KeyValueTable(['Hostname', 'Domain', 'IP'])
-                cci_table.align['Hostname'] = 'r'
-                cci_table.align['IP'] = 'l'
-                for cci in vlan['virtualGuests']:
-                    cci_table.add_row([cci['hostname'],
-                                       cci['domain'],
-                                       cci.get('primaryIpAddress')])
-                table.add_row(['ccis', cci_table])
+                vs_table = KeyValueTable(['Hostname', 'Domain', 'IP'])
+                vs_table.align['Hostname'] = 'r'
+                vs_table.align['IP'] = 'l'
+                for vsi in vlan['virtualGuests']:
+                    vs_table.add_row([vsi['hostname'],
+                                      vsi['domain'],
+                                      vsi.get('primaryIpAddress')])
+                table.add_row(['vs', vs_table])
             else:
-                table.add_row(['cci', 'none'])
+                table.add_row(['vs', 'none'])
 
         if not args.get('--no-hardware'):
             if vlan['hardware']:
@@ -98,7 +98,7 @@ Displays a list of VLANs
 
 Options:
   --sortby=ARG  Column to sort by. options: id, number, datacenter, IPs,
-    hardware, ccis, networking
+    hardware, vs, networking
 
 Filters:
   -d DC, --datacenter=DC  datacenter shortname (sng01, dal05, ...)
@@ -111,7 +111,7 @@ Filters:
         mgr = NetworkManager(self.client)
 
         table = Table([
-            'id', 'number', 'datacenter', 'name', 'IPs', 'hardware', 'ccis',
+            'id', 'number', 'datacenter', 'name', 'IPs', 'hardware', 'vs',
             'networking', 'firewall'
         ])
         table.sortby = args.get('--sortby') or 'id'

@@ -18,7 +18,7 @@ A CLI interface is broken into 4 major parts:
 
 Defining a module
 -----------------
-A module is a python module residing in `SoftLayer/CLI/modules/<module>.py`.  The filename represented here is what is directly exposed after the `sl` command. I.e. `sl cci` is `SoftLayer/CLI/modules/cci.py`.  The module's docblock is used as the `argument parser <http://docopt.org/>`_ and usage the end user will see.  `SoftLayer.CLI.helpers` contain all the helper functions and classes used for creating a CLI interface.  This is a typical setup and how it maps:
+A module is a python module residing in `SoftLayer/CLI/modules/<module>.py`.  The filename represented here is what is directly exposed after the `sl` command. I.e. `sl vs` is `SoftLayer/CLI/modules/vs.py`.  The module's docblock is used as the `argument parser <http://docopt.org/>`_ and usage the end user will see.  `SoftLayer.CLI.helpers` contain all the helper functions and classes used for creating a CLI interface.  This is a typical setup and how it maps:
 
 ::
 

@@ -18,7 +18,7 @@ class EnvironmentTests(unittest.TestCase):
 
     def test_plugin_list(self):
         actions = self.env.plugin_list()
-        self.assertIn('cci', actions)
+        self.assertIn('vs', actions)
         self.assertIn('dns', actions)
 
     def test_add_plugin(self):
@@ -62,19 +62,19 @@ class EnvironmentTests(unittest.TestCase):
         self.assertEqual(r, 'realname')
 
     def test_get_command_invalid(self):
-        self.assertRaises(InvalidCommand, self.env.get_command, 'cci', 'list')
+        self.assertRaises(InvalidCommand, self.env.get_command, 'vs', 'list')
 
     def test_get_command(self):
-        self.env.plugins = {'cci': {'list': 'something'}}
-        command = self.env.get_command('cci', 'list')
+        self.env.plugins = {'vs': {'list': 'something'}}
+        command = self.env.get_command('vs', 'list')
         self.assertEqual(command, 'something')
 
     def test_get_command_none(self):
         # If None is in the action list, anything that doesn't exist as a
         # command will return the value of the None key. This is to support
         # sl help any_module_name
-        self.env.plugins = {'cci': {None: 'something'}}
-        command = self.env.get_command('cci', 'something else')
+        self.env.plugins = {'vs': {None: 'something'}}
+        command = self.env.get_command('vs', 'something else')
         self.assertEqual(command, 'something')
 
     def test_exit(self):

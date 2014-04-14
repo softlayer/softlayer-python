@@ -52,9 +52,10 @@ class ServerCLITests(unittest.TestCase):
         f = getattr(self, method)
         f(expected, format_output(output, 'python'))
 
-    def test_ServerCreateOptions(self):
+    @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
+    def test_ServerCreateOptions(self, packages):
         args = {
-            '<chassis_id>': 999,
+            '<chassis_id>': '999',
             '--all': True,
             '--datacenter': False,
             '--cpu': False,
@@ -65,16 +66,21 @@ class ServerCLITests(unittest.TestCase):
             '--controller': False,
         }
 
+        test_data = [
+            (999, 'Chassis 999'),
+        ]
+        packages.return_value = test_data
+
         runnable = server.ServerCreateOptions(client=self.client)
 
         output = runnable.execute(args)
 
         expected = {
             'cpu': [
-                {'description': 'Dual Quad Core Pancake 200 - 1.60GHz',
-                 'id': 723},
-                {'description': 'Dual Quad Core Pancake 200 - 1.80GHz',
-                 'id': 724}],
+                {'Description': 'Dual Quad Core Pancake 200 - 1.60GHz',
+                 'ID': 723},
+                {'Description': 'Dual Quad Core Pancake 200 - 1.80GHz',
+                 'ID': 724}],
             'datacenter': ['RANDOM_LOCATION'],
             'disk': ['250_SATA_II', '500_SATA_II'],
             'disk_controllers': ['None', 'RAID0'],
@@ -93,9 +99,10 @@ class ServerCLITests(unittest.TestCase):
 
         self.assertEqual(expected, format_output(output, 'python'))
 
-    def test_ServerCreateOptions_with_cpu_only(self):
+    @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
+    def test_ServerCreateOptions_with_cpu_only(self, packages):
         args = {
-            '<chassis_id>': 999,
+            '<chassis_id>': '999',
             '--all': False,
             '--datacenter': False,
             '--cpu': True,
@@ -106,18 +113,93 @@ class ServerCLITests(unittest.TestCase):
             '--controller': False,
         }
 
+        test_data = [
+            (999, 'Chassis 999'),
+        ]
+        packages.return_value = test_data
+
         runnable = server.ServerCreateOptions(client=self.client)
 
         output = runnable.execute(args)
 
         expected = {
             'cpu': [
-                {'description': 'Dual Quad Core Pancake 200 - 1.60GHz',
-                 'id': 723},
-                {'description': 'Dual Quad Core Pancake 200 - 1.80GHz',
-                 'id': 724}
+                {'Description': 'Dual Quad Core Pancake 200 - 1.60GHz',
+                 'ID': 723},
+                {'Description': 'Dual Quad Core Pancake 200 - 1.80GHz',
+                 'ID': 724}
             ],
         }
+
+        self.assertEqual(expected, format_output(output, 'python'))
+
+    @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
+    def test_ServerCreateOptions_with_invalid_chassis(self, packages):
+        args = {
+            '<chassis_id>': '999',
+            '--all': True,
+            '--datacenter': False,
+            '--cpu': False,
+            '--nic': False,
+            '--disk': False,
+            '--os': False,
+            '--memory': False,
+            '--controller': False,
+        }
+
+        test_data = [
+            (998, 'Legacy Chassis'),
+        ]
+        packages.return_value = test_data
+
+        runnable = server.ServerCreateOptions(client=self.client)
+
+        self.assertRaises(CLIAbort, runnable.execute, args)
+
+    @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
+    @patch('SoftLayer.HardwareManager.get_bare_metal_package_id')
+    def test_ServerCreateOptions_for_bmc(self, bmpi, packages):
+        args = {
+            '<chassis_id>': '1099',
+            '--all': True,
+            '--datacenter': False,
+            '--cpu': False,
+            '--nic': False,
+            '--disk': False,
+            '--os': False,
+            '--memory': False,
+            '--controller': False,
+        }
+
+        test_data = [
+            (1099, 'Bare Metal Instance'),
+        ]
+        packages.return_value = test_data
+
+        bmpi.return_value = '1099'
+
+        runnable = server.ServerCreateOptions(client=self.client)
+
+        output = runnable.execute(args)
+
+        expected = {
+            'memory/cpu': [
+                {'cpu': ['2'], 'memory': '2'},
+                {'cpu': ['2', '4'], 'memory': '4'},
+            ],
+            'datacenter': ['RANDOM_LOCATION'],
+            'disk': ['250_SATA_II', '500_SATA_II'],
+            'dual nic': ['1000_DUAL', '100_DUAL', '10_DUAL'],
+            'os (CENTOS)': ['CENTOS_6_64_LAMP', 'CENTOS_6_64_MINIMAL'],
+            'os (REDHAT)': ['REDHAT_6_64_LAMP', 'REDHAT_6_64_MINIMAL'],
+            'os (UBUNTU)': ['UBUNTU_12_64_LAMP', 'UBUNTU_12_64_MINIMAL'],
+            'os (WIN)': [
+                'WIN_2008-DC_64',
+                'WIN_2008-ENT_64',
+                'WIN_2008-STD-R2_64',
+                'WIN_2008-STD_64',
+                'WIN_2012-DC-HYPERV_64'],
+            'single nic': ['100', '1000']}
 
         self.assertEqual(expected, format_output(output, 'python'))
 
@@ -528,6 +610,113 @@ class ServerCLITests(unittest.TestCase):
 
         export_to_template.assert_called_with('test_file.txt', expected,
                                               exclude=['--wait', '--test'])
+
+    @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
+    @patch('SoftLayer.HardwareManager.get_bare_metal_package_id')
+    def test_CreateServer_for_bmc(self, bmpi, packages):
+        args = {
+            '--chassis': '1099',
+            '--hostname': 'test',
+            '--domain': 'example.com',
+            '--datacenter': 'TEST00',
+            '--cpu': '2',
+            '--network': '100',
+            '--disk': ['250_SATA_II', '250_SATA_II'],
+            '--os': 'UBUNTU_12_64_MINIMAL',
+            '--memory': '2',
+            '--test': True,
+            '--export': None,
+            '--template': None,
+            '--key': [1234, 456],
+            '--vlan_public': 10234,
+            '--vlan_private': 20468,
+            '--postinstall': 'http://somescript.foo/myscript.sh',
+            '--billing': 'hourly',
+        }
+
+        test_data = [
+            (1099, 'Bare Metal Instance'),
+        ]
+        packages.return_value = test_data
+
+        bmpi.return_value = '1099'
+
+        runnable = server.CreateServer(client=self.client)
+
+        # First, test the --test flag
+        with patch('SoftLayer.HardwareManager.verify_order') as verify_mock:
+            verify_mock.return_value = {
+                'prices': [
+                    {
+                        'recurringFee': 0.0,
+                        'setupFee': 0.0,
+                        'item': {'description': 'First Item'},
+                    },
+                    {
+                        'recurringFee': 25.0,
+                        'setupFee': 0.0,
+                        'item': {'description': 'Second Item'},
+                    }
+                ]
+            }
+            output = runnable.execute(args)
+
+            expected = [
+                [
+                    {'Item': 'First Item', 'cost': '0.00'},
+                    {'Item': 'Second Item', 'cost': '25.00'},
+                    {'Item': 'Total monthly cost', 'cost': '25.00'}
+                ],
+                ''
+            ]
+
+            self.assertEqual(expected, format_output(output, 'python'))
+
+            # Make sure we can order without specifying the disk as well
+            args['--disk'] = []
+
+            output = runnable.execute(args)
+
+            self.assertEqual(expected, format_output(output, 'python'))
+
+            # And make sure we can pass in disk and SSH keys as comma separated
+            # strings, which is what templates do
+            args['--disk'] = '1000_DRIVE,1000_DRIVE'
+            args['--key'] = '123,456'
+
+            output = runnable.execute(args)
+
+            self.assertEqual(expected, format_output(output, 'python'))
+
+            # Test explicitly setting a RAID configuration
+            args['--controller'] = 'RAID0'
+
+            output = runnable.execute(args)
+
+            self.assertEqual(expected, format_output(output, 'python'))
+
+        # Now test ordering
+        with patch('SoftLayer.HardwareManager.place_order') as order_mock:
+            order_mock.return_value = {
+                'orderId': 98765,
+                'orderDate': '2013-08-02 15:23:47'
+            }
+
+            args['--test'] = False
+            args['--really'] = True
+
+            output = runnable.execute(args)
+
+            expected = {'id': 98765, 'created': '2013-08-02 15:23:47'}
+            self.assertEqual(expected, format_output(output, 'python'))
+
+        # Finally, test cancelling the process
+        with patch('SoftLayer.CLI.modules.server.confirm') as confirm:
+            confirm.return_value = False
+
+            args['--really'] = False
+
+            self.assertRaises(CLIAbort, runnable.execute, args)
 
     def test_EditServer(self):
         # Test both userdata and userfile at once
