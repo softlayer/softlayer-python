@@ -12,7 +12,7 @@ The available commands are:
   group-delete     Delete a service group from the load balancer
   group-edit       Edit the properties of a service group
   group-reset      Resets all the connections on a service group
-  health-checks    List the different health check values
+  health-check     List the different health check values
   list             List active load balancers
   routing-methods  List supported routing methods
   routing-types    List supported routing types
@@ -29,6 +29,19 @@ from SoftLayer.CLI import (CLIRunnable, Table, resolve_id,
 from SoftLayer.CLI.helpers import CLIAbort
 
 
+def get_ids(input_id):
+    """ Helper package to retrieve the actual IDs
+
+    :param input_id: the ID provided by the user
+    :returns: A list of valid IDs
+    """
+    key_value = input_id.split(':')
+    if len(key_value) != 2:
+        raise CLIAbort('Invalid ID %s: ID should be of the form xxx:yyy'
+                       % input_id)
+    return key_value
+
+
 def get_local_lbs_table(load_balancers):
     """ Helper package to format the local load balancers into a table.
 
@@ -42,11 +55,7 @@ def get_local_lbs_table(load_balancers):
                    'Connections/second',
                    'Type'])
 
-    table.align['VIP Address'] = 'r'
-    table.align['Location'] = 'r'
     table.align['Connections/second'] = 'r'
-    table.align['Connections/second'] = 'r'
-    table.align['Type'] = 'r'
 
     for load_balancer in load_balancers:
         ssl_support = 'Not Supported'
@@ -113,7 +122,9 @@ def get_local_lb_table(load_balancer):
 
             table3 = Table(['Service_ID', 'IP Address', 'Port',
                             'Health Check', 'Weight', 'Enabled', 'Status'])
+            service_exist = False
             for service in group['services']:
+                service_exist = True
                 health_check = service['healthChecks'][0]
                 table3.add_row([
                     '%s:%s' % (load_balancer['id'], service['id']),
@@ -125,7 +136,10 @@ def get_local_lb_table(load_balancer):
                     service['enabled'],
                     service['status']
                 ])
-            table.add_row([' Services', table3])
+            if service_exist:
+                table.add_row([' Services', table3])
+            else:
+                table.add_row([' Services', 'None'])
     return table
 
 
@@ -147,11 +161,11 @@ List active load balancers
 
 class LoadBalancerHealthChecks(CLIRunnable):
     """
-usage: sl loadbal health-check-types [options]
+usage: sl loadbal health-checks [options]
 
 List load balancer service health check types that can be used
 """
-    action = 'health-check-types'
+    action = 'health-checks'
 
     def execute(self, args):
         mgr = LoadBalancerManager(self.client)
@@ -222,7 +236,7 @@ Get Load balancer details
 
         input_id = args.get('<identifier>')
 
-        key_value = input_id.split(':')
+        key_value = get_ids(input_id)
         loadbal_id = int(key_value[1])
 
         load_balancer = mgr.get_local_lb(loadbal_id)
@@ -234,18 +248,16 @@ class LoadBalancerCancel(CLIRunnable):
 usage: sl loadbal cancel <identifier> [options]
 
 Cancels an existing load_balancer
-Options:
-  --really     Whether to skip the confirmation prompt
 
 """
     action = 'cancel'
-    options = ['really']
+    options = ['confirm']
 
     def execute(self, args):
         mgr = LoadBalancerManager(self.client)
         input_id = args.get('<identifier>')
 
-        key_value = input_id.split(':')
+        key_value = get_ids(input_id)
         loadbal_id = int(key_value[1])
 
         if args['--really'] or confirm("This action will cancel a load "
@@ -261,18 +273,16 @@ class LoadBalancerServiceDelete(CLIRunnable):
 usage: sl loadbal service-delete <identifier> [options]
 
 Deletes an existing load_balancer service
-Options:
-   --really     Whether to skip the confirmation prompt
 
 """
     action = 'service-delete'
-    options = ['really']
+    options = ['confirm']
 
     def execute(self, args):
         mgr = LoadBalancerManager(self.client)
         input_id = args.get('<identifier>')
 
-        key_value = input_id.split(':')
+        key_value = get_ids(input_id)
         service_id = int(key_value[1])
 
         if args['--really'] or confirm("This action will cancel a service "
@@ -288,18 +298,16 @@ class LoadBalancerServiceToggle(CLIRunnable):
 usage: sl loadbal service-toggle <identifier> [options]
 
 Toggle the status of an existing load_balancer service
-Options:
-  --really     Whether to skip the confirmation prompt
 
 """
     action = 'service-toggle'
-    options = ['really']
+    options = ['confirm']
 
     def execute(self, args):
         mgr = LoadBalancerManager(self.client)
         input_id = args.get('<identifier>')
 
-        key_value = input_id.split(':')
+        key_value = get_ids(input_id)
         service_id = int(key_value[1])
 
         if args['--really'] or confirm("This action will toggle the service "
@@ -329,7 +337,7 @@ Options:
         mgr = LoadBalancerManager(self.client)
         input_id = args.get('<identifier>')
 
-        key_value = input_id.split(':')
+        key_value = get_ids(input_id)
         loadbal_id = int(key_value[0])
         service_id = int(key_value[1])
 
@@ -339,7 +347,7 @@ Options:
             return 'At least one property is required to be changed!'
 
         # check if the IP is valid
-        ip_address_id = 0
+        ip_address_id = None
         if args['--ip']:
             ip_address = mgr.get_ip_address(args['--ip'])
             if not ip_address:
@@ -350,10 +358,10 @@ Options:
         mgr.edit_service(loadbal_id,
                          service_id,
                          ip_address_id=ip_address_id,
-                         enabled=int(args.get('--enabled') or -1),
-                         port=int(args.get('--port') or -1),
-                         weight=int(args.get('--weight') or -1),
-                         hc_type=int(args.get('--hc_type') or -1))
+                         enabled=args.get('--enabled'),
+                         port=args.get('--port'),
+                         weight=args.get('--weight'),
+                         hc_type=args.get('--hc_type'))
         return 'Load balancer service %s is being modified!' % input_id
 
 
@@ -377,7 +385,7 @@ Required:
         mgr = LoadBalancerManager(self.client)
         input_id = args.get('<identifier>')
 
-        key_value = input_id.split(':')
+        key_value = get_ids(input_id)
         loadbal_id = int(key_value[0])
         group_id = int(key_value[1])
 
@@ -403,18 +411,16 @@ class LoadBalancerServiceGroupDelete(CLIRunnable):
 usage: sl loadbal group-delete <identifier> [options]
 
 Deletes an existing load_balancer service group
-Options:
-  --really     Whether to skip the confirmation prompt
 
 """
     action = 'group-delete'
-    options = ['really']
+    options = ['confirm']
 
     def execute(self, args):
         mgr = LoadBalancerManager(self.client)
         input_id = args.get('<identifier>')
 
-        key_value = input_id.split(':')
+        key_value = get_ids(input_id)
         group_id = int(key_value[1])
 
         if args['--really'] or confirm("This action will cancel a service"
@@ -431,7 +437,7 @@ usage: sl loadbal group-edit <identifier> [options]
 
 Edits an existing load_balancer service group
 Options:
---allocation=ALLOC       Change the allocated % of connections
+--allocation=PERC        Change the allocated % of connections
 --port=PORT              Change the port
 --routing_type=TYPE      Change the port routing type
 --routing_method=METHOD  Change the routing method
@@ -443,7 +449,7 @@ Options:
         mgr = LoadBalancerManager(self.client)
         input_id = args.get('<identifier>')
 
-        key_value = input_id.split(':')
+        key_value = get_ids(input_id)
         loadbal_id = int(key_value[0])
         group_id = int(key_value[1])
 
@@ -457,10 +463,10 @@ Options:
 
         mgr.edit_service_group(loadbal_id,
                                group_id,
-                               allocation=int(args.get('--allocation') or -1),
-                               port=int(args.get('--port') or 0),
-                               routing_type=int(routing_type or 0),
-                               routing_method=int(routing_method or 0))
+                               allocation=args.get('--allocation'),
+                               port=args.get('--port'),
+                               routing_type=routing_type,
+                               routing_method=routing_method)
 
         return 'Load balancer service group %s is being updated!' % input_id
 
@@ -478,7 +484,7 @@ Resets the connections on a certain service group
         mgr = LoadBalancerManager(self.client)
         input_id = args.get('<identifier>')
 
-        key_value = input_id.split(':')
+        key_value = get_ids(input_id)
         loadbal_id = int(key_value[0])
         group_id = int(key_value[1])
 
@@ -488,12 +494,12 @@ Resets the connections on a certain service group
 
 class LoadBalancerServiceGroupAdd(CLIRunnable):
     """
-usage: sl loadbal group-add <identifier> --allocation=ALLOC --port=PORT \
+usage: sl loadbal group-add <identifier> --allocation=PERC --port=PORT \
 --routing_type=TYPE --routing_method=METHOD [options]
 
 Adds a new load_balancer service
 Required:
---allocation=ALLOC       The % of connections that will be allocated
+--allocation=PERC        The % of connections that will be allocated
 --port=PORT              The virtual port number for the group
 --routing_type=TYPE      The routing type for the group
 --routing_method=METHOD  The routing method for the group
@@ -504,7 +510,7 @@ Required:
     def execute(self, args):
         mgr = LoadBalancerManager(self.client)
         input_id = args.get('<identifier>')
-        key_value = input_id.split(':')
+        key_value = get_ids(input_id)
 
         loadbal_id = int(key_value[1])
 
@@ -527,10 +533,9 @@ Options:
   -d, --datacenter=DC    Datacenter shortname (sng01, dal05, ...)
                          Note: Omitting this value defaults to the first
                            available datacenter
-  --really     Whether to skip the confirmation prompt
 """
     action = 'create'
-    options = ['really']
+    options = ['confirm']
 
     def execute(self, args):
         mgr = LoadBalancerManager(self.client)

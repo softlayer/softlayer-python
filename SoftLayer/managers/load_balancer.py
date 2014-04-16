@@ -170,8 +170,8 @@ class LoadBalancerManager(IdentifierMixin, object):
                           'LoadBalancer_Service']
         return svc.toggleStatus(id=service_id)
 
-    def edit_service(self, loadbal_id, service_id, ip_address_id=0, port=-1,
-                     enabled=-1, hc_type=-1, weight=-1):
+    def edit_service(self, loadbal_id, service_id, ip_address_id=None,
+                     port=None, enabled=None, hc_type=None, weight=None):
         """ Edits an existing service properties
         :param int loadbal_id: The id of the loadbal where the service resides
         :param int service_id: The id of the service to edit
@@ -194,15 +194,16 @@ class LoadBalancerManager(IdentifierMixin, object):
                                                         **kwargs)
         for service in virtual_servers[0]['serviceGroups'][0]['services']:
             if service['id'] == service_id:
-                if enabled != -1:
-                    service['enabled'] = enabled
-                if port != -1:
-                    service['port'] = port
-                if weight != -1:
-                    service['groupReferences'][0]['weight'] = weight
-                if hc_type != -1:
-                    service['healthChecks'][0]['healthCheckTypeId'] = hc_type
-                if ip_address_id != 0:
+                if enabled is not None:
+                    service['enabled'] = int(enabled)
+                if port is not None:
+                    service['port'] = int(port)
+                if weight is not None:
+                    service['groupReferences'][0]['weight'] = int(weight)
+                if hc_type is not None:
+                    service['healthChecks'][0]['healthCheckTypeId'] = \
+                        int(hc_type)
+                if ip_address_id is not None:
                     service['ipAddressId'] = ip_address_id
 
         template = {'virtualServers': virtual_servers}
@@ -277,8 +278,8 @@ class LoadBalancerManager(IdentifierMixin, object):
         virtual_servers.append(service_template)
         return self.lb_svc.editObject(load_balancer, id=lb_id)
 
-    def edit_service_group(self, loadbal_id, group_id, allocation=-1, port=0,
-                           routing_type=0, routing_method=0):
+    def edit_service_group(self, loadbal_id, group_id, allocation=None,
+                           port=None, routing_type=None, routing_method=None):
         """ Edit an existing service group
         :param int loadbal_id: The id of the loadbal where the service resides
         :param int group_id: The id of the service group
@@ -296,14 +297,14 @@ class LoadBalancerManager(IdentifierMixin, object):
         for virtual_server in virtual_servers:
             if virtual_server['id'] == group_id:
                 service_group = virtual_server['serviceGroups'][0]
-                if allocation != -1:
-                    virtual_server['allocation'] = allocation
-                if port != 0:
-                    virtual_server['port'] = port
-                if routing_type != 0:
-                    service_group['routingTypeId'] = routing_type
-                if routing_method != 0:
-                    service_group['routingMethodId'] = routing_method
+                if allocation is not None:
+                    virtual_server['allocation'] = int(allocation)
+                if port is not None:
+                    virtual_server['port'] = int(port)
+                if routing_type is not None:
+                    service_group['routingTypeId'] = int(routing_type)
+                if routing_method is not None:
+                    service_group['routingMethodId'] = int(routing_method)
                 break
         return self.lb_svc.editObject(load_balancer, id=loadbal_id)
 
