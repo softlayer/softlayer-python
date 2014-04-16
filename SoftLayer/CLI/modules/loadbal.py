@@ -12,7 +12,7 @@ The available commands are:
   group-delete     Delete a service group from the load balancer
   group-edit       Edit the properties of a service group
   group-reset      Resets all the connections on a service group
-  health-check     List the different health check values
+  health-checks    List the different health check values
   list             List active load balancers
   routing-methods  List supported routing methods
   routing-types    List supported routing types
