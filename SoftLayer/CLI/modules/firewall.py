@@ -24,6 +24,19 @@ import tempfile
 DELIMITER = "=========================================\n"
 
 
+def get_ids(input_id):
+    """ Helper package to retrieve the actual IDs
+    :param input_id: the ID provided by the user
+    :returns: A list of valid IDs
+    """
+    key_value = input_id.split(':')
+
+    if len(key_value) != 2:
+        raise CLIAbort('Invalid ID %s: ID should be of the form xxx:yyy'
+                       % input_id)
+    return key_value
+
+
 def print_package_info(package):
     """ Helper package to print the firewall price.
 
@@ -270,7 +283,7 @@ Options:
     def execute(self, args):
         mgr = FirewallManager(self.client)
         input_id = args.get('<identifier>')
-        key_value = input_id.split(':')
+        key_value = get_ids(input_id)
         firewall_id = int(key_value[1])
 
         if args['--really'] or confirm("This action will cancel a firewall"
@@ -340,9 +353,9 @@ Get firewall details
 
     def execute(self, args):
         mgr = FirewallManager(self.client)
-        firewall_id = args.get('<identifier>')
+        input_id = args.get('<identifier>')
 
-        key_value = firewall_id.split(':')
+        key_value = get_ids(input_id)
         if key_value[0] == 'vlan':
             rules = mgr.get_dedicated_fwl_rules(key_value[1])
         else:
@@ -363,7 +376,7 @@ Edit the rules for a firewall
         mgr = FirewallManager(self.client)
         input_id = args.get('<identifier>')
 
-        key_value = input_id.split(':')
+        key_value = get_ids(input_id)
         firewall_id = int(key_value[1])
         if key_value[0] == 'vlan':
             orig_rules = mgr.get_dedicated_fwl_rules(firewall_id)
