@@ -12,6 +12,7 @@ getObject = {
     'primaryIpAddress': '172.16.240.2',
     'globalIdentifier': '1a2b3c-1701',
     'primaryBackendIpAddress': '10.45.19.37',
+    "primaryNetworkComponent": {"speed": 10},
     'hourlyBillingFlag': False,
     'createDate': '2013-08-01 15:23:45',
     'blockDevices': [{"device": 0, "uuid": 1},
