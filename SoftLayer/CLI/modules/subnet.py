@@ -93,11 +93,12 @@ Options:
         table.align['cost'] = 'r'
 
         total = 0.0
-        for price in result['prices']:
-            total += float(price.get('recurringFee', 0.0))
-            rate = "%.2f" % float(price['recurringFee'])
+        if 'prices' in result:
+            for price in result['prices']:
+                total += float(price.get('recurringFee', 0.0))
+                rate = "%.2f" % float(price['recurringFee'])
 
-            table.add_row([price['item']['description'], rate])
+                table.add_row([price['item']['description'], rate])
 
         table.add_row(['Total monthly cost', "%.2f" % total])
         return table
