@@ -32,20 +32,6 @@ class UnauthedUser(unittest.TestCase):
             SoftLayer.SoftLayerAPIError,
             client['SoftLayer_User_Customer'].getPortalLoginToken)
 
-    def test_404(self):
-        client = SoftLayer.Client(
-            username='doesnotexist', api_key='issurelywrong', timeout=20,
-            endpoint_url='http://httpbin.org/status/404')
-
-        try:
-            client['SoftLayer_User_Customer'].doSomething()
-        except SoftLayer.SoftLayerAPIError as e:
-            self.assertEqual(e.faultCode, 404)
-            self.assertIn('NOT FOUND', e.faultString)
-            self.assertIn('NOT FOUND', e.reason)
-        else:
-            self.fail('No Exception Raised')
-
     def test_no_hostname(self):
         try:
             # This test will fail if 'notvalidsoftlayer.com' becomes a thing

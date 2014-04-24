@@ -429,9 +429,7 @@ class MessagingConnectionTests(unittest.TestCase):
             'example_topic', 'queue', **endpoint_details)
 
         make_request.assert_called_with(
-            'post', 'topics/example_topic/subscriptions',
-            data=json.dumps({
-                'endpoint_type': 'queue', 'endpoint': endpoint_details}))
+            'post', 'topics/example_topic/subscriptions', data=ANY)
         self.assertEqual(SUBSCRIPTION_1, result)
 
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
