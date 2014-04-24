@@ -1,16 +1,24 @@
 3.1.0
 
-    * Adds CDN manager and CLI module
+    * CLI+API: Added CDN manager and CLI module
 
-    * Adds ticket manager and CLI module
+    * CLI+API: Added ticket manager and CLI module
 
-    * Adds image manager and improves image CLI module
+    * CLI+API: Added image manager and improves image CLI module
 
-    * Adds the ability to specify a proxy URL for API bindings and the CLI
+    * CLI+API: Added the ability to specify a proxy URL for API bindings and the CLI
 
-    * six is now used to provide support for Python 2 and Python 3 with the same source
+    * API: six is now used to provide support for Python 2 and Python 3 with the same source
+    
+    * CLI+API: Added ability to resize a virtual machine
+    
+    * CLI+API: Implemented product name changes in accordance with SoftLayer's new product names. Existing managers should continue to work as before. Minor CLI changes were necessary.
+    
+    * CLI+API: Added firewall manager and CLI module
+    
+    * CLI+API: Added load balancer manager and CLI module
 
-    * Many bug fixes
+    * Many bug fixes and minor suggested improvements
 
 
 3.0.2
