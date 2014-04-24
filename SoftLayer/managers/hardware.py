@@ -718,7 +718,7 @@ class HardwareManager(IdentifierMixin, object):
         :param string userdata: user data on the hardware to edit.
                                 If none exist it will be created
         :param string hostname: valid hostname
-        :param string domain: valid domain namem
+        :param string domain: valid domain name
         :param string notes: notes about this particular hardware
 
         """

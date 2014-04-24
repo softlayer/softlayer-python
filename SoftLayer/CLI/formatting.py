@@ -116,14 +116,14 @@ def gb(gigabytes):  # pylint: disable=C0103
 
 
 def blank():
-    """ Returns FormatedItem to make pretty output use a dash
+    """ Returns FormattedItem to make pretty output use a dash
         and raw formatting to use NULL
     """
     return FormattedItem(None, '-')
 
 
 def listing(items, separator=','):
-    """ Given an iterable, returns a FormatedItem which display a list of
+    """ Given an iterable, returns a FormattedItem which display a list of
         items
 
         :param items: An iterable that outputs strings
