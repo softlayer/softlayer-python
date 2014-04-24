@@ -180,7 +180,7 @@ class FormattedListTests(unittest.TestCase):
         self.assertEqual('1:two', result)
 
 
-class FormatedTxnTests(unittest.TestCase):
+class FormattedTxnTests(unittest.TestCase):
     def test_active_txn_empty(self):
         self.assertRaises(KeyError, cli.active_txn, {})
 

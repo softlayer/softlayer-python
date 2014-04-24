@@ -13,7 +13,7 @@ from SoftLayer.utils import configparser
 
 
 def get_client_settings_args(**kwargs):
-    """ Retreive client settings from user-supplied arguments
+    """ Retrieve client settings from user-supplied arguments
 
         :param \\*\\*kwargs: Arguments that are passed into the client instance
     """
@@ -31,7 +31,7 @@ def get_client_settings_args(**kwargs):
 
 
 def get_client_settings_env(**_):
-    """ Retreive client settings from environment settings
+    """ Retrieve client settings from environment settings
 
         :param \\*\\*kwargs: Arguments that are passed into the client instance
     """
@@ -46,7 +46,7 @@ def get_client_settings_env(**_):
 
 
 def get_client_settings_config_file(**kwargs):
-    """ Retreive client settings from the possible config file locations
+    """ Retrieve client settings from the possible config file locations
 
         :param \\*\\*kwargs: Arguments that are passed into the client instance
     """
@@ -84,7 +84,7 @@ SETTING_RESOLVERS = [get_client_settings_args,
 
 def get_client_settings(**kwargs):
     """ Parses settings from various input methods, preferring earlier values
-        to later ones. Once an 'auth' value is found, it returns the gathererd
+        to later ones. Once an 'auth' value is found, it returns the gathered
         settings. The settings currently come from explicit user arguments,
         environmental variables and config files.
 
