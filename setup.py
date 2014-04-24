@@ -51,7 +51,7 @@ setup(
     ],
     license='MIT',
     zip_safe=False,
-    url='http://github.com/softlayer/softlayer-api-python-client',
+    url='http://github.com/softlayer/softlayer-python',
     entry_points={
         'console_scripts': [
             'sl = SoftLayer.CLI.core:main',
