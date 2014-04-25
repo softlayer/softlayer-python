@@ -31,7 +31,7 @@ hostname or the ip address for a virtual server.
 from os import linesep
 import os.path
 
-from SoftLayer import VSManager, SshKeyManager, DNSManager, DNSZoneNotFound
+from SoftLayer import VSManager, SshKeyManager, DNSManager
 from SoftLayer.utils import lookup
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
@@ -910,11 +910,7 @@ Options:
         if not instance['primaryIpAddress']:
             raise CLIAbort('No primary IP address associated with this VS')
 
-        try:
-            zone = dns.get_zone(zone_id)
-        except DNSZoneNotFound:
-            raise CLIAbort("Unable to create A record, "
-                           "no zone found matching: %s" % instance['domain'])
+        zone = dns.get_zone(zone_id)
 
         go_for_it = args['--really'] or confirm(
             "Attempt to update DNS records for %s"

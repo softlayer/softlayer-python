@@ -175,7 +175,10 @@ getHardware = [{
         },
     ]
 }]
-getDomains = [{'name': 'example.com', 'id': 12345}]
+getDomains = [{'name': 'example.com',
+               'id': 12345,
+               'serial': 2014030728,
+               'updateDate': '2014-03-07T13:52:31-06:00'}]
 
 getObject = {
     'networkVlans': [{

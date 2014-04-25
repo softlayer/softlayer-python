@@ -106,41 +106,22 @@ class DNSTests(unittest.TestCase):
 
     def test_get_record(self):
         D = self.client['Dns_Domain'].getResourceRecords
-        records = Dns_Domain.getResourceRecords
 
         # maybe valid domain, but no records matching
         D.return_value = []
-        self.assertEqual(self.dns_client.get_records(12345),
-                         [])
+        self.assertEqual(self.dns_client.get_records(12345), [])
 
         D.reset_mock()
-        D.return_value = [records[1]]
-        self.dns_client.get_records(12345, record_type='a')
+        D.return_value = [Dns_Domain.getResourceRecords[0]]
+        self.dns_client.get_records(12345,
+                                    record_type='a',
+                                    host='hostname',
+                                    data='a',
+                                    ttl='86400')
         D.assert_called_once_with(
             id=12345,
-            filter={'resourceRecords': {'type': {"operation": "_= a"}}},
-            mask=ANY)
-
-        D.reset_mock()
-        D.return_value = [records[0]]
-        self.dns_client.get_records(12345, host='a')
-        D.assert_called_once_with(
-            id=12345,
-            filter={'resourceRecords': {'host': {"operation": "_= a"}}},
-            mask=ANY)
-
-        D.reset_mock()
-        D.return_value = records[3:5]
-        self.dns_client.get_records(12345, data='a')
-        D.assert_called_once_with(
-            id=12345,
-            filter={'resourceRecords': {'data': {"operation": "_= a"}}},
-            mask=ANY)
-
-        D.reset_mock()
-        D.return_value = records[3:5]
-        self.dns_client.get_records(12345, ttl='86400')
-        D.assert_called_once_with(
-            id=12345,
-            filter={'resourceRecords': {'ttl': {"operation": 86400}}},
+            filter={'resourceRecords': {'type': {'operation': '_= a'},
+                                        'host': {'operation': '_= hostname'},
+                                        'data': {'operation': '_= a'},
+                                        'ttl': {'operation': 86400}}},
             mask=ANY)

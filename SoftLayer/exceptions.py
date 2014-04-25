@@ -89,8 +89,3 @@ class InvalidMethodParameters(ServerError):
 class InternalError(ServerError):
     """ Internal Server Error """
     pass
-
-
-class DNSZoneNotFound(SoftLayerError):
-    """ DNS Zone was not found """
-    pass
