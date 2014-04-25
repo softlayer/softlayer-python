@@ -56,14 +56,13 @@ class TestHelpSetup(unittest.TestCase):
             output = command.execute({'--config': config_file.name})
 
             self.assertEqual('Configuration Updated Successfully', output)
-            self.assertEqual(
-                config_file.read().decode("utf-8"),
-                '''[softlayer]
-username = user
-api_key = AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-endpoint_url = %s
-
-''' % API_PUBLIC_ENDPOINT)
+            contents = config_file.read().decode("utf-8")
+            self.assertTrue('[softlayer]' in contents)
+            self.assertTrue('username = user' in contents)
+            self.assertTrue('api_key = AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+                            'AAAAAAAAAAAAAAAAAAAAAAAAAAAAA' in contents)
+            self.assertTrue('endpoint_url = %s' % API_PUBLIC_ENDPOINT
+                            in contents)
 
     @patch('SoftLayer.CLI.modules.config.confirm')
     def test_setup_cancel(self, confirm_mock):

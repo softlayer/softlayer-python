@@ -48,8 +48,8 @@ class DnsTests(unittest.TestCase):
 
         output = command.execute({'<zone>': None})
         self.assertEqual([{'serial': 2014030728,
-                          'updated': '2014-03-07T13:52:31-06:00',
-                          'id': 12345, 'zone': 'example.com'}],
+                           'updated': '2014-03-07T13:52:31-06:00',
+                           'id': 12345, 'zone': 'example.com'}],
                          format_output(output, 'python'))
 
     def test_list_all_zones(self):
