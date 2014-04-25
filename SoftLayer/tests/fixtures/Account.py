@@ -373,3 +373,12 @@ getNetworkVlans = [{
 }]
 
 getAdcLoadBalancers = []
+
+getNasNetworkStorage = [{
+    'id': 1,
+    'capacityGb': 10,
+    'serviceResource': {'datacenter': {'name': 'Dallas'}},
+    'username': 'user',
+    'password': 'pass',
+    'serviceResourceBackendIpAddress': '127.0.0.1',
+}]
