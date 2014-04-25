@@ -763,7 +763,7 @@ Optional:
   -i, --postinstall=URI  Post-install script to download
   -k KEY, --key=KEY      SSH keys to assign to the root user. Can be specified
                            multiple times.
-  --dry-run, --test      Do not create the server, just get a quote
+  --test                 Do not create the server, just get a quote
   --vlan_public=VLAN     The ID of the public VLAN on which you want the
                            hardware placed
   --vlan_private=VLAN    The ID of the private VLAN on which you want the
