@@ -233,15 +233,29 @@ getRwhoisData = {
     'privateResidenceFlag': 'privateResidenceFlag',
 }
 
-getGlobalIpRecords = [
-    {
-        'id': '200',
-        'ipAddress': {
-            'subnet': {
-                'networkIdentifier': '10.0.0.1',
-            },
+getGlobalIpRecords = [{
+    'id': '200',
+    'ipAddress': {
+        'subnet': {
+            'networkIdentifier': '10.0.0.1',
         },
-    }]
+        'ipAddress': '127.0.0.1',
+    },
+    'destinationIpAddress': {
+        'ipAddress': '127.0.0.1',
+        'virtualGuest': {'fullyQualifiedDomainName': 'example.com'}}
+}, {
+    'id': '201',
+    'ipAddress': {
+        'subnet': {
+            'networkIdentifier': '10.0.0.1',
+        },
+        'ipAddress': '127.0.0.1',
+    },
+    'destinationIpAddress': {
+        'ipAddress': '127.0.0.1',
+        'hardware': {'fullyQualifiedDomainName': 'example.com'}}
+}]
 
 getSubnets = [
     {
