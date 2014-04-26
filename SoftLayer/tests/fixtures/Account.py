@@ -181,15 +181,6 @@ getDomains = [{'name': 'example.com',
                'updateDate': '2014-03-07T13:52:31-06:00'}]
 
 getObject = {
-    'networkVlans': [{
-        'firewallNetworkComponents': [{'id': 1234}],
-        'networkVlanFirewall': [{'id': 1234}],
-        'dedicatedFirewallFlag': True,
-        'firewallGuestNetworkComponents': [{'id': 1234}],
-        'firewallInterfaces': [{'id': 1234}],
-        'firewallRules': [{'id': 1234}],
-        'highAvailabilityFirewallFlag': True,
-    }],
     'cdnAccounts': [
         {
             "cdnAccountName": "1234a",
@@ -265,8 +256,6 @@ getSubnets = [
         'version': 4,
         'subnetType': 'PRIMARY'
     }]
-
-getNetworkVlans = {'id': 1234}
 
 getSshKeys = [{'id': '100', 'label': 'Test 1'},
               {'id': '101', 'label': 'Test 2',
