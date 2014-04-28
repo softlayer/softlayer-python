@@ -377,8 +377,9 @@ class TestTemplateArgs(unittest.TestCase):
             '--memory': '32',
             '--template': path,
             '--hourly': False,
+            '--disk': [],
         }
-        cli.helpers.update_with_template_args(args)
+        cli.helpers.update_with_template_args(args, list_args=['--disk'])
         self.assertEqual(args, {
             '--cpu': '4',
             '--datacenter': 'dal05',
@@ -390,6 +391,7 @@ class TestTemplateArgs(unittest.TestCase):
             '--network': '100',
             '--os': 'DEBIAN_7_64',
             'key': 'value',
+            '--disk': ['50', '100'],
         })
 
 

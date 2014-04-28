@@ -383,18 +383,9 @@ Optional:
     required_params = ['--hostname', '--domain', '--cpu', '--memory']
 
     def execute(self, args):
-        update_with_template_args(args)
+        update_with_template_args(args, list_args=['--disk', '--key'])
         vsi = VSManager(self.client)
         self._update_with_like_args(args)
-
-        # Disks will be a comma-separated list. Let's make it a real list.
-        if isinstance(args.get('--disk'), str):
-            args['--disk'] = args.get('--disk').split(',')
-
-        # SSH keys may be a comma-separated list. Let's make it a real list.
-        if isinstance(args.get('--key'), str):
-            args['--key'] = args.get('--key').split(',')
-
         self._validate_args(args)
 
         # Do not create a virtual server with --test or --export

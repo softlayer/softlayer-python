@@ -779,17 +779,8 @@ Optional:
                        '--memory', '--os']
 
     def execute(self, args):
-        update_with_template_args(args)
+        update_with_template_args(args, list_args=['--disk', '--key'])
         mgr = HardwareManager(self.client)
-
-        # Disks will be a comma-separated list. Let's make it a real list.
-        if isinstance(args.get('--disk'), str):
-            args['--disk'] = args.get('--disk').split(',')
-
-        # Do the same thing for SSH keys
-        if isinstance(args.get('--key'), str):
-            args['--key'] = args.get('--key').split(',')
-
         self._validate_args(args)
 
         ds_options = mgr.get_dedicated_server_create_options(args['--chassis'])
