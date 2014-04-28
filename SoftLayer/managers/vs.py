@@ -217,7 +217,7 @@ class VSManager(IdentifierMixin, object):
             datacenter=None, os_code=None, image_id=None,
             dedicated=False, public_vlan=None, private_vlan=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
-            private=False, ssh_keys=None):
+            private=False, ssh_keys=None, image_template=None):
         """ Returns a dict appropriate to pass into Virtual_Guest::createObject
             See :func:`create_instance` for a list of available options.
         """
@@ -292,6 +292,9 @@ class VSManager(IdentifierMixin, object):
 
         if ssh_keys:
             data['sshKeys'] = [{'id': key_id} for key_id in ssh_keys]
+
+        if image_template:
+            data['imageTemplateId'] = image_template
 
         return data
 
