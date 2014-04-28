@@ -356,7 +356,7 @@ Optional:
   --dedicated            Create a dedicated VS (Virtual Server (Private Node))
   --san                  Use SAN storage instead of local disk. Applies to
                            all disks specified with --disk.
-  --dry-run, --test      Do not create VS, just get a quote
+  --test                 Do not create VS, just get a quote
   --export=FILE          Exports options to a template file
   -F, --userfile=FILE    Read userdata from file
   -i, --postinstall=URI  Post-install script to download

@@ -72,7 +72,7 @@ Add a new global IP address to your account.
 
 Options:
   --v6                 Orders IPv6
-  --dry-run, --test    Do not order the IP; just get a quote
+  --test               Do not order the IP; just get a quote
 """
     action = 'create'
     options = ['confirm']

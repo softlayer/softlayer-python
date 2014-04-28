@@ -62,7 +62,7 @@ Required:
 
 Options:
   --v6                 Orders IPv6
-  --dry-run, --test    Do not order the subnet; just get a quote
+  --test               Do not order the subnet; just get a quote
 """
     action = 'create'
     options = ['confirm']
