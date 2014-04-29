@@ -1,5 +1,5 @@
-.. _dns:
+.. _ticket:
 
-.. automodule:: SoftLayer.managers.dns
+.. automodule:: SoftLayer.managers.ticket
    :members:
    :inherited-members:

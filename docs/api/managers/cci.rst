@@ -1,5 +1,5 @@
-.. _dns:
+.. _cci:
 
-.. automodule:: SoftLayer.managers.dns
+.. automodule:: SoftLayer.managers.cci
    :members:
    :inherited-members:
