@@ -1,5 +1,5 @@
-.. _ticket:
+.. _load_balancer:
 
-.. automodule:: SoftLayer.managers.ticket
+.. automodule:: SoftLayer.managers.load_balancer
    :members:
    :inherited-members:

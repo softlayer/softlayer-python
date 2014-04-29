@@ -1,5 +1,5 @@
 """
-    SoftLayer.managers.cdn
+    SoftLayer.cdn
     ~~~~~~~~~~~~~~~~~~~~~~
     CDN Manager/helpers
 

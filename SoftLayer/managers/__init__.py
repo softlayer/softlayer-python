@@ -23,6 +23,6 @@ from SoftLayer.managers.ticket import TicketManager
 from SoftLayer.managers.iscsi import ISCSIManager
 from SoftLayer.managers.vs import VSManager
 __all__ = ['CCIManager', 'DNSManager', 'FirewallManager', 'HardwareManager',
-           'ImageManager', 'MessagingManager', 'MetadataManager', 'CCIManager',
+           'ImageManager', 'MessagingManager', 'MetadataManager', 'CDNManager',
            'NetworkManager', 'SshKeyManager', 'SSLManager', 'TicketManager',
            'VSManager', 'ISCSIManager', 'LoadBalancerManager']

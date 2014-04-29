@@ -1,5 +1,5 @@
-.. _ticket:
+.. _iscsi:
 
-.. automodule:: SoftLayer.managers.ticket
+.. automodule:: SoftLayer.managers.iscsi
    :members:
    :inherited-members:
