@@ -187,7 +187,7 @@ class MessagingConnection(object):
         :param period: 'hour', 'day', 'week', 'month'
         """
         resp = self._make_request('get', 'stats/%s' % period)
-        return json.loads(resp.content)
+        return resp.json()
 
     # QUEUE METHODS
 
@@ -200,7 +200,7 @@ class MessagingConnection(object):
         if tags:
             params['tags'] = ','.join(tags)
         resp = self._make_request('get', 'queues', params=params)
-        return json.loads(resp.content)
+        return resp.json()
 
     def create_queue(self, queue_name, **kwargs):
         """ Create Queue
@@ -212,7 +212,7 @@ class MessagingConnection(object):
         queue.update(kwargs)
         data = json.dumps(queue)
         resp = self._make_request('put', 'queues/%s' % queue_name, data=data)
-        return json.loads(resp.content)
+        return resp.json()
 
     def modify_queue(self, queue_name, **kwargs):
         """ Modify Queue
@@ -228,7 +228,7 @@ class MessagingConnection(object):
         :param queue_name: Queue Name
         """
         resp = self._make_request('get', 'queues/%s' % queue_name)
-        return json.loads(resp.content)
+        return resp.json()
 
     def delete_queue(self, queue_name, force=False):
         """ Delete Queue
@@ -254,7 +254,7 @@ class MessagingConnection(object):
         message.update(kwargs)
         resp = self._make_request('post', 'queues/%s/messages' % queue_name,
                                   data=json.dumps(message))
-        return json.loads(resp.content)
+        return resp.json()
 
     def pop_messages(self, queue_name, count=1):
         """ Pop messages from a queue
@@ -264,7 +264,7 @@ class MessagingConnection(object):
         """
         resp = self._make_request('get', 'queues/%s/messages' % queue_name,
                                   params={'batch': count})
-        return json.loads(resp.content)
+        return resp.json()
 
     def pop_message(self, queue_name):
         """ Pop a single message from a queue. If no messages are returned
@@ -299,7 +299,7 @@ class MessagingConnection(object):
         if tags:
             params['tags'] = ','.join(tags)
         resp = self._make_request('get', 'topics', params=params)
-        return json.loads(resp.content)
+        return resp.json()
 
     def create_topic(self, topic_name, **kwargs):
         """ Create Topic
@@ -309,7 +309,7 @@ class MessagingConnection(object):
         """
         data = json.dumps(kwargs)
         resp = self._make_request('put', 'topics/%s' % topic_name, data=data)
-        return json.loads(resp.content)
+        return resp.json()
 
     def modify_topic(self, topic_name, **kwargs):
         """ Modify Topic
@@ -325,7 +325,7 @@ class MessagingConnection(object):
         :param topic_name: Topic Name
         """
         resp = self._make_request('get', 'topics/%s' % topic_name)
-        return json.loads(resp.content)
+        return resp.json()
 
     def delete_topic(self, topic_name, force=False):
         """ Delete Topic
@@ -351,7 +351,7 @@ class MessagingConnection(object):
         message.update(kwargs)
         resp = self._make_request('post', 'topics/%s/messages' % topic_name,
                                   data=json.dumps(message))
-        return json.loads(resp.content)
+        return resp.json()
 
     def get_subscriptions(self, topic_name):
         """ Listing of subscriptions on a topic
@@ -360,7 +360,7 @@ class MessagingConnection(object):
         """
         resp = self._make_request('get',
                                   'topics/%s/subscriptions' % topic_name)
-        return json.loads(resp.content)
+        return resp.json()
 
     def create_subscription(self, topic_name, subscription_type, **kwargs):
         """ Create Subscription
@@ -373,7 +373,7 @@ class MessagingConnection(object):
             'post', 'topics/%s/subscriptions' % topic_name,
             data=json.dumps({
                 'endpoint_type': subscription_type, 'endpoint': kwargs}))
-        return json.loads(resp.content)
+        return resp.json()
 
     def delete_subscription(self, topic_name, subscription_id):
         """ Delete a subscription

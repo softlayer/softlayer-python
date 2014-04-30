@@ -241,7 +241,7 @@ class MessagingConnectionTests(unittest.TestCase):
         content = {
             'notifications': [{'key': [2012, 7, 27, 14, 31], 'value': 2}],
             'requests': [{'key': [2012, 7, 27, 14, 31], 'value': 11}]}
-        make_request().content = json.dumps(content)
+        make_request().json.return_value = content
         result = self.conn.stats()
 
         make_request.assert_called_with('get', 'stats/hour')
@@ -250,7 +250,7 @@ class MessagingConnectionTests(unittest.TestCase):
     # Queue-based Tests
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
     def test_get_queues(self, make_request):
-        make_request().content = json.dumps(QUEUE_LIST)
+        make_request().json.return_value = QUEUE_LIST
         result = self.conn.get_queues()
 
         make_request.assert_called_with('get', 'queues', params={})
@@ -265,7 +265,7 @@ class MessagingConnectionTests(unittest.TestCase):
 
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
     def test_create_queue(self, make_request):
-        make_request().content = json.dumps(QUEUE_1)
+        make_request().json.return_value = QUEUE_1
         result = self.conn.create_queue('example_queue')
 
         make_request.assert_called_with(
@@ -274,7 +274,7 @@ class MessagingConnectionTests(unittest.TestCase):
 
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
     def test_modify_queue(self, make_request):
-        make_request().content = json.dumps(QUEUE_1)
+        make_request().json.return_value = QUEUE_1
         result = self.conn.modify_queue('example_queue')
 
         make_request.assert_called_with(
@@ -283,7 +283,7 @@ class MessagingConnectionTests(unittest.TestCase):
 
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
     def test_get_queue(self, make_request):
-        make_request().content = json.dumps(QUEUE_1)
+        make_request().json.return_value = QUEUE_1
         result = self.conn.get_queue('example_queue')
 
         make_request.assert_called_with('get', 'queues/example_queue')
@@ -304,7 +304,7 @@ class MessagingConnectionTests(unittest.TestCase):
 
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
     def test_push_queue_message(self, make_request):
-        make_request().content = json.dumps(MESSAGE_1)
+        make_request().json.return_value = MESSAGE_1
         result = self.conn.push_queue_message('example_queue', '<body>')
 
         make_request.assert_called_with(
@@ -313,7 +313,7 @@ class MessagingConnectionTests(unittest.TestCase):
 
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
     def test_pop_messages(self, make_request):
-        make_request().content = json.dumps(MESSAGE_POP)
+        make_request().json.return_value = MESSAGE_POP
         result = self.conn.pop_messages('example_queue')
 
         make_request.assert_called_with(
@@ -322,7 +322,7 @@ class MessagingConnectionTests(unittest.TestCase):
 
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
     def test_pop_message(self, make_request):
-        make_request().content = json.dumps(MESSAGE_POP)
+        make_request().json.return_value = MESSAGE_POP
         result = self.conn.pop_message('example_queue')
 
         make_request.assert_called_with(
@@ -331,7 +331,7 @@ class MessagingConnectionTests(unittest.TestCase):
 
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
     def test_pop_message_empty(self, make_request):
-        make_request().content = json.dumps(MESSAGE_POP_EMPTY)
+        make_request().json.return_value = MESSAGE_POP_EMPTY
         result = self.conn.pop_message('example_queue')
 
         make_request.assert_called_with(
@@ -349,7 +349,7 @@ class MessagingConnectionTests(unittest.TestCase):
     # Topic-based Tests
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
     def test_get_topics(self, make_request):
-        make_request().content = json.dumps(TOPIC_LIST)
+        make_request().json.return_value = TOPIC_LIST
         result = self.conn.get_topics()
 
         make_request.assert_called_with('get', 'topics', params={})
@@ -364,7 +364,7 @@ class MessagingConnectionTests(unittest.TestCase):
 
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
     def test_create_topic(self, make_request):
-        make_request().content = json.dumps(TOPIC_1)
+        make_request().json.return_value = TOPIC_1
         result = self.conn.create_topic('example_topic')
 
         make_request.assert_called_with(
@@ -373,7 +373,7 @@ class MessagingConnectionTests(unittest.TestCase):
 
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
     def test_modify_topic(self, make_request):
-        make_request().content = json.dumps(TOPIC_1)
+        make_request().json.return_value = TOPIC_1
         result = self.conn.modify_topic('example_topic')
 
         make_request.assert_called_with(
@@ -382,7 +382,7 @@ class MessagingConnectionTests(unittest.TestCase):
 
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
     def test_get_topic(self, make_request):
-        make_request().content = json.dumps(TOPIC_1)
+        make_request().json.return_value = TOPIC_1
         result = self.conn.get_topic('example_topic')
 
         make_request.assert_called_with('get', 'topics/example_topic')
@@ -403,7 +403,7 @@ class MessagingConnectionTests(unittest.TestCase):
 
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
     def test_push_topic_message(self, make_request):
-        make_request().content = json.dumps(MESSAGE_1)
+        make_request().json.return_value = MESSAGE_1
         result = self.conn.push_topic_message('example_topic', '<body>')
 
         make_request.assert_called_with(
@@ -412,7 +412,7 @@ class MessagingConnectionTests(unittest.TestCase):
 
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
     def test_get_subscriptions(self, make_request):
-        make_request().content = json.dumps(SUBSCRIPTION_LIST)
+        make_request().json.return_value = SUBSCRIPTION_LIST
         result = self.conn.get_subscriptions('example_topic')
 
         make_request.assert_called_with(
@@ -421,7 +421,7 @@ class MessagingConnectionTests(unittest.TestCase):
 
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
     def test_create_subscription(self, make_request):
-        make_request().content = json.dumps(SUBSCRIPTION_1)
+        make_request().json.return_value = SUBSCRIPTION_1
         endpoint_details = {
             'account_id': 'test',
             'queue_name': 'topic_subscription_queue'}
@@ -436,7 +436,7 @@ class MessagingConnectionTests(unittest.TestCase):
 
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
     def test_delete_subscription(self, make_request):
-        make_request().content = json.dumps(SUBSCRIPTION_1)
+        make_request().json.return_value = SUBSCRIPTION_1
         result = self.conn.delete_subscription(
             'example_topic', SUBSCRIPTION_1['id'])
 
