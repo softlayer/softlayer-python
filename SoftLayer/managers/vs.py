@@ -567,6 +567,7 @@ class VSManager(IdentifierMixin, object):
         if nic_speed:
             item_id.append({'id': self._get_item_id_for_upgrade(
                 package_items, 'nic_speed', nic_speed)})
+
         order = {}
         order['complexType'] = \
             'SoftLayer_Container_Product_Order_Virtual_Guest_Upgrade'
