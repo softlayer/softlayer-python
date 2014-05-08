@@ -7,6 +7,7 @@
 from mock import patch
 
 from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests.fixtures import Dns_Domain
 from SoftLayer.CLI.helpers import format_output
 from SoftLayer.CLI.exceptions import CLIAbort
 from SoftLayer.CLI.modules import dns
@@ -56,12 +57,12 @@ class DnsTests(unittest.TestCase):
         command = dns.ListZones(client=self.client)
 
         output = command.execute({'<zone>': 'example.com'})
-        self.assertEqual([{'id': 1,
-                           'record': 'hostname',
-                           'ttl': 100,
-                           'type': 'A',
-                           'value': 'd'}],
-                         format_output(output, 'python'))
+        self.assertEqual({'record': 'a',
+                          'type': 'CNAME',
+                          'id': 1,
+                          'value': 'd',
+                          'ttl': 100},
+                         format_output(output, 'python')[0])
 
     def test_add_record(self):
         command = dns.AddRecord(client=self.client)
@@ -95,6 +96,8 @@ class DnsTests(unittest.TestCase):
     @patch('SoftLayer.CLI.modules.dns.no_going_back')
     def test_delete_record(self, no_going_back_mock):
         no_going_back_mock.return_value = True
+        self.client['Dns_Domain'].getResourceRecords.return_value = [
+            Dns_Domain.getResourceRecords[0]]
         command = dns.RecordRemove(client=self.client)
         output = command.execute({'<zone>': 'example.com',
                                   '<record>': 'hostname',

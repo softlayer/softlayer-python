@@ -105,20 +105,20 @@ class DNSTests(unittest.TestCase):
         f.assert_called_once_with(id=1)
 
     def test_get_record(self):
-        D = self.client['Dns_Domain'].getResourceRecords
+        records = self.client['Dns_Domain'].getResourceRecords
 
         # maybe valid domain, but no records matching
-        D.return_value = []
+        records.return_value = []
         self.assertEqual(self.dns_client.get_records(12345), [])
 
-        D.reset_mock()
-        D.return_value = [Dns_Domain.getResourceRecords[0]]
+        records.reset_mock()
+        records.return_value = [Dns_Domain.getResourceRecords[0]]
         self.dns_client.get_records(12345,
                                     record_type='a',
                                     host='hostname',
                                     data='a',
                                     ttl='86400')
-        D.assert_called_once_with(
+        records.assert_called_once_with(
             id=12345,
             filter={'resourceRecords': {'type': {'operation': '_= a'},
                                         'host': {'operation': '_= hostname'},
