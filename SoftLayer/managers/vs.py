@@ -133,6 +133,19 @@ class VSManager(IdentifierMixin, object):
         :returns: A dictionary containing a large amount of information about
                   the specified instance.
 
+        ::
+
+           # Print out the FQDN and IP address for instance ID 12345.
+           # env variables
+           # SL_USERNAME = YOUR_USERNAME
+           # SL_API_KEY = YOUR_API_KEY
+           import SoftLayer
+           client = SoftLayer.Client()
+
+           mgr = SoftLayer.VSManager(client)
+           vsi = mgr.get_instance(12345)
+           print vsi['fullyQualifiedDomainName'], vs['primaryIpAddress']
+
         """
 
         if 'mask' not in kwargs:
@@ -189,6 +202,18 @@ class VSManager(IdentifierMixin, object):
 
         :param integer instance_id: the instance ID to cancel
 
+        ::
+
+           # Cancel for instance ID 12345.
+           # env variables
+           # SL_USERNAME = YOUR_USERNAME
+           # SL_API_KEY = YOUR_API_KEY
+           import SoftLayer
+           client = SoftLayer.Client()
+
+           mgr = SoftLayer.VSManager(client)
+           mgr.cancel_instance(12345)
+
         """
         return self.guest.deleteObject(id=instance_id)
 
@@ -199,6 +224,20 @@ class VSManager(IdentifierMixin, object):
         :param string post_url: The URI of the post-install script to run
                                 after reload
         :param list ssh_keys: The SSH keys to add to the root user
+
+        ::
+
+           # Reload instance ID 12345 then run a custom post-provision script.
+           # env variables
+           # SL_USERNAME = YOUR_USERNAME
+           # SL_API_KEY = YOUR_API_KEY
+           import SoftLayer
+           client = SoftLayer.Client()
+
+           post_uri = 'https://somehost.com/bootstrap.sh'
+           mgr = SoftLayer.VSManager(client)
+           vsi = mgr.reload_instance(12345, post_uri=post_url)
+
         """
         config = {}
 
@@ -497,12 +536,23 @@ class VSManager(IdentifierMixin, object):
                 nic_speed=None, public=True):
         """
         Upgrades a VS instance
+
         :param int instance_id: Instance id of the VS to be upgraded
         :param int cpus: The number of virtual CPUs to upgrade to
                             of a VS instance.
         :param bool public: CPU will be in Private/Public Node.
         :param int memory: RAM of the VS to be upgraded to.
         :param int nic_speed: The port speed to set
+
+        ::
+
+           # Upgrade instance 12345 to 4 CPUs and 4 GB of memory
+           import SoftLayer
+           client = SoftLayer.Client(config="~/.softlayer")
+
+           mgr = SoftLayer.VSManager(client)
+           mgr.upgrade(12345, cpus=4, memory=4)
+
         """
         package_items = self._get_package_items()
         item_id = []
