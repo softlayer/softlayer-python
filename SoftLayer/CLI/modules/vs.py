@@ -437,8 +437,7 @@ Optional:
             output.append(FormattedItem(
                 None,
                 ' -- ! Prices reflected here are retail and do not '
-                'take account level discounts and are not guaranteed.')
-            )
+                'take account level discounts and are not guaranteed.'))
 
         if args['--export']:
             export_file = args.pop('--export')
