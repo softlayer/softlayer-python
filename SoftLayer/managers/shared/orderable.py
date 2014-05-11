@@ -8,7 +8,9 @@
 """
 
 
-class Orderable:
+class Orderable(object):
+    """ Abstracts ordering specific logic
+    """
     def get_packages_by_type(self, package_types, mask):
         """ Return all packages of a given type
 
@@ -47,7 +49,7 @@ class Orderable:
         for package in packages:
             if 'type' in package \
                     and package['type']['keyName'] == package_type:
-                        package_id = package['id']
+                package_id = package['id']
 
         return package_id
 
