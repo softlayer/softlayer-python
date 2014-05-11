@@ -11,9 +11,10 @@ import datetime
 from itertools import repeat
 
 from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin, lookup
+from SoftLayer.managers.shared import Orderable
 
 
-class VSManager(IdentifierMixin, object):
+class VSManager(IdentifierMixin, Orderable, object):
     """ Manage Virtual Servers """
     def __init__(self, client):
         self.client = client
@@ -529,13 +530,22 @@ class VSManager(IdentifierMixin, object):
             return True
         return False
 
+    def _get_package_service(self):
+        """ Return the package service to make our application calls
+
+        :returns: A SoftLayer Service
+        """
+        return self.client['Product_Package']
+
     def _get_package_items(self):
         """
         Following Method gets all the item ids related to VS
         """
         mask = "mask[description,capacity,prices.id,categories[name,id]]"
-        package = self.client['Product_Package']
-        return package.getItems(id=46, mask=mask)
+        package_type = 'VIRTUAL_SERVER_INSTANCE'
+        package_id = self.get_package_id_for_package_type(package_type)
+
+        return self._get_package_service().getItems(id=package_id, mask=mask)
 
     def _get_item_id_for_upgrade(self, package_items, option, value,
                                  public=True):
