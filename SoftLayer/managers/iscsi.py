@@ -79,7 +79,7 @@ class ISCSIManager(IdentifierMixin, object):
         """
 
         if 'mask' not in kwargs:
-            items = set([
+            items = [
                 'id',
                 'serviceResourceName',
                 'createDate',
@@ -92,7 +92,7 @@ class ISCSIManager(IdentifierMixin, object):
                 'notes',
                 'username',
                 'password'
-            ])
+            ]
             kwargs['mask'] = "mask[%s]" % ','.join(items)
         return self.iscsi_svc.getObject(id=volume_id, **kwargs)
 
