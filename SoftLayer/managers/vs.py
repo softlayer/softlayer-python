@@ -58,7 +58,7 @@ class VSManager(IdentifierMixin, object):
 
         """
         if 'mask' not in kwargs:
-            items = set([
+            items = [
                 'id',
                 'globalIdentifier',
                 'hostname',
@@ -73,7 +73,7 @@ class VSManager(IdentifierMixin, object):
                 'datacenter',
                 'activeTransaction.transactionStatus[friendlyName,name]',
                 'status',
-            ])
+            ]
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
         call = 'getVirtualGuests'
@@ -149,7 +149,7 @@ class VSManager(IdentifierMixin, object):
         """
 
         if 'mask' not in kwargs:
-            items = set([
+            items = [
                 'id',
                 'globalIdentifier',
                 'fullyQualifiedDomainName',
@@ -163,8 +163,9 @@ class VSManager(IdentifierMixin, object):
                 'privateNetworkOnlyFlag',
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
-                'networkComponents[id, status, speed, maxSpeed, name,'
-                'macAddress, primaryIpAddress, port, primarySubnet]',
+                '''networkComponents[id, status, speed, maxSpeed, name,'
+                                     macAddress, primaryIpAddress, port,
+                                     primarySubnet]'''
                 'lastKnownPowerState.name',
                 'powerState',
                 'status',
@@ -177,14 +178,15 @@ class VSManager(IdentifierMixin, object):
                 'blockDeviceTemplateGroup[id, name, globalIdentifier]',
                 'postInstallScriptUri',
                 'userData',
-                'operatingSystem.softwareLicense.'
-                'softwareDescription[manufacturer,name,version,referenceCode]',
-                'operatingSystem.passwords[username,password]',
+                '''operatingSystem[passwords[username,password],
+                                   softwareLicense.softwareDescription[
+                                       manufacturer,name,version,
+                                       referenceCode]]''',
                 'hourlyBillingFlag',
                 'billingItem.recurringFee',
                 'tagReferences[id,tag[name,id]]',
                 'networkVlans[id,vlanNumber,networkSpace]',
-            ])
+            ]
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
         return self.guest.getObject(id=instance_id, **kwargs)
