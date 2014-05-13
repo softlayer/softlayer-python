@@ -197,7 +197,8 @@ Options:
         if tag_row:
             table.add_row(['tags', listing(tag_row, separator=',')])
 
-        if not result['privateNetworkOnlyFlag']:
+        # Test to see if this actually has a primary (public) ip address
+        if result['primaryIpAddress']:
             ptr_domains = self.client['Virtual_Guest'].\
                 getReverseDomainRecords(id=vs_id)
 
