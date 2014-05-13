@@ -17,6 +17,7 @@ except ImportError:
     builtins_name = '__builtin__'
 
 from SoftLayer.CLI.helpers import format_output, CLIAbort, ArgumentError
+from SoftLayer.tests.fixtures import Hardware_Server
 from SoftLayer.CLI.modules import server
 
 
@@ -203,12 +204,10 @@ class ServerCLITests(unittest.TestCase):
 
         self.assertEqual(expected, format_output(output, 'python'))
 
-    def test_ServerDetails(self):
-        hw_id = 1234
-
+    def test_server_details(self):
         runnable = server.ServerDetails(client=self.client)
 
-        args = {'<identifier>': hw_id, '--passwords': True, '--price': True}
+        args = {'<identifier>': 1234, '--passwords': True, '--price': True}
         output = runnable.execute(args)
 
         expected = {
@@ -233,6 +232,19 @@ class ServerCLITests(unittest.TestCase):
         }
 
         self.assertEqual(expected, format_output(output, 'python'))
+
+    def test_server_details_issue_332(self):
+        runnable = server.ServerDetails(client=self.client)
+        result = Hardware_Server.getObject.copy()
+        result['primaryIpAddress'] = None
+        self.client['Hardware_Server'].getObject.return_value = result
+
+        runnable.execute({'<identifier>': 1234,
+                          '--passwords': True,
+                          '--price': True})
+
+        self.assertFalse(self.client['Hardware_Server']
+                         .getReverseDomainRecords.called)
 
     def test_ListServers(self):
         runnable = server.ListServers(client=self.client)
