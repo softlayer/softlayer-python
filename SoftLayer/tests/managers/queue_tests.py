@@ -10,7 +10,6 @@ from SoftLayer.tests import unittest
 import SoftLayer.managers.messaging
 
 from mock import MagicMock, patch, ANY
-import json
 
 QUEUE_1 = {
     'expiration': 40000,
