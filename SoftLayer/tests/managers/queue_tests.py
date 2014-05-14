@@ -5,11 +5,10 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import MessagingManager, Unauthenticated, SoftLayerError
-import SoftLayer.managers.messaging
 from SoftLayer.consts import USER_AGENT
 from SoftLayer.tests import unittest
+import SoftLayer.managers.messaging
 
-import json
 from mock import MagicMock, patch, ANY
 
 QUEUE_1 = {
@@ -429,9 +428,7 @@ class MessagingConnectionTests(unittest.TestCase):
             'example_topic', 'queue', **endpoint_details)
 
         make_request.assert_called_with(
-            'post', 'topics/example_topic/subscriptions',
-            data=json.dumps({
-                'endpoint_type': 'queue', 'endpoint': endpoint_details}))
+            'post', 'topics/example_topic/subscriptions', data=ANY)
         self.assertEqual(SUBSCRIPTION_1, result)
 
     @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')

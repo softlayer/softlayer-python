@@ -41,8 +41,7 @@ class CDNManager(IdentifierMixin, object):
         """
 
         if 'mask' not in kwargs:
-            items = set(['status'])
-            kwargs['mask'] = 'mask[%s]' % ','.join(items)
+            kwargs['mask'] = 'status'
 
         return self.account.getObject(id=account_id, **kwargs)
 

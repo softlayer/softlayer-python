@@ -90,8 +90,7 @@ Required:
 
     def execute(self, args):
         manager = CDNManager(self.client)
-        return str(manager.load_content(args.get('<account>'),
-                                        args.get('<content_url>')))
+        manager.load_content(args.get('<account>'), args.get('<content_url>'))
 
 
 class PurgeContent(CLIRunnable):
@@ -158,10 +157,7 @@ Options:
 
     def execute(self, args):
         manager = CDNManager(self.client)
-        media_type = args.get('--type', 'http')
-
-        if not media_type:
-            media_type = 'http'
+        media_type = args.get('--type') or 'http'
 
         manager.add_origin(args.get('<account>'), media_type,
                            args.get('<url>'), args.get('--cname', None))

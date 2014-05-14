@@ -519,15 +519,6 @@ class ServerCLITests(unittest.TestCase):
 
             self.assertEqual(expected, format_output(output, 'python'))
 
-            # And make sure we can pass in disk and SSH keys as comma separated
-            # strings, which is what templates do
-            args['--disk'] = '1000_DRIVE,1000_DRIVE'
-            args['--key'] = '123,456'
-
-            output = runnable.execute(args)
-
-            self.assertEqual(expected, format_output(output, 'python'))
-
             # Test explicitly setting a RAID configuration
             args['--controller'] = 'RAID0'
 
@@ -686,15 +677,6 @@ class ServerCLITests(unittest.TestCase):
 
             # Make sure we can order without specifying the disk as well
             args['--disk'] = []
-
-            output = runnable.execute(args)
-
-            self.assertEqual(expected, format_output(output, 'python'))
-
-            # And make sure we can pass in disk and SSH keys as comma separated
-            # strings, which is what templates do
-            args['--disk'] = '1000_DRIVE,1000_DRIVE'
-            args['--key'] = '123,456'
 
             output = runnable.execute(args)
 

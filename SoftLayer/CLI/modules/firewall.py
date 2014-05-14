@@ -14,12 +14,14 @@ The available commands are:
 # :license: MIT, see LICENSE for more details.
 
 from __future__ import print_function
-from SoftLayer import FirewallManager, SoftLayerError
-from SoftLayer.CLI import CLIRunnable, Table, listing, resolve_id, confirm
-from SoftLayer.CLI.helpers import blank, CLIAbort
 from subprocess import call
 import os
 import tempfile
+
+from SoftLayer import FirewallManager, SoftLayerError
+from SoftLayer.utils import lookup
+from SoftLayer.CLI import CLIRunnable, Table, listing, resolve_id, confirm
+from SoftLayer.CLI.helpers import blank, CLIAbort
 
 DELIMITER = "=========================================\n"
 
@@ -217,12 +219,11 @@ List active firewalls
                        'type',
                        'features',
                        'server/vlan id'])
-
         fwvlans = mgr.get_firewalls()
-        dedicatedfws = [firewall for firewall in fwvlans
-                        if firewall['dedicatedFirewallFlag']]
+        dedicated_firewalls = [firewall for firewall in fwvlans
+                               if firewall['dedicatedFirewallFlag']]
 
-        for vlan in dedicatedfws:
+        for vlan in dedicated_firewalls:
             features = []
             if vlan['highAvailabilityFirewallFlag']:
                 features.append('HA')
@@ -242,10 +243,11 @@ List active firewalls
         shared_vlan = [firewall for firewall in fwvlans
                        if not firewall['dedicatedFirewallFlag']]
         for vlan in shared_vlan:
-            fwls = [guest for guest in vlan['firewallGuestNetworkComponents']
-                    if has_firewall_component(guest)]
+            vs_firewalls = [guest
+                            for guest in vlan['firewallGuestNetworkComponents']
+                            if has_firewall_component(guest)]
 
-            for firewall in fwls:
+            for firewall in vs_firewalls:
                 table.add_row([
                     'cci:%s' % firewall['id'],
                     'CCI - standard',
@@ -253,15 +255,19 @@ List active firewalls
                     firewall['guestNetworkComponent']['guest']['id']
                 ])
 
-            fwls = [server for server in vlan['firewallNetworkComponents']
-                    if has_firewall_component(server)]
+            server_firewalls = [server
+                                for server in vlan['firewallNetworkComponents']
+                                if has_firewall_component(server)]
 
-            for fwl in fwls:
+            for firewall in server_firewalls:
                 table.add_row([
-                    'server:%s' % fwl['id'],
+                    'server:%s' % firewall['id'],
                     'Server - standard',
                     '-',
-                    fwl['networkComponent']['downlinkComponent']['hardwareId']
+                    lookup(firewall,
+                           'networkComponent',
+                           'downlinkComponent',
+                           'hardwareId')
                 ])
 
         return table

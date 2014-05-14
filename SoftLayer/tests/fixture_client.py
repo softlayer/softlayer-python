@@ -4,11 +4,11 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from mock import MagicMock
+from mock import MagicMock, MagicMixin
 from importlib import import_module
 
 
-class FixtureClient(object):
+class FixtureClient(MagicMixin):
 
     def __init__(self):
         # Keep track of Service instances in order to do future assertions
@@ -27,7 +27,7 @@ class FixtureClient(object):
         self.loaded_services = {}
 
 
-class FixtureService(object):
+class FixtureService(MagicMixin):
 
     def __init__(self, service_name):
         self.service_name = service_name
