@@ -6,14 +6,14 @@
 """
 from SoftLayer import MetadataManager, SoftLayerError, SoftLayerAPIError
 from SoftLayer.consts import API_PRIVATE_ENDPOINT_REST, USER_AGENT
-from SoftLayer.tests import unittest
+from SoftLayer.tests import TestCase
 
 from mock import patch, MagicMock
 
 
-class MetadataTests(unittest.TestCase):
+class MetadataTests(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.metadata = MetadataManager()
         self.make_request = MagicMock()
         self.metadata.make_request = self.make_request
@@ -73,9 +73,9 @@ class MetadataTests(unittest.TestCase):
         }, r)
 
 
-class MetadataTestsMakeRequest(unittest.TestCase):
+class MetadataTestsMakeRequest(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.metadata = MetadataManager()
         self.url = '/'.join([
             API_PRIVATE_ENDPOINT_REST.rstrip('/'),

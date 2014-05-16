@@ -6,17 +6,17 @@
 """
 from SoftLayer.auth import (
     AuthenticationBase, BasicAuthentication, TokenAuthentication)
-from SoftLayer.tests import unittest
+from SoftLayer.tests import TestCase
 
 
-class TestAuthenticationBase(unittest.TestCase):
+class TestAuthenticationBase(TestCase):
     def test_get_headers(self):
         auth = AuthenticationBase()
         self.assertRaises(NotImplementedError, auth.get_headers)
 
 
-class TestBasicAuthentication(unittest.TestCase):
-    def setUp(self):
+class TestBasicAuthentication(TestCase):
+    def set_up(self):
         self.auth = BasicAuthentication('USERNAME', 'APIKEY')
 
     def test_attribs(self):
@@ -37,8 +37,8 @@ class TestBasicAuthentication(unittest.TestCase):
         self.assertIn('USERNAME', s)
 
 
-class TestTokenAuthentication(unittest.TestCase):
-    def setUp(self):
+class TestTokenAuthentication(TestCase):
+    def set_up(self):
         self.auth = TokenAuthentication(12345, 'TOKEN')
 
     def test_attribs(self):

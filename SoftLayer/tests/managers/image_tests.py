@@ -5,16 +5,16 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import ImageManager
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests import TestCase, FixtureClient
 from SoftLayer.tests.fixtures import (
     Virtual_Guest_Block_Device_Template_Group, Account)
 
 from mock import ANY
 
 
-class ImageTests(unittest.TestCase):
+class ImageTests(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.client = FixtureClient()
         self.image = ImageManager(self.client)
         self.vgbdtg = self.client['Virtual_Guest_Block_Device_Template_Group']

@@ -7,6 +7,6 @@ env:
   - TOX_ENV=py34
   - TOX_ENV=pypy
   - TOX_ENV=pep8
-  - TOX_ENV=pylint
+  - TOX_ENV=py2pep8
 install: pip install tox --use-mirrors
 script: tox -e $TOX_ENV

@@ -4,13 +4,13 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.tests import unittest
+from SoftLayer.tests import TestCase
 from SoftLayer.CLI.modules import get_module_list
 
 from importlib import import_module
 
 
-class TestImportCLIModules(unittest.TestCase):
+class TestImportCLIModules(TestCase):
 
     def test_import_all(self):
         modules = get_module_list()

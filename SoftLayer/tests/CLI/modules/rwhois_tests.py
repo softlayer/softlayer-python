@@ -4,14 +4,14 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests import TestCase, FixtureClient
 from SoftLayer.CLI.modules import rwhois
 from SoftLayer.CLI.helpers import format_output
 from SoftLayer.CLI.exceptions import CLIAbort
 
 
-class RWhoisTests(unittest.TestCase):
-    def setUp(self):
+class RWhoisTests(TestCase):
+    def set_up(self):
         self.client = FixtureClient()
 
     def test_edit_nothing(self):

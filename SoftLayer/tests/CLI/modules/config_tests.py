@@ -9,14 +9,14 @@ import tempfile
 
 from SoftLayer import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT
 from SoftLayer.auth import BasicAuthentication
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests import TestCase, FixtureClient
 from SoftLayer.CLI.modules import config
 from SoftLayer.CLI.helpers import format_output
 from SoftLayer.CLI.exceptions import CLIAbort
 
 
-class TestHelpShow(unittest.TestCase):
-    def setUp(self):
+class TestHelpShow(TestCase):
+    def set_up(self):
         client = MagicMock()
         client.auth.username = 'user'
         client.auth.api_key = '12345'
@@ -36,8 +36,8 @@ class TestHelpShow(unittest.TestCase):
         self.assertEqual(expected, format_output(output, 'python'))
 
 
-class TestHelpSetup(unittest.TestCase):
-    def setUp(self):
+class TestHelpSetup(TestCase):
+    def set_up(self):
         client = FixtureClient()
         client.auth = BasicAuthentication('default-user', 'default-key')
         client.endpoint_url = 'default-endpoint-url'

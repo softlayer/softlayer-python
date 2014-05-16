@@ -7,13 +7,13 @@
 import os
 from mock import patch, MagicMock
 
-from SoftLayer.tests import unittest
+from SoftLayer.tests import TestCase
 from SoftLayer.CLI.environment import Environment, InvalidCommand
 
 
-class EnvironmentTests(unittest.TestCase):
+class EnvironmentTests(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.env = Environment()
 
     def test_plugin_list(self):

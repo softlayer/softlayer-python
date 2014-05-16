@@ -6,16 +6,16 @@
 """
 from SoftLayer import HardwareManager
 from SoftLayer.managers.hardware import get_default_value
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests import TestCase, FixtureClient
 from SoftLayer.tests.fixtures import (
     Hardware_Server, Account, Billing_Item, Ticket)
 
 from mock import ANY, call, patch
 
 
-class HardwareTests(unittest.TestCase):
+class HardwareTests(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.client = FixtureClient()
         self.hardware = HardwareManager(self.client)
 

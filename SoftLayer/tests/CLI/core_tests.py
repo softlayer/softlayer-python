@@ -8,7 +8,7 @@ from mock import MagicMock, patch
 
 import SoftLayer
 
-from SoftLayer.tests import unittest
+from SoftLayer.tests import TestCase
 from SoftLayer.CLI import core
 from SoftLayer.CLI.helpers import CLIAbort
 from SoftLayer.CLI.environment import Environment, InvalidModule, CLIRunnable
@@ -28,7 +28,7 @@ usage: sl vs [<args>...] [options]
 """
 
 
-class submodule_fixture(CLIRunnable):
+class SubmoduleFixture(CLIRunnable):
     """
 usage: sl vs list [options]
 
@@ -44,7 +44,7 @@ Options:
 class EnvironmentFixture(Environment):
     def __init__(self):
         super(EnvironmentFixture, self).__init__()
-        self.plugins = {'vs': {'list': submodule_fixture}}
+        self.plugins = {'vs': {'list': SubmoduleFixture}}
         self.aliases = {
             'meta': 'metadata',
             'my': 'metadata',
@@ -58,8 +58,8 @@ class EnvironmentFixture(Environment):
         return self.plugins.keys()
 
 
-class CommandLineTests(unittest.TestCase):
-    def setUp(self):
+class CommandLineTests(TestCase):
+    def set_up(self):
         self.env = EnvironmentFixture()
         self.env.get_module_name = MagicMock()
 
@@ -105,19 +105,19 @@ class CommandLineTests(unittest.TestCase):
 
     def test_module_with_no_command(self):
         self.env.plugins = {
-            'vs': {'list': submodule_fixture, None: submodule_fixture}
+            'vs': {'list': SubmoduleFixture, None: SubmoduleFixture}
         }
         self.env.get_module_name.return_value = 'vs'
         self.env.load_module = MagicMock()
         self.env.load_module.return_value = module_no_command_fixture
         resolver = core.CommandParser(self.env)
         command, command_args = resolver.parse(['vs', 'list'])
-        self.assertEqual(submodule_fixture, command)
+        self.assertEqual(SubmoduleFixture, command)
 
     def test_main(self):
         self.env.get_module_name.return_value = 'vs'
         self.env.plugins = {
-            'vs': {'list': submodule_fixture}
+            'vs': {'list': SubmoduleFixture}
         }
         self.assertRaises(
             SystemExit, core.main,
@@ -181,8 +181,8 @@ class CommandLineTests(unittest.TestCase):
             m.assert_called_once_with()
 
 
-class TestCommandParser(unittest.TestCase):
-    def setUp(self):
+class TestCommandParser(TestCase):
+    def set_up(self):
         self.env = EnvironmentFixture()
         self.parser = core.CommandParser(self.env)
 

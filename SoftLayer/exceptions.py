@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+# pylint: disable=C0103
 
 
 class SoftLayerError(Exception):
@@ -21,10 +22,10 @@ class SoftLayerAPIError(SoftLayerError):
 
     Provides faultCode and faultString properties.
     """
-    def __init__(self, faultCode, faultString, *args):
-        SoftLayerError.__init__(self, faultString, *args)
-        self.faultCode = faultCode  # pylint: disable=C0103
-        self.reason = self.faultString = faultString  # pylint: disable=C0103
+    def __init__(self, fault_code, fault_string, *args):
+        SoftLayerError.__init__(self, fault_string, *args)
+        self.faultCode = fault_code
+        self.reason = self.faultString = fault_string
 
     def __repr__(self):
         return '<%s(%s): %s>' % \

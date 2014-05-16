@@ -5,13 +5,13 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import SshKeyManager
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests import TestCase, FixtureClient
 from mock import call
 
 
-class SshKeyTests(unittest.TestCase):
+class SshKeyTests(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.client = FixtureClient()
         self.sshkey = SshKeyManager(self.client)
 

@@ -5,14 +5,14 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import SSLManager
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests import TestCase, FixtureClient
 
 from mock import ANY
 
 
-class SSLTests(unittest.TestCase):
+class SSLTests(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.client = FixtureClient()
         self.ssl = SSLManager(self.client)
         self.test_id = 10

@@ -5,15 +5,15 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import VSManager
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests import TestCase, FixtureClient
 from SoftLayer.tests.fixtures import Virtual_Guest
 
 from mock import MagicMock, ANY, call, patch
 
 
-class VSTests(unittest.TestCase):
+class VSTests(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.client = FixtureClient()
         self.vs = VSManager(self.client)
 
@@ -534,11 +534,11 @@ class VSTests(unittest.TestCase):
 
     def test_upgrade(self):
         # Testing  Upgrade
-        orderClient = self.client['Product_Order']
+        order_client = self.client['Product_Order']
 
         # test single upgrade
         self.vs.upgrade(1, cpus=4, public=False)
-        orderClient.placeOrder.called_once_with(1, cpus=4, public=False)
+        order_client.placeOrder.called_once_with(1, cpus=4, public=False)
 
         # Now test a blank upgrade
         self.vs.upgrade(1)
@@ -547,7 +547,7 @@ class VSTests(unittest.TestCase):
         # Testing all parameters Upgrade
         self.vs.upgrade(1, cpus=4, memory=2, nic_speed=1000, public=True)
         args = {'cpus': 4, 'memory': 2, 'nic_speed': 1000, 'public': 1000}
-        orderClient.placeOrder.called_once_with(1, **args)
+        order_client.placeOrder.called_once_with(1, **args)
 
     def test_get_item_id_for_upgrade(self):
         item_id = 0
@@ -560,9 +560,9 @@ class VSTests(unittest.TestCase):
         self.assertEqual(1133, item_id)
 
 
-class VSWaitReadyGoTests(unittest.TestCase):
+class VSWaitReadyGoTests(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.client = MagicMock()
         self.vs = VSManager(self.client)
         self.guestObject = self.client['Virtual_Guest'].getObject

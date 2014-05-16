@@ -8,11 +8,11 @@ from mock import patch, call, Mock, ANY
 
 import SoftLayer
 import SoftLayer.API
-from SoftLayer.tests import unittest
+from SoftLayer.tests import TestCase
 from SoftLayer.consts import USER_AGENT
 
 
-class Inititialization(unittest.TestCase):
+class Inititialization(TestCase):
     def test_init(self):
         client = SoftLayer.Client(username='doesnotexist',
                                   api_key='issurelywrong', timeout=10)
@@ -38,7 +38,7 @@ class Inititialization(unittest.TestCase):
         self.assertEquals(client.endpoint_url, 'http://endpoint_url')
 
 
-class ClientMethods(unittest.TestCase):
+class ClientMethods(TestCase):
     def test_help(self):
         help(SoftLayer)
         help(SoftLayer.Client)
@@ -71,8 +71,8 @@ class ClientMethods(unittest.TestCase):
         self.assertEqual(len(client), 0)
 
 
-class APIClient(unittest.TestCase):
-    def setUp(self):
+class APIClient(TestCase):
+    def set_up(self):
         self.client = SoftLayer.Client(
             username='doesnotexist', api_key='issurelywrong',
             endpoint_url="ENDPOINT")
@@ -304,8 +304,8 @@ class APIClient(unittest.TestCase):
             })
 
 
-class APITimedClient(unittest.TestCase):
-    def setUp(self):
+class APITimedClient(TestCase):
+    def set_up(self):
         self.client = SoftLayer.TimedClient(
             username='doesnotexist', api_key='issurelywrong',
             endpoint_url="ENDPOINT")
@@ -324,8 +324,8 @@ class APITimedClient(unittest.TestCase):
         self.assertEqual(expected_calls, self.client.get_last_calls())
 
 
-class UnauthenticatedAPIClient(unittest.TestCase):
-    def setUp(self):
+class UnauthenticatedAPIClient(TestCase):
+    def set_up(self):
         self.client = SoftLayer.Client(endpoint_url="ENDPOINT")
 
     @patch('SoftLayer.API.get_client_settings')

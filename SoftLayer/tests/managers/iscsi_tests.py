@@ -5,13 +5,13 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import ISCSIManager
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests import TestCase, FixtureClient
 from SoftLayer.tests.fixtures import Network_Storage_Iscsi
 from mock import ANY
 
 
-class ISCSITests(unittest.TestCase):
-    def setUp(self):
+class ISCSITests(TestCase):
+    def set_up(self):
         self.client = FixtureClient()
         self.iscsi = ISCSIManager(self.client)
 
@@ -46,8 +46,8 @@ class ISCSITests(unittest.TestCase):
                           size=10, location='foo')
 
     def test_create_iscsi(self):
-        getItems = self.client['Product_Package'].getItems
-        getItems.return_value = [
+        get_items = self.client['Product_Package'].getItems
+        get_items.return_value = [
             {
                 'id': 4439,
                 'capacity': '1',
@@ -77,8 +77,8 @@ class ISCSITests(unittest.TestCase):
         f.assert_called_once_with('unNeeded', id=iscsi_id)
 
     def test_create_snapshot_space(self):
-        getItems = self.client['Product_Package'].getItems
-        getItems.return_value = [
+        get_items = self.client['Product_Package'].getItems
+        get_items.return_value = [
             {
                 'id': 1121,
                 'capacity': '20',

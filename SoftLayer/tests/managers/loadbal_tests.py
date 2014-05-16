@@ -5,13 +5,13 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import LoadBalancerManager
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests import TestCase, FixtureClient
 from SoftLayer.tests.fixtures import Billing_Item
 
 
-class LoadBalancerTests(unittest.TestCase):
+class LoadBalancerTests(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.client = FixtureClient()
         self.lb_mgr = LoadBalancerManager(self.client)
 

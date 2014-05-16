@@ -6,14 +6,14 @@
 """
 from mock import patch
 
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests import TestCase, FixtureClient
 from SoftLayer.CLI.helpers import format_output
 from SoftLayer.CLI.exceptions import CLIAbort
 from SoftLayer.CLI.modules import globalip
 
 
-class DnsTests(unittest.TestCase):
-    def setUp(self):
+class DnsTests(TestCase):
+    def set_up(self):
         self.client = FixtureClient()
 
     def test_ip_assign(self):
