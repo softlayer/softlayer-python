@@ -73,7 +73,6 @@ class ISCSIManager(IdentifierMixin, object):
         """List iSCSI volume
         """
         account = self.client['Account']
-
         iscsi_list = account.getIscsiNetworkStorage(
             mask='eventCount,serviceResource[datacenter.name]')
         iscsi_list = [NestedDict(n) for n in iscsi_list]
