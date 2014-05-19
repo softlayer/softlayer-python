@@ -28,12 +28,8 @@ List iSCSI targets
     action = 'list'
 
     def execute(self, args):
-        account = self.client['Account']
-
-        iscsi_list = account.getIscsiNetworkStorage(
-            mask='eventCount,serviceResource[datacenter.name]')
-        iscsi_list = [NestedDict(n) for n in iscsi_list]
-
+        iscsi_mgr = ISCSIManager(self.client)
+        iscsi_list = iscsi_mgr.list_iscsi()
         table = Table([
             'id',
             'datacenter',
