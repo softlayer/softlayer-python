@@ -38,7 +38,6 @@ List iSCSI targets
             'password',
             'server'
         ])
-
         for iscsi in iscsi_list:
             table.add_row([
                 iscsi['id'],
@@ -49,7 +48,6 @@ List iSCSI targets
                 iscsi.get('username', blank()),
                 iscsi.get('password', blank()),
                 iscsi.get('serviceResourceBackendIpAddress', blank())])
-
         return table
 
 
