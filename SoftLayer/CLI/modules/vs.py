@@ -31,7 +31,7 @@ hostname or the ip address for a virtual server.
 from os import linesep
 import os.path
 
-from SoftLayer import VSManager, SshKeyManager, DNSManager, DNSZoneNotFound
+from SoftLayer import VSManager, SshKeyManager, DNSManager
 from SoftLayer.utils import lookup
 from SoftLayer.CLI import (
     CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
@@ -197,7 +197,8 @@ Options:
         if tag_row:
             table.add_row(['tags', listing(tag_row, separator=',')])
 
-        if not result['privateNetworkOnlyFlag']:
+        # Test to see if this actually has a primary (public) ip address
+        if result['primaryIpAddress']:
             ptr_domains = self.client['Virtual_Guest'].\
                 getReverseDomainRecords(id=vs_id)
 
@@ -382,18 +383,9 @@ Optional:
     required_params = ['--hostname', '--domain', '--cpu', '--memory']
 
     def execute(self, args):
-        update_with_template_args(args)
+        update_with_template_args(args, list_args=['--disk', '--key'])
         vsi = VSManager(self.client)
         self._update_with_like_args(args)
-
-        # Disks will be a comma-separated list. Let's make it a real list.
-        if isinstance(args.get('--disk'), str):
-            args['--disk'] = args.get('--disk').split(',')
-
-        # SSH keys may be a comma-separated list. Let's make it a real list.
-        if isinstance(args.get('--key'), str):
-            args['--key'] = args.get('--key').split(',')
-
         self._validate_args(args)
 
         # Do not create a virtual server with --test or --export
@@ -437,8 +429,7 @@ Optional:
             output.append(FormattedItem(
                 None,
                 ' -- ! Prices reflected here are retail and do not '
-                'take account level discounts and are not guaranteed.')
-            )
+                'take account level discounts and are not guaranteed.'))
 
         if args['--export']:
             export_file = args.pop('--export')
@@ -910,11 +901,7 @@ Options:
         if not instance['primaryIpAddress']:
             raise CLIAbort('No primary IP address associated with this VS')
 
-        try:
-            zone = dns.get_zone(zone_id)
-        except DNSZoneNotFound:
-            raise CLIAbort("Unable to create A record, "
-                           "no zone found matching: %s" % instance['domain'])
+        zone = dns.get_zone(zone_id)
 
         go_for_it = args['--really'] or confirm(
             "Attempt to update DNS records for %s"

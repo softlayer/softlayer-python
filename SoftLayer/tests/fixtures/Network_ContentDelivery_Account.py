@@ -7,7 +7,8 @@ getObject = {
     "dependantServiceFlag": True,
     "cdnSolutionName": "ORIGIN_PULL",
     "statusId": 4,
-    "accountId": 1234
+    "accountId": 1234,
+    "status": {'name': 'ACTIVE'},
 }
 
 getOriginPullMappingInformation = [

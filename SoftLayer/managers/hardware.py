@@ -100,7 +100,7 @@ class HardwareManager(IdentifierMixin, object):
 
         """
         if 'mask' not in kwargs:
-            hw_items = set([
+            hw_items = [
                 'id',
                 'hostname',
                 'domain',
@@ -112,10 +112,10 @@ class HardwareManager(IdentifierMixin, object):
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
                 'datacenter',
-            ])
-            server_items = set([
+            ]
+            server_items = [
                 'activeTransaction[id, transactionStatus[friendlyName,name]]',
-            ])
+            ]
 
             kwargs['mask'] = '[mask[%s],' \
                              ' mask(SoftLayer_Hardware_Server)[%s]]' % \
@@ -263,7 +263,7 @@ class HardwareManager(IdentifierMixin, object):
         """
 
         if 'mask' not in kwargs:
-            items = set([
+            items = [
                 'id',
                 'globalIdentifier',
                 'fullyQualifiedDomainName',
@@ -280,21 +280,20 @@ class HardwareManager(IdentifierMixin, object):
                 'networkManagementIpAddress',
                 'userData',
                 'datacenter',
-                'networkComponents[id, status, speed, maxSpeed, name,'
-                'ipmiMacAddress, ipmiIpAddress, macAddress, primaryIpAddress,'
-                'port, primarySubnet]',
-                'networkComponents.primarySubnet[id, netmask,'
-                'broadcastAddress, networkIdentifier, gateway]',
+                '''networkComponents[id, status, speed, maxSpeed, name,
+                   ipmiMacAddress, ipmiIpAddress, macAddress, primaryIpAddress,
+                   port, primarySubnet[id, netmask, broadcastAddress,
+                                       networkIdentifier, gateway]]''',
                 'hardwareChassis[id,name]',
                 'activeTransaction[id, transactionStatus[friendlyName,name]]',
-                'operatingSystem.softwareLicense.'
                 'softwareDescription[manufacturer,name,version,referenceCode]',
-                'operatingSystem.passwords[username,password]',
+                '''operatingSystem[softwareLicense,
+                                   passwords[username,password]]''',
                 'billingItem.recurringFee',
                 'hourlyBillingFlag',
                 'tagReferences[id,tag[name,id]]',
                 'networkVlans[id,vlanNumber,networkSpace]',
-            ])
+            ]
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
         return self.hardware.getObject(id=hardware_id, **kwargs)

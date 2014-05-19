@@ -175,18 +175,12 @@ getHardware = [{
         },
     ]
 }]
-getDomains = [{'name': 'example.com', 'id': 12345}]
+getDomains = [{'name': 'example.com',
+               'id': 12345,
+               'serial': 2014030728,
+               'updateDate': '2014-03-07T13:52:31-06:00'}]
 
 getObject = {
-    'networkVlans': [{
-        'firewallNetworkComponents': [{'id': 1234}],
-        'networkVlanFirewall': [{'id': 1234}],
-        'dedicatedFirewallFlag': True,
-        'firewallGuestNetworkComponents': [{'id': 1234}],
-        'firewallInterfaces': [{'id': 1234}],
-        'firewallRules': [{'id': 1234}],
-        'highAvailabilityFirewallFlag': True,
-    }],
     'cdnAccounts': [
         {
             "cdnAccountName": "1234a",
@@ -230,15 +224,29 @@ getRwhoisData = {
     'privateResidenceFlag': 'privateResidenceFlag',
 }
 
-getGlobalIpRecords = [
-    {
-        'id': '200',
-        'ipAddress': {
-            'subnet': {
-                'networkIdentifier': '10.0.0.1',
-            },
+getGlobalIpRecords = [{
+    'id': '200',
+    'ipAddress': {
+        'subnet': {
+            'networkIdentifier': '10.0.0.1',
         },
-    }]
+        'ipAddress': '127.0.0.1',
+    },
+    'destinationIpAddress': {
+        'ipAddress': '127.0.0.1',
+        'virtualGuest': {'fullyQualifiedDomainName': 'example.com'}}
+}, {
+    'id': '201',
+    'ipAddress': {
+        'subnet': {
+            'networkIdentifier': '10.0.0.1',
+        },
+        'ipAddress': '127.0.0.1',
+    },
+    'destinationIpAddress': {
+        'ipAddress': '127.0.0.1',
+        'hardware': {'fullyQualifiedDomainName': 'example.com'}}
+}]
 
 getSubnets = [
     {
@@ -248,8 +256,6 @@ getSubnets = [
         'version': 4,
         'subnetType': 'PRIMARY'
     }]
-
-getNetworkVlans = {'id': 1234}
 
 getSshKeys = [{'id': '100', 'label': 'Test 1'},
               {'id': '101', 'label': 'Test 2',
@@ -315,7 +321,8 @@ getOpenTickets = [ticket for ticket in getTickets
 getClosedTickets = [ticket for ticket in getTickets
                     if ticket['statusId'] == 1002]
 
-getCurrentUser = {"id": 12345}
+getCurrentUser = {'id': 12345,
+                  'apiAuthenticationKeys': [{'authenticationKey': 'A' * 64}]}
 
 getCdnAccounts = [
     {
@@ -355,3 +362,12 @@ getNetworkVlans = [{
 }]
 
 getAdcLoadBalancers = []
+
+getNasNetworkStorage = [{
+    'id': 1,
+    'capacityGb': 10,
+    'serviceResource': {'datacenter': {'name': 'Dallas'}},
+    'username': 'user',
+    'password': 'pass',
+    'serviceResourceBackendIpAddress': '127.0.0.1',
+}]

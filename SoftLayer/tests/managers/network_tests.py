@@ -239,7 +239,7 @@ class NetworkTests(unittest.TestCase):
     def test_resolve_global_ip_ids(self):
         service = self.client['Account']
         _id = self.network.resolve_global_ip_ids('10.0.0.1')
-        self.assertEqual(_id, ['200'])
+        self.assertEqual(_id, ['200', '201'])
 
         service.getGlobalIpRecords.return_value = []
         _id = self.network.resolve_global_ip_ids('nope')

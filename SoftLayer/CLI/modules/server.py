@@ -178,7 +178,8 @@ Options:
         if tag_row:
             table.add_row(['tags', listing(tag_row, separator=',')])
 
-        if not result['privateNetworkOnlyFlag']:
+        # Test to see if this actually has a primary (public) ip address
+        if result['primaryIpAddress']:
             ptr_domains = self.client['Hardware_Server']\
                 .getReverseDomainRecords(id=hardware_id)
 
@@ -778,17 +779,8 @@ Optional:
                        '--memory', '--os']
 
     def execute(self, args):
-        update_with_template_args(args)
+        update_with_template_args(args, list_args=['--disk', '--key'])
         mgr = HardwareManager(self.client)
-
-        # Disks will be a comma-separated list. Let's make it a real list.
-        if isinstance(args.get('--disk'), str):
-            args['--disk'] = args.get('--disk').split(',')
-
-        # Do the same thing for SSH keys
-        if isinstance(args.get('--key'), str):
-            args['--key'] = args.get('--key').split(',')
-
         self._validate_args(args)
 
         ds_options = mgr.get_dedicated_server_create_options(args['--chassis'])
@@ -819,8 +811,7 @@ Optional:
             output.append(FormattedItem(
                 '',
                 ' -- ! Prices reflected here are retail and do not '
-                'take account level discounts and are not guaranteed.')
-            )
+                'take account level discounts and are not guaranteed.'))
 
         if args['--export']:
             export_file = args.pop('--export')

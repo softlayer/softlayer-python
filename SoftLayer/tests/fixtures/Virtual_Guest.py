@@ -18,11 +18,17 @@ getObject = {
     'blockDevices': [{"device": 0, "uuid": 1},
                      {"device": 1},
                      {"device": 2, "uuid": 2}],
+    'notes': 'notes',
+    'networkVlans': [{'networkSpace': 'PUBLIC',
+                      'vlanNumber': 23,
+                      'id': 1}],
     'operatingSystem': {
+        'passwords': [{'username': 'user', 'password': 'pass'}],
         'softwareLicense': {
             'softwareDescription': {'version': '12.04-64 Minimal for CCI',
                                     'name': 'Ubuntu'}}
-    }
+    },
+    'tagReferences': [{'tag': {'name': 'production'}}],
 }
 
 getCreateObjectOptions = {

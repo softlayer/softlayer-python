@@ -18,7 +18,7 @@ The available record commands are:
 
 from SoftLayer.CLI import (
     CLIRunnable, no_going_back, Table, CLIAbort, resolve_id)
-from SoftLayer import DNSManager, DNSZoneNotFound
+from SoftLayer import DNSManager
 
 
 class DumpZone(CLIRunnable):
@@ -35,10 +35,7 @@ Arguments:
     def execute(self, args):
         manager = DNSManager(self.client)
         zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
-        try:
-            return manager.dump_zone(zone_id)
-        except DNSZoneNotFound:
-            raise CLIAbort("No zone found matching: %s" % args['<zone>'])
+        return manager.dump_zone(zone_id)
 
 
 class CreateZone(CLIRunnable):
@@ -102,13 +99,7 @@ Filters:
     def list_zone(self, args):
         """ list records for a particular zone """
         manager = DNSManager(self.client)
-        table = Table([
-            "id",
-            "record",
-            "type",
-            "ttl",
-            "value",
-        ])
+        table = Table(['id', 'record', 'type', 'ttl', 'value'])
 
         table.align['ttl'] = 'l'
         table.align['record'] = 'r'
@@ -116,16 +107,13 @@ Filters:
 
         zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
 
-        try:
-            records = manager.get_records(
-                zone_id,
-                record_type=args.get('--type'),
-                host=args.get('--record'),
-                ttl=args.get('--ttl'),
-                data=args.get('--data'),
-            )
-        except DNSZoneNotFound:
-            raise CLIAbort("No zone found matching: %s" % args['<zone>'])
+        records = manager.get_records(
+            zone_id,
+            record_type=args.get('--type'),
+            host=args.get('--record'),
+            ttl=args.get('--ttl'),
+            data=args.get('--data'),
+        )
 
         for record in records:
             table.add_row([
@@ -142,12 +130,7 @@ Filters:
         """ List all zones """
         manager = DNSManager(self.client)
         zones = manager.list_zones()
-        table = Table([
-            "id",
-            "zone",
-            "serial",
-            "updated",
-        ])
+        table = Table(['id', 'zone', 'serial', 'updated'])
         table.align['serial'] = 'c'
         table.align['updated'] = 'c'
 
@@ -184,14 +167,13 @@ Options:
         manager = DNSManager(self.client)
 
         zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
-        args['--ttl'] = args['--ttl'] or 7200
 
         manager.create_record(
             zone_id,
             args['<record>'],
             args['<type>'],
             args['<data>'],
-            ttl=args['--ttl'])
+            ttl=args['--ttl'] or 7200)
 
 
 class EditRecord(CLIRunnable):
@@ -216,12 +198,9 @@ Options:
         manager = DNSManager(self.client)
         zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
 
-        try:
-            results = manager.get_records(
-                zone_id,
-                host=args['<record>'])
-        except DNSZoneNotFound:
-            raise CLIAbort("No zone found matching: %s" % args['<zone>'])
+        results = manager.get_records(
+            zone_id,
+            host=args['<record>'])
 
         for result in results:
             if args['--id'] and str(result['id']) != args['--id']:
@@ -254,18 +233,13 @@ Options:
         if args['--id']:
             records = [{'id': args['--id']}]
         else:
-            try:
-                records = manager.get_records(
-                    zone_id,
-                    host=args['<record>'])
-            except DNSZoneNotFound:
-                raise CLIAbort("No zone found matching: %s" % args['<zone>'])
+            records = manager.get_records(
+                zone_id,
+                host=args['<record>'])
 
         if args['--really'] or no_going_back('yes'):
             table = Table(['record'])
             for result in records:
-                if args.get('--id') and args['--id'] != result['id']:
-                    continue
                 manager.delete_record(result['id'])
                 table.add_row([result['id']])
 

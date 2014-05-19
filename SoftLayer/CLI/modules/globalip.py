@@ -35,9 +35,6 @@ Required:
         global_ip_id = resolve_id(mgr.resolve_global_ip_ids,
                                   args.get('<identifier>'),
                                   name='global ip')
-        if not global_ip_id:
-            raise CLIAbort("Unable to find global IP record for " +
-                           args['<identifier>'])
         mgr.assign_global_ip(global_ip_id, args['<target>'])
 
 
@@ -60,7 +57,7 @@ Cancel a subnet
         if args['--really'] or no_going_back(global_ip_id):
             mgr.cancel_global_ip(global_ip_id)
         else:
-            CLIAbort('Aborted')
+            raise CLIAbort('Aborted')
 
 
 class GlobalIpCreate(CLIRunnable):
@@ -89,8 +86,7 @@ Options:
                 raise CLIAbort('Cancelling order.')
         result = mgr.add_global_ip(version=version,
                                    test_order=args.get('--test'))
-        if not result:
-            return 'Unable to place order: No valid price IDs found.'
+
         table = Table(['Item', 'cost'])
         table.align['Item'] = 'r'
         table.align['cost'] = 'r'
@@ -121,9 +117,7 @@ Filters:
     def execute(self, args):
         mgr = NetworkManager(self.client)
 
-        table = Table([
-            'id', 'ip', 'assigned', 'target'
-        ])
+        table = Table(['id', 'ip', 'assigned', 'target'])
         table.sortby = args.get('--sortby') or 'id'
 
         version = 0
@@ -146,9 +140,8 @@ Filters:
                     target += (' (%s)'
                                % virtual_guest['fullyQualifiedDomainName'])
                 elif ip_address['destinationIpAddress'].get('hardware'):
-                    target += ' (' + \
-                              dest['hardware']['fullyQualifiedDomainName'] + \
-                              ')'
+                    target += (' (%s)'
+                               % dest['hardware']['fullyQualifiedDomainName'])
 
             table.add_row([ip_address['id'],
                            ip_address['ipAddress']['ipAddress'],
@@ -173,7 +166,4 @@ Required:
         global_ip_id = resolve_id(mgr.resolve_global_ip_ids,
                                   args.get('<identifier>'),
                                   name='global ip')
-        if not global_ip_id:
-            raise CLIAbort("Unable to find global IP record for " +
-                           args['<identifier>'])
         mgr.unassign_global_ip(global_ip_id)
