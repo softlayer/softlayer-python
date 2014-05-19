@@ -6,7 +6,7 @@
 """
 from SoftLayer import FirewallManager
 from SoftLayer.tests import unittest, FixtureClient
-from SoftLayer.tests.fixtures import (Account, Network_Component_Firewall,
+from SoftLayer.tests.fixtures import (Network_Component_Firewall,
                                       Network_Vlan_Firewall, Billing_Item)
 from mock import ANY
 
@@ -23,12 +23,23 @@ class FirewallTests(unittest.TestCase):
         self.firewall = FirewallManager(self.client)
 
     def test_get_firewalls(self):
-        call = self.client['Account'].getObject
+        call = self.client['Account'].getNetworkVlans
+        firewall_vlan = {
+            'id': 1,
+            'firewallNetworkComponents': [{'id': 1234}],
+            'networkVlanFirewall': {'id': 1234},
+            'dedicatedFirewallFlag': True,
+            'firewallGuestNetworkComponents': [{'id': 1234}],
+            'firewallInterfaces': [{'id': 1234}],
+            'firewallRules': [{'id': 1234}],
+            'highAvailabilityFirewallFlag': True,
+        }
+        call.return_value = [firewall_vlan]
 
         firewalls = self.firewall.get_firewalls()
 
         call.assert_called_once_with(mask=ANY)
-        self.assertEqual(firewalls, Account.getObject['networkVlans'])
+        self.assertEqual(firewalls, [firewall_vlan])
 
     def test_get_standard_fwl_rules(self):
         call = self.client['Network_Component_Firewall'].getRules

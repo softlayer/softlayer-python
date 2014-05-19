@@ -167,20 +167,16 @@ class FirewallManager(IdentifierMixin, object):
 
         :returns: A list of firewalls on the current account.
         """
-        results = self.account.getObject(
-            mask={
-                'networkVlans': {
-                    'firewallNetworkComponents': None,
-                    'networkVlanFirewall': None,
-                    'dedicatedFirewallFlag': None,
-                    'firewallGuestNetworkComponents': None,
-                    'firewallInterfaces': {},
-                    'firewallRules': None,
-                    'highAvailabilityFirewallFlag': None,
-                    # 'primarySubnet': None,
-                }
-            })['networkVlans']
-        return [firewall for firewall in results
+        mask = ('firewallNetworkComponents,'
+                'networkVlanFirewall,'
+                'dedicatedFirewallFlag,'
+                'firewallGuestNetworkComponents,'
+                'firewallInterfaces,'
+                'firewallRules,'
+                'highAvailabilityFirewallFlag')
+
+        return [firewall
+                for firewall in self.account.getNetworkVlans(mask=mask)
                 if has_firewall(firewall)]
 
     def get_standard_fwl_rules(self, firewall_id):

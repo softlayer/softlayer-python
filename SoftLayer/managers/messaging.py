@@ -78,12 +78,12 @@ class MessagingManager(object):
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         """
         if 'mask' not in kwargs:
-            items = set([
+            items = [
                 'id',
                 'name',
                 'status',
                 'nodes',
-            ])
+            ]
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
         return self.client['Account'].getMessageQueueAccounts(**kwargs)
