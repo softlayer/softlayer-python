@@ -30,6 +30,7 @@ List iSCSI targets
     def execute(self, args):
         iscsi_mgr = ISCSIManager(self.client)
         iscsi_list = iscsi_mgr.list_iscsi()
+        iscsi_list = [NestedDict(n) for n in iscsi_list]
         table = Table([
             'id',
             'datacenter',

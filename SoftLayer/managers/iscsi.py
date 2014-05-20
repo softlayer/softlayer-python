@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~
     ISCSI Manager/helpers
 """
-from SoftLayer.utils import IdentifierMixin, NestedDict
+from SoftLayer.utils import IdentifierMixin
 
 
 class ISCSIManager(IdentifierMixin, object):
@@ -75,7 +75,6 @@ class ISCSIManager(IdentifierMixin, object):
         account = self.client['Account']
         iscsi_list = account.getIscsiNetworkStorage(
             mask='eventCount,serviceResource[datacenter.name]')
-        iscsi_list = [NestedDict(n) for n in iscsi_list]
         return iscsi_list
 
     def get_iscsi(self, volume_id, **kwargs):
