@@ -9,7 +9,8 @@ The available commands are:
 # :license: MIT, see LICENSE for more details.
 
 from SoftLayer.CLI import CLIRunnable, Table, FormattedItem
-from SoftLayer.CLI.helpers import NestedDict, blank
+from SoftLayer.CLI.helpers import blank
+from SoftLayer.utils import lookup
 
 
 class ListNAS(CLIRunnable):
@@ -27,7 +28,6 @@ Options:
 
         nas_accounts = account.getNasNetworkStorage(
             mask='eventCount,serviceResource[datacenter.name]')
-        nas_accounts = [NestedDict(n) for n in nas_accounts]
 
         table = Table(['id', 'datacenter', 'size', 'username', 'password',
                        'server'])
@@ -35,8 +35,10 @@ Options:
         for nas_account in nas_accounts:
             table.add_row([
                 nas_account['id'],
-                nas_account['serviceResource']['datacenter'].get('name',
-                                                                 blank()),
+                lookup(nas_account,
+                       'serviceResource',
+                       'datacenter',
+                       'name') or blank(),
                 FormattedItem(
                     nas_account.get('capacityGb', blank()),
                     "%dGB" % nas_account.get('capacityGb', 0)),
