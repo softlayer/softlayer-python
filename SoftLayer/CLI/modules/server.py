@@ -608,6 +608,11 @@ Options:
                     os_code = self._generate_windows_code(opsys['description'])
                 else:
                     os_results = os_regex.search(opsys['description'])
+
+                    # Skip this operating system if it's not parsable
+                    if os_results is None:
+                        continue
+
                     name = os_results.group(1)
                     version = os_results.group(2)
                     bits = bit_regex.search(opsys['description'])
