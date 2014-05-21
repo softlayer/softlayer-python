@@ -69,6 +69,14 @@ class ISCSIManager(IdentifierMixin, object):
         self.product_order.verifyOrder(iscsi_order)
         self.product_order.placeOrder(iscsi_order)
 
+    def list_iscsi(self):
+        """List iSCSI volume
+        """
+        account = self.client['Account']
+        iscsi_list = account.getIscsiNetworkStorage(
+            mask='eventCount,serviceResource[datacenter.name]')
+        return iscsi_list
+
     def get_iscsi(self, volume_id, **kwargs):
         """ Get details about a iSCSI storage
 
