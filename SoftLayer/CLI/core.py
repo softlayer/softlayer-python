@@ -246,7 +246,8 @@ def main(args=sys.argv[1:], env=Environment()):
         import traceback
         env.err("An unexpected error has occured:")
         env.err(traceback.format_exc())
-        env.err("Feel free to report this error as it is likely a bug.")
+        env.err("Feel free to report this error as it is likely a bug:")
+        env.err("    https://github.com/softlayer/softlayer-python/issues")
         exit_status = 1
 
     sys.exit(exit_status)
