@@ -163,9 +163,9 @@ class VSManager(IdentifierMixin, object):
                 'privateNetworkOnlyFlag',
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
-                '''networkComponents[id, status, speed, maxSpeed, name,'
+                '''networkComponents[id, status, speed, maxSpeed, name,
                                      macAddress, primaryIpAddress, port,
-                                     primarySubnet]'''
+                                     primarySubnet]''',
                 'lastKnownPowerState.name',
                 'powerState',
                 'status',
