@@ -4,9 +4,10 @@
     ISCSI Manager/helpers
 """
 from SoftLayer.utils import IdentifierMixin
+from SoftLayer.managers.shared import Orderable
 
 
-class ISCSIManager(IdentifierMixin, object):
+class ISCSIManager(IdentifierMixin, Orderable, object):
 
     """ Manages iSCSI storages """
 
@@ -20,7 +21,7 @@ class ISCSIManager(IdentifierMixin, object):
         """ Retrieves the Item Price IDs
         """
         item_prices = self.client['Product_Package'].getItems(
-            id=0,
+            id=self._get_ordering_package_id(),
             mask='id,capacity,prices[id]',
             filter={
                 'items': {
@@ -40,7 +41,7 @@ class ISCSIManager(IdentifierMixin, object):
             'complexType':
             'SoftLayer_Container_Product_Order_Network_Storage_Iscsi',
             'location': location_id,
-            'packageId': 0,  # storage package
+            'packageId': self._get_ordering_package_id(),
             'prices': [{'id': item_price}],
             'quantity': 1
         }
@@ -143,7 +144,7 @@ class ISCSIManager(IdentifierMixin, object):
             'SoftLayer_Container_Product_Order_\
 Network_Storage_Iscsi_SnapshotSpace',
             'location': result['serviceResource']['datacenter']['id'],
-            'packageId': 0,
+            'packageId': self._get_ordering_package_id(),
             'prices': [{'id': item_price}],
             'quantity': 1,
             'volumeId': volume_id}
@@ -160,7 +161,20 @@ Network_Storage_Iscsi_SnapshotSpace',
 
     def restore_from_snapshot(self, volume_id, snapshot_id):
         """ Restore the volume to snapshot's contents
-        :params: imteger volume_id: the volume ID
+        :params: integer volume_id: the volume ID
         :params: integer snapshot_id: the snapshot ID
         """
         self.iscsi_svc.restoreFromSnapshot(snapshot_id, id=volume_id)
+
+    def _get_ordering_package_id(self):
+        """ Return the package ID used for iSCSI orders
+        :return: integer
+        """
+        return self.get_package_id_for_package_type('ADDITIONAL_SERVICES')
+
+    def _get_package_service(self):
+        """ Return the package service to make our application calls
+
+        :returns: A SoftLayer Service
+        """
+        return self.client['Product_Package']

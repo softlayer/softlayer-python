@@ -48,6 +48,7 @@ setup(
         'SoftLayer.CLI',
         'SoftLayer.CLI.modules',
         'SoftLayer.managers',
+        'SoftLayer.managers.shared',
     ],
     license='MIT',
     zip_safe=False,

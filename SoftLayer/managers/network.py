@@ -7,6 +7,7 @@
 """
 
 from SoftLayer.utils import NestedDict, query_filter, resolve_ids, lookup
+from SoftLayer.managers.shared import Orderable
 
 DEFAULT_SUBNET_MASK = ','.join(['hardware',
                                 'datacenter',
@@ -15,14 +16,14 @@ DEFAULT_SUBNET_MASK = ','.join(['hardware',
 DEFAULT_VLAN_MASK = ','.join(['firewallInterfaces',
                               'hardware',
                               'networkComponents',
-                              'primaryRouter'  # Lack of comma intential
+                              'primaryRouter'  # Lack of comma intentional
                               '[id, fullyQualifiedDomainName, datacenter]',
                               'subnets',
                               'totalPrimaryIpAddressCount',
                               'virtualGuests'])
 
 
-class NetworkManager(object):
+class NetworkManager(Orderable, object):
     """ Manage Networks """
     def __init__(self, client):
         self.client = client
@@ -76,7 +77,8 @@ class NetworkManager(object):
         # item description.
         price_id = None
         quantity_str = str(quantity)
-        for item in package.getItems(id=0, mask='itemCategory'):
+        package_id = self._get_ordering_package_id()
+        for item in package.getItems(id=package_id, mask='itemCategory'):
             category_code = lookup(item, 'itemCategory', 'categoryCode')
             if all([category_code == category,
                     item.get('capacity') == quantity_str,
@@ -90,7 +92,7 @@ class NetworkManager(object):
                             ' subnet.')
 
         order = {
-            'packageId': 0,
+            'packageId': package_id,
             'prices': [{'id': price_id}],
             'quantity': 1,
             # This is necessary in order for the XML-RPC endpoint to select the
@@ -403,3 +405,16 @@ class NetworkManager(object):
         """
         results = self.list_vlans(name=name, mask='id')
         return [result['id'] for result in results]
+
+    def _get_ordering_package_id(self):
+        """ Return the package ID used for orders
+        :return: integer
+        """
+        return self.get_package_id_for_package_type('ADDITIONAL_SERVICES')
+
+    def _get_package_service(self):
+        """ Return the package service to make our application calls
+
+        :returns: A SoftLayer Service
+        """
+        return self.client['Product_Package']

@@ -9,9 +9,10 @@
 # pylint: disable=C0103
 import socket
 from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
+from SoftLayer.managers.shared import Orderable
 
 
-class HardwareManager(IdentifierMixin, object):
+class HardwareManager(IdentifierMixin, Orderable, object):
     """
     Manages hardware devices.
 
@@ -185,17 +186,14 @@ class HardwareManager(IdentifierMixin, object):
 
     def get_bare_metal_package_id(self):
         """ Return the bare metal package id """
-        packages = self.client['Product_Package'].getAllObjects(
-            mask='mask[id, name]',
-            filter={'name': query_filter('Bare Metal Instance')})
+        return self.get_package_id_for_package_type('BARE_METAL_CORE')
 
-        hw_id = 0
-        for package in packages:
-            if 'Bare Metal Instance' == package['name']:
-                hw_id = package['id']
-                break
+    def _get_package_service(self):
+        """ Return the package service to make our application calls
 
-        return hw_id
+        :returns: A SoftLayer Service
+        """
+        return self.client['Product_Package']
 
     def get_available_dedicated_server_packages(self):
         """ Retrieves a list of packages that are available for ordering
@@ -205,24 +203,11 @@ class HardwareManager(IdentifierMixin, object):
                   the form (id, name, description)
         """
 
-        package_obj = self.client['Product_Package']
         packages = []
+        mask = 'id,name,description,type[keyName]'
+        package_types = ['BARE_METAL_CPU', 'BARE_METAL_CORE']
 
-        # Pull back only server packages
-        mask = 'id,name,description,type'
-        _filter = {
-            'type': {
-                'keyName': {
-                    'operation': 'in',
-                    'options': [
-                        {'name': 'data',
-                         'value': ['BARE_METAL_CPU', 'BARE_METAL_CORE']}
-                    ],
-                },
-            },
-        }
-
-        for package in package_obj.getAllObjects(mask=mask, filter=_filter):
+        for package in self.get_packages_by_type(package_types, mask):
             # Filter out packages without a name or that are designated as
             # 'OUTLET.' The outlet packages are missing some necessary data
             # and their orders will fail.

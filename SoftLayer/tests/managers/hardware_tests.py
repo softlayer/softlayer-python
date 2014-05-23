@@ -306,7 +306,7 @@ class HardwareTests(unittest.TestCase):
             }
         }
         f = self.client['Product_Package'].getAllObjects
-        f.assert_has_calls([call(mask='id,name,description,type',
+        f.assert_has_calls([call(mask='id,name,description,type[keyName]',
                                  filter=filter_mock)])
 
     def test_get_dedicated_server_options(self):
