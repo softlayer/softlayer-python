@@ -139,23 +139,27 @@ Setup configuration
         timeout = defaults['timeout']
 
         # Ask for username
-        while True:
+        for _ in range(3):
             username = self.env.input(
                 'Username [%s]: ' % defaults['username']) \
                 or defaults['username']
             if username:
                 break
+        else:
+            raise CLIAbort('Aborted after 3 attempts')
 
         # Ask for 'secret' which can be api_key or their password
-        while True:
+        for _ in range(3):
             secret = self.env.getpass(
                 'API Key or Password [%s]: ' % defaults['api_key']) \
                 or defaults['api_key']
             if secret:
                 break
+        else:
+            raise CLIAbort('Aborted after 3 attempts')
 
         # Ask for which endpoint they want to use
-        while True:
+        for _ in range(3):
             endpoint_type = self.env.input(
                 'Endpoint (public|private|custom): ')
             endpoint_type = endpoint_type.lower()
@@ -173,6 +177,8 @@ Setup configuration
                     'Endpoint URL [%s]: ' % defaults['endpoint_url']
                 ) or defaults['endpoint_url']
                 break
+        else:
+            raise CLIAbort('Aborted after 3 attempts')
 
         return username, secret, endpoint_url, timeout
 
