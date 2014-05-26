@@ -1,9 +1,17 @@
 getAllObjects = [
-    {'id': 13, 'name': 'Mock Testing Package', 'description': 'a thing'},
+    {'id': 13, 'name': 'Mock Testing Package', 'description': 'a thing',
+     'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1},
+    {'id': 15, 'name': 'Inactive package', 'description': 'a cool server',
+     'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 0},
     {'id': 27, 'name': 'An additional testing category',
-     'description': 'Another thing - OUTLET'},
+     'description': 'Another thing - OUTLET',
+     'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1},
+    {'id': 28, 'name': 'An outlet package',
+     'description': 'Super fun package',
+     'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1},
     {'id': 50, 'name': 'Bare Metal Instance',
-     'description': 'Bare Metal Instance'},
+     'description': 'Bare Metal Instance',
+     'type': {'keyName': 'BARE_METAL_CORE'}, 'isActive': 1},
 ]
 getObject = getAllObjects[0]
 

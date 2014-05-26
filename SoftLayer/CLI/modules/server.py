@@ -30,14 +30,14 @@ from SoftLayer.CLI.helpers import (
     CLIRunnable, Table, KeyValueTable, FormattedItem, NestedDict, CLIAbort,
     blank, listing, gb, active_txn, no_going_back, resolve_id, confirm,
     ArgumentError, update_with_template_args, export_to_template)
-from SoftLayer import HardwareManager, SshKeyManager
+from SoftLayer import HardwareManager, SshKeyManager, OrderingManager
 
 
 class ListServers(CLIRunnable):
     """
 usage: sl server list [options]
 
-List hardware servers on the acount
+List hardware servers on the account
 
 Examples:
   sl server list --datacenter=dal05
@@ -63,7 +63,7 @@ For more on filters see 'sl help filters'
     action = 'list'
 
     def execute(self, args):
-        manager = HardwareManager(self.client)
+        manager = HardwareManager(self.client, OrderingManager(self.client))
 
         tags = None
         if args.get('--tags'):
@@ -119,7 +119,7 @@ Options:
     action = 'detail'
 
     def execute(self, args):
-        hardware = HardwareManager(self.client)
+        hardware = HardwareManager(self.client, OrderingManager(self.client))
 
         table = KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
@@ -207,7 +207,7 @@ Optional:
     options = ['confirm']
 
     def execute(self, args):
-        hardware = HardwareManager(self.client)
+        hardware = HardwareManager(self.client, OrderingManager(self.client))
         hardware_id = resolve_id(
             hardware.resolve_ids, args.get('<identifier>'), 'hardware')
         keys = []
@@ -238,7 +238,7 @@ Options:
     options = ['confirm']
 
     def execute(self, args):
-        mgr = HardwareManager(self.client)
+        mgr = HardwareManager(self.client, OrderingManager(self.client))
         hw_id = resolve_id(
             mgr.resolve_ids, args.get('<identifier>'), 'hardware')
 
@@ -269,7 +269,7 @@ Display a list of cancellation reasons
         table.align['Code'] = 'r'
         table.align['Reason'] = 'l'
 
-        mgr = HardwareManager(self.client)
+        mgr = HardwareManager(self.client, OrderingManager(self.client))
 
         for code, reason in mgr.get_cancellation_reasons().items():
             table.add_row([code, reason])
@@ -287,7 +287,7 @@ Power off an active server
     options = ['confirm']
 
     def execute(self, args):
-        mgr = HardwareManager(self.client)
+        mgr = HardwareManager(self.client, OrderingManager(self.client))
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
                            'hardware')
         if args['--really'] or confirm('This will power off the server with '
@@ -312,7 +312,7 @@ Optional:
 
     def execute(self, args):
         hardware_server = self.client['Hardware_Server']
-        mgr = HardwareManager(self.client)
+        mgr = HardwareManager(self.client, OrderingManager(self.client))
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
                            'hardware')
         if args['--really'] or confirm('This will power off the server with '
@@ -336,7 +336,7 @@ Power on a server
     action = 'power-on'
 
     def execute(self, args):
-        mgr = HardwareManager(self.client)
+        mgr = HardwareManager(self.client, OrderingManager(self.client))
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
                            'hardware')
         self.client['Hardware_Server'].powerOn(id=hw_id)
@@ -352,7 +352,7 @@ Issues power cycle to server via the power strip
     options = ['confirm']
 
     def execute(self, args):
-        mgr = HardwareManager(self.client)
+        mgr = HardwareManager(self.client, OrderingManager(self.client))
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
                            'hardware')
 
@@ -379,7 +379,7 @@ Options:
     def execute(self, args):
         public = args['public']
 
-        mgr = HardwareManager(self.client)
+        mgr = HardwareManager(self.client, OrderingManager(self.client))
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
                            'hardware')
 
@@ -399,7 +399,7 @@ Display a list of chassis available for ordering dedicated servers.
         table.align['Code'] = 'r'
         table.align['Chassis'] = 'l'
 
-        mgr = HardwareManager(self.client)
+        mgr = HardwareManager(self.client, OrderingManager(self.client))
         chassis = mgr.get_available_dedicated_server_packages()
 
         for chassis in chassis:
@@ -431,7 +431,7 @@ Options:
                'controller']
 
     def execute(self, args):
-        mgr = HardwareManager(self.client)
+        mgr = HardwareManager(self.client, OrderingManager(self.client))
 
         table = KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
@@ -785,7 +785,7 @@ Optional:
 
     def execute(self, args):
         update_with_template_args(args, list_args=['--disk', '--key'])
-        mgr = HardwareManager(self.client)
+        mgr = HardwareManager(self.client, OrderingManager(self.client))
         self._validate_args(args)
 
         ds_options = mgr.get_dedicated_server_create_options(args['--chassis'])
@@ -845,7 +845,7 @@ Optional:
         Helper method to centralize argument processing without convoluting
         code flow of the main execute method.
         """
-        mgr = HardwareManager(self.client)
+        mgr = HardwareManager(self.client, OrderingManager(self.client))
 
         order = {
             'hostname': args['--hostname'],
@@ -1038,7 +1038,7 @@ Options:
         data['hostname'] = args.get('--hostname')
         data['domain'] = args.get('--domain')
 
-        mgr = HardwareManager(self.client)
+        mgr = HardwareManager(self.client, OrderingManager(self.client))
         hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
                            'hardware')
         if not mgr.edit(hw_id, **data):
