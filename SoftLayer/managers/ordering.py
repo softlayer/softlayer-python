@@ -69,7 +69,6 @@ class OrderingManager(object):
 
         return non_outlet_packages
 
-
     @staticmethod
     def get_only_active_packages(packages):
         """ Return only active packages
