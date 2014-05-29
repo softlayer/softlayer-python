@@ -9,6 +9,7 @@
 # pylint: disable=C0103
 import socket
 from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
+from SoftLayer.managers.ordering import OrderingManager
 
 
 class HardwareManager(IdentifierMixin, object):
@@ -16,14 +17,20 @@ class HardwareManager(IdentifierMixin, object):
     Manages hardware devices.
 
     :param SoftLayer.API.Client client: an API client instance
+    :param SoftLayer.managers.OrderingManager ordering_manager: an optional
+                                              manager to handle ordering.
+                                              If none is provided, one will be
+                                              auto initialized.
     """
-
-    def __init__(self, client, ordering_manager):
+    def __init__(self, client, ordering_manager=None):
         self.client = client
         self.hardware = self.client['Hardware_Server']
         self.account = self.client['Account']
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
-        self.ordering_manager = ordering_manager
+        if ordering_manager is None:
+            self.ordering_manager = OrderingManager(client)
+        else:
+            self.ordering_manager = ordering_manager
 
     def cancel_hardware(self, hardware_id, reason='unneeded', comment=''):
         """ Cancels the specified dedicated server.

@@ -17,8 +17,7 @@ class HardwareTests(unittest.TestCase):
 
     def setUp(self):
         self.client = FixtureClient()
-        self.hardware = HardwareManager(self.client,
-                                        OrderingManager(self.client))
+        self.hardware = HardwareManager(self.client)
 
     def test_list_hardware(self):
         mcall = call(mask=ANY, filter={})
@@ -310,6 +309,11 @@ class HardwareTests(unittest.TestCase):
         f = self.client['Product_Package'].getAllObjects
         f.assert_has_calls([call(mask='id,name,description,type,isActive',
                                  filter=filter_mock)])
+
+    def test_get_server_packages_with_ordering_manager_provided(self):
+        self.hardware = HardwareManager(self.client,
+                                        OrderingManager(self.client))
+        self.test_get_available_dedicated_server_packages()
 
     def test_get_dedicated_server_options(self):
         package_id = 13
