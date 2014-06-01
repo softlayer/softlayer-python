@@ -9,6 +9,7 @@
 # pylint: disable=C0103
 import socket
 from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
+from SoftLayer.managers.ordering import OrderingManager
 
 
 class HardwareManager(IdentifierMixin, object):
@@ -16,13 +17,20 @@ class HardwareManager(IdentifierMixin, object):
     Manages hardware devices.
 
     :param SoftLayer.API.Client client: an API client instance
+    :param SoftLayer.managers.OrderingManager ordering_manager: an optional
+                                              manager to handle ordering.
+                                              If none is provided, one will be
+                                              auto initialized.
     """
-
-    def __init__(self, client):
+    def __init__(self, client, ordering_manager=None):
         self.client = client
         self.hardware = self.client['Hardware_Server']
         self.account = self.client['Account']
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
+        if ordering_manager is None:
+            self.ordering_manager = OrderingManager(client)
+        else:
+            self.ordering_manager = ordering_manager
 
     def cancel_hardware(self, hardware_id, reason='unneeded', comment=''):
         """ Cancels the specified dedicated server.
@@ -185,17 +193,11 @@ class HardwareManager(IdentifierMixin, object):
 
     def get_bare_metal_package_id(self):
         """ Return the bare metal package id """
-        packages = self.client['Product_Package'].getAllObjects(
-            mask='mask[id, name]',
-            filter={'name': query_filter('Bare Metal Instance')})
+        ordering_manager = self.ordering_manager
+        mask = "mask[id,name,description,type[keyName]]"
+        package = ordering_manager.get_package_by_type('BARE_METAL_CORE', mask)
 
-        hw_id = 0
-        for package in packages:
-            if 'Bare Metal Instance' == package['name']:
-                hw_id = package['id']
-                break
-
-        return hw_id
+        return package['id']
 
     def get_available_dedicated_server_packages(self):
         """ Retrieves a list of packages that are available for ordering
@@ -204,33 +206,26 @@ class HardwareManager(IdentifierMixin, object):
         :returns: A list of tuples of available dedicated server packages in
                   the form (id, name, description)
         """
+        available_packages = []
+        ordering_manager = self.ordering_manager
 
-        package_obj = self.client['Product_Package']
-        packages = []
+        mask = 'id,name,description,type,isActive'
+        package_types = ['BARE_METAL_CPU', 'BARE_METAL_CORE']
 
-        # Pull back only server packages
-        mask = 'id,name,description,type'
-        _filter = {
-            'type': {
-                'keyName': {
-                    'operation': 'in',
-                    'options': [
-                        {'name': 'data',
-                         'value': ['BARE_METAL_CPU', 'BARE_METAL_CORE']}
-                    ],
-                },
-            },
-        }
+        packages = ordering_manager.get_packages_of_type(package_types,
+                                                         mask)
+        # We only want packages that are active (we can place new orders for)
+        # and non-outlet.
+        # Outlet packages require specialized logic and we don't want to deal
+        # with them right now.
+        packages = ordering_manager.get_only_active_packages(packages)
+        packages = ordering_manager.filter_outlet_packages(packages)
 
-        for package in package_obj.getAllObjects(mask=mask, filter=_filter):
-            # Filter out packages without a name or that are designated as
-            # 'OUTLET.' The outlet packages are missing some necessary data
-            # and their orders will fail.
-            if package.get('name') and 'OUTLET' not in package['description']:
-                packages.append((package['id'], package['name'],
-                                 package['description']))
+        for package in packages:
+            available_packages.append((package['id'], package['name'],
+                                       package['description']))
 
-        return packages
+        return available_packages
 
     def get_dedicated_server_create_options(self, package_id):
         """ Retrieves the available options for creating a dedicated server in

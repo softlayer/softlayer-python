@@ -37,7 +37,7 @@ class ListServers(CLIRunnable):
     """
 usage: sl server list [options]
 
-List hardware servers on the acount
+List hardware servers on the account
 
 Examples:
   sl server list --datacenter=dal05

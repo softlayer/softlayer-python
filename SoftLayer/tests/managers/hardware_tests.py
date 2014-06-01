@@ -4,7 +4,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import HardwareManager
+from SoftLayer import HardwareManager, OrderingManager
 from SoftLayer.managers.hardware import get_default_value
 from SoftLayer.tests import unittest, FixtureClient
 from SoftLayer.tests.fixtures import (
@@ -94,7 +94,8 @@ class HardwareTests(unittest.TestCase):
 
     def test_get_bare_metal_create_options_returns_none_on_error(self):
         self.client['Product_Package'].getAllObjects.return_value = [
-            {'name': 'No Matching Instances', 'id': 0}]
+            {'name': 'No Matching Instances', 'id': 0,
+             'description': 'Nothing'}]
 
         self.assertIsNone(self.hardware.get_bare_metal_create_options())
 
@@ -306,8 +307,13 @@ class HardwareTests(unittest.TestCase):
             }
         }
         f = self.client['Product_Package'].getAllObjects
-        f.assert_has_calls([call(mask='id,name,description,type',
+        f.assert_has_calls([call(mask='id,name,description,type,isActive',
                                  filter=filter_mock)])
+
+    def test_get_server_packages_with_ordering_manager_provided(self):
+        self.hardware = HardwareManager(self.client,
+                                        OrderingManager(self.client))
+        self.test_get_available_dedicated_server_packages()
 
     def test_get_dedicated_server_options(self):
         package_id = 13
