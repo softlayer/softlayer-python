@@ -7,7 +7,7 @@
 import os
 
 import SoftLayer
-from SoftLayer.tests import unittest
+from SoftLayer.tests import TestCase, unittest
 
 
 def get_creds():
@@ -24,7 +24,7 @@ def get_creds():
     }
 
 
-class UnauthedUser(unittest.TestCase):
+class UnauthedUser(TestCase):
     def test_failed_auth(self):
         client = SoftLayer.Client(
             username='doesnotexist', api_key='issurelywrong', timeout=20)
@@ -45,7 +45,7 @@ class UnauthedUser(unittest.TestCase):
             self.fail('No Exception Raised')
 
 
-class AuthedUser(unittest.TestCase):
+class AuthedUser(TestCase):
     def test_service_does_not_exist(self):
         creds = get_creds()
         client = SoftLayer.Client(

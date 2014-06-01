@@ -8,13 +8,13 @@ from mock import patch, MagicMock, ANY
 
 from SoftLayer import SoftLayerAPIError, TransportError
 from SoftLayer.transports import make_rest_api_call, make_xml_rpc_api_call
-from SoftLayer.tests import unittest
+from SoftLayer.tests import TestCase
 from requests import HTTPError, RequestException
 
 
-class TestXmlRpcAPICall(unittest.TestCase):
+class TestXmlRpcAPICall(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.send_content = '''<?xml version="1.0" encoding="utf-8"?>
 <params>
 <param>
@@ -75,7 +75,7 @@ class TestXmlRpcAPICall(unittest.TestCase):
             timeout=None)
 
 
-class TestRestAPICall(unittest.TestCase):
+class TestRestAPICall(TestCase):
 
     @patch('SoftLayer.transports.requests.request')
     def test_json(self, request):

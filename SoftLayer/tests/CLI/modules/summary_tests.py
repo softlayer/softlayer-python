@@ -4,14 +4,14 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests import TestCase, FixtureClient
 from SoftLayer.CLI.modules import summary
 from SoftLayer.CLI.environment import Environment
 from SoftLayer.CLI.helpers import format_output
 
 
-class SummaryTests(unittest.TestCase):
-    def setUp(self):
+class SummaryTests(TestCase):
+    def set_up(self):
         self.client = FixtureClient()
 
     def test_summary(self):

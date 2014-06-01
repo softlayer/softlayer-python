@@ -7,7 +7,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests import TestCase, FixtureClient
 from mock import Mock, patch
 try:
     # Python 3.x compatibility
@@ -21,11 +21,11 @@ from SoftLayer.tests.fixtures import Hardware_Server
 from SoftLayer.CLI.modules import server
 
 
-class ServerCLITests(unittest.TestCase):
-    def setUp(self):
+class ServerCLITests(TestCase):
+    def set_up(self):
         self.client = FixtureClient()
 
-    def test_ServerCancelReasons(self):
+    def test_server_cancel_reasons(self):
         runnable = server.ServerCancelReasons(client=self.client)
         output = runnable.execute({})
 
@@ -54,7 +54,7 @@ class ServerCLITests(unittest.TestCase):
         f(expected, format_output(output, 'python'))
 
     @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
-    def test_ServerCreateOptions(self, packages):
+    def test_server_create_options(self, packages):
         args = {
             '<chassis_id>': '999',
             '--all': True,
@@ -101,7 +101,7 @@ class ServerCLITests(unittest.TestCase):
         self.assertEqual(expected, format_output(output, 'python'))
 
     @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
-    def test_ServerCreateOptions_with_cpu_only(self, packages):
+    def test_server_create_options_with_cpu_only(self, packages):
         args = {
             '<chassis_id>': '999',
             '--all': False,
@@ -135,7 +135,7 @@ class ServerCLITests(unittest.TestCase):
         self.assertEqual(expected, format_output(output, 'python'))
 
     @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
-    def test_ServerCreateOptions_with_invalid_chassis(self, packages):
+    def test_server_create_options_with_invalid_chassis(self, packages):
         args = {
             '<chassis_id>': '999',
             '--all': True,
@@ -159,7 +159,7 @@ class ServerCLITests(unittest.TestCase):
 
     @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
     @patch('SoftLayer.HardwareManager.get_bare_metal_package_id')
-    def test_ServerCreateOptions_for_bmc(self, bmpi, packages):
+    def test_server_create_options_for_bmc(self, bmpi, packages):
         args = {
             '<chassis_id>': '1099',
             '--all': True,
@@ -246,7 +246,7 @@ class ServerCLITests(unittest.TestCase):
         self.assertFalse(self.client['Hardware_Server']
                          .getReverseDomainRecords.called)
 
-    def test_ListServers(self):
+    def test_list_servers(self):
         runnable = server.ListServers(client=self.client)
 
         output = runnable.execute({'--tags': 'openstack'})
@@ -290,7 +290,7 @@ class ServerCLITests(unittest.TestCase):
     @patch('SoftLayer.CLI.modules.server.no_going_back')
     @patch('SoftLayer.HardwareManager.reload')
     @patch('SoftLayer.CLI.modules.server.resolve_id')
-    def test_ServerReload(
+    def test_server_reload(
             self, resolve_mock, reload_mock, ngb_mock, abort_mock):
         hw_id = 12345
         resolve_mock.return_value = hw_id
@@ -313,7 +313,7 @@ class ServerCLITests(unittest.TestCase):
     @patch('SoftLayer.CLI.modules.server.no_going_back')
     @patch('SoftLayer.HardwareManager.cancel_hardware')
     @patch('SoftLayer.CLI.modules.server.resolve_id')
-    def test_CancelServer(
+    def test_cancel_server(
             self, resolve_mock, cancel_mock, ngb_mock, abort_mock):
         hw_id = 12345
         resolve_mock.return_value = hw_id
@@ -339,7 +339,7 @@ class ServerCLITests(unittest.TestCase):
         env_mock.assert_called()
 
     @patch('SoftLayer.CLI.modules.server.confirm')
-    def test_ServerPowerOff(self, confirm_mock):
+    def test_server_power_off(self, confirm_mock):
         hw_id = 12345
         runnable = server.ServerPowerOff(client=self.client)
 
@@ -356,7 +356,7 @@ class ServerCLITests(unittest.TestCase):
         self.assertRaises(CLIAbort, runnable.execute, args)
 
     @patch('SoftLayer.CLI.modules.server.confirm')
-    def test_ServerReboot(self, confirm_mock):
+    def test_server_reboot(self, confirm_mock):
         hw_id = 12345
         runnable = server.ServerReboot(client=self.client)
 
@@ -387,7 +387,7 @@ class ServerCLITests(unittest.TestCase):
         args['--really'] = False
         self.assertRaises(CLIAbort, runnable.execute, args)
 
-    def test_ServerPowerOn(self):
+    def test_server_power_on(self):
         hw_id = 12345
         runnable = server.ServerPowerOn(client=self.client)
 
@@ -400,7 +400,7 @@ class ServerCLITests(unittest.TestCase):
         self.client['Hardware_Server'].powerOn.assert_called_with(id=hw_id)
 
     @patch('SoftLayer.CLI.modules.server.confirm')
-    def test_ServerPowerCycle(self, confirm_mock):
+    def test_server_power_cycle(self, confirm_mock):
         hw_id = 12345
         runnable = server.ServerPowerCycle(client=self.client)
 
@@ -420,7 +420,7 @@ class ServerCLITests(unittest.TestCase):
 
     @patch('SoftLayer.HardwareManager.change_port_speed')
     @patch('SoftLayer.CLI.modules.server.resolve_id')
-    def test_NicEditServer(self, resolve_mock, port_mock):
+    def test_cic_edit_server(self, resolve_mock, port_mock):
         hw_id = 12345
         resolve_mock.return_value = hw_id
 
@@ -443,7 +443,7 @@ class ServerCLITests(unittest.TestCase):
         runnable.execute(args)
 
     @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
-    def test_ListChassisServer(self, packages):
+    def test_list_chassis_server(self, packages):
         test_data = [
             (1, 'Chassis 1'),
             (2, 'Chassis 2')
@@ -460,7 +460,7 @@ class ServerCLITests(unittest.TestCase):
 
         self.assertEqual(expected, format_output(output, 'python'))
 
-    def test_CreateServer(self):
+    def test_create_server(self):
         args = {
             '--chassis': 999,
             '--hostname': 'test',
@@ -549,7 +549,7 @@ class ServerCLITests(unittest.TestCase):
 
             self.assertRaises(CLIAbort, runnable.execute, args)
 
-    def test_CreateServer_failures(self):
+    def test_create_server_failures(self):
 
         # This is missing a required argument
         args = {
@@ -586,7 +586,7 @@ class ServerCLITests(unittest.TestCase):
         self.assertRaises(CLIAbort, runnable.execute, args)
 
     @patch('SoftLayer.CLI.modules.server.export_to_template')
-    def test_CreateServer_with_export(self, export_to_template):
+    def test_create_server_with_export(self, export_to_template):
         args = {
             '--chassis': 999,
             '--hostname': 'test',
@@ -616,7 +616,7 @@ class ServerCLITests(unittest.TestCase):
 
     @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
     @patch('SoftLayer.HardwareManager.get_bare_metal_package_id')
-    def test_CreateServer_for_bmc(self, bmpi, packages):
+    def test_create_server_for_bmc(self, bmpi, packages):
         args = {
             '--chassis': '1099',
             '--hostname': 'test',
@@ -712,7 +712,7 @@ class ServerCLITests(unittest.TestCase):
 
             self.assertRaises(CLIAbort, runnable.execute, args)
 
-    def test_EditServer(self):
+    def test_edit_server(self):
         # Test both userdata and userfile at once
         args = {
             '<identifier>': 1000,

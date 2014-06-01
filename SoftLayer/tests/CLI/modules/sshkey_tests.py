@@ -8,14 +8,14 @@ import os.path
 from mock import patch
 import tempfile
 
-from SoftLayer.tests import unittest, FixtureClient, FIXTURE_PATH
+from SoftLayer.tests import TestCase, FixtureClient, FIXTURE_PATH
 from SoftLayer.CLI.helpers import format_output
 from SoftLayer.CLI.modules import sshkey
 from SoftLayer.CLI.exceptions import CLIAbort
 
 
-class SshKeyTests(unittest.TestCase):
-    def setUp(self):
+class SshKeyTests(TestCase):
+    def set_up(self):
         self.client = FixtureClient()
 
     def test_add_by_option(self):

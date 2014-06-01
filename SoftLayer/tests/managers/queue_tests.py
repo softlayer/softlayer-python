@@ -6,7 +6,7 @@
 """
 from SoftLayer import MessagingManager, Unauthenticated, SoftLayerError
 from SoftLayer.consts import USER_AGENT
-from SoftLayer.tests import unittest
+from SoftLayer.tests import TestCase
 import SoftLayer.managers.messaging
 
 from mock import MagicMock, patch, ANY
@@ -52,8 +52,8 @@ def mocked_auth_call(self):
     self.auth_token = 'NEW_AUTH_TOKEN'
 
 
-class QueueAuthTests(unittest.TestCase):
-    def setUp(self):
+class QueueAuthTests(TestCase):
+    def set_up(self):
         self.auth = SoftLayer.managers.messaging.QueueAuth(
             'endpoint', 'username', 'api_key', auth_token='auth_token')
 
@@ -119,9 +119,9 @@ class QueueAuthTests(unittest.TestCase):
         self.assertEqual(request.headers, {'X-Auth-Token': 'NEW_AUTH_TOKEN'})
 
 
-class MessagingManagerTests(unittest.TestCase):
+class MessagingManagerTests(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.client = MagicMock()
         self.manager = MessagingManager(self.client)
 
@@ -200,9 +200,9 @@ class MessagingManagerTests(unittest.TestCase):
         self.assertTrue(result)
 
 
-class MessagingConnectionTests(unittest.TestCase):
+class MessagingConnectionTests(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.conn = SoftLayer.managers.messaging.MessagingConnection(
             'acount_id', endpoint='endpoint')
         self.auth = MagicMock()

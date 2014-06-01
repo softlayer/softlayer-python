@@ -5,7 +5,7 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import FirewallManager
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests import TestCase, FixtureClient
 from SoftLayer.tests.fixtures import (Network_Component_Firewall,
                                       Network_Vlan_Firewall, Billing_Item)
 from mock import ANY
@@ -16,9 +16,9 @@ MASK = ('mask[orderValue,action,destinationIpAddress,destinationIpSubnetMask,'
         'sourceIpAddress,sourceIpSubnetMask,version]')
 
 
-class FirewallTests(unittest.TestCase):
+class FirewallTests(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.client = FixtureClient()
         self.firewall = FirewallManager(self.client)
 
@@ -120,8 +120,8 @@ class FirewallTests(unittest.TestCase):
         f.assert_called_once_with(id=billing_item_id)
         self.assertEqual(result, Billing_Item.cancelService)
         call = self.client['Network_Component_Firewall'].getObject
-        MASK = ('mask[id,billingItem[id]]')
-        call.assert_called_once_with(id=6327, mask=MASK)
+        mask = ('mask[id,billingItem[id]]')
+        call.assert_called_once_with(id=6327, mask=mask)
         # test dedicated firewalls
         billing_item_id = 21370815
         result = self.firewall.cancel_firewall(fwl_id, dedicated=True)
@@ -129,8 +129,8 @@ class FirewallTests(unittest.TestCase):
         f.assert_called_twice_with(id=billing_item_id)
         self.assertEqual(result, Billing_Item.cancelService)
         call = self.client['Network_Vlan_Firewall'].getObject
-        MASK = ('mask[id,billingItem[id]]')
-        call.assert_called_once_with(id=6327, mask=MASK)
+        mask = ('mask[id,billingItem[id]]')
+        call.assert_called_once_with(id=6327, mask=mask)
 
     def test_add_standard_firewall_cci(self):
         # test standard firewalls for CCI
@@ -228,9 +228,9 @@ class FirewallTests(unittest.TestCase):
         fwl_id = 1234
         self.firewall.edit_standard_fwl_rules(firewall_id=fwl_id,
                                               rules=rules)
-        tempObject = {
+        temp_object = {
             "networkComponentFirewallId": fwl_id,
             "rules": rules}
         f = self.client['Network_Firewall_Update_Request'].createObject
 
-        f.assert_called_once_with(tempObject)
+        f.assert_called_once_with(temp_object)

@@ -5,15 +5,15 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import DNSManager
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests import TestCase, FixtureClient
 from SoftLayer.tests.fixtures import Dns_Domain, Account
 
 from mock import ANY
 
 
-class DNSTests(unittest.TestCase):
+class DNSTests(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.client = FixtureClient()
         self.dns_client = DNSManager(self.client)
 

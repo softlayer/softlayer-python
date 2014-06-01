@@ -5,15 +5,15 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import NetworkManager
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests import TestCase, FixtureClient
 from SoftLayer.tests.fixtures import Product_Order
 
 from mock import ANY, call
 
 
-class NetworkTests(unittest.TestCase):
+class NetworkTests(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.client = FixtureClient()
         self.network = NetworkManager(self.client)
 

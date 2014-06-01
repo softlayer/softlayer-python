@@ -9,7 +9,7 @@ import os
 import json
 
 import SoftLayer.CLI as cli
-from SoftLayer.tests import FIXTURE_PATH, unittest
+from SoftLayer.tests import FIXTURE_PATH, TestCase
 from mock import patch, mock_open, call
 
 if sys.version_info >= (3,):
@@ -18,7 +18,7 @@ else:
     open_path = '__builtin__.open'
 
 
-class CLIJSONEncoderTest(unittest.TestCase):
+class CLIJSONEncoderTest(TestCase):
     def test_default(self):
         out = json.dumps({
             'formattedItem': cli.helpers.FormattedItem('normal', 'formatted')
@@ -35,7 +35,7 @@ class CLIJSONEncoderTest(unittest.TestCase):
             json.dumps, {'test': object()}, cls=cli.formatting.CLIJSONEncoder)
 
 
-class PromptTests(unittest.TestCase):
+class PromptTests(TestCase):
 
     @patch('SoftLayer.CLI.formatting.console_input')
     def test_invalid_response(self, raw_input_mock):
@@ -104,7 +104,7 @@ class PromptTests(unittest.TestCase):
         self.assertTrue(res)
 
 
-class FormattedItemTests(unittest.TestCase):
+class FormattedItemTests(TestCase):
 
     def test_init(self):
         item = cli.FormattedItem('test', 'test_formatted')
@@ -152,7 +152,7 @@ class FormattedItemTests(unittest.TestCase):
         self.assertEqual('NULL', str(item))
 
 
-class FormattedListTests(unittest.TestCase):
+class FormattedListTests(TestCase):
     def test_init(self):
         l = cli.listing([1, 'two'], separator=':')
         self.assertEqual([1, 'two'], list(l))
@@ -180,7 +180,7 @@ class FormattedListTests(unittest.TestCase):
         self.assertEqual('1:two', result)
 
 
-class FormattedTxnTests(unittest.TestCase):
+class FormattedTxnTests(TestCase):
     def test_active_txn_empty(self):
         self.assertRaises(KeyError, cli.active_txn, {})
 
@@ -229,7 +229,7 @@ class FormattedTxnTests(unittest.TestCase):
         self.assertEqual(result.original, b.original)
 
 
-class CLIAbortTests(unittest.TestCase):
+class CLIAbortTests(TestCase):
 
     def test_init(self):
         e = cli.helpers.CLIAbort("something")
@@ -238,7 +238,7 @@ class CLIAbortTests(unittest.TestCase):
         self.assertIsInstance(e, cli.helpers.CLIHalt)
 
 
-class ResolveIdTests(unittest.TestCase):
+class ResolveIdTests(TestCase):
 
     def test_resolve_id_one(self):
         resolver = lambda r: [12345]
@@ -257,7 +257,7 @@ class ResolveIdTests(unittest.TestCase):
             cli.helpers.CLIAbort, cli.helpers.resolve_id, resolver, 'test')
 
 
-class TestFormatOutput(unittest.TestCase):
+class TestFormatOutput(TestCase):
 
     def test_format_output_string(self):
         t = cli.helpers.format_output('just a string', 'raw')
@@ -356,7 +356,7 @@ class TestFormatOutput(unittest.TestCase):
         self.assertEqual({'nothing': None}, ret)
 
 
-class TestTemplateArgs(unittest.TestCase):
+class TestTemplateArgs(TestCase):
 
     def test_no_template_option(self):
         args = {'key': 'value'}
@@ -395,7 +395,7 @@ class TestTemplateArgs(unittest.TestCase):
         })
 
 
-class TestExportToTemplate(unittest.TestCase):
+class TestExportToTemplate(TestCase):
     def test_export_to_template(self):
         with patch(open_path, mock_open(), create=True) as open_:
             cli.helpers.export_to_template('filename', {

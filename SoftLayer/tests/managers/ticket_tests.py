@@ -5,14 +5,14 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import TicketManager
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests import TestCase, FixtureClient
 from SoftLayer.tests.fixtures import Ticket
 from mock import ANY, call
 
 
-class TicketTests(unittest.TestCase):
+class TicketTests(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.client = FixtureClient()
         self.ticket = TicketManager(self.client)
 

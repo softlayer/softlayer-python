@@ -4,12 +4,12 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.tests import unittest
+from SoftLayer.tests import TestCase
 from SoftLayer.CLI.modules import help
 from SoftLayer.CLI.environment import Environment
 
 
-class HelpTests(unittest.TestCase):
+class HelpTests(TestCase):
     def test_help(self):
         command = help.Show(env=Environment())
 

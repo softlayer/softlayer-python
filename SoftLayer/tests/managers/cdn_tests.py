@@ -6,15 +6,15 @@
 """
 from SoftLayer.managers.cdn import (CDNManager, MAX_URLS_PER_LOAD,
                                     MAX_URLS_PER_PURGE)
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests import TestCase, FixtureClient
 from SoftLayer.tests.fixtures import Account
 from mock import call
 from math import ceil
 
 
-class CDNTests(unittest.TestCase):
+class CDNTests(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.client = FixtureClient()
         self.cdn_client = CDNManager(self.client)
 

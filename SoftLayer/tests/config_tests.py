@@ -9,10 +9,10 @@ from mock import patch, Mock, ANY
 from SoftLayer.config import (
     get_client_settings_args, get_client_settings_env,
     get_client_settings_config_file, get_client_settings)
-from SoftLayer.tests import unittest
+from SoftLayer.tests import TestCase
 
 
-class TestGetClientSettings(unittest.TestCase):
+class TestGetClientSettings(TestCase):
 
     @patch('SoftLayer.config.SETTING_RESOLVERS', [])
     def test_no_resolvers(self):
@@ -40,7 +40,7 @@ class TestGetClientSettings(unittest.TestCase):
             self.assertEqual(result, {'auth': 'AUTH HANDLER', 'timeout': 20})
 
 
-class TestGetClientSettingsArgs(unittest.TestCase):
+class TestGetClientSettingsArgs(TestCase):
 
     def test_username_api_key(self):
         result = get_client_settings_args(username='username',
@@ -74,7 +74,7 @@ class TestGetClientSettingsArgs(unittest.TestCase):
         self.assertEqual(result['auth'], auth)
 
 
-class TestGetClientSettingsEnv(unittest.TestCase):
+class TestGetClientSettingsEnv(TestCase):
 
     @patch.dict('os.environ', {'SL_USERNAME': 'username',
                                'SL_API_KEY': 'api_key',
@@ -93,7 +93,7 @@ class TestGetClientSettingsEnv(unittest.TestCase):
         self.assertEqual(result, {'proxy': ANY})
 
 
-class TestGetClientSettingsConfigFile(unittest.TestCase):
+class TestGetClientSettingsConfigFile(TestCase):
 
     @patch('six.moves.configparser.RawConfigParser')
     def test_username_api_key(self, config_parser):

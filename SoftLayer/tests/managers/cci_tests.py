@@ -5,17 +5,17 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import CCIManager
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests import TestCase, FixtureClient
 
 from mock import ANY, call
 
 
-class CCITests(unittest.TestCase):
+class CCITests(TestCase):
     """
     Small class to verify the rename of CCIManager to VSManager didn't
     break any existing code.
     """
-    def setUp(self):
+    def set_up(self):
         self.client = FixtureClient()
         self.cci = CCIManager(self.client)
 
