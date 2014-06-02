@@ -5,12 +5,12 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import OrderingManager
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.tests import TestCase, FixtureClient
 
 
-class OrderingTests(unittest.TestCase):
+class OrderingTests(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.client = FixtureClient()
         self.ordering = OrderingManager(self.client)
 
