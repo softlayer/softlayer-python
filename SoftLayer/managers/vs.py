@@ -11,15 +11,28 @@ import datetime
 from itertools import repeat
 
 from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin, lookup
+from SoftLayer.managers.ordering import OrderingManager
 
 
 class VSManager(IdentifierMixin, object):
-    """ Manage Virtual Servers """
-    def __init__(self, client):
+    """
+    Manages Virtual Servers
+
+    :param SoftLayer.API.Client client: an API client instance
+    :param SoftLayer.managers.OrderingManager ordering_manager: an optional
+                                              manager to handle ordering.
+                                              If none is provided, one will be
+                                              auto initialized.
+    """
+    def __init__(self, client, ordering_manager=None):
         self.client = client
         self.account = client['Account']
         self.guest = client['Virtual_Guest']
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
+        if ordering_manager is None:
+            self.ordering_manager = OrderingManager(client)
+        else:
+            self.ordering_manager = ordering_manager
 
     def list_instances(self, hourly=True, monthly=True, tags=None, cpus=None,
                        memory=None, hostname=None, domain=None,
@@ -586,8 +599,10 @@ class VSManager(IdentifierMixin, object):
         Following Method gets all the item ids related to VS
         """
         mask = "mask[description,capacity,prices.id,categories[name,id]]"
-        package = self.client['Product_Package']
-        return package.getItems(id=46, mask=mask)
+        package_type = "VIRTUAL_SERVER_INSTANCE"
+        package_id = self.ordering_manager.get_package_id_by_type(package_type)
+        return self.ordering_manager\
+                   .get_package_service().getItems(id=package_id, mask=mask)
 
     def _get_item_id_for_upgrade(self, package_items, option, value,
                                  public=True):
