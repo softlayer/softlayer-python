@@ -589,7 +589,6 @@ class VSManager(IdentifierMixin, object):
         order['properties'] = [{'name': 'MAINTENANCE_WINDOW',
                                 'value': str(datetime.datetime.now())}]
         if cpus or memory or nic_speed:
-            self.client['Product_Order'].verifyOrder(order)
             self.client['Product_Order'].placeOrder(order)
             return True
         return False
