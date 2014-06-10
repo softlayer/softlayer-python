@@ -92,9 +92,27 @@ class OrderingManager(object):
         Syntactic sugar to retrieve a single package of a given type.
         If multiple packages share the given type, this will return the first
         one returned by the API.
+        If no packages are found, returns None
 
         :param package_type string representing the package type key name
                             we are interested in
         """
         packages = self.get_packages_of_type([package_type], mask)
-        return packages.pop()
+        if len(packages) == 0:
+            return None
+        else:
+            return packages.pop()
+
+    def get_package_id_by_type(self, package_type):
+        """ Return the package ID of a Product Package with a given type.
+
+        :param package_type string representing the package type key name
+                            we are interested in
+        :raises ValueError when no package of the given type is found
+        """
+        mask = "mask[id, name, description, isActive, type[keyName]]"
+        package = self.get_package_by_type(package_type, mask)
+        if package:
+            return package['id']
+        else:
+            raise ValueError("No package found for type: " + package_type)

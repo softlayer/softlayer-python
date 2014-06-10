@@ -66,7 +66,6 @@ class ISCSIManager(IdentifierMixin, object):
         item_price = self._find_item_prices(int(size),
                                             categorycode='iscsi')
         iscsi_order = self._build_order(item_price, location)
-        self.product_order.verifyOrder(iscsi_order)
         self.product_order.placeOrder(iscsi_order)
 
     def list_iscsi(self):
@@ -147,7 +146,6 @@ Network_Storage_Iscsi_SnapshotSpace',
             'prices': [{'id': item_price}],
             'quantity': 1,
             'volumeId': volume_id}
-        self.product_order.verifyOrder(snapshotspaceorder)
         self.product_order.placeOrder(snapshotspaceorder)
 
     def delete_snapshot(self, snapshot_id):

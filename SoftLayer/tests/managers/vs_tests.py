@@ -4,7 +4,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import VSManager
+from SoftLayer import VSManager, OrderingManager
 from SoftLayer.tests import TestCase, FixtureClient
 from SoftLayer.tests.fixtures import Virtual_Guest
 
@@ -15,7 +15,7 @@ class VSTests(TestCase):
 
     def set_up(self):
         self.client = FixtureClient()
-        self.vs = VSManager(self.client)
+        self.vs = VSManager(self.client, OrderingManager(self.client))
 
     def test_list_instances(self):
         mcall = call(mask=ANY, filter={})
@@ -535,6 +535,12 @@ class VSTests(TestCase):
     def test_upgrade(self):
         # Testing  Upgrade
         order_client = self.client['Product_Order']
+
+        self.client['Product_Package'].getAllObjects.return_value = [
+            {'id': 46, 'name': 'Virtual Servers',
+             'description': 'Virtual Server Instances',
+             'type': {'keyName': 'VIRTUAL_SERVER_INSTANCE'}, 'isActive': 1},
+        ]
 
         # test single upgrade
         self.vs.upgrade(1, cpus=4, public=False)
