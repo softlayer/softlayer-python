@@ -600,8 +600,9 @@ class VSManager(IdentifierMixin, object):
         mask = "mask[description,capacity,prices.id,categories[name,id]]"
         package_type = "VIRTUAL_SERVER_INSTANCE"
         package_id = self.ordering_manager.get_package_id_by_type(package_type)
-        return self.ordering_manager\
-                   .get_package_service().getItems(id=package_id, mask=mask)
+        package_service = self.ordering_manager.get_package_service()
+
+        return package_service.getItems(id=package_id, mask=mask)
 
     def _get_item_id_for_upgrade(self, package_items, option, value,
                                  public=True):
