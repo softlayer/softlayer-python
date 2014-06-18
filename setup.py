@@ -16,7 +16,7 @@ if sys.version_info <= (2, 6):
 extra = {}
 
 requires = [
-    'six >= 1.1.0',
+    'six >= 1.7.0',
     'prettytable >= 0.7.0',
     'docopt == 0.6.1',
     'requests',
