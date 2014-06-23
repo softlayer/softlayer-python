@@ -1,0 +1,150 @@
+/* =========================
+   Base
+   ========================= */
+
+// Body
+// -------------------------
+
+body {
+  .transition-duration(.5s);
+  background-color: @body-bg;
+  color: @text-color;
+  font-weight: @font-weight-normal;
+  font-family: @font-family-sans;
+  font-size: @font-size-normal;
+  line-height: @line-height-normal;
+  position: relative;
+  left: 0;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+// Links
+// -------------------------
+
+a {
+  .transition-duration(.5s);
+  color: @link-color;
+  &:hover,
+  &:focus {
+    color: @link-hover-color;
+  }
+}
+
+// Paragraph
+// -------------------------
+
+p {
+  margin: 0 0 @base-variable-normal;
+}
+
+// Lists
+// -------------------------
+
+ul,
+ol {
+  margin-top: 0;
+  margin-bottom: @base-variable-large;
+
+  ul,
+  ol {
+    margin-bottom: 0;
+  }
+
+  li > p {
+    margin-bottom: 0;
+  }
+}
+
+dl {
+  margin-bottom: @base-variable-normal;
+}
+
+dt {
+  font-weight: @font-weight-bold;
+  font-size: 15.5px;
+}
+
+dd {
+  margin-left: 0;
+}
+
+dt,
+dd {
+  line-height: @line-height-normal;
+}
+
+// Text decoration
+// -------------------------
+
+u {
+  .underline-text();
+  text-decoration: none;
+}
+
+// Horizontal rule
+// -------------------------
+
+hr {
+  margin: (@base-variable * 2) auto;
+  width: (@base-variable * 5);
+  border-top: 1px solid @hr-color;
+
+  &.full-screen {
+    width: initial;
+    margin: @base-variable-large 0;
+  }
+}
+
+// Display components
+// -------------------------
+
+.hidden {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+// Positioning
+// -------------------------
+
+.clearfix {
+  .clearfix();
+}
+
+.pull-right {
+  float: right !important;
+}
+
+.pull-left {
+  float: left !important;
+}
+
+// Text alignment
+// -------------------------
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-center{
+  text-align: center;
+}
+
+// Spacing
+// -------------------------
+
+.whitespace {
+  padding-top: (@base-variable * 5.5);
+  padding-bottom: (@base-variable * 3);
+}
+
+@media (min-width: @view-sm) {
+  .whitespace {
+    padding-top: (@base-variable * 7);
+    padding-bottom: (@base-variable * 4);
+  }
+}

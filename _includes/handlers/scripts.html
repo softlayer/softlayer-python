@@ -1,0 +1,16 @@
+<!-- JavaScript -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.2/modernizr.min.js"></script>
+<script src="{{page.baseurl}}public/js/main.js"></script>
+
+{% if page.header != null %}
+<script> // Indexing
+  $(document).ready(function() {
+    $(".indexing").indexing();
+  });
+</script>
+
+{% else %}
+<script src="{{page.baseurl}}public/js/profile.js"></script>
+
+{% endif %}

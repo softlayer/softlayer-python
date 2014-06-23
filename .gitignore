@@ -1,13 +1,19 @@
+# Folders
+_site/
+node_modules/
+
+# Files
 .DS_Store
-*.swp
+Desktop.ini
 Thumbs.db
-.svn
-._*
-*.pyc
-.coverage
-cover/*
-.tox
-docs/_build/*
-build/*
-dist/*
-*.egg-info
+Gemfile.lock
+validation-*.json
+
+# File extensions
+.config
+*~
+*.bak
+*.cache
+*.diff
+*.err
+*.log

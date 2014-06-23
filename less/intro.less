@@ -1,0 +1,88 @@
+/* =========================
+   Intro
+   ========================= */
+
+// Pages
+// -------------------------
+
+.page-header {
+  .optimize-text();
+  margin: 0;
+  padding-bottom: 2px;
+  color: @page-header-color;
+  font-weight: @font-weight-bold;
+  font-size: 39px;
+}
+
+.page-intro {
+  .optimize-text();
+  margin: 0;
+  color: @page-intro-color;
+  font-weight: @font-weight-light;
+  font-size: 28px;
+}
+
+@media (min-width: @view-sm) {
+  .page-header {
+    font-size: 45px;
+  }
+
+  .page-intro {
+    font-size: 30px;
+  }
+}
+
+// Featured
+// -------------------------
+
+.featured-header,
+.featured-subheader {
+  .optimize-text();
+  font-size: 27px;
+  font-weight: @font-weight-light;
+  line-height: @line-height-small;
+  font-family: @font-family-humanist-sans;
+  margin: 0;
+  letter-spacing: @letter-spacing-large;
+}
+
+.featured-header {
+  color: @featured-header-color;
+  padding-top: 76px;
+  padding-bottom: 4px;
+}
+
+.featured-subheader {
+  color: @featured-subheader-color;
+  padding-bottom: 20px;
+}
+
+.featured-intro {
+  .optimize-text();
+  color: @featured-intro-color;
+  font-size: 17px;
+  line-height: @line-height-large;
+  margin: 0;
+  font-weight: @font-weight-light;
+  font-family: @font-family-sans;
+  letter-spacing: 0;
+  padding-bottom: 56px;
+}
+
+@media (min-width: @view-sm) {
+  .featured-header,
+  .featured-subheader {
+    font-size: 37.5px;
+    line-height: @line-height-xsmall;
+  }
+
+  .featured-header {
+    padding-bottom: 0;
+  }
+
+  .featured-intro {
+    font-size: 20px;
+    padding-left: 66px;
+    padding-right: 66px;
+  }
+}

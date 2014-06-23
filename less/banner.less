@@ -1,0 +1,61 @@
+/* =========================
+   Banner
+   ========================= */
+
+.banner {
+  background-color: @banner-bg;
+  height: auto;
+  text-align: center;
+  width: 100%;
+
+  h3 {
+    margin: 0;
+    color: @banner-color !important;
+    padding: 24px 0 6px;
+    font-size: 24px;
+    font-family: @font-family-humanist-sans;
+    font-weight: @font-weight-light !important;
+    letter-spacing: @letter-spacing-large;
+  }
+
+  p {
+    color: @banner-paragraph;
+    font-weight: @font-weight-light !important;
+    font-size: 17px;
+  }
+}
+
+.banner-wrapper {
+  padding-top: 48px;
+  padding-bottom: 0;
+  &:last-child {
+    padding-bottom: 56px;
+  }
+}
+
+i#banner-icon-large {
+  .transition(color .5s);
+  font-size: 143px;
+  color: @banner-icon-large;
+
+  &:hover,
+  &:focus {
+    color: @banner-icon-hover;
+  }
+}
+
+i#banner-icon-small {
+  font-size: 15px;
+  color: @banner-icon-small;
+}
+
+@media (min-width: @view-sm) {
+  .banner h3 {
+    font-size: 27px;
+    padding-bottom: 12px;
+  }
+
+  #banner-wrapper {
+    padding-bottom: 56px;
+  }
+}

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% include top.html %}
+</head>
+
+<body>
+  {% include nav.html %}
+
+    {{ content }}
+
+<a href="#" id="top"> <!-- Controls reside in scrollability.js -->
+  <i class="fa fa-chevron-up"></i>
+</a>
+  {% include footer.html %}
+  {% include handlers/scripts.html %}
+  {% include handlers/analytics.html %}
+</body>
+</html>

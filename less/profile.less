@@ -1,0 +1,128 @@
+/* =========================
+   Profile
+   ========================= */
+
+.profile {
+  display: none;
+}
+
+@media (min-width: @view-sm) {
+  .profile {
+    .center-block();
+    text-align: center;
+    background-color: @white;
+    padding: 0 0 56px;
+  }
+}
+
+ol#repos {
+  margin: 0;
+  padding: 0;
+}
+
+.org .name {
+  width: 225px;
+  display: inline;
+  float: left;
+  position: relative;
+  margin: 15px 5px;
+  border-bottom-width: 2px;
+}
+
+.repo {
+  font-family: @font-family-sans;
+  border-radius: @border-radius-large;
+  border: 1px solid @profile-repo-border;
+  background: @profile-repo-bg;
+  height: 275px;
+
+  > a {
+    display:block;
+    width: 100%;
+    height: 100%;
+    color: inherit;
+    border-bottom: 0;
+  }
+
+  h2,
+  h4,
+  h5,
+  h6,
+  p {
+    font-family: inherit;
+  }
+
+  h4,
+  h5,
+  h6 {
+    color: @profile-repo-footer-color;
+    position: absolute;
+    margin: 0;
+    bottom: 0;
+    width: 100%;
+    font-weight: @font-weight-normal;
+    font-size: @font-size-xsmall;
+  }
+
+  h2,
+  h4,
+  p {
+    text-align: left;
+  }
+
+  h5,
+  h6 {
+    text-align: right;
+  }
+
+  h2 {
+    color: @profile-repo-header-color;
+    font-size: 22px;
+    line-height: @line-height-xsmall;
+    font-weight: @font-weight-light;
+    border-bottom: 1px solid @profile-repo-border;
+    padding: 12px 15px;
+    margin-top: 0;
+    letter-spacing: 0;
+  }
+
+  h4 {
+    padding: 15px 25px 25px 15px;
+    background-color: @profile-repo-footer-bg;
+    letter-spacing: 0;
+  }
+
+  h5 {
+    padding: 15px 45px 22px 0;
+    &:before {
+      padding-right: 4px;
+      content: "\f005";
+      font-family: FontAwesome;
+    }
+  }
+
+  h6 {
+    padding: 15px 15px 22px 0;
+    &:before {
+      padding-right: 2px;
+      content: "\f126";
+      font-family: FontAwesome;
+    }
+  }
+
+  p {
+    color: @profile-repo-color;
+    font-size: @font-size-medium;
+    margin: 12px 12px 20px 15px;
+  }
+}
+
+.repo.name.c {
+  font-style: normal;
+}
+
+@media (min-width: @view-lg) {
+  ol#repos {
+    padding: 0 100px;
+  }
+}

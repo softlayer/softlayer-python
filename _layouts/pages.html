@@ -1,0 +1,25 @@
+---
+layout: default
+---
+
+{% include social.html %}
+
+<div class="container whitespace">
+<div class="row">
+<div class="col-lg-8 col-lg-offset-1 col-md-8">
+<header>
+  <h1 class="page-header">{{page.header}}</h1>
+  <h2 class="page-intro">{{page.intro}}</h2>
+</header>
+
+  {{content}}
+
+</div>
+<div class="col-lg-2 col-lg-offset-1 col-md-2 col-lg-offset-2">
+<div class="subnav" id="subnav-element"> <!-- Controls reside in toggle.js -->
+  <ul class="indexing"> <!-- Results originate from indexing.js -->
+  </ul>
+</div>
+</div>
+</div>
+</div>

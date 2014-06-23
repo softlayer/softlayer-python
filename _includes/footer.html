@@ -1,0 +1,28 @@
+{% if page.header != null %}
+<footer class="footer">
+<div class="container">
+<div class="row">
+<div class="col-lg-11 col-lg-offset-1 col-md-12">
+
+<div class="footer-buttons">
+<a type="button" class="button gray small" href="{{site.github.star}}" target="_blank"><i class="fa fa-github-alt"></i>
+  Star
+</a>
+<a type="button" class="button gray small" href="{{site.github.fork}}" target="_blank"><i class="fa fa-github-alt"></i>
+  Fork
+</a>
+<a type="button" class="button gray small" href="https://twitter.com/share?hashtags=cli,python&text=See how {{site.project.name}} from @softlayer puts your resources to work from the command line&tw_p=tweetbutton&url={{site.github.url}}/cli" target="_blank"><i class="fa fa-twitter"></i>
+  Share
+</a>
+</div>
+
+<p>
+Developed by <a href="{{site.github.owner_url}}" target="_blank">{{site.owner.name}}</a>, with help from <a href="{{site.github.contributors}}" target="_blank">our contributors</a>.</p>
+<p>
+Code and documentation licensed under the terms of the <a href="{{site.license.www}}" target="_blank">{{site.license.type}} License</a>.</p>
+
+</div>
+</div>
+</div>
+</footer>
+{% endif %}

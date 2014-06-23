@@ -1,0 +1,110 @@
+/* =========================
+   Buttons
+   ========================= */
+
+// Button font size
+// -------------------------
+
+@button-font-size-normal: @font-size-medium;
+@button-font-size-large: @font-size-normal;
+@button-font-size-small: @font-size-small;
+
+// Normal button
+// -------------------------
+
+.button {
+  .optimize-text();
+  .button-size(@padding-vertical; @padding-horizontal-normal; @button-font-size-normal; @line-height-normal; @border-radius-normal);
+  .button-variant(@button-default-color; @button-default-bg; @button-default-border; @button-default-hover);
+  .transition-duration(.5s);
+  .transition-property(all);
+  display: inline-block;
+  border: 1px solid transparent;
+  vertical-align: middle;
+  text-align: center;
+  white-space: nowrap;
+  letter-spacing: @letter-spacing-normal;
+  font-weight: @font-weight-normal;
+  font-family: @font-family-humanist-sans;
+  cursor: pointer;
+
+  &:hover,
+  &:focus,
+  &:active {
+    outline: none;
+    color: @button-default-hover;
+    text-decoration: none;
+  }
+
+// Solid button
+// -------------------------
+
+  &.solid {
+    .solid-button-variant(@solid-button-default-color; @solid-button-default-bg; @solid-button-default-border);
+  }
+}
+
+// Variants
+// -------------------------
+
+// Normal variants
+
+.gray  {.button-variant(@button-gray-color; @button-gray-bg; @button-gray-border; @button-gray-hover);}
+.red   {.button-variant(@button-red-color; @button-red-bg; @button-red-border; @button-red-hover);}
+.blue  {.button-variant(@button-blue-color; @button-blue-bg; @button-blue-border; @button-blue-hover);}
+.white {.button-variant(@button-white-color; @button-white-bg; @button-white-border; @button-white-hover);}
+
+// Solid variants
+
+.solid       {.solid-button-variant(@solid-button-default-color; @solid-button-default-bg; @solid-button-default-border);}
+.solid-gray  {.solid-button-variant(@solid-button-gray-color; @solid-button-gray-bg; @solid-button-gray-border);}
+.solid-red   {.solid-button-variant(@solid-button-red-color; @solid-button-red-bg; @solid-button-red-border);}
+.solid-blue  {.solid-button-variant(@solid-button-blue-color; @solid-button-blue-bg; @solid-button-blue-border);}
+.solid-white {.solid-button-variant(@solid-button-white-color; @solid-button-white-bg; @solid-button-white-border);}
+
+// Optional button sizes
+// -------------------------
+
+.large {
+  .button-size(@padding-vertical; @padding-horizontal-large; @button-font-size-large; @line-height-xxlarge; @border-radius-normal);
+  letter-spacing: @letter-spacing-large;
+}
+
+.small {
+  .button-size(@padding-vertical; @padding-horizontal-small; @button-font-size-small; @line-height-xlarge; @border-radius-normal);
+}
+
+// Back-to-top button
+// -------------------------
+
+#top {
+  .opacity(.15);
+  .transition(.5s);
+  position: fixed;
+  right: 12px;
+  bottom: 16px;
+  visibility: hidden;
+  padding: 13px;
+  border-radius: @border-radius-normal;
+  background-color: @button-top-bg;
+  color: @white;
+  text-decoration: none;
+  line-height: 0;
+}
+
+@media (min-width: @view-lg) {
+  #top {
+    .opacity(.4);
+    background-color: transparent;
+    color: @button-top-color;
+    font-size: 21px;
+  }
+}
+
+// Icon
+// -------------------------
+
+i#more {
+  .opacity(.5);
+  font-size: 11px;
+}
