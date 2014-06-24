@@ -6,7 +6,7 @@ Found an issue? Here are some suggestions to help guide you through the escalati
 
 All issues are bagged and tagged on GitHub. Click the "Search" button and see if your issue has already been reported.
 
-<a type="button" class="button gray small" href="{{site.github.issues_url}}?labels=CLI" target="_blank">Search <i class="fa fa-chevron-right fa-fw" id="more"></i></a>
+<a type="button" class="button gray small more" href="{{site.github.issues_url}}?labels=CLI" target="_blank">Search</a>
 
 ### Provide Information about Your Setup
 
@@ -22,7 +22,7 @@ Paste any offending code, logs, or errors into a page on <a href="http://gist.gi
 
 {% gist caleorourke/42aa056026177bd7d53e %}
 
-> This method supports public and secret Gists. 
+> This method supports public and secret Gists.
 
 ### Use Our Template to Write-up the Report
 
@@ -49,4 +49,4 @@ Include any other comments, such as how you worked around it, suggestions you ha
 
 When you're ready, open a new issue and send it on over to us.
 
-<a type="button" class="button gray small" href="{{site.github.issues_url}}/new?labels=Bug" target="_blank">Submit <i class="fa fa-chevron-right fa-fw" id="more"></i></a>
+<a type="button" class="button gray small more" href="{{site.github.issues_url}}/new?labels=Bug" target="_blank">Submit</a>

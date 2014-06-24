@@ -9,8 +9,10 @@
 @button-font-size-large: @font-size-normal;
 @button-font-size-small: @font-size-small;
 
-// Normal button
+// Button Types
 // -------------------------
+
+// Normal buttons
 
 .button {
   .optimize-text();
@@ -36,8 +38,7 @@
     text-decoration: none;
   }
 
-// Solid button
-// -------------------------
+// Solid buttons
 
   &.solid {
     .solid-button-variant(@solid-button-default-color; @solid-button-default-bg; @solid-button-default-border);
@@ -62,8 +63,11 @@
 .solid-blue  {.solid-button-variant(@solid-button-blue-color; @solid-button-blue-bg; @solid-button-blue-border);}
 .solid-white {.solid-button-variant(@solid-button-white-color; @solid-button-white-bg; @solid-button-white-border);}
 
-// Optional button sizes
+
+// Options
 // -------------------------
+
+// Button sizes
 
 .large {
   .button-size(@padding-vertical; @padding-horizontal-large; @button-font-size-large; @line-height-xxlarge; @border-radius-normal);
@@ -74,8 +78,16 @@
   .button-size(@padding-vertical; @padding-horizontal-small; @button-font-size-small; @line-height-xlarge; @border-radius-normal);
 }
 
-// Back-to-top button
-// -------------------------
+// Button icons
+
+.more {
+  &:after {
+    .opacity(.5);
+    content: "\00a0 \00a0 \f054";
+    font-family: FontAwesome;
+    font-size: 11px;
+  }
+}
 
 #top {
   .opacity(.15);
@@ -101,10 +113,3 @@
   }
 }
 
-// Icon
-// -------------------------
-
-i#more {
-  .opacity(.5);
-  font-size: 11px;
-}

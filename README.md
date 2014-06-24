@@ -16,7 +16,7 @@ We use a homegrown, content-first framework for our GitHub docs. It provides the
 
 Below is a list of functional and aesthetic features and their purpose.
 
-### Core Functionality
+### Base Features
 
 * Base HTML5
 * Responsive grids and media queries from [Bootstrap](http://twitter.github.io/bootstrap)
