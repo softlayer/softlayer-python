@@ -1,6 +1,6 @@
 /*
 #  Profile
-#  Builds a GitHub profile from payloads for repo, contributors, stargazers, and tags
+#  Builds a GitHub profile from payloads of repos, contributors, stargazers, and tags
 #
 #  Copyright © SoftLayer, an IBM Company
 #  Code and documentation licensed under MIT
@@ -14,18 +14,6 @@ $.getJSON("https://api.github.com/repos/softlayer/softlayer-python/contributors?
   $(function() {
     $("#github-contributors").text(numContributors.length);
   });
-});
-
-// Repos
-// ------------------------------
-
-$.ajax({
-  url: "https://api.github.com/orgs/softlayer?callback?",
-  dataType: "jsonp",
-  success: function(json) {
-    numRepos = json.data;
-    $("#github-repos").text(numRepos.public_repos);
-  }
 });
 
 // Stargazers
@@ -52,7 +40,7 @@ $.ajax({
   }
 });
 
-// Org Profile
+// Repos
 // ------------------------------
 
 (function ($) {
@@ -65,29 +53,34 @@ $.ajax({
   };
 
   addRepo = function(repo) {
-    $item = $("<li>").addClass("repo name " + (repo.language || "").toLowerCase());
-    $link = $("<a>").attr("href", repoUrl(repo)).attr("target", "_blank").appendTo($item);
+    $item      = $("<li>").addClass("repo name " + (repo.language || "").toLowerCase());
+    $link      = $("<a>").attr("href", repoUrl(repo)).attr("target", "_blank").appendTo($item);
     $link.append($("<h2>").text(repo.name));
     $link.append($("<h4>").text(repo.language));
     $link.append($("<h5>").text(repo.watchers));
     $link.append($("<h6>").text(repo.forks));
     $link.append($("<p>").text(repoDescription(repo)));
+    
     $item.appendTo("#repos");
   };
 
   addRepos = function(repos, page) {
     repos = repos || [];
-    page  = page || 1;
-    uri   = "https://api.github.com/orgs/softlayer/repos?callback=?" + "&per_page=50" + "&page=" + page;
+    page  = page  || 1;
+    uri   = "https://api.github.com/orgs/softlayer/repos?callback=?" 
+          + "&per_page=50" 
+          + "&page="+ page;
 
-    return $.getJSON(uri, function(result) {
+    $.getJSON(uri, function(result) {
       if (result.data && result.data.length > 0) {
         repos = repos.concat(result.data);
         return addRepos(repos, page + 1);
-      } else {
-        return $(function() {
+      } 
+      else {
+        $(function() {
+          $("#github-repos").text(repos.length);
+          
           $.each(repos, function(i, repo) {
-
             repo.pushed_at    = new Date(repo.pushed_at);
             weekHalfLife      = 1.146 * Math.pow(10, -9);
             pushDelta         = "new Date" - Date.parse(repo.pushed_at);
