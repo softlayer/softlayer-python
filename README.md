@@ -38,7 +38,6 @@ Below is a list of functional and aesthetic features and their purpose.
 * [Grunt](http://gruntjs.com) to automate repetitive tasks
 * [LESS](http://lesscss.org) dynamic stylesheets for variables, mixins, nesting, and more
 * [jQuery](http://jquery.com)
-* [jQuery-Easing](http://gsgd.co.uk/sandbox/jquery/easing/) for advanced easing functions
 * [Modernizr](http://modernizr.com) for legacy- and cross-browser support
 * SoftLayer's [Profile](https://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/profiler.js) plugin for fetching organization and repository data from GitHub
 * SoftLayer's [Indexing](https://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/indexing.js) plugin for building table of contents on-the-fly
