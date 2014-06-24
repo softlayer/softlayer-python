@@ -2,6 +2,18 @@
    Normalize
    ========================= */
 
+// Adapted from http://github.com/necolas/normalize.css (Version 3.0.0)
+
+// Tweaks:  Added *, *:before & *:after with '.box-sizing()' property
+//          Added 'font-size' & '-webkit-tap-highlight-color' to html
+//          Added 'font-style', 'text-shadow' & 'cursor' to body
+//          Added 'text-decoration: none' to a
+//          Added del with 'text-decoration: line-through' property
+//          Added ul, ol with 'line-height: inherit' property
+//          Changed fieldset defaults to '0,
+//          Changed small default to '85%'
+//          Removed hgroup (deprecated in HTML5)
+
 *,
 *:before,
 *:after {
@@ -37,6 +49,7 @@ figcaption,
 figure,
 footer,
 header,
+main,
 nav,
 section,
 summary {
@@ -126,9 +139,9 @@ html input[disabled] {
 }
 
 fieldset {
-  border: 1px solid silver;
-  margin: 0 2px;
-  padding: .35em .625em .75em;;
+  border: none;
+  margin: 0;
+  padding: 0;
 }
 
 pre,
