@@ -15,7 +15,7 @@
 
   <a class="nav-item{% if page.url == "/" %} active {% endif %}" href="{{page.baseurl}}"><i class="fa fa-home fa-fw"></i> Home</a>
   <a class="nav-item" href="//softlayer-python.readthedocs.org/en/latest" target="_blank"><i class="fa fa-chevron-right fa-fw"></i> Documentation</a>
-  <a class="nav-item" href="{{page.baseurl}}cli"><i class="fa fa-chevron-right fa-fw"></i> Command-line (CLI)</a>
+  <a class="nav-item" href="{{page.baseurl}}cli"><i class="fa fa-chevron-right fa-fw"></i> {{site.project.name}}</a>
 
   <ul class="divider"></ul>
   <a class="nav-item" href="{{site.github.repository_url}}" target="_blank"><i class="fa fa-github-alt fa-fw"></i> Code</a>
@@ -50,7 +50,7 @@
   <a class="nav-item{% if page.url == "/" %} active {% endif %}" href="{{page.baseurl}}cli"><i class="fa fa-home fa-fw"></i> Home</a>
 
   {% include handlers/items.html %}
-    <a class="nav-item" href="{{page.baseurl}}"><i class="fa fa-chevron-right fa-fw"></i> Python Client</a>
+    <a class="nav-item" href="{{page.baseurl}}"><i class="fa fa-chevron-right fa-fw"></i> {{site.project.alias}}</a>
 
   <ul class="divider"></ul>
   <a class="nav-item" href="{{site.github.repository_url}}" target="_blank"><i class="fa fa-github-alt fa-fw"></i> Code</a>
@@ -86,7 +86,7 @@
   <a class="nav-item{% if page.url == "/" %} active {% endif %}" href="{{page.baseurl}}cli"><i class="fa fa-home fa-fw"></i> Home</a>
 
   {% include handlers/items.html %}
-    <a class="nav-item" href="{{page.baseurl}}"><i class="fa fa-chevron-right fa-fw"></i> Python Client</a>
+    <a class="nav-item" href="{{page.baseurl}}"><i class="fa fa-chevron-right fa-fw"></i> {{site.project.alias}}</a>
 
   <ul class="divider"></ul>
   <a class="nav-item" href="{{site.github.repository_url}}" target="_blank"><i class="fa fa-github-alt fa-fw"></i> Code</a>
