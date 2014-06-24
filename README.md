@@ -106,15 +106,15 @@ Read Yi Zeng's [Setup Jekyll on Windows](http://yizeng.me/2013/05/10/setup-jekyl
 
         cd softlayer-python
 
-4. Install Grunt
+4. Install Grunt (takes ~3 sec.)
 
         [sudo] npm install -g grunt-cli
 
-5. Install Node.js modules
+5. Install Node.js modules (takes ~15 sec.)
 
         [sudo] npm install
 
-5. Install Jekyll, Pygments and other dependencies
+5. Install Jekyll, Pygments and other dependencies (takes ~40 sec.)
 
         [sudo] grunt install
 
