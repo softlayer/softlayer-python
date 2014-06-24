@@ -107,14 +107,17 @@ Read Yi Zeng's [Setup Jekyll on Windows](http://yizeng.me/2013/05/10/setup-jekyl
 
         cd softlayer-python
 
-4. Install Grunt and modules for Node.js
+4. Install Grunt
+
+        [sudo] npm install -g grunt-cli
+
+5. Install Node.js modules
 
         [sudo] npm install
 
 5. Install Jekyll, Pygments and other dependencies
 
         [sudo] grunt install
-        [sudo] grunt install:pygments
 
 ---
 
@@ -388,7 +391,7 @@ Below a few issues and solutions that we came across during development.
 #### Incompatible character encodings
 
 * Problem: Getting **Liquid Exception: incompatible character encodings: UTF-8 and IBM437...** errors after running `grunt serve`.
-* Cause: The CLI does not use UTF-8 by default (example: Git for Windows). 
+* Cause: The CLI does not use UTF-8 by default (example: Git for Windows).
 * Solution: Run these commands before running `grunt serve`.
 
 ```bash
@@ -407,8 +410,8 @@ $ exit
 
 #### Liquid Exception: Cannot find /bin/sh
 
-* Problem: Getting **Liquid Exception: Cannot find /bin/sh**. 
-* Cause: A buggy version of `pygments.rb`. 
+* Problem: Getting **Liquid Exception: Cannot find /bin/sh**.
+* Cause: A buggy version of `pygments.rb`.
 * Solution: Use `pygments.rb` version 0.5.0. This means you'll have to uninstall newer versions as well. Run these commands.
 
 $ gem uninstall pygments.rb --version "=0.5.4"

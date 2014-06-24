@@ -30,8 +30,7 @@ module.exports = function(grunt) {
                   "python ez_setup.py",
                   "python get-pip.py",
                   "pip install Pygments",
-                  "cd ..",
-                  "cd .."].join("&&"),
+                  "cd ../.."].join("&&"),
         options: {
           stdout: true
         }
@@ -147,8 +146,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask("build", ["clean", "concat", "uglify", "recess:minify"]);
   grunt.registerTask("build:pretty", ["clean", "concat", "recess:unminify"]);
-  grunt.registerTask("install", ["shell:bundler"]);
-  grunt.registerTask("install:pygments", ["shell:pygments"]);
+  grunt.registerTask("install", ["shell:bundler", "shell:pygments"]);
   grunt.registerTask("preview", ["jekyll:preview"]);
   grunt.registerTask("serve", ["build", "jekyll:preview"]);
   grunt.registerTask("serve:pretty", ["build:pretty", "jekyll:preview"]);
