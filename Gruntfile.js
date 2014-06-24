@@ -128,9 +128,13 @@ module.exports = function(grunt) {
         reset: true,
         relaxerror: ["Bad value X-UA-Compatible for attribute http-equiv on element meta.",
                      "Element img is missing required attribute src.",
+                     "Empty heading",
+                     "Bad value button for attribute type on element a: Subtype missing.",
                      "No p element in scope but a p end tag seen.",
+                     "Section lacks heading.",
                      "The align attribute on the th element is obsolete.",
-                     "The align attribute on the td element is obsolete."]
+                     "The align attribute on the td element is obsolete.",
+                     "Illegal character in query: not a URL code point."]
       },
       files: {
         src: ["_site/*.html", "_site/**/*.html"]
