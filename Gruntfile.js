@@ -20,7 +20,8 @@ module.exports = function(grunt) {
       bundler: {
         command: ["gem update --system",
                   "gem install bundler",
-                  "bundle install"].join("&&"),
+                  "bundle install",
+                  "rm -r Gemfile.lock"].join("&&"),
         options: {
           stdout: true
         }
@@ -30,7 +31,8 @@ module.exports = function(grunt) {
                   "python ez_setup.py",
                   "python get-pip.py",
                   "pip install Pygments",
-                  "cd ../.."].join("&&"),
+                  "rm -r setuptools*",
+                  "cd ../../"].join("&&"),
         options: {
           stdout: true
         }
