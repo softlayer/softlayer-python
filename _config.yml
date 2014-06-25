@@ -70,7 +70,6 @@ exclude:         [ ".gitignore",
 gems:
   - jekyll-sitemap
   - jekyll-gist
-  - jekyll-paginate
 
 # ==============================
 # Analytics
