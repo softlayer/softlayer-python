@@ -4,5 +4,5 @@ We prefer that feature requests originate from open requests in GitHub, but weâ€
 
 Click "Search" to browse current requests or "Request" to submit a new one.
 
-<a type="button" class="button gray small more" href="{{site.github.issues_url}}?labels=CLI%2CNew+Feature" target="_blank">Search</a>
-<a type="button" class="button gray small more" href="{{site.github.issues_url}}/new?labels=New+Feature" target="_blank">Request</a>
+<a type="button" class="button blue small more" href="{{site.github.issues_url}}?labels=CLI%2CNew+Feature" target="_blank">Search</a>
+<a type="button" class="button blue small more" href="{{site.github.issues_url}}/new?labels=New+Feature" target="_blank">Request</a>
