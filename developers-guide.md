@@ -432,7 +432,8 @@ if not confirmation:
 ```
 
 ***
-# Configuration File
+# Configuration Format
+
 
 The configuration for {{site.project.alias}} gets created automatically after running `sl config setup`. It's an INI-based file with the following format:
 

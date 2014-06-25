@@ -52,4 +52,4 @@ $ sl config show
 ```
 </section>
 
-> Learn how to make your own [Configuration File in the Developer's Guide]({{page.baseurl}}developers-guide/#toc_21).
+> Learn how to make your own [configuration file in the Developer's Guide]({{page.baseurl}}developers-guide/#toc_21).

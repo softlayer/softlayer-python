@@ -98,9 +98,15 @@
   padding: 13px;
   border-radius: @border-radius-normal;
   background-color: @button-top-bg;
-  color: @white;
+  color: @button-top-color-inner;
   text-decoration: none;
   line-height: 0;
+
+  &>:hover,
+  &>:focus {
+    .opacity(1);
+    color: @gray20;
+  }
 }
 
 @media (min-width: @view-lg) {
