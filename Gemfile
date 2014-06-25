@@ -7,4 +7,3 @@ gem "pygments.rb", "= 0.5.0"
 gem "wdm", "~> 0.1.0", :platforms => [:mswin, :mingw, :x64_mingw]
 gem "jekyll-sitemap"
 gem "jekyll-gist"
-gem "jekyll-paginate"
