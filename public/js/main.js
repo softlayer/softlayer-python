@@ -1,7 +1,7 @@
 /* 
  * 
  * Python CLI project
- * Framework version 2.0.5, Built on 06-24-2014
+ * Framework version 2.0.6, Built on 06-25-2014
  * Copyright © 2014 SoftLayer, an IBM Company. All rights reserved.
  * Code and documentation licensed under MIT.
  * 
