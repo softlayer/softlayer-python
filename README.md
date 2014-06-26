@@ -369,17 +369,13 @@ Sublime Text users can configure these settings manually by opening <samp>Prefer
 
 Sublime does not include every syntax highlight. To get certain highlights, you have to install them by hand. The instructions below delve into the install processes for __Jekyll__, __LESS__, and __Liquid__.
 
-#### Package Control
-
-Use [Package Control](http://sublime.wbond.net), Sublime's built-in tool, to install these syntaxes.
-
-If you have Package Control, skip the rest of this and click any of the links below. If you don't, this [install guide](http://sublime.wbond.net/installation) will walk you through all the install options. Once that's done, click any of these links:
+Use [Package Control](http://sublime.wbond.net), Sublime's built-in tool, to install these syntaxes. If you already have Package Control, skip the rest of this and click any of the links below. If you don't, this [install guide](http://sublime.wbond.net/installation) will walk you through all the install options. Once that's done, click any of these links:
 
 * [Jekyll](#jekyll)
 * [LESS](#less)
 * [Liquid](#liquid)
 
-##### Jekyll
+#### Jekyll
 
 1. Open Preferences > Package Control.
 2. Type `Install Package` and hit return.
@@ -387,13 +383,13 @@ If you have Package Control, skip the rest of this and click any of the links be
 
 > The Jekyll package includes syntaxes for HTML, JSON, Markdown, and Textile.
 
-##### LESS
+#### LESS
 
 1. Open Preferences > Package Control.
 2. Type `Install Package` and hit return.
 3. Type `LESS` and hit return.
 
-##### Liquid
+#### Liquid
 
 1. Open Preferences > Package Control.
 2. Type `Install Package` and hit return.
