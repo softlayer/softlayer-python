@@ -1,3 +1,19 @@
+## Contents
+
+* [GitHub Pages](#github-pages)
+* [Features and Functionality](#features-and-functionality)
+* [Recommended Browsers](#recommended-browsers)
+* [Prerequisites](#prerequisites)
+* [Getting Started](#getting-started)
+* [Grunt](#grunt)
+* [Directory Structure](#directory-structure)
+* [HTML DOM Elements in JS](#html-dom-elements-in-js)
+* [Repository Metadata](#repository-metadata)
+* [Code Styles](#code-styles)
+* [Running into Problems?](#running-into-problems?)
+
+---
+
 ## GitHub Pages
 
 We use a homegrown, content-first framework for our GitHub docs. It provides the facilities to write content exclusively in Markdown and spin-up Jekyll-powered static websites, in addition to:
@@ -16,39 +32,43 @@ We use a homegrown, content-first framework for our GitHub docs. It provides the
 
 Below is a list of functional and aesthetic features and their purpose.
 
-### Base Features
+### Core Features
 
 * Base HTML5
-* Responsive grids and media queries from [Bootstrap](http://twitter.github.io/bootstrap)
-* [Logic tags](https://github.com/softlayer/softlayer-python/blob/gh-pages/_includes/handlers/items.html) for self-generating navigation links
-* Pretty URLs
-* [Web-App Viewports](http://github.com/h5bp/html5-boilerplate/blob/master/doc/extend.md#web-apps) for multi-device and OS support, including iOS 7.1+
-
-### Built-in Components
-
 * [Jekyll](http://jekyllrb.com "Jekyll") for free web hosting using GitHub Pages
 * [Redcarpet](http://github.com/vmg/redcarpet "Redcarpet") for Markdown-compatibility and rendering
 * [Pygments](http://pygments.org "Pygments") with the [GitHub](http://richleland.github.io/pygments-css) theme for code highlighting
 * [Normalize](http://necolas.github.io/normalize.css) for CSS normalization and resets
 * [Liquid](http://liquidmarkup.org "Liquid") as the core templating language
 * [Metadata](http://help.github.com/articles/repository-metadata-on-github-pages) for GitHub Pages
+* Responsive grids and media queries from [Bootstrap](http://twitter.github.io/bootstrap)
+* [Logic tags](https://github.com/softlayer/softlayer-python/blob/gh-pages/_includes/handlers/items.html) for self-generating navigation links
+* Pretty URLs
+* [Web-App Viewports](http://github.com/h5bp/html5-boilerplate/blob/master/doc/extend.md#web-apps) for multi-device and OS support, including iOS 7.1+
+* [Sitemaps.org](http://sitemaps.org)-compliant sitemap
+
+### Components
+
+* [jQuery](http://jquery.com)
+* [Font Awesome](http://fortawesome.github.io/Font-Awesome) iconic font
+* [Grunt](http://gruntjs.com) to automate repetitive tasks
+* [LESS](http://lesscss.org) dynamic stylesheets for variables, mixins, nesting, and more
+* [Modernizr](http://modernizr.com) for legacy- and cross-browser support
+* [Universal Analytics](http://www.google.com/analytics) snippet with [page scroll tracking](https://github.com/h5bp/html5-boilerplate/blob/master/doc/extend.md#google-universal-analytics) from Google
 
 ### Plugins
 
-* [Grunt](http://gruntjs.com) to automate repetitive tasks
-* [LESS](http://lesscss.org) dynamic stylesheets for variables, mixins, nesting, and more
-* [jQuery](http://jquery.com)
-* [Modernizr](http://modernizr.com) for legacy- and cross-browser support
-* SoftLayer's [Profile](https://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/profiler.js) plugin for fetching organization and repository data from GitHub
-* SoftLayer's [Indexing](https://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/indexing.js) plugin for building table of contents on-the-fly
-* [Font Awesome](http://fortawesome.github.io/Font-Awesome) iconic font
-* [Universal Analytics](http://www.google.com/analytics) snippet with [page scroll tracking](https://github.com/h5bp/html5-boilerplate/blob/master/doc/extend.md#google-universal-analytics) from Google
-* [Sitemaps.org](http://sitemaps.org)-compliant sitemap
-* SoftLayer's [Classify](https://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/classify.js) extensible DOM utility for class helper functions
+* [Classify](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/classify.js) extensible DOM utility for class helper functions
+* [Duration](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/duration.js) to estimate how long it takes to read a single page
+* [Easing](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/easing.js) for animated page scrolling
+* [Indexing](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/indexing.js) plugin for building table of contents on-the-fly
+* [Profile](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/profiler.js) plugin for fetching organization and repository data from GitHub
+* [Scrollability](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/scrollability.js) to set thresholds for elements while scrolling
+* [Toggle](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/toggle.js) to handle sliding and collapsing behavior for navigation
 
 ---
 
-## Web Browsers
+## Recommended Browsers
 
 We recommend the latest versions of the browsers and platforms below for the best performance and readability. For legacy browsers, the Modernizr plugin does its best but it's not perfect. Additionally, we use JS to render on-page elements. If it's disabled in your browser, you might not see those elements.
 
@@ -268,7 +288,7 @@ Here's an overview of what each directory does or contains.
 
 | Directory                | Overview  |
 | ------------------------ | --------- |
-| <samp>_includes/</samp>  | Reusable chunks of content (called “partials”) and semantic elements. The `{% include file.ext %}` tag indicates a partial is used. |
+| <samp>_includes/</samp>  | Reusable chunks of content (called “partials”) and semantic elements. The `{% include file.ext %}` tag indicates a partial is being used. |
 | <samp>_layouts/</samp>   | Reusable templates designed for specific uses, like **pages**, **news**, **articles**, and **blogs**. The `{{content}}` tag injects external content into layouts. |
 | <samp>extensions/</samp> | The source for `*.js` scripts. Concatenated JS files are stored in `public/js`. |
 | <samp>less/</samp>       | The source for `*.less` stylesheets. Concatenated LESS files are stored in `public/css`. |
@@ -385,7 +405,7 @@ If you have Package Control, skip the rest of this and click any of the links be
 
 ## Running into Problems?
 
-Below a few issues and solutions that we came across during development.
+Below are a few issues and solutions that we came across during development.
 
 #### Incompatible character encodings
 
@@ -411,9 +431,9 @@ $ exit
 
 * Problem: Getting **Liquid Exception: Cannot find /bin/sh**.
 * Cause: A buggy version of `pygments.rb`.
-* Solution: Use `pygments.rb` version 0.5.0. This means you'll have to uninstall newer versions as well. Run these commands.
+* Solution: Use `pygments.rb` version 0.5.0. This means you'll have to uninstall newer versions as well. Run the following commands.
 
-$ gem uninstall pygments.rb --version "=0.5.4"
-$ gem uninstall pygments.rb --version "=0.5.2"
-$ gem uninstall pygments.rb --version "=0.5.1"
-$ gem install pygments.rb --version "=0.5.0"
+        $ gem uninstall pygments.rb --version "=0.5.4"
+        $ gem uninstall pygments.rb --version "=0.5.2"
+        $ gem uninstall pygments.rb --version "=0.5.1"
+        $ gem install pygments.rb --version "=0.5.0"
