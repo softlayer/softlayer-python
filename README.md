@@ -10,7 +10,7 @@
 * [HTML DOM Elements in JS](#html-dom-elements-in-js)
 * [Repository Metadata](#repository-metadata)
 * [Code Styles](#code-styles)
-* [Running into Problems?](#running-into-problems?)
+* [Running into Problems?](#running-into-problems)
 
 ---
 
