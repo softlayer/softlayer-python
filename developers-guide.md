@@ -10,11 +10,10 @@ baseurl: "../"
 This guide explains how to start writing code for {{site.project.name}}. By now, you should know the basics covered in [Getting Started]({{page.baseurl}}getting-started). If not, we recommend starting there first. This guide doesn't rehash most of those topics.
 
 ***
-# Deep Dive into CLI
+# Deep Diving into CLI
 
 In Getting Started, we discussed the basics about the {{site.project.name}}:
 
-* It's a command-line utility
 * It's a reference implementation of our Python Client
 * It bootstraps the SoftLayer API and provides access to SoftLayer environments
 * It can spin-up virtual servers with *a la carte* features
@@ -183,10 +182,10 @@ Standard Options:
 ***
 ## Actions
 
-Actions are parameters the {{site.project.alias}} passes along to the API. These can be **arguments** or **options** (defined below).
+Actions are parameters the {{site.project.alias}} passes along to the API. These can be an **argument** or **option** (defined below).
 
-* Arguments: These locates the source or destination of information, or alter some type of operation.
-* Options: These tell the command to create, read, update, delete, or display something. Other names for options are "flag" and "switch".
+* Argument: Locates the source or destination of information, or alter some type of operation.
+* Option: Tells the command to create, read, update, delete, or display something. Other names for options are "flag" and "switch".
 
 ### Implementing an Action
 
