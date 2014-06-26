@@ -51,7 +51,7 @@ At its core, the {{site.project.name}} is comprised of four major parts:
 
 ## Modules
 
-Modules are Python executable files in the <samp>SoftLayer/CLI/modules</samp> directory. Each file contains specific definitions and statements that handle most of the heavy lifting.
+Modules are Python executable files in the <samp>SoftLayer/CLI/modules</samp> directory. Each one contains specific definitions and statements that handle most of the heavy lifting.
 
 The file name of each module is the exact name you'll use after `sl` (minus the <samp>.py</samp> suffix). For example, running `sl vs` references the <samp>SoftLayer/CLI/modules/vs.py</samp> module.
 
@@ -72,7 +72,7 @@ Available commands are:
 
 ### Basic Usage
 
-To see a list of available modules, run `sl`.
+To see a complete list of modules, run `sl`.
 
 ```bash
 $ sl
@@ -133,7 +133,7 @@ In each module, the docstring parses command-line arguments and usage patterns t
 
 Actions also use docstrings to parse command-line arguments. But unlike with modules, commonly-used arguments are added to the end, such as `--config` and `--format`.
 
-The interfaces required for actions include:
+The requirements for actions include:
 
 * The docstring for docopt
 * Class attributes for `actions`
@@ -183,14 +183,16 @@ Standard Options:
 ***
 ## Actions
 
-Actions are parameters the {{site.project.alias}} passes along to the API. These can be **arguments** or **options**, which look similar but are quite different (definitions below).
+Actions are parameters the {{site.project.alias}} passes along to the API. These can be **arguments** or **options** (defined below).
 
-* Argument: Identifies the source or destination of information, or alters some type of operation.
-* Option: Tells the command to create, read, update, delete, or display something. Other names for these are "flag" and "switch".
+* Arguments: These locates the source or destination of information, or alter some type of operation.
+* Options: These tell the command to create, read, update, delete, or display something. Other names for options are "flag" and "switch".
 
 ### Implementing an Action
 
-You can implement actions easily just by adding a class to a module with the subclass of `CLIRunnable`. Giving it this subclass is an important part of implementing an action because the name of the parent class is not referenced anywhere.
+You can implement actions easily just by adding a class to a module with the subclass of `CLIRunnable`. 
+
+> Giving it this subclass is an important part of implementing an action because the name of the parent class is not referenced anywhere.
 
 ```py
 class CLIRunnable(object):
@@ -247,7 +249,7 @@ Options:
 
 ### Options
 
-Options tell the command to create, read, update, or delete something. These may be conjoined with an argument or made to stand on their own. Either way, most commands will take in additional options. To see a list of options, use `-–help`.
+Options tell the command to create, read, update, or delete something. These may be conjoined with an argument or made to stand on their own. Either way, most commands will take in additional options. To see a complete list of options, use `-–help`.
 
 ```bash
 $ sl vs list --help
@@ -291,7 +293,7 @@ Standard Options:
 
 Output refers to how the CLI uses `execute` to display on-screen results.
 
-The `execute()` method expects to return either `None` or an instance of `helpers.Table`. If it returns `None`, the CLI assumes all output is being handled inside `execute()`.
+By default, the `execute()` method expects to return either `None` or an instance of `helpers.Table`. If it returns `None`, the CLI assumes all output is being handled inside `execute()`.
 
 A good example of where it's ideal to handle your own output is `DumpZone` in the <samp>dns</samp> module. The data from here comes back pre-formatted from the API. 99% of the time, though, data will come back unformatted.
 
@@ -357,9 +359,11 @@ test2 test2
 ***
 # Accessing our API
 
-Access to our API is available via the `client` attribute of the `CLIRunnable` instance.
+Access to our API is available via the `client` attribute of `CLIRunnable`.
 
-In `execute()`, for example, you can use `self.client` to access an instantiated instance of `SoftLayer.API.Client`. Check out our <a href="http://softlayer-python.readthedocs.org/en/latest/api/client.html#getting-started" target="_blank">Python Client docs</a> for details on how to use the `client` object.
+In `execute()`, for example, you can use `self.client` to access an instantiated instance of `SoftLayer.API.Client`. 
+
+Check out our <a href="http://softlayer-python.readthedocs.org/en/latest/api/client.html#getting-started" target="_blank">Python Client docs</a> for details on how to use the `client` object.
 
 ***
 # Confirmations
@@ -434,8 +438,7 @@ if not confirmation:
 ***
 # Configuration Format
 
-
-The configuration for {{site.project.alias}} gets created automatically after running `sl config setup`. It's an INI-based file with the following format:
+The configuration for {{site.project.alias}} gets created automatically after running `sl config setup`. This is an INI-based file with the following format:
 
 * A required section: `[softlayer]`
 * Two required properties: `username` and `api_key`
