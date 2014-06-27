@@ -40,8 +40,8 @@ a.toggle {
   left: 16px;
   font-size: 25px;
   color: @nav-toggle;
+
   &.pages {
-    .transition-duration(.5s);
     color: @nav-toggle-pages !important;
     &>:hover,
     &>:focus {
@@ -50,7 +50,6 @@ a.toggle {
   }
 
   &.featured {
-    .transition-duration(.5s);
     color: @white !important;
     &>:hover,
     &>:focus {
@@ -117,7 +116,7 @@ a.toggle {
     padding: 4px;
     font-size: @font-size-medium;
 
-    a:active,
+    a.active,
     a:hover,
     a:focus {
       color: @subnav-active-color;
