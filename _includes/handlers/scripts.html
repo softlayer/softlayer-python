@@ -4,12 +4,11 @@
 <script src="{{page.baseurl}}public/js/main.js"></script>
 
 {% if page.header != null %}
-<script> // Indexing
+<script>
   $(document).ready(function() {
-    $(".indexing").indexing();
+    $(".indexing").indexing(); // onDomready for indexing.js
+    $(".content").readEstimate(); // onDomready for read.js
   });
-
-  $("div.col-lg-8").estimatedTime(); // Duration
 </script>
 
 {% else %}

@@ -65,7 +65,7 @@ module.exports = function(grunt) {
               "extensions/indexing.js",
               "extensions/scrollability.js",
               "extensions/easing.js",
-              "extensions/duration.js"],
+              "extensions/read.js"],
         dest: "public/js/main.js"
       }
     },

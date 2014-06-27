@@ -2,14 +2,14 @@
    Social
    ========================= */
 
-.social-icons {
+.social {
   position: absolute;
   top: 17.5px;
   right: 14px;
   font-size: 21px;
 
   a {
-    .transition-duration(.5s);
+    .transition(color .5s);
     padding-right: 12px;
     color: @social-icon-color !important;
     &>:hover,
@@ -17,4 +17,13 @@
       color: @gray30;
     }
   }
+}
+
+.estimate {
+  padding-right: 12px;
+  font-family: @font-family-humanist-sans;
+  font-size: 15px;
+  color: rgba(0,0,0,.2);
+  letter-spacing: @letter-spacing-large;
+  vertical-align: text-bottom;
 }
