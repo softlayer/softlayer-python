@@ -4,7 +4,7 @@
 
 /* Adapted from http://github.com/necolas/normalize.css (Version 3.0.0) */
 
-/* 
+/*
  * Tweaks:  Added *, *:before & *:after with '.box-sizing()' property
  *          Added 'font-size' & '-webkit-tap-highlight-color' to html
  *          Added 'font-style', 'text-shadow' & 'cursor' to body
@@ -24,16 +24,16 @@
 
 html {
   font-size: 62.5%;
-  -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
 }
 
 body {
-  text-shadow: none;
-  font-style: normal;
-  cursor: auto;
   margin: 0;
+  font-style: normal;
+  text-shadow: none;
+  cursor: auto;
 }
 
 del {
@@ -64,8 +64,8 @@ template {
 }
 
 a {
-  background: transparent;
   text-decoration: none;
+  background: transparent;
 }
 
 a.active,
@@ -80,8 +80,8 @@ abbr[title] {
 }
 
 mark {
-  background: #ff0;
-  color: #000;
+  color: #000000;
+  background: #ffff00;
 }
 
 small {
@@ -91,9 +91,9 @@ small {
 sub,
 sup {
   position: relative;
-  vertical-align: baseline;
   font-size: 75%;
   line-height: 0;
+  vertical-align: baseline;
 }
 
 sup {
@@ -109,8 +109,8 @@ img {
 }
 
 hr {
-  box-sizing: content-box;
   height: 0;
+  box-sizing: content-box;
   border-width: 0;
 }
 
@@ -119,9 +119,9 @@ input,
 optgroup,
 select,
 textarea {
-  color: inherit;
-  font: inherit;
   margin: 0;
+  font: inherit;
+  color: inherit;
 }
 
 button,
@@ -131,8 +131,8 @@ select {
 
 button,
 html input[type="button"] {
-  cursor: pointer;
   -webkit-appearance: button;
+  cursor: pointer;
 }
 
 button[disabled],
@@ -141,9 +141,9 @@ html input[disabled] {
 }
 
 fieldset {
-  border: none;
-  margin: 0;
   padding: 0;
+  margin: 0;
+  border: none;
 }
 
 pre,
@@ -157,8 +157,8 @@ strong {
 }
 
 table {
-  border-collapse: collapse;
   border-spacing: 0;
+  border-collapse: collapse;
 }
 
 td, th {

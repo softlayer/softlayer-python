@@ -3,24 +3,23 @@
    ========================= */
 
 blockquote {
-  margin: 0 0 20px;
   padding: @padding-blockquote;
+  margin: 0 0 20px;
   color: @blockquote-color;
 
   p {
+    .opacity(.2);
+    padding-right: 60px;
     font-size: 17px;
     font-weight: @font-weight-light;
     line-height: @line-height-large;
-    padding-right: 60px;
-
     &:before {
-      .opacity(.2);
-      content: "\f075 \00a0";
-      font-family: FontAwesome;
-      font-size: 34px;
       display: block;
       margin-top: -8px;
+      font-family: FontAwesome;
+      font-size: 34px;
       color: @blockquote-icon;
+      content: "\f075 \00a0";
     }
   }
 
@@ -28,7 +27,6 @@ blockquote {
   ul,
   ol {
     display: -webkit-inline-box;
-
     &:first-child {
       margin-top: 0;
     }
@@ -49,21 +47,21 @@ blockquote {
 // -------------------------
 
 q {
-  margin: 0;
   padding: @padding-quote;
-  color: @quote-color;
-  font-size: 17.5px;
+  margin: 0;
   font-family: @font-family-serif;
+  font-size: 17.5px;
   line-height: @line-height-large;
+  color: @quote-color;
 
   p {
+    .opacity(.15);
     &:before {
-     .opacity(.15);
-      content: "\f10d \00a0";
-      font-family: FontAwesome;
-      font-size: 30px;
       display: block;
       margin-top: -12px;
+      font-family: FontAwesome;
+      font-size: 30px;
+      content: "\f10d \00a0";
     }
   }
 
@@ -71,7 +69,6 @@ q {
   ul,
   ol {
     display: -webkit-inline-box;
-
     &:first-child {
       margin-top: 0;
     }
@@ -83,10 +80,9 @@ q {
 
   small, .small {
     display: block;
-    color: @quote-small-color;
-    font-family: @font-family-serif;
     padding-left: 35px;
-
+    font-family: @font-family-serif;
+    color: @quote-small-color;
     &:before {
       content: "\2014 \00a0";
     }

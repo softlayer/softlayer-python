@@ -13,27 +13,27 @@
 }
 
 .hero-alias {
-  padding-top: 32px;
   position: fixed;
   z-index: -1000;
   min-width: 100%;
   min-height: 100%;
+  padding-top: 32px;
 }
 
 .hero-name {
   margin: 100px 0 0;
-  color: @hero-color;
-  font-weight: @font-weight-bold;
   font-size: 39px;
+  font-weight: @font-weight-bold;
+  color: @hero-color;
 }
 
 .hero-tagline {
   margin: 0 0 12px;
+  font-size: 22px;
+  font-weight: @font-weight-light;
+  line-height: @line-height-xsmall;
   color: @hero-tagline-color;
   letter-spacing: @letter-spacing-normal;
-  font-weight: @font-weight-light;
-  font-size: 22px;
-  line-height: @line-height-xsmall;
 }
 
 .hero-buttons {
@@ -43,22 +43,22 @@
 
 .hero-version p {
   margin: 24px 0 0;
+  font-family: @font-family-humanist-sans;
+  font-size: 14px;
   color: @hero-version-color;
   letter-spacing: @letter-spacing-normal;
-  font-size: 14px;
-  font-family: @font-family-humanist-sans;
 }
 
 .hero-image-right,
 .hero-image-left {
-  display: none
+  display: none;
 }
 
 @media (min-width: @view-sm) {
   .hero-image-right,
   .hero-image-left {
-    display: inline;
     position: absolute;
+    display: inline;
   }
 
   .hero-image-right {
@@ -76,9 +76,9 @@
 
   .hero {
     padding-bottom: 160px;
-    background: -webkit-linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.5)), url("../../public/images/featured-bg.jpg");
-    background: -moz-linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.5)), url("../../public/images/featured-bg.jpg");
-    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.5)), url("../../public/images/featured-bg.jpg");
+    background: -webkit-linear-gradient(rgba(0, 0, 0, .4), rgba(0, 0, 0, .5)), url("../../public/images/featured-bg.jpg");
+    background:    -moz-linear-gradient(rgba(0, 0, 0, .4), rgba(0, 0, 0, .5)), url("../../public/images/featured-bg.jpg");
+    background:         linear-gradient(rgba(0, 0, 0, .4), rgba(0, 0, 0, .5)), url("../../public/images/featured-bg.jpg");
     background-repeat: no-repeat;
     -webkit-background-size: cover;
        -moz-background-size: cover;
@@ -86,9 +86,9 @@
   }
 
   .hero-alias {
-    background: -webkit-linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.4)), url("../../public/images/featured-bg-alias.jpg");
-    background: -moz-linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.4)), url("../../public/images/featured-bg-alias.jpg");
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.4)), url("../../public/images/featured-bg-alias.jpg");
+    background: -webkit-linear-gradient(rgba(0, 0, 0, .5), rgba(0, 0, 0, .4)), url("../../public/images/featured-bg-alias.jpg");
+    background:    -moz-linear-gradient(rgba(0, 0, 0, .5), rgba(0, 0, 0, .4)), url("../../public/images/featured-bg-alias.jpg");
+    background:         linear-gradient(rgba(0, 0, 0, .5), rgba(0, 0, 0, .4)), url("../../public/images/featured-bg-alias.jpg");
     background-repeat: no-repeat;
     -webkit-background-size: cover;
        -moz-background-size: cover;

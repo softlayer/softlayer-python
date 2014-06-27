@@ -20,24 +20,23 @@
   .transition-duration(.5s);
   .transition-property(all);
   display: inline-block;
-  border: 1px solid transparent;
-  vertical-align: middle;
-  text-align: center;
-  white-space: nowrap;
-  letter-spacing: @letter-spacing-normal;
-  font-weight: @font-weight-normal;
   font-family: @font-family-humanist-sans;
+  font-weight: @font-weight-normal;
+  text-align: center;
+  letter-spacing: @letter-spacing-normal;
+  white-space: nowrap;
+  vertical-align: middle;
   cursor: pointer;
-
+  border: 1px solid transparent;
   &:hover,
   &:focus,
   &:active {
-    outline: none;
     color: @button-default-hover;
     text-decoration: none;
+    outline: none;
   }
 
-// Solid buttons
+  // Solid buttons
 
   &.solid {
     .solid-button-variant(@solid-button-default-color; @solid-button-default-bg; @solid-button-default-border);
@@ -82,9 +81,9 @@
 .more {
   &:after {
     .opacity(.5);
-    content: "\00a0 \00a0 \f054";
     font-family: FontAwesome;
     font-size: 11px;
+    content: "\00a0 \00a0 \f054";
   }
 }
 
@@ -94,14 +93,13 @@
   position: fixed;
   right: 12px;
   bottom: 16px;
-  visibility: hidden;
   padding: 13px;
-  border-radius: @border-radius-normal;
-  background-color: @button-top-bg;
+  line-height: 0;
   color: @button-top-color-inner;
   text-decoration: none;
-  line-height: 0;
-
+  visibility: hidden;
+  background-color: @button-top-bg;
+  border-radius: @border-radius-normal;
   &>:hover,
   &>:focus {
     .opacity(1);
@@ -112,9 +110,8 @@
 @media (min-width: @view-lg) {
   #top {
     .opacity(.4);
-    background-color: transparent;
-    color: @button-top-color;
     font-size: 21px;
+    color: @button-top-color;
+    background-color: transparent;
   }
 }
-

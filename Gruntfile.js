@@ -64,7 +64,8 @@ module.exports = function(grunt) {
               "extensions/toggle.js",
               "extensions/indexing.js",
               "extensions/scrollability.js",
-              "extensions/easing.js"],
+              "extensions/easing.js",
+              "extensions/duration.js"],
         dest: "public/js/main.js"
       }
     },

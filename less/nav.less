@@ -4,13 +4,13 @@
 
 .nav {
   position: fixed;
-  z-index: 1000;
   left: -228px;
+  z-index: 1000;
   width: 228px;
   height: 100%;
-  background-color: @nav-bg;
-  color: @nav-color;
   font-size: @font-size-medium;
+  color: @nav-color;
+  background-color: @nav-bg;
 }
 
 .pull {
@@ -29,18 +29,17 @@
 
 .nav-icon {
   display: inline-block;
+  margin: 0 0 4px;
   font-size: @font-size-medium;
   vertical-align: middle;
-  margin: 0 0 4px;
 }
 
 a.toggle {
   position: absolute;
   top: 14px;
   left: 16px;
-  color: @nav-toggle;
   font-size: 25px;
-
+  color: @nav-toggle;
   &.pages {
     .transition-duration(.5s);
     color: @nav-toggle-pages !important;
@@ -73,24 +72,24 @@ a.toggle {
 .nav-item {
   display: block;
   padding: @padding-nav-items;
-  color: @nav-color;
   line-height: @line-height-small;
+  color: @nav-color;
 }
 
 .nav-item.active,
 .nav-item:hover,
 .nav-item:focus {
-  background-color: rgba(255,255,255,.085);
   color: @nav-links;
+  background-color: rgba(255,255,255,.085);
 }
 
 .nav-footer {
   display: block;
-  margin: 0;
   padding: @padding-components 0;
+  margin: 0;
+  line-height: @line-height-large;
   color: @nav-footer-text;
   word-break: break-word;
-  line-height: @line-height-large;
 }
 
 .divider {
@@ -118,19 +117,18 @@ a.toggle {
     padding: 4px;
     font-size: @font-size-medium;
 
-    a {
-      color: @subnav-color;
-    }
-
     a:active,
     a:hover,
     a:focus {
       color: @subnav-active-color;
-
       &:after {
-        content: "\00a0 \00a0 \f141";
         font-family: FontAwesome;
+        content: "\00a0 \00a0 \f141";
       }
+    }
+
+    a {
+      color: @subnav-color;
     }
   }
 }

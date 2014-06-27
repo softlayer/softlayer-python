@@ -2,21 +2,12 @@
    Footer
    ========================= */
 
-// Footer
-// -------------------------
-
 footer {
   padding-top: (ceil(@base-variable * 1.25));
   padding-bottom: (ceil(@base-variable * 1.25));
-  border-top: 1px solid @footer-border;
-  background: @body-bg;
   font-size: @font-size-medium;
-
-  p {
-    color: @footer-color;
-    margin-bottom: 0;
-    line-height: @line-height-normal;
-  }
+  background: @body-bg;
+  border-top: 1px solid @footer-border;
 
   a {
     color: @footer-color;
@@ -25,6 +16,12 @@ footer {
   a:hover,
   a:focus {
     color: @footer-hover;
+  }
+
+  p {
+    margin-bottom: 0;
+    line-height: @line-height-normal;
+    color: @footer-color;
   }
 }
 

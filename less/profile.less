@@ -4,37 +4,37 @@
 
 .profile {
   display: none;
-}
+  }
 
 @media (min-width: @view-sm) {
   .profile {
     .center-block();
+    padding: 0 0 56px;
     text-align: center;
     background-color: @white;
-    padding: 0 0 56px;
   }
 }
 
 ol#repos {
-  margin: 0;
   padding: 0;
+  margin: 0;
 }
 
 .org .name {
-  width: 225px;
+  position: relative;
   display: inline;
   float: left;
-  position: relative;
+  width: 225px;
   margin: 15px 5px;
   border-bottom-width: 2px;
 }
 
 .repo {
-  font-family: @font-family-sans;
-  border-radius: @border-radius-large;
-  border: 1px solid @profile-repo-border;
-  background: @profile-repo-bg;
   height: 275px;
+  font-family: @font-family-sans;
+  background: @profile-repo-bg;
+  border: 1px solid @profile-repo-border;
+  border-radius: @border-radius-large;
 
   > a {
     display:block;
@@ -55,13 +55,13 @@ ol#repos {
   h4,
   h5,
   h6 {
-    color: @profile-repo-footer-color;
     position: absolute;
-    margin: 0;
     bottom: 0;
     width: 100%;
-    font-weight: @font-weight-normal;
+    margin: 0;
     font-size: @font-size-xsmall;
+    font-weight: @font-weight-normal;
+    color: @profile-repo-footer-color;
   }
 
   h2,
@@ -76,28 +76,28 @@ ol#repos {
   }
 
   h2 {
-    color: @profile-repo-header-color;
-    font-size: 22px;
-    line-height: @line-height-xsmall;
-    font-weight: @font-weight-light;
-    border-bottom: 1px solid @profile-repo-border;
     padding: 12px 15px;
     margin-top: 0;
+    font-size: 22px;
+    font-weight: @font-weight-light;
+    line-height: @line-height-xsmall;
+    color: @profile-repo-header-color;
     letter-spacing: 0;
+    border-bottom: 1px solid @profile-repo-border;
   }
 
   h4 {
     padding: 15px 25px 25px 15px;
-    background-color: @profile-repo-footer-bg;
     letter-spacing: 0;
+    background-color: @profile-repo-footer-bg;
   }
 
   h5 {
     padding: 15px 45px 22px 0;
     &:before {
       padding-right: 4px;
-      content: "\f005";
       font-family: FontAwesome;
+      content: "\f005";
     }
   }
 
@@ -105,15 +105,15 @@ ol#repos {
     padding: 15px 15px 22px 0;
     &:before {
       padding-right: 2px;
-      content: "\f126";
       font-family: FontAwesome;
+      content: "\f126";
     }
   }
 
   p {
-    color: @profile-repo-color;
-    font-size: @font-size-medium;
     margin: 12px 12px 20px 15px;
+    font-size: @font-size-medium;
+    color: @profile-repo-color;
   }
 }
 

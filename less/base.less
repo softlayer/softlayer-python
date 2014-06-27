@@ -7,15 +7,15 @@
 
 body {
   .transition-duration(.5s);
-  background-color: @body-bg;
-  color: @text-color;
-  font-weight: @font-weight-normal;
-  font-family: @font-family-sans;
-  font-size: @font-size-normal;
-  line-height: @line-height-normal;
   position: relative;
   left: 0;
   overflow-x: hidden;
+  font-family: @font-family-sans;
+  font-size: @font-size-normal;
+  font-weight: @font-weight-normal;
+  line-height: @line-height-normal;
+  color: @text-color;
+  background-color: @body-bg;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -61,8 +61,8 @@ dl {
 }
 
 dt {
-  font-weight: @font-weight-bold;
   font-size: 15.5px;
+  font-weight: @font-weight-bold;
 }
 
 dd {
@@ -86,10 +86,9 @@ u {
 // -------------------------
 
 hr {
-  margin: (@base-variable * 2) auto;
   width: (@base-variable * 5);
+  margin: (@base-variable * 2) auto;
   border-top: 1px solid @hr-color;
-
   &.full-screen {
     width: initial;
     margin: @base-variable-large 0;
