@@ -1,11 +1,26 @@
 /* =========================
-   Intro
+   Text
    ========================= */
+
+// Basic
+// -------------------------
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-center{
+  text-align: center;
+}
 
 // Pages
 // -------------------------
 
-.page-header {
+.page-text-header {
   .optimize-text();
   padding-bottom: 2px;
   margin: 0;
@@ -14,7 +29,7 @@
   color: @page-header-color;
 }
 
-.page-intro {
+.page-text-intro {
   .optimize-text();
   margin: 0;
   font-size: 28px;
@@ -23,11 +38,11 @@
 }
 
 @media (min-width: @view-sm) {
-  .page-header {
+  .page-text-header {
     font-size: 45px;
   }
 
-  .page-intro {
+  .page-text-intro {
     font-size: 30px;
   }
 }
@@ -35,8 +50,8 @@
 // Featured
 // -------------------------
 
-.featured-header,
-.featured-subheader {
+.featured-text-header,
+.featured-text-subheader {
   .optimize-text();
   margin: 0;
   font-family: @font-family-humanist-sans;
@@ -46,18 +61,18 @@
   letter-spacing: @letter-spacing-large;
 }
 
-.featured-header {
+.featured-text-header {
   padding-top: 76px;
   padding-bottom: 4px;
   color: @featured-header-color;
 }
 
-.featured-subheader {
+.featured-text-subheader {
   padding-bottom: 20px;
   color: @featured-subheader-color;
 }
 
-.featured-intro {
+.featured-text-intro {
   .optimize-text();
   padding-bottom: 56px;
   margin: 0;
@@ -70,17 +85,17 @@
 }
 
 @media (min-width: @view-sm) {
-  .featured-header,
-  .featured-subheader {
+  .featured-text-header,
+  .featured-text-subheader {
     font-size: 37.5px;
     line-height: @line-height-xsmall;
   }
 
-  .featured-header {
+  .featured-text-header {
     padding-bottom: 0;
   }
 
-  .featured-intro {
+  .featured-text-intro {
     padding-right: 66px;
     padding-left: 66px;
     font-size: 20px;

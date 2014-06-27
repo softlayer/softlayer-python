@@ -13,7 +13,7 @@
     var plugin   = this;
         el       = $(this);
         defaults = {
-          readOutput:         ".estimate",
+          readOutput:         ".duration",
           wordCount:          null,
           wordsPerMinute:     275,
           roundup:            true,
