@@ -38,9 +38,9 @@
     }
 
     var setTime = function (text) {
-      var totalWords     = text.trim().split(/\s+/g).length;
-      wordsPerSecond     = wordsPerMinute / 60;
-      totalTimeInSeconds = totalWords / wordsPerSecond;
+      var totalWords         = text.trim().split(/\s+/g).length;
+          wordsPerSecond     = wordsPerMinute / 60;
+          totalTimeInSeconds = totalWords / wordsPerSecond;
       
       if (roundup === true) {
         estimatedTimeInMinutes = Math.round(totalTimeInSeconds / 60);
@@ -49,8 +49,7 @@
         Math.floor(totalTimeInSeconds / 60);
       }
 
-      var estimatedTimeInSeconds = Math.round(totalTimeInSeconds - estimatedTimeInMinutes * 60);
-      
+      var estimatedTimeInSeconds = Math.round(totalTimeInSeconds - estimatedTimeInMinutes * 60);     
       if (roundup === true) {
         if (estimatedTimeInMinutes > 0) {
           $(estimateOutput).text(prependTime + estimatedTimeInMinutes + " " + minuteOutput);
