@@ -19,9 +19,7 @@
           rounding:          true,
           lessThanOneMinute: "",
           prependTime:       "",
-          prependWord:       "",
-          remotePath:        null,
-          remoteTarget:      null
+          prependWord:       ""
     };
 
     plugin.settings = $.extend({}, defaults, options);
@@ -29,24 +27,22 @@
     var estimateOutput    = plugin.settings.estimateOutput;
         wordCount         = plugin.settings.wordCount;
         wordsPerMinute    = plugin.settings.wordsPerMinute;
-        rounding          = plugin.settings.rounding;
+        roundup           = plugin.settings.roundup;
         lessThanOneMinute = plugin.settings.lessThanOneMinute;
         prependTime       = plugin.settings.prependTime;
         prependWord       = plugin.settings.prependWord;
-        remotePath        = plugin.settings.remotePath;
-        remoteTarget      = plugin.settings.remoteTarget;
-
 
     if (wordCount < wordsPerMinute) {
-      var lessThanOneMinute = lessThanOneMinute || "Less than a minute";
-      minShortForm = "minutes";
+      var lessThanOneMinute = lessThanOneMinute || "Less than a minute read";
+      minuteOutput = "min read";
     }
 
     var setTime = function (text) {
-      var totalWords = text.trim().split(/\s+/g).length;
-      wordsPerSecond = wordsPerMinute / 60;
+      var totalWords     = text.trim().split(/\s+/g).length;
+      wordsPerSecond     = wordsPerMinute / 60;
       totalTimeInSeconds = totalWords / wordsPerSecond;
-      if (rounding === true) {
+      
+      if (roundup === true) {
         estimatedTimeInMinutes = Math.round(totalTimeInSeconds / 60);
       }
       else {
@@ -54,9 +50,10 @@
       }
 
       var estimatedTimeInSeconds = Math.round(totalTimeInSeconds - estimatedTimeInMinutes * 60);
-      if (rounding === true) {
+      
+      if (roundup === true) {
         if (estimatedTimeInMinutes > 0) {
-          $(estimateOutput).text(prependTime + estimatedTimeInMinutes + " " + minShortForm);
+          $(estimateOutput).text(prependTime + estimatedTimeInMinutes + " " + minuteOutput);
         }
         else {
           $(estimateOutput).text(prependTime + lessThanOneMinute);
@@ -73,14 +70,7 @@
     };
 
     el.each(function () {
-      if (remotePath !== null && remoteTarget !== null) {
-        $.get(remotePath, function (data) {
-          setTime($("<div>").html(data).find(remoteTarget).text());
-        });
-      }
-      else {
-        setTime(el.text());
-      }
-    });
+      setTime(el.text());
+    }
   };
 })(jQuery);
