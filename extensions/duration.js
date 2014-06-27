@@ -33,7 +33,7 @@
         prependWord       = plugin.settings.prependWord;
 
     if (wordCount < wordsPerMinute) {
-      var lessThanOneMinute = lessThanOneMinute || "Less than a minute read";
+      var lessThanOneMinute = lessThanOneMinute || "Less than a min read";
       minuteOutput = "min read";
     }
 
