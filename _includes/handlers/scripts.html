@@ -7,11 +7,7 @@
 <script>
   $(document).ready(function() {
     $(".indexing").indexing(); // onDomready for indexing.js
-    $(".content").readEstimate(); // onDomready for read.js
+    $(".content").readEstimate(); // onDomready for estimate.js
   });
 </script>
-
-{% else %}
-<script src="{{page.baseurl}}assets/js/profile.js"></script>
-
 {% endif %}

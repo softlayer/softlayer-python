@@ -64,7 +64,8 @@ module.exports = function(grunt) {
               "plugins/toggle.js",
               "plugins/indexing.js",
               "plugins/scrollability.js",
-              "plugins/estimate.js"],
+              "plugins/estimate.js",
+              "plugins/profile.js"],
         dest: "assets/js/main.js"
       }
     },
@@ -77,14 +78,6 @@ module.exports = function(grunt) {
         },
         src: "<%= concat.main.dest %>",
         dest: "assets/js/main.js"
-      },
-      profile: {
-        options: {
-          banner: "<%= banner %>",
-          report: "min"
-        },
-        src: "plugins/profile.js",
-        dest: "assets/js/profile.js"
       }
     },
 

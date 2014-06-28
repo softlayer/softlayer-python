@@ -3,7 +3,6 @@
    ========================= */
 
 .estimate {
-  padding-right: 12px;
   font-family: @font-family-humanist-sans;
   font-size: 15px;
   color: rgba(0,0,0,0.2);
@@ -11,4 +10,10 @@
   position: absolute;
   top: 22px;
   right: 17px;
+}
+
+@media (min-width: @view-sm) {
+  .estimate {
+    padding-right: 12px;
+  }
 }

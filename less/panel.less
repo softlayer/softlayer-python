@@ -30,11 +30,10 @@
 
 .panel-title {
   margin-top: 0;
-  margin-bottom: @panel-title-margin-bottom;
-  font-size: @panel-title-font-size;
-  line-height: @panel-title-line-height;
-  font-weight: @panel-title-font-weight;
-  text-transform: none;
+  margin-bottom: 15px;
+  font-size: @font-size-large;
+  line-height: 24px;
+  font-weight: @font-weight-normal;
   color: @panel-title-color;
 }
 
@@ -56,35 +55,35 @@
 }
 
 .panel-box .panel-badge {
-  top: @panel-box-badge-top;
-  right: @panel-box-badge-right;
+  top: 12px;
+  right: 12px;
 }
 
 .panel-box .panel-teaser {
-  margin: @panel-box-teaser-margin @panel-box-teaser-margin @panel-box-teaser-margin-bottom @panel-box-teaser-margin;
+  margin: -15px -15px 15px -15px;
 }
 
 .panel-box-primary {
-  background-color: @panel-box-primary-background;
+  background-color: @panel-box-primary-bg;
   color: @panel-box-primary-color;
 }
 
 .panel-box-primary .panel-title {
-  color: @panel-box-primary-title-color;
+  color: @panel-box-primary-title;
 }
 
 .panel-box-secondary {
-  background-color: @panel-box-secondary-background;
+  background-color: @panel-box-secondary-bg;
   color: @panel-box-secondary-color;
 }
 
 .panel-box-secondary .panel-title {
-  color: @panel-box-secondary-title-color;
+  color: @panel-box-secondary-title;
 }
 
 .panel-header .panel-title {
-  padding-bottom: @panel-header-title-padding;
-  border-bottom: @panel-header-title-border-width solid @panel-header-title-border;
+  padding-bottom: @padding-panel-header-title;
+  border-bottom: 1px solid @panel-header-title-border;
   color: @panel-header-title-color;
 }
 
@@ -98,17 +97,17 @@
 }
 
 .panel + .panel-divider {
-  margin-top: (@panel-divider-gutter * 2) !important;
+  margin-top: (25px * 2) !important;
 }
 
 .panel + .panel-divider:before {
   content: "";
   display: block;
   position: absolute;
-  top: -(@panel-divider-gutter);
+  top: -(25px);
   left: 0;
   right: 0;
-  border-top: @panel-divider-border-width solid @panel-divider-border;
+  border-top: 1px solid @panel-border-divider;
 }
 
 .example {
@@ -141,9 +140,9 @@
 
 @media (min-width: @view-lg) {
   .panel + .panel-divider {
-    margin-top: (@panel-divider-gutter-large * 2) !important;
+    margin-top: (35px * 2) !important;
   }
   .panel + .panel-divider:before {
-    top: -(@panel-divider-gutter-large);
+    top: -(35px);
   }
 }
