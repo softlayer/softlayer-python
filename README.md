@@ -1,6 +1,6 @@
 ## Contents
 
-* [Project Page](#project-page)
+* [Our Project Pages](#our-project-pages)
 * [Features](#features)
 * [Recommended Browsers](#recommended-browsers)
 * [Prerequisites](#prerequisites)
@@ -14,11 +14,11 @@
 
 ---
 
-## Project Page
+## Our Project Pages
 
-We use a homegrown, content-first framework for our GitHub docs. It provides the facilities to write content exclusively in Markdown and spin-up Jekyll-powered static websites, in addition to:
+We use homegrown, content-first boilerplates for our GitHub docs. It provides the facilities to write content exclusively in Markdown and spin-up Jekyll-powered static websites, as well as:
 
-* Improving load times
+* Guaranteeing fast load times
 * Automating repetitive tasks
 * Embedding responsiveness in its core rather than wrapping code around elements
 * Having indexes/table of contents built automatically
@@ -94,7 +94,7 @@ See the table below for a comparison of OS platforms and browsers.
 
 ## Prerequisites
 
-Our framework requires the minimum versions for Ruby, Python, and Node.js. Click the links to get download and installation information for your OS.
+Our boilerplate requires the minimum versions for Ruby, Python, and Node.js. Click the links to get download and installation information for your OS.
 
 * [Ruby 2.0.0](http://www.ruby-lang.org/en/installation)
 * [Python 2.7.5](http://www.python.org/download) (see note)
@@ -114,43 +114,43 @@ Read Yi Zeng's [Setup Jekyll on Windows](http://yizeng.me/2013/05/10/setup-jekyl
 
   ~~~bash
   # each command returns a version number
-  ruby -v
-  python --version
-  node  --version
+  $ ruby -v
+  $ python --version
+  $ node  --version
   ~~~
 
 2. Clone from GitHub and go into the directory
 
   ~~~bash
-  git clone -b gh-pages https://github.com/softlayer/softlayer-python.git
-  cd softlayer-python
+  $ git clone -b gh-pages https://github.com/softlayer/softlayer-python.git
+  $ cd softlayer-python
   ~~~
 
 3. Install Grunt (~3 sec.)
 
   ~~~bash
-  [sudo] npm install -g grunt-cli
+  $ [sudo] npm install -g grunt-cli
   ~~~
 
 4. Install modes for Node.js (~15 sec.)
 
   ~~~bash
-  [sudo] npm install
+  $ [sudo] npm install
   ~~~
 
 5. Install Jekyll, Pygments and other dependencies (~35 sec.)
 
   ~~~bash
-  [sudo] grunt install
+  $ [sudo] grunt install
   ~~~
 
 ---
 
 ## Grunt
 
-We're big proponents of DRY (don't repeat yourself). That's why automation became such an important competency for this project. After all, the more automation there is, the less repetitive work you have (and hopefully the less mistakes you make).
+We're big proponents of DRY (don't repeat yourself). That's why automation became such an important competency for our boilerplate. After all, the more automation there is, the less repetitive work you have (and hopefully the less mistakes you make).
 
-With [Grunt](http://gruntjs.com), we're able to build a powerful harness that automates ankle-biting tasks like:
+Using [Grunt](http://gruntjs.com), we built a powerful harness that automates ankle-biting tasks like:
 
 * Bundling JS files and transpiling LESS into CSS
 * Validating HTML markup
