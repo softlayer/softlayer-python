@@ -16,11 +16,12 @@
 
 ## Our Project Pages
 
-We use homegrown, content-first boilerplates for our GitHub docs. It provides the facilities to write content exclusively in Markdown and spin-up Jekyll-powered static websites, as well as:
+We use homegrown, content-first boilerplates for our GitHub docs. They provide the facilities to write content exclusively in Markdown and spin-up [Jekyll](http://jekyllrb.com)-powered static websites, as well as:
 
 * Guaranteeing fast load times
 * Automating repetitive tasks
-* Embedding responsiveness in its core rather than wrapping code around elements
+* Embedding responsiveness in its core without wrapping code around elements
+* Providing estimated reading time 
 * Having indexes/table of contents built automatically
 * Deploying minified or unminified JS and CSS in production
 * Encoding URLs with the appropriate labels to help users filter or create issues accurately on GitHub
@@ -58,12 +59,12 @@ Below is a list of functional and aesthetic features and their purpose.
 
 ### Plugins
 
-* [Classify](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/classify.js) extensible DOM utility for class helper functions
-* [Estimate](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/duration.js) to gauge how long it takes to read a single page
-* [Indexing](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/indexing.js) plugin for building table of contents on-the-fly
-* [Profile](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/profiler.js) plugin for fetching organization and repository data from GitHub
-* [Scrollability](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/scrollability.js) to set thresholds for elements while scrolling
-* [Toggle](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/toggle.js) to handle sliding and collapsing behavior for navigation
+* [Classify](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/classify.js) DOM utility for class helper functions
+* [Estimate](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/estimate.js) to gauge how long it takes to read a single page
+* [Indexing](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/indexing.js) plugin for building table of contents on-the-fly
+* [Profile](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/profiler.js) plugin for fetching organization and repository data from GitHub
+* [Scrollability](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/scrollability.js) to set thresholds for elements while scrolling
+* [Toggle](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/toggle.js) to handle sliding and collapsing behavior for navigation
 
 ---
 
@@ -112,7 +113,7 @@ Read Yi Zeng's [Setup Jekyll on Windows](http://yizeng.me/2013/05/10/setup-jekyl
 
 1. Run the commands below to verify __Ruby__, __Python__ and __Node.js__ are installed (see [Prerequisites](#prerequisites) for supported versions)
 
-  ~~~bash
+  ~~~sh
   # each command returns a version number
   $ ruby -v
   $ python --version
@@ -121,26 +122,26 @@ Read Yi Zeng's [Setup Jekyll on Windows](http://yizeng.me/2013/05/10/setup-jekyl
 
 2. Clone from GitHub and go into the directory
 
-  ~~~bash
+  ~~~sh
   $ git clone -b gh-pages https://github.com/softlayer/softlayer-python.git
   $ cd softlayer-python
   ~~~
 
 3. Install Grunt (~3 sec.)
 
-  ~~~bash
+  ~~~sh
   $ [sudo] npm install -g grunt-cli
   ~~~
 
 4. Install modes for Node.js (~15 sec.)
 
-  ~~~bash
+  ~~~sh
   $ [sudo] npm install
   ~~~
 
 5. Install Jekyll, Pygments and other dependencies (~35 sec.)
 
-  ~~~bash
+  ~~~sh
   $ [sudo] grunt install
   ~~~
 
@@ -347,7 +348,7 @@ Below is a list of the metadata tags we use.
 
 ## Code Styles
 
-Use the settings below to help unify coding styles for different editors.
+Use the settings below to help unify coding styles across different editors.
 
 * `indent_style = space`
 * `end_of_line = lf`
