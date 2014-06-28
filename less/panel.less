@@ -28,6 +28,95 @@
   }
 }
 
+.panel-title {
+  margin-top: 0;
+  margin-bottom: @panel-title-margin-bottom;
+  font-size: @panel-title-font-size;
+  line-height: @panel-title-line-height;
+  font-weight: @panel-title-font-weight;
+  text-transform: @panel-title-text-transform;
+  color: @panel-title-color;
+  .hook-panel-title;
+}
+
+.panel-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  .hook-panel-badge;
+}
+
+.panel-box {
+  padding: @panel-box-padding;
+  background: @panel-box-background;
+  color: @panel-box-color;
+  .hook-panel-box;
+}
+
+.panel-box .panel-title { 
+  color: @panel-box-title-color; 
+}
+
+.panel-box .panel-badge {
+  top: @panel-box-badge-top;
+  right: @panel-box-badge-right;
+}
+
+.panel-box .panel-teaser { 
+  margin: @panel-box-teaser-margin @panel-box-teaser-margin @panel-box-teaser-margin-bottom @panel-box-teaser-margin; 
+}
+
+.panel-box-primary {
+  background-color: @panel-box-primary-background;
+  color: @panel-box-primary-color;
+  .hook-panel-box-primary;
+}
+
+.panel-box-primary .panel-title { 
+  color: @panel-box-primary-title-color; 
+}
+
+.panel-box-secondary {
+  background-color: @panel-box-secondary-background;
+  color: @panel-box-secondary-color;
+  .hook-panel-box-secondary;
+}
+
+.panel-box-secondary .panel-title { 
+  color: @panel-box-secondary-title-color; 
+}
+
+.panel-header .panel-title {
+  padding-bottom: @panel-header-title-padding;
+  border-bottom: @panel-header-title-border-width solid @panel-header-title-border;
+  color: @panel-header-title-color;
+  .hook-panel-header;
+}
+
+.panel-space {
+  padding: @panel-space-padding; 
+}
+
+.panel-space .panel-badge {
+  top: @panel-space-padding;
+  right: @panel-space-padding;
+}
+
+.panel + .panel-divider { 
+  margin-top: (@panel-divider-gutter * 2) !important; 
+}
+
+.panel + .panel-divider:before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: -(@panel-divider-gutter);
+  left: 0;
+  right: 0;
+  border-top: @panel-divider-border-width solid @panel-divider-border;
+}
+
 .example {
   &:after {
     position: absolute;
@@ -53,5 +142,14 @@
       border-bottom-right-radius: @border-radius-large;
       border-bottom-left-radius: @border-radius-large;
     }
+  }
+}
+
+@media (min-width: @view-lg) {
+  .panel + .panel-divider { 
+    margin-top: (@panel-divider-gutter-large * 2) !important; 
+  }
+  .panel + .panel-divider:before { 
+    top: -(@panel-divider-gutter-large); 
   }
 }
