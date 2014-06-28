@@ -110,20 +110,26 @@ Read Yi Zeng's [Setup Jekyll on Windows](http://yizeng.me/2013/05/10/setup-jekyl
 
 ## Getting Started
 
-1. Verify __Ruby__, __Python__ and __Node.js__ are installed (see [Prerequisites](#prerequisites) for supported versions)
+Step 1. Verify __Ruby__, __Python__ and __Node.js__ are installed (see [Prerequisites](#prerequisites) for supported versions)
 
-        # each command returns a version number
-        ruby -v
-        python --version
-        node  --version
+~~~bash
+# each command returns a version number
+ruby -v
+python --version
+node  --version
+~~~
 
-2. Clone from GitHub
+Step 2. Clone from GitHub
 
-        git clone -b gh-pages https://github.com/softlayer/softlayer-python.git
+~~~bash
+git clone -b gh-pages https://github.com/softlayer/softlayer-python.git
+~~~
 
-3. Go into the directory
+Step 3. Go into the directory
 
-        cd softlayer-python
+~~~bash
+cd softlayer-python
+~~~
 
 4. Install Grunt (takes ~3 sec.)
 
