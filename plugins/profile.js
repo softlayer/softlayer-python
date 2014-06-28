@@ -9,7 +9,6 @@
 heroElement = document.getElementById("hero-element");
 
 if (typeof(heroElement) !== undefined && heroElement !== null) {
-
   $.getJSON("https://api.github.com/repos/softlayer/softlayer-python/contributors?callback=?", function(result) {
     numContributors = result.data;
     $(function() {
@@ -34,8 +33,10 @@ if (typeof(heroElement) !== undefined && heroElement !== null) {
       $("#github-version").text(lastTag.name);
     }
   });
+}
 
-  (function ($) {
+(function ($) {
+  if (typeof(heroElement) !== undefined && heroElement !== null) {
     repoUrl = function(repo) {
       return repoUrls[repo.name] || repo.html_url;
     };
@@ -52,26 +53,24 @@ if (typeof(heroElement) !== undefined && heroElement !== null) {
       $link.append($("<h5>").text(repo.watchers));
       $link.append($("<h6>").text(repo.forks));
       $link.append($("<p>").text(repoDescription(repo)));
-    
+
       $item.appendTo("#repos");
     };
 
     addRepos = function(repos, page) {
       repos = repos || [];
       page  = page  || 1;
-      uri   = "https://api.github.com/orgs/softlayer/repos?callback=?" 
-            + "&per_page=50" 
-            + "&page="+ page;
+      uri   = "https://api.github.com/orgs/softlayer/repos?callback=?" + "&per_page=50" + "&page="+ page;
 
       $.getJSON(uri, function(result) {
         if (result.data && result.data.length > 0) {
           repos = repos.concat(result.data);
           return addRepos(repos, page + 1);
-        } 
+        }
         else {
           $(function() {
             $("#github-repos").text(repos.length);
-          
+
             $.each(repos, function(i, repo) {
               repo.pushed_at    = new Date(repo.pushed_at);
               weekHalfLife      = 1.146 * Math.pow(10, -9);
@@ -118,5 +117,5 @@ if (typeof(heroElement) !== undefined && heroElement !== null) {
     };
 
     return addRepos();
-  })
-}(jQuery);
+  }
+})(jQuery);

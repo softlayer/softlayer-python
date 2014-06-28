@@ -34,9 +34,8 @@
   font-size: @panel-title-font-size;
   line-height: @panel-title-line-height;
   font-weight: @panel-title-font-weight;
-  text-transform: @panel-title-text-transform;
+  text-transform: none;
   color: @panel-title-color;
-  .hook-panel-title;
 }
 
 .panel-badge {
@@ -44,18 +43,16 @@
   top: 0;
   right: 0;
   z-index: 1;
-  .hook-panel-badge;
 }
 
 .panel-box {
-  padding: @panel-box-padding;
+  padding: @padding-panel-box;
   background: @panel-box-background;
   color: @panel-box-color;
-  .hook-panel-box;
 }
 
-.panel-box .panel-title { 
-  color: @panel-box-title-color; 
+.panel-box .panel-title {
+  color: @panel-box-title-color;
 }
 
 .panel-box .panel-badge {
@@ -63,48 +60,45 @@
   right: @panel-box-badge-right;
 }
 
-.panel-box .panel-teaser { 
-  margin: @panel-box-teaser-margin @panel-box-teaser-margin @panel-box-teaser-margin-bottom @panel-box-teaser-margin; 
+.panel-box .panel-teaser {
+  margin: @panel-box-teaser-margin @panel-box-teaser-margin @panel-box-teaser-margin-bottom @panel-box-teaser-margin;
 }
 
 .panel-box-primary {
   background-color: @panel-box-primary-background;
   color: @panel-box-primary-color;
-  .hook-panel-box-primary;
 }
 
-.panel-box-primary .panel-title { 
-  color: @panel-box-primary-title-color; 
+.panel-box-primary .panel-title {
+  color: @panel-box-primary-title-color;
 }
 
 .panel-box-secondary {
   background-color: @panel-box-secondary-background;
   color: @panel-box-secondary-color;
-  .hook-panel-box-secondary;
 }
 
-.panel-box-secondary .panel-title { 
-  color: @panel-box-secondary-title-color; 
+.panel-box-secondary .panel-title {
+  color: @panel-box-secondary-title-color;
 }
 
 .panel-header .panel-title {
   padding-bottom: @panel-header-title-padding;
   border-bottom: @panel-header-title-border-width solid @panel-header-title-border;
   color: @panel-header-title-color;
-  .hook-panel-header;
 }
 
 .panel-space {
-  padding: @panel-space-padding; 
+  padding: @padding-panel;
+
+  .panel-badge {
+    top: @padding-panel-space;
+    right: @padding-panel-space;
+  }
 }
 
-.panel-space .panel-badge {
-  top: @panel-space-padding;
-  right: @panel-space-padding;
-}
-
-.panel + .panel-divider { 
-  margin-top: (@panel-divider-gutter * 2) !important; 
+.panel + .panel-divider {
+  margin-top: (@panel-divider-gutter * 2) !important;
 }
 
 .panel + .panel-divider:before {
@@ -146,10 +140,10 @@
 }
 
 @media (min-width: @view-lg) {
-  .panel + .panel-divider { 
-    margin-top: (@panel-divider-gutter-large * 2) !important; 
+  .panel + .panel-divider {
+    margin-top: (@panel-divider-gutter-large * 2) !important;
   }
-  .panel + .panel-divider:before { 
-    top: -(@panel-divider-gutter-large); 
+  .panel + .panel-divider:before {
+    top: -(@panel-divider-gutter-large);
   }
 }
