@@ -60,13 +60,12 @@ module.exports = function(grunt) {
         options: {
           banner: "<%= banner %>"
         },
-        src: ["extensions/classify.js",
-              "extensions/toggle.js",
-              "extensions/indexing.js",
-              "extensions/scrollability.js",
-              "extensions/easing.js",
-              "extensions/read.js"],
-        dest: "public/js/main.js"
+        src: ["plugins/classify.js",
+              "plugins/toggle.js",
+              "plugins/indexing.js",
+              "plugins/scrollability.js",
+              "plugins/estimate.js"],
+        dest: "assets/js/main.js"
       }
     },
 
@@ -77,15 +76,15 @@ module.exports = function(grunt) {
           report: "min"
         },
         src: "<%= concat.main.dest %>",
-        dest: "public/js/main.js"
+        dest: "assets/js/main.js"
       },
       profile: {
         options: {
           banner: "<%= banner %>",
           report: "min"
         },
-        src: "extensions/profile.js",
-        dest: "public/js/profile.js"
+        src: "plugins/profile.js",
+        dest: "assets/js/profile.js"
       }
     },
 
@@ -97,7 +96,7 @@ module.exports = function(grunt) {
           banner: "<%= banner %>"
         },
         src: ["less/@import.less"],
-        dest: "public/css/main.css"
+        dest: "assets/css/main.css"
       },
       minify: {
         options: {
@@ -106,7 +105,7 @@ module.exports = function(grunt) {
           banner: "<%= banner %>"
         },
         src: ["less/@import.less"],
-        dest: "public/css/main.css"
+        dest: "assets/css/main.css"
       }
     },
 

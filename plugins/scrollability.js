@@ -1,6 +1,6 @@
 /*
 #  Scrollability
-#  Thresholds and animations for page scrolling
+#  Thresholds and smooth animations for page scrolling
 #
 #  Copyright © SoftLayer, an IBM Company
 #  Code and documentation licensed under MIT
@@ -40,3 +40,18 @@ window.onscroll = function() {
     scrollTo(document.body, 0, 0);
   };
 };
+
+$("a[href*=#]:not([href=#])").click(function() {
+  if (location.pathname.replace(/^\//,"") == this.pathname.replace(/^\//,"") || location.hostname == this.hostname) {
+    var target = $(this.hash);
+        target = target.length ? target : $("[name=" + this.hash.slice(1) +"]");
+
+    if (target.length) {
+      $("html,body").animate({
+        scrollTop: target.offset().top
+      }, 1000);
+
+      return false;
+    }
+  }
+});

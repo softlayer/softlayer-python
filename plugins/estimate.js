@@ -1,6 +1,6 @@
 /*
-#  Read
-#  Estimates how long it'll take to read a single page
+#  Estimate
+#  Gauges how long it'll take to read a single page
 #
 #  Copyright © Softlayer, an IBM Company
 #  Code and documentation licensed under MIT
@@ -13,7 +13,7 @@
     var plugin   = this;
         el       = $(this);
         defaults = {
-          readOutput:         ".duration",
+          readOutput:         ".estimate",
           wordCount:          null,
           wordsPerMinute:     275,
           roundup:            true,
