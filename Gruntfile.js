@@ -20,7 +20,7 @@ module.exports = function(grunt) {
       bundler: {
         command: ["gem update --system",
                   "gem install bundler",
-                  "bundle install",
+                  "bundle install --quiet",
                   "rm -r Gemfile.lock"].join("&&"),
         options: {
           stdout: true
