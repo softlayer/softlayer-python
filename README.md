@@ -1,20 +1,20 @@
 ## Contents
 
-* [GitHub Pages](#github-pages)
-* [Features and Functionality](#features-and-functionality)
+* [Project Page](#project-page)
+* [Features](#features)
 * [Recommended Browsers](#recommended-browsers)
 * [Prerequisites](#prerequisites)
 * [Getting Started](#getting-started)
 * [Grunt](#grunt)
-* [Directory Structure](#directory-structure)
-* [HTML DOM Elements in JS](#html-dom-elements-in-js)
+* [Code Organization](#code-organization)
+* [DOM Elements](#dom-elements)
 * [Repository Metadata](#repository-metadata)
 * [Code Styles](#code-styles)
 * [Running into Problems?](#running-into-problems)
 
 ---
 
-## GitHub Pages
+## Project Page
 
 We use a homegrown, content-first framework for our GitHub docs. It provides the facilities to write content exclusively in Markdown and spin-up Jekyll-powered static websites, in addition to:
 
@@ -28,7 +28,7 @@ We use a homegrown, content-first framework for our GitHub docs. It provides the
 
 ---
 
-## Features and Functionality
+## Features
 
 Below is a list of functional and aesthetic features and their purpose.
 
@@ -59,7 +59,7 @@ Below is a list of functional and aesthetic features and their purpose.
 ### Plugins
 
 * [Classify](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/classify.js) extensible DOM utility for class helper functions
-* [Estimate](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/duration.js) to estimate how long it takes to read a single page
+* [Estimate](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/duration.js) to gauge how long it takes to read a single page
 * [Indexing](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/indexing.js) plugin for building table of contents on-the-fly
 * [Profile](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/profiler.js) plugin for fetching organization and repository data from GitHub
 * [Scrollability](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/scrollability.js) to set thresholds for elements while scrolling
@@ -100,7 +100,7 @@ Our framework requires the minimum versions for Ruby, Python, and Node.js. Click
 * [Python 2.7.5](http://www.python.org/download) (see note)
 * [Node.js 0.10.20](http://nodejs.org/download)
 
-> Note: Python powers the standard code highlighter, Pygments. Currently, Pygments 1.6 is not compatible with Python 3. **You must have Python 2 installed** until Pygments 2.0 is released (date pending).
+> Note: Python powers Pygments, which we use for code highlighting. Currently, Pygments 1.6 is not compatible with Python 3. **You must have Python 2 installed** until Pygments 2.0 is released (date pending).
 
 #### Windows Users
 
@@ -110,38 +110,39 @@ Read Yi Zeng's [Setup Jekyll on Windows](http://yizeng.me/2013/05/10/setup-jekyl
 
 ## Getting Started
 
-Step 1. Verify __Ruby__, __Python__ and __Node.js__ are installed (see [Prerequisites](#prerequisites) for supported versions)
+Before getting started, run the commands below to verify that __Ruby__, __Python__ and __Node.js__ are installed (see [Prerequisites](#prerequisites) for supported versions).
 
-~~~bash
+~~~sh
 # each command returns a version number
 ruby -v
 python --version
 node  --version
 ~~~
 
-Step 2. Clone from GitHub
+1. Clone from GitHub and go into the directory
 
-~~~bash
+~~~sh
 git clone -b gh-pages https://github.com/softlayer/softlayer-python.git
-~~~
-
-Step 3. Go into the directory
-
-~~~bash
 cd softlayer-python
 ~~~
 
-4. Install Grunt (takes ~3 sec.)
+^2. Install Grunt (~3 sec.)
 
-        [sudo] npm install -g grunt-cli
+~~~sh
+[sudo] npm install -g grunt-cli
+~~~
 
-5. Install Node.js modules (takes ~15 sec.)
+^3. Install modes for Node.js (~15 sec.)
 
-        [sudo] npm install
+~~~sh
+[sudo] npm install
+~~~
 
-5. Install Jekyll, Pygments and other dependencies (takes ~40 sec.)
+^4. Install Jekyll, Pygments and other dependencies (~35 sec.)
 
-        [sudo] grunt install
+~~~sh
+[sudo] grunt install
+~~~
 
 ---
 
@@ -184,7 +185,7 @@ Run `grunt install` to perform the following:
 2. Read in the Rubygem dependencies from the [Gemfile](gemfile)
 3. Use Bundler's CLI to install the necessary gems
 
-#### grunt preview
+#### Grunt Preview
 
 Run `grunt preview` to perform the following:
 
@@ -194,7 +195,7 @@ Run `grunt preview` to perform the following:
 
 > Preview mode lasts forever. It will not timeout after a period of non-usage. In order to kill it, press `CTRL+C`.
 
-#### grunt serve
+#### Grunt Serve
 
 *This task is a combination of `grunt build` and `grunt preview`.*
 
@@ -208,7 +209,7 @@ Run `grunt serve` to perform the following:
 
 > Just like with `grunt preview`, serve mode lasts forever. It will not timeout after a period of non-usage. In order to kill it, press `CTRL+C`.
 
-#### grunt test
+#### Grunt Test
 
 Run `grunt test` to perform the following:
 
@@ -216,11 +217,11 @@ Run `grunt test` to perform the following:
 2. Test all `*html` files against [W3's HTML validation service](http://validator.w3.org)
 3. Spit out logs
 
-#### grunt update
+#### Grunt Update
 
 Run `grunt update` to perform the following:
 
-1. Deletes the current `node_modules` directory
+1. Delete the current `node_modules` directory
 2. Read in the dev dependencies from [package.json](package.json)
 3. Fire off the `npm install` command
 4. Install a new `node_modules` directory with the latest dev dependency versions
@@ -258,17 +259,17 @@ Unlike Alias, Basic tasks perform a much smaller set of instructions. Only a few
 | Grunt Command           | Description |
 | ----------------------- | ----------- |
 | `grunt jekyll:preview`  | Same as the Alias `grunt preview` task |
-| `grunt recess:unminify` | Concats LESS files and drops a new CSS file into `public/css/` |
-| `grunt recess:minify`   | Concats and minifies LESS files and drops a new CSS file into `public/css/` |
+| `grunt recess:unminify` | Concats LESS files and drops a new CSS file into `assets/css/` |
+| `grunt recess:minify`   | Concats and minifies LESS files and drops a new CSS file into `assets/css/` |
 | `grunt shell:bundler`   | Same as the Alias `grunt install` task |
 | `grunt shell:npm`       | Same as the Alias `grunt update` task |
 | `grunt shell:pygments`  | Installs Python setuptools, pip, and Pygments |
 
 ---
 
-## Directory Structure
+## Code Organization
 
-Below is the basic directory structure---not including `node_modules` (Grunt), `_site` (Jekyll), or any directories made for one-off projects.
+Below is the basic spread for our directory---not including `node_modules` (Grunt), `_site` (Jekyll), or any directories made for one-off projects.
 
 <pre>
 ├─ _includes/
@@ -313,7 +314,7 @@ Here's an overview of each subdirectory.
 
 ---
 
-## HTML DOM Elements in JS
+## DOM Elements
 
 Several DOM elements are embedded within JS and render on the home/landing page. The table below provides the name and purpose of each element (in alphabetical order).
 
