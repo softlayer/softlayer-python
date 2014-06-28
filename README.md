@@ -59,8 +59,7 @@ Below is a list of functional and aesthetic features and their purpose.
 ### Plugins
 
 * [Classify](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/classify.js) extensible DOM utility for class helper functions
-* [Duration](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/duration.js) to estimate how long it takes to read a single page
-* [Easing](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/easing.js) for animated page scrolling
+* [Estimate](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/duration.js) to estimate how long it takes to read a single page
 * [Indexing](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/indexing.js) plugin for building table of contents on-the-fly
 * [Profile](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/profiler.js) plugin for fetching organization and repository data from GitHub
 * [Scrollability](http://github.com/softlayer/softlayer-python/blob/gh-pages/javascript/scrollability.js) to set thresholds for elements while scrolling
@@ -146,7 +145,7 @@ We're big proponents of DRY (don't repeat yourself). That's why automation becam
 
 With [Grunt](http://gruntjs.com), we're able to build a powerful harness that automates ankle-biting tasks like:
 
-* Concatenating JS files and transpiling LESS into CSS
+* Bundling JS files and transpiling LESS into CSS
 * Validating HTML markup
 * Installing runtime dependencies for Ruby and Node
 * Previewing work locally before pushing it to GitHub
@@ -168,8 +167,8 @@ Run any of these commands to initiate a task.
 
 Run `grunt build` to perform the following:
 
-1. Concat and minify `*.js` files using [UglifyJS](http://lisperator.net/uglifyjs)
-2. Concat and minify `*.less` files to `*.css` using [RECESS](http://twitter.github.io/recess)
+1. Bundle and minify `*.js` files using [UglifyJS](http://lisperator.net/uglifyjs)
+2. Bundle and minify `*.less` files to `*.css` using [RECESS](http://twitter.github.io/recess)
 
 #### Grunt Install
 
@@ -195,8 +194,8 @@ Run `grunt preview` to perform the following:
 
 Run `grunt serve` to perform the following:
 
-1. Concat and minify `*.js` files using [UglifyJS](http://lisperator.net/uglifyjs)
-2. Concat and minify `*.less` files to `*.css` using [RECESS](http://twitter.github.io/recess)
+1. Bundle and minify `*.js` files using [UglifyJS](http://lisperator.net/uglifyjs)
+2. Bundle and minify `*.less` files to `*.css` using [RECESS](http://twitter.github.io/recess)
 3. Build the website locally in the `_site` directory
 4. Start a local environment on [http://localhost:4000](http://localhost:4000)
 5. Watch and regenerate a new `_site` directory whenever a file is modified (except JS and LESS stylesheets)
@@ -268,31 +267,30 @@ Below is the basic directory structure---not including `node_modules` (Grunt), `
 <pre>
 ├─ _includes/
 │  ├─ docs/
-│  ├─ featured/
 │  ├─ handlers/
 │  └─ packages/
 ├─ _layout/
-├─ extensions/
-├─ less/
-├─ public/
+├─ assets/
 │  ├─ css/
 │  ├─ images/
 │  └─ js/
+├─ less/
+├─ plugins/
 
-5 directories, 7 subdirectories
+5 directories, 6 subdirectories
 </pre>
 
 ### Directory
 
 Here's an overview of what each directory does or contains.
 
-| Directory                | Overview  |
-| ------------------------ | --------- |
-| <samp>_includes/</samp>  | Reusable chunks of content (called “partials”) and semantic elements. The `{% include file.ext %}` tag indicates a partial is being used. |
-| <samp>_layouts/</samp>   | Reusable templates designed for specific uses, like **pages**, **news**, **articles**, and **blogs**. The `{{content}}` tag injects external content into layouts. |
-| <samp>extensions/</samp> | The source for `*.js` scripts. Concatenated JS files are stored in `public/js`. |
-| <samp>less/</samp>       | The source for `*.less` stylesheets. Concatenated LESS files are stored in `public/css`. |
-| <samp>public/</samp>     | Static and transpiled resources used exclusively by the website. This includes JS, CSS, and images.|
+| Directory               | Overview  |
+| ----------------------- | --------- |
+| <samp>_includes/</samp> | Reusable chunks of content (“partials”) and semantic elements. The `{% include file.ext %}` tag indicates a partial is being used. |
+| <samp>_layouts/</samp>  | Reusable templates designed for specific uses, like **pages**, **news**, **articles**, and **blogs**. The `{{content}}` tag injects external content into layouts. |
+| <samp>assets/</samp>    | Static and transpiled resources used exclusively by the website. This includes JS, CSS, and images.|
+| <samp>less/</samp>      | The source for `*.less` stylesheets. Concatenated LESS files are stored in `assets/css`. |
+| <samp>plugins/</samp>   | The source for `*.js` scripts. Bundled JS files are stored in `assets/js`. |
 
 ### Subdirectory
 
@@ -301,12 +299,11 @@ Here's an overview of each subdirectory.
 | Subdirectory                    | Overview |
 | ------------------------------- | -------- |
 | <samp>_includes/docs</samp>     | Reusable, plain-text snippets for documentation |
-| <samp>_includes/featured</samp> | Reusable, HTML snippets for the landing/home page
 | <samp>_includes/handlers</samp> | [Logic tags](http://docs.shopify.com/themes/liquid-basics) for the Liquid templating engine |
 | <samp>_includes/packages</samp> | The source for `ez_setup.py` and `get-pip.py` |
-| <samp>public/css</samp>         | Directory for static CSS resources |
-| <samp>public/images</samp>      | The source for all images, including favicons and logos |
-| <samp>public/js</samp>          | Directory for concatenated JS resources |
+| <samp>assets/css</samp>         | Directory for static CSS resources |
+| <samp>assets/images</samp>      | The source for all images, including favicons and logos |
+| <samp>assets/js</samp>          | Directory for concatenated JS resources |
 
 ---
 
