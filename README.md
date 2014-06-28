@@ -112,37 +112,37 @@ Read Yi Zeng's [Setup Jekyll on Windows](http://yizeng.me/2013/05/10/setup-jekyl
 
 1. Run the commands below to verify __Ruby__, __Python__ and __Node.js__ are installed (see [Prerequisites](#prerequisites) for supported versions)
 
-~~~sh
-# each command returns a version number
-ruby -v
-python --version
-node  --version
-~~~
+  ~~~bash
+  # each command returns a version number
+  ruby -v
+  python --version
+  node  --version
+  ~~~
 
 2. Clone from GitHub and go into the directory
 
-~~~sh
-git clone -b gh-pages https://github.com/softlayer/softlayer-python.git
-cd softlayer-python
-~~~
+  ~~~bash
+  git clone -b gh-pages https://github.com/softlayer/softlayer-python.git
+  cd softlayer-python
+  ~~~
 
 3. Install Grunt (~3 sec.)
 
-~~~sh
-[sudo] npm install -g grunt-cli
-~~~
+  ~~~bash
+  [sudo] npm install -g grunt-cli
+  ~~~
 
 4. Install modes for Node.js (~15 sec.)
 
-~~~sh
-[sudo] npm install
-~~~
+  ~~~bash
+  [sudo] npm install
+  ~~~
 
 5. Install Jekyll, Pygments and other dependencies (~35 sec.)
 
-~~~sh
-[sudo] grunt install
-~~~
+  ~~~bash
+  [sudo] grunt install
+  ~~~
 
 ---
 
