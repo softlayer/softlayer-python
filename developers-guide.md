@@ -10,7 +10,7 @@ baseurl: "../"
 This guide explains how to start writing code for {{site.project.name}}. By now, you should know the basics covered in [Getting Started]({{page.baseurl}}getting-started). If not, we recommend starting there first. This guide doesn't rehash most of those topics.
 
 ***
-# Deep Diving into CLI
+# Core Concept
 
 In Getting Started, we discussed the basics about the {{site.project.name}}:
 
@@ -39,7 +39,7 @@ In this example:
 {% include docs/code-organization.md %}
 
 ***
-# Core Functionality
+# Functionality
 
 At its core, the {{site.project.name}} is comprised of four major parts:
 
@@ -189,7 +189,7 @@ Actions are parameters the {{site.project.alias}} passes along to the API. These
 
 ### Implementing an Action
 
-You can implement actions easily just by adding a class to a module with the subclass of `CLIRunnable`. 
+You can implement actions easily just by adding a class to a module with the subclass of `CLIRunnable`.
 
 > Giving it this subclass is an important part of implementing an action because the name of the parent class is not referenced anywhere.
 
@@ -360,7 +360,7 @@ test2 test2
 
 Access to our API is available via the `client` attribute of `CLIRunnable`.
 
-In `execute()`, for example, you can use `self.client` to access an instantiated instance of `SoftLayer.API.Client`. 
+In `execute()`, for example, you can use `self.client` to access an instantiated instance of `SoftLayer.API.Client`.
 
 Check out our <a href="http://softlayer-python.readthedocs.org/en/latest/api/client.html#getting-started" target="_blank">Python Client docs</a> for details on how to use the `client` object.
 

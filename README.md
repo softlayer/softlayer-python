@@ -23,7 +23,7 @@ We use homegrown, content-first boilerplates for our GitHub docs. They provide t
 * Guaranteeing fast load times
 * Automating repetitive tasks
 * Embedding responsiveness in its core without wrapping code around elements
-* Providing estimated reading time 
+* Providing estimated reading time
 * Having indexes/table of contents built automatically
 * Deploying minified or unminified JS and CSS in production
 * Encoding URLs with the appropriate labels to help users filter or create issues accurately on GitHub
@@ -444,7 +444,7 @@ If you get **Liquid Exception: incompatible character encodings: UTF-8 and IBM43
 
 #### Conversion error
 
-If you're getting a **Conversion error: There was an error converting *file_name.md*"** error, this mean a HTML tag is not closed. To fix this, close all HTML tags.
+If you're getting a **Conversion error: There was an error converting *file_name.md*"** message, this means a HTML tag is not closed. To fix this, close all HTML tags.
 
 > Tip: Run `grunt test` to help find the open tag.
 
@@ -458,5 +458,9 @@ If you're getting a **Liquid Exception: Cannot find /bin/sh**, this means you ha
   $ gem uninstall pygments.rb --version "=0.5.1"
   $ gem install pygments.rb --version "=0.5.0"
   ~~~
+
+#### Not Found: `/' not found
+
+If you're getting a **'/' not found** error, this means something went wrong when Jekyll created the `_site` directory. It has nothing to do with you, it's all Jekyll. To fix this, stop Jekyll and restart it.
 
 <a href="#">back to top</a>

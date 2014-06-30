@@ -1,4 +1,34 @@
-<section class="featured-banner" id="banner-section"> <!-- Banner -->
+<!-- Hero -->
+<section class="featured-hero" id="featured-element">
+<div class="container">
+<div class="row">
+<div class="col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3">
+
+  <h1 class="featured-name">{{site.project.name}}</h1>
+  <h2 class="featured-tagline">{{site.project.tagline}}.</h2>
+
+<div class="featured-buttons">
+  <a class="button white" href="{{page.baseurl}}getting-started">
+    Get Started
+  </a>
+
+  <img class="featured-image-right" src="{{page.baseurl}}assets/images/arrow-right.png" alt="Getting Started">
+</div>
+
+<div class="featured-version">
+  <p>
+    Currently <span id="github-version"><i class="fa fa-spinner fa-spin"></i></span>
+  </p>
+</div>
+
+</div>
+</div>
+</div>
+</section>
+<!-- End Hero -->
+
+<!-- Banner -->
+<section class="featured-banner" id="banner-section">
 <div class="container">
 <div class="row">
 <div class="col-lg-12 col-md-12">
@@ -51,4 +81,32 @@
 </div>
 </div>
 </div>
-</section> <!-- End Banner -->
+</section>
+<!-- End Banner -->
+
+<hr>
+
+<!-- Portfolio -->
+<section class="featured-portfolio">
+<div class="container">
+<div class="row">
+<div class="col-lg-12 col-md-12">
+
+<div class="projects">
+  <h1 class="featured-header">
+    <span id="github-repos"><i class="fa fa-spinner fa-spin"></i></span> open source projects and counting.</h1>
+
+  <h1 class="featured-subheader">
+    Python. Go. Ruby. And many others.</h1>
+
+  <h4 class="featured-intro">
+    Our SoftLayer Labs team began at the grassroots level in open source communities. We’re firm believers in developing, sharing, and collaborating with other like-minded doers and enthusiasts.</h4>
+
+  <ol id="repos"></ol>
+</div>
+
+</div>
+</div>
+</div>
+</section>
+<!-- End Portfolio -->
