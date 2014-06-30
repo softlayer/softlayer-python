@@ -37,15 +37,28 @@
   <h1 class="hero-name">{{site.project.alias}}</h1>
   <h2 class="hero-tagline">{{site.github.project_tagline}}</h2>
 
-<div class="hero-buttons">
-  <a class="button white" href="http://softlayer-python.readthedocs.org/en/latest/index.html" target="_blank">
-    Learn More
-  </a>
+<div class="col-lg-4 col-md-4">
+<div class="hero-wrapper">
+  <a href="{{page.baseurl}}getting-started/#toc_1">
 
-  <a class="button white" href="{{page.baseurl}}cli">
-    {{site.project.name}}
-  </a>
+    <i class="fa fa-books" id="banner-slot-one"></i>
+    <h3>Docs</h3>
+    <p>{{site.project.name}} is an open source project. Pick from a wide range of options to get started. <i class="fa fa-arrow-circle-right fa-fw" id="banner-icon-slot-one"></i></p>
 
+  </a>
+</div>
+</div>
+
+<div class="col-lg-4 col-md-4">
+<div class="hero-wrapper">
+  <a href="{{page.baseurl}}contributing">
+
+    <i class="fa fa-terminal" id="banner-slot-two"></i>
+    <h3>Python CLI</h3>
+    <p><span id="github-contributors"><i class="fa fa-spinner fa-spin"></i></span> contributors have put time and effort into this project. Find out how you can help. <i class="fa fa-arrow-circle-right fa-fw" id="banner-icon-slot-two"></i></p>
+
+  </a>
+</div>
   <img class="hero-image-left" src="{{page.baseurl}}assets/images/arrow-left.png" alt="Go to Python CLI">
 </div>
 
