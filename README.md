@@ -29,6 +29,8 @@ We use homegrown, content-first boilerplates for our GitHub docs. They provide t
 * Encoding URLs with the appropriate labels to help users filter or create issues accurately on GitHub
 * Supporting local instances on Windows 7/8 OSes
 
+<a href="#">back to top</a>
+
 ---
 
 ## Features
@@ -68,6 +70,8 @@ Below is a list of functional and aesthetic features and their purpose.
 * [Scrollability](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/scrollability.js) to set thresholds for elements while scrolling
 * [Toggle](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/toggle.js) to handle sliding and collapsing behavior for navigation
 
+<a href="#">back to top</a>
+
 ---
 
 ## Recommended Browsers
@@ -93,6 +97,8 @@ See the table below for a comparison of OS platforms and browsers.
 
 > Note: Apple no longer provides updates for Safari on Windows. Due to the lack of security updates, we do not recommend using Safari on Windows.
 
+<a href="#">back to top</a>
+
 ---
 
 ## Prerequisites
@@ -108,6 +114,8 @@ Our boilerplate requires the minimum versions for Ruby, Python, and Node.js. Cli
 #### Windows Users
 
 Read Yi Zeng's [Setup Jekyll on Windows](http://yizeng.me/2013/05/10/setup-jekyll-on-windows "Setup Jekyll on Windows") article before getting into the thick of things. It will save you a ton of time and agony.
+
+<a href="#">back to top</a>
 
 ---
 
@@ -146,6 +154,8 @@ Read Yi Zeng's [Setup Jekyll on Windows](http://yizeng.me/2013/05/10/setup-jekyl
   ~~~sh
   $ [sudo] grunt install
   ~~~
+
+<a href="#">back to top</a>
 
 ---
 
@@ -268,6 +278,8 @@ Unlike Alias, Basic tasks perform a much smaller set of instructions. Only a few
 | `grunt shell:npm`       | Same as the Alias `grunt update` task |
 | `grunt shell:pygments`  | Installs Python setuptools, pip, and Pygments |
 
+<a href="#">back to top</a>
+
 ---
 
 ## Code Organization
@@ -315,6 +327,8 @@ Here's an overview of each subdirectory.
 | <samp>assets/images</samp>      | The source for all images, including favicons and logos |
 | <samp>assets/js</samp>          | Directory for concatenated JS resources |
 
+<a href="#">back to top</a>
+
 ---
 
 ## DOM Elements
@@ -328,6 +342,8 @@ Several DOM elements are embedded within JS and render on the home/landing page.
 | `#github-stargazers`   | Total number of stargazers for a single repo           |
 | `#github-version`      | Version number for the last pegged released            |
 | `#github-watchers`     | Total number of watchers/subscribers for a single repo |
+
+<a href="#">back to top</a>
 
 ---
 
@@ -345,6 +361,8 @@ Below is a list of the metadata tags we use.
 | `{{site.github.releases_url}}`    | http://github.com/softlayer/softlayer-python/releases |
 | `{{site.github.repository_url}}`  | http://github.com/softlayer/softlayer-python |
 | `{{site.github.url}}`             | http://softlayer.github.io/softlayer-python |
+
+<a href="#">back to top</a>
 
 ---
 
@@ -404,6 +422,8 @@ Use [Package Control](http://sublime.wbond.net), Sublime's built-in tool, to ins
 
 > The Liquid package includes syntax for HTML.
 
+<a href="#">back to top</a>
+
 ---
 
 ## Running into Problems?
@@ -439,3 +459,4 @@ If you're getting a **Liquid Exception: Cannot find /bin/sh**, this means you ha
   $ gem install pygments.rb --version "=0.5.0"
   ~~~
 
+<a href="#">back to top</a>
