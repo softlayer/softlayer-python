@@ -12,7 +12,8 @@
 * [Code Styles](#code-styles)
 * [Running into Problems?](#running-into-problems)
 
-[back to top](#)
+<a href="#">back to top</a>
+
 ---
 
 ## Our Project Pages
