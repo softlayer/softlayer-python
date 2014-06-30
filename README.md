@@ -414,13 +414,13 @@ Below are a few issues and solutions that we came across during development.
 * Cause: The CLI does not use UTF-8 by default (example: Git for Windows).
 * Solution: Run these commands before running `grunt serve`.
 
-```bash
-$ cmd
-$ chcp 65001
-$ exit
-```
+  ~~~sh
+  $ cmd
+  $ chcp 65001
+  $ exit
+  ~~~
 
-> You only need to run these commands when you first open your CLI. The settings persist locally until you close it.
+> Note: You only need to run these commands when you first open your CLI. The settings persist locally until you close it.
 
 #### Conversion error
 
@@ -434,7 +434,10 @@ $ exit
 * Cause: A buggy version of `pygments.rb`.
 * Solution: Default to `pygments.rb` version 0.5.0. This means you'll have to uninstall newer versions as well. Run the following commands.
 
-        $ gem uninstall pygments.rb --version "=0.5.4"
-        $ gem uninstall pygments.rb --version "=0.5.2"
-        $ gem uninstall pygments.rb --version "=0.5.1"
-        $ gem install pygments.rb --version "=0.5.0"
+  ~~~sh
+  $ gem uninstall pygments.rb --version "=0.5.4"
+  $ gem uninstall pygments.rb --version "=0.5.2"
+  $ gem uninstall pygments.rb --version "=0.5.1"
+  $ gem install pygments.rb --version "=0.5.0"
+  ~~~
+
