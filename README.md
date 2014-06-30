@@ -406,13 +406,11 @@ Use [Package Control](http://sublime.wbond.net), Sublime's built-in tool, to ins
 
 ## Running into Problems?
 
-Below are a few issues and solutions that we came across during development.
+Below are a few issues and solutions (or workarounds) that we came across during development.
 
 #### Incompatible character encodings
 
-* Problem: Getting **Liquid Exception: incompatible character encodings: UTF-8 and IBM437...** after running `grunt serve`.
-* Cause: The CLI does not use UTF-8 by default (example: Git for Windows).
-* Solution: Run these commands before running `grunt serve`.
+If you get **Liquid Exception: incompatible character encodings: UTF-8 and IBM437...** after running `grunt serve`, this means your CLI does not use UTF-8 by default (example: Git for Windows). A workaround is to run the following commands before running `grunt serve`.
 
   ~~~sh
   $ cmd
@@ -424,15 +422,13 @@ Below are a few issues and solutions that we came across during development.
 
 #### Conversion error
 
-* Problem: Getting **Conversion error: There was an error converting *file_name.md*"**.
-* Cause: A HTML tag is not closed.
-* Solution: Close all HTML tags. Run `grunt test` to help find the open tag.
+If you're getting a **Conversion error: There was an error converting *file_name.md*"** error, this mean a HTML tag is not closed. To fix this, close all HTML tags.
+
+> Tip: Run `grunt test` to help find the open tag.
 
 #### Liquid Exception: Cannot find /bin/sh
 
-* Problem: Getting **Liquid Exception: Cannot find /bin/sh**.
-* Cause: A buggy version of `pygments.rb`.
-* Solution: Default to `pygments.rb` version 0.5.0. This means you'll have to uninstall newer versions as well. Run the following commands.
+If you're getting a **Liquid Exception: Cannot find /bin/sh**, this means you have a buggy version of `pygments.rb`. A workaround is to use `pygments.rb` version 0.5.0. This means you'll have to uninstall newer versions as well. To do this, run the following commands.
 
   ~~~sh
   $ gem uninstall pygments.rb --version "=0.5.4"
