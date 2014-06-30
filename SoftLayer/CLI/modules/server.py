@@ -86,7 +86,8 @@ For more on filters see 'sl help filters'
             'memory',
             'primary_ip',
             'backend_ip',
-            'active_transaction'
+            'active_transaction',
+            'owner'
         ])
         table.sortby = args.get('--sortby') or 'host'
 
@@ -101,6 +102,7 @@ For more on filters see 'sl help filters'
                 server['primaryIpAddress'] or blank(),
                 server['primaryBackendIpAddress'] or blank(),
                 active_txn(server),
+                server['billingItem']['orderItem']['order']['userRecord']['username'],
             ])
 
         return table
@@ -150,7 +152,7 @@ Options:
                 ['softwareDescription']['name'] or blank()
             )])
         table.add_row(['created', result['provisionDate'] or blank()])
-
+        table.add_row(['owner', result ['billingItem']['orderItem']['order']['userRecord']['username']])
         vlan_table = Table(['type', 'number', 'id'])
         for vlan in result['networkVlans']:
             vlan_table.add_row([

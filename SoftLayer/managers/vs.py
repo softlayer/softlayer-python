@@ -86,6 +86,7 @@ class VSManager(IdentifierMixin, object):
                 'datacenter',
                 'activeTransaction.transactionStatus[friendlyName,name]',
                 'status',
+                'billingItem.orderItem.order.userRecord[username]'
             ]
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
@@ -199,6 +200,7 @@ class VSManager(IdentifierMixin, object):
                 'billingItem.recurringFee',
                 'tagReferences[id,tag[name,id]]',
                 'networkVlans[id,vlanNumber,networkSpace]',
+                'billingItem.orderItem.order.userRecord[username]'
             ]
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
