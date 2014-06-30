@@ -63,8 +63,8 @@ module.exports = function(grunt) {
         src: ["plugins/classify.js",
               "plugins/toggle.js",
               "plugins/indexing.js",
-              "plugins/scrollability.js",
-              "plugins/estimating.js",
+              "plugins/scrolling.js",
+              "plugins/readability.js",
               "plugins/portfolio.js"],
         dest: "assets/js/main.js"
       }

@@ -461,6 +461,10 @@ If you're getting a **Liquid Exception: Cannot find /bin/sh**, this means you ha
 
 #### Not Found: `/' not found
 
-If you're getting a **'/' not found** error, this means something went wrong when Jekyll created the `_site` directory. It has nothing to do with you, it's all Jekyll. To fix this, stop Jekyll and restart it.
+If you're getting a **'/' not found** error when you open a browser to `localhost:4000`, this means something went wrong when Jekyll created the `_site` directory. It has nothing to do with you, it's all Jekyll. To fix this, type `CTRL+C` to stop Jekyll and try again.
+
+#### Warning: cannot close fd before spawn
+
+If you get **Warning: cannot close fd before spawn** after running `grunt serve`, this means something went wrong when Jekyll created the `_site` directory. It has nothing to do with you, it's all Jekyll. To fix this, run `grunt serve` again.
 
 <a href="#">back to top</a>
