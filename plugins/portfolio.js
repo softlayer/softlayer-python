@@ -1,14 +1,14 @@
 /*
-#  Profile
-#  Builds a GitHub profile from payloads of repos, contributors, stargazers, and tags
+#  Portfolio
+#  Builds GitHub projects from payloads of repos, contributors, stargazers, and tags
 #
 #  Copyright © SoftLayer, an IBM Company
 #  Code and documentation licensed under MIT
 */
 
-heroElement = document.getElementById("hero-element");
+featuredElement = document.getElementById("featured-element");
 
-if (typeof(heroElement) !== undefined && heroElement !== null) {
+if (typeof(featuredElement) !== undefined && featuredElement !== null) {
   $.getJSON("https://api.github.com/repos/softlayer/softlayer-python/contributors?callback=?", function(result) {
     numContributors = result.data;
     $(function() {
@@ -36,7 +36,7 @@ if (typeof(heroElement) !== undefined && heroElement !== null) {
 }
 
 (function ($) {
-  if (typeof(heroElement) !== undefined && heroElement !== null) {
+  if (typeof(featuredElement) !== undefined && featuredElement !== null) {
     repoUrl = function(repo) {
       return repoUrls[repo.name] || repo.html_url;
     };

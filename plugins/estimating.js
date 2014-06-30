@@ -1,5 +1,5 @@
 /*
-#  Estimate
+#  Estimating
 #  Gauges how long it'll take to read a single page
 #
 #  Copyright © Softlayer, an IBM Company

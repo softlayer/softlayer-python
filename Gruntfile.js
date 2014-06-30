@@ -64,8 +64,8 @@ module.exports = function(grunt) {
               "plugins/toggle.js",
               "plugins/indexing.js",
               "plugins/scrollability.js",
-              "plugins/estimate.js",
-              "plugins/profile.js"],
+              "plugins/estimating.js",
+              "plugins/portfolio.js"],
         dest: "assets/js/main.js"
       }
     },
