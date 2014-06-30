@@ -1,0 +1,86 @@
+/* =========================
+   Text
+   ========================= */
+
+// Page margins
+// -------------------------
+
+.margins {
+  padding-top: (@base-variable * 5.5);
+  padding-bottom: (@base-variable * 3);
+}
+
+@media (min-width: @view-sm) {
+  .margins {
+    padding-top: (@base-variable * 7);
+    padding-bottom: (@base-variable * 4);
+  }
+}
+
+// Page header
+// -------------------------
+
+.page-header {
+  .optimize-text();
+  padding-bottom: 2px;
+  margin: 0;
+  font-size: 39px;
+  font-weight: @font-weight-bold;
+  color: @page-header-color;
+}
+
+.page-intro {
+  .optimize-text();
+  margin: 0;
+  letter-spacing: @letter-spacing-large;
+  font-size: 28px;
+  font-weight: @font-weight-light;
+  color: @page-intro-color;
+}
+
+@media (min-width: @view-sm) {
+  .page-header {
+    font-size: 45px;
+  }
+
+  .page-intro {
+    font-size: 30px;
+  }
+}
+
+// Social icons
+// -------------------------
+
+.social {
+  padding-top: 18px;
+  font-size: 21px;
+
+  a {
+    .transition(color .5s);
+    padding-right: 12px;
+    color: @social-icon-color !important;
+    &>:hover,
+    &>:focus {
+      color: @gray30;
+    }
+  }
+}
+
+// Reading time
+// -------------------------
+
+.estimate {
+  font-family: @font-family-humanist-sans;
+  font-size: 15px;
+  color: rgba(0,0,0,0.2);
+  letter-spacing: @letter-spacing-large;
+  position: absolute;
+  top: 22px;
+  right: 17px;
+}
+
+@media (min-width: @view-sm) {
+  .estimate {
+    padding-right: 12px;
+  }
+}
