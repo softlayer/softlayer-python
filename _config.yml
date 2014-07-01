@@ -61,11 +61,11 @@ permalink:       pretty
 exclude:         [ ".gitignore",
                    "Gemfile",
                    "Gruntfile.js",
-                   "extensions",
+                   "plugins",
                    "less",
                    "node_modules",
                    "package.json",
-                   "packages"
+                   "assets/packages"
                   ]
 gems:
   - jekyll-sitemap

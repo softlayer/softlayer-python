@@ -121,11 +121,6 @@
           animation-duration: @duration;
 }
 
-.animation-timing-function(@timing-function) {
-  -webkit-animation-timing-function: @timing-function;
-          animation-timing-function: @timing-function;
-}
-
 .animation-delay(@delay) {
   -webkit-animation-delay: @delay;
           animation-delay: @delay;
@@ -151,7 +146,7 @@
 // Content columns
 // -------------------------
 
-.content-columns(@column-count; @column-gap: @grid-gutter-width) {
+.content-columns(@column-count; @column-gap: 30px) {
   -webkit-column-count: @column-count;
      -moz-column-count: @column-count;
           column-count: @column-count;
@@ -253,30 +248,24 @@
 // Grid system
 // -------------------------
 
-@grid-columns: 12;
-@grid-gutter-width: 30px;
-
-@grid-float-breakpoint: @view-sm;
-@grid-float-breakpoint-max: (@grid-float-breakpoint - 1);
-
 .container-fixed() {
   margin-right: auto;
   margin-left: auto;
-  padding-left:  (@grid-gutter-width / 2);
-  padding-right: (@grid-gutter-width / 2);
+  padding-left:  (30px / 2);
+  padding-right: (30px / 2);
   .clearfix();
 }
 
-.make-row(@gutter: @grid-gutter-width) {
+.make-row(@gutter: 30px) {
   margin-left:  (@gutter / -2);
   margin-right: (@gutter / -2);
   .clearfix();
 }
 
-.make-xs-column(@columns; @gutter: @grid-gutter-width) {
+.make-xs-column(@columns; @gutter: 30px) {
   position: relative;
   float: left;
-  width: percentage((@columns / @grid-columns));
+  width: percentage((@columns / 12));
   min-height: 1px;
   padding-left:  (@gutter / 2);
   padding-right: (@gutter / 2);
@@ -284,25 +273,25 @@
 
 .make-xs-column-offset(@columns) {
   @media (min-width: @view-xs) {
-    margin-left: percentage((@columns / @grid-columns));
+    margin-left: percentage((@columns / 12));
   }
 }
 
 .make-xs-column-push(@columns) {
   @media (min-width: @view-xs) {
-    left: percentage((@columns / @grid-columns));
+    left: percentage((@columns / 12));
   }
 }
 
 .make-xs-column-pull(@columns) {
   @media (min-width: @view-xs) {
-    right: percentage((@columns / @grid-columns));
+    right: percentage((@columns / 12));
   }
 }
 
 // Generates small columns
 
-.make-sm-column(@columns; @gutter: @grid-gutter-width) {
+.make-sm-column(@columns; @gutter: 30px) {
   position: relative;
   min-height: 1px;
   padding-left:  (@gutter / 2);
@@ -310,31 +299,31 @@
 
   @media (min-width: @view-sm) {
     float: left;
-    width: percentage((@columns / @grid-columns));
+    width: percentage((@columns / 12));
   }
 }
 
 .make-sm-column-offset(@columns) {
   @media (min-width: @view-sm) {
-    margin-left: percentage((@columns / @grid-columns));
+    margin-left: percentage((@columns / 12));
   }
 }
 
 .make-sm-column-push(@columns) {
   @media (min-width: @view-sm) {
-    left: percentage((@columns / @grid-columns));
+    left: percentage((@columns / 12));
   }
 }
 
 .make-sm-column-pull(@columns) {
   @media (min-width: @view-sm) {
-    right: percentage((@columns / @grid-columns));
+    right: percentage((@columns / 12));
   }
 }
 
 // Generates medium columns
 
-.make-md-column(@columns; @gutter: @grid-gutter-width) {
+.make-md-column(@columns; @gutter: 30px) {
   position: relative;
   min-height: 1px;
   padding-left:  (@gutter / 2);
@@ -342,31 +331,31 @@
 
   @media (min-width: @view-md) {
     float: left;
-    width: percentage((@columns / @grid-columns));
+    width: percentage((@columns / 12));
   }
 }
 
 .make-md-column-offset(@columns) {
   @media (min-width: @view-md) {
-    margin-left: percentage((@columns / @grid-columns));
+    margin-left: percentage((@columns / 12));
   }
 }
 
 .make-md-column-push(@columns) {
   @media (min-width: @view-md) {
-    left: percentage((@columns / @grid-columns));
+    left: percentage((@columns / 12));
   }
 }
 
 .make-md-column-pull(@columns) {
   @media (min-width: @view-md) {
-    right: percentage((@columns / @grid-columns));
+    right: percentage((@columns / 12));
   }
 }
 
 // Generates large columns
 
-.make-lg-column(@columns; @gutter: @grid-gutter-width) {
+.make-lg-column(@columns; @gutter: 30px) {
   position: relative;
   min-height: 1px;
   padding-left:  (@gutter / 2);
@@ -374,25 +363,25 @@
 
   @media (min-width: @view-lg) {
     float: left;
-    width: percentage((@columns / @grid-columns));
+    width: percentage((@columns / 12));
   }
 }
 
 .make-lg-column-offset(@columns) {
   @media (min-width: @view-lg) {
-    margin-left: percentage((@columns / @grid-columns));
+    margin-left: percentage((@columns / 12));
   }
 }
 
 .make-lg-column-push(@columns) {
   @media (min-width: @view-lg) {
-    left: percentage((@columns / @grid-columns));
+    left: percentage((@columns / 12));
   }
 }
 
 .make-lg-column-pull(@columns) {
   @media (min-width: @view-lg) {
-    right: percentage((@columns / @grid-columns));
+    right: percentage((@columns / 12));
   }
 }
 
@@ -406,17 +395,17 @@
     .col((@index + 1), @item);
   }
 
-  .col(@index, @list) when (@index =< @grid-columns) { // general; "=<" isn't a typo
+  .col(@index, @list) when (@index =< 12) { // general; "=<" isn't a typo
     @item: ~".col-xs-@{index}, .col-sm-@{index}, .col-md-@{index}, .col-lg-@{index}";
     .col((@index + 1), ~"@{list}, @{item}");
   }
 
-  .col(@index, @list) when (@index > @grid-columns) {
+  .col(@index, @list) when (@index > 12) {
     @{list} {
       position: relative;
       min-height: 1px;
-      padding-left:  (@grid-gutter-width / 2);
-      padding-right: (@grid-gutter-width / 2);
+      padding-left:  (30px / 2);
+      padding-right: (30px / 2);
     }
   }
 
@@ -429,12 +418,12 @@
     .col((@index + 1), @item);
   }
 
-  .col(@index, @list) when (@index =< @grid-columns) {
+  .col(@index, @list) when (@index =< 12) {
     @item: ~".col-@{class}-@{index}";
     .col((@index + 1), ~"@{list}, @{item}");
   }
 
-  .col(@index, @list) when (@index > @grid-columns) {
+  .col(@index, @list) when (@index > 12) {
     @{list} {
       float: left;
     }
@@ -445,25 +434,25 @@
 
 .calc-grid(@index, @class, @type) when (@type = width) and (@index > 0) {
   .col-@{class}-@{index} {
-    width: percentage((@index / @grid-columns));
+    width: percentage((@index / 12));
   }
 }
 
 .calc-grid(@index, @class, @type) when (@type = push) {
   .col-@{class}-push-@{index} {
-    left: percentage((@index / @grid-columns));
+    left: percentage((@index / 12));
   }
 }
 
 .calc-grid(@index, @class, @type) when (@type = pull) {
   .col-@{class}-pull-@{index} {
-    right: percentage((@index / @grid-columns));
+    right: percentage((@index / 12));
   }
 }
 
 .calc-grid(@index, @class, @type) when (@type = offset) {
   .col-@{class}-offset-@{index} {
-    margin-left: percentage((@index / @grid-columns));
+    margin-left: percentage((@index / 12));
   }
 }
 

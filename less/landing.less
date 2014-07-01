@@ -108,9 +108,13 @@
 }
 
 @media (min-width: @view-sm) {
-  .featured-image-right,
-  .featured-image-left {
+  .featured-image-right {
     position: absolute;
+    display: inline;
+  }
+
+  .featured-image-left {
+    position: inherit;
     display: inline;
   }
 
@@ -175,8 +179,8 @@
   }
 
   .featured-image-left {
-    right: 88px;
-    top: 88px;
+    right: 144px;
+    top: 144px;
   }
 }
 
@@ -296,7 +300,7 @@ i#featured-icon-slot-two-alias {
 @media (min-width: @view-md) {
   i#featured-slot-one-alias,
   i#featured-slot-two-alias {
-  font-size: 118px;
+  font-size: 110px;
   }
 }
 
