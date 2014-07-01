@@ -12,7 +12,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON("package.json"),
     site: grunt.file.readYAML("_config.yml"),
     banner: "/* \n" + " * \n" + " * <%= site.project.name %> project\n" +
-            " * Framework version <%= site.project.version %>, Built on <%= grunt.template.today(\"mm-dd-yyyy\") %>\n" +
+            " * Boilerplate <%= site.project.version %>, Built on <%= grunt.template.today(\"mm-dd-yyyy\") %>\n" +
             " * Copyright © <%= grunt.template.today(\"yyyy\") %> <%= site.owner.name %>. All rights reserved.\n" +
             " * Code and documentation licensed under <%= site.license.type %>.\n" + " * \n" + " */\n\n",
 
@@ -27,7 +27,7 @@ module.exports = function(grunt) {
         }
       },
       pygments: {
-        command: ["cd _includes/packages",
+        command: ["cd assets/packages",
                   "python ez_setup.py",
                   "python get-pip.py",
                   "pip install Pygments",
