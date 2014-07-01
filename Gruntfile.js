@@ -150,5 +150,4 @@ module.exports = function(grunt) {
   grunt.registerTask("serve", ["build", "jekyll:preview"]);
   grunt.registerTask("serve:pretty", ["build:pretty", "jekyll:preview"]);
   grunt.registerTask("test", ["jekyll:test", "validation"]);
-  grunt.registerTask("update", ["shell:npm"]);
 };
