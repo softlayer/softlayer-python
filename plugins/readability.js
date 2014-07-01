@@ -17,39 +17,25 @@ ReadifyHTML5 = function(defaults, more_fixes) {
       by_match, el_label, n_label;
 
   fixes = {
-    article: {
-      role: "article"
-    },
-    aside: {
-      role: "complementary"
-    },
-    nav: {
-      role: "navigation"
-    },
-    main: {
-      role: "main"
-    },
-    output: {
-      "aria-live": "polite"
-    },
-    section: {
-      role: "region"
-    },
-    "[required]": {
-      "aria-required": "true"
-    }
+    article:      { role: "article" },
+    aside:        { role: "complementary" },
+    nav:          { role: "navigation" },
+    main:         { role: "main" },
+    section:      { role: "region" },
+    output:       { "aria-live": "polite" },
+    "[required]": { "aria-required": "true" }
   };
 
   result = {
-    ok: [],
+    ok:   [],
     warn: [],
     fail: []
   };
 
-  error = result.fail;
+  error       = result.fail;
   ATTR_SECURE = new RegExp("aria-[a-z]+|role|tabindex|title|alt|data-[\\w-]+|lang|" + "style|maxlength|placeholder|pattern|required|type|target|accesskey|longdesc");
-  ID_PREFIX = "acfy-id-";
-  n_label = 0;
+  ID_PREFIX   = "acfy-id-";
+  n_label     = 0;
 
   docs = document;
   if (docs.querySelectorAll) {
@@ -87,50 +73,51 @@ ReadifyHTML5 = function(defaults, more_fixes) {
       if (fixes.hasOwnProperty(fix)) {
         try {
           elems = docs.querySelectorAll(fix);
-        } catch (_error) {
+        } 
+        catch (_error) {
           ex = _error;
           error.push({
-            sel: fix,
+            sel:  fix,
             attr: null,
-            val: null,
-            msg: "Invalid syntax for `document.querySelectorAll` function",
-            ex: ex
+            val:  null,
+            msg:  "Invalid syntax for `document.querySelectorAll` function",
+            ex:   ex
           });
         }
         obj = fixes[fix];
         if (!elems || elems.length < 1) {
           result.warn.push({
-            sel: fix,
+            sel:  fix,
             attr: null,
-            val: null,
-            msg: "Not found"
+            val:  null,
+            msg:  "Not found"
           });
         }
         i = 0;
         while (i < elems.length) {
           for (key in obj) {
             if (obj.hasOwnProperty(key)) {
-              attr = key;
+              attr  = key;
               value = obj[key];
               if (attr.match(/_?note/)) {
                 continue;
               }
               if (!attr.match(ATTR_SECURE)) {
                 error.push({
-                  sel: fix,
+                  sel:  fix,
                   attr: attr,
-                  val: null,
-                  msg: "Attribute not allowed",
-                  re: ATTR_SECURE
+                  val:  null,
+                  msg:  "Attribute not allowed",
+                  re:   ATTR_SECURE
                 });
                 continue;
               }
               if (!(typeof value).match(/string|number|boolean/)) {
                 error.push({
-                  sel: fix,
+                  sel:  fix,
                   attr: attr,
-                  val: value,
-                  msg: "Value-type not allowed"
+                  val:  value,
+                  msg:  "Value-type not allowed"
                 });
                 continue;
               }
@@ -138,22 +125,23 @@ ReadifyHTML5 = function(defaults, more_fixes) {
               if (by_match) {
                 try {
                   el_label = docs.querySelector(value);
-                } catch (_error) {
+                } 
+                catch (_error) {
                   ex = _error;
                   error.push({
-                    sel: fix,
+                    sel:  fix,
                     attr: attr,
-                    val: value,
-                    msg: "Invalid selector syntax (2) - see 'val'",
-                    ex: ex
+                    val:  value,
+                    msg:  "Invalid selector syntax (2) - see 'val'",
+                    ex:   ex
                   });
                 }
                 if (!el_label) {
                   error.push({
-                    sel: fix,
+                    sel:  fix,
                     attr: attr,
-                    val: value,
-                    msg: "Labelledby ref not found - see 'val'"
+                    val:  value,
+                    msg:  "Labelledby ref not found - see 'val'"
                   });
                   continue;
                 }
@@ -161,23 +149,23 @@ ReadifyHTML5 = function(defaults, more_fixes) {
                   el_label.id = ID_PREFIX + n_label;
                 }
                 value = el_label.id;
-                attr = "aria-" + ("label" === by_match[1] ? "labelledby" : "describedby");
+                attr  = "aria-" + ("label" === by_match[1] ? "labelledby" : "describedby");
                 n_label++;
               }
               if (!elems[i].hasAttribute(attr)) {
                 elems[i].setAttribute(attr, value);
                 result.ok.push({
-                  sel: fix,
+                  sel:  fix,
                   attr: attr,
-                  val: value,
-                  msg: "Added"
+                  val:  value,
+                  msg:  "Added"
                 });
               } else {
                 result.warn.push({
-                  sel: fix,
+                  sel:  fix,
                   attr: attr,
-                  val: value,
-                  msg: "Already present, skipped"
+                  val:  value,
+                  msg:  "Already present, skipped"
                 });
               }
             }
@@ -200,7 +188,7 @@ ReadifyHTML5 = function(defaults, more_fixes) {
         defaults = {
           readOutput:         ".estimate",
           wordCount:          null,
-          wordsPerMinute:     275,
+          wordsPerMinute:     290, // balance count for words in <pre>/<code> by bumping var up from 270
           roundup:            true,
           lessThanOneMinute:  "",
           prependTime:        "",
