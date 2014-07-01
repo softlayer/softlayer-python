@@ -457,7 +457,7 @@ If you're getting a **Liquid Exception: Cannot find /bin/sh**, this means you ha
   $ gem install pygments.rb --version "=0.5.0"
   ~~~
 
-#### Not Found: `/' not found
+#### Not Found: '/' not found
 
 If you're getting a **'/' not found** error when you open a browser to `localhost:4000`, this means something went wrong when Jekyll created the `_site` directory. It has nothing to do with you, it's all Jekyll. To fix this, type `CTRL+C` to stop Jekyll and try again.
 
