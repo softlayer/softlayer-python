@@ -66,7 +66,7 @@ Below is a list of functional and aesthetic features and their purpose.
 * [Portfolio](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/portfolio.js) plugin for fetching organization and repository data from GitHub
 * [Readability](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/readability.js) to make HTML5 more accessible and estimate how long it takes to read a single page
 * [Scrollable](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/scrollable.js) to set thresholds for HTML elements while scrolling
-* [Toggle](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/toggle.js) handleS the sliding and collapsing behavior for navigation
+* [Toggle](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/toggle.js) handles the sliding and collapsing behavior for navigation
 
 <a href="#">back to top</a>
 
