@@ -1,6 +1,6 @@
 ## Contents
 
-* [Our Project Pages](#our-project-pages)
+* [Our Project Page](#our-project-pages)
 * [Features](#features)
 * [Compatibility](#compatibility)
 * [Prerequisites](#prerequisites)
@@ -16,7 +16,7 @@
 
 ## Our Project Pages
 
-We use homegrown, content-first boilerplates for our GitHub docs. They provide the facilities to write content exclusively in Markdown and spin-up [Jekyll](http://jekyllrb.com)-powered static websites, as well as:
+We use a homegrown, content-first boilerplate for our GitHub docs. It provides the facilities to write content exclusively in Markdown and spin-up [Jekyll](http://jekyllrb.com)-powered static websites, as well as:
 
 * Guaranteeing fast load times
 * Automating repetitive tasks
@@ -345,7 +345,7 @@ Several DOM elements are embedded within JS and render on the home/landing page.
 
 ---
 
-## Repository Metadata
+## Metadata
 
 We harness a few metadata tags using GitHub's [repository metadata](http://help.github.com/articles/repository-metadata-on-github-pages) feature, albeit not all of them for a number of reasons.
 
