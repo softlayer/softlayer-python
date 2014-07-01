@@ -1,5 +1,5 @@
 /*
-#  Scrolling
+#  Scrollable
 #  Thresholds and smooth animations for page scrolling
 #
 #  Copyright © SoftLayer, an IBM Company
