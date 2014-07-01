@@ -10,7 +10,7 @@
 * [Metadata](#metadata)
 * [DOM Elements](#dom-elements)
 * [Code Styles](#code-styles)
-* [Running into Problems?](#running-into-problems)
+* [Got Problems?](#got-problems)
 
 ---
 
@@ -424,7 +424,7 @@ Use [Package Control](http://sublime.wbond.net), Sublime's built-in tool, to ins
 
 ---
 
-## Running into Problems?
+## Got Problems?
 
 Below are a few issues and solutions (or workarounds) that we came across during development.
 
