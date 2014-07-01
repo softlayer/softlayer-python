@@ -1,6 +1,6 @@
 ## Contents
 
-* [Our Project Page](#our-project-pages)
+* [Our Project Page](#our-project-page)
 * [Features](#features)
 * [Compatibility](#compatibility)
 * [Prerequisites](#prerequisites)
@@ -14,7 +14,7 @@
 
 ---
 
-## Our Project Pages
+## Our Project Page
 
 We use a homegrown, content-first boilerplate for our GitHub docs. It provides the facilities to write content exclusively in Markdown and spin-up [Jekyll](http://jekyllrb.com)-powered static websites, as well as:
 
