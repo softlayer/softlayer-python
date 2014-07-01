@@ -64,10 +64,10 @@ Below is a list of functional and aesthetic features and their purpose.
 ### Plugins
 
 * [Classify](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/classify.js) DOM utility for class helper functions
-* [Estimate](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/estimate.js) to gauge how long it takes to read a single page
 * [Indexing](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/indexing.js) plugin for building table of contents on-the-fly
 * [Profile](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/profiler.js) plugin for fetching organization and repository data from GitHub
-* [Scrollability](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/scrollability.js) to set thresholds for elements while scrolling
+* [Readability](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/readability.js) to make HTML5 more accessible and estimate how long it takes to read a single page
+* [Scrolling](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/scrolling.js) to set thresholds for elements while scrolling
 * [Toggle](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/toggle.js) to handle sliding and collapsing behavior for navigation
 
 <a href="#">back to top</a>
