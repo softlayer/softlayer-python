@@ -1,7 +1,7 @@
 ---
 layout: pages
 header: Developer's Guide
-intro: The official starting point for anyone ready to get elbow-deep in code.
+intro: The official starting point for anyone ready to get elbow-deep in writing code for Python CLI.
 baseurl: "../"
 ---
 

@@ -36,13 +36,6 @@ module.exports = function(grunt) {
         options: {
           stdout: true
         }
-      },
-      npm: {
-        command: ["rm -r node_modules",
-                  "npm install"].join("&&"),
-        options: {
-          stdout: true
-        }
       }
     },
 

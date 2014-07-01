@@ -86,12 +86,12 @@ Starting from the best to the worst, we suggest the following:
 
 See the table below for a comparison of OS platforms and browsers.
 
-| Platform    | Chrome  | Firefox | Internet Explorer | Opera   | Safari  |
-| ----------- | ------- | ------- | ----------------- | ------- | ------- |
-| Android     | **Yes** | No	  | N/A	              | No      | N/A     |
-| iOS	      | **Yes** | N/A	  | N/A               | No      | **Yes** |
-| Mac OS X    | **Yes** | **Yes** | N/A               | **Yes** | **Yes** |
-| Windows     | **Yes** | **Yes** | **Yes**   	      | **Yes** | **Yes** (note) |
+| Platform    | Chrome  | Firefox   | Internet Explorer   | Opera   | Safari          |
+| ----------- | ------- | --------- | ------------------- | ------- | --------------- |
+| Android     | **Yes** | No        | N/A                 | No      | N/A             |
+| iOS         | **Yes** | N/A       | N/A                 | No      | **Yes**         |
+| Mac OS X    | **Yes** | **Yes**   | N/A                 | **Yes** | **Yes**         |
+| Windows     | **Yes** | **Yes**   | **Yes**             | **Yes** | **Yes** (note)  |
 
 > Note: Apple no longer provides updates for Safari on Windows. Due to the lack of security updates, we do not recommend using Safari on Windows.
 
@@ -228,7 +228,6 @@ Run any of these commands to initiate a task.
 * [`grunt preview`](#grunt-preview)
 * [`grunt serve`](#grunt-serve)
 * [`grunt test`](#grunt-test)
-* [`grunt update`](#grunt-update)
 
 #### Grunt Build
 
@@ -277,53 +276,14 @@ Run `grunt test` to perform the following:
 2. Test all `*html` files against [W3's HTML validation service](http://validator.w3.org)
 3. Spit out logs
 
-#### Grunt Update
+### Updating Grunt Dependencies
 
-Run `grunt update` to perform the following:
+Dependencies are updated often by their original authors. To keep up with them, we test and update the version levels in `package.json`. However, dependencies do not update themselves automatically. To install the most recent versions, run the following commands to delete the original <samp>node_modules</samp> directory and build a new one.
 
-1. Delete the current `node_modules` directory
-2. Read in the dev dependencies from [package.json](package.json)
-3. Fire off the `npm install` command
-4. Install a new `node_modules` directory with the latest dev dependency versions
-
-### Types of Grunt Tasks
-
-This section describes the different types of Grunt tasks.
-
-#### Alias Tasks
-
-The tasks listed above are called "Alias" tasks. They're designed specifically for this framework and perform two or more high-level functions.
-
-1. Reading in configuration data from package.json, config.yml, or OS environment variables
-2. Generating metadata dynamically
-3. Globbing multiple dependencies/plugins
-4. Creating files based on different options, sources, and destinations
-
-This table shows which dependencies each Alias task uses.
-
-| Task    | Grunt Command   | Dev Dependencies |
-| ------- | --------------- | ------------ |
-| Build   | `grunt build`   | clean, concat, uglify, recess |
-| Install | `grunt install` | shell |
-| Preview | `grunt preview` | jekyll |
-| Serve   | `grunt serve`   | clean, concat, uglify, recess, jekyll |
-| Test    | `grunt test`    | jekyll, validation |
-| Update  | `grunt update`  | shell |
-
-> Dependencies are updated often by their original authors. To keep up with them, we test and update the version levels in `package.json`. However, dependencies do not update themselves automatically. To get the latest versions, run `grunt update`.
-
-#### Basic Tasks
-
-Unlike Alias, Basic tasks perform a much smaller set of instructions. Only a few are actually useful outside of its Alias. Those that are useful are listed below.
-
-| Grunt Command           | Description |
-| ----------------------- | ----------- |
-| `grunt jekyll:preview`  | Same as the Alias `grunt preview` task |
-| `grunt recess:unminify` | Concats LESS files and drops a new CSS file into `assets/css/` |
-| `grunt recess:minify`   | Concats and minifies LESS files and drops a new CSS file into `assets/css/` |
-| `grunt shell:bundler`   | Same as the Alias `grunt install` task |
-| `grunt shell:npm`       | Same as the Alias `grunt update` task |
-| `grunt shell:pygments`  | Installs Python setuptools, pip, and Pygments |
+  ~~~sh
+  [sudo] rm -r node_modules
+  [sudo] npm install
+  ~~~
 
 <a href="#">back to top</a>
 
