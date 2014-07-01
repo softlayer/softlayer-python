@@ -2,17 +2,15 @@
 
 * [Our Project Pages](#our-project-pages)
 * [Features](#features)
-* [Recommended Browsers](#recommended-browsers)
+* [Compatibility](#compatibility)
 * [Prerequisites](#prerequisites)
 * [Getting Started](#getting-started)
-* [Grunt](#grunt)
 * [Code Organization](#code-organization)
+* [Grunt](#grunt)
+* [Metadata](#metadata)
 * [DOM Elements](#dom-elements)
-* [Repository Metadata](#repository-metadata)
 * [Code Styles](#code-styles)
 * [Running into Problems?](#running-into-problems)
-
-<a href="#">back to top</a>
 
 ---
 
@@ -65,16 +63,16 @@ Below is a list of functional and aesthetic features and their purpose.
 
 * [Classify](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/classify.js) DOM utility for class helper functions
 * [Indexing](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/indexing.js) plugin for building table of contents on-the-fly
-* [Profile](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/profiler.js) plugin for fetching organization and repository data from GitHub
+* [Portfolio](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/portfolio.js) plugin for fetching organization and repository data from GitHub
 * [Readability](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/readability.js) to make HTML5 more accessible and estimate how long it takes to read a single page
-* [Scrolling](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/scrolling.js) to set thresholds for elements while scrolling
-* [Toggle](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/toggle.js) to handle sliding and collapsing behavior for navigation
+* [Scrollable](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/scrollable.js) to set thresholds for HTML elements while scrolling
+* [Toggle](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/toggle.js) handleS the sliding and collapsing behavior for navigation
 
 <a href="#">back to top</a>
 
 ---
 
-## Recommended Browsers
+## Compatibility
 
 We recommend the latest versions of the browsers and platforms below for the best performance and readability. For legacy browsers, the Modernizr plugin does its best but it's not perfect. Additionally, we use JS to render on-page elements. If it's disabled in your browser, you might not see those elements.
 
@@ -111,7 +109,7 @@ Our boilerplate requires the minimum versions for Ruby, Python, and Node.js. Cli
 
 > Note: Python powers Pygments, which we use for code highlighting. Currently, Pygments 1.6 is not compatible with Python 3. **You must have Python 2 installed** until Pygments 2.0 is released (date pending).
 
-#### Windows Users
+### Windows Users
 
 Read Yi Zeng's [Setup Jekyll on Windows](http://yizeng.me/2013/05/10/setup-jekyll-on-windows "Setup Jekyll on Windows") article before getting into the thick of things. It will save you a ton of time and agony.
 
@@ -154,6 +152,55 @@ Read Yi Zeng's [Setup Jekyll on Windows](http://yizeng.me/2013/05/10/setup-jekyl
   ~~~sh
   $ [sudo] grunt install
   ~~~
+
+<a href="#">back to top</a>
+
+---
+
+## Code Organization
+
+Below is the basic spread for our directory---not including `node_modules` (Grunt), `_site` (Jekyll), or any directories made for one-off projects.
+
+<pre>
+├─ _includes/
+│  ├─ docs/
+│  ├─ handlers/
+│  └─ packages/
+├─ _layout/
+├─ assets/
+│  ├─ css/
+│  ├─ images/
+│  └─ js/
+├─ less/
+├─ plugins/
+
+5 directories, 6 subdirectories
+</pre>
+
+### Directory
+
+Here's an overview of what each directory does or contains.
+
+| Directory               | Overview  |
+| ----------------------- | --------- |
+| <samp>_includes/</samp> | Reusable chunks of content (“partials”) and semantic elements. The `{% include file.ext %}` tag indicates a partial is being used. |
+| <samp>_layouts/</samp>  | Reusable templates designed for specific uses, like **pages**, **news**, **articles**, and **blogs**. The `{{content}}` tag injects external content into layouts. |
+| <samp>assets/</samp>    | Static and transpiled resources used exclusively by the website. This includes JS, CSS, and images.|
+| <samp>less/</samp>      | The source for `*.less` stylesheets. Concatenated LESS files are stored in `assets/css`. |
+| <samp>plugins/</samp>   | The source for `*.js` scripts. Bundled JS files are stored in `assets/js`. |
+
+### Subdirectory
+
+Here's an overview of each subdirectory.
+
+| Subdirectory                    | Overview |
+| ------------------------------- | -------- |
+| <samp>_includes/docs</samp>     | Reusable, plain-text snippets for documentation |
+| <samp>_includes/handlers</samp> | [Logic tags](http://docs.shopify.com/themes/liquid-basics) for the Liquid templating engine |
+| <samp>_includes/packages</samp> | The source for `ez_setup.py` and `get-pip.py` |
+| <samp>assets/css</samp>         | Directory for static CSS resources |
+| <samp>assets/images</samp>      | The source for all images, including favicons and logos |
+| <samp>assets/js</samp>          | Directory for concatenated JS resources |
 
 <a href="#">back to top</a>
 
@@ -277,55 +324,6 @@ Unlike Alias, Basic tasks perform a much smaller set of instructions. Only a few
 | `grunt shell:bundler`   | Same as the Alias `grunt install` task |
 | `grunt shell:npm`       | Same as the Alias `grunt update` task |
 | `grunt shell:pygments`  | Installs Python setuptools, pip, and Pygments |
-
-<a href="#">back to top</a>
-
----
-
-## Code Organization
-
-Below is the basic spread for our directory---not including `node_modules` (Grunt), `_site` (Jekyll), or any directories made for one-off projects.
-
-<pre>
-├─ _includes/
-│  ├─ docs/
-│  ├─ handlers/
-│  └─ packages/
-├─ _layout/
-├─ assets/
-│  ├─ css/
-│  ├─ images/
-│  └─ js/
-├─ less/
-├─ plugins/
-
-5 directories, 6 subdirectories
-</pre>
-
-### Directory
-
-Here's an overview of what each directory does or contains.
-
-| Directory               | Overview  |
-| ----------------------- | --------- |
-| <samp>_includes/</samp> | Reusable chunks of content (“partials”) and semantic elements. The `{% include file.ext %}` tag indicates a partial is being used. |
-| <samp>_layouts/</samp>  | Reusable templates designed for specific uses, like **pages**, **news**, **articles**, and **blogs**. The `{{content}}` tag injects external content into layouts. |
-| <samp>assets/</samp>    | Static and transpiled resources used exclusively by the website. This includes JS, CSS, and images.|
-| <samp>less/</samp>      | The source for `*.less` stylesheets. Concatenated LESS files are stored in `assets/css`. |
-| <samp>plugins/</samp>   | The source for `*.js` scripts. Bundled JS files are stored in `assets/js`. |
-
-### Subdirectory
-
-Here's an overview of each subdirectory.
-
-| Subdirectory                    | Overview |
-| ------------------------------- | -------- |
-| <samp>_includes/docs</samp>     | Reusable, plain-text snippets for documentation |
-| <samp>_includes/handlers</samp> | [Logic tags](http://docs.shopify.com/themes/liquid-basics) for the Liquid templating engine |
-| <samp>_includes/packages</samp> | The source for `ez_setup.py` and `get-pip.py` |
-| <samp>assets/css</samp>         | Directory for static CSS resources |
-| <samp>assets/images</samp>      | The source for all images, including favicons and logos |
-| <samp>assets/js</samp>          | Directory for concatenated JS resources |
 
 <a href="#">back to top</a>
 
