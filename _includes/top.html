@@ -7,12 +7,12 @@
 <title>
 {% if page.header == null %}
 {% if page.title == "index" %}
-  {{site.project.alias}} &middot; {{site.owner.name}}
+    {{site.project.alias}} &middot; {{site.owner.name}}
 {% elsif page.title == "cli" %}
-  {{site.project.name}} &middot; {{site.owner.name}}
+    {{site.project.name}} &middot; {{site.owner.name}}
 {% endif %}
 {% else %}
-  {{page.header}} &middot; {{site.project.name}}
+    {{page.header}} &middot; {{site.project.name}}
 {% endif %}
 </title>
 
@@ -29,5 +29,5 @@
 <!-- Font -->
 <script src="//use.typekit.net/lzt3exy.js"></script>
 <script>
-  try{Typekit.load();}catch(e){}
+    try{Typekit.load();}catch(e){}
 </script>
