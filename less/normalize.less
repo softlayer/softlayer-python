@@ -12,8 +12,9 @@
  *        Added del with 'text-decoration: line-through' property
  *        Added ul, ol with 'line-height: inherit' property
  *        Changed fieldset defaults to '0,
- *        Changed 'bold' to '700'
+ *        Changed all 'bold' properties to '700'
  *        Changed small default to '85%'
+ *        Changed mark color to @black
  *        Removed hgroup (deprecated in HTML5)
  *        Removed leading zeros removed from decimals (e.g. 0.5em is now .5em)
  */
@@ -21,29 +22,29 @@
 *,
 *:before,
 *:after {
-  .box-sizing(border-box);
+    .box-sizing(border-box);
 }
 
 html {
-  font-size: 62.5%;
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
-  -webkit-text-size-adjust: 100%;
-      -ms-text-size-adjust: 100%;
+    font-size: 62.5%;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
 }
 
 body {
-  margin: 0;
-  font-style: normal;
-  text-shadow: none;
-  cursor: auto;
+    margin: 0;
+    font-style: normal;
+    text-shadow: none;
+    cursor: auto;
 }
 
 del {
-  text-decoration: line-through;
+    text-decoration: line-through;
 }
 
 ul, ol {
-  line-height: inherit;
+    line-height: inherit;
 }
 
 article,
@@ -57,63 +58,57 @@ main,
 nav,
 section,
 summary {
-  display: block;
+    display: block;
 }
 
 [hidden],
 template {
-  display: none;
+    display: none;
 }
 
 a {
-  text-decoration: none;
-  background: transparent;
+    text-decoration: none;
+    background: transparent;
 }
 
 a.active,
 a:active,
 a:hover,
 a:focus {
-  outline: 0;
+    outline: 0;
 }
 
 abbr[title] {
-  border-bottom: 1px dotted;
+    border-bottom: 1px dotted;
 }
 
 mark {
-  color: #000000;
-  background: #ffff00;
+    color: @black;
+    background: #ffff00;
 }
 
 small {
-  font-size: 85%;
+    font-size: 85%;
 }
 
 sub,
 sup {
-  position: relative;
-  font-size: 75%;
-  line-height: 0;
-  vertical-align: baseline;
+    position: relative;
+    font-size: 75%;
+    line-height: 0;
+    vertical-align: baseline;
 }
 
 sup {
-  top: -.5em;
+    top: -.5em;
 }
 
 sub {
-  bottom: -.25em;
+    bottom: -.25em;
 }
 
 img {
-  border: 0;
-}
-
-hr {
-  height: 0;
-  box-sizing: content-box;
-  border-width: 0;
+    border: 0;
 }
 
 button,
@@ -121,48 +116,48 @@ input,
 optgroup,
 select,
 textarea {
-  margin: 0;
-  font: inherit;
-  color: inherit;
+    margin: 0;
+    font: inherit;
+    color: inherit;
 }
 
 button,
 select {
-  text-transform: none;
+    text-transform: none;
 }
 
 button,
 html input[type="button"] {
-  -webkit-appearance: button;
-  cursor: pointer;
+    -webkit-appearance: button;
+    cursor: pointer;
 }
 
 button[disabled],
 html input[disabled] {
-  cursor: default;
+    cursor: default;
 }
 
 fieldset {
-  padding: 0;
-  margin: 0;
-  border: none;
+    padding: 0;
+    margin: 0;
+    border: none;
 }
 
 pre,
 textarea {
-  overflow: auto;
+    overflow: auto;
 }
 
 b,
 strong {
-  font-weight: 700;
+    font-weight: 700;
 }
 
 table {
-  border-spacing: 0;
-  border-collapse: collapse;
+    border-spacing: 0;
+    border-collapse: collapse;
 }
 
 td, th {
-  padding: 0;
+    padding: 0;
 }
