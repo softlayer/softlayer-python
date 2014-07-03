@@ -20,11 +20,11 @@ We use a homegrown, content-first boilerplate for our GitHub docs. It provides t
 
 * Guaranteeing fast load times
 * Automating repetitive tasks
-* Embedding responsiveness in its core without wrapping code around elements
+* Embedding responsiveness and accessibility in its core
 * Providing estimated reading time
-* Having indexes/table of contents built automatically
+* Having indexes/table of contents built on-the-fly
 * Deploying minified or unminified JS and CSS in production
-* Encoding URLs with the appropriate labels to help users filter or create issues accurately on GitHub
+* Encoding URLs with the appropriate labels to help filter and create issues accurately on GitHub
 * Supporting local instances on Windows 7/8 OSes
 
 <a href="#">back to top</a>
@@ -74,17 +74,17 @@ Below is a list of functional and aesthetic features and their purpose.
 
 ## Compatibility
 
-We recommend the latest versions of the browsers and platforms below for the best performance and readability. For legacy browsers, the Modernizr plugin does its best but it's not perfect. Additionally, we use JS to render on-page elements. If it's disabled in your browser, you might not see those elements.
+For the best performance and usability, we recommend the latest versions of the browsers and platforms below. As for legacy browsers, the Modernizr plugin does its best but it's not perfect. And like most sites today, we use JS to render on-page elements. If it's disabled in your browser, you might not see those elements.
 
 Starting from the best to the worst, we suggest the following:
 
-* Chrome (100%)
-* Safari (75%)
-* Firefox (50%)
-* Opera (50%)
-* Internet Explorer (25%)
+* Chrome (~100%)
+* Safari (~75%)
+* Firefox (~50%)
+* Opera (~50%)
+* Internet Explorer (~25%)
 
-See the table below for a comparison of OS platforms and browsers.
+The table below is a comparison of OS platforms and browsers.
 
 | Platform    | Chrome  | Firefox   | Internet Explorer   | Opera   | Safari          |
 | ----------- | ------- | --------- | ------------------- | ------- | --------------- |
@@ -93,7 +93,7 @@ See the table below for a comparison of OS platforms and browsers.
 | Mac OS X    | **Yes** | **Yes**   | N/A                 | **Yes** | **Yes**         |
 | Windows     | **Yes** | **Yes**   | **Yes**             | **Yes** | **Yes** (note)  |
 
-> Note: Apple no longer provides updates for Safari on Windows. Due to the lack of security updates, we do not recommend using Safari on Windows.
+> Note: Apple no longer provides updates for Safari on Windows. Due to the lack of security updates, we **do not recommend** using Safari on Windows. Use Chrome instead.
 
 <a href="#">back to top</a>
 
@@ -101,7 +101,7 @@ See the table below for a comparison of OS platforms and browsers.
 
 ## Prerequisites
 
-Our boilerplate requires the minimum versions for Ruby, Python, and Node.js. Click the links to get download and installation information for your OS.
+Our boilerplate requires the minimum versions for Ruby, Python, and Node.js. Use the links to get download and installation information for your OS.
 
 * [Ruby 2.0.0](http://www.ruby-lang.org/en/installation)
 * [Python 2.7.5](http://www.python.org/download) (see note)
@@ -119,7 +119,7 @@ Read Yi Zeng's [Setup Jekyll on Windows](http://yizeng.me/2013/05/10/setup-jekyl
 
 ## Getting Started
 
-1. Run the commands below to verify __Ruby__, __Python__ and __Node.js__ are installed (see [Prerequisites](#prerequisites) for supported versions)
+1. Run these commands to verify that __Ruby__, __Python__ and __Node.js__ are installed (see [Prerequisites](#prerequisites) for supported versions)
 
   ~~~sh
   # each command returns a version number
@@ -128,7 +128,7 @@ Read Yi Zeng's [Setup Jekyll on Windows](http://yizeng.me/2013/05/10/setup-jekyl
   $ node  --version
   ~~~
 
-2. Clone from GitHub and go into the directory
+2. Clone from GitHub and go into the directory (~5 sec.)
 
   ~~~sh
   $ git clone -b gh-pages https://github.com/softlayer/softlayer-python.git
@@ -141,7 +141,7 @@ Read Yi Zeng's [Setup Jekyll on Windows](http://yizeng.me/2013/05/10/setup-jekyl
   $ [sudo] npm install -g grunt-cli
   ~~~
 
-4. Install modes for Node.js (~15 sec.)
+4. Install modules for Node.js (~15 sec.)
 
   ~~~sh
   $ [sudo] npm install
@@ -165,16 +165,17 @@ Below is the basic spread for our directory---not including `node_modules` (Grun
 ├─ _includes/
 │  ├─ docs/
 │  ├─ handlers/
-│  └─ packages/
+│  └─ partials/
 ├─ _layout/
 ├─ assets/
 │  ├─ css/
 │  ├─ images/
 │  └─ js/
+│  └─ packages/
 ├─ less/
 ├─ plugins/
 
-5 directories, 6 subdirectories
+5 directories, 7 subdirectories
 </pre>
 
 ### Directory
@@ -186,8 +187,8 @@ Here's an overview of what each directory does or contains.
 | <samp>_includes/</samp> | Reusable chunks of content (“partials”) and semantic elements. The `{% include file.ext %}` tag indicates a partial is being used. |
 | <samp>_layouts/</samp>  | Reusable templates designed for specific uses, like **pages**, **news**, **articles**, and **blogs**. The `{{content}}` tag injects external content into layouts. |
 | <samp>assets/</samp>    | Static and transpiled resources used exclusively by the website. This includes JS, CSS, and images.|
-| <samp>less/</samp>      | The source for `*.less` stylesheets. Concatenated LESS files are stored in `assets/css`. |
-| <samp>plugins/</samp>   | The source for `*.js` scripts. Bundled JS files are stored in `assets/js`. |
+| <samp>less/</samp>      | Source for `*.less` stylesheets. Concatenated LESS files are stored in `assets/css`. |
+| <samp>plugins/</samp>   | Source for `*.js` scripts. Bundled JS files are stored in `assets/js`. |
 
 ### Subdirectory
 
@@ -197,10 +198,12 @@ Here's an overview of each subdirectory.
 | ------------------------------- | -------- |
 | <samp>_includes/docs</samp>     | Reusable, plain-text snippets for documentation |
 | <samp>_includes/handlers</samp> | [Logic tags](http://docs.shopify.com/themes/liquid-basics) for the Liquid templating engine |
-| <samp>_includes/packages</samp> | The source for `ez_setup.py` and `get-pip.py` |
+| <samp>_includes/partials</samp> | Reusable, HTML snippets for documentation and landing pages |
+| <samp>_includes/packages</samp> | Source for `ez_setup.py` and `get-pip.py` |
 | <samp>assets/css</samp>         | Directory for static CSS resources |
-| <samp>assets/images</samp>      | The source for all images, including favicons and logos |
-| <samp>assets/js</samp>          | Directory for concatenated JS resources |
+| <samp>assets/images</samp>      | Source for all images, including favicons and logos |
+| <samp>assets/js</samp>          | Directory for bundled JS resources |
+| <samp>assets/packages</samp>    | Source for `ez_setup.py` and `get-pip.py` |
 
 <a href="#">back to top</a>
 
