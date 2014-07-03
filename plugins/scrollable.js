@@ -9,49 +9,51 @@
 
 pageOffset = document.documentElement.scrollTop || document.body.scrollTop;
 scrollTo = function(element, to, duration) {
-  start         = element.scrollTop;
-  change        = to - start;
-  currentTime   = 0;
-  increment     = 20;
+    start         = element.scrollTop;
+    change        = to - start;
+    currentTime   = 0;
+    increment     = 20;
 
-  animateScroll = function() {
-    currentTime += increment;
-    val = Math.easeInOutQuad(currentTime, start, change, duration);
-    element.scrollTop = val;
-    if (currentTime < duration) {
-      setTimeout(animateScroll, increment);
-    }
-  };
-  Math.easeInOutQuad = function(t, b, c, d) { t /= d / 2;
-    if (t < 1) { return c / 2 * t * t + b; }
-    t--; return -c / 2 * (t * (t - 2) - 1) + b; };
+    animateScroll = function() {
+        currentTime += increment;
+        val = Math.easeInOutQuad(currentTime, start, change, duration);
+        element.scrollTop = val;
+        if (currentTime < duration) {
+            setTimeout(animateScroll, increment);
+        }
+    };
 
-  animateScroll();
+    Math.easeInOutQuad = function(t, b, c, d) { t /= d / 2;
+        if (t < 1) { return c / 2 * t * t + b; }
+        t--; return -c / 2 * (t * (t - 2) - 1) + b; };
+
+    animateScroll();
 };
 
 window.onscroll = function() {
-  if (pageYOffset >= 200) {
-    document.getElementById("top").style.visibility = "visible";
-  } else {
-    document.getElementById("top").style.visibility = "hidden";
-    return;
-  }
-  document.getElementById("top").onclick = function() {
-    scrollTo(document.body, 0, 0);
-  };
+    if (pageYOffset >= 200) {
+        document.getElementById("top").style.visibility = "visible";
+    }
+    else {
+        document.getElementById("top").style.visibility = "hidden";
+        return;
+    }
+    document.getElementById("top").onclick = function() {
+        scrollTo(document.body, 0, 0);
+    };
 };
 
 $("a[href*=#]:not([href=#])").click(function() {
-  if (location.pathname.replace(/^\//,"") == this.pathname.replace(/^\//,"") || location.hostname == this.hostname) {
-    var target = $(this.hash);
+    if (location.pathname.replace(/^\//,"") == this.pathname.replace(/^\//,"") || location.hostname == this.hostname) {
+        var target = $(this.hash);
         target = target.length ? target : $("[name=" + this.hash.slice(1) +"]");
 
-    if (target.length) {
-      $("html,body").animate({
-        scrollTop: target.offset().top
-      }, 1000);
+        if (target.length) {
+            $("html,body").animate({
+                scrollTop: target.offset().top
+            }, 1000);
 
-      return false;
+            return false;
+        }
     }
-  }
 });

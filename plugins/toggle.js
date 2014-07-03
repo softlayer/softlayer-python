@@ -13,11 +13,11 @@ subnavElement  = document.getElementById("subnav-element");
 toggleElement  = document.getElementById("toggle-element");
 
 toggleElement.onclick = function() {
-  classify.toggle(body, "push");
-  classify.toggle(navElement, "pull");
-  classify.toggle(iconElement, "hidden");
-  classify.toggle(toggleElement, "fixed");
-  if (typeof(subnavElement) !== undefined && subnavElement !== null) {
-    classify.toggle(subnavElement, "hidden");
-  }
+    classify.toggle(body, "push");
+    classify.toggle(navElement, "pull");
+    classify.toggle(iconElement, "hidden");
+    classify.toggle(toggleElement, "fixed");
+    if (typeof(subnavElement) !== undefined && subnavElement !== null) {
+        classify.toggle(subnavElement, "hidden");
+    }
 };
