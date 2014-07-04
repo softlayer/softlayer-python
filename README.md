@@ -335,10 +335,10 @@ The colors below correspond with their respective LESS `@xxxx` variables.
 ### Colors
 
 ![](http://www.placehold.it/250/3C464C/ffffff&text=@default)
-![](http://www.placehold.it/250/7B807C/ffffff&text=@gray)
-![](http://www.placehold.it/250/4073BD/ffffff&text=@blue)
-![](http://www.placehold.it/250/DD0224/ffffff&text=@red)
-![](http://www.placehold.it/250/1ABD6C/ffffff&text=@green)
+![](http://www.placehold.it/250/7B807C/ffffff&text=@gray   )
+![](http://www.placehold.it/250/4073BD/ffffff&text=@blue   )
+![](http://www.placehold.it/250/DD0224/ffffff&text=@red    )
+![](http://www.placehold.it/250/1ABD6C/ffffff&text=@green  )
 
 ### Base Colors
 
