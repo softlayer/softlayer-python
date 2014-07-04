@@ -200,7 +200,6 @@ Here's an overview of each subdirectory.
 | <samp>_includes/docs</samp>     | Reusable, plain-text snippets for documentation |
 | <samp>_includes/handlers</samp> | [Logic tags](http://docs.shopify.com/themes/liquid-basics) for the Liquid templating engine |
 | <samp>_includes/partials</samp> | Reusable, HTML snippets for documentation and landing pages |
-| <samp>_includes/packages</samp> | Source for `ez_setup.py` and `get-pip.py` |
 | <samp>assets/css</samp>         | Directory for static CSS resources |
 | <samp>assets/images</samp>      | Source for all images, including favicons and logos |
 | <samp>assets/js</samp>          | Directory for bundled JS resources |
