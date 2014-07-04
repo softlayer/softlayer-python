@@ -17,16 +17,16 @@
 
 ## Our Project Page
 
-We use a homegrown, content-first boilerplate for our GitHub docs. It provides the facilities to write content exclusively in Markdown and spin-up [Jekyll](http://jekyllrb.com)-powered static websites, as well as:
+We use a homegrown, content-first boilerplate for GitHub docs. It provides the facilities to write content exclusively in Markdown and spin-up [Jekyll](http://jekyllrb.com)-powered static websites, as well as:
 
 * Guaranteeing fast load times
 * Automating repetitive tasks
-* Embedding responsiveness and accessibility in its core
-* Providing estimated reading time
+* Rooting responsiveness and accessibility right from its core
+* Providing estimated reading times
 * Having indexes/table of contents built on-the-fly
 * Deploying minified or unminified JS and CSS in production
-* Encoding URLs with the appropriate labels to help filter and create issues accurately on GitHub
-* Supporting local instances on Windows 7/8 OSes
+* Encoding URLs with the apt labels to help users filter and create issues precisely
+* Supporting native instances on Windows 7/8 OSes
 
 <a href="#">back to top</a>
 
@@ -34,39 +34,39 @@ We use a homegrown, content-first boilerplate for our GitHub docs. It provides t
 
 ## Features
 
-Below is a list of functional and aesthetic features and their purpose.
+Below is a list of functional and aesthetic features.
 
 ### Core Features
 
 * [Base HTML5](http://www.sitepoint.com/a-basic-html5-template "Base HTML5")
 * [Jekyll](http://jekyllrb.com "Jekyll") for free web hosting using GitHub Pages
 * [Redcarpet](http://github.com/vmg/redcarpet "Redcarpet") for Markdown-compatibility and rendering
-* [Pygments](http://pygments.org "Pygments") with the [GitHub](http://richleland.github.io/pygments-css) theme for code highlighting
+* [Pygments](http://pygments.org "Pygments") with a custom theme for code highlighting
 * [Normalize](http://necolas.github.io/normalize.css) for CSS normalization and resets
-* [Liquid](http://liquidmarkup.org "Liquid") as the core templating language
+* [Liquid](http://liquidmarkup.org "Liquid") templating language
 * [Metadata](http://help.github.com/articles/repository-metadata-on-github-pages) for GitHub Pages
 * Responsive grids and media queries from [Bootstrap](http://twitter.github.io/bootstrap)
 * [Logic tags](https://github.com/softlayer/softlayer-python/blob/gh-pages/_includes/handlers/items.html) for self-generating navigation links
 * Pretty URLs
-* [Viewports](http://github.com/h5bp/html5-boilerplate/blob/master/doc/extend.md#web-apps) for multi-device and OS support, including iOS 7.1+
+* [Viewports](http://github.com/h5bp/html5-boilerplate/blob/master/doc/extend.md#web-apps) for device and OS support, including iOS 7.1+
 * [Sitemaps.org](http://sitemaps.org)-compliant sitemap
 
 ### Components
 
 * [jQuery](http://jquery.com)
 * [Font Awesome](http://fortawesome.github.io/Font-Awesome) iconic font
-* [Grunt](http://gruntjs.com) to automate repetitive tasks
+* [Grunt](http://gruntjs.com) task runner
 * [LESS](http://lesscss.org) dynamic stylesheets for variables, mixins, nesting, and more
 * [Modernizr](http://modernizr.com) for legacy- and cross-browser support
-* [Universal Analytics](http://www.google.com/analytics) snippet with [page scroll tracking](https://github.com/h5bp/html5-boilerplate/blob/master/doc/extend.md#google-universal-analytics) from Google
+* [Universal Analytics](http://www.google.com/analytics) with [page scroll tracking](https://github.com/h5bp/html5-boilerplate/blob/master/doc/extend.md#google-universal-analytics) from Google
 
 ### Plugins
 
 * [Classify](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/classify.js) DOM utility for class helper functions
 * [Indexing](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/indexing.js) plugin for building table of contents on-the-fly
 * [Portfolio](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/portfolio.js) plugin for fetching organization and repository data from GitHub
-* [Readability](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/readability.js) to make HTML5 more accessible and estimate how long it takes to read a single page
-* [Scrollable](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/scrollable.js) to set thresholds for HTML elements while scrolling
+* [Readability](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/readability.js) to make HTML5 more accessible and gauge how long it takes to read a single page
+* [Scrollable](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/scrollable.js) to apply thresholds for HTML elements while scrolling
 * [Toggle](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/toggle.js) handles the sliding and collapsing behavior for navigation
 
 <a href="#">back to top</a>
@@ -75,7 +75,7 @@ Below is a list of functional and aesthetic features and their purpose.
 
 ## Compatibility
 
-For the best performance and usability, we recommend the latest versions of the browsers and platforms below. As for legacy browsers, the Modernizr plugin does its best but it's not perfect. And like most sites today, we use JS to render on-page elements. If it's disabled in your browser, you might not see those elements.
+For the best performance and usability, we recommend the latest versions of the browsers and platforms listed below. As for legacy browsers, the Modernizr plugin does its best but it's not perfect. And like most sites today, we use JS to render on-page elements. If it's disabled in your browser, you might not see those elements.
 
 Starting from the best to the worst, we suggest the following:
 
@@ -102,7 +102,7 @@ The table below is a comparison of OS platforms and browsers.
 
 ## Prerequisites
 
-Our boilerplate requires the minimum versions for Ruby, Python, and Node.js. Use the links to get download and installation information for your OS.
+Our boilerplate requires the minimum versions for Ruby, Python, and Node.js. Use the links to get download and install information for your specific OS.
 
 * [Ruby 2.0.0](http://www.ruby-lang.org/en/installation)
 * [Python 2.7.5](http://www.python.org/download) (see note)
@@ -185,10 +185,10 @@ Here's an overview of what each directory does or contains.
 
 | Directory               | Overview  |
 | ----------------------- | --------- |
-| <samp>_includes/</samp> | Reusable chunks of content (“partials”) and semantic elements. The `{% include file.ext %}` tag indicates a partial is being used. |
+| <samp>_includes/</samp> | Reusable content (“partials”) and semantic elements. The `{% include file.ext %}` tag indicates a partial is being used. |
 | <samp>_layouts/</samp>  | Reusable templates designed for specific uses, like **pages**, **news**, **articles**, and **blogs**. The `{{content}}` tag injects external content into layouts. |
-| <samp>assets/</samp>    | Static and transpiled resources used exclusively by the website. This includes JS, CSS, and images.|
-| <samp>less/</samp>      | Source for `*.less` stylesheets. Concatenated LESS files are stored in `assets/css`. |
+| <samp>assets/</samp>    | Static and transpiled resources. This includes JS, CSS, and images.|
+| <samp>less/</samp>      | Source for `*.less` stylesheets. Bundled LESS files are stored in `assets/css`. |
 | <samp>plugins/</samp>   | Source for `*.js` scripts. Bundled JS files are stored in `assets/js`. |
 
 ### Subdirectory
@@ -197,13 +197,13 @@ Here's an overview of each subdirectory.
 
 | Subdirectory                    | Overview |
 | ------------------------------- | -------- |
-| <samp>_includes/docs</samp>     | Reusable, plain-text snippets for documentation |
-| <samp>_includes/handlers</samp> | [Logic tags](http://docs.shopify.com/themes/liquid-basics) for the Liquid templating engine |
-| <samp>_includes/partials</samp> | Reusable, HTML snippets for documentation and landing pages |
-| <samp>assets/css</samp>         | Directory for static CSS resources |
-| <samp>assets/images</samp>      | Source for all images, including favicons and logos |
-| <samp>assets/js</samp>          | Directory for bundled JS resources |
-| <samp>assets/packages</samp>    | Source for `ez_setup.py` and `get-pip.py` |
+| <samp>_includes/docs</samp>     | Reusable, plain-text snippets for documentation. |
+| <samp>_includes/handlers</samp> | [Logic tags](http://docs.shopify.com/themes/liquid-basics) for the Liquid templating engine. |
+| <samp>_includes/partials</samp> | Reusable, HTML snippets for documentation and landing pages. |
+| <samp>assets/css</samp>         | Static directory for bundled CSS resources. |
+| <samp>assets/images</samp>      | Source for all images, including favicons and logos. |
+| <samp>assets/js</samp>          | Static directory for bundled JS resources. |
+| <samp>assets/packages</samp>    | Source for `ez_setup.py` and `get-pip.py`. |
 
 <a href="#">back to top</a>
 
@@ -211,9 +211,9 @@ Here's an overview of each subdirectory.
 
 ## Grunt
 
-We're big proponents of DRY (don't repeat yourself). That's why automation became such an important competency for our boilerplate. After all, the more automation there is, the less repetitive work you have (and hopefully the less mistakes you make).
+We're big proponents of DRY (don't repeat yourself). After all, the more automation there is, the less repetitive work you have (and hopefully the less mistakes you make).
 
-Using [Grunt](http://gruntjs.com), we built a powerful harness that automates ankle-biting tasks like:
+Using [Grunt](http://gruntjs.com), we built a powerful harness that automates ankle-biters like:
 
 * Bundling JS files and transpiling LESS into CSS
 * Validating HTML markup
@@ -310,9 +310,9 @@ Several DOM elements are embedded within JS and render on the home/landing page.
 
 ## Metadata
 
-We harness a few metadata tags using GitHub's [repository metadata](http://help.github.com/articles/repository-metadata-on-github-pages) feature, albeit not all of them for a number of reasons.
+We harness several metadata tags using GitHub's [repository metadata](http://help.github.com/articles/repository-metadata-on-github-pages) feature --- albeit not all of them for a number of reasons.
 
-Below is a list of the metadata tags we use.
+Below is a list of metadata tags we use.
 
 | Metadata Tags                     | Example                                             |
 | --------------------------------- | --------------------------------------------------- |
