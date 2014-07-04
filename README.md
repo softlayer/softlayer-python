@@ -1,12 +1,12 @@
 ## Contents
 
-* [Our Project Page](#our-project-page)
-* [Features](#features)
+* [Introduction](#introduction)
+* [Features and Plugins](#features-and-plugins)
 * [Compatibility](#compatibility)
 * [Prerequisites](#prerequisites)
 * [Getting Started](#getting-started)
 * [Code Organization](#code-organization)
-* [Grunt](#grunt)
+* [Automation](#automation)
 * [Metadata](#metadata)
 * [DOM Elements](#dom-elements)
 * [Color Palette](#color-palette)
@@ -15,7 +15,7 @@
 
 ---
 
-## Our Project Page
+## Introduction
 
 We use a homegrown, content-first boilerplate for GitHub docs. It provides the facilities to write content exclusively in Markdown and spin-up [Jekyll](http://jekyllrb.com)-powered static websites, as well as:
 
@@ -24,7 +24,6 @@ We use a homegrown, content-first boilerplate for GitHub docs. It provides the f
 * Rooting responsiveness and accessibility right from its core
 * Providing estimated reading times
 * Having indexes/table of contents built on-the-fly
-* Deploying minified or unminified JS and CSS in production
 * Encoding URLs with the apt labels to help users filter and create issues precisely
 * Supporting native instances on Windows 7/8 OSes
 
@@ -32,9 +31,9 @@ We use a homegrown, content-first boilerplate for GitHub docs. It provides the f
 
 ---
 
-## Features
+## Features and Plugins
 
-Below is a list of functional and aesthetic features.
+Below is a list of functional and aesthetic features, baked-in components, and JS plugins.
 
 ### Core Features
 
@@ -92,7 +91,7 @@ The table below is a comparison of OS platforms and browsers.
 | Android     | **Yes** | No        | N/A                 | No      | N/A             |
 | iOS         | **Yes** | N/A       | N/A                 | No      | **Yes**         |
 | Mac OS X    | **Yes** | **Yes**   | N/A                 | **Yes** | **Yes**         |
-| Windows     | **Yes** | **Yes**   | **Yes**             | **Yes** | **Yes** (note)  |
+| Windows     | **Yes** | **Yes**   | **Yes**             | **Yes** | **Yes** <sup>see note</sup>  |
 
 > Note: Apple no longer provides updates for Safari on Windows. Due to the lack of security updates, we **do not recommend** using Safari on Windows. Use Chrome instead.
 
@@ -105,7 +104,7 @@ The table below is a comparison of OS platforms and browsers.
 Our boilerplate requires the minimum versions for Ruby, Python, and Node.js. Use the links to get download and install information for your specific OS.
 
 * [Ruby 2.0.0](http://www.ruby-lang.org/en/installation)
-* [Python 2.7.5](http://www.python.org/download) (see note)
+* [Python 2.7.5](http://www.python.org/download) <sup>see note</sup>
 * [Node.js 0.10.20](http://nodejs.org/download)
 
 > Note: Python powers Pygments, which we use for code highlighting. Currently, Pygments 1.6 is not compatible with Python 3. **You must have Python 2 installed** until Pygments 2.0 is released (date pending).
@@ -120,8 +119,7 @@ Read Yi Zeng's [Setup Jekyll on Windows](http://yizeng.me/2013/05/10/setup-jekyl
 
 ## Getting Started
 
-1. Run these commands to verify that __Ruby__, __Python__ and __Node.js__ are installed (see [Prerequisites](#prerequisites) for supported versions)
-
+1. Verify that __Ruby__, __Python__ and __Node.js__ are installed
     ~~~sh
     # each command returns a version number
     $ ruby -v
@@ -160,19 +158,19 @@ Read Yi Zeng's [Setup Jekyll on Windows](http://yizeng.me/2013/05/10/setup-jekyl
 
 ## Code Organization
 
-Below is the basic spread for our directory---not including `node_modules` (Grunt), `_site` (Jekyll), or any directories made for one-off projects.
+Below is the basic spread for our directory (not including `node_modules` for Grunt, `_site` for Jekyll, or any directories made for one-off projects).
 
 <pre>
 ├─ _includes/
-│  ├─ docs/
-│  ├─ handlers/
-│  └─ partials/
+│   ├─ content/
+│   ├─ handlers/
+│   └─ partials/
 ├─ _layout/
 ├─ assets/
-│  ├─ css/
-│  ├─ images/
-│  └─ js/
-│  └─ packages/
+│   ├─ css/
+│   ├─ images/
+│   ├─ js/
+│   └─ packages/
 ├─ less/
 ├─ plugins/
 
@@ -185,8 +183,8 @@ Here's an overview of what each directory does or contains.
 
 | Directory               | Overview  |
 | ----------------------- | --------- |
-| <samp>_includes/</samp> | Reusable content (“partials”) and semantic elements. The `{% include file.ext %}` tag indicates a partial is being used. |
-| <samp>_layouts/</samp>  | Reusable templates designed for specific uses, like **pages**, **news**, **articles**, and **blogs**. The `{{content}}` tag injects external content into layouts. |
+| <samp>_includes/</samp> | Reusable content (“partials”) and semantic HTML elements. `{% include file.ext %}` tags indicate where partials are being used. |
+| <samp>_layouts/</samp>  | Reusable templates designed for specific uses, like **pages**, **news**, **articles**, and **blogs**. `{{content}}` tags inject external content into layouts. |
 | <samp>assets/</samp>    | Static and transpiled resources. This includes JS, CSS, and images.|
 | <samp>less/</samp>      | Source for `*.less` stylesheets. Bundled LESS files are stored in `assets/css`. |
 | <samp>plugins/</samp>   | Source for `*.js` scripts. Bundled JS files are stored in `assets/js`. |
@@ -197,21 +195,21 @@ Here's an overview of each subdirectory.
 
 | Subdirectory                    | Overview |
 | ------------------------------- | -------- |
-| <samp>_includes/docs</samp>     | Reusable, plain-text snippets for documentation. |
-| <samp>_includes/handlers</samp> | [Logic tags](http://docs.shopify.com/themes/liquid-basics) for the Liquid templating engine. |
-| <samp>_includes/partials</samp> | Reusable, HTML snippets for documentation and landing pages. |
-| <samp>assets/css</samp>         | Static directory for bundled CSS resources. |
-| <samp>assets/images</samp>      | Source for all images, including favicons and logos. |
-| <samp>assets/js</samp>          | Static directory for bundled JS resources. |
-| <samp>assets/packages</samp>    | Source for `ez_setup.py` and `get-pip.py`. |
+| <samp>_includes/content/</samp>  | Reusable, plain-text snippets for documentation. |
+| <samp>_includes/handlers/</samp> | [Logic tags](http://docs.shopify.com/themes/liquid-basics) for the Liquid templating engine. |
+| <samp>_includes/partials/</samp> | Reusable, HTML snippets for documentation and landing pages. |
+| <samp>assets/css/</samp>         | Static directory for bundled CSS resources. |
+| <samp>assets/images/</samp>      | Source for all images, including favicons and logos. |
+| <samp>assets/js/</samp>          | Static directory for bundled JS resources. |
+| <samp>assets/packages/</samp>    | Source for `ez_setup.py` and `get-pip.py`. |
 
 <a href="#">back to top</a>
 
 ---
 
-## Grunt
+## Automation
 
-We're big proponents of DRY (don't repeat yourself). After all, the more automation there is, the less repetitive work you have (and hopefully the less mistakes you make).
+We're proponents of DRY (don't repeat yourself). After all, the more automation there is, the less repetitive work you have (and hopefully the less mistakes you make).
 
 Using [Grunt](http://gruntjs.com), we built a powerful harness that automates ankle-biters like:
 
@@ -283,10 +281,10 @@ Run `grunt test` to perform the following:
 
 Dependencies are updated often by their original authors. To keep up with them, we test and update the version levels in `package.json`. However, dependencies do not update themselves automatically. To install the most recent versions, run the following commands to delete the original <samp>node_modules</samp> directory and build a new one.
 
-    ~~~sh
-    [sudo] rm -r node_modules
-    [sudo] npm install
-    ~~~
+~~~sh
+$ [sudo] rm -r node_modules
+$ [sudo] npm install
+~~~
 
 <a href="#">back to top</a>
 
@@ -310,7 +308,7 @@ Several DOM elements are embedded within JS and render on the home/landing page.
 
 ## Metadata
 
-We harness several metadata tags using GitHub's [repository metadata](http://help.github.com/articles/repository-metadata-on-github-pages) feature --- albeit not all of them for a number of reasons.
+We harness several metadata tags using GitHub's [repository metadata](http://help.github.com/articles/repository-metadata-on-github-pages) feature, albeit not all of them for a number of reasons.
 
 Below is a list of metadata tags we use.
 
@@ -425,11 +423,11 @@ Below are a few issues and solutions (or workarounds) that we came across during
 
 If you get **Liquid Exception: incompatible character encodings: UTF-8 and IBM437...** after running `grunt serve`, this means your CLI does not use UTF-8 by default (example: Git for Windows). A workaround is to run the following commands before running `grunt serve`.
 
-    ~~~sh
-    $ cmd
-    $ chcp 65001
-    $ exit
-    ~~~
+~~~sh
+$ cmd
+$ chcp 65001
+$ exit
+~~~
 
 > Note: You only need to run these commands when you first open your CLI. The settings persist locally until you close it.
 
@@ -443,12 +441,12 @@ If you're getting a **Conversion error: There was an error converting *file_name
 
 If you're getting a **Liquid Exception: Cannot find /bin/sh**, this means you have a buggy version of `pygments.rb`. A workaround is to use `pygments.rb` version 0.5.0. This means you'll have to uninstall newer versions as well. To do this, run the following commands.
 
-    ~~~sh
-    $ gem uninstall pygments.rb --version "=0.5.4"
-    $ gem uninstall pygments.rb --version "=0.5.2"
-    $ gem uninstall pygments.rb --version "=0.5.1"
-    $ gem install pygments.rb --version "=0.5.0"
-    ~~~
+~~~sh
+$ gem uninstall pygments.rb --version "=0.5.4"
+$ gem uninstall pygments.rb --version "=0.5.2"
+$ gem uninstall pygments.rb --version "=0.5.1"
+$ gem install pygments.rb --version "=0.5.0"
+~~~
 
 #### Not Found: '/' not found
 
