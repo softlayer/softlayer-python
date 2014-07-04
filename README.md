@@ -334,23 +334,25 @@ The colors below correspond with their respective LESS `@xxxx` variables.
 
 ### Colors
 
-![](http://www.placehold.it/200/3C464C/ffffff&text=@default)
-![](http://www.placehold.it/200/7B807C/ffffff&text=@gray)
-![](http://www.placehold.it/200/4073BD/ffffff&text=@blue)
-![](http://www.placehold.it/200/DD0224/ffffff&text=@red)
-![](http://www.placehold.it/200/1ABD6C/ffffff&text=@green)
+![](http://www.placehold.it/250/3C464C/ffffff&text=@default)
+![](http://www.placehold.it/250/7B807C/ffffff&text=@gray)
+![](http://www.placehold.it/250/4073BD/ffffff&text=@blue)
+![](http://www.placehold.it/250/DD0224/ffffff&text=@red)
+![](http://www.placehold.it/250/1ABD6C/ffffff&text=@green)
 
 ### Base Colors
 
-![](http://www.placehold.it/200/F8F8F8/ffffff&text=@base90)
-![](http://www.placehold.it/200/F0F0F0/ffffff&text=@base80)
-![](http://www.placehold.it/200/DADADA/ffffff&text=@base70)
-![](http://www.placehold.it/200/BABABA/ffffff&text=@base60)
-![](http://www.placehold.it/200/AAAAAA/ffffff&text=@base50)
-![](http://www.placehold.it/200/777777/ffffff&text=@base40)
-![](http://www.placehold.it/200/555555/ffffff&text=@base30)
-![](http://www.placehold.it/200/333333/ffffff&text=@base20)
-![](http://www.placehold.it/200/222222/ffffff&text=@base10)
+![](http://www.placehold.it/250/F8F8F8/ffffff&text=@base90)
+![](http://www.placehold.it/250/F0F0F0/ffffff&text=@base80)
+![](http://www.placehold.it/250/DADADA/ffffff&text=@base70)
+![](http://www.placehold.it/250/BABABA/ffffff&text=@base60)
+![](http://www.placehold.it/250/AAAAAA/ffffff&text=@base50)
+![](http://www.placehold.it/250/777777/ffffff&text=@base40)
+![](http://www.placehold.it/250/555555/ffffff&text=@base30)
+![](http://www.placehold.it/250/333333/ffffff&text=@base20)
+![](http://www.placehold.it/250/222222/ffffff&text=@base10)
+
+<a href="#">back to top</a>
 
 ---
 
