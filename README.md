@@ -346,7 +346,7 @@ The colors below correspond with their respective LESS `@xxxx` variables.
 ![](http://www.placehold.it/200/F8F8F8/999999&text=@base90)
 ![](http://www.placehold.it/200/F0F0F0/999999&text=@base80)
 ![](http://www.placehold.it/200/DADADA/999999&text=@base70)
-![](http://www.placehold.it/250/BABABA/ffffff&text=@base60)
+![](http://www.placehold.it/200/BABABA/ffffff&text=@base60)
 ![](http://www.placehold.it/200/AAAAAA/ffffff&text=@base50)
 ![](http://www.placehold.it/200/777777/ffffff&text=@base40)
 ![](http://www.placehold.it/200/555555/ffffff&text=@base30)
