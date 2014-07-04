@@ -38,7 +38,7 @@ Below is a list of functional and aesthetic features and their purpose.
 
 ### Core Features
 
-* Base HTML5
+* [Base HTML5](http://www.sitepoint.com/a-basic-html5-template "Base HTML5")
 * [Jekyll](http://jekyllrb.com "Jekyll") for free web hosting using GitHub Pages
 * [Redcarpet](http://github.com/vmg/redcarpet "Redcarpet") for Markdown-compatibility and rendering
 * [Pygments](http://pygments.org "Pygments") with the [GitHub](http://richleland.github.io/pygments-css) theme for code highlighting
