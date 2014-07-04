@@ -9,6 +9,7 @@
 * [Grunt](#grunt)
 * [Metadata](#metadata)
 * [DOM Elements](#dom-elements)
+* [Color Palette](#color-palette)
 * [Code Styles](#code-styles)
 * [Got Problems?](#got-problems)
 
@@ -47,7 +48,7 @@ Below is a list of functional and aesthetic features and their purpose.
 * Responsive grids and media queries from [Bootstrap](http://twitter.github.io/bootstrap)
 * [Logic tags](https://github.com/softlayer/softlayer-python/blob/gh-pages/_includes/handlers/items.html) for self-generating navigation links
 * Pretty URLs
-* [Web-App Viewports](http://github.com/h5bp/html5-boilerplate/blob/master/doc/extend.md#web-apps) for multi-device and OS support, including iOS 7.1+
+* [Viewports](http://github.com/h5bp/html5-boilerplate/blob/master/doc/extend.md#web-apps) for multi-device and OS support, including iOS 7.1+
 * [Sitemaps.org](http://sitemaps.org)-compliant sitemap
 
 ### Components
@@ -121,37 +122,37 @@ Read Yi Zeng's [Setup Jekyll on Windows](http://yizeng.me/2013/05/10/setup-jekyl
 
 1. Run these commands to verify that __Ruby__, __Python__ and __Node.js__ are installed (see [Prerequisites](#prerequisites) for supported versions)
 
-  ~~~sh
-  # each command returns a version number
-  $ ruby -v
-  $ python --version
-  $ node  --version
-  ~~~
+    ~~~sh
+    # each command returns a version number
+    $ ruby -v
+    $ python --version
+    $ node  --version
+    ~~~
 
 2. Clone from GitHub and go into the directory (~5 sec.)
 
-  ~~~sh
-  $ git clone -b gh-pages https://github.com/softlayer/softlayer-python.git
-  $ cd softlayer-python
-  ~~~
+    ~~~sh
+    $ git clone -b gh-pages https://github.com/softlayer/softlayer-python.git
+    $ cd softlayer-python
+    ~~~
 
 3. Install Grunt (~3 sec.)
 
-  ~~~sh
-  $ [sudo] npm install -g grunt-cli
-  ~~~
+    ~~~sh
+    $ [sudo] npm install -g grunt-cli
+    ~~~
 
 4. Install modules for Node.js (~15 sec.)
 
-  ~~~sh
-  $ [sudo] npm install
-  ~~~
+    ~~~sh
+    $ [sudo] npm install
+    ~~~
 
 5. Install Jekyll, Pygments and other dependencies (~35 sec.)
 
-  ~~~sh
-  $ [sudo] grunt install
-  ~~~
+    ~~~sh
+    $ [sudo] grunt install
+    ~~~
 
 <a href="#">back to top</a>
 
@@ -283,10 +284,10 @@ Run `grunt test` to perform the following:
 
 Dependencies are updated often by their original authors. To keep up with them, we test and update the version levels in `package.json`. However, dependencies do not update themselves automatically. To install the most recent versions, run the following commands to delete the original <samp>node_modules</samp> directory and build a new one.
 
-  ~~~sh
-  [sudo] rm -r node_modules
-  [sudo] npm install
-  ~~~
+    ~~~sh
+    [sudo] rm -r node_modules
+    [sudo] npm install
+    ~~~
 
 <a href="#">back to top</a>
 
@@ -327,6 +328,32 @@ Below is a list of the metadata tags we use.
 
 ---
 
+## Color Palette
+
+The colors below correspond with their respective LESS `@xxxx` variables.
+
+### Colors
+
+![](http://www.placehold.it/200/3C464C/ffffff&text=@default)
+![](http://www.placehold.it/200/7B807C/ffffff&text=@gray)
+![](http://www.placehold.it/200/4073BD/ffffff&text=@blue)
+![](http://www.placehold.it/200/DD0224/ffffff&text=@red)
+![](http://www.placehold.it/200/1ABD6C/ffffff&text=@green)
+
+### Base Colors
+
+![](http://www.placehold.it/200/F8F8F8/ffffff&text=@base90)
+![](http://www.placehold.it/200/F0F0F0/ffffff&text=@base80)
+![](http://www.placehold.it/200/DADADA/ffffff&text=@base70)
+![](http://www.placehold.it/200/BABABA/ffffff&text=@base60)
+![](http://www.placehold.it/200/AAAAAA/ffffff&text=@base50)
+![](http://www.placehold.it/200/777777/ffffff&text=@base40)
+![](http://www.placehold.it/200/555555/ffffff&text=@base30)
+![](http://www.placehold.it/200/333333/ffffff&text=@base20)
+![](http://www.placehold.it/200/222222/ffffff&text=@base10)
+
+---
+
 ## Code Styles
 
 Use the settings below to help unify coding styles across different editors.
@@ -335,15 +362,15 @@ Use the settings below to help unify coding styles across different editors.
 * `end_of_line = lf`
 * `charset = utf-8`
 * `trim_trailing_whitespace = true`
-* `insert_final_newline = true`
-* `indent_size = 2`
+* `insert_final_newline = false`
+* `indent_size = 4`
 
 Sublime Text users can configure these settings manually by opening <samp>Preferences > Settings - User</samp>, inserting the lines below, and saving your settings.
 
 <pre>
 {
   "translate_tabs_to_spaces": true,
-  "tab_size": 2,
+  "tab_size": 4,
   "ensure_newline_at_eof_on_save": false,
   "default_encoding": "UTF-8",
   "default_line_ending": "lf",
@@ -395,11 +422,11 @@ Below are a few issues and solutions (or workarounds) that we came across during
 
 If you get **Liquid Exception: incompatible character encodings: UTF-8 and IBM437...** after running `grunt serve`, this means your CLI does not use UTF-8 by default (example: Git for Windows). A workaround is to run the following commands before running `grunt serve`.
 
-  ~~~sh
-  $ cmd
-  $ chcp 65001
-  $ exit
-  ~~~
+    ~~~sh
+    $ cmd
+    $ chcp 65001
+    $ exit
+    ~~~
 
 > Note: You only need to run these commands when you first open your CLI. The settings persist locally until you close it.
 
@@ -413,12 +440,12 @@ If you're getting a **Conversion error: There was an error converting *file_name
 
 If you're getting a **Liquid Exception: Cannot find /bin/sh**, this means you have a buggy version of `pygments.rb`. A workaround is to use `pygments.rb` version 0.5.0. This means you'll have to uninstall newer versions as well. To do this, run the following commands.
 
-  ~~~sh
-  $ gem uninstall pygments.rb --version "=0.5.4"
-  $ gem uninstall pygments.rb --version "=0.5.2"
-  $ gem uninstall pygments.rb --version "=0.5.1"
-  $ gem install pygments.rb --version "=0.5.0"
-  ~~~
+    ~~~sh
+    $ gem uninstall pygments.rb --version "=0.5.4"
+    $ gem uninstall pygments.rb --version "=0.5.2"
+    $ gem uninstall pygments.rb --version "=0.5.1"
+    $ gem install pygments.rb --version "=0.5.0"
+    ~~~
 
 #### Not Found: '/' not found
 
