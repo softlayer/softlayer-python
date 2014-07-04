@@ -4,10 +4,12 @@
 <script src="{{page.baseurl}}assets/js/main.js"></script>
 
 {% if page.header != null %}
+
 <script>
-  $(document).ready(function() {
-    $(".indexing").indexing(); // onDomready for indexing.js
-    $(".content").readEstimate(); // onDomready for readability.js
-  });
+    $(document).ready(function() {
+        $(".indexing").indexing(); // onDomready for indexing.js
+        $(".content").readEstimate(); // onDomready for readability.js
+    });
 </script>
+
 {% endif %}
