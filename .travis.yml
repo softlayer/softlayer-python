@@ -4,7 +4,10 @@ node_js:
     - "0.10.20"
 
 before_install:
-    - rvm use 2.0.0 --fuzzy
+    - rvm
+        - 2.0.0 --fuzzy
+    - python
+        - 2.7.6 --fuzzy
 
 install:
     - npm install -g grunt-cli
@@ -12,5 +15,5 @@ install:
     - grunt install
     - rm -r *.lock
 
-after_install:
+after_success:
     - grunt test
