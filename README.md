@@ -1,3 +1,11 @@
+## Status
+
+[![Build Status](https://travis-ci.org/softlayer/softlayer-python.svg?branch=gh-pages)](https://travis-ci.org/softlayer/softlayer-python?branch=gh-pages)
+[![Dependency Status](https://gemnasium.com/softlayer/softlayer-python.svg?branch=gh-pages)](https://gemnasium.com/softlayer/softlayer-python)
+[![MIT-license badge](http://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/softlayer/softlayer-python/blob/gh-pages/LICENSE.md)
+
+---
+
 ## Contents
 
 * [Introduction](#introduction)
