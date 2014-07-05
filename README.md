@@ -112,7 +112,7 @@ The table below is a comparison of OS platforms and browsers.
 Our boilerplate requires the minimum versions for Ruby, Python, and Node.js. Use the links to get download and install information for your specific OS.
 
 * [Ruby 2.0.0](http://www.ruby-lang.org/en/installation)
-* [Python 2.7.5](http://www.python.org/download) <sup>see note</sup>
+* [Python 2.7.6](http://www.python.org/download) <sup>see note</sup>
 * [Node.js 0.10.20](http://nodejs.org/download)
 
 > Note: Python powers Pygments, which we use for code highlighting. Currently, Pygments 1.6 is not compatible with Python 3. **You must have Python 2 installed** until Pygments 2.0 is released (date pending).
