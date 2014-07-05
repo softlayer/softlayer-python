@@ -36,7 +36,7 @@ In this example:
 * `-h` is the option passed to the command via the argument
 
 ***
-{% include docs/code-organization.md %}
+{% include content/code-organization.md %}
 
 ***
 # Functionality
@@ -464,4 +464,4 @@ Wondering where to go next? Here are a few ideas.
 * Not too familiar with Python? Find a heap of information on <a href="http://docs.python.org/3" target="_blank">Python's</a> website
 
 ***
-{% include docs/license.md %}
+{% include content/license.md %}

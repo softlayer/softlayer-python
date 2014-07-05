@@ -5,10 +5,10 @@ intro: Your "how to" source for downloading, installing, configuring, and workin
 baseurl: "../"
 ---
 
-{% include docs/introduction.md %}
+{% include content/introduction.md %}
 
 ***
-{% include docs/prerequisites.md %}
+{% include content/prerequisites.md %}
 
 ***
 # Installation
@@ -18,13 +18,13 @@ There are a number of ways to install the {{site.project.alias}} with our CLI. S
 * [Quick Install](#toc_3)
 * [Not-So Quick Install](#toc_7)
 
-{% include docs/installation.md %}
+{% include content/installation.md %}
 
 ***
-{% include docs/configure.md %}
+{% include content/configure.md %}
 
 ***
-{% include docs/virtual-servers.md %}
+{% include content/virtual-servers.md %}
 
 ***
 # Where to Go Next

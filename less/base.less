@@ -121,17 +121,17 @@ hr {
     float: left !important;
 }
 
-// Text alignment
+// Margins
 // -------------------------
 
-.text-left {
-    text-align: left;
+.margins {
+    padding-top: (@base-variable * 5.5);
+    padding-bottom: (@base-variable * 3);
 }
 
-.text-right {
-    text-align: right;
-}
-
-.text-center{
-    text-align: center;
+@media (min-width: @view-sm) {
+    .margins {
+        padding-top: (@base-variable * 7);
+        padding-bottom: (@base-variable * 4);
+    }
 }

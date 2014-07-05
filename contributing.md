@@ -16,21 +16,21 @@ Our dev workflow follows the <a href="https://help.github.com/articles/using-pul
 * [Feature Requests](#toc_3)
 * [Issue Reporting](#toc_4)
 
-{% include docs/code-standards.md %}
+{% include content/code-standards.md %}
 ***
-{% include docs/pull-requests.md %}
+{% include content/pull-requests.md %}
 ***
-{% include docs/feature-requests.md %}
+{% include content/feature-requests.md %}
 ***
-{% include docs/issues.md %}
+{% include content/issues.md %}
 ***
-{% include docs/source-control.md %}
+{% include content/source-control.md %}
 ***
-{% include docs/documentation.md %}
+{% include content/documentation.md %}
 ***
-{% include docs/projects.md %}
+{% include content/projects.md %}
 ***
-{% include docs/community.md %}
+{% include content/community.md %}
 
 ***
 # Where to Go Next
@@ -43,4 +43,4 @@ Wondering where to go next? Here are a few ideas.
 * Start collaborating with our [community members](#toc_14)
 
 ***
-{% include docs/license.md %}
+{% include content/license.md %}
