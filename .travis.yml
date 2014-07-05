@@ -1,0 +1,16 @@
+language: node_js
+
+node_js:
+    - "0.10.20"
+
+before_install:
+    - rvm use 2.0.0 --fuzzy
+
+install:
+    - npm install -g grunt-cli
+    - npm install
+    - grunt install
+    - rm -r *.lock
+
+after_install:
+    - grunt test
