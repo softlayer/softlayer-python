@@ -5,9 +5,9 @@
 
 {% if page.header != null %}
 <script>
-$(document).ready(function() {
-    $(".indexing").indexing(); // onDomready for indexing.js
-    $(".margins").readEstimate(); // onDomready for readability.js
+    $(document).ready(function() {
+        $(".indexing").indexing(); // onDomready for indexing.js
+        $(".content").readEstimate(); // onDomready for readability.js
 });
 </script>
 {% endif %}
