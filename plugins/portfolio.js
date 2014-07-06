@@ -35,7 +35,7 @@ if (typeof(featuredElement) !== undefined && featuredElement !== null) {
     });
 }
 
-(function ($) {
+(function($) {
     if (typeof(featuredElement) !== undefined && featuredElement !== null) {
         repoUrl = function(repo) {
             return repoUrls[repo.name] || repo.html_url;
