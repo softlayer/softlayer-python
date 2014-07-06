@@ -8,8 +8,6 @@
 
 ReadifyHTML5 = function(defaults, more_fixes) {
 
-    "use strict";
-
     var fix,
         key,
         mo;
@@ -182,8 +180,8 @@ ReadifyHTML5 = function(defaults, more_fixes) {
     return result;
 };
 
-(function ($) {
-    $.fn.readEstimate = function (options) {
+(function($) {
+    $.fn.readEstimate = function(options) {
         if (!this.length) {return this;}
 
         var plugin   = this;
@@ -213,7 +211,7 @@ ReadifyHTML5 = function(defaults, more_fixes) {
                 minuteOutput = "min read";
             }
 
-            var setTime = function (text) {
+            var setTime = function(text) {
                 var totalWords         = text.trim().split(/\s+/g).length;
                     wordsPerSecond     = wordsPerMinute / 60;
                     totalTimeInSeconds = totalWords / wordsPerSecond;
@@ -244,7 +242,7 @@ ReadifyHTML5 = function(defaults, more_fixes) {
                 }
             };
 
-            el.each(function () {
+            el.each(function() {
                 setTime(el.text());
             }
         );
