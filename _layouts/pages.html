@@ -5,7 +5,8 @@ layout: default
 {% include handlers/estimate.html %}
 
 <div class="container margins">
-<div class="col-lg-8 col-lg-offset-1 col-md-8">
+<div class="row">
+<div class="col-lg-8 col-lg-offset-1 col-md-8 content">
 
 <main role="main">
     <h1 class="page-header">{{page.header}}</h1>
@@ -15,7 +16,7 @@ layout: default
     {{content}}
 
 {% include handlers/social.html %}
-
+</div>
 <div class="col-lg-2 col-md-2">
 <div class="subnav" id="subnav-element"> <!-- toggle.js -->
     <ul class="indexing"></ul> <!-- indexing.js -->
