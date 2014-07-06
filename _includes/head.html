@@ -1,8 +1,5 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, minimal-ui">
-<meta name="description" content="{{site.project.tagline}}">
-<meta name="author" content="{{site.owner.name}}">
 
 <title>
 {% if page.header == null %}
@@ -16,17 +13,21 @@
 {% endif %}
 </title>
 
-<!-- Sitemap -->
-<link rel="sitemap" type="application/xml" title="Sitemap" href="{{page.baseurl}}sitemap.xml"> <!-- Directs search spiders to the sitemap -->
+<meta name="description" content="{{site.project.tagline}}">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+
+<!-- References -->
+<link rel="sitemap" type="application/xml" title="Sitemap" href="{{page.baseurl}}sitemap.xml">
+<link rel="author" href="{{page.baseurl}}humans.txt">
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="{{page.baseurl}}assets/css/main.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css">
 
 <!-- Icons -->
 <link rel="shortcut icon" sizes="32x32" href="{{page.baseurl}}assets/images/favicon.ico">
 <link rel="shortcut icon" sizes="196x196" href="{{page.baseurl}}assets/images/apple-touch-icon.png"> <!-- Android -->
 <link rel="apple-touch-icon" sizes="144x144" href="{{page.baseurl}}assets/images/apple-touch-icon.png"> <!-- Apple -->
-
-<!-- Stylesheets -->
-<link rel="stylesheet" href="{{page.baseurl}}assets/css/main.css">
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css">
 
 <!-- Font -->
 <script src="//use.typekit.net/lzt3exy.js"></script>
@@ -34,6 +35,6 @@
     try{Typekit.load();}catch(e){}
 </script>
 
-    <!--[if lt IE 9]>
+    <!--[if lt IE 8]>
         <p>You are using an <strong>outdated browser</strong>. Please <a href="http://browsehappy.com/">upgrade your browser</a> to a newer version or use a different browser, such as Chrome or Firefox.</p>
     <![endif]-->
