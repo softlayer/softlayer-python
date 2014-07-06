@@ -11,9 +11,8 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON("package.json"),
         site: grunt.file.readYAML("_config.yml"),
-        banner: "/* \n" + 
-                " * \n" + 
-                " * hum\n" +
+        banner: "/* \n" +
+                " * \n" +
                 " * Boilerplate <%= site.project.version %>, Built on <%= grunt.template.today(\"mm-dd-yyyy\") %>\n" +
                 " * Copyright © <%= grunt.template.today(\"yyyy\") %> <%= site.owner.name %>. All rights reserved.\n" +
                 " * Code and documentation licensed under <%= site.license.type %>.\n" + " * \n" + " */\n\n",
@@ -54,7 +53,8 @@ module.exports = function(grunt) {
                 options: {
                     banner: "<%= banner %>"
                 },
-                src: ["plugins/classify.js",
+                src: ["plugins/stub.js",
+                      "plugins/classify.js",
                       "plugins/toggle.js",
                       "plugins/indexing.js",
                       "plugins/scrollable.js",
