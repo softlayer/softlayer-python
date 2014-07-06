@@ -11,7 +11,9 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON("package.json"),
         site: grunt.file.readYAML("_config.yml"),
-        banner: "/* \n" + " * \n" + " * <%= site.project.name %> project\n" +
+        banner: "/* \n" + 
+                " * \n" + 
+                " * hum\n" +
                 " * Boilerplate <%= site.project.version %>, Built on <%= grunt.template.today(\"mm-dd-yyyy\") %>\n" +
                 " * Copyright © <%= grunt.template.today(\"yyyy\") %> <%= site.owner.name %>. All rights reserved.\n" +
                 " * Code and documentation licensed under <%= site.license.type %>.\n" + " * \n" + " */\n\n",
