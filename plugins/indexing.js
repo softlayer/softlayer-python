@@ -6,9 +6,9 @@
 #  Code and documentation licensed under MIT
 */
 
-(function ($) {
+(function($) {
     $.fn.indexing = function (options) {
-        headings = $("h1").filter(function () {
+        headings = $("h1").filter(function() {
             return this.id;
         });
         output = $(this);
@@ -17,7 +17,7 @@
             return;
         }
 
-        get_level = function (ele) {
+        get_level = function(ele) {
             return parseInt(ele.nodeName.replace("H", ""), 10);
         };
 
@@ -25,10 +25,10 @@
         this_level = void 0;
         html = "";
 
-        headings.on("click", function () {
+        headings.on("click", function() {
             window.location.hash = this.id;
         })
-            .each(function (_, heading) {
+            .each(function(_, heading) {
             this_level = get_level(heading);
 
             if (this_level === level) {
