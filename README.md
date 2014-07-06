@@ -45,33 +45,36 @@ Below is a list of functional and aesthetic features, baked-in components, and J
 
 ### Core Features
 
-* [Base HTML5](http://www.sitepoint.com/a-basic-html5-template "Base HTML5")
-* [Jekyll](http://jekyllrb.com "Jekyll") for free web hosting using GitHub Pages
-* [Redcarpet](http://github.com/vmg/redcarpet "Redcarpet") for Markdown-compatibility and rendering
-* [Pygments](http://pygments.org "Pygments") with a custom theme for code highlighting
-* [Normalize](http://necolas.github.io/normalize.css) for CSS normalization and resets
-* [Liquid](http://liquidmarkup.org "Liquid") templating language
-* [Metadata](http://help.github.com/articles/repository-metadata-on-github-pages) for GitHub Pages
-* Responsive grids and media queries from [Bootstrap](http://twitter.github.io/bootstrap)
-* [Logic tags](https://github.com/softlayer/softlayer-python/blob/gh-pages/_includes/handlers/items.html) for self-generating navigation links
+* [CSS3](http://www.css3.info)
+* Grids and MQs from [Bootstrap](http://twitter.github.io/bootstrap)
+* [HTML5](http://www.sitepoint.com/a-basic-html5-template)
+* [Node.js](http://nodejs.org)
 * Pretty URLs
-* [Viewports](http://github.com/h5bp/html5-boilerplate/blob/master/doc/extend.md#web-apps) for device and OS support, including iOS 7.1+
+* [Python](http://www.python.org)
+* [Repository Metadata](http://help.github.com/articles/repository-metadata-on-github-pages) for GitHub Pages
+* [Ruby](http://www.ruby-lang.org/en/)
 * [Sitemaps.org](http://sitemaps.org)-compliant sitemap
+* [Viewports](http://github.com/h5bp/html5-boilerplate/blob/master/doc/extend.md#web-apps) for device and OS support, including iOS 7.1+
 
 ### Components
 
-* [jQuery](http://jquery.com)
 * [Font Awesome](http://fortawesome.github.io/Font-Awesome) iconic font
 * [Grunt](http://gruntjs.com) task runner
+* [Jekyll](http://jekyllrb.com "Jekyll") for free web hosting using GitHub Pages
+* [jQuery](http://jquery.com)
 * [LESS](http://lesscss.org) dynamic stylesheets for variables, mixins, nesting, and more
+* [Liquid](http://liquidmarkup.org "Liquid") templating language with [logic tags](https://github.com/softlayer/softlayer-python/blob/gh-pages/_includes/handlers/items.html) for self-generating nav links
 * [Modernizr](http://modernizr.com) for legacy- and cross-browser support
+* [Normalize.css](http://necolas.github.io/normalize.css) for CSS normalization and resets
+* [Pygments](http://pygments.org "Pygments") with a custom theme for code highlighting
+* [Redcarpet](http://github.com/vmg/redcarpet "Redcarpet") for Markdown-compatibility and rendering
 * [Universal Analytics](http://www.google.com/analytics) with [page scroll tracking](https://github.com/h5bp/html5-boilerplate/blob/master/doc/extend.md#google-universal-analytics) from Google
 
 ### Plugins
 
 * [Classify](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/classify.js) DOM utility for class helper functions
 * [Indexing](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/indexing.js) plugin for building table of contents on-the-fly
-* [Portfolio](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/portfolio.js) plugin for fetching organization and repository data from GitHub
+* [Portfolio](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/portfolio.js) plugin for fetching GitHub data using AJAX and JSON
 * [Readability](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/readability.js) to make HTML5 more accessible and gauge how long it takes to read a single page
 * [Scrollable](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/scrollable.js) to apply thresholds for HTML elements while scrolling
 * [Toggle](http://github.com/softlayer/softlayer-python/blob/gh-pages/plugins/toggle.js) handles the sliding and collapsing behavior for navigation
