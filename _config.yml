@@ -14,14 +14,14 @@ project:
     name:           Python CLI
     alias:          Python Client
     tagline:        Put your resources to work effortlessly from the command line
-    version:        2.2.0  # framework version (not the product version)
+    version:        2.4.0  # framework version (not the product version)
 
 # ==============================
-# Owner/Business
+# Owner (An individual, group, or company)
 # ==============================
 
 owner:
-    name:           "SoftLayer, an IBM Company"  # wrap in quotes when punctuation is used
+    name:           "SoftLayer, an IBM Company"  # wrap in quotes whenever punctuation is used
     www:            http://www.softlayer.com
     twitter:        SoftLayerDevs
     freenode:       "#softlayer"
@@ -76,7 +76,6 @@ gems:
 
 google:
     id:             UA-40037365-3
-    domain:         softlayer.github.io
 
 # ==============================
 # GitHub
