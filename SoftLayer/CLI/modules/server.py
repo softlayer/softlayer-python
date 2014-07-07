@@ -102,7 +102,9 @@ For more on filters see 'sl help filters'
                 server['primaryIpAddress'] or blank(),
                 server['primaryBackendIpAddress'] or blank(),
                 active_txn(server),
-                server['billingItem']['orderItem']['order']['userRecord']['username'],
+                server
+                ['billingItem']['orderItem']['order']['userRecord']['username']
+                or blank(),
             ])
 
         return table
@@ -152,7 +154,9 @@ Options:
                 ['softwareDescription']['name'] or blank()
             )])
         table.add_row(['created', result['provisionDate'] or blank()])
-        table.add_row(['owner', result ['billingItem']['orderItem']['order']['userRecord']['username']])
+        table.add_row(['owner',
+                       result['billingItem']['orderItem']['order']
+                       ['userRecord']['username'] or blank()])
         vlan_table = Table(['type', 'number', 'id'])
         for vlan in result['networkVlans']:
             vlan_table.add_row([

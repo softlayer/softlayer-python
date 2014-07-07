@@ -95,7 +95,7 @@ For more on filters see 'sl help filters'
         table = Table([
             'id', 'datacenter', 'host',
             'cores', 'memory', 'primary_ip',
-            'backend_ip', 'active_transaction','owner'
+            'backend_ip', 'active_transaction', 'owner'
         ])
         table.sortby = args.get('--sortby') or 'host'
 
@@ -110,7 +110,8 @@ For more on filters see 'sl help filters'
                 guest['primaryIpAddress'] or blank(),
                 guest['primaryBackendIpAddress'] or blank(),
                 active_txn(guest),
-                guest['billingItem']['orderItem']['order']['userRecord']['username']
+                guest['billingItem']['orderItem']['order']
+                ['userRecord']['username']
             ])
 
         return table
@@ -172,7 +173,7 @@ Options:
         table.add_row(['created', result['createDate']])
         table.add_row(['modified', result['modifyDate']])
         table.add_row(['owner', FormattedItem(
-            lookup(result, 'billingItem', 'orderItem','order','userRecord','username'),
+            lookup(result, 'billingItem', 'orderItem', 'order', 'userRecord', 'username'),
         )])
 
         vlan_table = Table(['type', 'number', 'id'])
