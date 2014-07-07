@@ -5,18 +5,19 @@
 /* Adapted from http://github.com/necolas/normalize.css (Version 3.0.0) */
 
 /*
- * Mods:  Added *, *:before & *:after with '.box-sizing()' property
- *        Added 'font-size' & '-webkit-tap-highlight-color' to html
- *        Added 'font-style', 'text-shadow' & 'cursor' to body
- *        Added 'text-decoration: none' to a
- *        Added del with 'text-decoration: line-through' property
- *        Added ul, ol with 'line-height: inherit' property
- *        Changed fieldset defaults to '0,
- *        Changed all 'bold' properties to '700'
- *        Changed small default to '85%'
- *        Changed mark color to @black
- *        Removed hgroup (deprecated in HTML5)
- *        Removed leading zeros removed from decimals (e.g. 0.5em is now .5em)
+ * Mods:    Added *, *:before & *:after with ".box-sizing()"" property
+ *          Added "font-size" to html
+ *          Added "font-style", "text-shadow" & "cursor" to body
+ *          Added "text-decoration: none" to a
+ *          Added del with "text-decoration: line-through" property
+ *          Added ul, ol with "line-height: inherit" property
+ *          Added hr with "height", "border-width", and "box-sizing" properties
+ *          Changed fieldset defaults to "0"
+ *          Changed all bold properties to "700"
+ *          Changed small default to "85%"
+ *          Changed mark color to "@black"
+ *          Removed hgroup (deprecated in HTML5)
+ *          Removed leading zeros removed from decimals (e.g. 0.5em is now .5em)
  */
 
 *,
@@ -108,6 +109,12 @@ sub {
 
 img {
     border: 0;
+}
+
+hr {
+    height: 0;
+    box-sizing: content-box;
+    border-width: 0;
 }
 
 button,

@@ -15,7 +15,6 @@ body {
     line-height: @line-height-normal;
     color: @text-color;
     background-color: @body-bg;
-    -webkit-font-smoothing: antialiased;
 }
 
 // Links
@@ -87,9 +86,6 @@ u {
 // -------------------------
 
 hr {
-    height: 0;
-    box-sizing: content-box;
-    border-width: 0;
     border-top: 1px solid @hr-color;
     width: (@base-variable * 5);
     margin: (@base-variable * 2) auto;
@@ -109,10 +105,6 @@ hr {
 
 // Positioning
 // -------------------------
-
-.clearfix {
-    .clearfix();
-}
 
 .pull-right {
     float: right !important;
