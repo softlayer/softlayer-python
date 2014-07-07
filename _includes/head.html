@@ -1,6 +1,5 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
 <title>
 {% if page.header == null %}
 {% if page.title == "index" %}
@@ -12,9 +11,8 @@
     {{page.header}} &middot; {{site.project.name}}
 {% endif %}
 </title>
-
 <meta name="description" content="{{site.project.tagline}}">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui">
 
 <!-- References -->
 <link rel="sitemap" href="{{page.baseurl}}sitemap.xml" type="application/xml" title="Sitemap">
@@ -35,6 +33,6 @@
     try{Typekit.load();}catch(e){}
 </script>
 
-    <!--[if lt IE 8]>
+    <!--[if lt IE 9]>
         <p>You are using an <strong>outdated browser</strong>. Please <a href="http://browsehappy.com/">upgrade your browser</a> to a newer version or use a different browser, such as Chrome or Firefox.</p>
     <![endif]-->
