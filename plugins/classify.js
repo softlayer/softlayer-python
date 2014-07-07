@@ -14,12 +14,12 @@
 #  4. classify.toggle(elem, "my-class")
 */
 
-(function (window) {
-    classReg = function (className) {
+(function(window) {
+    classReg = function(className) {
         return new RegExp("(^|\\s+)" + className + "(\\s+|$)");
     };
 
-    toggleClass = function (elem, c) {
+    toggleClass = function(elem, c) {
         fn = (hasClass(elem, c) ? removeClass : addClass);
         fn(elem, c);
     };
@@ -30,31 +30,31 @@
 
     if ("classList" in document.documentElement) {
 
-        hasClass = function (elem, c) {
+        hasClass = function(elem, c) {
             return elem.classList.contains(c);
         };
 
-        addClass = function (elem, c) {
+        addClass = function(elem, c) {
             elem.classList.add(c);
         };
 
-        removeClass = function (elem, c) {
+        removeClass = function(elem, c) {
             elem.classList.remove(c);
         };
     }
     else {
 
-        hasClass = function (elem, c) {
+        hasClass = function(elem, c) {
             return classReg(c).test(elem.className);
         };
 
-        addClass = function (elem, c) {
+        addClass = function(elem, c) {
             if (!hasClass(elem, c)) {
                 elem.className = elem.className + " " + c;
             }
         };
 
-        removeClass = function (elem, c) {
+        removeClass = function(elem, c) {
             elem.className = elem.className.replace(classReg(c), " ");
         };
     }
