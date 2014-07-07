@@ -1,0 +1,11 @@
+# humanstxt.org/
+# The humans responsible & technology colophon
+                            
+/* TEAM */
+SoftLayer Labs: #caleorourke, #ibivibiv, #jasonjohnson, #marcalanjones, #neetuj, #sudorandom
+Location: Dallas, TX, USA
+
+/* SITE */
+Standards: CSS3, HTML5, Node.js, Python, Ruby
+Components: Font Awesome, Grunt, Jekyll, jQuery, LESS, Liquid, Modernizr, Normalize.css, Pygments, Redcarpet
+Software: Sublime Text 3, Git
