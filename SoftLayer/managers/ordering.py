@@ -116,3 +116,78 @@ class OrderingManager(object):
             return package['id']
         else:
             raise ValueError("No package found for type: " + package_type)
+
+    def get_quotes(self):
+        """ Retrieve a list of quotes
+        :return a list of SoftLayer_Billing_Order_Quote
+        """
+        quotes = self.client['Account'].getActiveQuotes()
+        return quotes
+
+    def get_quote_details(self, quote_id):
+        """ Retrieve quote details
+        :param quote_id ID number of target quote
+        """
+        quote = self.client['Billing_Order_Quote'].getObject(id=quote_id)
+        return quote
+
+    def get_order_container(self, quote_id):
+        """ Generate an order container from a quote object
+        :param quote_id ID number of target quote
+        """
+        container = self.client['Billing_Order_Quote']. \
+            getRecalculatedOrderContainer(id=quote_id)
+        return container['orderContainers'][0]
+
+    def generate_order_template(self, quote_id=None, hostnames=None,
+                                domain=None, quantity=None):
+        """ Generate a complete order template
+        :param int quote_id: ID of target quote
+        :param list hostnames: List of hostnames as strings
+        :param string domain: Domain name to be used for all servers
+        :param int quantity: Quantity to override default
+        """
+        container = self.get_order_container(quote_id)
+        if quantity is not None:
+            container['quantity'] = quantity
+        if container['packageId'] == 46:
+            product_type = 'virtualGuests'
+        else:
+            product_type = 'hardware'
+
+        if len(hostnames) != container['quantity']:
+            raise ValueError("You must specify a hostname for each \
+                server in the quote")
+
+        container[product_type] = []
+        for hostname in hostnames:
+            container[product_type].append(
+                {'hostname': hostname, 'domain': domain}
+            )
+        container['presetId'] = None
+        return container
+
+    def verify_quote(self, **kwargs):
+        """
+        Verifies that a quote order is valid without actually ordering
+        the resources
+
+        :param int quote_id: ID for the target quote
+        :param list hostnames: hostnames of the servers
+        :param string domain: domain of the new servers
+        :param int quantity: Quantity to override default
+        """
+        container = self.generate_order_template(**kwargs)
+        return self.client['Product_Order'].verifyOrder(container)
+
+    def order_quote(self, **kwargs):
+        """
+        Places an order using a quote
+
+        :param int quote_id: ID for the target quote
+        :param list hostnames: hostnames of the servers
+        :param string domain: domain of the new server
+        :param int quantity: Quantity to override default
+        """
+        container = self.generate_order_template(**kwargs)
+        return self.client['Product_Order'].placeOrder(container)

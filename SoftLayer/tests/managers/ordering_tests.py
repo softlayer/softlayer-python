@@ -69,3 +69,33 @@ class OrderingTests(TestCase):
         self.ordering.client['Product_Package'].getAllObjects.return_value = []
         with self.assertRaises(ValueError):
             self.ordering.get_package_id_by_type(package_type)
+
+    def test_get_order_container(self):
+        container = self.ordering.get_order_container(1234)
+        container_fixture = self.ordering.client['Billing_Order_Quote'].\
+            getRecalculatedOrderContainer(id=1234)
+        self.assertEqual(container, container_fixture)
+
+    def test_get_quotes(self):
+        quotes = self.ordering.get_quotes()
+        quotes_fixture = self.ordering.client['Billing_Order_Quote'].\
+            getActiveQuotes()
+        self.assertEqual(quotes, quotes_fixture)
+
+    def test_get_quote_details(self):
+        quote = self.ordering.get_quote_details(1234)
+        quote_fixture = self.ordering.client.getObject(id=1234)
+        self.assertEqual(quote, quote_fixture)
+
+    def test_verify_quote(self):
+        result = self.ordering.verify_quote(
+            quote_id=1234,
+            domain='example.com',
+            hostnames=['test1'],
+            quantity=1)
+
+        self.assertEqual(result, self.ordering.client['Product_Order'].
+                         verifyOrder())
+
+    def test_order_quote(self):
+        return True
