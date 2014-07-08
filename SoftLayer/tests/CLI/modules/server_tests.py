@@ -228,7 +228,8 @@ class ServerCLITests(TestCase):
             'tags': ['test_tag'],
             'users': ['root abc123'],
             'vlans': [{'id': 9653, 'number': 1800, 'type': 'PRIVATE'},
-                      {'id': 19082, 'number': 3672, 'type': 'PUBLIC'}]
+                      {'id': 19082, 'number': 3672, 'type': 'PUBLIC'}],
+            'owner': 'chechu'
         }
 
         self.assertEqual(expected, format_output(output, 'python'))

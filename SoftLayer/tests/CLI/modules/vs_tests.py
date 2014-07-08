@@ -26,7 +26,8 @@ class DnsTests(TestCase):
                            'cores': 2,
                            'active_transaction': None,
                            'id': 100,
-                           'backend_ip': '10.45.19.37'},
+                           'backend_ip': '10.45.19.37',
+                           'owner': 'chechu' },
                           {'datacenter': 'TEST00',
                            'primary_ip': '172.16.240.7',
                            'host': 'vs-test2.test.sftlyr.ws',
@@ -34,7 +35,8 @@ class DnsTests(TestCase):
                            'cores': 4,
                            'active_transaction': None,
                            'id': 104,
-                           'backend_ip': '10.45.19.35'}],
+                           'backend_ip': '10.45.19.35',
+                           'owner': 'chechu' }],
                          format_output(output, 'python'))
 
     def test_detail_vs(self):
@@ -67,7 +69,8 @@ class DnsTests(TestCase):
                           'users': [{'password': 'pass', 'username': 'user'}],
                           'vlans': [{'type': 'PUBLIC',
                                      'number': 23,
-                                     'id': 1}]},
+                                     'id': 1}],
+                          'owner': 'chechu'},
                          format_output(output, 'python'))
 
     def test_create_options(self):

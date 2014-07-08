@@ -93,6 +93,7 @@ For more on filters see 'sl help filters'
 
         for server in servers:
             server = NestedDict(server)
+            user = None
             if 'billingItem' in server:
                 if 'orderItem' in server['billingItem']:
                     user = (server['billingItem']['orderItem']['order']
@@ -156,6 +157,7 @@ Options:
                 ['softwareDescription']['name'] or blank()
             )])
         table.add_row(['created', result['provisionDate'] or blank()])
+        user = None
         if 'billingItem' in result:
             if 'orderItem' in result['billingItem']:
                 user = (result['billingItem']['orderItem']['order']
