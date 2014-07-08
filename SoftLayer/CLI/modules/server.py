@@ -93,6 +93,10 @@ For more on filters see 'sl help filters'
 
         for server in servers:
             server = NestedDict(server)
+            if 'billingItem' in server:
+                if 'orderItem' in server['billingItem']:
+                    user = (server['billingItem']['orderItem']['order']
+                            ['userRecord']['username'])
             table.add_row([
                 server['id'],
                 server['datacenter']['name'] or blank(),
@@ -102,9 +106,7 @@ For more on filters see 'sl help filters'
                 server['primaryIpAddress'] or blank(),
                 server['primaryBackendIpAddress'] or blank(),
                 active_txn(server),
-                server
-                ['billingItem']['orderItem']['order']['userRecord']['username']
-                or blank(),
+                user or blank(),
             ])
 
         return table
@@ -154,9 +156,12 @@ Options:
                 ['softwareDescription']['name'] or blank()
             )])
         table.add_row(['created', result['provisionDate'] or blank()])
+        if 'billingItem' in result:
+            if 'orderItem' in result['billingItem']:
+                user = (result['billingItem']['orderItem']['order']
+                        ['userRecord']['username'])
         table.add_row(['owner',
-                       result['billingItem']['orderItem']['order']
-                       ['userRecord']['username'] or blank()])
+                       user or blank()])
         vlan_table = Table(['type', 'number', 'id'])
         for vlan in result['networkVlans']:
             vlan_table.add_row([
