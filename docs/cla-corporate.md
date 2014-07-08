@@ -54,18 +54,22 @@ You accept and agree to the following terms and conditions for Your present and 
    communication that is conspicuously marked or otherwise designated
    in writing by You as "Not a Contribution."
 
-2. Grant of Copyright License. Subject to the terms and conditions
-   of this Agreement, You hereby grant to IBM and to
-   recipients of software distributed by IBM a perpetual,
-   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-   copyright license to reproduce, prepare derivative works of,
-   publicly display, publicly perform, sublicense, and distribute
-   Your Contributions and such derivative works.
+2. Grant of Copyright License.
 
-3. Grant of Patent License. Subject to the terms and conditions of
-   this Agreement, You hereby grant to IBM and to recipients
-   of software distributed by IBM a perpetual, worldwide,
-   non-exclusive, no-charge, royalty-free, irrevocable (except as
+   Subject to the terms and conditions of this Agreement,
+   You hereby grant to IBM and to recipients of software
+   distributed by IBM a perpetual, worldwide, non-exclusive, 
+   no-charge, royalty-free, irrevocable copyright license to 
+   reproduce, prepare derivative works of, publicly display, 
+   publicly perform, sublicense, and distribute Your Contributions
+   and such derivative works.
+
+3. Grant of Patent License.
+
+   Subject to the terms and conditions of this Agreement, 
+   You hereby grant to IBM and to recipients of software 
+   distributed by IBM a perpetual, worldwide, non-exclusive, 
+   no-charge, royalty-free, irrevocable (except as
    stated in this section) patent license to make, have made, use,
    offer to sell, sell, import, and otherwise transfer the Work,
    where such license applies only to those patent claims licensable
@@ -80,9 +84,11 @@ You accept and agree to the following terms and conditions for Your present and 
    Work shall terminate as of the date such litigation is filed.
 
 4. You represent that You are legally entitled to grant the above
-   license. You represent further that each employee of the
-   Corporation designated on Schedule A below (or in a subsequent
-   written modification to that Schedule) is authorized to submit
+   license.
+
+   You represent further that each employee of the Corporation 
+   designated on Schedule A below (or in a subsequent written
+   modification to that Schedule) is authorized to submit
    Contributions on behalf of the Corporation.
 
 5. You represent that each of Your Contributions is Your original
