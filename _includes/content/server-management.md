@@ -141,7 +141,7 @@ Looking at our options, we'll make a virtual server with the following server op
 | Subscription     | Hourly                | `--[option]`   | `hourly`       |
 | Data Center      | San Jose              | `--datacenter` | `scj01`        |
 
-> Go to [Additional Options](#toc_24) for a list of all options/flags.
+> Go to [Additional Options](#toc_12) for a list of all options/flags.
 
 The command we'll use begins with the CLI option, followed by the CLI value:
 
