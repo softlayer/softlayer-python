@@ -5,16 +5,16 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import socket
-from time import sleep
 import datetime
-from itertools import repeat
+import itertools
+import socket
+import time
 
-from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin, lookup
-from SoftLayer.managers.ordering import OrderingManager
+from SoftLayer.managers import ordering
+from SoftLayer import utils
 
 
-class VSManager(IdentifierMixin, object):
+class VSManager(utils.IdentifierMixin, object):
     """
     Manages Virtual Servers
 
@@ -30,7 +30,7 @@ class VSManager(IdentifierMixin, object):
         self.guest = client['Virtual_Guest']
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
         if ordering_manager is None:
-            self.ordering_manager = OrderingManager(client)
+            self.ordering_manager = ordering.OrderingManager(client)
         else:
             self.ordering_manager = ordering_manager
 
@@ -96,7 +96,7 @@ class VSManager(IdentifierMixin, object):
             elif monthly:
                 call = 'getMonthlyVirtualGuests'
 
-        _filter = NestedDict(kwargs.get('filter') or {})
+        _filter = utils.NestedDict(kwargs.get('filter') or {})
         if tags:
             _filter['virtualGuests']['tagReferences']['tag']['name'] = {
                 'operation': 'in',
@@ -104,36 +104,36 @@ class VSManager(IdentifierMixin, object):
             }
 
         if cpus:
-            _filter['virtualGuests']['maxCpu'] = query_filter(cpus)
+            _filter['virtualGuests']['maxCpu'] = utils.query_filter(cpus)
 
         if memory:
-            _filter['virtualGuests']['maxMemory'] = query_filter(memory)
+            _filter['virtualGuests']['maxMemory'] = utils.query_filter(memory)
 
         if hostname:
-            _filter['virtualGuests']['hostname'] = query_filter(hostname)
+            _filter['virtualGuests']['hostname'] = utils.query_filter(hostname)
 
         if domain:
-            _filter['virtualGuests']['domain'] = query_filter(domain)
+            _filter['virtualGuests']['domain'] = utils.query_filter(domain)
 
         if local_disk is not None:
-            _filter['virtualGuests']['localDiskFlag'] = \
-                query_filter(bool(local_disk))
+            _filter['virtualGuests']['localDiskFlag'] = (
+                utils.query_filter(bool(local_disk)))
 
         if datacenter:
-            _filter['virtualGuests']['datacenter']['name'] = \
-                query_filter(datacenter)
+            _filter['virtualGuests']['datacenter']['name'] = (
+                utils.query_filter(datacenter))
 
         if nic_speed:
-            _filter['virtualGuests']['networkComponents']['maxSpeed'] = \
-                query_filter(nic_speed)
+            _filter['virtualGuests']['networkComponents']['maxSpeed'] = (
+                utils.query_filter(nic_speed))
 
         if public_ip:
-            _filter['virtualGuests']['primaryIpAddress'] = \
-                query_filter(public_ip)
+            _filter['virtualGuests']['primaryIpAddress'] = (
+                utils.query_filter(public_ip))
 
         if private_ip:
-            _filter['virtualGuests']['primaryBackendIpAddress'] = \
-                query_filter(private_ip)
+            _filter['virtualGuests']['primaryBackendIpAddress'] = (
+                utils.query_filter(private_ip))
 
         kwargs['filter'] = _filter.to_dict()
         func = getattr(self.account, call)
@@ -380,10 +380,15 @@ class VSManager(IdentifierMixin, object):
         :param bool pending: Wait for pending transactions not related to
                              provisioning or reloads such as monitoring.
         """
-        for count, new_instance in enumerate(repeat(instance_id), start=1):
+        for count, new_instance in enumerate(itertools.repeat(instance_id),
+                                             start=1):
             instance = self.get_instance(new_instance)
-            last_reload = lookup(instance, 'lastOperatingSystemReload', 'id')
-            active_transaction = lookup(instance, 'activeTransaction', 'id')
+            last_reload = utils.lookup(instance,
+                                       'lastOperatingSystemReload',
+                                       'id')
+            active_transaction = utils.lookup(instance,
+                                              'activeTransaction',
+                                              'id')
 
             reloading = all((
                 active_transaction,
@@ -398,19 +403,20 @@ class VSManager(IdentifierMixin, object):
 
             # return True if the instance has only if the instance has
             # finished provisioning and isn't currently reloading the OS.
-            if instance.get('provisionDate') \
-                    and not reloading and not outstanding:
+            if all([instance.get('provisionDate'),
+                    not reloading,
+                    not outstanding]):
                 return True
 
             if count >= limit:
                 return False
 
-            sleep(delay)
+            time.sleep(delay)
 
     def verify_create_instance(self, **kwargs):
         """ Verifies an instance creation command without actually placing an
-        order. See :func:`create_instance` for a list of available
-        options. """
+            order. See :func:`create_instance` for a list of available options.
+        """
         create_options = self._generate_create_dict(**kwargs)
         return self.guest.generateOrderTemplate(create_options)
 
@@ -582,8 +588,8 @@ class VSManager(IdentifierMixin, object):
                 package_items, 'nic_speed', nic_speed)})
 
         order = {}
-        order['complexType'] = \
-            'SoftLayer_Container_Product_Order_Virtual_Guest_Upgrade'
+        order['complexType'] = (
+            'SoftLayer_Container_Product_Order_Virtual_Guest_Upgrade')
         order['virtualGuests'] = [{'id': int(instance_id)}]
         order['prices'] = item_id
         order['properties'] = [{'name': 'MAINTENANCE_WINDOW',

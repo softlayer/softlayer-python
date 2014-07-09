@@ -4,27 +4,26 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import HardwareManager, OrderingManager
-from SoftLayer.managers.hardware import get_default_value
-from SoftLayer.tests import TestCase, FixtureClient
-from SoftLayer.tests.fixtures import (
-    Hardware_Server, Account, Billing_Item, Ticket)
+import mock
 
-from mock import ANY, call, patch
+import SoftLayer
+from SoftLayer.managers import hardware
+from SoftLayer import testing
+from SoftLayer.testing import fixtures
 
 
-class HardwareTests(TestCase):
+class HardwareTests(testing.TestCase):
 
     def set_up(self):
-        self.client = FixtureClient()
-        self.hardware = HardwareManager(self.client)
+        self.client = testing.FixtureClient()
+        self.hardware = SoftLayer.HardwareManager(self.client)
 
     def test_list_hardware(self):
-        mcall = call(mask=ANY, filter={})
+        mcall = mock.call(mask=mock.ANY, filter={})
 
         results = self.hardware.list_hardware()
         self.client['Account'].getHardware.assert_has_calls(mcall)
-        self.assertEqual(results, Account.getHardware)
+        self.assertEqual(results, fixtures.Account.getHardware)
 
     def test_list_hardware_with_filters(self):
         results = self.hardware.list_hardware(
@@ -38,7 +37,7 @@ class HardwareTests(TestCase):
             public_ip='1.2.3.4',
             private_ip='4.3.2.1',
         )
-        self.client['Account'].getHardware.assert_has_calls(call(
+        self.client['Account'].getHardware.assert_has_calls(mock.call(
             filter={
                 'hardware': {
                     'datacenter': {'name': {'operation': '_= dal05'}},
@@ -57,9 +56,9 @@ class HardwareTests(TestCase):
                     'networkComponents': {'maxSpeed': {'operation': 100}},
                     'primaryBackendIpAddress': {'operation': '_= 4.3.2.1'}}
             },
-            mask=ANY,
+            mask=mock.ANY,
         ))
-        self.assertEqual(results, Account.getHardware)
+        self.assertEqual(results, fixtures.Account.getHardware)
 
     def test_resolve_ids_ip(self):
         _id = self.hardware._get_ids_from_ip('172.16.1.100')
@@ -81,8 +80,8 @@ class HardwareTests(TestCase):
         result = self.hardware.get_hardware(1000)
 
         self.client['Hardware_Server'].getObject.assert_called_once_with(
-            id=1000, mask=ANY)
-        self.assertEqual(Hardware_Server.getObject, result)
+            id=1000, mask=mock.ANY)
+        self.assertEqual(fixtures.Hardware_Server.getObject, result)
 
     def test_reload(self):
         post_uri = 'http://test.sftlyr.ws/test.sh'
@@ -204,7 +203,8 @@ class HardwareTests(TestCase):
         data = self.hardware._generate_create_dict(**args)
         self.assertEqual(expected, data)
 
-    @patch('SoftLayer.managers.hardware.HardwareManager._generate_create_dict')
+    @mock.patch('SoftLayer.managers.hardware.HardwareManager'
+                '._generate_create_dict')
     def test_verify_order(self, create_dict):
         create_dict.return_value = {'test': 1, 'verify': 1}
         self.hardware.verify_order(test=1, verify=1)
@@ -212,7 +212,8 @@ class HardwareTests(TestCase):
         f = self.client['Product_Order'].verifyOrder
         f.assert_called_once_with({'test': 1, 'verify': 1})
 
-    @patch('SoftLayer.managers.hardware.HardwareManager._generate_create_dict')
+    @mock.patch('SoftLayer.managers.hardware.HardwareManager'
+                '._generate_create_dict')
     def test_place_order(self, create_dict):
         create_dict.return_value = {'test': 1, 'verify': 1}
         self.hardware.place_order(test=1, verify=1)
@@ -226,7 +227,7 @@ class HardwareTests(TestCase):
         result = self.hardware.cancel_metal(b_id, immediate=True)
         f = self.client['Billing_Item'].cancelService
         f.assert_called_once_with(id=b_id)
-        self.assertEqual(result, Billing_Item.cancelService)
+        self.assertEqual(result, fixtures.Billing_Item.cancelService)
 
     def test_cancel_metal_on_anniversary(self):
         b_id = 6327
@@ -234,7 +235,8 @@ class HardwareTests(TestCase):
         result = self.hardware.cancel_metal(b_id, False)
         f = self.client['Billing_Item'].cancelServiceOnAnniversaryDate
         f.assert_called_once_with(id=b_id)
-        self.assertEqual(result, Billing_Item.cancelServiceOnAnniversaryDate)
+        self.assertEqual(result,
+                         fixtures.Billing_Item.cancelServiceOnAnniversaryDate)
 
     def test_cancel_hardware_without_reason(self):
         hw_id = 987
@@ -248,7 +250,8 @@ class HardwareTests(TestCase):
         f = self.client['Ticket'].createCancelServerTicket
         f.assert_called_once_with(hw_id, reasons['unneeded'], '', True,
                                   'HARDWARE')
-        self.assertEqual(result, Ticket.createCancelServerTicket)
+        self.assertEqual(result,
+                         fixtures.Ticket.createCancelServerTicket)
 
     def test_cancel_hardware_with_reason_and_comment(self):
         hw_id = 987
@@ -274,7 +277,8 @@ class HardwareTests(TestCase):
         result = self.hardware.cancel_hardware(hw_id)
         f = self.client['Billing_Item'].cancelServiceOnAnniversaryDate
         f.assert_called_once_with(id=hw_id)
-        self.assertEqual(result, Billing_Item.cancelServiceOnAnniversaryDate)
+        self.assertEqual(result,
+                         fixtures.Billing_Item.cancelServiceOnAnniversaryDate)
 
     def test_change_port_speed_public(self):
         hw_id = 1
@@ -307,12 +311,12 @@ class HardwareTests(TestCase):
             }
         }
         f = self.client['Product_Package'].getAllObjects
-        f.assert_has_calls([call(mask='id,name,description,type,isActive',
-                                 filter=filter_mock)])
+        f.assert_has_calls([mock.call(mask='id,name,description,type,isActive',
+                                      filter=filter_mock)])
 
     def test_get_server_packages_with_ordering_manager_provided(self):
-        self.hardware = HardwareManager(self.client,
-                                        OrderingManager(self.client))
+        self.hardware = SoftLayer.HardwareManager(
+            self.client, SoftLayer.OrderingManager(self.client))
         self.test_get_available_dedicated_server_packages()
 
     def test_get_dedicated_server_options(self):
@@ -332,8 +336,8 @@ class HardwareTests(TestCase):
     def test_get_default_value_returns_none_for_unknown_category(self):
         package_options = {'categories': ['Cat1', 'Cat2']}
 
-        self.assertEqual(None, get_default_value(package_options,
-                                                 'Unknown Category'))
+        self.assertEqual(None, hardware.get_default_value(package_options,
+                                                          'Unknown Category'))
 
     def test_get_default_value(self):
         price_id = 9876
@@ -347,11 +351,13 @@ class HardwareTests(TestCase):
                                           'price_id': price_id}]
                            }}}
 
-        self.assertEqual(price_id, get_default_value(package_options, 'Cat1'))
+        self.assertEqual(price_id,
+                         hardware.get_default_value(package_options, 'Cat1'))
 
     def test_get_default_value_none_free(self):
         package_options = {'categories': {}}
-        self.assertEqual(None, get_default_value(package_options, 'Cat1'))
+        self.assertEqual(None,
+                         hardware.get_default_value(package_options, 'Cat1'))
 
         package_options = {'categories':
                            {'Cat1': {
@@ -362,7 +368,8 @@ class HardwareTests(TestCase):
                                           'labor_fee': 0,
                                           'price_id': 1234}]
                            }}}
-        self.assertEqual(None, get_default_value(package_options, 'Cat1'))
+        self.assertEqual(None,
+                         hardware.get_default_value(package_options, 'Cat1'))
 
     def test_get_default_value_hourly(self):
         package_options = {'categories':
@@ -380,7 +387,8 @@ class HardwareTests(TestCase):
                                           'labor_fee': 0,
                                           'price_id': 4321}]
                            }}}
-        result = get_default_value(package_options, 'Cat1', hourly=True)
+        result = hardware.get_default_value(package_options, 'Cat1',
+                                            hourly=True)
         self.assertEqual(4321, result)
 
     def test_get_default_value_monthly(self):
@@ -399,7 +407,8 @@ class HardwareTests(TestCase):
                                           'labor_fee': 0,
                                           'price_id': 1234}]
                            }}}
-        result = get_default_value(package_options, 'Cat1', hourly=False)
+        result = hardware.get_default_value(package_options, 'Cat1',
+                                            hourly=False)
         self.assertEqual(1234, result)
 
     def test_edit(self):

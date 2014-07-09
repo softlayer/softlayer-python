@@ -23,10 +23,11 @@ The available commands are:
 """
 # :license: MIT, see LICENSE for more details.
 
-from SoftLayer import LoadBalancerManager
-from SoftLayer.CLI import (CLIRunnable, Table, resolve_id,
-                           confirm, KeyValueTable)
-from SoftLayer.CLI.helpers import CLIAbort
+import SoftLayer
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 
 
 def get_ids(input_id):
@@ -37,8 +38,8 @@ def get_ids(input_id):
     """
     key_value = input_id.split(':')
     if len(key_value) != 2:
-        raise CLIAbort('Invalid ID %s: ID should be of the form xxx:yyy'
-                       % input_id)
+        raise exceptions.CLIAbort(
+            'Invalid ID %s: ID should be of the form xxx:yyy' % input_id)
     return key_value
 
 
@@ -48,12 +49,12 @@ def get_local_lbs_table(load_balancers):
     :param dict load_balancers: A dictionary representing the load_balancers
     :returns: A table containing the local load balancers
     """
-    table = Table(['ID',
-                   'VIP Address',
-                   'Location',
-                   'SSL Offload',
-                   'Connections/second',
-                   'Type'])
+    table = formatting.Table(['ID',
+                              'VIP Address',
+                              'Location',
+                              'SSL Offload',
+                              'Connections/second',
+                              'Type'])
 
     table.align['Connections/second'] = 'r'
 
@@ -86,7 +87,7 @@ def get_local_lb_table(load_balancer):
     :param dict load_balancer: A dictionary representing the loadbal
     :returns: A table containing the local loadbal details
     """
-    table = KeyValueTable(['Name', 'Value'])
+    table = formatting.KeyValueTable(['Name', 'Value'])
     table.align['Name'] = 'l'
     table.align['Value'] = 'l'
     table.add_row(['General properties', '----------'])
@@ -104,8 +105,11 @@ def get_local_lb_table(load_balancer):
         table.add_row(['Service group %s' % index0,
                        '**************'])
         index0 += 1
-        table2 = Table(['Service group ID', 'Port', 'Allocation',
-                        'Routing type', 'Routing Method'])
+        table2 = formatting.Table(['Service group ID',
+                                   'Port',
+                                   'Allocation',
+                                   'Routing type',
+                                   'Routing Method'])
 
         for group in virtual_server['serviceGroups']:
             table2.add_row([
@@ -120,8 +124,13 @@ def get_local_lb_table(load_balancer):
 
             table.add_row([' Group Properties', table2])
 
-            table3 = Table(['Service_ID', 'IP Address', 'Port',
-                            'Health Check', 'Weight', 'Enabled', 'Status'])
+            table3 = formatting.Table(['Service_ID',
+                                       'IP Address',
+                                       'Port',
+                                       'Health Check',
+                                       'Weight',
+                                       'Enabled',
+                                       'Status'])
             service_exist = False
             for service in group['services']:
                 service_exist = True
@@ -143,7 +152,7 @@ def get_local_lb_table(load_balancer):
     return table
 
 
-class LoadBalancerList(CLIRunnable):
+class LoadBalancerList(environment.CLIRunnable):
     """
 usage: sl loadbal list [options]
 
@@ -153,13 +162,13 @@ List active load balancers
     action = 'list'
 
     def execute(self, args):
-        mgr = LoadBalancerManager(self.client)
+        mgr = SoftLayer.LoadBalancerManager(self.client)
 
         load_balancers = mgr.get_local_lbs()
         return get_local_lbs_table(load_balancers)
 
 
-class LoadBalancerHealthChecks(CLIRunnable):
+class LoadBalancerHealthChecks(environment.CLIRunnable):
     """
 usage: sl loadbal health-checks [options]
 
@@ -168,10 +177,10 @@ List load balancer service health check types that can be used
     action = 'health-checks'
 
     def execute(self, args):
-        mgr = LoadBalancerManager(self.client)
+        mgr = SoftLayer.LoadBalancerManager(self.client)
 
         hc_types = mgr.get_hc_types()
-        table = KeyValueTable(['ID', 'Name'])
+        table = formatting.KeyValueTable(['ID', 'Name'])
         table.align['ID'] = 'l'
         table.align['Name'] = 'l'
         table.sortby = 'ID'
@@ -180,7 +189,7 @@ List load balancer service health check types that can be used
         return table
 
 
-class LoadBalancerRoutingMethods(CLIRunnable):
+class LoadBalancerRoutingMethods(environment.CLIRunnable):
     """
 usage: sl loadbal routing-methods [options]
 
@@ -189,10 +198,10 @@ List load balancers routing methods that can be used
     action = 'routing-methods'
 
     def execute(self, args):
-        mgr = LoadBalancerManager(self.client)
+        mgr = SoftLayer.LoadBalancerManager(self.client)
 
         routing_methods = mgr.get_routing_methods()
-        table = KeyValueTable(['ID', 'Name'])
+        table = formatting.KeyValueTable(['ID', 'Name'])
         table.align['ID'] = 'l'
         table.align['Name'] = 'l'
         table.sortby = 'ID'
@@ -201,7 +210,7 @@ List load balancers routing methods that can be used
         return table
 
 
-class LoadBalancerRoutingTypes(CLIRunnable):
+class LoadBalancerRoutingTypes(environment.CLIRunnable):
     """
 usage: sl loadbal routing-types [options]
 
@@ -210,10 +219,10 @@ List load balancers routing types that can be used
     action = 'routing-types'
 
     def execute(self, args):
-        mgr = LoadBalancerManager(self.client)
+        mgr = SoftLayer.LoadBalancerManager(self.client)
 
         routing_types = mgr.get_routing_types()
-        table = KeyValueTable(['ID', 'Name'])
+        table = formatting.KeyValueTable(['ID', 'Name'])
         table.align['ID'] = 'l'
         table.align['Name'] = 'l'
         table.sortby = 'ID'
@@ -222,7 +231,7 @@ List load balancers routing types that can be used
         return table
 
 
-class LoadBalancerDetails(CLIRunnable):
+class LoadBalancerDetails(environment.CLIRunnable):
     """
 usage: sl loadbal detail <identifier> [options]
 
@@ -232,7 +241,7 @@ Get Load balancer details
     action = 'detail'
 
     def execute(self, args):
-        mgr = LoadBalancerManager(self.client)
+        mgr = SoftLayer.LoadBalancerManager(self.client)
 
         input_id = args.get('<identifier>')
 
@@ -243,7 +252,7 @@ Get Load balancer details
         return get_local_lb_table(load_balancer)
 
 
-class LoadBalancerCancel(CLIRunnable):
+class LoadBalancerCancel(environment.CLIRunnable):
     """
 usage: sl loadbal cancel <identifier> [options]
 
@@ -254,21 +263,21 @@ Cancels an existing load_balancer
     options = ['confirm']
 
     def execute(self, args):
-        mgr = LoadBalancerManager(self.client)
+        mgr = SoftLayer.LoadBalancerManager(self.client)
         input_id = args.get('<identifier>')
 
         key_value = get_ids(input_id)
         loadbal_id = int(key_value[1])
 
-        if args['--really'] or confirm("This action will cancel a load "
-                                       "balancer. Continue?"):
+        if args['--really'] or formatting.confirm("This action will cancel a "
+                                                  "load balancer. Continue?"):
             mgr.cancel_lb(loadbal_id)
             return 'Load Balancer with id %s is being cancelled!' % input_id
         else:
-            raise CLIAbort('Aborted.')
+            raise exceptions.CLIAbort('Aborted.')
 
 
-class LoadBalancerServiceDelete(CLIRunnable):
+class LoadBalancerServiceDelete(environment.CLIRunnable):
     """
 usage: sl loadbal service-delete <identifier> [options]
 
@@ -279,21 +288,22 @@ Deletes an existing load_balancer service
     options = ['confirm']
 
     def execute(self, args):
-        mgr = LoadBalancerManager(self.client)
+        mgr = SoftLayer.LoadBalancerManager(self.client)
         input_id = args.get('<identifier>')
 
         key_value = get_ids(input_id)
         service_id = int(key_value[1])
 
-        if args['--really'] or confirm("This action will cancel a service "
-                                       "from your load balancer. Continue?"):
+        if args['--really'] or formatting.confirm("This action will cancel a "
+                                                  "service from your load "
+                                                  "balancer. Continue?"):
             mgr.delete_service(service_id)
             return 'Load balancer service %s is being cancelled!' % input_id
         else:
-            raise CLIAbort('Aborted.')
+            raise exceptions.CLIAbort('Aborted.')
 
 
-class LoadBalancerServiceToggle(CLIRunnable):
+class LoadBalancerServiceToggle(environment.CLIRunnable):
     """
 usage: sl loadbal service-toggle <identifier> [options]
 
@@ -304,21 +314,22 @@ Toggle the status of an existing load_balancer service
     options = ['confirm']
 
     def execute(self, args):
-        mgr = LoadBalancerManager(self.client)
+        mgr = SoftLayer.LoadBalancerManager(self.client)
         input_id = args.get('<identifier>')
 
         key_value = get_ids(input_id)
         service_id = int(key_value[1])
 
-        if args['--really'] or confirm("This action will toggle the service "
-                                       "status on the service. Continue?"):
+        if args['--really'] or formatting.confirm("This action will toggle "
+                                                  "the status on the service. "
+                                                  "Continue?"):
             mgr.toggle_service_status(service_id)
             return 'Load balancer service %s status updated!' % input_id
         else:
-            raise CLIAbort('Aborted.')
+            raise exceptions.CLIAbort('Aborted.')
 
 
-class LoadBalancerServiceEdit(CLIRunnable):
+class LoadBalancerServiceEdit(environment.CLIRunnable):
     """
 usage: sl loadbal service-edit <identifier> [options]
 
@@ -334,7 +345,7 @@ Options:
     action = 'service-edit'
 
     def execute(self, args):
-        mgr = LoadBalancerManager(self.client)
+        mgr = SoftLayer.LoadBalancerManager(self.client)
         input_id = args.get('<identifier>')
 
         key_value = get_ids(input_id)
@@ -365,7 +376,7 @@ Options:
         return 'Load balancer service %s is being modified!' % input_id
 
 
-class LoadBalancerServiceAdd(CLIRunnable):
+class LoadBalancerServiceAdd(environment.CLIRunnable):
     """
 usage: sl loadbal service-add <identifier> --ip=IP --port=PORT \
 --weight=WEIGHT --hc_type=HCTYPE --enabled=ENABLED [options]
@@ -382,7 +393,7 @@ Required:
     action = 'service-add'
 
     def execute(self, args):
-        mgr = LoadBalancerManager(self.client)
+        mgr = SoftLayer.LoadBalancerManager(self.client)
         input_id = args.get('<identifier>')
 
         key_value = get_ids(input_id)
@@ -406,7 +417,7 @@ Required:
         return 'Load balancer service is being added!'
 
 
-class LoadBalancerServiceGroupDelete(CLIRunnable):
+class LoadBalancerServiceGroupDelete(environment.CLIRunnable):
     """
 usage: sl loadbal group-delete <identifier> [options]
 
@@ -417,21 +428,21 @@ Deletes an existing load_balancer service group
     options = ['confirm']
 
     def execute(self, args):
-        mgr = LoadBalancerManager(self.client)
+        mgr = SoftLayer.LoadBalancerManager(self.client)
         input_id = args.get('<identifier>')
 
         key_value = get_ids(input_id)
         group_id = int(key_value[1])
 
-        if args['--really'] or confirm("This action will cancel a service"
-                                       " group. Continue?"):
+        if args['--really'] or formatting.confirm("This action will cancel a "
+                                                  "service group. Continue?"):
             mgr.delete_service_group(group_id)
             return 'Service group %s is being deleted!' % input_id
         else:
-            raise CLIAbort('Aborted.')
+            raise exceptions.CLIAbort('Aborted.')
 
 
-class LoadBalancerServiceGroupEdit(CLIRunnable):
+class LoadBalancerServiceGroupEdit(environment.CLIRunnable):
     """
 usage: sl loadbal group-edit <identifier> [options]
 
@@ -446,7 +457,7 @@ Options:
     action = 'group-edit'
 
     def execute(self, args):
-        mgr = LoadBalancerManager(self.client)
+        mgr = SoftLayer.LoadBalancerManager(self.client)
         input_id = args.get('<identifier>')
 
         key_value = get_ids(input_id)
@@ -471,7 +482,7 @@ Options:
         return 'Load balancer service group %s is being updated!' % input_id
 
 
-class LoadBalancerServiceGroupReset(CLIRunnable):
+class LoadBalancerServiceGroupReset(environment.CLIRunnable):
     """
 usage: sl loadbal group-reset <identifier> [options]
 
@@ -481,7 +492,7 @@ Resets the connections on a certain service group
     action = 'group-reset'
 
     def execute(self, args):
-        mgr = LoadBalancerManager(self.client)
+        mgr = SoftLayer.LoadBalancerManager(self.client)
         input_id = args.get('<identifier>')
 
         key_value = get_ids(input_id)
@@ -492,7 +503,7 @@ Resets the connections on a certain service group
         return 'Load balancer service group connections are being reset!'
 
 
-class LoadBalancerServiceGroupAdd(CLIRunnable):
+class LoadBalancerServiceGroupAdd(environment.CLIRunnable):
     """
 usage: sl loadbal group-add <identifier> --allocation=PERC --port=PORT \
 --routing_type=TYPE --routing_method=METHOD [options]
@@ -508,7 +519,7 @@ Required:
     action = 'group-add'
 
     def execute(self, args):
-        mgr = LoadBalancerManager(self.client)
+        mgr = SoftLayer.LoadBalancerManager(self.client)
         input_id = args.get('<identifier>')
         key_value = get_ids(input_id)
 
@@ -523,7 +534,7 @@ Required:
         return 'Load balancer service group is being added!'
 
 
-class LoadBalancerCreate(CLIRunnable):
+class LoadBalancerCreate(environment.CLIRunnable):
     """
 usage: sl loadbal create <identifier> (--datacenter=DC) [options]
 
@@ -538,17 +549,17 @@ Options:
     options = ['confirm']
 
     def execute(self, args):
-        mgr = LoadBalancerManager(self.client)
-        input_id = resolve_id(
+        mgr = SoftLayer.LoadBalancerManager(self.client)
+        input_id = helpers.resolve_id(
             mgr.resolve_ids, args.get('<identifier>'), 'load_balancer')
-        if not confirm("This action will incur charges on your account. "
-                       "Continue?"):
-            raise CLIAbort('Aborted.')
+        if not formatting.confirm("This action will incur charges on your "
+                                  "account. Continue?"):
+            raise exceptions.CLIAbort('Aborted.')
         mgr.add_local_lb(input_id, datacenter=args['--datacenter'])
         return "Load balancer is being created!"
 
 
-class CreateOptionsLoadBalancer(CLIRunnable):
+class CreateOptionsLoadBalancer(environment.CLIRunnable):
     """
 usage: sl loadbal create-options
 
@@ -558,9 +569,9 @@ Output available options when adding a new load balancer
     action = 'create-options'
 
     def execute(self, args):
-        mgr = LoadBalancerManager(self.client)
+        mgr = SoftLayer.LoadBalancerManager(self.client)
 
-        table = Table(['id', 'capacity', 'description', 'price'])
+        table = formatting.Table(['id', 'capacity', 'description', 'price'])
 
         table.sortby = 'price'
         table.align['price'] = 'r'

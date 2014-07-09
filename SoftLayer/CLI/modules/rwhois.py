@@ -9,12 +9,13 @@ The available commands are:
 """
 # :license: MIT, see LICENSE for more details.
 
-from SoftLayer import NetworkManager
-from SoftLayer.CLI import CLIRunnable, KeyValueTable
-from SoftLayer.CLI.helpers import CLIAbort
+import SoftLayer
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 
 
-class RWhoisEdit(CLIRunnable):
+class RWhoisEdit(environment.CLIRunnable):
     """
 usage: sl rwhois edit [options]
 
@@ -40,7 +41,7 @@ Options:
     action = 'edit'
 
     def execute(self, args):
-        mgr = NetworkManager(self.client)
+        mgr = SoftLayer.NetworkManager(self.client)
 
         update = {
             'abuse_email': args.get('--abuse'),
@@ -62,12 +63,13 @@ Options:
 
         check = [x for x in update.values() if x is not None]
         if not check:
-            raise CLIAbort("You must specify at least one field to update.")
+            raise exceptions.CLIAbort(
+                "You must specify at least one field to update.")
 
         mgr.edit_rwhois(**update)  # pylint: disable=W0142
 
 
-class RWhoisShow(CLIRunnable):
+class RWhoisShow(environment.CLIRunnable):
     """
 usage: sl rwhois show [options]
 
@@ -76,10 +78,10 @@ Display the RWhois information for your account.
     action = 'show'
 
     def execute(self, args):
-        mgr = NetworkManager(self.client)
+        mgr = SoftLayer.NetworkManager(self.client)
         result = mgr.get_rwhois()
 
-        table = KeyValueTable(['Name', 'Value'])
+        table = formatting.KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
         table.align['Value'] = 'l'
         table.add_row(['Name', result['firstName'] + ' ' + result['lastName']])

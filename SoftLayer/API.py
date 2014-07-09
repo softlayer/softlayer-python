@@ -7,12 +7,13 @@
 """
 import time
 
-from .consts import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT, USER_AGENT
-from .transports import make_xml_rpc_api_call
-from .auth import TokenAuthentication
-from .config import get_client_settings
+from SoftLayer import auth as slauth
+from SoftLayer import config
+from SoftLayer import consts
+from SoftLayer import transports
 
-
+API_PUBLIC_ENDPOINT = consts.API_PUBLIC_ENDPOINT
+API_PRIVATE_ENDPOINT = consts.API_PRIVATE_ENDPOINT
 __all__ = ['Client', 'TimedClient', 'API_PUBLIC_ENDPOINT',
            'API_PRIVATE_ENDPOINT']
 
@@ -29,7 +30,7 @@ VALID_CALL_ARGS = set([
 
 
 class Client(object):
-    """ A SoftLayer API client.
+    """A SoftLayer API client.
 
     :param username: an optional API username if you wish to bypass the
         package's built-in username
@@ -58,13 +59,13 @@ class Client(object):
     def __init__(self, username=None, api_key=None, endpoint_url=None,
                  timeout=None, auth=None, config_file=None, proxy=None):
 
-        settings = get_client_settings(username=username,
-                                       api_key=api_key,
-                                       endpoint_url=endpoint_url,
-                                       timeout=timeout,
-                                       auth=auth,
-                                       proxy=proxy,
-                                       config_file=config_file)
+        settings = config.get_client_settings(username=username,
+                                              api_key=api_key,
+                                              endpoint_url=endpoint_url,
+                                              timeout=timeout,
+                                              auth=auth,
+                                              proxy=proxy,
+                                              config_file=config_file)
         self.auth = settings.get('auth')
         self.endpoint_url = (
             settings.get('endpoint_url') or API_PUBLIC_ENDPOINT).rstrip('/')
@@ -78,8 +79,7 @@ class Client(object):
     def authenticate_with_password(self, username, password,
                                    security_question_id=None,
                                    security_question_answer=None):
-        """ Performs Username/Password Authentication and gives back an auth
-            handler to use to create a client that uses token-based auth.
+        """Performs Username/Password Authentication
 
         :param string username: your SoftLayer username
         :param string password: your SoftLayer password
@@ -94,11 +94,11 @@ class Client(object):
             password,
             security_question_id,
             security_question_answer)
-        self.auth = TokenAuthentication(res['userId'], res['hash'])
+        self.auth = slauth.TokenAuthentication(res['userId'], res['hash'])
         return res['userId'], res['hash']
 
     def __getitem__(self, name):
-        """ Get a SoftLayer Service.
+        """Get a SoftLayer Service.
 
         :param name: The name of the service. E.G. Account
 
@@ -112,7 +112,7 @@ class Client(object):
         return Service(self, name)
 
     def call(self, service, method, *args, **kwargs):
-        """ Make a SoftLayer API call
+        """Make a SoftLayer API call
 
         :param service: the name of the SoftLayer API service
         :param method: the method to call on the service
@@ -162,7 +162,7 @@ class Client(object):
             }
 
         http_headers = {
-            'User-Agent': USER_AGENT,
+            'User-Agent': consts.USER_AGENT,
             'Content-Type': 'application/xml',
         }
 
@@ -174,17 +174,17 @@ class Client(object):
             http_headers.update(kwargs.get('raw_headers'))
 
         uri = '/'.join([self.endpoint_url, service])
-        return make_xml_rpc_api_call(uri, method, args,
-                                     headers=headers,
-                                     http_headers=http_headers,
-                                     timeout=self.timeout,
-                                     proxy=self.proxy)
+        return transports.make_xml_rpc_api_call(uri, method, args,
+                                                headers=headers,
+                                                http_headers=http_headers,
+                                                timeout=self.timeout,
+                                                proxy=self.proxy)
 
     __call__ = call
 
     def iter_call(self, service, method,
                   chunk=100, limit=None, offset=0, *args, **kwargs):
-        """ A generator that deals with paginating through results.
+        """A generator that deals with paginating through results.
 
         :param service: the name of the SoftLayer API service
         :param method: the method to call on the service
@@ -234,7 +234,7 @@ class Client(object):
                 break
 
     def __format_object_mask(self, objectmask, service):
-        """ Format new and old style object masks into proper headers.
+        """Format new and old style object masks into proper headers.
 
         :param objectmask: a string- or dict-based object mask
         :param service: a SoftLayer API service name
@@ -246,15 +246,15 @@ class Client(object):
             mheader = self._prefix + 'ObjectMask'
 
             objectmask = objectmask.strip()
-            if not objectmask.startswith('mask') \
-                    and not objectmask.startswith('['):
+            if (not objectmask.startswith('mask')
+                    and not objectmask.startswith('[')):
                 objectmask = "mask[%s]" % objectmask
 
         return {mheader: {'mask': objectmask}}
 
     def __repr__(self):
-        return "<Client: endpoint=%s, user=%r>" \
-            % (self.endpoint_url, self.auth)
+        return "<Client: endpoint=%s, user=%r>" % (self.endpoint_url,
+                                                   self.auth)
 
     __str__ = __repr__
 
@@ -263,11 +263,12 @@ class Client(object):
 
 
 class TimedClient(Client):
-    """ Subclass of Client()
+    """Client that records API call timings.
 
     Using this class will time every call to the API and store it in an
     internal list. This will have a slight impact on your client's memory
     usage and performance. You should only use this for debugging.
+
     """
 
     def __init__(self, *args, **kwargs):
@@ -275,7 +276,7 @@ class TimedClient(Client):
         super(TimedClient, self).__init__(*args, **kwargs)
 
     def call(self, service, method, *args, **kwargs):
-        """ See Client.call for documentation. """
+        """See Client.call for documentation."""
         start_time = time.time()
         result = super(TimedClient, self).call(service, method, *args,
                                                **kwargs)
@@ -285,7 +286,7 @@ class TimedClient(Client):
         return result
 
     def get_last_calls(self):
-        """ Retrieves the last_calls property.
+        """Retrieves the last_calls property.
 
         This property will contain a list of tuples in the form
         ('SERVICE.METHOD', initiated_utc_timestamp, execution_time)
@@ -296,7 +297,8 @@ class TimedClient(Client):
 
 
 class Service(object):
-    """ A SoftLayer Service.
+    """A SoftLayer Service.
+
         :param client: A SoftLayer.API.Client instance
         :param name str: The service name
 
@@ -306,7 +308,7 @@ class Service(object):
         self.name = name
 
     def call(self, name, *args, **kwargs):
-        """ Make a SoftLayer API call
+        """Make a SoftLayer API call.
 
         :param method: the method to call on the service
         :param \\*args: (optional) arguments for the remote call
@@ -333,7 +335,7 @@ class Service(object):
     __call__ = call
 
     def iter_call(self, name, *args, **kwargs):
-        """ A generator that deals with paginating through results.
+        """A generator that deals with paginating through results.
 
         :param method: the method to call on the service
         :param integer chunk: result size for each API call

@@ -6,6 +6,7 @@
     :license: MIT, see LICENSE for more details.
 """
 import re
+
 import six
 
 UUID_RE = re.compile(r'^[0-9a-f\-]{36}$', re.I)
@@ -19,9 +20,10 @@ xmlrpc_client = six.moves.xmlrpc_client  # pylint: disable=E1101,C0103
 
 
 def lookup(dic, key, *keys):
-    """ A generic dictionary access helper. This helps simplify code that uses
-        heavily nested dictionaries. It will return None if any of the keys
-        in *keys do not exist.
+    """A generic dictionary access helper.
+
+    This helps simplify code that uses heavily nested dictionaries. It will
+    return None if any of the keys in *keys do not exist.
 
     ::
 
@@ -38,8 +40,11 @@ def lookup(dic, key, *keys):
 
 
 class NestedDict(dict):
-    """ This helps with accessing a heavily nested dictionary. Access to keys
-        which don't exist will result in a new, empty dictionary
+    """This helps with accessing a heavily nested dictionary.
+
+    Dictionary where accessing keys that don't exist will return another
+    NestedDict object.
+
     """
 
     def __getitem__(self, key):
@@ -48,9 +53,9 @@ class NestedDict(dict):
         return self.setdefault(key, NestedDict())
 
     def to_dict(self):
-        """
-            Converts a NestedDict instance into a real dictionary. This is
-            needed for places where strict type checking is done.
+        """Converts a NestedDict instance into a real dictionary.
+
+        This is needed for places where strict type checking is done.
         """
         new_dict = {}
         for key, val in self.items():
@@ -62,8 +67,9 @@ class NestedDict(dict):
 
 
 def query_filter(query):
-    """ Translate a query-style string to a 'filter'. Query can be the
-    following formats:
+    """Translate a query-style string to a 'filter'.
+
+    Query can be the following formats:
 
     Case Insensitive
       'value' OR '*= value'    Contains
@@ -106,16 +112,20 @@ def query_filter(query):
 
 
 class IdentifierMixin(object):
-    """ This mixin provides an interface to provide multiple methods for
-        converting an 'indentifier' to an id """
+    """Mixin used to resolve ids from other names of objects.
+
+    This mixin provides an interface to provide multiple methods for
+    converting an 'indentifier' to an id
+
+    """
     resolvers = []
 
     def resolve_ids(self, identifier):
-        """ Takes a string and tries to resolve to a list of matching ids. What
-            exactly 'identifier' can be depends on the resolvers
+        """Takes a string and tries to resolve to a list of matching ids.
+
+        What exactly 'identifier' can be depends on the resolvers
 
         :param string identifier: identifying string
-
         :returns list:
         """
 
@@ -123,7 +133,7 @@ class IdentifierMixin(object):
 
 
 def resolve_ids(identifier, resolvers):
-    """ Resolves IDs given a list of functions
+    """Resolves IDs given a list of functions.
 
     :param string identifier: identifier string
     :param list resolvers: a list of functions

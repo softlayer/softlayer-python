@@ -5,7 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.utils import IdentifierMixin, NestedDict, query_filter
+from SoftLayer import utils
 
 RULE_MASK = ('mask[orderValue,action,destinationIpAddress,'
              'destinationIpSubnetMask,protocol,destinationPortRangeStart,'
@@ -28,7 +28,7 @@ def has_firewall(vlan):
     )
 
 
-class FirewallManager(IdentifierMixin, object):
+class FirewallManager(utils.IdentifierMixin, object):
 
     """ Manages firewalls.
 
@@ -57,12 +57,12 @@ class FirewallManager(IdentifierMixin, object):
 
         item = svc.getObject(mask=mask, id=server_id)
 
-        _filter = NestedDict({})
+        _filter = utils.NestedDict({})
         _value = "%s%s" % (item['primaryNetworkComponent']['speed'],
                            "Mbps Hardware Firewall")
-        _filter['items']['description'] = query_filter(_value)
+        _filter['items']['description'] = utils.query_filter(_value)
 
-        kwargs = NestedDict({})
+        kwargs = utils.NestedDict({})
         kwargs['id'] = 0  # look at package id 0
         kwargs['filter'] = _filter.to_dict()
         return self.prod_pkg.getItems(**kwargs)
@@ -77,13 +77,13 @@ class FirewallManager(IdentifierMixin, object):
 
         fwl_filter = 'Hardware Firewall (Dedicated)'
         ha_fwl_filter = 'Hardware Firewall (High Availability)'
-        _filter = NestedDict({})
+        _filter = utils.NestedDict({})
         if ha_enabled:
-            _filter['items']['description'] = query_filter(ha_fwl_filter)
+            _filter['items']['description'] = utils.query_filter(ha_fwl_filter)
         else:
-            _filter['items']['description'] = query_filter(fwl_filter)
+            _filter['items']['description'] = utils.query_filter(fwl_filter)
 
-        kwargs = NestedDict({})
+        kwargs = utils.NestedDict({})
         kwargs['id'] = 0  # look at package id 0
         kwargs['filter'] = _filter.to_dict()
         return self.prod_pkg.getItems(**kwargs)

@@ -4,15 +4,15 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import OrderingManager
-from SoftLayer.tests import TestCase, FixtureClient
+import SoftLayer
+from SoftLayer import testing
 
 
-class OrderingTests(TestCase):
+class OrderingTests(testing.TestCase):
 
     def set_up(self):
-        self.client = FixtureClient()
-        self.ordering = OrderingManager(self.client)
+        self.client = testing.FixtureClient()
+        self.ordering = SoftLayer.OrderingManager(self.client)
 
     def test_get_package_by_type_returns_no_outlet_packages(self):
         fixture_outlet_package_ids = [27, 28]

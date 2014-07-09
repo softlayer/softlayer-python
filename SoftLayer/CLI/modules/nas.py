@@ -8,12 +8,12 @@ The available commands are:
 """
 # :license: MIT, see LICENSE for more details.
 
-from SoftLayer.CLI import CLIRunnable, Table, FormattedItem
-from SoftLayer.CLI.helpers import blank
-from SoftLayer.utils import lookup
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import formatting
+from SoftLayer import utils
 
 
-class ListNAS(CLIRunnable):
+class ListNAS(environment.CLIRunnable):
     """
 usage: sl nas list [options]
 
@@ -29,21 +29,22 @@ Options:
         nas_accounts = account.getNasNetworkStorage(
             mask='eventCount,serviceResource[datacenter.name]')
 
-        table = Table(['id', 'datacenter', 'size', 'username', 'password',
-                       'server'])
+        table = formatting.Table(['id', 'datacenter', 'size', 'username',
+                                  'password', 'server'])
 
         for nas_account in nas_accounts:
             table.add_row([
                 nas_account['id'],
-                lookup(nas_account,
-                       'serviceResource',
-                       'datacenter',
-                       'name') or blank(),
-                FormattedItem(
-                    nas_account.get('capacityGb', blank()),
+                utils.lookup(nas_account,
+                             'serviceResource',
+                             'datacenter',
+                             'name') or formatting.blank(),
+                formatting.FormattedItem(
+                    nas_account.get('capacityGb', formatting.blank()),
                     "%dGB" % nas_account.get('capacityGb', 0)),
-                nas_account.get('username', blank()),
-                nas_account.get('password', blank()),
-                nas_account.get('serviceResourceBackendIpAddress', blank())])
+                nas_account.get('username', formatting.blank()),
+                nas_account.get('password', formatting.blank()),
+                nas_account.get('serviceResourceBackendIpAddress',
+                                formatting.blank())])
 
         return table

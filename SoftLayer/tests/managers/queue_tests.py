@@ -4,12 +4,12 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import MessagingManager, Unauthenticated, SoftLayerError
-from SoftLayer.consts import USER_AGENT
-from SoftLayer.tests import TestCase
-import SoftLayer.managers.messaging
+import mock
 
-from mock import MagicMock, patch, ANY
+import SoftLayer
+from SoftLayer import consts
+from SoftLayer.managers import messaging
+from SoftLayer import testing
 
 QUEUE_1 = {
     'expiration': 40000,
@@ -52,9 +52,9 @@ def mocked_auth_call(self):
     self.auth_token = 'NEW_AUTH_TOKEN'
 
 
-class QueueAuthTests(TestCase):
+class QueueAuthTests(testing.TestCase):
     def set_up(self):
-        self.auth = SoftLayer.managers.messaging.QueueAuth(
+        self.auth = messaging.QueueAuth(
             'endpoint', 'username', 'api_key', auth_token='auth_token')
 
     def test_init(self):
@@ -65,7 +65,7 @@ class QueueAuthTests(TestCase):
         self.assertEqual(auth.api_key, 'api_key')
         self.assertEqual(auth.auth_token, 'auth_token')
 
-    @patch('SoftLayer.managers.messaging.requests.post')
+    @mock.patch('SoftLayer.managers.messaging.requests.post')
     def test_auth(self, post):
         post().headers = {'X-Auth-Token': 'NEW_AUTH_TOKEN'}
         post().ok = True
@@ -73,32 +73,35 @@ class QueueAuthTests(TestCase):
         self.auth.auth_token = 'NEW_AUTH_TOKEN'
 
         post().ok = False
-        self.assertRaises(Unauthenticated, self.auth.auth)
+        self.assertRaises(SoftLayer.Unauthenticated, self.auth.auth)
 
-    @patch('SoftLayer.managers.messaging.QueueAuth.auth', mocked_auth_call)
+    @mock.patch('SoftLayer.managers.messaging.QueueAuth.auth',
+                mocked_auth_call)
     def test_handle_error_200(self):
         # No op on no error
-        request = MagicMock()
+        request = mock.MagicMock()
         request.status_code = 200
         self.auth.handle_error(request)
 
         self.assertEqual(self.auth.auth_token, 'auth_token')
         self.assertFalse(request.request.send.called)
 
-    @patch('SoftLayer.managers.messaging.QueueAuth.auth', mocked_auth_call)
+    @mock.patch('SoftLayer.managers.messaging.QueueAuth.auth',
+                mocked_auth_call)
     def test_handle_error_503(self):
         # Retry once more on 503 error
-        request = MagicMock()
+        request = mock.MagicMock()
         request.status_code = 503
         self.auth.handle_error(request)
 
         self.assertEqual(self.auth.auth_token, 'auth_token')
         request.connection.send.assert_called_with(request.request)
 
-    @patch('SoftLayer.managers.messaging.QueueAuth.auth', mocked_auth_call)
+    @mock.patch('SoftLayer.managers.messaging.QueueAuth.auth',
+                mocked_auth_call)
     def test_handle_error_401(self):
         # Re-auth on 401
-        request = MagicMock()
+        request = mock.MagicMock()
         request.status_code = 401
         request.request.headers = {'X-Auth-Token': 'OLD_AUTH_TOKEN'}
         self.auth.handle_error(request)
@@ -106,9 +109,10 @@ class QueueAuthTests(TestCase):
         self.assertEqual(self.auth.auth_token, 'NEW_AUTH_TOKEN')
         request.connection.send.assert_called_with(request.request)
 
-    @patch('SoftLayer.managers.messaging.QueueAuth.auth', mocked_auth_call)
+    @mock.patch('SoftLayer.managers.messaging.QueueAuth.auth',
+                mocked_auth_call)
     def test_call_unauthed(self):
-        request = MagicMock()
+        request = mock.MagicMock()
         request.headers = {}
         self.auth.auth_token = None
         self.auth(request)
@@ -119,22 +123,22 @@ class QueueAuthTests(TestCase):
         self.assertEqual(request.headers, {'X-Auth-Token': 'NEW_AUTH_TOKEN'})
 
 
-class MessagingManagerTests(TestCase):
+class MessagingManagerTests(testing.TestCase):
 
     def set_up(self):
-        self.client = MagicMock()
-        self.manager = MessagingManager(self.client)
+        self.client = mock.MagicMock()
+        self.manager = SoftLayer.MessagingManager(self.client)
 
     def test_list_accounts(self):
         self.manager.list_accounts()
         self.client['Account'].getMessageQueueAccounts.assert_called_with(
-            mask=ANY)
+            mask=mock.ANY)
 
     def test_get_endpoints(self):
         endpoints = self.manager.get_endpoints()
         self.assertEqual(endpoints, SoftLayer.managers.messaging.ENDPOINTS)
 
-    @patch('SoftLayer.managers.messaging.ENDPOINTS', {
+    @mock.patch('SoftLayer.managers.messaging.ENDPOINTS', {
         'datacenter01': {
             'private': 'private_endpoint', 'public': 'public_endpoint'},
         'dal05': {
@@ -167,7 +171,7 @@ class MessagingManagerTests(TestCase):
             TypeError,
             self.manager.get_endpoint, network='doesnotexist')
 
-    @patch('SoftLayer.managers.messaging.MessagingConnection')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection')
     def test_get_connection(self, conn):
         queue_conn = self.manager.get_connection('QUEUE_ACCOUNT_ID')
         conn.assert_called_with(
@@ -178,20 +182,20 @@ class MessagingManagerTests(TestCase):
 
     def test_get_connection_no_auth(self):
         self.client.auth = None
-        self.assertRaises(SoftLayerError,
+        self.assertRaises(SoftLayer.SoftLayerError,
                           self.manager.get_connection, 'QUEUE_ACCOUNT_ID')
 
     def test_get_connection_no_username(self):
         self.client.auth.username = None
-        self.assertRaises(SoftLayerError,
+        self.assertRaises(SoftLayer.SoftLayerError,
                           self.manager.get_connection, 'QUEUE_ACCOUNT_ID')
 
     def test_get_connection_no_api_key(self):
         self.client.auth.api_key = None
-        self.assertRaises(SoftLayerError,
+        self.assertRaises(SoftLayer.SoftLayerError,
                           self.manager.get_connection, 'QUEUE_ACCOUNT_ID')
 
-    @patch('SoftLayer.managers.messaging.requests.get')
+    @mock.patch('SoftLayer.managers.messaging.requests.get')
     def test_ping(self, get):
         result = self.manager.ping()
 
@@ -200,12 +204,12 @@ class MessagingManagerTests(TestCase):
         self.assertTrue(result)
 
 
-class MessagingConnectionTests(TestCase):
+class MessagingConnectionTests(testing.TestCase):
 
     def set_up(self):
         self.conn = SoftLayer.managers.messaging.MessagingConnection(
             'acount_id', endpoint='endpoint')
-        self.auth = MagicMock()
+        self.auth = mock.MagicMock()
         self.conn.auth = self.auth
 
     def test_init(self):
@@ -213,19 +217,19 @@ class MessagingConnectionTests(TestCase):
         self.assertEqual(self.conn.endpoint, 'endpoint')
         self.assertEqual(self.conn.auth, self.auth)
 
-    @patch('SoftLayer.managers.messaging.requests.request')
+    @mock.patch('SoftLayer.managers.messaging.requests.request')
     def test_make_request(self, request):
         resp = self.conn._make_request('GET', 'path')
         request.assert_called_with(
             'GET', 'endpoint/v1/acount_id/path',
             headers={
                 'Content-Type': 'application/json',
-                'User-Agent': USER_AGENT},
+                'User-Agent': consts.USER_AGENT},
             auth=self.auth)
         request().raise_for_status.assert_called_with()
         self.assertEqual(resp, request())
 
-    @patch('SoftLayer.managers.messaging.QueueAuth')
+    @mock.patch('SoftLayer.managers.messaging.QueueAuth')
     def test_authenticate(self, auth):
         self.conn.authenticate('username', 'api_key', auth_token='auth_token')
 
@@ -235,7 +239,8 @@ class MessagingConnectionTests(TestCase):
         auth().auth.assert_called_with()
         self.assertEqual(self.conn.auth, auth())
 
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection'
+                '._make_request')
     def test_stats(self, make_request):
         content = {
             'notifications': [{'key': [2012, 7, 27, 14, 31], 'value': 2}],
@@ -247,7 +252,8 @@ class MessagingConnectionTests(TestCase):
         self.assertEqual(content, result)
 
     # Queue-based Tests
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection'
+                '._make_request')
     def test_get_queues(self, make_request):
         make_request().json.return_value = QUEUE_LIST
         result = self.conn.get_queues()
@@ -262,7 +268,8 @@ class MessagingConnectionTests(TestCase):
             'get', 'queues', params={'tags': 'tag1,tag2'})
         self.assertEqual(QUEUE_LIST, result)
 
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection'
+                '._make_request')
     def test_create_queue(self, make_request):
         make_request().json.return_value = QUEUE_1
         result = self.conn.create_queue('example_queue')
@@ -271,7 +278,8 @@ class MessagingConnectionTests(TestCase):
             'put', 'queues/example_queue', data='{}')
         self.assertEqual(QUEUE_1, result)
 
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection'
+                '._make_request')
     def test_modify_queue(self, make_request):
         make_request().json.return_value = QUEUE_1
         result = self.conn.modify_queue('example_queue')
@@ -280,7 +288,8 @@ class MessagingConnectionTests(TestCase):
             'put', 'queues/example_queue', data='{}')
         self.assertEqual(QUEUE_1, result)
 
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection'
+                '._make_request')
     def test_get_queue(self, make_request):
         make_request().json.return_value = QUEUE_1
         result = self.conn.get_queue('example_queue')
@@ -288,7 +297,8 @@ class MessagingConnectionTests(TestCase):
         make_request.assert_called_with('get', 'queues/example_queue')
         self.assertEqual(QUEUE_1, result)
 
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection'
+                '._make_request')
     def test_delete_queue(self, make_request):
         result = self.conn.delete_queue('example_queue')
         make_request.assert_called_with(
@@ -301,7 +311,8 @@ class MessagingConnectionTests(TestCase):
             'delete', 'queues/example_queue', params={'force': 1})
         self.assertTrue(result)
 
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection'
+                '._make_request')
     def test_push_queue_message(self, make_request):
         make_request().json.return_value = MESSAGE_1
         result = self.conn.push_queue_message('example_queue', '<body>')
@@ -310,7 +321,8 @@ class MessagingConnectionTests(TestCase):
             'post', 'queues/example_queue/messages', data='{"body": "<body>"}')
         self.assertEqual(MESSAGE_1, result)
 
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection'
+                '._make_request')
     def test_pop_messages(self, make_request):
         make_request().json.return_value = MESSAGE_POP
         result = self.conn.pop_messages('example_queue')
@@ -319,7 +331,8 @@ class MessagingConnectionTests(TestCase):
             'get', 'queues/example_queue/messages', params={'batch': 1})
         self.assertEqual(MESSAGE_POP, result)
 
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection'
+                '._make_request')
     def test_pop_message(self, make_request):
         make_request().json.return_value = MESSAGE_POP
         result = self.conn.pop_message('example_queue')
@@ -328,7 +341,8 @@ class MessagingConnectionTests(TestCase):
             'get', 'queues/example_queue/messages', params={'batch': 1})
         self.assertEqual(MESSAGE_1, result)
 
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection'
+                '._make_request')
     def test_pop_message_empty(self, make_request):
         make_request().json.return_value = MESSAGE_POP_EMPTY
         result = self.conn.pop_message('example_queue')
@@ -337,7 +351,8 @@ class MessagingConnectionTests(TestCase):
             'get', 'queues/example_queue/messages', params={'batch': 1})
         self.assertEqual(None, result)
 
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection'
+                '._make_request')
     def test_delete_message(self, make_request):
         result = self.conn.delete_message('example_queue', MESSAGE_1['id'])
 
@@ -346,7 +361,8 @@ class MessagingConnectionTests(TestCase):
         self.assertTrue(result)
 
     # Topic-based Tests
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection'
+                '._make_request')
     def test_get_topics(self, make_request):
         make_request().json.return_value = TOPIC_LIST
         result = self.conn.get_topics()
@@ -361,7 +377,8 @@ class MessagingConnectionTests(TestCase):
             'get', 'topics', params={'tags': 'tag1,tag2'})
         self.assertEqual(TOPIC_LIST, result)
 
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection'
+                '._make_request')
     def test_create_topic(self, make_request):
         make_request().json.return_value = TOPIC_1
         result = self.conn.create_topic('example_topic')
@@ -370,7 +387,8 @@ class MessagingConnectionTests(TestCase):
             'put', 'topics/example_topic', data='{}')
         self.assertEqual(TOPIC_1, result)
 
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection'
+                '._make_request')
     def test_modify_topic(self, make_request):
         make_request().json.return_value = TOPIC_1
         result = self.conn.modify_topic('example_topic')
@@ -379,7 +397,8 @@ class MessagingConnectionTests(TestCase):
             'put', 'topics/example_topic', data='{}')
         self.assertEqual(TOPIC_1, result)
 
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection'
+                '._make_request')
     def test_get_topic(self, make_request):
         make_request().json.return_value = TOPIC_1
         result = self.conn.get_topic('example_topic')
@@ -387,7 +406,8 @@ class MessagingConnectionTests(TestCase):
         make_request.assert_called_with('get', 'topics/example_topic')
         self.assertEqual(TOPIC_1, result)
 
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection'
+                '._make_request')
     def test_delete_topic(self, make_request):
         result = self.conn.delete_topic('example_topic')
         make_request.assert_called_with(
@@ -400,7 +420,8 @@ class MessagingConnectionTests(TestCase):
             'delete', 'topics/example_topic', params={'force': 1})
         self.assertTrue(result)
 
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection'
+                '._make_request')
     def test_push_topic_message(self, make_request):
         make_request().json.return_value = MESSAGE_1
         result = self.conn.push_topic_message('example_topic', '<body>')
@@ -409,7 +430,8 @@ class MessagingConnectionTests(TestCase):
             'post', 'topics/example_topic/messages', data='{"body": "<body>"}')
         self.assertEqual(MESSAGE_1, result)
 
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection'
+                '._make_request')
     def test_get_subscriptions(self, make_request):
         make_request().json.return_value = SUBSCRIPTION_LIST
         result = self.conn.get_subscriptions('example_topic')
@@ -418,7 +440,8 @@ class MessagingConnectionTests(TestCase):
             'get', 'topics/example_topic/subscriptions')
         self.assertEqual(SUBSCRIPTION_LIST, result)
 
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection'
+                '._make_request')
     def test_create_subscription(self, make_request):
         make_request().json.return_value = SUBSCRIPTION_1
         endpoint_details = {
@@ -428,10 +451,11 @@ class MessagingConnectionTests(TestCase):
             'example_topic', 'queue', **endpoint_details)
 
         make_request.assert_called_with(
-            'post', 'topics/example_topic/subscriptions', data=ANY)
+            'post', 'topics/example_topic/subscriptions', data=mock.ANY)
         self.assertEqual(SUBSCRIPTION_1, result)
 
-    @patch('SoftLayer.managers.messaging.MessagingConnection._make_request')
+    @mock.patch('SoftLayer.managers.messaging.MessagingConnection.'
+                '_make_request')
     def test_delete_subscription(self, make_request):
         make_request().json.return_value = SUBSCRIPTION_1
         result = self.conn.delete_subscription(

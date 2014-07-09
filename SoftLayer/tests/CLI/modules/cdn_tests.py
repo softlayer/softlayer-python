@@ -4,14 +4,14 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.tests import TestCase, FixtureClient
-from SoftLayer.CLI.helpers import format_output
+from SoftLayer.CLI import formatting
 from SoftLayer.CLI.modules import cdn
+from SoftLayer import testing
 
 
-class CdnTests(TestCase):
+class CdnTests(testing.TestCase):
     def set_up(self):
-        self.client = FixtureClient()
+        self.client = testing.FixtureClient()
 
     def test_list_accounts(self):
         command = cdn.ListAccounts(client=self.client)
@@ -27,7 +27,7 @@ class CdnTests(TestCase):
                            'type': 'POP_PULL',
                            'id': 1234,
                            'account_name': '1234a'}],
-                         format_output(output, 'python'))
+                         formatting.format_output(output, 'python'))
 
     def test_detail_account(self):
         command = cdn.DetailAccount(client=self.client)
@@ -39,7 +39,7 @@ class CdnTests(TestCase):
                           'status': 'ACTIVE',
                           'id': 1234,
                           'account_name': '1234a'},
-                         format_output(output, 'python'))
+                         formatting.format_output(output, 'python'))
 
     def test_load_content(self):
         command = cdn.LoadContent(client=self.client)
@@ -67,7 +67,7 @@ class CdnTests(TestCase):
             {'media_type': 'FLASH',
              'origin_url': 'http://sng01.objectstorage.softlayer.net:80',
              'cname': None,
-             'id': '12345'}], format_output(output, 'python'))
+             'id': '12345'}], formatting.format_output(output, 'python'))
 
     def test_add_origin(self):
         command = cdn.AddOrigin(client=self.client)

@@ -6,15 +6,14 @@
 """
 # from mock import patch
 
-from SoftLayer.tests import TestCase, FixtureClient
-from SoftLayer.CLI.helpers import format_output
-# from SoftLayer.CLI.exceptions import CLIAbort
+from SoftLayer.CLI import formatting
 from SoftLayer.CLI.modules import firewall
+from SoftLayer import testing
 
 
-class FirewallTests(TestCase):
+class FirewallTests(testing.TestCase):
     def set_up(self):
-        self.client = FixtureClient()
+        self.client = testing.FixtureClient()
 
     def test_list_firewalls(self):
         call = self.client['Account'].getNetworkVlans
@@ -52,4 +51,4 @@ class FirewallTests(TestCase):
                            'firewall id': 'server:1234',
                            'server/vlan id': 1,
                            'type': 'Server - standard'}],
-                         format_output(output, 'python'))
+                         formatting.format_output(output, 'python'))

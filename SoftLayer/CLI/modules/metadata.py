@@ -22,18 +22,21 @@ The available commands are:
 """
 # :license: MIT, see LICENSE for more details.
 
-from SoftLayer import MetadataManager, TransportError
-from SoftLayer.CLI import CLIRunnable, KeyValueTable, listing, CLIAbort
+import SoftLayer
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 
 
-class MetaRunnable(CLIRunnable):
+class MetaRunnable(environment.CLIRunnable):
     """ A CLIRunnable that raises a nice error on connection issues because
-        the metadata service is only accessable on a SoftLayer device """
+        the metadata service is only accessable on a SoftLayer device
+    """
     def execute(self, args):
         try:
             return self._execute(args)
-        except TransportError:
-            raise CLIAbort(
+        except SoftLayer.TransportError:
+            raise exceptions.CLIAbort(
                 'Cannot connect to the backend service address. Make sure '
                 'this command is being ran from a device on the backend '
                 'network.')
@@ -52,7 +55,8 @@ List backend mac addresses
     action = 'backend_mac'
 
     def _execute(self, _):
-        return listing(MetadataManager().get('backend_mac'), separator=',')
+        backend_macs = SoftLayer.MetadataManager().get('backend_mac')
+        return formatting.listing(backend_macs, separator=',')
 
 
 class Datacenter(MetaRunnable):
@@ -64,7 +68,7 @@ Get datacenter name
     action = 'datacenter'
 
     def _execute(self, _):
-        return MetadataManager().get('datacenter')
+        return SoftLayer.MetadataManager().get('datacenter')
 
 
 class DatacenterId(MetaRunnable):
@@ -76,7 +80,7 @@ Get datacenter id
     action = 'datacenter_id'
 
     def _execute(self, _):
-        return MetadataManager().get('datacenter_id')
+        return SoftLayer.MetadataManager().get('datacenter_id')
 
 
 class FrontendMacAddresses(MetaRunnable):
@@ -88,7 +92,8 @@ List frontend mac addresses
     action = 'frontend_mac'
 
     def _execute(self, _):
-        return listing(MetadataManager().get('frontend_mac'), separator=',')
+        frontend_macs = SoftLayer.MetadataManager().get('frontend_mac')
+        return formatting.listing(frontend_macs, separator=',')
 
 
 class FullyQualifiedDomainName(MetaRunnable):
@@ -100,7 +105,7 @@ Get fully qualified domain name
     action = 'fqdn'
 
     def _execute(self, _):
-        return MetadataManager().get('fqdn')
+        return SoftLayer.MetadataManager().get('fqdn')
 
 
 class Hostname(MetaRunnable):
@@ -112,7 +117,7 @@ Get hostname
     action = 'hostname'
 
     def _execute(self, _):
-        return MetadataManager().get('hostname')
+        return SoftLayer.MetadataManager().get('hostname')
 
 
 class Id(MetaRunnable):
@@ -124,7 +129,7 @@ Get id
     action = 'id'
 
     def _execute(self, _):
-        return MetadataManager().get('id')
+        return SoftLayer.MetadataManager().get('id')
 
 
 class PrimaryBackendIpAddress(MetaRunnable):
@@ -136,7 +141,7 @@ Get primary backend ip address
     action = 'backend_ip'
 
     def _execute(self, _):
-        return MetadataManager().get('primary_backend_ip')
+        return SoftLayer.MetadataManager().get('primary_backend_ip')
 
 
 class PrimaryIpAddress(MetaRunnable):
@@ -148,7 +153,7 @@ Get primary ip address
     action = 'ip'
 
     def _execute(self, _):
-        return MetadataManager().get('primary_ip')
+        return SoftLayer.MetadataManager().get('primary_ip')
 
 
 class ProvisionState(MetaRunnable):
@@ -160,7 +165,7 @@ Get provision state
     action = 'provision_state'
 
     def _execute(self, _):
-        return MetadataManager().get('provision_state')
+        return SoftLayer.MetadataManager().get('provision_state')
 
 
 class Tags(MetaRunnable):
@@ -172,10 +177,11 @@ List tags
     action = 'tags'
 
     def _execute(self, _):
-        return listing(MetadataManager().get('tags'), separator=',')
+        return formatting.listing(SoftLayer.MetadataManager().get('tags'),
+                                  separator=',')
 
 
-class UserMetadata(CLIRunnable):
+class UserMetadata(environment.CLIRunnable):
     """
 usage: sl metadata user_data [options]
 
@@ -185,11 +191,11 @@ Get user-defined data
 
     def _execute(self, _):
         """ Returns user metadata """
-        userdata = MetadataManager().get('user_data')
+        userdata = SoftLayer.MetadataManager().get('user_data')
         if userdata:
             return userdata
         else:
-            raise CLIAbort("No user metadata.")
+            raise exceptions.CLIAbort("No user metadata.")
 
 
 class Network(MetaRunnable):
@@ -201,37 +207,37 @@ Get details about the public or private network
     action = 'network'
 
     def _execute(self, args):
-        meta = MetadataManager()
+        meta = SoftLayer.MetadataManager()
         if args['<public>']:
-            table = KeyValueTable(['Name', 'Value'])
+            table = formatting.KeyValueTable(['Name', 'Value'])
             table.align['Name'] = 'r'
             table.align['Value'] = 'l'
             network = meta.public_network()
             table.add_row([
                 'mac addresses',
-                listing(network['mac_addresses'], separator=',')])
+                formatting.listing(network['mac_addresses'], separator=',')])
             table.add_row([
                 'router', network['router']])
             table.add_row([
-                'vlans', listing(network['vlans'], separator=',')])
+                'vlans', formatting.listing(network['vlans'], separator=',')])
             table.add_row([
                 'vlan ids',
-                listing(network['vlan_ids'], separator=',')])
+                formatting.listing(network['vlan_ids'], separator=',')])
             return table
 
         if args['<private>']:
-            table = KeyValueTable(['Name', 'Value'])
+            table = formatting.KeyValueTable(['Name', 'Value'])
             table.align['Name'] = 'r'
             table.align['Value'] = 'l'
             network = meta.private_network()
             table.add_row([
                 'mac addresses',
-                listing(network['mac_addresses'], separator=',')])
+                formatting.listing(network['mac_addresses'], separator=',')])
             table.add_row([
                 'router', network['router']])
             table.add_row([
-                'vlans', listing(network['vlans'], separator=',')])
+                'vlans', formatting.listing(network['vlans'], separator=',')])
             table.add_row([
                 'vlan ids',
-                listing(network['vlan_ids'], separator=',')])
+                formatting.listing(network['vlan_ids'], separator=',')])
             return table

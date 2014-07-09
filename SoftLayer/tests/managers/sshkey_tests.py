@@ -4,16 +4,17 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import SshKeyManager
-from SoftLayer.tests import TestCase, FixtureClient
-from mock import call
+import mock
+
+import SoftLayer
+from SoftLayer import testing
 
 
-class SshKeyTests(TestCase):
+class SshKeyTests(testing.TestCase):
 
     def set_up(self):
-        self.client = FixtureClient()
-        self.sshkey = SshKeyManager(self.client)
+        self.client = testing.FixtureClient()
+        self.sshkey = SoftLayer.SshKeyManager(self.client)
 
     def test_add_key(self):
         key = 'pretend this is a public SSH key'
@@ -25,7 +26,7 @@ class SshKeyTests(TestCase):
             'label': label,
             'notes': notes,
         }
-        mcall = call(data)
+        mcall = mock.call(data)
         service = self.client['Security_Ssh_Key']
 
         self.sshkey.add_key(key=key, label=label, notes=notes)
@@ -33,7 +34,7 @@ class SshKeyTests(TestCase):
 
     def test_delete_key(self):
         id = 1234
-        mcall = call(id=id)
+        mcall = mock.call(id=id)
         service = self.client['Security_Ssh_Key']
 
         self.sshkey.delete_key(id)
@@ -48,7 +49,7 @@ class SshKeyTests(TestCase):
             'label': label,
             'notes': notes,
         }
-        mcall = call(data, id=id)
+        mcall = mock.call(data, id=id)
         service = self.client['Security_Ssh_Key']
 
         self.sshkey.edit_key(id, label=label, notes=notes)
@@ -56,7 +57,7 @@ class SshKeyTests(TestCase):
 
     def test_get_key(self):
         id = 1234
-        mcall = call(id=id)
+        mcall = mock.call(id=id)
         service = self.client['Security_Ssh_Key']
 
         self.sshkey.get_key(id)

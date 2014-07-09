@@ -8,11 +8,12 @@
 # Invalid names are ignored due to long method names and short argument names
 # pylint: disable=C0103
 import socket
-from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
-from SoftLayer.managers.ordering import OrderingManager
+
+from SoftLayer.managers import ordering
+from SoftLayer import utils
 
 
-class HardwareManager(IdentifierMixin, object):
+class HardwareManager(utils.IdentifierMixin, object):
     """
     Manages hardware devices.
 
@@ -28,7 +29,7 @@ class HardwareManager(IdentifierMixin, object):
         self.account = self.client['Account']
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
         if ordering_manager is None:
-            self.ordering_manager = OrderingManager(client)
+            self.ordering_manager = ordering.OrderingManager(client)
         else:
             self.ordering_manager = ordering_manager
 
@@ -125,12 +126,11 @@ class HardwareManager(IdentifierMixin, object):
                 'activeTransaction[id, transactionStatus[friendlyName,name]]',
             ]
 
-            kwargs['mask'] = '[mask[%s],' \
-                             ' mask(SoftLayer_Hardware_Server)[%s]]' % \
-                             (','.join(hw_items),
-                              ','.join(server_items))
+            kwargs['mask'] = ('[mask[%s],'
+                              ' mask(SoftLayer_Hardware_Server)[%s]]'
+                              % (','.join(hw_items), ','.join(server_items)))
 
-        _filter = NestedDict(kwargs.get('filter') or {})
+        _filter = utils.NestedDict(kwargs.get('filter') or {})
         if tags:
             _filter['hardware']['tagReferences']['tag']['name'] = {
                 'operation': 'in',
@@ -138,33 +138,33 @@ class HardwareManager(IdentifierMixin, object):
             }
 
         if cpus:
-            _filter['hardware']['processorPhysicalCoreAmount'] = \
-                query_filter(cpus)
+            _filter['hardware']['processorPhysicalCoreAmount'] = (
+                utils.query_filter(cpus))
 
         if memory:
-            _filter['hardware']['memoryCapacity'] = query_filter(memory)
+            _filter['hardware']['memoryCapacity'] = utils.query_filter(memory)
 
         if hostname:
-            _filter['hardware']['hostname'] = query_filter(hostname)
+            _filter['hardware']['hostname'] = utils.query_filter(hostname)
 
         if domain:
-            _filter['hardware']['domain'] = query_filter(domain)
+            _filter['hardware']['domain'] = utils.query_filter(domain)
 
         if datacenter:
-            _filter['hardware']['datacenter']['name'] = \
-                query_filter(datacenter)
+            _filter['hardware']['datacenter']['name'] = (
+                utils.query_filter(datacenter))
 
         if nic_speed:
-            _filter['hardware']['networkComponents']['maxSpeed'] = \
-                query_filter(nic_speed)
+            _filter['hardware']['networkComponents']['maxSpeed'] = (
+                utils.query_filter(nic_speed))
 
         if public_ip:
-            _filter['hardware']['primaryIpAddress'] = \
-                query_filter(public_ip)
+            _filter['hardware']['primaryIpAddress'] = (
+                utils.query_filter(public_ip))
 
         if private_ip:
-            _filter['hardware']['primaryBackendIpAddress'] = \
-                query_filter(private_ip)
+            _filter['hardware']['primaryBackendIpAddress'] = (
+                utils.query_filter(private_ip))
 
         kwargs['filter'] = _filter.to_dict()
         return self.account.getHardware(**kwargs)
@@ -668,7 +668,7 @@ class HardwareManager(IdentifierMixin, object):
 
         for config in package.getConfiguration(id=package_id, mask=mask):
             code = config['itemCategory']['categoryCode']
-            group = NestedDict(config['itemCategory']) or {}
+            group = utils.NestedDict(config['itemCategory']) or {}
             category = {
                 'sort': config['sort'],
                 'step': config['orderStepId'],

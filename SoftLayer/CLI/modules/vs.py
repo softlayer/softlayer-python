@@ -28,21 +28,19 @@ hostname or the ip address for a virtual server.
 """
 # :license: MIT, see LICENSE for more details.
 
-from os import linesep
+import os
 import os.path
 
-from SoftLayer import VSManager, SshKeyManager, DNSManager
-from SoftLayer.utils import lookup
-from SoftLayer.CLI import (
-    CLIRunnable, Table, no_going_back, confirm, mb_to_gb, listing,
-    FormattedItem)
-from SoftLayer.CLI.helpers import (
-    CLIAbort, ArgumentError, NestedDict, blank, resolve_id, KeyValueTable,
-    update_with_template_args, FALSE_VALUES, export_to_template,
-    active_txn, transaction_status)
+import SoftLayer
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
+from SoftLayer.CLI import template
+from SoftLayer import utils
 
 
-class ListVSIs(CLIRunnable):
+class ListVSIs(environment.CLIRunnable):
     """
 usage: sl vs list [--hourly | --monthly] [--sortby=SORT_COLUMN] [--tags=TAGS]
                   [options]
@@ -76,7 +74,7 @@ For more on filters see 'sl help filters'
     action = 'list'
 
     def execute(self, args):
-        vsi = VSManager(self.client)
+        vsi = SoftLayer.VSManager(self.client)
 
         tags = None
         if args.get('--tags'):
@@ -92,7 +90,7 @@ For more on filters see 'sl help filters'
                                     nic_speed=args.get('--network'),
                                     tags=tags)
 
-        table = Table([
+        table = formatting.Table([
             'id', 'datacenter', 'host',
             'cores', 'memory', 'primary_ip',
             'backend_ip', 'active_transaction',
@@ -100,22 +98,22 @@ For more on filters see 'sl help filters'
         table.sortby = args.get('--sortby') or 'host'
 
         for guest in guests:
-            guest = NestedDict(guest)
+            guest = utils.NestedDict(guest)
             table.add_row([
                 guest['id'],
-                guest['datacenter']['name'] or blank(),
+                guest['datacenter']['name'] or formatting.blank(),
                 guest['fullyQualifiedDomainName'],
                 guest['maxCpu'],
-                mb_to_gb(guest['maxMemory']),
-                guest['primaryIpAddress'] or blank(),
-                guest['primaryBackendIpAddress'] or blank(),
-                active_txn(guest),
+                formatting.mb_to_gb(guest['maxMemory']),
+                guest['primaryIpAddress'] or formatting.blank(),
+                guest['primaryBackendIpAddress'] or formatting.blank(),
+                formatting.active_txn(guest),
             ])
 
         return table
 
 
-class VSDetails(CLIRunnable):
+class VSDetails(environment.CLIRunnable):
     """
 usage: sl vs detail [--passwords] [--price] <identifier> [options]
 
@@ -128,50 +126,55 @@ Options:
     action = 'detail'
 
     def execute(self, args):
-        vsi = VSManager(self.client)
-        table = KeyValueTable(['Name', 'Value'])
+        vsi = SoftLayer.VSManager(self.client)
+        table = formatting.KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
         table.align['Value'] = 'l'
 
-        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        vs_id = helpers.resolve_id(vsi.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'VS')
         result = vsi.get_instance(vs_id)
-        result = NestedDict(result)
+        result = utils.NestedDict(result)
 
         table.add_row(['id', result['id']])
         table.add_row(['hostname', result['fullyQualifiedDomainName']])
-        table.add_row(['status', FormattedItem(
-            result['status']['keyName'] or blank(),
-            result['status']['name'] or blank()
+        table.add_row(['status', formatting.FormattedItem(
+            result['status']['keyName'] or formatting.blank(),
+            result['status']['name'] or formatting.blank()
         )])
-        table.add_row(['active_transaction', active_txn(result)])
-        table.add_row(['state', FormattedItem(
-            lookup(result, 'powerState', 'keyName'),
-            lookup(result, 'powerState', 'name'),
+        table.add_row(['active_transaction', formatting.active_txn(result)])
+        table.add_row(['state', formatting.FormattedItem(
+            utils.lookup(result, 'powerState', 'keyName'),
+            utils.lookup(result, 'powerState', 'name'),
         )])
-        table.add_row(['datacenter', result['datacenter']['name'] or blank()])
-        operating_system = lookup(result,
-                                  'operatingSystem',
-                                  'softwareLicense',
-                                  'softwareDescription') or {}
+        table.add_row(['datacenter',
+                       result['datacenter']['name'] or formatting.blank()])
+        operating_system = utils.lookup(result,
+                                        'operatingSystem',
+                                        'softwareLicense',
+                                        'softwareDescription') or {}
         table.add_row([
             'os',
-            FormattedItem(
-                operating_system.get('version') or blank(),
-                operating_system.get('name') or blank()
+            formatting.FormattedItem(
+                operating_system.get('version') or formatting.blank(),
+                operating_system.get('name') or formatting.blank()
             )])
         table.add_row(['os_version',
-                       operating_system.get('version') or blank()])
+                       operating_system.get('version') or formatting.blank()])
         table.add_row(['cores', result['maxCpu']])
-        table.add_row(['memory', mb_to_gb(result['maxMemory'])])
-        table.add_row(['public_ip', result['primaryIpAddress'] or blank()])
+        table.add_row(['memory', formatting.mb_to_gb(result['maxMemory'])])
+        table.add_row(['public_ip',
+                       result['primaryIpAddress'] or formatting.blank()])
         table.add_row(['private_ip',
-                       result['primaryBackendIpAddress'] or blank()])
+                       result['primaryBackendIpAddress']
+                       or formatting.blank()])
         table.add_row(['private_only', result['privateNetworkOnlyFlag']])
         table.add_row(['private_cpu', result['dedicatedAccountHostOnlyFlag']])
         table.add_row(['created', result['createDate']])
         table.add_row(['modified', result['modifyDate']])
 
-        vlan_table = Table(['type', 'number', 'id'])
+        vlan_table = formatting.Table(['type', 'number', 'id'])
         for vlan in result['networkVlans']:
             vlan_table.add_row([
                 vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
@@ -185,7 +188,7 @@ Options:
                            result['billingItem']['recurringFee']])
 
         if args.get('--passwords'):
-            pass_table = Table(['username', 'password'])
+            pass_table = formatting.Table(['username', 'password'])
             for item in result['operatingSystem']['passwords']:
                 pass_table.add_row([item['username'], item['password']])
             table.add_row(['users', pass_table])
@@ -195,12 +198,12 @@ Options:
             tag_row.append(tag['tag']['name'])
 
         if tag_row:
-            table.add_row(['tags', listing(tag_row, separator=',')])
+            table.add_row(['tags', formatting.listing(tag_row, separator=',')])
 
         # Test to see if this actually has a primary (public) ip address
         if result['primaryIpAddress']:
-            ptr_domains = self.client['Virtual_Guest'].\
-                getReverseDomainRecords(id=vs_id)
+            ptr_domains = (self.client['Virtual_Guest']
+                           .getReverseDomainRecords(id=vs_id))
 
             for ptr_domain in ptr_domains:
                 for ptr in ptr_domain['resourceRecords']:
@@ -209,7 +212,7 @@ Options:
         return table
 
 
-class CreateOptionsVS(CLIRunnable):
+class CreateOptionsVS(environment.CLIRunnable):
     """
 usage: sl vs create-options [options]
 
@@ -228,7 +231,7 @@ Options:
     options = ['datacenter', 'cpu', 'nic', 'disk', 'os', 'memory']
 
     def execute(self, args):
-        vsi = VSManager(self.client)
+        vsi = SoftLayer.VSManager(self.client)
         result = vsi.get_create_options()
 
         show_all = True
@@ -240,14 +243,15 @@ Options:
         if args['--all']:
             show_all = True
 
-        table = KeyValueTable(['Name', 'Value'])
+        table = formatting.KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
         table.align['Value'] = 'l'
 
         if args['--datacenter'] or show_all:
             datacenters = [dc['template']['datacenter']['name']
                            for dc in result['datacenters']]
-            table.add_row(['datacenter', listing(datacenters, separator=',')])
+            table.add_row(['datacenter',
+                           formatting.listing(datacenters, separator=',')])
 
         if args['--cpu'] or show_all:
             standard_cpu = [x for x in result['processors']
@@ -265,7 +269,7 @@ Options:
                     cpus.append(str(cpu_option['template']['startCpus']))
 
                 table.add_row(['cpus (%s)' % name,
-                               listing(cpus, separator=',')])
+                               formatting.listing(cpus, separator=',')])
 
             add_cpus_row(ded_cpu, 'private')
             add_cpus_row(standard_cpu, 'standard')
@@ -273,7 +277,8 @@ Options:
         if args['--memory'] or show_all:
             memory = [
                 str(m['template']['maxMemory']) for m in result['memory']]
-            table.add_row(['memory', listing(memory, separator=',')])
+            table.add_row(['memory',
+                           formatting.listing(memory, separator=',')])
 
         if args['--os'] or show_all:
             op_sys = [
@@ -289,8 +294,8 @@ Options:
             for summary in sorted(os_summary):
                 table.add_row([
                     'os (%s)' % summary,
-                    linesep.join(sorted([x for x in op_sys
-                                         if x[0:len(summary)] == summary]))
+                    os.linesep.join(sorted([x for x in op_sys
+                                            if x[0:len(summary)] == summary]))
                 ])
 
         if args['--disk'] or show_all:
@@ -314,7 +319,8 @@ Options:
 
                 for label in sorted(simple.keys()):
                     table.add_row(['%s disk(%s)' % (name, label),
-                                   listing(simple[label], separator=',')])
+                                   formatting.listing(simple[label],
+                                                      separator=',')])
 
             add_block_rows(local_disks, 'local')
             add_block_rows(san_disks, 'san')
@@ -327,12 +333,12 @@ Options:
 
             speeds = sorted(speeds)
 
-            table.add_row(['nic', listing(speeds, separator=',')])
+            table.add_row(['nic', formatting.listing(speeds, separator=',')])
 
         return table
 
 
-class CreateVS(CLIRunnable):
+class CreateVS(environment.CLIRunnable):
     """
 usage: sl vs create [--disk=SIZE...] [--key=KEY...] [options]
 
@@ -383,15 +389,15 @@ Optional:
     required_params = ['--hostname', '--domain', '--cpu', '--memory']
 
     def execute(self, args):
-        update_with_template_args(args, list_args=['--disk', '--key'])
-        vsi = VSManager(self.client)
+        template.update_with_template_args(args, list_args=['--disk', '--key'])
+        vsi = SoftLayer.VSManager(self.client)
         self._update_with_like_args(args)
         self._validate_args(args)
 
         # Do not create a virtual server with --test or --export
         do_create = not (args['--export'] or args['--test'])
 
-        table = Table(['Item', 'cost'])
+        table = formatting.Table(['Item', 'cost'])
         table.align['Item'] = 'r'
         table.align['cost'] = 'r'
         data = self._parse_create_args(args)
@@ -402,7 +408,7 @@ Optional:
             total_monthly = 0.0
             total_hourly = 0.0
 
-            table = Table(['Item', 'cost'])
+            table = formatting.Table(['Item', 'cost'])
             table.align['Item'] = 'r'
             table.align['cost'] = 'r'
 
@@ -426,23 +432,24 @@ Optional:
                 billing_rate = 'hourly'
             table.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
             output.append(table)
-            output.append(FormattedItem(
+            output.append(formatting.FormattedItem(
                 None,
                 ' -- ! Prices reflected here are retail and do not '
                 'take account level discounts and are not guaranteed.'))
 
         if args['--export']:
             export_file = args.pop('--export')
-            export_to_template(export_file, args, exclude=['--wait', '--test'])
+            template.export_to_template(export_file, args,
+                                        exclude=['--wait', '--test'])
             return 'Successfully exported options to a template file.'
 
         if do_create:
-            if args['--really'] or confirm(
+            if args['--really'] or formatting.confirm(
                     "This action will incur charges on your account. "
                     "Continue?"):
                 result = vsi.create_instance(**data)
 
-                table = KeyValueTable(['name', 'value'])
+                table = formatting.KeyValueTable(['name', 'value'])
                 table.align['name'] = 'r'
                 table.align['value'] = 'l'
                 table.add_row(['id', result['id']])
@@ -455,7 +462,7 @@ Optional:
                         result['id'], int(args.get('--wait') or 1))
                     table.add_row(['ready', ready])
             else:
-                raise CLIAbort('Aborting virtual server order.')
+                raise exceptions.CLIAbort('Aborting virtual server order.')
 
         return output
 
@@ -463,35 +470,39 @@ Optional:
         """ Raises an ArgumentError if the given arguments are not valid """
         invalid_args = [k for k in self.required_params if args.get(k) is None]
         if invalid_args:
-            raise ArgumentError('Missing required options: %s'
-                                % ','.join(invalid_args))
+            raise exceptions.ArgumentError('Missing required options: %s'
+                                           % ','.join(invalid_args))
 
         if all([args['--userdata'], args['--userfile']]):
-            raise ArgumentError('[-u | --userdata] not allowed with '
-                                '[-F | --userfile]')
+            raise exceptions.ArgumentError(
+                '[-u | --userdata] not allowed with [-F | --userfile]')
 
-        if args['--hourly'] in FALSE_VALUES:
+        if args['--hourly'] in formatting.FALSE_VALUES:
             args['--hourly'] = False
 
-        if args['--monthly'] in FALSE_VALUES:
+        if args['--monthly'] in formatting.FALSE_VALUES:
             args['--monthly'] = False
 
         if all([args['--hourly'], args['--monthly']]):
-            raise ArgumentError('[--hourly] not allowed with [--monthly]')
+            raise exceptions.ArgumentError(
+                '[--hourly] not allowed with [--monthly]')
 
         if not any([args['--hourly'], args['--monthly']]):
-            raise ArgumentError('One of [--hourly | --monthly] is required')
+            raise exceptions.ArgumentError(
+                'One of [--hourly | --monthly] is required')
 
         image_args = [args['--os'], args['--image']]
         if all(image_args):
-            raise ArgumentError('[-o | --os] not allowed with [--image]')
+            raise exceptions.ArgumentError(
+                '[-o | --os] not allowed with [--image]')
 
         if not any(image_args):
-            raise ArgumentError('One of [--os | --image] is required')
+            raise exceptions.ArgumentError(
+                'One of [--os | --image] is required')
 
         if args['--userfile']:
             if not os.path.exists(args['--userfile']):
-                raise ArgumentError(
+                raise exceptions.ArgumentError(
                     'File does not exist [-u | --userfile] = %s'
                     % args['--userfile'])
 
@@ -502,8 +513,10 @@ Optional:
         :param dict args: CLI arguments
         """
         if args['--like']:
-            vsi = VSManager(self.client)
-            vs_id = resolve_id(vsi.resolve_ids, args.pop('--like'), 'VS')
+            vsi = SoftLayer.VSManager(self.client)
+            vs_id = helpers.resolve_id(vsi.resolve_ids,
+                                       args.pop('--like'),
+                                       'VS')
             like_details = vsi.get_instance(vs_id)
             like_args = {
                 '--hostname': like_details['hostname'],
@@ -521,14 +534,14 @@ Optional:
             }
 
             # Handle mutually exclusive options
-            like_image = lookup(like_details,
-                                'blockDeviceTemplateGroup',
-                                'globalIdentifier')
-            like_os = lookup(like_details,
-                             'operatingSystem',
-                             'softwareLicense',
-                             'softwareDescription',
-                             'referenceCode')
+            like_image = utils.lookup(like_details,
+                                      'blockDeviceTemplateGroup',
+                                      'globalIdentifier')
+            like_os = utils.lookup(like_details,
+                                   'operatingSystem',
+                                   'softwareLicense',
+                                   'softwareDescription',
+                                   'referenceCode')
             if like_image and not args.get('--os'):
                 like_args['--image'] = like_image
             elif like_os and not args.get('--image'):
@@ -604,8 +617,8 @@ Optional:
         if args.get('--key'):
             keys = []
             for key in args.get('--key'):
-                key_id = resolve_id(SshKeyManager(self.client).resolve_ids,
-                                    key, 'SshKey')
+                resolver = SoftLayer.SshKeyManager(self.client).resolve_ids
+                key_id = helpers.resolve_id(resolver, key, 'SshKey')
                 keys.append(key_id)
             data['ssh_keys'] = keys
 
@@ -618,7 +631,7 @@ Optional:
         return data
 
 
-class ReadyVS(CLIRunnable):
+class ReadyVS(environment.CLIRunnable):
     """
 usage: sl vs ready <identifier> [options]
 
@@ -631,18 +644,20 @@ Optional:
     action = 'ready'
 
     def execute(self, args):
-        vsi = VSManager(self.client)
+        vsi = SoftLayer.VSManager(self.client)
 
-        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        vs_id = helpers.resolve_id(vsi.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'VS')
         ready = vsi.wait_for_ready(vs_id, int(args.get('--wait') or 0))
 
         if ready:
             return "READY"
         else:
-            raise CLIAbort("Instance %s not ready" % vs_id)
+            raise exceptions.CLIAbort("Instance %s not ready" % vs_id)
 
 
-class ReloadVS(CLIRunnable):
+class ReloadVS(environment.CLIRunnable):
     """
 usage: sl vs reload <identifier> [--key=KEY...] [options]
 
@@ -659,21 +674,23 @@ Optional:
     options = ['confirm']
 
     def execute(self, args):
-        vsi = VSManager(self.client)
-        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        vsi = SoftLayer.VSManager(self.client)
+        vs_id = helpers.resolve_id(vsi.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'VS')
         keys = []
         if args.get('--key'):
             for key in args.get('--key'):
-                key_id = resolve_id(SshKeyManager(self.client).resolve_ids,
-                                    key, 'SshKey')
+                resolver = SoftLayer.SshKeyManager(self.client).resolve_ids
+                key_id = helpers.resolve_id(resolver, key, 'SshKey')
                 keys.append(key_id)
-        if args['--really'] or no_going_back(vs_id):
+        if args['--really'] or formatting.no_going_back(vs_id):
             vsi.reload_instance(vs_id, args['--postinstall'], keys)
         else:
-            CLIAbort('Aborted')
+            raise exceptions.CLIAbort('Aborted')
 
 
-class CancelVS(CLIRunnable):
+class CancelVS(environment.CLIRunnable):
     """
 usage: sl vs cancel <identifier> [options]
 
@@ -684,15 +701,17 @@ Cancel a virtual server
     options = ['confirm']
 
     def execute(self, args):
-        vsi = VSManager(self.client)
-        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
-        if args['--really'] or no_going_back(vs_id):
+        vsi = SoftLayer.VSManager(self.client)
+        vs_id = helpers.resolve_id(vsi.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'VS')
+        if args['--really'] or formatting.no_going_back(vs_id):
             vsi.cancel_instance(vs_id)
         else:
-            CLIAbort('Aborted')
+            raise exceptions.CLIAbort('Aborted')
 
 
-class VSPowerOff(CLIRunnable):
+class VSPowerOff(environment.CLIRunnable):
     """
 usage: sl vs power-off <identifier> [--hard] [options]
 
@@ -706,19 +725,22 @@ Optional:
 
     def execute(self, args):
         virtual_guest = self.client['Virtual_Guest']
-        vsi = VSManager(self.client)
-        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
-        if args['--really'] or confirm('This will power off the VS with id '
-                                       '%s. Continue?' % vs_id):
+        vsi = SoftLayer.VSManager(self.client)
+        vs_id = helpers.resolve_id(vsi.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'VS')
+        if args['--really'] or formatting.confirm('This will power off the VS '
+                                                  'with id %s. Continue?'
+                                                  % vs_id):
             if args['--hard']:
                 virtual_guest.powerOff(id=vs_id)
             else:
                 virtual_guest.powerOffSoft(id=vs_id)
         else:
-            raise CLIAbort('Aborted.')
+            raise exceptions.CLIAbort('Aborted.')
 
 
-class VSReboot(CLIRunnable):
+class VSReboot(environment.CLIRunnable):
     """
 usage: sl vs reboot <identifier> [--hard | --soft] [options]
 
@@ -733,10 +755,13 @@ Optional:
 
     def execute(self, args):
         virtual_guest = self.client['Virtual_Guest']
-        vsi = VSManager(self.client)
-        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
-        if args['--really'] or confirm('This will reboot the VS with id '
-                                       '%s. Continue?' % vs_id):
+        vsi = SoftLayer.VSManager(self.client)
+        vs_id = helpers.resolve_id(vsi.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'VS')
+        if args['--really'] or formatting.confirm('This will reboot the VS '
+                                                  'with id %s. Continue?'
+                                                  % vs_id):
             if args['--hard']:
                 virtual_guest.rebootHard(id=vs_id)
             elif args['--soft']:
@@ -744,10 +769,10 @@ Optional:
             else:
                 virtual_guest.rebootDefault(id=vs_id)
         else:
-            raise CLIAbort('Aborted.')
+            raise exceptions.CLIAbort('Aborted.')
 
 
-class VSPowerOn(CLIRunnable):
+class VSPowerOn(environment.CLIRunnable):
     """
 usage: sl vs power-on <identifier> [options]
 
@@ -757,12 +782,14 @@ Power on a virtual server
 
     def execute(self, args):
         virtual_guest = self.client['Virtual_Guest']
-        vsi = VSManager(self.client)
-        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        vsi = SoftLayer.VSManager(self.client)
+        vs_id = helpers.resolve_id(vsi.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'VS')
         virtual_guest.powerOn(id=vs_id)
 
 
-class VSPause(CLIRunnable):
+class VSPause(environment.CLIRunnable):
     """
 usage: sl vs pause <identifier> [options]
 
@@ -773,17 +800,20 @@ Pauses an active virtual server
 
     def execute(self, args):
         virtual_guest = self.client['Virtual_Guest']
-        vsi = VSManager(self.client)
-        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        vsi = SoftLayer.VSManager(self.client)
+        vs_id = helpers.resolve_id(vsi.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'VS')
 
-        if args['--really'] or confirm('This will pause the VS with id '
-                                       '%s. Continue?' % vs_id):
+        if args['--really'] or formatting.confirm('This will pause the VS '
+                                                  'with id %s. Continue?'
+                                                  % vs_id):
             virtual_guest.pause(id=vs_id)
         else:
-            raise CLIAbort('Aborted.')
+            raise exceptions.CLIAbort('Aborted.')
 
 
-class VSResume(CLIRunnable):
+class VSResume(environment.CLIRunnable):
     """
 usage: sl vs resume <identifier> [options]
 
@@ -793,12 +823,14 @@ Resumes a paused virtual server
 
     def execute(self, args):
         virtual_guest = self.client['Virtual_Guest']
-        vsi = VSManager(self.client)
-        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        vsi = SoftLayer.VSManager(self.client)
+        vs_id = helpers.resolve_id(vsi.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'VS')
         virtual_guest.resume(id=vs_id)
 
 
-class NicEditVS(CLIRunnable):
+class NicEditVS(environment.CLIRunnable):
     """
 usage: sl vs nic-edit <identifier> (public | private) --speed=SPEED [options]
 
@@ -813,13 +845,15 @@ Options:
     def execute(self, args):
         public = args['public']
 
-        vsi = VSManager(self.client)
-        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        vsi = SoftLayer.VSManager(self.client)
+        vs_id = helpers.resolve_id(vsi.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'VS')
 
         vsi.change_port_speed(vs_id, public, args['--speed'])
 
 
-class VSDNS(CLIRunnable):
+class VSDNS(environment.CLIRunnable):
     """
 usage: sl vs dns sync <identifier> [options]
 
@@ -843,12 +877,16 @@ Options:
 
     def dns_sync(self, args):
         """ Sync DNS records to match the FQDN of the virtual server """
-        dns = DNSManager(self.client)
-        vsi = VSManager(self.client)
+        dns = SoftLayer.DNSManager(self.client)
+        vsi = SoftLayer.VSManager(self.client)
 
-        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        vs_id = helpers.resolve_id(vsi.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'VS')
         instance = vsi.get_instance(vs_id)
-        zone_id = resolve_id(dns.resolve_ids, instance['domain'], name='zone')
+        zone_id = helpers.resolve_id(dns.resolve_ids,
+                                     instance['domain'],
+                                     name='zone')
 
         def sync_a_record():
             """ Sync A record """
@@ -868,8 +906,9 @@ Options:
             else:
                 recs = [x for x in records if x['type'].lower() == 'a']
                 if len(recs) != 1:
-                    raise CLIAbort("Aborting A record sync, found %d "
-                                   "A record exists!" % len(recs))
+                    raise exceptions.CLIAbort("Aborting A record sync, found "
+                                              "%d A record exists!"
+                                              % len(recs))
                 rec = recs[0]
                 rec['data'] = instance['primaryIpAddress']
                 rec['ttl'] = args['--ttl']
@@ -878,8 +917,8 @@ Options:
         def sync_ptr_record():
             """ Sync PTR record """
             host_rec = instance['primaryIpAddress'].split('.')[-1]
-            ptr_domains = self.client['Virtual_Guest'].\
-                getReverseDomainRecords(id=instance['id'])[0]
+            ptr_domains = (self.client['Virtual_Guest']
+                           .getReverseDomainRecords(id=instance['id'])[0])
             edit_ptr = None
             for ptr in ptr_domains['resourceRecords']:
                 if ptr['host'] == host_rec:
@@ -899,16 +938,17 @@ Options:
                     ttl=args['--ttl'])
 
         if not instance['primaryIpAddress']:
-            raise CLIAbort('No primary IP address associated with this VS')
+            raise exceptions.CLIAbort('No primary IP address associated with '
+                                      'this VS')
 
         zone = dns.get_zone(zone_id)
 
-        go_for_it = args['--really'] or confirm(
+        go_for_it = args['--really'] or formatting.confirm(
             "Attempt to update DNS records for %s"
             % instance['fullyQualifiedDomainName'])
 
         if not go_for_it:
-            raise CLIAbort("Aborting DNS sync")
+            raise exceptions.CLIAbort("Aborting DNS sync")
 
         both = False
         if not args['--ptr'] and not args['-a']:
@@ -921,7 +961,7 @@ Options:
             sync_ptr_record()
 
 
-class EditVS(CLIRunnable):
+class EditVS(environment.CLIRunnable):
     """
 usage: sl vs edit <identifier> [options]
 
@@ -939,11 +979,11 @@ Options:
         data = {}
 
         if args['--userdata'] and args['--userfile']:
-            raise ArgumentError('[-u | --userdata] not allowed with '
-                                '[-F | --userfile]')
+            raise exceptions.ArgumentError(
+                '[-u | --userdata] not allowed with [-F | --userfile]')
         if args['--userfile']:
             if not os.path.exists(args['--userfile']):
-                raise ArgumentError(
+                raise exceptions.ArgumentError(
                     'File does not exist [-u | --userfile] = %s'
                     % args['--userfile'])
 
@@ -956,13 +996,15 @@ Options:
         data['hostname'] = args.get('--hostname')
         data['domain'] = args.get('--domain')
 
-        vsi = VSManager(self.client)
-        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        vsi = SoftLayer.VSManager(self.client)
+        vs_id = helpers.resolve_id(vsi.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'VS')
         if not vsi.edit(vs_id, **data):
-            raise CLIAbort("Failed to update virtual server")
+            raise exceptions.CLIAbort("Failed to update virtual server")
 
 
-class CaptureVS(CLIRunnable):
+class CaptureVS(environment.CLIRunnable):
     """
 usage: sl vs capture <identifier> [options]
 
@@ -978,9 +1020,11 @@ Optional:
     action = 'capture'
 
     def execute(self, args):
-        vsi = VSManager(self.client)
+        vsi = SoftLayer.VSManager(self.client)
 
-        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
+        vs_id = helpers.resolve_id(vsi.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'VS')
 
         if args['--all']:
             additional_disks = True
@@ -992,20 +1036,20 @@ Optional:
                               additional_disks,
                               args.get('--note'))
 
-        table = KeyValueTable(['Name', 'Value'])
+        table = formatting.KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
         table.align['Value'] = 'l'
 
         table.add_row(['vs_id', capture['guestId']])
         table.add_row(['date', capture['createDate'][:10]])
         table.add_row(['time', capture['createDate'][11:19]])
-        table.add_row(['transaction', transaction_status(capture)])
+        table.add_row(['transaction', formatting.transaction_status(capture)])
         table.add_row(['transaction_id', capture['id']])
         table.add_row(['all_disks', additional_disks])
         return table
 
 
-class UpgradeVS(CLIRunnable):
+class UpgradeVS(environment.CLIRunnable):
     """
 usage: sl vs upgrade <identifier> [options]
 
@@ -1031,7 +1075,7 @@ However for Network, no reboot is required.
     options = ['confirm']
 
     def execute(self, args):
-        vsi = VSManager(self.client)
+        vsi = SoftLayer.VSManager(self.client)
         data = {}
         data['cpus'] = args.get('--cpu')
         data['memory'] = args.get('--memory')
@@ -1040,12 +1084,14 @@ However for Network, no reboot is required.
         if args.get('--private'):
             data['public'] = False
         data = self.verify_upgrade_parameters(data)
-        vs_id = resolve_id(vsi.resolve_ids, args.get('<identifier>'), 'VS')
-        if args['--really'] or confirm(
+        vs_id = helpers.resolve_id(vsi.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'VS')
+        if args['--really'] or formatting.confirm(
                 "This action will incur charges on your account. "
                 "Continue?"):
             if not vsi.upgrade(vs_id, **data):
-                raise CLIAbort('VS Upgrade Failed')
+                raise exceptions.CLIAbort('VS Upgrade Failed')
 
     def verify_upgrade_parameters(self, data):
         """
@@ -1062,6 +1108,6 @@ However for Network, no reboot is required.
             if data['nic_speed']:
                 data['nic_speed'] = int(data['nic_speed'])
             return data
-        except:
+        except Exception:
             raise ValueError(
                 "One or more Values of VS parameters are not correct")

@@ -6,13 +6,13 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from SoftLayer.utils import query_filter, NestedDict, IdentifierMixin
+from SoftLayer import utils
 
 IMAGE_MASK = ('id,accountId,name,globalIdentifier,blockDevices,parentId,'
               'createDate')
 
 
-class ImageManager(IdentifierMixin, object):
+class ImageManager(utils.IdentifierMixin, object):
     """
     Manages server images
 
@@ -53,14 +53,14 @@ class ImageManager(IdentifierMixin, object):
         if 'mask' not in kwargs:
             kwargs['mask'] = IMAGE_MASK
 
-        _filter = NestedDict(kwargs.get('filter') or {})
+        _filter = utils.NestedDict(kwargs.get('filter') or {})
         if name:
-            _filter['privateBlockDeviceTemplateGroups']['name'] = \
-                query_filter(name)
+            _filter['privateBlockDeviceTemplateGroups']['name'] = (
+                utils.query_filter(name))
 
         if guid:
-            _filter['privateBlockDeviceTemplateGroups']['globalIdentifier'] = \
-                query_filter(guid)
+            _filter['privateBlockDeviceTemplateGroups']['globalIdentifier'] = (
+                utils.query_filter(guid))
 
         kwargs['filter'] = _filter.to_dict()
 
@@ -77,12 +77,12 @@ class ImageManager(IdentifierMixin, object):
         if 'mask' not in kwargs:
             kwargs['mask'] = IMAGE_MASK
 
-        _filter = NestedDict(kwargs.get('filter') or {})
+        _filter = utils.NestedDict(kwargs.get('filter') or {})
         if name:
-            _filter['name'] = query_filter(name)
+            _filter['name'] = utils.query_filter(name)
 
         if guid:
-            _filter['globalIdentifier'] = query_filter(guid)
+            _filter['globalIdentifier'] = utils.query_filter(guid)
 
         kwargs['filter'] = _filter.to_dict()
 
