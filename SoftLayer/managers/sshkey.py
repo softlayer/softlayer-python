@@ -6,10 +6,10 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from SoftLayer.utils import IdentifierMixin, NestedDict, query_filter
+from SoftLayer import utils
 
 
-class SshKeyManager(IdentifierMixin, object):
+class SshKeyManager(utils.IdentifierMixin, object):
     """
     Manages account SSH keys.
 
@@ -76,9 +76,9 @@ class SshKeyManager(IdentifierMixin, object):
         :param string label: Filter list based on SSH key label
         :returns: A list of dictionaries with information about each key
         """
-        _filter = NestedDict({})
+        _filter = utils.NestedDict({})
         if label:
-            _filter['sshKeys']['label'] = query_filter(label)
+            _filter['sshKeys']['label'] = utils.query_filter(label)
 
         return self.client['Account'].getSshKeys(filter=_filter.to_dict())
 

@@ -6,10 +6,11 @@
     :license: MIT, see LICENSE for more details.
 """
 import warnings
-from SoftLayer.managers.vs import VSManager
+
+from SoftLayer.managers import vs
 
 
-class CCIManager(VSManager):
+class CCIManager(vs.VSManager):
     """
     Wrapper for the VSManager class to provide backwards compatibility with the
     old CCIManager class.

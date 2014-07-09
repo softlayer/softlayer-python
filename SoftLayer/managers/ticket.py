@@ -6,10 +6,10 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from SoftLayer.utils import IdentifierMixin
+from SoftLayer import utils
 
 
-class TicketManager(IdentifierMixin, object):
+class TicketManager(utils.IdentifierMixin, object):
     """
     Manages account Tickets
 

@@ -5,10 +5,10 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.utils import IdentifierMixin, NestedDict, query_filter
+from SoftLayer import utils
 
 
-class LoadBalancerManager(IdentifierMixin, object):
+class LoadBalancerManager(utils.IdentifierMixin, object):
 
     """ Manages load balancers.
     :param SoftLayer.API.Client client: the API client instance
@@ -28,10 +28,10 @@ class LoadBalancerManager(IdentifierMixin, object):
         """
 
         lb_filter = '*Load Balancer*'
-        _filter = NestedDict({})
-        _filter['items']['description'] = query_filter(lb_filter)
+        _filter = utils.NestedDict({})
+        _filter['items']['description'] = utils.query_filter(lb_filter)
 
-        kwargs = NestedDict({})
+        kwargs = utils.NestedDict({})
         kwargs['id'] = 0  # look at package id 0
         kwargs['filter'] = _filter.to_dict()
         packages = self.prod_pkg.getItems(**kwargs)
@@ -181,11 +181,11 @@ class LoadBalancerManager(IdentifierMixin, object):
         :param int hc_type: The health check type
         :param int weight: the weight to give to the service
         """
-        _filter = NestedDict({})
-        _filter['virtualServers']['serviceGroups']['services']['id'] = \
-            query_filter(service_id)
+        _filter = utils.NestedDict({})
+        _filter['virtualServers']['serviceGroups']['services']['id'] = (
+            utils.query_filter(service_id))
 
-        kwargs = NestedDict({})
+        kwargs = utils.NestedDict({})
         kwargs['filter'] = _filter.to_dict()
         kwargs['mask'] = ('mask[serviceGroups[services[groupReferences,'
                           'healthChecks]]]')
@@ -201,8 +201,8 @@ class LoadBalancerManager(IdentifierMixin, object):
                 if weight is not None:
                     service['groupReferences'][0]['weight'] = int(weight)
                 if hc_type is not None:
-                    service['healthChecks'][0]['healthCheckTypeId'] = \
-                        int(hc_type)
+                    service['healthChecks'][0]['healthCheckTypeId'] = (
+                        int(hc_type))
                 if ip_address_id is not None:
                     service['ipAddressId'] = ip_address_id
 
@@ -222,7 +222,7 @@ class LoadBalancerManager(IdentifierMixin, object):
         :param int hc_type: The health check type
         :param int weight: the weight to give to the service
         """
-        kwargs = NestedDict({})
+        kwargs = utils.NestedDict({})
         kwargs['mask'] = ('mask[virtualServers[serviceGroups'
                           '[services[groupReferences]]]]')
 
@@ -244,9 +244,9 @@ class LoadBalancerManager(IdentifierMixin, object):
                             'weight': weight
                         }
                     ]
-                    }
-                virtual_server['serviceGroups'][0]['services']. \
-                    append(service_template)
+                }
+                services = virtual_server['serviceGroups'][0]['services']
+                services.append(service_template)
 
         return self.lb_svc.editObject(load_balancer, id=loadbal_id)
 
@@ -259,7 +259,7 @@ class LoadBalancerManager(IdentifierMixin, object):
         :param int routing_type: the routing type to set on the service group
         :param int routing_method: The routing method to set on the group
         """
-        kwargs = NestedDict({})
+        kwargs = utils.NestedDict({})
         kwargs['mask'] = ('mask[virtualServers[serviceGroups'
                           '[services[groupReferences]]]]')
         load_balancer = self.lb_svc.getObject(id=lb_id, **kwargs)
@@ -288,7 +288,7 @@ class LoadBalancerManager(IdentifierMixin, object):
         :param int routing_type: the routing type to set on the service group
         :param int routing_method: The routing method to set on the group
         """
-        kwargs = NestedDict({})
+        kwargs = utils.NestedDict({})
         kwargs['mask'] = ('mask[virtualServers[serviceGroups'
                           '[services[groupReferences]]]]')
 
@@ -313,10 +313,10 @@ class LoadBalancerManager(IdentifierMixin, object):
         :param int loadbal_id: The id of the loadbal
         :param int group_id: The id of the service group to reset
         """
-        _filter = NestedDict({})
-        _filter['virtualServers']['id'] = query_filter(group_id)
+        _filter = utils.NestedDict({})
+        _filter['virtualServers']['id'] = utils.query_filter(group_id)
 
-        kwargs = NestedDict({})
+        kwargs = utils.NestedDict({})
         kwargs['filter'] = _filter.to_dict()
         kwargs['mask'] = 'mask[serviceGroups]'
 

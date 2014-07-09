@@ -237,7 +237,7 @@ def get_server_categories_mock():
             'sort': 9,
             'item': {
                 'description': 'Ubuntu Linux 12.04 LTS Precise Pangolin - '
-                'Minimal Install (64 bit)',
+                               'Minimal Install (64 bit)',
                 'id': 4170
             },
             'laborFee': '0',
@@ -251,7 +251,7 @@ def get_server_categories_mock():
             'sort': 9,
             'item': {
                 'description': 'Ubuntu Linux 12.04 LTS Precise Pangolin '
-                '(64 bit)',
+                               '(64 bit)',
                 'id': 4166
             },
             'id': 17430,
@@ -268,7 +268,7 @@ def get_server_categories_mock():
             'sort': 15,
             'item': {
                 'description': 'Windows Server 2008 R2 Standard Edition '
-                '(64bit)',
+                               '(64bit)',
                 'id': 977
             },
             'id': 1858,
@@ -282,7 +282,7 @@ def get_server_categories_mock():
             'sort': 15,
             'item': {
                 'description': 'Windows Server 2008 R2 Enterprise Edition '
-                '(64bit)',
+                               '(64bit)',
                 'id': 978
             },
             'id': 1861,
@@ -297,7 +297,7 @@ def get_server_categories_mock():
             'sort': 15,
             'item': {
                 'description': 'Windows Server 2008 R2 Datacenter Edition '
-                'With Hyper-V (64bit)',
+                               'With Hyper-V (64bit)',
                 'id': 980
             },
             'laborFee': '0',
@@ -311,7 +311,7 @@ def get_server_categories_mock():
             'sort': 18,
             'item': {
                 'description': 'Windows Server 2003 Standard SP2 with R2 '
-                '(64 bit)',
+                               '(64 bit)',
                 'id': 422
             },
             'id': 692,
@@ -440,7 +440,7 @@ def get_server_categories_mock():
             'item': {
                 'capacity': '10',
                 'description': '10 Mbps Dual Public & Private Networks '
-                '(up to 20 Mbps)',
+                               '(up to 20 Mbps)',
                 'id': 4332
             },
             'laborFee': '0',
@@ -456,7 +456,7 @@ def get_server_categories_mock():
             'item': {
                 'capacity': '100',
                 'description': '100 Mbps Dual Public & Private Networks '
-                '(up to 200 Mbps)',
+                               '(up to 200 Mbps)',
                 'id': 4336
             },
             'laborFee': '0',
@@ -637,7 +637,7 @@ def get_bmc_categories_mock():
             'item': {
                 'capacity': '2',
                 'description': '2 x 2.0 GHz Core Bare Metal Instance - '
-                '2 GB Ram',
+                               '2 GB Ram',
                 'id': 1013
             },
             'laborFee': '0',
@@ -653,7 +653,7 @@ def get_bmc_categories_mock():
             'item': {
                 'capacity': '4',
                 'description': '4 x 2.0 GHz Core Bare Metal Instance - '
-                '4 GB Ram',
+                               '4 GB Ram',
                 'id': 1014
             },
             'laborFee': '0',
@@ -669,7 +669,7 @@ def get_bmc_categories_mock():
             'item': {
                 'capacity': '2',
                 'description': '2 x 2.0 GHz Core Bare Metal Instance - '
-                '4 GB Ram',
+                               '4 GB Ram',
                 'id': 1014
             },
             'laborFee': '0',
@@ -717,7 +717,7 @@ def get_bmc_categories_mock():
             'sort': 1,
             'item': {
                 'description': 'Red Hat Enterprise Linux 6 - Minimal Install '
-                '(64 bit)',
+                               '(64 bit)',
                 'id': 3838
             },
             'id': 13798,
@@ -731,7 +731,7 @@ def get_bmc_categories_mock():
             'sort': 1,
             'item': {
                 'description': 'Red Hat Enterprise Linux 6 - LAMP Install '
-                '(64 bit)',
+                               '(64 bit)',
                 'id': 3834
             },
             'id': 13795,
@@ -749,7 +749,7 @@ def get_bmc_categories_mock():
             'sort': 9,
             'item': {
                 'description': 'Ubuntu Linux 12.04 LTS Precise Pangolin - '
-                'Minimal Install (64 bit)',
+                               'Minimal Install (64 bit)',
                 'id': 4170
             },
             'laborFee': '0',
@@ -764,7 +764,7 @@ def get_bmc_categories_mock():
             'sort': 9,
             'item': {
                 'description': 'Ubuntu Linux 12.04 LTS Precise Pangolin - '
-                'LAMP Install (64 bit)',
+                               'LAMP Install (64 bit)',
                 'id': 4168
             },
             'laborFee': '0',
@@ -782,7 +782,7 @@ def get_bmc_categories_mock():
             'sort': 16,
             'item': {
                 'description': 'Windows Server 2008 Standard Edition SP2 '
-                '(64bit)',
+                               '(64bit)',
                 'id': 936
             },
             'laborFee': '0',
@@ -797,7 +797,7 @@ def get_bmc_categories_mock():
             'sort': 16,
             'item': {
                 'description': 'Windows Server 2008 Enterprise Edition SP2 '
-                '(64bit)',
+                               '(64bit)',
                 'id': 938
             },
             'laborFee': '0',
@@ -812,7 +812,7 @@ def get_bmc_categories_mock():
             'sort': 16,
             'item': {
                 'description': 'Windows Server 2008 Datacenter Edition SP2 '
-                '(64bit)',
+                               '(64bit)',
                 'id': 940
             },
             'laborFee': '0',
@@ -827,7 +827,7 @@ def get_bmc_categories_mock():
             'sort': 17,
             'item': {
                 'description': 'Windows Server 2012 Datacenter Edition With '
-                'Hyper-V (64bit)',
+                               'Hyper-V (64bit)',
                 'id': 4247
             },
             'laborFee': '0',
@@ -842,7 +842,7 @@ def get_bmc_categories_mock():
             'sort': 15,
             'item': {
                 'description': 'Windows Server 2008 Standard SP1 with R2 '
-                '(64 bit)',
+                               '(64 bit)',
                 'id': 4248
             },
             'laborFee': '0',
@@ -930,7 +930,7 @@ def get_bmc_categories_mock():
             'item': {
                 'capacity': '10',
                 'description': '10 Mbps Dual Public & Private Networks '
-                '(up to 20 Mbps)',
+                               '(up to 20 Mbps)',
                 'id': 4332
             },
             'laborFee': '0',
@@ -946,7 +946,7 @@ def get_bmc_categories_mock():
             'item': {
                 'capacity': '100',
                 'description': '100 Mbps Dual Public & Private Networks '
-                '(up to 200 Mbps)',
+                               '(up to 200 Mbps)',
                 'id': 4336
             },
             'laborFee': '0',
@@ -963,7 +963,7 @@ def get_bmc_categories_mock():
             'item': {
                 'capacity': '1000',
                 'description': '1 Gbps Dual Public & Private Networks '
-                '(up to 2 Gbps)',
+                               '(up to 2 Gbps)',
                 'id': 1284
             },
             'laborFee': '0',

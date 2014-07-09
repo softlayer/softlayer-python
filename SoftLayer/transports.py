@@ -5,21 +5,19 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.exceptions import (
-    SoftLayerAPIError, NotWellFormed, UnsupportedEncoding, InvalidCharacter,
-    SpecViolation, MethodNotFound, InvalidMethodParameters, InternalError,
-    ApplicationError, RemoteSystemError, TransportError)
-from SoftLayer.utils import xmlrpc_client
+from SoftLayer import exceptions
+from SoftLayer import utils
 
-import logging
-import requests
 import json
+import logging
+
+import requests
 
 LOGGER = logging.getLogger(__name__)
 
 
 def _proxies_dict(proxy):
-    """ Makes a dict appropriate to pass to requests """
+    """Makes a dict appropriate to pass to requests."""
     if not proxy:
         return None
     return {'http': proxy, 'https': proxy}
@@ -27,7 +25,7 @@ def _proxies_dict(proxy):
 
 def make_xml_rpc_api_call(uri, method, args=None, headers=None,
                           http_headers=None, timeout=None, proxy=None):
-    """ Makes a SoftLayer API call against the XML-RPC endpoint
+    """Makes a SoftLayer API call against the XML-RPC endpoint.
 
     :param string uri: endpoint URL
     :param string method: method to call E.G.: 'getObject'
@@ -41,9 +39,9 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
         largs = list(args)
         largs.insert(0, {'headers': headers})
 
-        payload = xmlrpc_client.dumps(tuple(largs),
-                                      methodname=method,
-                                      allow_none=True)
+        payload = utils.xmlrpc_client.dumps(tuple(largs),
+                                            methodname=method,
+                                            allow_none=True)
         session = requests.Session()
         req = requests.Request('POST', uri, data=payload,
                                headers=http_headers).prepare()
@@ -59,34 +57,34 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
         LOGGER.debug(response.headers)
         LOGGER.debug(response.content)
         response.raise_for_status()
-        result = xmlrpc_client.loads(response.content,)[0][0]
+        result = utils.xmlrpc_client.loads(response.content,)[0][0]
         return result
-    except xmlrpc_client.Fault as ex:
+    except utils.xmlrpc_client.Fault as ex:
         # These exceptions are formed from the XML-RPC spec
         # http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
         error_mapping = {
-            '-32700': NotWellFormed,
-            '-32701': UnsupportedEncoding,
-            '-32702': InvalidCharacter,
-            '-32600': SpecViolation,
-            '-32601': MethodNotFound,
-            '-32602': InvalidMethodParameters,
-            '-32603': InternalError,
-            '-32500': ApplicationError,
-            '-32400': RemoteSystemError,
-            '-32300': TransportError,
+            '-32700': exceptions.NotWellFormed,
+            '-32701': exceptions.UnsupportedEncoding,
+            '-32702': exceptions.InvalidCharacter,
+            '-32600': exceptions.SpecViolation,
+            '-32601': exceptions.MethodNotFound,
+            '-32602': exceptions.InvalidMethodParameters,
+            '-32603': exceptions.InternalError,
+            '-32500': exceptions.ApplicationError,
+            '-32400': exceptions.RemoteSystemError,
+            '-32300': exceptions.TransportError,
         }
-        raise error_mapping.get(ex.faultCode, SoftLayerAPIError)(
+        raise error_mapping.get(ex.faultCode, exceptions.SoftLayerAPIError)(
             ex.faultCode, ex.faultString)
     except requests.HTTPError as ex:
-        raise TransportError(ex.response.status_code, str(ex))
+        raise exceptions.TransportError(ex.response.status_code, str(ex))
     except requests.RequestException as ex:
-        raise TransportError(0, str(ex))
+        raise exceptions.TransportError(0, str(ex))
 
 
 def make_rest_api_call(method, url,
                        http_headers=None, timeout=None, proxy=None):
-    """ Makes a SoftLayer API call against the REST endpoint
+    """Makes a SoftLayer API call against the REST endpoint.
 
     :param string method: HTTP method: GET, POST, PUT, DELETE
     :param string url: endpoint URL
@@ -108,8 +106,10 @@ def make_rest_api_call(method, url,
     except requests.HTTPError as ex:
         if url.endswith('.json'):
             content = json.loads(ex.response.content)
-            raise SoftLayerAPIError(ex.response.status_code, content['error'])
+            raise exceptions.SoftLayerAPIError(ex.response.status_code,
+                                               content['error'])
         else:
-            raise SoftLayerAPIError(ex.response.status_code, ex.response.text)
+            raise exceptions.SoftLayerAPIError(ex.response.status_code,
+                                               ex.response.text)
     except requests.RequestException as ex:
-        raise TransportError(0, str(ex))
+        raise exceptions.TransportError(0, str(ex))

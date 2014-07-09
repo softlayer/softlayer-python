@@ -7,13 +7,13 @@
 import os
 
 import SoftLayer
-from SoftLayer.tests import TestCase, unittest
+from SoftLayer import testing
 
 
 def get_creds():
     for key in 'SL_USERNAME SL_API_KEY'.split():
         if key not in os.environ:
-            raise unittest.SkipTest(
+            raise testing.unittest.SkipTest(
                 'SL_USERNAME and SL_API_KEY environmental variables not set')
 
     return {
@@ -24,7 +24,7 @@ def get_creds():
     }
 
 
-class UnauthedUser(TestCase):
+class UnauthedUser(testing.TestCase):
     def test_failed_auth(self):
         client = SoftLayer.Client(
             username='doesnotexist', api_key='issurelywrong', timeout=20)
@@ -35,7 +35,7 @@ class UnauthedUser(TestCase):
     def test_no_hostname(self):
         try:
             # This test will fail if 'notvalidsoftlayer.com' becomes a thing
-            SoftLayer.API.make_xml_rpc_api_call(
+            SoftLayer.transports.make_xml_rpc_api_call(
                 'http://notvalidsoftlayer.com', 'getObject')
         except SoftLayer.SoftLayerAPIError as e:
             self.assertEqual(e.faultCode, 0)
@@ -45,7 +45,7 @@ class UnauthedUser(TestCase):
             self.fail('No Exception Raised')
 
 
-class AuthedUser(TestCase):
+class AuthedUser(testing.TestCase):
     def test_service_does_not_exist(self):
         creds = get_creds()
         client = SoftLayer.Client(

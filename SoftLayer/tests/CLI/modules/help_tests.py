@@ -4,14 +4,14 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.tests import TestCase
+from SoftLayer.CLI import environment
 from SoftLayer.CLI.modules import help
-from SoftLayer.CLI.environment import Environment
+from SoftLayer import testing
 
 
-class HelpTests(TestCase):
+class HelpTests(testing.TestCase):
     def test_help(self):
-        command = help.Show(env=Environment())
+        command = help.Show(env=environment.Environment())
 
         output = command.execute({'<module>': None, '<command>': None})
         self.assertTrue('usage: sl help' in output)

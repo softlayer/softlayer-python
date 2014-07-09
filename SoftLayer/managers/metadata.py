@@ -5,9 +5,9 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.transports import make_rest_api_call
-from SoftLayer.consts import API_PRIVATE_ENDPOINT_REST, USER_AGENT
-from SoftLayer.exceptions import SoftLayerAPIError, SoftLayerError
+from SoftLayer import consts
+from SoftLayer import exceptions
+from SoftLayer import transports
 
 
 METADATA_MAPPING = {
@@ -54,7 +54,7 @@ class MetadataManager(object):
     attribs = METADATA_MAPPING
 
     def __init__(self, client=None, timeout=5):
-        self.url = API_PRIVATE_ENDPOINT_REST.rstrip('/')
+        self.url = consts.API_PRIVATE_ENDPOINT_REST.rstrip('/')
         self.timeout = timeout
         self.client = client
 
@@ -65,10 +65,11 @@ class MetadataManager(object):
         """
         url = '/'.join([self.url, 'SoftLayer_Resource_Metadata', path])
         try:
-            return make_rest_api_call('GET', url,
-                                      http_headers={'User-Agent': USER_AGENT},
-                                      timeout=self.timeout)
-        except SoftLayerAPIError as ex:
+            return transports.make_rest_api_call(
+                'GET', url,
+                http_headers={'User-Agent': consts.USER_AGENT},
+                timeout=self.timeout)
+        except exceptions.SoftLayerAPIError as ex:
             if ex.faultCode == 404:
                 return None
             raise ex
@@ -81,7 +82,7 @@ class MetadataManager(object):
 
         """
         if name not in self.attribs:
-            raise SoftLayerError('Unknown metadata attribute.')
+            raise exceptions.SoftLayerError('Unknown metadata attribute.')
 
         call_details = self.attribs[name]
         extension = '.json'
@@ -90,7 +91,7 @@ class MetadataManager(object):
 
         if call_details.get('param_req'):
             if not param:
-                raise SoftLayerError(
+                raise exceptions.SoftLayerError(
                     'Parameter required to get this attribute.')
             path = "%s/%s%s" % (self.attribs[name]['call'], param, extension)
         else:

@@ -9,17 +9,17 @@ View help on a module or command.
 # Missing docstrings ignored due to __doc__ = __doc__ magic
 # pylint: disable=C0111
 
-from SoftLayer.CLI.core import CommandParser
-from SoftLayer.CLI import CLIRunnable
+from SoftLayer.CLI import core
+from SoftLayer.CLI import environment
 
 
-class Show(CLIRunnable):
+class Show(environment.CLIRunnable):
     # Use the same documentation as the module
     __doc__ = __doc__
     action = None
 
     def execute(self, args):
-        parser = CommandParser(self.env)
+        parser = core.CommandParser(self.env)
         if not any([args['<command>'], args['<module>']]):
             return parser.get_module_help('help')
 

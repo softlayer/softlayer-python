@@ -16,12 +16,14 @@ The available record commands are:
 """
 # :license: MIT, see LICENSE for more details.
 
-from SoftLayer.CLI import (
-    CLIRunnable, no_going_back, Table, CLIAbort, resolve_id)
-from SoftLayer import DNSManager
+import SoftLayer
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 
 
-class DumpZone(CLIRunnable):
+class DumpZone(environment.CLIRunnable):
     """
 usage: sl dns print <zone> [options]
 
@@ -33,12 +35,13 @@ Arguments:
     action = "print"
 
     def execute(self, args):
-        manager = DNSManager(self.client)
-        zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
+        manager = SoftLayer.DNSManager(self.client)
+        zone_id = helpers.resolve_id(manager.resolve_ids, args['<zone>'],
+                                     name='zone')
         return manager.dump_zone(zone_id)
 
 
-class CreateZone(CLIRunnable):
+class CreateZone(environment.CLIRunnable):
     """
 usage: sl dns create <zone> [options]
 
@@ -50,11 +53,11 @@ Arguments:
     action = 'create'
 
     def execute(self, args):
-        manager = DNSManager(self.client)
+        manager = SoftLayer.DNSManager(self.client)
         manager.create_zone(args['<zone>'])
 
 
-class DeleteZone(CLIRunnable):
+class DeleteZone(environment.CLIRunnable):
     """
 usage: sl dns delete <zone> [options]
 
@@ -67,16 +70,17 @@ Arguments:
     options = ['confirm']
 
     def execute(self, args):
-        manager = DNSManager(self.client)
-        zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
+        manager = SoftLayer.DNSManager(self.client)
+        zone_id = helpers.resolve_id(manager.resolve_ids, args['<zone>'],
+                                     name='zone')
 
-        if args['--really'] or no_going_back(args['<zone>']):
+        if args['--really'] or formatting.no_going_back(args['<zone>']):
             manager.delete_zone(zone_id)
         else:
-            raise CLIAbort("Aborted.")
+            raise exceptions.CLIAbort("Aborted.")
 
 
-class ListZones(CLIRunnable):
+class ListZones(environment.CLIRunnable):
     """
 usage: sl dns list [<zone>] [options]
 
@@ -98,14 +102,15 @@ Filters:
 
     def list_zone(self, args):
         """ list records for a particular zone """
-        manager = DNSManager(self.client)
-        table = Table(['id', 'record', 'type', 'ttl', 'value'])
+        manager = SoftLayer.DNSManager(self.client)
+        table = formatting.Table(['id', 'record', 'type', 'ttl', 'value'])
 
         table.align['ttl'] = 'l'
         table.align['record'] = 'r'
         table.align['value'] = 'l'
 
-        zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
+        zone_id = helpers.resolve_id(manager.resolve_ids, args['<zone>'],
+                                     name='zone')
 
         records = manager.get_records(
             zone_id,
@@ -128,9 +133,9 @@ Filters:
 
     def list_all_zones(self):
         """ List all zones """
-        manager = DNSManager(self.client)
+        manager = SoftLayer.DNSManager(self.client)
         zones = manager.list_zones()
-        table = Table(['id', 'zone', 'serial', 'updated'])
+        table = formatting.Table(['id', 'zone', 'serial', 'updated'])
         table.align['serial'] = 'c'
         table.align['updated'] = 'c'
 
@@ -145,7 +150,7 @@ Filters:
         return table
 
 
-class AddRecord(CLIRunnable):
+class AddRecord(environment.CLIRunnable):
     """
 usage: sl dns add <zone> <record> <type> <data> [--ttl=TTL] [options]
 
@@ -164,9 +169,10 @@ Options:
     action = 'add'
 
     def execute(self, args):
-        manager = DNSManager(self.client)
+        manager = SoftLayer.DNSManager(self.client)
 
-        zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
+        zone_id = helpers.resolve_id(manager.resolve_ids, args['<zone>'],
+                                     name='zone')
 
         manager.create_record(
             zone_id,
@@ -176,7 +182,7 @@ Options:
             ttl=args['--ttl'] or 7200)
 
 
-class EditRecord(CLIRunnable):
+class EditRecord(environment.CLIRunnable):
     """
 usage: sl dns edit <zone> <record> [--data=DATA] [--ttl=TTL] [--id=ID]
                    [options]
@@ -195,8 +201,9 @@ Options:
     action = 'edit'
 
     def execute(self, args):
-        manager = DNSManager(self.client)
-        zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
+        manager = SoftLayer.DNSManager(self.client)
+        zone_id = helpers.resolve_id(manager.resolve_ids, args['<zone>'],
+                                     name='zone')
 
         results = manager.get_records(
             zone_id,
@@ -210,7 +217,7 @@ Options:
             manager.edit_record(result)
 
 
-class RecordRemove(CLIRunnable):
+class RecordRemove(environment.CLIRunnable):
     """
 usage: sl dns remove <zone> <record> [--id=ID] [options]
 
@@ -227,8 +234,9 @@ Options:
     options = ['confirm']
 
     def execute(self, args):
-        manager = DNSManager(self.client)
-        zone_id = resolve_id(manager.resolve_ids, args['<zone>'], name='zone')
+        manager = SoftLayer.DNSManager(self.client)
+        zone_id = helpers.resolve_id(manager.resolve_ids, args['<zone>'],
+                                     name='zone')
 
         if args['--id']:
             records = [{'id': args['--id']}]
@@ -237,11 +245,11 @@ Options:
                 zone_id,
                 host=args['<record>'])
 
-        if args['--really'] or no_going_back('yes'):
-            table = Table(['record'])
+        if args['--really'] or formatting.no_going_back('yes'):
+            table = formatting.Table(['record'])
             for result in records:
                 manager.delete_record(result['id'])
                 table.add_row([result['id']])
 
             return table
-        raise CLIAbort("Aborted.")
+        raise exceptions.CLIAbort("Aborted.")
