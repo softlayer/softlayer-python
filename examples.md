@@ -12,6 +12,6 @@ baseurl: "../"
 
 Wondering where to go next? Here are a few ideas.
 
-* Learn the intricacies of the CLI in our [Developer's Guide]({{page.baseurl}}developers-guide)  
-* [Become a contributor]({{page.baseurl}}contributing/#toc_0)
+* Learn the intricacies of CLI in our [Developer's Guide]({{page.baseurl}}developers-guide)  
+* [Become a contributor]({{page.baseurl}}contributing)
 * Connected with us and [our community members]({{page.baseurl}}contributing/#toc_14)
