@@ -1,0 +1,28 @@
+/* =========================
+   Invert
+   ========================= */
+
+a#invert-toggle {
+    position: absolute;
+    top: 17.5px;
+    display: block;
+    background-color: transparent;
+    color: @base70 !important;
+    text-align: center;
+    cursor: pointer;
+    right: 16px;
+    font-size: 24.5px;
+}
+
+.invert {
+    background-color: @black;
+    color: @body-bg;
+
+    a {
+        color: lighten(@link-color, 24%);
+    }
+
+    h1, h2, h3, h4 {
+  	color: @gray70;
+    }
+}
