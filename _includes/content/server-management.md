@@ -1,6 +1,6 @@
 # Introduction 
 
-This section is a blended "how to" and "FAQ" for creating and working with virtual servers. Several examples are **real user scenarios**, whereas others are simply **usage examples**. Included are the following:
+This section is a blended "how to" and "FAQ" for creating and working with virtual servers. Several examples are real user scenarios, whereas others are simply usage examples. Included are the following:
 
 <div class="container">
 <div class="row">
