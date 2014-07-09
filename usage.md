@@ -5,4 +5,4 @@ intro: Real-world scenarios and snippets that show how easy it is to work with v
 baseurl: "../"
 ---
 
-{% include content/virtual-servers.md %}
+{% include content/server-management.md %}
