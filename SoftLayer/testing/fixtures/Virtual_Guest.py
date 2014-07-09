@@ -218,6 +218,7 @@ deleteObject = True
 setPrivateNetworkInterfaceSpeed = True
 setPublicNetworkInterfaceSpeed = True
 createObject = getObject
+createObjects = True
 generateOrderTemplate = {}
 setUserMetadata = ['meta']
 reloadOperatingSystem = 'OK'

@@ -142,6 +142,19 @@ class VSTests(testing.TestCase):
         self.client['Virtual_Guest'].createObject.assert_called_once_with(
             {'test': 1, 'verify': 1})
 
+    def test_create_instances(self):
+        self.vs.create_instances([{'cpus': 1,
+                                   'memory': 1024,
+                                   'hostname': 'server',
+                                   'domain': 'example.com'}])
+        self.client['Virtual_Guest'].createObjects.assert_called_once_with([
+            {'domain': 'example.com',
+             'hourlyBillingFlag': True,
+             'localDiskFlag': True,
+             'maxMemory': 1024, 'hostname':
+             'server',
+             'startCpus': 1}])
+
     def test_generate_os_and_image(self):
         self.assertRaises(
             ValueError,
