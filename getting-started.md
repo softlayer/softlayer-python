@@ -24,14 +24,11 @@ There are a number of ways to install the {{site.project.alias}} with our CLI. S
 {% include content/configure.md %}
 
 ***
-{% include content/virtual-servers.md %}
-
-***
 # Where to Go Next
 
 Wondering where to go next? Here are a few ideas.
 
-* Check out the official docs for <a href="http://softlayer-python.readthedocs.org/en/latest" target="_blank">Python Client</a>
+* See [user scenarios and usage examples]({{page.baseurl}}usage) for creating and working with virtual servers 
 * Learn about [becoming a contributor]({{page.baseurl}}contributing/#toc_0)
 * Get connected to us and [our community]({{page.baseurl}}contributing/#toc_14)
 * Boost your knowledge of GitHub and explore the articles on <a href="http://help.github.com" target="_blank">GitHub Help</a>
