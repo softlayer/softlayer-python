@@ -445,17 +445,24 @@ class VSManager(utils.IdentifierMixin, object):
                                 this VS placed.
         :param int private_vlan: The ID of the public VLAN on which you want
                                  this VS placed.
-        :param bool bare_metal: Flag to indicate if this is a bare metal server
-                                or a dedicated server (default).
         :param list disks: A list of disk capacities for this server.
         :param string post_uri: The URI of the post-install script to run
                                 after reload
         :param bool private: If true, the VS will be provisioned only with
                              access to the private network. Defaults to false
         :param list ssh_keys: The SSH keys to add to the root user
+        :param int nic_speed: The port speed to set
         """
-        create_options = self._generate_create_dict(**kwargs)
-        return self.guest.createObject(create_options)
+        return self.guest.createObject(self._generate_create_dict(**kwargs))
+
+    def create_instances(self, config_list):
+        """ Creates multiple virtual server instances
+
+        This takes a list of dictionaries using the same arguments as
+        create_instance().
+        """
+        return self.guest.createObjects([self._generate_create_dict(**kwargs)
+                                         for kwargs in config_list])
 
     def change_port_speed(self, instance_id, public, speed):
         """ Allows you to change the port speed of a virtual server's NICs.
