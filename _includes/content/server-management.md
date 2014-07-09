@@ -1,6 +1,6 @@
-# Working with Virtual Servers
+# Introduction 
 
-This section is a blended "how to" and "FAQ" for working with virtual servers. Several examples are real user scenarios, whereas others are simply usage examples. It includes the following:
+This section is a blended "how to" and "FAQ" for creating and working with virtual servers. Several examples are **real user scenarios**, whereas others are simply **usage examples**. Included are the following:
 
 <div class="container">
 <div class="row">
@@ -9,18 +9,21 @@ This section is a blended "how to" and "FAQ" for working with virtual servers. S
 <li><a href="#toc_16">See Available Options</a></li>
 <li><a href="#toc_17">Create a Virtual Server</a></li>
 <li><a href="#toc_18">Check Status</a></li>
-<li><a href="#toc_19">Access a Virtual Server</a></li>
 </div>
 
 <div class="col-lg-4 col-md-4">
+<li><a href="#toc_19">Access a Virtual Server</a></li>
 <li><a href="#toc_20">Edit a Virtual Server</a></li>
 <li><a href="#toc_21">Reload a Virtual Server</a></li>
 <li><a href="#toc_22">Cancel a Virtual Server</a></li>
-<li><a href="#toc_23">Additional Commands</a></li>
-<li><a href="#toc_24">Additional Options</a></li>
 </div>
 </div>
 </div>
+
+***
+# User Scenarios
+
+Below are individual scenarios for creating and managing virtual servers.
 
 ### List Virtual Servers
 
@@ -37,7 +40,7 @@ $ sl vs list
 ```
 </section>
 
-***
+
 ### See Available Options
 
 Before we can create a virtual server, we need to know what options are available. This includes:
@@ -119,7 +122,7 @@ $ sl vs create-options
 ```
 </section>
 
-***
+
 ### Create a Virtual Server
 
 Looking at our options, we'll make a virtual server with the following server options:
@@ -189,7 +192,7 @@ $ sl vs list
 ```
 </section>
 
-***
+
 ### Check Status
 
 Run the following command to see if your virtual server is ready to use.
@@ -203,7 +206,7 @@ READY
 
 The "READY" status indicates that the virtual server has finished the provisioning process and is ready to use.
 
-***
+
 ### Access a Virtual Server
 
 Now that we have a virtual server, we need access to it. To do this, run `sl vs detail [host]`. The CLI will show the basic details about the virtual server.
@@ -239,6 +242,10 @@ $ sl vs detail example --passwords
 > Be careful when using the `-–passwords` option. This prints the password onto your screen, which others might see. In addition, we recommend that you change your password immediately after creating your virtual server.
 
 ***
+# Usage Examples
+
+Below are examples that demonstrate how to manage virtual servers.
+
 ### Edit a Virtual Server
 
 You can edit several details for each individual virtual server, such as the domain and hostname. Run `sl vs edit --help` to see usage examples.
@@ -256,7 +263,6 @@ Options:
   -u --userdata=DATA  User defined metadata string
 ```
 
-***
 ### Reload a Virtual Server
 
 You can reload the OS for a virtual server based on its current configuration. Run `sl vs reload --help` to see usage examples.
@@ -274,7 +280,6 @@ Optional:
                            multiple times
 ```
 
-***
 ### Cancel a Virtual Server
 
 In addition to ordering a virtual server, you can also use the CLI to cancel one. Run `sl vs cancel --help` to see usage examples.
@@ -287,7 +292,7 @@ Cancel a virtual server
 ```
 
 ***
-### Additional Commands
+# Additional Commands
 
 There are a number of other commands to help manage your virtual servers. To see them all, run `sl help vs`.
 
@@ -325,7 +330,7 @@ Standard Options:
 ```
 
 ***
-### Additional Options
+# Additional Options
 
 Below is a list of options to use for ordering/creating your virtual servers. To see them all, run `sl vs create --help`.
 
