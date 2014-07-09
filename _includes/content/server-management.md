@@ -5,17 +5,17 @@ This section is a blended "how to" and "FAQ" for creating and working with virtu
 <div class="container">
 <div class="row">
 <div class="col-lg-4 col-md-4">
-<li><a href="#toc_15">List Virtual Servers</a></li>
-<li><a href="#toc_16">See Available Options</a></li>
-<li><a href="#toc_17">Create a Virtual Server</a></li>
-<li><a href="#toc_18">Check Status</a></li>
+<li><a href="#toc_2">List Virtual Servers</a></li>
+<li><a href="#toc_3">See Available Options</a></li>
+<li><a href="#toc_4">Create a Virtual Server</a></li>
+<li><a href="#toc_5">Check Status</a></li>
 </div>
 
 <div class="col-lg-4 col-md-4">
-<li><a href="#toc_19">Access a Virtual Server</a></li>
-<li><a href="#toc_20">Edit a Virtual Server</a></li>
-<li><a href="#toc_21">Reload a Virtual Server</a></li>
-<li><a href="#toc_22">Cancel a Virtual Server</a></li>
+<li><a href="#toc_6">Access a Virtual Server</a></li>
+<li><a href="#toc_8">Edit a Virtual Server</a></li>
+<li><a href="#toc_9">Reload a Virtual Server</a></li>
+<li><a href="#toc_10">Cancel a Virtual Server</a></li>
 </div>
 </div>
 </div>
@@ -25,7 +25,7 @@ This section is a blended "how to" and "FAQ" for creating and working with virtu
 
 Below are individual scenarios for creating and managing virtual servers.
 
-### List Virtual Servers
+## List Virtual Servers
 
 Run `sl vs list` to generate a list of current virtual servers. In this example, the CLI spits out an empty list.
 
@@ -41,7 +41,7 @@ $ sl vs list
 </section>
 
 
-### See Available Options
+## See Available Options
 
 Before we can create a virtual server, we need to know what options are available. This includes:
 
@@ -123,7 +123,7 @@ $ sl vs create-options
 </section>
 
 
-### Create a Virtual Server
+## Create a Virtual Server
 
 Looking at our options, we'll make a virtual server with the following server options:
 
@@ -193,7 +193,7 @@ $ sl vs list
 </section>
 
 
-### Check Status
+## Check Status
 
 Run the following command to see if your virtual server is ready to use.
 
@@ -207,7 +207,7 @@ READY
 The "READY" status indicates that the virtual server has finished the provisioning process and is ready to use.
 
 
-### Access a Virtual Server
+## Access a Virtual Server
 
 Now that we have a virtual server, we need access to it. To do this, run `sl vs detail [host]`. The CLI will show the basic details about the virtual server.
 
@@ -246,7 +246,7 @@ $ sl vs detail example --passwords
 
 Below are examples that demonstrate how to manage virtual servers.
 
-### Edit a Virtual Server
+## Edit a Virtual Server
 
 You can edit several details for each individual virtual server, such as the domain and hostname. Run `sl vs edit --help` to see usage examples.
 
@@ -263,7 +263,7 @@ Options:
   -u --userdata=DATA  User defined metadata string
 ```
 
-### Reload a Virtual Server
+## Reload a Virtual Server
 
 You can reload the OS for a virtual server based on its current configuration. Run `sl vs reload --help` to see usage examples.
 
@@ -280,7 +280,7 @@ Optional:
                            multiple times
 ```
 
-### Cancel a Virtual Server
+## Cancel a Virtual Server
 
 In addition to ordering a virtual server, you can also use the CLI to cancel one. Run `sl vs cancel --help` to see usage examples.
 
