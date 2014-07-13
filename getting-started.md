@@ -1,7 +1,7 @@
 ---
 layout: pages
 header: Getting Started
-intro: Your "how to" source for downloading, installing, configuring, and working with CLI.
+intro: Your "how to" source for downloading, installing, and configuration.
 baseurl: "../"
 ---
 
