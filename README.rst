@@ -15,10 +15,7 @@ This library provides a simple interface to interact with SoftLayer's XML-RPC AP
 
 Documentation
 -------------
-Documentation is available at https://softlayer-python.readthedocs.org
-
-* API Client: https://softlayer-python.readthedocs.org/en/latest/api/client.html
-* Command-line Interface: https://softlayer-python.readthedocs.org/en/latest/cli.html
+Documentation is available at http://softlayer.github.io/softlayer-python/
 
 Installation
 ------------
@@ -44,7 +41,7 @@ library.
 
 System Requirements
 -------------------
-* This library has been tested on Python 2.6, 2.7, 3.2 and 3.3.
+* This library has been tested on Python 2.6, 2.7, 3.3 and 3.4.
 * A valid SoftLayer API username and key are required to call SoftLayer's API
 * A connection to SoftLayer's private network is required to connect to
   SoftLayer’s private network API endpoints.
