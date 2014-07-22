@@ -19,6 +19,7 @@ Networking:
   cdn        Content Delivery Network service management
   dns        Domain Name System
   firewall   Firewall rule and security management
+  loadbal    Load Balancer management
   globalip   Global IP address management
   messaging  Message Queue Service
   rwhois     RWhoIs operations
