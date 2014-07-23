@@ -366,7 +366,7 @@ Optional:
   --test                 Do not create VS, just get a quote
   --export=FILE          Exports options to a template file
   -F, --userfile=FILE    Read userdata from file
-  -g --tag=TAG           Comma list of tags to set or empty string to remove all
+  -g --tag=TAG           Comma list of tags to set
   -i, --postinstall=URI  Post-install script to download
                            (Only HTTPS executes, HTTP leaves file in /root)
   -k, --key=KEY          SSH keys to add to the root user. Can be specified
@@ -538,7 +538,6 @@ Optional:
             if tag_refs is not None and len(tag_refs) > 0:
                 tags = ','.join([t['tag']['name'] for t in tag_refs])
                 like_args['--tag'] = tags
-                
 
             # Handle mutually exclusive options
             like_image = utils.lookup(like_details,

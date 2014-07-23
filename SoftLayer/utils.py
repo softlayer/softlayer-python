@@ -165,10 +165,10 @@ def dict_extract(dictionary, keys):
     :param dict keys: a dict who's keys specify the keys to extract
     from the dictionary and values are the defaults to use if
     the key is not in the target dict.
-    :returns tuple 
+    :returns tuple
     """
     vals = []
-    for key, default in keys.iteritems():
+    for key, default in keys.items():
         vals.append(dictionary.get(key, default))
         if dictionary.get(key, None) is not None:
             del dictionary[key]

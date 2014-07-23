@@ -452,8 +452,7 @@ class VSManager(utils.IdentifierMixin, object):
                              access to the private network. Defaults to false
         :param list ssh_keys: The SSH keys to add to the root user
         :param int nic_speed: The port speed to set
-        :param string tag: tags to set on the VS as a comma separated list.
-                            Use the empty string to remove all tags.
+        :param string tag: tags to set on the VS as a comma separated list
         """
         tag, = utils.dict_extract(kwargs, {'tag': None})
         inst = self.guest.createObject(self._generate_create_dict(**kwargs))
@@ -473,9 +472,9 @@ class VSManager(utils.IdentifierMixin, object):
         resp = self.guest.createObjects([self._generate_create_dict(**kwargs)
                                          for kwargs in config_list])
 
-        for index in range(0, len(resp)):
-            if tags[index] is not None:
-                self.guest.setTags(tags[index], id=resp[index]['id'])
+        for instance, tag in zip(resp, tags):
+            if tag is not None:
+                self.guest.setTags(tag, id=instance['id'])
 
         return resp
 
