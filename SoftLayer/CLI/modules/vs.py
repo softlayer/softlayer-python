@@ -366,6 +366,7 @@ Optional:
   --test                 Do not create VS, just get a quote
   --export=FILE          Exports options to a template file
   -F, --userfile=FILE    Read userdata from file
+  -g --tag=TAG           Comma list of tags to set or empty string to remove all
   -i, --postinstall=URI  Post-install script to download
                            (Only HTTPS executes, HTTP leaves file in /root)
   -k, --key=KEY          SSH keys to add to the root user. Can be specified
@@ -533,6 +534,12 @@ Optional:
                 '--private': like_details['privateNetworkOnlyFlag'],
             }
 
+            tag_refs = like_details.get('tagReferences', None)
+            if tag_refs is not None and len(tag_refs) > 0:
+                tags = ','.join([t['tag']['name'] for t in tag_refs])
+                like_args['--tag'] = tags
+                
+
             # Handle mutually exclusive options
             like_image = utils.lookup(like_details,
                                       'blockDeviceTemplateGroup',
@@ -627,6 +634,9 @@ Optional:
 
         if args.get('--vlan_private'):
             data['private_vlan'] = args['--vlan_private']
+
+        if args.get('--tag'):
+            data['tag'] = args['--tag']
 
         return data
 
@@ -970,6 +980,7 @@ Edit a virtual server's details
 Options:
   -D --domain=DOMAIN  Domain portion of the FQDN example: example.com
   -F --userfile=FILE  Read userdata from file
+  -g --tag=TAG        Comma list of tags to set or empty string to remove all
   -H --hostname=HOST  Host portion of the FQDN. example: server
   -u --userdata=DATA  User defined metadata string
 """
@@ -995,6 +1006,7 @@ Options:
 
         data['hostname'] = args.get('--hostname')
         data['domain'] = args.get('--domain')
+        data['tag'] = args.get("--tag")
 
         vsi = SoftLayer.VSManager(self.client)
         vs_id = helpers.resolve_id(vsi.resolve_ids,

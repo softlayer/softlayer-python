@@ -452,8 +452,14 @@ class VSManager(utils.IdentifierMixin, object):
                              access to the private network. Defaults to false
         :param list ssh_keys: The SSH keys to add to the root user
         :param int nic_speed: The port speed to set
+        :param string tag: tags to set on the VS as a comma separated list.
+                            Use the empty string to remove all tags.
         """
-        return self.guest.createObject(self._generate_create_dict(**kwargs))
+        tag, = utils.dict_extract(kwargs, {'tag': None})
+        inst = self.guest.createObject(self._generate_create_dict(**kwargs))
+        if tag is not None:
+            self.guest.setTags(tag, id=inst['id'])
+        return inst
 
     def create_instances(self, config_list):
         """ Creates multiple virtual server instances
@@ -461,8 +467,17 @@ class VSManager(utils.IdentifierMixin, object):
         This takes a list of dictionaries using the same arguments as
         create_instance().
         """
-        return self.guest.createObjects([self._generate_create_dict(**kwargs)
+        tags = [utils.dict_extract(conf, {'tag': None})[0]
+                for conf in config_list]
+
+        resp = self.guest.createObjects([self._generate_create_dict(**kwargs)
                                          for kwargs in config_list])
+
+        for index in range(0, len(resp)):
+            if tags[index] is not None:
+                self.guest.setTags(tags[index], id=resp[index]['id'])
+
+        return resp
 
     def change_port_speed(self, instance_id, public, speed):
         """ Allows you to change the port speed of a virtual server's NICs.
@@ -503,7 +518,7 @@ class VSManager(utils.IdentifierMixin, object):
             return [result['id'] for result in results]
 
     def edit(self, instance_id, userdata=None, hostname=None, domain=None,
-             notes=None):
+             notes=None, tag=None):
         """ Edit hostname, domain name, notes, and/or the user data of a VS
 
         Parameters set to None will be ignored and not attempted to be updated.
@@ -514,12 +529,17 @@ class VSManager(utils.IdentifierMixin, object):
         :param string hostname: valid hostname
         :param string domain: valid domain namem
         :param string notes: notes about this particular VS
+        :param string tag: tags to set on the VS as a comma separated list.
+                            Use the empty string to remove all tags.
 
         """
 
         obj = {}
         if userdata:
             self.guest.setUserMetadata([userdata], id=instance_id)
+
+        if tag is not None:
+            self.guest.setTags(tag, id=instance_id)
 
         if hostname:
             obj['hostname'] = hostname

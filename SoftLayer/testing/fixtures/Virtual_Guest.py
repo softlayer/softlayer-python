@@ -218,9 +218,9 @@ deleteObject = True
 setPrivateNetworkInterfaceSpeed = True
 setPublicNetworkInterfaceSpeed = True
 createObject = getObject
-createObjects = True
+createObjects = [getObject]
 generateOrderTemplate = {}
 setUserMetadata = ['meta']
 reloadOperatingSystem = 'OK'
-
+setTags = True
 createArchiveTransaction = {}

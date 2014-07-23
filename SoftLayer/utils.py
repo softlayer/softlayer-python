@@ -156,3 +156,20 @@ def resolve_ids(identifier, resolvers):
             return ids
 
     return []
+
+
+def dict_extract(dictionary, keys):
+    """Extracts & removes keys from a dict with a default value.
+
+    :param dict dictionary: the target dictionary to operate on
+    :param dict keys: a dict who's keys specify the keys to extract
+    from the dictionary and values are the defaults to use if
+    the key is not in the target dict.
+    :returns tuple 
+    """
+    vals = []
+    for key, default in keys.iteritems():
+        vals.append(dictionary.get(key, default))
+        if dictionary.get(key, None) is not None:
+            del dictionary[key]
+    return tuple(vals)
