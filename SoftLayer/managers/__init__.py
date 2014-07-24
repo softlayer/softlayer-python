@@ -25,9 +25,10 @@ from SoftLayer.managers.sshkey import SshKeyManager  # NOQA
 from SoftLayer.managers.ssl import SSLManager  # NOQA
 from SoftLayer.managers.ticket import TicketManager  # NOQA
 from SoftLayer.managers.vs import VSManager  # NOQA
+from SoftLayer.managers.autoscale import AutoscaleManager  # NOQA
 
 __all__ = ['CCIManager', 'DNSManager', 'FirewallManager', 'HardwareManager',
            'ImageManager', 'MessagingManager', 'MetadataManager', 'CDNManager',
            'NetworkManager', 'SshKeyManager', 'SSLManager', 'TicketManager',
            'VSManager', 'ISCSIManager', 'LoadBalancerManager',
-           'OrderingManager']
+           'OrderingManager','AutoscaleManager']

@@ -8,9 +8,14 @@
 
 from SoftLayer import utils
 
-AUTOSCALE_MASK = ('regionalGroup,policies.triggers,policies.actions,'
+AUTOSCALE_MASK = ('regionalGroup,'
+              'policies.repeatingTriggers.schedule,policies.repeatingTriggers.type,'
+              'policies.oneTimeTriggers.date,policies.oneTimeTriggers.type,'
+              'policies.resourceUseTriggers.watches,policies.resourceUseTriggers.type,'
+              'policies.scaleActions.type,terminationPolicy,'
               'loadBalancers.routingMethod,loadBalancers.routingType,'
-              'loadBalancers.healthCheck.type,loadBalancers.healthCheck.attributes,loadBalancers.virtualServer')
+              'loadBalancers.healthCheck.type,loadBalancers.healthCheck.attributes,loadBalancers.virtualServer,'
+              'virtualGuestMembers.virtualGuest.primaryBackendIpAddress,virtualGuestMembers.virtualGuest.primaryIpAddress,virtualGuestMembers.virtualGuest.datacenter')
 
 class AutoscaleManager(utils.IdentifierMixin, object):
     """
@@ -32,9 +37,7 @@ class AutoscaleManager(utils.IdentifierMixin, object):
         if 'mask' not in kwargs:
             kwargs['mask'] = AUTOSCALE_MASK
 
-        x=self.client_scalegroup.getObject(id=group_id, **kwargs)
-        print x
-        return x
+        return self.client_scalegroup.getObject(id=group_id, **kwargs)
 
     def delete_group(self, group_id):
         """ deletes the specified group.
