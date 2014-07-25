@@ -20,6 +20,9 @@ class ListGroups(environment.CLIRunnable):
 usage: sl autoscale list [options]
 
 List autoscale groups
+
+Filters:
+  --name=NAME               Name of the autoscale group
 """
     action = 'list'
 
@@ -28,7 +31,18 @@ List autoscale groups
 
 
         mask="virtualGuestAssetCount"
-        groups = autoscale_mgr.list_groups(mask=mask)
+        if args.get('--name'):
+            name=args.get('--name')
+            _filter={'scaleGroups': 
+                           {'name': 
+                                { 'operation' : 'in',
+                                  'options' :[{'name':'data','value':[name]}]
+                                }
+                           }
+                    }
+            groups = autoscale_mgr.list_groups(mask=mask,filter=_filter)
+        else:
+            groups = autoscale_mgr.list_groups(mask=mask)
         
 
         table = formatting.Table(['id',

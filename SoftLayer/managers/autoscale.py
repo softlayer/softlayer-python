@@ -46,7 +46,7 @@ class AutoscaleManager(utils.IdentifierMixin, object):
         """
         self.client_scalegroup.deleteObject(id=group_id)
 
-    def list_groups(self, name=None, **kwargs):
+    def list_groups(self, **kwargs):
         """ List all Autoscale groups.
 
         :param string name: filter based on name
@@ -54,13 +54,6 @@ class AutoscaleManager(utils.IdentifierMixin, object):
         """
         if 'mask' not in kwargs:
             kwargs['mask'] = AUTOSCALE_MASK
-
-        _filter = utils.NestedDict(kwargs.get('filter') or {})
-        if name:
-            _filter['name'] = (
-                utils.query_filter(name))
-
-        kwargs['filter'] = _filter.to_dict()
 
         account = self.client['Account']
         return account.getScaleGroups(**kwargs)
