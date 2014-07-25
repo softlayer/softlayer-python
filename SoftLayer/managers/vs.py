@@ -610,7 +610,7 @@ class VSManager(utils.IdentifierMixin, object):
         """
         Following Method gets all the item ids related to VS
         """
-        mask = "mask[description,capacity,prices.id,categories[name,id]]"
+        mask = "mask[description,capacity,prices[id,categories[name,id]]]"
         package_type = "VIRTUAL_SERVER_INSTANCE"
         package_id = self.ordering_manager.get_package_id_by_type(package_type)
         package_service = self.ordering_manager.get_package_service()
@@ -628,8 +628,9 @@ class VSManager(utils.IdentifierMixin, object):
         """
         vs_id = {'memory': 3, 'cpus': 80, 'nic_speed': 26}
         for item in package_items:
-            for j in range(len(item['categories'])):
-                if not (item['categories'][j]['id'] == vs_id[option] and
+            categories = item['prices'][0]['categories']
+            for j in range(len(categories)):
+                if not (categories[j]['id'] == vs_id[option] and
                         item['capacity'] == str(value)):
                     continue
                 if option == 'cpus':
