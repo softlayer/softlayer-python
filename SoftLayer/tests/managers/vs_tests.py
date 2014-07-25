@@ -137,16 +137,19 @@ class VSTests(testing.TestCase):
     @mock.patch('SoftLayer.managers.vs.VSManager._generate_create_dict')
     def test_create_instance(self, create_dict):
         create_dict.return_value = {'test': 1, 'verify': 1}
-        self.vs.create_instance(test=1, verify=1)
+        self.vs.create_instance(test=1, verify=1, tag='dev,green')
         create_dict.assert_called_once_with(test=1, verify=1)
         self.client['Virtual_Guest'].createObject.assert_called_once_with(
             {'test': 1, 'verify': 1})
+        self.client['Virtual_Guest'].setTags.assert_called_once_with(
+            'dev,green', id=100)
 
     def test_create_instances(self):
         self.vs.create_instances([{'cpus': 1,
                                    'memory': 1024,
                                    'hostname': 'server',
-                                   'domain': 'example.com'}])
+                                   'domain': 'example.com',
+                                   'tag': 'dev,green'}])
         self.client['Virtual_Guest'].createObjects.assert_called_once_with([
             {'domain': 'example.com',
              'hourlyBillingFlag': True,
@@ -154,6 +157,8 @@ class VSTests(testing.TestCase):
              'maxMemory': 1024, 'hostname':
              'server',
              'startCpus': 1}])
+        self.client['Virtual_Guest'].setTags.assert_called_once_with(
+            'dev,green', id=100)
 
     def test_generate_os_and_image(self):
         self.assertRaises(
@@ -531,6 +536,13 @@ class VSTests(testing.TestCase):
 
         self.vs.edit(100, **args)
         service.editObject.assert_called_once_with(args, id=100)
+
+        # Test tag support
+        self.vs.edit(100, tag='dev,green')
+        service.setTags.assert_called_once_with('dev,green', id=100)
+        service.setTags.reset_mock()
+        self.vs.edit(100, tag='')
+        service.setTags.assert_called_once_with('', id=100)
 
     def test_captures(self):
         archive = self.client['Virtual_Guest'].createArchiveTransaction
