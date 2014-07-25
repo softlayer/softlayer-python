@@ -80,7 +80,7 @@ Get datacenter id
     action = 'datacenter_id'
 
     def _execute(self, _):
-        return SoftLayer.MetadataManager().get('datacenter_id')
+        return str(SoftLayer.MetadataManager().get('datacenter_id'))
 
 
 class FrontendMacAddresses(MetaRunnable):
@@ -129,7 +129,7 @@ Get id
     action = 'id'
 
     def _execute(self, _):
-        return SoftLayer.MetadataManager().get('id')
+        return str(SoftLayer.MetadataManager().get('id'))
 
 
 class PrimaryBackendIpAddress(MetaRunnable):
