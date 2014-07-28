@@ -44,7 +44,7 @@ class Client(object):
     :param auth: an object which responds to get_headers() to be inserted into
         the xml-rpc headers. Example: `BasicAuthentication`
     :param config_file: A path to a configuration file used to load settings
-    :param user_agent: an optional User Agent to report when making API 
+    :param user_agent: an optional User Agent to report when making API
         calls if you wish to bypass the packages built in User Agent string
 
     Usage:
@@ -59,7 +59,8 @@ class Client(object):
     _prefix = "SoftLayer_"
 
     def __init__(self, username=None, api_key=None, endpoint_url=None,
-                 timeout=None, auth=None, config_file=None, proxy=None, user_agent=None):
+                 timeout=None, auth=None, config_file=None, proxy=None,
+                 user_agent=None):
 
         settings = config.get_client_settings(username=username,
                                               api_key=api_key,
