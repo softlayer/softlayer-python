@@ -574,7 +574,7 @@ class VSTests(testing.TestCase):
         item_id = 0
         package_items = self.client['Product_Package'].getItems(id=46)
         for item in package_items:
-            if ((item['prices'][0]['categories'][0]['id'] == 3)
+            if ((item['categories'][0]['id'] == 3)
                     and (item.get('capacity') == '2')):
                 item_id = item['prices'][0]['id']
                 break
