@@ -45,6 +45,8 @@ The easiest way to do that is to use: 'sl config setup'
 """
 # :license: MIT, see LICENSE for more details.
 
+# pylint: disable=W0703
+
 import logging
 import sys
 
