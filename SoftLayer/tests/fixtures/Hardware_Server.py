@@ -10,7 +10,7 @@ getObject = {
                             }
                         }
                     }
-    },
+                    },
     'primaryIpAddress': '172.16.1.100',
     'hostname': 'hardware-test1',
     'domain': 'test.sftlyr.ws',

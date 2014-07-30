@@ -12,6 +12,7 @@ from SoftLayer.CLI.modules import vs
 
 
 class DnsTests(TestCase):
+
     def set_up(self):
         self.client = FixtureClient()
 
@@ -27,7 +28,7 @@ class DnsTests(TestCase):
                            'active_transaction': None,
                            'id': 100,
                            'backend_ip': '10.45.19.37',
-                           'owner': 'chechu' },
+                           'owner': 'chechu'},
                           {'datacenter': 'TEST00',
                            'primary_ip': '172.16.240.7',
                            'host': 'vs-test2.test.sftlyr.ws',
@@ -36,12 +37,11 @@ class DnsTests(TestCase):
                            'active_transaction': None,
                            'id': 104,
                            'backend_ip': '10.45.19.35',
-                           'owner': 'chechu' }],
+                           'owner': 'chechu'}],
                          format_output(output, 'python'))
 
     def test_detail_vs(self):
         command = vs.VSDetails(client=self.client)
-
         output = command.execute({'<identifier>': '100',
                                   '--passwords': True,
                                   '--price': True})
@@ -56,8 +56,8 @@ class DnsTests(TestCase):
                           'modified': {},
                           'os': '12.04-64 Minimal for CCI',
                           'os_version': '12.04-64 Minimal for CCI',
-                          'price rate': {},
                           'notes': 'notes',
+                          'price rate': 1.54,
                           'tags': ['production'],
                           'private_cpu': {},
                           'private_ip': '10.45.19.37',

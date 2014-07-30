@@ -42,7 +42,7 @@ getVirtualGuests = [{
                             }
                         }
                     }
-    },
+                    },
 }, {
     'id': 104,
     'hostname': 'vs-test2',
@@ -67,7 +67,7 @@ getVirtualGuests = [{
                             }
                         }
                     }
-    },
+                    },
 }]
 
 getMonthlyVirtualGuests = [vs for vs in getVirtualGuests
@@ -88,7 +88,7 @@ getHardware = [{
                             }
                         }
                     }
-    },
+                    },
     'primaryIpAddress': '172.16.1.100',
     'hostname': 'hardware-test1',
     'domain': 'test.sftlyr.ws',
@@ -145,7 +145,7 @@ getHardware = [{
                             }
                         }
                     }
-    },
+                    },
     'primaryIpAddress': '172.16.4.94',
     'hostname': 'hardware-test2',
     'domain': 'test.sftlyr.ws',
@@ -187,7 +187,7 @@ getHardware = [{
                             }
                         }
                     }
-    },
+                    },
     'primaryIpAddress': '172.16.4.95',
     'hostname': 'hardware-bad-memory',
     'domain': 'test.sftlyr.ws',
