@@ -43,6 +43,7 @@ from SoftLayer.CLI.helpers import (
 
 
 class ListVSIs(CLIRunnable):
+
     """
 usage: sl vs list [--hourly | --monthly] [--sortby=SORT_COLUMN] [--tags=TAGS]
                   [options]
@@ -118,6 +119,7 @@ For more on filters see 'sl help filters'
 
 
 class VSDetails(CLIRunnable):
+
     """
 usage: sl vs detail [--passwords] [--price] <identifier> [options]
 
@@ -173,7 +175,8 @@ Options:
         table.add_row(['created', result['createDate']])
         table.add_row(['modified', result['modifyDate']])
         table.add_row(['owner', FormattedItem(
-            lookup(result, 'billingItem', 'orderItem', 'order', 'userRecord', 'username'),
+            lookup(result, 'billingItem', 'orderItem',
+                   'order', 'userRecord', 'username'),
         )])
 
         vlan_table = Table(['type', 'number', 'id'])
@@ -215,6 +218,7 @@ Options:
 
 
 class CreateOptionsVS(CLIRunnable):
+
     """
 usage: sl vs create-options [options]
 
@@ -338,6 +342,7 @@ Options:
 
 
 class CreateVS(CLIRunnable):
+
     """
 usage: sl vs create [--disk=SIZE...] [--key=KEY...] [options]
 
@@ -624,6 +629,7 @@ Optional:
 
 
 class ReadyVS(CLIRunnable):
+
     """
 usage: sl vs ready <identifier> [options]
 
@@ -648,6 +654,7 @@ Optional:
 
 
 class ReloadVS(CLIRunnable):
+
     """
 usage: sl vs reload <identifier> [--key=KEY...] [options]
 
@@ -679,6 +686,7 @@ Optional:
 
 
 class CancelVS(CLIRunnable):
+
     """
 usage: sl vs cancel <identifier> [options]
 
@@ -698,6 +706,7 @@ Cancel a virtual server
 
 
 class VSPowerOff(CLIRunnable):
+
     """
 usage: sl vs power-off <identifier> [--hard] [options]
 
@@ -724,6 +733,7 @@ Optional:
 
 
 class VSReboot(CLIRunnable):
+
     """
 usage: sl vs reboot <identifier> [--hard | --soft] [options]
 
@@ -753,6 +763,7 @@ Optional:
 
 
 class VSPowerOn(CLIRunnable):
+
     """
 usage: sl vs power-on <identifier> [options]
 
@@ -768,6 +779,7 @@ Power on a virtual server
 
 
 class VSPause(CLIRunnable):
+
     """
 usage: sl vs pause <identifier> [options]
 
@@ -789,6 +801,7 @@ Pauses an active virtual server
 
 
 class VSResume(CLIRunnable):
+
     """
 usage: sl vs resume <identifier> [options]
 
@@ -804,6 +817,7 @@ Resumes a paused virtual server
 
 
 class NicEditVS(CLIRunnable):
+
     """
 usage: sl vs nic-edit <identifier> (public | private) --speed=SPEED [options]
 
@@ -825,6 +839,7 @@ Options:
 
 
 class VSDNS(CLIRunnable):
+
     """
 usage: sl vs dns sync <identifier> [options]
 
@@ -927,6 +942,7 @@ Options:
 
 
 class EditVS(CLIRunnable):
+
     """
 usage: sl vs edit <identifier> [options]
 
@@ -968,6 +984,7 @@ Options:
 
 
 class CaptureVS(CLIRunnable):
+
     """
 usage: sl vs capture <identifier> [options]
 
@@ -1011,6 +1028,7 @@ Optional:
 
 
 class UpgradeVS(CLIRunnable):
+
     """
 usage: sl vs upgrade <identifier> [options]
 

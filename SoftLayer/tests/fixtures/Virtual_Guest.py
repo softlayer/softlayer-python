@@ -12,7 +12,7 @@ getObject = {
                             }
                         }
                     }
-    },
+                    },
     'datacenter': {'id': 50, 'name': 'TEST00',
                    'description': 'Test Data Center'},
     'powerState': {'keyName': 'RUNNING', 'name': 'Running'},
