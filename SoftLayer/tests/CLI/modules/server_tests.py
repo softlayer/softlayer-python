@@ -261,7 +261,8 @@ class ServerCLITests(TestCase):
                 'cores': 2,
                 'id': 1000,
                 'backend_ip': '10.1.0.2',
-                'active_transaction': 'TXN_NAME'
+                'active_transaction': 'TXN_NAME',
+                'owner': 'chechu'
             },
             {
                 'datacenter': 'TEST00',
@@ -271,7 +272,8 @@ class ServerCLITests(TestCase):
                 'cores': 4,
                 'id': 1001,
                 'backend_ip': '10.1.0.3',
-                'active_transaction': None
+                'active_transaction': None,
+                'owner': 'chechu'
             },
             {
                 'datacenter': 'TEST00',
@@ -281,7 +283,8 @@ class ServerCLITests(TestCase):
                 'cores': 4,
                 'id': 1002,
                 'backend_ip': '10.1.0.4',
-                'active_transaction': None
+                'active_transaction': None,
+                'owner': 'chechu'
             }
         ]
 
