@@ -41,7 +41,6 @@ class DnsTests(TestCase):
 
     def test_detail_vs(self):
         command = vs.VSDetails(client=self.client)
-
         output = command.execute({'<identifier>': '100',
                                   '--passwords': True,
                                   '--price': True})
@@ -56,8 +55,8 @@ class DnsTests(TestCase):
                           'modified': {},
                           'os': '12.04-64 Minimal for CCI',
                           'os_version': '12.04-64 Minimal for CCI',
-                          'price rate': {},
                           'notes': 'notes',
+                          'price rate': 1.54,                          
                           'tags': ['production'],
                           'private_cpu': {},
                           'private_ip': '10.45.19.37',
