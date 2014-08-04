@@ -121,6 +121,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
                 'datacenter',
+                'billingItem.orderItem.order.userRecord[username]',
             ]
             server_items = [
                 'activeTransaction[id, transactionStatus[friendlyName,name]]',
@@ -291,6 +292,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                 'hourlyBillingFlag',
                 'tagReferences[id,tag[name,id]]',
                 'networkVlans[id,vlanNumber,networkSpace]',
+                'billingItem.orderItem.order.userRecord[username]',
             ]
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 

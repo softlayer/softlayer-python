@@ -41,6 +41,7 @@ from SoftLayer import utils
 
 
 class ListVSIs(environment.CLIRunnable):
+
     """
 usage: sl vs list [--hourly | --monthly] [--sortby=SORT_COLUMN] [--tags=TAGS]
                   [options]
@@ -93,7 +94,7 @@ For more on filters see 'sl help filters'
         table = formatting.Table([
             'id', 'datacenter', 'host',
             'cores', 'memory', 'primary_ip',
-            'backend_ip', 'active_transaction',
+            'backend_ip', 'active_transaction', 'owner'
         ])
         table.sortby = args.get('--sortby') or 'host'
 
@@ -104,16 +105,19 @@ For more on filters see 'sl help filters'
                 guest['datacenter']['name'] or formatting.blank(),
                 guest['fullyQualifiedDomainName'],
                 guest['maxCpu'],
-                formatting.mb_to_gb(guest['maxMemory']),
-                guest['primaryIpAddress'] or formatting.blank(),
-                guest['primaryBackendIpAddress'] or formatting.blank(),
-                formatting.active_txn(guest),
+                mb_to_gb(guest['maxMemory']),
+                guest['primaryIpAddress'] or blank(),
+                guest['primaryBackendIpAddress'] or blank(),
+                active_txn(guest),
+                guest['billingItem']['orderItem']['order']
+                ['userRecord']['username']
             ])
 
         return table
 
 
 class VSDetails(environment.CLIRunnable):
+
     """
 usage: sl vs detail [--passwords] [--price] <identifier> [options]
 
@@ -173,6 +177,10 @@ Options:
         table.add_row(['private_cpu', result['dedicatedAccountHostOnlyFlag']])
         table.add_row(['created', result['createDate']])
         table.add_row(['modified', result['modifyDate']])
+        table.add_row(['owner', FormattedItem(
+            lookup(result, 'billingItem', 'orderItem',
+                   'order', 'userRecord', 'username'),
+        )])
 
         vlan_table = formatting.Table(['type', 'number', 'id'])
         for vlan in result['networkVlans']:
@@ -213,6 +221,7 @@ Options:
 
 
 class CreateOptionsVS(environment.CLIRunnable):
+
     """
 usage: sl vs create-options [options]
 
@@ -339,6 +348,7 @@ Options:
 
 
 class CreateVS(environment.CLIRunnable):
+
     """
 usage: sl vs create [--disk=SIZE...] [--key=KEY...] [options]
 
@@ -641,6 +651,7 @@ Optional:
 
 
 class ReadyVS(environment.CLIRunnable):
+
     """
 usage: sl vs ready <identifier> [options]
 
@@ -667,6 +678,7 @@ Optional:
 
 
 class ReloadVS(environment.CLIRunnable):
+
     """
 usage: sl vs reload <identifier> [--key=KEY...] [options]
 
@@ -700,6 +712,7 @@ Optional:
 
 
 class CancelVS(environment.CLIRunnable):
+
     """
 usage: sl vs cancel <identifier> [options]
 
@@ -721,6 +734,7 @@ Cancel a virtual server
 
 
 class VSPowerOff(environment.CLIRunnable):
+
     """
 usage: sl vs power-off <identifier> [--hard] [options]
 
@@ -750,6 +764,7 @@ Optional:
 
 
 class VSReboot(environment.CLIRunnable):
+
     """
 usage: sl vs reboot <identifier> [--hard | --soft] [options]
 
@@ -782,6 +797,7 @@ Optional:
 
 
 class VSPowerOn(environment.CLIRunnable):
+
     """
 usage: sl vs power-on <identifier> [options]
 
@@ -799,6 +815,7 @@ Power on a virtual server
 
 
 class VSPause(environment.CLIRunnable):
+
     """
 usage: sl vs pause <identifier> [options]
 
@@ -823,6 +840,7 @@ Pauses an active virtual server
 
 
 class VSResume(environment.CLIRunnable):
+
     """
 usage: sl vs resume <identifier> [options]
 
@@ -840,6 +858,7 @@ Resumes a paused virtual server
 
 
 class NicEditVS(environment.CLIRunnable):
+
     """
 usage: sl vs nic-edit <identifier> (public | private) --speed=SPEED [options]
 
@@ -863,6 +882,7 @@ Options:
 
 
 class VSDNS(environment.CLIRunnable):
+
     """
 usage: sl vs dns sync <identifier> [options]
 
@@ -971,6 +991,7 @@ Options:
 
 
 class EditVS(environment.CLIRunnable):
+
     """
 usage: sl vs edit <identifier> [options]
 
@@ -1016,6 +1037,7 @@ Options:
 
 
 class CaptureVS(environment.CLIRunnable):
+
     """
 usage: sl vs capture <identifier> [options]
 
@@ -1061,6 +1083,7 @@ Optional:
 
 
 class UpgradeVS(environment.CLIRunnable):
+
     """
 usage: sl vs upgrade <identifier> [options]
 

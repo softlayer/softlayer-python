@@ -36,6 +36,7 @@ from SoftLayer import utils
 
 
 class ListServers(environment.CLIRunnable):
+
     """
 usage: sl server list [options]
 
@@ -88,27 +89,35 @@ For more on filters see 'sl help filters'
             'memory',
             'primary_ip',
             'backend_ip',
-            'active_transaction'
+            'active_transaction',
+            'owner'
         ])
         table.sortby = args.get('--sortby') or 'host'
 
         for server in servers:
-            server = utils.NestedDict(server)
+            server = NestedDict(server)
+            user = None
+            if 'billingItem' in server:
+                if 'orderItem' in server['billingItem']:
+                    user = (server['billingItem']['orderItem']['order']
+                            ['userRecord']['username'])
             table.add_row([
                 server['id'],
                 server['datacenter']['name'] or formatting.blank(),
                 server['fullyQualifiedDomainName'],
                 server['processorPhysicalCoreAmount'],
-                formatting.gb(server['memoryCapacity'] or 0),
-                server['primaryIpAddress'] or formatting.blank(),
-                server['primaryBackendIpAddress'] or formatting.blank(),
-                formatting.active_txn(server),
+                gb(server['memoryCapacity'] or 0),
+                server['primaryIpAddress'] or blank(),
+                server['primaryBackendIpAddress'] or blank(),
+                active_txn(server),
+                user or blank(),
             ])
 
         return table
 
 
 class ServerDetails(environment.CLIRunnable):
+
     """
 usage: sl server detail [--passwords] [--price] <identifier> [options]
 
@@ -156,10 +165,17 @@ Options:
                 result['operatingSystem']['softwareLicense']
                 ['softwareDescription']['name'] or formatting.blank()
             )])
-        table.add_row(['created',
-                       result['provisionDate'] or formatting.blank()])
 
-        vlan_table = formatting.Table(['type', 'number', 'id'])
+        table.add_row(['created', result['provisionDate'] or blank()])
+        user = None
+        if 'billingItem' in result:
+            if 'orderItem' in result['billingItem']:
+                user = (result['billingItem']['orderItem']['order']
+                        ['userRecord']['username'])
+        table.add_row(['owner',
+                       user or blank()])
+        vlan_table = Table(['type', 'number', 'id'])
+
         for vlan in result['networkVlans']:
             vlan_table.add_row([
                 vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
@@ -199,6 +215,7 @@ Options:
 
 
 class ServerReload(environment.CLIRunnable):
+
     """
 usage: sl server reload <identifier> [--key=KEY...] [options]
 
@@ -231,6 +248,7 @@ Optional:
 
 
 class CancelServer(environment.CLIRunnable):
+
     """
 usage: sl server cancel <identifier> [options]
 
@@ -264,6 +282,7 @@ Options:
 
 
 class ServerCancelReasons(environment.CLIRunnable):
+
     """
 usage: sl server cancel-reasons
 
@@ -286,6 +305,7 @@ Display a list of cancellation reasons
 
 
 class ServerPowerOff(environment.CLIRunnable):
+
     """
 usage: sl server power-off <identifier> [options]
 
@@ -308,6 +328,7 @@ Power off an active server
 
 
 class ServerReboot(environment.CLIRunnable):
+
     """
 usage: sl server reboot <identifier> [--hard | --soft] [options]
 
@@ -340,6 +361,7 @@ Optional:
 
 
 class ServerPowerOn(environment.CLIRunnable):
+
     """
 usage: sl server power-on <identifier> [options]
 
@@ -356,6 +378,7 @@ Power on a server
 
 
 class ServerPowerCycle(environment.CLIRunnable):
+
     """
 usage: sl server power-cycle <identifier> [options]
 
@@ -379,6 +402,7 @@ Issues power cycle to server via the power strip
 
 
 class NicEditServer(environment.CLIRunnable):
+
     """
 usage: sl server nic-edit <identifier> (public | private) --speed=SPEED
                           [options]
@@ -403,6 +427,7 @@ Options:
 
 
 class ListChassisServer(environment.CLIRunnable):
+
     """
 usage: sl server list-chassis [options]
 
@@ -425,6 +450,7 @@ Display a list of chassis available for ordering dedicated servers.
 
 
 class ServerCreateOptions(environment.CLIRunnable):
+
     """
 usage: sl server create-options <chassis_id> [options]
 
@@ -757,6 +783,7 @@ Options:
 
 
 class CreateServer(environment.CLIRunnable):
+
     """
 usage: sl server create [--disk=SIZE...] [--key=KEY...] [options]
 
@@ -1021,6 +1048,7 @@ Optional:
 
 
 class EditServer(environment.CLIRunnable):
+
     """
 usage: sl server edit <identifier> [options]
 
