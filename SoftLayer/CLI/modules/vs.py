@@ -110,7 +110,7 @@ For more on filters see 'sl help filters'
                 guest['primaryBackendIpAddress'] or formatting.blank(),
                 formatting.active_txn(guest),
                 guest['billingItem']['orderItem']['order']
-                ['userRecord']['username']
+                ['userRecord']['username'] or formatting.blank(),
             ])
 
         return table
