@@ -105,10 +105,10 @@ For more on filters see 'sl help filters'
                 guest['datacenter']['name'] or formatting.blank(),
                 guest['fullyQualifiedDomainName'],
                 guest['maxCpu'],
-                mb_to_gb(guest['maxMemory']),
-                guest['primaryIpAddress'] or blank(),
-                guest['primaryBackendIpAddress'] or blank(),
-                active_txn(guest),
+                formatting.mb_to_gb(guest['maxMemory']),
+                guest['primaryIpAddress'] or formatting.blank(),
+                guest['primaryBackendIpAddress'] or formatting.blank(),
+                formatting.active_txn(guest),
                 guest['billingItem']['orderItem']['order']
                 ['userRecord']['username']
             ])

@@ -95,7 +95,7 @@ For more on filters see 'sl help filters'
         table.sortby = args.get('--sortby') or 'host'
 
         for server in servers:
-            server = NestedDict(server)
+            server = utils.NestedDict(server)
             user = None
             if 'billingItem' in server:
                 if 'orderItem' in server['billingItem']:
@@ -106,11 +106,11 @@ For more on filters see 'sl help filters'
                 server['datacenter']['name'] or formatting.blank(),
                 server['fullyQualifiedDomainName'],
                 server['processorPhysicalCoreAmount'],
-                gb(server['memoryCapacity'] or 0),
-                server['primaryIpAddress'] or blank(),
-                server['primaryBackendIpAddress'] or blank(),
-                active_txn(server),
-                user or blank(),
+                formatting.gb(server['memoryCapacity'] or 0),
+                server['primaryIpAddress'] or formatting.blank(),
+                server['primaryBackendIpAddress'] or formatting.blank(),
+                formatting.active_txn(server),
+                user or formatting.blank(),
             ])
 
         return table
@@ -166,14 +166,14 @@ Options:
                 ['softwareDescription']['name'] or formatting.blank()
             )])
 
-        table.add_row(['created', result['provisionDate'] or blank()])
+        table.add_row(['created', result['provisionDate'] or formatting.blank()])
         user = None
         if 'billingItem' in result:
             if 'orderItem' in result['billingItem']:
                 user = (result['billingItem']['orderItem']['order']
                         ['userRecord']['username'])
         table.add_row(['owner',
-                       user or blank()])
+                       user or formatting.blank()])
         vlan_table = Table(['type', 'number', 'id'])
 
         for vlan in result['networkVlans']:
