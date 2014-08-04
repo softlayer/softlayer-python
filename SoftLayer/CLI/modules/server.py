@@ -23,17 +23,20 @@ For several commands, <identifier> will be asked for. This can be the id,
 hostname or the ip address for a piece of hardware.
 """
 # :license: MIT, see LICENSE for more details.
-import re
 import os
-from os import linesep
-from SoftLayer.CLI.helpers import (
-    CLIRunnable, Table, KeyValueTable, FormattedItem, NestedDict, CLIAbort,
-    blank, listing, gb, active_txn, no_going_back, resolve_id, confirm,
-    ArgumentError, update_with_template_args, export_to_template)
-from SoftLayer import HardwareManager, SshKeyManager
+import re
+
+import SoftLayer
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
+from SoftLayer.CLI import template
+from SoftLayer import utils
 
 
-class ListServers(CLIRunnable):
+class ListServers(environment.CLIRunnable):
+
     """
 usage: sl server list [options]
 
@@ -63,7 +66,7 @@ For more on filters see 'sl help filters'
     action = 'list'
 
     def execute(self, args):
-        manager = HardwareManager(self.client)
+        manager = SoftLayer.HardwareManager(self.client)
 
         tags = None
         if args.get('--tags'):
@@ -78,7 +81,7 @@ For more on filters see 'sl help filters'
             nic_speed=args.get('--network'),
             tags=tags)
 
-        table = Table([
+        table = formatting.Table([
             'id',
             'datacenter',
             'host',
@@ -92,7 +95,7 @@ For more on filters see 'sl help filters'
         table.sortby = args.get('--sortby') or 'host'
 
         for server in servers:
-            server = NestedDict(server)
+            server = utils.NestedDict(server)
             user = None
             if 'billingItem' in server:
                 if 'orderItem' in server['billingItem']:
@@ -100,20 +103,21 @@ For more on filters see 'sl help filters'
                             ['userRecord']['username'])
             table.add_row([
                 server['id'],
-                server['datacenter']['name'] or blank(),
+                server['datacenter']['name'] or formatting.blank(),
                 server['fullyQualifiedDomainName'],
                 server['processorPhysicalCoreAmount'],
-                gb(server['memoryCapacity'] or 0),
-                server['primaryIpAddress'] or blank(),
-                server['primaryBackendIpAddress'] or blank(),
-                active_txn(server),
-                user or blank(),
+                formatting.gb(server['memoryCapacity'] or 0),
+                server['primaryIpAddress'] or formatting.blank(),
+                server['primaryBackendIpAddress'] or formatting.blank(),
+                formatting.active_txn(server),
+                user or formatting.blank(),
             ])
 
         return table
 
 
-class ServerDetails(CLIRunnable):
+class ServerDetails(environment.CLIRunnable):
+
     """
 usage: sl server detail [--passwords] [--price] <identifier> [options]
 
@@ -126,45 +130,52 @@ Options:
     action = 'detail'
 
     def execute(self, args):
-        hardware = HardwareManager(self.client)
+        hardware = SoftLayer.HardwareManager(self.client)
 
-        table = KeyValueTable(['Name', 'Value'])
+        table = formatting.KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
         table.align['Value'] = 'l'
 
-        hardware_id = resolve_id(
+        hardware_id = helpers.resolve_id(
             hardware.resolve_ids, args.get('<identifier>'), 'hardware')
         result = hardware.get_hardware(hardware_id)
-        result = NestedDict(result)
+        result = utils.NestedDict(result)
 
         table.add_row(['id', result['id']])
         table.add_row(['hostname', result['fullyQualifiedDomainName']])
         table.add_row(['status', result['hardwareStatus']['status']])
-        table.add_row(['datacenter', result['datacenter']['name'] or blank()])
+        table.add_row(['datacenter',
+                       result['datacenter']['name'] or formatting.blank()])
         table.add_row(['cores', result['processorPhysicalCoreAmount']])
-        table.add_row(['memory', gb(result['memoryCapacity'])])
-        table.add_row(['public_ip', result['primaryIpAddress'] or blank()])
-        table.add_row(
-            ['private_ip', result['primaryBackendIpAddress'] or blank()])
+        table.add_row(['memory',
+                       formatting.gb(result['memoryCapacity'])])
+        table.add_row(['public_ip',
+                       result['primaryIpAddress'] or formatting.blank()])
+        table.add_row(['private_ip',
+                       result['primaryBackendIpAddress']
+                       or formatting.blank()])
         table.add_row(['ipmi_ip',
-                       result['networkManagementIpAddress'] or blank()])
+                       result['networkManagementIpAddress']
+                       or formatting.blank()])
         table.add_row([
             'os',
-            FormattedItem(
+            formatting.FormattedItem(
                 result['operatingSystem']['softwareLicense']
-                ['softwareDescription']['referenceCode'] or blank(),
+                ['softwareDescription']['referenceCode'] or formatting.blank(),
                 result['operatingSystem']['softwareLicense']
-                ['softwareDescription']['name'] or blank()
+                ['softwareDescription']['name'] or formatting.blank()
             )])
-        table.add_row(['created', result['provisionDate'] or blank()])
+
+        table.add_row(['created', result['provisionDate'] or formatting.blank()])
         user = None
         if 'billingItem' in result:
             if 'orderItem' in result['billingItem']:
                 user = (result['billingItem']['orderItem']['order']
                         ['userRecord']['username'])
         table.add_row(['owner',
-                       user or blank()])
+                       user or formatting.blank()])
         vlan_table = Table(['type', 'number', 'id'])
+
         for vlan in result['networkVlans']:
             vlan_table.add_row([
                 vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
@@ -182,19 +193,19 @@ Options:
             for item in result['operatingSystem']['passwords']:
                 user_strs.append(
                     "%s %s" % (item['username'], item['password']))
-            table.add_row(['users', listing(user_strs)])
+            table.add_row(['users', formatting.listing(user_strs)])
 
         tag_row = []
         for tag in result['tagReferences']:
             tag_row.append(tag['tag']['name'])
 
         if tag_row:
-            table.add_row(['tags', listing(tag_row, separator=',')])
+            table.add_row(['tags', formatting.listing(tag_row, separator=',')])
 
         # Test to see if this actually has a primary (public) ip address
         if result['primaryIpAddress']:
-            ptr_domains = self.client['Hardware_Server']\
-                .getReverseDomainRecords(id=hardware_id)
+            ptr_domains = (self.client['Hardware_Server']
+                           .getReverseDomainRecords(id=hardware_id))
 
             for ptr_domain in ptr_domains:
                 for ptr in ptr_domain['resourceRecords']:
@@ -203,7 +214,8 @@ Options:
         return table
 
 
-class ServerReload(CLIRunnable):
+class ServerReload(environment.CLIRunnable):
+
     """
 usage: sl server reload <identifier> [--key=KEY...] [options]
 
@@ -220,22 +232,23 @@ Optional:
     options = ['confirm']
 
     def execute(self, args):
-        hardware = HardwareManager(self.client)
-        hardware_id = resolve_id(
+        hardware = SoftLayer.HardwareManager(self.client)
+        hardware_id = helpers.resolve_id(
             hardware.resolve_ids, args.get('<identifier>'), 'hardware')
         keys = []
         if args.get('--key'):
             for key in args.get('--key'):
-                key_id = resolve_id(SshKeyManager(self.client).resolve_ids,
-                                    key, 'SshKey')
+                resolver = SoftLayer.SshKeyManager(self.client).resolve_ids
+                key_id = helpers.resolve_id(resolver, key, 'SshKey')
                 keys.append(key_id)
-        if args['--really'] or no_going_back(hardware_id):
+        if args['--really'] or formatting.no_going_back(hardware_id):
             hardware.reload(hardware_id, args['--postinstall'], keys)
         else:
-            CLIAbort('Aborted')
+            raise exceptions.CLIAbort('Aborted')
 
 
-class CancelServer(CLIRunnable):
+class CancelServer(environment.CLIRunnable):
+
     """
 usage: sl server cancel <identifier> [options]
 
@@ -251,8 +264,8 @@ Options:
     options = ['confirm']
 
     def execute(self, args):
-        mgr = HardwareManager(self.client)
-        hw_id = resolve_id(
+        mgr = SoftLayer.HardwareManager(self.client)
+        hw_id = helpers.resolve_id(
             mgr.resolve_ids, args.get('<identifier>'), 'hardware')
 
         comment = args.get('--comment')
@@ -262,13 +275,14 @@ Options:
 
         reason = args.get('--reason')
 
-        if args['--really'] or no_going_back(hw_id):
+        if args['--really'] or formatting.no_going_back(hw_id):
             mgr.cancel_hardware(hw_id, reason, comment)
         else:
-            CLIAbort('Aborted')
+            raise exceptions.CLIAbort('Aborted')
 
 
-class ServerCancelReasons(CLIRunnable):
+class ServerCancelReasons(environment.CLIRunnable):
+
     """
 usage: sl server cancel-reasons
 
@@ -278,11 +292,11 @@ Display a list of cancellation reasons
     action = 'cancel-reasons'
 
     def execute(self, args):
-        table = Table(['Code', 'Reason'])
+        table = formatting.Table(['Code', 'Reason'])
         table.align['Code'] = 'r'
         table.align['Reason'] = 'l'
 
-        mgr = HardwareManager(self.client)
+        mgr = SoftLayer.HardwareManager(self.client)
 
         for code, reason in mgr.get_cancellation_reasons().items():
             table.add_row([code, reason])
@@ -290,7 +304,8 @@ Display a list of cancellation reasons
         return table
 
 
-class ServerPowerOff(CLIRunnable):
+class ServerPowerOff(environment.CLIRunnable):
+
     """
 usage: sl server power-off <identifier> [options]
 
@@ -300,17 +315,20 @@ Power off an active server
     options = ['confirm']
 
     def execute(self, args):
-        mgr = HardwareManager(self.client)
-        hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
-                           'hardware')
-        if args['--really'] or confirm('This will power off the server with '
-                                       'id %s. Continue?' % hw_id):
+        mgr = SoftLayer.HardwareManager(self.client)
+        hw_id = helpers.resolve_id(mgr.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'hardware')
+        if args['--really'] or formatting.confirm('This will power off the '
+                                                  'server with id %s '
+                                                  'Continue?' % hw_id):
             self.client['Hardware_Server'].powerOff(id=hw_id)
         else:
-            raise CLIAbort('Aborted.')
+            raise exceptions.CLIAbort('Aborted.')
 
 
-class ServerReboot(CLIRunnable):
+class ServerReboot(environment.CLIRunnable):
+
     """
 usage: sl server reboot <identifier> [--hard | --soft] [options]
 
@@ -325,11 +343,13 @@ Optional:
 
     def execute(self, args):
         hardware_server = self.client['Hardware_Server']
-        mgr = HardwareManager(self.client)
-        hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
-                           'hardware')
-        if args['--really'] or confirm('This will power off the server with '
-                                       'id %s. Continue?' % hw_id):
+        mgr = SoftLayer.HardwareManager(self.client)
+        hw_id = helpers.resolve_id(mgr.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'hardware')
+        if args['--really'] or formatting.confirm('This will power off the '
+                                                  'server with id %s. '
+                                                  'Continue?' % hw_id):
             if args['--hard']:
                 hardware_server.rebootHard(id=hw_id)
             elif args['--soft']:
@@ -337,10 +357,11 @@ Optional:
             else:
                 hardware_server.rebootDefault(id=hw_id)
         else:
-            raise CLIAbort('Aborted.')
+            raise exceptions.CLIAbort('Aborted.')
 
 
-class ServerPowerOn(CLIRunnable):
+class ServerPowerOn(environment.CLIRunnable):
+
     """
 usage: sl server power-on <identifier> [options]
 
@@ -349,13 +370,15 @@ Power on a server
     action = 'power-on'
 
     def execute(self, args):
-        mgr = HardwareManager(self.client)
-        hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
-                           'hardware')
+        mgr = SoftLayer.HardwareManager(self.client)
+        hw_id = helpers.resolve_id(mgr.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'hardware')
         self.client['Hardware_Server'].powerOn(id=hw_id)
 
 
-class ServerPowerCycle(CLIRunnable):
+class ServerPowerCycle(environment.CLIRunnable):
+
     """
 usage: sl server power-cycle <identifier> [options]
 
@@ -365,18 +388,21 @@ Issues power cycle to server via the power strip
     options = ['confirm']
 
     def execute(self, args):
-        mgr = HardwareManager(self.client)
-        hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
-                           'hardware')
+        mgr = SoftLayer.HardwareManager(self.client)
+        hw_id = helpers.resolve_id(mgr.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'hardware')
 
-        if args['--really'] or confirm('This will power off the server with '
-                                       'id %s. Continue?' % hw_id):
+        if args['--really'] or formatting.confirm('This will power off the '
+                                                  'server with id %s. '
+                                                  'Continue?' % hw_id):
             self.client['Hardware_Server'].powerCycle(id=hw_id)
         else:
-            raise CLIAbort('Aborted.')
+            raise exceptions.CLIAbort('Aborted.')
 
 
-class NicEditServer(CLIRunnable):
+class NicEditServer(environment.CLIRunnable):
+
     """
 usage: sl server nic-edit <identifier> (public | private) --speed=SPEED
                           [options]
@@ -392,14 +418,16 @@ Options:
     def execute(self, args):
         public = args['public']
 
-        mgr = HardwareManager(self.client)
-        hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
-                           'hardware')
+        mgr = SoftLayer.HardwareManager(self.client)
+        hw_id = helpers.resolve_id(mgr.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'hardware')
 
         mgr.change_port_speed(hw_id, public, args['--speed'])
 
 
-class ListChassisServer(CLIRunnable):
+class ListChassisServer(environment.CLIRunnable):
+
     """
 usage: sl server list-chassis [options]
 
@@ -408,11 +436,11 @@ Display a list of chassis available for ordering dedicated servers.
     action = 'list-chassis'
 
     def execute(self, args):
-        table = Table(['Code', 'Chassis'])
+        table = formatting.Table(['Code', 'Chassis'])
         table.align['Code'] = 'r'
         table.align['Chassis'] = 'l'
 
-        mgr = HardwareManager(self.client)
+        mgr = SoftLayer.HardwareManager(self.client)
         chassis = mgr.get_available_dedicated_server_packages()
 
         for chassis in chassis:
@@ -421,7 +449,8 @@ Display a list of chassis available for ordering dedicated servers.
         return table
 
 
-class ServerCreateOptions(CLIRunnable):
+class ServerCreateOptions(environment.CLIRunnable):
+
     """
 usage: sl server create-options <chassis_id> [options]
 
@@ -444,9 +473,9 @@ Options:
                'controller']
 
     def execute(self, args):
-        mgr = HardwareManager(self.client)
+        mgr = SoftLayer.HardwareManager(self.client)
 
-        table = KeyValueTable(['Name', 'Value'])
+        table = formatting.KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
         table.align['Value'] = 'l'
 
@@ -459,7 +488,7 @@ Options:
                 break
 
         if not found:
-            raise CLIAbort('Invalid chassis specified.')
+            raise exceptions.CLIAbort('Invalid chassis specified.')
 
         ds_options = mgr.get_dedicated_server_create_options(chassis_id)
 
@@ -480,12 +509,12 @@ Options:
         if args['--datacenter'] or show_all:
             results = self.get_create_options(ds_options, 'datacenter')[0]
 
-            table.add_row([results[0], listing(sorted(results[1]))])
+            table.add_row([results[0], formatting.listing(sorted(results[1]))])
 
         if (args['--cpu'] or show_all) and not bmc:
             results = self.get_create_options(ds_options, 'cpu')
 
-            cpu_table = Table(['ID', 'Description'])
+            cpu_table = formatting.Table(['ID', 'Description'])
             cpu_table.align['ID'] = 'r'
             cpu_table.align['Description'] = 'l'
 
@@ -496,16 +525,16 @@ Options:
         if (args['--memory'] or show_all) and not bmc:
             results = self.get_create_options(ds_options, 'memory')[0]
 
-            table.add_row([results[0], listing(
+            table.add_row([results[0], formatting.listing(
                 item[0] for item in sorted(results[1]))])
 
         if bmc and (show_all or args['--memory'] or args['--cpu']):
             results = self.get_create_options(ds_options, 'server_core')
-            memory_cpu_table = Table(['memory', 'cpu'])
+            memory_cpu_table = formatting.Table(['memory', 'cpu'])
             for result in results:
                 memory_cpu_table.add_row([
                     result[0],
-                    listing(
+                    formatting.listing(
                         [item[0] for item in sorted(
                             result[1], key=lambda x: int(x[0])
                         )])])
@@ -517,9 +546,9 @@ Options:
             for result in results:
                 table.add_row([
                     result[0],
-                    listing(
+                    formatting.listing(
                         [item[0] for item in sorted(result[1])],
-                        separator=linesep
+                        separator=os.linesep
                     )])
 
         if args['--disk'] or show_all:
@@ -527,22 +556,22 @@ Options:
 
             table.add_row([
                 results[0],
-                listing(
+                formatting.listing(
                     [item[0] for item in sorted(results[1])],
-                    separator=linesep
+                    separator=os.linesep
                 )])
 
         if args['--nic'] or show_all:
             results = self.get_create_options(ds_options, 'nic')
 
             for result in results:
-                table.add_row([result[0], listing(
+                table.add_row([result[0], formatting.listing(
                     item[0] for item in sorted(result[1],))])
 
         if (args['--controller'] or show_all) and not bmc:
             results = self.get_create_options(ds_options, 'disk_controller')[0]
 
-            table.add_row([results[0], listing(
+            table.add_row([results[0], formatting.listing(
                 item[0] for item in sorted(results[1],))])
 
         return table
@@ -581,8 +610,8 @@ Options:
                 ram.append((int(option['capacity']), option['price_id']))
 
             return_value = [('memory', ram)]
-        elif 'server_core' == section and \
-             'server_core' in ds_options['categories']:
+        elif ('server_core' == section
+              and 'server_core' in ds_options['categories']):
             mem_options = {}
             cpu_regex = re.compile(r'(\d+) x ')
             memory_regex = re.compile(r' - (\d+) GB Ram', re.I)
@@ -753,7 +782,8 @@ Options:
         return os_code
 
 
-class CreateServer(CLIRunnable):
+class CreateServer(environment.CLIRunnable):
+
     """
 usage: sl server create [--disk=SIZE...] [--key=KEY...] [options]
 
@@ -797,8 +827,8 @@ Optional:
                        '--memory', '--os']
 
     def execute(self, args):
-        update_with_template_args(args, list_args=['--disk', '--key'])
-        mgr = HardwareManager(self.client)
+        template.update_with_template_args(args, list_args=['--disk', '--key'])
+        mgr = SoftLayer.HardwareManager(self.client)
         self._validate_args(args)
 
         ds_options = mgr.get_dedicated_server_create_options(args['--chassis'])
@@ -812,7 +842,7 @@ Optional:
         if args.get('--test'):
             result = mgr.verify_order(**order)
 
-            table = Table(['Item', 'cost'])
+            table = formatting.Table(['Item', 'cost'])
             table.align['Item'] = 'r'
             table.align['cost'] = 'r'
 
@@ -826,30 +856,31 @@ Optional:
             table.add_row(['Total monthly cost', "%.2f" % total])
             output = []
             output.append(table)
-            output.append(FormattedItem(
+            output.append(formatting.FormattedItem(
                 '',
                 ' -- ! Prices reflected here are retail and do not '
                 'take account level discounts and are not guaranteed.'))
 
         if args['--export']:
             export_file = args.pop('--export')
-            export_to_template(export_file, args, exclude=['--wait', '--test'])
+            template.export_to_template(export_file, args,
+                                        exclude=['--wait', '--test'])
             return 'Successfully exported options to a template file.'
 
         if do_create:
-            if args['--really'] or confirm(
+            if args['--really'] or formatting.confirm(
                     "This action will incur charges on your account. "
                     "Continue?"):
                 result = mgr.place_order(**order)
 
-                table = KeyValueTable(['name', 'value'])
+                table = formatting.KeyValueTable(['name', 'value'])
                 table.align['name'] = 'r'
                 table.align['value'] = 'l'
                 table.add_row(['id', result['orderId']])
                 table.add_row(['created', result['orderDate']])
                 output = table
             else:
-                raise CLIAbort('Aborting dedicated server order.')
+                raise exceptions.CLIAbort('Aborting dedicated server order.')
 
         return output
 
@@ -858,7 +889,7 @@ Optional:
         Helper method to centralize argument processing without convoluting
         code flow of the main execute method.
         """
-        mgr = HardwareManager(self.client)
+        mgr = SoftLayer.HardwareManager(self.client)
 
         order = {
             'hostname': args['--hostname'],
@@ -879,7 +910,7 @@ Optional:
         if os_price:
             order['os'] = os_price
         else:
-            raise CLIAbort('Invalid operating system specified.')
+            raise exceptions.CLIAbort('Invalid operating system specified.')
 
         order['location'] = args['--datacenter'] or 'FIRST_AVAILABLE'
 
@@ -930,7 +961,7 @@ Optional:
         if nic_price:
             order['port_speed'] = nic_price
         else:
-            raise CLIAbort('Invalid NIC speed specified.')
+            raise exceptions.CLIAbort('Invalid NIC speed specified.')
 
         if args.get('--postinstall'):
             order['post_uri'] = args.get('--postinstall')
@@ -939,8 +970,8 @@ Optional:
         if args.get('--key'):
             keys = []
             for key in args.get('--key'):
-                key_id = resolve_id(SshKeyManager(self.client).resolve_ids,
-                                    key, 'SshKey')
+                resolver = SoftLayer.SshKeyManager(self.client).resolve_ids
+                key_id = helpers.resolve_id(resolver, key, 'SshKey')
                 keys.append(key_id)
             order['ssh_keys'] = keys
 
@@ -956,8 +987,8 @@ Optional:
         """ Raises an ArgumentError if the given arguments are not valid """
         invalid_args = [k for k in self.required_params if args.get(k) is None]
         if invalid_args:
-            raise ArgumentError('Missing required options: %s'
-                                % ','.join(invalid_args))
+            raise exceptions.ArgumentError('Missing required options: %s'
+                                           % ','.join(invalid_args))
 
     def _get_default_value(self, ds_options, option):
         """ Returns a 'free' price id given an option """
@@ -1016,7 +1047,8 @@ Optional:
                     return item_options[2]
 
 
-class EditServer(CLIRunnable):
+class EditServer(environment.CLIRunnable):
+
     """
 usage: sl server edit <identifier> [options]
 
@@ -1034,11 +1066,11 @@ Options:
         data = {}
 
         if args['--userdata'] and args['--userfile']:
-            raise ArgumentError('[-u | --userdata] not allowed with '
-                                '[-F | --userfile]')
+            raise exceptions.ArgumentError(
+                '[-u | --userdata] not allowed with [-F | --userfile]')
         if args['--userfile']:
             if not os.path.exists(args['--userfile']):
-                raise ArgumentError(
+                raise exceptions.ArgumentError(
                     'File does not exist [-u | --userfile] = %s'
                     % args['--userfile'])
 
@@ -1051,8 +1083,9 @@ Options:
         data['hostname'] = args.get('--hostname')
         data['domain'] = args.get('--domain')
 
-        mgr = HardwareManager(self.client)
-        hw_id = resolve_id(mgr.resolve_ids, args.get('<identifier>'),
-                           'hardware')
+        mgr = SoftLayer.HardwareManager(self.client)
+        hw_id = helpers.resolve_id(mgr.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'hardware')
         if not mgr.edit(hw_id, **data):
-            raise CLIAbort("Failed to update hardware")
+            raise exceptions.CLIAbort("Failed to update hardware")

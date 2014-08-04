@@ -23,7 +23,6 @@ getVirtualGuests = [{
     'domain': 'test.sftlyr.ws',
     'fullyQualifiedDomainName': 'vs-test1.test.sftlyr.ws',
     'status': {'keyName': 'ACTIVE', 'name': 'Active'},
-    # TODO - This needs to come from wherever data centers come from
     'datacenter': {'id': 50, 'name': 'TEST00',
                    'description': 'Test Data Center'},
     'powerState': {'keyName': 'RUNNING', 'name': 'Running'},
@@ -49,7 +48,6 @@ getVirtualGuests = [{
     'domain': 'test.sftlyr.ws',
     'fullyQualifiedDomainName': 'vs-test2.test.sftlyr.ws',
     'status': {'keyName': 'ACTIVE', 'name': 'Active'},
-    # TODO - This needs to come from wherever data centers come from
     'datacenter': {'id': 50, 'name': 'TEST00',
                    'description': 'Test Data Center'},
     'powerState': {'keyName': 'RUNNING', 'name': 'Running'},
@@ -302,7 +300,6 @@ getSubnets = [
 
 getSshKeys = [{'id': '100', 'label': 'Test 1'},
               {'id': '101', 'label': 'Test 2',
-               'notes': 'Test notes',
                'finterprint': 'aa:bb:cc:dd',
                'notes': 'my key'}]
 

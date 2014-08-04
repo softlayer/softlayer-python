@@ -4,24 +4,24 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import NetworkManager
-from SoftLayer.tests import TestCase, FixtureClient
-from SoftLayer.tests.fixtures import Product_Order
+import mock
 
-from mock import ANY, call
+import SoftLayer
+from SoftLayer import testing
+from SoftLayer.testing import fixtures
 
 
-class NetworkTests(TestCase):
+class NetworkTests(testing.TestCase):
 
     def set_up(self):
-        self.client = FixtureClient()
-        self.network = NetworkManager(self.client)
+        self.client = testing.FixtureClient()
+        self.network = SoftLayer.NetworkManager(self.client)
 
     def test_ip_lookup(self):
         service = self.client['Network_Subnet_IpAddress']
 
         self.network.ip_lookup('10.0.1.37')
-        service.getByIpAddress.assert_called_with('10.0.1.37', mask=ANY)
+        service.getByIpAddress.assert_called_with('10.0.1.37', mask=mock.ANY)
 
     def test_add_subnet_raises_exception_on_failure(self):
         self.assertRaises(TypeError, self.network.add_subnet, ('bad'))
@@ -30,7 +30,7 @@ class NetworkTests(TestCase):
         # Test a global IPv4 order
         result = self.network.add_global_ip(test_order=True)
 
-        self.assertEqual(Product_Order.verifyOrder, result)
+        self.assertEqual(fixtures.Product_Order.verifyOrder, result)
 
     def test_add_subnet_for_ipv4(self):
         # Test a four public address IPv4 order
@@ -40,7 +40,7 @@ class NetworkTests(TestCase):
                                          version=4,
                                          test_order=True)
 
-        self.assertEqual(Product_Order.verifyOrder, result)
+        self.assertEqual(fixtures.Product_Order.verifyOrder, result)
 
         result = self.network.add_subnet('public',
                                          quantity=4,
@@ -48,12 +48,12 @@ class NetworkTests(TestCase):
                                          version=4,
                                          test_order=False)
 
-        self.assertEqual(Product_Order.verifyOrder, result)
+        self.assertEqual(fixtures.Product_Order.verifyOrder, result)
 
         result = self.network.add_subnet('global',
                                          test_order=True)
 
-        self.assertEqual(Product_Order.verifyOrder, result)
+        self.assertEqual(fixtures.Product_Order.verifyOrder, result)
 
     def test_add_subnet_for_ipv6(self):
         # Test a public IPv6 order
@@ -63,14 +63,14 @@ class NetworkTests(TestCase):
                                          version=6,
                                          test_order=True)
 
-        self.assertEqual(Product_Order.verifyOrder, result)
+        self.assertEqual(fixtures.Product_Order.verifyOrder, result)
 
         # Test a global IPv6 order
         result = self.network.add_subnet('global',
                                          version=6,
                                          test_order=True)
 
-        self.assertEqual(Product_Order.verifyOrder, result)
+        self.assertEqual(fixtures.Product_Order.verifyOrder, result)
 
     def test_assign_global_ip(self):
         self.network.assign_global_ip(9876, '172.16.24.76')
@@ -125,7 +125,7 @@ class NetworkTests(TestCase):
         self.client['Account'].getRwhoisData.assert_called()
 
     def test_get_subnet(self):
-        mcall = call(id=9876, mask=ANY)
+        mcall = mock.call(id=9876, mask=mock.ANY)
         service = self.client['Network_Subnet']
 
         self.network.get_subnet(9876)
@@ -135,14 +135,15 @@ class NetworkTests(TestCase):
         service = self.client['Network_Vlan']
 
         self.network.get_vlan(1234)
-        service.getObject.assert_has_calls(call(id=1234, mask=ANY))
+        service.getObject.assert_has_calls(mock.call(id=1234, mask=mock.ANY))
 
     def test_list_global_ips_default(self):
         self.network.list_global_ips()
 
         mask = 'destinationIpAddress[hardware, virtualGuest],ipAddress'
         service = self.client['Account']
-        service.getGlobalIpRecords.assert_has_calls(call(filter={}, mask=mask))
+        service.getGlobalIpRecords.assert_has_calls(mock.call(filter={},
+                                                              mask=mask))
 
     def test_list_global_ips_with_filter(self):
         self.network.list_global_ips(version=4)
@@ -158,8 +159,8 @@ class NetworkTests(TestCase):
             }
         }
         service = self.client['Account']
-        service.getGlobalIpRecords.assert_has_calls(call(filter=_filter,
-                                                         mask=mask))
+        service.getGlobalIpRecords.assert_has_calls(mock.call(filter=_filter,
+                                                              mask=mask))
 
     def test_list_subnets_default(self):
         _filter = {'subnets': {'subnetType': {'operation': '!= GLOBAL_IP'}}}
@@ -168,7 +169,8 @@ class NetworkTests(TestCase):
 
         self.network.list_subnets()
 
-        service.getSubnets.assert_has_calls(call(filter=_filter, mask=mask))
+        service.getSubnets.assert_has_calls(mock.call(filter=_filter,
+                                            mask=mask))
 
     def test_list_subnets_with_filters(self):
         result = self.network.list_subnets(
@@ -198,7 +200,8 @@ class NetworkTests(TestCase):
         service = self.client['Account']
 
         self.network.list_vlans()
-        service.getNetworkVlans.assert_has_calls(call(filter={}, mask=ANY))
+        service.getNetworkVlans.assert_has_calls(mock.call(filter={},
+                                                           mask=mock.ANY))
 
     def test_list_vlans_with_filters(self):
         self.network.list_vlans(
@@ -208,7 +211,7 @@ class NetworkTests(TestCase):
         )
 
         service = self.client['Account']
-        service.getNetworkVlans.assert_has_calls(call(
+        service.getNetworkVlans.assert_has_calls(mock.call(
             filter={
                 'networkVlans': {
                     'primaryRouter': {
@@ -219,7 +222,7 @@ class NetworkTests(TestCase):
                     'name': {'operation': '_= primary-vlan'},
                 },
             },
-            mask=ANY
+            mask=mock.ANY
         ))
 
     def test_summary_by_datacenter(self):

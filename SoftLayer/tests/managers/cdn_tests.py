@@ -4,34 +4,35 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.managers.cdn import (CDNManager, MAX_URLS_PER_LOAD,
-                                    MAX_URLS_PER_PURGE)
-from SoftLayer.tests import TestCase, FixtureClient
-from SoftLayer.tests.fixtures import Account
-from mock import call
-from math import ceil
+import math
+
+import mock
+
+from SoftLayer.managers import cdn
+from SoftLayer import testing
+from SoftLayer.testing import fixtures
 
 
-class CDNTests(TestCase):
+class CDNTests(testing.TestCase):
 
     def set_up(self):
-        self.client = FixtureClient()
-        self.cdn_client = CDNManager(self.client)
+        self.client = testing.FixtureClient()
+        self.cdn_client = cdn.CDNManager(self.client)
 
     def test_list_accounts(self):
         accounts = self.cdn_client.list_accounts()
-        self.assertEqual(accounts, Account.getCdnAccounts)
+        self.assertEqual(accounts, fixtures.Account.getCdnAccounts)
 
     def test_get_account(self):
         account = self.cdn_client.get_account(12345)
-        account_fixtures = self.client['Network_ContentDelivery_Account'].\
-            getObject(id=12345)
+        account_fixtures = (self.client['Network_ContentDelivery_Account']
+                            .getObject(id=12345))
         self.assertEqual(account, account_fixtures)
 
     def test_get_origins(self):
         origins = self.cdn_client.get_origins(12345)
-        origins_fixture = self.client['Network_ContentDelivery_Account'].\
-            getOriginPullMappingInformation(id=12345)
+        origins_fixture = (self.client['Network_ContentDelivery_Account']
+                           .getOriginPullMappingInformation(id=12345))
         self.assertEqual(origins, origins_fixture)
 
     def test_add_origin(self):
@@ -55,7 +56,7 @@ class CDNTests(TestCase):
     def test_remove_origin(self):
         account_id = 12345
         id = 12345
-        mcall = call(account_id, id=id)
+        mcall = mock.call(account_id, id=id)
         service = self.client['Network_ContentDelivery_Account']
 
         self.cdn_client.remove_origin(account_id, id)
@@ -73,7 +74,7 @@ class CDNTests(TestCase):
         self.cdn_client.load_content(account_id, urls)
         service = self.client['Network_ContentDelivery_Account']
         self.assertEqual(service.loadContent.call_count,
-                         ceil(len(urls) / float(MAX_URLS_PER_LOAD)))
+                         math.ceil(len(urls) / float(cdn.MAX_URLS_PER_LOAD)))
 
     def test_load_content_single(self):
         account_id = 12345
@@ -93,7 +94,7 @@ class CDNTests(TestCase):
 
         self.cdn_client.load_content(account_id, urls)
         self.assertEqual(service.loadContent.call_count,
-                         ceil(len(urls) / float(MAX_URLS_PER_LOAD)))
+                         math.ceil(len(urls) / float(cdn.MAX_URLS_PER_LOAD)))
 
     def test_purge_content(self):
         account_id = 12345
@@ -107,7 +108,7 @@ class CDNTests(TestCase):
         self.cdn_client.purge_content(account_id, urls)
         service = self.client['Network_ContentDelivery_Account']
         self.assertEqual(service.purgeContent.call_count,
-                         ceil(len(urls) / float(MAX_URLS_PER_PURGE)))
+                         math.ceil(len(urls) / float(cdn.MAX_URLS_PER_PURGE)))
 
     def test_purge_content_failure(self):
         account_id = 12345
@@ -120,7 +121,7 @@ class CDNTests(TestCase):
 
         self.cdn_client.purge_content(account_id, urls)
         self.assertEqual(service.purgeContent.call_count,
-                         ceil(len(urls) / float(MAX_URLS_PER_PURGE)))
+                         math.ceil(len(urls) / float(cdn.MAX_URLS_PER_PURGE)))
 
     def test_purge_content_single(self):
         account_id = 12345

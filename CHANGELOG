@@ -1,3 +1,15 @@
+3.2.0
+
+    * CLI+API: Added firewall manager and CLI module
+
+    * CLI+API: Added iscsi manager and CLI module
+
+    * API: Added ability to create multiple virtual servers at once to VSManager
+
+    * API: Added OrderingManager. Remove hard-coded price IDs
+
+    * Fixed several small bug fixes
+
 3.1.0
 
     * CLI+API: Added CDN manager and CLI module

@@ -7,8 +7,6 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.tests import TestCase, FixtureClient
-from mock import Mock, patch
 try:
     # Python 3.x compatibility
     import builtins  # NOQA
@@ -16,14 +14,18 @@ try:
 except ImportError:
     builtins_name = '__builtin__'
 
-from SoftLayer.CLI.helpers import format_output, CLIAbort, ArgumentError
-from SoftLayer.tests.fixtures import Hardware_Server
+import mock
+
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 from SoftLayer.CLI.modules import server
+from SoftLayer import testing
+from SoftLayer.testing import fixtures
 
 
-class ServerCLITests(TestCase):
+class ServerCLITests(testing.TestCase):
     def set_up(self):
-        self.client = FixtureClient()
+        self.client = testing.FixtureClient()
 
     def test_server_cancel_reasons(self):
         runnable = server.ServerCancelReasons(client=self.client)
@@ -51,9 +53,10 @@ class ServerCLITests(TestCase):
             method = 'assertCountEqual'
 
         f = getattr(self, method)
-        f(expected, format_output(output, 'python'))
+        f(expected, formatting.format_output(output, 'python'))
 
-    @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
+    @mock.patch('SoftLayer.HardwareManager'
+                '.get_available_dedicated_server_packages')
     def test_server_create_options(self, packages):
         args = {
             '<chassis_id>': '999',
@@ -98,9 +101,10 @@ class ServerCLITests(TestCase):
                 'WIN_2012-DC-HYPERV_64'],
             'single nic': ['100', '1000']}
 
-        self.assertEqual(expected, format_output(output, 'python'))
+        self.assertEqual(expected, formatting.format_output(output, 'python'))
 
-    @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
+    @mock.patch('SoftLayer.HardwareManager'
+                '.get_available_dedicated_server_packages')
     def test_server_create_options_with_cpu_only(self, packages):
         args = {
             '<chassis_id>': '999',
@@ -132,9 +136,10 @@ class ServerCLITests(TestCase):
             ],
         }
 
-        self.assertEqual(expected, format_output(output, 'python'))
+        self.assertEqual(expected, formatting.format_output(output, 'python'))
 
-    @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
+    @mock.patch('SoftLayer.HardwareManager'
+                '.get_available_dedicated_server_packages')
     def test_server_create_options_with_invalid_chassis(self, packages):
         args = {
             '<chassis_id>': '999',
@@ -155,10 +160,11 @@ class ServerCLITests(TestCase):
 
         runnable = server.ServerCreateOptions(client=self.client)
 
-        self.assertRaises(CLIAbort, runnable.execute, args)
+        self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
 
-    @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
-    @patch('SoftLayer.HardwareManager.get_bare_metal_package_id')
+    @mock.patch('SoftLayer.HardwareManager'
+                '.get_available_dedicated_server_packages')
+    @mock.patch('SoftLayer.HardwareManager.get_bare_metal_package_id')
     def test_server_create_options_for_bmc(self, bmpi, packages):
         args = {
             '<chassis_id>': '1099',
@@ -202,7 +208,7 @@ class ServerCLITests(TestCase):
                 'WIN_2012-DC-HYPERV_64'],
             'single nic': ['100', '1000']}
 
-        self.assertEqual(expected, format_output(output, 'python'))
+        self.assertEqual(expected, formatting.format_output(output, 'python'))
 
     def test_server_details(self):
         runnable = server.ServerDetails(client=self.client)
@@ -232,11 +238,11 @@ class ServerCLITests(TestCase):
             'owner': 'chechu'
         }
 
-        self.assertEqual(expected, format_output(output, 'python'))
+        self.assertEqual(expected, formatting.format_output(output, 'python'))
 
     def test_server_details_issue_332(self):
         runnable = server.ServerDetails(client=self.client)
-        result = Hardware_Server.getObject.copy()
+        result = fixtures.Hardware_Server.getObject.copy()
         result['primaryIpAddress'] = None
         self.client['Hardware_Server'].getObject.return_value = result
 
@@ -288,14 +294,12 @@ class ServerCLITests(TestCase):
             }
         ]
 
-        self.assertEqual(expected, format_output(output, 'python'))
+        self.assertEqual(expected, formatting.format_output(output, 'python'))
 
-    @patch('SoftLayer.CLI.modules.server.CLIAbort')
-    @patch('SoftLayer.CLI.modules.server.no_going_back')
-    @patch('SoftLayer.HardwareManager.reload')
-    @patch('SoftLayer.CLI.modules.server.resolve_id')
-    def test_server_reload(
-            self, resolve_mock, reload_mock, ngb_mock, abort_mock):
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    @mock.patch('SoftLayer.HardwareManager.reload')
+    @mock.patch('SoftLayer.CLI.helpers.resolve_id')
+    def test_server_reload(self, resolve_mock, reload_mock, ngb_mock):
         hw_id = 12345
         resolve_mock.return_value = hw_id
         ngb_mock.return_value = False
@@ -310,15 +314,12 @@ class ServerCLITests(TestCase):
         # Now check to make sure we properly call CLIAbort in the negative case
         args['--really'] = False
 
-        runnable.execute(args)
-        abort_mock.assert_called()
+        self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
 
-    @patch('SoftLayer.CLI.modules.server.CLIAbort')
-    @patch('SoftLayer.CLI.modules.server.no_going_back')
-    @patch('SoftLayer.HardwareManager.cancel_hardware')
-    @patch('SoftLayer.CLI.modules.server.resolve_id')
-    def test_cancel_server(
-            self, resolve_mock, cancel_mock, ngb_mock, abort_mock):
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    @mock.patch('SoftLayer.HardwareManager.cancel_hardware')
+    @mock.patch('SoftLayer.CLI.helpers.resolve_id')
+    def test_cancel_server(self, resolve_mock, cancel_mock, ngb_mock):
         hw_id = 12345
         resolve_mock.return_value = hw_id
         ngb_mock.return_value = False
@@ -331,18 +332,17 @@ class ServerCLITests(TestCase):
         cancel_mock.assert_called_with(hw_id, args['--reason'], None)
 
         # Now check to make sure we properly call CLIAbort in the negative case
-        env_mock = Mock()
-        env_mock.input = Mock()
+        env_mock = mock.Mock()
+        env_mock.input = mock.Mock()
         env_mock.input.return_value = 'Comment'
 
         args['--really'] = False
         runnable = server.CancelServer(client=self.client, env=env_mock)
 
-        runnable.execute(args)
-        abort_mock.assert_called()
+        self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
         env_mock.assert_called()
 
-    @patch('SoftLayer.CLI.modules.server.confirm')
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_server_power_off(self, confirm_mock):
         hw_id = 12345
         runnable = server.ServerPowerOff(client=self.client)
@@ -357,9 +357,9 @@ class ServerCLITests(TestCase):
         # Now check to make sure we properly call CLIAbort in the negative case
         confirm_mock.return_value = False
         args['--really'] = False
-        self.assertRaises(CLIAbort, runnable.execute, args)
+        self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
 
-    @patch('SoftLayer.CLI.modules.server.confirm')
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_server_reboot(self, confirm_mock):
         hw_id = 12345
         runnable = server.ServerReboot(client=self.client)
@@ -389,7 +389,7 @@ class ServerCLITests(TestCase):
         # Now check to make sure we properly call CLIAbort in the negative case
         confirm_mock.return_value = False
         args['--really'] = False
-        self.assertRaises(CLIAbort, runnable.execute, args)
+        self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
 
     def test_server_power_on(self):
         hw_id = 12345
@@ -403,7 +403,7 @@ class ServerCLITests(TestCase):
         runnable.execute(args)
         self.client['Hardware_Server'].powerOn.assert_called_with(id=hw_id)
 
-    @patch('SoftLayer.CLI.modules.server.confirm')
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_server_power_cycle(self, confirm_mock):
         hw_id = 12345
         runnable = server.ServerPowerCycle(client=self.client)
@@ -420,10 +420,10 @@ class ServerCLITests(TestCase):
         # Now check to make sure we properly call CLIAbort in the negative case
         confirm_mock.return_value = False
         args['--really'] = False
-        self.assertRaises(CLIAbort, runnable.execute, args)
+        self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
 
-    @patch('SoftLayer.HardwareManager.change_port_speed')
-    @patch('SoftLayer.CLI.modules.server.resolve_id')
+    @mock.patch('SoftLayer.HardwareManager.change_port_speed')
+    @mock.patch('SoftLayer.CLI.helpers.resolve_id')
     def test_cic_edit_server(self, resolve_mock, port_mock):
         hw_id = 12345
         resolve_mock.return_value = hw_id
@@ -446,7 +446,8 @@ class ServerCLITests(TestCase):
         # Second call simulates an error
         runnable.execute(args)
 
-    @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
+    @mock.patch('SoftLayer.HardwareManager'
+                '.get_available_dedicated_server_packages')
     def test_list_chassis_server(self, packages):
         test_data = [
             (1, 'Chassis 1'),
@@ -462,7 +463,7 @@ class ServerCLITests(TestCase):
             {'Chassis': 'Chassis 2', 'Code': 2}
         ]
 
-        self.assertEqual(expected, format_output(output, 'python'))
+        self.assertEqual(expected, formatting.format_output(output, 'python'))
 
     def test_create_server(self):
         args = {
@@ -488,7 +489,8 @@ class ServerCLITests(TestCase):
         runnable = server.CreateServer(client=self.client)
 
         # First, test the --test flag
-        with patch('SoftLayer.HardwareManager.verify_order') as verify_mock:
+        with mock.patch('SoftLayer.HardwareManager'
+                        '.verify_order') as verify_mock:
             verify_mock.return_value = {
                 'prices': [
                     {
@@ -514,24 +516,27 @@ class ServerCLITests(TestCase):
                 ''
             ]
 
-            self.assertEqual(expected, format_output(output, 'python'))
+            self.assertEqual(expected,
+                             formatting.format_output(output, 'python'))
 
             # Make sure we can order without specifying the disk as well
             args['--disk'] = []
 
             output = runnable.execute(args)
 
-            self.assertEqual(expected, format_output(output, 'python'))
+            self.assertEqual(expected,
+                             formatting.format_output(output, 'python'))
 
             # Test explicitly setting a RAID configuration
             args['--controller'] = 'RAID0'
 
             output = runnable.execute(args)
 
-            self.assertEqual(expected, format_output(output, 'python'))
+            self.assertEqual(expected,
+                             formatting.format_output(output, 'python'))
 
         # Now test ordering
-        with patch('SoftLayer.HardwareManager.place_order') as order_mock:
+        with mock.patch('SoftLayer.HardwareManager.place_order') as order_mock:
             order_mock.return_value = {
                 'orderId': 98765,
                 'orderDate': '2013-08-02 15:23:47'
@@ -543,15 +548,16 @@ class ServerCLITests(TestCase):
             output = runnable.execute(args)
 
             expected = {'id': 98765, 'created': '2013-08-02 15:23:47'}
-            self.assertEqual(expected, format_output(output, 'python'))
+            self.assertEqual(expected,
+                             formatting.format_output(output, 'python'))
 
         # Finally, test cancelling the process
-        with patch('SoftLayer.CLI.modules.server.confirm') as confirm:
+        with mock.patch('SoftLayer.CLI.formatting.confirm') as confirm:
             confirm.return_value = False
 
             args['--really'] = False
 
-            self.assertRaises(CLIAbort, runnable.execute, args)
+            self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
 
     def test_create_server_failures(self):
 
@@ -573,23 +579,23 @@ class ServerCLITests(TestCase):
         runnable = server.CreateServer(client=self.client)
 
         # Verify that ArgumentError is properly raised on error
-        self.assertRaises(ArgumentError, runnable.execute, args)
+        self.assertRaises(exceptions.ArgumentError, runnable.execute, args)
 
         # This contains an invalid network argument
         args['--chassis'] = 999
         args['--network'] = 9999
 
         # Verify that CLIAbort is properly raised on error
-        self.assertRaises(CLIAbort, runnable.execute, args)
+        self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
 
         # This contains an invalid operating system argument
         args['--network'] = '100'
         args['--os'] = 'nope'
 
         # Verify that CLIAbort is properly raised on error
-        self.assertRaises(CLIAbort, runnable.execute, args)
+        self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
 
-    @patch('SoftLayer.CLI.modules.server.export_to_template')
+    @mock.patch('SoftLayer.CLI.template.export_to_template')
     def test_create_server_with_export(self, export_to_template):
         args = {
             '--chassis': 999,
@@ -618,8 +624,9 @@ class ServerCLITests(TestCase):
         export_to_template.assert_called_with('test_file.txt', expected,
                                               exclude=['--wait', '--test'])
 
-    @patch('SoftLayer.HardwareManager.get_available_dedicated_server_packages')
-    @patch('SoftLayer.HardwareManager.get_bare_metal_package_id')
+    @mock.patch('SoftLayer.HardwareManager'
+                '.get_available_dedicated_server_packages')
+    @mock.patch('SoftLayer.HardwareManager.get_bare_metal_package_id')
     def test_create_server_for_bmc(self, bmpi, packages):
         args = {
             '--chassis': '1099',
@@ -651,7 +658,8 @@ class ServerCLITests(TestCase):
         runnable = server.CreateServer(client=self.client)
 
         # First, test the --test flag
-        with patch('SoftLayer.HardwareManager.verify_order') as verify_mock:
+        with mock.patch('SoftLayer.HardwareManager'
+                        '.verify_order') as verify_mock:
             verify_mock.return_value = {
                 'prices': [
                     {
@@ -677,24 +685,27 @@ class ServerCLITests(TestCase):
                 ''
             ]
 
-            self.assertEqual(expected, format_output(output, 'python'))
+            self.assertEqual(expected,
+                             formatting.format_output(output, 'python'))
 
             # Make sure we can order without specifying the disk as well
             args['--disk'] = []
 
             output = runnable.execute(args)
 
-            self.assertEqual(expected, format_output(output, 'python'))
+            self.assertEqual(expected,
+                             formatting.format_output(output, 'python'))
 
             # Test explicitly setting a RAID configuration
             args['--controller'] = 'RAID0'
 
             output = runnable.execute(args)
 
-            self.assertEqual(expected, format_output(output, 'python'))
+            self.assertEqual(expected,
+                             formatting.format_output(output, 'python'))
 
         # Now test ordering
-        with patch('SoftLayer.HardwareManager.place_order') as order_mock:
+        with mock.patch('SoftLayer.HardwareManager.place_order') as order_mock:
             order_mock.return_value = {
                 'orderId': 98765,
                 'orderDate': '2013-08-02 15:23:47'
@@ -706,15 +717,16 @@ class ServerCLITests(TestCase):
             output = runnable.execute(args)
 
             expected = {'id': 98765, 'created': '2013-08-02 15:23:47'}
-            self.assertEqual(expected, format_output(output, 'python'))
+            self.assertEqual(expected,
+                             formatting.format_output(output, 'python'))
 
         # Finally, test cancelling the process
-        with patch('SoftLayer.CLI.modules.server.confirm') as confirm:
+        with mock.patch('SoftLayer.CLI.formatting.confirm') as confirm:
             confirm.return_value = False
 
             args['--really'] = False
 
-            self.assertRaises(CLIAbort, runnable.execute, args)
+            self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
 
     def test_edit_server(self):
         # Test both userdata and userfile at once
@@ -727,15 +739,15 @@ class ServerCLITests(TestCase):
         }
         runnable = server.EditServer(client=self.client)
 
-        self.assertRaises(ArgumentError, runnable.execute, args)
+        self.assertRaises(exceptions.ArgumentError, runnable.execute, args)
 
         # Simulate a missing file error
         args['--userdata'] = None
 
-        with patch('os.path.exists') as exists:
+        with mock.patch('os.path.exists') as exists:
             exists.return_value = False
 
-            self.assertRaises(ArgumentError, runnable.execute, args)
+            self.assertRaises(exceptions.ArgumentError, runnable.execute, args)
 
         # Test a successful edit with user data
         args['--userdata'] = 'My data'
@@ -747,7 +759,7 @@ class ServerCLITests(TestCase):
             'hostname': 'hardware-test1',
         }
 
-        with patch('SoftLayer.HardwareManager.edit') as edit_mock:
+        with mock.patch('SoftLayer.HardwareManager.edit') as edit_mock:
             edit_mock.return_value = True
 
             runnable.execute(args)
@@ -757,7 +769,7 @@ class ServerCLITests(TestCase):
             # Now check for a CLIAbort if there's an error
             edit_mock.return_value = False
 
-            self.assertRaises(CLIAbort, runnable.execute, args)
+            self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
 
         # Test a successful edit with a user file
         args['--userdata'] = None
@@ -769,14 +781,14 @@ class ServerCLITests(TestCase):
             'hostname': 'hardware-test1',
         }
 
-        with patch('os.path.exists') as exists:
+        with mock.patch('os.path.exists') as exists:
             exists.return_value = True
-            with patch(builtins_name + '.open') as file_mock:
+            with mock.patch(builtins_name + '.open') as file_mock:
                 file_mock.return_value.__enter__ = lambda s: s
-                file_mock.return_value.__exit__ = Mock()
+                file_mock.return_value.__exit__ = mock.Mock()
                 file_mock.return_value.read.return_value = 'some data'
 
-                with patch('SoftLayer.HardwareManager.edit') as edit_mock:
+                with mock.patch('SoftLayer.HardwareManager.edit') as edit_mock:
                     edit_mock.return_value = True
                     expected['userdata'] = 'some data'
 

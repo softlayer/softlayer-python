@@ -4,16 +4,16 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import LoadBalancerManager
-from SoftLayer.tests import TestCase, FixtureClient
-from SoftLayer.tests.fixtures import Billing_Item
+import SoftLayer
+from SoftLayer import testing
+from SoftLayer.testing import fixtures
 
 
-class LoadBalancerTests(TestCase):
+class LoadBalancerTests(testing.TestCase):
 
     def set_up(self):
-        self.client = FixtureClient()
-        self.lb_mgr = LoadBalancerManager(self.client)
+        self.client = testing.FixtureClient()
+        self.lb_mgr = SoftLayer.LoadBalancerManager(self.client)
 
     def test_get_lb_pkgs(self):
         self.lb_mgr.get_lb_pkgs()
@@ -22,9 +22,9 @@ class LoadBalancerTests(TestCase):
             'items': {
                 'description': {
                     'operation': '*= Load Balancer'
-                    }
                 }
             }
+        }
         f.assert_called_once_with(filter=_filter, id=0)
 
     def test_get_ip_address(self):
@@ -67,7 +67,7 @@ class LoadBalancerTests(TestCase):
         result = self.lb_mgr.cancel_lb(loadbal_id)
         f = self.client['Billing_Item'].cancelService
         f.assert_called_once_with(id=billing_item_id)
-        self.assertEqual(result, Billing_Item.cancelService)
+        self.assertEqual(result, fixtures.Billing_Item.cancelService)
 
     def test_add_local_lb(self):
         price_id = 6327
@@ -146,11 +146,11 @@ class LoadBalancerTests(TestCase):
                     'services': {
                         'id': {
                             'operation': 1234
-                            }
                         }
                     }
                 }
             }
+        }
         mask = 'mask[serviceGroups[services[groupReferences,healthChecks]]]'
         call.assert_called_once_with(filter=_filter, mask=mask, id=loadbal_id)
 

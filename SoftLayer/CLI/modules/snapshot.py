@@ -13,14 +13,15 @@ The available commands are:
 For several commands <identifier> will be asked for.This can be the id
 of iSCSI volume or iSCSI snapshot.
 """
-from SoftLayer.CLI import (CLIRunnable, Table)
-from SoftLayer.CLI.helpers import (
-    ArgumentError, NestedDict,
-    resolve_id)
-from SoftLayer import ISCSIManager
+import SoftLayer
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
+from SoftLayer import utils
 
 
-class CreateSnapshot(CLIRunnable):
+class CreateSnapshot(environment.CLIRunnable):
 
     """
 usage: sl snapshot create <identifier> [options]
@@ -38,16 +39,15 @@ Options:
     action = 'create'
 
     def execute(self, args):
-        iscsi_mgr = ISCSIManager(self.client)
-        iscsi_id = resolve_id(
-            iscsi_mgr.resolve_ids,
-            args.get('<identifier>'),
-            'iSCSI')
+        iscsi_mgr = SoftLayer.ISCSIManager(self.client)
+        iscsi_id = helpers.resolve_id(iscsi_mgr.resolve_ids,
+                                      args.get('<identifier>'),
+                                      'iSCSI')
         notes = args.get('--notes')
         iscsi_mgr.create_snapshot(iscsi_id, notes)
 
 
-class CreateSnapshotSpace(CLIRunnable):
+class CreateSnapshotSpace(environment.CLIRunnable):
 
     """
 usage: sl snapshot create-space <identifier> [options]
@@ -65,20 +65,19 @@ Required :
     required_params = ['--capacity']
 
     def execute(self, args):
-        iscsi_mgr = ISCSIManager(self.client)
+        iscsi_mgr = SoftLayer.ISCSIManager(self.client)
         invalid_args = [k for k in self.required_params if args.get(k) is None]
         if invalid_args:
-            raise ArgumentError('Missing required options: %s'
-                                % ','.join(invalid_args))
-        iscsi_id = resolve_id(
-            iscsi_mgr.resolve_ids,
-            args.get('<identifier>'),
-            'iSCSI')
+            raise exceptions.ArgumentError('Missing required options: %s'
+                                           % ','.join(invalid_args))
+        iscsi_id = helpers.resolve_id(iscsi_mgr.resolve_ids,
+                                      args.get('<identifier>'),
+                                      'iSCSI')
         capacity = args.get('--capacity')
         iscsi_mgr.create_snapshot_space(iscsi_id, capacity)
 
 
-class CancelSnapshot(CLIRunnable):
+class CancelSnapshot(environment.CLIRunnable):
 
     """
 usage: sl snapshot cancel <identifier> [options]
@@ -89,15 +88,14 @@ Cancel/Delete iSCSI snapshot.
     action = 'cancel'
 
     def execute(self, args):
-        iscsi_mgr = ISCSIManager(self.client)
-        snapshot_id = resolve_id(
-            iscsi_mgr.resolve_ids,
-            args.get('<identifier>'),
-            'Snapshot')
+        iscsi_mgr = SoftLayer.ISCSIManager(self.client)
+        snapshot_id = helpers.resolve_id(iscsi_mgr.resolve_ids,
+                                         args.get('<identifier>'),
+                                         'Snapshot')
         iscsi_mgr.delete_snapshot(snapshot_id)
 
 
-class RestoreVolumeFromSnapshot(CLIRunnable):
+class RestoreVolumeFromSnapshot(environment.CLIRunnable):
 
     """
 usage: sl snapshot restore-volume <volume_identifier> <snapshot_identifier>
@@ -108,17 +106,17 @@ restores volume from existing snapshot.
     action = 'restore-volume'
 
     def execute(self, args):
-        iscsi_mgr = ISCSIManager(self.client)
-        volume_id = resolve_id(
-            iscsi_mgr.resolve_ids, args.get('<volume_identifier>'), 'iSCSI')
-        snapshot_id = resolve_id(
-            iscsi_mgr.resolve_ids,
-            args.get('<snapshot_identifier>'),
-            'Snapshot')
+        iscsi_mgr = SoftLayer.ISCSIManager(self.client)
+        volume_id = helpers.resolve_id(iscsi_mgr.resolve_ids,
+                                       args.get('<volume_identifier>'),
+                                       'iSCSI')
+        snapshot_id = helpers.resolve_id(iscsi_mgr.resolve_ids,
+                                         args.get('<snapshot_identifier>'),
+                                         'Snapshot')
         iscsi_mgr.restore_from_snapshot(volume_id, snapshot_id)
 
 
-class ListSnapshots(CLIRunnable):
+class ListSnapshots(environment.CLIRunnable):
 
     """
 usage: sl snapshot list <identifier>
@@ -128,15 +126,16 @@ List iSCSI Snapshots
     action = 'list'
 
     def execute(self, args):
-        iscsi_mgr = ISCSIManager(self.client)
-        iscsi_id = resolve_id(
-            iscsi_mgr.resolve_ids, args.get('<identifier>'), 'iSCSI')
+        iscsi_mgr = SoftLayer.ISCSIManager(self.client)
+        iscsi_id = helpers.resolve_id(iscsi_mgr.resolve_ids,
+                                      args.get('<identifier>'),
+                                      'iSCSI')
         iscsi = self.client['Network_Storage_Iscsi']
         snapshots = iscsi.getPartnerships(
             mask='volumeId,partnerVolumeId,createDate,type', id=iscsi_id)
-        snapshots = [NestedDict(n) for n in snapshots]
+        snapshots = [utils.NestedDict(n) for n in snapshots]
 
-        table = Table([
+        table = formatting.Table([
             'id',
             'createDate',
             'name',
@@ -149,5 +148,5 @@ List iSCSI Snapshots
                 snapshot['createDate'],
                 snapshot['type']['name'],
                 snapshot['type']['description'],
-                ])
+            ])
         return table

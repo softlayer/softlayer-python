@@ -11,12 +11,14 @@ The available commands are:
 """
 # :license: MIT, see LICENSE for more details.
 
-from SoftLayer import ImageManager
-from SoftLayer.CLI import CLIRunnable, Table, KeyValueTable, blank, resolve_id
-from SoftLayer.CLI.helpers import CLIAbort
+import SoftLayer
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 
 
-class ListImages(CLIRunnable):
+class ListImages(environment.CLIRunnable):
     """
 usage: sl image list [--public | --private] [options]
 
@@ -29,7 +31,7 @@ Options:
     action = 'list'
 
     def execute(self, args):
-        image_mgr = ImageManager(self.client)
+        image_mgr = SoftLayer.ImageManager(self.client)
 
         neither = not any([args['--private'], args['--public']])
         mask = 'id,accountId,name,globalIdentifier,blockDevices,parentId'
@@ -45,26 +47,26 @@ Options:
                 image['visibility'] = 'public'
                 images.append(image)
 
-        table = Table(['id',
-                       'account',
-                       'visibility',
-                       'name',
-                       'global_identifier'])
+        table = formatting.Table(['id',
+                                  'account',
+                                  'visibility',
+                                  'name',
+                                  'global_identifier'])
 
         images = [image for image in images if image['parentId'] == '']
         for image in images:
             table.add_row([
                 image['id'],
-                image.get('accountId', blank()),
+                image.get('accountId', formatting.blank()),
                 image['visibility'],
                 image['name'].strip(),
-                image.get('globalIdentifier', blank()),
+                image.get('globalIdentifier', formatting.blank()),
             ])
 
         return table
 
 
-class DetailImage(CLIRunnable):
+class DetailImage(environment.CLIRunnable):
     """
 usage: sl image detail <identifier> [options]
 
@@ -73,27 +75,27 @@ Get details for an image
     action = 'detail'
 
     def execute(self, args):
-        image_mgr = ImageManager(self.client)
-        image_id = resolve_id(image_mgr.resolve_ids,
-                              args.get('<identifier>'),
-                              'image')
+        image_mgr = SoftLayer.ImageManager(self.client)
+        image_id = helpers.resolve_id(image_mgr.resolve_ids,
+                                      args.get('<identifier>'),
+                                      'image')
 
         image = image_mgr.get_image(image_id)
 
-        table = KeyValueTable(['Name', 'Value'])
+        table = formatting.KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
         table.align['Value'] = 'l'
 
         table.add_row(['id', image['id']])
-        table.add_row(['account', image.get('accountId', blank())])
+        table.add_row(['account', image.get('accountId', formatting.blank())])
         table.add_row(['name', image['name'].strip()])
         table.add_row(['global_identifier',
-                       image.get('globalIdentifier', blank())])
+                       image.get('globalIdentifier', formatting.blank())])
 
         return table
 
 
-class DeleteImage(CLIRunnable):
+class DeleteImage(environment.CLIRunnable):
     """
 usage: sl image delete <identifier> [options]
 
@@ -102,15 +104,15 @@ Get details for an image
     action = 'delete'
 
     def execute(self, args):
-        image_mgr = ImageManager(self.client)
-        image_id = resolve_id(image_mgr.resolve_ids,
-                              args.get('<identifier>'),
-                              'image')
+        image_mgr = SoftLayer.ImageManager(self.client)
+        image_id = helpers.resolve_id(image_mgr.resolve_ids,
+                                      args.get('<identifier>'),
+                                      'image')
 
         image_mgr.delete_image(image_id)
 
 
-class EditImage(CLIRunnable):
+class EditImage(environment.CLIRunnable):
     """
 usage: sl image edit <identifier> [--tag=Tag...] [options]
 
@@ -126,7 +128,7 @@ Note: Image to be edited must be private
     action = 'edit'
 
     def execute(self, args):
-        image_mgr = ImageManager(self.client)
+        image_mgr = SoftLayer.ImageManager(self.client)
         data = {}
         if args.get('--name'):
             data['name'] = args.get('--name')
@@ -134,7 +136,7 @@ Note: Image to be edited must be private
             data['note'] = args.get('--note')
         if args.get('--tag'):
             data['tag'] = args.get('--tag')
-        image_id = resolve_id(image_mgr.resolve_ids,
-                              args.get('<identifier>'), 'image')
+        image_id = helpers.resolve_id(image_mgr.resolve_ids,
+                                      args.get('<identifier>'), 'image')
         if not image_mgr.edit(image_id, **data):
-            raise CLIAbort("Failed to Edit Image")
+            raise exceptions.CLIAbort("Failed to Edit Image")

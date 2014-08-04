@@ -6,10 +6,11 @@
     :license: MIT, see LICENSE for more details.
 """
 import json
+
 import requests.auth
 
-from SoftLayer.consts import USER_AGENT
-from SoftLayer.exceptions import Unauthenticated, SoftLayerError
+from SoftLayer import consts
+from SoftLayer import exceptions
 
 ENDPOINTS = {
     "dal05": {
@@ -43,8 +44,8 @@ class QueueAuth(requests.auth.AuthBase):
         if resp.ok:
             self.auth_token = resp.headers['X-Auth-Token']
         else:
-            raise Unauthenticated("Error while authenticating: %s"
-                                  % resp.status_code)
+            raise exceptions.Unauthenticated("Error while authenticating: %s"
+                                             % resp.status_code)
 
     def handle_error(self, resp, **_):
         """ Handle errors """
@@ -116,10 +117,10 @@ class MessagingManager(object):
         :param datacenter: Datacenter code
         :param network: network ('public' or 'private')
         """
-        if not self.client.auth \
-                or not getattr(self.client.auth, 'username', None) \
-                or not getattr(self.client.auth, 'api_key', None):
-            raise SoftLayerError(
+        if any([not self.client.auth,
+                not getattr(self.client.auth, 'username', None),
+                not getattr(self.client.auth, 'api_key', None)]):
+            raise exceptions.SoftLayerError(
                 'Client instance auth must be BasicAuthentication.')
 
         client = MessagingConnection(
@@ -156,7 +157,7 @@ class MessagingConnection(object):
         """
         headers = {
             'Content-Type': 'application/json',
-            'User-Agent': USER_AGENT,
+            'User-Agent': consts.USER_AGENT,
         }
         headers.update(kwargs.get('headers', {}))
         kwargs['headers'] = headers

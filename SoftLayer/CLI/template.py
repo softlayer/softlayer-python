@@ -9,12 +9,12 @@
 """
 import os.path
 
-from .exceptions import ArgumentError
-from SoftLayer.utils import configparser, StringIO
+from SoftLayer.CLI import exceptions
+from SoftLayer import utils
 
 
 def update_with_template_args(args, list_args=None):
-    """ Populates arguments with arguments from the template file, if provided.
+    """Populates arguments with arguments from the template file, if provided.
 
     :param dict args: command-line arguments
     """
@@ -25,14 +25,14 @@ def update_with_template_args(args, list_args=None):
 
     template_path = args.pop('--template')
     if not os.path.exists(template_path):
-        raise ArgumentError(
+        raise exceptions.ArgumentError(
             'File does not exist [-t | --template] = %s'
             % template_path)
 
-    config = configparser.ConfigParser()
+    config = utils.configparser.ConfigParser()
     ini_str = '[settings]\n' + open(
         os.path.expanduser(template_path), 'r').read()
-    ini_fp = StringIO(ini_str)
+    ini_fp = utils.StringIO(ini_str)
     config.readfp(ini_fp)
 
     # Merge template options with the options passed in
@@ -45,7 +45,7 @@ def update_with_template_args(args, list_args=None):
 
 
 def export_to_template(filename, args, exclude=None):
-    """ Exports given options to the given filename in INI format
+    """Exports given options to the given filename in INI format.
 
     :param filename: Filename to save options to
     :param dict args: Arguments to export

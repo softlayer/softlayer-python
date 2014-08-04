@@ -4,21 +4,22 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import VSManager, OrderingManager
-from SoftLayer.tests import TestCase, FixtureClient
-from SoftLayer.tests.fixtures import Virtual_Guest
+import mock
 
-from mock import MagicMock, ANY, call, patch
+import SoftLayer
+from SoftLayer import testing
+from SoftLayer.testing import fixtures
 
 
-class VSTests(TestCase):
+class VSTests(testing.TestCase):
 
     def set_up(self):
-        self.client = FixtureClient()
-        self.vs = VSManager(self.client, OrderingManager(self.client))
+        self.client = testing.FixtureClient()
+        self.vs = SoftLayer.VSManager(self.client,
+                                      SoftLayer.OrderingManager(self.client))
 
     def test_list_instances(self):
-        mcall = call(mask=ANY, filter={})
+        mcall = mock.call(mask=mock.ANY, filter={})
         service = self.client['Account']
 
         list_expected_ids = [100, 104]
@@ -62,7 +63,7 @@ class VSTests(TestCase):
         )
 
         service = self.client['Account']
-        service.getVirtualGuests.assert_has_calls(call(
+        service.getVirtualGuests.assert_has_calls(mock.call(
             filter={
                 'virtualGuests': {
                     'datacenter': {
@@ -81,7 +82,7 @@ class VSTests(TestCase):
                     'primaryIpAddress': {'operation': '_= 1.2.3.4'},
                     'primaryBackendIpAddress': {'operation': '_= 4.3.2.1'}
                 }},
-            mask=ANY,
+            mask=mock.ANY,
         ))
 
     def test_resolve_ids_ip(self):
@@ -104,12 +105,13 @@ class VSTests(TestCase):
     def test_get_instance(self):
         result = self.vs.get_instance(100)
         self.client['Virtual_Guest'].getObject.assert_called_once_with(
-            id=100, mask=ANY)
-        self.assertEqual(Virtual_Guest.getObject, result)
+            id=100, mask=mock.ANY)
+        self.assertEqual(fixtures.Virtual_Guest.getObject, result)
 
     def test_get_create_options(self):
         results = self.vs.get_create_options()
-        self.assertEqual(Virtual_Guest.getCreateObjectOptions, results)
+        self.assertEqual(fixtures.Virtual_Guest.getCreateObjectOptions,
+                         results)
 
     def test_cancel_instance(self):
         self.vs.cancel_instance(1)
@@ -124,7 +126,7 @@ class VSTests(TestCase):
                                   {'customProvisionScriptUri': post_uri,
                                    'sshKeyIds': [1701]}, id=1)
 
-    @patch('SoftLayer.managers.vs.VSManager._generate_create_dict')
+    @mock.patch('SoftLayer.managers.vs.VSManager._generate_create_dict')
     def test_create_verify(self, create_dict):
         create_dict.return_value = {'test': 1, 'verify': 1}
         self.vs.verify_create_instance(test=1, verify=1)
@@ -132,13 +134,31 @@ class VSTests(TestCase):
         f = self.client['Virtual_Guest'].generateOrderTemplate
         f.assert_called_once_with({'test': 1, 'verify': 1})
 
-    @patch('SoftLayer.managers.vs.VSManager._generate_create_dict')
+    @mock.patch('SoftLayer.managers.vs.VSManager._generate_create_dict')
     def test_create_instance(self, create_dict):
         create_dict.return_value = {'test': 1, 'verify': 1}
-        self.vs.create_instance(test=1, verify=1)
+        self.vs.create_instance(test=1, verify=1, tag='dev,green')
         create_dict.assert_called_once_with(test=1, verify=1)
         self.client['Virtual_Guest'].createObject.assert_called_once_with(
             {'test': 1, 'verify': 1})
+        self.client['Virtual_Guest'].setTags.assert_called_once_with(
+            'dev,green', id=100)
+
+    def test_create_instances(self):
+        self.vs.create_instances([{'cpus': 1,
+                                   'memory': 1024,
+                                   'hostname': 'server',
+                                   'domain': 'example.com',
+                                   'tag': 'dev,green'}])
+        self.client['Virtual_Guest'].createObjects.assert_called_once_with([
+            {'domain': 'example.com',
+             'hourlyBillingFlag': True,
+             'localDiskFlag': True,
+             'maxMemory': 1024, 'hostname':
+             'server',
+             'startCpus': 1}])
+        self.client['Virtual_Guest'].setTags.assert_called_once_with(
+            'dev,green', id=100)
 
     def test_generate_os_and_image(self):
         self.assertRaises(
@@ -517,6 +537,13 @@ class VSTests(TestCase):
         self.vs.edit(100, **args)
         service.editObject.assert_called_once_with(args, id=100)
 
+        # Test tag support
+        self.vs.edit(100, tag='dev,green')
+        service.setTags.assert_called_once_with('dev,green', id=100)
+        service.setTags.reset_mock()
+        self.vs.edit(100, tag='')
+        service.setTags.assert_called_once_with('', id=100)
+
     def test_captures(self):
         archive = self.client['Virtual_Guest'].createArchiveTransaction
 
@@ -559,21 +586,21 @@ class VSTests(TestCase):
         item_id = 0
         package_items = self.client['Product_Package'].getItems(id=46)
         for item in package_items:
-            if ((item['categories'][0]['id'] == 3)
+            if ((item['prices'][0]['categories'][0]['id'] == 3)
                     and (item.get('capacity') == '2')):
                 item_id = item['prices'][0]['id']
                 break
         self.assertEqual(1133, item_id)
 
 
-class VSWaitReadyGoTests(TestCase):
+class VSWaitReadyGoTests(testing.TestCase):
 
     def set_up(self):
-        self.client = MagicMock()
-        self.vs = VSManager(self.client)
+        self.client = mock.MagicMock()
+        self.vs = SoftLayer.VSManager(self.client)
         self.guestObject = self.client['Virtual_Guest'].getObject
 
-    @patch('SoftLayer.managers.vs.VSManager.wait_for_ready')
+    @mock.patch('SoftLayer.managers.vs.VSManager.wait_for_ready')
     def test_wait_interface(self, ready):
         # verify interface to wait_for_ready is intact
         self.vs.wait_for_transaction(1, 1)
@@ -642,7 +669,7 @@ class VSWaitReadyGoTests(TestCase):
         value = self.vs.wait_for_ready(1, 1, pending=True)
         self.assertFalse(value)
 
-    @patch('SoftLayer.managers.vs.sleep')
+    @mock.patch('time.sleep')
     def test_ready_iter_once_incomplete(self, _sleep):
         self.guestObject = self.client['Virtual_Guest'].getObject
 
@@ -654,7 +681,7 @@ class VSWaitReadyGoTests(TestCase):
         self.assertFalse(value)
         self.assertFalse(_sleep.called)
 
-    @patch('SoftLayer.managers.vs.sleep')
+    @mock.patch('time.sleep')
     def test_iter_once_complete(self, _sleep):
         # no iteration, true
         self.guestObject.side_effect = [
@@ -664,7 +691,7 @@ class VSWaitReadyGoTests(TestCase):
         self.assertTrue(value)
         self.assertFalse(_sleep.called)
 
-    @patch('SoftLayer.managers.vs.sleep')
+    @mock.patch('time.sleep')
     def test_iter_four_complete(self, _sleep):
         # test 4 iterations with positive match
         self.guestObject.side_effect = [
@@ -676,13 +703,13 @@ class VSWaitReadyGoTests(TestCase):
 
         value = self.vs.wait_for_ready(1, 4)
         self.assertTrue(value)
-        _sleep.assert_has_calls([call(1), call(1), call(1)])
+        _sleep.assert_has_calls([mock.call(1), mock.call(1), mock.call(1)])
         self.guestObject.assert_has_calls([
-            call(id=1, mask=ANY), call(id=1, mask=ANY),
-            call(id=1, mask=ANY), call(id=1, mask=ANY),
+            mock.call(id=1, mask=mock.ANY), mock.call(id=1, mask=mock.ANY),
+            mock.call(id=1, mask=mock.ANY), mock.call(id=1, mask=mock.ANY),
         ])
 
-    @patch('SoftLayer.managers.vs.sleep')
+    @mock.patch('time.sleep')
     def test_iter_two_incomplete(self, _sleep):
         # test 2 iterations, with no matches
         self.guestObject.side_effect = [
@@ -694,10 +721,10 @@ class VSWaitReadyGoTests(TestCase):
         self.assertFalse(value)
         _sleep.assert_called_once_with(1)
         self.guestObject.assert_has_calls([
-            call(id=1, mask=ANY), call(id=1, mask=ANY),
+            mock.call(id=1, mask=mock.ANY), mock.call(id=1, mask=mock.ANY),
         ])
 
-    @patch('SoftLayer.managers.vs.sleep')
+    @mock.patch('time.sleep')
     def test_iter_ten_incomplete(self, _sleep):
         # 10 iterations at 10 second sleeps with no
         # matching values.
@@ -716,14 +743,15 @@ class VSWaitReadyGoTests(TestCase):
         value = self.vs.wait_for_ready(1, 10, delay=10)
         self.assertFalse(value)
         self.guestObject.assert_has_calls([
-            call(id=1, mask=ANY), call(id=1, mask=ANY),
-            call(id=1, mask=ANY), call(id=1, mask=ANY),
-            call(id=1, mask=ANY), call(id=1, mask=ANY),
-            call(id=1, mask=ANY), call(id=1, mask=ANY),
-            call(id=1, mask=ANY), call(id=1, mask=ANY),
+            mock.call(id=1, mask=mock.ANY), mock.call(id=1, mask=mock.ANY),
+            mock.call(id=1, mask=mock.ANY), mock.call(id=1, mask=mock.ANY),
+            mock.call(id=1, mask=mock.ANY), mock.call(id=1, mask=mock.ANY),
+            mock.call(id=1, mask=mock.ANY), mock.call(id=1, mask=mock.ANY),
+            mock.call(id=1, mask=mock.ANY), mock.call(id=1, mask=mock.ANY),
         ])
         # should only be 9 calls to sleep, last iteration
         # should return a value and skip the sleep
         _sleep.assert_has_calls([
-            call(10), call(10), call(10), call(10), call(10),
-            call(10), call(10), call(10), call(10)])
+            mock.call(10), mock.call(10), mock.call(10), mock.call(10),
+            mock.call(10), mock.call(10), mock.call(10), mock.call(10),
+            mock.call(10)])

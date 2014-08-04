@@ -3,10 +3,10 @@
     ~~~~~~~~~~~~~~~
     ISCSI Manager/helpers
 """
-from SoftLayer.utils import IdentifierMixin
+from SoftLayer import utils
 
 
-class ISCSIManager(IdentifierMixin, object):
+class ISCSIManager(utils.IdentifierMixin, object):
 
     """ Manages iSCSI storages """
 

@@ -5,16 +5,16 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import socket
-from time import sleep
 import datetime
-from itertools import repeat
+import itertools
+import socket
+import time
 
-from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin, lookup
-from SoftLayer.managers.ordering import OrderingManager
+from SoftLayer.managers import ordering
+from SoftLayer import utils
 
 
-class VSManager(IdentifierMixin, object):
+class VSManager(utils.IdentifierMixin, object):
     """
     Manages Virtual Servers
 
@@ -30,7 +30,7 @@ class VSManager(IdentifierMixin, object):
         self.guest = client['Virtual_Guest']
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
         if ordering_manager is None:
-            self.ordering_manager = OrderingManager(client)
+            self.ordering_manager = ordering.OrderingManager(client)
         else:
             self.ordering_manager = ordering_manager
 
@@ -97,7 +97,7 @@ class VSManager(IdentifierMixin, object):
             elif monthly:
                 call = 'getMonthlyVirtualGuests'
 
-        _filter = NestedDict(kwargs.get('filter') or {})
+        _filter = utils.NestedDict(kwargs.get('filter') or {})
         if tags:
             _filter['virtualGuests']['tagReferences']['tag']['name'] = {
                 'operation': 'in',
@@ -105,36 +105,36 @@ class VSManager(IdentifierMixin, object):
             }
 
         if cpus:
-            _filter['virtualGuests']['maxCpu'] = query_filter(cpus)
+            _filter['virtualGuests']['maxCpu'] = utils.query_filter(cpus)
 
         if memory:
-            _filter['virtualGuests']['maxMemory'] = query_filter(memory)
+            _filter['virtualGuests']['maxMemory'] = utils.query_filter(memory)
 
         if hostname:
-            _filter['virtualGuests']['hostname'] = query_filter(hostname)
+            _filter['virtualGuests']['hostname'] = utils.query_filter(hostname)
 
         if domain:
-            _filter['virtualGuests']['domain'] = query_filter(domain)
+            _filter['virtualGuests']['domain'] = utils.query_filter(domain)
 
         if local_disk is not None:
-            _filter['virtualGuests']['localDiskFlag'] = \
-                query_filter(bool(local_disk))
+            _filter['virtualGuests']['localDiskFlag'] = (
+                utils.query_filter(bool(local_disk)))
 
         if datacenter:
-            _filter['virtualGuests']['datacenter']['name'] = \
-                query_filter(datacenter)
+            _filter['virtualGuests']['datacenter']['name'] = (
+                utils.query_filter(datacenter))
 
         if nic_speed:
-            _filter['virtualGuests']['networkComponents']['maxSpeed'] = \
-                query_filter(nic_speed)
+            _filter['virtualGuests']['networkComponents']['maxSpeed'] = (
+                utils.query_filter(nic_speed))
 
         if public_ip:
-            _filter['virtualGuests']['primaryIpAddress'] = \
-                query_filter(public_ip)
+            _filter['virtualGuests']['primaryIpAddress'] = (
+                utils.query_filter(public_ip))
 
         if private_ip:
-            _filter['virtualGuests']['primaryBackendIpAddress'] = \
-                query_filter(private_ip)
+            _filter['virtualGuests']['primaryBackendIpAddress'] = (
+                utils.query_filter(private_ip))
 
         kwargs['filter'] = _filter.to_dict()
         func = getattr(self.account, call)
@@ -382,10 +382,15 @@ class VSManager(IdentifierMixin, object):
         :param bool pending: Wait for pending transactions not related to
                              provisioning or reloads such as monitoring.
         """
-        for count, new_instance in enumerate(repeat(instance_id), start=1):
+        for count, new_instance in enumerate(itertools.repeat(instance_id),
+                                             start=1):
             instance = self.get_instance(new_instance)
-            last_reload = lookup(instance, 'lastOperatingSystemReload', 'id')
-            active_transaction = lookup(instance, 'activeTransaction', 'id')
+            last_reload = utils.lookup(instance,
+                                       'lastOperatingSystemReload',
+                                       'id')
+            active_transaction = utils.lookup(instance,
+                                              'activeTransaction',
+                                              'id')
 
             reloading = all((
                 active_transaction,
@@ -400,19 +405,20 @@ class VSManager(IdentifierMixin, object):
 
             # return True if the instance has only if the instance has
             # finished provisioning and isn't currently reloading the OS.
-            if instance.get('provisionDate') \
-                    and not reloading and not outstanding:
+            if all([instance.get('provisionDate'),
+                    not reloading,
+                    not outstanding]):
                 return True
 
             if count >= limit:
                 return False
 
-            sleep(delay)
+            time.sleep(delay)
 
     def verify_create_instance(self, **kwargs):
         """ Verifies an instance creation command without actually placing an
-        order. See :func:`create_instance` for a list of available
-        options. """
+            order. See :func:`create_instance` for a list of available options.
+        """
         create_options = self._generate_create_dict(**kwargs)
         return self.guest.generateOrderTemplate(create_options)
 
@@ -441,17 +447,38 @@ class VSManager(IdentifierMixin, object):
                                 this VS placed.
         :param int private_vlan: The ID of the public VLAN on which you want
                                  this VS placed.
-        :param bool bare_metal: Flag to indicate if this is a bare metal server
-                                or a dedicated server (default).
         :param list disks: A list of disk capacities for this server.
         :param string post_uri: The URI of the post-install script to run
                                 after reload
         :param bool private: If true, the VS will be provisioned only with
                              access to the private network. Defaults to false
         :param list ssh_keys: The SSH keys to add to the root user
+        :param int nic_speed: The port speed to set
+        :param string tag: tags to set on the VS as a comma separated list
         """
-        create_options = self._generate_create_dict(**kwargs)
-        return self.guest.createObject(create_options)
+        tag, = utils.dict_extract(kwargs, {'tag': None})
+        inst = self.guest.createObject(self._generate_create_dict(**kwargs))
+        if tag is not None:
+            self.guest.setTags(tag, id=inst['id'])
+        return inst
+
+    def create_instances(self, config_list):
+        """ Creates multiple virtual server instances
+
+        This takes a list of dictionaries using the same arguments as
+        create_instance().
+        """
+        tags = [utils.dict_extract(conf, {'tag': None})[0]
+                for conf in config_list]
+
+        resp = self.guest.createObjects([self._generate_create_dict(**kwargs)
+                                         for kwargs in config_list])
+
+        for instance, tag in zip(resp, tags):
+            if tag is not None:
+                self.guest.setTags(tag, id=instance['id'])
+
+        return resp
 
     def change_port_speed(self, instance_id, public, speed):
         """ Allows you to change the port speed of a virtual server's NICs.
@@ -492,7 +519,7 @@ class VSManager(IdentifierMixin, object):
             return [result['id'] for result in results]
 
     def edit(self, instance_id, userdata=None, hostname=None, domain=None,
-             notes=None):
+             notes=None, tag=None):
         """ Edit hostname, domain name, notes, and/or the user data of a VS
 
         Parameters set to None will be ignored and not attempted to be updated.
@@ -503,12 +530,17 @@ class VSManager(IdentifierMixin, object):
         :param string hostname: valid hostname
         :param string domain: valid domain namem
         :param string notes: notes about this particular VS
+        :param string tag: tags to set on the VS as a comma separated list.
+                            Use the empty string to remove all tags.
 
         """
 
         obj = {}
         if userdata:
             self.guest.setUserMetadata([userdata], id=instance_id)
+
+        if tag is not None:
+            self.guest.setTags(tag, id=instance_id)
 
         if hostname:
             obj['hostname'] = hostname
@@ -584,8 +616,8 @@ class VSManager(IdentifierMixin, object):
                 package_items, 'nic_speed', nic_speed)})
 
         order = {}
-        order['complexType'] = \
-            'SoftLayer_Container_Product_Order_Virtual_Guest_Upgrade'
+        order['complexType'] = (
+            'SoftLayer_Container_Product_Order_Virtual_Guest_Upgrade')
         order['virtualGuests'] = [{'id': int(instance_id)}]
         order['prices'] = item_id
         order['properties'] = [{'name': 'MAINTENANCE_WINDOW',
@@ -599,7 +631,7 @@ class VSManager(IdentifierMixin, object):
         """
         Following Method gets all the item ids related to VS
         """
-        mask = "mask[description,capacity,prices.id,categories[name,id]]"
+        mask = "mask[description,capacity,prices[id,categories[name,id]]]"
         package_type = "VIRTUAL_SERVER_INSTANCE"
         package_id = self.ordering_manager.get_package_id_by_type(package_type)
         package_service = self.ordering_manager.get_package_service()
@@ -617,8 +649,9 @@ class VSManager(IdentifierMixin, object):
         """
         vs_id = {'memory': 3, 'cpus': 80, 'nic_speed': 26}
         for item in package_items:
-            for j in range(len(item['categories'])):
-                if not (item['categories'][j]['id'] == vs_id[option] and
+            categories = item['prices'][0]['categories']
+            for j in range(len(categories)):
+                if not (categories[j]['id'] == vs_id[option] and
                         item['capacity'] == str(value)):
                     continue
                 if option == 'cpus':

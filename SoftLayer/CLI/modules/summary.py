@@ -5,11 +5,12 @@ Display summary information about the account
 """
 # :license: MIT, see LICENSE for more details.
 
-from SoftLayer import NetworkManager
-from SoftLayer.CLI import CLIRunnable, Table
+import SoftLayer
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import formatting
 
 
-class Summary(CLIRunnable):
+class Summary(environment.CLIRunnable):
     """
 usage: sl summary [options]
 
@@ -22,10 +23,10 @@ Options:
     action = None
 
     def execute(self, args):
-        mgr = NetworkManager(self.client)
+        mgr = SoftLayer.NetworkManager(self.client)
         datacenters = mgr.summary_by_datacenter()
 
-        table = Table([
+        table = formatting.Table([
             'datacenter', 'vlans', 'subnets', 'IPs', 'networking',
             'hardware', 'vs'
         ])

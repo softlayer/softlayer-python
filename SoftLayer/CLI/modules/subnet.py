@@ -12,14 +12,15 @@ The available commands are:
 """
 # :license: MIT, see LICENSE for more details.
 
-from SoftLayer import NetworkManager
-from SoftLayer.utils import lookup
-from SoftLayer.CLI import (
-    CLIRunnable, Table, KeyValueTable, confirm, no_going_back, resolve_id)
-from SoftLayer.CLI.helpers import CLIAbort, blank
+import SoftLayer
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
+from SoftLayer import utils
 
 
-class SubnetCancel(CLIRunnable):
+class SubnetCancel(environment.CLIRunnable):
     """
 usage: sl subnet cancel <identifier> [options]
 
@@ -30,18 +31,18 @@ Cancel a subnet
     options = ['confirm']
 
     def execute(self, args):
-        mgr = NetworkManager(self.client)
-        subnet_id = resolve_id(mgr.resolve_subnet_ids,
-                               args.get('<identifier>'),
-                               name='subnet')
+        mgr = SoftLayer.NetworkManager(self.client)
+        subnet_id = helpers.resolve_id(mgr.resolve_subnet_ids,
+                                       args.get('<identifier>'),
+                                       name='subnet')
 
-        if args['--really'] or no_going_back(subnet_id):
+        if args['--really'] or formatting.no_going_back(subnet_id):
             mgr.cancel_subnet(subnet_id)
         else:
-            CLIAbort('Aborted')
+            raise exceptions.CLIAbort('Aborted')
 
 
-class SubnetCreate(CLIRunnable):
+class SubnetCreate(environment.CLIRunnable):
     """
 usage:
   sl subnet create (public|private) <quantity> <vlan> [options]
@@ -68,7 +69,7 @@ Options:
     options = ['confirm']
 
     def execute(self, args):
-        mgr = NetworkManager(self.client)
+        mgr = SoftLayer.NetworkManager(self.client)
 
         _type = 'private'
         if args['public']:
@@ -78,9 +79,9 @@ Options:
         if args.get('--v6'):
             version = 6
         if not args.get('--test') and not args['--really']:
-            if not confirm("This action will incur charges on your account."
-                           "Continue?"):
-                raise CLIAbort('Cancelling order.')
+            if not formatting.confirm("This action will incur charges on your "
+                                      "account. Continue?"):
+                raise exceptions.CLIAbort('Cancelling order.')
         result = mgr.add_subnet(_type,
                                 quantity=args['<quantity>'],
                                 vlan_id=args['<vlan>'],
@@ -88,7 +89,7 @@ Options:
                                 test_order=args.get('--test'))
         if not result:
             return 'Unable to place order: No valid price IDs found.'
-        table = Table(['Item', 'cost'])
+        table = formatting.Table(['Item', 'cost'])
         table.align['Item'] = 'r'
         table.align['cost'] = 'r'
 
@@ -104,7 +105,7 @@ Options:
         return table
 
 
-class SubnetDetail(CLIRunnable):
+class SubnetDetail(environment.CLIRunnable):
     """
 usage: sl subnet detail <identifier> [options]
 
@@ -117,13 +118,13 @@ Filters:
     action = 'detail'
 
     def execute(self, args):
-        mgr = NetworkManager(self.client)
-        subnet_id = resolve_id(mgr.resolve_subnet_ids,
-                               args.get('<identifier>'),
-                               name='subnet')
+        mgr = SoftLayer.NetworkManager(self.client)
+        subnet_id = helpers.resolve_id(mgr.resolve_subnet_ids,
+                                       args.get('<identifier>'),
+                                       name='subnet')
         subnet = mgr.get_subnet(subnet_id)
 
-        table = KeyValueTable(['Name', 'Value'])
+        table = formatting.KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
         table.align['Value'] = 'l'
 
@@ -132,15 +133,16 @@ Filters:
                        '%s/%s' % (subnet['networkIdentifier'],
                                   str(subnet['cidr']))])
         table.add_row(['subnet type', subnet['subnetType']])
-        table.add_row(['gateway', subnet.get('gateway', blank())])
-        table.add_row(['broadcast', subnet.get('broadcastAddress', blank())])
+        table.add_row(['gateway', subnet.get('gateway', formatting.blank())])
+        table.add_row(['broadcast',
+                       subnet.get('broadcastAddress', formatting.blank())])
         table.add_row(['datacenter', subnet['datacenter']['name']])
         table.add_row(['usable ips',
-                       subnet.get('usableIpAddressCount', blank())])
+                       subnet.get('usableIpAddressCount', formatting.blank())])
 
         if not args.get('--no-vs'):
             if subnet['virtualGuests']:
-                vs_table = Table(['Hostname', 'Domain', 'IP'])
+                vs_table = formatting.Table(['Hostname', 'Domain', 'IP'])
                 vs_table.align['Hostname'] = 'r'
                 vs_table.align['IP'] = 'l'
                 for vsi in subnet['virtualGuests']:
@@ -153,7 +155,7 @@ Filters:
 
         if not args.get('--no-hardware'):
             if subnet['hardware']:
-                hw_table = Table(['Hostname', 'Domain', 'IP'])
+                hw_table = formatting.Table(['Hostname', 'Domain', 'IP'])
                 hw_table.align['Hostname'] = 'r'
                 hw_table.align['IP'] = 'l'
                 for hardware in subnet['hardware']:
@@ -167,7 +169,7 @@ Filters:
         return table
 
 
-class SubnetList(CLIRunnable):
+class SubnetList(environment.CLIRunnable):
     """
 usage: sl subnet list [options]
 
@@ -187,9 +189,9 @@ Filters:
     action = 'list'
 
     def execute(self, args):
-        mgr = NetworkManager(self.client)
+        mgr = SoftLayer.NetworkManager(self.client)
 
-        table = Table([
+        table = formatting.Table([
             'id', 'identifier', 'type', 'datacenter', 'vlan id', 'IPs',
             'hardware', 'vs',
         ])
@@ -212,8 +214,9 @@ Filters:
             table.add_row([
                 subnet['id'],
                 '%s/%s' % (subnet['networkIdentifier'], str(subnet['cidr'])),
-                subnet.get('subnetType', blank()),
-                lookup(subnet, 'datacenter', 'name',) or blank(),
+                subnet.get('subnetType', formatting.blank()),
+                utils.lookup(subnet, 'datacenter', 'name',)
+                or formatting.blank(),
                 subnet['networkVlanId'],
                 subnet['ipAddressCount'],
                 len(subnet['hardware']),
@@ -223,7 +226,7 @@ Filters:
         return table
 
 
-class SubnetLookup(CLIRunnable):
+class SubnetLookup(environment.CLIRunnable):
     """
 usage: sl subnet lookup <ip> [options]
 
@@ -234,21 +237,21 @@ information.
     action = 'lookup'
 
     def execute(self, args):
-        mgr = NetworkManager(self.client)
+        mgr = SoftLayer.NetworkManager(self.client)
 
         addr_info = mgr.ip_lookup(args['<ip>'])
 
         if not addr_info:
             return 'Not found'
 
-        table = KeyValueTable(['Name', 'Value'])
+        table = formatting.KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
         table.align['Value'] = 'l'
 
         table.add_row(['id', addr_info['id']])
         table.add_row(['ip', addr_info['ipAddress']])
 
-        subnet_table = KeyValueTable(['Name', 'Value'])
+        subnet_table = formatting.KeyValueTable(['Name', 'Value'])
         subnet_table.align['Name'] = 'r'
         subnet_table.align['Value'] = 'l'
         subnet_table.add_row(['id', addr_info['subnet']['id']])
@@ -264,7 +267,7 @@ information.
         table.add_row(['subnet', subnet_table])
 
         if addr_info.get('virtualGuest') or addr_info.get('hardware'):
-            device_table = KeyValueTable(['Name', 'Value'])
+            device_table = formatting.KeyValueTable(['Name', 'Value'])
             device_table.align['Name'] = 'r'
             device_table.align['Value'] = 'l'
             if addr_info.get('virtualGuest'):

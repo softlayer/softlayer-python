@@ -6,33 +6,33 @@
     :license: MIT, see LICENSE for more details.
 """
 import SoftLayer
-from SoftLayer.tests import TestCase
+from SoftLayer import testing
 
 
-class TestExceptions(TestCase):
+class TestExceptions(testing.TestCase):
 
     def test_softlayer_api_error(self):
         e = SoftLayer.SoftLayerAPIError('fault code', 'fault string')
-        self.assertEquals(e.faultCode, 'fault code')
-        self.assertEquals(e.faultString, 'fault string')
-        self.assertEquals(e.reason, 'fault string')
-        self.assertEquals(
+        self.assertEqual(e.faultCode, 'fault code')
+        self.assertEqual(e.faultString, 'fault string')
+        self.assertEqual(e.reason, 'fault string')
+        self.assertEqual(
             repr(e), "<SoftLayerAPIError(fault code): fault string>")
-        self.assertEquals(
+        self.assertEqual(
             str(e), "SoftLayerAPIError(fault code): fault string")
 
     def test_parse_error(self):
         e = SoftLayer.ParseError('fault code', 'fault string')
-        self.assertEquals(e.faultCode, 'fault code')
-        self.assertEquals(e.faultString, 'fault string')
-        self.assertEquals(e.reason, 'fault string')
-        self.assertEquals(
+        self.assertEqual(e.faultCode, 'fault code')
+        self.assertEqual(e.faultString, 'fault string')
+        self.assertEqual(e.reason, 'fault string')
+        self.assertEqual(
             repr(e), "<ParseError(fault code): fault string>")
-        self.assertEquals(
+        self.assertEqual(
             str(e), "ParseError(fault code): fault string")
 
 
-class TestUtils(TestCase):
+class TestUtils(testing.TestCase):
 
     def test_query_filter(self):
         result = SoftLayer.utils.query_filter('test')
@@ -60,7 +60,7 @@ class TestUtils(TestCase):
         self.assertEqual({'operation': 10}, result)
 
 
-class TestNestedDict(TestCase):
+class TestNestedDict(testing.TestCase):
 
     def test_basic(self):
         n = SoftLayer.utils.NestedDict()
@@ -100,7 +100,7 @@ class TestNestedDict(TestCase):
         self.assertEqual(dict, type(d['test']['test1']['test2']['test3']))
 
 
-class TestLookup(TestCase):
+class TestLookup(testing.TestCase):
 
     def test_lookup(self):
         d = {'test': {'nested': 1}}
@@ -131,7 +131,7 @@ class IdentifierFixture(SoftLayer.utils.IdentifierMixin):
     resolvers = [is_a, is_b]
 
 
-class TestIdentifierMixin(TestCase):
+class TestIdentifierMixin(testing.TestCase):
 
     def set_up(self):
         self.fixture = IdentifierFixture()

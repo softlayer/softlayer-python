@@ -4,17 +4,17 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from mock import patch
+import mock
 
-from SoftLayer.tests import TestCase, FixtureClient
-from SoftLayer.CLI.helpers import format_output
+from SoftLayer.CLI import formatting
 from SoftLayer.CLI.modules import vs
+from SoftLayer import testing
 
 
-class DnsTests(TestCase):
+class DnsTests(testing.TestCase):
 
     def set_up(self):
-        self.client = FixtureClient()
+        self.client = testing.FixtureClient()
 
     def test_list_vs(self):
         command = vs.ListVSIs(client=self.client)
@@ -93,9 +93,9 @@ class DnsTests(TestCase):
                           'os (CENTOS)': 'CENTOS_6_64',
                           'os (DEBIAN)': 'DEBIAN_7_64',
                           'os (UBUNTU)': 'UBUNTU_12_64'},
-                         format_output(output, 'python'))
+                         formatting.format_output(output, 'python'))
 
-    @patch('SoftLayer.CLI.modules.vs.confirm')
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create(self, confirm_mock):
         confirm_mock.return_value = True
         command = vs.CreateVS(client=self.client)
@@ -127,9 +127,10 @@ class DnsTests(TestCase):
                                   '--vlan_public': None,
                                   '--vlan_private': None,
                                   '--wait': None,
-                                  '--really': False})
+                                  '--really': False,
+                                  '--tag': 'dev,green'})
 
         self.assertEqual([{'guid': '1a2b3c-1701',
                            'id': 100,
                            'created': '2013-08-01 15:23:45'}],
-                         format_output(output, 'python'))
+                         formatting.format_output(output, 'python'))

@@ -152,7 +152,7 @@ getCreateObjectOptions = {
             'itemPrice': {
                 'item': {
                     'description': 'Debian GNU/Linux 7.0 Wheezy/Stable -'
-                    ' Minimal Install (64 bit)'
+                                   ' Minimal Install (64 bit)'
                 },
                 'hourlyRecurringFee': '0',
                 'recurringFee': '0'
@@ -165,7 +165,7 @@ getCreateObjectOptions = {
             'itemPrice': {
                 'item': {
                     'description': 'Ubuntu Linux 12.04 LTS Precise'
-                    ' Pangolin - Minimal Install (64 bit)'
+                                   ' Pangolin - Minimal Install (64 bit)'
                 },
                 'hourlyRecurringFee': '0',
                 'recurringFee': '0'
@@ -227,8 +227,9 @@ deleteObject = True
 setPrivateNetworkInterfaceSpeed = True
 setPublicNetworkInterfaceSpeed = True
 createObject = getObject
+createObjects = [getObject]
 generateOrderTemplate = {}
 setUserMetadata = ['meta']
 reloadOperatingSystem = 'OK'
-
+setTags = True
 createArchiveTransaction = {}

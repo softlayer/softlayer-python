@@ -4,14 +4,14 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.tests import TestCase, FixtureClient
+from SoftLayer.CLI import formatting
 from SoftLayer.CLI.modules import nas
-from SoftLayer.CLI.helpers import format_output
+from SoftLayer import testing
 
 
-class RWhoisTests(TestCase):
+class RWhoisTests(testing.TestCase):
     def set_up(self):
-        self.client = FixtureClient()
+        self.client = testing.FixtureClient()
 
     def test_list_nas(self):
         command = nas.ListNAS(client=self.client)
@@ -23,4 +23,4 @@ class RWhoisTests(TestCase):
                            'password': 'pass',
                            'id': 1,
                            'size': 10}],
-                         format_output(output, 'python'))
+                         formatting.format_output(output, 'python'))

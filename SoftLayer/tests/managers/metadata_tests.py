@@ -4,18 +4,18 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import MetadataManager, SoftLayerError, SoftLayerAPIError
-from SoftLayer.consts import API_PRIVATE_ENDPOINT_REST, USER_AGENT
-from SoftLayer.tests import TestCase
+import mock
 
-from mock import patch, MagicMock
+import SoftLayer
+from SoftLayer import consts
+from SoftLayer import testing
 
 
-class MetadataTests(TestCase):
+class MetadataTests(testing.TestCase):
 
     def set_up(self):
-        self.metadata = MetadataManager()
-        self.make_request = MagicMock()
+        self.metadata = SoftLayer.MetadataManager()
+        self.make_request = mock.MagicMock()
         self.metadata.make_request = self.make_request
 
     def test_no_param(self):
@@ -43,10 +43,12 @@ class MetadataTests(TestCase):
         self.assertEqual(None, r)
 
     def test_w_param_error(self):
-        self.assertRaises(SoftLayerError, self.metadata.get, 'vlans')
+        self.assertRaises(SoftLayer.SoftLayerError, self.metadata.get, 'vlans')
 
     def test_not_exists(self):
-        self.assertRaises(SoftLayerError, self.metadata.get, 'something')
+        self.assertRaises(SoftLayer.SoftLayerError,
+                          self.metadata.get,
+                          'something')
 
     def test_networks_not_exist(self):
         self.make_request.return_value = []
@@ -73,34 +75,35 @@ class MetadataTests(TestCase):
         }, r)
 
 
-class MetadataTestsMakeRequest(TestCase):
+class MetadataTestsMakeRequest(testing.TestCase):
 
     def set_up(self):
-        self.metadata = MetadataManager()
+        self.metadata = SoftLayer.MetadataManager()
         self.url = '/'.join([
-            API_PRIVATE_ENDPOINT_REST.rstrip('/'),
+            consts.API_PRIVATE_ENDPOINT_REST.rstrip('/'),
             'SoftLayer_Resource_Metadata',
             'something.json'])
 
-    @patch('SoftLayer.managers.metadata.make_rest_api_call')
+    @mock.patch('SoftLayer.transports.make_rest_api_call')
     def test_basic(self, make_api_call):
         r = self.metadata.make_request('something.json')
         make_api_call.assert_called_with(
             'GET', self.url,
             timeout=5,
-            http_headers={'User-Agent': USER_AGENT})
+            http_headers={'User-Agent': consts.USER_AGENT})
         self.assertEqual(make_api_call(), r)
 
-    @patch('SoftLayer.managers.metadata.make_rest_api_call')
+    @mock.patch('SoftLayer.transports.make_rest_api_call')
     def test_raise_error(self, make_api_call):
-        make_api_call.side_effect = SoftLayerAPIError(
+        make_api_call.side_effect = SoftLayer.SoftLayerAPIError(
             'faultCode', 'faultString')
         self.assertRaises(
-            SoftLayerAPIError,
+            SoftLayer.SoftLayerAPIError,
             self.metadata.make_request, 'something.json')
 
-    @patch('SoftLayer.managers.metadata.make_rest_api_call')
+    @mock.patch('SoftLayer.transports.make_rest_api_call')
     def test_raise_404_error(self, make_api_call):
-        make_api_call.side_effect = SoftLayerAPIError(404, 'faultString')
+        make_api_call.side_effect = SoftLayer.SoftLayerAPIError(404,
+                                                                'faultString')
         r = self.metadata.make_request('something.json')
         self.assertEqual(r, None)
