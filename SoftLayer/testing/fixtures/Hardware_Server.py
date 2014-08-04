@@ -2,7 +2,15 @@ getObject = {
     'id': 1000,
     'datacenter': {'id': 50, 'name': 'TEST00',
                    'description': 'Test Data Center'},
-    'billingItem': {'id': 6327, 'recurringFee': 1.54},
+    'billingItem': {'id': 6327, 'recurringFee': 1.54,
+                    'orderItem': {
+                        'order': {
+                            'userRecord': {
+                                'username': 'chechu',
+                            }
+                        }
+                    }
+                    },
     'primaryIpAddress': '172.16.1.100',
     'hostname': 'hardware-test1',
     'domain': 'test.sftlyr.ws',

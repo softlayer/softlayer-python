@@ -234,7 +234,8 @@ class ServerCLITests(testing.TestCase):
             'tags': ['test_tag'],
             'users': ['root abc123'],
             'vlans': [{'id': 9653, 'number': 1800, 'type': 'PRIVATE'},
-                      {'id': 19082, 'number': 3672, 'type': 'PUBLIC'}]
+                      {'id': 19082, 'number': 3672, 'type': 'PUBLIC'}],
+            'owner': 'chechu'
         }
 
         self.assertEqual(expected, formatting.format_output(output, 'python'))
@@ -266,7 +267,8 @@ class ServerCLITests(testing.TestCase):
                 'cores': 2,
                 'id': 1000,
                 'backend_ip': '10.1.0.2',
-                'active_transaction': 'TXN_NAME'
+                'active_transaction': 'TXN_NAME',
+                'owner': 'chechu'
             },
             {
                 'datacenter': 'TEST00',
@@ -276,7 +278,8 @@ class ServerCLITests(testing.TestCase):
                 'cores': 4,
                 'id': 1001,
                 'backend_ip': '10.1.0.3',
-                'active_transaction': None
+                'active_transaction': None,
+                'owner': 'chechu'
             },
             {
                 'datacenter': 'TEST00',
@@ -286,7 +289,8 @@ class ServerCLITests(testing.TestCase):
                 'cores': 4,
                 'id': 1002,
                 'backend_ip': '10.1.0.4',
-                'active_transaction': None
+                'active_transaction': None,
+                'owner': 'chechu'
             }
         ]
 
