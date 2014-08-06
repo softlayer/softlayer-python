@@ -15,6 +15,7 @@ from SoftLayer import utils
 
 
 class VSManager(utils.IdentifierMixin, object):
+
     """
     Manages Virtual Servers
 
@@ -24,6 +25,7 @@ class VSManager(utils.IdentifierMixin, object):
                                               If none is provided, one will be
                                               auto initialized.
     """
+
     def __init__(self, client, ordering_manager=None):
         self.client = client
         self.account = client['Account']
@@ -555,6 +557,13 @@ class VSManager(utils.IdentifierMixin, object):
             return True
 
         return self.guest.editObject(obj, id=instance_id)
+
+    def rescue(self, instance_id):
+        """ Reboot a VSI into the Xen recsue kernel
+
+        :param integer instance_id: the instance ID to rescue
+        """
+        return self.guest.executeRescueLayer(id=instance_id)
 
     def capture(self, instance_id, name, additional_disks=False, notes=None):
         """ Capture one or all disks from a VS to a SoftLayer image.

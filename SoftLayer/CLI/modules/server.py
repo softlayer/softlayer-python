@@ -166,7 +166,8 @@ Options:
                 ['softwareDescription']['name'] or formatting.blank()
             )])
 
-        table.add_row(['created', result['provisionDate'] or formatting.blank()])
+        table.add_row(
+            ['created', result['provisionDate'] or formatting.blank()])
         user = None
         if 'billingItem' in result:
             if 'orderItem' in result['billingItem']:
@@ -174,7 +175,7 @@ Options:
                         ['userRecord']['username'])
         table.add_row(['owner',
                        user or formatting.blank()])
-        vlan_table = Table(['type', 'number', 'id'])
+        vlan_table = formatting.Table(['type', 'number', 'id'])
 
         for vlan in result['networkVlans']:
             vlan_table.add_row([

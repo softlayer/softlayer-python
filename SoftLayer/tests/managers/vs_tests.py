@@ -516,6 +516,15 @@ class VSTests(testing.TestCase):
         f = service.setPrivateNetworkInterfaceSpeed
         f.assert_called_once_with(speed, id=vs_id)
 
+    def test_rescue(self):
+        # Test rescue environment
+        vs_id = 1234
+        self.vs.rescue(vs_id)
+
+        service = self.client['Virtual_Guest']
+        f = service.executeRescueLayer
+        f.assert_called_once_with(id=vs_id)
+
     def test_edit(self):
         # Test editing user data
         service = self.client['Virtual_Guest']

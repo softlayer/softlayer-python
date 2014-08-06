@@ -38,7 +38,7 @@ class DnsTests(testing.TestCase):
                            'id': 104,
                            'backend_ip': '10.45.19.35',
                            'owner': 'chechu'}],
-                         format_output(output, 'python'))
+                         formatting.format_output(output, 'python'))
 
     def test_detail_vs(self):
         command = vs.VSDetails(client=self.client)
@@ -71,7 +71,7 @@ class DnsTests(testing.TestCase):
                                      'number': 23,
                                      'id': 1}],
                           'owner': 'chechu'},
-                         format_output(output, 'python'))
+                         formatting.format_output(output, 'python'))
 
     def test_create_options(self):
         command = vs.CreateOptionsVS(client=self.client)

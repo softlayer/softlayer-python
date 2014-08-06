@@ -177,9 +177,9 @@ Options:
         table.add_row(['private_cpu', result['dedicatedAccountHostOnlyFlag']])
         table.add_row(['created', result['createDate']])
         table.add_row(['modified', result['modifyDate']])
-        table.add_row(['owner', FormattedItem(
-            lookup(result, 'billingItem', 'orderItem',
-                   'order', 'userRecord', 'username'),
+        table.add_row(['owner', formatting.FormattedItem(
+            utils.lookup(result, 'billingItem', 'orderItem',
+                         'order', 'userRecord', 'username'),
         )])
 
         vlan_table = formatting.Table(['type', 'number', 'id'])
@@ -879,6 +879,32 @@ Options:
                                    'VS')
 
         vsi.change_port_speed(vs_id, public, args['--speed'])
+
+
+class VSRescue(environment.CLIRunnable):
+
+    """
+usage: sl vs rescue <identifier> [options]
+
+Reboot into Xen rescue image
+
+
+"""
+    action = 'rescue'
+    options = ['confirm']
+
+    def execute(self, args):
+        vsi = SoftLayer.VSManager(self.client)
+        vs_id = helpers.resolve_id(vsi.resolve_ids,
+                                   args.get('<identifier>'),
+                                   'VS')
+        if args['--really'] or formatting.confirm(
+                "This action will reboot this VSI. "
+                "Continue?"):
+
+            vsi.rescue(vs_id)
+        else:
+            raise exceptions.CLIAbort('Aborted')
 
 
 class VSDNS(environment.CLIRunnable):
