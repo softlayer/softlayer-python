@@ -371,3 +371,9 @@ getNasNetworkStorage = [{
     'password': 'pass',
     'serviceResourceBackendIpAddress': '127.0.0.1',
 }]
+
+getActiveQuotes = [{
+    'id': 1234,
+    'name': 'TestQuote1234',
+    'quoteKey': '1234test4321',
+}]

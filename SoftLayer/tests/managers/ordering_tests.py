@@ -74,17 +74,17 @@ class OrderingTests(TestCase):
         container = self.ordering.get_order_container(1234)
         container_fixture = self.ordering.client['Billing_Order_Quote'].\
             getRecalculatedOrderContainer(id=1234)
-        self.assertEqual(container, container_fixture)
+        self.assertEqual(container, container_fixture['orderContainers'][0])
 
     def test_get_quotes(self):
         quotes = self.ordering.get_quotes()
-        quotes_fixture = self.ordering.client['Billing_Order_Quote'].\
-            getActiveQuotes()
+        quotes_fixture = self.ordering.client['Account'].getActiveQuotes()
         self.assertEqual(quotes, quotes_fixture)
 
     def test_get_quote_details(self):
         quote = self.ordering.get_quote_details(1234)
-        quote_fixture = self.ordering.client.getObject(id=1234)
+        quote_fixture = self.ordering.client['Billing_Order_Quote'].getObject(
+            id=1234)
         self.assertEqual(quote, quote_fixture)
 
     def test_verify_quote(self):

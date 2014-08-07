@@ -5,12 +5,6 @@ getObject = {
     'quoteKey': '1234test4321',
 }
 
-getActiveQuotes = [{
-    'id': 1234,
-    'name': 'TestQuote1234',
-    'quoteKey': '1234test4321',
-}]
-
 getRecalculatedOrderContainer = {
     'orderContainers': [{
         'presetId': '',
@@ -18,7 +12,7 @@ getRecalculatedOrderContainer = {
             'id': 1921
         }],
         'quantity': 1,
+        'packageId': 50,
+        'useHourlyPricing': '',
     }],
-    'packageId': 50,
-    'useHourlyPricing': ''
 }
