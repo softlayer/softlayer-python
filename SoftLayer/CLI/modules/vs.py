@@ -570,6 +570,7 @@ Optional:
 
         :param dict args: CLI arguments
         """
+        args=utils.sanitize_args(args)
         data = {
             "hourly": args['--hourly'],
             "cpus": args['--cpu'],
