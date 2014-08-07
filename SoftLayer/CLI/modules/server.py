@@ -95,7 +95,7 @@ For more on filters see 'sl help filters'
 
         for server in servers:
             server = utils.NestedDict(server)
-            
+
             table.add_row([
                 server['id'],
                 server['datacenter']['name'] or formatting.blank(),
@@ -167,8 +167,8 @@ Options:
 
         table.add_row(['owner', formatting.FormattedItem(
             utils.lookup(result, 'billingItem', 'orderItem',
-                         'order', 'userRecord', 'username') \
-                        or formatting.blank(),
+                         'order', 'userRecord',
+                         'username') or formatting.blank()
         )])
 
         vlan_table = formatting.Table(['type', 'number', 'id'])

@@ -177,8 +177,8 @@ Options:
         table.add_row(['modified', result['modifyDate']])
         table.add_row(['owner', formatting.FormattedItem(
             utils.lookup(result, 'billingItem', 'orderItem',
-                         'order', 'userRecord', 'username') \
-                        or formatting.blank(),
+                         'order', 'userRecord',
+                         'username') or formatting.blank(),
         )])
 
         vlan_table = formatting.Table(['type', 'number', 'id'])
