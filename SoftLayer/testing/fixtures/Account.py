@@ -1,4 +1,3 @@
-
 getPrivateBlockDeviceTemplateGroups = [{
     'accountId': 1234,
     'blockDevices': [],
@@ -32,6 +31,18 @@ getVirtualGuests = [{
     'globalIdentifier': '1a2b3c-1701',
     'primaryBackendIpAddress': '10.45.19.37',
     'hourlyBillingFlag': False,
+
+    'billingItem': {
+        'id': 6327,
+        'recurringFee': 1.54,
+        'orderItem': {
+            'order': {
+                'userRecord': {
+                    'username': 'chechu',
+                }
+            }
+        }
+    },
 }, {
     'id': 104,
     'hostname': 'vs-test2',
@@ -47,6 +58,17 @@ getVirtualGuests = [{
     'globalIdentifier': '05a8ac-6abf0',
     'primaryBackendIpAddress': '10.45.19.35',
     'hourlyBillingFlag': True,
+    'billingItem': {
+        'id': 6327,
+        'recurringFee': 1.54,
+        'orderItem': {
+            'order': {
+                'userRecord': {
+                    'username': 'chechu',
+                }
+            }
+        }
+    },
 }]
 
 getMonthlyVirtualGuests = [vs for vs in getVirtualGuests
@@ -59,7 +81,17 @@ getHardware = [{
     'id': 1000,
     'datacenter': {'id': 50, 'name': 'TEST00',
                    'description': 'Test Data Center'},
-    'billingItem': {'id': 6327, 'recurringFee': 1.54},
+    'billingItem': {
+        'id': 6327,
+        'recurringFee': 1.54,
+        'orderItem': {
+            'order': {
+                'userRecord': {
+                    'username': 'chechu',
+                }
+            }
+        }
+    },
     'primaryIpAddress': '172.16.1.100',
     'hostname': 'hardware-test1',
     'domain': 'test.sftlyr.ws',
@@ -108,7 +140,16 @@ getHardware = [{
     'id': 1001,
     'datacenter': {'name': 'TEST00',
                    'description': 'Test Data Center'},
-    'billingItem': {'id': 7112},
+    'billingItem': {
+        'id': 7112,
+        'orderItem': {
+            'order': {
+                'userRecord': {
+                    'username': 'chechu',
+                }
+            }
+        }
+    },
     'primaryIpAddress': '172.16.4.94',
     'hostname': 'hardware-test2',
     'domain': 'test.sftlyr.ws',
@@ -142,7 +183,16 @@ getHardware = [{
     'id': 1002,
     'datacenter': {'name': 'TEST00',
                    'description': 'Test Data Center'},
-    'billingItem': {'id': 7112},
+    'billingItem': {
+        'id': 7112,
+        'orderItem': {
+            'order': {
+                'userRecord': {
+                    'username': 'chechu',
+                }
+            }
+        }
+    },
     'primaryIpAddress': '172.16.4.95',
     'hostname': 'hardware-bad-memory',
     'domain': 'test.sftlyr.ws',

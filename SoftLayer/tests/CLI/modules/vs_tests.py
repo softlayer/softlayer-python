@@ -12,6 +12,7 @@ from SoftLayer import testing
 
 
 class DnsTests(testing.TestCase):
+
     def set_up(self):
         self.client = testing.FixtureClient()
 
@@ -26,7 +27,8 @@ class DnsTests(testing.TestCase):
                            'cores': 2,
                            'active_transaction': None,
                            'id': 100,
-                           'backend_ip': '10.45.19.37'},
+                           'backend_ip': '10.45.19.37',
+                           'owner': 'chechu'},
                           {'datacenter': 'TEST00',
                            'primary_ip': '172.16.240.7',
                            'host': 'vs-test2.test.sftlyr.ws',
@@ -34,12 +36,12 @@ class DnsTests(testing.TestCase):
                            'cores': 4,
                            'active_transaction': None,
                            'id': 104,
-                           'backend_ip': '10.45.19.35'}],
+                           'backend_ip': '10.45.19.35',
+                           'owner': 'chechu'}],
                          formatting.format_output(output, 'python'))
 
     def test_detail_vs(self):
         command = vs.VSDetails(client=self.client)
-
         output = command.execute({'<identifier>': '100',
                                   '--passwords': True,
                                   '--price': True})
@@ -54,8 +56,8 @@ class DnsTests(testing.TestCase):
                           'modified': {},
                           'os': '12.04-64 Minimal for CCI',
                           'os_version': '12.04-64 Minimal for CCI',
-                          'price rate': {},
                           'notes': 'notes',
+                          'price rate': 1.54,
                           'tags': ['production'],
                           'private_cpu': {},
                           'private_ip': '10.45.19.37',
@@ -67,7 +69,8 @@ class DnsTests(testing.TestCase):
                           'users': [{'password': 'pass', 'username': 'user'}],
                           'vlans': [{'type': 'PUBLIC',
                                      'number': 23,
-                                     'id': 1}]},
+                                     'id': 1}],
+                          'owner': 'chechu'},
                          formatting.format_output(output, 'python'))
 
     def test_create_options(self):

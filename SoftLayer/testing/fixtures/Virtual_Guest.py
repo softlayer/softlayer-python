@@ -4,6 +4,17 @@ getObject = {
     'domain': 'test.sftlyr.ws',
     'fullyQualifiedDomainName': 'vs-test1.test.sftlyr.ws',
     'status': {'keyName': 'ACTIVE', 'name': 'Active'},
+    'billingItem': {
+        'id': 6327,
+        'recurringFee': 1.54,
+        'orderItem': {
+            'order': {
+                'userRecord': {
+                    'username': 'chechu',
+                }
+            }
+        }
+    },
     'datacenter': {'id': 50, 'name': 'TEST00',
                    'description': 'Test Data Center'},
     'powerState': {'keyName': 'RUNNING', 'name': 'Running'},
@@ -224,3 +235,4 @@ setUserMetadata = ['meta']
 reloadOperatingSystem = 'OK'
 setTags = True
 createArchiveTransaction = {}
+executeRescueLayer = True

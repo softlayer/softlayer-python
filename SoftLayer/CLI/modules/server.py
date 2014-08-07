@@ -88,12 +88,14 @@ For more on filters see 'sl help filters'
             'memory',
             'primary_ip',
             'backend_ip',
-            'active_transaction'
+            'active_transaction',
+            'owner'
         ])
         table.sortby = args.get('--sortby') or 'host'
 
         for server in servers:
             server = utils.NestedDict(server)
+
             table.add_row([
                 server['id'],
                 server['datacenter']['name'] or formatting.blank(),
@@ -103,6 +105,9 @@ For more on filters see 'sl help filters'
                 server['primaryIpAddress'] or formatting.blank(),
                 server['primaryBackendIpAddress'] or formatting.blank(),
                 formatting.active_txn(server),
+                utils.lookup(
+                    server, 'billingItem', 'orderItem', 'order', 'userRecord',
+                    'username') or formatting.blank(),
             ])
 
         return table
@@ -156,10 +161,18 @@ Options:
                 result['operatingSystem']['softwareLicense']
                 ['softwareDescription']['name'] or formatting.blank()
             )])
-        table.add_row(['created',
-                       result['provisionDate'] or formatting.blank()])
+
+        table.add_row(
+            ['created', result['provisionDate'] or formatting.blank()])
+
+        table.add_row(['owner', formatting.FormattedItem(
+            utils.lookup(result, 'billingItem', 'orderItem',
+                         'order', 'userRecord',
+                         'username') or formatting.blank()
+        )])
 
         vlan_table = formatting.Table(['type', 'number', 'id'])
+
         for vlan in result['networkVlans']:
             vlan_table.add_row([
                 vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
