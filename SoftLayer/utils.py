@@ -158,6 +158,13 @@ def resolve_ids(identifier, resolvers):
     return []
 
 
+def sanitize_args(args):
+    for key, value in args.items():
+        if isinstance(value, str) and value.startswith('='):
+            args[key] = value[1:]
+    return args	
+
+
 def dict_extract(dictionary, keys):
     """Extracts & removes keys from a dict with a default value.
 

@@ -3,10 +3,10 @@
     ~~~~~~~~~~~~~~~
     ISCSI Manager/helpers
 """
-from SoftLayer import utils
+from SoftLayer.utils import IdentifierMixin, NestedDict
 
 
-class ISCSIManager(utils.IdentifierMixin, object):
+class ISCSIManager(IdentifierMixin, object):
 
     """ Manages iSCSI storages """
 
@@ -66,14 +66,18 @@ class ISCSIManager(utils.IdentifierMixin, object):
         item_price = self._find_item_prices(int(size),
                                             categorycode='iscsi')
         iscsi_order = self._build_order(item_price, location)
+        self.product_order.verifyOrder(iscsi_order)
         self.product_order.placeOrder(iscsi_order)
 
     def list_iscsi(self):
         """List iSCSI volume
         """
         account = self.client['Account']
+
         iscsi_list = account.getIscsiNetworkStorage(
             mask='eventCount,serviceResource[datacenter.name]')
+        iscsi_list = [NestedDict(n) for n in iscsi_list]
+        print iscsi_list
         return iscsi_list
 
     def get_iscsi(self, volume_id, **kwargs):
@@ -146,6 +150,7 @@ Network_Storage_Iscsi_SnapshotSpace',
             'prices': [{'id': item_price}],
             'quantity': 1,
             'volumeId': volume_id}
+        self.product_order.verifyOrder(snapshotspaceorder)
         self.product_order.placeOrder(snapshotspaceorder)
 
     def delete_snapshot(self, snapshot_id):

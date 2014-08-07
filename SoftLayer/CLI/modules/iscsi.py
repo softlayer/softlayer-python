@@ -12,16 +12,13 @@ The available commands are:
 For several commands, <identifier> will be asked for. This will be the id
 for iSCSI target.
 """
-# from SoftLayer.CLI import (CLIRunnable, Table, no_going_back, FormattedItem)
-import SoftLayer
-from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
-from SoftLayer.CLI import formatting
-from SoftLayer.CLI import helpers
-from SoftLayer import utils
+from SoftLayer.CLI import (CLIRunnable, Table, no_going_back, FormattedItem)
+from SoftLayer.CLI.helpers import (
+    CLIAbort, ArgumentError, NestedDict, blank, resolve_id, KeyValueTable)
+from SoftLayer import ISCSIManager
 
 
-class ListISCSIs(environment.CLIRunnable):
+class ListISCSIs(CLIRunnable):
 
     """
 usage: sl iscsi list [options]
@@ -31,10 +28,9 @@ List iSCSI targets
     action = 'list'
 
     def execute(self, args):
-        iscsi_mgr = SoftLayer.ISCSIManager(self.client)
+        iscsi_mgr = ISCSIManager(self.client)
         iscsi_list = iscsi_mgr.list_iscsi()
-        iscsi_list = [utils.NestedDict(n) for n in iscsi_list]
-        table = formatting.Table([
+        table = Table([
             'id',
             'datacenter',
             'size',
@@ -42,22 +38,22 @@ List iSCSI targets
             'password',
             'server'
         ])
+
         for iscsi in iscsi_list:
             table.add_row([
                 iscsi['id'],
-                iscsi['serviceResource']['datacenter'].get('name',
-                                                           formatting.blank()),
-                formatting.FormattedItem(
-                    iscsi.get('capacityGb', formatting.blank()),
+                iscsi['serviceResource']['datacenter'].get('name', blank()),
+                FormattedItem(
+                    iscsi.get('capacityGb', blank()),
                     "%dGB" % iscsi.get('capacityGb', 0)),
-                iscsi.get('username', formatting.blank()),
-                iscsi.get('password', formatting.blank()),
-                iscsi.get('serviceResourceBackendIpAddress',
-                          formatting.blank())])
+                iscsi.get('username', blank()),
+                iscsi.get('password', blank()),
+                iscsi.get('serviceResourceBackendIpAddress', blank())])
+
         return table
 
 
-class CreateISCSI(environment.CLIRunnable):
+class CreateISCSI(CLIRunnable):
 
     """
 usage: sl iscsi create [options]
@@ -78,7 +74,7 @@ Required:
     required_params = ['--size', '--datacenter']
 
     def execute(self, args):
-        iscsi_mgr = SoftLayer.ISCSIManager(self.client)
+        iscsi_mgr = ISCSIManager(self.client)
         self._validate_create_args(args)
         size, location = self._parse_create_args(args)
         iscsi_mgr.create_iscsi(size=size, location=location)
@@ -96,11 +92,11 @@ Required:
         """ Raises an ArgumentError if the given arguments are not valid """
         invalid_args = [k for k in self.required_params if args.get(k) is None]
         if invalid_args:
-            raise exceptions.ArgumentError('Missing required options: %s'
-                                           % ','.join(invalid_args))
+            raise ArgumentError('Missing required options: %s'
+                                % ','.join(invalid_args))
 
 
-class CancelISCSI(environment.CLIRunnable):
+class CancelISCSI(CLIRunnable):
 
     """
 usage: sl iscsi cancel <identifier> [options]
@@ -121,8 +117,8 @@ options :
     options = ['confirm']
 
     def execute(self, args):
-        iscsi_mgr = SoftLayer.ISCSIManager(self.client)
-        iscsi_id = helpers.resolve_id(
+        iscsi_mgr = ISCSIManager(self.client)
+        iscsi_id = resolve_id(
             iscsi_mgr.resolve_ids,
             args.get('<identifier>'),
             'iSCSI')
@@ -130,13 +126,13 @@ options :
         immediate = args.get('--immediate', False)
 
         reason = args.get('--reason')
-        if args['--really'] or formatting.no_going_back(iscsi_id):
+        if args['--really'] or no_going_back(iscsi_id):
             iscsi_mgr.cancel_iscsi(iscsi_id, reason, immediate)
         else:
-            raise exceptions.CLIAbort('Aborted')
+            CLIAbort('Aborted')
 
 
-class ISCSIDetails(environment.CLIRunnable):
+class ISCSIDetails(CLIRunnable):
 
     """
 usage: sl iscsi detail [--password] <identifier> [options]
@@ -153,17 +149,17 @@ Options:
     action = 'detail'
 
     def execute(self, args):
-        iscsi_mgr = SoftLayer.ISCSIManager(self.client)
-        table = formatting.KeyValueTable(['Name', 'Value'])
+        iscsi_mgr = ISCSIManager(self.client)
+        table = KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
         table.align['Value'] = 'l'
 
-        iscsi_id = helpers.resolve_id(
+        iscsi_id = resolve_id(
             iscsi_mgr.resolve_ids,
             args.get('<identifier>'),
             'iSCSI')
         result = iscsi_mgr.get_iscsi(iscsi_id)
-        result = utils.NestedDict(result)
+        result = NestedDict(result)
 
         table.add_row(['id', result['id']])
         table.add_row(['serviceResourceName', result['serviceResourceName']])
@@ -182,7 +178,7 @@ Options:
             table.add_row(['notes', result['notes']])
 
         if args.get('--password'):
-            pass_table = formatting.Table(['username', 'password'])
+            pass_table = Table(['username', 'password'])
             pass_table.add_row([result['username'], result['password']])
             table.add_row(['users', pass_table])
 
