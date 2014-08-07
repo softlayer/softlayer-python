@@ -16,7 +16,7 @@ if sys.version_info <= (2, 6):
 extra = {}
 
 requires = [
-    'six >= 1.1.0',
+    'six >= 1.7.0',
     'prettytable >= 0.7.0',
     'docopt == 0.6.1',
     'requests',
@@ -38,7 +38,7 @@ else:
 
 setup(
     name='SoftLayer',
-    version='3.1.0',
+    version='3.2.0',
     description=description,
     long_description=long_description,
     author='SoftLayer Technologies, Inc.',
@@ -48,6 +48,7 @@ setup(
         'SoftLayer.CLI',
         'SoftLayer.CLI.modules',
         'SoftLayer.managers',
+        'SoftLayer.testing',
     ],
     license='MIT',
     zip_safe=False,

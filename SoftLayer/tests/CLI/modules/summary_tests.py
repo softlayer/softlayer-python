@@ -4,18 +4,19 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import formatting
 from SoftLayer.CLI.modules import summary
-from SoftLayer.CLI.environment import Environment
-from SoftLayer.CLI.helpers import format_output
+from SoftLayer import testing
 
 
-class SummaryTests(unittest.TestCase):
-    def setUp(self):
-        self.client = FixtureClient()
+class SummaryTests(testing.TestCase):
+    def set_up(self):
+        self.client = testing.FixtureClient()
 
     def test_summary(self):
-        command = summary.Summary(client=self.client, env=Environment())
+        command = summary.Summary(client=self.client,
+                                  env=environment.Environment())
 
         output = command.execute({})
         expected = [{'datacenter': 'dal00',
@@ -25,4 +26,4 @@ class SummaryTests(unittest.TestCase):
                      'IPs': 3,
                      'vs': 1,
                      'vlans': 1}]
-        self.assertEqual(expected, format_output(output, 'python'))
+        self.assertEqual(expected, formatting.format_output(output, 'python'))

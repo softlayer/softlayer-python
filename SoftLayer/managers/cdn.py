@@ -1,19 +1,20 @@
 """
     SoftLayer.cdn
-    ~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~
     CDN Manager/helpers
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.utils import IdentifierMixin
-from six import string_types
+from SoftLayer import utils
+
+import six
 
 
 MAX_URLS_PER_LOAD = 5
 MAX_URLS_PER_PURGE = 5
 
 
-class CDNManager(IdentifierMixin, object):
+class CDNManager(utils.IdentifierMixin, object):
     """ Manage CDN accounts """
 
     def __init__(self, client):
@@ -107,7 +108,7 @@ class CDNManager(IdentifierMixin, object):
                   otherwise, returns the first error encountered.
         """
 
-        if isinstance(urls, string_types):
+        if isinstance(urls, six.string_types):
             urls = [urls]
 
         for i in range(0, len(urls), MAX_URLS_PER_LOAD):
@@ -129,7 +130,7 @@ class CDNManager(IdentifierMixin, object):
                   otherwise, returns the first error encountered.
         """
 
-        if isinstance(urls, string_types):
+        if isinstance(urls, six.string_types):
             urls = [urls]
 
         for i in range(0, len(urls), MAX_URLS_PER_PURGE):

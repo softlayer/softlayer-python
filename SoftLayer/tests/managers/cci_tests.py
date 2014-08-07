@@ -4,23 +4,23 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import CCIManager
-from SoftLayer.tests import unittest, FixtureClient
+import mock
 
-from mock import ANY, call
+import SoftLayer
+from SoftLayer import testing
 
 
-class CCITests(unittest.TestCase):
+class CCITests(testing.TestCase):
     """
     Small class to verify the rename of CCIManager to VSManager didn't
     break any existing code.
     """
-    def setUp(self):
-        self.client = FixtureClient()
-        self.cci = CCIManager(self.client)
+    def set_up(self):
+        self.client = testing.FixtureClient()
+        self.cci = SoftLayer.CCIManager(self.client)
 
     def test_list_instances(self):
-        mcall = call(mask=ANY, filter={})
+        mcall = mock.call(mask=mock.ANY, filter={})
         service = self.client['Account']
 
         list_expected_ids = [100, 104]

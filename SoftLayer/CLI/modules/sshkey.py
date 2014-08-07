@@ -12,14 +12,16 @@ The available commands are:
 """
 # :license: MIT, see LICENSE for more details.
 
-from os.path import expanduser
+from os import path
 
-from SoftLayer import SshKeyManager
-from SoftLayer.CLI import CLIRunnable, Table, no_going_back
-from SoftLayer.CLI.helpers import CLIAbort, resolve_id, KeyValueTable
+import SoftLayer
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 
 
-class AddSshKey(CLIRunnable):
+class AddSshKey(environment.CLIRunnable):
     """
 usage: sl sshkey add <label> (--file=FILE | --key=KEY ) [options]
 
@@ -44,17 +46,17 @@ Optional:
         if args.get('--key'):
             key = args['--key']
         else:
-            key_file = open(expanduser(args['--file']), 'rU')
+            key_file = open(path.expanduser(args['--file']), 'rU')
             key = key_file.read().strip()
             key_file.close()
 
-        mgr = SshKeyManager(self.client)
+        mgr = SoftLayer.SshKeyManager(self.client)
         result = mgr.add_key(key, args['<label>'], args.get('--notes'))
 
         return "SSH key added: %s" % result.get('fingerprint')
 
 
-class RemoveSshKey(CLIRunnable):
+class RemoveSshKey(environment.CLIRunnable):
     """
 usage: sl sshkey remove <identifier> [options]
 
@@ -69,17 +71,18 @@ Required:
     options = ['confirm']
 
     def execute(self, args):
-        mgr = SshKeyManager(self.client)
+        mgr = SoftLayer.SshKeyManager(self.client)
 
-        key_id = resolve_id(mgr.resolve_ids,
-                            args.get('<identifier>'), 'SshKey')
-        if args['--really'] or no_going_back(key_id):
+        key_id = helpers.resolve_id(mgr.resolve_ids,
+                                    args.get('<identifier>'),
+                                    'SshKey')
+        if args['--really'] or formatting.no_going_back(key_id):
             mgr.delete_key(key_id)
         else:
-            raise CLIAbort('Aborted')
+            raise exceptions.CLIAbort('Aborted')
 
 
-class EditSshKey(CLIRunnable):
+class EditSshKey(environment.CLIRunnable):
     """
 usage: sl sshkey edit <identifier> [options]
 
@@ -91,18 +94,19 @@ Options:
     action = 'edit'
 
     def execute(self, args):
-        mgr = SshKeyManager(self.client)
+        mgr = SoftLayer.SshKeyManager(self.client)
 
-        key_id = resolve_id(mgr.resolve_ids,
-                            args.get('<identifier>'), 'SshKey')
+        key_id = helpers.resolve_id(mgr.resolve_ids,
+                                    args.get('<identifier>'),
+                                    'SshKey')
 
         if not mgr.edit_key(key_id,
                             label=args['--label'],
                             notes=args['--notes']):
-            raise CLIAbort('Failed to edit SSH key')
+            raise exceptions.CLIAbort('Failed to edit SSH key')
 
 
-class ListSshKey(CLIRunnable):
+class ListSshKey(environment.CLIRunnable):
     """
 usage: sl sshkey list [options]
 
@@ -114,10 +118,10 @@ Options:
     action = 'list'
 
     def execute(self, args):
-        mgr = SshKeyManager(self.client)
+        mgr = SoftLayer.SshKeyManager(self.client)
         keys = mgr.list_keys()
 
-        table = Table(['id', 'label', 'fingerprint', 'notes'])
+        table = formatting.Table(['id', 'label', 'fingerprint', 'notes'])
 
         for key in keys:
             table.add_row([key['id'],
@@ -128,7 +132,7 @@ Options:
         return table
 
 
-class PrintSshKey(CLIRunnable):
+class PrintSshKey(environment.CLIRunnable):
     """
 usage: sl sshkey print <identifier> [--file=FILE]
 
@@ -141,18 +145,19 @@ Options:
     action = 'print'
 
     def execute(self, args):
-        mgr = SshKeyManager(self.client)
+        mgr = SoftLayer.SshKeyManager(self.client)
 
-        key_id = resolve_id(mgr.resolve_ids,
-                            args.get('<identifier>'), 'SshKey')
+        key_id = helpers.resolve_id(mgr.resolve_ids,
+                                    args.get('<identifier>'),
+                                    'SshKey')
 
         key = mgr.get_key(key_id)
 
         if args.get('--file'):
-            with open(expanduser(args['--file']), 'w') as pub_file:
+            with open(path.expanduser(args['--file']), 'w') as pub_file:
                 pub_file.write(key['key'])
 
-        table = KeyValueTable(['Name', 'Value'])
+        table = formatting.KeyValueTable(['Name', 'Value'])
         table.add_row(['id', key['id']])
         table.add_row(['label', key.get('label')])
         table.add_row(['notes', key.get('notes', '-')])

@@ -4,17 +4,17 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from mock import patch
+import mock
 
-from SoftLayer.tests import unittest, FixtureClient
-from SoftLayer.CLI.helpers import format_output
-from SoftLayer.CLI.exceptions import CLIAbort
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 from SoftLayer.CLI.modules import globalip
+from SoftLayer import testing
 
 
-class DnsTests(unittest.TestCase):
-    def setUp(self):
-        self.client = FixtureClient()
+class DnsTests(testing.TestCase):
+    def set_up(self):
+        self.client = testing.FixtureClient()
 
     def test_ip_assign(self):
         command = globalip.GlobalIpAssign(client=self.client)
@@ -23,7 +23,7 @@ class DnsTests(unittest.TestCase):
                                   '<target>': '127.0.0.1'})
         self.assertEqual(None, output)
 
-    @patch('SoftLayer.CLI.modules.globalip.no_going_back')
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
     def test_ip_cancel(self, no_going_back_mock):
         no_going_back_mock.return_value = True
         command = globalip.GlobalIpCancel(client=self.client)
@@ -33,7 +33,7 @@ class DnsTests(unittest.TestCase):
 
         no_going_back_mock.return_value = False
 
-        self.assertRaises(CLIAbort,
+        self.assertRaises(exceptions.CLIAbort,
                           command.execute,
                           {'<identifier>': '1', '--really': False})
 
@@ -49,7 +49,7 @@ class DnsTests(unittest.TestCase):
                            'id': '201',
                            'ip': '127.0.0.1',
                            'target': '127.0.0.1 (example.com)'}],
-                         format_output(output, 'python'))
+                         formatting.format_output(output, 'python'))
 
         output = command.execute({'--v6': True})
         self.assertEqual([{'assigned': 'Yes',
@@ -60,4 +60,4 @@ class DnsTests(unittest.TestCase):
                            'id': '201',
                            'ip': '127.0.0.1',
                            'target': '127.0.0.1 (example.com)'}],
-                         format_output(output, 'python'))
+                         formatting.format_output(output, 'python'))

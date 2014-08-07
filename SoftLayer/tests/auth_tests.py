@@ -4,27 +4,26 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.auth import (
-    AuthenticationBase, BasicAuthentication, TokenAuthentication)
-from SoftLayer.tests import unittest
+from SoftLayer import auth
+from SoftLayer import testing
 
 
-class TestAuthenticationBase(unittest.TestCase):
+class TestAuthenticationBase(testing.TestCase):
     def test_get_headers(self):
-        auth = AuthenticationBase()
-        self.assertRaises(NotImplementedError, auth.get_headers)
+        auth_base = auth.AuthenticationBase()
+        self.assertRaises(NotImplementedError, auth_base.get_headers)
 
 
-class TestBasicAuthentication(unittest.TestCase):
-    def setUp(self):
-        self.auth = BasicAuthentication('USERNAME', 'APIKEY')
+class TestBasicAuthentication(testing.TestCase):
+    def set_up(self):
+        self.auth = auth.BasicAuthentication('USERNAME', 'APIKEY')
 
     def test_attribs(self):
-        self.assertEquals(self.auth.username, 'USERNAME')
-        self.assertEquals(self.auth.api_key, 'APIKEY')
+        self.assertEqual(self.auth.username, 'USERNAME')
+        self.assertEqual(self.auth.api_key, 'APIKEY')
 
     def test_get_headers(self):
-        self.assertEquals(self.auth.get_headers(), {
+        self.assertEqual(self.auth.get_headers(), {
             'authenticate': {
                 'username': 'USERNAME',
                 'apiKey': 'APIKEY',
@@ -37,16 +36,16 @@ class TestBasicAuthentication(unittest.TestCase):
         self.assertIn('USERNAME', s)
 
 
-class TestTokenAuthentication(unittest.TestCase):
-    def setUp(self):
-        self.auth = TokenAuthentication(12345, 'TOKEN')
+class TestTokenAuthentication(testing.TestCase):
+    def set_up(self):
+        self.auth = auth.TokenAuthentication(12345, 'TOKEN')
 
     def test_attribs(self):
-        self.assertEquals(self.auth.user_id, 12345)
-        self.assertEquals(self.auth.auth_token, 'TOKEN')
+        self.assertEqual(self.auth.user_id, 12345)
+        self.assertEqual(self.auth.auth_token, 'TOKEN')
 
     def test_get_headers(self):
-        self.assertEquals(self.auth.get_headers(), {
+        self.assertEqual(self.auth.get_headers(), {
             'authenticate': {
                 'complexType': 'PortalLoginToken',
                 'userId': 12345,

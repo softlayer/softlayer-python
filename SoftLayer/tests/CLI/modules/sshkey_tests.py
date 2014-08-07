@@ -5,18 +5,19 @@
     :license: MIT, see LICENSE for more details.
 """
 import os.path
-from mock import patch
 import tempfile
 
-from SoftLayer.tests import unittest, FixtureClient, FIXTURE_PATH
-from SoftLayer.CLI.helpers import format_output
+import mock
+
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 from SoftLayer.CLI.modules import sshkey
-from SoftLayer.CLI.exceptions import CLIAbort
+from SoftLayer import testing
 
 
-class SshKeyTests(unittest.TestCase):
-    def setUp(self):
-        self.client = FixtureClient()
+class SshKeyTests(testing.TestCase):
+    def set_up(self):
+        self.client = testing.FixtureClient()
 
     def test_add_by_option(self):
         service = self.client['Security_Ssh_Key']
@@ -36,7 +37,7 @@ class SshKeyTests(unittest.TestCase):
 
     def test_add_by_file(self):
         command = sshkey.AddSshKey(client=self.client)
-        path = os.path.join(FIXTURE_PATH, 'id_rsa.pub')
+        path = os.path.join(testing.FIXTURE_PATH, 'id_rsa.pub')
 
         output = command.execute({
             '<label>': 'key1',
@@ -50,14 +51,15 @@ class SshKeyTests(unittest.TestCase):
         command.execute({'<identifier>': '1234',
                          '--really': True})
 
-    @patch('SoftLayer.CLI.modules.sshkey.no_going_back')
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
     def test_remove_key_fail(self, ngb_mock):
         ngb_mock.return_value = False
 
         command = sshkey.RemoveSshKey(client=self.client)
 
-        self.assertRaises(CLIAbort, command.execute, {'<identifier>': '1234',
-                                                      '--really': False})
+        self.assertRaises(exceptions.CLIAbort,
+                          command.execute, {'<identifier>': '1234',
+                                            '--really': False})
 
     def test_edit_key(self):
         command = sshkey.EditSshKey(client=self.client)
@@ -76,7 +78,7 @@ class SshKeyTests(unittest.TestCase):
         service = self.client['Security_Ssh_Key']
         service.editObject.return_value = False
         command = sshkey.EditSshKey(client=self.client)
-        self.assertRaises(CLIAbort,
+        self.assertRaises(exceptions.CLIAbort,
                           command.execute, {'<identifier>': '1234',
                                             '--label': 'key1',
                                             '--notes': 'my key'})
@@ -85,7 +87,7 @@ class SshKeyTests(unittest.TestCase):
         command = sshkey.ListSshKey(client=self.client)
         output = command.execute({})
 
-        self.assertEqual(format_output(output, 'python'),
+        self.assertEqual(formatting.format_output(output, 'python'),
                          [{'notes': '-',
                            'fingerprint': None,
                            'id': '100',
@@ -99,7 +101,7 @@ class SshKeyTests(unittest.TestCase):
         command = sshkey.PrintSshKey(client=self.client)
         output = command.execute({'<identifier>': '1234'})
 
-        self.assertEqual(format_output(output, 'python'),
+        self.assertEqual(formatting.format_output(output, 'python'),
                          {'id': 1234, 'label': 'label', 'notes': 'notes'})
 
     def test_print_key_file(self):

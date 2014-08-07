@@ -11,12 +11,12 @@ The available commands are:
 
 import os.path
 
-from SoftLayer import (
-    SoftLayerAPIError, API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT)
-from SoftLayer.auth import BasicAuthentication
-from SoftLayer.CLI import (
-    CLIRunnable, CLIAbort, KeyValueTable, confirm, format_output)
-from SoftLayer.utils import configparser
+import SoftLayer
+from SoftLayer import auth
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
+from SoftLayer import utils
 
 
 def get_settings_from_client(client):
@@ -41,7 +41,7 @@ def get_settings_from_client(client):
 
 def config_table(settings):
     """ Returns a config table """
-    table = KeyValueTable(['Name', 'Value'])
+    table = formatting.KeyValueTable(['Name', 'Value'])
     table.align['Name'] = 'r'
     table.align['Value'] = 'l'
     table.add_row(['Username', settings['username'] or 'not set'])
@@ -52,18 +52,20 @@ def config_table(settings):
 
 
 def get_api_key(client, username, secret, endpoint_url=None):
-    """ Tries API-Key and password auth to get (and potentially generate) an
-        API key. """
+    """ Attempts API-Key and password auth to get an API key
+
+    This will also generate an API key if one doesn't exist
+    """
 
     client.endpoint_url = endpoint_url
     client.auth = None
     # Try to use a client with username/api key
     if len(secret) == 64:
         try:
-            client.auth = BasicAuthentication(username, secret)
+            client.auth = auth.BasicAuthentication(username, secret)
             client['Account'].getCurrentUser()
             return secret
-        except SoftLayerAPIError as ex:
+        except SoftLayer.SoftLayerAPIError as ex:
             if 'invalid api token' not in ex.faultString.lower():
                 raise
     else:
@@ -79,7 +81,7 @@ def get_api_key(client, username, secret, endpoint_url=None):
         return api_keys[0]['authenticationKey']
 
 
-class Setup(CLIRunnable):
+class Setup(environment.CLIRunnable):
     """
 usage: sl config setup [options]
 
@@ -99,22 +101,23 @@ Setup configuration
         config_path = os.path.expanduser(path)
 
         self.env.out(
-            format_output(config_table({'username': username,
-                                        'api_key': api_key,
-                                        'endpoint_url': endpoint_url,
-                                        'timeout': timeout})))
+            formatting.format_output(config_table({
+                'username': username,
+                'api_key': api_key,
+                'endpoint_url': endpoint_url,
+                'timeout': timeout})))
 
-        if not confirm('Are you sure you want to write settings to "%s"?'
-                       % config_path, default=True):
-            raise CLIAbort('Aborted.')
+        if not formatting.confirm('Are you sure you want to write settings '
+                                  'to "%s"?' % config_path, default=True):
+            raise exceptions.CLIAbort('Aborted.')
 
         # Persist the config file. Read the target config file in before
         # setting the values to avoid clobbering settings
-        config = configparser.RawConfigParser()
+        config = utils.configparser.RawConfigParser()
         config.read(config_path)
         try:
             config.add_section('softlayer')
-        except configparser.DuplicateSectionError:
+        except utils.configparser.DuplicateSectionError:
             pass
 
         config.set('softlayer', 'username', username)
@@ -139,45 +142,51 @@ Setup configuration
         timeout = defaults['timeout']
 
         # Ask for username
-        while True:
-            username = self.env.input(
-                'Username [%s]: ' % defaults['username']) \
-                or defaults['username']
+        for _ in range(3):
+            username = (self.env.input('Username [%s]: '
+                                       % defaults['username'])
+                        or defaults['username'])
             if username:
                 break
+        else:
+            raise exceptions.CLIAbort('Aborted after 3 attempts')
 
         # Ask for 'secret' which can be api_key or their password
-        while True:
-            secret = self.env.getpass(
-                'API Key or Password [%s]: ' % defaults['api_key']) \
-                or defaults['api_key']
+        for _ in range(3):
+            secret = (self.env.getpass('API Key or Password [%s]: '
+                                       % defaults['api_key'])
+                      or defaults['api_key'])
             if secret:
                 break
+        else:
+            raise exceptions.CLIAbort('Aborted after 3 attempts')
 
         # Ask for which endpoint they want to use
-        while True:
+        for _ in range(3):
             endpoint_type = self.env.input(
                 'Endpoint (public|private|custom): ')
             endpoint_type = endpoint_type.lower()
             if not endpoint_type:
-                endpoint_url = API_PUBLIC_ENDPOINT
+                endpoint_url = SoftLayer.API_PUBLIC_ENDPOINT
                 break
             if endpoint_type == 'public':
-                endpoint_url = API_PUBLIC_ENDPOINT
+                endpoint_url = SoftLayer.API_PUBLIC_ENDPOINT
                 break
             elif endpoint_type == 'private':
-                endpoint_url = API_PRIVATE_ENDPOINT
+                endpoint_url = SoftLayer.API_PRIVATE_ENDPOINT
                 break
             elif endpoint_type == 'custom':
                 endpoint_url = self.env.input(
                     'Endpoint URL [%s]: ' % defaults['endpoint_url']
                 ) or defaults['endpoint_url']
                 break
+        else:
+            raise exceptions.CLIAbort('Aborted after 3 attempts')
 
         return username, secret, endpoint_url, timeout
 
 
-class Show(CLIRunnable):
+class Show(environment.CLIRunnable):
     """
 usage: sl config show [options]
 

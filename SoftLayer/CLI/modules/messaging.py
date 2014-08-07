@@ -31,9 +31,10 @@ The available commands are:
 # pylint: disable=C0111
 import sys
 
-from SoftLayer import MessagingManager
-from SoftLayer.CLI import CLIRunnable, Table
-from SoftLayer.CLI.helpers import CLIAbort, listing, ArgumentError, blank
+import SoftLayer
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 
 
 COMMON_MESSAGING_ARGS = """Service Options:
@@ -42,7 +43,7 @@ COMMON_MESSAGING_ARGS = """Service Options:
 """
 
 
-class ListAccounts(CLIRunnable):
+class ListAccounts(environment.CLIRunnable):
     """
 usage: sl messaging accounts-list [options]
 
@@ -52,10 +53,10 @@ List SoftLayer Message Queue Accounts
     action = 'accounts-list'
 
     def execute(self, args):
-        manager = MessagingManager(self.client)
+        manager = SoftLayer.MessagingManager(self.client)
         accounts = manager.list_accounts()
 
-        table = Table([
+        table = formatting.Table([
             'id', 'name', 'status'
         ])
         for account in accounts:
@@ -71,7 +72,7 @@ List SoftLayer Message Queue Accounts
         return table
 
 
-class ListEndpoints(CLIRunnable):
+class ListEndpoints(environment.CLIRunnable):
     """
 usage: sl messaging endpoints-list [options]
 
@@ -81,23 +82,23 @@ List SoftLayer Message Queue Endpoints
     action = 'endpoints-list'
 
     def execute(self, args):
-        manager = MessagingManager(self.client)
+        manager = SoftLayer.MessagingManager(self.client)
         regions = manager.get_endpoints()
 
-        table = Table([
+        table = formatting.Table([
             'name', 'public', 'private'
         ])
         for region, endpoints in regions.items():
             table.add_row([
                 region,
-                endpoints.get('public') or blank(),
-                endpoints.get('private') or blank(),
+                endpoints.get('public') or formatting.blank(),
+                endpoints.get('private') or formatting.blank(),
             ])
 
         return table
 
 
-class Ping(CLIRunnable):
+class Ping(environment.CLIRunnable):
     __doc__ = """
 usage: sl messaging ping [options]
 
@@ -107,25 +108,25 @@ Ping the SoftLayer Message Queue service
     action = 'ping'
 
     def execute(self, args):
-        manager = MessagingManager(self.client)
+        manager = SoftLayer.MessagingManager(self.client)
         okay = manager.ping(
             datacenter=args['--datacenter'], network=args['--network'])
         if okay:
             return 'OK'
         else:
-            CLIAbort('Ping failed')
+            exceptions.CLIAbort('Ping failed')
 
 
 def queue_table(queue):
     """ Returns a table with details about a queue """
-    table = Table(['property', 'value'])
+    table = formatting.Table(['property', 'value'])
     table.align['property'] = 'r'
     table.align['value'] = 'l'
 
     table.add_row(['name', queue['name']])
     table.add_row(['message_count', queue['message_count']])
     table.add_row(['visible_message_count', queue['visible_message_count']])
-    table.add_row(['tags', listing(queue['tags'] or [])])
+    table.add_row(['tags', formatting.listing(queue['tags'] or [])])
     table.add_row(['expiration', queue['expiration']])
     table.add_row(['visibility_interval', queue['visibility_interval']])
     return table
@@ -133,7 +134,7 @@ def queue_table(queue):
 
 def message_table(message):
     """ Returns a table with details about a message """
-    table = Table(['property', 'value'])
+    table = formatting.Table(['property', 'value'])
     table.align['property'] = 'r'
     table.align['value'] = 'l'
 
@@ -147,18 +148,18 @@ def message_table(message):
 
 def topic_table(topic):
     """ Returns a table with details about a topic """
-    table = Table(['property', 'value'])
+    table = formatting.Table(['property', 'value'])
     table.align['property'] = 'r'
     table.align['value'] = 'l'
 
     table.add_row(['name', topic['name']])
-    table.add_row(['tags', listing(topic['tags'] or [])])
+    table.add_row(['tags', formatting.listing(topic['tags'] or [])])
     return table
 
 
 def subscription_table(sub):
     """ Returns a table with details about a subscription """
-    table = Table(['property', 'value'])
+    table = formatting.Table(['property', 'value'])
     table.align['property'] = 'r'
     table.align['value'] = 'l'
 
@@ -169,7 +170,7 @@ def subscription_table(sub):
     return table
 
 
-class QueueList(CLIRunnable):
+class QueueList(environment.CLIRunnable):
     __doc__ = """
 usage: sl messaging queue-list <account_id> [options]
 
@@ -179,12 +180,12 @@ List all queues on an account
     action = 'queue-list'
 
     def execute(self, args):
-        manager = MessagingManager(self.client)
+        manager = SoftLayer.MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
 
         queues = mq_client.get_queues()['items']
 
-        table = Table([
+        table = formatting.Table([
             'name', 'message_count', 'visible_message_count'
         ])
         for queue in queues:
@@ -196,7 +197,7 @@ List all queues on an account
         return table
 
 
-class QueueDetail(CLIRunnable):
+class QueueDetail(environment.CLIRunnable):
     __doc__ = """
 usage: sl messaging queue-detail <account_id> <queue_name> [options]
 
@@ -206,13 +207,13 @@ Detail a queue
     action = 'queue-detail'
 
     def execute(self, args):
-        manager = MessagingManager(self.client)
+        manager = SoftLayer.MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
         queue = mq_client.get_queue(args['<queue_name>'])
         return queue_table(queue)
 
 
-class QueueCreate(CLIRunnable):
+class QueueCreate(environment.CLIRunnable):
     __doc__ = """
 usage: sl messaging queue-add <account_id> <queue_name> [options]
 
@@ -228,7 +229,7 @@ Options:
     action = 'queue-add'
 
     def execute(self, args):
-        manager = MessagingManager(self.client)
+        manager = SoftLayer.MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
         tags = None
         if args.get('--tags'):
@@ -243,7 +244,7 @@ Options:
         return queue_table(queue)
 
 
-class QueueModify(CLIRunnable):
+class QueueModify(environment.CLIRunnable):
     __doc__ = """
 usage: sl messaging queue-edit <account_id> <queue_name> [options]
 
@@ -259,7 +260,7 @@ Options:
     action = 'queue-edit'
 
     def execute(self, args):
-        manager = MessagingManager(self.client)
+        manager = SoftLayer.MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
         tags = None
         if args.get('--tags'):
@@ -274,7 +275,7 @@ Options:
         return queue_table(queue)
 
 
-class QueueDelete(CLIRunnable):
+class QueueDelete(environment.CLIRunnable):
     __doc__ = """
 usage: sl messaging queue-remove <account_id> <queue_name> [<message_id>]
                                  [options]
@@ -288,7 +289,7 @@ Options:
     action = 'queue-remove'
 
     def execute(self, args):
-        manager = MessagingManager(self.client)
+        manager = SoftLayer.MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
 
         if args['<message_id>']:
@@ -298,7 +299,7 @@ Options:
             mq_client.delete_queue(args['<queue_name>'], args.get('--force'))
 
 
-class QueuePush(CLIRunnable):
+class QueuePush(environment.CLIRunnable):
     __doc__ = """
 usage: sl messaging queue-push <account_id> <queue_name> (<message> | -)
                                [options]
@@ -312,7 +313,7 @@ Options:
     action = 'queue-push'
 
     def execute(self, args):
-        manager = MessagingManager(self.client)
+        manager = SoftLayer.MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
         body = ''
         if args['<message>'] == '-':
@@ -323,7 +324,7 @@ Options:
             mq_client.push_queue_message(args['<queue_name>'], body))
 
 
-class QueuePop(CLIRunnable):
+class QueuePop(environment.CLIRunnable):
     __doc__ = """
 usage: sl messaging queue-pop <account_id> <queue_name>  [options]
 
@@ -337,7 +338,7 @@ Options:
     action = 'queue-pop'
 
     def execute(self, args):
-        manager = MessagingManager(self.client)
+        manager = SoftLayer.MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
 
         messages = mq_client.pop_messages(
@@ -355,7 +356,7 @@ Options:
         return formatted_messages
 
 
-class TopicList(CLIRunnable):
+class TopicList(environment.CLIRunnable):
     __doc__ = """
 usage: sl messaging topic-list <account_id> [options]
 
@@ -365,17 +366,17 @@ List all topics on an account
     action = 'topic-list'
 
     def execute(self, args):
-        manager = MessagingManager(self.client)
+        manager = SoftLayer.MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
         topics = mq_client.get_topics()['items']
 
-        table = Table(['name'])
+        table = formatting.Table(['name'])
         for topic in topics:
             table.add_row([topic['name']])
         return table
 
 
-class TopicDetail(CLIRunnable):
+class TopicDetail(environment.CLIRunnable):
     __doc__ = """
 usage: sl messaging topic-detail <account_id> <topic_name> [options]
 
@@ -385,7 +386,7 @@ Detail a topic
     action = 'topic-detail'
 
     def execute(self, args):
-        manager = MessagingManager(self.client)
+        manager = SoftLayer.MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
         topic = mq_client.get_topic(args['<topic_name>'])
         subscriptions = mq_client.get_subscriptions(args['<topic_name>'])
@@ -395,7 +396,7 @@ Detail a topic
         return [topic_table(topic), tables]
 
 
-class TopicCreate(CLIRunnable):
+class TopicCreate(environment.CLIRunnable):
     __doc__ = """
 usage: sl messaging topic-add <account_id> <topic_name> [options]
 
@@ -405,7 +406,7 @@ Create a new topic
     action = 'topic-add'
 
     def execute(self, args):
-        manager = MessagingManager(self.client)
+        manager = SoftLayer.MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
         tags = None
         if args.get('--tags'):
@@ -421,7 +422,7 @@ Create a new topic
         return topic_table(topic)
 
 
-class TopicDelete(CLIRunnable):
+class TopicDelete(environment.CLIRunnable):
     __doc__ = """
 usage: sl messaging topic-remove <account_id> <topic_name> [options]
 
@@ -434,12 +435,12 @@ Options:
     action = 'topic-remove'
 
     def execute(self, args):
-        manager = MessagingManager(self.client)
+        manager = SoftLayer.MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
         mq_client.delete_topic(args['<topic_name>'], args.get('--force'))
 
 
-class TopicSubscribe(CLIRunnable):
+class TopicSubscribe(environment.CLIRunnable):
     __doc__ = """
 usage: sl messaging topic-subscribe <account_id> <topic_name> [options]
 
@@ -456,7 +457,7 @@ Options:
     action = 'topic-subscribe'
 
     def execute(self, args):
-        manager = MessagingManager(self.client)
+        manager = SoftLayer.MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
         if args['--type'] == 'queue':
             subscription = mq_client.create_subscription(
@@ -473,12 +474,12 @@ Options:
                 body=args['--http-body']
             )
         else:
-            raise ArgumentError(
+            raise exceptions.ArgumentError(
                 '--type should be either queue or http.')
         return subscription_table(subscription)
 
 
-class TopicUnsubscribe(CLIRunnable):
+class TopicUnsubscribe(environment.CLIRunnable):
     __doc__ = """
 usage: sl messaging topic-unsubscribe <account_id> <topic_name>
                                       <subscription_id> [options]
@@ -489,7 +490,7 @@ Remove a subscription on a topic
     action = 'topic-unsubscribe'
 
     def execute(self, args):
-        manager = MessagingManager(self.client)
+        manager = SoftLayer.MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
 
         mq_client.delete_subscription(
@@ -497,7 +498,7 @@ Remove a subscription on a topic
             args['<subscription_id>'])
 
 
-class TopicPush(CLIRunnable):
+class TopicPush(environment.CLIRunnable):
     __doc__ = """
 usage: sl messaging topic-push <account_id> <topic_name> (<message> | -)
                                [options]
@@ -508,7 +509,7 @@ Push a message into a topic
     action = 'topic-push'
 
     def execute(self, args):
-        manager = MessagingManager(self.client)
+        manager = SoftLayer.MessagingManager(self.client)
         mq_client = manager.get_connection(args['<account_id>'])
 
         # the message body comes from the positional argument or stdin

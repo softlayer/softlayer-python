@@ -13,12 +13,13 @@ The available commands are:
 """
 # :license: MIT, see LICENSE for more details.
 
-from SoftLayer.CLI.helpers import CLIRunnable, no_going_back, Table, CLIAbort
-from SoftLayer.CLI.helpers import blank
-from SoftLayer import SSLManager
+import SoftLayer
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 
 
-class ListCerts(CLIRunnable):
+class ListCerts(environment.CLIRunnable):
     """
 usage: sl ssl list [options]
 
@@ -33,23 +34,26 @@ Options:
     action = 'list'
 
     def execute(self, args):
-        manager = SSLManager(self.client)
+        manager = SoftLayer.SSLManager(self.client)
 
         certificates = manager.list_certs(args['--status'])
 
-        table = Table(['id', 'common_name', 'days_until_expire', 'notes'])
+        table = formatting.Table(['id',
+                                  'common_name',
+                                  'days_until_expire',
+                                  'notes'])
         for certificate in certificates:
             table.add_row([
                 certificate['id'],
                 certificate['commonName'],
                 certificate['validityDays'],
-                certificate.get('notes', blank())
+                certificate.get('notes', formatting.blank())
             ])
         table.sortby = args['--sortby']
         return table
 
 
-class AddCertificate(CLIRunnable):
+class AddCertificate(environment.CLIRunnable):
     """
 usage: sl ssl add --crt=FILE --key=FILE [options]
 
@@ -74,21 +78,21 @@ Options:
             template['certificate'] = open(args['--crt']).read()
             template['privateKey'] = open(args['--key']).read()
             if args['--csr']:
-                template['certificateSigningRequest'] = \
-                    open(args['--csr']).read()
+                body = open(args['--csr']).read()
+                template['certificateSigningRequest'] = body
 
             if args['--icc']:
-                template['intermediateCertificate'] = \
-                    open(args['--icc']).read()
+                body = open(args['--icc']).read()
+                template['intermediateCertificate'] = body
 
         except IOError:
-            raise CLIAbort("File does not exist")
+            raise exceptions.CLIAbort("File does not exist")
 
-        manager = SSLManager(self.client)
+        manager = SoftLayer.SSLManager(self.client)
         manager.add_certificate(template)
 
 
-class EditCertificate(CLIRunnable):
+class EditCertificate(environment.CLIRunnable):
     """
 usage: sl ssl edit <id> [options]
 
@@ -116,11 +120,11 @@ Options:
         if args['--notes']:
             template['notes'] = args['--notes']
 
-        manager = SSLManager(self.client)
+        manager = SoftLayer.SSLManager(self.client)
         manager.edit_certificate(template)
 
 
-class RemoveCertificate(CLIRunnable):
+class RemoveCertificate(environment.CLIRunnable):
     """
 usage: sl ssl remove <id> [options]
 
@@ -130,13 +134,13 @@ Remove SSL certificate
     options = ['confirm']
 
     def execute(self, args):
-        manager = SSLManager(self.client)
-        if args['--really'] or no_going_back('yes'):
+        manager = SoftLayer.SSLManager(self.client)
+        if args['--really'] or formatting.no_going_back('yes'):
             manager.remove_certificate(args['<id>'])
-        raise CLIAbort("Aborted.")
+        raise exceptions.CLIAbort("Aborted.")
 
 
-class DownloadCertificate(CLIRunnable):
+class DownloadCertificate(environment.CLIRunnable):
     """
 usage: sl ssl download <id> [options]
 
@@ -150,7 +154,7 @@ Download SSL certificate and key file
             with open(filename, 'w') as cert_file:
                 cert_file.write(content)
 
-        manager = SSLManager(self.client)
+        manager = SoftLayer.SSLManager(self.client)
         certificate = manager.get_certificate(args['<id>'])
 
         write_cert(

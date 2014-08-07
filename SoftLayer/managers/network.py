@@ -6,7 +6,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from SoftLayer.utils import NestedDict, query_filter, resolve_ids, lookup
+from SoftLayer import utils
 
 DEFAULT_SUBNET_MASK = ','.join(['hardware',
                                 'datacenter',
@@ -77,7 +77,7 @@ class NetworkManager(object):
         price_id = None
         quantity_str = str(quantity)
         for item in package.getItems(id=0, mask='itemCategory'):
-            category_code = lookup(item, 'itemCategory', 'categoryCode')
+            category_code = utils.lookup(item, 'itemCategory', 'categoryCode')
             if all([category_code == category,
                     item.get('capacity') == quantity_str,
                     version == 4 or (version == 6 and
@@ -213,15 +213,15 @@ class NetworkManager(object):
                     'ipAddress']
             kwargs['mask'] = ','.join(mask)
 
-        _filter = NestedDict({})
+        _filter = utils.NestedDict({})
 
         if version:
-            ver = query_filter(version)
+            ver = utils.query_filter(version)
             _filter['globalIpRecords']['ipAddress']['subnet']['version'] = ver
 
         if identifier:
             subnet_filter = _filter['globalIpRecords']['ipAddress']['subnet']
-            subnet_filter['networkIdentifier'] = query_filter(identifier)
+            subnet_filter['networkIdentifier'] = utils.query_filter(identifier)
 
         kwargs['filter'] = _filter.to_dict()
         return self.account.getGlobalIpRecords(**kwargs)
@@ -245,17 +245,18 @@ class NetworkManager(object):
         if 'mask' not in kwargs:
             kwargs['mask'] = DEFAULT_SUBNET_MASK
 
-        _filter = NestedDict(kwargs.get('filter') or {})
+        _filter = utils.NestedDict(kwargs.get('filter') or {})
 
         if identifier:
-            _filter['subnets']['networkIdentifier'] = query_filter(identifier)
+            _filter['subnets']['networkIdentifier'] = (
+                utils.query_filter(identifier))
         if datacenter:
-            _filter['subnets']['datacenter']['name'] = \
-                query_filter(datacenter)
+            _filter['subnets']['datacenter']['name'] = (
+                utils.query_filter(datacenter))
         if version:
-            _filter['subnets']['version'] = query_filter(version)
+            _filter['subnets']['version'] = utils.query_filter(version)
         if subnet_type:
-            _filter['subnets']['subnetType'] = query_filter(subnet_type)
+            _filter['subnets']['subnetType'] = utils.query_filter(subnet_type)
         else:
             # This filters out global IPs from the subnet listing.
             _filter['subnets']['subnetType'] = {'operation': '!= GLOBAL_IP'}
@@ -280,17 +281,18 @@ class NetworkManager(object):
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
 
         """
-        _filter = NestedDict(kwargs.get('filter') or {})
+        _filter = utils.NestedDict(kwargs.get('filter') or {})
 
         if vlan_number:
-            _filter['networkVlans']['vlanNumber'] = query_filter(vlan_number)
+            _filter['networkVlans']['vlanNumber'] = (
+                utils.query_filter(vlan_number))
 
         if name:
-            _filter['networkVlans']['name'] = query_filter(name)
+            _filter['networkVlans']['name'] = utils.query_filter(name)
 
         if datacenter:
-            _filter['networkVlans']['primaryRouter']['datacenter']['name'] = \
-                query_filter(datacenter)
+            _filter['networkVlans']['primaryRouter']['datacenter']['name'] = (
+                utils.query_filter(datacenter))
 
         kwargs['filter'] = _filter.to_dict()
 
@@ -301,15 +303,17 @@ class NetworkManager(object):
 
     def resolve_global_ip_ids(self, identifier):
         """ Resolve global ip ids """
-        return resolve_ids(identifier, [self._list_global_ips_by_identifier])
+        return utils.resolve_ids(identifier,
+                                 [self._list_global_ips_by_identifier])
 
     def resolve_subnet_ids(self, identifier):
         """ Resolve subnet ids """
-        return resolve_ids(identifier, [self._list_subnets_by_identifier])
+        return utils.resolve_ids(identifier,
+                                 [self._list_subnets_by_identifier])
 
     def resolve_vlan_ids(self, identifier):
         """ Resolve VLAN ids """
-        return resolve_ids(identifier, [self._list_vlans_by_name])
+        return utils.resolve_ids(identifier, [self._list_vlans_by_name])
 
     def summary_by_datacenter(self):
         """ Provides a dictionary with a summary of all network information on
@@ -359,8 +363,8 @@ class NetworkManager(object):
                     datacenters[name]['virtualGuestCount'] += 1
                     unique_vms.append(virtual_guest['id'])
 
-            datacenters[name]['primaryIpCount'] += \
-                vlan['totalPrimaryIpAddressCount']
+            datacenters[name]['primaryIpCount'] += (
+                vlan['totalPrimaryIpAddressCount'])
             datacenters[name]['subnetCount'] += len(vlan['subnets'])
 
         return datacenters

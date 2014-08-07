@@ -7,22 +7,24 @@
     :license: MIT, see LICENSE for more details.
 """
 # pylint: disable=E0202
-import os
 import json
+import os
 
-from prettytable import PrettyTable, FRAME, NONE
+import prettytable
 
-from SoftLayer.utils import string_types, console_input
+from SoftLayer import utils
+
+FALSE_VALUES = ['0', 'false', 'FALSE', 'no', 'False']
 
 
 def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
-    """ Given some data, will format it for output
+    """Given some data, will format it for console output.
 
     :param data: One of: String, Table, FormattedItem, List, Tuple,
                  SequentialOutput
     :param string fmt (optional): One of: table, raw, json, python
     """
-    if isinstance(data, string_types):
+    if isinstance(data, utils.string_types):
         if fmt == 'json':
             return json.dumps(data)
         return data
@@ -66,13 +68,12 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
 
 
 def format_prettytable(table):
-    """ Takes a SoftLayer.CLI.formatting.Table instance and returns a formatted
-        prettytable """
+    """Converts SoftLayer.CLI.formatting.Table instance to a prettytable."""
     for i, row in enumerate(table.rows):
         for j, item in enumerate(row):
             table.rows[i][j] = format_output(item)
     ptable = table.prettytable()
-    ptable.hrules = FRAME
+    ptable.hrules = prettytable.FRAME
     ptable.horizontal_char = '.'
     ptable.vertical_char = ':'
     ptable.junction_char = ':'
@@ -80,15 +81,14 @@ def format_prettytable(table):
 
 
 def format_no_tty(table):
-    """ Takes a SoftLayer.CLI.formatting.Table instance and returns a formatted
-        prettytable that has as little formatting as possible """
+    """Converts SoftLayer.CLI.formatting.Table instance to a prettytable."""
     for i, row in enumerate(table.rows):
         for j, item in enumerate(row):
             table.rows[i][j] = format_output(item, fmt='raw')
     ptable = table.prettytable()
     for col in table.columns:
         ptable.align[col] = 'l'
-    ptable.hrules = NONE
+    ptable.hrules = prettytable.NONE
     ptable.border = False
     ptable.header = False
     ptable.left_padding_width = 0
@@ -97,8 +97,7 @@ def format_no_tty(table):
 
 
 def mb_to_gb(megabytes):
-    """ Takes in the number of megabytes and returns a FormattedItem that
-        displays gigabytes.
+    """Converts number of megabytes to a FormattedItem in gigabytes.
 
     :param int megabytes: number of megabytes
     """
@@ -106,8 +105,7 @@ def mb_to_gb(megabytes):
 
 
 def gb(gigabytes):  # pylint: disable=C0103
-    """ Takes in the number of gigabytes and returns a FormattedItem that
-        displays gigabytes.
+    """Converts number of gigabytes to a FormattedItem in gigabytes.
 
     :param int gigabytes: number of gigabytes
     """
@@ -116,15 +114,12 @@ def gb(gigabytes):  # pylint: disable=C0103
 
 
 def blank():
-    """ Returns FormattedItem to make pretty output use a dash
-        and raw formatting to use NULL
-    """
+    """Returns a blank FormattedItem."""
     return FormattedItem(None, '-')
 
 
 def listing(items, separator=','):
-    """ Given an iterable, returns a FormattedItem which display a list of
-        items
+    """Given an iterable return a FormattedItem which display the list of items
 
         :param items: An iterable that outputs strings
         :param string separator: the separator to use
@@ -133,23 +128,17 @@ def listing(items, separator=','):
 
 
 def active_txn(item):
-    """ Returns a FormattedItem describing the active transaction (if any) on
-        the given object. If no active transaction is running, returns a blank
-        FormattedItem.
+    """Returns a FormattedItem describing the active transaction on a object.
+
+        If no active transaction is running, returns a blank FormattedItem.
 
         :param item: An object capable of having an active transaction
     """
-    if not item['activeTransaction'].get('transactionStatus'):
-        return blank()
-
-    return FormattedItem(
-        item['activeTransaction']['transactionStatus'].get('name'),
-        item['activeTransaction']['transactionStatus'].get('friendlyName'))
+    return transaction_status(item['activeTransaction'])
 
 
 def transaction_status(transaction):
-    """ Returns a FormattedItem describing the transaction status (if any) on
-        the given object. If there is no status, returns a blank FormattedItem.
+    """Returns a FormattedItem describing the given transaction.
 
         :param item: An object capable of having an active transaction
     """
@@ -162,15 +151,17 @@ def transaction_status(transaction):
 
 
 def valid_response(prompt, *valid):
-    """ Will display a prompt for a command-line user. If the input is in the
-        valid given valid list then it will return True. Otherwise, it will
-        return False. If no input is received from the user, None is returned
-        instead.
+    """Prompt user for input.
+
+    Will display a prompt for a command-line user. If the input is in the
+    valid given valid list then it will return True. Otherwise, it will
+    return False. If no input is received from the user, None is returned
+    instead.
 
     :param string prompt: string prompt to give to the user
     :param string \\*valid: valid responses
     """
-    ans = console_input(prompt).lower()
+    ans = utils.console_input(prompt).lower()
 
     if ans in valid:
         return True
@@ -181,7 +172,7 @@ def valid_response(prompt, *valid):
 
 
 def confirm(prompt_str, default=False):
-    """ Show a confirmation prompt to a command-line user.
+    """Show a confirmation prompt to a command-line user.
 
     :param string prompt_str: prompt to give to the user
     :param bool default: Default value to True or False
@@ -200,7 +191,7 @@ def confirm(prompt_str, default=False):
 
 
 def no_going_back(confirmation):
-    """ Show a confirmation to a user.
+    """Show a confirmation to a user.
 
     :param confirmation str: the string the user has to enter in order to
                              confirm their action.
@@ -215,8 +206,9 @@ def no_going_back(confirmation):
 
 
 class SequentialOutput(list):
-    """ This object represents output in a sequence. The purpose is to
-        de-couple the separator from the output itself.
+    """SequentialOutput is used for outputting sequential items.
+
+    The purpose is to de-couple the separator from the output itself.
 
     :param separator str: string to use as a default separator
     """
@@ -225,7 +217,7 @@ class SequentialOutput(list):
         super(SequentialOutput, self).__init__(*args, **kwargs)
 
     def to_python(self):
-        """ returns itself, since it itself is a list """
+        """returns itself, since it itself is a list."""
         return self
 
     def __str__(self):
@@ -233,18 +225,16 @@ class SequentialOutput(list):
 
 
 class CLIJSONEncoder(json.JSONEncoder):
-    " A JSON encoder which is able to use a .to_python() method on objects. "
+    """A JSON encoder which is able to use a .to_python() method on objects."""
     def default(self, obj):
-        """ If the normal JSONEncoder doesn't understand, we have a chance to
-            encode the object into a native python type.
-        """
+        """Encode object if it implements to_python()."""
         if hasattr(obj, 'to_python'):
             return obj.to_python()
         return super(CLIJSONEncoder, self).default(obj)
 
 
 class Table(object):
-    """ A Table structure.
+    """A Table structure used for output.
 
     :param list columns: a list of column names
     """
@@ -256,14 +246,14 @@ class Table(object):
         self.sortby = None
 
     def add_row(self, row):
-        """ Add a row to the table
+        """Add a row to the table.
 
         :param list row: the row of string to be added
         """
         self.rows.append(row)
 
     def to_python(self):
-        """ Decode this Table object to standard Python types """
+        """Decode this Table object to standard Python types."""
         # Adding rows
         items = []
         for row in self.rows:
@@ -272,8 +262,8 @@ class Table(object):
         return items
 
     def prettytable(self):
-        """ Returns a new prettytable instance. """
-        table = PrettyTable(self.columns)
+        """Returns a new prettytable instance."""
+        table = prettytable.PrettyTable(self.columns)
         if self.sortby:
             table.sortby = self.sortby
         for a_col, alignment in self.align.items():
@@ -286,10 +276,9 @@ class Table(object):
 
 
 class KeyValueTable(Table):
-    """ This is a Table which is intended to be used to display key-value
-        pairs. It expects there to be only two columns."""
+    """A table that is oriented towards key-value pairs."""
     def to_python(self):
-        """ Decode this KeyValueTable object to standard Python types """
+        """Decode this KeyValueTable object to standard Python types."""
         mapping = {}
         for row in self.rows:
             mapping[row[0]] = _format_python_value(row[1])
@@ -297,8 +286,7 @@ class KeyValueTable(Table):
 
 
 class FormattedItem(object):
-    """ This is an object which wraps a single value that is able to be
-        represented in a human readable and a machine-readable way.
+    """This is an object that can be displayed as a human readable and raw.
 
         :param original: raw (machine-readable) value
         :param string formatted: human-readable value
@@ -311,11 +299,11 @@ class FormattedItem(object):
             self.formatted = self.original
 
     def to_python(self):
-        """ returns the original (raw) value """
+        """returns the original (raw) value."""
         return self.original
 
     def __str__(self):
-        """ returns the formatted value """
+        """returns the formatted value."""
         # If the original value is None, represent this as 'NULL'
         if self.original is None:
             return 'NULL'
@@ -325,7 +313,7 @@ class FormattedItem(object):
 
 
 def _format_python_value(value):
-    """ If the value has to_python() defined then return that """
+    """If the value has to_python() defined then return that."""
     if hasattr(value, 'to_python'):
         return value.to_python()
     return value

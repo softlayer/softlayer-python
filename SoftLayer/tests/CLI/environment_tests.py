@@ -5,16 +5,18 @@
     :license: MIT, see LICENSE for more details.
 """
 import os
-from mock import patch, MagicMock
 
-from SoftLayer.tests import unittest
-from SoftLayer.CLI.environment import Environment, InvalidCommand
+import mock
+
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer import testing
 
 
-class EnvironmentTests(unittest.TestCase):
+class EnvironmentTests(testing.TestCase):
 
-    def setUp(self):
-        self.env = Environment()
+    def set_up(self):
+        self.env = environment.Environment()
 
     def test_plugin_list(self):
         actions = self.env.plugin_list()
@@ -22,7 +24,7 @@ class EnvironmentTests(unittest.TestCase):
         self.assertIn('dns', actions)
 
     def test_add_plugin(self):
-        m = MagicMock()
+        m = mock.MagicMock()
         m.action = 'add_plugin_action_test'
         self.env.add_plugin(m)
 
@@ -30,24 +32,24 @@ class EnvironmentTests(unittest.TestCase):
                          {'mock': {'add_plugin_action_test': m}})
 
     def test_out(self):
-        self.env.stdout = MagicMock()
+        self.env.stdout = mock.MagicMock()
         self.env.out('TEXT OUTPUT')
         self.env.stdout.write.assert_any_call('TEXT OUTPUT')
         self.env.stdout.write.assert_any_call(os.linesep)
 
     def test_err(self):
-        self.env.stderr = MagicMock()
+        self.env.stderr = mock.MagicMock()
         self.env.err('TEXT OUTPUT')
         self.env.stderr.write.assert_any_call('TEXT OUTPUT')
         self.env.stderr.write.assert_any_call(os.linesep)
 
-    @patch('SoftLayer.CLI.environment.console_input')
+    @mock.patch('SoftLayer.utils.console_input')
     def test_input(self, raw_input_mock):
         r = self.env.input('input')
         raw_input_mock.assert_called_with('input')
         self.assertEqual(raw_input_mock(), r)
 
-    @patch('getpass.getpass')
+    @mock.patch('getpass.getpass')
     def test_getpass(self, getpass):
         r = self.env.getpass('input')
         getpass.assert_called_with('input')
@@ -62,7 +64,8 @@ class EnvironmentTests(unittest.TestCase):
         self.assertEqual(r, 'realname')
 
     def test_get_command_invalid(self):
-        self.assertRaises(InvalidCommand, self.env.get_command, 'vs', 'list')
+        self.assertRaises(exceptions.InvalidCommand,
+                          self.env.get_command, 'vs', 'list')
 
     def test_get_command(self):
         self.env.plugins = {'vs': {'list': 'something'}}

@@ -9,11 +9,13 @@ The available commands are:
 """
 # :license: MIT, see LICENSE for more details.
 
-from SoftLayer import NetworkManager
-from SoftLayer.CLI import CLIRunnable, Table, KeyValueTable, blank, resolve_id
+import SoftLayer
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 
 
-class VlanDetail(CLIRunnable):
+class VlanDetail(environment.CLIRunnable):
     """
 usage: sl vlan detail <identifier> [options]
 
@@ -26,14 +28,14 @@ Filters:
     action = 'detail'
 
     def execute(self, args):
-        mgr = NetworkManager(self.client)
+        mgr = SoftLayer.NetworkManager(self.client)
 
-        vlan_id = resolve_id(mgr.resolve_vlan_ids,
-                             args.get('<identifier>'),
-                             'VLAN')
+        vlan_id = helpers.resolve_id(mgr.resolve_vlan_ids,
+                                     args.get('<identifier>'),
+                                     'VLAN')
         vlan = mgr.get_vlan(vlan_id)
 
-        table = KeyValueTable(['Name', 'Value'])
+        table = formatting.KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
         table.align['Value'] = 'l'
 
@@ -47,7 +49,7 @@ Filters:
                        'Yes' if vlan['firewallInterfaces'] else 'No'])
         subnets = []
         for subnet in vlan['subnets']:
-            subnet_table = KeyValueTable(['Name', 'Value'])
+            subnet_table = formatting.KeyValueTable(['Name', 'Value'])
             subnet_table.align['Name'] = 'r'
             subnet_table.align['Value'] = 'l'
             subnet_table.add_row(['id', subnet['id']])
@@ -63,7 +65,9 @@ Filters:
 
         if not args.get('--no-vs'):
             if vlan['virtualGuests']:
-                vs_table = KeyValueTable(['Hostname', 'Domain', 'IP'])
+                vs_table = formatting.KeyValueTable(['Hostname',
+                                                     'Domain',
+                                                     'IP'])
                 vs_table.align['Hostname'] = 'r'
                 vs_table.align['IP'] = 'l'
                 for vsi in vlan['virtualGuests']:
@@ -76,7 +80,7 @@ Filters:
 
         if not args.get('--no-hardware'):
             if vlan['hardware']:
-                hw_table = Table(['Hostname', 'Domain', 'IP'])
+                hw_table = formatting.Table(['Hostname', 'Domain', 'IP'])
                 hw_table.align['Hostname'] = 'r'
                 hw_table.align['IP'] = 'l'
                 for hardware in vlan['hardware']:
@@ -90,7 +94,7 @@ Filters:
         return table
 
 
-class VlanList(CLIRunnable):
+class VlanList(environment.CLIRunnable):
     """
 usage: sl vlan list [options]
 
@@ -108,9 +112,9 @@ Filters:
     action = 'list'
 
     def execute(self, args):
-        mgr = NetworkManager(self.client)
+        mgr = SoftLayer.NetworkManager(self.client)
 
-        table = Table([
+        table = formatting.Table([
             'id', 'number', 'datacenter', 'name', 'IPs', 'hardware', 'vs',
             'networking', 'firewall'
         ])
@@ -126,7 +130,7 @@ Filters:
                 vlan['id'],
                 vlan['vlanNumber'],
                 vlan['primaryRouter']['datacenter']['name'],
-                vlan.get('name') or blank(),
+                vlan.get('name') or formatting.blank(),
                 vlan['totalPrimaryIpAddressCount'],
                 len(vlan['hardware']),
                 len(vlan['virtualGuests']),

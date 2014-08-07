@@ -4,11 +4,11 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import FirewallManager
-from SoftLayer.tests import unittest, FixtureClient
-from SoftLayer.tests.fixtures import (Network_Component_Firewall,
-                                      Network_Vlan_Firewall, Billing_Item)
-from mock import ANY
+import mock
+
+import SoftLayer
+from SoftLayer import testing
+from SoftLayer.testing import fixtures
 
 
 MASK = ('mask[orderValue,action,destinationIpAddress,destinationIpSubnetMask,'
@@ -16,11 +16,11 @@ MASK = ('mask[orderValue,action,destinationIpAddress,destinationIpSubnetMask,'
         'sourceIpAddress,sourceIpSubnetMask,version]')
 
 
-class FirewallTests(unittest.TestCase):
+class FirewallTests(testing.TestCase):
 
-    def setUp(self):
-        self.client = FixtureClient()
-        self.firewall = FirewallManager(self.client)
+    def set_up(self):
+        self.client = testing.FixtureClient()
+        self.firewall = SoftLayer.FirewallManager(self.client)
 
     def test_get_firewalls(self):
         call = self.client['Account'].getNetworkVlans
@@ -38,7 +38,7 @@ class FirewallTests(unittest.TestCase):
 
         firewalls = self.firewall.get_firewalls()
 
-        call.assert_called_once_with(mask=ANY)
+        call.assert_called_once_with(mask=mock.ANY)
         self.assertEqual(firewalls, [firewall_vlan])
 
     def test_get_standard_fwl_rules(self):
@@ -46,14 +46,14 @@ class FirewallTests(unittest.TestCase):
 
         rules = self.firewall.get_standard_fwl_rules(1234)
         call.assert_called_once_with(id=1234, mask=MASK)
-        self.assertEqual(rules, Network_Component_Firewall.getRules)
+        self.assertEqual(rules, fixtures.Network_Component_Firewall.getRules)
 
     def test_get_dedicated_fwl_rules(self):
         call = self.client['Network_Vlan_Firewall'].getRules
 
         rules = self.firewall.get_dedicated_fwl_rules(1234)
         call.assert_called_once_with(id=1234, mask=MASK)
-        self.assertEqual(rules, Network_Vlan_Firewall.getRules)
+        self.assertEqual(rules, fixtures.Network_Vlan_Firewall.getRules)
 
     def test_get_standard_package(self):
         # test standard firewalls
@@ -65,9 +65,9 @@ class FirewallTests(unittest.TestCase):
             'items': {
                 'description': {
                     'operation': '_= 10Mbps Hardware Firewall'
-                    }
                 }
             }
+        }
         f.assert_called_once_with(filter=_filter, id=0)
         call2.assert_called_once_with(id=1234, mask=mask)
 
@@ -79,9 +79,9 @@ class FirewallTests(unittest.TestCase):
             'items': {
                 'description': {
                     'operation': '_= 10Mbps Hardware Firewall'
-                    }
                 }
             }
+        }
         f.assert_called_twice_with(filter=_filter, id=0)
         call2.assert_called_once_with(id=1234, mask=mask)
 
@@ -93,9 +93,9 @@ class FirewallTests(unittest.TestCase):
             'items': {
                 'description': {
                     'operation': '_= Hardware Firewall (High Availability)'
-                    }
                 }
             }
+        }
         f.assert_called_once_with(filter=_filter, id=0)
 
     def test_get_dedicated_package_pkg(self):
@@ -106,9 +106,9 @@ class FirewallTests(unittest.TestCase):
             'items': {
                 'description': {
                     'operation': '_= Hardware Firewall (Dedicated)'
-                    }
                 }
             }
+        }
         f.assert_called_once_with(filter=_filter, id=0)
 
     def test_cancel_firewall(self):
@@ -118,19 +118,19 @@ class FirewallTests(unittest.TestCase):
         result = self.firewall.cancel_firewall(fwl_id, dedicated=False)
         f = self.client['Billing_Item'].cancelService
         f.assert_called_once_with(id=billing_item_id)
-        self.assertEqual(result, Billing_Item.cancelService)
+        self.assertEqual(result, fixtures.Billing_Item.cancelService)
         call = self.client['Network_Component_Firewall'].getObject
-        MASK = ('mask[id,billingItem[id]]')
-        call.assert_called_once_with(id=6327, mask=MASK)
+        mask = ('mask[id,billingItem[id]]')
+        call.assert_called_once_with(id=6327, mask=mask)
         # test dedicated firewalls
         billing_item_id = 21370815
         result = self.firewall.cancel_firewall(fwl_id, dedicated=True)
         f = self.client['Billing_Item'].cancelService
         f.assert_called_twice_with(id=billing_item_id)
-        self.assertEqual(result, Billing_Item.cancelService)
+        self.assertEqual(result, fixtures.Billing_Item.cancelService)
         call = self.client['Network_Vlan_Firewall'].getObject
-        MASK = ('mask[id,billingItem[id]]')
-        call.assert_called_once_with(id=6327, mask=MASK)
+        mask = ('mask[id,billingItem[id]]')
+        call.assert_called_once_with(id=6327, mask=mask)
 
     def test_add_standard_firewall_cci(self):
         # test standard firewalls for CCI
@@ -141,9 +141,9 @@ class FirewallTests(unittest.TestCase):
             'items': {
                 'description': {
                     'operation': '_= 10Mbps Hardware Firewall'
-                    }
                 }
             }
+        }
         f.assert_called_once_with(filter=_filter, id=0)
 
         call2 = self.client['Virtual_Guest'].getObject
@@ -165,9 +165,9 @@ class FirewallTests(unittest.TestCase):
             'items': {
                 'description': {
                     'operation': '_= 10Mbps Hardware Firewall'
-                    }
                 }
             }
+        }
         f.assert_called_once_with(filter=_filter, id=0)
 
         call2 = self.client['Hardware_Server'].getObject
@@ -185,9 +185,9 @@ class FirewallTests(unittest.TestCase):
             'items': {
                 'description': {
                     'operation': '_= Hardware Firewall (Dedicated)'
-                    }
                 }
             }
+        }
         f.assert_called_once_with(filter=_filter, id=0)
 
     def test_add_vlan_firewall_ha(self):
@@ -202,15 +202,15 @@ class FirewallTests(unittest.TestCase):
             'items': {
                 'description': {
                     'operation': '_= Hardware Firewall (High Availability)'
-                    }
                 }
             }
+        }
 
         f.assert_called_once_with(filter=_filter, id=0)
 
     def test_edit_dedicated_fwl_rules(self):
         # test standard firewalls
-        rules = Network_Vlan_Firewall.getRules
+        rules = fixtures.Network_Vlan_Firewall.getRules
         fwl_id = 1234
         fwl_ctx_acl_id = 3142
         self.firewall.edit_dedicated_fwl_rules(firewall_id=fwl_id,
@@ -224,13 +224,13 @@ class FirewallTests(unittest.TestCase):
 
     def test_edit_standard_fwl_rules(self):
         # test standard firewalls
-        rules = Network_Component_Firewall.getRules
+        rules = fixtures.Network_Component_Firewall.getRules
         fwl_id = 1234
         self.firewall.edit_standard_fwl_rules(firewall_id=fwl_id,
                                               rules=rules)
-        tempObject = {
+        temp_object = {
             "networkComponentFirewallId": fwl_id,
             "rules": rules}
         f = self.client['Network_Firewall_Update_Request'].createObject
 
-        f.assert_called_once_with(tempObject)
+        f.assert_called_once_with(temp_object)

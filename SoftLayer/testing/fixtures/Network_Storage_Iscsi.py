@@ -54,13 +54,13 @@ createSnapshot = {
         'snapshotCapacityGb': '40',
         'username': 'username'},
     'password': 'abcdef',
-                'serviceProviderId': 1,
-                'serviceResource': {'backendIpAddress': '10.1.0.1',
-                                    'name': 'storagedal05',
-                                    'type': {'type': 'ISCSI'}},
-                'serviceResourceBackendIpAddress': '10.1.0.1',
-                'serviceResourceName': 'storagedal05',
-                'username': 'username'}
+    'serviceProviderId': 1,
+    'serviceResource': {'backendIpAddress': '10.1.0.1',
+                        'name': 'storagedal05',
+                        'type': {'type': 'ISCSI'}},
+    'serviceResourceBackendIpAddress': '10.1.0.1',
+    'serviceResourceName': 'storagedal05',
+    'username': 'username'}
 
 restoreFromSnapshot = True
 editObject = True

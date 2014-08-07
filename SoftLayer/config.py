@@ -8,12 +8,12 @@
 import os
 import os.path
 
-from .auth import BasicAuthentication
-from SoftLayer.utils import configparser
+from SoftLayer import auth
+from SoftLayer import utils
 
 
 def get_client_settings_args(**kwargs):
-    """ Retrieve client settings from user-supplied arguments
+    """Retrieve client settings from user-supplied arguments.
 
         :param \\*\\*kwargs: Arguments that are passed into the client instance
     """
@@ -26,12 +26,12 @@ def get_client_settings_args(**kwargs):
     username = kwargs.get('username')
     api_key = kwargs.get('api_key')
     if username and api_key and not settings['auth']:
-        settings['auth'] = BasicAuthentication(username, api_key)
+        settings['auth'] = auth.BasicAuthentication(username, api_key)
     return settings
 
 
 def get_client_settings_env(**_):
-    """ Retrieve client settings from environment settings
+    """Retrieve client settings from environment settings.
 
         :param \\*\\*kwargs: Arguments that are passed into the client instance
     """
@@ -41,12 +41,12 @@ def get_client_settings_env(**_):
 
     config = {'proxy': proxy}
     if username and api_key:
-        config['auth'] = BasicAuthentication(username, api_key)
+        config['auth'] = auth.BasicAuthentication(username, api_key)
     return config
 
 
 def get_client_settings_config_file(**kwargs):
-    """ Retrieve client settings from the possible config file locations
+    """Retrieve client settings from the possible config file locations.
 
         :param \\*\\*kwargs: Arguments that are passed into the client instance
     """
@@ -54,7 +54,7 @@ def get_client_settings_config_file(**kwargs):
     if kwargs.get('config_file'):
         config_files.append(kwargs.get('config_file'))
     config_files = [os.path.expanduser(f) for f in config_files]
-    config = configparser.RawConfigParser({
+    config = utils.configparser.RawConfigParser({
         'username': '',
         'api_key': '',
         'endpoint_url': '',
@@ -74,7 +74,7 @@ def get_client_settings_config_file(**kwargs):
     username = config.get('softlayer', 'username')
     api_key = config.get('softlayer', 'api_key')
     if username and api_key:
-        settings['auth'] = BasicAuthentication(username, api_key)
+        settings['auth'] = auth.BasicAuthentication(username, api_key)
     return settings
 
 SETTING_RESOLVERS = [get_client_settings_args,
@@ -83,10 +83,12 @@ SETTING_RESOLVERS = [get_client_settings_args,
 
 
 def get_client_settings(**kwargs):
-    """ Parses settings from various input methods, preferring earlier values
-        to later ones. Once an 'auth' value is found, it returns the gathered
-        settings. The settings currently come from explicit user arguments,
-        environmental variables and config files.
+    """Parse client settings.
+
+    Parses settings from various input methods, preferring earlier values
+    to later ones. Once an 'auth' value is found, it returns the gathered
+    settings. The settings currently come from explicit user arguments,
+    environmental variables and config files.
 
         :param \\*\\*kwargs: Arguments that are passed into the client instance
     """

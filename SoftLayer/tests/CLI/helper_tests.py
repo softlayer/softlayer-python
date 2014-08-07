@@ -4,13 +4,18 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import sys
-import os
 import json
+import os
+import sys
 
-import SoftLayer.CLI as cli
-from SoftLayer.tests import FIXTURE_PATH, unittest
-from mock import patch, mock_open, call
+import mock
+
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
+from SoftLayer.CLI import template
+from SoftLayer import testing
 
 if sys.version_info >= (3,):
     open_path = 'builtins.open'
@@ -18,174 +23,174 @@ else:
     open_path = '__builtin__.open'
 
 
-class CLIJSONEncoderTest(unittest.TestCase):
+class CLIJSONEncoderTest(testing.TestCase):
     def test_default(self):
         out = json.dumps({
-            'formattedItem': cli.helpers.FormattedItem('normal', 'formatted')
-        }, cls=cli.formatting.CLIJSONEncoder)
+            'formattedItem': formatting.FormattedItem('normal', 'formatted')
+        }, cls=formatting.CLIJSONEncoder)
         self.assertEqual(out, '{"formattedItem": "normal"}')
 
         out = json.dumps({'normal': 'string'},
-                         cls=cli.formatting.CLIJSONEncoder)
+                         cls=formatting.CLIJSONEncoder)
         self.assertEqual(out, '{"normal": "string"}')
 
     def test_fail(self):
         self.assertRaises(
             TypeError,
-            json.dumps, {'test': object()}, cls=cli.formatting.CLIJSONEncoder)
+            json.dumps, {'test': object()}, cls=formatting.CLIJSONEncoder)
 
 
-class PromptTests(unittest.TestCase):
+class PromptTests(testing.TestCase):
 
-    @patch('SoftLayer.CLI.formatting.console_input')
+    @mock.patch('SoftLayer.utils.console_input')
     def test_invalid_response(self, raw_input_mock):
         raw_input_mock.return_value = 'y'
-        result = cli.helpers.valid_response('test', 'n')
+        result = formatting.valid_response('test', 'n')
         raw_input_mock.assert_called_with('test')
         self.assertFalse(result)
 
         raw_input_mock.return_value = 'wakakwakwaka'
-        result = cli.helpers.valid_response('test', 'n')
+        result = formatting.valid_response('test', 'n')
         raw_input_mock.assert_called_with('test')
         self.assertFalse(result)
 
         raw_input_mock.return_value = ''
-        result = cli.helpers.valid_response('test', 'n')
+        result = formatting.valid_response('test', 'n')
         raw_input_mock.assert_called_with('test')
         self.assertEqual(result, None)
 
-    @patch('SoftLayer.CLI.formatting.console_input')
+    @mock.patch('SoftLayer.utils.console_input')
     def test_valid_response(self, raw_input_mock):
         raw_input_mock.return_value = 'n'
-        result = cli.helpers.valid_response('test', 'n')
+        result = formatting.valid_response('test', 'n')
         raw_input_mock.assert_called_with('test')
         self.assertTrue(result)
 
         raw_input_mock.return_value = 'N'
-        result = cli.helpers.valid_response('test', 'n')
+        result = formatting.valid_response('test', 'n')
         raw_input_mock.assert_called_with('test')
         self.assertTrue(result)
 
-    @patch('SoftLayer.CLI.formatting.console_input')
+    @mock.patch('SoftLayer.utils.console_input')
     def test_do_or_die(self, raw_input_mock):
         confirmed = '37347373737'
         raw_input_mock.return_value = confirmed
-        result = cli.no_going_back(confirmed)
+        result = formatting.no_going_back(confirmed)
         self.assertTrue(result)
 
         # no_going_back should cast int's to str()
         confirmed = '4712309182309'
         raw_input_mock.return_value = confirmed
-        result = cli.no_going_back(int(confirmed))
+        result = formatting.no_going_back(int(confirmed))
         self.assertTrue(result)
 
         confirmed = None
         raw_input_mock.return_value = ''
-        result = cli.no_going_back(confirmed)
+        result = formatting.no_going_back(confirmed)
         self.assertFalse(result)
 
     def test_clirunnable_exercise(self):
-        runnable = cli.CLIRunnable()
+        runnable = environment.CLIRunnable()
         res = runnable.execute({})
         self.assertEqual(res, None)
 
-    @patch('SoftLayer.CLI.formatting.console_input')
+    @mock.patch('SoftLayer.utils.console_input')
     def test_confirmation(self, raw_input_mock):
         raw_input_mock.return_value = 'Y'
-        res = cli.confirm('Confirm?', default=False)
+        res = formatting.confirm('Confirm?', default=False)
         self.assertTrue(res)
 
         raw_input_mock.return_value = 'N'
-        res = cli.confirm('Confirm?', default=False)
+        res = formatting.confirm('Confirm?', default=False)
         self.assertFalse(res)
 
         raw_input_mock.return_value = ''
-        res = cli.confirm('Confirm?', default=True)
+        res = formatting.confirm('Confirm?', default=True)
         self.assertTrue(res)
 
 
-class FormattedItemTests(unittest.TestCase):
+class FormattedItemTests(testing.TestCase):
 
     def test_init(self):
-        item = cli.FormattedItem('test', 'test_formatted')
+        item = formatting.FormattedItem('test', 'test_formatted')
         self.assertEqual('test', item.original)
         self.assertEqual('test_formatted', item.formatted)
         self.assertEqual('test', str(item))
 
-        item = cli.FormattedItem('test')
+        item = formatting.FormattedItem('test')
         self.assertEqual('test', item.original)
         self.assertEqual('test', item.formatted)
         self.assertEqual('test', str(item))
 
     def test_mb_to_gb(self):
-        item = cli.mb_to_gb(1024)
+        item = formatting.mb_to_gb(1024)
         self.assertEqual(1024, item.original)
         self.assertEqual('1G', item.formatted)
 
-        item = cli.mb_to_gb('1024')
+        item = formatting.mb_to_gb('1024')
         self.assertEqual('1024', item.original)
         self.assertEqual('1G', item.formatted)
 
-        item = cli.mb_to_gb('1025.0')
+        item = formatting.mb_to_gb('1025.0')
         self.assertEqual('1025.0', item.original)
         self.assertEqual('1G', item.formatted)
 
-        self.assertRaises(ValueError, cli.mb_to_gb, '1024string')
+        self.assertRaises(ValueError, formatting.mb_to_gb, '1024string')
 
     def test_gb(self):
-        item = cli.gb(2)
+        item = formatting.gb(2)
         self.assertEqual(2048, item.original)
         self.assertEqual('2G', item.formatted)
 
-        item = cli.gb('2')
+        item = formatting.gb('2')
         self.assertEqual(2048, item.original)
         self.assertEqual('2G', item.formatted)
 
-        item = cli.gb('2.0')
+        item = formatting.gb('2.0')
         self.assertEqual(2048, item.original)
         self.assertEqual('2G', item.formatted)
 
     def test_blank(self):
-        item = cli.helpers.blank()
+        item = formatting.blank()
         self.assertEqual(None, item.original)
         self.assertEqual('-', item.formatted)
         self.assertEqual('NULL', str(item))
 
 
-class FormattedListTests(unittest.TestCase):
+class FormattedListTests(testing.TestCase):
     def test_init(self):
-        l = cli.listing([1, 'two'], separator=':')
+        l = formatting.listing([1, 'two'], separator=':')
         self.assertEqual([1, 'two'], list(l))
         self.assertEqual(':', l.separator)
 
-        l = cli.listing([])
+        l = formatting.listing([])
         self.assertEqual(',', l.separator)
 
     def test_to_python(self):
-        l = cli.listing([1, 'two'])
+        l = formatting.listing([1, 'two'])
         result = l.to_python()
         self.assertEqual([1, 'two'], result)
 
-        l = cli.listing(x for x in [1, 'two'])
+        l = formatting.listing(x for x in [1, 'two'])
         result = l.to_python()
         self.assertEqual([1, 'two'], result)
 
     def test_str(self):
-        l = cli.listing([1, 'two'])
+        l = formatting.listing([1, 'two'])
         result = str(l)
         self.assertEqual('1,two', result)
 
-        l = cli.listing((x for x in [1, 'two']), separator=':')
+        l = formatting.listing((x for x in [1, 'two']), separator=':')
         result = str(l)
         self.assertEqual('1:two', result)
 
 
-class FormattedTxnTests(unittest.TestCase):
+class FormattedTxnTests(testing.TestCase):
     def test_active_txn_empty(self):
-        self.assertRaises(KeyError, cli.active_txn, {})
+        self.assertRaises(KeyError, formatting.active_txn, {})
 
     def test_active_txn(self):
-        result = cli.active_txn({
+        result = formatting.active_txn({
             'activeTransaction': {
                 'transactionStatus': {
                     'name': 'a',
@@ -193,184 +198,186 @@ class FormattedTxnTests(unittest.TestCase):
                 }
             }
         })
-        self.assertEquals(result.original, 'a')
-        self.assertEquals(result.formatted, 'b')
-        self.assertIsInstance(result, cli.FormattedItem)
+        self.assertEqual(result.original, 'a')
+        self.assertEqual(result.formatted, 'b')
+        self.assertIsInstance(result, formatting.FormattedItem)
 
     def test_active_txn_missing(self):
         """ a dict with activeTransaction but not transactionStatus
-            should return blank() instead of raising an exception"""
-        b = cli.blank()
+            should return blank() instead of raising an exception
+        """
+        b = formatting.blank()
 
-        result = cli.active_txn({
+        result = formatting.active_txn({
             'activeTransaction': {}
         })
-        self.assertIsInstance(result, cli.FormattedItem)
-        self.assertEquals(result.original, b.original)
+        self.assertIsInstance(result, formatting.FormattedItem)
+        self.assertEqual(result.original, b.original)
 
     def test_transaction_status(self):
-        result = cli.transaction_status({
+        result = formatting.transaction_status({
             'transactionStatus': {
                 'name': 'a',
                 'friendlyName': 'b'
             }
         })
-        self.assertEquals(result.original, 'a')
-        self.assertEquals(result.formatted, 'b')
-        self.assertIsInstance(result, cli.FormattedItem)
+        self.assertEqual(result.original, 'a')
+        self.assertEqual(result.formatted, 'b')
+        self.assertIsInstance(result, formatting.FormattedItem)
 
     def test_transaction_status_missing(self):
-        b = cli.blank()
+        b = formatting.blank()
 
-        result = cli.transaction_status({
+        result = formatting.transaction_status({
             'transactionStatus': {}
         })
-        self.assertIsInstance(result, cli.FormattedItem)
+        self.assertIsInstance(result, formatting.FormattedItem)
         self.assertEqual(result.original, b.original)
 
 
-class CLIAbortTests(unittest.TestCase):
+class CLIAbortTests(testing.TestCase):
 
     def test_init(self):
-        e = cli.helpers.CLIAbort("something")
+        e = exceptions.CLIAbort("something")
         self.assertEqual(2, e.code)
         self.assertEqual("something", e.message)
-        self.assertIsInstance(e, cli.helpers.CLIHalt)
+        self.assertIsInstance(e, exceptions.CLIHalt)
 
 
-class ResolveIdTests(unittest.TestCase):
+class ResolveIdTests(testing.TestCase):
 
     def test_resolve_id_one(self):
         resolver = lambda r: [12345]
-        id = cli.helpers.resolve_id(resolver, 'test')
+        id = helpers.resolve_id(resolver, 'test')
 
         self.assertEqual(id, 12345)
 
     def test_resolve_id_none(self):
         resolver = lambda r: []
         self.assertRaises(
-            cli.helpers.CLIAbort, cli.helpers.resolve_id, resolver, 'test')
+            exceptions.CLIAbort, helpers.resolve_id, resolver, 'test')
 
     def test_resolve_id_multiple(self):
         resolver = lambda r: [12345, 54321]
         self.assertRaises(
-            cli.helpers.CLIAbort, cli.helpers.resolve_id, resolver, 'test')
+            exceptions.CLIAbort, helpers.resolve_id, resolver, 'test')
 
 
-class TestFormatOutput(unittest.TestCase):
+class TestFormatOutput(testing.TestCase):
 
     def test_format_output_string(self):
-        t = cli.helpers.format_output('just a string', 'raw')
+        t = formatting.format_output('just a string', 'raw')
         self.assertEqual('just a string', t)
 
-        t = cli.helpers.format_output(b'just a string', 'raw')
+        t = formatting.format_output(b'just a string', 'raw')
         self.assertEqual(b'just a string', t)
 
     def test_format_output_raw(self):
-        t = cli.Table(['nothing'])
+        t = formatting.Table(['nothing'])
         t.align['nothing'] = 'c'
         t.add_row(['testdata'])
         t.sortby = 'nothing'
-        ret = cli.helpers.format_output(t, 'raw')
+        ret = formatting.format_output(t, 'raw')
 
         self.assertNotIn('nothing', str(ret))
         self.assertIn('testdata', str(ret))
 
     def test_format_output_json(self):
-        t = cli.Table(['nothing'])
+        t = formatting.Table(['nothing'])
         t.align['nothing'] = 'c'
         t.add_row(['testdata'])
-        t.add_row([cli.helpers.blank()])
+        t.add_row([formatting.blank()])
         t.sortby = 'nothing'
-        ret = cli.helpers.format_output(t, 'json')
+        ret = formatting.format_output(t, 'json')
         # This uses json.dumps due to slight changes in the output between
         # py3.3 and py3.4
         expected = json.dumps([{'nothing': 'testdata'}, {'nothing': None}],
                               indent=4)
         self.assertEqual(expected, ret)
 
-        ret = cli.helpers.format_output('test', 'json')
+        ret = formatting.format_output('test', 'json')
         self.assertEqual('"test"', ret)
 
     def test_format_output_json_keyvaluetable(self):
-        t = cli.KeyValueTable(['key', 'value'])
-        t.add_row(['nothing', cli.helpers.blank()])
+        t = formatting.KeyValueTable(['key', 'value'])
+        t.add_row(['nothing', formatting.blank()])
         t.sortby = 'nothing'
-        ret = cli.helpers.format_output(t, 'json')
+        ret = formatting.format_output(t, 'json')
         self.assertEqual('''{
     "nothing": null
 }''', ret)
 
     def test_format_output_formatted_item(self):
-        item = cli.FormattedItem('test', 'test_formatted')
-        ret = cli.helpers.format_output(item, 'table')
+        item = formatting.FormattedItem('test', 'test_formatted')
+        ret = formatting.format_output(item, 'table')
         self.assertEqual('test_formatted', ret)
 
     def test_format_output_list(self):
         item = ['this', 'is', 'a', 'list']
-        ret = cli.helpers.format_output(item, 'table')
+        ret = formatting.format_output(item, 'table')
         self.assertEqual(os.linesep.join(item), ret)
 
     def test_format_output_table(self):
-        t = cli.Table(['nothing'])
+        t = formatting.Table(['nothing'])
         t.align['nothing'] = 'c'
         t.add_row(['testdata'])
         t.sortby = 'nothing'
-        ret = cli.helpers.format_output(t, 'table')
+        ret = formatting.format_output(t, 'table')
 
         self.assertIn('nothing', str(ret))
         self.assertIn('testdata', str(ret))
 
     def test_unknown(self):
-        t = cli.helpers.format_output({}, 'raw')
+        t = formatting.format_output({}, 'raw')
         self.assertEqual({}, t)
 
     def test_sequentialoutput(self):
-        t = cli.helpers.SequentialOutput()
+        t = formatting.SequentialOutput()
         self.assertTrue(hasattr(t, 'append'))
         t.append('This is a test')
         t.append('')
         t.append('More tests')
-        output = cli.helpers.format_output(t)
+        output = formatting.format_output(t)
         self.assertEqual("This is a test\nMore tests", output)
 
         t.separator = ','
-        output = cli.helpers.format_output(t)
+        output = formatting.format_output(t)
         self.assertEqual("This is a test,More tests", output)
 
     def test_format_output_python(self):
-        t = cli.helpers.format_output('just a string', 'python')
+        t = formatting.format_output('just a string', 'python')
         self.assertEqual('just a string', t)
 
-        t = cli.helpers.format_output(['just a string'], 'python')
+        t = formatting.format_output(['just a string'], 'python')
         self.assertEqual(['just a string'], t)
 
-        t = cli.helpers.format_output({'test_key': 'test_value'}, 'python')
+        t = formatting.format_output({'test_key': 'test_value'}, 'python')
         self.assertEqual({'test_key': 'test_value'}, t)
 
     def test_format_output_python_keyvaluetable(self):
-        t = cli.KeyValueTable(['key', 'value'])
-        t.add_row(['nothing', cli.helpers.blank()])
+        t = formatting.KeyValueTable(['key', 'value'])
+        t.add_row(['nothing', formatting.blank()])
         t.sortby = 'nothing'
-        ret = cli.helpers.format_output(t, 'python')
+        ret = formatting.format_output(t, 'python')
         self.assertEqual({'nothing': None}, ret)
 
 
-class TestTemplateArgs(unittest.TestCase):
+class TestTemplateArgs(testing.TestCase):
 
     def test_no_template_option(self):
         args = {'key': 'value'}
-        cli.helpers.update_with_template_args(args)
+        template.update_with_template_args(args)
         self.assertEqual(args, {'key': 'value'})
 
     def test_template_not_exists(self):
-        path = os.path.join(FIXTURE_PATH, 'sample_template_not_exists.conf')
-        self.assertRaises(cli.helpers.ArgumentError,
-                          cli.helpers.update_with_template_args,
+        path = os.path.join(testing.FIXTURE_PATH,
+                            'sample_template_not_exists.conf')
+        self.assertRaises(exceptions.ArgumentError,
+                          template.update_with_template_args,
                           {'--template': path})
 
     def test_template_options(self):
-        path = os.path.join(FIXTURE_PATH, 'sample_vs_template.conf')
+        path = os.path.join(testing.FIXTURE_PATH, 'sample_vs_template.conf')
         args = {
             'key': 'value',
             '--cpu': None,
@@ -379,7 +386,7 @@ class TestTemplateArgs(unittest.TestCase):
             '--hourly': False,
             '--disk': [],
         }
-        cli.helpers.update_with_template_args(args, list_args=['--disk'])
+        template.update_with_template_args(args, list_args=['--disk'])
         self.assertEqual(args, {
             '--cpu': '4',
             '--datacenter': 'dal05',
@@ -395,10 +402,10 @@ class TestTemplateArgs(unittest.TestCase):
         })
 
 
-class TestExportToTemplate(unittest.TestCase):
+class TestExportToTemplate(testing.TestCase):
     def test_export_to_template(self):
-        with patch(open_path, mock_open(), create=True) as open_:
-            cli.helpers.export_to_template('filename', {
+        with mock.patch(open_path, mock.mock_open(), create=True) as open_:
+            template.export_to_template('filename', {
                 '--os': None,
                 '--datacenter': 'ams01',
                 '--disk': ['disk1', 'disk2'],
@@ -413,6 +420,6 @@ class TestExportToTemplate(unittest.TestCase):
 
             open_.assert_called_with('filename', 'w')
             open_().write.assert_has_calls([
-                call('datacenter=ams01\n'),
-                call('disk=disk1,disk2\n'),
+                mock.call('datacenter=ams01\n'),
+                mock.call('disk=disk1,disk2\n'),
             ], any_order=True)  # Order isn't really guaranteed

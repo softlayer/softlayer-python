@@ -4,19 +4,19 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.tests import unittest, FixtureClient
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 from SoftLayer.CLI.modules import rwhois
-from SoftLayer.CLI.helpers import format_output
-from SoftLayer.CLI.exceptions import CLIAbort
+from SoftLayer import testing
 
 
-class RWhoisTests(unittest.TestCase):
-    def setUp(self):
-        self.client = FixtureClient()
+class RWhoisTests(testing.TestCase):
+    def set_up(self):
+        self.client = testing.FixtureClient()
 
     def test_edit_nothing(self):
         command = rwhois.RWhoisEdit(client=self.client)
-        self.assertRaises(CLIAbort, command.execute, {})
+        self.assertRaises(exceptions.CLIAbort, command.execute, {})
 
     def test_edit(self):
         command = rwhois.RWhoisEdit(client=self.client)
@@ -72,4 +72,4 @@ class RWhoisTests(unittest.TestCase):
                     'Name': 'firstName lastName',
                     'Postal Code': 'postalCode',
                     'State': '-'}
-        self.assertEqual(expected, format_output(output, 'python'))
+        self.assertEqual(expected, formatting.format_output(output, 'python'))

@@ -4,22 +4,23 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import ISCSIManager
-from SoftLayer.tests import unittest, FixtureClient
-from SoftLayer.tests.fixtures import Network_Storage_Iscsi
-from mock import ANY
+import mock
+
+import SoftLayer
+from SoftLayer import testing
+from SoftLayer.testing import fixtures
 
 
-class ISCSITests(unittest.TestCase):
-    def setUp(self):
-        self.client = FixtureClient()
-        self.iscsi = ISCSIManager(self.client)
+class ISCSITests(testing.TestCase):
+    def set_up(self):
+        self.client = testing.FixtureClient()
+        self.iscsi = SoftLayer.ISCSIManager(self.client)
 
     def test_get_iscsi(self):
         result = self.iscsi.get_iscsi(100)
         self.client['Network_Storage_Iscsi'].getObject.assert_called_once_with(
-            id=100, mask=ANY)
-        self.assertEqual(Network_Storage_Iscsi.getObject, result)
+            id=100, mask=mock.ANY)
+        self.assertEqual(fixtures.Network_Storage_Iscsi.getObject, result)
 
     def test_cancel_iscsi_immediately(self):
         iscsi_id = 600
@@ -46,8 +47,8 @@ class ISCSITests(unittest.TestCase):
                           size=10, location='foo')
 
     def test_create_iscsi(self):
-        getItems = self.client['Product_Package'].getItems
-        getItems.return_value = [
+        get_items = self.client['Product_Package'].getItems
+        get_items.return_value = [
             {
                 'id': 4439,
                 'capacity': '1',
@@ -77,8 +78,8 @@ class ISCSITests(unittest.TestCase):
         f.assert_called_once_with('unNeeded', id=iscsi_id)
 
     def test_create_snapshot_space(self):
-        getItems = self.client['Product_Package'].getItems
-        getItems.return_value = [
+        get_items = self.client['Product_Package'].getItems
+        get_items.return_value = [
             {
                 'id': 1121,
                 'capacity': '20',
@@ -95,8 +96,8 @@ class ISCSITests(unittest.TestCase):
              'location': 138124,
              'packageId': 0,
              'complexType':
-             'SoftLayer_Container_\
-Product_Order_Network_Storage_Iscsi_SnapshotSpace',
+             'SoftLayer_Container_'
+                'Product_Order_Network_Storage_Iscsi_SnapshotSpace',
              'prices': [{'id': 2014}],
              'quantity': 1
              })

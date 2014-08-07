@@ -4,17 +4,17 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from mock import patch, MagicMock, ANY
+import mock
+import requests
 
-from SoftLayer import SoftLayerAPIError, TransportError
-from SoftLayer.transports import make_rest_api_call, make_xml_rpc_api_call
-from SoftLayer.tests import unittest
-from requests import HTTPError, RequestException
+import SoftLayer
+from SoftLayer import testing
+from SoftLayer import transports
 
 
-class TestXmlRpcAPICall(unittest.TestCase):
+class TestXmlRpcAPICall(testing.TestCase):
 
-    def setUp(self):
+    def set_up(self):
         self.send_content = '''<?xml version="1.0" encoding="utf-8"?>
 <params>
 <param>
@@ -26,7 +26,7 @@ class TestXmlRpcAPICall(unittest.TestCase):
 </param>
 </params>'''
 
-    @patch('SoftLayer.transports.requests.Session.send')
+    @mock.patch('SoftLayer.transports.requests.Session.send')
     def test_call(self, send):
         send().content = self.send_content
 
@@ -44,43 +44,44 @@ class TestXmlRpcAPICall(unittest.TestCase):
 </params>
 </methodCall>
 '''
-        resp = make_xml_rpc_api_call(
+        resp = transports.make_xml_rpc_api_call(
             'http://something.com/path/to/resource', 'getObject')
         args = send.call_args
         self.assertIsNotNone(args)
         args, kwargs = args
 
-        send.assert_called_with(ANY, proxies=None, timeout=None)
+        send.assert_called_with(mock.ANY, proxies=None, timeout=None)
         self.assertEqual(resp, [])
-        self.assertEquals(args[0].body, data)
+        self.assertEqual(args[0].body, data)
 
     def test_proxy_without_protocol(self):
         self.assertRaises(
-            TransportError,
-            make_xml_rpc_api_call,
+            SoftLayer.TransportError,
+            transports.make_xml_rpc_api_call,
             'http://something.com/path/to/resource',
             'getObject',
             'localhost:3128')
 
-    @patch('SoftLayer.transports.requests.Session.send')
+    @mock.patch('SoftLayer.transports.requests.Session.send')
     def test_valid_proxy(self, send):
         send().content = self.send_content
-        make_xml_rpc_api_call('http://something.com/path/to/resource',
-                              'getObject',
-                              proxy='http://localhost:3128')
+        transports.make_xml_rpc_api_call(
+            'http://something.com/path/to/resource',
+            'getObject',
+            proxy='http://localhost:3128')
         send.assert_called_with(
-            ANY,
+            mock.ANY,
             proxies={'https': 'http://localhost:3128',
                      'http': 'http://localhost:3128'},
             timeout=None)
 
 
-class TestRestAPICall(unittest.TestCase):
+class TestRestAPICall(testing.TestCase):
 
-    @patch('SoftLayer.transports.requests.request')
+    @mock.patch('SoftLayer.transports.requests.request')
     def test_json(self, request):
         request().content = '{}'
-        resp = make_rest_api_call(
+        resp = transports.make_rest_api_call(
             'GET', 'http://something.com/path/to/resource.json')
         self.assertEqual(resp, {})
         request.assert_called_with(
@@ -90,8 +91,8 @@ class TestRestAPICall(unittest.TestCase):
             timeout=None)
 
         # Test JSON Error
-        e = HTTPError('error')
-        e.response = MagicMock()
+        e = requests.HTTPError('error')
+        e.response = mock.MagicMock()
         e.response.status_code = 404
         e.response.content = '''{
             "error": "description",
@@ -100,35 +101,36 @@ class TestRestAPICall(unittest.TestCase):
         request().raise_for_status.side_effect = e
 
         self.assertRaises(
-            SoftLayerAPIError,
-            make_rest_api_call,
+            SoftLayer.SoftLayerAPIError,
+            transports.make_rest_api_call,
             'GET',
             'http://something.com/path/to/resource.json')
 
     def test_proxy_without_protocol(self):
         self.assertRaises(
-            TransportError,
-            make_rest_api_call,
+            SoftLayer.TransportError,
+            transports.make_rest_api_call,
             'GET'
             'http://something.com/path/to/resource.txt',
             'localhost:3128')
 
-    @patch('SoftLayer.transports.requests.request')
+    @mock.patch('SoftLayer.transports.requests.request')
     def test_valid_proxy(self, request):
-        make_rest_api_call('GET',
-                           'http://something.com/path/to/resource.txt',
-                           proxy='http://localhost:3128')
+        transports.make_rest_api_call(
+            'GET',
+            'http://something.com/path/to/resource.txt',
+            proxy='http://localhost:3128')
         request.assert_called_with(
             'GET', 'http://something.com/path/to/resource.txt',
-            headers=ANY,
+            headers=mock.ANY,
             proxies={'https': 'http://localhost:3128',
                      'http': 'http://localhost:3128'},
             timeout=None)
 
-    @patch('SoftLayer.transports.requests.request')
+    @mock.patch('SoftLayer.transports.requests.request')
     def test_text(self, request):
         request().text = 'content'
-        resp = make_rest_api_call(
+        resp = transports.make_rest_api_call(
             'GET', 'http://something.com/path/to/resource.txt')
         self.assertEqual(resp, 'content')
         request.assert_called_with(
@@ -138,28 +140,28 @@ class TestRestAPICall(unittest.TestCase):
             timeout=None)
 
         # Test Text Error
-        e = HTTPError('error')
-        e.response = MagicMock()
+        e = requests.HTTPError('error')
+        e.response = mock.MagicMock()
         e.response.status_code = 404
         e.response.content = 'Error Code'
         request().raise_for_status.side_effect = e
 
         self.assertRaises(
-            SoftLayerAPIError,
-            make_rest_api_call,
+            SoftLayer.SoftLayerAPIError,
+            transports.make_rest_api_call,
             'GET',
             'http://something.com/path/to/resource.txt')
 
-    @patch('SoftLayer.transports.requests.request')
+    @mock.patch('SoftLayer.transports.requests.request')
     def test_unknown_error(self, request):
-        e = RequestException('error')
-        e.response = MagicMock()
+        e = requests.RequestException('error')
+        e.response = mock.MagicMock()
         e.response.status_code = 404
         e.response.content = 'Error Code'
         request().raise_for_status.side_effect = e
 
         self.assertRaises(
-            TransportError,
-            make_rest_api_call,
+            SoftLayer.TransportError,
+            transports.make_rest_api_call,
             'GET',
             'http://something.com/path/to/resource.txt')

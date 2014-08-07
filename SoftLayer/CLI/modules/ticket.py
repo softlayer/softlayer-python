@@ -13,14 +13,16 @@ The available commands are:
 """
 # :license: MIT, see LICENSE for more details.
 
-import textwrap
-import tempfile
 import os
-from subprocess import call
+import subprocess
+import tempfile
+import textwrap
 
-from SoftLayer import TicketManager
-from SoftLayer.CLI import (CLIRunnable, Table, resolve_id, NestedDict,
-                           KeyValueTable)
+import SoftLayer
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
+from SoftLayer import utils
 
 TEMPLATE_MSG = "***** SoftLayer Ticket Content ******"
 
@@ -39,9 +41,9 @@ def get_ticket_results(mgr, ticket_id, update_count=1):
 
     """
     result = mgr.get_ticket(ticket_id)
-    result = NestedDict(result)
+    result = utils.NestedDict(result)
 
-    table = KeyValueTable(['Name', 'Value'])
+    table = formatting.KeyValueTable(['Name', 'Value'])
     table.align['Name'] = 'r'
     table.align['Value'] = 'l'
 
@@ -86,7 +88,7 @@ def open_editor(beg_msg, ending_msg=None):
             tfile.write(ending_msg)
         # flush the file and open it for editing
         tfile.flush()
-        call([editor, tfile.name])
+        subprocess.call([editor, tfile.name])
         tfile.seek(0)
         data = tfile.read()
         return data
@@ -94,7 +96,7 @@ def open_editor(beg_msg, ending_msg=None):
     return
 
 
-class ListTickets(CLIRunnable):
+class ListTickets(environment.CLIRunnable):
     """
 usage: sl ticket list [options]
 
@@ -107,14 +109,14 @@ Options:
     action = 'list'
 
     def execute(self, args):
-        ticket_mgr = TicketManager(self.client)
+        ticket_mgr = SoftLayer.TicketManager(self.client)
 
         tickets = ticket_mgr.list_tickets(
             open_status=not args.get('--closed'),
             closed_status=args.get('--closed'))
 
-        table = Table(['id', 'assigned user', 'title',
-                       'creation date', 'last edit date'])
+        table = formatting.Table(['id', 'assigned user', 'title',
+                                  'creation date', 'last edit date'])
 
         for ticket in tickets:
             if ticket['assignedUser']:
@@ -138,7 +140,7 @@ Options:
         return table
 
 
-class ListSubjectsTickets(CLIRunnable):
+class ListSubjectsTickets(environment.CLIRunnable):
     """
 usage: sl ticket subjects [options]
 
@@ -148,9 +150,9 @@ List Subject IDs for ticket creation
     action = 'subjects'
 
     def execute(self, args):
-        ticket_mgr = TicketManager(self.client)
+        ticket_mgr = SoftLayer.TicketManager(self.client)
 
-        table = Table(['id', 'subject'])
+        table = formatting.Table(['id', 'subject'])
         for subject in ticket_mgr.list_subjects():
             table.add_row([
                 subject['id'],
@@ -159,7 +161,7 @@ List Subject IDs for ticket creation
         return table
 
 
-class UpdateTicket(CLIRunnable):
+class UpdateTicket(environment.CLIRunnable):
     """
 usage: sl ticket update <identifier> [options]
 
@@ -173,10 +175,11 @@ Options:
     options = ['--body']
 
     def execute(self, args):
-        mgr = TicketManager(self.client)
+        mgr = SoftLayer.TicketManager(self.client)
 
-        ticket_id = resolve_id(
-            mgr.resolve_ids, args.get('<identifier>'), 'ticket')
+        ticket_id = helpers.resolve_id(mgr.resolve_ids,
+                                       args.get('<identifier>'),
+                                       'ticket')
 
         body = args.get('--body')
         if body is None:
@@ -186,7 +189,7 @@ Options:
         return "Ticket Updated!"
 
 
-class TicketsSummary(CLIRunnable):
+class TicketsSummary(environment.CLIRunnable):
     """
 usage: sl ticket summary [options]
 
@@ -201,9 +204,9 @@ Give summary info about tickets
                 'openSalesTicketCount, openSupportTicketCount, '
                 'openAccountingTicketCount]')
         account = self.client['Account'].getObject(mask=mask)
-        table = Table(['Status', 'count'])
+        table = formatting.Table(['Status', 'count'])
 
-        nested = Table(['Type', 'count'])
+        nested = formatting.Table(['Type', 'count'])
         nested.add_row(['Accounting',
                         account['openAccountingTicketCount']])
         nested.add_row(['Billing', account['openBillingTicketCount']])
@@ -217,7 +220,7 @@ Give summary info about tickets
         return table
 
 
-class TicketDetails(CLIRunnable):
+class TicketDetails(environment.CLIRunnable):
     """
 usage: sl ticket detail  <identifier> [options]
 
@@ -229,10 +232,11 @@ Options:
     action = 'detail'
 
     def execute(self, args):
-        mgr = TicketManager(self.client)
+        mgr = SoftLayer.TicketManager(self.client)
 
-        ticket_id = resolve_id(
-            mgr.resolve_ids, args.get('<identifier>'), 'ticket')
+        ticket_id = helpers.resolve_id(mgr.resolve_ids,
+                                       args.get('<identifier>'),
+                                       'ticket')
 
         count = args.get('--count')
         if count is None:
@@ -240,7 +244,7 @@ Options:
         return get_ticket_results(mgr, ticket_id, update_count=int(count))
 
 
-class CreateTicket(CLIRunnable):
+class CreateTicket(environment.CLIRunnable):
     """
 usage: sl ticket create --title=TITLE --subject=ID [options]
 
@@ -259,7 +263,7 @@ Optional:
     required_params = ['--title, --subject']
 
     def execute(self, args):
-        mgr = TicketManager(self.client)
+        mgr = SoftLayer.TicketManager(self.client)
         if args.get('--title') is "":
             return 'Please provide a valid title'
         body = args.get('--body')

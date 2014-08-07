@@ -4,17 +4,17 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.tests import unittest
-from SoftLayer.CLI.modules import get_module_list
+from SoftLayer.CLI import modules
+from SoftLayer import testing
 
-from importlib import import_module
+import importlib
 
 
-class TestImportCLIModules(unittest.TestCase):
+class TestImportCLIModules(testing.TestCase):
 
     def test_import_all(self):
-        modules = get_module_list()
-        for module in modules:
+        _modules = modules.get_module_list()
+        for module in _modules:
             module_path = 'SoftLayer.CLI.modules.' + module
             print("Importing %s" % module_path)
-            import_module(module_path)
+            importlib.import_module(module_path)

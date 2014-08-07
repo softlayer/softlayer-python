@@ -12,13 +12,14 @@ The available commands are:
 """
 # :license: MIT, see LICENSE for more details.
 
-from SoftLayer import NetworkManager
-from SoftLayer.CLI import (
-    CLIRunnable, Table, confirm, no_going_back, resolve_id)
-from SoftLayer.CLI.helpers import CLIAbort
+import SoftLayer
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 
 
-class GlobalIpAssign(CLIRunnable):
+class GlobalIpAssign(environment.CLIRunnable):
     """
 usage: sl globalip assign <identifier> <target> [options]
 
@@ -31,14 +32,14 @@ Required:
     action = 'assign'
 
     def execute(self, args):
-        mgr = NetworkManager(self.client)
-        global_ip_id = resolve_id(mgr.resolve_global_ip_ids,
-                                  args.get('<identifier>'),
-                                  name='global ip')
+        mgr = SoftLayer.NetworkManager(self.client)
+        global_ip_id = helpers.resolve_id(mgr.resolve_global_ip_ids,
+                                          args.get('<identifier>'),
+                                          name='global ip')
         mgr.assign_global_ip(global_ip_id, args['<target>'])
 
 
-class GlobalIpCancel(CLIRunnable):
+class GlobalIpCancel(environment.CLIRunnable):
     """
 usage: sl globalip cancel <identifier> [options]
 
@@ -49,18 +50,18 @@ Cancel a subnet
     options = ['confirm']
 
     def execute(self, args):
-        mgr = NetworkManager(self.client)
-        global_ip_id = resolve_id(mgr.resolve_global_ip_ids,
-                                  args.get('<identifier>'),
-                                  name='global ip')
+        mgr = SoftLayer.NetworkManager(self.client)
+        global_ip_id = helpers.resolve_id(mgr.resolve_global_ip_ids,
+                                          args.get('<identifier>'),
+                                          name='global ip')
 
-        if args['--really'] or no_going_back(global_ip_id):
+        if args['--really'] or formatting.no_going_back(global_ip_id):
             mgr.cancel_global_ip(global_ip_id)
         else:
-            raise CLIAbort('Aborted')
+            raise exceptions.CLIAbort('Aborted')
 
 
-class GlobalIpCreate(CLIRunnable):
+class GlobalIpCreate(environment.CLIRunnable):
     """
 usage:
   sl globalip create [options]
@@ -75,19 +76,19 @@ Options:
     options = ['confirm']
 
     def execute(self, args):
-        mgr = NetworkManager(self.client)
+        mgr = SoftLayer.NetworkManager(self.client)
 
         version = 4
         if args.get('--v6'):
             version = 6
         if not args.get('--test') and not args['--really']:
-            if not confirm("This action will incur charges on your account."
-                           "Continue?"):
-                raise CLIAbort('Cancelling order.')
+            if not formatting.confirm("This action will incur charges on your "
+                                      "account. Continue?"):
+                raise exceptions.CLIAbort('Cancelling order.')
         result = mgr.add_global_ip(version=version,
                                    test_order=args.get('--test'))
 
-        table = Table(['Item', 'cost'])
+        table = formatting.Table(['Item', 'cost'])
         table.align['Item'] = 'r'
         table.align['cost'] = 'r'
 
@@ -102,7 +103,7 @@ Options:
         return table
 
 
-class GlobalIpList(CLIRunnable):
+class GlobalIpList(environment.CLIRunnable):
     """
 usage: sl globalip list [options]
 
@@ -115,9 +116,9 @@ Filters:
     action = 'list'
 
     def execute(self, args):
-        mgr = NetworkManager(self.client)
+        mgr = SoftLayer.NetworkManager(self.client)
 
-        table = Table(['id', 'ip', 'assigned', 'target'])
+        table = formatting.Table(['id', 'ip', 'assigned', 'target'])
         table.sortby = args.get('--sortby') or 'id'
 
         version = 0
@@ -150,7 +151,7 @@ Filters:
         return table
 
 
-class GlobalIpUnassign(CLIRunnable):
+class GlobalIpUnassign(environment.CLIRunnable):
     """
 usage: sl globalip unassign <identifier> [options]
 
@@ -162,8 +163,8 @@ Required:
     action = 'unassign'
 
     def execute(self, args):
-        mgr = NetworkManager(self.client)
-        global_ip_id = resolve_id(mgr.resolve_global_ip_ids,
-                                  args.get('<identifier>'),
-                                  name='global ip')
+        mgr = SoftLayer.NetworkManager(self.client)
+        global_ip_id = helpers.resolve_id(mgr.resolve_global_ip_ids,
+                                          args.get('<identifier>'),
+                                          name='global ip')
         mgr.unassign_global_ip(global_ip_id)

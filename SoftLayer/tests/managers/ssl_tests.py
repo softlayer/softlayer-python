@@ -4,31 +4,31 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import SSLManager
-from SoftLayer.tests import unittest, FixtureClient
+import mock
 
-from mock import ANY
+import SoftLayer
+from SoftLayer import testing
 
 
-class SSLTests(unittest.TestCase):
+class SSLTests(testing.TestCase):
 
-    def setUp(self):
-        self.client = FixtureClient()
-        self.ssl = SSLManager(self.client)
+    def set_up(self):
+        self.client = testing.FixtureClient()
+        self.ssl = SoftLayer.SSLManager(self.client)
         self.test_id = 10
 
     def test_list_certs(self):
         self.ssl.list_certs('valid')
         f = self.client['Account'].getValidSecurityCertificates
-        f.assert_called_once_with(mask=ANY)
+        f.assert_called_once_with(mask=mock.ANY)
 
         self.ssl.list_certs('expired')
         f = self.client['Account'].getExpiredSecurityCertificates
-        f.assert_called_once_with(mask=ANY)
+        f.assert_called_once_with(mask=mock.ANY)
 
         self.ssl.list_certs('all')
         f = self.client['Account'].getSecurityCertificates
-        f.assert_called_once_with(mask=ANY)
+        f.assert_called_once_with(mask=mock.ANY)
 
     def test_add_certificate(self):
         test_cert = {

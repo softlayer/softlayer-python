@@ -4,18 +4,18 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import DNSManager
-from SoftLayer.tests import unittest, FixtureClient
-from SoftLayer.tests.fixtures import Dns_Domain, Account
+import mock
 
-from mock import ANY
+import SoftLayer
+from SoftLayer import testing
+from SoftLayer.testing import fixtures
 
 
-class DNSTests(unittest.TestCase):
+class DNSTests(testing.TestCase):
 
-    def setUp(self):
-        self.client = FixtureClient()
-        self.dns_client = DNSManager(self.client)
+    def set_up(self):
+        self.client = testing.FixtureClient()
+        self.dns_client = SoftLayer.DNSManager(self.client)
 
     def test_init_exercise(self):
         self.assertTrue(hasattr(self.dns_client, 'service'))
@@ -23,12 +23,12 @@ class DNSTests(unittest.TestCase):
 
     def test_list_zones(self):
         zones = self.dns_client.list_zones()
-        self.assertEqual(zones, Account.getDomains)
+        self.assertEqual(zones, fixtures.Account.getDomains)
 
     def test_get_zone(self):
         # match, with defaults
         res = self.dns_client.get_zone(12345)
-        self.assertEqual(res, Dns_Domain.getObject)
+        self.assertEqual(res, fixtures.Dns_Domain.getObject)
         self.client['Dns_Domain'].getObject.assert_called_once_with(
             id=12345,
             mask='resourceRecords')
@@ -59,7 +59,7 @@ class DNSTests(unittest.TestCase):
         res = self.dns_client.create_zone('example.com')
 
         self.client['Dns_Domain'].createObject.assert_called_once_with({
-            'name': 'example.com', "resourceRecords": {}, "serial": ANY
+            'name': 'example.com', "resourceRecords": {}, "serial": mock.ANY
         })
 
         self.assertEqual(res, {'name': 'example.com'})
@@ -112,7 +112,7 @@ class DNSTests(unittest.TestCase):
         self.assertEqual(self.dns_client.get_records(12345), [])
 
         records.reset_mock()
-        records.return_value = [Dns_Domain.getResourceRecords[0]]
+        records.return_value = [fixtures.Dns_Domain.getResourceRecords[0]]
         self.dns_client.get_records(12345,
                                     record_type='a',
                                     host='hostname',
@@ -124,4 +124,4 @@ class DNSTests(unittest.TestCase):
                                         'host': {'operation': '_= hostname'},
                                         'data': {'operation': '_= a'},
                                         'ttl': {'operation': 86400}}},
-            mask=ANY)
+            mask=mock.ANY)

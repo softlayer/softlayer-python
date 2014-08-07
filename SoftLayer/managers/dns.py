@@ -5,12 +5,12 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from time import strftime
+import time
 
-from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin
+from SoftLayer import utils
 
 
-class DNSManager(IdentifierMixin, object):
+class DNSManager(utils.IdentifierMixin, object):
     """ DNSManager initialization.
 
     :param SoftLayer.API.Client client: the client instance
@@ -26,7 +26,7 @@ class DNSManager(IdentifierMixin, object):
     def _get_zone_id_from_name(self, name):
         """ Return zone ID based on a zone """
         results = self.client['Account'].getDomains(
-            filter={"domains": {"name": query_filter(name)}})
+            filter={"domains": {"name": utils.query_filter(name)}})
         return [x['id'] for x in results]
 
     def list_zones(self, **kwargs):
@@ -60,7 +60,7 @@ class DNSManager(IdentifierMixin, object):
         """
         return self.service.createObject({
             'name': zone,
-            'serial': serial or strftime('%Y%m%d01'),
+            'serial': serial or time.strftime('%Y%m%d01'),
             "resourceRecords": {}})
 
     def delete_zone(self, zone_id):
@@ -119,19 +119,19 @@ class DNSManager(IdentifierMixin, object):
         :returns: A list of dictionaries representing the matching records
                   within the specified zone.
         """
-        _filter = NestedDict()
+        _filter = utils.NestedDict()
 
         if ttl:
-            _filter['resourceRecords']['ttl'] = query_filter(ttl)
+            _filter['resourceRecords']['ttl'] = utils.query_filter(ttl)
 
         if host:
-            _filter['resourceRecords']['host'] = query_filter(host)
+            _filter['resourceRecords']['host'] = utils.query_filter(host)
 
         if data:
-            _filter['resourceRecords']['data'] = query_filter(data)
+            _filter['resourceRecords']['data'] = utils.query_filter(data)
 
         if record_type:
-            _filter['resourceRecords']['type'] = query_filter(
+            _filter['resourceRecords']['type'] = utils.query_filter(
                 record_type.lower())
 
         results = self.service.getResourceRecords(

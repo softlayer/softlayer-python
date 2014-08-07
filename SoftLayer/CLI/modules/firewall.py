@@ -14,14 +14,16 @@ The available commands are:
 # :license: MIT, see LICENSE for more details.
 
 from __future__ import print_function
-from subprocess import call
 import os
+import subprocess
 import tempfile
 
-from SoftLayer import FirewallManager, SoftLayerError
-from SoftLayer.utils import lookup
-from SoftLayer.CLI import CLIRunnable, Table, listing, resolve_id, confirm
-from SoftLayer.CLI.helpers import blank, CLIAbort
+import SoftLayer
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
+from SoftLayer import utils
 
 DELIMITER = "=========================================\n"
 
@@ -34,8 +36,8 @@ def get_ids(input_id):
     key_value = input_id.split(':')
 
     if len(key_value) != 2:
-        raise CLIAbort('Invalid ID %s: ID should be of the form xxx:yyy'
-                       % input_id)
+        raise exceptions.CLIAbort(
+            'Invalid ID %s: ID should be of the form xxx:yyy' % input_id)
     return key_value
 
 
@@ -69,8 +71,8 @@ def get_rules_table(rules):
     :param list rules: A list containing the rules of the firewall
     :returns: a formatted table of the firewall rules
     """
-    table = Table(['#', 'action', 'protocol', 'src_ip', 'src_mask', 'dest',
-                   'dest_mask'])
+    table = formatting.Table(['#', 'action', 'protocol', 'src_ip', 'src_mask',
+                              'dest', 'dest_mask'])
     table.sortby = '#'
     for rule in rules:
         table.add_row([
@@ -137,7 +139,7 @@ def open_editor(rules=None, content=None):
             # if content is provided, just display it as is
             tfile.write(content)
             tfile.flush()
-            call([editor, tfile.name])
+            subprocess.call([editor, tfile.name])
             tfile.seek(0)
             data = tfile.read()
             return data
@@ -153,7 +155,7 @@ def open_editor(rules=None, content=None):
                 tfile.write(get_formatted_rule(rule))
         tfile.write(DELIMITER)
         tfile.flush()
-        call([editor, tfile.name])
+        subprocess.call([editor, tfile.name])
         tfile.seek(0)
         data = tfile.read()
         return data
@@ -205,7 +207,7 @@ def parse_rules(content=None):
     return parsed_rules
 
 
-class FWList(CLIRunnable):
+class FWList(environment.CLIRunnable):
     """
 usage: sl firewall list [options]
 
@@ -214,11 +216,11 @@ List active firewalls
     action = 'list'
 
     def execute(self, args):
-        mgr = FirewallManager(self.client)
-        table = Table(['firewall id',
-                       'type',
-                       'features',
-                       'server/vlan id'])
+        mgr = SoftLayer.FirewallManager(self.client)
+        table = formatting.Table(['firewall id',
+                                  'type',
+                                  'features',
+                                  'server/vlan id'])
         fwvlans = mgr.get_firewalls()
         dedicated_firewalls = [firewall for firewall in fwvlans
                                if firewall['dedicatedFirewallFlag']]
@@ -229,9 +231,9 @@ List active firewalls
                 features.append('HA')
 
             if features:
-                feature_list = listing(features, separator=',')
+                feature_list = formatting.listing(features, separator=',')
             else:
-                feature_list = blank()
+                feature_list = formatting.blank()
 
             table.add_row([
                 'vlan:%s' % vlan['networkVlanFirewall']['id'],
@@ -264,16 +266,16 @@ List active firewalls
                     'server:%s' % firewall['id'],
                     'Server - standard',
                     '-',
-                    lookup(firewall,
-                           'networkComponent',
-                           'downlinkComponent',
-                           'hardwareId')
+                    utils.lookup(firewall,
+                                 'networkComponent',
+                                 'downlinkComponent',
+                                 'hardwareId')
                 ])
 
         return table
 
 
-class FWCancel(CLIRunnable):
+class FWCancel(environment.CLIRunnable):
     """
 usage: sl firewall cancel <identifier> [options]
 
@@ -287,23 +289,24 @@ Options:
     options = ['really']
 
     def execute(self, args):
-        mgr = FirewallManager(self.client)
+        mgr = SoftLayer.FirewallManager(self.client)
         input_id = args.get('<identifier>')
         key_value = get_ids(input_id)
         firewall_id = int(key_value[1])
 
-        if args['--really'] or confirm("This action will cancel a firewall"
-                                       " from your account. Continue?"):
+        if args['--really'] or formatting.confirm("This action will cancel a "
+                                                  "firewall from your account."
+                                                  " Continue?"):
             if key_value[0] in ['cci', 'server']:
                 mgr.cancel_firewall(firewall_id, dedicated=False)
             elif key_value[0] == 'vlan':
                 mgr.cancel_firewall(firewall_id, dedicated=True)
             return 'Firewall with id %s is being cancelled!' % input_id
         else:
-            raise CLIAbort('Aborted.')
+            raise exceptions.CLIAbort('Aborted.')
 
 
-class FWAdd(CLIRunnable):
+class FWAdd(environment.CLIRunnable):
     """
 usage: sl firewall add <identifier> (--cci | --vlan | --server) [options]
 
@@ -319,8 +322,8 @@ Options:
     options = ['really', 'ha']
 
     def execute(self, args):
-        mgr = FirewallManager(self.client)
-        input_id = resolve_id(
+        mgr = SoftLayer.FirewallManager(self.client)
+        input_id = helpers.resolve_id(
             mgr.resolve_ids, args.get('<identifier>'), 'firewall')
         ha_support = args.get('--ha', False)
         if not args['--really']:
@@ -335,9 +338,9 @@ Options:
                 return "Unable to add firewall - Is network public enabled?"
             print_package_info(pkg)
 
-            if not confirm("This action will incur charges on your account. "
-                           "Continue?"):
-                raise CLIAbort('Aborted.')
+            if not formatting.confirm("This action will incur charges on your "
+                                      "account. Continue?"):
+                raise exceptions.CLIAbort('Aborted.')
 
         if args['--vlan']:
             mgr.add_vlan_firewall(input_id, ha_enabled=ha_support)
@@ -349,7 +352,7 @@ Options:
         return "Firewall is being created!"
 
 
-class FWDetails(CLIRunnable):
+class FWDetails(environment.CLIRunnable):
     """
 usage: sl firewall detail <identifier> [options]
 
@@ -358,7 +361,7 @@ Get firewall details
     action = 'detail'
 
     def execute(self, args):
-        mgr = FirewallManager(self.client)
+        mgr = SoftLayer.FirewallManager(self.client)
         input_id = args.get('<identifier>')
 
         key_value = get_ids(input_id)
@@ -370,7 +373,7 @@ Get firewall details
         return get_rules_table(rules)
 
 
-class FWEdit(CLIRunnable):
+class FWEdit(environment.CLIRunnable):
     """
 usage: sl firewall edit <identifier> [options]
 
@@ -379,7 +382,7 @@ Edit the rules for a firewall
     action = 'edit'
 
     def execute(self, args):
-        mgr = FirewallManager(self.client)
+        mgr = SoftLayer.FirewallManager(self.client)
         input_id = args.get('<identifier>')
 
         key_value = get_ids(input_id)
@@ -391,8 +394,8 @@ Edit the rules for a firewall
         # open an editor for the user to enter their rules
         edited_rules = open_editor(rules=orig_rules)
         print(edited_rules)
-        if confirm("Would you like to submit the rules. "
-                   "Continue?"):
+        if formatting.confirm("Would you like to submit the rules. "
+                              "Continue?"):
             while True:
                 try:
                     rules = parse_rules(edited_rules)
@@ -403,19 +406,19 @@ Edit the rules for a firewall
                         rules = mgr.edit_standard_fwl_rules(firewall_id,
                                                             rules)
                     break
-                except (SoftLayerError, ValueError) as error:
+                except (SoftLayer.SoftLayerError, ValueError) as error:
                     print("Unexpected error({%s})" % (error))
-                    if confirm("Would you like to continue editing the rules"
-                               ". Continue?"):
+                    if formatting.confirm("Would you like to continue editing "
+                                          "the rules. Continue?"):
                         edited_rules = open_editor(content=edited_rules)
                         print(edited_rules)
-                        if confirm("Would you like to submit the rules. "
-                                   "Continue?"):
+                        if formatting.confirm("Would you like to submit the "
+                                              "rules. Continue?"):
                             continue
                         else:
-                            raise CLIAbort('Aborted.')
+                            raise exceptions.CLIAbort('Aborted.')
                     else:
-                        raise CLIAbort('Aborted.')
+                        raise exceptions.CLIAbort('Aborted.')
                     return 'Firewall updated!'
         else:
-            raise CLIAbort('Aborted.')
+            raise exceptions.CLIAbort('Aborted.')

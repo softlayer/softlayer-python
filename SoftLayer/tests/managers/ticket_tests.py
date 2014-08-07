@@ -4,20 +4,21 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import TicketManager
-from SoftLayer.tests import unittest, FixtureClient
-from SoftLayer.tests.fixtures import Ticket
-from mock import ANY, call
+import mock
+
+import SoftLayer
+from SoftLayer import testing
+from SoftLayer.testing import fixtures
 
 
-class TicketTests(unittest.TestCase):
+class TicketTests(testing.TestCase):
 
-    def setUp(self):
-        self.client = FixtureClient()
-        self.ticket = TicketManager(self.client)
+    def set_up(self):
+        self.client = testing.FixtureClient()
+        self.ticket = SoftLayer.TicketManager(self.client)
 
     def test_list_tickets(self):
-        mcall = call(mask=ANY)
+        mcall = mock.call(mask=mock.ANY)
         service = self.client['Account']
 
         list_expected_ids = [100, 101, 102]
@@ -55,8 +56,8 @@ class TicketTests(unittest.TestCase):
     def test_get_instance(self):
         result = self.ticket.get_ticket(100)
         self.client['Ticket'].getObject.assert_called_once_with(
-            id=100, mask=ANY)
-        self.assertEqual(Ticket.getObject, result)
+            id=100, mask=mock.ANY)
+        self.assertEqual(fixtures.Ticket.getObject, result)
 
     def test_create_ticket(self):
         self.ticket.create_ticket(

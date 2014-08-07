@@ -4,14 +4,13 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from mock import MagicMock, patch
+import mock
 
 import SoftLayer
-
-from SoftLayer.tests import unittest
 from SoftLayer.CLI import core
-from SoftLayer.CLI.helpers import CLIAbort
-from SoftLayer.CLI.environment import Environment, InvalidModule, CLIRunnable
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer import testing
 
 
 def module_fixture():
@@ -28,7 +27,7 @@ usage: sl vs [<args>...] [options]
 """
 
 
-class submodule_fixture(CLIRunnable):
+class SubmoduleFixture(environment.CLIRunnable):
     """
 usage: sl vs list [options]
 
@@ -41,10 +40,10 @@ Options:
         return "test"
 
 
-class EnvironmentFixture(Environment):
+class EnvironmentFixture(environment.Environment):
     def __init__(self):
         super(EnvironmentFixture, self).__init__()
-        self.plugins = {'vs': {'list': submodule_fixture}}
+        self.plugins = {'vs': {'list': SubmoduleFixture}}
         self.aliases = {
             'meta': 'metadata',
             'my': 'metadata',
@@ -58,10 +57,10 @@ class EnvironmentFixture(Environment):
         return self.plugins.keys()
 
 
-class CommandLineTests(unittest.TestCase):
-    def setUp(self):
+class CommandLineTests(testing.TestCase):
+    def set_up(self):
         self.env = EnvironmentFixture()
-        self.env.get_module_name = MagicMock()
+        self.env.get_module_name = mock.MagicMock()
 
     def test_normal_path(self):
         self.env.get_module_name.return_value = 'vs'
@@ -76,7 +75,7 @@ class CommandLineTests(unittest.TestCase):
             SystemExit, core.main,
             args=['vs', 'list', '--format=totallynotvalid'], env=self.env)
 
-    @patch('SoftLayer.TimedClient.get_last_calls')
+    @mock.patch('SoftLayer.TimedClient.get_last_calls')
     def test_normal_path_with_timings(self, calls_mock):
         calls_mock.return_value = [('SERVICE.METHOD', 1000, 0.25)]
         self.env.get_module_name.return_value = 'vs'
@@ -86,8 +85,8 @@ class CommandLineTests(unittest.TestCase):
             env=self.env)
         calls_mock.assert_called()
 
-    @patch('logging.getLogger')
-    @patch('logging.StreamHandler')
+    @mock.patch('logging.getLogger')
+    @mock.patch('logging.StreamHandler')
     def test_with_debug(self, stream_handler, logger):
         self.env.get_module_name.return_value = 'vs'
         self.assertRaises(
@@ -105,19 +104,19 @@ class CommandLineTests(unittest.TestCase):
 
     def test_module_with_no_command(self):
         self.env.plugins = {
-            'vs': {'list': submodule_fixture, None: submodule_fixture}
+            'vs': {'list': SubmoduleFixture, None: SubmoduleFixture}
         }
         self.env.get_module_name.return_value = 'vs'
-        self.env.load_module = MagicMock()
+        self.env.load_module = mock.MagicMock()
         self.env.load_module.return_value = module_no_command_fixture
         resolver = core.CommandParser(self.env)
         command, command_args = resolver.parse(['vs', 'list'])
-        self.assertEqual(submodule_fixture, command)
+        self.assertEqual(SubmoduleFixture, command)
 
     def test_main(self):
         self.env.get_module_name.return_value = 'vs'
         self.env.plugins = {
-            'vs': {'list': submodule_fixture}
+            'vs': {'list': SubmoduleFixture}
         }
         self.assertRaises(
             SystemExit, core.main,
@@ -136,12 +135,12 @@ class CommandLineTests(unittest.TestCase):
             SystemExit, core.main, args=['vs', 'list'], env=self.env)
 
     def test_abort(self):
-        self.env.get_module_name.side_effect = CLIAbort('exit!')
+        self.env.get_module_name.side_effect = exceptions.CLIAbort('exit!')
         self.assertRaises(
             SystemExit, core.main, args=['vs', 'list'], env=self.env)
 
     def test_invalid_module_error(self):
-        self.env.get_module_name.side_effect = InvalidModule('vs')
+        self.env.get_module_name.side_effect = exceptions.InvalidModule('vs')
         self.assertRaises(
             SystemExit, core.main, args=['vs', 'list'], env=self.env)
 
@@ -168,7 +167,7 @@ class CommandLineTests(unittest.TestCase):
         self.assertRaises(
             SystemExit, core.main, args=['vs', 'list'], env=self.env)
 
-    @patch('traceback.format_exc')
+    @mock.patch('traceback.format_exc')
     def test_uncaught_error(self, m):
         # Exceptions not caught should just Exit
         errors = [TypeError, RuntimeError, NameError, OSError, SystemError]
@@ -181,8 +180,8 @@ class CommandLineTests(unittest.TestCase):
             m.assert_called_once_with()
 
 
-class TestCommandParser(unittest.TestCase):
-    def setUp(self):
+class TestCommandParser(testing.TestCase):
+    def set_up(self):
         self.env = EnvironmentFixture()
         self.parser = core.CommandParser(self.env)
 
@@ -228,16 +227,16 @@ class TestCommandParser(unittest.TestCase):
         self.assertRaises(
             SystemExit, self.parser.parse_main_args, args=['--help'])
 
-    @patch('sys.stdout.isatty', return_value=True)
+    @mock.patch('sys.stdout.isatty', return_value=True)
     def test_tty(self, tty):
         self.assertRaises(
             SystemExit, self.parser.parse_command_args, 'vs', 'list', [])
 
     def test_confirm(self):
-        command = MagicMock()
+        command = mock.MagicMock()
         command.options = ['confirm']
         command.__doc__ = 'usage: sl vs list [options]'
-        self.env.get_command = MagicMock()
+        self.env.get_command = mock.MagicMock()
         self.env.get_command.return_value = command
         self.assertRaises(
             SystemExit, self.parser.parse_command_args, 'vs', 'list', [])

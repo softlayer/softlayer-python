@@ -14,15 +14,15 @@
     :license: MIT, see LICENSE for more details.
 """
 # pylint: disable=w0401
-from SoftLayer.consts import VERSION
+from SoftLayer import consts
 
-from .API import *  # NOQA
-from .managers import *  # NOQA
-from .exceptions import *  # NOQA
-from .auth import *  # NOQA
+from SoftLayer.API import *  # NOQA
+from SoftLayer.managers import *  # NOQA
+from SoftLayer.exceptions import *  # NOQA
+from SoftLayer.auth import *  # NOQA
 
 __title__ = 'SoftLayer'
-__version__ = VERSION
+__version__ = consts.VERSION
 __author__ = 'SoftLayer Technologies, Inc.'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2014 SoftLayer Technologies, Inc.'

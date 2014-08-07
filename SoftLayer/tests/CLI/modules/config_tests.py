@@ -4,20 +4,21 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from mock import MagicMock, patch
 import tempfile
 
-from SoftLayer import API_PUBLIC_ENDPOINT, API_PRIVATE_ENDPOINT
-from SoftLayer.auth import BasicAuthentication
-from SoftLayer.tests import unittest, FixtureClient
+import mock
+
+from SoftLayer import auth
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 from SoftLayer.CLI.modules import config
-from SoftLayer.CLI.helpers import format_output
-from SoftLayer.CLI.exceptions import CLIAbort
+from SoftLayer import consts
+from SoftLayer import testing
 
 
-class TestHelpShow(unittest.TestCase):
-    def setUp(self):
-        client = MagicMock()
+class TestHelpShow(testing.TestCase):
+    def set_up(self):
+        client = mock.MagicMock()
         client.auth.username = 'user'
         client.auth.api_key = '12345'
         client.endpoint_url = 'https://some/endpoint'
@@ -33,19 +34,19 @@ class TestHelpShow(unittest.TestCase):
                     'Endpoint URL': self.client.endpoint_url,
                     'API Key': self.client.auth.api_key,
                     'Timeout': self.client.timeout}
-        self.assertEqual(expected, format_output(output, 'python'))
+        self.assertEqual(expected, formatting.format_output(output, 'python'))
 
 
-class TestHelpSetup(unittest.TestCase):
-    def setUp(self):
-        client = FixtureClient()
-        client.auth = BasicAuthentication('default-user', 'default-key')
+class TestHelpSetup(testing.TestCase):
+    def set_up(self):
+        client = testing.FixtureClient()
+        client.auth = auth.BasicAuthentication('default-user', 'default-key')
         client.endpoint_url = 'default-endpoint-url'
         client.timeout = 10
         self.client = client
-        self.env = MagicMock()
+        self.env = mock.MagicMock()
 
-    @patch('SoftLayer.CLI.modules.config.confirm')
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_setup(self, confirm_mock):
         with tempfile.NamedTemporaryFile() as config_file:
             confirm_mock.return_value = True
@@ -61,10 +62,10 @@ class TestHelpSetup(unittest.TestCase):
             self.assertTrue('username = user' in contents)
             self.assertTrue('api_key = AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
                             'AAAAAAAAAAAAAAAAAAAAAAAAAAAAA' in contents)
-            self.assertTrue('endpoint_url = %s' % API_PUBLIC_ENDPOINT
+            self.assertTrue('endpoint_url = %s' % consts.API_PUBLIC_ENDPOINT
                             in contents)
 
-    @patch('SoftLayer.CLI.modules.config.confirm')
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_setup_cancel(self, confirm_mock):
         with tempfile.NamedTemporaryFile() as config_file:
             confirm_mock.return_value = False
@@ -72,7 +73,7 @@ class TestHelpSetup(unittest.TestCase):
             self.env.input.side_effect = ['user', 'public']
 
             command = config.Setup(client=self.client, env=self.env)
-            self.assertRaises(CLIAbort,
+            self.assertRaises(exceptions.CLIAbort,
                               command.execute, {'--config': config_file.name})
 
     def test_get_user_input_private(self):
@@ -85,7 +86,7 @@ class TestHelpSetup(unittest.TestCase):
 
         self.assertEqual(username, 'user')
         self.assertEqual(secret, 'A' * 64)
-        self.assertEqual(endpoint_url, API_PRIVATE_ENDPOINT)
+        self.assertEqual(endpoint_url, consts.API_PRIVATE_ENDPOINT)
         self.assertEqual(timeout, 10)
 
     def test_get_user_input_custom(self):
@@ -106,4 +107,4 @@ class TestHelpSetup(unittest.TestCase):
 
         _, _, endpoint_url, _ = command.get_user_input()
 
-        self.assertEqual(endpoint_url, API_PUBLIC_ENDPOINT)
+        self.assertEqual(endpoint_url, consts.API_PUBLIC_ENDPOINT)
