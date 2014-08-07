@@ -36,7 +36,6 @@ from SoftLayer import utils
 
 
 class ListServers(environment.CLIRunnable):
-
     """
 usage: sl server list [options]
 
@@ -96,11 +95,7 @@ For more on filters see 'sl help filters'
 
         for server in servers:
             server = utils.NestedDict(server)
-            user = None
-            if 'billingItem' in server:
-                if 'orderItem' in server['billingItem']:
-                    user = (server['billingItem']['orderItem']['order']
-                            ['userRecord']['username'])
+            
             table.add_row([
                 server['id'],
                 server['datacenter']['name'] or formatting.blank(),
@@ -110,14 +105,15 @@ For more on filters see 'sl help filters'
                 server['primaryIpAddress'] or formatting.blank(),
                 server['primaryBackendIpAddress'] or formatting.blank(),
                 formatting.active_txn(server),
-                user or formatting.blank(),
+                utils.lookup(
+                    server, 'billingItem', 'orderItem', 'order', 'userRecord',
+                    'username') or formatting.blank(),
             ])
 
         return table
 
 
 class ServerDetails(environment.CLIRunnable):
-
     """
 usage: sl server detail [--passwords] [--price] <identifier> [options]
 
@@ -168,13 +164,13 @@ Options:
 
         table.add_row(
             ['created', result['provisionDate'] or formatting.blank()])
-        user = None
-        if 'billingItem' in result:
-            if 'orderItem' in result['billingItem']:
-                user = (result['billingItem']['orderItem']['order']
-                        ['userRecord']['username'])
-        table.add_row(['owner',
-                       user or formatting.blank()])
+
+        table.add_row(['owner', formatting.FormattedItem(
+            utils.lookup(result, 'billingItem', 'orderItem',
+                         'order', 'userRecord', 'username') \
+                        or formatting.blank(),
+        )])
+
         vlan_table = formatting.Table(['type', 'number', 'id'])
 
         for vlan in result['networkVlans']:
@@ -216,7 +212,6 @@ Options:
 
 
 class ServerReload(environment.CLIRunnable):
-
     """
 usage: sl server reload <identifier> [--key=KEY...] [options]
 
@@ -249,7 +244,6 @@ Optional:
 
 
 class CancelServer(environment.CLIRunnable):
-
     """
 usage: sl server cancel <identifier> [options]
 
@@ -283,7 +277,6 @@ Options:
 
 
 class ServerCancelReasons(environment.CLIRunnable):
-
     """
 usage: sl server cancel-reasons
 
@@ -306,7 +299,6 @@ Display a list of cancellation reasons
 
 
 class ServerPowerOff(environment.CLIRunnable):
-
     """
 usage: sl server power-off <identifier> [options]
 
@@ -329,7 +321,6 @@ Power off an active server
 
 
 class ServerReboot(environment.CLIRunnable):
-
     """
 usage: sl server reboot <identifier> [--hard | --soft] [options]
 
@@ -362,7 +353,6 @@ Optional:
 
 
 class ServerPowerOn(environment.CLIRunnable):
-
     """
 usage: sl server power-on <identifier> [options]
 
@@ -379,7 +369,6 @@ Power on a server
 
 
 class ServerPowerCycle(environment.CLIRunnable):
-
     """
 usage: sl server power-cycle <identifier> [options]
 
@@ -403,7 +392,6 @@ Issues power cycle to server via the power strip
 
 
 class NicEditServer(environment.CLIRunnable):
-
     """
 usage: sl server nic-edit <identifier> (public | private) --speed=SPEED
                           [options]
@@ -428,7 +416,6 @@ Options:
 
 
 class ListChassisServer(environment.CLIRunnable):
-
     """
 usage: sl server list-chassis [options]
 
@@ -451,7 +438,6 @@ Display a list of chassis available for ordering dedicated servers.
 
 
 class ServerCreateOptions(environment.CLIRunnable):
-
     """
 usage: sl server create-options <chassis_id> [options]
 
@@ -784,7 +770,6 @@ Options:
 
 
 class CreateServer(environment.CLIRunnable):
-
     """
 usage: sl server create [--disk=SIZE...] [--key=KEY...] [options]
 
@@ -1049,7 +1034,6 @@ Optional:
 
 
 class EditServer(environment.CLIRunnable):
-
     """
 usage: sl server edit <identifier> [options]
 

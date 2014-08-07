@@ -41,7 +41,6 @@ from SoftLayer import utils
 
 
 class ListVSIs(environment.CLIRunnable):
-
     """
 usage: sl vs list [--hourly | --monthly] [--sortby=SORT_COLUMN] [--tags=TAGS]
                   [options]
@@ -109,15 +108,14 @@ For more on filters see 'sl help filters'
                 guest['primaryIpAddress'] or formatting.blank(),
                 guest['primaryBackendIpAddress'] or formatting.blank(),
                 formatting.active_txn(guest),
-                guest['billingItem']['orderItem']['order']
-                ['userRecord']['username'] or formatting.blank(),
+                utils.lookup(guest, 'billingItem', 'orderItem', 'order',
+                             'userRecord', 'username') or formatting.blank(),
             ])
 
         return table
 
 
 class VSDetails(environment.CLIRunnable):
-
     """
 usage: sl vs detail [--passwords] [--price] <identifier> [options]
 
@@ -179,7 +177,8 @@ Options:
         table.add_row(['modified', result['modifyDate']])
         table.add_row(['owner', formatting.FormattedItem(
             utils.lookup(result, 'billingItem', 'orderItem',
-                         'order', 'userRecord', 'username'),
+                         'order', 'userRecord', 'username') \
+                        or formatting.blank(),
         )])
 
         vlan_table = formatting.Table(['type', 'number', 'id'])
@@ -221,7 +220,6 @@ Options:
 
 
 class CreateOptionsVS(environment.CLIRunnable):
-
     """
 usage: sl vs create-options [options]
 
@@ -348,7 +346,6 @@ Options:
 
 
 class CreateVS(environment.CLIRunnable):
-
     """
 usage: sl vs create [--disk=SIZE...] [--key=KEY...] [options]
 
@@ -678,7 +675,6 @@ Optional:
 
 
 class ReloadVS(environment.CLIRunnable):
-
     """
 usage: sl vs reload <identifier> [--key=KEY...] [options]
 
@@ -712,7 +708,6 @@ Optional:
 
 
 class CancelVS(environment.CLIRunnable):
-
     """
 usage: sl vs cancel <identifier> [options]
 
@@ -734,7 +729,6 @@ Cancel a virtual server
 
 
 class VSPowerOff(environment.CLIRunnable):
-
     """
 usage: sl vs power-off <identifier> [--hard] [options]
 
@@ -764,7 +758,6 @@ Optional:
 
 
 class VSReboot(environment.CLIRunnable):
-
     """
 usage: sl vs reboot <identifier> [--hard | --soft] [options]
 
@@ -797,7 +790,6 @@ Optional:
 
 
 class VSPowerOn(environment.CLIRunnable):
-
     """
 usage: sl vs power-on <identifier> [options]
 
@@ -815,7 +807,6 @@ Power on a virtual server
 
 
 class VSPause(environment.CLIRunnable):
-
     """
 usage: sl vs pause <identifier> [options]
 
@@ -840,7 +831,6 @@ Pauses an active virtual server
 
 
 class VSResume(environment.CLIRunnable):
-
     """
 usage: sl vs resume <identifier> [options]
 
@@ -858,7 +848,6 @@ Resumes a paused virtual server
 
 
 class NicEditVS(environment.CLIRunnable):
-
     """
 usage: sl vs nic-edit <identifier> (public | private) --speed=SPEED [options]
 
@@ -882,7 +871,6 @@ Options:
 
 
 class VSRescue(environment.CLIRunnable):
-
     """
 usage: sl vs rescue <identifier> [options]
 
@@ -908,7 +896,6 @@ Reboot into Xen rescue image
 
 
 class VSDNS(environment.CLIRunnable):
-
     """
 usage: sl vs dns sync <identifier> [options]
 
@@ -1017,7 +1004,6 @@ Options:
 
 
 class EditVS(environment.CLIRunnable):
-
     """
 usage: sl vs edit <identifier> [options]
 
@@ -1063,7 +1049,6 @@ Options:
 
 
 class CaptureVS(environment.CLIRunnable):
-
     """
 usage: sl vs capture <identifier> [options]
 
@@ -1109,7 +1094,6 @@ Optional:
 
 
 class UpgradeVS(environment.CLIRunnable):
-
     """
 usage: sl vs upgrade <identifier> [options]
 
