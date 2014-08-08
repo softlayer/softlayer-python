@@ -30,3 +30,13 @@ def resolve_id(resolver, identifier, name='object'):
             (name, identifier, ', '.join([str(_id) for _id in ids])))
 
     return ids[0]
+
+
+def sanitize_args(args):
+    """ sanitize input (remove = sign from argument values)
+    :returns args back
+    """
+    for key, value in args.items():
+        if isinstance(value, str) and value.startswith('='):
+            args[key] = value[1:]
+    return args

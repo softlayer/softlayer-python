@@ -249,7 +249,6 @@ class ResolveIdTests(testing.TestCase):
     def test_resolve_id_one(self):
         resolver = lambda r: [12345]
         id = helpers.resolve_id(resolver, 'test')
-
         self.assertEqual(id, 12345)
 
     def test_resolve_id_none(self):
@@ -423,3 +422,19 @@ class TestExportToTemplate(testing.TestCase):
                 mock.call('datacenter=ams01\n'),
                 mock.call('disk=disk1,disk2\n'),
             ], any_order=True)  # Order isn't really guaranteed
+
+
+class TestInputSanitization(testing.TestCase):
+
+    def test_equalto_removed(self):
+        args = {
+            '--os': None,
+            '--datacenter': '=ams01',
+            '--memory': '=1g',
+            '--test': '=1344'}
+        argnew = helpers.sanitize_args(args)
+        self.assertEqual(argnew, {
+            '--os': None,
+            '--datacenter': 'ams01',
+            '--memory': '1g',
+            '--test': '1344'})

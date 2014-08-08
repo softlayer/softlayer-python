@@ -105,7 +105,7 @@ class DnsTests(testing.TestCase):
                                   '--hostname': 'host',
                                   '--image': None,
                                   '--os': 'UBUNTU_LATEST',
-                                  '--memory': '1024',
+                                  '--memory': '=1024',
                                   '--nic': '100',
                                   '--hourly': True,
                                   '--monthly': False,
