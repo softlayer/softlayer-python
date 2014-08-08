@@ -173,3 +173,10 @@ def dict_extract(dictionary, keys):
         if dictionary.get(key, None) is not None:
             del dictionary[key]
     return tuple(vals)
+
+
+def sanitize_args(args):
+    for key, value in args.items():
+        if isinstance(value, str) and value.startswith('='):
+            args[key] = value[1:]
+    return args
