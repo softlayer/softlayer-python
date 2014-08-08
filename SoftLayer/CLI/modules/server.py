@@ -436,6 +436,7 @@ Display a list of chassis available for ordering dedicated servers.
 
         return table
 
+
 class ServerRescue(environment.CLIRunnable):
     """
 usage: sl server rescue <identifier> [options]
