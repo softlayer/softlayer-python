@@ -430,3 +430,12 @@ class HardwareTests(testing.TestCase):
 
         self.hardware.edit(100, **args)
         service.editObject.assert_called_once_with(args, id=100)
+
+    def test_rescue(self):
+        # Test rescue environment
+        hardware_id = 1234
+        self.hardware.rescue(hardware_id)
+
+        service = self.client['Hardware_Server']
+        f = service.bootToRescueLayer
+        f.assert_called_once_with(id=hardware_id)

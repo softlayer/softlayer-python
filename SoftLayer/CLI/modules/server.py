@@ -437,6 +437,32 @@ Display a list of chassis available for ordering dedicated servers.
         return table
 
 
+class ServerRescue(environment.CLIRunnable):
+    """
+usage: sl server rescue <identifier> [options]
+
+Reboot server into a rescue image
+
+
+"""
+    action = 'rescue'
+    options = ['confirm']
+
+    def execute(self, args):
+        server = SoftLayer.HardwareManager(self.client)
+        server_id = helpers.resolve_id(server.resolve_ids,
+                                       args.get('<identifier>'),
+                                       'hardware')
+
+        if args['--really'] or formatting.confirm(
+                "This action will reboot this server. "
+                "Continue?"):
+
+            server.rescue(server_id)
+        else:
+            raise exceptions.CLIAbort('Aborted')
+
+
 class ServerCreateOptions(environment.CLIRunnable):
     """
 usage: sl server create-options <chassis_id> [options]

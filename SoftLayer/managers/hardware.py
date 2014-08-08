@@ -318,6 +318,13 @@ class HardwareManager(utils.IdentifierMixin, object):
         return self.hardware.reloadOperatingSystem('FORCE', config,
                                                    id=hardware_id)
 
+    def rescue(self, hardware_id):
+        """ Reboot a server into the a recsue kernel
+
+        :param integer instance_id: the server ID to rescue
+        """
+        return self.hardware.bootToRescueLayer(id=hardware_id)
+
     def change_port_speed(self, hardware_id, public, speed):
         """ Allows you to change the port speed of a server's NICs.
 

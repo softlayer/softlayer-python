@@ -73,3 +73,4 @@ setUserMetadata = ['meta']
 reloadOperatingSystem = 'OK'
 getReverseDomainRecords = [
     {'resourceRecords': [{'data': '2.0.1.10.in-addr.arpa'}]}]
+bootToRescueLayer = True
