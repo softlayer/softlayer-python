@@ -137,7 +137,8 @@ class VSTests(testing.TestCase):
     @mock.patch('SoftLayer.managers.vs.VSManager._generate_create_dict')
     def test_create_instance(self, create_dict):
         create_dict.return_value = {'test': 1, 'verify': 1}
-        self.vs.create_instance(test=1, verify=1, tag='dev,green')
+        self.vs.create_instance(test=1, verify=1, tags='dev,green')
+
         create_dict.assert_called_once_with(test=1, verify=1)
         self.client['Virtual_Guest'].createObject.assert_called_once_with(
             {'test': 1, 'verify': 1})
@@ -149,7 +150,7 @@ class VSTests(testing.TestCase):
                                    'memory': 1024,
                                    'hostname': 'server',
                                    'domain': 'example.com',
-                                   'tag': 'dev,green'}])
+                                   'tags': 'dev,green'}])
         self.client['Virtual_Guest'].createObjects.assert_called_once_with([
             {'domain': 'example.com',
              'hourlyBillingFlag': True,

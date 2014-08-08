@@ -458,10 +458,10 @@ class VSManager(utils.IdentifierMixin, object):
         :param int nic_speed: The port speed to set
         :param string tag: tags to set on the VS as a comma separated list
         """
-        tag, = utils.dict_extract(kwargs, {'tag': None})
+        tags = kwargs.pop('tags', None)
         inst = self.guest.createObject(self._generate_create_dict(**kwargs))
-        if tag is not None:
-            self.guest.setTags(tag, id=inst['id'])
+        if tags is not None:
+            self.guest.setTags(tags, id=inst['id'])
         return inst
 
     def create_instances(self, config_list):
@@ -470,8 +470,7 @@ class VSManager(utils.IdentifierMixin, object):
         This takes a list of dictionaries using the same arguments as
         create_instance().
         """
-        tags = [utils.dict_extract(conf, {'tag': None})[0]
-                for conf in config_list]
+        tags = [conf.pop('tags', None) for conf in config_list]
 
         resp = self.guest.createObjects([self._generate_create_dict(**kwargs)
                                          for kwargs in config_list])

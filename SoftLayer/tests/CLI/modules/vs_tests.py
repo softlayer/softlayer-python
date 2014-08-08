@@ -128,7 +128,7 @@ class DnsTests(testing.TestCase):
                                   '--vlan_private': None,
                                   '--wait': None,
                                   '--really': False,
-                                  '--tag': 'dev,green'})
+                                  '--tags': 'dev,green'})
 
         self.assertEqual([{'guid': '1a2b3c-1701',
                            'id': 100,
