@@ -176,6 +176,9 @@ def dict_extract(dictionary, keys):
 
 
 def sanitize_args(args):
+    """ sanitize input (remove = sign from argument values)
+    :returns args back
+    """
     for key, value in args.items():
         if isinstance(value, str) and value.startswith('='):
             args[key] = value[1:]
