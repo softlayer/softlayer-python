@@ -165,12 +165,11 @@ class DnsTests(testing.TestCase):
                                   '--vlan_public': None,
                                   '--vlan_private': None,
                                   '--wait': None,
-                                  '--really': False,
-                                  '--tag': 'dev,green'})
+                                  '--really': False})
 
         self.assertEqual([{'guid': '1a2b3c-1701',
                            'id': 100,
                            'created': '2013-08-01 15:23:45'}],
                          formatting.format_output(output, 'python'))
         service = self.client['Virtual_Guest']
-        service.createObject.assert_called_with(memory=1024)
+        service.createObject.assert_called_with(maxMemory=1024, mask=mock.ANY)
