@@ -172,4 +172,10 @@ class DnsTests(testing.TestCase):
                            'created': '2013-08-01 15:23:45'}],
                          formatting.format_output(output, 'python'))
         service = self.client['Virtual_Guest']
-        service.createObject.assert_called_with(maxMemory=1024, mask=mock.ANY)
+        service.createObject.assert_called_with({'domain': 'example.com',
+                                                 'localDiskFlag': True,
+                                                 'startCpus': 2,
+                                                 'operatingSystemReferenceCode': 'UBUNTU_LATEST',
+                                                 'maxMemory': 1024,
+                                                 'hourlyBillingFlag': True,
+                                                 'hostname': 'host'})
