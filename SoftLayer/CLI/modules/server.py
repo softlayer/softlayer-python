@@ -208,7 +208,7 @@ Options:
                 for ptr_domain in ptr_domains:
                     for ptr in ptr_domain['resourceRecords']:
                         table.add_row(['ptr', ptr['data']])
-        except:
+        except Exception:
             pass
         return table
 
