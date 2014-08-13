@@ -25,7 +25,6 @@ hostname or the ip address for a piece of hardware.
 # :license: MIT, see LICENSE for more details.
 import os
 import re
-import SoftLayer
 
 import SoftLayer
 from SoftLayer.CLI import environment
