@@ -243,7 +243,7 @@ class ServerCLITests(testing.TestCase):
     def test_server_details_issue_332(self):
         runnable = server.ServerDetails(client=self.client)
         result = fixtures.Hardware_Server.getObject.copy()
-        result['primaryIpAddress'] = None
+        result['privateNetworkOnlyFlag'] = True
         self.client['Hardware_Server'].getObject.return_value = result
 
         runnable.execute({'<identifier>': 1234,
