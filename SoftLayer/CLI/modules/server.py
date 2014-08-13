@@ -25,6 +25,7 @@ hostname or the ip address for a piece of hardware.
 # :license: MIT, see LICENSE for more details.
 import os
 import re
+import SoftLayer
 
 import SoftLayer
 from SoftLayer.CLI import environment
@@ -208,7 +209,7 @@ Options:
                 for ptr_domain in ptr_domains:
                     for ptr in ptr_domain['resourceRecords']:
                         table.add_row(['ptr', ptr['data']])
-        except Exception:
+        except SoftLayer.SoftLayerAPIError:
             pass
         return table
 
