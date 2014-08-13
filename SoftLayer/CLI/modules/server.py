@@ -201,7 +201,7 @@ Options:
 
         # Test to see if this actually has a primary (public) ip address
         try:
-            if result['primaryIpAddress']:
+            if not result['privateNetworkOnlyFlag']:
                 ptr_domains = (self.client['Hardware_Server']
                                .getReverseDomainRecords(id=hardware_id))
 
