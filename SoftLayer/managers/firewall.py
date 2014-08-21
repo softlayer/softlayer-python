@@ -157,6 +157,12 @@ class FirewallManager(utils.IdentifierMixin, object):
         return fwl_svc.getObject(id=firewall_id, mask=mask)
 
     def _get_fwl_port_speed(self, server_id, is_cci=True):
+        """ Determines the appropriate speed for a firewall
+
+        :param int server_id: The ID of server the firewall is for
+        :param bool is_cci: true if the server_id is for a virtual server
+        :returns: a integer representing the Mbps speed of a firewall
+        """
         fwl_port_speed = 0
         if is_cci:
             mask = ('mask[primaryNetworkComponent[maxSpeed]]')
@@ -174,7 +180,7 @@ class FirewallManager(utils.IdentifierMixin, object):
                        if 'networkComponentGroup' in interface]
             ungrouped = [interface
                          for interface in network_components
-                         if not('networkComponentGroup' in interface)]
+                         if 'networkComponentGroup' not in interface]
 
             # For each group, sum the maxSpeeds of each compoment in the
             # group. Put the sum for each in a new list
