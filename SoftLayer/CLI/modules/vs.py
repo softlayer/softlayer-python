@@ -208,13 +208,16 @@ Options:
             table.add_row(['tags', formatting.listing(tag_row, separator=',')])
 
         # Test to see if this actually has a primary (public) ip address
-        if result['primaryIpAddress']:
-            ptr_domains = (self.client['Virtual_Guest']
-                           .getReverseDomainRecords(id=vs_id))
+        try:
+            if not result['privateNetworkOnlyFlag']:
+                ptr_domains = (self.client['Virtual_Guest']
+                               .getReverseDomainRecords(id=vs_id))
 
-            for ptr_domain in ptr_domains:
-                for ptr in ptr_domain['resourceRecords']:
-                    table.add_row(['ptr', ptr['data']])
+                for ptr_domain in ptr_domains:
+                    for ptr in ptr_domain['resourceRecords']:
+                        table.add_row(['ptr', ptr['data']])
+        except SoftLayer.SoftLayerAPIError:
+            pass
 
         return table
 
