@@ -134,3 +134,49 @@ class DnsTests(testing.TestCase):
                            'id': 100,
                            'created': '2013-08-01 15:23:45'}],
                          formatting.format_output(output, 'python'))
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_check_create_args(self, confirm_mock):
+        confirm_mock.return_value = True
+        command = vs.CreateVS(client=self.client)
+        output = command.execute({'--cpu': '2',
+                                  '--domain': 'example.com',
+                                  '--hostname': 'host',
+                                  '--image': None,
+                                  '--os': 'UBUNTU_LATEST',
+                                  '--memory': '=1024',
+                                  '--nic': '100',
+                                  '--hourly': True,
+                                  '--monthly': False,
+                                  '--like': None,
+                                  '--datacenter': None,
+                                  '--dedicated': False,
+                                  '--san': False,
+                                  '--test': False,
+                                  '--export': None,
+                                  '--userfile': None,
+                                  '--postinstall': None,
+                                  '--key': [],
+                                  '--network': [],
+                                  '--disk': [],
+                                  '--private': False,
+                                  '--template': None,
+                                  '--userdata': None,
+                                  '--vlan_public': None,
+                                  '--vlan_private': None,
+                                  '--wait': None,
+                                  '--really': False})
+
+        self.assertEqual([{'guid': '1a2b3c-1701',
+                           'id': 100,
+                           'created': '2013-08-01 15:23:45'}],
+                         formatting.format_output(output, 'python'))
+        service = self.client['Virtual_Guest']
+        service.createObject.assert_called_with({
+            'domain': 'example.com',
+            'localDiskFlag': True,
+            'startCpus': 2,
+            'operatingSystemReferenceCode': 'UBUNTU_LATEST',
+            'maxMemory': 1024,
+            'hourlyBillingFlag': True,
+            'hostname': 'host'})

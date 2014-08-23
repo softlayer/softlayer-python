@@ -580,6 +580,7 @@ Optional:
 
         :param dict args: CLI arguments
         """
+        args = helpers.sanitize_args(args)
         data = {
             "hourly": args['--hourly'],
             "cpus": args['--cpu'],
