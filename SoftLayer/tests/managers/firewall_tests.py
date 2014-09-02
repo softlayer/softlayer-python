@@ -55,35 +55,43 @@ class FirewallTests(testing.TestCase):
         call.assert_called_once_with(id=1234, mask=MASK)
         self.assertEqual(rules, fixtures.Network_Vlan_Firewall.getRules)
 
-    def test_get_standard_package(self):
+    def test_get_standard_package_virtual_server(self):
         # test standard firewalls
         self.firewall.get_standard_package(server_id=1234, is_cci=True)
+        package_call = self.client['Product_Package'].getItems
+        _filter = {
+            'items': {
+                'description': {
+                    'operation': '_= 100Mbps Hardware Firewall'
+                }
+            }
+        }
+        package_call.assert_called_once_with(filter=_filter, id=0)
+
+        mask = ('mask[primaryNetworkComponent[maxSpeed]]')
         call2 = self.client['Virtual_Guest'].getObject
-        mask = ('mask[primaryNetworkComponent[speed]]')
+        call2.assert_called_once_with(id=1234, mask=mask)
+
+    def test_get_standard_package_bare_metal(self):
+        self.firewall.get_standard_package(server_id=1234, is_cci=False)
+
+        # we should ask for the frontEndNetworkComponents to get
+        # the firewall port speed
+        mask = ('mask[id,maxSpeed,'
+                'networkComponentGroup.networkComponents]')
+        fenc_call = self.client['Hardware_Server'].getFrontendNetworkComponents
+        fenc_call.assert_called_once_with(id=1234, mask=mask)
+
+        # shiould call the product package for a 2000Mbps firwall
         f = self.client['Product_Package'].getItems
         _filter = {
             'items': {
                 'description': {
-                    'operation': '_= 10Mbps Hardware Firewall'
+                    'operation': '_= 2000Mbps Hardware Firewall'
                 }
             }
         }
         f.assert_called_once_with(filter=_filter, id=0)
-        call2.assert_called_once_with(id=1234, mask=mask)
-
-        self.firewall.get_standard_package(server_id=1234, is_cci=False)
-        call2 = self.client['Hardware_Server'].getObject
-        mask = ('mask[primaryNetworkComponent[speed]]')
-        f = self.client['Product_Package'].getItems
-        _filter = {
-            'items': {
-                'description': {
-                    'operation': '_= 10Mbps Hardware Firewall'
-                }
-            }
-        }
-        f.assert_called_twice_with(filter=_filter, id=0)
-        call2.assert_called_once_with(id=1234, mask=mask)
 
     def test_get_dedicated_package_ha(self):
         # test dedicated HA firewalls
@@ -140,38 +148,50 @@ class FirewallTests(testing.TestCase):
         _filter = {
             'items': {
                 'description': {
-                    'operation': '_= 10Mbps Hardware Firewall'
+                    'operation': '_= 100Mbps Hardware Firewall'
                 }
             }
         }
         f.assert_called_once_with(filter=_filter, id=0)
 
         call2 = self.client['Virtual_Guest'].getObject
-        mask = ('mask[primaryNetworkComponent[speed]]')
-        call2.assert_called_once_with(id=6327, mask=mask)
+        mask = ('mask[primaryNetworkComponent[maxSpeed]]')
+        call2.assert_called_once_with(id=server_id, mask=mask)
         f = self.client['Product_Order'].placeOrder
         f.assert_called_once()
 
     def test_add_standard_firewall_server(self):
         # test dedicated firewall for Servers
         server_id = 6327
-        mask = ('mask[primaryNetworkComponent[speed]]')
         self.firewall.add_standard_firewall(server_id, is_cci=False)
+
+        # The placeOrder call should be made at the end of the routine
         f = self.client['Product_Order'].placeOrder
         f.assert_called_once()
 
+        # We should query the product package for a 2000Mbps firewall
         f = self.client['Product_Package'].getItems
         _filter = {
             'items': {
                 'description': {
-                    'operation': '_= 10Mbps Hardware Firewall'
+                    'operation': '_= 2000Mbps Hardware Firewall'
                 }
             }
         }
         f.assert_called_once_with(filter=_filter, id=0)
 
-        call2 = self.client['Hardware_Server'].getObject
-        call2.assert_called_once_with(id=6327, mask=mask)
+        # we should ask for the frontEndNetworkComponents to get
+        # the firewall port speed
+        mask = ('mask[id,maxSpeed,'
+                'networkComponentGroup.networkComponents]')
+        fenc_call = self.client['Hardware_Server'].getFrontendNetworkComponents
+        fenc_call.assert_called_once_with(id=server_id, mask=mask)
+
+    def test__get_fwl_port_speed_server(self):
+        # Test the routine that calculates the speed of firewall
+        # required for a server
+        port_speed = self.firewall._get_fwl_port_speed(186908, False)
+        self.assertEqual(port_speed, 2000)
 
     def test_add_vlan_firewall(self):
         # test dedicated firewall for Vlan
