@@ -334,8 +334,7 @@ class NetworkManager(object):
         unique_network = []
 
         for vlan in self.list_vlans():
-            datacenter = vlan['primaryRouter']['datacenter']
-            name = datacenter['name']
+            name = utils.lookup(vlan, 'primaryRouter', 'datacenter', 'name')
             if name not in datacenters:
                 datacenters[name] = {
                     'hardwareCount': 0,

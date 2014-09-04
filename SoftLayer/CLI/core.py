@@ -69,6 +69,25 @@ DEBUG_LOGGING_MAP = {
 VALID_FORMATS = ['raw', 'table', 'json']
 
 
+def _append_common_options(arg_doc):
+    """Append common options to the doc string"""
+    default_format = 'raw'
+    if sys.stdout.isatty():
+        default_format = 'table'
+
+    arg_doc += """
+Standard Options:
+  --format=ARG            Output format. [Options: table, raw] [Default: %s]
+  -C FILE --config=FILE   Config file location. [Default: ~/.softlayer]
+  --debug=LEVEL           Specifies the debug noise level
+                           1=warn, 2=info, 3=debug
+  --timings               Time each API call and display after results
+  --proxy=PROTO:PROXY_URL HTTP[s] proxy to be use to make API calls
+  -h --help               Show this screen
+""" % default_format
+    return arg_doc
+
+
 class CommandParser(object):
     """Helper class to parse commands.
 
@@ -79,22 +98,17 @@ class CommandParser(object):
 
     def get_main_help(self):
         """Get main help text."""
-        return __doc__.strip()
+        return _append_common_options(__doc__).strip()
 
     def get_module_help(self, module_name):
         """Get help text for a module."""
         module = self.env.load_module(module_name)
         arg_doc = module.__doc__
-        return arg_doc.strip()
+        return _append_common_options(arg_doc).strip()
 
     def get_command_help(self, module_name, command_name):
         """Get help text for a specific command."""
         command = self.env.get_command(module_name, command_name)
-
-        default_format = 'raw'
-        if sys.stdout.isatty():
-            default_format = 'table'
-
         arg_doc = command.__doc__
 
         if 'confirm' in command.options:
@@ -103,18 +117,7 @@ Prompt Options:
   -y, --really  Confirm all prompt actions
 """
 
-        if '[options]' in arg_doc:
-            arg_doc += """
-Standard Options:
-  --format=ARG            Output format. [Options: table, raw] [Default: %s]
-  -C FILE --config=FILE   Config file location. [Default: ~/.softlayer]
-  --debug=LEVEL           Specifies the debug noise level
-                           1=warn, 2=info, 3=debug
-  --timings               Time each API call and display after results
-  --proxy=PROTO:PROXY_URL HTTP[s] proxy to be use to make API calls
-  -h --help               Show this screen
-""" % default_format
-        return arg_doc.strip()
+        return _append_common_options(arg_doc).strip()
 
     def parse_main_args(self, args):
         """Parse root arguments."""
