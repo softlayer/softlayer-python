@@ -35,7 +35,7 @@ class RWhoisTests(testing.TestCase):
                                   '--public': False})
 
         self.assertEqual(None, output)
-        service = self.client['Network_Subnet_Rwhois_Data']
+        service = self.client['Network_Subnet_Registration']
         service.editObject.assert_called_with({'city': 'Dallas',
                                                'firstName': 'John',
                                                'companyName': 'Company, Inc',
@@ -55,7 +55,7 @@ class RWhoisTests(testing.TestCase):
                                   '--public': True})
 
         self.assertEqual(None, output)
-        service = self.client['Network_Subnet_Rwhois_Data']
+        service = self.client['Network_Subnet_Registration']
         service.editObject.assert_called_with({'privateResidenceFlag': True},
                                               id='id')
 
