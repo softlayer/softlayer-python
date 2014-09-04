@@ -38,6 +38,9 @@ class UnauthedUser(testing.TestCase):
             SoftLayer.transports.make_xml_rpc_api_call(
                 'http://notvalidsoftlayer.com', 'getObject')
         except Exception as ex:
+            # NOTE(sudorandom): This used to be an instance of
+            #                   SoftLayer.SoftLayerAPIError
+            # Related issue: https://github.com/kennethreitz/requests/pull/2193
             self.assertIn('not known', str(ex))
         else:
             self.fail('No Exception Raised')
