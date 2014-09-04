@@ -8,6 +8,7 @@ The available zone commands are:
   delete  Delete zone
   list    List zones or a zone's records
   print   Print zone in BIND format
+  import  Import a BIND style zone file
 
 The available record commands are:
   add     Add resource record
@@ -78,6 +79,61 @@ Arguments:
             manager.delete_zone(zone_id)
         else:
             raise exceptions.CLIAbort("Aborted.")
+
+
+class ImportZone(environment.CLIRunnable):
+    """
+usage: sl dns import <file>
+
+Creates a new zone based of a BIND formatted file
+    """
+    action = 'import'
+    def execute(self,args):
+        import pprint
+        import re
+        import sys
+        manager = SoftLayer.DNSManager(self.client)
+        zone = ''
+        records = {}
+        pp = pprint.PrettyPrinter(indent=2)
+        lines = [line.strip() for line in open(args['<file>'])]
+        zoneSearch = re.search('\$ORIGIN (?P<zone>.*)\.',lines[0])
+        zone = zoneSearch.group('zone')
+
+
+        try:
+            zone_id = helpers.resolve_id(manager.resolve_ids, zone,name='zone')
+        except :
+            print "Unexpected error:", sys.exc_info()[0]
+            zone_id = None
+            pass
+        if (zone_id is None):
+
+            print "CREATING ZONE:   %s" % (zone) 
+            manager.create_zone(zone)
+            zone_id = helpers.resolve_id(manager.resolve_ids, zone,name='zone')
+
+        print "ZoneID: %s" % (zone_id)
+
+
+
+        for content in lines:
+            domainSearch = re.search('(?P<domain>\w+)\s+(?P<ttl>\d+)\s+(?P<class>\w+)\s+(?P<type>\w+)\s+(?P<record>.*)',content)
+            if (domainSearch is not None): 
+                domainName = domainSearch.group('domain')
+                domainttl = domainSearch.group('ttl')
+                domainClass = domainSearch.group('class')
+                domainType = domainSearch.group('type')
+                domainRecord = domainSearch.group('record')
+                print "Domain: %s TTL: %s Class: %s Type: %s Record: %s" % (domainName,domainttl,domainClass,domainType,domainRecord) 
+                manager.create_record(zone_id,domainName,domainType,domainRecord,domainttl)
+
+            continue
+            # print content
+        # zone = dns.zone.from_file(args['<file>'])
+        print "IMPORT ZONE %s" % (args['<file>'])
+        # pp.pprint(zone)
+
 
 
 class ListZones(environment.CLIRunnable):
