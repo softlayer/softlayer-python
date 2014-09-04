@@ -15,7 +15,8 @@ from SoftLayer import transports
 class TestXmlRpcAPICall(testing.TestCase):
 
     def set_up(self):
-        self.send_content = '''<?xml version="1.0" encoding="utf-8"?>
+        self.response = mock.MagicMock()
+        self.response.content = '''<?xml version="1.0" encoding="utf-8"?>
 <params>
 <param>
  <value>
@@ -26,9 +27,9 @@ class TestXmlRpcAPICall(testing.TestCase):
 </param>
 </params>'''
 
-    @mock.patch('SoftLayer.transports.requests.Session.send')
-    def test_call(self, send):
-        send().content = self.send_content
+    @mock.patch('requests.request')
+    def test_call(self, request):
+        request.return_value = self.response
 
         data = '''<?xml version='1.0'?>
 <methodCall>
@@ -46,33 +47,43 @@ class TestXmlRpcAPICall(testing.TestCase):
 '''
         resp = transports.make_xml_rpc_api_call(
             'http://something.com/path/to/resource', 'getObject')
-        args = send.call_args
+        args = request.call_args
         self.assertIsNotNone(args)
         args, kwargs = args
 
-        send.assert_called_with(mock.ANY, proxies=None, timeout=None)
+        request.assert_called_with('POST',
+                                   'http://something.com/path/to/resource',
+                                   headers=None,
+                                   proxies=None,
+                                   data=data,
+                                   timeout=None)
         self.assertEqual(resp, [])
-        self.assertEqual(args[0].body, data)
 
     def test_proxy_without_protocol(self):
+        # NOTE(sudorandom): This used to be an instance of requests.HTTPError,
+        #                   but something changes in requests to make that no
+        #                   longer the case.
         self.assertRaises(
-            SoftLayer.TransportError,
+            Exception,  # NOQA
             transports.make_xml_rpc_api_call,
             'http://something.com/path/to/resource',
             'getObject',
             'localhost:3128')
 
-    @mock.patch('SoftLayer.transports.requests.Session.send')
-    def test_valid_proxy(self, send):
-        send().content = self.send_content
+    @mock.patch('requests.request')
+    def test_valid_proxy(self, request):
+        request.return_value = self.response
         transports.make_xml_rpc_api_call(
             'http://something.com/path/to/resource',
             'getObject',
             proxy='http://localhost:3128')
-        send.assert_called_with(
+        request.assert_called_with(
+            'POST',
             mock.ANY,
+            headers=None,
             proxies={'https': 'http://localhost:3128',
                      'http': 'http://localhost:3128'},
+            data=mock.ANY,
             timeout=None)
 
 
