@@ -224,7 +224,7 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         for package in packages:
             available_packages.append((package['id'], package['name'],
-                                       package['description']))
+                                       package.get('description', None)))
 
         return available_packages
 
