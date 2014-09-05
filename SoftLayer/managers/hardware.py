@@ -33,7 +33,8 @@ class HardwareManager(utils.IdentifierMixin, object):
         else:
             self.ordering_manager = ordering_manager
 
-    def cancel_hardware(self, hardware_id, reason='unneeded', comment=''):
+    def cancel_hardware(self, hardware_id, reason='unneeded', comment='',
+                        immediate=False):
         """ Cancels the specified dedicated server.
 
         :param int hardware_id: The ID of the hardware to be cancelled.
@@ -48,7 +49,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                                    mask='id,bareMetalInstanceFlag')
 
         if server.get('bareMetalInstanceFlag'):
-            return self.cancel_metal(hardware_id)
+            return self.cancel_metal(hardware_id, immediate)
 
         reasons = self.get_cancellation_reasons()
         cancel_reason = reasons['unneeded']

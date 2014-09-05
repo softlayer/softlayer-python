@@ -252,6 +252,8 @@ usage: sl server cancel <identifier> [options]
 Cancel a dedicated server
 
 Options:
+  --immediate        Cancels the server immediately (instead of on the billing
+                       anniversary)
   --comment=COMMENT  An optional comment to add to the cancellation ticket
   --reason=REASON    An optional cancellation reason. See cancel-reasons for a
                        list of available options
@@ -271,9 +273,10 @@ Options:
             comment = self.env.input("(Optional) Add a cancellation comment:")
 
         reason = args.get('--reason')
+        immediate = args.get('--immediate')
 
         if args['--really'] or formatting.no_going_back(hw_id):
-            mgr.cancel_hardware(hw_id, reason, comment)
+            mgr.cancel_hardware(hw_id, reason, comment, immediate)
         else:
             raise exceptions.CLIAbort('Aborted')
 
