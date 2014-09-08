@@ -132,8 +132,9 @@ class NetworkManager(object):
         :param int subnet_id: The ID of the subnet to be cancelled.
         """
         subnet = self.get_subnet(subnet_id, mask='id, billingItem.id')
+        if "billingItem" not in subnet:
+            raise ValueError('can not cancel subnet %s' % subnet_id)
         billing_id = subnet['billingItem']['id']
-
         return self.client['Billing_Item'].cancelService(id=billing_id)
 
     def edit_rwhois(self, abuse_email=None, address1=None, address2=None,
