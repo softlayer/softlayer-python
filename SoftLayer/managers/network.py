@@ -7,6 +7,7 @@
 """
 
 from SoftLayer import utils
+from SoftLayer import exceptions
 
 DEFAULT_SUBNET_MASK = ','.join(['hardware',
                                 'datacenter',
@@ -133,7 +134,7 @@ class NetworkManager(object):
         """
         subnet = self.get_subnet(subnet_id, mask='id, billingItem.id')
         if "billingItem" not in subnet:
-            raise ValueError('can not cancel subnet %s' % subnet_id)
+            raise  exceptions.SoftLayerError('Can not cancel subnet %s' % subnet_id)
         billing_id = subnet['billingItem']['id']
         return self.client['Billing_Item'].cancelService(id=billing_id)
 
