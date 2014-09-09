@@ -60,13 +60,8 @@ class TestXmlRpcAPICall(testing.TestCase):
         self.assertEqual(resp, [])
 
     def test_proxy_without_protocol(self):
-        # NOTE(sudorandom): This used to be an instance of requests.HTTPError,
-        #                   but something changes in requests to make that no
-        #                   longer the case.
-        #                   Related issue:
-        #                   https://github.com/kennethreitz/requests/pull/2193
         self.assertRaises(
-            Exception,  # NOQA
+            SoftLayer.TransportError,  # NOQA
             transports.make_xml_rpc_api_call,
             'http://something.com/path/to/resource',
             'getObject',

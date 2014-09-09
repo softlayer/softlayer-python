@@ -37,11 +37,10 @@ class UnauthedUser(testing.TestCase):
             # This test will fail if 'notvalidsoftlayer.com' becomes a thing
             SoftLayer.transports.make_xml_rpc_api_call(
                 'http://notvalidsoftlayer.com', 'getObject')
-        except Exception as ex:
-            # NOTE(sudorandom): This used to be an instance of
-            #                   SoftLayer.SoftLayerAPIError
-            # Related issue: https://github.com/kennethreitz/requests/pull/2193
+        except SoftLayer.SoftLayerAPIError as ex:
             self.assertIn('not known', str(ex))
+            self.assertIn('not known', ex.faultString)
+            self.assertEqual(ex.faultCode, 0)
         else:
             self.fail('No Exception Raised')
 
