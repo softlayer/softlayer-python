@@ -113,7 +113,7 @@ Get details for an image
         disk_space = 0
         datacenters = []
         for child in image.get('children'):
-            disk_space = child.get('blockDevicesDiskSpaceTotal', 0)
+            disk_space = int(child.get('blockDevicesDiskSpaceTotal', 0))
             if child.get('datacenter'):
                 datacenters.append(utils.lookup(child, 'datacenter', 'name'))
 
