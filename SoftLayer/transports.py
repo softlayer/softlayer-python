@@ -23,8 +23,9 @@ def _proxies_dict(proxy):
     return {'http': proxy, 'https': proxy}
 
 
-def make_xml_rpc_api_call(uri, method, args=None, headers=None,
-                          http_headers=None, timeout=None, proxy=None):
+def make_xml_rpc_api_call(url, method, args=None, headers=None,
+                          http_headers=None, timeout=None, proxy=None,
+                          verify=True, cert=None):
     """Makes a SoftLayer API call against the XML-RPC endpoint.
 
     :param string uri: endpoint URL
@@ -32,6 +33,8 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
     :param dict headers: XML-RPC headers to use for the request
     :param dict http_headers: HTTP headers to use for the request
     :param int timeout: number of seconds to use as a timeout
+    :param bool verify: verify SSL cert
+    :param cert: client certificate path
     """
     if args is None:
         args = tuple()
@@ -43,14 +46,16 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
                                             methodname=method,
                                             allow_none=True)
         LOGGER.debug("=== REQUEST ===")
-        LOGGER.info('POST %s', uri)
+        LOGGER.info('POST %s', url)
         LOGGER.debug(http_headers)
         LOGGER.debug(payload)
 
-        response = requests.request('POST', uri,
+        response = requests.request('POST', url,
                                     data=payload,
                                     headers=http_headers,
                                     timeout=timeout,
+                                    verify=verify,
+                                    cert=cert,
                                     proxies=_proxies_dict(proxy))
         LOGGER.debug("=== RESPONSE ===")
         LOGGER.debug(response.headers)

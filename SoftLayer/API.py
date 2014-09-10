@@ -146,9 +146,6 @@ class Client(object):
 
         headers = kwargs.get('headers', {})
 
-        if self.auth:
-            headers.update(self.auth.get_headers())
-
         if kwargs.get('id') is not None:
             headers[service + 'InitParameters'] = {'id': kwargs.get('id')}
 
@@ -178,11 +175,18 @@ class Client(object):
             http_headers.update(kwargs.get('raw_headers'))
 
         uri = '/'.join([self.endpoint_url, service])
+        options = {
+            'headers': headers,
+            'http_headers': http_headers,
+            'timeout': self.timeout,
+            'proxy': self.proxy,
+        }
+
+        if self.auth:
+            options = self.auth.get_options(options)
+
         return transports.make_xml_rpc_api_call(uri, method, args,
-                                                headers=headers,
-                                                http_headers=http_headers,
-                                                timeout=self.timeout,
-                                                proxy=self.proxy)
+                                                **options)
 
     __call__ = call
 
@@ -326,6 +330,8 @@ class Service(object):
         :param int offset: (optional) offset results by this many
         :param boolean iter: (optional) if True, returns a generator with the
                              results
+        :param bool verify: verify SSL cert
+        :param cert: client certificate path
 
         Usage:
             >>> import SoftLayer
