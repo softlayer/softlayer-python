@@ -21,7 +21,7 @@ from SoftLayer import utils
 MASK = ('id,accountId,name,globalIdentifier,parentId,publicFlag,flexImageFlag,'
         'imageType')
 DETAIL_MASK = MASK + (',children[id,blockDevicesDiskSpaceTotal,datacenter],'
-                      'note,createDate')
+                      'note,createDate,status')
 PUBLIC_TYPE = formatting.FormattedItem('PUBLIC', 'Public')
 PRIVATE_TYPE = formatting.FormattedItem('PRIVATE', 'Private')
 
@@ -106,6 +106,10 @@ Get details for an image
         table.add_row(['global_identifier',
                        image.get('globalIdentifier', formatting.blank())])
         table.add_row(['name', image['name'].strip()])
+        table.add_row(['status', formatting.FormattedItem(
+            utils.lookup(image, 'status', 'keyname'),
+            utils.lookup(image, 'status', 'name'),
+        )])
         table.add_row(['account', image.get('accountId', formatting.blank())])
         table.add_row(['visibility',
                        PUBLIC_TYPE if image['publicFlag'] else PRIVATE_TYPE])
