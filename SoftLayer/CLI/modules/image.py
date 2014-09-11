@@ -122,7 +122,7 @@ Get details for an image
         table.add_row(['note', image.get('note')])
         table.add_row(['created', image.get('createDate')])
         table.add_row(['disk_space', formatting.b_to_gb(disk_space)])
-        table.add_row(['datacenters', formatting.listing(datacenters,
+        table.add_row(['datacenters', formatting.listing(sorted(datacenters),
                                                          separator=',')])
 
         return table
