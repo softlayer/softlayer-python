@@ -21,7 +21,7 @@ from SoftLayer import utils
 MASK = ('id,accountId,name,globalIdentifier,parentId,publicFlag,flexImageFlag,'
         'imageType')
 DETAIL_MASK = MASK + (',children[id,blockDevicesDiskSpaceTotal,datacenter],'
-                      'note')
+                      'note,createDate')
 PUBLIC_TYPE = formatting.FormattedItem('PUBLIC', 'Public')
 PRIVATE_TYPE = formatting.FormattedItem('PRIVATE', 'Private')
 
@@ -91,6 +91,12 @@ Get details for an image
                                       'image')
 
         image = image_mgr.get_image(image_id, mask=DETAIL_MASK)
+        disk_space = 0
+        datacenters = []
+        for child in image.get('children'):
+            disk_space = int(child.get('blockDevicesDiskSpaceTotal', 0))
+            if child.get('datacenter'):
+                datacenters.append(utils.lookup(child, 'datacenter', 'name'))
 
         table = formatting.KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
@@ -110,13 +116,7 @@ Get details for an image
                        )])
         table.add_row(['flex', image.get('flexImageFlag')])
         table.add_row(['note', image.get('note')])
-        disk_space = 0
-        datacenters = []
-        for child in image.get('children'):
-            disk_space = int(child.get('blockDevicesDiskSpaceTotal', 0))
-            if child.get('datacenter'):
-                datacenters.append(utils.lookup(child, 'datacenter', 'name'))
-
+        table.add_row(['created', image.get('createDate')])
         table.add_row(['disk_space', formatting.b_to_gb(disk_space)])
         table.add_row(['datacenters', formatting.listing(datacenters,
                                                          separator=',')])
