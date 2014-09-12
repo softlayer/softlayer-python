@@ -83,57 +83,72 @@ Arguments:
 
 class ImportZone(environment.CLIRunnable):
     """
-usage: sl dns import <file>
+usage: sl dns import <file> [--dryRun]
 
-Creates a new zone based of a BIND formatted file
+Creates a new zone based off a nicely BIND formatted file
+
+Arguments:
+    <file> Path to the bind zone file you want to import
+Options:
+    --dryRun    don't actually do anything. This will show you what we were able to parse. 
+
     """
     action = 'import'
     def execute(self,args):
-        import pprint
         import re
-        import sys
+        dryRun = args.get('--dryRun')
+
         manager = SoftLayer.DNSManager(self.client)
-        zone = ''
-        records = {}
-        pp = pprint.PrettyPrinter(indent=2)
         lines = [line.strip() for line in open(args['<file>'])]
         zoneSearch = re.search('\$ORIGIN (?P<zone>.*)\.',lines[0])
         zone = zoneSearch.group('zone')
 
-
-        try:
-            zone_id = helpers.resolve_id(manager.resolve_ids, zone,name='zone')
-        except :
-            print "Unexpected error:", sys.exc_info()[0]
-            zone_id = None
-            pass
-        if (zone_id is None):
-
-            print "CREATING ZONE:   %s" % (zone) 
-            manager.create_zone(zone)
-            zone_id = helpers.resolve_id(manager.resolve_ids, zone,name='zone')
-
-        print "ZoneID: %s" % (zone_id)
-
-
+        if (dryRun):
+            print  "Starting up a dry run..." 
+            zone_id = 0
+        else:
+            try:
+                zone_id = helpers.resolve_id(manager.resolve_ids, zone,name='zone')
+            except :
+                print "\033[92mCREATED ZONE:   %s\033[0m" % (zone)
+                manager.create_zone(zone)
+                zone_id = helpers.resolve_id(manager.resolve_ids, zone,name='zone')
 
         for content in lines:
-            domainSearch = re.search('(?P<domain>\w+)\s+(?P<ttl>\d+)\s+(?P<class>\w+)\s+(?P<type>\w+)\s+(?P<record>.*)',content)
+            domainSearch = re.search('((?P<domain>(\w+(\.)?)*|\@)?\s+(?P<ttl>\d+)?\s+(?P<class>\w+)?)?\s+(?P<type>\w+)\s+(?P<record>.*)',content)
             if (domainSearch is not None): 
                 domainName = domainSearch.group('domain')
+                #The API requires we send a host, although bind allows a blank entry. @ is the same thing as blank
+                if (domainName is None):
+                    domainName = "@"
+
                 domainttl = domainSearch.group('ttl')
                 domainClass = domainSearch.group('class')
                 domainType = domainSearch.group('type')
                 domainRecord = domainSearch.group('record')
-                print "Domain: %s TTL: %s Class: %s Type: %s Record: %s" % (domainName,domainttl,domainClass,domainType,domainRecord) 
-                manager.create_record(zone_id,domainName,domainType,domainRecord,domainttl)
 
-            continue
-            # print content
-        # zone = dns.zone.from_file(args['<file>'])
-        print "IMPORT ZONE %s" % (args['<file>'])
-        # pp.pprint(zone)
+                #This will skip the SOA record bit. And any domain that gets parsed oddly.
+                if (domainType.upper() == 'IN'):
+                    print "SKIPPED: Host: %s TTL: %s Type: %s Record: %s" % (domainName,domainttl,domainType,domainRecord) 
+                    continue
 
+                #the dns class doesn't support weighted MX records yet, so we chomp that part out. 
+                if (domainType.upper() == "MX"):
+                    recordSearch = re.search('(?P<weight>\d+)\s+(?P<record>.*)',domainRecord)
+                    domainRecord = recordSearch.group('record')
+
+                try:
+                    if (dryRun):
+                        print "Parsed: Host: %s TTL: %s Type: %s Record: %s" % (domainName,domainttl,domainType,domainRecord) 
+                    else:
+                        manager.create_record(zone_id,domainName,domainType,domainRecord,domainttl)
+                        print "\033[92mCreated: Host: %s TTL: %s Type: %s Record: %s\033[0m" % (domainName,domainttl,domainType,domainRecord)
+                except Exception, e:
+                    print "\033[91mFAILED: Host: %s Type: %s Record: %s" % (domainName,domainType,domainRecord.upper())  
+                    print "\t", e ,"\033[0m"
+
+
+        return "Finished"
 
 
 class ListZones(environment.CLIRunnable):
