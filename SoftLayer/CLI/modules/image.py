@@ -16,6 +16,14 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
+from SoftLayer import utils
+
+MASK = ('id,accountId,name,globalIdentifier,parentId,publicFlag,flexImageFlag,'
+        'imageType')
+DETAIL_MASK = MASK + (',children[id,blockDevicesDiskSpaceTotal,datacenter],'
+                      'note,createDate,status')
+PUBLIC_TYPE = formatting.FormattedItem('PUBLIC', 'Public')
+PRIVATE_TYPE = formatting.FormattedItem('PRIVATE', 'Private')
 
 
 class ListImages(environment.CLIRunnable):
@@ -34,32 +42,34 @@ Options:
         image_mgr = SoftLayer.ImageManager(self.client)
 
         neither = not any([args['--private'], args['--public']])
-        mask = 'id,accountId,name,globalIdentifier,blockDevices,parentId'
 
         images = []
         if args['--private'] or neither:
-            for image in image_mgr.list_private_images(mask=mask):
-                image['visibility'] = 'private'
+            for image in image_mgr.list_private_images(mask=MASK):
                 images.append(image)
 
         if args['--public'] or neither:
-            for image in image_mgr.list_public_images(mask=mask):
-                image['visibility'] = 'public'
+            for image in image_mgr.list_public_images(mask=MASK):
                 images.append(image)
 
         table = formatting.Table(['id',
                                   'account',
-                                  'visibility',
                                   'name',
+                                  'type',
+                                  'visibility',
                                   'global_identifier'])
 
         images = [image for image in images if image['parentId'] == '']
         for image in images:
+
             table.add_row([
                 image['id'],
                 image.get('accountId', formatting.blank()),
-                image['visibility'],
                 image['name'].strip(),
+                formatting.FormattedItem(
+                    utils.lookup(image, 'imageType', 'keyName'),
+                    utils.lookup(image, 'imageType', 'name')),
+                PUBLIC_TYPE if image['publicFlag'] else PRIVATE_TYPE,
                 image.get('globalIdentifier', formatting.blank()),
             ])
 
@@ -80,17 +90,40 @@ Get details for an image
                                       args.get('<identifier>'),
                                       'image')
 
-        image = image_mgr.get_image(image_id)
+        image = image_mgr.get_image(image_id, mask=DETAIL_MASK)
+        disk_space = 0
+        datacenters = []
+        for child in image.get('children'):
+            disk_space = int(child.get('blockDevicesDiskSpaceTotal', 0))
+            if child.get('datacenter'):
+                datacenters.append(utils.lookup(child, 'datacenter', 'name'))
 
         table = formatting.KeyValueTable(['Name', 'Value'])
         table.align['Name'] = 'r'
         table.align['Value'] = 'l'
 
         table.add_row(['id', image['id']])
-        table.add_row(['account', image.get('accountId', formatting.blank())])
-        table.add_row(['name', image['name'].strip()])
         table.add_row(['global_identifier',
                        image.get('globalIdentifier', formatting.blank())])
+        table.add_row(['name', image['name'].strip()])
+        table.add_row(['status', formatting.FormattedItem(
+            utils.lookup(image, 'status', 'keyname'),
+            utils.lookup(image, 'status', 'name'),
+        )])
+        table.add_row(['account', image.get('accountId', formatting.blank())])
+        table.add_row(['visibility',
+                       PUBLIC_TYPE if image['publicFlag'] else PRIVATE_TYPE])
+        table.add_row(['type',
+                       formatting.FormattedItem(
+                           utils.lookup(image, 'imageType', 'keyName'),
+                           utils.lookup(image, 'imageType', 'name'),
+                       )])
+        table.add_row(['flex', image.get('flexImageFlag')])
+        table.add_row(['note', image.get('note')])
+        table.add_row(['created', image.get('createDate')])
+        table.add_row(['disk_space', formatting.b_to_gb(disk_space)])
+        table.add_row(['datacenters', formatting.listing(sorted(datacenters),
+                                                         separator=',')])
 
         return table
 

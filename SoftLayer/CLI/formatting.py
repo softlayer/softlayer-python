@@ -104,6 +104,15 @@ def mb_to_gb(megabytes):
     return FormattedItem(megabytes, "%dG" % (float(megabytes) / 1024))
 
 
+def b_to_gb(_bytes):
+    """Converts number of bytes to a FormattedItem in gigabytes.
+
+    :param int _bytes: number of bytes
+    """
+    return FormattedItem(_bytes,
+                         "%.2fG" % (float(_bytes) / 1024 / 1024 / 1024))
+
+
 def gb(gigabytes):  # pylint: disable=C0103
     """Converts number of gigabytes to a FormattedItem in gigabytes.
 
