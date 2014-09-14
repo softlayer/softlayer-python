@@ -117,7 +117,7 @@ class NetworkTests(testing.TestCase):
             'privateResidenceFlag': False,
             'state': 'TX',
         }
-        f = self.client['Network_Subnet_Rwhois_Data'].editObject
+        f = self.client['Network_Subnet_Registration'].editObject
         f.assert_called_with(expected, id='id')
 
     def test_get_rwhois(self):
