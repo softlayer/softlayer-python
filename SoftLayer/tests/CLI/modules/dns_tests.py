@@ -119,3 +119,15 @@ class DnsTests(testing.TestCase):
                                             '<record>': 'hostname',
                                             '--id': 1,
                                             '--really': False})
+
+    def test_import_zone(self):
+        import pprint 
+        pp = pprint.PrettyPrinter(indent=4)
+
+        command = dns.ImportZone(client=self.client)
+        output = command.execute({
+            '<zone>' : 'realtest.com'
+            '--dryRun' : '--dryRun'
+            })
+        pp.pprint(output)
+        self.assertEqual(['Finished'],output)
