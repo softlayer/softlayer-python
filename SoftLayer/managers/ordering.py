@@ -63,8 +63,8 @@ class OrderingManager(object):
         non_outlet_packages = []
 
         for package in packages:
-            if all(['OUTLET' not in package['description'].upper(),
-                    'OUTLET' not in package['name'].upper()]):
+            if all(['OUTLET' not in package.get('description', '').upper(),
+                    'OUTLET' not in package.get('name', '').upper()]):
                 non_outlet_packages.append(package)
 
         return non_outlet_packages
