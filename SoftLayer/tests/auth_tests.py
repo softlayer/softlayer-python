@@ -11,7 +11,8 @@ from SoftLayer import testing
 class TestAuthenticationBase(testing.TestCase):
     def test_get_options(self):
         auth_base = auth.AuthenticationBase()
-        self.assertRaises(NotImplementedError, auth_base.get_options, {})
+        self.assertEqual(auth_base.get_options({}), {})
+        self.assertEqual(auth_base.get_headers(), {})
 
 
 class TestBasicAuthentication(testing.TestCase):

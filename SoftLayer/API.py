@@ -6,6 +6,7 @@
     :license: MIT, see LICENSE for more details.
 """
 import time
+import warnings
 
 from SoftLayer import auth as slauth
 from SoftLayer import config
@@ -183,7 +184,14 @@ class Client(object):
         }
 
         if self.auth:
-            options = self.auth.get_options(options)
+            if getattr(self.auth, "get_headers", None):
+                warnings.warn("auth.get_headers() is deprecation and will be "
+                              "removed in the next major version",
+                              DeprecationWarning)
+                headers.update(self.auth.get_headers())
+
+            if getattr(self.auth, "get_options", None):
+                options = self.auth.get_options(options)
 
         return transports.make_xml_rpc_api_call(uri, method, args,
                                                 **options)

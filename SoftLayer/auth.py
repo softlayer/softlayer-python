@@ -10,9 +10,22 @@ __all__ = ['BasicAuthentication', 'TokenAuthentication', 'AuthenticationBase']
 
 class AuthenticationBase(object):
     """A base authentication class intended to be overridden."""
+
     def get_options(self, options):
-        """Receives request options and returns request options."""
-        raise NotImplementedError
+        """Receives request options and returns request options.
+
+            :param options dict: dictionary of request options
+
+        """
+        return options
+
+    def get_headers(self):
+        """Return a dictionary of headers to be inserted for authentication.
+
+        .. deprecated:: 3.3.0
+           Use :func:`get_options` instead.
+        """
+        return {}
 
 
 class TokenAuthentication(AuthenticationBase):
