@@ -184,14 +184,14 @@ class Client(object):
         }
 
         if self.auth:
-            if getattr(self.auth, "get_headers", None):
-                warnings.warn("auth.get_headers() is deprecation and will be "
+            extra_headers = self.auth.get_headers()
+            if extra_headers:
+                warnings.warn("auth.get_headers() is deprecated and will be "
                               "removed in the next major version",
                               DeprecationWarning)
-                headers.update(self.auth.get_headers())
+                headers.update(extra_headers)
 
-            if getattr(self.auth, "get_options", None):
-                options = self.auth.get_options(options)
+            options = self.auth.get_options(options)
 
         return transports.make_xml_rpc_api_call(uri, method, args,
                                                 **options)

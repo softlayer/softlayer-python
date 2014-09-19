@@ -4,6 +4,8 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import warnings
+
 import mock
 
 import SoftLayer
@@ -24,10 +26,18 @@ class APIClient(testing.TestCase):
 
     @mock.patch('SoftLayer.transports.make_xml_rpc_api_call')
     def test_simple_call(self, make_xml_rpc_api_call):
-        self.client['SERVICE'].METHOD()
-        make_xml_rpc_api_call.assert_called_with(
-            mock.ANY, mock.ANY, mock.ANY,
-            headers={'deprecated': 'header'},
-            proxy=mock.ANY,
-            timeout=mock.ANY,
-            http_headers=mock.ANY)
+        with warnings.catch_warnings(record=True) as w:
+            # Cause all warnings to always be triggered.
+            warnings.simplefilter("always")
+
+            self.client['SERVICE'].METHOD()
+
+            make_xml_rpc_api_call.assert_called_with(
+                mock.ANY, mock.ANY, mock.ANY,
+                headers={'deprecated': 'header'},
+                proxy=mock.ANY,
+                timeout=mock.ANY,
+                http_headers=mock.ANY)
+            self.assertEqual(len(w), 1)
+            self.assertEqual(w[0].category, DeprecationWarning)
+            self.assertIn("deprecated", str(w[0].message))
