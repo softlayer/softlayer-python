@@ -45,14 +45,15 @@ class TestXmlRpcAPICall(testing.TestCase):
 </params>
 </methodCall>
 '''
-        resp = transports.make_xml_rpc_api_call(
-            'http://something.com/path/to/resource', 'getObject')
-        args = request.call_args
-        self.assertIsNotNone(args)
-        args, kwargs = args
+
+        req = transports.Request()
+        req.endpoint = 'http://something.com'
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        resp = transports.make_xml_rpc_api_call(req)
 
         request.assert_called_with('POST',
-                                   'http://something.com/path/to/resource',
+                                   'http://something.com/SoftLayer_Service',
                                    headers=None,
                                    proxies=None,
                                    data=data,
@@ -62,20 +63,26 @@ class TestXmlRpcAPICall(testing.TestCase):
         self.assertEqual(resp, [])
 
     def test_proxy_without_protocol(self):
-        self.assertRaises(
-            SoftLayer.TransportError,  # NOQA
-            transports.make_xml_rpc_api_call,
-            'http://something.com/path/to/resource',
-            'getObject',
-            'localhost:3128')
+        req = transports.Request()
+        req.endpoint = 'http://something.com'
+        req.service = 'SoftLayer_Service'
+        req.method = 'Resource'
+        req.proxy = 'localhost:3128'
+
+        self.assertRaises(SoftLayer.TransportError,
+                          transports.make_xml_rpc_api_call, req)
 
     @mock.patch('requests.request')
     def test_valid_proxy(self, request):
         request.return_value = self.response
-        transports.make_xml_rpc_api_call(
-            'http://something.com/path/to/resource',
-            'getObject',
-            proxy='http://localhost:3128')
+
+        req = transports.Request()
+        req.endpoint = 'http://something.com'
+        req.service = 'SoftLayer_Service'
+        req.method = 'Resource'
+        req.proxy = 'http://localhost:3128'
+        transports.make_xml_rpc_api_call(req)
+
         request.assert_called_with(
             'POST',
             mock.ANY,
@@ -87,17 +94,163 @@ class TestXmlRpcAPICall(testing.TestCase):
             cert=None,
             verify=True)
 
+    @mock.patch('requests.request')
+    def test_identifier(self, request):
+        request.return_value = self.response
+
+        req = transports.Request()
+        req.endpoint = "http://something.com"
+        req.service = "SoftLayer_Service"
+        req.method = "getObject"
+        req.identifier = 1234
+        transports.make_xml_rpc_api_call(req)
+
+        args, kwargs = request.call_args
+        self.assertIn(
+            """<member>
+<name>id</name>
+<value><int>1234</int></value>
+</member>""", kwargs['data'])
+
+    @mock.patch('requests.request')
+    def test_filter(self, request):
+        request.return_value = self.response
+
+        req = transports.Request()
+        req.endpoint = "http://something.com"
+        req.service = "SoftLayer_Service"
+        req.method = "getObject"
+        req.filter = {'TYPE': {'attribute': {'operation': '^= prefix'}}}
+        transports.make_xml_rpc_api_call(req)
+
+        args, kwargs = request.call_args
+        self.assertIn(
+            """<member>
+<name>operation</name>
+<value><string>^= prefix</string></value>
+</member>""", kwargs['data'])
+
+    @mock.patch('requests.request')
+    def test_limit_offset(self, request):
+        request.return_value = self.response
+
+        req = transports.Request()
+        req.endpoint = "http://something.com"
+        req.service = "SoftLayer_Service"
+        req.method = "getObject"
+        req.limit = 10
+        transports.make_xml_rpc_api_call(req)
+
+        args, kwargs = request.call_args
+        self.assertIn("""<member>
+<name>resultLimit</name>
+<value><struct>
+<member>""", kwargs['data'])
+        self.assertIn("""<name>limit</name>
+<value><int>10</int></value>
+</member>""", kwargs['data'])
+
+    @mock.patch('requests.request')
+    def test_old_mask(self, request):
+        request.return_value = self.response
+
+        req = transports.Request()
+        req.endpoint = "http://something.com"
+        req.service = "SoftLayer_Service"
+        req.method = "getObject"
+        req.mask = {"something": "nested"}
+        transports.make_xml_rpc_api_call(req)
+
+        args, kwargs = request.call_args
+        self.assertIn("""<member>
+<name>mask</name>
+<value><struct>
+<member>
+<name>something</name>
+<value><string>nested</string></value>
+</member>
+</struct></value>
+</member>""", kwargs['data'])
+
+    @mock.patch('requests.request')
+    def test_mask_call_no_mask_prefix(self, request):
+        request.return_value = self.response
+
+        req = transports.Request()
+        req.endpoint = "http://something.com"
+        req.service = "SoftLayer_Service"
+        req.method = "getObject"
+        req.mask = "something.nested"
+        transports.make_xml_rpc_api_call(req)
+
+        args, kwargs = request.call_args
+        self.assertIn(
+            "<value><string>mask[something.nested]</string></value>",
+            kwargs['data'])
+
+    @mock.patch('requests.request')
+    def test_mask_call_v2(self, request):
+        request.return_value = self.response
+
+        req = transports.Request()
+        req.endpoint = "http://something.com"
+        req.service = "SoftLayer_Service"
+        req.method = "getObject"
+        req.mask = "mask[something[nested]]"
+        transports.make_xml_rpc_api_call(req)
+
+        args, kwargs = request.call_args
+        self.assertIn(
+            "<value><string>mask[something[nested]]</string></value>",
+            kwargs['data'])
+
+    @mock.patch('requests.request')
+    def test_mask_call_v2_dot(self, request):
+        request.return_value = self.response
+
+        req = transports.Request()
+        req.endpoint = "http://something.com"
+        req.service = "SoftLayer_Service"
+        req.method = "getObject"
+        req.mask = "mask.something.nested"
+        transports.make_xml_rpc_api_call(req)
+
+        args, kwargs = request.call_args
+        self.assertIn("<value><string>mask.something.nested</string></value>",
+                      kwargs['data'])
+
+    @mock.patch('requests.request')
+    def test_request_exception(self, request):
+        # Test Text Error
+        e = requests.HTTPError('error')
+        e.response = mock.MagicMock()
+        e.response.status_code = 404
+        e.response.content = 'Error Code'
+        request().raise_for_status.side_effect = e
+
+        req = transports.Request()
+        req.endpoint = 'http://something.com'
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+
+        self.assertRaises(SoftLayer.TransportError,
+                          transports.make_xml_rpc_api_call, req)
+
 
 class TestRestAPICall(testing.TestCase):
 
-    @mock.patch('SoftLayer.transports.requests.request')
+    @mock.patch('requests.request')
     def test_json(self, request):
         request().content = '{}'
-        resp = transports.make_rest_api_call(
-            'GET', 'http://something.com/path/to/resource.json')
+        req = transports.Request()
+        req.endpoint = 'http://something.com'
+        req.service = 'SoftLayer_Service'
+        req.method = 'Resource'
+
+        resp = transports.make_rest_api_call(req, extension='json')
         self.assertEqual(resp, {})
         request.assert_called_with(
-            'GET', 'http://something.com/path/to/resource.json',
+            'GET', 'http://something.com/SoftLayer_Service/Resource.json',
             headers=None,
             proxies=None,
             timeout=None)
@@ -114,39 +267,71 @@ class TestRestAPICall(testing.TestCase):
 
         self.assertRaises(
             SoftLayer.SoftLayerAPIError,
-            transports.make_rest_api_call,
-            'GET',
-            'http://something.com/path/to/resource.json')
+            transports.make_rest_api_call, req, extension='json')
 
     def test_proxy_without_protocol(self):
-        self.assertRaises(
-            SoftLayer.TransportError,
-            transports.make_rest_api_call,
-            'GET'
-            'http://something.com/path/to/resource.txt',
-            'localhost:3128')
+        req = transports.Request()
+        req.endpoint = 'http://something.com'
+        req.service = 'SoftLayer_Service'
+        req.method = 'Resource'
+        req.proxy = 'localhost:3128'
 
-    @mock.patch('SoftLayer.transports.requests.request')
+        self.assertRaises(SoftLayer.TransportError,
+                          transports.make_rest_api_call, req)
+
+    @mock.patch('requests.request')
     def test_valid_proxy(self, request):
-        transports.make_rest_api_call(
-            'GET',
-            'http://something.com/path/to/resource.txt',
-            proxy='http://localhost:3128')
+        request().content = '{}'
+
+        req = transports.Request()
+        req.endpoint = 'http://something.com'
+        req.service = 'SoftLayer_Service'
+        req.method = 'Resource'
+        req.proxy = 'http://localhost:3128'
+
+        transports.make_rest_api_call(req)
         request.assert_called_with(
-            'GET', 'http://something.com/path/to/resource.txt',
-            headers=mock.ANY,
+            'GET', 'http://something.com/SoftLayer_Service/Resource.json',
             proxies={'https': 'http://localhost:3128',
                      'http': 'http://localhost:3128'},
+            timeout=mock.ANY,
+            headers=mock.ANY)
+
+    @mock.patch('requests.request')
+    def test_with_id(self, request):
+        request().content = '{}'
+
+        req = transports.Request()
+        req.endpoint = 'http://something.com'
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        req.identifier = 2
+
+        resp = transports.make_rest_api_call(req)
+
+        self.assertEqual(resp, {})
+        request.assert_called_with(
+            'GET',
+            'http://something.com/SoftLayer_Service/getObject/2.json',
+            headers=None,
+            proxies=None,
             timeout=None)
 
-    @mock.patch('SoftLayer.transports.requests.request')
+    @mock.patch('requests.request')
     def test_text(self, request):
+        request().content = 'content'
         request().text = 'content'
-        resp = transports.make_rest_api_call(
-            'GET', 'http://something.com/path/to/resource.txt')
+
+        req = transports.Request()
+        req.endpoint = 'http://something.com'
+        req.service = 'SoftLayer_Service'
+        req.method = 'Resource'
+
+        resp = transports.make_rest_api_call(req, extension='txt')
         self.assertEqual(resp, 'content')
         request.assert_called_with(
-            'GET', 'http://something.com/path/to/resource.txt',
+            'GET',
+            'http://something.com/SoftLayer_Service/Resource.txt',
             headers=None,
             proxies=None,
             timeout=None)
@@ -158,13 +343,10 @@ class TestRestAPICall(testing.TestCase):
         e.response.content = 'Error Code'
         request().raise_for_status.side_effect = e
 
-        self.assertRaises(
-            SoftLayer.SoftLayerAPIError,
-            transports.make_rest_api_call,
-            'GET',
-            'http://something.com/path/to/resource.txt')
+        self.assertRaises(SoftLayer.SoftLayerAPIError,
+                          transports.make_rest_api_call, req, extension='txt')
 
-    @mock.patch('SoftLayer.transports.requests.request')
+    @mock.patch('requests.request')
     def test_unknown_error(self, request):
         e = requests.RequestException('error')
         e.response = mock.MagicMock()
@@ -172,8 +354,10 @@ class TestRestAPICall(testing.TestCase):
         e.response.content = 'Error Code'
         request().raise_for_status.side_effect = e
 
-        self.assertRaises(
-            SoftLayer.TransportError,
-            transports.make_rest_api_call,
-            'GET',
-            'http://something.com/path/to/resource.txt')
+        req = transports.Request()
+        req.endpoint = 'http://something.com'
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+
+        self.assertRaises(SoftLayer.TransportError,
+                          transports.make_rest_api_call, req)

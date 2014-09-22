@@ -145,24 +145,6 @@ class Client(object):
         if not service.startswith(self._prefix):
             service = self._prefix + service
 
-        headers = kwargs.get('headers', {})
-
-        if kwargs.get('id') is not None:
-            headers[service + 'InitParameters'] = {'id': kwargs.get('id')}
-
-        if kwargs.get('mask') is not None:
-            headers.update(self.__format_object_mask(kwargs.get('mask'),
-                                                     service))
-
-        if kwargs.get('filter') is not None:
-            headers['%sObjectFilter' % service] = kwargs.get('filter')
-
-        if kwargs.get('limit'):
-            headers['resultLimit'] = {
-                'limit': kwargs.get('limit'),
-                'offset': kwargs.get('offset', 0),
-            }
-
         http_headers = {
             'User-Agent': self.user_agent or consts.USER_AGENT,
             'Content-Type': 'application/xml',
@@ -175,13 +157,19 @@ class Client(object):
         if kwargs.get('raw_headers'):
             http_headers.update(kwargs.get('raw_headers'))
 
-        uri = '/'.join([self.endpoint_url, service])
-        options = {
-            'headers': headers,
-            'http_headers': http_headers,
-            'timeout': self.timeout,
-            'proxy': self.proxy,
-        }
+        request = transports.Request()
+        request.endpoint = self.endpoint_url
+        request.service = service
+        request.method = method
+        request.args = args
+        request.transport_headers = http_headers
+        request.timeout = self. timeout
+        request.proxy = self.proxy
+        request.identifier = kwargs.get('id')
+        request.mask = kwargs.get('mask')
+        request.filter = kwargs.get('filter')
+        request.limit = kwargs.get('limit')
+        request.offset = kwargs.get('offset')
 
         if self.auth:
             extra_headers = self.auth.get_headers()
@@ -189,12 +177,11 @@ class Client(object):
                 warnings.warn("auth.get_headers() is deprecated and will be "
                               "removed in the next major version",
                               DeprecationWarning)
-                headers.update(extra_headers)
+                request.headers.update(extra_headers)
 
-            options = self.auth.get_options(options)
+            request = self.auth.get_request(request)
 
-        return transports.make_xml_rpc_api_call(uri, method, args,
-                                                **options)
+        return transports.make_xml_rpc_api_call(request)
 
     __call__ = call
 
@@ -248,25 +235,6 @@ class Client(object):
 
             if len(results) < chunk:
                 break
-
-    def __format_object_mask(self, objectmask, service):
-        """Format new and old style object masks into proper headers.
-
-        :param objectmask: a string- or dict-based object mask
-        :param service: a SoftLayer API service name
-
-        """
-        if isinstance(objectmask, dict):
-            mheader = '%sObjectMask' % service
-        else:
-            mheader = self._prefix + 'ObjectMask'
-
-            objectmask = objectmask.strip()
-            if (not objectmask.startswith('mask')
-                    and not objectmask.startswith('[')):
-                objectmask = "mask[%s]" % objectmask
-
-        return {mheader: {'mask': objectmask}}
 
     def __repr__(self):
         return "<Client: endpoint=%s, user=%r>" % (self.endpoint_url,

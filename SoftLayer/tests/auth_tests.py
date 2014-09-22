@@ -6,12 +6,13 @@
 """
 from SoftLayer import auth
 from SoftLayer import testing
+from SoftLayer import transports
 
 
 class TestAuthenticationBase(testing.TestCase):
-    def test_get_options(self):
+    def test_get_request(self):
         auth_base = auth.AuthenticationBase()
-        self.assertEqual(auth_base.get_options({}), {})
+        self.assertEqual(auth_base.get_request({}), {})
         self.assertEqual(auth_base.get_headers(), {})
 
 
@@ -23,14 +24,13 @@ class TestBasicAuthentication(testing.TestCase):
         self.assertEqual(self.auth.username, 'USERNAME')
         self.assertEqual(self.auth.api_key, 'APIKEY')
 
-    def test_get_options(self):
-        headers = {'headers': {}}
-        self.assertEqual(self.auth.get_options(headers), {
-            'headers': {
-                'authenticate': {
-                    'username': 'USERNAME',
-                    'apiKey': 'APIKEY',
-                }
+    def test_get_request(self):
+        req = transports.Request()
+        authed_req = self.auth.get_request(req)
+        self.assertEqual(authed_req.headers, {
+            'authenticate': {
+                'username': 'USERNAME',
+                'apiKey': 'APIKEY',
             }
         })
 
@@ -48,15 +48,14 @@ class TestTokenAuthentication(testing.TestCase):
         self.assertEqual(self.auth.user_id, 12345)
         self.assertEqual(self.auth.auth_token, 'TOKEN')
 
-    def test_get_options(self):
-        headers = {'headers': {}}
-        self.assertEqual(self.auth.get_options(headers), {
-            'headers': {
-                'authenticate': {
-                    'complexType': 'PortalLoginToken',
-                    'userId': 12345,
-                    'authToken': 'TOKEN',
-                }
+    def test_get_request(self):
+        req = transports.Request()
+        authed_req = self.auth.get_request(req)
+        self.assertEqual(authed_req.headers, {
+            'authenticate': {
+                'complexType': 'PortalLoginToken',
+                'userId': 12345,
+                'authToken': 'TOKEN',
             }
         })
 
