@@ -9,9 +9,10 @@ from SoftLayer import testing
 
 
 class TestAuthenticationBase(testing.TestCase):
-    def test_get_headers(self):
+    def test_get_options(self):
         auth_base = auth.AuthenticationBase()
-        self.assertRaises(NotImplementedError, auth_base.get_headers)
+        self.assertEqual(auth_base.get_options({}), {})
+        self.assertEqual(auth_base.get_headers(), {})
 
 
 class TestBasicAuthentication(testing.TestCase):
@@ -22,11 +23,14 @@ class TestBasicAuthentication(testing.TestCase):
         self.assertEqual(self.auth.username, 'USERNAME')
         self.assertEqual(self.auth.api_key, 'APIKEY')
 
-    def test_get_headers(self):
-        self.assertEqual(self.auth.get_headers(), {
-            'authenticate': {
-                'username': 'USERNAME',
-                'apiKey': 'APIKEY',
+    def test_get_options(self):
+        headers = {'headers': {}}
+        self.assertEqual(self.auth.get_options(headers), {
+            'headers': {
+                'authenticate': {
+                    'username': 'USERNAME',
+                    'apiKey': 'APIKEY',
+                }
             }
         })
 
@@ -44,12 +48,15 @@ class TestTokenAuthentication(testing.TestCase):
         self.assertEqual(self.auth.user_id, 12345)
         self.assertEqual(self.auth.auth_token, 'TOKEN')
 
-    def test_get_headers(self):
-        self.assertEqual(self.auth.get_headers(), {
-            'authenticate': {
-                'complexType': 'PortalLoginToken',
-                'userId': 12345,
-                'authToken': 'TOKEN',
+    def test_get_options(self):
+        headers = {'headers': {}}
+        self.assertEqual(self.auth.get_options(headers), {
+            'headers': {
+                'authenticate': {
+                    'complexType': 'PortalLoginToken',
+                    'userId': 12345,
+                    'authToken': 'TOKEN',
+                }
             }
         })
 

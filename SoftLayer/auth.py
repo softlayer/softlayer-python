@@ -10,9 +10,22 @@ __all__ = ['BasicAuthentication', 'TokenAuthentication', 'AuthenticationBase']
 
 class AuthenticationBase(object):
     """A base authentication class intended to be overridden."""
+
+    def get_options(self, options):
+        """Receives request options and returns request options.
+
+            :param options dict: dictionary of request options
+
+        """
+        return options
+
     def get_headers(self):
-        """Return a dictionary of headers to be inserted for authentication."""
-        raise NotImplementedError
+        """Return a dictionary of headers to be inserted for authentication.
+
+        .. deprecated:: 3.3.0
+           Use :func:`get_options` instead.
+        """
+        return {}
 
 
 class TokenAuthentication(AuthenticationBase):
@@ -26,15 +39,14 @@ class TokenAuthentication(AuthenticationBase):
         self.user_id = user_id
         self.auth_token = auth_token
 
-    def get_headers(self):
-        """Returns token-based auth headers."""
-        return {
-            'authenticate': {
-                'complexType': 'PortalLoginToken',
-                'userId': self.user_id,
-                'authToken': self.auth_token,
-            }
+    def get_options(self, options):
+        """Sets token-based auth headers."""
+        options['headers']['authenticate'] = {
+            'complexType': 'PortalLoginToken',
+            'userId': self.user_id,
+            'authToken': self.auth_token,
         }
+        return options
 
     def __repr__(self):
         return "<TokenAuthentication: %s %s>" % (self.user_id, self.auth_token)
@@ -50,14 +62,13 @@ class BasicAuthentication(AuthenticationBase):
         self.username = username
         self.api_key = api_key
 
-    def get_headers(self):
-        """Returns token-based auth headers."""
-        return {
-            'authenticate': {
-                'username': self.username,
-                'apiKey': self.api_key,
-            }
+    def get_options(self, options):
+        """Sets token-based auth headers."""
+        options['headers']['authenticate'] = {
+            'username': self.username,
+            'apiKey': self.api_key,
         }
+        return options
 
     def __repr__(self):
         return "<BasicAuthentication: %s>" % (self.username)

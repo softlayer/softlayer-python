@@ -56,7 +56,9 @@ class TestXmlRpcAPICall(testing.TestCase):
                                    headers=None,
                                    proxies=None,
                                    data=data,
-                                   timeout=None)
+                                   timeout=None,
+                                   cert=None,
+                                   verify=True)
         self.assertEqual(resp, [])
 
     def test_proxy_without_protocol(self):
@@ -81,7 +83,9 @@ class TestXmlRpcAPICall(testing.TestCase):
             proxies={'https': 'http://localhost:3128',
                      'http': 'http://localhost:3128'},
             data=mock.ANY,
-            timeout=None)
+            timeout=None,
+            cert=None,
+            verify=True)
 
 
 class TestRestAPICall(testing.TestCase):
