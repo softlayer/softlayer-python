@@ -247,7 +247,7 @@ class TestRestAPICall(testing.TestCase):
         req.service = 'SoftLayer_Service'
         req.method = 'Resource'
 
-        resp = transports.make_rest_api_call(req, extension='json')
+        resp = transports.make_rest_api_call(req)
         self.assertEqual(resp, {})
         request.assert_called_with(
             'GET', 'http://something.com/SoftLayer_Service/Resource.json',
@@ -266,8 +266,7 @@ class TestRestAPICall(testing.TestCase):
         request().raise_for_status.side_effect = e
 
         self.assertRaises(
-            SoftLayer.SoftLayerAPIError,
-            transports.make_rest_api_call, req, extension='json')
+            SoftLayer.SoftLayerAPIError, transports.make_rest_api_call, req)
 
     def test_proxy_without_protocol(self):
         req = transports.Request()
@@ -316,35 +315,6 @@ class TestRestAPICall(testing.TestCase):
             headers=None,
             proxies=None,
             timeout=None)
-
-    @mock.patch('requests.request')
-    def test_text(self, request):
-        request().content = 'content'
-        request().text = 'content'
-
-        req = transports.Request()
-        req.endpoint = 'http://something.com'
-        req.service = 'SoftLayer_Service'
-        req.method = 'Resource'
-
-        resp = transports.make_rest_api_call(req, extension='txt')
-        self.assertEqual(resp, 'content')
-        request.assert_called_with(
-            'GET',
-            'http://something.com/SoftLayer_Service/Resource.txt',
-            headers=None,
-            proxies=None,
-            timeout=None)
-
-        # Test Text Error
-        e = requests.HTTPError('error')
-        e.response = mock.MagicMock()
-        e.response.status_code = 404
-        e.response.content = 'Error Code'
-        request().raise_for_status.side_effect = e
-
-        self.assertRaises(SoftLayer.SoftLayerAPIError,
-                          transports.make_rest_api_call, req, extension='txt')
 
     @mock.patch('requests.request')
     def test_unknown_error(self, request):

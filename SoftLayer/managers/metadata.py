@@ -69,9 +69,6 @@ class MetadataManager(object):
             raise exceptions.SoftLayerError('Unknown metadata attribute.')
 
         call_details = self.attribs[name]
-        extension = 'json'
-        if self.attribs[name]['call'] == 'UserMetadata':
-            extension = 'txt'
 
         if call_details.get('param_req'):
             if not param:
@@ -87,8 +84,7 @@ class MetadataManager(object):
         request.identifier = param
 
         try:
-            return transports.make_rest_api_call(request,
-                                                 extension=extension)
+            return transports.make_rest_api_call(request)
         except exceptions.SoftLayerAPIError as ex:
             if ex.faultCode == 404:
                 return None

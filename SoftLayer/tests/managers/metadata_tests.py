@@ -32,7 +32,6 @@ class MetadataTests(testing.TestCase):
                          {'User-Agent': consts.USER_AGENT})
         self.assertEqual(request.timeout, self.metadata.timeout)
         self.assertEqual(request.identifier, None)
-        self.assertEqual(kwargs['extension'], 'json')
 
     @mock.patch('SoftLayer.transports.make_rest_api_call')
     def test_no_param(self, make_request):
@@ -64,7 +63,6 @@ class MetadataTests(testing.TestCase):
         (request, ), kwargs = make_request.call_args
         self.assertEqual(request.method, 'UserMetadata')
         self.assertEqual(request.identifier, None)
-        self.assertEqual(kwargs['extension'], 'txt')
 
     @mock.patch('SoftLayer.transports.make_rest_api_call')
     def test_return_none(self, make_request):

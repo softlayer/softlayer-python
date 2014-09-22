@@ -141,7 +141,7 @@ def make_xml_rpc_api_call(request):
         raise exceptions.TransportError(0, str(ex))
 
 
-def make_rest_api_call(request, extension='json'):
+def make_rest_api_call(request):
     """Makes a SoftLayer API call against the REST endpoint.
 
     This currently only works with GET requests
@@ -154,7 +154,7 @@ def make_rest_api_call(request, extension='json'):
     if request.identifier is not None:
         url_parts.append(str(request.identifier))
 
-    url = '%s.%s' % ('/'.join(url_parts), extension)
+    url = '%s.%s' % ('/'.join(url_parts), 'json')
 
     LOGGER.debug("=== REQUEST ===")
     LOGGER.info('%s %s', request.method, url)
@@ -168,18 +168,11 @@ def make_rest_api_call(request, extension='json'):
         LOGGER.debug(resp.headers)
         LOGGER.debug(resp.content)
         resp.raise_for_status()
-        if extension == 'json':
-            return json.loads(resp.content)
-        else:
-            return resp.text
+        return json.loads(resp.content)
     except requests.HTTPError as ex:
-        if extension == 'json':
-            content = json.loads(ex.response.content)
-            raise exceptions.SoftLayerAPIError(ex.response.status_code,
-                                               content['error'])
-        else:
-            raise exceptions.SoftLayerAPIError(ex.response.status_code,
-                                               ex.response.content)
+        content = json.loads(ex.response.content)
+        raise exceptions.SoftLayerAPIError(ex.response.status_code,
+                                           content['error'])
     except requests.RequestException as ex:
         raise exceptions.TransportError(0, str(ex))
 
