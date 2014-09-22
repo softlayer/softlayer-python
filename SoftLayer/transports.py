@@ -157,7 +157,7 @@ def make_rest_api_call(request):
     url = '%s.%s' % ('/'.join(url_parts), 'json')
 
     LOGGER.debug("=== REQUEST ===")
-    LOGGER.info('%s %s', request.method, url)
+    LOGGER.info(url)
     LOGGER.debug(request.transport_headers)
     try:
         resp = requests.request('GET', url,
