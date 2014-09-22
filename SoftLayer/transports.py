@@ -94,7 +94,7 @@ def make_xml_rpc_api_call(request):
                 'offset': request.offset or 0,
             }
 
-        largs.insert(0, {'headers': headers or None})
+        largs.insert(0, {'headers': headers})
 
         url = '/'.join([request.endpoint, request.service])
         payload = utils.xmlrpc_client.dumps(tuple(largs),

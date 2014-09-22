@@ -39,7 +39,9 @@ class TestXmlRpcAPICall(testing.TestCase):
 <value><struct>
 <member>
 <name>headers</name>
-<value><nil/></value></member>
+<value><struct>
+</struct></value>
+</member>
 </struct></value>
 </param>
 </params>
