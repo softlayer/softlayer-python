@@ -32,7 +32,7 @@ class Request(object):
         self.method = None
 
         #: RPC Arguments.
-        self.args = []
+        self.args = tuple()
 
         #: Transport headers.
         self.headers = {}
@@ -43,7 +43,7 @@ class Request(object):
         #: Integer timeout.
         self.timeout = None
 
-        #: URL to proxy to.
+        #: URL to proxy API requests to.
         self.proxy = None
 
         #: Verify HTTPS Certificate.
