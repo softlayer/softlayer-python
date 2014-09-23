@@ -163,7 +163,7 @@ class Client(object):
         request.method = method
         request.args = args
         request.transport_headers = http_headers
-        request.timeout = self. timeout
+        request.timeout = self.timeout
         request.proxy = self.proxy
         request.identifier = kwargs.get('id')
         request.mask = kwargs.get('mask')
