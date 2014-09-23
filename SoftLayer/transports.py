@@ -25,20 +25,20 @@ class Request(object):
         #: The SoftLayer endpoint address.
         self.endpoint = None
 
-        #: Service name.
+        #: API service name. E.G. SoftLayer_Account
         self.service = None
 
-        #: Method name.
+        #: API method name. E.G. getObject
         self.method = None
 
-        #: RPC Arguments.
+        #: API Parameters.
         self.args = tuple()
 
-        #: Transport headers.
+        #: API headers, used for authentication, masks, limits, offsets, etc.
         self.headers = {}
 
         #: Transport headers.
-        self.transport_headers = None
+        self.transport_headers = {}
 
         #: Integer timeout.
         self.timeout = None
@@ -46,10 +46,10 @@ class Request(object):
         #: URL to proxy API requests to.
         self.proxy = None
 
-        #: Verify HTTPS Certificate.
+        #: Boolean specifying if the server certificate should be verified.
         self.verify = True
 
-        #: Client certificate path.
+        #: Client certificate file path.
         self.cert = None
 
         #: InitParameter/identifier of an object.
@@ -111,7 +111,7 @@ def make_xml_rpc_api_call(request):
                                     timeout=request.timeout,
                                     verify=request.verify,
                                     cert=request.cert,
-                                    proxies=_proxies_dict(request.proxy))
+                                    proxies=__proxies_dict(request.proxy))
         LOGGER.debug("=== RESPONSE ===")
         LOGGER.debug(response.headers)
         LOGGER.debug(response.content)
@@ -163,7 +163,7 @@ def make_rest_api_call(request):
         resp = requests.request('GET', url,
                                 headers=request.transport_headers,
                                 timeout=request.timeout,
-                                proxies=_proxies_dict(request.proxy))
+                                proxies=__proxies_dict(request.proxy))
         LOGGER.debug("=== RESPONSE ===")
         LOGGER.debug(resp.headers)
         LOGGER.debug(resp.content)
@@ -177,8 +177,8 @@ def make_rest_api_call(request):
         raise exceptions.TransportError(0, str(ex))
 
 
-def _proxies_dict(proxy):
-    """Makes a dict appropriate to pass to requests."""
+def __proxies_dict(proxy):
+    """Makes a proxy dict appropriate to pass to requests."""
     if not proxy:
         return None
     return {'http': proxy, 'https': proxy}

@@ -58,7 +58,7 @@ class TestXmlRpcAPICall(testing.TestCase):
 
         request.assert_called_with('POST',
                                    'http://something.com/SoftLayer_Service',
-                                   headers=None,
+                                   headers={},
                                    proxies=None,
                                    data=data,
                                    timeout=None,
@@ -94,7 +94,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         request.assert_called_with(
             'POST',
             mock.ANY,
-            headers=None,
+            headers={},
             proxies={'https': 'http://localhost:3128',
                      'http': 'http://localhost:3128'},
             data=mock.ANY,
@@ -248,7 +248,7 @@ class TestXmlRpcAPICall(testing.TestCase):
 class TestRestAPICall(testing.TestCase):
 
     @mock.patch('requests.request')
-    def test_json(self, request):
+    def test_basic(self, request):
         request().content = '{}'
         req = transports.Request()
         req.endpoint = 'http://something.com'
@@ -259,7 +259,7 @@ class TestRestAPICall(testing.TestCase):
         self.assertEqual(resp, {})
         request.assert_called_with(
             'GET', 'http://something.com/SoftLayer_Service/Resource.json',
-            headers=None,
+            headers={},
             proxies=None,
             timeout=None)
 
@@ -273,8 +273,8 @@ class TestRestAPICall(testing.TestCase):
         }'''
         request().raise_for_status.side_effect = e
 
-        self.assertRaises(
-            SoftLayer.SoftLayerAPIError, transports.make_rest_api_call, req)
+        self.assertRaises(SoftLayer.SoftLayerAPIError,
+                          transports.make_rest_api_call, req)
 
     def test_proxy_without_protocol(self):
         req = transports.Request()
@@ -324,7 +324,7 @@ class TestRestAPICall(testing.TestCase):
         request.assert_called_with(
             'GET',
             'http://something.com/SoftLayer_Service/getObject/2.json',
-            headers=None,
+            headers={},
             proxies=None,
             timeout=None)
 
