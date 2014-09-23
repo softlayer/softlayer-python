@@ -1104,7 +1104,7 @@ usage: sl vs upgrade <identifier> [options]
 Upgrade parameters of a virtual server
 
 Examples:
-    sl vs upgrade --cpus 2
+    sl vs upgrade --cpu 2
     sl vs upgrade --memory 2048 --network 1000
 Options:
     --cpu=CPU          Number of CPU cores

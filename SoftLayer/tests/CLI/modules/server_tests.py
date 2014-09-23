@@ -329,7 +329,7 @@ class ServerCLITests(testing.TestCase):
         args = {'--really': True, '--reason': 'Test'}
         runnable.execute(args)
 
-        cancel_mock.assert_called_with(hw_id, args['--reason'], None)
+        cancel_mock.assert_called_with(hw_id, args['--reason'], None, None)
 
         # Now check to make sure we properly call CLIAbort in the negative case
         env_mock = mock.Mock()

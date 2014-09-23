@@ -23,8 +23,9 @@ def _proxies_dict(proxy):
     return {'http': proxy, 'https': proxy}
 
 
-def make_xml_rpc_api_call(uri, method, args=None, headers=None,
-                          http_headers=None, timeout=None, proxy=None):
+def make_xml_rpc_api_call(url, method, args=None, headers=None,
+                          http_headers=None, timeout=None, proxy=None,
+                          verify=True, cert=None):
     """Makes a SoftLayer API call against the XML-RPC endpoint.
 
     :param string uri: endpoint URL
@@ -32,6 +33,8 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
     :param dict headers: XML-RPC headers to use for the request
     :param dict http_headers: HTTP headers to use for the request
     :param int timeout: number of seconds to use as a timeout
+    :param bool verify: verify SSL cert
+    :param cert: client certificate path
     """
     if args is None:
         args = tuple()
@@ -42,17 +45,18 @@ def make_xml_rpc_api_call(uri, method, args=None, headers=None,
         payload = utils.xmlrpc_client.dumps(tuple(largs),
                                             methodname=method,
                                             allow_none=True)
-        session = requests.Session()
-        req = requests.Request('POST', uri, data=payload,
-                               headers=http_headers).prepare()
         LOGGER.debug("=== REQUEST ===")
-        LOGGER.info('POST %s', uri)
-        LOGGER.debug(req.headers)
+        LOGGER.info('POST %s', url)
+        LOGGER.debug(http_headers)
         LOGGER.debug(payload)
 
-        response = session.send(req,
-                                timeout=timeout,
-                                proxies=_proxies_dict(proxy))
+        response = requests.request('POST', url,
+                                    data=payload,
+                                    headers=http_headers,
+                                    timeout=timeout,
+                                    verify=verify,
+                                    cert=cert,
+                                    proxies=_proxies_dict(proxy))
         LOGGER.debug("=== RESPONSE ===")
         LOGGER.debug(response.headers)
         LOGGER.debug(response.content)
@@ -91,14 +95,18 @@ def make_rest_api_call(method, url,
     :param dict http_headers: HTTP headers to use for the request
     :param int timeout: number of seconds to use as a timeout
     """
+    LOGGER.debug("=== REQUEST ===")
     LOGGER.info('%s %s', method, url)
+    LOGGER.debug(http_headers)
     try:
         resp = requests.request(method, url,
                                 headers=http_headers,
                                 timeout=timeout,
                                 proxies=_proxies_dict(proxy))
-        resp.raise_for_status()
+        LOGGER.debug("=== RESPONSE ===")
+        LOGGER.debug(resp.headers)
         LOGGER.debug(resp.content)
+        resp.raise_for_status()
         if url.endswith('.json'):
             return json.loads(resp.content)
         else:

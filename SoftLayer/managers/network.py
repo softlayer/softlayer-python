@@ -6,6 +6,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
+from SoftLayer import exceptions
 from SoftLayer import utils
 
 DEFAULT_SUBNET_MASK = ','.join(['hardware',
@@ -132,8 +133,10 @@ class NetworkManager(object):
         :param int subnet_id: The ID of the subnet to be cancelled.
         """
         subnet = self.get_subnet(subnet_id, mask='id, billingItem.id')
+        if "billingItem" not in subnet:
+            raise exceptions.SoftLayerError("subnet %s can not be cancelled"
+                                            " " % subnet_id)
         billing_id = subnet['billingItem']['id']
-
         return self.client['Billing_Item'].cancelService(id=billing_id)
 
     def edit_rwhois(self, abuse_email=None, address1=None, address2=None,
@@ -334,8 +337,7 @@ class NetworkManager(object):
         unique_network = []
 
         for vlan in self.list_vlans():
-            datacenter = vlan['primaryRouter']['datacenter']
-            name = datacenter['name']
+            name = utils.lookup(vlan, 'primaryRouter', 'datacenter', 'name')
             if name not in datacenters:
                 datacenters[name] = {
                     'hardwareCount': 0,

@@ -17,9 +17,9 @@ class Inititialization(testing.TestCase):
         client = SoftLayer.Client(username='doesnotexist',
                                   api_key='issurelywrong', timeout=10)
 
-        auth_headers = {'authenticate': {'username': 'doesnotexist',
-                                         'apiKey': 'issurelywrong'}}
-        self.assertEqual(client.auth.get_headers(), auth_headers)
+        self.assertIsInstance(client.auth, SoftLayer.BasicAuthentication)
+        self.assertEqual(client.auth.username, 'doesnotexist')
+        self.assertEqual(client.auth.api_key, 'issurelywrong')
         self.assertEqual(client.endpoint_url,
                          SoftLayer.API_PUBLIC_ENDPOINT.rstrip('/'))
         self.assertEqual(client.timeout, 10)

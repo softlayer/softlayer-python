@@ -49,16 +49,10 @@ class FirewallManager(utils.IdentifierMixin, object):
                             False for a server
         :returns: A dictionary containing the standard CCI firewall package
         """
-        mask = ('mask[primaryNetworkComponent[speed]]')
-        if is_cci:
-            svc = self.client['Virtual_Guest']
-        else:
-            svc = self.client['Hardware_Server']
-
-        item = svc.getObject(mask=mask, id=server_id)
+        firewall_port_speed = self._get_fwl_port_speed(server_id, is_cci)
 
         _filter = utils.NestedDict({})
-        _value = "%s%s" % (item['primaryNetworkComponent']['speed'],
+        _value = "%s%s" % (firewall_port_speed,
                            "Mbps Hardware Firewall")
         _filter['items']['description'] = utils.query_filter(_value)
 
@@ -161,6 +155,52 @@ class FirewallManager(utils.IdentifierMixin, object):
         else:
             fwl_svc = self.client['Network_Component_Firewall']
         return fwl_svc.getObject(id=firewall_id, mask=mask)
+
+    def _get_fwl_port_speed(self, server_id, is_cci=True):
+        """ Determines the appropriate speed for a firewall
+
+        :param int server_id: The ID of server the firewall is for
+        :param bool is_cci: true if the server_id is for a virtual server
+        :returns: a integer representing the Mbps speed of a firewall
+        """
+        fwl_port_speed = 0
+        if is_cci:
+            mask = ('mask[primaryNetworkComponent[maxSpeed]]')
+            svc = self.client['Virtual_Guest']
+            primary = svc.getObject(mask=mask, id=server_id)
+            fwl_port_speed = primary['primaryNetworkComponent']['maxSpeed']
+        else:
+            mask = ('mask[id,maxSpeed,'
+                    'networkComponentGroup.networkComponents]')
+            svc = self.client['Hardware_Server']
+            network_components = svc.getFrontendNetworkComponents(
+                mask=mask, id=server_id)
+            grouped = [interface['networkComponentGroup']['networkComponents']
+                       for interface in network_components
+                       if 'networkComponentGroup' in interface]
+            ungrouped = [interface
+                         for interface in network_components
+                         if 'networkComponentGroup' not in interface]
+
+            # For each group, sum the maxSpeeds of each compoment in the
+            # group. Put the sum for each in a new list
+            group_speeds = []
+            for group in grouped:
+                group_speed = 0
+                for interface in group:
+                    group_speed += interface['maxSpeed']
+                group_speeds.append(group_speed)
+
+            # The max speed of all groups is the max of the list
+            max_grouped_speed = max(group_speeds)
+
+            max_ungrouped = 0
+            for interface in ungrouped:
+                max_ungrouped = max(max_ungrouped, interface['maxSpeed'])
+
+            fwl_port_speed = max(max_grouped_speed, max_ungrouped)
+
+        return fwl_port_speed
 
     def get_firewalls(self):
         """ Returns a list of all firewalls on the account.

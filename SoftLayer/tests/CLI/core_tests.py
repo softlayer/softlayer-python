@@ -197,7 +197,6 @@ class TestCommandParser(testing.TestCase):
         args = self.parser.parse_main_args(args=[])
         self.assertEqual({
             '--help': False,
-            '-h': False,
             '<args>': [],
             '<module>': None,
             '<command>': None,
@@ -207,7 +206,6 @@ class TestCommandParser(testing.TestCase):
         args = self.parser.parse_main_args(args=['help'])
         self.assertEqual({
             '--help': False,
-            '-h': False,
             '<args>': [],
             '<module>': 'help',
             '<command>': None,
@@ -217,7 +215,6 @@ class TestCommandParser(testing.TestCase):
         args = self.parser.parse_main_args(args=['help', 'module'])
         self.assertEqual({
             '--help': False,
-            '-h': False,
             '<args>': ['module'],
             '<module>': 'help',
             '<command>': None,
