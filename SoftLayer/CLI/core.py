@@ -4,7 +4,7 @@ usage: sl <module> [<args>...]
        sl help <module> <command>
        sl [-h | --help]
 
-SoftLayer Command-line Client
+SoftLayer Command-line Client {version}
 
 The available modules are:
 
@@ -98,7 +98,8 @@ class CommandParser(object):
 
     def get_main_help(self):
         """Get main help text."""
-        return _append_common_options(__doc__).strip()
+        main_doc = __doc__.format(version=SoftLayer.__version__)
+        return _append_common_options(main_doc).strip()
 
     def get_module_help(self, module_name):
         """Get help text for a module."""
