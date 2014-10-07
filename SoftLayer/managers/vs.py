@@ -15,9 +15,7 @@ from SoftLayer import utils
 
 
 class VSManager(utils.IdentifierMixin, object):
-
-    """
-    Manages Virtual Servers
+    """Manages Virtual Servers.
 
     :param SoftLayer.API.Client client: an API client instance
     :param SoftLayer.managers.OrderingManager ordering_manager: an optional
@@ -40,7 +38,7 @@ class VSManager(utils.IdentifierMixin, object):
                        memory=None, hostname=None, domain=None,
                        local_disk=None, datacenter=None, nic_speed=None,
                        public_ip=None, private_ip=None, **kwargs):
-        """ Retrieve a list of all virtual servers on the account.
+        """Retrieve a list of all virtual servers on the account.
 
         :param boolean hourly: include hourly instances
         :param boolean monthly: include monthly instances
@@ -143,7 +141,7 @@ class VSManager(utils.IdentifierMixin, object):
         return func(**kwargs)
 
     def get_instance(self, instance_id, **kwargs):
-        """ Get details about a virtual server instance
+        """Get details about a virtual server instance.
 
         :param integer instance_id: the instance ID
         :returns: A dictionary containing a large amount of information about
@@ -209,7 +207,7 @@ class VSManager(utils.IdentifierMixin, object):
         return self.guest.getObject(id=instance_id, **kwargs)
 
     def get_create_options(self):
-        """ Retrieves the available options for creating a VS.
+        """Retrieves the available options for creating a VS.
 
         :returns: A dictionary of creation options.
 
@@ -217,7 +215,7 @@ class VSManager(utils.IdentifierMixin, object):
         return self.guest.getCreateObjectOptions()
 
     def cancel_instance(self, instance_id):
-        """ Cancel an instance immediately, deleting all its data.
+        """Cancel an instance immediately, deleting all its data.
 
         :param integer instance_id: the instance ID to cancel
 
@@ -237,7 +235,7 @@ class VSManager(utils.IdentifierMixin, object):
         return self.guest.deleteObject(id=instance_id)
 
     def reload_instance(self, instance_id, post_uri=None, ssh_keys=None):
-        """ Perform an OS reload of an instance with its current configuration.
+        """Perform an OS reload of an instance with its current configuration.
 
         :param integer instance_id: the instance ID to reload
         :param string post_url: The URI of the post-install script to run
@@ -276,7 +274,8 @@ class VSManager(utils.IdentifierMixin, object):
             dedicated=False, public_vlan=None, private_vlan=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
             private=False, ssh_keys=None):
-        """ Returns a dict appropriate to pass into Virtual_Guest::createObject
+        """Returns a dict appropriate to pass into Virtual_Guest::createObject
+
             See :func:`create_instance` for a list of available options.
         """
         required = [cpus, memory, hostname, domain]
@@ -354,8 +353,9 @@ class VSManager(utils.IdentifierMixin, object):
         return data
 
     def wait_for_transaction(self, instance_id, limit, delay=1):
-        """ Waits on a VS transaction for the specified amount of time.
-        is really just a wrapper for wait_for_ready(pending=True).
+        """Waits on a VS transaction for the specified amount of time.
+
+        This is really just a wrapper for wait_for_ready(pending=True).
         Provided for backwards compatibility.
 
 
@@ -369,13 +369,14 @@ class VSManager(utils.IdentifierMixin, object):
                                    pending=True)
 
     def wait_for_ready(self, instance_id, limit, delay=1, pending=False):
-        """ Determine if a VS is ready and available.  In some cases
-        though, that can mean that no transactions are running. The default
-        arguments imply a VS is operational and ready for use by having
-        network connectivity and remote access is available.  Setting
-        ``pending=True`` will ensure future API calls
-        against this instance will not error due to pending
-        transactions such as OS Reloads and cancellations.
+        """Determine if a VS is ready and available.
+
+        In some cases though, that can mean that no transactions are running.
+        The default arguments imply a VS is operational and ready for use by
+        having network connectivity and remote access is available. Setting
+        ``pending=True`` will ensure future API calls against this instance
+        will not error due to pending transactions such as OS Reloads and
+        cancellations.
 
         :param int instance_id: The instance ID with the pending transaction
         :param int limit: The maximum amount of time to wait.
@@ -418,15 +419,16 @@ class VSManager(utils.IdentifierMixin, object):
             time.sleep(delay)
 
     def verify_create_instance(self, **kwargs):
-        """ Verifies an instance creation command without actually placing an
-            order. See :func:`create_instance` for a list of available options.
+        """Verifies an instance creation command.
+
+        Without actually placing an order.
+        See :func:`create_instance` for a list of available options.
         """
         create_options = self._generate_create_dict(**kwargs)
         return self.guest.generateOrderTemplate(create_options)
 
     def create_instance(self, **kwargs):
-        """
-        Creates a new virtual server instance
+        """Creates a new virtual server instance.
 
         :param int cpus: The number of virtual CPUs to include in the instance.
         :param int memory: The amount of RAM to order.
@@ -456,7 +458,7 @@ class VSManager(utils.IdentifierMixin, object):
                              access to the private network. Defaults to false
         :param list ssh_keys: The SSH keys to add to the root user
         :param int nic_speed: The port speed to set
-        :param string tag: tags to set on the VS as a comma separated list
+        :param string tags: tags to set on the VS as a comma separated list
         """
         tags = kwargs.pop('tags', None)
         inst = self.guest.createObject(self._generate_create_dict(**kwargs))
@@ -465,7 +467,7 @@ class VSManager(utils.IdentifierMixin, object):
         return inst
 
     def create_instances(self, config_list):
-        """ Creates multiple virtual server instances
+        """Creates multiple virtual server instances.
 
         This takes a list of dictionaries using the same arguments as
         create_instance().
@@ -482,7 +484,7 @@ class VSManager(utils.IdentifierMixin, object):
         return resp
 
     def change_port_speed(self, instance_id, public, speed):
-        """ Allows you to change the port speed of a virtual server's NICs.
+        """Allows you to change the port speed of a virtual server's NICs.
 
         :param int instance_id: The ID of the VS
         :param bool public: Flag to indicate which interface to change.
@@ -498,12 +500,12 @@ class VSManager(utils.IdentifierMixin, object):
         return func(speed, id=instance_id)
 
     def _get_ids_from_hostname(self, hostname):
-        """ List VS ids which match the given hostname """
+        """List VS ids which match the given hostname."""
         results = self.list_instances(hostname=hostname, mask="id")
         return [result['id'] for result in results]
 
     def _get_ids_from_ip(self, ip_address):
-        """ List VS ids which match the given ip address """
+        """List VS ids which match the given ip address."""
         try:
             # Does it look like an ip address?
             socket.inet_aton(ip_address)
@@ -521,7 +523,7 @@ class VSManager(utils.IdentifierMixin, object):
 
     def edit(self, instance_id, userdata=None, hostname=None, domain=None,
              notes=None, tag=None):
-        """ Edit hostname, domain name, notes, and/or the user data of a VS
+        """Edit hostname, domain name, notes, and/or the user data of a VS.
 
         Parameters set to None will be ignored and not attempted to be updated.
 
@@ -558,14 +560,14 @@ class VSManager(utils.IdentifierMixin, object):
         return self.guest.editObject(obj, id=instance_id)
 
     def rescue(self, instance_id):
-        """ Reboot a VSI into the Xen recsue kernel
+        """Reboot a VSI into the Xen recsue kernel.
 
         :param integer instance_id: the instance ID to rescue
         """
         return self.guest.executeRescueLayer(id=instance_id)
 
     def capture(self, instance_id, name, additional_disks=False, notes=None):
-        """ Capture one or all disks from a VS to a SoftLayer image.
+        """Capture one or all disks from a VS to a SoftLayer image.
 
         Parameters set to None will be ignored and not attempted to be updated.
 
@@ -591,8 +593,7 @@ class VSManager(utils.IdentifierMixin, object):
 
     def upgrade(self, instance_id, cpus=None, memory=None,
                 nic_speed=None, public=True):
-        """
-        Upgrades a VS instance
+        """Upgrades a VS instance.
 
         :param int instance_id: Instance id of the VS to be upgraded
         :param int cpus: The number of virtual CPUs to upgrade to
@@ -636,9 +637,7 @@ class VSManager(utils.IdentifierMixin, object):
         return False
 
     def _get_package_items(self):
-        """
-        Following Method gets all the item ids related to VS
-        """
+        """Following Method gets all the item ids related to VS."""
         mask = "mask[description,capacity,prices[id,categories[name,id]]]"
         package_type = "VIRTUAL_SERVER_INSTANCE"
         package_id = self.ordering_manager.get_package_id_by_type(package_type)
@@ -648,8 +647,8 @@ class VSManager(utils.IdentifierMixin, object):
 
     def _get_item_id_for_upgrade(self, package_items, option, value,
                                  public=True):
-        """
-        Find the item ids for the parameters you want to upgrade to.
+        """Find the item ids for the parameters you want to upgrade to.
+
         :param list package_items: Contains all the items related to an VS
         :param string option: Describes type of parameter to be upgraded
         :param int value: The value of the parameter to be upgraded

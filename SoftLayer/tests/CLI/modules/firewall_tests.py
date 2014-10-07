@@ -4,10 +4,8 @@
 
     :license: MIT, see LICENSE for more details.
 """
-# from mock import patch
+import json
 
-from SoftLayer.CLI import formatting
-from SoftLayer.CLI.modules import firewall
 from SoftLayer import testing
 
 
@@ -16,30 +14,11 @@ class FirewallTests(testing.TestCase):
         self.client = testing.FixtureClient()
 
     def test_list_firewalls(self):
-        call = self.client['Account'].getNetworkVlans
-        call.return_value = [{
-            'id': 1,
-            'dedicatedFirewallFlag': True,
-            'highAvailabilityFirewallFlag': True,
-            'networkVlanFirewall': {'id': 1234},
-        }, {
-            'id': 2,
-            'dedicatedFirewallFlag': False,
-            'firewallGuestNetworkComponents': [{
-                'id': 1234,
-                'guestNetworkComponent': {'guest': {'id': 1}},
-                'status': 'ok'}],
-            'firewallNetworkComponents': [{
-                'id': 1234,
-                'networkComponent': {'downlinkComponent': {'hardwareId': 1}},
-                'status': 'ok'}],
-        }
-        ]
-        command = firewall.FWList(client=self.client)
+        result = self.run_command(['firewall', 'list'])
 
-        output = command.execute({})
-
-        self.assertEqual([{'type': 'VLAN - dedicated',
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output),
+                         [{'type': 'VLAN - dedicated',
                            'server/vlan id': 1,
                            'features': ['HA'],
                            'firewall id': 'vlan:1234'},
@@ -50,5 +29,4 @@ class FirewallTests(testing.TestCase):
                           {'features': '-',
                            'firewall id': 'server:1234',
                            'server/vlan id': 1,
-                           'type': 'Server - standard'}],
-                         formatting.format_output(output, 'python'))
+                           'type': 'Server - standard'}])

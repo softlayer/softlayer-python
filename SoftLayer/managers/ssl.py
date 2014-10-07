@@ -8,8 +8,7 @@
 
 
 class SSLManager(object):
-    """
-    Manages SSL certificates.
+    """Manages SSL certificates.
 
     :param SoftLayer.API.Client client: an API client instance
     """
@@ -19,7 +18,7 @@ class SSLManager(object):
         self.ssl = self.client['Security_Certificate']
 
     def list_certs(self, method='all'):
-        """ List all certificates.
+        """List all certificates.
 
         :param string method: The type of certificates to list. Options are
                               'all', 'expired', and 'valid'.
@@ -38,7 +37,7 @@ class SSLManager(object):
         return func(mask=mask)
 
     def add_certificate(self, certificate):
-        """ Creates a new certificate.
+        """Creates a new certificate.
 
         :param dict certificate: A dictionary representing the parts of the
                                  certificate. See SLDN for more information.
@@ -47,7 +46,7 @@ class SSLManager(object):
         return self.ssl.createObject(certificate)
 
     def remove_certificate(self, cert_id):
-        """ Removes a certificate.
+        """Removes a certificate.
 
         :param integer cert_id: a certificate ID to remove
 
@@ -55,7 +54,7 @@ class SSLManager(object):
         return self.ssl.deleteObject(id=cert_id)
 
     def edit_certificate(self, certificate):
-        """ Updates a certificate with the included options.
+        """Updates a certificate with the included options.
 
         The provided dict must include an 'id' key and value corresponding to
         the certificate ID that should be updated.
@@ -66,7 +65,7 @@ class SSLManager(object):
         return self.ssl.editObject(certificate, id=certificate['id'])
 
     def get_certificate(self, cert_id):
-        """ Gets a certificate with the ID specified.
+        """Gets a certificate with the ID specified.
 
         :param integer cert_id: the certificate ID to retrieve
 

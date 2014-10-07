@@ -10,8 +10,7 @@ from SoftLayer import utils
 
 
 class SshKeyManager(utils.IdentifierMixin, object):
-    """
-    Manages account SSH keys.
+    """Manages account SSH keys.
 
     :param SoftLayer.API.Client client: an API client instance
     """
@@ -22,7 +21,7 @@ class SshKeyManager(utils.IdentifierMixin, object):
         self.resolvers = [self._get_ids_from_label]
 
     def add_key(self, key, label, notes=None):
-        """ Adds a new SSH key to the account.
+        """Adds a new SSH key to the account.
 
         :param string key: The SSH key to add
         :param string label: The label for the key
@@ -37,7 +36,7 @@ class SshKeyManager(utils.IdentifierMixin, object):
         return self.sshkey.createObject(order)
 
     def delete_key(self, key_id):
-        """ Permanently deletes an SSH key from the account.
+        """Permanently deletes an SSH key from the account.
 
         :param int key_id: The ID of the key to delete
 
@@ -45,7 +44,7 @@ class SshKeyManager(utils.IdentifierMixin, object):
         return self.sshkey.deleteObject(id=key_id)
 
     def edit_key(self, key_id, label=None, notes=None):
-        """ Edits information about an SSH key.
+        """Edits information about an SSH key.
 
         :param int key_id: The ID of the key to edit
         :param string label: The new label for the key
@@ -63,7 +62,7 @@ class SshKeyManager(utils.IdentifierMixin, object):
         return self.sshkey.editObject(data, id=key_id)
 
     def get_key(self, key_id):
-        """ Returns full information about a single SSH key.
+        """Returns full information about a single SSH key.
 
         :param int key_id: The ID of the key to retrieve
         :returns: A dictionary of information about the key
@@ -71,7 +70,7 @@ class SshKeyManager(utils.IdentifierMixin, object):
         return self.sshkey.getObject(id=key_id)
 
     def list_keys(self, label=None):
-        """ Lists all SSH keys on the account.
+        """Lists all SSH keys on the account.
 
         :param string label: Filter list based on SSH key label
         :returns: A list of dictionaries with information about each key
@@ -83,7 +82,7 @@ class SshKeyManager(utils.IdentifierMixin, object):
         return self.client['Account'].getSshKeys(filter=_filter.to_dict())
 
     def _get_ids_from_label(self, label):
-        """ Return sshkey IDs which match the given label """
+        """Return sshkey IDs which match the given label."""
         keys = self.list_keys()
         results = []
         for key in keys:

@@ -4,236 +4,108 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import mock
+import logging
 
 import SoftLayer
 from SoftLayer.CLI import core
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
 from SoftLayer import testing
+from SoftLayer import utils
+
+import click
+import mock
 
 
-def module_fixture():
-    """
-usage: sl vs <command> [<args>...] [options]
-       sl vs [-h | --help]
-"""
+class CoreTests(testing.TestCase):
+
+    def test_load_all(self):
+        recursive_subcommand_loader(core.cli, path='root')
+
+    def test_debug_max(self):
+        with mock.patch('logging.getLogger') as log_mock:
+            result = self.run_command(['--debug=3', 'vs', 'list'])
+
+            self.assertEqual(result.exit_code, 0)
+            log_mock().addHandler.assert_called_with(mock.ANY)
+            log_mock().setLevel.assert_called_with(logging.DEBUG)
+
+    def test_verbose_max(self):
+        with mock.patch('logging.getLogger') as log_mock:
+            result = self.run_command(['-vvv', 'vs', 'list'])
+
+            self.assertEqual(result.exit_code, 0)
+            log_mock().addHandler.assert_called_with(mock.ANY)
+            log_mock().setLevel.assert_called_with(logging.DEBUG)
+
+    def test_build_client(self):
+        env = environment.Environment()
+        result = self.run_command(['vs', 'list'], env=env)
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertIsNotNone(env.client)
+
+    def test_timings(self):
+        result = self.run_command(['--timings', 'vs', 'list'])
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn('"method": "getVirtualGuests"', result.output)
+        self.assertIn('"service": "Account"', result.output)
+        self.assertIn('"time":', result.output)
 
 
-def module_no_command_fixture():
-    """
-usage: sl vs [<args>...] [options]
-       sl vs [-h | --help]
-"""
+class CoreMainTests(testing.TestCase):
+
+    @mock.patch('SoftLayer.CLI.core.cli.main')
+    @mock.patch('sys.stdout', new_callable=utils.StringIO)
+    def test_unexpected_error(self, stdoutmock, climock):
+        climock.side_effect = AttributeError('Attribute foo does not exist')
+
+        with self.assertRaises(SystemExit):
+            core.main()
+
+        self.assertIn("Feel free to report this error as it is likely a bug",
+                      stdoutmock.getvalue())
+        self.assertIn("Traceback (most recent call last)",
+                      stdoutmock.getvalue())
+        self.assertIn("AttributeError: Attribute foo does not exist",
+                      stdoutmock.getvalue())
+
+    @mock.patch('SoftLayer.CLI.core.cli.main')
+    @mock.patch('sys.stdout', new_callable=utils.StringIO)
+    def test_sl_error(self, stdoutmock, climock):
+        ex = SoftLayer.SoftLayerAPIError('SoftLayer_Exception', 'Not found')
+        climock.side_effect = ex
+
+        with self.assertRaises(SystemExit):
+            core.main()
+
+        self.assertIn("SoftLayerAPIError(SoftLayer_Exception): Not found",
+                      stdoutmock.getvalue())
+
+    @mock.patch('SoftLayer.CLI.core.cli.main')
+    @mock.patch('sys.stdout', new_callable=utils.StringIO)
+    def test_auth_error(self, stdoutmock, climock):
+        ex = SoftLayer.SoftLayerAPIError('SoftLayer_Exception',
+                                         'Invalid API token.')
+        climock.side_effect = ex
+
+        with self.assertRaises(SystemExit):
+            core.main()
+
+        self.assertIn("Authentication Failed:", stdoutmock.getvalue())
+        self.assertIn("use 'sl config setup'", stdoutmock.getvalue())
 
 
-class SubmoduleFixture(environment.CLIRunnable):
-    """
-usage: sl vs list [options]
+def recursive_subcommand_loader(root, path=''):
+    """Recursively load and list every command."""
 
-Options:
-  --hourly  Show hourly instances
-"""
-    options = []
+    if getattr(root, 'list_commands', None) is None:
+        return
 
-    def execute(self, args):
-        return "test"
+    ctx = click.Context(root)
 
-
-class EnvironmentFixture(environment.Environment):
-    def __init__(self):
-        super(EnvironmentFixture, self).__init__()
-        self.plugins = {'vs': {'list': SubmoduleFixture}}
-        self.aliases = {
-            'meta': 'metadata',
-            'my': 'metadata',
-        }
-        self.config = {}
-
-    def load_module(self, *args, **kwargs):
-        return module_fixture
-
-    def plugin_list(self, *args, **kwargs):
-        return self.plugins.keys()
-
-
-class CommandLineTests(testing.TestCase):
-    def set_up(self):
-        self.env = EnvironmentFixture()
-        self.env.get_module_name = mock.MagicMock()
-
-    def test_normal_path(self):
-        self.env.get_module_name.return_value = 'vs'
-        self.assertRaises(
-            SystemExit, core.main,
-            args=['vs', 'list', '--config=path/to/config'],
-            env=self.env)
-        self.assertRaises(
-            SystemExit, core.main,
-            args=['vs', 'nope', '--config=path/to/config'], env=self.env)
-        self.assertRaises(
-            SystemExit, core.main,
-            args=['vs', 'list', '--format=totallynotvalid'], env=self.env)
-
-    @mock.patch('SoftLayer.TimedClient.get_last_calls')
-    def test_normal_path_with_timings(self, calls_mock):
-        calls_mock.return_value = [('SERVICE.METHOD', 1000, 0.25)]
-        self.env.get_module_name.return_value = 'vs'
-        self.assertRaises(
-            SystemExit, core.main,
-            args=['vs', 'list', '--config=path/to/config', '--timings'],
-            env=self.env)
-        calls_mock.assert_called()
-
-    @mock.patch('logging.getLogger')
-    @mock.patch('logging.StreamHandler')
-    def test_with_debug(self, stream_handler, logger):
-        self.env.get_module_name.return_value = 'vs'
-        self.assertRaises(
-            SystemExit, core.main,
-            args=['vs', 'list', '--debug=3'],
-            env=self.env)
-        logger().setLevel.assert_called_with(10)
-        logger().addHandler.assert_called_with(stream_handler())
-
-    def test_invalid_module(self):
-        self.env.get_module_name.return_value = 'nope'
-        self.assertRaises(
-            SystemExit, core.main,
-            args=['nope', 'list', '--config=path/to/config'], env=self.env)
-
-    def test_module_with_no_command(self):
-        self.env.plugins = {
-            'vs': {'list': SubmoduleFixture, None: SubmoduleFixture}
-        }
-        self.env.get_module_name.return_value = 'vs'
-        self.env.load_module = mock.MagicMock()
-        self.env.load_module.return_value = module_no_command_fixture
-        resolver = core.CommandParser(self.env)
-        command, command_args = resolver.parse(['vs', 'list'])
-        self.assertEqual(SubmoduleFixture, command)
-
-    def test_main(self):
-        self.env.get_module_name.return_value = 'vs'
-        self.env.plugins = {
-            'vs': {'list': SubmoduleFixture}
-        }
-        self.assertRaises(
-            SystemExit, core.main,
-            args=['vs', 'list'],
-            env=self.env)
-
-    def test_help(self):
-        self.env.get_module_name.return_value = 'help'
-        self.assertRaises(
-            SystemExit, core.main,
-            args=['help', 'vs', '--config=path/to/config'], env=self.env)
-
-    def test_keyboard_interrupt(self):
-        self.env.get_module_name.side_effect = KeyboardInterrupt
-        self.assertRaises(
-            SystemExit, core.main, args=['vs', 'list'], env=self.env)
-
-    def test_abort(self):
-        self.env.get_module_name.side_effect = exceptions.CLIAbort('exit!')
-        self.assertRaises(
-            SystemExit, core.main, args=['vs', 'list'], env=self.env)
-
-    def test_invalid_module_error(self):
-        self.env.get_module_name.side_effect = exceptions.InvalidModule('vs')
-        self.assertRaises(
-            SystemExit, core.main, args=['vs', 'list'], env=self.env)
-
-    def test_softlayer_error(self):
-        self.env.get_module_name.side_effect = SoftLayer.SoftLayerError
-        self.assertRaises(
-            SystemExit, core.main, args=['vs', 'list'], env=self.env)
-
-    def test_softlayer_api_error(self):
-        error = SoftLayer.SoftLayerAPIError('Exception', 'Exception Text')
-        self.env.get_module_name.side_effect = error
-        self.assertRaises(
-            SystemExit, core.main, args=['vs', 'list'], env=self.env)
-
-    def test_softlayer_api_error_authentication_error(self):
-        error = SoftLayer.SoftLayerAPIError('SoftLayerException',
-                                            'Invalid API Token')
-        self.env.get_module_name.side_effect = error
-        self.assertRaises(
-            SystemExit, core.main, args=['vs', 'list'], env=self.env)
-
-    def test_system_exit_error(self):
-        self.env.get_module_name.side_effect = SystemExit
-        self.assertRaises(
-            SystemExit, core.main, args=['vs', 'list'], env=self.env)
-
-    @mock.patch('traceback.format_exc')
-    def test_uncaught_error(self, m):
-        # Exceptions not caught should just Exit
-        errors = [TypeError, RuntimeError, NameError, OSError, SystemError]
-        for err in errors:
-            m.reset_mock()
-            m.return_value = 'testing'
-            self.env.get_module_name.side_effect = err
-            self.assertRaises(
-                SystemExit, core.main, args=['vs', 'list'], env=self.env)
-            m.assert_called_once_with()
-
-
-class TestCommandParser(testing.TestCase):
-    def set_up(self):
-        self.env = EnvironmentFixture()
-        self.parser = core.CommandParser(self.env)
-
-    def test_main(self,):
-        args = self.parser.parse_main_args(
-            args=['vs', 'list'])
-
-        self.assertEqual(args['help'], False)
-        self.assertEqual(args['<module>'], 'vs')
-        self.assertEqual(args['<args>'], ['list'])
-
-    def test_primary_help(self):
-        args = self.parser.parse_main_args(args=[])
-        self.assertEqual({
-            '--help': False,
-            '<args>': [],
-            '<module>': None,
-            '<command>': None,
-            'help': False,
-        }, args)
-
-        args = self.parser.parse_main_args(args=['help'])
-        self.assertEqual({
-            '--help': False,
-            '<args>': [],
-            '<module>': 'help',
-            '<command>': None,
-            'help': False,
-        }, args)
-
-        args = self.parser.parse_main_args(args=['help', 'module'])
-        self.assertEqual({
-            '--help': False,
-            '<args>': ['module'],
-            '<module>': 'help',
-            '<command>': None,
-            'help': False,
-        }, args)
-
-        self.assertRaises(
-            SystemExit, self.parser.parse_main_args, args=['--help'])
-
-    @mock.patch('sys.stdout.isatty', return_value=True)
-    def test_tty(self, tty):
-        self.assertRaises(
-            SystemExit, self.parser.parse_command_args, 'vs', 'list', [])
-
-    def test_confirm(self):
-        command = mock.MagicMock()
-        command.options = ['confirm']
-        command.__doc__ = 'usage: sl vs list [options]'
-        self.env.get_command = mock.MagicMock()
-        self.env.get_command.return_value = command
-        self.assertRaises(
-            SystemExit, self.parser.parse_command_args, 'vs', 'list', [])
+    for command in root.list_commands(ctx):
+        new_root = root.get_command(ctx, command)
+        new_path = '%s:%s' % (path, command)
+        recursive_subcommand_loader(new_root, path=new_path)
+        logging.info('loading %s', new_path)

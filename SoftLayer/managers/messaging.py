@@ -21,7 +21,7 @@ ENDPOINTS = {
 
 
 class QueueAuth(requests.auth.AuthBase):
-    """ Message Queue authentication for requests
+    """Message Queue authentication for requests.
 
     :param endpoint: endpoint URL
     :param username: SoftLayer username
@@ -35,7 +35,7 @@ class QueueAuth(requests.auth.AuthBase):
         self.auth_token = auth_token
 
     def auth(self):
-        """ Do Authentication """
+        """Do Authentication."""
         headers = {
             'X-Auth-User': self.username,
             'X-Auth-Key': self.api_key
@@ -48,7 +48,7 @@ class QueueAuth(requests.auth.AuthBase):
                                              % resp.status_code)
 
     def handle_error(self, resp, **_):
-        """ Handle errors """
+        """Handle errors."""
         resp.request.deregister_hook('response', self.handle_error)
         if resp.status_code == 503:
             resp.connection.send(resp.request)
@@ -58,8 +58,9 @@ class QueueAuth(requests.auth.AuthBase):
             resp.connection.send(resp.request)
 
     def __call__(self, resp):
-        """ Attach auth token to the request. Do authentication if an auth
-            token isn't available
+        """Attach auth token to the request.
+
+        Do authentication if an auth token isn't available
         """
         if not self.auth_token:
             self.auth()
@@ -69,12 +70,12 @@ class QueueAuth(requests.auth.AuthBase):
 
 
 class MessagingManager(object):
-    """ Manage SoftLayer Message Queue """
+    """Manage SoftLayer Message Queue."""
     def __init__(self, client):
         self.client = client
 
     def list_accounts(self, **kwargs):
-        """ List message queue accounts
+        """List message queue accounts.
 
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         """
@@ -90,7 +91,7 @@ class MessagingManager(object):
         return self.client['Account'].getMessageQueueAccounts(**kwargs)
 
     def get_endpoint(self, datacenter=None, network=None):
-        """ Get a message queue endpoint based on datacenter/network type
+        """Get a message queue endpoint based on datacenter/network type.
 
         :param datacenter: datacenter code
         :param network: network ('public' or 'private')
@@ -107,11 +108,11 @@ class MessagingManager(object):
                             % (datacenter, network))
 
     def get_endpoints(self):
-        """ Get all known message queue endpoints """
+        """Get all known message queue endpoints."""
         return ENDPOINTS
 
     def get_connection(self, account_id, datacenter=None, network=None):
-        """ Get connection to Message Queue Service
+        """Get connection to Message Queue Service.
 
         :param account_id: Message Queue Account id
         :param datacenter: Datacenter code
@@ -130,7 +131,7 @@ class MessagingManager(object):
         return client
 
     def ping(self, datacenter=None, network=None):
-        """ Ping a message queue endpoint """
+        """Ping a message queue endpoint."""
         resp = requests.get('%s/v1/ping' %
                             self.get_endpoint(datacenter, network))
         resp.raise_for_status()
@@ -138,7 +139,7 @@ class MessagingManager(object):
 
 
 class MessagingConnection(object):
-    """ Message Queue Service Connection
+    """Message Queue Service Connection.
 
     :param account_id: Message Queue Account id
     :param endpoint: Endpoint URL
@@ -149,7 +150,7 @@ class MessagingConnection(object):
         self.auth = None
 
     def _make_request(self, method, path, **kwargs):
-        """ Make request. Generally not called directly
+        """Make request. Generally not called directly.
 
         :param method: HTTP Method
         :param path: resource Path
@@ -169,7 +170,7 @@ class MessagingConnection(object):
         return resp
 
     def authenticate(self, username, api_key, auth_token=None):
-        """ Make request. Generally not called directly
+        """Authenticate this connection using the given credentials.
 
         :param username: SoftLayer username
         :param api_key: SoftLayer API Key
@@ -183,7 +184,7 @@ class MessagingConnection(object):
         self.auth = auth
 
     def stats(self, period='hour'):
-        """ Get account stats
+        """Get account stats.
 
         :param period: 'hour', 'day', 'week', 'month'
         """
@@ -193,7 +194,7 @@ class MessagingConnection(object):
     # QUEUE METHODS
 
     def get_queues(self, tags=None):
-        """ Get listing of queues
+        """Get listing of queues.
 
         :param list tags: (optional) list of tags to filter by
         """
@@ -204,7 +205,7 @@ class MessagingConnection(object):
         return resp.json()
 
     def create_queue(self, queue_name, **kwargs):
-        """ Create Queue
+        """Create Queue.
 
         :param queue_name: Queue Name
         :param dict \\*\\*kwargs: queue options
@@ -216,7 +217,7 @@ class MessagingConnection(object):
         return resp.json()
 
     def modify_queue(self, queue_name, **kwargs):
-        """ Modify Queue
+        """Modify Queue.
 
         :param queue_name: Queue Name
         :param dict \\*\\*kwargs: queue options
@@ -224,7 +225,7 @@ class MessagingConnection(object):
         return self.create_queue(queue_name, **kwargs)
 
     def get_queue(self, queue_name):
-        """ Get queue details
+        """Get queue details.
 
         :param queue_name: Queue Name
         """
@@ -232,7 +233,7 @@ class MessagingConnection(object):
         return resp.json()
 
     def delete_queue(self, queue_name, force=False):
-        """ Delete Queue
+        """Delete Queue.
 
         :param queue_name: Queue Name
         :param force: (optional) Force queue to be deleted even if there
@@ -245,7 +246,7 @@ class MessagingConnection(object):
         return True
 
     def push_queue_message(self, queue_name, body, **kwargs):
-        """ Create Queue Message
+        """Create Queue Message.
 
         :param queue_name: Queue Name
         :param body: Message body
@@ -258,7 +259,7 @@ class MessagingConnection(object):
         return resp.json()
 
     def pop_messages(self, queue_name, count=1):
-        """ Pop messages from a queue
+        """Pop messages from a queue.
 
         :param queue_name: Queue Name
         :param count: (optional) number of messages to retrieve
@@ -268,8 +269,9 @@ class MessagingConnection(object):
         return resp.json()
 
     def pop_message(self, queue_name):
-        """ Pop a single message from a queue. If no messages are returned
-            this returns None
+        """Pop a single message from a queue.
+
+        If no messages are returned this returns None
 
         :param queue_name: Queue Name
         """
@@ -280,7 +282,7 @@ class MessagingConnection(object):
             return None
 
     def delete_message(self, queue_name, message_id):
-        """ Delete a message
+        """Delete a message.
 
         :param queue_name: Queue Name
         :param message_id: Message id
@@ -292,7 +294,7 @@ class MessagingConnection(object):
     # TOPIC METHODS
 
     def get_topics(self, tags=None):
-        """ Get listing of topics
+        """Get listing of topics.
 
         :param list tags: (optional) list of tags to filter by
         """
@@ -303,7 +305,7 @@ class MessagingConnection(object):
         return resp.json()
 
     def create_topic(self, topic_name, **kwargs):
-        """ Create Topic
+        """Create Topic.
 
         :param topic_name: Topic Name
         :param dict \\*\\*kwargs: Topic options
@@ -313,7 +315,7 @@ class MessagingConnection(object):
         return resp.json()
 
     def modify_topic(self, topic_name, **kwargs):
-        """ Modify Topic
+        """Modify Topic.
 
         :param topic_name: Topic Name
         :param dict \\*\\*kwargs: Topic options
@@ -321,7 +323,7 @@ class MessagingConnection(object):
         return self.create_topic(topic_name, **kwargs)
 
     def get_topic(self, topic_name):
-        """ Get topic details
+        """Get topic details.
 
         :param topic_name: Topic Name
         """
@@ -329,7 +331,7 @@ class MessagingConnection(object):
         return resp.json()
 
     def delete_topic(self, topic_name, force=False):
-        """ Delete Topic
+        """Delete Topic.
 
         :param topic_name: Topic Name
         :param force: (optional) Force topic to be deleted even if there
@@ -342,7 +344,7 @@ class MessagingConnection(object):
         return True
 
     def push_topic_message(self, topic_name, body, **kwargs):
-        """ Create Topic Message
+        """Create Topic Message.
 
         :param topic_name: Topic Name
         :param body: Message body
@@ -355,7 +357,7 @@ class MessagingConnection(object):
         return resp.json()
 
     def get_subscriptions(self, topic_name):
-        """ Listing of subscriptions on a topic
+        """Listing of subscriptions on a topic.
 
         :param topic_name: Topic Name
         """
@@ -364,7 +366,7 @@ class MessagingConnection(object):
         return resp.json()
 
     def create_subscription(self, topic_name, subscription_type, **kwargs):
-        """ Create Subscription
+        """Create Subscription.
 
         :param topic_name: Topic Name
         :param subscription_type: type ('queue' or 'http')
@@ -377,7 +379,7 @@ class MessagingConnection(object):
         return resp.json()
 
     def delete_subscription(self, topic_name, subscription_id):
-        """ Delete a subscription
+        """Delete a subscription.
 
         :param topic_name: Topic Name
         :param subscription_id: Subscription id

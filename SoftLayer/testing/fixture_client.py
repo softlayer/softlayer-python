@@ -6,18 +6,30 @@
 """
 # Disable pylint import error because mock might not be installed.
 # Also disable the too-few-public-methods error.
-# pylint: disable=F0401,R0903
+# pylint: disable=F0401,R0903,unused-argument
+import SoftLayer
+
 import importlib
 
-import mock
+try:
+    import mock
+    HAS_MOCK = True
+except ImportError:
+    HAS_MOCK = False
 
 
-class FixtureClient(mock.MagicMixin):
-    """ Implements an interface similiar to SoftLayer.Client() """
+class FixtureClient(object):
+    """Implements an interface similiar to SoftLayer.Client()."""
 
     def __init__(self):
         # Keep track of Service instances in order to do future assertions
         self.loaded_services = {}
+
+        # The following properties are used to appear like a normal client
+        self.auth = SoftLayer.BasicAuthentication('default-user',
+                                                  'default-key')
+        self.endpoint_url = 'default-endpoint-url'
+        self.timeout = 10
 
     def __getitem__(self, service_name):
         if service_name in self.loaded_services:
@@ -28,13 +40,19 @@ class FixtureClient(mock.MagicMixin):
 
         return service
 
+    def call(self, service, method, *args, **kwargs):
+        return getattr(self[service], method)(*args, **kwargs)
+
     def reset_mock(self):
-        """ Reset all of the loaded mocks """
+        """Reset all of the loaded mocks."""
         self.loaded_services = {}
 
+    def __str__(self):
+        return "<SoftLayer.testing.fixture_client>"
 
-class FixtureService(mock.MagicMixin):
-    """ Implements an interface similiar to SoftLayer.Service() """
+
+class FixtureService(object):
+    """Implements an interface similiar to SoftLayer.Service()."""
 
     def __init__(self, service_name):
         self.service_name = service_name
@@ -52,13 +70,24 @@ class FixtureService(mock.MagicMixin):
         if name in self.loaded_methods:
             return self.loaded_methods[name]
 
-        call_handler = mock.MagicMock()
         fixture = getattr(self.module, name, None)
         if fixture is not None:
-            call_handler.return_value = fixture
+            call_handler = _wrap_fixture(fixture)
+            self.loaded_methods[name] = call_handler
+            return call_handler
         else:
             raise NotImplementedError('%s::%s fixture is not implemented'
                                       % (self.service_name, name))
 
-        self.loaded_methods[name] = call_handler
+
+def _wrap_fixture(fixture):
+    """Wraps the fixture in either a MagicMock object or a closure."""
+    if HAS_MOCK:
+        call_handler = mock.MagicMock()
+        call_handler.return_value = fixture
         return call_handler
+
+    def wrapped(*args, **kwargs):
+        return fixture
+
+    return wrapped

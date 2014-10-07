@@ -4,8 +4,8 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import os
 
+import click
 import mock
 
 from SoftLayer.CLI import environment
@@ -18,30 +18,10 @@ class EnvironmentTests(testing.TestCase):
     def set_up(self):
         self.env = environment.Environment()
 
-    def test_plugin_list(self):
-        actions = self.env.plugin_list()
+    def test_module_list(self):
+        actions = self.env.module_list()
         self.assertIn('vs', actions)
         self.assertIn('dns', actions)
-
-    def test_add_plugin(self):
-        m = mock.MagicMock()
-        m.action = 'add_plugin_action_test'
-        self.env.add_plugin(m)
-
-        self.assertEqual(self.env.plugins,
-                         {'mock': {'add_plugin_action_test': m}})
-
-    def test_out(self):
-        self.env.stdout = mock.MagicMock()
-        self.env.out('TEXT OUTPUT')
-        self.env.stdout.write.assert_any_call('TEXT OUTPUT')
-        self.env.stdout.write.assert_any_call(os.linesep)
-
-    def test_err(self):
-        self.env.stderr = mock.MagicMock()
-        self.env.err('TEXT OUTPUT')
-        self.env.stderr.write.assert_any_call('TEXT OUTPUT')
-        self.env.stderr.write.assert_any_call(os.linesep)
 
     @mock.patch('SoftLayer.utils.console_input')
     def test_input(self, raw_input_mock):
@@ -65,20 +45,9 @@ class EnvironmentTests(testing.TestCase):
 
     def test_get_command_invalid(self):
         self.assertRaises(exceptions.InvalidCommand,
-                          self.env.get_command, 'vs', 'list')
+                          self.env.get_command, 'invalid', 'command')
 
     def test_get_command(self):
         self.env.plugins = {'vs': {'list': 'something'}}
         command = self.env.get_command('vs', 'list')
-        self.assertEqual(command, 'something')
-
-    def test_get_command_none(self):
-        # If None is in the action list, anything that doesn't exist as a
-        # command will return the value of the None key. This is to support
-        # sl help any_module_name
-        self.env.plugins = {'vs': {None: 'something'}}
-        command = self.env.get_command('vs', 'something else')
-        self.assertEqual(command, 'something')
-
-    def test_exit(self):
-        self.assertRaises(SystemExit, self.env.exit, 1)
+        self.assertIsInstance(command, click.Command)
