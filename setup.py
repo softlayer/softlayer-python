@@ -107,6 +107,12 @@ setup(
             'globalip:list = SoftLayer.CLI.globalip.list:cli',
             'globalip:unassign = SoftLayer.CLI.globalip.unassign:cli',
 
+            'image = SoftLayer.CLI.image',
+            'image:delete = SoftLayer.CLI.image.delete:cli',
+            'image:detail = SoftLayer.CLI.image.detail:cli',
+            'image:edit = SoftLayer.CLI.image.edit:cli',
+            'image:list = SoftLayer.CLI.image.list:cli',
+
             'summary = SoftLayer.CLI.summary:cli',
         ]
     },
