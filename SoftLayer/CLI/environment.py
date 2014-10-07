@@ -16,7 +16,7 @@ from SoftLayer import utils
 import click
 import pkg_resources
 
-# pylint: disable=R0201
+# pylint: disable=too-many-instance-attributes, invalid-name
 
 
 class Environment(object):
@@ -44,6 +44,8 @@ class Environment(object):
         self.config_file = None
 
     def command_list(self, module_name):
+        """Command listing"""
+
         self._load_modules()
         # Filter commands registered as None. These are the bases.
         return sorted([m for m in self.plugins[module_name].keys()
@@ -65,6 +67,7 @@ class Environment(object):
         raise exceptions.InvalidCommand(module_name, command_name)
 
     def get_module(self, module_name):
+        """Returns the module"""
         self._load_modules()
         return self.get_command(module_name, None)
 

@@ -10,17 +10,16 @@ import click
 
 
 @click.command()
-@click.argument('identifier')
-@click.option('--v6', is_flag=True, help='Order a IPv6 IP')
+@click.option('--ipv6', '--v6', is_flag=True, help='Order a IPv6 IP')
 @click.option('--test', help='test order')
 @environment.pass_env
-def cli(env, identifier, v6, test):
+def cli(env, ipv6, test):
     """Creates a global IP"""
 
     mgr = SoftLayer.NetworkManager(env.client)
 
     version = 4
-    if v6:
+    if ipv6:
         version = 6
     if not test and not env.skip_confirmations:
         if not formatting.confirm("This action will incur charges on your "

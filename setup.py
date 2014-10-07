@@ -103,7 +103,7 @@ setup(
             'globalip = SoftLayer.CLI.globalip',
             'globalip:assign = SoftLayer.CLI.globalip.assign:cli',
             'globalip:cancel = SoftLayer.CLI.globalip.cancel:cli',
-            'globalip:detail = SoftLayer.CLI.globalip.create:cli',
+            'globalip:create = SoftLayer.CLI.globalip.create:cli',
             'globalip:list = SoftLayer.CLI.globalip.list:cli',
             'globalip:unassign = SoftLayer.CLI.globalip.unassign:cli',
 

@@ -38,8 +38,8 @@ def cli(env, identifier, domain, userfile, tag, hostname, userdata):
     if userdata:
         data['userdata'] = userdata
     elif userfile:
-        with open(userfile, 'r') as f:
-            data['userdata'] = f.read()
+        with open(userfile, 'r') as userfile_obj:
+            data['userdata'] = userfile_obj.read()
 
     data['hostname'] = hostname
     data['domain'] = domain

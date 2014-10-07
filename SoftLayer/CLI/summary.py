@@ -8,7 +8,7 @@ from SoftLayer.CLI import formatting
 import click
 
 
-@click.command(help="Display summary information about the account")
+@click.command()
 @click.option('--sortby',
               help='Column to sort by',
               default='datacenter',
@@ -21,6 +21,8 @@ import click
                                  'vs']))
 @environment.pass_env
 def cli(env, sortby):
+    """Display summary information about the account"""
+
     mgr = SoftLayer.NetworkManager(env.client)
     datacenters = mgr.summary_by_datacenter()
 

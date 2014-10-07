@@ -16,6 +16,7 @@ from SoftLayer.CLI import formatting
 
 import click
 # pylint: disable=too-many-public-methods, broad-except, unused-argument
+# pylint: disable=redefined-builtin
 
 DEBUG_LOGGING_MAP = {
     '0': logging.CRITICAL,

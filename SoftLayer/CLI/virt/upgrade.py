@@ -11,6 +11,7 @@ import click
 
 
 class MemoryType(click.ParamType):
+    """Memory type"""
     name = 'integer'
 
     def convert(self, value, param, ctx):

@@ -15,16 +15,18 @@ import click
               type=click.Choice(['vs', 'vlan', 'server']),
               help='Firewall type',
               required=True)
-@click.option('--ha', is_flag=True, help='High available firewall option')
+@click.option('--high-availability', '--ha',
+              is_flag=True,
+              help='High available firewall option')
 @environment.pass_env
-def cli(env, target, firewall_type, ha):
+def cli(env, target, firewall_type, high_availability):
     """Create new firewall"""
 
     mgr = SoftLayer.FirewallManager(env.client)
 
     if not env.skip_confirmations:
         if firewall_type == 'vlan':
-            pkg = mgr.get_dedicated_package(ha_enabled=ha)
+            pkg = mgr.get_dedicated_package(ha_enabled=high_availability)
         elif firewall_type == 'vs':
             pkg = mgr.get_standard_package(target, is_cci=True)
         elif firewall_type == 'server':
@@ -43,7 +45,7 @@ def cli(env, target, firewall_type, ha):
             raise exceptions.CLIAbort('Aborted.')
 
     if firewall_type == 'vlan':
-        mgr.add_vlan_firewall(target, ha_enabled=ha)
+        mgr.add_vlan_firewall(target, ha_enabled=high_availability)
     elif firewall_type == 'vs':
         mgr.add_standard_firewall(target, is_cci=True)
     elif firewall_type == 'server':

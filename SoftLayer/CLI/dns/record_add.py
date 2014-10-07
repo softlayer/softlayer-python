@@ -6,6 +6,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import helpers
 
 import click
+# pylint: disable=redefined-builtin
 
 
 @click.command()

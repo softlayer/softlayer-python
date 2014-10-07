@@ -15,14 +15,16 @@ arguments, it will attempt to update both the A and PTR records. If you don't
 want to update both records, you may use the -a or --ptr arguments to limit
 the records updated.""")
 @click.argument('identifier')
-@click.option('-a', is_flag=True, help="Sync the A record for the host")
+@click.option('--a-record', '-a',
+              is_flag=True,
+              help="Sync the A record for the host")
 @click.option('--ptr', is_flag=True, help="Sync the PTR record for the host")
 @click.option('--ttl',
               default=7200,
               type=click.INT,
               help="Sets the TTL for the A and/or PTR records")
 @environment.pass_env
-def cli(env, identifier, a, ptr, ttl):
+def cli(env, identifier, a_record, ptr, ttl):
     """Sync DNS records"""
 
     dns = SoftLayer.DNSManager(env.client)
@@ -91,10 +93,10 @@ def cli(env, identifier, a, ptr, ttl):
         raise exceptions.CLIAbort("Aborting DNS sync")
 
     both = False
-    if not ptr and not a:
+    if not ptr and not a_record:
         both = True
 
-    if both or a:
+    if both or a_record:
         sync_a_record()
 
     if both or ptr:

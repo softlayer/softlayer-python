@@ -7,6 +7,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
 import click
+# pylint: disable=redefined-builtin
 
 
 @click.command(short_help="Capture SoftLayer image")
