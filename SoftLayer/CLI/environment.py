@@ -6,15 +6,15 @@
     :license: MIT, see LICENSE for more details.
 """
 import getpass
-import importlib
-import inspect
 import os
 import os.path
 import sys
 
 from SoftLayer.CLI import exceptions
-from SoftLayer.CLI import modules
 from SoftLayer import utils
+
+import click
+import pkg_resources
 
 # pylint: disable=R0201
 
@@ -37,15 +37,36 @@ class Environment(object):
         }
         self.stdout = sys.stdout
         self.stderr = sys.stderr
+        self.client = None
+        self.format = 'table'
+        self.skip_confirmations = False
+        self._modules_loaded = False
+        self.config_file = None
+
+    def command_list(self, module_name):
+        self._load_modules()
+        # Filter commands registered as None. These are the bases.
+        return sorted([m for m in self.plugins[module_name].keys()
+                       if m is not None])
+
+    def module_list(self):
+        """Returns the list of modules in SoftLayer.CLI.modules."""
+        self._load_modules()
+        return sorted(list(self.plugins.keys()))
 
     def get_command(self, module_name, command_name):
         """Based on the loaded modules, return a command."""
+        self._load_modules()
         actions = self.plugins.get(module_name) or {}
+
         if command_name in actions:
-            return actions[command_name]
-        if None in actions:
-            return actions[None]
+            return actions[command_name].load()
+
         raise exceptions.InvalidCommand(module_name, command_name)
+
+    def get_module(self, module_name):
+        self._load_modules()
+        return self.get_command(module_name, None)
 
     def get_module_name(self, module_name):
         """Returns the actual module name. Uses the alias mapping."""
@@ -53,28 +74,22 @@ class Environment(object):
             return self.aliases[module_name]
         return module_name
 
-    def load_module(self, module_name):  # pragma: no cover
+    def _load_modules(self):
         """Loads module by name."""
-        try:
-            module = importlib.import_module('SoftLayer.CLI.modules.%s'
-                                             % module_name)
-            for _, obj in inspect.getmembers(module):
-                if inspect.isclass(obj) and issubclass(obj, CLIRunnable):
-                    self.add_plugin(obj)
-            return module
-        except ImportError:
-            raise exceptions.InvalidModule(module_name)
+        if self._modules_loaded is True:
+            return
 
-    def add_plugin(self, cls):
-        """Add a CLIRunnable as a plugin to the environment."""
-        command = cls.__module__.split('.')[-1]
-        if command not in self.plugins:
-            self.plugins[command] = {}
-        self.plugins[command][cls.action] = cls
+        for obj in pkg_resources.iter_entry_points(group='softlayer.cli',
+                                                   name=None):
+            if ':' in obj.name:
+                module, subcommand = obj.name.split(':')
+            else:
+                module, subcommand = obj.name, None
+            if module not in self.plugins:
+                self.plugins[module] = {}
+            self.plugins[module][subcommand] = obj
 
-    def plugin_list(self):
-        """Returns the list of modules in SoftLayer.CLI.modules."""
-        return modules.get_module_list()
+        self._modules_loaded = True
 
     def out(self, output, newline=True):
         """Outputs a string to the console (stdout)."""
@@ -101,23 +116,4 @@ class Environment(object):
         sys.exit(code)
 
 
-class CLIRunnable(object):
-    """This represents a descrete command or action in the CLI.
-
-    CLIRunnable is intended to be subclassed.
-
-    """
-    options = []  # set by subclass
-    action = 'not set'  # set by subclass
-
-    def __init__(self, client=None, env=None):
-        self.client = client
-        self.env = env
-
-    def execute(self, args):
-        """Execute the command.
-
-        This is intended to be overridden in a subclass.
-
-        """
-        pass
+pass_env = click.make_pass_decorator(Environment, ensure=True)

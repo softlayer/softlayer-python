@@ -9,7 +9,6 @@
 """
 import os.path
 
-from SoftLayer.CLI import exceptions
 from SoftLayer import utils
 
 
@@ -18,16 +17,12 @@ def update_with_template_args(args, list_args=None):
 
     :param dict args: command-line arguments
     """
-    if not args.get('--template'):
+    if not args.get('template'):
         return
 
     list_args = list_args or []
 
-    template_path = args.pop('--template')
-    if not os.path.exists(template_path):
-        raise exceptions.ArgumentError(
-            'File does not exist [-t | --template] = %s'
-            % template_path)
+    template_path = args.pop('template')
 
     config = utils.configparser.ConfigParser()
     ini_str = '[settings]\n' + open(
@@ -53,15 +48,14 @@ def export_to_template(filename, args, exclude=None):
                                     be exported
     """
     exclude = exclude or []
-    exclude.append('--config')
-    exclude.append('--really')
-    exclude.append('--format')
-    exclude.append('--debug')
+    exclude.append('config')
+    exclude.append('really')
+    exclude.append('format')
+    exclude.append('debug')
 
     with open(filename, "w") as template_file:
         for k, val in args.items():
-            if val and k.startswith('-') and k not in exclude:
-                k = k.lstrip('-')
+            if val and k not in exclude:
                 if isinstance(val, list):
                     val = ','.join(val)
                 template_file.write('%s=%s\n' % (k, val))
