@@ -24,7 +24,6 @@ DEBUG_LOGGING_MAP = {
     '3': logging.DEBUG
 }
 
-
 VALID_FORMATS = ['table', 'raw', 'json']
 DEFAULT_FORMAT = 'raw'
 if sys.stdout.isatty():
