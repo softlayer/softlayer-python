@@ -100,11 +100,11 @@ Options:
 
         manager = SoftLayer.DNSManager(self.client)
         lines = [line.strip() for line in open(args['<file>'])]
-        zoneSearch = re.search('\$ORIGIN (?P<zone>.*)\.',lines[0])
+        zoneSearch = re.search('^\$ORIGIN (?P<zone>.*)\.',lines[0])
         zone = zoneSearch.group('zone')
 
         if (dryRun):
-            print  "Starting up a dry run..." 
+            print  "Starting up a dry run for %s..." % (zone) 
             zone_id = 0
         else:
             try:
@@ -114,9 +114,11 @@ Options:
                 manager.create_zone(zone)
                 zone_id = helpers.resolve_id(manager.resolve_ids, zone,name='zone')
 
-        for content in lines:
-            domainSearch = re.search('((?P<domain>(\w+(\.)?)*|\@)?\s+(?P<ttl>\d+)?\s+(?P<class>\w+)?)?\s+(?P<type>\w+)\s+(?P<record>.*)',content)
-            if (domainSearch is not None): 
+        for content in lines[1:]:
+            domainSearch = re.search('^((?P<domain>([\w-]+(\.)?)*|\@)?\s+(?P<ttl>\d+)?\s+(?P<class>\w+)?)?\s+(?P<type>\w+)\s+(?P<record>.*)',content)
+            if (domainSearch is None): 
+                print "\033[92mFailed: unknown line:   %s\033[0m" % (content)
+            else:
                 domainName = domainSearch.group('domain')
                 #The API requires we send a host, although bind allows a blank entry. @ is the same thing as blank
                 if (domainName is None):
