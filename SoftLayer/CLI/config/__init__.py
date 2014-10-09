@@ -1,4 +1,4 @@
-"""View and edit CLI configuration"""
+"""CLI configuration"""
 # :license: MIT, see LICENSE for more details.
 
 from SoftLayer.CLI import formatting

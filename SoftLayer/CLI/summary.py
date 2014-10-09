@@ -1,4 +1,4 @@
-"""Display summary information about the account"""
+"""Account summary"""
 # :license: MIT, see LICENSE for more details.
 
 import SoftLayer

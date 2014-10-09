@@ -1,4 +1,4 @@
-"""Get details for an image"""
+"""Edit details of an image"""
 # :license: MIT, see LICENSE for more details.
 
 import SoftLayer
@@ -16,6 +16,8 @@ import click
 @click.option('--tag', help="Tags for the image")
 @environment.pass_env
 def cli(env, identifier, name, note, tag):
+    """Edit details of an image"""
+
     image_mgr = SoftLayer.ImageManager(env.client)
     data = {}
     if name:

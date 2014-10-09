@@ -1,7 +1,7 @@
 """
 usage: sl loadbal [<command>] [<args>...] [options]
 
-Local LoadBalancer management
+Load-balancer management
 
 The available commands are:
   cancel           Cancel an existing load balancer

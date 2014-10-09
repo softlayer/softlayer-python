@@ -46,7 +46,7 @@ def get_api_key(client, username, secret, endpoint_url=None):
 @click.command()
 @environment.pass_env
 def cli(env):
-    """Show current CLI configuration"""
+    """Edit configuration"""
 
     username, secret, endpoint_url, timeout = get_user_input(env)
 

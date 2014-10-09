@@ -1,7 +1,7 @@
 """
 usage: sl nas [<command>] [<args>...] [options]
 
-Manage NAS accounts
+Network Attached Storage
 
 The available commands are:
   list  List NAS accounts

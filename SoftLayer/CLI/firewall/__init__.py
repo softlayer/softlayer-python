@@ -1,4 +1,4 @@
-"""Firewall rule and security management"""
+"""Firewalls"""
 # :license: MIT, see LICENSE for more details.
 
 from SoftLayer.CLI import exceptions
