@@ -29,7 +29,6 @@ def has_firewall(vlan):
 
 
 class FirewallManager(utils.IdentifierMixin, object):
-
     """ Manages firewalls.
 
     :param SoftLayer.API.Client client: the API client instance
@@ -49,17 +48,13 @@ class FirewallManager(utils.IdentifierMixin, object):
                             False for a server
         :returns: A dictionary containing the standard CCI firewall package
         """
+
         firewall_port_speed = self._get_fwl_port_speed(server_id, is_cci)
 
-        _filter = utils.NestedDict({})
-        _value = "%s%s" % (firewall_port_speed,
-                           "Mbps Hardware Firewall")
-        _filter['items']['description'] = utils.query_filter(_value)
+        _value = "%s%s" % (firewall_port_speed, "Mbps Hardware Firewall")
+        _filter = {'items': {'description': utils.query_filter(_value)}}
 
-        kwargs = utils.NestedDict({})
-        kwargs['id'] = 0  # look at package id 0
-        kwargs['filter'] = _filter.to_dict()
-        return self.prod_pkg.getItems(**kwargs)
+        return self.prod_pkg.getItems(id=0, filter=_filter)
 
     def get_dedicated_package(self, ha_enabled=False):
         """ Retrieves the dedicated firewall package.
@@ -77,10 +72,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         else:
             _filter['items']['description'] = utils.query_filter(fwl_filter)
 
-        kwargs = utils.NestedDict({})
-        kwargs['id'] = 0  # look at package id 0
-        kwargs['filter'] = _filter.to_dict()
-        return self.prod_pkg.getItems(**kwargs)
+        return self.prod_pkg.getItems(id=0, filter=_filter.to_dict())
 
     def cancel_firewall(self, firewall_id, dedicated=False):
         """ Cancels the specified firewall.
@@ -89,6 +81,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         :param bool dedicated: If true, the firewall instance is dedicated,
                                otherwise, the firewall instance is shared.
         """
+
         fwl_billing = self._get_fwl_billing_item(firewall_id, dedicated)
         billing_id = fwl_billing['billingItem']['id']
         billing_item = self.client['Billing_Item']
@@ -102,6 +95,7 @@ class FirewallManager(utils.IdentifierMixin, object):
                             otherwise for a CCI
         :returns: A dictionary containing the standard CCI firewall order
         """
+
         package = self.get_standard_package(server_id, is_cci)
         if is_cci:
             product_order = {
@@ -131,6 +125,7 @@ class FirewallManager(utils.IdentifierMixin, object):
 
         :returns: A dictionary containing the VLAN firewall order
         """
+
         package = self.get_dedicated_package(ha_enabled)
         product_order = {
             'complexType': 'SoftLayer_Container_Product_Order_Network_'
@@ -149,6 +144,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         :param bool dedicated: whether the firewall is dedicated or standard
         :returns: A dictionary of the firewall billing item.
         """
+
         mask = ('mask[id,billingItem[id]]')
         if dedicated:
             fwl_svc = self.client['Network_Vlan_Firewall']
@@ -163,15 +159,15 @@ class FirewallManager(utils.IdentifierMixin, object):
         :param bool is_cci: true if the server_id is for a virtual server
         :returns: a integer representing the Mbps speed of a firewall
         """
+
         fwl_port_speed = 0
         if is_cci:
-            mask = ('mask[primaryNetworkComponent[maxSpeed]]')
+            mask = ('primaryNetworkComponent[maxSpeed]')
             svc = self.client['Virtual_Guest']
             primary = svc.getObject(mask=mask, id=server_id)
             fwl_port_speed = primary['primaryNetworkComponent']['maxSpeed']
         else:
-            mask = ('mask[id,maxSpeed,'
-                    'networkComponentGroup.networkComponents]')
+            mask = ('id,maxSpeed,networkComponentGroup.networkComponents')
             svc = self.client['Hardware_Server']
             network_components = svc.getFrontendNetworkComponents(
                 mask=mask, id=server_id)
@@ -207,6 +203,7 @@ class FirewallManager(utils.IdentifierMixin, object):
 
         :returns: A list of firewalls on the current account.
         """
+
         mask = ('firewallNetworkComponents,'
                 'networkVlanFirewall,'
                 'dedicatedFirewallFlag,'
@@ -225,6 +222,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         :param integer firewall_id: the instance ID of the standard firewall
         :returns: A list of the rules.
         """
+
         svc = self.client['Network_Component_Firewall']
         return svc.getRules(id=firewall_id, mask=RULE_MASK)
 
@@ -234,6 +232,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         :param integer firewall_id: the instance ID of the dedicated firewall
         :returns: A list of the rules.
         """
+
         svc = self.client['Network_Vlan_Firewall']
         return svc.getRules(id=firewall_id, mask=RULE_MASK)
 
@@ -243,6 +242,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         :param integer firewall_id: the instance ID of the dedicated firewall
         :param dict rules: the rules to be pushed on the firewall
         """
+
         mask = ('mask[networkVlan[firewallInterfaces'
                 '[firewallContextAccessControlLists]]]')
         svc = self.client['Network_Vlan_Firewall']
@@ -257,10 +257,8 @@ class FirewallManager(utils.IdentifierMixin, object):
                     continue
                 fwl_ctx_acl_id = control_list['id']
 
-        template = {
-            'firewallContextAccessControlListId': fwl_ctx_acl_id,
-            'rules': rules
-        }
+        template = {'firewallContextAccessControlListId': fwl_ctx_acl_id,
+                    'rules': rules}
 
         svc = self.client['Network_Firewall_Update_Request']
         return svc.createObject(template)
@@ -271,9 +269,8 @@ class FirewallManager(utils.IdentifierMixin, object):
         :param integer firewall_id: the instance ID of the standard firewall
         :param dict rules: the rules to be pushed on the firewall
         """
+
         rule_svc = self.client['Network_Firewall_Update_Request']
-        template = {
-            "networkComponentFirewallId": firewall_id,
-            "rules": rules}
+        template = {'networkComponentFirewallId': firewall_id, 'rules': rules}
 
         return rule_svc.createObject(template)

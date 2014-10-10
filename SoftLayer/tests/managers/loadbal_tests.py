@@ -45,12 +45,12 @@ class LoadBalancerTests(testing.TestCase):
         f.assert_called_once()
 
     def test_get_location(self):
-        id1 = self.lb_mgr.get_location('sjc01')
+        id1 = self.lb_mgr._get_location('sjc01')
         f = self.client['Location'].getDataCenters
         f.assert_called_once()
         self.assertEqual(id1, 168642)
 
-        id2 = self.lb_mgr.get_location('dal05')
+        id2 = self.lb_mgr._get_location('dal05')
         f = self.client['Location'].getDataCenters
         f.assert_called_once()
         self.assertEqual(id2, 'FIRST_AVAILABLE')
@@ -151,7 +151,7 @@ class LoadBalancerTests(testing.TestCase):
                 }
             }
         }
-        mask = 'mask[serviceGroups[services[groupReferences,healthChecks]]]'
+        mask = 'serviceGroups[services[groupReferences,healthChecks]]'
         call.assert_called_once_with(filter=_filter, mask=mask, id=loadbal_id)
 
         call = self.client['Network_Application_Delivery_Controller_'
@@ -213,8 +213,7 @@ class LoadBalancerTests(testing.TestCase):
         call = self.client['Network_Application_Delivery_Controller_'
                            'LoadBalancer_VirtualIpAddress'].getObject
 
-        mask = ('mask[virtualServers[serviceGroups'
-                '[services[groupReferences]]]]')
+        mask = 'virtualServers[serviceGroups[services[groupReferences]]]'
         call.assert_called_once_with(mask=mask, id=loadbal_id)
 
         call = self.client['Network_Application_Delivery_Controller_'
@@ -229,8 +228,9 @@ class LoadBalancerTests(testing.TestCase):
                            'LoadBalancer_VirtualIpAddress'].getVirtualServers
 
         _filter = {'virtualServers': {'id': {'operation': group_id}}}
-        mask = 'mask[serviceGroups]'
-        call.assert_called_once_with(filter=_filter, mask=mask, id=loadbal_id)
+        call.assert_called_once_with(filter=_filter,
+                                     mask='serviceGroups',
+                                     id=loadbal_id)
 
         call = self.client['Network_Application_Delivery_Controller_'
                            'LoadBalancer_Service_Group'].kickAllConnections

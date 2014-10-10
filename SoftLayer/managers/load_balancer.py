@@ -9,8 +9,8 @@ from SoftLayer import utils
 
 
 class LoadBalancerManager(utils.IdentifierMixin, object):
-
     """ Manages load balancers.
+
     :param SoftLayer.API.Client client: the API client instance
     """
 
@@ -27,14 +27,10 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :returns: A dictionary containing the load balancer packages
         """
 
-        lb_filter = '*Load Balancer*'
-        _filter = utils.NestedDict({})
-        _filter['items']['description'] = utils.query_filter(lb_filter)
+        _filter = {'items': {'description':
+                             utils.query_filter('*Load Balancer*')}}
 
-        kwargs = utils.NestedDict({})
-        kwargs['id'] = 0  # look at package id 0
-        kwargs['filter'] = _filter.to_dict()
-        packages = self.prod_pkg.getItems(**kwargs)
+        packages = self.prod_pkg.getItems(id=0, filter=_filter)
         pkgs = []
         for package in packages:
             if not package['description'].startswith('Global'):
@@ -46,6 +42,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
         :returns: A dictionary containing the IP address properties
         """
+
         svc = self.client['Network_Subnet_IpAddress']
         return svc.getByIpAddress(ip_address)
 
@@ -54,6 +51,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
         :returns: A dictionary containing the health check types
         """
+
         svc = self.client['Network_Application_Delivery_Controller_'
                           'LoadBalancer_Health_Check_Type']
         return svc.getAllObjects()
@@ -63,6 +61,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
         :returns: A dictionary containing the load balancer routing methods
         """
+
         svc = self.client['Network_Application_Delivery_Controller_'
                           'LoadBalancer_Routing_Method']
         return svc.getAllObjects()
@@ -72,17 +71,19 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
         :returns: A dictionary containing the load balancer routing types
         """
+
         svc = self.client['Network_Application_Delivery_Controller_'
                           'LoadBalancer_Routing_Type']
         return svc.getAllObjects()
 
-    def get_location(self, datacenter):
+    def _get_location(self, datacenter):
         """ Returns the location of the specified datacenter
 
         :param string datacenter: The datacenter to create the loadbalancer in
 
         :returns: the location id of the given datacenter
         """
+
         dcenters = self.client['Location'].getDataCenters()
         for dcenter in dcenters:
             if dcenter['name'] == datacenter:
@@ -94,6 +95,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
         :param int loadbal_id: Load Balancer ID to be cancelled.
         """
+
         lb_billing = self.lb_svc.getBillingItem(id=loadbal_id)
         billing_id = lb_billing['id']
         billing_item = self.client['Billing_Item']
@@ -104,15 +106,15 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
         :param int price_item_id: The price item ID for the load balancer
         :param string datacenter: The datacenter to create the loadbalancer in
-
         :returns: A dictionary containing the product order
         """
+
         product_order = {
             'complexType': 'SoftLayer_Container_Product_Order_Network_'
                            'LoadBalancer',
             'quantity': 1,
             'packageId': 0,
-            "location": self.get_location(datacenter),
+            "location": self._get_location(datacenter),
             'prices': [{'id': price_item_id}]
         }
         return self.client['Product_Order'].placeOrder(product_order)
@@ -122,16 +124,17 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
         :returns: A list of all local load balancers on the current account.
         """
+
         mask = ('mask[loadBalancerHardware[datacenter],ipAddress]')
         return self.account.getAdcLoadBalancers(mask=mask)
 
     def get_local_lb(self, loadbal_id, **kwargs):
         """ Returns a specified local load balancer given the id.
-        :param int loadbal_id: The id of the load balancer to retrieve
 
+        :param int loadbal_id: The id of the load balancer to retrieve
         :returns: A dictionary containing the details of the load balancer
         """
-        # virtualServers.serviceGroups.services.ipAddress
+
         if 'mask' not in kwargs:
             kwargs['mask'] = ('mask[loadBalancerHardware[datacenter], '
                               'ipAddress, virtualServers[serviceGroups'
@@ -146,6 +149,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
         :param int service_id: The id of the service to delete
         """
+
         svc = self.client['Network_Application_Delivery_Controller_'
                           'LoadBalancer_Service']
 
@@ -156,6 +160,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
         :param int group_id: The id of the service group to delete
         """
+
         svc = self.client['Network_Application_Delivery_Controller_'
                           'LoadBalancer_VirtualServer']
 
@@ -166,6 +171,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
         :param int service_id: The id of the service to delete
         """
+
         svc = self.client['Network_Application_Delivery_Controller_'
                           'LoadBalancer_Service']
         return svc.toggleStatus(id=service_id)
@@ -173,6 +179,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
     def edit_service(self, loadbal_id, service_id, ip_address_id=None,
                      port=None, enabled=None, hc_type=None, weight=None):
         """ Edits an existing service properties
+
         :param int loadbal_id: The id of the loadbal where the service resides
         :param int service_id: The id of the service to edit
         :param string ip_address: The ip address of the service
@@ -181,28 +188,26 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :param int hc_type: The health check type
         :param int weight: the weight to give to the service
         """
-        _filter = utils.NestedDict({})
-        _filter['virtualServers']['serviceGroups']['services']['id'] = (
-            utils.query_filter(service_id))
 
-        kwargs = utils.NestedDict({})
-        kwargs['filter'] = _filter.to_dict()
-        kwargs['mask'] = ('mask[serviceGroups[services[groupReferences,'
-                          'healthChecks]]]')
+        _filter = {'virtualServers': {'serviceGroups': {'services': {'id':
+                   utils.query_filter(service_id)}}}}
+
+        mask = 'serviceGroups[services[groupReferences,healthChecks]]'
 
         virtual_servers = self.lb_svc.getVirtualServers(id=loadbal_id,
-                                                        **kwargs)
+                                                        filter=_filter,
+                                                        mask=mask)
+
         for service in virtual_servers[0]['serviceGroups'][0]['services']:
             if service['id'] == service_id:
                 if enabled is not None:
-                    service['enabled'] = int(enabled)
+                    service['enabled'] = enabled
                 if port is not None:
-                    service['port'] = int(port)
+                    service['port'] = port
                 if weight is not None:
-                    service['groupReferences'][0]['weight'] = int(weight)
+                    service['groupReferences'][0]['weight'] = weight
                 if hc_type is not None:
-                    service['healthChecks'][0]['healthCheckTypeId'] = (
-                        int(hc_type))
+                    service['healthChecks'][0]['healthCheckTypeId'] = hc_type
                 if ip_address_id is not None:
                     service['ipAddressId'] = ip_address_id
 
@@ -254,16 +259,14 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
                           routing_type=2, routing_method=10):
         """ Adds a new service group to the load balancer
         :param int loadbal_id: The id of the loadbal where the service resides
-        :param int allocation: the % of connections to allocate to the group
+        :param int allocation: percent of connections to allocate toward the
+                               group
         :param int port: the port of the service group
         :param int routing_type: the routing type to set on the service group
         :param int routing_method: The routing method to set on the group
         """
-        kwargs = utils.NestedDict({})
-        kwargs['mask'] = ('mask[virtualServers[serviceGroups'
-                          '[services[groupReferences]]]]')
-        load_balancer = self.lb_svc.getObject(id=lb_id, **kwargs)
-        virtual_servers = load_balancer['virtualServers']
+        mask = 'virtualServers[serviceGroups[services[groupReferences]]]'
+        load_balancer = self.lb_svc.getObject(id=lb_id, mask=mask)
         service_template = {
             'port': port,
             'allocation': allocation,
@@ -275,7 +278,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
             ]
         }
 
-        virtual_servers.append(service_template)
+        load_balancer['virtualServers'].append(service_template)
         return self.lb_svc.editObject(load_balancer, id=lb_id)
 
     def edit_service_group(self, loadbal_id, group_id, allocation=None,
@@ -298,13 +301,13 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
             if virtual_server['id'] == group_id:
                 service_group = virtual_server['serviceGroups'][0]
                 if allocation is not None:
-                    virtual_server['allocation'] = int(allocation)
+                    virtual_server['allocation'] = allocation
                 if port is not None:
-                    virtual_server['port'] = int(port)
+                    virtual_server['port'] = port
                 if routing_type is not None:
-                    service_group['routingTypeId'] = int(routing_type)
+                    service_group['routingTypeId'] = routing_type
                 if routing_method is not None:
-                    service_group['routingMethodId'] = int(routing_method)
+                    service_group['routingMethodId'] = routing_method
                 break
         return self.lb_svc.editObject(load_balancer, id=loadbal_id)
 
@@ -313,15 +316,11 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :param int loadbal_id: The id of the loadbal
         :param int group_id: The id of the service group to reset
         """
-        _filter = utils.NestedDict({})
-        _filter['virtualServers']['id'] = utils.query_filter(group_id)
 
-        kwargs = utils.NestedDict({})
-        kwargs['filter'] = _filter.to_dict()
-        kwargs['mask'] = 'mask[serviceGroups]'
-
+        _filter = {'virtualServers': {'id': utils.query_filter(group_id)}}
         virtual_servers = self.lb_svc.getVirtualServers(id=loadbal_id,
-                                                        **kwargs)
+                                                        filter=_filter,
+                                                        mask='serviceGroups')
         actual_id = virtual_servers[0]['serviceGroups'][0]['id']
 
         svc = self.client['Network_Application_Delivery_Controller'
