@@ -22,6 +22,14 @@ from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
+import re
+
+RECORD_REGEX = re.compile(r"""^((?P<domain>([\w-]+(\.)?)*|\@)?\s+
+                               (?P<ttl>\d+)?\s+
+                               (?P<class>\w+)?)?\s+
+                               (?P<type>\w+)\s+
+                               (?P<data>.*)""", re.X)
+
 
 class DumpZone(environment.CLIRunnable):
     """
@@ -78,6 +86,112 @@ Arguments:
             manager.delete_zone(zone_id)
         else:
             raise exceptions.CLIAbort("Aborted.")
+
+
+class ImportZone(environment.CLIRunnable):
+    """
+usage: sl dns import <file> [options]
+
+Creates a new zone based off a nicely BIND formatted file
+
+Arguments:
+    <file> Path to the bind zone file you want to import
+Options:
+    --dry-run  Don't actually do anything. This will show you what is parsed
+
+    """
+    action = 'import'
+
+    def execute(self, args):
+
+        dry_run = args.get('--dry-run')
+
+        manager = SoftLayer.DNSManager(self.client)
+        with open(args['<file>']) as zone_file:
+            zone_contents = zone_file.read()
+
+        zone, records, bad_lines = parse_zone_details(zone_contents)
+
+        self.env.out("Parsed: zone=%s" % zone)
+        for record in records:
+            self.env.out("Parsed: %s" % record)
+        for line in bad_lines:
+            self.env.out("Unparsed: %s" % line)
+
+        if dry_run:
+            return
+
+        # Find zone id or create the zone if it doesn't exist
+        try:
+            zone_id = helpers.resolve_id(manager.resolve_ids, zone,
+                                         name='zone')
+        except exceptions.CLIAbort:
+            zone_id = manager.create_zone(zone)['id']
+            self.env.out("\033[92mCREATED ZONE:   %s\033[0m" % zone)
+
+        # Attempt to create each record
+        for record in records:
+            try:
+                manager.create_record(zone_id,
+                                      record['record'],
+                                      record['record_type'],
+                                      record['data'],
+                                      record['ttl'])
+                self.env.out("\033[92mCreated: Host: %s\033[0m" % record)
+            except SoftLayer.SoftLayerAPIError as ex:
+                self.env.out("\033[91mFAILED: %s" % record)
+                self.env.out("%s \033[0m" % ex)
+
+        return "Finished"
+
+
+def parse_zone_details(zone_contents):
+    """Parses a zone file into python data-structures"""
+    records = []
+    bad_lines = []
+    zone_lines = [line.strip() for line in zone_contents.split('\n')]
+
+    zone_search = re.search(r'^\$ORIGIN (?P<zone>.*)\.', zone_lines[0])
+    zone = zone_search.group('zone')
+
+    for line in zone_lines[1:]:
+        record_search = re.search(RECORD_REGEX, line)
+        if record_search is None:
+            bad_lines.append(line)
+            continue
+
+        name = record_search.group('domain')
+        # The API requires we send a host, although bind allows a blank
+        # entry. @ is the same thing as blank
+        if name is None:
+            name = "@"
+
+        ttl = record_search.group('ttl')
+        # we don't do anything with the class
+        # domain_class = domainSearch.group('class')
+        record_type = record_search.group('type').upper()
+        data = record_search.group('data')
+
+        # the dns class doesn't support weighted MX records yet, so we chomp
+        # that part out.
+        if record_type == "MX":
+            record_search = re.search(r'(?P<weight>\d+)\s+(?P<data>.*)', data)
+            data = record_search.group('data')
+
+        # This will skip the SOA record bit. And any domain that gets
+        # parsed oddly.
+        if record_type == 'IN':
+            bad_lines.append(line)
+            continue
+
+        records.append({
+            'record': name,
+            'record_type': record_type,
+            'data': data,
+            'ttl': ttl,
+        })
+
+    return zone, records, bad_lines
 
 
 class ListZones(environment.CLIRunnable):
