@@ -1,6 +1,6 @@
 """
     SoftLayer.tests.managers.ordering_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :license: MIT, see LICENSE for more details.
 """
@@ -83,19 +83,41 @@ class OrderingTests(testing.TestCase):
 
     def test_get_quote_details(self):
         quote = self.ordering.get_quote_details(1234)
-        quote_fixture = self.ordering.client['Billing_Order_Quote'].getObject(
-            id=1234)
+        quote_service = self.ordering.client['Billing_Order_Quote']
+        quote_fixture = quote_service.getObject(id=1234)
         self.assertEqual(quote, quote_fixture)
 
     def test_verify_quote(self):
-        result = self.ordering.verify_quote(
-            quote_id=1234,
-            domain='example.com',
-            hostnames=['test1'],
-            quantity=1)
+        order_service = self.ordering.client['Product_Order']
+        result = self.ordering.verify_quote(1234,
+                                            [{'hostname': 'test1',
+                                              'domain': 'example.com'}],
+                                            quantity=1)
 
-        self.assertEqual(result, self.ordering.client['Product_Order'].
-                         verifyOrder())
+        self.assertEqual(result, order_service.verifyOrder())
+        self.assertTrue(order_service.verifyOrder.called)
 
     def test_order_quote(self):
-        return True
+        order_service = self.ordering.client['Product_Order']
+        result = self.ordering.verify_quote(1234,
+                                            [{'hostname': 'test1',
+                                              'domain': 'example.com'}],
+                                            quantity=1)
+
+        self.assertEqual(result, order_service.placeOrder())
+        self.assertTrue(order_service.placeOrder.called)
+
+    def test_generate_order_template(self):
+        result = self.ordering.generate_order_template(
+            1234, [{'hostname': 'test1', 'domain': 'example.com'}], quantity=1)
+        self.assertEqual(result, {'presetId': None,
+                                  'hardware': [{'domain': 'example.com',
+                                                'hostname': 'test1'}],
+                                  'useHourlyPricing': '',
+                                  'packageId': 50,
+                                  'prices': [{'id': 1921}],
+                                  'quantity': 1})
+
+    def test_generate_order_template_extra_quantity(self):
+        with self.assertRaises(ValueError):
+            self.ordering.generate_order_template(1234, [], quantity=1)
