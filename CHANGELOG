@@ -1,3 +1,19 @@
+3.3.0
+
+    * CLI+API: Load balancer support
+
+    * CLI: More detail added to the `sl image detail` and `sl image list` commands
+
+    * CLI+API: Adds support for booting into rescue images for virtual servers and hardware
+
+    * API: Adds ability to order virtual and hardare servers from a quote to the ordering manager
+
+    * CLI: Fixes bug with sl server list-chassis and sl server list-chassis
+
+    * API: Restructure of the way custom authentication can be plugged in the API client
+
+    * Several other bug fixes
+
 3.2.0
 
     * CLI+API: Added firewall manager and CLI module
@@ -8,7 +24,7 @@
 
     * API: Added OrderingManager. Remove hard-coded price IDs
 
-    * Fixed several small bug fixes
+    * Fixed several small bugs
 
 3.1.0
 
