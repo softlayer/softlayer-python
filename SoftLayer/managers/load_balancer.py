@@ -1,6 +1,6 @@
 """
     SoftLayer.load_balancer
-    ~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~
     Load Balancer Manager/helpers
 
     :license: MIT, see LICENSE for more details.
@@ -136,11 +136,11 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         """
 
         if 'mask' not in kwargs:
-            kwargs['mask'] = ('mask[loadBalancerHardware[datacenter], '
+            kwargs['mask'] = ('loadBalancerHardware[datacenter], '
                               'ipAddress, virtualServers[serviceGroups'
                               '[routingMethod,routingType,services'
                               '[healthChecks[type], groupReferences,'
-                              ' ipAddress]]]]')
+                              ' ipAddress]]]')
 
         return self.lb_svc.getObject(id=loadbal_id, **kwargs)
 
@@ -184,7 +184,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :param int service_id: The id of the service to edit
         :param string ip_address: The ip address of the service
         :param int port: the port of the service
-        :param int enabled: 1 to enable the service, 0 to disable it
+        :param bool enabled: enable or disable the search
         :param int hc_type: The health check type
         :param int weight: the weight to give to the service
         """
@@ -201,7 +201,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         for service in virtual_servers[0]['serviceGroups'][0]['services']:
             if service['id'] == service_id:
                 if enabled is not None:
-                    service['enabled'] = enabled
+                    service['enabled'] = int(enabled)
                 if port is not None:
                     service['port'] = port
                 if weight is not None:
@@ -217,13 +217,14 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         return load_balancer
 
     def add_service(self, loadbal_id, service_group_id, ip_address_id,
-                    port=80, enabled=1, hc_type=21, weight=1):
+                    port=80, enabled=True, hc_type=21, weight=1):
         """ Adds a new service to the service group
+
         :param int loadbal_id: The id of the loadbal where the service resides
         :param int service_group_id: The group to add the service to
         :param int ip_address id: The ip address ID of the service
         :param int port: the port of the service
-        :param int enabled: 1 to enable the service, 0 to disable it
+        :param bool enabled: Enable or disable the service
         :param int hc_type: The health check type
         :param int weight: the weight to give to the service
         """
@@ -236,7 +237,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         for virtual_server in virtual_servers:
             if virtual_server['id'] == service_group_id:
                 service_template = {
-                    'enabled': enabled,
+                    'enabled': int(enabled),
                     'port': port,
                     'ipAddressId': ip_address_id,
                     'healthChecks': [
@@ -258,6 +259,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
     def add_service_group(self, lb_id, allocation=100, port=80,
                           routing_type=2, routing_method=10):
         """ Adds a new service group to the load balancer
+
         :param int loadbal_id: The id of the loadbal where the service resides
         :param int allocation: percent of connections to allocate toward the
                                group
@@ -265,6 +267,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :param int routing_type: the routing type to set on the service group
         :param int routing_method: The routing method to set on the group
         """
+
         mask = 'virtualServers[serviceGroups[services[groupReferences]]]'
         load_balancer = self.lb_svc.getObject(id=lb_id, mask=mask)
         service_template = {
@@ -284,6 +287,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
     def edit_service_group(self, loadbal_id, group_id, allocation=None,
                            port=None, routing_type=None, routing_method=None):
         """ Edit an existing service group
+
         :param int loadbal_id: The id of the loadbal where the service resides
         :param int group_id: The id of the service group
         :param int allocation: the % of connections to allocate to the group
@@ -291,12 +295,12 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :param int routing_type: the routing type to set on the service group
         :param int routing_method: The routing method to set on the group
         """
-        kwargs = utils.NestedDict({})
-        kwargs['mask'] = ('mask[virtualServers[serviceGroups'
-                          '[services[groupReferences]]]]')
 
-        load_balancer = self.lb_svc.getObject(id=loadbal_id, **kwargs)
+        mask = 'virtualServers[serviceGroups[services[groupReferences]]]'
+
+        load_balancer = self.lb_svc.getObject(id=loadbal_id, mask=mask)
         virtual_servers = load_balancer['virtualServers']
+
         for virtual_server in virtual_servers:
             if virtual_server['id'] == group_id:
                 service_group = virtual_server['serviceGroups'][0]
@@ -309,10 +313,12 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
                 if routing_method is not None:
                     service_group['routingMethodId'] = routing_method
                 break
+
         return self.lb_svc.editObject(load_balancer, id=loadbal_id)
 
     def reset_service_group(self, loadbal_id, group_id):
         """ Resets all the connections on the service group
+
         :param int loadbal_id: The id of the loadbal
         :param int group_id: The id of the service group to reset
         """
