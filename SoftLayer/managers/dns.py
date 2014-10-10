@@ -21,7 +21,6 @@ class DNSManager(utils.IdentifierMixin, object):
         self.client = client
         self.service = self.client['Dns_Domain']
         self.record = self.client['Dns_Domain_ResourceRecord']
-
         self.resolvers = [self._get_zone_id_from_name]
 
     def _get_zone_id_from_name(self, name):
