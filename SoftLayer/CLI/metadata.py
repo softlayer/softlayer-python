@@ -2,7 +2,6 @@
 # :license: MIT, see LICENSE for more details.
 
 import SoftLayer
-from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 
@@ -29,8 +28,7 @@ META_MAPPING = {
                                            'provision_state',
                                            'tags',
                                            'user_data']))
-@environment.pass_env
-def cli(env, prop):
+def cli(prop):
     """Find details about this machine"""
 
     try:
@@ -47,6 +45,7 @@ def cli(env, prop):
 
 
 def get_network():
+    """Returns a list of tables with public and private network details"""
     meta = SoftLayer.MetadataManager()
     network_tables = []
     for network_func in [meta.public_network, meta.private_network]:

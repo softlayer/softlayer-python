@@ -22,7 +22,7 @@ import pkg_resources
 class Environment(object):
     """Provides access to the current CLI environment."""
     def __init__(self):
-        # {'module_name': {'action': 'actionClass'}}
+        # {'module_name': {'action': plugin_loader}}
         self.plugins = {}
         self.aliases = {
             'meta': 'metadata',

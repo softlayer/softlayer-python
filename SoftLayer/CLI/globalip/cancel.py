@@ -17,8 +17,7 @@ def cli(env, identifier):
     """Cancel global IP"""
 
     mgr = SoftLayer.NetworkManager(env.client)
-    global_ip_id = helpers.resolve_id(mgr.resolve_global_ip_ids,
-                                      identifier,
+    global_ip_id = helpers.resolve_id(mgr.resolve_global_ip_ids, identifier,
                                       name='global ip')
 
     if env.skip_confirmations or formatting.no_going_back(global_ip_id):

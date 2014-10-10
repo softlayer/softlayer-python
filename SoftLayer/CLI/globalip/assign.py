@@ -16,7 +16,6 @@ def cli(env, identifier, target):
     """Assigns the global IP to a target"""
 
     mgr = SoftLayer.NetworkManager(env.client)
-    global_ip_id = helpers.resolve_id(mgr.resolve_global_ip_ids,
-                                      identifier,
+    global_ip_id = helpers.resolve_id(mgr.resolve_global_ip_ids, identifier,
                                       name='global ip')
     mgr.assign_global_ip(global_ip_id, target)
