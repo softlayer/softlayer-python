@@ -189,8 +189,10 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :param int weight: the weight to give to the service
         """
 
-        _filter = {'virtualServers': {'serviceGroups': {'services': {'id':
-                   utils.query_filter(service_id)}}}}
+        _filter = {
+            'virtualServers': {
+                'serviceGroups': {
+                    'services': {'id': utils.query_filter(service_id)}}}}
 
         mask = 'serviceGroups[services[groupReferences,healthChecks]]'
 
