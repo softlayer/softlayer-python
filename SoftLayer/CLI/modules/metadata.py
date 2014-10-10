@@ -181,7 +181,7 @@ List tags
                                   separator=',')
 
 
-class UserMetadata(environment.CLIRunnable):
+class UserMetadata(MetaRunnable):
     """
 usage: sl metadata user_data [options]
 

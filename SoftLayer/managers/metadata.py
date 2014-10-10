@@ -58,22 +58,6 @@ class MetadataManager(object):
         self.timeout = timeout
         self.client = client
 
-    def make_request(self, path):
-        """ Make a request against the metadata service
-
-        :param string path: path to the specific metadata resource
-        """
-        url = '/'.join([self.url, 'SoftLayer_Resource_Metadata', path])
-        try:
-            return transports.make_rest_api_call(
-                'GET', url,
-                http_headers={'User-Agent': consts.USER_AGENT},
-                timeout=self.timeout)
-        except exceptions.SoftLayerAPIError as ex:
-            if ex.faultCode == 404:
-                return None
-            raise ex
-
     def get(self, name, param=None):
         """ Retreive a metadata attribute
 
@@ -85,19 +69,26 @@ class MetadataManager(object):
             raise exceptions.SoftLayerError('Unknown metadata attribute.')
 
         call_details = self.attribs[name]
-        extension = '.json'
-        if self.attribs[name]['call'] == 'UserMetadata':
-            extension = '.txt'
 
         if call_details.get('param_req'):
             if not param:
                 raise exceptions.SoftLayerError(
                     'Parameter required to get this attribute.')
-            path = "%s/%s%s" % (self.attribs[name]['call'], param, extension)
-        else:
-            path = "%s%s" % (self.attribs[name]['call'], extension)
 
-        return self.make_request(path)
+        request = transports.Request()
+        request.endpoint = self.url
+        request.service = 'SoftLayer_Resource_Metadata'
+        request.method = self.attribs[name]['call']
+        request.transport_headers = {'User-Agent': consts.USER_AGENT}
+        request.timeout = self.timeout
+        request.identifier = param
+
+        try:
+            return transports.make_rest_api_call(request)
+        except exceptions.SoftLayerAPIError as ex:
+            if ex.faultCode == 404:
+                return None
+            raise ex
 
     def _get_network(self, kind, router=True, vlans=True, vlan_ids=True):
         """ Wrapper for getting details about networks

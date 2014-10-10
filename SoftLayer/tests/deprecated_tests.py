@@ -30,14 +30,14 @@ class APIClient(testing.TestCase):
             # Cause all warnings to always be triggered.
             warnings.simplefilter("always")
 
-            self.client['SERVICE'].METHOD()
+            make_xml_rpc_api_call.return_value = {"test": "result"}
+            resp = self.client['SERVICE'].METHOD()
 
-            make_xml_rpc_api_call.assert_called_with(
-                mock.ANY, mock.ANY, mock.ANY,
-                headers={'deprecated': 'header'},
-                proxy=mock.ANY,
-                timeout=mock.ANY,
-                http_headers=mock.ANY)
+            self.assertEqual(resp, {"test": "result"})
+
+            (request,), kwargs = make_xml_rpc_api_call.call_args
+            self.assertEqual(request.headers, {'deprecated': 'header'})
+
             self.assertEqual(len(w), 1)
             self.assertEqual(w[0].category, DeprecationWarning)
             self.assertIn("deprecated", str(w[0].message))

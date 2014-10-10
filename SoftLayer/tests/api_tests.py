@@ -8,8 +8,10 @@ import mock
 
 import SoftLayer
 import SoftLayer.API
-from SoftLayer import consts
 from SoftLayer import testing
+
+TEST_AUTH_HEADERS = {
+    'authenticate': {'apiKey': 'issurelywrong', 'username': 'doesnotexist'}}
 
 
 class Inititialization(testing.TestCase):
@@ -79,109 +81,49 @@ class APIClient(testing.TestCase):
 
     @mock.patch('SoftLayer.transports.make_xml_rpc_api_call')
     def test_simple_call(self, make_xml_rpc_api_call):
-        self.client['SERVICE'].METHOD()
-        make_xml_rpc_api_call.assert_called_with(
-            'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
-            headers={
-                'authenticate': {
-                    'username': 'doesnotexist', 'apiKey': 'issurelywrong'}},
-            proxy=None,
-            timeout=None,
-            http_headers={
-                'Content-Type': 'application/xml',
-                'User-Agent': consts.USER_AGENT,
-                'Accept': '*/*',
-                'Accept-Encoding': 'gzip, deflate, compress',
-            })
+        make_xml_rpc_api_call.return_value = {"test": "result"}
+        resp = self.client['SERVICE'].METHOD()
+
+        self.assertEqual(resp, {"test": "result"})
+
+        (request,), kwargs = make_xml_rpc_api_call.call_args
+        self.assertEqual(request.endpoint, self.client.endpoint_url)
+        self.assertEqual(request.service, 'SoftLayer_SERVICE')
+        self.assertEqual(request.method, 'METHOD')
+        self.assertEqual(request.mask, None)
+        self.assertEqual(request.filter, None)
+        self.assertEqual(request.identifier, None)
+        self.assertEqual(request.args, tuple())
+        self.assertEqual(request.limit, None)
+        self.assertEqual(request.offset, None)
+        self.assertEqual(request.headers, TEST_AUTH_HEADERS)
 
     @mock.patch('SoftLayer.transports.make_xml_rpc_api_call')
     def test_complex(self, make_xml_rpc_api_call):
-        self.client['SERVICE'].METHOD(
+        make_xml_rpc_api_call.return_value = {"test": "result"}
+        resp = self.client['SERVICE'].METHOD(
             1234,
             id=5678,
             mask={'object': {'attribute': ''}},
             raw_headers={'RAW': 'HEADER'},
             filter={
-                'TYPE': {'obj': {'attribute': {'operation': '^= prefix'}}}},
+                'TYPE': {'attribute': {'operation': '^= prefix'}}},
             limit=9, offset=10)
 
-        make_xml_rpc_api_call.assert_called_with(
-            'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (1234, ),
-            headers={
-                'SoftLayer_SERVICEObjectMask': {
-                    'mask': {'object': {'attribute': ''}}},
-                'SoftLayer_SERVICEObjectFilter': {
-                    'TYPE': {
-                        'obj': {'attribute': {'operation': '^= prefix'}}}},
-                'authenticate': {
-                    'username': 'doesnotexist', 'apiKey': 'issurelywrong'},
-                'SoftLayer_SERVICEInitParameters': {'id': 5678},
-                'resultLimit': {'limit': 9, 'offset': 10}},
-            proxy=None,
-            timeout=None,
-            http_headers={
-                'RAW': 'HEADER',
-                'Content-Type': 'application/xml',
-                'User-Agent': consts.USER_AGENT,
-                'Accept': '*/*',
-                'Accept-Encoding': 'gzip, deflate, compress',
-            })
+        self.assertEqual(resp, {"test": "result"})
 
-    @mock.patch('SoftLayer.transports.make_xml_rpc_api_call')
-    def test_mask_call_v2(self, make_xml_rpc_api_call):
-        self.client['SERVICE'].METHOD(
-            mask="mask[something[nested]]")
-        make_xml_rpc_api_call.assert_called_with(
-            'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
-            headers={
-                'authenticate': {
-                    'username': 'doesnotexist', 'apiKey': 'issurelywrong'},
-                'SoftLayer_ObjectMask': {'mask': 'mask[something[nested]]'}},
-            proxy=None,
-            timeout=None,
-            http_headers={
-                'Content-Type': 'application/xml',
-                'User-Agent': consts.USER_AGENT,
-                'Accept': '*/*',
-                'Accept-Encoding': 'gzip, deflate, compress',
-            })
-
-    @mock.patch('SoftLayer.transports.make_xml_rpc_api_call')
-    def test_mask_call_v2_dot(self, make_xml_rpc_api_call):
-        self.client['SERVICE'].METHOD(
-            mask="mask.something.nested")
-        make_xml_rpc_api_call.assert_called_with(
-            'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
-            headers={
-                'authenticate': {
-                    'username': 'doesnotexist', 'apiKey': 'issurelywrong'},
-                'SoftLayer_ObjectMask': {'mask': 'mask.something.nested'}},
-            proxy=None,
-            timeout=None,
-            http_headers={
-                'Content-Type': 'application/xml',
-                'User-Agent': consts.USER_AGENT,
-                'Accept': '*/*',
-                'Accept-Encoding': 'gzip, deflate, compress',
-            })
-
-    @mock.patch('SoftLayer.transports.make_xml_rpc_api_call')
-    def test_mask_call_no_mask_prefix(self, make_xml_rpc_api_call):
-        self.client['SERVICE'].METHOD(mask="something.nested")
-        make_xml_rpc_api_call.assert_called_with(
-            'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
-            headers={
-                'authenticate': {
-                    'username': 'doesnotexist', 'apiKey': 'issurelywrong'},
-                'SoftLayer_ObjectMask': {'mask': 'mask[something.nested]'}},
-            proxy=None,
-            timeout=None,
-            http_headers={
-                'Content-Type': 'application/xml',
-                'User-Agent': consts.USER_AGENT,
-                'Accept': '*/*',
-                'Accept-Encoding': 'gzip, deflate, compress',
-            })
+        (request,), kwargs = make_xml_rpc_api_call.call_args
+        self.assertEqual(request.endpoint, self.client.endpoint_url)
+        self.assertEqual(request.service, 'SoftLayer_SERVICE')
+        self.assertEqual(request.method, 'METHOD')
+        self.assertEqual(request.mask, {'object': {'attribute': ''}})
+        self.assertEqual(request.filter,
+                         {'TYPE': {'attribute': {'operation': '^= prefix'}}})
+        self.assertEqual(request.identifier, 5678)
+        self.assertEqual(request.args, (1234,))
+        self.assertEqual(request.limit, 9)
+        self.assertEqual(request.offset, 10)
+        self.assertEqual(request.headers, TEST_AUTH_HEADERS)
 
     @mock.patch('SoftLayer.API.Client.iter_call')
     def test_iterate(self, _iter_call):
@@ -250,8 +192,8 @@ class APIClient(testing.TestCase):
         # Chunk size of 0 is invalid
         self.assertRaises(
             AttributeError,
-            lambda: list(self.client.iter_call(
-                'SERVICE', 'METHOD', iter=True, chunk=0)))
+            lambda: list(self.client.iter_call('SERVICE', 'METHOD',
+                                               iter=True, chunk=0)))
 
     def test_call_invalid_arguments(self):
         self.assertRaises(
@@ -261,30 +203,19 @@ class APIClient(testing.TestCase):
     @mock.patch('SoftLayer.transports.make_xml_rpc_api_call')
     def test_call_compression_disabled(self, make_xml_rpc_api_call):
         self.client['SERVICE'].METHOD(compress=False)
-        make_xml_rpc_api_call.assert_called_with(
-            'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
-            headers=mock.ANY,
-            proxy=None,
-            timeout=None,
-            http_headers={
-                'Content-Type': 'application/xml',
-                'User-Agent': consts.USER_AGENT,
-            })
+
+        (request,), kwargs = make_xml_rpc_api_call.call_args
+        self.assertNotIn('Accept-Encoding', request.transport_headers)
+        self.assertNotIn('Accept', request.transport_headers)
 
     @mock.patch('SoftLayer.transports.make_xml_rpc_api_call')
     def test_call_compression_enabled(self, make_xml_rpc_api_call):
         self.client['SERVICE'].METHOD(compress=True)
-        make_xml_rpc_api_call.assert_called_with(
-            'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
-            headers=mock.ANY,
-            proxy=None,
-            timeout=None,
-            http_headers={
-                'Content-Type': 'application/xml',
-                'User-Agent': consts.USER_AGENT,
-                'Accept': '*/*',
-                'Accept-Encoding': 'gzip, deflate, compress',
-            })
+
+        (request,), kwargs = make_xml_rpc_api_call.call_args
+        headers = request.transport_headers
+        self.assertEqual(headers['Accept-Encoding'], 'gzip, deflate, compress')
+        self.assertEqual(headers['Accept'], '*/*')
 
     @mock.patch('SoftLayer.transports.make_xml_rpc_api_call')
     def test_call_compression_override(self, make_xml_rpc_api_call):
@@ -292,16 +223,10 @@ class APIClient(testing.TestCase):
         self.client['SERVICE'].METHOD(
             compress=False,
             raw_headers={'Accept-Encoding': 'gzip'})
-        make_xml_rpc_api_call.assert_called_with(
-            'ENDPOINT/SoftLayer_SERVICE', 'METHOD', (),
-            headers=mock.ANY,
-            proxy=None,
-            timeout=None,
-            http_headers={
-                'Content-Type': 'application/xml',
-                'User-Agent': consts.USER_AGENT,
-                'Accept-Encoding': 'gzip',
-            })
+
+        (request,), kwargs = make_xml_rpc_api_call.call_args
+        self.assertEqual(request.transport_headers['Accept-Encoding'], 'gzip')
+        self.assertNotIn('Accept', request.transport_headers)
 
 
 class APITimedClient(testing.TestCase):
