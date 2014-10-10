@@ -8,7 +8,6 @@ The available zone commands are:
   delete  Delete zone
   list    List zones or a zone's records
   print   Print zone in BIND format
-  import  Import a BIND style zone file
 
 The available record commands are:
   add     Add resource record
@@ -79,78 +78,6 @@ Arguments:
             manager.delete_zone(zone_id)
         else:
             raise exceptions.CLIAbort("Aborted.")
-
-
-class ImportZone(environment.CLIRunnable):
-    """
-usage: sl dns import <file> [--dryRun]
-
-Creates a new zone based off a nicely BIND formatted file
-
-Arguments:
-    <file> Path to the bind zone file you want to import
-Options:
-    --dryRun    don't actually do anything. This will show you what we were able to parse. 
-
-    """
-    action = 'import'
-    def execute(self,args):
-        import re
-        dryRun = args.get('--dryRun')
-
-        manager = SoftLayer.DNSManager(self.client)
-        lines = [line.strip() for line in open(args['<file>'])]
-        zoneSearch = re.search('^\$ORIGIN (?P<zone>.*)\.',lines[0])
-        zone = zoneSearch.group('zone')
-
-        if (dryRun):
-            print  "Starting up a dry run for %s..." % (zone) 
-            zone_id = 0
-        else:
-            try:
-                zone_id = helpers.resolve_id(manager.resolve_ids, zone,name='zone')
-            except :
-                print "\033[92mCREATED ZONE:   %s\033[0m" % (zone)
-                manager.create_zone(zone)
-                zone_id = helpers.resolve_id(manager.resolve_ids, zone,name='zone')
-
-        for content in lines[1:]:
-            domainSearch = re.search('^((?P<domain>([\w-]+(\.)?)*|\@)?\s+(?P<ttl>\d+)?\s+(?P<class>\w+)?)?\s+(?P<type>\w+)\s+(?P<record>.*)',content)
-            if (domainSearch is None): 
-                print "\033[92mFailed: unknown line:   %s\033[0m" % (content)
-            else:
-                domainName = domainSearch.group('domain')
-                #The API requires we send a host, although bind allows a blank entry. @ is the same thing as blank
-                if (domainName is None):
-                    domainName = "@"
-
-                domainttl = domainSearch.group('ttl')
-                domainClass = domainSearch.group('class')
-                domainType = domainSearch.group('type')
-                domainRecord = domainSearch.group('record')
-
-                #This will skip the SOA record bit. And any domain that gets parsed oddly.
-                if (domainType.upper() == 'IN'):
-                    print "SKIPPED: Host: %s TTL: %s Type: %s Record: %s" % (domainName,domainttl,domainType,domainRecord) 
-                    continue
-
-                #the dns class doesn't support weighted MX records yet, so we chomp that part out. 
-                if (domainType.upper() == "MX"):
-                    recordSearch = re.search('(?P<weight>\d+)\s+(?P<record>.*)',domainRecord)
-                    domainRecord = recordSearch.group('record')
-
-                try:
-                    if (dryRun):
-                        print "Parsed: Host: %s TTL: %s Type: %s Record: %s" % (domainName,domainttl,domainType,domainRecord) 
-                    else:
-                        manager.create_record(zone_id,domainName,domainType,domainRecord,domainttl)
-                        print "\033[92mCreated: Host: %s TTL: %s Type: %s Record: %s\033[0m" % (domainName,domainttl,domainType,domainRecord)
-                except Exception, e:
-                    print "\033[91mFAILED: Host: %s Type: %s Record: %s" % (domainName,domainType,domainRecord.upper())  
-                    print "\t", e ,"\033[0m"
-
-
-        return "Finished"
 
 
 class ListZones(environment.CLIRunnable):
