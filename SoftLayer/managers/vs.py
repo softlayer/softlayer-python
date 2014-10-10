@@ -642,7 +642,7 @@ class VSManager(utils.IdentifierMixin, object):
         mask = "mask[description,capacity,prices[id,categories[name,id]]]"
         package_type = "VIRTUAL_SERVER_INSTANCE"
         package_id = self.ordering_manager.get_package_id_by_type(package_type)
-        package_service = self.ordering_manager.get_package_service()
+        package_service = self.client['Product_Package']
 
         return package_service.getItems(id=package_id, mask=mask)
 

@@ -156,7 +156,7 @@ class OrderingManager(object):
         container = self.get_order_container(quote_id)
         container['quantity'] = quantity
 
-        # TODO(kmcdonald): This will only work with virtualGuests and hardware.
+        # NOTE(kmcdonald): This will only work with virtualGuests and hardware.
         #                  There has to be a better way, since this is based on
         #                  an existing quote that supposedly knows about this
         #                  detail
