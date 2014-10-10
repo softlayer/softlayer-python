@@ -88,7 +88,7 @@ class LoadBalancerTests(testing.TestCase):
     def test_get_local_lbs(self):
         self.lb_mgr.get_local_lbs()
         call = self.client['Account'].getAdcLoadBalancers
-        mask = ('mask[loadBalancerHardware[datacenter],ipAddress]')
+        mask = 'mask[loadBalancerHardware[datacenter],ipAddress]'
         call.assert_called_once_with(mask=mask)
 
     def test_get_local_lb(self):
@@ -97,11 +97,11 @@ class LoadBalancerTests(testing.TestCase):
         call = self.client['Network_Application_Delivery_Controller_'
                            'LoadBalancer_VirtualIpAddress'].getObject
 
-        mask = ('mask[loadBalancerHardware[datacenter], '
+        mask = ('loadBalancerHardware[datacenter], '
                 'ipAddress, virtualServers[serviceGroups'
                 '[routingMethod,routingType,services'
                 '[healthChecks[type], groupReferences,'
-                ' ipAddress]]]]')
+                ' ipAddress]]]')
         call.assert_called_once_with(id=lb_id, mask=mask)
 
     def test_delete_service(self):
@@ -194,8 +194,7 @@ class LoadBalancerTests(testing.TestCase):
         call = self.client['Network_Application_Delivery_Controller_'
                            'LoadBalancer_VirtualIpAddress'].getObject
 
-        mask = ('mask[virtualServers[serviceGroups'
-                '[services[groupReferences]]]]')
+        mask = 'virtualServers[serviceGroups[services[groupReferences]]]'
         call.assert_called_once_with(mask=mask, id=loadbal_id)
 
         call = self.client['Network_Application_Delivery_Controller_'
