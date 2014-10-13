@@ -73,6 +73,12 @@ class ModuleLoader(click.MultiCommand):
 
 
 class CliClient(SoftLayer.Client):
+    """ A wrapped SoftLayer.Client that adds CLI-specific functionality
+
+    At the moment, it has a slightly different accounting for API call timings
+    but will also allow for 2FA and other similar functionality.
+
+    """
 
     def __init__(self, client, *args, **kwargs):
         self.client = client

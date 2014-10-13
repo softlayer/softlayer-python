@@ -9,7 +9,6 @@ import click
 
 
 @click.command()
-@click.argument('identifier')
 @click.option('--title', required=True, help="The title of the ticket")
 @click.option('--subject-id',
               required=True,
@@ -17,7 +16,7 @@ import click
  issue 'sl ticket subjects' to get the list""")
 @click.option('--body', help="The ticket body")
 @environment.pass_env
-def cli(env, identifier, title, subject_id, body):
+def cli(env, title, subject_id, body):
     """Create a support ticket"""
     mgr = SoftLayer.TicketManager(env.client)
 
@@ -27,4 +26,4 @@ def cli(env, identifier, title, subject_id, body):
     created_ticket = mgr.create_ticket(title=title,
                                        body=body,
                                        subject=subject_id)
-    return get_ticket_results(mgr, created_ticket['id'])
+    return ticket.get_ticket_results(mgr, created_ticket['id'])

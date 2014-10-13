@@ -10,13 +10,14 @@ import click
 
 
 @click.command()
-@click.option('--open / --closed', help="Display closed tickets")
+@click.option('--open / --closed', 'is_open', help="Display closed tickets")
 @environment.pass_env
-def cli(env, open):
+def cli(env, is_open):
     """List tickets"""
     ticket_mgr = SoftLayer.TicketManager(env.client)
 
-    tickets = ticket_mgr.list_tickets(open_status=not open, closed_status=open)
+    tickets = ticket_mgr.list_tickets(open_status=not is_open,
+                                      closed_status=is_open)
 
     table = formatting.Table(['id', 'assigned user', 'title',
                               'creation date', 'last edit date'])
@@ -24,8 +25,8 @@ def cli(env, open):
     for ticket in tickets:
         user = 'N/A'
         if ticket.get('assignedUser'):
-            "%s %s" % (ticket['assignedUser']['firstName'],
-                       ticket['assignedUser']['lastName']),
+            user = "%s %s" % (ticket['assignedUser']['firstName'],
+                              ticket['assignedUser']['lastName']),
 
         table.add_row([
             ticket['id'],
