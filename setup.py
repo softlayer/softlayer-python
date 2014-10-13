@@ -145,11 +145,11 @@ cli_entry_points = [
     'metadata = SoftLayer.CLI.metadata:cli',
 
     'nas = SoftLayer.CLI.nas',
-    # 'nas:list = SoftLayer.CLI.nas.list:cli',
+    'nas:list = SoftLayer.CLI.nas.list:cli',
 
     'rwhois = SoftLayer.CLI.rwhois',
-    # 'rwhois:edit = SoftLayer.CLI.rwhois.edit:cli',
-    # 'rwhois:show = SoftLayer.CLI.rwhois.show:cli',
+    'rwhois:edit = SoftLayer.CLI.rwhois.edit:cli',
+    'rwhois:show = SoftLayer.CLI.rwhois.show:cli',
 
     'server = SoftLayer.CLI.server',
     # 'server:cancel = SoftLayer.CLI.server.cancel:cli',
