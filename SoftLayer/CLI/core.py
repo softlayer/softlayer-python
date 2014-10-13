@@ -7,6 +7,7 @@
 """
 import logging
 import sys
+import time
 import types
 
 import SoftLayer
@@ -19,10 +20,10 @@ import click
 # pylint: disable=redefined-builtin
 
 DEBUG_LOGGING_MAP = {
-    '0': logging.CRITICAL,
-    '1': logging.WARNING,
-    '2': logging.INFO,
-    '3': logging.DEBUG
+    0: logging.CRITICAL,
+    1: logging.WARNING,
+    2: logging.INFO,
+    3: logging.DEBUG
 }
 
 VALID_FORMATS = ['table', 'raw', 'json']
@@ -71,6 +72,23 @@ class ModuleLoader(click.MultiCommand):
             return module
 
 
+class CliClient(SoftLayer.Client):
+
+    def __init__(self, client, *args, **kwargs):
+        self.client = client
+        self.last_calls = []
+        super(CliClient, self).__init__(*args, **kwargs)
+
+    def call(self, service, method, *args, **kwargs):
+        """See Client.call for documentation."""
+        start_time = time.time()
+        result = self.client.call(service, method, *args, **kwargs)
+        end_time = time.time()
+        diff = end_time - start_time
+        self.last_calls.append((service, method, start_time, diff))
+        return result
+
+
 @click.group(help="SoftLayer Command-line Client",
              epilog="""To use most commands your SoftLayer
 username and api_key need to be configured. The easiest way to do that is to
@@ -91,7 +109,11 @@ use: 'sl config setup'""",
               required=False,
               default='0',
               help="Specifies the debug noise level",
-              type=click.Choice(sorted(DEBUG_LOGGING_MAP.keys())))
+              type=click.Choice(sorted([str(key) for key
+                                        in DEBUG_LOGGING_MAP.keys()])))
+@click.option('--verbose', '-v',
+              help="Specifies the debug noise level",
+              count=True)
 @click.option('--timings',
               required=False,
               is_flag=True,
@@ -103,33 +125,47 @@ use: 'sl config setup'""",
               is_flag=True,
               required=False,
               help="Confirm all prompt actions")
+@click.option('--fixtures',
+              is_flag=True,
+              required=False,
+              help="Use fixtures instead of actually making API calls")
 @click.version_option(version=SoftLayer.__version__,
                       prog_name="SoftLayer Command-line Client")
 def cli(ctx,
-        format='table',
         config=None,
         debug=0,
+        verbose=0,
         timings=False,
         proxy=None,
-        really=False):
+        really=False,
+        fixtures=False,
+        **kwargs):
     """Main click CLI entry-point"""
+
     # Set logging level
-    if debug:
+    debug_int = int(debug)
+    if debug_int:
+        verbose = debug_int
+
+    if verbose:
         logger = logging.getLogger()
         handler = logging.StreamHandler()
         logger.addHandler(handler)
-        logger.setLevel(DEBUG_LOGGING_MAP.get(debug, logging.DEBUG))
+        logger.setLevel(DEBUG_LOGGING_MAP.get(verbose, logging.DEBUG))
 
     # Create SL Client
-    kwargs = {
+    client_kwargs = {
         'proxy': proxy,
         'config_file': config,
     }
 
-    if timings:
-        client = SoftLayer.TimedClient(**kwargs)
+    if fixtures:
+        from SoftLayer import testing
+        real_client = testing.FixtureClient()
     else:
-        client = SoftLayer.Client(**kwargs)
+        real_client = SoftLayer.Client(**client_kwargs)
+
+    client = CliClient(real_client)
 
     # Populate environement with client and set it as the context object
     env = ctx.ensure_object(environment.Environment)
@@ -140,19 +176,19 @@ def cli(ctx,
 
 @cli.resultcallback()
 @click.pass_context
-def output_result(ctx, result, format, config, debug, timings, proxy, really):
+def output_result(ctx, result, timings=False, format='table', **kwargs):
     """Outputs the results returned by the CLI and also outputs timings."""
+
     result = formatting.format_output(result, fmt=format)
     env = ctx.ensure_object(environment.Environment)
     if result:
         env.out(result)
 
     if timings:
-        api_calls = env.client.get_last_calls()
-        timing_table = formatting.KeyValueTable(['call', 'time'])
+        timing_table = formatting.KeyValueTable(['service', 'method', 'time'])
 
-        for call, _, duration in api_calls:
-            timing_table.add_row([call, duration])
+        for service, call, _, duration in env.client.last_calls:
+            timing_table.add_row([service, call, duration])
 
         env.err(formatting.format_output(timing_table, fmt=format))
 

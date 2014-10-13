@@ -150,11 +150,6 @@ def cli(env, **args):
 
 def _validate_args(args):
     """ Raises an ArgumentError if the given arguments are not valid """
-    req_params = ['hostname', 'domain', 'cpu', 'memory', 'datacenter', 'os']
-    invalid_args = [k for k in req_params if args.get(k) is None]
-    if invalid_args:
-        raise exceptions.ArgumentError('Missing required options: %s'
-                                       % ', '.join(invalid_args))
 
     if all([args['userdata'], args['userfile']]):
         raise exceptions.ArgumentError(

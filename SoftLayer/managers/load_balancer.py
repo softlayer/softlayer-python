@@ -1,6 +1,6 @@
 """
     SoftLayer.load_balancer
-    ~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~
     Load Balancer Manager/helpers
 
     :license: MIT, see LICENSE for more details.
@@ -40,14 +40,6 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
             if not package['description'].startswith('Global'):
                 pkgs.append(package)
         return pkgs
-
-    def get_ip_address(self, ip_address=None):
-        """ Retrieves the IP address object given the ip address itself
-
-        :returns: A dictionary containing the IP address properties
-        """
-        svc = self.client['Network_Subnet_IpAddress']
-        return svc.getByIpAddress(ip_address)
 
     def get_hc_types(self):
         """ Retrieves the health check type values

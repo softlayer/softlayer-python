@@ -28,6 +28,9 @@ class FixtureClient(mock.MagicMixin):
 
         return service
 
+    def call(self, service, method, **kwargs):
+        return getattr(self[service], method)(**kwargs)
+
     def reset_mock(self):
         """ Reset all of the loaded mocks """
         self.loaded_services = {}
