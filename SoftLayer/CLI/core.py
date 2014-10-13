@@ -108,11 +108,12 @@ use: 'sl config setup'""",
 @click.option('--debug',
               required=False,
               default='0',
-              help="Specifies the debug noise level",
+              help="Sets the debug noise level",
               type=click.Choice(sorted([str(key) for key
                                         in DEBUG_LOGGING_MAP.keys()])))
 @click.option('--verbose', '-v',
-              help="Specifies the debug noise level",
+              help="Sets the debug noise level",
+              type=click.IntRange(0, 3, clamp=True),
               count=True)
 @click.option('--timings',
               required=False,
