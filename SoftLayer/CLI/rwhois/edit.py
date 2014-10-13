@@ -4,27 +4,10 @@
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
-from SoftLayer.CLI import formatting
-from SoftLayer.CLI import image as image_mod
-from SoftLayer import utils
 
 import click
 
 
-  # --abuse=EMAIL      Set the abuse email
-  # --address1=ADDR    Update the address 1 field
-  # --address2=ADDR    Update the address 2 field
-  # --city=CITY        Set the city information
-  # --company=NAME     Set the company name
-  # --country=COUNTRY  Set the country information. Use the two-letter
-  #                      abbreviation.
-  # --firstname=NAME   Update the first name field
-  # --lastname=NAME    Update the last name field
-  # --postal=CODE      Set the postal code field
-  # --private          Flags the address as a private residence.
-  # --public           Flags the address as a public residence.
-  # --state=STATE      Set the state information. Use the two-letter
-  #                      abbreviation.
 @click.command()
 @click.option('--abuse', help='Set the abuse email address')
 @click.option('--address1', help='Update the address 1 field')
@@ -42,6 +25,7 @@ import click
 @environment.pass_env
 def cli(env, abuse, address1, address2, city, company, country, firstname,
         lastname, postal, public, state):
+    """Edit the RWhois data on the account"""
     mgr = SoftLayer.NetworkManager(env.client)
 
     update = {

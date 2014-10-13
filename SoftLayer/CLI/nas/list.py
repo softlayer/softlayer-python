@@ -1,9 +1,9 @@
 """List NAS accounts"""
 # :license: MIT, see LICENSE for more details.
 
-from SoftLayer import utils
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer import utils
 
 import click
 
