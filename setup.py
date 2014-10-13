@@ -181,11 +181,11 @@ cli_entry_points = [
     # 'ssl:remove = SoftLayer.CLI.ssl.remove:cli',
 
     'subnet = SoftLayer.CLI.subnet',
-    # 'subnet:cancel = SoftLayer.CLI.subnet.cancel:cli',
-    # 'subnet:create = SoftLayer.CLI.subnet.create:cli',
-    # 'subnet:detail = SoftLayer.CLI.subnet.detail:cli',
-    # 'subnet:list = SoftLayer.CLI.subnet.list:cli',
-    # 'subnet:lookup = SoftLayer.CLI.subnet.lookup:cli',
+    'subnet:cancel = SoftLayer.CLI.subnet.cancel:cli',
+    'subnet:create = SoftLayer.CLI.subnet.create:cli',
+    'subnet:detail = SoftLayer.CLI.subnet.detail:cli',
+    'subnet:list = SoftLayer.CLI.subnet.list:cli',
+    'subnet:lookup = SoftLayer.CLI.subnet.lookup:cli',
 
     'ticket = SoftLayer.CLI.ticket',
     'ticket:create = SoftLayer.CLI.ticket.create:cli',
