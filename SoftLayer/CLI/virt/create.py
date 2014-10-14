@@ -15,7 +15,7 @@ import click
 @click.command(epilog="See 'sl vs create-options' for valid options")
 @click.option('--domain', '-D', help="Domain portion of the FQDN")
 @click.option('--hostname', '-H', help="Host portion of the FQDN")
-@click.option('--image', '-H',
+@click.option('--image',
               help="Image GUID. See: 'sl image list' for reference")
 @click.option('--cpu', '-c', help="Number of CPU cores", type=click.INT)
 @click.option('--memory', '-m', help="Memory in mebibytes", type=click.INT)
@@ -224,7 +224,7 @@ def _parse_create_args(client, args):
     :param dict args: CLI arguments
     """
     data = {
-        "hourly": args['hourly'],
+        "hourly": args['billing'] == 'hourly',
         "cpus": args['cpu'],
         "domain": args['domain'],
         "hostname": args['hostname'],

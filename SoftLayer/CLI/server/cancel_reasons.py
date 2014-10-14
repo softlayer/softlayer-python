@@ -9,9 +9,8 @@ import click
 
 
 @click.command()
-@click.argument('identifier')
 @environment.pass_env
-def cli(env, identifier):
+def cli(env):
     """Display a list of cancellation reasons"""
 
     table = formatting.Table(['Code', 'Reason'])
