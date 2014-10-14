@@ -12,11 +12,11 @@ import click
 
 @click.command()
 @click.argument('identifier')
-@click.option('--file', '-f',
+@click.option('--out-file', '-f',
               type=click.Path(exists=True, writable=True),
               help="The public SSH key will be written to this file")
 @environment.pass_env
-def cli(env, identifier, file):
+def cli(env, identifier, out_file):
     """Prints out an SSH key to the screen"""
 
     mgr = SoftLayer.SshKeyManager(env.client)
@@ -25,8 +25,8 @@ def cli(env, identifier, file):
 
     key = mgr.get_key(key_id)
 
-    if file:
-        with open(path.expanduser(file), 'w') as pub_file:
+    if out_file:
+        with open(path.expanduser(out_file), 'w') as pub_file:
             pub_file.write(key['key'])
 
     table = formatting.KeyValueTable(['Name', 'Value'])

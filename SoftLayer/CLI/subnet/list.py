@@ -25,10 +25,10 @@ import click
               help="Filter by datacenter shortname (sng01, dal05, ...)")
 @click.option('--identifier', help="Filter by network identifier")
 @click.option('--subnet-type', '-t', help="Filter by subnet type")
-@click.option('--v4', is_flag=True, help="Display only IPv4 subnets")
-@click.option('--v6', is_flag=True, help="Display only IPv6 subnets")
+@click.option('--v4', '--ipv4', is_flag=True, help="Display only IPv4 subnets")
+@click.option('--v6', '--ipv6', is_flag=True, help="Display only IPv6 subnets")
 @environment.pass_env
-def cli(env, sortby, datacenter, identifier, subnet_type, v4, v6):
+def cli(env, sortby, datacenter, identifier, subnet_type, ipv4, ipv6):
     """List subnets"""
 
     mgr = SoftLayer.NetworkManager(env.client)
@@ -40,9 +40,9 @@ def cli(env, sortby, datacenter, identifier, subnet_type, v4, v6):
     table.sortby = sortby
 
     version = 0
-    if v4:
+    if ipv4:
         version = 4
-    elif v6:
+    elif ipv6:
         version = 6
 
     subnets = mgr.list_subnets(

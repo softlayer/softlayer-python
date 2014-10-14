@@ -14,12 +14,12 @@ import click
 @click.argument('network', type=click.Choice(['public', 'private']))
 @click.argument('quantity', type=click.INT)
 @click.argument('vlan-id')
-@click.option('--v6', is_flag=True, help="Order v6 IP Addresses")
+@click.option('--v6', '--ipv6', is_flag=True, help="Order v6 IP Addresses")
 @click.option('--test',
               is_flag=True,
               help="Do not order the subnet; just get a quote")
 @environment.pass_env
-def cli(env, network, quantity, vlan_id, v6, test):
+def cli(env, network, quantity, vlan_id, ipv6, test):
     """Add a new subnet to your account. Valid quantities vary by type
 
     \b
@@ -35,7 +35,7 @@ def cli(env, network, quantity, vlan_id, v6, test):
     mgr = SoftLayer.NetworkManager(env.client)
 
     version = 4
-    if v6:
+    if ipv6:
         version = 6
     if not test and not env.skip_confirmations:
         if not formatting.confirm("This action will incur charges on your "
