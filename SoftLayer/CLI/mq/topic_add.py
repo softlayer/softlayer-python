@@ -34,14 +34,14 @@ def cli(env, account_id, topic_name, datacenter, network,
     mq_client = manager.get_connection(account_id,
                                        datacenter=datacenter, network=network)
 
-    tags = None
+    tag_list = None
     if tags:
-        tags = [tag.strip() for tag in tags.split(',')]
+        tag_list = [tag.strip() for tag in tags.split(',')]
 
     topic = mq_client.create_topic(
         topic_name,
         visibility_interval=visibility_interval,
         expiration=expiration,
-        tags=tags,
+        tags=tag_list,
     )
     return mq.topic_table(topic)

@@ -1,4 +1,4 @@
-"""List SoftLayer Message Queue Endpoints"""
+"""List all queues on an account"""
 # :license: MIT, see LICENSE for more details.
 
 import SoftLayer
@@ -16,7 +16,7 @@ import click
               help="Network type")
 @environment.pass_env
 def cli(env, account_id, datacenter, network):
-    """List SoftLayer Message Queue Endpoints"""
+    """List all queues on an account"""
 
     manager = SoftLayer.MessagingManager(env.client)
     mq_client = manager.get_connection(account_id,

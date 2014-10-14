@@ -1,0 +1,107 @@
+"""Get details for a hardware device"""
+# :license: MIT, see LICENSE for more details.
+
+import SoftLayer
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
+from SoftLayer import utils
+
+import click
+
+
+@click.command()
+@click.argument('identifier')
+@click.option('--passwords', help='Show passwords (check over your shoulder!)')
+@click.option('--price', help='Show associated prices')
+@environment.pass_env
+def cli(env, identifier, passwords, price):
+    """Get details for a hardware device"""
+
+    hardware = SoftLayer.HardwareManager(env.client)
+
+    table = formatting.KeyValueTable(['Name', 'Value'])
+    table.align['Name'] = 'r'
+    table.align['Value'] = 'l'
+
+    hardware_id = helpers.resolve_id(hardware.resolve_ids,
+                                     identifier,
+                                     'hardware')
+    result = hardware.get_hardware(hardware_id)
+    result = utils.NestedDict(result)
+
+    table.add_row(['id', result['id']])
+    table.add_row(['hostname', result['fullyQualifiedDomainName']])
+    table.add_row(['status', result['hardwareStatus']['status']])
+    table.add_row(['datacenter',
+                   result['datacenter']['name'] or formatting.blank()])
+    table.add_row(['cores', result['processorPhysicalCoreAmount']])
+    table.add_row(['memory',
+                   formatting.gb(result['memoryCapacity'])])
+    table.add_row(['public_ip',
+                   result['primaryIpAddress'] or formatting.blank()])
+    table.add_row(['private_ip',
+                   result['primaryBackendIpAddress']
+                   or formatting.blank()])
+    table.add_row(['ipmi_ip',
+                   result['networkManagementIpAddress']
+                   or formatting.blank()])
+    table.add_row([
+        'os',
+        formatting.FormattedItem(
+            result['operatingSystem']['softwareLicense']
+            ['softwareDescription']['referenceCode'] or formatting.blank(),
+            result['operatingSystem']['softwareLicense']
+            ['softwareDescription']['name'] or formatting.blank()
+        )])
+
+    table.add_row(
+        ['created', result['provisionDate'] or formatting.blank()])
+
+    table.add_row(['owner', formatting.FormattedItem(
+        utils.lookup(result, 'billingItem', 'orderItem',
+                     'order', 'userRecord',
+                     'username') or formatting.blank()
+    )])
+
+    vlan_table = formatting.Table(['type', 'number', 'id'])
+
+    for vlan in result['networkVlans']:
+        vlan_table.add_row([
+            vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
+    table.add_row(['vlans', vlan_table])
+
+    if result.get('notes'):
+        table.add_row(['notes', result['notes']])
+
+    if price:
+        table.add_row(['price rate',
+                       result['billingItem']['recurringFee']])
+
+    if passwords:
+        user_strs = []
+        for item in result['operatingSystem']['passwords']:
+            user_strs.append(
+                "%s %s" % (item['username'], item['password']))
+        table.add_row(['users', formatting.listing(user_strs)])
+
+    tag_row = []
+    for tag in result['tagReferences']:
+        tag_row.append(tag['tag']['name'])
+
+    if tag_row:
+        table.add_row(['tags', formatting.listing(tag_row, separator=',')])
+
+    # Test to see if this actually has a primary (public) ip address
+    try:
+        if not result['privateNetworkOnlyFlag']:
+            ptr_domains = (env.client['Hardware_Server']
+                           .getReverseDomainRecords(id=hardware_id))
+
+            for ptr_domain in ptr_domains:
+                for ptr in ptr_domain['resourceRecords']:
+                    table.add_row(['ptr', ptr['data']])
+    except SoftLayer.SoftLayerAPIError:
+        pass
+
+    return table

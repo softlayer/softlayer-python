@@ -19,7 +19,7 @@ import click
               help="Network type")
 @environment.pass_env
 def cli(env, account_id, queue_name, message, datacenter, network):
-    """Delete a queue or a queued message"""
+    """Push a message into a queue"""
 
     manager = SoftLayer.MessagingManager(env.client)
     mq_client = manager.get_connection(account_id,

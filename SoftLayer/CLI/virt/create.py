@@ -13,16 +13,18 @@ import click
 
 
 @click.command(epilog="See 'sl vs create-options' for valid options")
-@click.option('--cpu', '-c', help="Number of CPU cores", type=click.INT)
 @click.option('--domain', '-D', help="Domain portion of the FQDN")
 @click.option('--hostname', '-H', help="Host portion of the FQDN")
 @click.option('--image', '-H',
               help="Image GUID. See: 'sl image list' for reference")
+@click.option('--cpu', '-c', help="Number of CPU cores", type=click.INT)
 @click.option('--memory', '-m', help="Memory in mebibytes", type=click.INT)
 @click.option('--os', '-o',
               help="OS install code. Tip: you can specify <OS>_LATEST")
-@click.option('--hourly/--monthly',
-              help="Hourly or monthly rate instance type")
+@click.option('--billing',
+              type=click.Choice(['hourly', 'monthly']),
+              default='hourly',
+              help="""Billing rate""")
 @click.option('--datacenter', '-d', help="Datacenter shortname")
 @click.option('--dedicated/--public',
               is_flag=True,
@@ -34,7 +36,7 @@ import click
               is_flag=True,
               help="Do not actually create the virtual server")
 @click.option('--export',
-              is_flag=True,
+              type=click.Path(writable=True, resolve_path=True),
               help="Exports options to a template file")
 @click.option('--userfile', '-F',
               help="Read userdata from file",
@@ -55,18 +57,18 @@ import click
               help="A template file that defaults the command-line options",
               type=click.Path(exists=True, readable=True, resolve_path=True))
 @click.option('--userdata', '-u', help="User defined metadata string")
-@click.option('--vlan_public',
+@click.option('--vlan-public',
               help="The ID of the public VLAN on which you want the virtual "
               "server placed",
               type=click.INT)
-@click.option('--vlan_private',
+@click.option('--vlan-private',
               help="The ID of the private VLAN on which you want the virtual "
                    "server placed",
               type=click.INT)
 @click.option('--wait',
+              type=click.INT,
               help="Wait until VS is finished provisioning for up to X "
-                   "seconds before returning",
-              type=click.INT)
+                   "seconds before returning")
 @environment.pass_env
 def cli(env, **args):
     """Order/create virtual servers"""
@@ -97,16 +99,17 @@ def cli(env, **args):
         for price in result['prices']:
             total_monthly += float(price.get('recurringFee', 0.0))
             total_hourly += float(price.get('hourlyRecurringFee', 0.0))
-            if args.get('hourly'):
+            if args.get('billing') == 'hourly':
                 rate = "%.2f" % float(price['hourlyRecurringFee'])
-            else:
+            elif args.get('billing') == 'monthly':
                 rate = "%.2f" % float(price['recurringFee'])
 
             table.add_row([price['item']['description'], rate])
 
-        if args.get('hourly'):
+        total = 0
+        if args.get('billing') == 'hourly':
             total = total_hourly
-        else:
+        elif args.get('billing') == 'monthly':
             total = total_monthly
 
         billing_rate = 'monthly'

@@ -15,7 +15,7 @@ import click
               help="Network type")
 @environment.pass_env
 def cli(env, datacenter, network):
-    """List SoftLayer Message Queue Endpoints"""
+    """Ping the SoftLayer Message Queue service"""
 
     manager = SoftLayer.MessagingManager(env.client)
     okay = manager.ping(datacenter=datacenter, network=network)

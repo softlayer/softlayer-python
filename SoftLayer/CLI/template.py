@@ -32,11 +32,10 @@ def update_with_template_args(args, list_args=None):
 
     # Merge template options with the options passed in
     for key, value in config.items('settings'):
-        option_key = '--%s' % key
-        if option_key in list_args:
+        if key in list_args:
             value = value.split(',')
-        if not args.get(option_key):
-            args[option_key] = value
+        if not args.get(key):
+            args[key] = value
 
 
 def export_to_template(filename, args, exclude=None):
@@ -56,6 +55,8 @@ def export_to_template(filename, args, exclude=None):
     with open(filename, "w") as template_file:
         for k, val in args.items():
             if val and k not in exclude:
+                if isinstance(val, tuple):
+                    val = ','.join(val)
                 if isinstance(val, list):
                     val = ','.join(val)
                 template_file.write('%s=%s\n' % (k, val))
