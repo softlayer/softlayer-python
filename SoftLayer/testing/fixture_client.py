@@ -7,6 +7,7 @@
 # Disable pylint import error because mock might not be installed.
 # Also disable the too-few-public-methods error.
 # pylint: disable=F0401,R0903
+import SoftLayer
 import importlib
 
 import mock
@@ -18,6 +19,12 @@ class FixtureClient(mock.MagicMixin):
     def __init__(self):
         # Keep track of Service instances in order to do future assertions
         self.loaded_services = {}
+
+        # The following properties are used to appear like a normal client
+        self.auth = SoftLayer.BasicAuthentication('default-user',
+                                                  'default-key')
+        self.endpoint_url = 'default-endpoint-url'
+        self.timeout = 10
 
     def __getitem__(self, service_name):
         if service_name in self.loaded_services:

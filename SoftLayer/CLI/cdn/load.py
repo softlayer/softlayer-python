@@ -8,7 +8,7 @@ import click
 
 
 @click.command()
-@click.argument('account_id', nargs=-1)
+@click.argument('account_id')
 @click.argument('content_url', nargs=-1)
 @environment.pass_env
 def cli(env, account_id, content_url):

@@ -12,5 +12,5 @@ import click
 def cli(env):
     """Show current configuration"""
 
-    settings = config.get_settings_from_client(env.client)
+    settings = config.get_settings_from_client(env.client.real_client)
     return config.config_table(settings)

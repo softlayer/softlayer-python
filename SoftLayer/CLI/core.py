@@ -11,7 +11,7 @@ import time
 import types
 
 import SoftLayer
-from SoftLayer.CLI import environment
+from SoftLayer.CLI import environment as clienvironment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 
@@ -40,12 +40,12 @@ class CommandLoader(click.MultiCommand):
 
     def list_commands(self, ctx):
         """Get module for click"""
-        env = ctx.ensure_object(environment.Environment)
+        env = ctx.ensure_object(clienvironment.Environment)
         return env.command_list(self.module)
 
     def get_command(self, ctx, name):
         """Get command for click"""
-        env = ctx.ensure_object(environment.Environment)
+        env = ctx.ensure_object(clienvironment.Environment)
         command = env.get_command(self.module, name)
         return command
 
@@ -55,12 +55,12 @@ class ModuleLoader(click.MultiCommand):
 
     def list_commands(self, ctx):
         """Get module for click"""
-        env = ctx.ensure_object(environment.Environment)
+        env = ctx.ensure_object(clienvironment.Environment)
         return sorted(env.module_list())
 
     def get_command(self, ctx, name):
         """Get command for click"""
-        env = ctx.ensure_object(environment.Environment)
+        env = ctx.ensure_object(clienvironment.Environment)
 
         # Do alias lookup
         module_name = env.get_module_name(name)
@@ -81,14 +81,15 @@ class CliClient(SoftLayer.Client):
     """
 
     def __init__(self, client, *args, **kwargs):
-        self.client = client
+        self.real_client = client
         self.last_calls = []
-        super(CliClient, self).__init__(*args, **kwargs)
 
     def call(self, service, method, *args, **kwargs):
         """See Client.call for documentation."""
         start_time = time.time()
-        result = self.client.call(service, method, *args, **kwargs)
+
+        result = self.real_client.call(service, method, *args, **kwargs)
+
         end_time = time.time()
         diff = end_time - start_time
         self.last_calls.append((service, method, start_time, diff))
@@ -160,25 +161,21 @@ def cli(ctx,
         logger.addHandler(handler)
         logger.setLevel(DEBUG_LOGGING_MAP.get(verbose, logging.DEBUG))
 
-    # Create SL Client
-    client_kwargs = {
-        'proxy': proxy,
-        'config_file': config,
-    }
-
-    if fixtures:
-        from SoftLayer import testing
-        real_client = testing.FixtureClient()
-    else:
-        real_client = SoftLayer.Client(**client_kwargs)
-
-    client = CliClient(real_client)
-
     # Populate environement with client and set it as the context object
-    env = ctx.ensure_object(environment.Environment)
+    env = ctx.ensure_object(clienvironment.Environment)
     env.skip_confirmations = really
     env.config_file = config
-    env.client = client
+    if env.client is None:
+        # Environment can be passed in explicitly. This is used for testing
+        if fixtures:
+            from SoftLayer import testing
+            real_client = testing.FixtureClient()
+        else:
+            # Create SL Client
+            real_client = SoftLayer.Client(proxy=proxy, config_file=config)
+
+        client = CliClient(real_client)
+        env.client = client
 
 
 @cli.resultcallback()
@@ -187,7 +184,7 @@ def output_result(ctx, result, timings=False, format='table', **kwargs):
     """Outputs the results returned by the CLI and also outputs timings."""
 
     result = formatting.format_output(result, fmt=format)
-    env = ctx.ensure_object(environment.Environment)
+    env = ctx.ensure_object(clienvironment.Environment)
     if result:
         env.out(result)
 

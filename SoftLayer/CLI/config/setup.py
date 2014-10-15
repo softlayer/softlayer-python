@@ -97,7 +97,7 @@ def cli(env):
 def get_user_input(env):
     """ Ask for username, secret (api_key or password) and endpoint_url """
 
-    defaults = config.get_settings_from_client(env.client)
+    defaults = config.get_settings_from_client(env.client.real_client)
     timeout = defaults['timeout']
 
     # Ask for username
