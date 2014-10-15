@@ -397,6 +397,23 @@ getCdnAccounts = [
 ]
 
 getNetworkVlans = [{
+    'id': 1,
+    'dedicatedFirewallFlag': True,
+    'highAvailabilityFirewallFlag': True,
+    'networkVlanFirewall': {'id': 1234},
+}, {
+    'id': 2,
+    'dedicatedFirewallFlag': False,
+    'firewallGuestNetworkComponents': [{
+        'id': 1234,
+        'guestNetworkComponent': {'guest': {'id': 1}},
+        'status': 'ok'}],
+    'firewallNetworkComponents': [{
+        'id': 1234,
+        'networkComponent': {'downlinkComponent': {'hardwareId': 1}},
+        'status': 'ok'}]
+}, {
+    'id': 3,
     'name': 'dal00',
     'hardware': [{'id': 1}],
     'networkComponents': [{'id': 2}],

@@ -19,4 +19,5 @@ def cli(env, record_id):
 
     if env.skip_confirmations or formatting.no_going_back('yes'):
         manager.delete_record(record_id)
-    raise exceptions.CLIAbort("Aborted.")
+    else:
+        raise exceptions.CLIAbort("Aborted.")

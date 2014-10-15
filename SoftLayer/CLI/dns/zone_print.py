@@ -3,12 +3,14 @@
 
 import SoftLayer
 from SoftLayer.CLI import helpers
+from SoftLayer.CLI import environment
 
 import click
 
 
 @click.command()
 @click.argument('zone')
+@environment.pass_env
 def cli(env, zone):
     """Print zone in BIND format"""
 

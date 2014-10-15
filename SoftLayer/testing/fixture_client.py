@@ -42,6 +42,9 @@ class FixtureClient(mock.MagicMixin):
         """ Reset all of the loaded mocks """
         self.loaded_services = {}
 
+    def __str__(self):
+        return "<SoftLayer.testing.fixture_client>"
+
 
 class FixtureService(mock.MagicMixin):
     """ Implements an interface similiar to SoftLayer.Service() """

@@ -9,7 +9,6 @@ import tempfile
 
 import mock
 
-from SoftLayer import auth
 from SoftLayer.CLI.config import setup as config
 from SoftLayer.CLI import core
 from SoftLayer.CLI import environment
@@ -35,9 +34,6 @@ class TestHelpSetup(testing.TestCase):
     def set_up(self):
         self.env = environment.Environment()
         client = core.CliClient(testing.FixtureClient())
-        client.auth = auth.BasicAuthentication('default-user', 'default-key')
-        client.endpoint_url = 'default-endpoint-url'
-        client.timeout = 10
         self.env.client = client
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')

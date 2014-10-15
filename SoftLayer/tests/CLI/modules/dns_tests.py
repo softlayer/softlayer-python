@@ -4,124 +4,98 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import json
 import os.path
 
 import mock
 
+from SoftLayer.CLI import core
+from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
-from SoftLayer.CLI import formatting
-from SoftLayer.CLI.modules import dns
+from SoftLayer.CLI.dns import zone_import
 from SoftLayer import testing
-from SoftLayer.testing import fixtures
 
 
 class DnsTests(testing.TestCase):
-    def set_up(self):
-        self.client = testing.FixtureClient()
-        self.env = mock.MagicMock()
 
-    def test_dump_zone(self):
-        command = dns.DumpZone(client=self.client)
+    def test_zone_print(self):
+        result = testing.run_command(['dns', 'zone-print', '1234'])
 
-        output = command.execute({'<zone>': '1234'})
-        self.assertEqual('lots of text', output)
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output), "lots of text")
 
     def test_create_zone(self):
-        command = dns.CreateZone(client=self.client)
+        result = testing.run_command(['dns', 'zone-create', 'example.com'])
 
-        output = command.execute({'<zone>': 'example.com'})
-        self.assertEqual(None, output)
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(result.output, "")
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
     def test_delete_zone(self, no_going_back_mock):
         no_going_back_mock.return_value = True
-        command = dns.DeleteZone(client=self.client)
+        result = testing.run_command(['dns', 'zone-delete', '1234'])
 
-        output = command.execute({'<zone>': 'example.com', '--really': False})
-        self.assertEqual(None, output)
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(result.output, "")
 
         no_going_back_mock.return_value = False
-        command = dns.DeleteZone(client=self.client)
+        result = testing.run_command(['--really',
+                                      'dns', 'zone-delete', '1234'])
 
-        self.assertRaises(exceptions.CLIAbort,
-                          command.execute, {'<zone>': 'example.com',
-                                            '--really': False})
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(result.output, "")
+
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    def test_delete_zone_abort(self, no_going_back_mock):
+        no_going_back_mock.return_value = False
+        result = testing.run_command(['dns', 'zone-delete', '1234'])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
     def test_list_zones(self):
-        command = dns.ListZones(client=self.client)
+        result = testing.run_command(['dns', 'zone-list'])
 
-        output = command.execute({'<zone>': None})
-        self.assertEqual([{'serial': 2014030728,
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output),
+                         [{'serial': 2014030728,
                            'updated': '2014-03-07T13:52:31-06:00',
-                           'id': 12345, 'zone': 'example.com'}],
-                         formatting.format_output(output, 'python'))
+                           'id': 12345,
+                           'zone': 'example.com'}])
 
-    def test_list_all_zones(self):
-        command = dns.ListZones(client=self.client)
+    def test_list_records(self):
+        result = testing.run_command(['dns', 'record-list', '1234'])
 
-        output = command.execute({'<zone>': 'example.com'})
-        self.assertEqual({'record': 'a',
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output)[0],
+                         {'record': 'a',
                           'type': 'CNAME',
                           'id': 1,
                           'value': 'd',
-                          'ttl': 100},
-                         formatting.format_output(output, 'python')[0])
+                          'ttl': 7200})
 
     def test_add_record(self):
-        command = dns.AddRecord(client=self.client)
+        result = testing.run_command(['dns', 'record-add', '1234',
+                                      'hostname', 'A', 'd', '--ttl=100'])
 
-        output = command.execute({'<zone>': 'example.com',
-                                  '<record>': 'hostname',
-                                  '<type>': 'A',
-                                  '<data>': 'd',
-                                  '--ttl': 100})
-        self.assertEqual(None, output)
-
-    def test_edit_record(self):
-        command = dns.EditRecord(client=self.client)
-
-        output = command.execute({'<zone>': 'example.com',
-                                  '<record>': 'hostname',
-                                  '<type>': 'A',
-                                  '--data': 'd',
-                                  '--id': 1,
-                                  '--ttl': 100})
-        self.assertEqual(None, output)
-
-        output = command.execute({'<zone>': 'example.com',
-                                  '<record>': 'hostname',
-                                  '<type>': 'A',
-                                  '--data': 'd',
-                                  '--id': None,
-                                  '--ttl': 100})
-        self.assertEqual(None, output)
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(result.output, "")
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
     def test_delete_record(self, no_going_back_mock):
         no_going_back_mock.return_value = True
-        self.client['Dns_Domain'].getResourceRecords.return_value = [
-            fixtures.Dns_Domain.getResourceRecords[0]]
-        command = dns.RecordRemove(client=self.client)
-        output = command.execute({'<zone>': 'example.com',
-                                  '<record>': 'hostname',
-                                  '--id': '1',
-                                  '--really': False})
-        self.assertEqual([{'record': '1'}],
-                         formatting.format_output(output, 'python'))
+        result = testing.run_command(['dns', 'record-remove', '1234'])
 
-        output = command.execute({'<zone>': 'example.com',
-                                  '<record>': 'hostname',
-                                  '--id': None,
-                                  '--really': False})
-        self.assertEqual([{'record': 1}],
-                         formatting.format_output(output, 'python'))
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(result.output, "")
 
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    def test_delete_record_abort(self, no_going_back_mock):
         no_going_back_mock.return_value = False
-        self.assertRaises(exceptions.CLIAbort,
-                          command.execute, {'<zone>': 'example.com',
-                                            '<record>': 'hostname',
-                                            '--id': 1,
-                                            '--really': False})
+        result = testing.run_command(['dns', 'record-remove', '1234'])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
     def test_parse_zone_file(self):
         zone_file = """$ORIGIN realtest.com.
@@ -148,66 +122,61 @@ spf  IN TXT "v=spf1 ip4:192.0.2.0/24 ip4:198.51.100.123 a"
 """
         expected = [{'data': 'ns1.softlayer.com.',
                      'record': '@',
-                     'record_type': 'NS',
+                     'type': 'NS',
                      'ttl': '86400'},
                     {'data': 'ns2.softlayer.com.',
                      'record': '@',
-                     'record_type': 'NS',
+                     'type': 'NS',
                      'ttl': '86400'},
                     {'data': '127.0.0.1',
                      'record': 'testing',
-                     'record_type': 'A',
+                     'type': 'A',
                      'ttl': '86400'},
                     {'data': '12.12.0.1',
                      'record': 'testing1',
-                     'record_type': 'A',
+                     'type': 'A',
                      'ttl': '86400'},
                     {'data': '1.0.3.4',
                      'record': 'server2',
-                     'record_type': 'A',
+                     'type': 'A',
                      'ttl': None},
                     {'data': 'server2',
                      'record': 'ftp',
-                     'record_type': 'CNAME',
+                     'type': 'CNAME',
                      'ttl': None},
                     {'data': '"This is just a test of the txt record"',
                      'record': 'dev.realtest.com',
-                     'record_type': 'TXT',
+                     'type': 'TXT',
                      'ttl': None},
                     {'data': '"v=spf1 ip4:192.0.2.0/24 ip4:198.51.100.123 a"',
                      'record': 'spf',
-                     'record_type': 'TXT',
+                     'type': 'TXT',
                      'ttl': None}]
-        zone, records, bad_lines = dns.parse_zone_details(zone_file)
+        zone, records, bad_lines = zone_import.parse_zone_details(zone_file)
         self.assertEqual(zone, 'realtest.com')
         self.assertEqual(records, expected)
         self.assertEqual(len(bad_lines), 13)
 
     def test_import_zone_dry_run(self):
-        command = dns.ImportZone(client=self.client, env=self.env)
         path = os.path.join(testing.FIXTURE_PATH, 'realtest.com')
-        output = command.execute({
-            '<file>': path,
-            '--dry-run': True,
-        })
+        result = testing.run_command(['dns', 'import', path, '--dry-run'])
 
-        # Dry run should not result in create calls
-        self.assertFalse(self.client['Dns_Domain'].createObject.called)
-        record_service = self.client['Dns_Domain_ResourceRecord']
-        self.assertFalse(record_service.createObject.called)
-
-        self.assertEqual(None, output)
+        self.assertIn("Parsed: zone=realtest.com", result.output)
+        self.assertIn(
+            "Parsed: type=NS, record=@, data=ns1.softlayer.com., ttl=86400",
+            result.output)
+        self.assertIn("Unparsed: $TTL 86400", result.output)
 
     def test_import_zone(self):
-        command = dns.ImportZone(client=self.client, env=self.env)
-        path = os.path.join(testing.FIXTURE_PATH, 'realtest.com')
-        output = command.execute({
-            '<file>': path,
-            '--dry-run': False,
-        })
+        env = environment.Environment()
+        client = testing.FixtureClient()
+        env.client = core.CliClient(client)
 
-        self.assertFalse(self.client['Dns_Domain'].createObject.called)
-        record_service = self.client['Dns_Domain_ResourceRecord']
+        path = os.path.join(testing.FIXTURE_PATH, 'realtest.com')
+        result = testing.run_command(['dns', 'import', path], environment=env)
+
+        self.assertFalse(client['Dns_Domain'].createObject.called)
+        record_service = client['Dns_Domain_ResourceRecord']
         self.assertEqual(record_service.createObject.call_args_list,
                          [mock.call({'data': 'ns1.softlayer.com.',
                                      'host': '@',
@@ -252,4 +221,4 @@ spf  IN TXT "v=spf1 ip4:192.0.2.0/24 ip4:198.51.100.123 a"
                                      'type': 'TXT',
                                      'ttl': None})])
 
-        self.assertEqual("Finished", output)
+        self.assertIn("Finished", result.output)

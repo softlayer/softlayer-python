@@ -15,6 +15,9 @@ class CLIHalt(SystemExit):
         super(CLIHalt, self).__init__(*args)
         self.code = code
 
+    def __str__(self):
+        return "<CLIHalt code=%s %s>" % (self.code, self.args)
+
 
 class CLIAbort(CLIHalt):
     """Halt the execution of the command. Gives an exit code of 2."""

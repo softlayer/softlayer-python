@@ -70,6 +70,7 @@ cli_entry_points = [
     'config:show = SoftLayer.CLI.config.show:cli',
 
     'dns = SoftLayer.CLI.dns',
+    'dns:import = SoftLayer.CLI.dns.zone_import:cli',
     'dns:record-add = SoftLayer.CLI.dns.record_add:cli',
     'dns:record-list = SoftLayer.CLI.dns.record_list:cli',
     'dns:record-remove = SoftLayer.CLI.dns.record_remove:cli',

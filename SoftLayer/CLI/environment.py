@@ -6,8 +6,6 @@
     :license: MIT, see LICENSE for more details.
 """
 import getpass
-import os
-import os.path
 import sys
 
 from SoftLayer.CLI import exceptions
@@ -96,15 +94,11 @@ class Environment(object):
 
     def out(self, output, newline=True):
         """Outputs a string to the console (stdout)."""
-        self.stdout.write(output)
-        if newline:
-            self.stdout.write(os.linesep)
+        click.echo(output, nl=newline)
 
     def err(self, output, newline=True):
         """Outputs an error string to the console (stderr)."""
-        self.stderr.write(output)
-        if newline:
-            self.stderr.write(os.linesep)
+        click.echo(output, nl=newline, err=True)
 
     def input(self, prompt):
         """Provide a command prompt."""
