@@ -212,7 +212,9 @@ class HardwareManager(utils.IdentifierMixin, object):
         ordering_manager = self.ordering_manager
 
         mask = 'id,name,description,type,isActive'
-        package_types = ['BARE_METAL_CPU', 'BARE_METAL_CORE']
+        package_types = ['BARE_METAL_CPU',
+                         'BARE_METAL_CORE',
+                         'BARE_METAL_CPU_FAST_PROVISION']
 
         packages = ordering_manager.get_packages_of_type(package_types,
                                                          mask)

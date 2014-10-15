@@ -305,7 +305,9 @@ class HardwareTests(testing.TestCase):
                     'operation': 'in',
                     'options': [{
                         'name': 'data',
-                        'value': ['BARE_METAL_CPU', 'BARE_METAL_CORE']
+                        'value': ['BARE_METAL_CPU',
+                                  'BARE_METAL_CORE',
+                                  'BARE_METAL_CPU_FAST_PROVISION']
                     }]
                 }
             }
