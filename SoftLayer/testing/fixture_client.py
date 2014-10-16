@@ -11,10 +11,14 @@ import SoftLayer
 
 import importlib
 
-import mock
+try:
+    import mock
+    HAS_MOCK = True
+except ImportError:
+    HAS_MOCK = False
 
 
-class FixtureClient(mock.MagicMixin):
+class FixtureClient():
     """ Implements an interface similiar to SoftLayer.Client() """
 
     def __init__(self):
@@ -47,7 +51,7 @@ class FixtureClient(mock.MagicMixin):
         return "<SoftLayer.testing.fixture_client>"
 
 
-class FixtureService(mock.MagicMixin):
+class FixtureService():
     """ Implements an interface similiar to SoftLayer.Service() """
 
     def __init__(self, service_name):
@@ -66,13 +70,22 @@ class FixtureService(mock.MagicMixin):
         if name in self.loaded_methods:
             return self.loaded_methods[name]
 
-        call_handler = mock.MagicMock()
         fixture = getattr(self.module, name, None)
         if fixture is not None:
-            call_handler.return_value = fixture
+            call_handler = self._wrap_fixture(fixture)
+            self.loaded_methods[name] = call_handler
+            return call_handler
         else:
             raise NotImplementedError('%s::%s fixture is not implemented'
                                       % (self.service_name, name))
 
-        self.loaded_methods[name] = call_handler
-        return call_handler
+    def _wrap_fixture(self, fixture):
+        if HAS_MOCK:
+            call_handler = mock.MagicMock()
+            call_handler.return_value = fixture
+            return call_handler
+
+        def wrapped(*args, **kwargs):
+            return fixture
+
+        return wrapped

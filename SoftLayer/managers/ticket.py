@@ -1,6 +1,6 @@
 """
     SoftLayer.ticket
-    ~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~
     Ticket Manager/helpers
 
     :license: MIT, see LICENSE for more details.

@@ -13,8 +13,6 @@ Code Organization
 
   * **API** - Primary API client.
   * **CLI** - Code for the command-line interface.
-
-    * **modules** - CLI Modules.
   * **managers** - API Managers. Abstractions to help use the API.
 
 
@@ -78,7 +76,7 @@ The primary docs are built at `Read the Docs <https://readthedocs.org/projects/s
 
 Style
 -----
-This project follows :pep:`8` and most of the style suggestions that pyflakes recommends. Run `Flake8 <https://pypi.python.org/pypi/flake8/2.0>`_ regularly.
+This project follows :pep:`8` and most of the style suggestions that pyflakes recommends. Run `Flake8 <https://pypi.python.org/pypi/flake8/2.0>`_ regularly. Flake8, with project-specific exceptions, can be ran by using tox.
 
 
 Contributing

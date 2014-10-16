@@ -2,3 +2,5 @@ tox
 nose
 mock
 coverage
+fabric
+sphinx
