@@ -76,7 +76,7 @@ class Environment(object):
         return module_name
 
     def _load_modules(self):
-        """Loads module by name."""
+        """Loads all modules."""
         if self._modules_loaded is True:
             return
 
@@ -86,8 +86,9 @@ class Environment(object):
         self._modules_loaded = True
 
     def _load_modules_from_python(self):
+        """Load modules from the native python source."""
         for name, modpath in modules.ALL_MODULES:
-            module, subcommand = self._parse_name(name)
+            module, subcommand = _parse_name(name)
             if module not in self.plugins:
                 self.plugins[module] = {}
 
@@ -98,21 +99,14 @@ class Environment(object):
             self.plugins[module][subcommand] = ModuleLoader(path, attr=attr)
 
     def _load_modules_from_entry_points(self):
+        """Load modules from the entry_points (slower)."""
         for obj in pkg_resources.iter_entry_points(group='softlayer.cli',
                                                    name=None):
 
-            module, subcommand = self._parse_name(obj.name)
+            module, subcommand = _parse_name(obj.name)
             if module not in self.plugins:
                 self.plugins[module] = {}
             self.plugins[module][subcommand] = obj
-
-    def _parse_name(self, name):
-        if ':' in name:
-            module, subcommand = name.split(':')
-        else:
-            module, subcommand = name, None
-
-        return module, subcommand
 
     def out(self, output, newline=True):
         """Outputs a string to the console (stdout)."""
@@ -136,15 +130,28 @@ class Environment(object):
 
 
 class ModuleLoader(object):
+    """Module loader that acts a little like an EntryPoint object."""
+
     def __init__(self, import_path, attr=None):
         self.import_path = import_path
         self.attr = attr
 
     def load(self):
+        """load and return the module/attribute"""
         module = importlib.import_module(self.import_path)
         if self.attr:
             return getattr(module, self.attr)
         return module
+
+
+def _parse_name(name):
+    """Parse command name and path from the given name."""
+    if ':' in name:
+        module, subcommand = name.split(':', 1)
+    else:
+        module, subcommand = name, None
+
+    return module, subcommand
 
 
 pass_env = click.make_pass_decorator(Environment, ensure=True)
