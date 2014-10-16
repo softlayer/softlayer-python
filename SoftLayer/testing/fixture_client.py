@@ -6,7 +6,7 @@
 """
 # Disable pylint import error because mock might not be installed.
 # Also disable the too-few-public-methods error.
-# pylint: disable=F0401,R0903
+# pylint: disable=F0401,R0903,unused-argument
 import SoftLayer
 
 import importlib
@@ -18,8 +18,8 @@ except ImportError:
     HAS_MOCK = False
 
 
-class FixtureClient():
-    """ Implements an interface similiar to SoftLayer.Client() """
+class FixtureClient(object):
+    """Implements an interface similiar to SoftLayer.Client()"""
 
     def __init__(self):
         # Keep track of Service instances in order to do future assertions
@@ -51,8 +51,8 @@ class FixtureClient():
         return "<SoftLayer.testing.fixture_client>"
 
 
-class FixtureService():
-    """ Implements an interface similiar to SoftLayer.Service() """
+class FixtureService(object):
+    """Implements an interface similiar to SoftLayer.Service()"""
 
     def __init__(self, service_name):
         self.service_name = service_name
@@ -72,20 +72,22 @@ class FixtureService():
 
         fixture = getattr(self.module, name, None)
         if fixture is not None:
-            call_handler = self._wrap_fixture(fixture)
+            call_handler = _wrap_fixture(fixture)
             self.loaded_methods[name] = call_handler
             return call_handler
         else:
             raise NotImplementedError('%s::%s fixture is not implemented'
                                       % (self.service_name, name))
 
-    def _wrap_fixture(self, fixture):
-        if HAS_MOCK:
-            call_handler = mock.MagicMock()
-            call_handler.return_value = fixture
-            return call_handler
 
-        def wrapped(*args, **kwargs):
-            return fixture
+def _wrap_fixture(fixture):
+    """Wraps the fixture in either a MagicMock object or a closure"""
+    if HAS_MOCK:
+        call_handler = mock.MagicMock()
+        call_handler.return_value = fixture
+        return call_handler
 
-        return wrapped
+    def wrapped(*args, **kwargs):
+        return fixture
+
+    return wrapped
