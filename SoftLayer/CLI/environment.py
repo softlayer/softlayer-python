@@ -6,9 +6,11 @@
     :license: MIT, see LICENSE for more details.
 """
 import getpass
+import importlib
 import sys
 
 from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import modules
 from SoftLayer import utils
 
 import click
@@ -78,17 +80,39 @@ class Environment(object):
         if self._modules_loaded is True:
             return
 
+        self._load_modules_from_python()
+        self._load_modules_from_entry_points()
+
+        self._modules_loaded = True
+
+    def _load_modules_from_python(self):
+        for name, modpath in modules.ALL_MODULES:
+            module, subcommand = self._parse_name(name)
+            if module not in self.plugins:
+                self.plugins[module] = {}
+
+            if ':' in modpath:
+                path, attr = modpath.split(':', 1)
+            else:
+                path, attr = modpath, None
+            self.plugins[module][subcommand] = ModuleLoader(path, attr=attr)
+
+    def _load_modules_from_entry_points(self):
         for obj in pkg_resources.iter_entry_points(group='softlayer.cli',
                                                    name=None):
-            if ':' in obj.name:
-                module, subcommand = obj.name.split(':')
-            else:
-                module, subcommand = obj.name, None
+
+            module, subcommand = self._parse_name(obj.name)
             if module not in self.plugins:
                 self.plugins[module] = {}
             self.plugins[module][subcommand] = obj
 
-        self._modules_loaded = True
+    def _parse_name(self, name):
+        if ':' in name:
+            module, subcommand = name.split(':')
+        else:
+            module, subcommand = name, None
+
+        return module, subcommand
 
     def out(self, output, newline=True):
         """Outputs a string to the console (stdout)."""
@@ -109,6 +133,18 @@ class Environment(object):
     def exit(self, code=0):
         """Exit."""
         sys.exit(code)
+
+
+class ModuleLoader(object):
+    def __init__(self, import_path, attr=None):
+        self.import_path = import_path
+        self.attr = attr
+
+    def load(self):
+        module = importlib.import_module(self.import_path)
+        if self.attr:
+            return getattr(module, self.attr)
+        return module
 
 
 pass_env = click.make_pass_decorator(Environment, ensure=True)
