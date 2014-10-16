@@ -42,7 +42,7 @@ import click
               help="Read userdata from file",
               type=click.Path(exists=True, readable=True, resolve_path=True))
 @click.option('--postinstall', '-i', help="Post-install script to download")
-@click.option('--keys', '-m',
+@click.option('--key', '-k',
               multiple=True,
               help="SSH keys to add to the root user")
 @click.option('--disk', multiple=True, help="Disk sizes")
@@ -53,6 +53,7 @@ import click
               is_flag=True,
               help="Use the configuration from an existing VS")
 @click.option('--network', '-n', help="Network port speed in Mbps")
+@click.option('--tag', '-g', multiple=True, help="Tags to add to the instance")
 @click.option('--template', '-t',
               help="A template file that defaults the command-line options",
               type=click.Path(exists=True, readable=True, resolve_path=True))
@@ -277,6 +278,6 @@ def _parse_create_args(client, args):
         data['private_vlan'] = args['vlan_private']
 
     if args.get('tag'):
-        data['tag'] = args['tag']
+        data['tags'] = args['tag']
 
     return data

@@ -17,19 +17,18 @@ except ImportError:
 import mock
 
 from SoftLayer.CLI import exceptions
-from SoftLayer.CLI import formatting
-from SoftLayer.CLI.modules import server
+from SoftLayer.CLI.server import create
 from SoftLayer import testing
 from SoftLayer.testing import fixtures
 
+import json
+import tempfile
+
 
 class ServerCLITests(testing.TestCase):
-    def set_up(self):
-        self.client = testing.FixtureClient()
 
     def test_server_cancel_reasons(self):
-        runnable = server.ServerCancelReasons(client=self.client)
-        output = runnable.execute({})
+        result = self.run_command(['server', 'cancel-reasons'])
 
         expected = [
             {'Code': 'datacenter',
@@ -47,37 +46,16 @@ class ServerCLITests(testing.TestCase):
             {'Code': 'migrate_larger', 'Reason': 'Migrating to larger server'}
         ]
 
-        method = 'assertItemsEqual'
-        if not hasattr(self, method):
-            # For Python 3.3 compatibility
-            method = 'assertCountEqual'
-
-        f = getattr(self, method)
-        f(expected, formatting.format_output(output, 'python'))
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output), expected)
 
     @mock.patch('SoftLayer.HardwareManager'
                 '.get_available_dedicated_server_packages')
     def test_server_create_options(self, packages):
-        args = {
-            '<chassis_id>': '999',
-            '--all': True,
-            '--datacenter': False,
-            '--cpu': False,
-            '--nic': False,
-            '--disk': False,
-            '--os': False,
-            '--memory': False,
-            '--controller': False,
-        }
 
-        test_data = [
-            (999, 'Chassis 999'),
-        ]
-        packages.return_value = test_data
+        packages.return_value = [(999, 'Chassis 999')]
 
-        runnable = server.ServerCreateOptions(client=self.client)
-
-        output = runnable.execute(args)
+        result = self.run_command(['server', 'create-options', '999'])
 
         expected = {
             'cpu': [
@@ -101,93 +79,26 @@ class ServerCLITests(testing.TestCase):
                 'WIN_2012-DC-HYPERV_64'],
             'single nic': ['100', '1000']}
 
-        self.assertEqual(expected, formatting.format_output(output, 'python'))
-
-    @mock.patch('SoftLayer.HardwareManager'
-                '.get_available_dedicated_server_packages')
-    def test_server_create_options_with_cpu_only(self, packages):
-        args = {
-            '<chassis_id>': '999',
-            '--all': False,
-            '--datacenter': False,
-            '--cpu': True,
-            '--nic': False,
-            '--disk': False,
-            '--os': False,
-            '--memory': False,
-            '--controller': False,
-        }
-
-        test_data = [
-            (999, 'Chassis 999'),
-        ]
-        packages.return_value = test_data
-
-        runnable = server.ServerCreateOptions(client=self.client)
-
-        output = runnable.execute(args)
-
-        expected = {
-            'cpu': [
-                {'Description': 'Dual Quad Core Pancake 200 - 1.60GHz',
-                 'ID': 723},
-                {'Description': 'Dual Quad Core Pancake 200 - 1.80GHz',
-                 'ID': 724}
-            ],
-        }
-
-        self.assertEqual(expected, formatting.format_output(output, 'python'))
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output), expected)
 
     @mock.patch('SoftLayer.HardwareManager'
                 '.get_available_dedicated_server_packages')
     def test_server_create_options_with_invalid_chassis(self, packages):
-        args = {
-            '<chassis_id>': '999',
-            '--all': True,
-            '--datacenter': False,
-            '--cpu': False,
-            '--nic': False,
-            '--disk': False,
-            '--os': False,
-            '--memory': False,
-            '--controller': False,
-        }
+        packages.return_value = [(998, 'Legacy Chassis')]
+        result = self.run_command(['server', 'create-options', '999'])
 
-        test_data = [
-            (998, 'Legacy Chassis'),
-        ]
-        packages.return_value = test_data
-
-        runnable = server.ServerCreateOptions(client=self.client)
-
-        self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
     @mock.patch('SoftLayer.HardwareManager'
                 '.get_available_dedicated_server_packages')
     @mock.patch('SoftLayer.HardwareManager.get_bare_metal_package_id')
     def test_server_create_options_for_bmc(self, bmpi, packages):
-        args = {
-            '<chassis_id>': '1099',
-            '--all': True,
-            '--datacenter': False,
-            '--cpu': False,
-            '--nic': False,
-            '--disk': False,
-            '--os': False,
-            '--memory': False,
-            '--controller': False,
-        }
-
-        test_data = [
-            (1099, 'Bare Metal Instance'),
-        ]
-        packages.return_value = test_data
-
+        packages.return_value = [(1099, 'Bare Metal Instance')]
         bmpi.return_value = '1099'
 
-        runnable = server.ServerCreateOptions(client=self.client)
-
-        output = runnable.execute(args)
+        result = self.run_command(['server', 'create-options', '1099'])
 
         expected = {
             'memory/cpu': [
@@ -208,13 +119,12 @@ class ServerCLITests(testing.TestCase):
                 'WIN_2012-DC-HYPERV_64'],
             'single nic': ['100', '1000']}
 
-        self.assertEqual(expected, formatting.format_output(output, 'python'))
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output), expected)
 
     def test_server_details(self):
-        runnable = server.ServerDetails(client=self.client)
-
-        args = {'<identifier>': 1234, '--passwords': True, '--price': True}
-        output = runnable.execute(args)
+        result = self.run_command(['server', 'detail', '1234',
+                                   '--passwords', '--price'])
 
         expected = {
             'status': 'ACTIVE',
@@ -238,25 +148,20 @@ class ServerCLITests(testing.TestCase):
             'owner': 'chechu'
         }
 
-        self.assertEqual(expected, formatting.format_output(output, 'python'))
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output), expected)
 
     def test_server_details_issue_332(self):
-        runnable = server.ServerDetails(client=self.client)
         result = fixtures.Hardware_Server.getObject.copy()
         result['privateNetworkOnlyFlag'] = True
         self.client['Hardware_Server'].getObject.return_value = result
+        result = self.run_command(['server', 'detail', '1234'])
 
-        runnable.execute({'<identifier>': 1234,
-                          '--passwords': True,
-                          '--price': True})
-
-        self.assertFalse(self.client['Hardware_Server']
-                         .getReverseDomainRecords.called)
+        service = self.client['Hardware_Server']
+        self.assertFalse(service.getReverseDomainRecords.called)
 
     def test_list_servers(self):
-        runnable = server.ListServers(client=self.client)
-
-        output = runnable.execute({'--tags': 'openstack'})
+        result = self.run_command(['server', 'list', '--tags=openstack'])
 
         expected = [
             {
@@ -294,510 +199,473 @@ class ServerCLITests(testing.TestCase):
             }
         ]
 
-        self.assertEqual(expected, formatting.format_output(output, 'python'))
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output), expected)
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
     @mock.patch('SoftLayer.HardwareManager.reload')
-    @mock.patch('SoftLayer.CLI.helpers.resolve_id')
-    def test_server_reload(self, resolve_mock, reload_mock, ngb_mock):
-        hw_id = 12345
-        resolve_mock.return_value = hw_id
+    def test_server_reload(self, reload_mock, ngb_mock):
         ngb_mock.return_value = False
-        runnable = server.ServerReload(client=self.client)
 
         # Check the positive case
-        args = {'--really': True, '--postinstall': None, '--key': [12345]}
-        runnable.execute(args)
+        result = self.run_command(['--really', 'server', 'reload', '12345',
+                                   '--key=4567'])
 
-        reload_mock.assert_called_with(hw_id, args['--postinstall'], [12345])
+        self.assertEqual(result.exit_code, 0)
+        reload_mock.assert_called_with(12345, None, [4567])
 
         # Now check to make sure we properly call CLIAbort in the negative case
-        args['--really'] = False
+        result = self.run_command(['server', 'reload', '12345'])
 
-        self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
     @mock.patch('SoftLayer.HardwareManager.cancel_hardware')
-    @mock.patch('SoftLayer.CLI.helpers.resolve_id')
-    def test_cancel_server(self, resolve_mock, cancel_mock, ngb_mock):
-        hw_id = 12345
-        resolve_mock.return_value = hw_id
+    def test_cancel_server(self, cancel_mock, ngb_mock):
         ngb_mock.return_value = False
-        runnable = server.CancelServer(client=self.client)
 
         # Check the positive case
-        args = {'--really': True, '--reason': 'Test'}
-        runnable.execute(args)
+        result = self.run_command(['--really', 'server', 'cancel', '12345',
+                                   '--reason=Test', '--comment=Test'])
 
-        cancel_mock.assert_called_with(hw_id, args['--reason'], None, None)
+        self.assertEqual(result.exit_code, 0)
+        cancel_mock.assert_called_with(12345, "Test", "Test", False)
 
-        # Now check to make sure we properly call CLIAbort in the negative case
-        env_mock = mock.Mock()
-        env_mock.input = mock.Mock()
-        env_mock.input.return_value = 'Comment'
+        # Test
+        result = self.run_command(['server', 'cancel', '12345',
+                                   '--reason=Test', '--comment=Test'])
 
-        args['--really'] = False
-        runnable = server.CancelServer(client=self.client, env=env_mock)
-
-        self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
-        env_mock.assert_called()
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_server_power_off(self, confirm_mock):
-        hw_id = 12345
-        runnable = server.ServerPowerOff(client=self.client)
-
         # Check the positive case
-        args = {'--really': True, '<identifier>': '12345'}
+        result = self.run_command(['--really', 'server', 'power-off', '12345'])
 
-        runnable.execute(args)
-
-        self.client['Hardware_Server'].powerOff.assert_called_with(id=hw_id)
+        self.client['Hardware_Server'].powerOff.assert_called_with(id=12345)
 
         # Now check to make sure we properly call CLIAbort in the negative case
         confirm_mock.return_value = False
-        args['--really'] = False
-        self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
+        result = self.run_command(['server', 'power-off', '12345'])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    def test_server_reboot_default(self):
+        result = self.run_command(['--really', 'server', 'reboot', '12345'])
+
+        self.assertEqual(result.exit_code, 0)
+        service = self.client['Hardware_Server']
+        service.rebootDefault.assert_called_with(id=12345)
+
+    def test_server_reboot_soft(self):
+        result = self.run_command(['--really', 'server', 'reboot', '12345',
+                                   '--soft'])
+
+        self.assertEqual(result.exit_code, 0)
+        self.client['Hardware_Server'].rebootSoft.assert_called_with(id=12345)
+
+    def test_server_reboot_hard(self):
+        result = self.run_command(['--really', 'server', 'reboot', '12345',
+                                   '--hard'])
+
+        self.assertEqual(result.exit_code, 0)
+        self.client['Hardware_Server'].rebootHard.assert_called_with(id=12345)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_server_reboot(self, confirm_mock):
-        hw_id = 12345
-        runnable = server.ServerReboot(client=self.client)
-
-        # Check the positive case
-        args = {
-            '--really': True,
-            '<identifier>': '12345',
-            '--hard': False,
-            '--soft': False,
-        }
-
-        runnable.execute(args)
-        self.client['Hardware_Server'].rebootDefault.assert_called_with(
-            id=hw_id)
-
-        args['--soft'] = True
-        args['--hard'] = False
-        runnable.execute(args)
-        self.client['Hardware_Server'].rebootSoft.assert_called_with(id=hw_id)
-
-        args['--soft'] = False
-        args['--hard'] = True
-        runnable.execute(args)
-        self.client['Hardware_Server'].rebootHard.assert_called_with(id=hw_id)
-
-        # Now check to make sure we properly call CLIAbort in the negative case
+    def test_server_reboot_negative(self, confirm_mock):
         confirm_mock.return_value = False
-        args['--really'] = False
-        self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
+        result = self.run_command(['server', 'reboot', '12345'])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
     def test_server_power_on(self):
-        hw_id = 12345
-        runnable = server.ServerPowerOn(client=self.client)
+        result = self.run_command(['--really', 'server', 'power-on', '12345'])
 
-        # Check the positive case
-        args = {
-            '<identifier>': '12345',
-        }
+        self.assertEqual(result.exit_code, 0)
+        self.client['Hardware_Server'].powerOn.assert_called_with(id=12345)
 
-        runnable.execute(args)
-        self.client['Hardware_Server'].powerOn.assert_called_with(id=hw_id)
+    def test_server_power_cycle(self):
+        result = self.run_command(['--really', 'server', 'power-cycle',
+                                   '12345'])
+
+        self.assertEqual(result.exit_code, 0)
+        self.client['Hardware_Server'].powerCycle.assert_called_with(id=12345)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_server_power_cycle(self, confirm_mock):
-        hw_id = 12345
-        runnable = server.ServerPowerCycle(client=self.client)
-
-        # Check the positive case
-        args = {
-            '<identifier>': '12345',
-            '--really': True,
-        }
-
-        runnable.execute(args)
-        self.client['Hardware_Server'].powerCycle.assert_called_with(id=hw_id)
-
-        # Now check to make sure we properly call CLIAbort in the negative case
+    def test_server_power_cycle_negative(self, confirm_mock):
         confirm_mock.return_value = False
-        args['--really'] = False
-        self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
+        result = self.run_command(['server', 'power-cycle', '12345'])
 
-    @mock.patch('SoftLayer.HardwareManager.change_port_speed')
-    @mock.patch('SoftLayer.CLI.helpers.resolve_id')
-    def test_cic_edit_server(self, resolve_mock, port_mock):
-        hw_id = 12345
-        resolve_mock.return_value = hw_id
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
-        # Test updating the port
-        args = {
-            'port': True,
-            'public': False,
-            'private': True,
-            '--speed': 100
-        }
+    def test_nic_edit_server(self):
+        result = self.run_command(['server', 'nic-edit', '12345', 'public',
+                                   '--speed=100'])
 
-        port_mock.side_effect = [True, False]
-        runnable = server.NicEditServer(client=self.client)
-
-        # First call simulates a success
-        runnable.execute(args)
-        port_mock.assert_called_with(hw_id, False, 100)
-
-        # Second call simulates an error
-        runnable.execute(args)
+        self.assertEqual(result.exit_code, 0)
+        service = self.client['Hardware_Server']
+        service.setPublicNetworkInterfaceSpeed.assert_called_with(100,
+                                                                  id=12345)
 
     @mock.patch('SoftLayer.HardwareManager'
                 '.get_available_dedicated_server_packages')
     def test_list_chassis_server(self, packages):
-        test_data = [
-            (1, 'Chassis 1'),
-            (2, 'Chassis 2')
-        ]
-        packages.return_value = test_data
-        runnable = server.ListChassisServer(client=self.client)
+        packages.return_value = [(1, 'Chassis 1', 'Some chassis'),
+                                 (2, 'Chassis 2', 'Another chassis')]
+        result = self.run_command(['server', 'list-chassis'])
 
-        output = runnable.execute({})
+        expected = [{'chassis': 'Chassis 1', 'code': 1},
+                    {'chassis': 'Chassis 2', 'code': 2}]
 
-        expected = [
-            {'Chassis': 'Chassis 1', 'Code': 1},
-            {'Chassis': 'Chassis 2', 'Code': 2}
-        ]
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output), expected)
 
-        self.assertEqual(expected, formatting.format_output(output, 'python'))
+    @mock.patch('SoftLayer.HardwareManager.verify_order')
+    def test_create_server_test_flag(self, verify_mock):
+        verify_mock.return_value = {
+            'prices': [
+                {
+                    'recurringFee': 0.0,
+                    'setupFee': 0.0,
+                    'item': {'description': 'First Item'},
+                },
+                {
+                    'recurringFee': 25.0,
+                    'setupFee': 0.0,
+                    'item': {'description': 'Second Item'},
+                }
+            ]
+        }
+        result = self.run_command(['server', 'create',
+                                   '--chassis=999',
+                                   '--hostname=test',
+                                   '--domain=example.com',
+                                   '--datacenter=TEST00',
+                                   '--cpu=4',
+                                   '--network=100',
+                                   '--disk=250_SATA_II',
+                                   '--disk=250_SATA_II',
+                                   '--os=UBUNTU_12_64_MINIMAL',
+                                   '--memory=4',
+                                   '--controller=RAID0',
+                                   '--test',
+                                   '--key=1234',
+                                   '--key=456',
+                                   '--vlan-public=10234',
+                                   '--vlan-private=20468',
+                                   '--postinstall='
+                                   'http://somescript.foo/myscript.sh',
+                                   ],
+                                  fmt='raw')
 
-    def test_create_server(self):
-        args = {
-            '--chassis': 999,
-            '--hostname': 'test',
-            '--domain': 'example.com',
-            '--datacenter': 'TEST00',
-            '--cpu': False,
-            '--network': '100',
-            '--disk': ['250_SATA_II', '250_SATA_II'],
-            '--os': 'UBUNTU_12_64_MINIMAL',
-            '--memory': False,
-            '--controller': False,
-            '--test': True,
-            '--export': None,
-            '--template': None,
-            '--key': [1234, 456],
-            '--vlan_public': 10234,
-            '--vlan_private': 20468,
-            '--postinstall': 'http://somescript.foo/myscript.sh',
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("First Item", result.output)
+        self.assertIn("Second Item", result.output)
+        self.assertIn("Total monthly cost", result.output)
+
+    @mock.patch('SoftLayer.HardwareManager.verify_order')
+    def test_create_server_test_no_disk(self, verify_mock):
+
+        verify_mock.return_value = {
+            'prices': [
+                {
+                    'recurringFee': 0.0,
+                    'setupFee': 0.0,
+                    'item': {'description': 'First Item'},
+                },
+                {
+                    'recurringFee': 25.0,
+                    'setupFee': 0.0,
+                    'item': {'description': 'Second Item'},
+                }
+            ]
+        }
+        result = self.run_command(['server', 'create',
+                                   '--chassis=999',
+                                   '--hostname=test',
+                                   '--domain=example.com',
+                                   '--datacenter=TEST00',
+                                   '--cpu=4',
+                                   '--network=100',
+                                   '--os=UBUNTU_12_64_MINIMAL',
+                                   '--memory=4',
+                                   '--controller=RAID0',
+                                   '--test',
+                                   '--key=1234',
+                                   '--key=456',
+                                   '--vlan-public=10234',
+                                   '--vlan-private=20468',
+                                   '--postinstall='
+                                   'http://somescript.foo/myscript.sh',
+                                   ],
+                                  fmt='raw')
+
+        self.assertEqual(result.exit_code, 0)
+
+    @mock.patch('SoftLayer.HardwareManager.verify_order')
+    def test_create_server_test_no_disk_no_raid(self, verify_mock):
+        verify_mock.return_value = {
+            'prices': [
+                {
+                    'recurringFee': 0.0,
+                    'setupFee': 0.0,
+                    'item': {'description': 'First Item'},
+                },
+                {
+                    'recurringFee': 25.0,
+                    'setupFee': 0.0,
+                    'item': {'description': 'Second Item'},
+                }
+            ]
         }
 
-        runnable = server.CreateServer(client=self.client)
+        result = self.run_command(['server', 'create',
+                                   '--chassis=999',
+                                   '--hostname=test',
+                                   '--domain=example.com',
+                                   '--datacenter=TEST00',
+                                   '--cpu=4',
+                                   '--network=100',
+                                   '--os=UBUNTU_12_64_MINIMAL',
+                                   '--memory=4',
+                                   '--test',
+                                   '--vlan-public=10234',
+                                   '--vlan-private=20468',
+                                   ],
+                                  fmt='raw')
 
-        # First, test the --test flag
-        with mock.patch('SoftLayer.HardwareManager'
-                        '.verify_order') as verify_mock:
-            verify_mock.return_value = {
-                'prices': [
-                    {
-                        'recurringFee': 0.0,
-                        'setupFee': 0.0,
-                        'item': {'description': 'First Item'},
-                    },
-                    {
-                        'recurringFee': 25.0,
-                        'setupFee': 0.0,
-                        'item': {'description': 'Second Item'},
-                    }
-                ]
-            }
-            output = runnable.execute(args)
+        self.assertEqual(result.exit_code, 0)
 
-            expected = [
-                [
-                    {'Item': 'First Item', 'cost': '0.00'},
-                    {'Item': 'Second Item', 'cost': '25.00'},
-                    {'Item': 'Total monthly cost', 'cost': '25.00'}
-                ],
-                ''
-            ]
+    @mock.patch('SoftLayer.HardwareManager.place_order')
+    def test_create_server(self, order_mock):
+        order_mock.return_value = {
+            'orderId': 98765,
+            'orderDate': '2013-08-02 15:23:47'
+        }
 
-            self.assertEqual(expected,
-                             formatting.format_output(output, 'python'))
+        result = self.run_command(['--really', 'server', 'create',
+                                   '--chassis=999',
+                                   '--hostname=test',
+                                   '--domain=example.com',
+                                   '--datacenter=TEST00',
+                                   '--cpu=4',
+                                   '--network=100',
+                                   '--os=UBUNTU_12_64_MINIMAL',
+                                   '--memory=4',
+                                   '--vlan-public=10234',
+                                   '--vlan-private=20468',
+                                   ])
 
-            # Make sure we can order without specifying the disk as well
-            args['--disk'] = []
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output),
+                         {'id': 98765, 'created': '2013-08-02 15:23:47'})
 
-            output = runnable.execute(args)
-
-            self.assertEqual(expected,
-                             formatting.format_output(output, 'python'))
-
-            # Test explicitly setting a RAID configuration
-            args['--controller'] = 'RAID0'
-
-            output = runnable.execute(args)
-
-            self.assertEqual(expected,
-                             formatting.format_output(output, 'python'))
-
-        # Now test ordering
-        with mock.patch('SoftLayer.HardwareManager.place_order') as order_mock:
-            order_mock.return_value = {
-                'orderId': 98765,
-                'orderDate': '2013-08-02 15:23:47'
-            }
-
-            args['--test'] = False
-            args['--really'] = True
-
-            output = runnable.execute(args)
-
-            expected = {'id': 98765, 'created': '2013-08-02 15:23:47'}
-            self.assertEqual(expected,
-                             formatting.format_output(output, 'python'))
-
-        # Finally, test cancelling the process
-        with mock.patch('SoftLayer.CLI.formatting.confirm') as confirm:
-            confirm.return_value = False
-
-            args['--really'] = False
-
-            self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
-
-    def test_create_server_failures(self):
+    def test_create_server_missing_required(self):
 
         # This is missing a required argument
-        args = {
-            '--hostname': 'test',
-            '--domain': 'example.com',
-            '--datacenter': 'TEST00',
-            '--cpu': False,
-            '--disk': ['1000_DRIVE', '1000_DRIVE'],
-            '--os': 'UBUNTU_12_64_MINIMAL',
-            '--memory': False,
-            '--controller': False,
-            '--test': True,
-            '--export': None,
-            '--template': None,
-        }
+        result = self.run_command(['server', 'create',
+                                   # Note: no chassis id
+                                   '--hostname=test',
+                                   '--domain=example.com',
+                                   '--datacenter=TEST00',
+                                   '--cpu=4',
+                                   '--network=100',
+                                   '--os=UBUNTU_12_64_MINIMAL',
+                                   '--memory=4',
+                                   ])
 
-        runnable = server.CreateServer(client=self.client)
-
-        # Verify that ArgumentError is properly raised on error
-        self.assertRaises(exceptions.ArgumentError, runnable.execute, args)
-
-        # This contains an invalid network argument
-        args['--chassis'] = 999
-        args['--network'] = 9999
-
-        # Verify that CLIAbort is properly raised on error
-        self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
-
-        # This contains an invalid operating system argument
-        args['--network'] = '100'
-        args['--os'] = 'nope'
-
-        # Verify that CLIAbort is properly raised on error
-        self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIsInstance(result.exception, SystemExit)
 
     @mock.patch('SoftLayer.CLI.template.export_to_template')
     def test_create_server_with_export(self, export_to_template):
-        args = {
-            '--chassis': 999,
-            '--hostname': 'test',
-            '--domain': 'example.com',
-            '--datacenter': 'TEST00',
-            '--cpu': False,
-            '--network': '100',
-            '--disk': ['1000_DRIVE', '1000_DRIVE'],
-            '--os': 'UBUNTU_12_64_MINIMAL',
-            '--memory': False,
-            '--controller': False,
-            '--test': True,
-            '--template': None,
-            '--key': [1234],
-            '--export': 'test_file.txt',
-        }
+        result = self.run_command(['server', 'create',
+                                   # Note: no chassis id
+                                   '--chassis=999',
+                                   '--hostname=test',
+                                   '--domain=example.com',
+                                   '--datacenter=TEST00',
+                                   '--cpu=4',
+                                   '--memory=4',
+                                   '--network=100',
+                                   '--os=UBUNTU_12_64_MINIMAL',
+                                   '--key=1234',
+                                   '--export=/path/to/test_file.txt',
+                                   ])
 
-        runnable = server.CreateServer(client=self.client)
-
-        expected = args.copy()
-        del(expected['--export'])
-
-        runnable.execute(args)
-
-        export_to_template.assert_called_with('test_file.txt', expected,
-                                              exclude=['--wait', '--test'])
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("Successfully exported options to a template file.",
+                      result.output)
+        export_to_template.assert_called_with('/path/to/test_file.txt',
+                                              {'domain': 'example.com',
+                                               'san': False,
+                                               'dedicated': False,
+                                               'private': False,
+                                               'disk': (),
+                                               'userdata': None,
+                                               'network': '100',
+                                               'billing': 'monthly',
+                                               'userfile': None,
+                                               'hostname': 'test',
+                                               'template': None,
+                                               'memory': 4,
+                                               'test': False,
+                                               'postinstall': None,
+                                               'controller': None,
+                                               'chassis': '999',
+                                               'key': ('1234',),
+                                               'vlan_private': None,
+                                               'wait': None,
+                                               'tag': (),
+                                               'datacenter': 'TEST00',
+                                               'like': False,
+                                               'os': 'UBUNTU_12_64_MINIMAL',
+                                               'cpu': 4,
+                                               'vlan_public': None},
+                                              exclude=['wait', 'test'])
 
     @mock.patch('SoftLayer.HardwareManager'
                 '.get_available_dedicated_server_packages')
     @mock.patch('SoftLayer.HardwareManager.get_bare_metal_package_id')
-    def test_create_server_for_bmc(self, bmpi, packages):
-        args = {
-            '--chassis': '1099',
-            '--hostname': 'test',
-            '--domain': 'example.com',
-            '--datacenter': 'TEST00',
-            '--cpu': '2',
-            '--network': '100',
-            '--disk': ['250_SATA_II', '250_SATA_II'],
-            '--os': 'UBUNTU_12_64_MINIMAL',
-            '--memory': '2',
-            '--test': True,
-            '--export': None,
-            '--template': None,
-            '--key': [1234, 456],
-            '--vlan_public': 10234,
-            '--vlan_private': 20468,
-            '--postinstall': 'http://somescript.foo/myscript.sh',
-            '--billing': 'hourly',
-        }
-
-        test_data = [
-            (1099, 'Bare Metal Instance'),
-        ]
-        packages.return_value = test_data
-
+    @mock.patch('SoftLayer.HardwareManager.verify_order')
+    def test_create_server_test_for_bmc(self, verify_mock, bmpi, packages):
+        packages.return_value = [(1099, 'Bare Metal Instance', 'BMC')]
         bmpi.return_value = '1099'
 
-        runnable = server.CreateServer(client=self.client)
-
         # First, test the --test flag
-        with mock.patch('SoftLayer.HardwareManager'
-                        '.verify_order') as verify_mock:
-            verify_mock.return_value = {
-                'prices': [
-                    {
-                        'recurringFee': 0.0,
-                        'setupFee': 0.0,
-                        'item': {'description': 'First Item'},
-                    },
-                    {
-                        'recurringFee': 25.0,
-                        'setupFee': 0.0,
-                        'item': {'description': 'Second Item'},
-                    }
-                ]
-            }
-            output = runnable.execute(args)
-
-            expected = [
-                [
-                    {'Item': 'First Item', 'cost': '0.00'},
-                    {'Item': 'Second Item', 'cost': '25.00'},
-                    {'Item': 'Total monthly cost', 'cost': '25.00'}
-                ],
-                ''
+        verify_mock.return_value = {
+            'prices': [
+                {
+                    'recurringFee': 0.0,
+                    'setupFee': 0.0,
+                    'item': {'description': 'First Item'},
+                },
+                {
+                    'recurringFee': 25.0,
+                    'setupFee': 0.0,
+                    'item': {'description': 'Second Item'},
+                }
             ]
+        }
 
-            self.assertEqual(expected,
-                             formatting.format_output(output, 'python'))
+        result = self.run_command(['server', 'create',
+                                   '--chassis=1099',
+                                   '--hostname=test',
+                                   '--domain=example.com',
+                                   '--datacenter=TEST00',
+                                   '--cpu=2',
+                                   '--memory=2',
+                                   '--network=100',
+                                   '--disk=250_SATA_II',
+                                   '--disk=250_SATA_II',
+                                   '--os=UBUNTU_12_64_MINIMAL',
+                                   '--vlan-public=10234',
+                                   '--vlan-private=20468',
+                                   '--key=1234',
+                                   '--key=456',
+                                   '--test',
+                                   '--postinstall='
+                                   'http://somescript.foo/myscript.sh',
+                                   '--billing=hourly',
+                                   ])
 
-            # Make sure we can order without specifying the disk as well
-            args['--disk'] = []
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("First Item", result.output)
+        self.assertIn("Second Item", result.output)
+        self.assertIn("Total monthly cost", result.output)
 
-            output = runnable.execute(args)
+    @mock.patch('SoftLayer.HardwareManager'
+                '.get_available_dedicated_server_packages')
+    @mock.patch('SoftLayer.HardwareManager.get_bare_metal_package_id')
+    @mock.patch('SoftLayer.HardwareManager.place_order')
+    def test_create_server_for_bmc(self, order_mock, bmpi, packages):
+        order_mock.return_value = {
+            'orderId': 98765,
+            'orderDate': '2013-08-02 15:23:47'
+        }
 
-            self.assertEqual(expected,
-                             formatting.format_output(output, 'python'))
+        result = self.run_command(['--really', 'server', 'create',
+                                   '--chassis=1099',
+                                   '--hostname=test',
+                                   '--domain=example.com',
+                                   '--datacenter=TEST00',
+                                   '--cpu=4',
+                                   '--memory=4',
+                                   '--network=100',
+                                   '--disk=250_SATA_II',
+                                   '--disk=250_SATA_II',
+                                   '--os=UBUNTU_12_64_MINIMAL',
+                                   '--vlan-public=10234',
+                                   '--vlan-private=20468',
+                                   '--key=1234',
+                                   '--key=456',
+                                   '--billing=hourly',
+                                   ])
 
-            # Test explicitly setting a RAID configuration
-            args['--controller'] = 'RAID0'
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output),
+                         {'id': 98765, 'created': '2013-08-02 15:23:47'})
 
-            output = runnable.execute(args)
-
-            self.assertEqual(expected,
-                             formatting.format_output(output, 'python'))
-
-        # Now test ordering
-        with mock.patch('SoftLayer.HardwareManager.place_order') as order_mock:
-            order_mock.return_value = {
-                'orderId': 98765,
-                'orderDate': '2013-08-02 15:23:47'
-            }
-
-            args['--test'] = False
-            args['--really'] = True
-
-            output = runnable.execute(args)
-
-            expected = {'id': 98765, 'created': '2013-08-02 15:23:47'}
-            self.assertEqual(expected,
-                             formatting.format_output(output, 'python'))
-
-        # Finally, test cancelling the process
-        with mock.patch('SoftLayer.CLI.formatting.confirm') as confirm:
-            confirm.return_value = False
-
-            args['--really'] = False
-
-            self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
-
-    def test_edit_server(self):
+    def test_edit_server_userdata_and_file(self):
         # Test both userdata and userfile at once
-        args = {
-            '<identifier>': 1000,
-            '--hostname': 'hardware-test1',
-            '--domain': 'test.sftlyr.ws',
-            '--userdata': 'My data',
-            '--userfile': 'my_file.txt',
-        }
-        runnable = server.EditServer(client=self.client)
+        with tempfile.NamedTemporaryFile() as userfile:
+            result = self.run_command(['server', 'edit', '1000',
+                                       '--hostname=hardware-test1',
+                                       '--domain=test.sftlyr.ws',
+                                       '--userdata=My data',
+                                       '--userfile=%s' % userfile.name])
 
-        self.assertRaises(exceptions.ArgumentError, runnable.execute, args)
+            self.assertEqual(result.exit_code, 2)
+            self.assertIsInstance(result.exception, exceptions.ArgumentError)
 
-        # Simulate a missing file error
-        args['--userdata'] = None
+    def test_edit_server_userdata(self):
+        result = self.run_command(['server', 'edit', '1000',
+                                   '--hostname=hardware-test1',
+                                   '--domain=test.sftlyr.ws',
+                                   '--userdata=My data'])
 
-        with mock.patch('os.path.exists') as exists:
-            exists.return_value = False
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(result.output, "")
+        service = self.client['Hardware_Server']
+        service.editObject.assert_called_with({'domain': 'test.sftlyr.ws',
+                                               'hostname': 'hardware-test1'},
+                                              id=1000)
+        service.setUserMetadata.assert_called_with(['My data'], id=1000)
 
-            self.assertRaises(exceptions.ArgumentError, runnable.execute, args)
+    @mock.patch('SoftLayer.HardwareManager.edit')
+    def test_edit_server_failed(self, edit_mock):
+        edit_mock.return_value = False
+        result = self.run_command(['server', 'edit', '1000',
+                                   '--hostname=hardware-test1',
+                                   '--domain=test.sftlyr.ws',
+                                   '--userdata=My data'])
 
-        # Test a successful edit with user data
-        args['--userdata'] = 'My data'
-        args['--userfile'] = None
+        self.assertEqual(result.exit_code, 2)
+        self.assertEqual(result.output, "")
+        edit_mock.assert_called_with(1000,
+                                     userdata='My data',
+                                     domain='test.sftlyr.ws',
+                                     hostname='hardware-test1')
 
-        expected = {
-            'userdata': 'My data',
-            'domain': 'test.sftlyr.ws',
-            'hostname': 'hardware-test1',
-        }
+    def test_edit_server_userfile(self):
+        with tempfile.NamedTemporaryFile() as userfile:
+            userfile.write("some data")
+            userfile.flush()
 
-        with mock.patch('SoftLayer.HardwareManager.edit') as edit_mock:
-            edit_mock.return_value = True
+            result = self.run_command(['server', 'edit', '1000',
+                                       '--userfile=%s' % userfile.name])
 
-            runnable.execute(args)
-
-            edit_mock.assert_called_with(1000, **expected)
-
-            # Now check for a CLIAbort if there's an error
-            edit_mock.return_value = False
-
-            self.assertRaises(exceptions.CLIAbort, runnable.execute, args)
-
-        # Test a successful edit with a user file
-        args['--userdata'] = None
-        args['--userfile'] = 'my_file.txt'
-
-        expected = {
-            'userdata': 'My data',
-            'domain': 'test.sftlyr.ws',
-            'hostname': 'hardware-test1',
-        }
-
-        with mock.patch('os.path.exists') as exists:
-            exists.return_value = True
-            with mock.patch(builtins_name + '.open') as file_mock:
-                file_mock.return_value.__enter__ = lambda s: s
-                file_mock.return_value.__exit__ = mock.Mock()
-                file_mock.return_value.read.return_value = 'some data'
-
-                with mock.patch('SoftLayer.HardwareManager.edit') as edit_mock:
-                    edit_mock.return_value = True
-                    expected['userdata'] = 'some data'
-
-                    runnable.execute(args)
-
-                    edit_mock.assert_called_with(1000, **expected)
+            self.assertEqual(result.exit_code, 0)
+            self.assertEqual(result.output, "")
+            service = self.client['Hardware_Server']
+            service.setUserMetadata.assert_called_with(['some data'], id=1000)
 
     def test_get_default_value_returns_none_for_unknown_category(self):
         option_mock = {'categories': {'cat1': []}}
-        runnable = server.CreateServer()
-        output = runnable._get_default_value(option_mock, 'nope')
+        output = create._get_default_value(option_mock, 'nope')
         self.assertEqual(None, output)

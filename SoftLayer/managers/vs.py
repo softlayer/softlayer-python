@@ -456,7 +456,7 @@ class VSManager(utils.IdentifierMixin, object):
                              access to the private network. Defaults to false
         :param list ssh_keys: The SSH keys to add to the root user
         :param int nic_speed: The port speed to set
-        :param string tag: tags to set on the VS as a comma separated list
+        :param string tags: tags to set on the VS as a comma separated list
         """
         tags = kwargs.pop('tags', None)
         inst = self.guest.createObject(self._generate_create_dict(**kwargs))

@@ -4,7 +4,6 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import os
 
 import click
 import mock
@@ -23,18 +22,6 @@ class EnvironmentTests(testing.TestCase):
         actions = self.env.module_list()
         self.assertIn('vs', actions)
         self.assertIn('dns', actions)
-
-    def test_out(self):
-        self.env.stdout = mock.MagicMock()
-        self.env.out('TEXT OUTPUT')
-        self.env.stdout.write.assert_any_call('TEXT OUTPUT')
-        self.env.stdout.write.assert_any_call(os.linesep)
-
-    def test_err(self):
-        self.env.stderr = mock.MagicMock()
-        self.env.err('TEXT OUTPUT')
-        self.env.stderr.write.assert_any_call('TEXT OUTPUT')
-        self.env.stderr.write.assert_any_call(os.linesep)
 
     @mock.patch('SoftLayer.utils.console_input')
     def test_input(self, raw_input_mock):

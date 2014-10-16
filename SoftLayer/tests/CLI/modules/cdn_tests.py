@@ -12,7 +12,7 @@ import json
 class CdnTests(testing.TestCase):
 
     def test_list_accounts(self):
-        result = testing.run_command(['cdn', 'list'])
+        result = self.run_command(['cdn', 'list'])
 
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(json.loads(result.output),
@@ -28,7 +28,7 @@ class CdnTests(testing.TestCase):
                            'account_name': '1234a'}])
 
     def test_detail_account(self):
-        result = testing.run_command(['cdn', 'detail', '1245'])
+        result = self.run_command(['cdn', 'detail', '1245'])
 
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(json.loads(result.output),
@@ -40,21 +40,21 @@ class CdnTests(testing.TestCase):
                           'account_name': '1234a'})
 
     def test_load_content(self):
-        result = testing.run_command(['cdn', 'load', '1234',
-                                      'http://example.com'])
+        result = self.run_command(['cdn', 'load', '1234',
+                                   'http://example.com'])
 
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(result.output, "")
 
     def test_purge_content(self):
-        result = testing.run_command(['cdn', 'purge', '1234',
-                                      'http://example.com'])
+        result = self.run_command(['cdn', 'purge', '1234',
+                                   'http://example.com'])
 
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(result.output, "")
 
     def test_list_origins(self):
-        result = testing.run_command(['cdn', 'origin-list', '1234'])
+        result = self.run_command(['cdn', 'origin-list', '1234'])
 
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(json.loads(result.output), [
@@ -68,15 +68,15 @@ class CdnTests(testing.TestCase):
              'id': '12345'}])
 
     def test_add_origin(self):
-        result = testing.run_command(['cdn', 'origin-add', '1234',
-                                      'http://example.com'])
+        result = self.run_command(['cdn', 'origin-add', '1234',
+                                   'http://example.com'])
 
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(result.output, "")
 
     def test_remove_origin(self):
-        result = testing.run_command(['cdn', 'origin-remove', '1234',
-                                      'http://example.com'])
+        result = self.run_command(['cdn', 'origin-remove', '1234',
+                                   'http://example.com'])
 
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(result.output, "")

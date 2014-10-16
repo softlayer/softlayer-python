@@ -14,7 +14,7 @@ class FirewallTests(testing.TestCase):
         self.client = testing.FixtureClient()
 
     def test_list_firewalls(self):
-        result = testing.run_command(['firewall', 'list'])
+        result = self.run_command(['firewall', 'list'])
 
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(json.loads(result.output),

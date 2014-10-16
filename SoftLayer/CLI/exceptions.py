@@ -16,7 +16,10 @@ class CLIHalt(SystemExit):
         self.code = code
 
     def __str__(self):
-        return "<CLIHalt code=%s %s>" % (self.code, self.args)
+        return "<CLIHalt code=%s msg=%s>" % (self.code,
+                                             getattr(self, 'message'))
+
+    __repr__ = __str__
 
 
 class CLIAbort(CLIHalt):

@@ -12,8 +12,12 @@ import click
 
 @click.command()
 @click.argument('identifier')
-@click.option('--passwords', help='Show passwords (check over your shoulder!)')
-@click.option('--price', help='Show associated prices')
+@click.option('--passwords',
+              is_flag=True,
+              help='Show passwords (check over your shoulder!)')
+@click.option('--price',
+              is_flag=True,
+              help='Show associated prices')
 @environment.pass_env
 def cli(env, identifier, passwords, price):
     """Get details for a hardware device"""

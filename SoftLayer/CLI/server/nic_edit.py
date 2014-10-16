@@ -12,7 +12,7 @@ import click
 @click.argument('identifier')
 @click.argument('network', type=click.Choice(['public', 'private']))
 @click.option('--speed',
-              type=click.Choice([0, 10, 100, 1000, 10000]),
+              type=click.Choice(['0', '10', '100', '1000', '10000']),
               help="Port speed. 0 disables the port")
 @environment.pass_env
 def cli(env, identifier, network, speed):
@@ -21,4 +21,4 @@ def cli(env, identifier, network, speed):
     mgr = SoftLayer.HardwareManager(env.client)
     hw_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'hardware')
 
-    mgr.change_port_speed(hw_id, network == 'public', speed)
+    mgr.change_port_speed(hw_id, network == 'public', int(speed))

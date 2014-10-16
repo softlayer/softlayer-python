@@ -13,26 +13,13 @@ except ImportError:
 import os.path
 
 from SoftLayer.CLI import core
+from SoftLayer.CLI import environment
 from SoftLayer.testing import fixture_client
 
 from click.testing import CliRunner
 
 FixtureClient = fixture_client.FixtureClient
 FIXTURE_PATH = os.path.abspath(os.path.join(__file__, '..', 'fixtures'))
-
-
-def run_command(args=None,
-                env=None,
-                environment=None,
-                fixtures=True,
-                fmt='json'):
-
-    runner = CliRunner()
-    if fixtures:
-        args.insert(0, '--fixtures')
-    args.insert(0, '--format=%s' % fmt)
-
-    return runner.invoke(core.cli, args=args, env=env, obj=environment)
 
 
 class TestCase(unittest.TestCase):
@@ -47,9 +34,25 @@ class TestCase(unittest.TestCase):
         pass
 
     def setUp(self):  # NOQA
+        self.env = environment.Environment()
+        self.client = FixtureClient()
+        self.env.client = core.CliClient(self.client)
         return self.set_up()
 
     def tearDown(self):  # NOQA
         return self.tear_down()
+
+    def run_command(self,
+                    args=None,
+                    environment=None,
+                    fixtures=True,
+                    fmt='json'):
+
+        runner = CliRunner()
+        if fixtures:
+            args.insert(0, '--fixtures')
+        args.insert(0, '--format=%s' % fmt)
+
+        return runner.invoke(core.cli, args=args, obj=environment or self.env)
 
 __all__ = ['unittest', 'FixtureClient']

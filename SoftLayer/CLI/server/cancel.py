@@ -14,6 +14,7 @@ import click
 @click.argument('identifier')
 @click.option('--immediate',
               is_flag=True,
+              default=False,
               help="""Cancels the server immediately (instead of on the billing
  anniversary)""")
 @click.option('--comment',
@@ -28,10 +29,13 @@ def cli(env, identifier, immediate, comment, reason):
     mgr = SoftLayer.HardwareManager(env.client)
     hw_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'hardware')
 
+    print "GOT HERE"
     if not comment and not env.skip_confirmations:
         comment = env.input("(Optional) Add a cancellation comment:")
 
+    print "GOT HERE1"
     if env.skip_confirmations or formatting.no_going_back(hw_id):
         mgr.cancel_hardware(hw_id, reason, comment, immediate)
     else:
+        print "GOT HERE2"
         raise exceptions.CLIAbort('Aborted')

@@ -4,26 +4,28 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.CLI import environment
-from SoftLayer.CLI import formatting
-from SoftLayer.CLI.modules import summary
 from SoftLayer import testing
+
+import json
 
 
 class SummaryTests(testing.TestCase):
-    def set_up(self):
-        self.client = testing.FixtureClient()
 
     def test_summary(self):
-        command = summary.Summary(client=self.client,
-                                  env=environment.Environment())
+        result = self.run_command(['summary'])
+        print result.output
 
-        output = command.execute({})
-        expected = [{'datacenter': 'dal00',
-                     'networking': 1,
-                     'subnets': 0,
-                     'hardware': 1,
-                     'IPs': 3,
-                     'vs': 1,
-                     'vlans': 1}]
-        self.assertEqual(expected, formatting.format_output(output, 'python'))
+        expected = [
+            {
+                'datacenter': 'dal00',
+                'networking': 1,
+                'subnets': 0,
+                'hardware': 1,
+                'ips': 6,
+                'vs': 1,
+                'vlans': 3
+            }
+        ]
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output), expected)

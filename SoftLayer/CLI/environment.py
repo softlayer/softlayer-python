@@ -33,8 +33,6 @@ class Environment(object):
             'virtual': 'vs',
             'lb': 'loadbal',
         }
-        self.stdout = sys.stdout
-        self.stderr = sys.stderr
         self.client = None
         self.format = 'table'
         self.skip_confirmations = False

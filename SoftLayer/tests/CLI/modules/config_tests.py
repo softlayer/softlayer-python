@@ -10,8 +10,6 @@ import tempfile
 import mock
 
 from SoftLayer.CLI.config import setup as config
-from SoftLayer.CLI import core
-from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer import consts
 from SoftLayer import testing
@@ -20,7 +18,7 @@ from SoftLayer import testing
 class TestHelpShow(testing.TestCase):
 
     def test_show(self):
-        result = testing.run_command(['config', 'show'])
+        result = self.run_command(['config', 'show'])
 
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(json.loads(result.output),
@@ -31,10 +29,6 @@ class TestHelpShow(testing.TestCase):
 
 
 class TestHelpSetup(testing.TestCase):
-    def set_up(self):
-        self.env = environment.Environment()
-        client = core.CliClient(testing.FixtureClient())
-        self.env.client = client
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
@@ -45,8 +39,8 @@ class TestHelpSetup(testing.TestCase):
             getpass.return_value = 'A' * 64
             input.side_effect = ['user', 'public']
 
-            result = testing.run_command(['--config=%s' % config_file.name,
-                                          'config', 'setup'])
+            result = self.run_command(['--config=%s' % config_file.name,
+                                       'config', 'setup'])
 
             self.assertEqual(result.exit_code, 0)
             self.assertTrue('Configuration Updated Successfully'
@@ -68,8 +62,8 @@ class TestHelpSetup(testing.TestCase):
             getpass.return_value = 'A' * 64
             input.side_effect = ['user', 'public']
 
-            result = testing.run_command(['--config=%s' % config_file.name,
-                                          'config', 'setup'])
+            result = self.run_command(['--config=%s' % config_file.name,
+                                       'config', 'setup'])
 
             self.assertEqual(result.exit_code, 2)
             self.assertIsInstance(result.exception, exceptions.CLIAbort)

@@ -269,7 +269,7 @@ getRwhoisData = {
     'lastName': 'lastName',
     'modifyDate': 'modifyDate',
     'postalCode': 'postalCode',
-    'privateResidenceFlag': 'privateResidenceFlag',
+    'privateResidenceFlag': True,
 }
 
 getGlobalIpRecords = [{
@@ -398,12 +398,27 @@ getCdnAccounts = [
 
 getNetworkVlans = [{
     'id': 1,
+    'hardware': [],
+    'networkComponents': [],
+    'primaryRouter': {
+        'datacenter': {'name': 'dal00'}
+    },
+    'virtualGuests': [],
     'dedicatedFirewallFlag': True,
     'highAvailabilityFirewallFlag': True,
     'networkVlanFirewall': {'id': 1234},
+    'totalPrimaryIpAddressCount': 1,
+    'subnets': [],
 }, {
     'id': 2,
+    'totalPrimaryIpAddressCount': 2,
     'dedicatedFirewallFlag': False,
+    'hardware': [],
+    'networkComponents': [],
+    'primaryRouter': {
+        'datacenter': {'name': 'dal00'}
+    },
+    'virtualGuests': [],
     'firewallGuestNetworkComponents': [{
         'id': 1234,
         'guestNetworkComponent': {'guest': {'id': 1}},
@@ -411,7 +426,8 @@ getNetworkVlans = [{
     'firewallNetworkComponents': [{
         'id': 1234,
         'networkComponent': {'downlinkComponent': {'hardwareId': 1}},
-        'status': 'ok'}]
+        'status': 'ok'}],
+    'subnets': [],
 }, {
     'id': 3,
     'name': 'dal00',

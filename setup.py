@@ -157,6 +157,7 @@ cli_entry_points = [
     'server:create = SoftLayer.CLI.server.create:cli',
     'server:create-options = SoftLayer.CLI.server.create_options:cli',
     'server:detail = SoftLayer.CLI.server.detail:cli',
+    'server:edit = SoftLayer.CLI.server.edit:cli',
     'server:list = SoftLayer.CLI.server.list:cli',
     'server:list-chassis = SoftLayer.CLI.server.list_chassis:cli',
     'server:nic-edit = SoftLayer.CLI.server.nic_edit:cli',
@@ -206,7 +207,7 @@ cli_entry_points = [
     'vlan:detail = SoftLayer.CLI.vlan.detail:cli',
     'vlan:list = SoftLayer.CLI.vlan.list:cli',
 
-    'summary = SoftLayer.CLI.summary',
+    'summary = SoftLayer.CLI.summary:cli',
 ]
 
 setup(
