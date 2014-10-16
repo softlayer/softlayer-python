@@ -8,6 +8,7 @@
 # Also disable the too-few-public-methods error.
 # pylint: disable=F0401,R0903
 import SoftLayer
+
 import importlib
 
 import mock

@@ -2,8 +2,8 @@
 # :license: MIT, see LICENSE for more details.
 
 import SoftLayer
-from SoftLayer.CLI import helpers
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import helpers
 
 import click
 

@@ -17,7 +17,7 @@ from SoftLayer.CLI import formatting
 
 import click
 # pylint: disable=too-many-public-methods, broad-except, unused-argument
-# pylint: disable=redefined-builtin
+# pylint: disable=redefined-builtin, super-init-not-called
 
 DEBUG_LOGGING_MAP = {
     0: logging.CRITICAL,
@@ -83,6 +83,7 @@ class CliClient(SoftLayer.Client):
     def __init__(self, client, *args, **kwargs):
         self.real_client = client
         self.last_calls = []
+        # NOTE(kmcdonald): I really don't like this pattern.
 
     def call(self, service, method, *args, **kwargs):
         """See Client.call for documentation."""

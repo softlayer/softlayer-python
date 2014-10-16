@@ -74,8 +74,8 @@ class TestHelpSetup(testing.TestCase):
         getpass.return_value = 'A' * 64
         input.side_effect = ['user', 'private']
 
-        username, secret, endpoint_url, timeout = \
-            config.get_user_input(self.env)
+        username, secret, endpoint_url, timeout = (
+            config.get_user_input(self.env))
 
         self.assertEqual(username, 'user')
         self.assertEqual(secret, 'A' * 64)

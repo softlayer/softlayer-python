@@ -9,8 +9,8 @@ import os.path
 
 import mock
 
-from SoftLayer.CLI import exceptions
 from SoftLayer.CLI.dns import zone_import
+from SoftLayer.CLI import exceptions
 from SoftLayer import testing
 
 

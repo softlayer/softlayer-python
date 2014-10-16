@@ -13,7 +13,6 @@ class SummaryTests(testing.TestCase):
 
     def test_summary(self):
         result = self.run_command(['summary'])
-        print result.output
 
         expected = [
             {

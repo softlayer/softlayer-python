@@ -16,7 +16,7 @@ from SoftLayer.CLI import core
 from SoftLayer.CLI import environment
 from SoftLayer.testing import fixture_client
 
-from click.testing import CliRunner
+from click import testing
 
 FixtureClient = fixture_client.FixtureClient
 FIXTURE_PATH = os.path.abspath(os.path.join(__file__, '..', 'fixtures'))
@@ -44,15 +44,15 @@ class TestCase(unittest.TestCase):
 
     def run_command(self,
                     args=None,
-                    environment=None,
+                    env=None,
                     fixtures=True,
                     fmt='json'):
 
-        runner = CliRunner()
+        runner = testing.CliRunner()
         if fixtures:
             args.insert(0, '--fixtures')
         args.insert(0, '--format=%s' % fmt)
 
-        return runner.invoke(core.cli, args=args, obj=environment or self.env)
+        return runner.invoke(core.cli, args=args, obj=env or self.env)
 
 __all__ = ['unittest', 'FixtureClient']

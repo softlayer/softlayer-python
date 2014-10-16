@@ -21,7 +21,6 @@ def power_off(env, identifier):
     if env.skip_confirmations or formatting.confirm('This will power off the '
                                                     'server with id %s '
                                                     'Continue?' % hw_id):
-        print env.client.real_client['Hardware_Server']
         env.client['Hardware_Server'].powerOff(id=hw_id)
     else:
         raise exceptions.CLIAbort('Aborted.')

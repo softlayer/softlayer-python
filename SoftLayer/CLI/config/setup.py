@@ -85,7 +85,7 @@ def cli(env):
     config_fd = os.fdopen(os.open(config_path,
                                   (os.O_WRONLY | os.O_CREAT | os.O_TRUNC),
                                   0o600),
-                          'wb')
+                          'w')
     try:
         parsed_config.write(config_fd)
     finally:

@@ -4,8 +4,8 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import os.path
 import json
+import os.path
 import tempfile
 
 import mock
