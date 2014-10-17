@@ -2,7 +2,7 @@ import sys
 import os
 
 try:
-    from setuptools import setup
+    from setuptools import setup, find_packages
 except ImportError:
     print("Distribute is required for install:")
     print("    http://python-distribute.org/distribute_setup.py")
@@ -18,7 +18,7 @@ extra = {}
 requires = [
     'six >= 1.7.0',
     'prettytable >= 0.7.0',
-    'docopt == 0.6.1',
+    'click',
     'requests',
 ]
 
@@ -43,24 +43,14 @@ setup(
     long_description=long_description,
     author='SoftLayer Technologies, Inc.',
     author_email='sldn@softlayer.com',
-    packages=[
-        'SoftLayer',
-        'SoftLayer.CLI',
-        'SoftLayer.CLI.modules',
-        'SoftLayer.managers',
-        'SoftLayer.testing',
-    ],
+    packages=find_packages(exclude=["SoftLayer.tests"]),
     license='MIT',
     zip_safe=False,
     url='http://github.com/softlayer/softlayer-python',
     entry_points={
-        'console_scripts': [
-            'sl = SoftLayer.CLI.core:main',
-        ],
+        'console_scripts': ['sl = SoftLayer.CLI.core:main'],
     },
-    package_data={
-        'SoftLayer': ['tests/fixtures/*.conf'],
-    },
+    package_data={'SoftLayer': ['tests/fixtures/*.conf']},
     test_suite='nose.collector',
     install_requires=requires,
     classifiers=[
@@ -72,8 +62,8 @@ setup(
         'Operating System :: OS Independent',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: Implementation :: CPython',

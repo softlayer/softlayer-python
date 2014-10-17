@@ -10,7 +10,6 @@ import sys
 
 import mock
 
-from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
@@ -88,11 +87,6 @@ class PromptTests(testing.TestCase):
         raw_input_mock.return_value = ''
         result = formatting.no_going_back(confirmed)
         self.assertFalse(result)
-
-    def test_clirunnable_exercise(self):
-        runnable = environment.CLIRunnable()
-        res = runnable.execute({})
-        self.assertEqual(res, None)
 
     @mock.patch('SoftLayer.utils.console_input')
     def test_confirmation(self, raw_input_mock):
@@ -368,36 +362,27 @@ class TestTemplateArgs(testing.TestCase):
         template.update_with_template_args(args)
         self.assertEqual(args, {'key': 'value'})
 
-    def test_template_not_exists(self):
-        path = os.path.join(testing.FIXTURE_PATH,
-                            'sample_template_not_exists.conf')
-        self.assertRaises(exceptions.ArgumentError,
-                          template.update_with_template_args,
-                          {'--template': path})
-
     def test_template_options(self):
         path = os.path.join(testing.FIXTURE_PATH, 'sample_vs_template.conf')
         args = {
-            'key': 'value',
-            '--cpu': None,
-            '--memory': '32',
-            '--template': path,
-            '--hourly': False,
-            '--disk': [],
+            'cpu': None,
+            'memory': '32',
+            'template': path,
+            'hourly': False,
+            'disk': [],
         }
-        template.update_with_template_args(args, list_args=['--disk'])
+        template.update_with_template_args(args, list_args=['disk'])
         self.assertEqual(args, {
-            '--cpu': '4',
-            '--datacenter': 'dal05',
-            '--domain': 'example.com',
-            '--hostname': 'myhost',
-            '--hourly': 'true',
-            '--memory': '32',
-            '--monthly': 'false',
-            '--network': '100',
-            '--os': 'DEBIAN_7_64',
-            'key': 'value',
-            '--disk': ['50', '100'],
+            'cpu': '4',
+            'datacenter': 'dal05',
+            'domain': 'example.com',
+            'hostname': 'myhost',
+            'hourly': 'true',
+            'memory': '32',
+            'monthly': 'false',
+            'network': '100',
+            'os': 'DEBIAN_7_64',
+            'disk': ['50', '100'],
         })
 
 
@@ -405,36 +390,20 @@ class TestExportToTemplate(testing.TestCase):
     def test_export_to_template(self):
         with mock.patch(open_path, mock.mock_open(), create=True) as open_:
             template.export_to_template('filename', {
-                '--os': None,
-                '--datacenter': 'ams01',
-                '--disk': ['disk1', 'disk2'],
+                'os': None,
+                'datacenter': 'ams01',
+                'disk': ('disk1', 'disk2'),
                 # The following should get stripped out
-                '--config': 'no',
-                '--really': 'no',
-                '--format': 'no',
-                '--debug': 'no',
+                'config': 'no',
+                'really': 'no',
+                'format': 'no',
+                'debug': 'no',
                 # exclude list
-                '--test': 'test',
-            }, exclude=['--test'])
+                'test': 'test',
+            }, exclude=['test'])
 
             open_.assert_called_with('filename', 'w')
             open_().write.assert_has_calls([
                 mock.call('datacenter=ams01\n'),
                 mock.call('disk=disk1,disk2\n'),
             ], any_order=True)  # Order isn't really guaranteed
-
-
-class TestInputSanitization(testing.TestCase):
-
-    def test_equalto_removed(self):
-        args = {
-            '--os': None,
-            '--datacenter': '=ams01',
-            '--memory': '=1g',
-            '--test': '=1344'}
-        argnew = helpers.sanitize_args(args)
-        self.assertEqual(argnew, {
-            '--os': None,
-            '--datacenter': 'ams01',
-            '--memory': '1g',
-            '--test': '1344'})

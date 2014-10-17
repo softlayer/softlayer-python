@@ -27,11 +27,6 @@ class LoadBalancerTests(testing.TestCase):
         }
         f.assert_called_once_with(filter=_filter, id=0)
 
-    def test_get_ip_address(self):
-        self.lb_mgr.get_ip_address()
-        f = self.client['Network_Subnet_IpAddress'].getByIpAddress
-        f.assert_called_once()
-
     def test_get_hc_types(self):
         self.lb_mgr.get_hc_types()
         f = self.client['Network_Application_Delivery_Controller_'
