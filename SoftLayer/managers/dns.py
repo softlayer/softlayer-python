@@ -106,15 +106,22 @@ class DNSManager(utils.IdentifierMixin, object):
         """
         self.record.deleteObject(id=record_id)
 
+    def get_record(self, record_id):
+        """ Get a DNS record.
+
+        :param integer id: the record's ID
+        """
+        return self.record.getObject(id=record_id)
+
     def get_records(self, zone_id, ttl=None, data=None, host=None,
                     record_type=None):
         """ List, and optionally filter, records within a zone.
 
         :param zone: the zone name in which to search.
-        :param int ttl: optionally, time in seconds:
-        :param data: optionally, the records data
-        :param host: optionally, record's host
-        :param record_type: optionally, the type of record:
+        :param int ttl: time in seconds
+        :param str data: the records data
+        :param str host: record's host
+        :param str record_type: the type of record
 
         :returns: A list of dictionaries representing the matching records
                   within the specified zone.

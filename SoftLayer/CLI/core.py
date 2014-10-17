@@ -141,6 +141,7 @@ use: 'sl config setup'""",
 @click.version_option(version=SoftLayer.__version__,
                       prog_name="SoftLayer Command-line Client")
 def cli(ctx,
+        format='table',
         config=None,
         debug=0,
         verbose=0,
@@ -166,6 +167,7 @@ def cli(ctx,
     env = ctx.ensure_object(clienvironment.Environment)
     env.skip_confirmations = really
     env.config_file = config
+    env.format = format
     if env.client is None:
         # Environment can be passed in explicitly. This is used for testing
         if fixtures:
@@ -181,13 +183,13 @@ def cli(ctx,
 
 @cli.resultcallback()
 @click.pass_context
-def output_result(ctx, result, timings=False, format='table', **kwargs):
+def output_result(ctx, result, timings=False, **kwargs):
     """Outputs the results returned by the CLI and also outputs timings."""
 
-    result = formatting.format_output(result, fmt=format)
     env = ctx.ensure_object(clienvironment.Environment)
-    if result:
-        env.out(result)
+    output = env.fmt(result)
+    if output:
+        env.out(output)
 
     if timings:
         timing_table = formatting.KeyValueTable(['service', 'method', 'time'])
@@ -195,7 +197,7 @@ def output_result(ctx, result, timings=False, format='table', **kwargs):
         for service, call, _, duration in env.client.last_calls:
             timing_table.add_row([service, call, duration])
 
-        env.err(formatting.format_output(timing_table, fmt=format))
+        env.err(env.fmt(timing_table))
 
 
 def main():

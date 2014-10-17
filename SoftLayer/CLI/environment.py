@@ -10,6 +10,7 @@ import importlib
 import sys
 
 from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 from SoftLayer.CLI import modules
 from SoftLayer import utils
 
@@ -115,6 +116,9 @@ class Environment(object):
     def err(self, output, newline=True):
         """Outputs an error string to the console (stderr)."""
         click.echo(output, nl=newline, err=True)
+
+    def fmt(self, output):
+        return formatting.format_output(output, fmt=self.format)
 
     def input(self, prompt):
         """Provide a command prompt."""

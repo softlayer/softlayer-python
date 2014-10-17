@@ -58,12 +58,10 @@ def cli(env):
         path = env.config_file
     config_path = os.path.expanduser(path)
 
-    env.out(
-        formatting.format_output(config.config_table({
-            'username': username,
-            'api_key': api_key,
-            'endpoint_url': endpoint_url,
-            'timeout': timeout})))
+    env.out(env.fmt(config.config_table({'username': username,
+                                         'api_key': api_key,
+                                         'endpoint_url': endpoint_url,
+                                         'timeout': timeout})))
 
     if not formatting.confirm('Are you sure you want to write settings '
                               'to "%s"?' % config_path, default=True):

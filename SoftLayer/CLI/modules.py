@@ -42,6 +42,7 @@ ALL_MODULES = [
     ('dns', 'SoftLayer.CLI.dns'),
     ('dns:import', 'SoftLayer.CLI.dns.zone_import:cli'),
     ('dns:record-add', 'SoftLayer.CLI.dns.record_add:cli'),
+    ('dns:record-edit', 'SoftLayer.CLI.dns.record_edit:cli'),
     ('dns:record-list', 'SoftLayer.CLI.dns.record_list:cli'),
     ('dns:record-remove', 'SoftLayer.CLI.dns.record_remove:cli'),
     ('dns:zone-create', 'SoftLayer.CLI.dns.zone_create:cli'),
