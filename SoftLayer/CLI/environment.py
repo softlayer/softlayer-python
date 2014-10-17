@@ -118,6 +118,7 @@ class Environment(object):
         click.echo(output, nl=newline, err=True)
 
     def fmt(self, output):
+        """Format output based on current the environment format"""
         return formatting.format_output(output, fmt=self.format)
 
     def input(self, prompt):
