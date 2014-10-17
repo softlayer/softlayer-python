@@ -192,7 +192,7 @@ def output_result(ctx, result, timings=False, **kwargs):
         env.out(output)
 
     if timings:
-        timing_table = formatting.KeyValueTable(['service', 'method', 'time'])
+        timing_table = formatting.Table(['service', 'method', 'time'])
 
         for service, call, _, duration in env.client.last_calls:
             timing_table.add_row([service, call, duration])
