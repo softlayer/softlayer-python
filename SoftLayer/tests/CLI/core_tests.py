@@ -6,6 +6,7 @@
 """
 import logging
 
+import SoftLayer
 from SoftLayer.CLI import core
 from SoftLayer.CLI import environment
 from SoftLayer import testing
@@ -69,8 +70,35 @@ class CoreMainTests(testing.TestCase):
         self.assertIn("AttributeError: Attribute foo does not exist",
                       stdoutmock.getvalue())
 
+    @mock.patch('SoftLayer.CLI.core.cli.main')
+    @mock.patch('sys.stdout', new_callable=utils.StringIO)
+    def test_sl_error(self, stdoutmock, climock):
+        ex = SoftLayer.SoftLayerAPIError('SoftLayer_Exception', 'Not found')
+        climock.side_effect = ex
+
+        with self.assertRaises(SystemExit):
+            core.main()
+
+        self.assertIn("SoftLayerAPIError(SoftLayer_Exception): Not found",
+                      stdoutmock.getvalue())
+
+    @mock.patch('SoftLayer.CLI.core.cli.main')
+    @mock.patch('sys.stdout', new_callable=utils.StringIO)
+    def test_auth_error(self, stdoutmock, climock):
+        ex = SoftLayer.SoftLayerAPIError('SoftLayer_Exception',
+                                         'Invalid API token.')
+        climock.side_effect = ex
+
+        with self.assertRaises(SystemExit):
+            core.main()
+
+        self.assertIn("Authentication Failed:", stdoutmock.getvalue())
+        self.assertIn("use 'sl config setup'", stdoutmock.getvalue())
+
 
 def recursive_subcommand_loader(root, path=''):
+    """Recursively load and list every command"""
+
     if getattr(root, 'list_commands', None) is None:
         return
 

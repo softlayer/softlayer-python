@@ -202,12 +202,14 @@ def output_result(ctx, result, timings=False, **kwargs):
 
 def main():
     """Main program. Catches several common errors and displays them nicely."""
+    exit_status = 0
     try:
         cli.main()
     except SoftLayer.SoftLayerAPIError as ex:
         if 'invalid api token' in ex.faultString.lower():
             click.echo("Authentication Failed: To update your credentials,"
                        " use 'sl config setup'")
+            exit_status = 1
         else:
             click.echo(str(ex))
             exit_status = 1
