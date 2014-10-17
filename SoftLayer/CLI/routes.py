@@ -1,12 +1,12 @@
 """
-    SoftLayer.CLI.modules
+    SoftLayer.CLI.routes
     ~~~~~~~~~~~~~~~~~~~~~
-    This is how all modules are registered with the CLI.
+    This is how all commands are registered with the CLI.
 
     :license: MIT, see LICENSE for more details.
 """
 
-ALL_MODULES = [
+ALL_ROUTES = [
     ('vs', 'SoftLayer.CLI.virt'),
     ('vs:cancel', 'SoftLayer.CLI.virt.cancel:cli'),
     ('vs:capture', 'SoftLayer.CLI.virt.capture:cli'),

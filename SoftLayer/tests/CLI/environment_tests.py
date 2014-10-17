@@ -51,6 +51,3 @@ class EnvironmentTests(testing.TestCase):
         self.env.plugins = {'vs': {'list': 'something'}}
         command = self.env.get_command('vs', 'list')
         self.assertIsInstance(command, click.Command)
-
-    def test_exit(self):
-        self.assertRaises(SystemExit, self.env.exit, 1)

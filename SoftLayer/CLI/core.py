@@ -11,7 +11,7 @@ import time
 import types
 
 import SoftLayer
-from SoftLayer.CLI import environment as clienvironment
+from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 
@@ -40,12 +40,12 @@ class CommandLoader(click.MultiCommand):
 
     def list_commands(self, ctx):
         """Get module for click"""
-        env = ctx.ensure_object(clienvironment.Environment)
+        env = ctx.ensure_object(environment.Environment)
         return env.command_list(self.module)
 
     def get_command(self, ctx, name):
         """Get command for click"""
-        env = ctx.ensure_object(clienvironment.Environment)
+        env = ctx.ensure_object(environment.Environment)
         command = env.get_command(self.module, name)
         return command
 
@@ -55,12 +55,12 @@ class ModuleLoader(click.MultiCommand):
 
     def list_commands(self, ctx):
         """Get module for click"""
-        env = ctx.ensure_object(clienvironment.Environment)
+        env = ctx.ensure_object(environment.Environment)
         return sorted(env.module_list())
 
     def get_command(self, ctx, name):
         """Get command for click"""
-        env = ctx.ensure_object(clienvironment.Environment)
+        env = ctx.ensure_object(environment.Environment)
 
         # Do alias lookup
         module_name = env.get_module_name(name)
@@ -164,7 +164,7 @@ def cli(ctx,
         logger.setLevel(DEBUG_LOGGING_MAP.get(verbose, logging.DEBUG))
 
     # Populate environement with client and set it as the context object
-    env = ctx.ensure_object(clienvironment.Environment)
+    env = ctx.ensure_object(environment.Environment)
     env.skip_confirmations = really
     env.config_file = config
     env.format = format
@@ -186,7 +186,7 @@ def cli(ctx,
 def output_result(ctx, result, timings=False, **kwargs):
     """Outputs the results returned by the CLI and also outputs timings."""
 
-    env = ctx.ensure_object(clienvironment.Environment)
+    env = ctx.ensure_object(environment.Environment)
     output = env.fmt(result)
     if output:
         env.out(output)

@@ -7,11 +7,10 @@
 """
 import getpass
 import importlib
-import sys
 
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
-from SoftLayer.CLI import modules
+from SoftLayer.CLI import routes
 from SoftLayer import utils
 
 import click
@@ -88,7 +87,7 @@ class Environment(object):
 
     def _load_modules_from_python(self):
         """Load modules from the native python source."""
-        for name, modpath in modules.ALL_MODULES:
+        for name, modpath in routes.ALL_ROUTES:
             module, subcommand = _parse_name(name)
             if module not in self.plugins:
                 self.plugins[module] = {}
@@ -128,10 +127,6 @@ class Environment(object):
     def getpass(self, prompt):
         """Provide a password prompt."""
         return getpass.getpass(prompt)
-
-    def exit(self, code=0):
-        """Exit."""
-        sys.exit(code)
 
 
 class ModuleLoader(object):

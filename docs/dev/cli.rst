@@ -36,7 +36,7 @@ For the first example, we can create `sl table-example` by creating the followin
 
         return t
 
-Then we need to register it so that `sl table-example` will know to route to this new module. We do that by adding ALL_MODULES in SoftLayer/CLI/modules.py to include the following:
+Then we need to register it so that `sl table-example` will know to route to this new module. We do that by adding ALL_ROUTES in SoftLayer/CLI/routes.py to include the following:
 
 ::
 
