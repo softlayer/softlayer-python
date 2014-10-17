@@ -145,7 +145,6 @@ def cli(ctx,
         config=None,
         debug=0,
         verbose=0,
-        timings=False,
         proxy=None,
         really=False,
         fixtures=False,
@@ -159,8 +158,7 @@ def cli(ctx,
 
     if verbose:
         logger = logging.getLogger()
-        handler = logging.StreamHandler()
-        logger.addHandler(handler)
+        logger.addHandler(logging.StreamHandler())
         logger.setLevel(DEBUG_LOGGING_MAP.get(verbose, logging.DEBUG))
 
     # Populate environement with client and set it as the context object
