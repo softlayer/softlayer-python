@@ -68,7 +68,7 @@ class FirewallTests(testing.TestCase):
         }
         package_call.assert_called_once_with(filter=_filter, id=0)
 
-        mask = ('mask[primaryNetworkComponent[maxSpeed]]')
+        mask = 'primaryNetworkComponent[maxSpeed]'
         call2 = self.client['Virtual_Guest'].getObject
         call2.assert_called_once_with(id=1234, mask=mask)
 
@@ -77,8 +77,7 @@ class FirewallTests(testing.TestCase):
 
         # we should ask for the frontEndNetworkComponents to get
         # the firewall port speed
-        mask = ('mask[id,maxSpeed,'
-                'networkComponentGroup.networkComponents]')
+        mask = 'id,maxSpeed,networkComponentGroup.networkComponents'
         fenc_call = self.client['Hardware_Server'].getFrontendNetworkComponents
         fenc_call.assert_called_once_with(id=1234, mask=mask)
 
@@ -155,7 +154,7 @@ class FirewallTests(testing.TestCase):
         f.assert_called_once_with(filter=_filter, id=0)
 
         call2 = self.client['Virtual_Guest'].getObject
-        mask = ('mask[primaryNetworkComponent[maxSpeed]]')
+        mask = 'primaryNetworkComponent[maxSpeed]'
         call2.assert_called_once_with(id=server_id, mask=mask)
         f = self.client['Product_Order'].placeOrder
         f.assert_called_once()
@@ -182,8 +181,7 @@ class FirewallTests(testing.TestCase):
 
         # we should ask for the frontEndNetworkComponents to get
         # the firewall port speed
-        mask = ('mask[id,maxSpeed,'
-                'networkComponentGroup.networkComponents]')
+        mask = 'id,maxSpeed,networkComponentGroup.networkComponents'
         fenc_call = self.client['Hardware_Server'].getFrontendNetworkComponents
         fenc_call.assert_called_once_with(id=server_id, mask=mask)
 
