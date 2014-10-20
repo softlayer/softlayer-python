@@ -125,6 +125,7 @@ use: 'sl config setup'""",
               required=False,
               help="Confirm all prompt actions")
 @click.option('--fixtures',
+              envvar='SL_FIXTURES',
               is_flag=True,
               required=False,
               help="Use fixtures instead of actually making API calls")
