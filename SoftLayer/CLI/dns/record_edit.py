@@ -28,8 +28,6 @@ def cli(env, zone_id, by_record, by_id, data, ttl):
     for result in results:
         if by_id and str(result['id']) != by_id:
             continue
-        print result
         result['data'] = data or result['data']
         result['ttl'] = ttl or result['ttl']
-        print result
         manager.edit_record(result)
