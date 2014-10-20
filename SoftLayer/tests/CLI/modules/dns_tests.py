@@ -68,7 +68,7 @@ class DnsTests(testing.TestCase):
                          {'record': 'a',
                           'type': 'CNAME',
                           'id': 1,
-                          'value': 'd',
+                          'data': 'd',
                           'ttl': 7200})
 
     def test_add_record(self):
