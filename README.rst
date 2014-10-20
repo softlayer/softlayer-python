@@ -1,6 +1,6 @@
 SoftLayer API Python Client
 ===========================
-.. image:: https://api.travis-ci.org/softlayer/softlayer-python.png
+.. image:: https://travis-ci.org/softlayer/softlayer-python.svg?branch=master
     :target: https://travis-ci.org/softlayer/softlayer-python
         
 .. image:: https://landscape.io/github/softlayer/softlayer-python/master/landscape.png
