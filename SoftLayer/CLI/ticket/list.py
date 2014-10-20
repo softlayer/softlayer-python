@@ -10,7 +10,8 @@ import click
 
 
 @click.command()
-@click.option('--open / --closed', 'is_open', help="Display closed tickets")
+@click.option('--open / --closed', 'is_open',
+              help="Display only open or closed tickets")
 @environment.pass_env
 def cli(env, is_open):
     """List tickets."""

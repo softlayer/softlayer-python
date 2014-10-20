@@ -28,7 +28,32 @@ def rescue(env, identifier):
 
 @click.command()
 @click.argument('identifier')
-@click.option('--hard', is_flag=True, help="Perform a hard shutdown")
+@click.option('--hard/--soft',
+              default=None,
+              help="Perform a hard or soft reboot")
+@environment.pass_env
+def reboot(env, identifier, hard):
+    """Reboot an active virtual server."""
+
+    virtual_guest = env.client['Virtual_Guest']
+    mgr = SoftLayer.HardwareManager(env.client)
+    vs_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'VS')
+    if any([env.skip_confirmations,
+            formatting.confirm('This will reboot the VS with id %s. '
+                               'Continue?' % vs_id)]):
+        if hard is True:
+            virtual_guest.rebootHard(id=vs_id)
+        elif hard is False:
+            virtual_guest.rebootSoft(id=vs_id)
+        else:
+            virtual_guest.rebootDefault(id=vs_id)
+    else:
+        raise exceptions.CLIAbort('Aborted.')
+
+
+@click.command()
+@click.argument('identifier')
+@click.option('--hard/--soft', help="Perform a hard shutdown")
 @environment.pass_env
 def power_off(env, identifier, hard):
     """Power off an active virtual server."""

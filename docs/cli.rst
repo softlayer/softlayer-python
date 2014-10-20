@@ -71,60 +71,61 @@ To discover the available commands, simply type `sl`.
 	  --help                     Show this message and exit.
 
 	Commands:
-	  cdn        Content Delivery Network
-	  config     CLI configuration
-	  dns        Domain Name System
-	  firewall   Firewalls
-	  globalip   Global IP addresses
-	  image      Compute images
-	  iscsi      iSCSI storage
-	  loadbal    Load balancers
-	  messaging  Message queue service
-	  metadata   Find details about this machine
-	  nas        Network Attached Storage
-	  rwhois     Referral Whois
-	  server     Hardware servers
-	  snapshot   Snapshots
-	  sshkey     SSH Keys
-	  ssl        SSL Certificates
-	  subnet     Network subnets
-	  summary    Display summary information about the account
-	  ticket     Support tickets
-	  vlan       Network VLANs
-	  vs         Virtual Servers
+	  cdn        Content Delivery Network.
+	  config     CLI configuration.
+	  dns        Domain Name System.
+	  firewall   Firewalls.
+	  globalip   Global IP addresses.
+	  image      Compute images.
+	  iscsi      iSCSI storage.
+	  loadbal    Load balancers.
+	  messaging  Message queue service.
+	  metadata   Find details about this machine.
+	  nas        Network Attached Storage.
+	  rwhois     Referral Whois.
+	  server     Hardware servers.
+	  snapshot   Snapshots.
+	  sshkey     SSH Keys.
+	  ssl        SSL Certificates.
+	  subnet     Network subnets.
+	  summary    Account summary.
+	  ticket     Support tickets.
+	  vlan       Network VLANs.
+	  vs         Virtual Servers.
 
 	  To use most commands your SoftLayer username and api_key need to be
 	  configured. The easiest way to do that is to use: 'sl config setup'
 
-As you can see, there are a number of commands. To look at the list of subcommands for Cloud Compute Instances, type `sl <command>`. For example:
+As you can see, there are a number of commands/sections. To look at the list of subcommands for virtual servers type `sl vs`. For example:
 ::
 
 	$ sl vs
 	Usage: sl vs [OPTIONS] COMMAND [ARGS]...
 
-	  Virtual Servers
+	  Virtual Servers.
 
 	Options:
 	  --help  Show this message and exit.
 
 	Commands:
-	  cancel          Cancel virtual servers
-	  capture         Capture SoftLayer image
-	  create          Order/create virtual servers
-	  create-options  Virtual server order options
-	  detail          Get details for a virtual server
-	  dns-sync        Sync DNS records
-	  edit            Edit a virtual server's details
-	  list            List virtual servers
-	  network         Manage network settings
-	  pause           Pauses an active virtual server
-	  power_off       Power off an active virtual server
-	  power_on        Power on a virtual server
-	  ready           Check if a virtual server is ready
-	  reload          Reload operating system on a virtual server
-	  rescue          Reboot into a rescue image
-	  resume          Resumes a paused virtual server
-	  upgrade         Upgrade a virtual server
+	  cancel          Cancel virtual servers.
+	  capture         Capture SoftLayer image.
+	  create          Order/create virtual servers.
+	  create-options  Virtual server order options.
+	  detail          Get details for a virtual server.
+	  dns-sync        Sync DNS records.
+	  edit            Edit a virtual server's details.
+	  list            List virtual servers.
+	  network         Manage network settings.
+	  pause           Pauses an active virtual server.
+	  power_off       Power off an active virtual server.
+	  power_on        Power on a virtual server.
+	  ready           Check if a virtual server is ready.
+	  reboot          Reboot an active virtual server.
+	  reload          Reload operating system on a virtual server.
+	  rescue          Reboot into a rescue image.
+	  resume          Resumes a paused virtual server.
+	  upgrade         Upgrade a virtual server.
 
 Finally, we can make an actual call. Let's list out the virtual servers on our account using `sl vs list`.
 

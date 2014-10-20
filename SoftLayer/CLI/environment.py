@@ -22,8 +22,9 @@ import pkg_resources
 class Environment(object):
     """Provides access to the current CLI environment."""
     def __init__(self):
-        # {'module_name': {'action': plugin_loader}}
-        self.plugins = {}
+        # {'path:to:command': ModuleLoader()}
+        # {'vs:list': ModuleLoader()}
+        self.commands = {}
         self.aliases = {
             'meta': 'metadata',
             'my': 'metadata',
@@ -40,73 +41,6 @@ class Environment(object):
         self.skip_confirmations = False
         self._modules_loaded = False
         self.config_file = None
-
-    def command_list(self, module_name):
-        """Command listing."""
-
-        self._load_modules()
-        # Filter commands registered as None. These are the bases.
-        return sorted([m for m in self.plugins[module_name].keys()
-                       if m is not None])
-
-    def module_list(self):
-        """Returns the list of modules in SoftLayer.CLI.modules."""
-        self._load_modules()
-        return sorted(list(self.plugins.keys()))
-
-    def get_command(self, module_name, command_name):
-        """Based on the loaded modules, return a command."""
-        self._load_modules()
-        actions = self.plugins.get(module_name) or {}
-
-        if command_name in actions:
-            return actions[command_name].load()
-
-        raise exceptions.InvalidCommand(module_name, command_name)
-
-    def get_module(self, module_name):
-        """Returns the module."""
-        self._load_modules()
-        return self.get_command(module_name, None)
-
-    def get_module_name(self, module_name):
-        """Returns the actual module name. Uses the alias mapping."""
-        if module_name in self.aliases:
-            return self.aliases[module_name]
-        return module_name
-
-    def _load_modules(self):
-        """Loads all modules."""
-        if self._modules_loaded is True:
-            return
-
-        self._load_modules_from_python()
-        self._load_modules_from_entry_points()
-
-        self._modules_loaded = True
-
-    def _load_modules_from_python(self):
-        """Load modules from the native python source."""
-        for name, modpath in routes.ALL_ROUTES:
-            module, subcommand = _parse_name(name)
-            if module not in self.plugins:
-                self.plugins[module] = {}
-
-            if ':' in modpath:
-                path, attr = modpath.split(':', 1)
-            else:
-                path, attr = modpath, None
-            self.plugins[module][subcommand] = ModuleLoader(path, attr=attr)
-
-    def _load_modules_from_entry_points(self):
-        """Load modules from the entry_points (slower)."""
-        for obj in pkg_resources.iter_entry_points(group='softlayer.cli',
-                                                   name=None):
-
-            module, subcommand = _parse_name(obj.name)
-            if module not in self.plugins:
-                self.plugins[module] = {}
-            self.plugins[module][subcommand] = obj
 
     def out(self, output, newline=True):
         """Outputs a string to the console (stdout)."""
@@ -128,6 +62,63 @@ class Environment(object):
         """Provide a password prompt."""
         return getpass.getpass(prompt)
 
+    # Command loading methods
+    def list_commands(self, *path):
+        """Command listing."""
+        self._load_modules()
+        path_str = self.resolve_alias(':'.join(path))
+
+        commands = []
+        for command in self.commands.keys():
+            # Filter based on prefix and the segment length
+            if all([command.startswith(path_str),
+                    len(path) == command.count(":")]):
+                offset = len(path_str)+1 if path_str else 0
+                commands.append(command[offset:])
+
+        return sorted(commands)
+
+    def get_command(self, *path):
+        """Return command at the given path or raise error."""
+        self._load_modules()
+        path_str = self.resolve_alias(':'.join(path))
+
+        if path_str in self.commands:
+            return self.commands[path_str].load()
+
+        raise exceptions.InvalidCommand(path)
+
+    def resolve_alias(self, path_str):
+        """Returns the actual command name. Uses the alias mapping."""
+        if path_str in self.aliases:
+            return self.aliases[path_str]
+        return path_str
+
+    def _load_modules(self):
+        """Loads all modules."""
+        if self._modules_loaded is True:
+            return
+
+        self._load_modules_from_python()
+        self._load_modules_from_entry_points()
+
+        self._modules_loaded = True
+
+    def _load_modules_from_python(self):
+        """Load modules from the native python source."""
+        for name, modpath in routes.ALL_ROUTES:
+            if ':' in modpath:
+                path, attr = modpath.split(':', 1)
+            else:
+                path, attr = modpath, None
+            self.commands[name] = ModuleLoader(path, attr=attr)
+
+    def _load_modules_from_entry_points(self):
+        """Load modules from the entry_points (slower)."""
+        for obj in pkg_resources.iter_entry_points(group='softlayer.cli',
+                                                   name=None):
+            self.commands[obj.name] = obj
+
 
 class ModuleLoader(object):
     """Module loader that acts a little like an EntryPoint object."""
@@ -142,16 +133,6 @@ class ModuleLoader(object):
         if self.attr:
             return getattr(module, self.attr)
         return module
-
-
-def _parse_name(name):
-    """Parse command name and path from the given name."""
-    if ':' in name:
-        module, subcommand = name.split(':', 1)
-    else:
-        module, subcommand = name, None
-
-    return module, subcommand
 
 
 pass_env = click.make_pass_decorator(Environment, ensure=True)

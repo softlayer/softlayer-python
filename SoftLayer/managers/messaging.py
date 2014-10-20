@@ -35,7 +35,7 @@ class QueueAuth(requests.auth.AuthBase):
         self.auth_token = auth_token
 
     def auth(self):
-        """Do Authentication."""
+        """Authenticate."""
         headers = {
             'X-Auth-User': self.username,
             'X-Auth-Key': self.api_key

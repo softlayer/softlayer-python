@@ -10,7 +10,7 @@ import click
 
 @click.command()
 @click.argument('identifier')
-@click.argument('network_type', type=click.Choice(['public', 'private']))
+@click.argument('network-type', type=click.Choice(['public', 'private']))
 @click.option('--speed',
               required=True,
               help="Port speed. 0 disables the port.",
@@ -19,7 +19,7 @@ import click
 def cli(env, identifier, network_type, speed):
     """Manage network settings."""
 
-    public = network_type == 'public'
+    public = (network_type == 'public')
 
     vsi = SoftLayer.VSManager(env.client)
     vs_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')

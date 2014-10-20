@@ -18,8 +18,8 @@ class EnvironmentTests(testing.TestCase):
     def set_up(self):
         self.env = environment.Environment()
 
-    def test_module_list(self):
-        actions = self.env.module_list()
+    def test_list_commands(self):
+        actions = self.env.list_commands()
         self.assertIn('vs', actions)
         self.assertIn('dns', actions)
 
@@ -35,12 +35,12 @@ class EnvironmentTests(testing.TestCase):
         getpass.assert_called_with('input')
         self.assertEqual(getpass(), r)
 
-    def test_get_module_name(self):
+    def test_resolve_alias(self):
         self.env.aliases = {'aliasname': 'realname'}
-        r = self.env.get_module_name('aliasname')
+        r = self.env.resolve_alias('aliasname')
         self.assertEqual(r, 'realname')
 
-        r = self.env.get_module_name('realname')
+        r = self.env.resolve_alias('realname')
         self.assertEqual(r, 'realname')
 
     def test_get_command_invalid(self):

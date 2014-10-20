@@ -14,7 +14,7 @@ import click
               type=click.Path(exists=True),
               help="The id_rsa.pub file to import for this key")
 @click.option('--key', '-k', help="The actual SSH key")
-@click.option('--note', help="Extra note that will be associated to this key")
+@click.option('--note', help="Extra note that will be associated with key")
 @environment.pass_env
 def cli(env, label, in_file, key, note):
     """Add a new SSH key."""

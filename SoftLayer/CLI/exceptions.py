@@ -38,12 +38,6 @@ class ArgumentError(CLIAbort):
 
 class InvalidCommand(SoftLayer.SoftLayerError):
     """Raised when trying to use a command that does not exist."""
-    def __init__(self, module_name, command_name, *args):
-        self.module_name = module_name
-        self.command_name = command_name
-        cmd_str = module_name
-        if command_name is not None:
-            cmd_str = '%s %s' % (module_name, command_name)
-        SoftLayer.SoftLayerError.__init__(self,
-                                          'Invalid command: "%s"' % cmd_str,
-                                          *args)
+    def __init__(self, path, *args):
+        msg = 'Invalid command: "%s"' % ' '.join(path)
+        SoftLayer.SoftLayerError.__init__(self, msg, *args)

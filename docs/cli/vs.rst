@@ -176,26 +176,27 @@ There are many other commands to help manage virtual servers. To see them all, u
 	$ sl vs
 	Usage: sl vs [OPTIONS] COMMAND [ARGS]...
 
-	  Virtual Servers
+	  Virtual Servers.
 
 	Options:
 	  --help  Show this message and exit.
 
 	Commands:
-	  cancel          Cancel virtual servers
-	  capture         Capture SoftLayer image
-	  create          Order/create virtual servers
-	  create-options  Virtual server order options
-	  detail          Get details for a virtual server
-	  dns-sync        Sync DNS records
-	  edit            Edit a virtual server's details
-	  list            List virtual servers
-	  network         Manage network settings
-	  pause           Pauses an active virtual server
-	  power_off       Power off an active virtual server
-	  power_on        Power on a virtual server
-	  ready           Check if a virtual server is ready
-	  reload          Reload operating system on a virtual server
-	  rescue          Reboot into a rescue image
-	  resume          Resumes a paused virtual server
-	  upgrade         Upgrade a virtual server
+	  cancel          Cancel virtual servers.
+	  capture         Capture SoftLayer image.
+	  create          Order/create virtual servers.
+	  create-options  Virtual server order options.
+	  detail          Get details for a virtual server.
+	  dns-sync        Sync DNS records.
+	  edit            Edit a virtual server's details.
+	  list            List virtual servers.
+	  network         Manage network settings.
+	  pause           Pauses an active virtual server.
+	  power_off       Power off an active virtual server.
+	  power_on        Power on a virtual server.
+	  ready           Check if a virtual server is ready.
+	  reboot          Reboot an active virtual server.
+	  reload          Reload operating system on a virtual server.
+	  rescue          Reboot into a rescue image.
+	  resume          Resumes a paused virtual server.
+	  upgrade         Upgrade a virtual server.

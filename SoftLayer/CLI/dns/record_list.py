@@ -23,11 +23,11 @@ def cli(env, zone, data, record, ttl, type):
     """List all records in a zone."""
 
     manager = SoftLayer.DNSManager(env.client)
-    table = formatting.Table(['id', 'record', 'type', 'ttl', 'value'])
+    table = formatting.Table(['id', 'record', 'type', 'ttl', 'data'])
 
     table.align['ttl'] = 'l'
     table.align['record'] = 'r'
-    table.align['value'] = 'l'
+    table.align['data'] = 'l'
 
     zone_id = helpers.resolve_id(manager.resolve_ids, zone, name='zone')
 

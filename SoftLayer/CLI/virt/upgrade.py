@@ -6,23 +6,9 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
+from SoftLayer.CLI import virt
 
 import click
-
-
-class MemoryType(click.ParamType):
-    """Memory type."""
-    name = 'integer'
-
-    def convert(self, value, param, ctx):
-        """Validate memory argument."""
-        try:
-            return int(value) / 1024
-        except ValueError:
-            self.fail('%s is not an integer that is divisable by 1024'
-                      % value, param, ctx)
-
-MEM_TYPE = MemoryType()
 
 
 @click.command(epilog="""Note: SoftLayer automatically reboots the VS once
@@ -33,7 +19,7 @@ completed. However for Network, no reboot is required.""")
 @click.option('--private',
               is_flag=True,
               help="CPU core will be on a dedicated host server.")
-@click.option('--memory', type=MEM_TYPE, help="Memory in megabytes")
+@click.option('--memory', type=virt.MEM_TYPE, help="Memory in megabytes")
 @click.option('--network', type=click.INT, help="Network port speed in Mbps")
 @environment.pass_env
 def cli(env, identifier, cpu, private, memory, network):

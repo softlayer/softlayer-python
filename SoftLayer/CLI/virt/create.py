@@ -7,6 +7,7 @@ from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 from SoftLayer.CLI import template
+from SoftLayer.CLI import virt
 from SoftLayer import utils
 
 import click
@@ -18,7 +19,7 @@ import click
 @click.option('--image',
               help="Image GUID. See: 'sl image list' for reference")
 @click.option('--cpu', '-c', help="Number of CPU cores", type=click.INT)
-@click.option('--memory', '-m', help="Memory in mebibytes", type=click.INT)
+@click.option('--memory', '-m', help="Memory in mebibytes", type=virt.MEM_TYPE)
 @click.option('--os', '-o',
               help="OS install code. Tip: you can specify <OS>_LATEST")
 @click.option('--billing',
@@ -234,11 +235,7 @@ def _parse_create_args(client, args):
         "local_disk": not args['san'],
     }
 
-    memory = args['memory']
-    if memory < 1024:
-        memory = memory * 1024
-
-    data["memory"] = memory
+    data["memory"] = args['memory']
 
     if args.get('os'):
         data['os_code'] = args['os']

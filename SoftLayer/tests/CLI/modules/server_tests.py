@@ -507,7 +507,6 @@ class ServerCLITests(testing.TestCase):
                                                'wait': None,
                                                'tag': (),
                                                'datacenter': 'TEST00',
-                                               'like': False,
                                                'os': 'UBUNTU_12_64_MINIMAL',
                                                'cpu': 4,
                                                'vlan_public': None},

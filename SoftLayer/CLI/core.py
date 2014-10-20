@@ -34,41 +34,30 @@ if sys.stdout.isatty():
 
 
 class CommandLoader(click.MultiCommand):
-    """Loads commands for click."""
-    def __init__(self, module=None, **attrs):
-        click.MultiCommand.__init__(self, **attrs)
-        self.module = module
-
-    def list_commands(self, ctx):
-        """Get module for click."""
-        env = ctx.ensure_object(environment.Environment)
-        return env.command_list(self.module)
-
-    def get_command(self, ctx, name):
-        """Get command for click."""
-        env = ctx.ensure_object(environment.Environment)
-        command = env.get_command(self.module, name)
-        return command
-
-
-class ModuleLoader(click.MultiCommand):
     """Loads module for click."""
 
+    def __init__(self, *path, **attrs):
+        click.MultiCommand.__init__(self, **attrs)
+        self.path = path
+
     def list_commands(self, ctx):
         """Get module for click."""
         env = ctx.ensure_object(environment.Environment)
-        return sorted(env.module_list())
+        return sorted(env.list_commands(*self.path))
 
     def get_command(self, ctx, name):
         """Get command for click."""
         env = ctx.ensure_object(environment.Environment)
 
-        # Do alias lookup
-        module_name = env.get_module_name(name)
+        # Do alias lookup (only available for root commands)
+        if len(self.path) == 0:
+            name = env.resolve_alias(name)
 
-        module = env.get_module(module_name)
+        new_path = list(self.path)
+        new_path.append(name)
+        module = env.get_command(*new_path)
         if isinstance(module, types.ModuleType):
-            return CommandLoader(module=module_name, help=module.__doc__)
+            return CommandLoader(*new_path, help=module.__doc__)
         else:
             return module
 
@@ -102,7 +91,7 @@ class CliClient(SoftLayer.Client):
              epilog="""To use most commands your SoftLayer
 username and api_key need to be configured. The easiest way to do that is to
 use: 'sl config setup'""",
-             cls=ModuleLoader)
+             cls=CommandLoader)
 @click.pass_context
 @click.option('--format',
               default=DEFAULT_FORMAT,

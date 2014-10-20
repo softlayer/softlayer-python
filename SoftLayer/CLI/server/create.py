@@ -31,8 +31,8 @@ import click
 @click.option('--billing',
               type=click.Choice(['hourly', 'monthly']),
               default='monthly',
-              help="""Billing rate. The hourly rate is only available on the
- bare metal instances""")
+              help="""Billing rate.
+The hourly rate is only available on bare metal instances""")
 @click.option('--datacenter', '-d', help="Datacenter shortname")
 @click.option('--dedicated/--public',
               is_flag=True,
@@ -58,9 +58,6 @@ import click
 @click.option('--private',
               is_flag=True,
               help="Forces the VS to only have access the private network")
-@click.option('--like',
-              is_flag=True,
-              help="Use the configuration from an existing VS")
 @click.option('--network', '-n', help="Network port speed in Mbps")
 @click.option('--tag', '-g', multiple=True, help="Tags to add to the instance")
 @click.option('--template', '-t',
