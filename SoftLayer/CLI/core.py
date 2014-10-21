@@ -20,6 +20,9 @@ import click
 # pylint: disable=too-many-public-methods, broad-except, unused-argument
 # pylint: disable=redefined-builtin, super-init-not-called
 
+# Disable the cyclic import error. This is handled by an inline import.
+# pylint: disable=cyclic-import
+
 DEBUG_LOGGING_MAP = {
     0: logging.CRITICAL,
     1: logging.WARNING,
@@ -160,8 +163,8 @@ def cli(ctx,
     if env.client is None:
         # Environment can be passed in explicitly. This is used for testing
         if fixtures:
-            from SoftLayer import testing
-            real_client = testing.FixtureClient()
+            from SoftLayer import fixture_client
+            real_client = fixture_client.FixtureClient()
         else:
             # Create SL Client
             real_client = SoftLayer.Client(proxy=proxy, config_file=config)

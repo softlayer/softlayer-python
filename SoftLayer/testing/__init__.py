@@ -14,7 +14,7 @@ import os.path
 
 from SoftLayer.CLI import core
 from SoftLayer.CLI import environment
-from SoftLayer.testing import fixture_client
+from SoftLayer import fixture_client
 
 from click import testing
 
@@ -47,12 +47,17 @@ class TestCase(unittest.TestCase):
                     env=None,
                     fixtures=True,
                     fmt='json'):
+        """A helper that runs a SoftLayer CLI command.
 
-        runner = testing.CliRunner()
-        if fixtures:
+        This returns a click.testing.Result object.
+        """
+        args = args or []
+
+        if fixtures is True:
             args.insert(0, '--fixtures')
         args.insert(0, '--format=%s' % fmt)
 
+        runner = testing.CliRunner()
         return runner.invoke(core.cli, args=args, obj=env or self.env)
 
 __all__ = ['unittest', 'FixtureClient']

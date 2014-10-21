@@ -41,6 +41,7 @@ class FixtureClient(object):
         return service
 
     def call(self, service, method, *args, **kwargs):
+        """Call the method on the service."""
         return getattr(self[service], method)(*args, **kwargs)
 
     def reset_mock(self):
@@ -88,6 +89,7 @@ def _wrap_fixture(fixture):
         return call_handler
 
     def wrapped(*args, **kwargs):
+        """When this is called, return the fixture (ignoring the arguments)."""
         return fixture
 
     return wrapped

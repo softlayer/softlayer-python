@@ -21,6 +21,7 @@ import pkg_resources
 
 class Environment(object):
     """Provides access to the current CLI environment."""
+
     def __init__(self):
         # {'path:to:command': ModuleLoader()}
         # {'vs:list': ModuleLoader()}
@@ -70,9 +71,12 @@ class Environment(object):
 
         commands = []
         for command in self.commands.keys():
+
             # Filter based on prefix and the segment length
             if all([command.startswith(path_str),
                     len(path) == command.count(":")]):
+
+                # offset is used to exclude the path that the caller requested.
                 offset = len(path_str)+1 if path_str else 0
                 commands.append(command[offset:])
 
