@@ -1,3 +1,20 @@
+3.3.0
+
+    * CLI/API: Adds load balancer management
+
+    * CLI: DNS zone file import
+
+    * CLI: Improves image detail command output
+
+    * CLI: Adds command to reboot into a rescue image for bare metal
+
+    * API: Adds ability to place orders using quotes
+
+    * CLI: Fixes major issue that was breaking server ordering
+
+    * API/CLI: Several smaller bug fixes
+
+
 3.2.0
 
     * CLI+API: Added firewall manager and CLI module
