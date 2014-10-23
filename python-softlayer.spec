@@ -1,18 +1,20 @@
 # sitelib for noarch packages, sitearch for others (remove the unneeded one)
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 %{!?python_sitearch: %global python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
+%global commit master
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
 
-Name:           python-softlayer
-Version:        773ab17
+Name:           softlayer-python
+Version:        %{commit}
 Release:        1%{?dist}
 Summary:        softlayer python interface
 
 License:        Softlayer
 URL:            https://github.com/softlayer/softlayer-python
-Source0:        python-softlayer-773ab17.tar.gz
+Source:         https://github.com/softlayer/softlayer-python/archive/%{commit}/softlayer-python-%{commit}.tar.gz
 
 #BuildArch:      
-BuildRequires:  python-devel
+BuildRequires:  python-devel, python-setuptools
 Requires:       python-requests, python-docopt = 0.6.1, python-prettytable >= 0.7.0
 Requires:       python-importlib, python-six >= 1.6.1
 
@@ -43,5 +45,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Oct 23 2014 Christopher Gallo <chrisagallo@gmail.com> - master-2
+- Changed Source to a proper github url, added python-setuptool build
+  requirement
+
 * Wed Mar 19 2014 Andy Bakun <rpmbuild@thwartedefforts.org> 773ab17-1
 - initial packaging
