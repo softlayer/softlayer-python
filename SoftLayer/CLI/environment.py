@@ -16,7 +16,7 @@ from SoftLayer import utils
 import click
 import pkg_resources
 
-# pylint: disable=too-many-instance-attributes, invalid-name
+# pylint: disable=too-many-instance-attributes, invalid-name, no-self-use
 
 
 class Environment(object):

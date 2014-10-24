@@ -11,6 +11,8 @@ import requests.auth
 
 from SoftLayer import consts
 from SoftLayer import exceptions
+# pylint: disable=no-self-use
+
 
 ENDPOINTS = {
     "dal05": {

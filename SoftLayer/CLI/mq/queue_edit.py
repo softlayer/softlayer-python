@@ -26,8 +26,8 @@ import click
               help="Time in seconds that messages will live")
 @click.option('--tags', help="Comma-separated list of tags")
 @environment.pass_env
-def cli(env, account_id, queue_name, datacenter, network,
-        visibility_interval, expiration, tags):
+def cli(env, account_id, queue_name, datacenter, network, visibility_interval,
+        expiration, tags):
     """Modify a queue."""
 
     manager = SoftLayer.MessagingManager(env.client)
@@ -37,7 +37,7 @@ def cli(env, account_id, queue_name, datacenter, network,
     if tags:
         tag_list = [tag.strip() for tag in tags.split(',')]
 
-    queue = mq_client.create_queue(
+    queue = mq_client.modify_queue(
         queue_name,
         visibility_interval=visibility_interval,
         expiration=expiration,

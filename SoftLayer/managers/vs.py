@@ -12,6 +12,7 @@ import time
 
 from SoftLayer.managers import ordering
 from SoftLayer import utils
+# pylint: disable=no-self-use
 
 
 class VSManager(utils.IdentifierMixin, object):

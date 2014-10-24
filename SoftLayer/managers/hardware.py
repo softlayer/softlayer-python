@@ -5,12 +5,12 @@
 
     :license: MIT, see LICENSE for more details.
 """
-# Invalid names are ignored due to long method names and short argument names
-# pylint: disable=C0103
 import socket
 
 from SoftLayer.managers import ordering
 from SoftLayer import utils
+# Invalid names are ignored due to long method names and short argument names
+# pylint: disable=invalid-name, no-self-use
 
 
 class HardwareManager(utils.IdentifierMixin, object):

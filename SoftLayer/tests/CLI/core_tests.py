@@ -105,7 +105,7 @@ def recursive_subcommand_loader(root, path=''):
     ctx = click.Context(root)
 
     for command in root.list_commands(ctx):
-        new_root = root.get_command(ctx, command)
         new_path = '%s:%s' % (path, command)
+        logging.info("loading %s", new_path)
+        new_root = root.get_command(ctx, command)
         recursive_subcommand_loader(new_root, path=new_path)
-        logging.info('loading %s', new_path)

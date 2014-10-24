@@ -26,8 +26,8 @@ import click
               help="Time in seconds that messages will live")
 @click.option('--tags', help="Comma-separated list of tags")
 @environment.pass_env
-def cli(env, account_id, queue_name, datacenter, network,
-        visibility_interval, expiration, tags):
+def cli(env, account_id, queue_name, datacenter, network, visibility_interval,
+        expiration, tags):
     """Create a queue."""
 
     manager = SoftLayer.MessagingManager(env.client)
