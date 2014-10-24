@@ -25,16 +25,12 @@ import click
 @click.option('--hostname', '-H', help='Filter by hostname')
 @click.option('--memory', '-m', help='Filter by memory in gigabytes')
 @click.option('--network', '-n', help='Filter by network port speed in Mbps')
-@click.option('--tags', help='Filter by tags')
+@click.option('--tag', multiple=True, help='Filter by tags')
 @environment.pass_env
-def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tags):
+def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag):
     """List hardware servers."""
 
     manager = SoftLayer.HardwareManager(env.client)
-
-    tag_list = None
-    if tags:
-        tag_list = [tag.strip() for tag in tags.split(',')]
 
     servers = manager.list_hardware(
         hostname=hostname,
@@ -43,7 +39,7 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tags):
         memory=memory,
         datacenter=datacenter,
         nic_speed=network,
-        tags=tag_list)
+        tags=tag)
 
     table = formatting.Table([
         'id',

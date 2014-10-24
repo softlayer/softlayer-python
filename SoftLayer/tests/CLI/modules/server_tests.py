@@ -145,7 +145,7 @@ class ServerCLITests(testing.TestCase):
         self.assertFalse(service.getReverseDomainRecords.called)
 
     def test_list_servers(self):
-        result = self.run_command(['server', 'list', '--tags=openstack'])
+        result = self.run_command(['server', 'list', '--tag=openstack'])
 
         expected = [
             {
@@ -505,7 +505,6 @@ class ServerCLITests(testing.TestCase):
                                                'key': ('1234',),
                                                'vlan_private': None,
                                                'wait': None,
-                                               'tag': (),
                                                'datacenter': 'TEST00',
                                                'os': 'UBUNTU_12_64_MINIMAL',
                                                'cpu': 4,
