@@ -196,8 +196,7 @@ def _update_with_like_args(env, args):
 
         tag_refs = like_details.get('tagReferences', None)
         if tag_refs is not None and len(tag_refs) > 0:
-            tags = ','.join([t['tag']['name'] for t in tag_refs])
-            like_args['tag'] = tags
+            like_args['tag'] = [t['tag']['name'] for t in tag_refs]
 
         # Handle mutually exclusive options
         like_image = utils.lookup(like_details,
@@ -274,6 +273,6 @@ def _parse_create_args(client, args):
         data['private_vlan'] = args['vlan_private']
 
     if args.get('tag'):
-        data['tags'] = args['tag']
+        data['tags'] = ','.join(args['tag'])
 
     return data

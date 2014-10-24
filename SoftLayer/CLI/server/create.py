@@ -59,7 +59,6 @@ The hourly rate is only available on bare metal instances""")
               is_flag=True,
               help="Forces the VS to only have access the private network")
 @click.option('--network', '-n', help="Network port speed in Mbps")
-@click.option('--tag', '-g', multiple=True, help="Tags to add to the instance")
 @click.option('--template', '-t',
               help="A template file that defaults the command-line options",
               type=click.Path(exists=True, readable=True, resolve_path=True))
