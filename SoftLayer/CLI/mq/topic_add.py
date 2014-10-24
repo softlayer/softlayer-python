@@ -24,24 +24,20 @@ import click
               type=click.INT,
               default=604800,
               help="Time in seconds that messages will live")
-@click.option('--tags', help="Comma-separated list of tags")
+@click.option('--tag', '-g', multiple=True, help="Tags to add to the topic")
 @environment.pass_env
 def cli(env, account_id, topic_name, datacenter, network,
-        visibility_interval, expiration, tags):
+        visibility_interval, expiration, tag):
     """Create a new topic."""
 
     manager = SoftLayer.MessagingManager(env.client)
     mq_client = manager.get_connection(account_id,
                                        datacenter=datacenter, network=network)
 
-    tag_list = None
-    if tags:
-        tag_list = [tag.strip() for tag in tags.split(',')]
-
     topic = mq_client.create_topic(
         topic_name,
         visibility_interval=visibility_interval,
         expiration=expiration,
-        tags=tag_list,
+        tags=tag,
     )
     return mq.topic_table(topic)

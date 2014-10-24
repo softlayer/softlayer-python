@@ -75,6 +75,7 @@ class CliClient(SoftLayer.Client):
 
     def __init__(self, client, *args, **kwargs):
         self.real_client = client
+        self.auth = client.auth
         self.last_calls = []
         # NOTE(kmcdonald): I really don't like this pattern.
 
