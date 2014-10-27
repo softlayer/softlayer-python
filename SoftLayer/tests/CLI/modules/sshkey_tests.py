@@ -4,72 +4,66 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import json
 import os.path
 import tempfile
 
 import mock
 
-from SoftLayer.CLI import exceptions
-from SoftLayer.CLI import formatting
-from SoftLayer.CLI.modules import sshkey
 from SoftLayer import testing
 
 
 class SshKeyTests(testing.TestCase):
-    def set_up(self):
-        self.client = testing.FixtureClient()
 
     def test_add_by_option(self):
         service = self.client['Security_Ssh_Key']
-        command = sshkey.AddSshKey(client=self.client)
         mock_key = service.getObject()['key']
 
-        output = command.execute({
-            '<label>': 'key1',
-            '--key': mock_key,
-            '--notes': 'my key',
-        })
+        result = self.run_command(['sshkey', 'add', 'key1',
+                                   '--key=%s' % mock_key,
+                                   '--note=my key'])
 
-        self.assertEqual(output, 'SSH key added: aa:bb:cc:dd')
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output),
+                         "SSH key added: aa:bb:cc:dd")
         service.createObject.assert_called_with({'notes': 'my key',
                                                  'key': mock_key,
                                                  'label': 'key1'})
 
     def test_add_by_file(self):
-        command = sshkey.AddSshKey(client=self.client)
         path = os.path.join(testing.FIXTURE_PATH, 'id_rsa.pub')
 
-        output = command.execute({
-            '<label>': 'key1',
-            '--file': path,
-        })
+        result = self.run_command(['sshkey', 'add', 'key1',
+                                   '--in-file=%s' % path])
 
-        self.assertEqual(output, 'SSH key added: aa:bb:cc:dd')
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output),
+                         "SSH key added: aa:bb:cc:dd")
+        service = self.client['Security_Ssh_Key']
+        mock_key = service.getObject()['key']
+        service.createObject.assert_called_with({'notes': None,
+                                                 'key': mock_key,
+                                                 'label': 'key1'})
 
     def test_remove_key(self):
-        command = sshkey.RemoveSshKey(client=self.client)
-        command.execute({'<identifier>': '1234',
-                         '--really': True})
+        result = self.run_command(['--really', 'sshkey', 'remove', '1234'])
+
+        self.assertEqual(result.exit_code, 0)
+        service = self.client['Security_Ssh_Key']
+        service.deleteObject.assert_called_with(id=1234)
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
     def test_remove_key_fail(self, ngb_mock):
         ngb_mock.return_value = False
+        result = self.run_command(['sshkey', 'remove', '1234'])
 
-        command = sshkey.RemoveSshKey(client=self.client)
-
-        self.assertRaises(exceptions.CLIAbort,
-                          command.execute, {'<identifier>': '1234',
-                                            '--really': False})
+        self.assertEqual(result.exit_code, 2)
 
     def test_edit_key(self):
-        command = sshkey.EditSshKey(client=self.client)
-        output = command.execute({
-            '<identifier>': '1234',
-            '--label': 'key1',
-            '--notes': 'my key',
-        })
+        result = self.run_command(['sshkey', 'edit', '1234',
+                                   '--label=key1', '--note=my key'])
 
-        self.assertEqual(output, None)
+        self.assertEqual(result.exit_code, 0)
         service = self.client['Security_Ssh_Key']
         service.editObject.assert_called_with({'notes': 'my key',
                                                'label': 'key1'}, id=1234)
@@ -77,17 +71,17 @@ class SshKeyTests(testing.TestCase):
     def test_edit_key_fail(self):
         service = self.client['Security_Ssh_Key']
         service.editObject.return_value = False
-        command = sshkey.EditSshKey(client=self.client)
-        self.assertRaises(exceptions.CLIAbort,
-                          command.execute, {'<identifier>': '1234',
-                                            '--label': 'key1',
-                                            '--notes': 'my key'})
+
+        result = self.run_command(['sshkey', 'edit', '1234',
+                                   '--label=key1', '--note=my key'])
+
+        self.assertEqual(result.exit_code, 2)
 
     def test_list_keys(self):
-        command = sshkey.ListSshKey(client=self.client)
-        output = command.execute({})
+        result = self.run_command(['sshkey', 'list'])
 
-        self.assertEqual(formatting.format_output(output, 'python'),
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output),
                          [{'notes': '-',
                            'fingerprint': None,
                            'id': '100',
@@ -98,18 +92,18 @@ class SshKeyTests(testing.TestCase):
                            'label': 'Test 2'}])
 
     def test_print_key(self):
-        command = sshkey.PrintSshKey(client=self.client)
-        output = command.execute({'<identifier>': '1234'})
+        result = self.run_command(['sshkey', 'print', '1234'])
 
-        self.assertEqual(formatting.format_output(output, 'python'),
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output),
                          {'id': 1234, 'label': 'label', 'notes': 'notes'})
 
     def test_print_key_file(self):
-        sshkey_file = tempfile.NamedTemporaryFile()
-        service = self.client['Security_Ssh_Key']
-        mock_key = service.getObject()['key']
-        command = sshkey.PrintSshKey(client=self.client)
+        with tempfile.NamedTemporaryFile() as sshkey_file:
+            service = self.client['Security_Ssh_Key']
+            mock_key = service.getObject()['key']
+            result = self.run_command(['sshkey', 'print', '1234',
+                                       '--out-file=%s' % sshkey_file.name])
 
-        command.execute({'<identifier>': '1234', '--file': sshkey_file.name})
-
-        self.assertEqual(mock_key, sshkey_file.read().decode("utf-8"))
+            self.assertEqual(result.exit_code, 0)
+            self.assertEqual(mock_key, sshkey_file.read().decode("utf-8"))

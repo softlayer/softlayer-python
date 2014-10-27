@@ -54,73 +54,78 @@ To discover the available commands, simply type `sl`.
 ::
 
 	$ sl
-	usage: sl <module> [<args>...]
-	       sl help <module>
-	       sl help <module> <command>
-	       sl [-h | --help]
-	
-	SoftLayer Command-line Client
-	
-	Compute:
-	  image     Manages compute and flex images
-	  metadata  Get details about this machine. Also available with 'my' and 'meta'
-	  server    Bare metal servers
-	  sshkey    Manage SSH keys on your account
-	  vs        Virtual Servers (formerly CCIs)
+	Usage: sl [OPTIONS] COMMAND [ARGS]...
 
-	Networking:
-	  cdn        Content Delivery Network service management
-	  dns        Domain Name System
-	  firewall   Firewall rule and security management
-	  globalip   Global IP address management
-	  messaging  Message Queue Service
-	  rwhois     RWhoIs operations
-	  ssl        Manages SSL
-	  subnet     Subnet ordering and management
-	  vlan       Manage VLANs on your account
+	  SoftLayer Command-line Client
 
-	Storage:
-	  iscsi     View iSCSI details
-	  nas       View NAS details
+	Options:
+	  --format [table|raw|json]  Output format
+	  -C, --config PATH          Config file location
+	  --debug [0|1|2|3]          Sets the debug noise level
+	  -v, --verbose              Sets the debug noise level
+	  --timings                  Time each API call and display after results
+	  --proxy TEXT               HTTP[S] proxy to be use to make API calls
+	  -y, --really               Confirm all prompt actions
+	  --fixtures                 Use fixtures instead of actually making API calls
+	  --version                  Show the version and exit.
+	  --help                     Show this message and exit.
 
-	General:
-	  config    View and edit configuration for this tool
-	  ticket    Manage account tickets
-	  summary   Display an overall summary of your account
-	  help      Show help
+	Commands:
+	  cdn        Content Delivery Network.
+	  config     CLI configuration.
+	  dns        Domain Name System.
+	  firewall   Firewalls.
+	  globalip   Global IP addresses.
+	  image      Compute images.
+	  iscsi      iSCSI storage.
+	  loadbal    Load balancers.
+	  messaging  Message queue service.
+	  metadata   Find details about this machine.
+	  nas        Network Attached Storage.
+	  rwhois     Referral Whois.
+	  server     Hardware servers.
+	  snapshot   Snapshots.
+	  sshkey     SSH Keys.
+	  ssl        SSL Certificates.
+	  subnet     Network subnets.
+	  summary    Account summary.
+	  ticket     Support tickets.
+	  vlan       Network VLANs.
+	  vs         Virtual Servers.
 
-	See 'sl help <module>' for more information on a specific module.
+	  To use most commands your SoftLayer username and api_key need to be
+	  configured. The easiest way to do that is to use: 'sl config setup'
 
-	To use most commands your SoftLayer username and api_key need to be configured.
-	The easiest way to do that is to use: 'sl config setup'
-
-As you can see, there are a number of commands. To look at the list of subcommands for Cloud Compute Instances, type `sl <command>`. For example:
+As you can see, there are a number of commands/sections. To look at the list of subcommands for virtual servers type `sl vs`. For example:
 ::
 
 	$ sl vs
-	usage: sl vs [<command>] [<args>...] [options]
+	Usage: sl vs [OPTIONS] COMMAND [ARGS]...
 
-	Manage, delete, order compute instances
+	  Virtual Servers.
 
-	The available commands are:
-	  cancel          Cancel a running virtual server
-	  capture         Create an image the disk(s) of a virtual server
-	  create          Order and create a virtual server
-	                    (see sl vs create-options for choices)
-	  create-options  Output available available options when creating a VS
-	  detail          Output details about a virtual server
-	  dns             DNS related actions to a virtual server
-	  edit            Edit details of a virtual server
-	  list            List virtual servers on the account
-	  nic-edit        Edit NIC settings
-	  pause           Pauses an active virtual server
-	  power-off       Powers off a running virtual server
-	  power-on        Boots up a virtual server
-	  ready           Check if a virtual server has finished provisioning
-	  reboot          Reboots a running virtual server
-	  reload          Reload the OS on a VS based on its current configuration
-	  resume          Resumes a paused virtual server
-	  upgrade         Upgrades parameters of a virtual server
+	Options:
+	  --help  Show this message and exit.
+
+	Commands:
+	  cancel          Cancel virtual servers.
+	  capture         Capture SoftLayer image.
+	  create          Order/create virtual servers.
+	  create-options  Virtual server order options.
+	  detail          Get details for a virtual server.
+	  dns-sync        Sync DNS records.
+	  edit            Edit a virtual server's details.
+	  list            List virtual servers.
+	  network         Manage network settings.
+	  pause           Pauses an active virtual server.
+	  power_off       Power off an active virtual server.
+	  power_on        Power on a virtual server.
+	  ready           Check if a virtual server is ready.
+	  reboot          Reboot an active virtual server.
+	  reload          Reload operating system on a virtual server.
+	  rescue          Reboot into a rescue image.
+	  resume          Resumes a paused virtual server.
+	  upgrade         Upgrade a virtual server.
 
 Finally, we can make an actual call. Let's list out the virtual servers on our account using `sl vs list`.
 
@@ -137,36 +142,21 @@ Most commands will take in additional options/arguments. To see all available ac
 ::
 
 	$ sl vs list --help
-	usage: sl vs list [--hourly | --monthly] [--sortby=SORT_COLUMN] [--tags=TAGS]
-	                  [options]
+		Usage: sl vs list [OPTIONS]
 
-	List virtual servers
-
-	Examples:
-	    sl vs list --datacenter=dal05
-	    sl vs list --network=100 --cpu=2
-	    sl vs list --memory='>= 2048'
-	    sl vs list --tags=production,db
+	  List virtual servers
 
 	Options:
-	  --sortby=ARG  Column to sort by. options: id, datacenter, host,
-	                Cores, memory, primary_ip, backend_ip
-
-	Filters:
-	  --hourly                 Show hourly instances
-	  --monthly                Show monthly instances
-	  -H --hostname=HOST       Host portion of the FQDN. example: server
-	  -D --domain=DOMAIN       Domain portion of the FQDN example: example.com
-	  -c --cpu=CPU             Number of CPU cores
-	  -m --memory=MEMORY       Memory in mebibytes (n * 1024)
-	  -d DC, --datacenter=DC   datacenter shortname (sng01, dal05, ...)
-	  -n MBPS, --network=MBPS  Network port speed in Mbps
-	  --tags=ARG               Only show instances that have one of these tags.
-	                           Comma-separated. (production,db)
-
-	For more on filters see 'sl help filters'
-
-	Standard Options:
-	  --format=ARG           Output format. [Options: table, raw] [Default: table]
-	  -C FILE --config=FILE  Config file location. [Default: ~/.softlayer]
-	  -h --help              Show this screen
+	  --sortby [id|datacenter|host|cores|memory|primary_ip|backend_ip]
+	                                  Column to sort by
+	  -c, --cpu INTEGER               Number of CPU cores
+	  -D, --domain TEXT               Domain portion of the FQDN
+	  -d, --datacenter TEXT           Datacenter shortname
+	  -H, --hostname TEXT             Host portion of the FQDN
+	  -m, --memory INTEGER            Memory in mebibytes
+	  -n, --network TEXT              Network port speed in Mbps
+	  --hourly                        Show only hourly instances
+	  --monthly                       Show only monthly instances
+	  --tags TEXT                     Show instances that have one of these comma-
+	                                  separated tags
+	  --help                          Show this message and exit.

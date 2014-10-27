@@ -13,8 +13,6 @@ Code Organization
 
   * **API** - Primary API client.
   * **CLI** - Code for the command-line interface.
-
-    * **modules** - CLI Modules.
   * **managers** - API Managers. Abstractions to help use the API.
 
 
@@ -55,7 +53,7 @@ Running the tests in multiple environments, using tox, is very time consuming. I
 
 ::
 
-  python setup.py nosetests
+  nosetests
   
 
 Documentation
@@ -73,17 +71,17 @@ The documentation will be built in `docs/_build/html`. If you don't have fabric,
   cd docs
   make html
 
-The primary docs are built at `Read the Docs <https://readthedocs.org/projects/softlayer-api-python-client/>`_.
+The primary docs are built at `Read the Docs <http://softlayer-python.readthedocs.org/>`_.
 
 
 Style
 -----
-This project follows :pep:`8` and most of the style suggestions that pyflakes recommends. Run `Flake8 <https://pypi.python.org/pypi/flake8/2.0>`_ regularly.
+This project follows :pep:`8` and most of the style suggestions that pyflakes recommends. Run `Flake8 <https://pypi.python.org/pypi/flake8/2.0>`_ regularly. Flake8, with project-specific exceptions, can be ran by using tox.
 
 
 Contributing
 ------------
-Contributing to the Python API bindings follows the fork-pull-request model on `github <http://github.com>`_. The project uses Github's `issues <https://github.com/softlayer/softlayer-api-python-client/issues>`_ and `pull requests <https://github.com/softlayer/softlayer-api-python-client/pulls>`_ to manage source control, bug fixes and new feature development regarding the API bindings and the CLI.
+Contributing to the Python API bindings follows the fork-pull-request model on `github <http://github.com>`_. The project uses Github's `issues <https://github.com/softlayer/softlayer-python/issues>`_ and `pull requests <https://github.com/softlayer/softlayer-python/pulls>`_ to manage source control, bug fixes and new feature development regarding the API bindings and the CLI.
 
 
 Developer Resources
@@ -91,8 +89,8 @@ Developer Resources
 .. toctree::
 
    SoftLayer API Documentation <http://sldn.softlayer.com/reference/softlayerapi>
-   Source on Github <https://github.com/softlayer/softlayer-api-python-client>
-   Issues <https://github.com/softlayer/softlayer-api-python-client/issues>
+   Source on Github <https://github.com/softlayer/softlayer-python>
+   Issues <https://github.com/softlayer/softlayer-python/issues>
    PyPI <https://pypi.python.org/pypi/softlayer/>
    Twitter <https://twitter.com/SoftLayerDevs>
    #softlayer on freenode <irc://irc.freenode.net/#softlayer>

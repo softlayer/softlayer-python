@@ -11,10 +11,7 @@ from SoftLayer import testing
 
 
 class CCITests(testing.TestCase):
-    """
-    Small class to verify the rename of CCIManager to VSManager didn't
-    break any existing code.
-    """
+    """Verify the rename of CCIManager to VSManager."""
     def set_up(self):
         self.client = testing.FixtureClient()
         self.cci = SoftLayer.CCIManager(self.client)

@@ -15,6 +15,12 @@ class CLIHalt(SystemExit):
         super(CLIHalt, self).__init__(*args)
         self.code = code
 
+    def __str__(self):
+        return "<CLIHalt code=%s msg=%s>" % (self.code,
+                                             getattr(self, 'message'))
+
+    __repr__ = __str__
+
 
 class CLIAbort(CLIHalt):
     """Halt the execution of the command. Gives an exit code of 2."""
@@ -32,16 +38,6 @@ class ArgumentError(CLIAbort):
 
 class InvalidCommand(SoftLayer.SoftLayerError):
     """Raised when trying to use a command that does not exist."""
-    def __init__(self, module_name, command_name, *args):
-        self.module_name = module_name
-        self.command_name = command_name
-        error = 'Invalid command: "%s".' % self.command_name
-        SoftLayer.SoftLayerError.__init__(self, error, *args)
-
-
-class InvalidModule(SoftLayer.SoftLayerError):
-    """Raised when trying to use a module that does not exist."""
-    def __init__(self, module_name, *args):
-        self.module_name = module_name
-        error = 'Invalid module: "%s".' % self.module_name
-        SoftLayer.SoftLayerError.__init__(self, error, *args)
+    def __init__(self, path, *args):
+        msg = 'Invalid command: "%s"' % ' '.join(path)
+        SoftLayer.SoftLayerError.__init__(self, msg, *args)

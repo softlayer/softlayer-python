@@ -548,10 +548,10 @@ class VSTests(testing.TestCase):
         service.editObject.assert_called_once_with(args, id=100)
 
         # Test tag support
-        self.vs.edit(100, tag='dev,green')
+        self.vs.edit(100, tags='dev,green')
         service.setTags.assert_called_once_with('dev,green', id=100)
         service.setTags.reset_mock()
-        self.vs.edit(100, tag='')
+        self.vs.edit(100, tags='')
         service.setTags.assert_called_once_with('', id=100)
 
     def test_captures(self):

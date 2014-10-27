@@ -523,7 +523,7 @@ class VSManager(utils.IdentifierMixin, object):
             return [result['id'] for result in results]
 
     def edit(self, instance_id, userdata=None, hostname=None, domain=None,
-             notes=None, tag=None):
+             notes=None, tags=None):
         """Edit hostname, domain name, notes, and/or the user data of a VS.
 
         Parameters set to None will be ignored and not attempted to be updated.
@@ -534,7 +534,7 @@ class VSManager(utils.IdentifierMixin, object):
         :param string hostname: valid hostname
         :param string domain: valid domain namem
         :param string notes: notes about this particular VS
-        :param string tag: tags to set on the VS as a comma separated list.
+        :param string tags: tags to set on the VS as a comma separated list.
                             Use the empty string to remove all tags.
 
         """
@@ -543,8 +543,8 @@ class VSManager(utils.IdentifierMixin, object):
         if userdata:
             self.guest.setUserMetadata([userdata], id=instance_id)
 
-        if tag is not None:
-            self.guest.setTags(tag, id=instance_id)
+        if tags is not None:
+            self.guest.setTags(tags, id=instance_id)
 
         if hostname:
             obj['hostname'] = hostname

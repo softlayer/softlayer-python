@@ -34,9 +34,10 @@ METADATA_ATTRIBUTES = METADATA_MAPPING.keys()
 
 
 class MetadataManager(object):
-    """ Provides an interface for the metadata service. This provides metadata
-        about the resourse it is called from. See `METADATA_ATTRIBUTES` for
-        full list of attributes.
+    """Provides an interface for the metadata service.
+
+    This provides metadata about the resourse it is called from.
+    See `METADATA_ATTRIBUTES` for full list of attributes.
 
         Usage:
 
@@ -59,7 +60,7 @@ class MetadataManager(object):
         self.client = client
 
     def get(self, name, param=None):
-        """ Retreive a metadata attribute
+        """Retreive a metadata attribute.
 
         :param string name: name of the attribute to retrieve. See `attribs`
         :param param: Required parameter for some attributes
@@ -91,7 +92,7 @@ class MetadataManager(object):
             raise ex
 
     def _get_network(self, kind, router=True, vlans=True, vlan_ids=True):
-        """ Wrapper for getting details about networks
+        """Wrapper for getting details about networks.
 
             :param string kind: network kind. Typically 'public' or 'private'
             :param boolean router: flag to include router information
@@ -118,7 +119,7 @@ class MetadataManager(object):
         return network
 
     def public_network(self, **kwargs):
-        """ Returns details about the public network
+        """Returns details about the public network.
 
         :param boolean router: True to return router details
         :param boolean vlans: True to return vlan details
@@ -128,7 +129,7 @@ class MetadataManager(object):
         return self._get_network('frontend', **kwargs)
 
     def private_network(self, **kwargs):
-        """ Returns details about the private network
+        """Returns details about the private network.
 
         :param boolean router: True to return router details
         :param boolean vlans: True to return vlan details

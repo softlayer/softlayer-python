@@ -13,83 +13,104 @@ First, let's list the current virtual servers with `sl vs list`.
 ::
 
 	$ sl vs list
-	:....:............:......:.......:........:............:............:....................:
-	: id : datacenter : host : cores : memory : primary_ip : backend_ip : active_transaction :
-	:....:............:......:.......:........:............:............:....................:
-	:....:............:......:.......:........:............:............:....................:
+	:.....:............:.........................:.......:........:..............:.............:....................:........:
+	:  id : datacenter :           host          : cores : memory :  primary_ip  :  backend_ip : active_transaction : owner  :
+	:.....:............:.........................:.......:........:..............:.............:....................:........:
+	:.....:............:.........................:.......:........:..............:.............:....................:........:
 
 We don't have any virtual servers! Let's fix that. Before we can create a VS, we need to know what options are available to me: RAM, CPU, operating systems, disk sizes, disk types, datacenters. Luckily, there's a simple command to do that, `sl vs create-options`.
 
 ::
 
 	$ sl vs create-options
-	:.................:..............................................................................................:
-	:            Name : Value                                                                                        :
-	:.................:..............................................................................................:
-	:      datacenter : ams01,dal01,dal05,sea01,sjc01,sng01,wdc01                                                    :
-	:  cpus (private) : 1,2,4,8                                                                                      :
-	: cpus (standard) : 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16                                                       :
-	:          memory : 1024,2048,3072,4096,5120,6144,7168,8192,9216,10240,11264,12288,13312,14336,15360,16384,32768 :
-	:     os (CENTOS) : CENTOS_5_32                                                                                  :
-	:                 : CENTOS_5_64                                                                                  :
-	:                 : CENTOS_6_32                                                                                  :
-	:                 : CENTOS_6_64                                                                                  :
-	: os (CLOUDLINUX) : CLOUDLINUX_5_32                                                                              :
-	:                 : CLOUDLINUX_5_64                                                                              :
-	:                 : CLOUDLINUX_6_32                                                                              :
-	:                 : CLOUDLINUX_6_64                                                                              :
-	:     os (DEBIAN) : DEBIAN_5_32                                                                                  :
-	:                 : DEBIAN_5_64                                                                                  :
-	:                 : DEBIAN_6_32                                                                                  :
-	:                 : DEBIAN_6_64                                                                                  :
-	:                 : DEBIAN_7_32                                                                                  :
-	:                 : DEBIAN_7_64                                                                                  :
-	:     os (REDHAT) : REDHAT_5_64                                                                                  :
-	:                 : REDHAT_6_32                                                                                  :
-	:                 : REDHAT_6_64                                                                                  :
-	:     os (UBUNTU) : UBUNTU_10_32                                                                                 :
-	:                 : UBUNTU_10_64                                                                                 :
-	:                 : UBUNTU_12_32                                                                                 :
-	:                 : UBUNTU_12_64                                                                                 :
-	:                 : UBUNTU_8_32                                                                                  :
-	:                 : UBUNTU_8_64                                                                                  :
-	:   os (VYATTACE) : VYATTACE_6.5_64                                                                              :
-	:        os (WIN) : WIN_2003-DC-SP2-1_32                                                                         :
-	:                 : WIN_2003-DC-SP2-1_64                                                                         :
-	:                 : WIN_2003-ENT-SP2-5_32                                                                        :
-	:                 : WIN_2003-ENT-SP2-5_64                                                                        :
-	:                 : WIN_2003-STD-SP2-5_32                                                                        :
-	:                 : WIN_2003-STD-SP2-5_64                                                                        :
-	:                 : WIN_2008-DC-R2_64                                                                            :
-	:                 : WIN_2008-DC-SP2_32                                                                           :
-	:                 : WIN_2008-DC-SP2_64                                                                           :
-	:                 : WIN_2008-ENT-R2_64                                                                           :
-	:                 : WIN_2008-ENT-SP2_32                                                                          :
-	:                 : WIN_2008-ENT-SP2_64                                                                          :
-	:                 : WIN_2008-STD-R2-SP1_64                                                                       :
-	:                 : WIN_2008-STD-R2_64                                                                           :
-	:                 : WIN_2008-STD-SP2_32                                                                          :
-	:                 : WIN_2008-STD-SP2_64                                                                          :
-	:                 : WIN_2012-DC_64                                                                               :
-	:                 : WIN_2012-STD_64                                                                              :
-	:                 : WIN_7-ENT_32                                                                                 :
-	:                 : WIN_7-PRO_32                                                                                 :
-	:                 : WIN_8-ENT_64                                                                                 :
-	:   local disk(0) : 25,100                                                                                       :
-	:   local disk(2) : 25,100,150,200,300                                                                           :
-	:     san disk(0) : 25,100                                                                                       :
-	:     san disk(2) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000              :
-	:     san disk(3) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000              :
-	:     san disk(4) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000              :
-	:     san disk(5) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000              :
-	:             nic : 10,100,1000                                                                                  :
-	:.................:..............................................................................................:
+	:.................:.................................................................................:
+	:            Name : Value                                                                           :
+	:.................:.................................................................................:
+	:      datacenter : ams01,dal01,dal05,dal06,hkg02,hou02,lon02,mel01,sea01,sjc01,sng01,tor01,wdc01   :
+	:  cpus (private) : 1,2,4,8                                                                         :
+	: cpus (standard) : 1,2,4,8,12,16                                                                   :
+	:          memory : 1024,2048,4096,6144,8192,12288,16384,32768,49152,65536                          :
+	:     os (CENTOS) : CENTOS_5_32                                                                     :
+	:                 : CENTOS_5_64                                                                     :
+	:                 : CENTOS_6_32                                                                     :
+	:                 : CENTOS_6_64                                                                     :
+	:                 : CENTOS_LATEST                                                                   :
+	:                 : CENTOS_LATEST_32                                                                :
+	:                 : CENTOS_LATEST_64                                                                :
+	: os (CLOUDLINUX) : CLOUDLINUX_5_32                                                                 :
+	:                 : CLOUDLINUX_5_64                                                                 :
+	:                 : CLOUDLINUX_6_32                                                                 :
+	:                 : CLOUDLINUX_6_64                                                                 :
+	:                 : CLOUDLINUX_LATEST                                                               :
+	:                 : CLOUDLINUX_LATEST_32                                                            :
+	:                 : CLOUDLINUX_LATEST_64                                                            :
+	:     os (DEBIAN) : DEBIAN_5_32                                                                     :
+	:                 : DEBIAN_5_64                                                                     :
+	:                 : DEBIAN_6_32                                                                     :
+	:                 : DEBIAN_6_64                                                                     :
+	:                 : DEBIAN_7_32                                                                     :
+	:                 : DEBIAN_7_64                                                                     :
+	:                 : DEBIAN_LATEST                                                                   :
+	:                 : DEBIAN_LATEST_32                                                                :
+	:                 : DEBIAN_LATEST_64                                                                :
+	:     os (REDHAT) : REDHAT_5_32                                                                     :
+	:                 : REDHAT_5_64                                                                     :
+	:                 : REDHAT_6_32                                                                     :
+	:                 : REDHAT_6_64                                                                     :
+	:                 : REDHAT_LATEST                                                                   :
+	:                 : REDHAT_LATEST_32                                                                :
+	:                 : REDHAT_LATEST_64                                                                :
+	:     os (UBUNTU) : UBUNTU_10_32                                                                    :
+	:                 : UBUNTU_10_64                                                                    :
+	:                 : UBUNTU_12_32                                                                    :
+	:                 : UBUNTU_12_64                                                                    :
+	:                 : UBUNTU_14_32                                                                    :
+	:                 : UBUNTU_14_64                                                                    :
+	:                 : UBUNTU_LATEST                                                                   :
+	:                 : UBUNTU_LATEST_32                                                                :
+	:                 : UBUNTU_LATEST_64                                                                :
+	:   os (VYATTACE) : VYATTACE_6.5_64                                                                 :
+	:                 : VYATTACE_6.6_64                                                                 :
+	:                 : VYATTACE_LATEST                                                                 :
+	:                 : VYATTACE_LATEST_64                                                              :
+	:        os (WIN) : WIN_2003-DC-SP2-1_32                                                            :
+	:                 : WIN_2003-DC-SP2-1_64                                                            :
+	:                 : WIN_2003-ENT-SP2-5_32                                                           :
+	:                 : WIN_2003-ENT-SP2-5_64                                                           :
+	:                 : WIN_2003-STD-SP2-5_32                                                           :
+	:                 : WIN_2003-STD-SP2-5_64                                                           :
+	:                 : WIN_2008-DC-R2_64                                                               :
+	:                 : WIN_2008-DC-SP2_64                                                              :
+	:                 : WIN_2008-ENT-R2_64                                                              :
+	:                 : WIN_2008-ENT-SP2_32                                                             :
+	:                 : WIN_2008-ENT-SP2_64                                                             :
+	:                 : WIN_2008-STD-R2-SP1_64                                                          :
+	:                 : WIN_2008-STD-R2_64                                                              :
+	:                 : WIN_2008-STD-SP2_32                                                             :
+	:                 : WIN_2008-STD-SP2_64                                                             :
+	:                 : WIN_2012-DC_64                                                                  :
+	:                 : WIN_2012-STD_64                                                                 :
+	:                 : WIN_7-ENT_32                                                                    :
+	:                 : WIN_7-PRO_32                                                                    :
+	:                 : WIN_8-ENT_64                                                                    :
+	:                 : WIN_LATEST                                                                      :
+	:                 : WIN_LATEST_32                                                                   :
+	:                 : WIN_LATEST_64                                                                   :
+	:   local disk(0) : 25,100                                                                          :
+	:   local disk(2) : 25,100,150,200,300                                                              :
+	:     san disk(0) : 25,100                                                                          :
+	:     san disk(2) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000 :
+	:     san disk(3) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000 :
+	:     san disk(4) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000 :
+	:     san disk(5) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000 :
+	:             nic : 10,100,1000                                                                     :
+	:.................:.................................................................................:
 
 Here's the command to create a 2-core, 1G memory, Ubuntu 12.04 hourly instance in the San Jose datacenter using the command `sl vs create`.
 
 ::
 
-	$ sl vs create --host=example --domain=softlayer.com -c 2 -m 1024 -o UBUNTU_12_64 --hourly --datacenter sjc01
+	$ sl vs create --hostname=example --domain=softlayer.com -c 2 -m 1024 -o UBUNTU_12_64 --billing=hourly --datacenter=sjc01
 	This action will incur charges on your account. Continue? [y/N]: y
 	:.........:......................................:
 	:    name : value                                :
@@ -152,33 +173,30 @@ There are many other commands to help manage virtual servers. To see them all, u
 
 ::
 	
-	$ sl help vs
-	usage: sl vs [<command>] [<args>...] [options]
+	$ sl vs
+	Usage: sl vs [OPTIONS] COMMAND [ARGS]...
 
-	Manage, delete, order compute instances
+	  Virtual Servers.
 
-	The available commands are:
-	  cancel          Cancel a running virtual server
-	  capture         Create an image the disk(s) of a virtual server
-	  create          Order and create a virtual server
-	                    (see sl vs create-options for choices)
-	  create-options  Output available available options when creating a VS
-	  detail          Output details about a virtual server
-	  dns             DNS related actions to a virtual server
-	  edit            Edit details of a virtual server
-	  list            List virtual servers on the account
-	  nic-edit        Edit NIC settings
-	  pause           Pauses an active virtual server
-	  power-off       Powers off a running virtual server
-	  power-on        Boots up a virtual server
-	  ready           Check if a virtual server has finished provisioning
-	  reboot          Reboots a running virtual server
-	  reload          Reload the OS on a VS based on its current configuration
-	  resume          Resumes a paused virtual server
-	  upgrade         Upgrades parameters of a virtual server
+	Options:
+	  --help  Show this message and exit.
 
-	For several commands, <identifier> will be asked for. This can be the id,
-	hostname or the ip address for a virtual server.
-
-	Standard Options:
-	  -h --help  Show this screen
+	Commands:
+	  cancel          Cancel virtual servers.
+	  capture         Capture SoftLayer image.
+	  create          Order/create virtual servers.
+	  create-options  Virtual server order options.
+	  detail          Get details for a virtual server.
+	  dns-sync        Sync DNS records.
+	  edit            Edit a virtual server's details.
+	  list            List virtual servers.
+	  network         Manage network settings.
+	  pause           Pauses an active virtual server.
+	  power_off       Power off an active virtual server.
+	  power_on        Power on a virtual server.
+	  ready           Check if a virtual server is ready.
+	  reboot          Reboot an active virtual server.
+	  reload          Reload operating system on a virtual server.
+	  rescue          Reboot into a rescue image.
+	  resume          Resumes a paused virtual server.
+	  upgrade         Upgrade a virtual server.

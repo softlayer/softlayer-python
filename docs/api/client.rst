@@ -7,7 +7,7 @@ This is the primary API client to make API calls. It deals with constructing and
 
 
 * `SoftLayer API Documentation <http://sldn.softlayer.com/reference/softlayerapi>`_
-* `Source on Github <https://github.com/softlayer/softlayer-api-python-client>`_
+* `Source on Github <https://github.com/softlayer/softlayer-python>`_
 
 ::
 

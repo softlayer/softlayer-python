@@ -6,21 +6,19 @@
 """
 import mock
 
-from SoftLayer.CLI import formatting
-from SoftLayer.CLI.modules import vs
 from SoftLayer import testing
+
+import json
 
 
 class DnsTests(testing.TestCase):
 
-    def set_up(self):
-        self.client = testing.FixtureClient()
-
     def test_list_vs(self):
-        command = vs.ListVSIs(client=self.client)
+        result = self.run_command(['vs', 'list', '--tags=tag'])
 
-        output = command.execute({'--tags': 'tag'})
-        self.assertEqual([{'datacenter': 'TEST00',
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output),
+                         [{'datacenter': 'TEST00',
                            'primary_ip': '172.16.240.2',
                            'host': 'vs-test1.test.sftlyr.ws',
                            'memory': 1024,
@@ -37,16 +35,15 @@ class DnsTests(testing.TestCase):
                            'active_transaction': None,
                            'id': 104,
                            'backend_ip': '10.45.19.35',
-                           'owner': 'chechu'}],
-                         formatting.format_output(output, 'python'))
+                           'owner': 'chechu'}])
 
     def test_detail_vs(self):
-        command = vs.VSDetails(client=self.client)
-        output = command.execute({'<identifier>': '100',
-                                  '--passwords': True,
-                                  '--price': True})
+        result = self.run_command(['vs', 'detail', '100',
+                                   '--passwords', '--price'])
 
-        self.assertEqual({'active_transaction': None,
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output),
+                         {'active_transaction': None,
                           'cores': 2,
                           'created': '2013-08-01 15:23:45',
                           'datacenter': 'TEST00',
@@ -70,21 +67,14 @@ class DnsTests(testing.TestCase):
                           'vlans': [{'type': 'PUBLIC',
                                      'number': 23,
                                      'id': 1}],
-                          'owner': 'chechu'},
-                         formatting.format_output(output, 'python'))
+                          'owner': 'chechu'})
 
     def test_create_options(self):
-        command = vs.CreateOptionsVS(client=self.client)
+        result = self.run_command(['vs', 'create-options'])
 
-        output = command.execute({'--all': True,
-                                  '--cpu': True,
-                                  '--datacenter': True,
-                                  '--disk': True,
-                                  '--memory': True,
-                                  '--nic': True,
-                                  '--os': True})
-
-        self.assertEqual({'cpus (private)': [],
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output),
+                         {'cpus (private)': [],
                           'cpus (standard)': ['1', '2', '3', '4'],
                           'datacenter': ['ams01', 'dal05'],
                           'local disk(0)': ['25', '100'],
@@ -92,91 +82,35 @@ class DnsTests(testing.TestCase):
                           'nic': ['10', '100', '1000'],
                           'os (CENTOS)': 'CENTOS_6_64',
                           'os (DEBIAN)': 'DEBIAN_7_64',
-                          'os (UBUNTU)': 'UBUNTU_12_64'},
-                         formatting.format_output(output, 'python'))
+                          'os (UBUNTU)': 'UBUNTU_12_64'})
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create(self, confirm_mock):
         confirm_mock.return_value = True
-        command = vs.CreateVS(client=self.client)
+        result = self.run_command(['vs', 'create',
+                                   '--cpu=2',
+                                   '--domain=example.com',
+                                   '--hostname=host',
+                                   '--os=UBUNTU_LATEST',
+                                   '--memory=1',
+                                   '--network=100',
+                                   '--billing=hourly',
+                                   '--tag=dev',
+                                   '--tag=green'])
 
-        output = command.execute({'--cpu': '2',
-                                  '--domain': 'example.com',
-                                  '--hostname': 'host',
-                                  '--image': None,
-                                  '--os': 'UBUNTU_LATEST',
-                                  '--memory': '1024',
-                                  '--nic': '100',
-                                  '--hourly': True,
-                                  '--monthly': False,
-                                  '--like': None,
-                                  '--datacenter': None,
-                                  '--dedicated': False,
-                                  '--san': False,
-                                  '--test': False,
-                                  '--export': None,
-                                  '--userfile': None,
-                                  '--postinstall': None,
-                                  '--key': [],
-                                  '--like': [],
-                                  '--network': [],
-                                  '--disk': [],
-                                  '--private': False,
-                                  '--template': None,
-                                  '--userdata': None,
-                                  '--vlan_public': None,
-                                  '--vlan_private': None,
-                                  '--wait': None,
-                                  '--really': False,
-                                  '--tags': 'dev,green'})
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output),
+                         {'guid': '1a2b3c-1701',
+                          'id': 100,
+                          'created': '2013-08-01 15:23:45'})
 
-        self.assertEqual([{'guid': '1a2b3c-1701',
-                           'id': 100,
-                           'created': '2013-08-01 15:23:45'}],
-                         formatting.format_output(output, 'python'))
-
-    @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_check_create_args(self, confirm_mock):
-        confirm_mock.return_value = True
-        command = vs.CreateVS(client=self.client)
-        output = command.execute({'--cpu': '2',
-                                  '--domain': 'example.com',
-                                  '--hostname': 'host',
-                                  '--image': None,
-                                  '--os': 'UBUNTU_LATEST',
-                                  '--memory': '=1024',
-                                  '--nic': '100',
-                                  '--hourly': True,
-                                  '--monthly': False,
-                                  '--like': None,
-                                  '--datacenter': None,
-                                  '--dedicated': False,
-                                  '--san': False,
-                                  '--test': False,
-                                  '--export': None,
-                                  '--userfile': None,
-                                  '--postinstall': None,
-                                  '--key': [],
-                                  '--network': [],
-                                  '--disk': [],
-                                  '--private': False,
-                                  '--template': None,
-                                  '--userdata': None,
-                                  '--vlan_public': None,
-                                  '--vlan_private': None,
-                                  '--wait': None,
-                                  '--really': False})
-
-        self.assertEqual([{'guid': '1a2b3c-1701',
-                           'id': 100,
-                           'created': '2013-08-01 15:23:45'}],
-                         formatting.format_output(output, 'python'))
         service = self.client['Virtual_Guest']
         service.createObject.assert_called_with({
             'domain': 'example.com',
+            'hourlyBillingFlag': True,
             'localDiskFlag': True,
+            'maxMemory': 1024,
+            'hostname': 'host',
             'startCpus': 2,
             'operatingSystemReferenceCode': 'UBUNTU_LATEST',
-            'maxMemory': 1024,
-            'hourlyBillingFlag': True,
-            'hostname': 'host'})
+            'networkComponents': [{'maxSpeed': '100'}]})
