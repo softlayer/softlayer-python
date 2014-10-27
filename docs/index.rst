@@ -3,8 +3,8 @@
 SoftLayer API Python Client |version|
 ========================================
 `API Docs <http://sldn.softlayer.com/reference/softlayerapi>`_ ``|``
-`Github <https://github.com/softlayer/softlayer-api-python-client>`_ ``|``
-`Issues <https://github.com/softlayer/softlayer-api-python-client/issues>`_ ``|``
+`Github <https://github.com/softlayer/softlayer-python>`_ ``|``
+`Issues <https://github.com/softlayer/softlayer-python/issues>`_ ``|``
 `PyPI <https://pypi.python.org/pypi/softlayer/>`_ ``|``
 `Twitter <https://twitter.com/SoftLayerDevs>`_ ``|``
 `#softlayer on freenode <irc://irc.freenode.net/#softlayer>`_
@@ -37,8 +37,8 @@ External Links
 .. toctree::
 
    SoftLayer API Documentation <http://sldn.softlayer.com/reference/softlayerapi>
-   Source on Github <https://github.com/softlayer/softlayer-api-python-client>
-   Issues <https://github.com/softlayer/softlayer-api-python-client/issues>
+   Source on Github <https://github.com/softlayer/softlayer-python>
+   Issues <https://github.com/softlayer/softlayer-python/issues>
    PyPI <https://pypi.python.org/pypi/softlayer/>
    Twitter <https://twitter.com/SoftLayerDevs>
    #softlayer on freenode <irc://irc.freenode.net/#softlayer>

@@ -5,64 +5,65 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer.CLI import exceptions
-from SoftLayer.CLI import formatting
-from SoftLayer.CLI.modules import rwhois
 from SoftLayer import testing
+
+import json
 
 
 class RWhoisTests(testing.TestCase):
-    def set_up(self):
-        self.client = testing.FixtureClient()
-
     def test_edit_nothing(self):
-        command = rwhois.RWhoisEdit(client=self.client)
-        self.assertRaises(exceptions.CLIAbort, command.execute, {})
+        result = self.run_command(['rwhois', 'edit'])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
     def test_edit(self):
-        command = rwhois.RWhoisEdit(client=self.client)
-        output = command.execute({'--abuse': 'abuse@site.com',
-                                  '--address1': 'address line 1',
-                                  '--address2': 'address line 2',
-                                  '--company': 'Company, Inc',
-                                  '--city': 'Dallas',
-                                  '--country': 'United States',
-                                  '--firstname': 'John',
-                                  '--lastname': 'Smith',
-                                  '--postal': '12345',
-                                  '--state': 'TX',
-                                  '--state': 'TX',
-                                  '--private': True,
-                                  '--public': False})
 
-        self.assertEqual(None, output)
+        result = self.run_command(['rwhois', 'edit',
+                                   '--abuse=abuse@site.com',
+                                   '--address1=address line 1',
+                                   '--address2=address line 2',
+                                   '--company=Company, Inc',
+                                   '--city=Dallas',
+                                   '--country=United States',
+                                   '--firstname=John',
+                                   '--lastname=Smith',
+                                   '--postal=12345',
+                                   '--state=TX',
+                                   '--state=TX',
+                                   '--private'])
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(result.output, "")
+
         service = self.client['Network_Subnet_Rwhois_Data']
-        service.editObject.assert_called_with({'city': 'Dallas',
-                                               'firstName': 'John',
-                                               'companyName': 'Company, Inc',
-                                               'address1': 'address line 1',
-                                               'address2': 'address line 2',
-                                               'lastName': 'Smith',
-                                               'abuseEmail': 'abuse@site.com',
-                                               'state': 'TX',
-                                               'country': 'United States',
-                                               'postalCode': '12345',
-                                               'privateResidenceFlag': False},
-                                              id='id')
+        service.editObject.assert_called_with(
+            {'city': 'Dallas',
+             'firstName': 'John',
+             'companyName': 'Company, Inc',
+             'address1': 'address line 1',
+             'address2': 'address line 2',
+             'lastName': 'Smith',
+             'abuseEmail': 'abuse@site.com',
+             'state': 'TX',
+             'country': 'United States',
+             'postalCode': '12345',
+             'privateResidenceFlag': True},
+            id='id')
 
     def test_edit_public(self):
-        command = rwhois.RWhoisEdit(client=self.client)
-        output = command.execute({'--private': False,
-                                  '--public': True})
+        result = self.run_command(['rwhois', 'edit', '--public'])
 
-        self.assertEqual(None, output)
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(result.output, "")
         service = self.client['Network_Subnet_Rwhois_Data']
-        service.editObject.assert_called_with({'privateResidenceFlag': True},
+        service.editObject.assert_called_with({'privateResidenceFlag': False},
                                               id='id')
 
     def test_show(self):
-        command = rwhois.RWhoisShow(client=self.client)
+        self.maxDiff = 100000
+        result = self.run_command(['rwhois', 'show'])
 
-        output = command.execute({})
         expected = {'Abuse Email': 'abuseEmail',
                     'Address 1': 'address1',
                     'Address 2': 'address2',
@@ -71,5 +72,7 @@ class RWhoisTests(testing.TestCase):
                     'Country': 'country',
                     'Name': 'firstName lastName',
                     'Postal Code': 'postalCode',
-                    'State': '-'}
-        self.assertEqual(expected, formatting.format_output(output, 'python'))
+                    'State': '-',
+                    'Private Residence': True}
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output), expected)

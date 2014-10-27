@@ -4,23 +4,20 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.CLI import formatting
-from SoftLayer.CLI.modules import nas
 from SoftLayer import testing
+
+import json
 
 
 class RWhoisTests(testing.TestCase):
-    def set_up(self):
-        self.client = testing.FixtureClient()
-
     def test_list_nas(self):
-        command = nas.ListNAS(client=self.client)
-        output = command.execute({})
+        result = self.run_command(['nas', 'list'])
 
-        self.assertEqual([{'username': 'user',
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output),
+                         [{'username': 'user',
                            'datacenter': 'Dallas',
                            'server': '127.0.0.1',
                            'password': 'pass',
                            'id': 1,
-                           'size': 10}],
-                         formatting.format_output(output, 'python'))
+                           'size': 10}])

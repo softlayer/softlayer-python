@@ -15,14 +15,14 @@ MAX_URLS_PER_PURGE = 5
 
 
 class CDNManager(utils.IdentifierMixin, object):
-    """ Manage CDN accounts """
+    """Manage CDN accounts."""
 
     def __init__(self, client):
         self.client = client
         self.account = self.client['Network_ContentDelivery_Account']
 
     def list_accounts(self):
-        """ Lists CDN accounts for the active user. """
+        """Lists CDN accounts for the active user."""
 
         account = self.client['Account']
         mask = 'cdnAccounts[%s]' % ', '.join(['id',
@@ -34,7 +34,7 @@ class CDNManager(utils.IdentifierMixin, object):
         return account.getObject(mask=mask).get('cdnAccounts', [])
 
     def get_account(self, account_id, **kwargs):
-        """ Retrieves a CDN account with the specified account ID.
+        """Retrieves a CDN account with the specified account ID.
 
         :param account_id int: the numeric ID associated with the CDN account.
         :param dict \\*\\*kwargs: additional arguments to include in the object
@@ -47,8 +47,7 @@ class CDNManager(utils.IdentifierMixin, object):
         return self.account.getObject(id=account_id, **kwargs)
 
     def get_origins(self, account_id, **kwargs):
-        """ Retrieves a list of origin pull mappings for a specified CDN
-        account.
+        """Retrieves list of origin pull mappings for a specified CDN account.
 
         :param account_id int: the numeric ID associated with the CDN account.
         :param dict \\*\\*kwargs: additional arguments to include in the object
@@ -60,8 +59,7 @@ class CDNManager(utils.IdentifierMixin, object):
 
     def add_origin(self, account_id, media_type, origin_url, cname=None,
                    secure=False):
-        """ Adds an original pull mapping to an origin-pull based CDN account
-        with the options provided.
+        """Adds an original pull mapping to an origin-pull.
 
         :param int account_id: the numeric ID associated with the CDN account.
         :param string media_type: the media type/protocol associated with this
@@ -87,8 +85,7 @@ class CDNManager(utils.IdentifierMixin, object):
         return self.account.createOriginPullMapping(config, id=account_id)
 
     def remove_origin(self, account_id, origin_id):
-        """ Removes an origin pull mapping with the given origin pull ID under
-        the provided CDN account ID.
+        """Removes an origin pull mapping with the given origin pull ID.
 
         :param int account_id: the CDN account ID from which the mapping should
                                be deleted.
@@ -98,7 +95,7 @@ class CDNManager(utils.IdentifierMixin, object):
         return self.account.deleteOriginPullRule(origin_id, id=account_id)
 
     def load_content(self, account_id, urls):
-        """ Prefetches one or more URLs to the CDN edge nodes.
+        """Prefetches one or more URLs to the CDN edge nodes.
 
         :param int account_id: the CDN account ID into which content should be
                                preloaded.
@@ -120,7 +117,7 @@ class CDNManager(utils.IdentifierMixin, object):
         return True
 
     def purge_content(self, account_id, urls):
-        """ Purges one or more URLs from the CDN edge nodes.
+        """Purges one or more URLs from the CDN edge nodes.
 
         :param int account_id: the CDN account ID from which content should
                                be purged.

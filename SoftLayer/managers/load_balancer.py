@@ -9,7 +9,7 @@ from SoftLayer import utils
 
 
 class LoadBalancerManager(utils.IdentifierMixin, object):
-    """ Manages load balancers.
+    """Manages load balancers.
 
     :param SoftLayer.API.Client client: the API client instance
     """
@@ -22,7 +22,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
                                   'LoadBalancer_VirtualIpAddress']
 
     def get_lb_pkgs(self):
-        """ Retrieves the local load balancer packages.
+        """Retrieves the local load balancer packages.
 
         :returns: A dictionary containing the load balancer packages
         """
@@ -37,17 +37,8 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
                 pkgs.append(package)
         return pkgs
 
-    def get_ip_address(self, ip_address=None):
-        """ Retrieves the IP address object given the ip address itself
-
-        :returns: A dictionary containing the IP address properties
-        """
-
-        svc = self.client['Network_Subnet_IpAddress']
-        return svc.getByIpAddress(ip_address)
-
     def get_hc_types(self):
-        """ Retrieves the health check type values
+        """Retrieves the health check type values.
 
         :returns: A dictionary containing the health check types
         """
@@ -57,7 +48,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         return svc.getAllObjects()
 
     def get_routing_methods(self):
-        """ Retrieves the load balancer routing methods.
+        """Retrieves the load balancer routing methods.
 
         :returns: A dictionary containing the load balancer routing methods
         """
@@ -67,7 +58,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         return svc.getAllObjects()
 
     def get_routing_types(self):
-        """ Retrieves the load balancer routing types.
+        """Retrieves the load balancer routing types.
 
         :returns: A dictionary containing the load balancer routing types
         """
@@ -77,7 +68,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         return svc.getAllObjects()
 
     def _get_location(self, datacenter):
-        """ Returns the location of the specified datacenter
+        """Returns the location of the specified datacenter.
 
         :param string datacenter: The datacenter to create the loadbalancer in
 
@@ -91,7 +82,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         return 'FIRST_AVAILABLE'
 
     def cancel_lb(self, loadbal_id):
-        """ Cancels the specified load balancer.
+        """Cancels the specified load balancer.
 
         :param int loadbal_id: Load Balancer ID to be cancelled.
         """
@@ -102,7 +93,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         return billing_item.cancelService(id=billing_id)
 
     def add_local_lb(self, price_item_id, datacenter):
-        """ Creates a local load balancer in the specified data center
+        """Creates a local load balancer in the specified data center.
 
         :param int price_item_id: The price item ID for the load balancer
         :param string datacenter: The datacenter to create the loadbalancer in
@@ -120,7 +111,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         return self.client['Product_Order'].placeOrder(product_order)
 
     def get_local_lbs(self):
-        """ Returns a list of all local load balancers on the account.
+        """Returns a list of all local load balancers on the account.
 
         :returns: A list of all local load balancers on the current account.
         """
@@ -129,7 +120,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         return self.account.getAdcLoadBalancers(mask=mask)
 
     def get_local_lb(self, loadbal_id, **kwargs):
-        """ Returns a specified local load balancer given the id.
+        """Returns a specified local load balancer given the id.
 
         :param int loadbal_id: The id of the load balancer to retrieve
         :returns: A dictionary containing the details of the load balancer
@@ -145,7 +136,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         return self.lb_svc.getObject(id=loadbal_id, **kwargs)
 
     def delete_service(self, service_id):
-        """ Deletes a service from the loadbal_id
+        """Deletes a service from the loadbal_id.
 
         :param int service_id: The id of the service to delete
         """
@@ -156,7 +147,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         return svc.deleteObject(id=service_id)
 
     def delete_service_group(self, group_id):
-        """ Deletes a service group from the loadbal_id
+        """Deletes a service group from the loadbal_id.
 
         :param int group_id: The id of the service group to delete
         """
@@ -167,7 +158,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         return svc.deleteObject(id=group_id)
 
     def toggle_service_status(self, service_id):
-        """ Toggles the service status
+        """Toggles the service status.
 
         :param int service_id: The id of the service to delete
         """
@@ -178,7 +169,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
     def edit_service(self, loadbal_id, service_id, ip_address_id=None,
                      port=None, enabled=None, hc_type=None, weight=None):
-        """ Edits an existing service properties
+        """Edits an existing service properties.
 
         :param int loadbal_id: The id of the loadbal where the service resides
         :param int service_id: The id of the service to edit
@@ -220,7 +211,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
     def add_service(self, loadbal_id, service_group_id, ip_address_id,
                     port=80, enabled=True, hc_type=21, weight=1):
-        """ Adds a new service to the service group
+        """Adds a new service to the service group.
 
         :param int loadbal_id: The id of the loadbal where the service resides
         :param int service_group_id: The group to add the service to
@@ -260,7 +251,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
     def add_service_group(self, lb_id, allocation=100, port=80,
                           routing_type=2, routing_method=10):
-        """ Adds a new service group to the load balancer
+        """Adds a new service group to the load balancer.
 
         :param int loadbal_id: The id of the loadbal where the service resides
         :param int allocation: percent of connections to allocate toward the
@@ -288,7 +279,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
     def edit_service_group(self, loadbal_id, group_id, allocation=None,
                            port=None, routing_type=None, routing_method=None):
-        """ Edit an existing service group
+        """Edit an existing service group.
 
         :param int loadbal_id: The id of the loadbal where the service resides
         :param int group_id: The id of the service group
@@ -319,7 +310,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         return self.lb_svc.editObject(load_balancer, id=loadbal_id)
 
     def reset_service_group(self, loadbal_id, group_id):
-        """ Resets all the connections on the service group
+        """Resets all the connections on the service group.
 
         :param int loadbal_id: The id of the loadbal
         :param int group_id: The id of the service group to reset

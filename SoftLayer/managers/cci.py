@@ -11,10 +11,7 @@ from SoftLayer.managers import vs
 
 
 class CCIManager(vs.VSManager):
-    """
-    Wrapper for the VSManager class to provide backwards compatibility with the
-    old CCIManager class.
-    """
+    """Deprecated wrapper for the VSManager class."""
     def __init__(self, client):
         super(CCIManager, self).__init__(client)
         warnings.warn("The CCIManager class has been replaced with VSManager.",
