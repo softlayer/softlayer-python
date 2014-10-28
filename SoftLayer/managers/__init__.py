@@ -19,13 +19,13 @@ from SoftLayer.managers.iscsi import ISCSIManager  # NOQA
 from SoftLayer.managers.load_balancer import LoadBalancerManager  # NOQA
 from SoftLayer.managers.messaging import MessagingManager  # NOQA
 from SoftLayer.managers.metadata import MetadataManager  # NOQA
+from SoftLayer.managers.monitor import MonitoringManager  # NOQA
 from SoftLayer.managers.network import NetworkManager  # NOQA
 from SoftLayer.managers.ordering import OrderingManager  # NOQA
 from SoftLayer.managers.sshkey import SshKeyManager  # NOQA
 from SoftLayer.managers.ssl import SSLManager  # NOQA
 from SoftLayer.managers.ticket import TicketManager  # NOQA
 from SoftLayer.managers.vs import VSManager  # NOQA
-from SoftLayer.managers.monitor import MonitoringManager # NOQA
 
 __all__ = ['CCIManager', 'DNSManager', 'FirewallManager', 'HardwareManager',
            'ImageManager', 'MessagingManager', 'MetadataManager', 'CDNManager',
