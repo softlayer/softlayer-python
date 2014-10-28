@@ -27,11 +27,15 @@ class MonitoringManager(utils.IdentifierMixin, object):
         self.server = self.client[server_type]
 
     def get_status(self, server_id):
-        # Monitoring Status number meanings
-        # 0 = Down
-        # 1 = Warning
-        # 2 = OK
-        # >2 = something strange happened
+        """ get the monitoring status of a server
+        :param int server_id: the id of the server
+
+        Definition of some of the monitoring status codes
+         0 = Down
+         1 = Warning
+         2 = OK
+         >2 = something strange happened
+        """
 
         mask = "lastResult, subnet[virtualGuests,hardware]"
         agent = self.server.getNetworkMonitors(id=server_id, mask=mask)
