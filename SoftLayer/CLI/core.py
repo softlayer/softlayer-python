@@ -37,6 +37,7 @@ General:
   ticket    Manage account tickets
   summary   Display an overall summary of your account
   help      Show help
+  monitor   View monitoring information
 
 See 'sl help <module>' for more information on a specific module.
 
