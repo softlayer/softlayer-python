@@ -8,8 +8,7 @@
 
 
 class OrderingManager(object):
-    """
-    Manages hardware devices.
+    """Manages hardware devices.
 
     :param SoftLayer.API.Client client: an API client instance
     """
@@ -18,7 +17,7 @@ class OrderingManager(object):
         self.client = client
 
     def get_packages_of_type(self, package_types, mask):
-        """ Get packages that match a certain type
+        """Get packages that match a certain type.
 
         Each ordering package has a type, so return all packages that match
         the types we are looking for
@@ -47,7 +46,7 @@ class OrderingManager(object):
 
     @staticmethod
     def filter_outlet_packages(packages):
-        """ Remove packages designated as OUTLET
+        """Remove packages designated as OUTLET.
 
         Those type of packages must be handled in a different way,
         and they are not supported at the moment.
@@ -67,7 +66,7 @@ class OrderingManager(object):
 
     @staticmethod
     def get_only_active_packages(packages):
-        """ Return only active packages
+        """Return only active packages.
 
         If a package is active, it is eligible for ordering
         This will inspect the 'isActive' property on the provided packages
@@ -84,7 +83,7 @@ class OrderingManager(object):
         return active_packages
 
     def get_package_by_type(self, package_type, mask):
-        """ Get a single package of a given type.
+        """Get a single package of a given type.
 
         Syntactic sugar to retrieve a single package of a given type.
         If multiple packages share the given type, this will return the first
@@ -101,7 +100,7 @@ class OrderingManager(object):
             return packages.pop()
 
     def get_package_id_by_type(self, package_type):
-        """ Return the package ID of a Product Package with a given type.
+        """Return the package ID of a Product Package with a given type.
 
         :param package_type string representing the package type key name
                             we are interested in
@@ -116,7 +115,7 @@ class OrderingManager(object):
             raise ValueError("No package found for type: " + package_type)
 
     def get_quotes(self):
-        """ Retrieve a list of quotes
+        """Retrieve a list of quotes.
 
         :return a list of SoftLayer_Billing_Order_Quote
         """
@@ -125,7 +124,7 @@ class OrderingManager(object):
         return quotes
 
     def get_quote_details(self, quote_id):
-        """ Retrieve quote details
+        """Retrieve quote details.
 
         :param quote_id ID number of target quote
         """
@@ -134,7 +133,7 @@ class OrderingManager(object):
         return quote
 
     def get_order_container(self, quote_id):
-        """ Generate an order container from a quote object
+        """Generate an order container from a quote object.
 
         :param quote_id ID number of target quote
         """
@@ -144,7 +143,7 @@ class OrderingManager(object):
         return container['orderContainers'][0]
 
     def generate_order_template(self, quote_id, extra, quantity=1):
-        """ Generate a complete order template
+        """Generate a complete order template.
 
         :param int quote_id: ID of target quote
         :param list extra: List of dictionaries that have extra details about
@@ -176,9 +175,7 @@ class OrderingManager(object):
         return container
 
     def verify_quote(self, quote_id, extra, quantity=1):
-        """
-        Verifies that a quote order is valid without actually ordering
-        the resources
+        """Verifies that a quote order is valid.
 
         :param int quote_id: ID for the target quote
         :param list hostnames: hostnames of the servers
@@ -191,7 +188,7 @@ class OrderingManager(object):
         return self.client['Product_Order'].verifyOrder(container)
 
     def order_quote(self, quote_id, extra, quantity=1):
-        """ Places an order using a quote
+        """Places an order using a quote
 
         :param int quote_id: ID for the target quote
         :param list hostnames: hostnames of the servers

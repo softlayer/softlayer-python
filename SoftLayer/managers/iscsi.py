@@ -7,8 +7,7 @@ from SoftLayer import utils
 
 
 class ISCSIManager(utils.IdentifierMixin, object):
-
-    """ Manages iSCSI storages """
+    """Manages iSCSI storages."""
 
     def __init__(self, client):
         self.configuration = {}
@@ -17,8 +16,7 @@ class ISCSIManager(utils.IdentifierMixin, object):
         self.product_order = self.client['Product_Order']
 
     def _find_item_prices(self, size, categorycode=''):
-        """ Retrieves the Item Price IDs
-        """
+        """Retrieves the Item Price IDs."""
         item_prices = self.client['Product_Package'].getItems(
             id=0,
             mask='id,capacity,prices[id]',
@@ -32,8 +30,7 @@ class ISCSIManager(utils.IdentifierMixin, object):
         return item_price
 
     def _build_order(self, item_price, location):
-        """ Returns a dict appropriate to pass into Product_Order::placeOrder()
-        """
+        """Returns a dict appropriate for Product_Order::placeOrder()."""
 
         location_id = self._get_location_id(location)
         order = {
@@ -47,9 +44,7 @@ class ISCSIManager(utils.IdentifierMixin, object):
         return order
 
     def _get_location_id(self, location):
-        """ Returns location id of datacenter to pass into
-            ProductOrder::placeOrder()
-        """
+        """Returns location id of datacenter for ProductOrder::placeOrder()."""
         loc_svc = self.client['Location_Datacenter']
         datacenters = loc_svc.getDatacenters(mask='mask[longName,id,name]')
         for datacenter in datacenters:
@@ -59,7 +54,8 @@ class ISCSIManager(utils.IdentifierMixin, object):
         raise ValueError('Invalid datacenter name specified.')
 
     def create_iscsi(self, size=None, location=None):
-        """Places an order for iSCSI volume
+        """Places an order for iSCSI volume.
+
         :param integer size: size of iSCSI volume to create
         :param string location: datacenter to use to create volume in
         """
@@ -69,20 +65,18 @@ class ISCSIManager(utils.IdentifierMixin, object):
         self.product_order.placeOrder(iscsi_order)
 
     def list_iscsi(self):
-        """List iSCSI volume
-        """
+        """List iSCSI volume."""
         account = self.client['Account']
         iscsi_list = account.getIscsiNetworkStorage(
             mask='eventCount,serviceResource[datacenter.name]')
         return iscsi_list
 
     def get_iscsi(self, volume_id, **kwargs):
-        """ Get details about a iSCSI storage
+        """Get details about a iSCSI storage.
 
         :param integer volume_id: the volume ID
         :returns: A dictionary containing a large amount of information about
                   the specified storage.
-
         """
 
         if 'mask' not in kwargs:
@@ -104,7 +98,7 @@ class ISCSIManager(utils.IdentifierMixin, object):
         return self.iscsi_svc.getObject(id=volume_id, **kwargs)
 
     def cancel_iscsi(self, volume_id, reason='unNeeded', immediate=False):
-        """ Cancels the given iSCSI volume
+        """Cancels the given iSCSI volume.
 
         :param integer volume_id: the volume ID
 
@@ -120,7 +114,7 @@ class ISCSIManager(utils.IdentifierMixin, object):
             id=billingitemid)
 
     def create_snapshot(self, volume_id, notes='No longer needed'):
-        """ Orders a snapshot for given volume
+        """Orders a snapshot for given volume.
 
         :param integer volume_id: the volume ID
         """
@@ -128,7 +122,7 @@ class ISCSIManager(utils.IdentifierMixin, object):
         self.iscsi_svc.createSnapshot(notes, id=volume_id)
 
     def create_snapshot_space(self, volume_id, capacity):
-        """ Orders a snapshot space for given volume
+        """Orders a snapshot space for given volume.
 
         :param integer volume_id: the volume ID
         :param integer capacity: capacity in ~GB
@@ -149,7 +143,7 @@ Network_Storage_Iscsi_SnapshotSpace',
         self.product_order.placeOrder(snapshotspaceorder)
 
     def delete_snapshot(self, snapshot_id):
-        """ Deletes the given snapshot
+        """Deletes the given snapshot.
 
         :params: integer snapshot_id: the snapshot ID
         """
@@ -157,7 +151,8 @@ Network_Storage_Iscsi_SnapshotSpace',
         self.iscsi_svc.deleteObject(id=snapshot_id)
 
     def restore_from_snapshot(self, volume_id, snapshot_id):
-        """ Restore the volume to snapshot's contents
+        """Restore the volume to snapshot's contents.
+
         :params: imteger volume_id: the volume ID
         :params: integer snapshot_id: the snapshot ID
         """

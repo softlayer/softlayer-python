@@ -77,7 +77,7 @@ class TestXmlRpcAPICall(testing.TestCase):
             self.assertRaises(SoftLayer.TransportError,
                               transports.make_xml_rpc_api_call, req)
         except AssertionError:
-            warnings.warn("AssertionError raised instead of a "
+            warnings.warn("Incorrect Exception raised. Expected a "
                           "SoftLayer.TransportError error")
 
     @mock.patch('requests.request')

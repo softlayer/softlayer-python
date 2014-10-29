@@ -7,57 +7,62 @@
 import mock
 
 from SoftLayer.CLI import exceptions
-from SoftLayer.CLI import formatting
-from SoftLayer.CLI.modules import globalip
 from SoftLayer import testing
+
+import json
 
 
 class DnsTests(testing.TestCase):
-    def set_up(self):
-        self.client = testing.FixtureClient()
 
     def test_ip_assign(self):
-        command = globalip.GlobalIpAssign(client=self.client)
+        result = self.run_command(['globalip', 'assign', '1', '127.0.0.1'])
 
-        output = command.execute({'<identifier>': '1',
-                                  '<target>': '127.0.0.1'})
-        self.assertEqual(None, output)
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(result.output, "")
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
     def test_ip_cancel(self, no_going_back_mock):
+        # Test using --really flag
+        result = self.run_command(['--really', 'globalip', 'cancel', '1'])
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(result.output, "")
+
+        # Test with confirmation
         no_going_back_mock.return_value = True
-        command = globalip.GlobalIpCancel(client=self.client)
+        result = self.run_command(['globalip', 'cancel', '1'])
 
-        output = command.execute({'<identifier>': '1', '--really': False})
-        self.assertEqual(None, output)
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(result.output, "")
 
+        # Test with confirmation and responding negatively
         no_going_back_mock.return_value = False
+        result = self.run_command(['globalip', 'cancel', '1'])
 
-        self.assertRaises(exceptions.CLIAbort,
-                          command.execute,
-                          {'<identifier>': '1', '--really': False})
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
     def test_ip_list(self):
-        command = globalip.GlobalIpList(client=self.client)
+        result = self.run_command(['globalip', 'list', '--ip-version=v4'])
 
-        output = command.execute({'--v4': True})
-        self.assertEqual([{'assigned': 'Yes',
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output),
+                         [{'assigned': 'Yes',
                            'id': '200',
                            'ip': '127.0.0.1',
                            'target': '127.0.0.1 (example.com)'},
                           {'assigned': 'Yes',
                            'id': '201',
                            'ip': '127.0.0.1',
-                           'target': '127.0.0.1 (example.com)'}],
-                         formatting.format_output(output, 'python'))
+                           'target': '127.0.0.1 (example.com)'}])
 
-        output = command.execute({'--v6': True})
-        self.assertEqual([{'assigned': 'Yes',
+        result = self.run_command(['globalip', 'list', '--ip-version=v6'])
+        self.assertEqual(json.loads(result.output),
+                         [{'assigned': 'Yes',
                            'id': '200',
                            'ip': '127.0.0.1',
                            'target': '127.0.0.1 (example.com)'},
                           {'assigned': 'Yes',
                            'id': '201',
                            'ip': '127.0.0.1',
-                           'target': '127.0.0.1 (example.com)'}],
-                         formatting.format_output(output, 'python'))
+                           'target': '127.0.0.1 (example.com)'}])

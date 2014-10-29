@@ -14,7 +14,7 @@ RULE_MASK = ('mask[orderValue,action,destinationIpAddress,'
 
 
 def has_firewall(vlan):
-    """ Helper to determine whether or not a VLAN has a firewall.
+    """Helper to determine whether or not a VLAN has a firewall.
 
     :param dict vlan: A dictionary representing a VLAN
     :returns: True if the VLAN has a firewall, false if it doesn't.
@@ -29,7 +29,7 @@ def has_firewall(vlan):
 
 
 class FirewallManager(utils.IdentifierMixin, object):
-    """ Manages firewalls.
+    """Manages firewalls.
 
     :param SoftLayer.API.Client client: the API client instance
 
@@ -41,7 +41,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         self.prod_pkg = self.client['Product_Package']
 
     def get_standard_package(self, server_id, is_cci=True):
-        """ Retrieves the standard firewall package for the CCI.
+        """Retrieves the standard firewall package for the CCI.
 
         :param int server_id: The ID of the server to create the firewall for
         :param bool is_cci: True if the id provided is for a CCI,
@@ -57,7 +57,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         return self.prod_pkg.getItems(id=0, filter=_filter)
 
     def get_dedicated_package(self, ha_enabled=False):
-        """ Retrieves the dedicated firewall package.
+        """Retrieves the dedicated firewall package.
 
         :param bool ha_enabled: True if HA is to be enabled on the firewall
                                 False for No HA
@@ -75,7 +75,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         return self.prod_pkg.getItems(id=0, filter=_filter.to_dict())
 
     def cancel_firewall(self, firewall_id, dedicated=False):
-        """ Cancels the specified firewall.
+        """Cancels the specified firewall.
 
         :param int firewall_id: Firewall ID to be cancelled.
         :param bool dedicated: If true, the firewall instance is dedicated,
@@ -88,7 +88,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         return billing_item.cancelService(id=billing_id)
 
     def add_standard_firewall(self, server_id, is_cci=True):
-        """ Creates a firewall for the specified CCI/Server
+        """Creates a firewall for the specified CCI/Server.
 
         :param int cci_id: The ID of the CCI to create the firewall for
         :param bool is_cci: If false, will create the firewall for a server,
@@ -118,7 +118,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         return self.client['Product_Order'].placeOrder(product_order)
 
     def add_vlan_firewall(self, vlan_id, ha_enabled=False):
-        """ Creates a firewall for the specified vlan
+        """Creates a firewall for the specified vlan.
 
         :param int vlan_id: The ID of the vlan to create the firewall for
         :param bool ha_enabled: If True, Ha firewall will be created
@@ -138,7 +138,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         return self.client['Product_Order'].placeOrder(product_order)
 
     def _get_fwl_billing_item(self, firewall_id, dedicated=False):
-        """ Retrieves the billing item of the firewall
+        """Retrieves the billing item of the firewall.
 
         :param int firewall_id: Firewall ID to get the billing item for
         :param bool dedicated: whether the firewall is dedicated or standard
@@ -153,7 +153,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         return fwl_svc.getObject(id=firewall_id, mask=mask)
 
     def _get_fwl_port_speed(self, server_id, is_cci=True):
-        """ Determines the appropriate speed for a firewall
+        """Determines the appropriate speed for a firewall.
 
         :param int server_id: The ID of server the firewall is for
         :param bool is_cci: true if the server_id is for a virtual server
@@ -199,7 +199,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         return fwl_port_speed
 
     def get_firewalls(self):
-        """ Returns a list of all firewalls on the account.
+        """Returns a list of all firewalls on the account.
 
         :returns: A list of firewalls on the current account.
         """
@@ -217,7 +217,7 @@ class FirewallManager(utils.IdentifierMixin, object):
                 if has_firewall(firewall)]
 
     def get_standard_fwl_rules(self, firewall_id):
-        """ Get the rules of a standard firewall
+        """Get the rules of a standard firewall.
 
         :param integer firewall_id: the instance ID of the standard firewall
         :returns: A list of the rules.
@@ -227,7 +227,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         return svc.getRules(id=firewall_id, mask=RULE_MASK)
 
     def get_dedicated_fwl_rules(self, firewall_id):
-        """ Get the rules of a dedicated firewall
+        """Get the rules of a dedicated firewall.
 
         :param integer firewall_id: the instance ID of the dedicated firewall
         :returns: A list of the rules.
@@ -237,7 +237,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         return svc.getRules(id=firewall_id, mask=RULE_MASK)
 
     def edit_dedicated_fwl_rules(self, firewall_id, rules):
-        """ Edit the rules for dedicated firewall
+        """Edit the rules for dedicated firewall.
 
         :param integer firewall_id: the instance ID of the dedicated firewall
         :param dict rules: the rules to be pushed on the firewall
@@ -264,7 +264,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         return svc.createObject(template)
 
     def edit_standard_fwl_rules(self, firewall_id, rules):
-        """ Edit the rules for standard firewall
+        """Edit the rules for standard firewall.
 
         :param integer firewall_id: the instance ID of the standard firewall
         :param dict rules: the rules to be pushed on the firewall
