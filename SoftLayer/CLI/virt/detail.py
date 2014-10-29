@@ -95,7 +95,7 @@ def cli(self, identifier, passwords=False, price=False):
         tag_row.append(tag['tag']['name'])
 
     if tag_row:
-        table.add_row(['tags', formatting.listing(tag_row, separator=',')])
+        table.add_row(['tags', formatting.listing(tag_row, separator=', ')])
 
     # Test to see if this actually has a primary (public) ip address
     try:
