@@ -5,7 +5,6 @@ Manage Monitoring.
 
 The available commands are:
     status  Show basic monitoring status of servers
-
 """
 
 import SoftLayer
@@ -15,7 +14,8 @@ from SoftLayer import utils
 
 
 class MonitorStatus(environment.CLIRunnable):
-    """
+    """Manages all things related to monitoring
+
 usage: sl monitor status [options]
 
 Unless shows status of all servers.
@@ -23,8 +23,8 @@ Unless shows status of all servers.
 Options:
     --only-hardware  Show only hardware servers
     --only-virtual   Show only virtual servers
+"""
 
-    """
     action = 'status'
 
     def execute(self, args):
