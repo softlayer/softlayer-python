@@ -48,8 +48,27 @@ class MonitoringManager(utils.IdentifierMixin, object):
         :returns: Retrns a list of dictionaries with server and monitoring
                   information.
         """
+        return self._get_network_monitors('getHardware', **kwargs)
+
+    def list_guest_status(self, **kwargs):
+        """ List all virtual guests with their monitoring status
+
+        :param dict \\*\\*kwargs: response-level options (mask, limit, filter)
+        :returns: Retrns a list of dictionaries with server and monitoring
+                  information.
+        """
+        return self._get_network_monitors('getVirtualGuests', **kwargs)
+
+    def _get_network_monitors(self, call, **kwargs):
+        """ Does all the actual work of getting the servers monitoring status
+        :param string call: method from the account class to call
+                            'getHardware' or 'getVirtualGuests'
+        :param dict \\*\\*kwargs: response-level options (mask, limit, filter)
+        :returns: Retrns a list of dictionaries with server and monitoring
+                  information.
+        """
         if 'mask' not in kwargs:
-            hw_items = [
+            vs_items = [
                 'id',
                 'fullyQualifiedDomainName',
                 'primaryBackendIpAddress',
@@ -59,7 +78,7 @@ class MonitoringManager(utils.IdentifierMixin, object):
             ]
 
             kwargs['mask'] = ('[mask[%s]]'
-                              % (','.join(hw_items)))
+                              % (','.join(vs_items)))
         kwargs['filter'] = ''
-        output = self.account.getHardware(**kwargs)
-        return output
+        function = getattr(self.account, call)
+        return function(**kwargs)

@@ -31,7 +31,6 @@ getVirtualGuests = [{
     'globalIdentifier': '1a2b3c-1701',
     'primaryBackendIpAddress': '10.45.19.37',
     'hourlyBillingFlag': False,
-
     'billingItem': {
         'id': 6327,
         'recurringFee': 1.54,
@@ -43,6 +42,11 @@ getVirtualGuests = [{
             }
         }
     },
+    'networkMonitors': [{
+        'guestId': 100,
+        'hardwareId': '',
+        'lastResult': {'responseStatus': 2}
+    }],
 }, {
     'id': 104,
     'hostname': 'vs-test2',
@@ -69,6 +73,11 @@ getVirtualGuests = [{
             }
         }
     },
+    'networkMonitors': [{
+        'guestId': 104,
+        'hardwareId': '',
+        'lastResult': {'responseStatus': 0}
+    }],
 }]
 
 getMonthlyVirtualGuests = [vs for vs in getVirtualGuests
@@ -135,7 +144,12 @@ getHardware = [{
             'friendlyName': 'Friendly Transaction Name',
             'id': 6660
         }
-    }
+    },
+    'networkMonitors': [{
+        'guestId': '',
+        'hardwareId': 1000,
+        'lastResult': {'responseStatus': 2}
+    }],
 }, {
     'id': 1001,
     'datacenter': {'name': 'TEST00',
@@ -178,7 +192,12 @@ getHardware = [{
             'vlanNumber': 3672,
             'id': 19082
         },
-    ]
+    ],
+    'networkMonitors': [{
+        'guestId': '',
+        'hardwareId': 1001,
+        'lastResult': {'responseStatus': 0}
+    }],
 }, {
     'id': 1002,
     'datacenter': {'name': 'TEST00',
@@ -221,7 +240,12 @@ getHardware = [{
             'vlanNumber': 3672,
             'id': 19082
         },
-    ]
+    ],
+    'networkMonitors': [{
+        'guestId': '',
+        'hardwareId': 1002,
+        'lastResult': {'responseStatus': 2}
+    }],
 }]
 getDomains = [{'name': 'example.com',
                'id': 12345,

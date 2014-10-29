@@ -20,6 +20,10 @@ usage: sl monitor status [options]
 
 Unless shows status of all servers.
 
+Options:
+    --only-hardware  Show only hardware servers
+    --only-virtual   Show only virtual servers
+
     """
     action = 'status'
 
@@ -31,7 +35,17 @@ Unless shows status of all servers.
         ])
 
         manager = SoftLayer.MonitoringManager(self.client)
-        results = manager.list_hardware_status()
+        if args.get('--only-virtual'):
+            hardware = []
+            guest = manager.list_guest_status()
+        elif args.get('--only-hardware'):
+            hardware = manager.list_hardware_status()
+            guest = []
+        else:
+            hardware = manager.list_hardware_status()
+            guest = manager.list_guest_status()
+
+        results = hardware + guest
         for server in results:
             server = utils.NestedDict(server)
             res = server['networkMonitors'][0]['lastResult']['responseStatus']
