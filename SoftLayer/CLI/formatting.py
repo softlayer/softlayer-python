@@ -10,6 +10,7 @@
 import json
 import os
 
+import click
 import prettytable
 
 from SoftLayer import utils
@@ -170,7 +171,9 @@ def valid_response(prompt, *valid):
     :param string prompt: string prompt to give to the user
     :param string \\*valid: valid responses
     """
-    ans = utils.console_input(prompt).lower()
+    import logging
+    logging.info("PROMPT %s", prompt)
+    ans = click.prompt(prompt).lower()
 
     if ans in valid:
         return True

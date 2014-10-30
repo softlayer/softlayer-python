@@ -5,13 +5,11 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import getpass
 import importlib
 
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import routes
-from SoftLayer import utils
 
 import click
 import pkg_resources
@@ -48,11 +46,11 @@ class Environment(object):
 
     def input(self, prompt):
         """Provide a command prompt."""
-        return utils.console_input(prompt)
+        return click.prompt(prompt)
 
     def getpass(self, prompt):
         """Provide a password prompt."""
-        return getpass.getpass(prompt)
+        return click.prompt(prompt, hide_input=True)
 
     # Command loading methods
     def list_commands(self, *path):

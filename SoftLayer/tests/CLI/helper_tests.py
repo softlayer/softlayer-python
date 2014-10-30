@@ -41,64 +41,64 @@ class CLIJSONEncoderTest(testing.TestCase):
 
 class PromptTests(testing.TestCase):
 
-    @mock.patch('SoftLayer.utils.console_input')
-    def test_invalid_response(self, raw_input_mock):
-        raw_input_mock.return_value = 'y'
+    @mock.patch('click.prompt')
+    def test_invalid_response(self, prompt_mock):
+        prompt_mock.return_value = 'y'
         result = formatting.valid_response('test', 'n')
-        raw_input_mock.assert_called_with('test')
+        prompt_mock.assert_called_with('test')
         self.assertFalse(result)
 
-        raw_input_mock.return_value = 'wakakwakwaka'
+        prompt_mock.return_value = 'wakakwakwaka'
         result = formatting.valid_response('test', 'n')
-        raw_input_mock.assert_called_with('test')
+        prompt_mock.assert_called_with('test')
         self.assertFalse(result)
 
-        raw_input_mock.return_value = ''
+        prompt_mock.return_value = ''
         result = formatting.valid_response('test', 'n')
-        raw_input_mock.assert_called_with('test')
+        prompt_mock.assert_called_with('test')
         self.assertEqual(result, None)
 
-    @mock.patch('SoftLayer.utils.console_input')
-    def test_valid_response(self, raw_input_mock):
-        raw_input_mock.return_value = 'n'
+    @mock.patch('click.prompt')
+    def test_valid_response(self, prompt_mock):
+        prompt_mock.return_value = 'n'
         result = formatting.valid_response('test', 'n')
-        raw_input_mock.assert_called_with('test')
+        prompt_mock.assert_called_with('test')
         self.assertTrue(result)
 
-        raw_input_mock.return_value = 'N'
+        prompt_mock.return_value = 'N'
         result = formatting.valid_response('test', 'n')
-        raw_input_mock.assert_called_with('test')
+        prompt_mock.assert_called_with('test')
         self.assertTrue(result)
 
-    @mock.patch('SoftLayer.utils.console_input')
-    def test_do_or_die(self, raw_input_mock):
+    @mock.patch('click.prompt')
+    def test_do_or_die(self, prompt_mock):
         confirmed = '37347373737'
-        raw_input_mock.return_value = confirmed
+        prompt_mock.return_value = confirmed
         result = formatting.no_going_back(confirmed)
         self.assertTrue(result)
 
         # no_going_back should cast int's to str()
         confirmed = '4712309182309'
-        raw_input_mock.return_value = confirmed
+        prompt_mock.return_value = confirmed
         result = formatting.no_going_back(int(confirmed))
         self.assertTrue(result)
 
         confirmed = None
-        raw_input_mock.return_value = ''
+        prompt_mock.return_value = ''
         result = formatting.no_going_back(confirmed)
         self.assertFalse(result)
 
-    @mock.patch('SoftLayer.utils.console_input')
-    def test_confirmation(self, raw_input_mock):
-        raw_input_mock.return_value = 'Y'
+    @mock.patch('click.prompt')
+    def test_confirmation(self, prompt_mock):
+        prompt_mock.return_value = 'Y'
         res = formatting.confirm('Confirm?', default=False)
         self.assertTrue(res)
 
-        raw_input_mock.return_value = 'N'
+        prompt_mock.return_value = 'N'
         res = formatting.confirm('Confirm?', default=False)
         self.assertFalse(res)
 
-        raw_input_mock.return_value = ''
+        prompt_mock.return_value = ''
         res = formatting.confirm('Confirm?', default=True)
         self.assertTrue(res)
 
