@@ -9,14 +9,16 @@ import re
 
 import six
 
+# pylint: disable=pointless-except, no-member, invalid-name
+
 UUID_RE = re.compile(r'^[0-9a-f\-]{36}$', re.I)
 KNOWN_OPERATIONS = ['<=', '>=', '<', '>', '~', '!~', '*=', '^=', '$=', '_=']
 
-configparser = six.moves.configparser  # pylint: disable=E1101,C0103
-console_input = six.moves.input  # pylint: disable=E1101,C0103
-string_types = six.string_types  # pylint: disable=C0103
-StringIO = six.StringIO  # pylint: disable=C0103
-xmlrpc_client = six.moves.xmlrpc_client  # pylint: disable=E1101,C0103
+configparser = six.moves.configparser
+console_input = six.moves.input
+string_types = six.string_types
+StringIO = six.StringIO
+xmlrpc_client = six.moves.xmlrpc_client
 
 
 def lookup(dic, key, *keys):

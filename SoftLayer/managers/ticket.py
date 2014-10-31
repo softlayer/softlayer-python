@@ -1,6 +1,6 @@
 """
     SoftLayer.ticket
-    ~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~
     Ticket Manager/helpers
 
     :license: MIT, see LICENSE for more details.
@@ -10,8 +10,7 @@ from SoftLayer import utils
 
 
 class TicketManager(utils.IdentifierMixin, object):
-    """
-    Manages account Tickets
+    """Manages support Tickets.
 
     :param SoftLayer.API.Client client: an API client instance
     """
@@ -22,7 +21,7 @@ class TicketManager(utils.IdentifierMixin, object):
         self.ticket = self.client['Ticket']
 
     def list_tickets(self, open_status=True, closed_status=True):
-        """ List all tickets
+        """List all tickets.
 
         :param boolean open_status: include open tickets
         :param boolean closed_status: include closed tickets
@@ -41,11 +40,11 @@ class TicketManager(utils.IdentifierMixin, object):
         return func(mask=mask)
 
     def list_subjects(self):
-        """ List all tickets"""
+        """List all tickets."""
         return self.client['Ticket_Subject'].getAllObjects()
 
     def get_ticket(self, ticket_id):
-        """ Get details about a ticket
+        """Get details about a ticket.
 
         :param integer id: the ticket ID
         :returns: A dictionary containing a large amount of information about
@@ -57,7 +56,7 @@ class TicketManager(utils.IdentifierMixin, object):
         return self.ticket.getObject(id=ticket_id, mask=mask)
 
     def create_ticket(self, title=None, body=None, subject=None):
-        """ Create a new ticket
+        """Create a new ticket.
 
         :param string title: title for the new ticket
         :param string body: body for the new ticket
@@ -75,7 +74,7 @@ class TicketManager(utils.IdentifierMixin, object):
         return created_ticket
 
     def update_ticket(self, ticket_id=None, body=None):
-        """ Update a ticket
+        """Update a ticket.
 
         :param integer ticket_id: the id of the ticket to update
         :param string body: entry to update in the ticket

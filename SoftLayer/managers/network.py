@@ -24,7 +24,7 @@ DEFAULT_VLAN_MASK = ','.join(['firewallInterfaces',
 
 
 class NetworkManager(object):
-    """ Manage Networks """
+    """Manage Networks."""
     def __init__(self, client):
         self.client = client
         self.account = client['Account']
@@ -32,7 +32,7 @@ class NetworkManager(object):
         self.subnet = client['Network_Subnet']
 
     def add_global_ip(self, version=4, test_order=False):
-        """ Adds a global IP address to the account.
+        """Adds a global IP address to the account.
 
         :param int version: Specifies whether this is IPv4 or IPv6
         :param bool test_order: If true, this will only verify the order.
@@ -45,7 +45,7 @@ class NetworkManager(object):
 
     def add_subnet(self, subnet_type, quantity=None, vlan_id=None, version=4,
                    test_order=False):
-        """ Orders a new subnet
+        """Orders a new subnet
 
         :param str subnet_type: Type of subnet to add: private, public, global
         :param int quantity: Number of IPs in the subnet
@@ -108,7 +108,7 @@ class NetworkManager(object):
             return self.client['Product_Order'].placeOrder(order)
 
     def assign_global_ip(self, global_ip_id, target):
-        """ Assigns a global IP address to a specified target.
+        """Assigns a global IP address to a specified target.
 
         :param int global_ip_id: The ID of the global IP being assigned
         :param string target: The IP address to assign
@@ -117,7 +117,7 @@ class NetworkManager(object):
             target, id=global_ip_id)
 
     def cancel_global_ip(self, global_ip_id):
-        """ Cancels the specified global IP address.
+        """Cancels the specified global IP address.
 
         :param int id: The ID of the global IP to be cancelled.
         """
@@ -128,7 +128,7 @@ class NetworkManager(object):
         return self.client['Billing_Item'].cancelService(id=billing_id)
 
     def cancel_subnet(self, subnet_id):
-        """ Cancels the specified subnet.
+        """Cancels the specified subnet.
 
         :param int subnet_id: The ID of the subnet to be cancelled.
         """
@@ -143,7 +143,7 @@ class NetworkManager(object):
                     city=None, company_name=None, country=None,
                     first_name=None, last_name=None, postal_code=None,
                     private_residence=None, state=None):
-        """ Edit rwhois record """
+        """Edit rwhois record."""
         update = {}
         for key, value in [('abuseEmail', abuse_email),
                            ('address1', address1),
@@ -166,7 +166,7 @@ class NetworkManager(object):
                 update, id=rwhois['id'])
 
     def ip_lookup(self, ip_address):
-        """ Looks up an IP address and returns network information about it.
+        """Looks up an IP address and returns network information about it.
 
         :param string ip_address: An IP address. Can be IPv4 or IPv6
         :returns: A dictionary of information about the IP
@@ -176,14 +176,14 @@ class NetworkManager(object):
         return obj.getByIpAddress(ip_address, mask='hardware, virtualGuest')
 
     def get_rwhois(self):
-        """ Returns the RWhois information about the current account.
+        """Returns the RWhois information about the current account.
 
         :returns: A dictionary containing the account's RWhois information.
         """
         return self.account.getRwhoisData()
 
     def get_subnet(self, subnet_id, **kwargs):
-        """ Returns information about a single subnet.
+        """Returns information about a single subnet.
 
         :param string id: Either the ID for the subnet or its network
                           identifier
@@ -195,7 +195,7 @@ class NetworkManager(object):
         return self.subnet.getObject(id=subnet_id, **kwargs)
 
     def get_vlan(self, vlan_id):
-        """ Returns information about a single VLAN.
+        """Returns information about a single VLAN.
 
         :param int id: The unique identifier for the VLAN
         :returns: A dictionary containing a large amount of information about
@@ -205,7 +205,7 @@ class NetworkManager(object):
         return self.vlan.getObject(id=vlan_id, mask=DEFAULT_VLAN_MASK)
 
     def list_global_ips(self, version=None, identifier=None, **kwargs):
-        """ Returns a list of all global IP address records on the account.
+        """Returns a list of all global IP address records on the account.
 
         :param int version: Only returns IPs of this version (4 or 6)
         :param string identifier: If specified, the list will only contain the
@@ -231,7 +231,7 @@ class NetworkManager(object):
 
     def list_subnets(self, identifier=None, datacenter=None, version=0,
                      subnet_type=None, **kwargs):
-        """ Display a list of all subnets on the account.
+        """Display a list of all subnets on the account.
 
         This provides a quick overview of all subnets including information
         about data center residence and the number of devices attached.
@@ -270,7 +270,7 @@ class NetworkManager(object):
 
     def list_vlans(self, datacenter=None, vlan_number=None, name=None,
                    **kwargs):
-        """ Display a list of all VLANs on the account.
+        """Display a list of all VLANs on the account.
 
         This provides a quick overview of all VLANs including information about
         data center residence and the number of devices attached.
@@ -305,22 +305,21 @@ class NetworkManager(object):
         return self.account.getNetworkVlans(**kwargs)
 
     def resolve_global_ip_ids(self, identifier):
-        """ Resolve global ip ids """
+        """Resolve global ip ids."""
         return utils.resolve_ids(identifier,
                                  [self._list_global_ips_by_identifier])
 
     def resolve_subnet_ids(self, identifier):
-        """ Resolve subnet ids """
+        """Resolve subnet ids."""
         return utils.resolve_ids(identifier,
                                  [self._list_subnets_by_identifier])
 
     def resolve_vlan_ids(self, identifier):
-        """ Resolve VLAN ids """
+        """Resolve VLAN ids."""
         return utils.resolve_ids(identifier, [self._list_vlans_by_name])
 
     def summary_by_datacenter(self):
-        """ Provides a dictionary with a summary of all network information on
-        the account, grouped by data center.
+        """Summary of the networks on the account, grouped by data center.
 
         The resultant dictionary is primarily useful for statistical purposes.
         It contains count information rather than raw data. If you want raw
@@ -372,7 +371,7 @@ class NetworkManager(object):
         return datacenters
 
     def unassign_global_ip(self, global_ip_id):
-        """ Unassigns a global IP address from a target.
+        """Unassigns a global IP address from a target.
 
         :param int id: The ID of the global IP being unassigned
         """
@@ -380,8 +379,7 @@ class NetworkManager(object):
             id=global_ip_id)
 
     def _list_global_ips_by_identifier(self, identifier):
-        """ Returns a list of IDs of the global IP matching the specified
-            network identifier
+        """Returns a list of IDs of the global IP matching the identifier.
 
         :param string identifier: The identifier to look up
         :returns: List of matching IDs
@@ -390,8 +388,7 @@ class NetworkManager(object):
         return [result['id'] for result in results]
 
     def _list_subnets_by_identifier(self, identifier):
-        """ Returns a list of IDs of the subnet matching the specified
-            network identifier
+        """Returns a list of IDs of the subnet matching the identifier.
 
         :param string identifier: The identifier to look up
         :returns: List of matching IDs
@@ -402,7 +399,7 @@ class NetworkManager(object):
         return [result['id'] for result in results]
 
     def _list_vlans_by_name(self, name):
-        """ Returns a list of IDs of VLANs which match the given VLAN name.
+        """Returns a list of IDs of VLANs which match the given VLAN name.
 
         :param string name: a VLAN name
         :returns: List of matching IDs

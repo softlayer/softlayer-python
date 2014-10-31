@@ -7,23 +7,25 @@
 """
 import getpass
 import importlib
-import inspect
-import os
-import os.path
-import sys
 
 from SoftLayer.CLI import exceptions
-from SoftLayer.CLI import modules
+from SoftLayer.CLI import formatting
+from SoftLayer.CLI import routes
 from SoftLayer import utils
 
-# pylint: disable=R0201
+import click
+import pkg_resources
+
+# pylint: disable=too-many-instance-attributes, invalid-name, no-self-use
 
 
 class Environment(object):
     """Provides access to the current CLI environment."""
+
     def __init__(self):
-        # {'module_name': {'action': 'actionClass'}}
-        self.plugins = {}
+        # {'path:to:command': ModuleLoader()}
+        # {'vs:list': ModuleLoader()}
+        self.commands = {}
         self.aliases = {
             'meta': 'metadata',
             'my': 'metadata',
@@ -35,58 +37,23 @@ class Environment(object):
             'virtual': 'vs',
             'lb': 'loadbal',
         }
-        self.stdout = sys.stdout
-        self.stderr = sys.stderr
-
-    def get_command(self, module_name, command_name):
-        """Based on the loaded modules, return a command."""
-        actions = self.plugins.get(module_name) or {}
-        if command_name in actions:
-            return actions[command_name]
-        if None in actions:
-            return actions[None]
-        raise exceptions.InvalidCommand(module_name, command_name)
-
-    def get_module_name(self, module_name):
-        """Returns the actual module name. Uses the alias mapping."""
-        if module_name in self.aliases:
-            return self.aliases[module_name]
-        return module_name
-
-    def load_module(self, module_name):  # pragma: no cover
-        """Loads module by name."""
-        try:
-            module = importlib.import_module('SoftLayer.CLI.modules.%s'
-                                             % module_name)
-            for _, obj in inspect.getmembers(module):
-                if inspect.isclass(obj) and issubclass(obj, CLIRunnable):
-                    self.add_plugin(obj)
-            return module
-        except ImportError:
-            raise exceptions.InvalidModule(module_name)
-
-    def add_plugin(self, cls):
-        """Add a CLIRunnable as a plugin to the environment."""
-        command = cls.__module__.split('.')[-1]
-        if command not in self.plugins:
-            self.plugins[command] = {}
-        self.plugins[command][cls.action] = cls
-
-    def plugin_list(self):
-        """Returns the list of modules in SoftLayer.CLI.modules."""
-        return modules.get_module_list()
+        self.client = None
+        self.format = 'table'
+        self.skip_confirmations = False
+        self._modules_loaded = False
+        self.config_file = None
 
     def out(self, output, newline=True):
         """Outputs a string to the console (stdout)."""
-        self.stdout.write(output)
-        if newline:
-            self.stdout.write(os.linesep)
+        click.echo(output, nl=newline)
 
     def err(self, output, newline=True):
         """Outputs an error string to the console (stderr)."""
-        self.stderr.write(output)
-        if newline:
-            self.stderr.write(os.linesep)
+        click.echo(output, nl=newline, err=True)
+
+    def fmt(self, output):
+        """Format output based on current the environment format."""
+        return formatting.format_output(output, fmt=self.format)
 
     def input(self, prompt):
         """Provide a command prompt."""
@@ -96,28 +63,80 @@ class Environment(object):
         """Provide a password prompt."""
         return getpass.getpass(prompt)
 
-    def exit(self, code=0):
-        """Exit."""
-        sys.exit(code)
+    # Command loading methods
+    def list_commands(self, *path):
+        """Command listing."""
+        self._load_modules()
+        path_str = self.resolve_alias(':'.join(path))
+
+        commands = []
+        for command in self.commands.keys():
+
+            # Filter based on prefix and the segment length
+            if all([command.startswith(path_str),
+                    len(path) == command.count(":")]):
+
+                # offset is used to exclude the path that the caller requested.
+                offset = len(path_str)+1 if path_str else 0
+                commands.append(command[offset:])
+
+        return sorted(commands)
+
+    def get_command(self, *path):
+        """Return command at the given path or raise error."""
+        self._load_modules()
+        path_str = self.resolve_alias(':'.join(path))
+
+        if path_str in self.commands:
+            return self.commands[path_str].load()
+
+        raise exceptions.InvalidCommand(path)
+
+    def resolve_alias(self, path_str):
+        """Returns the actual command name. Uses the alias mapping."""
+        if path_str in self.aliases:
+            return self.aliases[path_str]
+        return path_str
+
+    def _load_modules(self):
+        """Loads all modules."""
+        if self._modules_loaded is True:
+            return
+
+        self._load_modules_from_python()
+        self._load_modules_from_entry_points()
+
+        self._modules_loaded = True
+
+    def _load_modules_from_python(self):
+        """Load modules from the native python source."""
+        for name, modpath in routes.ALL_ROUTES:
+            if ':' in modpath:
+                path, attr = modpath.split(':', 1)
+            else:
+                path, attr = modpath, None
+            self.commands[name] = ModuleLoader(path, attr=attr)
+
+    def _load_modules_from_entry_points(self):
+        """Load modules from the entry_points (slower)."""
+        for obj in pkg_resources.iter_entry_points(group='softlayer.cli',
+                                                   name=None):
+            self.commands[obj.name] = obj
 
 
-class CLIRunnable(object):
-    """This represents a descrete command or action in the CLI.
+class ModuleLoader(object):
+    """Module loader that acts a little like an EntryPoint object."""
 
-    CLIRunnable is intended to be subclassed.
+    def __init__(self, import_path, attr=None):
+        self.import_path = import_path
+        self.attr = attr
 
-    """
-    options = []  # set by subclass
-    action = 'not set'  # set by subclass
+    def load(self):
+        """load and return the module/attribute."""
+        module = importlib.import_module(self.import_path)
+        if self.attr:
+            return getattr(module, self.attr)
+        return module
 
-    def __init__(self, client=None, env=None):
-        self.client = client
-        self.env = env
 
-    def execute(self, args):
-        """Execute the command.
-
-        This is intended to be overridden in a subclass.
-
-        """
-        pass
+pass_env = click.make_pass_decorator(Environment, ensure=True)
