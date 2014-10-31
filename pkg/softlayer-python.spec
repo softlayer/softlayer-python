@@ -15,7 +15,7 @@ Source:         https://github.com/softlayer/softlayer-python/archive/%{commit}/
 
 #BuildArch:      
 BuildRequires:  python-devel, python-setuptools
-Requires:       python-requests, python-docopt = 0.6.1, python-prettytable >= 0.7.0
+Requires:       python-requests, python-click, python-prettytable >= 0.7.0
 Requires:       python-importlib, python-six >= 1.6.1
 
 %description
