@@ -20,6 +20,7 @@ The available commands are:
   ready           Check if a virtual server has finished provisioning
   reboot          Reboots a running virtual server
   reload          Reload the OS on a VS based on its current configuration
+  rescue          Reboot server into a rescue image
   resume          Resumes a paused virtual server
   upgrade         Upgrades parameters of a virtual server
 

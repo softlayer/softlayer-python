@@ -18,6 +18,7 @@ The available commands are:
   power-on        Boots up a server
   reboot          Reboots a running server
   reload          Perform an OS reload
+  rescue          Reboot server into a rescue image
 
 For several commands, <identifier> will be asked for. This can be the id,
 hostname or the ip address for a piece of hardware.
