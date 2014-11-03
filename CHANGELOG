@@ -1,3 +1,7 @@
+3.3.1
+
+    * Adds 'rescue' command to virtual server and hardware command lists
+
 3.3.0
 
     * CLI+API: Load balancer support
