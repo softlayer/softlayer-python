@@ -15,15 +15,13 @@ from SoftLayer.testing import fixtures
 class HardwareTests(testing.TestCase):
 
     def set_up(self):
-        self.client = testing.FixtureClient()
         self.hardware = SoftLayer.HardwareManager(self.client)
 
     def test_list_hardware(self):
-        mcall = mock.call(mask=mock.ANY, filter={})
-
         results = self.hardware.list_hardware()
-        self.client['Account'].getHardware.assert_has_calls(mcall)
-        self.assertEqual(results, fixtures.Account.getHardware)
+
+        self.assertEqual(results, fixtures.SoftLayer_Account.getHardware)
+        self.assert_called_with('SoftLayer_Account', 'getHardware')
 
     def test_list_hardware_with_filters(self):
         results = self.hardware.list_hardware(
@@ -37,28 +35,28 @@ class HardwareTests(testing.TestCase):
             public_ip='1.2.3.4',
             private_ip='4.3.2.1',
         )
-        self.client['Account'].getHardware.assert_has_calls(mock.call(
-            filter={
-                'hardware': {
-                    'datacenter': {'name': {'operation': '_= dal05'}},
-                    'domain': {'operation': '_= example.com'},
-                    'tagReferences': {
-                        'tag': {'name': {
-                            'operation': 'in',
-                            'options': [
-                                {'name': 'data', 'value': ['tag1', 'tag2']}]
-                        }}
-                    },
-                    'memoryCapacity': {'operation': 1},
-                    'processorPhysicalCoreAmount': {'operation': 2},
-                    'hostname': {'operation': '_= hostname'},
-                    'primaryIpAddress': {'operation': '_= 1.2.3.4'},
-                    'networkComponents': {'maxSpeed': {'operation': 100}},
-                    'primaryBackendIpAddress': {'operation': '_= 4.3.2.1'}}
-            },
-            mask=mock.ANY,
-        ))
-        self.assertEqual(results, fixtures.Account.getHardware)
+
+        self.assertEqual(results, fixtures.SoftLayer_Account.getHardware)
+        _filter = {
+            'hardware': {
+                'datacenter': {'name': {'operation': '_= dal05'}},
+                'domain': {'operation': '_= example.com'},
+                'tagReferences': {
+                    'tag': {'name': {
+                        'operation': 'in',
+                        'options': [
+                            {'name': 'data', 'value': ['tag1', 'tag2']}]
+                    }}
+                },
+                'memoryCapacity': {'operation': 1},
+                'processorPhysicalCoreAmount': {'operation': 2},
+                'hostname': {'operation': '_= hostname'},
+                'primaryIpAddress': {'operation': '_= 1.2.3.4'},
+                'networkComponents': {'maxSpeed': {'operation': 100}},
+                'primaryBackendIpAddress': {'operation': '_= 4.3.2.1'}}
+        }
+        self.assert_called_with('SoftLayer_Account', 'getHardware',
+                                filter=_filter)
 
     def test_resolve_ids_ip(self):
         _id = self.hardware._get_ids_from_ip('172.16.1.100')
@@ -68,8 +66,11 @@ class HardwareTests(testing.TestCase):
         self.assertEqual(_id, [])
 
         # Now simulate a private IP test
-        self.client['Account'].getHardware.side_effect = [[], [{'id': 99}]]
+        mock = self.set_mock('SoftLayer_Account', 'getHardware')
+        mock.side_effect = [[], [{'id': 99}]]
+
         _id = self.hardware._get_ids_from_ip('10.0.1.87')
+
         self.assertEqual(_id, [99])
 
     def test_resolve_ids_hostname(self):
@@ -79,38 +80,58 @@ class HardwareTests(testing.TestCase):
     def test_get_hardware(self):
         result = self.hardware.get_hardware(1000)
 
-        self.client['Hardware_Server'].getObject.assert_called_once_with(
-            id=1000, mask=mock.ANY)
-        self.assertEqual(fixtures.Hardware_Server.getObject, result)
+        self.assertEqual(fixtures.SoftLayer_Hardware_Server.getObject, result)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getObject',
+                                identifier=1000)
 
     def test_reload(self):
         post_uri = 'http://test.sftlyr.ws/test.sh'
-        self.hardware.reload(1, post_uri=post_uri, ssh_keys=[1701])
-        f = self.client['Hardware_Server'].reloadOperatingSystem
-        f.assert_called_once_with('FORCE',
-                                  {'customProvisionScriptUri': post_uri,
-                                   'sshKeyIds': [1701]}, id=1)
+        result = self.hardware.reload(1, post_uri=post_uri, ssh_keys=[1701])
+
+        self.assertEqual(result, 'OK')
+        self.assert_called_with('SoftLayer_Hardware_Server',
+                                'reloadOperatingSystem',
+                                args=('FORCE',
+                                      {'customProvisionScriptUri': post_uri,
+                                       'sshKeyIds': [1701]}),
+                                identifier=1)
 
     def test_get_bare_metal_create_options_returns_none_on_error(self):
-        self.client['Product_Package'].getAllObjects.return_value = [
-            {'name': 'No Matching Instances', 'id': 0,
-             'description': 'Nothing'}]
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [{
+            'id': 0,
+            'name': 'No Matching Instances',
+            'description': 'Nothing'
+        }]
 
         self.assertIsNone(self.hardware.get_bare_metal_create_options())
 
     def test_get_bare_metal_create_options(self):
-        package_id = 50
-        self.hardware.get_bare_metal_create_options()
+        result = self.hardware.get_bare_metal_create_options()
 
-        f1 = self.client['Product_Package'].getRegions
-        f1.assert_called_once_with(id=package_id)
+        self.assertEqual(len(result['categories']['disk0']['items']), 2)
+        self.assertEqual(len(result['categories']['disk1']['items']), 1)
+        self.assertEqual(len(result['categories']['disk1']['items']), 1)
+        self.assertEqual(len(result['categories']['disk_controller']['items']),
+                         2)
+        self.assertEqual(len(result['categories']['os']['items']), 11)
+        self.assertEqual(len(result['categories']['port_speed']['items']), 5)
+        self.assertEqual(len(result['categories']['ram']['items']), 2)
+        self.assertEqual(len(result['categories']['random']['items']), 1)
+        self.assertEqual(len(result['categories']['server']['items']), 2)
+        self.assertEqual(len(result['categories']['server_core']['items']), 3)
+        self.assertEqual(len(result['locations']), 1)
 
-        f2 = self.client['Product_Package'].getConfiguration
-        f2.assert_called_once_with(id=package_id,
-                                   mask='mask[itemCategory[group]]')
+        self.assert_called_with('SoftLayer_Product_Package', 'getRegions',
+                                identifier=50)
 
-        f3 = self.client['Product_Package'].getCategories
-        f3.assert_called_once_with(id=package_id)
+        self.assert_called_with('SoftLayer_Product_Package',
+                                'getConfiguration',
+                                identifier=50,
+                                mask='mask[itemCategory[group]]')
+
+        self.assert_called_with('SoftLayer_Product_Package', 'getCategories',
+                                identifier=50)
 
     def test_generate_create_dict_with_all_bare_metal_options(self):
         args = {
@@ -207,99 +228,95 @@ class HardwareTests(testing.TestCase):
                 '._generate_create_dict')
     def test_verify_order(self, create_dict):
         create_dict.return_value = {'test': 1, 'verify': 1}
+
         self.hardware.verify_order(test=1, verify=1)
+
         create_dict.assert_called_once_with(test=1, verify=1)
-        f = self.client['Product_Order'].verifyOrder
-        f.assert_called_once_with({'test': 1, 'verify': 1})
+        self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder',
+                                args=({'test': 1, 'verify': 1},))
 
     @mock.patch('SoftLayer.managers.hardware.HardwareManager'
                 '._generate_create_dict')
     def test_place_order(self, create_dict):
         create_dict.return_value = {'test': 1, 'verify': 1}
         self.hardware.place_order(test=1, verify=1)
+
         create_dict.assert_called_once_with(test=1, verify=1)
-        f = self.client['Product_Order'].placeOrder
-        f.assert_called_once_with({'test': 1, 'verify': 1})
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder',
+                                args=({'test': 1, 'verify': 1},))
 
     def test_cancel_metal_immediately(self):
-        b_id = 6327
 
-        result = self.hardware.cancel_metal(b_id, immediate=True)
-        f = self.client['Billing_Item'].cancelService
-        f.assert_called_once_with(id=b_id)
-        self.assertEqual(result, fixtures.Billing_Item.cancelService)
+        result = self.hardware.cancel_metal(6327, immediate=True)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelService',
+                                identifier=6327)
 
     def test_cancel_metal_on_anniversary(self):
-        b_id = 6327
 
-        result = self.hardware.cancel_metal(b_id, False)
-        f = self.client['Billing_Item'].cancelServiceOnAnniversaryDate
-        f.assert_called_once_with(id=b_id)
-        self.assertEqual(result,
-                         fixtures.Billing_Item.cancelServiceOnAnniversaryDate)
+        result = self.hardware.cancel_metal(6327, False)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Billing_Item',
+                                'cancelServiceOnAnniversaryDate',
+                                identifier=6327)
 
     def test_cancel_hardware_without_reason(self):
-        hw_id = 987
-        self.client['Hardware_Server'].getObject.return_value = {
-            'id': hw_id,
-            'bareMetalInstanceFlag': False,
-        }
-        result = self.hardware.cancel_hardware(hw_id)
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        mock.return_value = {'id': 987, 'bareMetalInstanceFlag': False}
 
-        reasons = self.hardware.get_cancellation_reasons()
-        f = self.client['Ticket'].createCancelServerTicket
-        f.assert_called_once_with(hw_id, reasons['unneeded'], '', True,
-                                  'HARDWARE')
+        result = self.hardware.cancel_hardware(987)
+
         self.assertEqual(result,
-                         fixtures.Ticket.createCancelServerTicket)
+                         fixtures.SoftLayer_Ticket.createCancelServerTicket)
+        reasons = self.hardware.get_cancellation_reasons()
+        args = (987, reasons['unneeded'], '', True, 'HARDWARE')
+        self.assert_called_with('SoftLayer_Ticket', 'createCancelServerTicket',
+                                args=args)
 
     def test_cancel_hardware_with_reason_and_comment(self):
-        hw_id = 987
-        reason = 'sales'
-        comment = 'Test Comment'
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        mock.return_value = {'id': 987, 'bareMetalInstanceFlag': False}
 
-        self.client['Hardware_Server'].getObject.return_value = {
-            'id': hw_id,
-            'bareMetalInstanceFlag': False,
-        }
+        result = self.hardware.cancel_hardware(987, 'sales', 'Test Comment')
 
-        self.hardware.cancel_hardware(hw_id, reason, comment)
-
+        self.assertEqual(result,
+                         fixtures.SoftLayer_Ticket.createCancelServerTicket)
         reasons = self.hardware.get_cancellation_reasons()
-
-        f = self.client['Ticket'].createCancelServerTicket
-        f.assert_called_once_with(hw_id, reasons[reason], comment, True,
-                                  'HARDWARE')
+        args = (987, reasons['sales'], 'Test Comment', True, 'HARDWARE')
+        self.assert_called_with('SoftLayer_Ticket', 'createCancelServerTicket',
+                                args=args)
 
     def test_cancel_hardware_on_bmc(self):
-        hw_id = 6327
 
-        result = self.hardware.cancel_hardware(hw_id)
-        f = self.client['Billing_Item'].cancelServiceOnAnniversaryDate
-        f.assert_called_once_with(id=hw_id)
-        self.assertEqual(result,
-                         fixtures.Billing_Item.cancelServiceOnAnniversaryDate)
+        result = self.hardware.cancel_hardware(6327)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Billing_Item',
+                                'cancelServiceOnAnniversaryDate',
+                                identifier=6327)
 
     def test_change_port_speed_public(self):
-        hw_id = 1
-        speed = 100
-        self.hardware.change_port_speed(hw_id, True, speed)
+        self.hardware.change_port_speed(2, True, 100)
 
-        f = self.client['Hardware_Server'].setPublicNetworkInterfaceSpeed
-        f.assert_called_once_with(speed, id=hw_id)
+        self.assert_called_with('SoftLayer_Hardware_Server',
+                                'setPublicNetworkInterfaceSpeed',
+                                identifier=2,
+                                args=(100,))
 
     def test_change_port_speed_private(self):
-        hw_id = 2
-        speed = 10
-        self.hardware.change_port_speed(hw_id, False, speed)
+        self.hardware.change_port_speed(2, False, 10)
 
-        f = self.client['Hardware_Server'].setPrivateNetworkInterfaceSpeed
-        f.assert_called_once_with(speed, id=hw_id)
+        self.assert_called_with('SoftLayer_Hardware_Server',
+                                'setPrivateNetworkInterfaceSpeed',
+                                identifier=2,
+                                args=(10,))
 
     def test_get_available_dedicated_server_packages(self):
         self.hardware.get_available_dedicated_server_packages()
 
-        filter_mock = {
+        _filter = {
             'type': {
                 'keyName': {
                     'operation': 'in',
@@ -311,9 +328,9 @@ class HardwareTests(testing.TestCase):
                 }
             }
         }
-        f = self.client['Product_Package'].getAllObjects
-        f.assert_has_calls([mock.call(mask='id,name,description,type,isActive',
-                                      filter=filter_mock)])
+        self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects',
+                                filter=_filter,
+                                mask='id,name,description,type,isActive')
 
     def test_get_server_packages_with_ordering_manager_provided(self):
         self.hardware = SoftLayer.HardwareManager(
@@ -321,18 +338,31 @@ class HardwareTests(testing.TestCase):
         self.test_get_available_dedicated_server_packages()
 
     def test_get_dedicated_server_options(self):
-        package_id = 13
-        self.hardware.get_dedicated_server_create_options(package_id)
+        result = self.hardware.get_dedicated_server_create_options(13)
 
-        f1 = self.client['Product_Package'].getRegions
-        f1.assert_called_once_with(id=package_id)
+        self.assertEqual(len(result['categories']['disk0']['items']), 2)
+        self.assertEqual(len(result['categories']['disk1']['items']), 1)
+        self.assertEqual(len(result['categories']['disk1']['items']), 1)
+        self.assertEqual(len(result['categories']['disk_controller']['items']),
+                         2)
+        self.assertEqual(len(result['categories']['os']['items']), 11)
+        self.assertEqual(len(result['categories']['port_speed']['items']), 5)
+        self.assertEqual(len(result['categories']['ram']['items']), 2)
+        self.assertEqual(len(result['categories']['random']['items']), 1)
+        self.assertEqual(len(result['categories']['server']['items']), 2)
+        self.assertEqual(len(result['categories']['server_core']['items']), 3)
+        self.assertEqual(len(result['locations']), 1)
 
-        f2 = self.client['Product_Package'].getConfiguration
-        f2.assert_called_once_with(id=package_id,
-                                   mask='mask[itemCategory[group]]')
+        self.assert_called_with('SoftLayer_Product_Package', 'getRegions',
+                                identifier=13)
 
-        f3 = self.client['Product_Package'].getCategories
-        f3.assert_called_once_with(id=package_id)
+        self.assert_called_with('SoftLayer_Product_Package',
+                                'getConfiguration',
+                                identifier=13,
+                                mask='mask[itemCategory[group]]')
+
+        self.assert_called_with('SoftLayer_Product_Package', 'getCategories',
+                                identifier=13)
 
     def test_get_default_value_returns_none_for_unknown_category(self):
         package_options = {'categories': ['Cat1', 'Cat2']}
@@ -412,31 +442,41 @@ class HardwareTests(testing.TestCase):
                                             hourly=False)
         self.assertEqual(1234, result)
 
-    def test_edit(self):
+    def test_edit_meta(self):
         # Test editing user data
         self.hardware.edit(100, userdata='my data')
 
-        service = self.client['Hardware_Server']
-        service.setUserMetadata.assert_called_once_with(['my data'], id=100)
+        self.assert_called_with('SoftLayer_Hardware_Server',
+                                'setUserMetadata',
+                                args=(['my data'],),
+                                identifier=100)
 
+    def test_edit_blank(self):
         # Now test a blank edit
         self.assertTrue(self.hardware.edit, 100)
+        self.assertEqual(self.calls(), [])
 
+    def test_edit(self):
         # Finally, test a full edit
-        args = {
-            'hostname': 'new-host',
-            'domain': 'new.sftlyr.ws',
-            'notes': 'random notes',
-        }
+        self.hardware.edit(100,
+                           hostname='new-host',
+                           domain='new.sftlyr.ws',
+                           notes='random notes')
 
-        self.hardware.edit(100, **args)
-        service.editObject.assert_called_once_with(args, id=100)
+        self.assert_called_with('SoftLayer_Hardware_Server',
+                                'editObject',
+                                args=({
+                                    'hostname': 'new-host',
+                                    'domain': 'new.sftlyr.ws',
+                                    'notes': 'random notes',
+                                },),
+                                identifier=100)
 
     def test_rescue(self):
         # Test rescue environment
-        hardware_id = 1234
-        self.hardware.rescue(hardware_id)
+        restult = self.hardware.rescue(1234)
 
-        service = self.client['Hardware_Server']
-        f = service.bootToRescueLayer
-        f.assert_called_once_with(id=hardware_id)
+        self.assertEqual(restult, True)
+        self.assert_called_with('SoftLayer_Hardware_Server',
+                                'bootToRescueLayer',
+                                identifier=1234)

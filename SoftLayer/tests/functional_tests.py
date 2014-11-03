@@ -42,7 +42,8 @@ class UnauthedUser(testing.TestCase):
             request.id = 1234
 
             # This test will fail if 'notvalidsoftlayer.com' becomes a thing
-            transports.make_xml_rpc_api_call(request)
+            transport = transports.XmlRpcTransport()
+            transport(request)
         except SoftLayer.SoftLayerAPIError as ex:
             self.assertIn('not known', str(ex))
             self.assertIn('not known', ex.faultString)

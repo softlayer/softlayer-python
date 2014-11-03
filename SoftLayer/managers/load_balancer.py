@@ -116,7 +116,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :returns: A list of all local load balancers on the current account.
         """
 
-        mask = ('mask[loadBalancerHardware[datacenter],ipAddress]')
+        mask = 'loadBalancerHardware[datacenter],ipAddress'
         return self.account.getAdcLoadBalancers(mask=mask)
 
     def get_local_lb(self, loadbal_id, **kwargs):
@@ -222,8 +222,8 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :param int weight: the weight to give to the service
         """
         kwargs = utils.NestedDict({})
-        kwargs['mask'] = ('mask[virtualServers[serviceGroups'
-                          '[services[groupReferences]]]]')
+        kwargs['mask'] = ('virtualServers['
+                          'serviceGroups[services[groupReferences]]]')
 
         load_balancer = self.lb_svc.getObject(id=loadbal_id, **kwargs)
         virtual_servers = load_balancer['virtualServers']

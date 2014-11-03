@@ -10,8 +10,6 @@ from SoftLayer import testing
 
 
 class FirewallTests(testing.TestCase):
-    def set_up(self):
-        self.client = testing.FixtureClient()
 
     def test_list_firewalls(self):
         result = self.run_command(['firewall', 'list'])

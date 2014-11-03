@@ -16,7 +16,7 @@ class OrderingManager(object):
     def __init__(self, client):
         self.client = client
 
-    def get_packages_of_type(self, package_types, mask):
+    def get_packages_of_type(self, package_types, mask=None):
         """Get packages that match a certain type.
 
         Each ordering package has a type, so return all packages that match
@@ -82,7 +82,7 @@ class OrderingManager(object):
 
         return active_packages
 
-    def get_package_by_type(self, package_type, mask):
+    def get_package_by_type(self, package_type, mask=None):
         """Get a single package of a given type.
 
         Syntactic sugar to retrieve a single package of a given type.

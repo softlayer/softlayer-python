@@ -25,7 +25,7 @@ class TestHelpShow(testing.TestCase):
                          {'Username': 'default-user',
                           'API Key': 'default-key',
                           'Endpoint URL': 'default-endpoint-url',
-                          'Timeout': 10})
+                          'Timeout': 10.0})
 
 
 class TestHelpSetup(testing.TestCase):

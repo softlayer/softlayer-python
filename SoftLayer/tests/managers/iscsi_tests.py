@@ -4,7 +4,6 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import mock
 
 import SoftLayer
 from SoftLayer import testing
@@ -13,33 +12,36 @@ from SoftLayer.testing import fixtures
 
 class ISCSITests(testing.TestCase):
     def set_up(self):
-        self.client = testing.FixtureClient()
         self.iscsi = SoftLayer.ISCSIManager(self.client)
 
     def test_get_iscsi(self):
         result = self.iscsi.get_iscsi(100)
-        self.client['Network_Storage_Iscsi'].getObject.assert_called_once_with(
-            id=100, mask=mock.ANY)
-        self.assertEqual(fixtures.Network_Storage_Iscsi.getObject, result)
+
+        self.assertEqual(fixtures.SoftLayer_Network_Storage_Iscsi.getObject,
+                         result)
+        self.assert_called_with('SoftLayer_Network_Storage_Iscsi', 'getObject',
+                                identifier=100)
 
     def test_cancel_iscsi_immediately(self):
-        iscsi_id = 600
-        self.iscsi.cancel_iscsi(iscsi_id, immediate=True)
-        f = self.client['Billing_Item'].cancelItem
-        f.assert_called_once_with(True, True, 'unNeeded', id=iscsi_id)
+        self.iscsi.cancel_iscsi(600, immediate=True)
+
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
+                                args=(True, True, 'unNeeded'),
+                                identifier=600)
 
     def test_cancel_iscsi_without_reason(self):
-        iscsi_id = 600
-        self.iscsi.cancel_iscsi(iscsi_id)
-        f = self.client['Billing_Item'].cancelItem
-        f.assert_called_once_with(False, True, 'unNeeded', id=iscsi_id)
+        self.iscsi.cancel_iscsi(600)
+
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
+                                args=(False, True, 'unNeeded'),
+                                identifier=600)
 
     def test_cancel_iscsi_with_reason(self):
-        iscsi_id = 600
-        reason = 'Network Performance'
-        self.iscsi.cancel_iscsi(iscsi_id, reason)
-        f = self.client['Billing_Item'].cancelItem
-        f.assert_called_once_with(False, True, reason, id=iscsi_id)
+        self.iscsi.cancel_iscsi(600, 'Network Performance')
+
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
+                                args=(False, True, 'Network Performance'),
+                                identifier=600)
 
     def test_invalid_datacenter(self):
         self.assertRaises(ValueError,
@@ -47,39 +49,45 @@ class ISCSITests(testing.TestCase):
                           size=10, location='foo')
 
     def test_create_iscsi(self):
-        get_items = self.client['Product_Package'].getItems
-        get_items.return_value = [
+        mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
+        mock.return_value = [
             {
                 'id': 4439,
                 'capacity': '1',
                 'description': '1 GB iSCSI Storage',
                 'itemCategory': {'categoryCode': 'iscsi'},
                 'prices': [{'id': 2222}]
-            }]
+            }
+        ]
+
         self.iscsi.create_iscsi(size=1, location='dal05')
-        f = self.client['Product_Order'].placeOrder
-        f.assert_called_once_with(
-            {'prices': [{'id': 2222}],
-             'quantity': 1,
-             'location': 0,
-             'packageId': 0,
-             'complexType':
-             'SoftLayer_Container_Product_Order_Network_Storage_Iscsi'})
+
+        args = ({'prices': [{'id': 2222}],
+                 'quantity': 1,
+                 'location': 0,
+                 'packageId': 0,
+                 'complexType':
+                 'SoftLayer_Container_Product_Order_Network_Storage_Iscsi'},)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder',
+                                args=args)
 
     def test_delete_snapshot(self):
         self.iscsi.delete_snapshot(1)
-        self.client[
-            'Network_Storage_Iscsi'].deleteObject.assert_called_once_with(id=1)
+
+        self.assert_called_with('SoftLayer_Network_Storage_Iscsi',
+                                'deleteObject',
+                                identifier=1)
 
     def test_create_snapshot(self):
-        iscsi_id = 100
-        self.iscsi.create_snapshot(iscsi_id, 'unNeeded')
-        f = self.client['Network_Storage_Iscsi'].createSnapshot
-        f.assert_called_once_with('unNeeded', id=iscsi_id)
+        self.iscsi.create_snapshot(100, 'unNeeded')
+
+        self.assert_called_with('SoftLayer_Network_Storage_Iscsi',
+                                'createSnapshot',
+                                identifier=100)
 
     def test_create_snapshot_space(self):
-        get_items = self.client['Product_Package'].getItems
-        get_items.return_value = [
+        mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
+        mock.return_value = [
             {
                 'id': 1121,
                 'capacity': '20',
@@ -87,24 +95,28 @@ class ISCSITests(testing.TestCase):
                 'itemCategory': {'categoryCode': 'iscsi_snapshot_space'},
                 'prices': [{'id': 2014}]
             }]
-        iscsi_id = 100
-        capacity = 20
-        self.iscsi.create_snapshot_space(iscsi_id, capacity)
-        f = self.client['Product_Order'].placeOrder
-        f.assert_called_once_with(
-            {'volumeId': 100,
-             'location': 138124,
-             'packageId': 0,
-             'complexType':
-             'SoftLayer_Container_'
+
+        self.iscsi.create_snapshot_space(100, 20)
+
+        args = (
+            {
+                'volumeId': 100,
+                'location': 138124,
+                'packageId': 0,
+                'complexType':
+                'SoftLayer_Container_'
                 'Product_Order_Network_Storage_Iscsi_SnapshotSpace',
-             'prices': [{'id': 2014}],
-             'quantity': 1
-             })
+                'prices': [{'id': 2014}],
+                'quantity': 1,
+            },
+        )
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder',
+                                args=args)
 
     def test_restore_from_snapshot(self):
-        volume_id = 100
-        snapshot_id = 101
-        self.iscsi.restore_from_snapshot(volume_id, snapshot_id)
-        f = self.client['Network_Storage_Iscsi'].restoreFromSnapshot
-        f.assert_called_once_with(101, id=100)
+        self.iscsi.restore_from_snapshot(100, 101)
+
+        self.assert_called_with('SoftLayer_Network_Storage_Iscsi',
+                                'restoreFromSnapshot',
+                                args=(101,),
+                                identifier=100)

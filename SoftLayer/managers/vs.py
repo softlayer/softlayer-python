@@ -614,25 +614,33 @@ class VSManager(utils.IdentifierMixin, object):
 
         """
         package_items = self._get_package_items()
-        item_id = []
+        prices = []
         if cpus:
-            item_id.append({'id': self._get_item_id_for_upgrade(
-                package_items, 'cpus', cpus, public)})
+            prices.append({
+                'id': self._get_item_id_for_upgrade(package_items,
+                                                    'cpus',
+                                                    cpus,
+                                                    public)})
         if memory:
-            item_id.append({'id': self._get_item_id_for_upgrade(
-                package_items, 'memory', memory)})
+            prices.append({
+                'id': self._get_item_id_for_upgrade(package_items,
+                                                    'memory',
+                                                    memory)})
         if nic_speed:
-            item_id.append({'id': self._get_item_id_for_upgrade(
-                package_items, 'nic_speed', nic_speed)})
+            prices.append({
+                'id': self._get_item_id_for_upgrade(package_items,
+                                                    'nic_speed',
+                                                    nic_speed)})
 
-        order = {}
-        order['complexType'] = (
-            'SoftLayer_Container_Product_Order_Virtual_Guest_Upgrade')
-        order['virtualGuests'] = [{'id': int(instance_id)}]
-        order['prices'] = item_id
-        order['properties'] = [{'name': 'MAINTENANCE_WINDOW',
-                                'value': str(datetime.datetime.now())}]
-        if cpus or memory or nic_speed:
+        order = {
+            'complexType': 'SoftLayer_Container_Product_Order_Virtual_Guest_'
+                           'Upgrade',
+            'prices': prices,
+            'properties': [{'name': 'MAINTENANCE_WINDOW',
+                            'value': str(datetime.datetime.now())}],
+            'virtualGuests': [{'id': int(instance_id)}],
+        }
+        if prices:
             self.client['Product_Order'].placeOrder(order)
             return True
         return False

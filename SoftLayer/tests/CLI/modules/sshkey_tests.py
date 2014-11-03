@@ -26,9 +26,10 @@ class SshKeyTests(testing.TestCase):
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(json.loads(result.output),
                          "SSH key added: aa:bb:cc:dd")
-        service.createObject.assert_called_with({'notes': 'my key',
-                                                 'key': mock_key,
-                                                 'label': 'key1'})
+        self.assert_called_with('SoftLayer_Security_Ssh_Key', 'createObject',
+                                args=({'notes': 'my key',
+                                       'key': mock_key,
+                                       'label': 'key1'},))
 
     def test_add_by_file(self):
         path = os.path.join(testing.FIXTURE_PATH, 'id_rsa.pub')
@@ -41,16 +42,17 @@ class SshKeyTests(testing.TestCase):
                          "SSH key added: aa:bb:cc:dd")
         service = self.client['Security_Ssh_Key']
         mock_key = service.getObject()['key']
-        service.createObject.assert_called_with({'notes': None,
-                                                 'key': mock_key,
-                                                 'label': 'key1'})
+        self.assert_called_with('SoftLayer_Security_Ssh_Key', 'createObject',
+                                args=({'notes': None,
+                                       'key': mock_key,
+                                       'label': 'key1'},))
 
     def test_remove_key(self):
         result = self.run_command(['--really', 'sshkey', 'remove', '1234'])
 
         self.assertEqual(result.exit_code, 0)
-        service = self.client['Security_Ssh_Key']
-        service.deleteObject.assert_called_with(id=1234)
+        self.assert_called_with('SoftLayer_Security_Ssh_Key', 'deleteObject',
+                                identifier=1234)
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
     def test_remove_key_fail(self, ngb_mock):
@@ -64,13 +66,14 @@ class SshKeyTests(testing.TestCase):
                                    '--label=key1', '--note=my key'])
 
         self.assertEqual(result.exit_code, 0)
-        service = self.client['Security_Ssh_Key']
-        service.editObject.assert_called_with({'notes': 'my key',
-                                               'label': 'key1'}, id=1234)
+        self.assert_called_with('SoftLayer_Security_Ssh_Key', 'editObject',
+                                args=({'notes': 'my key',
+                                       'label': 'key1'},),
+                                identifier=1234)
 
     def test_edit_key_fail(self):
-        service = self.client['Security_Ssh_Key']
-        service.editObject.return_value = False
+        fixture = self.set_mock('SoftLayer_Security_Ssh_Key', 'editObject')
+        fixture.return_value = False
 
         result = self.run_command(['sshkey', 'edit', '1234',
                                    '--label=key1', '--note=my key'])
