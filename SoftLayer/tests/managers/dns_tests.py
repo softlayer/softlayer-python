@@ -56,7 +56,7 @@ class DNSTests(testing.TestCase):
                                 filter=_filter)
 
     def test_create_zone(self):
-        res = self.dns_client.create_zone('example.com')
+        res = self.dns_client.create_zone('example.com', serial='2014110201')
 
         args = ({'serial': '2014110201',
                  'name': 'example.com',
