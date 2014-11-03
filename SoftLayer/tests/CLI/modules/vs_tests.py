@@ -104,13 +104,13 @@ class DnsTests(testing.TestCase):
                           'id': 100,
                           'created': '2013-08-01 15:23:45'})
 
-        service = self.client['Virtual_Guest']
-        service.createObject.assert_called_with({
-            'domain': 'example.com',
-            'hourlyBillingFlag': True,
-            'localDiskFlag': True,
-            'maxMemory': 1024,
-            'hostname': 'host',
-            'startCpus': 2,
-            'operatingSystemReferenceCode': 'UBUNTU_LATEST',
-            'networkComponents': [{'maxSpeed': '100'}]})
+        args = ({'domain': 'example.com',
+                 'hourlyBillingFlag': True,
+                 'localDiskFlag': True,
+                 'maxMemory': 1024,
+                 'hostname': 'host',
+                 'startCpus': 2,
+                 'operatingSystemReferenceCode': 'UBUNTU_LATEST',
+                 'networkComponents': [{'maxSpeed': '100'}]},)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
+                                args=args)

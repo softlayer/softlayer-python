@@ -6,18 +6,20 @@
 """
 import SoftLayer
 from SoftLayer import testing
-from SoftLayer.testing import fixtures
+
+VIRT_IP_SERVICE = ('SoftLayer_Network_Application_Delivery_Controller_'
+                   'LoadBalancer_VirtualIpAddress')
 
 
 class LoadBalancerTests(testing.TestCase):
 
     def set_up(self):
-        self.client = testing.FixtureClient()
         self.lb_mgr = SoftLayer.LoadBalancerManager(self.client)
 
     def test_get_lb_pkgs(self):
-        self.lb_mgr.get_lb_pkgs()
-        f = self.client['Product_Package'].getItems
+        result = self.lb_mgr.get_lb_pkgs()
+
+        self.assertEqual(len(result), 12)
         _filter = {
             'items': {
                 'description': {
@@ -25,116 +27,110 @@ class LoadBalancerTests(testing.TestCase):
                 }
             }
         }
-        f.assert_called_once_with(filter=_filter, id=0)
+        self.assert_called_with('SoftLayer_Product_Package', 'getItems',
+                                identifier=0,
+                                filter=_filter)
 
     def test_get_hc_types(self):
-        self.lb_mgr.get_hc_types()
-        f = self.client['Network_Application_Delivery_Controller_'
-                        'LoadBalancer_Health_Check_Type'].getAllObjects
-        f.assert_called_once()
+        result = self.lb_mgr.get_hc_types()
+
+        self.assertEqual(len(result), 6)
+        service = ('SoftLayer_Network_Application_Delivery_Controller_'
+                   'LoadBalancer_Health_Check_Type')
+        self.assert_called_with(service, 'getAllObjects')
 
     def test_get_routing_methods(self):
-        self.lb_mgr.get_routing_methods()
-        f = self.client['Network_Application_Delivery_Controller_'
-                        'LoadBalancer_Routing_Method'].getAllObjects
-        f.assert_called_once()
+        result = self.lb_mgr.get_routing_methods()
+
+        self.assertEqual(len(result), 12)
+        service = ('SoftLayer_Network_Application_Delivery_Controller_'
+                   'LoadBalancer_Routing_Method')
+        self.assert_called_with(service, 'getAllObjects')
 
     def test_get_location(self):
         id1 = self.lb_mgr._get_location('sjc01')
-        f = self.client['Location'].getDataCenters
-        f.assert_called_once()
         self.assertEqual(id1, 168642)
 
         id2 = self.lb_mgr._get_location('dal05')
-        f = self.client['Location'].getDataCenters
-        f.assert_called_once()
         self.assertEqual(id2, 'FIRST_AVAILABLE')
 
     def test_get_routing_types(self):
-        self.lb_mgr.get_routing_types()
-        f = self.client['Network_Application_Delivery_Controller_'
-                        'LoadBalancer_Routing_Type'].getAllObjects
-        f.assert_called_once()
+        result = self.lb_mgr.get_routing_types()
+
+        self.assertEqual(len(result), 6)
+        service = ('SoftLayer_Network_Application_Delivery_Controller_'
+                   'LoadBalancer_Routing_Type')
+        self.assert_called_with(service, 'getAllObjects')
 
     def test_cancel_lb(self):
-        loadbal_id = 6327
-        billing_item_id = 21370814
-        result = self.lb_mgr.cancel_lb(loadbal_id)
-        f = self.client['Billing_Item'].cancelService
-        f.assert_called_once_with(id=billing_item_id)
-        self.assertEqual(result, fixtures.Billing_Item.cancelService)
+        result = self.lb_mgr.cancel_lb(6327)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelService',
+                                identifier=21370814)
 
     def test_add_local_lb(self):
-        price_id = 6327
-        datacenter = 'sjc01'
-        self.lb_mgr.add_local_lb(price_id, datacenter)
+        self.lb_mgr.add_local_lb(6327, 'sjc01')
 
-        _package = {
+        args = ({
             'complexType': 'SoftLayer_Container_Product_Order_Network_'
                            'LoadBalancer',
             'quantity': 1,
             'packageId': 0,
             "location": 168642,
-            'prices': [{'id': price_id}]
-        }
-        f = self.client['Product_Order'].placeOrder
-        f.assert_called_once_with(_package)
+            'prices': [{'id': 6327}]
+        },)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder',
+                                args=args)
 
     def test_get_local_lbs(self):
-        self.lb_mgr.get_local_lbs()
-        call = self.client['Account'].getAdcLoadBalancers
-        mask = 'mask[loadBalancerHardware[datacenter],ipAddress]'
-        call.assert_called_once_with(mask=mask)
+        result = self.lb_mgr.get_local_lbs()
+
+        self.assertEqual(len(result), 0)
+        mask = 'loadBalancerHardware[datacenter],ipAddress'
+        self.assert_called_with('SoftLayer_Account', 'getAdcLoadBalancers',
+                                mask=mask)
 
     def test_get_local_lb(self):
-        lb_id = 12345
-        self.lb_mgr.get_local_lb(lb_id)
-        call = self.client['Network_Application_Delivery_Controller_'
-                           'LoadBalancer_VirtualIpAddress'].getObject
+        result = self.lb_mgr.get_local_lb(22348)
 
+        self.assertEqual(result['id'], 22348)
         mask = ('loadBalancerHardware[datacenter], '
                 'ipAddress, virtualServers[serviceGroups'
                 '[routingMethod,routingType,services'
                 '[healthChecks[type], groupReferences,'
                 ' ipAddress]]]')
-        call.assert_called_once_with(id=lb_id, mask=mask)
+        self.assert_called_with(VIRT_IP_SERVICE, 'getObject',
+                                identifier=22348,
+                                mask=mask)
 
     def test_delete_service(self):
-        service_id = 1234
-        self.lb_mgr.delete_service(service_id)
-        call = self.client['Network_Application_Delivery_Controller_'
-                           'LoadBalancer_Service'].deleteObject
+        result = self.lb_mgr.delete_service(1234)
 
-        call.assert_called_once_with(id=service_id)
+        self.assertEqual(result, True)
+        service = ('SoftLayer_Network_Application_Delivery_Controller_'
+                   'LoadBalancer_Service')
+        self.assert_called_with(service, 'deleteObject', identifier=1234)
 
     def test_delete_service_group(self):
-        service_group = 1234
-        self.lb_mgr.delete_service_group(service_group)
-        call = self.client['Network_Application_Delivery_Controller_'
-                           'LoadBalancer_VirtualServer'].deleteObject
+        result = self.lb_mgr.delete_service_group(1234)
 
-        call.assert_called_once_with(id=service_group)
+        self.assertEqual(result, True)
+        service = ('SoftLayer_Network_Application_Delivery_Controller_'
+                   'LoadBalancer_VirtualServer')
+        self.assert_called_with(service, 'deleteObject', identifier=1234)
 
     def test_toggle_service_status(self):
-        service_id = 1234
-        self.lb_mgr.toggle_service_status(service_id)
-        call = self.client['Network_Application_Delivery_Controller_'
-                           'LoadBalancer_Service'].toggleStatus
+        result = self.lb_mgr.toggle_service_status(1234)
 
-        call.assert_called_once_with(id=service_id)
+        self.assertEqual(result, True)
+        service = ('SoftLayer_Network_Application_Delivery_Controller_'
+                   'LoadBalancer_Service')
+        self.assert_called_with(service, 'toggleStatus', identifier=1234)
 
     def test_edit_service(self):
-        loadbal_id = 12345
-        service_id = 1234
-        ip_address = '9.9.9.9'
-        port = 80
-        enabled = 1
-        hc_type = 21
-        weight = 1
-        self.lb_mgr.edit_service(loadbal_id, service_id, ip_address,
-                                 port, enabled, hc_type, weight)
-        call = self.client['Network_Application_Delivery_Controller_'
-                           'LoadBalancer_VirtualIpAddress'].getVirtualServers
+        self.lb_mgr.edit_service(12345, 1234, '9.9.9.9', 80, True, 21, 1)
+
         _filter = {
             'virtualServers': {
                 'serviceGroups': {
@@ -147,85 +143,67 @@ class LoadBalancerTests(testing.TestCase):
             }
         }
         mask = 'serviceGroups[services[groupReferences,healthChecks]]'
-        call.assert_called_once_with(filter=_filter, mask=mask, id=loadbal_id)
+        self.assert_called_with(VIRT_IP_SERVICE, 'getVirtualServers',
+                                identifier=12345,
+                                filter=_filter,
+                                mask=mask)
 
-        call = self.client['Network_Application_Delivery_Controller_'
-                           'LoadBalancer_VirtualIpAddress'].editObject
-        call.assert_called_once()
+        self.assert_called_with(VIRT_IP_SERVICE, 'editObject')
 
     def test_add_service(self):
-        loadbal_id = 12345
-        group_id = 50718
-        ip_address_id = 123
-        port = 80
-        enabled = 1
-        hc_type = 21
-        weight = 1
-        self.lb_mgr.add_service(loadbal_id, group_id, ip_address_id,
-                                port, enabled, hc_type, weight)
-        call = self.client['Network_Application_Delivery_Controller_'
-                           'LoadBalancer_VirtualIpAddress'].getObject
+        self.lb_mgr.add_service(12345, 50718, 123, 80, True, 21, 1)
 
-        mask = ('mask[virtualServers[serviceGroups'
-                '[services[groupReferences]]]]')
-        call.assert_called_once_with(mask=mask, id=loadbal_id)
+        mask = 'virtualServers[serviceGroups[services[groupReferences]]]'
+        self.assert_called_with(VIRT_IP_SERVICE, 'getObject',
+                                mask=mask,
+                                identifier=12345)
 
-        call = self.client['Network_Application_Delivery_Controller_'
-                           'LoadBalancer_VirtualIpAddress'].editObject
-        call.assert_called_once()
+        self.assert_called_with(VIRT_IP_SERVICE, 'editObject',
+                                identifier=12345)
+        arg = self.calls(VIRT_IP_SERVICE, 'editObject')[0].args[0]
+        self.assertEqual(
+            len(arg['virtualServers'][0]['serviceGroups'][0]['services']),
+            2)
 
     def test_edit_service_group(self):
-        loadbal_id = 12345
-        group_id = 50718
-        allocation = 100
-        port = 80
-        routing_type = 2
-        routing_method = 10
-        self.lb_mgr.edit_service_group(loadbal_id, group_id=group_id,
-                                       allocation=allocation,
-                                       port=port,
-                                       routing_type=routing_type,
-                                       routing_method=routing_method)
-        call = self.client['Network_Application_Delivery_Controller_'
-                           'LoadBalancer_VirtualIpAddress'].getObject
+        self.lb_mgr.edit_service_group(12345,
+                                       group_id=50718,
+                                       allocation=100,
+                                       port=80,
+                                       routing_type=2,
+                                       routing_method=10)
 
         mask = 'virtualServers[serviceGroups[services[groupReferences]]]'
-        call.assert_called_once_with(mask=mask, id=loadbal_id)
+        self.assert_called_with(VIRT_IP_SERVICE, 'getObject',
+                                identifier=12345,
+                                mask=mask)
 
-        call = self.client['Network_Application_Delivery_Controller_'
-                           'LoadBalancer_VirtualIpAddress'].editObject
-        call.assert_called_once()
+        self.assert_called_with(VIRT_IP_SERVICE, 'getObject', identifier=12345)
 
     def test_add_service_group(self):
-        loadbal_id = 12345
-        allocation = 100
-        port = 80
-        routing_type = 2
-        routing_method = 10
-        self.lb_mgr.add_service_group(loadbal_id, allocation, port,
-                                      routing_type, routing_method)
-        call = self.client['Network_Application_Delivery_Controller_'
-                           'LoadBalancer_VirtualIpAddress'].getObject
+        self.lb_mgr.add_service_group(12345, 100, 80, 2, 10)
 
         mask = 'virtualServers[serviceGroups[services[groupReferences]]]'
-        call.assert_called_once_with(mask=mask, id=loadbal_id)
+        self.assert_called_with(VIRT_IP_SERVICE, 'getObject',
+                                mask=mask,
+                                identifier=12345)
 
-        call = self.client['Network_Application_Delivery_Controller_'
-                           'LoadBalancer_VirtualIpAddress'].editObject
-        call.assert_called_once()
+        self.assert_called_with(VIRT_IP_SERVICE, 'editObject',
+                                identifier=12345)
+        arg = self.calls(VIRT_IP_SERVICE, 'editObject')[0].args[0]
+        self.assertEqual(len(arg['virtualServers']), 2)
 
     def test_reset_service_group(self):
-        loadbal_id = 12345
-        group_id = 50718
-        self.lb_mgr.reset_service_group(loadbal_id, group_id=group_id)
-        call = self.client['Network_Application_Delivery_Controller_'
-                           'LoadBalancer_VirtualIpAddress'].getVirtualServers
+        result = self.lb_mgr.reset_service_group(12345, group_id=50718)
 
-        _filter = {'virtualServers': {'id': {'operation': group_id}}}
-        call.assert_called_once_with(filter=_filter,
-                                     mask='serviceGroups',
-                                     id=loadbal_id)
+        self.assertEqual(result, True)
+        _filter = {'virtualServers': {'id': {'operation': 50718}}}
+        self.assert_called_with(VIRT_IP_SERVICE, 'getVirtualServers',
+                                identifier=12345,
+                                filter=_filter,
+                                mask='serviceGroups')
 
-        call = self.client['Network_Application_Delivery_Controller_'
-                           'LoadBalancer_Service_Group'].kickAllConnections
-        call.assert_called_once_with(id=51758)
+        service = ('SoftLayer_Network_Application_Delivery_Controller_'
+                   'LoadBalancer_Service_Group')
+        self.assert_called_with(service, 'kickAllConnections',
+                                identifier=51758)

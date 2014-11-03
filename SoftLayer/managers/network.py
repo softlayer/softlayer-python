@@ -162,8 +162,10 @@ class NetworkManager(object):
         # If there's anything to update, update it
         if update:
             rwhois = self.get_rwhois()
-            self.client['Network_Subnet_Rwhois_Data'].editObject(
+            return self.client['Network_Subnet_Rwhois_Data'].editObject(
                 update, id=rwhois['id'])
+
+        return True
 
     def ip_lookup(self, ip_address):
         """Looks up an IP address and returns network information about it.

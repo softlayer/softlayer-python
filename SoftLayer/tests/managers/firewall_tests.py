@@ -4,26 +4,18 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import mock
 
 import SoftLayer
 from SoftLayer import testing
 from SoftLayer.testing import fixtures
 
 
-MASK = ('mask[orderValue,action,destinationIpAddress,destinationIpSubnetMask,'
-        'protocol,destinationPortRangeStart,destinationPortRangeEnd,'
-        'sourceIpAddress,sourceIpSubnetMask,version]')
-
-
 class FirewallTests(testing.TestCase):
 
     def set_up(self):
-        self.client = testing.FixtureClient()
         self.firewall = SoftLayer.FirewallManager(self.client)
 
     def test_get_firewalls(self):
-        call = self.client['Account'].getNetworkVlans
         firewall_vlan = {
             'id': 1,
             'firewallNetworkComponents': [{'id': 1234}],
@@ -34,31 +26,41 @@ class FirewallTests(testing.TestCase):
             'firewallRules': [{'id': 1234}],
             'highAvailabilityFirewallFlag': True,
         }
-        call.return_value = [firewall_vlan]
+        mock = self.set_mock('SoftLayer_Account', 'getNetworkVlans')
+        mock.return_value = [firewall_vlan]
 
         firewalls = self.firewall.get_firewalls()
 
-        call.assert_called_once_with(mask=mock.ANY)
         self.assertEqual(firewalls, [firewall_vlan])
+        self.assert_called_with('SoftLayer_Account', 'getNetworkVlans')
 
     def test_get_standard_fwl_rules(self):
-        call = self.client['Network_Component_Firewall'].getRules
-
         rules = self.firewall.get_standard_fwl_rules(1234)
-        call.assert_called_once_with(id=1234, mask=MASK)
-        self.assertEqual(rules, fixtures.Network_Component_Firewall.getRules)
+
+        self.assertEqual(
+            rules,
+            fixtures.SoftLayer_Network_Component_Firewall.getRules)
+        self.assert_called_with('SoftLayer_Network_Component_Firewall',
+                                'getRules',
+                                identifier=1234)
 
     def test_get_dedicated_fwl_rules(self):
-        call = self.client['Network_Vlan_Firewall'].getRules
 
         rules = self.firewall.get_dedicated_fwl_rules(1234)
-        call.assert_called_once_with(id=1234, mask=MASK)
-        self.assertEqual(rules, fixtures.Network_Vlan_Firewall.getRules)
+
+        self.assertEqual(rules,
+                         fixtures.SoftLayer_Network_Vlan_Firewall.getRules)
+        self.assert_called_with('SoftLayer_Network_Vlan_Firewall', 'getRules',
+                                identifier=1234)
 
     def test_get_standard_package_virtual_server(self):
         # test standard firewalls
         self.firewall.get_standard_package(server_id=1234, is_cci=True)
-        package_call = self.client['Product_Package'].getItems
+
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'getObject',
+                                identifier=1234,
+                                mask='primaryNetworkComponent[maxSpeed]')
+
         _filter = {
             'items': {
                 'description': {
@@ -66,11 +68,9 @@ class FirewallTests(testing.TestCase):
                 }
             }
         }
-        package_call.assert_called_once_with(filter=_filter, id=0)
-
-        mask = 'primaryNetworkComponent[maxSpeed]'
-        call2 = self.client['Virtual_Guest'].getObject
-        call2.assert_called_once_with(id=1234, mask=mask)
+        self.assert_called_with('SoftLayer_Product_Package', 'getItems',
+                                identifier=0,
+                                filter=_filter)
 
     def test_get_standard_package_bare_metal(self):
         self.firewall.get_standard_package(server_id=1234, is_cci=False)
@@ -78,11 +78,12 @@ class FirewallTests(testing.TestCase):
         # we should ask for the frontEndNetworkComponents to get
         # the firewall port speed
         mask = 'id,maxSpeed,networkComponentGroup.networkComponents'
-        fenc_call = self.client['Hardware_Server'].getFrontendNetworkComponents
-        fenc_call.assert_called_once_with(id=1234, mask=mask)
+        self.assert_called_with('SoftLayer_Hardware_Server',
+                                'getFrontendNetworkComponents',
+                                identifier=1234,
+                                mask=mask)
 
         # shiould call the product package for a 2000Mbps firwall
-        f = self.client['Product_Package'].getItems
         _filter = {
             'items': {
                 'description': {
@@ -90,12 +91,14 @@ class FirewallTests(testing.TestCase):
                 }
             }
         }
-        f.assert_called_once_with(filter=_filter, id=0)
+        self.assert_called_with('SoftLayer_Product_Package', 'getItems',
+                                identifier=0,
+                                filter=_filter)
 
     def test_get_dedicated_package_ha(self):
         # test dedicated HA firewalls
         self.firewall.get_dedicated_package(ha_enabled=True)
-        f = self.client['Product_Package'].getItems
+
         _filter = {
             'items': {
                 'description': {
@@ -103,12 +106,14 @@ class FirewallTests(testing.TestCase):
                 }
             }
         }
-        f.assert_called_once_with(filter=_filter, id=0)
+        self.assert_called_with('SoftLayer_Product_Package', 'getItems',
+                                identifier=0,
+                                filter=_filter)
 
     def test_get_dedicated_package_pkg(self):
         # test dedicated HA firewalls
         self.firewall.get_dedicated_package(ha_enabled=False)
-        f = self.client['Product_Package'].getItems
+
         _filter = {
             'items': {
                 'description': {
@@ -116,34 +121,42 @@ class FirewallTests(testing.TestCase):
                 }
             }
         }
-        f.assert_called_once_with(filter=_filter, id=0)
+        self.assert_called_with('SoftLayer_Product_Package', 'getItems',
+                                identifier=0,
+                                filter=_filter)
 
     def test_cancel_firewall(self):
         # test standard firewalls
-        fwl_id = 6327
-        billing_item_id = 21370814
-        result = self.firewall.cancel_firewall(fwl_id, dedicated=False)
-        f = self.client['Billing_Item'].cancelService
-        f.assert_called_once_with(id=billing_item_id)
-        self.assertEqual(result, fixtures.Billing_Item.cancelService)
-        call = self.client['Network_Component_Firewall'].getObject
-        mask = ('mask[id,billingItem[id]]')
-        call.assert_called_once_with(id=6327, mask=mask)
+        result = self.firewall.cancel_firewall(6327, dedicated=False)
+
+        self.assertEqual(result, fixtures.SoftLayer_Billing_Item.cancelService)
+        self.assert_called_with('SoftLayer_Network_Component_Firewall',
+                                'getObject',
+                                identifier=6327,
+                                mask='mask[id,billingItem[id]]')
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelService',
+                                identifier=21370814)
+
+    def test_cancel_dedicated_firewall(self):
         # test dedicated firewalls
-        billing_item_id = 21370815
-        result = self.firewall.cancel_firewall(fwl_id, dedicated=True)
-        f = self.client['Billing_Item'].cancelService
-        f.assert_called_twice_with(id=billing_item_id)
-        self.assertEqual(result, fixtures.Billing_Item.cancelService)
-        call = self.client['Network_Vlan_Firewall'].getObject
-        mask = ('mask[id,billingItem[id]]')
-        call.assert_called_once_with(id=6327, mask=mask)
+        result = self.firewall.cancel_firewall(6327, dedicated=True)
+
+        self.assertEqual(result, fixtures.SoftLayer_Billing_Item.cancelService)
+        self.assert_called_with('SoftLayer_Network_Vlan_Firewall',
+                                'getObject',
+                                identifier=6327,
+                                mask='mask[id,billingItem[id]]')
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelService',
+                                identifier=21370815)
 
     def test_add_standard_firewall_cci(self):
         # test standard firewalls for CCI
-        server_id = 6327
-        self.firewall.add_standard_firewall(server_id, is_cci=True)
-        f = self.client['Product_Package'].getItems
+        self.firewall.add_standard_firewall(6327, is_cci=True)
+
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'getObject',
+                                mask='primaryNetworkComponent[maxSpeed]',
+                                identifier=6327)
+
         _filter = {
             'items': {
                 'description': {
@@ -151,25 +164,24 @@ class FirewallTests(testing.TestCase):
                 }
             }
         }
-        f.assert_called_once_with(filter=_filter, id=0)
+        self.assert_called_with('SoftLayer_Product_Package', 'getItems',
+                                filter=_filter,
+                                identifier=0)
 
-        call2 = self.client['Virtual_Guest'].getObject
-        mask = 'primaryNetworkComponent[maxSpeed]'
-        call2.assert_called_once_with(id=server_id, mask=mask)
-        f = self.client['Product_Order'].placeOrder
-        f.assert_called_once()
+        args = ({'prices': [{'id': 1122}],
+                 'quantity': 1,
+                 'virtualGuests': [{'id': 6327}],
+                 'packageId': 0,
+                 'complexType': 'SoftLayer_Container_Product_Order_Network_'
+                                'Protection_Firewall'},)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder',
+                                args=args)
 
     def test_add_standard_firewall_server(self):
         # test dedicated firewall for Servers
-        server_id = 6327
-        self.firewall.add_standard_firewall(server_id, is_cci=False)
-
-        # The placeOrder call should be made at the end of the routine
-        f = self.client['Product_Order'].placeOrder
-        f.assert_called_once()
+        self.firewall.add_standard_firewall(6327, is_cci=False)
 
         # We should query the product package for a 2000Mbps firewall
-        f = self.client['Product_Package'].getItems
         _filter = {
             'items': {
                 'description': {
@@ -177,28 +189,38 @@ class FirewallTests(testing.TestCase):
                 }
             }
         }
-        f.assert_called_once_with(filter=_filter, id=0)
+        self.assert_called_with('SoftLayer_Product_Package', 'getItems',
+                                identifier=0,
+                                filter=_filter)
 
         # we should ask for the frontEndNetworkComponents to get
         # the firewall port speed
         mask = 'id,maxSpeed,networkComponentGroup.networkComponents'
-        fenc_call = self.client['Hardware_Server'].getFrontendNetworkComponents
-        fenc_call.assert_called_once_with(id=server_id, mask=mask)
+        self.assert_called_with('SoftLayer_Hardware_Server',
+                                'getFrontendNetworkComponents',
+                                mask=mask,
+                                identifier=6327)
+
+        args = ({'hardware': [{'id': 6327}],
+                 'prices': [{'id': 1122}],
+                 'quantity': 1,
+                 'packageId': 0,
+                 'complexType': 'SoftLayer_Container_Product_Order_Network_'
+                                'Protection_Firewall'},)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder',
+                                args=args)
 
     def test__get_fwl_port_speed_server(self):
         # Test the routine that calculates the speed of firewall
         # required for a server
         port_speed = self.firewall._get_fwl_port_speed(186908, False)
+
         self.assertEqual(port_speed, 2000)
 
     def test_add_vlan_firewall(self):
         # test dedicated firewall for Vlan
-        vlan_id = 6327
-        self.firewall.add_vlan_firewall(vlan_id, ha_enabled=False)
-        f = self.client['Product_Order'].placeOrder
-        f.assert_called_once()
+        self.firewall.add_vlan_firewall(6327, ha_enabled=False)
 
-        f = self.client['Product_Package'].getItems
         _filter = {
             'items': {
                 'description': {
@@ -206,16 +228,23 @@ class FirewallTests(testing.TestCase):
                 }
             }
         }
-        f.assert_called_once_with(filter=_filter, id=0)
+        self.assert_called_with('SoftLayer_Product_Package', 'getItems',
+                                identifier=0,
+                                filter=_filter)
+
+        args = ({'prices': [{'id': 1122}],
+                 'quantity': 1,
+                 'vlanId': 6327,
+                 'packageId': 0,
+                 'complexType': 'SoftLayer_Container_Product_Order_Network_'
+                                'Protection_Firewall_Dedicated'},)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder',
+                                args=args)
 
     def test_add_vlan_firewall_ha(self):
         # test dedicated firewall for Vlan
-        vlan_id = 6327
-        self.firewall.add_vlan_firewall(vlan_id, ha_enabled=True)
-        f = self.client['Product_Order'].placeOrder
-        f.assert_called_once()
+        self.firewall.add_vlan_firewall(6327, ha_enabled=True)
 
-        f = self.client['Product_Package'].getItems
         _filter = {
             'items': {
                 'description': {
@@ -223,32 +252,39 @@ class FirewallTests(testing.TestCase):
                 }
             }
         }
+        self.assert_called_with('SoftLayer_Product_Package', 'getItems',
+                                identifier=0,
+                                filter=_filter)
 
-        f.assert_called_once_with(filter=_filter, id=0)
+        args = ({'prices': [{'id': 1122}],
+                 'quantity': 1,
+                 'vlanId': 6327,
+                 'packageId': 0,
+                 'complexType': 'SoftLayer_Container_Product_Order_Network_'
+                                'Protection_Firewall_Dedicated'},)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder',
+                                args=args)
 
     def test_edit_dedicated_fwl_rules(self):
         # test standard firewalls
-        rules = fixtures.Network_Vlan_Firewall.getRules
-        fwl_id = 1234
-        fwl_ctx_acl_id = 3142
-        self.firewall.edit_dedicated_fwl_rules(firewall_id=fwl_id,
+        rules = fixtures.SoftLayer_Network_Vlan_Firewall.getRules
+        self.firewall.edit_dedicated_fwl_rules(firewall_id=1234,
                                                rules=rules)
-        template = {
-            'firewallContextAccessControlListId': fwl_ctx_acl_id,
-            'rules': rules
-        }
-        f = self.client['Network_Firewall_Update_Request'].createObject
-        f.assert_called_once_with(template)
+
+        args = ({'firewallContextAccessControlListId': 3142,
+                 'rules': rules},)
+        self.assert_called_with('SoftLayer_Network_Firewall_Update_Request',
+                                'createObject',
+                                args=args)
 
     def test_edit_standard_fwl_rules(self):
         # test standard firewalls
-        rules = fixtures.Network_Component_Firewall.getRules
-        fwl_id = 1234
-        self.firewall.edit_standard_fwl_rules(firewall_id=fwl_id,
+        rules = fixtures.SoftLayer_Network_Component_Firewall.getRules
+        self.firewall.edit_standard_fwl_rules(firewall_id=1234,
                                               rules=rules)
-        temp_object = {
-            "networkComponentFirewallId": fwl_id,
-            "rules": rules}
-        f = self.client['Network_Firewall_Update_Request'].createObject
 
-        f.assert_called_once_with(temp_object)
+        args = ({"networkComponentFirewallId": 1234,
+                 "rules": rules},)
+        self.assert_called_with('SoftLayer_Network_Firewall_Update_Request',
+                                'createObject',
+                                args=args)

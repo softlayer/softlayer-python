@@ -1,3 +1,0 @@
-cancelService = {}
-cancelServiceOnAnniversaryDate = {}
-cancelItem = {}

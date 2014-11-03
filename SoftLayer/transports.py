@@ -8,14 +8,22 @@
 from SoftLayer import exceptions
 from SoftLayer import utils
 
+import importlib
 import json
 import logging
+import time
 
 import requests
 
 LOGGER = logging.getLogger(__name__)
 # transports.Request does have a lot of instance attributes. :(
 # pylint: disable=too-many-instance-attributes
+
+__all__ = ['Request',
+           'XmlRpcTransport',
+           'RestTransport',
+           'TimingTransport',
+           'FixtureTransport']
 
 
 class Request(object):
@@ -68,123 +76,173 @@ class Request(object):
         self.offset = None
 
 
-def make_xml_rpc_api_call(request):
-    """Makes a SoftLayer API call against the XML-RPC endpoint.
+class XmlRpcTransport(object):
+    """XML-RPC transport."""
 
-    :param request request: Request object
-    """
-    try:
-        largs = list(request.args)
+    def __call__(self, request):
+        """Makes a SoftLayer API call against the XML-RPC endpoint.
 
-        headers = request.headers
+        :param request request: Request object
+        """
+        try:
+            largs = list(request.args)
 
-        if request.identifier is not None:
-            header_name = request.service + 'InitParameters'
-            headers[header_name] = {'id': request.identifier}
+            headers = request.headers
 
-        if request.mask is not None:
-            headers.update(__format_object_mask(request.mask, request.service))
+            if request.identifier is not None:
+                header_name = request.service + 'InitParameters'
+                headers[header_name] = {'id': request.identifier}
 
-        if request.filter is not None:
-            headers['%sObjectFilter' % request.service] = request.filter
+            if request.mask is not None:
+                headers.update(_format_object_mask(request.mask,
+                                                   request.service))
 
-        if request.limit:
-            headers['resultLimit'] = {
-                'limit': request.limit,
-                'offset': request.offset or 0,
+            if request.filter is not None:
+                headers['%sObjectFilter' % request.service] = request.filter
+
+            if request.limit:
+                headers['resultLimit'] = {
+                    'limit': request.limit,
+                    'offset': request.offset or 0,
+                }
+
+            largs.insert(0, {'headers': headers})
+
+            url = '/'.join([request.endpoint, request.service])
+            payload = utils.xmlrpc_client.dumps(tuple(largs),
+                                                methodname=request.method,
+                                                allow_none=True)
+            LOGGER.debug("=== REQUEST ===")
+            LOGGER.info('POST %s', url)
+            LOGGER.debug(request.transport_headers)
+            LOGGER.debug(payload)
+
+            response = requests.request('POST', url,
+                                        data=payload,
+                                        headers=request.transport_headers,
+                                        timeout=request.timeout,
+                                        verify=request.verify,
+                                        cert=request.cert,
+                                        proxies=_proxies_dict(request.proxy))
+            LOGGER.debug("=== RESPONSE ===")
+            LOGGER.debug(response.headers)
+            LOGGER.debug(response.content)
+            response.raise_for_status()
+            result = utils.xmlrpc_client.loads(response.content,)[0][0]
+            return result
+        except utils.xmlrpc_client.Fault as ex:
+            # These exceptions are formed from the XML-RPC spec
+            # http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
+            error_mapping = {
+                '-32700': exceptions.NotWellFormed,
+                '-32701': exceptions.UnsupportedEncoding,
+                '-32702': exceptions.InvalidCharacter,
+                '-32600': exceptions.SpecViolation,
+                '-32601': exceptions.MethodNotFound,
+                '-32602': exceptions.InvalidMethodParameters,
+                '-32603': exceptions.InternalError,
+                '-32500': exceptions.ApplicationError,
+                '-32400': exceptions.RemoteSystemError,
+                '-32300': exceptions.TransportError,
             }
+            _ex = error_mapping.get(ex.faultCode, exceptions.SoftLayerAPIError)
+            raise _ex(ex.faultCode, ex.faultString)
+        except requests.HTTPError as ex:
+            raise exceptions.TransportError(ex.response.status_code, str(ex))
+        except requests.RequestException as ex:
+            raise exceptions.TransportError(0, str(ex))
 
-        largs.insert(0, {'headers': headers})
 
-        url = '/'.join([request.endpoint, request.service])
-        payload = utils.xmlrpc_client.dumps(tuple(largs),
-                                            methodname=request.method,
-                                            allow_none=True)
+class RestTransport(object):
+    """REST transport."""
+
+    def __call__(self, request):
+        """Makes a SoftLayer API call against the REST endpoint.
+
+        This currently only works with GET requests
+
+        :param request request: Request object
+        """
+        url_parts = [request.endpoint, request.service, request.method]
+        if request.identifier is not None:
+            url_parts.append(str(request.identifier))
+
+        url = '%s.%s' % ('/'.join(url_parts), 'json')
+
         LOGGER.debug("=== REQUEST ===")
-        LOGGER.info('POST %s', url)
+        LOGGER.info(url)
         LOGGER.debug(request.transport_headers)
-        LOGGER.debug(payload)
-
-        response = requests.request('POST', url,
-                                    data=payload,
+        try:
+            resp = requests.request('GET', url,
                                     headers=request.transport_headers,
                                     timeout=request.timeout,
-                                    verify=request.verify,
-                                    cert=request.cert,
-                                    proxies=__proxies_dict(request.proxy))
-        LOGGER.debug("=== RESPONSE ===")
-        LOGGER.debug(response.headers)
-        LOGGER.debug(response.content)
-        response.raise_for_status()
-        result = utils.xmlrpc_client.loads(response.content,)[0][0]
+                                    proxies=_proxies_dict(request.proxy))
+            LOGGER.debug("=== RESPONSE ===")
+            LOGGER.debug(resp.headers)
+            LOGGER.debug(resp.content)
+            resp.raise_for_status()
+            return json.loads(resp.content)
+        except requests.HTTPError as ex:
+            content = json.loads(ex.response.content)
+            raise exceptions.SoftLayerAPIError(ex.response.status_code,
+                                               content['error'])
+        except requests.RequestException as ex:
+            raise exceptions.TransportError(0, str(ex))
+
+
+class TimingTransport(object):
+    """Transport that records API call timings."""
+
+    def __init__(self, transport):
+        self.transport = transport
+        self.last_calls = []
+
+    def __call__(self, call):
+        """See Client.call for documentation."""
+        start_time = time.time()
+
+        result = self.transport(call)
+
+        end_time = time.time()
+        self.last_calls.append((call, start_time, end_time - start_time))
         return result
-    except utils.xmlrpc_client.Fault as ex:
-        # These exceptions are formed from the XML-RPC spec
-        # http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
-        error_mapping = {
-            '-32700': exceptions.NotWellFormed,
-            '-32701': exceptions.UnsupportedEncoding,
-            '-32702': exceptions.InvalidCharacter,
-            '-32600': exceptions.SpecViolation,
-            '-32601': exceptions.MethodNotFound,
-            '-32602': exceptions.InvalidMethodParameters,
-            '-32603': exceptions.InternalError,
-            '-32500': exceptions.ApplicationError,
-            '-32400': exceptions.RemoteSystemError,
-            '-32300': exceptions.TransportError,
-        }
-        raise error_mapping.get(ex.faultCode, exceptions.SoftLayerAPIError)(
-            ex.faultCode, ex.faultString)
-    except requests.HTTPError as ex:
-        raise exceptions.TransportError(ex.response.status_code, str(ex))
-    except requests.RequestException as ex:
-        raise exceptions.TransportError(0, str(ex))
+
+    def get_last_calls(self):
+        """Retrieves the last_calls property.
+
+        This property will contain a list of tuples in the form
+        (Request, initiated_utc_timestamp, execution_time)
+        """
+        last_calls = self.last_calls
+        self.last_calls = []
+        return last_calls
 
 
-def make_rest_api_call(request):
-    """Makes a SoftLayer API call against the REST endpoint.
-
-    This currently only works with GET requests
-
-    :param request request: Request object
-    """
-    url_parts = [request.endpoint,
-                 request.service,
-                 request.method]
-    if request.identifier is not None:
-        url_parts.append(str(request.identifier))
-
-    url = '%s.%s' % ('/'.join(url_parts), 'json')
-
-    LOGGER.debug("=== REQUEST ===")
-    LOGGER.info(url)
-    LOGGER.debug(request.transport_headers)
-    try:
-        resp = requests.request('GET', url,
-                                headers=request.transport_headers,
-                                timeout=request.timeout,
-                                proxies=__proxies_dict(request.proxy))
-        LOGGER.debug("=== RESPONSE ===")
-        LOGGER.debug(resp.headers)
-        LOGGER.debug(resp.content)
-        resp.raise_for_status()
-        return json.loads(resp.content)
-    except requests.HTTPError as ex:
-        content = json.loads(ex.response.content)
-        raise exceptions.SoftLayerAPIError(ex.response.status_code,
-                                           content['error'])
-    except requests.RequestException as ex:
-        raise exceptions.TransportError(0, str(ex))
+class FixtureTransport(object):
+    """Implements a transport which returns fixtures."""
+    def __call__(self, call):
+        """Load fixture from the default fixture path."""
+        try:
+            module_path = 'SoftLayer.testing.fixtures.%s' % call.service
+            module = importlib.import_module(module_path)
+        except ImportError:
+            raise NotImplementedError('%s::%s fixture is not implemented'
+                                      % (call.service, call.method))
+        try:
+            return getattr(module, call.method)
+        except AttributeError:
+            raise NotImplementedError('%s::%s fixture is not implemented'
+                                      % (call.service, call.method))
 
 
-def __proxies_dict(proxy):
+def _proxies_dict(proxy):
     """Makes a proxy dict appropriate to pass to requests."""
     if not proxy:
         return None
     return {'http': proxy, 'https': proxy}
 
 
-def __format_object_mask(objectmask, service):
+def _format_object_mask(objectmask, service):
     """Format new and old style object masks into proper headers.
 
     :param objectmask: a string- or dict-based object mask
