@@ -18,7 +18,7 @@ class MonitorTests(testing.TestCase):
         self.monitor_manager = SoftLayer.MonitoringManager(self.client)
 
     def test_list_hardware_status(self):
-        mcall = mock.call(mask=mock.ANY, filter='')
+        mcall = mock.call(mask=mock.ANY)
         service = self.client['Account']
 
         result = self.monitor_manager.list_hardware_status()
@@ -26,7 +26,7 @@ class MonitorTests(testing.TestCase):
         service.getHardware.assert_has_calls(mcall)
 
     def test_list_guest_status(self):
-        mcall = mock.call(mask=mock.ANY, filter='')
+        mcall = mock.call(mask=mock.ANY)
         service = self.client['Account']
 
         result = self.monitor_manager.list_guest_status()

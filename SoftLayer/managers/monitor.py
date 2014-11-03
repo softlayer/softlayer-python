@@ -5,8 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
-# Invalid names are ignored due to long method names and short argument names
-# pylint: disable=C0103
+
 
 from SoftLayer import utils
 
@@ -82,6 +81,5 @@ class MonitoringManager(utils.IdentifierMixin, object):
 
             kwargs['mask'] = ('[mask[%s]]'
                               % (','.join(vs_items)))
-        kwargs['filter'] = ''
         function = getattr(self.account, call)
         return function(**kwargs)

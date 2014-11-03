@@ -45,20 +45,24 @@ def cli(env, only_hardware=False, only_virtual=False):
         server = utils.NestedDict(server)
         res = server['networkMonitors'][0]['lastResult']['responseStatus']
         date = server['networkMonitors'][0]['lastResult']['finishTime']
-        status = '\033[35mUNKNOWN\033[0m'
+        status = 'UNKNOWN'
+        status_color = None
         if res == 0:
-            status = '\033[31mDOWN\033[0m'
+            status = 'DOWN'
+            status_color = 'red'
         elif res == 1:
-            status = '\033[93mWARNING\033[0m'
+            status = 'WARNING'
+            status_color = 'yellow'
         elif res == 2:
-            status = '\033[32mOK\033[0m'
+            status = 'OK'
+            status_color = 'green'
 
         table.add_row([
             server['id'],
             server['datacenter']['name'] or formatting.blank(),
             server['fullyQualifiedDomainName'],
             server['primaryIpAddress'] or formatting.blank(),
-            status,
+            click.style(status, fg=status_color),
             date
         ])
 
