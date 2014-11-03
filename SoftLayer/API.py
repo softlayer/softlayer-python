@@ -45,7 +45,7 @@ class Client(object):
     :param config_file: A path to a configuration file used to load settings
     :param user_agent: an optional User Agent to report when making API
         calls if you wish to bypass the packages built in User Agent string
-    :param transport: An object that's callable this signature:
+    :param transport: An object that's callable with this signature:
                       transport(SoftLayer.transports.Request)
 
     Usage:
