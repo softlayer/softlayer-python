@@ -8,7 +8,6 @@
 from __future__ import print_function
 import logging
 import sys
-import time
 import types
 
 import SoftLayer
@@ -63,32 +62,6 @@ class CommandLoader(click.MultiCommand):
             return CommandLoader(*new_path, help=module.__doc__)
         else:
             return module
-
-
-class CliClient(SoftLayer.Client):
-    """A wrapped SoftLayer.Client that adds CLI-specific functionality.
-
-    At the moment, it has a slightly different accounting for API call timings
-    but will also allow for 2FA and other similar functionality.
-
-    """
-
-    def __init__(self, client, *args, **kwargs):
-        self.real_client = client
-        self.auth = client.auth
-        self.last_calls = []
-        # NOTE(kmcdonald): I really don't like this pattern.
-
-    def call(self, service, method, *args, **kwargs):
-        """See Client.call for documentation."""
-        start_time = time.time()
-
-        result = self.real_client.call(service, method, *args, **kwargs)
-
-        end_time = time.time()
-        diff = end_time - start_time
-        self.last_calls.append((service, method, start_time, diff))
-        return result
 
 
 @click.group(help="SoftLayer Command-line Client",
@@ -164,14 +137,15 @@ def cli(ctx,
     if env.client is None:
         # Environment can be passed in explicitly. This is used for testing
         if fixtures:
-            from SoftLayer import fixture_client
-            real_client = fixture_client.FixtureClient()
+            transport = SoftLayer.FixtureTransport()
         else:
             # Create SL Client
-            real_client = SoftLayer.Client(proxy=proxy, config_file=config)
+            transport = SoftLayer.XmlRpcTransport()
 
-        client = CliClient(real_client)
-        env.client = client
+        wrapped_transport = SoftLayer.TimingTransport(transport)
+        env.client = SoftLayer.Client(proxy=proxy,
+                                      config_file=config,
+                                      transport=wrapped_transport)
 
 
 @cli.resultcallback()
@@ -187,8 +161,9 @@ def output_result(ctx, result, timings=False, **kwargs):
     if timings:
         timing_table = formatting.Table(['service', 'method', 'time'])
 
-        for service, call, _, duration in env.client.last_calls:
-            timing_table.add_row([service, call, duration])
+        calls = env.client.transport.get_last_calls()
+        for call, _, duration in calls:
+            timing_table.add_row([call.service, call.method, duration])
 
         env.err(env.fmt(timing_table))
 

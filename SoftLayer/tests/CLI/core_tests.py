@@ -49,7 +49,7 @@ class CoreTests(testing.TestCase):
 
         self.assertEqual(result.exit_code, 0)
         self.assertIn('"method": "getVirtualGuests"', result.output)
-        self.assertIn('"service": "Account"', result.output)
+        self.assertIn('"service": "SoftLayer_Account"', result.output)
         self.assertIn('"time":', result.output)
 
 

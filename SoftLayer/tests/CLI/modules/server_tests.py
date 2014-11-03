@@ -19,7 +19,6 @@ import mock
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI.server import create
 from SoftLayer import testing
-from SoftLayer.testing.fixtures import Hardware_Server
 
 import json
 import tempfile
@@ -135,15 +134,6 @@ class ServerCLITests(testing.TestCase):
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(json.loads(result.output), expected)
 
-    def test_server_details_issue_332(self):
-        result = Hardware_Server.getObject.copy()
-        result['privateNetworkOnlyFlag'] = True
-        self.client['Hardware_Server'].getObject.return_value = result
-        result = self.run_command(['server', 'detail', '1234'])
-
-        service = self.client['Hardware_Server']
-        self.assertFalse(service.getReverseDomainRecords.called)
-
     def test_list_servers(self):
         result = self.run_command(['server', 'list', '--tag=openstack'])
 
@@ -228,7 +218,8 @@ class ServerCLITests(testing.TestCase):
         # Check the positive case
         result = self.run_command(['--really', 'server', 'power-off', '12345'])
 
-        self.client['Hardware_Server'].powerOff.assert_called_with(id=12345)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'powerOff',
+                                identifier=12345)
 
         # Now check to make sure we properly call CLIAbort in the negative case
         confirm_mock.return_value = False
@@ -241,22 +232,24 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['--really', 'server', 'reboot', '12345'])
 
         self.assertEqual(result.exit_code, 0)
-        service = self.client['Hardware_Server']
-        service.rebootDefault.assert_called_with(id=12345)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'rebootDefault',
+                                identifier=12345)
 
     def test_server_reboot_soft(self):
         result = self.run_command(['--really', 'server', 'reboot', '12345',
                                    '--soft'])
 
         self.assertEqual(result.exit_code, 0)
-        self.client['Hardware_Server'].rebootSoft.assert_called_with(id=12345)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'rebootSoft',
+                                identifier=12345)
 
     def test_server_reboot_hard(self):
         result = self.run_command(['--really', 'server', 'reboot', '12345',
                                    '--hard'])
 
         self.assertEqual(result.exit_code, 0)
-        self.client['Hardware_Server'].rebootHard.assert_called_with(id=12345)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'rebootHard',
+                                identifier=12345)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_server_reboot_negative(self, confirm_mock):
@@ -270,14 +263,16 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['--really', 'server', 'power-on', '12345'])
 
         self.assertEqual(result.exit_code, 0)
-        self.client['Hardware_Server'].powerOn.assert_called_with(id=12345)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'powerOn',
+                                identifier=12345)
 
     def test_server_power_cycle(self):
         result = self.run_command(['--really', 'server', 'power-cycle',
                                    '12345'])
 
         self.assertEqual(result.exit_code, 0)
-        self.client['Hardware_Server'].powerCycle.assert_called_with(id=12345)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'powerCycle',
+                                identifier=12345)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_server_power_cycle_negative(self, confirm_mock):
@@ -292,9 +287,10 @@ class ServerCLITests(testing.TestCase):
                                    '--speed=100'])
 
         self.assertEqual(result.exit_code, 0)
-        service = self.client['Hardware_Server']
-        service.setPublicNetworkInterfaceSpeed.assert_called_with(100,
-                                                                  id=12345)
+        self.assert_called_with('SoftLayer_Hardware_Server',
+                                'setPublicNetworkInterfaceSpeed',
+                                args=(100,),
+                                identifier=12345)
 
     @mock.patch('SoftLayer.HardwareManager'
                 '.get_available_dedicated_server_packages')
@@ -613,11 +609,10 @@ class ServerCLITests(testing.TestCase):
 
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(result.output, "")
-        service = self.client['Hardware_Server']
-        service.editObject.assert_called_with({'domain': 'test.sftlyr.ws',
-                                               'hostname': 'hardware-test1'},
-                                              id=1000)
-        service.setUserMetadata.assert_called_with(['My data'], id=1000)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'editObject',
+                                args=({'domain': 'test.sftlyr.ws',
+                                       'hostname': 'hardware-test1'},),
+                                identifier=1000)
 
     @mock.patch('SoftLayer.HardwareManager.edit')
     def test_edit_server_failed(self, edit_mock):
@@ -644,8 +639,10 @@ class ServerCLITests(testing.TestCase):
 
             self.assertEqual(result.exit_code, 0)
             self.assertEqual(result.output, "")
-            service = self.client['Hardware_Server']
-            service.setUserMetadata.assert_called_with(['some data'], id=1000)
+            self.assert_called_with('SoftLayer_Hardware_Server',
+                                    'setUserMetadata',
+                                    args=(['some data'],),
+                                    identifier=1000)
 
     def test_get_default_value_returns_none_for_unknown_category(self):
         option_mock = {'categories': {'cat1': []}}

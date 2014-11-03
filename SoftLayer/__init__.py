@@ -20,6 +20,7 @@ from SoftLayer.API import *  # NOQA
 from SoftLayer.managers import *  # NOQA
 from SoftLayer.exceptions import *  # NOQA
 from SoftLayer.auth import *  # NOQA
+from SoftLayer.transports import *  # NOQA
 
 __title__ = 'SoftLayer'
 __version__ = consts.VERSION

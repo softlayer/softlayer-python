@@ -95,4 +95,4 @@ getVirtualServers = [
         "virtualIpAddressId": 22348
     }
 ]
-editObject = {}
+editObject = True

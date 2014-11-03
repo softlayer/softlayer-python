@@ -1,0 +1,2 @@
+deleteObject = True
+toggleStatus = True

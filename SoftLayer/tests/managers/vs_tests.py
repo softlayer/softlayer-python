@@ -14,37 +14,36 @@ from SoftLayer.testing import fixtures
 class VSTests(testing.TestCase):
 
     def set_up(self):
-        self.client = testing.FixtureClient()
         self.vs = SoftLayer.VSManager(self.client,
                                       SoftLayer.OrderingManager(self.client))
 
     def test_list_instances(self):
-        mcall = mock.call(mask=mock.ANY, filter={})
-        service = self.client['Account']
-
-        list_expected_ids = [100, 104]
-        hourly_expected_ids = [104]
-        monthly_expected_ids = [100]
-
         results = self.vs.list_instances(hourly=True, monthly=True)
-        service.getVirtualGuests.assert_has_calls(mcall)
-        for result in results:
-            self.assertIn(result['id'], list_expected_ids)
 
-        result = self.vs.list_instances(hourly=False, monthly=False)
-        service.getVirtualGuests.assert_has_calls(mcall)
         for result in results:
-            self.assertIn(result['id'], list_expected_ids)
+            self.assertIn(result['id'], [100, 104])
+        self.assert_called_with('SoftLayer_Account', 'getVirtualGuests')
 
+    def test_list_instances_neither(self):
+        results = self.vs.list_instances(hourly=False, monthly=False)
+
+        for result in results:
+            self.assertIn(result['id'], [100, 104])
+        self.assert_called_with('SoftLayer_Account', 'getVirtualGuests')
+
+    def test_list_instances_monthly(self):
         results = self.vs.list_instances(hourly=False, monthly=True)
-        service.getMonthlyVirtualGuests.assert_has_calls(mcall)
-        for result in results:
-            self.assertIn(result['id'], monthly_expected_ids)
 
-        results = self.vs.list_instances(hourly=True, monthly=False)
-        service.getHourlyVirtualGuests.assert_has_calls(mcall)
         for result in results:
-            self.assertIn(result['id'], hourly_expected_ids)
+            self.assertIn(result['id'], [100])
+        self.assert_called_with('SoftLayer_Account', 'getMonthlyVirtualGuests')
+
+    def test_list_instances_hourly(self):
+        results = self.vs.list_instances(hourly=True, monthly=False)
+
+        for result in results:
+            self.assertIn(result['id'], [104])
+        self.assert_called_with('SoftLayer_Account', 'getHourlyVirtualGuests')
 
     def test_list_instances_with_filters(self):
         self.vs.list_instances(
@@ -62,41 +61,45 @@ class VSTests(testing.TestCase):
             private_ip='4.3.2.1',
         )
 
-        service = self.client['Account']
-        service.getVirtualGuests.assert_has_calls(mock.call(
-            filter={
-                'virtualGuests': {
-                    'datacenter': {
-                        'name': {'operation': '_= dal05'}},
-                    'domain': {'operation': '_= example.com'},
-                    'tagReferences': {
-                        'tag': {'name': {
-                            'operation': 'in',
-                            'options': [{
-                                'name': 'data', 'value': ['tag1', 'tag2']}]}}},
-                    'maxCpu': {'operation': 2},
-                    'localDiskFlag': {'operation': True},
-                    'maxMemory': {'operation': 1024},
-                    'hostname': {'operation': '_= hostname'},
-                    'networkComponents': {'maxSpeed': {'operation': 100}},
-                    'primaryIpAddress': {'operation': '_= 1.2.3.4'},
-                    'primaryBackendIpAddress': {'operation': '_= 4.3.2.1'}
-                }},
-            mask=mock.ANY,
-        ))
+        _filter = {
+            'virtualGuests': {
+                'datacenter': {
+                    'name': {'operation': '_= dal05'}},
+                'domain': {'operation': '_= example.com'},
+                'tagReferences': {
+                    'tag': {'name': {
+                        'operation': 'in',
+                        'options': [{
+                            'name': 'data', 'value': ['tag1', 'tag2']}]}}},
+                'maxCpu': {'operation': 2},
+                'localDiskFlag': {'operation': True},
+                'maxMemory': {'operation': 1024},
+                'hostname': {'operation': '_= hostname'},
+                'networkComponents': {'maxSpeed': {'operation': 100}},
+                'primaryIpAddress': {'operation': '_= 1.2.3.4'},
+                'primaryBackendIpAddress': {'operation': '_= 4.3.2.1'}
+            }
+        }
+        self.assert_called_with('SoftLayer_Account', 'getVirtualGuests',
+                                filter=_filter)
 
     def test_resolve_ids_ip(self):
-        service = self.client['Account']
         _id = self.vs._get_ids_from_ip('172.16.240.2')
+
         self.assertEqual(_id, [100, 104])
 
+    def test_resolve_ids_ip_private(self):
+        # Now simulate a private IP test
+        mock = self.set_mock('SoftLayer_Account', 'getVirtualGuests')
+        mock.side_effect = [[], [{'id': 99}]]
+
+        _id = self.vs._get_ids_from_ip('10.0.1.87')
+
+        self.assertEqual(_id, [99])
+
+    def test_resolve_ids_ip_invalid(self):
         _id = self.vs._get_ids_from_ip('nope')
         self.assertEqual(_id, [])
-
-        # Now simulate a private IP test
-        service.getVirtualGuests.side_effect = [[], [{'id': 99}]]
-        _id = self.vs._get_ids_from_ip('10.0.1.87')
-        self.assertEqual(_id, [99])
 
     def test_resolve_ids_hostname(self):
         _id = self.vs._get_ids_from_hostname('vs-test1')
@@ -104,46 +107,59 @@ class VSTests(testing.TestCase):
 
     def test_get_instance(self):
         result = self.vs.get_instance(100)
-        self.client['Virtual_Guest'].getObject.assert_called_once_with(
-            id=100, mask=mock.ANY)
-        self.assertEqual(fixtures.Virtual_Guest.getObject, result)
+
+        self.assertEqual(fixtures.SoftLayer_Virtual_Guest.getObject, result)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'getObject',
+                                identifier=100)
 
     def test_get_create_options(self):
         results = self.vs.get_create_options()
-        self.assertEqual(fixtures.Virtual_Guest.getCreateObjectOptions,
-                         results)
+
+        self.assertEqual(
+            fixtures.SoftLayer_Virtual_Guest.getCreateObjectOptions, results)
 
     def test_cancel_instance(self):
-        self.vs.cancel_instance(1)
-        self.client['Virtual_Guest'].deleteObject.assert_called_once_with(id=1)
+        result = self.vs.cancel_instance(1)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'deleteObject',
+                                identifier=1)
 
     def test_reload_instance(self):
         post_uri = 'http://test.sftlyr.ws/test.sh'
+
         self.vs.reload_instance(1, post_uri=post_uri, ssh_keys=[1701])
-        service = self.client['Virtual_Guest']
-        f = service.reloadOperatingSystem
-        f.assert_called_once_with('FORCE',
-                                  {'customProvisionScriptUri': post_uri,
-                                   'sshKeyIds': [1701]}, id=1)
+
+        args = ('FORCE', {'customProvisionScriptUri': post_uri,
+                          'sshKeyIds': [1701]})
+        self.assert_called_with('SoftLayer_Virtual_Guest',
+                                'reloadOperatingSystem',
+                                args=args,
+                                identifier=1)
 
     @mock.patch('SoftLayer.managers.vs.VSManager._generate_create_dict')
     def test_create_verify(self, create_dict):
         create_dict.return_value = {'test': 1, 'verify': 1}
+
         self.vs.verify_create_instance(test=1, verify=1)
+
         create_dict.assert_called_once_with(test=1, verify=1)
-        f = self.client['Virtual_Guest'].generateOrderTemplate
-        f.assert_called_once_with({'test': 1, 'verify': 1})
+        self.assert_called_with('SoftLayer_Virtual_Guest',
+                                'generateOrderTemplate',
+                                args=({'test': 1, 'verify': 1},))
 
     @mock.patch('SoftLayer.managers.vs.VSManager._generate_create_dict')
     def test_create_instance(self, create_dict):
         create_dict.return_value = {'test': 1, 'verify': 1}
+
         self.vs.create_instance(test=1, verify=1, tags='dev,green')
 
         create_dict.assert_called_once_with(test=1, verify=1)
-        self.client['Virtual_Guest'].createObject.assert_called_once_with(
-            {'test': 1, 'verify': 1})
-        self.client['Virtual_Guest'].setTags.assert_called_once_with(
-            'dev,green', id=100)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
+                                args=({'test': 1, 'verify': 1},))
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'setTags',
+                                args=('dev,green',),
+                                identifier=100)
 
     def test_create_instances(self):
         self.vs.create_instances([{'cpus': 1,
@@ -151,15 +167,18 @@ class VSTests(testing.TestCase):
                                    'hostname': 'server',
                                    'domain': 'example.com',
                                    'tags': 'dev,green'}])
-        self.client['Virtual_Guest'].createObjects.assert_called_once_with([
-            {'domain': 'example.com',
-             'hourlyBillingFlag': True,
-             'localDiskFlag': True,
-             'maxMemory': 1024, 'hostname':
-             'server',
-             'startCpus': 1}])
-        self.client['Virtual_Guest'].setTags.assert_called_once_with(
-            'dev,green', id=100)
+
+        args = ([{'domain': 'example.com',
+                  'hourlyBillingFlag': True,
+                  'localDiskFlag': True,
+                  'maxMemory': 1024,
+                  'hostname': 'server',
+                  'startCpus': 1}],)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'createObjects',
+                                args=args)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'setTags',
+                                args=('dev,green',),
+                                identifier=100)
 
     def test_generate_os_and_image(self):
         self.assertRaises(
@@ -500,97 +519,146 @@ class VSTests(testing.TestCase):
         self.assertEqual(data['blockDevices'], assert_data['blockDevices'])
 
     def test_change_port_speed_public(self):
-        vs_id = 1
-        speed = 100
-        self.vs.change_port_speed(vs_id, True, speed)
+        result = self.vs.change_port_speed(1, True, 100)
 
-        service = self.client['Virtual_Guest']
-        f = service.setPublicNetworkInterfaceSpeed
-        f.assert_called_once_with(speed, id=vs_id)
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Virtual_Guest',
+                                'setPublicNetworkInterfaceSpeed',
+                                identifier=1,
+                                args=(100,))
 
     def test_change_port_speed_private(self):
-        vs_id = 2
-        speed = 10
-        self.vs.change_port_speed(vs_id, False, speed)
+        result = self.vs.change_port_speed(2, False, 10)
 
-        service = self.client['Virtual_Guest']
-        f = service.setPrivateNetworkInterfaceSpeed
-        f.assert_called_once_with(speed, id=vs_id)
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Virtual_Guest',
+                                'setPrivateNetworkInterfaceSpeed',
+                                identifier=2,
+                                args=(10,))
 
     def test_rescue(self):
         # Test rescue environment
-        vs_id = 1234
-        self.vs.rescue(vs_id)
+        result = self.vs.rescue(1234)
 
-        service = self.client['Virtual_Guest']
-        f = service.executeRescueLayer
-        f.assert_called_once_with(id=vs_id)
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Virtual_Guest',
+                                'executeRescueLayer',
+                                identifier=1234)
 
-    def test_edit(self):
+    def test_edit_metadata(self):
         # Test editing user data
-        service = self.client['Virtual_Guest']
+        result = self.vs.edit(100, userdata='my data')
 
-        self.vs.edit(100, userdata='my data')
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'setUserMetadata',
+                                identifier=100,
+                                args=(['my data'],))
 
-        service.setUserMetadata.assert_called_once_with(['my data'], id=100)
-
+    def test_edit_blank(self):
         # Now test a blank edit
         self.assertTrue(self.vs.edit, 100)
 
-        # Finally, test a full edit
-        args = {
+    def test_edit_full(self):
+        result = self.vs.edit(100,
+                              hostname='new-host',
+                              domain='new.sftlyr.ws',
+                              notes='random notes')
+
+        self.assertEqual(result, True)
+        args = ({
             'hostname': 'new-host',
             'domain': 'new.sftlyr.ws',
             'notes': 'random notes',
-        }
+        },)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'editObject',
+                                identifier=100,
+                                args=args)
 
-        self.vs.edit(100, **args)
-        service.editObject.assert_called_once_with(args, id=100)
-
+    def test_edit_tags(self):
         # Test tag support
-        self.vs.edit(100, tags='dev,green')
-        service.setTags.assert_called_once_with('dev,green', id=100)
-        service.setTags.reset_mock()
-        self.vs.edit(100, tags='')
-        service.setTags.assert_called_once_with('', id=100)
+        result = self.vs.edit(100, tags='dev,green')
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'setTags',
+                                identifier=100,
+                                args=('dev,green',))
+
+    def test_edit_tags_blank(self):
+        result = self.vs.edit(100, tags='')
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'setTags',
+                                identifier=100,
+                                args=('',))
 
     def test_captures(self):
-        archive = self.client['Virtual_Guest'].createArchiveTransaction
-
         # capture only the OS disk
-        self.vs.capture(1, 'a')
-        archive.called_once_with('a', [{"device": 0}], "", id=1)
+        result = self.vs.capture(1, 'a')
 
-        archive.reset()
+        expected = fixtures.SoftLayer_Virtual_Guest.createArchiveTransaction
+        self.assertEqual(result, expected)
+        args = ('a', [], None)
+        self.assert_called_with('SoftLayer_Virtual_Guest',
+                                'createArchiveTransaction',
+                                args=args,
+                                identifier=1)
 
+    def test_capture_additional_disks(self):
         # capture all the disks, minus the swap
         # make sure the data is carried along with it
-        self.vs.capture(1, 'a', additional_disks=True)
-        archive.called_once_with('a', [{"device": 0, "uuid": 1},
-                                 {"device": 2, "uuid": 2}], "", id=1)
+        result = self.vs.capture(1, 'a', additional_disks=True)
+
+        expected = fixtures.SoftLayer_Virtual_Guest.createArchiveTransaction
+        self.assertEqual(result, expected)
+        args = ('a', [{'device': 0, 'uuid': 1},
+                      {'device': 1},
+                      {'device': 2, 'uuid': 2}], None)
+        self.assert_called_with('SoftLayer_Virtual_Guest',
+                                'createArchiveTransaction',
+                                args=args,
+                                identifier=1)
 
     def test_upgrade(self):
-        # Testing  Upgrade
-        order_client = self.client['Product_Order']
-
-        self.client['Product_Package'].getAllObjects.return_value = [
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [
             {'id': 46, 'name': 'Virtual Servers',
              'description': 'Virtual Server Instances',
              'type': {'keyName': 'VIRTUAL_SERVER_INSTANCE'}, 'isActive': 1},
         ]
 
         # test single upgrade
-        self.vs.upgrade(1, cpus=4, public=False)
-        order_client.placeOrder.called_once_with(1, cpus=4, public=False)
+        result = self.vs.upgrade(1, cpus=4, public=False)
 
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
+        call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
+        order_container = call.args[0]
+        self.assertEqual(order_container['prices'], [{'id': 1007}])
+        self.assertEqual(order_container['virtualGuests'], [{'id': 1}])
+
+    def test_upgrade_blank(self):
         # Now test a blank upgrade
-        self.vs.upgrade(1)
-        self.assertTrue(self.vs.upgrade, 1)
+        result = self.vs.upgrade(1)
 
+        self.assertEqual(result, False)
+        self.assertEqual(self.calls('SoftLayer_Product_Order', 'placeOrder'),
+                         [])
+
+    def test_upgrade_full(self):
         # Testing all parameters Upgrade
-        self.vs.upgrade(1, cpus=4, memory=2, nic_speed=1000, public=True)
-        args = {'cpus': 4, 'memory': 2, 'nic_speed': 1000, 'public': 1000}
-        order_client.placeOrder.called_once_with(1, **args)
+        result = self.vs.upgrade(1,
+                                 cpus=4,
+                                 memory=2,
+                                 nic_speed=1000,
+                                 public=True)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
+        call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
+        order_container = call.args[0]
+        self.assertEqual(order_container['prices'],
+                         [{'id': 1144}, {'id': 1133}, {'id': 1122}])
+        self.assertEqual(order_container['virtualGuests'], [{'id': 1}])
 
     def test_get_item_id_for_upgrade(self):
         item_id = 0

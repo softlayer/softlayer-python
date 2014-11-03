@@ -12,6 +12,7 @@ import json
 
 class RWhoisTests(testing.TestCase):
     def test_edit_nothing(self):
+
         result = self.run_command(['rwhois', 'edit'])
 
         self.assertEqual(result.exit_code, 2)
@@ -36,29 +37,31 @@ class RWhoisTests(testing.TestCase):
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(result.output, "")
 
-        service = self.client['Network_Subnet_Rwhois_Data']
-        service.editObject.assert_called_with(
-            {'city': 'Dallas',
-             'firstName': 'John',
-             'companyName': 'Company, Inc',
-             'address1': 'address line 1',
-             'address2': 'address line 2',
-             'lastName': 'Smith',
-             'abuseEmail': 'abuse@site.com',
-             'state': 'TX',
-             'country': 'United States',
-             'postalCode': '12345',
-             'privateResidenceFlag': True},
-            id='id')
+        self.assert_called_with('SoftLayer_Network_Subnet_Rwhois_Data',
+                                'editObject',
+                                args=({'city': 'Dallas',
+                                       'firstName': 'John',
+                                       'companyName': 'Company, Inc',
+                                       'address1': 'address line 1',
+                                       'address2': 'address line 2',
+                                       'lastName': 'Smith',
+                                       'abuseEmail': 'abuse@site.com',
+                                       'state': 'TX',
+                                       'country': 'United States',
+                                       'postalCode': '12345',
+                                       'privateResidenceFlag': True},),
+                                identifier='id')
 
     def test_edit_public(self):
         result = self.run_command(['rwhois', 'edit', '--public'])
 
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(result.output, "")
-        service = self.client['Network_Subnet_Rwhois_Data']
-        service.editObject.assert_called_with({'privateResidenceFlag': False},
-                                              id='id')
+
+        self.assert_called_with('SoftLayer_Network_Subnet_Rwhois_Data',
+                                'editObject',
+                                args=({'privateResidenceFlag': False},),
+                                identifier='id')
 
     def test_show(self):
         self.maxDiff = 100000

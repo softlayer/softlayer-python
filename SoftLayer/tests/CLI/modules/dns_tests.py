@@ -168,50 +168,56 @@ spf  IN TXT "v=spf1 ip4:192.0.2.0/24 ip4:198.51.100.123 a"
         path = os.path.join(testing.FIXTURE_PATH, 'realtest.com')
         result = self.run_command(['dns', 'import', path])
 
-        self.assertFalse(self.client['Dns_Domain'].createObject.called)
-        record_service = self.client['Dns_Domain_ResourceRecord']
-        self.assertEqual(record_service.createObject.call_args_list,
-                         [mock.call({'data': 'ns1.softlayer.com.',
-                                     'host': '@',
-                                     'domainId': 12345,
-                                     'type': 'NS',
-                                     'ttl': '86400'}),
-                          mock.call({'data': 'ns2.softlayer.com.',
-                                     'host': '@',
-                                     'domainId': 12345,
-                                     'type': 'NS',
-                                     'ttl': '86400'}),
-                          mock.call({'data': '127.0.0.1',
-                                     'host': 'testing',
-                                     'domainId': 12345,
-                                     'type': 'A',
-                                     'ttl': '86400'}),
-                          mock.call({'data': '12.12.0.1',
-                                     'host': 'testing1',
-                                     'domainId': 12345,
-                                     'type': 'A',
-                                     'ttl': '86400'}),
-                          mock.call({'data': '1.0.3.4',
-                                     'host': 'server2',
-                                     'domainId': 12345,
-                                     'type': 'A',
-                                     'ttl': None}),
-                          mock.call({'data': 'server2',
-                                     'host': 'ftp',
-                                     'domainId': 12345,
-                                     'type': 'CNAME',
-                                     'ttl': None}),
-                          mock.call({'data':
-                                     '"This is just a test of the txt record"',
-                                     'host': 'dev.realtest.com',
-                                     'domainId': 12345,
-                                     'type': 'TXT',
-                                     'ttl': None}),
-                          mock.call({'data': '"v=spf1 ip4:192.0.2.0/24 '
-                                             'ip4:198.51.100.123 a -all"',
-                                     'host': 'spf',
-                                     'domainId': 12345,
-                                     'type': 'TXT',
-                                     'ttl': None})])
+        self.assertEqual(self.calls('SoftLayer_Dns_Domain', 'createObject'),
+                         [])
+
+        calls = self.calls('SoftLayer_Dns_Domain_ResourceRecord',
+                           'createObject')
+        expected_calls = [{'data': 'ns1.softlayer.com.',
+                           'host': '@',
+                           'domainId': 12345,
+                           'type': 'NS',
+                           'ttl': '86400'},
+                          {'data': 'ns2.softlayer.com.',
+                           'host': '@',
+                           'domainId': 12345,
+                           'type': 'NS',
+                           'ttl': '86400'},
+                          {'data': '127.0.0.1',
+                           'host': 'testing',
+                           'domainId': 12345,
+                           'type': 'A',
+                           'ttl': '86400'},
+                          {'data': '12.12.0.1',
+                           'host': 'testing1',
+                           'domainId': 12345,
+                           'type': 'A',
+                           'ttl': '86400'},
+                          {'data': '1.0.3.4',
+                           'host': 'server2',
+                           'domainId': 12345,
+                           'type': 'A',
+                           'ttl': None},
+                          {'data': 'server2',
+                           'host': 'ftp',
+                           'domainId': 12345,
+                           'type': 'CNAME',
+                           'ttl': None},
+                          {'data':
+                           '"This is just a test of the txt record"',
+                           'host': 'dev.realtest.com',
+                           'domainId': 12345,
+                           'type': 'TXT',
+                           'ttl': None},
+                          {'data': '"v=spf1 ip4:192.0.2.0/24 '
+                                   'ip4:198.51.100.123 a -all"',
+                           'host': 'spf',
+                           'domainId': 12345,
+                           'type': 'TXT',
+                           'ttl': None}]
+
+        self.assertEqual(len(calls), len(expected_calls))
+        for call, expected_call in zip(calls, expected_calls):
+            self.assertDictEqual(call.args[0], expected_call)
 
         self.assertIn("Finished", result.output)

@@ -12,7 +12,7 @@ def get_settings_from_client(client):
     settings = {
         'username': '',
         'api_key': '',
-        'timeout': client.timeout or '',
+        'timeout': client.timeout or None,
         'endpoint_url': client.endpoint_url,
     }
     try:

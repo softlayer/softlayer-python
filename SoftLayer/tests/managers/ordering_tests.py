@@ -6,25 +6,23 @@
 """
 import SoftLayer
 from SoftLayer import testing
+from SoftLayer.testing import fixtures
 
 
 class OrderingTests(testing.TestCase):
 
     def set_up(self):
-        self.client = testing.FixtureClient()
         self.ordering = SoftLayer.OrderingManager(self.client)
 
     def test_get_package_by_type_returns_no_outlet_packages(self):
-        fixture_outlet_package_ids = [27, 28]
         packages = self._get_server_packages()
         filtered_packages = self.ordering.filter_outlet_packages(packages)
 
-        for package_id in fixture_outlet_package_ids:
+        for package_id in [27, 28]:
             self._assert_package_id_not_present(package_id, filtered_packages)
 
     def _get_server_packages(self):
-        mask = 'id, name, description, type, isActive'
-        return self.ordering.get_packages_of_type(['BARE_METAL_CPU'], mask)
+        return self.ordering.get_packages_of_type(['BARE_METAL_CPU'])
 
     def _assert_package_id_not_present(self, package_id, packages):
         package_ids = []
@@ -34,11 +32,10 @@ class OrderingTests(testing.TestCase):
         self.assertNotIn(package_id, package_ids)
 
     def test_get_active_packages(self):
-        fixture_inactive_package_ids = [15]
         packages = self._get_server_packages()
         filtered_packages = self.ordering.get_only_active_packages(packages)
 
-        for package_id in fixture_inactive_package_ids:
+        for package_id in [15]:
             self._assert_package_id_not_present(package_id, filtered_packages)
 
     def test_get_package_by_type_returns_if_found(self):
@@ -48,27 +45,32 @@ class OrderingTests(testing.TestCase):
         self.assertIsNotNone(package)
 
     def test_get_package_by_type_returns_none_if_not_found(self):
-        package_type = "PIZZA_FLAVORED_SERVERS"
-        mask = "mask[id, name]"
-        self.ordering.client['Product_Package'].getAllObjects.return_value = []
-        package = self.ordering.get_package_by_type(package_type, mask)
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = []
+
+        package = self.ordering.get_package_by_type("PIZZA_FLAVORED_SERVERS")
+
         self.assertIsNone(package)
 
     def test_get_package_id_by_type_returns_valid_id(self):
-        package_type = "VIRTUAL_SERVER_INSTANCE"
-        self.ordering.client['Product_Package'].getAllObjects.return_value = [
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [
             {'id': 46, 'name': 'Virtual Servers',
              'description': 'Virtual Server Instances',
              'type': {'keyName': 'VIRTUAL_SERVER_INSTANCE'}, 'isActive': 1},
         ]
+
+        package_type = "VIRTUAL_SERVER_INSTANCE"
         package_id = self.ordering.get_package_id_by_type(package_type)
+
         self.assertEqual(46, package_id)
 
     def test_get_package_id_by_type_fails_for_nonexistent_package_type(self):
-        package_type = "STRAWBERRY_FLAVORED_SERVERS"
-        self.ordering.client['Product_Package'].getAllObjects.return_value = []
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = []
+
         with self.assertRaises(ValueError):
-            self.ordering.get_package_id_by_type(package_type)
+            self.ordering.get_package_id_by_type("STRAWBERRY_FLAVORED_SERVERS")
 
     def test_get_order_container(self):
         container = self.ordering.get_order_container(1234)
@@ -88,24 +90,22 @@ class OrderingTests(testing.TestCase):
         self.assertEqual(quote, quote_fixture)
 
     def test_verify_quote(self):
-        order_service = self.ordering.client['Product_Order']
         result = self.ordering.verify_quote(1234,
                                             [{'hostname': 'test1',
                                               'domain': 'example.com'}],
                                             quantity=1)
 
-        self.assertEqual(result, order_service.verifyOrder())
-        self.assertTrue(order_service.verifyOrder.called)
+        self.assertEqual(result, fixtures.SoftLayer_Product_Order.verifyOrder)
+        self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder')
 
     def test_order_quote(self):
-        order_service = self.ordering.client['Product_Order']
-        result = self.ordering.verify_quote(1234,
-                                            [{'hostname': 'test1',
-                                              'domain': 'example.com'}],
-                                            quantity=1)
+        result = self.ordering.order_quote(1234,
+                                           [{'hostname': 'test1',
+                                             'domain': 'example.com'}],
+                                           quantity=1)
 
-        self.assertEqual(result, order_service.placeOrder())
-        self.assertTrue(order_service.placeOrder.called)
+        self.assertEqual(result, fixtures.SoftLayer_Product_Order.placeOrder)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
 
     def test_generate_order_template(self):
         result = self.ordering.generate_order_template(

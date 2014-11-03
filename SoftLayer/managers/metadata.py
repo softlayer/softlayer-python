@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import SoftLayer
 from SoftLayer import consts
 from SoftLayer import exceptions
 from SoftLayer import transports
@@ -55,8 +56,11 @@ class MetadataManager(object):
     attribs = METADATA_MAPPING
 
     def __init__(self, client=None, timeout=5):
-        self.url = consts.API_PRIVATE_ENDPOINT_REST.rstrip('/')
-        self.timeout = timeout
+        url = consts.API_PRIVATE_ENDPOINT_REST.rstrip('/')
+        if client is None:
+            client = SoftLayer.Client(endpoint_url=url,
+                                      timeout=timeout,
+                                      transport=transports.RestTransport())
         self.client = client
 
     def get(self, name, param=None):
@@ -76,16 +80,10 @@ class MetadataManager(object):
                 raise exceptions.SoftLayerError(
                     'Parameter required to get this attribute.')
 
-        request = transports.Request()
-        request.endpoint = self.url
-        request.service = 'SoftLayer_Resource_Metadata'
-        request.method = self.attribs[name]['call']
-        request.transport_headers = {'User-Agent': consts.USER_AGENT}
-        request.timeout = self.timeout
-        request.identifier = param
-
         try:
-            return transports.make_rest_api_call(request)
+            return self.client.call('Resource_Metadata',
+                                    self.attribs[name]['call'],
+                                    id=param)
         except exceptions.SoftLayerAPIError as ex:
             if ex.faultCode == 404:
                 return None
