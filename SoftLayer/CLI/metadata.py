@@ -16,18 +16,21 @@ META_MAPPING = {
 @click.command(epilog="These commands only work on devices on the backend "
                       "SoftLayer network. This allows for self-discovery for "
                       "newly provisioned resources.")
-@click.argument('prop', type=click.Choice(['backend_ip',
-                                           'backend_mac',
-                                           'datacenter',
-                                           'datacenter_id',
-                                           'fqdn',
-                                           'frontend_mac',
-                                           'id',
-                                           'ip',
-                                           'network',
-                                           'provision_state',
-                                           'tags',
-                                           'user_data']))
+
+@click.option('--backend_ip', 'prop', flag_value='backend_ip')
+@click.option('--backend_mac', 'prop', flag_value='backend_mac')
+@click.option('--datacenter', 'prop', flag_value='datacenter')
+@click.option('--datacenter_id', 'prop', flag_value='datacenter_id')
+@click.option('--fqdn', 'prop', flag_value='fqdn')
+@click.option('--frontend_mac', 'prop', flag_value='frontend_mac')
+@click.option('--id', 'prop', flag_value='id')
+@click.option('--ip', 'prop', flag_value='ip')
+@click.option('--network', 'prop', flag_value='network')
+@click.option('--provision_state', 'prop', flag_value='provision_state')
+@click.option('--tags', 'prop', flag_value='tags')
+@click.option('--user_data', 'prop', flag_value='user_data')
+
+
 def cli(prop):
     """Find details about this machine."""
 
