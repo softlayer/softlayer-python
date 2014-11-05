@@ -9,18 +9,18 @@ import click
 
 
 META_CHOICES = [
- 'backend_ip',
- 'backend_mac',
- 'datacenter',
- 'datacenter_id',
- 'fqdn',
- 'frontend_mac',
- 'id',
- 'ip',
- 'network',
- 'provision_state',
- 'tags',
- 'user_data',
+    'backend_ip',
+    'backend_mac',
+    'datacenter',
+    'datacenter_id',
+    'fqdn',
+    'frontend_mac',
+    'id',
+    'ip',
+    'network',
+    'provision_state',
+    'tags',
+    'user_data',
 ]
 
 META_MAPPING = {
@@ -28,22 +28,34 @@ META_MAPPING = {
     'ip': 'primary_ip',
 }
 
-HELP="""Find details about this machine
+HELP = """Find details about this machine
 
 \b
-PROP Choices 
+PROP Choices
 %s
-\b 
+\b
 Examples :
 %s
-""" %('*'+'\n*'.join(META_CHOICES),'sl metadata '+'\nsl metadata '.join(META_CHOICES))
+""" % ('*'+'\n*'.join(META_CHOICES), 'sl metadata '+'\nsl metadata '.join(META_CHOICES))
+
+
 @click.command(help=HELP,
                short_help="Find details about this machine.",
                epilog="These commands only work on devices on the backend "
                       "SoftLayer network. This allows for self-discovery for "
                       "newly provisioned resources.")
-
-
+@click.argument('prop', type=click.Choice(['backend_ip',
+                                           'backend_mac',
+                                           'datacenter',
+                                           'datacenter_id',
+                                           'fqdn',
+                                           'frontend_mac',
+                                           'id',
+                                           'ip',
+                                           'network',
+                                           'provision_state',
+                                           'tags',
+                                           'user_data']))
 def cli(prop):
     """Find details about this machine."""
 
