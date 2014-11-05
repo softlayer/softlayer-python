@@ -14,7 +14,7 @@ import click
 @click.argument('identifier')
 @click.option('--postinstall', '-i', help="Post-install script to download")
 @helpers.multi_option('--key', '-k',
-              help="SSH keys to add to the root user")
+                      help="SSH keys to add to the root user")
 @environment.pass_env
 def cli(env, identifier, postinstall, key):
     """Reload operating system on a virtual server."""

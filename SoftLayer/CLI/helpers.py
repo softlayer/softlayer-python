@@ -11,12 +11,17 @@ import click
 
 
 def multi_option(*param_decls, **attrs):
+    """
+    modify help text to highlight that multiple occurance on this option are permitted
+    :param param_decls:
+    :param attrs:
+    :return:
+    """
     attrhelp = attrs.get('help', None)
     if attrhelp is not None:
         newhelp = attrhelp + " (multiple occurrence permitted)"
         attrs['help'] = newhelp
-        attrs['multiple'] = True
-
+    attrs['multiple'] = True
     return click.option(*param_decls, **attrs)
 
 
