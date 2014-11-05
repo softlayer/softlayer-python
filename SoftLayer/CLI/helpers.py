@@ -7,7 +7,17 @@
 """
 
 from SoftLayer.CLI import exceptions
+import click
 
+
+def multi_option(*param_decls, **attrs):
+    attrhelp = attrs.get('help')
+    if attrhelp is not None:
+        newhelp = attrhelp +"(multiple occurrence permitted)"
+        attrs['help'] = newhelp
+        attrs['multiple'] = True
+
+    return click.option(*param_decls, **attrs)
 
 def resolve_id(resolver, identifier, name='object'):
     """Resolves a single id using a resolver function.
