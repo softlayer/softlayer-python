@@ -11,5 +11,3 @@ docs/_build/*
 build/*
 dist/*
 *.egg-info
-.slenv/*
-.idea/*
