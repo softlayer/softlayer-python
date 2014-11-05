@@ -36,7 +36,8 @@ PROP Choices
 \b
 Examples :
 %s
-""" % ('*'+'\n*'.join(META_CHOICES), 'sl metadata '+'\nsl metadata '.join(META_CHOICES))
+""" % ('*'+'\n*'.join(META_CHOICES),
+       'sl metadata '+'\nsl metadata '.join(META_CHOICES))
 
 
 @click.command(help=HELP,
