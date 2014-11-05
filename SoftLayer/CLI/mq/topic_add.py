@@ -4,6 +4,7 @@
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import mq
+from SoftLayer.CLI import helpers
 
 import click
 
@@ -24,7 +25,7 @@ import click
               type=click.INT,
               default=604800,
               help="Time in seconds that messages will live")
-@click.option('--tag', '-g', multiple=True, help="Tags to add to the topic")
+@helpers.multi_option('--tag', '-g', help="Tags to add to the topic")
 @environment.pass_env
 def cli(env, account_id, topic_name, datacenter, network,
         visibility_interval, expiration, tag):

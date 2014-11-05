@@ -50,10 +50,10 @@ The hourly rate is only available on bare metal instances""")
               help="Read userdata from file",
               type=click.Path(exists=True, readable=True, resolve_path=True))
 @click.option('--postinstall', '-i', help="Post-install script to download")
-@click.option('--key', '-k',
-              multiple=True,
+@helpers.multi_option('--key', '-k',
               help="SSH keys to add to the root user")
-@click.option('--disk', multiple=True, help="Disk sizes")
+
+@helpers.multi_option('--disk', help="Disk sizes")
 @click.option('--controller', help="The RAID configuration for the server")
 @click.option('--private',
               is_flag=True,
