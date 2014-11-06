@@ -60,17 +60,16 @@ class CallCliTests(testing.TestCase):
         result = self.run_command(['call-api', 'Service', 'method'],
                                   fmt='table')
 
+        print result.output
         self.assertEqual(result.exit_code, 0)
-        self.assertEqual(result.output, """:........:........:
-:   Name : Value  :
-:........:........:
-:    int : 10     :
-:   None : None   :
-:  float : 1.0    :
-:   Bool : True   :
-: string : string :
-:........:........:
-""")
+        self.assertIn(":........:........:", result.output)
+        self.assertIn(":   Name : Value  :", result.output)
+        self.assertIn(":    int : 10     :", result.output)
+        self.assertIn(":   None : None   :", result.output)
+        self.assertIn(":  float : 1.0    :", result.output)
+        self.assertIn(":   Bool : True   :", result.output)
+        self.assertIn(": string : string :", result.output)
+        self.assertIn(":........:........:", result.output)
 
     def test_object_nested(self):
         mock = self.set_mock('SoftLayer_Service', 'method')
