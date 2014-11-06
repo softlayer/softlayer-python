@@ -4,7 +4,9 @@
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 from SoftLayer import utils
+
 
 import click
 
@@ -25,7 +27,7 @@ import click
 @click.option('--hostname', '-H', help='Filter by hostname')
 @click.option('--memory', '-m', help='Filter by memory in gigabytes')
 @click.option('--network', '-n', help='Filter by network port speed in Mbps')
-@click.option('--tag', multiple=True, help='Filter by tags')
+@helpers.multi_option('--tag', help='Filter by tags')
 @environment.pass_env
 def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag):
     """List hardware servers."""

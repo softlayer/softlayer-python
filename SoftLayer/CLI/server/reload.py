@@ -13,9 +13,8 @@ import click
 @click.command()
 @click.argument('identifier')
 @click.option('--postinstall', '-i', help="SSH keys to add to the root user")
-@click.option('--key', '-k',
-              multiple=True,
-              help="""Post-install script to download
+@helpers.multi_option('--key', '-k',
+                      help="""Post-install script to download
  (Only HTTPS executes, HTTP leaves file in /root)""")
 @environment.pass_env
 def cli(env, identifier, postinstall, key):
