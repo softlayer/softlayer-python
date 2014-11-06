@@ -3,8 +3,9 @@
 
 import SoftLayer
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import mq
 from SoftLayer.CLI import helpers
+from SoftLayer.CLI import mq
+
 
 import click
 

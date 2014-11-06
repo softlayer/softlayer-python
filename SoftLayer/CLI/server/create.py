@@ -52,7 +52,6 @@ The hourly rate is only available on bare metal instances""")
 @click.option('--postinstall', '-i', help="Post-install script to download")
 @helpers.multi_option('--key', '-k',
                       help="SSH keys to add to the root user")
-
 @helpers.multi_option('--disk', help="Disk sizes")
 @click.option('--controller', help="The RAID configuration for the server")
 @click.option('--private',
