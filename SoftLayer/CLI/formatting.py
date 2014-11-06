@@ -251,7 +251,6 @@ class Table(object):
         self.columns = columns
         self.rows = []
         self.align = {}
-        self.format = {}
         self.sortby = None
 
     def add_row(self, row):

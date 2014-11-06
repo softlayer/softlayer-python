@@ -56,8 +56,22 @@ def format_api_dict(result):
 
 def format_api_list(result):
     """Format list responses into a table."""
-    # Gather all unique keys from every value
-    # Note(kmcdonald): This assumes we only return lists of objects.
+
+    if not result:
+        return result
+
+    if isinstance(result[0], dict):
+        return format_api_list_objects(result)
+
+    table = formatting.Table(["Value"])
+    for item in result:
+        table.add_row([format_api_result(item)])
+    return table
+
+
+def format_api_list_objects(result):
+    """Format list of objects into a table."""
+
     all_keys = set()
     for item in result:
         all_keys = all_keys.union(item.keys())
