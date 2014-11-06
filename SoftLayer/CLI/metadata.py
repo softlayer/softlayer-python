@@ -44,18 +44,7 @@ Examples :
                epilog="These commands only work on devices on the backend "
                       "SoftLayer network. This allows for self-discovery for "
                       "newly provisioned resources.")
-@click.argument('prop', type=click.Choice(['backend_ip',
-                                           'backend_mac',
-                                           'datacenter',
-                                           'datacenter_id',
-                                           'fqdn',
-                                           'frontend_mac',
-                                           'id',
-                                           'ip',
-                                           'network',
-                                           'provision_state',
-                                           'tags',
-                                           'user_data']))
+@click.argument('prop', type=click.Choice(META_CHOICES))
 def cli(prop):
     """Find details about this machine."""
 
