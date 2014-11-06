@@ -12,7 +12,7 @@ import click
 
 def multi_option(*param_decls, **attrs):
     """
-    modify help text to highlight that a option is permitted multiple times
+    modify help text and indicate option is permitted multiple times
     :param param_decls:
     :param attrs:
     :return:
