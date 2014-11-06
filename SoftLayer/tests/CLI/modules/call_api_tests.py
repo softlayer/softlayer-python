@@ -60,8 +60,8 @@ class CallCliTests(testing.TestCase):
         result = self.run_command(['call-api', 'Service', 'method'],
                                   fmt='table')
 
-        print result.output
         self.assertEqual(result.exit_code, 0)
+        # NOTE(kmcdonald): Order is not guaranteed
         self.assertIn(":........:........:", result.output)
         self.assertIn(":   Name : Value  :", result.output)
         self.assertIn(":    int : 10     :", result.output)
