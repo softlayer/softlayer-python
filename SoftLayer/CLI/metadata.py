@@ -7,13 +7,41 @@ from SoftLayer.CLI import formatting
 
 import click
 
+META_CHOICES = [
+    'backend_ip',
+    'backend_mac',
+    'datacenter',
+    'datacenter_id',
+    'fqdn',
+    'frontend_mac',
+    'id',
+    'ip',
+    'network',
+    'provision_state',
+    'tags',
+    'user_data',
+]
+
 META_MAPPING = {
     'backend_ip': 'primary_backend_ip',
     'ip': 'primary_ip',
 }
 
+HELP = """Find details about this machine
 
-@click.command(epilog="These commands only work on devices on the backend "
+\b
+PROP Choices
+%s
+\b
+Examples :
+%s
+""" % ('*'+'\n*'.join(META_CHOICES),
+       'sl metadata '+'\nsl metadata '.join(META_CHOICES))
+
+
+@click.command(help=HELP,
+               short_help="Find details about this machine.",
+               epilog="These commands only work on devices on the backend "
                       "SoftLayer network. This allows for self-discovery for "
                       "newly provisioned resources.")
 @click.argument('prop', type=click.Choice(['backend_ip',
