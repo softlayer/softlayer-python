@@ -7,12 +7,6 @@
 
     :license: MIT, see LICENSE for more details.
 """
-try:
-    # Python 3.x compatibility
-    import builtins  # NOQA
-    builtins_name = 'builtins'
-except ImportError:
-    builtins_name = '__builtin__'
 
 import mock
 
@@ -141,35 +135,26 @@ class ServerCLITests(testing.TestCase):
             {
                 'datacenter': 'TEST00',
                 'primary_ip': '172.16.1.100',
-                'host': 'hardware-test1.test.sftlyr.ws',
-                'memory': 2048,
-                'cores': 2,
+                'host': 'hardware-test1',
                 'id': 1000,
                 'backend_ip': '10.1.0.2',
-                'active_transaction': 'TXN_NAME',
-                'owner': 'chechu'
+                'action': 'TXN_NAME',
             },
             {
                 'datacenter': 'TEST00',
                 'primary_ip': '172.16.4.94',
-                'host': 'hardware-test2.test.sftlyr.ws',
-                'memory': 4096,
-                'cores': 4,
+                'host': 'hardware-test2',
                 'id': 1001,
                 'backend_ip': '10.1.0.3',
-                'active_transaction': None,
-                'owner': 'chechu'
+                'action': None,
             },
             {
                 'datacenter': 'TEST00',
                 'primary_ip': '172.16.4.95',
-                'host': 'hardware-bad-memory.test.sftlyr.ws',
-                'memory': 0,
-                'cores': 4,
+                'host': 'hardware-bad-memory',
                 'id': 1002,
                 'backend_ip': '10.1.0.4',
-                'active_transaction': None,
-                'owner': 'chechu'
+                'action': None,
             }
         ]
 

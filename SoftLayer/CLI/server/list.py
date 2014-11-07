@@ -47,12 +47,9 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag):
         'id',
         'datacenter',
         'host',
-        'cores',
-        'memory',
         'primary_ip',
         'backend_ip',
-        'active_transaction',
-        'owner'
+        'action',
     ])
     table.sortby = sortby
 
@@ -62,15 +59,10 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag):
         table.add_row([
             server['id'],
             server['datacenter']['name'] or formatting.blank(),
-            server['fullyQualifiedDomainName'],
-            server['processorPhysicalCoreAmount'],
-            formatting.gb(server['memoryCapacity'] or 0),
+            server['hostname'],
             server['primaryIpAddress'] or formatting.blank(),
             server['primaryBackendIpAddress'] or formatting.blank(),
             formatting.active_txn(server),
-            utils.lookup(
-                server, 'billingItem', 'orderItem', 'order', 'userRecord',
-                'username') or formatting.blank(),
         ])
 
     return table

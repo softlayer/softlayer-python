@@ -51,10 +51,13 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
                                 nic_speed=network,
                                 tags=tag_list)
 
-    table = formatting.Table([
-        'id', 'datacenter', 'host', 'cores', 'memory', 'primary_ip',
-        'backend_ip', 'active_transaction', 'owner'
-    ])
+    table = formatting.Table(['id',
+                              'datacenter',
+                              'host',
+                              'primary_ip',
+                              'backend_ip',
+                              'action',
+                              ])
     table.sortby = sortby or 'host'
 
     for guest in guests:
@@ -62,14 +65,10 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
         table.add_row([
             guest['id'],
             guest['datacenter']['name'] or formatting.blank(),
-            guest['fullyQualifiedDomainName'],
-            guest['maxCpu'],
-            formatting.mb_to_gb(guest['maxMemory']),
+            guest['hostname'],
             guest['primaryIpAddress'] or formatting.blank(),
             guest['primaryBackendIpAddress'] or formatting.blank(),
             formatting.active_txn(guest),
-            utils.lookup(guest, 'billingItem', 'orderItem', 'order',
-                         'userRecord', 'username') or formatting.blank(),
         ])
 
     return table

@@ -20,22 +20,16 @@ class DnsTests(testing.TestCase):
         self.assertEqual(json.loads(result.output),
                          [{'datacenter': 'TEST00',
                            'primary_ip': '172.16.240.2',
-                           'host': 'vs-test1.test.sftlyr.ws',
-                           'memory': 1024,
-                           'cores': 2,
-                           'active_transaction': None,
+                           'host': 'vs-test1',
+                           'action': None,
                            'id': 100,
-                           'backend_ip': '10.45.19.37',
-                           'owner': 'chechu'},
+                           'backend_ip': '10.45.19.37'},
                           {'datacenter': 'TEST00',
                            'primary_ip': '172.16.240.7',
-                           'host': 'vs-test2.test.sftlyr.ws',
-                           'memory': 4096,
-                           'cores': 4,
-                           'active_transaction': None,
+                           'host': 'vs-test2',
+                           'action': None,
                            'id': 104,
-                           'backend_ip': '10.45.19.35',
-                           'owner': 'chechu'}])
+                           'backend_ip': '10.45.19.35'}])
 
     def test_detail_vs(self):
         result = self.run_command(['vs', 'detail', '100',

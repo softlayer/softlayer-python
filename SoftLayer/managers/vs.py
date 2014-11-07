@@ -87,7 +87,6 @@ class VSManager(utils.IdentifierMixin, object):
                 'datacenter',
                 'activeTransaction.transactionStatus[friendlyName,name]',
                 'status',
-                'billingItem.orderItem.order.userRecord[username]'
             ]
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
