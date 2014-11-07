@@ -22,13 +22,13 @@ class DnsTests(testing.TestCase):
                            'primary_ip': '172.16.240.2',
                            'host': 'vs-test1',
                            'action': None,
-                           'id': 100,
+                           'globalIdentifier': '1a2b3c-1701',
                            'backend_ip': '10.45.19.37'},
                           {'datacenter': 'TEST00',
                            'primary_ip': '172.16.240.7',
                            'host': 'vs-test2',
                            'action': None,
-                           'id': 104,
+                           'globalIdentifier': '05a8ac-6abf0',
                            'backend_ip': '10.45.19.35'}])
 
     def test_detail_vs(self):

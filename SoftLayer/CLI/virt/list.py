@@ -51,13 +51,14 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
                                 nic_speed=network,
                                 tags=tag_list)
 
-    table = formatting.Table(['globalIdentifier',
-                              'host',
-                              'primary_ip',
-                              'backend_ip',
-                              'datacenter',
-                              'action',
-                              ])
+    table = formatting.Table([
+        'globalIdentifier',
+        'host',
+        'primary_ip',
+        'backend_ip',
+        'datacenter',
+        'action',
+    ])
     table.sortby = sortby or 'host'
 
     for guest in guests:
