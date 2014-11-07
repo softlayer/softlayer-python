@@ -51,11 +51,11 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
                                 nic_speed=network,
                                 tags=tag_list)
 
-    table = formatting.Table(['id',
-                              'datacenter',
+    table = formatting.Table(['globalIdentifier',
                               'host',
                               'primary_ip',
                               'backend_ip',
+                              'datacenter',
                               'action',
                               ])
     table.sortby = sortby or 'host'
@@ -63,11 +63,11 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
     for guest in guests:
         guest = utils.NestedDict(guest)
         table.add_row([
-            guest['id'],
-            guest['datacenter']['name'] or formatting.blank(),
+            guest['globalIdentifier'] or guest['id'],
             guest['hostname'],
             guest['primaryIpAddress'] or formatting.blank(),
             guest['primaryBackendIpAddress'] or formatting.blank(),
+            guest['datacenter']['name'] or formatting.blank(),
             formatting.active_txn(guest),
         ])
 

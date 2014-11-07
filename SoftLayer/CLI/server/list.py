@@ -44,11 +44,11 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag):
         tags=tag)
 
     table = formatting.Table([
-        'id',
-        'datacenter',
+        'globalIdentifier',
         'host',
         'primary_ip',
         'backend_ip',
+        'datacenter',
         'action',
     ])
     table.sortby = sortby
@@ -57,11 +57,11 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag):
         server = utils.NestedDict(server)
 
         table.add_row([
-            server['id'],
-            server['datacenter']['name'] or formatting.blank(),
+            server['globalIdentifier'] or server['id'],
             server['hostname'],
             server['primaryIpAddress'] or formatting.blank(),
             server['primaryBackendIpAddress'] or formatting.blank(),
+            server['datacenter']['name'] or formatting.blank(),
             formatting.active_txn(server),
         ])
 
