@@ -12,13 +12,11 @@ import click
 @click.command()
 @click.option('--sortby',
               help='Column to sort by',
-              type=click.Choice(['id',
-                                 'datacenter',
-                                 'host',
-                                 'cores',
-                                 'memory',
+              type=click.Choice(['guid',
+                                 'hostname',
                                  'primary_ip',
-                                 'backend_ip']))
+                                 'backend_ip',
+                                 'datacenter']))
 @click.option('--cpu', '-c', help='Number of CPU cores', type=click.INT)
 @click.option('--domain', '-D', help='Domain portion of the FQDN')
 @click.option('--datacenter', '-d', help='Datacenter shortname')
@@ -52,14 +50,14 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
                                 tags=tag_list)
 
     table = formatting.Table([
-        'globalIdentifier',
-        'host',
+        'guid',
+        'hostname',
         'primary_ip',
         'backend_ip',
         'datacenter',
         'action',
     ])
-    table.sortby = sortby or 'host'
+    table.sortby = sortby or 'hostname'
 
     for guest in guests:
         guest = utils.NestedDict(guest)
