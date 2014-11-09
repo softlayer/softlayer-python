@@ -680,3 +680,102 @@ class VSManager(utils.IdentifierMixin, object):
                         return item['prices'][0]['id']
                 else:
                     return item['prices'][0]['id']
+
+    def _generate_prices_ids(self, price_ids):
+        prices = []
+        for id in price_ids:
+            prices.append({'id': id})
+        return prices
+
+    def _generate_virtual_guests_options(self, domain, hostname, public_vlan=None, private_vlan=None):
+        virtual_guests = {
+            'domain': domain,
+            'hostname': hostname,
+            'privateNetworkOnlyFlag': False,
+            'bareMetalInstanceFlag': False
+        }
+
+        if public_vlan:
+            virtual_guests['primaryNetworkComponent'] = {
+                "networkVlan": {"id": int(public_vlan)}}
+        if private_vlan:
+            virtual_guests['primaryBackendNetworkComponent'] = {
+                "networkVlan": {"id": int(private_vlan)}}
+
+        return virtual_guests
+
+    def _generate_place_order_options(self, location, hostname, domain,
+                                      use_hourly_pricing=False, quantity=1, provision_scripts=None,
+                                      private_vlan=None, public_vlan=None,
+                                      image_template_global_identifier=None, image_template_id=None,
+                                      ssh_keys=None, price_ids=[]):
+        """ Generates the order options of the desired virtual guest
+
+        :param location: The location to use for the desired server
+        :param hostname: The hostname to use for the desired server.
+        :param domain: The domain to use for the desired server.
+        :param bool use_hourly_pricing: Flag to indicate if this server should be billed
+                            hourly (default) or monthly.
+        :param quantity: The quantity of the desired server
+        :param list provision_scripts: A list of the URIs of the post-install
+                                scripts to run after reload.
+        :param int public_vlan: The ID of the public VLAN on which you want
+                                this VS placed.
+        :param int private_vlan: The ID of the public VLAN on which you want
+                                 this VS placed.
+        :param ssh_keys: The SSH keys to add to the root user.
+        :param price_ids: The list of price ids
+        """
+        #
+        # required = [location, hostname, domain]
+        # if not all(required):
+        #     raise ValueError("{0} are required".format(required))
+
+        virtual_guest = self._generate_virtual_guests_options(
+            domain=domain, hostname=hostname, private_vlan=private_vlan, public_vlan=public_vlan)
+        prices = self._generate_prices_ids(price_ids)
+
+        order_options = {
+            'packageId': 46,
+            'location': location,
+            'prices': prices,
+            'virtualGuests': [virtual_guest],
+            'provisionScripts': [],
+            'quantity': quantity,
+            'useHourlyPricing': use_hourly_pricing,
+            }
+        if provision_scripts:
+            order_options['provisionScripts'] = provision_scripts
+        if ssh_keys:
+            order_options['sshKeys'] = [{'sshKeyIds': ssh_keys}]
+        if image_template_global_identifier:
+            order_options['imageTemplateGlobalIdentifier'] = image_template_global_identifier
+        if image_template_id:
+            order_options['imageTemplateId'] = image_template_id
+
+        return order_options
+
+    def verify_place_order(self, **kwargs):
+        place_order_options = self._generate_place_order_options(**kwargs)
+        return self.client['Product_Order'].verifyOrder(place_order_options)
+
+    def place_order(self, **kwargs):
+        """ Places an order.
+
+        :param location: The location to use for the desired server
+        :param hostname: The hostname to use for the desired server.
+        :param domain: The domain to use for the desired server.
+        :param bool use_hourly_pricing: Flag to indicate if this server should be billed
+                            hourly (default) or monthly.
+        :param quantity: The quantity of the desired server
+        :param list provision_scripts: A list of the URIs of the post-install
+                                scripts to run after reload.
+        :param int public_vlan: The ID of the public VLAN on which you want
+                                this VS placed.
+        :param int private_vlan: The ID of the public VLAN on which you want
+                                 this VS placed.
+        :param ssh_keys: The SSH keys to add to the root user.
+        :param price_ids: The list of price ids
+        """
+        place_order_options = self._generate_place_order_options(**kwargs)
+        return self.client['Product_Order'].placeOrder(place_order_options)
