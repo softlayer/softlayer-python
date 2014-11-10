@@ -692,15 +692,14 @@ class VSManager(utils.IdentifierMixin, object):
             'domain': domain,
             'hostname': hostname,
             'privateNetworkOnlyFlag': False,
-            'bareMetalInstanceFlag': False
         }
 
         if public_vlan:
             virtual_guests['primaryNetworkComponent'] = {
-                "networkVlan": {"id": int(public_vlan)}}
+                'networkVlan': {'id': int(public_vlan)}}
         if private_vlan:
             virtual_guests['primaryBackendNetworkComponent'] = {
-                "networkVlan": {"id": int(private_vlan)}}
+                'networkVlan': {'id': int(private_vlan)}}
 
         return virtual_guests
 
@@ -740,7 +739,6 @@ class VSManager(utils.IdentifierMixin, object):
             'location': location,
             'prices': prices,
             'virtualGuests': [virtual_guest],
-            'provisionScripts': [],
             'quantity': quantity,
             'useHourlyPricing': use_hourly_pricing,
             }
