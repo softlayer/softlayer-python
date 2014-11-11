@@ -118,3 +118,8 @@ class ImageManager(utils.IdentifierMixin, object):
             return True
         else:
             return False
+
+    def import_image_from_uri(self, data):
+        """Import images which match the given uri."""
+        result = self.vgbdtg.createFromExternalSource(data)
+        return result['id'], result['name']

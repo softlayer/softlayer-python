@@ -130,3 +130,11 @@ class ImageTests(testing.TestCase):
         self.assert_called_with(IMAGE_SERVICE, 'editObject',
                                 identifier=1,
                                 args=({'name': 'abc', 'note': 'xyz'},))
+
+    def test_import_invalid_image(self):
+        # Test updating tags
+        self.image.import_image_from_uri(1, {name:"test", note:"testimage", uri:"invaliduri"})
+
+        self.assert_called_with(IMAGE_SERVICE, 'createFromExternalSource',
+                                identifier=1,
+                                args=({name:"test", note:"testimage", uri:"invaliduri"},))
