@@ -32,9 +32,10 @@ def cli(env, name, note, osrefcode, uri):
     if uri:
         data['uri'] = uri
 
-    #not sure if u should validate here or not
-    #if uri.endswith(".vhd") and osrefcode == "":
+    # not sure if u should validate here or not
+    # if uri.endswith(".vhd") and osrefcode == "":
     #    raise exceptions.CLIAbort("Please specify osrefcode for .vhdImage")
+
     newimage = image_mgr.import_image_from_uri(data)
     if not newimage:
         raise exceptions.CLIAbort("Failed to import Image")
