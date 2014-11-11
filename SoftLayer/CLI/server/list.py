@@ -52,7 +52,8 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag):
 
     for server in servers:
         server = utils.NestedDict(server)
-
+        # NOTE(kmcdonald): There are cases where a server might not have a
+        #                  globalIdentifier.
         table.add_row([
             server['globalIdentifier'] or server['id'],
             server['hostname'],
