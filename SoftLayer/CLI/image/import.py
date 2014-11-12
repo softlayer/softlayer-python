@@ -4,6 +4,7 @@
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 
 
 import click
@@ -23,6 +24,7 @@ def cli(env, name, note, osrefcode, uri):
 
     image_mgr = SoftLayer.ImageManager(env.client)
     data = {}
+    output = []
     if name:
         data['name'] = name
     if note:
@@ -36,8 +38,17 @@ def cli(env, name, note, osrefcode, uri):
     # if uri.endswith(".vhd") and osrefcode == "":
     #    raise exceptions.CLIAbort("Please specify osrefcode for .vhdImage")
 
-    newimage = image_mgr.import_image_from_uri(data)
-    if not newimage:
+    result = image_mgr.import_image_from_uri(data)
+
+    if not result:
         raise exceptions.CLIAbort("Failed to import Image")
 
-    return 'Image %s was imported succesfully!' % newimage
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
+    table.add_row(['name', result['name']])
+    table.add_row(['id', result['id']])
+    table.add_row(['created', result['createDate']])
+    table.add_row(['guid', result['globalIdentifier']])
+    output.append(table)
+    return output

@@ -38,7 +38,7 @@ class ImageManager(utils.IdentifierMixin, object):
     def delete_image(self, image_id):
         """Deletes the specified image.
 
-        :param int image: The ID of the image.
+        :param int image_id: The ID of the image.
         """
         self.vgbdtg.deleteObject(id=image_id)
 
@@ -100,7 +100,7 @@ class ImageManager(utils.IdentifierMixin, object):
     def edit(self, image_id, name=None, note=None, tag=None):
         """Edit image related details.
 
-        :param int image: The ID of the image
+        :param int image_id: The ID of the image
         :param string name: Name of the Image.
         :param string note: Note of the image.
         :param string tag: Tags of the image to be updated to.
@@ -122,4 +122,4 @@ class ImageManager(utils.IdentifierMixin, object):
     def import_image_from_uri(self, data):
         """Import images which match the given uri."""
         result = self.vgbdtg.createFromExternalSource(data)
-        return result['name']
+        return result
