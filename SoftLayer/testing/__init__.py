@@ -116,8 +116,7 @@ class TestCase(unittest.TestCase):
         """
 
         for call in self.calls(service, method):
-            if all([getattr(call, prop) == value
-                    for prop, value in props.items()]):
+            if call_has_props(call, props):
                 return
 
         self.fail('%s::%s was not called with given properties: %s'
@@ -144,5 +143,23 @@ class TestCase(unittest.TestCase):
 
         runner = testing.CliRunner()
         return runner.invoke(core.cli, args=args, obj=env or self.env)
+
+
+def call_has_props(call, props):
+    """Check if a call has matching properties of a given props dictionary."""
+
+    for prop, value in props.items():
+        call_value = getattr(call, prop)
+        if call_value != value:
+            logging.info('%s::%s property mismatch(%s): %r != %r',
+                         call.service,
+                         call.method,
+                         prop,
+                         value,
+                         call_value)
+            return False
+
+    return True
+
 
 __all__ = ['unittest']
