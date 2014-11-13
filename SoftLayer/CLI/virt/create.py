@@ -39,9 +39,6 @@ import click
 @click.option('--export',
               type=click.Path(writable=True, resolve_path=True),
               help="Exports options to a template file")
-@click.option('--userfile', '-F',
-              help="Read userdata from file",
-              type=click.Path(exists=True, readable=True, resolve_path=True))
 @click.option('--postinstall', '-i', help="Post-install script to download")
 @helpers.multi_option('--key', '-k',
                       help="SSH keys to add to the root user")
@@ -58,6 +55,9 @@ import click
               help="A template file that defaults the command-line options",
               type=click.Path(exists=True, readable=True, resolve_path=True))
 @click.option('--userdata', '-u', help="User defined metadata string")
+@click.option('--userfile', '-F',
+              help="Read userdata from file",
+              type=click.Path(exists=True, readable=True, resolve_path=True))
 @click.option('--vlan-public',
               help="The ID of the public VLAN on which you want the virtual "
               "server placed",
