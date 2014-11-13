@@ -218,6 +218,6 @@ spf  IN TXT "v=spf1 ip4:192.0.2.0/24 ip4:198.51.100.123 a"
 
         self.assertEqual(len(calls), len(expected_calls))
         for call, expected_call in zip(calls, expected_calls):
-            self.assertDictEqual(call.args[0], expected_call)
+            self.assertEqual(call.args[0], expected_call)
 
         self.assertIn("Finished", result.output)
