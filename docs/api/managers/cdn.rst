@@ -1,5 +1,5 @@
 .. _cdn:
 
-.. automodule:: SoftLayer.managers.cdn
+.. automodule:: softlayer.managers.cdn
    :members:
    :inherited-members:

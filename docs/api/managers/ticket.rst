@@ -1,5 +1,5 @@
 .. _ticket:
 
-.. automodule:: SoftLayer.managers.ticket
+.. automodule:: softlayer.managers.ticket
    :members:
    :inherited-members:

@@ -9,11 +9,11 @@ The command line parsing is currently based on `click <http://click.pocoo.org/>`
 
 First Example
 -------------
-For the first example, we can create `slcli table-example` by creating the following file at SoftLayer/CLI/table_example.py:
+For the first example, we can create `slcli table-example` by creating the following file at softlayer/cli/table_example.py:
 
 ::
 
-    from SoftLayer.CLI import formatting
+    from softlayer.cli import formatting
 
     import click
 
@@ -36,12 +36,12 @@ For the first example, we can create `slcli table-example` by creating the follo
 
         return t
 
-Then we need to register it so that `slcli table-example` will know to route to this new module. We do that by adding ALL_ROUTES in SoftLayer/CLI/routes.py to include the following:
+Then we need to register it so that `slcli table-example` will know to route to this new module. We do that by adding ALL_ROUTES in softlayer/cli/routes.py to include the following:
 
 ::
 
     ...
-    ('table-example', 'SoftLayer.CLI.table_example:cli'),
+    ('table-example', 'softlayer.cli.table_example:cli'),
     ...
 
 Which gives us
@@ -64,11 +64,11 @@ Formatting of the data represented in the table is actually controlled upstream 
 
 Arguments
 ---------
-A command usually isn't very useful without context or arguments of some kind. With click, you have a large array of argument and option types at your disposal. Additionally, with the SoftLayer CLI, we have global options and context which is stored in `SoftLayer.CLI.environment.Environment` and is attainable through a decorator located at `SoftLayer.CLI.environment.pass_env`. An example of options and the environment is shown below. It also shows how output should be done using `env.out` instead of printing. This is used for testing and to have a consistent way to print things onto the screen.
+A command usually isn't very useful without context or arguments of some kind. With click, you have a large array of argument and option types at your disposal. Additionally, with the SoftLayer CLI, we have global options and context which is stored in `softlayer.CLI.environment.Environment` and is attainable through a decorator located at `softlayer.CLI.environment.pass_env`. An example of options and the environment is shown below. It also shows how output should be done using `env.out` instead of printing. This is used for testing and to have a consistent way to print things onto the screen.
 
 ::
 
-    from SoftLayer.CLI import environment
+    from softlayer.cli import environment
 
     import click
 
@@ -104,11 +104,11 @@ Refer to the click library documentation for more options.
 
 Accessing the API
 -----------------
-A SoftLayer client is stood up for every command and is available through `SoftLayer.CLI.environment.Environment.client`. The example below shows how to make a simple API call to the SoftLayer_Account::getObject.
+A SoftLayer client is stood up for every command and is available through `softlayer.cli.environment.Environment.client`. The example below shows how to make a simple API call to the SoftLayer_Account::getObject.
 
 ::
 
-    from SoftLayer.CLI import environment
+    from softlayer.cli import environment
 
     import click
 
@@ -125,7 +125,7 @@ A SoftLayer client is stood up for every command and is available through `SoftL
 Aborting execution
 ------------------
 
-When a confirmation fails, you probably want to stop execution and give a non-zero exit code. To do that, raise a `SoftLayer.CLI.exceptions.CLIAbort` exception with the message for the user as the first parameter. This will prevent any further execution and properly return the right error code.
+When a confirmation fails, you probably want to stop execution and give a non-zero exit code. To do that, raise a `softlayer.cli.exceptions.CLIAbort` exception with the message for the user as the first parameter. This will prevent any further execution and properly return the right error code.
 
 ::
 
