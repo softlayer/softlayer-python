@@ -10,7 +10,7 @@ The SoftLayer API bindings load your settings from a number of different locatio
 * Config file locations (~/.softlayer, /etc/softlayer.conf)
 * Or argument (-C/path/to/config or --config=/path/to/config)
 
-The configuration file is INI-based and requires the `softlayer` section to be present. The only required fields are `username` and `api_key`. You can optionally supply the `endpoint_url` as well. This file is created automatically by the `sl config setup` command detailed here: :ref:`config_setup`.
+The configuration file is INI-based and requires the `softlayer` section to be present. The only required fields are `username` and `api_key`. You can optionally supply the `endpoint_url` as well. This file is created automatically by the `slcli config setup` command detailed here: :ref:`config_setup`.
 
 *Config Example*
 ::
