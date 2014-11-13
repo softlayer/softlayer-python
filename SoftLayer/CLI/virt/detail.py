@@ -33,6 +33,7 @@ def cli(self, identifier, passwords=False, price=False):
     table.add_row(['guid', result['globalIdentifier']])
     table.add_row(['hostname', result['hostname']])
     table.add_row(['domain', result['domain']])
+    table.add_row(['fqdn', result['fullyQualifiedDomainName']])
     table.add_row(['status', formatting.FormattedItem(
         result['status']['keyName'] or formatting.blank(),
         result['status']['name'] or formatting.blank()

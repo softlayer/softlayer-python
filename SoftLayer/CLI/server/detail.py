@@ -38,6 +38,7 @@ def cli(env, identifier, passwords, price):
     table.add_row(['guid', result['globalIdentifier']] or formatting.blank())
     table.add_row(['hostname', result['hostname']])
     table.add_row(['domain', result['domain']])
+    table.add_row(['fqdn', result['fullyQualifiedDomainName']])
     table.add_row(['status', result['hardwareStatus']['status']])
     table.add_row(['datacenter',
                    result['datacenter']['name'] or formatting.blank()])

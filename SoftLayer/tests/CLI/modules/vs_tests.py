@@ -43,6 +43,7 @@ class DnsTests(testing.TestCase):
                           'datacenter': 'TEST00',
                           'hostname': 'vs-test1',
                           'domain': 'test.sftlyr.ws',
+                          'fqdn': 'vs-test1.test.sftlyr.ws',
                           'id': 100,
                           'guid': '1a2b3c-1701',
                           'memory': 1024,
