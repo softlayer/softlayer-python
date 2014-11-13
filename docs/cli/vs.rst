@@ -9,20 +9,20 @@ Using the SoftLayer portal for ordering virtual servers is fine, but for a numbe
 	The following assumes that the client is already :ref:`configured with valid SoftLayer credentials<cli>`.
 
 
-First, let's list the current virtual servers with `sl vs list`.
+First, let's list the current virtual servers with `slcli vs list`.
 ::
 
-	$ sl vs list
+	$ slcli vs list
 	:.....:............:.........................:.......:........:..............:.............:....................:........:
 	:  id : datacenter :           host          : cores : memory :  primary_ip  :  backend_ip : active_transaction : owner  :
 	:.....:............:.........................:.......:........:..............:.............:....................:........:
 	:.....:............:.........................:.......:........:..............:.............:....................:........:
 
-We don't have any virtual servers! Let's fix that. Before we can create a VS, we need to know what options are available to me: RAM, CPU, operating systems, disk sizes, disk types, datacenters. Luckily, there's a simple command to do that, `sl vs create-options`.
+We don't have any virtual servers! Let's fix that. Before we can create a VS, we need to know what options are available to me: RAM, CPU, operating systems, disk sizes, disk types, datacenters. Luckily, there's a simple command to do that, `slcli vs create-options`.
 
 ::
 
-	$ sl vs create-options
+	$ slcli vs create-options
 	:.................:.................................................................................:
 	:            Name : Value                                                                           :
 	:.................:.................................................................................:
@@ -106,11 +106,11 @@ We don't have any virtual servers! Let's fix that. Before we can create a VS, we
 	:             nic : 10,100,1000                                                                     :
 	:.................:.................................................................................:
 
-Here's the command to create a 2-core, 1G memory, Ubuntu 12.04 hourly instance in the San Jose datacenter using the command `sl vs create`.
+Here's the command to create a 2-core, 1G memory, Ubuntu 12.04 hourly instance in the San Jose datacenter using the command `slcli vs create`.
 
 ::
 
-	$ sl vs create --hostname=example --domain=softlayer.com -c 2 -m 1024 -o UBUNTU_12_64 --billing=hourly --datacenter=sjc01
+	$ slcli vs create --hostname=example --domain=softlayer.com -c 2 -m 1024 -o UBUNTU_12_64 --billing=hourly --datacenter=sjc01
 	This action will incur charges on your account. Continue? [y/N]: y
 	:.........:......................................:
 	:    name : value                                :
@@ -125,7 +125,7 @@ With the last command, the virtual server has begun being created. It should ins
 
 ::
 
-	$ sl vs list
+	$ slcli vs list
 	:.........:............:.......................:.......:........:................:..............:....................:
 	:    id   : datacenter :          host         : cores : memory :   primary_ip   :  backend_ip  : active_transaction :
 	:.........:............:.......................:.......:........:................:..............:....................:
@@ -136,10 +136,10 @@ Cool. You may ask "It's creating... but how do I know when it's done?". Well, he
 
 ::
 
-	$ sl vs ready 'example' --wait=600
+	$ slcli vs ready 'example' --wait=600
 	READY
 
-When the previous command returns, I know that the virtual server has finished the provisioning process and is ready to use. This is *very* useful for chaining commands together. Now that you have your virtual server, let's get access to it. To do that, use the `sl vs detail` command. From the example below, you can see that the username is 'root' and password is 'ABCDEFGH'.
+When the previous command returns, I know that the virtual server has finished the provisioning process and is ready to use. This is *very* useful for chaining commands together. Now that you have your virtual server, let's get access to it. To do that, use the `slcli vs detail` command. From the example below, you can see that the username is 'root' and password is 'ABCDEFGH'.
 
 .. warning::
 
@@ -147,7 +147,7 @@ When the previous command returns, I know that the virtual server has finished t
 
 ::
 
-	$ sl vs detail example --passwords
+	$ slcli vs detail example --passwords
 	:..............:...........................:
 	:         Name : Value                     :
 	:..............:...........................:
@@ -169,12 +169,12 @@ When the previous command returns, I know that the virtual server has finished t
 	:..............:...........................:
 
 
-There are many other commands to help manage virtual servers. To see them all, use `sl help vs`.
+There are many other commands to help manage virtual servers. To see them all, use `slcli help vs`.
 
 ::
 	
-	$ sl vs
-	Usage: sl vs [OPTIONS] COMMAND [ARGS]...
+	$ slcli vs
+	Usage: slcli vs [OPTIONS] COMMAND [ARGS]...
 
 	  Virtual Servers.
 
