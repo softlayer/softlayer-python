@@ -19,6 +19,7 @@ import click
 @click.option('--hostname', '-H',
               help="Host portion of the FQDN")
 @click.option('--chassis',
+              required=True,
               help="The chassis to use for the new server")
 @click.option('--cpu', '-c',
               help="Number of CPU cores",

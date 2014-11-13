@@ -40,6 +40,18 @@ class EnvironmentTests(testing.TestCase):
         command = self.env.get_command('fixture', 'run')
         self.assertIsInstance(command, click.Command)
 
+    @mock.patch('click.prompt')
+    def test_input(self, prompt_mock):
+        r = self.env.input('input')
+        prompt_mock.assert_called_with('input')
+        self.assertEqual(prompt_mock(), r)
+
+    @mock.patch('click.prompt')
+    def test_getpass(self, prompt_mock):
+        r = self.env.getpass('input')
+        prompt_mock.assert_called_with('input', hide_input=True)
+        self.assertEqual(prompt_mock(), r)
+
     def test_resolve_alias(self):
         self.env.aliases = {'aliasname': 'realname'}
         r = self.env.resolve_alias('aliasname')
@@ -47,15 +59,3 @@ class EnvironmentTests(testing.TestCase):
 
         r = self.env.resolve_alias('realname')
         self.assertEqual(r, 'realname')
-
-    @mock.patch('SoftLayer.utils.console_input')
-    def test_input(self, raw_input_mock):
-        r = self.env.input('input')
-        raw_input_mock.assert_called_with('input')
-        self.assertEqual(raw_input_mock(), r)
-
-    @mock.patch('getpass.getpass')
-    def test_getpass(self, getpass):
-        r = self.env.getpass('input')
-        getpass.assert_called_with('input')
-        self.assertEqual(getpass(), r)

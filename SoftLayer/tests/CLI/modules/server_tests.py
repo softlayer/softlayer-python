@@ -446,7 +446,7 @@ class ServerCLITests(testing.TestCase):
                                    '--memory=4',
                                    ])
 
-        self.assertEqual(result.exit_code, 1)
+        self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, SystemExit)
 
     @mock.patch('SoftLayer.CLI.template.export_to_template')
