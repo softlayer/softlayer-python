@@ -121,7 +121,6 @@ class HardwareManager(utils.IdentifierMixin, object):
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
                 'datacenter',
-                'billingItem.orderItem.order.userRecord[username]',
             ]
             server_items = [
                 'activeTransaction[id, transactionStatus[friendlyName,name]]',

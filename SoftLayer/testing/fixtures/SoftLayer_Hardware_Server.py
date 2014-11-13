@@ -1,5 +1,6 @@
 getObject = {
     'id': 1000,
+    'globalIdentifier': '1a2b3c-1701',
     'datacenter': {'id': 50, 'name': 'TEST00',
                    'description': 'Test Data Center'},
     'billingItem': {

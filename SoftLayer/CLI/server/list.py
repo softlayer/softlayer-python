@@ -14,13 +14,11 @@ import click
 @click.command()
 @click.option('--sortby',
               help='Column to sort by',
-              type=click.Choice(['id',
-                                 'datacenter',
-                                 'host',
-                                 'cores',
-                                 'memory',
+              type=click.Choice(['guid',
+                                 'hostname',
                                  'primary_ip',
-                                 'backend_ip']))
+                                 'backend_ip',
+                                 'datacenter']))
 @click.option('--cpu', '-c', help='Filter by number of CPU cores')
 @click.option('--domain', '-D', help='Filter by domain')
 @click.option('--datacenter', '-d', help='Filter by datacenter')
@@ -34,43 +32,35 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag):
 
     manager = SoftLayer.HardwareManager(env.client)
 
-    servers = manager.list_hardware(
-        hostname=hostname,
-        domain=domain,
-        cpus=cpu,
-        memory=memory,
-        datacenter=datacenter,
-        nic_speed=network,
-        tags=tag)
+    servers = manager.list_hardware(hostname=hostname,
+                                    domain=domain,
+                                    cpus=cpu,
+                                    memory=memory,
+                                    datacenter=datacenter,
+                                    nic_speed=network,
+                                    tags=tag)
 
     table = formatting.Table([
-        'id',
-        'datacenter',
-        'host',
-        'cores',
-        'memory',
+        'guid',
+        'hostname',
         'primary_ip',
         'backend_ip',
-        'active_transaction',
-        'owner'
+        'datacenter',
+        'action',
     ])
-    table.sortby = sortby
+    table.sortby = sortby or 'hostname'
 
     for server in servers:
         server = utils.NestedDict(server)
-
+        # NOTE(kmcdonald): There are cases where a server might not have a
+        #                  globalIdentifier.
         table.add_row([
-            server['id'],
-            server['datacenter']['name'] or formatting.blank(),
-            server['fullyQualifiedDomainName'],
-            server['processorPhysicalCoreAmount'],
-            formatting.gb(server['memoryCapacity'] or 0),
+            server['globalIdentifier'] or server['id'],
+            server['hostname'],
             server['primaryIpAddress'] or formatting.blank(),
             server['primaryBackendIpAddress'] or formatting.blank(),
+            server['datacenter']['name'] or formatting.blank(),
             formatting.active_txn(server),
-            utils.lookup(
-                server, 'billingItem', 'orderItem', 'order', 'userRecord',
-                'username') or formatting.blank(),
         ])
 
     return table
