@@ -45,11 +45,13 @@ class CommandLoader(click.MultiCommand):
     def list_commands(self, ctx):
         """Get module for click."""
         env = ctx.ensure_object(environment.Environment)
+        env.load()
         return sorted(env.list_commands(*self.path))
 
     def get_command(self, ctx, name):
         """Get command for click."""
         env = ctx.ensure_object(environment.Environment)
+        env.load()
 
         # Do alias lookup (only available for root commands)
         if len(self.path) == 0:

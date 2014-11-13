@@ -26,17 +26,8 @@ class Environment(object):
         # {'path:to:command': ModuleLoader()}
         # {'vs:list': ModuleLoader()}
         self.commands = {}
-        self.aliases = {
-            'meta': 'metadata',
-            'my': 'metadata',
-            'vm': 'vs',
-            'cci': 'vs',
-            'hardware': 'server',
-            'hw': 'server',
-            'bmetal': 'bmc',
-            'virtual': 'vs',
-            'lb': 'loadbal',
-        }
+        self.aliases = {}
+
         self.client = None
         self.format = 'table'
         self.skip_confirmations = False
@@ -66,8 +57,7 @@ class Environment(object):
     # Command loading methods
     def list_commands(self, *path):
         """Command listing."""
-        self._load_modules()
-        path_str = self.resolve_alias(':'.join(path))
+        path_str = ':'.join(path)
 
         commands = []
         for command in self.commands.keys():
@@ -84,8 +74,7 @@ class Environment(object):
 
     def get_command(self, *path):
         """Return command at the given path or raise error."""
-        self._load_modules()
-        path_str = self.resolve_alias(':'.join(path))
+        path_str = ':'.join(path)
 
         if path_str in self.commands:
             return self.commands[path_str].load()
@@ -98,7 +87,7 @@ class Environment(object):
             return self.aliases[path_str]
         return path_str
 
-    def _load_modules(self):
+    def load(self):
         """Loads all modules."""
         if self._modules_loaded is True:
             return
@@ -117,8 +106,18 @@ class Environment(object):
                 path, attr = modpath, None
             self.commands[name] = ModuleLoader(path, attr=attr)
 
+        self.aliases = routes.ALL_ALIASES
+
     def _load_modules_from_entry_points(self):
-        """Load modules from the entry_points (slower)."""
+        """Load modules from the entry_points (slower).
+
+        Entry points can be used to add new commands to the CLI.
+
+        Usage:
+
+            entry_points={'softlayer.cli': ['new-cmd = mymodule.new_cmd.cli']}
+
+        """
         for obj in pkg_resources.iter_entry_points(group='softlayer.cli',
                                                    name=None):
             self.commands[obj.name] = obj

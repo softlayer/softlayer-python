@@ -181,3 +181,15 @@ ALL_ROUTES = [
 
     ('summary', 'SoftLayer.CLI.summary:cli'),
 ]
+
+ALL_ALIASES = {
+    'meta': 'metadata',
+    'my': 'metadata',
+    'vm': 'vs',
+    'cci': 'vs',
+    'hardware': 'server',
+    'hw': 'server',
+    'bmetal': 'bmc',
+    'virtual': 'vs',
+    'lb': 'loadbal',
+}
