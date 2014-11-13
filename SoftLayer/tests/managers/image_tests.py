@@ -132,7 +132,7 @@ class ImageTests(testing.TestCase):
                                 args=({'name': 'abc', 'note': 'xyz'},))
 
     def test_import_image(self):
-        # Test updating tags
+        # Test import image
         self.image.import_image_from_uri({'name': 'test_image',
                                           'note': 'testimage',
                                           'uri': 'invaliduri'})
