@@ -55,11 +55,18 @@ class MockableTransport(object):
     def _record_call(self, call):
         """Record and log the API call (for later assertions)."""
         self.calls.append(call)
-        logging.info('%s::%s called with identifier=%s, args=%s',
-                     call.service,
-                     call.method,
-                     call.identifier,
-                     call.args)
+
+        details = []
+        for prop in ['identifier',
+                     'args',
+                     'mask',
+                     'filter',
+                     'limit',
+                     'offset']:
+            details.append('%s=%r' % (prop, getattr(call, prop)))
+
+        logging.info('%s::%s called; %s',
+                     call.service, call.method, '; '.join(details))
 
 
 def _mock_key(service, method):

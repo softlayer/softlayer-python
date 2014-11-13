@@ -7,6 +7,8 @@
 """
 
 ALL_ROUTES = [
+    ('call-api', 'SoftLayer.CLI.call_api:cli'),
+
     ('vs', 'SoftLayer.CLI.virt'),
     ('vs:cancel', 'SoftLayer.CLI.virt.cancel:cli'),
     ('vs:capture', 'SoftLayer.CLI.virt.capture:cli'),
