@@ -1,5 +1,5 @@
 """
-    softlayer.testing
+    SoftLayer.testing
     ~~~~~~~~~~~~~~~~~
 
     :license: MIT, see LICENSE for more details.
@@ -7,10 +7,6 @@
 # Disable pylint import error and too many methods error
 # pylint: disable=F0401,R0904
 import logging
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest
 import os.path
 
 import softlayer
@@ -19,6 +15,7 @@ from softlayer.cli import environment
 
 from click import testing
 import mock
+import testtools
 
 FIXTURE_PATH = os.path.abspath(os.path.join(__file__, '..', 'fixtures'))
 
@@ -74,7 +71,7 @@ def _mock_key(service, method):
     return '%s::%s' % (service, method)
 
 
-class TestCase(unittest.TestCase):
+class TestCase(testtools.TestCase):
     """Testcase class with PEP-8 compatable method names."""
 
     def set_up(self):
@@ -86,6 +83,7 @@ class TestCase(unittest.TestCase):
         pass
 
     def setUp(self):  # NOQA
+        super(TestCase, self).setUp()
         self.env = environment.Environment()
 
         # Create a crazy mockable, fixture client
@@ -102,6 +100,7 @@ class TestCase(unittest.TestCase):
         return self.set_up()
 
     def tearDown(self):  # NOQA
+        super(TestCase, self).tearDown()
         return self.tear_down()
 
     def calls(self, service=None, method=None):
@@ -168,6 +167,3 @@ def call_has_props(call, props):
             return False
 
     return True
-
-
-__all__ = ['unittest']
