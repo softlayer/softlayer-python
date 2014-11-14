@@ -30,13 +30,17 @@ META_MAPPING = {
 HELP = """Find details about this machine
 
 \b
-PROP Choices
+PROP Choices:
 %s
+
 \b
-Examples :
-%s
-""" % ('*'+'\n*'.join(META_CHOICES),
-       'sl metadata '+'\nsl metadata '.join(META_CHOICES))
+Examples:
+slcli metadata ip
+slcli metadata backend_ip
+slcli metadata user_data
+slcli metadata tags
+
+""" % ('\n'.join(' - %s' % choice for choice in META_CHOICES))
 
 
 @click.command(help=HELP,

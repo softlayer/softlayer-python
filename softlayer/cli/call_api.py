@@ -19,9 +19,9 @@ def cli(env, service, method, _id, mask, limit, offset):
 
     \b
     Examples:
-    sl call-api Account getObject
-    sl call-api Account getVirtualGuests --limit=10 --mask=id,hostname
-    sl call-api Virtual_Guest getObject --id=2710344
+    slcli call-api Account getObject
+    slcli call-api Account getVirtualGuests --limit=10 --mask=id,hostname
+    slcli call-api Virtual_Guest getObject --id=2710344
     """
     result = env.client.call(service, method,
                              id=_id,

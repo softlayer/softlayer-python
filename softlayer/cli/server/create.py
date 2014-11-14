@@ -12,8 +12,8 @@ from softlayer.cli import template
 import click
 
 
-@click.command(epilog="""See 'sl server list-chassis' and
- 'sl server create-options' for valid options.""")
+@click.command(epilog="""See 'slcli server list-chassis' and
+ 'slcli server create-options' for valid options.""")
 @click.option('--domain', '-D',
               help="Domain portion of the FQDN")
 @click.option('--hostname', '-H',

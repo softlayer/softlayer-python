@@ -69,7 +69,7 @@ class CommandLoader(click.MultiCommand):
 @click.group(help="SoftLayer Command-line Client",
              epilog="""To use most commands your SoftLayer
 username and api_key need to be configured. The easiest way to do that is to
-use: 'sl config setup'""",
+use: 'slcli config setup'""",
              cls=CommandLoader)
 @click.pass_context
 @click.option('--format',
@@ -178,7 +178,7 @@ def main():
     except softlayer.SoftLayerAPIError as ex:
         if 'invalid api token' in ex.faultString.lower():
             print("Authentication Failed: To update your credentials,"
-                  " use 'sl config setup'")
+                  " use 'slcli config setup'")
             exit_status = 1
         else:
             print(str(ex))
