@@ -30,7 +30,7 @@ def cli(env, name, note, osrefcode, uri):
     if note:
         data['note'] = note
     if osrefcode:
-        data['osrefcode'] = osrefcode
+        data['operatingSystemReferenceCode'] = osrefcode
     if uri:
         data['uri'] = uri
 
