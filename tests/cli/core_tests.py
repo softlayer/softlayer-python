@@ -90,7 +90,7 @@ class CoreMainTests(testing.TestCase):
         self.assertRaises(SystemExit, core.main)
 
         self.assertIn("Authentication Failed:", stdoutmock.getvalue())
-        self.assertIn("use 'sl config setup'", stdoutmock.getvalue())
+        self.assertIn("use 'slcli config setup'", stdoutmock.getvalue())
 
 
 def recursive_subcommand_loader(root, path=''):
