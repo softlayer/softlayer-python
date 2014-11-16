@@ -687,11 +687,12 @@ class VSManager(utils.IdentifierMixin, object):
             prices.append({'id': id})
         return prices
 
-    def _generate_virtual_guests_options(self, domain, hostname, public_vlan=None, private_vlan=None):
+    def _generate_virtual_guests_options(self, domain, hostname,
+                                         private_network_only=False, public_vlan=None, private_vlan=None):
         virtual_guests = {
             'domain': domain,
             'hostname': hostname,
-            'privateNetworkOnlyFlag': False,
+            'privateNetworkOnlyFlag': private_network_only,
         }
 
         if public_vlan:
@@ -705,33 +706,32 @@ class VSManager(utils.IdentifierMixin, object):
 
     def _generate_place_order_options(self, location, hostname, domain,
                                       use_hourly_pricing=False, quantity=1, provision_scripts=None,
-                                      private_vlan=None, public_vlan=None,
+                                      private_network_only=False, private_vlan=None, public_vlan=None,
                                       image_template_global_identifier=None, image_template_id=None,
                                       ssh_keys=None, price_ids=[]):
         """ Generates the order options of the desired virtual guest
 
-        :param location: The location to use for the desired server
-        :param hostname: The hostname to use for the desired server.
-        :param domain: The domain to use for the desired server.
+        :param location: The location to use.
+        :param hostname: The hostname to use.
+        :param domain: The domain to use.
         :param bool use_hourly_pricing: Flag to indicate if this server should be billed
                             hourly (default) or monthly.
-        :param quantity: The quantity of the desired server
+        :param quantity: The amount of servers to order.
         :param list provision_scripts: A list of the URIs of the post-install
                                 scripts to run after reload.
+        :param bool private_network_only:
+        Flag to indicate whether the computing instance only has access to the private network.
         :param int public_vlan: The ID of the public VLAN on which you want
                                 this VS placed.
         :param int private_vlan: The ID of the public VLAN on which you want
                                  this VS placed.
         :param ssh_keys: The SSH keys to add to the root user.
-        :param price_ids: The list of price ids
+        :param price_ids: The list of price ids.
         """
-        #
-        # required = [location, hostname, domain]
-        # if not all(required):
-        #     raise ValueError("{0} are required".format(required))
 
         virtual_guest = self._generate_virtual_guests_options(
-            domain=domain, hostname=hostname, private_vlan=private_vlan, public_vlan=public_vlan)
+            domain=domain, hostname=hostname, private_network_only=private_network_only,
+            private_vlan=private_vlan, public_vlan=public_vlan)
         prices = self._generate_prices_ids(price_ids)
 
         order_options = {
@@ -760,20 +760,22 @@ class VSManager(utils.IdentifierMixin, object):
     def place_order(self, **kwargs):
         """ Places an order.
 
-        :param location: The location to use for the desired server
+        :param location: The location to use for the desired server.
         :param hostname: The hostname to use for the desired server.
         :param domain: The domain to use for the desired server.
-        :param bool use_hourly_pricing: Flag to indicate if this server should be billed
+        :param bool use_hourly_pricing: Flag to indicate if this server should be billed.
                             hourly (default) or monthly.
-        :param quantity: The quantity of the desired server
+        :param quantity: The quantity of the desired server.
         :param list provision_scripts: A list of the URIs of the post-install
                                 scripts to run after reload.
+        :param bool private_network_only:
+        Flag to indicate whether the computing instance only has access to the private network.
         :param int public_vlan: The ID of the public VLAN on which you want
                                 this VS placed.
         :param int private_vlan: The ID of the public VLAN on which you want
                                  this VS placed.
         :param ssh_keys: The SSH keys to add to the root user.
-        :param price_ids: The list of price ids
+        :param price_ids: The list of price ids.
         """
         place_order_options = self._generate_place_order_options(**kwargs)
         return self.client['Product_Order'].placeOrder(place_order_options)
