@@ -30,6 +30,7 @@ class NetworkManager(object):
         self.account = client['Account']
         self.vlan = client['Network_Vlan']
         self.subnet = client['Network_Subnet']
+        self.network_storage = self.client['Network_Storage']
 
     def add_global_ip(self, version=4, test_order=False):
         """Adds a global IP address to the account.
@@ -408,3 +409,13 @@ class NetworkManager(object):
         """
         results = self.list_vlans(name=name, mask='id')
         return [result['id'] for result in results]
+
+    def get_nas_credentials(self, identifier, **kwargs):
+        """Returns a list of IDs of VLANs which match the given VLAN name.
+
+        :param integer instance_id: the instance ID
+        :returns: A dictionary containing a large amount of information about
+                  the specified instance.
+        """
+        result = self.network_storage.getObject(id=identifier, **kwargs)
+        return result
