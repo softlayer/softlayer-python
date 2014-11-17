@@ -11,7 +11,7 @@ import click
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """List NAS account credentials"""
+    """List NAS account credentials."""
 
     nw_mgr = SoftLayer.NetworkManager(env.client)
     result = nw_mgr.get_nas_credentials(identifier)
