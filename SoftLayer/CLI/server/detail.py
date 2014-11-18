@@ -83,11 +83,10 @@ def cli(env, identifier, passwords, price):
                        result['billingItem']['recurringFee']])
 
     if passwords:
-        user_strs = []
+        pass_table = formatting.Table(['username', 'password'])
         for item in result['operatingSystem']['passwords']:
-            user_strs.append(
-                "%s %s" % (item['username'], item['password']))
-        table.add_row(['users', formatting.listing(user_strs)])
+             pass_table.add_row([item['username'], item['password']])
+        table.add_row(['users', pass_table])
 
     tag_row = []
     for tag in result['tagReferences']:

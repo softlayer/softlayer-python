@@ -28,6 +28,8 @@ ALL_ROUTES = [
     ('vs:reboot', 'SoftLayer.CLI.virt.power:reboot'),
     ('vs:reload', 'SoftLayer.CLI.virt.reload:cli'),
     ('vs:upgrade', 'SoftLayer.CLI.virt.upgrade:cli'),
+    ('vs:credentials', 'SoftLayer.CLI.virt.credentials:cli'),
+
 
     ('cdn', 'SoftLayer.CLI.cdn'),
     ('cdn:detail', 'SoftLayer.CLI.cdn.detail:cli'),
@@ -120,6 +122,7 @@ ALL_ROUTES = [
 
     ('nas', 'SoftLayer.CLI.nas'),
     ('nas:list', 'SoftLayer.CLI.nas.list:cli'),
+    ('nas:credentials', 'SoftLayer.CLI.nas.credentials:cli'),
 
     ('rwhois', 'SoftLayer.CLI.rwhois'),
     ('rwhois:edit', 'SoftLayer.CLI.rwhois.edit:cli'),
@@ -140,6 +143,7 @@ ALL_ROUTES = [
     ('server:power-on', 'SoftLayer.CLI.server.power:power_on'),
     ('server:reboot', 'SoftLayer.CLI.server.power:reboot'),
     ('server:reload', 'SoftLayer.CLI.server.reload:cli'),
+    ('server:credentials', 'SoftLayer.CLI.server.credentials:cli'),
 
     ('snapshot', 'SoftLayer.CLI.snapshot'),
     ('snapshot:cancel', 'SoftLayer.CLI.snapshot.cancel:cli'),
@@ -147,6 +151,7 @@ ALL_ROUTES = [
     ('snapshot:create-space', 'SoftLayer.CLI.snapshot.create_space:cli'),
     ('snapshot:list', 'SoftLayer.CLI.snapshot.list:cli'),
     ('snapshot:restore-volume', 'SoftLayer.CLI.snapshot.restore_volume:cli'),
+
 
     ('sshkey', 'SoftLayer.CLI.sshkey'),
     ('sshkey:add', 'SoftLayer.CLI.sshkey.add:cli'),
