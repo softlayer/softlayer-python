@@ -85,7 +85,7 @@ def cli(env, identifier, passwords, price):
     if passwords:
         pass_table = formatting.Table(['username', 'password'])
         for item in result['operatingSystem']['passwords']:
-             pass_table.add_row([item['username'], item['password']])
+            pass_table.add_row([item['username'], item['password']])
         table.add_row(['users', pass_table])
 
     tag_row = []
