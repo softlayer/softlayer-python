@@ -30,7 +30,6 @@ ALL_ROUTES = [
     ('vs:upgrade', 'SoftLayer.CLI.virt.upgrade:cli'),
     ('vs:credentials', 'SoftLayer.CLI.virt.credentials:cli'),
 
-
     ('cdn', 'SoftLayer.CLI.cdn'),
     ('cdn:detail', 'SoftLayer.CLI.cdn.detail:cli'),
     ('cdn:list', 'SoftLayer.CLI.cdn.list:cli'),
@@ -151,7 +150,6 @@ ALL_ROUTES = [
     ('snapshot:create-space', 'SoftLayer.CLI.snapshot.create_space:cli'),
     ('snapshot:list', 'SoftLayer.CLI.snapshot.list:cli'),
     ('snapshot:restore-volume', 'SoftLayer.CLI.snapshot.restore_volume:cli'),
-
 
     ('sshkey', 'SoftLayer.CLI.sshkey'),
     ('sshkey:add', 'SoftLayer.CLI.sshkey.add:cli'),
