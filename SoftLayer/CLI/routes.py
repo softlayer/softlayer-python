@@ -9,6 +9,7 @@
 ALL_ROUTES = [
     ('billing', 'SoftLayer.CLI.billing'),
     ('billing:list', 'SoftLayer.CLI.billing.list:cli'),
+    ('billing:info', 'SoftLayer.CLI.billing.info:cli'),
 
     ('call-api', 'SoftLayer.CLI.call_api:cli'),
 

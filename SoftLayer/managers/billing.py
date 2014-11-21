@@ -36,7 +36,12 @@ class BillingManager(object):
         self.account = self.client['Account']
         self.billing_order = self.client['Billing_Order']
 
-    def list_resources(self, from_date=None, to_date=None, group_by=None, **kwargs):
+    def get_info(self):
+        result = self.account.getBillingInfo()
+        return result
+
+
+    def list_resources(self, from_date=None, to_date=None, group_by=None, resource_status=None, **kwargs):
         """ Retrieve a list of all ordered resources along with their costing.
 
         :param dict \\*\\*kwargs: response-level option (limit)
@@ -69,7 +74,7 @@ class BillingManager(object):
         user = self.account.getCurrentUser(mask='mask[id]')
         _filter['orders']['userRecordId'] = query_filter(user['id'])
         date_format = '%Y-%m-%d'
-        print user
+
         if from_date:
             from_date_filter = from_date + '*'
             _filter['orders']['createDate'] = query_filter(from_date_filter)
@@ -77,15 +82,17 @@ class BillingManager(object):
             to_date_filter = to_date + '*'
             _filter['orders']['createDate'] = query_filter(to_date_filter)
         if group_by:
-            group_by_filter = '~' + group_by
-            _filter['orders']['description'] = query_filter()
+            group_by_filter = '*' + group_by
+            _filter['orders']['description'] = query_filter(group_by_filter)
         orders = self.account.getOrders(filter=_filter.to_dict())
-        print orders
         total = 0.0
         result = []
 
         for order in orders:
+            print order
+            print order['id'], order['orderTypeId']
             billing_order = self.client['Billing_Order']
+
             params['id'] = order_id = order['id']
             items = billing_order.getItems(**params)
             cost = float(0.0)
@@ -97,6 +104,7 @@ class BillingManager(object):
             cancellation_date = ''
 
             for item in items:
+                #print item
                 if flag == 1:
                     resource_type = item['description']
 
