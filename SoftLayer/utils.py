@@ -112,6 +112,15 @@ def query_filter(query):
     return {'operation': query}
 
 
+def query_filter_date(start, end):
+    return {'operation': 'betweenDate',
+            'options': [
+                {'name': 'startDate', 'value': [start+' 0:0:0']},
+                {'name': 'endDate', 'value': [end+' 0:0:0']}
+            ]
+    }
+
+
 class IdentifierMixin(object):
     """Mixin used to resolve ids from other names of objects.
 

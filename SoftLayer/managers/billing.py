@@ -5,7 +5,7 @@
             
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer.utils import NestedDict, query_filter, IdentifierMixin, lookup
+from SoftLayer.utils import NestedDict, query_filter, query_filter_date, IdentifierMixin, lookup
 import SoftLayer
 from calendar import monthrange
 from datetime import datetime, date, timedelta
@@ -41,7 +41,7 @@ class BillingManager(object):
         return result
 
 
-    def list_resources(self, from_date=None, to_date=None, group_by=None, resource_status=None, **kwargs):
+    def list_resources(self, from_date=None, to_date=None, **kwargs):
         """ Retrieve a list of all ordered resources along with their costing.
 
         :param dict \\*\\*kwargs: response-level option (limit)
@@ -75,15 +75,15 @@ class BillingManager(object):
         _filter['orders']['userRecordId'] = query_filter(user['id'])
         date_format = '%Y-%m-%d'
 
-        if from_date:
-            from_date_filter = from_date + '*'
+        if from_date and to_date:
+            filter['orders']['createDate'] = query_filter_date(from_date, to_date)
+        elif from_date:
+            from_date_filter = '>=' + ' ' + from_date
             _filter['orders']['createDate'] = query_filter(from_date_filter)
-        if to_date:
-            to_date_filter = to_date + '*'
+        elif to_date:
+            to_date_filter = '<=' + ' ' + to_date
             _filter['orders']['createDate'] = query_filter(to_date_filter)
-        if group_by:
-            group_by_filter = '*' + group_by
-            _filter['orders']['description'] = query_filter(group_by_filter)
+        print  _filter['orders']['createDate']
         orders = self.account.getOrders(filter=_filter.to_dict())
         total = 0.0
         result = []

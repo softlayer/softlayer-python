@@ -11,26 +11,18 @@ import click
 
 
 @click.command()
-@click.option('--frmdate', '-f', help='cost incurred from from_date')
-@click.option('--enddate', '-e',
+@click.option('--start_date', '-f', help='cost incurred from from_date')
+@click.option('--end_date', '-e',
               help='end date to consider, default is latest time stamp')
-@click.option('--group', '-g',
-              help='grouping by a resource type e.g server, iscsi etc.')
-@click.option('--resource', '-r',
-              help='shows only cost of the active/inactive resources',
-              type=click.Choice(['active',
-                                 'inactive']))
 @environment.pass_env
-def cli(env, frmdate, enddate, group, resource):
+def cli(env, start_date, end_date):
     """List billing information for accounts."""
     billing = SoftLayer.BillingManager(env.client)
-    from_date = frmdate
-    to_date = enddate
-    group_by = group
-    resource_status = resource
+    from_date = start_date
+    to_date = end_date
     table = formatting.Table(['Order ID', 'Resource Name', 'Resource Type',
                    'cost', 'create_date'])
-    resources = billing.list_resources(from_date, to_date, group_by)
+    resources = billing.list_resources(from_date, to_date)
 
     for resource in resources:
         resource = utils.NestedDict(resource)
