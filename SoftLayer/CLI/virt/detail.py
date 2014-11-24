@@ -57,7 +57,7 @@ def cli(self, identifier, passwords=False, price=False):
         )])
     table.add_row(['os_version',
                    operating_system.get('version') or formatting.blank()])
-    ('billing:list', 'SoftLayer.CLI.billing.list:cli'),
+    table.add_row(['cores', result['maxCpu']])
     table.add_row(['memory', formatting.mb_to_gb(result['maxMemory'])])
     table.add_row(['public_ip',
                    result['primaryIpAddress'] or formatting.blank()])
