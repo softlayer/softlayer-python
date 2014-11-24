@@ -30,7 +30,16 @@ def cli(env, frmdate, enddate, group, resource):
     resource_status = resource
     table = formatting.Table(['Order ID', 'Resource Name', 'Resource Type',
                    'cost', 'create_date'])
-    result = billing.list_resources(from_date, to_date, group_by)
+    resources = billing.list_resources(from_date, to_date, group_by)
 
+    for resource in resources:
+        resource = utils.NestedDict(resource)
+        table.add_row([
+            resource['id'],
+            resource['hostName'],
+            resource['resourceType'],
+            resource['cost'],
+            resource['createDate']
+        ])
 
     return table
