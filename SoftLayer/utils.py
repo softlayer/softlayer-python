@@ -6,6 +6,7 @@
     :license: MIT, see LICENSE for more details.
 """
 import re
+import datetime
 
 import six
 
@@ -113,14 +114,21 @@ def query_filter(query):
 
 
 def query_filter_date(start, end):
-    print start, end
-    start = start.replace("-", "/")
-    end = end.replace("-", "/")
-    return {'operation': 'betweenDate',
-            'options': [
-                {'name': 'startDate', 'value': [start+' 0:0:0']},
-                {'name': 'endDate', 'value': [end+' 0:0:0']}
-            ]
+    """
+    :param start:YY-MM-DD
+    :param end: YY-MM-DD
+    :return:
+    """
+    sdate = datetime.datetime.strptime(start, "%Y-%m-%d")
+    edate = datetime.datetime.strptime(end, "%Y-%m-%d")
+    startdate = "%s/%s/%s" % (sdate.month, sdate.day, sdate.year)
+    enddate = "%s/%s/%s" % (edate.month, edate.day, edate.year)
+    return {
+        'operation': 'betweenDate',
+        'options': [
+            {'name': 'startDate', 'value': [startdate+' 0:0:0']},
+            {'name': 'endDate', 'value': [enddate+' 0:0:0']}
+        ]
     }
 
 

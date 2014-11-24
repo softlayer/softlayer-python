@@ -21,7 +21,7 @@ def cli(env, start_date, end_date):
     from_date = start_date
     to_date = end_date
     table = formatting.Table(['Order ID', 'Resource Name', 'Resource Type',
-                   'cost', 'create_date'])
+                              'cost', 'create_date'])
     resources = billing.list_resources(from_date, to_date)
 
     for resource in resources:
