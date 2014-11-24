@@ -113,6 +113,9 @@ def query_filter(query):
 
 
 def query_filter_date(start, end):
+    print start, end
+    start = start.replace("-", "/")
+    end = end.replace("-", "/")
     return {'operation': 'betweenDate',
             'options': [
                 {'name': 'startDate', 'value': [start+' 0:0:0']},

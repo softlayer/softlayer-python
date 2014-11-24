@@ -76,7 +76,7 @@ class BillingManager(object):
         date_format = '%Y-%m-%d'
 
         if from_date and to_date:
-            filter['orders']['createDate'] = query_filter_date(from_date, to_date)
+            _filter['orders']['createDate'] = query_filter_date(from_date, to_date)
         elif from_date:
             from_date_filter = '>=' + ' ' + from_date
             _filter['orders']['createDate'] = query_filter(from_date_filter)
