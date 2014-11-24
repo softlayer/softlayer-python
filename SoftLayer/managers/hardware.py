@@ -7,10 +7,19 @@
 """
 import socket
 
+import SoftLayer
 from SoftLayer.managers import ordering
 from SoftLayer import utils
 # Invalid names are ignored due to long method names and short argument names
 # pylint: disable=invalid-name, no-self-use
+
+REQUIRED_CATEGORIES = [
+    'bandwidth',
+    'port_speed',
+    'pri_ip_addresses',
+    'vpn_management',
+    'remote_management',
+]
 
 
 class HardwareManager(utils.IdentifierMixin, object):
@@ -169,86 +178,6 @@ class HardwareManager(utils.IdentifierMixin, object):
         kwargs['filter'] = _filter.to_dict()
         return self.account.getHardware(**kwargs)
 
-    def get_bare_metal_create_options(self):
-        """Retrieves the available options for creating a bare metal server.
-
-        :returns: A dictionary of creation options. The categories to order are
-                  contained within the 'categories' key. See
-                  :func:`_parse_package_data` for detailed information.
-
-        .. note::
-
-           The information for ordering bare metal instances comes from
-           multiple API calls. In order to make the process easier, this
-           function will make those calls and reformat the results into a
-           dictionary that's easier to manage. It's recommended that you cache
-           these results with a reasonable lifetime for performance reasons.
-        """
-        hw_id = self.get_bare_metal_package_id()
-
-        if not hw_id:
-            return None
-
-        return self._parse_package_data(hw_id)
-
-    def get_bare_metal_package_id(self):
-        """Return the bare metal package id."""
-        ordering_manager = self.ordering_manager
-        mask = "mask[id,name,description,type[keyName]]"
-        package = ordering_manager.get_package_by_type('BARE_METAL_CORE', mask)
-
-        return package['id']
-
-    def get_available_dedicated_server_packages(self):
-        """Retrieves a list of packages for ordering dedicated servers.
-
-        :returns: A list of tuples of available dedicated server packages in
-                  the form (id, name, description)
-        """
-        available_packages = []
-        ordering_manager = self.ordering_manager
-
-        mask = 'id,name,description,type,isActive'
-        package_types = ['BARE_METAL_CPU',
-                         'BARE_METAL_CORE']
-
-        packages = ordering_manager.get_packages_of_type(package_types,
-                                                         mask)
-        # We only want packages that are active (we can place new orders for)
-        # and non-outlet.
-        # Outlet packages require specialized logic and we don't want to deal
-        # with them right now.
-        packages = ordering_manager.get_only_active_packages(packages)
-        packages = ordering_manager.filter_outlet_packages(packages)
-
-        for package in packages:
-            available_packages.append((package['id'], package['name'],
-                                       package.get('description', None)))
-
-        return available_packages
-
-    def get_dedicated_server_create_options(self, package_id):
-        """Returns chassis-specific options for creating a dedicated server.
-
-        The chassis is based on package ID.
-
-        :param int package_id: The package ID to retrieve the creation options
-                               for. This should come from
-                               :func:`get_available_dedicated_server_packages`.
-        :returns: A dictionary of creation options. The categories to order are
-                  contained within the 'categories' key. See
-                  :func:`_parse_package_data` for detailed information.
-
-        .. note::
-
-           The information for ordering dedicated servers comes from multiple
-           API calls. In order to make the process simpler, this function will
-           make those calls and reformat the results into a dictionary that's
-           easier to manage. It's recommended that you cache these results with
-           a reasonable lifetime for performance reasons.
-        """
-        return self._parse_package_data(package_id)
-
     def get_hardware(self, hardware_id, **kwargs):
         """Get details about a hardware device.
 
@@ -343,107 +272,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         return func(speed, id=hardware_id)
 
     def place_order(self, **kwargs):
-        """Places an order for a piece of hardware.
-
-        Translates a list of arguments into a dictionary necessary for creating
-        a server.
-
-        .. warning::
-           All items here must be price IDs, NOT quantities!
-
-        :param int server: The identification string for the server to
-                           order. This will either be the CPU/Memory
-                           combination ID for bare metal instances or the
-                           CPU model for dedicated servers.
-        :param string hostname: The hostname to use for the new server.
-        :param string domain: The domain to use for the new server.
-        :param bool hourly: Flag to indicate if this server should be billed
-                            hourly (default) or monthly. Only applies to bare
-                            metal instances.
-        :param string location: The location string (data center) for the
-                                server
-        :param int os: The operating system to use
-        :param array disks: An array of disks for the server. Disks will be
-                            added in the order specified.
-        :param int port_speed: The port speed for the server.
-        :param bool bare_metal: Flag to indicate if this is a bare metal server
-                                or a dedicated server (default).
-        :param int ram: The amount of RAM to order. Only applies to dedicated
-                        servers.
-        :param int package_id: The package_id to use for the server. This
-                               should either be a chassis ID for dedicated
-                               servers or the bare metal instance package ID,
-                               which can be obtained by calling
-                               get_bare_metal_package_id
-        :param int disk_controller: The disk controller to use.
-        :param list ssh_keys: The SSH keys to add to the root user
-        :param int public_vlan: The ID of the public VLAN on which you want
-                                this server placed.
-        :param int private_vlan: The ID of the public VLAN on which you want
-                                 this server placed.
-        :param string post_uri: The URI of the post-install script to run
-                                after reload
-
-        .. warning::
-           Due to how the ordering structure currently works, all ordering
-           takes place using price IDs rather than quantities. See the
-           following sample for an example of using HardwareManager functions
-           for ordering a basic server.
-
-        ::
-
-           # client is assumed to be an initialized SoftLayer.API.Client object
-           mgr = HardwareManager(client)
-
-           # Package ID 32 corresponds to the 'Quad Processor, Quad Core Intel'
-           # package. This information can be obtained from the
-           # :func:`get_available_dedicated_server_packages` function.
-           options = mgr.get_dedicated_server_create_options(32)
-
-           # Review the contents of options to find the information that
-           # applies to your order. For the sake of this example, we assume
-           # that your selections are a series of item IDs for each category
-           # organized into a key-value dictionary.
-
-           # This contains selections for all required categories
-           selections = {
-               'server': 542, # Quad Processor Quad Core Intel 7310 - 1.60GHz
-               'pri_ip_addresses': 15, # 1 IP Address
-               'notification': 51, # Email and Ticket
-               'ram': 280, # 16 GB FB-DIMM Registered 533/667
-               'bandwidth': 173, # 5000 GB Bandwidth
-               'lockbox': 45, # 1 GB Lockbox
-               'monitoring': 49, # Host Ping
-               'disk0': 14, # 500GB SATA II (for the first disk)
-               'response': 52, # Automated Notification
-               'port_speed': 187, # 100 Mbps Public & Private Networks
-               'power_supply': 469, # Redundant Power Supplies
-               'disk_controller': 487, # Non-RAID
-               'vulnerability_scanner': 307, # Nessus
-               'vpn_management': 309, # Unlimited SSL VPN Users
-               'remote_management': 504, # Reboot / KVM over IP
-               'os': 4166, # Ubuntu Linux 12.04 LTS Precise Pangolin (64 bit)
-           }
-
-           args = {
-               'location': 'FIRST_AVAILABLE', # Pick the first available DC
-               'packageId': 32, # From above
-               'disks': [],
-           }
-
-           for cat, item_id in selections:
-               for item in options['categories'][cat]['items'].items():
-                   if item['id'] == item_id:
-                       if 'disk' not in cat or 'disk_controller' == cat:
-                           args[cat] = item['price_id']
-                       else:
-                           args['disks'].append(item['price_id'])
-
-           # You can call :func:`verify_order` here to test the order instead
-           # of actually placing it if you prefer.
-           result = mgr.place_order(**args)
-
-        """
+        """Places an order for a piece of hardware."""
         create_options = self._generate_create_dict(**kwargs)
         return self.client['Product_Order'].placeOrder(create_options)
 
@@ -474,53 +303,21 @@ class HardwareManager(utils.IdentifierMixin, object):
             'moving': 'Moving to competitor',
         }
 
-    def _generate_create_dict(
-            self, server=None, hostname=None, domain=None, hourly=False,
-            location=None, os=None, disks=None, port_speed=None,
-            bare_metal=None, ram=None, package_id=None, disk_controller=None,
-            ssh_keys=None, public_vlan=None, private_vlan=None, post_uri=None):
+    def _generate_create_dict(self,
+                              size=None,
+                              hostname=None,
+                              domain=None,
+                              datacenter=None,
+                              os=None,
+                              ssh_keys=None,
+                              public_vlan=None,
+                              private_vlan=None,
+                              post_uri=None):
         """Translates arguments into a dictionary for creating a server.
 
-        .. warning::
-           All items here must be price IDs, NOT quantities!
-
-        :param int server: The identification string for the server to
-                           order. This will either be the CPU/Memory
-                           combination ID for bare metal instances or the
-                           CPU model for dedicated servers.
-        :param string hostname: The hostname to use for the new server.
-        :param string domain: The domain to use for the new server.
-        :param bool hourly: Flag to indicate if this server should be billed
-                            hourly (default) or monthly. Only applies to bare
-                            metal instances.
-        :param string location: The location string (data center) for the
-                                server
-        :param int os: The operating system to use
-        :param array disks: An array of disks for the server. Disks will be
-                            added in the order specified.
-        :param int port_speed: The port speed for the server.
-        :param bool bare_metal: Flag to indicate if this is a bare metal server
-                                or a dedicated server (default).
-        :param int ram: The amount of RAM to order. Only applies to dedicated
-                        servers.
-        :param int package_id: The package_id to use for the server. This
-                               should either be a chassis ID for dedicated
-                               servers or the bare metal instance package ID,
-                               which can be obtained by calling
-                               get_bare_metal_package_id
-        :param int disk_controller: The disk controller to use.
-        :param list ssh_keys: The SSH keys to add to the root user
-        :param int public_vlan: The ID of the public VLAN on which you want
-                                this server placed.
-        :param int private_vlan: The ID of the public VLAN on which you want
-                                 this server placed.
         """
-        arguments = ['server', 'hostname', 'domain', 'location', 'os', 'disks',
-                     'port_speed', 'bare_metal', 'ram', 'package_id',
-                     'disk_controller', 'server_core', 'disk0']
 
         hardware = {
-            'bareMetalInstanceFlag': bare_metal,
             'hostname': hostname,
             'domain': domain,
         }
@@ -532,10 +329,29 @@ class HardwareManager(utils.IdentifierMixin, object):
             hardware['primaryBackendNetworkComponent'] = {
                 "networkVlan": {"id": int(private_vlan)}}
 
+        package_mask = '''
+items[
+    keyName,
+    description,
+    itemCategory[id,categoryCode],
+    prices
+]
+'''
+        package = self.client['Product_Package'].getObject(id=200,
+                                                           mask=package_mask)
+
+        prices = []
+        for category in REQUIRED_CATEGORIES:
+            prices.append(_get_default_price_id(package['items'], category))
+
+        prices.append(_get_os_price_id(package['items'], os))
+
         order = {
             'hardware': [hardware],
-            'location': location,
-            'prices': [],
+            'location': datacenter,  # TODO: lookup OS price id based on keyname instead of a name like "HONGKONG02"
+            'prices': prices,
+            'packageId': 200,  # TODO: Look this up based on package type
+            'presetId': 70,  # TODO: Verify that preset id is a thing
         }
 
         if post_uri:
@@ -543,49 +359,6 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         if ssh_keys:
             order['sshKeys'] = [{'sshKeyIds': ssh_keys}]
-
-        if bare_metal:
-            order['packageId'] = self.get_bare_metal_package_id()
-            order['prices'].append({'id': int(server)})
-            p_options = self.get_bare_metal_create_options()
-            if hourly:
-                order['useHourlyPricing'] = True
-        else:
-            order['packageId'] = package_id
-            order['prices'].append({'id': int(server)})
-            p_options = self.get_dedicated_server_create_options(package_id)
-
-        if disks:
-            for disk in disks:
-                order['prices'].append({'id': int(disk)})
-
-        if os:
-            order['prices'].append({'id': int(os)})
-
-        if port_speed:
-            order['prices'].append({'id': int(port_speed)})
-
-        if ram:
-            order['prices'].append({'id': int(ram)})
-
-        if disk_controller:
-            order['prices'].append({'id': int(disk_controller)})
-
-        # Find all remaining required categories so we can auto-default them
-        required_fields = []
-        for category, data in p_options['categories'].items():
-            if data.get('is_required') and category not in arguments:
-                if 'disk' in category:
-                    # This block makes sure that we can default unspecified
-                    # disks if the user hasn't specified enough.
-                    disk_count = int(category.replace('disk', ''))
-                    if len(disks) >= disk_count + 1:
-                        continue
-                required_fields.append(category)
-
-        for category in required_fields:
-            price = get_default_value(p_options, category, hourly=hourly)
-            order['prices'].append({'id': price})
 
         return order
 
@@ -610,108 +383,6 @@ class HardwareManager(utils.IdentifierMixin, object):
         results = self.list_hardware(private_ip=ip, mask="id")
         if results:
             return [result['id'] for result in results]
-
-    def _parse_package_data(self, package_id):
-        """Parses data from the specified package into a consistent dictionary.
-
-        The data returned by the API varies significantly from one package
-        to another, which means that consuming it can make your program more
-        complicated than desired. This function will make all necessary API
-        calls for the specified package ID and build the results into a
-        consistently formatted dictionary like so:
-
-        result = {
-            'locations': [{'delivery_information': <string>,
-                           'keyname': <string>,
-                           'long_name': <string>}],
-            'categories': {
-                'category_code': {
-                    'sort': <int>,
-                    'step': <int>,
-                    'is_required': <bool>,
-                    'name': <string>,
-                    'group': <string>,
-                    'items': [
-                        {
-                            'id': <int>,
-                            'description': <string>,
-                            'sort': <int>,
-                            'price_id': <int>,
-                            'recurring_fee': <float>,
-                            'setup_fee': <float>,
-                            'hourly_recurring_fee': <float>,
-                            'one_time_fee': <float>,
-                            'labor_fee': <float>,
-                            'capacity': <float>,
-                        }
-                    ]
-                }
-            }
-        }
-
-        Your code can rely upon each of those elements always being present.
-        Each list will contain at least one entry as well, though most will
-        contain more than one.
-        """
-        package = self.client['Product_Package']
-
-        results = {
-            'categories': {},
-            'locations': []
-        }
-
-        # First pull the list of available locations. We do it with the
-        # getObject() call so that we get access to the delivery time info.
-        object_data = package.getRegions(id=package_id)
-
-        for loc in object_data:
-            details = loc['location']['locationPackageDetails'][0]
-
-            results['locations'].append({
-                'delivery_information': details.get('deliveryTimeInformation'),
-                'keyname': loc['keyname'],
-                'long_name': loc['description'],
-            })
-
-        mask = 'mask[itemCategory[group]]'
-
-        for config in package.getConfiguration(id=package_id, mask=mask):
-            code = config['itemCategory']['categoryCode']
-            group = utils.NestedDict(config['itemCategory']) or {}
-            category = {
-                'sort': config['sort'],
-                'step': config['orderStepId'],
-                'is_required': config['isRequired'],
-                'name': config['itemCategory']['name'],
-                'group': group['group']['name'],
-                'items': [],
-            }
-
-            results['categories'][code] = category
-
-        # Now pull in the available package item
-        for category in package.getCategories(id=package_id):
-            code = category['categoryCode']
-            items = []
-
-            for group in category['groups']:
-                for price in group['prices']:
-                    items.append({
-                        'id': price['itemId'],
-                        'description': price['item']['description'],
-                        'sort': price['sort'],
-                        'price_id': price['id'],
-                        'recurring_fee': price.get('recurringFee'),
-                        'setup_fee': price.get('setupFee'),
-                        'hourly_recurring_fee':
-                        price.get('hourlyRecurringFee'),
-                        'one_time_fee': price.get('oneTimeFee'),
-                        'labor_fee': price.get('laborFee'),
-                        'capacity': float(price['item'].get('capacity', 0)),
-                    })
-            results['categories'][code]['items'] = items
-
-        return results
 
     def edit(self, hardware_id, userdata=None, hostname=None, domain=None,
              notes=None):
@@ -769,36 +440,35 @@ class HardwareManager(utils.IdentifierMixin, object):
             id=hardware_id)
 
 
-def get_default_value(package_options, category, hourly=False):
-    """Returns the default price ID for the specified category.
+def _get_default_price_id(items, option):
+    """Returns a 'free' price id given an option."""
+    for item in items:
 
-    This determination is made by parsing the items in the package_options
-    argument and finding the first item that has zero specified for every fee
-    field.
+        if not utils.lookup(item, 'itemCategory', 'categoryCode') == option:
+            continue
 
-    .. note::
-       If the category has multiple items with no fee, this will return the
-       first it finds and then short circuit. This may not match the default
-       value presented on the SoftLayer ordering portal. Additionally, this
-       method will return None if there are no free items in the category.
+        for price in item['prices']:
+            if all([float(price.get('hourlyRecurringFee', 0)) == 0.0,
+                    float(price.get('recurringFee', 0)) == 0.0,
+                    ]):
+                return price['id']
 
-    :returns: Returns the price ID of the first free item it finds or None
-              if there are no free items.
-    """
-    if category not in package_options['categories']:
-        return
+    raise SoftLayer.SoftLayerError('Could not find valid price for %s option' %
+                                   option)
 
-    for item in package_options['categories'][category]['items']:
-        if hourly:
-            if item.get('hourly_recurring_fee') is None:
-                continue
-        else:
-            if item.get('recurring_fee') is None:
-                continue
 
-        if not any([float(item.get('setup_fee') or 0),
-                    float(item.get('recurring_fee') or 0),
-                    float(item.get('hourly_recurring_fee') or 0),
-                    float(item.get('one_time_fee') or 0),
-                    float(item.get('labor_fee') or 0)]):
-            return item['price_id']
+def _get_os_price_id(items, os):
+    """Returns the price id matching."""
+    for item in items:
+
+        if not utils.lookup(item, 'itemCategory', 'categoryCode') == 'os':
+            continue
+
+        if not utils.lookup(item, 'keyName') == os:
+            continue
+
+        for price in item['prices']:
+            return price['id']
+
+    raise SoftLayer.SoftLayerError('Could not find valid price for os: "%s"' %
+                                   os)
