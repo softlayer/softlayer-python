@@ -1,4 +1,4 @@
-"""List BIlling information of Accounts."""
+"""List billing details of Account."""
 # :license: MIT, see LICENSE for more details.
 
 
@@ -12,7 +12,7 @@ import click
 @click.command()
 @environment.pass_env
 def cli(env):
-    """List billing information for accounts."""
+    """List billing details of Account."""
     billing = SoftLayer.BillingManager(env.client)
     table = formatting.Table(['Name', 'Value'])
     info = billing.get_info()

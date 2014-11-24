@@ -1,4 +1,4 @@
-"""List BIlling information of Accounts."""
+"""List billing information of orders."""
 # :license: MIT, see LICENSE for more details.
 
 
@@ -16,7 +16,7 @@ import click
               help='end date to consider, default is latest time stamp')
 @environment.pass_env
 def cli(env, start_date, end_date):
-    """List billing information for accounts."""
+    """List billing information for orders."""
     billing = SoftLayer.BillingManager(env.client)
     from_date = start_date
     to_date = end_date
