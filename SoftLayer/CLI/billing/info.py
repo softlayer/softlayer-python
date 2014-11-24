@@ -33,7 +33,6 @@ def cli(env):
     pass_table = formatting.Table(['Name', 'Value'])
     result = info['currency']
     for key in result.keys():
-        print key, result[key]
         pass_table.add_row([key, result[key]])
     table.add_row(['currency', pass_table])
     return table

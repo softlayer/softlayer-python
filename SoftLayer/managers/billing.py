@@ -58,6 +58,22 @@ class BillingManager(object):
         result = self.account.getBillingInfo()
         return result
 
+    def get_balance(self):
+        """
+
+        :return: billing account info
+        """
+        result = self.account.getBalance()
+        return result
+
+    def get_next_balance(self):
+        """
+
+        :return: billing account info
+        """
+        result = self.account.getNextInvoiceTotalAmount()
+        return result
+
     def list_resources(self, from_date=None, to_date=None, **kwargs):
         """ Retrieve a list of all ordered resources along with their costing.
 
