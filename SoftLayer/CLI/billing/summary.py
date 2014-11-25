@@ -17,6 +17,8 @@ def cli(env):
     table = formatting.Table(['Name', 'Value'])
     balance = billing.get_balance()
     next_balance = billing.get_next_balance()
+    last_bill_date = billing.get_latest_bill_date()
     table.add_row(['Current Balance', balance])
     table.add_row(['Estimated Next Balance', next_balance])
+    table.add_row(['Last Billing Date', last_bill_date])
     return table
