@@ -17,6 +17,11 @@ import click
 @click.option('--size', '-s', help="Hardware size")
 @click.option('--os', '-o', help="OS install code")
 @click.option('--datacenter', '-d', help="Datacenter shortname")
+@click.option('--billing',
+              type=click.Choice(['hourly', 'monthly']),
+              default='hourly',
+              help="Billing rate")
+@click.option('--port-speed', type=click.INT, help="Port speeds")
 @click.option('--test',
               is_flag=True,
               help="Do not actually create the virtual server")
@@ -34,6 +39,7 @@ import click
               help="The ID of the private VLAN on which you want the virtual "
                    "server placed",
               type=click.INT)
+@click.option('--extras', default='', help="Extra options; comma-separated")
 @click.option('--wait',
               type=click.INT,
               help="Wait until the server is finished provisioning for up to "
@@ -63,6 +69,10 @@ def cli(env, **args):
         'ssh_keys': ssh_keys,
         'post_uri': args.get('postinstall'),
         'os': args['os'],
+        'hourly': args.get('billing') == 'hourly',
+        'port_speed': args.get('port_speed'),
+        'no_public': args.get('no_public') or False,
+        'extras': args.get('extras').split(','),
     }
 
     # Do not create hardware server with --test or --export

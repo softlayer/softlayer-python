@@ -25,7 +25,7 @@ import click
 @click.option('--billing',
               type=click.Choice(['hourly', 'monthly']),
               default='hourly',
-              help="""Billing rate""")
+              help="Billing rate")
 @click.option('--datacenter', '-d', help="Datacenter shortname")
 @click.option('--dedicated/--public',
               is_flag=True,
@@ -114,7 +114,7 @@ def cli(env, **args):
             total = total_monthly
 
         billing_rate = 'monthly'
-        if args.get('hourly'):
+        if args.get('billing') == 'hourly':
             billing_rate = 'hourly'
         table.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
         output.append(table)

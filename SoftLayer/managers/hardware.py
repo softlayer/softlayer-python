@@ -13,14 +13,6 @@ from SoftLayer import utils
 # Invalid names are ignored due to long method names and short argument names
 # pylint: disable=invalid-name, no-self-use
 
-REQUIRED_CATEGORIES = [
-    'bandwidth',
-    'port_speed',
-    'pri_ip_addresses',
-    'vpn_management',
-    'remote_management',
-]
-
 
 class HardwareManager(utils.IdentifierMixin, object):
     """Manage hardware devices.
@@ -309,13 +301,17 @@ class HardwareManager(utils.IdentifierMixin, object):
                               domain=None,
                               datacenter=None,
                               os=None,
+                              port_speed=None,
                               ssh_keys=None,
                               public_vlan=None,
                               private_vlan=None,
-                              post_uri=None):
-        """Translates arguments into a dictionary for creating a server.
+                              post_uri=None,
+                              hourly=True,
+                              no_public=False,
+                              extras=None):
+        """Translates arguments into a dictionary for creating a server."""
 
-        """
+        extras = extras or []
 
         hardware = {
             'hostname': hostname,
@@ -332,26 +328,44 @@ class HardwareManager(utils.IdentifierMixin, object):
         package_mask = '''
 items[
     keyName,
+    capacity,
     description,
+    attributes[id,attributeTypeKeyName],
     itemCategory[id,categoryCode],
+    softwareDescription[id,referenceCode],
     prices
-]
+],
+regions[location[location]]
 '''
         package = self.client['Product_Package'].getObject(id=200,
                                                            mask=package_mask)
 
         prices = []
-        for category in REQUIRED_CATEGORIES:
-            prices.append(_get_default_price_id(package['items'], category))
+        for category in ['pri_ip_addresses',
+                         'vpn_management',
+                         'remote_management',
+                         ]:
+            prices.append(_get_default_price_id(package['items'],
+                                                category,
+                                                hourly))
 
         prices.append(_get_os_price_id(package['items'], os))
+        prices.append(_get_bandwidth_price_id(package['items'],
+                                              hourly=hourly,
+                                              no_public=no_public))
+        prices.append(_get_port_speed_price_id(package['items'],
+                                               port_speed,
+                                               no_public))
+        for extra in extras:
+            prices.append(_get_extra_price_id(package['items'], extra, hourly))
 
         order = {
             'hardware': [hardware],
             'location': datacenter,  # TODO: lookup OS price id based on keyname instead of a name like "HONGKONG02"
-            'prices': prices,
+            'prices': [{'id': price} for price in prices],
             'packageId': 200,  # TODO: Look this up based on package type
             'presetId': 70,  # TODO: Verify that preset id is a thing
+            'useHourlyPricing': hourly,
         }
 
         if post_uri:
@@ -440,21 +454,66 @@ items[
             id=hardware_id)
 
 
-def _get_default_price_id(items, option):
-    """Returns a 'free' price id given an option."""
-    for item in items:
+def _get_extra_price_id(items, key_name, hourly):
+    """Returns a price id attached to item with the given key_name."""
 
+    for item in items:
+        if not utils.lookup(item, 'keyName') == key_name:
+            continue
+
+        for price in item['prices']:
+            if matches_billing(price, hourly):
+                return price['id']
+
+    raise SoftLayer.SoftLayerError("Could not find valid price for %s" %
+                                   key_name)
+
+
+def _get_default_price_id(items, option, hourly):
+    """Returns a 'free' price id given an option."""
+
+    for item in items:
         if not utils.lookup(item, 'itemCategory', 'categoryCode') == option:
             continue
 
         for price in item['prices']:
-            if all([float(price.get('hourlyRecurringFee', 0)) == 0.0,
-                    float(price.get('recurringFee', 0)) == 0.0,
+            if any([float(price.get('hourlyRecurringFee', 0)) != 0.0,
+                    float(price.get('recurringFee', 0)) != 0.0,
+                    not matches_billing(price, hourly)
                     ]):
-                return price['id']
+                continue
+            return price['id']
 
-    raise SoftLayer.SoftLayerError('Could not find valid price for %s option' %
+    raise SoftLayer.SoftLayerError("Could not find valid price for %s option" %
                                    option)
+
+
+def _get_bandwidth_price_id(items, hourly=True, no_public=False):
+
+    # Prefer pay-for-use data transfer with hourly
+    for item in items:
+
+        if not utils.lookup(item,
+                            'itemCategory',
+                            'categoryCode') == 'bandwidth':
+            continue
+
+        capacity = float(item.get('capacity', 0))
+        if any([
+            # Hourly and private only do pay-as-you-go bandwidth
+            (hourly or no_public) and capacity != 0.0,
+            not (hourly or no_public) and capacity == 0.0,
+        ]):
+            continue
+
+        for price in item['prices']:
+            if not matches_billing(price, hourly):
+                continue
+
+            return price['id']
+
+    raise SoftLayer.SoftLayerError(
+        "Could not find valid price for bandwidth option")
 
 
 def _get_os_price_id(items, os):
@@ -464,7 +523,9 @@ def _get_os_price_id(items, os):
         if not utils.lookup(item, 'itemCategory', 'categoryCode') == 'os':
             continue
 
-        if not utils.lookup(item, 'keyName') == os:
+        if not utils.lookup(item,
+                            'softwareDescription',
+                            'referenceCode') == os:
             continue
 
         for price in item['prices']:
@@ -472,3 +533,44 @@ def _get_os_price_id(items, os):
 
     raise SoftLayer.SoftLayerError('Could not find valid price for os: "%s"' %
                                    os)
+
+
+def _get_port_speed_price_id(items, port_speed, no_public):
+
+    for item in items:
+
+        if not utils.lookup(item,
+                            'itemCategory',
+                            'categoryCode') == 'port_speed':
+            continue
+
+    for item in items:
+
+        if not utils.lookup(item,
+                            'itemCategory',
+                            'categoryCode') == 'port_speed':
+            continue
+
+        if any([int(utils.lookup(item, 'capacity')) != port_speed,
+                is_private_port_speed_item(item) != no_public,
+                ]):
+            continue
+
+        for price in item['prices']:
+            return price['id']
+
+    raise SoftLayer.SoftLayerError(
+        "Could not find valid price for port speed: '%s'" % port_speed)
+
+
+def matches_billing(price, hourly):
+    return any([hourly and price.get('hourlyRecurringFee') is not None,
+                not hourly and price.get('recurringFee') is not None])
+
+
+def is_private_port_speed_item(item):
+    for attribute in item['attributes']:
+        if attribute['attributeTypeKeyName'] == 'IS_PRIVATE_NETWORK_ONLY':
+            return True
+
+    return False
