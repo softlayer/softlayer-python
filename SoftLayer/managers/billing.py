@@ -88,7 +88,6 @@ class BillingManager(object):
         :return: billing account info
         """
         result = self.account.getAllBillingItems()
-        print result
         return result
 
     def list_resources(self, from_date=None, to_date=None, **kwargs):
