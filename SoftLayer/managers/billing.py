@@ -13,6 +13,10 @@ import time
 
 
 class BillingManager(object):
+    """Manages Billing details.
+
+    :param SoftLayer.managers.orderingManager
+    """
 
     def _format_date(self, date):
         """
