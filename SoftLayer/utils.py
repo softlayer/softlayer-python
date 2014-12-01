@@ -5,8 +5,8 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import re
 import datetime
+import re
 
 import six
 
@@ -114,10 +114,10 @@ def query_filter(query):
 
 
 def query_filter_date(start, end):
-    """
+    """Query filters given start and end date.
+
     :param start:YY-MM-DD
     :param end: YY-MM-DD
-    :return:
     """
     sdate = datetime.datetime.strptime(start, "%Y-%m-%d")
     edate = datetime.datetime.strptime(end, "%Y-%m-%d")
