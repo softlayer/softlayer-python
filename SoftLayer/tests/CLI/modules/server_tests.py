@@ -11,7 +11,6 @@
 import mock
 
 from SoftLayer.CLI import exceptions
-from SoftLayer.CLI.server import create
 from SoftLayer import testing
 
 import json
@@ -25,79 +24,6 @@ class ServerCLITests(testing.TestCase):
         output = json.loads(result.output)
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(len(output), 10)
-
-    @mock.patch('SoftLayer.HardwareManager'
-                '.get_available_dedicated_server_packages')
-    def test_server_create_options(self, packages):
-
-        packages.return_value = [(999, 'Chassis 999')]
-
-        result = self.run_command(['server', 'create-options', '999'])
-
-        expected = {
-            'cpu': [
-                {'Description': 'Dual Quad Core Pancake 200 - 1.60GHz',
-                 'ID': 723},
-                {'Description': 'Dual Quad Core Pancake 200 - 1.80GHz',
-                 'ID': 724}],
-            'datacenter': ['RANDOM_LOCATION'],
-            'disk': ['250_SATA_II', '500_SATA_II'],
-            'disk_controllers': ['None', 'RAID0'],
-            'dual nic': ['1000_DUAL', '100_DUAL', '10_DUAL'],
-            'memory': [4, 6],
-            'os (CENTOS)': ['CENTOS_6_64_LAMP', 'CENTOS_6_64_MINIMAL'],
-            'os (REDHAT)': ['REDHAT_6_64_LAMP', 'REDHAT_6_64_MINIMAL'],
-            'os (UBUNTU)': ['UBUNTU_12_64_LAMP', 'UBUNTU_12_64_MINIMAL'],
-            'os (WIN)': [
-                'WIN_2008-DC_64',
-                'WIN_2008-ENT_64',
-                'WIN_2008-STD-R2_64',
-                'WIN_2008-STD_64',
-                'WIN_2012-DC-HYPERV_64'],
-            'single nic': ['100', '1000']}
-
-        self.assertEqual(result.exit_code, 0)
-        self.assertEqual(json.loads(result.output), expected)
-
-    @mock.patch('SoftLayer.HardwareManager'
-                '.get_available_dedicated_server_packages')
-    def test_server_create_options_with_invalid_chassis(self, packages):
-        packages.return_value = [(998, 'Legacy Chassis')]
-        result = self.run_command(['server', 'create-options', '999'])
-
-        self.assertEqual(result.exit_code, 2)
-        self.assertIsInstance(result.exception, exceptions.CLIAbort)
-
-    @mock.patch('SoftLayer.HardwareManager'
-                '.get_available_dedicated_server_packages')
-    @mock.patch('SoftLayer.HardwareManager.get_bare_metal_package_id')
-    def test_server_create_options_for_bmc(self, bmpi, packages):
-        packages.return_value = [(1099, 'Bare Metal Instance')]
-        bmpi.return_value = '1099'
-
-        result = self.run_command(['server', 'create-options', '1099'])
-
-        expected = {
-            'memory/cpu': [
-                {'cpu': ['2'], 'memory': '2'},
-                {'cpu': ['2', '4'], 'memory': '4'},
-            ],
-            'datacenter': ['RANDOM_LOCATION'],
-            'disk': ['250_SATA_II', '500_SATA_II'],
-            'dual nic': ['1000_DUAL', '100_DUAL', '10_DUAL'],
-            'os (CENTOS)': ['CENTOS_6_64_LAMP', 'CENTOS_6_64_MINIMAL'],
-            'os (REDHAT)': ['REDHAT_6_64_LAMP', 'REDHAT_6_64_MINIMAL'],
-            'os (UBUNTU)': ['UBUNTU_12_64_LAMP', 'UBUNTU_12_64_MINIMAL'],
-            'os (WIN)': [
-                'WIN_2008-DC_64',
-                'WIN_2008-ENT_64',
-                'WIN_2008-STD-R2_64',
-                'WIN_2008-STD_64',
-                'WIN_2012-DC-HYPERV_64'],
-            'single nic': ['100', '1000']}
-
-        self.assertEqual(result.exit_code, 0)
-        self.assertEqual(json.loads(result.output), expected)
 
     def test_server_details(self):
         result = self.run_command(['server', 'detail', '1234',
@@ -280,19 +206,6 @@ class ServerCLITests(testing.TestCase):
                                 args=(100,),
                                 identifier=12345)
 
-    @mock.patch('SoftLayer.HardwareManager'
-                '.get_available_dedicated_server_packages')
-    def test_list_chassis_server(self, packages):
-        packages.return_value = [(1, 'Chassis 1', 'Some chassis'),
-                                 (2, 'Chassis 2', 'Another chassis')]
-        result = self.run_command(['server', 'list-chassis'])
-
-        expected = [{'chassis': 'Chassis 1', 'code': 1},
-                    {'chassis': 'Chassis 2', 'code': 2}]
-
-        self.assertEqual(result.exit_code, 0)
-        self.assertEqual(json.loads(result.output), expected)
-
     @mock.patch('SoftLayer.HardwareManager.verify_order')
     def test_create_server_test_flag(self, verify_mock):
         verify_mock.return_value = {
@@ -309,26 +222,17 @@ class ServerCLITests(testing.TestCase):
                 }
             ]
         }
-        result = self.run_command(['server', 'create',
-                                   '--chassis=999',
+
+        result = self.run_command(['--really', 'server', 'create',
+                                   '--size=S1270_8GB_2X1TBSATA_NORAID',
                                    '--hostname=test',
                                    '--domain=example.com',
                                    '--datacenter=TEST00',
-                                   '--cpu=4',
-                                   '--network=100',
-                                   '--disk=250_SATA_II',
-                                   '--disk=250_SATA_II',
-                                   '--os=UBUNTU_12_64_MINIMAL',
-                                   '--memory=4',
-                                   '--controller=RAID0',
-                                   '--test',
-                                   '--key=1234',
-                                   '--key=456',
+                                   '--port-speed=100',
+                                   '--os=UBUNTU_12_64',
                                    '--vlan-public=10234',
                                    '--vlan-private=20468',
-                                   '--postinstall='
-                                   'http://somescript.foo/myscript.sh',
-                                   ],
+                                   '--test'],
                                   fmt='raw')
 
         self.assertEqual(result.exit_code, 0)
@@ -336,78 +240,20 @@ class ServerCLITests(testing.TestCase):
         self.assertIn("Second Item", result.output)
         self.assertIn("Total monthly cost", result.output)
 
-    @mock.patch('SoftLayer.HardwareManager.verify_order')
-    def test_create_server_test_no_disk(self, verify_mock):
-
-        verify_mock.return_value = {
-            'prices': [
-                {
-                    'recurringFee': 0.0,
-                    'setupFee': 0.0,
-                    'item': {'description': 'First Item'},
-                },
-                {
-                    'recurringFee': 25.0,
-                    'setupFee': 0.0,
-                    'item': {'description': 'Second Item'},
-                }
-            ]
-        }
-        result = self.run_command(['server', 'create',
-                                   '--chassis=999',
-                                   '--hostname=test',
-                                   '--domain=example.com',
-                                   '--datacenter=TEST00',
-                                   '--cpu=4',
-                                   '--network=100',
-                                   '--os=UBUNTU_12_64_MINIMAL',
-                                   '--memory=4',
-                                   '--controller=RAID0',
-                                   '--test',
-                                   '--key=1234',
-                                   '--key=456',
-                                   '--vlan-public=10234',
-                                   '--vlan-private=20468',
-                                   '--postinstall='
-                                   'http://somescript.foo/myscript.sh',
-                                   ],
-                                  fmt='raw')
+    def test_create_options(self):
+        result = self.run_command(['server', 'create-options'])
 
         self.assertEqual(result.exit_code, 0)
-
-    @mock.patch('SoftLayer.HardwareManager.verify_order')
-    def test_create_server_test_no_disk_no_raid(self, verify_mock):
-        verify_mock.return_value = {
-            'prices': [
-                {
-                    'recurringFee': 0.0,
-                    'setupFee': 0.0,
-                    'item': {'description': 'First Item'},
-                },
-                {
-                    'recurringFee': 25.0,
-                    'setupFee': 0.0,
-                    'item': {'description': 'Second Item'},
-                }
-            ]
-        }
-
-        result = self.run_command(['server', 'create',
-                                   '--chassis=999',
-                                   '--hostname=test',
-                                   '--domain=example.com',
-                                   '--datacenter=TEST00',
-                                   '--cpu=4',
-                                   '--network=100',
-                                   '--os=UBUNTU_12_64_MINIMAL',
-                                   '--memory=4',
-                                   '--test',
-                                   '--vlan-public=10234',
-                                   '--vlan-private=20468',
-                                   ],
-                                  fmt='raw')
-
-        self.assertEqual(result.exit_code, 0)
+        expected = [
+            [{'datacenter': 'Washington 1', 'value': 'wdc01'}],
+            [{'size': 'Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID',
+              'value': 'S1270_8GB_2X1TBSATA_NORAID'}],
+            [{'operating_system': 'Ubuntu / 14.04-64',
+              'value': 'UBUNTU_14_64'}],
+            [{'port_speed': '10 Mbps Public & Private Network Uplinks',
+              'value': '10'}],
+            [{'extras': '1 IPv6 Address', 'value': '1_IPV6_ADDRESS'}]]
+        self.assertEqual(json.loads(result.output), expected)
 
     @mock.patch('SoftLayer.HardwareManager.place_order')
     def test_create_server(self, order_mock):
@@ -417,14 +263,12 @@ class ServerCLITests(testing.TestCase):
         }
 
         result = self.run_command(['--really', 'server', 'create',
-                                   '--chassis=999',
+                                   '--size=S1270_8GB_2X1TBSATA_NORAID',
                                    '--hostname=test',
                                    '--domain=example.com',
                                    '--datacenter=TEST00',
-                                   '--cpu=4',
-                                   '--network=100',
-                                   '--os=UBUNTU_12_64_MINIMAL',
-                                   '--memory=4',
+                                   '--port-speed=100',
+                                   '--os=UBUNTU_12_64',
                                    '--vlan-public=10234',
                                    '--vlan-private=20468',
                                    ])
@@ -441,141 +285,46 @@ class ServerCLITests(testing.TestCase):
                                    '--hostname=test',
                                    '--domain=example.com',
                                    '--datacenter=TEST00',
-                                   '--cpu=4',
                                    '--network=100',
                                    '--os=UBUNTU_12_64_MINIMAL',
-                                   '--memory=4',
                                    ])
 
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, SystemExit)
 
     @mock.patch('SoftLayer.CLI.template.export_to_template')
-    def test_create_server_with_export(self, export_to_template):
-        result = self.run_command(['server', 'create',
-                                   # Note: no chassis id
-                                   '--chassis=999',
+    def test_create_server_with_export(self, export_mock):
+        result = self.run_command(['--really', 'server', 'create',
+                                   '--size=S1270_8GB_2X1TBSATA_NORAID',
                                    '--hostname=test',
                                    '--domain=example.com',
                                    '--datacenter=TEST00',
-                                   '--cpu=4',
-                                   '--memory=4',
-                                   '--network=100',
-                                   '--os=UBUNTU_12_64_MINIMAL',
-                                   '--key=1234',
-                                   '--export=/path/to/test_file.txt',
-                                   ])
+                                   '--port-speed=100',
+                                   '--os=UBUNTU_12_64',
+                                   '--vlan-public=10234',
+                                   '--vlan-private=20468',
+                                   '--export=/path/to/test_file.txt'],
+                                  fmt='raw')
 
         self.assertEqual(result.exit_code, 0)
         self.assertIn("Successfully exported options to a template file.",
                       result.output)
-        export_to_template.assert_called_with('/path/to/test_file.txt',
-                                              {'domain': 'example.com',
-                                               'san': False,
-                                               'dedicated': False,
-                                               'private': False,
-                                               'disk': (),
-                                               'userdata': None,
-                                               'network': '100',
-                                               'billing': 'monthly',
-                                               'userfile': None,
-                                               'hostname': 'test',
-                                               'template': None,
-                                               'memory': 4,
-                                               'test': False,
-                                               'postinstall': None,
-                                               'controller': None,
-                                               'chassis': '999',
-                                               'key': ('1234',),
-                                               'vlan_private': None,
-                                               'wait': None,
-                                               'datacenter': 'TEST00',
-                                               'os': 'UBUNTU_12_64_MINIMAL',
-                                               'cpu': 4,
-                                               'vlan_public': None},
-                                              exclude=['wait', 'test'])
-
-    @mock.patch('SoftLayer.HardwareManager'
-                '.get_available_dedicated_server_packages')
-    @mock.patch('SoftLayer.HardwareManager.get_bare_metal_package_id')
-    @mock.patch('SoftLayer.HardwareManager.verify_order')
-    def test_create_server_test_for_bmc(self, verify_mock, bmpi, packages):
-        packages.return_value = [(1099, 'Bare Metal Instance', 'BMC')]
-        bmpi.return_value = '1099'
-
-        # First, test the --test flag
-        verify_mock.return_value = {
-            'prices': [
-                {
-                    'recurringFee': 0.0,
-                    'setupFee': 0.0,
-                    'item': {'description': 'First Item'},
-                },
-                {
-                    'recurringFee': 25.0,
-                    'setupFee': 0.0,
-                    'item': {'description': 'Second Item'},
-                }
-            ]
-        }
-
-        result = self.run_command(['server', 'create',
-                                   '--chassis=1099',
-                                   '--hostname=test',
-                                   '--domain=example.com',
-                                   '--datacenter=TEST00',
-                                   '--cpu=2',
-                                   '--memory=2',
-                                   '--network=100',
-                                   '--disk=250_SATA_II',
-                                   '--disk=250_SATA_II',
-                                   '--os=UBUNTU_12_64_MINIMAL',
-                                   '--vlan-public=10234',
-                                   '--vlan-private=20468',
-                                   '--key=1234',
-                                   '--key=456',
-                                   '--test',
-                                   '--postinstall='
-                                   'http://somescript.foo/myscript.sh',
-                                   '--billing=hourly',
-                                   ])
-
-        self.assertEqual(result.exit_code, 0)
-        self.assertIn("First Item", result.output)
-        self.assertIn("Second Item", result.output)
-        self.assertIn("Total monthly cost", result.output)
-
-    @mock.patch('SoftLayer.HardwareManager'
-                '.get_available_dedicated_server_packages')
-    @mock.patch('SoftLayer.HardwareManager.get_bare_metal_package_id')
-    @mock.patch('SoftLayer.HardwareManager.place_order')
-    def test_create_server_for_bmc(self, order_mock, bmpi, packages):
-        order_mock.return_value = {
-            'orderId': 98765,
-            'orderDate': '2013-08-02 15:23:47'
-        }
-
-        result = self.run_command(['--really', 'server', 'create',
-                                   '--chassis=1099',
-                                   '--hostname=test',
-                                   '--domain=example.com',
-                                   '--datacenter=TEST00',
-                                   '--cpu=4',
-                                   '--memory=4',
-                                   '--network=100',
-                                   '--disk=250_SATA_II',
-                                   '--disk=250_SATA_II',
-                                   '--os=UBUNTU_12_64_MINIMAL',
-                                   '--vlan-public=10234',
-                                   '--vlan-private=20468',
-                                   '--key=1234',
-                                   '--key=456',
-                                   '--billing=hourly',
-                                   ])
-
-        self.assertEqual(result.exit_code, 0)
-        self.assertEqual(json.loads(result.output),
-                         {'id': 98765, 'created': '2013-08-02 15:23:47'})
+        export_mock.assert_called_with('/path/to/test_file.txt',
+                                       {'billing': 'hourly',
+                                        'datacenter': 'TEST00',
+                                        'domain': 'example.com',
+                                        'extra': (),
+                                        'hostname': 'test',
+                                        'key': (),
+                                        'os': 'UBUNTU_12_64',
+                                        'port_speed': 100,
+                                        'postinstall': None,
+                                        'size': 'S1270_8GB_2X1TBSATA_NORAID',
+                                        'test': False,
+                                        'vlan_private': 20468,
+                                        'vlan_public': 10234,
+                                        'wait': None},
+                                       exclude=['wait', 'test'])
 
     def test_edit_server_userdata_and_file(self):
         # Test both userdata and userfile at once
@@ -631,11 +380,6 @@ class ServerCLITests(testing.TestCase):
                                     'setUserMetadata',
                                     args=(['some data'],),
                                     identifier=1000)
-
-    def test_get_default_value_returns_none_for_unknown_category(self):
-        option_mock = {'categories': {'cat1': []}}
-        output = create._get_default_value(option_mock, 'nope')
-        self.assertEqual(None, output)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_update_firmware(self, confirm_mock):

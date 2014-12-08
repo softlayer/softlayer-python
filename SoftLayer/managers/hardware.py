@@ -13,6 +13,10 @@ from SoftLayer import utils
 # Invalid names are ignored due to long method names and short argument names
 # pylint: disable=invalid-name, no-self-use
 
+EXTRA_CATEGORIES = ['pri_ipv6_addresses',
+                    'static_ipv6_addresses',
+                    'sec_ip_addresses']
+
 
 class HardwareManager(utils.IdentifierMixin, object):
     """Manage hardware devices.
@@ -295,11 +299,92 @@ class HardwareManager(utils.IdentifierMixin, object):
             'moving': 'Moving to competitor',
         }
 
+    def get_create_options(self):
+        """Returns valid options for ordering hardware."""
+
+        package = self._get_package()
+
+        # Locations
+        locations = []
+        for region in package['regions']:
+            locations.append({
+                'name': region['location']['location']['longName'],
+                'key': region['location']['location']['name'],
+            })
+
+        # Sizes
+        sizes = []
+        for preset in package['activePresets']:
+            sizes.append({
+                'name': preset['description'],
+                'key': preset['keyName']
+            })
+
+        # Operating systems
+        operating_systems = []
+        for item in package['items']:
+            if item['itemCategory']['categoryCode'] == 'os':
+                operating_systems.append({
+                    'name': item['softwareDescription']['longDescription'],
+                    'key': item['softwareDescription']['referenceCode'],
+                })
+
+        # Port speeds
+        port_speeds = []
+        for item in package['items']:
+            if all([item['itemCategory']['categoryCode'] == 'port_speed',
+                    not _is_private_port_speed_item(item)]):
+                port_speeds.append({
+                    'name': item['description'],
+                    'key': item['capacity'],
+                })
+
+        # Extras
+        extras = []
+        for item in package['items']:
+            if item['itemCategory']['categoryCode'] in EXTRA_CATEGORIES:
+                extras.append({
+                    'name': item['description'],
+                    'key': item['keyName']
+                })
+
+        return {
+            'locations': locations,
+            'sizes': sizes,
+            'operating_systems': operating_systems,
+            'port_speeds': port_speeds,
+            'extras': extras,
+        }
+
+    def _get_package(self):
+        """Get the package related to simple hardware ordering."""
+        mask = '''
+items[
+    keyName,
+    capacity,
+    description,
+    attributes[id,attributeTypeKeyName],
+    itemCategory[id,categoryCode],
+    softwareDescription[id,referenceCode,longDescription],
+    prices
+],
+activePresets,
+regions[location[location]]
+'''
+
+        package_type = 'BARE_METAL_CPU_FAST_PROVISION'
+        packages = self.ordering_manager.get_packages_of_type([package_type],
+                                                              mask=mask)
+        if len(packages) != 1:
+            raise SoftLayer.SoftLayerError("Ordering package not found")
+
+        return packages.pop()
+
     def _generate_create_dict(self,
                               size=None,
                               hostname=None,
                               domain=None,
-                              datacenter=None,
+                              location=None,
                               os=None,
                               port_speed=None,
                               ssh_keys=None,
@@ -325,32 +410,12 @@ class HardwareManager(utils.IdentifierMixin, object):
             hardware['primaryBackendNetworkComponent'] = {
                 "networkVlan": {"id": int(private_vlan)}}
 
-        package_mask = '''
-items[
-    keyName,
-    capacity,
-    description,
-    attributes[id,attributeTypeKeyName],
-    itemCategory[id,categoryCode],
-    softwareDescription[id,referenceCode],
-    prices
-],
-activePresets,
-regions[location[location]]
-'''
-        _filter = {
-            'type': {'keyName': {'operation': 'BARE_METAL_CPU_FAST_PROVISION'}}
-        }
-        package_service = self.client['Product_Package']
-        package = package_service.getAllObjects(filter=_filter,
-                                                mask=package_mask,
-                                                limit=1)
+        package = self._get_package()
 
         prices = []
         for category in ['pri_ip_addresses',
                          'vpn_management',
-                         'remote_management',
-                         ]:
+                         'remote_management']:
             prices.append(_get_default_price_id(package['items'],
                                                 category,
                                                 hourly))
@@ -369,7 +434,7 @@ regions[location[location]]
 
         order = {
             'hardware': [hardware],
-            'location': _get_location_long_name(package, datacenter),
+            'location': _get_location_key(package, location),
             'prices': [{'id': price} for price in prices],
             'packageId': package['id'],
             'presetId': _get_preset_id(package, size),
@@ -470,7 +535,7 @@ def _get_extra_price_id(items, key_name, hourly):
             continue
 
         for price in item['prices']:
-            if matches_billing(price, hourly):
+            if _matches_billing(price, hourly):
                 return price['id']
 
     raise SoftLayer.SoftLayerError("Could not find valid price for %s" %
@@ -487,8 +552,7 @@ def _get_default_price_id(items, option, hourly):
         for price in item['prices']:
             if any([float(price.get('hourlyRecurringFee', 0)) != 0.0,
                     float(price.get('recurringFee', 0)) != 0.0,
-                    not matches_billing(price, hourly)
-                    ]):
+                    not _matches_billing(price, hourly)]):
                 continue
             return price['id']
 
@@ -497,6 +561,7 @@ def _get_default_price_id(items, option, hourly):
 
 
 def _get_bandwidth_price_id(items, hourly=True, no_public=False):
+    """Choose a valid price id for bandwidth."""
 
     # Prefer pay-for-use data transfer with hourly
     for item in items:
@@ -507,15 +572,13 @@ def _get_bandwidth_price_id(items, hourly=True, no_public=False):
             continue
 
         capacity = float(item.get('capacity', 0))
-        if any([
-            # Hourly and private only do pay-as-you-go bandwidth
-            (hourly or no_public) and capacity != 0.0,
-            not (hourly or no_public) and capacity == 0.0,
-        ]):
+        # Hourly and private only do pay-as-you-go bandwidth
+        if any([(hourly or no_public) and capacity != 0.0,
+                not (hourly or no_public) and capacity == 0.0]):
             continue
 
         for price in item['prices']:
-            if not matches_billing(price, hourly):
+            if not _matches_billing(price, hourly):
                 continue
 
             return price['id']
@@ -544,6 +607,7 @@ def _get_os_price_id(items, os):
 
 
 def _get_port_speed_price_id(items, port_speed, no_public):
+    """Choose a valid price id for port speed."""
 
     for item in items:
 
@@ -560,8 +624,7 @@ def _get_port_speed_price_id(items, port_speed, no_public):
             continue
 
         if any([int(utils.lookup(item, 'capacity')) != port_speed,
-                is_private_port_speed_item(item) != no_public,
-                ]):
+                _is_private_port_speed_item(item) != no_public]):
             continue
 
         for price in item['prices']:
@@ -571,12 +634,14 @@ def _get_port_speed_price_id(items, port_speed, no_public):
         "Could not find valid price for port speed: '%s'" % port_speed)
 
 
-def matches_billing(price, hourly):
+def _matches_billing(price, hourly):
+    """Return if the price object is hourly and/or monthly."""
     return any([hourly and price.get('hourlyRecurringFee') is not None,
                 not hourly and price.get('recurringFee') is not None])
 
 
-def is_private_port_speed_item(item):
+def _is_private_port_speed_item(item):
+    """Determine if the port speed item is private network only."""
     for attribute in item['attributes']:
         if attribute['attributeTypeKeyName'] == 'IS_PRIVATE_NETWORK_ONLY':
             return True
@@ -584,16 +649,18 @@ def is_private_port_speed_item(item):
     return False
 
 
-def _get_location_long_name(package, datacenter):
+def _get_location_key(package, location):
+    """Get the longer key with a short location name."""
     for region in package['regions']:
-        if region['location']['location']['name'] == datacenter:
+        if region['location']['location']['name'] == location:
             return region['keyname']
 
     raise SoftLayer.SoftLayerError("Could not find valid location for: '%s'"
-                                   % datacenter)
+                                   % location)
 
 
 def _get_preset_id(package, size):
+    """Get the preset id given the keyName of the preset."""
     for preset in package['activePresets']:
         if preset['keyName'] == size:
             return preset['id']

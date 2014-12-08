@@ -59,24 +59,20 @@ def cli(env, **args):
             key_id = helpers.resolve_id(resolver, key, 'SshKey')
             ssh_keys.append(key_id)
 
-    extras = []
-    if args.get('extras'):
-        extras = args.get('extras').split(',')
-
     order = {
         'hostname': args['hostname'],
         'domain': args['domain'],
         'size': args['size'],
         'public_vlan': args.get('vlan_public'),
         'private_vlan': args.get('vlan_private'),
-        'datacenter': args.get('datacenter'),
+        'location': args.get('datacenter'),
         'ssh_keys': ssh_keys,
         'post_uri': args.get('postinstall'),
         'os': args['os'],
         'hourly': args.get('billing') == 'hourly',
         'port_speed': args.get('port_speed'),
         'no_public': args.get('no_public') or False,
-        'extras': extras,
+        'extras': args.get('extra'),
     }
 
     # Do not create hardware server with --test or --export
