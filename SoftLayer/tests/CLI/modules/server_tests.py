@@ -123,7 +123,7 @@ class ServerCLITests(testing.TestCase):
             'public_ip': '172.16.1.100',
             'status': 'ACTIVE',
             'tags': ['test_tag'],
-            'users': ['root abc123'],
+            'users': [{'password': 'abc123', 'username': 'root'}],
             'vlans': [{'id': 9653, 'number': 1800, 'type': 'PRIVATE'},
                       {'id': 19082, 'number': 3672, 'type': 'PUBLIC'}]
         }

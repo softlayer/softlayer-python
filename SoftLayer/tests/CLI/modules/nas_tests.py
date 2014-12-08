@@ -15,9 +15,7 @@ class RWhoisTests(testing.TestCase):
 
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(json.loads(result.output),
-                         [{'username': 'user',
-                           'datacenter': 'Dallas',
+                         [{'datacenter': 'Dallas',
                            'server': '127.0.0.1',
-                           'password': 'pass',
                            'id': 1,
                            'size': 10}])
