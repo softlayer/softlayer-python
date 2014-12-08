@@ -39,7 +39,7 @@ import click
               help="The ID of the private VLAN on which you want the virtual "
                    "server placed",
               type=click.INT)
-@click.option('--extras', default='', help="Extra options; comma-separated")
+@helpers.multi_option('--extra', '-e', help="Extra options")
 @click.option('--wait',
               type=click.INT,
               help="Wait until the server is finished provisioning for up to "
@@ -59,6 +59,10 @@ def cli(env, **args):
             key_id = helpers.resolve_id(resolver, key, 'SshKey')
             ssh_keys.append(key_id)
 
+    extras = []
+    if args.get('extras'):
+        extras = args.get('extras').split(',')
+
     order = {
         'hostname': args['hostname'],
         'domain': args['domain'],
@@ -72,7 +76,7 @@ def cli(env, **args):
         'hourly': args.get('billing') == 'hourly',
         'port_speed': args.get('port_speed'),
         'no_public': args.get('no_public') or False,
-        'extras': args.get('extras').split(','),
+        'extras': extras,
     }
 
     # Do not create hardware server with --test or --export

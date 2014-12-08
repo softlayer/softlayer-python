@@ -335,10 +335,16 @@ items[
     softwareDescription[id,referenceCode],
     prices
 ],
+activePresets,
 regions[location[location]]
 '''
-        package = self.client['Product_Package'].getObject(id=200,
-                                                           mask=package_mask)
+        _filter = {
+            'type': {'keyName': {'operation': 'BARE_METAL_CPU_FAST_PROVISION'}}
+        }
+        package_service = self.client['Product_Package']
+        package = package_service.getAllObjects(filter=_filter,
+                                                mask=package_mask,
+                                                limit=1)
 
         prices = []
         for category in ['pri_ip_addresses',
@@ -353,18 +359,20 @@ regions[location[location]]
         prices.append(_get_bandwidth_price_id(package['items'],
                                               hourly=hourly,
                                               no_public=no_public))
+
         prices.append(_get_port_speed_price_id(package['items'],
                                                port_speed,
                                                no_public))
+
         for extra in extras:
             prices.append(_get_extra_price_id(package['items'], extra, hourly))
 
         order = {
             'hardware': [hardware],
-            'location': datacenter,  # TODO: lookup OS price id based on keyname instead of a name like "HONGKONG02"
+            'location': _get_location_long_name(package, datacenter),
             'prices': [{'id': price} for price in prices],
-            'packageId': 200,  # TODO: Look this up based on package type
-            'presetId': 70,  # TODO: Verify that preset id is a thing
+            'packageId': package['id'],
+            'presetId': _get_preset_id(package, size),
             'useHourlyPricing': hourly,
         }
 
@@ -574,3 +582,21 @@ def is_private_port_speed_item(item):
             return True
 
     return False
+
+
+def _get_location_long_name(package, datacenter):
+    for region in package['regions']:
+        if region['location']['location']['name'] == datacenter:
+            return region['keyname']
+
+    raise SoftLayer.SoftLayerError("Could not find valid location for: '%s'"
+                                   % datacenter)
+
+
+def _get_preset_id(package, size):
+    for preset in package['activePresets']:
+        if preset['keyName'] == size:
+            return preset['id']
+
+    raise SoftLayer.SoftLayerError("Could not find valid size for: '%s'"
+                                   % size)
