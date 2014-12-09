@@ -271,6 +271,7 @@ class ServerCLITests(testing.TestCase):
                                    '--os=UBUNTU_12_64',
                                    '--vlan-public=10234',
                                    '--vlan-private=20468',
+                                   '--key=10',
                                    ])
 
         self.assertEqual(result.exit_code, 0)

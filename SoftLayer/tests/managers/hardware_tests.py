@@ -4,17 +4,36 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import copy
+
 import mock
 
 import SoftLayer
+from SoftLayer import managers
 from SoftLayer import testing
 from SoftLayer.testing import fixtures
+
+
+MINIMAL_TEST_CREATE_ARGS = {
+    'size': 'S1270_8GB_2X1TBSATA_NORAID',
+    'hostname': 'unicorn',
+    'domain': 'giggles.woo',
+    'location': 'wdc01',
+    'os': 'UBUNTU_14_64',
+    'port_speed': 10,
+}
 
 
 class HardwareTests(testing.TestCase):
 
     def set_up(self):
         self.hardware = SoftLayer.HardwareManager(self.client)
+
+    def test_init_with_ordering_manager(self):
+        ordering_manager = SoftLayer.OrderingManager(self.client)
+        mgr = SoftLayer.HardwareManager(self.client, ordering_manager)
+
+        self.assertEqual(mgr.ordering_manager, ordering_manager)
 
     def test_list_hardware(self):
         results = self.hardware.list_hardware()
@@ -95,6 +114,57 @@ class HardwareTests(testing.TestCase):
                                        'sshKeyIds': [1701]}),
                                 identifier=1)
 
+    def test_get_create_options(self):
+        options = self.hardware.get_create_options()
+
+        expected = {
+            'extras': [{'key': '1_IPV6_ADDRESS', 'name': '1 IPv6 Address'}],
+            'locations': [{'key': 'wdc01', 'name': 'Washington 1'}],
+            'operating_systems': [{'key': 'UBUNTU_14_64',
+                                   'name': 'Ubuntu / 14.04-64'}],
+            'port_speeds': [{
+                'key': '10',
+                'name': '10 Mbps Public & Private Network Uplinks'
+            }],
+            'sizes': [{
+                'key': 'S1270_8GB_2X1TBSATA_NORAID',
+                'name': 'Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID'
+            }]
+        }
+
+        self.assertEqual(options, expected)
+
+    def test_get_create_options_package_missing(self):
+        packages = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        packages.return_value = []
+
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               self.hardware.get_create_options)
+        self.assertEqual("Ordering package not found", str(ex))
+
+    def test_generate_create_dict_no_items(self):
+        packages = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        packages_copy = copy.deepcopy(
+            fixtures.SoftLayer_Product_Package.getAllObjects)
+        packages_copy[0]['items'] = []
+        packages.return_value = packages_copy
+
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               self.hardware._generate_create_dict)
+        self.assertIn("Could not find valid price", str(ex))
+
+    def test_generate_create_dict_no_regions(self):
+        packages = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        packages_copy = copy.deepcopy(
+            fixtures.SoftLayer_Product_Package.getAllObjects)
+        packages_copy[0]['regions'] = []
+        packages.return_value = packages_copy
+
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               self.hardware._generate_create_dict,
+                               **MINIMAL_TEST_CREATE_ARGS)
+        self.assertIn("Could not find valid location for: 'wdc01'", str(ex))
+
     def test_generate_create_dict(self):
         args = {
             'size': 'S1270_8GB_2X1TBSATA_NORAID',
@@ -106,6 +176,9 @@ class HardwareTests(testing.TestCase):
             'hourly': True,
             'public_vlan': 10234,
             'private_vlan': 20468,
+            'extras': ['1_IPV6_ADDRESS'],
+            'post_uri': 'http://example.com/script.php',
+            'ssh_keys': [10],
         }
 
         expected = {
@@ -124,8 +197,12 @@ class HardwareTests(testing.TestCase):
                        {'id': 906},
                        {'id': 37650},
                        {'id': 1800},
-                       {'id': 272}],
-            'useHourlyPricing': True}
+                       {'id': 272},
+                       {'id': 17129}],
+            'useHourlyPricing': True,
+            'provisionScripts': ['http://example.com/script.php'],
+            'sshKeys': [{'sshKeyIds': [10]}],
+        }
 
         data = self.hardware._generate_create_dict(**args)
 
@@ -275,3 +352,38 @@ class HardwareTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Hardware_Server',
                                 'createFirmwareUpdateTransaction',
                                 identifier=100, args=(0, 1, 1, 0))
+
+
+class HardwareHelperTests(testing.TestCase):
+    def test_get_extra_price_id_no_items(self):
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               managers.hardware._get_extra_price_id,
+                               [], 'test', True)
+        self.assertEqual("Could not find valid price for test", str(ex))
+
+    def test_get_default_price_id_no_items(self):
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               managers.hardware._get_default_price_id,
+                               [], 'test', True)
+        self.assertEqual("Could not find valid price for test option", str(ex))
+
+    def test_get_bandwidth_price_id_no_items(self):
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               managers.hardware._get_bandwidth_price_id,
+                               [], hourly=True, no_public=False)
+        self.assertEqual("Could not find valid price for bandwidth option",
+                         str(ex))
+
+    def test_get_os_price_id_no_items(self):
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               managers.hardware._get_os_price_id,
+                               [], 'UBUNTU_14_64')
+        self.assertEqual("Could not find valid price for os: \"UBUNTU_14_64\"",
+                         str(ex))
+
+    def test_get_port_speed_price_id_no_items(self):
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               managers.hardware._get_port_speed_price_id,
+                               [], 10, True)
+        self.assertEqual("Could not find valid price for port speed: '10'",
+                         str(ex))

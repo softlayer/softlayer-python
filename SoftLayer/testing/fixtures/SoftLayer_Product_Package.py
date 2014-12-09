@@ -1,5 +1,22 @@
 HARDWARE_ITEMS = [
     {'attributes': [],
+     'capacity': '999',
+     'description': 'Unknown',
+     'itemCategory': {'categoryCode': 'unknown', 'id': 325},
+     'keyName': 'UNKNOWN',
+     'prices': [{'accountRestrictions': [],
+                 'currentPriceFlag': '',
+                 'hourlyRecurringFee': '0',
+                 'id': 1245172,
+                 'itemId': 935954,
+                 'laborFee': '0',
+                 'onSaleFlag': '',
+                 'oneTimeFee': '0',
+                 'quantity': '',
+                 'recurringFee': '0',
+                 'setupFee': '0',
+                 'sort': 0}]},
+    {'attributes': [],
      'capacity': '64',
      'description': '1 IPv6 Address',
      'itemCategory': {'categoryCode': 'pri_ipv6_addresses',
@@ -161,7 +178,8 @@ getAllObjects = [{
                                            'name': 'wdc01'}},
                  'sortOrder': 10}],
     'subDescription': 'Bare Metal Server',
-    'unitSize': 1}]
+    'unitSize': 1,
+}]
 
 getItems = [
     {

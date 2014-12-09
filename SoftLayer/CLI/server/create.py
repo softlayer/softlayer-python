@@ -53,11 +53,10 @@ def cli(env, **args):
 
     # Get the SSH keys
     ssh_keys = []
-    if args.get('key'):
-        for key in args.get('key'):
-            resolver = SoftLayer.SshKeyManager(env.client).resolve_ids
-            key_id = helpers.resolve_id(resolver, key, 'SshKey')
-            ssh_keys.append(key_id)
+    for key in args.get('key'):
+        resolver = SoftLayer.SshKeyManager(env.client).resolve_ids
+        key_id = helpers.resolve_id(resolver, key, 'SshKey')
+        ssh_keys.append(key_id)
 
     order = {
         'hostname': args['hostname'],
