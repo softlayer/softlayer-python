@@ -73,6 +73,7 @@ ALL_ROUTES = [
     ('image:detail', 'SoftLayer.CLI.image.detail:cli'),
     ('image:edit', 'SoftLayer.CLI.image.edit:cli'),
     ('image:list', 'SoftLayer.CLI.image.list:cli'),
+    ('image:import', 'SoftLayer.CLI.image.import:cli'),
 
     ('iscsi', 'SoftLayer.CLI.iscsi'),
     ('iscsi:cancel', 'SoftLayer.CLI.iscsi.cancel:cli'),
