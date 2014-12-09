@@ -538,8 +538,8 @@ def _get_extra_price_id(items, key_name, hourly):
             if _matches_billing(price, hourly):
                 return price['id']
 
-    raise SoftLayer.SoftLayerError("Could not find valid price for %s" %
-                                   key_name)
+    raise SoftLayer.SoftLayerError(
+        "Could not find valid price for extra option, '%s'" % key_name)
 
 
 def _get_default_price_id(items, option, hourly):
@@ -556,8 +556,8 @@ def _get_default_price_id(items, option, hourly):
                 continue
             return price['id']
 
-    raise SoftLayer.SoftLayerError("Could not find valid price for %s option" %
-                                   option)
+    raise SoftLayer.SoftLayerError(
+        "Could not find valid price for '%s' option" % option)
 
 
 def _get_bandwidth_price_id(items, hourly=True, no_public=False):
@@ -602,7 +602,7 @@ def _get_os_price_id(items, os):
         for price in item['prices']:
             return price['id']
 
-    raise SoftLayer.SoftLayerError('Could not find valid price for os: "%s"' %
+    raise SoftLayer.SoftLayerError("Could not find valid price for os: '%s'" %
                                    os)
 
 

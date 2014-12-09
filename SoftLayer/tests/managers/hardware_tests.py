@@ -359,13 +359,15 @@ class HardwareHelperTests(testing.TestCase):
         ex = self.assertRaises(SoftLayer.SoftLayerError,
                                managers.hardware._get_extra_price_id,
                                [], 'test', True)
-        self.assertEqual("Could not find valid price for test", str(ex))
+        self.assertEqual("Could not find valid price for extra option, 'test'",
+                         str(ex))
 
     def test_get_default_price_id_no_items(self):
         ex = self.assertRaises(SoftLayer.SoftLayerError,
                                managers.hardware._get_default_price_id,
                                [], 'test', True)
-        self.assertEqual("Could not find valid price for test option", str(ex))
+        self.assertEqual("Could not find valid price for 'test' option",
+                         str(ex))
 
     def test_get_bandwidth_price_id_no_items(self):
         ex = self.assertRaises(SoftLayer.SoftLayerError,
@@ -378,7 +380,7 @@ class HardwareHelperTests(testing.TestCase):
         ex = self.assertRaises(SoftLayer.SoftLayerError,
                                managers.hardware._get_os_price_id,
                                [], 'UBUNTU_14_64')
-        self.assertEqual("Could not find valid price for os: \"UBUNTU_14_64\"",
+        self.assertEqual("Could not find valid price for os: 'UBUNTU_14_64'",
                          str(ex))
 
     def test_get_port_speed_price_id_no_items(self):
