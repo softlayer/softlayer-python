@@ -549,11 +549,10 @@ def _get_default_price_id(items, option, hourly):
             continue
 
         for price in item['prices']:
-            if any([float(price.get('hourlyRecurringFee', 0)) != 0.0,
-                    float(price.get('recurringFee', 0)) != 0.0,
-                    not _matches_billing(price, hourly)]):
-                continue
-            return price['id']
+            if all([float(price.get('hourlyRecurringFee', 0)) == 0.0,
+                    float(price.get('recurringFee', 0)) == 0.0,
+                    _matches_billing(price, hourly)]):
+                return price['id']
 
     raise SoftLayer.SoftLayerError(
         "Could not find valid price for '%s' option" % option)
@@ -575,10 +574,8 @@ def _get_bandwidth_price_id(items, hourly=True, no_public=False):
             continue
 
         for price in item['prices']:
-            if not _matches_billing(price, hourly):
-                continue
-
-            return price['id']
+            if _matches_billing(price, hourly):
+                return price['id']
 
     raise SoftLayer.SoftLayerError(
         "Could not find valid price for bandwidth option")
@@ -588,12 +585,12 @@ def _get_os_price_id(items, os):
     """Returns the price id matching."""
 
     for item in items:
-        if not utils.lookup(item, 'itemCategory', 'categoryCode') == 'os':
-            continue
-
-        if not utils.lookup(item,
-                            'softwareDescription',
-                            'referenceCode') == os:
+        if any([not utils.lookup(item,
+                                 'itemCategory',
+                                 'categoryCode') == 'os',
+                not utils.lookup(item,
+                                 'softwareDescription',
+                                 'referenceCode') == os]):
             continue
 
         for price in item['prices']:
@@ -607,13 +604,12 @@ def _get_port_speed_price_id(items, port_speed, no_public):
     """Choose a valid price id for port speed."""
 
     for item in items:
-        if not utils.lookup(item,
-                            'itemCategory',
-                            'categoryCode') == 'port_speed':
-            continue
 
         # Check for correct capacity and if the item matches private only
-        if any([int(utils.lookup(item, 'capacity')) != port_speed,
+        if any([not utils.lookup(item,
+                                 'itemCategory',
+                                 'categoryCode') == 'port_speed',
+                int(utils.lookup(item, 'capacity')) != port_speed,
                 _is_private_port_speed_item(item) != no_public]):
             continue
 

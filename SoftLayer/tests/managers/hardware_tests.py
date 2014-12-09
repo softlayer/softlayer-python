@@ -165,6 +165,20 @@ class HardwareTests(testing.TestCase):
                                **MINIMAL_TEST_CREATE_ARGS)
         self.assertIn("Could not find valid location for: 'wdc01'", str(ex))
 
+    def test_generate_create_dict_invalid_size(self):
+        args = {
+            'size': 'UNKNOWN_SIZE',
+            'hostname': 'unicorn',
+            'domain': 'giggles.woo',
+            'location': 'wdc01',
+            'os': 'UBUNTU_14_64',
+            'port_speed': 10,
+        }
+
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               self.hardware._generate_create_dict, **args)
+        self.assertIn("Could not find valid size for: 'UNKNOWN_SIZE'", str(ex))
+
     def test_generate_create_dict(self):
         args = {
             'size': 'S1270_8GB_2X1TBSATA_NORAID',
