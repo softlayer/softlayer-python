@@ -378,7 +378,7 @@ regions[location[location]]
         if len(packages) != 1:
             raise SoftLayer.SoftLayerError("Ordering package not found")
 
-        return packages.pop()
+        return packages[0]
 
     def _generate_create_dict(self,
                               size=None,
@@ -412,7 +412,6 @@ regions[location[location]]
         prices.append(_get_bandwidth_price_id(package['items'],
                                               hourly=hourly,
                                               no_public=no_public))
-
         prices.append(_get_port_speed_price_id(package['items'],
                                                port_speed,
                                                no_public))
@@ -566,14 +565,12 @@ def _get_bandwidth_price_id(items, hourly=True, no_public=False):
     # Prefer pay-for-use data transfer with hourly
     for item in items:
 
-        if not utils.lookup(item,
-                            'itemCategory',
-                            'categoryCode') == 'bandwidth':
-            continue
-
         capacity = float(item.get('capacity', 0))
         # Hourly and private only do pay-as-you-go bandwidth
-        if any([(hourly or no_public) and capacity != 0.0,
+        if any([not utils.lookup(item,
+                                 'itemCategory',
+                                 'categoryCode') == 'bandwidth',
+                (hourly or no_public) and capacity != 0.0,
                 not (hourly or no_public) and capacity == 0.0]):
             continue
 
@@ -589,8 +586,8 @@ def _get_bandwidth_price_id(items, hourly=True, no_public=False):
 
 def _get_os_price_id(items, os):
     """Returns the price id matching."""
-    for item in items:
 
+    for item in items:
         if not utils.lookup(item, 'itemCategory', 'categoryCode') == 'os':
             continue
 
@@ -610,19 +607,12 @@ def _get_port_speed_price_id(items, port_speed, no_public):
     """Choose a valid price id for port speed."""
 
     for item in items:
-
         if not utils.lookup(item,
                             'itemCategory',
                             'categoryCode') == 'port_speed':
             continue
 
-    for item in items:
-
-        if not utils.lookup(item,
-                            'itemCategory',
-                            'categoryCode') == 'port_speed':
-            continue
-
+        # Check for correct capacity and if the item matches private only
         if any([int(utils.lookup(item, 'capacity')) != port_speed,
                 _is_private_port_speed_item(item) != no_public]):
             continue
