@@ -3,6 +3,7 @@
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 
 import click
 
@@ -14,8 +15,10 @@ def cli(env, identifier):
     """List virtual server credentials."""
 
     vsi = SoftLayer.VSManager(env.client)
-    result = vsi.get_instance(identifier)
+    vs_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
+    instance = vsi.get_instance(vs_id)
+
     table = formatting.Table(['username', 'password'])
-    for item in result['operatingSystem']['passwords']:
+    for item in instance['operatingSystem']['passwords']:
         table.add_row([item['username'], item['password']])
     return table

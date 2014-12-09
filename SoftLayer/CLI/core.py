@@ -70,7 +70,8 @@ class CommandLoader(click.MultiCommand):
              epilog="""To use most commands your SoftLayer
 username and api_key need to be configured. The easiest way to do that is to
 use: 'sl config setup'""",
-             cls=CommandLoader)
+             cls=CommandLoader,
+             context_settings={'help_option_names': ['-h', '--help']})
 @click.pass_context
 @click.option('--format',
               default=DEFAULT_FORMAT,
@@ -78,8 +79,7 @@ use: 'sl config setup'""",
               type=click.Choice(VALID_FORMATS))
 @click.option('--config', '-C',
               required=False,
-              default=click.get_app_dir('softlayer',
-                                        force_posix=True),
+              default=click.get_app_dir('softlayer', force_posix=True),
               help="Config file location",
               type=click.Path(resolve_path=True))
 @click.option('--debug',
