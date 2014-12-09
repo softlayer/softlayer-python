@@ -17,17 +17,11 @@ import click
 @click.option('--size', '-s', help="Hardware size")
 @click.option('--os', '-o', help="OS install code")
 @click.option('--datacenter', '-d', help="Datacenter shortname")
+@click.option('--port-speed', type=click.INT, help="Port speeds")
 @click.option('--billing',
               type=click.Choice(['hourly', 'monthly']),
               default='hourly',
               help="Billing rate")
-@click.option('--port-speed', type=click.INT, help="Port speeds")
-@click.option('--test',
-              is_flag=True,
-              help="Do not actually create the virtual server")
-@click.option('--export',
-              type=click.Path(writable=True, resolve_path=True),
-              help="Exports options to a template file")
 @click.option('--postinstall', '-i', help="Post-install script to download")
 @helpers.multi_option('--key', '-k',
                       help="SSH keys to add to the root user")
@@ -40,6 +34,12 @@ import click
                    "server placed",
               type=click.INT)
 @helpers.multi_option('--extra', '-e', help="Extra options")
+@click.option('--test',
+              is_flag=True,
+              help="Do not actually create the virtual server")
+@click.option('--export',
+              type=click.Path(writable=True, resolve_path=True),
+              help="Exports options to a template file")
 @click.option('--wait',
               type=click.INT,
               help="Wait until the server is finished provisioning for up to "

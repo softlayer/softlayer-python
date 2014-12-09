@@ -398,18 +398,6 @@ regions[location[location]]
 
         extras = extras or []
 
-        hardware = {
-            'hostname': hostname,
-            'domain': domain,
-        }
-
-        if public_vlan:
-            hardware['primaryNetworkComponent'] = {
-                "networkVlan": {"id": int(public_vlan)}}
-        if private_vlan:
-            hardware['primaryBackendNetworkComponent'] = {
-                "networkVlan": {"id": int(private_vlan)}}
-
         package = self._get_package()
 
         prices = []
@@ -431,6 +419,18 @@ regions[location[location]]
 
         for extra in extras:
             prices.append(_get_extra_price_id(package['items'], extra, hourly))
+
+        hardware = {
+            'hostname': hostname,
+            'domain': domain,
+        }
+
+        if public_vlan:
+            hardware['primaryNetworkComponent'] = {
+                "networkVlan": {"id": int(public_vlan)}}
+        if private_vlan:
+            hardware['primaryBackendNetworkComponent'] = {
+                "networkVlan": {"id": int(private_vlan)}}
 
         order = {
             'hardware': [hardware],

@@ -362,6 +362,22 @@ class HardwareHelperTests(testing.TestCase):
         self.assertEqual("Could not find valid price for extra option, 'test'",
                          str(ex))
 
+    def test_get_default_price_id_item_not_first(self):
+        items = [{
+            'itemCategory': {'categoryCode': 'unknown', 'id': 325},
+            'keyName': 'UNKNOWN',
+            'prices': [{'accountRestrictions': [],
+                        'currentPriceFlag': '',
+                        'hourlyRecurringFee': '10.0',
+                        'id': 1245172,
+                        'recurringFee': '1.0'}],
+        }]
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               managers.hardware._get_default_price_id,
+                               items, 'unknown', True)
+        self.assertEqual("Could not find valid price for 'unknown' option",
+                         str(ex))
+
     def test_get_default_price_id_no_items(self):
         ex = self.assertRaises(SoftLayer.SoftLayerError,
                                managers.hardware._get_default_price_id,
