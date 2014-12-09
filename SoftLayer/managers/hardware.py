@@ -604,12 +604,13 @@ def _get_port_speed_price_id(items, port_speed, no_public):
     """Choose a valid price id for port speed."""
 
     for item in items:
+        if not utils.lookup(item,
+                            'itemCategory',
+                            'categoryCode') == 'port_speed':
+            continue
 
         # Check for correct capacity and if the item matches private only
-        if any([not utils.lookup(item,
-                                 'itemCategory',
-                                 'categoryCode') == 'port_speed',
-                int(utils.lookup(item, 'capacity')) != port_speed,
+        if any([int(utils.lookup(item, 'capacity')) != port_speed,
                 _is_private_port_speed_item(item) != no_public]):
             continue
 
