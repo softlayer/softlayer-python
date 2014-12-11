@@ -69,8 +69,9 @@ class OrderingTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = []
 
-        with self.assertRaises(ValueError):
-            self.ordering.get_package_id_by_type("STRAWBERRY_FLAVORED_SERVERS")
+        self.assertRaises(ValueError,
+                          self.ordering.get_package_id_by_type,
+                          "STRAWBERRY_FLAVORED_SERVERS")
 
     def test_get_order_container(self):
         container = self.ordering.get_order_container(1234)
@@ -119,5 +120,6 @@ class OrderingTests(testing.TestCase):
                                   'quantity': 1})
 
     def test_generate_order_template_extra_quantity(self):
-        with self.assertRaises(ValueError):
-            self.ordering.generate_order_template(1234, [], quantity=1)
+        self.assertRaises(ValueError,
+                          self.ordering.generate_order_template,
+                          1234, [], quantity=1)

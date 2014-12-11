@@ -15,7 +15,6 @@ UUID_RE = re.compile(r'^[0-9a-f\-]{36}$', re.I)
 KNOWN_OPERATIONS = ['<=', '>=', '<', '>', '~', '!~', '*=', '^=', '$=', '_=']
 
 configparser = six.moves.configparser
-console_input = six.moves.input
 string_types = six.string_types
 StringIO = six.StringIO
 xmlrpc_client = six.moves.xmlrpc_client

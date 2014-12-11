@@ -35,21 +35,21 @@ def cli(env, identifier, passwords, price):
     result = utils.NestedDict(result)
 
     table.add_row(['id', result['id']])
-    table.add_row(['hostname', result['fullyQualifiedDomainName']])
+    table.add_row(['guid', result['globalIdentifier']] or formatting.blank())
+    table.add_row(['hostname', result['hostname']])
+    table.add_row(['domain', result['domain']])
+    table.add_row(['fqdn', result['fullyQualifiedDomainName']])
     table.add_row(['status', result['hardwareStatus']['status']])
     table.add_row(['datacenter',
                    result['datacenter']['name'] or formatting.blank()])
     table.add_row(['cores', result['processorPhysicalCoreAmount']])
-    table.add_row(['memory',
-                   formatting.gb(result['memoryCapacity'])])
+    table.add_row(['memory', formatting.gb(result['memoryCapacity'])])
     table.add_row(['public_ip',
                    result['primaryIpAddress'] or formatting.blank()])
     table.add_row(['private_ip',
-                   result['primaryBackendIpAddress']
-                   or formatting.blank()])
+                   result['primaryBackendIpAddress'] or formatting.blank()])
     table.add_row(['ipmi_ip',
-                   result['networkManagementIpAddress']
-                   or formatting.blank()])
+                   result['networkManagementIpAddress'] or formatting.blank()])
     table.add_row([
         'os',
         formatting.FormattedItem(
@@ -83,11 +83,10 @@ def cli(env, identifier, passwords, price):
                        result['billingItem']['recurringFee']])
 
     if passwords:
-        user_strs = []
+        pass_table = formatting.Table(['username', 'password'])
         for item in result['operatingSystem']['passwords']:
-            user_strs.append(
-                "%s %s" % (item['username'], item['password']))
-        table.add_row(['users', formatting.listing(user_strs)])
+            pass_table.add_row([item['username'], item['password']])
+        table.add_row(['users', pass_table])
 
     tag_row = []
     for tag in result['tagReferences']:

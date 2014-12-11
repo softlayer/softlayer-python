@@ -7,12 +7,6 @@
 
     :license: MIT, see LICENSE for more details.
 """
-try:
-    # Python 3.x compatibility
-    import builtins  # NOQA
-    builtins_name = 'builtins'
-except ImportError:
-    builtins_name = '__builtin__'
 
 import mock
 
@@ -110,25 +104,28 @@ class ServerCLITests(testing.TestCase):
                                    '--passwords', '--price'])
 
         expected = {
-            'status': 'ACTIVE',
-            'datacenter': 'TEST00',
-            'created': '2013-08-01 15:23:45',
-            'notes': 'These are test notes.',
-            'hostname': 'hardware-test1.test.sftlyr.ws',
-            'public_ip': '172.16.1.100',
-            'private_ip': '10.1.0.2',
-            'ipmi_ip': '10.1.0.3',
-            'price rate': 1.54,
-            'memory': 2048,
             'cores': 2,
-            'ptr': '2.0.1.10.in-addr.arpa',
-            'os': 'Ubuntu',
+            'created': '2013-08-01 15:23:45',
+            'datacenter': 'TEST00',
+            'guid': '1a2b3c-1701',
+            'domain': 'test.sftlyr.ws',
+            'hostname': 'hardware-test1',
+            'fqdn': 'hardware-test1.test.sftlyr.ws',
             'id': 1000,
+            'ipmi_ip': '10.1.0.3',
+            'memory': 2048,
+            'notes': 'These are test notes.',
+            'os': 'Ubuntu',
+            'owner': 'chechu',
+            'price rate': 1.54,
+            'private_ip': '10.1.0.2',
+            'ptr': '2.0.1.10.in-addr.arpa',
+            'public_ip': '172.16.1.100',
+            'status': 'ACTIVE',
             'tags': ['test_tag'],
-            'users': ['root abc123'],
+            'users': [{'password': 'abc123', 'username': 'root'}],
             'vlans': [{'id': 9653, 'number': 1800, 'type': 'PRIVATE'},
-                      {'id': 19082, 'number': 3672, 'type': 'PUBLIC'}],
-            'owner': 'chechu'
+                      {'id': 19082, 'number': 3672, 'type': 'PUBLIC'}]
         }
 
         self.assertEqual(result.exit_code, 0)
@@ -141,35 +138,26 @@ class ServerCLITests(testing.TestCase):
             {
                 'datacenter': 'TEST00',
                 'primary_ip': '172.16.1.100',
-                'host': 'hardware-test1.test.sftlyr.ws',
-                'memory': 2048,
-                'cores': 2,
-                'id': 1000,
+                'hostname': 'hardware-test1',
+                'guid': '1a2b3c-1701',
                 'backend_ip': '10.1.0.2',
-                'active_transaction': 'TXN_NAME',
-                'owner': 'chechu'
+                'action': 'TXN_NAME',
             },
             {
                 'datacenter': 'TEST00',
                 'primary_ip': '172.16.4.94',
-                'host': 'hardware-test2.test.sftlyr.ws',
-                'memory': 4096,
-                'cores': 4,
-                'id': 1001,
+                'hostname': 'hardware-test2',
+                'guid': '1a2b3c-1702',
                 'backend_ip': '10.1.0.3',
-                'active_transaction': None,
-                'owner': 'chechu'
+                'action': None,
             },
             {
                 'datacenter': 'TEST00',
                 'primary_ip': '172.16.4.95',
-                'host': 'hardware-bad-memory.test.sftlyr.ws',
-                'memory': 0,
-                'cores': 4,
-                'id': 1002,
+                'hostname': 'hardware-bad-memory',
+                'guid': 1002,
                 'backend_ip': '10.1.0.4',
-                'active_transaction': None,
-                'owner': 'chechu'
+                'action': None,
             }
         ]
 
@@ -459,7 +447,7 @@ class ServerCLITests(testing.TestCase):
                                    '--memory=4',
                                    ])
 
-        self.assertEqual(result.exit_code, 1)
+        self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, SystemExit)
 
     @mock.patch('SoftLayer.CLI.template.export_to_template')

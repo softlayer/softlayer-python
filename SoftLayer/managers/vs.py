@@ -87,7 +87,6 @@ class VSManager(utils.IdentifierMixin, object):
                 'datacenter',
                 'activeTransaction.transactionStatus[friendlyName,name]',
                 'status',
-                'billingItem.orderItem.order.userRecord[username]'
             ]
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
@@ -332,7 +331,7 @@ class VSManager(utils.IdentifierMixin, object):
         if nic_speed:
             data['networkComponents'] = [{'maxSpeed': nic_speed}]
 
-        if disks and isinstance(disks, list):
+        if disks:
             data['blockDevices'] = [
                 {"device": "0", "diskImage": {"capacity": disks[0]}}
             ]

@@ -7,10 +7,6 @@
 # Disable pylint import error and too many methods error
 # pylint: disable=F0401,R0904
 import logging
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest
 import os.path
 
 import SoftLayer
@@ -19,6 +15,7 @@ from SoftLayer.CLI import environment
 
 from click import testing
 import mock
+import testtools
 
 FIXTURE_PATH = os.path.abspath(os.path.join(__file__, '..', 'fixtures'))
 
@@ -55,11 +52,18 @@ class MockableTransport(object):
     def _record_call(self, call):
         """Record and log the API call (for later assertions)."""
         self.calls.append(call)
-        logging.info('%s::%s called with identifier=%s, args=%s',
-                     call.service,
-                     call.method,
-                     call.identifier,
-                     call.args)
+
+        details = []
+        for prop in ['identifier',
+                     'args',
+                     'mask',
+                     'filter',
+                     'limit',
+                     'offset']:
+            details.append('%s=%r' % (prop, getattr(call, prop)))
+
+        logging.info('%s::%s called; %s',
+                     call.service, call.method, '; '.join(details))
 
 
 def _mock_key(service, method):
@@ -67,7 +71,7 @@ def _mock_key(service, method):
     return '%s::%s' % (service, method)
 
 
-class TestCase(unittest.TestCase):
+class TestCase(testtools.TestCase):
     """Testcase class with PEP-8 compatable method names."""
 
     def set_up(self):
@@ -79,6 +83,7 @@ class TestCase(unittest.TestCase):
         pass
 
     def setUp(self):  # NOQA
+        super(TestCase, self).setUp()
         self.env = environment.Environment()
 
         # Create a crazy mockable, fixture client
@@ -95,6 +100,7 @@ class TestCase(unittest.TestCase):
         return self.set_up()
 
     def tearDown(self):  # NOQA
+        super(TestCase, self).tearDown()
         return self.tear_down()
 
     def calls(self, service=None, method=None):
@@ -116,8 +122,7 @@ class TestCase(unittest.TestCase):
         """
 
         for call in self.calls(service, method):
-            if all([getattr(call, prop) == value
-                    for prop, value in props.items()]):
+            if call_has_props(call, props):
                 return
 
         self.fail('%s::%s was not called with given properties: %s'
@@ -145,4 +150,20 @@ class TestCase(unittest.TestCase):
         runner = testing.CliRunner()
         return runner.invoke(core.cli, args=args, obj=env or self.env)
 
-__all__ = ['unittest']
+
+def call_has_props(call, props):
+    """Check if a call has matching properties of a given props dictionary."""
+
+    for prop, expected_value in props.items():
+        actual_value = getattr(call, prop)
+        if actual_value != expected_value:
+            logging.info(
+                '%s::%s property mismatch, %s: expected=%r; actual=%r',
+                call.service,
+                call.method,
+                prop,
+                expected_value,
+                actual_value)
+            return False
+
+    return True

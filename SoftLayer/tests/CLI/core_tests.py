@@ -60,8 +60,7 @@ class CoreMainTests(testing.TestCase):
     def test_unexpected_error(self, stdoutmock, climock):
         climock.side_effect = AttributeError('Attribute foo does not exist')
 
-        with self.assertRaises(SystemExit):
-            core.main()
+        self.assertRaises(SystemExit, core.main)
 
         self.assertIn("Feel free to report this error as it is likely a bug",
                       stdoutmock.getvalue())
@@ -76,8 +75,7 @@ class CoreMainTests(testing.TestCase):
         ex = SoftLayer.SoftLayerAPIError('SoftLayer_Exception', 'Not found')
         climock.side_effect = ex
 
-        with self.assertRaises(SystemExit):
-            core.main()
+        self.assertRaises(SystemExit, core.main)
 
         self.assertIn("SoftLayerAPIError(SoftLayer_Exception): Not found",
                       stdoutmock.getvalue())
@@ -89,8 +87,7 @@ class CoreMainTests(testing.TestCase):
                                          'Invalid API token.')
         climock.side_effect = ex
 
-        with self.assertRaises(SystemExit):
-            core.main()
+        self.assertRaises(SystemExit, core.main)
 
         self.assertIn("Authentication Failed:", stdoutmock.getvalue())
         self.assertIn("use 'sl config setup'", stdoutmock.getvalue())

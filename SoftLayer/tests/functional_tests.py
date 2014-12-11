@@ -11,21 +11,23 @@ from SoftLayer import testing
 from SoftLayer import transports
 
 
-def get_creds():
-    for key in 'SL_USERNAME SL_API_KEY'.split():
-        if key not in os.environ:
-            raise testing.unittest.SkipTest(
-                'SL_USERNAME and SL_API_KEY environmental variables not set')
+class FunctionalTest(testing.TestCase):
+    def _get_creds(self):
+        for key in 'SL_USERNAME SL_API_KEY'.split():
+            if key not in os.environ:
+                raise self.skipTest('SL_USERNAME and SL_API_KEY environmental '
+                                    'variables not set')
 
-    return {
-        'endpoint': (os.environ.get('SL_API_ENDPOINT') or
-                     SoftLayer.API_PUBLIC_ENDPOINT),
-        'username': os.environ['SL_USERNAME'],
-        'api_key': os.environ['SL_API_KEY']
-    }
+        return {
+            'endpoint': (os.environ.get('SL_API_ENDPOINT') or
+                         SoftLayer.API_PUBLIC_ENDPOINT),
+            'username': os.environ['SL_USERNAME'],
+            'api_key': os.environ['SL_API_KEY']
+        }
 
 
-class UnauthedUser(testing.TestCase):
+class UnauthedUser(FunctionalTest):
+
     def test_failed_auth(self):
         client = SoftLayer.Client(
             username='doesnotexist', api_key='issurelywrong', timeout=20)
@@ -52,9 +54,9 @@ class UnauthedUser(testing.TestCase):
             self.fail('No Exception Raised')
 
 
-class AuthedUser(testing.TestCase):
+class AuthedUser(FunctionalTest):
     def test_service_does_not_exist(self):
-        creds = get_creds()
+        creds = self._get_creds()
         client = SoftLayer.Client(
             username=creds['username'],
             api_key=creds['api_key'],
@@ -71,7 +73,7 @@ class AuthedUser(testing.TestCase):
             self.fail('No Exception Raised')
 
     def test_get_users(self):
-        creds = get_creds()
+        creds = self._get_creds()
         client = SoftLayer.Client(
             username=creds['username'],
             api_key=creds['api_key'],
@@ -86,7 +88,7 @@ class AuthedUser(testing.TestCase):
         self.assertTrue(found)
 
     def test_result_types(self):
-        creds = get_creds()
+        creds = self._get_creds()
         client = SoftLayer.Client(
             username=creds['username'],
             api_key=creds['api_key'],

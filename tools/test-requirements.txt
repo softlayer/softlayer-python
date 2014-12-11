@@ -3,3 +3,4 @@ nose
 mock
 coverage
 sphinx
+testtools

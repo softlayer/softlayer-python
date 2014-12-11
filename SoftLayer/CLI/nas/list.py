@@ -18,8 +18,7 @@ def cli(env):
     nas_accounts = account.getNasNetworkStorage(
         mask='eventCount,serviceResource[datacenter.name]')
 
-    table = formatting.Table(['id', 'datacenter', 'size', 'username',
-                              'password', 'server'])
+    table = formatting.Table(['id', 'datacenter', 'size', 'server'])
 
     for nas_account in nas_accounts:
         table.add_row([
@@ -31,8 +30,6 @@ def cli(env):
             formatting.FormattedItem(
                 nas_account.get('capacityGb', formatting.blank()),
                 "%dGB" % nas_account.get('capacityGb', 0)),
-            nas_account.get('username', formatting.blank()),
-            nas_account.get('password', formatting.blank()),
             nas_account.get('serviceResourceBackendIpAddress',
                             formatting.blank())])
 

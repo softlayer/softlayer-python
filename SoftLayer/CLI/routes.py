@@ -7,6 +7,8 @@
 """
 
 ALL_ROUTES = [
+    ('call-api', 'SoftLayer.CLI.call_api:cli'),
+
     ('vs', 'SoftLayer.CLI.virt'),
     ('vs:cancel', 'SoftLayer.CLI.virt.cancel:cli'),
     ('vs:capture', 'SoftLayer.CLI.virt.capture:cli'),
@@ -26,6 +28,7 @@ ALL_ROUTES = [
     ('vs:reboot', 'SoftLayer.CLI.virt.power:reboot'),
     ('vs:reload', 'SoftLayer.CLI.virt.reload:cli'),
     ('vs:upgrade', 'SoftLayer.CLI.virt.upgrade:cli'),
+    ('vs:credentials', 'SoftLayer.CLI.virt.credentials:cli'),
 
     ('cdn', 'SoftLayer.CLI.cdn'),
     ('cdn:detail', 'SoftLayer.CLI.cdn.detail:cli'),
@@ -70,6 +73,7 @@ ALL_ROUTES = [
     ('image:detail', 'SoftLayer.CLI.image.detail:cli'),
     ('image:edit', 'SoftLayer.CLI.image.edit:cli'),
     ('image:list', 'SoftLayer.CLI.image.list:cli'),
+    ('image:import', 'SoftLayer.CLI.image.import:cli'),
 
     ('iscsi', 'SoftLayer.CLI.iscsi'),
     ('iscsi:cancel', 'SoftLayer.CLI.iscsi.cancel:cli'),
@@ -121,6 +125,7 @@ ALL_ROUTES = [
 
     ('nas', 'SoftLayer.CLI.nas'),
     ('nas:list', 'SoftLayer.CLI.nas.list:cli'),
+    ('nas:credentials', 'SoftLayer.CLI.nas.credentials:cli'),
 
     ('rwhois', 'SoftLayer.CLI.rwhois'),
     ('rwhois:edit', 'SoftLayer.CLI.rwhois.edit:cli'),
@@ -141,6 +146,7 @@ ALL_ROUTES = [
     ('server:power-on', 'SoftLayer.CLI.server.power:power_on'),
     ('server:reboot', 'SoftLayer.CLI.server.power:reboot'),
     ('server:reload', 'SoftLayer.CLI.server.reload:cli'),
+    ('server:credentials', 'SoftLayer.CLI.server.credentials:cli'),
 
     ('snapshot', 'SoftLayer.CLI.snapshot'),
     ('snapshot:cancel', 'SoftLayer.CLI.snapshot.cancel:cli'),
@@ -184,3 +190,15 @@ ALL_ROUTES = [
 
     ('summary', 'SoftLayer.CLI.summary:cli'),
 ]
+
+ALL_ALIASES = {
+    'meta': 'metadata',
+    'my': 'metadata',
+    'vm': 'vs',
+    'cci': 'vs',
+    'hardware': 'server',
+    'hw': 'server',
+    'bmetal': 'bmc',
+    'virtual': 'vs',
+    'lb': 'loadbal',
+}

@@ -30,16 +30,19 @@ def cli(self, identifier, passwords=False, price=False):
     result = utils.NestedDict(result)
 
     table.add_row(['id', result['id']])
-    table.add_row(['hostname', result['fullyQualifiedDomainName']])
+    table.add_row(['guid', result['globalIdentifier']])
+    table.add_row(['hostname', result['hostname']])
+    table.add_row(['domain', result['domain']])
+    table.add_row(['fqdn', result['fullyQualifiedDomainName']])
     table.add_row(['status', formatting.FormattedItem(
         result['status']['keyName'] or formatting.blank(),
         result['status']['name'] or formatting.blank()
     )])
-    table.add_row(['active_transaction', formatting.active_txn(result)])
     table.add_row(['state', formatting.FormattedItem(
         utils.lookup(result, 'powerState', 'keyName'),
         utils.lookup(result, 'powerState', 'name'),
     )])
+    table.add_row(['active_transaction', formatting.active_txn(result)])
     table.add_row(['datacenter',
                    result['datacenter']['name'] or formatting.blank()])
     operating_system = utils.lookup(result,
@@ -95,7 +98,7 @@ def cli(self, identifier, passwords=False, price=False):
         tag_row.append(tag['tag']['name'])
 
     if tag_row:
-        table.add_row(['tags', formatting.listing(tag_row, separator=',')])
+        table.add_row(['tags', formatting.listing(tag_row, separator=', ')])
 
     # Test to see if this actually has a primary (public) ip address
     try:

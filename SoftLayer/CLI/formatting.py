@@ -10,6 +10,7 @@
 import json
 import os
 
+import click
 import prettytable
 
 from SoftLayer import utils
@@ -170,7 +171,7 @@ def valid_response(prompt, *valid):
     :param string prompt: string prompt to give to the user
     :param string \\*valid: valid responses
     """
-    ans = utils.console_input(prompt).lower()
+    ans = click.prompt(prompt).lower()
 
     if ans in valid:
         return True
@@ -251,7 +252,6 @@ class Table(object):
         self.columns = columns
         self.rows = []
         self.align = {}
-        self.format = {}
         self.sortby = None
 
     def add_row(self, row):

@@ -19,6 +19,7 @@ import click
 @click.option('--hostname', '-H',
               help="Host portion of the FQDN")
 @click.option('--chassis',
+              required=True,
               help="The chassis to use for the new server")
 @click.option('--cpu', '-c',
               help="Number of CPU cores",
@@ -46,14 +47,10 @@ The hourly rate is only available on bare metal instances""")
 @click.option('--export',
               type=click.Path(writable=True, resolve_path=True),
               help="Exports options to a template file")
-@click.option('--userfile', '-F',
-              help="Read userdata from file",
-              type=click.Path(exists=True, readable=True, resolve_path=True))
 @click.option('--postinstall', '-i', help="Post-install script to download")
-@click.option('--key', '-k',
-              multiple=True,
-              help="SSH keys to add to the root user")
-@click.option('--disk', multiple=True, help="Disk sizes")
+@helpers.multi_option('--key', '-k',
+                      help="SSH keys to add to the root user")
+@helpers.multi_option('--disk', help="Disk sizes")
 @click.option('--controller', help="The RAID configuration for the server")
 @click.option('--private',
               is_flag=True,
@@ -63,6 +60,9 @@ The hourly rate is only available on bare metal instances""")
               help="A template file that defaults the command-line options",
               type=click.Path(exists=True, readable=True, resolve_path=True))
 @click.option('--userdata', '-u', help="User defined metadata string")
+@click.option('--userfile', '-F',
+              help="Read userdata from file",
+              type=click.Path(exists=True, readable=True, resolve_path=True))
 @click.option('--vlan-public',
               help="The ID of the public VLAN on which you want the virtual "
               "server placed",
