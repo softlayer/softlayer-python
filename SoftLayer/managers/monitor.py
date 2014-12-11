@@ -76,7 +76,7 @@ class MonitoringManager(utils.IdentifierMixin, object):
                 'primaryBackendIpAddress',
                 'primaryIpAddress',
                 'datacenter',
-                'networkMonitors[lastResult]'
+                'networkMonitors[lastResult,queryType]'
             ]
 
             kwargs['mask'] = ('[mask[%s]]'
