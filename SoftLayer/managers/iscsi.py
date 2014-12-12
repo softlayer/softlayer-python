@@ -2,6 +2,8 @@
     SoftLayer.iscsi
     ~~~~~~~~~~~~~~~
     ISCSI Manager/helpers
+
+    :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import utils
 

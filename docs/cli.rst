@@ -3,7 +3,11 @@
 Command-line Interface
 ======================
 
-The SoftLayer command line interface is available via the `sl` command available in your `PATH`.  The `sl` command is a reference implementation of SoftLayer API bindings for python and how to efficiently make API calls. See the :ref:`usage-examples` section to see how to discover all of the functionality not fully documented here.
+The SoftLayer command line interface is available via the `sl` command
+available in your `PATH`.  The `sl` command is a reference implementation of
+SoftLayer API bindings for python and how to efficiently make API calls. See
+the :ref:`usage-examples` section to see how to discover all of the
+functionality not fully documented here.
 
 .. toctree::
    :maxdepth: 2
@@ -29,7 +33,7 @@ To update the configuration, you can use `sl config setup`.
 	:      API Key : oyVmeipYQCNrjVS4rF9bHWV7D75S6pa1fghFl384v7mwRCbHTfuJ8qRORIqoVnha :
 	: Endpoint URL : https://api.softlayer.com/xmlrpc/v3/                             :
 	:..............:..................................................................:
-	Are you sure you want to write settings to "/path/to/home/.softlayer"? [y/N]: y
+	Are you sure you want to write settings to "/home/me/.softlayer"? [y/N]: y
 
 To check the configuration, you can use `sl config show`.
 ::
@@ -71,6 +75,7 @@ To discover the available commands, simply type `sl`.
 	  --help                     Show this message and exit.
 
 	Commands:
+	  call-api   Call arbitrary API endpoints.
 	  cdn        Content Delivery Network.
 	  config     CLI configuration.
 	  dns        Domain Name System.
@@ -96,7 +101,8 @@ To discover the available commands, simply type `sl`.
 	  To use most commands your SoftLayer username and api_key need to be
 	  configured. The easiest way to do that is to use: 'sl config setup'
 
-As you can see, there are a number of commands/sections. To look at the list of subcommands for virtual servers type `sl vs`. For example:
+As you can see, there are a number of commands/sections. To look at the list of
+subcommands for virtual servers type `sl vs`. For example:
 ::
 
 	$ sl vs
@@ -112,6 +118,7 @@ As you can see, there are a number of commands/sections. To look at the list of 
 	  capture         Capture SoftLayer image.
 	  create          Order/create virtual servers.
 	  create-options  Virtual server order options.
+	  credentials     List virtual server credentials.
 	  detail          Get details for a virtual server.
 	  dns-sync        Sync DNS records.
 	  edit            Edit a virtual server's details.
@@ -127,7 +134,8 @@ As you can see, there are a number of commands/sections. To look at the list of 
 	  resume          Resumes a paused virtual server.
 	  upgrade         Upgrade a virtual server.
 
-Finally, we can make an actual call. Let's list out the virtual servers on our account using `sl vs list`.
+Finally, we can make an actual call. Let's list out the virtual servers on our
+account by using `sl vs list`.
 
 ::
 
@@ -135,19 +143,19 @@ Finally, we can make an actual call. Let's list out the virtual servers on our a
 	:.........:............:....................:.......:........:................:..............:....................:
 	:    id   : datacenter :       host         : cores : memory :   primary_ip   :  backend_ip  : active_transaction :
 	:.........:............:....................:.......:........:................:..............:....................:
-	: 1234567 :   dal05    :  test.example.com  :   4   :   4G   :    12.34.56    :   65.43.21   :         -          :
+	: 1234567 :   sjc01    :  test.example.com  :   4   :   4G   :    12.34.56    :   65.43.21   :         -          :
 	:.........:............:....................:.......:........:................:..............:....................:
 
 Most commands will take in additional options/arguments. To see all available actions, use `--help`.
 ::
 
 	$ sl vs list --help
-		Usage: sl vs list [OPTIONS]
+	Usage: sl vs list [OPTIONS]
 
-	  List virtual servers
+	  List virtual servers.
 
 	Options:
-	  --sortby [id|datacenter|host|cores|memory|primary_ip|backend_ip]
+	  --sortby [guid|hostname|primary_ip|backend_ip|datacenter]
 	                                  Column to sort by
 	  -c, --cpu INTEGER               Number of CPU cores
 	  -D, --domain TEXT               Domain portion of the FQDN

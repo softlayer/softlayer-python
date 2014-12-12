@@ -1,40 +1,54 @@
-#### International Business machines, Inc.
-#####Software Grant and Corporate Contributor License Agreement ("Agreement")
+#### International Business Machines, Inc.
+##### Software Grant and Corporate Contributor License Agreement ("Agreement")
 
-http://www.github.com/softlayer/softlayer-python/
-
-
-Thank you for your interest in IBM’s softlayer-python project (“the Project"). In order to clarify the intellectual property license granted with Contributions from any person or entity, IBM must have a Contributor License Agreement (CLA) on file that has been signed by each Contributor, indicating agreement to the license terms below. This license is for your protection as a Contributor as well as the protection of IBM and its users; it does not change your rights to use your own Contributions for any other purpose.
-
-This version of the Agreement allows an entity (the "Corporation") to submit Contributions to the Project, to authorize Contributions submitted by its designated employees to the Project, and to grant copyright and patent licenses thereto.
-
-If you have not already done so, please complete and sign, then scan and email a pdf file of this Agreement to pjackson@softlayer.com. 
+https://github.com/softlayer/softlayer-python/
 
 
+Thank you for your interest in IBM’s softlayer-python project (“the Project").
+In order to clarify the intellectual property license granted with
+Contributions from any person or entity, IBM must have a Contributor License
+Agreement (CLA) on file that has been signed by each Contributor, indicating
+agreement to the license terms below. This license is for your protection as a
+Contributor as well as the protection of IBM and its users; it does not change
+your rights to use your own Contributions for any other purpose.
 
-Please read this document carefully before signing and keep a copy for your records.
+This version of the Agreement allows an entity (the "Corporation") to submit
+Contributions to the Project, to authorize Contributions submitted by its
+designated employees to the Project, and to grant copyright and patent licenses
+thereto.
+
+If you have not already done so, please complete and sign, then scan and email
+a PDF file of this Agreement to pjackson@softlayer.com.
+
+
+
+Please read this document carefully before signing and keep a copy for your
+records.
 
 Corporation name:    ________________________________________________
-      
-Corporation address: ________________________________________________                     
+
+Corporation address: ________________________________________________
 
 Point of Contact:    ________________________________________________
 
 E-Mail:              ________________________________________________
 
-Telephone:           _____________________ 
-      
+Telephone:           _____________________
 
-You accept and agree to the following terms and conditions for Your present and future Contributions submitted to the Project. Except for the license granted herein to IBM and recipients of software distributed by IBM, You reserve all right, title, and interest in and to Your Contributions.
+
+You accept and agree to the following terms and conditions for Your present and
+future Contributions submitted to the Project. Except for the license granted
+herein to IBM and recipients of software distributed by IBM, You reserve all
+right, title, and interest in and to Your Contributions.
 
 1. Definitions.
 
    "You" (or "Your") shall mean the copyright owner or legal entity
    authorized by the copyright owner that is making this Agreement
-   with IBM. For legal entities, the entity making a Contribution and    
-   all other entities that control, are controlled by, or are under 
-   common control with that entity are considered to be a single    
-   Contributor. For the purposes of this definition, "control" means    
+   with IBM. For legal entities, the entity making a Contribution and
+   all other entities that control, are controlled by, or are under
+   common control with that entity are considered to be a single
+   Contributor. For the purposes of this definition, "control" means
    (i) the power, direct or indirect, to cause the direction or
    management of such entity, whether by contract or otherwise, or
    (ii) ownership of fifty percent (50%) or more of the outstanding
@@ -42,7 +56,7 @@ You accept and agree to the following terms and conditions for Your present and 
 
    "Contribution" shall mean the code, documentation or other original
    works of authorship expressly identified in Schedule B, as well as
-   any original work of authorship, including any modifications or    
+   any original work of authorship, including any modifications or
    additions to an existing work, that is intentionally submitted by
    You to IBM for inclusion in, or documentation of, the Project managed
    by IBM (the "Work"). For the purposes of this definition, "submitted"
@@ -58,17 +72,17 @@ You accept and agree to the following terms and conditions for Your present and 
 
    Subject to the terms and conditions of this Agreement,
    You hereby grant to IBM and to recipients of software
-   distributed by IBM a perpetual, worldwide, non-exclusive, 
-   no-charge, royalty-free, irrevocable copyright license to 
-   reproduce, prepare derivative works of, publicly display, 
+   distributed by IBM a perpetual, worldwide, non-exclusive,
+   no-charge, royalty-free, irrevocable copyright license to
+   reproduce, prepare derivative works of, publicly display,
    publicly perform, sublicense, and distribute Your Contributions
    and such derivative works.
 
 3. Grant of Patent License.
 
-   Subject to the terms and conditions of this Agreement, 
-   You hereby grant to IBM and to recipients of software 
-   distributed by IBM a perpetual, worldwide, non-exclusive, 
+   Subject to the terms and conditions of this Agreement,
+   You hereby grant to IBM and to recipients of software
+   distributed by IBM a perpetual, worldwide, non-exclusive,
    no-charge, royalty-free, irrevocable (except as
    stated in this section) patent license to make, have made, use,
    offer to sell, sell, import, and otherwise transfer the Work,
@@ -86,7 +100,7 @@ You accept and agree to the following terms and conditions for Your present and 
 4. You represent that You are legally entitled to grant the above
    license.
 
-   You represent further that each employee of the Corporation 
+   You represent further that each employee of the Corporation
    designated on Schedule A below (or in a subsequent written
    modification to that Schedule) is authorized to submit
    Contributions on behalf of the Corporation.

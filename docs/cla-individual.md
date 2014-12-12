@@ -1,21 +1,28 @@
 #### International Business Machines, Inc. (IBM)
-#####Individual Contributor License Agreement ("Agreement")
-            
-http://www.github.com/softlayer/softlayer-python
+##### Individual Contributor License Agreement ("Agreement")
+
+https://github.com/softlayer/softlayer-python
 
 Thank you for your interest in the softlayer-python project ("the Project").
 
-In order to clarify the intellectual property license granted with Contributions from any person or entity, IBM must have a Contributor License Agreement ("CLA") on file that has been signed by each Contributor, indicating agreement to the license terms below. This license is for your protection as a Contributor as well as the protection of IBM and its customers; it does not change your rights to use your own Contributions for any other purpose.
+In order to clarify the intellectual property license granted with
+Contributions from any person or entity, IBM must have a Contributor License
+Agreement ("CLA") on file that has been signed by each Contributor, indicating
+agreement to the license terms below. This license is for your protection as a
+Contributor as well as the protection of IBM and its customers; it does not
+change your rights to use your own Contributions for any other purpose.
 
-If you have not already done so, please complete and sign, then scan and email a pdf file of this Agreement to pjackson@softlayer.com
+If you have not already done so, please complete and sign, then scan and email
+a PDF file of this Agreement to pjackson@softlayer.com.
 
-Please read this document carefully before signing and keep a copy for your records.
+Please read this document carefully before signing and keep a copy for your
+records.
 
   Full name: ______________________________________________________
 
   (optional) Public name: _________________________________________
 
-  Mailing Address: ________________________________________________                
+  Mailing Address: ________________________________________________
 
   Country:   ______________________________________________________
 
@@ -24,17 +31,20 @@ Please read this document carefully before signing and keep a copy for your reco
   E-Mail:    ______________________________________________________
 
 
-You accept and agree to the following terms and conditions for Your present and future Contributions submitted to the Project. Except for the license granted herein to IBM and recipients of software distributed by IBM, You reserve all right, title, and interest in and to Your Contributions.
+You accept and agree to the following terms and conditions for Your present and
+future Contributions submitted to the Project. Except for the license granted
+herein to IBM and recipients of software distributed by IBM, You reserve all
+right, title, and interest in and to Your Contributions.
 
 1. Definitions.
 
    "You" (or "Your") shall mean the copyright owner or legal entity
    authorized by the copyright owner that is making this Agreement
    with IBM. For legal entities, the entity making a Contribution and
-   all other entities that control, are controlled by, or are under 
+   all other entities that control, are controlled by, or are under
    common control with that entity are considered to be a single
-   Contributor. For the purposes of this definition, "control" means 
-   (i) the power, direct or indirect, to cause the direction or 
+   Contributor. For the purposes of this definition, "control" means
+   (i) the power, direct or indirect, to cause the direction or
    management of such entity, whether by contract or otherwise,
    or (ii) ownership of fifty percent (50%) or more of the outstanding
    shares, or (iii) beneficial ownership of such entity.
@@ -44,9 +54,9 @@ You accept and agree to the following terms and conditions for Your present and 
    is intentionally submitted by You to the Project for inclusion
    in, or documentation of, the Project (”the Work”). For the purposes
    of this definition, "submitted" means any form of electronic, verbal,
-   or written communication sent to the Project or its representatives, 
+   or written communication sent to the Project or its representatives,
    including but not limited to communication on electronic mailing lists,
-   source code control systems, and issue tracking systems that are 
+   source code control systems, and issue tracking systems that are
    managed by, or on behalf of, the Project for the purpose of discussing
    and improving the Work, but excluding communication that is conspicuously
    marked or otherwise designated in writing by You as "Not a Contribution."
@@ -56,26 +66,26 @@ You accept and agree to the following terms and conditions for Your present and 
    Subject to the terms and conditions of this Agreement, You hereby grant
    to IBM and to recipients of software distributed by IBM a perpetual,
    worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright
-   license to reproduce, prepare derivative works of, publicly display, 
-   publicly perform, sublicense, and distribute Your Contributions and 
+   license to reproduce, prepare derivative works of, publicly display,
+   publicly perform, sublicense, and distribute Your Contributions and
    such derivative works.
 
 3. Grant of Patent License.
 
    Subject to the terms and conditions of this Agreement, You hereby grant
-   to IBM and to recipients of software distributed by IBM a perpetual, 
+   to IBM and to recipients of software distributed by IBM a perpetual,
    worldwide, non-exclusive, no-charge, royalty-free, irrevocable (except
    as stated in this section) patent license to make, have made, use, offer
-   to sell, sell, import, and otherwise transfer the Work to which Your 
+   to sell, sell, import, and otherwise transfer the Work to which Your
    Contribution(s) were submitted, where such license applies only to those
-   patent claims licensable by You that are necessarily infringed by Your 
+   patent claims licensable by You that are necessarily infringed by Your
    Contribution(s) alone or by combination of Your Contribution(s) with the
    Work to which such Contribution(s) was submitted. If any entity institutes
    patent litigation against You or any other entity (including a cross-claim
    or counterclaim in a lawsuit) alleging that your Contribution, or the Work
-   to which you have contributed, constitutes direct or contributory patent 
-   infringement, then any patent licenses granted to that entity under this 
-   Agreement for that Contribution or Work shall terminate as of the date 
+   to which you have contributed, constitutes direct or contributory patent
+   infringement, then any patent licenses granted to that entity under this
+   Agreement for that Contribution or Work shall terminate as of the date
    such litigation is filed.
 
 4. You represent that you are legally entitled to grant the above
