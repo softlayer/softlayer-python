@@ -49,8 +49,8 @@ def cli(env):
 
         for firewall in vs_firewalls:
             table.add_row([
-                'cci:%s' % firewall['id'],
-                'CCI - standard',
+                'vs:%s' % firewall['id'],
+                'Virtual Server - standard',
                 '-',
                 firewall['guestNetworkComponent']['guest']['id']
             ])

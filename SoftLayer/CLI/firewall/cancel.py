@@ -22,7 +22,7 @@ def cli(env, identifier):
     if any([env.skip_confirmations,
             formatting.confirm("This action will cancel a firewall from your"
                                "account. Continue?")]):
-        if firewall_type in ['cci', 'server']:
+        if firewall_type in ['vs', 'server']:
             mgr.cancel_firewall(firewall_id, dedicated=False)
         elif firewall_type == 'vlan':
             mgr.cancel_firewall(firewall_id, dedicated=True)

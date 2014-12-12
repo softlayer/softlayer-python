@@ -28,9 +28,9 @@ def cli(env, target, firewall_type, high_availability):
         if firewall_type == 'vlan':
             pkg = mgr.get_dedicated_package(ha_enabled=high_availability)
         elif firewall_type == 'vs':
-            pkg = mgr.get_standard_package(target, is_cci=True)
+            pkg = mgr.get_standard_package(target, is_virt=True)
         elif firewall_type == 'server':
-            pkg = mgr.get_standard_package(target, is_cci=False)
+            pkg = mgr.get_standard_package(target, is_virt=False)
 
         if not pkg:
             return "Unable to add firewall - Is network public enabled?"
@@ -47,8 +47,8 @@ def cli(env, target, firewall_type, high_availability):
     if firewall_type == 'vlan':
         mgr.add_vlan_firewall(target, ha_enabled=high_availability)
     elif firewall_type == 'vs':
-        mgr.add_standard_firewall(target, is_cci=True)
+        mgr.add_standard_firewall(target, is_virt=True)
     elif firewall_type == 'server':
-        mgr.add_standard_firewall(target, is_cci=False)
+        mgr.add_standard_firewall(target, is_virt=False)
 
     return "Firewall is being created!"

@@ -11,14 +11,14 @@ import click
 
 @click.command()
 @click.argument('identifier')
-@click.option('--no-vs', '--no-cci',
+@click.option('--no-vs',
               is_flag=True,
               help="Hide virtual server listing")
 @click.option('--no-hardware',
               is_flag=True,
               help="Hide hardware listing")
 @environment.pass_env
-def cli(env, identifier, no_cci, no_hardware):
+def cli(env, identifier, no_vs, no_hardware):
     """Cancel a subnet."""
 
     mgr = SoftLayer.NetworkManager(env.client)
@@ -42,7 +42,7 @@ def cli(env, identifier, no_cci, no_hardware):
     table.add_row(['usable ips',
                    subnet.get('usableIpAddressCount', formatting.blank())])
 
-    if not no_cci:
+    if not no_vs:
         if subnet['virtualGuests']:
             vs_table = formatting.Table(['Hostname', 'Domain', 'IP'])
             vs_table.align['Hostname'] = 'r'

@@ -40,16 +40,17 @@ class FirewallManager(utils.IdentifierMixin, object):
         self.account = self.client['Account']
         self.prod_pkg = self.client['Product_Package']
 
-    def get_standard_package(self, server_id, is_cci=True):
-        """Retrieves the standard firewall package for the CCI.
+    def get_standard_package(self, server_id, is_virt=True):
+        """Retrieves the standard firewall package for the virtual server.
 
         :param int server_id: The ID of the server to create the firewall for
-        :param bool is_cci: True if the id provided is for a CCI,
-                            False for a server
-        :returns: A dictionary containing the standard CCI firewall package
+        :param bool is_virt: True if the ID provided is for a virtual server,
+                             False for a server
+        :returns: A dictionary containing the standard virtual server firewall
+                  package
         """
 
-        firewall_port_speed = self._get_fwl_port_speed(server_id, is_cci)
+        firewall_port_speed = self._get_fwl_port_speed(server_id, is_virt)
 
         _value = "%s%s" % (firewall_port_speed, "Mbps Hardware Firewall")
         _filter = {'items': {'description': utils.query_filter(_value)}}
@@ -61,7 +62,8 @@ class FirewallManager(utils.IdentifierMixin, object):
 
         :param bool ha_enabled: True if HA is to be enabled on the firewall
                                 False for No HA
-        :returns: A dictionary containing the dedicated CCI firewall package
+        :returns: A dictionary containing the dedicated virtual server firewall
+                  package
         """
 
         fwl_filter = 'Hardware Firewall (Dedicated)'
@@ -87,17 +89,18 @@ class FirewallManager(utils.IdentifierMixin, object):
         billing_item = self.client['Billing_Item']
         return billing_item.cancelService(id=billing_id)
 
-    def add_standard_firewall(self, server_id, is_cci=True):
-        """Creates a firewall for the specified CCI/Server.
+    def add_standard_firewall(self, server_id, is_virt=True):
+        """Creates a firewall for the specified virtual/hardware server.
 
-        :param int cci_id: The ID of the CCI to create the firewall for
-        :param bool is_cci: If false, will create the firewall for a server,
-                            otherwise for a CCI
-        :returns: A dictionary containing the standard CCI firewall order
+        :param int server_id: The ID of the server to create the firewall for
+        :param bool is_virt: If true, will create the firewall for a virtual
+                             server, otherwise for a hardware server.
+        :returns: A dictionary containing the standard virtual server firewall
+                  order
         """
 
-        package = self.get_standard_package(server_id, is_cci)
-        if is_cci:
+        package = self.get_standard_package(server_id, is_virt)
+        if is_virt:
             product_order = {
                 'complexType': 'SoftLayer_Container_Product_Order_Network_'
                                'Protection_Firewall',
@@ -121,7 +124,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         """Creates a firewall for the specified vlan.
 
         :param int vlan_id: The ID of the vlan to create the firewall for
-        :param bool ha_enabled: If True, Ha firewall will be created
+        :param bool ha_enabled: If True, an HA firewall will be created
 
         :returns: A dictionary containing the VLAN firewall order
         """
@@ -152,16 +155,16 @@ class FirewallManager(utils.IdentifierMixin, object):
             fwl_svc = self.client['Network_Component_Firewall']
         return fwl_svc.getObject(id=firewall_id, mask=mask)
 
-    def _get_fwl_port_speed(self, server_id, is_cci=True):
+    def _get_fwl_port_speed(self, server_id, is_virt=True):
         """Determines the appropriate speed for a firewall.
 
         :param int server_id: The ID of server the firewall is for
-        :param bool is_cci: true if the server_id is for a virtual server
+        :param bool is_virt: True if the server_id is for a virtual server
         :returns: a integer representing the Mbps speed of a firewall
         """
 
         fwl_port_speed = 0
-        if is_cci:
+        if is_virt:
             mask = ('primaryNetworkComponent[maxSpeed]')
             svc = self.client['Virtual_Guest']
             primary = svc.getObject(mask=mask, id=server_id)
