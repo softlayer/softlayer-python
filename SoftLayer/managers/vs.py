@@ -688,7 +688,8 @@ class VSManager(utils.IdentifierMixin, object):
         return prices
 
     def _generate_virtual_guests_options(self, domain, hostname,
-                                         private_network_only=False, public_vlan=None, private_vlan=None):
+                                         private_network_only=False,
+                                         public_vlan=None, private_vlan=None):
         virtual_guests = {
             'domain': domain,
             'hostname': hostname,
@@ -705,9 +706,12 @@ class VSManager(utils.IdentifierMixin, object):
         return virtual_guests
 
     def _generate_place_order_options(self, location, hostname, domain,
-                                      use_hourly_pricing=True, quantity=1, provision_scripts=None,
-                                      private_network_only=False, private_vlan=None, public_vlan=None,
-                                      image_template_global_identifier=None, image_template_id=None,
+                                      use_hourly_pricing=True, quantity=1,
+                                      provision_scripts=None,
+                                      private_network_only=False,
+                                      private_vlan=None, public_vlan=None,
+                                      image_template_global_identifier=None,
+                                      image_template_id=None,
                                       ssh_keys=None, price_ids=[]):
         """ Generates the order options of the desired virtual guest
 
@@ -739,7 +743,8 @@ class VSManager(utils.IdentifierMixin, object):
         """
 
         virtual_guest = self._generate_virtual_guests_options(
-            domain=domain, hostname=hostname, private_network_only=private_network_only,
+            domain=domain, hostname=hostname,
+            private_network_only=private_network_only,
             private_vlan=private_vlan, public_vlan=public_vlan)
         prices = self._generate_prices_ids(price_ids)
 
@@ -756,7 +761,8 @@ class VSManager(utils.IdentifierMixin, object):
         if ssh_keys:
             order_options['sshKeys'] = [{'sshKeyIds': ssh_keys}]
         if image_template_global_identifier:
-            order_options['imageTemplateGlobalIdentifier'] = image_template_global_identifier
+            order_options['imageTemplateGlobalIdentifier'] = \
+                image_template_global_identifier
         if image_template_id:
             order_options['imageTemplateId'] = image_template_id
 

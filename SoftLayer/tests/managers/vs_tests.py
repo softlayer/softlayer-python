@@ -672,15 +672,17 @@ class VSTests(testing.TestCase):
 
     def test_generate_place_order_options(self):
         data = self.vs._generate_place_order_options(
-            location='sng01', hostname='hostname', domain='example.com', use_hourly_pricing=True,
-            price_ids=[21074, 1642, 1647, 2202, 274, 1800, 21, 55, 57, 58, 905, 418, 420])
+            location='sng01', hostname='hostname', domain='example.com',
+            use_hourly_pricing=True,
+            price_ids=[21074, 1642, 1647, 2202, 274, 1800, 21, 55, 57, 58, 905,
+                       418, 420])
         assert_data = {
             'location': 'sng01',
             'packageId': 46,
             'useHourlyPricing': True,
             'prices': [{'id': 21074}, {'id': 1642}, {'id': 1647},
                        {'id': 2202}, {'id': 274}, {'id': 1800},
-                       {'id': 21}, {'id': 55}, {'id': 57},{'id': 58},
+                       {'id': 21}, {'id': 55}, {'id': 57}, {'id': 58},
                        {'id': 905}, {'id': 418}, {'id': 420}],
             'virtualGuests': [{'domain': 'example.com',
                                'hostname': 'hostname',
@@ -689,11 +691,10 @@ class VSTests(testing.TestCase):
         }
         self.assertDictEqual(data, assert_data)
 
-
     @mock.patch('SoftLayer.managers.vs.VSManager._generate_place_order_options')
     def test_verify_place_order(self, generate_options):
         generate_options.return_value = {'test': 1, 'verify': 1}
-        order = self.vs.verify_place_order(test=1, verify=1)
+        self.vs.verify_place_order(test=1, verify=1)
 
         generate_options.assert_called_once_with(test=1, verify=1)
         self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder',
@@ -702,13 +703,11 @@ class VSTests(testing.TestCase):
     @mock.patch('SoftLayer.managers.vs.VSManager._generate_place_order_options')
     def test_place_order(self, generate_options):
         generate_options.return_value = {'test': 1, 'verify': 1}
-        order = self.vs.place_order(test=1, verify=1)
+        self.vs.place_order(test=1, verify=1)
 
         generate_options.assert_called_once_with(test=1, verify=1)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder',
-                            args=({'test': 1, 'verify': 1},))
-
-
+                                args=({'test': 1, 'verify': 1},))
 
 
 class VSWaitReadyGoTests(testing.TestCase):
@@ -876,10 +875,11 @@ class VSWaitReadyGoTests(testing.TestCase):
 
     def test_generate_place_order_options(self):
         args = {
-            'location': 'sng01', #'168642',
+            'location': 'sng01',
             'hostname': 'hostname',
             'domain': 'example.com',
             'use_hourly_pricing': True,
-            'price_ids': [21074, 1642, 1647, 2202, 274, 1800, 21, 55, 57, 58, 905, 418, 420]
+            'price_ids': [21074, 1642, 1647, 2202, 274, 1800, 21, 55, 57, 58,
+                          905, 418, 420]
         }
-        data = self.vs._generate_place_order_options(**args)
+        self.vs._generate_place_order_options(**args)
