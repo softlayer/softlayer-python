@@ -705,28 +705,37 @@ class VSManager(utils.IdentifierMixin, object):
         return virtual_guests
 
     def _generate_place_order_options(self, location, hostname, domain,
-                                      use_hourly_pricing=False, quantity=1, provision_scripts=None,
+                                      use_hourly_pricing=True, quantity=1, provision_scripts=None,
                                       private_network_only=False, private_vlan=None, public_vlan=None,
                                       image_template_global_identifier=None, image_template_id=None,
                                       ssh_keys=None, price_ids=[]):
         """ Generates the order options of the desired virtual guest
 
-        :param location: The location to use.
-        :param hostname: The hostname to use.
-        :param domain: The domain to use.
-        :param bool use_hourly_pricing: Flag to indicate if this server should be billed
-                            hourly (default) or monthly.
-        :param quantity: The amount of servers to order.
-        :param list provision_scripts: A list of the URIs of the post-install
-                                scripts to run after reload.
+        :param location:                The location to use.
+        :param hostname:                The hostname to use.
+        :param domain:                  The domain to use.
+        :param bool use_hourly_pricing: Flag to indicate if this guest should
+                                        be billed hourly (default) or monthly.
+        :param quantity:                The amount of virtual guests to order.
+        :param list provision_scripts:  A list of the URIs of the post-install
+                                        scripts to run on the virtual guest.
         :param bool private_network_only:
-        Flag to indicate whether the computing instance only has access to the private network.
-        :param int public_vlan: The ID of the public VLAN on which you want
-                                this VS placed.
-        :param int private_vlan: The ID of the public VLAN on which you want
-                                 this VS placed.
-        :param ssh_keys: The SSH keys to add to the root user.
-        :param price_ids: The list of price ids.
+                                        Flag to indicate whether the computing
+                                        instance only has access to the private
+                                        network.
+        :param int private_vlan:        The ID of the public VLAN on which you
+                                        want this VS placed.
+        :param int public_vlan:         The ID of the public VLAN on which you
+                                        want this VS placed.
+        :param image_template_global_identifier:
+                                        An image template global id to load the
+                                        VS with. If an image is used, OS should
+                                        not be specified.
+        :param image_template_id:       An image template id to load the VS
+                                        with. If an image is used, OS should
+                                        not be specified.
+        :param ssh_keys:                The SSH keys to add to the root user.
+        :param price_ids:               A list of the required items price ids.
         """
 
         virtual_guest = self._generate_virtual_guests_options(
@@ -758,24 +767,33 @@ class VSManager(utils.IdentifierMixin, object):
         return self.client['Product_Order'].verifyOrder(place_order_options)
 
     def place_order(self, **kwargs):
-        """ Places an order.
+        """ Generates the order options of the desired virtual guest
 
-        :param location: The location to use for the desired server.
-        :param hostname: The hostname to use for the desired server.
-        :param domain: The domain to use for the desired server.
-        :param bool use_hourly_pricing: Flag to indicate if this server should be billed.
-                            hourly (default) or monthly.
-        :param quantity: The quantity of the desired server.
-        :param list provision_scripts: A list of the URIs of the post-install
-                                scripts to run after reload.
+        :param location:                The location to use.
+        :param hostname:                The hostname to use.
+        :param domain:                  The domain to use.
+        :param bool use_hourly_pricing: Flag to indicate if this guest should
+                                        be billed hourly (default) or monthly.
+        :param quantity:                The amount of virtual guests to order.
+        :param list provision_scripts:  A list of the URIs of the post-install
+                                        scripts to run on the virtual guest.
         :param bool private_network_only:
-        Flag to indicate whether the computing instance only has access to the private network.
-        :param int public_vlan: The ID of the public VLAN on which you want
-                                this VS placed.
-        :param int private_vlan: The ID of the public VLAN on which you want
-                                 this VS placed.
-        :param ssh_keys: The SSH keys to add to the root user.
-        :param price_ids: The list of price ids.
+                                        Flag to indicate whether the computing
+                                        instance only has access to the private
+                                        network.
+        :param int private_vlan:        The ID of the public VLAN on which you
+                                        want this VS placed.
+        :param int public_vlan:         The ID of the public VLAN on which you
+                                        want this VS placed.
+        :param image_template_global_identifier:
+                                        An image template global id to load the
+                                        VS with. If an image is used, OS should
+                                        not be specified.
+        :param image_template_id:       An image template id to load the VS
+                                        with. If an image is used, OS should
+                                        not be specified.
+        :param ssh_keys:                The SSH keys to add to the root user.
+        :param price_ids:               A list of the required items price ids.
         """
         place_order_options = self._generate_place_order_options(**kwargs)
         return self.client['Product_Order'].placeOrder(place_order_options)
