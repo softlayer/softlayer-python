@@ -767,7 +767,7 @@ class VSManager(utils.IdentifierMixin, object):
         return self.client['Product_Order'].verifyOrder(place_order_options)
 
     def place_order(self, **kwargs):
-        """ Generates the order options of the desired virtual guest
+        """ Places an order.
 
         :param location:                The location to use.
         :param hostname:                The hostname to use.
