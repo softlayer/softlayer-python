@@ -1,5 +1,5 @@
 """
-    softlayer.CLI
+    softlayer.cli
     ~~~~~~~~~~~~~~
     Contains all code related to the CLI interface
 

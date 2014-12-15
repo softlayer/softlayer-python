@@ -64,7 +64,7 @@ Formatting of the data represented in the table is actually controlled upstream 
 
 Arguments
 ---------
-A command usually isn't very useful without context or arguments of some kind. With click, you have a large array of argument and option types at your disposal. Additionally, with the SoftLayer CLI, we have global options and context which is stored in `softlayer.CLI.environment.Environment` and is attainable through a decorator located at `softlayer.CLI.environment.pass_env`. An example of options and the environment is shown below. It also shows how output should be done using `env.out` instead of printing. This is used for testing and to have a consistent way to print things onto the screen.
+A command usually isn't very useful without context or arguments of some kind. With click, you have a large array of argument and option types at your disposal. Additionally, with the SoftLayer CLI, we have global options and context which is stored in `softlayer.cli.environment.Environment` and is attainable through a decorator located at `softlayer.cli.environment.pass_env`. An example of options and the environment is shown below. It also shows how output should be done using `env.out` instead of printing. This is used for testing and to have a consistent way to print things onto the screen.
 
 ::
 

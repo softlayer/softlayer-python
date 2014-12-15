@@ -12,6 +12,6 @@ import click
 
 def main():
     """Main function for the deprecated 'sl' command."""
-    click.echo("ERORR: Use the 'slcli' command instead.")
-    click.echo("> slcli %s" % ' '.join(sys.argv[1:]))
+    click.echo("ERROR: Use the 'slcli' command instead.", err=True)
+    click.echo("> slcli %s" % ' '.join(sys.argv[1:]), err=True)
     exit(-1)

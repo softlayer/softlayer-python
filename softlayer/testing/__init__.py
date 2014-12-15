@@ -1,5 +1,5 @@
 """
-    SoftLayer.testing
+    softlayer.testing
     ~~~~~~~~~~~~~~~~~
 
     :license: MIT, see LICENSE for more details.
