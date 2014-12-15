@@ -9,11 +9,11 @@ Version:        %{commit}
 Release:        1%{?dist}
 Summary:        softlayer python interface
 
-License:        Softlayer
+License:        MIT
 URL:            https://github.com/softlayer/softlayer-python
 Source:         https://github.com/softlayer/softlayer-python/archive/%{commit}/softlayer-python-%{commit}.tar.gz
 
-#BuildArch:      
+#BuildArch:
 BuildRequires:  python-devel, python-setuptools
 Requires:       python-requests, python-click, python-prettytable >= 0.7.0
 Requires:       python-importlib, python-six >= 1.6.1
@@ -34,7 +34,7 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py build
 rm -rf $RPM_BUILD_ROOT
 %{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
 
- 
+
 %files
 %doc
 /usr/bin/sl

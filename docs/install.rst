@@ -14,16 +14,19 @@ Install via pip: ::
 Debian/Ubuntu
 -------------
 
-For Debian "jessie" (currently testing) and Ubuntu 14.04, official system packages are available::
+For Debian "jessie" (currently testing) and Ubuntu 14.04, official system
+packages are available::
 
 	$ sudo apt-get install python-softlayer
 
 
 .. _install_from_source:
+
 From Source
 -----------
 
-The project is developed on GitHub, at `https://github.com/softlayer/softlayer-python <https://github.com/softlayer/softlayer-python>`_.
+The project is developed on GitHub, at
+`https://github.com/softlayer/softlayer-python <https://github.com/softlayer/softlayer-python>`_.
 
 Install from source via pip (requires `git <http://git-scm.com>`_): ::
 
@@ -46,4 +49,5 @@ or install it into your site-packages easily::
 
     $ python setup.py install
 
-For more information about working with the source, or contributing to the project, please see the :ref:`Contribution Guide <api_dev>`.
+For more information about working with the source, or contributing to the
+project, please see the :ref:`Contribution Guide <api_dev>`.
