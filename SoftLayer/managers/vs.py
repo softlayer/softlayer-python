@@ -713,7 +713,7 @@ class VSManager(utils.IdentifierMixin, object):
                                       image_template_global_identifier=None,
                                       image_template_id=None,
                                       ssh_keys=None, price_ids=[]):
-        """ Generates the order options of the desired virtual guest
+        """Generates the order options of the desired virtual guest
 
         :param location:                The location to use.
         :param hostname:                The hostname to use.
@@ -761,8 +761,8 @@ class VSManager(utils.IdentifierMixin, object):
         if ssh_keys:
             order_options['sshKeys'] = [{'sshKeyIds': ssh_keys}]
         if image_template_global_identifier:
-            order_options['imageTemplateGlobalIdentifier'] = \
-                image_template_global_identifier
+            order_options['imageTemplateGlobalIdentifier'] = (
+                image_template_global_identifier)
         if image_template_id:
             order_options['imageTemplateId'] = image_template_id
 
@@ -773,7 +773,7 @@ class VSManager(utils.IdentifierMixin, object):
         return self.client['Product_Order'].verifyOrder(place_order_options)
 
     def place_order(self, **kwargs):
-        """ Places an order.
+        """Places an order.
 
         :param location:                The location to use.
         :param hostname:                The hostname to use.

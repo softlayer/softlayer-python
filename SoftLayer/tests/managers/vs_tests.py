@@ -691,7 +691,8 @@ class VSTests(testing.TestCase):
         }
         self.assertDictEqual(data, assert_data)
 
-    @mock.patch('SoftLayer.managers.vs.VSManager._generate_place_order_options')
+    @mock.patch(
+        'SoftLayer.managers.vs.VSManager._generate_place_order_options')
     def test_verify_place_order(self, generate_options):
         generate_options.return_value = {'test': 1, 'verify': 1}
         self.vs.verify_place_order(test=1, verify=1)
@@ -700,7 +701,8 @@ class VSTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder',
                                 args=({'test': 1, 'verify': 1},))
 
-    @mock.patch('SoftLayer.managers.vs.VSManager._generate_place_order_options')
+    @mock.patch(
+        'SoftLayer.managers.vs.VSManager._generate_place_order_options')
     def test_place_order(self, generate_options):
         generate_options.return_value = {'test': 1, 'verify': 1}
         self.vs.place_order(test=1, verify=1)
