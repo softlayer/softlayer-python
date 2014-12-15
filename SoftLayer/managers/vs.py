@@ -682,14 +682,35 @@ class VSManager(utils.IdentifierMixin, object):
                     return item['prices'][0]['id']
 
     def _generate_prices_ids(self, price_ids):
+        """
+        Takes a list of price ids and create list of id pair of this format:
+        {'id':price_id1}
+        {'id':price_id2}
+        {'id':price_id3}
+        ...
+        This structure is required for the creation of VS using place_order
+        """
         prices = []
-        for id in price_ids:
-            prices.append({'id': id})
+        for price_id in price_ids:
+            prices.append({'id': price_id})
         return prices
 
-    def _generate_virtual_guests_options(self, domain, hostname,
-                                         private_network_only=False,
-                                         public_vlan=None, private_vlan=None):
+    def _create_virtual_guests_options(self, domain, hostname,
+                                       private_network_only=False,
+                                       public_vlan=None, private_vlan=None):
+        """
+        Creates the Virtual Guest structure require for VS creation.
+        :param string domain:   The domain the VS will belong to
+        :param string hostname: The hostname of the VS
+        :param boolean private_network_only:
+                                Indicates whether the VS will have access to a
+                                private network only or to private and public
+                                networks (default).
+        :param int public_vlan: The ID of the public VLAN on which the VS will
+                                be placed
+        :param int private_vlan:The ID of the private VLAN on which the VS will
+                                be placed
+        """
         virtual_guests = {
             'domain': domain,
             'hostname': hostname,
@@ -710,10 +731,67 @@ class VSManager(utils.IdentifierMixin, object):
                                       provision_scripts=None,
                                       private_network_only=False,
                                       private_vlan=None, public_vlan=None,
-                                      image_template_global_identifier=None,
+                                      image_template_global_id=None,
                                       image_template_id=None,
                                       ssh_keys=None, price_ids=[]):
         """Generates the order options of the desired virtual guest
+
+        :param location:                The location to use.
+        :param hostname:                The hostname to use.
+        :param domain:                  The domain to use.
+        :param bool use_hourly_pricing: Flag to indicate if this guest should
+                                        be billed hourly (default) or monthly.
+        :param quantity:                The amount of virtual guests to order.
+        :param list provision_scripts:  A list of the URIs of the post-install
+                                        scripts to run on the virtual guest.
+        :param bool private_network_only:
+                                        Flag to indicate whether the computing
+                                        instance only has access to the private
+                                        network.
+        :param int private_vlan:        The ID of the private VLAN on which you
+                                        want this VS placed.
+        :param int public_vlan:         The ID of the public VLAN on which you
+                                        want this VS placed.
+        :param image_template_global_id:
+                                        An image template global id to load the
+                                        VS with. If an image is used, OS should
+                                        not be specified.
+        :param image_template_id:       An image template id to load the VS
+                                        with. If an image is used, OS should
+                                        not be specified.
+        :param ssh_keys:                The SSH keys to add to the root user.
+        :param price_ids:               A list of the required items price ids.
+        """
+
+        virtual_guest = self._create_virtual_guests_options(
+            domain=domain, hostname=hostname,
+            private_network_only=private_network_only,
+            private_vlan=private_vlan, public_vlan=public_vlan)
+        prices = self._generate_prices_ids(price_ids)
+
+        order_options = {
+            'packageId': 46,
+            'location': location,
+            'prices': prices,
+            'virtualGuests': [virtual_guest],
+            'quantity': quantity,
+            'useHourlyPricing': use_hourly_pricing,
+            }
+        if provision_scripts:
+            order_options['provisionScripts'] = provision_scripts
+        if ssh_keys:
+            order_options['sshKeys'] = [{'sshKeyIds': ssh_keys}]
+        if image_template_global_id:
+            order_options['imageTemplateGlobalIdentifier'] = (
+                image_template_global_id)
+        if image_template_id:
+            order_options['imageTemplateId'] = image_template_id
+
+        return order_options
+
+    def verify_place_order(self, **kwargs):
+        """
+        Verifies an order to create a VS.
 
         :param location:                The location to use.
         :param hostname:                The hostname to use.
@@ -741,39 +819,11 @@ class VSManager(utils.IdentifierMixin, object):
         :param ssh_keys:                The SSH keys to add to the root user.
         :param price_ids:               A list of the required items price ids.
         """
-
-        virtual_guest = self._generate_virtual_guests_options(
-            domain=domain, hostname=hostname,
-            private_network_only=private_network_only,
-            private_vlan=private_vlan, public_vlan=public_vlan)
-        prices = self._generate_prices_ids(price_ids)
-
-        order_options = {
-            'packageId': 46,
-            'location': location,
-            'prices': prices,
-            'virtualGuests': [virtual_guest],
-            'quantity': quantity,
-            'useHourlyPricing': use_hourly_pricing,
-            }
-        if provision_scripts:
-            order_options['provisionScripts'] = provision_scripts
-        if ssh_keys:
-            order_options['sshKeys'] = [{'sshKeyIds': ssh_keys}]
-        if image_template_global_identifier:
-            order_options['imageTemplateGlobalIdentifier'] = (
-                image_template_global_identifier)
-        if image_template_id:
-            order_options['imageTemplateId'] = image_template_id
-
-        return order_options
-
-    def verify_place_order(self, **kwargs):
         place_order_options = self._generate_place_order_options(**kwargs)
         return self.client['Product_Order'].verifyOrder(place_order_options)
 
     def place_order(self, **kwargs):
-        """Places an order.
+        """Places an order to create a VS.
 
         :param location:                The location to use.
         :param hostname:                The hostname to use.
