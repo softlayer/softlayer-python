@@ -733,7 +733,7 @@ class VSManager(utils.IdentifierMixin, object):
                                       private_vlan=None, public_vlan=None,
                                       image_template_global_id=None,
                                       image_template_id=None,
-                                      ssh_keys=None, price_ids=[]):
+                                      ssh_keys=None, price_ids=None):
         """Generates the order options of the desired virtual guest
 
         :param location:                The location to use.
@@ -763,6 +763,7 @@ class VSManager(utils.IdentifierMixin, object):
         :param price_ids:               A list of the required items price ids.
         """
 
+        price_ids = price_ids or []
         virtual_guest = self._create_virtual_guests_options(
             domain=domain, hostname=hostname,
             private_network_only=private_network_only,
