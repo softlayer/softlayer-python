@@ -682,8 +682,8 @@ class VSManager(utils.IdentifierMixin, object):
                     return item['prices'][0]['id']
 
     def _generate_prices_ids(self, price_ids):
-        """
-        Takes a list of price ids and create list of id pair of this format:
+
+        """Takes a list of price ids and create list of id pair of this format:
         {'id':price_id1}
         {'id':price_id2}
         {'id':price_id3}
@@ -698,8 +698,8 @@ class VSManager(utils.IdentifierMixin, object):
     def _create_virtual_guests_options(self, domain, hostname,
                                        private_network_only=False,
                                        public_vlan=None, private_vlan=None):
-        """
-        Creates the Virtual Guest structure require for VS creation.
+
+        """Creates the Virtual Guest structure require for VS creation.
         :param string domain:   The domain the VS will belong to
         :param string hostname: The hostname of the VS
         :param boolean private_network_only:
@@ -791,8 +791,8 @@ class VSManager(utils.IdentifierMixin, object):
         return order_options
 
     def verify_place_order(self, **kwargs):
-        """
-        Verifies an order to create a VS.
+        
+        """Verifies an order to create a VS.
 
         :param location:                The location to use.
         :param hostname:                The hostname to use.
