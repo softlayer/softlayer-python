@@ -36,7 +36,7 @@ getObject = {
     'operatingSystem': {
         'passwords': [{'username': 'user', 'password': 'pass'}],
         'softwareLicense': {
-            'softwareDescription': {'version': '12.04-64 Minimal for CCI',
+            'softwareDescription': {'version': '12.04-64 Minimal for VSI',
                                     'name': 'Ubuntu'}}
     },
     'tagReferences': [{'tag': {'name': 'production'}}],
