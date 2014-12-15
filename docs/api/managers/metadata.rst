@@ -1,7 +1,7 @@
 .. _metadata:
 
-.. automodule:: SoftLayer.managers.metadata
+.. automodule:: softlayer.managers.metadata
    :members:
    :inherited-members:
 
-.. autoattribute:: SoftLayer.managers.metadata.METADATA_ATTRIBUTES
+.. autoattribute:: softlayer.managers.metadata.METADATA_ATTRIBUTES

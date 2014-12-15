@@ -1,5 +1,5 @@
 .. _hardware:
 
-.. automodule:: SoftLayer.managers.hardware
+.. automodule:: softlayer.managers.hardware
    :members:
    :inherited-members:

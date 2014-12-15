@@ -14,7 +14,7 @@ locations.
 The configuration file is INI-based and requires the `softlayer` section to be
 present. The only required fields are `username` and `api_key`. You can
 optionally supply the `endpoint_url` as well. This file is created
-automatically by the `sl config setup` command detailed here:
+automatically by the `slcli config setup` command detailed here:
 :ref:`config_setup`.
 
 *Config Example*

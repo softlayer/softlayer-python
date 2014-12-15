@@ -1,5 +1,5 @@
 .. _messaging:
 
-.. automodule:: SoftLayer.managers.messaging
+.. automodule:: softlayer.managers.messaging
    :members:
    :inherited-members:

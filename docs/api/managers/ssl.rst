@@ -1,5 +1,5 @@
 .. _ssl:
 
-.. automodule:: SoftLayer.managers.ssl
+.. automodule:: softlayer.managers.ssl
    :members:
    :inherited-members:

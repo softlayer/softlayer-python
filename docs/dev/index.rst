@@ -10,11 +10,12 @@ Code Organization
 -----------------
 
 * **docs** - Where The source to this documentation lives.
-* **SoftLayer** - All the source lives under here.
+* **softlayer** - All the source lives under here.
 
-  * **API** - Primary API client.
-  * **CLI** - Code for the command-line interface.
+  * **api** - Primary API client.
+  * **cli** - Code for the command-line interface.
   * **managers** - API Managers. Abstractions to help use the API.
+* **tests** - Where all the unit and functional tests live.
 
 
 Setting Up A Dev Environment

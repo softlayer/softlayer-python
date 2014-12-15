@@ -1,5 +1,5 @@
 .. _iscsi:
 
-.. automodule:: SoftLayer.managers.iscsi
+.. automodule:: softlayer.managers.iscsi
    :members:
    :inherited-members:

@@ -1,5 +1,5 @@
 .. _sshkey:
 
-.. automodule:: SoftLayer.managers.sshkey
+.. automodule:: softlayer.managers.sshkey
    :members:
    :inherited-members:

@@ -1,0 +1,30 @@
+"""
+    softlayer.tests.cli.modules.firewall_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    :license: MIT, see LICENSE for more details.
+"""
+import json
+
+from softlayer import testing
+
+
+class FirewallTests(testing.TestCase):
+
+    def test_list_firewalls(self):
+        result = self.run_command(['firewall', 'list'])
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output),
+                         [{'type': 'VLAN - dedicated',
+                           'server/vlan id': 1,
+                           'features': ['HA'],
+                           'firewall id': 'vlan:1234'},
+                          {'features': '-',
+                           'firewall id': 'vs:1234',
+                           'server/vlan id': 1,
+                           'type': 'Virtual Server - standard'},
+                          {'features': '-',
+                           'firewall id': 'server:1234',
+                           'server/vlan id': 1,
+                           'type': 'Server - standard'}])

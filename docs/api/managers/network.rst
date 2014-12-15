@@ -1,5 +1,5 @@
 .. _network:
 
-.. automodule:: SoftLayer.managers.network
+.. automodule:: softlayer.managers.network
    :members:
    :inherited-members:

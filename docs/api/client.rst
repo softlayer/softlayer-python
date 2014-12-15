@@ -13,8 +13,8 @@ that will help to use the SoftLayer API.
 
 ::
 
-	>>> import SoftLayer
-	>>> client = SoftLayer.Client(username="username", api_key="api_key")
+	>>> import softlayer
+	>>> client = softlayer.Client(username="username", api_key="api_key")
 	>>> resp = client['Account'].getObject()
 	>>> resp['companyName']
 	'Your Company'
@@ -29,8 +29,8 @@ instance. However, you can also set these in the environmental variables
 Creating a client instance by passing in the username/api_key:
 ::
 
-    import SoftLayer
-    client = SoftLayer.Client(username='YOUR_USERNAME', api_key='YOUR_API_KEY')
+    import softlayer
+    client = softlayer.Client(username='YOUR_USERNAME', api_key='YOUR_API_KEY')
 
 Creating a client instance with environmental variables set:
 ::
@@ -38,18 +38,19 @@ Creating a client instance with environmental variables set:
     $ export SL_USERNAME=YOUR_USERNAME
     $ export SL_API_KEY=YOUR_API_KEY
     $ python
-    >>> import SoftLayer
-    >>> client = SoftLayer.Client()
+    >>> import softlayer
+    >>> client = softlayer.Client()
 
 Below is an example of creating a client instance with more options. This will
 create a client with the private API endpoint (only accessible from the
 SoftLayer private network) and a timeout of 4 minutes.
 ::
 
-    client = SoftLayer.Client(username='YOUR_USERNAME',
+    client = softlayer.Client(username='YOUR_USERNAME',
                               api_key='YOUR_API_KEY'
-                              endpoint_url=SoftLayer.API_PRIVATE_ENDPOINT,
+                              endpoint_url=softlayer.API_PRIVATE_ENDPOINT,
                               timeout=240)
+>>>>>>> Rename all the things
 
 Managers
 --------
@@ -59,7 +60,7 @@ complexities of using the API into classes that provide a simpler interface to
 various services. These are higher-level interfaces to the SoftLayer API.
 ::
 
-	from SoftLayer import VSManager, Client
+	from softlayer import VSManager, Client
 	client = Client(...)
 	vs = VSManager(client)
 	vs.list_instances()
@@ -163,140 +164,19 @@ have billing implications.
 
 API Reference
 -------------
-.. autoclass:: SoftLayer.Client
+.. autoclass:: softlayer.Client
    :members:
    :undoc-members:
 
-   .. automethod:: SoftLayer.Client.__getitem__
+   .. automethod:: softlayer.Client.__getitem__
 
-.. autoclass:: SoftLayer.API.Service
+.. autoclass:: softlayer.API.Service
    :members:
    :undoc-members:
 
-   .. automethod:: SoftLayer.API.Service.__call__
+   .. automethod:: softlayer.API.Service.__call__
 
 
-.. automodule:: SoftLayer.exceptions
+.. automodule:: softlayer.exceptions
    :members:
    :undoc-members:
-
-
-Backwards Compatibility
------------------------
-As of version 3.0 of the API bindings, the old API methods and parameters no
-longer work. Below are examples of converting old API calls to the new ones.
-
-**Get the IP address for an account**
-::
-
-	# Old
-	import SoftLayer.API
-	client = SoftLayer.API.Client('SoftLayer_Account', None, 'username', 'api_key')
-	client.set_object_mask({'ipAddresses' : None})
-	client.set_result_limit(10, offset=10)
-	client.getObject()
-
-	# New
-	import SoftLayer
-	client = SoftLayer.Client(username='username', api_key='api_key')
-	client['Account'].getObject(mask="ipAddresses", limit=10, offset=0)
-
-**Importing the module**
-::
-
-	# Old
-	import SoftLayer.API
-
-	# New
-	import SoftLayer
-
-**Creating a client instance**
-::
-
-	# Old
-	client = SoftLayer.API.Client('SoftLayer_Account', None, 'username', 'api_key')
-
-	# New
-	client = SoftLayer.Client(username='username', api_key='api_key')
-	service = client['Account']
-
-**Making an API call**
-::
-
-	# Old
-	client = SoftLayer.API.Client('SoftLayer_Account', None, 'username', 'api_key')
-	client.getObject()
-
-	# New
-	client = SoftLayer.Client(username='username', api_key='api_key')
-	client['Account'].getObject()
-
-	# Optionally
-	service = client['Account']
-	service.getObject()
-
-**Setting Object Mask**
-::
-
-	# Old
-	client.set_object_mask({'ipAddresses' : None})
-
-	# New
-	client['Account'].getObject(mask="ipAddresses")
-
-**Using Init Parameter**
-::
-
-	# Old
-	client.set_init_parameter(1234)
-
-	# New
-	client['Account'].getObject(id=1234)
-
-**Setting Result Limit and Offset**
-::
-
-	# Old
-	client.set_result_limit(10, offset=10)
-
-	# New
-	client['Account'].getObject(limit=10, offset=10)
-
-**Adding Additional Headers**
-::
-
-	# Old
-	# These headers are persisted accross API calls
-	client.add_header('header', 'value')
-
-	# New
-	# These headers are NOT persisted accross API calls
-	client['Account'].getObject(headers={'header': 'value'})
-
-**Removing Additional Headers**
-::
-
-	# Old
-	client.remove_header('header')
-
-	# New
-	client['Account'].getObject()
-
-**Adding Additional HTTP Headers**
-::
-
-	# Old
-	client.add_raw_header('header', 'value')
-
-	# New
-	client['Account'].getObject(raw_headers={'header': 'value'})
-
-**Changing Authentication Credentials**
-::
-
-	# Old
-	client.set_authentication('username', 'api_key')
-
-	# New
-	client.username = 'username'
-	client.api_key = 'api_key'

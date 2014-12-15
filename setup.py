@@ -33,18 +33,21 @@ else:
     LONG_DESCRIPTION = DESCRIPTION
 
 setup(
-    name='SoftLayer',
+    name='softlayer',
     version='3.3.0',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     author='SoftLayer Technologies, Inc.',
     author_email='sldn@softlayer.com',
-    packages=find_packages(exclude=["SoftLayer.tests"]),
+    packages=find_packages(exclude=["tests"]),
     license='MIT',
     zip_safe=False,
     url='http://github.com/softlayer/softlayer-python',
     entry_points={
-        'console_scripts': ['sl = SoftLayer.CLI.core:main'],
+        'console_scripts': [
+            'slcli = SoftLayer.CLI.core:main',
+            'sl = SoftLayer.CLI.deprecated:main',
+        ],
     },
     test_suite='nose.collector',
     install_requires=REQUIRES,

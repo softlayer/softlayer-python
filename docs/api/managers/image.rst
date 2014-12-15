@@ -1,5 +1,5 @@
 .. _image:
 
-.. automodule:: SoftLayer.managers.image
+.. automodule:: softlayer.managers.image
    :members:
    :inherited-members:
