@@ -41,13 +41,13 @@ def cli(env, only_hardware=False, only_virtual=False):
         guest = manager.list_guest_status()
 
     results = hardware + guest
-    for serverObject in results:
-        server = utils.NestedDict(serverObject)
+    for server_object in results:
+        server = utils.NestedDict(server_object)
         for monitor in server['networkMonitors']:
             res = monitor['lastResult']['responseStatus']
             date = monitor['lastResult']['finishTime']
-            ip = monitor['ipAddress']
-            monitorType = monitor['queryType']['name']
+            ip_address = monitor['ipAddress']
+            monitor_type = monitor['queryType']['name']
             status = 'UNKNOWN'
             status_color = None
             if res == 0:
@@ -64,10 +64,10 @@ def cli(env, only_hardware=False, only_virtual=False):
                 server['id'],
                 server['datacenter']['name'] or formatting.blank(),
                 server['fullyQualifiedDomainName'],
-                ip or formatting.blank(),
+                ip_address or formatting.blank(),
                 click.style(status, fg=status_color),
-                monitorType,
-                date 
+                monitor_type,
+                date
             ])
 
     return table
