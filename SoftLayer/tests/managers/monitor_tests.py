@@ -17,7 +17,9 @@ class MonitorTests(testing.TestCase):
     def test_list_hardware_status(self):
         result = self.monitor_manager.list_hardware_status()
         self.assertEqual(result, fixtures.SoftLayer_Account.getHardware)
+        self.assert_called_with('SoftLayer_Account', 'getHardware')
 
     def test_list_guest_status(self):
         result = self.monitor_manager.list_guest_status()
         self.assertEqual(result, fixtures.SoftLayer_Account.getVirtualGuests)
+        self.assert_called_with('SoftLayer_Account', 'getVirtualGuests')
