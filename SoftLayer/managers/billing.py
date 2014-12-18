@@ -20,31 +20,6 @@ class BillingManager(object):
     :param SoftLayer.managers.orderingManager
     """
 
-    def _format_date(self, date):
-        """format  date.
-
-        :param dt: YY-MM-DD
-        """
-        result = date.replace('T', ' ')
-        return result[0:10]
-
-    def _get_month_delta(self, date1, date2):
-        """get month
-
-        :param date1: YY-MM-DD
-        :param date2: YY-MM-DD
-        :return: delta
-        """
-        delta = 0
-        while True:
-            mdays = calendar.monthrange(date1.year, date1.month)[1]
-            date1 += datetime.timedelta(days=mdays)
-            if date1 <= date2:
-                delta += 1
-            else:
-                break
-        return delta
-
     def __init__(self, client):
         """init
 
@@ -154,20 +129,19 @@ class BillingManager(object):
 
                 if 'hourlyRecurringFee' not in item['billingItem']:
                     create_date = datetime.datetime.strptime(
-                        self._format_date(
+                        format_date(
                             item['billingItem']['createDate']), date_format)
                     if cancellation_date:
                         cancel_date = datetime.datetime.strptime(
-                            self._format_date(
+                            format_date(
                                 item['billingItem']['cancellationDate']),
                             date_format)
-                        usedmonths = self._get_month_delta(create_date,
-                                                           cancel_date)
+                        usedmonths = get_month_delta(create_date, cancel_date)
                     else:
                         now = datetime.datetime.strptime(
-                            self._format_date(str(datetime.datetime.now())),
+                            format_date(str(datetime.datetime.now())),
                             date_format)
-                        usedmonths = self._get_month_delta(create_date, now)
+                        usedmonths = get_month_delta(create_date, now)
 
                     usedmonths += 1
 
@@ -189,14 +163,14 @@ class BillingManager(object):
                                             'operation':
                                                 item['billingItem']['id']}}}}})
                     if virtual_guest:
-                        cost = virtual_guest[0]['billingItem']
-                        ['currentHourlyCharge']
+                        cost = virtual_guest[0]['billingItem']['currentHourly' \
+                                                               'Charge']
 
                 else:
                     create_date = datetime.datetime.strptime(
-                        self._format_date(creation_date), date_format)
+                        format_date(creation_date), date_format)
                     cancel_date = datetime.datetime.strptime(
-                        self._format_date(cancellation_date), date_format)
+                        format_date(cancellation_date), date_format)
                     d1_ts = time.mktime(create_date.timetuple())
                     d2_ts = time.mktime(cancel_date.timetuple())
                     usedhours = math.ceil(d2_ts - d1_ts)/3600
@@ -217,3 +191,30 @@ class BillingManager(object):
             }
             result.append(resource)
         return result
+
+
+def format_date(date):
+    """format  date.
+
+    :param date: YY-MM-DD
+    """
+    result = date.replace('T', ' ')
+    return result[0:10]
+
+
+def get_month_delta(date1, date2):
+    """get month
+
+    :param date1: YY-MM-DD
+    :param date2: YY-MM-DD
+    :return: delta
+    """
+    delta = 0
+    while True:
+        mdays = calendar.monthrange(date1.year, date1.month)[1]
+        date1 += datetime.timedelta(days=mdays)
+        if date1 <= date2:
+            delta += 1
+        else:
+            break
+    return delta
