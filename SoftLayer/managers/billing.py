@@ -62,6 +62,18 @@ class BillingManager(object):
         result = self.account.getLatestBillDate()
         return result
 
+    def get_summary(self):
+        """get summary
+
+        :return: billing account info
+        """
+        result = {
+            'lastbilldate': self.get_latest_bill_date(),
+            'balance': self.get_balance(),
+            'nextbalance': self.get_next_balance()
+        }
+        return result
+
     def get_next_bill_items(self):
         """get next bill items
 
@@ -163,8 +175,8 @@ class BillingManager(object):
                                             'operation':
                                                 item['billingItem']['id']}}}}})
                     if virtual_guest:
-                        cost = virtual_guest[0]['billingItem']['currentHourly' \
-                                                               'Charge']
+                        guest = virtual_guest[0]
+                        cost = guest['billingItem']['currentHourlyCharge']
 
                 else:
                     create_date = datetime.datetime.strptime(

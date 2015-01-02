@@ -16,6 +16,7 @@ def cli(env):
     billing = SoftLayer.BillingManager(env.client)
     table = formatting.Table(['Name', 'Value'])
     info = billing.get_info()
+    table.add_row(['accountId', info['accountId']])
     table.add_row(['id', info['id']])
     table.add_row(['paymentTerms', info['paymentTerms']])
     table.add_row(['modifyDate', info['modifyDate']])

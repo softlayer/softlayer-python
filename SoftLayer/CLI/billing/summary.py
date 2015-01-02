@@ -15,9 +15,10 @@ def cli(env):
     """List billing summary."""
     billing = SoftLayer.BillingManager(env.client)
     table = formatting.Table(['Name', 'Value'])
-    balance = billing.get_balance()
-    next_balance = billing.get_next_balance()
-    last_bill_date = billing.get_latest_bill_date()
+    result = billing.get_summary()
+    balance = result['balance']
+    next_balance = result['nextbalance']
+    last_bill_date = result['lastbilldate']
     table.add_row(['Current Balance', balance])
     table.add_row(['Estimated Next Balance', next_balance])
     table.add_row(['Last Billing Date', last_bill_date])
