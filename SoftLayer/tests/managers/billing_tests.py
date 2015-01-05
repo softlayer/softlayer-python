@@ -5,6 +5,7 @@
     :license: MIT, see LICENSE for more details.
 """
 import datetime
+
 import SoftLayer
 from SoftLayer import testing
 
@@ -31,11 +32,11 @@ class BillingTests(testing.TestCase):
 
     def test_billing_summary_with_date(self):
         results = self.billing.list_resources(from_date='2014-02-06')
-        test_date = datetime.date(2014, 2, 6)
         now = datetime.date.today()
         now_delta = now - datetime.date(2014, 2, 6)
         for result in results:
             create_date = result['createDate']
-            row_date = datetime.datetime.strptime(create_date[0:10], '%Y-%m-%d')
+            strp_date = create_date[0:10]
+            row_date = datetime.datetime.strptime(strp_date, '%Y-%m-%d')
             row_delta = now - row_date.date()
             self.assertTrue(now_delta >= row_delta)
