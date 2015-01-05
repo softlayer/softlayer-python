@@ -11,9 +11,10 @@ import click
 
 
 @click.command()
-@click.option('--start_date', '-f', help='cost incurred from from_date')
+@click.option('--start_date', '-f', help='cost incurred from this start date')
 @click.option('--end_date', '-e',
-              help='end date to consider, default is latest time stamp')
+              help='cost incurred before this end date'
+                   ' (default is current time stamp)')
 @environment.pass_env
 def cli(env, start_date, end_date):
     """List billing information for orders."""
