@@ -114,11 +114,11 @@ def get_create_options(ds_options, section, pretty=True):
 
     elif 'disk' == section:
         disks = []
-        type_regex = re.compile(r'^[\d\.]+[GT]B\s+(.+)$')
+        type_regex = re.compile(r'^[\d\.\s]+[GT]B\s+(.+)$')
         for disk in ds_options['categories']['disk0']['items']:
             disk_type = 'SATA'
-            disk_type = type_regex.match(disk['description']).group(1)
-
+            if type_regex.match(disk['description']) is not None:
+                disk_type = type_regex.match(disk['description']).group(1)
             disk_type = disk_type.replace('RPM', '').strip()
             disk_type = disk_type.replace(' ', '_').upper()
             disk_type = str(int(disk['capacity'])) + '_' + disk_type
