@@ -637,7 +637,7 @@ class VSManager(utils.IdentifierMixin, object):
                            'Upgrade',
             'prices': prices,
             'properties': [{'name': 'MAINTENANCE_WINDOW',
-                            'value': str(datetime.datetime.now(tz=pytz.timezone("posixrules")))}],
+                            'value': str(datetime.datetime.utcnow().replace(tzinfo=pytz.utc))}],
             'virtualGuests': [{'id': int(instance_id)}],
         }
         if prices:
