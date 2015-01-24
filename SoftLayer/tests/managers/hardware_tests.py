@@ -472,11 +472,24 @@ class HardwareTests(testing.TestCase):
                                 },),
                                 identifier=100)
 
-    def test_rescue(self):
+    def test_update_firmware(self):
         # Test rescue environment
-        restult = self.hardware.rescue(1234)
+        restult = self.hardware.update_firmware(100)
 
         self.assertEqual(restult, True)
         self.assert_called_with('SoftLayer_Hardware_Server',
-                                'bootToRescueLayer',
-                                identifier=1234)
+                                'createFirmwareUpdateTransaction',
+                                identifier=100,
+                                args=(True, True, True, True))
+
+    def test_update_firmware_selective(self):
+        # Test rescue environment
+        restult = self.hardware.update_firmware(100,
+                                                ipmi=False,
+                                                hard_drive=False)
+
+        self.assertEqual(restult, True)
+        self.assert_called_with('SoftLayer_Hardware_Server',
+                                'createFirmwareUpdateTransaction',
+                                identifier=100,
+                                args=(False, True, True, False))

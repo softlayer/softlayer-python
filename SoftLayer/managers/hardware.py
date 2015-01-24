@@ -746,6 +746,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         return self.hardware.editObject(obj, id=hardware_id)
 
     def update_firmware(self,
+                        hardware_id,
                         ipmi=True,
                         raid_controller=True,
                         bios=True,
@@ -754,6 +755,8 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         This will cause the server to be unavailable for ~20 minutes.
 
+        :param int hardware_id: The ID of the hardware to have its firmware
+                                updated.
         :param bool ipmi: Update the ipmi firmware.
         :param bool raid_controller: Update the raid controller firmware.
         :param bool bios: Update the bios firmware.
@@ -761,7 +764,8 @@ class HardwareManager(utils.IdentifierMixin, object):
         """
 
         return self.hardware.createFirmwareUpdateTransaction(
-            bool(ipmi), bool(raid_controller), bool(bios), bool(hard_drive))
+            bool(ipmi), bool(raid_controller), bool(bios), bool(hard_drive),
+            id=hardware_id)
 
 
 def get_default_value(package_options, category, hourly=False):
