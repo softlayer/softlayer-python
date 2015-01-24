@@ -149,6 +149,7 @@ ALL_ROUTES = [
     ('server:reboot', 'SoftLayer.CLI.server.power:reboot'),
     ('server:reload', 'SoftLayer.CLI.server.reload:cli'),
     ('server:credentials', 'SoftLayer.CLI.server.credentials:cli'),
+    ('server:update-firmware', 'SoftLayer.CLI.server.update_firmware:cli'),
 
     ('snapshot', 'SoftLayer.CLI.snapshot'),
     ('snapshot:cancel', 'SoftLayer.CLI.snapshot.cancel:cli'),

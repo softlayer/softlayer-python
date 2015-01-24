@@ -70,6 +70,7 @@ powerCycle = True
 rebootSoft = True
 rebootDefault = True
 rebootHard = True
+createFirmwareUpdateTransaction = True
 setUserMetadata = ['meta']
 reloadOperatingSystem = 'OK'
 getReverseDomainRecords = [
