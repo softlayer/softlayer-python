@@ -646,5 +646,4 @@ class ServerCLITests(testing.TestCase):
         self.assertEqual(result.output, "")
         self.assert_called_with('SoftLayer_Hardware_Server',
                                 'createFirmwareUpdateTransaction',
-                                args=((True, True, True, True)),
-                                identifier=1000)
+                                args=((1, 1, 1, 1)), identifier=1000)
