@@ -102,7 +102,6 @@ class ServerCLITests(testing.TestCase):
     def test_server_details(self):
         result = self.run_command(['server', 'detail', '1234',
                                    '--passwords', '--price'])
-
         expected = {
             'cores': 2,
             'created': '2013-08-01 15:23:45',
@@ -121,6 +120,7 @@ class ServerCLITests(testing.TestCase):
             'private_ip': '10.1.0.2',
             'ptr': '2.0.1.10.in-addr.arpa',
             'public_ip': '172.16.1.100',
+            'remote users': [{'password': 'abc123', 'ipmi_username': 'root'}],
             'status': 'ACTIVE',
             'tags': ['test_tag'],
             'users': [{'password': 'abc123', 'username': 'root'}],
