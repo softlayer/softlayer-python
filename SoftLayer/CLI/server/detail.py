@@ -88,7 +88,6 @@ def cli(env, identifier, passwords, price):
             pass_table.add_row([item['username'], item['password']])
         table.add_row(['users', pass_table])
 
-    if passwords:
         pass_table = formatting.Table(['ipmi_username', 'password'])
         for item in result['remoteManagementAccounts']:
             pass_table.add_row([item['username'], item['password']])
