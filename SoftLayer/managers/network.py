@@ -329,8 +329,8 @@ class NetworkManager(object):
         information, see the :func:`list_vlans` method instead.
 
         :returns: A dictionary keyed by data center with the data containing a
-                    series of counts for hardware, subnets, CCIs, and other
-                    objects residing within that data center.
+                  set of counts for subnets, hardware, virtual servers, and
+                  other objects residing within that data center.
 
         """
         datacenters = {}

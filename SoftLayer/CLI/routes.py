@@ -7,6 +7,11 @@
 """
 
 ALL_ROUTES = [
+    ('billing', 'SoftLayer.CLI.billing'),
+    ('billing:list', 'SoftLayer.CLI.billing.list:cli'),
+    ('billing:info', 'SoftLayer.CLI.billing.info:cli'),
+    ('billing:summary', 'SoftLayer.CLI.billing.summary:cli'),
+
     ('call-api', 'SoftLayer.CLI.call_api:cli'),
 
     ('vs', 'SoftLayer.CLI.virt'),
@@ -195,7 +200,6 @@ ALL_ALIASES = {
     'meta': 'metadata',
     'my': 'metadata',
     'vm': 'vs',
-    'cci': 'vs',
     'hardware': 'server',
     'hw': 'server',
     'bmetal': 'bmc',

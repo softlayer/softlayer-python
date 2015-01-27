@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import datetime
 import re
 
 import six
@@ -110,6 +111,25 @@ def query_filter(query):
             query = "_= %s" % query
 
     return {'operation': query}
+
+
+def query_filter_date(start, end):
+    """Query filters given start and end date.
+
+    :param start:YY-MM-DD
+    :param end: YY-MM-DD
+    """
+    sdate = datetime.datetime.strptime(start, "%Y-%m-%d")
+    edate = datetime.datetime.strptime(end, "%Y-%m-%d")
+    startdate = "%s/%s/%s" % (sdate.month, sdate.day, sdate.year)
+    enddate = "%s/%s/%s" % (edate.month, edate.day, edate.year)
+    return {
+        'operation': 'betweenDate',
+        'options': [
+            {'name': 'startDate', 'value': [startdate+' 0:0:0']},
+            {'name': 'endDate', 'value': [enddate+' 0:0:0']}
+        ]
+    }
 
 
 class IdentifierMixin(object):

@@ -2,6 +2,8 @@
     SoftLayer.iscsi
     ~~~~~~~~~~~~~~~
     ISCSI Manager/helpers
+
+    :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import utils
 
@@ -62,7 +64,7 @@ class ISCSIManager(utils.IdentifierMixin, object):
         item_price = self._find_item_prices(int(size),
                                             categorycode='iscsi')
         iscsi_order = self._build_order(item_price, location)
-        self.product_order.placeOrder(iscsi_order)
+        return self.product_order.placeOrder(iscsi_order)
 
     def list_iscsi(self):
         """List iSCSI volume."""

@@ -483,3 +483,35 @@ getActiveQuotes = [{
     'name': 'TestQuote1234',
     'quoteKey': '1234test4321',
 }]
+
+
+getOrders = [{
+    'id': 1234,
+    'resourceType': '1 x 2.0 GHz Core',
+    'hostName': 'test',
+    'createDate': '2014-05-01T14:03:04-07:00',
+    'cost': 0.0
+}]
+
+getBillingInfo = [{
+    'id': 1234,
+    'accountId': 123,
+    'resourceType': '1 x 2.0 GHz Core',
+    'hostName': 'test',
+    'modifyDate': '2014-05-01T14:03:04-07:00',
+    'createDate': '2014-05-01T14:03:04-07:00',
+    'anniversaryDayOfMonth': 2,
+    'percentDiscountOnetime': 2,
+    'sparePoolAmount': 0,
+    'currency': {
+        'KeyName': 'usd',
+        'id': 1,
+        'name': 'dollars'
+    }
+}]
+
+getLatestBillDate = '2014-05-01T14:03:04-07:00'
+
+getBalance = 40
+
+getNextInvoiceTotalAmount = 2

@@ -55,7 +55,7 @@ class FirewallTests(testing.TestCase):
 
     def test_get_standard_package_virtual_server(self):
         # test standard firewalls
-        self.firewall.get_standard_package(server_id=1234, is_cci=True)
+        self.firewall.get_standard_package(server_id=1234, is_virt=True)
 
         self.assert_called_with('SoftLayer_Virtual_Guest', 'getObject',
                                 identifier=1234,
@@ -73,7 +73,7 @@ class FirewallTests(testing.TestCase):
                                 filter=_filter)
 
     def test_get_standard_package_bare_metal(self):
-        self.firewall.get_standard_package(server_id=1234, is_cci=False)
+        self.firewall.get_standard_package(server_id=1234, is_virt=False)
 
         # we should ask for the frontEndNetworkComponents to get
         # the firewall port speed
@@ -149,9 +149,9 @@ class FirewallTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Billing_Item', 'cancelService',
                                 identifier=21370815)
 
-    def test_add_standard_firewall_cci(self):
-        # test standard firewalls for CCI
-        self.firewall.add_standard_firewall(6327, is_cci=True)
+    def test_add_standard_firewall_virtual_server(self):
+        # test standard firewalls for virtual servers
+        self.firewall.add_standard_firewall(6327, is_virt=True)
 
         self.assert_called_with('SoftLayer_Virtual_Guest', 'getObject',
                                 mask='primaryNetworkComponent[maxSpeed]',
@@ -179,7 +179,7 @@ class FirewallTests(testing.TestCase):
 
     def test_add_standard_firewall_server(self):
         # test dedicated firewall for Servers
-        self.firewall.add_standard_firewall(6327, is_cci=False)
+        self.firewall.add_standard_firewall(6327, is_virt=False)
 
         # We should query the product package for a 2000Mbps firewall
         _filter = {
