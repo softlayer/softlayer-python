@@ -45,7 +45,20 @@ getVirtualGuests = [{
     'networkMonitors': [{
         'guestId': 100,
         'hardwareId': '',
-        'lastResult': {'responseStatus': 2}
+        'ipAddress': '158.85.177.200',
+        'queryType': {'name': 'SERVICE_PING'},
+        'lastResult': {
+            'responseStatus': 2,
+            'finishTime': '2015-01-28T17:27:06-06:00'
+            }
+    }, {
+        'guestId': 104,
+        'hardwareId': '',
+        'ipAddress': '158.85.177.200',
+        'queryType': {'name': 'KEY_ERROR'},
+        'lastResult': {
+            'responseStatus': 1
+            }
     }],
 }, {
     'id': 104,
@@ -76,7 +89,21 @@ getVirtualGuests = [{
     'networkMonitors': [{
         'guestId': 104,
         'hardwareId': '',
-        'lastResult': {'responseStatus': 0}
+        'ipAddress': '158.85.177.200',
+        'queryType': {'name': 'SERVICE_PING'},
+        'lastResult': {
+            'responseStatus': 0,
+            'finishTime': '2014-01-28T17:27:06-06:00'
+            }
+    }, {
+        'guestId': 104,
+        'hardwareId': '',
+        'ipAddress': '158.85.177.200',
+        'queryType': {'name': 'SERVICE_PING'},
+        'lastResult': {
+            'responseStatus': 1,
+            'finishTime': '2014-01-28T17:27:06-06:00'
+            }
     }],
 }]
 
@@ -149,7 +176,12 @@ getHardware = [{
     'networkMonitors': [{
         'guestId': '',
         'hardwareId': 1000,
-        'lastResult': {'responseStatus': 2}
+        'ipAddress': '158.85.177.200',
+        'queryType': {'name': 'SERVICE_PING'},
+        'lastResult': {
+            'responseStatus': 1,
+            'finishTime': '2014-01-28T17:27:06-06:00'
+            }
     }],
 }, {
     'id': 1001,
@@ -198,7 +230,12 @@ getHardware = [{
     'networkMonitors': [{
         'guestId': '',
         'hardwareId': 1001,
-        'lastResult': {'responseStatus': 0}
+        'ipAddress': '158.85.177.200',
+        'queryType': {'name': 'SERVICE_PING'},
+        'lastResult': {
+            'responseStatus': 0,
+            'finishTime': '2014-01-28T17:27:06-06:00'
+            }
     }],
 }, {
     'id': 1002,
@@ -246,7 +283,12 @@ getHardware = [{
     'networkMonitors': [{
         'guestId': '',
         'hardwareId': 1002,
-        'lastResult': {'responseStatus': 2}
+        'ipAddress': '158.85.177.200',
+        'queryType': {'name': 'SERVICE_PING'},
+        'lastResult': {
+            'responseStatus': 2,
+            'finishTime': '2014-01-28T17:27:06-06:00'
+            }
     }],
 }]
 getDomains = [{'name': 'example.com',

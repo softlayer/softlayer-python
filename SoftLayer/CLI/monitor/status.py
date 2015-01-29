@@ -28,26 +28,35 @@ def cli(env, only_hardware=False, only_virtual=False):
         'id', 'datacenter', 'FQDN', 'IP',
         'status', 'Type', 'last checked at'
     ])
-
-    manager = SoftLayer.MonitoringManager(env.client)
+    hw_manager = SoftLayer.HardwareMonitorManager(env.client)
+    vs_manager = SoftLayer.VSMonitorManager(env.client)
     if only_virtual:
         hardware = []
-        guest = manager.list_guest_status()
+        guest = vs_manager.list_status()
     elif only_hardware:
-        hardware = manager.list_hardware_status()
+        hardware = hw_manager.list_status()
         guest = []
     else:
-        hardware = manager.list_hardware_status()
-        guest = manager.list_guest_status()
+        hardware = hw_manager.list_status()
+        guest = vs_manager.list_status()
 
     results = hardware + guest
     for server_object in results:
         server = utils.NestedDict(server_object)
         for monitor in server['networkMonitors']:
-            res = monitor['lastResult']['responseStatus']
-            date = monitor['lastResult']['finishTime']
-            ip_address = monitor['ipAddress']
-            monitor_type = monitor['queryType']['name']
+            try:
+                res = monitor['lastResult']['responseStatus']
+                date = monitor['lastResult']['finishTime']
+                ip_address = monitor['ipAddress']
+                monitor_type = monitor['queryType']['name']
+            except KeyError:
+                # if a monitor does't have the lastResult ususally it is
+                # still being provisioned
+                res = 0
+                date = "--"
+                ip_address = None
+                monitor_type = "--"
+
             status = 'UNKNOWN'
             status_color = None
             if res == 0:
