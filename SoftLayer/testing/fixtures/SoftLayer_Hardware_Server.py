@@ -38,6 +38,9 @@ getObject = {
             {'username': 'root', 'password': 'abc123'}
         ],
     },
+    'remoteManagementAccounts': [
+        {'username': 'root', 'password': 'abc123'}
+    ],
     'networkVlans': [
         {
             'networkSpace': 'PRIVATE',

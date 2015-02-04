@@ -293,6 +293,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                 'tagReferences[id,tag[name,id]]',
                 'networkVlans[id,vlanNumber,networkSpace]',
                 'billingItem.orderItem.order.userRecord[username]',
+                'remoteManagementAccounts[username,password]',
             ]
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
