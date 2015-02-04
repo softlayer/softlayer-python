@@ -6,7 +6,8 @@ Installation
 Using Pip
 ---------
 
-Install via pip: ::
+Install via pip:
+::
 
 	$ pip install softlayer
 
@@ -15,7 +16,8 @@ Debian/Ubuntu
 -------------
 
 For Debian "jessie" (currently testing) and Ubuntu 14.04, official system
-packages are available::
+packages are available. **These are typically a couple versions behind so it is recommended to install from pypi if problems are encountered.**
+::
 
 	$ sudo apt-get install python-softlayer
 
@@ -28,7 +30,8 @@ From Source
 The project is developed on GitHub, at
 `https://github.com/softlayer/softlayer-python <https://github.com/softlayer/softlayer-python>`_.
 
-Install from source via pip (requires `git <http://git-scm.com>`_): ::
+Install from source via pip (requires `git <http://git-scm.com>`_):
+::
 
 	$ pip install git+git://github.com/softlayer/softlayer-python.git
 
@@ -36,18 +39,25 @@ You can clone the public repository::
 
     $ git clone git@github.com:softlayer/softlayer-python.git
 
-Or, Download the `tarball <https://github.com/softlayer/softlayer-python/tarball/master>`_::
+Or, Download the `tarball <https://github.com/softlayer/softlayer-python/tarball/master>`_:
+::
 
     $ curl -OL https://github.com/softlayer/softlayer-python/tarball/master
 
-Or, download the `zipball <https://github.com/softlayer/softlayer-python/zipball/master>`_::
+Or, download the `zipball <https://github.com/softlayer/softlayer-python/zipball/master>`_:
+::
 
     $ curl -OL https://github.com/softlayer/softlayer-python/zipball/master
 
-Once you have a copy of the source, you can embed it in your Python package,
-or install it into your site-packages easily::
+Once you have a copy of the source you can install it with one of the following commands:
+::
 
     $ python setup.py install
+
+Or:
+::
+
+    $ pip install .
 
 For more information about working with the source, or contributing to the
 project, please see the :ref:`Contribution Guide <api_dev>`.
