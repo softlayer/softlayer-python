@@ -636,3 +636,14 @@ class ServerCLITests(testing.TestCase):
         option_mock = {'categories': {'cat1': []}}
         output = create._get_default_value(option_mock, 'nope')
         self.assertEqual(None, output)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_update_firmware(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['server', 'update-firmware', '1000'])
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(result.output, "")
+        self.assert_called_with('SoftLayer_Hardware_Server',
+                                'createFirmwareUpdateTransaction',
+                                args=((1, 1, 1, 1)), identifier=1000)

@@ -226,8 +226,8 @@ class FixtureTransport(object):
             module_path = 'SoftLayer.testing.fixtures.%s' % call.service
             module = importlib.import_module(module_path)
         except ImportError:
-            raise NotImplementedError('%s::%s fixture is not implemented'
-                                      % (call.service, call.method))
+            raise NotImplementedError('%s fixture is not implemented'
+                                      % call.service)
         try:
             return getattr(module, call.method)
         except AttributeError:
