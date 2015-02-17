@@ -37,6 +37,9 @@ import click
 @click.option('--test',
               is_flag=True,
               help="Do not actually create the virtual server")
+@click.option('--template', '-t',
+              help="A template file that defaults the command-line options",
+              type=click.Path(exists=True, readable=True, resolve_path=True))
 @click.option('--export',
               type=click.Path(writable=True, resolve_path=True),
               help="Exports options to a template file")
