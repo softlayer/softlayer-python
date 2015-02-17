@@ -324,7 +324,8 @@ class ServerCLITests(testing.TestCase):
                                         'test': False,
                                         'vlan_private': 20468,
                                         'vlan_public': 10234,
-                                        'wait': None},
+                                        'wait': None,
+                                        'template': None},
                                        exclude=['wait', 'test'])
 
     def test_edit_server_userdata_and_file(self):
