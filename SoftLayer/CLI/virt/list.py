@@ -28,13 +28,16 @@ import click
 @click.option('--tags',
               help='Show instances that have one of these comma-separated '
                    'tags')
+@click.option('--column', help='Columns to display. default is '
+              ' guid, hostname, primary_ip, backend_ip, datacenter, action',
+              default="guid,hostname,primary_ip,backend_ip,datacenter,action")
 @environment.pass_env
 def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
-        hourly, monthly, tags):
+        hourly, monthly, tags, column):
     """List virtual servers."""
 
     vsi = SoftLayer.VSManager(env.client)
-
+    columns = [col.strip() for col in column.split(',')]
     tag_list = None
     if tags:
         tag_list = [tag.strip() for tag in tags.split(',')]
@@ -49,25 +52,28 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
                                 nic_speed=network,
                                 tags=tag_list)
 
-    table = formatting.Table([
-        'guid',
-        'hostname',
-        'primary_ip',
-        'backend_ip',
-        'datacenter',
-        'action',
-    ])
+    table = formatting.Table(columns)
     table.sortby = sortby or 'hostname'
-
     for guest in guests:
         guest = utils.NestedDict(guest)
-        table.add_row([
-            guest['globalIdentifier'] or guest['id'],
-            guest['hostname'],
-            guest['primaryIpAddress'] or formatting.blank(),
-            guest['primaryBackendIpAddress'] or formatting.blank(),
-            guest['datacenter']['name'] or formatting.blank(),
-            formatting.active_txn(guest),
-        ])
+        row_column = []
+        for col in columns:
+            entry = None
+            if col == 'guid':
+                entry = guest['globalIdentifier']
+            elif col == 'datacenter':
+                entry = guest['datacenter']['name']
+            elif col == 'primary_ip':
+                entry = guest['primaryIpAddress']
+            elif col == 'backend_ip':
+                entry = guest['primaryBackendIpAddress']
+            elif col == 'action':
+                entry = formatting.active_txn(guest)
+            else:
+                entry = guest[col]
+
+            row_column.append(entry or formatting.blank())
+
+        table.add_row(row_column)
 
     return table
