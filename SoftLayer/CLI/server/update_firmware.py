@@ -23,4 +23,4 @@ def cli(env, identifier):
                                'update device firmware. Continue?' % hw_id)):
         raise exceptions.CLIAbort('Aborted.')
 
-    mgr.update_firmware()
+    mgr.update_firmware(hw_id)
