@@ -19,7 +19,7 @@ def cli(env, identifier):
 
     vsi = SoftLayer.VSManager(env.client)
     vs_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
-    if env.skip_confirmations or formatting.no_going_back(vs_id):
-        vsi.cancel_instance(vs_id)
-    else:
+    if not (env.skip_confirmations or formatting.no_going_back(vs_id)):
         raise exceptions.CLIAbort('Aborted')
+
+    vsi.cancel_instance(vs_id)

@@ -18,12 +18,12 @@ def power_off(env, identifier):
 
     mgr = SoftLayer.HardwareManager(env.client)
     hw_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'hardware')
-    if env.skip_confirmations or formatting.confirm('This will power off the '
-                                                    'server with id %s '
-                                                    'Continue?' % hw_id):
-        env.client['Hardware_Server'].powerOff(id=hw_id)
-    else:
+    if not (env.skip_confirmations or
+            formatting.confirm('This will power off the server with id %s '
+                               'Continue?' % hw_id)):
         raise exceptions.CLIAbort('Aborted.')
+
+    env.client['Hardware_Server'].powerOff(id=hw_id)
 
 
 @click.command()
@@ -38,17 +38,17 @@ def reboot(env, identifier, hard):
     hardware_server = env.client['Hardware_Server']
     mgr = SoftLayer.HardwareManager(env.client)
     hw_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'hardware')
-    if env.skip_confirmations or formatting.confirm('This will power off the '
-                                                    'server with id %s. '
-                                                    'Continue?' % hw_id):
-        if hard is True:
-            hardware_server.rebootHard(id=hw_id)
-        elif hard is False:
-            hardware_server.rebootSoft(id=hw_id)
-        else:
-            hardware_server.rebootDefault(id=hw_id)
-    else:
+    if not (env.skip_confirmations or
+            formatting.confirm('This will power off the server with id %s. '
+                               'Continue?' % hw_id)):
         raise exceptions.CLIAbort('Aborted.')
+
+    if hard is True:
+        hardware_server.rebootHard(id=hw_id)
+    elif hard is False:
+        hardware_server.rebootSoft(id=hw_id)
+    else:
+        hardware_server.rebootDefault(id=hw_id)
 
 
 @click.command()
@@ -71,9 +71,9 @@ def power_cycle(env, identifier):
     mgr = SoftLayer.HardwareManager(env.client)
     hw_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'hardware')
 
-    if env.skip_confirmations or formatting.confirm('This will power off the '
-                                                    'server with id %s. '
-                                                    'Continue?' % hw_id):
-        env.client['Hardware_Server'].powerCycle(id=hw_id)
-    else:
+    if not (env.skip_confirmations or
+            formatting.confirm('This will power off the server with id %s. '
+                               'Continue?' % hw_id)):
         raise exceptions.CLIAbort('Aborted.')
+
+    env.client['Hardware_Server'].powerCycle(id=hw_id)

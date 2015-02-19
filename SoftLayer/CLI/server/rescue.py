@@ -19,10 +19,10 @@ def cli(env, identifier):
     server = SoftLayer.HardwareManager(env.client)
     server_id = helpers.resolve_id(server.resolve_ids, identifier, 'hardware')
 
-    if env.skip_confirmations or formatting.confirm(
-            "This action will reboot this server. "
-            "Continue?"):
+    if not (env.skip_confirmations or
+            formatting.confirm("This action will reboot this server. "
+                               "Continue?")):
 
-        server.rescue(server_id)
-    else:
         raise exceptions.CLIAbort('Aborted')
+
+    server.rescue(server_id)

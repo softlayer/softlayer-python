@@ -17,7 +17,7 @@ def cli(env, record_id):
 
     manager = SoftLayer.DNSManager(env.client)
 
-    if env.skip_confirmations or formatting.no_going_back('yes'):
-        manager.delete_record(record_id)
-    else:
+    if not (env.skip_confirmations or formatting.no_going_back('yes')):
         raise exceptions.CLIAbort("Aborted.")
+
+    manager.delete_record(record_id)

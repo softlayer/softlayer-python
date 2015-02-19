@@ -18,7 +18,7 @@ def cli(env, identifier):
     mgr = SoftLayer.SshKeyManager(env.client)
 
     key_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'SshKey')
-    if env.skip_confirmations or formatting.no_going_back(key_id):
-        mgr.delete_key(key_id)
-    else:
+    if not (env.skip_confirmations or formatting.no_going_back(key_id)):
         raise exceptions.CLIAbort('Aborted')
+
+    mgr.delete_key(key_id)

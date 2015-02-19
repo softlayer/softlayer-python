@@ -18,12 +18,11 @@ def rescue(env, identifier):
 
     vsi = SoftLayer.VSManager(env.client)
     vs_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
-    if env.skip_confirmations or formatting.confirm(
-            "This action will reboot this VSI. Continue?"):
-
-        vsi.rescue(vs_id)
-    else:
+    if not (env.skip_confirmations or
+            formatting.confirm("This action will reboot this VSI. Continue?")):
         raise exceptions.CLIAbort('Aborted')
+
+    vsi.rescue(vs_id)
 
 
 @click.command()
@@ -38,17 +37,17 @@ def reboot(env, identifier, hard):
     virtual_guest = env.client['Virtual_Guest']
     mgr = SoftLayer.HardwareManager(env.client)
     vs_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'VS')
-    if any([env.skip_confirmations,
+    if not (env.skip_confirmations or
             formatting.confirm('This will reboot the VS with id %s. '
-                               'Continue?' % vs_id)]):
-        if hard is True:
-            virtual_guest.rebootHard(id=vs_id)
-        elif hard is False:
-            virtual_guest.rebootSoft(id=vs_id)
-        else:
-            virtual_guest.rebootDefault(id=vs_id)
-    else:
+                               'Continue?' % vs_id)):
         raise exceptions.CLIAbort('Aborted.')
+
+    if hard is True:
+        virtual_guest.rebootHard(id=vs_id)
+    elif hard is False:
+        virtual_guest.rebootSoft(id=vs_id)
+    else:
+        virtual_guest.rebootDefault(id=vs_id)
 
 
 @click.command()
@@ -61,15 +60,15 @@ def power_off(env, identifier, hard):
     virtual_guest = env.client['Virtual_Guest']
     vsi = SoftLayer.VSManager(env.client)
     vs_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
-    if any([env.skip_confirmations,
+    if not (env.skip_confirmations or
             formatting.confirm('This will power off the VS with id %s. '
-                               'Continue?' % vs_id)]):
-        if hard:
-            virtual_guest.powerOff(id=vs_id)
-        else:
-            virtual_guest.powerOffSoft(id=vs_id)
-    else:
+                               'Continue?' % vs_id)):
         raise exceptions.CLIAbort('Aborted.')
+
+    if hard:
+        virtual_guest.powerOff(id=vs_id)
+    else:
+        virtual_guest.powerOffSoft(id=vs_id)
 
 
 @click.command()
@@ -92,12 +91,12 @@ def pause(env, identifier):
     vsi = SoftLayer.VSManager(env.client)
     vs_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
 
-    if any([env.skip_confirmations,
+    if not (env.skip_confirmations or
             formatting.confirm('This will pause the VS with id %s. Continue?'
-                               % vs_id)]):
-        env.client['Virtual_Guest'].pause(id=vs_id)
-    else:
+                               % vs_id)):
         raise exceptions.CLIAbort('Aborted.')
+
+    env.client['Virtual_Guest'].pause(id=vs_id)
 
 
 @click.command()

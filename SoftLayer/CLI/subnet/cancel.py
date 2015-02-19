@@ -20,7 +20,7 @@ def cli(env, identifier):
     subnet_id = helpers.resolve_id(mgr.resolve_subnet_ids, identifier,
                                    name='subnet')
 
-    if env.skip_confirmations or formatting.no_going_back(subnet_id):
-        mgr.cancel_subnet(subnet_id)
-    else:
+    if not (env.skip_confirmations or formatting.no_going_back(subnet_id)):
         raise exceptions.CLIAbort('Aborted')
+
+    mgr.cancel_subnet(subnet_id)

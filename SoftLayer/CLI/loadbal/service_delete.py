@@ -19,10 +19,10 @@ def cli(env, identifier):
     mgr = SoftLayer.LoadBalancerManager(env.client)
     _, service_id = loadbal.parse_id(identifier)
 
-    if env.skip_confirmations or formatting.confirm("This action will cancel "
-                                                    "a service from your load "
-                                                    "balancer. Continue?"):
-        mgr.delete_service(service_id)
-        return 'Load balancer service %s is being cancelled!' % service_id
-    else:
+    if not (env.skip_confirmations or
+            formatting.confirm("This action will cancel a service from your "
+                               "load balancer. Continue?")):
         raise exceptions.CLIAbort('Aborted.')
+
+    mgr.delete_service(service_id)
+    return 'Load balancer service %s is being cancelled!' % service_id

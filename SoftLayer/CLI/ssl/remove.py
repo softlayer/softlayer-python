@@ -16,6 +16,7 @@ def cli(env, identifier):
     """Remove SSL certificate."""
 
     manager = SoftLayer.SSLManager(env.client)
-    if env.skip_confirmations or formatting.no_going_back('yes'):
-        manager.remove_certificate(identifier)
-    raise exceptions.CLIAbort("Aborted.")
+    if not (env.skip_confirmations or formatting.no_going_back('yes')):
+        raise exceptions.CLIAbort("Aborted.")
+
+    manager.remove_certificate(identifier)

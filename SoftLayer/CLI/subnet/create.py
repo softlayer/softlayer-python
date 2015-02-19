@@ -34,13 +34,15 @@ def cli(env, network, quantity, vlan_id, ipv6, test):
 
     mgr = SoftLayer.NetworkManager(env.client)
 
-    version = 4
-    if ipv6:
-        version = 6
-    if not test and not env.skip_confirmations:
+    if not (test or env.skip_confirmations):
         if not formatting.confirm("This action will incur charges on your "
                                   "account. Continue?"):
             raise exceptions.CLIAbort('Cancelling order.')
+
+    version = 4
+    if ipv6:
+        version = 6
+
     result = mgr.add_subnet(network,
                             quantity=quantity,
                             vlan_id=vlan_id,

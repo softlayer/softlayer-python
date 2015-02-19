@@ -28,12 +28,14 @@ def cli(env, identifier, cpu, private, memory, network):
     vsi = SoftLayer.VSManager(env.client)
 
     vs_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
-    if env.skip_confirmations or formatting.confirm(
+    if not (env.skip_confirmations or formatting.confirm(
             "This action will incur charges on your account. "
-            "Continue?"):
-        if not vsi.upgrade(vs_id,
-                           cpus=cpu,
-                           memory=memory,
-                           nic_speed=network,
-                           public=not private):
-            raise exceptions.CLIAbort('VS Upgrade Failed')
+            "Continue?")):
+        raise exceptions.CLIAbort('Aborted')
+
+    if not vsi.upgrade(vs_id,
+                       cpus=cpu,
+                       memory=memory,
+                       nic_speed=network,
+                       public=not private):
+        raise exceptions.CLIAbort('VS Upgrade Failed')

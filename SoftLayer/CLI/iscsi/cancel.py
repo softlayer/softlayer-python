@@ -24,7 +24,7 @@ def cli(env, identifier, reason, immediate):
     iscsi_mgr = SoftLayer.ISCSIManager(env.client)
     iscsi_id = helpers.resolve_id(iscsi_mgr.resolve_ids, identifier, 'iSCSI')
 
-    if env.skip_confirmations or formatting.no_going_back(iscsi_id):
-        iscsi_mgr.cancel_iscsi(iscsi_id, reason, immediate)
-    else:
+    if not (env.skip_confirmations or formatting.no_going_back(iscsi_id)):
         raise exceptions.CLIAbort('Aborted')
+
+    iscsi_mgr.cancel_iscsi(iscsi_id, reason, immediate)
