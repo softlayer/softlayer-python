@@ -29,9 +29,6 @@ def cli(env, identifier, immediate, comment, reason):
     mgr = SoftLayer.HardwareManager(env.client)
     hw_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'hardware')
 
-    if not (comment or env.skip_confirmations):
-        comment = env.input("(Optional) Add a cancellation comment:")
-
     if not (env.skip_confirmations or formatting.no_going_back(hw_id)):
         raise exceptions.CLIAbort('Aborted')
 
