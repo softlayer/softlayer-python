@@ -631,12 +631,15 @@ class VSManager(utils.IdentifierMixin, object):
                                                     'nic_speed',
                                                     nic_speed)})
 
+        maintenance_window = datetime.datetime.now(utils.UTC())
         order = {
             'complexType': 'SoftLayer_Container_Product_Order_Virtual_Guest_'
                            'Upgrade',
             'prices': prices,
-            'properties': [{'name': 'MAINTENANCE_WINDOW',
-                            'value': str(datetime.datetime.now())}],
+            'properties': [{
+                'name': 'MAINTENANCE_WINDOW',
+                'value': maintenance_window.strftime("%Y-%m-%d %H:%M:%S%z")
+            }],
             'virtualGuests': [{'id': int(instance_id)}],
         }
         if prices:
