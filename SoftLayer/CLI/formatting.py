@@ -188,9 +188,9 @@ def confirm(prompt_str, default=False):
     :param bool default: Default value to True or False
     """
     if default:
-        prompt = '%s [Y/n]: ' % prompt_str
+        prompt = '%s [Y/n]' % prompt_str
     else:
-        prompt = '%s [y/N]: ' % prompt_str
+        prompt = '%s [y/N]' % prompt_str
 
     response = valid_response(prompt, 'y', 'yes', 'yeah', 'yup', 'yolo')
 
@@ -211,7 +211,7 @@ def no_going_back(confirmation):
 
     return valid_response(
         'This action cannot be undone! '
-        'Type "%s" or press Enter to abort: ' % confirmation,
+        'Type "%s" or press Enter to abort' % confirmation,
         str(confirmation))
 
 

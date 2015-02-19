@@ -27,7 +27,7 @@ def cli(env, identifier, postinstall, key):
             resolver = SoftLayer.SshKeyManager(env.client).resolve_ids
             key_id = helpers.resolve_id(resolver, single_key, 'SshKey')
             keys.append(key_id)
-    if env.skip_confirmations or formatting.no_going_back(vs_id):
-        vsi.reload_instance(vs_id, postinstall, keys)
-    else:
+    if not (env.skip_confirmations or formatting.no_going_back(vs_id)):
         raise exceptions.CLIAbort('Aborted')
+
+    vsi.reload_instance(vs_id, postinstall, keys)

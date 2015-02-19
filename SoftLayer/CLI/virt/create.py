@@ -130,24 +130,24 @@ def cli(env, **args):
         return 'Successfully exported options to a template file.'
 
     if do_create:
-        if env.skip_confirmations or formatting.confirm(
-                "This action will incur charges on your account. Continue?"):
-            result = vsi.create_instance(**data)
-
-            table = formatting.KeyValueTable(['name', 'value'])
-            table.align['name'] = 'r'
-            table.align['value'] = 'l'
-            table.add_row(['id', result['id']])
-            table.add_row(['created', result['createDate']])
-            table.add_row(['guid', result['globalIdentifier']])
-            output.append(table)
-
-            if args.get('wait'):
-                ready = vsi.wait_for_ready(
-                    result['id'], int(args.get('wait') or 1))
-                table.add_row(['ready', ready])
-        else:
+        if not (env.skip_confirmations or formatting.confirm(
+                "This action will incur charges on your account. Continue?")):
             raise exceptions.CLIAbort('Aborting virtual server order.')
+
+        result = vsi.create_instance(**data)
+
+        table = formatting.KeyValueTable(['name', 'value'])
+        table.align['name'] = 'r'
+        table.align['value'] = 'l'
+        table.add_row(['id', result['id']])
+        table.add_row(['created', result['createDate']])
+        table.add_row(['guid', result['globalIdentifier']])
+        output.append(table)
+
+        if args.get('wait'):
+            ready = vsi.wait_for_ready(
+                result['id'], int(args.get('wait') or 1))
+            table.add_row(['ready', ready])
 
     return output
 

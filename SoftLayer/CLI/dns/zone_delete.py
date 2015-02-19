@@ -19,7 +19,7 @@ def cli(env, zone):
     manager = SoftLayer.DNSManager(env.client)
     zone_id = helpers.resolve_id(manager.resolve_ids, zone, name='zone')
 
-    if env.skip_confirmations or formatting.no_going_back(zone):
-        manager.delete_zone(zone_id)
-    else:
+    if not (env.skip_confirmations or formatting.no_going_back(zone)):
         raise exceptions.CLIAbort("Aborted.")
+
+    manager.delete_zone(zone_id)
