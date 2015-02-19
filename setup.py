@@ -19,6 +19,7 @@ REQUIRES = [
     'prettytable >= 0.7.0',
     'click',
     'requests',
+    'pytz',
 ]
 
 if sys.version_info < (2, 7):

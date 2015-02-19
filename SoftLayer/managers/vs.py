@@ -9,6 +9,7 @@ import datetime
 import itertools
 import socket
 import time
+import pytz
 
 from SoftLayer.managers import ordering
 from SoftLayer import utils
@@ -636,7 +637,7 @@ class VSManager(utils.IdentifierMixin, object):
                            'Upgrade',
             'prices': prices,
             'properties': [{'name': 'MAINTENANCE_WINDOW',
-                            'value': str(datetime.datetime.now())}],
+                            'value': str(datetime.datetime.utcnow().replace(tzinfo=pytz.utc))}],
             'virtualGuests': [{'id': int(instance_id)}],
         }
         if prices:
