@@ -262,6 +262,8 @@ class TestRestAPICall(testing.TestCase):
         request.assert_called_with(
             'GET', 'http://something.com/SoftLayer_Service/Resource.json',
             headers={},
+            verify=True,
+            cert=None,
             proxies=None,
             timeout=None)
 
@@ -305,6 +307,8 @@ class TestRestAPICall(testing.TestCase):
             'GET', 'http://something.com/SoftLayer_Service/Resource.json',
             proxies={'https': 'http://localhost:3128',
                      'http': 'http://localhost:3128'},
+            verify=True,
+            cert=None,
             timeout=mock.ANY,
             headers=mock.ANY)
 
@@ -325,6 +329,8 @@ class TestRestAPICall(testing.TestCase):
             'GET',
             'http://something.com/SoftLayer_Service/getObject/2.json',
             headers={},
+            verify=True,
+            cert=None,
             proxies=None,
             timeout=None)
 
