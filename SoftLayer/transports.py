@@ -176,6 +176,8 @@ class RestTransport(object):
             resp = requests.request('GET', url,
                                     headers=request.transport_headers,
                                     timeout=request.timeout,
+                                    verify=request.verify,
+                                    cert=request.cert,
                                     proxies=_proxies_dict(request.proxy))
             LOGGER.debug("=== RESPONSE ===")
             LOGGER.debug(resp.headers)
