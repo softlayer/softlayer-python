@@ -177,3 +177,16 @@ def resolve_ids(identifier, resolvers):
             return ids
 
     return []
+
+
+class UTC(datetime.tzinfo):
+    """UTC timezone"""
+
+    def utcoffset(self, _):
+        return datetime.timedelta(0)
+
+    def tzname(self, _):
+        return "UTC"
+
+    def dst(self, _):
+        return datetime.timedelta(0)
