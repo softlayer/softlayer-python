@@ -8,5 +8,10 @@ env:
   - TOX_ENV=pypy
   - TOX_ENV=analysis
   - TOX_ENV=coverage
-install: pip install tox --use-mirrors
-script: tox -e $TOX_ENV
+install:
+ - pip install tox --use-mirrors
+ - pip install coveralls
+script:
+ - tox -e $TOX_ENV
+after_success:
+ - if [[ $TOX_ENV = "coverage" ]]; then coveralls; fi
