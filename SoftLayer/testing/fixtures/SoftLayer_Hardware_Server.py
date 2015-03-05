@@ -6,6 +6,7 @@ getObject = {
     'billingItem': {
         'id': 6327,
         'recurringFee': 1.54,
+        'nextInvoiceTotalRecurringAmount': 16.08,
         'orderItem': {
             'order': {
                 'userRecord': {
