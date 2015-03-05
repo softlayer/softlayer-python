@@ -108,6 +108,24 @@ class OrderingTests(testing.TestCase):
         self.assertEqual(result, fixtures.SoftLayer_Product_Order.placeOrder)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
 
+    def test_bill_order_quote(self):
+        result = self.ordering.bill_order_quote(1234,
+                                                [{'hostname': 'test1',
+                                                  'domain': 'example.com'}],
+                                                quantity=1)
+        self.assertEqual(result,
+                         fixtures.SoftLayer_Billing_Order_Quote.placeOrder)
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'placeOrder')
+
+    def test_bill_verify_quote(self):
+        result = self.ordering.bill_verify_quote(1234,
+                                                 [{'hostname': 'test1',
+                                                   'domain': 'example.com'}],
+                                                 quantity=1)
+        self.assertEqual(result,
+                         fixtures.SoftLayer_Billing_Order_Quote.verifyOrder)
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'verifyOrder')
+
     def test_generate_order_template(self):
         result = self.ordering.generate_order_template(
             1234, [{'hostname': 'test1', 'domain': 'example.com'}], quantity=1)

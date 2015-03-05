@@ -199,3 +199,29 @@ class OrderingManager(object):
         container = self.generate_order_template(quote_id, extra,
                                                  quantity=quantity)
         return self.client['Product_Order'].placeOrder(container)
+
+    def bill_order_quote(self, quote_id, extra, quantity=1):
+        """Places an order using a quote
+
+        :param int quote_id: ID for the target quote
+        :param list hostnames: hostnames of the servers
+        :param string domain: domain of the new server
+        :param int quantity: Quantity to override default
+        """
+
+        container = self.generate_order_template(quote_id, extra,
+                                                 quantity=quantity)
+        return self.client['Billing_Order_Quote'].placeOrder(container)
+
+    def bill_verify_quote(self, quote_id, extra, quantity=1):
+        """Places an order using a quote
+
+        :param int quote_id: ID for the target quote
+        :param list hostnames: hostnames of the servers
+        :param string domain: domain of the new server
+        :param int quantity: Quantity to override default
+        """
+
+        container = self.generate_order_template(quote_id, extra,
+                                                 quantity=quantity)
+        return self.client['Billing_Order_Quote'].verifyOrder(container)
