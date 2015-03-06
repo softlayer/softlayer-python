@@ -62,8 +62,7 @@ def cli(self, identifier, passwords=False, price=False):
     table.add_row(['public_ip',
                    result['primaryIpAddress'] or formatting.blank()])
     table.add_row(['private_ip',
-                   result['primaryBackendIpAddress']
-                   or formatting.blank()])
+                   result['primaryBackendIpAddress'] or formatting.blank()])
     table.add_row(['private_only', result['privateNetworkOnlyFlag']])
     table.add_row(['private_cpu', result['dedicatedAccountHostOnlyFlag']])
     table.add_row(['created', result['createDate']])

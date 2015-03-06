@@ -100,8 +100,8 @@ def get_user_input(env):
 
     # Ask for username
     for _ in range(3):
-        username = (env.input('Username [%s]: ' % defaults['username'])
-                    or defaults['username'])
+        username = (env.input('Username [%s]: ' % defaults['username']) or
+                    defaults['username'])
         if username:
             break
     else:
@@ -110,8 +110,8 @@ def get_user_input(env):
     # Ask for 'secret' which can be api_key or their password
     for _ in range(3):
         secret = (env.getpass('API Key or Password [%s]: '
-                              % defaults['api_key'])
-                  or defaults['api_key'])
+                              % defaults['api_key']) or
+                  defaults['api_key'])
         if secret:
             break
     else:
