@@ -19,10 +19,10 @@ functionality not fully documented here.
 
 Configuration Setup
 -------------------
-To update the configuration, you can use `sl config setup`.
+To update the configuration, you can use `sl setup`.
 ::
 
-	$ sl config setup
+	$ sl setup
 	Username []: username
 	API Key or Password []:
 	Endpoint (public|private|custom): public
@@ -99,7 +99,7 @@ To discover the available commands, simply type `sl`.
 	  vs         Virtual Servers.
 
 	  To use most commands your SoftLayer username and api_key need to be
-	  configured. The easiest way to do that is to use: 'sl config setup'
+	  configured. The easiest way to do that is to use: 'sl setup'
 
 As you can see, there are a number of commands/sections. To look at the list of
 subcommands for virtual servers type `sl vs`. For example:
