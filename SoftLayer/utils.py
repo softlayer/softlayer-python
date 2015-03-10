@@ -1,7 +1,7 @@
 """
     SoftLayer.utils
     ~~~~~~~~~~~~~~~
-    Utility function/classes
+    Utility function/classes.
 
     :license: MIT, see LICENSE for more details.
 """
@@ -180,7 +180,7 @@ def resolve_ids(identifier, resolvers):
 
 
 class UTC(datetime.tzinfo):
-    """UTC timezone"""
+    """UTC timezone."""
 
     def utcoffset(self, _):
         return datetime.timedelta(0)

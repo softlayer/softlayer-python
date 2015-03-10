@@ -10,13 +10,8 @@ import click
 
 
 @click.command()
-@click.option('--sortby',
-              help='Column to sort by',
-              type=click.Choice(['guid',
-                                 'hostname',
-                                 'primary_ip',
-                                 'backend_ip',
-                                 'datacenter']))
+@click.option('--sortby', help='Column to sort by',
+              default='hostname')
 @click.option('--cpu', '-c', help='Number of CPU cores', type=click.INT)
 @click.option('--domain', '-D', help='Domain portion of the FQDN')
 @click.option('--datacenter', '-d', help='Datacenter shortname')
@@ -53,22 +48,23 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
                                 tags=tag_list)
 
     table = formatting.Table(columns)
-    table.sortby = sortby or 'hostname'
+    table.sortby = sortby
+    column_map = {}
+    column_map['guid'] = 'globalIdentifier'
+    column_map['primary_ip'] = 'primaryIpAddress'
+    column_map['backend_ip'] = 'primaryBackendIpAddress'
+    column_map['datacenter'] = 'datacenter-name'
+    column_map['action'] = 'formatted-action'
+
     for guest in guests:
         guest = utils.NestedDict(guest)
+        guest['datacenter-name'] = guest['datacenter']['name']
+        guest['formatted-action'] = formatting.active_txn(guest)
         row_column = []
         for col in columns:
             entry = None
-            if col == 'guid':
-                entry = guest['globalIdentifier']
-            elif col == 'datacenter':
-                entry = guest['datacenter']['name']
-            elif col == 'primary_ip':
-                entry = guest['primaryIpAddress']
-            elif col == 'backend_ip':
-                entry = guest['primaryBackendIpAddress']
-            elif col == 'action':
-                entry = formatting.active_txn(guest)
+            if col in column_map:
+                entry = guest[column_map[col]]
             else:
                 entry = guest[col]
 

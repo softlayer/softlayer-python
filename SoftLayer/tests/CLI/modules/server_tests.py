@@ -136,28 +136,28 @@ class ServerCLITests(testing.TestCase):
 
         expected = [
             {
-                'datacenter': 'TEST00',
-                'primary_ip': '172.16.1.100',
-                'hostname': 'hardware-test1',
-                'guid': '1a2b3c-1701',
-                'backend_ip': '10.1.0.2',
-                'action': 'TXN_NAME',
+                u'datacenter': u'TEST00',
+                u'primary_ip': u'172.16.1.100',
+                u'hostname': u'hardware-test1',
+                u'guid': u'1a2b3c-1701',
+                u'backend_ip': u'10.1.0.2',
+                u'action': u'TXN_NAME',
             },
             {
-                'datacenter': 'TEST00',
-                'primary_ip': '172.16.4.94',
-                'hostname': 'hardware-test2',
-                'guid': '1a2b3c-1702',
-                'backend_ip': '10.1.0.3',
-                'action': None,
+                u'datacenter': u'TEST00',
+                u'primary_ip': u'172.16.4.94',
+                u'hostname': u'hardware-test2',
+                u'guid': u'1a2b3c-1702',
+                u'backend_ip': u'10.1.0.3',
+                u'action': None,
             },
             {
-                'datacenter': 'TEST00',
-                'primary_ip': '172.16.4.95',
-                'hostname': 'hardware-bad-memory',
-                'guid': 1002,
-                'backend_ip': '10.1.0.4',
-                'action': None,
+                u'datacenter': u'TEST00',
+                u'primary_ip': u'172.16.4.95',
+                u'hostname': u'hardware-bad-memory',
+                u'guid': None,
+                u'backend_ip': u'10.1.0.4',
+                u'action': None,
             }
         ]
 
