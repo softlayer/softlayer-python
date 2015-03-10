@@ -20,7 +20,7 @@ def cli(env, identifier):
     global_ip_id = helpers.resolve_id(mgr.resolve_global_ip_ids, identifier,
                                       name='global ip')
 
-    if env.skip_confirmations or formatting.no_going_back(global_ip_id):
-        mgr.cancel_global_ip(global_ip_id)
-    else:
+    if not (env.skip_confirmations or formatting.no_going_back(global_ip_id)):
         raise exceptions.CLIAbort('Aborted')
+
+    mgr.cancel_global_ip(global_ip_id)

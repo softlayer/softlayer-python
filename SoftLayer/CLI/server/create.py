@@ -119,19 +119,19 @@ def cli(env, **args):
         return 'Successfully exported options to a template file.'
 
     if do_create:
-        if env.skip_confirmations or formatting.confirm(
+        if not (env.skip_confirmations or formatting.confirm(
                 "This action will incur charges on your account. "
-                "Continue?"):
-            result = mgr.place_order(**order)
-
-            table = formatting.KeyValueTable(['name', 'value'])
-            table.align['name'] = 'r'
-            table.align['value'] = 'l'
-            table.add_row(['id', result['orderId']])
-            table.add_row(['created', result['orderDate']])
-            output = table
-        else:
+                "Continue?")):
             raise exceptions.CLIAbort('Aborting dedicated server order.')
+
+        result = mgr.place_order(**order)
+
+        table = formatting.KeyValueTable(['name', 'value'])
+        table.align['name'] = 'r'
+        table.align['value'] = 'l'
+        table.add_row(['id', result['orderId']])
+        table.add_row(['created', result['orderDate']])
+        output = table
 
     return output
 

@@ -80,7 +80,9 @@ def cli(env, identifier, passwords, price):
 
     if price:
         table.add_row(['price rate',
-                       result['billingItem']['recurringFee']])
+                       utils.lookup(result,
+                                    'billingItem',
+                                    'nextInvoiceTotalRecurringAmount')])
 
     if passwords:
         pass_table = formatting.Table(['username', 'password'])

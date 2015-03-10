@@ -288,7 +288,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                                                         version,
                                                         referenceCode]],
                     passwords[username,password]]''',
-                'billingItem.recurringFee',
+                'billingItem.nextInvoiceTotalRecurringAmount',
                 'hourlyBillingFlag',
                 'tagReferences[id,tag[name,id]]',
                 'networkVlans[id,vlanNumber,networkSpace]',

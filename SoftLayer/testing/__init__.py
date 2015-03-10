@@ -83,7 +83,7 @@ class TestCase(testtools.TestCase):
         pass
 
     def setUp(self):  # NOQA
-        super(TestCase, self).setUp()
+        testtools.TestCase.setUp(self)
         self.env = environment.Environment()
 
         # Create a crazy mockable, fixture client
@@ -100,7 +100,7 @@ class TestCase(testtools.TestCase):
         return self.set_up()
 
     def tearDown(self):  # NOQA
-        super(TestCase, self).tearDown()
+        testtools.TestCase.tearDown(self)
         return self.tear_down()
 
     def calls(self, service=None, method=None):
@@ -125,8 +125,8 @@ class TestCase(testtools.TestCase):
             if call_has_props(call, props):
                 return
 
-        self.fail('%s::%s was not called with given properties: %s'
-                  % (service, method, props))
+        raise AssertionError('%s::%s was not called with given properties: %s'
+                             % (service, method, props))
 
     def set_mock(self, service, method):
         """Set and return mock on the current client."""

@@ -116,7 +116,7 @@ class ServerCLITests(testing.TestCase):
             'notes': 'These are test notes.',
             'os': 'Ubuntu',
             'owner': 'chechu',
-            'price rate': 1.54,
+            'price rate': 16.08,
             'private_ip': '10.1.0.2',
             'ptr': '2.0.1.10.in-addr.arpa',
             'public_ip': '172.16.1.100',

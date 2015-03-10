@@ -19,10 +19,10 @@ def cli(env, identifier):
 
     _, group_id = loadbal.parse_id(identifier)
 
-    if env.skip_confirmations or formatting.confirm("This action will cancel "
-                                                    "a service group. "
-                                                    "Continue?"):
-        mgr.delete_service_group(group_id)
-        return 'Service group %s is being deleted!' % identifier
-    else:
+    if not (env.skip_confirmations or
+            formatting.confirm("This action will cancel a service group. "
+                               "Continue?")):
         raise exceptions.CLIAbort('Aborted.')
+
+    mgr.delete_service_group(group_id)
+    return 'Service group %s is being deleted!' % identifier

@@ -9,6 +9,9 @@ SoftLayer API Python Client
 .. image:: https://badge.fury.io/py/SoftLayer.png
     :target: http://badge.fury.io/py/SoftLayer
 
+.. image:: https://coveralls.io/repos/softlayer/softlayer-python/badge.svg
+    :target: https://coveralls.io/r/softlayer/softlayer-python
+
 SoftLayer API bindings for Python. For use with
 `SoftLayer's API <http://sldn.softlayer.com/reference/softlayerapi>`_.
 

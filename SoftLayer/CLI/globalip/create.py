@@ -21,10 +21,12 @@ def cli(env, ipv6, test):
     version = 4
     if ipv6:
         version = 6
-    if not test and not env.skip_confirmations:
+
+    if not (test or env.skip_confirmations):
         if not formatting.confirm("This action will incur charges on your "
                                   "account. Continue?"):
             raise exceptions.CLIAbort('Cancelling order.')
+
     result = mgr.add_global_ip(version=version, test_order=test)
 
     table = formatting.Table(['item', 'cost'])

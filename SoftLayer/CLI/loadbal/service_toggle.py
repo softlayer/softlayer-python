@@ -19,10 +19,10 @@ def cli(env, identifier):
     mgr = SoftLayer.LoadBalancerManager(env.client)
     _, service_id = loadbal.parse_id(identifier)
 
-    if env.skip_confirmations or formatting.confirm("This action will toggle "
-                                                    "the status on the "
-                                                    "service. Continue?"):
-        mgr.toggle_service_status(service_id)
-        return 'Load balancer service %s status updated!' % identifier
-    else:
+    if not (env.skip_confirmations or
+            formatting.confirm("This action will toggle the status on the "
+                               "service. Continue?")):
         raise exceptions.CLIAbort('Aborted.')
+
+    mgr.toggle_service_status(service_id)
+    return 'Load balancer service %s status updated!' % identifier
