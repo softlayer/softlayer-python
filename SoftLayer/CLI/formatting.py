@@ -13,6 +13,7 @@ import os
 import click
 import prettytable
 
+from SoftLayer.CLI import exceptions
 from SoftLayer import utils
 
 FALSE_VALUES = ['0', 'false', 'FALSE', 'no', 'False']
@@ -274,7 +275,11 @@ class Table(object):
         """Returns a new prettytable instance."""
         table = prettytable.PrettyTable(self.columns)
         if self.sortby:
-            table.sortby = self.sortby
+            if self.sortby in self.columns:
+                table.sortby = self.sortby
+            else:
+                msg = "Column (%s) doesn't exist to sort by" % self.sortby
+                raise exceptions.CLIAbort(msg)
         for a_col, alignment in self.align.items():
             table.align[a_col] = alignment
 
