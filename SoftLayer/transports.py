@@ -257,8 +257,8 @@ def _format_object_mask(objectmask, service):
         mheader = 'SoftLayer_ObjectMask'
 
         objectmask = objectmask.strip()
-        if (not objectmask.startswith('mask')
-                and not objectmask.startswith('[')):
+        if (not objectmask.startswith('mask') and
+                not objectmask.startswith('[')):
             objectmask = "mask[%s]" % objectmask
 
     return {mheader: {'mask': objectmask}}

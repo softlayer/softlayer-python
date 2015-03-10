@@ -72,8 +72,8 @@ class Client(object):
                                               config_file=config_file)
         self.auth = settings.get('auth')
 
-        self.endpoint_url = (settings.get('endpoint_url')
-                             or API_PUBLIC_ENDPOINT).rstrip('/')
+        self.endpoint_url = (settings.get('endpoint_url') or
+                             API_PUBLIC_ENDPOINT).rstrip('/')
         self.transport = transport or transports.XmlRpcTransport()
 
         self.timeout = None
