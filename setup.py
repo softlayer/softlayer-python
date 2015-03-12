@@ -44,7 +44,10 @@ setup(
     zip_safe=False,
     url='http://github.com/softlayer/softlayer-python',
     entry_points={
-        'console_scripts': ['sl = SoftLayer.CLI.core:main'],
+        'console_scripts': [
+            'slcli = SoftLayer.CLI.core:main',
+            'sl = SoftLayer.CLI.deprecated:main',
+        ],
     },
     test_suite='nose.collector',
     install_requires=REQUIRES,

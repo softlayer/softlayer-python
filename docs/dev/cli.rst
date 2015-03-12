@@ -9,7 +9,7 @@ The command line parsing is currently based on `click <http://click.pocoo.org/>`
 
 First Example
 -------------
-For the first example, we can create `sl table-example` by creating the following file at SoftLayer/CLI/table_example.py:
+For the first example, we can create `slcli table-example` by creating the following file at SoftLayer/CLI/table_example.py:
 
 ::
 
@@ -36,7 +36,7 @@ For the first example, we can create `sl table-example` by creating the followin
 
         return t
 
-Then we need to register it so that `sl table-example` will know to route to this new module. We do that by adding ALL_ROUTES in SoftLayer/CLI/routes.py to include the following:
+Then we need to register it so that `slcli table-example` will know to route to this new module. We do that by adding ALL_ROUTES in SoftLayer/CLI/routes.py to include the following:
 
 ::
 
@@ -47,7 +47,7 @@ Then we need to register it so that `sl table-example` will know to route to thi
 Which gives us
 ::
 
-  $ sl table-example
+  $ slcli table-example
   :.......:.......:
   :  col1 : col2  :
   :.......:.......:
@@ -55,9 +55,9 @@ Which gives us
   : test2 : test2 :
   :.......:.......:
 
-  $ sl --format=raw table-example
-   test   test  
-   test2  test2 
+  $ slcli --format=raw table-example
+   test   test
+   test2  test2
 
 Formatting of the data represented in the table is actually controlled upstream from the CLIRunnable's making supporting more data formats in the future easier.
 

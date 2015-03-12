@@ -14,10 +14,10 @@ using SoftLayer's command-line client.
 	:ref:`configured with valid SoftLayer credentials<cli>`.
 
 
-First, let's list the current virtual servers with `sl vs list`.
+First, let's list the current virtual servers with `slcli vs list`.
 ::
 
-	$ sl vs list
+	$ slcli vs list
 	:.....:............:.........................:.......:........:..............:.............:....................:........:
 	:  id : datacenter :           host          : cores : memory :  primary_ip  :  backend_ip : active_transaction : owner  :
 	:.....:............:.........................:.......:........:..............:.............:....................:........:
@@ -26,11 +26,11 @@ First, let's list the current virtual servers with `sl vs list`.
 We don't have any virtual servers yet! Let's fix that. Before we can create a
 virtual server (VS), we need to know what options are available to us: RAM,
 CPU, operating systems, disk sizes, disk types, datacenters, and so on.
-Luckily, there's a simple command to show all options: `sl vs create-options`.
+Luckily, there's a simple command to show all options: `slcli vs create-options`.
 
 ::
 
-	$ sl vs create-options
+	$ slcli vs create-options
 	:.................:...........................................................................................:
 	:            Name : Value                                                                                     :
 	:.................:...........................................................................................:
@@ -112,11 +112,11 @@ Luckily, there's a simple command to show all options: `sl vs create-options`.
 
 Here's the command to create a 2-core virtual server with 1GiB memory, running
 Ubuntu 14.04 LTS, and that is billed on an hourly basis in the San Jose 1
-datacenter using the command `sl vs create`.
+datacenter using the command `slcli vs create`.
 
 ::
 
-	$ sl vs create --hostname=example --domain=softlayer.com --cpu 2 --memory 1024 -o UBUNTU_14_64 --datacenter=sjc01 --billing=hourly
+	$ slcli vs create --hostname=example --domain=softlayer.com --cpu 2 --memory 1024 -o UBUNTU_14_64 --datacenter=sjc01 --billing=hourly
 	This action will incur charges on your account. Continue? [y/N]: y
 	:.........:......................................:
 	:    name : value                                :
@@ -132,7 +132,7 @@ instantly appear in your virtual server list now.
 
 ::
 
-	$ sl vs list
+	$ slcli vs list
 	:.........:............:.......................:.......:........:................:..............:....................:
 	:    id   : datacenter :          host         : cores : memory :   primary_ip   :  backend_ip  : active_transaction :
 	:.........:............:.......................:.......:........:................:..............:....................:
@@ -144,7 +144,7 @@ here's how:
 
 ::
 
-	$ sl vs ready 'example' --wait=600
+	$ slcli vs ready 'example' --wait=600
 	READY
 
 When the previous command returns, you'll know that the virtual server has
@@ -152,7 +152,7 @@ finished the provisioning process and is ready to use. This is *very* useful
 for chaining commands together.
 
 Now that you have your virtual server, let's get access to it. To do that, use
-the `sl vs detail` command. From the example below, you can see that the
+the `slcli vs detail` command. From the example below, you can see that the
 username is 'root' and password is 'ABCDEFGH'.
 
 .. warning::
@@ -165,7 +165,7 @@ username is 'root' and password is 'ABCDEFGH'.
 
 ::
 
-	$ sl vs detail example --passwords
+	$ slcli vs detail example --passwords
 	:..............:...........................:
 	:         Name : Value                     :
 	:..............:...........................:
@@ -188,12 +188,12 @@ username is 'root' and password is 'ABCDEFGH'.
 
 
 There are many other commands to help manage virtual servers. To see them all,
-use `sl help vs`.
+use `slcli help vs`.
 
 ::
 
-	$ sl vs
-	Usage: sl vs [OPTIONS] COMMAND [ARGS]...
+	$ slcli vs
+	Usage: slcli vs [OPTIONS] COMMAND [ARGS]...
 
 	  Virtual Servers.
 
