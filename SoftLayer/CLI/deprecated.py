@@ -9,6 +9,7 @@ import sys
 import click
 
 
+@click.command()
 def main():
     """Main function for the deprecated 'sl' command."""
     click.echo("ERROR: Use the 'slcli' command instead.", err=True)
