@@ -16,5 +16,5 @@ class EnvironmentTests(testing.TestCase):
         runner = click.testing.CliRunner()
         result = runner.invoke(deprecated.main)
 
-        self.assertEquals(result.exit_code, -1)
+        self.assertEqual(result.exit_code, -1)
         self.assertIn("ERROR: Use the 'slcli' command instead.", result.output)
