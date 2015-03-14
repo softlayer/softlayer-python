@@ -637,7 +637,7 @@ class VSManager(utils.IdentifierMixin, object):
             # Change the hostname on instance 12345 to 'something'
             result = mgr.edit(instance_id=12345 , hostname="something")
             #result will be True or an Exception
-            print vsi
+            print result
         """
 
         obj = {}

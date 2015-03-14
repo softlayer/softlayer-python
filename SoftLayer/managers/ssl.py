@@ -11,6 +11,17 @@ class SSLManager(object):
     """Manages SSL certificates.
 
     :param SoftLayer.API.Client client: an API client instance
+
+    Example::
+       # Initialize the Manager. 
+       # env variables. These can also be specified in ~/.softlayer,
+       # or passed directly to SoftLayer.Client()
+       # SL_USERNAME = YOUR_USERNAME
+       # SL_API_KEY = YOUR_API_KEY
+       import SoftLayer
+       client = SoftLayer.Client()
+       mgr = SoftLayer.SSLManager(client)
+
     """
 
     def __init__(self, client):
@@ -23,6 +34,12 @@ class SSLManager(object):
         :param string method: The type of certificates to list. Options are
                               'all', 'expired', and 'valid'.
         :returns: A list of dictionaries representing the requested SSL certs.
+
+        Example::
+
+            # Get all valid SSL certs
+            certs = mgr.list_certs(method='valid')
+            print certs
 
         """
         ssl = self.client['Account']
@@ -42,6 +59,11 @@ class SSLManager(object):
         :param dict certificate: A dictionary representing the parts of the
                                  certificate. See SLDN for more information.
 
+        Example::
+
+            cert = ??
+            result = mgr.add_certificate(certificate=cert)
+
         """
         return self.ssl.createObject(certificate)
 
@@ -49,6 +71,12 @@ class SSLManager(object):
         """Removes a certificate.
 
         :param integer cert_id: a certificate ID to remove
+
+        Example::
+
+            # Removes certificate with id 1234
+            result = mgr.remove_certificate(cert_id = 1234)
+            print result
 
         """
         return self.ssl.deleteObject(id=cert_id)
@@ -61,6 +89,13 @@ class SSLManager(object):
 
         :param dict certificate: the certificate to update.
 
+        Example::
+
+            # Updates the cert id 1234
+            cert['id'] = 1234
+            cert['certificate'] = ??
+            result = mgr.edit_certificate(certificate=cert)
+
         """
         return self.ssl.editObject(certificate, id=certificate['id'])
 
@@ -68,6 +103,11 @@ class SSLManager(object):
         """Gets a certificate with the ID specified.
 
         :param integer cert_id: the certificate ID to retrieve
+
+        Example::
+
+            cert = mgr.get_certificate(cert_id=1234)
+            print(cert)
 
         """
         return self.ssl.getObject(id=cert_id)

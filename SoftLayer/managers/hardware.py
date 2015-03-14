@@ -21,6 +21,16 @@ class HardwareManager(utils.IdentifierMixin, object):
                                               manager to handle ordering.
                                               If none is provided, one will be
                                               auto initialized.
+    Example::
+           # Initialize the Manager. 
+           # env variables. These can also be specified in ~/.softlayer,
+           # or passed directly to SoftLayer.Client()
+           # SL_USERNAME = YOUR_USERNAME
+           # SL_API_KEY = YOUR_API_KEY
+           import SoftLayer
+           client = SoftLayer.Client()
+           mgr = SoftLayer.HardwareManager(client)
+
     """
     def __init__(self, client, ordering_manager=None):
         self.client = client
@@ -41,6 +51,14 @@ class HardwareManager(utils.IdentifierMixin, object):
                               come from :func:`get_cancellation_reasons`.
         :param string comment: An optional comment to include with the
                                cancellation.
+        :param immediate bool: False = Cancel at end of billing cycle.
+                               True = Cancel now, only for bareMetalInstances
+
+        Example::
+
+            # Cancels hardware id 1234
+            result = mrg.cancel_hardware(hardware_id=1234)
+            print result
         """
         # Check to see if this is actually a pre-configured server (BMC). They
         # require a different cancellation call.
@@ -75,6 +93,11 @@ class HardwareManager(utils.IdentifierMixin, object):
         :param bool immediate: If true, the bare metal instance will be
                                cancelled immediately. Otherwise, it will be
                                scheduled to cancel on the anniversary date.
+
+        Example::
+
+            result = mgr.cancel_metal(hardware_id=1234)
+            print result
         """
         hw_billing = self.get_hardware(hardware_id,
                                        mask='mask[id, billingItem.id]')
@@ -106,6 +129,14 @@ class HardwareManager(utils.IdentifierMixin, object):
         :returns: Returns a list of dictionaries representing the matching
                   hardware. This list will contain both dedicated servers and
                   bare metal computing instances
+
+        Example::
+
+            # Using a custom object-mask. Will get ONLY what is specified
+            # These will stem from the SoftLayer_Hardware_Server datatype
+            object_mask = "mask[hostname,monitoringRobot[robotStatus]]"
+            result = mgr.list_hardware(mask=object_mask)
+            print result
 
         """
         if 'mask' not in kwargs:
@@ -183,6 +214,11 @@ class HardwareManager(utils.IdentifierMixin, object):
            function will make those calls and reformat the results into a
            dictionary that's easier to manage. It's recommended that you cache
            these results with a reasonable lifetime for performance reasons.
+
+        Example::
+
+            result = mgr.get_bare_metal_create_options()
+            print result
         """
         hw_id = self.get_bare_metal_package_id()
 
@@ -192,7 +228,15 @@ class HardwareManager(utils.IdentifierMixin, object):
         return self._parse_package_data(hw_id)
 
     def get_bare_metal_package_id(self):
-        """Return the bare metal package id."""
+        """Return the bare metal package id.
+
+        :resturns: the id of the BARE_METAL_CORE package
+
+        Example::
+
+            result = mgr.get_bare_metal_package_id
+
+        """
         ordering_manager = self.ordering_manager
         mask = "mask[id,name,description,type[keyName]]"
         package = ordering_manager.get_package_by_type('BARE_METAL_CORE', mask)
@@ -204,6 +248,11 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         :returns: A list of tuples of available dedicated server packages in
                   the form (id, name, description)
+
+        Example::
+
+            result = mgr.get_available_dedicated_server_packages()
+            print result
         """
         available_packages = []
         ordering_manager = self.ordering_manager
@@ -246,6 +295,14 @@ class HardwareManager(utils.IdentifierMixin, object):
            make those calls and reformat the results into a dictionary that's
            easier to manage. It's recommended that you cache these results with
            a reasonable lifetime for performance reasons.
+
+        Example::
+
+            package_ids = mgr.get_available_dedicated_server_packages()
+            #pick which package you want the create options for
+            package_id = ?? 
+            result = mgr.get_dedicated_server_create_options(package_id)
+            print result
         """
         return self._parse_package_data(package_id)
 
@@ -256,6 +313,12 @@ class HardwareManager(utils.IdentifierMixin, object):
         :returns: A dictionary containing a large amount of information about
                   the specified server.
 
+        Example::
+
+            object_mask = "mask[id,networkVlans[vlanNumber]]"
+            # Object masks are optional
+            result = mrg.get_hardware(hardware_id=1234,mask=object_mask)
+            print result
         """
 
         if 'mask' not in kwargs:
@@ -323,6 +386,11 @@ class HardwareManager(utils.IdentifierMixin, object):
         """Reboot a server into the a recsue kernel.
 
         :param integer instance_id: the server ID to rescue
+
+        Example::
+
+            result = mgr.rescue(1234)
+            print result
         """
         return self.hardware.bootToRescueLayer(id=hardware_id)
 
@@ -334,6 +402,16 @@ class HardwareManager(utils.IdentifierMixin, object):
                             True (default) means the public interface.
                             False indicates the private interface.
         :param int speed: The port speed to set.
+
+        .. warning::
+            A port speed of 0 will disable the interface.
+
+        Example::
+            #change the Public interface to 10Mbps on instance 12345
+            result = mgr.change_port_speed(hardware_id=12345, 
+                                        public=True, speed=10)
+            # result will be True or an Exception
+            print result 
         """
         if public:
             func = self.hardware.setPublicNetworkInterfaceSpeed
@@ -390,7 +468,7 @@ class HardwareManager(utils.IdentifierMixin, object):
            following sample for an example of using HardwareManager functions
            for ordering a basic server.
 
-        ::
+        Example::
 
            # client is assumed to be an initialized SoftLayer.API.Client object
            mgr = HardwareManager(client)
@@ -449,8 +527,17 @@ class HardwareManager(utils.IdentifierMixin, object):
 
     def verify_order(self, **kwargs):
         """Verifies an order for a piece of hardware.
+        Behaves exactly like place_order, except it doesnt actually
+        add a server to your account. Will let you know if the ordering
+        system likes your order or not.
 
         See :func:`place_order` for a list of available options.
+
+        Example::
+
+            # Use the place_order example for the content of args
+            result = mgr.verify_order(**args)
+            print result
         """
         create_options = self._generate_create_dict(**kwargs)
         return self.client['Product_Order'].verifyOrder(create_options)
@@ -460,6 +547,11 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         These can be used when cancelling a dedicated server
         via :func:`cancel_hardware`.
+
+        Example::
+
+            result = mgr.get_cancellation_reasons()
+            print result
         """
         return {
             'unneeded': 'No longer needed',
@@ -726,6 +818,11 @@ class HardwareManager(utils.IdentifierMixin, object):
         :param string domain: valid domain name
         :param string notes: notes about this particular hardware
 
+        Example::
+            # Change the hostname on instance 12345 to 'something'
+            result = mgr.edit(hardware_id=12345 , hostname="something")
+            #result will be True or an Exception
+            print result
         """
 
         obj = {}
@@ -746,12 +843,8 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         return self.hardware.editObject(obj, id=hardware_id)
 
-    def update_firmware(self,
-                        hardware_id,
-                        ipmi=True,
-                        raid_controller=True,
-                        bios=True,
-                        hard_drive=True):
+    def update_firmware(self, hardware_id, ipmi=True, raid_controller=True,
+                        bios=True, hard_drive=True):
         """Update hardware firmware.
 
         This will cause the server to be unavailable for ~20 minutes.
@@ -762,6 +855,12 @@ class HardwareManager(utils.IdentifierMixin, object):
         :param bool raid_controller: Update the raid controller firmware.
         :param bool bios: Update the bios firmware.
         :param bool hard_drive: Update the hard drive firmware.
+
+        Example::
+
+            # Check the servers active transactions to see progress
+            result = mgr.update_firmware(hardware_id=1234)
+            print result
         """
 
         return self.hardware.createFirmwareUpdateTransaction(
@@ -780,9 +879,9 @@ def get_default_value(package_options, category, hourly=False):
        If the category has multiple items with no fee, this will return the
        first it finds and then short circuit. This may not match the default
        value presented on the SoftLayer ordering portal. Additionally, this
-       method will return None if there are no free items in the category.
+       method will return None if there are no fee items in the category.
 
-    :returns: Returns the price ID of the first free item it finds or None
+    :returns: Returns the price ID of the first fee item it finds or None
               if there are no free items.
     """
     if category not in package_options['categories']:
