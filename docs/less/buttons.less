@@ -1,0 +1,121 @@
+/* =========================
+   Buttons
+   ========================= */
+
+// Button font size
+// -------------------------
+
+@button-font-size-normal: @font-size-medium;
+@button-font-size-large: @font-size-normal;
+@button-font-size-small: @font-size-small;
+
+// Button Types
+// -------------------------
+
+// Normal buttons
+
+.button {
+    .button-size(@padding-vertical; @padding-horizontal-normal; @button-font-size-normal; @line-height-normal; @border-radius-normal);
+    .button-variant(@button-default-color; @button-default-bg; @button-default-border; @button-default-hover);
+    .transition-duration(.5s);
+    .transition-property(all);
+    display: inline-block;
+    font-family: @font-family-humanist-sans;
+    font-weight: @font-weight-normal;
+    text-align: center;
+    letter-spacing: @letter-spacing-normal;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid transparent;
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+        color: @button-default-hover;
+        text-decoration: none;
+        outline: none;
+    }
+
+    // Solid buttons
+
+    &.solid {
+        .solid-button-variant(@solid-button-default-color; @solid-button-default-bg; @solid-button-default-border);
+    }
+}
+
+// Variants
+// -------------------------
+
+// Normal variants
+
+.gray  {.button-variant(@button-gray-color; @button-gray-bg; @button-gray-border; @button-gray-hover);}
+.red   {.button-variant(@button-red-color; @button-red-bg; @button-red-border; @button-red-hover);}
+.blue  {.button-variant(@button-blue-color; @button-blue-bg; @button-blue-border; @button-blue-hover);}
+.green {.button-variant(@button-green-color; @button-green-bg; @button-green-border; @button-green-hover);}
+.white {.button-variant(@button-white-color; @button-white-bg; @button-white-border; @button-white-hover);}
+
+// Solid variants
+
+.solid       {.solid-button-variant(@solid-button-default-color; @solid-button-default-bg; @solid-button-default-border);}
+.solid-gray  {.solid-button-variant(@solid-button-gray-color; @solid-button-gray-bg; @solid-button-gray-border);}
+.solid-red   {.solid-button-variant(@solid-button-red-color; @solid-button-red-bg; @solid-button-red-border);}
+.solid-blue  {.solid-button-variant(@solid-button-blue-color; @solid-button-blue-bg; @solid-button-blue-border);}
+.solid-green {.solid-button-variant(@solid-button-green-color; @solid-button-green-bg; @solid-button-green-border);}
+.solid-white {.solid-button-variant(@solid-button-white-color; @solid-button-white-bg; @solid-button-white-border);}
+
+// Button sizes
+// -------------------------
+
+.large {
+    .button-size(@padding-vertical; @padding-horizontal-large; @button-font-size-large; @line-height-xxlarge; @border-radius-normal);
+    letter-spacing: @letter-spacing-large;
+}
+
+.small {
+    .button-size(@padding-vertical; @padding-horizontal-small; @button-font-size-small; @line-height-xlarge; @border-radius-normal);
+}
+
+// Button icons
+// -------------------------
+
+.more {
+    &:after {
+        .opacity(.5);
+        font-family: FontAwesome;
+        font-size: 11px;
+        content: "\00a0 \00a0 \f054";
+    }
+}
+
+#top {
+    .opacity(.15);
+    .transition(.5s);
+    position: fixed;
+    right: 12px;
+    bottom: 16px;
+    padding: 13px;
+    line-height: 0;
+    color: @button-top-color-inner;
+    text-decoration: none;
+    visibility: hidden;
+    background-color: @button-top-bg;
+    border-radius: @border-radius-normal;
+    &>:hover,
+    &>:focus {
+        .opacity(1);
+        color: @gray20;
+    }
+}
+
+@media (min-width: @view-lg) {
+    #top {
+        .opacity(.4);
+        font-size: 21px;
+        color: @button-top-color;
+        background-color: transparent;
+        &>:hover {
+            bottom: 30px;
+        }
+    }
+}

@@ -1,0 +1,130 @@
+/* =========================
+   Base
+   ========================= */
+
+// Body
+// -------------------------
+
+body {
+    position: relative;
+    left: 0;
+    overflow-x: hidden;
+    font-family: @font-family-sans;
+    font-size: @font-size-normal;
+    font-weight: @font-weight-normal;
+    line-height: @line-height-normal;
+    color: @text-color;
+    background-color: @body-bg;
+}
+
+// Links
+// -------------------------
+
+a {
+    .transition-duration(.5s);
+    color: @link-color;
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+        color: @link-hover-color;
+    }
+}
+
+// Paragraph
+// -------------------------
+
+p {
+    margin: 0 0 @base-variable-normal;
+}
+
+// Lists
+// -------------------------
+
+ul,
+ol {
+    margin-top: 0;
+    margin-bottom: @base-variable-large;
+
+    ul,
+    ol {
+        margin-bottom: 0;
+    }
+
+    li > p {
+        margin-bottom: 0;
+    }
+}
+
+dl {
+    margin-bottom: @base-variable-normal;
+}
+
+dt {
+    font-size: 15.5px;
+    font-weight: @font-weight-bold;
+}
+
+dd {
+    margin-left: 0;
+}
+
+dt,
+dd {
+    line-height: @line-height-normal;
+}
+
+// Text decoration
+// -------------------------
+
+u {
+    .underline-text();
+    text-decoration: none;
+}
+
+// Horizontal rule
+// -------------------------
+
+hr {
+    border-top: 1px solid @hr-color;
+    width: (@base-variable * 5);
+    margin: (@base-variable * 2) auto;
+    &.full-screen {
+        width: initial;
+        margin: @base-variable-large 0;
+    }
+}
+
+// Display components
+// -------------------------
+
+.hidden {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+// Positioning
+// -------------------------
+
+.pull-right {
+    float: right !important;
+}
+
+.pull-left {
+    float: left !important;
+}
+
+// Margins
+// -------------------------
+
+.margins {
+    padding-top: (@base-variable * 5.5);
+    padding-bottom: (@base-variable * 3);
+}
+
+@media (min-width: @view-sm) {
+    .margins {
+        padding-top: (@base-variable * 7);
+        padding-bottom: (@base-variable * 4);
+    }
+}

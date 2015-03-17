@@ -1,0 +1,20 @@
+{% if page.header != null %}
+
+<footer class="footer" role="contentinfo">
+<div class="container">
+<div class="row">
+<div class="col-lg-11 col-lg-offset-1 col-md-12">
+
+    <p>
+    Developed by <a href="{{site.github.owner_url}}" target="_blank">{{site.owner.name}}</a>, with help from <a href="{{site.github.contributors}}" target="_blank">our contributors</a>.
+    </p>
+    <p>
+    Code and documentation licensed under the terms of the <a href="{{site.license.www}}" target="_blank">{{site.license.type}} License</a>.
+    </p>
+
+</div>
+</div>
+</div>
+</footer>
+
+{% endif %}

@@ -1,0 +1,30 @@
+/* =========================
+   Footer
+   ========================= */
+
+footer {
+    padding-top: (ceil(@base-variable * 1.25));
+    padding-bottom: (ceil(@base-variable * 1.25));
+    font-size: @font-size-medium;
+    background: @body-bg;
+    border-top: 1px solid @footer-border;
+
+    a {
+        color: @footer-color;
+    }
+
+    a:hover,
+    a:focus {
+        color: @footer-hover;
+    }
+
+    p {
+        margin-bottom: 0;
+        line-height: @line-height-normal;
+        color: @footer-color;
+    }
+}
+
+.footer-buttons {
+    padding-bottom: 8px;
+}

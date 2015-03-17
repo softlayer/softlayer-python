@@ -1,0 +1,97 @@
+#
+# * Config
+# * Stores static configuration and project info
+# *
+# * Copyright © SoftLayer, an IBM Company
+# * Released under the MIT license
+#
+
+# ==============================
+# Project
+# ==============================
+
+project:
+    name:           Python CLI
+    alias:          Python Client
+    tagline:        Put your resources to work effortlessly from the command line
+    version:        2.4.0  # framework version (not the product version)
+
+# ==============================
+# Owner (An individual, group, or company)
+# ==============================
+
+owner:
+    name:           "SoftLayer, an IBM Company"  # wrap in quotes whenever punctuation is used
+    www:            http://www.softlayer.com
+    twitter:        SoftLayerDevs
+    freenode:       "#softlayer"
+
+# ==============================
+# License
+# ==============================
+
+license:
+    type:           MIT
+    www:            https://raw.githubusercontent.com/softlayer/softlayer-python/master/LICENSE
+
+# ==============================
+# Markdown
+# ==============================
+
+highlighter:        pygments
+markdown:           redcarpet
+redcarpet:
+    extensions:     ["autolink",
+                     "fenced_code_blocks",
+                     "lax_spacing",
+                     "smart",
+                     "strikethrough",
+                     "superscript",
+                     "tables",
+                     "underline",
+                     "with_toc_data"]
+
+# ==============================
+# Server
+# ==============================
+
+baseurl:            /softlayer-python
+permalink:          pretty
+exclude:            [".gitignore",
+                     "Gemfile",
+                     "Gruntfile.js",
+                     "plugins",
+                     "less",
+                     "node_modules",
+                     "package.json",
+                     "assets/packages"
+                    ]
+gems:
+  - jekyll-sitemap
+  - jekyll-gist
+
+# ==============================
+# Analytics
+# ==============================
+
+google:
+    id:             UA-40037365-3
+
+# ==============================
+# GitHub
+# ==============================
+
+github:
+    fork:           http://github.com/softlayer/softlayer-python/fork
+    star:           http://github.com/softlayer/softlayer-python/stargazers
+    watch:          http://github.com/softlayer/softlayer-python/watchers
+    contributors:   http://github.com/softlayer/softlayer-python/contributors
+    pulls:          http://github.com/softlayer/softlayer-python/pulls
+
+    download:
+        tarball:    https://github.com/softlayer/softlayer-python/tarball/master
+        zipball:    https://github.com/softlayer/softlayer-python/zipball/master
+
+    clone:
+        https:      https://github.com/softlayer/softlayer-python.git
+        ssh:        git@github.com:softlayer/softlayer-python.git

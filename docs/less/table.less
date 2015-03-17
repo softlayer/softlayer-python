@@ -1,0 +1,48 @@
+/* =========================
+   Table
+   ========================= */
+
+table {
+    display: block;
+    max-width: 100%;
+    margin: @base-variable-normal 0 @base-variable;
+    overflow-x: scroll;
+    overflow-y: hidden;
+
+    > thead {
+        color: @table-text-accent;
+        background-color: @table-bg-accent;
+        border-top: 1px solid @table-border-color;
+        border-right: 1px solid @table-border-color;
+        border-bottom: 1px solid @table-border-color;
+        border-left: 1px solid @table-border-color;
+
+        > tr {
+            > th {
+                border-left: 1px solid @table-border-color;
+            }
+            > th,
+              td {
+                padding: @padding-table-cell;
+                white-space: nowrap;
+            }
+        }
+    }
+
+    > tbody {
+        overflow-x: auto;
+        > tr {
+            > th,
+              td {
+                padding: @padding-table-cell;
+                border: 1px solid @table-border-color;
+            }
+        }
+    }
+}
+
+@media (min-width: @view-md) {
+    table {
+        display: table;
+    }
+}

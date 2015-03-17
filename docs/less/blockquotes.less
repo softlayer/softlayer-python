@@ -1,0 +1,90 @@
+/* =========================
+   Blockquotes
+   ========================= */
+
+blockquote {
+    padding: @padding-blockquote;
+    margin: 0 0 20px;
+    color: @blockquote-color;
+
+    p {
+        padding-right: 60px;
+        font-size: 17px;
+        font-weight: @font-weight-light;
+        line-height: @line-height-large;
+        &:before {
+            .opacity(.2);
+            display: block;
+            margin-top: -8px;
+            font-family: FontAwesome;
+            font-size: 34px;
+            color: @blockquote-icon;
+            content: "\f075 \00a0";
+        }
+    }
+
+    p,
+    ul,
+    ol {
+        display: -webkit-inline-box;
+        &:first-child {
+            margin-top: 0;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        code,
+        samp {
+            font-size: @font-size-medium;
+            color: @blockquote-code;
+        }
+    }
+}
+
+// Quote
+// -------------------------
+
+q {
+    padding: @padding-quote;
+    margin: 0;
+    font-family: @font-family-serif;
+    font-size: 17.5px;
+    line-height: @line-height-large;
+    color: @quote-color;
+
+    p {
+        &:before {
+            .opacity(.15);
+            display: block;
+            margin-top: -12px;
+            font-family: FontAwesome;
+            font-size: 30px;
+            content: "\f10d \00a0";
+        }
+    }
+
+    p,
+    ul,
+    ol {
+        display: -webkit-inline-box;
+        &:first-child {
+            margin-top: 0;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    small, .small {
+        display: block;
+        padding-left: 35px;
+        font-family: @font-family-serif;
+        color: @quote-small-color;
+        &:before {
+            content: "\2014 \00a0";
+        }
+    }
+}

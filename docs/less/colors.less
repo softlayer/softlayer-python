@@ -1,0 +1,243 @@
+/* =========================
+   Colors
+   ========================= */
+
+// Color palette
+// -------------------------
+
+@white:                     #ffffff;
+@gray:                      #7b807c;
+@blue:                      #4073bd;
+@red:                       #dd0224;
+@green:                     #1abd6c;
+@black:                     #151515;
+
+@default:                   #3c464c;
+
+// Base colors
+// -------------------------
+
+@base90:                    #f8f8f8;
+@base80:                    #f0f0f0;
+@base70:                    #dadada;
+@base60:                    #bababa;
+@base50:                    #aaaaaa;
+@base40:                    #777777;
+@base30:                    #555555;
+@base20:                    #333333;
+@base10:                    #222222;
+
+// Grayscale
+// -------------------------
+
+@gray90:                    rgba(0,0,0,0.025);
+@gray80:                    rgba(0,0,0,0.04);
+@gray70:                    rgba(0,0,0,0.1);
+@gray60:                    rgba(0,0,0,0.3);
+@gray50:                    rgba(0,0,0,0.35);
+@gray40:                    rgba(0,0,0,0.55);
+@gray30:                    rgba(0,0,0,0.65);
+@gray20:                    rgba(0,0,0,0.75);
+@gray10:                    rgba(0,0,0,0.8);
+
+// Base
+// -------------------------
+
+@body-bg:                   @white;
+@text-color:                @black;
+@text-darken:               @gray30;
+@text-lighten:              @gray50;
+
+@link-color:                @blue;
+@link-hover-color:          darken(@link-color, 8%);
+
+@hr-color:                  @gray70;
+
+// Typography
+// -------------------------
+
+@headings-color:            @black;
+@headings-color-small:      @gray50;
+
+// Footer
+// -------------------------
+
+@footer-color:              @gray;
+@footer-border:             @gray80;
+@footer-hover:              @gray10;
+
+// Nav
+// -------------------------
+
+@nav-bg:                    @base10;
+@nav-color:                 @base80;
+@nav-links:                 @white;
+@nav-footer-text:           @base40;
+
+@nav-toggle:                @white;
+@nav-toggle-pages:          @gray70;
+
+@nav-divider:               @base20;
+
+@subnav-color:              @gray;
+@subnav-active-color:       @gray10;
+
+// Intro
+// -------------------------
+
+@page-header-color:         @gray20;
+@page-intro-color:          @gray;
+
+@featured-header-color:     @gray30;
+@featured-subheader-color:  @gray50;
+@featured-intro-color:      @gray50;
+
+// Panels
+// -------------------------
+
+@panel-border-color:        @gray60;
+@panel-example-color:       @gray60;
+
+// Social
+// -------------------------
+
+@social-icon-color:         @gray70;
+
+// Blockquotes
+// -------------------------
+
+@blockquote-color:          @gray40;
+@blockquote-icon:           @gray40;
+@blockquote-code:           @gray30;
+
+@quote-color:               @gray50;
+@quote-small-color:         @gray60;
+
+// Table
+// -------------------------
+
+@table-bg-accent:           @base80;
+@table-bg-accent-color:     @base20;
+@table-text-accent:         @base20;
+@table-border-color:        @base70;
+
+// Code
+// -------------------------
+
+@code-bg:                   @gray90;
+@code-color:                @black;
+@code-border-color:         @gray70;
+
+@samp-color:                @gray30;
+
+@pre-bg:                    @gray90;
+@pre-color:                 @black;
+@pre-border-color:          @gray70;
+
+@output-color:              @black;
+
+// Hero
+// -------------------------
+
+@hero-bg:                   @black;
+@hero-color:                @white;
+@hero-tagline-color:        @base70;
+@hero-version-color:        @base70;
+
+// Banner
+// -------------------------
+
+@banner-color:              @gray30;
+@banner-paragraph:          @gray50;
+
+@banner-icon-large:         @base30;
+@banner-icon-small:         @gray70;
+@banner-icon-hover:         @blue;
+
+@banner-links:              @gray50;
+@banner-links-hover:        @blue;
+
+// Profile
+// -------------------------
+
+@profile-bg:                @white;
+@profile-repo-bg:           @white;
+@profile-repo-border:       @gray70;
+
+@profile-repo-color:        @gray40;
+@profile-repo-header-color: @gray40;
+@profile-repo-footer-color: @gray50;
+@profile-repo-footer-bg:    @gray80;
+
+// Components
+// -------------------------
+
+@component-active-color:    @base90;
+@component-active-bg:       @gray;
+
+// Buttons
+// -------------------------
+
+// Top
+
+@button-top-bg:             @base20;
+@button-top-color:          @base50;
+@button-top-color-inner:    @white;
+
+// Normal
+
+@button-default-color:      @default;
+@button-default-bg:         transparent;
+@button-default-border:     lighten(@default, 8%);
+@button-default-hover:      @white;
+
+@button-gray-color:         @gray;
+@button-gray-bg:            transparent;
+@button-gray-border:        lighten(@gray, 12%);
+@button-gray-hover:         @white;
+
+@button-red-color:          @red;
+@button-red-bg:             transparent;
+@button-red-border:         lighten(@red, 8%);
+@button-red-hover:          @white;
+
+@button-blue-color:         @blue;
+@button-blue-bg:            transparent;
+@button-blue-border:        lighten(@blue, 8%);
+@button-blue-hover:         @white;
+
+@button-green-color:        @green;
+@button-green-bg:           transparent;
+@button-green-border:       lighten(@green, 8%);
+@button-green-hover:        @white;
+
+@button-white-color:        @white;
+@button-white-bg:           rgba(182,183,183,0.8);
+@button-white-border:       rgba(247,247,248,0.8);
+@button-white-hover:        @white;
+
+// Solid
+
+@solid-button-default-color:   @white;
+@solid-button-default-bg:      @default;
+@solid-button-default-border:  @default;
+
+@solid-button-gray-color:      @white;
+@solid-button-gray-bg:         @gray;
+@solid-button-gray-border:     @gray;
+
+@solid-button-red-color:       @white;
+@solid-button-red-bg:          @red;
+@solid-button-red-border:      @red;
+
+@solid-button-blue-color:      @white;
+@solid-button-blue-bg:         @blue;
+@solid-button-blue-border:     @blue;
+
+@solid-button-green-color:     @white;
+@solid-button-green-bg:        @green;
+@solid-button-green-border:    @green;
+
+@solid-button-white-color:     @gray;
+@solid-button-white-bg:        @white;
+@solid-button-white-border:    @white;

@@ -1,0 +1,94 @@
+/* =========================
+   Custom
+   ========================= */
+
+.hero-alias {
+    padding: 32px 0 100px;
+    text-align: center;
+    background-color: @hero-bg;
+    background: url("../../assets/images/mobile-bg.png");
+    background-repeat: repeat;
+}
+
+.hero-image-alias {
+    display: none;
+}
+
+.banner-alias {
+    background-color: transparent;
+     width: 100%;
+    height: auto;
+    text-align: center;
+
+    h3 {
+        color: @white !important;
+        padding: 24px 0 6px;
+        margin: 0;
+        font-family: @font-family-humanist-sans;
+        font-size: 24px;
+        font-weight: @font-weight-light !important;
+        letter-spacing: @letter-spacing-large;
+    }
+
+    p {
+        color: @white;
+        font-size: 17px;
+        font-weight: @font-weight-light !important;
+    }
+}
+
+i#banner-slot-one-alias,
+i#banner-slot-two-alias {
+    .transition(color .5s);
+    font-size: 88px;
+    color: @base90;
+    &:hover,
+    &:focus {
+        color: @base60;
+    }
+}
+
+i#banner-icon-slot-one-alias,
+i#banner-icon-slot-two-alias {
+    font-size: 15px;
+    color: @base70;
+}
+
+@media (min-width: @view-sm) {
+    .hero-alias {
+        position: fixed;
+        z-index: -1000;
+        min-width: 100%;
+        min-height: 100%;
+        padding-bottom: 0;
+        padding-top: 170px;
+        background: -webkit-linear-gradient(rgba(0,0,0,.4), rgba(0,0,0,.2)), url("../../assets/images/landing-bg-alias.jpg");
+        background:    -moz-linear-gradient(rgba(0,0,0,.4), rgba(0,0,0,.2)), url("../../assets/images/landing-bg-alias.jpg");
+        background:         linear-gradient(rgba(0,0,0,.4), rgba(0,0,0,.2)), url("../../assets/images/landing-bg-alias.jpg");
+        background-repeat: no-repeat;
+        -webkit-background-size: cover;
+           -moz-background-size: cover;
+                background-size: cover;
+    }
+
+    .hero-image-alias {
+        position: inherit;
+        display: inline;
+        right: 208px;
+        top: 108px;
+    }
+}
+
+@media (min-width: @view-md) {
+    i#banner-slot-one-alias,
+    i#banner-slot-two-alias {
+        font-size: 110px;
+    }
+}
+
+@media (min-width: @view-sm) {
+    .banner-alias h3 {
+        padding-bottom: 12px;
+        font-size: 27px;
+    }
+}

@@ -1,0 +1,15 @@
+<!-- Nav Items -->
+<!-- Creates links for pages with "layout: pages" frontmatter -->
+{% assign nav-items = site.pages %}
+{% for node in nav-items %}
+    {% if node.header != null %}
+        {% if node.layout == "pages" %}
+
+        <a class="nav-item{% if page.url == node.url %} active {% endif %}" href="{{site.baseurl}}{{node.url}}">
+            <i class="fa fa-chevron-right fa-fw"></i> {{node.header}}
+        </a>
+
+        {% endif %}
+    {% endif %}
+{% endfor %}
+<!-- End Nav Items -->

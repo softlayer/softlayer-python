@@ -1,0 +1,108 @@
+{% if page.header == null %}
+{% if page.title == "index" %}
+
+<img class="logo" src="{{page.baseurl}}assets/images/logo.png" height="88" width="181" alt="SoftLayer, an IBM Company">
+
+<a class="toggle" id="toggle-element" href="#"> <!-- toggle.js -->
+    <i class="fa fa-bars"></i>
+    <p class="nav-icon">
+        <i class="fa fa-caret-right" id="icon-element"></i>
+    </p>
+</a>
+
+<nav class="nav" id="nav-element" role="navigation">
+<div class="nav-wrapper">
+
+        <a class="nav-item{% if page.url == "/" %} active {% endif %}" href="{{page.baseurl}}"><i class="fa fa-home fa-fw"></i> Home</a>
+        <a class="nav-item" href="//softlayer-python.readthedocs.org/en/latest/install.html#installation" target="_blank"><i class="fa fa-chevron-right fa-fw"></i> Getting Started</a>
+        <a class="nav-item" href="//softlayer-python.readthedocs.org/en/latest/dev/index.html#contribution-guide" target="_blank"><i class="fa fa-chevron-right fa-fw"></i> Contribution Guide</a>
+        <a class="nav-item" href="{{page.baseurl}}cli"><i class="fa fa-chevron-right fa-fw"></i> CLI</a>
+
+    <ul class="divider"></ul>
+        <a class="nav-item" href="{{site.github.repository_url}}" target="_blank"><i class="fa fa-github-alt fa-fw"></i> Code</a>
+        <a class="nav-item" href="{{site.github.issues_url}}" target="_blank"><i class="fa fa-bug fa-fw"></i> Issues</a>
+        <a class="nav-item" href="{{site.github.releases_url}}" target="_blank"><i class="fa fa-tags fa-fw"></i> Release History</a>
+
+    <ul class="divider"></ul>
+        <a class="nav-item" href="{{site.github.star}}" target="_blank"><i class="fa fa-star fa-fw"></i> Star Our Repo</a>
+        <a class="nav-item" href="{{site.github.fork}}" target="_blank"><i class="fa fa-code-fork fa-fw"></i> Fork Our Repo</a>
+        <a class="nav-item" href="//twitter.com/{{site.owner.twitter}}" target="_blank"><i class="fa fa-twitter fa-fw"></i> @{{site.owner.twitter}}</a>
+
+    <ul class="divider"></ul>
+        <p class="nav-footer"> © {{site.time | date: "%Y"}} {{site.owner.name}}. All rights reserved.</p>
+
+</div>
+</nav>
+
+{% elsif page.title == "cli" %}
+
+<img class="logo" src="{{page.baseurl}}assets/images/logo.png" height="88" width="181" alt="SoftLayer, an IBM Company">
+
+<a class="toggle featured" id="toggle-element" href="#"> <!-- toggle.js -->
+    <i class="fa fa-bars"></i>
+    <p class="nav-icon">
+        <i class="fa fa-caret-right" id="icon-element"></i>
+    </p>
+</a>
+
+<nav class="nav" id="nav-element" role="navigation">
+<div class="nav-wrapper">
+
+        <a class="nav-item{% if page.url == "/" %} active {% endif %}" href="{{page.baseurl}}cli"><i class="fa fa-home fa-fw"></i> Home</a>
+
+        {% include handlers/items.html %}
+
+    <ul class="divider"></ul>
+        <a class="nav-item" href="{{site.github.repository_url}}" target="_blank"><i class="fa fa-github-alt fa-fw"></i> Code</a>
+        <a class="nav-item" href="{{site.github.issues_url}}" target="_blank"><i class="fa fa-bug fa-fw"></i> Issues</a>
+        <a class="nav-item" href="{{site.github.releases_url}}" target="_blank"><i class="fa fa-tags fa-fw"></i> Release History</a>
+        <a class="nav-item" href="{{page.baseurl}}"><i class="fa fa-bars fa-fw"></i> {{site.project.alias}}</a>
+
+    <ul class="divider"></ul>
+        <a class="nav-item" href="{{site.github.star}}" target="_blank"><i class="fa fa-star fa-fw"></i> Star Our Repo</a>
+        <a class="nav-item" href="{{site.github.fork}}" target="_blank"><i class="fa fa-code-fork fa-fw"></i> Fork Our Repo</a>
+        <a class="nav-item" href="//twitter.com/{{site.owner.twitter}}" target="_blank"><i class="fa fa-twitter fa-fw"></i> @{{site.owner.twitter}}</a>
+
+    <ul class="divider"></ul>
+        <p class="nav-footer"> © {{site.time | date: "%Y"}} {{site.owner.name}}. All rights reserved.</p>
+
+</div>
+</nav>
+
+{% endif %}
+{% else %}
+
+<img class="hidden" src="{{page.baseurl}}assets/images/logo.png" height="88" width="181" alt="SoftLayer, an IBM Company">
+
+<a class="toggle pages" id="toggle-element" href="#"> <!-- toggle.js -->
+    <i class="fa fa-bars"></i>
+    <p class="nav-icon">
+        <i class="fa fa-caret-right" id="icon-element"></i>
+    </p>
+</a>
+
+<nav class="nav" id="nav-element" role="navigation">
+<div class="nav-wrapper">
+
+        <a class="nav-item{% if page.url == "/" %} active {% endif %}" href="{{page.baseurl}}cli"><i class="fa fa-home fa-fw"></i> Home</a>
+
+        {% include handlers/items.html %}
+
+    <ul class="divider"></ul>
+        <a class="nav-item" href="{{site.github.repository_url}}" target="_blank"><i class="fa fa-github-alt fa-fw"></i> Code</a>
+        <a class="nav-item" href="{{site.github.issues_url}}" target="_blank"><i class="fa fa-bug fa-fw"></i> Issues</a>
+        <a class="nav-item" href="{{site.github.releases_url}}" target="_blank"><i class="fa fa-tags fa-fw"></i> Release History</a>
+        <a class="nav-item" href="{{page.baseurl}}"><i class="fa fa-bars fa-fw"></i> {{site.project.alias}}</a>
+
+    <ul class="divider"></ul>
+        <a class="nav-item" href="{{site.github.star}}" target="_blank"><i class="fa fa-star fa-fw"></i> Star Our Repo</a>
+        <a class="nav-item" href="{{site.github.fork}}" target="_blank"><i class="fa fa-code-fork fa-fw"></i> Fork Our Repo</a>
+        <a class="nav-item" href="//twitter.com/{{site.owner.twitter}}" target="_blank"><i class="fa fa-twitter fa-fw"></i> @{{site.owner.twitter}}</a>
+
+    <ul class="divider"></ul>
+        <p class="nav-footer"> © {{site.time | date: "%Y"}} {{site.owner.name}}. All rights reserved.</p>
+
+</div>
+</nav>
+
+{% endif %}

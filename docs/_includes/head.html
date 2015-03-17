@@ -1,0 +1,36 @@
+<meta http-equiv="REFRESH" content="0; url=http://softlayer-python.readthedocs.org/en/latest/index.html">
+<!--
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>
+{% if page.header == null %}
+{% if page.title == "index" %}
+    {{site.project.alias}} &middot; {{site.owner.name}}
+{% elsif page.title == "cli" %}
+    {{site.project.name}} &middot; {{site.owner.name}}
+{% endif %}
+{% else %}
+    {{page.header}} &middot; {{site.project.name}}
+{% endif %}
+</title>
+<meta name="description" content="{{site.project.tagline}}">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui">
+
+<link rel="sitemap" href="{{page.baseurl}}sitemap.xml" type="application/xml" title="Sitemap">
+<link rel="author" href="{{page.baseurl}}humans.txt">
+
+<link rel="stylesheet" href="{{page.baseurl}}assets/css/main.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css">
+
+<link rel="shortcut icon" href="{{page.baseurl}}assets/images/favicon.ico" sizes="32x32">
+<link rel="shortcut icon" href="{{page.baseurl}}assets/images/apple-touch-icon.png" sizes="196x196">
+<link rel="apple-touch-icon" href="{{page.baseurl}}assets/images/apple-touch-icon.png" sizes="144x144">
+
+<script src="//use.typekit.net/lzt3exy.js"></script>
+<script>
+    try{Typekit.load();}catch(e){}
+</script>
+
+    <!--[if lt IE 9]>
+        <p>You are using an <strong>outdated browser</strong>. Please <a href="http://browsehappy.com/">upgrade your browser</a> to a newer version or use a different browser, such as Chrome or Firefox.</p>
+    <![endif]-->

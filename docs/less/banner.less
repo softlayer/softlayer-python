@@ -1,0 +1,61 @@
+/* =========================
+   Banner
+   ========================= */
+
+.banner {
+    text-align: center;
+
+    h3 {
+        padding: 22px 0 8px;
+        margin: 0;
+        font-family: @font-family-humanist-sans;
+        font-size: 24px;
+        font-weight: @font-weight-light !important;
+        letter-spacing: @letter-spacing-large;
+        color: @banner-color !important;
+    }
+
+    p {
+        font-size: 17px;
+        font-weight: @font-weight-light !important;
+        color: @banner-paragraph;
+    }
+}
+
+.banner-wrapper {
+    padding-top: 48px;
+    padding-bottom: 0;
+    &:last-child {
+        padding-bottom: 56px;
+    }
+}
+
+i#banner-slot-one,
+i#banner-slot-two,
+i#banner-slot-three {
+    .transition(color .5s);
+    font-size: 154px;
+    color: @banner-icon-large;
+    &:hover,
+    &:focus {
+        color: @banner-icon-hover;
+    }
+}
+
+i#banner-icon-slot-one,
+i#banner-icon-slot-two,
+i#banner-icon-slot-three {
+    font-size: 15px;
+    color: @banner-icon-small;
+}
+
+@media (min-width: @view-sm) {
+    .banner h3 {
+        padding-bottom: 12px;
+        font-size: 27px;
+    }
+
+    .banner-wrapper {
+        padding-bottom: 56px;
+    }
+}

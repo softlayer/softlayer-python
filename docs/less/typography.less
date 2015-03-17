@@ -1,0 +1,99 @@
+/* =========================
+   Typography
+   ========================= */
+
+// Font family
+// -------------------------
+
+@font-family-sans:            "Helvetica Neue", Helvetica, sans-serif;
+@font-family-humanist-sans:   "JAF-Bernino-Sans", "Lucida Sans", Verdana, sans-serif;
+@font-family-serif:           Georgia, Palatino, serif;
+@font-family-monospace:       Menlo, Consolas, monospace;
+
+// Font sizes
+// -------------------------
+
+@font-size-normal:            15px;
+
+@font-size-large:             17.5px;
+@font-size-medium:            13.5px;
+@font-size-small:             12.5px;
+@font-size-xsmall:            11.5px;
+
+@font-size-h1:                30px;
+@font-size-h2:                25px;
+@font-size-h3:                22.5px;
+@font-size-h4:                19px;
+
+// Font weight
+// -------------------------
+
+@font-weight-light:           300;
+@font-weight-normal:          400;
+@font-weight-bold:            700;
+
+// Letter spacing
+// -------------------------
+
+@letter-spacing-normal:       -.02em;
+@letter-spacing-large:        -.04em;
+@letter-spacing-small:        -.01em;
+
+// Headings
+// -------------------------
+
+h1 {
+    margin: (ceil(@font-size-h1 * @line-height-xlarge)) 0 5px;
+    letter-spacing: @letter-spacing-large;
+    font-weight: @font-weight-normal;
+    font-size: @font-size-h1;
+}
+
+h2 {
+    margin: (ceil(@font-size-h2 * @line-height-xlarge)) 0 3px;
+    letter-spacing: @letter-spacing-large;
+    font-weight: @font-weight-bold;
+    font-size: @font-size-h2;
+}
+
+h3 {
+    margin: (ceil(@font-size-h3 * @line-height-xlarge)) 0 4px;
+    font-weight: @font-weight-normal;
+    letter-spacing: @letter-spacing-large;
+    font-size: @font-size-h3;
+}
+
+h4 {
+    margin: (ceil(@font-size-h4 * @line-height-xlarge)) 0 4px;
+    font-weight: @font-weight-bold;
+    letter-spacing: @letter-spacing-normal;
+    font-size: @font-size-h4;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    color: @headings-color;
+    font-family: @font-family-humanist-sans;
+    line-height: @line-height-xsmall;
+    small {
+        color: @headings-color-small;
+        font-weight: @font-weight-normal;
+    }
+}
+
+// Emphasis
+// -------------------------
+
+h1 {
+    small {
+        font-size: 70%;
+    }
+}
+
+h2 {
+    small {
+        font-size: 80%;
+    }
+}

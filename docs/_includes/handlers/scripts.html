@@ -1,0 +1,43 @@
+<!-- JavaScript -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.2/modernizr.min.js"></script>
+<script src="{{page.baseurl}}assets/js/main.js"></script>
+
+{% if page.header != null %}
+    <script>
+        $(document).ready(function() {
+            $(".indexing").indexing(); // onDomready for indexing.js
+            $(".content").readEstimate(); // onDomready for readability.js
+        });
+    </script>
+{% endif %}
+
+<!-- Universal Analytics -->
+<!-- Enabled if a domain and ID are added to "config.yml" -->
+{% if site.google.id != "UA-XXXXXXXX-X" %}
+
+    <script>
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+        e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+        e.src="//www.google-analytics.com/analytics.js";
+        r.parentNode.insertBefore(e,r)}(window,document,"script","ga"));
+        ga("create","{{site.google.id}}");ga("send","pageview");
+
+    $(function() { // Tracks page scroll events for Universal Analytics
+        var isDuplicateScrollEvent,
+        scrollTimeStart = new Date(),
+        $window         = $(window),
+        $document       = $(document),scrollPercent;
+
+        $window.scroll(function() {
+            scrollPercent = Math.round(100 * ($window.height() + $window.scrollTop()) / $document.height());
+            if (scrollPercent > 70 && !isDuplicateScrollEvent) { // page scroll to 70%
+                isDuplicateScrollEvent = 1;ga("send","event","scroll","Window: " + $window.height() + "px; Document: " + $document.height() + "px; Time: " + Math.round((new Date() - scrollTimeStart) / 1000, 1) + "s");
+            }
+        });
+    });
+    </script>
+
+{% endif %}
+<!-- End Universal Analytics -->
