@@ -112,11 +112,9 @@ class XmlRpcTransport(object):
 
             largs.insert(0, {'headers': headers})
 
-            interpreter_version = sys.version_info[0]
-
             # In Python 2 xmlrpc_client.dumps(...) does not
             # automatically perform base64 encoding.
-            if interpreter_version < 3:
+            if sys.version_info[0] < 3:
                 for index, dictionary in enumerate(largs):
                     if 'data' in dictionary:
                         data = dictionary['data']
