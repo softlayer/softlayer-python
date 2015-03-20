@@ -8,12 +8,16 @@
 from SoftLayer import exceptions
 from SoftLayer import utils
 
+import base64
+
 import importlib
 import json
 import logging
 import time
 
 import requests
+
+import sys
 
 LOGGER = logging.getLogger(__name__)
 # transports.Request does have a lot of instance attributes. :(
@@ -107,6 +111,17 @@ class XmlRpcTransport(object):
                 }
 
             largs.insert(0, {'headers': headers})
+
+            interpreter_version = sys.version_info[0]
+
+            # In Python 2 xmlrpc_client.dumps(...) does not
+            # automatically perform base64 encoding.
+            if interpreter_version < 3:
+                for dictionary in largs:
+                    if 'data' in dictionary:
+                        data = largs[1]['data']
+                        largs[1]['data'] = base64.b64encode(data)
+                        break
 
             url = '/'.join([request.endpoint, request.service])
             payload = utils.xmlrpc_client.dumps(tuple(largs),
