@@ -117,10 +117,10 @@ class XmlRpcTransport(object):
             # In Python 2 xmlrpc_client.dumps(...) does not
             # automatically perform base64 encoding.
             if interpreter_version < 3:
-                for dictionary in largs:
+                for index, dictionary in enumerate(largs):
                     if 'data' in dictionary:
-                        data = largs[1]['data']
-                        largs[1]['data'] = base64.b64encode(data)
+                        data = dictionary['data']
+                        largs[index]['data'] = base64.b64encode(data)
                         break
 
             url = '/'.join([request.endpoint, request.service])
