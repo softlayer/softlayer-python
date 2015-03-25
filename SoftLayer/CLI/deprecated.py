@@ -4,14 +4,12 @@
     Handles usage of the deprecated command name, 'sl'.
     :license: MIT, see LICENSE for more details.
 """
+from __future__ import print_function
 import sys
 
-import click
 
-
-@click.command()
 def main():
     """Main function for the deprecated 'sl' command."""
-    click.echo("ERROR: Use the 'slcli' command instead.", err=True)
-    click.echo("> slcli %s" % ' '.join(sys.argv[1:]), err=True)
+    print("ERROR: Use the 'slcli' command instead.", file=sys.stderr)
+    print("> slcli %s" % ' '.join(sys.argv[1:]), file=sys.stderr)
     exit(-1)
