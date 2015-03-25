@@ -131,7 +131,7 @@ class APIClient(testing.TestCase):
         _iter_call.assert_called_with('SERVICE', 'METHOD', 'ARG')
 
     @mock.patch('SoftLayer.API.Client.iter_call')
-    def test_service_iter_call(self, _iter_call):
+    def test_service_iter_call_with_chunk(self, _iter_call):
         self.client['SERVICE'].iter_call('METHOD', 'ARG', chunk=2)
         _iter_call.assert_called_with('SERVICE', 'METHOD', 'ARG', chunk=2)
 
