@@ -188,18 +188,21 @@ class Client(object):
 
     __call__ = call
 
-    def iter_call(self, service, method,
-                  chunk=100, limit=None, offset=0, *args, **kwargs):
+    def iter_call(self, service, method, *args, **kwargs):
         """A generator that deals with paginating through results.
 
         :param service: the name of the SoftLayer API service
         :param method: the method to call on the service
-        :param integer chunk: result size for each API call
+        :param integer chunk: result size for each API call (defaults to 100)
         :param \\*args: same optional arguments that ``Service.call`` takes
         :param \\*\\*kwargs: same optional keyword arguments that
                            ``Service.call`` takes
 
         """
+        chunk = kwargs.pop('chunk', 100)
+        limit = kwargs.pop('limit', None)
+        offset = kwargs.pop('offset', 0)
+
         if chunk <= 0:
             raise AttributeError("Chunk size should be greater than zero.")
 
@@ -217,6 +220,7 @@ class Client(object):
                 # Don't over-fetch past the given limit
                 if chunk + result_count > limit:
                     chunk = limit - result_count
+
             results = self.call(service, method,
                                 offset=offset, limit=chunk, *args, **kwargs)
 
