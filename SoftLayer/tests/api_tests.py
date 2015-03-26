@@ -43,15 +43,6 @@ class Inititialization(testing.TestCase):
 
 
 class ClientMethods(testing.TestCase):
-    def test_help(self):
-        help(SoftLayer)
-        help(SoftLayer.Client)
-        client = SoftLayer.Client(
-            username='doesnotexist',
-            api_key='issurelywrong'
-        )
-        help(client)
-        help(client['SERVICE'])
 
     def test_repr(self):
         client = SoftLayer.Client(
