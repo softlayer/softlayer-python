@@ -127,8 +127,13 @@ class APIClient(testing.TestCase):
 
     @mock.patch('SoftLayer.API.Client.iter_call')
     def test_service_iter_call(self, _iter_call):
-        self.client['SERVICE'].iter_call('METHOD')
-        _iter_call.assert_called_with('SERVICE', 'METHOD')
+        self.client['SERVICE'].iter_call('METHOD', 'ARG')
+        _iter_call.assert_called_with('SERVICE', 'METHOD', 'ARG')
+
+    @mock.patch('SoftLayer.API.Client.iter_call')
+    def test_service_iter_call_with_chunk(self, _iter_call):
+        self.client['SERVICE'].iter_call('METHOD', 'ARG', chunk=2)
+        _iter_call.assert_called_with('SERVICE', 'METHOD', 'ARG', chunk=2)
 
     @mock.patch('SoftLayer.API.Client.call')
     def test_iter_call(self, _call):
@@ -176,12 +181,17 @@ class APIClient(testing.TestCase):
 
         # chunk=25, limit=30, offset=12
         _call.side_effect = [list(range(0, 25)), list(range(25, 30))]
-        result = list(self.client.iter_call(
-            'SERVICE', 'METHOD', iter=True, limit=30, chunk=25, offset=12))
+        result = list(self.client.iter_call('SERVICE', 'METHOD', 'ARG',
+                                            iter=True,
+                                            limit=30,
+                                            chunk=25,
+                                            offset=12))
         self.assertEqual(list(range(30)), result)
         _call.assert_has_calls([
-            mock.call('SERVICE', 'METHOD', iter=False, limit=25, offset=12),
-            mock.call('SERVICE', 'METHOD', iter=False, limit=5, offset=37),
+            mock.call('SERVICE', 'METHOD', 'ARG',
+                      iter=False, limit=25, offset=12),
+            mock.call('SERVICE', 'METHOD', 'ARG',
+                      iter=False, limit=5, offset=37),
         ])
 
         # Chunk size of 0 is invalid
