@@ -268,7 +268,27 @@ class HardwareManager(utils.IdentifierMixin, object):
         return func(speed, id=hardware_id)
 
     def place_order(self, **kwargs):
-        """Places an order for a piece of hardware."""
+        """Places an order for a piece of hardware.
+
+        See get_create_options() for valid arguments.
+
+        :param string size: server size name
+        :param string hostname: server hostname
+        :param string domain: server domain name
+        :param string location: location (datacenter) name
+        :param string os: operating system name
+        :param int port_speed: Port speed in Mbps
+        :param list ssh_keys: list of ssh key ids
+        :param int public_vlan: public vlan id
+        :param int private_vlan: private vlan id
+        :param string post_uri: The URI of the post-install script to run
+                                after reload
+        :param boolean hourly: True if using hourly pricing (default).
+                               False for monthly.
+        :param boolean no_public: True if this server should only have private
+                                  interfaces
+        :param list extras: List of extra feature names
+        """
         create_options = self._generate_create_dict(**kwargs)
         return self.client['Product_Order'].placeOrder(create_options)
 
