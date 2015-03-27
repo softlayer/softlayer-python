@@ -126,6 +126,9 @@ ALL_ROUTES = [
 
     ('metadata', 'SoftLayer.CLI.metadata:cli'),
 
+    ('monitor', 'SoftLayer.CLI.monitor'),
+    ('monitor:status', 'SoftLayer.CLI.monitor.status:cli'),
+
     ('nas', 'SoftLayer.CLI.nas'),
     ('nas:list', 'SoftLayer.CLI.nas.list:cli'),
     ('nas:credentials', 'SoftLayer.CLI.nas.credentials:cli'),
