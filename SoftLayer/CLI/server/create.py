@@ -12,8 +12,8 @@ import click
 
 
 @click.command(epilog="""See 'sl server create-options' for valid options.""")
-@click.option('--domain', '-D', help="Domain portion of the FQDN")
 @click.option('--hostname', '-H', help="Host portion of the FQDN")
+@click.option('--domain', '-D', help="Domain portion of the FQDN")
 @click.option('--size', '-s', help="Hardware size")
 @click.option('--os', '-o', help="OS install code")
 @click.option('--datacenter', '-d', help="Datacenter shortname")
