@@ -142,7 +142,6 @@ ALL_ROUTES = [
     ('server:detail', 'SoftLayer.CLI.server.detail:cli'),
     ('server:edit', 'SoftLayer.CLI.server.edit:cli'),
     ('server:list', 'SoftLayer.CLI.server.list:cli'),
-    ('server:list-chassis', 'SoftLayer.CLI.server.list_chassis:cli'),
     ('server:nic-edit', 'SoftLayer.CLI.server.nic_edit:cli'),
     ('server:power-cycle', 'SoftLayer.CLI.server.power:power_cycle'),
     ('server:power-off', 'SoftLayer.CLI.server.power:power_off'),
