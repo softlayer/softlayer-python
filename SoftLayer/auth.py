@@ -74,3 +74,23 @@ class BasicAuthentication(AuthenticationBase):
 
     def __repr__(self):
         return "<BasicAuthentication: %s>" % (self.username)
+
+
+class BasicHTTPAuthentication(AuthenticationBase):
+    """Token-based authentication class.
+
+        :param username str: a user's username
+        :param api_key str: a user's API key
+    """
+    def __init__(self, username, api_key):
+        self.username = username
+        self.api_key = api_key
+
+    def get_request(self, request):
+        """Sets token-based auth headers."""
+        request.transport_user = self.username
+        request.transport_password = self.api_key
+        return request
+
+    def __repr__(self):
+        return "<BasicHTTPAuthentication: %s>" % (self.username)

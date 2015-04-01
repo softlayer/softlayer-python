@@ -68,17 +68,19 @@ class Client(object):
                                               endpoint_url=endpoint_url,
                                               timeout=timeout,
                                               auth=auth,
+                                              transport=transport,
                                               proxy=proxy,
                                               config_file=config_file)
         self.auth = settings.get('auth')
+        self.version = settings.get('version')
 
-        self.endpoint_url = (settings.get('endpoint_url') or
-                             API_PUBLIC_ENDPOINT).rstrip('/')
-        self.transport = transport or transports.XmlRpcTransport()
+        self.endpoint_url = (settings.get('endpoint_url') or '').rstrip('/')
+        self.transport = settings.get('transport')
 
         self.timeout = None
         if settings.get('timeout'):
             self.timeout = float(settings.get('timeout'))
+
         self.proxy = None
         if settings.get('proxy'):
             self.proxy = settings.get('proxy')

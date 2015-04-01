@@ -45,6 +45,12 @@ class Request(object):
         #: API headers, used for authentication, masks, limits, offsets, etc.
         self.headers = {}
 
+        #: Transport user.
+        self.transport_user = None
+
+        #: Transport password.
+        self.transport_password = None
+
         #: Transport headers.
         self.transport_headers = {}
 
@@ -168,13 +174,44 @@ class RestTransport(object):
             url_parts.append(str(request.identifier))
 
         url = '%s.%s' % ('/'.join(url_parts), 'json')
+        params = {}
+        body = {}
+
+        if request.mask:
+            params['objectMask'] = request.mask
+
+        if request.limit:
+            params['limit'] = request.limit
+
+        if request.offset:
+            params['offset'] = request.offset
+
+        if request.filter:
+            params['objectFilter'] = json.dumps(request.filter)
+
+        if request.args:
+            body['parameters'] = json.dumps(request.args)
+
+        auth = None
+        if request.transport_user:
+            auth = requests.auth.HTTPBasicAuth(
+                request.transport_user,
+                request.transport_password,
+            )
+
+        raw_body = None
+        if body:
+            raw_body = json.dumps(body)
 
         LOGGER.debug("=== REQUEST ===")
         LOGGER.info(url)
         LOGGER.debug(request.transport_headers)
         try:
             resp = requests.request('GET', url,
+                                    auth=auth,
                                     headers=request.transport_headers,
+                                    params=params,
+                                    data=raw_body,
                                     timeout=request.timeout,
                                     verify=request.verify,
                                     cert=request.cert,
