@@ -108,8 +108,7 @@ use: 'slcli setup'""",
               is_flag=True,
               required=False,
               help="Use fixtures instead of actually making API calls")
-@click.version_option(version=SoftLayer.__version__,
-                      prog_name="SoftLayer Command-line Client")
+@click.version_option(prog_name="slcli (SoftLayer Command-line)")
 def cli(ctx,
         format='table',
         config=None,
