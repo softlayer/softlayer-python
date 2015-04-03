@@ -263,6 +263,9 @@ class TestRestAPICall(testing.TestCase):
             'GET', 'http://something.com/SoftLayer_Service/Resource.json',
             headers={},
             verify=True,
+            params={},
+            auth=None,
+            data=None,
             cert=None,
             proxies=None,
             timeout=None)
@@ -309,6 +312,9 @@ class TestRestAPICall(testing.TestCase):
                      'http': 'http://localhost:3128'},
             verify=True,
             cert=None,
+            params={},
+            auth=None,
+            data=None,
             timeout=mock.ANY,
             headers=mock.ANY)
 
@@ -330,6 +336,9 @@ class TestRestAPICall(testing.TestCase):
             'http://something.com/SoftLayer_Service/getObject/2.json',
             headers={},
             verify=True,
+            params={},
+            auth=None,
+            data=None,
             cert=None,
             proxies=None,
             timeout=None)

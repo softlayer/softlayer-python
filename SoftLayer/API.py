@@ -67,15 +67,27 @@ class Client(object):
                                               api_key=api_key,
                                               endpoint_url=endpoint_url,
                                               timeout=timeout,
-                                              auth=auth,
-                                              transport=transport,
                                               proxy=proxy,
                                               config_file=config_file)
-        self.auth = settings.get('auth')
-        self.version = settings.get('version')
 
-        self.endpoint_url = (settings.get('endpoint_url') or '').rstrip('/')
-        self.transport = settings.get('transport')
+        # Default the transport to use XMLRPC
+        if transport is None:
+            transport = transports.XmlRpcTransport()
+        self.transport = transport
+
+        self.endpoint_url = (settings.get('endpoint_url') or
+                             consts.API_PUBLIC_ENDPOINT).rstrip('/')
+
+        # If we have enough information to make an auth driver, let's do it
+        if(auth is None and
+           settings.get('username') and
+           settings.get('api_key')):
+
+            auth = slauth.BasicAuthentication(
+                settings.get('username'),
+                settings.get('api_key'),
+            )
+        self.auth = auth
 
         self.timeout = None
         if settings.get('timeout'):

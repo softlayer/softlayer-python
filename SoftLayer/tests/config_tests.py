@@ -50,27 +50,9 @@ class TestGetClientSettingsArgs(testing.TestCase):
 
         self.assertEqual(result['endpoint_url'], 'http://endpoint/')
         self.assertEqual(result['timeout'], 10)
-        self.assertEqual(result['auth'].username, 'username')
-        self.assertEqual(result['auth'].api_key, 'api_key')
+        self.assertEqual(result['username'], 'username')
+        self.assertEqual(result['api_key'], 'api_key')
         self.assertEqual(result['proxy'], 'https://localhost:3128')
-
-    def test_no_auth(self):
-        result = config.get_client_settings_args()
-
-        self.assertEqual(result, {
-            'endpoint_url': None,
-            'timeout': None,
-            'proxy': None,
-            'auth': None,
-        })
-
-    def test_with_auth(self):
-        auth = mock.Mock()
-        result = config.get_client_settings_args(auth=auth)
-
-        self.assertEqual(result['endpoint_url'], None)
-        self.assertEqual(result['timeout'], None)
-        self.assertEqual(result['auth'], auth)
 
 
 class TestGetClientSettingsEnv(testing.TestCase):
@@ -81,15 +63,8 @@ class TestGetClientSettingsEnv(testing.TestCase):
     def test_username_api_key(self):
         result = config.get_client_settings_env()
 
-        self.assertEqual(result['auth'].username, 'username')
-        self.assertEqual(result['auth'].api_key, 'api_key')
-
-    @mock.patch.dict('os.environ', {'SL_USERNAME': '', 'SL_API_KEY': ''})
-    def test_no_auth(self):
-        result = config.get_client_settings_env()
-
-        # proxy might get ANY value depending on test env.
-        self.assertEqual(result, {'proxy': mock.ANY})
+        self.assertEqual(result['username'], 'username')
+        self.assertEqual(result['api_key'], 'api_key')
 
 
 class TestGetClientSettingsConfigFile(testing.TestCase):
@@ -101,8 +76,8 @@ class TestGetClientSettingsConfigFile(testing.TestCase):
         self.assertEqual(result['endpoint_url'], config_parser().get())
         self.assertEqual(result['timeout'], config_parser().get())
         self.assertEqual(result['proxy'], config_parser().get())
-        self.assertEqual(result['auth'].username, config_parser().get())
-        self.assertEqual(result['auth'].api_key, config_parser().get())
+        self.assertEqual(result['username'], config_parser().get())
+        self.assertEqual(result['api_key'], config_parser().get())
 
     @mock.patch('six.moves.configparser.RawConfigParser')
     def test_no_section(self, config_parser):

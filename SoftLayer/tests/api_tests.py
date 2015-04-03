@@ -32,11 +32,10 @@ class Inititialization(testing.TestCase):
     def test_env(self, get_client_settings):
         auth = mock.Mock()
         get_client_settings.return_value = {
-            'auth': auth,
             'timeout': 10,
             'endpoint_url': 'http://endpoint_url/',
         }
-        client = SoftLayer.Client()
+        client = SoftLayer.Client(auth=auth)
         self.assertEqual(client.auth.get_headers(), auth.get_headers())
         self.assertEqual(client.timeout, 10)
         self.assertEqual(client.endpoint_url, 'http://endpoint_url')
