@@ -18,7 +18,7 @@ def get_client_settings_args(**kwargs):
     """
     return {
         'endpoint_url': kwargs.get('endpoint_url'),
-        'timeout': kwargs.get('timeout'),
+        'timeout': float(kwargs.get('timeout') or 0),
         'proxy': kwargs.get('proxy'),
         'username': kwargs.get('username'),
         'api_key': kwargs.get('api_key'),
@@ -51,7 +51,7 @@ def get_client_settings_config_file(**kwargs):
         'username': '',
         'api_key': '',
         'endpoint_url': '',
-        'timeout': '',
+        'timeout': '0',
         'proxy': '',
     })
     config.read(config_files)
@@ -61,7 +61,7 @@ def get_client_settings_config_file(**kwargs):
 
     return {
         'endpoint_url': config.get('softlayer', 'endpoint_url'),
-        'timeout': config.get('softlayer', 'timeout'),
+        'timeout': config.getfloat('softlayer', 'timeout'),
         'proxy': config.get('softlayer', 'proxy'),
         'username': config.get('softlayer', 'username'),
         'api_key': config.get('softlayer', 'api_key'),

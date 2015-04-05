@@ -74,7 +74,7 @@ class TestGetClientSettingsConfigFile(testing.TestCase):
         result = config.get_client_settings_config_file()
 
         self.assertEqual(result['endpoint_url'], config_parser().get())
-        self.assertEqual(result['timeout'], config_parser().get())
+        self.assertEqual(result['timeout'], config_parser().getfloat())
         self.assertEqual(result['proxy'], config_parser().get())
         self.assertEqual(result['username'], config_parser().get())
         self.assertEqual(result['api_key'], config_parser().get())

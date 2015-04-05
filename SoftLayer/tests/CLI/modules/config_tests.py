@@ -24,8 +24,8 @@ class TestHelpShow(testing.TestCase):
         self.assertEqual(json.loads(result.output),
                          {'Username': 'default-user',
                           'API Key': 'default-key',
-                          'Endpoint URL': 'default-endpoint-url',
-                          'Timeout': 10.0})
+                          'Endpoint URL': 'not set',
+                          'Timeout': 'not set'})
 
 
 class TestHelpSetup(testing.TestCase):
@@ -80,7 +80,6 @@ class TestHelpSetup(testing.TestCase):
         self.assertEqual(username, 'user')
         self.assertEqual(secret, 'A' * 64)
         self.assertEqual(endpoint_url, consts.API_PRIVATE_ENDPOINT)
-        self.assertEqual(timeout, 10)
 
     @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
     @mock.patch('SoftLayer.CLI.environment.Environment.input')

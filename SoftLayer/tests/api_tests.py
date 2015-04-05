@@ -8,7 +8,6 @@ import mock
 
 import SoftLayer
 import SoftLayer.API
-from SoftLayer import consts
 from SoftLayer import testing
 
 TEST_AUTH_HEADERS = {
@@ -24,9 +23,9 @@ class Inititialization(testing.TestCase):
         self.assertIsInstance(client.auth, SoftLayer.BasicAuthentication)
         self.assertEqual(client.auth.username, 'doesnotexist')
         self.assertEqual(client.auth.api_key, 'issurelywrong')
-        self.assertEqual(client.endpoint_url,
+        self.assertEqual(client.transport.endpoint_url,
                          SoftLayer.API_PUBLIC_ENDPOINT.rstrip('/'))
-        self.assertEqual(client.timeout, 10)
+        self.assertEqual(client.transport.timeout, 10)
 
     @mock.patch('SoftLayer.config.get_client_settings')
     def test_env(self, get_client_settings):
@@ -37,8 +36,8 @@ class Inititialization(testing.TestCase):
         }
         client = SoftLayer.Client(auth=auth)
         self.assertEqual(client.auth.get_headers(), auth.get_headers())
-        self.assertEqual(client.timeout, 10)
-        self.assertEqual(client.endpoint_url, 'http://endpoint_url')
+        self.assertEqual(client.transport.timeout, 10)
+        self.assertEqual(client.transport.endpoint_url, 'http://endpoint_url')
 
 
 class ClientMethods(testing.TestCase):
@@ -75,7 +74,6 @@ class APIClient(testing.TestCase):
 
         self.assertEqual(resp, {"test": "result"})
         self.assert_called_with('SoftLayer_SERVICE', 'METHOD',
-                                endpoint=self.client.endpoint_url,
                                 mask=None,
                                 filter=None,
                                 identifier=None,
@@ -100,7 +98,6 @@ class APIClient(testing.TestCase):
 
         self.assertEqual(resp, {"test": "result"})
         self.assert_called_with('SoftLayer_SERVICE', 'METHOD',
-                                endpoint=self.client.endpoint_url,
                                 mask={'object': {'attribute': ''}},
                                 filter=_filter,
                                 identifier=5678,
@@ -110,22 +107,22 @@ class APIClient(testing.TestCase):
                                 headers=TEST_AUTH_HEADERS,
                                 )
 
-    @mock.patch('SoftLayer.API.Client.iter_call')
+    @mock.patch('SoftLayer.API.BaseClient.iter_call')
     def test_iterate(self, _iter_call):
         self.client['SERVICE'].METHOD(iter=True)
         _iter_call.assert_called_with('SERVICE', 'METHOD')
 
-    @mock.patch('SoftLayer.API.Client.iter_call')
+    @mock.patch('SoftLayer.API.BaseClient.iter_call')
     def test_service_iter_call(self, _iter_call):
         self.client['SERVICE'].iter_call('METHOD', 'ARG')
         _iter_call.assert_called_with('SERVICE', 'METHOD', 'ARG')
 
-    @mock.patch('SoftLayer.API.Client.iter_call')
+    @mock.patch('SoftLayer.API.BaseClient.iter_call')
     def test_service_iter_call_with_chunk(self, _iter_call):
         self.client['SERVICE'].iter_call('METHOD', 'ARG', chunk=2)
         _iter_call.assert_called_with('SERVICE', 'METHOD', 'ARG', chunk=2)
 
-    @mock.patch('SoftLayer.API.Client.call')
+    @mock.patch('SoftLayer.API.BaseClient.call')
     def test_iter_call(self, _call):
         # chunk=100, no limit
         _call.side_effect = [list(range(100)), list(range(100, 125))]
@@ -206,10 +203,8 @@ class APIClient(testing.TestCase):
         self.client['SERVICE'].METHOD(compress=True)
 
         expected_headers = {
-            'Content-Type': 'application/xml',
             'Accept-Encoding': 'gzip, deflate, compress',
             'Accept': '*/*',
-            'User-Agent': consts.USER_AGENT,
         }
         self.assert_called_with('SoftLayer_SERVICE', 'METHOD',
                                 transport_headers=expected_headers)
@@ -222,9 +217,7 @@ class APIClient(testing.TestCase):
             raw_headers={'Accept-Encoding': 'gzip'})
 
         expected_headers = {
-            'Content-Type': 'application/xml',
             'Accept-Encoding': 'gzip',
-            'User-Agent': consts.USER_AGENT,
         }
         self.assert_called_with('SoftLayer_SERVICE', 'METHOD',
                                 transport_headers=expected_headers)
@@ -244,9 +237,9 @@ class UnauthenticatedAPIClient(testing.TestCase):
     def test_init_with_proxy(self, get_client_settings):
         get_client_settings.return_value = {'proxy': 'http://localhost:3128'}
         client = SoftLayer.Client()
-        self.assertEqual(client.proxy, 'http://localhost:3128')
+        self.assertEqual(client.transport.proxy, 'http://localhost:3128')
 
-    @mock.patch('SoftLayer.API.Client.call')
+    @mock.patch('SoftLayer.API.BaseClient.call')
     def test_authenticate_with_password(self, _call):
         _call.return_value = {
             'userId': 12345,

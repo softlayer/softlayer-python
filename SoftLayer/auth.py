@@ -7,7 +7,12 @@
 """
 # pylint: disable=no-self-use
 
-__all__ = ['BasicAuthentication', 'TokenAuthentication', 'AuthenticationBase']
+__all__ = [
+    'BasicAuthentication',
+    'TokenAuthentication',
+    'BasicHTTPAuthentication',
+    'AuthenticationBase',
+]
 
 
 class AuthenticationBase(object):
@@ -51,7 +56,7 @@ class TokenAuthentication(AuthenticationBase):
         return request
 
     def __repr__(self):
-        return "<TokenAuthentication: %s %s>" % (self.user_id, self.auth_token)
+        return "TokenAuthentication(%r)" % self.user_id
 
 
 class BasicAuthentication(AuthenticationBase):
@@ -73,7 +78,7 @@ class BasicAuthentication(AuthenticationBase):
         return request
 
     def __repr__(self):
-        return "<BasicAuthentication: %s>" % (self.username)
+        return "BasicAuthentication(username=%r)" % self.username
 
 
 class BasicHTTPAuthentication(AuthenticationBase):
@@ -93,4 +98,4 @@ class BasicHTTPAuthentication(AuthenticationBase):
         return request
 
     def __repr__(self):
-        return "<BasicHTTPAuthentication: %s>" % (self.username)
+        return "BasicHTTPAuthentication(username=%r)" % self.username

@@ -10,6 +10,7 @@ import mock
 import requests
 
 import SoftLayer
+from SoftLayer import consts
 from SoftLayer import testing
 from SoftLayer import transports
 
@@ -17,7 +18,9 @@ from SoftLayer import transports
 class TestXmlRpcAPICall(testing.TestCase):
 
     def set_up(self):
-        self.transport = transports.XmlRpcTransport()
+        self.transport = transports.XmlRpcTransport(
+            endpoint_url='http://something.com',
+        )
         self.response = mock.MagicMock()
         self.response.content = '''<?xml version="1.0" encoding="utf-8"?>
 <params>
@@ -52,14 +55,14 @@ class TestXmlRpcAPICall(testing.TestCase):
 '''
 
         req = transports.Request()
-        req.endpoint = 'http://something.com'
         req.service = 'SoftLayer_Service'
         req.method = 'getObject'
         resp = self.transport(req)
 
         request.assert_called_with('POST',
                                    'http://something.com/SoftLayer_Service',
-                                   headers={},
+                                   headers={'Content-Type': 'application/xml',
+                                            'User-Agent': consts.USER_AGENT},
                                    proxies=None,
                                    data=data,
                                    timeout=None,
@@ -69,7 +72,6 @@ class TestXmlRpcAPICall(testing.TestCase):
 
     def test_proxy_without_protocol(self):
         req = transports.Request()
-        req.endpoint = 'http://something.com'
         req.service = 'SoftLayer_Service'
         req.method = 'Resource'
         req.proxy = 'localhost:3128'
@@ -83,21 +85,20 @@ class TestXmlRpcAPICall(testing.TestCase):
     @mock.patch('requests.request')
     def test_valid_proxy(self, request):
         request.return_value = self.response
+        self.transport.proxy = 'http://localhost:3128'
 
         req = transports.Request()
-        req.endpoint = 'http://something.com'
         req.service = 'SoftLayer_Service'
         req.method = 'Resource'
-        req.proxy = 'http://localhost:3128'
         self.transport(req)
 
         request.assert_called_with(
             'POST',
             mock.ANY,
-            headers={},
             proxies={'https': 'http://localhost:3128',
                      'http': 'http://localhost:3128'},
             data=mock.ANY,
+            headers=mock.ANY,
             timeout=None,
             cert=None,
             verify=True)
@@ -237,7 +238,6 @@ class TestXmlRpcAPICall(testing.TestCase):
         request().raise_for_status.side_effect = e
 
         req = transports.Request()
-        req.endpoint = 'http://something.com'
         req.service = 'SoftLayer_Service'
         req.method = 'getObject'
 
@@ -247,13 +247,14 @@ class TestXmlRpcAPICall(testing.TestCase):
 class TestRestAPICall(testing.TestCase):
 
     def set_up(self):
-        self.transport = transports.RestTransport()
+        self.transport = transports.RestTransport(
+            endpoint_url='http://something.com',
+        )
 
     @mock.patch('requests.request')
     def test_basic(self, request):
         request().content = '{}'
         req = transports.Request()
-        req.endpoint = 'http://something.com'
         req.service = 'SoftLayer_Service'
         req.method = 'Resource'
 
@@ -261,7 +262,7 @@ class TestRestAPICall(testing.TestCase):
         self.assertEqual(resp, {})
         request.assert_called_with(
             'GET', 'http://something.com/SoftLayer_Service/Resource.json',
-            headers={},
+            headers=mock.ANY,
             verify=True,
             params={},
             auth=None,
@@ -284,7 +285,6 @@ class TestRestAPICall(testing.TestCase):
 
     def test_proxy_without_protocol(self):
         req = transports.Request()
-        req.endpoint = 'http://something.com'
         req.service = 'SoftLayer_Service'
         req.method = 'Resource'
         req.proxy = 'localhost:3128'
@@ -298,12 +298,11 @@ class TestRestAPICall(testing.TestCase):
     @mock.patch('requests.request')
     def test_valid_proxy(self, request):
         request().content = '{}'
+        self.transport.proxy = 'http://localhost:3128'
 
         req = transports.Request()
-        req.endpoint = 'http://something.com'
         req.service = 'SoftLayer_Service'
         req.method = 'Resource'
-        req.proxy = 'http://localhost:3128'
 
         self.transport(req)
         request.assert_called_with(
@@ -323,7 +322,6 @@ class TestRestAPICall(testing.TestCase):
         request().content = '{}'
 
         req = transports.Request()
-        req.endpoint = 'http://something.com'
         req.service = 'SoftLayer_Service'
         req.method = 'getObject'
         req.identifier = 2
@@ -334,7 +332,7 @@ class TestRestAPICall(testing.TestCase):
         request.assert_called_with(
             'GET',
             'http://something.com/SoftLayer_Service/getObject/2.json',
-            headers={},
+            headers=mock.ANY,
             verify=True,
             params={},
             auth=None,
@@ -352,7 +350,6 @@ class TestRestAPICall(testing.TestCase):
         request().raise_for_status.side_effect = e
 
         req = transports.Request()
-        req.endpoint = 'http://something.com'
         req.service = 'SoftLayer_Service'
         req.method = 'getObject'
 
