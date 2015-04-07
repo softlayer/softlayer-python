@@ -89,11 +89,9 @@ def create_client_from_env(username=None,
         transport = transports.XmlRpcTransport(
             endpoint_url=settings.get('endpoint_url'),
             proxy=settings.get('proxy'),
-            user_agent=user_agent,
             timeout=settings.get('timeout')
+            user_agent=user_agent,
         )
-
-    transport = transport
 
     # If we have enough information to make an auth driver, let's do it
     if auth is None and settings.get('username') and settings.get('api_key'):
@@ -111,7 +109,8 @@ def Client(**kwargs):
 
     Deprecated in favor of create_client_from_env()
     """
-    warnings.warn("use create_client_from_env() instead", DeprecationWarning)
+    warnings.warn("use SoftLayer.create_client_from_env() instead",
+                  DeprecationWarning)
     return create_client_from_env(**kwargs)
 
 
