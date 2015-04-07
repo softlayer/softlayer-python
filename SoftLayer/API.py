@@ -89,7 +89,7 @@ def create_client_from_env(username=None,
         transport = transports.XmlRpcTransport(
             endpoint_url=settings.get('endpoint_url'),
             proxy=settings.get('proxy'),
-            timeout=settings.get('timeout')
+            timeout=settings.get('timeout'),
             user_agent=user_agent,
         )
 
