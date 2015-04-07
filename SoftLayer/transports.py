@@ -103,8 +103,8 @@ class XmlRpcTransport(object):
             headers[header_name] = {'id': request.identifier}
 
         if request.mask is not None:
-            headers.update(_format_object_mask(request.mask,
-                                               request.service))
+            headers.update(_format_object_mask_xmlrpc(request.mask,
+                                                      request.service))
 
         if request.filter is not None:
             headers['%sObjectFilter' % request.service] = request.filter
@@ -198,7 +198,7 @@ class RestTransport(object):
         body = {}
 
         if request.mask:
-            params['objectMask'] = request.mask
+            params['objectMask'] = _format_object_mask(request.mask)
 
         if request.limit:
             params['limit'] = request.limit
@@ -308,7 +308,7 @@ def _proxies_dict(proxy):
     return {'http': proxy, 'https': proxy}
 
 
-def _format_object_mask(objectmask, service):
+def _format_object_mask_xmlrpc(objectmask, service):
     """Format new and old style object masks into proper headers.
 
     :param objectmask: a string- or dict-based object mask
@@ -319,10 +319,13 @@ def _format_object_mask(objectmask, service):
         mheader = '%sObjectMask' % service
     else:
         mheader = 'SoftLayer_ObjectMask'
-
-        objectmask = objectmask.strip()
-        if (not objectmask.startswith('mask') and
-                not objectmask.startswith('[')):
-            objectmask = "mask[%s]" % objectmask
+        objectmask = _format_object_mask(objectmask)
 
     return {mheader: {'mask': objectmask}}
+
+
+def _format_object_mask(mask):
+    objectmask = mask.strip()
+    if not mask.startswith('mask') and not mask.startswith('['):
+        mask = "mask[%s]" % objectmask
+    return mask
