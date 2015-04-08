@@ -323,6 +323,7 @@ def _format_object_mask_xmlrpc(objectmask, service):
 
 
 def _format_object_mask(mask):
+    """Format object mask (wrap with mask[] if it isn't already)."""
     objectmask = mask.strip()
     if not mask.startswith('mask') and not mask.startswith('['):
         mask = "mask[%s]" % objectmask
