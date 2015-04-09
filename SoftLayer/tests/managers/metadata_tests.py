@@ -21,7 +21,6 @@ class MetadataTests(testing.TestCase):
 
         self.assertEqual('dal01', resp)
         self.assert_called_with('SoftLayer_Resource_Metadata', 'Datacenter',
-                                timeout=10.0,
                                 identifier=None)
 
     def test_no_param(self):

@@ -56,11 +56,12 @@ class MetadataManager(object):
     attribs = METADATA_MAPPING
 
     def __init__(self, client=None, timeout=5):
-        url = consts.API_PRIVATE_ENDPOINT_REST.rstrip('/')
         if client is None:
-            client = SoftLayer.Client(endpoint_url=url,
-                                      timeout=timeout,
-                                      transport=transports.RestTransport())
+            transport = transports.RestTransport(
+                timeout=timeout,
+                endpoint_url=consts.API_PRIVATE_ENDPOINT_REST,
+            )
+            client = SoftLayer.BaseClient(transport=transport)
         self.client = client
 
     def get(self, name, param=None):

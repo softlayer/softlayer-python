@@ -63,4 +63,23 @@ class TestTokenAuthentication(testing.TestCase):
         s = repr(self.auth)
         self.assertIn('TokenAuthentication', s)
         self.assertIn('12345', s)
-        self.assertIn('TOKEN', s)
+
+
+class TestBasicHTTPAuthentication(testing.TestCase):
+    def set_up(self):
+        self.auth = auth.BasicHTTPAuthentication('USERNAME', 'APIKEY')
+
+    def test_attribs(self):
+        self.assertEqual(self.auth.username, 'USERNAME')
+        self.assertEqual(self.auth.api_key, 'APIKEY')
+
+    def test_get_request(self):
+        req = transports.Request()
+        authed_req = self.auth.get_request(req)
+        self.assertEqual(authed_req.transport_user, 'USERNAME')
+        self.assertEqual(authed_req.transport_password, 'APIKEY')
+
+    def test_repr(self):
+        s = repr(self.auth)
+        self.assertIn('BasicHTTPAuthentication', s)
+        self.assertIn('USERNAME', s)
