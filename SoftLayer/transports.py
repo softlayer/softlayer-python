@@ -189,9 +189,11 @@ class RestTransport(object):
 
         :param request request: Request object
         """
-        url_parts = [self.endpoint_url, request.service, request.method]
+        url_parts = [self.endpoint_url, request.service]
         if request.identifier is not None:
             url_parts.append(str(request.identifier))
+        if request.method is not None:
+            url_parts.append(request.method)
 
         url = '%s.%s' % ('/'.join(url_parts), 'json')
         params = {}
@@ -228,6 +230,7 @@ class RestTransport(object):
         LOGGER.debug("=== REQUEST ===")
         LOGGER.info(url)
         LOGGER.debug(request.transport_headers)
+        LOGGER.debug(raw_body)
         try:
             resp = requests.request('GET', url,
                                     auth=auth,

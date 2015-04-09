@@ -331,7 +331,7 @@ class TestRestAPICall(testing.TestCase):
         self.assertEqual(resp, {})
         request.assert_called_with(
             'GET',
-            'http://something.com/SoftLayer_Service/getObject/2.json',
+            'http://something.com/SoftLayer_Service/2/getObject.json',
             headers=mock.ANY,
             verify=True,
             params={},
