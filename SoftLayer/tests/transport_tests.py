@@ -4,6 +4,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import json
 import warnings
 
 import mock
@@ -353,8 +354,7 @@ class TestRestAPICall(testing.TestCase):
         resp = self.transport(req)
 
         self.assertEqual(resp, {})
-        expected_body = ('{"parameters": '
-                         '[{"domain": "test.com", "hostname": "example"}]}')
+        expected_body = json.dumps({'parameters': req.args})
         request.assert_called_with(
             'GET',
             'http://something.com/SoftLayer_Service/createObject.json',
