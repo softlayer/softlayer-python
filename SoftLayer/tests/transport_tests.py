@@ -342,6 +342,32 @@ class TestRestAPICall(testing.TestCase):
             timeout=None)
 
     @mock.patch('requests.request')
+    def test_with_args(self, request):
+        request().content = '{}'
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'createObject'
+        req.args = ({'domain': 'test.com', 'hostname': 'example'}, )
+
+        resp = self.transport(req)
+
+        self.assertEqual(resp, {})
+        expected_body = ('{"parameters": '
+                         '[{"domain": "test.com", "hostname": "example"}]}')
+        request.assert_called_with(
+            'GET',
+            'http://something.com/SoftLayer_Service/createObject.json',
+            headers=mock.ANY,
+            verify=True,
+            data=expected_body,
+            params={},
+            auth=None,
+            cert=None,
+            proxies=None,
+            timeout=None)
+
+    @mock.patch('requests.request')
     def test_unknown_error(self, request):
         e = requests.RequestException('error')
         e.response = mock.MagicMock()
