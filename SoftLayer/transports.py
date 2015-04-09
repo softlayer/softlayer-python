@@ -208,7 +208,7 @@ class RestTransport(object):
             params['objectFilter'] = json.dumps(request.filter)
 
         if request.args:
-            body['parameters'] = json.dumps(request.args)
+            body['parameters'] = json.dumps({'parameters': request.args})
 
         auth = None
         if request.transport_user:
