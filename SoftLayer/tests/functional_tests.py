@@ -38,13 +38,14 @@ class UnauthedUser(FunctionalTest):
     def test_no_hostname(self):
         try:
             request = transports.Request()
-            request.endpoint = 'http://notvalidsoftlayer.com'
             request.service = 'SoftLayer_Account'
             request.method = 'getObject'
             request.id = 1234
 
             # This test will fail if 'notvalidsoftlayer.com' becomes a thing
-            transport = transports.XmlRpcTransport()
+            transport = transports.XmlRpcTransport(
+                endpoint_url='http://notvalidsoftlayer.com',
+            )
             transport(request)
         except SoftLayer.SoftLayerAPIError as ex:
             self.assertIn('not known', str(ex))

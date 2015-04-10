@@ -1,119 +1,102 @@
 """
-    SoftLayer.tests.config_tests
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    SoftLayer.tests.CLI.modules.config_tests
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :license: MIT, see LICENSE for more details.
 """
+import json
+import tempfile
+
 import mock
 
-from SoftLayer import config
+from SoftLayer.CLI.config import setup as config
+from SoftLayer.CLI import exceptions
+from SoftLayer import consts
 from SoftLayer import testing
 
 
-class TestGetClientSettings(testing.TestCase):
+class TestHelpShow(testing.TestCase):
 
-    @mock.patch('SoftLayer.config.SETTING_RESOLVERS', [])
-    def test_no_resolvers(self):
-        result = config.get_client_settings()
-        self.assertEqual(result, {})
+    def test_show(self):
+        result = self.run_command(['config', 'show'])
 
-    def test_resolve_one(self):
-        resolvers = [mock.Mock() for i in range(1)]
-        resolvers[0].return_value = {'auth': 'AUTH HANDLER'}
-        with mock.patch('SoftLayer.config.SETTING_RESOLVERS', resolvers):
-            result = config.get_client_settings()
-            self.assertEqual(result, {'auth': 'AUTH HANDLER'})
-
-    def test_inherit(self):
-        # This tests the inheritting properties of the list of resolvers.
-        # Values should be preferred on earlier resolvers except where their
-        # value is false-ish
-        resolvers = [mock.Mock() for i in range(4)]
-        resolvers[0].return_value = {'timeout': 20}
-        resolvers[1].return_value = {'timeout': 10, 'auth': None}
-        resolvers[2].return_value = None
-        resolvers[3].return_value = {'auth': 'AUTH HANDLER'}
-        with mock.patch('SoftLayer.config.SETTING_RESOLVERS', resolvers):
-            result = config.get_client_settings()
-            self.assertEqual(result, {'auth': 'AUTH HANDLER', 'timeout': 20})
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output),
+                         {'Username': 'default-user',
+                          'API Key': 'default-key',
+                          'Endpoint URL': 'not set',
+                          'Timeout': 'not set'})
 
 
-class TestGetClientSettingsArgs(testing.TestCase):
+class TestHelpSetup(testing.TestCase):
 
-    def test_username_api_key(self):
-        result = config.get_client_settings_args(
-            username='username',
-            api_key='api_key',
-            endpoint_url='http://endpoint/',
-            timeout=10,
-            proxy='https://localhost:3128')
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
+    @mock.patch('SoftLayer.CLI.environment.Environment.input')
+    def test_setup(self, input, getpass, confirm_mock):
+        with tempfile.NamedTemporaryFile() as config_file:
+            confirm_mock.return_value = True
+            getpass.return_value = 'A' * 64
+            input.side_effect = ['user', 'public']
 
-        self.assertEqual(result['endpoint_url'], 'http://endpoint/')
-        self.assertEqual(result['timeout'], 10)
-        self.assertEqual(result['auth'].username, 'username')
-        self.assertEqual(result['auth'].api_key, 'api_key')
-        self.assertEqual(result['proxy'], 'https://localhost:3128')
+            result = self.run_command(['--config=%s' % config_file.name,
+                                       'config', 'setup'])
 
-    def test_no_auth(self):
-        result = config.get_client_settings_args()
+            self.assertEqual(result.exit_code, 0)
+            self.assertTrue('Configuration Updated Successfully'
+                            in result.output)
+            contents = config_file.read().decode("utf-8")
+            self.assertTrue('[softlayer]' in contents)
+            self.assertTrue('username = user' in contents)
+            self.assertTrue('api_key = AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+                            'AAAAAAAAAAAAAAAAAAAAAAAAAAAAA' in contents)
+            self.assertTrue('endpoint_url = %s' % consts.API_PUBLIC_ENDPOINT
+                            in contents)
 
-        self.assertEqual(result, {
-            'endpoint_url': None,
-            'timeout': None,
-            'proxy': None,
-            'auth': None,
-        })
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
+    @mock.patch('SoftLayer.CLI.environment.Environment.input')
+    def test_setup_cancel(self, input, getpass, confirm_mock):
+        with tempfile.NamedTemporaryFile() as config_file:
+            confirm_mock.return_value = False
+            getpass.return_value = 'A' * 64
+            input.side_effect = ['user', 'public']
 
-    def test_with_auth(self):
-        auth = mock.Mock()
-        result = config.get_client_settings_args(auth=auth)
+            result = self.run_command(['--config=%s' % config_file.name,
+                                       'config', 'setup'])
 
-        self.assertEqual(result['endpoint_url'], None)
-        self.assertEqual(result['timeout'], None)
-        self.assertEqual(result['auth'], auth)
+            self.assertEqual(result.exit_code, 2)
+            self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
+    @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
+    @mock.patch('SoftLayer.CLI.environment.Environment.input')
+    def test_get_user_input_private(self, input, getpass):
+        getpass.return_value = 'A' * 64
+        input.side_effect = ['user', 'private']
 
-class TestGetClientSettingsEnv(testing.TestCase):
+        username, secret, endpoint_url, timeout = (
+            config.get_user_input(self.env))
 
-    @mock.patch.dict('os.environ', {'SL_USERNAME': 'username',
-                                    'SL_API_KEY': 'api_key',
-                                    'https_proxy': 'https://localhost:3128'})
-    def test_username_api_key(self):
-        result = config.get_client_settings_env()
+        self.assertEqual(username, 'user')
+        self.assertEqual(secret, 'A' * 64)
+        self.assertEqual(endpoint_url, consts.API_PRIVATE_ENDPOINT)
 
-        self.assertEqual(result['auth'].username, 'username')
-        self.assertEqual(result['auth'].api_key, 'api_key')
+    @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
+    @mock.patch('SoftLayer.CLI.environment.Environment.input')
+    def test_get_user_input_custom(self, input, getpass):
+        getpass.return_value = 'A' * 64
+        input.side_effect = ['user', 'custom', 'custom-endpoint']
 
-    @mock.patch.dict('os.environ', {'SL_USERNAME': '', 'SL_API_KEY': ''})
-    def test_no_auth(self):
-        result = config.get_client_settings_env()
+        _, _, endpoint_url, _ = config.get_user_input(self.env)
 
-        # proxy might get ANY value depending on test env.
-        self.assertEqual(result, {'proxy': mock.ANY})
+        self.assertEqual(endpoint_url, 'custom-endpoint')
 
+    @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
+    @mock.patch('SoftLayer.CLI.environment.Environment.input')
+    def test_get_user_input_default(self, input, getpass):
+        self.env.getpass.return_value = 'A' * 64
+        self.env.input.side_effect = ['user', '']
 
-class TestGetClientSettingsConfigFile(testing.TestCase):
+        _, _, endpoint_url, _ = config.get_user_input(self.env)
 
-    @mock.patch('six.moves.configparser.RawConfigParser')
-    def test_username_api_key(self, config_parser):
-        result = config.get_client_settings_config_file()
-
-        self.assertEqual(result['endpoint_url'], config_parser().get())
-        self.assertEqual(result['timeout'], config_parser().get())
-        self.assertEqual(result['proxy'], config_parser().get())
-        self.assertEqual(result['auth'].username, config_parser().get())
-        self.assertEqual(result['auth'].api_key, config_parser().get())
-
-    @mock.patch('six.moves.configparser.RawConfigParser')
-    def test_no_section(self, config_parser):
-        config_parser().has_section.return_value = False
-        result = config.get_client_settings_config_file()
-
-        self.assertIsNone(result)
-
-    @mock.patch('six.moves.configparser.RawConfigParser')
-    def test_config_file(self, config_parser):
-        config.get_client_settings_config_file(config_file='path/to/config')
-        config_parser().read.assert_called_with([mock.ANY,
-                                                mock.ANY,
-                                                'path/to/config'])
+        self.assertEqual(endpoint_url, consts.API_PUBLIC_ENDPOINT)
