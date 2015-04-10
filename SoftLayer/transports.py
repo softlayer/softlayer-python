@@ -92,6 +92,7 @@ class XmlRpcTransport(object):
 
     def __call__(self, request):
         """Makes a SoftLayer API call against the XML-RPC endpoint.
+
         :param request request: Request object
         """
         largs = list(request.args)

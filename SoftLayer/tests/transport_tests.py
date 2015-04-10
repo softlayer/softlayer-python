@@ -4,7 +4,6 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import json
 import warnings
 
 import mock
