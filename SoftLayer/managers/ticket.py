@@ -50,8 +50,8 @@ class TicketManager(utils.IdentifierMixin, object):
                   the specified ticket.
 
         """
-        mask = ('mask[id, title, assignedUser[firstName, lastName],'
-                'createDate,lastEditDate,updates[entry,editor],updateCount]')
+        mask = ('id, title, assignedUser[firstName, lastName],status,'
+                'createDate,lastEditDate,updates[entry,editor],updateCount')
         return self.ticket.getObject(id=ticket_id, mask=mask)
 
     def create_ticket(self, title=None, body=None, subject=None):
