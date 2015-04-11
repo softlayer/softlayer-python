@@ -1,7 +1,6 @@
 """Support tickets."""
 
 from SoftLayer.CLI import formatting
-from SoftLayer import utils
 
 import click
 
