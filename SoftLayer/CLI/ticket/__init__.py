@@ -17,27 +17,42 @@ def get_ticket_results(mgr, ticket_id, update_count=1):
     :returns: a KeyValue table containing the details of the ticket
 
     """
-    result = mgr.get_ticket(ticket_id)
-    result = utils.NestedDict(result)
+    ticket = mgr.get_ticket(ticket_id)
 
     table = formatting.KeyValueTable(['Name', 'Value'])
     table.align['Name'] = 'r'
     table.align['Value'] = 'l'
 
-    table.add_row(['id', result['id']])
-    table.add_row(['title', result['title']])
-    if result['assignedUser']:
-        table.add_row(['assignedUser',
-                       "%s %s" % (result['assignedUser']['firstName'],
-                                  result['assignedUser']['lastName'])])
-    table.add_row(['createDate', result['createDate']])
-    table.add_row(['lastEditDate', result['lastEditDate']])
+    table.add_row(['id', ticket['id']])
+    table.add_row(['title', ticket['title']])
+    if ticket.get('assignedUser'):
+        user = ticket['assignedUser']
+        table.add_row([
+            'user',
+            "%s %s" % (user.get('firstName'), user.get('lastName')),
+        ])
 
-    total_update_count = result['updateCount']
-    count = min(total_update_count, update_count)
-    for i, update in enumerate(result['updates'][:count]):
+    table.add_row(['created', ticket.get('createDate')])
+    table.add_row(['edited', ticket.get('lastEditDate')])
+
+    # Only show up to the specified update count
+    updates = ticket.get('updates', [])
+    count = min(len(updates), update_count)
+    count_offset = len(updates) - count + 1  # Display as one-indexed
+    for i, update in enumerate(updates[-count:]):
+        wrapped_entry = ""
+
+        # Add user details (fields are different between employee and users)
+        editor = update.get('editor')
+        if editor:
+            if editor.get('displayName'):
+                wrapped_entry += "By %s (Employee)\n" % (editor['displayName'])
+            if editor.get('firstName'):
+                wrapped_entry += "By %s %s\n" % (editor.get('firstName'),
+                                                 editor.get('lastName'))
+
         # NOTE(kmcdonald): Windows new-line characters need to be stripped out
-        wrapped_entry = click.wrap_text(update['entry'].replace('\r', ''))
-        table.add_row(['Update %s' % (i + 1,), wrapped_entry])
+        wrapped_entry += click.wrap_text(update['entry'].replace('\r', ''))
+        table.add_row(['update %s' % (count_offset + i,), wrapped_entry])
 
     return table
