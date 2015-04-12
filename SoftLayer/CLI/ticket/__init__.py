@@ -32,7 +32,6 @@ def get_ticket_results(mgr, ticket_id, update_count=1):
         ])
 
     table.add_row(['status', ticket['status']['name']])
-
     table.add_row(['created', ticket.get('createDate')])
     table.add_row(['edited', ticket.get('lastEditDate')])
 

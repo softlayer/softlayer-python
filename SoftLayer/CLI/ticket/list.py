@@ -25,10 +25,10 @@ def cli(env, is_open):
                               'last_edited', 'status'])
 
     for ticket in tickets:
-        user = 'N/A'
+        user = formatting.blank()
         if ticket.get('assignedUser'):
             user = "%s %s" % (ticket['assignedUser']['firstName'],
-                              ticket['assignedUser']['lastName']),
+                              ticket['assignedUser']['lastName'])
 
         table.add_row([
             ticket['id'],
