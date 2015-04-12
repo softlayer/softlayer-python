@@ -18,7 +18,8 @@ getObject = {
         {'entry': 'a bot says something'},
         {'entry': 'user says something',
          'editor': {'firstName': 'John', 'lastName': 'Smith'}},
-        {'entry': 'employee says something', 'editor': {'displayName': 'emp1'}},
+        {'entry': 'employee says something',
+         'editor': {'displayName': 'emp1'}},
 
     ]
 }
