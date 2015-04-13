@@ -64,7 +64,7 @@ class VSManager(utils.IdentifierMixin, object):
            # SL_USERNAME = YOUR_USERNAME
            # SL_API_KEY = YOUR_API_KEY
            import SoftLayer
-           client = SoftLayer.Client()
+           client = SoftLayer.create_client_from_env()
 
            mgr = SoftLayer.VSManager(client)
            for vsi in mgr.list_instances(hourly=True, datacenter='dal05'):
@@ -154,7 +154,7 @@ class VSManager(utils.IdentifierMixin, object):
            # SL_USERNAME = YOUR_USERNAME
            # SL_API_KEY = YOUR_API_KEY
            import SoftLayer
-           client = SoftLayer.Client()
+           client = SoftLayer.create_client_from_env()
 
            mgr = SoftLayer.VSManager(client)
            vsi = mgr.get_instance(12345)
@@ -226,7 +226,7 @@ class VSManager(utils.IdentifierMixin, object):
            # SL_USERNAME = YOUR_USERNAME
            # SL_API_KEY = YOUR_API_KEY
            import SoftLayer
-           client = SoftLayer.Client()
+           client = SoftLayer.create_client_from_env()
 
            mgr = SoftLayer.VSManager(client)
            mgr.cancel_instance(12345)
@@ -249,7 +249,7 @@ class VSManager(utils.IdentifierMixin, object):
            # SL_USERNAME = YOUR_USERNAME
            # SL_API_KEY = YOUR_API_KEY
            import SoftLayer
-           client = SoftLayer.Client()
+           client = SoftLayer.create_client_from_env()
 
            post_uri = 'https://somehost.com/bootstrap.sh'
            mgr = SoftLayer.VSManager(client)
@@ -606,7 +606,7 @@ class VSManager(utils.IdentifierMixin, object):
 
            # Upgrade instance 12345 to 4 CPUs and 4 GB of memory
            import SoftLayer
-           client = SoftLayer.Client(config="~/.softlayer")
+           client = SoftLayer.create_client_from_env()
 
            mgr = SoftLayer.VSManager(client)
            mgr.upgrade(12345, cpus=4, memory=4)

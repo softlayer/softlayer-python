@@ -6,7 +6,8 @@
     Usage:
 
         >>> import SoftLayer
-        >>> client = SoftLayer.Client(username="username", api_key="api_key")
+        >>> client = SoftLayer.create_client_from_env(username="username",
+                                                      api_key="api_key")
         >>> resp = client['Account'].getObject()
         >>> resp['companyName']
         'Your Company'

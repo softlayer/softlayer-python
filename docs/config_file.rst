@@ -6,7 +6,7 @@ Configuration File
 The SoftLayer API bindings load your settings from a number of different
 locations.
 
-* Input directly into SoftLayer.Client(...)
+* Input directly into SoftLayer.create_client_from_env(...)
 * Enviorment variables (`SL_USERNAME`, `SL_API_KEY`)
 * Config file locations (`~/.softlayer`, `/etc/softlayer.conf`)
 * Or argument (`-C/path/to/config` or `--config=/path/to/config`)

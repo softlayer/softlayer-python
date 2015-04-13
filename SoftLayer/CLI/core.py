@@ -144,9 +144,11 @@ def cli(ctx,
             transport = SoftLayer.XmlRpcTransport()
 
         wrapped_transport = SoftLayer.TimingTransport(transport)
-        env.client = SoftLayer.Client(proxy=proxy,
-                                      config_file=config,
-                                      transport=wrapped_transport)
+        env.client = SoftLayer.create_client_from_env(
+            proxy=proxy,
+            config_file=config,
+            transport=wrapped_transport,
+        )
 
 
 @cli.resultcallback()
