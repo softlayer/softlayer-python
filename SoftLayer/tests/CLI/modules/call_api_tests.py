@@ -119,6 +119,17 @@ class CallCliTests(testing.TestCase):
 :......:......:.......:.....:........:
 """)
 
+    def test_parameters(self):
+        mock = self.set_mock('SoftLayer_Service', 'method')
+        mock.return_value = {}
+
+        result = self.run_command(['call-api', 'Service', 'method',
+                                   'arg1', '1234'])
+
+        self.assertEqual(result.exit_code, 0)
+        self.assert_called_with('SoftLayer_Service', 'method',
+                                args=('arg1', '1234'))
+
 
 class CallCliHelperTests(testing.TestCase):
 
