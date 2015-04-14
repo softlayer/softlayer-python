@@ -28,7 +28,8 @@ class MetadataTests(testing.TestCase):
 
         self.assertEqual('dal01', resp)
         self.assert_called_with('SoftLayer_Resource_Metadata', 'Datacenter',
-                                identifier=None)
+                                identifier=None,
+                                args=tuple())
 
     def test_w_param(self):
         resp = self.metadata.get('vlans', '1:2:3:4:5')
