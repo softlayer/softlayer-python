@@ -35,7 +35,7 @@ def cli(env, identifier, passwords, price):
     result = utils.NestedDict(result)
 
     table.add_row(['id', result['id']])
-    table.add_row(['guid', result['globalIdentifier']] or formatting.blank())
+    table.add_row(['guid', result['globalIdentifier'] or formatting.blank()])
     table.add_row(['hostname', result['hostname']])
     table.add_row(['domain', result['domain']])
     table.add_row(['fqdn', result['fullyQualifiedDomainName']])

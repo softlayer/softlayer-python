@@ -47,51 +47,22 @@ class HardwareManager(utils.IdentifierMixin, object):
         :param string comment: An optional comment to include with the
                                cancellation.
         """
-        # Check to see if this is actually a pre-configured server (BMC). They
-        # require a different cancellation call.
-        server = self.get_hardware(hardware_id,
-                                   mask='id,bareMetalInstanceFlag')
 
-        if server.get('bareMetalInstanceFlag'):
-            return self.cancel_metal(hardware_id, immediate)
-
+        # Get cancel reason
         reasons = self.get_cancellation_reasons()
-        cancel_reason = reasons['unneeded']
+        cancel_reason = reasons.get(reason, reasons['unneeded'])
 
-        if reason in reasons:
-            cancel_reason = reasons[reason]
-
-        # Arguments per SLDN:
-        # attachmentId - Hardware ID
-        # Reason
-        # content - Comment about the cancellation
-        # cancelAssociatedItems
-        # attachmentType - Only option is HARDWARE
-        return self.client['Ticket'].createCancelServerTicket(hardware_id,
-                                                              cancel_reason,
-                                                              comment,
-                                                              True,
-                                                              'HARDWARE')
-
-    def cancel_metal(self, hardware_id, immediate=False):
-        """Cancels the specified bare metal instance.
-
-        :param int id: The ID of the bare metal instance to be cancelled.
-        :param bool immediate: If true, the bare metal instance will be
-                               cancelled immediately. Otherwise, it will be
-                               scheduled to cancel on the anniversary date.
-        """
         hw_billing = self.get_hardware(hardware_id,
                                        mask='mask[id, billingItem.id]')
+        if 'billingItem' not in hw_billing:
+            raise SoftLayer.SoftLayerError(
+                "No billing item found for hardware")
 
         billing_id = hw_billing['billingItem']['id']
 
-        billing_item = self.client['Billing_Item']
-
-        if immediate:
-            return billing_item.cancelService(id=billing_id)
-        else:
-            return billing_item.cancelServiceOnAnniversaryDate(id=billing_id)
+        return self.client.call('Billing_Item', 'cancelItem',
+                                immediate, False, cancel_reason, comment,
+                                id=billing_id)
 
     def list_hardware(self, tags=None, cpus=None, memory=None, hostname=None,
                       domain=None, datacenter=None, nic_speed=None,
