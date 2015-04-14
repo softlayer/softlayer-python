@@ -281,7 +281,6 @@ class HardwareTests(testing.TestCase):
                                 identifier=6327,
                                 args=(False, False, 'No longer needed', ''))
 
-
     def test_cancel_hardware_no_billing_item(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
         mock.return_value = {'id': 987}
@@ -289,6 +288,8 @@ class HardwareTests(testing.TestCase):
         ex = self.assertRaises(SoftLayer.SoftLayerError,
                                self.hardware.cancel_hardware,
                                6327)
+        self.assertEqual("No billing item found for hardware",
+                         str(ex))
 
     def test_change_port_speed_public(self):
         self.hardware.change_port_speed(2, True, 100)
