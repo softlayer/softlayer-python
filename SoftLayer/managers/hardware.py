@@ -59,7 +59,7 @@ class HardwareManager(utils.IdentifierMixin, object):
 
             # Cancels hardware id 1234
             result = mrg.cancel_hardware(hardware_id=1234)
-            print result
+            
         """
         # Check to see if this is actually a pre-configured server (BMC). They
         # require a different cancellation call.
@@ -97,7 +97,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         Example::
 
             result = mgr.cancel_metal(hardware_id=1234)
-            print result
+            
         """
         hw_billing = self.get_hardware(hardware_id,
                                        mask='mask[id, billingItem.id]')
@@ -136,7 +136,7 @@ class HardwareManager(utils.IdentifierMixin, object):
             # These will stem from the SoftLayer_Hardware_Server datatype
             object_mask = "mask[hostname,monitoringRobot[robotStatus]]"
             result = mgr.list_hardware(mask=object_mask)
-            print result
+            
 
         """
         if 'mask' not in kwargs:
@@ -212,7 +212,7 @@ class HardwareManager(utils.IdentifierMixin, object):
             object_mask = "mask[id,networkVlans[vlanNumber]]"
             # Object masks are optional
             result = mrg.get_hardware(hardware_id=1234,mask=object_mask)
-            print result
+            
         """
 
         if 'mask' not in kwargs:
@@ -284,7 +284,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         Example::
 
             result = mgr.rescue(1234)
-            print result
+            
         """
         return self.hardware.bootToRescueLayer(id=hardware_id)
 
@@ -305,7 +305,7 @@ class HardwareManager(utils.IdentifierMixin, object):
             result = mgr.change_port_speed(hardware_id=12345,
                                         public=True, speed=10)
             # result will be True or an Exception
-            print result
+            
         """
         if public:
             func = self.hardware.setPublicNetworkInterfaceSpeed
@@ -335,65 +335,6 @@ class HardwareManager(utils.IdentifierMixin, object):
         :param boolean no_public: True if this server should only have private
                                   interfaces
         :param list extras: List of extra feature names
-
-        .. warning::
-           Due to how the ordering structure currently works, all ordering
-           takes place using price IDs rather than quantities. See the
-           following sample for an example of using HardwareManager functions
-           for ordering a basic server.
-
-        Example::
-
-           # client is assumed to be an initialized SoftLayer.API.Client object
-           mgr = HardwareManager(client)
-
-           # Package ID 32 corresponds to the 'Quad Processor, Quad Core Intel'
-           # package. This information can be obtained from the
-           # :func:`get_available_dedicated_server_packages` function.
-           options = mgr.get_dedicated_server_create_options(32)
-
-           # Review the contents of options to find the information that
-           # applies to your order. For the sake of this example, we assume
-           # that your selections are a series of item IDs for each category
-           # organized into a key-value dictionary.
-
-           # This contains selections for all required categories
-           selections = {
-               'server': 542, # Quad Processor Quad Core Intel 7310 - 1.60GHz
-               'pri_ip_addresses': 15, # 1 IP Address
-               'notification': 51, # Email and Ticket
-               'ram': 280, # 16 GB FB-DIMM Registered 533/667
-               'bandwidth': 173, # 5000 GB Bandwidth
-               'lockbox': 45, # 1 GB Lockbox
-               'monitoring': 49, # Host Ping
-               'disk0': 14, # 500GB SATA II (for the first disk)
-               'response': 52, # Automated Notification
-               'port_speed': 187, # 100 Mbps Public & Private Networks
-               'power_supply': 469, # Redundant Power Supplies
-               'disk_controller': 487, # Non-RAID
-               'vulnerability_scanner': 307, # Nessus
-               'vpn_management': 309, # Unlimited SSL VPN Users
-               'remote_management': 504, # Reboot / KVM over IP
-               'os': 4166, # Ubuntu Linux 12.04 LTS Precise Pangolin (64 bit)
-           }
-
-           args = {
-               'location': 'FIRST_AVAILABLE', # Pick the first available DC
-               'packageId': 32, # From above
-               'disks': [],
-           }
-
-           for cat, item_id in selections:
-               for item in options['categories'][cat]['items'].items():
-                   if item['id'] == item_id:
-                       if 'disk' not in cat or 'disk_controller' == cat:
-                           args[cat] = item['price_id']
-                       else:
-                           args['disks'].append(item['price_id'])
-
-           # You can call :func:`verify_order` here to test the order instead
-           # of actually placing it if you prefer.
-           result = mgr.place_order(**args)
         """
         create_options = self._generate_create_dict(**kwargs)
         return self.client['Product_Order'].placeOrder(create_options)
@@ -613,7 +554,7 @@ regions[location[location]]
             # Change the hostname on instance 12345 to 'something'
             result = mgr.edit(hardware_id=12345 , hostname="something")
             #result will be True or an Exception
-            print result
+            
 
         """
 
@@ -656,7 +597,7 @@ regions[location[location]]
 
             # Check the servers active transactions to see progress
             result = mgr.update_firmware(hardware_id=1234)
-            print result
+            
         """
 
         return self.hardware.createFirmwareUpdateTransaction(
