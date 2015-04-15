@@ -76,8 +76,6 @@ class SSLManager(object):
 
             # Removes certificate with id 1234
             result = mgr.remove_certificate(cert_id = 1234)
-            
-
         """
         return self.ssl.deleteObject(id=cert_id)
 

@@ -586,7 +586,6 @@ class VSManager(utils.IdentifierMixin, object):
             result = mgr.change_port_speed(instance_id=12345,
                                         public=True, speed=10)
             # result will be True or an Exception
-            
         """
         if public:
             func = self.guest.setPublicNetworkInterfaceSpeed
@@ -637,7 +636,6 @@ class VSManager(utils.IdentifierMixin, object):
             # Change the hostname on instance 12345 to 'something'
             result = mgr.edit(instance_id=12345 , hostname="something")
             #result will be True or an Exception
-            
         """
 
         obj = {}
@@ -690,7 +688,6 @@ class VSManager(utils.IdentifierMixin, object):
             name = "Testing Images"
             notes = "Some notes about this image"
             result = mgr.capture(instance_id=12345, name=name, notes=notes)
-            
         """
         vsi = self.get_instance(instance_id)
 

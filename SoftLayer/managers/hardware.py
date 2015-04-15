@@ -59,7 +59,6 @@ class HardwareManager(utils.IdentifierMixin, object):
 
             # Cancels hardware id 1234
             result = mrg.cancel_hardware(hardware_id=1234)
-            
         """
         # Check to see if this is actually a pre-configured server (BMC). They
         # require a different cancellation call.
@@ -93,7 +92,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         :param int id: The ID of the bare metal instance to be cancelled.
         :param bool immediate: If true, the bare metal instance will be
                                cancelled immediately. Otherwise, it will be
-                               scheduled to cancel on the anniversary date. 
+                               scheduled to cancel on the anniversary date.
         """
         hw_billing = self.get_hardware(hardware_id,
                                        mask='mask[id, billingItem.id]')
@@ -132,8 +131,6 @@ class HardwareManager(utils.IdentifierMixin, object):
             # These will stem from the SoftLayer_Hardware_Server datatype
             object_mask = "mask[hostname,monitoringRobot[robotStatus]]"
             result = mgr.list_hardware(mask=object_mask)
-            
-
         """
         if 'mask' not in kwargs:
             hw_items = [
@@ -208,7 +205,6 @@ class HardwareManager(utils.IdentifierMixin, object):
             object_mask = "mask[id,networkVlans[vlanNumber]]"
             # Object masks are optional
             result = mrg.get_hardware(hardware_id=1234,mask=object_mask)
-            
         """
 
         if 'mask' not in kwargs:
@@ -280,7 +276,6 @@ class HardwareManager(utils.IdentifierMixin, object):
         Example::
 
             result = mgr.rescue(1234)
-            
         """
         return self.hardware.bootToRescueLayer(id=hardware_id)
 
@@ -301,7 +296,6 @@ class HardwareManager(utils.IdentifierMixin, object):
             result = mgr.change_port_speed(hardware_id=12345,
                                         public=True, speed=10)
             # result will be True or an Exception
-            
         """
         if public:
             func = self.hardware.setPublicNetworkInterfaceSpeed
@@ -550,8 +544,6 @@ regions[location[location]]
             # Change the hostname on instance 12345 to 'something'
             result = mgr.edit(hardware_id=12345 , hostname="something")
             #result will be True or an Exception
-            
-
         """
 
         obj = {}
@@ -593,7 +585,6 @@ regions[location[location]]
 
             # Check the servers active transactions to see progress
             result = mgr.update_firmware(hardware_id=1234)
-            
         """
 
         return self.hardware.createFirmwareUpdateTransaction(
