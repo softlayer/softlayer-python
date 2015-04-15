@@ -23,16 +23,16 @@ import click
 @click.option('--tags',
               help='Show instances that have one of these comma-separated '
                    'tags')
-@click.option('--column', help='Columns to display. default is '
+@click.option('--columns', help='Columns to display. default is '
               ' guid, hostname, primary_ip, backend_ip, datacenter, action',
               default="guid,hostname,primary_ip,backend_ip,datacenter,action")
 @environment.pass_env
 def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
-        hourly, monthly, tags, column):
+        hourly, monthly, tags, columns):
     """List virtual servers."""
 
     vsi = SoftLayer.VSManager(env.client)
-    columns = [col.strip() for col in column.split(',')]
+    columns_clean = [col.strip() for col in columns.split(',')]
     tag_list = None
     if tags:
         tag_list = [tag.strip() for tag in tags.split(',')]
@@ -47,7 +47,7 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
                                 nic_speed=network,
                                 tags=tag_list)
 
-    table = formatting.Table(columns)
+    table = formatting.Table(columns_clean)
     table.sortby = sortby
     column_map = {}
     column_map['guid'] = 'globalIdentifier'
@@ -61,7 +61,7 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
         guest['datacenter-name'] = guest['datacenter']['name']
         guest['formatted-action'] = formatting.active_txn(guest)
         row_column = []
-        for col in columns:
+        for col in columns_clean:
             entry = None
             if col in column_map:
                 entry = guest[column_map[col]]

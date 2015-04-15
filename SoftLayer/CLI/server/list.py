@@ -20,17 +20,17 @@ import click
 @click.option('--hostname', '-H', help='Filter by hostname')
 @click.option('--memory', '-m', help='Filter by memory in gigabytes')
 @click.option('--network', '-n', help='Filter by network port speed in Mbps')
-@click.option('--column', help='Columns to display. default is '
+@click.option('--columns', help='Columns to display. default is '
               ' guid, hostname, primary_ip, backend_ip, datacenter, action',
               default="guid,hostname,primary_ip,backend_ip,datacenter,action")
 @helpers.multi_option('--tag', help='Filter by tags')
 @environment.pass_env
 def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag,
-        column):
+        columns):
     """List hardware servers."""
 
     manager = SoftLayer.HardwareManager(env.client)
-    columns = [col.strip() for col in column.split(',')]
+    columns_clean = [col.strip() for col in columns.split(',')]
 
     servers = manager.list_hardware(hostname=hostname,
                                     domain=domain,
@@ -40,7 +40,7 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag,
                                     nic_speed=network,
                                     tags=tag)
 
-    table = formatting.Table(columns)
+    table = formatting.Table(columns_clean)
     table.sortby = sortby
     column_map = {}
     column_map['guid'] = 'globalIdentifier'
@@ -54,7 +54,7 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag,
         server['datacenter-name'] = server['datacenter']['name']
         server['formatted-action'] = formatting.active_txn(server)
         row_column = []
-        for col in columns:
+        for col in columns_clean:
             entry = None
             if col in column_map:
                 entry = server[column_map[col]]
