@@ -82,10 +82,13 @@ class MetadataManager(object):
                 raise exceptions.SoftLayerError(
                     'Parameter required to get this attribute.')
 
+        params = tuple()
+        if param is not None:
+            params = (param,)
         try:
             return self.client.call('Resource_Metadata',
                                     self.attribs[name]['call'],
-                                    param)
+                                    *params)
         except exceptions.SoftLayerAPIError as ex:
             if ex.faultCode == 404:
                 return None
