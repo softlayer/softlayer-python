@@ -19,10 +19,10 @@ functionality not fully documented here.
 
 Configuration Setup
 -------------------
-To update the configuration, you can use `sl config setup`.
+To update the configuration, you can use `slcli setup`.
 ::
 
-	$ sl config setup
+	$ slcli setup
 	Username []: username
 	API Key or Password []:
 	Endpoint (public|private|custom): public
@@ -35,10 +35,10 @@ To update the configuration, you can use `sl config setup`.
 	:..............:..................................................................:
 	Are you sure you want to write settings to "/home/me/.softlayer"? [y/N]: y
 
-To check the configuration, you can use `sl config show`.
+To check the configuration, you can use `slcli config show`.
 ::
 
-	$ sl config show
+	$ slcli config show
 	:..............:..................................................................:
 	:         Name : Value                                                            :
 	:..............:..................................................................:
@@ -58,7 +58,7 @@ To discover the available commands, simply type `sl`.
 ::
 
 	$ sl
-	Usage: sl [OPTIONS] COMMAND [ARGS]...
+	Usage: slcli [OPTIONS] COMMAND [ARGS]...
 
 	  SoftLayer Command-line Client
 
@@ -99,14 +99,14 @@ To discover the available commands, simply type `sl`.
 	  vs         Virtual Servers.
 
 	  To use most commands your SoftLayer username and api_key need to be
-	  configured. The easiest way to do that is to use: 'sl config setup'
+	  configured. The easiest way to do that is to use: 'slcli setup'
 
 As you can see, there are a number of commands/sections. To look at the list of
-subcommands for virtual servers type `sl vs`. For example:
+subcommands for virtual servers type `slcli vs`. For example:
 ::
 
-	$ sl vs
-	Usage: sl vs [OPTIONS] COMMAND [ARGS]...
+	$ slcli vs
+	Usage: slcli vs [OPTIONS] COMMAND [ARGS]...
 
 	  Virtual Servers.
 
@@ -135,11 +135,11 @@ subcommands for virtual servers type `sl vs`. For example:
 	  upgrade         Upgrade a virtual server.
 
 Finally, we can make an actual call. Let's list out the virtual servers on our
-account by using `sl vs list`.
+account by using `slcli vs list`.
 
 ::
 
-	$ sl vs list
+	$ slcli vs list
 	:.........:............:....................:.......:........:................:..............:....................:
 	:    id   : datacenter :       host         : cores : memory :   primary_ip   :  backend_ip  : active_transaction :
 	:.........:............:....................:.......:........:................:..............:....................:
@@ -149,8 +149,8 @@ account by using `sl vs list`.
 Most commands will take in additional options/arguments. To see all available actions, use `--help`.
 ::
 
-	$ sl vs list --help
-	Usage: sl vs list [OPTIONS]
+	$ slcli vs list --help
+	Usage: slcli vs list [OPTIONS]
 
 	  List virtual servers.
 

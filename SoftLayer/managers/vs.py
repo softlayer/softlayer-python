@@ -25,7 +25,7 @@ class VSManager(utils.IdentifierMixin, object):
                                               auto initialized.
 
     Example::
-           # Initialize the VSManager. 
+           # Initialize the VSManager.
            # env variables. These can also be specified in ~/.softlayer,
            # or passed directly to SoftLayer.Client()
            # SL_USERNAME = YOUR_USERNAME
@@ -70,7 +70,7 @@ class VSManager(utils.IdentifierMixin, object):
 
         Example::
 
-            # Print out a list of all hourly instances in the DAL05 data center.
+            # Print out a list of hourly instances in the DAL05 data center.
 
             for vsi in mgr.list_instances(hourly=True, datacenter='dal05'):
                print vsi['fullyQualifiedDomainName'], vsi['primaryIpAddress']
@@ -434,17 +434,17 @@ class VSManager(utils.IdentifierMixin, object):
 
         Example::
             new_vsi = {
-                'domain': u'test01.labs.sftlyr.ws', 
-                'hostname': u'minion05', 
-                'datacenter': u'hkg02', 
-                'dedicated': False, 
-                'private': False, 
-                'cpus': 1, 
-                'os_code' : u'UBUNTU_LATEST', 
-                'hourly': True, 
-                'ssh_keys': [1234], 
-                'disks': ('100','25'), 
-                'local_disk': True, 
+                'domain': u'test01.labs.sftlyr.ws',
+                'hostname': u'minion05',
+                'datacenter': u'hkg02',
+                'dedicated': False,
+                'private': False,
+                'cpus': 1,
+                'os_code' : u'UBUNTU_LATEST',
+                'hourly': True,
+                'ssh_keys': [1234],
+                'disks': ('100','25'),
+                'local_disk': True,
                 'memory': 1024
             }
 
@@ -494,17 +494,17 @@ class VSManager(utils.IdentifierMixin, object):
 
         Example::
             new_vsi = {
-                'domain': u'test01.labs.sftlyr.ws', 
-                'hostname': u'minion05', 
-                'datacenter': u'hkg02', 
-                'dedicated': False, 
-                'private': False, 
-                'cpus': 1, 
-                'os_code' : u'UBUNTU_LATEST', 
-                'hourly': True, 
-                'ssh_keys': [1234], 
-                'disks': ('100','25'), 
-                'local_disk': True, 
+                'domain': u'test01.labs.sftlyr.ws',
+                'hostname': u'minion05',
+                'datacenter': u'hkg02',
+                'dedicated': False,
+                'private': False,
+                'cpus': 1,
+                'os_code' : u'UBUNTU_LATEST',
+                'hourly': True,
+                'ssh_keys': [1234],
+                'disks': ('100','25'),
+                'local_disk': True,
                 'memory': 1024,
                 'tags': 'test, pleaseCancel'
             }
@@ -531,17 +531,17 @@ class VSManager(utils.IdentifierMixin, object):
         Example::
             # Define the instance we want to create.
             new_vsi = {
-                'domain': u'test01.labs.sftlyr.ws', 
-                'hostname': u'multi-test', 
-                'datacenter': u'hkg02', 
-                'dedicated': False, 
-                'private': False, 
-                'cpus': 1, 
-                'os_code' : u'UBUNTU_LATEST', 
-                'hourly': True, 
-                'ssh_keys': [87634], 
-                'disks': ('100','25'), 
-                'local_disk': True, 
+                'domain': u'test01.labs.sftlyr.ws',
+                'hostname': u'multi-test',
+                'datacenter': u'hkg02',
+                'dedicated': False,
+                'private': False,
+                'cpus': 1,
+                'os_code' : u'UBUNTU_LATEST',
+                'hourly': True,
+                'ssh_keys': [87634],
+                'disks': ('100','25'),
+                'local_disk': True,
                 'memory': 1024,
                 'tags': 'test, pleaseCancel'
             }
@@ -583,10 +583,10 @@ class VSManager(utils.IdentifierMixin, object):
 
         Example::
             #change the Public interface to 10Mbps on instance 12345
-            result = mgr.change_port_speed(instance_id=12345, 
+            result = mgr.change_port_speed(instance_id=12345,
                                         public=True, speed=10)
             # result will be True or an Exception
-            print result 
+            print result
         """
         if public:
             func = self.guest.setPublicNetworkInterfaceSpeed

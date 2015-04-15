@@ -13,11 +13,11 @@ from SoftLayer import utils
 import click
 
 
-@click.command(epilog="See 'sl vs create-options' for valid options")
+@click.command(epilog="See 'slcli vs create-options' for valid options")
 @click.option('--domain', '-D', help="Domain portion of the FQDN")
 @click.option('--hostname', '-H', help="Host portion of the FQDN")
 @click.option('--image',
-              help="Image GUID. See: 'sl image list' for reference")
+              help="Image GUID. See: 'slcli image list' for reference")
 @click.option('--cpu', '-c', help="Number of CPU cores", type=click.INT)
 @click.option('--memory', '-m', help="Memory in mebibytes", type=virt.MEM_TYPE)
 @click.option('--os', '-o',
@@ -25,7 +25,7 @@ import click
 @click.option('--billing',
               type=click.Choice(['hourly', 'monthly']),
               default='hourly',
-              help="""Billing rate""")
+              help="Billing rate")
 @click.option('--datacenter', '-d', help="Datacenter shortname")
 @click.option('--dedicated/--public',
               is_flag=True,
@@ -114,7 +114,7 @@ def cli(env, **args):
             total = total_monthly
 
         billing_rate = 'monthly'
-        if args.get('hourly'):
+        if args.get('billing') == 'hourly':
             billing_rate = 'hourly'
         table.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
         output.append(table)

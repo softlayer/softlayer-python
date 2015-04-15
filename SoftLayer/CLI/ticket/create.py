@@ -13,7 +13,7 @@ import click
 @click.option('--subject-id',
               required=True,
               help="""The subject id to use for the ticket,
- issue 'sl ticket subjects' to get the list""")
+ issue 'slcli ticket subjects' to get the list""")
 @click.option('--body', help="The ticket body")
 @environment.pass_env
 def cli(env, title, subject_id, body):

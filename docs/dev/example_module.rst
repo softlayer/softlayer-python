@@ -8,7 +8,7 @@ Example CLI Module
 ::
 
     """
-    usage: sl example [<command>] [<args>...] [options]
+    usage: slcli example [<command>] [<args>...] [options]
 
     Example implementation of a CLI module
 
@@ -24,7 +24,7 @@ Example CLI Module
 
     class ExampleAction(CLIRunnable):
         """
-    usage: sl example print [options]
+    usage: slcli example print [options]
 
     Print example
     """
@@ -37,7 +37,7 @@ Example CLI Module
 
     class ExamplePretty(CLIRunnable):
         """
-    usage: sl example pretty [options]
+    usage: slcli example pretty [options]
 
     Pretty output example
     """
@@ -63,7 +63,7 @@ Example CLI Module
 
     class ExampleArgs(CLIRunnable):
         """
-    usage: sl example parse [--test] [--this=THIS|--that=THAT]
+    usage: slcli example parse [--test] [--this=THIS|--that=THAT]
                             (--one|--two) [options]
 
     Argument parsing example
@@ -91,4 +91,3 @@ Example CLI Module
 
             if args.get('--that'):
                 print "you dont have", args['--that']
-    

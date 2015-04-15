@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+from SoftLayer import consts
 from SoftLayer import exceptions
 from SoftLayer import utils
 
@@ -19,20 +20,19 @@ LOGGER = logging.getLogger(__name__)
 # transports.Request does have a lot of instance attributes. :(
 # pylint: disable=too-many-instance-attributes
 
-__all__ = ['Request',
-           'XmlRpcTransport',
-           'RestTransport',
-           'TimingTransport',
-           'FixtureTransport']
+__all__ = [
+    'Request',
+    'XmlRpcTransport',
+    'RestTransport',
+    'TimingTransport',
+    'FixtureTransport',
+]
 
 
 class Request(object):
     """Transport request object."""
 
     def __init__(self):
-        #: The SoftLayer endpoint address.
-        self.endpoint = None
-
         #: API service name. E.G. SoftLayer_Account
         self.service = None
 
@@ -45,14 +45,14 @@ class Request(object):
         #: API headers, used for authentication, masks, limits, offsets, etc.
         self.headers = {}
 
+        #: Transport user.
+        self.transport_user = None
+
+        #: Transport password.
+        self.transport_password = None
+
         #: Transport headers.
         self.transport_headers = {}
-
-        #: Integer timeout.
-        self.timeout = None
-
-        #: URL to proxy API requests to.
-        self.proxy = None
 
         #: Boolean specifying if the server certificate should be verified.
         self.verify = True
@@ -78,58 +78,69 @@ class Request(object):
 
 class XmlRpcTransport(object):
     """XML-RPC transport."""
+    def __init__(self,
+                 endpoint_url=None,
+                 timeout=None,
+                 proxy=None,
+                 user_agent=None):
+
+        self.endpoint_url = (endpoint_url or
+                             consts.API_PUBLIC_ENDPOINT).rstrip('/')
+        self.timeout = timeout or None
+        self.proxy = proxy
+        self.user_agent = user_agent or consts.USER_AGENT
 
     def __call__(self, request):
         """Makes a SoftLayer API call against the XML-RPC endpoint.
 
         :param request request: Request object
         """
+        largs = list(request.args)
+
+        headers = request.headers
+
+        if request.identifier is not None:
+            header_name = request.service + 'InitParameters'
+            headers[header_name] = {'id': request.identifier}
+
+        if request.mask is not None:
+            headers.update(_format_object_mask(request.mask, request.service))
+
+        if request.filter is not None:
+            headers['%sObjectFilter' % request.service] = request.filter
+
+        if request.limit:
+            headers['resultLimit'] = {
+                'limit': request.limit,
+                'offset': request.offset or 0,
+            }
+
+        largs.insert(0, {'headers': headers})
+        request.transport_headers.setdefault('Content-Type', 'application/xml')
+        request.transport_headers.setdefault('User-Agent', self.user_agent)
+
+        url = '/'.join([self.endpoint_url, request.service])
+        payload = utils.xmlrpc_client.dumps(tuple(largs),
+                                            methodname=request.method,
+                                            allow_none=True)
+        LOGGER.debug("=== REQUEST ===")
+        LOGGER.info('POST %s', url)
+        LOGGER.debug(request.transport_headers)
+        LOGGER.debug(payload)
+
         try:
-            largs = list(request.args)
-
-            headers = request.headers
-
-            if request.identifier is not None:
-                header_name = request.service + 'InitParameters'
-                headers[header_name] = {'id': request.identifier}
-
-            if request.mask is not None:
-                headers.update(_format_object_mask(request.mask,
-                                                   request.service))
-
-            if request.filter is not None:
-                headers['%sObjectFilter' % request.service] = request.filter
-
-            if request.limit:
-                headers['resultLimit'] = {
-                    'limit': request.limit,
-                    'offset': request.offset or 0,
-                }
-
-            largs.insert(0, {'headers': headers})
-
-            url = '/'.join([request.endpoint, request.service])
-            payload = utils.xmlrpc_client.dumps(tuple(largs),
-                                                methodname=request.method,
-                                                allow_none=True)
-            LOGGER.debug("=== REQUEST ===")
-            LOGGER.info('POST %s', url)
-            LOGGER.debug(request.transport_headers)
-            LOGGER.debug(payload)
-
             response = requests.request('POST', url,
                                         data=payload,
                                         headers=request.transport_headers,
-                                        timeout=request.timeout,
+                                        timeout=self.timeout,
                                         verify=request.verify,
                                         cert=request.cert,
-                                        proxies=_proxies_dict(request.proxy))
+                                        proxies=_proxies_dict(self.proxy))
             LOGGER.debug("=== RESPONSE ===")
             LOGGER.debug(response.headers)
             LOGGER.debug(response.content)
             response.raise_for_status()
-            result = utils.xmlrpc_client.loads(response.content,)[0][0]
-            return result
+            return utils.xmlrpc_client.loads(response.content)[0][0]
         except utils.xmlrpc_client.Fault as ex:
             # These exceptions are formed from the XML-RPC spec
             # http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
@@ -154,7 +165,23 @@ class XmlRpcTransport(object):
 
 
 class RestTransport(object):
-    """REST transport."""
+    """REST transport.
+
+    Currently only supports GET requests (no POST, PUT, DELETE) and lacks
+    support for masks, filters, limits and offsets.
+    """
+
+    def __init__(self,
+                 endpoint_url=None,
+                 timeout=None,
+                 proxy=None,
+                 user_agent=None):
+
+        self.endpoint_url = (endpoint_url or
+                             consts.API_PUBLIC_ENDPOINT_REST).rstrip('/')
+        self.timeout = timeout or None
+        self.proxy = proxy
+        self.user_agent = user_agent or consts.USER_AGENT
 
     def __call__(self, request):
         """Makes a SoftLayer API call against the REST endpoint.
@@ -163,9 +190,17 @@ class RestTransport(object):
 
         :param request request: Request object
         """
-        url_parts = [request.endpoint, request.service, request.method]
+        url_parts = [self.endpoint_url, request.service]
         if request.identifier is not None:
             url_parts.append(str(request.identifier))
+        if request.method is not None:
+            url_parts.append(request.method)
+        for arg in request.args:
+            url_parts.append(str(arg))
+
+        request.transport_headers.setdefault('Content-Type',
+                                             'application/json')
+        request.transport_headers.setdefault('User-Agent', self.user_agent)
 
         url = '%s.%s' % ('/'.join(url_parts), 'json')
 
@@ -175,10 +210,10 @@ class RestTransport(object):
         try:
             resp = requests.request('GET', url,
                                     headers=request.transport_headers,
-                                    timeout=request.timeout,
+                                    timeout=self.timeout,
                                     verify=request.verify,
                                     cert=request.cert,
-                                    proxies=_proxies_dict(request.proxy))
+                                    proxies=_proxies_dict(self.proxy))
             LOGGER.debug("=== RESPONSE ===")
             LOGGER.debug(resp.headers)
             LOGGER.debug(resp.content)

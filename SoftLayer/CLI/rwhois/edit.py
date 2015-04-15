@@ -52,4 +52,4 @@ def cli(env, abuse, address1, address2, city, company, country, firstname,
         raise exceptions.CLIAbort(
             "You must specify at least one field to update.")
 
-    mgr.edit_rwhois(**update)  # pylint: disable=W0142
+    mgr.edit_rwhois(**update)

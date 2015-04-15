@@ -7,11 +7,6 @@
 """
 
 ALL_ROUTES = [
-    ('billing', 'SoftLayer.CLI.billing'),
-    ('billing:list', 'SoftLayer.CLI.billing.list:cli'),
-    ('billing:info', 'SoftLayer.CLI.billing.info:cli'),
-    ('billing:summary', 'SoftLayer.CLI.billing.summary:cli'),
-
     ('call-api', 'SoftLayer.CLI.call_api:cli'),
 
     ('vs', 'SoftLayer.CLI.virt'),
@@ -47,6 +42,7 @@ ALL_ROUTES = [
     ('config', 'SoftLayer.CLI.config'),
     ('config:setup', 'SoftLayer.CLI.config.setup:cli'),
     ('config:show', 'SoftLayer.CLI.config.show:cli'),
+    ('setup', 'SoftLayer.CLI.config.setup:cli'),
 
     ('dns', 'SoftLayer.CLI.dns'),
     ('dns:import', 'SoftLayer.CLI.dns.zone_import:cli'),
@@ -141,7 +137,6 @@ ALL_ROUTES = [
     ('server:detail', 'SoftLayer.CLI.server.detail:cli'),
     ('server:edit', 'SoftLayer.CLI.server.edit:cli'),
     ('server:list', 'SoftLayer.CLI.server.list:cli'),
-    ('server:list-chassis', 'SoftLayer.CLI.server.list_chassis:cli'),
     ('server:nic-edit', 'SoftLayer.CLI.server.nic_edit:cli'),
     ('server:power-cycle', 'SoftLayer.CLI.server.power:power_cycle'),
     ('server:power-off', 'SoftLayer.CLI.server.power:power_off'),

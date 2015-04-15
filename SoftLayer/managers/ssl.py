@@ -13,7 +13,7 @@ class SSLManager(object):
     :param SoftLayer.API.Client client: an API client instance
 
     Example::
-       # Initialize the Manager. 
+       # Initialize the Manager.
        # env variables. These can also be specified in ~/.softlayer,
        # or passed directly to SoftLayer.Client()
        # SL_USERNAME = YOUR_USERNAME
