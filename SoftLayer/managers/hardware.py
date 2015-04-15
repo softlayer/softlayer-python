@@ -93,11 +93,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         :param int id: The ID of the bare metal instance to be cancelled.
         :param bool immediate: If true, the bare metal instance will be
                                cancelled immediately. Otherwise, it will be
-                               scheduled to cancel on the anniversary date.
-        Example::
-
-            result = mgr.cancel_metal(hardware_id=1234)
-            
+                               scheduled to cancel on the anniversary date. 
         """
         hw_billing = self.get_hardware(hardware_id,
                                        mask='mask[id, billingItem.id]')
