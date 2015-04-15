@@ -55,11 +55,13 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
     column_map['backend_ip'] = 'primaryBackendIpAddress'
     column_map['datacenter'] = 'datacenter-name'
     column_map['action'] = 'formatted-action'
+    column_map['powerState'] = 'powerState-name'
 
     for guest in guests:
         guest = utils.NestedDict(guest)
         guest['datacenter-name'] = guest['datacenter']['name']
         guest['formatted-action'] = formatting.active_txn(guest)
+        guest['powerState-name'] =guest['powerState']['name']
         row_column = []
         for col in columns_clean:
             entry = None
