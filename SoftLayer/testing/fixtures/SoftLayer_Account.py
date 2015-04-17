@@ -361,6 +361,7 @@ getTickets = [
             "id": 1001,
             "name": "Open"
         },
+        'assignedUser': {'firstName': 'John', 'lastName': 'Smith'},
         "statusId": 1001,
         "title": "Cloud Instance Cancellation - 08/01/13"
     }]

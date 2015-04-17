@@ -74,23 +74,6 @@ class TicketTests(testing.TestCase):
     def test_update_ticket(self):
         # test a full update
         self.ticket.update_ticket(100, body='Update1')
-        args = (
-            {
-                "accountId": 1234,
-                "assignedUserId": 12345,
-                "createDate": "2013-08-01T14:14:04-07:00",
-                "id": 100,
-                "lastEditDate": "2013-08-01T14:16:47-07:00",
-                "lastEditType": "AUTO",
-                "modifyDate": "2013-08-01T14:16:47-07:00",
-                "status": {
-                    "id": 1002,
-                    "name": "Closed"
-                },
-                "statusId": 1002,
-                "title": "Cloud Instance Cancellation - 08/01/13"
-            },
-            'Update1')
-        self.assert_called_with('SoftLayer_Ticket', 'edit',
-                                args=args,
+        self.assert_called_with('SoftLayer_Ticket', 'addUpdate',
+                                args=({'entry': 'Update1'},),
                                 identifier=100)
