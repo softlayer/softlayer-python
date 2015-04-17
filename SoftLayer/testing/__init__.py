@@ -84,18 +84,13 @@ class TestCase(testtools.TestCase):
 
     def setUp(self):  # NOQA
         testtools.TestCase.setUp(self)
-        self.env = environment.Environment()
 
         # Create a crazy mockable, fixture client
-        auth = SoftLayer.BasicAuthentication('default-user', 'default-key')
         self.mocks = MockableTransport(SoftLayer.FixtureTransport())
         self.transport = SoftLayer.TimingTransport(self.mocks)
-        self.client = SoftLayer.Client(
-            transport=self.transport,
-            auth=auth,
-            timeout=10,
-            endpoint_url='default-endpoint-url')
+        self.client = SoftLayer.BaseClient(transport=self.transport)
 
+        self.env = environment.Environment()
         self.env.client = self.client
         return self.set_up()
 

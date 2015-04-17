@@ -156,7 +156,7 @@ class BaseClient(object):
 
         Usage:
             >>> import SoftLayer
-            >>> client = SoftLayer.Client()
+            >>> client = SoftLayer.create_client_from_env()
             >>> client['Account']
             <Service: Account>
 
@@ -176,7 +176,7 @@ class BaseClient(object):
 
         Usage:
             >>> import SoftLayer
-            >>> client = SoftLayer.Client()
+            >>> client = SoftLayer.create_client_from_env()
             >>> client['Account'].getVirtualGuests(mask="id", limit=10)
             [...]
 
@@ -321,7 +321,7 @@ class Service(object):
 
         Usage:
             >>> import SoftLayer
-            >>> client = SoftLayer.Client()
+            >>> client = SoftLayer.create_client_from_env()
             >>> client['Account'].getVirtualGuests(mask="id", limit=10)
             [...]
 
@@ -341,7 +341,7 @@ class Service(object):
 
         Usage:
             >>> import SoftLayer
-            >>> client = SoftLayer.Client()
+            >>> client = SoftLayer.create_client_from_env()
             >>> gen = client['Account'].getVirtualGuests(iter=True)
             >>> for virtual_guest in gen:
             ...     virtual_guest['id']

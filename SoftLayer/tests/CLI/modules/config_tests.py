@@ -9,21 +9,32 @@ import tempfile
 
 import mock
 
+import SoftLayer
+from SoftLayer import auth
 from SoftLayer.CLI.config import setup as config
 from SoftLayer.CLI import exceptions
 from SoftLayer import consts
 from SoftLayer import testing
+from SoftLayer import transports
 
 
 class TestHelpShow(testing.TestCase):
+
+    def set_up(self):
+        transport = transports.XmlRpcTransport(
+            endpoint_url='http://endpoint-url',
+        )
+        self.env.client = SoftLayer.BaseClient(
+            transport=transport,
+            auth=auth.BasicAuthentication('username', 'api-key'))
 
     def test_show(self):
         result = self.run_command(['config', 'show'])
 
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(json.loads(result.output),
-                         {'Username': 'default-user',
-                          'API Key': 'default-key',
+                         {'Username': 'username',
+                          'API Key': 'api-key',
                           'Endpoint URL': 'not set',
                           'Timeout': 'not set'})
 
