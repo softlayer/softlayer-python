@@ -1,4 +1,5 @@
 requests
+requests[security]
 click
 prettytable >= 0.7.0
 six >= 1.7.0
