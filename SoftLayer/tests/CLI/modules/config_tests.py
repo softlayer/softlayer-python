@@ -48,7 +48,7 @@ class TestHelpSetup(testing.TestCase):
         with tempfile.NamedTemporaryFile() as config_file:
             confirm_mock.return_value = True
             getpass.return_value = 'A' * 64
-            input.side_effect = ['user', 'public']
+            input.side_effect = ['user', 'public', 0]
 
             result = self.run_command(['--config=%s' % config_file.name,
                                        'config', 'setup'])
@@ -71,7 +71,7 @@ class TestHelpSetup(testing.TestCase):
         with tempfile.NamedTemporaryFile() as config_file:
             confirm_mock.return_value = False
             getpass.return_value = 'A' * 64
-            input.side_effect = ['user', 'public']
+            input.side_effect = ['user', 'public', 0]
 
             result = self.run_command(['--config=%s' % config_file.name,
                                        'config', 'setup'])
@@ -83,7 +83,7 @@ class TestHelpSetup(testing.TestCase):
     @mock.patch('SoftLayer.CLI.environment.Environment.input')
     def test_get_user_input_private(self, input, getpass):
         getpass.return_value = 'A' * 64
-        input.side_effect = ['user', 'private']
+        input.side_effect = ['user', 'private', 0]
 
         username, secret, endpoint_url, timeout = (
             config.get_user_input(self.env))
@@ -96,7 +96,7 @@ class TestHelpSetup(testing.TestCase):
     @mock.patch('SoftLayer.CLI.environment.Environment.input')
     def test_get_user_input_custom(self, input, getpass):
         getpass.return_value = 'A' * 64
-        input.side_effect = ['user', 'custom', 'custom-endpoint']
+        input.side_effect = ['user', 'custom', 'custom-endpoint', 0]
 
         _, _, endpoint_url, _ = config.get_user_input(self.env)
 
@@ -106,7 +106,7 @@ class TestHelpSetup(testing.TestCase):
     @mock.patch('SoftLayer.CLI.environment.Environment.input')
     def test_get_user_input_default(self, input, getpass):
         self.env.getpass.return_value = 'A' * 64
-        self.env.input.side_effect = ['user', '']
+        self.env.input.side_effect = ['user', 'public', 0]
 
         _, _, endpoint_url, _ = config.get_user_input(self.env)
 

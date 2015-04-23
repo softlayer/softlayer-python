@@ -160,27 +160,6 @@ def transaction_status(transaction):
         transaction['transactionStatus'].get('friendlyName'))
 
 
-def valid_response(prompt, *valid):
-    """Prompt user for input.
-
-    Will display a prompt for a command-line user. If the input is in the
-    valid given valid list then it will return True. Otherwise, it will
-    return False. If no input is received from the user, None is returned
-    instead.
-
-    :param string prompt: string prompt to give to the user
-    :param string \\*valid: valid responses
-    """
-    ans = click.prompt(prompt).lower()
-
-    if ans in valid:
-        return True
-    elif ans == '':
-        return None
-
-    return False
-
-
 def confirm(prompt_str, default=False):
     """Show a confirmation prompt to a command-line user.
 
@@ -188,16 +167,17 @@ def confirm(prompt_str, default=False):
     :param bool default: Default value to True or False
     """
     if default:
+        default_str = 'y'
         prompt = '%s [Y/n]' % prompt_str
     else:
+        default_str = 'n'
         prompt = '%s [y/N]' % prompt_str
 
-    response = valid_response(prompt, 'y', 'yes', 'yeah', 'yup', 'yolo')
+    ans = click.prompt(prompt, default=default_str, show_default=False)
+    if ans.lower() in ('y', 'yes', 'yeah', 'yup', 'yolo'):
+        return True
 
-    if response is None:
-        return default
-
-    return response
+    return False
 
 
 def no_going_back(confirmation):
@@ -209,10 +189,14 @@ def no_going_back(confirmation):
     if not confirmation:
         confirmation = 'yes'
 
-    return valid_response(
-        'This action cannot be undone! '
-        'Type "%s" or press Enter to abort' % confirmation,
-        str(confirmation))
+    prompt = ('This action cannot be undone! Type "%s" or press Enter '
+              'to abort' % confirmation)
+
+    ans = click.confirm(prompt, default='', show_default=False).lower()
+    if ans == str(confirmation):
+        return True
+
+    return False
 
 
 class SequentialOutput(list):

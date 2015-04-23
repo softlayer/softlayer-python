@@ -44,13 +44,13 @@ class Environment(object):
         """Format output based on current the environment format."""
         return formatting.format_output(output, fmt=self.format)
 
-    def input(self, prompt):
+    def input(self, prompt, default=None):
         """Provide a command prompt."""
-        return click.prompt(prompt)
+        return click.prompt(prompt, default=default)
 
-    def getpass(self, prompt):
+    def getpass(self, prompt, default=None):
         """Provide a password prompt."""
-        return click.prompt(prompt, hide_input=True)
+        return click.prompt(prompt, hide_input=True, default=default)
 
     # Command loading methods
     def list_commands(self, *path):
