@@ -144,7 +144,7 @@ def active_txn(item):
 
         :param item: An object capable of having an active transaction
     """
-    return transaction_status(item['activeTransaction'])
+    return transaction_status(utils.lookup(item, 'activeTransaction'))
 
 
 def transaction_status(transaction):
@@ -152,7 +152,7 @@ def transaction_status(transaction):
 
         :param item: An object capable of having an active transaction
     """
-    if not transaction.get('transactionStatus'):
+    if not transaction or not transaction.get('transactionStatus'):
         return blank()
 
     return FormattedItem(

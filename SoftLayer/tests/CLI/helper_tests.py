@@ -181,7 +181,8 @@ class FormattedListTests(testing.TestCase):
 
 class FormattedTxnTests(testing.TestCase):
     def test_active_txn_empty(self):
-        self.assertRaises(KeyError, formatting.active_txn, {})
+        result = formatting.active_txn({})
+        self.assertEqual(str(result), 'NULL')
 
     def test_active_txn(self):
         result = formatting.active_txn({
