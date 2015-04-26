@@ -27,7 +27,7 @@ class DNSTests(testing.TestCase):
         self.assertEqual(res, fixtures.SoftLayer_Dns_Domain.getObject)
         self.assert_called_with('SoftLayer_Dns_Domain', 'getObject',
                                 identifier=12345,
-                                mask='resourceRecords')
+                                mask='mask[resourceRecords]')
 
     def test_get_zone_without_records(self):
         self.dns_client.get_zone(12345, records=False)

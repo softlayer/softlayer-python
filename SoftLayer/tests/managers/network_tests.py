@@ -153,7 +153,7 @@ class NetworkTests(testing.TestCase):
 
         self.assertEqual(result,
                          fixtures.SoftLayer_Account.getGlobalIpRecords)
-        mask = 'destinationIpAddress[hardware, virtualGuest],ipAddress'
+        mask = 'mask[destinationIpAddress[hardware, virtualGuest],ipAddress]'
         self.assert_called_with('SoftLayer_Account', 'getGlobalIpRecords',
                                 mask=mask)
 
@@ -162,7 +162,7 @@ class NetworkTests(testing.TestCase):
 
         self.assertEqual(result,
                          fixtures.SoftLayer_Account.getGlobalIpRecords)
-        mask = 'destinationIpAddress[hardware, virtualGuest],ipAddress'
+        mask = 'mask[destinationIpAddress[hardware, virtualGuest],ipAddress]'
         _filter = {
             'globalIpRecords': {
                 'ipAddress': {
@@ -172,7 +172,7 @@ class NetworkTests(testing.TestCase):
                 }
             }
         }
-        mask = 'destinationIpAddress[hardware, virtualGuest],ipAddress'
+        mask = 'mask[destinationIpAddress[hardware, virtualGuest],ipAddress]'
         self.assert_called_with('SoftLayer_Account', 'getGlobalIpRecords',
                                 mask=mask,
                                 filter=_filter)
@@ -182,7 +182,7 @@ class NetworkTests(testing.TestCase):
 
         self.assertEqual(result, fixtures.SoftLayer_Account.getSubnets)
         _filter = {'subnets': {'subnetType': {'operation': '!= GLOBAL_IP'}}}
-        mask = 'hardware,datacenter,ipAddressCount,virtualGuests'
+        mask = 'mask[hardware,datacenter,ipAddressCount,virtualGuests]'
         self.assert_called_with('SoftLayer_Account', 'getSubnets',
                                 mask=mask,
                                 filter=_filter)
@@ -206,7 +206,7 @@ class NetworkTests(testing.TestCase):
                 'networkIdentifier': {'operation': '_= 10.0.0.1'}
             }
         }
-        mask = 'hardware,datacenter,ipAddressCount,virtualGuests'
+        mask = 'mask[hardware,datacenter,ipAddressCount,virtualGuests]'
         self.assert_called_with('SoftLayer_Account', 'getSubnets',
                                 mask=mask,
                                 filter=_filter)

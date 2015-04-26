@@ -189,34 +189,41 @@ class APIClient(testing.TestCase):
             self.client.call, 'SERVICE', 'METHOD', invalid_kwarg='invalid')
 
     def test_call_compression_disabled(self):
-        self.set_mock('SoftLayer_SERVICE', 'METHOD')
+        mocked = self.set_mock('SoftLayer_SERVICE', 'METHOD')
+        mocked.return_value = {}
+
         self.client['SERVICE'].METHOD(compress=False)
 
-        self.assert_called_with('SoftLayer_SERVICE', 'METHOD')
+        calls = self.calls('SoftLayer_SERVICE', 'METHOD')
+        self.assertEqual(len(calls), 1)
+        headers = calls[0].transport_headers
+        self.assertEqual(headers.get('accept-encoding'), 'identity')
 
     def test_call_compression_enabled(self):
-        self.set_mock('SoftLayer_SERVICE', 'METHOD')
+        mocked = self.set_mock('SoftLayer_SERVICE', 'METHOD')
+        mocked.return_value = {}
+
         self.client['SERVICE'].METHOD(compress=True)
 
-        expected_headers = {
-            'Accept-Encoding': 'gzip, deflate, compress',
-            'Accept': '*/*',
-        }
-        self.assert_called_with('SoftLayer_SERVICE', 'METHOD',
-                                transport_headers=expected_headers)
+        calls = self.calls('SoftLayer_SERVICE', 'METHOD')
+        self.assertEqual(len(calls), 1)
+        headers = calls[0].transport_headers
+        self.assertEqual(headers.get('accept-encoding'),
+                         'gzip, deflate, compress')
 
     def test_call_compression_override(self):
         # raw_headers should override compress=False
-        self.set_mock('SoftLayer_SERVICE', 'METHOD')
+        mocked = self.set_mock('SoftLayer_SERVICE', 'METHOD')
+        mocked.return_value = {}
+
         self.client['SERVICE'].METHOD(
             compress=False,
             raw_headers={'Accept-Encoding': 'gzip'})
 
-        expected_headers = {
-            'Accept-Encoding': 'gzip',
-        }
-        self.assert_called_with('SoftLayer_SERVICE', 'METHOD',
-                                transport_headers=expected_headers)
+        calls = self.calls('SoftLayer_SERVICE', 'METHOD')
+        self.assertEqual(len(calls), 1)
+        headers = calls[0].transport_headers
+        self.assertEqual(headers.get('accept-encoding'), 'gzip')
 
 
 class UnauthenticatedAPIClient(testing.TestCase):
