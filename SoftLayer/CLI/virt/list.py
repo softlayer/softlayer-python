@@ -60,13 +60,13 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
     table.sortby = sortby or 'hostname'
 
     for guest in guests:
-        guest = utils.NestedDict(guest)
         table.add_row([
-            guest['globalIdentifier'] or guest['id'],
-            guest['hostname'],
-            guest['primaryIpAddress'] or formatting.blank(),
-            guest['primaryBackendIpAddress'] or formatting.blank(),
-            guest['datacenter']['name'] or formatting.blank(),
+            utils.lookup(guest, 'globalIdentifier') or guest['id'],
+            utils.lookup(guest, 'hostname') or formatting.blank(),
+            utils.lookup(guest, 'primaryIpAddress') or formatting.blank(),
+            utils.lookup(guest, 'primaryBackendIpAddress') or
+            formatting.blank(),
+            utils.lookup(guest, 'datacenter', 'name') or formatting.blank(),
             formatting.active_txn(guest),
         ])
 
