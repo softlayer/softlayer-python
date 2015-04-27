@@ -41,6 +41,15 @@ class TestHelpShow(testing.TestCase):
 
 class TestHelpSetup(testing.TestCase):
 
+    def set_up(self):
+        super(TestHelpSetup, self).set_up()
+
+        # NOTE(kmcdonald): since the endpoint_url is changed with the client
+        # in these commands, we need to ensure that a fixtured transport is
+        # used.
+        transport = testing.MockableTransport(SoftLayer.FixtureTransport())
+        self.env.client = SoftLayer.BaseClient(transport=transport)
+
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
     @mock.patch('SoftLayer.CLI.environment.Environment.input')
