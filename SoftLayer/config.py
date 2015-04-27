@@ -16,9 +16,12 @@ def get_client_settings_args(**kwargs):
 
         :param \\*\\*kwargs: Arguments that are passed into the client instance
     """
+    timeout = kwargs.get('timeout')
+    if timeout is not None:
+        timeout = float(timeout)
     return {
         'endpoint_url': kwargs.get('endpoint_url'),
-        'timeout': float(kwargs.get('timeout') or 0),
+        'timeout': timeout,
         'proxy': kwargs.get('proxy'),
         'username': kwargs.get('username'),
         'api_key': kwargs.get('api_key'),
