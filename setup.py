@@ -21,8 +21,15 @@ REQUIRES = [
     'requests',
 ]
 
+# Importlib was introduced in 2.7
 if sys.version_info < (2, 7):
     REQUIRES.append('importlib')
+
+# The security addon for requests is needed to make a proper SSL context in
+# python versions before 2.7.9:
+# https://urllib3.readthedocs.org/en/latest/security.html#insecureplatformwarning
+if sys.version_info < (2, 7, 9):
+    REQUIRES.append('requests[security]')
 
 DESCRIPTION = "A library for SoftLayer's API"
 
@@ -54,7 +61,6 @@ setup(
     keywords=['softlayer', 'cloud'],
     classifiers=[
         'Environment :: Console',
-        'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
         'License :: OSI Approved :: MIT License',
