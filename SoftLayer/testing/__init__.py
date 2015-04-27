@@ -85,6 +85,8 @@ class TestCase(testtools.TestCase):
         """Stand up fixtured/mockable XML-RPC server."""
         cls.mocks = MockableTransport(SoftLayer.FixtureTransport())
         cls.server = xmlrpc.create_test_server(cls.mocks)
+        host, port = cls.server.socket.getsockname()[:2]
+        cls.endpoint_url = "http://%s:%s" % (host, port)
 
     @classmethod
     def tearDownClass(cls):
@@ -104,9 +106,7 @@ class TestCase(testtools.TestCase):
 
         self.mocks.clear()
 
-        host, port = self.server.socket.getsockname()[:2]
-        endpoint_url = "http://%s:%s" % (host, port)
-        transport = SoftLayer.XmlRpcTransport(endpoint_url=endpoint_url)
+        transport = SoftLayer.XmlRpcTransport(endpoint_url=self.endpoint_url)
         wrapped_transport = SoftLayer.TimingTransport(transport)
 
         self.client = SoftLayer.BaseClient(transport=wrapped_transport)
