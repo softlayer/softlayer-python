@@ -55,7 +55,7 @@ class TestHandler(six.moves.BaseHTTPServer.BaseHTTPRequestHandler):
 
             response_body = utils.xmlrpc_client.dumps((response,),
                                                       allow_none=True,
-                                                      methodresponse=1)
+                                                      methodresponse=True)
 
             self.send_response(200)
             self.send_header("Content-type", "application/xml")
@@ -63,12 +63,12 @@ class TestHandler(six.moves.BaseHTTPServer.BaseHTTPRequestHandler):
             self.wfile.write(response_body.encode('utf-8'))
 
         except SoftLayer.SoftLayerAPIError as ex:
-            self.send_response(ex.faultCode or 500)
+            self.send_response(200)
             self.end_headers()
             response = utils.xmlrpc_client.Fault(ex.faultCode, str(ex.reason))
-            response_body = utils.xmlrpc_client.dumps((response,),
+            response_body = utils.xmlrpc_client.dumps(response,
                                                       allow_none=True,
-                                                      methodresponse=1)
+                                                      methodresponse=True)
             self.wfile.write(response_body.encode('utf-8'))
         except Exception as ex:
             self.send_response(500)
