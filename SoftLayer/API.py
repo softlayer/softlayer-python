@@ -192,11 +192,12 @@ class BaseClient(object):
         if self._prefix and not service.startswith(self._prefix):
             service = self._prefix + service
 
-        http_headers = {}
+        http_headers = {'Accept': '*/*'}
 
         if kwargs.get('compress', True):
-            http_headers['Accept'] = '*/*'
             http_headers['Accept-Encoding'] = 'gzip, deflate, compress'
+        else:
+            http_headers['Accept-Encoding'] = None
 
         if kwargs.get('raw_headers'):
             http_headers.update(kwargs.get('raw_headers'))

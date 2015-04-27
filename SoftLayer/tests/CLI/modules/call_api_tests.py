@@ -26,7 +26,7 @@ class CallCliTests(testing.TestCase):
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(json.loads(result.output), 'test')
         self.assert_called_with('SoftLayer_Service', 'method',
-                                mask='some.mask',
+                                mask='mask[some.mask]',
                                 limit=20,
                                 offset=40,
                                 identifier='100')

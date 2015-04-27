@@ -59,7 +59,7 @@ class FirewallTests(testing.TestCase):
 
         self.assert_called_with('SoftLayer_Virtual_Guest', 'getObject',
                                 identifier=1234,
-                                mask='primaryNetworkComponent[maxSpeed]')
+                                mask='mask[primaryNetworkComponent[maxSpeed]]')
 
         _filter = {
             'items': {
@@ -77,7 +77,7 @@ class FirewallTests(testing.TestCase):
 
         # we should ask for the frontEndNetworkComponents to get
         # the firewall port speed
-        mask = 'id,maxSpeed,networkComponentGroup.networkComponents'
+        mask = 'mask[id,maxSpeed,networkComponentGroup.networkComponents]'
         self.assert_called_with('SoftLayer_Hardware_Server',
                                 'getFrontendNetworkComponents',
                                 identifier=1234,
@@ -154,7 +154,7 @@ class FirewallTests(testing.TestCase):
         self.firewall.add_standard_firewall(6327, is_virt=True)
 
         self.assert_called_with('SoftLayer_Virtual_Guest', 'getObject',
-                                mask='primaryNetworkComponent[maxSpeed]',
+                                mask='mask[primaryNetworkComponent[maxSpeed]]',
                                 identifier=6327)
 
         _filter = {
@@ -195,7 +195,7 @@ class FirewallTests(testing.TestCase):
 
         # we should ask for the frontEndNetworkComponents to get
         # the firewall port speed
-        mask = 'id,maxSpeed,networkComponentGroup.networkComponents'
+        mask = 'mask[id,maxSpeed,networkComponentGroup.networkComponents]'
         self.assert_called_with('SoftLayer_Hardware_Server',
                                 'getFrontendNetworkComponents',
                                 mask=mask,
