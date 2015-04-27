@@ -1,5 +1,5 @@
 """
-    SoftLayer.testing.xmprpc
+    SoftLayer.testing.xmlrpc
     ~~~~~~~~~~~~~~~~~~~~~~~~
     XMP-RPC server which can use a transport to proxy requests for testing.
 
