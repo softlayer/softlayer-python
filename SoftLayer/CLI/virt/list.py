@@ -50,7 +50,7 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
                                 tags=tag_list)
 
     table = formatting.Table([
-        'guid',
+        'id',
         'hostname',
         'primary_ip',
         'backend_ip',
@@ -61,7 +61,7 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
 
     for guest in guests:
         table.add_row([
-            utils.lookup(guest, 'globalIdentifier') or guest['id'],
+            utils.lookup(guest, 'id'),
             utils.lookup(guest, 'hostname') or formatting.blank(),
             utils.lookup(guest, 'primaryIpAddress') or formatting.blank(),
             utils.lookup(guest, 'primaryBackendIpAddress') or
