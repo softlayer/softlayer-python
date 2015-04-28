@@ -719,6 +719,9 @@ class VSManager(utils.IdentifierMixin, object):
         :returns: bool
         Example::
 
+           # Upgrade instance 12345 to 4 CPUs and 4 GB of memory
+           import SoftLayer
+           client = SoftLayer.create_client_from_env()
            mgr = SoftLayer.VSManager(client)
            mgr.upgrade(12345, cpus=4, memory=4)
 

@@ -243,57 +243,53 @@ class HardwareTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder',
                                 args=({'test': 1, 'verify': 1},))
 
-    def test_cancel_metal_immediately(self):
-
-        result = self.hardware.cancel_metal(6327, immediate=True)
-
-        self.assertEqual(result, True)
-        self.assert_called_with('SoftLayer_Billing_Item', 'cancelService',
-                                identifier=6327)
-
-    def test_cancel_metal_on_anniversary(self):
-
-        result = self.hardware.cancel_metal(6327, False)
-
-        self.assertEqual(result, True)
-        self.assert_called_with('SoftLayer_Billing_Item',
-                                'cancelServiceOnAnniversaryDate',
-                                identifier=6327)
-
     def test_cancel_hardware_without_reason(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
-        mock.return_value = {'id': 987, 'bareMetalInstanceFlag': False}
+        mock.return_value = {'id': 987, 'billingItem': {'id': 1234}}
 
         result = self.hardware.cancel_hardware(987)
 
-        self.assertEqual(result,
-                         fixtures.SoftLayer_Ticket.createCancelServerTicket)
+        self.assertEqual(result, True)
         reasons = self.hardware.get_cancellation_reasons()
-        args = (987, reasons['unneeded'], '', True, 'HARDWARE')
-        self.assert_called_with('SoftLayer_Ticket', 'createCancelServerTicket',
+        args = (False, False, reasons['unneeded'], '')
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
+                                identifier=1234,
                                 args=args)
 
     def test_cancel_hardware_with_reason_and_comment(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
-        mock.return_value = {'id': 987, 'bareMetalInstanceFlag': False}
+        mock.return_value = {'id': 987, 'billingItem': {'id': 1234}}
 
-        result = self.hardware.cancel_hardware(987, 'sales', 'Test Comment')
+        result = self.hardware.cancel_hardware(6327,
+                                               reason='sales',
+                                               comment='Test Comment')
 
-        self.assertEqual(result,
-                         fixtures.SoftLayer_Ticket.createCancelServerTicket)
+        self.assertEqual(result, True)
         reasons = self.hardware.get_cancellation_reasons()
-        args = (987, reasons['sales'], 'Test Comment', True, 'HARDWARE')
-        self.assert_called_with('SoftLayer_Ticket', 'createCancelServerTicket',
+        args = (False, False, reasons['sales'], 'Test Comment')
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
+                                identifier=1234,
                                 args=args)
 
-    def test_cancel_hardware_on_bmc(self):
+    def test_cancel_hardware(self):
 
         result = self.hardware.cancel_hardware(6327)
 
         self.assertEqual(result, True)
         self.assert_called_with('SoftLayer_Billing_Item',
-                                'cancelServiceOnAnniversaryDate',
-                                identifier=6327)
+                                'cancelItem',
+                                identifier=6327,
+                                args=(False, False, 'No longer needed', ''))
+
+    def test_cancel_hardware_no_billing_item(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        mock.return_value = {'id': 987}
+
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               self.hardware.cancel_hardware,
+                               6327)
+        self.assertEqual("No billing item found for hardware",
+                         str(ex))
 
     def test_change_port_speed_public(self):
         self.hardware.change_port_speed(2, True, 100)

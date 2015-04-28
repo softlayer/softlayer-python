@@ -9,22 +9,20 @@ import mock
 import SoftLayer
 import SoftLayer.API
 from SoftLayer import testing
-
-TEST_AUTH_HEADERS = {
-    'authenticate': {'username': 'default-user', 'apiKey': 'default-key'}
-}
+from SoftLayer import transports
 
 
 class Inititialization(testing.TestCase):
     def test_init(self):
         client = SoftLayer.Client(username='doesnotexist',
-                                  api_key='issurelywrong', timeout=10)
+                                  api_key='issurelywrong',
+                                  timeout=10)
 
         self.assertIsInstance(client.auth, SoftLayer.BasicAuthentication)
         self.assertEqual(client.auth.username, 'doesnotexist')
         self.assertEqual(client.auth.api_key, 'issurelywrong')
-        self.assertEqual(client.transport.endpoint_url,
-                         SoftLayer.API_PUBLIC_ENDPOINT.rstrip('/'))
+        self.assertIsNotNone(client.transport)
+        self.assertIsInstance(client.transport, transports.XmlRpcTransport)
         self.assertEqual(client.transport.timeout, 10)
 
     @mock.patch('SoftLayer.config.get_client_settings')
@@ -80,7 +78,6 @@ class APIClient(testing.TestCase):
                                 args=tuple(),
                                 limit=None,
                                 offset=None,
-                                headers=TEST_AUTH_HEADERS,
                                 )
 
     def test_complex(self):
@@ -104,7 +101,6 @@ class APIClient(testing.TestCase):
                                 args=(1234,),
                                 limit=9,
                                 offset=10,
-                                headers=TEST_AUTH_HEADERS,
                                 )
 
     @mock.patch('SoftLayer.API.BaseClient.iter_call')
@@ -193,34 +189,41 @@ class APIClient(testing.TestCase):
             self.client.call, 'SERVICE', 'METHOD', invalid_kwarg='invalid')
 
     def test_call_compression_disabled(self):
-        self.set_mock('SoftLayer_SERVICE', 'METHOD')
+        mocked = self.set_mock('SoftLayer_SERVICE', 'METHOD')
+        mocked.return_value = {}
+
         self.client['SERVICE'].METHOD(compress=False)
 
-        self.assert_called_with('SoftLayer_SERVICE', 'METHOD')
+        calls = self.calls('SoftLayer_SERVICE', 'METHOD')
+        self.assertEqual(len(calls), 1)
+        headers = calls[0].transport_headers
+        self.assertEqual(headers.get('accept-encoding'), 'identity')
 
     def test_call_compression_enabled(self):
-        self.set_mock('SoftLayer_SERVICE', 'METHOD')
+        mocked = self.set_mock('SoftLayer_SERVICE', 'METHOD')
+        mocked.return_value = {}
+
         self.client['SERVICE'].METHOD(compress=True)
 
-        expected_headers = {
-            'Accept-Encoding': 'gzip, deflate, compress',
-            'Accept': '*/*',
-        }
-        self.assert_called_with('SoftLayer_SERVICE', 'METHOD',
-                                transport_headers=expected_headers)
+        calls = self.calls('SoftLayer_SERVICE', 'METHOD')
+        self.assertEqual(len(calls), 1)
+        headers = calls[0].transport_headers
+        self.assertEqual(headers.get('accept-encoding'),
+                         'gzip, deflate, compress')
 
     def test_call_compression_override(self):
         # raw_headers should override compress=False
-        self.set_mock('SoftLayer_SERVICE', 'METHOD')
+        mocked = self.set_mock('SoftLayer_SERVICE', 'METHOD')
+        mocked.return_value = {}
+
         self.client['SERVICE'].METHOD(
             compress=False,
             raw_headers={'Accept-Encoding': 'gzip'})
 
-        expected_headers = {
-            'Accept-Encoding': 'gzip',
-        }
-        self.assert_called_with('SoftLayer_SERVICE', 'METHOD',
-                                transport_headers=expected_headers)
+        calls = self.calls('SoftLayer_SERVICE', 'METHOD')
+        self.assertEqual(len(calls), 1)
+        headers = calls[0].transport_headers
+        self.assertEqual(headers.get('accept-encoding'), 'gzip')
 
 
 class UnauthenticatedAPIClient(testing.TestCase):

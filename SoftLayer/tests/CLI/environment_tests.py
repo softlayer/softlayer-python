@@ -43,13 +43,13 @@ class EnvironmentTests(testing.TestCase):
     @mock.patch('click.prompt')
     def test_input(self, prompt_mock):
         r = self.env.input('input')
-        prompt_mock.assert_called_with('input')
+        prompt_mock.assert_called_with('input', default=None)
         self.assertEqual(prompt_mock(), r)
 
     @mock.patch('click.prompt')
     def test_getpass(self, prompt_mock):
         r = self.env.getpass('input')
-        prompt_mock.assert_called_with('input', hide_input=True)
+        prompt_mock.assert_called_with('input', default=None, hide_input=True)
         self.assertEqual(prompt_mock(), r)
 
     def test_resolve_alias(self):

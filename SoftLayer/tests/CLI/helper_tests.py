@@ -41,50 +41,21 @@ class CLIJSONEncoderTest(testing.TestCase):
 
 class PromptTests(testing.TestCase):
 
-    @mock.patch('click.prompt')
-    def test_invalid_response(self, prompt_mock):
-        prompt_mock.return_value = 'y'
-        result = formatting.valid_response('test', 'n')
-        prompt_mock.assert_called_with('test')
-        self.assertFalse(result)
-
-        prompt_mock.return_value = 'wakakwakwaka'
-        result = formatting.valid_response('test', 'n')
-        prompt_mock.assert_called_with('test')
-        self.assertFalse(result)
-
-        prompt_mock.return_value = ''
-        result = formatting.valid_response('test', 'n')
-        prompt_mock.assert_called_with('test')
-        self.assertEqual(result, None)
-
-    @mock.patch('click.prompt')
-    def test_valid_response(self, prompt_mock):
-        prompt_mock.return_value = 'n'
-        result = formatting.valid_response('test', 'n')
-        prompt_mock.assert_called_with('test')
-        self.assertTrue(result)
-
-        prompt_mock.return_value = 'N'
-        result = formatting.valid_response('test', 'n')
-        prompt_mock.assert_called_with('test')
-        self.assertTrue(result)
-
-    @mock.patch('click.prompt')
-    def test_do_or_die(self, prompt_mock):
+    @mock.patch('click.confirm')
+    def test_do_or_die(self, confirm_mock):
         confirmed = '37347373737'
-        prompt_mock.return_value = confirmed
+        confirm_mock.return_value = confirmed
         result = formatting.no_going_back(confirmed)
         self.assertTrue(result)
 
         # no_going_back should cast int's to str()
         confirmed = '4712309182309'
-        prompt_mock.return_value = confirmed
+        confirm_mock.return_value = confirmed
         result = formatting.no_going_back(int(confirmed))
         self.assertTrue(result)
 
         confirmed = None
-        prompt_mock.return_value = ''
+        confirm_mock.return_value = ''
         result = formatting.no_going_back(confirmed)
         self.assertFalse(result)
 
@@ -98,9 +69,19 @@ class PromptTests(testing.TestCase):
         res = formatting.confirm('Confirm?', default=False)
         self.assertFalse(res)
 
-        prompt_mock.return_value = ''
+        prompt_mock.return_value = 'Y'
         res = formatting.confirm('Confirm?', default=True)
         self.assertTrue(res)
+        prompt_mock.assert_called_with('Confirm? [Y/n]',
+                                       default='y',
+                                       show_default=False)
+
+        prompt_mock.return_value = 'N'
+        res = formatting.confirm('Confirm?', default=False)
+        self.assertFalse(res)
+        prompt_mock.assert_called_with('Confirm? [y/N]',
+                                       default='n',
+                                       show_default=False)
 
 
 class FormattedItemTests(testing.TestCase):
@@ -181,7 +162,8 @@ class FormattedListTests(testing.TestCase):
 
 class FormattedTxnTests(testing.TestCase):
     def test_active_txn_empty(self):
-        self.assertRaises(KeyError, formatting.active_txn, {})
+        result = formatting.active_txn({})
+        self.assertEqual(str(result), 'NULL')
 
     def test_active_txn(self):
         result = formatting.active_txn({

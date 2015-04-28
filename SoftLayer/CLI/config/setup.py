@@ -13,14 +13,12 @@ from SoftLayer import utils
 import click
 
 
-def get_api_key(client, username, secret, endpoint_url=None):
+def get_api_key(client, username, secret):
     """Attempts API-Key and password auth to get an API key.
 
     This will also generate an API key if one doesn't exist
     """
 
-    client.endpoint_url = endpoint_url
-    client.auth = None
     # Try to use a client with username/api key
     if len(secret) == 64:
         try:
@@ -50,8 +48,8 @@ def cli(env):
 
     username, secret, endpoint_url, timeout = get_user_input(env)
 
-    api_key = get_api_key(env.client, username, secret,
-                          endpoint_url=endpoint_url)
+    env.client.transport.transport.endpoint_url = endpoint_url
+    api_key = get_api_key(env.client, username, secret)
 
     path = '~/.softlayer'
     if env.config_file:
@@ -79,6 +77,7 @@ def cli(env):
     parsed_config.set('softlayer', 'username', username)
     parsed_config.set('softlayer', 'api_key', api_key)
     parsed_config.set('softlayer', 'endpoint_url', endpoint_url)
+    parsed_config.set('softlayer', 'timeout', timeout)
 
     config_fd = os.fdopen(os.open(config_path,
                                   (os.O_WRONLY | os.O_CREAT | os.O_TRUNC),
@@ -96,47 +95,28 @@ def get_user_input(env):
     """Ask for username, secret (api_key or password) and endpoint_url."""
 
     defaults = config.get_settings_from_client(env.client)
-    timeout = defaults['timeout']
 
     # Ask for username
-    for _ in range(3):
-        username = (env.input('Username [%s]: ' % defaults['username']) or
-                    defaults['username'])
-        if username:
-            break
-    else:
-        raise exceptions.CLIAbort('Aborted after 3 attempts')
+    username = env.input('Username', default=defaults['username'])
 
     # Ask for 'secret' which can be api_key or their password
-    for _ in range(3):
-        secret = (env.getpass('API Key or Password [%s]: '
-                              % defaults['api_key']) or
-                  defaults['api_key'])
-        if secret:
-            break
-    else:
-        raise exceptions.CLIAbort('Aborted after 3 attempts')
+    secret = env.getpass('API Key or Password', default=defaults['api_key'])
 
     # Ask for which endpoint they want to use
-    for _ in range(3):
-        endpoint_type = env.input(
-            'Endpoint (public|private|custom): ')
-        endpoint_type = endpoint_type.lower()
-        if not endpoint_type:
-            endpoint_url = SoftLayer.API_PUBLIC_ENDPOINT
-            break
-        if endpoint_type == 'public':
-            endpoint_url = SoftLayer.API_PUBLIC_ENDPOINT
-            break
-        elif endpoint_type == 'private':
-            endpoint_url = SoftLayer.API_PRIVATE_ENDPOINT
-            break
-        elif endpoint_type == 'custom':
-            endpoint_url = env.input(
-                'Endpoint URL [%s]: ' % defaults['endpoint_url']
-            ) or defaults['endpoint_url']
-            break
-    else:
-        raise exceptions.CLIAbort('Aborted after 3 attempts')
+    endpoint_type = env.input(
+        'Endpoint (public|private|custom)', default='public')
+    endpoint_type = endpoint_type.lower()
+    if endpoint_type is None:
+        endpoint_url = SoftLayer.API_PUBLIC_ENDPOINT
+    if endpoint_type == 'public':
+        endpoint_url = SoftLayer.API_PUBLIC_ENDPOINT
+    elif endpoint_type == 'private':
+        endpoint_url = SoftLayer.API_PRIVATE_ENDPOINT
+    elif endpoint_type == 'custom':
+        endpoint_url = env.input('Endpoint URL',
+                                 default=defaults['endpoint_url'])
+
+    # Ask for timeout
+    timeout = env.input('Timeout', default=defaults['timeout'] or 0)
 
     return username, secret, endpoint_url, timeout

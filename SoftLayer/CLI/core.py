@@ -138,15 +138,19 @@ def cli(ctx,
     if env.client is None:
         # Environment can be passed in explicitly. This is used for testing
         if fixtures:
-            transport = SoftLayer.FixtureTransport()
+            client = SoftLayer.BaseClient(
+                transport=SoftLayer.FixtureTransport(),
+                auth=None,
+            )
         else:
             # Create SL Client
-            transport = SoftLayer.XmlRpcTransport()
+            client = SoftLayer.create_client_from_env(
+                proxy=proxy,
+                config_file=config,
+            )
 
-        wrapped_transport = SoftLayer.TimingTransport(transport)
-        env.client = SoftLayer.Client(proxy=proxy,
-                                      config_file=config,
-                                      transport=wrapped_transport)
+        client.transport = SoftLayer.TimingTransport(client.transport)
+        env.client = client
 
 
 @cli.resultcallback()

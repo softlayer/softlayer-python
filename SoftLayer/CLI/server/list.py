@@ -41,7 +41,7 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag):
                                     tags=tag)
 
     table = formatting.Table([
-        'guid',
+        'id',
         'hostname',
         'primary_ip',
         'backend_ip',
@@ -51,15 +51,13 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag):
     table.sortby = sortby or 'hostname'
 
     for server in servers:
-        server = utils.NestedDict(server)
-        # NOTE(kmcdonald): There are cases where a server might not have a
-        #                  globalIdentifier.
         table.add_row([
-            server['globalIdentifier'] or server['id'],
-            server['hostname'],
-            server['primaryIpAddress'] or formatting.blank(),
-            server['primaryBackendIpAddress'] or formatting.blank(),
-            server['datacenter']['name'] or formatting.blank(),
+            utils.lookup(server, 'id'),
+            utils.lookup(server, 'hostname') or formatting.blank(),
+            utils.lookup(server, 'primaryIpAddress') or formatting.blank(),
+            utils.lookup(server, 'primaryBackendIpAddress') or
+            formatting.blank(),
+            utils.lookup(server, 'datacenter', 'name') or formatting.blank(),
             formatting.active_txn(server),
         ])
 

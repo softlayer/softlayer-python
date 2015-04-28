@@ -6,7 +6,8 @@
     Usage:
 
         >>> import SoftLayer
-        >>> client = SoftLayer.Client(username="username", api_key="api_key")
+        >>> client = SoftLayer.create_client_from_env(username="username",
+                                                      api_key="api_key")
         >>> resp = client['Account'].getObject()
         >>> resp['companyName']
         'Your Company'
@@ -27,5 +28,6 @@ __version__ = consts.VERSION
 __author__ = 'SoftLayer Technologies, Inc.'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2014 SoftLayer Technologies, Inc.'
-__all__ = ['Client', 'BasicAuthentication', 'SoftLayerError',
-           'SoftLayerAPIError', 'API_PUBLIC_ENDPOINT', 'API_PRIVATE_ENDPOINT']
+__all__ = ['BaseClient', 'create_client_from_env', 'Client',
+           'BasicAuthentication', 'SoftLayerError', 'SoftLayerAPIError',
+           'API_PUBLIC_ENDPOINT', 'API_PRIVATE_ENDPOINT']

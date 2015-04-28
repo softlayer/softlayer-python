@@ -26,8 +26,8 @@ class TicketManager(utils.IdentifierMixin, object):
         :param boolean open_status: include open tickets
         :param boolean closed_status: include closed tickets
         """
-        mask = ('mask[id, title, assignedUser[firstName, lastName],'
-                'createDate,lastEditDate,accountId]')
+        mask = ('id, title, assignedUser[firstName, lastName],'
+                'createDate,lastEditDate,accountId,status')
 
         call = 'getTickets'
         if not all([open_status, closed_status]):
@@ -36,8 +36,7 @@ class TicketManager(utils.IdentifierMixin, object):
             elif closed_status:
                 call = 'getClosedTickets'
 
-        func = getattr(self.account, call)
-        return func(mask=mask)
+        return self.client.call('Account', call, mask=mask)
 
     def list_subjects(self):
         """List all tickets."""
@@ -51,8 +50,8 @@ class TicketManager(utils.IdentifierMixin, object):
                   the specified ticket.
 
         """
-        mask = ('mask[id, title, assignedUser[firstName, lastName],'
-                'createDate,lastEditDate,updates[entry],updateCount]')
+        mask = ('id, title, assignedUser[firstName, lastName],status,'
+                'createDate,lastEditDate,updates[entry,editor],updateCount')
         return self.ticket.getObject(id=ticket_id, mask=mask)
 
     def create_ticket(self, title=None, body=None, subject=None):
@@ -79,6 +78,4 @@ class TicketManager(utils.IdentifierMixin, object):
         :param integer ticket_id: the id of the ticket to update
         :param string body: entry to update in the ticket
         """
-
-        ticket = self.ticket.getObject(id=ticket_id)
-        return self.ticket.edit(ticket, body, id=ticket_id)
+        return self.ticket.addUpdate({'entry': body}, id=ticket_id)

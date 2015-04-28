@@ -5,13 +5,14 @@
     :license: MIT, see LICENSE for more details.
 """
 # Disable pylint import error and too many methods error
-# pylint: disable=F0401,R0904
+# pylint: disable=invalid-name
 import logging
 import os.path
 
 import SoftLayer
 from SoftLayer.CLI import core
 from SoftLayer.CLI import environment
+from SoftLayer.testing import xmlrpc
 
 from click import testing
 import mock
@@ -49,6 +50,11 @@ class MockableTransport(object):
         self.mocked[_mock_key(service, method)] = _mock
         return _mock
 
+    def clear(self):
+        """Clear out mocks and call history."""
+        self.calls = []
+        self.mocked = {}
+
     def _record_call(self, call):
         """Record and log the API call (for later assertions)."""
         self.calls.append(call)
@@ -74,6 +80,19 @@ def _mock_key(service, method):
 class TestCase(testtools.TestCase):
     """Testcase class with PEP-8 compatable method names."""
 
+    @classmethod
+    def setUpClass(cls):
+        """Stand up fixtured/mockable XML-RPC server."""
+        cls.mocks = MockableTransport(SoftLayer.FixtureTransport())
+        cls.server = xmlrpc.create_test_server(cls.mocks)
+        host, port = cls.server.socket.getsockname()[:2]
+        cls.endpoint_url = "http://%s:%s" % (host, port)
+
+    @classmethod
+    def tearDownClass(cls):
+        """Clean up the http server."""
+        cls.server.shutdown()
+
     def set_up(self):
         """Aliased from setUp."""
         pass
@@ -84,24 +103,22 @@ class TestCase(testtools.TestCase):
 
     def setUp(self):  # NOQA
         testtools.TestCase.setUp(self)
+
+        self.mocks.clear()
+
+        transport = SoftLayer.XmlRpcTransport(endpoint_url=self.endpoint_url)
+        wrapped_transport = SoftLayer.TimingTransport(transport)
+
+        self.client = SoftLayer.BaseClient(transport=wrapped_transport)
+
         self.env = environment.Environment()
-
-        # Create a crazy mockable, fixture client
-        auth = SoftLayer.BasicAuthentication('default-user', 'default-key')
-        self.mocks = MockableTransport(SoftLayer.FixtureTransport())
-        self.transport = SoftLayer.TimingTransport(self.mocks)
-        self.client = SoftLayer.Client(
-            transport=self.transport,
-            auth=auth,
-            timeout=10,
-            endpoint_url='default-endpoint-url')
-
         self.env.client = self.client
-        return self.set_up()
+        self.set_up()
 
     def tearDown(self):  # NOQA
         testtools.TestCase.tearDown(self)
-        return self.tear_down()
+        self.tear_down()
+        self.mocks.clear()
 
     def calls(self, service=None, method=None):
         """Return all API calls made during the current test."""
