@@ -41,7 +41,7 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag):
                                     tags=tag)
 
     table = formatting.Table([
-        'guid',
+        'id',
         'hostname',
         'primary_ip',
         'backend_ip',
@@ -51,10 +51,8 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag):
     table.sortby = sortby or 'hostname'
 
     for server in servers:
-        # NOTE(kmcdonald): There are cases where a server might not have a
-        #                  globalIdentifier or hostname.
         table.add_row([
-            utils.lookup(server, 'globalIdentifier') or server['id'],
+            utils.lookup(server, 'id'),
             utils.lookup(server, 'hostname') or formatting.blank(),
             utils.lookup(server, 'primaryIpAddress') or formatting.blank(),
             utils.lookup(server, 'primaryBackendIpAddress') or
