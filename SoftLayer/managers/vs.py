@@ -25,6 +25,7 @@ class VSManager(utils.IdentifierMixin, object):
                                               auto initialized.
 
     Example::
+
            # Initialize the VSManager.
            # env variables. These can also be specified in ~/.softlayer,
            # or passed directly to SoftLayer.Client()
@@ -390,6 +391,7 @@ class VSManager(utils.IdentifierMixin, object):
                              provisioning or reloads such as monitoring.
 
         Example::
+
             # Will return once vsi 12345 is ready, or after 10 checks
             ready = mgr.wait_for_ready(12345, 10)
         """
@@ -433,6 +435,7 @@ class VSManager(utils.IdentifierMixin, object):
         See :func:`create_instance` for a list of available options.
 
         Example::
+        
             new_vsi = {
                 'domain': u'test01.labs.sftlyr.ws',
                 'hostname': u'minion05',

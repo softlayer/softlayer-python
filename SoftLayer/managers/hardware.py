@@ -27,6 +27,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                                               If none is provided, one will be
                                               auto initialized.
     Example::
+
        # Initialize the Manager.
        # env variables. These can also be specified in ~/.softlayer,
        # or passed directly to SoftLayer.Client()
@@ -58,7 +59,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         Example::
 
             # Cancels hardware id 1234
-            result = mrg.cancel_hardware(hardware_id=1234)
+            result = mgr.cancel_hardware(hardware_id=1234)
         """
         # Check to see if this is actually a pre-configured server (BMC). They
         # require a different cancellation call.
@@ -204,7 +205,7 @@ class HardwareManager(utils.IdentifierMixin, object):
 
             object_mask = "mask[id,networkVlans[vlanNumber]]"
             # Object masks are optional
-            result = mrg.get_hardware(hardware_id=1234,mask=object_mask)
+            result = mgr.get_hardware(hardware_id=1234,mask=object_mask)
         """
 
         if 'mask' not in kwargs:
@@ -292,6 +293,7 @@ class HardwareManager(utils.IdentifierMixin, object):
             A port speed of 0 will disable the interface.
 
         Example::
+
             #change the Public interface to 10Mbps on instance 12345
             result = mgr.change_port_speed(hardware_id=12345,
                                         public=True, speed=10)
@@ -541,6 +543,7 @@ regions[location[location]]
         :param string notes: notes about this particular hardware
 
         Example::
+        
             # Change the hostname on instance 12345 to 'something'
             result = mgr.edit(hardware_id=12345 , hostname="something")
             #result will be True or an Exception
