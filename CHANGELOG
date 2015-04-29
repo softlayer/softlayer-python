@@ -1,3 +1,12 @@
+4.0.1
+
+    * Fixes bug in `sl setup` command not properly defaulting to current values.
+
+    * Fixes bug where turning off compression headers would still send compression headers.
+
+    * Reverts to using ids over global identifiers for `sl vs list` and `sl server list`.
+
+
 4.0.0
 
     * Because there are many changes between version 3 and version 4, it is strongly recommend to pin the version of the SoftLayer python bindings as soon as you can in order to prevent unintentional breakage when upgrading. To keep yourself on version 3, you can use this directive: softlayer>=3,<4. That can be used with pip (pip install softlayer>=3,<4), requirements in your setup.py and/or in your requirements.txt file.
