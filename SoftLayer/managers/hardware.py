@@ -514,7 +514,7 @@ regions[location[location]]
         :param string notes: notes about this particular hardware
 
         Example::
-        
+
             # Change the hostname on instance 12345 to 'something'
             result = mgr.edit(hardware_id=12345 , hostname="something")
             #result will be True or an Exception

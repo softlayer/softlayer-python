@@ -435,7 +435,7 @@ class VSManager(utils.IdentifierMixin, object):
         See :func:`create_instance` for a list of available options.
 
         Example::
-        
+
             new_vsi = {
                 'domain': u'test01.labs.sftlyr.ws',
                 'hostname': u'minion05',
