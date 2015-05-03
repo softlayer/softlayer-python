@@ -131,6 +131,27 @@ class FormattedItemTests(testing.TestCase):
         self.assertEqual('-', item.formatted)
         self.assertEqual('NULL', str(item))
 
+    def test_sort_mixed(self):
+        blank = formatting.blank()
+        items = [10, blank]
+        sorted_items = sorted(items)
+        self.assertEqual(sorted_items, [blank, 10])
+
+        items = [blank, 10]
+        sorted_items = sorted(items)
+        self.assertEqual(sorted_items, [blank, 10])
+
+        items = [blank, "10"]
+        sorted_items = sorted(items)
+        self.assertEqual(sorted_items, [blank, "10"])
+
+    def test_sort(self):
+        items = [10, formatting.FormattedItem(20), formatting.FormattedItem(5)]
+        sorted_items = sorted(items)
+        self.assertEqual(sorted_items, [formatting.FormattedItem(5),
+                                        10,
+                                        formatting.FormattedItem(20)])
+
 
 class FormattedListTests(testing.TestCase):
     def test_init(self):
