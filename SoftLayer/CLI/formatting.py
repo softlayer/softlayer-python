@@ -192,8 +192,8 @@ def no_going_back(confirmation):
     prompt = ('This action cannot be undone! Type "%s" or press Enter '
               'to abort' % confirmation)
 
-    ans = click.confirm(prompt, default='', show_default=False).lower()
-    if ans == str(confirmation):
+    ans = click.prompt(prompt, default='', show_default=False)
+    if ans.lower() == str(confirmation):
         return True
 
     return False

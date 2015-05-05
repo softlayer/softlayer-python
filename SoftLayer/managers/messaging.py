@@ -168,7 +168,12 @@ class MessagingConnection(object):
 
         url = '/'.join((self.endpoint, 'v1', self.account_id, path))
         resp = requests.request(method, url, **kwargs)
-        resp.raise_for_status()
+        try:
+            resp.raise_for_status()
+        except requests.HTTPError as ex:
+            content = json.loads(ex.response.content)
+            raise exceptions.SoftLayerAPIError(ex.response.status_code,
+                                               content['message'])
         return resp
 
     def authenticate(self, username, api_key, auth_token=None):

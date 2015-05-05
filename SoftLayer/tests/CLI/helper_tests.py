@@ -41,21 +41,21 @@ class CLIJSONEncoderTest(testing.TestCase):
 
 class PromptTests(testing.TestCase):
 
-    @mock.patch('click.confirm')
-    def test_do_or_die(self, confirm_mock):
+    @mock.patch('click.prompt')
+    def test_do_or_die(self, prompt_mock):
         confirmed = '37347373737'
-        confirm_mock.return_value = confirmed
+        prompt_mock.return_value = confirmed
         result = formatting.no_going_back(confirmed)
         self.assertTrue(result)
 
         # no_going_back should cast int's to str()
         confirmed = '4712309182309'
-        confirm_mock.return_value = confirmed
+        prompt_mock.return_value = confirmed
         result = formatting.no_going_back(int(confirmed))
         self.assertTrue(result)
 
         confirmed = None
-        confirm_mock.return_value = ''
+        prompt_mock.return_value = ''
         result = formatting.no_going_back(confirmed)
         self.assertFalse(result)
 
