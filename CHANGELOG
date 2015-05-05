@@ -1,3 +1,12 @@
+4.0.2
+
+    * Fixes a bug that breaks user confirmation prompts
+
+    * Fixes general issue with sorting on certain row types in the CLI
+
+    * Fixes image capture for Windows guests
+
+
 4.0.1
 
     * Fixes bug in `sl setup` command not properly defaulting to current values.
