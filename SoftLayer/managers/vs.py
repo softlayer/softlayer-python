@@ -581,9 +581,10 @@ class VSManager(utils.IdentifierMixin, object):
         vsi = self.get_instance(instance_id)
 
         disk_filter = lambda x: x['device'] == '0'
-        # Disk 1 is swap partition.  Need to skip its capture.
+        # Skip disk 1 (swap partition) and CD mounts
         if additional_disks:
-            disk_filter = lambda x: x['device'] != '1'
+            disk_filter = lambda x: (str(x['device']) != '1' and
+                                     x['mountType'] != 'CD')
 
         disks = [block_device for block_device in vsi['blockDevices']
                  if disk_filter(block_device)]
