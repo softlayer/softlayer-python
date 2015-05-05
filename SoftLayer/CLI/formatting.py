@@ -73,6 +73,7 @@ def format_prettytable(table):
     for i, row in enumerate(table.rows):
         for j, item in enumerate(row):
             table.rows[i][j] = format_output(item)
+
     ptable = table.prettytable()
     ptable.hrules = prettytable.FRAME
     ptable.horizontal_char = '.'
@@ -83,12 +84,15 @@ def format_prettytable(table):
 
 def format_no_tty(table):
     """Converts SoftLayer.CLI.formatting.Table instance to a prettytable."""
+
     for i, row in enumerate(table.rows):
         for j, item in enumerate(row):
             table.rows[i][j] = format_output(item, fmt='raw')
     ptable = table.prettytable()
+
     for col in table.columns:
         ptable.align[col] = 'l'
+
     ptable.hrules = prettytable.NONE
     ptable.border = False
     ptable.header = False
@@ -303,6 +307,30 @@ class FormattedItem(object):
         return str(self.original)
 
     __repr__ = __str__
+
+    # Implement sorting methods.
+    # NOTE(kmcdonald): functools.total_ordering could be used once support for
+    # Python 2.6 is dropped
+    def __eq__(self, other):
+        return self.original == getattr(other, 'original', other)
+
+    def __lt__(self, other):
+        if self.original is None:
+            return True
+
+        other_val = getattr(other, 'original', other)
+        if other_val is None:
+            return False
+        return self.original < other_val
+
+    def __gt__(self, other):
+        return not (self < other or self == other)
+
+    def __le__(self, other):
+        return self < other or self == other
+
+    def __ge__(self, other):
+        return not self < other
 
 
 def _format_python_value(value):

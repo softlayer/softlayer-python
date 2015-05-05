@@ -136,7 +136,7 @@ getHardware = [{
             'friendlyName': 'Friendly Transaction Name',
             'id': 6660
         }
-    }
+    },
 }, {
     'id': 1001,
     'globalIdentifier': '1a2b3c-1702',
@@ -224,6 +224,8 @@ getHardware = [{
             'id': 19082
         },
     ]
+}, {
+    'id': 1003,
 }]
 getDomains = [{'name': 'example.com',
                'id': 12345,

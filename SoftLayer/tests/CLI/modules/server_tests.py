@@ -84,11 +84,19 @@ class ServerCLITests(testing.TestCase):
                 'id': 1002,
                 'backend_ip': '10.1.0.4',
                 'action': None,
-            }
+            },
+            {
+                'action': None,
+                'backend_ip': None,
+                'datacenter': None,
+                'hostname': None,
+                'id': 1003,
+                'primary_ip': None,
+            },
         ]
 
         self.assertEqual(result.exit_code, 0)
-        self.assertEqual(json.loads(result.output), expected)
+        self.assertEqual(expected, json.loads(result.output))
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
     @mock.patch('SoftLayer.HardwareManager.reload')

@@ -14,7 +14,7 @@ import click
 @click.command()
 @click.option('--sortby',
               help='Column to sort by',
-              type=click.Choice(['guid',
+              type=click.Choice(['id',
                                  'hostname',
                                  'primary_ip',
                                  'backend_ip',
