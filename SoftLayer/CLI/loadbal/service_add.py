@@ -24,7 +24,7 @@ import click
 @click.option('--healthcheck-type',
               required=True,
               help="The health check type")
-@click.option('--ip-address', '--ip',
+@click.option('--ip-address',
               required=True,
               help="The IP of the service")
 @environment.pass_env
