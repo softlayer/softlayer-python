@@ -4,6 +4,7 @@
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer import utils
 
 
 import click
@@ -43,7 +44,7 @@ def cli(env, sortby, datacenter, number, name):
         table.add_row([
             vlan['id'],
             vlan['vlanNumber'],
-            vlan['primaryRouter']['datacenter']['name'],
+            utils.lookup(vlan, 'primaryRouter', 'datacenter', 'name'),
             vlan.get('name') or formatting.blank(),
             vlan['totalPrimaryIpAddressCount'],
             len(vlan['hardware']),

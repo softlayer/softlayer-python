@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+from SoftLayer import exceptions
 from SoftLayer import utils
 
 
@@ -28,8 +29,13 @@ class ISCSIManager(utils.IdentifierMixin, object):
                     'categories': {
                         'categoryCode': {'operation': categorycode}
                     }}})
-        item_price = item_prices[0]['prices'][0]['id']
-        return item_price
+
+        for item_price in item_prices:
+            for price in item_price['prices']:
+                return price['id']
+
+        raise exceptions.SoftLayerError(
+            "Could not find a valid price with for the given size")
 
     def _build_order(self, item_price, location):
         """Returns a dict appropriate for Product_Order::placeOrder()."""
