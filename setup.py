@@ -2,6 +2,8 @@ from __future__ import print_function
 import sys
 import os
 
+from codecs import open
+
 try:
     from setuptools import setup, find_packages
 except ImportError:
