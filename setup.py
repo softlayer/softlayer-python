@@ -27,7 +27,7 @@ if sys.version_info < (2, 7):
 DESCRIPTION = "A library for SoftLayer's API"
 
 if os.path.exists('README.rst'):
-    with open('README.rst') as readme_file:
+    with open('README.rst', 'r', 'utf-8') as readme_file:
         LONG_DESCRIPTION = readme_file.read()
 else:
     LONG_DESCRIPTION = DESCRIPTION
