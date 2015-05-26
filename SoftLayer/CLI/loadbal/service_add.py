@@ -40,7 +40,7 @@ def cli(env, identifier, enabled, port, weight, healthcheck_type, ip):
     if ip:
         ip_service = env.client['Network_Subnet_IpAddress']
         ip_record = ip_service.getByIpAddress(ip)
-        if len(ip_record)>0:
+        if len(ip_record) > 0:
             ip_address_id = ip_record['id']
 
     mgr.add_service(loadbal_id,
