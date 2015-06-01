@@ -16,6 +16,9 @@ import pkg_resources
 
 # pylint: disable=too-many-instance-attributes, invalid-name, no-self-use
 
+# Calling pkg_resources.iter_entry_points shows a false-positive
+# pylint: disable=no-member
+
 
 class Environment(object):
     """Provides access to the current CLI environment."""
