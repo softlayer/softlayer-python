@@ -47,12 +47,10 @@ class UnauthedUser(FunctionalTest):
                 endpoint_url='http://notvalidsoftlayer.com',
             )
             transport(request)
-        except SoftLayer.SoftLayerAPIError as ex:
-            self.assertIn('not known', str(ex))
-            self.assertIn('not known', ex.faultString)
+        except SoftLayer.TransportError as ex:
             self.assertEqual(ex.faultCode, 0)
         else:
-            self.fail('No Exception Raised')
+            self.fail('Transport Error Exception Not Raised')
 
 
 class AuthedUser(FunctionalTest):

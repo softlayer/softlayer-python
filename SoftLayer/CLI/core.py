@@ -176,6 +176,7 @@ def output_result(ctx, result, timings=False, **kwargs):
 def main():
     """Main program. Catches several common errors and displays them nicely."""
     exit_status = 0
+
     try:
         cli.main()
     except SoftLayer.SoftLayerAPIError as ex:
