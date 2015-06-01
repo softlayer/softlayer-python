@@ -34,6 +34,22 @@ DEFAULT_FORMAT = 'raw'
 if sys.stdout.isatty():
     DEFAULT_FORMAT = 'table'
 
+# Attempt to set the locale for the user if the default encoding is
+# ascii. More information here:
+# http://click.pocoo.org/4/python3/#python-3-surrogate-handling
+import codecs
+import locale
+try:
+    ENC = codecs.lookup(locale.getpreferredencoding()).name
+except Exception:
+    ENC = 'ascii'
+
+if ENC == 'ascii':
+    try:
+        locale.setlocale(locale.LC_ALL, 'C.UTF-8')
+    except Exception:
+        pass
+
 
 class CommandLoader(click.MultiCommand):
     """Loads module for click."""
