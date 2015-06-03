@@ -52,6 +52,8 @@ def cli(env, **args):
     """Order/create a dedicated server."""
 
     template.update_with_template_args(args, list_args=['key'])
+    _validate_args(args)
+
     mgr = SoftLayer.HardwareManager(env.client)
 
     # Get the SSH keys
@@ -125,3 +127,20 @@ def cli(env, **args):
         output = table
 
     return output
+
+
+def _validate_args(args):
+    """Raises an ArgumentError if the given arguments are not valid."""
+    missing = []
+    for arg in ['size',
+                'datacenter',
+                'os',
+                'port_speed',
+                'hostname',
+                'domain']:
+        if not args.get(arg):
+            missing.append(arg)
+
+    if missing:
+        raise exceptions.ArgumentError('Missing required options: %s'
+                                       % ', '.join(missing))

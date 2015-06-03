@@ -154,6 +154,14 @@ def cli(env, **args):
 
 def _validate_args(args):
     """Raises an ArgumentError if the given arguments are not valid."""
+    missing = []
+    for arg in ['cpu', 'memory', 'hostname', 'domain']:
+        if not args.get(arg):
+            missing.append(arg)
+
+    if missing:
+        raise exceptions.ArgumentError('Missing required options: %s'
+                                       % ', '.join(missing))
 
     if all([args['userdata'], args['userfile']]):
         raise exceptions.ArgumentError(
