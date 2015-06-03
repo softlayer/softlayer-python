@@ -20,7 +20,7 @@ REQUIRES = [
     'six >= 1.7.0',
     'prettytable >= 0.7.0',
     'click',
-    'requests',
+    'requests >= 2.7.0',
 ]
 
 if sys.version_info < (2, 7):
