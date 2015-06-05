@@ -449,7 +449,7 @@ class VSManager(utils.IdentifierMixin, object):
                                incur a fee on your account.
         :param int public_vlan: The ID of the public VLAN on which you want
                                 this VS placed.
-        :param int private_vlan: The ID of the public VLAN on which you want
+        :param int private_vlan: The ID of the private VLAN on which you want
                                  this VS placed.
         :param list disks: A list of disk capacities for this server.
         :param string post_uri: The URI of the post-install script to run
