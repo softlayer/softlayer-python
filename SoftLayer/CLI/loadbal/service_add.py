@@ -24,11 +24,11 @@ import click
 @click.option('--healthcheck-type',
               required=True,
               help="The health check type")
-@click.option('--ip',
+@click.option('--ip-address',
               required=True,
-              help="The IP of the service")
+              help="The IP address of the service")
 @environment.pass_env
-def cli(env, identifier, enabled, port, weight, healthcheck_type, ip):
+def cli(env, identifier, enabled, port, weight, healthcheck_type, ip_address):
     """Adds a new load balancer service."""
 
     mgr = SoftLayer.LoadBalancerManager(env.client)
@@ -37,9 +37,9 @@ def cli(env, identifier, enabled, port, weight, healthcheck_type, ip):
 
     # check if the IP is valid
     ip_address_id = None
-    if ip:
+    if ip_address:
         ip_service = env.client['Network_Subnet_IpAddress']
-        ip_record = ip_service.getByIpAddress(ip)
+        ip_record = ip_service.getByIpAddress(ip_address)
         if len(ip_record) > 0:
             ip_address_id = ip_record['id']
 
