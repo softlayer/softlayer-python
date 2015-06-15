@@ -92,6 +92,6 @@ def create_test_server(transport, host='localhost', port=0):
     """Create a test XML-RPC server in a new thread."""
     server = TestServer(transport, (host, port), TestHandler)
     thread = threading.Thread(target=server.serve_forever,
-                              kwargs={'poll_interval': 0.05})
+                              kwargs={'poll_interval': 0.01})
     thread.start()
     return server
