@@ -1,3 +1,13 @@
+4.0.3
+
+    * Fixes bug with `slcli vs ready` command
+
+    * Fixes bug with `slcli loadbal service-add` command
+
+    * Fixes bug with `slcli vlan list` with vlans that don't have a datacenter
+
+    * Improves validation of virtual server and hardware create commands
+
 4.0.2
 
     * Fixes a bug that breaks user confirmation prompts
