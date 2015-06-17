@@ -2,8 +2,18 @@
 
 import click
 
+import json
+
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+
+
+def validate_filter(ctx, param, value):
+    try:
+        if value:
+            return json.loads(value)
+    except ValueError:
+        raise click.BadParameter('filters need to be in JSON format')
 
 
 @click.command('call', short_help="Call arbitrary API endpoints.")
@@ -11,11 +21,12 @@ from SoftLayer.CLI import formatting
 @click.argument('method')
 @click.argument('parameters', nargs=-1)
 @click.option('--id', '_id', help="Init parameter")
+@click.option('--filter', '_filter', callback=validate_filter, help="Object filter in a JSON string")
 @click.option('--mask', help="String-based object mask")
 @click.option('--limit', type=click.INT, help="Result limit")
 @click.option('--offset', type=click.INT, help="Result offset")
 @environment.pass_env
-def cli(env, service, method, parameters, _id, mask, limit, offset):
+def cli(env, service, method, parameters, _id, _filter, mask, limit, offset):
     """Call arbitrary API endpoints with the given SERVICE and METHOD.
 
     \b
@@ -28,6 +39,7 @@ def cli(env, service, method, parameters, _id, mask, limit, offset):
     """
     result = env.client.call(service, method, *parameters,
                              id=_id,
+                             filter=_filter,
                              mask=mask,
                              limit=limit,
                              offset=offset)
