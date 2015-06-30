@@ -1,3 +1,9 @@
+4.0.4
+
+    * Fixes bug with pulling the userData property for the virtual server detail
+
+    * Fixes a class of bugs invloving unicode from the API
+
 4.0.3
 
     * Fixes bug with `slcli vs ready` command
