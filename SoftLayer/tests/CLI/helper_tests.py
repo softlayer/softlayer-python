@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
     SoftLayer.tests.CLI.helper_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -356,6 +357,17 @@ class TestFormatOutput(testing.TestCase):
         t.sortby = 'nothing'
         ret = formatting.format_output(t, 'python')
         self.assertEqual({'nothing': None}, ret)
+
+    def test_format_output_unicode(self):
+        t = formatting.format_output('☃', 'raw')
+        self.assertEqual('☃', t)
+
+        item = formatting.FormattedItem('raw ☃', '☃')
+        t = formatting.format_output(item)
+        self.assertEqual('☃', t)
+
+        t = formatting.format_output(item, 'raw')
+        self.assertEqual('raw ☃', t)
 
 
 class TestTemplateArgs(testing.TestCase):

@@ -50,7 +50,7 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
     # responds to .formatted
     if hasattr(data, 'formatted'):
         if fmt == 'table':
-            return str(data.formatted)
+            return data.formatted
 
     # responds to .separator
     if hasattr(data, 'separator'):
