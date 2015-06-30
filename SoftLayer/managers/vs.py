@@ -191,7 +191,6 @@ class VSManager(utils.IdentifierMixin, object):
                 'blockDevices',
                 'blockDeviceTemplateGroup[id, name, globalIdentifier]',
                 'postInstallScriptUri',
-                'userData',
                 '''operatingSystem[passwords[username,password],
                                    softwareLicense.softwareDescription[
                                        manufacturer,name,version,
