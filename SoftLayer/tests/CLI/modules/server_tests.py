@@ -57,6 +57,25 @@ class ServerCLITests(testing.TestCase):
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(json.loads(result.output), expected)
 
+    def test_detail_vs_empty_tag(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        mock.return_value = {
+            'id': 100,
+            'processorPhysicalCoreAmount': 2,
+            'memoryCapacity': 2,
+            'tagReferences': [
+                {'tag': {'name': 'example-tag'}},
+                {},
+            ],
+        }
+        result = self.run_command(['server', 'detail', '100'])
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(
+            json.loads(result.output)['tags'],
+            ['example-tag'],
+        )
+
     def test_list_servers(self):
         result = self.run_command(['server', 'list', '--tag=openstack'])
 

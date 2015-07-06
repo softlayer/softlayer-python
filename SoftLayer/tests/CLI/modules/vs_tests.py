@@ -66,6 +66,25 @@ class DnsTests(testing.TestCase):
                                      'id': 1}],
                           'owner': 'chechu'})
 
+    def test_detail_vs_empty_tag(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getObject')
+        mock.return_value = {
+            'id': 100,
+            'maxCpu': 2,
+            'maxMemory': 1024,
+            'tagReferences': [
+                {'tag': {'name': 'example-tag'}},
+                {},
+            ],
+        }
+        result = self.run_command(['vs', 'detail', '100'])
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(
+            json.loads(result.output)['tags'],
+            ['example-tag'],
+        )
+
     def test_create_options(self):
         result = self.run_command(['vs', 'create-options'])
 
