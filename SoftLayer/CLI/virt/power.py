@@ -101,6 +101,7 @@ def pause(env, identifier):
 
 @click.command()
 @click.argument('identifier')
+@environment.pass_env
 def resume(env, identifier):
     """Resumes a paused virtual server."""
 
