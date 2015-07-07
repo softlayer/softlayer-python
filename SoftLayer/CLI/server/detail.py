@@ -96,8 +96,10 @@ def cli(env, identifier, passwords, price):
         table.add_row(['remote users', pass_table])
 
     tag_row = []
-    for tag in result['tagReferences']:
-        tag_row.append(tag['tag']['name'])
+    for tag_detail in result['tagReferences']:
+        tag = utils.lookup(tag_detail, 'tag', 'name')
+        if tag is not None:
+            tag_row.append(tag)
 
     if tag_row:
         table.add_row(['tags', formatting.listing(tag_row, separator=',')])
