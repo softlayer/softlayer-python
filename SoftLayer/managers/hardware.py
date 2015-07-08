@@ -473,8 +473,8 @@ regions[location[location]]
         :param string hostname: valid hostname
         :param string domain: valid domain name
         :param string notes: notes about this particular hardware
-        :param string tags: tags to set on the hardware as a comma separated list.
-                            Use the empty string to remove all tags.
+        :param string tags: tags to set on the hardware as a comma separated
+                            list. Use the empty string to remove all tags.
 
         """
 
