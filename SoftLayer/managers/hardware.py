@@ -462,7 +462,7 @@ regions[location[location]]
             return [result['id'] for result in results]
 
     def edit(self, hardware_id, userdata=None, hostname=None, domain=None,
-             notes=None):
+             notes=None, tags=None):
         """Edit hostname, domain name, notes, user data of the hardware.
 
         Parameters set to None will be ignored and not attempted to be updated.
@@ -473,12 +473,17 @@ regions[location[location]]
         :param string hostname: valid hostname
         :param string domain: valid domain name
         :param string notes: notes about this particular hardware
+        :param string tags: tags to set on the hardware as a comma separated
+                            list. Use the empty string to remove all tags.
 
         """
 
         obj = {}
         if userdata:
             self.hardware.setUserMetadata([userdata], id=hardware_id)
+
+        if tags is not None:
+            self.hardware.setTags(tags, id=hardware_id)
 
         if hostname:
             obj['hostname'] = hostname
