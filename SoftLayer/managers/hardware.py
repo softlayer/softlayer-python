@@ -360,7 +360,7 @@ items[
     prices
 ],
 activePresets,
-regions[location[location]]
+regions[location[location[priceGroups]]]
 '''
 
         package_type = 'BARE_METAL_CPU_FAST_PROVISION'
@@ -390,25 +390,32 @@ regions[location[location]]
         extras = extras or []
 
         package = self._get_package()
+        location = _get_location(package, location)
 
         prices = []
         for category in ['pri_ip_addresses',
                          'vpn_management',
                          'remote_management']:
             prices.append(_get_default_price_id(package['items'],
-                                                category,
-                                                hourly))
+                                                option=category,
+                                                hourly=hourly,
+                                                location=location))
 
-        prices.append(_get_os_price_id(package['items'], os))
+        prices.append(_get_os_price_id(package['items'], os,
+                                       location=location))
         prices.append(_get_bandwidth_price_id(package['items'],
                                               hourly=hourly,
-                                              no_public=no_public))
+                                              no_public=no_public,
+                                              location=location))
         prices.append(_get_port_speed_price_id(package['items'],
                                                port_speed,
-                                               no_public))
+                                               no_public,
+                                               location=location))
 
         for extra in extras:
-            prices.append(_get_extra_price_id(package['items'], extra, hourly))
+            prices.append(_get_extra_price_id(package['items'],
+                                              extra, hourly,
+                                              location=location))
 
         hardware = {
             'hostname': hostname,
@@ -424,7 +431,7 @@ regions[location[location]]
 
         order = {
             'hardware': [hardware],
-            'location': _get_location_key(package, location),
+            'location': location['keyname'],
             'prices': [{'id': price} for price in prices],
             'packageId': package['id'],
             'presetId': _get_preset_id(package, size),
@@ -522,7 +529,7 @@ regions[location[location]]
             id=hardware_id)
 
 
-def _get_extra_price_id(items, key_name, hourly):
+def _get_extra_price_id(items, key_name, hourly, location):
     """Returns a price id attached to item with the given key_name."""
 
     for item in items:
@@ -530,14 +537,19 @@ def _get_extra_price_id(items, key_name, hourly):
             continue
 
         for price in item['prices']:
-            if _matches_billing(price, hourly):
-                return price['id']
+            if not _matches_billing(price, hourly):
+                continue
+
+            if not _matches_location(price, location):
+                continue
+
+            return price['id']
 
     raise SoftLayer.SoftLayerError(
         "Could not find valid price for extra option, '%s'" % key_name)
 
 
-def _get_default_price_id(items, option, hourly):
+def _get_default_price_id(items, option, hourly, location):
     """Returns a 'free' price id given an option."""
 
     for item in items:
@@ -547,14 +559,18 @@ def _get_default_price_id(items, option, hourly):
         for price in item['prices']:
             if all([float(price.get('hourlyRecurringFee', 0)) == 0.0,
                     float(price.get('recurringFee', 0)) == 0.0,
-                    _matches_billing(price, hourly)]):
+                    _matches_billing(price, hourly),
+                    _matches_location(price, location)]):
                 return price['id']
 
     raise SoftLayer.SoftLayerError(
         "Could not find valid price for '%s' option" % option)
 
 
-def _get_bandwidth_price_id(items, hourly=True, no_public=False):
+def _get_bandwidth_price_id(items,
+                            hourly=True,
+                            no_public=False,
+                            location=None):
     """Choose a valid price id for bandwidth."""
 
     # Prefer pay-for-use data transfer with hourly
@@ -570,14 +586,18 @@ def _get_bandwidth_price_id(items, hourly=True, no_public=False):
             continue
 
         for price in item['prices']:
-            if _matches_billing(price, hourly):
-                return price['id']
+            if not _matches_billing(price, hourly):
+                continue
+            if not _matches_location(price, location):
+                continue
+
+            return price['id']
 
     raise SoftLayer.SoftLayerError(
         "Could not find valid price for bandwidth option")
 
 
-def _get_os_price_id(items, os):
+def _get_os_price_id(items, os, location):
     """Returns the price id matching."""
 
     for item in items:
@@ -590,13 +610,16 @@ def _get_os_price_id(items, os):
             continue
 
         for price in item['prices']:
+            if not _matches_location(price, location):
+                continue
+
             return price['id']
 
     raise SoftLayer.SoftLayerError("Could not find valid price for os: '%s'" %
                                    os)
 
 
-def _get_port_speed_price_id(items, port_speed, no_public):
+def _get_port_speed_price_id(items, port_speed, no_public, location):
     """Choose a valid price id for port speed."""
 
     for item in items:
@@ -611,6 +634,9 @@ def _get_port_speed_price_id(items, port_speed, no_public):
             continue
 
         for price in item['prices']:
+            if not _matches_location(price, location):
+                continue
+
             return price['id']
 
     raise SoftLayer.SoftLayerError(
@@ -618,9 +644,24 @@ def _get_port_speed_price_id(items, port_speed, no_public):
 
 
 def _matches_billing(price, hourly):
-    """Return if the price object is hourly and/or monthly."""
+    """Return True if the price object is hourly and/or monthly."""
     return any([hourly and price.get('hourlyRecurringFee') is not None,
                 not hourly and price.get('recurringFee') is not None])
+
+
+def _matches_location(price, location):
+    """Return True if the price object matches the location."""
+    # the price has no location restriction
+    if not price.get('locationGroupId'):
+        return True
+
+    # Check to see if any of the location groups match the location group
+    # of this price object
+    for group in location['location']['location']['priceGroups']:
+        if group['id'] == price['locationGroupId']:
+            return True
+
+    return False
 
 
 def _is_private_port_speed_item(item):
@@ -632,11 +673,11 @@ def _is_private_port_speed_item(item):
     return False
 
 
-def _get_location_key(package, location):
+def _get_location(package, location):
     """Get the longer key with a short location name."""
     for region in package['regions']:
         if region['location']['location']['name'] == location:
-            return region['keyname']
+            return region
 
     raise SoftLayer.SoftLayerError("Could not find valid location for: '%s'"
                                    % location)

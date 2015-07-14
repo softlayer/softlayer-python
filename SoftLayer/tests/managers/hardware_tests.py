@@ -150,7 +150,8 @@ class HardwareTests(testing.TestCase):
         packages.return_value = packages_copy
 
         ex = self.assertRaises(SoftLayer.SoftLayerError,
-                               self.hardware._generate_create_dict)
+                               self.hardware._generate_create_dict,
+                               location="wdc01")
         self.assertIn("Could not find valid price", str(ex))
 
     def test_generate_create_dict_no_regions(self):
@@ -368,7 +369,7 @@ class HardwareHelperTests(testing.TestCase):
     def test_get_extra_price_id_no_items(self):
         ex = self.assertRaises(SoftLayer.SoftLayerError,
                                managers.hardware._get_extra_price_id,
-                               [], 'test', True)
+                               [], 'test', True, None)
         self.assertEqual("Could not find valid price for extra option, 'test'",
                          str(ex))
 
@@ -384,14 +385,14 @@ class HardwareHelperTests(testing.TestCase):
         }]
         ex = self.assertRaises(SoftLayer.SoftLayerError,
                                managers.hardware._get_default_price_id,
-                               items, 'unknown', True)
+                               items, 'unknown', True, None)
         self.assertEqual("Could not find valid price for 'unknown' option",
                          str(ex))
 
     def test_get_default_price_id_no_items(self):
         ex = self.assertRaises(SoftLayer.SoftLayerError,
                                managers.hardware._get_default_price_id,
-                               [], 'test', True)
+                               [], 'test', True, None)
         self.assertEqual("Could not find valid price for 'test' option",
                          str(ex))
 
@@ -405,13 +406,13 @@ class HardwareHelperTests(testing.TestCase):
     def test_get_os_price_id_no_items(self):
         ex = self.assertRaises(SoftLayer.SoftLayerError,
                                managers.hardware._get_os_price_id,
-                               [], 'UBUNTU_14_64')
+                               [], 'UBUNTU_14_64', None)
         self.assertEqual("Could not find valid price for os: 'UBUNTU_14_64'",
                          str(ex))
 
     def test_get_port_speed_price_id_no_items(self):
         ex = self.assertRaises(SoftLayer.SoftLayerError,
                                managers.hardware._get_port_speed_price_id,
-                               [], 10, True)
+                               [], 10, True, None)
         self.assertEqual("Could not find valid price for port speed: '10'",
                          str(ex))
