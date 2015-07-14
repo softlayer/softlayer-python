@@ -1,4 +1,4 @@
-"""Cancel a subnet."""
+"""Get subnet details."""
 # :license: MIT, see LICENSE for more details.
 
 import SoftLayer
@@ -19,7 +19,7 @@ import click
               help="Hide hardware listing")
 @environment.pass_env
 def cli(env, identifier, no_vs, no_hardware):
-    """Cancel a subnet."""
+    """Get subnet details."""
 
     mgr = SoftLayer.NetworkManager(env.client)
     subnet_id = helpers.resolve_id(mgr.resolve_subnet_ids, identifier,
