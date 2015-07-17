@@ -38,7 +38,7 @@
 
     * CLI: The command is renamed from `sl` to `slcli` to avoid package conflicts.
 
-    * CLI: Global options now need to be specified right after the `slcli` command. For example, you would now use `sl --format=raw` vs `list over sl vs list --format=raw`. This is a change for the following options:
+    * CLI: Global options now need to be specified right after the `slcli` command. For example, you would now use `slcli --format=raw list` over `slcli vs list --format=raw`. This is a change for the following options:
         * --format
         * -c or --config
         * --debug
