@@ -416,6 +416,6 @@ class TestExportToTemplate(testing.TestCase):
             with open(tmp.name) as f:
                 data = f.read()
 
-                self.assertEquals(len(data.splitlines()), 2)
+                self.assertEqual(len(data.splitlines()), 2)
                 self.assertIn('datacenter=ams01\n', data)
                 self.assertIn('disk=disk1,disk2\n', data)
