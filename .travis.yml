@@ -16,7 +16,7 @@ matrix:
     - python: "2.7"
       env: TOX_ENV=coverage
 install:
- - pip install tox --use-mirrors
+ - pip install tox
  - pip install coveralls
 script:
  - tox -e $TOX_ENV
