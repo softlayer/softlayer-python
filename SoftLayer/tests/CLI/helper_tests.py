@@ -7,7 +7,7 @@
 """
 import json
 import os
-import sys
+import tempfile
 
 import mock
 
@@ -16,11 +16,6 @@ from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 from SoftLayer.CLI import template
 from SoftLayer import testing
-
-if sys.version_info >= (3,):
-    open_path = 'builtins.open'
-else:
-    open_path = '__builtin__.open'
 
 
 class CLIJSONEncoderTest(testing.TestCase):
@@ -403,8 +398,9 @@ class TestTemplateArgs(testing.TestCase):
 
 class TestExportToTemplate(testing.TestCase):
     def test_export_to_template(self):
-        with mock.patch(open_path, mock.mock_open(), create=True) as open_:
-            template.export_to_template('filename', {
+        with tempfile.NamedTemporaryFile() as tmp:
+
+            template.export_to_template(tmp.name, {
                 'os': None,
                 'datacenter': 'ams01',
                 'disk': ('disk1', 'disk2'),
@@ -417,8 +413,9 @@ class TestExportToTemplate(testing.TestCase):
                 'test': 'test',
             }, exclude=['test'])
 
-            open_.assert_called_with('filename', 'w')
-            open_().write.assert_has_calls([
-                mock.call('datacenter=ams01\n'),
-                mock.call('disk=disk1,disk2\n'),
-            ], any_order=True)  # Order isn't really guaranteed
+            with open(tmp.name) as f:
+                data = f.read()
+
+                self.assertEqual(len(data.splitlines()), 2)
+                self.assertIn('datacenter=ams01\n', data)
+                self.assertIn('disk=disk1,disk2\n', data)

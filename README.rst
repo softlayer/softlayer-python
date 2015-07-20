@@ -52,7 +52,7 @@ library.
 
 System Requirements
 -------------------
-* This library has been tested on Python 2.6, 2.7, 3.3 and 3.4.
+* This library has been tested on Python 2.7, 3.3 and 3.4.
 * A valid SoftLayer API username and key are required to call SoftLayer's API.
 * A connection to SoftLayer's private network is required to connect to
   SoftLayer’s private network API endpoints.
