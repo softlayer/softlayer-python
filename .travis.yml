@@ -8,14 +8,15 @@ matrix:
       env: TOX_ENV=py33
     - python: "3.4"
       env: TOX_ENV=py34
-    - python: "nightly"
-      env: TOX_ENV=py35
     - python: "pypy"
       env: TOX_ENV=pypy
     - python: "2.7"
       env: TOX_ENV=analysis
     - python: "2.7"
       env: TOX_ENV=coverage
+  allow_failures:
+    - python: "nightly"
+      env: TOX_ENV=py35
 install:
  - pip install tox
  - pip install coveralls
