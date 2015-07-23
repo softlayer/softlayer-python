@@ -1,4 +1,4 @@
-"""Cancels a firewalls."""
+"""Cancels a firewall."""
 # :license: MIT, see LICENSE for more details.
 
 import SoftLayer
