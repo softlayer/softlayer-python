@@ -72,7 +72,6 @@ username and api_key need to be configured. The easiest way to do that is to
 use: 'slcli setup'""",
              cls=CommandLoader,
              context_settings={'help_option_names': ['-h', '--help']})
-@click.pass_context
 @click.option('--format',
               default=DEFAULT_FORMAT,
               help="Output format",
@@ -109,7 +108,8 @@ use: 'slcli setup'""",
               required=False,
               help="Use fixtures instead of actually making API calls")
 @click.version_option(prog_name="slcli (SoftLayer Command-line)")
-def cli(ctx,
+@environment.pass_env
+def cli(env,
         format='table',
         config=None,
         debug=0,
@@ -131,7 +131,6 @@ def cli(ctx,
         logger.setLevel(DEBUG_LOGGING_MAP.get(verbose, logging.DEBUG))
 
     # Populate environement with client and set it as the context object
-    env = ctx.ensure_object(environment.Environment)
     env.skip_confirmations = really
     env.config_file = config
     env.format = format
@@ -154,11 +153,10 @@ def cli(ctx,
 
 
 @cli.resultcallback()
-@click.pass_context
-def output_result(ctx, result, timings=False, **kwargs):
+@environment.pass_env
+def output_result(env, result, timings=False, **kwargs):
     """Outputs the results returned by the CLI and also outputs timings."""
 
-    env = ctx.ensure_object(environment.Environment)
     output = env.fmt(result)
     if output:
         env.out(output)
