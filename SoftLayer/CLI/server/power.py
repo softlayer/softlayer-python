@@ -66,7 +66,7 @@ def power_on(env, identifier):
 @click.argument('identifier')
 @environment.pass_env
 def power_cycle(env, identifier):
-    """Power on a server."""
+    """Power cycle a server."""
 
     mgr = SoftLayer.HardwareManager(env.client)
     hw_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'hardware')

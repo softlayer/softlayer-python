@@ -19,7 +19,12 @@ import mock
 class CoreTests(testing.TestCase):
 
     def test_load_all(self):
-        recursive_subcommand_loader(core.cli, path='root')
+        for path, cmd in recursive_subcommand_loader(core.cli, path='root'):
+            try:
+                cmd.main(args=['--help'])
+            except SystemExit as ex:
+                if ex.code != 0:
+                    self.fail("Non-zero exit code for command: %s" % path)
 
     def test_debug_max(self):
         with mock.patch('logging.getLogger') as log_mock:
@@ -105,4 +110,6 @@ def recursive_subcommand_loader(root, path=''):
         new_path = '%s:%s' % (path, command)
         logging.info("loading %s", new_path)
         new_root = root.get_command(ctx, command)
-        recursive_subcommand_loader(new_root, path=new_path)
+        for path, cmd in recursive_subcommand_loader(new_root, path=new_path):
+            yield path, cmd
+        yield path, new_root
