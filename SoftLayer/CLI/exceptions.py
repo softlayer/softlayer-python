@@ -6,8 +6,6 @@
     :license: MIT, see LICENSE for more details.
 """
 
-import SoftLayer
-
 
 class CLIHalt(SystemExit):
     """Smoothly halt the execution of the command. No error."""
@@ -34,10 +32,3 @@ class ArgumentError(CLIAbort):
     def __init__(self, msg, *args):
         super(ArgumentError, self).__init__(msg, *args)
         self.message = "Argument Error: %s" % msg
-
-
-class InvalidCommand(SoftLayer.SoftLayerError):
-    """Raised when trying to use a command that does not exist."""
-    def __init__(self, path, *args):
-        msg = 'Invalid command: "%s"' % ' '.join(path)
-        SoftLayer.SoftLayerError.__init__(self, msg, *args)

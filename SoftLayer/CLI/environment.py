@@ -7,7 +7,6 @@
 """
 import importlib
 
-from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import routes
 
@@ -68,7 +67,7 @@ class Environment(object):
                     len(path) == command.count(":")]):
 
                 # offset is used to exclude the path that the caller requested.
-                offset = len(path_str)+1 if path_str else 0
+                offset = len(path_str) + 1 if path_str else 0
                 commands.append(command[offset:])
 
         return sorted(commands)
@@ -80,7 +79,7 @@ class Environment(object):
         if path_str in self.commands:
             return self.commands[path_str].load()
 
-        raise exceptions.InvalidCommand(path)
+        return None
 
     def resolve_alias(self, path_str):
         """Returns the actual command name. Uses the alias mapping."""
