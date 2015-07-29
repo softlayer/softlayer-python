@@ -49,6 +49,7 @@ class TestHandler(six.moves.BaseHTTPServer.BaseHTTPRequestHandler):
                                                   'InitParameters').get('id')
             req.transport_headers = dict(((k.lower(), v)
                                           for k, v in self.headers.items()))
+            req.headers = headers
 
             # Get response
             response = self.server.transport(req)
