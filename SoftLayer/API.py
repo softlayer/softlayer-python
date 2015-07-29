@@ -223,6 +223,7 @@ class BaseClient(object):
 
             request = self.auth.get_request(request)
 
+        request.headers.update(kwargs.get('headers', {}))
         return self.transport(request)
 
     __call__ = call

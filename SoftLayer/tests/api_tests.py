@@ -89,9 +89,11 @@ class APIClient(testing.TestCase):
             1234,
             id=5678,
             mask={'object': {'attribute': ''}},
+            headers={'header': 'value'},
             raw_headers={'RAW': 'HEADER'},
             filter=_filter,
-            limit=9, offset=10)
+            limit=9,
+            offset=10)
 
         self.assertEqual(resp, {"test": "result"})
         self.assert_called_with('SoftLayer_SERVICE', 'METHOD',
@@ -102,6 +104,10 @@ class APIClient(testing.TestCase):
                                 limit=9,
                                 offset=10,
                                 )
+        calls = self.calls('SoftLayer_SERVICE', 'METHOD')
+        self.assertEqual(len(calls), 1)
+        self.assertIn('header', calls[0].headers)
+        self.assertEqual(calls[0].headers['header'], 'value')
 
     @mock.patch('SoftLayer.API.BaseClient.iter_call')
     def test_iterate(self, _iter_call):
