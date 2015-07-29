@@ -9,7 +9,6 @@ import click
 import mock
 
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
 from SoftLayer import testing
 
 
@@ -30,8 +29,8 @@ class EnvironmentTests(testing.TestCase):
         self.assertIn('dns', actions)
 
     def test_get_command_invalid(self):
-        self.assertRaises(exceptions.InvalidCommand,
-                          self.env.get_command, 'invalid', 'command')
+        cmd = self.env.get_command('invalid', 'command')
+        self.assertEqual(cmd, None)
 
     def test_get_command(self):
         mod_path = 'SoftLayer.tests.CLI.environment_tests'
