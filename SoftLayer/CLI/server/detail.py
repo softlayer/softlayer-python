@@ -62,11 +62,14 @@ def cli(env, identifier, passwords, price):
     table.add_row(
         ['created', result['provisionDate'] or formatting.blank()])
 
-    table.add_row(['owner', formatting.FormattedItem(
-        utils.lookup(result, 'billingItem', 'orderItem',
-                     'order', 'userRecord',
-                     'username') or formatting.blank()
-    )])
+    if utils.lookup(result, 'billingItem') != []:
+        table.add_row(['owner', formatting.FormattedItem(
+            utils.lookup(result, 'billingItem', 'orderItem',
+                         'order', 'userRecord',
+                         'username') or formatting.blank(),
+        )])
+    else:
+        table.add_row(['owner', formatting.blank()])
 
     vlan_table = formatting.Table(['type', 'number', 'id'])
 
