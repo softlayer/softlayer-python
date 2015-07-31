@@ -97,7 +97,7 @@ def cli(env, identifier, passwords, price):
 
     tag_row = []
     for tag in result['tagReferences']:
-        tag_row.append(tag['tag']['name'])
+        tag_row.append(tag.get('tag').get('name'))
 
     if tag_row:
         table.add_row(['tags', formatting.listing(tag_row, separator=',')])
