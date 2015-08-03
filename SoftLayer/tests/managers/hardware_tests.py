@@ -9,9 +9,9 @@ import copy
 import mock
 
 import SoftLayer
+from SoftLayer import fixtures
 from SoftLayer import managers
 from SoftLayer import testing
-from SoftLayer.testing import fixtures
 
 
 MINIMAL_TEST_CREATE_ARGS = {

@@ -1,6 +1,6 @@
 """
-    SoftLayer.core
-    ~~~~~~~~~~~~~~
+    SoftLayer.CLI.core
+    ~~~~~~~~~~~~~~~~~~
     Core for the SoftLayer CLI
 
     :license: MIT, see LICENSE for more details.
@@ -71,6 +71,7 @@ class CommandLoader(click.MultiCommand):
 username and api_key need to be configured. The easiest way to do that is to
 use: 'slcli setup'""",
              cls=CommandLoader,
+             invoke_without_command=True,
              context_settings={'help_option_names': ['-h', '--help']})
 @click.option('--format',
               default=DEFAULT_FORMAT,
@@ -109,7 +110,8 @@ use: 'slcli setup'""",
               help="Use fixtures instead of actually making API calls")
 @click.version_option(prog_name="slcli (SoftLayer Command-line)")
 @environment.pass_env
-def cli(env,
+@click.pass_context
+def cli(ctx, env,
         format='table',
         config=None,
         debug=0,
@@ -151,6 +153,10 @@ def cli(env,
         client.transport = SoftLayer.TimingTransport(client.transport)
         env.client = client
 
+    if ctx.invoked_subcommand is None:
+        from SoftLayer.CLI import shell
+        shell.main(env)
+
 
 @cli.resultcallback()
 @environment.pass_env
@@ -171,12 +177,12 @@ def output_result(env, result, timings=False, **kwargs):
         env.err(env.fmt(timing_table))
 
 
-def main():
+def main(**kwargs):
     """Main program. Catches several common errors and displays them nicely."""
     exit_status = 0
 
     try:
-        cli.main()
+        cli.main(**kwargs)
     except SoftLayer.SoftLayerAPIError as ex:
         if 'invalid api token' in ex.faultString.lower():
             print("Authentication Failed: To update your credentials,"

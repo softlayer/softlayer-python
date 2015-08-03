@@ -21,6 +21,7 @@ REQUIRES = [
     'prettytable >= 0.7.0',
     'click',
     'requests >= 2.7.0',
+    'prompt_toolkit',
 ]
 
 if sys.version_info < (2, 7):

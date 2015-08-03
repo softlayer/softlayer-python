@@ -7,8 +7,8 @@
 import math
 
 from SoftLayer.managers import cdn
+from SoftLayer import fixtures
 from SoftLayer import testing
-from SoftLayer.testing import fixtures
 
 
 class CDNTests(testing.TestCase):
