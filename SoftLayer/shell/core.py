@@ -35,13 +35,13 @@ ALL_ALIASES = {
 
 
 class ShellExit(Exception):
+    """Exception raised to quit the shell."""
     pass
 
 
 @click.command()
 @environment.pass_env
-@click.pass_context
-def cli(ctx, env):
+def cli(env):
     """Enters a shell for slcli."""
     env.load_modules_from_python(ALL_ROUTES)
     env.aliases.update(ALL_ALIASES)
