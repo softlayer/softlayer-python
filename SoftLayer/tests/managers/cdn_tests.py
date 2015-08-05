@@ -6,8 +6,8 @@
 """
 import math
 
-from SoftLayer.managers import cdn
 from SoftLayer import fixtures
+from SoftLayer.managers import cdn
 from SoftLayer import testing
 
 

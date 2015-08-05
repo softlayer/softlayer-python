@@ -7,45 +7,83 @@
 """
 from __future__ import print_function
 from __future__ import unicode_literals
+import os
 import shlex
 import sys
 import traceback
 
 import click
-from prompt_toolkit import completion
-from prompt_toolkit import shortcuts
+from prompt_toolkit import completion as p_completion
+from prompt_toolkit import history as p_history
+from prompt_toolkit import shortcuts as p_shortcuts
 
 from SoftLayer.CLI import core
+from SoftLayer.CLI import environment
 
 # pylint: disable=broad-except
 
+ALL_ROUTES = [
+    ('exit', 'SoftLayer.shell.cmd_exit:cli'),
+    ('shell-help', 'SoftLayer.shell.cmd_help:cli'),
+]
 
-def main(env):
-    """Main entry-point for the shell."""
+ALL_ALIASES = {
+    '?': 'shell-help',
+    'help': 'shell-help',
+    'quit': 'exit',
+}
+
+
+class ShellExit(Exception):
+    pass
+
+
+@click.command()
+@environment.pass_env
+@click.pass_context
+def cli(ctx, env):
+    """Enters a shell for slcli."""
+    env.load_modules_from_python(ALL_ROUTES)
+    env.aliases.update(ALL_ALIASES)
     exit_code = 0
+    app_path = click.get_app_dir('softlayer')
+
+    if not os.path.exists(app_path):
+        os.makedirs(os.path.dirname(app_path))
+    history = p_history.FileHistory(os.path.join(app_path, 'history'))
+    completer = ShellCompleter()
+
     while True:
         try:
-            line = shortcuts.get_input("(%s)> " % exit_code,
-                                       completer=ShellCompleter())
+            line = p_shortcuts.get_input("(%s)> " % exit_code,
+                                         completer=completer,
+                                         history=history)
             try:
                 args = shlex.split(line)
             except ValueError as ex:
                 print("Invalid Command: %s" % ex)
                 continue
 
-            core.main(args=args, obj=env)
+            # Reset client so that --fixtures can be toggled on and off
+            env.client = None
+            core.main(args=args,
+                      obj=env,
+                      prog_name="",
+                      reraise_exceptions=True)
         except SystemExit as ex:
             exit_code = ex.code
         except KeyboardInterrupt:
             exit_code = 1
         except EOFError:
             return
-        except Exception:
+        except ShellExit:
+            return
+        except Exception as ex:
             exit_code = 1
             traceback.print_exc(file=sys.stderr)
 
 
-class ShellCompleter(completion.Completer):
+class ShellCompleter(p_completion.Completer):
     """Completer for the shell."""
 
     def get_completions(self, document, complete_event):
@@ -90,4 +128,4 @@ def _click_generator(root, parts):
     # yield all collected options that starts with the incomplete section
     for option in options:
         if option.startswith(incomplete):
-            yield completion.Completion(option, -len(incomplete))
+            yield p_completion.Completion(option, -len(incomplete))
