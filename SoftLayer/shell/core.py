@@ -75,7 +75,7 @@ def cli(ctx, env):
                 if val is True:
                     env_args.append('--%s' % arg)
                 elif isinstance(val, int):
-                    for i in range(val):
+                    for _ in range(val):
                         env_args.append('--%s' % arg)
                 elif val is None:
                     continue
