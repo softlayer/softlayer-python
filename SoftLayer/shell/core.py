@@ -41,8 +41,10 @@ class ShellExit(Exception):
 
 @click.command()
 @environment.pass_env
-def cli(env):
+@click.pass_context
+def cli(ctx, env):
     """Enters a shell for slcli."""
+
     env.load_modules_from_python(ALL_ROUTES)
     env.aliases.update(ALL_ALIASES)
     exit_code = 0
@@ -52,6 +54,7 @@ def cli(env):
         os.makedirs(os.path.dirname(app_path))
     history = p_history.FileHistory(os.path.join(app_path, 'history'))
     completer = ShellCompleter()
+    env.vars['ENV_ARGS'] = ctx.parent.params
 
     while True:
         try:
@@ -66,7 +69,20 @@ def cli(env):
 
             # Reset client so that --fixtures can be toggled on and off
             env.client = None
-            core.main(args=args,
+
+            env_args = []
+            for arg, val in env.vars.get('ENV_ARGS', {}).items():
+                if val is True:
+                    env_args.append('--%s' % arg)
+                elif isinstance(val, int):
+                    for i in range(val):
+                        env_args.append('--%s' % arg)
+                elif val is None:
+                    continue
+                else:
+                    env_args.append('--%s=%s' % (arg, val))
+
+            core.main(args=env_args + args,
                       obj=env,
                       prog_name="",
                       reraise_exceptions=True)

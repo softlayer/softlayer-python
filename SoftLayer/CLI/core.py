@@ -98,11 +98,11 @@ use: 'slcli setup'""",
 @click.option('--proxy',
               required=False,
               help="HTTP[S] proxy to be use to make API calls")
-@click.option('--really', '-y',
+@click.option('--really / --not-really', '-y',
               is_flag=True,
               required=False,
               help="Confirm all prompt actions")
-@click.option('--fixtures',
+@click.option('--fixtures / --no-fixtures',
               envvar='SL_FIXTURES',
               is_flag=True,
               required=False,
