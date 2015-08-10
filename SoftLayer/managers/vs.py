@@ -394,9 +394,12 @@ class VSManager(utils.IdentifierMixin, object):
             # Will return once vsi 12345 is ready, or after 10 checks
             ready = mgr.wait_for_ready(12345, 10)
         """
-        for count, new_instance in enumerate(itertools.repeat(instance_id),
-                                             start=1):
-            instance = self.get_instance(new_instance)
+        until = time.time() + limit
+        for new_instance in itertools.repeat(instance_id):
+            mask = """id,
+                      lastOperatingSystemReload.id,
+                      activeTransaction.id,provisionDate"""
+            instance = self.get_instance(new_instance, mask=mask)
             last_reload = utils.lookup(instance,
                                        'lastOperatingSystemReload',
                                        'id')
@@ -407,7 +410,7 @@ class VSManager(utils.IdentifierMixin, object):
             reloading = all((
                 active_transaction,
                 last_reload,
-                last_reload == active_transaction
+                last_reload == active_transaction,
             ))
 
             # only check for outstanding transactions if requested
@@ -422,10 +425,11 @@ class VSManager(utils.IdentifierMixin, object):
                     not outstanding]):
                 return True
 
-            if count >= limit:
+            now = time.time()
+            if now >= until:
                 return False
 
-            time.sleep(delay)
+            time.sleep(min(delay, until - now))
 
     def verify_create_instance(self, **kwargs):
         """Verifies an instance creation command.
