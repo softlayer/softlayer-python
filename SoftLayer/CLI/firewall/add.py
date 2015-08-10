@@ -15,7 +15,7 @@ import click
               type=click.Choice(['vs', 'vlan', 'server']),
               help='Firewall type',
               required=True)
-@click.option('--high-availability', '--ha',
+@click.option('--high-availability', '-ha',
               is_flag=True,
               help='High available firewall option')
 @environment.pass_env
