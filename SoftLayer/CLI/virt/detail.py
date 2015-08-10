@@ -67,11 +67,14 @@ def cli(self, identifier, passwords=False, price=False):
     table.add_row(['private_cpu', result['dedicatedAccountHostOnlyFlag']])
     table.add_row(['created', result['createDate']])
     table.add_row(['modified', result['modifyDate']])
-    table.add_row(['owner', formatting.FormattedItem(
-        utils.lookup(result, 'billingItem', 'orderItem',
-                     'order', 'userRecord',
-                     'username') or formatting.blank(),
-    )])
+    if utils.lookup(result, 'billingItem') != []:
+        table.add_row(['owner', formatting.FormattedItem(
+            utils.lookup(result, 'billingItem', 'orderItem',
+                         'order', 'userRecord',
+                         'username') or formatting.blank(),
+        )])
+    else:
+        table.add_row(['owner', formatting.blank()])
 
     vlan_table = formatting.Table(['type', 'number', 'id'])
     for vlan in result['networkVlans']:
