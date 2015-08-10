@@ -129,27 +129,3 @@ class CallCliTests(testing.TestCase):
         self.assertEqual(result.exit_code, 0)
         self.assert_called_with('SoftLayer_Service', 'method',
                                 args=('arg1', '1234'))
-
-
-class CallCliHelperTests(testing.TestCase):
-
-    def test_format_api_dict(self):
-        result = call_api.format_api_dict({'key': 'value'})
-
-        self.assertIsInstance(result, formatting.Table)
-        self.assertEqual(result.columns, ['Name', 'Value'])
-        self.assertEqual(result.rows, [['key', 'value']])
-
-    def test_format_api_list(self):
-        result = call_api.format_api_list([{'key': 'value'}])
-
-        self.assertIsInstance(result, formatting.Table)
-        self.assertEqual(result.columns, ['key'])
-        self.assertEqual(result.rows, [['value']])
-
-    def test_format_api_list_non_objects(self):
-        result = call_api.format_api_list(['a', 'b', 'c'])
-
-        self.assertIsInstance(result, formatting.Table)
-        self.assertEqual(result.columns, ['Value'])
-        self.assertEqual(result.rows, [['a'], ['b'], ['c']])

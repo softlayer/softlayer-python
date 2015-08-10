@@ -419,3 +419,27 @@ class TestExportToTemplate(testing.TestCase):
                 self.assertEqual(len(data.splitlines()), 2)
                 self.assertIn('datacenter=ams01\n', data)
                 self.assertIn('disk=disk1,disk2\n', data)
+
+
+class IterToTableTests(testing.TestCase):
+
+    def test_format_api_dict(self):
+        result = formatting._format_dict({'key': 'value'})
+
+        self.assertIsInstance(result, formatting.Table)
+        self.assertEqual(result.columns, ['Name', 'Value'])
+        self.assertEqual(result.rows, [['key', 'value']])
+
+    def test_format_api_list(self):
+        result = formatting._format_list([{'key': 'value'}])
+
+        self.assertIsInstance(result, formatting.Table)
+        self.assertEqual(result.columns, ['key'])
+        self.assertEqual(result.rows, [['value']])
+
+    def test_format_api_list_non_objects(self):
+        result = formatting._format_list(['a', 'b', 'c'])
+
+        self.assertIsInstance(result, formatting.Table)
+        self.assertEqual(result.columns, ['Value'])
+        self.assertEqual(result.rows, [['a'], ['b'], ['c']])

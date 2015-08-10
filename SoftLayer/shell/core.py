@@ -25,6 +25,7 @@ from SoftLayer.CLI import environment
 ALL_ROUTES = [
     ('exit', 'SoftLayer.shell.cmd_exit:cli'),
     ('shell-help', 'SoftLayer.shell.cmd_help:cli'),
+    ('env', 'SoftLayer.shell.cmd_env:cli'),
 ]
 
 ALL_ALIASES = {
@@ -54,7 +55,7 @@ def cli(ctx, env):
         os.makedirs(os.path.dirname(app_path))
     history = p_history.FileHistory(os.path.join(app_path, 'history'))
     completer = ShellCompleter()
-    env.vars['ENV_ARGS'] = ctx.parent.params
+    env.vars['GLOBAL_ARGS'] = ctx.parent.params
 
     while True:
         try:
@@ -67,11 +68,14 @@ def cli(ctx, env):
                 print("Invalid Command: %s" % ex)
                 continue
 
+            if not args:
+                continue
+
             # Reset client so that --fixtures can be toggled on and off
             env.client = None
 
             env_args = []
-            for arg, val in env.vars.get('ENV_ARGS', {}).items():
+            for arg, val in env.vars.get('GLOBAL_ARGS', {}).items():
                 if val is True:
                     env_args.append('--%s' % arg)
                 elif isinstance(val, int):
