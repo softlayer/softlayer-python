@@ -83,7 +83,7 @@ use: 'slcli setup'""",
               type=click.Path(resolve_path=True))
 @click.option('--debug',
               required=False,
-              default='0',
+              default=None,
               help="Sets the debug noise level",
               type=click.Choice(sorted([str(key) for key
                                         in DEBUG_LOGGING_MAP.keys()])))
@@ -121,9 +121,8 @@ def cli(env,
     """Main click CLI entry-point."""
 
     # Set logging level
-    debug_int = int(debug)
-    if debug_int:
-        verbose = debug_int
+    if debug is not None:
+        verbose = int(debug)
 
     if verbose:
         logger = logging.getLogger()

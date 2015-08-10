@@ -109,10 +109,10 @@ class ShellCompleter(p_completion.Completer):
         except ValueError:
             return []
 
-        return _click_generator(core.cli, parts)
+        return _click_autocomplete(core.cli, parts)
 
 
-def _click_generator(root, parts):
+def _click_autocomplete(root, parts):
     """Completer generator for click applications."""
     location = root
     incomplete = ''
