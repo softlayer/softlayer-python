@@ -11,7 +11,7 @@ from SoftLayer import testing
 import json
 
 
-class DnsTests(testing.TestCase):
+class VirtTests(testing.TestCase):
 
     def test_list_vs(self):
         result = self.run_command(['vs', 'list', '--tags=tag'])
@@ -111,6 +111,7 @@ class DnsTests(testing.TestCase):
                                    '--memory=1',
                                    '--network=100',
                                    '--billing=hourly',
+                                   '--datacenter=dal05',
                                    '--tag=dev',
                                    '--tag=green'])
 
@@ -120,7 +121,8 @@ class DnsTests(testing.TestCase):
                           'id': 100,
                           'created': '2013-08-01 15:23:45'})
 
-        args = ({'domain': 'example.com',
+        args = ({'datacenter': {'name': 'dal05'},
+                 'domain': 'example.com',
                  'hourlyBillingFlag': True,
                  'localDiskFlag': True,
                  'maxMemory': 1024,

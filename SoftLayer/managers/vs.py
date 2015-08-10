@@ -196,6 +196,7 @@ class VSManager(utils.IdentifierMixin, object):
                                        manufacturer,name,version,
                                        referenceCode]]''',
                 'hourlyBillingFlag',
+                'userData',
                 'billingItem.recurringFee',
                 'tagReferences[id,tag[name,id]]',
                 'networkVlans[id,vlanNumber,networkSpace]',

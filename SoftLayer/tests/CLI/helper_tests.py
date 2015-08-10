@@ -9,8 +9,10 @@ import json
 import os
 import tempfile
 
+import click
 import mock
 
+from SoftLayer.CLI import core
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
@@ -368,27 +370,21 @@ class TestFormatOutput(testing.TestCase):
 class TestTemplateArgs(testing.TestCase):
 
     def test_no_template_option(self):
-        args = {'key': 'value'}
-        template.update_with_template_args(args)
-        self.assertEqual(args, {'key': 'value'})
+        ctx = click.Context(core.cli)
+        template.TemplateCallback()(ctx, None, None)
+        self.assertIsNone(ctx.default_map)
 
     def test_template_options(self):
+        ctx = click.Context(core.cli)
         path = os.path.join(testing.FIXTURE_PATH, 'sample_vs_template.conf')
-        args = {
-            'cpu': None,
-            'memory': '32',
-            'template': path,
-            'hourly': False,
-            'disk': [],
-        }
-        template.update_with_template_args(args, list_args=['disk'])
-        self.assertEqual(args, {
+        template.TemplateCallback(list_args=['disk'])(ctx, None, path)
+        self.assertEqual(ctx.default_map, {
             'cpu': '4',
             'datacenter': 'dal05',
             'domain': 'example.com',
             'hostname': 'myhost',
             'hourly': 'true',
-            'memory': '32',
+            'memory': '1024',
             'monthly': 'false',
             'network': '100',
             'os': 'DEBIAN_7_64',

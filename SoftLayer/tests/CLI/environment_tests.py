@@ -42,7 +42,9 @@ class EnvironmentTests(testing.TestCase):
     @mock.patch('click.prompt')
     def test_input(self, prompt_mock):
         r = self.env.input('input')
-        prompt_mock.assert_called_with('input', default=None)
+        prompt_mock.assert_called_with('input',
+                                       default=None,
+                                       show_default=True)
         self.assertEqual(prompt_mock(), r)
 
     @mock.patch('click.prompt')

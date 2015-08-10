@@ -12,30 +12,34 @@ import os.path
 from SoftLayer import utils
 
 
-def update_with_template_args(args, list_args=None):
-    """Populates arguments with arguments from the template file, if provided.
+class TemplateCallback(object):
+    """Callback to use to populate click arguments with a template."""
 
-    :param dict args: command-line arguments
-    """
-    if not args.get('template'):
-        return
+    def __init__(self, list_args=None):
+        self.list_args = list_args or []
 
-    list_args = list_args or []
+    def __call__(self, ctx, param, value):
+        if value is None:
+            return
 
-    template_path = args.pop('template')
+        config = utils.configparser.ConfigParser()
+        ini_str = '[settings]\n' + open(
+            os.path.expanduser(value), 'r').read()
+        ini_fp = utils.StringIO(ini_str)
+        config.readfp(ini_fp)
 
-    config = utils.configparser.ConfigParser()
-    ini_str = '[settings]\n' + open(
-        os.path.expanduser(template_path), 'r').read()
-    ini_fp = utils.StringIO(ini_str)
-    config.readfp(ini_fp)
+        # Merge template options with the options passed in
+        args = {}
+        for key, value in config.items('settings'):
+            if key in self.list_args:
+                value = value.split(',')
 
-    # Merge template options with the options passed in
-    for key, value in config.items('settings'):
-        if key in list_args:
-            value = value.split(',')
-        if not args.get(key):
-            args[key] = value
+            if not args.get(key):
+                args[key] = value
+
+        if ctx.default_map is None:
+            ctx.default_map = {}
+        ctx.default_map.update(args)
 
 
 def export_to_template(filename, args, exclude=None):
