@@ -46,9 +46,9 @@ class Environment(object):
         """Format output based on current the environment format."""
         return formatting.format_output(output, fmt=self.format)
 
-    def input(self, prompt, default=None):
+    def input(self, prompt, default=None, show_default=True):
         """Provide a command prompt."""
-        return click.prompt(prompt, default=default)
+        return click.prompt(prompt, default=default, show_default=show_default)
 
     def getpass(self, prompt, default=None):
         """Provide a password prompt."""

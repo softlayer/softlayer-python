@@ -71,7 +71,8 @@ class CommandLoader(click.MultiCommand):
 username and api_key need to be configured. The easiest way to do that is to
 use: 'slcli setup'""",
              cls=CommandLoader,
-             context_settings={'help_option_names': ['-h', '--help']})
+             context_settings={'help_option_names': ['-h', '--help'],
+                               'auto_envvar_prefix': 'SLCLI'})
 @click.option('--format',
               default=DEFAULT_FORMAT,
               help="Output format",

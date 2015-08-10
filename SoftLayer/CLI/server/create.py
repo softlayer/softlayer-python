@@ -12,12 +12,29 @@ import click
 
 
 @click.command(epilog="See 'slcli server create-options' for valid options.")
-@click.option('--hostname', '-H', help="Host portion of the FQDN")
-@click.option('--domain', '-D', help="Domain portion of the FQDN")
-@click.option('--size', '-s', help="Hardware size")
-@click.option('--os', '-o', help="OS install code")
-@click.option('--datacenter', '-d', help="Datacenter shortname")
-@click.option('--port-speed', type=click.INT, help="Port speeds")
+@click.option('--hostname', '-H',
+              help="Host portion of the FQDN",
+              required=True,
+              prompt=True)
+@click.option('--domain', '-D',
+              help="Domain portion of the FQDN",
+              required=True,
+              prompt=True)
+@click.option('--size', '-s',
+              help="Hardware size",
+              required=True,
+              prompt=True)
+@click.option('--os', '-o', help="OS install code",
+              required=True,
+              prompt=True)
+@click.option('--datacenter', '-d', help="Datacenter shortname",
+              required=True,
+              prompt=True)
+@click.option('--port-speed',
+              type=click.INT,
+              help="Port speeds",
+              required=True,
+              prompt=True)
 @click.option('--billing',
               type=click.Choice(['hourly', 'monthly']),
               default='hourly',
@@ -38,6 +55,8 @@ import click
               is_flag=True,
               help="Do not actually create the virtual server")
 @click.option('--template', '-t',
+              is_eager=True,
+              callback=template.TemplateCallback(list_args=['key']),
               help="A template file that defaults the command-line options",
               type=click.Path(exists=True, readable=True, resolve_path=True))
 @click.option('--export',
@@ -50,10 +69,6 @@ import click
 @environment.pass_env
 def cli(env, **args):
     """Order/create a dedicated server."""
-
-    template.update_with_template_args(args, list_args=['key'])
-    _validate_args(args)
-
     mgr = SoftLayer.HardwareManager(env.client)
 
     # Get the SSH keys
@@ -127,20 +142,3 @@ def cli(env, **args):
         output = table
 
     return output
-
-
-def _validate_args(args):
-    """Raises an ArgumentError if the given arguments are not valid."""
-    missing = []
-    for arg in ['size',
-                'datacenter',
-                'os',
-                'port_speed',
-                'hostname',
-                'domain']:
-        if not args.get(arg):
-            missing.append(arg)
-
-    if missing:
-        raise exceptions.ArgumentError('Missing required options: %s'
-                                       % ', '.join(missing))
