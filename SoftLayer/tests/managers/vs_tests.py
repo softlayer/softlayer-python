@@ -141,7 +141,7 @@ class VSTests(testing.TestCase):
     def test_create_verify(self, create_dict):
         create_dict.return_value = {'test': 1, 'verify': 1}
 
-        self.vs.verify_create_instance(test=1, verify=1)
+        self.vs.verify_create_instance(test=1, verify=1, tags=['test', 'tags'])
 
         create_dict.assert_called_once_with(test=1, verify=1)
         self.assert_called_with('SoftLayer_Virtual_Guest',

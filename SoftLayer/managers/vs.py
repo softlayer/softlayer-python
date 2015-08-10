@@ -423,6 +423,7 @@ class VSManager(utils.IdentifierMixin, object):
         Without actually placing an order.
         See :func:`create_instance` for a list of available options.
         """
+        kwargs.pop('tags', None)
         create_options = self._generate_create_dict(**kwargs)
         return self.guest.generateOrderTemplate(create_options)
 
