@@ -47,7 +47,7 @@ def cli(ctx, env):
     # Set up prompt_toolkit settings
     app_path = click.get_app_dir('softlayer')
     if not os.path.exists(app_path):
-        os.makedirs(os.path.dirname(app_path))
+        os.makedirs(app_path)
     history = p_history.FileHistory(os.path.join(app_path, 'history'))
     complete = completer.ShellCompleter()
 
