@@ -26,6 +26,16 @@ class HardwareManager(utils.IdentifierMixin, object):
                                               manager to handle ordering.
                                               If none is provided, one will be
                                               auto initialized.
+    Example::
+
+       # Initialize the Manager.
+       # env variables. These can also be specified in ~/.softlayer,
+       # or passed directly to SoftLayer.Client()
+       # SL_USERNAME = YOUR_USERNAME
+       # SL_API_KEY = YOUR_API_KEY
+       import SoftLayer
+       client = SoftLayer.Client()
+       mgr = SoftLayer.HardwareManager(client)
     """
     def __init__(self, client, ordering_manager=None):
         self.client = client
@@ -46,6 +56,10 @@ class HardwareManager(utils.IdentifierMixin, object):
                               come from :func:`get_cancellation_reasons`.
         :param string comment: An optional comment to include with the
                                cancellation.
+        Example::
+
+            # Cancels hardware id 1234
+            result = mgr.cancel_hardware(hardware_id=1234)
         """
 
         # Get cancel reason
@@ -83,6 +97,12 @@ class HardwareManager(utils.IdentifierMixin, object):
                   hardware. This list will contain both dedicated servers and
                   bare metal computing instances
 
+       Example::
+
+            # Using a custom object-mask. Will get ONLY what is specified
+            # These will stem from the SoftLayer_Hardware_Server datatype
+            object_mask = "mask[hostname,monitoringRobot[robotStatus]]"
+            result = mgr.list_hardware(mask=object_mask)
         """
         if 'mask' not in kwargs:
             hw_items = [
@@ -152,6 +172,11 @@ class HardwareManager(utils.IdentifierMixin, object):
         :returns: A dictionary containing a large amount of information about
                   the specified server.
 
+        Example::
+
+            object_mask = "mask[id,networkVlans[vlanNumber]]"
+            # Object masks are optional
+            result = mgr.get_hardware(hardware_id=1234,mask=object_mask)
         """
 
         if 'mask' not in kwargs:
@@ -219,6 +244,10 @@ class HardwareManager(utils.IdentifierMixin, object):
         """Reboot a server into the a recsue kernel.
 
         :param integer instance_id: the server ID to rescue
+
+        Example::
+
+            result = mgr.rescue(1234)
         """
         return self.hardware.bootToRescueLayer(id=hardware_id)
 
@@ -230,6 +259,16 @@ class HardwareManager(utils.IdentifierMixin, object):
                             True (default) means the public interface.
                             False indicates the private interface.
         :param int speed: The port speed to set.
+
+        .. warning::
+            A port speed of 0 will disable the interface.
+
+        Example::
+
+            #change the Public interface to 10Mbps on instance 12345
+            result = mgr.change_port_speed(hardware_id=12345,
+                                        public=True, speed=10)
+            # result will be True or an Exception
         """
         if public:
             func = self.hardware.setPublicNetworkInterfaceSpeed
@@ -483,6 +522,11 @@ regions[location[location[priceGroups]]]
         :param string tags: tags to set on the hardware as a comma separated
                             list. Use the empty string to remove all tags.
 
+        Example::
+
+            # Change the hostname on instance 12345 to 'something'
+            result = mgr.edit(hardware_id=12345 , hostname="something")
+            #result will be True or an Exception
         """
 
         obj = {}
@@ -522,6 +566,11 @@ regions[location[location[priceGroups]]]
         :param bool raid_controller: Update the raid controller firmware.
         :param bool bios: Update the bios firmware.
         :param bool hard_drive: Update the hard drive firmware.
+
+        Example::
+
+            # Check the servers active transactions to see progress
+            result = mgr.update_firmware(hardware_id=1234)
         """
 
         return self.hardware.createFirmwareUpdateTransaction(
