@@ -58,7 +58,7 @@ def cli(ctx, env):
     env = copy.deepcopy(env)
     env.load_modules_from_python(ALL_ROUTES)
     env.aliases.update(ALL_ALIASES)
-    env.vars['gloabl_args'] = ctx.parent.params
+    env.vars['global_args'] = ctx.parent.params
     env.vars['is_shell'] = True
     env.vars['last_exit_code'] = 0
 
@@ -145,7 +145,8 @@ def _click_autocomplete(root, parts):
 
 
 def get_env_args(env):
-    for arg, val in env.vars.get('gloabl_args', {}).items():
+    """Yield options to inject into the slcli command from the environment."""
+    for arg, val in env.vars.get('global_args', {}).items():
         if val is True:
             yield '--%s' % arg
         elif isinstance(val, int):
