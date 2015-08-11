@@ -1,4 +1,14 @@
-4.0.5
+4.1.0
+
+    * Adds a shell which provides a shell interface for `slcli`. This is available by using `slcli shell`
+
+    * `slcli vs create` and `slcli server create` will now prompt for missing required options
+
+    * Fixes `slcli firewall add` command
+
+    * Handles case where `slcli vs detail` and `slcli server detail` was causing an error when trying to display the creator
+
+    * Fixes VSManager.verify_create_instance() with tags (and, in turn, `slcli vs create --test` with tags)
 
     * Fixes `vs resume` command
 
