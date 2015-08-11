@@ -31,7 +31,7 @@ def _click_autocomplete(root, text):
 
     location, incomplete = _click_resolve_command(root, parts)
 
-    if not text.endswith(' ') and not incomplete:
+    if not text.endswith(' ') and not incomplete and text:
         return []
 
     options = []
