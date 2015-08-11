@@ -18,7 +18,7 @@ from click import testing
 import mock
 import testtools
 
-FIXTURE_PATH = os.path.abspath(os.path.join(__file__, '..', 'fixtures'))
+FIXTURE_PATH = os.path.abspath(os.path.join(__file__, '..', '..', 'fixtures'))
 
 
 class MockableTransport(object):

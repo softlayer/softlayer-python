@@ -260,7 +260,7 @@ class FixtureTransport(object):
     def __call__(self, call):
         """Load fixture from the default fixture path."""
         try:
-            module_path = 'SoftLayer.testing.fixtures.%s' % call.service
+            module_path = 'SoftLayer.fixtures.%s' % call.service
             module = importlib.import_module(module_path)
         except ImportError:
             raise NotImplementedError('%s fixture is not implemented'
