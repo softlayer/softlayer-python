@@ -5,8 +5,8 @@
     :license: MIT, see LICENSE for more details.
 """
 import SoftLayer
+from SoftLayer import fixtures
 from SoftLayer import testing
-from SoftLayer.testing import fixtures
 
 
 class SSLTests(testing.TestCase):

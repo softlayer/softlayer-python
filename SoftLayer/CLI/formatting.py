@@ -338,3 +338,62 @@ def _format_python_value(value):
     if hasattr(value, 'to_python'):
         return value.to_python()
     return value
+
+
+def iter_to_table(value):
+    """Convert raw API responses to response tables."""
+    if isinstance(value, list):
+        return _format_list(value)
+    if isinstance(value, dict):
+        return _format_dict(value)
+    return value
+
+
+def _format_dict(result):
+    """Format dictionary responses into key-value table."""
+
+    table = KeyValueTable(['Name', 'Value'])
+    table.align['Name'] = 'r'
+    table.align['Value'] = 'l'
+
+    for key, value in result.items():
+        value = iter_to_table(value)
+        table.add_row([key, value])
+
+    return table
+
+
+def _format_list(result):
+    """Format list responses into a table."""
+
+    if not result:
+        return result
+
+    if isinstance(result[0], dict):
+        return _format_list_objects(result)
+
+    table = Table(["Value"])
+    for item in result:
+        table.add_row([iter_to_table(item)])
+    return table
+
+
+def _format_list_objects(result):
+    """Format list of objects into a table."""
+
+    all_keys = set()
+    for item in result:
+        all_keys = all_keys.union(item.keys())
+
+    all_keys = sorted(all_keys)
+    table = Table(all_keys)
+
+    for item in result:
+        values = []
+        for key in all_keys:
+            value = iter_to_table(item.get(key))
+            values.append(value)
+
+        table.add_row(values)
+
+    return table
