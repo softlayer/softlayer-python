@@ -20,7 +20,10 @@ import click
               help='High available firewall option')
 @environment.pass_env
 def cli(env, target, firewall_type, high_availability):
-    """Create new firewall."""
+    """Create new firewall.
+
+    TARGET: Id of the server the firewall will protect
+    """
 
     mgr = SoftLayer.FirewallManager(env.client)
 
