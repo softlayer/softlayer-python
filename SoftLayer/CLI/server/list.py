@@ -25,12 +25,17 @@ import click
 @click.option('--hostname', '-H', help='Filter by hostname')
 @click.option('--memory', '-m', help='Filter by memory in gigabytes')
 @click.option('--network', '-n', help='Filter by network port speed in Mbps')
+@click.option('--columns', help='Columns to display. default is '
+              ' guid, hostname, primary_ip, backend_ip, datacenter, action',
+              default="guid,hostname,primary_ip,backend_ip,datacenter,action")
 @helpers.multi_option('--tag', help='Filter by tags')
 @environment.pass_env
-def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag):
+def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag,
+        columns):
     """List hardware servers."""
 
     manager = SoftLayer.HardwareManager(env.client)
+    columns_clean = [col.strip() for col in columns.split(',')]
 
     servers = manager.list_hardware(hostname=hostname,
                                     domain=domain,
@@ -40,25 +45,29 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag):
                                     nic_speed=network,
                                     tags=tag)
 
-    table = formatting.Table([
-        'id',
-        'hostname',
-        'primary_ip',
-        'backend_ip',
-        'datacenter',
-        'action',
-    ])
-    table.sortby = sortby or 'hostname'
+    table = formatting.Table(columns_clean)
+    table.sortby = sortby
+    column_map = {}
+    column_map['guid'] = 'globalIdentifier'
+    column_map['primary_ip'] = 'primaryIpAddress'
+    column_map['backend_ip'] = 'primaryBackendIpAddress'
+    column_map['datacenter'] = 'datacenter-name'
+    column_map['action'] = 'formatted-action'
 
     for server in servers:
-        table.add_row([
-            utils.lookup(server, 'id'),
-            utils.lookup(server, 'hostname') or formatting.blank(),
-            utils.lookup(server, 'primaryIpAddress') or formatting.blank(),
-            utils.lookup(server, 'primaryBackendIpAddress') or
-            formatting.blank(),
-            utils.lookup(server, 'datacenter', 'name') or formatting.blank(),
-            formatting.active_txn(server),
-        ])
+        server = utils.NestedDict(server)
+        server['datacenter-name'] = server['datacenter']['name']
+        server['formatted-action'] = formatting.active_txn(server)
+        row_column = []
+        for col in columns_clean:
+            entry = None
+            if col in column_map:
+                entry = server[column_map[col]]
+            else:
+                entry = server[col]
+
+            row_column.append(entry or formatting.blank())
+
+        table.add_row(row_column)
 
     return table

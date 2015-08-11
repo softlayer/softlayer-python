@@ -10,13 +10,8 @@ import click
 
 
 @click.command()
-@click.option('--sortby',
-              help='Column to sort by',
-              type=click.Choice(['guid',
-                                 'hostname',
-                                 'primary_ip',
-                                 'backend_ip',
-                                 'datacenter']))
+@click.option('--sortby', help='Column to sort by',
+              default='hostname')
 @click.option('--cpu', '-c', help='Number of CPU cores', type=click.INT)
 @click.option('--domain', '-D', help='Domain portion of the FQDN')
 @click.option('--datacenter', '-d', help='Datacenter shortname')
@@ -28,13 +23,16 @@ import click
 @click.option('--tags',
               help='Show instances that have one of these comma-separated '
                    'tags')
+@click.option('--columns', help='Columns to display. default is '
+              ' guid, hostname, primary_ip, backend_ip, datacenter, action',
+              default="guid,hostname,primary_ip,backend_ip,datacenter,action")
 @environment.pass_env
 def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
-        hourly, monthly, tags):
+        hourly, monthly, tags, columns):
     """List virtual servers."""
 
     vsi = SoftLayer.VSManager(env.client)
-
+    columns_clean = [col.strip() for col in columns.split(',')]
     tag_list = None
     if tags:
         tag_list = [tag.strip() for tag in tags.split(',')]
@@ -49,25 +47,31 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
                                 nic_speed=network,
                                 tags=tag_list)
 
-    table = formatting.Table([
-        'id',
-        'hostname',
-        'primary_ip',
-        'backend_ip',
-        'datacenter',
-        'action',
-    ])
-    table.sortby = sortby or 'hostname'
+    table = formatting.Table(columns_clean)
+    table.sortby = sortby
+    column_map = {}
+    column_map['guid'] = 'globalIdentifier'
+    column_map['primary_ip'] = 'primaryIpAddress'
+    column_map['backend_ip'] = 'primaryBackendIpAddress'
+    column_map['datacenter'] = 'datacenter-name'
+    column_map['action'] = 'formatted-action'
+    column_map['powerState'] = 'powerState-name'
 
     for guest in guests:
-        table.add_row([
-            utils.lookup(guest, 'id'),
-            utils.lookup(guest, 'hostname') or formatting.blank(),
-            utils.lookup(guest, 'primaryIpAddress') or formatting.blank(),
-            utils.lookup(guest, 'primaryBackendIpAddress') or
-            formatting.blank(),
-            utils.lookup(guest, 'datacenter', 'name') or formatting.blank(),
-            formatting.active_txn(guest),
-        ])
+        guest = utils.NestedDict(guest)
+        guest['datacenter-name'] = guest['datacenter']['name']
+        guest['formatted-action'] = formatting.active_txn(guest)
+        guest['powerState-name'] = guest['powerState']['name']
+        row_column = []
+        for col in columns_clean:
+            entry = None
+            if col in column_map:
+                entry = guest[column_map[col]]
+            else:
+                entry = guest[col]
+
+            row_column.append(entry or formatting.blank())
+
+        table.add_row(row_column)
 
     return table
