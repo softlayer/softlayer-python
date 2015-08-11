@@ -15,12 +15,15 @@ import click
               type=click.Choice(['vs', 'vlan', 'server']),
               help='Firewall type',
               required=True)
-@click.option('--high-availability', '--ha',
+@click.option('--ha', '--high-availability',
               is_flag=True,
               help='High available firewall option')
 @environment.pass_env
 def cli(env, target, firewall_type, high_availability):
-    """Create new firewall."""
+    """Create new firewall.
+
+    TARGET: Id of the server the firewall will protect
+    """
 
     mgr = SoftLayer.FirewallManager(env.client)
 
