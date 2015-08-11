@@ -54,6 +54,7 @@ def _click_autocomplete(root, text):
 
 
 def _click_resolve_command(root, parts):
+    """Return the click command and the left over text given some vargs."""
     location = root
     incomplete = ''
     for part in parts:
