@@ -4,8 +4,9 @@
 import click
 from click import formatting
 
-from SoftLayer.CLI import core
+from SoftLayer.CLI import core as cli_core
 from SoftLayer.CLI import environment
+from SoftLayer.shell import core
 
 
 @click.command()
@@ -18,11 +19,19 @@ def cli(ctx, env):
 
     formatter = formatting.HelpFormatter()
     commands = []
-    for name in core.cli.list_commands(ctx):
-        command = core.cli.get_command(ctx, name)
-        commands.append((name, command.short_help))
+    shell_commands = []
+    for name in cli_core.cli.list_commands(ctx):
+        command = cli_core.cli.get_command(ctx, name)
+        details = (name, command.short_help)
+        if name in dict(core.ALL_ROUTES):
+            shell_commands.append(details)
+        else:
+            commands.append(details)
 
-    with formatter.section('Available Commands'):
+    with formatter.section('Shell Commands'):
+        formatter.write_dl(shell_commands)
+
+    with formatter.section('Commands'):
         formatter.write_dl(commands)
 
     for line in formatter.buffer:

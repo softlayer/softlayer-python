@@ -7,6 +7,7 @@
 """
 from __future__ import print_function
 from __future__ import unicode_literals
+import copy
 import os
 import shlex
 import sys
@@ -46,20 +47,24 @@ class ShellExit(Exception):
 def cli(ctx, env):
     """Enters a shell for slcli."""
 
-    env.load_modules_from_python(ALL_ROUTES)
-    env.aliases.update(ALL_ALIASES)
-    exit_code = 0
+    # Set up prompt_toolkit settings
     app_path = click.get_app_dir('softlayer')
-
     if not os.path.exists(app_path):
         os.makedirs(os.path.dirname(app_path))
     history = p_history.FileHistory(os.path.join(app_path, 'history'))
     completer = ShellCompleter()
-    env.vars['GLOBAL_ARGS'] = ctx.parent.params
+
+    # Set up the environment
+    env = copy.deepcopy(env)
+    env.load_modules_from_python(ALL_ROUTES)
+    env.aliases.update(ALL_ALIASES)
+    env.vars['gloabl_args'] = ctx.parent.params
+    env.vars['is_shell'] = True
+    env.vars['last_exit_code'] = 0
 
     while True:
         try:
-            line = p_shortcuts.get_input("(%s)> " % exit_code,
+            line = p_shortcuts.get_input("(%s)> " % env.vars['last_exit_code'],
                                          completer=completer,
                                          history=history)
             try:
@@ -74,32 +79,20 @@ def cli(ctx, env):
             # Reset client so that --fixtures can be toggled on and off
             env.client = None
 
-            env_args = []
-            for arg, val in env.vars.get('GLOBAL_ARGS', {}).items():
-                if val is True:
-                    env_args.append('--%s' % arg)
-                elif isinstance(val, int):
-                    for _ in range(val):
-                        env_args.append('--%s' % arg)
-                elif val is None:
-                    continue
-                else:
-                    env_args.append('--%s=%s' % (arg, val))
-
-            core.main(args=env_args + args,
+            core.main(args=list(get_env_args(env)) + args,
                       obj=env,
                       prog_name="",
                       reraise_exceptions=True)
         except SystemExit as ex:
-            exit_code = ex.code
+            env.vars['last_exit_code'] = ex.code
         except KeyboardInterrupt:
-            exit_code = 1
+            env.vars['last_exit_code'] = 1
         except EOFError:
             return
         except ShellExit:
             return
         except Exception as ex:
-            exit_code = 1
+            env.vars['last_exit_code'] = 1
             traceback.print_exc(file=sys.stderr)
 
 
@@ -149,3 +142,16 @@ def _click_autocomplete(root, parts):
     for option in options:
         if option.startswith(incomplete):
             yield p_completion.Completion(option, -len(incomplete))
+
+
+def get_env_args(env):
+    for arg, val in env.vars.get('gloabl_args', {}).items():
+        if val is True:
+            yield '--%s' % arg
+        elif isinstance(val, int):
+            for _ in range(val):
+                yield '--%s' % arg
+        elif val is None:
+            continue
+        else:
+            yield '--%s=%s' % (arg, val)
