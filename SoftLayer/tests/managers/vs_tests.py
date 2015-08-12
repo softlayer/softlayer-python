@@ -610,9 +610,8 @@ class VSTests(testing.TestCase):
 
         expected = fixtures.SoftLayer_Virtual_Guest.createArchiveTransaction
         self.assertEqual(result, expected)
-        args = ('a', [{'device': 0, 'uuid': 1},
-                      {'device': 1},
-                      {'device': 2, 'uuid': 2}], None)
+        args = ('a', [{'device': 0, 'mountType': 'Disk', 'uuid': 1},
+                      {'device': 3, 'mountType': 'Disk', 'uuid': 3}], None)
         self.assert_called_with('SoftLayer_Virtual_Guest',
                                 'createArchiveTransaction',
                                 args=args,

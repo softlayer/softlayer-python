@@ -9,7 +9,6 @@ import click
 import mock
 
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
 from SoftLayer import testing
 
 
@@ -30,8 +29,8 @@ class EnvironmentTests(testing.TestCase):
         self.assertIn('dns', actions)
 
     def test_get_command_invalid(self):
-        self.assertRaises(exceptions.InvalidCommand,
-                          self.env.get_command, 'invalid', 'command')
+        cmd = self.env.get_command('invalid', 'command')
+        self.assertEqual(cmd, None)
 
     def test_get_command(self):
         mod_path = 'SoftLayer.tests.CLI.environment_tests'
@@ -43,13 +42,15 @@ class EnvironmentTests(testing.TestCase):
     @mock.patch('click.prompt')
     def test_input(self, prompt_mock):
         r = self.env.input('input')
-        prompt_mock.assert_called_with('input')
+        prompt_mock.assert_called_with('input',
+                                       default=None,
+                                       show_default=True)
         self.assertEqual(prompt_mock(), r)
 
     @mock.patch('click.prompt')
     def test_getpass(self, prompt_mock):
         r = self.env.getpass('input')
-        prompt_mock.assert_called_with('input', hide_input=True)
+        prompt_mock.assert_called_with('input', default=None, hide_input=True)
         self.assertEqual(prompt_mock(), r)
 
     def test_resolve_alias(self):

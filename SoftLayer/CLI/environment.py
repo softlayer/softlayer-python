@@ -7,7 +7,6 @@
 """
 import importlib
 
-from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import routes
 
@@ -15,6 +14,9 @@ import click
 import pkg_resources
 
 # pylint: disable=too-many-instance-attributes, invalid-name, no-self-use
+
+# Calling pkg_resources.iter_entry_points shows a false-positive
+# pylint: disable=no-member
 
 
 class Environment(object):
@@ -44,13 +46,13 @@ class Environment(object):
         """Format output based on current the environment format."""
         return formatting.format_output(output, fmt=self.format)
 
-    def input(self, prompt):
+    def input(self, prompt, default=None, show_default=True):
         """Provide a command prompt."""
-        return click.prompt(prompt)
+        return click.prompt(prompt, default=default, show_default=show_default)
 
-    def getpass(self, prompt):
+    def getpass(self, prompt, default=None):
         """Provide a password prompt."""
-        return click.prompt(prompt, hide_input=True)
+        return click.prompt(prompt, hide_input=True, default=default)
 
     # Command loading methods
     def list_commands(self, *path):
@@ -65,7 +67,7 @@ class Environment(object):
                     len(path) == command.count(":")]):
 
                 # offset is used to exclude the path that the caller requested.
-                offset = len(path_str)+1 if path_str else 0
+                offset = len(path_str) + 1 if path_str else 0
                 commands.append(command[offset:])
 
         return sorted(commands)
@@ -77,7 +79,7 @@ class Environment(object):
         if path_str in self.commands:
             return self.commands[path_str].load()
 
-        raise exceptions.InvalidCommand(path)
+        return None
 
     def resolve_alias(self, path_str):
         """Returns the actual command name. Uses the alias mapping."""

@@ -64,7 +64,7 @@ class VSManager(utils.IdentifierMixin, object):
            # SL_USERNAME = YOUR_USERNAME
            # SL_API_KEY = YOUR_API_KEY
            import SoftLayer
-           client = SoftLayer.Client()
+           client = SoftLayer.create_client_from_env()
 
            mgr = SoftLayer.VSManager(client)
            for vsi in mgr.list_instances(hourly=True, datacenter='dal05'):
@@ -154,7 +154,7 @@ class VSManager(utils.IdentifierMixin, object):
            # SL_USERNAME = YOUR_USERNAME
            # SL_API_KEY = YOUR_API_KEY
            import SoftLayer
-           client = SoftLayer.Client()
+           client = SoftLayer.create_client_from_env()
 
            mgr = SoftLayer.VSManager(client)
            vsi = mgr.get_instance(12345)
@@ -191,12 +191,12 @@ class VSManager(utils.IdentifierMixin, object):
                 'blockDevices',
                 'blockDeviceTemplateGroup[id, name, globalIdentifier]',
                 'postInstallScriptUri',
-                'userData',
                 '''operatingSystem[passwords[username,password],
                                    softwareLicense.softwareDescription[
                                        manufacturer,name,version,
                                        referenceCode]]''',
                 'hourlyBillingFlag',
+                'userData',
                 'billingItem.recurringFee',
                 'tagReferences[id,tag[name,id]]',
                 'networkVlans[id,vlanNumber,networkSpace]',
@@ -226,7 +226,7 @@ class VSManager(utils.IdentifierMixin, object):
            # SL_USERNAME = YOUR_USERNAME
            # SL_API_KEY = YOUR_API_KEY
            import SoftLayer
-           client = SoftLayer.Client()
+           client = SoftLayer.create_client_from_env()
 
            mgr = SoftLayer.VSManager(client)
            mgr.cancel_instance(12345)
@@ -249,7 +249,7 @@ class VSManager(utils.IdentifierMixin, object):
            # SL_USERNAME = YOUR_USERNAME
            # SL_API_KEY = YOUR_API_KEY
            import SoftLayer
-           client = SoftLayer.Client()
+           client = SoftLayer.create_client_from_env()
 
            post_uri = 'https://somehost.com/bootstrap.sh'
            mgr = SoftLayer.VSManager(client)
@@ -449,7 +449,7 @@ class VSManager(utils.IdentifierMixin, object):
                                incur a fee on your account.
         :param int public_vlan: The ID of the public VLAN on which you want
                                 this VS placed.
-        :param int private_vlan: The ID of the public VLAN on which you want
+        :param int private_vlan: The ID of the private VLAN on which you want
                                  this VS placed.
         :param list disks: A list of disk capacities for this server.
         :param string post_uri: The URI of the post-install script to run
@@ -581,9 +581,10 @@ class VSManager(utils.IdentifierMixin, object):
         vsi = self.get_instance(instance_id)
 
         disk_filter = lambda x: x['device'] == '0'
-        # Disk 1 is swap partition.  Need to skip its capture.
+        # Skip disk 1 (swap partition) and CD mounts
         if additional_disks:
-            disk_filter = lambda x: x['device'] != '1'
+            disk_filter = lambda x: (str(x['device']) != '1' and
+                                     x['mountType'] != 'CD')
 
         disks = [block_device for block_device in vsi['blockDevices']
                  if disk_filter(block_device)]
@@ -606,7 +607,7 @@ class VSManager(utils.IdentifierMixin, object):
 
            # Upgrade instance 12345 to 4 CPUs and 4 GB of memory
            import SoftLayer
-           client = SoftLayer.Client(config="~/.softlayer")
+           client = SoftLayer.create_client_from_env()
 
            mgr = SoftLayer.VSManager(client)
            mgr.upgrade(12345, cpus=4, memory=4)

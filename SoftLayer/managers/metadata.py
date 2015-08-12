@@ -43,7 +43,7 @@ class MetadataManager(object):
         Usage:
 
             >>> import SoftLayer
-            >>> client = SoftLayer.Client()
+            >>> client = SoftLayer.create_client_from_env()
             >>> from SoftLayer import MetadataManager
             >>> meta = MetadataManager(client)
             >>> meta.get('datacenter')
@@ -56,11 +56,13 @@ class MetadataManager(object):
     attribs = METADATA_MAPPING
 
     def __init__(self, client=None, timeout=5):
-        url = consts.API_PRIVATE_ENDPOINT_REST.rstrip('/')
         if client is None:
-            client = SoftLayer.Client(endpoint_url=url,
-                                      timeout=timeout,
-                                      transport=transports.RestTransport())
+            transport = transports.RestTransport(
+                timeout=timeout,
+                endpoint_url=consts.API_PRIVATE_ENDPOINT_REST,
+            )
+            client = SoftLayer.BaseClient(transport=transport)
+
         self.client = client
 
     def get(self, name, param=None):
@@ -80,10 +82,13 @@ class MetadataManager(object):
                 raise exceptions.SoftLayerError(
                     'Parameter required to get this attribute.')
 
+        params = tuple()
+        if param is not None:
+            params = (param,)
         try:
             return self.client.call('Resource_Metadata',
                                     self.attribs[name]['call'],
-                                    id=param)
+                                    *params)
         except exceptions.SoftLayerAPIError as ex:
             if ex.faultCode == 404:
                 return None

@@ -69,10 +69,10 @@ class CommandLoader(click.MultiCommand):
 @click.group(help="SoftLayer Command-line Client",
              epilog="""To use most commands your SoftLayer
 username and api_key need to be configured. The easiest way to do that is to
-use: 'sl config setup'""",
+use: 'slcli setup'""",
              cls=CommandLoader,
-             context_settings={'help_option_names': ['-h', '--help']})
-@click.pass_context
+             context_settings={'help_option_names': ['-h', '--help'],
+                               'auto_envvar_prefix': 'SLCLI'})
 @click.option('--format',
               default=DEFAULT_FORMAT,
               help="Output format",
@@ -108,9 +108,9 @@ use: 'sl config setup'""",
               is_flag=True,
               required=False,
               help="Use fixtures instead of actually making API calls")
-@click.version_option(version=SoftLayer.__version__,
-                      prog_name="SoftLayer Command-line Client")
-def cli(ctx,
+@click.version_option(prog_name="slcli (SoftLayer Command-line)")
+@environment.pass_env
+def cli(env,
         format='table',
         config=None,
         debug=0,
@@ -132,30 +132,32 @@ def cli(ctx,
         logger.setLevel(DEBUG_LOGGING_MAP.get(verbose, logging.DEBUG))
 
     # Populate environement with client and set it as the context object
-    env = ctx.ensure_object(environment.Environment)
     env.skip_confirmations = really
     env.config_file = config
     env.format = format
     if env.client is None:
         # Environment can be passed in explicitly. This is used for testing
         if fixtures:
-            transport = SoftLayer.FixtureTransport()
+            client = SoftLayer.BaseClient(
+                transport=SoftLayer.FixtureTransport(),
+                auth=None,
+            )
         else:
             # Create SL Client
-            transport = SoftLayer.XmlRpcTransport()
+            client = SoftLayer.create_client_from_env(
+                proxy=proxy,
+                config_file=config,
+            )
 
-        wrapped_transport = SoftLayer.TimingTransport(transport)
-        env.client = SoftLayer.Client(proxy=proxy,
-                                      config_file=config,
-                                      transport=wrapped_transport)
+        client.transport = SoftLayer.TimingTransport(client.transport)
+        env.client = client
 
 
 @cli.resultcallback()
-@click.pass_context
-def output_result(ctx, result, timings=False, **kwargs):
+@environment.pass_env
+def output_result(env, result, timings=False, **kwargs):
     """Outputs the results returned by the CLI and also outputs timings."""
 
-    env = ctx.ensure_object(environment.Environment)
     output = env.fmt(result)
     if output:
         env.out(output)
@@ -173,12 +175,13 @@ def output_result(ctx, result, timings=False, **kwargs):
 def main():
     """Main program. Catches several common errors and displays them nicely."""
     exit_status = 0
+
     try:
         cli.main()
     except SoftLayer.SoftLayerAPIError as ex:
         if 'invalid api token' in ex.faultString.lower():
             print("Authentication Failed: To update your credentials,"
-                  " use 'sl config setup'")
+                  " use 'slcli config setup'")
             exit_status = 1
         else:
             print(str(ex))

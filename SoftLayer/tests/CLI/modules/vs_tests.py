@@ -11,7 +11,7 @@ from SoftLayer import testing
 import json
 
 
-class DnsTests(testing.TestCase):
+class VirtTests(testing.TestCase):
 
     def test_list_vs(self):
         result = self.run_command(['vs', 'list', '--tags=tag'])
@@ -22,13 +22,13 @@ class DnsTests(testing.TestCase):
                            'primary_ip': '172.16.240.2',
                            'hostname': 'vs-test1',
                            'action': None,
-                           'guid': '1a2b3c-1701',
+                           'id': 100,
                            'backend_ip': '10.45.19.37'},
                           {'datacenter': 'TEST00',
                            'primary_ip': '172.16.240.7',
                            'hostname': 'vs-test2',
                            'action': None,
-                           'guid': '05a8ac-6abf0',
+                           'id': 104,
                            'backend_ip': '10.45.19.35'}])
 
     def test_detail_vs(self):
@@ -66,6 +66,25 @@ class DnsTests(testing.TestCase):
                                      'id': 1}],
                           'owner': 'chechu'})
 
+    def test_detail_vs_empty_tag(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getObject')
+        mock.return_value = {
+            'id': 100,
+            'maxCpu': 2,
+            'maxMemory': 1024,
+            'tagReferences': [
+                {'tag': {'name': 'example-tag'}},
+                {},
+            ],
+        }
+        result = self.run_command(['vs', 'detail', '100'])
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(
+            json.loads(result.output)['tags'],
+            ['example-tag'],
+        )
+
     def test_create_options(self):
         result = self.run_command(['vs', 'create-options'])
 
@@ -92,6 +111,7 @@ class DnsTests(testing.TestCase):
                                    '--memory=1',
                                    '--network=100',
                                    '--billing=hourly',
+                                   '--datacenter=dal05',
                                    '--tag=dev',
                                    '--tag=green'])
 
@@ -101,7 +121,8 @@ class DnsTests(testing.TestCase):
                           'id': 100,
                           'created': '2013-08-01 15:23:45'})
 
-        args = ({'domain': 'example.com',
+        args = ({'datacenter': {'name': 'dal05'},
+                 'domain': 'example.com',
                  'hourlyBillingFlag': True,
                  'localDiskFlag': True,
                  'maxMemory': 1024,

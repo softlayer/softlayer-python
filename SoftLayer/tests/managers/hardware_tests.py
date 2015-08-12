@@ -4,18 +4,36 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import copy
+
 import mock
 
 import SoftLayer
-from SoftLayer.managers import hardware
+from SoftLayer import managers
 from SoftLayer import testing
 from SoftLayer.testing import fixtures
+
+
+MINIMAL_TEST_CREATE_ARGS = {
+    'size': 'S1270_8GB_2X1TBSATA_NORAID',
+    'hostname': 'unicorn',
+    'domain': 'giggles.woo',
+    'location': 'wdc01',
+    'os': 'UBUNTU_14_64',
+    'port_speed': 10,
+}
 
 
 class HardwareTests(testing.TestCase):
 
     def set_up(self):
         self.hardware = SoftLayer.HardwareManager(self.client)
+
+    def test_init_with_ordering_manager(self):
+        ordering_manager = SoftLayer.OrderingManager(self.client)
+        mgr = SoftLayer.HardwareManager(self.client, ordering_manager)
+
+        self.assertEqual(mgr.ordering_manager, ordering_manager)
 
     def test_list_hardware(self):
         results = self.hardware.list_hardware()
@@ -60,7 +78,7 @@ class HardwareTests(testing.TestCase):
 
     def test_resolve_ids_ip(self):
         _id = self.hardware._get_ids_from_ip('172.16.1.100')
-        self.assertEqual(_id, [1000, 1001, 1002])
+        self.assertEqual(_id, [1000, 1001, 1002, 1003])
 
         _id = self.hardware._get_ids_from_ip('nope')
         self.assertEqual(_id, [])
@@ -75,7 +93,7 @@ class HardwareTests(testing.TestCase):
 
     def test_resolve_ids_hostname(self):
         _id = self.hardware._get_ids_from_hostname('hardware-test1')
-        self.assertEqual(_id, [1000, 1001, 1002])
+        self.assertEqual(_id, [1000, 1001, 1002, 1003])
 
     def test_get_hardware(self):
         result = self.hardware.get_hardware(1000)
@@ -96,132 +114,113 @@ class HardwareTests(testing.TestCase):
                                        'sshKeyIds': [1701]}),
                                 identifier=1)
 
-    def test_get_bare_metal_create_options_returns_none_on_error(self):
-        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        mock.return_value = [{
-            'id': 0,
-            'name': 'No Matching Instances',
-            'description': 'Nothing'
-        }]
+    def test_get_create_options(self):
+        options = self.hardware.get_create_options()
 
-        self.assertIsNone(self.hardware.get_bare_metal_create_options())
+        expected = {
+            'extras': [{'key': '1_IPV6_ADDRESS', 'name': '1 IPv6 Address'}],
+            'locations': [{'key': 'wdc01', 'name': 'Washington 1'}],
+            'operating_systems': [{'key': 'UBUNTU_14_64',
+                                   'name': 'Ubuntu / 14.04-64'}],
+            'port_speeds': [{
+                'key': '10',
+                'name': '10 Mbps Public & Private Network Uplinks'
+            }],
+            'sizes': [{
+                'key': 'S1270_8GB_2X1TBSATA_NORAID',
+                'name': 'Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID'
+            }]
+        }
 
-    def test_get_bare_metal_create_options(self):
-        result = self.hardware.get_bare_metal_create_options()
+        self.assertEqual(options, expected)
 
-        self.assertEqual(len(result['categories']['disk0']['items']), 2)
-        self.assertEqual(len(result['categories']['disk1']['items']), 1)
-        self.assertEqual(len(result['categories']['disk1']['items']), 1)
-        self.assertEqual(len(result['categories']['disk_controller']['items']),
-                         2)
-        self.assertEqual(len(result['categories']['os']['items']), 11)
-        self.assertEqual(len(result['categories']['port_speed']['items']), 5)
-        self.assertEqual(len(result['categories']['ram']['items']), 2)
-        self.assertEqual(len(result['categories']['random']['items']), 1)
-        self.assertEqual(len(result['categories']['server']['items']), 2)
-        self.assertEqual(len(result['categories']['server_core']['items']), 3)
-        self.assertEqual(len(result['locations']), 1)
+    def test_get_create_options_package_missing(self):
+        packages = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        packages.return_value = []
 
-        self.assert_called_with('SoftLayer_Product_Package', 'getRegions',
-                                identifier=50)
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               self.hardware.get_create_options)
+        self.assertEqual("Ordering package not found", str(ex))
 
-        self.assert_called_with('SoftLayer_Product_Package',
-                                'getConfiguration',
-                                identifier=50,
-                                mask='mask[itemCategory[group]]')
+    def test_generate_create_dict_no_items(self):
+        packages = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        packages_copy = copy.deepcopy(
+            fixtures.SoftLayer_Product_Package.getAllObjects)
+        packages_copy[0]['items'] = []
+        packages.return_value = packages_copy
 
-        self.assert_called_with('SoftLayer_Product_Package', 'getCategories',
-                                identifier=50)
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               self.hardware._generate_create_dict,
+                               location="wdc01")
+        self.assertIn("Could not find valid price", str(ex))
 
-    def test_generate_create_dict_with_all_bare_metal_options(self):
+    def test_generate_create_dict_no_regions(self):
+        packages = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        packages_copy = copy.deepcopy(
+            fixtures.SoftLayer_Product_Package.getAllObjects)
+        packages_copy[0]['regions'] = []
+        packages.return_value = packages_copy
+
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               self.hardware._generate_create_dict,
+                               **MINIMAL_TEST_CREATE_ARGS)
+        self.assertIn("Could not find valid location for: 'wdc01'", str(ex))
+
+    def test_generate_create_dict_invalid_size(self):
         args = {
-            'server': 100,
+            'size': 'UNKNOWN_SIZE',
             'hostname': 'unicorn',
             'domain': 'giggles.woo',
-            'disks': [500],
-            'location': 'Wyrmshire',
-            'os': 200,
-            'port_speed': 600,
-            'bare_metal': True,
+            'location': 'wdc01',
+            'os': 'UBUNTU_14_64',
+            'port_speed': 10,
+        }
+
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               self.hardware._generate_create_dict, **args)
+        self.assertIn("Could not find valid size for: 'UNKNOWN_SIZE'", str(ex))
+
+    def test_generate_create_dict(self):
+        args = {
+            'size': 'S1270_8GB_2X1TBSATA_NORAID',
+            'hostname': 'unicorn',
+            'domain': 'giggles.woo',
+            'location': 'wdc01',
+            'os': 'UBUNTU_14_64',
+            'port_speed': 10,
             'hourly': True,
             'public_vlan': 10234,
             'private_vlan': 20468,
+            'extras': ['1_IPV6_ADDRESS'],
+            'post_uri': 'http://example.com/script.php',
+            'ssh_keys': [10],
         }
 
         expected = {
-            'hardware': [
-                {
-                    'domain': 'giggles.woo',
-                    'bareMetalInstanceFlag': True,
-                    'hostname': 'unicorn',
-                    'primaryBackendNetworkComponent':
-                    {'networkVlan': {'id': 20468}},
-                    'primaryNetworkComponent':
-                    {'networkVlan': {'id': 10234}},
-                }
-            ],
-            'prices': [
-                {'id': 100},
-                {'id': 500},
-                {'id': 200},
-                {'id': 600},
-                {'id': 12000}
-            ],
+            'hardware': [{
+                'domain': 'giggles.woo',
+                'hostname': 'unicorn',
+                'primaryBackendNetworkComponent': {
+                    'networkVlan': {'id': 20468}
+                },
+                'primaryNetworkComponent': {'networkVlan': {'id': 10234}}}],
+            'location': 'WASHINGTON_DC',
+            'packageId': 200,
+            'presetId': 64,
+            'prices': [{'id': 21},
+                       {'id': 420},
+                       {'id': 906},
+                       {'id': 37650},
+                       {'id': 1800},
+                       {'id': 272},
+                       {'id': 17129}],
             'useHourlyPricing': True,
-            'location': 'Wyrmshire', 'packageId': 50
+            'provisionScripts': ['http://example.com/script.php'],
+            'sshKeys': [{'sshKeyIds': [10]}],
         }
 
         data = self.hardware._generate_create_dict(**args)
 
-        self.assertEqual(expected, data)
-
-    def test_generate_create_dict_with_all_dedicated_server_options(self):
-        args = {
-            'server': 100,
-            'hostname': 'unicorn',
-            'domain': 'giggles.woo',
-            'disks': [1000, 1000, 1000, 1000],
-            'location': 'Wyrmshire',
-            'os': 200,
-            'port_speed': 600,
-            'bare_metal': False,
-            'package_id': 13,
-            'ram': 1400,
-            'disk_controller': 1500,
-            'ssh_keys': [3000, 3001],
-            'public_vlan': 10234,
-            'private_vlan': 20468,
-            'post_uri': 'http://somescript.foo/myscript.sh',
-        }
-
-        expected = {
-            'hardware': [
-                {
-                    'domain': 'giggles.woo',
-                    'bareMetalInstanceFlag': False,
-                    'hostname': 'unicorn',
-                    'primaryBackendNetworkComponent':
-                    {'networkVlan': {'id': 20468}},
-                    'primaryNetworkComponent':
-                    {'networkVlan': {'id': 10234}},
-                }
-            ],
-            'prices': [
-                {'id': 100},
-                {'id': 1000},
-                {'id': 1000},
-                {'id': 1000},
-                {'id': 1000},
-                {'id': 200},
-                {'id': 600},
-                {'id': 1400},
-                {'id': 1500}],
-            'sshKeys': [{'sshKeyIds': [3000, 3001]}],
-            'location': 'Wyrmshire', 'packageId': 13,
-            'provisionScripts': ['http://somescript.foo/myscript.sh'],
-        }
-
-        data = self.hardware._generate_create_dict(**args)
         self.assertEqual(expected, data)
 
     @mock.patch('SoftLayer.managers.hardware.HardwareManager'
@@ -245,57 +244,53 @@ class HardwareTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder',
                                 args=({'test': 1, 'verify': 1},))
 
-    def test_cancel_metal_immediately(self):
-
-        result = self.hardware.cancel_metal(6327, immediate=True)
-
-        self.assertEqual(result, True)
-        self.assert_called_with('SoftLayer_Billing_Item', 'cancelService',
-                                identifier=6327)
-
-    def test_cancel_metal_on_anniversary(self):
-
-        result = self.hardware.cancel_metal(6327, False)
-
-        self.assertEqual(result, True)
-        self.assert_called_with('SoftLayer_Billing_Item',
-                                'cancelServiceOnAnniversaryDate',
-                                identifier=6327)
-
     def test_cancel_hardware_without_reason(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
-        mock.return_value = {'id': 987, 'bareMetalInstanceFlag': False}
+        mock.return_value = {'id': 987, 'billingItem': {'id': 1234}}
 
         result = self.hardware.cancel_hardware(987)
 
-        self.assertEqual(result,
-                         fixtures.SoftLayer_Ticket.createCancelServerTicket)
+        self.assertEqual(result, True)
         reasons = self.hardware.get_cancellation_reasons()
-        args = (987, reasons['unneeded'], '', True, 'HARDWARE')
-        self.assert_called_with('SoftLayer_Ticket', 'createCancelServerTicket',
+        args = (False, False, reasons['unneeded'], '')
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
+                                identifier=1234,
                                 args=args)
 
     def test_cancel_hardware_with_reason_and_comment(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
-        mock.return_value = {'id': 987, 'bareMetalInstanceFlag': False}
+        mock.return_value = {'id': 987, 'billingItem': {'id': 1234}}
 
-        result = self.hardware.cancel_hardware(987, 'sales', 'Test Comment')
+        result = self.hardware.cancel_hardware(6327,
+                                               reason='sales',
+                                               comment='Test Comment')
 
-        self.assertEqual(result,
-                         fixtures.SoftLayer_Ticket.createCancelServerTicket)
+        self.assertEqual(result, True)
         reasons = self.hardware.get_cancellation_reasons()
-        args = (987, reasons['sales'], 'Test Comment', True, 'HARDWARE')
-        self.assert_called_with('SoftLayer_Ticket', 'createCancelServerTicket',
+        args = (False, False, reasons['sales'], 'Test Comment')
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
+                                identifier=1234,
                                 args=args)
 
-    def test_cancel_hardware_on_bmc(self):
+    def test_cancel_hardware(self):
 
         result = self.hardware.cancel_hardware(6327)
 
         self.assertEqual(result, True)
         self.assert_called_with('SoftLayer_Billing_Item',
-                                'cancelServiceOnAnniversaryDate',
-                                identifier=6327)
+                                'cancelItem',
+                                identifier=6327,
+                                args=(False, False, 'No longer needed', ''))
+
+    def test_cancel_hardware_no_billing_item(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        mock.return_value = {'id': 987}
+
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               self.hardware.cancel_hardware,
+                               6327)
+        self.assertEqual("No billing item found for hardware",
+                         str(ex))
 
     def test_change_port_speed_public(self):
         self.hardware.change_port_speed(2, True, 100)
@@ -312,135 +307,6 @@ class HardwareTests(testing.TestCase):
                                 'setPrivateNetworkInterfaceSpeed',
                                 identifier=2,
                                 args=(10,))
-
-    def test_get_available_dedicated_server_packages(self):
-        self.hardware.get_available_dedicated_server_packages()
-
-        _filter = {
-            'type': {
-                'keyName': {
-                    'operation': 'in',
-                    'options': [{
-                        'name': 'data',
-                        'value': ['BARE_METAL_CPU',
-                                  'BARE_METAL_CORE']
-                    }]
-                }
-            }
-        }
-        self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects',
-                                filter=_filter,
-                                mask='id,name,description,type,isActive')
-
-    def test_get_server_packages_with_ordering_manager_provided(self):
-        self.hardware = SoftLayer.HardwareManager(
-            self.client, SoftLayer.OrderingManager(self.client))
-        self.test_get_available_dedicated_server_packages()
-
-    def test_get_dedicated_server_options(self):
-        result = self.hardware.get_dedicated_server_create_options(13)
-
-        self.assertEqual(len(result['categories']['disk0']['items']), 2)
-        self.assertEqual(len(result['categories']['disk1']['items']), 1)
-        self.assertEqual(len(result['categories']['disk1']['items']), 1)
-        self.assertEqual(len(result['categories']['disk_controller']['items']),
-                         2)
-        self.assertEqual(len(result['categories']['os']['items']), 11)
-        self.assertEqual(len(result['categories']['port_speed']['items']), 5)
-        self.assertEqual(len(result['categories']['ram']['items']), 2)
-        self.assertEqual(len(result['categories']['random']['items']), 1)
-        self.assertEqual(len(result['categories']['server']['items']), 2)
-        self.assertEqual(len(result['categories']['server_core']['items']), 3)
-        self.assertEqual(len(result['locations']), 1)
-
-        self.assert_called_with('SoftLayer_Product_Package', 'getRegions',
-                                identifier=13)
-
-        self.assert_called_with('SoftLayer_Product_Package',
-                                'getConfiguration',
-                                identifier=13,
-                                mask='mask[itemCategory[group]]')
-
-        self.assert_called_with('SoftLayer_Product_Package', 'getCategories',
-                                identifier=13)
-
-    def test_get_default_value_returns_none_for_unknown_category(self):
-        package_options = {'categories': ['Cat1', 'Cat2']}
-
-        self.assertEqual(None, hardware.get_default_value(package_options,
-                                                          'Unknown Category'))
-
-    def test_get_default_value(self):
-        price_id = 9876
-        package_options = {'categories':
-                           {'Cat1': {
-                               'items': [{'setup_fee': 0,
-                                          'recurring_fee': 0,
-                                          'hourly_recurring_fee': 0,
-                                          'one_time_fee': 0,
-                                          'labor_fee': 0,
-                                          'price_id': price_id}]
-                           }}}
-
-        self.assertEqual(price_id,
-                         hardware.get_default_value(package_options, 'Cat1'))
-
-    def test_get_default_value_none_free(self):
-        package_options = {'categories': {}}
-        self.assertEqual(None,
-                         hardware.get_default_value(package_options, 'Cat1'))
-
-        package_options = {'categories':
-                           {'Cat1': {
-                               'items': [{'setup_fee': 10,
-                                          'recurring_fee': 0,
-                                          'hourly_recurring_fee': 0,
-                                          'one_time_fee': 0,
-                                          'labor_fee': 0,
-                                          'price_id': 1234}]
-                           }}}
-        self.assertEqual(None,
-                         hardware.get_default_value(package_options, 'Cat1'))
-
-    def test_get_default_value_hourly(self):
-        package_options = {'categories':
-                           {'Cat1': {
-                               'items': [{'setup_fee': 0,
-                                          'recurring_fee': 0,
-                                          'hourly_recurring_fee': None,
-                                          'one_time_fee': 0,
-                                          'labor_fee': 0,
-                                          'price_id': 1234},
-                                         {'setup_fee': 0,
-                                          'recurring_fee': None,
-                                          'hourly_recurring_fee': 0,
-                                          'one_time_fee': 0,
-                                          'labor_fee': 0,
-                                          'price_id': 4321}]
-                           }}}
-        result = hardware.get_default_value(package_options, 'Cat1',
-                                            hourly=True)
-        self.assertEqual(4321, result)
-
-    def test_get_default_value_monthly(self):
-        package_options = {'categories':
-                           {'Cat1': {
-                               'items': [{'setup_fee': 0,
-                                          'recurring_fee': None,
-                                          'hourly_recurring_fee': 0,
-                                          'one_time_fee': 0,
-                                          'labor_fee': 0,
-                                          'price_id': 4321},
-                                         {'setup_fee': 0,
-                                          'recurring_fee': 0,
-                                          'hourly_recurring_fee': None,
-                                          'one_time_fee': 0,
-                                          'labor_fee': 0,
-                                          'price_id': 1234}]
-                           }}}
-        result = hardware.get_default_value(package_options, 'Cat1',
-                                            hourly=False)
-        self.assertEqual(1234, result)
 
     def test_edit_meta(self):
         # Test editing user data
@@ -497,3 +363,56 @@ class HardwareTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Hardware_Server',
                                 'createFirmwareUpdateTransaction',
                                 identifier=100, args=(0, 1, 1, 0))
+
+
+class HardwareHelperTests(testing.TestCase):
+    def test_get_extra_price_id_no_items(self):
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               managers.hardware._get_extra_price_id,
+                               [], 'test', True, None)
+        self.assertEqual("Could not find valid price for extra option, 'test'",
+                         str(ex))
+
+    def test_get_default_price_id_item_not_first(self):
+        items = [{
+            'itemCategory': {'categoryCode': 'unknown', 'id': 325},
+            'keyName': 'UNKNOWN',
+            'prices': [{'accountRestrictions': [],
+                        'currentPriceFlag': '',
+                        'hourlyRecurringFee': '10.0',
+                        'id': 1245172,
+                        'recurringFee': '1.0'}],
+        }]
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               managers.hardware._get_default_price_id,
+                               items, 'unknown', True, None)
+        self.assertEqual("Could not find valid price for 'unknown' option",
+                         str(ex))
+
+    def test_get_default_price_id_no_items(self):
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               managers.hardware._get_default_price_id,
+                               [], 'test', True, None)
+        self.assertEqual("Could not find valid price for 'test' option",
+                         str(ex))
+
+    def test_get_bandwidth_price_id_no_items(self):
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               managers.hardware._get_bandwidth_price_id,
+                               [], hourly=True, no_public=False)
+        self.assertEqual("Could not find valid price for bandwidth option",
+                         str(ex))
+
+    def test_get_os_price_id_no_items(self):
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               managers.hardware._get_os_price_id,
+                               [], 'UBUNTU_14_64', None)
+        self.assertEqual("Could not find valid price for os: 'UBUNTU_14_64'",
+                         str(ex))
+
+    def test_get_port_speed_price_id_no_items(self):
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               managers.hardware._get_port_speed_price_id,
+                               [], 10, True, None)
+        self.assertEqual("Could not find valid price for port speed: '10'",
+                         str(ex))

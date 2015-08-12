@@ -21,7 +21,6 @@ class MetadataTests(testing.TestCase):
 
         self.assertEqual('dal01', resp)
         self.assert_called_with('SoftLayer_Resource_Metadata', 'Datacenter',
-                                timeout=10.0,
                                 identifier=None)
 
     def test_no_param(self):
@@ -29,14 +28,15 @@ class MetadataTests(testing.TestCase):
 
         self.assertEqual('dal01', resp)
         self.assert_called_with('SoftLayer_Resource_Metadata', 'Datacenter',
-                                identifier=None)
+                                identifier=None,
+                                args=tuple())
 
     def test_w_param(self):
         resp = self.metadata.get('vlans', '1:2:3:4:5')
 
         self.assertEqual([10, 124], resp)
         self.assert_called_with('SoftLayer_Resource_Metadata', 'Vlans',
-                                identifier='1:2:3:4:5')
+                                args=('1:2:3:4:5',))
 
     def test_user_data(self):
         resp = self.metadata.get('user_data')

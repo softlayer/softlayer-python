@@ -2,6 +2,8 @@ from __future__ import print_function
 import sys
 import os
 
+from codecs import open
+
 try:
     from setuptools import setup, find_packages
 except ImportError:
@@ -18,7 +20,7 @@ REQUIRES = [
     'six >= 1.7.0',
     'prettytable >= 0.7.0',
     'click',
-    'requests',
+    'requests >= 2.7.0',
 ]
 
 if sys.version_info < (2, 7):
@@ -27,14 +29,14 @@ if sys.version_info < (2, 7):
 DESCRIPTION = "A library for SoftLayer's API"
 
 if os.path.exists('README.rst'):
-    with open('README.rst') as readme_file:
+    with open('README.rst', 'r', 'utf-8') as readme_file:
         LONG_DESCRIPTION = readme_file.read()
 else:
     LONG_DESCRIPTION = DESCRIPTION
 
 setup(
     name='SoftLayer',
-    version='3.3.0',
+    version='4.0.4',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     author='SoftLayer Technologies, Inc.',
@@ -44,7 +46,10 @@ setup(
     zip_safe=False,
     url='http://github.com/softlayer/softlayer-python',
     entry_points={
-        'console_scripts': ['sl = SoftLayer.CLI.core:main'],
+        'console_scripts': [
+            'slcli = SoftLayer.CLI.core:main',
+            'sl = SoftLayer.CLI.deprecated:main',
+        ],
     },
     test_suite='nose.collector',
     install_requires=REQUIRES,

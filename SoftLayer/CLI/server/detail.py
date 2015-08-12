@@ -35,7 +35,7 @@ def cli(env, identifier, passwords, price):
     result = utils.NestedDict(result)
 
     table.add_row(['id', result['id']])
-    table.add_row(['guid', result['globalIdentifier']] or formatting.blank())
+    table.add_row(['guid', result['globalIdentifier'] or formatting.blank()])
     table.add_row(['hostname', result['hostname']])
     table.add_row(['domain', result['domain']])
     table.add_row(['fqdn', result['fullyQualifiedDomainName']])
@@ -62,11 +62,14 @@ def cli(env, identifier, passwords, price):
     table.add_row(
         ['created', result['provisionDate'] or formatting.blank()])
 
-    table.add_row(['owner', formatting.FormattedItem(
-        utils.lookup(result, 'billingItem', 'orderItem',
-                     'order', 'userRecord',
-                     'username') or formatting.blank()
-    )])
+    if utils.lookup(result, 'billingItem') != []:
+        table.add_row(['owner', formatting.FormattedItem(
+            utils.lookup(result, 'billingItem', 'orderItem',
+                         'order', 'userRecord',
+                         'username') or formatting.blank(),
+        )])
+    else:
+        table.add_row(['owner', formatting.blank()])
 
     vlan_table = formatting.Table(['type', 'number', 'id'])
 
@@ -96,8 +99,10 @@ def cli(env, identifier, passwords, price):
         table.add_row(['remote users', pass_table])
 
     tag_row = []
-    for tag in result['tagReferences']:
-        tag_row.append(tag['tag']['name'])
+    for tag_detail in result['tagReferences']:
+        tag = utils.lookup(tag_detail, 'tag', 'name')
+        if tag is not None:
+            tag_row.append(tag)
 
     if tag_row:
         table.add_row(['tags', formatting.listing(tag_row, separator=',')])

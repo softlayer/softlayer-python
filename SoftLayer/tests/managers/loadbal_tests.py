@@ -87,7 +87,7 @@ class LoadBalancerTests(testing.TestCase):
         result = self.lb_mgr.get_local_lbs()
 
         self.assertEqual(len(result), 0)
-        mask = 'loadBalancerHardware[datacenter],ipAddress'
+        mask = 'mask[loadBalancerHardware[datacenter],ipAddress]'
         self.assert_called_with('SoftLayer_Account', 'getAdcLoadBalancers',
                                 mask=mask)
 
@@ -95,11 +95,12 @@ class LoadBalancerTests(testing.TestCase):
         result = self.lb_mgr.get_local_lb(22348)
 
         self.assertEqual(result['id'], 22348)
-        mask = ('loadBalancerHardware[datacenter], '
+        mask = ('mask['
+                'loadBalancerHardware[datacenter], '
                 'ipAddress, virtualServers[serviceGroups'
                 '[routingMethod,routingType,services'
                 '[healthChecks[type], groupReferences,'
-                ' ipAddress]]]')
+                ' ipAddress]]]]')
         self.assert_called_with(VIRT_IP_SERVICE, 'getObject',
                                 identifier=22348,
                                 mask=mask)
@@ -142,7 +143,7 @@ class LoadBalancerTests(testing.TestCase):
                 }
             }
         }
-        mask = 'serviceGroups[services[groupReferences,healthChecks]]'
+        mask = 'mask[serviceGroups[services[groupReferences,healthChecks]]]'
         self.assert_called_with(VIRT_IP_SERVICE, 'getVirtualServers',
                                 identifier=12345,
                                 filter=_filter,
@@ -153,7 +154,7 @@ class LoadBalancerTests(testing.TestCase):
     def test_add_service(self):
         self.lb_mgr.add_service(12345, 50718, 123, 80, True, 21, 1)
 
-        mask = 'virtualServers[serviceGroups[services[groupReferences]]]'
+        mask = 'mask[virtualServers[serviceGroups[services[groupReferences]]]]'
         self.assert_called_with(VIRT_IP_SERVICE, 'getObject',
                                 mask=mask,
                                 identifier=12345)
@@ -173,7 +174,7 @@ class LoadBalancerTests(testing.TestCase):
                                        routing_type=2,
                                        routing_method=10)
 
-        mask = 'virtualServers[serviceGroups[services[groupReferences]]]'
+        mask = 'mask[virtualServers[serviceGroups[services[groupReferences]]]]'
         self.assert_called_with(VIRT_IP_SERVICE, 'getObject',
                                 identifier=12345,
                                 mask=mask)
@@ -183,7 +184,7 @@ class LoadBalancerTests(testing.TestCase):
     def test_add_service_group(self):
         self.lb_mgr.add_service_group(12345, 100, 80, 2, 10)
 
-        mask = 'virtualServers[serviceGroups[services[groupReferences]]]'
+        mask = 'mask[virtualServers[serviceGroups[services[groupReferences]]]]'
         self.assert_called_with(VIRT_IP_SERVICE, 'getObject',
                                 mask=mask,
                                 identifier=12345)
@@ -201,7 +202,7 @@ class LoadBalancerTests(testing.TestCase):
         self.assert_called_with(VIRT_IP_SERVICE, 'getVirtualServers',
                                 identifier=12345,
                                 filter=_filter,
-                                mask='serviceGroups')
+                                mask='mask[serviceGroups]')
 
         service = ('SoftLayer_Network_Application_Delivery_Controller_'
                    'LoadBalancer_Service_Group')

@@ -51,7 +51,7 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
     # responds to .formatted
     if hasattr(data, 'formatted'):
         if fmt == 'table':
-            return str(data.formatted)
+            return data.formatted
 
     # responds to .separator
     if hasattr(data, 'separator'):
@@ -74,6 +74,7 @@ def format_prettytable(table):
     for i, row in enumerate(table.rows):
         for j, item in enumerate(row):
             table.rows[i][j] = format_output(item)
+
     ptable = table.prettytable()
     ptable.hrules = prettytable.FRAME
     ptable.horizontal_char = '.'
@@ -84,12 +85,15 @@ def format_prettytable(table):
 
 def format_no_tty(table):
     """Converts SoftLayer.CLI.formatting.Table instance to a prettytable."""
+
     for i, row in enumerate(table.rows):
         for j, item in enumerate(row):
             table.rows[i][j] = format_output(item, fmt='raw')
     ptable = table.prettytable()
+
     for col in table.columns:
         ptable.align[col] = 'l'
+
     ptable.hrules = prettytable.NONE
     ptable.border = False
     ptable.header = False
@@ -145,7 +149,7 @@ def active_txn(item):
 
         :param item: An object capable of having an active transaction
     """
-    return transaction_status(item['activeTransaction'])
+    return transaction_status(utils.lookup(item, 'activeTransaction'))
 
 
 def transaction_status(transaction):
@@ -153,33 +157,12 @@ def transaction_status(transaction):
 
         :param item: An object capable of having an active transaction
     """
-    if not transaction.get('transactionStatus'):
+    if not transaction or not transaction.get('transactionStatus'):
         return blank()
 
     return FormattedItem(
         transaction['transactionStatus'].get('name'),
         transaction['transactionStatus'].get('friendlyName'))
-
-
-def valid_response(prompt, *valid):
-    """Prompt user for input.
-
-    Will display a prompt for a command-line user. If the input is in the
-    valid given valid list then it will return True. Otherwise, it will
-    return False. If no input is received from the user, None is returned
-    instead.
-
-    :param string prompt: string prompt to give to the user
-    :param string \\*valid: valid responses
-    """
-    ans = click.prompt(prompt).lower()
-
-    if ans in valid:
-        return True
-    elif ans == '':
-        return None
-
-    return False
 
 
 def confirm(prompt_str, default=False):
@@ -189,16 +172,17 @@ def confirm(prompt_str, default=False):
     :param bool default: Default value to True or False
     """
     if default:
+        default_str = 'y'
         prompt = '%s [Y/n]' % prompt_str
     else:
+        default_str = 'n'
         prompt = '%s [y/N]' % prompt_str
 
-    response = valid_response(prompt, 'y', 'yes', 'yeah', 'yup', 'yolo')
+    ans = click.prompt(prompt, default=default_str, show_default=False)
+    if ans.lower() in ('y', 'yes', 'yeah', 'yup', 'yolo'):
+        return True
 
-    if response is None:
-        return default
-
-    return response
+    return False
 
 
 def no_going_back(confirmation):
@@ -210,10 +194,14 @@ def no_going_back(confirmation):
     if not confirmation:
         confirmation = 'yes'
 
-    return valid_response(
-        'This action cannot be undone! '
-        'Type "%s" or press Enter to abort' % confirmation,
-        str(confirmation))
+    prompt = ('This action cannot be undone! Type "%s" or press Enter '
+              'to abort' % confirmation)
+
+    ans = click.prompt(prompt, default='', show_default=False)
+    if ans.lower() == str(confirmation):
+        return True
+
+    return False
 
 
 class SequentialOutput(list):
@@ -324,6 +312,30 @@ class FormattedItem(object):
         return str(self.original)
 
     __repr__ = __str__
+
+    # Implement sorting methods.
+    # NOTE(kmcdonald): functools.total_ordering could be used once support for
+    # Python 2.6 is dropped
+    def __eq__(self, other):
+        return self.original == getattr(other, 'original', other)
+
+    def __lt__(self, other):
+        if self.original is None:
+            return True
+
+        other_val = getattr(other, 'original', other)
+        if other_val is None:
+            return False
+        return self.original < other_val
+
+    def __gt__(self, other):
+        return not (self < other or self == other)
+
+    def __le__(self, other):
+        return self < other or self == other
+
+    def __ge__(self, other):
+        return not self < other
 
 
 def _format_python_value(value):

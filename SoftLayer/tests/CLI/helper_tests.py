@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
     SoftLayer.tests.CLI.helper_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -6,20 +7,17 @@
 """
 import json
 import os
-import sys
+import tempfile
 
+import click
 import mock
 
+from SoftLayer.CLI import core
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 from SoftLayer.CLI import template
 from SoftLayer import testing
-
-if sys.version_info >= (3,):
-    open_path = 'builtins.open'
-else:
-    open_path = '__builtin__.open'
 
 
 class CLIJSONEncoderTest(testing.TestCase):
@@ -40,35 +38,6 @@ class CLIJSONEncoderTest(testing.TestCase):
 
 
 class PromptTests(testing.TestCase):
-
-    @mock.patch('click.prompt')
-    def test_invalid_response(self, prompt_mock):
-        prompt_mock.return_value = 'y'
-        result = formatting.valid_response('test', 'n')
-        prompt_mock.assert_called_with('test')
-        self.assertFalse(result)
-
-        prompt_mock.return_value = 'wakakwakwaka'
-        result = formatting.valid_response('test', 'n')
-        prompt_mock.assert_called_with('test')
-        self.assertFalse(result)
-
-        prompt_mock.return_value = ''
-        result = formatting.valid_response('test', 'n')
-        prompt_mock.assert_called_with('test')
-        self.assertEqual(result, None)
-
-    @mock.patch('click.prompt')
-    def test_valid_response(self, prompt_mock):
-        prompt_mock.return_value = 'n'
-        result = formatting.valid_response('test', 'n')
-        prompt_mock.assert_called_with('test')
-        self.assertTrue(result)
-
-        prompt_mock.return_value = 'N'
-        result = formatting.valid_response('test', 'n')
-        prompt_mock.assert_called_with('test')
-        self.assertTrue(result)
 
     @mock.patch('click.prompt')
     def test_do_or_die(self, prompt_mock):
@@ -98,9 +67,19 @@ class PromptTests(testing.TestCase):
         res = formatting.confirm('Confirm?', default=False)
         self.assertFalse(res)
 
-        prompt_mock.return_value = ''
+        prompt_mock.return_value = 'Y'
         res = formatting.confirm('Confirm?', default=True)
         self.assertTrue(res)
+        prompt_mock.assert_called_with('Confirm? [Y/n]',
+                                       default='y',
+                                       show_default=False)
+
+        prompt_mock.return_value = 'N'
+        res = formatting.confirm('Confirm?', default=False)
+        self.assertFalse(res)
+        prompt_mock.assert_called_with('Confirm? [y/N]',
+                                       default='n',
+                                       show_default=False)
 
 
 class FormattedItemTests(testing.TestCase):
@@ -150,6 +129,27 @@ class FormattedItemTests(testing.TestCase):
         self.assertEqual('-', item.formatted)
         self.assertEqual('NULL', str(item))
 
+    def test_sort_mixed(self):
+        blank = formatting.blank()
+        items = [10, blank]
+        sorted_items = sorted(items)
+        self.assertEqual(sorted_items, [blank, 10])
+
+        items = [blank, 10]
+        sorted_items = sorted(items)
+        self.assertEqual(sorted_items, [blank, 10])
+
+        items = [blank, "10"]
+        sorted_items = sorted(items)
+        self.assertEqual(sorted_items, [blank, "10"])
+
+    def test_sort(self):
+        items = [10, formatting.FormattedItem(20), formatting.FormattedItem(5)]
+        sorted_items = sorted(items)
+        self.assertEqual(sorted_items, [formatting.FormattedItem(5),
+                                        10,
+                                        formatting.FormattedItem(20)])
+
 
 class FormattedListTests(testing.TestCase):
     def test_init(self):
@@ -181,7 +181,8 @@ class FormattedListTests(testing.TestCase):
 
 class FormattedTxnTests(testing.TestCase):
     def test_active_txn_empty(self):
-        self.assertRaises(KeyError, formatting.active_txn, {})
+        result = formatting.active_txn({})
+        self.assertEqual(str(result), 'NULL')
 
     def test_active_txn(self):
         result = formatting.active_txn({
@@ -354,31 +355,36 @@ class TestFormatOutput(testing.TestCase):
         ret = formatting.format_output(t, 'python')
         self.assertEqual({'nothing': None}, ret)
 
+    def test_format_output_unicode(self):
+        t = formatting.format_output('☃', 'raw')
+        self.assertEqual('☃', t)
+
+        item = formatting.FormattedItem('raw ☃', '☃')
+        t = formatting.format_output(item)
+        self.assertEqual('☃', t)
+
+        t = formatting.format_output(item, 'raw')
+        self.assertEqual('raw ☃', t)
+
 
 class TestTemplateArgs(testing.TestCase):
 
     def test_no_template_option(self):
-        args = {'key': 'value'}
-        template.update_with_template_args(args)
-        self.assertEqual(args, {'key': 'value'})
+        ctx = click.Context(core.cli)
+        template.TemplateCallback()(ctx, None, None)
+        self.assertIsNone(ctx.default_map)
 
     def test_template_options(self):
+        ctx = click.Context(core.cli)
         path = os.path.join(testing.FIXTURE_PATH, 'sample_vs_template.conf')
-        args = {
-            'cpu': None,
-            'memory': '32',
-            'template': path,
-            'hourly': False,
-            'disk': [],
-        }
-        template.update_with_template_args(args, list_args=['disk'])
-        self.assertEqual(args, {
+        template.TemplateCallback(list_args=['disk'])(ctx, None, path)
+        self.assertEqual(ctx.default_map, {
             'cpu': '4',
             'datacenter': 'dal05',
             'domain': 'example.com',
             'hostname': 'myhost',
             'hourly': 'true',
-            'memory': '32',
+            'memory': '1024',
             'monthly': 'false',
             'network': '100',
             'os': 'DEBIAN_7_64',
@@ -388,8 +394,9 @@ class TestTemplateArgs(testing.TestCase):
 
 class TestExportToTemplate(testing.TestCase):
     def test_export_to_template(self):
-        with mock.patch(open_path, mock.mock_open(), create=True) as open_:
-            template.export_to_template('filename', {
+        with tempfile.NamedTemporaryFile() as tmp:
+
+            template.export_to_template(tmp.name, {
                 'os': None,
                 'datacenter': 'ams01',
                 'disk': ('disk1', 'disk2'),
@@ -402,8 +409,9 @@ class TestExportToTemplate(testing.TestCase):
                 'test': 'test',
             }, exclude=['test'])
 
-            open_.assert_called_with('filename', 'w')
-            open_().write.assert_has_calls([
-                mock.call('datacenter=ams01\n'),
-                mock.call('disk=disk1,disk2\n'),
-            ], any_order=True)  # Order isn't really guaranteed
+            with open(tmp.name) as f:
+                data = f.read()
+
+                self.assertEqual(len(data.splitlines()), 2)
+                self.assertIn('datacenter=ams01\n', data)
+                self.assertIn('disk=disk1,disk2\n', data)

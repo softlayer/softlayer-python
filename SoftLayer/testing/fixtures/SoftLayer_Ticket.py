@@ -12,7 +12,16 @@ getObject = {
         "name": "Closed"
     },
     "statusId": 1002,
-    "title": "Cloud Instance Cancellation - 08/01/13"
+    "title": "Cloud Instance Cancellation - 08/01/13",
+    'updateCount': 3,
+    'updates': [
+        {'entry': 'a bot says something'},
+        {'entry': 'user says something',
+         'editor': {'firstName': 'John', 'lastName': 'Smith'}},
+        {'entry': 'employee says something',
+         'editor': {'displayName': 'emp1'}},
+
+    ]
 }
 
 createStandardTicket = {
@@ -23,3 +32,4 @@ createStandardTicket = {
     "title": "Cloud Instance Cancellation - 08/01/13"
 }
 edit = True
+addUpdate = {}

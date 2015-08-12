@@ -24,9 +24,9 @@ import click
 @click.option('--healthcheck-type',
               required=True,
               help="The health check type")
-@click.option('--ip-address', '--ip',
+@click.option('--ip-address',
               required=True,
-              help="The IP of the service")
+              help="The IP address of the service")
 @environment.pass_env
 def cli(env, identifier, enabled, port, weight, healthcheck_type, ip_address):
     """Adds a new load balancer service."""
@@ -40,7 +40,8 @@ def cli(env, identifier, enabled, port, weight, healthcheck_type, ip_address):
     if ip_address:
         ip_service = env.client['Network_Subnet_IpAddress']
         ip_record = ip_service.getByIpAddress(ip_address)
-        ip_address_id = ip_record['id']
+        if len(ip_record) > 0:
+            ip_address_id = ip_record['id']
 
     mgr.add_service(loadbal_id,
                     group_id,

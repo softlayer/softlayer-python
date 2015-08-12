@@ -12,8 +12,13 @@ import click
 
 
 @click.command()
-@click.option('--sortby', help='Column to sort by',
-              default='hostname')
+@click.option('--sortby',
+              help='Column to sort by',
+              type=click.Choice(['id',
+                                 'hostname',
+                                 'primary_ip',
+                                 'backend_ip',
+                                 'datacenter']))
 @click.option('--cpu', '-c', help='Filter by number of CPU cores')
 @click.option('--domain', '-D', help='Filter by domain')
 @click.option('--datacenter', '-d', help='Filter by datacenter')

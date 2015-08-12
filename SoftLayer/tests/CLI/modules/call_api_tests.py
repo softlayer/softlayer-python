@@ -26,7 +26,7 @@ class CallCliTests(testing.TestCase):
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(json.loads(result.output), 'test')
         self.assert_called_with('SoftLayer_Service', 'method',
-                                mask='some.mask',
+                                mask='mask[some.mask]',
                                 limit=20,
                                 offset=40,
                                 identifier='100')
@@ -118,6 +118,17 @@ class CallCliTests(testing.TestCase):
 : True : None :  1.0  :  10 : string :
 :......:......:.......:.....:........:
 """)
+
+    def test_parameters(self):
+        mock = self.set_mock('SoftLayer_Service', 'method')
+        mock.return_value = {}
+
+        result = self.run_command(['call-api', 'Service', 'method',
+                                   'arg1', '1234'])
+
+        self.assertEqual(result.exit_code, 0)
+        self.assert_called_with('SoftLayer_Service', 'method',
+                                args=('arg1', '1234'))
 
 
 class CallCliHelperTests(testing.TestCase):

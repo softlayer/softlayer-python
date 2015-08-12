@@ -12,11 +12,20 @@ from SoftLayer import config
 from SoftLayer import consts
 from SoftLayer import transports
 
+# pylint: disable=invalid-name
+
+
 API_PUBLIC_ENDPOINT = consts.API_PUBLIC_ENDPOINT
 API_PRIVATE_ENDPOINT = consts.API_PRIVATE_ENDPOINT
-__all__ = ['Client', 'API_PUBLIC_ENDPOINT', 'API_PRIVATE_ENDPOINT']
+__all__ = [
+    'create_client_from_env',
+    'Client',
+    'BaseClient',
+    'API_PUBLIC_ENDPOINT',
+    'API_PRIVATE_ENDPOINT',
+]
 
-VALID_CALL_ARGS = set([
+VALID_CALL_ARGS = set((
     'id',
     'mask',
     'filter',
@@ -25,11 +34,22 @@ VALID_CALL_ARGS = set([
     'raw_headers',
     'limit',
     'offset',
-])
+))
 
 
-class Client(object):
-    """A SoftLayer API client.
+def create_client_from_env(username=None,
+                           api_key=None,
+                           endpoint_url=None,
+                           timeout=None,
+                           auth=None,
+                           config_file=None,
+                           proxy=None,
+                           user_agent=None,
+                           transport=None):
+    """Creates a SoftLayer API client using your environment.
+
+    Settings are loaded via keyword arguments, environemtal variables and
+    config file.
 
     :param username: an optional API username if you wish to bypass the
         package's built-in username
@@ -51,38 +71,62 @@ class Client(object):
     Usage:
 
         >>> import SoftLayer
-        >>> client = SoftLayer.Client(username="username", api_key="api_key")
+        >>> client = SoftLayer.create_client_from_env()
         >>> resp = client['Account'].getObject()
         >>> resp['companyName']
         'Your Company'
 
     """
+    settings = config.get_client_settings(username=username,
+                                          api_key=api_key,
+                                          endpoint_url=endpoint_url,
+                                          timeout=timeout,
+                                          proxy=proxy,
+                                          config_file=config_file)
+
+    # Default the transport to use XMLRPC
+    if transport is None:
+        transport = transports.XmlRpcTransport(
+            endpoint_url=settings.get('endpoint_url'),
+            proxy=settings.get('proxy'),
+            timeout=settings.get('timeout'),
+            user_agent=user_agent,
+        )
+
+    # If we have enough information to make an auth driver, let's do it
+    if auth is None and settings.get('username') and settings.get('api_key'):
+
+        auth = slauth.BasicAuthentication(
+            settings.get('username'),
+            settings.get('api_key'),
+        )
+
+    return BaseClient(auth=auth, transport=transport)
+
+
+def Client(**kwargs):
+    """Get a SoftLayer API Client using environmental settings.
+
+    Deprecated in favor of create_client_from_env()
+    """
+    warnings.warn("use SoftLayer.create_client_from_env() instead",
+                  DeprecationWarning)
+    return create_client_from_env(**kwargs)
+
+
+class BaseClient(object):
+    """Base SoftLayer API client.
+
+    :param auth: auth driver that looks like SoftLayer.auth.AuthenticationBase
+    :param transport: An object that's callable with this signature:
+                      transport(SoftLayer.transports.Request)
+    """
+
     _prefix = "SoftLayer_"
 
-    def __init__(self, username=None, api_key=None, endpoint_url=None,
-                 timeout=None, auth=None, config_file=None, proxy=None,
-                 user_agent=None, transport=None):
-
-        settings = config.get_client_settings(username=username,
-                                              api_key=api_key,
-                                              endpoint_url=endpoint_url,
-                                              timeout=timeout,
-                                              auth=auth,
-                                              proxy=proxy,
-                                              config_file=config_file)
-        self.auth = settings.get('auth')
-
-        self.endpoint_url = (settings.get('endpoint_url') or
-                             API_PUBLIC_ENDPOINT).rstrip('/')
-        self.transport = transport or transports.XmlRpcTransport()
-
-        self.timeout = None
-        if settings.get('timeout'):
-            self.timeout = float(settings.get('timeout'))
-        self.proxy = None
-        if settings.get('proxy'):
-            self.proxy = settings.get('proxy')
-        self.user_agent = user_agent
+    def __init__(self, auth=None, transport=None):
+        self.auth = auth
+        self.transport = transport
 
     def authenticate_with_password(self, username, password,
                                    security_question_id=None,
@@ -112,7 +156,7 @@ class Client(object):
 
         Usage:
             >>> import SoftLayer
-            >>> client = SoftLayer.Client()
+            >>> client = SoftLayer.create_client_from_env()
             >>> client['Account']
             <Service: Account>
 
@@ -132,7 +176,7 @@ class Client(object):
 
         Usage:
             >>> import SoftLayer
-            >>> client = SoftLayer.Client()
+            >>> client = SoftLayer.create_client_from_env()
             >>> client['Account'].getVirtualGuests(mask="id", limit=10)
             [...]
 
@@ -145,29 +189,24 @@ class Client(object):
             raise TypeError(
                 'Invalid keyword arguments: %s' % ','.join(invalid_kwargs))
 
-        if not service.startswith(self._prefix):
+        if self._prefix and not service.startswith(self._prefix):
             service = self._prefix + service
 
-        http_headers = {
-            'User-Agent': self.user_agent or consts.USER_AGENT,
-            'Content-Type': 'application/xml',
-        }
+        http_headers = {'Accept': '*/*'}
 
         if kwargs.get('compress', True):
-            http_headers['Accept'] = '*/*'
             http_headers['Accept-Encoding'] = 'gzip, deflate, compress'
+        else:
+            http_headers['Accept-Encoding'] = None
 
         if kwargs.get('raw_headers'):
             http_headers.update(kwargs.get('raw_headers'))
 
         request = transports.Request()
-        request.endpoint = self.endpoint_url
         request.service = service
         request.method = method
         request.args = args
         request.transport_headers = http_headers
-        request.timeout = self.timeout
-        request.proxy = self.proxy
         request.identifier = kwargs.get('id')
         request.mask = kwargs.get('mask')
         request.filter = kwargs.get('filter')
@@ -184,22 +223,26 @@ class Client(object):
 
             request = self.auth.get_request(request)
 
+        request.headers.update(kwargs.get('headers', {}))
         return self.transport(request)
 
     __call__ = call
 
-    def iter_call(self, service, method,
-                  chunk=100, limit=None, offset=0, *args, **kwargs):
+    def iter_call(self, service, method, *args, **kwargs):
         """A generator that deals with paginating through results.
 
         :param service: the name of the SoftLayer API service
         :param method: the method to call on the service
-        :param integer chunk: result size for each API call
+        :param integer chunk: result size for each API call (defaults to 100)
         :param \\*args: same optional arguments that ``Service.call`` takes
         :param \\*\\*kwargs: same optional keyword arguments that
                            ``Service.call`` takes
 
         """
+        chunk = kwargs.pop('chunk', 100)
+        limit = kwargs.pop('limit', None)
+        offset = kwargs.pop('offset', 0)
+
         if chunk <= 0:
             raise AttributeError("Chunk size should be greater than zero.")
 
@@ -217,6 +260,7 @@ class Client(object):
                 # Don't over-fetch past the given limit
                 if chunk + result_count > limit:
                     chunk = limit - result_count
+
             results = self.call(service, method,
                                 offset=offset, limit=chunk, *args, **kwargs)
 
@@ -240,8 +284,7 @@ class Client(object):
                 break
 
     def __repr__(self):
-        return "<Client: endpoint=%s, user=%r>" % (self.endpoint_url,
-                                                   self.auth)
+        return "Client(transport=%r, auth=%r)" % (self.transport, self.auth)
 
     __str__ = __repr__
 
@@ -280,7 +323,7 @@ class Service(object):
 
         Usage:
             >>> import SoftLayer
-            >>> client = SoftLayer.Client()
+            >>> client = SoftLayer.create_client_from_env()
             >>> client['Account'].getVirtualGuests(mask="id", limit=10)
             [...]
 
@@ -300,7 +343,7 @@ class Service(object):
 
         Usage:
             >>> import SoftLayer
-            >>> client = SoftLayer.Client()
+            >>> client = SoftLayer.create_client_from_env()
             >>> gen = client['Account'].getVirtualGuests(iter=True)
             >>> for virtual_guest in gen:
             ...     virtual_guest['id']

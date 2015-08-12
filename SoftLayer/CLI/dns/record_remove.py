@@ -13,7 +13,7 @@ import click
 @click.argument('record_id')
 @environment.pass_env
 def cli(env, record_id):
-    """Add resource record."""
+    """Remove resource record."""
 
     manager = SoftLayer.DNSManager(env.client)
 

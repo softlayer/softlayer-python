@@ -1,4 +1,4 @@
-"""List firewalls."""
+"""Cancels a firewall."""
 # :license: MIT, see LICENSE for more details.
 
 import SoftLayer
@@ -14,7 +14,7 @@ import click
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """List firewalls."""
+    """Cancels a firewall."""
 
     mgr = SoftLayer.FirewallManager(env.client)
     firewall_type, firewall_id = firewall.parse_id(identifier)
