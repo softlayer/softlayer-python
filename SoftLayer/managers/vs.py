@@ -23,6 +23,18 @@ class VSManager(utils.IdentifierMixin, object):
                                               manager to handle ordering.
                                               If none is provided, one will be
                                               auto initialized.
+
+    Example::
+
+           # Initialize the VSManager.
+           # env variables. These can also be specified in ~/.softlayer,
+           # or passed directly to SoftLayer.Client()
+           # SL_USERNAME = YOUR_USERNAME
+           # SL_API_KEY = YOUR_API_KEY
+           import SoftLayer
+           client = SoftLayer.Client()
+           mgr = SoftLayer.VSManager(client)
+
     """
 
     def __init__(self, client, ordering_manager=None):
@@ -57,18 +69,17 @@ class VSManager(utils.IdentifierMixin, object):
         :returns: Returns a list of dictionaries representing the matching
                   virtual servers
 
-        ::
+        Example::
 
-           # Print out a list of all hourly instances in the DAL05 data center.
-           # env variables
-           # SL_USERNAME = YOUR_USERNAME
-           # SL_API_KEY = YOUR_API_KEY
-           import SoftLayer
-           client = SoftLayer.create_client_from_env()
+            # Print out a list of hourly instances in the DAL05 data center.
 
-           mgr = SoftLayer.VSManager(client)
-           for vsi in mgr.list_instances(hourly=True, datacenter='dal05'):
-               print vsi['fullyQualifiedDomainName'], vs['primaryIpAddress']
+            for vsi in mgr.list_instances(hourly=True, datacenter='dal05'):
+               print vsi['fullyQualifiedDomainName'], vsi['primaryIpAddress']
+
+            # Using a custom object-mask. Will get ONLY what is specified
+            object_mask = "mask[hostname,monitoringRobot[robotStatus]]"
+            for vsi in mgr.list_instances(mask=object_mask,hourly=True):
+                print vsi
 
         """
         if 'mask' not in kwargs:
@@ -147,18 +158,16 @@ class VSManager(utils.IdentifierMixin, object):
         :returns: A dictionary containing a large amount of information about
                   the specified instance.
 
-        ::
+        Example::
 
-           # Print out the FQDN and IP address for instance ID 12345.
-           # env variables
-           # SL_USERNAME = YOUR_USERNAME
-           # SL_API_KEY = YOUR_API_KEY
-           import SoftLayer
-           client = SoftLayer.create_client_from_env()
+            # Print out instance ID 12345.
+            vsi = mgr.get_instance(12345)
+            print vsi
 
-           mgr = SoftLayer.VSManager(client)
-           vsi = mgr.get_instance(12345)
-           print vsi['fullyQualifiedDomainName'], vs['primaryIpAddress']
+            # Print out only FQDN and primaryIP for instance 12345
+            object_mask = "mask[fullyQualifiedDomainName,primaryIpAddress]"
+            vsi = mgr.get_instance(12345, mask=mask)
+            print vsi
 
         """
 
@@ -211,6 +220,11 @@ class VSManager(utils.IdentifierMixin, object):
 
         :returns: A dictionary of creation options.
 
+        Example::
+
+            # Prints out the create option dictionary
+            options = mgr.get_create_options()
+            print(options)
         """
         return self.guest.getCreateObjectOptions()
 
@@ -219,17 +233,10 @@ class VSManager(utils.IdentifierMixin, object):
 
         :param integer instance_id: the instance ID to cancel
 
-        ::
+        Example::
 
-           # Cancel for instance ID 12345.
-           # env variables
-           # SL_USERNAME = YOUR_USERNAME
-           # SL_API_KEY = YOUR_API_KEY
-           import SoftLayer
-           client = SoftLayer.create_client_from_env()
-
-           mgr = SoftLayer.VSManager(client)
-           mgr.cancel_instance(12345)
+            # Cancels instance 12345
+            mgr.cancel_instance(12345)
 
         """
         return self.guest.deleteObject(id=instance_id)
@@ -242,17 +249,15 @@ class VSManager(utils.IdentifierMixin, object):
                                 after reload
         :param list ssh_keys: The SSH keys to add to the root user
 
-        ::
+        .. warning::
+            Post-provision script MUST be HTTPS for it to be executed.
+            This will reformat the primary drive.
+
+        Example::
 
            # Reload instance ID 12345 then run a custom post-provision script.
-           # env variables
-           # SL_USERNAME = YOUR_USERNAME
-           # SL_API_KEY = YOUR_API_KEY
-           import SoftLayer
-           client = SoftLayer.create_client_from_env()
-
+           # Post-provision script MUST be HTTPS for it to be executed.
            post_uri = 'https://somehost.com/bootstrap.sh'
-           mgr = SoftLayer.VSManager(client)
            vsi = mgr.reload_instance(12345, post_uri=post_url)
 
         """
@@ -384,6 +389,11 @@ class VSManager(utils.IdentifierMixin, object):
                           Defaults to 1.
         :param bool pending: Wait for pending transactions not related to
                              provisioning or reloads such as monitoring.
+
+        Example::
+
+            # Will return once vsi 12345 is ready, or after 10 checks
+            ready = mgr.wait_for_ready(12345, 10)
         """
         for count, new_instance in enumerate(itertools.repeat(instance_id),
                                              start=1):
@@ -423,7 +433,30 @@ class VSManager(utils.IdentifierMixin, object):
 
         Without actually placing an order.
         See :func:`create_instance` for a list of available options.
+
+        Example::
+
+            new_vsi = {
+                'domain': u'test01.labs.sftlyr.ws',
+                'hostname': u'minion05',
+                'datacenter': u'hkg02',
+                'dedicated': False,
+                'private': False,
+                'cpus': 1,
+                'os_code' : u'UBUNTU_LATEST',
+                'hourly': True,
+                'ssh_keys': [1234],
+                'disks': ('100','25'),
+                'local_disk': True,
+                'memory': 1024
+            }
+
+            vsi = mgr.verify_create_instance(**new_vsi)
+            # vsi will be a SoftLayer_Container_Product_Order_Virtual_Guest
+            # if your order is correct. Otherwise you will get an exception
+            print vsi
         """
+        kwargs.pop('tags', None)
         create_options = self._generate_create_dict(**kwargs)
         return self.guest.generateOrderTemplate(create_options)
 
@@ -459,6 +492,30 @@ class VSManager(utils.IdentifierMixin, object):
         :param list ssh_keys: The SSH keys to add to the root user
         :param int nic_speed: The port speed to set
         :param string tags: tags to set on the VS as a comma separated list
+
+        .. warning::
+            This will add charges to your account
+
+        Example::
+            new_vsi = {
+                'domain': u'test01.labs.sftlyr.ws',
+                'hostname': u'minion05',
+                'datacenter': u'hkg02',
+                'dedicated': False,
+                'private': False,
+                'cpus': 1,
+                'os_code' : u'UBUNTU_LATEST',
+                'hourly': True,
+                'ssh_keys': [1234],
+                'disks': ('100','25'),
+                'local_disk': True,
+                'memory': 1024,
+                'tags': 'test, pleaseCancel'
+            }
+
+            vsi = mgr.create_instance(**new_vsi)
+            # vsi will have the newly created vsi details if done properly.
+            print vsi
         """
         tags = kwargs.pop('tags', None)
         inst = self.guest.createObject(self._generate_create_dict(**kwargs))
@@ -471,6 +528,39 @@ class VSManager(utils.IdentifierMixin, object):
 
         This takes a list of dictionaries using the same arguments as
         create_instance().
+
+        .. warning::
+            This will add charges to your account
+
+        Example::
+            # Define the instance we want to create.
+            new_vsi = {
+                'domain': u'test01.labs.sftlyr.ws',
+                'hostname': u'multi-test',
+                'datacenter': u'hkg02',
+                'dedicated': False,
+                'private': False,
+                'cpus': 1,
+                'os_code' : u'UBUNTU_LATEST',
+                'hourly': True,
+                'ssh_keys': [87634],
+                'disks': ('100','25'),
+                'local_disk': True,
+                'memory': 1024,
+                'tags': 'test, pleaseCancel'
+            }
+
+            # using .copy() so we can make changes to individual nodes
+            instances = [new_vsi.copy(), new_vsi.copy(), new_vsi.copy()]
+
+            # give each its own hostname, not required.
+            instances[0]['hostname'] = "multi-test01"
+            instances[1]['hostname'] = "multi-test02"
+            instances[2]['hostname'] = "multi-test03"
+
+            vsi = mgr.create_instances(config_list=instances)
+            #vsi will be a dictionary of all the new virtual servers
+            print vsi
         """
         tags = [conf.pop('tags', None) for conf in config_list]
 
@@ -491,6 +581,15 @@ class VSManager(utils.IdentifierMixin, object):
                             True (default) means the public interface.
                             False indicates the private interface.
         :param int speed: The port speed to set.
+
+        .. warning::
+            A port speed of 0 will disable the interface.
+
+        Example::
+            #change the Public interface to 10Mbps on instance 12345
+            result = mgr.change_port_speed(instance_id=12345,
+                                        public=True, speed=10)
+            # result will be True or an Exception
         """
         if public:
             func = self.guest.setPublicNetworkInterfaceSpeed
@@ -535,7 +634,12 @@ class VSManager(utils.IdentifierMixin, object):
         :param string notes: notes about this particular VS
         :param string tags: tags to set on the VS as a comma separated list.
                             Use the empty string to remove all tags.
+        :returns: bool -- True or an Exception
 
+        Example::
+            # Change the hostname on instance 12345 to 'something'
+            result = mgr.edit(instance_id=12345 , hostname="something")
+            #result will be True or an Exception
         """
 
         obj = {}
@@ -563,6 +667,11 @@ class VSManager(utils.IdentifierMixin, object):
         """Reboot a VSI into the Xen recsue kernel.
 
         :param integer instance_id: the instance ID to rescue
+        :returns: bool -- True or an Exception
+
+        Example::
+            # Puts instance 12345 into rescue mode
+            result = mgr.rescue(instance_id=12345)
         """
         return self.guest.executeRescueLayer(id=instance_id)
 
@@ -577,6 +686,12 @@ class VSManager(utils.IdentifierMixin, object):
                                         attached storage devices
         :param string notes: notes about this particular image
 
+        :returns: dictionary -- information about the capture transaction.
+
+        Example::
+            name = "Testing Images"
+            notes = "Some notes about this image"
+            result = mgr.capture(instance_id=12345, name=name, notes=notes)
         """
         vsi = self.get_instance(instance_id)
 
@@ -603,12 +718,12 @@ class VSManager(utils.IdentifierMixin, object):
         :param int memory: RAM of the VS to be upgraded to.
         :param int nic_speed: The port speed to set
 
-        ::
+        :returns: bool
+        Example::
 
            # Upgrade instance 12345 to 4 CPUs and 4 GB of memory
            import SoftLayer
            client = SoftLayer.create_client_from_env()
-
            mgr = SoftLayer.VSManager(client)
            mgr.upgrade(12345, cpus=4, memory=4)
 

@@ -28,11 +28,14 @@ class Environment(object):
         self.commands = {}
         self.aliases = {}
 
+        self.vars = {}
+
         self.client = None
         self.format = 'table'
         self.skip_confirmations = False
-        self._modules_loaded = False
         self.config_file = None
+
+        self._modules_loaded = False
 
     def out(self, output, newline=True):
         """Outputs a string to the console (stdout)."""
@@ -92,23 +95,22 @@ class Environment(object):
         if self._modules_loaded is True:
             return
 
-        self._load_modules_from_python()
-        self._load_modules_from_entry_points()
+        self.load_modules_from_python(routes.ALL_ROUTES)
+        self.aliases.update(routes.ALL_ALIASES)
+        self._load_modules_from_entry_points('softlayer.cli')
 
         self._modules_loaded = True
 
-    def _load_modules_from_python(self):
+    def load_modules_from_python(self, route_list):
         """Load modules from the native python source."""
-        for name, modpath in routes.ALL_ROUTES:
+        for name, modpath in route_list:
             if ':' in modpath:
                 path, attr = modpath.split(':', 1)
             else:
                 path, attr = modpath, None
             self.commands[name] = ModuleLoader(path, attr=attr)
 
-        self.aliases = routes.ALL_ALIASES
-
-    def _load_modules_from_entry_points(self):
+    def _load_modules_from_entry_points(self, entry_point_group):
         """Load modules from the entry_points (slower).
 
         Entry points can be used to add new commands to the CLI.
@@ -118,7 +120,7 @@ class Environment(object):
             entry_points={'softlayer.cli': ['new-cmd = mymodule.new_cmd.cli']}
 
         """
-        for obj in pkg_resources.iter_entry_points(group='softlayer.cli',
+        for obj in pkg_resources.iter_entry_points(group=entry_point_group,
                                                    name=None):
             self.commands[obj.name] = obj
 

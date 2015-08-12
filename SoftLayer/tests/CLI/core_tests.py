@@ -19,7 +19,8 @@ import mock
 class CoreTests(testing.TestCase):
 
     def test_load_all(self):
-        for path, cmd in recursive_subcommand_loader(core.cli, path='root'):
+        for path, cmd in recursive_subcommand_loader(core.cli,
+                                                     current_path='root'):
             try:
                 cmd.main(args=['--help'])
             except SystemExit as ex:
@@ -98,7 +99,7 @@ class CoreMainTests(testing.TestCase):
         self.assertIn("use 'slcli config setup'", stdoutmock.getvalue())
 
 
-def recursive_subcommand_loader(root, path=''):
+def recursive_subcommand_loader(root, current_path=''):
     """Recursively load and list every command."""
 
     if getattr(root, 'list_commands', None) is None:
@@ -107,9 +108,10 @@ def recursive_subcommand_loader(root, path=''):
     ctx = click.Context(root)
 
     for command in root.list_commands(ctx):
-        new_path = '%s:%s' % (path, command)
+        new_path = '%s:%s' % (current_path, command)
         logging.info("loading %s", new_path)
         new_root = root.get_command(ctx, command)
-        for path, cmd in recursive_subcommand_loader(new_root, path=new_path):
+        for path, cmd in recursive_subcommand_loader(new_root,
+                                                     current_path=new_path):
             yield path, cmd
-        yield path, new_root
+        yield current_path, new_root

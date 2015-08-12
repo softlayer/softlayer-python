@@ -1,6 +1,6 @@
 """
-    SoftLayer.core
-    ~~~~~~~~~~~~~~
+    SoftLayer.CLI.core
+    ~~~~~~~~~~~~~~~~~~
     Core for the SoftLayer CLI
 
     :license: MIT, see LICENSE for more details.
@@ -84,7 +84,7 @@ use: 'slcli setup'""",
               type=click.Path(resolve_path=True))
 @click.option('--debug',
               required=False,
-              default='0',
+              default=None,
               help="Sets the debug noise level",
               type=click.Choice(sorted([str(key) for key
                                         in DEBUG_LOGGING_MAP.keys()])))
@@ -99,11 +99,11 @@ use: 'slcli setup'""",
 @click.option('--proxy',
               required=False,
               help="HTTP[S] proxy to be use to make API calls")
-@click.option('--really', '-y',
+@click.option('--really / --not-really', '-y',
               is_flag=True,
               required=False,
               help="Confirm all prompt actions")
-@click.option('--fixtures',
+@click.option('--fixtures / --no-fixtures',
               envvar='SL_FIXTURES',
               is_flag=True,
               required=False,
@@ -122,9 +122,8 @@ def cli(env,
     """Main click CLI entry-point."""
 
     # Set logging level
-    debug_int = int(debug)
-    if debug_int:
-        verbose = debug_int
+    if debug is not None:
+        verbose = int(debug)
 
     if verbose:
         logger = logging.getLogger()
@@ -172,12 +171,12 @@ def output_result(env, result, timings=False, **kwargs):
         env.err(env.fmt(timing_table))
 
 
-def main():
+def main(reraise_exceptions=False, **kwargs):
     """Main program. Catches several common errors and displays them nicely."""
     exit_status = 0
 
     try:
-        cli.main()
+        cli.main(**kwargs)
     except SoftLayer.SoftLayerAPIError as ex:
         if 'invalid api token' in ex.faultString.lower():
             print("Authentication Failed: To update your credentials,"
@@ -193,6 +192,9 @@ def main():
         print(str(ex.message))
         exit_status = ex.code
     except Exception:
+        if reraise_exceptions:
+            raise
+
         import traceback
         print("An unexpected error has occured:")
         print(str(traceback.format_exc()))
