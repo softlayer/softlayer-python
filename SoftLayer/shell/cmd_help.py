@@ -6,7 +6,7 @@ from click import formatting
 
 from SoftLayer.CLI import core as cli_core
 from SoftLayer.CLI import environment
-from SoftLayer.shell import core
+from SoftLayer.shell import routes
 
 
 @click.command()
@@ -23,7 +23,7 @@ def cli(ctx, env):
     for name in cli_core.cli.list_commands(ctx):
         command = cli_core.cli.get_command(ctx, name)
         details = (name, command.short_help)
-        if name in dict(core.ALL_ROUTES):
+        if name in dict(routes.ALL_ROUTES):
             shell_commands.append(details)
         else:
             commands.append(details)
