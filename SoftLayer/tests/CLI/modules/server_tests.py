@@ -101,7 +101,6 @@ class ServerCLITests(testing.TestCase):
                 'primary_ip': '172.16.4.95',
                 'hostname': 'hardware-bad-memory',
                 'id': 1002,
-                'guid': None,
                 'backend_ip': '10.1.0.4',
                 'action': None,
             },

@@ -12,13 +12,8 @@ import click
 
 
 @click.command()
-@click.option('--sortby',
-              help='Column to sort by',
-              type=click.Choice(['id',
-                                 'hostname',
-                                 'primary_ip',
-                                 'backend_ip',
-                                 'datacenter']))
+@click.option('--sortby', help='Column to sort by',
+              default='hostname')
 @click.option('--cpu', '-c', help='Filter by number of CPU cores')
 @click.option('--domain', '-D', help='Filter by domain')
 @click.option('--datacenter', '-d', help='Filter by datacenter')
@@ -26,8 +21,8 @@ import click
 @click.option('--memory', '-m', help='Filter by memory in gigabytes')
 @click.option('--network', '-n', help='Filter by network port speed in Mbps')
 @click.option('--columns', help='Columns to display. default is '
-              ' guid, hostname, primary_ip, backend_ip, datacenter, action',
-              default="guid,hostname,primary_ip,backend_ip,datacenter,action")
+              ' id, hostname, primary_ip, backend_ip, datacenter, action',
+              default="id,hostname,primary_ip,backend_ip,datacenter,action")
 @helpers.multi_option('--tag', help='Filter by tags')
 @environment.pass_env
 def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag,
@@ -53,11 +48,13 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag,
     column_map['backend_ip'] = 'primaryBackendIpAddress'
     column_map['datacenter'] = 'datacenter-name'
     column_map['action'] = 'formatted-action'
+    column_map['powerState'] = 'powerState-name'
 
     for server in servers:
         server = utils.NestedDict(server)
         server['datacenter-name'] = server['datacenter']['name']
         server['formatted-action'] = formatting.active_txn(server)
+        server['powerState-name'] = server['powerState']['name']
         row_column = []
         for col in columns_clean:
             entry = None

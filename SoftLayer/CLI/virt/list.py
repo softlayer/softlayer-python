@@ -24,8 +24,8 @@ import click
               help='Show instances that have one of these comma-separated '
                    'tags')
 @click.option('--columns', help='Columns to display. default is '
-              ' guid, hostname, primary_ip, backend_ip, datacenter, action',
-              default="guid,hostname,primary_ip,backend_ip,datacenter,action")
+              ' id, hostname, primary_ip, backend_ip, datacenter, action',
+              default="id,hostname,primary_ip,backend_ip,datacenter,action")
 @environment.pass_env
 def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
         hourly, monthly, tags, columns):
