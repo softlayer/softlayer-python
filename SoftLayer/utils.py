@@ -1,7 +1,7 @@
 """
     SoftLayer.utils
     ~~~~~~~~~~~~~~~
-    Utility function/classes
+    Utility function/classes.
 
     :license: MIT, see LICENSE for more details.
 """
