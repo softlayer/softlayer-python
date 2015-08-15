@@ -2,16 +2,27 @@
 # :license: MIT, see LICENSE for more details.
 
 import SoftLayer
+from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-from SoftLayer import utils
+from SoftLayer.CLI import helpers
 
 import click
 
+# pylint: disable=unnecessary-lambda
+
+COLUMN_MAP = {
+    'guid': ('globalIdentifier',),
+    'primary_ip': ('primaryIpAddress',),
+    'backend_ip': ('primaryBackendIpAddress',),
+    'datacenter': ('datacenter', 'name'),
+    'action': lambda guest: formatting.active_txn(guest),
+    'power_state': ('powerState', 'name'),
+}
+
 
 @click.command()
-@click.option('--sortby', help='Column to sort by',
-              default='hostname')
+@click.option('--sortby', help='Column to sort by', default='hostname')
 @click.option('--cpu', '-c', help='Number of CPU cores', type=click.INT)
 @click.option('--domain', '-D', help='Domain portion of the FQDN')
 @click.option('--datacenter', '-d', help='Datacenter shortname')
@@ -20,23 +31,18 @@ import click
 @click.option('--network', '-n', help='Network port speed in Mbps')
 @click.option('--hourly', is_flag=True, help='Show only hourly instances')
 @click.option('--monthly', is_flag=True, help='Show only monthly instances')
-@click.option('--tags',
-              help='Show instances that have one of these comma-separated '
-                   'tags')
-@click.option('--columns', help='Columns to display. default is '
-              ' id, hostname, primary_ip, backend_ip, datacenter, action',
+@helpers.multi_option('--tag', help='Filter by tags')
+@click.option('--columns',
+              callback=column_helper.get_formatter(COLUMN_MAP),
+              help='Columns to display. default is id, hostname, primary_ip, '
+              'backend_ip, datacenter, action',
               default="id,hostname,primary_ip,backend_ip,datacenter,action")
 @environment.pass_env
 def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
-        hourly, monthly, tags, columns):
+        hourly, monthly, tag, columns):
     """List virtual servers."""
 
     vsi = SoftLayer.VSManager(env.client)
-    columns_clean = [col.strip() for col in columns.split(',')]
-    tag_list = None
-    if tags:
-        tag_list = [tag.strip() for tag in tags.split(',')]
-
     guests = vsi.list_instances(hourly=hourly,
                                 monthly=monthly,
                                 hostname=hostname,
@@ -45,33 +51,13 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
                                 memory=memory,
                                 datacenter=datacenter,
                                 nic_speed=network,
-                                tags=tag_list)
+                                tags=tag)
 
-    table = formatting.Table(columns_clean)
+    table = formatting.Table(columns.columns)
     table.sortby = sortby
-    column_map = {}
-    column_map['guid'] = 'globalIdentifier'
-    column_map['primary_ip'] = 'primaryIpAddress'
-    column_map['backend_ip'] = 'primaryBackendIpAddress'
-    column_map['datacenter'] = 'datacenter-name'
-    column_map['action'] = 'formatted-action'
-    column_map['powerState'] = 'powerState-name'
 
     for guest in guests:
-        guest = utils.NestedDict(guest)
-        guest['datacenter-name'] = guest['datacenter']['name']
-        guest['formatted-action'] = formatting.active_txn(guest)
-        guest['powerState-name'] = guest['powerState']['name']
-        row_column = []
-        for col in columns_clean:
-            entry = None
-            if col in column_map:
-                entry = guest[column_map[col]]
-            else:
-                entry = guest[col]
-
-            row_column.append(entry or formatting.blank())
-
-        table.add_row(row_column)
+        table.add_row([value or formatting.blank()
+                       for value in columns.row(guest)])
 
     env.fout(table)

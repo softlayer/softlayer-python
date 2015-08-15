@@ -14,7 +14,7 @@ import json
 class VirtTests(testing.TestCase):
 
     def test_list_vs(self):
-        result = self.run_command(['vs', 'list', '--tags=tag'])
+        result = self.run_command(['vs', 'list', '--tag=tag'])
 
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(json.loads(result.output),
