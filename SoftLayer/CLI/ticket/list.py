@@ -38,4 +38,4 @@ def cli(env, is_open):
             ticket['status']['name'],
         ])
 
-    return table
+    env.fout(table)

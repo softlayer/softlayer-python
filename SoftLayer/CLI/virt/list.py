@@ -74,4 +74,4 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
 
         table.add_row(row_column)
 
-    return table
+    env.fout(table)

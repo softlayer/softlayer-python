@@ -88,7 +88,7 @@ def cli(env):
     finally:
         config_fd.close()
 
-    return "Configuration Updated Successfully"
+    env.fout("Configuration Updated Successfully")
 
 
 def get_user_input(env):

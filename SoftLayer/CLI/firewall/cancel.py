@@ -31,4 +31,4 @@ def cli(env, identifier):
     else:
         raise exceptions.CLIAbort('Unknown firewall type: %s' % firewall_type)
 
-    return 'Firewall with id %s is being cancelled!' % identifier
+    env.fout('Firewall with id %s is being cancelled!' % identifier)

@@ -63,4 +63,4 @@ def cli(env, network, quantity, vlan_id, ipv6, test):
             table.add_row([price['item']['description'], rate])
 
     table.add_row(['Total monthly cost', "%.2f" % total])
-    return table
+    env.fout(table)

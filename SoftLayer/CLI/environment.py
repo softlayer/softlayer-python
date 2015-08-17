@@ -49,6 +49,11 @@ class Environment(object):
         """Format output based on current the environment format."""
         return formatting.format_output(output, fmt=self.format)
 
+    def fout(self, output, newline=True):
+        """Format the input and output to the console (stdout)."""
+        if output is not None:
+            self.out(self.fmt(output), newline=newline)
+
     def input(self, prompt, default=None, show_default=True):
         """Provide a command prompt."""
         return click.prompt(prompt, default=default, show_default=show_default)

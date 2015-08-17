@@ -68,4 +68,4 @@ def cli(env, identifier, no_vs, no_hardware):
         else:
             table.add_row(['hardware', 'none'])
 
-    return table
+    env.fout(table)

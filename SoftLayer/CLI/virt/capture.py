@@ -34,4 +34,4 @@ def cli(env, identifier, name, all, note):
     table.add_row(['transaction', formatting.transaction_status(capture)])
     table.add_row(['transaction_id', capture['id']])
     table.add_row(['all_disks', all])
-    return table
+    env.fout(table)

@@ -52,4 +52,4 @@ def cli(env, public):
             image.get('accountId', formatting.blank()),
         ])
 
-    return table
+    env.fout(table)

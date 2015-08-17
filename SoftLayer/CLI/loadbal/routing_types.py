@@ -21,4 +21,4 @@ def cli(env):
     table.sortby = 'ID'
     for routing_method in routing_methods:
         table.add_row([routing_method['id'], routing_method['name']])
-    return table
+    env.fout(table)

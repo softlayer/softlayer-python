@@ -43,4 +43,4 @@ def cli(env, account_id, topic_name, datacenter, network, sub_type, queue_name,
             url=http_url,
             body=http_body,
         )
-    return mq.subscription_table(subscription)
+    env.fout(mq.subscription_table(subscription))

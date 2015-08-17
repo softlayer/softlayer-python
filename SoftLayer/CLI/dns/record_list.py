@@ -46,4 +46,4 @@ def cli(env, zone, data, record, ttl, type):
             record['data']
         ])
 
-    return table
+    env.fout(table)

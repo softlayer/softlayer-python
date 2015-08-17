@@ -46,4 +46,4 @@ def cli(env, identifier, enabled, port, weight, healthcheck_type, ip_address):
                      port=port,
                      weight=weight,
                      hc_type=healthcheck_type)
-    return 'Load balancer service %s is being modified!' % identifier
+    env.fout('Load balancer service %s is being modified!' % identifier)

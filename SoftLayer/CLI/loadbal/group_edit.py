@@ -38,4 +38,4 @@ def cli(env, identifier, allocation, port, routing_type, routing_method):
                            routing_type=routing_type,
                            routing_method=routing_method)
 
-    return 'Load balancer service group %s is being updated!' % identifier
+    env.fout('Load balancer service group %s is being updated!' % identifier)

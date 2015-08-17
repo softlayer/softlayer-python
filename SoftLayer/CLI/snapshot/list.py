@@ -34,4 +34,4 @@ def cli(env, iscsi_identifier):
             snapshot['type']['name'],
             snapshot['type']['description'],
         ])
-    return table
+    env.fout(table)

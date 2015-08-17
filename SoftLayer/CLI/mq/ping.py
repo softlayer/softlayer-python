@@ -20,6 +20,6 @@ def cli(env, datacenter, network):
     manager = SoftLayer.MessagingManager(env.client)
     okay = manager.ping(datacenter=datacenter, network=network)
     if okay:
-        return 'OK'
+        env.fout('OK')
     else:
         exceptions.CLIAbort('Ping failed')

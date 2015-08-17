@@ -30,4 +30,4 @@ def cli(env):
     table.add_row(['Open', nested])
     table.add_row(['Closed', account['closedTicketCount']])
 
-    return table
+    env.fout(table)

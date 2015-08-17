@@ -154,12 +154,8 @@ def cli(env,
 
 @cli.resultcallback()
 @environment.pass_env
-def output_result(env, result, timings=False, **kwargs):
+def output_result(env, timings=False, *args, **kwargs):
     """Outputs the results returned by the CLI and also outputs timings."""
-
-    output = env.fmt(result)
-    if output:
-        env.out(output)
 
     if timings:
         timing_table = formatting.Table(['service', 'method', 'time'])

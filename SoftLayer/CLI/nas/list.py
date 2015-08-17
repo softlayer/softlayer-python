@@ -33,4 +33,4 @@ def cli(env):
             nas_account.get('serviceResourceBackendIpAddress',
                             formatting.blank())])
 
-    return table
+    env.fout(table)

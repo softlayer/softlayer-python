@@ -26,4 +26,4 @@ def cli(env, account_id, datacenter, network):
     table = formatting.Table(['name'])
     for topic in topics:
         table.add_row([topic['name']])
-    return table
+    env.fout(table)

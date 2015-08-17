@@ -13,4 +13,4 @@ def cli(env):
     """Show current configuration."""
 
     settings = config.get_settings_from_client(env.client)
-    return config.config_table(settings)
+    env.fout(config.config_table(settings))

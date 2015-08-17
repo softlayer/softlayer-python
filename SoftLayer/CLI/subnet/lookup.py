@@ -57,4 +57,4 @@ def cli(env, ip_address):
         device_table.add_row(['name', device['fullyQualifiedDomainName']])
         device_table.add_row(['type', device_type])
         table.add_row(['device', device_table])
-    return table
+    env.fout(table)

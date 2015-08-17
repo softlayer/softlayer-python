@@ -252,7 +252,7 @@ def cli(env, **args):
         export_file = args.pop('export')
         template.export_to_template(export_file, args,
                                     exclude=['wait', 'test'])
-        return 'Successfully exported options to a template file.'
+        env.fout('Successfully exported options to a template file.')
 
     if do_create:
         if not (env.skip_confirmations or formatting.confirm(
@@ -274,7 +274,7 @@ def cli(env, **args):
                 result['id'], int(args.get('wait') or 1))
             table.add_row(['ready', ready])
 
-    return output
+    env.fout(output)
 
 
 def _validate_args(env, args):

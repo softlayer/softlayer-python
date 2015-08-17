@@ -2,6 +2,7 @@
 # :license: MIT, see LICENSE for more details.
 
 import SoftLayer
+from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 
@@ -45,15 +46,16 @@ Examples :
                       "SoftLayer network. This allows for self-discovery for "
                       "newly provisioned resources.")
 @click.argument('prop', type=click.Choice(META_CHOICES))
-def cli(prop):
+@environment.pass_env
+def cli(env, prop):
     """Find details about this machine."""
 
     try:
         if prop == 'network':
-            return get_network()
+            env.fout(get_network())
 
         meta_prop = META_MAPPING.get(prop) or prop
-        return SoftLayer.MetadataManager().get(meta_prop)
+        env.fout(SoftLayer.MetadataManager().get(meta_prop))
     except SoftLayer.TransportError:
         raise exceptions.CLIAbort(
             'Cannot connect to the backend service address. Make sure '

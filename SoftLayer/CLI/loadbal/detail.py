@@ -82,4 +82,5 @@ def cli(env, identifier):
                 table.add_row([' Services', table3])
             else:
                 table.add_row([' Services', 'None'])
-    return table
+
+    env.fout(table)

@@ -54,4 +54,4 @@ def cli(env, target, firewall_type, high_availability):
     elif firewall_type == 'server':
         mgr.add_standard_firewall(target, is_virt=False)
 
-    return "Firewall is being created!"
+    env.fout("Firewall is being created!")

@@ -17,10 +17,10 @@ import click
               help='Show passwords (check over your shoulder!)')
 @click.option('--price', is_flag=True, help='Show associated prices')
 @environment.pass_env
-def cli(self, identifier, passwords=False, price=False):
+def cli(env, identifier, passwords=False, price=False):
     """Get details for a virtual server."""
 
-    vsi = SoftLayer.VSManager(self.client)
+    vsi = SoftLayer.VSManager(env.client)
     table = formatting.KeyValueTable(['Name', 'Value'])
     table.align['Name'] = 'r'
     table.align['Value'] = 'l'
@@ -107,8 +107,10 @@ def cli(self, identifier, passwords=False, price=False):
     # Test to see if this actually has a primary (public) ip address
     try:
         if not result['privateNetworkOnlyFlag']:
-            ptr_domains = (self.client['Virtual_Guest']
-                           .getReverseDomainRecords(id=vs_id))
+            ptr_domains = env.client.call(
+                'Virtual_Guest', 'getReverseDomainRecords',
+                id=vs_id,
+            )
 
             for ptr_domain in ptr_domains:
                 for ptr in ptr_domain['resourceRecords']:
@@ -116,4 +118,4 @@ def cli(self, identifier, passwords=False, price=False):
     except SoftLayer.SoftLayerAPIError:
         pass
 
-    return table
+    env.fout(table)

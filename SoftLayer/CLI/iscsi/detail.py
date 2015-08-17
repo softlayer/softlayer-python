@@ -51,4 +51,4 @@ def cli(env, identifier, password):
         pass_table.add_row([result['username'], result['password']])
         table.add_row(['users', pass_table])
 
-    return table
+    env.fout(table)

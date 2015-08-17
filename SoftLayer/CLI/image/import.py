@@ -51,4 +51,4 @@ def cli(env, name, note, osrefcode, uri):
     table.add_row(['created', result['createDate']])
     table.add_row(['guid', result['globalIdentifier']])
     output.append(table)
-    return output
+    env.fout(output)

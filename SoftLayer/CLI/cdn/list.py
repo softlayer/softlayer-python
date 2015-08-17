@@ -40,4 +40,4 @@ def cli(env, sortby):
         ])
 
     table.sortby = sortby
-    return table
+    env.fout(table)
