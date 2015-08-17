@@ -19,9 +19,6 @@ import click
 # pylint: disable=too-many-public-methods, broad-except, unused-argument
 # pylint: disable=redefined-builtin, super-init-not-called
 
-# Disable the cyclic import error. This is handled by an inline import.
-# pylint: disable=cyclic-import
-
 DEBUG_LOGGING_MAP = {
     0: logging.CRITICAL,
     1: logging.WARNING,
