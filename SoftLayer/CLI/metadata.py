@@ -53,6 +53,7 @@ def cli(env, prop):
     try:
         if prop == 'network':
             env.fout(get_network())
+            return
 
         meta_prop = META_MAPPING.get(prop) or prop
         env.fout(SoftLayer.MetadataManager().get(meta_prop))

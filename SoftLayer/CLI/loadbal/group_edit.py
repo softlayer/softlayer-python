@@ -3,6 +3,7 @@
 
 import SoftLayer
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import loadbal
 
 import click
@@ -29,7 +30,8 @@ def cli(env, identifier, allocation, port, routing_type, routing_method):
 
     # check if any input is provided
     if not any([allocation, port, routing_type, routing_method]):
-        return 'At least one property is required to be changed!'
+        raise exceptions.CLIAbort(
+            'At least one property is required to be changed!')
 
     mgr.edit_service_group(loadbal_id,
                            group_id,

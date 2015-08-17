@@ -125,6 +125,7 @@ def cli(env, **args):
         template.export_to_template(export_file, args,
                                     exclude=['wait', 'test'])
         env.fout('Successfully exported options to a template file.')
+        return
 
     if do_create:
         if not (env.skip_confirmations or formatting.confirm(

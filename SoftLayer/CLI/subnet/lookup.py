@@ -3,6 +3,7 @@
 
 import SoftLayer
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 
 
@@ -20,7 +21,7 @@ def cli(env, ip_address):
     addr_info = mgr.ip_lookup(ip_address)
 
     if not addr_info:
-        return 'Not found'
+        raise exceptions.CLIAbort('Not found')
 
     table = formatting.KeyValueTable(['Name', 'Value'])
     table.align['Name'] = 'r'

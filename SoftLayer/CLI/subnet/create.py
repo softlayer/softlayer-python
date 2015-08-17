@@ -49,7 +49,9 @@ def cli(env, network, quantity, vlan_id, ipv6, test):
                             version=version,
                             test_order=test)
     if not result:
-        return 'Unable to place order: No valid price IDs found.'
+        raise exceptions.CLIAbort(
+            'Unable to place order: No valid price IDs found.')
+
     table = formatting.Table(['Item', 'cost'])
     table.align['Item'] = 'r'
     table.align['cost'] = 'r'
