@@ -147,10 +147,10 @@ def cli(env,
                 proxy=proxy,
                 config_file=config,
             )
-
-        env.vars['timings'] = SoftLayer.TimingTransport(client.transport)
-        client.transport = env.vars['timings']
         env.client = client
+
+    env.vars['timings'] = SoftLayer.TimingTransport(env.client.transport)
+    env.client.transport = env.vars['timings']
 
 
 @cli.resultcallback()
