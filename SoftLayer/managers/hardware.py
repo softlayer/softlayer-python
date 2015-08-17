@@ -291,8 +291,6 @@ class HardwareManager(utils.IdentifierMixin, object):
         :param string os: operating system name
         :param int port_speed: Port speed in Mbps
         :param list ssh_keys: list of ssh key ids
-        :param int public_vlan: public vlan id
-        :param int private_vlan: private vlan id
         :param string post_uri: The URI of the post-install script to run
                                 after reload
         :param boolean hourly: True if using hourly pricing (default).
@@ -420,8 +418,6 @@ regions[location[location[priceGroups]]]
                               os=None,
                               port_speed=None,
                               ssh_keys=None,
-                              public_vlan=None,
-                              private_vlan=None,
                               post_uri=None,
                               hourly=True,
                               no_public=False,
@@ -462,13 +458,6 @@ regions[location[location[priceGroups]]]
             'hostname': hostname,
             'domain': domain,
         }
-
-        if public_vlan:
-            hardware['primaryNetworkComponent'] = {
-                "networkVlan": {"id": int(public_vlan)}}
-        if private_vlan:
-            hardware['primaryBackendNetworkComponent'] = {
-                "networkVlan": {"id": int(private_vlan)}}
 
         order = {
             'hardware': [hardware],

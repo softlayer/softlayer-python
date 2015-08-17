@@ -42,7 +42,7 @@ import click
 @click.option('--postinstall', '-i', help="Post-install script to download")
 @helpers.multi_option('--key', '-k',
                       help="SSH keys to add to the root user")
-@click.option('--no_public',
+@click.option('--no-public',
               is_flag=True,
               help="Private network only")
 @helpers.multi_option('--extra', '-e', help="Extra options")
@@ -77,8 +77,6 @@ def cli(env, **args):
         'hostname': args['hostname'],
         'domain': args['domain'],
         'size': args['size'],
-        'public_vlan': args.get('vlan_public'),
-        'private_vlan': args.get('vlan_private'),
         'location': args.get('datacenter'),
         'ssh_keys': ssh_keys,
         'post_uri': args.get('postinstall'),
