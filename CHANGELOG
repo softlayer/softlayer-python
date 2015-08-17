@@ -1,3 +1,25 @@
+4.1.0
+
+    * Adds a shell which provides a shell interface for `slcli`. This is available by using `slcli shell`
+
+    * `slcli vs create` and `slcli server create` will now prompt for missing required options
+
+    * Fixes `slcli firewall add` command
+
+    * Handles case where `slcli vs detail` and `slcli server detail` was causing an error when trying to display the creator
+
+    * Fixes VSManager.verify_create_instance() with tags (and, in turn, `slcli vs create --test` with tags)
+
+    * Fixes `vs resume` command
+
+    * Updates hardware ordering to deal with location-specific prices
+
+    * Fixes several description errors in the CLI
+
+    * Running `vs edit` without a tag option will no longer remove all tags
+
+    * Adds editing of hardware tags
+
 4.0.4
 
     * Fixes bug with pulling the userData property for the virtual server detail
