@@ -42,14 +42,9 @@ import click
 @click.option('--postinstall', '-i', help="Post-install script to download")
 @helpers.multi_option('--key', '-k',
                       help="SSH keys to add to the root user")
-@click.option('--vlan-public',
-              help="The ID of the public VLAN on which you want the virtual "
-              "server placed",
-              type=click.INT)
-@click.option('--vlan-private',
-              help="The ID of the private VLAN on which you want the virtual "
-                   "server placed",
-              type=click.INT)
+@click.option('--no-public',
+              is_flag=True,
+              help="Private network only")
 @helpers.multi_option('--extra', '-e', help="Extra options")
 @click.option('--test',
               is_flag=True,
@@ -82,8 +77,6 @@ def cli(env, **args):
         'hostname': args['hostname'],
         'domain': args['domain'],
         'size': args['size'],
-        'public_vlan': args.get('vlan_public'),
-        'private_vlan': args.get('vlan_private'),
         'location': args.get('datacenter'),
         'ssh_keys': ssh_keys,
         'post_uri': args.get('postinstall'),
