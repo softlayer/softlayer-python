@@ -1,3 +1,13 @@
+4.1.1
+
+    * Fixes to work with Click v5
+
+    * Re-adds `--no-public` option to only provision private interfaces with servers via `slcli server create`
+
+    * Removes non-functional `--vlan-public` and `--vlan-private` from `slcli server create`
+
+    * VSManager.wait_for_ready will now behave as it is documented to behave.
+
 4.1.0
 
     * Adds a shell which provides a shell interface for `slcli`. This is available by using `slcli shell`
