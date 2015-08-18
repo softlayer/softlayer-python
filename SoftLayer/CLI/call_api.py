@@ -7,8 +7,11 @@ import json
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 
+# pylint: disable=unused-argument
+
 
 def validate_filter(ctx, param, value):
+    """Try to parse the given filter as a JSON string."""
     try:
         if value:
             return json.loads(value)
@@ -21,7 +24,9 @@ def validate_filter(ctx, param, value):
 @click.argument('method')
 @click.argument('parameters', nargs=-1)
 @click.option('--id', '_id', help="Init parameter")
-@click.option('--filter', '_filter', callback=validate_filter, help="Object filter in a JSON string")
+@click.option('--filter', '_filter',
+              callback=validate_filter,
+              help="Object filter in a JSON string")
 @click.option('--mask', help="String-based object mask")
 @click.option('--limit', type=click.INT, help="Result limit")
 @click.option('--offset', type=click.INT, help="Result offset")
