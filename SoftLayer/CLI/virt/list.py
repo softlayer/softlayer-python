@@ -11,14 +11,18 @@ import click
 
 # pylint: disable=unnecessary-lambda
 
-COLUMN_MAP = {
-    'guid': ('globalIdentifier',),
-    'primary_ip': ('primaryIpAddress',),
-    'backend_ip': ('primaryBackendIpAddress',),
-    'datacenter': ('datacenter', 'name'),
-    'action': lambda guest: formatting.active_txn(guest),
-    'power_state': ('powerState', 'name'),
-}
+COLUMNS = [
+    column_helper.Column('guid', ('globalIdentifier',)),
+    column_helper.Column('primary_ip', ('primaryIpAddress',)),
+    column_helper.Column('backend_ip', ('primaryBackendIpAddress',)),
+    column_helper.Column('datacenter', ('datacenter', 'name')),
+    column_helper.Column('action', lambda guest: formatting.active_txn(guest),
+                         mask='''
+                         activeTransaction[
+                            id,transactionStatus[name,friendlyName]
+                         ]'''),
+    column_helper.Column('power_state', ('powerState', 'name')),
+]
 
 
 @click.command()
@@ -33,7 +37,7 @@ COLUMN_MAP = {
 @click.option('--monthly', is_flag=True, help='Show only monthly instances')
 @helpers.multi_option('--tag', help='Filter by tags')
 @click.option('--columns',
-              callback=column_helper.get_formatter(COLUMN_MAP),
+              callback=column_helper.get_formatter(COLUMNS),
               help='Columns to display. default is id, hostname, primary_ip, '
               'backend_ip, datacenter, action',
               default="id,hostname,primary_ip,backend_ip,datacenter,action")
@@ -51,7 +55,8 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
                                 memory=memory,
                                 datacenter=datacenter,
                                 nic_speed=network,
-                                tags=tag)
+                                tags=tag,
+                                mask=columns.mask())
 
     table = formatting.Table(columns.columns)
     table.sortby = sortby
