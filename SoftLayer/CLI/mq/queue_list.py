@@ -31,4 +31,4 @@ def cli(env, account_id, datacenter, network):
         table.add_row([queue['name'],
                        queue['message_count'],
                        queue['visible_message_count']])
-    return table
+    env.fout(table)

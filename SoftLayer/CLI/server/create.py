@@ -42,14 +42,9 @@ import click
 @click.option('--postinstall', '-i', help="Post-install script to download")
 @helpers.multi_option('--key', '-k',
                       help="SSH keys to add to the root user")
-@click.option('--vlan-public',
-              help="The ID of the public VLAN on which you want the virtual "
-              "server placed",
-              type=click.INT)
-@click.option('--vlan-private',
-              help="The ID of the private VLAN on which you want the virtual "
-                   "server placed",
-              type=click.INT)
+@click.option('--no-public',
+              is_flag=True,
+              help="Private network only")
 @helpers.multi_option('--extra', '-e', help="Extra options")
 @click.option('--test',
               is_flag=True,
@@ -82,8 +77,6 @@ def cli(env, **args):
         'hostname': args['hostname'],
         'domain': args['domain'],
         'size': args['size'],
-        'public_vlan': args.get('vlan_public'),
-        'private_vlan': args.get('vlan_private'),
         'location': args.get('datacenter'),
         'ssh_keys': ssh_keys,
         'post_uri': args.get('postinstall'),
@@ -124,7 +117,8 @@ def cli(env, **args):
         export_file = args.pop('export')
         template.export_to_template(export_file, args,
                                     exclude=['wait', 'test'])
-        return 'Successfully exported options to a template file.'
+        env.fout('Successfully exported options to a template file.')
+        return
 
     if do_create:
         if not (env.skip_confirmations or formatting.confirm(
@@ -141,4 +135,4 @@ def cli(env, **args):
         table.add_row(['created', result['orderDate']])
         output = table
 
-    return output
+    env.fout(output)

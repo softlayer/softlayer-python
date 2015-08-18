@@ -32,4 +32,4 @@ def cli(env):
             '%.2f' % float(package['prices'][0]['recurringFee'])
         ])
 
-    return table
+    env.fout(table)

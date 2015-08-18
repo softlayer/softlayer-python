@@ -25,4 +25,4 @@ def cli(env, identifier):
         raise exceptions.CLIAbort('Aborted.')
 
     mgr.delete_service(service_id)
-    return 'Load balancer service %s is being cancelled!' % service_id
+    env.fout('Load balancer service %s is being cancelled!' % service_id)

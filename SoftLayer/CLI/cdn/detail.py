@@ -29,4 +29,4 @@ def cli(env, account_id):
     table.add_row(['notes',
                    account.get('cdnAccountNote', formatting.blank())])
 
-    return table
+    env.fout(table)

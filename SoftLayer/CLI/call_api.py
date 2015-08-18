@@ -31,4 +31,4 @@ def cli(env, service, method, parameters, _id, mask, limit, offset):
                              mask=mask,
                              limit=limit,
                              offset=offset)
-    return formatting.iter_to_table(result)
+    env.fout(formatting.iter_to_table(result))

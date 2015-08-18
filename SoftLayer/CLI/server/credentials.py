@@ -23,4 +23,4 @@ def cli(env, identifier):
     table = formatting.Table(['username', 'password'])
     for item in instance['operatingSystem']['passwords']:
         table.add_row([item['username'], item['password']])
-    return table
+    env.fout(table)

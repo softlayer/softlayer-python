@@ -252,7 +252,7 @@ def cli(env, **args):
         export_file = args.pop('export')
         template.export_to_template(export_file, args,
                                     exclude=['wait', 'test'])
-        return 'Successfully exported options to a template file.'
+        env.fout('Successfully exported options to a template file.')
 
     if do_create:
         if not (env.skip_confirmations or formatting.confirm(
@@ -270,11 +270,13 @@ def cli(env, **args):
         output.append(table)
 
         if args.get('wait'):
-            ready = vsi.wait_for_ready(
-                result['id'], int(args.get('wait') or 1))
+            ready = vsi.wait_for_ready(result['id'], args.get('wait') or 1)
             table.add_row(['ready', ready])
+            if ready is False:
+                env.out(env.fmt(output))
+                raise exceptions.CLIHalt(code=1)
 
-    return output
+    env.fout(output)
 
 
 def _validate_args(env, args):

@@ -27,4 +27,4 @@ def cli(env):
             zone['updateDate'],
         ])
 
-    return table
+    env.fout(table)

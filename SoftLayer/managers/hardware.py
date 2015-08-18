@@ -21,11 +21,6 @@ EXTRA_CATEGORIES = ['pri_ipv6_addresses',
 class HardwareManager(utils.IdentifierMixin, object):
     """Manage hardware devices.
 
-    :param SoftLayer.API.Client client: an API client instance
-    :param SoftLayer.managers.OrderingManager ordering_manager: an optional
-                                              manager to handle ordering.
-                                              If none is provided, one will be
-                                              auto initialized.
     Example::
 
        # Initialize the Manager.
@@ -36,6 +31,12 @@ class HardwareManager(utils.IdentifierMixin, object):
        import SoftLayer
        client = SoftLayer.Client()
        mgr = SoftLayer.HardwareManager(client)
+
+    :param SoftLayer.API.Client client: an API client instance
+    :param SoftLayer.managers.OrderingManager ordering_manager: an optional
+                                              manager to handle ordering.
+                                              If none is provided, one will be
+                                              auto initialized.
     """
     def __init__(self, client, ordering_manager=None):
         self.client = client
@@ -51,15 +52,16 @@ class HardwareManager(utils.IdentifierMixin, object):
                         immediate=False):
         """Cancels the specified dedicated server.
 
+        Example::
+
+            # Cancels hardware id 1234
+            result = mgr.cancel_hardware(hardware_id=1234)
+
         :param int hardware_id: The ID of the hardware to be cancelled.
         :param string reason: The reason code for the cancellation. This should
                               come from :func:`get_cancellation_reasons`.
         :param string comment: An optional comment to include with the
                                cancellation.
-        Example::
-
-            # Cancels hardware id 1234
-            result = mgr.cancel_hardware(hardware_id=1234)
         """
 
         # Get cancel reason
@@ -289,8 +291,6 @@ class HardwareManager(utils.IdentifierMixin, object):
         :param string os: operating system name
         :param int port_speed: Port speed in Mbps
         :param list ssh_keys: list of ssh key ids
-        :param int public_vlan: public vlan id
-        :param int private_vlan: private vlan id
         :param string post_uri: The URI of the post-install script to run
                                 after reload
         :param boolean hourly: True if using hourly pricing (default).
@@ -418,8 +418,6 @@ regions[location[location[priceGroups]]]
                               os=None,
                               port_speed=None,
                               ssh_keys=None,
-                              public_vlan=None,
-                              private_vlan=None,
                               post_uri=None,
                               hourly=True,
                               no_public=False,
@@ -460,13 +458,6 @@ regions[location[location[priceGroups]]]
             'hostname': hostname,
             'domain': domain,
         }
-
-        if public_vlan:
-            hardware['primaryNetworkComponent'] = {
-                "networkVlan": {"id": int(public_vlan)}}
-        if private_vlan:
-            hardware['primaryBackendNetworkComponent'] = {
-                "networkVlan": {"id": int(private_vlan)}}
 
         order = {
             'hardware': [hardware],

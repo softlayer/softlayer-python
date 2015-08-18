@@ -19,4 +19,4 @@ def cli(env, identifier, count):
     mgr = SoftLayer.TicketManager(env.client)
 
     ticket_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'ticket')
-    return ticket.get_ticket_results(mgr, ticket_id, update_count=count)
+    env.fout(ticket.get_ticket_results(mgr, ticket_id, update_count=count))

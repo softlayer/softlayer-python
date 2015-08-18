@@ -23,4 +23,4 @@ def cli(env, identifier, body):
         body = click.edit('\n\n' + ticket.TEMPLATE_MSG)
 
     mgr.update_ticket(ticket_id=ticket_id, body=body)
-    return "Ticket Updated!"
+    env.fout("Ticket Updated!")

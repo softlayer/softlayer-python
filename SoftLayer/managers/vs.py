@@ -53,6 +53,18 @@ class VSManager(utils.IdentifierMixin, object):
                        public_ip=None, private_ip=None, **kwargs):
         """Retrieve a list of all virtual servers on the account.
 
+        Example::
+
+            # Print out a list of hourly instances in the DAL05 data center.
+
+            for vsi in mgr.list_instances(hourly=True, datacenter='dal05'):
+               print vsi['fullyQualifiedDomainName'], vsi['primaryIpAddress']
+
+            # Using a custom object-mask. Will get ONLY what is specified
+            object_mask = "mask[hostname,monitoringRobot[robotStatus]]"
+            for vsi in mgr.list_instances(mask=object_mask,hourly=True):
+                print vsi
+
         :param boolean hourly: include hourly instances
         :param boolean monthly: include monthly instances
         :param list tags: filter based on list of tags
@@ -68,19 +80,6 @@ class VSManager(utils.IdentifierMixin, object):
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         :returns: Returns a list of dictionaries representing the matching
                   virtual servers
-
-        Example::
-
-            # Print out a list of hourly instances in the DAL05 data center.
-
-            for vsi in mgr.list_instances(hourly=True, datacenter='dal05'):
-               print vsi['fullyQualifiedDomainName'], vsi['primaryIpAddress']
-
-            # Using a custom object-mask. Will get ONLY what is specified
-            object_mask = "mask[hostname,monitoringRobot[robotStatus]]"
-            for vsi in mgr.list_instances(mask=object_mask,hourly=True):
-                print vsi
-
         """
         if 'mask' not in kwargs:
             items = [
@@ -395,9 +394,12 @@ class VSManager(utils.IdentifierMixin, object):
             # Will return once vsi 12345 is ready, or after 10 checks
             ready = mgr.wait_for_ready(12345, 10)
         """
-        for count, new_instance in enumerate(itertools.repeat(instance_id),
-                                             start=1):
-            instance = self.get_instance(new_instance)
+        until = time.time() + limit
+        for new_instance in itertools.repeat(instance_id):
+            mask = """id,
+                      lastOperatingSystemReload.id,
+                      activeTransaction.id,provisionDate"""
+            instance = self.get_instance(new_instance, mask=mask)
             last_reload = utils.lookup(instance,
                                        'lastOperatingSystemReload',
                                        'id')
@@ -408,7 +410,7 @@ class VSManager(utils.IdentifierMixin, object):
             reloading = all((
                 active_transaction,
                 last_reload,
-                last_reload == active_transaction
+                last_reload == active_transaction,
             ))
 
             # only check for outstanding transactions if requested
@@ -423,10 +425,11 @@ class VSManager(utils.IdentifierMixin, object):
                     not outstanding]):
                 return True
 
-            if count >= limit:
+            now = time.time()
+            if now >= until:
                 return False
 
-            time.sleep(delay)
+            time.sleep(min(delay, until - now))
 
     def verify_create_instance(self, **kwargs):
         """Verifies an instance creation command.
@@ -463,6 +466,32 @@ class VSManager(utils.IdentifierMixin, object):
     def create_instance(self, **kwargs):
         """Creates a new virtual server instance.
 
+        .. warning::
+
+            This will add charges to your account
+
+        Example::
+
+            new_vsi = {
+                'domain': u'test01.labs.sftlyr.ws',
+                'hostname': u'minion05',
+                'datacenter': u'hkg02',
+                'dedicated': False,
+                'private': False,
+                'cpus': 1,
+                'os_code' : u'UBUNTU_LATEST',
+                'hourly': True,
+                'ssh_keys': [1234],
+                'disks': ('100','25'),
+                'local_disk': True,
+                'memory': 1024,
+                'tags': 'test, pleaseCancel'
+            }
+
+            vsi = mgr.create_instance(**new_vsi)
+            # vsi will have the newly created vsi details if done properly.
+            print vsi
+
         :param int cpus: The number of virtual CPUs to include in the instance.
         :param int memory: The amount of RAM to order.
         :param bool hourly: Flag to indicate if this server should be billed
@@ -492,30 +521,6 @@ class VSManager(utils.IdentifierMixin, object):
         :param list ssh_keys: The SSH keys to add to the root user
         :param int nic_speed: The port speed to set
         :param string tags: tags to set on the VS as a comma separated list
-
-        .. warning::
-            This will add charges to your account
-
-        Example::
-            new_vsi = {
-                'domain': u'test01.labs.sftlyr.ws',
-                'hostname': u'minion05',
-                'datacenter': u'hkg02',
-                'dedicated': False,
-                'private': False,
-                'cpus': 1,
-                'os_code' : u'UBUNTU_LATEST',
-                'hourly': True,
-                'ssh_keys': [1234],
-                'disks': ('100','25'),
-                'local_disk': True,
-                'memory': 1024,
-                'tags': 'test, pleaseCancel'
-            }
-
-            vsi = mgr.create_instance(**new_vsi)
-            # vsi will have the newly created vsi details if done properly.
-            print vsi
         """
         tags = kwargs.pop('tags', None)
         inst = self.guest.createObject(self._generate_create_dict(**kwargs))
@@ -530,9 +535,11 @@ class VSManager(utils.IdentifierMixin, object):
         create_instance().
 
         .. warning::
+
             This will add charges to your account
 
         Example::
+
             # Define the instance we want to create.
             new_vsi = {
                 'domain': u'test01.labs.sftlyr.ws',
@@ -576,6 +583,13 @@ class VSManager(utils.IdentifierMixin, object):
     def change_port_speed(self, instance_id, public, speed):
         """Allows you to change the port speed of a virtual server's NICs.
 
+        Example::
+
+            #change the Public interface to 10Mbps on instance 12345
+            result = mgr.change_port_speed(instance_id=12345,
+                                        public=True, speed=10)
+            # result will be True or an Exception
+
         :param int instance_id: The ID of the VS
         :param bool public: Flag to indicate which interface to change.
                             True (default) means the public interface.
@@ -584,12 +598,6 @@ class VSManager(utils.IdentifierMixin, object):
 
         .. warning::
             A port speed of 0 will disable the interface.
-
-        Example::
-            #change the Public interface to 10Mbps on instance 12345
-            result = mgr.change_port_speed(instance_id=12345,
-                                        public=True, speed=10)
-            # result will be True or an Exception
         """
         if public:
             func = self.guest.setPublicNetworkInterfaceSpeed
@@ -711,14 +719,6 @@ class VSManager(utils.IdentifierMixin, object):
                 nic_speed=None, public=True):
         """Upgrades a VS instance.
 
-        :param int instance_id: Instance id of the VS to be upgraded
-        :param int cpus: The number of virtual CPUs to upgrade to
-                            of a VS instance.
-        :param bool public: CPU will be in Private/Public Node.
-        :param int memory: RAM of the VS to be upgraded to.
-        :param int nic_speed: The port speed to set
-
-        :returns: bool
         Example::
 
            # Upgrade instance 12345 to 4 CPUs and 4 GB of memory
@@ -727,6 +727,14 @@ class VSManager(utils.IdentifierMixin, object):
            mgr = SoftLayer.VSManager(client)
            mgr.upgrade(12345, cpus=4, memory=4)
 
+        :param int instance_id: Instance id of the VS to be upgraded
+        :param int cpus: The number of virtual CPUs to upgrade to
+                            of a VS instance.
+        :param bool public: CPU will be in Private/Public Node.
+        :param int memory: RAM of the VS to be upgraded to.
+        :param int nic_speed: The port speed to set
+
+        :returns: bool
         """
         package_items = self._get_package_items()
         prices = []

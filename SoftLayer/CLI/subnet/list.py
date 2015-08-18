@@ -64,4 +64,4 @@ def cli(env, sortby, datacenter, identifier, subnet_type, ipv4, ipv6):
             len(subnet['virtualGuests']),
         ])
 
-    return table
+    env.fout(table)

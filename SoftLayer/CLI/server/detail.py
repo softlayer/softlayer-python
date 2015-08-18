@@ -119,4 +119,4 @@ def cli(env, identifier, passwords, price):
     except SoftLayer.SoftLayerAPIError:
         pass
 
-    return table
+    env.fout(table)

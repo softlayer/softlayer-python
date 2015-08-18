@@ -23,7 +23,7 @@ def cli(env, identifier):
     else:
         rules = mgr.get_standard_fwl_rules(firewall_id)
 
-    return get_rules_table(rules)
+    env.fout(get_rules_table(rules))
 
 
 def get_rules_table(rules):

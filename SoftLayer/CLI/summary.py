@@ -42,4 +42,4 @@ def cli(env, sortby):
             datacenter['virtualGuestCount'],
         ])
 
-    return table
+    env.fout(table)

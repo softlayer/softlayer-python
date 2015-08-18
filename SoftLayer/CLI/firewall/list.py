@@ -70,7 +70,7 @@ def cli(env):
                              'hardwareId')
             ])
 
-    return table
+    env.fout(table)
 
 
 def has_firewall_component(server):

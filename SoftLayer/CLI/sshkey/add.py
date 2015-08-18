@@ -29,4 +29,4 @@ def cli(env, label, in_file, key, note):
     mgr = SoftLayer.SshKeyManager(env.client)
     result = mgr.add_key(key_text, label, note)
 
-    return "SSH key added: %s" % result.get('fingerprint')
+    env.fout("SSH key added: %s" % result.get('fingerprint'))

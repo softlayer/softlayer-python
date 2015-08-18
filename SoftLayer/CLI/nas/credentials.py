@@ -18,4 +18,4 @@ def cli(env, identifier):
     table = formatting.Table(['username', 'password'])
     table.add_row([result['username'],
                    result['password']])
-    return table
+    env.fout(table)

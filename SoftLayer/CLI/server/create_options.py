@@ -52,4 +52,4 @@ def cli(env):
         extras_table.add_row([extra['name'], extra['key']])
     tables.append(extras_table)
 
-    return formatting.listing(tables, separator='\n')
+    env.fout(formatting.listing(tables, separator='\n'))

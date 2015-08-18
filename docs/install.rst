@@ -3,6 +3,13 @@
 Installation
 ============
 
+What's Included
+---------------
+When you install softlayer-python you you will get the following:
+
+* a python package called 'SoftLayer' (casing is important) available in your python path.
+* a command-line client placed in your system path named 'slcli'.
+
 Using Pip
 ---------
 

@@ -22,4 +22,4 @@ def cli(env, billing_id, datacenter):
                               "account. Continue?"):
         raise exceptions.CLIAbort('Aborted.')
     mgr.add_local_lb(billing_id, datacenter=datacenter)
-    return "Load balancer is being created!"
+    env.fout("Load balancer is being created!")

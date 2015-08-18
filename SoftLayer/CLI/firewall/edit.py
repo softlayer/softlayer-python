@@ -175,6 +175,6 @@ def cli(env, identifier):
                         raise exceptions.CLIAbort('Aborted.')
                 else:
                     raise exceptions.CLIAbort('Aborted.')
-                return 'Firewall updated!'
+                env.fout('Firewall updated!')
     else:
         raise exceptions.CLIAbort('Aborted.')

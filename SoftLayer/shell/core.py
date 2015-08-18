@@ -6,7 +6,6 @@
     :license: MIT, see LICENSE for more details.
 """
 from __future__ import print_function
-from __future__ import unicode_literals
 import copy
 import os
 import shlex
@@ -53,9 +52,11 @@ def cli(ctx, env):
 
     while True:
         try:
-            line = p_shortcuts.get_input("(%s)> " % env.vars['last_exit_code'],
-                                         completer=complete,
-                                         history=history)
+            line = p_shortcuts.get_input(
+                u"(%s)> " % env.vars['last_exit_code'],
+                completer=complete,
+                history=history,
+            )
             try:
                 args = shlex.split(line)
             except ValueError as ex:

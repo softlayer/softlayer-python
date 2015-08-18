@@ -47,4 +47,4 @@ def cli(env, ip_version):
                        ip_address['ipAddress']['ipAddress'],
                        assigned,
                        target])
-    return table
+    env.fout(table)

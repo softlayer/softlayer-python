@@ -19,4 +19,4 @@ def cli(env):
     for subject in ticket_mgr.list_subjects():
         table.add_row([subject['id'], subject['name']])
 
-    return table
+    env.fout(table)

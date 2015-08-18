@@ -26,4 +26,4 @@ def cli(env, identifier):
         raise exceptions.CLIAbort('Aborted.')
 
     mgr.cancel_lb(loadbal_id)
-    return 'Load Balancer with id %s is being cancelled!' % identifier
+    env.fout('Load Balancer with id %s is being cancelled!' % identifier)

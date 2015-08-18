@@ -49,7 +49,9 @@ def cli(env, network, quantity, vlan_id, ipv6, test):
                             version=version,
                             test_order=test)
     if not result:
-        return 'Unable to place order: No valid price IDs found.'
+        raise exceptions.CLIAbort(
+            'Unable to place order: No valid price IDs found.')
+
     table = formatting.Table(['Item', 'cost'])
     table.align['Item'] = 'r'
     table.align['cost'] = 'r'
@@ -63,4 +65,4 @@ def cli(env, network, quantity, vlan_id, ipv6, test):
             table.add_row([price['item']['description'], rate])
 
     table.add_row(['Total monthly cost', "%.2f" % total])
-    return table
+    env.fout(table)

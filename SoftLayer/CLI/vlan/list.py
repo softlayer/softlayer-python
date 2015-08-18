@@ -53,4 +53,4 @@ def cli(env, sortby, datacenter, number, name):
             'Yes' if vlan['firewallInterfaces'] else 'No',
         ])
 
-    return table
+    env.fout(table)

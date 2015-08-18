@@ -38,4 +38,4 @@ def cli(env, account_id, queue_name, count, delete_after, datacenter, network):
     if delete_after:
         for message in messages['items']:
             mq_client.delete_message(queue_name, message['id'])
-    return formatted_messages
+    env.fout(formatted_messages)

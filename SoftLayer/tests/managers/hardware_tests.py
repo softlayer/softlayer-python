@@ -189,8 +189,6 @@ class HardwareTests(testing.TestCase):
             'os': 'UBUNTU_14_64',
             'port_speed': 10,
             'hourly': True,
-            'public_vlan': 10234,
-            'private_vlan': 20468,
             'extras': ['1_IPV6_ADDRESS'],
             'post_uri': 'http://example.com/script.php',
             'ssh_keys': [10],
@@ -200,10 +198,7 @@ class HardwareTests(testing.TestCase):
             'hardware': [{
                 'domain': 'giggles.woo',
                 'hostname': 'unicorn',
-                'primaryBackendNetworkComponent': {
-                    'networkVlan': {'id': 20468}
-                },
-                'primaryNetworkComponent': {'networkVlan': {'id': 10234}}}],
+            }],
             'location': 'WASHINGTON_DC',
             'packageId': 200,
             'presetId': 64,
