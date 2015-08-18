@@ -21,11 +21,6 @@ EXTRA_CATEGORIES = ['pri_ipv6_addresses',
 class HardwareManager(utils.IdentifierMixin, object):
     """Manage hardware devices.
 
-    :param SoftLayer.API.Client client: an API client instance
-    :param SoftLayer.managers.OrderingManager ordering_manager: an optional
-                                              manager to handle ordering.
-                                              If none is provided, one will be
-                                              auto initialized.
     Example::
 
        # Initialize the Manager.
@@ -36,6 +31,12 @@ class HardwareManager(utils.IdentifierMixin, object):
        import SoftLayer
        client = SoftLayer.Client()
        mgr = SoftLayer.HardwareManager(client)
+
+    :param SoftLayer.API.Client client: an API client instance
+    :param SoftLayer.managers.OrderingManager ordering_manager: an optional
+                                              manager to handle ordering.
+                                              If none is provided, one will be
+                                              auto initialized.
     """
     def __init__(self, client, ordering_manager=None):
         self.client = client
@@ -51,15 +52,16 @@ class HardwareManager(utils.IdentifierMixin, object):
                         immediate=False):
         """Cancels the specified dedicated server.
 
+        Example::
+
+            # Cancels hardware id 1234
+            result = mgr.cancel_hardware(hardware_id=1234)
+
         :param int hardware_id: The ID of the hardware to be cancelled.
         :param string reason: The reason code for the cancellation. This should
                               come from :func:`get_cancellation_reasons`.
         :param string comment: An optional comment to include with the
                                cancellation.
-        Example::
-
-            # Cancels hardware id 1234
-            result = mgr.cancel_hardware(hardware_id=1234)
         """
 
         # Get cancel reason
