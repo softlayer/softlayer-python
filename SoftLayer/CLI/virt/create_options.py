@@ -109,4 +109,4 @@ def cli(env):
 
     table.add_row(['nic', formatting.listing(speeds, separator=',')])
 
-    return table
+    env.fout(table)

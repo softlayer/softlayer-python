@@ -37,4 +37,5 @@ def cli(env):
             iscsi.get('password', formatting.blank()),
             iscsi.get('serviceResourceBackendIpAddress',
                       formatting.blank())])
-    return table
+
+    env.fout(table)

@@ -31,4 +31,4 @@ def cli(env, sortby):
                        key.get('fingerprint'),
                        key.get('notes', '-')])
 
-    return table
+    env.fout(table)

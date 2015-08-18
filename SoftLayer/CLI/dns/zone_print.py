@@ -16,4 +16,4 @@ def cli(env, zone):
 
     manager = SoftLayer.DNSManager(env.client)
     zone_id = helpers.resolve_id(manager.resolve_ids, zone, name='zone')
-    return manager.dump_zone(zone_id)
+    env.fout(manager.dump_zone(zone_id))

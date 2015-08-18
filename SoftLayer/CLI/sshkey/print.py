@@ -33,4 +33,4 @@ def cli(env, identifier, out_file):
     table.add_row(['id', key['id']])
     table.add_row(['label', key.get('label')])
     table.add_row(['notes', key.get('notes', '-')])
-    return table
+    env.fout(table)

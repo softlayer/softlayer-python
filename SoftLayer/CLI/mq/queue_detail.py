@@ -23,4 +23,4 @@ def cli(env, account_id, queue_name, datacenter, network):
     mq_client = manager.get_connection(account_id,
                                        datacenter=datacenter, network=network)
     queue = mq_client.get_queue(queue_name)
-    return mq.queue_table(queue)
+    env.fout(mq.queue_table(queue))

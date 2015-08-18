@@ -38,4 +38,4 @@ def cli(env, status, sortby):
             certificate.get('notes', formatting.blank())
         ])
     table.sortby = sortby
-    return table
+    env.fout(table)

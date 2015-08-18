@@ -20,6 +20,6 @@ def cli(env, identifier, wait):
     vs_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
     ready = vsi.wait_for_ready(vs_id, wait)
     if ready:
-        return "READY"
+        env.fout("READY")
     else:
         raise exceptions.CLIAbort("Instance %s not ready" % vs_id)

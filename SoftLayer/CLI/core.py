@@ -147,24 +147,21 @@ def cli(env,
                 proxy=proxy,
                 config_file=config,
             )
-
-        client.transport = SoftLayer.TimingTransport(client.transport)
         env.client = client
+
+    env.vars['timings'] = SoftLayer.TimingTransport(env.client.transport)
+    env.client.transport = env.vars['timings']
 
 
 @cli.resultcallback()
 @environment.pass_env
-def output_result(env, result, timings=False, **kwargs):
+def output_result(env, timings=False, *args, **kwargs):
     """Outputs the results returned by the CLI and also outputs timings."""
 
-    output = env.fmt(result)
-    if output:
-        env.out(output)
-
-    if timings:
+    if timings and env.vars.get('timings'):
         timing_table = formatting.Table(['service', 'method', 'time'])
 
-        calls = env.client.transport.get_last_calls()
+        calls = env.vars['timings'].get_last_calls()
         for call, _, duration in calls:
             timing_table.add_row([call.service, call.method, duration])
 

@@ -22,4 +22,4 @@ def cli(env):
     for code, reason in mgr.get_cancellation_reasons().items():
         table.add_row([code, reason])
 
-    return table
+    env.fout(table)

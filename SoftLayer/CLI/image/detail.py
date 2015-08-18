@@ -56,4 +56,4 @@ def cli(env, identifier):
     table.add_row(['datacenters', formatting.listing(sorted(datacenters),
                                                      separator=',')])
 
-    return table
+    env.fout(table)

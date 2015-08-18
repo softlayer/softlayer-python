@@ -1,5 +1,5 @@
 requests
-click
+click >= 5
 prettytable >= 0.7.0
 six >= 1.7.0
 prompt_toolkit

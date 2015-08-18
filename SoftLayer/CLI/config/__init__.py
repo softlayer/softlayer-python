@@ -4,6 +4,15 @@
 from SoftLayer.CLI import formatting
 
 
+def _resolve_transport(transport):
+    """recursively look for transports which refer to other transports."""
+    nested_transport = getattr(transport, 'transport', None)
+    if nested_transport is not None:
+        return nested_transport
+
+    return _resolve_transport(nested_transport)
+
+
 def get_settings_from_client(client):
     """Pull out settings from a SoftLayer.BaseClient instance.
 
@@ -21,9 +30,10 @@ def get_settings_from_client(client):
     except AttributeError:
         pass
 
+    transport = _resolve_transport(client.transport)
     try:
-        settings['timeout'] = client.transport.transport.timeout
-        settings['endpoint_url'] = client.transport.transport.endpoint_url
+        settings['timeout'] = transport.timeout
+        settings['endpoint_url'] = transport.endpoint_url
     except AttributeError:
         pass
 

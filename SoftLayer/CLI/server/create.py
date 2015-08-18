@@ -124,7 +124,8 @@ def cli(env, **args):
         export_file = args.pop('export')
         template.export_to_template(export_file, args,
                                     exclude=['wait', 'test'])
-        return 'Successfully exported options to a template file.'
+        env.fout('Successfully exported options to a template file.')
+        return
 
     if do_create:
         if not (env.skip_confirmations or formatting.confirm(
@@ -141,4 +142,4 @@ def cli(env, **args):
         table.add_row(['created', result['orderDate']])
         output = table
 
-    return output
+    env.fout(output)

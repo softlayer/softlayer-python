@@ -25,4 +25,4 @@ def cli(env, account_id):
                        origin.get('cname', formatting.blank()),
                        origin['originUrl']])
 
-    return table
+    env.fout(table)

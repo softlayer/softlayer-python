@@ -46,4 +46,4 @@ def cli(env):
             lb_type
         ])
 
-    return table
+    env.fout(table)

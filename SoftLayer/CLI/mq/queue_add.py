@@ -42,4 +42,4 @@ def cli(env, account_id, queue_name, datacenter, network, visibility_interval,
         expiration=expiration,
         tags=tag,
     )
-    return mq.queue_table(queue)
+    env.fout(mq.queue_table(queue))

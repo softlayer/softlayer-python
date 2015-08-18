@@ -42,4 +42,4 @@ def cli(env, account_id, topic_name, datacenter, network,
         expiration=expiration,
         tags=tag,
     )
-    return mq.topic_table(topic)
+    env.fout(mq.topic_table(topic))

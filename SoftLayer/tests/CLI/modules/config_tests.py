@@ -35,7 +35,7 @@ class TestHelpShow(testing.TestCase):
         self.assertEqual(json.loads(result.output),
                          {'Username': 'username',
                           'API Key': 'api-key',
-                          'Endpoint URL': 'not set',
+                          'Endpoint URL': 'http://endpoint-url',
                           'Timeout': 'not set'})
 
 

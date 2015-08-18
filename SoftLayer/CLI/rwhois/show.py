@@ -31,4 +31,4 @@ def cli(env):
     table.add_row(['Country', result['country']])
     table.add_row(['Private Residence', result['privateResidenceFlag']])
 
-    return table
+    env.fout(table)

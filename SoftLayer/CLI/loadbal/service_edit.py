@@ -3,6 +3,7 @@
 
 import SoftLayer
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import loadbal
 
 import click
@@ -30,7 +31,8 @@ def cli(env, identifier, enabled, port, weight, healthcheck_type, ip_address):
 
     # check if any input is provided
     if not any([ip_address, enabled, weight, port, healthcheck_type]):
-        return 'At least one property is required to be changed!'
+        raise exceptions.CLIAbort(
+            'At least one property is required to be changed!')
 
     # check if the IP is valid
     ip_address_id = None
@@ -46,4 +48,4 @@ def cli(env, identifier, enabled, port, weight, healthcheck_type, ip_address):
                      port=port,
                      weight=weight,
                      hc_type=healthcheck_type)
-    return 'Load balancer service %s is being modified!' % identifier
+    env.fout('Load balancer service %s is being modified!' % identifier)

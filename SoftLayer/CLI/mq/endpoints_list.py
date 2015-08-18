@@ -24,4 +24,4 @@ def cli(env):
             endpoints.get('private') or formatting.blank(),
         ])
 
-    return table
+    env.fout(table)

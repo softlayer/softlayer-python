@@ -25,4 +25,4 @@ def cli(env):
                        account['name'],
                        account['status']['name']])
 
-    return table
+    env.fout(table)
