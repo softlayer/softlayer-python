@@ -257,8 +257,6 @@ class ServerCLITests(testing.TestCase):
                                    '--datacenter=TEST00',
                                    '--port-speed=100',
                                    '--os=UBUNTU_12_64',
-                                   '--vlan-public=10234',
-                                   '--vlan-private=20468',
                                    '--test'],
                                   fmt='raw')
 
@@ -296,8 +294,6 @@ class ServerCLITests(testing.TestCase):
                                    '--datacenter=TEST00',
                                    '--port-speed=100',
                                    '--os=UBUNTU_12_64',
-                                   '--vlan-public=10234',
-                                   '--vlan-private=20468',
                                    '--key=10',
                                    ])
 
@@ -329,8 +325,6 @@ class ServerCLITests(testing.TestCase):
                                    '--datacenter=TEST00',
                                    '--port-speed=100',
                                    '--os=UBUNTU_12_64',
-                                   '--vlan-public=10234',
-                                   '--vlan-private=20468',
                                    '--export=/path/to/test_file.txt'],
                                   fmt='raw')
 
@@ -349,8 +343,6 @@ class ServerCLITests(testing.TestCase):
                                         'postinstall': None,
                                         'size': 'S1270_8GB_2X1TBSATA_NORAID',
                                         'test': False,
-                                        'vlan_private': 20468,
-                                        'vlan_public': 10234,
                                         'wait': None,
                                         'template': None},
                                        exclude=['wait', 'test'])
