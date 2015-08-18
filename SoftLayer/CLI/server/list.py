@@ -52,7 +52,7 @@ DEFAULT_COLUMNS = [
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
               help='Columns to display. Options: %s'
-                   % ', '.join(column.name for column in COLUMNS),
+              % ', '.join(column.name for column in COLUMNS),
               default=','.join(DEFAULT_COLUMNS))
 @environment.pass_env
 def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag,

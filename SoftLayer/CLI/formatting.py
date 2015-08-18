@@ -166,6 +166,7 @@ def transaction_status(transaction):
 
 
 def tags(tag_references):
+    """Returns a formatted list of tags."""
     tag_row = []
     for tag_detail in tag_references:
         tag = utils.lookup(tag_detail, 'tag', 'name')
