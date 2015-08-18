@@ -22,6 +22,19 @@ COLUMNS = [
                             id,transactionStatus[name,friendlyName]
                          ]'''),
     column_helper.Column('power_state', ('powerState', 'name')),
+    column_helper.Column(
+        'tags',
+        lambda server: formatting.tags(server.get('tagReferences')),
+        mask="tagReferences.tag.name"),
+]
+
+DEFAULT_COLUMNS = [
+    'id',
+    'hostname',
+    'primary_ip',
+    'backend_ip',
+    'datacenter',
+    'action',
 ]
 
 
@@ -38,9 +51,9 @@ COLUMNS = [
 @helpers.multi_option('--tag', help='Filter by tags')
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
-              help='Columns to display. default is id, hostname, primary_ip, '
-              'backend_ip, datacenter, action',
-              default="id,hostname,primary_ip,backend_ip,datacenter,action")
+              help='Columns to display. Options: %s'
+                   % ', '.join(column.name for column in COLUMNS),
+              default=','.join(DEFAULT_COLUMNS))
 @environment.pass_env
 def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
         hourly, monthly, tag, columns):
