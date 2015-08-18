@@ -270,9 +270,11 @@ def cli(env, **args):
         output.append(table)
 
         if args.get('wait'):
-            ready = vsi.wait_for_ready(
-                result['id'], int(args.get('wait') or 1))
+            ready = vsi.wait_for_ready(result['id'], args.get('wait') or 1)
             table.add_row(['ready', ready])
+            if ready is False:
+                env.out(env.fmt(output))
+                raise exceptions.CLIHalt(code=1)
 
     env.fout(output)
 
