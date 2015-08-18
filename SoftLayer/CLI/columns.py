@@ -13,6 +13,7 @@ from SoftLayer import utils
 
 
 class Column(object):
+    """Column desctribes an attribute and how to fetch/display it."""
     def __init__(self, name, path, mask=None):
         self.name = name
         self.path = path
@@ -47,6 +48,7 @@ class ColumnFormatter(object):
                 yield utils.lookup(data, *column)
 
     def mask(self):
+        """Returns a SoftLayer mask to fetch data needed for each column."""
         return ','.join(self.mask_parts)
 
 
@@ -71,7 +73,7 @@ def get_formatter(columns):
             if column in column_map:
                 formatter.add_column(column_map[column])
             else:
-                formatter.add_column(Column(column, (column,)))
+                formatter.add_column(Column(column, column.split('.')))
 
         return formatter
 
