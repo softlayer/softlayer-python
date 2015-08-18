@@ -58,7 +58,8 @@ class SSLManager(object):
         """Creates a new certificate.
 
         :param dict certificate: A dictionary representing the parts of the
-                                 certificate. See SLDN for more information.
+                                 certificate.
+                                 See developer.softlayer.com for more info.
 
         Example::
 

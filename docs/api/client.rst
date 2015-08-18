@@ -8,7 +8,7 @@ and executing XML-RPC calls against the SoftLayer API. Below are some links
 that will help to use the SoftLayer API.
 
 
-* `SoftLayer API Documentation <http://sldn.softlayer.com/reference/softlayerapi>`_
+* `SoftLayer API Documentation <http://developer.softlayer.com/reference/softlayerapi>`_
 * `Source on GitHub <https://github.com/softlayer/softlayer-python>`_
 
 ::
@@ -86,9 +86,9 @@ offsets, and retrieving objects by id. The following section assumes you have
 an initialized client named 'client'.
 
 The best way to test our setup is to call the
-`getObject <http://sldn.softlayer.com/reference/services/SoftLayer_Account/getObject>`_
+`getObject <http://developer.softlayer.com/reference/services/SoftLayer_Account/getObject>`_
 method on the
-`SoftLayer_Account <http://sldn.softlayer.com/reference/services/SoftLayer_Account>`_
+`SoftLayer_Account <http://developer.softlayer.com/reference/services/SoftLayer_Account>`_
 service.
 ::
 
@@ -97,7 +97,7 @@ service.
 For a more complex example we'll retrieve a support ticket with id 123456 along
 with the ticket's updates, the user it's assigned to, the servers attached to
 it, and the datacenter those servers are in. To retrieve our extra information
-using an `object mask <http://sldn.softlayer.com/article/Extended-Object-Masks>`_.
+using an `object mask <http://developer.softlayer.com/article/Extended-Object-Masks>`_.
 
 Retrieve a ticket using object masks.
 ::
@@ -107,7 +107,7 @@ Retrieve a ticket using object masks.
 
 
 Now add an update to the ticket with
-`Ticket.addUpdate <http://sldn.softlayer.com/reference/services/SoftLayer_Ticket/addUpdate>`_.
+`Ticket.addUpdate <http://developer.softlayer.com/reference/services/SoftLayer_Ticket/addUpdate>`_.
 This uses a parameter, which translate to positional arguments in the order
 that they appear in the API docs.
 ::
@@ -145,7 +145,7 @@ SoftLayer's XML-RPC API also allows for pagination.
     client['Account'].getVirtualGuests(limit=10, offset=10)  # Page 2
 
 Here's how to create a new Cloud Compute Instance using
-`SoftLayer_Virtual_Guest.createObject <http://sldn.softlayer.com/reference/services/SoftLayer_Virtual_Guest/createObject>`_.
+`SoftLayer_Virtual_Guest.createObject <http://developer.softlayer.com/reference/services/SoftLayer_Virtual_Guest/createObject>`_.
 Be warned, this call actually creates an hourly virtual server so this will
 have billing implications.
 ::

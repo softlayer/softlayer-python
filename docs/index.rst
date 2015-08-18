@@ -2,7 +2,7 @@
 
 SoftLayer API Python Client |version|
 ========================================
-`API Docs <http://sldn.softlayer.com/reference/softlayerapi>`_ ``|``
+`API Docs <http://developer.softlayer.com/reference/softlayerapi>`_ ``|``
 `GitHub <https://github.com/softlayer/softlayer-python>`_ ``|``
 `Issues <https://github.com/softlayer/softlayer-python/issues>`_ ``|``
 `Pull Requests <https://github.com/softlayer/softlayer-python/pulls>`_ ``|``
@@ -12,7 +12,7 @@ SoftLayer API Python Client |version|
 
 
 This is the documentation to SoftLayer's Python API Bindings. These bindings
-use SoftLayer's `XML-RPC interface <http://sldn.softlayer.com/article/XML-RPC>`_
+use SoftLayer's `XML-RPC interface <http://developer.softlayer.com/article/XML-RPC>`_
 in order to manage SoftLayer services.
 
 .. toctree::
@@ -39,7 +39,7 @@ External Links
 --------------
 .. toctree::
 
-   SoftLayer API Documentation <http://sldn.softlayer.com/reference/softlayerapi>
+   SoftLayer API Documentation <http://developer.softlayer.com/reference/softlayerapi>
    Source on GitHub <https://github.com/softlayer/softlayer-python>
    Issues <https://github.com/softlayer/softlayer-python/issues>
    Pull Requests <https://github.com/softlayer/softlayer-python/pulls>

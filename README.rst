@@ -13,11 +13,11 @@ SoftLayer API Python Client
     :target: https://coveralls.io/r/softlayer/softlayer-python
 
 SoftLayer API bindings for Python. For use with
-`SoftLayer's API <http://sldn.softlayer.com/reference/softlayerapi>`_.
+`SoftLayer's API <http://developer.softlayer.com/reference/softlayerapi>`_.
 
 This library provides a simple interface to interact with SoftLayer's XML-RPC
 API and provides support for many of SoftLayer API's features like
-`object masks <http://sldn.softlayer.com/article/Using-Object-Masks-SoftLayerAPI>`_
+`object masks <http://developer.softlayer.com/article/Object-Masks>`_
 and includes a command-line interface that can be used to manage various
 SoftLayer services.
 
