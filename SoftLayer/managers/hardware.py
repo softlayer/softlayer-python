@@ -363,7 +363,10 @@ class HardwareManager(utils.IdentifierMixin, object):
         port_speeds = []
         for item in package['items']:
             if all([item['itemCategory']['categoryCode'] == 'port_speed',
-                    not _is_private_port_speed_item(item)]):
+                    # Hide private options
+                    not _is_private_port_speed_item(item),
+                    # Hide unbonded options
+                    _is_bonded(item)]):
                 port_speeds.append({
                     'name': item['description'],
                     'key': item['capacity'],
@@ -670,7 +673,8 @@ def _get_port_speed_price_id(items, port_speed, no_public, location):
 
         # Check for correct capacity and if the item matches private only
         if any([int(utils.lookup(item, 'capacity')) != port_speed,
-                _is_private_port_speed_item(item) != no_public]):
+                _is_private_port_speed_item(item) != no_public,
+                not _is_bonded(item)]):
             continue
 
         for price in item['prices']:
@@ -711,6 +715,15 @@ def _is_private_port_speed_item(item):
             return True
 
     return False
+
+
+def _is_bonded(item):
+    """Determine if the item refers to a bonded port."""
+    for attribute in item['attributes']:
+        if attribute['attributeTypeKeyName'] == 'NON_LACP':
+            return False
+
+    return True
 
 
 def _get_location(package, location):
