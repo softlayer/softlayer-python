@@ -86,7 +86,7 @@
 
     * API: Adds virtual server rescue command to SoftLayer.VSManager
 
-    * API+CLI: Adds ability to import virtual images from a given URI. The API only supports importing from a swift account using 'swift://'. For more details, see http://sldn.softlayer.com/reference/services/SoftLayer_Virtual_Guest_Block_Device_Template_Group/createFromExternalSource.
+    * API+CLI: Adds ability to import virtual images from a given URI. The API only supports importing from a swift account using 'swift://'. For more details, see http://developer.softlayer.com/reference/services/SoftLayer_Virtual_Guest_Block_Device_Template_Group/createFromExternalSource.
 
     * CLI: A `--fixtures` global flag was added to pull from fixture data instead of the API. This is useful for discovery, demonstration and testing purposes.
 

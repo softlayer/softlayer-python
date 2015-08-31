@@ -132,7 +132,7 @@ Developer Resources
 -------------------
 .. toctree::
 
-   SoftLayer API Documentation <http://sldn.softlayer.com/reference/softlayerapi>
+   SoftLayer API Documentation <http://developer.softlayer.com/reference/softlayerapi>
    Source on GitHub <https://github.com/softlayer/softlayer-python>
    Issues <https://github.com/softlayer/softlayer-python/issues>
    Pull Requests <https://github.com/softlayer/softlayer-python/pulls>
