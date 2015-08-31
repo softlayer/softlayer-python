@@ -25,6 +25,9 @@ COLUMNS = [
         ]]'''),
     column_helper.Column('power_state', ('powerState', 'name')),
     column_helper.Column(
+        'created_by',
+        ('billingItem', 'orderItem', 'order', 'userRecord', 'username')),
+    column_helper.Column(
         'tags',
         lambda server: formatting.tags(server.get('tagReferences')),
         mask="tagReferences.tag.name"),
@@ -41,7 +44,6 @@ DEFAULT_COLUMNS = [
 
 
 @click.command()
-@click.option('--sortby', help='Column to sort by', default='hostname')
 @click.option('--cpu', '-c', help='Filter by number of CPU cores')
 @click.option('--domain', '-D', help='Filter by domain')
 @click.option('--datacenter', '-d', help='Filter by datacenter')
@@ -49,6 +51,7 @@ DEFAULT_COLUMNS = [
 @click.option('--memory', '-m', help='Filter by memory in gigabytes')
 @click.option('--network', '-n', help='Filter by network port speed in Mbps')
 @helpers.multi_option('--tag', help='Filter by tags')
+@click.option('--sortby', help='Column to sort by', default='hostname')
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
               help='Columns to display. Options: %s'
