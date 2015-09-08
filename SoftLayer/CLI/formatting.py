@@ -165,6 +165,20 @@ def transaction_status(transaction):
         transaction['transactionStatus'].get('friendlyName'))
 
 
+def tags(tag_references):
+    """Returns a formatted list of tags."""
+    if not tag_references:
+        return blank()
+
+    tag_row = []
+    for tag_detail in tag_references:
+        tag = utils.lookup(tag_detail, 'tag', 'name')
+        if tag is not None:
+            tag_row.append(tag)
+
+    return listing(tag_row, separator=', ')
+
+
 def confirm(prompt_str, default=False):
     """Show a confirmation prompt to a command-line user.
 

@@ -11,18 +11,39 @@ import click
 
 # pylint: disable=unnecessary-lambda
 
-COLUMN_MAP = {
-    'guid': ('globalIdentifier',),
-    'primary_ip': ('primaryIpAddress',),
-    'backend_ip': ('primaryBackendIpAddress',),
-    'datacenter': ('datacenter', 'name'),
-    'action': lambda server: formatting.active_txn(server),
-    'power_state': ('powerState', 'name'),
-}
+COLUMNS = [
+    column_helper.Column('guid', ('globalIdentifier',)),
+    column_helper.Column('primary_ip', ('primaryIpAddress',)),
+    column_helper.Column('backend_ip', ('primaryBackendIpAddress',)),
+    column_helper.Column('datacenter', ('datacenter', 'name')),
+    column_helper.Column(
+        'action',
+        lambda server: formatting.active_txn(server),
+        mask='''
+        mask(SoftLayer_Hardware_Server)[activeTransaction[
+            id,transactionStatus[name,friendlyName]
+        ]]'''),
+    column_helper.Column('power_state', ('powerState', 'name')),
+    column_helper.Column(
+        'created_by',
+        ('billingItem', 'orderItem', 'order', 'userRecord', 'username')),
+    column_helper.Column(
+        'tags',
+        lambda server: formatting.tags(server.get('tagReferences')),
+        mask="tagReferences.tag.name"),
+]
+
+DEFAULT_COLUMNS = [
+    'id',
+    'hostname',
+    'primary_ip',
+    'backend_ip',
+    'datacenter',
+    'action',
+]
 
 
 @click.command()
-@click.option('--sortby', help='Column to sort by', default='hostname')
 @click.option('--cpu', '-c', help='Filter by number of CPU cores')
 @click.option('--domain', '-D', help='Filter by domain')
 @click.option('--datacenter', '-d', help='Filter by datacenter')
@@ -30,11 +51,12 @@ COLUMN_MAP = {
 @click.option('--memory', '-m', help='Filter by memory in gigabytes')
 @click.option('--network', '-n', help='Filter by network port speed in Mbps')
 @helpers.multi_option('--tag', help='Filter by tags')
+@click.option('--sortby', help='Column to sort by', default='hostname')
 @click.option('--columns',
-              callback=column_helper.get_formatter(COLUMN_MAP),
-              help='Columns to display. default is id, hostname, primary_ip, '
-              'backend_ip, datacenter, action',
-              default="id,hostname,primary_ip,backend_ip,datacenter,action")
+              callback=column_helper.get_formatter(COLUMNS),
+              help='Columns to display. Options: %s'
+              % ', '.join(column.name for column in COLUMNS),
+              default=','.join(DEFAULT_COLUMNS))
 @environment.pass_env
 def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag,
         columns):
@@ -48,7 +70,8 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag,
                                     memory=memory,
                                     datacenter=datacenter,
                                     nic_speed=network,
-                                    tags=tag)
+                                    tags=tag,
+                                    mask=columns.mask())
 
     table = formatting.Table(columns.columns)
     table.sortby = sortby
