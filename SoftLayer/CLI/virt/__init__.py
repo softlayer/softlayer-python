@@ -13,7 +13,7 @@ class MemoryType(click.ParamType):
     name = 'integer'
 
     def convert(self, value, param, ctx):
-        """Validate memory argument. Returns the memory value in megabytes."""
+        """Validate memory argument. Returns the memory value in gigabytes."""
         matches = MEMORY_RE.match(value.lower())
         if matches is None:
             self.fail('%s is not a valid value for memory amount'
@@ -23,13 +23,13 @@ class MemoryType(click.ParamType):
         if unit in [None, 'm', 'mb']:
             # Assume the user intends gigabytes if they specify a number < 1024
             if amount < 1024:
-                return amount * 1024
+                return amount
             else:
                 if amount % 1024 != 0:
                     self.fail('%s is not an integer that is divisable by 1024'
                               % value, param, ctx)
-                return amount
+                return amount / 1024
         elif unit in ['g', 'gb']:
-            return amount * 1024
+            return amount
 
 MEM_TYPE = MemoryType()
