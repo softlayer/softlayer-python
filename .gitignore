@@ -5,6 +5,7 @@ Thumbs.db
 ._*
 *.pyc
 .coverage
+htmlcov
 cover/*
 .tox
 docs/_build/*

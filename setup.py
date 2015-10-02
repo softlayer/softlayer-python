@@ -30,7 +30,6 @@ setup(
             'sl = SoftLayer.CLI.deprecated:main',
         ],
     },
-    test_suite='nose.collector',
     install_requires=[
         'six >= 1.7.0',
         'prettytable >= 0.7.0',
