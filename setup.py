@@ -20,7 +20,7 @@ setup(
     long_description=LONG_DESCRIPTION,
     author='SoftLayer Technologies, Inc.',
     author_email='sldn@softlayer.com',
-    packages=find_packages(exclude=["SoftLayer.tests"]),
+    packages=find_packages(exclude=['tests']),
     license='MIT',
     zip_safe=False,
     url='http://github.com/softlayer/softlayer-python',
