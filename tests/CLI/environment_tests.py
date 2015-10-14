@@ -33,8 +33,10 @@ class EnvironmentTests(testing.TestCase):
         self.assertEqual(cmd, None)
 
     def test_get_command(self):
-        mod_path = 'SoftLayer.tests.CLI.environment_tests'
-        fixture_loader = environment.ModuleLoader(mod_path, 'fixture_command')
+        fixture_loader = environment.ModuleLoader(
+            'tests.CLI.environment_tests',
+            'fixture_command',
+        )
         self.env.commands = {'fixture:run': fixture_loader}
         command = self.env.get_command('fixture', 'run')
         self.assertIsInstance(command, click.Command)

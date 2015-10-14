@@ -1,6 +1,6 @@
 tox
-nose
+pytest
+pytest-cov
 mock
-coverage
 sphinx
 testtools
