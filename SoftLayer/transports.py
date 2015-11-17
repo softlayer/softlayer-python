@@ -120,7 +120,8 @@ class XmlRpcTransport(object):
             headers[header_name] = {'id': request.identifier}
 
         if request.mask is not None:
-            headers.update(_format_object_mask(request.mask, request.service))
+            headers.update(_format_object_mask_xmlrpc(request.mask,
+                                                      request.service))
 
         if request.filter is not None:
             headers['%sObjectFilter' % request.service] = request.filter
@@ -215,10 +216,9 @@ class RestTransport(object):
                                              'application/json')
         request.transport_headers.setdefault('User-Agent', self.user_agent)
 
-        params = {}
-        body = {}
+        params = request.headers.copy()
         if request.mask:
-            params['objectMask'] = request.mask
+            params['objectMask'] = _format_object_mask(request.mask)
 
         if request.limit:
             params['limit'] = request.limit
@@ -229,9 +229,6 @@ class RestTransport(object):
         if request.filter:
             params['objectFilter'] = json.dumps(request.filter)
 
-        if request.args:
-            body['parameters'] = json.dumps(request.args)
-
         auth = None
         if request.transport_user:
             auth = requests.auth.HTTPBasicAuth(
@@ -239,15 +236,22 @@ class RestTransport(object):
                 request.transport_password,
             )
 
-        raw_body = None
-        if body:
-            raw_body = json.dumps(body)
-
         method = REST_SPECIAL_METHODS.get(request.method)
         is_special_method = True
         if method is None:
             is_special_method = False
             method = 'GET'
+
+        body = {}
+        if request.args:
+            # NOTE(kmcdonald): force POST when there are arguments because
+            # the request body is ignored otherwise.
+            method = 'POST'
+            body['parameters'] = request.args
+
+        raw_body = None
+        if body:
+            raw_body = json.dumps(body)
 
         url_parts = [self.endpoint_url, request.service]
         if request.identifier is not None:
@@ -258,14 +262,12 @@ class RestTransport(object):
         if request.method is not None and not is_special_method:
             url_parts.append(request.method)
 
-        for arg in request.args:
-            url_parts.append(str(arg))
-
         url = '%s.%s' % ('/'.join(url_parts), 'json')
 
         LOGGER.debug("=== REQUEST ===")
         LOGGER.info(url)
         LOGGER.debug(request.transport_headers)
+        LOGGER.debug(raw_body)
         try:
             resp = requests.request(method, url,
                                     auth=auth,
@@ -347,7 +349,7 @@ def _proxies_dict(proxy):
     return {'http': proxy, 'https': proxy}
 
 
-def _format_object_mask(objectmask, service):
+def _format_object_mask_xmlrpc(objectmask, service):
     """Format new and old style object masks into proper headers.
 
     :param objectmask: a string- or dict-based object mask
@@ -358,10 +360,22 @@ def _format_object_mask(objectmask, service):
         mheader = '%sObjectMask' % service
     else:
         mheader = 'SoftLayer_ObjectMask'
-
-        objectmask = objectmask.strip()
-        if (not objectmask.startswith('mask') and
-                not objectmask.startswith('[')):
-            objectmask = "mask[%s]" % objectmask
+        objectmask = _format_object_mask(objectmask)
 
     return {mheader: {'mask': objectmask}}
+
+
+def _format_object_mask(objectmask):
+    """Format the new style object mask.
+
+    This wraps the user mask with mask[USER_MASK] if it does not already
+    have one. This makes it slightly easier for users.
+
+    :param objectmask: a string-based object mask
+
+    """
+    objectmask = objectmask.strip()
+    if (not objectmask.startswith('mask') and
+            not objectmask.startswith('[')):
+        objectmask = "mask[%s]" % objectmask
+    return objectmask

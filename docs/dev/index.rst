@@ -75,12 +75,12 @@ versions every time you push new code.
 
 Using tox to running the tests in multiple environments can be very time
 consuming. If you wish to quickly run the tests in your own environment, you
-may do so using `nose <https://nose.readthedocs.org>`_.  The command to do that
+may do so using `py.test <http://pytest.org/>`_.  The command to do that
 is:
 
 ::
 
-  nosetests
+  py.test tests
 
 
 Documentation

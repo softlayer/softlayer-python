@@ -372,12 +372,83 @@ class TestRestAPICall(testing.TestCase):
 
         self.assertEqual(resp, {})
         request.assert_called_with(
-            'GET',
-            'http://something.com/SoftLayer_Service/getObject/test/1.json',
+            'POST',
+            'http://something.com/SoftLayer_Service/getObject.json',
             headers=mock.ANY,
             auth=None,
-            data='{"parameters": "[\\"test\\", 1]"}',
+            data='{"parameters": ["test", 1]}',
             params={},
+            verify=True,
+            cert=None,
+            proxies=None,
+            timeout=None)
+
+
+    @mock.patch('requests.request')
+    def test_with_filter(self, request):
+        request().content = '{}'
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        req.filter = {'TYPE': {'attribute': {'operation': '^= prefix'}}}
+
+        resp = self.transport(req)
+
+        self.assertEqual(resp, {})
+        request.assert_called_with(
+            'GET',
+            'http://something.com/SoftLayer_Service/getObject.json',
+            params={'objectFilter':
+                    '{"TYPE": {"attribute": {"operation": "^= prefix"}}}'},
+            headers=mock.ANY,
+            auth=None,
+            data=None,
+            verify=True,
+            cert=None,
+            proxies=None,
+            timeout=None)
+
+    @mock.patch('requests.request')
+    def test_with_mask(self, request):
+        request().content = '{}'
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        req.mask = 'id,property'
+
+        resp = self.transport(req)
+
+        self.assertEqual(resp, {})
+        request.assert_called_with(
+            'GET',
+            'http://something.com/SoftLayer_Service/getObject.json',
+            params={'objectMask': 'mask[id,property]'},
+            headers=mock.ANY,
+            auth=None,
+            data=None,
+            verify=True,
+            cert=None,
+            proxies=None,
+            timeout=None)
+
+        # Now test with mask[] prefix
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        req.mask = 'mask[id,property]'
+
+        resp = self.transport(req)
+
+        self.assertEqual(resp, {})
+        request.assert_called_with(
+            'GET',
+            'http://something.com/SoftLayer_Service/getObject.json',
+            params={'objectMask': 'mask[id,property]'},
+            headers=mock.ANY,
+            auth=None,
+            data=None,
             verify=True,
             cert=None,
             proxies=None,
