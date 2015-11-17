@@ -141,6 +141,7 @@ def cli(env,
         else:
             # Create SL Client
             client = SoftLayer.create_client_from_env(
+                transport=SoftLayer.RestTransport(),
                 proxy=proxy,
                 config_file=config,
             )

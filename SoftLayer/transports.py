@@ -28,6 +28,14 @@ __all__ = [
     'FixtureTransport',
 ]
 
+REST_SPECIAL_METHODS = {
+    'deleteObject': 'DELETE',
+    'createObject': 'POST',
+    'createObjects': 'POST',
+    'editObject': 'PUT',
+    'editObjects': 'PUT',
+}
+
 
 class Request(object):
     """Transport request object."""
@@ -74,6 +82,14 @@ class Request(object):
 
         #: Integer result offset.
         self.offset = None
+
+
+class SoftLayerListResult(list):
+    """A SoftLayer list result."""
+
+    def __init__(self, items, total_count):
+        self.total_count = total_count
+        super(SoftLayerListResult, self).__init__(items)
 
 
 class XmlRpcTransport(object):
@@ -129,18 +145,23 @@ class XmlRpcTransport(object):
         LOGGER.debug(payload)
 
         try:
-            response = requests.request('POST', url,
-                                        data=payload,
-                                        headers=request.transport_headers,
-                                        timeout=self.timeout,
-                                        verify=request.verify,
-                                        cert=request.cert,
-                                        proxies=_proxies_dict(self.proxy))
+            resp = requests.request('POST', url,
+                                    data=payload,
+                                    headers=request.transport_headers,
+                                    timeout=self.timeout,
+                                    verify=request.verify,
+                                    cert=request.cert,
+                                    proxies=_proxies_dict(self.proxy))
             LOGGER.debug("=== RESPONSE ===")
-            LOGGER.debug(response.headers)
-            LOGGER.debug(response.content)
-            response.raise_for_status()
-            return utils.xmlrpc_client.loads(response.content)[0][0]
+            LOGGER.debug(resp.headers)
+            LOGGER.debug(resp.content)
+            resp.raise_for_status()
+            result = utils.xmlrpc_client.loads(resp.content)[0][0]
+            if isinstance(result, list):
+                return SoftLayerListResult(
+                    result, int(resp.headers.get('softlayer-total-items', 0)))
+            else:
+                return result
         except utils.xmlrpc_client.Fault as ex:
             # These exceptions are formed from the XML-RPC spec
             # http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
@@ -190,17 +211,55 @@ class RestTransport(object):
 
         :param request request: Request object
         """
-        url_parts = [self.endpoint_url, request.service]
-        if request.identifier is not None:
-            url_parts.append(str(request.identifier))
-        if request.method is not None:
-            url_parts.append(request.method)
-        for arg in request.args:
-            url_parts.append(str(arg))
-
         request.transport_headers.setdefault('Content-Type',
                                              'application/json')
         request.transport_headers.setdefault('User-Agent', self.user_agent)
+
+        params = {}
+        body = {}
+        if request.mask:
+            params['objectMask'] = request.mask
+
+        if request.limit:
+            params['limit'] = request.limit
+
+        if request.offset:
+            params['offset'] = request.offset
+
+        if request.filter:
+            params['objectFilter'] = json.dumps(request.filter)
+
+        if request.args:
+            body['parameters'] = json.dumps(request.args)
+
+        auth = None
+        if request.transport_user:
+            auth = requests.auth.HTTPBasicAuth(
+                request.transport_user,
+                request.transport_password,
+            )
+
+        raw_body = None
+        if body:
+            raw_body = json.dumps(body)
+
+        method = REST_SPECIAL_METHODS.get(request.method)
+        is_special_method = True
+        if method is None:
+            is_special_method = False
+            method = 'GET'
+
+        url_parts = [self.endpoint_url, request.service]
+        if request.identifier is not None:
+            url_parts.append(str(request.identifier))
+
+        # Special methods (createObject, editObject, etc) use the HTTP verb
+        # to determine the action on the resource
+        if request.method is not None and not is_special_method:
+            url_parts.append(request.method)
+
+        for arg in request.args:
+            url_parts.append(str(arg))
 
         url = '%s.%s' % ('/'.join(url_parts), 'json')
 
@@ -208,8 +267,11 @@ class RestTransport(object):
         LOGGER.info(url)
         LOGGER.debug(request.transport_headers)
         try:
-            resp = requests.request('GET', url,
+            resp = requests.request(method, url,
+                                    auth=auth,
                                     headers=request.transport_headers,
+                                    params=params,
+                                    data=raw_body,
                                     timeout=self.timeout,
                                     verify=request.verify,
                                     cert=request.cert,
@@ -218,7 +280,13 @@ class RestTransport(object):
             LOGGER.debug(resp.headers)
             LOGGER.debug(resp.content)
             resp.raise_for_status()
-            return json.loads(resp.content)
+            result = json.loads(resp.content)
+
+            if isinstance(result, list):
+                return SoftLayerListResult(
+                    result, int(resp.headers.get('softlayer-total-items', 0)))
+            else:
+                return result
         except requests.HTTPError as ex:
             content = json.loads(ex.response.content)
             raise exceptions.SoftLayerAPIError(ex.response.status_code,

@@ -204,7 +204,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
                 if ip_address_id is not None:
                     service['ipAddressId'] = ip_address_id
 
-        template = {'virtualServers': virtual_servers}
+        template = {'virtualServers': list(virtual_servers)}
 
         load_balancer = self.lb_svc.editObject(template, id=loadbal_id)
         return load_balancer

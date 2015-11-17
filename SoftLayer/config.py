@@ -19,6 +19,7 @@ def get_client_settings_args(**kwargs):
     timeout = kwargs.get('timeout')
     if timeout is not None:
         timeout = float(timeout)
+
     return {
         'endpoint_url': kwargs.get('endpoint_url'),
         'timeout': timeout,
