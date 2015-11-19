@@ -27,3 +27,5 @@ createFromExternalSource = [{
     'id': 100,
     'name': 'test_image',
 }]
+
+copyToExternalSource = True

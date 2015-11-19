@@ -40,6 +40,10 @@ def cli(env, identifier):
         utils.lookup(image, 'status', 'keyname'),
         utils.lookup(image, 'status', 'name'),
     )])
+    table.add_row([
+        'active_transaction',
+        formatting.transaction_status(image.get('transaction')),
+    ])
     table.add_row(['account', image.get('accountId', formatting.blank())])
     table.add_row(['visibility',
                    image_mod.PUBLIC_TYPE if image['publicFlag']
