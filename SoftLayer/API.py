@@ -72,7 +72,7 @@ def create_client_from_env(username=None,
 
         >>> import SoftLayer
         >>> client = SoftLayer.create_client_from_env()
-        >>> resp = client['Account'].getObject()
+        >>> resp = client.call('Account', 'getObject')
         >>> resp['companyName']
         'Your Company'
 
@@ -141,11 +141,11 @@ class BaseClient(object):
 
         """
         self.auth = None
-        res = self['User_Customer'].getPortalLoginToken(
-            username,
-            password,
-            security_question_id,
-            security_question_answer)
+        res = self.call('User_Customer', 'getPortalLoginToken',
+                        username,
+                        password,
+                        security_question_id,
+                        security_question_answer)
         self.auth = slauth.TokenAuthentication(res['userId'], res['hash'])
         return res['userId'], res['hash']
 
@@ -177,7 +177,7 @@ class BaseClient(object):
         Usage:
             >>> import SoftLayer
             >>> client = SoftLayer.create_client_from_env()
-            >>> client['Account'].getVirtualGuests(mask="id", limit=10)
+            >>> client.call('Account', 'getVirtualGuests', mask="id", limit=10)
             [...]
 
         """
@@ -344,7 +344,7 @@ class Service(object):
         Usage:
             >>> import SoftLayer
             >>> client = SoftLayer.create_client_from_env()
-            >>> gen = client['Account'].getVirtualGuests(iter=True)
+            >>> gen = client.call('Account', 'getVirtualGuests', iter=True)
             >>> for virtual_guest in gen:
             ...     virtual_guest['id']
             ...
