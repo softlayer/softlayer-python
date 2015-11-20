@@ -95,11 +95,21 @@ def create_client_from_env(username=None,
 
     # If we have enough information to make an auth driver, let's do it
     if auth is None and settings.get('username') and settings.get('api_key'):
+        # NOTE(kmcdonald): some transports mask other transports, so this is
+        # a way to find the 'real' one
+        real_transport = getattr(transport, 'transport', transport)
 
-        auth = slauth.BasicAuthentication(
-            settings.get('username'),
-            settings.get('api_key'),
-        )
+        if isinstance(real_transport, transports.XmlRpcTransport):
+            auth = slauth.BasicAuthentication(
+                settings.get('username'),
+                settings.get('api_key'),
+            )
+
+        elif isinstance(real_transport, transports.RestTransport):
+            auth = slauth.BasicHTTPAuthentication(
+                settings.get('username'),
+                settings.get('api_key'),
+            )
 
     return BaseClient(auth=auth, transport=transport)
 

@@ -4,10 +4,12 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import io
 import warnings
 
 import mock
 import requests
+import six
 
 import SoftLayer
 from SoftLayer import consts
@@ -21,8 +23,8 @@ class TestXmlRpcAPICall(testing.TestCase):
         self.transport = transports.XmlRpcTransport(
             endpoint_url='http://something.com',
         )
-        self.response = mock.MagicMock()
-        self.response.content = '''<?xml version="1.0" encoding="utf-8"?>
+        self.response = requests.Response()
+        list_body = six.b('''<?xml version="1.0" encoding="utf-8"?>
 <params>
 <param>
  <value>
@@ -31,7 +33,10 @@ class TestXmlRpcAPICall(testing.TestCase):
   </array>
  </value>
 </param>
-</params>'''
+</params>''')
+        self.response.raw = io.BytesIO(list_body)
+        self.response.headers['SoftLayer-Total-Items'] = 10
+        self.response.status_code = 200
 
     @mock.patch('requests.request')
     def test_call(self, request):
@@ -69,6 +74,8 @@ class TestXmlRpcAPICall(testing.TestCase):
                                    cert=None,
                                    verify=True)
         self.assertEqual(resp, [])
+        self.assertIsInstance(resp, transports.SoftLayerListResult)
+        self.assertEqual(resp.total_count, 10)
 
     def test_proxy_without_protocol(self):
         req = transports.Request()
@@ -253,21 +260,32 @@ class TestRestAPICall(testing.TestCase):
 
     @mock.patch('requests.request')
     def test_basic(self, request):
-        request().content = '{}'
+        request().content = '[]'
+        request().headers = requests.structures.CaseInsensitiveDict({
+            'SoftLayer-Total-Items': '10',
+        })
+
         req = transports.Request()
         req.service = 'SoftLayer_Service'
         req.method = 'Resource'
-
         resp = self.transport(req)
-        self.assertEqual(resp, {})
+
+        self.assertEqual(resp, [])
+        self.assertIsInstance(resp, transports.SoftLayerListResult)
+        self.assertEqual(resp.total_count, 10)
         request.assert_called_with(
             'GET', 'http://something.com/SoftLayer_Service/Resource.json',
             headers=mock.ANY,
+            auth=None,
+            data=None,
+            params={},
             verify=True,
             cert=None,
             proxies=None,
             timeout=None)
 
+    @mock.patch('requests.request')
+    def test_error(self, request):
         # Test JSON Error
         e = requests.HTTPError('error')
         e.response = mock.MagicMock()
@@ -278,6 +296,9 @@ class TestRestAPICall(testing.TestCase):
         }'''
         request().raise_for_status.side_effect = e
 
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'Resource'
         self.assertRaises(SoftLayer.SoftLayerAPIError, self.transport, req)
 
     def test_proxy_without_protocol(self):
@@ -306,6 +327,9 @@ class TestRestAPICall(testing.TestCase):
             'GET', 'http://something.com/SoftLayer_Service/Resource.json',
             proxies={'https': 'http://localhost:3128',
                      'http': 'http://localhost:3128'},
+            auth=None,
+            data=None,
+            params={},
             verify=True,
             cert=None,
             timeout=mock.ANY,
@@ -327,6 +351,9 @@ class TestRestAPICall(testing.TestCase):
             'GET',
             'http://something.com/SoftLayer_Service/2/getObject.json',
             headers=mock.ANY,
+            auth=None,
+            data=None,
+            params={},
             verify=True,
             cert=None,
             proxies=None,
@@ -345,9 +372,83 @@ class TestRestAPICall(testing.TestCase):
 
         self.assertEqual(resp, {})
         request.assert_called_with(
-            'GET',
-            'http://something.com/SoftLayer_Service/getObject/test/1.json',
+            'POST',
+            'http://something.com/SoftLayer_Service/getObject.json',
             headers=mock.ANY,
+            auth=None,
+            data='{"parameters": ["test", 1]}',
+            params={},
+            verify=True,
+            cert=None,
+            proxies=None,
+            timeout=None)
+
+
+    @mock.patch('requests.request')
+    def test_with_filter(self, request):
+        request().content = '{}'
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        req.filter = {'TYPE': {'attribute': {'operation': '^= prefix'}}}
+
+        resp = self.transport(req)
+
+        self.assertEqual(resp, {})
+        request.assert_called_with(
+            'GET',
+            'http://something.com/SoftLayer_Service/getObject.json',
+            params={'objectFilter':
+                    '{"TYPE": {"attribute": {"operation": "^= prefix"}}}'},
+            headers=mock.ANY,
+            auth=None,
+            data=None,
+            verify=True,
+            cert=None,
+            proxies=None,
+            timeout=None)
+
+    @mock.patch('requests.request')
+    def test_with_mask(self, request):
+        request().content = '{}'
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        req.mask = 'id,property'
+
+        resp = self.transport(req)
+
+        self.assertEqual(resp, {})
+        request.assert_called_with(
+            'GET',
+            'http://something.com/SoftLayer_Service/getObject.json',
+            params={'objectMask': 'mask[id,property]'},
+            headers=mock.ANY,
+            auth=None,
+            data=None,
+            verify=True,
+            cert=None,
+            proxies=None,
+            timeout=None)
+
+        # Now test with mask[] prefix
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        req.mask = 'mask[id,property]'
+
+        resp = self.transport(req)
+
+        self.assertEqual(resp, {})
+        request.assert_called_with(
+            'GET',
+            'http://something.com/SoftLayer_Service/getObject.json',
+            params={'objectMask': 'mask[id,property]'},
+            headers=mock.ANY,
+            auth=None,
+            data=None,
             verify=True,
             cert=None,
             proxies=None,
