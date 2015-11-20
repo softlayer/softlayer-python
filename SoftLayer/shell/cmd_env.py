@@ -11,4 +11,7 @@ from SoftLayer.CLI import formatting
 @environment.pass_env
 def cli(env):
     """Print environment variables."""
-    env.fout(formatting.iter_to_table(env.vars))
+    filtered_vars = dict([(k, v)
+                          for k, v in env.vars.items()
+                          if not k.startswith('_')])
+    env.fout(formatting.iter_to_table(filtered_vars))
