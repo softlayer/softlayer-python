@@ -27,7 +27,7 @@ def cli(env):
     datacenters = [dc['template']['datacenter']['name']
                    for dc in result['datacenters']]
     table.add_row(['datacenter',
-                   formatting.listing(datacenters, separator=',')])
+                   formatting.listing(datacenters, separator='\n')])
 
     # CPUs
     standard_cpu = [x for x in result['processors']
