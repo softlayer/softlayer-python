@@ -145,7 +145,7 @@ def _parse_create_args(client, args):
 @click.option('--os', '-o',
               help="OS install code. Tip: you can specify <OS>_LATEST")
 @click.option('--image',
-              help="Image GUID. See: 'slcli image list' for reference")
+              help="Image ID. See: 'slcli image list' for reference")
 @click.option('--billing',
               type=click.Choice(['hourly', 'monthly']),
               default='hourly',

@@ -240,17 +240,21 @@ class VSManager(utils.IdentifierMixin, object):
         """
         return self.guest.deleteObject(id=instance_id)
 
-    def reload_instance(self, instance_id, post_uri=None, ssh_keys=None):
-        """Perform an OS reload of an instance with its current configuration.
+    def reload_instance(self, instance_id,
+                        post_uri=None,
+                        ssh_keys=None,
+                        image_id=None):
+        """Perform an OS reload of an instance.
 
         :param integer instance_id: the instance ID to reload
         :param string post_url: The URI of the post-install script to run
                                 after reload
         :param list ssh_keys: The SSH keys to add to the root user
+        :param int image_id: The ID of the image to load onto the server
 
         .. warning::
-            Post-provision script MUST be HTTPS for it to be executed.
             This will reformat the primary drive.
+            Post-provision script MUST be HTTPS for it to be executed.
 
         Example::
 
@@ -268,8 +272,11 @@ class VSManager(utils.IdentifierMixin, object):
         if ssh_keys:
             config['sshKeyIds'] = [key_id for key_id in ssh_keys]
 
-        return self.guest.reloadOperatingSystem('FORCE', config,
-                                                id=instance_id)
+        if image_id:
+            config['imageTemplateId'] = image_id
+
+        return self.client.call('Virtual_Guest', 'reloadOperatingSystem',
+                                'FORCE', config, id=instance_id)
 
     def _generate_create_dict(
             self, cpus=None, memory=None, hourly=True,
