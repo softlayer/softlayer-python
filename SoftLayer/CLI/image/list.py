@@ -24,11 +24,13 @@ def cli(env, name, public):
 
     images = []
     if public in [False, None]:
-        for image in image_mgr.list_private_images(name=name, mask=image_mod.MASK):
+        for image in image_mgr.list_private_images(name=name,
+                                                   mask=image_mod.MASK):
             images.append(image)
 
     if public in [True, None]:
-        for image in image_mgr.list_public_images(name=name, mask=image_mod.MASK):
+        for image in image_mgr.list_public_images(name=name,
+                                                  mask=image_mod.MASK):
             images.append(image)
 
     table = formatting.Table(['id',
