@@ -7,6 +7,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+from SoftLayer.managers.block import BlockStorageManager
 from SoftLayer.managers.cdn import CDNManager
 from SoftLayer.managers.dns import DNSManager
 from SoftLayer.managers.firewall import FirewallManager
@@ -25,6 +26,7 @@ from SoftLayer.managers.ticket import TicketManager
 from SoftLayer.managers.vs import VSManager
 
 __all__ = [
+    'BlockStorageManager',
     'CDNManager',
     'DNSManager',
     'FirewallManager',
