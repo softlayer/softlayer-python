@@ -23,6 +23,7 @@ from SoftLayer.managers.sshkey import SshKeyManager  # NOQA
 from SoftLayer.managers.ssl import SSLManager  # NOQA
 from SoftLayer.managers.ticket import TicketManager  # NOQA
 from SoftLayer.managers.vs import VSManager  # NOQA
+from SoftLayer.managers.block import BlockStorageManager  #NOQA
 
 __all__ = [
     'CDNManager',
@@ -40,4 +41,5 @@ __all__ = [
     'SSLManager',
     'TicketManager',
     'VSManager',
+    'BlockStorageManager'
 ]
