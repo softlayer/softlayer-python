@@ -126,12 +126,29 @@ class VSTests(testing.TestCase):
                                 identifier=1)
 
     def test_reload_instance(self):
+        self.vs.reload_instance(1)
+
+        self.assert_called_with('SoftLayer_Virtual_Guest',
+                                'reloadOperatingSystem',
+                                args=('FORCE', {}),
+                                identifier=1)
+
+    def test_reload_instance_posturi_sshkeys(self):
         post_uri = 'http://test.sftlyr.ws/test.sh'
 
         self.vs.reload_instance(1, post_uri=post_uri, ssh_keys=[1701])
 
         args = ('FORCE', {'customProvisionScriptUri': post_uri,
                           'sshKeyIds': [1701]})
+        self.assert_called_with('SoftLayer_Virtual_Guest',
+                                'reloadOperatingSystem',
+                                args=args,
+                                identifier=1)
+
+    def test_reload_instance_with_new_os(self):
+        self.vs.reload_instance(1, image_id=1234)
+
+        args = ('FORCE', {'imageTemplateId': 1234})
         self.assert_called_with('SoftLayer_Virtual_Guest',
                                 'reloadOperatingSystem',
                                 args=args,
