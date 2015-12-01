@@ -243,7 +243,8 @@ class FirewallManager(utils.IdentifierMixin, object):
         """Edit the rules for dedicated firewall.
 
         :param integer firewall_id: the instance ID of the dedicated firewall
-        :param dict rules: the rules to be pushed on the firewall
+        :param list rules: the rules to be pushed on the firewall as defined by
+                           SoftLayer_Network_Firewall_Update_Request_Rule
         """
 
         mask = ('mask[networkVlan[firewallInterfaces'
@@ -255,6 +256,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         for fwl1 in network_vlan['firewallInterfaces']:
             if fwl1['name'] == 'inside':
                 continue
+
             for control_list in fwl1['firewallContextAccessControlLists']:
                 if control_list['direction'] == 'out':
                     continue
