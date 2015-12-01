@@ -12,6 +12,7 @@ SoftLayer API Python Client
 .. image:: https://coveralls.io/repos/softlayer/softlayer-python/badge.svg
     :target: https://coveralls.io/r/softlayer/softlayer-python
 
+
 This library provides a simple Python client to interact with `SoftLayer's
 XML-RPC API <http://developer.softlayer.com/reference/softlayerapi>`_.
 
@@ -50,6 +51,9 @@ Or you can install from source. Download source and run:
 The most up-to-date version of this library can be found on the SoftLayer
 GitHub public repositories at http://github.com/softlayer. Please post to Stack Overflow at https://stackoverflow.com/ or open a support ticket in the customer portal if you have any questions regarding use of this library. If you use Stack Overflow please tag your posts with “SoftLayer” so our team can easily find your post. 
 
+InsecurePlatformWarning Notice
+------------------------------
+This library relies on the `requests <http://docs.python-requests.org/>`_ library to make HTTP requests. On Python versions below Python 2.7.9, requests has started emitting a security warning (InsecurePlatformWarning) due to insecurities with creating SSL connections. To resolve this, upgrade to Python 2.7.9+ or follow the instructions here: http://stackoverflow.com/a/29099439.
 
 System Requirements
 -------------------
