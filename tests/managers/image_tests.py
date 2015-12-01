@@ -132,12 +132,24 @@ class ImageTests(testing.TestCase):
                                 args=({'name': 'abc', 'note': 'xyz'},))
 
     def test_import_image(self):
-        # Test import image
-        self.image.import_image_from_uri({'name': 'test_image',
-                                          'note': 'testimage',
-                                          'uri': 'invaliduri'})
+        self.image.import_image_from_uri(name='test_image',
+                                         note='testimage',
+                                         uri='someuri',
+                                         os_code='UBUNTU_LATEST')
 
-        self.assert_called_with(IMAGE_SERVICE, 'createFromExternalSource',
-                                args=({'name': 'test_image',
-                                       'note': 'testimage',
-                                       'uri': 'invaliduri'},))
+        self.assert_called_with(
+            IMAGE_SERVICE,
+            'createFromExternalSource',
+            args=({'name': 'test_image',
+                   'note': 'testimage',
+                   'uri': 'someuri',
+                   'operatingSystemReferenceCode': 'UBUNTU_LATEST'},))
+
+    def test_export_image(self):
+        self.image.export_image_to_uri(1234, 'someuri')
+
+        self.assert_called_with(
+            IMAGE_SERVICE,
+            'copyToExternalSource',
+            args=({'uri': 'someuri'},),
+            identifier=1234)
