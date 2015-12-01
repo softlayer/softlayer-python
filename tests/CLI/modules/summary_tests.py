@@ -17,11 +17,10 @@ class SummaryTests(testing.TestCase):
         expected = [
             {
                 'datacenter': 'dal00',
-                'networking': 1,
                 'subnets': 0,
                 'hardware': 1,
-                'ips': 6,
-                'vs': 1,
+                'public_ips': 6,
+                'virtual_servers': 1,
                 'vlans': 3
             }
         ]

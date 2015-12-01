@@ -241,12 +241,11 @@ class NetworkTests(testing.TestCase):
     def test_summary_by_datacenter(self):
         result = self.network.summary_by_datacenter()
 
-        expected = {'dal00': {'hardwareCount': 1,
-                              'networkingCount': 1,
-                              'virtualGuestCount': 1,
-                              'subnetCount': 0,
-                              'primaryIpCount': 6,
-                              'vlanCount': 3}}
+        expected = {'dal00': {'hardware_count': 1,
+                              'virtual_guest_count': 1,
+                              'subnet_count': 0,
+                              'public_ip_count': 6,
+                              'vlan_count': 3}}
         self.assertEqual(expected, result)
 
     def test_resolve_global_ip_ids(self):

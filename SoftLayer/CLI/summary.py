@@ -13,12 +13,11 @@ import click
               help='Column to sort by',
               default='datacenter',
               type=click.Choice(['datacenter',
+                                 'hardware',
+                                 'virtual_servers',
                                  'vlans',
                                  'subnets',
-                                 'ips',
-                                 'networking',
-                                 'hardware',
-                                 'vs']))
+                                 'public_ips']))
 @environment.pass_env
 def cli(env, sortby):
     """Account summary."""
@@ -27,19 +26,23 @@ def cli(env, sortby):
     datacenters = mgr.summary_by_datacenter()
 
     table = formatting.Table([
-        'datacenter', 'vlans', 'subnets', 'ips', 'networking', 'hardware', 'vs'
+        'datacenter',
+        'hardware',
+        'virtual_servers',
+        'vlans',
+        'subnets',
+        'public_ips',
     ])
     table.sortby = sortby
 
     for name, datacenter in datacenters.items():
         table.add_row([
             name,
-            datacenter['vlanCount'],
-            datacenter['subnetCount'],
-            datacenter['primaryIpCount'],
-            datacenter['networkingCount'],
-            datacenter['hardwareCount'],
-            datacenter['virtualGuestCount'],
+            datacenter['hardware_count'],
+            datacenter['virtual_guest_count'],
+            datacenter['vlan_count'],
+            datacenter['subnet_count'],
+            datacenter['public_ip_count'],
         ])
 
     env.fout(table)
