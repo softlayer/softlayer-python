@@ -25,9 +25,9 @@ def cli(env, identifier, password):
     result = iscsi_mgr.get_iscsi(iscsi_id)
     result = utils.NestedDict(result)
 
-    table = formatting.KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'r'
-    table.align['Value'] = 'l'
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
 
     table.add_row(['id', result['id']])
     table.add_row(['serviceResourceName', result['serviceResourceName']])

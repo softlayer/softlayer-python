@@ -17,9 +17,9 @@ def cli(env, account_id):
     manager = SoftLayer.CDNManager(env.client)
     account = manager.get_account(account_id)
 
-    table = formatting.KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'r'
-    table.align['Value'] = 'l'
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
 
     table.add_row(['id', account['id']])
     table.add_row(['account_name', account['cdnAccountName']])

@@ -19,11 +19,13 @@ from SoftLayer.CLI import mq
 @click.option('--visibility-interval',
               type=click.INT,
               default=30,
+              show_default=True,
               help="Time in seconds that messages will re-appear after being "
                    "popped")
 @click.option('--expiration',
               type=click.INT,
               default=604800,
+              show_default=True,
               help="Time in seconds that messages will live")
 @helpers.multi_option('--tag', '-g', help="Tags to add to the topic")
 @environment.pass_env

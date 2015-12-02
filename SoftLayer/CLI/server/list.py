@@ -52,12 +52,15 @@ DEFAULT_COLUMNS = [
 @click.option('--memory', '-m', help='Filter by memory in gigabytes')
 @click.option('--network', '-n', help='Filter by network port speed in Mbps')
 @helpers.multi_option('--tag', help='Filter by tags')
-@click.option('--sortby', help='Column to sort by', default='hostname')
+@click.option('--sortby', help='Column to sort by',
+              default='hostname',
+              show_default=True)
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
-              help='Columns to display. Options: %s'
+              help='Columns to display. [options: %s]'
               % ', '.join(column.name for column in COLUMNS),
-              default=','.join(DEFAULT_COLUMNS))
+              default=','.join(DEFAULT_COLUMNS),
+              show_default=True)
 @environment.pass_env
 def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag,
         columns):

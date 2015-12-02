@@ -42,9 +42,9 @@ def get_settings_from_client(client):
 
 def config_table(settings):
     """Returns a config table."""
-    table = formatting.KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'r'
-    table.align['Value'] = 'l'
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
     table.add_row(['Username', settings['username'] or 'not set'])
     table.add_row(['API Key', settings['api_key'] or 'not set'])
     table.add_row(['Endpoint URL', settings['endpoint_url'] or 'not set'])

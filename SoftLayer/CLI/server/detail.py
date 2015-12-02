@@ -24,9 +24,9 @@ def cli(env, identifier, passwords, price):
 
     hardware = SoftLayer.HardwareManager(env.client)
 
-    table = formatting.KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'r'
-    table.align['Value'] = 'l'
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
 
     hardware_id = helpers.resolve_id(hardware.resolve_ids,
                                      identifier,

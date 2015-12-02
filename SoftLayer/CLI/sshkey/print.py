@@ -29,7 +29,7 @@ def cli(env, identifier, out_file):
         with open(path.expanduser(out_file), 'w') as pub_file:
             pub_file.write(key['key'])
 
-    table = formatting.KeyValueTable(['Name', 'Value'])
+    table = formatting.KeyValueTable(['name', 'value'])
     table.add_row(['id', key['id']])
     table.add_row(['label', key.get('label')])
     table.add_row(['notes', key.get('notes', '-')])

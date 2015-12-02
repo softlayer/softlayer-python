@@ -18,9 +18,9 @@ def cli(env):
     vsi = SoftLayer.VSManager(env.client)
     result = vsi.get_create_options()
 
-    table = formatting.KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'r'
-    table.align['Value'] = 'l'
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
 
     # Datacenters
     datacenters = [dc['template']['datacenter']['name']

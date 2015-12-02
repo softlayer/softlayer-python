@@ -149,6 +149,7 @@ def _parse_create_args(client, args):
 @click.option('--billing',
               type=click.Choice(['hourly', 'monthly']),
               default='hourly',
+              show_default=True,
               help="Billing rate")
 @click.option('--dedicated/--public',
               is_flag=True,

@@ -72,8 +72,8 @@ def get_network():
         network = network_func()
 
         table = formatting.KeyValueTable(['name', 'value'])
-        table.align['Name'] = 'r'
-        table.align['Value'] = 'l'
+        table.align['name'] = 'r'
+        table.align['value'] = 'l'
         table.add_row(['mac addresses',
                        formatting.listing(network['mac_addresses'],
                                           separator=',')])

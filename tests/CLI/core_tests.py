@@ -27,14 +27,6 @@ class CoreTests(testing.TestCase):
                 if ex.code != 0:
                     self.fail("Non-zero exit code for command: %s" % path)
 
-    def test_debug_max(self):
-        with mock.patch('logging.getLogger') as log_mock:
-            result = self.run_command(['--debug=3', 'vs', 'list'])
-
-            self.assertEqual(result.exit_code, 0)
-            log_mock().addHandler.assert_called_with(mock.ANY)
-            log_mock().setLevel.assert_called_with(logging.DEBUG)
-
     def test_verbose_max(self):
         with mock.patch('logging.getLogger') as log_mock:
             result = self.run_command(['-vvv', 'vs', 'list'])
@@ -50,13 +42,16 @@ class CoreTests(testing.TestCase):
         self.assertEqual(result.exit_code, 0)
         self.assertIsNotNone(env.client)
 
-    def test_timings(self):
-        result = self.run_command(['--timings', 'vs', 'list'])
+    def test_diagnostics(self):
+        result = self.run_command(['-v', 'vs', 'list'])
 
         self.assertEqual(result.exit_code, 0)
-        self.assertIn('"method": "getVirtualGuests"', result.output)
-        self.assertIn('"service": "SoftLayer_Account"', result.output)
-        self.assertIn('"time":', result.output)
+        self.assertIn('SoftLayer_Account::getVirtualGuests', result.output)
+        self.assertIn('"execution_time"', result.output)
+        self.assertIn('"api_calls"', result.output)
+        self.assertIn('"version"', result.output)
+        self.assertIn('"python_version"', result.output)
+        self.assertIn('"library_location"', result.output)
 
 
 class CoreMainTests(testing.TestCase):

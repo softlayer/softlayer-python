@@ -18,9 +18,9 @@ def get_ticket_results(mgr, ticket_id, update_count=1):
     """
     ticket = mgr.get_ticket(ticket_id)
 
-    table = formatting.KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'r'
-    table.align['Value'] = 'l'
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
 
     table.add_row(['id', ticket['id']])
     table.add_row(['title', ticket['title']])

@@ -12,6 +12,7 @@ from SoftLayer.CLI import formatting
 @click.option('--sortby',
               help='Column to sort by',
               default='datacenter',
+              show_default=True,
               type=click.Choice(['datacenter',
                                  'hardware',
                                  'virtual_servers',

@@ -38,6 +38,7 @@ from SoftLayer.CLI import template
 @click.option('--billing',
               type=click.Choice(['hourly', 'monthly']),
               default='hourly',
+              show_default=True,
               help="Billing rate")
 @click.option('--postinstall', '-i', help="Post-install script to download")
 @helpers.multi_option('--key', '-k',

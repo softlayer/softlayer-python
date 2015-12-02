@@ -11,6 +11,7 @@ from SoftLayer.CLI import formatting
 @click.command()
 @click.option('--status',
               default="all",
+              show_default=True,
               type=click.Choice(['all', 'valid', 'expired']),
               help="Show certificates with this status")
 @click.option('--sortby',

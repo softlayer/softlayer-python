@@ -13,6 +13,7 @@ from SoftLayer.CLI import mq
 @click.argument('queue-name')
 @click.option('--count',
               default=1,
+              show_default=True,
               type=click.INT,
               help="Count of messages to pop")
 @click.option('--delete-after',

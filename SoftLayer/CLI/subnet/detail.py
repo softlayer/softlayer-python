@@ -26,9 +26,9 @@ def cli(env, identifier, no_vs, no_hardware):
                                    name='subnet')
     subnet = mgr.get_subnet(subnet_id)
 
-    table = formatting.KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'r'
-    table.align['Value'] = 'l'
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
 
     table.add_row(['id', subnet['id']])
     table.add_row(['identifier',
