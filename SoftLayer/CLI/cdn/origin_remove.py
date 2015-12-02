@@ -1,10 +1,10 @@
 """Remove an origin pull mapping."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
-
-import click
 
 
 @click.command()

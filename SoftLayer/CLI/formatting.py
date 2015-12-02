@@ -349,7 +349,7 @@ class FormattedItem(object):
         return self < other or self == other
 
     def __ge__(self, other):
-        return not self < other
+        return self >= other
 
 
 def _format_python_value(value):

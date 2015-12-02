@@ -1,14 +1,14 @@
 """Upgrade a virtual server."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 from SoftLayer.CLI import virt
-
-import click
 
 
 @click.command(epilog="""Note: SoftLayer automatically reboots the VS once

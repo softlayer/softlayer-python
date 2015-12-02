@@ -5,9 +5,9 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import utils
-
 import six
+
+from SoftLayer import utils
 
 
 MAX_URLS_PER_LOAD = 5

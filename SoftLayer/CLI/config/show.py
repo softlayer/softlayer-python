@@ -1,10 +1,10 @@
 """Show current CLI configuration."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 from SoftLayer.CLI import config
 from SoftLayer.CLI import environment
-
-import click
 
 
 @click.command()

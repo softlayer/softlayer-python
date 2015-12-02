@@ -5,13 +5,13 @@ import os
 import subprocess
 import tempfile
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import firewall
 from SoftLayer.CLI import formatting
-
-import click
 
 DELIMITER = "=========================================\n"
 

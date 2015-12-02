@@ -1,13 +1,13 @@
 """Toggle the status of an existing load balancer service."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import loadbal
-
-import click
 
 
 @click.command()

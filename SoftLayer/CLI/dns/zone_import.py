@@ -2,12 +2,12 @@
 # :license: MIT, see LICENSE for more details.
 import re
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import helpers
-
-import click
 
 RECORD_REGEX = re.compile(r"""^((?P<domain>([\w-]+(\.)?)*|\@)?\s+
                                (?P<ttl>\d+)?\s+

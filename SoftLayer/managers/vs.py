@@ -799,8 +799,8 @@ class VSManager(utils.IdentifierMixin, object):
         vs_id = {'memory': 3, 'cpus': 80, 'nic_speed': 26}
         for item in package_items:
             categories = item['prices'][0]['categories']
-            for j in range(len(categories)):
-                if not (categories[j]['id'] == vs_id[option] and
+            for category in categories:
+                if not (category['id'] == vs_id[option] and
                         item['capacity'] == str(value)):
                     continue
                 if option == 'cpus':

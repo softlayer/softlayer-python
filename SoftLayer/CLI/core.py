@@ -10,12 +10,13 @@ import logging
 import sys
 import types
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 
-import click
 # pylint: disable=too-many-public-methods, broad-except, unused-argument
 # pylint: disable=redefined-builtin, super-init-not-called
 

@@ -9,14 +9,15 @@
 import logging
 import os.path
 
+from click import testing
+import mock
+import testtools
+
 import SoftLayer
 from SoftLayer.CLI import core
 from SoftLayer.CLI import environment
 from SoftLayer.testing import xmlrpc
 
-from click import testing
-import mock
-import testtools
 
 FIXTURE_PATH = os.path.abspath(os.path.join(__file__, '..', '..', 'fixtures'))
 

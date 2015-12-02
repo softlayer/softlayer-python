@@ -576,7 +576,7 @@ def _get_extra_price_id(items, key_name, hourly, location):
     """Returns a price id attached to item with the given key_name."""
 
     for item in items:
-        if not utils.lookup(item, 'keyName') == key_name:
+        if utils.lookup(item, 'keyName') != key_name:
             continue
 
         for price in item['prices']:
@@ -596,7 +596,7 @@ def _get_default_price_id(items, option, hourly, location):
     """Returns a 'free' price id given an option."""
 
     for item in items:
-        if not utils.lookup(item, 'itemCategory', 'categoryCode') == option:
+        if utils.lookup(item, 'itemCategory', 'categoryCode') != option:
             continue
 
         for price in item['prices']:
@@ -621,9 +621,9 @@ def _get_bandwidth_price_id(items,
 
         capacity = float(item.get('capacity', 0))
         # Hourly and private only do pay-as-you-go bandwidth
-        if any([not utils.lookup(item,
-                                 'itemCategory',
-                                 'categoryCode') == 'bandwidth',
+        if any([utils.lookup(item,
+                             'itemCategory',
+                             'categoryCode') != 'bandwidth',
                 (hourly or no_public) and capacity != 0.0,
                 not (hourly or no_public) and capacity == 0.0]):
             continue
@@ -644,12 +644,12 @@ def _get_os_price_id(items, os, location):
     """Returns the price id matching."""
 
     for item in items:
-        if any([not utils.lookup(item,
-                                 'itemCategory',
-                                 'categoryCode') == 'os',
-                not utils.lookup(item,
-                                 'softwareDescription',
-                                 'referenceCode') == os]):
+        if any([utils.lookup(item,
+                             'itemCategory',
+                             'categoryCode') != 'os',
+                utils.lookup(item,
+                             'softwareDescription',
+                             'referenceCode') != os]):
             continue
 
         for price in item['prices']:
@@ -666,9 +666,9 @@ def _get_port_speed_price_id(items, port_speed, no_public, location):
     """Choose a valid price id for port speed."""
 
     for item in items:
-        if not utils.lookup(item,
-                            'itemCategory',
-                            'categoryCode') == 'port_speed':
+        if utils.lookup(item,
+                        'itemCategory',
+                        'categoryCode') != 'port_speed':
             continue
 
         # Check for correct capacity and if the item matches private only

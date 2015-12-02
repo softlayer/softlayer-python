@@ -7,10 +7,10 @@
 """
 import shlex
 
-from SoftLayer.CLI import core
-
 import click
 from prompt_toolkit import completion as completion
+
+from SoftLayer.CLI import core
 
 
 class ShellCompleter(completion.Completer):

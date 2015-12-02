@@ -6,9 +6,9 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from SoftLayer.CLI import exceptions
-
 import click
+
+from SoftLayer.CLI import exceptions
 
 
 def multi_option(*param_decls, **attrs):

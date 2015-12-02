@@ -7,11 +7,11 @@
 """
 import importlib
 
-from SoftLayer.CLI import formatting
-from SoftLayer.CLI import routes
-
 import click
 import pkg_resources
+
+from SoftLayer.CLI import formatting
+from SoftLayer.CLI import routes
 
 # pylint: disable=too-many-instance-attributes, invalid-name, no-self-use
 

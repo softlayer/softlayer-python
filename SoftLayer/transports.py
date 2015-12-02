@@ -5,16 +5,16 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import consts
-from SoftLayer import exceptions
-from SoftLayer import utils
-
 import importlib
 import json
 import logging
 import time
 
 import requests
+
+from SoftLayer import consts
+from SoftLayer import exceptions
+from SoftLayer import utils
 
 LOGGER = logging.getLogger(__name__)
 # transports.Request does have a lot of instance attributes. :(

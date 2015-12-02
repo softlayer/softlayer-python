@@ -1,10 +1,10 @@
 """Summary info about tickets."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-
-import click
 
 
 @click.command()
