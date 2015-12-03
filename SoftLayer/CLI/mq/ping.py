@@ -1,11 +1,11 @@
 """Ping the SoftLayer Message Queue service."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
-
-import click
 
 
 @click.command()

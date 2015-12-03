@@ -2,11 +2,11 @@
 # :license: MIT, see LICENSE for more details.
 import sys
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import mq
-
-import click
 
 
 @click.command()

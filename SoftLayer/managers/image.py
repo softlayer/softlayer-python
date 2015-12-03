@@ -114,10 +114,8 @@ class ImageManager(utils.IdentifierMixin, object):
             self.vgbdtg.editObject(obj, id=image_id)
         if tag:
             self.vgbdtg.setTags(str(tag), id=image_id)
-        if name or note or tag:
-            return True
-        else:
-            return False
+
+        return bool(name or note or tag)
 
     def import_image_from_uri(self, name, uri, os_code=None, note=None):
         """Import a new image from object storage.

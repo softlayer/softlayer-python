@@ -1,8 +1,8 @@
 """Support tickets."""
 
-from SoftLayer.CLI import formatting
-
 import click
+
+from SoftLayer.CLI import formatting
 
 
 TEMPLATE_MSG = "***** SoftLayer Ticket Content ******"

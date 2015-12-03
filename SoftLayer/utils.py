@@ -10,7 +10,7 @@ import re
 
 import six
 
-# pylint: disable=pointless-except, no-member, invalid-name
+# pylint: disable=no-member, invalid-name
 
 UUID_RE = re.compile(r'^[0-9a-f\-]{36}$', re.I)
 KNOWN_OPERATIONS = ['<=', '>=', '<', '>', '~', '!~', '*=', '^=', '$=', '_=']
@@ -37,7 +37,7 @@ def lookup(dic, key, *keys):
 
     """
     if keys:
-        return lookup(dic.get(key, {}), *keys)
+        return lookup(dic.get(key, {}), keys[0], *keys[1:])
     return dic.get(key)
 
 

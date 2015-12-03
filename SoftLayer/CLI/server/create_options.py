@@ -1,10 +1,11 @@
 """Server order options for a given chassis."""
 # :license: MIT, see LICENSE for more details.
+
+import click
+
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import hardware
-
-import click
 
 
 @click.command()

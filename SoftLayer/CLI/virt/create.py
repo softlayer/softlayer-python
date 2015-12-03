@@ -1,6 +1,8 @@
 """Manage, delete, order compute instances."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
@@ -9,8 +11,6 @@ from SoftLayer.CLI import helpers
 from SoftLayer.CLI import template
 from SoftLayer.CLI import virt
 from SoftLayer import utils
-
-import click
 
 
 def _update_with_like_args(ctx, _, value):

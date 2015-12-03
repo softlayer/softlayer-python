@@ -1,8 +1,7 @@
 """Call arbitrary API endpoints."""
+import json
 
 import click
-
-import json
 
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting

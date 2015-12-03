@@ -1,11 +1,11 @@
 """Create a support ticket."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import ticket
-
-import click
 
 
 @click.command()

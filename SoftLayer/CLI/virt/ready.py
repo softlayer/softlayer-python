@@ -1,12 +1,12 @@
 """Check if a virtual server is ready."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import helpers
-
-import click
 
 
 @click.command()

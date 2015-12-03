@@ -1,13 +1,12 @@
 """Find an IP address and display its subnet and device info."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
-
-
-import click
 
 
 @click.command()

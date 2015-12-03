@@ -1,14 +1,14 @@
 """Get details for an image."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 from SoftLayer.CLI import image as image_mod
 from SoftLayer import utils
-
-import click
 
 
 @click.command()
