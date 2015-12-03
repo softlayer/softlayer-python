@@ -8,17 +8,19 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 
 
+COLUMNS = ['datacenter',
+           'hardware',
+           'virtual_servers',
+           'vlans',
+           'subnets',
+           'public_ips']
+
+
 @click.command()
 @click.option('--sortby',
               help='Column to sort by',
               default='datacenter',
-              show_default=True,
-              type=click.Choice(['datacenter',
-                                 'hardware',
-                                 'virtual_servers',
-                                 'vlans',
-                                 'subnets',
-                                 'public_ips']))
+              type=click.Choice(COLUMNS))
 @environment.pass_env
 def cli(env, sortby):
     """Account summary."""
@@ -26,14 +28,7 @@ def cli(env, sortby):
     mgr = SoftLayer.NetworkManager(env.client)
     datacenters = mgr.summary_by_datacenter()
 
-    table = formatting.Table([
-        'datacenter',
-        'hardware',
-        'virtual_servers',
-        'vlans',
-        'subnets',
-        'public_ips',
-    ])
+    table = formatting.Table(COLUMNS)
     table.sortby = sortby
 
     for name, datacenter in datacenters.items():

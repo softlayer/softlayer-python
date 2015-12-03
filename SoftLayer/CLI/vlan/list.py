@@ -8,18 +8,20 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer import utils
 
+COLUMNS = ['id',
+           'number',
+           'name',
+           'firewall',
+           'datacenter',
+           'hardware',
+           'virtual_servers',
+           'public_ips']
+
 
 @click.command()
 @click.option('--sortby',
               help='Column to sort by',
-              type=click.Choice(['id',
-                                 'number',
-                                 'datacenter',
-                                 'IPs',
-                                 'hardware',
-                                 'vs',
-                                 'networking',
-                                 'firewall']))
+              type=click.Choice(COLUMNS))
 @click.option('--datacenter', '-d',
               help='Filter by datacenter shortname (sng01, dal05, ...)')
 @click.option('--number', '-n', help='Filter by VLAN number')
@@ -30,10 +32,7 @@ def cli(env, sortby, datacenter, number, name):
 
     mgr = SoftLayer.NetworkManager(env.client)
 
-    table = formatting.Table([
-        'id', 'number', 'datacenter', 'name', 'IPs', 'hardware', 'vs',
-        'networking', 'firewall'
-    ])
+    table = formatting.Table(COLUMNS)
     table.sortby = sortby
 
     vlans = mgr.list_vlans(datacenter=datacenter,
@@ -43,13 +42,12 @@ def cli(env, sortby, datacenter, number, name):
         table.add_row([
             vlan['id'],
             vlan['vlanNumber'],
-            utils.lookup(vlan, 'primaryRouter', 'datacenter', 'name'),
             vlan.get('name') or formatting.blank(),
-            vlan['totalPrimaryIpAddressCount'],
+            'Yes' if vlan['firewallInterfaces'] else 'No',
+            utils.lookup(vlan, 'primaryRouter', 'datacenter', 'name'),
             len(vlan['hardware']),
             len(vlan['virtualGuests']),
-            len(vlan['networkComponents']),
-            'Yes' if vlan['firewallInterfaces'] else 'No',
+            vlan['totalPrimaryIpAddressCount'],
         ])
 
     env.fout(table)
