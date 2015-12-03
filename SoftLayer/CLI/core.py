@@ -150,7 +150,8 @@ def output_diagnostics(env, verbose=0, **kwargs):
 
     if verbose > 0:
         diagnostic_table = formatting.Table(['name', 'value'])
-        diagnostic_table.add_row(['execution_time', time.time() - START_TIME])
+        diagnostic_table.add_row(['execution_time',
+                                  '%fs' % (time.time() - START_TIME)])
 
         api_call_value = []
         for call, _, duration in env.vars['_timings'].get_last_calls():
