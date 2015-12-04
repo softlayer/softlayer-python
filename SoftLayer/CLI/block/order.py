@@ -1,26 +1,34 @@
 """Order a block storage volume."""
 # :license: MIT, see LICENSE for more details.
 
+import click
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
-import click
 
 
-@click.command()
-@click.option('--storage_type',
+CONTEXT_SETTINGS = dict(token_normalize_func=lambda x: x.upper())
+
+
+@click.command(context_settings=CONTEXT_SETTINGS)
+@click.option('--storage-type',
               help='Type of storage volume',
               type=click.Choice(['performance', 'endurance']),
               required=True)
 @click.option('--size',
-              help='Size of storage volume',
+              type=int,
+              help='Size of storage volume in GB',
               required=True)
 @click.option('--iops',
-              help='Performance Storage IOPs')
+              type=int,
+              help='Performance Storage IOPs,'
+              + ' between 100 and 6000 in multiples of 100'
+              + '  [required for storage-type performance]')
 @click.option('--tier',
-              help='Endurance Storage Tier (IOP per GB)',
+              help='Endurance Storage Tier (IOP per GB)'
+              + '  [required for storage-type endurance]',
               type=click.Choice(['0.25', '2', '4']))
-@click.option('--os',
+@click.option('--os-type',
               help='Operating System',
               type=click.Choice([
                   'HYPER_V',
@@ -32,42 +40,54 @@ import click
                   'XEN']),
               required=True)
 @click.option('--location',
-              help='Size of storage volume',
+              help='Datacenter short name (e.g.: dal09)',
               required=True)
 @environment.pass_env
-def cli(env, storage_type, size, iops, tier, os, location):
+def cli(env, storage_type, size, iops, tier, os_type, location):
     """Order a block storage volume."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
+    storage_type = storage_type.lower()
 
     if storage_type == 'performance':
         if iops is None:
-            raise exceptions.CLIAbort('Option --iops required with performance')
+            raise exceptions.CLIAbort(
+                'Option --iops required with Performance')
+
+        if iops < 100 or iops > 6000:
+            raise exceptions.CLIAbort(
+                'Option --iops must be between 100 and 6000, inclusive')
+
+        if iops % 100 != 0:
+            raise exceptions.CLIAbort(
+                'Option --iops must be a multiple of 100'
+            )
 
         order = block_manager.order_block_volume(
             storage_type='performance_storage_iscsi',
             location=location,
             size=size,
             iops=iops,
-            os_type=os
+            os_type=os_type
         )
 
     if storage_type == 'endurance':
         if tier is None:
-            raise exceptions.CLIAbort('Option --tier required with performance')
+            raise exceptions.CLIAbort(
+                'Option --tier required with Endurance in IOPS/GB [0.25,2,4]')
 
         order = block_manager.order_block_volume(
             storage_type='storage_service_enterprise',
             location=location,
             size=size,
             tier_level=tier,
-            os_type=os
+            os_type=os_type
         )
 
     if 'placedOrder' in order.keys():
-        print "Order #{0} placed successfully!".format(
-            order['placedOrder']['id'])
+        click.echo("Order #{0} placed successfully!".format(
+            order['placedOrder']['id']))
         for item in order['placedOrder']['items']:
-            print " > %s" % item['description']
+            click.echo(" > %s" % item['description'])
     else:
-        print "Order could not be placed! Please verify your options " \
-              "and try again."
+        click.echo("Order could not be placed! Please verify your options " +
+                   "and try again.")

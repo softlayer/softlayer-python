@@ -1,12 +1,12 @@
 """List block storage volumes."""
 # :license: MIT, see LICENSE for more details.
 
+import click
 import SoftLayer
 from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 
-import click
 
 COLUMNS = [
     column_helper.Column('id', ('id',)),
@@ -33,7 +33,7 @@ DEFAULT_COLUMNS = [
 @click.command()
 @click.option('--username', '-u', help='Volume username')
 @click.option('--datacenter', '-d', help='Datacenter shortname')
-@click.option('--storage_type',
+@click.option('--storage-type',
               help='Type of storage volume',
               type=click.Choice(['performance', 'endurance']))
 @click.option('--sortby', help='Column to sort by', default='username')
@@ -47,9 +47,9 @@ def cli(env, sortby, columns, datacenter, username, storage_type):
     """List block storage."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
     block_volumes = block_manager.list_block_volumes(datacenter=datacenter,
-                                                  username=username,
-                                                  storage_type=storage_type,
-                                                  mask=columns.mask())
+                                                     username=username,
+                                                     storage_type=storage_type,
+                                                     mask=columns.mask())
 
     table = formatting.Table(columns.columns)
     table.sortby = sortby

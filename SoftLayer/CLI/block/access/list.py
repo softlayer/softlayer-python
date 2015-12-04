@@ -1,18 +1,35 @@
 """List hosts with access to volume."""
 # :license: MIT, see LICENSE for more details.
 
+import click
 import SoftLayer
 from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 
-import click
 
 COLUMNS = [
-    column_helper.Column('id', ('id',)),
-    column_helper.Column('hostname', ('hostname',)),
-    column_helper.Column('type', ('type',)),
-    column_helper.Column('primaryBackendIpAddress', ('primaryBackendIpAddress',)),
+    column_helper.Column(
+        'id',
+        ('id',)),
+    column_helper.Column(
+        'hostname',
+        ('hostname',)),
+    column_helper.Column(
+        'type',
+        ('type',)),
+    column_helper.Column(
+        'primaryBackendIpAddress',
+        ('primaryBackendIpAddress',)),
+    column_helper.Column(
+        'hostIqn',
+        ('allowedHost', 'name',)),
+    column_helper.Column(
+        'username',
+        ('allowedHost', 'credential', 'username',)),
+    column_helper.Column(
+        'password',
+        ('allowedHost', 'credential', 'password',)),
 ]
 
 DEFAULT_COLUMNS = [
@@ -20,6 +37,9 @@ DEFAULT_COLUMNS = [
     'hostname',
     'type',
     'primaryBackendIpAddress',
+    'hostIqn',
+    'username',
+    'password',
 ]
 
 
@@ -35,7 +55,8 @@ DEFAULT_COLUMNS = [
 def cli(env, columns, sortby, volume_id):
     """List block storage."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
-    access_list = block_manager.get_block_volume_access_list(volume_id=volume_id)
+    access_list = block_manager.get_block_volume_access_list(
+        volume_id=volume_id)
     table = formatting.Table(columns.columns)
     table.sortby = sortby
 
