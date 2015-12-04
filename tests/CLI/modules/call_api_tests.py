@@ -43,7 +43,6 @@ class CallCliTests(testing.TestCase):
                                    '-f nested.property=5432',
                                    '--output-python'])
 
-        print(result.exception)
         self.assertEqual(result.exit_code, 0)
         # NOTE(kmcdonald): Python 3 no longer inserts 'u' before unicode
         # string literals but python 2 does. These are stripped out to make
