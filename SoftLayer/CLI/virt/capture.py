@@ -25,9 +25,9 @@ def cli(env, identifier, name, all, note):
 
     capture = vsi.capture(vs_id, name, all, note)
 
-    table = formatting.KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'r'
-    table.align['Value'] = 'l'
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
 
     table.add_row(['vs_id', capture['guestId']])
     table.add_row(['date', capture['createDate'][:10]])

@@ -21,6 +21,7 @@ the records updated.""")
 @click.option('--ptr', is_flag=True, help="Sync the PTR record for the host")
 @click.option('--ttl',
               default=7200,
+              show_default=True,
               type=click.INT,
               help="Sets the TTL for the A and/or PTR records")
 @environment.pass_env

@@ -371,9 +371,9 @@ def iter_to_table(value):
 def _format_dict(result):
     """Format dictionary responses into key-value table."""
 
-    table = KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'r'
-    table.align['Value'] = 'l'
+    table = KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
 
     for key, value in result.items():
         value = iter_to_table(value)
@@ -391,7 +391,7 @@ def _format_list(result):
     if isinstance(result[0], dict):
         return _format_list_objects(result)
 
-    table = Table(["Value"])
+    table = Table(['value'])
     for item in result:
         table.add_row([iter_to_table(item)])
     return table

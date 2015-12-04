@@ -12,9 +12,11 @@ from SoftLayer.CLI import formatting
 @click.command()
 @click.argument('name')
 @click.argument('uri')
-@click.option('--note', default="",
+@click.option('--note',
+              default="",
               help="The note to be applied to the imported template")
-@click.option('--os-code', default="",
+@click.option('--os-code',
+              default="",
               help="The referenceCode of the operating system software"
                    " description for the imported VHD")
 @environment.pass_env

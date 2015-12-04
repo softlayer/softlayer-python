@@ -11,7 +11,11 @@ from SoftLayer.CLI import helpers
 
 @click.command()
 @click.argument('identifier')
-@click.option('--wait', default=0, type=click.INT, help="Name of the image")
+@click.option('--wait',
+              default=0,
+              show_default=True,
+              type=click.INT,
+              help="Name of the image")
 @environment.pass_env
 def cli(env, identifier, wait):
     """Check if a virtual server is ready."""

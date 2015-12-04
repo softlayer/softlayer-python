@@ -26,9 +26,9 @@ def cli(env, identifier, no_vs, no_hardware):
     vlan_id = helpers.resolve_id(mgr.resolve_vlan_ids, identifier, 'VLAN')
     vlan = mgr.get_vlan(vlan_id)
 
-    table = formatting.KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'r'
-    table.align['Value'] = 'l'
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
 
     table.add_row(['id', vlan['id']])
     table.add_row(['number', vlan['vlanNumber']])
@@ -40,9 +40,9 @@ def cli(env, identifier, no_vs, no_hardware):
                    'Yes' if vlan['firewallInterfaces'] else 'No'])
     subnets = []
     for subnet in vlan['subnets']:
-        subnet_table = formatting.KeyValueTable(['Name', 'Value'])
-        subnet_table.align['Name'] = 'r'
-        subnet_table.align['Value'] = 'l'
+        subnet_table = formatting.KeyValueTable(['name', 'value'])
+        subnet_table.align['name'] = 'r'
+        subnet_table.align['value'] = 'l'
         subnet_table.add_row(['id', subnet['id']])
         subnet_table.add_row(['identifier', subnet['networkIdentifier']])
         subnet_table.add_row(['netmask', subnet['netmask']])

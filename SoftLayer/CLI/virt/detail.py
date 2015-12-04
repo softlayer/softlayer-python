@@ -21,9 +21,9 @@ def cli(env, identifier, passwords=False, price=False):
     """Get details for a virtual server."""
 
     vsi = SoftLayer.VSManager(env.client)
-    table = formatting.KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'r'
-    table.align['Value'] = 'l'
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
 
     vs_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
     result = vsi.get_instance(vs_id)

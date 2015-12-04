@@ -61,7 +61,7 @@ class CallCliTests(testing.TestCase):
         self.assertEqual(result.exit_code, 0)
         # NOTE(kmcdonald): Order is not guaranteed
         self.assertIn(":........:........:", result.output)
-        self.assertIn(":   Name : Value  :", result.output)
+        self.assertIn(":   name : value  :", result.output)
         self.assertIn(":    int : 10     :", result.output)
         self.assertIn(":   None : None   :", result.output)
         self.assertIn(":  float : 1.0    :", result.output)

@@ -423,7 +423,7 @@ class IterToTableTests(testing.TestCase):
         result = formatting._format_dict({'key': 'value'})
 
         self.assertIsInstance(result, formatting.Table)
-        self.assertEqual(result.columns, ['Name', 'Value'])
+        self.assertEqual(result.columns, ['name', 'value'])
         self.assertEqual(result.rows, [['key', 'value']])
 
     def test_format_api_list(self):
@@ -437,5 +437,5 @@ class IterToTableTests(testing.TestCase):
         result = formatting._format_list(['a', 'b', 'c'])
 
         self.assertIsInstance(result, formatting.Table)
-        self.assertEqual(result.columns, ['Value'])
+        self.assertEqual(result.columns, ['value'])
         self.assertEqual(result.rows, [['a'], ['b'], ['c']])

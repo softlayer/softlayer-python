@@ -11,7 +11,11 @@ from SoftLayer.CLI import ticket
 
 @click.command()
 @click.argument('identifier')
-@click.option('--count', type=click.INT, help="Number of updates", default=10)
+@click.option('--count',
+              type=click.INT,
+              help="Number of updates",
+              show_default=True,
+              default=10)
 @environment.pass_env
 def cli(env, identifier, count):
     """Get details for a ticket."""

@@ -20,9 +20,9 @@ def cli(env, identifier):
 
     load_balancer = mgr.get_local_lb(loadbal_id)
 
-    table = formatting.KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'l'
-    table.align['Value'] = 'l'
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'l'
+    table.align['value'] = 'l'
     table.add_row(['General properties', '----------'])
     table.add_row([' ID', 'local:%s' % load_balancer['id']])
     table.add_row([' IP Address', load_balancer['ipAddress']['ipAddress']])

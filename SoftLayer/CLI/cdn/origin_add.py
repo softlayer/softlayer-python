@@ -14,7 +14,8 @@ from SoftLayer.CLI import environment
 @click.argument('content_url')
 @click.option('--type',
               help='The media type for this mapping (http, flash, wm, ...)',
-              default='http')
+              default='http',
+              show_default=True)
 @click.option('--cname',
               help='An optional CNAME to attach to the mapping')
 @environment.pass_env

@@ -162,7 +162,7 @@ class TestCase(testtools.TestCase):
         args = args or []
 
         if fixtures is True:
-            args.insert(0, '--fixtures')
+            args.insert(0, '--demo')
         args.insert(0, '--format=%s' % fmt)
 
         runner = testing.CliRunner()
