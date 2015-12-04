@@ -34,7 +34,7 @@ def cli(env, identifier, no_vs, no_hardware):
     table.add_row(['number', vlan['vlanNumber']])
     table.add_row(['datacenter',
                    vlan['primaryRouter']['datacenter']['longName']])
-    table.add_row(['primary router',
+    table.add_row(['primary_router',
                    vlan['primaryRouter']['fullyQualifiedDomainName']])
     table.add_row(['firewall',
                    'Yes' if vlan['firewallInterfaces'] else 'No'])
@@ -54,30 +54,28 @@ def cli(env, identifier, no_vs, no_hardware):
 
     table.add_row(['subnets', subnets])
 
+    server_columns = ['hostname', 'domain', 'public_ip', 'private_ip']
+
     if not no_vs:
         if vlan['virtualGuests']:
-            vs_table = formatting.KeyValueTable(['Hostname',
-                                                 'Domain',
-                                                 'IP'])
-            vs_table.align['Hostname'] = 'r'
-            vs_table.align['IP'] = 'l'
+            vs_table = formatting.KeyValueTable(server_columns)
             for vsi in vlan['virtualGuests']:
                 vs_table.add_row([vsi['hostname'],
                                   vsi['domain'],
-                                  vsi.get('primaryIpAddress')])
+                                  vsi.get('primaryIpAddress'),
+                                  vsi.get('primaryBackendIpAddress')])
             table.add_row(['vs', vs_table])
         else:
             table.add_row(['vs', 'none'])
 
     if not no_hardware:
         if vlan['hardware']:
-            hw_table = formatting.Table(['Hostname', 'Domain', 'IP'])
-            hw_table.align['Hostname'] = 'r'
-            hw_table.align['IP'] = 'l'
+            hw_table = formatting.Table(server_columns)
             for hardware in vlan['hardware']:
                 hw_table.add_row([hardware['hostname'],
                                   hardware['domain'],
-                                  hardware.get('primaryIpAddress')])
+                                  hardware.get('primaryIpAddress'),
+                                  hardware.get('primaryBackendIpAddress')])
             table.add_row(['hardware', hw_table])
         else:
             table.add_row(['hardware', 'none'])

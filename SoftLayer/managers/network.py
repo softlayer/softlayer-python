@@ -350,7 +350,7 @@ class NetworkManager(object):
             datacenters[name]['vlan_count'] += 1
             datacenters[name]['public_ip_count'] += (
                 vlan['totalPrimaryIpAddressCount'])
-            datacenters[name]['vlan_count'] += len(vlan['subnets'])
+            datacenters[name]['subnet_count'] += len(vlan['subnets'])
 
             for hardware in vlan['hardware']:
                 if hardware['id'] not in unique_servers:
