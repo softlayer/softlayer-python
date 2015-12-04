@@ -13,6 +13,9 @@ COLUMNS = [
     column_helper.Column('hostname', ('hostname',)),
     column_helper.Column('type', ('type',)),
     column_helper.Column('primaryBackendIpAddress', ('primaryBackendIpAddress',)),
+    column_helper.Column('hostIqn', ('allowedHost', 'name',)),
+    column_helper.Column('username', ('allowedHost', 'credential', 'username',)),
+    column_helper.Column('password', ('allowedHost', 'credential', 'password',)),
 ]
 
 DEFAULT_COLUMNS = [
@@ -20,6 +23,9 @@ DEFAULT_COLUMNS = [
     'hostname',
     'type',
     'primaryBackendIpAddress',
+    'hostIqn',
+    'username',
+    'password',
 ]
 
 

@@ -46,8 +46,10 @@ class BlockStorageManager(utils.IdentifierMixin, object):
 
         _filter = utils.NestedDict(kwargs.get('filter') or {})
 
+        _filter['networkStorage']['serviceResource']['type']['type'] = (utils.query_filter('!~ ISCSI'))
+
         _filter['networkStorage']['storageType']['keyName'] = (
-            utils.query_filter('*=BLOCK_STORAGE'))
+            utils.query_filter('*BLOCK_STORAGE'))
         if storage_type:
             _filter['networkStorage']['storageType']['keyName'] = (
                 utils.query_filter('%s_BLOCK_STORAGE' % storage_type.upper()))
@@ -84,7 +86,8 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 'serviceResource.datacenter[name]',
                 'serviceResourceBackendIpAddress',
                 'storageTierLevel',
-                'iops'
+                'iops',
+                'lunId',
             ]
             kwargs['mask'] = "mask[%s]" % ','.join(items)
         return self.block_svc.getObject(id=volume_id, **kwargs)
@@ -99,10 +102,10 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         if 'mask' not in kwargs:
             items = [
                 'id',
-                'allowedVirtualGuests',
-                'allowedHardware',
-                'allowedSubnets',
-                'allowedIpAddresses'
+                'allowedVirtualGuests[allowedHost[credential]]',
+                'allowedHardware[allowedHost[credential]]',
+                'allowedSubnets[allowedHost[credential]]',
+                'allowedIpAddresses[allowedHost[credential]]',
             ]
             kwargs['mask'] = "mask[%s]" % ','.join(items)
         return self.block_svc.getObject(id=volume_id, **kwargs)
