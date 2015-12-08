@@ -18,6 +18,7 @@ from SoftLayer.managers.load_balancer import LoadBalancerManager  # NOQA
 from SoftLayer.managers.messaging import MessagingManager  # NOQA
 from SoftLayer.managers.metadata import MetadataManager  # NOQA
 from SoftLayer.managers.network import NetworkManager  # NOQA
+from SoftLayer.managers.object_storage import ObjectStorageManager  # NOQA
 from SoftLayer.managers.ordering import OrderingManager  # NOQA
 from SoftLayer.managers.sshkey import SshKeyManager  # NOQA
 from SoftLayer.managers.ssl import SSLManager  # NOQA
@@ -35,6 +36,7 @@ __all__ = [
     'MessagingManager',
     'MetadataManager',
     'NetworkManager',
+    'ObjectStorageManager',
     'OrderingManager',
     'SshKeyManager',
     'SSLManager',
