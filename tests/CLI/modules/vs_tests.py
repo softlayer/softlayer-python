@@ -5,7 +5,7 @@
     :license: MIT, see LICENSE for more details.
 """
 import mock
-
+from pprint import pprint as pp
 from SoftLayer import testing
 
 import json
@@ -132,3 +132,35 @@ class VirtTests(testing.TestCase):
                  'networkComponents': [{'maxSpeed': '100'}]},)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
                                 args=args)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_dns_sync(self, confirm_mock):
+        confirm_mock.return_value = True
+        getReverseDomainRecords = self.set_mock('SoftLayer_Virtual_Guest', 
+                                  'getReverseDomainRecords')
+        getReverseDomainRecords.return_value = [{
+            'networkAddress': '172.16.240.2',
+            'name': '2.240.16.172.in-addr.arpa',
+            'resourceRecords': [{'data': 'test.softlayer.com.',
+                                 'id': 100,
+                                 'host': '2'}],
+            'updateDate': '2013-09-11T14:36:57-07:00',
+            'serial': 1234665663,
+            'id': 123456,
+        }]
+        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain', 
+                                           'getResourceRecords')
+        getResourceRecords.return_value = [
+            {'id': 1, 
+             'ttl': 7200, 
+             'data': '172.16.240.2', 
+             'host': 'test', 
+             'type': 'a'}
+        ]
+        result = self.run_command(['vs', 'dns-sync', '100'])
+        self.assertEqual(result.exit_code, 0)
+        result = self.run_command(['vs', 'dns-sync', '--aaaa-record', '100'])
+        self.assertEqual(result.exit_code, 2)
+
+
+
