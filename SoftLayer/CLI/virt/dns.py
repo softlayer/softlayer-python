@@ -54,7 +54,9 @@ def cli(env, identifier, a_record, aaaa_record, ptr, ttl):
 
     def sync_a_record():
         """Sync A record."""
-        records = dns.get_records(zone_id, host=instance['hostname'])
+        records = dns.get_records(zone_id,
+                                  host=instance['hostname'],
+                                  record_type='a')
         if not records:
             # don't have a record, lets add one to the base zone
             dns.create_record(zone['id'],
@@ -63,11 +65,10 @@ def cli(env, identifier, a_record, aaaa_record, ptr, ttl):
                               instance['primaryIpAddress'],
                               ttl=ttl)
         else:
-            recs = [x for x in records if x['type'].lower() == 'a']
-            if len(recs) != 1:
+            if len(records) != 1:
                 raise exceptions.CLIAbort("Aborting A record sync, found "
-                                          "%d A record exists!" % len(recs))
-            rec = recs[0]
+                                          "%d A record exists!" % len(records))
+            rec = records[0]
             rec['data'] = instance['primaryIpAddress']
             rec['ttl'] = ttl
             dns.edit_record(rec)
@@ -77,7 +78,6 @@ def cli(env, identifier, a_record, aaaa_record, ptr, ttl):
         records = dns.get_records(zone_id,
                                   host=instance['hostname'],
                                   record_type='aaaa')
-
         try:
             # done this way to stay within 80 character lines
             component = instance['primaryNetworkComponent']
@@ -95,11 +95,10 @@ def cli(env, identifier, a_record, aaaa_record, ptr, ttl):
                               ip_address,
                               ttl=ttl)
         else:
-            recs = [x for x in records if x['type'].lower() == 'aaaa']
-            if len(recs) != 1:
+            if len(records) != 1:
                 raise exceptions.CLIAbort("Aborting A record sync, found "
-                                          "%d A record exists!" % len(recs))
-            rec = recs[0]
+                                          "%d A record exists!" % len(records))
+            rec = records[0]
             rec['data'] = ip_address
             rec['ttl'] = ttl
             dns.edit_record(rec)
