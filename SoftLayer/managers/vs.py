@@ -608,11 +608,13 @@ class VSManager(utils.IdentifierMixin, object):
             A port speed of 0 will disable the interface.
         """
         if public:
-            func = self.guest.setPublicNetworkInterfaceSpeed
+            return self.client.call('Virtual_Guest',
+                                    'setPublicNetworkInterfaceSpeed',
+                                    speed, id=instance_id)
         else:
-            func = self.guest.setPrivateNetworkInterfaceSpeed
-
-        return func(speed, id=instance_id)
+            return self.client.call('Virtual_Guest',
+                                    'setPrivateNetworkInterfaceSpeed',
+                                    speed, id=instance_id)
 
     def _get_ids_from_hostname(self, hostname):
         """List VS ids which match the given hostname."""
