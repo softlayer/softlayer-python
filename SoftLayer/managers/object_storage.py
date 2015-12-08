@@ -37,9 +37,9 @@ class ObjectStorageManager(object):
         }
         endpoints = []
         for node in self.client.call('Account', 'getHubNetworkStorage',
-                                mask=ENDPOINT_MASK,
-                                limit=1,
-                                filter=_filter)['storageNodes']:
+                                     mask=ENDPOINT_MASK,
+                                     limit=1,
+                                     filter=_filter)['storageNodes']:
             endpoints.append({
                 'datacenter': node['datacenter'],
                 'public': node['frontendIpAddress'],
