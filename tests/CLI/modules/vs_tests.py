@@ -5,7 +5,6 @@
     :license: MIT, see LICENSE for more details.
 """
 import mock
-from pprint import pprint as pp
 from SoftLayer import testing
 
 import json
