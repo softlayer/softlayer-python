@@ -370,17 +370,21 @@ class VirtTests(testing.TestCase):
         self.assert_called_with(
             'SoftLayer_Virtual_Guest', 'editObject',
             args=({'domain': 'example.com', 'hostname': 'host'},),
+            identifier=100,
         )
         self.assert_called_with(
             'SoftLayer_Virtual_Guest', 'setUserMetadata',
             args=(['"testdata"'],),
+            identifier=100,
         )
         self.assert_called_with(
             'SoftLayer_Virtual_Guest', 'setPublicNetworkInterfaceSpeed',
             args=(10,),
+            identifier=100,
         )
         self.assert_called_with(
             'SoftLayer_Virtual_Guest', 'setPrivateNetworkInterfaceSpeed',
             args=(100,),
+            identifier=100,
         )
 

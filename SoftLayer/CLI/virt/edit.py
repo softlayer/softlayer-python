@@ -34,11 +34,11 @@ def cli(env, identifier, domain, userfile, tag, hostname, userdata,
         public_speed, private_speed):
     """Edit a virtual server's details."""
 
-    data = {}
-
     if userdata and userfile:
         raise exceptions.ArgumentError(
             '[-u | --userdata] not allowed with [-F | --userfile]')
+
+    data = {}
 
     if userdata:
         data['userdata'] = userdata

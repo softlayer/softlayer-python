@@ -223,16 +223,6 @@ class ServerCLITests(testing.TestCase):
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
-    def test_nic_edit_server(self):
-        result = self.run_command(['server', 'nic-edit', '12345', 'public',
-                                   '--speed=100'])
-
-        self.assertEqual(result.exit_code, 0)
-        self.assert_called_with('SoftLayer_Hardware_Server',
-                                'setPublicNetworkInterfaceSpeed',
-                                args=(100,),
-                                identifier=12345)
-
     @mock.patch('SoftLayer.HardwareManager.verify_order')
     def test_create_server_test_flag(self, verify_mock):
         verify_mock.return_value = {
@@ -415,3 +405,38 @@ class ServerCLITests(testing.TestCase):
         self.assert_called_with('SoftLayer_Hardware_Server',
                                 'createFirmwareUpdateTransaction',
                                 args=((1, 1, 1, 1)), identifier=1000)
+
+    def test_edit(self):
+        result = self.run_command(['server', 'edit',
+                                   '--domain=example.com',
+                                   '--hostname=host',
+                                   '--userdata="testdata"',
+                                   '--tag=dev',
+                                   '--tag=green',
+                                   '--public-speed=10',
+                                   '--private-speed=100',
+                                   '100'])
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(result.output, '')
+
+        self.assert_called_with(
+            'SoftLayer_Hardware_Server', 'editObject',
+            args=({'domain': 'example.com', 'hostname': 'host'},),
+            identifier=100,
+        )
+        self.assert_called_with(
+            'SoftLayer_Hardware_Server', 'setUserMetadata',
+            args=(['"testdata"'],),
+            identifier=100,
+        )
+        self.assert_called_with(
+            'SoftLayer_Hardware_Server', 'setPublicNetworkInterfaceSpeed',
+            args=(10,),
+            identifier=100,
+        )
+        self.assert_called_with(
+            'SoftLayer_Hardware_Server', 'setPrivateNetworkInterfaceSpeed',
+            args=(100,),
+            identifier=100,
+        )
