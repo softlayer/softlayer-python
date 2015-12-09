@@ -37,12 +37,11 @@ Contributing
 
 External Links
 --------------
-.. toctree::
 
-   SoftLayer API Documentation <http://developer.softlayer.com/reference/softlayerapi>
-   Source on GitHub <https://github.com/softlayer/softlayer-python>
-   Issues <https://github.com/softlayer/softlayer-python/issues>
-   Pull Requests <https://github.com/softlayer/softlayer-python/pulls>
-   PyPI <https://pypi.python.org/pypi/softlayer/>
-   Twitter <https://twitter.com/SoftLayerDevs>
-   #softlayer on freenode <irc://irc.freenode.net/#softlayer>
+* `SoftLayer API Documentation <http://developer.softlayer.com/reference/softlayerapi>`_
+* `Source on GitHub <https://github.com/softlayer/softlayer-python>`_
+* `Issues <https://github.com/softlayer/softlayer-python/issues>`_
+* `Pull Requests <https://github.com/softlayer/softlayer-python/pulls>`_
+* `PyPI <https://pypi.python.org/pypi/softlayer/>`_
+* `Twitter <https://twitter.com/SoftLayerDevs>`_
+* `#softlayer on freenode <irc://irc.freenode.net/#softlayer>`_
