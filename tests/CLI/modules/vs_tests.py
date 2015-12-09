@@ -133,7 +133,6 @@ class VirtTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
                                 args=args)
 
-#SoftLayer/CLI/virt/dns.py 74     19    74%   68-74, 98-104, 114-116, 119-120, 129, 139
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_both(self, confirm_mock):
         confirm_mock.return_value = True
