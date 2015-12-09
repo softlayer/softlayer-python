@@ -139,7 +139,7 @@ def cli(env, identifier, a_record, aaaa_record, ptr, ttl):
         raise exceptions.CLIAbort("Aborting DNS sync")
 
     both = False
-    if not ptr and not a_record:
+    if not ptr and not a_record and not aaaa_record:
         both = True
 
     if both or a_record:
