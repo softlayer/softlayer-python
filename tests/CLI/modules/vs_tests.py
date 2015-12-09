@@ -7,7 +7,7 @@
 import mock
 from SoftLayer import testing
 from SoftLayer.CLI import exceptions
-from pprint import pprint as pp
+
 import json
 
 
