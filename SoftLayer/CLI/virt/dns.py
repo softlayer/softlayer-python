@@ -18,6 +18,9 @@ the records updated.""")
 @click.option('--a-record', '-a',
               is_flag=True,
               help="Sync the A record for the host")
+@click.option('--aaaa-record',
+              is_flag=True,
+              help="Sync the AAAA record for the host")
 @click.option('--ptr', is_flag=True, help="Sync the PTR record for the host")
 @click.option('--ttl',
               default=7200,
@@ -25,22 +28,35 @@ the records updated.""")
               type=click.INT,
               help="Sets the TTL for the A and/or PTR records")
 @environment.pass_env
-def cli(env, identifier, a_record, ptr, ttl):
+def cli(env, identifier, a_record, aaaa_record, ptr, ttl):
     """Sync DNS records."""
 
+    items = ['id',
+             'globalIdentifier',
+             'fullyQualifiedDomainName',
+             'hostname',
+             'domain',
+             'primaryBackendIpAddress',
+             'primaryIpAddress',
+             '''primaryNetworkComponent[
+                id, primaryIpAddress,
+                primaryVersion6IpAddressRecord[ipAddress]
+             ]''']
+    mask = "mask[%s]" % ','.join(items)
     dns = SoftLayer.DNSManager(env.client)
     vsi = SoftLayer.VSManager(env.client)
 
     vs_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
-    instance = vsi.get_instance(vs_id)
+    instance = vsi.get_instance(vs_id, mask=mask)
     zone_id = helpers.resolve_id(dns.resolve_ids,
                                  instance['domain'],
                                  name='zone')
 
     def sync_a_record():
         """Sync A record."""
-        records = dns.get_records(zone_id, host=instance['hostname'])
-
+        records = dns.get_records(zone_id,
+                                  host=instance['hostname'],
+                                  record_type='a')
         if not records:
             # don't have a record, lets add one to the base zone
             dns.create_record(zone['id'],
@@ -49,12 +65,41 @@ def cli(env, identifier, a_record, ptr, ttl):
                               instance['primaryIpAddress'],
                               ttl=ttl)
         else:
-            recs = [x for x in records if x['type'].lower() == 'a']
-            if len(recs) != 1:
+            if len(records) != 1:
                 raise exceptions.CLIAbort("Aborting A record sync, found "
-                                          "%d A record exists!" % len(recs))
-            rec = recs[0]
+                                          "%d A record exists!" % len(records))
+            rec = records[0]
             rec['data'] = instance['primaryIpAddress']
+            rec['ttl'] = ttl
+            dns.edit_record(rec)
+
+    def sync_aaaa_record():
+        """Sync AAAA record."""
+        records = dns.get_records(zone_id,
+                                  host=instance['hostname'],
+                                  record_type='aaaa')
+        try:
+            # done this way to stay within 80 character lines
+            component = instance['primaryNetworkComponent']
+            record = component['primaryVersion6IpAddressRecord']
+            ip_address = record['ipAddress']
+        except KeyError:
+            raise exceptions.CLIAbort("%s does not have an ipv6 address"
+                                      % instance['fullyQualifiedDomainName'])
+
+        if not records:
+            # don't have a record, lets add one to the base zone
+            dns.create_record(zone['id'],
+                              instance['hostname'],
+                              'aaaa',
+                              ip_address,
+                              ttl=ttl)
+        else:
+            if len(records) != 1:
+                raise exceptions.CLIAbort("Aborting A record sync, found "
+                                          "%d A record exists!" % len(records))
+            rec = records[0]
+            rec['data'] = ip_address
             rec['ttl'] = ttl
             dns.edit_record(rec)
 
@@ -94,7 +139,7 @@ def cli(env, identifier, a_record, ptr, ttl):
         raise exceptions.CLIAbort("Aborting DNS sync")
 
     both = False
-    if not ptr and not a_record:
+    if not ptr and not a_record and not aaaa_record:
         both = True
 
     if both or a_record:
@@ -102,3 +147,6 @@ def cli(env, identifier, a_record, ptr, ttl):
 
     if both or ptr:
         sync_ptr_record()
+
+    if aaaa_record:
+        sync_aaaa_record()
