@@ -383,7 +383,6 @@ class TestRestAPICall(testing.TestCase):
             proxies=None,
             timeout=None)
 
-
     @mock.patch('requests.request')
     def test_with_filter(self, request):
         request().content = '{}'

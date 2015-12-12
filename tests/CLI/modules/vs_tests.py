@@ -4,11 +4,12 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import mock
-from SoftLayer import testing
-from SoftLayer.CLI import exceptions
-
 import json
+
+import mock
+
+from SoftLayer.CLI import exceptions
+from SoftLayer import testing
 
 
 class VirtTests(testing.TestCase):
@@ -136,8 +137,8 @@ class VirtTests(testing.TestCase):
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_both(self, confirm_mock):
         confirm_mock.return_value = True
-        getReverseDomainRecords = self.set_mock('SoftLayer_Virtual_Guest', 
-                                  'getReverseDomainRecords')
+        getReverseDomainRecords = self.set_mock('SoftLayer_Virtual_Guest',
+                                                'getReverseDomainRecords')
         getReverseDomainRecords.return_value = [{
             'networkAddress': '172.16.240.2',
             'name': '2.240.16.172.in-addr.arpa',
@@ -148,7 +149,7 @@ class VirtTests(testing.TestCase):
             'serial': 1234665663,
             'id': 123456,
         }]
-        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain', 
+        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain',
                                            'getResourceRecords')
         getResourceRecords.return_value = []
         createAargs = ({
@@ -165,43 +166,45 @@ class VirtTests(testing.TestCase):
             'data': 'vs-test1.test.sftlyr.ws',
             'ttl': 7200
         },)
+
         result = self.run_command(['vs', 'dns-sync', '100'])
+
         self.assertEqual(result.exit_code, 0)
-        self.assert_called_with('SoftLayer_Dns_Domain','getResourceRecords')
-        self.assert_called_with('SoftLayer_Virtual_Guest','getReverseDomainRecords')
-        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord','createObject',args=createAargs)
-        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord','createObject',args=createPTRargs)
+        self.assert_called_with('SoftLayer_Dns_Domain', 'getResourceRecords')
+        self.assert_called_with('SoftLayer_Virtual_Guest',
+                                'getReverseDomainRecords')
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
+                                'createObject',
+                                args=createAargs)
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
+                                'createObject',
+                                args=createPTRargs)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_v6(self, confirm_mock):
         confirm_mock.return_value = True
-        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain', 
+        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain',
                                            'getResourceRecords')
         getResourceRecords.return_value = []
-        createAargs = ({
-            'type': 'a',
-            'host': 'vs-test1',
-            'domainId': 98765,
-            'data': '172.16.240.2',
-            'ttl': 7200
-        },)
         guest = self.set_mock('SoftLayer_Virtual_Guest', 'getObject')
         test_guest = {
-            'id' : 100,
+            'id': 100,
             'hostname': 'vs-test1',
             'domain': 'sftlyr.ws',
             'primaryIpAddress': '172.16.240.2',
-            'fullyQualifiedDomainName' : 'vs-test1.sftlyr.ws',
+            'fullyQualifiedDomainName': 'vs-test1.sftlyr.ws',
             "primaryNetworkComponent": {}
         }
         guest.return_value = test_guest
+
         result = self.run_command(['vs', 'dns-sync', '--aaaa-record', '100'])
+
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
         test_guest['primaryNetworkComponent'] = {
-            'primaryVersion6IpAddressRecord' : {
-                'ipAddress' : '2607:f0d0:1b01:0023:0000:0000:0000:0004'
+            'primaryVersion6IpAddressRecord': {
+                'ipAddress': '2607:f0d0:1b01:0023:0000:0000:0000:0004'
             }
         }
         createV6args = ({
@@ -214,7 +217,9 @@ class VirtTests(testing.TestCase):
         guest.return_value = test_guest
         result = self.run_command(['vs', 'dns-sync', '--aaaa-record', '100'])
         self.assertEqual(result.exit_code, 0)
-        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord','createObject',args=createV6args)
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
+                                'createObject',
+                                args=createV6args)
 
         v6Record = {
             'id': 1,
@@ -224,51 +229,59 @@ class VirtTests(testing.TestCase):
             'type': 'aaaa'
         }
 
-        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain', 'getResourceRecords')
-        getResourceRecords.return_value =[v6Record]
+        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain',
+                                           'getResourceRecords')
+        getResourceRecords.return_value = [v6Record]
         editArgs = (v6Record,)
         result = self.run_command(['vs', 'dns-sync', '--aaaa-record', '100'])
         self.assertEqual(result.exit_code, 0)
-        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord','editObject',args=editArgs)
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
+                                'editObject',
+                                args=editArgs)
 
-        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain', 'getResourceRecords')
-        getResourceRecords.return_value =[v6Record, v6Record]
+        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain',
+                                           'getResourceRecords')
+        getResourceRecords.return_value = [v6Record, v6Record]
         result = self.run_command(['vs', 'dns-sync', '--aaaa-record', '100'])
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
-
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_edit_a(self, confirm_mock):
         confirm_mock.return_value = True
-        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain', 
+        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain',
                                            'getResourceRecords')
         getResourceRecords.return_value = [
-            {'id': 1, 'ttl': 7200, 'data': '1.1.1.1', 'host': 'vs-test1', 'type': 'a'}
+            {'id': 1, 'ttl': 7200, 'data': '1.1.1.1',
+             'host': 'vs-test1', 'type': 'a'}
         ]
         editArgs = (
-            {'type': 'a', 'host': 'vs-test1','data': '172.16.240.2', 'id': 1, 'ttl': 7200},
+            {'type': 'a', 'host': 'vs-test1', 'data': '172.16.240.2',
+             'id': 1, 'ttl': 7200},
         )
         result = self.run_command(['vs', 'dns-sync', '-a', '100'])
         self.assertEqual(result.exit_code, 0)
         self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
-            'editObject',args=editArgs)
+                                'editObject',
+                                args=editArgs)
 
-        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain','getResourceRecords')
+        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain',
+                                           'getResourceRecords')
         getResourceRecords.return_value = [
-            {'id': 1, 'ttl': 7200, 'data': '1.1.1.1', 'host': 'vs-test1', 'type': 'a'},
-            {'id': 2, 'ttl': 7200, 'data': '1.1.1.1', 'host': 'vs-test1', 'type': 'a'}
+            {'id': 1, 'ttl': 7200, 'data': '1.1.1.1',
+             'host': 'vs-test1', 'type': 'a'},
+            {'id': 2, 'ttl': 7200, 'data': '1.1.1.1',
+             'host': 'vs-test1', 'type': 'a'}
         ]
         result = self.run_command(['vs', 'dns-sync', '-a', '100'])
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
-
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_edit_ptr(self, confirm_mock):
         confirm_mock.return_value = True
-        getReverseDomainRecords = self.set_mock('SoftLayer_Virtual_Guest', 
-                                  'getReverseDomainRecords')
+        getReverseDomainRecords = self.set_mock('SoftLayer_Virtual_Guest',
+                                                'getReverseDomainRecords')
         getReverseDomainRecords.return_value = [{
             'networkAddress': '172.16.240.2',
             'name': '2.240.16.172.in-addr.arpa',
@@ -279,11 +292,13 @@ class VirtTests(testing.TestCase):
             'serial': 1234665663,
             'id': 123456,
         }]
-        editArgs = ({'host': '2', 'data': 'vs-test1.test.sftlyr.ws', 'id': 100, 'ttl': 7200},)
+        editArgs = ({'host': '2', 'data': 'vs-test1.test.sftlyr.ws',
+                     'id': 100, 'ttl': 7200},)
         result = self.run_command(['vs', 'dns-sync', '--ptr', '100'])
         self.assertEqual(result.exit_code, 0)
-        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord','editObject',args=editArgs)
-
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
+                                'editObject',
+                                args=editArgs)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_misc_exception(self, confirm_mock):
@@ -294,15 +309,14 @@ class VirtTests(testing.TestCase):
 
         guest = self.set_mock('SoftLayer_Virtual_Guest', 'getObject')
         test_guest = {
-            'id' : 100,
-            'primaryIpAddress' :'',
+            'id': 100,
+            'primaryIpAddress': '',
             'hostname': 'vs-test1',
             'domain': 'sftlyr.ws',
-            'fullyQualifiedDomainName' : 'vs-test1.sftlyr.ws',
+            'fullyQualifiedDomainName': 'vs-test1.sftlyr.ws',
             "primaryNetworkComponent": {}
         }
         guest.return_value = test_guest
         result = self.run_command(['vs', 'dns-sync', '-a', '100'])
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
-
