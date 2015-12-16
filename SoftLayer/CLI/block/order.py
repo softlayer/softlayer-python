@@ -1,10 +1,10 @@
 """Order a block storage volume."""
 # :license: MIT, see LICENSE for more details.
 
+import click
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
-import click
 
 
 @click.command()
@@ -41,7 +41,8 @@ def cli(env, storage_type, size, iops, tier, os, location):
 
     if storage_type == 'performance':
         if iops is None:
-            raise exceptions.CLIAbort('Option --iops required with performance')
+            raise exceptions.CLIAbort(
+                'Option --iops required with performance')
 
         order = block_manager.order_block_volume(
             storage_type='performance_storage_iscsi',
@@ -53,7 +54,8 @@ def cli(env, storage_type, size, iops, tier, os, location):
 
     if storage_type == 'endurance':
         if tier is None:
-            raise exceptions.CLIAbort('Option --tier required with performance')
+            raise exceptions.CLIAbort(
+                'Option --tier required with performance')
 
         order = block_manager.order_block_volume(
             storage_type='storage_service_enterprise',

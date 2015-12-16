@@ -33,12 +33,14 @@ def cli(env, volume_id):
     table.add_row(
         ['LUN Id', "%s" % block_volume['lunId']])
 
-    if block_volume['storageType']['keyName'].split('_').pop(0) == 'PERFORMANCE':
+    if block_volume['storageType']['keyName'].split('_').pop(0)\
+            == 'PERFORMANCE':
         table.add_row(
             ['IOPs', block_volume['iops']])
     if block_volume['storageType']['keyName'].split('_').pop(0) == 'ENDURANCE':
         table.add_row(
-            ['Endurance Tier', block_volume['storageTierLevel']['description']])
+            ['Endurance Tier',
+             block_volume['storageTierLevel']['description']])
 
     table.add_row(
         ['Data Center', block_volume['serviceResource']['datacenter']['name']])

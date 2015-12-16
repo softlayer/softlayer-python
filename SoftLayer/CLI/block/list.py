@@ -47,9 +47,9 @@ def cli(env, sortby, columns, datacenter, username, storage_type):
     """List block storage."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
     block_volumes = block_manager.list_block_volumes(datacenter=datacenter,
-                                                  username=username,
-                                                  storage_type=storage_type,
-                                                  mask=columns.mask())
+                                                     username=username,
+                                                     storage_type=storage_type,
+                                                     mask=columns.mask())
 
     table = formatting.Table(columns.columns)
     table.sortby = sortby

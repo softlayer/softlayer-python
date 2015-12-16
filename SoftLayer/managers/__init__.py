@@ -8,6 +8,7 @@
     :license: MIT, see LICENSE for more details.
 """
 # pylint: disable=w0401
+from SoftLayer.managers.block import BlockStorageManager  # NOQA
 from SoftLayer.managers.cdn import CDNManager  # NOQA
 from SoftLayer.managers.dns import DNSManager  # NOQA
 from SoftLayer.managers.firewall import FirewallManager  # NOQA
@@ -23,9 +24,9 @@ from SoftLayer.managers.sshkey import SshKeyManager  # NOQA
 from SoftLayer.managers.ssl import SSLManager  # NOQA
 from SoftLayer.managers.ticket import TicketManager  # NOQA
 from SoftLayer.managers.vs import VSManager  # NOQA
-from SoftLayer.managers.block import BlockStorageManager  #NOQA
 
 __all__ = [
+    'BlockStorageManager',
     'CDNManager',
     'DNSManager',
     'FirewallManager',
@@ -41,5 +42,4 @@ __all__ = [
     'SSLManager',
     'TicketManager',
     'VSManager',
-    'BlockStorageManager'
 ]
