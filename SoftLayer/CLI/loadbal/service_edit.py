@@ -30,7 +30,8 @@ def cli(env, identifier, enabled, port, weight, healthcheck_type, ip_address):
     loadbal_id, service_id = loadbal.parse_id(identifier)
 
     # check if any input is provided
-    if not any([ip_address, enabled, weight, port, healthcheck_type]):
+    if ((not any([ip_address, weight, port, healthcheck_type])) and
+            enabled is None):
         raise exceptions.CLIAbort(
             'At least one property is required to be changed!')
 
