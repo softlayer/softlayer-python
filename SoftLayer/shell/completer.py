@@ -11,16 +11,16 @@ import shlex
 import click
 from prompt_toolkit import completion as completion
 
-from SoftLayer.CLI import core
-
 
 class ShellCompleter(completion.Completer):
     """Completer for the shell."""
+    def __init__(self, click_root):
+        self.root = click_root
 
     def get_completions(self, document, complete_event):
         """Returns an iterator of completions for the shell."""
 
-        return _click_autocomplete(core.cli, document.text_before_cursor)
+        return _click_autocomplete(self.root, document.text_before_cursor)
 
 
 def _click_autocomplete(root, text):
@@ -46,7 +46,8 @@ def _click_autocomplete(root, text):
 
     elif isinstance(location, (click.MultiCommand, click.core.Group)):
         ctx = click.Context(location)
-        for command in location.list_commands(ctx):
+        commands = location.list_commands(ctx)
+        for command in commands:
             if command.startswith(incomplete):
                 cmd = location.get_command(ctx, command)
                 yield completion.Completion(command, -len(incomplete),
