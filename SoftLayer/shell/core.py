@@ -77,19 +77,21 @@ def cli(ctx, env):
                 auto_suggest=p_auto_suggest.AutoSuggestFromHistory(),
                 get_prompt_tokens=get_prompt_tokens,
             )
+
+            # Parse arguments
             try:
-                try:
-                    args = shlex.split(line)
-                except ValueError as ex:
-                    print("Invalid Command: %s" % ex)
-                    continue
+                args = shlex.split(line)
+            except ValueError as ex:
+                print("Invalid Command: %s" % ex)
+                continue
 
-                if not args:
-                    continue
+            if not args:
+                continue
 
+            # Run Command
+            try:
                 # Reset client so that the client gets refreshed
                 env.client = None
-
                 core.main(args=list(get_env_args(env)) + args,
                           obj=env,
                           prog_name="",
@@ -103,6 +105,7 @@ def cli(ctx, env):
             except Exception as ex:
                 env.vars['last_exit_code'] = 1
                 traceback.print_exc(file=sys.stderr)
+
         except KeyboardInterrupt:
             env.vars['last_exit_code'] = 130
 
