@@ -44,11 +44,17 @@ class CommandLoader(click.MultiCommand):
         click.MultiCommand.__init__(self, **attrs)
         self.path = path
 
-    def list_commands(self, ctx):
-        """Get module for click."""
+    def list_commands(self, ctx, **kwargs):
+        """List all sub-commands."""
         env = ctx.ensure_object(environment.Environment)
         env.load()
-        return sorted(env.list_commands(*self.path))
+
+        commands = env.list_commands(*self.path)
+
+        if kwargs.get('with_aliases', False) and len(self.path) == 0:
+            commands.extend(env.aliases.keys())
+
+        return sorted(commands)
 
     def get_command(self, ctx, name):
         """Get command for click."""

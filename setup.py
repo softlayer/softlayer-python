@@ -35,7 +35,7 @@ setup(
         'prettytable >= 0.7.0',
         'click >= 5',
         'requests >= 2.7.0',
-        'prompt_toolkit',
+        'prompt_toolkit >= 0.53',
     ],
     keywords=['softlayer', 'cloud'],
     classifiers=[

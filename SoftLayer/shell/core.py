@@ -13,6 +13,7 @@ import sys
 import traceback
 
 import click
+from prompt_toolkit import auto_suggest as p_auto_suggest
 from prompt_toolkit import history as p_history
 from prompt_toolkit import shortcuts as p_shortcuts
 
@@ -52,10 +53,12 @@ def cli(ctx, env):
 
     while True:
         try:
-            line = p_shortcuts.get_input(
+            line = p_shortcuts.prompt(
                 u"(%s)> " % env.vars['last_exit_code'],
                 completer=complete,
                 history=history,
+                auto_suggest=p_auto_suggest.AutoSuggestFromHistory(),
+                mouse_support=True,
             )
             try:
                 args = shlex.split(line)

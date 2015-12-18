@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import itertools
 import shlex
 
 import click
@@ -27,30 +28,29 @@ def _click_autocomplete(root, text):
     try:
         parts = shlex.split(text)
     except ValueError:
-        return []
+        raise StopIteration
 
     location, incomplete = _click_resolve_command(root, parts)
 
     if not text.endswith(' ') and not incomplete and text:
-        return []
+        raise StopIteration
 
-    options = []
     if incomplete and not incomplete[0:2].isalnum():
         for param in location.params:
             if not isinstance(param, click.Option):
                 continue
-            options.extend(param.opts)
-            options.extend(param.secondary_opts)
-    elif isinstance(location, (click.MultiCommand, click.core.Group)):
-        options.extend(location.list_commands(click.Context(location)))
+            for opt in itertools.chain(param.opts, param.secondary_opts):
+                if opt.startswith(incomplete):
+                    yield completion.Completion(opt, -len(incomplete),
+                                                display_meta=param.help)
 
-    # collect options that starts with the incomplete section
-    completions = []
-    for option in options:
-        if option.startswith(incomplete):
-            completions.append(
-                completion.Completion(option, -len(incomplete)))
-    return completions
+    elif isinstance(location, (click.MultiCommand, click.core.Group)):
+        ctx = click.Context(location)
+        for command in location.list_commands(ctx):
+            if command.startswith(incomplete):
+                cmd = location.get_command(ctx, command)
+                yield completion.Completion(command, -len(incomplete),
+                                            display_meta=cmd.short_help)
 
 
 def _click_resolve_command(root, parts):
