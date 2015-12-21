@@ -20,7 +20,7 @@ from SoftLayer.CLI import loadbal
               type=click.INT,
               help="Change the weight of the service")
 @click.option('--healthcheck-type', help="Change the health check type")
-@click.option('--ip-address', help="Change the IP of the service")
+@click.option('--ip-address', help="Change the IP address of the service")
 @environment.pass_env
 def cli(env, identifier, enabled, port, weight, healthcheck_type, ip_address):
     """Edit the properties of a service group."""
