@@ -1,12 +1,12 @@
 """List block storage snapshots."""
 # :license: MIT, see LICENSE for more details.
 
+import click
 import SoftLayer
 from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 
-import click
 
 COLUMNS = [
     column_helper.Column('id', ('id',)),
