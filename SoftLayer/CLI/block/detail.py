@@ -45,14 +45,13 @@ def cli(env, volume_id):
     table.add_row(
         ['Data Center', block_volume['serviceResource']['datacenter']['name']])
     table.add_row(
-        ['Bytes Used', block_volume['bytesUsed']])
-    table.add_row(
-        ['IP', block_volume['serviceResourceBackendIpAddress']])
+        ['Target IP', block_volume['serviceResourceBackendIpAddress']])
 
     if block_volume['snapshotCapacityGb']:
         table.add_row(
-            ['Snapshot Reserved (GB)', block_volume['snapshotCapacityGb']])
+            ['Snapshot Capacity (GB)', block_volume['snapshotCapacityGb']])
         table.add_row(
-            ['Snapshot Used (Byes)', block_volume['snapshotSizeBytes']])
+            ['Snapshot Used (Bytes)',
+             block_volume['parentVolume']['snapshotSizeBytes']])
 
     env.fout(table)
