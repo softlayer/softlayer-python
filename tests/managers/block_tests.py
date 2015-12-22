@@ -9,6 +9,7 @@ import SoftLayer
 from SoftLayer import fixtures
 from SoftLayer import testing
 
+
 class BlockTests(testing.TestCase):
     def set_up(self):
         self.block = SoftLayer.BlockStorageManager(self.client)

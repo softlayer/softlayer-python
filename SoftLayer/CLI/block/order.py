@@ -66,10 +66,10 @@ def cli(env, storage_type, size, iops, tier, os_type, location):
         )
 
     if 'placedOrder' in order.keys():
-        print("Order #{0} placed successfully!".format(
+        click.echo("Order #{0} placed successfully!".format(
             order['placedOrder']['id']))
         for item in order['placedOrder']['items']:
-            print(" > %s" % item['description'])
+            click.echo(" > %s" % item['description'])
     else:
-        print("Order could not be placed! Please verify your options " +
-              "and try again.")
+        click.echo("Order could not be placed! Please verify your options " +
+                   "and try again.")
