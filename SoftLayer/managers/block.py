@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+from SoftLayer import exceptions
 from SoftLayer import utils
 
 
@@ -45,7 +46,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
 
         _filter = utils.NestedDict(kwargs.get('filter') or {})
 
-        _filter['iscsiNetworkStorage']['serviceResource']['type']['type'] =\
+        _filter['iscsiNetworkStorage']['serviceResource']['type']['type'] = \
             (utils.query_filter('!~ ISCSI'))
 
         _filter['iscsiNetworkStorage']['storageType']['keyName'] = (
@@ -56,12 +57,11 @@ class BlockStorageManager(utils.IdentifierMixin, object):
 
         if datacenter:
             _filter['iscsiNetworkStorage']['serviceResource']['datacenter'][
-                'name'] = (
-                utils.query_filter(datacenter))
+                'name'] = (utils.query_filter(datacenter))
 
         if username:
-            _filter['iscsiNetworkStorage']['username'] = (
-                utils.query_filter(username))
+            _filter['iscsiNetworkStorage']['username'] = \
+                (utils.query_filter(username))
 
         kwargs['filter'] = _filter.to_dict()
         func = getattr(self.account, call)
@@ -130,21 +130,33 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         return self.block_svc.getObject(id=volume_id, **kwargs)
 
     def order_block_volume(self, storage_type, location, size, os_type,
-                           iops=None, tier_level=None, **kwargs):
+                           iops=None, tier_level=None):
+        """Places an order for a block volume.
+
+        :param storage_type: "Performance" or "Endurance"
+        :param location: Datacenter in which to order iSCSI volume
+        :param size: Size of the desired volume, in GB
+        :param os_type: OS Type to use for volume alignment, see help for list
+        :param iops: Number of IOPs for a "Performance" order
+        :param tier_level: Tier level to use for an "Endurance" order
+        """
 
         base_type_name = 'SoftLayer_Container_Product_Order_Network_'
         package = self._get_package(storage_type)
         if package['name'] == 'Performance':
-            complexType = base_type_name + 'PerformanceStorage_Iscsi'
+            complex_type = base_type_name + 'PerformanceStorage_Iscsi'
             prices = self._get_item_prices_performance(package, size, iops)
-        if package['name'] == 'Endurance':
-            complexType = base_type_name + 'Storage_Enterprise'
+        elif package['name'] == 'Endurance':
+            complex_type = base_type_name + 'Storage_Enterprise'
             prices = self._get_item_prices_endurance(package, size, tier_level)
+        else:
+            raise exceptions.SoftLayerError(
+                "storage_type must be either Performance or Endurance")
 
         location_id = self._get_location_id(location)
 
         order = {
-            'complexType': complexType,
+            'complexType': complex_type,
             'packageId': package['id'],
             'osFormatType': {'keyName': os_type},
             'prices': prices,
@@ -180,7 +192,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         return func(**kwargs).pop()
 
     @staticmethod
-    def _get_item_prices_performance(package, size, iops, **kwargs):
+    def _get_item_prices_performance(package, size, iops):
         """Returns a collection of prices for performance storage.
 
         :param package: Package object
@@ -189,27 +201,32 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         :param kwargs:
         :return: Returns a collection of prices for performance storage.
         """
+        parent_category_code = 'performance_storage_iscsi'
+        space_category_code = 'performance_storage_space'
+        iops_category_code = 'performance_storage_iops'
+
         prices = []
         for item in package['items']:
             for price in item['prices']:
                 for category in price['categories']:
-                    if price['locationGroupId'] == '' \
-                       and (category['categoryCode'] ==
-                            'performance_storage_iscsi'
-                            or (item['capacity'] == size
-                                and category['categoryCode'] ==
-                                'performance_storage_space')
-                            or (item['capacity'] == iops
-                                and category['categoryCode'] ==
-                                'performance_storage_iops'
-                                and (price['capacityRestrictionMinimum']
-                                     <= size
-                                     <= price['capacityRestrictionMaximum']))):
-                        prices.append(price)
+                    if price['locationGroupId'] == '':
+                        # Find the parent-level price object.
+                        if category['categoryCode'] == parent_category_code:
+                            prices.append(price)
+                        # Find the valid space price object.
+                        elif (category['categoryCode'] == space_category_code
+                              and item['capacity'] == size):
+                            prices.append(price)
+                        # Find the valid iops price object.
+                        elif (category['categoryCode'] == iops_category_code
+                              and item['capacity'] == iops
+                              and (price['capacityRestrictionMinimum'] <= size
+                                   <= price['capacityRestrictionMaximum'])):
+                            prices.append(price)
         return prices
 
     @staticmethod
-    def _get_item_prices_endurance(package, size, tier_level, **kwargs):
+    def _get_item_prices_endurance(package, size, tier_level):
         """Returns a collection of prices for a endurance storage order.
 
         :param package: Package object
@@ -225,24 +242,35 @@ class BlockStorageManager(utils.IdentifierMixin, object):
             '4': '300'
         }
 
+        endurance_parent_category_codes = [
+            'storage_service_enterprise',
+            'storage_block',
+        ]
+
+        space_category_code = 'performance_storage_space'
+        tier_category_code = 'storage_tier_level'
+
         prices = []
         for item in package['items']:
             for price in item['prices']:
                 for category in price['categories']:
-                    if price['locationGroupId'] == '' \
-                       and (category[
-                            'categoryCode'] == 'storage_service_enterprise'
-                            or category['categoryCode'] == 'storage_block'
-                            or (category[
-                                'categoryCode'] == 'performance_storage_space'
-                                and price['capacityRestrictionMinimum'] ==
-                                tiers.get(tier_level)
-                                and item['capacity'] == size)
-                            or (category['categoryCode'] ==
-                                'storage_tier_level'
-                                and item['attributes'][0]['value'] ==
-                                tiers.get(tier_level))):
-                        prices.append(price)
+                    # Only collect prices from valid location groups.
+                    if price['locationGroupId'] == '':
+                        # Find the parent-level price object.
+                        if any(category['categoryCode'] in s
+                               for s in endurance_parent_category_codes):
+                            prices.append(price)
+                        # Find the valid space price object.
+                        elif (category['categoryCode'] == space_category_code
+                              and price['capacityRestrictionMinimum'] ==
+                              tiers.get(tier_level)
+                              and item['capacity'] == size):
+                            prices.append(price)
+                        # Find the valid tier price object.
+                        elif (category['categoryCode'] == tier_category_code
+                              and item['attributes'][0]['value'] ==
+                              tiers.get(tier_level)):
+                            prices.append(price)
         return prices
 
     def _get_location_id(self, location):

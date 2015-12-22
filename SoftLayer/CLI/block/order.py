@@ -20,7 +20,7 @@ from SoftLayer.CLI import exceptions
 @click.option('--tier',
               help='Endurance Storage Tier (IOP per GB)',
               type=click.Choice(['0.25', '2', '4']))
-@click.option('--os',
+@click.option('--os_type',
               help='Operating System',
               type=click.Choice([
                   'HYPER_V',
@@ -35,7 +35,7 @@ from SoftLayer.CLI import exceptions
               help='Size of storage volume',
               required=True)
 @environment.pass_env
-def cli(env, storage_type, size, iops, tier, os, location):
+def cli(env, storage_type, size, iops, tier, os_type, location):
     """Order a block storage volume."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
 
@@ -49,7 +49,7 @@ def cli(env, storage_type, size, iops, tier, os, location):
             location=location,
             size=size,
             iops=iops,
-            os_type=os
+            os_type=os_type
         )
 
     if storage_type == 'endurance':
@@ -62,7 +62,7 @@ def cli(env, storage_type, size, iops, tier, os, location):
             location=location,
             size=size,
             tier_level=tier,
-            os_type=os
+            os_type=os_type
         )
 
     if 'placedOrder' in order.keys():
