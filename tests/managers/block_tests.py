@@ -14,6 +14,13 @@ class BlockTests(testing.TestCase):
     def set_up(self):
         self.block = SoftLayer.BlockStorageManager(self.client)
 
+    def test_cancel_block_volume_immediately(self):
+        self.block.cancel_block_volume(123, immediate=True)
+
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
+                                args=(True, True, 'No longer needed'),
+                                identifier=449)
+
     def test_get_block_volume_details(self):
         result = self.block.get_block_volume_details(100)
 

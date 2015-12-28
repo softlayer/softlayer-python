@@ -287,3 +287,24 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 location = datacenter['id']
                 return location
         raise ValueError('Invalid datacenter name specified.')
+
+    def cancel_block_volume(self, volume_id,
+                            reason='No longer needed',
+                            immediate=False):
+        """Cancels the given block storage volume.
+
+        :param integer volume_id: the volume ID
+        :param string reason: The reason for cancellation
+        :param boolean immediate_flag: Cancel immediately or
+        on anniversary date
+        """
+        block_volume = self.get_block_volume_details(
+            volume_id,
+            mask='mask[id,billingItem[id]]')
+        billing_item_id = block_volume['billingItem']['id']
+
+        self.client['Billing_Item'].cancelItem(
+            immediate,
+            True,
+            reason,
+            id=billing_item_id)
