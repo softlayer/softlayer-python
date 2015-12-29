@@ -60,6 +60,7 @@ class BlockTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Network_Storage', 'deleteObject',
                                 identifier=100)
 
+<<<<<<< HEAD
     def test_order_block_volume_no_package(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = []
@@ -210,3 +211,20 @@ class BlockTests(testing.TestCase):
                     'setupFee': '1'}],
                 },
             )
+=======
+    def test_authorize_host_to_volume(self):
+        result = self.block.authorize_host_to_volume(50,
+                                                     hardware_ids=[100],
+                                                     virtual_guest_ids=[200],
+                                                     ip_address_ids=[300])
+        self.assertEqual(fixtures.SoftLayer_Network_Storage.
+                         allowAccessFromHostList, result)
+
+    def test_deauthorize_host_to_volume(self):
+        result = self.block.authorize_host_to_volume(50,
+                                                     hardware_ids=[100],
+                                                     virtual_guest_ids=[200],
+                                                     ip_address_ids=[300])
+        self.assertEqual(fixtures.SoftLayer_Network_Storage.
+                         removeAccessFromHostList, result)
+>>>>>>> d99abc2... Add host authorization to block storage
