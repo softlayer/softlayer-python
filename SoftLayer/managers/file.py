@@ -1,7 +1,7 @@
 """
-    SoftLayer.block
+    SoftLayer.file
     ~~~~~~~~~~~~~~~
-    Block Storage Manager
+    File Storage Manager
 
     :license: MIT, see LICENSE for more details.
 """
@@ -10,28 +10,27 @@ from SoftLayer.managers import storage_utils
 from SoftLayer import utils
 
 
-class BlockStorageManager(utils.IdentifierMixin, object):
-    """Manages Block Storage volumes."""
+class FileStorageManager(utils.IdentifierMixin, object):
+    """Manages file Storage volumes."""
 
     def __init__(self, client):
         self.configuration = {}
         self.client = client
 
-    def list_block_volumes(self, datacenter=None, username=None,
-                           storage_type=None, **kwargs):
-        """Returns a list of block volumes.
+    def list_file_volumes(self, datacenter=None, username=None,
+                          storage_type=None, **kwargs):
+        """Returns a list of file volumes.
 
         :param datacenter: Datacenter short name (e.g.: dal09)
         :param username: Name of volume.
         :param storage_type: Type of volume: Endurance or Performance
         :param kwargs:
-        :return: Returns a list of block volumes.
+        :return: Returns a list of file volumes.
         """
         if 'mask' not in kwargs:
             items = [
                 'id',
                 'username',
-                'lunId',
                 'capacityGb',
                 'bytesUsed',
                 'serviceResource.datacenter[name]',
@@ -42,27 +41,27 @@ class BlockStorageManager(utils.IdentifierMixin, object):
 
         _filter = utils.NestedDict(kwargs.get('filter') or {})
 
-        _filter['iscsiNetworkStorage']['serviceResource']['type']['type'] = \
-            (utils.query_filter('!~ ISCSI'))
+        _filter['nfsNetworkStorage']['serviceResource']['type']['type'] = \
+            (utils.query_filter('!~ NFS'))
 
-        _filter['iscsiNetworkStorage']['storageType']['keyName'] = (
-            utils.query_filter('*BLOCK_STORAGE'))
+        _filter['nfsNetworkStorage']['storageType']['keyName'] = (
+            utils.query_filter('*FILE_STORAGE'))
         if storage_type:
-            _filter['iscsiNetworkStorage']['storageType']['keyName'] = (
-                utils.query_filter('%s_BLOCK_STORAGE' % storage_type.upper()))
+            _filter['nfsNetworkStorage']['storageType']['keyName'] = (
+                utils.query_filter('%s_FILE_STORAGE' % storage_type.upper()))
 
         if datacenter:
-            _filter['iscsiNetworkStorage']['serviceResource']['datacenter'][
+            _filter['nfsNetworkStorage']['serviceResource']['datacenter'][
                 'name'] = (utils.query_filter(datacenter))
 
         if username:
-            _filter['iscsiNetworkStorage']['username'] = \
+            _filter['nfsNetworkStorage']['username'] = \
                 (utils.query_filter(username))
 
         kwargs['filter'] = _filter.to_dict()
-        return self.client.call('Account', 'getIscsiNetworkStorage', **kwargs)
+        return self.client.call('Account', 'getNasNetworkStorage', **kwargs)
 
-    def get_block_volume_details(self, volume_id, **kwargs):
+    def get_file_volume_details(self, volume_id, **kwargs):
         """Returns details about the specified volume.
 
         :param volume_id: ID of volume.
@@ -76,6 +75,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 'username',
                 'password',
                 'capacityGb',
+                'bytesUsed',
                 'snapshotCapacityGb',
                 'parentVolume.snapshotSizeBytes',
                 'storageType.keyName',
@@ -91,7 +91,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         return self.client.call('Network_Storage', 'getObject',
                                 id=volume_id, **kwargs)
 
-    def get_block_volume_access_list(self, volume_id, **kwargs):
+    def get_file_volume_access_list(self, volume_id, **kwargs):
         """Returns a list of authorized hosts for a specified volume.
 
         :param volume_id: ID of volume.
@@ -110,7 +110,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         return self.client.call('Network_Storage', 'getObject',
                                 id=volume_id, **kwargs)
 
-    def get_block_volume_snapshot_list(self, volume_id, **kwargs):
+    def get_file_volume_snapshot_list(self, volume_id, **kwargs):
         """Returns a list of snapshots for the specified volume.
 
         :param volume_id: ID of volume.
@@ -128,7 +128,6 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 'dailySchedule',
                 'weeklySchedule'
                 ]
-
             kwargs['mask'] = ','.join(items)
 
         return self.client.call('Network_Storage', 'getSnapshots',
@@ -138,23 +137,25 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                                  hardware_ids=None,
                                  virtual_guest_ids=None,
                                  ip_address_ids=None,
+                                 subnet_ids=None,
                                  **kwargs):
-        """Authorizes hosts to Block Storage Volumes
+        """Authorizes hosts to File Storage Volumes
 
-        :param volume_id: The Block volume to authorize hosts to
+        :param volume_id: The File volume to authorize hosts to
         :param hardware_ids: A List of SoftLayer_Hardware ids
         :param virtual_guest_ids: A List of SoftLayer_Virtual_Guest ids
         :param ip_address_ids: A List of SoftLayer_Network_Subnet_IpAddress ids
+        :param subnet_ids: A List of SoftLayer_Network_Subnet ids
         :return: Returns an array of
                 SoftLayer_Network_Storage_Allowed_Host objects
-                which now have access to the given Block volume
+                which now have access to the given File volume
         """
         host_templates = []
         storage_utils.populate_host_templates(host_templates,
                                               hardware_ids,
                                               virtual_guest_ids,
                                               ip_address_ids,
-                                              None)
+                                              subnet_ids)
 
         return self.client.call('Network_Storage', 'allowAccessFromHostList',
                                 host_templates, id=volume_id, **kwargs)
@@ -163,23 +164,25 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                                    hardware_ids=None,
                                    virtual_guest_ids=None,
                                    ip_address_ids=None,
+                                   subnet_ids=None,
                                    **kwargs):
-        """Revokes authorization of hosts to Block Storage Volumes
+        """Revokes authorization of hosts to File Storage Volumes
 
-        :param volume_id: The Block volume to deauthorize hosts to
+        :param volume_id: The File volume to deauthorize hosts to
         :param hardware_ids: A List of SoftLayer_Hardware ids
         :param virtual_guest_ids: A List of SoftLayer_Virtual_Guest ids
         :param ip_address_ids: A List of SoftLayer_Network_Subnet_IpAddress ids
+        :param subnet_ids: A List of SoftLayer_Network_Subnet ids
         :return: Returns an array of
                 SoftLayer_Network_Storage_Allowed_Host objects
-                which have access to the given Block volume
+                which have access to the given File volume
         """
         host_templates = []
         storage_utils.populate_host_templates(host_templates,
                                               hardware_ids,
                                               virtual_guest_ids,
                                               ip_address_ids,
-                                              None)
+                                              subnet_ids)
 
         return self.client.call('Network_Storage', 'removeAccessFromHostList',
                                 host_templates, id=volume_id, **kwargs)
@@ -192,9 +195,9 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         return self.client.call('Network_Storage', 'deleteObject',
                                 id=snapshot_id)
 
-    def order_block_volume(self, storage_type, location, size, os_type,
-                           iops=None, tier_level=None):
-        """Places an order for a block volume.
+    def order_file_volume(self, storage_type, location, size, os_type,
+                          iops=None, tier_level=None):
+        """Places an order for a file volume.
 
         :param storage_type: "performance_storage_iscsi" (performance)
                              or "storage_service_enterprise" (endurance)
@@ -214,12 +217,12 @@ class BlockStorageManager(utils.IdentifierMixin, object):
 
         base_type_name = 'SoftLayer_Container_Product_Order_Network_'
         package = storage_utils.get_package(self, storage_type)
-        if storage_type == 'performance_storage_iscsi':
-            complex_type = base_type_name + 'PerformanceStorage_Iscsi'
+        if storage_type == 'performance_storage_nfs':
+            complex_type = base_type_name + 'PerformanceStorage_Nfs'
             prices = [
                 storage_utils.find_performance_price(
                     package,
-                    'performance_storage_iscsi'
+                    'performance_storage_nfs'
                     ),
                 storage_utils.find_performance_space_price(package, iops),
                 storage_utils.find_performance_iops_price(package, size, iops),
@@ -227,7 +230,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         elif storage_type == 'storage_service_enterprise':
             complex_type = base_type_name + 'Storage_Enterprise'
             prices = [
-                storage_utils.find_endurance_price(package, 'storage_block'),
+                storage_utils.find_endurance_price(package, 'storage_file'),
                 storage_utils.find_endurance_price(
                     package,
                     'storage_service_enterprise'
@@ -241,7 +244,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
             ]
         else:
             raise exceptions.SoftLayerError(
-                "Block volume storage_type must be either "
+                "File volume storage_type must be either "
                 "Performance or Endurance")
 
         order = {
@@ -256,7 +259,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         return self.client.call('Product_Order', 'placeOrder', order)
 
     def create_snapshot(self, volume_id, notes='', **kwargs):
-        """Creates a snapshot on the given block volume.
+        """Creates a snapshot on the given file volume.
 
         :param integer volume_id: The id of the volume
         :param string notes: The notes or "name" to assign the snapshot
@@ -266,30 +269,59 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         return self.client.call('Network_Storage', 'createSnapshot',
                                 notes, id=volume_id, **kwargs)
 
+    def enable_snapshots(self, volume_id, schedule_type, retention_count,
+                         minute, hour, day_of_week, **kwargs):
+        """Enables snapshots for a specific file volume at a given schedule
+
+        :param integer volume_id: The id of the volume
+        :param string schedule_type: 'HOURLY'|'DAILY'|'WEEKLY'
+        :return: Returns whether successfully scheduled or not
+        """
+
+        return self.client.call('Network_Storage', 'enableSnapshots',
+                                schedule_type,
+                                retention_count,
+                                minute,
+                                hour,
+                                day_of_week,
+                                id=volume_id,
+                                **kwargs)
+
+    def disable_snapshots(self, volume_id, schedule_type):
+        """Disables snapshots for a specific file volume at a given schedule
+
+        :param integer volume_id: The id of the volume
+        :param string schedule_type: 'HOURLY'|'DAILY'|'WEEKLY'
+        :return: Returns whether successfully disabled or not
+        """
+
+        return self.client.call('Network_Storage', 'disableSnapshots',
+                                schedule_type, id=volume_id)
+
     def order_snapshot_space(self, volume_id, capacity, tier,
                              upgrade, **kwargs):
-        """Orders snapshot space for the given block volume.
+        """Orders snapshot space for the given file volume.
 
         :param integer volume_id: The id of the volume
         :param integer capacity: The capacity to order, in GB
-        :param float tier: The tier level of the block volume, in IOPS per GB
+        :param float tier: The tier level of the file volume, in IOPS per GB
         :param boolean upgrade: Flag to indicate if this order is an upgrade
         :return: Returns a SoftLayer_Container_Product_Order_Receipt
         """
         package = storage_utils.get_package(self, 'storage_service_enterprise')
-        block_mask = 'serviceResource.datacenter[id],'\
+        file_mask = 'serviceResource.datacenter[id],'\
             'storageTierLevel,billingItem'
-        block_volume = self.get_block_volume_details(volume_id,
-                                                     mask=block_mask,
-                                                     **kwargs)
+        file_volume = self.get_file_volume_details(volume_id,
+                                                   mask=file_mask,
+                                                   **kwargs)
 
-        storage_type = block_volume['billingItem']['categoryCode']
+        storage_type = file_volume['billingItem']['categoryCode']
         if storage_type != 'storage_service_enterprise':
             raise exceptions.SoftLayerError(
-                "Block volume storage_type must be Endurance")
+                "File volume storage_type must be Endurance")
 
         if tier is None:
-            tier = storage_utils.find_endurance_tier_iops_per_gb(block_volume)
+            tier = storage_utils.find_endurance_tier_iops_per_gb(file_volume)
         prices = [storage_utils.find_snapshot_space_price(
             package, capacity, tier)]
 
@@ -305,7 +337,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
             'packageId': package['id'],
             'prices': prices,
             'quantity': 1,
-            'location': block_volume['serviceResource']['datacenter']['id'],
+            'location': file_volume['serviceResource']['datacenter']['id'],
             'volumeId': volume_id,
         }
 
@@ -323,16 +355,15 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         on anniversary date
         """
 
-        block_volume = self.get_block_volume_details(
+        file_volume = self.get_file_volume_details(
             volume_id,
             mask='mask[id,billingItem[activeChildren]]')
+        children_array = file_volume['billingItem']['activeChildren']
+        billing_item_id = None
 
-        if 'activeChildren' not in block_volume['billingItem']:
+        if 'activeChildren' not in file_volume['billingItem']:
             raise exceptions.SoftLayerError(
                 'No snapshot space found to cancel')
-
-        children_array = block_volume['billingItem']['activeChildren']
-        billing_item_id = None
 
         for child in children_array:
             if child['categoryCode'] == 'storage_snapshot_space':
@@ -349,39 +380,6 @@ class BlockStorageManager(utils.IdentifierMixin, object):
             reason,
             id=billing_item_id)
 
-    def enable_snapshots(self, volume_id, schedule_type, retention_count,
-                         minute, hour, day_of_week, **kwargs):
-        """Enables snapshots for a specific block volume at a given schedule
-
-        :param integer volume_id: The id of the volume
-        :param string schedule_type: 'HOURLY'|'DAILY'|'WEEKLY'
-        :param integer retention_count: Number of snapshots to be kept
-        :param integer minute: Minute when to take snapshot
-        :param integer hour: Hour when to take snapshot
-        :param string day_of_week: Day when to take snapshot
-        :return: Returns whether successfully scheduled or not
-        """
-
-        return self.client.call('Network_Storage', 'enableSnapshots',
-                                schedule_type,
-                                retention_count,
-                                minute,
-                                hour,
-                                day_of_week,
-                                id=volume_id,
-                                **kwargs)
-
-    def disable_snapshots(self, volume_id, schedule_type):
-        """Disables snapshots for a specific block volume at a given schedule
-
-        :param integer volume_id: The id of the volume
-        :param string schedule_type: 'HOURLY'|'DAILY'|'WEEKLY'
-        :return: Returns whether successfully disabled or not
-        """
-
-        return self.client.call('Network_Storage', 'disableSnapshots',
-                                schedule_type, id=volume_id)
-
     def restore_from_snapshot(self, volume_id, snapshot_id):
         """Restores a specific volume from a snapshot
 
@@ -393,20 +391,20 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         return self.client.call('Network_Storage', 'restoreFromSnapshot',
                                 snapshot_id, id=volume_id)
 
-    def cancel_block_volume(self, volume_id,
-                            reason='No longer needed',
-                            immediate=False):
-        """Cancels the given block storage volume.
+    def cancel_file_volume(self, volume_id,
+                           reason='No longer needed',
+                           immediate=False):
+        """Cancels the given file storage volume.
 
         :param integer volume_id: The volume ID
         :param string reason: The reason for cancellation
         :param boolean immediate_flag: Cancel immediately or
         on anniversary date
         """
-        block_volume = self.get_block_volume_details(
+        file_volume = self.get_file_volume_details(
             volume_id,
             mask='mask[id,billingItem[id]]')
-        billing_item_id = block_volume['billingItem']['id']
+        billing_item_id = file_volume['billingItem']['id']
 
         return self.client['Billing_Item'].cancelItem(
             immediate,

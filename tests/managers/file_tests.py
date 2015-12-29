@@ -1,5 +1,5 @@
 """
-    SoftLayer.tests.managers.block_tests
+    SoftLayer.tests.managers.file_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :license: MIT, see LICENSE for more details.
@@ -10,12 +10,12 @@ from SoftLayer import fixtures
 from SoftLayer import testing
 
 
-class BlockTests(testing.TestCase):
+class FileTests(testing.TestCase):
     def set_up(self):
-        self.block = SoftLayer.BlockStorageManager(self.client)
+        self.file = SoftLayer.FileStorageManager(self.client)
 
-    def test_cancel_block_volume_immediately(self):
-        self.block.cancel_block_volume(123, immediate=True)
+    def test_cancel_file_volume_immediately(self):
+        self.file.cancel_file_volume(123, immediate=True)
 
         self.assert_called_with(
             'SoftLayer_Billing_Item',
@@ -24,27 +24,40 @@ class BlockTests(testing.TestCase):
             identifier=449,
         )
 
-    def test_get_block_volume_details(self):
-        result = self.block.get_block_volume_details(100)
+    def test_authorize_host_to_volume(self):
+        result = self.file.authorize_host_to_volume(
+            50,
+            hardware_ids=[100],
+            virtual_guest_ids=[200],
+            ip_address_ids=[300],
+            subnet_ids=[400])
 
-        self.assertEqual(fixtures.SoftLayer_Network_Storage.getObject, result)
+        self.assertEqual(fixtures.SoftLayer_Network_Storage.
+                         allowAccessFromHostList, result)
 
         self.assert_called_with(
             'SoftLayer_Network_Storage',
-            'getObject',
-            identifier=100
-            )
+            'allowAccessFromHostList',
+            identifier=50)
 
-    def test_list_block_volumes(self):
-        result = self.block.list_block_volumes()
+    def test_deauthorize_host_to_volume(self):
+        result = self.file.deauthorize_host_to_volume(
+            50,
+            hardware_ids=[100],
+            virtual_guest_ids=[200],
+            ip_address_ids=[300],
+            subnet_ids=[400])
 
-        self.assertEqual(fixtures.SoftLayer_Account.getIscsiNetworkStorage,
-                         result)
+        self.assertEqual(fixtures.SoftLayer_Network_Storage.
+                         removeAccessFromHostList, result)
 
-        self.assert_called_with('SoftLayer_Account', 'getIscsiNetworkStorage')
+        self.assert_called_with(
+            'SoftLayer_Network_Storage',
+            'removeAccessFromHostList',
+            identifier=50)
 
-    def test_get_block_volume_access_list(self):
-        result = self.block.get_block_volume_access_list(100)
+    def test_get_file_volume_access_list(self):
+        result = self.file.get_file_volume_access_list(100)
 
         self.assertEqual(fixtures.SoftLayer_Network_Storage.getObject, result)
 
@@ -53,8 +66,51 @@ class BlockTests(testing.TestCase):
             'getObject',
             identifier=100)
 
-    def test_get_block_volume_snapshot_list(self):
-        result = self.block.get_block_volume_snapshot_list(100)
+    def test_enable_snapshots(self):
+        result = self.file.enable_snapshots(12345678, 'WEEKLY', 10,
+                                            47, 16, 'FRIDAY')
+
+        self.assertEqual(fixtures.SoftLayer_Network_Storage.enableSnapshots,
+                         result)
+
+        self.assert_called_with(
+            'SoftLayer_Network_Storage',
+            'enableSnapshots',
+            identifier=12345678)
+
+    def test_disable_snapshots(self):
+        result = self.file.disable_snapshots(12345678, 'HOURLY')
+
+        self.assertEqual(fixtures.SoftLayer_Network_Storage.disableSnapshots,
+                         result)
+        self.assert_called_with(
+            'SoftLayer_Network_Storage',
+            'disableSnapshots',
+            identifier=12345678)
+
+    def test_snapshot_restore(self):
+        result = self.file.restore_from_snapshot(12345678, 87654321)
+
+        self.assertEqual(
+            fixtures.SoftLayer_Network_Storage.restoreFromSnapshot,
+            result)
+        self.assert_called_with(
+            'SoftLayer_Network_Storage',
+            'restoreFromSnapshot',
+            identifier=12345678)
+
+    def test_get_file_volume_details(self):
+        result = self.file.get_file_volume_details(100)
+
+        self.assertEqual(fixtures.SoftLayer_Network_Storage.getObject, result)
+
+        self.assert_called_with(
+            'SoftLayer_Network_Storage',
+            'getObject',
+            identifier=100)
+
+    def test_get_file_volume_snapshot_list(self):
+        result = self.file.get_file_volume_snapshot_list(100)
 
         self.assertEqual(fixtures.SoftLayer_Network_Storage.getSnapshots,
                          result)
@@ -64,8 +120,29 @@ class BlockTests(testing.TestCase):
             'getSnapshots',
             identifier=100)
 
+    def test_create_snapshot(self):
+        result = self.file.create_snapshot(123, 'hello world')
+
+        self.assertEqual(fixtures.SoftLayer_Network_Storage.createSnapshot,
+                         result)
+
+        self.assert_called_with(
+            'SoftLayer_Network_Storage',
+            'createSnapshot',
+            identifier=123)
+
+    def test_cancel_snapshot_immediately(self):
+        self.file.cancel_snapshot_space(1234, immediate=True)
+
+        self.assert_called_with(
+            'SoftLayer_Billing_Item',
+            'cancelItem',
+            args=(True, True, 'No longer needed'),
+            identifier=123,
+        )
+
     def test_delete_snapshot(self):
-        result = self.block.delete_snapshot(100)
+        result = self.file.delete_snapshot(100)
 
         self.assertEqual(fixtures.SoftLayer_Network_Storage.deleteObject,
                          result)
@@ -75,45 +152,35 @@ class BlockTests(testing.TestCase):
             'deleteObject',
             identifier=100)
 
-    def test_order_block_volume_no_package(self):
+    def test_order_file_volume_no_package(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = []
 
         self.assertRaises(
             ValueError,
-            self.block.order_block_volume,
-            "performance_storage_iscsi",
+            self.file.order_file_volume,
+            "performance_storage_nfs",
             "dal05",
-            100,
+            40,
             "LINUX",
             iops=100,
         )
 
-    def test_order_block_volume_too_many_packages(self):
+    def test_order_file_volume_too_many_packages(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [{}, {}]
 
         self.assertRaises(
             ValueError,
-            self.block.order_block_volume,
-            "performance_storage_iscsi",
+            self.file.order_file_volume,
+            "performance_storage_nfs",
             "dal05",
-            100,
+            40,
             "LINUX",
             iops=100,
         )
 
-    def test_cancel_snapshot_immediately(self):
-        self.block.cancel_snapshot_space(1234, immediate=True)
-
-        self.assert_called_with(
-            'SoftLayer_Billing_Item',
-            'cancelItem',
-            args=(True, True, 'No longer needed'),
-            identifier=123,
-        )
-
-    def test_order_block_volume_performance(self):
+    def test_order_file_volume_performance(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [{
             'id': 1,
@@ -124,7 +191,7 @@ class BlockTests(testing.TestCase):
                     'id': 1,
                     'locationGroupId': '',
                     'categories': [{
-                        'categoryCode': 'performance_storage_iscsi',
+                        'categoryCode': 'performance_storage_nfs',
                     }],
                 }],
             }, {
@@ -150,8 +217,8 @@ class BlockTests(testing.TestCase):
             }],
         }]
 
-        result = self.block.order_block_volume(
-            "performance_storage_iscsi",
+        result = self.file.order_file_volume(
+            "performance_storage_nfs",
             "dal05",
             100,
             "LINUX",
@@ -177,18 +244,26 @@ class BlockTests(testing.TestCase):
                 },
             )
 
-    def test_order_block_volume_endurance(self):
+    def test_list_file_volumes(self):
+        result = self.file.list_file_volumes()
+
+        self.assertEqual(fixtures.SoftLayer_Account.getNasNetworkStorage,
+                         result)
+
+        self.assert_called_with('SoftLayer_Account', 'getNasNetworkStorage')
+
+    def test_order_file_volume_endurance(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [{
             'id': 1,
-            'name': 'Performance',
+            'name': 'Endurance',
             'items': [{
                 'capacity': '1',
                 'prices': [{
                     'id': 1,
                     'locationGroupId': '',
                     'categories': [{
-                        'categoryCode': 'storage_block',
+                        'categoryCode': 'storage_file',
                     }],
                 }],
             }, {
@@ -226,7 +301,7 @@ class BlockTests(testing.TestCase):
             }],
         }]
 
-        result = self.block.order_block_volume(
+        result = self.file.order_file_volume(
             "storage_service_enterprise",
             "dal05",
             100,
@@ -253,87 +328,13 @@ class BlockTests(testing.TestCase):
                 },
             )
 
-    def test_authorize_host_to_volume(self):
-        result = self.block.authorize_host_to_volume(
-            50,
-            hardware_ids=[100],
-            virtual_guest_ids=[200],
-            ip_address_ids=[300])
-
-        self.assertEqual(fixtures.SoftLayer_Network_Storage.
-                         allowAccessFromHostList, result)
-
-        self.assert_called_with(
-            'SoftLayer_Network_Storage',
-            'allowAccessFromHostList',
-            identifier=50)
-
-    def test_deauthorize_host_to_volume(self):
-        result = self.block.deauthorize_host_to_volume(
-            50,
-            hardware_ids=[100],
-            virtual_guest_ids=[200],
-            ip_address_ids=[300])
-
-        self.assertEqual(fixtures.SoftLayer_Network_Storage.
-                         removeAccessFromHostList, result)
-
-        self.assert_called_with(
-            'SoftLayer_Network_Storage',
-            'removeAccessFromHostList',
-            identifier=50)
-
-    def test_create_snapshot(self):
-        result = self.block.create_snapshot(123, 'hello world')
-
-        self.assertEqual(fixtures.SoftLayer_Network_Storage.createSnapshot,
-                         result)
-
-        self.assert_called_with(
-            'SoftLayer_Network_Storage',
-            'createSnapshot',
-            identifier=123)
-
-    def test_snapshot_restore(self):
-        result = self.block.restore_from_snapshot(12345678, 87654321)
-
-        self.assertEqual(
-            fixtures.SoftLayer_Network_Storage.restoreFromSnapshot,
-            result)
-        self.assert_called_with(
-            'SoftLayer_Network_Storage',
-            'restoreFromSnapshot',
-            identifier=12345678)
-
-    def test_enable_snapshots(self):
-        result = self.block.enable_snapshots(12345678, 'WEEKLY', 10,
-                                             47, 16, 'FRIDAY')
-
-        self.assertEqual(fixtures.SoftLayer_Network_Storage.enableSnapshots,
-                         result)
-
-        self.assert_called_with(
-            'SoftLayer_Network_Storage',
-            'enableSnapshots',
-            identifier=12345678)
-
-    def test_disable_snapshots(self):
-        result = self.block.disable_snapshots(12345678, 'HOURLY')
-
-        self.assertEqual(fixtures.SoftLayer_Network_Storage.disableSnapshots,
-                         result)
-        self.assert_called_with(
-            'SoftLayer_Network_Storage',
-            'disableSnapshots',
-            identifier=12345678)
-
     def test_order_snapshot_space_no_package(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = []
 
         self.assertRaises(
             ValueError,
-            self.block.order_snapshot_space,
+            self.file.order_snapshot_space,
             100,
             5,
             None,
@@ -346,7 +347,7 @@ class BlockTests(testing.TestCase):
 
         self.assertRaises(
             ValueError,
-            self.block.order_snapshot_space,
+            self.file.order_snapshot_space,
             100,
             5,
             None,
@@ -370,7 +371,7 @@ class BlockTests(testing.TestCase):
                 'prices': [{
                     'locationGroupId': '',
                     'categories': [{
-                        'categoryCode': 'storage_block',
+                        'categoryCode': 'storage_file',
                     }],
                 }],
             }, {
@@ -406,7 +407,7 @@ class BlockTests(testing.TestCase):
             }],
         }]
 
-        result = self.block.order_snapshot_space(
+        result = self.file.order_snapshot_space(
             100,
             5,
             None,

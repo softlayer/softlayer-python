@@ -1,4 +1,4 @@
-"""Authorizes hosts on a specific block volume."""
+"""Authorizes hosts on a specific file volume."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -18,10 +18,13 @@ from SoftLayer.CLI import exceptions
               ' to authorize')
 @click.option('--ip-address', multiple=True,
               help='An IP address to authorize')
+@click.option('--subnet-id', '-s', multiple=True,
+              help='The id of one SoftLayer_Network_Subnet to authorize')
 @environment.pass_env
-def cli(env, volume_id, hardware_id, virtual_id, ip_address_id, ip_address):
+def cli(env, volume_id, hardware_id, virtual_id, ip_address_id,
+        ip_address, subnet_id):
     """Authorizes hosts to access a given volume"""
-    block_manager = SoftLayer.BlockStorageManager(env.client)
+    file_manager = SoftLayer.FileStorageManager(env.client)
     ip_address_id_list = list(ip_address_id)
 
     # Convert actual IP Addresses to their SoftLayer ids
@@ -36,10 +39,11 @@ def cli(env, volume_id, hardware_id, virtual_id, ip_address_id, ip_address):
             else:
                 ip_address_id_list.append(ip_address_object['id'])
 
-    block_manager.authorize_host_to_volume(volume_id,
-                                           hardware_id,
-                                           virtual_id,
-                                           ip_address_id_list)
+    file_manager.authorize_host_to_volume(volume_id,
+                                          hardware_id,
+                                          virtual_id,
+                                          ip_address_id_list,
+                                          subnet_id)
 
     # If no exception was raised, the command succeeded
     click.echo('The specified hosts were authorized to access %s' % volume_id)

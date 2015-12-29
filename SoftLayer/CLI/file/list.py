@@ -1,4 +1,4 @@
-"""List block storage volumes."""
+"""List file storage volumes."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -22,7 +22,6 @@ COLUMNS = [
     column_helper.Column('bytes_used', ('bytesUsed',), mask="bytesUsed"),
     column_helper.Column('ip_addr', ('serviceResourceBackendIpAddress',),
                          mask="serviceResourceBackendIpAddress"),
-    column_helper.Column('lunId', ('lunId',), mask="lunId"),
     column_helper.Column('active_transactions', ('activeTransactionCount',),
                          mask="activeTransactionCount"),
 ]
@@ -35,7 +34,6 @@ DEFAULT_COLUMNS = [
     'capacity_gb',
     'bytes_used',
     'ip_addr',
-    'lunId',
     'active_transactions'
 ]
 
@@ -54,18 +52,18 @@ DEFAULT_COLUMNS = [
               default=','.join(DEFAULT_COLUMNS))
 @environment.pass_env
 def cli(env, sortby, columns, datacenter, username, storage_type):
-    """List block storage."""
-    block_manager = SoftLayer.BlockStorageManager(env.client)
-    block_volumes = block_manager.list_block_volumes(datacenter=datacenter,
-                                                     username=username,
-                                                     storage_type=storage_type,
-                                                     mask=columns.mask())
+    """List file storage."""
+    file_manager = SoftLayer.FileStorageManager(env.client)
+    file_volumes = file_manager.list_file_volumes(datacenter=datacenter,
+                                                  username=username,
+                                                  storage_type=storage_type,
+                                                  mask=columns.mask())
 
     table = formatting.Table(columns.columns)
     table.sortby = sortby
 
-    for block_volume in block_volumes:
+    for file_volume in file_volumes:
         table.add_row([value or formatting.blank()
-                       for value in columns.row(block_volume)])
+                       for value in columns.row(file_volume)])
 
     env.fout(table)

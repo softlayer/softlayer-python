@@ -1,4 +1,4 @@
-"""Order a block storage volume."""
+"""Order a file storage volume."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -12,12 +12,12 @@ CONTEXT_SETTINGS = dict(token_normalize_func=lambda x: x.upper())
 
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.option('--storage-type',
-              help='Type of block storage volume',
+              help='Type of file storage volume',
               type=click.Choice(['performance', 'endurance']),
               required=True)
 @click.option('--size',
               type=int,
-              help='Size of block storage volume in GB',
+              help='Size of file storage volume in GB',
               required=True)
 @click.option('--iops',
               type=int,
@@ -44,8 +44,8 @@ CONTEXT_SETTINGS = dict(token_normalize_func=lambda x: x.upper())
               required=True)
 @environment.pass_env
 def cli(env, storage_type, size, iops, tier, os_type, location):
-    """Order a block storage volume."""
-    block_manager = SoftLayer.BlockStorageManager(env.client)
+    """Order a file storage volume."""
+    file_manager = SoftLayer.FileStorageManager(env.client)
     storage_type = storage_type.lower()
 
     if storage_type == 'performance':
@@ -63,8 +63,8 @@ def cli(env, storage_type, size, iops, tier, os_type, location):
             )
 
         try:
-            order = block_manager.order_block_volume(
-                storage_type='performance_storage_iscsi',
+            order = file_manager.order_file_volume(
+                storage_type='performance_storage_nfs',
                 location=location,
                 size=size,
                 iops=iops,
@@ -79,7 +79,7 @@ def cli(env, storage_type, size, iops, tier, os_type, location):
                 'Option --tier required with Endurance in IOPS/GB [0.25,2,4]')
 
         try:
-            order = block_manager.order_block_volume(
+            order = file_manager.order_file_volume(
                 storage_type='storage_service_enterprise',
                 location=location,
                 size=size,
