@@ -16,3 +16,5 @@ getObject = {
     'serviceResourceName': 'Storage Type 01 Aggregate staaspar0101_pc01',
     'username': 'username'
 }
+
+deleteObject = True

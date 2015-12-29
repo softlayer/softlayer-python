@@ -44,3 +44,11 @@ class BlockTests(testing.TestCase):
                          result)
         self.assert_called_with('SoftLayer_Network_Storage', 'getObject',
                                 identifier=100)
+
+    def test_delete_snapshot(self):
+        result = self.block.delete_snapshot(100)
+
+        self.assertEqual(fixtures.SoftLayer_Network_Storage.deleteObject,
+                         result)
+        self.assert_called_with('SoftLayer_Network_Storage', 'deleteObject',
+                                identifier=100)

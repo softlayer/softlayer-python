@@ -130,6 +130,13 @@ class BlockStorageManager(utils.IdentifierMixin, object):
             kwargs['mask'] = "mask[%s]" % ','.join(items)
         return self.block_svc.getObject(id=volume_id, **kwargs)
 
+    def delete_snapshot(self, snapshot_id):
+        """Deletes the specified snapshot object.
+
+        :param snapshot_id: The ID of the snapshot object to delete.
+        """
+        return self.block_svc.deleteObject(id=snapshot_id)
+
     def order_block_volume(self, storage_type, location, size, os_type,
                            iops=None, tier_level=None):
         """Places an order for a block volume.
