@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import collections
 
 from SoftLayer import exceptions
 from SoftLayer import utils
@@ -13,14 +14,14 @@ DEFAULT_SUBNET_MASK = ','.join(['hardware',
                                 'datacenter',
                                 'ipAddressCount',
                                 'virtualGuests'])
-DEFAULT_VLAN_MASK = ','.join(['firewallInterfaces',
-                              'hardware',
-                              'networkComponents',
-                              'primaryRouter'  # Lack of comma intential
-                              '[id, fullyQualifiedDomainName, datacenter]',
-                              'subnets',
-                              'totalPrimaryIpAddressCount',
-                              'virtualGuests'])
+DEFAULT_VLAN_MASK = ','.join([
+    'firewallInterfaces',
+    'hardware',
+    'primaryRouter[id, fullyQualifiedDomainName, datacenter]',
+    'subnets',
+    'totalPrimaryIpAddressCount',
+    'virtualGuests',
+])
 
 
 class NetworkManager(object):
@@ -333,45 +334,35 @@ class NetworkManager(object):
                   other objects residing within that data center.
 
         """
-        datacenters = {}
-        unique_vms = []
-        unique_servers = []
-        unique_network = []
+        datacenters = collections.defaultdict(lambda: {
+            'hardware_count': 0,
+            'public_ip_count': 0,
+            'subnet_count': 0,
+            'virtual_guest_count': 0,
+            'vlan_count': 0,
+        })
+        unique_vms = set()
+        unique_servers = set()
 
         for vlan in self.list_vlans():
             name = utils.lookup(vlan, 'primaryRouter', 'datacenter', 'name')
-            if name not in datacenters:
-                datacenters[name] = {
-                    'hardwareCount': 0,
-                    'networkingCount': 0,
-                    'primaryIpCount': 0,
-                    'subnetCount': 0,
-                    'virtualGuestCount': 0,
-                    'vlanCount': 0,
-                }
 
-            datacenters[name]['vlanCount'] += 1
+            datacenters[name]['vlan_count'] += 1
+            datacenters[name]['public_ip_count'] += (
+                vlan['totalPrimaryIpAddressCount'])
+            datacenters[name]['subnet_count'] += len(vlan['subnets'])
 
             for hardware in vlan['hardware']:
                 if hardware['id'] not in unique_servers:
-                    datacenters[name]['hardwareCount'] += 1
-                    unique_servers.append(hardware['id'])
-
-            for net in vlan['networkComponents']:
-                if net['id'] not in unique_network:
-                    datacenters[name]['networkingCount'] += 1
-                    unique_network.append(net['id'])
+                    datacenters[name]['hardware_count'] += 1
+                    unique_servers.add(hardware['id'])
 
             for virtual_guest in vlan['virtualGuests']:
                 if virtual_guest['id'] not in unique_vms:
-                    datacenters[name]['virtualGuestCount'] += 1
-                    unique_vms.append(virtual_guest['id'])
+                    datacenters[name]['virtual_guest_count'] += 1
+                    unique_vms.add(virtual_guest['id'])
 
-            datacenters[name]['primaryIpCount'] += (
-                vlan['totalPrimaryIpAddressCount'])
-            datacenters[name]['subnetCount'] += len(vlan['subnets'])
-
-        return datacenters
+        return dict(datacenters)
 
     def unassign_global_ip(self, global_ip_id):
         """Unassigns a global IP address from a target.

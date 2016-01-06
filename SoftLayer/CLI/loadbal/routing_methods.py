@@ -1,11 +1,11 @@
 """List routing methods."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-
-import click
 
 
 @click.command()
@@ -22,4 +22,4 @@ def cli(env):
     for routing_method in routing_methods:
         table.add_row([routing_method['id'], routing_method['name']])
 
-    return table
+    env.fout(table)

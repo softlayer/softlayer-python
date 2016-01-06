@@ -1,11 +1,11 @@
 """List SoftLayer Message Queue Endpoints."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-
-import click
 
 
 @click.command()
@@ -24,4 +24,4 @@ def cli(env):
             endpoints.get('private') or formatting.blank(),
         ])
 
-    return table
+    env.fout(table)

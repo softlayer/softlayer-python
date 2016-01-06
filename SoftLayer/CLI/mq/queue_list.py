@@ -1,11 +1,11 @@
 """List all queues on an account."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-
-import click
 
 
 @click.command()
@@ -31,4 +31,4 @@ def cli(env, account_id, datacenter, network):
         table.add_row([queue['name'],
                        queue['message_count'],
                        queue['visible_message_count']])
-    return table
+    env.fout(table)

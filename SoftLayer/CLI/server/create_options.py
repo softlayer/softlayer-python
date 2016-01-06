@@ -1,10 +1,11 @@
 """Server order options for a given chassis."""
 # :license: MIT, see LICENSE for more details.
+
+import click
+
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import hardware
-
-import click
 
 
 @click.command()
@@ -52,4 +53,4 @@ def cli(env):
         extras_table.add_row([extra['name'], extra['key']])
     tables.append(extras_table)
 
-    return formatting.listing(tables, separator='\n')
+    env.fout(formatting.listing(tables, separator='\n'))

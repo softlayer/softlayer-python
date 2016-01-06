@@ -1,11 +1,12 @@
 """Find details about this machine."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
+from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
-
-import click
 
 META_CHOICES = [
     'backend_ip',
@@ -45,15 +46,17 @@ Examples :
                       "SoftLayer network. This allows for self-discovery for "
                       "newly provisioned resources.")
 @click.argument('prop', type=click.Choice(META_CHOICES))
-def cli(prop):
+@environment.pass_env
+def cli(env, prop):
     """Find details about this machine."""
 
     try:
         if prop == 'network':
-            return get_network()
+            env.fout(get_network())
+            return
 
         meta_prop = META_MAPPING.get(prop) or prop
-        return SoftLayer.MetadataManager().get(meta_prop)
+        env.fout(SoftLayer.MetadataManager().get(meta_prop))
     except SoftLayer.TransportError:
         raise exceptions.CLIAbort(
             'Cannot connect to the backend service address. Make sure '
@@ -69,8 +72,8 @@ def get_network():
         network = network_func()
 
         table = formatting.KeyValueTable(['name', 'value'])
-        table.align['Name'] = 'r'
-        table.align['Value'] = 'l'
+        table.align['name'] = 'r'
+        table.align['value'] = 'l'
         table.add_row(['mac addresses',
                        formatting.listing(network['mac_addresses'],
                                           separator=',')])

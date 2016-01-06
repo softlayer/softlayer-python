@@ -5,16 +5,16 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import consts
-from SoftLayer import exceptions
-from SoftLayer import utils
-
 import importlib
 import json
 import logging
 import time
 
 import requests
+
+from SoftLayer import consts
+from SoftLayer import exceptions
+from SoftLayer import utils
 
 LOGGER = logging.getLogger(__name__)
 # transports.Request does have a lot of instance attributes. :(
@@ -27,6 +27,14 @@ __all__ = [
     'TimingTransport',
     'FixtureTransport',
 ]
+
+REST_SPECIAL_METHODS = {
+    'deleteObject': 'DELETE',
+    'createObject': 'POST',
+    'createObjects': 'POST',
+    'editObject': 'PUT',
+    'editObjects': 'PUT',
+}
 
 
 class Request(object):
@@ -76,6 +84,14 @@ class Request(object):
         self.offset = None
 
 
+class SoftLayerListResult(list):
+    """A SoftLayer list result."""
+
+    def __init__(self, items, total_count):
+        self.total_count = total_count
+        super(SoftLayerListResult, self).__init__(items)
+
+
 class XmlRpcTransport(object):
     """XML-RPC transport."""
     def __init__(self,
@@ -104,7 +120,8 @@ class XmlRpcTransport(object):
             headers[header_name] = {'id': request.identifier}
 
         if request.mask is not None:
-            headers.update(_format_object_mask(request.mask, request.service))
+            headers.update(_format_object_mask_xmlrpc(request.mask,
+                                                      request.service))
 
         if request.filter is not None:
             headers['%sObjectFilter' % request.service] = request.filter
@@ -129,18 +146,23 @@ class XmlRpcTransport(object):
         LOGGER.debug(payload)
 
         try:
-            response = requests.request('POST', url,
-                                        data=payload,
-                                        headers=request.transport_headers,
-                                        timeout=self.timeout,
-                                        verify=request.verify,
-                                        cert=request.cert,
-                                        proxies=_proxies_dict(self.proxy))
+            resp = requests.request('POST', url,
+                                    data=payload,
+                                    headers=request.transport_headers,
+                                    timeout=self.timeout,
+                                    verify=request.verify,
+                                    cert=request.cert,
+                                    proxies=_proxies_dict(self.proxy))
             LOGGER.debug("=== RESPONSE ===")
-            LOGGER.debug(response.headers)
-            LOGGER.debug(response.content)
-            response.raise_for_status()
-            return utils.xmlrpc_client.loads(response.content)[0][0]
+            LOGGER.debug(resp.headers)
+            LOGGER.debug(resp.content)
+            resp.raise_for_status()
+            result = utils.xmlrpc_client.loads(resp.content)[0][0]
+            if isinstance(result, list):
+                return SoftLayerListResult(
+                    result, int(resp.headers.get('softlayer-total-items', 0)))
+            else:
+                return result
         except utils.xmlrpc_client.Fault as ex:
             # These exceptions are formed from the XML-RPC spec
             # http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
@@ -190,26 +212,68 @@ class RestTransport(object):
 
         :param request request: Request object
         """
-        url_parts = [self.endpoint_url, request.service]
-        if request.identifier is not None:
-            url_parts.append(str(request.identifier))
-        if request.method is not None:
-            url_parts.append(request.method)
-        for arg in request.args:
-            url_parts.append(str(arg))
-
         request.transport_headers.setdefault('Content-Type',
                                              'application/json')
         request.transport_headers.setdefault('User-Agent', self.user_agent)
+
+        params = request.headers.copy()
+        if request.mask:
+            params['objectMask'] = _format_object_mask(request.mask)
+
+        if request.limit:
+            params['limit'] = request.limit
+
+        if request.offset:
+            params['offset'] = request.offset
+
+        if request.filter:
+            params['objectFilter'] = json.dumps(request.filter)
+
+        auth = None
+        if request.transport_user:
+            auth = requests.auth.HTTPBasicAuth(
+                request.transport_user,
+                request.transport_password,
+            )
+
+        method = REST_SPECIAL_METHODS.get(request.method)
+        is_special_method = True
+        if method is None:
+            is_special_method = False
+            method = 'GET'
+
+        body = {}
+        if request.args:
+            # NOTE(kmcdonald): force POST when there are arguments because
+            # the request body is ignored otherwise.
+            method = 'POST'
+            body['parameters'] = request.args
+
+        raw_body = None
+        if body:
+            raw_body = json.dumps(body)
+
+        url_parts = [self.endpoint_url, request.service]
+        if request.identifier is not None:
+            url_parts.append(str(request.identifier))
+
+        # Special methods (createObject, editObject, etc) use the HTTP verb
+        # to determine the action on the resource
+        if request.method is not None and not is_special_method:
+            url_parts.append(request.method)
 
         url = '%s.%s' % ('/'.join(url_parts), 'json')
 
         LOGGER.debug("=== REQUEST ===")
         LOGGER.info(url)
         LOGGER.debug(request.transport_headers)
+        LOGGER.debug(raw_body)
         try:
-            resp = requests.request('GET', url,
+            resp = requests.request(method, url,
+                                    auth=auth,
                                     headers=request.transport_headers,
+                                    params=params,
+                                    data=raw_body,
                                     timeout=self.timeout,
                                     verify=request.verify,
                                     cert=request.cert,
@@ -218,7 +282,13 @@ class RestTransport(object):
             LOGGER.debug(resp.headers)
             LOGGER.debug(resp.content)
             resp.raise_for_status()
-            return json.loads(resp.content)
+            result = json.loads(resp.content)
+
+            if isinstance(result, list):
+                return SoftLayerListResult(
+                    result, int(resp.headers.get('softlayer-total-items', 0)))
+            else:
+                return result
         except requests.HTTPError as ex:
             content = json.loads(ex.response.content)
             raise exceptions.SoftLayerAPIError(ex.response.status_code,
@@ -279,7 +349,7 @@ def _proxies_dict(proxy):
     return {'http': proxy, 'https': proxy}
 
 
-def _format_object_mask(objectmask, service):
+def _format_object_mask_xmlrpc(objectmask, service):
     """Format new and old style object masks into proper headers.
 
     :param objectmask: a string- or dict-based object mask
@@ -290,10 +360,22 @@ def _format_object_mask(objectmask, service):
         mheader = '%sObjectMask' % service
     else:
         mheader = 'SoftLayer_ObjectMask'
-
-        objectmask = objectmask.strip()
-        if (not objectmask.startswith('mask') and
-                not objectmask.startswith('[')):
-            objectmask = "mask[%s]" % objectmask
+        objectmask = _format_object_mask(objectmask)
 
     return {mheader: {'mask': objectmask}}
+
+
+def _format_object_mask(objectmask):
+    """Format the new style object mask.
+
+    This wraps the user mask with mask[USER_MASK] if it does not already
+    have one. This makes it slightly easier for users.
+
+    :param objectmask: a string-based object mask
+
+    """
+    objectmask = objectmask.strip()
+    if (not objectmask.startswith('mask') and
+            not objectmask.startswith('[')):
+        objectmask = "mask[%s]" % objectmask
+    return objectmask

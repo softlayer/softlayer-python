@@ -1,13 +1,13 @@
 """Cancel an existing load balancer."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import loadbal
-
-import click
 
 
 @click.command()
@@ -26,4 +26,4 @@ def cli(env, identifier):
         raise exceptions.CLIAbort('Aborted.')
 
     mgr.cancel_lb(loadbal_id)
-    return 'Load Balancer with id %s is being cancelled!' % identifier
+    env.fout('Load Balancer with id %s is being cancelled!' % identifier)

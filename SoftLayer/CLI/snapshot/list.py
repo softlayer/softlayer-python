@@ -1,13 +1,13 @@
 """List iSCSI Snapshots."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 from SoftLayer import utils
-
-import click
 
 
 @click.command()
@@ -34,4 +34,4 @@ def cli(env, iscsi_identifier):
             snapshot['type']['name'],
             snapshot['type']['description'],
         ])
-    return table
+    env.fout(table)

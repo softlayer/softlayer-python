@@ -1,11 +1,11 @@
 """Pops a message from a queue."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import mq
-
-import click
 
 
 @click.command()
@@ -13,6 +13,7 @@ import click
 @click.argument('queue-name')
 @click.option('--count',
               default=1,
+              show_default=True,
               type=click.INT,
               help="Count of messages to pop")
 @click.option('--delete-after',
@@ -38,4 +39,4 @@ def cli(env, account_id, queue_name, count, delete_after, datacenter, network):
     if delete_after:
         for message in messages['items']:
             mq_client.delete_message(queue_name, message['id'])
-    return formatted_messages
+    env.fout(formatted_messages)

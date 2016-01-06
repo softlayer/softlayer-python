@@ -1,24 +1,50 @@
 """List hardware servers."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
+from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
-from SoftLayer import utils
 
 
-import click
+# pylint: disable=unnecessary-lambda
+
+COLUMNS = [
+    column_helper.Column('guid', ('globalIdentifier',)),
+    column_helper.Column('primary_ip', ('primaryIpAddress',)),
+    column_helper.Column('backend_ip', ('primaryBackendIpAddress',)),
+    column_helper.Column('datacenter', ('datacenter', 'name')),
+    column_helper.Column(
+        'action',
+        lambda server: formatting.active_txn(server),
+        mask='''
+        mask(SoftLayer_Hardware_Server)[activeTransaction[
+            id,transactionStatus[name,friendlyName]
+        ]]'''),
+    column_helper.Column('power_state', ('powerState', 'name')),
+    column_helper.Column(
+        'created_by',
+        ('billingItem', 'orderItem', 'order', 'userRecord', 'username')),
+    column_helper.Column(
+        'tags',
+        lambda server: formatting.tags(server.get('tagReferences')),
+        mask="tagReferences.tag.name"),
+]
+
+DEFAULT_COLUMNS = [
+    'id',
+    'hostname',
+    'primary_ip',
+    'backend_ip',
+    'datacenter',
+    'action',
+]
 
 
 @click.command()
-@click.option('--sortby',
-              help='Column to sort by',
-              type=click.Choice(['id',
-                                 'hostname',
-                                 'primary_ip',
-                                 'backend_ip',
-                                 'datacenter']))
 @click.option('--cpu', '-c', help='Filter by number of CPU cores')
 @click.option('--domain', '-D', help='Filter by domain')
 @click.option('--datacenter', '-d', help='Filter by datacenter')
@@ -26,8 +52,18 @@ import click
 @click.option('--memory', '-m', help='Filter by memory in gigabytes')
 @click.option('--network', '-n', help='Filter by network port speed in Mbps')
 @helpers.multi_option('--tag', help='Filter by tags')
+@click.option('--sortby', help='Column to sort by',
+              default='hostname',
+              show_default=True)
+@click.option('--columns',
+              callback=column_helper.get_formatter(COLUMNS),
+              help='Columns to display. [options: %s]'
+              % ', '.join(column.name for column in COLUMNS),
+              default=','.join(DEFAULT_COLUMNS),
+              show_default=True)
 @environment.pass_env
-def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag):
+def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag,
+        columns):
     """List hardware servers."""
 
     manager = SoftLayer.HardwareManager(env.client)
@@ -38,27 +74,14 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag):
                                     memory=memory,
                                     datacenter=datacenter,
                                     nic_speed=network,
-                                    tags=tag)
+                                    tags=tag,
+                                    mask=columns.mask())
 
-    table = formatting.Table([
-        'id',
-        'hostname',
-        'primary_ip',
-        'backend_ip',
-        'datacenter',
-        'action',
-    ])
-    table.sortby = sortby or 'hostname'
+    table = formatting.Table(columns.columns)
+    table.sortby = sortby
 
     for server in servers:
-        table.add_row([
-            utils.lookup(server, 'id'),
-            utils.lookup(server, 'hostname') or formatting.blank(),
-            utils.lookup(server, 'primaryIpAddress') or formatting.blank(),
-            utils.lookup(server, 'primaryBackendIpAddress') or
-            formatting.blank(),
-            utils.lookup(server, 'datacenter', 'name') or formatting.blank(),
-            formatting.active_txn(server),
-        ])
+        table.add_row([value or formatting.blank()
+                       for value in columns.row(server)])
 
-    return table
+    env.fout(table)

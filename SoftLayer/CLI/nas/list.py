@@ -1,11 +1,11 @@
 """List NAS accounts."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer import utils
-
-import click
 
 
 @click.command()
@@ -33,4 +33,4 @@ def cli(env):
             nas_account.get('serviceResourceBackendIpAddress',
                             formatting.blank())])
 
-    return table
+    env.fout(table)

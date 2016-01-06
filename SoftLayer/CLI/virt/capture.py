@@ -1,14 +1,15 @@
 """Capture virtual server image."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
-import click
-# pylint: disable=redefined-builtin
 
+# pylint: disable=redefined-builtin
 
 @click.command(short_help="Capture SoftLayer image.")
 @click.argument('identifier')
@@ -24,9 +25,9 @@ def cli(env, identifier, name, all, note):
 
     capture = vsi.capture(vs_id, name, all, note)
 
-    table = formatting.KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'r'
-    table.align['Value'] = 'l'
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
 
     table.add_row(['vs_id', capture['guestId']])
     table.add_row(['date', capture['createDate'][:10]])
@@ -34,4 +35,4 @@ def cli(env, identifier, name, all, note):
     table.add_row(['transaction', formatting.transaction_status(capture)])
     table.add_row(['transaction_id', capture['id']])
     table.add_row(['all_disks', all])
-    return table
+    env.fout(table)

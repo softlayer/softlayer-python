@@ -1,12 +1,12 @@
 """List firewalls."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer import utils
-
-import click
 
 
 @click.command()
@@ -70,7 +70,7 @@ def cli(env):
                              'hardwareId')
             ])
 
-    return table
+    env.fout(table)
 
 
 def has_firewall_component(server):

@@ -1,11 +1,11 @@
 """List health check types."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-
-import click
 
 
 @click.command()
@@ -23,4 +23,4 @@ def cli(env):
     for hc_type in hc_types:
         table.add_row([hc_type['id'], hc_type['name']])
 
-    return table
+    env.fout(table)

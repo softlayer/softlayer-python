@@ -1,12 +1,12 @@
 """Create new firewall."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
-
-import click
 
 
 @click.command()
@@ -36,7 +36,8 @@ def cli(env, target, firewall_type, high_availability):
             pkg = mgr.get_standard_package(target, is_virt=False)
 
         if not pkg:
-            return "Unable to add firewall - Is network public enabled?"
+            exceptions.CLIAbort(
+                "Unable to add firewall - Is network public enabled?")
 
         env.out("******************")
         env.out("Product: %s" % pkg[0]['description'])
@@ -54,4 +55,4 @@ def cli(env, target, firewall_type, high_availability):
     elif firewall_type == 'server':
         mgr.add_standard_firewall(target, is_virt=False)
 
-    return "Firewall is being created!"
+    env.fout("Firewall is being created!")

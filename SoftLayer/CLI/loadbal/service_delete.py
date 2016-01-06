@@ -1,13 +1,13 @@
 """Deletes an existing load balancer service."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import loadbal
-
-import click
 
 
 @click.command()
@@ -25,4 +25,4 @@ def cli(env, identifier):
         raise exceptions.CLIAbort('Aborted.')
 
     mgr.delete_service(service_id)
-    return 'Load balancer service %s is being cancelled!' % service_id
+    env.fout('Load balancer service %s is being cancelled!' % service_id)

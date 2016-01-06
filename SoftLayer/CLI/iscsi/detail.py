@@ -1,13 +1,13 @@
 """Get details for an iSCSI target."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 from SoftLayer import utils
-
-import click
 
 
 @click.command()
@@ -25,9 +25,9 @@ def cli(env, identifier, password):
     result = iscsi_mgr.get_iscsi(iscsi_id)
     result = utils.NestedDict(result)
 
-    table = formatting.KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'r'
-    table.align['Value'] = 'l'
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
 
     table.add_row(['id', result['id']])
     table.add_row(['serviceResourceName', result['serviceResourceName']])
@@ -51,4 +51,4 @@ def cli(env, identifier, password):
         pass_table.add_row([result['username'], result['password']])
         table.add_row(['users', pass_table])
 
-    return table
+    env.fout(table)

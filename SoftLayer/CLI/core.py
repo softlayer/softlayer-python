@@ -7,21 +7,23 @@
 """
 from __future__ import print_function
 import logging
+import os
 import sys
+import time
 import types
+
+import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
+from SoftLayer import consts
 
-import click
 # pylint: disable=too-many-public-methods, broad-except, unused-argument
 # pylint: disable=redefined-builtin, super-init-not-called
 
-# Disable the cyclic import error. This is handled by an inline import.
-# pylint: disable=cyclic-import
-
+START_TIME = time.time()
 DEBUG_LOGGING_MAP = {
     0: logging.CRITICAL,
     1: logging.WARNING,
@@ -75,27 +77,20 @@ use: 'slcli setup'""",
                                'auto_envvar_prefix': 'SLCLI'})
 @click.option('--format',
               default=DEFAULT_FORMAT,
+              show_default=True,
               help="Output format",
               type=click.Choice(VALID_FORMATS))
 @click.option('--config', '-C',
               required=False,
               default=click.get_app_dir('softlayer', force_posix=True),
+              show_default=True,
               help="Config file location",
               type=click.Path(resolve_path=True))
-@click.option('--debug',
-              required=False,
-              default=None,
-              help="Sets the debug noise level",
-              type=click.Choice(sorted([str(key) for key
-                                        in DEBUG_LOGGING_MAP.keys()])))
 @click.option('--verbose', '-v',
-              help="Sets the debug noise level",
+              help="Sets the debug noise level, specify multiple times "
+                   "for more verbosity.",
               type=click.IntRange(0, 3, clamp=True),
               count=True)
-@click.option('--timings',
-              required=False,
-              is_flag=True,
-              help="Time each API call and display after results")
 @click.option('--proxy',
               required=False,
               help="HTTP[S] proxy to be use to make API calls")
@@ -103,29 +98,23 @@ use: 'slcli setup'""",
               is_flag=True,
               required=False,
               help="Confirm all prompt actions")
-@click.option('--fixtures / --no-fixtures',
-              envvar='SL_FIXTURES',
+@click.option('--demo / --no-demo',
               is_flag=True,
               required=False,
-              help="Use fixtures instead of actually making API calls")
+              help="Use demo data instead of actually making API calls")
 @click.version_option(prog_name="slcli (SoftLayer Command-line)")
 @environment.pass_env
 def cli(env,
         format='table',
         config=None,
-        debug=0,
         verbose=0,
         proxy=None,
         really=False,
-        fixtures=False,
+        demo=False,
         **kwargs):
     """Main click CLI entry-point."""
 
-    # Set logging level
-    if debug is not None:
-        verbose = int(debug)
-
-    if verbose:
+    if verbose > 0:
         logger = logging.getLogger()
         logger.addHandler(logging.StreamHandler())
         logger.setLevel(DEBUG_LOGGING_MAP.get(verbose, logging.DEBUG))
@@ -136,7 +125,7 @@ def cli(env,
     env.format = format
     if env.client is None:
         # Environment can be passed in explicitly. This is used for testing
-        if fixtures:
+        if demo:
             client = SoftLayer.BaseClient(
                 transport=SoftLayer.FixtureTransport(),
                 auth=None,
@@ -147,28 +136,35 @@ def cli(env,
                 proxy=proxy,
                 config_file=config,
             )
-
-        client.transport = SoftLayer.TimingTransport(client.transport)
         env.client = client
+
+    env.vars['_start'] = time.time()
+    env.vars['_timings'] = SoftLayer.TimingTransport(env.client.transport)
+    env.client.transport = env.vars['_timings']
 
 
 @cli.resultcallback()
 @environment.pass_env
-def output_result(env, result, timings=False, **kwargs):
-    """Outputs the results returned by the CLI and also outputs timings."""
+def output_diagnostics(env, verbose=0, **kwargs):
+    """Output diagnostic information."""
 
-    output = env.fmt(result)
-    if output:
-        env.out(output)
+    if verbose > 0:
+        diagnostic_table = formatting.Table(['name', 'value'])
+        diagnostic_table.add_row(['execution_time',
+                                  '%fs' % (time.time() - START_TIME)])
 
-    if timings:
-        timing_table = formatting.Table(['service', 'method', 'time'])
+        api_call_value = []
+        for call, _, duration in env.vars['_timings'].get_last_calls():
+            api_call_value.append(
+                "%s::%s (%fs)" % (call.service, call.method, duration))
 
-        calls = env.client.transport.get_last_calls()
-        for call, _, duration in calls:
-            timing_table.add_row([call.service, call.method, duration])
+        diagnostic_table.add_row(['api_calls', api_call_value])
+        diagnostic_table.add_row(['version', consts.USER_AGENT])
+        diagnostic_table.add_row(['python_version', sys.version])
+        diagnostic_table.add_row(['library_location',
+                                  os.path.dirname(SoftLayer.__file__)])
 
-        env.err(env.fmt(timing_table))
+        env.err(env.fmt(diagnostic_table))
 
 
 def main(reraise_exceptions=False, **kwargs):

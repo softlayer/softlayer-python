@@ -1,12 +1,12 @@
 """List all records in a zone."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
-
-import click
 # pylint: disable=redefined-builtin
 
 
@@ -46,4 +46,4 @@ def cli(env, zone, data, record, ttl, type):
             record['data']
         ])
 
-    return table
+    env.fout(table)

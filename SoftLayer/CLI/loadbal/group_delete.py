@@ -1,13 +1,13 @@
 """Deletes an existing load balancer service group."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import loadbal
-
-import click
 
 
 @click.command()
@@ -25,4 +25,4 @@ def cli(env, identifier):
         raise exceptions.CLIAbort('Aborted.')
 
     mgr.delete_service_group(group_id)
-    return 'Service group %s is being deleted!' % identifier
+    env.fout('Service group %s is being deleted!' % identifier)

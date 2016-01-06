@@ -1,14 +1,13 @@
 """Virtual server order options."""
 # :license: MIT, see LICENSE for more details.
-
 import os
 import os.path
+
+import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-
-import click
 
 
 @click.command()
@@ -19,15 +18,15 @@ def cli(env):
     vsi = SoftLayer.VSManager(env.client)
     result = vsi.get_create_options()
 
-    table = formatting.KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'r'
-    table.align['Value'] = 'l'
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
 
     # Datacenters
     datacenters = [dc['template']['datacenter']['name']
                    for dc in result['datacenters']]
     table.add_row(['datacenter',
-                   formatting.listing(datacenters, separator=',')])
+                   formatting.listing(datacenters, separator='\n')])
 
     # CPUs
     standard_cpu = [x for x in result['processors']
@@ -109,4 +108,4 @@ def cli(env):
 
     table.add_row(['nic', formatting.listing(speeds, separator=',')])
 
-    return table
+    env.fout(table)

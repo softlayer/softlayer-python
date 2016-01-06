@@ -2,12 +2,12 @@
 # :license: MIT, see LICENSE for more details.
 from os import path
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
-
-import click
 
 
 @click.command()
@@ -29,8 +29,8 @@ def cli(env, identifier, out_file):
         with open(path.expanduser(out_file), 'w') as pub_file:
             pub_file.write(key['key'])
 
-    table = formatting.KeyValueTable(['Name', 'Value'])
+    table = formatting.KeyValueTable(['name', 'value'])
     table.add_row(['id', key['id']])
     table.add_row(['label', key.get('label')])
     table.add_row(['notes', key.get('notes', '-')])
-    return table
+    env.fout(table)

@@ -1,6 +1,8 @@
 """Manage, delete, order compute instances."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
@@ -9,8 +11,6 @@ from SoftLayer.CLI import helpers
 from SoftLayer.CLI import template
 from SoftLayer.CLI import virt
 from SoftLayer import utils
-
-import click
 
 
 def _update_with_like_args(ctx, _, value):
@@ -145,10 +145,11 @@ def _parse_create_args(client, args):
 @click.option('--os', '-o',
               help="OS install code. Tip: you can specify <OS>_LATEST")
 @click.option('--image',
-              help="Image GUID. See: 'slcli image list' for reference")
+              help="Image ID. See: 'slcli image list' for reference")
 @click.option('--billing',
               type=click.Choice(['hourly', 'monthly']),
               default='hourly',
+              show_default=True,
               help="Billing rate")
 @click.option('--dedicated/--public',
               is_flag=True,
@@ -252,7 +253,7 @@ def cli(env, **args):
         export_file = args.pop('export')
         template.export_to_template(export_file, args,
                                     exclude=['wait', 'test'])
-        return 'Successfully exported options to a template file.'
+        env.fout('Successfully exported options to a template file.')
 
     if do_create:
         if not (env.skip_confirmations or formatting.confirm(
@@ -270,11 +271,13 @@ def cli(env, **args):
         output.append(table)
 
         if args.get('wait'):
-            ready = vsi.wait_for_ready(
-                result['id'], int(args.get('wait') or 1))
+            ready = vsi.wait_for_ready(result['id'], args.get('wait') or 1)
             table.add_row(['ready', ready])
+            if ready is False:
+                env.out(env.fmt(output))
+                raise exceptions.CLIHalt(code=1)
 
-    return output
+    env.fout(output)
 
 
 def _validate_args(env, args):

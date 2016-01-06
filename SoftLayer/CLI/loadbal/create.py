@@ -1,12 +1,12 @@
 """Adds a load balancer given the id returned from create-options."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
-
-import click
 
 
 @click.command()
@@ -22,4 +22,4 @@ def cli(env, billing_id, datacenter):
                               "account. Continue?"):
         raise exceptions.CLIAbort('Aborted.')
     mgr.add_local_lb(billing_id, datacenter=datacenter)
-    return "Load balancer is being created!"
+    env.fout("Load balancer is being created!")

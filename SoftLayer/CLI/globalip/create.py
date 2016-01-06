@@ -1,12 +1,12 @@
 """Creates a global IP."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
-
-import click
 
 
 @click.command()
@@ -41,4 +41,4 @@ def cli(env, ipv6, test):
         table.add_row([price['item']['description'], rate])
 
     table.add_row(['Total monthly cost', "%.2f" % total])
-    return table
+    env.fout(table)

@@ -1,14 +1,14 @@
 """Get details for an image."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 from SoftLayer.CLI import image as image_mod
 from SoftLayer import utils
-
-import click
 
 
 @click.command()
@@ -28,9 +28,9 @@ def cli(env, identifier):
         if child.get('datacenter'):
             datacenters.append(utils.lookup(child, 'datacenter', 'name'))
 
-    table = formatting.KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'r'
-    table.align['Value'] = 'l'
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
 
     table.add_row(['id', image['id']])
     table.add_row(['global_identifier',
@@ -40,6 +40,10 @@ def cli(env, identifier):
         utils.lookup(image, 'status', 'keyname'),
         utils.lookup(image, 'status', 'name'),
     )])
+    table.add_row([
+        'active_transaction',
+        formatting.transaction_status(image.get('transaction')),
+    ])
     table.add_row(['account', image.get('accountId', formatting.blank())])
     table.add_row(['visibility',
                    image_mod.PUBLIC_TYPE if image['publicFlag']
@@ -56,4 +60,4 @@ def cli(env, identifier):
     table.add_row(['datacenters', formatting.listing(sorted(datacenters),
                                                      separator=',')])
 
-    return table
+    env.fout(table)

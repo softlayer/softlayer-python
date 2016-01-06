@@ -1,22 +1,26 @@
 """Reload the OS on a virtual server."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
-import click
-
 
 @click.command()
 @click.argument('identifier')
 @click.option('--postinstall', '-i', help="Post-install script to download")
+@click.option(
+    '--image',
+    help="""Image ID. The default is to use the current operating system.
+See: 'slcli image list' for reference""")
 @helpers.multi_option('--key', '-k',
                       help="SSH keys to add to the root user")
 @environment.pass_env
-def cli(env, identifier, postinstall, key):
+def cli(env, identifier, postinstall, key, image):
     """Reload operating system on a virtual server."""
 
     vsi = SoftLayer.VSManager(env.client)
@@ -30,4 +34,7 @@ def cli(env, identifier, postinstall, key):
     if not (env.skip_confirmations or formatting.no_going_back(vs_id)):
         raise exceptions.CLIAbort('Aborted')
 
-    vsi.reload_instance(vs_id, postinstall, keys)
+    vsi.reload_instance(vs_id,
+                        post_uri=postinstall,
+                        ssh_keys=keys,
+                        image_id=image)

@@ -1,11 +1,12 @@
 """List virtual server credentials."""
 # :license: MIT, see LICENSE for more details.
+
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
-
-import click
 
 
 @click.command()
@@ -23,4 +24,4 @@ def cli(env, identifier):
     table = formatting.Table(['username', 'password'])
     for item in instance['operatingSystem']['passwords']:
         table.add_row([item['username'], item['password']])
-    return table
+    env.fout(table)

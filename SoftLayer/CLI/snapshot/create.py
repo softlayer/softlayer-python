@@ -1,12 +1,11 @@
 """Create a snapshot of an iSCSI volume."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import helpers
-
-
-import click
 
 
 @click.command()

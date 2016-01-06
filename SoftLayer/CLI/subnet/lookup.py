@@ -1,12 +1,12 @@
 """Find an IP address and display its subnet and device info."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
-
-
-import click
 
 
 @click.command()
@@ -20,18 +20,18 @@ def cli(env, ip_address):
     addr_info = mgr.ip_lookup(ip_address)
 
     if not addr_info:
-        return 'Not found'
+        raise exceptions.CLIAbort('Not found')
 
-    table = formatting.KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'r'
-    table.align['Value'] = 'l'
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
 
     table.add_row(['id', addr_info['id']])
     table.add_row(['ip', addr_info['ipAddress']])
 
-    subnet_table = formatting.KeyValueTable(['Name', 'Value'])
-    subnet_table.align['Name'] = 'r'
-    subnet_table.align['Value'] = 'l'
+    subnet_table = formatting.KeyValueTable(['name', 'value'])
+    subnet_table.align['name'] = 'r'
+    subnet_table.align['value'] = 'l'
     subnet_table.add_row(['id', addr_info['subnet']['id']])
     subnet_table.add_row(['identifier',
                           '%s/%s' % (addr_info['subnet']['networkIdentifier'],
@@ -44,9 +44,9 @@ def cli(env, ip_address):
     table.add_row(['subnet', subnet_table])
 
     if addr_info.get('virtualGuest') or addr_info.get('hardware'):
-        device_table = formatting.KeyValueTable(['Name', 'Value'])
-        device_table.align['Name'] = 'r'
-        device_table.align['Value'] = 'l'
+        device_table = formatting.KeyValueTable(['name', 'value'])
+        device_table.align['name'] = 'r'
+        device_table.align['value'] = 'l'
         if addr_info.get('virtualGuest'):
             device = addr_info['virtualGuest']
             device_type = 'vs'
@@ -57,4 +57,4 @@ def cli(env, ip_address):
         device_table.add_row(['name', device['fullyQualifiedDomainName']])
         device_table.add_row(['type', device_type])
         table.add_row(['device', device_table])
-    return table
+    env.fout(table)

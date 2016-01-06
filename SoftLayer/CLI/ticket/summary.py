@@ -1,10 +1,10 @@
 """Summary info about tickets."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-
-import click
 
 
 @click.command()
@@ -30,4 +30,4 @@ def cli(env):
     table.add_row(['Open', nested])
     table.add_row(['Closed', account['closedTicketCount']])
 
-    return table
+    env.fout(table)

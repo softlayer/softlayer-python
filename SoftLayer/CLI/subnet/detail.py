@@ -1,12 +1,12 @@
 """Get subnet details."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
-
-import click
 
 
 @click.command()
@@ -26,9 +26,9 @@ def cli(env, identifier, no_vs, no_hardware):
                                    name='subnet')
     subnet = mgr.get_subnet(subnet_id)
 
-    table = formatting.KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'r'
-    table.align['Value'] = 'l'
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
 
     table.add_row(['id', subnet['id']])
     table.add_row(['identifier',
@@ -68,4 +68,4 @@ def cli(env, identifier, no_vs, no_hardware):
         else:
             table.add_row(['hardware', 'none'])
 
-    return table
+    env.fout(table)

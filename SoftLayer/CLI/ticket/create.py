@@ -1,11 +1,11 @@
 """Create a support ticket."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import ticket
-
-import click
 
 
 @click.command()
@@ -26,4 +26,4 @@ def cli(env, title, subject_id, body):
     created_ticket = mgr.create_ticket(title=title,
                                        body=body,
                                        subject=subject_id)
-    return ticket.get_ticket_results(mgr, created_ticket['id'])
+    env.fout(ticket.get_ticket_results(mgr, created_ticket['id']))

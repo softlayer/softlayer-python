@@ -1,10 +1,11 @@
 """Create an origin pull mapping."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 
-import click
 # pylint: disable=redefined-builtin
 
 
@@ -13,7 +14,8 @@ import click
 @click.argument('content_url')
 @click.option('--type',
               help='The media type for this mapping (http, flash, wm, ...)',
-              default='http')
+              default='http',
+              show_default=True)
 @click.option('--cname',
               help='An optional CNAME to attach to the mapping')
 @environment.pass_env

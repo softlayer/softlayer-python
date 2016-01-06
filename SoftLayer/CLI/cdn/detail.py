@@ -1,11 +1,11 @@
 """Detail a CDN Account."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-
-import click
 
 
 @click.command()
@@ -17,9 +17,9 @@ def cli(env, account_id):
     manager = SoftLayer.CDNManager(env.client)
     account = manager.get_account(account_id)
 
-    table = formatting.KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'r'
-    table.align['Value'] = 'l'
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
 
     table.add_row(['id', account['id']])
     table.add_row(['account_name', account['cdnAccountName']])
@@ -29,4 +29,4 @@ def cli(env, account_id):
     table.add_row(['notes',
                    account.get('cdnAccountNote', formatting.blank())])
 
-    return table
+    env.fout(table)

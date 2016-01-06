@@ -1,11 +1,11 @@
 """Display the RWhois information for your account."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-
-import click
 
 
 @click.command()
@@ -16,9 +16,9 @@ def cli(env):
     mgr = SoftLayer.NetworkManager(env.client)
     result = mgr.get_rwhois()
 
-    table = formatting.KeyValueTable(['Name', 'Value'])
-    table.align['Name'] = 'r'
-    table.align['Value'] = 'l'
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
     table.add_row(['Name', result['firstName'] + ' ' + result['lastName']])
     table.add_row(['Company', result['companyName']])
     table.add_row(['Abuse Email', result['abuseEmail']])
@@ -31,4 +31,4 @@ def cli(env):
     table.add_row(['Country', result['country']])
     table.add_row(['Private Residence', result['privateResidenceFlag']])
 
-    return table
+    env.fout(table)

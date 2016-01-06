@@ -1,31 +1,9 @@
 from __future__ import print_function
 import sys
+from codecs import open
 import os
 
-from codecs import open
-
-try:
-    from setuptools import setup, find_packages
-except ImportError:
-    print("Distribute is required for install:")
-    print("    http://python-distribute.org/distribute_setup.py")
-    sys.exit(1)
-
-# Not supported for Python versions < 2.6
-if sys.version_info <= (2, 6):
-    print("Python 2.6 or greater is required.")
-    sys.exit(1)
-
-REQUIRES = [
-    'six >= 1.7.0',
-    'prettytable >= 0.7.0',
-    'click',
-    'requests >= 2.7.0',
-    'prompt_toolkit',
-]
-
-if sys.version_info < (2, 7):
-    REQUIRES.append('importlib')
+from setuptools import setup, find_packages
 
 DESCRIPTION = "A library for SoftLayer's API"
 
@@ -37,12 +15,12 @@ else:
 
 setup(
     name='SoftLayer',
-    version='4.0.4',
+    version='4.1.1',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     author='SoftLayer Technologies, Inc.',
     author_email='sldn@softlayer.com',
-    packages=find_packages(exclude=["SoftLayer.tests"]),
+    packages=find_packages(exclude=['tests']),
     license='MIT',
     zip_safe=False,
     url='http://github.com/softlayer/softlayer-python',
@@ -52,8 +30,13 @@ setup(
             'sl = SoftLayer.CLI.deprecated:main',
         ],
     },
-    test_suite='nose.collector',
-    install_requires=REQUIRES,
+    install_requires=[
+        'six >= 1.7.0',
+        'prettytable >= 0.7.0',
+        'click >= 5',
+        'requests >= 2.7.0',
+        'prompt_toolkit',
+    ],
     keywords=['softlayer', 'cloud'],
     classifiers=[
         'Environment :: Console',

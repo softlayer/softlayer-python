@@ -9,7 +9,7 @@
 from SoftLayer import utils
 
 IMAGE_MASK = ('id,accountId,name,globalIdentifier,blockDevices,parentId,'
-              'createDate')
+              'createDate,transaction')
 
 
 class ImageManager(utils.IdentifierMixin, object):
@@ -114,12 +114,31 @@ class ImageManager(utils.IdentifierMixin, object):
             self.vgbdtg.editObject(obj, id=image_id)
         if tag:
             self.vgbdtg.setTags(str(tag), id=image_id)
-        if name or note or tag:
-            return True
-        else:
-            return False
 
-    def import_image_from_uri(self, data):
-        """Import images which match the given uri."""
-        result = self.vgbdtg.createFromExternalSource(data)
-        return result
+        return bool(name or note or tag)
+
+    def import_image_from_uri(self, name, uri, os_code=None, note=None):
+        """Import a new image from object storage.
+
+        :param string name: Name of the new image
+        :param string uri: The URI for an object storage object
+            (.vhd/.iso file) of the format:
+            swift://<objectStorageAccount>@<cluster>/<container>/<objectPath>
+        :param string os_code: The reference code of the operating system
+        :param string note: Note to add to the image
+        """
+        return self.vgbdtg.createFromExternalSource({
+            'name': name,
+            'note': note,
+            'operatingSystemReferenceCode': os_code,
+            'uri': uri,
+        })
+
+    def export_image_to_uri(self, image_id, uri):
+        """Export image into the given object storage
+
+        :param int image_id: The ID of the image
+        :param string uri: The URI for object storage of the format
+            swift://<objectStorageAccount>@<cluster>/<container>/<objectPath>
+        """
+        return self.vgbdtg.copyToExternalSource({'uri': uri}, id=image_id)

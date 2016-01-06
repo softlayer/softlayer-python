@@ -1,3 +1,35 @@
+4.1.1
+
+    * Fixes to work with Click v5
+
+    * Re-adds `--no-public` option to only provision private interfaces with servers via `slcli server create`
+
+    * Removes non-functional `--vlan-public` and `--vlan-private` from `slcli server create`
+
+    * VSManager.wait_for_ready will now behave as it is documented to behave.
+
+4.1.0
+
+    * Adds a shell which provides a shell interface for `slcli`. This is available by using `slcli shell`
+
+    * `slcli vs create` and `slcli server create` will now prompt for missing required options
+
+    * Fixes `slcli firewall add` command
+
+    * Handles case where `slcli vs detail` and `slcli server detail` was causing an error when trying to display the creator
+
+    * Fixes VSManager.verify_create_instance() with tags (and, in turn, `slcli vs create --test` with tags)
+
+    * Fixes `vs resume` command
+
+    * Updates hardware ordering to deal with location-specific prices
+
+    * Fixes several description errors in the CLI
+
+    * Running `vs edit` without a tag option will no longer remove all tags
+
+    * Adds editing of hardware tags
+
 4.0.4
 
     * Fixes bug with pulling the userData property for the virtual server detail
@@ -54,7 +86,7 @@
 
     * API: Adds virtual server rescue command to SoftLayer.VSManager
 
-    * API+CLI: Adds ability to import virtual images from a given URI. The API only supports importing from a swift account using 'swift://'. For more details, see http://sldn.softlayer.com/reference/services/SoftLayer_Virtual_Guest_Block_Device_Template_Group/createFromExternalSource.
+    * API+CLI: Adds ability to import virtual images from a given URI. The API only supports importing from a swift account using 'swift://'. For more details, see http://developer.softlayer.com/reference/services/SoftLayer_Virtual_Guest_Block_Device_Template_Group/createFromExternalSource.
 
     * CLI: A `--fixtures` global flag was added to pull from fixture data instead of the API. This is useful for discovery, demonstration and testing purposes.
 

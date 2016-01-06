@@ -1,11 +1,11 @@
 """Show load balancer options."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-
-import click
 
 
 @click.command()
@@ -32,4 +32,4 @@ def cli(env):
             '%.2f' % float(package['prices'][0]['recurringFee'])
         ])
 
-    return table
+    env.fout(table)

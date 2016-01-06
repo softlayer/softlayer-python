@@ -1,11 +1,11 @@
 """List all global IPs."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-
-import click
 
 
 @click.command()
@@ -47,4 +47,4 @@ def cli(env, ip_version):
                        ip_address['ipAddress']['ipAddress'],
                        assigned,
                        target])
-    return table
+    env.fout(table)

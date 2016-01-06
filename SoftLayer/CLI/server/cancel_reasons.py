@@ -1,11 +1,11 @@
 """Display a list of cancellation reasons."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-
-import click
 
 
 @click.command()
@@ -22,4 +22,4 @@ def cli(env):
     for code, reason in mgr.get_cancellation_reasons().items():
         table.add_row([code, reason])
 
-    return table
+    env.fout(table)

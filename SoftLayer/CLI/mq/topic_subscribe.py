@@ -1,11 +1,11 @@
 """Create a subscription on a topic."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import mq
-
-import click
 
 
 @click.command()
@@ -43,4 +43,4 @@ def cli(env, account_id, topic_name, datacenter, network, sub_type, queue_name,
             url=http_url,
             body=http_body,
         )
-    return mq.subscription_table(subscription)
+    env.fout(mq.subscription_table(subscription))

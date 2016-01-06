@@ -9,14 +9,15 @@
 import logging
 import os.path
 
+from click import testing
+import mock
+import testtools
+
 import SoftLayer
 from SoftLayer.CLI import core
 from SoftLayer.CLI import environment
 from SoftLayer.testing import xmlrpc
 
-from click import testing
-import mock
-import testtools
 
 FIXTURE_PATH = os.path.abspath(os.path.join(__file__, '..', '..', 'fixtures'))
 
@@ -161,7 +162,7 @@ class TestCase(testtools.TestCase):
         args = args or []
 
         if fixtures is True:
-            args.insert(0, '--fixtures')
+            args.insert(0, '--demo')
         args.insert(0, '--format=%s' % fmt)
 
         runner = testing.CliRunner()

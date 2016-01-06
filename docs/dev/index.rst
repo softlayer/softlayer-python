@@ -75,12 +75,12 @@ versions every time you push new code.
 
 Using tox to running the tests in multiple environments can be very time
 consuming. If you wish to quickly run the tests in your own environment, you
-may do so using `nose <https://nose.readthedocs.org>`_.  The command to do that
+may do so using `py.test <http://pytest.org/>`_.  The command to do that
 is:
 
 ::
 
-  nosetests
+  py.test tests
 
 
 Documentation
@@ -132,7 +132,7 @@ Developer Resources
 -------------------
 .. toctree::
 
-   SoftLayer API Documentation <http://sldn.softlayer.com/reference/softlayerapi>
+   SoftLayer API Documentation <http://developer.softlayer.com/reference/softlayerapi>
    Source on GitHub <https://github.com/softlayer/softlayer-python>
    Issues <https://github.com/softlayer/softlayer-python/issues>
    Pull Requests <https://github.com/softlayer/softlayer-python/pulls>

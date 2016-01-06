@@ -1,10 +1,11 @@
 """List NAS account credentials."""
 # :license: MIT, see LICENSE for more details.
+
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-
-import click
 
 
 @click.command()
@@ -18,4 +19,4 @@ def cli(env, identifier):
     table = formatting.Table(['username', 'password'])
     table.add_row([result['username'],
                    result['password']])
-    return table
+    env.fout(table)

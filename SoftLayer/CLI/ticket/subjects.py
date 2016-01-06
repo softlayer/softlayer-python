@@ -1,12 +1,11 @@
 """List Subject IDs for ticket creation."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-
-
-import click
 
 
 @click.command()
@@ -19,4 +18,4 @@ def cli(env):
     for subject in ticket_mgr.list_subjects():
         table.add_row([subject['id'], subject['name']])
 
-    return table
+    env.fout(table)

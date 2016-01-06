@@ -1,16 +1,17 @@
 """List SSL certificates."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-
-import click
 
 
 @click.command()
 @click.option('--status',
               default="all",
+              show_default=True,
               type=click.Choice(['all', 'valid', 'expired']),
               help="Show certificates with this status")
 @click.option('--sortby',
@@ -38,4 +39,4 @@ def cli(env, status, sortby):
             certificate.get('notes', formatting.blank())
         ])
     table.sortby = sortby
-    return table
+    env.fout(table)

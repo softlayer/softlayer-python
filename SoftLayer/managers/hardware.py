@@ -21,11 +21,6 @@ EXTRA_CATEGORIES = ['pri_ipv6_addresses',
 class HardwareManager(utils.IdentifierMixin, object):
     """Manage hardware devices.
 
-    :param SoftLayer.API.Client client: an API client instance
-    :param SoftLayer.managers.OrderingManager ordering_manager: an optional
-                                              manager to handle ordering.
-                                              If none is provided, one will be
-                                              auto initialized.
     Example::
 
        # Initialize the Manager.
@@ -36,6 +31,12 @@ class HardwareManager(utils.IdentifierMixin, object):
        import SoftLayer
        client = SoftLayer.Client()
        mgr = SoftLayer.HardwareManager(client)
+
+    :param SoftLayer.API.Client client: an API client instance
+    :param SoftLayer.managers.OrderingManager ordering_manager: an optional
+                                              manager to handle ordering.
+                                              If none is provided, one will be
+                                              auto initialized.
     """
     def __init__(self, client, ordering_manager=None):
         self.client = client
@@ -51,15 +52,16 @@ class HardwareManager(utils.IdentifierMixin, object):
                         immediate=False):
         """Cancels the specified dedicated server.
 
+        Example::
+
+            # Cancels hardware id 1234
+            result = mgr.cancel_hardware(hardware_id=1234)
+
         :param int hardware_id: The ID of the hardware to be cancelled.
         :param string reason: The reason code for the cancellation. This should
                               come from :func:`get_cancellation_reasons`.
         :param string comment: An optional comment to include with the
                                cancellation.
-        Example::
-
-            # Cancels hardware id 1234
-            result = mgr.cancel_hardware(hardware_id=1234)
         """
 
         # Get cancel reason
@@ -289,8 +291,6 @@ class HardwareManager(utils.IdentifierMixin, object):
         :param string os: operating system name
         :param int port_speed: Port speed in Mbps
         :param list ssh_keys: list of ssh key ids
-        :param int public_vlan: public vlan id
-        :param int private_vlan: private vlan id
         :param string post_uri: The URI of the post-install script to run
                                 after reload
         :param boolean hourly: True if using hourly pricing (default).
@@ -363,7 +363,10 @@ class HardwareManager(utils.IdentifierMixin, object):
         port_speeds = []
         for item in package['items']:
             if all([item['itemCategory']['categoryCode'] == 'port_speed',
-                    not _is_private_port_speed_item(item)]):
+                    # Hide private options
+                    not _is_private_port_speed_item(item),
+                    # Hide unbonded options
+                    _is_bonded(item)]):
                 port_speeds.append({
                     'name': item['description'],
                     'key': item['capacity'],
@@ -418,8 +421,6 @@ regions[location[location[priceGroups]]]
                               os=None,
                               port_speed=None,
                               ssh_keys=None,
-                              public_vlan=None,
-                              private_vlan=None,
                               post_uri=None,
                               hourly=True,
                               no_public=False,
@@ -460,13 +461,6 @@ regions[location[location[priceGroups]]]
             'hostname': hostname,
             'domain': domain,
         }
-
-        if public_vlan:
-            hardware['primaryNetworkComponent'] = {
-                "networkVlan": {"id": int(public_vlan)}}
-        if private_vlan:
-            hardware['primaryBackendNetworkComponent'] = {
-                "networkVlan": {"id": int(private_vlan)}}
 
         order = {
             'hardware': [hardware],
@@ -582,7 +576,7 @@ def _get_extra_price_id(items, key_name, hourly, location):
     """Returns a price id attached to item with the given key_name."""
 
     for item in items:
-        if not utils.lookup(item, 'keyName') == key_name:
+        if utils.lookup(item, 'keyName') != key_name:
             continue
 
         for price in item['prices']:
@@ -602,7 +596,7 @@ def _get_default_price_id(items, option, hourly, location):
     """Returns a 'free' price id given an option."""
 
     for item in items:
-        if not utils.lookup(item, 'itemCategory', 'categoryCode') == option:
+        if utils.lookup(item, 'itemCategory', 'categoryCode') != option:
             continue
 
         for price in item['prices']:
@@ -627,9 +621,9 @@ def _get_bandwidth_price_id(items,
 
         capacity = float(item.get('capacity', 0))
         # Hourly and private only do pay-as-you-go bandwidth
-        if any([not utils.lookup(item,
-                                 'itemCategory',
-                                 'categoryCode') == 'bandwidth',
+        if any([utils.lookup(item,
+                             'itemCategory',
+                             'categoryCode') != 'bandwidth',
                 (hourly or no_public) and capacity != 0.0,
                 not (hourly or no_public) and capacity == 0.0]):
             continue
@@ -650,12 +644,12 @@ def _get_os_price_id(items, os, location):
     """Returns the price id matching."""
 
     for item in items:
-        if any([not utils.lookup(item,
-                                 'itemCategory',
-                                 'categoryCode') == 'os',
-                not utils.lookup(item,
-                                 'softwareDescription',
-                                 'referenceCode') == os]):
+        if any([utils.lookup(item,
+                             'itemCategory',
+                             'categoryCode') != 'os',
+                utils.lookup(item,
+                             'softwareDescription',
+                             'referenceCode') != os]):
             continue
 
         for price in item['prices']:
@@ -672,14 +666,15 @@ def _get_port_speed_price_id(items, port_speed, no_public, location):
     """Choose a valid price id for port speed."""
 
     for item in items:
-        if not utils.lookup(item,
-                            'itemCategory',
-                            'categoryCode') == 'port_speed':
+        if utils.lookup(item,
+                        'itemCategory',
+                        'categoryCode') != 'port_speed':
             continue
 
         # Check for correct capacity and if the item matches private only
         if any([int(utils.lookup(item, 'capacity')) != port_speed,
-                _is_private_port_speed_item(item) != no_public]):
+                _is_private_port_speed_item(item) != no_public,
+                not _is_bonded(item)]):
             continue
 
         for price in item['prices']:
@@ -720,6 +715,15 @@ def _is_private_port_speed_item(item):
             return True
 
     return False
+
+
+def _is_bonded(item):
+    """Determine if the item refers to a bonded port."""
+    for attribute in item['attributes']:
+        if attribute['attributeTypeKeyName'] == 'NON_LACP':
+            return False
+
+    return True
 
 
 def _get_location(package, location):

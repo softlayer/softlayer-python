@@ -1,11 +1,11 @@
 """List origin pull mappings."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-
-import click
 
 
 @click.command()
@@ -25,4 +25,4 @@ def cli(env, account_id):
                        origin.get('cname', formatting.blank()),
                        origin['originUrl']])
 
-    return table
+    env.fout(table)

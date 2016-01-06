@@ -1,14 +1,14 @@
 """Upgrade a virtual server."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 from SoftLayer.CLI import virt
-
-import click
 
 
 @click.command(epilog="""Note: SoftLayer automatically reboots the VS once
@@ -35,7 +35,7 @@ def cli(env, identifier, cpu, private, memory, network):
 
     if not vsi.upgrade(vs_id,
                        cpus=cpu,
-                       memory=memory,
+                       memory=memory/1024,
                        nic_speed=network,
                        public=not private):
         raise exceptions.CLIAbort('VS Upgrade Failed')

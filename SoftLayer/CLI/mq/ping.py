@@ -1,11 +1,11 @@
 """Ping the SoftLayer Message Queue service."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
-
-import click
 
 
 @click.command()
@@ -20,6 +20,6 @@ def cli(env, datacenter, network):
     manager = SoftLayer.MessagingManager(env.client)
     okay = manager.ping(datacenter=datacenter, network=network)
     if okay:
-        return 'OK'
+        env.fout('OK')
     else:
         exceptions.CLIAbort('Ping failed')

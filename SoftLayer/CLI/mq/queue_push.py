@@ -2,11 +2,11 @@
 # :license: MIT, see LICENSE for more details.
 import sys
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import mq
-
-import click
 
 
 @click.command()
@@ -29,4 +29,4 @@ def cli(env, account_id, queue_name, message, datacenter, network):
         body = sys.stdin.read()
     else:
         body = message
-    return mq.message_table(mq_client.push_queue_message(queue_name, body))
+    env.fout(mq.message_table(mq_client.push_queue_message(queue_name, body)))

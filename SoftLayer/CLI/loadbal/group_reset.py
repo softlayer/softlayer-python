@@ -1,11 +1,11 @@
 """Reset connections on a certain service group."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import loadbal
-
-import click
 
 
 @click.command()
@@ -18,4 +18,4 @@ def cli(env, identifier):
     loadbal_id, group_id = loadbal.parse_id(identifier)
 
     mgr.reset_service_group(loadbal_id, group_id)
-    return 'Load balancer service group connections are being reset!'
+    env.fout('Load balancer service group connections are being reset!')

@@ -1,11 +1,11 @@
 """Detail a topic."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import mq
-
-import click
 
 
 @click.command()
@@ -27,4 +27,4 @@ def cli(env, account_id, topic_name, datacenter, network):
     tables = []
     for sub in subscriptions['items']:
         tables.append(mq.subscription_table(sub))
-    return [mq.topic_table(topic), tables]
+    env.fout([mq.topic_table(topic), tables])

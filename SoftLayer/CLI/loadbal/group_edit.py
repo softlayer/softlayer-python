@@ -1,11 +1,12 @@
 """Edit an existing load balancer service group."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import loadbal
-
-import click
 
 
 @click.command()
@@ -29,7 +30,8 @@ def cli(env, identifier, allocation, port, routing_type, routing_method):
 
     # check if any input is provided
     if not any([allocation, port, routing_type, routing_method]):
-        return 'At least one property is required to be changed!'
+        raise exceptions.CLIAbort(
+            'At least one property is required to be changed!')
 
     mgr.edit_service_group(loadbal_id,
                            group_id,
@@ -38,4 +40,4 @@ def cli(env, identifier, allocation, port, routing_type, routing_method):
                            routing_type=routing_type,
                            routing_method=routing_method)
 
-    return 'Load balancer service group %s is being updated!' % identifier
+    env.fout('Load balancer service group %s is being updated!' % identifier)

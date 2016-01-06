@@ -1,11 +1,11 @@
 """Adds a new load balancer service."""
 # :license: MIT, see LICENSE for more details.
 
+import click
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import loadbal
-
-import click
 
 
 @click.command()
@@ -50,4 +50,4 @@ def cli(env, identifier, enabled, port, weight, healthcheck_type, ip_address):
                     port=port,
                     weight=weight,
                     hc_type=healthcheck_type)
-    return 'Load balancer service is being added!'
+    env.fout('Load balancer service is being added!')
