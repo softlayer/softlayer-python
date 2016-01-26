@@ -128,6 +128,12 @@ ALL_ROUTES = [
     ('nas:list', 'SoftLayer.CLI.nas.list:cli'),
     ('nas:credentials', 'SoftLayer.CLI.nas.credentials:cli'),
 
+    ('object-storage', 'SoftLayer.CLI.object_storage'),
+    ('object-storage:accounts',
+     'SoftLayer.CLI.object_storage.list_accounts:cli'),
+    ('object-storage:endpoints',
+     'SoftLayer.CLI.object_storage.list_endpoints:cli'),
+
     ('rwhois', 'SoftLayer.CLI.rwhois'),
     ('rwhois:edit', 'SoftLayer.CLI.rwhois.edit:cli'),
     ('rwhois:show', 'SoftLayer.CLI.rwhois.show:cli'),

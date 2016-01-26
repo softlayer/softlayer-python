@@ -63,7 +63,7 @@ class CommandLoader(click.MultiCommand):
         new_path.append(name)
         module = env.get_command(*new_path)
         if isinstance(module, types.ModuleType):
-            return CommandLoader(*new_path, help=module.__doc__)
+            return CommandLoader(*new_path, help=module.__doc__ or '')
         else:
             return module
 

@@ -494,3 +494,6 @@ getLatestBillDate = '2014-05-01T14:03:04-07:00'
 getBalance = 40
 
 getNextInvoiceTotalAmount = 2
+
+getHubNetworkStorage = [{'id': 12345, 'username': 'SLOS12345-1'},
+                        {'id': 12346, 'username': 'SLOS12345-2'}]
