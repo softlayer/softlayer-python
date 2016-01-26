@@ -33,9 +33,12 @@ def cli(env, identifier, cpu, private, memory, network):
             "Continue?")):
         raise exceptions.CLIAbort('Aborted')
 
+    if memory:
+        memory = int(memory / 1024)
+
     if not vsi.upgrade(vs_id,
                        cpus=cpu,
-                       memory=memory/1024,
+                       memory=memory,
                        nic_speed=network,
                        public=not private):
         raise exceptions.CLIAbort('VS Upgrade Failed')

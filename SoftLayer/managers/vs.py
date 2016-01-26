@@ -697,7 +697,7 @@ class VSManager(utils.IdentifierMixin, object):
 
         :param integer instance_id: the instance ID to edit
         :param string name: name assigned to the image
-        :param string additional_disks: set to true to include all additional
+        :param bool additional_disks: set to true to include all additional
                                         attached storage devices
         :param string notes: notes about this particular image
 
@@ -780,7 +780,13 @@ class VSManager(utils.IdentifierMixin, object):
 
     def _get_package_items(self):
         """Following Method gets all the item ids related to VS."""
-        mask = "mask[description,capacity,prices[id,categories[name,id]]]"
+        mask = [
+            'description',
+            'capacity',
+            'prices[id,categories[name,id,categoryCode]]'
+        ]
+        mask = "mask[%s]" % ','.join(mask)
+
         package_type = "VIRTUAL_SERVER_INSTANCE"
         package_id = self.ordering_manager.get_package_id_by_type(package_type)
         package_service = self.client['Product_Package']
@@ -796,12 +802,17 @@ class VSManager(utils.IdentifierMixin, object):
         :param int value: The value of the parameter to be upgraded
         :param bool public: CPU will be in Private/Public Node.
         """
-        vs_id = {'memory': 3, 'cpus': 80, 'nic_speed': 26}
+        option_category = {
+            'memory': 'ram',
+            'cpus': 'guest_core',
+            'nic_speed': 'port_speed'
+        }
+
         for item in package_items:
             categories = item['prices'][0]['categories']
             for category in categories:
-                if not (category['id'] == vs_id[option] and
-                        item['capacity'] == str(value)):
+                if not (category['categoryCode'] == option_category[option] and
+                        str(item['capacity']) == str(value)):
                     continue
                 if option == 'cpus':
                     if public and ('Private' not in item['description']):
