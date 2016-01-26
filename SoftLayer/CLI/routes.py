@@ -204,7 +204,6 @@ ALL_ALIASES = {
     'vm': 'vs',
     'hardware': 'server',
     'hw': 'server',
-    'bmetal': 'bmc',
     'virtual': 'vs',
     'lb': 'loadbal',
 }

@@ -10,6 +10,7 @@ import importlib
 import click
 import pkg_resources
 
+import SoftLayer
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import routes
 
@@ -128,6 +129,28 @@ class Environment(object):
         for obj in pkg_resources.iter_entry_points(group=entry_point_group,
                                                    name=None):
             self.commands[obj.name] = obj
+
+    def ensure_client(self, config_file=None, is_demo=False, proxy=None):
+        """Create a new SLAPI client to the environment.
+
+        This will be a no-op if there is already a client in this environment.
+        """
+        if self.client is not None:
+            return
+
+        # Environment can be passed in explicitly. This is used for testing
+        if is_demo:
+            client = SoftLayer.BaseClient(
+                transport=SoftLayer.FixtureTransport(),
+                auth=None,
+            )
+        else:
+            # Create SL Client
+            client = SoftLayer.create_client_from_env(
+                proxy=proxy,
+                config_file=config_file,
+            )
+        self.client = client
 
 
 class ModuleLoader(object):

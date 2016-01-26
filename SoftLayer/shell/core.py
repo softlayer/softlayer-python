@@ -13,8 +13,10 @@ import sys
 import traceback
 
 import click
+from prompt_toolkit import auto_suggest as p_auto_suggest
 from prompt_toolkit import history as p_history
 from prompt_toolkit import shortcuts as p_shortcuts
+from pygments import token
 
 from SoftLayer.CLI import core
 from SoftLayer.CLI import environment
@@ -48,15 +50,35 @@ def cli(ctx, env):
     if not os.path.exists(app_path):
         os.makedirs(app_path)
     history = p_history.FileHistory(os.path.join(app_path, 'history'))
-    complete = completer.ShellCompleter()
+    complete = completer.ShellCompleter(core.cli)
 
     while True:
+        def get_prompt_tokens(_):
+            """Returns tokens for the command prompt"""
+            tokens = []
+            try:
+                tokens.append((token.Token.Username, env.client.auth.username))
+                tokens.append((token.Token.At, "@"))
+            except AttributeError:
+                pass
+
+            tokens.append((token.Token.Host, "slcli-shell"))
+            if env.vars['last_exit_code']:
+                tokens.append((token.Token.ErrorPrompt, '> '))
+            else:
+                tokens.append((token.Token.Prompt, '> '))
+
+            return tokens
+
         try:
-            line = p_shortcuts.get_input(
-                u"(%s)> " % env.vars['last_exit_code'],
+            line = p_shortcuts.prompt(
                 completer=complete,
                 history=history,
+                auto_suggest=p_auto_suggest.AutoSuggestFromHistory(),
+                get_prompt_tokens=get_prompt_tokens,
             )
+
+            # Parse arguments
             try:
                 args = shlex.split(line)
             except ValueError as ex:
@@ -66,24 +88,26 @@ def cli(ctx, env):
             if not args:
                 continue
 
-            # Reset client so that the client gets refreshed
-            env.client = None
+            # Run Command
+            try:
+                # Reset client so that the client gets refreshed
+                env.client = None
+                core.main(args=list(get_env_args(env)) + args,
+                          obj=env,
+                          prog_name="",
+                          reraise_exceptions=True)
+            except SystemExit as ex:
+                env.vars['last_exit_code'] = ex.code
+            except EOFError:
+                return
+            except ShellExit:
+                return
+            except Exception as ex:
+                env.vars['last_exit_code'] = 1
+                traceback.print_exc(file=sys.stderr)
 
-            core.main(args=list(get_env_args(env)) + args,
-                      obj=env,
-                      prog_name="",
-                      reraise_exceptions=True)
-        except SystemExit as ex:
-            env.vars['last_exit_code'] = ex.code
         except KeyboardInterrupt:
-            env.vars['last_exit_code'] = 1
-        except EOFError:
-            return
-        except ShellExit:
-            return
-        except Exception as ex:
-            env.vars['last_exit_code'] = 1
-            traceback.print_exc(file=sys.stderr)
+            env.vars['last_exit_code'] = 130
 
 
 def get_env_args(env):
