@@ -25,7 +25,7 @@ class EnvironmentTests(testing.TestCase):
     def test_list_commands(self):
         self.env.load()
         actions = self.env.list_commands()
-        self.assertIn('vs', actions)
+        self.assertIn('virtual', actions)
         self.assertIn('dns', actions)
 
     def test_get_command_invalid(self):
