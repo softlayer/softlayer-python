@@ -403,26 +403,33 @@ getCdnAccounts = [
 
 getNetworkVlans = [{
     'id': 1,
+    'networkSpace': 'PRIVATE',
+    'hardwareCount': 0,
     'hardware': [],
     'networkComponents': [],
     'primaryRouter': {
         'datacenter': {'name': 'dal00'}
     },
+    'virtualGuestCount': 0,
     'virtualGuests': [],
     'dedicatedFirewallFlag': True,
     'highAvailabilityFirewallFlag': True,
     'networkVlanFirewall': {'id': 1234},
     'totalPrimaryIpAddressCount': 1,
+    'subnetCount': 0,
     'subnets': [],
 }, {
     'id': 2,
+    'networkSpace': 'PRIVATE',
     'totalPrimaryIpAddressCount': 2,
     'dedicatedFirewallFlag': False,
+    'hardwareCount': 0,
     'hardware': [],
     'networkComponents': [],
     'primaryRouter': {
         'datacenter': {'name': 'dal00'}
     },
+    'virtualGuestCount': 0,
     'virtualGuests': [],
     'firewallGuestNetworkComponents': [{
         'id': 1234,
@@ -432,17 +439,22 @@ getNetworkVlans = [{
         'id': 1234,
         'networkComponent': {'downlinkComponent': {'hardwareId': 1}},
         'status': 'ok'}],
+    'subnetCount': 0,
     'subnets': [],
 }, {
     'id': 3,
+    'networkSpace': 'PRIVATE',
     'name': 'dal00',
+    'hardwareCount': 1,
     'hardware': [{'id': 1}],
     'networkComponents': [{'id': 2}],
     'primaryRouter': {
         'datacenter': {'name': 'dal00'}
     },
     'totalPrimaryIpAddressCount': 3,
+    'subnetCount': 0,
     'subnets': [],
+    'virtualGuestCount': 1,
     'virtualGuests': [{'id': 3}]
 }]
 
