@@ -7,6 +7,7 @@
 import mock
 
 import SoftLayer
+from SoftLayer import exceptions
 from SoftLayer import fixtures
 from SoftLayer import testing
 
@@ -672,9 +673,15 @@ class VSTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
         call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
         order_container = call.args[0]
-        self.assertEqual(order_container['prices'],
-                         [{'id': 1144}, {'id': 1133}, {'id': 1122}])
+        self.assertIn({'id': 1144}, order_container['prices'])
+        self.assertIn({'id': 1133}, order_container['prices'])
+        self.assertIn({'id': 1122}, order_container['prices'])
         self.assertEqual(order_container['virtualGuests'], [{'id': 1}])
+
+    def test_upgrade_skips_location_based_prices(self):
+        # Test that no prices that have locationGroupId set are used
+        self.assertRaises(exceptions.SoftLayerError,
+                          self.vs.upgrade, 1, cpus=55, memory=2, public=True)
 
     def test_get_item_id_for_upgrade(self):
         item_id = 0

@@ -320,3 +320,35 @@ class VirtTests(testing.TestCase):
         result = self.run_command(['vs', 'dns-sync', '-a', '100'])
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    def test_upgrade_no_options(self, ):
+        result = self.run_command(['vs', 'upgrade', '100'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.ArgumentError)
+
+    def test_upgrade_private_no_cpu(self):
+        result = self.run_command(['vs', 'upgrade', '100', '--private',
+                                   '--memory=1024'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.ArgumentError)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_upgrade_aborted(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['vs', 'upgrade', '100', '--cpu=1'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_upgrade(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['vs', 'upgrade', '100', '--cpu=4',
+                                   '--memory=2048', '--network=1000'])
+        self.assertEqual(result.exit_code, 0)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
+        call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
+        order_container = call.args[0]
+        self.assertIn({'id': 1144}, order_container['prices'])
+        self.assertIn({'id': 1133}, order_container['prices'])
+        self.assertIn({'id': 1122}, order_container['prices'])
+        self.assertEqual(order_container['virtualGuests'], [{'id': 100}])
