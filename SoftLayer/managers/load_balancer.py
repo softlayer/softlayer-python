@@ -67,18 +67,19 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
                           'LoadBalancer_Routing_Type']
         return svc.getAllObjects()
 
-    def _get_location(self, datacenter):
+    def _get_location(self, datacenter_name):
         """Returns the location of the specified datacenter.
 
-        :param string datacenter: The datacenter to create the loadbalancer in
+        :param string datacenter_name: The datacenter to create
+                                       the loadbalancer in
 
         :returns: the location id of the given datacenter
         """
 
-        dcenters = self.client['Location'].getDataCenters()
-        for dcenter in dcenters:
-            if dcenter['name'] == datacenter:
-                return dcenter['id']
+        datacenters = self.client['Location'].getDataCenters()
+        for datacenter in datacenters:
+            if datacenter['name'] == datacenter_name:
+                return datacenter['id']
         return 'FIRST_AVAILABLE'
 
     def cancel_lb(self, loadbal_id):
