@@ -19,7 +19,7 @@ class LoadBalancerTests(testing.TestCase):
     def test_get_lb_pkgs(self):
         result = self.lb_mgr.get_lb_pkgs()
 
-        self.assertEqual(len(result), 12)
+        self.assertEqual(len(result), 13)
         _filter = {
             'items': {
                 'description': {
