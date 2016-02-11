@@ -11,7 +11,7 @@ from SoftLayer.CLI import formatting
 @click.command()
 @environment.pass_env
 def cli(env):
-    """Reset connections on a certain service group."""
+    """Get price options to create a load balancer with."""
 
     mgr = SoftLayer.LoadBalancerManager(env.client)
 
