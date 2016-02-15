@@ -33,7 +33,7 @@ DEFAULT_COLUMNS = [
 @click.command()
 @click.option('--username', '-u', help='Volume username')
 @click.option('--datacenter', '-d', help='Datacenter shortname')
-@click.option('--storage_type',
+@click.option('--storage-type',
               help='Type of storage volume',
               type=click.Choice(['performance', 'endurance']))
 @click.option('--sortby', help='Column to sort by', default='username')

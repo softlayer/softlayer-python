@@ -42,8 +42,6 @@ class BlockStorageManager(utils.IdentifierMixin, object):
             ]
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
-        call = 'getIscsiNetworkStorage'
-
         _filter = utils.NestedDict(kwargs.get('filter') or {})
 
         _filter['iscsiNetworkStorage']['serviceResource']['type']['type'] = \
@@ -64,8 +62,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 (utils.query_filter(username))
 
         kwargs['filter'] = _filter.to_dict()
-        func = getattr(self.account, call)
-        return func(**kwargs)
+        return self.client.call('Account', 'getIscsiNetworkStorage', **kwargs)
 
     def get_block_volume_details(self, volume_id, **kwargs):
         """Returns details about the specified volume.
@@ -213,6 +210,9 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         space_category_code = 'performance_storage_space'
         iops_category_code = 'performance_storage_iops'
 
+        found_space_price = False
+        found_iops_price = False
+
         prices = []
         for item in package['items']:
             for price in item['prices']:
@@ -225,12 +225,19 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                         elif (category['categoryCode'] == space_category_code
                               and item['capacity'] == size):
                             prices.append(price)
+                            found_space_price = True
                         # Find the valid iops price object.
                         elif (category['categoryCode'] == iops_category_code
                               and item['capacity'] == iops
                               and (price['capacityRestrictionMinimum'] <= size
                                    <= price['capacityRestrictionMaximum'])):
                             prices.append(price)
+                            found_iops_price = True
+
+        if found_space_price is False or found_iops_price is False:
+            raise ValueError(
+                "No prices found for the requested size and iops.")
+
         return prices
 
     @staticmethod
@@ -258,6 +265,9 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         space_category_code = 'performance_storage_space'
         tier_category_code = 'storage_tier_level'
 
+        found_space_price = False
+        found_iops_price = False
+
         prices = []
         for item in package['items']:
             for price in item['prices']:
@@ -274,11 +284,18 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                               tiers.get(tier_level)
                               and item['capacity'] == size):
                             prices.append(price)
+                            found_space_price = True
                         # Find the valid tier price object.
                         elif (category['categoryCode'] == tier_category_code
                               and item['attributes'][0]['value'] ==
                               tiers.get(tier_level)):
                             prices.append(price)
+                            found_iops_price = True
+
+        if found_space_price is False or found_iops_price is False:
+            raise ValueError(
+                "No prices found for the requested size and tier.")
+
         return prices
 
     def _get_location_id(self, location):

@@ -7,8 +7,11 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 
 
-@click.command()
-@click.option('--storage_type',
+CONTEXT_SETTINGS = dict(token_normalize_func=lambda x: x.upper())
+
+
+@click.command(context_settings=CONTEXT_SETTINGS)
+@click.option('--storage-type',
               help='Type of storage volume',
               type=click.Choice(['performance', 'endurance']),
               required=True)
@@ -16,11 +19,15 @@ from SoftLayer.CLI import exceptions
               help='Size of storage volume',
               required=True)
 @click.option('--iops',
-              help='Performance Storage IOPs')
+              type=int,
+              help='Performance Storage IOPs,'
+              + ' between 100 and 6000 in multiples of 100'
+              + '  [required for storage-type performance]')
 @click.option('--tier',
-              help='Endurance Storage Tier (IOP per GB)',
+              help='Endurance Storage Tier (IOP per GB)'
+              + '  [required for storage-type endurance]',
               type=click.Choice(['0.25', '2', '4']))
-@click.option('--os_type',
+@click.option('--os-type',
               help='Operating System',
               type=click.Choice([
                   'HYPER_V',
@@ -38,11 +45,21 @@ from SoftLayer.CLI import exceptions
 def cli(env, storage_type, size, iops, tier, os_type, location):
     """Order a block storage volume."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
+    storage_type = storage_type.lower()
 
     if storage_type == 'performance':
         if iops is None:
             raise exceptions.CLIAbort(
-                'Option --iops required with performance')
+                'Option --iops required with Performance')
+
+        if iops < 100 or iops > 6000:
+            raise exceptions.CLIAbort(
+                'Option --iops must be between 100 and 6000, inclusive')
+
+        if iops % 100 != 0:
+            raise exceptions.CLIAbort(
+                'Option --iops must be a multiple of 100'
+            )
 
         order = block_manager.order_block_volume(
             storage_type='performance_storage_iscsi',
@@ -55,7 +72,7 @@ def cli(env, storage_type, size, iops, tier, os_type, location):
     if storage_type == 'endurance':
         if tier is None:
             raise exceptions.CLIAbort(
-                'Option --tier required with performance')
+                'Option --tier required with Endurance')
 
         order = block_manager.order_block_volume(
             storage_type='storage_service_enterprise',

@@ -10,7 +10,7 @@ from SoftLayer.CLI import formatting
 
 
 @click.command()
-@click.argument('volume_id')
+@click.argument('volume-id')
 @click.option('--reason', help="An optional reason for cancellation")
 @click.option('--immediate',
               is_flag=True,
