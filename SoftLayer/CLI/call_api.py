@@ -51,7 +51,8 @@ def _build_python_example(args, kwargs):
 @click.option('--id', '_id', help="Init parameter")
 @helpers.multi_option('--filter', '-f', '_filters',
                       help="Object filters. This should be of the form: "
-                      "'property=value' or 'nested.property=value'")
+                      "'property=value' or 'nested.property=value'. Complex "
+                      "filters like betweenDate are not currently supported.")
 @click.option('--mask', help="String-based object mask")
 @click.option('--limit', type=click.INT, help="Result limit")
 @click.option('--offset', type=click.INT, help="Result offset")

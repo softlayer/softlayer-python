@@ -5,7 +5,6 @@
     :license: MIT, see LICENSE for more details.
 """
 import json
-import re
 
 from SoftLayer.CLI import call_api
 from SoftLayer import testing
