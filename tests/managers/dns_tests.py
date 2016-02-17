@@ -77,7 +77,8 @@ class DNSTests(testing.TestCase):
                                 args=('example.com',))
 
     def test_create_record(self):
-        res = self.dns_client.create_record(1, 'test', 'TXT', 'testing', ttl=1200)
+        res = self.dns_client.create_record(1, 'test', 'TXT', 'testing',
+                                            ttl=1200)
 
         self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
                                 'createObject',
