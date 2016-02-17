@@ -387,4 +387,3 @@ class VirtTests(testing.TestCase):
             args=(100,),
             identifier=100,
         )
-
