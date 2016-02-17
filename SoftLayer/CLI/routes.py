@@ -20,7 +20,6 @@ ALL_ROUTES = [
     ('virtual:dns-sync', 'SoftLayer.CLI.virt.dns:cli'),
     ('virtual:edit', 'SoftLayer.CLI.virt.edit:cli'),
     ('virtual:list', 'SoftLayer.CLI.virt.list:cli'),
-    ('virtual:network', 'SoftLayer.CLI.virt.network:cli'),
     ('virtual:pause', 'SoftLayer.CLI.virt.power:pause'),
     ('virtual:power-off', 'SoftLayer.CLI.virt.power:power_off'),
     ('virtual:power-on', 'SoftLayer.CLI.virt.power:power_on'),
