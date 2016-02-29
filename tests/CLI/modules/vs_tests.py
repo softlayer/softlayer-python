@@ -352,3 +352,38 @@ class VirtTests(testing.TestCase):
         self.assertIn({'id': 1133}, order_container['prices'])
         self.assertIn({'id': 1122}, order_container['prices'])
         self.assertEqual(order_container['virtualGuests'], [{'id': 100}])
+
+    def test_edit(self):
+        result = self.run_command(['vs', 'edit',
+                                   '--domain=example.com',
+                                   '--hostname=host',
+                                   '--userdata="testdata"',
+                                   '--tag=dev',
+                                   '--tag=green',
+                                   '--public-speed=10',
+                                   '--private-speed=100',
+                                   '100'])
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(result.output, '')
+
+        self.assert_called_with(
+            'SoftLayer_Virtual_Guest', 'editObject',
+            args=({'domain': 'example.com', 'hostname': 'host'},),
+            identifier=100,
+        )
+        self.assert_called_with(
+            'SoftLayer_Virtual_Guest', 'setUserMetadata',
+            args=(['"testdata"'],),
+            identifier=100,
+        )
+        self.assert_called_with(
+            'SoftLayer_Virtual_Guest', 'setPublicNetworkInterfaceSpeed',
+            args=(10,),
+            identifier=100,
+        )
+        self.assert_called_with(
+            'SoftLayer_Virtual_Guest', 'setPrivateNetworkInterfaceSpeed',
+            args=(100,),
+            identifier=100,
+        )

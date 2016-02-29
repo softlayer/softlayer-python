@@ -269,15 +269,17 @@ class HardwareManager(utils.IdentifierMixin, object):
 
             #change the Public interface to 10Mbps on instance 12345
             result = mgr.change_port_speed(hardware_id=12345,
-                                        public=True, speed=10)
+                                           public=True, speed=10)
             # result will be True or an Exception
         """
         if public:
-            func = self.hardware.setPublicNetworkInterfaceSpeed
+            return self.client.call('Hardware_Server',
+                                    'setPublicNetworkInterfaceSpeed',
+                                    speed, id=hardware_id)
         else:
-            func = self.hardware.setPrivateNetworkInterfaceSpeed
-
-        return func(speed, id=hardware_id)
+            return self.client.call('Hardware_Server',
+                                    'setPrivateNetworkInterfaceSpeed',
+                                    speed, id=hardware_id)
 
     def place_order(self, **kwargs):
         """Places an order for a piece of hardware.
