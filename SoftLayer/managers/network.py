@@ -16,11 +16,12 @@ DEFAULT_SUBNET_MASK = ','.join(['hardware',
                                 'virtualGuests'])
 DEFAULT_VLAN_MASK = ','.join([
     'firewallInterfaces',
-    'hardware',
+    'hardwareCount',
     'primaryRouter[id, fullyQualifiedDomainName, datacenter]',
-    'subnets',
+    'subnetCount',
     'totalPrimaryIpAddressCount',
-    'virtualGuests',
+    'virtualGuestCount',
+    'networkSpace',
 ])
 
 
@@ -341,8 +342,6 @@ class NetworkManager(object):
             'virtual_guest_count': 0,
             'vlan_count': 0,
         })
-        unique_vms = set()
-        unique_servers = set()
 
         for vlan in self.list_vlans():
             name = utils.lookup(vlan, 'primaryRouter', 'datacenter', 'name')
@@ -350,17 +349,14 @@ class NetworkManager(object):
             datacenters[name]['vlan_count'] += 1
             datacenters[name]['public_ip_count'] += (
                 vlan['totalPrimaryIpAddressCount'])
-            datacenters[name]['subnet_count'] += len(vlan['subnets'])
+            datacenters[name]['subnet_count'] += vlan['subnetCount']
 
-            for hardware in vlan['hardware']:
-                if hardware['id'] not in unique_servers:
-                    datacenters[name]['hardware_count'] += 1
-                    unique_servers.add(hardware['id'])
-
-            for virtual_guest in vlan['virtualGuests']:
-                if virtual_guest['id'] not in unique_vms:
-                    datacenters[name]['virtual_guest_count'] += 1
-                    unique_vms.add(virtual_guest['id'])
+            # NOTE(kmcdonald): Only count hardware/guests once
+            if vlan.get('networkSpace') == 'PRIVATE':
+                datacenters[name]['hardware_count'] += (
+                    vlan['hardwareCount'])
+                datacenters[name]['virtual_guest_count'] += (
+                    vlan['virtualGuestCount'])
 
         return dict(datacenters)
 

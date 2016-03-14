@@ -92,7 +92,7 @@ class DNSManager(utils.IdentifierMixin, object):
         :param integer ttl: the TTL or time-to-live value (default: 60)
 
         """
-        self.record.createObject({
+        return self.record.createObject({
             'domainId': zone_id,
             'ttl': ttl,
             'host': record,

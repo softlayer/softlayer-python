@@ -45,8 +45,8 @@ def cli(env, sortby, datacenter, number, name):
             vlan.get('name') or formatting.blank(),
             'Yes' if vlan['firewallInterfaces'] else 'No',
             utils.lookup(vlan, 'primaryRouter', 'datacenter', 'name'),
-            len(vlan['hardware']),
-            len(vlan['virtualGuests']),
+            vlan['hardwareCount'],
+            vlan['virtualGuestCount'],
             vlan['totalPrimaryIpAddressCount'],
         ])
 

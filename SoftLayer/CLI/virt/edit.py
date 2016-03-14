@@ -21,15 +21,24 @@ from SoftLayer.CLI import helpers
 @click.option('--userfile', '-F',
               help="Read userdata from file",
               type=click.Path(exists=True, readable=True, resolve_path=True))
+@click.option('--public-speed',
+              help="Public port speed.",
+              default=None,
+              type=click.Choice(['0', '10', '100', '1000', '10000']))
+@click.option('--private-speed',
+              help="Private port speed.",
+              default=None,
+              type=click.Choice(['0', '10', '100', '1000', '10000']))
 @environment.pass_env
-def cli(env, identifier, domain, userfile, tag, hostname, userdata):
+def cli(env, identifier, domain, userfile, tag, hostname, userdata,
+        public_speed, private_speed):
     """Edit a virtual server's details."""
-
-    data = {}
 
     if userdata and userfile:
         raise exceptions.ArgumentError(
             '[-u | --userdata] not allowed with [-F | --userfile]')
+
+    data = {}
 
     if userdata:
         data['userdata'] = userdata
@@ -47,3 +56,9 @@ def cli(env, identifier, domain, userfile, tag, hostname, userdata):
     vs_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
     if not vsi.edit(vs_id, **data):
         raise exceptions.CLIAbort("Failed to update virtual server")
+
+    if public_speed is not None:
+        vsi.change_port_speed(vs_id, True, int(public_speed))
+
+    if private_speed is not None:
+        vsi.change_port_speed(vs_id, False, int(private_speed))

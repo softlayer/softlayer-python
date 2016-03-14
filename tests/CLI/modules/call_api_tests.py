@@ -4,12 +4,61 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import json
+
+from SoftLayer.CLI import call_api
 from SoftLayer import testing
 
-import json
+
+class BuildFilterTests(testing.TestCase):
+
+    def test_empty(self):
+        assert call_api._build_filters([]) == {}
+
+    def test_basic(self):
+        result = call_api._build_filters(['property=value'])
+        assert result == {'property': {'operation': '_= value'}}
+
+    def test_nested(self):
+        result = call_api._build_filters(['nested.property=value'])
+        assert result == {'nested': {'property': {'operation': '_= value'}}}
+
+    def test_multi(self):
+        result = call_api._build_filters(['prop1=value1', 'prop2=prop2'])
+        assert result == {
+            'prop1': {'operation': '_= value1'},
+            'prop2': {'operation': '_= prop2'},
+        }
 
 
 class CallCliTests(testing.TestCase):
+
+    def test_python_output(self):
+        result = self.run_command(['call-api', 'Service', 'method',
+                                   '--mask=some.mask',
+                                   '--limit=20',
+                                   '--offset=40',
+                                   '--id=100',
+                                   '-f nested.property=5432',
+                                   '--output-python'])
+
+        self.assertEqual(result.exit_code, 0)
+        # NOTE(kmcdonald): Python 3 no longer inserts 'u' before unicode
+        # string literals but python 2 does. These are stripped out to make
+        # this test pass on both python versions.
+        stripped_output = result.output.replace("u'", "'")
+        self.assertIsNotNone(stripped_output, """import SoftLayer
+
+client = SoftLayer.create_client_from_env()
+result = client.call(u'Service',
+                     u'method',
+                     filter={u'nested': {u'property': {'operation': 5432}}},
+                     id=u'100',
+                     limit=20,
+                     mask=u'some.mask',
+                     offset=40)
+""")
+        self.assertEqual(self.calls(), [], "no API calls were made")
 
     def test_options(self):
         mock = self.set_mock('SoftLayer_Service', 'method')
@@ -19,7 +68,9 @@ class CallCliTests(testing.TestCase):
                                    '--mask=some.mask',
                                    '--limit=20',
                                    '--offset=40',
-                                   '--id=100'])
+                                   '--id=100',
+                                   '-f property=1234',
+                                   '-f nested.property=5432'])
 
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(json.loads(result.output), 'test')
@@ -27,7 +78,11 @@ class CallCliTests(testing.TestCase):
                                 mask='mask[some.mask]',
                                 limit=20,
                                 offset=40,
-                                identifier='100')
+                                identifier='100',
+                                filter={
+                                    'property': {'operation': 1234},
+                                    'nested': {'property': {'operation': 5432}}
+                                })
 
     def test_object(self):
         mock = self.set_mock('SoftLayer_Service', 'method')

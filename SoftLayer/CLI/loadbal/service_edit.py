@@ -20,7 +20,7 @@ from SoftLayer.CLI import loadbal
               type=click.INT,
               help="Change the weight of the service")
 @click.option('--healthcheck-type', help="Change the health check type")
-@click.option('--ip-address', '--ip', help="Change the IP of the service")
+@click.option('--ip-address', help="Change the IP address of the service")
 @environment.pass_env
 def cli(env, identifier, enabled, port, weight, healthcheck_type, ip_address):
     """Edit the properties of a service group."""
@@ -30,7 +30,8 @@ def cli(env, identifier, enabled, port, weight, healthcheck_type, ip_address):
     loadbal_id, service_id = loadbal.parse_id(identifier)
 
     # check if any input is provided
-    if not any([ip_address, enabled, weight, port, healthcheck_type]):
+    if ((not any([ip_address, weight, port, healthcheck_type])) and
+            enabled is None):
         raise exceptions.CLIAbort(
             'At least one property is required to be changed!')
 

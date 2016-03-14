@@ -26,6 +26,7 @@ __all__ = [
     'RestTransport',
     'TimingTransport',
     'FixtureTransport',
+    'SoftLayerListResult',
 ]
 
 REST_SPECIAL_METHODS = {
@@ -85,10 +86,14 @@ class Request(object):
 
 
 class SoftLayerListResult(list):
-    """A SoftLayer list result."""
+    """A SoftLayer API list result."""
 
     def __init__(self, items, total_count):
+
+        #: total count of items that exist on the server. This is useful when
+        #: paginating through a large list of objects.
         self.total_count = total_count
+
         super(SoftLayerListResult, self).__init__(items)
 
 

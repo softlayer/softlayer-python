@@ -106,6 +106,9 @@ def recursive_subcommand_loader(root, current_path=''):
         new_path = '%s:%s' % (current_path, command)
         logging.info("loading %s", new_path)
         new_root = root.get_command(ctx, command)
+        if new_root is None:
+            raise Exception('Could not load command: %s' % command)
+
         for path, cmd in recursive_subcommand_loader(new_root,
                                                      current_path=new_path):
             yield path, cmd

@@ -77,7 +77,8 @@ class DNSTests(testing.TestCase):
                                 args=('example.com',))
 
     def test_create_record(self):
-        self.dns_client.create_record(1, 'test', 'TXT', 'testing', ttl=1200)
+        res = self.dns_client.create_record(1, 'test', 'TXT', 'testing',
+                                            ttl=1200)
 
         self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
                                 'createObject',
@@ -88,6 +89,7 @@ class DNSTests(testing.TestCase):
                                     'type': 'TXT',
                                     'data': 'testing'
                                 },))
+        self.assertEqual(res, {'name': 'example.com'})
 
     def test_delete_record(self):
         self.dns_client.delete_record(1)

@@ -10,6 +10,7 @@ import itertools
 import socket
 import time
 
+from SoftLayer import exceptions
 from SoftLayer.managers import ordering
 from SoftLayer import utils
 # pylint: disable=no-self-use
@@ -607,11 +608,13 @@ class VSManager(utils.IdentifierMixin, object):
             A port speed of 0 will disable the interface.
         """
         if public:
-            func = self.guest.setPublicNetworkInterfaceSpeed
+            return self.client.call('Virtual_Guest',
+                                    'setPublicNetworkInterfaceSpeed',
+                                    speed, id=instance_id)
         else:
-            func = self.guest.setPrivateNetworkInterfaceSpeed
-
-        return func(speed, id=instance_id)
+            return self.client.call('Virtual_Guest',
+                                    'setPrivateNetworkInterfaceSpeed',
+                                    speed, id=instance_id)
 
     def _get_ids_from_hostname(self, hostname):
         """List VS ids which match the given hostname."""
@@ -697,7 +700,7 @@ class VSManager(utils.IdentifierMixin, object):
 
         :param integer instance_id: the instance ID to edit
         :param string name: name assigned to the image
-        :param string additional_disks: set to true to include all additional
+        :param bool additional_disks: set to true to include all additional
                                         attached storage devices
         :param string notes: notes about this particular image
 
@@ -745,22 +748,22 @@ class VSManager(utils.IdentifierMixin, object):
         """
         package_items = self._get_package_items()
         prices = []
-        if cpus:
-            prices.append({
-                'id': self._get_item_id_for_upgrade(package_items,
-                                                    'cpus',
-                                                    cpus,
-                                                    public)})
-        if memory:
-            prices.append({
-                'id': self._get_item_id_for_upgrade(package_items,
-                                                    'memory',
-                                                    memory)})
-        if nic_speed:
-            prices.append({
-                'id': self._get_item_id_for_upgrade(package_items,
-                                                    'nic_speed',
-                                                    nic_speed)})
+
+        for option, value in {'cpus': cpus,
+                              'memory': memory,
+                              'nic_speed': nic_speed}.items():
+            if not value:
+                continue
+            price_id = self._get_price_id_for_upgrade(package_items,
+                                                      option,
+                                                      value,
+                                                      public)
+            if not price_id:
+                # Every option provided is expected to have a price
+                raise exceptions.SoftLayerError(
+                    "Unable to find %s option with value %s" % (option, value))
+
+            prices.append({'id': price_id})
 
         maintenance_window = datetime.datetime.now(utils.UTC())
         order = {
@@ -780,36 +783,56 @@ class VSManager(utils.IdentifierMixin, object):
 
     def _get_package_items(self):
         """Following Method gets all the item ids related to VS."""
-        mask = "mask[description,capacity,prices[id,categories[name,id]]]"
+        mask = [
+            'description',
+            'capacity',
+            'prices[id,locationGroupId,categories[name,id,categoryCode]]'
+        ]
+        mask = "mask[%s]" % ','.join(mask)
+
         package_type = "VIRTUAL_SERVER_INSTANCE"
         package_id = self.ordering_manager.get_package_id_by_type(package_type)
         package_service = self.client['Product_Package']
 
         return package_service.getItems(id=package_id, mask=mask)
 
-    def _get_item_id_for_upgrade(self, package_items, option, value,
-                                 public=True):
-        """Find the item ids for the parameters you want to upgrade to.
+    def _get_price_id_for_upgrade(self, package_items, option, value,
+                                  public=True):
+        """Find the price id for the option and value to upgrade.
 
         :param list package_items: Contains all the items related to an VS
         :param string option: Describes type of parameter to be upgraded
         :param int value: The value of the parameter to be upgraded
         :param bool public: CPU will be in Private/Public Node.
         """
-        vs_id = {'memory': 3, 'cpus': 80, 'nic_speed': 26}
+        option_category = {
+            'memory': 'ram',
+            'cpus': 'guest_core',
+            'nic_speed': 'port_speed'
+        }
+        category_code = option_category[option]
         for item in package_items:
-            categories = item['prices'][0]['categories']
-            for category in categories:
-                if not (category['id'] == vs_id[option] and
-                        item['capacity'] == str(value)):
+            is_private = str(item['description']).startswith('Private')
+            for price in item['prices']:
+                if 'locationGroupId' in price and price['locationGroupId']:
+                    # Skip location based prices
                     continue
-                if option == 'cpus':
-                    if public and ('Private' not in item['description']):
-                        return item['prices'][0]['id']
-                    elif not public and ('Private' in item['description']):
-                        return item['prices'][0]['id']
-                elif option == 'nic_speed':
-                    if 'Public' in item['description']:
-                        return item['prices'][0]['id']
-                else:
-                    return item['prices'][0]['id']
+
+                if 'categories' not in price:
+                    continue
+
+                categories = price['categories']
+                for category in categories:
+                    if not (category['categoryCode'] == category_code
+                            and str(item['capacity']) == str(value)):
+                        continue
+                    if option == 'cpus':
+                        if public and not is_private:
+                            return price['id']
+                        elif not public and is_private:
+                            return price['id']
+                    elif option == 'nic_speed':
+                        if 'Public' in item['description']:
+                            return price['id']
+                    else:
+                        return price['id']

@@ -66,6 +66,7 @@ getObject = {
     }
 }
 editObject = True
+setTags = True
 setPrivateNetworkInterfaceSpeed = True
 setPublicNetworkInterfaceSpeed = True
 powerOff = True

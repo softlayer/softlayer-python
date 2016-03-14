@@ -45,9 +45,10 @@ class CommandLoader(click.MultiCommand):
         self.path = path
 
     def list_commands(self, ctx):
-        """Get module for click."""
+        """List all sub-commands."""
         env = ctx.ensure_object(environment.Environment)
         env.load()
+
         return sorted(env.list_commands(*self.path))
 
     def get_command(self, ctx, name):
@@ -63,7 +64,7 @@ class CommandLoader(click.MultiCommand):
         new_path.append(name)
         module = env.get_command(*new_path)
         if isinstance(module, types.ModuleType):
-            return CommandLoader(*new_path, help=module.__doc__)
+            return CommandLoader(*new_path, help=module.__doc__ or '')
         else:
             return module
 
@@ -123,20 +124,7 @@ def cli(env,
     env.skip_confirmations = really
     env.config_file = config
     env.format = format
-    if env.client is None:
-        # Environment can be passed in explicitly. This is used for testing
-        if demo:
-            client = SoftLayer.BaseClient(
-                transport=SoftLayer.FixtureTransport(),
-                auth=None,
-            )
-        else:
-            # Create SL Client
-            client = SoftLayer.create_client_from_env(
-                proxy=proxy,
-                config_file=config,
-            )
-        env.client = client
+    env.ensure_client(config_file=config, is_demo=demo, proxy=proxy)
 
     env.vars['_start'] = time.time()
     env.vars['_timings'] = SoftLayer.TimingTransport(env.client.transport)

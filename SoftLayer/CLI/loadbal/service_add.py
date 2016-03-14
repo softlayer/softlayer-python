@@ -12,7 +12,7 @@ from SoftLayer.CLI import loadbal
 @click.argument('identifier')
 @click.option('--enabled / --disabled',
               required=True,
-              help="Create the service as enable or disabled")
+              help="Create the service as enabled or disabled")
 @click.option('--port',
               required=True,
               help="The port number for the service",
