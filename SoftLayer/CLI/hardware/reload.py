@@ -12,9 +12,9 @@ from SoftLayer.CLI import helpers
 
 @click.command()
 @click.argument('identifier')
-@click.option('--postinstall', '-i',
-              help=("Post-install script to download "
-                    "(Only HTTPS executes, HTTP leaves file in /root"))
+@helpers.multi_option('--postinstall', '-i',
+             help=("Post-install script to download "
+                   "(Only HTTPS executes, HTTP leaves file in /root"))
 @helpers.multi_option('--key', '-k', help="SSH keys to add to the root user")
 @environment.pass_env
 def cli(env, identifier, postinstall, key):
