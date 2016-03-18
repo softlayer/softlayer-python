@@ -127,7 +127,7 @@ class ServerCLITests(testing.TestCase):
                                    '--key=4567'])
 
         self.assertEqual(result.exit_code, 0)
-        reload_mock.assert_called_with(12345, None, [4567])
+        reload_mock.assert_called_with(12345, (), [4567])
 
         # Now check to make sure we properly call CLIAbort in the negative case
         result = self.run_command(['server', 'reload', '12345'])
