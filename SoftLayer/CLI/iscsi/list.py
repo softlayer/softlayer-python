@@ -28,8 +28,10 @@ def cli(env):
     for iscsi in iscsi_list:
         table.add_row([
             iscsi['id'],
-            iscsi['serviceResource']['datacenter'].get('name',
-                                                       formatting.blank()),
+            utils.lookup(iscsi,
+                         'serviceResource',
+                         'datacenter',
+                         'name') or formatting.blank(),
             formatting.FormattedItem(iscsi.get('capacityGb',
                                                formatting.blank()),
                                      "%dGB" % iscsi.get('capacityGb', 0)),
