@@ -33,3 +33,5 @@ deleteOriginPullRule = True
 loadContent = True
 
 purgeContent = True
+
+purgeCache = True
