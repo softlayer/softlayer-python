@@ -59,13 +59,8 @@ class NestedDict(dict):
 
         This is needed for places where strict type checking is done.
         """
-        new_dict = {}
-        for key, val in self.items():
-            if isinstance(val, NestedDict):
-                new_dict[key] = val.to_dict()
-            else:
-                new_dict[key] = val
-        return new_dict
+        return {key: val.to_dict() if isinstance(val, NestedDict) else val
+            for key, val in self.items()}
 
 
 def query_filter(query):
