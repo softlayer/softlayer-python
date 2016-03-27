@@ -60,7 +60,7 @@ class NestedDict(dict):
         This is needed for places where strict type checking is done.
         """
         return {key: val.to_dict() if isinstance(val, NestedDict) else val
-            for key, val in self.items()}
+                for key, val in self.items()}
 
 
 def query_filter(query):
