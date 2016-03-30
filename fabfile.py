@@ -36,14 +36,14 @@ def release(version, force=False):
 
     clean()
 
-    puts(" * Tagging Version %s" % version_str)
-    force_option = 'f' if force else ''
-    local("git tag -%sam \"%s\" %s" % (force_option, version_str, version_str))
-
     local("pip install wheel")
 
     puts(" * Uploading to PyPI")
     upload()
+
+    puts(" * Tagging Version %s" % version_str)
+    force_option = 'f' if force else ''
+    local("git tag -%sam \"%s\" %s" % (force_option, version_str, version_str))
 
     puts(" * Pushing Tag to upstream")
     local("git push upstream %s" % version_str)
