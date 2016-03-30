@@ -36,6 +36,7 @@ setup(
         'click >= 5',
         'requests >= 2.7.0',
         'prompt_toolkit >= 0.53',
+        'pygments >= 2.0.0',
     ],
     keywords=['softlayer', 'cloud'],
     classifiers=[
