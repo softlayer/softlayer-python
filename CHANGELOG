@@ -1,3 +1,11 @@
+5.0.1
+
+    * Adds missing depdendency that was previously pulled in by prompt_toolkit
+
+    * Fix a bug by updating the CDN manager to use the new purge method
+
+    * Fixes bug that occured when iscsi listings with resources have no datacenter
+
 5.0.0
 
     * Adds a shell (accessable with `slcli shell`) which provides autocomplete for slcli commands and options

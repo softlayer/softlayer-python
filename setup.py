@@ -15,7 +15,7 @@ else:
 
 setup(
     name='SoftLayer',
-    version='5.0.0',
+    version='5.0.1',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     author='SoftLayer Technologies, Inc.',
@@ -49,8 +49,8 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
