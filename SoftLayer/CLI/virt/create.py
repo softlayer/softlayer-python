@@ -81,7 +81,13 @@ def _parse_create_args(client, args):
         data['os_code'] = args['os']
 
     if args.get('image'):
-        data['image_id'] = args['image']
+        if args.get('image').isdigit():
+            image_mgr = SoftLayer.ImageManager(client)
+            image_details = image_mgr.get_image(args.get('image'),
+                                                mask="id,globalIdentifier")
+            data['image_id'] = image_details['globalIdentifier']
+        else:
+            data['image_id'] = args['image']
 
     if args.get('datacenter'):
         data['datacenter'] = args['datacenter']

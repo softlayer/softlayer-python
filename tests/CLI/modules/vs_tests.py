@@ -135,6 +135,41 @@ class VirtTests(testing.TestCase):
                                 args=args)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_create_with_integer_image_id(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['vs', 'create',
+                                   '--cpu=2',
+                                   '--domain=example.com',
+                                   '--hostname=host',
+                                   '--image=12345',
+                                   '--memory=1',
+                                   '--network=100',
+                                   '--billing=hourly',
+                                   '--datacenter=dal05'])
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(json.loads(result.output),
+                         {'guid': '1a2b3c-1701',
+                          'id': 100,
+                          'created': '2013-08-01 15:23:45'})
+
+        args = ({
+            'datacenter': {'name': 'dal05'},
+            'domain': 'example.com',
+            'hourlyBillingFlag': True,
+            'localDiskFlag': True,
+            'maxMemory': 1024,
+            'hostname': 'host',
+            'startCpus': 2,
+            'blockDeviceTemplateGroup': {
+                'globalIdentifier': '0B5DEAF4-643D-46CA-A695-CECBE8832C9D',
+            },
+            'networkComponents': [{'maxSpeed': '100'}]
+        },)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
+                                args=args)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_both(self, confirm_mock):
         confirm_mock.return_value = True
         getReverseDomainRecords = self.set_mock('SoftLayer_Virtual_Guest',
