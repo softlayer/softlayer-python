@@ -23,6 +23,15 @@ DEFAULT_VLAN_MASK = ','.join([
     'virtualGuestCount',
     'networkSpace',
 ])
+DEFAULT_GET_VLAN_MASK = ','.join([
+    'firewallInterfaces',
+    'primaryRouter[id, fullyQualifiedDomainName, datacenter]',
+    'totalPrimaryIpAddressCount',
+    'networkSpace',
+    'hardware',
+    'subnets',
+    'virtualGuests',
+])
 
 
 class NetworkManager(object):
@@ -207,7 +216,7 @@ class NetworkManager(object):
                   the specified VLAN.
 
         """
-        return self.vlan.getObject(id=vlan_id, mask=DEFAULT_VLAN_MASK)
+        return self.vlan.getObject(id=vlan_id, mask=DEFAULT_GET_VLAN_MASK)
 
     def list_global_ips(self, version=None, identifier=None, **kwargs):
         """Returns a list of all global IP address records on the account.
