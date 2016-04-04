@@ -77,3 +77,28 @@ class TicketTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Ticket', 'addUpdate',
                                 args=({'entry': 'Update1'},),
                                 identifier=100)
+
+    def test_attach_hardware(self):
+        self.ticket.attach_hardware(100, 123)
+        self.assert_called_with('SoftLayer_Ticket', 'addAttachedHardware',
+                                args=(123,),
+                                identifier=100)
+
+    def test_attach_virtual_server(self):
+        self.ticket.attach_virtual_server(100, 123)
+        self.assert_called_with('SoftLayer_Ticket', 'addAttachedVirtualGuest',
+                                args=(123,),
+                                identifier=100)
+
+    def test_detach_hardware(self):
+        self.ticket.detach_hardware(100, 123)
+        self.assert_called_with('SoftLayer_Ticket', 'removeAttachedHardware',
+                                args=(123,),
+                                identifier=100)
+
+    def test_detach_virtual_server(self):
+        self.ticket.detach_virtual_server(100, 123)
+        self.assert_called_with('SoftLayer_Ticket',
+                                'removeAttachedVirtualGuest',
+                                args=(123,),
+                                identifier=100)
