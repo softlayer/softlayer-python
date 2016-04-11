@@ -33,3 +33,20 @@ createStandardTicket = {
 }
 edit = True
 addUpdate = {}
+
+addAttachedHardware = {
+    "id": 123,
+    "createDate": "2013-08-01T14:14:04-07:00",
+    "hardwareId": 1,
+    "ticketId": 100
+}
+
+addAttachedVirtualGuest = {
+    "id": 123,
+    "createDate": "2013-08-01T14:14:04-07:00",
+    "virtualGuestId": 1,
+    "ticketId": 100
+}
+
+removeAttachedHardware = True
+removeAttachedVirtualGuest = True

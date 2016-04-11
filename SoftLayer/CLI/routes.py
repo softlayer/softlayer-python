@@ -188,6 +188,8 @@ ALL_ROUTES = [
     ('ticket:update', 'SoftLayer.CLI.ticket.update:cli'),
     ('ticket:subjects', 'SoftLayer.CLI.ticket.subjects:cli'),
     ('ticket:summary', 'SoftLayer.CLI.ticket.summary:cli'),
+    ('ticket:attach', 'SoftLayer.CLI.ticket.attach:cli'),
+    ('ticket:detach', 'SoftLayer.CLI.ticket.detach:cli'),
 
     ('vlan', 'SoftLayer.CLI.vlan'),
     ('vlan:detail', 'SoftLayer.CLI.vlan.detail:cli'),
