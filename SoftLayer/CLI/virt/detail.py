@@ -90,9 +90,19 @@ def cli(env, identifier, passwords=False, price=False):
                        result['billingItem']['recurringFee']])
 
     if passwords:
-        pass_table = formatting.Table(['username', 'password'])
-        for item in result['operatingSystem']['passwords']:
-            pass_table.add_row([item['username'], item['password']])
+        pass_table = formatting.Table(['software', 'username', 'password'])
+
+        for component in result['softwareComponents']:
+            for item in component['passwords']:
+                pass_table.add_row([
+                    utils.lookup(component,
+                                 'softwareLicense',
+                                 'softwareDescription',
+                                 'name'),
+                    item['username'],
+                    item['password'],
+                ])
+
         table.add_row(['users', pass_table])
 
     table.add_row(['tags', formatting.tags(result['tagReferences'])])

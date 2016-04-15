@@ -40,6 +40,11 @@ getObject = {
             'softwareDescription': {'version': '12.04-64 Minimal for VSI',
                                     'name': 'Ubuntu'}}
     },
+    'softwareComponents': [{
+        'passwords': [{'username': 'user', 'password': 'pass'}],
+        'softwareLicense': {
+            'softwareDescription': {'name': 'Ubuntu'}}
+    }],
     'tagReferences': [{'tag': {'name': 'production'}}],
 }
 
