@@ -17,7 +17,7 @@ CONTEXT_SETTINGS = dict(token_normalize_func=lambda x: x.upper())
               required=True)
 @click.option('--size',
               type=int,
-              help='Size of storage volume, integer in GB',
+              help='Size of storage volume in GB',
               required=True)
 @click.option('--iops',
               type=int,
@@ -40,7 +40,7 @@ CONTEXT_SETTINGS = dict(token_normalize_func=lambda x: x.upper())
                   'XEN']),
               required=True)
 @click.option('--location',
-              help='Datacenter location to provision storage. lower case- eg sjc01',
+              help='Datacenter short name (e.g.: dal09)',
               required=True)
 @environment.pass_env
 def cli(env, storage_type, size, iops, tier, os_type, location):
