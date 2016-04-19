@@ -16,6 +16,7 @@ CONTEXT_SETTINGS = dict(token_normalize_func=lambda x: x.upper())
               type=click.Choice(['performance', 'endurance']),
               required=True)
 @click.option('--size',
+              type=int,
               help='Size of storage volume, integer in GB',
               required=True)
 @click.option('--iops',
