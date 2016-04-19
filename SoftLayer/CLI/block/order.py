@@ -16,7 +16,7 @@ CONTEXT_SETTINGS = dict(token_normalize_func=lambda x: x.upper())
               type=click.Choice(['performance', 'endurance']),
               required=True)
 @click.option('--size',
-              help='Size of storage volume',
+              help='Size of storage volume, integer in GB',
               required=True)
 @click.option('--iops',
               type=int,
@@ -39,7 +39,7 @@ CONTEXT_SETTINGS = dict(token_normalize_func=lambda x: x.upper())
                   'XEN']),
               required=True)
 @click.option('--location',
-              help='Size of storage volume',
+              help='Datacenter location to provision storage. lower case- eg sjc01',
               required=True)
 @environment.pass_env
 def cli(env, storage_type, size, iops, tier, os_type, location):
@@ -72,7 +72,7 @@ def cli(env, storage_type, size, iops, tier, os_type, location):
     if storage_type == 'endurance':
         if tier is None:
             raise exceptions.CLIAbort(
-                'Option --tier required with Endurance')
+                'Option --tier required with Endurance in IOPS/GB [0.25,2,4]')
 
         order = block_manager.order_block_volume(
             storage_type='storage_service_enterprise',
