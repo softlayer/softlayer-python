@@ -146,6 +146,11 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         :param tier_level: Tier level to use for an "Endurance" order
         """
 
+        try:
+            location_id = self._get_location_id(location)
+        except ValueError:
+            raise exceptions.SoftLayerError("Invalid datacenter name specified. Please provide the lower case short name (e.g.: dal09)")
+
         base_type_name = 'SoftLayer_Container_Product_Order_Network_'
         package = self._get_package(storage_type)
         if package['name'] == 'Performance':
@@ -157,8 +162,6 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         else:
             raise exceptions.SoftLayerError(
                 "storage_type must be either Performance or Endurance")
-
-        location_id = self._get_location_id(location)
 
         order = {
             'complexType': complex_type,
