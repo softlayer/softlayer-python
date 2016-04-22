@@ -22,11 +22,11 @@ CONTEXT_SETTINGS = dict(token_normalize_func=lambda x: x.upper())
 @click.option('--iops',
               type=int,
               help='Performance Storage IOPs,'
-              + ' between 100 and 6000 in multiples of 100'
-              + '  [required for storage-type performance]')
+              ' between 100 and 6000 in multiples of 100'
+              '  [required for storage-type performance]')
 @click.option('--tier',
               help='Endurance Storage Tier (IOP per GB)'
-              + '  [required for storage-type endurance]',
+              '  [required for storage-type endurance]',
               type=click.Choice(['0.25', '2', '4']))
 @click.option('--os-type',
               help='Operating System',
@@ -62,26 +62,32 @@ def cli(env, storage_type, size, iops, tier, os_type, location):
                 'Option --iops must be a multiple of 100'
             )
 
-        order = block_manager.order_block_volume(
-            storage_type='performance_storage_iscsi',
-            location=location,
-            size=size,
-            iops=iops,
-            os_type=os_type
-        )
+        try:
+            order = block_manager.order_block_volume(
+                storage_type='performance_storage_iscsi',
+                location=location,
+                size=size,
+                iops=iops,
+                os_type=os_type
+            )
+        except ValueError as ex:
+            raise exceptions.ArgumentError(str(ex))
 
     if storage_type == 'endurance':
         if tier is None:
             raise exceptions.CLIAbort(
                 'Option --tier required with Endurance in IOPS/GB [0.25,2,4]')
 
-        order = block_manager.order_block_volume(
-            storage_type='storage_service_enterprise',
-            location=location,
-            size=size,
-            tier_level=tier,
-            os_type=os_type
-        )
+        try:
+            order = block_manager.order_block_volume(
+                storage_type='storage_service_enterprise',
+                location=location,
+                size=size,
+                tier_level=tier,
+                os_type=os_type
+            )
+        except ValueError as ex:
+            raise exceptions.ArgumentError(str(ex))
 
     if 'placedOrder' in order.keys():
         click.echo("Order #{0} placed successfully!".format(
