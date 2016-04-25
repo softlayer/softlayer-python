@@ -10,9 +10,9 @@ from SoftLayer import utils
 
 
 ENDURANCE_TIERS = {
-    '0.25': '100',
-    '2': '200',
-    '4': '300'
+    0.25: 100,
+    2: 200,
+    4: 300,
 }
 
 
@@ -22,11 +22,6 @@ class BlockStorageManager(utils.IdentifierMixin, object):
     def __init__(self, client):
         self.configuration = {}
         self.client = client
-        self.account = client['Account']
-        self.product_package = self.client['Product_Package']
-        self.block_svc = self.client['Network_Storage']
-        self.block_os_types = self.client['Network_Storage_Iscsi_OS_Type']
-        self.product_order = self.client['Product_Order']
 
     def list_block_volumes(self, datacenter=None, username=None,
                            storage_type=None, **kwargs):
@@ -95,7 +90,8 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 'lunId',
             ]
             kwargs['mask'] = "mask[%s]" % ','.join(items)
-        return self.block_svc.getObject(id=volume_id, **kwargs)
+        return self.client.call('Network_Storage', 'getObject',
+                                id=volume_id, **kwargs)
 
     def get_block_volume_access_list(self, volume_id, **kwargs):
         """Returns a list of authorized hosts for a specified volume.
@@ -113,7 +109,8 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 'allowedIpAddresses[allowedHost[credential]]',
             ]
             kwargs['mask'] = "mask[%s]" % ','.join(items)
-        return self.block_svc.getObject(id=volume_id, **kwargs)
+        return self.client.call('Network_Storage', 'getObject',
+                                id=volume_id, **kwargs)
 
     def get_block_volume_snapshot_list(self, volume_id, **kwargs):
         """Returns a list of snapshots for the specified volume.
@@ -123,29 +120,34 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         :return: Returns a list of snapshots for the specified volume.
         """
         if 'mask' not in kwargs:
-            items = [
-                'snapshots.id',
-                'snapshots.notes',
-                'snapshots.snapshotSizeBytes',
-                'snapshots.storageType.keyName',
-                'snapshots.snapshotCreationTimestamp',
-                'snapshots[hourlySchedule,dailySchedule,weeklySchedule]',
-            ]
+            items = '''snapshots[
+    id,
+    notes,
+    snapshotSizeBytes,
+    storageType[keyName],
+    snapshotCreationTimestamp
+    hourlySchedule,
+    dailySchedule,
+    weeklySchedule
+]'''
             kwargs['mask'] = "mask[%s]" % ','.join(items)
-        return self.block_svc.getObject(id=volume_id, **kwargs)
+        return self.client.call('Network_Storage', 'getObject',
+                                id=volume_id, **kwargs)
 
     def delete_snapshot(self, snapshot_id):
         """Deletes the specified snapshot object.
 
         :param snapshot_id: The ID of the snapshot object to delete.
         """
-        return self.block_svc.deleteObject(id=snapshot_id)
+        return self.client.call('Network_Storage', 'deleteObject',
+                                id=snapshot_id)
 
     def order_block_volume(self, storage_type, location, size, os_type,
                            iops=None, tier_level=None):
         """Places an order for a block volume.
 
-        :param storage_type: "Performance" or "Endurance"
+        :param storage_type: "performance_storage_iscsi" (performance)
+                             or "storage_service_enterprise" (endurance)
         :param location: Datacenter in which to order iSCSI volume
         :param size: Size of the desired volume, in GB
         :param os_type: OS Type to use for volume alignment, see help for list
@@ -162,14 +164,14 @@ class BlockStorageManager(utils.IdentifierMixin, object):
 
         base_type_name = 'SoftLayer_Container_Product_Order_Network_'
         package = self._get_package(storage_type)
-        if package['name'] == 'Performance':
+        if storage_type == 'performance_storage_iscsi':
             complex_type = base_type_name + 'PerformanceStorage_Iscsi'
             prices = [
                 _find_performance_block_price(package),
                 _find_performance_space_price(package, iops),
                 _find_performance_iops_price(package, size, iops),
             ]
-        elif package['name'] == 'Endurance':
+        elif storage_type == 'storage_service_enterprise':
             complex_type = base_type_name + 'Storage_Enterprise'
             prices = [
                 _find_endurance_block_price(package),
@@ -190,32 +192,34 @@ class BlockStorageManager(utils.IdentifierMixin, object):
             'location': location_id,
         }
 
-        return self.product_order.placeOrder(order)
+        return self.client.call('Product_Order', 'placeOrder', order)
 
-    def _get_package(self, category_code, **kwargs):
+    def _get_package(self, category_code):
         """Returns a product packaged based on type of storage.
 
         :param category_code: Category code of product package.
-        :param kwargs:
         :return: Returns a packaged based on type of storage.
         """
-        if 'mask' not in kwargs:
-            items = [
-                'id',
-                'name',
-                'items',
-                'items[prices[categories],attributes]'
-            ]
-            kwargs['mask'] = "mask[%s]" % ','.join(items)
 
-        _filter = utils.NestedDict(kwargs.get('filter') or {})
+        _filter = utils.NestedDict({})
         _filter['categories']['categoryCode'] = (
             utils.query_filter(category_code))
         _filter['statusCode'] = (utils.query_filter('ACTIVE'))
-        kwargs['filter'] = _filter.to_dict()
 
-        func = getattr(self.product_package, 'getAllObjects')
-        return func(**kwargs).pop()
+        packages = self.client.call('Product_Package', 'getAllObjects',
+                                    filter=_filter.to_dict(),
+                                    mask="""
+id,
+name,
+items[prices[categories],attributes]
+""")
+        if len(packages) == 0:
+            raise ValueError('No packages were found for %s' % category_code)
+        if len(packages) > 1:
+            raise ValueError('More than one package was found for %s'
+                             % category_code)
+
+        return packages[0]
 
     def _get_location_id(self, location):
         """Returns location id
@@ -297,7 +301,10 @@ def _find_endurance_space_price(package, size, tier_level):
                 continue
 
             level = ENDURANCE_TIERS.get(tier_level)
-            if price['capacityRestrictionMinimum'] != level:
+            if level < int(price['capacityRestrictionMinimum']):
+                continue
+
+            if level > int(price['capacityRestrictionMaximum']):
                 continue
 
             return price
@@ -307,8 +314,8 @@ def _find_endurance_space_price(package, size, tier_level):
 
 def _find_endurance_tier_price(package, tier_level):
     for item in package['items']:
-        for attribute in item['attributes']:
-            if attribute['value'] != ENDURANCE_TIERS.get(tier_level):
+        for attribute in item.get('attributes', []):
+            if int(attribute['value']) == ENDURANCE_TIERS.get(tier_level):
                 break
         else:
             continue

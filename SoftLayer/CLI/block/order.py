@@ -83,7 +83,7 @@ def cli(env, storage_type, size, iops, tier, os_type, location):
                 storage_type='storage_service_enterprise',
                 location=location,
                 size=size,
-                tier_level=tier,
+                tier_level=float(tier),
                 os_type=os_type
             )
         except ValueError as ex:
