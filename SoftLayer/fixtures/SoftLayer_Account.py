@@ -526,5 +526,6 @@ getIscsiNetworkStorage = [{
     'serviceResource': {'datacenter': {'id': 449500}},
     'serviceResourceBackendIpAddress': '10.1.2.3',
     'serviceResourceName': 'Storage Type 01 Aggregate staaspar0101_pc01',
-    'username': 'username'
+    'username': 'username',
+    'storageType': {'keyName': 'ENDURANCE_STORAGE'},
 }]

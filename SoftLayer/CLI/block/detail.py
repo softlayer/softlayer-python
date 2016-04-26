@@ -21,36 +21,39 @@ def cli(env, volume_id):
     table.align['Name'] = 'r'
     table.align['Value'] = 'l'
 
-    table.add_row(
-        ['ID', block_volume['id']])
-    table.add_row(
-        ['Username', block_volume['username']])
-    table.add_row(
-        ['Type', block_volume['storageType']['keyName'].split('_').pop(0)])
-    table.add_row(
-        ['Capacity (GB)', "%iGB" % block_volume['capacityGb']])
-    table.add_row(
-        ['LUN Id', "%s" % block_volume['lunId']])
+    storage_type = block_volume['storageType']['keyName'].split('_').pop(0)
+    table.add_row(['ID', block_volume['id']])
+    table.add_row(['Username', block_volume['username']])
+    table.add_row(['Type', storage_type])
+    table.add_row(['Capacity (GB)', "%iGB" % block_volume['capacityGb']])
+    table.add_row(['LUN Id', "%s" % block_volume['lunId']])
 
-    if block_volume['storageType']['keyName'].split('_').pop(0)\
-            == 'PERFORMANCE':
-        table.add_row(
-            ['IOPs', block_volume['iops']])
-    if block_volume['storageType']['keyName'].split('_').pop(0) == 'ENDURANCE':
-        table.add_row(
-            ['Endurance Tier',
-             block_volume['storageTierLevel']['description']])
+    if block_volume.get('iops'):
+        table.add_row(['IOPs', block_volume['iops']])
 
-    table.add_row(
-        ['Data Center', block_volume['serviceResource']['datacenter']['name']])
-    table.add_row(
-        ['Target IP', block_volume['serviceResourceBackendIpAddress']])
+    if block_volume.get('storageTierLevel'):
+        table.add_row([
+            'Endurance Tier',
+            block_volume['storageTierLevel']['description'],
+        ])
+
+    table.add_row([
+        'Data Center',
+        block_volume['serviceResource']['datacenter']['name'],
+    ])
+    table.add_row([
+        'Target IP',
+        block_volume['serviceResourceBackendIpAddress'],
+    ])
 
     if block_volume['snapshotCapacityGb']:
-        table.add_row(
-            ['Snapshot Capacity (GB)', block_volume['snapshotCapacityGb']])
-        table.add_row(
-            ['Snapshot Used (Bytes)',
-             block_volume['parentVolume']['snapshotSizeBytes']])
+        table.add_row([
+            'Snapshot Capacity (GB)',
+            block_volume['snapshotCapacityGb'],
+        ])
+        table.add_row([
+            'Snapshot Used (Bytes)',
+            block_volume['parentVolume']['snapshotSizeBytes'],
+        ])
 
     env.fout(table)

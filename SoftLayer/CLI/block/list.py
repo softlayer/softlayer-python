@@ -9,14 +9,19 @@ from SoftLayer.CLI import formatting
 
 
 COLUMNS = [
-    column_helper.Column('id', ('id',)),
-    column_helper.Column('username', ('username',)),
+    column_helper.Column('id', ('id',), mask="id"),
+    column_helper.Column('username', ('username',), mask="username"),
     column_helper.Column('datacenter',
-                         ('serviceResource', 'datacenter', 'name')),
-    column_helper.Column('storageType', ('storageType', 'keyName')),
-    column_helper.Column('capacityGb', ('capacityGb',)),
-    column_helper.Column('bytesUsed', ('bytesUsed',)),
-    column_helper.Column('ipAddr', ('serviceResourceBackendIpAddress',)),
+                         ('serviceResource', 'datacenter', 'name'),
+                         mask="serviceResource.datacenter.name"),
+    column_helper.Column(
+        'storageType',
+        lambda b: b['storageType']['keyName'].split('_').pop(0),
+        mask="storageType.keyName"),
+    column_helper.Column('capacityGb', ('capacityGb',), mask="capacityGb"),
+    column_helper.Column('bytesUsed', ('bytesUsed',), mask="bytesUsed"),
+    column_helper.Column('ipAddr', ('serviceResourceBackendIpAddress',),
+                         mask="serviceResourceBackendIpAddress"),
 ]
 
 DEFAULT_COLUMNS = [
@@ -55,8 +60,6 @@ def cli(env, sortby, columns, datacenter, username, storage_type):
     table.sortby = sortby
 
     for block_volume in block_volumes:
-        block_volume['storageType']['keyName'] = block_volume['storageType'][
-            'keyName'].split('_').pop(0)
         table.add_row([value or formatting.blank()
                        for value in columns.row(block_volume)])
 
