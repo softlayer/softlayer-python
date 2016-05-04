@@ -45,7 +45,7 @@ allowedIpAddresses[ipAddress,note],
 """),
     column_helper.Column('type', ('type',)),
     column_helper.Column(
-        'primaryBackendIpAddress',
+        'private_ip_address',
         ('primaryBackendIpAddress',),
         """
 allowedVirtualGuests.primaryBackendIpAddress
@@ -54,7 +54,7 @@ allowedSubnets.primaryBackendIpAddress
 allowedIpAddresses.primaryBackendIpAddress
 """),
     column_helper.Column(
-        'hostIqn',
+        'host_iqn',
         ('allowedHost', 'name',),
         """
 allowedVirtualGuests.allowedHost.name
@@ -87,8 +87,8 @@ DEFAULT_COLUMNS = [
     'id',
     'name',
     'type',
-    'primaryBackendIpAddress',
-    'hostIqn',
+    'private_ip_address',
+    'host_iqn',
     'username',
     'password',
 ]
@@ -104,7 +104,7 @@ DEFAULT_COLUMNS = [
               default=','.join(DEFAULT_COLUMNS))
 @environment.pass_env
 def cli(env, columns, sortby, volume_id):
-    """List block storage."""
+    """List ACLs."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
     access_list = block_manager.get_block_volume_access_list(
         volume_id=volume_id)

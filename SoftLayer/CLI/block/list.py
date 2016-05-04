@@ -15,12 +15,12 @@ COLUMNS = [
                          ('serviceResource', 'datacenter', 'name'),
                          mask="serviceResource.datacenter.name"),
     column_helper.Column(
-        'storageType',
+        'storage_type',
         lambda b: b['storageType']['keyName'].split('_').pop(0),
         mask="storageType.keyName"),
-    column_helper.Column('capacityGb', ('capacityGb',), mask="capacityGb"),
-    column_helper.Column('bytesUsed', ('bytesUsed',), mask="bytesUsed"),
-    column_helper.Column('ipAddr', ('serviceResourceBackendIpAddress',),
+    column_helper.Column('capacity_gb', ('capacityGb',), mask="capacityGb"),
+    column_helper.Column('bytes_used', ('bytesUsed',), mask="bytesUsed"),
+    column_helper.Column('ip_addr', ('serviceResourceBackendIpAddress',),
                          mask="serviceResourceBackendIpAddress"),
 ]
 
@@ -28,10 +28,10 @@ DEFAULT_COLUMNS = [
     'id',
     'username',
     'datacenter',
-    'storageType',
-    'capacityGb',
-    'bytesUsed',
-    'ipAddr'
+    'storage_type',
+    'capacity_gb',
+    'bytes_used',
+    'ip_addr'
 ]
 
 

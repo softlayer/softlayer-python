@@ -42,7 +42,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 'serviceResource.datacenter[name]',
                 'serviceResourceBackendIpAddress'
             ]
-            kwargs['mask'] = "mask[%s]" % ','.join(items)
+            kwargs['mask'] = ','.join(items)
 
         _filter = utils.NestedDict(kwargs.get('filter') or {})
 
@@ -89,7 +89,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 'iops',
                 'lunId',
             ]
-            kwargs['mask'] = "mask[%s]" % ','.join(items)
+            kwargs['mask'] = ','.join(items)
         return self.client.call('Network_Storage', 'getObject',
                                 id=volume_id, **kwargs)
 
@@ -108,7 +108,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 'allowedSubnets[allowedHost[credential]]',
                 'allowedIpAddresses[allowedHost[credential]]',
             ]
-            kwargs['mask'] = "mask[%s]" % ','.join(items)
+            kwargs['mask'] = ','.join(items)
         return self.client.call('Network_Storage', 'getObject',
                                 id=volume_id, **kwargs)
 
@@ -130,8 +130,9 @@ class BlockStorageManager(utils.IdentifierMixin, object):
     dailySchedule,
     weeklySchedule
 ]'''
-            kwargs['mask'] = "mask[%s]" % ','.join(items)
-        return self.client.call('Network_Storage', 'getObject',
+            kwargs['mask'] = ','.join(items)
+
+        return self.client.call('Network_Storage', 'getSnapshots',
                                 id=volume_id, **kwargs)
 
     def delete_snapshot(self, snapshot_id):

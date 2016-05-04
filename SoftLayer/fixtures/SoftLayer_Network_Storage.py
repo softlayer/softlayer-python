@@ -61,5 +61,5 @@ getObject = {
         },
     }],
 }
-
+getSnapshots = []
 deleteObject = True

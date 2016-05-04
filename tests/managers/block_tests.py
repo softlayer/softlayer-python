@@ -47,9 +47,9 @@ class BlockTests(testing.TestCase):
     def test_get_block_volume_snapshot_list(self):
         result = self.block.get_block_volume_snapshot_list(100)
 
-        self.assertEqual(fixtures.SoftLayer_Network_Storage.getObject,
+        self.assertEqual(fixtures.SoftLayer_Network_Storage.getSnapshots,
                          result)
-        self.assert_called_with('SoftLayer_Network_Storage', 'getObject',
+        self.assert_called_with('SoftLayer_Network_Storage', 'getSnapshots',
                                 identifier=100)
 
     def test_delete_snapshot(self):
