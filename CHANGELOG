@@ -1,3 +1,13 @@
+5.1.0
+
+    * Added block storage functionality. You can order, list, detail, cancel volumes. You can list and delete snapshots. You can also list ACLs for volumes.
+
+    * Added functionality to attach/detach devices to tickets
+
+    * Virtual list now lists users and passwords for all known software
+
+    * Fixes bug with `vlan detail` CLI command
+
 5.0.1
 
     * Adds missing depdendency that was previously pulled in by prompt_toolkit
