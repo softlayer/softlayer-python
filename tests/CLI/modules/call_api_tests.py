@@ -42,7 +42,7 @@ class CallCliTests(testing.TestCase):
                                    '-f nested.property=5432',
                                    '--output-python'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         # NOTE(kmcdonald): Python 3 no longer inserts 'u' before unicode
         # string literals but python 2 does. These are stripped out to make
         # this test pass on both python versions.
@@ -72,7 +72,7 @@ result = client.call(u'Service',
                                    '-f property=1234',
                                    '-f nested.property=5432'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output), 'test')
         self.assert_called_with('SoftLayer_Service', 'method',
                                 mask='mask[some.mask]',
@@ -94,7 +94,7 @@ result = client.call(u'Service',
 
         result = self.run_command(['call-api', 'Service', 'method'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          {'string': 'string',
                           'int': 10,
@@ -113,7 +113,7 @@ result = client.call(u'Service',
         result = self.run_command(['call-api', 'Service', 'method'],
                                   fmt='table')
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         # NOTE(kmcdonald): Order is not guaranteed
         self.assertIn(":........:........:", result.output)
         self.assertIn(":   name : value  :", result.output)
@@ -130,7 +130,7 @@ result = client.call(u'Service',
 
         result = self.run_command(['call-api', 'Service', 'method'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          {'this': {'is': [{'pretty': 'nested'}]}})
 
@@ -144,7 +144,7 @@ result = client.call(u'Service',
 
         result = self.run_command(['call-api', 'Service', 'method'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          [{'string': 'string',
                            'int': 10,
@@ -163,7 +163,7 @@ result = client.call(u'Service',
         result = self.run_command(['call-api', 'Service', 'method'],
                                   fmt='table')
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(result.output,
                          """:......:......:.......:.....:........:
 : Bool : None : float : int : string :
@@ -179,6 +179,6 @@ result = client.call(u'Service',
         result = self.run_command(['call-api', 'Service', 'method',
                                    'arg1', '1234'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Service', 'method',
                                 args=('arg1', '1234'))

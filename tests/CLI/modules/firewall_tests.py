@@ -14,7 +14,7 @@ class FirewallTests(testing.TestCase):
     def test_list_firewalls(self):
         result = self.run_command(['firewall', 'list'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          [{'type': 'VLAN - dedicated',
                            'server/vlan id': 1,

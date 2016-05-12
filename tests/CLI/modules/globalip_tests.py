@@ -17,7 +17,7 @@ class DnsTests(testing.TestCase):
     def test_ip_assign(self):
         result = self.run_command(['globalip', 'assign', '1', '127.0.0.1'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(result.output, "")
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
@@ -25,14 +25,14 @@ class DnsTests(testing.TestCase):
         # Test using --really flag
         result = self.run_command(['--really', 'globalip', 'cancel', '1'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(result.output, "")
 
         # Test with confirmation
         no_going_back_mock.return_value = True
         result = self.run_command(['globalip', 'cancel', '1'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(result.output, "")
 
         # Test with confirmation and responding negatively
@@ -45,7 +45,7 @@ class DnsTests(testing.TestCase):
     def test_ip_list(self):
         result = self.run_command(['globalip', 'list', '--ip-version=v4'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          [{'assigned': 'Yes',
                            'id': '200',

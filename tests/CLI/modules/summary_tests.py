@@ -25,5 +25,5 @@ class SummaryTests(testing.TestCase):
             }
         ]
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output), expected)
