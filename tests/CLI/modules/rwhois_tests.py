@@ -34,7 +34,7 @@ class RWhoisTests(testing.TestCase):
                                    '--state=TX',
                                    '--private'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(result.output, "")
 
         self.assert_called_with('SoftLayer_Network_Subnet_Rwhois_Data',
@@ -55,7 +55,7 @@ class RWhoisTests(testing.TestCase):
     def test_edit_public(self):
         result = self.run_command(['rwhois', 'edit', '--public'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(result.output, "")
 
         self.assert_called_with('SoftLayer_Network_Subnet_Rwhois_Data',
@@ -77,5 +77,5 @@ class RWhoisTests(testing.TestCase):
                     'Postal Code': 'postalCode',
                     'State': '-',
                     'Private Residence': True}
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output), expected)

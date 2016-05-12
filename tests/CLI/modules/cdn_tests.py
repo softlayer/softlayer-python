@@ -14,7 +14,7 @@ class CdnTests(testing.TestCase):
     def test_list_accounts(self):
         result = self.run_command(['cdn', 'list'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          [{'notes': None,
                            'created': '2012-06-25T14:05:28-07:00',
@@ -30,7 +30,7 @@ class CdnTests(testing.TestCase):
     def test_detail_account(self):
         result = self.run_command(['cdn', 'detail', '1245'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          {'notes': None,
                           'created': '2012-06-25T14:05:28-07:00',
@@ -43,20 +43,20 @@ class CdnTests(testing.TestCase):
         result = self.run_command(['cdn', 'load', '1234',
                                    'http://example.com'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(result.output, "")
 
     def test_purge_content(self):
         result = self.run_command(['cdn', 'purge', '1234',
                                    'http://example.com'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(result.output, "")
 
     def test_list_origins(self):
         result = self.run_command(['cdn', 'origin-list', '1234'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output), [
             {'media_type': 'FLASH',
              'origin_url': 'http://ams01.objectstorage.softlayer.net:80',
@@ -71,12 +71,12 @@ class CdnTests(testing.TestCase):
         result = self.run_command(['cdn', 'origin-add', '1234',
                                    'http://example.com'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(result.output, "")
 
     def test_remove_origin(self):
         result = self.run_command(['cdn', 'origin-remove', '1234',
                                    'http://example.com'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(result.output, "")

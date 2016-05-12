@@ -19,13 +19,13 @@ class DnsTests(testing.TestCase):
     def test_zone_print(self):
         result = self.run_command(['dns', 'zone-print', '1234'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output), "lots of text")
 
     def test_create_zone(self):
         result = self.run_command(['dns', 'zone-create', 'example.com'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(result.output, "")
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
@@ -33,13 +33,13 @@ class DnsTests(testing.TestCase):
         no_going_back_mock.return_value = True
         result = self.run_command(['dns', 'zone-delete', '1234'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(result.output, "")
 
         no_going_back_mock.return_value = False
         result = self.run_command(['--really', 'dns', 'zone-delete', '1234'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(result.output, "")
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
@@ -53,7 +53,7 @@ class DnsTests(testing.TestCase):
     def test_list_zones(self):
         result = self.run_command(['dns', 'zone-list'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          [{'serial': 2014030728,
                            'updated': '2014-03-07T13:52:31-06:00',
@@ -63,7 +63,7 @@ class DnsTests(testing.TestCase):
     def test_list_records(self):
         result = self.run_command(['dns', 'record-list', '1234'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output)[0],
                          {'record': 'a',
                           'type': 'CNAME',
@@ -75,7 +75,7 @@ class DnsTests(testing.TestCase):
         result = self.run_command(['dns', 'record-add', '1234', 'hostname',
                                    'A', 'd', '--ttl=100'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(result.output, "")
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
@@ -83,7 +83,7 @@ class DnsTests(testing.TestCase):
         no_going_back_mock.return_value = True
         result = self.run_command(['dns', 'record-remove', '1234'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(result.output, "")
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')

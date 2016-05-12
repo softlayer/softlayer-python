@@ -14,7 +14,7 @@ class BlockTests(testing.TestCase):
     def test_access_list(self):
         result = self.run_command(['block', 'access-list', '1234'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual([
             {
                 'username': 'joe',
@@ -58,7 +58,7 @@ class BlockTests(testing.TestCase):
         result = self.run_command([
             '--really', 'block', 'volume-cancel', '1234'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual("", result.output)
         self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
                                 args=(False, True, None))
@@ -66,7 +66,7 @@ class BlockTests(testing.TestCase):
     def test_volume_detail(self):
         result = self.run_command(['block', 'volume-detail', '1234'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual({
             'Username': 'username',
             'LUN Id': '2',
@@ -84,7 +84,7 @@ class BlockTests(testing.TestCase):
     def test_volume_list(self):
         result = self.run_command(['block', 'volume-list'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual([
             {
                 'bytes_used': None,

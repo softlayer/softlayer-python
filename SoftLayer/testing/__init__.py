@@ -146,6 +146,13 @@ class TestCase(testtools.TestCase):
         raise AssertionError('%s::%s was not called with given properties: %s'
                              % (service, method, props))
 
+    def assert_no_fail(self, result):
+        """Fail when a failing click result has an error"""
+        if result.exception:
+            raise result.exception
+
+        self.assertEqual(result.exit_code, 0)
+
     def set_mock(self, service, method):
         """Set and return mock on the current client."""
         return self.mocks.set_mock(service, method)
