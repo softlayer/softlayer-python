@@ -39,6 +39,31 @@ class BuildFilterTests(testing.TestCase):
             }
         }
 
+    def test_in_multi(self):
+        result = call_api._build_filters([
+          'prop_a=a_val1,a_val2',
+          'prop_b=b_val1,b_val2',
+        ])
+        assert result == {
+            'prop_a': {
+                'operation': 'in',
+                'options': [{'name': 'data', 'value': ['a_val1', 'a_val2']}],
+            },
+            'prop_b': {
+                'operation': 'in',
+                'options': [{'name': 'data', 'value': ['b_val1', 'b_val2']}],
+            },
+        }
+
+    def test_in_with_whitespace(self):
+        result = call_api._build_filters(['prop=   value1 ,  value2  '])
+        assert result == {
+            'prop': {
+                'operation': 'in',
+                'options': [{'name': 'data', 'value': ['value1', 'value2']}],
+            }
+        }
+
 
 class CallCliTests(testing.TestCase):
 
