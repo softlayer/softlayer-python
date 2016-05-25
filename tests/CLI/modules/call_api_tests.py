@@ -30,6 +30,12 @@ class BuildFilterTests(testing.TestCase):
             'prop2': {'operation': '_= prop2'},
         }
 
+    def test_in(self):
+        result = call_api._build_filters(['prop=value1,value2'])
+        assert result == {
+            'prop': {'operation': 'in', 'options': [{'name': 'data', 'value': ['value1', 'value2']}]}
+        }
+
 
 class CallCliTests(testing.TestCase):
 

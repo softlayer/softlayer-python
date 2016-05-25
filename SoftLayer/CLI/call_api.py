@@ -24,7 +24,19 @@ def _build_filters(_filters):
         # Actually drill down and add the filter
         for part in parts[:-1]:
             current = current[part]
-        current[parts[-1]] = utils.query_filter(value.strip())
+
+        value = value
+        if ',' in value:
+            value_parts = value.split(',')
+            current[parts[-1]] = {
+                'operation': 'in',
+                'options': [{
+                    'name': 'data',
+                    'value': [p.strip() for p in value_parts],
+                }],
+            }
+        else:
+            current[parts[-1]] = utils.query_filter(value.strip())
 
     return root.to_dict()
 
@@ -74,6 +86,8 @@ def cli(env, service, method, parameters, _id, _filters, mask, limit, offset,
         -f 'virtualGuests.datacenter.name=dal05' \\
         -f 'virtualGuests.maxCpu=4' \\
         --mask=id,hostname,datacenter.name,maxCpu
+    slcli call-api Account getVirtualGuests \\
+        -f 'virtualGuests.datacenter.name=dal05,sng01'
     """
 
     args = [service, method] + list(parameters)
