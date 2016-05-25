@@ -41,8 +41,8 @@ class BuildFilterTests(testing.TestCase):
 
     def test_in_multi(self):
         result = call_api._build_filters([
-          'prop_a=a_val1,a_val2',
-          'prop_b=b_val1,b_val2',
+            'prop_a=a_val1,a_val2',
+            'prop_b=b_val1,b_val2',
         ])
         assert result == {
             'prop_a': {
