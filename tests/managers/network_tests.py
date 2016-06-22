@@ -182,7 +182,7 @@ class NetworkTests(testing.TestCase):
 
         self.assertEqual(result, fixtures.SoftLayer_Account.getSubnets)
         _filter = {'subnets': {'subnetType': {'operation': '!= GLOBAL_IP'}}}
-        mask = 'mask[hardware,datacenter,ipAddressCount,virtualGuests]'
+        mask = 'mask[hardware,datacenter,ipAddressCount,virtualGuests,addressSpace]'
         self.assert_called_with('SoftLayer_Account', 'getSubnets',
                                 mask=mask,
                                 filter=_filter)
@@ -191,22 +191,24 @@ class NetworkTests(testing.TestCase):
         result = self.network.list_subnets(
             identifier='10.0.0.1',
             datacenter='dal00',
-            subnet_type='PRIMARY',
             version=4,
+            subnet_type='PRIMARY',
+            address_space='PUBLIC',
         )
 
         self.assertEqual(result, fixtures.SoftLayer_Account.getSubnets)
         _filter = {
             'subnets': {
+                'networkIdentifier': {'operation': '_= 10.0.0.1'},
                 'datacenter': {
                     'name': {'operation': '_= dal00'}
                 },
                 'version': {'operation': 4},
                 'subnetType': {'operation': '_= PRIMARY'},
-                'networkIdentifier': {'operation': '_= 10.0.0.1'}
+                'addressSpace': {'operation': '_= PUBLIC'},
             }
         }
-        mask = 'mask[hardware,datacenter,ipAddressCount,virtualGuests]'
+        mask = 'mask[hardware,datacenter,ipAddressCount,virtualGuests,addressSpace]'
         self.assert_called_with('SoftLayer_Account', 'getSubnets',
                                 mask=mask,
                                 filter=_filter)

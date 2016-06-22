@@ -13,7 +13,8 @@ from SoftLayer import utils
 DEFAULT_SUBNET_MASK = ','.join(['hardware',
                                 'datacenter',
                                 'ipAddressCount',
-                                'virtualGuests'])
+                                'virtualGuests',
+                                'addressSpace'])
 DEFAULT_VLAN_MASK = ','.join([
     'firewallInterfaces',
     'hardwareCount',
@@ -244,7 +245,7 @@ class NetworkManager(object):
         return self.account.getGlobalIpRecords(**kwargs)
 
     def list_subnets(self, identifier=None, datacenter=None, version=0,
-                     subnet_type=None, **kwargs):
+                     subnet_type=None, address_space=None, **kwargs):
         """Display a list of all subnets on the account.
 
         This provides a quick overview of all subnets including information
@@ -257,6 +258,8 @@ class NetworkManager(object):
         :param int version: Only returns subnets of this version (4 or 6).
         :param string subnet_type: If specified, it will only returns subnets
                                      of this type.
+        :param string address_space: If specified, it will only returns subnets
+                                       with the given address space label.
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         """
         if 'mask' not in kwargs:
@@ -277,6 +280,8 @@ class NetworkManager(object):
         else:
             # This filters out global IPs from the subnet listing.
             _filter['subnets']['subnetType'] = {'operation': '!= GLOBAL_IP'}
+        if address_space:
+            _filter['subnets']['addressSpace'] = utils.query_filter(address_space)
 
         kwargs['filter'] = _filter.to_dict()
 
