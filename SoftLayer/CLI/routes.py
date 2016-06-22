@@ -195,6 +195,7 @@ ALL_ROUTES = [
     ('ticket:detail', 'SoftLayer.CLI.ticket.detail:cli'),
     ('ticket:list', 'SoftLayer.CLI.ticket.list:cli'),
     ('ticket:update', 'SoftLayer.CLI.ticket.update:cli'),
+    ('ticket:upload', 'SoftLayer.CLI.ticket.upload:cli'),
     ('ticket:subjects', 'SoftLayer.CLI.ticket.subjects:cli'),
     ('ticket:summary', 'SoftLayer.CLI.ticket.summary:cli'),
     ('ticket:attach', 'SoftLayer.CLI.ticket.attach:cli'),

@@ -80,6 +80,9 @@ class TicketManager(utils.IdentifierMixin, object):
         """
         return self.ticket.addUpdate({'entry': body}, id=ticket_id)
 
+    def upload_attachment(self, ticket_id=None, file=None):
+        return self.ticket.addAttachedFile(file, id=ticket_id)
+
     def attach_hardware(self, ticket_id=None, hardware_id=None):
         """Attach hardware to a ticket.
 
