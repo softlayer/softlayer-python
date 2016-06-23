@@ -281,7 +281,8 @@ class NetworkManager(object):
             # This filters out global IPs from the subnet listing.
             _filter['subnets']['subnetType'] = {'operation': '!= GLOBAL_IP'}
         if address_space:
-            _filter['subnets']['addressSpace'] = utils.query_filter(address_space)
+            _filter['subnets']['addressSpace'] = utils.query_filter(
+                address_space)
 
         kwargs['filter'] = _filter.to_dict()
 

@@ -6,6 +6,7 @@
 """
 import SoftLayer
 from SoftLayer import fixtures
+from SoftLayer.managers import network
 from SoftLayer import testing
 
 
@@ -182,9 +183,8 @@ class NetworkTests(testing.TestCase):
 
         self.assertEqual(result, fixtures.SoftLayer_Account.getSubnets)
         _filter = {'subnets': {'subnetType': {'operation': '!= GLOBAL_IP'}}}
-        mask = 'mask[hardware,datacenter,ipAddressCount,virtualGuests,addressSpace]'
         self.assert_called_with('SoftLayer_Account', 'getSubnets',
-                                mask=mask,
+                                mask='mask[%s]' % network.DEFAULT_SUBNET_MASK,
                                 filter=_filter)
 
     def test_list_subnets_with_filters(self):
@@ -208,9 +208,8 @@ class NetworkTests(testing.TestCase):
                 'addressSpace': {'operation': '_= PUBLIC'},
             }
         }
-        mask = 'mask[hardware,datacenter,ipAddressCount,virtualGuests,addressSpace]'
         self.assert_called_with('SoftLayer_Account', 'getSubnets',
-                                mask=mask,
+                                mask='mask[%s]' % network.DEFAULT_SUBNET_MASK,
                                 filter=_filter)
 
     def test_list_vlans_default(self):
