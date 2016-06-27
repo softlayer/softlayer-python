@@ -193,7 +193,7 @@ class NetworkTests(testing.TestCase):
             datacenter='dal00',
             version=4,
             subnet_type='PRIMARY',
-            address_space='PUBLIC',
+            network_space='PUBLIC',
         )
 
         self.assertEqual(result, fixtures.SoftLayer_Account.getSubnets)
@@ -205,9 +205,10 @@ class NetworkTests(testing.TestCase):
                 },
                 'version': {'operation': 4},
                 'subnetType': {'operation': '_= PRIMARY'},
-                'addressSpace': {'operation': '_= PUBLIC'},
+                'networkVlan': {'networkSpace': {'operation': '_= PUBLIC'}},
             }
         }
+
         self.assert_called_with('SoftLayer_Account', 'getSubnets',
                                 mask='mask[%s]' % network.DEFAULT_SUBNET_MASK,
                                 filter=_filter)

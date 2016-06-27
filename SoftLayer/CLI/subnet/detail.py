@@ -7,6 +7,7 @@ import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
+from SoftLayer import utils
 
 
 @click.command()
@@ -35,6 +36,8 @@ def cli(env, identifier, no_vs, no_hardware):
                    '%s/%s' % (subnet['networkIdentifier'],
                               str(subnet['cidr']))])
     table.add_row(['subnet type', subnet['subnetType']])
+    table.add_row(['network space',
+                   utils.lookup(subnet, 'networkVlan', 'networkSpace')])
     table.add_row(['gateway', subnet.get('gateway', formatting.blank())])
     table.add_row(['broadcast',
                    subnet.get('broadcastAddress', formatting.blank())])
