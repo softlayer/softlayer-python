@@ -14,8 +14,8 @@ from SoftLayer.CLI import ticket
 
 @click.command()
 @click.argument('identifier')
-@click.option('--file', help="The path of the file that will be uploaded and attached to the ticket")
-@click.option('--name', help="The name of the file that will be uploaded and attached to the ticket")
+@click.option('--file', help="The path of the file to be uploaded and attached to the ticket")
+@click.option('--name', help="The name of the file to be uploaded and attached to the ticket")
 @environment.pass_env
 def cli(env, identifier, file, name):
     """Adds an attachment to an existing ticket."""
@@ -40,7 +40,6 @@ def cli(env, identifier, file, name):
         "filename": name,
         "data": bytes
     }
-
 
     attached_file = mgr.upload_attachment(ticket_id=ticket_id, file=file_object)
     env.fout("File attached: \n%s" % attached_file)
