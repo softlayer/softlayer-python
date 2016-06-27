@@ -15,7 +15,7 @@ from SoftLayer import utils
               type=click.Choice(['id',
                                  'identifier',
                                  'type',
-                                 'address_space',
+                                 'network_space',
                                  'datacenter',
                                  'vlan_id',
                                  'IPs',
@@ -25,18 +25,18 @@ from SoftLayer import utils
               help="Filter by datacenter shortname (sng01, dal05, ...)")
 @click.option('--identifier', help="Filter by network identifier")
 @click.option('--subnet-type', '-t', help="Filter by subnet type")
-@click.option('--address-space', help="Filter by address space")
+@click.option('--network-space', help="Filter by network space")
 @click.option('--v4', '--ipv4', is_flag=True, help="Display only IPv4 subnets")
 @click.option('--v6', '--ipv6', is_flag=True, help="Display only IPv6 subnets")
 @environment.pass_env
-def cli(env, sortby, datacenter, identifier, subnet_type, address_space,
+def cli(env, sortby, datacenter, identifier, subnet_type, network_space,
         ipv4, ipv6):
     """List subnets."""
 
     mgr = SoftLayer.NetworkManager(env.client)
 
     table = formatting.Table([
-        'id', 'identifier', 'type', 'address_space', 'datacenter', 'vlan_id',
+        'id', 'identifier', 'type', 'network_space', 'datacenter', 'vlan_id',
         'IPs', 'hardware', 'vs',
     ])
     table.sortby = sortby
@@ -52,7 +52,7 @@ def cli(env, sortby, datacenter, identifier, subnet_type, address_space,
         version=version,
         identifier=identifier,
         subnet_type=subnet_type,
-        address_space=address_space,
+        network_space=network_space,
     )
 
     for subnet in subnets:
@@ -60,7 +60,9 @@ def cli(env, sortby, datacenter, identifier, subnet_type, address_space,
             subnet['id'],
             '%s/%s' % (subnet['networkIdentifier'], str(subnet['cidr'])),
             subnet.get('subnetType', formatting.blank()),
-            subnet.get('addressSpace', formatting.blank()),
+            utils.lookup(subnet,
+                         'networkVlan',
+                         'networkSpace') or formatting.blank(),
             utils.lookup(subnet, 'datacenter', 'name',) or formatting.blank(),
             subnet['networkVlanId'],
             subnet['ipAddressCount'],
