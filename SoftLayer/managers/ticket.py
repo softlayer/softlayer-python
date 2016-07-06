@@ -80,8 +80,16 @@ class TicketManager(utils.IdentifierMixin, object):
         """
         return self.ticket.addUpdate({'entry': body}, id=ticket_id)
 
-    def upload_attachment(self, ticket_id=None, file=None):
-        return self.ticket.addAttachedFile(file, id=ticket_id)
+    def upload_attachment(self, ticket_id=None, data=None):
+        """Upload an attachment to a ticket.
+
+        :param integer ticket_id: the id of the ticket to
+                                  upload the attachment to
+        :param SoftLayer_Container_Utility_File_Attachment data:
+                                  the object of the attachment
+        :returns The uploaded attachment
+        """
+        return self.ticket.addAttachedFile(data, id=ticket_id)
 
     def attach_hardware(self, ticket_id=None, hardware_id=None):
         """Attach hardware to a ticket.
