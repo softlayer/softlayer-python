@@ -88,12 +88,18 @@ class FormattedItemTests(testing.TestCase):
         item = formatting.FormattedItem('test', 'test_formatted')
         self.assertEqual('test', item.original)
         self.assertEqual('test_formatted', item.formatted)
-        self.assertEqual('test', item)
+        self.assertEqual('test', str(item))
 
         item = formatting.FormattedItem('test')
         self.assertEqual('test', item.original)
         self.assertEqual('test', item.formatted)
-        self.assertEqual('test', item)
+        self.assertEqual('test', str(item))
+
+    def test_unicode(self):
+        item = formatting.FormattedItem(u'\u32423', u'\u32423')
+        self.assertEqual(u'\u32423', item.original)
+        self.assertEqual(u'\u32423', item.formatted)
+        self.assertEqual('invalid', str(item))
 
     def test_mb_to_gb(self):
         item = formatting.mb_to_gb(1024)

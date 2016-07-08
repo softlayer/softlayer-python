@@ -12,7 +12,6 @@ import os
 
 import click
 import prettytable
-import six
 
 from SoftLayer.CLI import exceptions
 from SoftLayer import utils
@@ -325,12 +324,13 @@ class FormattedItem(object):
         if self.original is None:
             return 'NULL'
 
-        if isinstance(self.original, six.string_types):
-            return str(self.original.encode('utf8'))
+        try:
+            return str(self.original)
+        except UnicodeError:
+            return 'invalid'
 
-        return str(self.original)
-
-    __repr__ = __str__
+    def __repr__(self):
+        return 'FormattedItem(%r, %r)' % (self.original, self.formatted)
 
     # Implement sorting methods.
     # NOTE(kmcdonald): functools.total_ordering could be used once support for

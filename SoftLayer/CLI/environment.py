@@ -69,7 +69,7 @@ class Environment(object):
         path_str = ':'.join(path)
 
         commands = []
-        for command in self.commands.keys():
+        for command in self.commands:
 
             # Filter based on prefix and the segment length
             if all([command.startswith(path_str),
