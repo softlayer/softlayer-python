@@ -12,6 +12,7 @@ import os
 
 import click
 import prettytable
+import six
 
 from SoftLayer.CLI import exceptions
 from SoftLayer import utils
@@ -323,6 +324,10 @@ class FormattedItem(object):
         # If the original value is None, represent this as 'NULL'
         if self.original is None:
             return 'NULL'
+
+        if isinstance(self.original, six.string_types):
+            return str(self.original.encode('utf8'))
+
         return str(self.original)
 
     __repr__ = __str__

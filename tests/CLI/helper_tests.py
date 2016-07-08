@@ -88,12 +88,12 @@ class FormattedItemTests(testing.TestCase):
         item = formatting.FormattedItem('test', 'test_formatted')
         self.assertEqual('test', item.original)
         self.assertEqual('test_formatted', item.formatted)
-        self.assertEqual('test', str(item))
+        self.assertEqual('test', item)
 
         item = formatting.FormattedItem('test')
         self.assertEqual('test', item.original)
         self.assertEqual('test', item.formatted)
-        self.assertEqual('test', str(item))
+        self.assertEqual('test', item)
 
     def test_mb_to_gb(self):
         item = formatting.mb_to_gb(1024)
