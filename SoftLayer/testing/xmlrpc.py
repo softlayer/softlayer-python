@@ -59,9 +59,12 @@ class TestHandler(six.moves.BaseHTTPServer.BaseHTTPRequestHandler):
                                                       methodresponse=True)
 
             self.send_response(200)
-            self.send_header("Content-type", "application/xml")
+            self.send_header("Content-type", "application/xml; charset=UTF-8")
             self.end_headers()
-            self.wfile.write(response_body.encode('utf-8'))
+            try:
+                self.wfile.write(response_body.encode('utf-8'))
+            except UnicodeDecodeError:
+                self.wfile.write(response_body)
 
         except SoftLayer.SoftLayerAPIError as ex:
             self.send_response(200)

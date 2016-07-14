@@ -323,9 +323,14 @@ class FormattedItem(object):
         # If the original value is None, represent this as 'NULL'
         if self.original is None:
             return 'NULL'
-        return str(self.original)
 
-    __repr__ = __str__
+        try:
+            return str(self.original)
+        except UnicodeError:
+            return 'invalid'
+
+    def __repr__(self):
+        return 'FormattedItem(%r, %r)' % (self.original, self.formatted)
 
     # Implement sorting methods.
     # NOTE(kmcdonald): functools.total_ordering could be used once support for

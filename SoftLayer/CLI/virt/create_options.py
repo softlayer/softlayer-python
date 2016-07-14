@@ -90,7 +90,7 @@ def cli(env):
 
             simple[bid].append(str(block['diskImage']['capacity']))
 
-        for label in sorted(simple.keys()):
+        for label in sorted(simple):
             table.add_row(['%s disk(%s)' % (name, label),
                            formatting.listing(simple[label],
                                               separator=',')])
