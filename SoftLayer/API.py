@@ -34,6 +34,7 @@ VALID_CALL_ARGS = set((
     'raw_headers',
     'limit',
     'offset',
+    'verify',
 ))
 
 
@@ -174,15 +175,22 @@ class BaseClient(object):
         return Service(self, name)
 
     def call(self, service, method, *args, **kwargs):
-        """Make a SoftLayer API call
+        """Make a SoftLayer API call.
 
-        :param service: the name of the SoftLayer API service
         :param method: the method to call on the service
-        :param \\*args: same optional arguments that ``Service.call`` takes
-        :param \\*\\*kwargs: same optional keyword arguments that
-                           ``Service.call`` takes
-
-        :param service: the name of the SoftLayer API service
+        :param \\*args: (optional) arguments for the remote call
+        :param id: (optional) id for the resource
+        :param mask: (optional) object mask
+        :param dict filter: (optional) filter dict
+        :param dict headers: (optional) optional XML-RPC headers
+        :param boolean compress: (optional) Enable/Disable HTTP compression
+        :param dict raw_headers: (optional) HTTP transport headers
+        :param int limit: (optional) return at most this many results
+        :param int offset: (optional) offset results by this many
+        :param boolean iter: (optional) if True, returns a generator with the
+                             results
+        :param bool verify: verify SSL cert
+        :param cert: client certificate path
 
         Usage:
             >>> import SoftLayer
@@ -222,6 +230,7 @@ class BaseClient(object):
         request.filter = kwargs.get('filter')
         request.limit = kwargs.get('limit')
         request.offset = kwargs.get('offset')
+        request.verify = kwargs.get('verify')
 
         if self.auth:
             extra_headers = self.auth.get_headers()
@@ -314,22 +323,15 @@ class Service(object):
         self.name = name
 
     def call(self, name, *args, **kwargs):
-        """Make a SoftLayer API call.
+        """Make a SoftLayer API call
 
+        :param service: the name of the SoftLayer API service
         :param method: the method to call on the service
-        :param \\*args: (optional) arguments for the remote call
-        :param id: (optional) id for the resource
-        :param mask: (optional) object mask
-        :param dict filter: (optional) filter dict
-        :param dict headers: (optional) optional XML-RPC headers
-        :param boolean compress: (optional) Enable/Disable HTTP compression
-        :param dict raw_headers: (optional) HTTP transport headers
-        :param int limit: (optional) return at most this many results
-        :param int offset: (optional) offset results by this many
-        :param boolean iter: (optional) if True, returns a generator with the
-                             results
-        :param bool verify: verify SSL cert
-        :param cert: client certificate path
+        :param \\*args: same optional arguments that ``BaseClient.call`` takes
+        :param \\*\\*kwargs: same optional keyword arguments that
+                           ``BaseClient.call`` takes
+
+        :param service: the name of the SoftLayer API service
 
         Usage:
             >>> import SoftLayer
