@@ -64,7 +64,7 @@ ALL_ROUTES = [
 
     ('block:snapshot-list', 'SoftLayer.CLI.block.snapshot_list:cli'),
     ('block:snapshot-delete', 'SoftLayer.CLI.block.snapshot_delete:cli'),
-    
+
     ('block:access-list', 'SoftLayer.CLI.block.access_list:cli'),
     ('block:access-authorize', 'SoftLayer.CLI.block.access.authorize:cli'),
     ('block:access-revoke', 'SoftLayer.CLI.block.access.revoke:cli'),
