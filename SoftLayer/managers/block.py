@@ -169,7 +169,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                     'id': ip_address_id
                 })
 
-        return self.block_svc.\
+        return self.client['Network_Storage'].\
             allowAccessFromHostList(host_templates, id=volume_id)
 
     def deauthorize_host_to_volume(self, volume_id,
@@ -206,7 +206,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                     'id': ip_address_id
                 })
 
-        return self.block_svc.\
+        return self.client['Network_Storage'].\
             removeAccessFromHostList(host_templates, id=volume_id)
 
     def delete_snapshot(self, snapshot_id):
