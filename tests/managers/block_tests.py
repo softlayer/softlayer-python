@@ -210,7 +210,7 @@ class BlockTests(testing.TestCase):
                     'setupFee': '1'}],
                 },
             )
-            
+
     def test_authorize_host_to_volume(self):
         result = self.block.authorize_host_to_volume(50,
                                                      hardware_ids=[100],
@@ -226,4 +226,3 @@ class BlockTests(testing.TestCase):
                                                      ip_address_ids=[300])
         self.assertEqual(fixtures.SoftLayer_Network_Storage.
                          removeAccessFromHostList, result)
->>>>>>> d99abc2... Add host authorization to block storage
