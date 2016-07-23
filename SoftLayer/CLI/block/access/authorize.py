@@ -3,7 +3,7 @@
 
 import click
 import SoftLayer
-from SoftLayer.CLI import environment
+from SoftLayer.CLI import environment, exceptions
 
 
 @click.command()
@@ -28,7 +28,12 @@ def cli(env, volume_id, hardware_id, virtual_id, ip_address_id, ip_address):
         network_manager = SoftLayer.NetworkManager(env.client)
         for ip_address_value in ip_address:
             ip_address_object = network_manager.ip_lookup(ip_address_value)
-            ip_address_id_list.append(ip_address_object['id'])
+            if ip_address_object == "":
+                click.echo("IP Address not found on your account. Please confirm IP " +
+                           "and try again.")
+                raise exceptions.ArgumentError('Incorrect IP Address')
+            else:
+                ip_address_id_list.append(ip_address_object['id'])
 
     block_manager.authorize_host_to_volume(volume_id,
                                            hardware_id,
