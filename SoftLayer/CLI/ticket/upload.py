@@ -31,15 +31,7 @@ def cli(env, identifier, path, name):
     if name is None:
         name = os.path.basename(path)
 
-    file_bytes = None
-    with open(path, 'rb') as attached_file:
-        file_bytes = attached_file.read()
-
-    file_object = {
-        "filename": name,
-        "data": file_bytes
-    }
-
     attached_file = mgr.upload_attachment(ticket_id=ticket_id,
-                                          data=file_object)
+                                          file_path=path,
+                                          file_name=name)
     env.fout("File attached: \n%s" % attached_file)
