@@ -61,9 +61,13 @@ ALL_ROUTES = [
     ('block:volume-detail', 'SoftLayer.CLI.block.detail:cli'),
     ('block:volume-cancel', 'SoftLayer.CLI.block.cancel:cli'),
     ('block:volume-order', 'SoftLayer.CLI.block.order:cli'),
+
     ('block:snapshot-list', 'SoftLayer.CLI.block.snapshot_list:cli'),
     ('block:snapshot-delete', 'SoftLayer.CLI.block.snapshot_delete:cli'),
+
     ('block:access-list', 'SoftLayer.CLI.block.access_list:cli'),
+    ('block:access-authorize', 'SoftLayer.CLI.block.access.authorize:cli'),
+    ('block:access-revoke', 'SoftLayer.CLI.block.access.revoke:cli'),
 
     ('firewall', 'SoftLayer.CLI.firewall'),
     ('firewall:add', 'SoftLayer.CLI.firewall.add:cli'),

@@ -135,6 +135,80 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         return self.client.call('Network_Storage', 'getSnapshots',
                                 id=volume_id, **kwargs)
 
+    def authorize_host_to_volume(self, volume_id,
+                                 hardware_ids=None,
+                                 virtual_guest_ids=None,
+                                 ip_address_ids=None):
+        """Authorizes hosts to Block Storage Volumes
+
+        :param volume_id: The Volume to authorize hosts to
+        :param hardware_ids: A List of SoftLayer_Hardware ids
+        :param virtual_guest_ids: A List of SoftLayer_Virtual_Guest ids
+        :param ip_address_ids: A List of SoftLayer_Network_Subnet_IpAddress ids
+        """
+        host_templates = []
+
+        if hardware_ids is not None:
+            for hardware_id in hardware_ids:
+                host_templates.append({
+                    'objectType': 'SoftLayer_Hardware',
+                    'id': hardware_id
+                })
+
+        if virtual_guest_ids is not None:
+            for virtual_guest_id in virtual_guest_ids:
+                host_templates.append({
+                    'objectType': 'SoftLayer_Virtual_Guest',
+                    'id': virtual_guest_id
+                })
+
+        if ip_address_ids is not None:
+            for ip_address_id in ip_address_ids:
+                host_templates.append({
+                    'objectType': 'SoftLayer_Network_Subnet_IpAddress',
+                    'id': ip_address_id
+                })
+
+        return self.client.call('Network_Storage', 'allowAccessFromHostList',
+                                host_templates, id=volume_id)
+
+    def deauthorize_host_to_volume(self, volume_id,
+                                   hardware_ids=None,
+                                   virtual_guest_ids=None,
+                                   ip_address_ids=None):
+        """Revokes authorization of hosts to Block Storage Volumes
+
+        :param volume_id: The Volume to deauthorize hosts to
+        :param hardware_ids: A List of SoftLayer_Hardware ids
+        :param virtual_guest_ids: A List of SoftLayer_Virtual_Guest ids
+        :param ip_address_ids: A List of SoftLayer_Network_Subnet_IpAddress ids
+        """
+        host_templates = []
+
+        if hardware_ids is not None:
+            for hardware_id in hardware_ids:
+                host_templates.append({
+                    'objectType': 'SoftLayer_Hardware',
+                    'id': hardware_id
+                })
+
+        if virtual_guest_ids is not None:
+            for virtual_guest_id in virtual_guest_ids:
+                host_templates.append({
+                    'objectType': 'SoftLayer_Virtual_Guest',
+                    'id': virtual_guest_id
+                })
+
+        if ip_address_ids is not None:
+            for ip_address_id in ip_address_ids:
+                host_templates.append({
+                    'objectType': 'SoftLayer_Network_Subnet_IpAddress',
+                    'id': ip_address_id
+                })
+
+        return self.client.call('Network_Storage', 'removeAccessFromHostList',
+                                host_templates, id=volume_id)
+
     def delete_snapshot(self, snapshot_id):
         """Deletes the specified snapshot object.
 

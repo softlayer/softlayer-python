@@ -210,3 +210,19 @@ class BlockTests(testing.TestCase):
                     'setupFee': '1'}],
                 },
             )
+
+    def test_authorize_host_to_volume(self):
+        result = self.block.authorize_host_to_volume(50,
+                                                     hardware_ids=[100],
+                                                     virtual_guest_ids=[200],
+                                                     ip_address_ids=[300])
+        self.assertEqual(fixtures.SoftLayer_Network_Storage.
+                         allowAccessFromHostList, result)
+
+    def test_deauthorize_host_to_volume(self):
+        result = self.block.authorize_host_to_volume(50,
+                                                     hardware_ids=[100],
+                                                     virtual_guest_ids=[200],
+                                                     ip_address_ids=[300])
+        self.assertEqual(fixtures.SoftLayer_Network_Storage.
+                         removeAccessFromHostList, result)

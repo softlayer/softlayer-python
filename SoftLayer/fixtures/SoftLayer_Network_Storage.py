@@ -63,3 +63,5 @@ getObject = {
 }
 getSnapshots = []
 deleteObject = True
+allowAccessFromHostList = True
+removeAccessFromHostList = True
