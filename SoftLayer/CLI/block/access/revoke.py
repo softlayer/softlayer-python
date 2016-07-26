@@ -8,16 +8,16 @@ from SoftLayer.CLI import environment
 
 @click.command()
 @click.argument('volume_id')
-@click.option('--hardware_id', '-h', multiple=True,
+@click.option('--hardware-id', '-h', multiple=True,
               help='The id of one SoftLayer_Hardware'
               ' to revoke authorization')
-@click.option('--virtual_id', '-v', multiple=True,
+@click.option('--virtual-id', '-v', multiple=True,
               help='The id of one SoftLayer_Virtual_Guest'
               ' to revoke authorization')
-@click.option('--ip_address_id', '-i', multiple=True,
+@click.option('--ip_address-id', '-i', multiple=True,
               help='The id of one SoftLayer_Network_Subnet_IpAddress'
               ' to revoke authorization')
-@click.option('--ip_address', multiple=True,
+@click.option('--ip-address', multiple=True,
               help='An IP address to revoke authorization')
 @environment.pass_env
 def cli(env, volume_id, hardware_id, virtual_id, ip_address_id, ip_address):
