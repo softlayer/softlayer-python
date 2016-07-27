@@ -48,5 +48,17 @@ addAttachedVirtualGuest = {
     "ticketId": 100
 }
 
+addAttachedFile = {
+    "id": 123,
+    "fileName": "a_file_name",
+    "fileSize": "100",
+    "ticketId": 100,
+    "updateId": 200,
+    "createDate": "2013-08-01T14:14:04-07:00",
+    "modifyDate": "2013-08-01T14:14:04-07:00",
+    "uploaderType": "USER",
+    "uploaderId": "300"
+}
+
 removeAttachedHardware = True
 removeAttachedVirtualGuest = True

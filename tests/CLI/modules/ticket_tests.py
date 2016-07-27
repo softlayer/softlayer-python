@@ -167,3 +167,40 @@ class TicketTests(testing.TestCase):
                                 'removeAttachedVirtualGuest',
                                 args=(100,),
                                 identifier=1)
+
+    def test_ticket_upload_no_path(self):
+        result = self.run_command(['ticket', 'upload', '1'])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.ArgumentError)
+
+    def test_ticket_upload_invalid_path(self):
+        result = self.run_command(['ticket', 'upload', '1',
+                                   '--path=tests/resources/nonexistent_file',
+                                   '--name=a_file_name'])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.ArgumentError)
+
+    def test_ticket_upload_no_name(self):
+        result = self.run_command(['ticket', 'upload', '1',
+                                   '--path=tests/resources/attachment_upload'])
+
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Ticket',
+                                'addAttachedFile',
+                                args=({"filename": "attachment_upload",
+                                       "data": b"ticket attached data"},),
+                                identifier=1)
+
+    def test_ticket_upload(self):
+        result = self.run_command(['ticket', 'upload', '1',
+                                   '--path=tests/resources/attachment_upload',
+                                   '--name=a_file_name'])
+
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Ticket',
+                                'addAttachedFile',
+                                args=({"filename": "a_file_name",
+                                       "data": b"ticket attached data"},),
+                                identifier=1)
