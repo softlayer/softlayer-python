@@ -80,6 +80,30 @@ class TicketManager(utils.IdentifierMixin, object):
         """
         return self.ticket.addUpdate({'entry': body}, id=ticket_id)
 
+    def upload_attachment(self, ticket_id=None, file_path=None,
+                          file_name=None):
+        """Upload an attachment to a ticket.
+
+        :param integer ticket_id: the id of the ticket to
+                                  upload the attachment to
+        :param string file_path:
+                                  The path of the attachment to be uploaded
+        :param string file_name:
+                                  The name of the attachment shown
+                                  in the ticket
+        :returns The uploaded attachment
+        """
+        file_content = None
+        with open(file_path, 'rb') as attached_file:
+            file_content = attached_file.read()
+
+        file_object = {
+            "filename": file_name,
+            "data": file_content
+        }
+
+        return self.ticket.addAttachedFile(file_object, id=ticket_id)
+
     def attach_hardware(self, ticket_id=None, hardware_id=None):
         """Attach hardware to a ticket.
 
