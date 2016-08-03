@@ -5,14 +5,14 @@ import itertools
 import sys
 
 import click
-from SoftLayer import utils
+
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
-import sparkblocks
+from SoftLayer import utils
 
 
-def validate_datetime(ctx, param, value):
+# pylint: disable=unused-argument
+def _validate_datetime(ctx, param, value):
     try:
         return datetime.datetime.strptime(value, "%Y-%m-%d")
     except (ValueError, TypeError):
@@ -91,15 +91,17 @@ def _get_hardware_bandwidth(env, start, end):
     with click.progressbar(list(hw_call),
                            label='Calculating for hardware',
                            file=sys.stderr) as hws:
-        for hw in hws:
+        for instance in hws:
             pool_name = None
-            if utils.lookup(hw, 'virtualRack', 'bandwidthAllotmentTypeId') == 2:
-                pool_name = utils.lookup(hw, 'virtualRack', 'name')
+            if utils.lookup(instance,
+                            'virtualRack',
+                            'bandwidthAllotmentTypeId') == 2:
+                pool_name = utils.lookup(instance, 'virtualRack', 'name')
 
             yield {
-                'id': hw['id'],
+                'id': instance['id'],
                 'type': 'hardware',
-                'name': hw['hostname'],
+                'name': instance['hostname'],
                 'pool': pool_name,
                 'data': env.client.call(
                     'Metric_Tracking_Object',
@@ -108,7 +110,7 @@ def _get_hardware_bandwidth(env, start, end):
                     end.strftime('%Y-%m-%d %H:%M:%S %Z'),
                     types,
                     3600,
-                    id=hw['metricTrackingObject']['id'],
+                    id=instance['metricTrackingObject']['id'],
                 ),
             }
 
@@ -137,15 +139,17 @@ def _get_virtual_bandwidth(env, start, end):
     with click.progressbar(list(call),
                            label='Calculating for virtual',
                            file=sys.stderr) as vms:
-        for vm in vms:
+        for instance in vms:
             pool_name = None
-            if utils.lookup(vm, 'virtualRack', 'bandwidthAllotmentTypeId') == 2:
-                pool_name = utils.lookup(vm, 'virtualRack', 'id')
+            if utils.lookup(instance,
+                            'virtualRack',
+                            'bandwidthAllotmentTypeId') == 2:
+                pool_name = utils.lookup(instance, 'virtualRack', 'id')
 
             yield {
-                'id': vm['id'],
+                'id': instance['id'],
                 'type': 'virtual',
-                'name': vm['hostname'],
+                'name': instance['hostname'],
                 'pool': pool_name,
                 'data': env.client.call(
                     'Metric_Tracking_Object',
@@ -154,7 +158,7 @@ def _get_virtual_bandwidth(env, start, end):
                     end.strftime('%Y-%m-%d %H:%M:%S %Z'),
                     types,
                     3600,
-                    id=vm['metricTrackingObjectId'],
+                    id=instance['metricTrackingObjectId'],
                 ),
             }
 
@@ -162,18 +166,23 @@ def _get_virtual_bandwidth(env, start, end):
 @click.command(short_help="Bandwidth report for every pool/server")
 @click.option(
     '--start',
-    callback=validate_datetime,
-    default=(datetime.datetime.now() - datetime.timedelta(days=30)).strftime('%Y-%m-%d'),
+    callback=_validate_datetime,
+    default=(
+        datetime.datetime.now() - datetime.timedelta(days=30)
+    ).strftime('%Y-%m-%d'),
     help="datetime in the format 'YYYY-MM-DD' or 'YYYY-MM-DD HH-MM-SS'")
 @click.option(
     '--end',
-    callback=validate_datetime,
+    callback=_validate_datetime,
     default=datetime.datetime.now().strftime('%Y-%m-%d'),
     help="datetime in the format 'YYYY-MM-DD' or 'YYYY-MM-DD HH-MM-SS'")
 @environment.pass_env
 def cli(env, start, end):
-    """Bandwidth report for every pool/server. This reports on the total data
-       transfered for each virtual sever, hardware server and bandwidth pool."""
+    """Bandwidth report for every pool/server.
+
+    This reports on the total data transfered for each virtual sever, hardware
+    server and bandwidth pool.
+    """
 
     env.err('Generating bandwidth report for %s to %s' % (start, end))
 
@@ -187,7 +196,8 @@ def cli(env, start, end):
         'pool',
     ])
 
-    def filter_data(key, results):
+    def f_type(key, results):
+        "Filter metric data by type"
         return (result['counter'] for result in results
                 if result['type'] == key)
 
@@ -195,17 +205,17 @@ def cli(env, start, end):
         for item in itertools.chain(_get_pooled_bandwidth(env, start, end),
                                     _get_virtual_bandwidth(env, start, end),
                                     _get_hardware_bandwidth(env, start, end)):
-            pub_in = int(sum(filter_data('publicIn_net_octet', item['data'])))
-            pub_out = int(sum(filter_data('publicOut_net_octet', item['data'])))
-            priv_in = int(sum(filter_data('privateIn_net_octet', item['data'])))
-            priv_out = int(sum(filter_data('privateOut_net_octet', item['data'])))
+            pub_in = int(sum(f_type('publicIn_net_octet', item['data'])))
+            pub_out = int(sum(f_type('publicOut_net_octet', item['data'])))
+            pri_in = int(sum(f_type('privateIn_net_octet', item['data'])))
+            pri_out = int(sum(f_type('privateOut_net_octet', item['data'])))
             table.add_row([
                 item['type'],
                 item['name'],
                 formatting.FormattedItem(formatting.b_to_gb(pub_in), pub_in),
                 formatting.FormattedItem(formatting.b_to_gb(pub_out), pub_out),
-                formatting.FormattedItem(formatting.b_to_gb(priv_in), priv_in),
-                formatting.FormattedItem(formatting.b_to_gb(priv_out), priv_out),
+                formatting.FormattedItem(formatting.b_to_gb(pri_in), pri_in),
+                formatting.FormattedItem(formatting.b_to_gb(pri_out), pri_out),
                 item.get('pool') or formatting.blank(),
             ])
     except KeyboardInterrupt:
