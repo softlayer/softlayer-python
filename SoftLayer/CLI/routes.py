@@ -210,6 +210,9 @@ ALL_ROUTES = [
     ('vlan:list', 'SoftLayer.CLI.vlan.list:cli'),
 
     ('summary', 'SoftLayer.CLI.summary:cli'),
+
+    ('report', 'SoftLayer.CLI.report'),
+    ('report:bandwidth', 'SoftLayer.CLI.report.bandwidth:cli'),
 ]
 
 ALL_ALIASES = {
