@@ -7,6 +7,7 @@
     :license: MIT, see LICENSE for more details.
 """
 # pylint: disable=E0202
+import collections
 import json
 import os
 
@@ -252,6 +253,13 @@ class Table(object):
     :param list columns: a list of column names
     """
     def __init__(self, columns):
+        duplicated_cols = [col for col, count
+                           in collections.Counter(columns).items()
+                           if count > 1]
+        if len(duplicated_cols) > 0:
+            raise exceptions.CLIAbort("Duplicated columns are not allowed: %s"
+                                      % ','.join(duplicated_cols))
+
         self.columns = columns
         self.rows = []
         self.align = {}
