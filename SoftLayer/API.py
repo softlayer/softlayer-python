@@ -86,7 +86,8 @@ def create_client_from_env(username=None,
                                           config_file=config_file)
 
     if transport is None:
-        if '/rest' in settings.get('endpoint_url'):
+        url = settings.get('endpoint_url')
+        if url is not None and '/rest' in url:
             # If this looks like a rest endpoint, use the rest transport
             transport = transports.RestTransport(
                 endpoint_url=settings.get('endpoint_url'),
