@@ -85,14 +85,23 @@ def create_client_from_env(username=None,
                                           proxy=proxy,
                                           config_file=config_file)
 
-    # Default the transport to use XMLRPC
     if transport is None:
-        transport = transports.XmlRpcTransport(
-            endpoint_url=settings.get('endpoint_url'),
-            proxy=settings.get('proxy'),
-            timeout=settings.get('timeout'),
-            user_agent=user_agent,
-        )
+        if '/rest' in settings.get('endpoint_url'):
+            # If this looks like a rest endpoint, use the rest transport
+            transport = transports.RestTransport(
+                endpoint_url=settings.get('endpoint_url'),
+                proxy=settings.get('proxy'),
+                timeout=settings.get('timeout'),
+                user_agent=user_agent,
+            )
+        else:
+            # Default the transport to use XMLRPC
+            transport = transports.XmlRpcTransport(
+                endpoint_url=settings.get('endpoint_url'),
+                proxy=settings.get('proxy'),
+                timeout=settings.get('timeout'),
+                user_agent=user_agent,
+            )
 
     # If we have enough information to make an auth driver, let's do it
     if auth is None and settings.get('username') and settings.get('api_key'):
