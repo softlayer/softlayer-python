@@ -19,10 +19,10 @@ def _validate_datetime(ctx, param, value):
         pass
 
     try:
-        return datetime.datetime.strptime(value, "%Y-%m-%d %H:%M%S")
+        return datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
     except (ValueError, TypeError):
         raise click.BadParameter(
-            "not in the format 'YYYY-MM-DD' or 'YYYY-MM-DD HH-MM-SS'")
+            "not in the format 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS'")
 
 
 def _get_pooled_bandwidth(env, start, end):
@@ -173,12 +173,12 @@ def _get_virtual_bandwidth(env, start, end):
     default=(
         datetime.datetime.now() - datetime.timedelta(days=30)
     ).strftime('%Y-%m-%d'),
-    help="datetime in the format 'YYYY-MM-DD' or 'YYYY-MM-DD HH-MM-SS'")
+    help="datetime in the format 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS'")
 @click.option(
     '--end',
     callback=_validate_datetime,
     default=datetime.datetime.now().strftime('%Y-%m-%d'),
-    help="datetime in the format 'YYYY-MM-DD' or 'YYYY-MM-DD HH-MM-SS'")
+    help="datetime in the format 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS'")
 @environment.pass_env
 def cli(env, start, end):
     """Bandwidth report for every pool/server.

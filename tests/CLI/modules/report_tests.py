@@ -11,7 +11,28 @@ import json
 
 class ReportTests(testing.TestCase):
 
-    def test_list_accounts(self):
+    def test_bandwidth_invalid_date(self):
+        result = self.run_command(
+            [
+                'report',
+                'bandwidth',
+                '--start=welp',
+                '--end=2016-01-01',
+            ],
+        )
+        self.assertTrue('Invalid value for "--start"', result.output)
+
+        result = self.run_command(
+            [
+                'report',
+                'bandwidth',
+                '--start=2016-01-01',
+                '--end=welp',
+            ],
+        )
+        self.assertTrue('Invalid value for "--end"', result.output)
+
+    def test_bandwidth_report(self):
         racks = self.set_mock('SoftLayer_Account', 'getVirtualDedicatedRacks')
         racks.return_value = [{
             'id': 1,
@@ -57,7 +78,7 @@ class ReportTests(testing.TestCase):
             'report',
             'bandwidth',
             '--start=2016-02-04',
-            '--end=2016-03-04',
+            '--end=2016-03-04 12:34:56',
         ])
 
         self.assert_no_fail(result)
@@ -141,7 +162,7 @@ class ReportTests(testing.TestCase):
                           identifier=1)[0]
         expected_args = (
             '2016-02-04 00:00:00 ',
-            '2016-03-04 00:00:00 ',
+            '2016-03-04 12:34:56 ',
             [{
                 'keyName': 'PUBLICIN',
                 'name': 'publicIn',
