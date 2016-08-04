@@ -179,8 +179,11 @@ def _get_virtual_bandwidth(env, start, end):
     callback=_validate_datetime,
     default=datetime.datetime.now().strftime('%Y-%m-%d'),
     help="datetime in the format 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS'")
+@click.option('--sortby', help='Column to sort by',
+              default='hostname',
+              show_default=True)
 @environment.pass_env
-def cli(env, start, end):
+def cli(env, start, end, sortby):
     """Bandwidth report for every pool/server.
 
     This reports on the total data transfered for each virtual sever, hardware
@@ -198,6 +201,7 @@ def cli(env, start, end):
         'private_out',
         'pool',
     ])
+    table.sortby = sortby
 
     def f_type(key, results):
         "Filter metric data by type"
@@ -215,10 +219,10 @@ def cli(env, start, end):
             table.add_row([
                 item['type'],
                 item['name'],
-                formatting.FormattedItem(formatting.b_to_gb(pub_in), pub_in),
-                formatting.FormattedItem(formatting.b_to_gb(pub_out), pub_out),
-                formatting.FormattedItem(formatting.b_to_gb(pri_in), pri_in),
-                formatting.FormattedItem(formatting.b_to_gb(pri_out), pri_out),
+                formatting.b_to_gb(pub_in),
+                formatting.b_to_gb(pub_out),
+                formatting.b_to_gb(pri_in),
+                formatting.b_to_gb(pri_out),
                 item.get('pool') or formatting.blank(),
             ])
     except KeyboardInterrupt:
