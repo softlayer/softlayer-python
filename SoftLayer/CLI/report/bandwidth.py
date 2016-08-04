@@ -92,6 +92,9 @@ def _get_hardware_bandwidth(env, start, end):
                            label='Calculating for hardware',
                            file=sys.stderr) as hws:
         for instance in hws:
+            if not utils.lookup(instance, 'metricTrackingObject', 'id'):
+                continue
+
             pool_name = None
             if utils.lookup(instance,
                             'virtualRack',
