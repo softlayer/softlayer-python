@@ -6,6 +6,7 @@
 """
 # Disable pylint import error and too many methods error
 # pylint: disable=invalid-name
+from __future__ import print_function
 import logging
 import os.path
 
