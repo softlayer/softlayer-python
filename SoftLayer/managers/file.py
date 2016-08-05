@@ -41,21 +41,21 @@ class FileStorageManager(utils.IdentifierMixin, object):
 
         _filter = utils.NestedDict(kwargs.get('filter') or {})
 
-        _filter['nfsNetworkStorage']['serviceResource']['type']['type'] = \
-            (utils.query_filter('!~ NFS'))
+        _filter['nasNetworkStorage']['serviceResource']['type']['type'] = \
+            (utils.query_filter('!~ NAS'))
 
-        _filter['nfsNetworkStorage']['storageType']['keyName'] = (
+        _filter['nasNetworkStorage']['storageType']['keyName'] = (
             utils.query_filter('*FILE_STORAGE'))
         if storage_type:
-            _filter['nfsNetworkStorage']['storageType']['keyName'] = (
+            _filter['nasNetworkStorage']['storageType']['keyName'] = (
                 utils.query_filter('%s_FILE_STORAGE' % storage_type.upper()))
 
         if datacenter:
-            _filter['nfsNetworkStorage']['serviceResource']['datacenter'][
+            _filter['nasNetworkStorage']['serviceResource']['datacenter'][
                 'name'] = (utils.query_filter(datacenter))
 
         if username:
-            _filter['nfsNetworkStorage']['username'] = \
+            _filter['nasNetworkStorage']['username'] = \
                 (utils.query_filter(username))
 
         kwargs['filter'] = _filter.to_dict()
