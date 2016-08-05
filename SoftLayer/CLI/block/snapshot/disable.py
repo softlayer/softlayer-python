@@ -19,7 +19,7 @@ def cli(env, volume_id, schedule_type):
     if (schedule_type != 'HOURLY' and schedule_type != 'DAILY'
             and schedule_type != 'WEEKLY'):
         raise exceptions.CLIAbort(
-            '--schedule_type must be HOURLY, DAILY, or WEEKLY')
+            '--schedule-type must be HOURLY, DAILY, or WEEKLY')
 
     block_manager = SoftLayer.BlockStorageManager(env.client)
     disabled = block_manager.disable_snapshots(volume_id, schedule_type)

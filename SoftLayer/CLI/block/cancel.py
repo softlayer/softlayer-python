@@ -36,4 +36,4 @@ def cli(env, volume_id, reason, immediate):
             click.echo('Block volume with id %s has been marked'
                        ' for cancellation' % volume_id)
     else:
-        click.echo('Unable to cancle block volume %s' % volume_id)
+        click.echo('Unable to cancel block volume %s' % volume_id)
