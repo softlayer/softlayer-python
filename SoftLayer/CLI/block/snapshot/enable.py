@@ -30,11 +30,11 @@ def cli(env, volume_id, schedule_type, retention_count,
     """Enables snapshots for a given volume on the specified schedule"""
     block_manager = SoftLayer.BlockStorageManager(env.client)
 
+    valid_schedule_types = {'HOURLY', 'DAILY', 'WEEKLY'}
     valid_days = {'SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY',
                   'FRIDAY', 'SATURDAY'}
 
-    if (schedule_type != 'HOURLY' and schedule_type != 'DAILY'
-            and schedule_type != 'WEEKLY'):
+    if schedule_type not in valid_schedule_types:
         raise exceptions.CLIAbort(
             '--schedule-type must be HOURLY, DAILY, or WEEKLY, not '
             + schedule_type)

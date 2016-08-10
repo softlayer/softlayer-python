@@ -16,7 +16,10 @@ COLUMNS = [
                          mask="serviceResource.datacenter.name"),
     column_helper.Column(
         'storage_type',
-        lambda b: b['storageType']['keyName'].split('_').pop(0),
+        lambda b: b['storageType']['keyName'].split('_').pop(0)
+        if 'storageType' in b and 'keyName' in b['storageType']
+        and isinstance(b['storageType']['keyName'], str)
+        else '-',
         mask="storageType.keyName"),
     column_helper.Column('capacity_gb', ('capacityGb',), mask="capacityGb"),
     column_helper.Column('bytes_used', ('bytesUsed',), mask="bytesUsed"),
