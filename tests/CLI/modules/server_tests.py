@@ -22,7 +22,7 @@ class ServerCLITests(testing.TestCase):
     def test_server_cancel_reasons(self):
         result = self.run_command(['server', 'cancel-reasons'])
         output = json.loads(result.output)
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(len(output), 10)
 
     def test_server_details(self):
@@ -54,7 +54,7 @@ class ServerCLITests(testing.TestCase):
                       {'id': 19082, 'number': 3672, 'type': 'PUBLIC'}]
         }
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output), expected)
 
     def test_detail_vs_empty_tag(self):
@@ -70,7 +70,7 @@ class ServerCLITests(testing.TestCase):
         }
         result = self.run_command(['server', 'detail', '100'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(
             json.loads(result.output)['tags'],
             ['example-tag'],
@@ -114,7 +114,7 @@ class ServerCLITests(testing.TestCase):
             },
         ]
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(expected, json.loads(result.output))
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
@@ -126,7 +126,7 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['--really', 'server', 'reload', '12345',
                                    '--key=4567'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         reload_mock.assert_called_with(12345, None, [4567])
 
         # Now check to make sure we properly call CLIAbort in the negative case
@@ -144,7 +144,7 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['--really', 'server', 'cancel', '12345',
                                    '--reason=Test', '--comment=Test'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         cancel_mock.assert_called_with(12345, "Test", "Test", False)
 
         # Test
@@ -172,7 +172,7 @@ class ServerCLITests(testing.TestCase):
     def test_server_reboot_default(self):
         result = self.run_command(['--really', 'server', 'reboot', '12345'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Hardware_Server', 'rebootDefault',
                                 identifier=12345)
 
@@ -180,7 +180,7 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['--really', 'server', 'reboot', '12345',
                                    '--soft'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Hardware_Server', 'rebootSoft',
                                 identifier=12345)
 
@@ -188,7 +188,7 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['--really', 'server', 'reboot', '12345',
                                    '--hard'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Hardware_Server', 'rebootHard',
                                 identifier=12345)
 
@@ -203,7 +203,7 @@ class ServerCLITests(testing.TestCase):
     def test_server_power_on(self):
         result = self.run_command(['--really', 'server', 'power-on', '12345'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Hardware_Server', 'powerOn',
                                 identifier=12345)
 
@@ -211,7 +211,7 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['--really', 'server', 'power-cycle',
                                    '12345'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Hardware_Server', 'powerCycle',
                                 identifier=12345)
 
@@ -250,7 +250,7 @@ class ServerCLITests(testing.TestCase):
                                    '--test'],
                                   fmt='raw')
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertIn("First Item", result.output)
         self.assertIn("Second Item", result.output)
         self.assertIn("Total monthly cost", result.output)
@@ -258,7 +258,7 @@ class ServerCLITests(testing.TestCase):
     def test_create_options(self):
         result = self.run_command(['server', 'create-options'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         expected = [
             [{'datacenter': 'Washington 1', 'value': 'wdc01'}],
             [{'size': 'Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID',
@@ -288,7 +288,7 @@ class ServerCLITests(testing.TestCase):
                                    '--key=10',
                                    ])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          {'id': 98765, 'created': '2013-08-02 15:23:47'})
 
@@ -320,7 +320,7 @@ class ServerCLITests(testing.TestCase):
                                    '--export=/path/to/test_file.txt'],
                                   fmt='raw')
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertIn("Successfully exported options to a template file.",
                       result.output)
         export_mock.assert_called_with('/path/to/test_file.txt',
@@ -358,7 +358,7 @@ class ServerCLITests(testing.TestCase):
                                    '--domain=test.sftlyr.ws',
                                    '--userdata=My data'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(result.output, "")
         self.assert_called_with('SoftLayer_Hardware_Server', 'editObject',
                                 args=({'domain': 'test.sftlyr.ws',
@@ -388,7 +388,7 @@ class ServerCLITests(testing.TestCase):
             result = self.run_command(['server', 'edit', '1000',
                                        '--userfile=%s' % userfile.name])
 
-            self.assertEqual(result.exit_code, 0)
+            self.assert_no_fail(result)
             self.assertEqual(result.output, "")
             self.assert_called_with('SoftLayer_Hardware_Server',
                                     'setUserMetadata',
@@ -400,7 +400,7 @@ class ServerCLITests(testing.TestCase):
         confirm_mock.return_value = True
         result = self.run_command(['server', 'update-firmware', '1000'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(result.output, "")
         self.assert_called_with('SoftLayer_Hardware_Server',
                                 'createFirmwareUpdateTransaction',
@@ -417,7 +417,7 @@ class ServerCLITests(testing.TestCase):
                                    '--private-speed=100',
                                    '100'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(result.output, '')
 
         self.assert_called_with(

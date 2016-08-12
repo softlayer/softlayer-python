@@ -105,7 +105,7 @@ class CDNTests(testing.TestCase):
 
         self.cdn_client.purge_content(12345, urls)
         calls = self.calls('SoftLayer_Network_ContentDelivery_Account',
-                           'purgeContent')
+                           'purgeCache')
         self.assertEqual(len(calls),
                          math.ceil(len(urls) / float(cdn.MAX_URLS_PER_PURGE)))
 
@@ -115,12 +115,12 @@ class CDNTests(testing.TestCase):
                 'http://x/img/0x001.png']
 
         mock = self.set_mock('SoftLayer_Network_ContentDelivery_Account',
-                             'purgeContent')
+                             'purgeCache')
         mock.return_value = False
 
         self.cdn_client.purge_content(12345, urls)
         calls = self.calls('SoftLayer_Network_ContentDelivery_Account',
-                           'purgeContent')
+                           'purgeCache')
         self.assertEqual(len(calls),
                          math.ceil(len(urls) / float(cdn.MAX_URLS_PER_PURGE)))
 
@@ -129,6 +129,6 @@ class CDNTests(testing.TestCase):
 
         self.cdn_client.purge_content(12345, url)
         self.assert_called_with('SoftLayer_Network_ContentDelivery_Account',
-                                'purgeContent',
+                                'purgeCache',
                                 args=([url],),
                                 identifier=12345)

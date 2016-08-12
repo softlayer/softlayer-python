@@ -17,7 +17,7 @@ class VirtTests(testing.TestCase):
     def test_list_vs(self):
         result = self.run_command(['vs', 'list', '--tag=tag'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          [{'datacenter': 'TEST00',
                            'primary_ip': '172.16.240.2',
@@ -36,7 +36,7 @@ class VirtTests(testing.TestCase):
         result = self.run_command(['vs', 'detail', '100',
                                    '--passwords', '--price'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          {'active_transaction': None,
                           'cores': 2,
@@ -61,7 +61,9 @@ class VirtTests(testing.TestCase):
                           'public_ip': '172.16.240.2',
                           'state': 'RUNNING',
                           'status': 'ACTIVE',
-                          'users': [{'password': 'pass', 'username': 'user'}],
+                          'users': [{'software': 'Ubuntu',
+                                     'password': 'pass',
+                                     'username': 'user'}],
                           'vlans': [{'type': 'PUBLIC',
                                      'number': 23,
                                      'id': 1}],
@@ -80,7 +82,7 @@ class VirtTests(testing.TestCase):
         }
         result = self.run_command(['vs', 'detail', '100'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(
             json.loads(result.output)['tags'],
             ['example-tag'],
@@ -89,7 +91,7 @@ class VirtTests(testing.TestCase):
     def test_create_options(self):
         result = self.run_command(['vs', 'create-options'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          {'cpus (private)': [],
                           'cpus (standard)': ['1', '2', '3', '4'],
@@ -116,7 +118,7 @@ class VirtTests(testing.TestCase):
                                    '--tag=dev',
                                    '--tag=green'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          {'guid': '1a2b3c-1701',
                           'id': 100,
@@ -131,6 +133,41 @@ class VirtTests(testing.TestCase):
                  'startCpus': 2,
                  'operatingSystemReferenceCode': 'UBUNTU_LATEST',
                  'networkComponents': [{'maxSpeed': '100'}]},)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
+                                args=args)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_create_with_integer_image_id(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['vs', 'create',
+                                   '--cpu=2',
+                                   '--domain=example.com',
+                                   '--hostname=host',
+                                   '--image=12345',
+                                   '--memory=1',
+                                   '--network=100',
+                                   '--billing=hourly',
+                                   '--datacenter=dal05'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output),
+                         {'guid': '1a2b3c-1701',
+                          'id': 100,
+                          'created': '2013-08-01 15:23:45'})
+
+        args = ({
+            'datacenter': {'name': 'dal05'},
+            'domain': 'example.com',
+            'hourlyBillingFlag': True,
+            'localDiskFlag': True,
+            'maxMemory': 1024,
+            'hostname': 'host',
+            'startCpus': 2,
+            'blockDeviceTemplateGroup': {
+                'globalIdentifier': '0B5DEAF4-643D-46CA-A695-CECBE8832C9D',
+            },
+            'networkComponents': [{'maxSpeed': '100'}]
+        },)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
                                 args=args)
 
@@ -169,7 +206,7 @@ class VirtTests(testing.TestCase):
 
         result = self.run_command(['vs', 'dns-sync', '100'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Dns_Domain', 'getResourceRecords')
         self.assert_called_with('SoftLayer_Virtual_Guest',
                                 'getReverseDomainRecords')
@@ -216,7 +253,7 @@ class VirtTests(testing.TestCase):
         },)
         guest.return_value = test_guest
         result = self.run_command(['vs', 'dns-sync', '--aaaa-record', '100'])
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
                                 'createObject',
                                 args=createV6args)
@@ -234,7 +271,7 @@ class VirtTests(testing.TestCase):
         getResourceRecords.return_value = [v6Record]
         editArgs = (v6Record,)
         result = self.run_command(['vs', 'dns-sync', '--aaaa-record', '100'])
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
                                 'editObject',
                                 args=editArgs)
@@ -260,7 +297,7 @@ class VirtTests(testing.TestCase):
              'id': 1, 'ttl': 7200},
         )
         result = self.run_command(['vs', 'dns-sync', '-a', '100'])
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
                                 'editObject',
                                 args=editArgs)
@@ -295,7 +332,7 @@ class VirtTests(testing.TestCase):
         editArgs = ({'host': '2', 'data': 'vs-test1.test.sftlyr.ws',
                      'id': 100, 'ttl': 7200},)
         result = self.run_command(['vs', 'dns-sync', '--ptr', '100'])
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
                                 'editObject',
                                 args=editArgs)
@@ -344,7 +381,7 @@ class VirtTests(testing.TestCase):
         confirm_mock.return_value = True
         result = self.run_command(['vs', 'upgrade', '100', '--cpu=4',
                                    '--memory=2048', '--network=1000'])
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
         call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
         order_container = call.args[0]
@@ -364,7 +401,7 @@ class VirtTests(testing.TestCase):
                                    '--private-speed=100',
                                    '100'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(result.output, '')
 
         self.assert_called_with(

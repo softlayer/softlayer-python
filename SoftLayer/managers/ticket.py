@@ -39,13 +39,13 @@ class TicketManager(utils.IdentifierMixin, object):
         return self.client.call('Account', call, mask=mask)
 
     def list_subjects(self):
-        """List all tickets."""
+        """List all ticket subjects."""
         return self.client['Ticket_Subject'].getAllObjects()
 
     def get_ticket(self, ticket_id):
         """Get details about a ticket.
 
-        :param integer id: the ticket ID
+        :param integer ticket_id: the ticket ID
         :returns: A dictionary containing a large amount of information about
                   the specified ticket.
 
@@ -79,3 +79,63 @@ class TicketManager(utils.IdentifierMixin, object):
         :param string body: entry to update in the ticket
         """
         return self.ticket.addUpdate({'entry': body}, id=ticket_id)
+
+    def upload_attachment(self, ticket_id=None, file_path=None,
+                          file_name=None):
+        """Upload an attachment to a ticket.
+
+        :param integer ticket_id: the id of the ticket to
+                                  upload the attachment to
+        :param string file_path:
+                                  The path of the attachment to be uploaded
+        :param string file_name:
+                                  The name of the attachment shown
+                                  in the ticket
+        :returns The uploaded attachment
+        """
+        file_content = None
+        with open(file_path, 'rb') as attached_file:
+            file_content = attached_file.read()
+
+        file_object = {
+            "filename": file_name,
+            "data": file_content
+        }
+
+        return self.ticket.addAttachedFile(file_object, id=ticket_id)
+
+    def attach_hardware(self, ticket_id=None, hardware_id=None):
+        """Attach hardware to a ticket.
+
+        :param integer ticket_id: the id of the ticket to attach to
+        :param integer hardware_id: the id of the hardware to attach
+        :returns The new ticket attachment
+        """
+        return self.ticket.addAttachedHardware(hardware_id, id=ticket_id)
+
+    def attach_virtual_server(self, ticket_id=None, virtual_id=None):
+        """Attach a virtual server to a ticket.
+
+        :param integer ticket_id: the id of the ticket to attach to
+        :param integer virtual_id: the id of the virtual server to attach
+        :returns The new ticket attachment
+        """
+        return self.ticket.addAttachedVirtualGuest(virtual_id, id=ticket_id)
+
+    def detach_hardware(self, ticket_id=None, hardware_id=None):
+        """Detach hardware from a ticket.
+
+        :param ticket_id: the id of the ticket to detach from
+        :param hardware_id: the id of the hardware to detach
+        :return: Whether the detachment was successful
+        """
+        return self.ticket.removeAttachedHardware(hardware_id, id=ticket_id)
+
+    def detach_virtual_server(self, ticket_id=None, virtual_id=None):
+        """Detach a virtual server from a ticket.
+
+        :param ticket_id: the id of the ticket to detach from
+        :param virtual_id: the id of the virtual server to detach
+        :return: Whether the detachment was successful
+        """
+        return self.ticket.removeAttachedVirtualGuest(virtual_id, id=ticket_id)

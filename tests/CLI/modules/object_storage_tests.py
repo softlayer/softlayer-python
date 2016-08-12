@@ -14,7 +14,7 @@ class ObjectStorageTests(testing.TestCase):
     def test_list_accounts(self):
         result = self.run_command(['object-storage', 'accounts'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          [{'id': 12345, 'name': 'SLOS12345-1'},
                           {'id': 12346, 'name': 'SLOS12345-2'}])
@@ -31,7 +31,7 @@ class ObjectStorageTests(testing.TestCase):
 
         result = self.run_command(['object-storage', 'endpoints'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          [{'datacenter': 'dal05',
                            'private': 'https://dal05/auth/v1.0/',

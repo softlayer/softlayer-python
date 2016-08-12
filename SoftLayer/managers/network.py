@@ -13,7 +13,8 @@ from SoftLayer import utils
 DEFAULT_SUBNET_MASK = ','.join(['hardware',
                                 'datacenter',
                                 'ipAddressCount',
-                                'virtualGuests'])
+                                'virtualGuests',
+                                'networkVlan[id,networkSpace]'])
 DEFAULT_VLAN_MASK = ','.join([
     'firewallInterfaces',
     'hardwareCount',
@@ -22,6 +23,15 @@ DEFAULT_VLAN_MASK = ','.join([
     'totalPrimaryIpAddressCount',
     'virtualGuestCount',
     'networkSpace',
+])
+DEFAULT_GET_VLAN_MASK = ','.join([
+    'firewallInterfaces',
+    'primaryRouter[id, fullyQualifiedDomainName, datacenter]',
+    'totalPrimaryIpAddressCount',
+    'networkSpace',
+    'hardware',
+    'subnets',
+    'virtualGuests',
 ])
 
 
@@ -207,7 +217,7 @@ class NetworkManager(object):
                   the specified VLAN.
 
         """
-        return self.vlan.getObject(id=vlan_id, mask=DEFAULT_VLAN_MASK)
+        return self.vlan.getObject(id=vlan_id, mask=DEFAULT_GET_VLAN_MASK)
 
     def list_global_ips(self, version=None, identifier=None, **kwargs):
         """Returns a list of all global IP address records on the account.
@@ -235,7 +245,7 @@ class NetworkManager(object):
         return self.account.getGlobalIpRecords(**kwargs)
 
     def list_subnets(self, identifier=None, datacenter=None, version=0,
-                     subnet_type=None, **kwargs):
+                     subnet_type=None, network_space=None, **kwargs):
         """Display a list of all subnets on the account.
 
         This provides a quick overview of all subnets including information
@@ -248,6 +258,8 @@ class NetworkManager(object):
         :param int version: Only returns subnets of this version (4 or 6).
         :param string subnet_type: If specified, it will only returns subnets
                                      of this type.
+        :param string network_space: If specified, it will only returns subnets
+                                       with the given address space label.
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         """
         if 'mask' not in kwargs:
@@ -268,6 +280,9 @@ class NetworkManager(object):
         else:
             # This filters out global IPs from the subnet listing.
             _filter['subnets']['subnetType'] = {'operation': '!= GLOBAL_IP'}
+        if network_space:
+            _filter['subnets']['networkVlan']['networkSpace'] = (
+                utils.query_filter(network_space))
 
         kwargs['filter'] = _filter.to_dict()
 

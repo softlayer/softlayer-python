@@ -31,7 +31,7 @@ class TestHelpShow(testing.TestCase):
     def test_show(self):
         result = self.run_command(['config', 'show'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          {'Username': 'username',
                           'API Key': 'api-key',
@@ -62,7 +62,7 @@ class TestHelpSetup(testing.TestCase):
             result = self.run_command(['--config=%s' % config_file.name,
                                        'config', 'setup'])
 
-            self.assertEqual(result.exit_code, 0)
+            self.assert_no_fail(result)
             self.assertTrue('Configuration Updated Successfully'
                             in result.output)
             contents = config_file.read().decode("utf-8")

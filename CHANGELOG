@@ -1,3 +1,37 @@
+5.1.0
+
+    * Added block storage functionality. You can order, list, detail, cancel volumes. You can list and delete snapshots. You can also list ACLs for volumes.
+
+    * Added functionality to attach/detach devices to tickets
+
+    * Virtual list now lists users and passwords for all known software
+
+    * Fixes bug with `vlan detail` CLI command
+
+5.0.1
+
+    * Adds missing depdendency that was previously pulled in by prompt_toolkit
+
+    * Fix a bug by updating the CDN manager to use the new purge method
+
+    * Fixes bug that occured when iscsi listings with resources have no datacenter
+
+5.0.0
+
+    * Adds a shell (accessable with `slcli shell`) which provides autocomplete for slcli commands and options
+
+    * Move modifying nic speed to `slcli virtual edit` and `slcli hardware edit` instead of having its own command
+
+    * How filters work with `slcli call-api` has changed significantly. Instead of accepting JSON, it now accepts an easier-to-use format. See `slcli call-api -h` for examples
+
+    * Adds manager for object storage
+
+    * 'virtual' and 'hardware' are preferred over 'vs' and 'server' in the CLI
+
+    * Improved REST transport support
+
+    * Many bug fixes
+
 4.1.1
 
     * Fixes to work with Click v5

@@ -39,7 +39,7 @@ def cli(env, identifier, no_vs, no_hardware):
     table.add_row(['firewall',
                    'Yes' if vlan['firewallInterfaces'] else 'No'])
     subnets = []
-    for subnet in vlan['subnets']:
+    for subnet in vlan.get('subnets', []):
         subnet_table = formatting.KeyValueTable(['name', 'value'])
         subnet_table.align['name'] = 'r'
         subnet_table.align['value'] = 'l'
@@ -57,7 +57,7 @@ def cli(env, identifier, no_vs, no_hardware):
     server_columns = ['hostname', 'domain', 'public_ip', 'private_ip']
 
     if not no_vs:
-        if vlan['virtualGuests']:
+        if vlan.get('virtualGuests'):
             vs_table = formatting.KeyValueTable(server_columns)
             for vsi in vlan['virtualGuests']:
                 vs_table.add_row([vsi['hostname'],
@@ -69,7 +69,7 @@ def cli(env, identifier, no_vs, no_hardware):
             table.add_row(['vs', 'none'])
 
     if not no_hardware:
-        if vlan['hardware']:
+        if vlan.get('hardware'):
             hw_table = formatting.Table(server_columns)
             for hardware in vlan['hardware']:
                 hw_table.add_row([hardware['hostname'],

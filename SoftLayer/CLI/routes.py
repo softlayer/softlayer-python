@@ -56,6 +56,19 @@ ALL_ROUTES = [
     ('dns:zone-list', 'SoftLayer.CLI.dns.zone_list:cli'),
     ('dns:zone-print', 'SoftLayer.CLI.dns.zone_print:cli'),
 
+    ('block', 'SoftLayer.CLI.block'),
+    ('block:volume-list', 'SoftLayer.CLI.block.list:cli'),
+    ('block:volume-detail', 'SoftLayer.CLI.block.detail:cli'),
+    ('block:volume-cancel', 'SoftLayer.CLI.block.cancel:cli'),
+    ('block:volume-order', 'SoftLayer.CLI.block.order:cli'),
+
+    ('block:snapshot-list', 'SoftLayer.CLI.block.snapshot_list:cli'),
+    ('block:snapshot-delete', 'SoftLayer.CLI.block.snapshot_delete:cli'),
+
+    ('block:access-list', 'SoftLayer.CLI.block.access_list:cli'),
+    ('block:access-authorize', 'SoftLayer.CLI.block.access.authorize:cli'),
+    ('block:access-revoke', 'SoftLayer.CLI.block.access.revoke:cli'),
+
     ('firewall', 'SoftLayer.CLI.firewall'),
     ('firewall:add', 'SoftLayer.CLI.firewall.add:cli'),
     ('firewall:cancel', 'SoftLayer.CLI.firewall.cancel:cli'),
@@ -186,8 +199,11 @@ ALL_ROUTES = [
     ('ticket:detail', 'SoftLayer.CLI.ticket.detail:cli'),
     ('ticket:list', 'SoftLayer.CLI.ticket.list:cli'),
     ('ticket:update', 'SoftLayer.CLI.ticket.update:cli'),
+    ('ticket:upload', 'SoftLayer.CLI.ticket.upload:cli'),
     ('ticket:subjects', 'SoftLayer.CLI.ticket.subjects:cli'),
     ('ticket:summary', 'SoftLayer.CLI.ticket.summary:cli'),
+    ('ticket:attach', 'SoftLayer.CLI.ticket.attach:cli'),
+    ('ticket:detach', 'SoftLayer.CLI.ticket.detach:cli'),
 
     ('vlan', 'SoftLayer.CLI.vlan'),
     ('vlan:detail', 'SoftLayer.CLI.vlan.detail:cli'),

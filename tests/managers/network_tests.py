@@ -6,6 +6,7 @@
 """
 import SoftLayer
 from SoftLayer import fixtures
+from SoftLayer.managers import network
 from SoftLayer import testing
 
 
@@ -182,33 +183,34 @@ class NetworkTests(testing.TestCase):
 
         self.assertEqual(result, fixtures.SoftLayer_Account.getSubnets)
         _filter = {'subnets': {'subnetType': {'operation': '!= GLOBAL_IP'}}}
-        mask = 'mask[hardware,datacenter,ipAddressCount,virtualGuests]'
         self.assert_called_with('SoftLayer_Account', 'getSubnets',
-                                mask=mask,
+                                mask='mask[%s]' % network.DEFAULT_SUBNET_MASK,
                                 filter=_filter)
 
     def test_list_subnets_with_filters(self):
         result = self.network.list_subnets(
             identifier='10.0.0.1',
             datacenter='dal00',
-            subnet_type='PRIMARY',
             version=4,
+            subnet_type='PRIMARY',
+            network_space='PUBLIC',
         )
 
         self.assertEqual(result, fixtures.SoftLayer_Account.getSubnets)
         _filter = {
             'subnets': {
+                'networkIdentifier': {'operation': '_= 10.0.0.1'},
                 'datacenter': {
                     'name': {'operation': '_= dal00'}
                 },
                 'version': {'operation': 4},
                 'subnetType': {'operation': '_= PRIMARY'},
-                'networkIdentifier': {'operation': '_= 10.0.0.1'}
+                'networkVlan': {'networkSpace': {'operation': '_= PUBLIC'}},
             }
         }
-        mask = 'mask[hardware,datacenter,ipAddressCount,virtualGuests]'
+
         self.assert_called_with('SoftLayer_Account', 'getSubnets',
-                                mask=mask,
+                                mask='mask[%s]' % network.DEFAULT_SUBNET_MASK,
                                 filter=_filter)
 
     def test_list_vlans_default(self):

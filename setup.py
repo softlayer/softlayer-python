@@ -15,7 +15,7 @@ else:
 
 setup(
     name='SoftLayer',
-    version='4.1.1',
+    version='5.1.0',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     author='SoftLayer Technologies, Inc.',
@@ -36,6 +36,7 @@ setup(
         'click >= 5',
         'requests >= 2.7.0',
         'prompt_toolkit >= 0.53',
+        'pygments >= 2.0.0',
     ],
     keywords=['softlayer', 'cloud'],
     classifiers=[
@@ -49,8 +50,8 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],

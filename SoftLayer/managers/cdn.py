@@ -131,8 +131,8 @@ class CDNManager(utils.IdentifierMixin, object):
             urls = [urls]
 
         for i in range(0, len(urls), MAX_URLS_PER_PURGE):
-            result = self.account.purgeContent(urls[i:i + MAX_URLS_PER_PURGE],
-                                               id=account_id)
+            result = self.account.purgeCache(urls[i:i + MAX_URLS_PER_PURGE],
+                                             id=account_id)
             if not result:
                 return result
 

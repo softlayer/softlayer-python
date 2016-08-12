@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
 getPrivateBlockDeviceTemplateGroups = [{
     'accountId': 1234,
     'blockDevices': [],
@@ -5,15 +7,18 @@ getPrivateBlockDeviceTemplateGroups = [{
     'globalIdentifier': 'E6DBD73B-1651-4B28-BCBA-A11DF7C9D79E',
     'id': 200,
     'name': 'test_image',
-    'parentId': ''
+    'parentId': '',
+    'publicFlag': False,
 }, {
     'accountId': 1234,
     'blockDevices': [],
     'createDate': '2013-12-05T21:53:03-06:00',
     'globalIdentifier': 'F9329795-4220-4B0A-B970-C86B950667FA',
     'id': 201,
-    'name': 'private_image2',
-    'parentId': ''
+    # 'name': 'private_image2',
+    'name': u'a¬ሴ€耀',
+    'parentId': '',
+    'publicFlag': False,
 }]
 
 getVirtualGuests = [{
@@ -509,3 +514,23 @@ getNextInvoiceTotalAmount = 2
 
 getHubNetworkStorage = [{'id': 12345, 'username': 'SLOS12345-1'},
                         {'id': 12346, 'username': 'SLOS12345-2'}]
+
+getIscsiNetworkStorage = [{
+    'accountId': 1234,
+    'billingItem': {'id': 449},
+    'capacityGb': 20,
+    'createDate': '2015:50:15-04:00',
+    'guestId': '',
+    'hardwareId': '',
+    'hostId': '',
+    'id': 100,
+    'nasType': 'ISCSI',
+    'notes': """{'status': 'available'}""",
+    'password': '',
+    'serviceProviderId': 1,
+    'serviceResource': {'datacenter': {'id': 449500}},
+    'serviceResourceBackendIpAddress': '10.1.2.3',
+    'serviceResourceName': 'Storage Type 01 Aggregate staaspar0101_pc01',
+    'username': 'username',
+    'storageType': {'keyName': 'ENDURANCE_STORAGE'},
+}]

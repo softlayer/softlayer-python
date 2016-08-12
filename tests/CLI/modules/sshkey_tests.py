@@ -23,7 +23,7 @@ class SshKeyTests(testing.TestCase):
                                    '--key=%s' % mock_key,
                                    '--note=my key'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          "SSH key added: aa:bb:cc:dd")
         self.assert_called_with('SoftLayer_Security_Ssh_Key', 'createObject',
@@ -37,7 +37,7 @@ class SshKeyTests(testing.TestCase):
         result = self.run_command(['sshkey', 'add', 'key1',
                                    '--in-file=%s' % path])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          "SSH key added: aa:bb:cc:dd")
         service = self.client['Security_Ssh_Key']
@@ -50,7 +50,7 @@ class SshKeyTests(testing.TestCase):
     def test_remove_key(self):
         result = self.run_command(['--really', 'sshkey', 'remove', '1234'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Security_Ssh_Key', 'deleteObject',
                                 identifier=1234)
 
@@ -65,7 +65,7 @@ class SshKeyTests(testing.TestCase):
         result = self.run_command(['sshkey', 'edit', '1234',
                                    '--label=key1', '--note=my key'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Security_Ssh_Key', 'editObject',
                                 args=({'notes': 'my key',
                                        'label': 'key1'},),
@@ -83,7 +83,7 @@ class SshKeyTests(testing.TestCase):
     def test_list_keys(self):
         result = self.run_command(['sshkey', 'list'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          [{'notes': '-',
                            'fingerprint': None,
@@ -97,7 +97,7 @@ class SshKeyTests(testing.TestCase):
     def test_print_key(self):
         result = self.run_command(['sshkey', 'print', '1234'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          {'id': 1234, 'label': 'label', 'notes': 'notes'})
 
@@ -108,5 +108,5 @@ class SshKeyTests(testing.TestCase):
             result = self.run_command(['sshkey', 'print', '1234',
                                        '--out-file=%s' % sshkey_file.name])
 
-            self.assertEqual(result.exit_code, 0)
+            self.assert_no_fail(result)
             self.assertEqual(mock_key, sshkey_file.read().decode("utf-8"))
