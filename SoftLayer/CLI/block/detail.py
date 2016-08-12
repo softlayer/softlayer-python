@@ -51,9 +51,19 @@ def cli(env, volume_id):
             'Snapshot Capacity (GB)',
             block_volume['snapshotCapacityGb'],
         ])
-        table.add_row([
-            'Snapshot Used (Bytes)',
-            block_volume['parentVolume']['snapshotSizeBytes'],
-        ])
+        if 'snapshotSizeBytes' in block_volume['parentVolume']:
+            table.add_row([
+                'Snapshot Used (Bytes)',
+                block_volume['parentVolume']['snapshotSizeBytes'],
+            ])
+
+    table.add_row(['# of Active Transactions', "%i"
+                   % block_volume['activeTransactionCount']])
+
+    if block_volume['activeTransactions']:
+        for trans in block_volume['activeTransactions']:
+            table.add_row([
+                'Ongoing Transactions',
+                trans['transactionStatus']['friendlyName']])
 
     env.fout(table)

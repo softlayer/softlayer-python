@@ -1,6 +1,13 @@
 getObject = {
     'accountId': 1234,
-    'billingItem': {'id': 449},
+    'billingItem': {
+        'id': 449,
+        'categoryCode': 'storage_service_enterprise',
+        'activeChildren': [{
+            'categoryCode': 'storage_snapshot_space',
+            'id': 123
+        }]
+    },
     'capacityGb': 20,
     'createDate': '2015:50:15-04:00',
     'guestId': '',
@@ -12,7 +19,7 @@ getObject = {
     'password': '',
     'serviceProviderId': 1,
     'iops': 1000,
-    'storageTierLevel': {'description': 'Tier 1'},
+    'storageTierLevel': {'description': '2 IOPS per GB'},
     'snapshotCapacityGb': 10,
     'parentVolume': {'snapshotSizeBytes': 1024},
     'serviceResource': {'datacenter': {'id': 449500, 'name': 'dal05'}},
@@ -20,6 +27,9 @@ getObject = {
     'serviceResourceName': 'Storage Type 01 Aggregate staaspar0101_pc01',
     'username': 'username',
     'storageType': {'keyName': 'ENDURANCE_STORAGE'},
+    'bytesUsed': 0,
+    'activeTransactions': None,
+    'activeTransactionCount': 0,
     'allowedVirtualGuests': [{
         'id': 1234,
         'hostname': 'test-server',
@@ -61,7 +71,23 @@ getObject = {
         },
     }],
 }
-getSnapshots = []
+
+getSnapshots = [{
+    'id': 470,
+    'notes': 'unit_testing_note',
+    'snapshotCreationTimestamp': '2016-07-06T07:41:19-05:00',
+    'snapshotSizeBytes': '42',
+}]
+
 deleteObject = True
 allowAccessFromHostList = True
 removeAccessFromHostList = True
+
+restoreFromSnapshot = True
+
+createSnapshot = {
+    'id': 449
+}
+
+enableSnapshots = True
+disableSnapshots = True

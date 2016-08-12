@@ -1,4 +1,4 @@
-"""Cancel an existing iSCSI account."""
+"""Cancel a snapshot space subscription."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -14,26 +14,27 @@ from SoftLayer.CLI import formatting
 @click.option('--reason', help="An optional reason for cancellation")
 @click.option('--immediate',
               is_flag=True,
-              help="Cancels the block storage volume immediately instead "
+              help="Cancels the snapshot space immediately instead "
                    "of on the billing anniversary")
 @environment.pass_env
 def cli(env, volume_id, reason, immediate):
-    """Cancel an existing block storage volume."""
+    """Cancel existing snapshot space for a given volume."""
 
     block_storage_manager = SoftLayer.BlockStorageManager(env.client)
 
     if not (env.skip_confirmations or formatting.no_going_back(volume_id)):
         raise exceptions.CLIAbort('Aborted')
 
-    cancelled = block_storage_manager.cancel_block_volume(volume_id,
-                                                          reason, immediate)
+    cancelled = block_storage_manager.cancel_snapshot_space(
+        volume_id, reason, immediate)
 
     if cancelled:
         if immediate:
             click.echo('Block volume with id %s has been marked'
-                       ' for immediate cancellation' % volume_id)
+                       ' for immediate snapshot cancellation' % volume_id)
         else:
             click.echo('Block volume with id %s has been marked'
-                       ' for cancellation' % volume_id)
+                       ' for snapshot cancellation' % volume_id)
     else:
-        click.echo('Unable to cancel block volume %s' % volume_id)
+        click.echo('Unable to cancel snapshot space for block volume %s'
+                   % volume_id)

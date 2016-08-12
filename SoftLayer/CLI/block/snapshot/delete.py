@@ -1,4 +1,4 @@
-"""Create a block storage snapshot."""
+"""Delete a block storage snapshot."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -12,4 +12,7 @@ from SoftLayer.CLI import environment
 def cli(env, snapshot_id):
     """Deletes a snapshot on a given volume"""
     block_manager = SoftLayer.BlockStorageManager(env.client)
-    block_manager.delete_snapshot(snapshot_id)
+    deleted = block_manager.delete_snapshot(snapshot_id)
+
+    if deleted:
+        click.echo('Snapshot %s deleted' % snapshot_id)

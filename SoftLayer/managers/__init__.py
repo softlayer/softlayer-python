@@ -10,6 +10,7 @@
 from SoftLayer.managers.block import BlockStorageManager
 from SoftLayer.managers.cdn import CDNManager
 from SoftLayer.managers.dns import DNSManager
+from SoftLayer.managers.file import FileStorageManager
 from SoftLayer.managers.firewall import FirewallManager
 from SoftLayer.managers.hardware import HardwareManager
 from SoftLayer.managers.image import ImageManager
@@ -29,6 +30,7 @@ __all__ = [
     'BlockStorageManager',
     'CDNManager',
     'DNSManager',
+    'FileStorageManager',
     'FirewallManager',
     'HardwareManager',
     'ImageManager',

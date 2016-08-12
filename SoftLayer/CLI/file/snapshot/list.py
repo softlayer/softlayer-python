@@ -1,4 +1,4 @@
-"""List block storage snapshots."""
+"""List file storage snapshots."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -9,17 +9,12 @@ from SoftLayer.CLI import formatting
 
 
 COLUMNS = [
-    column_helper.Column(
-        'id',
-        ('snapshots', 'id',),
-        mask='snapshots.id'),
-    column_helper.Column('name', ('snapshots', 'notes',),
-                         mask='snapshots.notes'),
-    column_helper.Column('created',
-                         ('snapshots', 'snapshotCreationTimestamp',),
-                         mask='snapshots.snapshotCreationTimestamp'),
-    column_helper.Column('size_bytes', ('snapshots', 'snapshotSizeBytes',),
-                         mask='snapshots.snapshotSizeBytes'),
+    column_helper.Column('id', ('id',), mask='id'),
+    column_helper.Column('name', ('notes',), mask='notes'),
+    column_helper.Column('created', ('snapshotCreationTimestamp',),
+                         mask='snapshotCreationTimestamp'),
+    column_helper.Column('size_bytes', ('snapshotSizeBytes',),
+                         mask='snapshotSizeBytes'),
 ]
 
 DEFAULT_COLUMNS = [
@@ -40,12 +35,12 @@ DEFAULT_COLUMNS = [
                   ', '.join(column.name for column in COLUMNS)),
               default=','.join(DEFAULT_COLUMNS))
 @environment.pass_env
-def cli(env, sortby, columns, volume_id):
-    """List block storage snapshots."""
-    block_manager = SoftLayer.BlockStorageManager(env.client)
-    snapshots = block_manager.get_block_volume_snapshot_list(
-        volume_id=volume_id,
-        mask=columns.mask(),
+def cli(env, volume_id, sortby, columns):
+    """List file storage snapshots."""
+    file_manager = SoftLayer.FileStorageManager(env.client)
+    snapshots = file_manager.get_file_volume_snapshot_list(
+        volume_id,
+        mask=columns.mask()
     )
 
     table = formatting.Table(columns.columns)
