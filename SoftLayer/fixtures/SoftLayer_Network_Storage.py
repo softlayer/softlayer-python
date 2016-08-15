@@ -2,10 +2,12 @@ getObject = {
     'accountId': 1234,
     'billingItem': {
         'id': 449,
+        'cancellationDate': '',
         'categoryCode': 'storage_service_enterprise',
         'activeChildren': [{
             'categoryCode': 'storage_snapshot_space',
-            'id': 123
+            'id': 123,
+            'cancellationDate': '',
         }]
     },
     'capacityGb': 20,
@@ -20,8 +22,13 @@ getObject = {
     'serviceProviderId': 1,
     'iops': 1000,
     'storageTierLevel': {'description': '2 IOPS per GB'},
-    'snapshotCapacityGb': 10,
+    'snapshotCapacityGb': '10',
     'parentVolume': {'snapshotSizeBytes': 1024},
+    'osType': {'keyName': 'LINUX'},
+    'schedules': [{
+        'id': 978,
+        'type': {'keyname': 'SNAPSHOT_WEEKLY'},
+    }],
     'serviceResource': {'datacenter': {'id': 449500, 'name': 'dal05'}},
     'serviceResourceBackendIpAddress': '10.1.2.3',
     'serviceResourceName': 'Storage Type 01 Aggregate staaspar0101_pc01',
@@ -70,6 +77,21 @@ getObject = {
             'credential': {'username': 'joe', 'password': '12345'},
         },
     }],
+    'replicationStatus': 'Replicant Volume Provisioning has completed.',
+    'replicationPartnerCount': 1,
+    'replicationPartners': [{
+        'id': 1784,
+        'username': 'TEST_REP_1',
+        'serviceResourceBackendIpAddress': '10.3.174.79',
+        'serviceResource': {'datacenter': {'name': 'wdc01'}},
+        'replicationSchedule': {'type': {'keyname': 'REPLICATION_HOURLY'}},
+    }, {
+        'id': 1785,
+        'username': 'TEST_REP_2',
+        'serviceResourceBackendIpAddress': '10.3.177.84',
+        'serviceResource': {'datacenter': {'name': 'dal01'}},
+        'replicationSchedule': {'type': {'keyname': 'REPLICATION_DAILY'}},
+    }],
 }
 
 getSnapshots = [{
@@ -82,7 +104,8 @@ getSnapshots = [{
 deleteObject = True
 allowAccessFromHostList = True
 removeAccessFromHostList = True
-
+failoverToReplicant = True
+failbackFromReplicant = True
 restoreFromSnapshot = True
 
 createSnapshot = {

@@ -73,14 +73,28 @@ class BlockTests(testing.TestCase):
             'LUN Id': '2',
             'Endurance Tier': '2 IOPS per GB',
             'IOPs': 1000,
-            'Snapshot Capacity (GB)': 10,
+            'Snapshot Capacity (GB)': '10',
             'Snapshot Used (Bytes)': 1024,
             'Capacity (GB)': '20GB',
             'Target IP': '10.1.2.3',
             'Data Center': 'dal05',
             'Type': 'ENDURANCE',
             'ID': 100,
-            '# of Active Transactions': '0'
+            '# of Active Transactions': '0',
+            'Replicant Count': '1',
+            'Replication Status': 'Replicant Volume Provisioning '
+                                  'has completed.',
+            'Replicant Volumes': [[
+                {'Replicant ID': 'Volume Name', '1784': 'TEST_REP_1'},
+                {'Replicant ID': 'Target IP', '1784': '10.3.174.79'},
+                {'Replicant ID': 'Data Center', '1784': 'wdc01'},
+                {'Replicant ID': 'Schedule', '1784': 'REPLICATION_HOURLY'},
+            ], [
+                {'Replicant ID': 'Volume Name', '1785': 'TEST_REP_2'},
+                {'Replicant ID': 'Target IP', '1785': '10.3.177.84'},
+                {'Replicant ID': 'Data Center', '1785': 'dal01'},
+                {'Replicant ID': 'Schedule', '1785': 'REPLICATION_DAILY'},
+            ]]
         }, json.loads(result.output))
 
     def test_volume_list(self):
@@ -208,3 +222,62 @@ class BlockTests(testing.TestCase):
                                    '--ip-address=192.3.2.1'])
 
         self.assert_no_fail(result)
+
+    def test_replicant_failover(self):
+        result = self.run_command(['block', 'replica-failover', '12345678',
+                                   '--replicant-id=5678', '--immediate'])
+
+        self.assert_no_fail(result)
+        self.assertEqual('Failover to replicant is now in progress.\n',
+                         result.output)
+
+    def test_replicant_failback(self):
+        result = self.run_command(['block', 'replica-failback', '12345678',
+                                   '--replicant-id=5678'])
+
+        self.assert_no_fail(result)
+        self.assertEqual('Failback from replicant is now in progress.\n',
+                         result.output)
+
+    @mock.patch('SoftLayer.BlockStorageManager.order_replicant_volume')
+    def test_replicant_order_order_not_placed(self, order_mock):
+        order_mock.return_value = {}
+
+        result = self.run_command(['block', 'replica-order', '100',
+                                   '--snapshot-schedule=DAILY',
+                                   '--location=dal05'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.output,
+                         'Order could not be placed! Please verify '
+                         'your options and try again.\n')
+
+    @mock.patch('SoftLayer.BlockStorageManager.order_replicant_volume')
+    def test_replicant_order(self, order_mock):
+        order_mock.return_value = {
+            'placedOrder': {
+                'id': 91604,
+                'items': [
+                    {'description': 'Endurance Storage'},
+                    {'description': '2 IOPS per GB'},
+                    {'description': 'Block Storage'},
+                    {'description': '20 GB Storage Space'},
+                    {'description': '10 GB Storage Space (Snapshot Space)'},
+                    {'description': '20 GB Storage Space Replicant of: TEST'},
+                ],
+            }
+        }
+
+        result = self.run_command(['block', 'replica-order', '100',
+                                   '--snapshot-schedule=DAILY',
+                                   '--location=dal05', '--tier=2'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.output,
+                         'Order #91604 placed successfully!\n'
+                         ' > Endurance Storage\n'
+                         ' > 2 IOPS per GB\n'
+                         ' > Block Storage\n'
+                         ' > 20 GB Storage Space\n'
+                         ' > 10 GB Storage Space (Snapshot Space)\n'
+                         ' > 20 GB Storage Space Replicant of: TEST\n')
