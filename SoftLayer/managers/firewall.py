@@ -10,7 +10,7 @@ from SoftLayer import utils
 RULE_MASK = ('mask[orderValue,action,destinationIpAddress,'
              'destinationIpSubnetMask,protocol,destinationPortRangeStart,'
              'destinationPortRangeEnd,sourceIpAddress,sourceIpSubnetMask,'
-             'version]')
+             'version,notes]')
 
 
 def has_firewall(vlan):
