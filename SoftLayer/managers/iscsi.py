@@ -10,7 +10,14 @@ from SoftLayer import utils
 
 
 class ISCSIManager(utils.IdentifierMixin, object):
-    """Manages iSCSI storages."""
+    """Manages SoftLayer iSCSI storage accounts.
+
+    See product information here:
+    https://knowledgelayer.softlayer.com/topic/iscsi
+
+    :param SoftLayer.API.BaseClient client: the client instance
+
+    """
 
     def __init__(self, client):
         self.configuration = {}

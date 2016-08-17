@@ -17,13 +17,9 @@ from SoftLayer import utils
 
 
 class VSManager(utils.IdentifierMixin, object):
-    """Manages Virtual Servers.
+    """Manages SoftLayer Virtual Servers.
 
-    :param SoftLayer.API.Client client: an API client instance
-    :param SoftLayer.managers.OrderingManager ordering_manager: an optional
-                                              manager to handle ordering.
-                                              If none is provided, one will be
-                                              auto initialized.
+    See product information here: http://www.softlayer.com/virtual-servers
 
     Example::
 
@@ -35,6 +31,13 @@ class VSManager(utils.IdentifierMixin, object):
            import SoftLayer
            client = SoftLayer.Client()
            mgr = SoftLayer.VSManager(client)
+
+
+    :param SoftLayer.API.BaseClient client: the client instance
+    :param SoftLayer.managers.OrderingManager ordering_manager: an optional
+                                              manager to handle ordering.
+                                              If none is provided, one will be
+                                              auto initialized.
 
     """
 
