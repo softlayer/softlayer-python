@@ -27,8 +27,9 @@ COLUMNS = [
                          mask="serviceResourceBackendIpAddress"),
     column_helper.Column('active_transactions', ('activeTransactionCount',),
                          mask="activeTransactionCount"),
-    column_helper.Column('created_by',
-        ('billingItem', 'orderItem', 'order', 'userRecord', 'username')),
+    column_helper.Column(
+                         'created_by',
+                         ('billingItem', 'orderItem', 'order', 'userRecord', 'username')),
 ]
 
 DEFAULT_COLUMNS = [
