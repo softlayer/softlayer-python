@@ -28,6 +28,8 @@ COLUMNS = [
     column_helper.Column('lunId', ('lunId',), mask="lunId"),
     column_helper.Column('active_transactions', ('activeTransactionCount',),
                          mask="activeTransactionCount"),
+    column_helper.Column('created_by',
+        ('billingItem', 'orderItem', 'order', 'userRecord', 'username')),
 ]
 
 DEFAULT_COLUMNS = [
