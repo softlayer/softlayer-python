@@ -437,7 +437,8 @@ regions[location[location[priceGroups]]]
         prices = []
         for category in ['pri_ip_addresses',
                          'vpn_management',
-                         'remote_management']:
+                         'remote_management',
+                         'other']:
             prices.append(_get_default_price_id(package['items'],
                                                 option=category,
                                                 hourly=hourly,

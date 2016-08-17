@@ -205,6 +205,7 @@ class HardwareTests(testing.TestCase):
             'prices': [{'id': 21},
                        {'id': 420},
                        {'id': 906},
+                       {'id': 178117},
                        {'id': 37650},
                        {'id': 1800},
                        {'id': 272},
