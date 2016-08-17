@@ -26,3 +26,5 @@ def cli(env, volume_id, replicant_id, immediate):
 
     if success:
         click.echo("Failover to replicant is now in progress.")
+    else:
+        click.echo("Failover operation could not be initiated.")

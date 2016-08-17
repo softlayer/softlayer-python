@@ -464,8 +464,7 @@ class BlockTests(testing.TestCase):
             100,
             'WEEKLY',
             'moon_center',
-            None,
-            'LINUX',
+            os_type='LINUX',
         )
 
     def test_order_block_replicant_invalid_storage_type(self):
@@ -484,8 +483,7 @@ class BlockTests(testing.TestCase):
             100,
             'WEEKLY',
             'dal05',
-            None,
-            'LINUX',
+            os_type='LINUX',
         )
 
     def test_order_block_replicant_no_snapshot_space(self):
@@ -504,8 +502,7 @@ class BlockTests(testing.TestCase):
             100,
             'WEEKLY',
             'dal05',
-            None,
-            'LINUX',
+            os_type='LINUX',
         )
 
     def test_order_block_replicant_primary_volume_cancelled(self):
@@ -530,8 +527,7 @@ class BlockTests(testing.TestCase):
             100,
             'WEEKLY',
             'dal05',
-            None,
-            'LINUX',
+            os_type='LINUX',
         )
 
     def test_order_block_replicant_snapshot_space_cancelled(self):
@@ -560,8 +556,7 @@ class BlockTests(testing.TestCase):
             100,
             'WEEKLY',
             'dal05',
-            None,
-            'LINUX',
+            os_type='LINUX',
         )
 
     def test_order_block_replicant_os_type_not_found(self):
@@ -575,8 +570,7 @@ class BlockTests(testing.TestCase):
             100,
             'WEEKLY',
             'dal05',
-            '2',
-            None,
+            tier='2',
         )
 
     def test_order_block_replicant(self):
@@ -680,8 +674,6 @@ class BlockTests(testing.TestCase):
             100,
             'WEEKLY',
             'dal05',
-            None,
-            None,
             )
 
         self.assertEqual(

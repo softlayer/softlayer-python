@@ -194,7 +194,7 @@ class FileStorageManager(utils.IdentifierMixin, object):
                                 host_templates, id=volume_id, **kwargs)
 
     def order_replicant_volume(self, volume_id, snapshot_schedule,
-                               location, tier):
+                               location, tier=None):
         """Places an order for a replicant file volume.
 
         :param volume_id: The ID of the primary volume to be replicated

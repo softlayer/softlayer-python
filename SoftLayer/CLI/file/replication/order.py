@@ -7,7 +7,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 
 
-CONTEXT_SETTINGS = dict(token_normalize_func=lambda x: x.upper())
+CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 
 
 @click.command(context_settings=CONTEXT_SETTINGS)

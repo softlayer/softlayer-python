@@ -191,7 +191,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                                 host_templates, id=volume_id, **kwargs)
 
     def order_replicant_volume(self, volume_id, snapshot_schedule,
-                               location, tier, os_type):
+                               location, tier=None, os_type=None):
         """Places an order for a replicant block volume.
 
         :param volume_id: The ID of the primary volume to be replicated
@@ -210,9 +210,8 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                                                      mask=block_mask)
 
         if os_type is None:
-            if 'osType' in block_volume\
-                    and 'keyName' in block_volume['osType']\
-                    and isinstance(block_volume['osType']['keyName'], str):
+            if isinstance(utils.lookup(block_volume, 'osType', 'keyName'),
+                          str):
                 os_type = block_volume['osType']['keyName']
             else:
                 raise exceptions.SoftLayerError(

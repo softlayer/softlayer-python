@@ -465,7 +465,6 @@ class FileTests(testing.TestCase):
             100,
             'WEEKLY',
             'moon_center',
-            None,
         )
 
     def test_order_file_replicant_invalid_storage_type(self):
@@ -484,7 +483,6 @@ class FileTests(testing.TestCase):
             100,
             'WEEKLY',
             'dal05',
-            None,
         )
 
     def test_order_file_replicant_no_snapshot_space(self):
@@ -503,7 +501,6 @@ class FileTests(testing.TestCase):
             100,
             'WEEKLY',
             'dal05',
-            None,
         )
 
     def test_order_file_replicant_primary_volume_cancelled(self):
@@ -528,7 +525,6 @@ class FileTests(testing.TestCase):
             100,
             'WEEKLY',
             'dal05',
-            None,
         )
 
     def test_order_file_replicant_snapshot_space_cancelled(self):
@@ -557,7 +553,6 @@ class FileTests(testing.TestCase):
             100,
             'WEEKLY',
             'dal05',
-            None,
         )
 
     def test_order_file_replicant(self):
@@ -661,7 +656,6 @@ class FileTests(testing.TestCase):
             100,
             'WEEKLY',
             'dal05',
-            None,
             )
 
         self.assertEqual(
