@@ -182,43 +182,42 @@ class HardwareManager(utils.IdentifierMixin, object):
         """
 
         if 'mask' not in kwargs:
-            items = [
-                'id',
-                'globalIdentifier',
-                'fullyQualifiedDomainName',
-                'hostname',
-                'domain',
-                'provisionDate',
-                'hardwareStatus',
-                'processorPhysicalCoreAmount',
-                'memoryCapacity',
-                'notes',
-                'privateNetworkOnlyFlag',
-                'primaryBackendIpAddress',
-                'primaryIpAddress',
-                'networkManagementIpAddress',
-                'userData',
-                'datacenter',
+            kwargs['mask'] =  (
+                'id,'
+                'globalIdentifier,'
+                'fullyQualifiedDomainName,'
+                'hostname,'
+                'domain,'
+                'provisionDate,'
+                'hardwareStatus,'
+                'processorPhysicalCoreAmount,'
+                'memoryCapacity,'
+                'notes,'
+                'privateNetworkOnlyFlag,'
+                'primaryBackendIpAddress,'
+                'primaryIpAddress,'
+                'networkManagementIpAddress,'
+                'userData,'
+                'datacenter,'
                 '''networkComponents[id, status, speed, maxSpeed, name,
                    ipmiMacAddress, ipmiIpAddress, macAddress, primaryIpAddress,
                    port, primarySubnet[id, netmask, broadcastAddress,
-                                       networkIdentifier, gateway]]''',
-                'hardwareChassis[id,name]',
-                'activeTransaction[id, transactionStatus[friendlyName,name]]',
+                                       networkIdentifier, gateway]],'''
+                'hardwareChassis[id,name],'
+                'activeTransaction[id, transactionStatus[friendlyName,name]],'
                 '''operatingSystem[
                     softwareLicense[softwareDescription[manufacturer,
                                                         name,
                                                         version,
                                                         referenceCode]],
-                    passwords[username,password]]''',
-                'billingItem.nextInvoiceTotalRecurringAmount',
-                'hourlyBillingFlag',
-                'tagReferences[id,tag[name,id]]',
-                'networkVlans[id,vlanNumber,networkSpace]',
-                'billingItem.orderItem.order.userRecord[username]',
-                'remoteManagementAccounts[username,password]',
-            ]
-            kwargs['mask'] = "mask[%s]" % ','.join(items)
+                    passwords[username,password]],'''
+                'billingItem.nextInvoiceTotalRecurringAmount,'
+                'hourlyBillingFlag,'
+                'tagReferences[id,tag[name,id]],'
+                'networkVlans[id,vlanNumber,networkSpace],'
+                'billingItem.orderItem.order.userRecord[username],'
+                'remoteManagementAccounts[username,password]'
+            )
 
         return self.hardware.getObject(id=hardware_id, **kwargs)
 

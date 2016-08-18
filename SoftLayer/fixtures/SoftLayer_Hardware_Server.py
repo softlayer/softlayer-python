@@ -31,8 +31,9 @@ getObject = {
     'operatingSystem': {
         'softwareLicense': {
             'softwareDescription': {
-                'referenceCode': 'Ubuntu',
-                'name': 'Ubuntu 12.04 LTS',
+                'referenceCode': 'UBUNTU_12_64',
+                'name': 'Ubuntu',
+                'version': 'Ubuntu 12.04 LTS',
             }
         },
         'passwords': [

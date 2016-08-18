@@ -49,12 +49,7 @@ def cli(env, identifier, passwords=False, price=False):
                                     'operatingSystem',
                                     'softwareLicense',
                                     'softwareDescription') or {}
-    table.add_row([
-        'os',
-        formatting.FormattedItem(
-            operating_system.get('version') or formatting.blank(),
-            operating_system.get('name') or formatting.blank()
-        )])
+    table.add_row(['os', operating_system.get('name') or formatting.blank()])
     table.add_row(['os_version',
                    operating_system.get('version') or formatting.blank()])
     table.add_row(['cores', result['maxCpu']])

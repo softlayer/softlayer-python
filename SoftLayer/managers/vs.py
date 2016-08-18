@@ -172,49 +172,50 @@ class VSManager(utils.IdentifierMixin, object):
         """
 
         if 'mask' not in kwargs:
-            items = [
-                'id',
-                'globalIdentifier',
-                'fullyQualifiedDomainName',
-                'hostname',
-                'domain',
-                'createDate',
-                'modifyDate',
-                'provisionDate',
-                'notes',
-                'dedicatedAccountHostOnlyFlag',
-                'privateNetworkOnlyFlag',
-                'primaryBackendIpAddress',
-                'primaryIpAddress',
+            kwargs['mask'] = (
+                'id,'
+                'globalIdentifier,'
+                'fullyQualifiedDomainName,'
+                'hostname,'
+                'domain,'
+                'createDate,'
+                'modifyDate,'
+                'provisionDate,'
+                'notes,'
+                'dedicatedAccountHostOnlyFlag,'
+                'privateNetworkOnlyFlag,'
+                'primaryBackendIpAddress,'
+                'primaryIpAddress,'
                 '''networkComponents[id, status, speed, maxSpeed, name,
                                      macAddress, primaryIpAddress, port,
-                                     primarySubnet]''',
-                'lastKnownPowerState.name',
-                'powerState',
-                'status',
-                'maxCpu',
-                'maxMemory',
-                'datacenter',
-                'activeTransaction[id, transactionStatus[friendlyName,name]]',
-                'lastOperatingSystemReload.id',
-                'blockDevices',
-                'blockDeviceTemplateGroup[id, name, globalIdentifier]',
-                'postInstallScriptUri',
-                '''softwareComponents[
-                    passwords[username,password,notes],
-                    softwareLicense[softwareDescription[name]]]''',
+                                     primarySubnet],'''
+                'lastKnownPowerState.name,'
+                'powerState,'
+                'status,'
+                'maxCpu,'
+                'maxMemory,'
+                'datacenter,'
+                'activeTransaction[id, transactionStatus[friendlyName,name]],'
+                'lastOperatingSystemReload.id,'
+                'blockDevices,'
+                'blockDeviceTemplateGroup[id, name, globalIdentifier],'
+                'postInstallScriptUri,'
                 '''operatingSystem[passwords[username,password],
                                    softwareLicense.softwareDescription[
                                        manufacturer,name,version,
-                                       referenceCode]]''',
-                'hourlyBillingFlag',
-                'userData',
-                'billingItem.recurringFee',
-                'tagReferences[id,tag[name,id]]',
-                'networkVlans[id,vlanNumber,networkSpace]',
+                                       referenceCode]],'''
+                '''softwareComponents[
+                    passwords[username,password,notes],
+                    softwareLicense[softwareDescription[
+                                        manufacturer,name,version,
+                                        referenceCode]]],'''
+                'hourlyBillingFlag,'
+                'userData,'
+                'billingItem.recurringFee,'
+                'tagReferences[id,tag[name,id]],'
+                'networkVlans[id,vlanNumber,networkSpace],'
                 'billingItem.orderItem.order.userRecord[username]'
-            ]
-            kwargs['mask'] = "mask[%s]" % ','.join(items)
+            )
 
         return self.guest.getObject(id=instance_id, **kwargs)
 
