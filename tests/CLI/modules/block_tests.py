@@ -101,18 +101,97 @@ class BlockTests(testing.TestCase):
             }],
             json.loads(result.output))
 
+    def test_volume_order_performance_iops_not_given(self):
+        result = self.run_command(['block', 'volume-order',
+                                   '--storage-type=performance', '--size=20',
+                                   '--os-type=linux', '--location=dal05'])
+
+        self.assertEqual(2, result.exit_code)
+
+    def test_volume_order_performance_iops_out_of_range(self):
+        result = self.run_command(['block', 'volume-order',
+                                   '--storage-type=performance', '--size=20',
+                                   '--iops=80000', '--os-type=linux',
+                                   '--location=dal05'])
+
+        self.assertEqual(2, result.exit_code)
+
+    def test_volume_order_performance_iops_not_multiple_of_100(self):
+        result = self.run_command(['block', 'volume-order',
+                                   '--storage-type=performance', '--size=20',
+                                   '--iops=122', '--os-type=linux',
+                                   '--location=dal05'])
+
+        self.assertEqual(2, result.exit_code)
+
+    def test_volume_order_performance_snapshot_error(self):
+        result = self.run_command(['block', 'volume-order',
+                                   '--storage-type=performance', '--size=20',
+                                   '--iops=100', '--os-type=linux',
+                                   '--location=dal05', '--snapshot-size=10'])
+
+        self.assertEqual(2, result.exit_code)
+
     @mock.patch('SoftLayer.BlockStorageManager.order_block_volume')
-    def test_volume_order(self, order_mock):
+    def test_volume_order_performance(self, order_mock):
         order_mock.return_value = {
             'placedOrder': {
                 'id': 478,
-                'items': [{'description': 'Endurance Storage'},
-                          {'description': 'Block Storage'},
-                          {'description': '0.25 IOPS per GB'},
-                          {'description': '20 GB Storage Space'},
-                          ]
+                'items': [
+                    {'description': 'Performance Storage'},
+                    {'description': 'Block Storage'},
+                    {'description': '0.25 IOPS per GB'},
+                    {'description': '20 GB Storage Space'}]
+            }
+        }
+
+        result = self.run_command(['block', 'volume-order',
+                                   '--storage-type=performance', '--size=20',
+                                   '--iops=100', '--os-type=linux',
+                                   '--location=dal05'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.output,
+                         'Order #478 placed successfully!\n'
+                         ' > Performance Storage\n > Block Storage\n'
+                         ' > 0.25 IOPS per GB\n > 20 GB Storage Space\n')
+
+    def test_volume_order_endurance_tier_not_given(self):
+        result = self.run_command(['block', 'volume-order',
+                                   '--storage-type=endurance', '--size=20',
+                                   '--os-type=linux', '--location=dal05'])
+
+        self.assertEqual(2, result.exit_code)
+
+    @mock.patch('SoftLayer.BlockStorageManager.order_block_volume')
+    def test_volume_order_endurance(self, order_mock):
+        order_mock.return_value = {
+            'placedOrder': {
+                'id': 478,
+                'items': [
+                    {'description': 'Endurance Storage'},
+                    {'description': 'Block Storage'},
+                    {'description': '0.25 IOPS per GB'},
+                    {'description': '20 GB Storage Space'},
+                    {'description': '10 GB Storage Space (Snapshot Space)'}]
                 }
         }
+
+        result = self.run_command(['block', 'volume-order',
+                                   '--storage-type=endurance', '--size=20',
+                                   '--tier=0.25', '--os-type=linux',
+                                   '--location=dal05', '--snapshot-size=10'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.output,
+                         'Order #478 placed successfully!\n'
+                         ' > Endurance Storage\n > Block Storage\n'
+                         ' > 0.25 IOPS per GB\n > 20 GB Storage Space\n'
+                         ' > 10 GB Storage Space (Snapshot Space)\n')
+
+    @mock.patch('SoftLayer.BlockStorageManager.order_block_volume')
+    def test_volume_order_order_not_placed(self, order_mock):
+        order_mock.return_value = {}
 
         result = self.run_command(['block', 'volume-order',
                                    '--storage-type=endurance', '--size=20',
@@ -121,9 +200,8 @@ class BlockTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assertEqual(result.output,
-                         'Order #478 placed successfully!\n'
-                         ' > Endurance Storage\n > Block Storage\n'
-                         ' > 0.25 IOPS per GB\n > 20 GB Storage Space\n')
+                         'Order could not be placed! Please verify '
+                         'your options and try again.\n')
 
     def test_enable_snapshots(self):
         result = self.run_command(['block', 'snapshot-enable', '12345678',

@@ -193,7 +193,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                                 id=snapshot_id)
 
     def order_block_volume(self, storage_type, location, size, os_type,
-                           iops=None, tier_level=None):
+                           iops=None, tier_level=None, snapshot_size=None):
         """Places an order for a block volume.
 
         :param storage_type: "performance_storage_iscsi" (performance)
@@ -203,6 +203,8 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         :param os_type: OS Type to use for volume alignment, see help for list
         :param iops: Number of IOPs for a "Performance" order
         :param tier_level: Tier level to use for an "Endurance" order
+        :param snapshot_size: The size of optional snapshot space,
+        if snapshot space should also be ordered (None if not ordered)
         """
 
         try:
@@ -239,6 +241,9 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                     ),
                 storage_utils.find_endurance_tier_price(package, tier_level),
             ]
+            if snapshot_size is not None:
+                prices.append(storage_utils.find_snapshot_space_price(
+                    package, snapshot_size, tier_level))
         else:
             raise exceptions.SoftLayerError(
                 "Block volume storage_type must be either "

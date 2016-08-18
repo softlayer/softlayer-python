@@ -222,7 +222,7 @@ class FileTests(testing.TestCase):
             "dal05",
             100,
             "LINUX",
-            iops=100
+            iops=100,
             )
 
         self.assertEqual(
@@ -306,7 +306,95 @@ class FileTests(testing.TestCase):
             "dal05",
             100,
             "LINUX",
-            tier_level=0.25
+            tier_level=0.25,
+            )
+
+        self.assertEqual(
+            result,
+            {
+                'orderDate': '2013-08-01 15:23:45',
+                'orderId': 1234,
+                'prices': [{
+                    'hourlyRecurringFee': '2',
+                    'id': 1,
+                    'item': {'description': 'this is a thing', 'id': 1},
+                    'laborFee': '2',
+                    'oneTimeFee': '2',
+                    'oneTimeFeeTax': '.1',
+                    'quantity': 1,
+                    'recurringFee': '2',
+                    'recurringFeeTax': '.1',
+                    'setupFee': '1'}],
+                },
+            )
+
+    def test_order_file_volume_endurance_with_snapshot(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [{
+            'id': 1,
+            'name': 'Endurance',
+            'items': [{
+                'capacity': '1',
+                'prices': [{
+                    'id': 1,
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'storage_file',
+                    }],
+                }],
+            }, {
+                'capacity': '1',
+                'prices': [{
+                    'id': 2,
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'storage_service_enterprise',
+                    }],
+                }],
+            }, {
+                'capacity': '100',
+                'prices': [{
+                    'id': 3,
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'performance_storage_space',
+                    }],
+                    'capacityRestrictionMinimum': '100',
+                    'capacityRestrictionMaximum': '100',
+                }],
+            }, {
+                'capacity': '100',
+                'attributes': [{
+                    'value': '100',
+                }],
+                'prices': [{
+                    'id': 4,
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'storage_tier_level',
+                    }],
+                }],
+            }, {
+                'capacity': '10',
+                'prices': [{
+                    'id': 5,
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'storage_snapshot_space',
+                    }],
+                    'capacityRestrictionMinimum': '100',
+                    'capacityRestrictionMaximum': '100',
+                }],
+            }],
+        }]
+
+        result = self.file.order_file_volume(
+            "storage_service_enterprise",
+            "dal05",
+            100,
+            "LINUX",
+            tier_level=0.25,
+            snapshot_size=10,
             )
 
         self.assertEqual(
