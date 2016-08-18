@@ -182,7 +182,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         """
 
         if 'mask' not in kwargs:
-            kwargs['mask'] =  (
+            kwargs['mask'] = (
                 'id,'
                 'globalIdentifier,'
                 'fullyQualifiedDomainName,'
