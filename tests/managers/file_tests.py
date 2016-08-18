@@ -6,6 +6,7 @@
 """
 
 import SoftLayer
+from SoftLayer import exceptions
 from SoftLayer import fixtures
 from SoftLayer import testing
 
@@ -139,6 +140,30 @@ class FileTests(testing.TestCase):
             'cancelItem',
             args=(True, True, 'No longer needed'),
             identifier=123,
+        )
+
+    def test_replicant_failover(self):
+        result = self.file.failover_to_replicant(1234, 5678, immediate=True)
+
+        self.assertEqual(
+            fixtures.SoftLayer_Network_Storage.failoverToReplicant, result)
+        self.assert_called_with(
+            'SoftLayer_Network_Storage',
+            'failoverToReplicant',
+            args=(5678, True),
+            identifier=1234,
+        )
+
+    def test_replicant_failback(self):
+        result = self.file.failback_from_replicant(1234, 5678)
+
+        self.assertEqual(
+            fixtures.SoftLayer_Network_Storage.failbackFromReplicant, result)
+        self.assert_called_with(
+            'SoftLayer_Network_Storage',
+            'failbackFromReplicant',
+            args=(5678,),
+            identifier=1234,
         )
 
     def test_delete_snapshot(self):
@@ -500,6 +525,225 @@ class FileTests(testing.TestCase):
             5,
             None,
             False,
+            )
+
+        self.assertEqual(
+            result,
+            {
+                'orderId': 1234,
+                'orderDate': '2013-08-01 15:23:45',
+                'prices': [{
+                    'hourlyRecurringFee': '2',
+                    'id': 1,
+                    'item': {'description': 'this is a thing', 'id': 1},
+                    'laborFee': '2',
+                    'oneTimeFee': '2',
+                    'oneTimeFeeTax': '.1',
+                    'quantity': 1,
+                    'recurringFee': '2',
+                    'recurringFeeTax': '.1',
+                    'setupFee': '1'}],
+                },
+            )
+
+    def test_order_file_replicant_invalid_location(self):
+        self.assertRaises(
+            exceptions.SoftLayerError,
+            self.file.order_replicant_volume,
+            100,
+            'WEEKLY',
+            'moon_center',
+        )
+
+    def test_order_file_replicant_invalid_storage_type(self):
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+
+        mock.return_value = {
+            'capacityGb': 20,
+            'billingItem': {
+                'categoryCode': 'not_the_storage_you_are_looking_for'
+            }
+        }
+
+        self.assertRaises(
+            exceptions.SoftLayerError,
+            self.file.order_replicant_volume,
+            100,
+            'WEEKLY',
+            'dal05',
+        )
+
+    def test_order_file_replicant_no_snapshot_space(self):
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+
+        mock.return_value = {
+            'capacityGb': 20,
+            'billingItem': {
+                'categoryCode': 'storage_service_enterprise'
+            }
+        }
+
+        self.assertRaises(
+            exceptions.SoftLayerError,
+            self.file.order_replicant_volume,
+            100,
+            'WEEKLY',
+            'dal05',
+        )
+
+    def test_order_file_replicant_primary_volume_cancelled(self):
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+
+        mock.return_value = {
+            'capacityGb': 20,
+            'snapshotCapacityGb': '10',
+            'schedules': [{
+                'id': 7770,
+                'type': {'keyname': 'SNAPSHOT_WEEKLY'}
+            }],
+            'billingItem': {
+                'categoryCode': 'storage_service_enterprise',
+                'cancellationDate': '2016-09-04T22:00:00-07:00'
+            }
+        }
+
+        self.assertRaises(
+            exceptions.SoftLayerError,
+            self.file.order_replicant_volume,
+            100,
+            'WEEKLY',
+            'dal05',
+        )
+
+    def test_order_file_replicant_snapshot_space_cancelled(self):
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+
+        mock.return_value = {
+            'capacityGb': 20,
+            'snapshotCapacityGb': '10',
+            'schedules': [{
+                'id': 7770,
+                'type': {'keyname': 'SNAPSHOT_WEEKLY'}
+            }],
+            'billingItem': {
+                'categoryCode': 'storage_service_enterprise',
+                'cancellationDate': '',
+                'activeChildren': [{
+                    'categoryCode': 'storage_snapshot_space',
+                    'cancellationDate': '2016-09-04T22:00:00-07:00'
+                }]
+            }
+        }
+
+        self.assertRaises(
+            exceptions.SoftLayerError,
+            self.file.order_replicant_volume,
+            100,
+            'WEEKLY',
+            'dal05',
+        )
+
+    def test_order_file_replicant(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [{
+            'id': 240,
+            'name': 'Endurance',
+            'items': [{
+                'capacity': '0',
+                'attributes': [{
+                    'value': '42',
+                }],
+                'prices': [{
+                    'locationGroupId': '530',
+                }],
+            }, {
+                'capacity': '10',
+                'attributes': [{
+                    'value': '200',
+                }],
+                'prices': [{
+                    'locationGroupId': '530',
+                }, {
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'storage_service_enterprise',
+                    }],
+                }, {
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'storage_tier_level',
+                    }],
+                }, {
+                    'id': 46130,
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'storage_snapshot_space',
+                    }],
+                    'capacityRestrictionMinimum': '200',
+                    'capacityRestrictionMaximum': '200',
+                }],
+            }, {
+                'capacity': '20',
+                'prices': [{
+                    'locationGroupId': '530',
+                }, {
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'storage_file',
+                    }],
+                }, {
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'storage_service_enterprise',
+                    }],
+                }, {
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'performance_storage_space',
+                    }],
+                    'capacityRestrictionMinimum': '742',
+                }, {
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'performance_storage_space',
+                    }],
+                    'capacityRestrictionMinimum': '42',
+                    'capacityRestrictionMaximum': '42',
+                }, {
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'performance_storage_space',
+                    }],
+                    'capacityRestrictionMinimum': '200',
+                    'capacityRestrictionMaximum': '200',
+                }, {
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'performance_storage_replication',
+                    }],
+                    'capacityRestrictionMinimum': '742',
+                }, {
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'performance_storage_replication',
+                    }],
+                    'capacityRestrictionMinimum': '42',
+                    'capacityRestrictionMaximum': '42',
+                }, {
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'performance_storage_replication',
+                    }],
+                    'capacityRestrictionMinimum': '200',
+                    'capacityRestrictionMaximum': '200',
+                }],
+            }],
+        }]
+
+        result = self.file.order_replicant_volume(
+            100,
+            'WEEKLY',
+            'dal05',
             )
 
         self.assertEqual(

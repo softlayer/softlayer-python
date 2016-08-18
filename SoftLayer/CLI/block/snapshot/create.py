@@ -16,5 +16,9 @@ def cli(env, volume_id, notes):
     block_manager = SoftLayer.BlockStorageManager(env.client)
     snapshot = block_manager.create_snapshot(volume_id, notes=notes)
 
-    if snapshot['id']:
+    if 'id' in snapshot:
         click.echo('New snapshot created with id: %s' % snapshot['id'])
+    else:
+        click.echo('Error occurred while creating snapshot.\n'
+                   'Ensure volume is not failed over or in another '
+                   'state which prevents taking snapshots.')

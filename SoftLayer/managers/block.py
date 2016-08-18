@@ -46,7 +46,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
             (utils.query_filter('!~ ISCSI'))
 
         _filter['iscsiNetworkStorage']['storageType']['keyName'] = (
-            utils.query_filter('*BLOCK_STORAGE'))
+            utils.query_filter('*BLOCK_STORAGE*'))
         if storage_type:
             _filter['iscsiNetworkStorage']['storageType']['keyName'] = (
                 utils.query_filter('%s_BLOCK_STORAGE' % storage_type.upper()))
@@ -86,6 +86,12 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 'lunId',
                 'activeTransactionCount',
                 'activeTransactions.transactionStatus[friendlyName]',
+                'replicationPartnerCount',
+                'replicationStatus',
+                'replicationPartners[id,username,'
+                'serviceResourceBackendIpAddress,'
+                'serviceResource[datacenter[name]],'
+                'replicationSchedule[type[keyname]]]',
             ]
             kwargs['mask'] = ','.join(items)
         return self.client.call('Network_Storage', 'getObject',
@@ -183,6 +189,43 @@ class BlockStorageManager(utils.IdentifierMixin, object):
 
         return self.client.call('Network_Storage', 'removeAccessFromHostList',
                                 host_templates, id=volume_id, **kwargs)
+
+    def order_replicant_volume(self, volume_id, snapshot_schedule,
+                               location, tier=None, os_type=None):
+        """Places an order for a replicant block volume.
+
+        :param volume_id: The ID of the primary volume to be replicated
+        :param snapshot_schedule: The primary volume's snapshot
+                                  schedule to use for replication
+        :param location: The location for the ordered replicant volume
+        :param tier: The tier (IOPS per GB) of the primary volume
+        :param os_type: The OS type of the primary volume
+        :return: Returns a SoftLayer_Container_Product_Order_Receipt
+        """
+
+        block_mask = 'billingItem[activeChildren],storageTierLevel,'\
+                     'osType,snapshotCapacityGb,schedules,'\
+                     'hourlySchedule,dailySchedule,weeklySchedule'
+        block_volume = self.get_block_volume_details(volume_id,
+                                                     mask=block_mask)
+
+        if os_type is None:
+            if isinstance(utils.lookup(block_volume, 'osType', 'keyName'),
+                          str):
+                os_type = block_volume['osType']['keyName']
+            else:
+                raise exceptions.SoftLayerError(
+                    "Cannot find primary volume's os-type "
+                    "automatically; must specify manually")
+
+        order = storage_utils.prepare_replicant_order_object(
+            self, volume_id, snapshot_schedule, location, tier,
+            block_volume, 'block'
+        )
+
+        order['osFormatType'] = {'keyName': os_type}
+
+        return self.client.call('Product_Order', 'placeOrder', order)
 
     def delete_snapshot(self, snapshot_id):
         """Deletes the specified snapshot object.
@@ -418,3 +461,26 @@ class BlockStorageManager(utils.IdentifierMixin, object):
             True,
             reason,
             id=billing_item_id)
+
+    def failover_to_replicant(self, volume_id, replicant_id, immediate=False):
+        """Failover to a volume replicant.
+
+        :param integer volume_id: The id of the volume
+        :param integer replicant_id: ID of replicant to failover to
+        :param boolean immediate: Flag indicating if failover is immediate
+        :return: Returns whether failover was successful or not
+        """
+
+        return self.client.call('Network_Storage', 'failoverToReplicant',
+                                replicant_id, immediate, id=volume_id)
+
+    def failback_from_replicant(self, volume_id, replicant_id):
+        """Failback from a volume replicant.
+
+        :param integer volume_id: The id of the volume
+        :param integer: ID of replicant to failback from
+        :return: Returns whether failback was successful or not
+        """
+
+        return self.client.call('Network_Storage', 'failbackFromReplicant',
+                                replicant_id, id=volume_id)

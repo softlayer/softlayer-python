@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+from SoftLayer import exceptions
 from SoftLayer import utils
 
 
@@ -282,6 +283,39 @@ def find_performance_iops_price(package, size, iops):
     raise ValueError("Could not find price for iops for the given volume")
 
 
+def find_replication_price(package, capacity, tier_level):
+    """Find the price in the given package for the desired replicant volume
+
+    :param package: The product package of the endurance storage type
+    :param capacity: The capacity of the primary storage volume
+    :param tier_level: The tier of the primary storage volume
+    :return: Returns the price for the given size, or an error if not found
+    """
+    for item in package['items']:
+        if int(item['capacity']) != capacity:
+            continue
+
+        for price in item['prices']:
+            # Only collect prices from valid location groups.
+            if price['locationGroupId'] != '':
+                continue
+
+            if not _has_category(price['categories'],
+                                 'performance_storage_replication'):
+                continue
+
+            level = ENDURANCE_TIERS.get(tier_level)
+            if level < int(price['capacityRestrictionMinimum']):
+                continue
+
+            if level > int(price['capacityRestrictionMaximum']):
+                continue
+
+            return price
+
+    raise ValueError("Could not find price for replicant volume")
+
+
 def find_snapshot_space_price(package, size, tier_level):
     """Find the price in the given package for the desired snapshot space size
 
@@ -313,6 +347,102 @@ def find_snapshot_space_price(package, size, tier_level):
             return price
 
     raise ValueError("Could not find price for snapshot space")
+
+
+def find_snapshot_schedule_id(volume, snapshot_schedule_keyname):
+    """Find the snapshot schedule ID for the given volume and keyname
+
+    :param volume: The volume for which the snapshot ID is desired
+    :param snapshot_schedule_keyname: The keyname of the snapshot schedule
+    :return: Returns an int value indicating the volume's snapshot schedule ID
+    """
+    for schedule in volume['schedules']:
+        if 'type' in schedule and 'keyname' in schedule['type']:
+            if schedule['type']['keyname'] == snapshot_schedule_keyname:
+                return schedule['id']
+
+    raise ValueError("The given snapshot schedule ID was not found for "
+                     "the given storage volume")
+
+
+def prepare_replicant_order_object(manager, volume_id, snapshot_schedule,
+                                   location, tier, volume, volume_type):
+    """Prepare the order object which is submitted to the placeOrder() method
+
+    :param manager: The File or Block manager calling this function
+    :param volume_id: The ID of the primary volume to be replicated
+    :param snapshot_schedule: The primary volume's snapshot
+                              schedule to use for replication
+    :param location: The location for the ordered replicant volume
+    :param tier: The tier (IOPS per GB) of the primary volume
+    :param volume: The primary volume as a SoftLayer_Network_Storage object
+    :param volume_type: The type of the primary volume ('file' or 'block')
+    :return: Returns the order object for the
+             Product_Order service's placeOrder() method
+    """
+
+    try:
+        location_id = get_location_id(manager, location)
+    except ValueError:
+        raise exceptions.SoftLayerError(
+            "Invalid data center name specified. "
+            "Please provide the lower case short name (e.g.: dal09)")
+
+    volume_capacity = int(volume['capacityGb'])
+    storage_type = volume['billingItem']['categoryCode']
+
+    if storage_type != 'storage_service_enterprise':
+        raise exceptions.SoftLayerError(
+            "Primary volume storage_type must be Endurance")
+
+    if 'snapshotCapacityGb' in volume:
+        volume_snapshot_capacity = int(volume['snapshotCapacityGb'])
+    else:
+        raise exceptions.SoftLayerError(
+            "Snapshot capacity not found for the given primary volume")
+
+    snapshot_schedule_id = find_snapshot_schedule_id(
+        volume,
+        'SNAPSHOT_' + snapshot_schedule
+    )
+
+    if volume['billingItem']['cancellationDate'] != '':
+        raise exceptions.SoftLayerError(
+            'This volume is set for cancellation; '
+            'unable to order replicant volume')
+
+    for child in volume['billingItem']['activeChildren']:
+        if child['categoryCode'] == 'storage_snapshot_space'\
+                and child['cancellationDate'] != '':
+            raise exceptions.SoftLayerError(
+                'The snapshot space for this volume is set for '
+                'cancellation; unable to order replicant volume')
+
+    if tier is None:
+        tier = find_endurance_tier_iops_per_gb(volume)
+
+    package = get_package(manager, storage_type)
+    prices = [
+        find_endurance_price(package, 'storage_service_enterprise'),
+        find_endurance_price(package, 'storage_' + volume_type),
+        find_endurance_tier_price(package, tier),
+        find_endurance_space_price(package, volume_capacity, tier),
+        find_snapshot_space_price(package, volume_snapshot_capacity, tier),
+        find_replication_price(package, volume_capacity, tier),
+    ]
+
+    replicant_order = {
+        'complexType': 'SoftLayer_Container_Product_Order_'
+                       'Network_Storage_Enterprise',
+        'packageId': package['id'],
+        'prices': prices,
+        'quantity': 1,
+        'location': location_id,
+        'originVolumeId': int(volume_id),
+        'originVolumeScheduleId': snapshot_schedule_id,
+    }
+
+    return replicant_order
 
 
 def _has_category(categories, category_code):
