@@ -213,11 +213,14 @@ class HardwareManager(utils.IdentifierMixin, object):
                                                         version,
                                                         referenceCode]],
                     passwords[username,password]],'''
-                'billingItem.nextInvoiceTotalRecurringAmount,'
+                'billingItem['
+                'id,nextInvoiceTotalRecurringAmount,'
+                'children[nextInvoiceTotalRecurringAmount],'
+                'orderItem.order.userRecord[username]'
+                '],'
                 'hourlyBillingFlag,'
                 'tagReferences[id,tag[name,id]],'
                 'networkVlans[id,vlanNumber,networkSpace],'
-                'billingItem.orderItem.order.userRecord[username],'
                 'remoteManagementAccounts[username,password]'
             )
 

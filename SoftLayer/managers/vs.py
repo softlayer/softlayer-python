@@ -214,10 +214,13 @@ class VSManager(utils.IdentifierMixin, object):
                                         referenceCode]]],'''
                 'hourlyBillingFlag,'
                 'userData,'
-                'billingItem.recurringFee,'
+                'billingItem['
+                'id,nextInvoiceTotalRecurringAmount,'
+                'children[categoryCode,nextInvoiceTotalRecurringAmount],'
+                'orderItem.order.userRecord[username]'
+                '],'
                 'tagReferences[id,tag[name,id]],'
-                'networkVlans[id,vlanNumber,networkSpace],'
-                'billingItem.orderItem.order.userRecord[username]'
+                'networkVlans[id,vlanNumber,networkSpace]'
             )
 
         return self.guest.getObject(id=instance_id, **kwargs)

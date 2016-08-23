@@ -81,10 +81,15 @@ def cli(env, identifier, passwords, price):
         table.add_row(['notes', result['notes']])
 
     if price:
-        table.add_row(['price rate',
-                       utils.lookup(result,
-                                    'billingItem',
-                                    'nextInvoiceTotalRecurringAmount')])
+        total_price = utils.lookup(result,
+                                   'billingItem',
+                                   'nextInvoiceTotalRecurringAmount') or 0
+        total_price += sum(p['nextInvoiceTotalRecurringAmount']
+                           for p
+                           in utils.lookup(result,
+                                           'billingItem',
+                                           'children') or [])
+        table.add_row(['price_rate', total_price])
 
     if passwords:
         pass_table = formatting.Table(['username', 'password'])
