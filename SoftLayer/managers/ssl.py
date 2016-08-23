@@ -8,9 +8,9 @@
 
 
 class SSLManager(object):
-    """Manages SSL certificates.
+    """Manages SSL certificates in SoftLayer.
 
-    :param SoftLayer.API.Client client: an API client instance
+    See product information here: http://www.softlayer.com/ssl-certificates
 
     Example::
 
@@ -22,6 +22,8 @@ class SSLManager(object):
        import SoftLayer
        client = SoftLayer.Client()
        mgr = SoftLayer.SSLManager(client)
+
+    :param SoftLayer.API.BaseClient client: the client instance
 
     """
 

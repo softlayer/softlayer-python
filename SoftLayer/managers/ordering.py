@@ -8,9 +8,9 @@
 
 
 class OrderingManager(object):
-    """Manages hardware devices.
+    """Manager to help ordering via the SoftLayer API.
 
-    :param SoftLayer.API.Client client: an API client instance
+    :param SoftLayer.API.BaseClient client: the client instance
     """
 
     def __init__(self, client):

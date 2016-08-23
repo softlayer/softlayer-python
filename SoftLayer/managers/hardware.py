@@ -19,7 +19,7 @@ EXTRA_CATEGORIES = ['pri_ipv6_addresses',
 
 
 class HardwareManager(utils.IdentifierMixin, object):
-    """Manage hardware devices.
+    """Manage SoftLayer hardware servers.
 
     Example::
 
@@ -32,7 +32,9 @@ class HardwareManager(utils.IdentifierMixin, object):
        client = SoftLayer.Client()
        mgr = SoftLayer.HardwareManager(client)
 
-    :param SoftLayer.API.Client client: an API client instance
+    See product information here: http://www.softlayer.com/bare-metal-servers
+
+    :param SoftLayer.API.BaseClient client: the client instance
     :param SoftLayer.managers.OrderingManager ordering_manager: an optional
                                               manager to handle ordering.
                                               If none is provided, one will be

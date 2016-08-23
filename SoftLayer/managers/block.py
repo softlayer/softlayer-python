@@ -11,7 +11,12 @@ from SoftLayer import utils
 
 
 class BlockStorageManager(utils.IdentifierMixin, object):
-    """Manages Block Storage volumes."""
+    """Manages SoftLayer Block Storage volumes.
+
+    See product information here: http://www.softlayer.com/block-storage
+
+    :param SoftLayer.API.BaseClient client: the client instance
+    """
 
     def __init__(self, client):
         self.configuration = {}
