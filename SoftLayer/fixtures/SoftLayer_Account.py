@@ -23,6 +23,7 @@ getPrivateBlockDeviceTemplateGroups = [{
 
 getVirtualGuests = [{
     'id': 100,
+    'metricTrackingObjectId': 1,
     'hostname': 'vs-test1',
     'domain': 'test.sftlyr.ws',
     'fullyQualifiedDomainName': 'vs-test1.test.sftlyr.ws',
@@ -50,6 +51,7 @@ getVirtualGuests = [{
     },
 }, {
     'id': 104,
+    'metricTrackingObjectId': 2,
     'hostname': 'vs-test2',
     'domain': 'test.sftlyr.ws',
     'fullyQualifiedDomainName': 'vs-test2.test.sftlyr.ws',
@@ -74,6 +76,7 @@ getVirtualGuests = [{
             }
         }
     },
+    'virtualRack': {'id': 1, 'bandwidthAllotmentTypeId': 2},
 }]
 
 getMonthlyVirtualGuests = [vs for vs in getVirtualGuests
@@ -84,6 +87,7 @@ getHourlyVirtualGuests = [vs for vs in getVirtualGuests
 
 getHardware = [{
     'id': 1000,
+    'metricTrackingObject': {'id': 3},
     'globalIdentifier': '1a2b3c-1701',
     'datacenter': {'id': 50, 'name': 'TEST00',
                    'description': 'Test Data Center'},
@@ -144,6 +148,7 @@ getHardware = [{
     },
 }, {
     'id': 1001,
+    'metricTrackingObject': {'id': 4},
     'globalIdentifier': '1a2b3c-1702',
     'datacenter': {'name': 'TEST00',
                    'description': 'Test Data Center'},
@@ -188,6 +193,7 @@ getHardware = [{
     ]
 }, {
     'id': 1002,
+    'metricTrackingObject': {'id': 5},
     'datacenter': {'name': 'TEST00',
                    'description': 'Test Data Center'},
     'billingItem': {
@@ -534,4 +540,10 @@ getIscsiNetworkStorage = [{
     'serviceResourceName': 'Storage Type 01 Aggregate staaspar0101_pc01',
     'username': 'username',
     'storageType': {'keyName': 'ENDURANCE_STORAGE'},
+}]
+
+getVirtualDedicatedRacks = [{
+    'id': 1,
+    'name': 'my first pool',
+    'metricTrackingObjectId': 10,
 }]
