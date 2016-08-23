@@ -43,7 +43,7 @@ class ServerCLITests(testing.TestCase):
             'os': 'Ubuntu',
             'os_version': 'Ubuntu 12.04 LTS',
             'owner': 'chechu',
-            'price rate': 16.08,
+            'price_rate': 21.08,
             'private_ip': '10.1.0.2',
             'ptr': '2.0.1.10.in-addr.arpa',
             'public_ip': '172.16.1.100',

@@ -6,7 +6,14 @@ getObject = {
     'status': {'keyName': 'ACTIVE', 'name': 'Active'},
     'billingItem': {
         'id': 6327,
-        'recurringFee': 1.54,
+        'nextInvoiceTotalRecurringAmount': 1.54,
+        'children': [
+            {'nextInvoiceTotalRecurringAmount': 1},
+            {'nextInvoiceTotalRecurringAmount': 1},
+            {'nextInvoiceTotalRecurringAmount': 1},
+            {'nextInvoiceTotalRecurringAmount': 1},
+            {'nextInvoiceTotalRecurringAmount': 1},
+        ],
         'orderItem': {
             'order': {
                 'userRecord': {

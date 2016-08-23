@@ -52,7 +52,7 @@ class VirtTests(testing.TestCase):
                           'os': 'Ubuntu',
                           'os_version': '12.04-64 Minimal for VSI',
                           'notes': 'notes',
-                          'price rate': 1.54,
+                          'price_rate': 6.54,
                           'tags': ['production'],
                           'private_cpu': {},
                           'private_ip': '10.45.19.37',
