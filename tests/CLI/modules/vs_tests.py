@@ -49,7 +49,7 @@ class VirtTests(testing.TestCase):
                           'guid': '1a2b3c-1701',
                           'memory': 1024,
                           'modified': {},
-                          'os': '12.04-64 Minimal for VSI',
+                          'os': 'Ubuntu',
                           'os_version': '12.04-64 Minimal for VSI',
                           'notes': 'notes',
                           'price rate': 1.54,

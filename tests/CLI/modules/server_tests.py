@@ -41,6 +41,7 @@ class ServerCLITests(testing.TestCase):
             'memory': 2048,
             'notes': 'These are test notes.',
             'os': 'Ubuntu',
+            'os_version': 'Ubuntu 12.04 LTS',
             'owner': 'chechu',
             'price rate': 16.08,
             'private_ip': '10.1.0.2',
@@ -55,7 +56,7 @@ class ServerCLITests(testing.TestCase):
         }
 
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output), expected)
+        self.assertEqual(expected, json.loads(result.output))
 
     def test_detail_vs_empty_tag(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
