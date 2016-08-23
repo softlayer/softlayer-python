@@ -25,6 +25,21 @@ class Inititialization(testing.TestCase):
         self.assertIsInstance(client.transport, transports.XmlRpcTransport)
         self.assertEqual(client.transport.timeout, 10)
 
+    def test_init_with_rest_url(self):
+        client = SoftLayer.Client(username='doesnotexist',
+                                  api_key='issurelywrong',
+                                  timeout=10,
+                                  endpoint_url='http://example.com/v3/rest/')
+
+        self.assertIsInstance(client.auth, SoftLayer.BasicHTTPAuthentication)
+        self.assertEqual(client.auth.username, 'doesnotexist')
+        self.assertEqual(client.auth.api_key, 'issurelywrong')
+        self.assertIsNotNone(client.transport)
+        self.assertIsInstance(client.transport, transports.RestTransport)
+        self.assertEqual(client.transport.endpoint_url,
+                         'http://example.com/v3/rest')
+        self.assertEqual(client.transport.timeout, 10)
+
     @mock.patch('SoftLayer.config.get_client_settings')
     def test_env(self, get_client_settings):
         auth = mock.Mock()
