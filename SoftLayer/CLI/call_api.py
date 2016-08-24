@@ -20,6 +20,7 @@ def _build_filters(_filters):
     """
     root = utils.NestedDict({})
     for _filter in _filters:
+        operation = None
         for operation, token in SPLIT_TOKENS:
             # split "some.key=value" into ["some.key", "value"]
             top_parts = _filter.split(token, 1)
