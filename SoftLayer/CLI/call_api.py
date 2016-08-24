@@ -42,12 +42,11 @@ def _build_filters(_filters):
         if operation == 'eq':
             current[parts[-1]] = utils.query_filter(value.strip())
         elif operation == 'in':
-            value_parts = value.split(',')
             current[parts[-1]] = {
                 'operation': 'in',
                 'options': [{
                     'name': 'data',
-                    'value': [p.strip() for p in value_parts],
+                    'value': [p.strip() for p in value.split(',')],
                 }],
             }
 
