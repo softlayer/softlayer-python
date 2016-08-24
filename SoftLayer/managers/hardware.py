@@ -434,6 +434,16 @@ class HardwareManager(utils.IdentifierMixin, object):
             'extras': extras,
         }
 
+    def get_hardware_status_from_order(self, order_id):
+        BILLING_ORDER_MASK = 'mask[orderTopLevelItems[hostName,billingItem[id,provisionTransaction[hardware[id,hardwareStatus]]]]]'
+        order = self.ordering_manager.get_order(order_id, BILLING_ORDER_MASK)
+        return [_get_hardware_status_from_billing(item)
+                for item in _get_billing_items(order)]
+
+    def get_hardware_ids(self, order_id):
+        return [hw['hardwareId']
+                for hw in self.get_hardware_status_from_order(order_id)]
+
     @retry(logger=LOGGER)
     def _get_package(self):
         """Get the package related to simple hardware ordering."""
@@ -458,7 +468,7 @@ class HardwareManager(utils.IdentifierMixin, object):
 
     def _generate_create_dict(self,
                               size=None,
-                              hostname=None,
+                              hostnames=None,
                               domain=None,
                               location=None,
                               os=None,
@@ -467,7 +477,8 @@ class HardwareManager(utils.IdentifierMixin, object):
                               post_uri=None,
                               hourly=True,
                               no_public=False,
-                              extras=None):
+                              extras=None,
+                              quantity=1):
         """Translates arguments into a dictionary for creating a server."""
 
         extras = extras or []
@@ -499,19 +510,19 @@ class HardwareManager(utils.IdentifierMixin, object):
             prices.append(_get_extra_price_id(package['items'],
                                               extra, hourly,
                                               location=location))
-
-        hardware = {
+        hardware = [{
             'hostname': hostname,
             'domain': domain,
-        }
+        } for hostname in hostnames]
 
         order = {
-            'hardware': [hardware],
+            'hardware': hardware,
             'location': location['keyname'],
             'prices': [{'id': price} for price in prices],
             'packageId': package['id'],
             'presetId': _get_preset_id(package, size),
             'useHourlyPricing': hourly,
+            'quantity': quantity
         }
 
         if post_uri:
@@ -810,3 +821,10 @@ def _get_preset_id(package, size):
             return preset['id']
 
     raise SoftLayer.SoftLayerError("Could not find valid size for: '%s'" % size)
+
+def _get_billing_items(order):
+    return [top['billingItem'] for top in order['orderTopLevelItems']
+            if 'billingItem' in top]
+
+def _get_hardware_status_from_billing(billing_item):
+    return billing_item['provisionTransaction']

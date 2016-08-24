@@ -2,6 +2,7 @@
 # :license: MIT, see LICENSE for more details.
 
 import click
+import json
 
 import SoftLayer
 from SoftLayer.CLI import environment
@@ -14,8 +15,10 @@ from SoftLayer import utils
 @click.argument('identifier')
 @click.option('--passwords', is_flag=True, help='Show passwords (check over your shoulder!)')
 @click.option('--price', is_flag=True, help='Show associated prices')
+@click.option('--output-json', is_flag=True, default=False)
+@click.option('--verbose', is_flag=True, default=False)
 @environment.pass_env
-def cli(env, identifier, passwords, price):
+def cli(env, identifier, passwords, price, output_json, verbose):
     """Get details for a hardware device."""
 
     hardware = SoftLayer.HardwareManager(env.client)
@@ -27,6 +30,26 @@ def cli(env, identifier, passwords, price):
     hardware_id = helpers.resolve_id(hardware.resolve_ids, identifier, 'hardware')
     result = hardware.get_hardware(hardware_id)
     result = utils.NestedDict(result)
+
+    if output_json:
+        if verbose:
+            env.fout(json.dumps(result))
+        else:
+            partial = {k: result[k] for k in
+                       ['id',
+                        'primaryIpAddress',
+                        'primaryBackendIpAddress',
+                        'hostname',
+                        'fullyQualifiedDomainName',
+                        'operatingSystem'
+                        ]}
+            partial['osPlatform'] = partial \
+                ['operatingSystem'] \
+                ['softwareLicense'] \
+                ['softwareDescription'] \
+                ['name']
+            env.fout(json.dumps(partial))
+        return
 
     operating_system = utils.lookup(result, 'operatingSystem', 'softwareLicense', 'softwareDescription') or {}
     memory = formatting.gb(result.get('memoryCapacity', 0))

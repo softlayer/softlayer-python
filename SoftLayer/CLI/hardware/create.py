@@ -2,6 +2,7 @@
 # :license: MIT, see LICENSE for more details.
 
 import click
+import json
 
 import SoftLayer
 from SoftLayer.CLI import environment
@@ -12,8 +13,8 @@ from SoftLayer.CLI import template
 
 
 @click.command(epilog="See 'slcli server create-options' for valid options.")
-@click.option('--hostname', '-H',
-              help="Host portion of the FQDN",
+@click.option('--hostnames', '-H',
+              help="Host portions of the FQDN",
               required=True,
               prompt=True)
 @click.option('--domain', '-D',
@@ -62,6 +63,8 @@ from SoftLayer.CLI import template
               type=click.INT,
               help="Wait until the server is finished provisioning for up to "
                    "X seconds before returning")
+@click.option('--quantity', default=1, type=click.INT)
+@click.option('--output-json', is_flag=True)
 @environment.pass_env
 def cli(env, **args):
     """Order/create a dedicated server."""
@@ -75,7 +78,7 @@ def cli(env, **args):
         ssh_keys.append(key_id)
 
     order = {
-        'hostname': args['hostname'],
+        'hostnames': args['hostnames'].split(','),
         'domain': args['domain'],
         'size': args['size'],
         'location': args.get('datacenter'),
@@ -86,6 +89,7 @@ def cli(env, **args):
         'port_speed': args.get('port_speed'),
         'no_public': args.get('no_public') or False,
         'extras': args.get('extra'),
+        'quantity': args.get('quantity'),
     }
 
     # Do not create hardware server with --test or --export
@@ -129,11 +133,16 @@ def cli(env, **args):
 
         result = mgr.place_order(**order)
 
-        table = formatting.KeyValueTable(['name', 'value'])
-        table.align['name'] = 'r'
-        table.align['value'] = 'l'
-        table.add_row(['id', result['orderId']])
-        table.add_row(['created', result['orderDate']])
-        output = table
+        if args['output_json']:
+            env.fout(json.dumps({'orderId': result['orderId'],
+                                 'created': result['orderDate']}))
 
-    env.fout(output)
+        else:
+            table = formatting.KeyValueTable(['name', 'value'])
+            table.align['name'] = 'r'
+            table.align['value'] = 'l'
+            table.add_row(['id', result['orderId']])
+            table.add_row(['created', result['orderDate']])
+            output = table
+
+            env.fout(output)

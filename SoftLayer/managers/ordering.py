@@ -518,3 +518,9 @@ class OrderingManager(object):
         if len(datacenter) != 1:
             raise exceptions.SoftLayerError("Unable to find location: %s" % location)
         return datacenter[0]['id']
+
+    def get_order(self, order_id, mask=None):
+        return self.client['Billing_Order'].getObject(
+            id=order_id,
+            mask=mask
+        )
