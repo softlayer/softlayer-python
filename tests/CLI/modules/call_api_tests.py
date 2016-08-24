@@ -7,7 +7,10 @@
 import json
 
 from SoftLayer.CLI import call_api
+from SoftLayer.CLI import exceptions
 from SoftLayer import testing
+
+import pytest
 
 
 class BuildFilterTests(testing.TestCase):
@@ -29,6 +32,48 @@ class BuildFilterTests(testing.TestCase):
             'prop1': {'operation': '_= value1'},
             'prop2': {'operation': '_= prop2'},
         }
+
+    def test_in(self):
+        result = call_api._build_filters(['prop IN value1,value2'])
+        assert result == {
+            'prop': {
+                'operation': 'in',
+                'options': [{'name': 'data', 'value': ['value1', 'value2']}],
+            }
+        }
+
+    def test_in_multi(self):
+        result = call_api._build_filters([
+            'prop_a IN a_val1,a_val2',
+            'prop_b IN b_val1,b_val2',
+        ])
+        assert result == {
+            'prop_a': {
+                'operation': 'in',
+                'options': [{'name': 'data', 'value': ['a_val1', 'a_val2']}],
+            },
+            'prop_b': {
+                'operation': 'in',
+                'options': [{'name': 'data', 'value': ['b_val1', 'b_val2']}],
+            },
+        }
+
+    def test_in_with_whitespace(self):
+        result = call_api._build_filters(['prop IN value1 ,  value2  '])
+        assert result == {
+            'prop': {
+                'operation': 'in',
+                'options': [{'name': 'data', 'value': ['value1', 'value2']}],
+            }
+        }
+
+    def test_invalid_operation(self):
+        with pytest.raises(exceptions.CLIAbort):
+            call_api._build_filters(['prop N/A value1'])
+
+    def test_only_whitespace(self):
+        with pytest.raises(exceptions.CLIAbort):
+            call_api._build_filters([' '])
 
 
 class CallCliTests(testing.TestCase):

@@ -2,9 +2,15 @@
 import click
 
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 from SoftLayer import utils
+
+SPLIT_TOKENS = [
+    ('in', ' IN '),
+    ('eq', '='),
+]
 
 
 def _build_filters(_filters):
@@ -14,9 +20,17 @@ def _build_filters(_filters):
     """
     root = utils.NestedDict({})
     for _filter in _filters:
-        # split "some.key=value" into ["some.key", "value"]
-        key, value = _filter.split('=', 1)
+        operation = None
+        for operation, token in SPLIT_TOKENS:
+            # split "some.key=value" into ["some.key", "value"]
+            top_parts = _filter.split(token, 1)
+            if len(top_parts) == 2:
+                break
+        else:
+            raise exceptions.CLIAbort('Failed to find valid operation for: %s'
+                                      % _filter)
 
+        key, value = top_parts
         current = root
         # split "some.key" into ["some", "key"]
         parts = [part.strip() for part in key.split('.')]
@@ -24,7 +38,17 @@ def _build_filters(_filters):
         # Actually drill down and add the filter
         for part in parts[:-1]:
             current = current[part]
-        current[parts[-1]] = utils.query_filter(value.strip())
+
+        if operation == 'eq':
+            current[parts[-1]] = utils.query_filter(value.strip())
+        elif operation == 'in':
+            current[parts[-1]] = {
+                'operation': 'in',
+                'options': [{
+                    'name': 'data',
+                    'value': [p.strip() for p in value.split(',')],
+                }],
+            }
 
     return root.to_dict()
 
@@ -74,6 +98,8 @@ def cli(env, service, method, parameters, _id, _filters, mask, limit, offset,
         -f 'virtualGuests.datacenter.name=dal05' \\
         -f 'virtualGuests.maxCpu=4' \\
         --mask=id,hostname,datacenter.name,maxCpu
+    slcli call-api Account getVirtualGuests \\
+        -f 'virtualGuests.datacenter.name IN dal05,sng01'
     """
 
     args = [service, method] + list(parameters)
