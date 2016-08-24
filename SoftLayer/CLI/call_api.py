@@ -20,14 +20,14 @@ def _build_filters(_filters):
     """
     root = utils.NestedDict({})
     for _filter in _filters:
-        for op, token in SPLIT_TOKENS:
+        for operation, token in SPLIT_TOKENS:
             # split "some.key=value" into ["some.key", "value"]
             top_parts = _filter.split(token, 1)
-            operation = op
             if len(top_parts) == 2:
                 break
         else:
-            raise exceptions.CLIAbort('Failed to find valid operation for: %s' % _filter)
+            raise exceptions.CLIAbort('Failed to find valid operation for: %s'
+                                      % _filter)
 
         key, value = top_parts
         current = root
