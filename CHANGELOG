@@ -1,3 +1,21 @@
+5.2.0
+
+    * Significant additions to `slcli file` and `slcli block` commands. You can now authorize hosts, revoke access. You can also create, delete, restore, disable, enable snapshots. These features need to be battle-tested so report any issues that you see.
+
+    * Adds logic to `SoftLayer.create_client_from_env` that detects if a REST endpoint_url was given in order to use the REST transport automatically. This means that you can also configure REST endpoints for `slcli`. The default still uses XML-RPC endpoint, but from a small amount of testing shows that the REST transport is significantly faster.
+
+    * Adds `--network-space` to `slcli subnet list` in order to filter subnets based on network space. The two main options are PUBLIC and PRIVATE. For example, to list all public subnets, you can run: `slcli subnet list --network-space=PUBLIC`
+
+    * Fixes a UnicodeEncodeError when piping slcli output with unicode characters. This was mostly reported with `slcli image list` but could also happen with many other calls.
+
+    *  Adds a new, non-default column, "created_by" that shows who ordered the volume for `slcli file volume-list` and `slcli block volume-list`.
+
+    * Fixed a bug where os_version was not displaying correctly in `slcli virtual detail` or `slcli virtual detail`
+
+    * Adds a new `slcli report bandwidth` command that will print a report of all bandwidth pools and virtual/hardware servers that your user has access to.
+
+    * Adds an "IN" syntax to the `slcli call-api` command. For example, to find VSIs that are in either the dal05 or sng01 datacenter you can run this command: `slcli call-api Account getVirtualGuests -f 'virtualGuests.datacenter.name IN dal05,sng01'`
+
 5.1.0
 
     * Added block storage functionality. You can order, list, detail, cancel volumes. You can list and delete snapshots. You can also list ACLs for volumes.
