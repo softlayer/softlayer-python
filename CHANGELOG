@@ -8,7 +8,7 @@
 
     * Fixes a UnicodeEncodeError when piping slcli output with unicode characters. This was mostly reported with `slcli image list` but could also happen with many other calls.
 
-    *  Adds a new, non-default column, "created_by" that shows who ordered the volume for `slcli file volume-list` and `slcli block volume-list`.
+    * Adds a new, non-default column, "created_by" that shows who ordered the volume for `slcli file volume-list` and `slcli block volume-list`.
 
     * Fixed a bug where os_version was not displaying correctly in `slcli virtual detail` or `slcli virtual detail`
 
