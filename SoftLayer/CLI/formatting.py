@@ -47,7 +47,8 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
                 indent=4,
                 cls=CLIJSONEncoder)
         elif fmt == 'jsonraw':
-            return json.dumps(format_output(data, fmt='python'), CLIJSONEncoder)
+            return json.dumps(format_output(data, fmt='python'),
+                              CLIJSONEncoder)
         elif fmt == 'python':
             return data.to_python()
 
