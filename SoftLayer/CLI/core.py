@@ -31,7 +31,7 @@ DEBUG_LOGGING_MAP = {
     3: logging.DEBUG
 }
 
-VALID_FORMATS = ['table', 'raw', 'json']
+VALID_FORMATS = ['table', 'raw', 'json', 'jsonraw']
 DEFAULT_FORMAT = 'raw'
 if sys.stdout.isatty():
     DEFAULT_FORMAT = 'table'

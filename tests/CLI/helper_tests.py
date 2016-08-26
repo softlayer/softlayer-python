@@ -306,6 +306,21 @@ class TestFormatOutput(testing.TestCase):
         ret = formatting.format_output('test', 'json')
         self.assertEqual('"test"', ret)
 
+    def test_format_output_jsonraw(self):
+        t = formatting.Table(['nothing'])
+        t.align['nothing'] = 'c'
+        t.add_row(['testdata'])
+        t.add_row([formatting.blank()])
+        t.sortby = 'nothing'
+        ret = formatting.format_output(t, 'jsonraw')
+        # This uses json.dumps due to slight changes in the output between
+        # py3.3 and py3.4
+        expected = json.dumps([{'nothing': 'testdata'}, {'nothing': None}])
+        self.assertEqual(expected, ret)
+
+        ret = formatting.format_output('test', 'json')
+        self.assertEqual('"test"', ret)
+
     def test_format_output_json_keyvaluetable(self):
         t = formatting.KeyValueTable(['key', 'value'])
         t.add_row(['nothing', formatting.blank()])
@@ -314,6 +329,21 @@ class TestFormatOutput(testing.TestCase):
         self.assertEqual('''{
     "nothing": null
 }''', ret)
+
+    def test_format_output_jsonraw_keyvaluetable(self):
+        t = formatting.KeyValueTable(['key', 'value'])
+        t.add_row(['nothing', formatting.blank()])
+        t.sortby = 'nothing'
+        ret = formatting.format_output(t, 'jsonraw')
+        self.assertEqual('''{"nothing": null}''', ret)
+
+    def test_format_output_json_string(self):
+        ret = formatting.format_output("test", 'json')
+        self.assertEqual('"test"', ret)
+
+    def test_format_output_jsonraw_string(self):
+        ret = formatting.format_output("test", 'jsonraw')
+        self.assertEqual('"test"', ret)
 
     def test_format_output_formatted_item(self):
         item = formatting.FormattedItem('test', 'test_formatted')
@@ -379,6 +409,16 @@ class TestFormatOutput(testing.TestCase):
 
         t = formatting.format_output(item, 'raw')
         self.assertEqual('raw ☃', t)
+
+    def test_format_output_table_invalid_sort(self):
+        t = formatting.Table(['nothing'])
+        t.align['nothing'] = 'c'
+        t.add_row(['testdata'])
+        t.sortby = 'DOES NOT EXIST'
+        self.assertRaises(
+            exceptions.CLIHalt,
+            formatting.format_output, t, 'table',
+        )
 
 
 class TestTemplateArgs(testing.TestCase):
