@@ -2,6 +2,7 @@
 
 ## [Unreleased] - [Changes](https://github.com/softlayer/softlayer-python/compare/v5.0.0...HEAD)
 ### Added
+
 ### Changed
 
 ## [5.2.0] - 2016-08-25 - [Changes](https://github.com/softlayer/softlayer-python/compare/v5.1.0...v5.2.0)
@@ -12,6 +13,7 @@
  - CLI: Adds a new, non-default column, "created_by" that shows who ordered the volume for `slcli file volume-list` and `slcli block volume-list`.
  - CLI: Adds a new `slcli report bandwidth` command that will print a report of all bandwidth pools and virtual/hardware servers that your user has access to.
  - CLI: Adds an "IN" syntax to the `slcli call-api` command. For example, to find VSIs that are in either the dal05 or sng01 datacenter you can run this command: `slcli call-api Account getVirtualGuests -f 'virtualGuests.datacenter.name IN dal05,sng01'`
+
 ### Changed
  - CLI: Fixes a UnicodeEncodeError when piping slcli output with unicode characters. This was mostly reported with `slcli image list` but could also happen with many other calls.
  - CLI: Fixed a bug where os_version was not displaying correctly in `slcli virtual detail` or `slcli virtual detail`
@@ -21,10 +23,12 @@
  - CLI+API: Added block storage functionality. You can order, list, detail, cancel volumes. You can list and delete snapshots. You can also list ACLs for volumes.
  - Added functionality to attach/detach devices to tickets
  - CLI: Virtual list now lists users and passwords for all known software
+
 ### Changed
  - CLI: Fixes bug with `vlan detail` CLI command
 
 ## [5.0.1] - 2016-03-30 - [Changes](https://github.com/softlayer/softlayer-python/compare/v5.0.0...v5.0.1)
+
 ### Changed
  - CLI: Adds missing dependency that was previously pulled in by prompt_toolkit
  - API: Fix a bug by updating the CDN manager to use the new purge method
@@ -36,6 +40,7 @@
  - CLI: How filters work with `slcli call-api` has changed significantly. Instead of accepting JSON, it now accepts an easier-to-use format. See `slcli call-api -h` for examples
  - API: Adds manager for object storage
  - API: Improved REST transport support
+
 ### Changed
  - CLI: Move modifying nic speed to `slcli virtual edit` and `slcli hardware edit` instead of having its own command
  - CLI: 'virtual' and 'hardware' are preferred over 'vs' and 'server' in the CLI
@@ -44,6 +49,7 @@
 ## [4.1.1] - 2015-08-17 - [Changes](https://github.com/softlayer/softlayer-python/compare/v4.1.0...v4.1.1)
 ### Added
  - CLI: Re-adds `--no-public` option to only provision private interfaces with servers via `slcli server create`
+
 ### Changed
  - CLI: Fixes to work with Click v5
  - Removes non-functional `--vlan-public` and `--vlan-private` from `slcli server create`
@@ -54,6 +60,7 @@
  - CLI: Adds a shell which provides a shell interface for `slcli`. This is available by using `slcli shell`
  - CLI: `slcli vs create` and `slcli server create` will now prompt for missing required options
  - CLI+API: Adds editing of hardware tags
+
 ### Changed
  - CLI: Fixes `slcli firewall add` command
  - CLI: Handles case where `slcli vs detail` and `slcli server detail` was causing an error when trying to display the creator
@@ -97,6 +104,7 @@
  - CLI: A `--verbose` or `-v` flag was added to eventually replace `--debug`. To make a command more verbose, simply add more `-v` flags. For example `sl -vvv vs list` will be the most verbose and show everything down to request/response tracing.
  - CLI: Credentials can now be requested using `sl vs credentials <identifier>`, `sl hardware credentials <identifier>` and `sl nas credentials <identifier>` for virtual servers, hardware servers and NAS accounts respectively.
  - CLI: Adds virtual server rescue command, `sl vs rescue <identifier>`
+
 ### Changed
  - CLI: The command is renamed from `sl` to `slcli` to avoid package conflicts.
  - CLI: Global options now need to be specified right after the `slcli` command. For example, you would now use `slcli --format=raw list` over `slcli vs list --format=raw`. This is a change for the following options:
@@ -118,6 +126,7 @@
  - CLI: Adds command to import DNS entries from BIND zone files
  - CLI+API: Adds support for booting into rescue images for virtual servers and hardware
  - API: Adds ability to order virtual and hardare servers from a quote to the ordering manager
+
 ### Changed
  - CLI: Fixes bug with `sl server list-chassis` and `sl server list-chassis`
  - API: Restructure of the way custom authentication can be plugged in the API client
@@ -129,6 +138,7 @@
  - CLI+API: Added iscsi manager and CLI module
  - API: Added ability to create multiple virtual servers at once to VSManager
  - API: Added OrderingManager. Remove hard-coded price IDs
+
 ### Changed
  - Fixed several small bugs
 
@@ -141,6 +151,7 @@
  - CLI+API: Added ability to resize a virtual machine
  - CLI+API: Added firewall manager and CLI module
  - CLI+API: Added load balancer manager and CLI module
+
 ### Changed
  - API: six is now used to provide support for Python 2 and Python 3 with the same source
  - CLI+API: Implemented product name changes in accordance with SoftLayer's new product names. Existing managers should continue to work as before. Minor CLI changes were necessary.
@@ -153,6 +164,7 @@
  - CLI: Added support for ordering multiple disks when creating a CCI.
  - API: Added flag to disable compression on HTTP requests.
  - CLI: Added CIDR information to subnet displays.
+
 ### Changed
  - CLI: Fixed the sl bmc create --network argument.
  - CLI+API: Improved output of the message queue feature and fixed some minor bugs.
@@ -162,6 +174,7 @@
 ### [3.0.1] - 2013-10-11 - [Changes](https://github.com/softlayer/softlayer-python/compare/v3.0.0...v3.0.1)
 ### Added
  - CLI+API: Added ability to specify SSH keys when reloading CCIs and servers.
+
 ### Changed
  - CLI: Fixed an error message about pricing information that appeared when ordering a new private subnet.
 
@@ -179,6 +192,7 @@
  - CLI: Adds a --debug option to print out debugging information. --debug=3 is the highest log level which prints full HTTP request/responses including the body
  - CLI+API: Adds the ability to create hardware servers with a default SSH key
  - CLI: Adds templating for creating CCIs and hardware nodes which can be used to create more CCIs and hardware with the same settings
+
 ### Changed
  - Many bug fixes and consistency improvements
  - API: Removes old API client interfaces which have been deprecated in the v2. See link for more details: https://softlayer-api-python-client.readthedocs.org/en/latest/api/client/#backwards-compatibility
@@ -193,6 +207,7 @@
  - CLI: Added --debug option to CLI commands
  - API: Added more logging
  - API: Added token-based auth so you can use the API bindings with your username/password if you want. (It's still highly recommended to use your API key instead of your password)
+
 ### Changed
  - Several bug fixes and improvements
  - Removed Python 2.5 support. Some stuff MIGHT work with 2.5 but it is no longer tested
@@ -206,5 +221,6 @@
  - CLI: For most CCI commands, you can specify id, hostname, private ip or public ip as <identifier>
  - CLI: Adds the ability to filter list results for CCIs
  - API: for large result sets, requests can now be chunked into smaller batches on the server side. Using service.iter_call('getObjects', ...) or service.getObjects(..., iter=True) will return a generator regardless of the results returned. offset and limit can be passed in like normal. An additional named parameter of 'chunk' is used to limit the number of items coming back in a single request, defaults to 100
+
 ### Changed
  - Consistency changes/bug fixes
