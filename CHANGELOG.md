@@ -88,8 +88,7 @@
  - CLI: Fixes general issue with sorting on certain row types in the CLI
  - API: Fixes image capture for Windows guests
 
-## [4.0.1] - 2015-04-28 - [Changes]()
- - https://github.com/softlayer/softlayer-python/compare/v4.0.0...v4.0.1
+## [4.0.1] - 2015-04-28 - [Changes](https://github.com/softlayer/softlayer-python/compare/v4.0.0...v4.0.1)
 ### Changed
  - CLI: Fixes bug in `sl setup` command not properly defaulting to current values.
  - API: Fixes bug where turning off compression headers would still send compression headers.
@@ -97,6 +96,7 @@
 
 ## [4.0.0] - 2015-04-21 - [Changes](https://github.com/softlayer/softlayer-python/compare/v3.3.0...v4.0.0)
  - Because there are many changes between version 3 and version 4, it is strongly recommend to pin the version of the SoftLayer python bindings as soon as you can in order to prevent unintentional breakage when upgrading. To keep yourself on version 3, you can use this directive: softlayer>=3,<4. That can be used with pip (pip install softlayer>=3,<4), requirements in your setup.py and/or in your requirements.txt file.
+
 ### Added
  - API: The client transport is now pluggable. If you want to add extra logging or accounting, you can now subclass or wrap softlayer.transports.XmlRpcTransport in order to do so. A good example of that is done with softlayer.transports.TimingTransport.
  - API+CLI: Adds ability to import virtual images from a given URI. The API only supports importing from a swift account using 'swift://'. For more details, see http://developer.softlayer.com/reference/services/SoftLayer_Virtual_Guest_Block_Device_Template_Group/createFromExternalSource.
