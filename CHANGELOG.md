@@ -1,7 +1,7 @@
 # Change Log
 
 ## [Unreleased]
- - Changes: https://github.com/softlayer/softlayer-python/compare/v5.0.0...HEAD
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.0...HEAD
 
 ### Added
 
