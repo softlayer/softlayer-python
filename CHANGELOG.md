@@ -1,11 +1,15 @@
 # Change Log
 
-## [Unreleased] - [Changes](https://github.com/softlayer/softlayer-python/compare/v5.0.0...HEAD)
+## [Unreleased]
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.0.0...HEAD
+
 ### Added
 
 ### Changed
 
-## [5.2.0] - 2016-08-25 - [Changes](https://github.com/softlayer/softlayer-python/compare/v5.1.0...v5.2.0)
+## [5.2.0] - 2016-08-25
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.1.0...v5.2.0
+
 ### Added
  - CLI+API: Significant additions to `slcli file` and `slcli block` commands. You can now authorize hosts, revoke access. You can also create, delete, restore, disable, enable snapshots. These features need to be battle-tested so report any issues that you see.
  - CLI+API: Adds logic to `SoftLayer.create_client_from_env` that detects if a REST endpoint_url was given in order to use the REST transport automatically. This means that you can also configure REST endpoints for `slcli`. The default still uses XML-RPC endpoint, but from a small amount of testing shows that the REST transport is significantly faster.
@@ -18,7 +22,9 @@
  - CLI: Fixes a UnicodeEncodeError when piping slcli output with unicode characters. This was mostly reported with `slcli image list` but could also happen with many other calls.
  - CLI: Fixed a bug where os_version was not displaying correctly in `slcli virtual detail` or `slcli virtual detail`
 
-## [5.1.0] - 2016-05-12 - [Changes](https://github.com/softlayer/softlayer-python/compare/v5.0.1...v5.1.0)
+## [5.1.0] - 2016-05-12
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.0.1...v5.1.0
+
 ### Added
  - CLI+API: Added block storage functionality. You can order, list, detail, cancel volumes. You can list and delete snapshots. You can also list ACLs for volumes.
  - Added functionality to attach/detach devices to tickets
@@ -27,14 +33,17 @@
 ### Changed
  - CLI: Fixes bug with `vlan detail` CLI command
 
-## [5.0.1] - 2016-03-30 - [Changes](https://github.com/softlayer/softlayer-python/compare/v5.0.0...v5.0.1)
+## [5.0.1] - 2016-03-30
+ - https://github.com/softlayer/softlayer-python/compare/v5.0.0...v5.0.1
 
 ### Changed
  - CLI: Adds missing dependency that was previously pulled in by prompt_toolkit
  - API: Fix a bug by updating the CDN manager to use the new purge method
  - CLI: Fixes bug that occured when iscsi listings with resources have no datacenter
 
-## [5.0.0] - 2016-03-18 - [Changes](https://github.com/softlayer/softlayer-python/compare/v4.1.1...v5.0.0)
+## [5.0.0] - 2016-03-18
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v4.1.1...v5.0.0
+
 ### Added
  - CLI: Adds a shell (accessable with `slcli shell`) which provides autocomplete for slcli commands and options
  - CLI: How filters work with `slcli call-api` has changed significantly. Instead of accepting JSON, it now accepts an easier-to-use format. See `slcli call-api -h` for examples
@@ -46,7 +55,9 @@
  - CLI: 'virtual' and 'hardware' are preferred over 'vs' and 'server' in the CLI
  - CLI+API: Many unmentioned bug fixes
 
-## [4.1.1] - 2015-08-17 - [Changes](https://github.com/softlayer/softlayer-python/compare/v4.1.0...v4.1.1)
+## [4.1.1] - 2015-08-17
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v4.1.0...v4.1.1
+
 ### Added
  - CLI: Re-adds `--no-public` option to only provision private interfaces with servers via `slcli server create`
 
@@ -55,7 +66,9 @@
  - Removes non-functional `--vlan-public` and `--vlan-private` from `slcli server create`
  - VSManager.wait_for_ready will now behave as it is documented to behave.
 
-## [4.1.0] - 2015-08-17 - [Changes](https://github.com/softlayer/softlayer-python/compare/v4.0.4...v4.1.0)
+## [4.1.0] - 2015-08-17
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v4.0.4...v4.1.0
+
 ### Added
  - CLI: Adds a shell which provides a shell interface for `slcli`. This is available by using `slcli shell`
  - CLI: `slcli vs create` and `slcli server create` will now prompt for missing required options
@@ -70,31 +83,40 @@
  - CLI: Fixes several description errors in the CLI
  - CLI: Running `vs edit` without a tag option will no longer remove all tags
 
-## [4.0.4] - 2015-06-30 - [Changes](https://github.com/softlayer/softlayer-python/compare/v4.0.3...v4.0.4)
+## [4.0.4] - 2015-06-30
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v4.0.3...v4.0.4
+
 ### Changed
  - CLI: Fixes bug with pulling the userData property for the virtual server detail
  - CLI: Fixes a class of bugs invloving unicode from the API
 
-## [4.0.3] - 2015-06-15 - [Changes](https://github.com/softlayer/softlayer-python/compare/v4.0.2...v4.0.3)
+## [4.0.3] - 2015-06-15
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v4.0.2...v4.0.3
+
 ### Changed
  - CLI: Fixes bug with `slcli vs ready` command
  - CLI: Fixes bug with `slcli loadbal service-add` command
  - CLI: Fixes bug with `slcli vlan list` with vlans that don't have a datacenter
  - CLI: Improves validation of virtual server and hardware create commands
 
-## [4.0.2] - 2015-05-04 - [Changes](https://github.com/softlayer/softlayer-python/compare/v4.0.1...v4.0.2)
+## [4.0.2] - 2015-05-04
+ - Changes https://github.com/softlayer/softlayer-python/compare/v4.0.1...v4.0.2
+
 ### Changed
  - CLI: Fixes a bug that breaks user confirmation prompts
  - CLI: Fixes general issue with sorting on certain row types in the CLI
  - API: Fixes image capture for Windows guests
 
-## [4.0.1] - 2015-04-28 - [Changes](https://github.com/softlayer/softlayer-python/compare/v4.0.0...v4.0.1)
+## [4.0.1] - 2015-04-28
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v4.0.0...v4.0.1
+
 ### Changed
  - CLI: Fixes bug in `sl setup` command not properly defaulting to current values.
  - API: Fixes bug where turning off compression headers would still send compression headers.
  - CLI: Reverts to using ids over global identifiers for `sl vs list` and `sl server list`.
 
-## [4.0.0] - 2015-04-21 - [Changes](https://github.com/softlayer/softlayer-python/compare/v3.3.0...v4.0.0)
+## [4.0.0] - 2015-04-21
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v3.3.0...v4.0.0
  - Because there are many changes between version 3 and version 4, it is strongly recommend to pin the version of the SoftLayer python bindings as soon as you can in order to prevent unintentional breakage when upgrading. To keep yourself on version 3, you can use this directive: softlayer>=3,<4. That can be used with pip (pip install softlayer>=3,<4), requirements in your setup.py and/or in your requirements.txt file.
 
 ### Added
@@ -119,7 +141,9 @@
  - API: Adds virtual server rescue command to SoftLayer.VSManager
  - CLI: Significant changes were done to the CLI argument parsing. Docopt was dropped in favor of click. Therefore, some subtle differences which aren't documented here may exist.
 
-## [3.3.0] - 2014-10-23 - [Changes](https://github.com/softlayer/softlayer-python/compare/v3.2.0...v3.3.0)
+## [3.3.0] - 2014-10-23
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v3.2.0...v3.3.0
+
 ### Added
  - CLI+API: Load balancer support
  - CLI: More detail added to the `sl image detail` and `sl image list` commands
@@ -132,7 +156,9 @@
  - API: Restructure of the way custom authentication can be plugged in the API client
  - Several other bug fixes
 
-## [3.2.0] - 2014-07-09 - [Changes](https://github.com/softlayer/softlayer-python/compare/v3.1.0...v3.2.0)
+## [3.2.0] - 2014-07-09
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v3.1.0...v3.2.0
+
 ### Added
  - CLI+API: Added firewall manager and CLI module
  - CLI+API: Added iscsi manager and CLI module
@@ -142,7 +168,9 @@
 ### Changed
  - Fixed several small bugs
 
-## [3.1.0] - 2014-04-24 - [Changes]() - [Changes](https://github.com/softlayer/softlayer-python/compare/v3.0.2...v3.1.0)
+## [3.1.0] - 2014-04-24
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v3.0.2...v3.1.0
+
 ### Added
  - CLI+API: Added CDN manager and CLI module
  - CLI+API: Added ticket manager and CLI module
@@ -157,7 +185,9 @@
  - CLI+API: Implemented product name changes in accordance with SoftLayer's new product names. Existing managers should continue to work as before. Minor CLI changes were necessary.
  - Many bug fixes and minor suggested improvements
 
-## [3.0.2] - 2013-12-9 - [Changes](https://github.com/softlayer/softlayer-python/compare/v3.0.1...v3.0.2)
+## [3.0.2] - 2013-12-9
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v3.0.1...v3.0.2
+
 ### Added
  - CLI+API: Simplified object mask reformatting and added support for more complex masks.
  - CLI+API: Added IPMI IP address to hardware details.
@@ -171,14 +201,18 @@
  - CLI: Fixed an error when using --test and ordering a non-private subnet.
  - API: Fix to prevent double counting results in summary_by_datacenter().
 
-### [3.0.1] - 2013-10-11 - [Changes](https://github.com/softlayer/softlayer-python/compare/v3.0.0...v3.0.1)
+### [3.0.1] - 2013-10-11
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v3.0.0...v3.0.1
+
 ### Added
  - CLI+API: Added ability to specify SSH keys when reloading CCIs and servers.
 
 ### Changed
  - CLI: Fixed an error message about pricing information that appeared when ordering a new private subnet.
 
-## [3.0.0] - 2013-09-19 - [Changes](https://github.com/softlayer/softlayer-python/compare/v2.3.0...v3.0.0)
+## [3.0.0] - 2013-09-19
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v2.3.0...v3.0.0
+
 ### Added
  - CLI+API: Adds SoftLayer Message Queue Service bindings (as a manager) and a CLI counterpart. With this you can interact with existing message queue accounts
  - CLI+API: Adds the ability to create CCIs with the following options: metadata, post-install script, SSH key
@@ -198,7 +232,9 @@
  - API: Removes old API client interfaces which have been deprecated in the v2. See link for more details: https://softlayer-api-python-client.readthedocs.org/en/latest/api/client/#backwards-compatibility
  - CLI: The commands in the main help are now organized into categories
 
-## [2.3.0] - 2013-07-19 - [Changes](https://github.com/softlayer/softlayer-python/compare/v2.2.0...v2.3.0)
+## [2.3.0] - 2013-07-19
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v2.2.0...v2.3.0
+
 ### Added
  - CLI+API: Added much more hardware support: Filters for hardware listing, dedicated server/bare metal cloud ordering, hardware cancellation
  - CLI+API: Added DNS Zone filtering (server side)
