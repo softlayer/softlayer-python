@@ -100,6 +100,7 @@ class TestHelpSetup(testing.TestCase):
         self.assertEqual(username, 'user')
         self.assertEqual(secret, 'A' * 64)
         self.assertEqual(endpoint_url, consts.API_PRIVATE_ENDPOINT)
+        self.assertEqual(timeout, 0)
 
     @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
     @mock.patch('SoftLayer.CLI.environment.Environment.input')
