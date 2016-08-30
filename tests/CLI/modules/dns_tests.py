@@ -115,6 +115,8 @@ ftp                             IN  CNAME server2
 dev.realtest.com    IN  TXT "This is just a test of the txt record"
     IN  AAAA  2001:db8:10::1
 spf  IN TXT "v=spf1 ip4:192.0.2.0/24 ip4:198.51.100.123 a"
+*.testing              86400    IN A     127.0.0.2
+*                      86400    IN A     127.0.0.3
 
 """
         expected = [{'data': 'ns1.softlayer.com.',
@@ -148,7 +150,15 @@ spf  IN TXT "v=spf1 ip4:192.0.2.0/24 ip4:198.51.100.123 a"
                     {'data': '"v=spf1 ip4:192.0.2.0/24 ip4:198.51.100.123 a"',
                      'record': 'spf',
                      'type': 'TXT',
-                     'ttl': None}]
+                     'ttl': None},
+                     {'data': '127.0.0.2',
+                      'record': '*.testing',
+                      'type': 'A',
+                      'ttl': '86400'},
+                      {'data': '127.0.0.3',
+                       'record': '*',
+                       'type': 'A',
+                       'ttl': '86400'}]
         zone, records, bad_lines = zone_import.parse_zone_details(zone_file)
         self.assertEqual(zone, 'realtest.com')
         self.assertEqual(records, expected)
