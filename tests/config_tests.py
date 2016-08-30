@@ -86,9 +86,9 @@ class TestGetClientSettingsConfigFile(testing.TestCase):
 
         self.assertIsNone(result)
 
-    @mock.patch('six.moves.configparser.RawConfigParser')
-    def test_config_file(self, config_parser):
-        config.get_client_settings_config_file(config_file='path/to/config')
-        config_parser().read.assert_called_with([mock.ANY,
-                                                mock.ANY,
-                                                'path/to/config'])
+@mock.patch('six.moves.configparser.RawConfigParser')
+def test_config_file(self, config_parser):
+    config.get_client_settings_config_file(config_file='path/to/config')
+    config_parser().read.assert_called_with([mock.ANY,
+                                             mock.ANY,
+                                            'path/to/config'])

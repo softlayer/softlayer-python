@@ -53,11 +53,11 @@ class TestHelpSetup(testing.TestCase):
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
     @mock.patch('SoftLayer.CLI.environment.Environment.input')
-    def test_setup(self, input, getpass, confirm_mock):
+    def test_setup(self, mocked_input, getpass, confirm_mock):
         with tempfile.NamedTemporaryFile() as config_file:
             confirm_mock.return_value = True
             getpass.return_value = 'A' * 64
-            input.side_effect = ['user', 'public', 0]
+            mocked_input.side_effect = ['user', 'public', 0]
 
             result = self.run_command(['--config=%s' % config_file.name,
                                        'config', 'setup'])
@@ -76,11 +76,11 @@ class TestHelpSetup(testing.TestCase):
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
     @mock.patch('SoftLayer.CLI.environment.Environment.input')
-    def test_setup_cancel(self, input, getpass, confirm_mock):
+    def test_setup_cancel(self, mocked_input, getpass, confirm_mock):
         with tempfile.NamedTemporaryFile() as config_file:
             confirm_mock.return_value = False
             getpass.return_value = 'A' * 64
-            input.side_effect = ['user', 'public', 0]
+            mocked_input.side_effect = ['user', 'public', 0]
 
             result = self.run_command(['--config=%s' % config_file.name,
                                        'config', 'setup'])
@@ -90,9 +90,9 @@ class TestHelpSetup(testing.TestCase):
 
     @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
     @mock.patch('SoftLayer.CLI.environment.Environment.input')
-    def test_get_user_input_private(self, input, getpass):
+    def test_get_user_input_private(self, mocked_input, getpass):
         getpass.return_value = 'A' * 64
-        input.side_effect = ['user', 'private', 0]
+        mocked_input.side_effect = ['user', 'private', 0]
 
         username, secret, endpoint_url, timeout = (
             config.get_user_input(self.env))
@@ -103,9 +103,9 @@ class TestHelpSetup(testing.TestCase):
 
     @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
     @mock.patch('SoftLayer.CLI.environment.Environment.input')
-    def test_get_user_input_custom(self, input, getpass):
+    def test_get_user_input_custom(self, mocked_input, getpass):
         getpass.return_value = 'A' * 64
-        input.side_effect = ['user', 'custom', 'custom-endpoint', 0]
+        mocked_input.side_effect = ['user', 'custom', 'custom-endpoint', 0]
 
         _, _, endpoint_url, _ = config.get_user_input(self.env)
 
@@ -113,9 +113,9 @@ class TestHelpSetup(testing.TestCase):
 
     @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
     @mock.patch('SoftLayer.CLI.environment.Environment.input')
-    def test_get_user_input_default(self, input, getpass):
+    def test_get_user_input_default(self, mocked_input, getpass):
         self.env.getpass.return_value = 'A' * 64
-        self.env.input.side_effect = ['user', 'public', 0]
+        mocked_input.side_effect = ['user', 'public', 0]
 
         _, _, endpoint_url, _ = config.get_user_input(self.env)
 
