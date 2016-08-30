@@ -45,7 +45,6 @@ def test_filter_in():
     }
 
 
-
 def test_filter_in_multi():
     result = call_api._build_filters([
         'prop_a IN a_val1,a_val2',
