@@ -121,7 +121,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         req.identifier = 1234
         self.transport(req)
 
-        args, kwargs = request.call_args
+        _, kwargs = request.call_args
         self.assertIn(
             """<member>
 <name>id</name>
