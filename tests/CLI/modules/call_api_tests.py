@@ -13,25 +13,25 @@ from SoftLayer import testing
 import pytest
 
 
-def test_filter_empty(self):
+def test_filter_empty():
     assert call_api._build_filters([]) == {}
 
-def test_filter_basic(self):
+def test_filter_basic():
     result = call_api._build_filters(['property=value'])
     assert result == {'property': {'operation': '_= value'}}
 
-def test_filter_nested(self):
+def test_filter_nested():
     result = call_api._build_filters(['nested.property=value'])
     assert result == {'nested': {'property': {'operation': '_= value'}}}
 
-def test_filter_multi(self):
+def test_filter_multi():
     result = call_api._build_filters(['prop1=value1', 'prop2=prop2'])
     assert result == {
         'prop1': {'operation': '_= value1'},
         'prop2': {'operation': '_= prop2'},
     }
 
-def test_filter_in(self):
+def test_filter_in():
     result = call_api._build_filters(['prop IN value1,value2'])
     assert result == {
         'prop': {
@@ -40,7 +40,7 @@ def test_filter_in(self):
         }
     }
 
-def test_filter_in_multi(self):
+def test_filter_in_multi():
     result = call_api._build_filters([
         'prop_a IN a_val1,a_val2',
         'prop_b IN b_val1,b_val2',
@@ -56,7 +56,7 @@ def test_filter_in_multi(self):
         },
     }
 
-def test_filter_in_with_whitespace(self):
+def test_filter_in_with_whitespace():
     result = call_api._build_filters(['prop IN value1 ,  value2  '])
     assert result == {
         'prop': {
@@ -65,11 +65,11 @@ def test_filter_in_with_whitespace(self):
         }
     }
 
-def test_filter_invalid_operation(self):
+def test_filter_invalid_operation():
     with pytest.raises(exceptions.CLIAbort):
         call_api._build_filters(['prop N/A value1'])
 
-def test_filter_only_whitespace(self):
+def test_filter_only_whitespace():
     with pytest.raises(exceptions.CLIAbort):
         call_api._build_filters([' '])
 
