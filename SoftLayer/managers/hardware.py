@@ -529,7 +529,9 @@ class HardwareManager(utils.IdentifierMixin, object):
             order['provisionScripts'] = [post_uri]
 
         if ssh_keys:
-            order['sshKeys'] = [{'sshKeyIds': ssh_keys}]
+            # need a copy of the key ids for each host, otherwise it
+            # will only set up keys on the first host
+            order['sshKeys'] = [{'sshKeyIds': ssh_keys}] * quantity
 
         return order
 
