@@ -714,19 +714,21 @@ class VSManager(utils.IdentifierMixin, object):
             notes = "Some notes about this image"
             result = mgr.capture(instance_id=12345, name=name, notes=notes)
         """
+        disks = self.client.call('Virtual_Guest', 'getObject', id=instance_id, mask="id,blockDevices[id,diskImage[id,metadataFlag]]")
+        metadata_disks = [element.get('id') for element in disks.get('blockDevices') if element.get('diskImage').get('metadataFlag') == True]
         vsi = self.get_instance(instance_id)
 
         disk_filter = lambda x: x['device'] == '0'
-        # Skip disk 1 (swap partition) and CD mounts
+        # Skip disk 1 (swap partition), CD mounts, and metadata disks
         if additional_disks:
             disk_filter = lambda x: (str(x['device']) != '1' and
-                                     x['mountType'] != 'CD')
-
-        disks = [block_device for block_device in vsi['blockDevices']
+                                     x['mountType'] != 'CD' and
+                                     x['id'] not in metadata_disks)
+        non_metadata_disks = [block_device for block_device in vsi['blockDevices']
                  if disk_filter(block_device)]
 
         return self.guest.createArchiveTransaction(
-            name, disks, notes, id=instance_id)
+            name, non_metadata_disks, notes, id=instance_id)
 
     def upgrade(self, instance_id, cpus=None, memory=None,
                 nic_speed=None, public=True):
