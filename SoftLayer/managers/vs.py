@@ -745,7 +745,7 @@ class VSManager(utils.IdentifierMixin, object):
                 continue
 
             # Only use the first block device if we don't want additional disks
-            if not additional_disks and block_device['device'] != '0':
+            if not additional_disks and str(block_device['device']) != '0':
                 continue
 
             disks_to_capture.append(block_device)
