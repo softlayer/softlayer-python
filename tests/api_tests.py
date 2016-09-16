@@ -16,7 +16,8 @@ class Inititialization(testing.TestCase):
     def test_init(self):
         client = SoftLayer.Client(username='doesnotexist',
                                   api_key='issurelywrong',
-                                  timeout=10)
+                                  timeout=10,
+                                  endpoint_url='http://example.com/v3/xmlrpc/')
 
         self.assertIsInstance(client.auth, SoftLayer.BasicAuthentication)
         self.assertEqual(client.auth.username, 'doesnotexist')
@@ -95,7 +96,7 @@ class APIClient(testing.TestCase):
                                 offset=None,
                                 )
 
-    def test_verify(self):
+    def test_verify_request_false(self):
         client = SoftLayer.BaseClient(transport=self.mocks)
         mock = self.set_mock('SoftLayer_SERVICE', 'METHOD')
         mock.return_value = {"test": "result"}
@@ -104,6 +105,26 @@ class APIClient(testing.TestCase):
 
         self.assertEqual(resp, {"test": "result"})
         self.assert_called_with('SoftLayer_SERVICE', 'METHOD', verify=False)
+
+    def test_verify_request_true(self):
+        client = SoftLayer.BaseClient(transport=self.mocks)
+        mock = self.set_mock('SoftLayer_SERVICE', 'METHOD')
+        mock.return_value = {"test": "result"}
+
+        resp = client.call('SERVICE', 'METHOD', verify=True)
+
+        self.assertEqual(resp, {"test": "result"})
+        self.assert_called_with('SoftLayer_SERVICE', 'METHOD', verify=True)
+
+    def test_verify_request_not_specified(self):
+        client = SoftLayer.BaseClient(transport=self.mocks)
+        mock = self.set_mock('SoftLayer_SERVICE', 'METHOD')
+        mock.return_value = {"test": "result"}
+
+        resp = client.call('SERVICE', 'METHOD')
+
+        self.assertEqual(resp, {"test": "result"})
+        self.assert_called_with('SoftLayer_SERVICE', 'METHOD', verify=None)
 
     @mock.patch('SoftLayer.API.BaseClient.iter_call')
     def test_iterate(self, _iter_call):
