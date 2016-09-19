@@ -50,16 +50,16 @@ class HardwareManager(utils.IdentifierMixin, object):
         else:
             self.ordering_manager = ordering_manager
 
-    def cancel_hardware(self, hardware_id, reason='unneeded', comment='',
+    def cancel_hardware(self, network_id, reason='unneeded', comment='',
                         immediate=False):
         """Cancels the specified dedicated server.
 
         Example::
 
             # Cancels hardware id 1234
-            result = mgr.cancel_hardware(hardware_id=1234)
+            result = mgr.cancel_hardware(network_id=1234)
 
-        :param int hardware_id: The ID of the hardware to be cancelled.
+        :param int network_id: The ID of the hardware to be cancelled.
         :param string reason: The reason code for the cancellation. This should
                               come from :func:`get_cancellation_reasons`.
         :param string comment: An optional comment to include with the
@@ -70,7 +70,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         reasons = self.get_cancellation_reasons()
         cancel_reason = reasons.get(reason, reasons['unneeded'])
 
-        hw_billing = self.get_hardware(hardware_id,
+        hw_billing = self.get_hardware(network_id,
                                        mask='mask[id, billingItem.id]')
         if 'billingItem' not in hw_billing:
             raise SoftLayer.SoftLayerError(
@@ -169,7 +169,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         kwargs['filter'] = _filter.to_dict()
         return self.account.getHardware(**kwargs)
 
-    def get_hardware(self, hardware_id, **kwargs):
+    def get_hardware(self, network_id, **kwargs):
         """Get details about a hardware device.
 
         :param integer id: the hardware ID
@@ -180,7 +180,7 @@ class HardwareManager(utils.IdentifierMixin, object):
 
             object_mask = "mask[id,networkVlans[vlanNumber]]"
             # Object masks are optional
-            result = mgr.get_hardware(hardware_id=1234,mask=object_mask)
+            result = mgr.get_hardware(network_id=1234,mask=object_mask)
         """
 
         if 'mask' not in kwargs:
@@ -224,12 +224,12 @@ class HardwareManager(utils.IdentifierMixin, object):
                 'remoteManagementAccounts[username,password]'
             )
 
-        return self.hardware.getObject(id=hardware_id, **kwargs)
+        return self.hardware.getObject(id=network_id, **kwargs)
 
-    def reload(self, hardware_id, post_uri=None, ssh_keys=None):
+    def reload(self, network_id, post_uri=None, ssh_keys=None):
         """Perform an OS reload of a server with its current configuration.
 
-        :param integer hardware_id: the instance ID to reload
+        :param integer network_id: the instance ID to reload
         :param string post_url: The URI of the post-install script to run
                                 after reload
         :param list ssh_keys: The SSH keys to add to the root user
@@ -244,9 +244,9 @@ class HardwareManager(utils.IdentifierMixin, object):
             config['sshKeyIds'] = [key_id for key_id in ssh_keys]
 
         return self.hardware.reloadOperatingSystem('FORCE', config,
-                                                   id=hardware_id)
+                                                   id=network_id)
 
-    def rescue(self, hardware_id):
+    def rescue(self, network_id):
         """Reboot a server into the a recsue kernel.
 
         :param integer instance_id: the server ID to rescue
@@ -255,12 +255,41 @@ class HardwareManager(utils.IdentifierMixin, object):
 
             result = mgr.rescue(1234)
         """
-        return self.hardware.bootToRescueLayer(id=hardware_id)
+        return self.hardware.bootToRescueLayer(id=network_id)
 
-    def change_port_speed(self, hardware_id, public, speed):
+    def trunk(self, hardware_id, vlan_id):
+        """Add vlan trunk to a server.
+
+        :param integer hardware_id: the hardware ID to add vlan trunk.
+        :param integer vlan_id: the vlan id.
+
+        Example::
+
+            # Add trunk
+            result = mgr.trunk(824671, 1341234)
+            # Remove trunk
+            result = mgr.trunk(824671, -1341234)
+        """
+        action = 'addNetworkVlanTrunks'
+        if vlan_id < 0:
+            action = 'removeNetworkVlanTrunks'
+        vlan_id = abs(vlan_id)
+        vmgr = SoftLayer.NetworkManager(self.client)
+        vlan = vmgr.get_vlan(vlan_id)
+        name = "primaryBackendNetworkComponent"
+        if vlan['networkSpace'] == 'PUBLIC':
+            name = "primaryNetworkComponent"
+        mask = 'id,' + name + ',' + name
+        hw = self.get_hardware(hardware_id, mask=mask)
+        network_id = hw[name]["id"]
+        param = [{'id': vlan_id}]
+        return self.client.call('Network_Component', action, param,
+                                id=network_id)
+
+    def change_port_speed(self, network_id, public, speed):
         """Allows you to change the port speed of a server's NICs.
 
-        :param int hardware_id: The ID of the server
+        :param int network_id: The ID of the server
         :param bool public: Flag to indicate which interface to change.
                             True (default) means the public interface.
                             False indicates the private interface.
@@ -272,18 +301,18 @@ class HardwareManager(utils.IdentifierMixin, object):
         Example::
 
             #change the Public interface to 10Mbps on instance 12345
-            result = mgr.change_port_speed(hardware_id=12345,
+            result = mgr.change_port_speed(network_id=12345,
                                            public=True, speed=10)
             # result will be True or an Exception
         """
         if public:
             return self.client.call('Hardware_Server',
                                     'setPublicNetworkInterfaceSpeed',
-                                    speed, id=hardware_id)
+                                    speed, id=network_id)
         else:
             return self.client.call('Hardware_Server',
                                     'setPrivateNetworkInterfaceSpeed',
-                                    speed, id=hardware_id)
+                                    speed, id=network_id)
 
     def place_order(self, **kwargs):
         """Places an order for a piece of hardware.
@@ -507,13 +536,13 @@ regions[location[location[priceGroups]]]
         if results:
             return [result['id'] for result in results]
 
-    def edit(self, hardware_id, userdata=None, hostname=None, domain=None,
+    def edit(self, network_id, userdata=None, hostname=None, domain=None,
              notes=None, tags=None):
         """Edit hostname, domain name, notes, user data of the hardware.
 
         Parameters set to None will be ignored and not attempted to be updated.
 
-        :param integer hardware_id: the instance ID to edit
+        :param integer network_id: the instance ID to edit
         :param string userdata: user data on the hardware to edit.
                                 If none exist it will be created
         :param string hostname: valid hostname
@@ -525,16 +554,16 @@ regions[location[location[priceGroups]]]
         Example::
 
             # Change the hostname on instance 12345 to 'something'
-            result = mgr.edit(hardware_id=12345 , hostname="something")
+            result = mgr.edit(network_id=12345 , hostname="something")
             #result will be True or an Exception
         """
 
         obj = {}
         if userdata:
-            self.hardware.setUserMetadata([userdata], id=hardware_id)
+            self.hardware.setUserMetadata([userdata], id=network_id)
 
         if tags is not None:
-            self.hardware.setTags(tags, id=hardware_id)
+            self.hardware.setTags(tags, id=network_id)
 
         if hostname:
             obj['hostname'] = hostname
@@ -548,10 +577,10 @@ regions[location[location[priceGroups]]]
         if not obj:
             return True
 
-        return self.hardware.editObject(obj, id=hardware_id)
+        return self.hardware.editObject(obj, id=network_id)
 
     def update_firmware(self,
-                        hardware_id,
+                        network_id,
                         ipmi=True,
                         raid_controller=True,
                         bios=True,
@@ -560,7 +589,7 @@ regions[location[location[priceGroups]]]
 
         This will cause the server to be unavailable for ~20 minutes.
 
-        :param int hardware_id: The ID of the hardware to have its firmware
+        :param int network_id: The ID of the hardware to have its firmware
                                 updated.
         :param bool ipmi: Update the ipmi firmware.
         :param bool raid_controller: Update the raid controller firmware.
@@ -570,12 +599,12 @@ regions[location[location[priceGroups]]]
         Example::
 
             # Check the servers active transactions to see progress
-            result = mgr.update_firmware(hardware_id=1234)
+            result = mgr.update_firmware(network_id=1234)
         """
 
         return self.hardware.createFirmwareUpdateTransaction(
             bool(ipmi), bool(raid_controller), bool(bios), bool(hard_drive),
-            id=hardware_id)
+            id=network_id)
 
 
 def _get_extra_price_id(items, key_name, hourly, location):

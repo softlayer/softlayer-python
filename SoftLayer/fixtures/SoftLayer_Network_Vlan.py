@@ -1,1 +1,2 @@
-getObject = {'primaryRouter': {'datacenter': {'id': 1234}}}
+getObject = {'primaryRouter': {'datacenter': {'id': 1234}},
+             'networkSpace': 'PRIVATE'}

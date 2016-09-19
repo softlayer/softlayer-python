@@ -32,7 +32,9 @@ getObject = {
     'primaryBackendIpAddress': '10.1.0.2',
     'networkManagementIpAddress': '10.1.0.3',
     'hardwareStatus': {'status': 'ACTIVE'},
-    'primaryNetworkComponent': {'maxSpeed': 10, 'speed': 10},
+    'primaryNetworkComponent': {'maxSpeed': 10, 'speed': 10, 'id': 2234},
+    'primaryBackendNetworkComponent': {'maxSpeed': 10, 'speed': 10,
+                                       'id': 1234},
     'provisionDate': '2013-08-01 15:23:45',
     'notes': 'These are test notes.',
     'operatingSystem': {

@@ -287,6 +287,35 @@ class HardwareTests(testing.TestCase):
         self.assertEqual("No billing item found for hardware",
                          str(ex))
 
+    def test_trunk_public(self):
+        mock = self.set_mock('SoftLayer_Network_Vlan', 'getObject')
+        mock.return_value = {
+            'primaryRouter': {
+                'datacenter': {
+                    'id': 1234
+                }},
+            'networkSpace': 'PUBLIC'
+        }
+        self.hardware.trunk(2, 1000)
+        self.assert_called_with(
+            'SoftLayer_Network_Component', 'addNetworkVlanTrunks',
+            args=([{'id': 1000}],),
+            identifier=2234)
+
+    def test_trunk_private(self):
+        self.hardware.trunk(2, 1000)
+        self.assert_called_with(
+            'SoftLayer_Network_Component', 'addNetworkVlanTrunks',
+            args=([{'id': 1000}],),
+            identifier=1234)
+
+    def test_trunk_remove(self):
+        self.hardware.trunk(2, -1000)
+        self.assert_called_with(
+            'SoftLayer_Network_Component', 'removeNetworkVlanTrunks',
+            args=([{'id': 1000}],),
+            identifier=1234)
+
     def test_change_port_speed_public(self):
         self.hardware.change_port_speed(2, True, 100)
 

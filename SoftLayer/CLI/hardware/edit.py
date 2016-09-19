@@ -28,9 +28,14 @@ from SoftLayer.CLI import helpers
               help="Private port speed.",
               default=None,
               type=click.Choice(['0', '10', '100', '1000', '10000']))
+@click.option('--trunk',
+              help="Add or remove vlan trunk, positive vlan id "
+              "means to add, negative means to remove",
+              default=None,
+              type=click.INT)
 @environment.pass_env
 def cli(env, identifier, domain, userfile, tag, hostname, userdata,
-        public_speed, private_speed):
+        public_speed, private_speed, trunk):
     """Edit hardware details."""
 
     if userdata and userfile:
@@ -62,3 +67,9 @@ def cli(env, identifier, domain, userfile, tag, hostname, userdata,
 
     if private_speed is not None:
         mgr.change_port_speed(hw_id, False, int(private_speed))
+
+    if trunk is not None:
+        if not mgr.trunk(hw_id, vlan_id=trunk):
+            raise exceptions.CLIAbort(
+                'Failed to %s vlan trunk %s' % (
+                    'add' if trunk > 0 else 'remove', abs(trunk)))
