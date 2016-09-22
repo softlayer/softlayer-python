@@ -441,3 +441,31 @@ class ServerCLITests(testing.TestCase):
             args=(100,),
             identifier=100,
         )
+
+    def test_edit_add_trunk(self):
+        result = self.run_command(['server', 'edit',
+                                   '--trunk=1000',
+                                   '100'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.output, '')
+
+        self.assert_called_with(
+            'SoftLayer_Network_Component', 'addNetworkVlanTrunks',
+            args=([{'id': 1000}],),
+            identifier=1234,
+        )
+
+    def test_edit_remove_trunk(self):
+        result = self.run_command(['server', 'edit',
+                                   '--trunk=-1000',
+                                   '100'])
+
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+        self.assertEqual(result.output, '')
+
+        self.assert_called_with(
+            'SoftLayer_Network_Component', 'removeNetworkVlanTrunks',
+            args=([{'id': 1000}],),
+            identifier=1234,
+        )
