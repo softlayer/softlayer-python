@@ -69,7 +69,8 @@ def create_client_from_env(username=None,
         calls if you wish to bypass the packages built in User Agent string
     :param transport: An object that's callable with this signature:
                       transport(SoftLayer.transports.Request)
-    :param bool verify: decide to verify the server's SSL cert
+    :param bool verify: decide to verify the server's SSL/TLS cert. DO NOT SET
+                        TO FALSE WITHOUT UNDERSTANDING THE IMPLICATIONS.
 
     Usage:
 
