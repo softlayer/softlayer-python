@@ -64,7 +64,7 @@ class Request(object):
         self.transport_headers = {}
 
         #: Boolean specifying if the server certificate should be verified.
-        self.verify = True
+        self.verify = None
 
         #: Client certificate file path.
         self.cert = None
@@ -103,13 +103,15 @@ class XmlRpcTransport(object):
                  endpoint_url=None,
                  timeout=None,
                  proxy=None,
-                 user_agent=None):
+                 user_agent=None,
+                 verify=True):
 
         self.endpoint_url = (endpoint_url or
                              consts.API_PUBLIC_ENDPOINT).rstrip('/')
         self.timeout = timeout or None
         self.proxy = proxy
         self.user_agent = user_agent or consts.USER_AGENT
+        self.verify = verify
 
     def __call__(self, request):
         """Makes a SoftLayer API call against the XML-RPC endpoint.
@@ -145,6 +147,12 @@ class XmlRpcTransport(object):
         payload = utils.xmlrpc_client.dumps(tuple(largs),
                                             methodname=request.method,
                                             allow_none=True)
+
+        # Prefer the request setting, if it's not None
+        verify = request.verify
+        if verify is None:
+            verify = self.verify
+
         LOGGER.debug("=== REQUEST ===")
         LOGGER.info('POST %s', url)
         LOGGER.debug(request.transport_headers)
@@ -155,7 +163,7 @@ class XmlRpcTransport(object):
                                     data=payload,
                                     headers=request.transport_headers,
                                     timeout=self.timeout,
-                                    verify=request.verify,
+                                    verify=verify,
                                     cert=request.cert,
                                     proxies=_proxies_dict(self.proxy))
             LOGGER.debug("=== RESPONSE ===")
@@ -202,13 +210,15 @@ class RestTransport(object):
                  endpoint_url=None,
                  timeout=None,
                  proxy=None,
-                 user_agent=None):
+                 user_agent=None,
+                 verify=True):
 
         self.endpoint_url = (endpoint_url or
                              consts.API_PUBLIC_ENDPOINT_REST).rstrip('/')
         self.timeout = timeout or None
         self.proxy = proxy
         self.user_agent = user_agent or consts.USER_AGENT
+        self.verify = verify
 
     def __call__(self, request):
         """Makes a SoftLayer API call against the REST endpoint.
@@ -269,6 +279,11 @@ class RestTransport(object):
 
         url = '%s.%s' % ('/'.join(url_parts), 'json')
 
+        # Prefer the request setting, if it's not None
+        verify = request.verify
+        if verify is None:
+            verify = self.verify
+
         LOGGER.debug("=== REQUEST ===")
         LOGGER.info(url)
         LOGGER.debug(request.transport_headers)
@@ -280,14 +295,14 @@ class RestTransport(object):
                                     params=params,
                                     data=raw_body,
                                     timeout=self.timeout,
-                                    verify=request.verify,
+                                    verify=verify,
                                     cert=request.cert,
                                     proxies=_proxies_dict(self.proxy))
             LOGGER.debug("=== RESPONSE ===")
             LOGGER.debug(resp.headers)
-            LOGGER.debug(resp.content)
+            LOGGER.debug(resp.text)
             resp.raise_for_status()
-            result = json.loads(resp.content)
+            result = json.loads(resp.text)
 
             if isinstance(result, list):
                 return SoftLayerListResult(
@@ -295,9 +310,9 @@ class RestTransport(object):
             else:
                 return result
         except requests.HTTPError as ex:
-            content = json.loads(ex.response.content)
+            message = json.loads(ex.response.text)['error']
             raise exceptions.SoftLayerAPIError(ex.response.status_code,
-                                               content['error'])
+                                               message)
         except requests.RequestException as ex:
             raise exceptions.TransportError(0, str(ex))
 

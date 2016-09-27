@@ -8,6 +8,7 @@ import io
 import warnings
 
 import mock
+import pytest
 import requests
 import six
 
@@ -17,26 +18,31 @@ from SoftLayer import testing
 from SoftLayer import transports
 
 
+def get_xmlrpc_response():
+    response = requests.Response()
+    list_body = six.b('''<?xml version="1.0" encoding="utf-8"?>
+<params>
+<param>
+<value>
+<array>
+<data/>
+</array>
+</value>
+</param>
+</params>''')
+    response.raw = io.BytesIO(list_body)
+    response.headers['SoftLayer-Total-Items'] = 10
+    response.status_code = 200
+    return response
+
+
 class TestXmlRpcAPICall(testing.TestCase):
 
     def set_up(self):
         self.transport = transports.XmlRpcTransport(
             endpoint_url='http://something.com',
         )
-        self.response = requests.Response()
-        list_body = six.b('''<?xml version="1.0" encoding="utf-8"?>
-<params>
-<param>
- <value>
-  <array>
-   <data/>
-  </array>
- </value>
-</param>
-</params>''')
-        self.response.raw = io.BytesIO(list_body)
-        self.response.headers['SoftLayer-Total-Items'] = 10
-        self.response.status_code = 200
+        self.response = get_xmlrpc_response()
 
     @mock.patch('requests.request')
     def test_call(self, request):
@@ -251,6 +257,55 @@ class TestXmlRpcAPICall(testing.TestCase):
         self.assertRaises(SoftLayer.TransportError, self.transport, req)
 
 
+@mock.patch('requests.request')
+@pytest.mark.parametrize(
+    "transport_verify,request_verify,expected",
+    [
+        (True, True, True),
+        (True, False, False),
+        (True, None, True),
+
+        (False, True, True),
+        (False, False, False),
+        (False, None, False),
+
+        (None, True, True),
+        (None, False, False),
+        (None, None, True),
+    ]
+)
+def test_verify(request,
+                transport_verify,
+                request_verify,
+                expected):
+    request.return_value = get_xmlrpc_response()
+
+    transport = transports.XmlRpcTransport(
+        endpoint_url='http://something.com',
+    )
+
+    req = transports.Request()
+    req.service = 'SoftLayer_Service'
+    req.method = 'getObject'
+
+    if request_verify is not None:
+        req.verify = request_verify
+
+    if transport_verify is not None:
+        transport.verify = transport_verify
+
+    transport(req)
+
+    request.assert_called_with('POST',
+                               'http://something.com/SoftLayer_Service',
+                               data=mock.ANY,
+                               headers=mock.ANY,
+                               cert=mock.ANY,
+                               proxies=mock.ANY,
+                               timeout=mock.ANY,
+                               verify=expected)
+
+
 class TestRestAPICall(testing.TestCase):
 
     def set_up(self):
@@ -261,6 +316,7 @@ class TestRestAPICall(testing.TestCase):
     @mock.patch('requests.request')
     def test_basic(self, request):
         request().content = '[]'
+        request().text = '[]'
         request().headers = requests.structures.CaseInsensitiveDict({
             'SoftLayer-Total-Items': '10',
         })
@@ -290,7 +346,7 @@ class TestRestAPICall(testing.TestCase):
         e = requests.HTTPError('error')
         e.response = mock.MagicMock()
         e.response.status_code = 404
-        e.response.content = '''{
+        e.response.text = '''{
             "error": "description",
             "code": "Error Code"
         }'''
@@ -315,7 +371,7 @@ class TestRestAPICall(testing.TestCase):
 
     @mock.patch('requests.request')
     def test_valid_proxy(self, request):
-        request().content = '{}'
+        request().text = '{}'
         self.transport.proxy = 'http://localhost:3128'
 
         req = transports.Request()
@@ -323,6 +379,7 @@ class TestRestAPICall(testing.TestCase):
         req.method = 'Resource'
 
         self.transport(req)
+
         request.assert_called_with(
             'GET', 'http://something.com/SoftLayer_Service/Resource.json',
             proxies={'https': 'http://localhost:3128',
@@ -337,7 +394,7 @@ class TestRestAPICall(testing.TestCase):
 
     @mock.patch('requests.request')
     def test_with_id(self, request):
-        request().content = '{}'
+        request().text = '{}'
 
         req = transports.Request()
         req.service = 'SoftLayer_Service'
@@ -361,7 +418,7 @@ class TestRestAPICall(testing.TestCase):
 
     @mock.patch('requests.request')
     def test_with_args(self, request):
-        request().content = '{}'
+        request().text = '{}'
 
         req = transports.Request()
         req.service = 'SoftLayer_Service'
@@ -385,7 +442,7 @@ class TestRestAPICall(testing.TestCase):
 
     @mock.patch('requests.request')
     def test_with_filter(self, request):
-        request().content = '{}'
+        request().text = '{}'
 
         req = transports.Request()
         req.service = 'SoftLayer_Service'
@@ -410,7 +467,7 @@ class TestRestAPICall(testing.TestCase):
 
     @mock.patch('requests.request')
     def test_with_mask(self, request):
-        request().content = '{}'
+        request().text = '{}'
 
         req = transports.Request()
         req.service = 'SoftLayer_Service'
