@@ -727,7 +727,8 @@ class VSManager(utils.IdentifierMixin, object):
             'getObject',
             id=instance_id,
             mask="""id,
-            blockDevices[id,device,mountType,diskImage[id,metadataFlag]]""")
+            blockDevices[id,device,mountType,
+            diskImage[id,metadataFlag,type[keyName]]]""")
 
         disks_to_capture = []
         for block_device in vsi['blockDevices']:
@@ -736,8 +737,12 @@ class VSManager(utils.IdentifierMixin, object):
             if utils.lookup(block_device, 'diskImage', 'metadataFlag'):
                 continue
 
-            # We never want device 1 (swap)
-            if str(block_device['device']) == '1':
+            # We never want swap devices
+            type_name = utils.lookup(block_device,
+                                     'diskImage',
+                                     'type',
+                                     'keyName')
+            if type_name == 'SWAP':
                 continue
 
             # We never want CD images
