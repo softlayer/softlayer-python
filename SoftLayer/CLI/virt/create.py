@@ -2,6 +2,7 @@
 # :license: MIT, see LICENSE for more details.
 
 import click
+import json
 
 import SoftLayer
 from SoftLayer.CLI import environment
@@ -67,96 +68,100 @@ def _update_with_like_args(ctx, _, value):
 
 
 def _parse_create_args(client, args):
-    """Converts CLI arguments to args for VSManager.create_instance.
+    """Converts CLI arguments to args for VSManager.create_instances.
 
     :param dict args: CLI arguments
     """
-    data = {
-        "hourly": args['billing'] == 'hourly',
-        "domain": args['domain'],
-        "hostname": args['hostname'],
-        "private": args['private'],
-        "dedicated": args['dedicated'],
-        "disks": args['disk'],
-        "cpus": args.get('cpu', None),
-        "memory": args.get('memory', None),
-        "flavor": args.get('flavor', None),
-        "boot_mode": args.get('boot_mode', None)
-    }
+    config_list = []
 
-    # The primary disk is included in the flavor and the local_disk flag is not needed
-    # Setting it to None prevents errors from the flag not matching the flavor
-    if not args.get('san') and args.get('flavor'):
-        data['local_disk'] = None
-    else:
-        data['local_disk'] = not args['san']
+    for hostname in args['hostnames'].split(','):
+        data = {
+            "hourly": args['billing'] == 'hourly',
+            "domain": args['domain'],
+            "hostname": hostname,
+            "private": args['private'],
+            "dedicated": args['dedicated'],
+            "disks": args['disk'],
+            "cpus": args.get('cpu', None),
+            "memory": args.get('memory', None),
+            "flavor": args.get('flavor', None),
+            "boot_mode": args.get('boot_mode', None)
+        }
 
-    if args.get('os'):
-        data['os_code'] = args['os']
-
-    if args.get('image'):
-        if args.get('image').isdigit():
-            image_mgr = SoftLayer.ImageManager(client)
-            image_details = image_mgr.get_image(args.get('image'),
-                                                mask="id,globalIdentifier")
-            data['image_id'] = image_details['globalIdentifier']
+        # The primary disk is included in the flavor and the local_disk flag is not needed
+        # Setting it to None prevents errors from the flag not matching the flavor
+        if not args.get('san') and args.get('flavor'):
+            data['local_disk'] = None
         else:
-            data['image_id'] = args['image']
+            data['local_disk'] = not args['san']
 
-    if args.get('datacenter'):
-        data['datacenter'] = args['datacenter']
+        if args.get('os'):
+            data['os_code'] = args['os']
 
-    if args.get('network'):
-        data['nic_speed'] = args.get('network')
+        if args.get('image'):
+            if args.get('image').isdigit():
+                image_mgr = SoftLayer.ImageManager(client)
+                image_details = image_mgr.get_image(args.get('image'),
+                                                    mask="id,globalIdentifier")
+                data['image_id'] = image_details['globalIdentifier']
+            else:
+                data['image_id'] = args['image']
 
-    if args.get('userdata'):
-        data['userdata'] = args['userdata']
-    elif args.get('userfile'):
-        with open(args['userfile'], 'r') as userfile:
-            data['userdata'] = userfile.read()
+        if args.get('datacenter'):
+            data['datacenter'] = args['datacenter']
 
-    if args.get('postinstall'):
-        data['post_uri'] = args.get('postinstall')
+        if args.get('network'):
+            data['nic_speed'] = args.get('network')
 
-    # Get the SSH keys
-    if args.get('key'):
-        keys = []
-        for key in args.get('key'):
-            resolver = SoftLayer.SshKeyManager(client).resolve_ids
-            key_id = helpers.resolve_id(resolver, key, 'SshKey')
-            keys.append(key_id)
-        data['ssh_keys'] = keys
+        if args.get('userdata'):
+            data['userdata'] = args['userdata']
+        elif args.get('userfile'):
+            with open(args['userfile'], 'r') as userfile:
+                data['userdata'] = userfile.read()
 
-    if args.get('vlan_public'):
-        data['public_vlan'] = args['vlan_public']
+        if args.get('postinstall'):
+            data['post_uri'] = args.get('postinstall')
 
-    if args.get('vlan_private'):
-        data['private_vlan'] = args['vlan_private']
+        # Get the SSH keys
+        if args.get('key'):
+            keys = []
+            for key in args.get('key'):
+                resolver = SoftLayer.SshKeyManager(client).resolve_ids
+                key_id = helpers.resolve_id(resolver, key, 'SshKey')
+                keys.append(key_id)
+            data['ssh_keys'] = keys
 
-    data['public_subnet'] = args.get('subnet_public', None)
+        if args.get('vlan_public'):
+            data['public_vlan'] = args['vlan_public']
 
-    data['private_subnet'] = args.get('subnet_private', None)
+        if args.get('vlan_private'):
+            data['private_vlan'] = args['vlan_private']
 
-    if args.get('public_security_group'):
-        pub_groups = args.get('public_security_group')
-        data['public_security_groups'] = [group for group in pub_groups]
+        data['public_subnet'] = args.get('subnet_public', None)
 
-    if args.get('private_security_group'):
-        priv_groups = args.get('private_security_group')
-        data['private_security_groups'] = [group for group in priv_groups]
+        data['private_subnet'] = args.get('subnet_private', None)
 
-    if args.get('tag'):
-        data['tags'] = ','.join(args['tag'])
+        if args.get('public_security_group'):
+            pub_groups = args.get('public_security_group')
+            data['public_security_groups'] = [group for group in pub_groups]
 
-    if args.get('host_id'):
-        data['host_id'] = args['host_id']
+        if args.get('private_security_group'):
+            priv_groups = args.get('private_security_group')
+            data['private_security_groups'] = [group for group in priv_groups]
 
-    return data
+        if args.get('tag'):
+            data['tags'] = ','.join(args['tag'])
+
+        if args.get('host_id'):
+            data['host_id'] = args['host_id']
+
+        config_list.append(data)
+    return config_list
 
 
 @click.command(epilog="See 'slcli vs create-options' for valid options")
-@click.option('--hostname', '-H',
-              help="Host portion of the FQDN",
+@click.option('--hostnames', '-H',
+              help="Hosts portion of the FQDN",
               required=True,
               prompt=True)
 @click.option('--domain', '-D',
@@ -253,6 +258,7 @@ def _parse_create_args(client, args):
               type=click.INT,
               help="Wait until VS is finished provisioning for up to X "
                    "seconds before returning")
+@click.option('--output-json', is_flag=True)
 @environment.pass_env
 def cli(env, **args):
     """Order/create virtual servers."""
@@ -265,43 +271,44 @@ def cli(env, **args):
     table = formatting.Table(['Item', 'cost'])
     table.align['Item'] = 'r'
     table.align['cost'] = 'r'
-    data = _parse_create_args(env.client, args)
+    config_list = _parse_create_args(env.client, args)
 
     output = []
     if args.get('test'):
-        result = vsi.verify_create_instance(**data)
-        total_monthly = 0.0
-        total_hourly = 0.0
-
-        table = formatting.Table(['Item', 'cost'])
-        table.align['Item'] = 'r'
-        table.align['cost'] = 'r'
-
-        for price in result['prices']:
-            total_monthly += float(price.get('recurringFee', 0.0))
-            total_hourly += float(price.get('hourlyRecurringFee', 0.0))
+        for config in config_list:
+            result = vsi.verify_create_instance(**config)
+            total_monthly = 0.0
+            total_hourly = 0.0
+    
+            table = formatting.Table(['Item', 'cost'])
+            table.align['Item'] = 'r'
+            table.align['cost'] = 'r'
+    
+            for price in result['prices']:
+                total_monthly += float(price.get('recurringFee', 0.0))
+                total_hourly += float(price.get('hourlyRecurringFee', 0.0))
+                if args.get('billing') == 'hourly':
+                    rate = "%.2f" % float(price['hourlyRecurringFee'])
+                elif args.get('billing') == 'monthly':
+                    rate = "%.2f" % float(price['recurringFee'])
+    
+                table.add_row([price['item']['description'], rate])
+    
+            total = 0
             if args.get('billing') == 'hourly':
-                rate = "%.2f" % float(price['hourlyRecurringFee'])
+                total = total_hourly
             elif args.get('billing') == 'monthly':
-                rate = "%.2f" % float(price['recurringFee'])
+                total = total_monthly
 
-            table.add_row([price['item']['description'], rate])
-
-        total = 0
-        if args.get('billing') == 'hourly':
-            total = total_hourly
-        elif args.get('billing') == 'monthly':
-            total = total_monthly
-
-        billing_rate = 'monthly'
-        if args.get('billing') == 'hourly':
-            billing_rate = 'hourly'
-        table.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
-        output.append(table)
-        output.append(formatting.FormattedItem(
-            None,
-            ' -- ! Prices reflected here are retail and do not '
-            'take account level discounts and are not guaranteed.'))
+            billing_rate = 'monthly'
+            if args.get('billing') == 'hourly':
+                billing_rate = 'hourly'
+            table.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
+            output.append(table)
+            output.append(formatting.FormattedItem(
+                None,
+                ' -- ! Prices reflected here are retail and do not '
+                'take account level discounts and are not guaranteed.'))
 
     if args['export']:
         export_file = args.pop('export')
@@ -314,15 +321,7 @@ def cli(env, **args):
                 "This action will incur charges on your account. Continue?")):
             raise exceptions.CLIAbort('Aborting virtual server order.')
 
-        result = vsi.create_instance(**data)
-
-        table = formatting.KeyValueTable(['name', 'value'])
-        table.align['name'] = 'r'
-        table.align['value'] = 'l'
-        table.add_row(['id', result['id']])
-        table.add_row(['created', result['createDate']])
-        table.add_row(['guid', result['globalIdentifier']])
-        output.append(table)
+        result = vsi.create_instances(config_list)
 
         if args.get('wait'):
             ready = vsi.wait_for_ready(result['id'], args.get('wait') or 1)
@@ -331,7 +330,20 @@ def cli(env, **args):
                 env.out(env.fmt(output))
                 raise exceptions.CLIHalt(code=1)
 
-    env.fout(output)
+        if args['output_json']:
+            env.fout(json.dumps(result))
+        else:
+            for instance_data in result:
+                table = formatting.KeyValueTable(['name', 'value'])
+                table.align['name'] = 'r'
+                table.align['value'] = 'l'
+                table.add_row(['id', instance_data['id']])
+                table.add_row(['hostname', instance_data['hostname']])
+                table.add_row(['created', instance_data['createDate']])
+                table.add_row(['uuid', instance_data['uuid']])
+                output.append(table)
+
+            env.fout(output)
 
 
 def _validate_args(env, args):
