@@ -55,6 +55,12 @@ def cli(env, volume_id):
         file_volume['serviceResourceBackendIpAddress'],
     ])
 
+    if file_volume['fileNetworkMountAddress']:
+        table.add_row([
+            'Mount Address',
+            file_volume['fileNetworkMountAddress'],
+        ])
+
     if file_volume['snapshotCapacityGb']:
         table.add_row([
             'Snapshot Capacity (GB)',

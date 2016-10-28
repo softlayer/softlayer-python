@@ -86,7 +86,8 @@ class FileTests(testing.TestCase):
                 'ip_addr': '127.0.0.1',
                 'storage_type': 'ENDURANCE',
                 'username': 'user',
-                'active_transactions': None
+                'active_transactions': None,
+                'mount_addr': '127.0.0.1:/TEST'
             }],
             json.loads(result.output))
 
@@ -122,6 +123,7 @@ class FileTests(testing.TestCase):
             'Used Space': '0B',
             'Endurance Tier': '2 IOPS per GB',
             'IOPs': 1000,
+            'Mount Address': '127.0.0.1:/TEST',
             'Snapshot Capacity (GB)': '10',
             'Snapshot Used (Bytes)': 1024,
             'Capacity (GB)': '20GB',

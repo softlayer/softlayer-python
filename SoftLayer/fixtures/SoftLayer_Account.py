@@ -479,6 +479,7 @@ getNasNetworkStorage = [{
     'password': 'pass',
     'serviceResourceBackendIpAddress': '127.0.0.1',
     'storageType': {'keyName': 'ENDURANCE_STORAGE'},
+    'fileNetworkMountAddress': '127.0.0.1:/TEST',
 }]
 
 getActiveQuotes = [{
