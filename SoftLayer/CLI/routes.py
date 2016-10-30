@@ -197,8 +197,8 @@ ALL_ROUTES = [
     ('nas:list', 'SoftLayer.CLI.nas.list:cli'),
     ('nas:credentials', 'SoftLayer.CLI.nas.credentials:cli'),
     ('nas:grant-access', 'SoftLayer.CLI.nas.grant_access:cli'),
-    ('nas:grant-vm-access', 'SoftLayer.CLI.nas.grant_vm_access:cli'),
     ('nas:detail', 'SoftLayer.CLI.nas.detail:cli'),
+    ('nas:revoke-access', 'SoftLayer.CLI.nas.revoke_access:cli'),
 
     ('object-storage', 'SoftLayer.CLI.object_storage'),
     ('object-storage:accounts',
