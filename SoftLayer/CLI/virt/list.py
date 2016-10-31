@@ -2,6 +2,7 @@
 # :license: MIT, see LICENSE for more details.
 
 import click
+import json
 
 import SoftLayer
 from SoftLayer.CLI import columns as column_helper
@@ -66,9 +67,10 @@ DEFAULT_COLUMNS = [
               help='How many results to get in one api call, default is 100',
               default=100,
               show_default=True)
+@click.option('--output-json', is_flag=True, default=False)
 @environment.pass_env
 def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
-        hourly, monthly, tag, columns, limit):
+        hourly, monthly, tag, columns, limit, output_json):
     """List virtual servers."""
 
     vsi = SoftLayer.VSManager(env.client)
@@ -83,6 +85,10 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
                                 tags=tag,
                                 mask=columns.mask(),
                                 limit=limit)
+
+    if output_json:
+        env.fout(json.dumps({'vm': guests}))
+        return
 
     table = formatting.Table(columns.columns)
     table.sortby = sortby
