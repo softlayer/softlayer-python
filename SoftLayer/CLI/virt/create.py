@@ -331,7 +331,7 @@ def cli(env, **args):
                 raise exceptions.CLIHalt(code=1)
 
         if args['output_json']:
-            env.fout(json.dumps(result))
+            env.fout(json.dumps({'statuses': result}))
         else:
             for instance_data in result:
                 table = formatting.KeyValueTable(['name', 'value'])
