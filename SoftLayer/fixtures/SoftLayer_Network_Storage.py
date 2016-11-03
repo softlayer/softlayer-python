@@ -31,6 +31,7 @@ getObject = {
     }],
     'serviceResource': {'datacenter': {'id': 449500, 'name': 'dal05'}},
     'serviceResourceBackendIpAddress': '10.1.2.3',
+    'fileNetworkMountAddress': '127.0.0.1:/TEST',
     'serviceResourceName': 'Storage Type 01 Aggregate staaspar0101_pc01',
     'username': 'username',
     'storageType': {'keyName': 'ENDURANCE_STORAGE'},
