@@ -1,11 +1,22 @@
 # Change Log
 
 ## [Unreleased]
- - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.0...HEAD
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.1...HEAD
 
 ### Added
 
 ### Changed
+
+## [5.2.1] - 2016-10-4
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.0...v5.2.1
+
+### Added
+ - CLI: Adds a new 'jsonraw' format option that will print JSON without whitespace. This is useful for integrating the CLI with other tooling.
+
+### Changed
+ - API: Fixes JSON loading while using the REST transport with Python 3
+ - CLI+API: Metadata disks are now excluded when capturing "all" block devices with `slcli virtual capture --all`
+ - CLI: Fixes a bug where dns zone importing was not importing wildcard records
 
 ## [5.2.0] - 2016-08-25
  - Changes: https://github.com/softlayer/softlayer-python/compare/v5.1.0...v5.2.0
