@@ -27,7 +27,7 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 @click.option('--tier',
               help='Endurance Storage Tier (IOP per GB)'
               '  [required for storage-type endurance]',
-              type=click.Choice(['0.25', '2', '4']))
+              type=click.Choice(['0.25', '2', '4', '10']))
 @click.option('--os-type',
               help='Operating System',
               type=click.Choice([
@@ -88,7 +88,9 @@ def cli(env, storage_type, size, iops, tier, os_type,
     if storage_type == 'endurance':
         if tier is None:
             raise exceptions.CLIAbort(
-                'Option --tier required with Endurance in IOPS/GB [0.25,2,4]')
+                'Option --tier required with Endurance in IOPS/GB '
+                '[0.25,2,4,10]'
+            )
 
         try:
             order = block_manager.order_block_volume(

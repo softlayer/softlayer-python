@@ -13,6 +13,7 @@ ENDURANCE_TIERS = {
     0.25: 100,
     2: 200,
     4: 300,
+    10: 1000,
 }
 
 
@@ -201,6 +202,9 @@ def find_endurance_tier_iops_per_gb(volume):
 
         if iops_per_gb == '4':
             return 4.0
+
+        if iops_per_gb == '10':
+            return 10.0
 
     raise ValueError("Could not find tier IOPS per GB for this volume")
 
