@@ -24,7 +24,7 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 @click.option('--tier',
               help='Endurance Storage Tier (IOPS per GB) of the primary'
               ' volume for which a replicant is ordered [optional]',
-              type=click.Choice(['0.25', '2', '4']))
+              type=click.Choice(['0.25', '2', '4', '10']))
 @click.option('--os-type',
               help='Operating System Type (e.g.: LINUX) of the primary'
               ' volume for which a replica is ordered [optional]',
