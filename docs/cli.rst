@@ -3,8 +3,8 @@
 Command-line Interface
 ======================
 
-The SoftLayer command line interface is available via the `sl` command
-available in your `PATH`.  The `sl` command is a reference implementation of
+The SoftLayer command line interface is available via the `slcli` command
+available in your `PATH`.  The `slcli` command is a reference implementation of
 SoftLayer API bindings for python and how to efficiently make API calls. See
 the :ref:`usage-examples` section to see how to discover all of the
 functionality not fully documented here.
@@ -54,10 +54,10 @@ To see more about the config file format, see :ref:`config_file`.
 
 Usage Examples
 --------------
-To discover the available commands, simply type `sl`.
+To discover the available commands, simply type `slcli`.
 ::
 
-	$ sl
+	$ slcli
 	Usage: slcli [OPTIONS] COMMAND [ARGS]...
 
 	  SoftLayer Command-line Client
