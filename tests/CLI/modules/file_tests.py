@@ -151,31 +151,29 @@ class FileTests(testing.TestCase):
     def test_volume_order_performance_iops_not_given(self):
         result = self.run_command(['file', 'volume-order',
                                    '--storage-type=performance', '--size=20',
-                                   '--os-type=linux', '--location=dal05'])
+                                   '--location=dal05'])
 
         self.assertEqual(2, result.exit_code)
 
     def test_volume_order_performance_iops_out_of_range(self):
         result = self.run_command(['file', 'volume-order',
                                    '--storage-type=performance', '--size=20',
-                                   '--iops=80000', '--os-type=linux',
-                                   '--location=dal05'])
+                                   '--iops=80000', '--location=dal05'])
 
         self.assertEqual(2, result.exit_code)
 
     def test_volume_order_performance_iops_not_multiple_of_100(self):
         result = self.run_command(['file', 'volume-order',
                                    '--storage-type=performance', '--size=20',
-                                   '--iops=122', '--os-type=linux',
-                                   '--location=dal05'])
+                                   '--iops=122', '--location=dal05'])
 
         self.assertEqual(2, result.exit_code)
 
     def test_volume_order_performance_snapshot_error(self):
         result = self.run_command(['file', 'volume-order',
                                    '--storage-type=performance', '--size=20',
-                                   '--iops=100', '--os-type=linux',
-                                   '--location=dal05', '--snapshot-size=10'])
+                                   '--iops=100', '--location=dal05',
+                                   '--snapshot-size=10'])
 
         self.assertEqual(2, result.exit_code)
 
@@ -194,8 +192,7 @@ class FileTests(testing.TestCase):
 
         result = self.run_command(['file', 'volume-order',
                                    '--storage-type=performance', '--size=20',
-                                   '--iops=100', '--os-type=linux',
-                                   '--location=dal05'])
+                                   '--iops=100', '--location=dal05'])
 
         self.assert_no_fail(result)
         self.assertEqual(result.output,
@@ -206,7 +203,7 @@ class FileTests(testing.TestCase):
     def test_volume_order_endurance_tier_not_given(self):
         result = self.run_command(['file', 'volume-order',
                                    '--storage-type=endurance', '--size=20',
-                                   '--os-type=linux', '--location=dal05'])
+                                   '--location=dal05'])
 
         self.assertEqual(2, result.exit_code)
 
@@ -226,8 +223,8 @@ class FileTests(testing.TestCase):
 
         result = self.run_command(['file', 'volume-order',
                                    '--storage-type=endurance', '--size=20',
-                                   '--tier=0.25', '--os-type=linux',
-                                   '--location=dal05', '--snapshot-size=10'])
+                                   '--tier=0.25', '--location=dal05',
+                                   '--snapshot-size=10'])
 
         self.assert_no_fail(result)
         self.assertEqual(result.output,
@@ -242,8 +239,7 @@ class FileTests(testing.TestCase):
 
         result = self.run_command(['file', 'volume-order',
                                    '--storage-type=endurance', '--size=20',
-                                   '--tier=0.25', '--os-type=linux',
-                                   '--location=dal05'])
+                                   '--tier=0.25', '--location=dal05'])
 
         self.assert_no_fail(result)
         self.assertEqual(result.output,

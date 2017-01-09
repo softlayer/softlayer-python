@@ -285,6 +285,10 @@ class FileStorageManager(utils.IdentifierMixin, object):
                 "File volume storage_type must be either "
                 "Performance or Endurance")
 
+        if os_type:
+            raise exceptions.SoftLayerError(
+                'OS type is not used on file storage orders.')
+
         order = {
             'complexType': complex_type,
             'packageId': package['id'],
