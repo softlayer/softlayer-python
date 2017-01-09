@@ -187,7 +187,7 @@ class FileTests(testing.TestCase):
             "performance_storage_nfs",
             "dal05",
             40,
-            "LINUX",
+            None,
             iops=100,
         )
 
@@ -201,7 +201,7 @@ class FileTests(testing.TestCase):
             "performance_storage_nfs",
             "dal05",
             40,
-            "LINUX",
+            None,
             iops=100,
         )
 
@@ -246,7 +246,7 @@ class FileTests(testing.TestCase):
             "performance_storage_nfs",
             "dal05",
             100,
-            "LINUX",
+            None,
             iops=100,
             )
 
@@ -330,7 +330,7 @@ class FileTests(testing.TestCase):
             "storage_service_enterprise",
             "dal05",
             100,
-            "LINUX",
+            None,
             tier_level=0.25,
             )
 
@@ -417,7 +417,7 @@ class FileTests(testing.TestCase):
             "storage_service_enterprise",
             "dal05",
             100,
-            "LINUX",
+            None,
             tier_level=0.25,
             snapshot_size=10,
             )

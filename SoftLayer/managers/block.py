@@ -271,7 +271,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                     package,
                     'performance_storage_iscsi'
                     ),
-                storage_utils.find_performance_space_price(package, iops),
+                storage_utils.find_performance_space_price(package, size),
                 storage_utils.find_performance_iops_price(package, size, iops),
             ]
         elif storage_type == 'storage_service_enterprise':
