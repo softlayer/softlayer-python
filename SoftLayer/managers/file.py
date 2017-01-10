@@ -242,6 +242,9 @@ class FileStorageManager(utils.IdentifierMixin, object):
         :param snapshot_size: The size of optional snapshot space,
         if snapshot space should also be ordered (None if not ordered)
         """
+        if os_type:
+            raise exceptions.SoftLayerError(
+                'OS type is not used on file storage orders')
 
         try:
             location_id = storage_utils.get_location_id(self, location)
@@ -284,10 +287,6 @@ class FileStorageManager(utils.IdentifierMixin, object):
             raise exceptions.SoftLayerError(
                 "File volume storage_type must be either "
                 "Performance or Endurance")
-
-        if os_type:
-            raise exceptions.SoftLayerError(
-                'OS type is not used on file storage orders.')
 
         order = {
             'complexType': complex_type,

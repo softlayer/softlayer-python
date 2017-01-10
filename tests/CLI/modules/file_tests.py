@@ -246,6 +246,28 @@ class FileTests(testing.TestCase):
                          'Order could not be placed! Please verify '
                          'your options and try again.\n')
 
+    @mock.patch('SoftLayer.FileStorageManager.order_file_volume')
+    def test_volume_order_performance_manager_error(self, order_mock):
+        order_mock.side_effect = ValueError('failure!')
+
+        result = self.run_command(['file', 'volume-order',
+                                   '--storage-type=performance', '--size=20',
+                                   '--iops=100', '--location=dal05'])
+
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual('Argument Error: failure!', result.exception.message)
+
+    @mock.patch('SoftLayer.FileStorageManager.order_file_volume')
+    def test_volume_order_endurance_manager_error(self, order_mock):
+        order_mock.side_effect = ValueError('failure!')
+
+        result = self.run_command(['file', 'volume-order',
+                                   '--storage-type=endurance', '--size=20',
+                                   '--tier=0.25', '--location=dal05'])
+
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual('Argument Error: failure!', result.exception.message)
+
     def test_enable_snapshots(self):
         result = self.run_command(['file', 'snapshot-enable', '12345678',
                                    '--schedule-type=HOURLY', '--minute=10',
