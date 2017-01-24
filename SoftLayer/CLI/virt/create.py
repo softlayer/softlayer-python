@@ -119,6 +119,14 @@ def _parse_create_args(client, args):
     if args.get('vlan_private'):
         data['private_vlan'] = args['vlan_private']
 
+    if args.get('public_security_group'):
+        pub_groups = args.get('public_security_group')
+        data['public_security_groups'] = [group for group in pub_groups]
+
+    if args.get('private_security_group'):
+        priv_groups = args.get('private_security_group')
+        data['private_security_groups'] = [group for group in priv_groups]
+
     if args.get('tag'):
         data['tags'] = ','.join(args['tag'])
 
@@ -201,6 +209,14 @@ def _parse_create_args(client, args):
               help="The ID of the private VLAN on which you want the virtual "
                    "server placed",
               type=click.INT)
+@helpers.multi_option('--public-security-group',
+                      '-S',
+                      help=('Security group ID to associate with '
+                            'the public interface'))
+@helpers.multi_option('--private-security-group',
+                      '-s',
+                      help=('Security group ID to associate with '
+                            'the private interface'))
 @click.option('--wait',
               type=click.INT,
               help="Wait until VS is finished provisioning for up to X "
