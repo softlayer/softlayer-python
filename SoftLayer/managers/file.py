@@ -228,7 +228,7 @@ class FileStorageManager(utils.IdentifierMixin, object):
         return self.client.call('Network_Storage', 'deleteObject',
                                 id=snapshot_id)
 
-    def order_file_volume(self, storage_type, location, size, os_type,
+    def order_file_volume(self, storage_type, location, size, os_type=None,
                           iops=None, tier_level=None, snapshot_size=None):
         """Places an order for a file volume.
 
@@ -236,12 +236,15 @@ class FileStorageManager(utils.IdentifierMixin, object):
                              or "storage_service_enterprise" (endurance)
         :param location: Datacenter in which to order iSCSI volume
         :param size: Size of the desired volume, in GB
-        :param os_type: OS Type to use for volume alignment, see help for list
+        :param os_type: Not used for file storage orders, leave None
         :param iops: Number of IOPs for a "Performance" order
         :param tier_level: Tier level to use for an "Endurance" order
         :param snapshot_size: The size of optional snapshot space,
         if snapshot space should also be ordered (None if not ordered)
         """
+        if os_type:
+            raise exceptions.SoftLayerError(
+                'OS type is not used on file storage orders')
 
         try:
             location_id = storage_utils.get_location_id(self, location)
@@ -259,7 +262,7 @@ class FileStorageManager(utils.IdentifierMixin, object):
                     package,
                     'performance_storage_nfs'
                     ),
-                storage_utils.find_performance_space_price(package, iops),
+                storage_utils.find_performance_space_price(package, size),
                 storage_utils.find_performance_iops_price(package, size, iops),
             ]
         elif storage_type == 'storage_service_enterprise':
@@ -288,7 +291,6 @@ class FileStorageManager(utils.IdentifierMixin, object):
         order = {
             'complexType': complex_type,
             'packageId': package['id'],
-            'osFormatType': {'keyName': os_type},
             'prices': prices,
             'quantity': 1,
             'location': location_id,
@@ -313,6 +315,15 @@ class FileStorageManager(utils.IdentifierMixin, object):
 
         :param integer volume_id: The id of the volume
         :param string schedule_type: 'HOURLY'|'DAILY'|'WEEKLY'
+        :param integer retention_count: The number of snapshots to attempt to
+        retain in this schedule
+        :param integer minute: The minute of the hour at which HOURLY, DAILY,
+        and WEEKLY snapshots should be taken
+        :param integer hour: The hour of the day at which DAILY and WEEKLY
+        snapshots should be taken
+        :param string|integer day_of_week: The day of the week on which WEEKLY
+        snapshots should be taken, either as a string ('SUNDAY') or integer
+        ('0' is Sunday)
         :return: Returns whether successfully scheduled or not
         """
 
@@ -340,7 +351,7 @@ class FileStorageManager(utils.IdentifierMixin, object):
                              upgrade, **kwargs):
         """Orders snapshot space for the given file volume.
 
-        :param integer volume_id: The id of the volume
+        :param integer volume_id: The ID of the volume
         :param integer capacity: The capacity to order, in GB
         :param float tier: The tier level of the file volume, in IOPS per GB
         :param boolean upgrade: Flag to indicate if this order is an upgrade
@@ -390,7 +401,7 @@ class FileStorageManager(utils.IdentifierMixin, object):
 
         :param integer volume_id: The volume ID
         :param string reason: The reason for cancellation
-        :param boolean immediate_flag: Cancel immediately or
+        :param boolean immediate: Cancel immediately or
         on anniversary date
         """
 
@@ -422,9 +433,9 @@ class FileStorageManager(utils.IdentifierMixin, object):
     def restore_from_snapshot(self, volume_id, snapshot_id):
         """Restores a specific volume from a snapshot
 
-        :param integer volume_id: The id of the volume
+        :param integer volume_id: The ID of the volume
         :param integer snapshot_id: The id of the restore point
-        :return: Returns whether succesfully restored or not
+        :return: Returns whether successfully restored or not
         """
 
         return self.client.call('Network_Storage', 'restoreFromSnapshot',
@@ -437,7 +448,7 @@ class FileStorageManager(utils.IdentifierMixin, object):
 
         :param integer volume_id: The volume ID
         :param string reason: The reason for cancellation
-        :param boolean immediate_flag: Cancel immediately or
+        :param boolean immediate: Cancel immediately or
         on anniversary date
         """
         file_volume = self.get_file_volume_details(
@@ -454,7 +465,7 @@ class FileStorageManager(utils.IdentifierMixin, object):
     def failover_to_replicant(self, volume_id, replicant_id, immediate=False):
         """Failover to a volume replicant.
 
-        :param integer volume_id: The id of the volume
+        :param integer volume_id: The ID of the volume
         :param integer replicant_id: ID of replicant to failover to
         :param boolean immediate: Flag indicating if failover is immediate
         :return: Returns whether failover was successful or not
@@ -466,8 +477,8 @@ class FileStorageManager(utils.IdentifierMixin, object):
     def failback_from_replicant(self, volume_id, replicant_id):
         """Failback from a volume replicant.
 
-        :param integer volume_id: The id of the volume
-        :param integer: ID of replicant to failback from
+        :param integer volume_id: The ID of the volume
+        :param integer replicant_id: ID of replicant to failback from
         :return: Returns whether failback was successful or not
         """
 

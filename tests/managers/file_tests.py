@@ -177,6 +177,25 @@ class FileTests(testing.TestCase):
             'deleteObject',
             identifier=100)
 
+    def test_order_file_volume_invalid_location(self):
+        mock = self.set_mock('SoftLayer_Location_Datacenter', 'getDatacenters')
+        mock.return_value = []
+
+        exception = self.assertRaises(
+            exceptions.SoftLayerError,
+            self.file.order_file_volume,
+            "performance_storage_nfs",
+            "dal05",
+            100,
+            None,
+            iops=100,
+        )
+
+        self.assertEqual(str(exception), "Invalid datacenter name "
+                                         "specified. Please provide the "
+                                         "lower case short name "
+                                         "(e.g.: dal09)")
+
     def test_order_file_volume_no_package(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = []
@@ -187,7 +206,7 @@ class FileTests(testing.TestCase):
             "performance_storage_nfs",
             "dal05",
             40,
-            "LINUX",
+            None,
             iops=100,
         )
 
@@ -201,9 +220,38 @@ class FileTests(testing.TestCase):
             "performance_storage_nfs",
             "dal05",
             40,
+            None,
+            iops=100,
+        )
+
+    def test_order_file_volume_invalid_storage_type(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [{}]
+
+        exception = self.assertRaises(
+            exceptions.SoftLayerError,
+            self.file.order_file_volume,
+            "something_completely_different",
+            "dal05",
+            100,
+            None,
+            iops=100,
+        )
+        self.assertEqual(str(exception), "File volume storage_type must be "
+                                         "either Performance or Endurance")
+
+    def test_order_file_volume_os_type_provided(self):
+        exception = self.assertRaises(
+            exceptions.SoftLayerError,
+            self.file.order_file_volume,
+            "performance_storage_nfs",
+            "dal05",
+            100,
             "LINUX",
             iops=100,
         )
+        self.assertEqual(str(exception), "OS type is not used on file "
+                                         "storage orders")
 
     def test_order_file_volume_performance(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
@@ -246,7 +294,7 @@ class FileTests(testing.TestCase):
             "performance_storage_nfs",
             "dal05",
             100,
-            "LINUX",
+            None,
             iops=100,
             )
 
@@ -330,7 +378,7 @@ class FileTests(testing.TestCase):
             "storage_service_enterprise",
             "dal05",
             100,
-            "LINUX",
+            None,
             tier_level=0.25,
             )
 
@@ -417,7 +465,7 @@ class FileTests(testing.TestCase):
             "storage_service_enterprise",
             "dal05",
             100,
-            "LINUX",
+            None,
             tier_level=0.25,
             snapshot_size=10,
             )
@@ -466,6 +514,78 @@ class FileTests(testing.TestCase):
             None,
             False,
         )
+
+    def test_order_snapshot_space_invalid_category(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [{
+            'id': 240,
+            'name': 'Endurance',
+            'items': [{
+                'capacity': '0',
+            }, {
+                'capacity': '5',
+                'prices': [{
+                    'locationGroupId': '530',
+                    }],
+            }, {
+                'capacity': '5',
+                'prices': [{
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'storage_file',
+                    }],
+                }],
+            }, {
+                'capacity': '5',
+                'prices': [{
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'storage_snapshot_space',
+                    }],
+                    'capacityRestrictionMinimum': '300',
+                }],
+            }, {
+                'capacity': '5',
+                'prices': [{
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'storage_snapshot_space',
+                    }],
+                    'capacityRestrictionMinimum': '100',
+                    'capacityRestrictionMaximum': '100',
+                }],
+            }, {
+                'capacity': '5',
+                'prices': [{
+                    'id': 46130,
+                    'locationGroupId': '',
+                    'categories': [{
+                        'categoryCode': 'storage_snapshot_space',
+                    }],
+                    'capacityRestrictionMinimum': '200',
+                    'capacityRestrictionMaximum': '200',
+                }],
+            }],
+        }]
+
+        billing_item_mock = self.set_mock('SoftLayer_Network_Storage',
+                                          'getObject')
+        billing_item_mock.return_value = {
+            'billingItem': {
+                'categoryCode': 'not_storage_service_enterprise'
+            }
+        }
+
+        exception = self.assertRaises(
+            exceptions.SoftLayerError,
+            self.file.order_snapshot_space,
+            100,
+            5,
+            None,
+            False,
+        )
+        self.assertEqual(str(exception), "File volume storage_type must be "
+                                         "Endurance")
 
     def test_order_snapshot_space(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')

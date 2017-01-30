@@ -60,7 +60,7 @@ def populate_host_templates(host_templates,
 
 
 def get_package(manager, category_code):
-    """Returns a product packaged based on type of storage.
+    """Returns a product package based on type of storage.
 
     :param manager: The storage manager which calls this function.
     :param category_code: Category code of product package.
