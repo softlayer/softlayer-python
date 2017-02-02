@@ -9,7 +9,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import helpers
 
-RECORD_REGEX = re.compile(r"""^((?P<domain>([\w-]+(\.)?)*|\@)?\s+
+RECORD_REGEX = re.compile(r"""^((?P<domain>(([\w-]+|\*)(\.)?)*|\@)?\s+
                                (?P<ttl>\d+)?\s+
                                (?P<class>\w+)?)?\s+
                                (?P<type>\w+)\s+

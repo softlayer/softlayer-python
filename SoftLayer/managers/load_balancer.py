@@ -9,9 +9,12 @@ from SoftLayer import utils
 
 
 class LoadBalancerManager(utils.IdentifierMixin, object):
-    """Manages load balancers.
+    """Manages SoftLayer load balancers.
 
-    :param SoftLayer.API.Client client: the API client instance
+    See product information here: http://www.softlayer.com/load-balancing
+
+    :param SoftLayer.API.BaseClient client: the client instance
+
     """
 
     def __init__(self, client):

@@ -20,7 +20,7 @@ Code Organization
 Setting Up A Dev Environment
 ----------------------------
 Before working with the SoftLayer Python API client source, we strongly
-recommend that you know how to use Python's virtualization environment,
+recommend that you know how to use Python's virtual environment,
 `virtualenv <https://pypi.python.org/pypi/virtualenv>`_. Virtualenv allows you
 to create isolated Python environments that are individually tailored to
 particular development projects. Each environment can have its own set of
@@ -62,9 +62,13 @@ the root of the source tree:
   tox
 
 In addition to testing different versions of Python, tox checks for common
-mistakes in the code using `Flake8 <https://pypi.python.org/pypi/flake8/2.0>`_.
-You should eliminate the simple errors reported by Flake8 before submitting
-your code.
+mistakes in the code using `Flake8 <https://pypi.python.org/pypi/flake8/2.0>`_ and `pylint <https://www.pylint.org/>`_.
+You should eliminate the linting errors that are reported before submitting
+your code. You can run only the linting checks by using this command:
+
+::
+
+  tox -eanalysis
 
 The project's configuration instructs tox to test against many different
 versions of Python. A tox test will use as many of those as it can find on your
@@ -73,7 +77,7 @@ you point the `Travis <https://travis-ci.org>`_ continuous integration tool at
 your GitHub fork. Travis will run the test against the full suite of Python
 versions every time you push new code.
 
-Using tox to running the tests in multiple environments can be very time
+Using tox to run tests in multiple environments can be very time
 consuming. If you wish to quickly run the tests in your own environment, you
 may do so using `py.test <http://pytest.org/>`_.  The command to do that
 is:
@@ -109,7 +113,7 @@ The primary docs are built at
 
 Style
 -----
-This project follows :pep:`8` and most of the style suggestions that pyflakes
+This project tries to follow :pep:`8` and most of the style suggestions that pyflakes
 recommends. Run `Flake8 <https://pypi.python.org/pypi/flake8/2.0>`_ regularly.
 Flake8, with project-specific exceptions, can be run by using tox:
 
@@ -120,12 +124,15 @@ Flake8, with project-specific exceptions, can be run by using tox:
 
 Contributing
 ------------
-Contributing to the Python API bindings follows the fork-pull-request model on
+Contributing to the Python API bindings follows the `fork-pull-request model <https://guides.github.com/introduction/flow/>`_ on
 `GitHub <http://github.com>`_. The project uses GitHub's
 `issue tracker <https://github.com/softlayer/softlayer-python/issues>`_ and
 `pull requests <https://github.com/softlayer/softlayer-python/pulls>`_ to
 manage source control, bug fixes and new feature development regarding the API
-bindings and the CLI.
+bindings and the CLI. In order to contribute, we require that you sign a contributer agreemenet:
+
+* Sign our contributor agreement (CLA) You can find the :download:`CLA here <cla-individual.md>`.
+* If you're contributing on behalf of your employer we'll need a signed copy of our corporate contributor agreement (CCLA) as well.  You can find the :download:`CCLA here <cla-corporate.md>`.
 
 
 Developer Resources

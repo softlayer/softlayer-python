@@ -6,6 +6,7 @@
 """
 # Disable pylint import error and too many methods error
 # pylint: disable=invalid-name
+from __future__ import print_function
 import logging
 import os.path
 
@@ -121,7 +122,7 @@ class TestCase(testtools.TestCase):
         self.tear_down()
         self.mocks.clear()
 
-    def calls(self, service=None, method=None):
+    def calls(self, service=None, method=None, **props):
         """Return all API calls made during the current test."""
 
         conditions = []
@@ -129,6 +130,8 @@ class TestCase(testtools.TestCase):
             conditions.append(lambda call: call.service == service)
         if method is not None:
             conditions.append(lambda call: call.method == method)
+        if props:
+            conditions.append(lambda call: call_has_props(call, props))
 
         return [call for call in self.mocks.calls
                 if all(cond(call) for cond in conditions)]
@@ -139,9 +142,8 @@ class TestCase(testtools.TestCase):
         Props are properties of the given transport.Request object.
         """
 
-        for call in self.calls(service, method):
-            if call_has_props(call, props):
-                return
+        if self.calls(service, method, **props):
+            return
 
         raise AssertionError('%s::%s was not called with given properties: %s'
                              % (service, method, props))
@@ -149,6 +151,7 @@ class TestCase(testtools.TestCase):
     def assert_no_fail(self, result):
         """Fail when a failing click result has an error"""
         if result.exception:
+            print(result.output)
             raise result.exception
 
         self.assertEqual(result.exit_code, 0)

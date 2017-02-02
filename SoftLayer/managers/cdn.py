@@ -15,7 +15,13 @@ MAX_URLS_PER_PURGE = 5
 
 
 class CDNManager(utils.IdentifierMixin, object):
-    """Manage CDN accounts."""
+    """Manage CDN accounts and content.
+
+    See product information here:
+    http://www.softlayer.com/content-delivery-network
+
+    :param SoftLayer.API.BaseClient client: the client instance
+    """
 
     def __init__(self, client):
         self.client = client

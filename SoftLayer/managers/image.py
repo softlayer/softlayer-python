@@ -13,9 +13,12 @@ IMAGE_MASK = ('id,accountId,name,globalIdentifier,blockDevices,parentId,'
 
 
 class ImageManager(utils.IdentifierMixin, object):
-    """Manages server images.
+    """Manages SoftLayer server images.
 
-    :param SoftLayer.API.Client client: an API client instance
+    See product information here:
+    https://knowledgelayer.softlayer.com/topic/image-templates
+
+    :param SoftLayer.API.BaseClient client: the client instance
     """
 
     def __init__(self, client):

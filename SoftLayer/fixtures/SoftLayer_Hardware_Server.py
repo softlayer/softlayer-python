@@ -7,6 +7,13 @@ getObject = {
         'id': 6327,
         'recurringFee': 1.54,
         'nextInvoiceTotalRecurringAmount': 16.08,
+        'children': [
+            {'nextInvoiceTotalRecurringAmount': 1},
+            {'nextInvoiceTotalRecurringAmount': 1},
+            {'nextInvoiceTotalRecurringAmount': 1},
+            {'nextInvoiceTotalRecurringAmount': 1},
+            {'nextInvoiceTotalRecurringAmount': 1},
+        ],
         'orderItem': {
             'order': {
                 'userRecord': {
@@ -31,8 +38,9 @@ getObject = {
     'operatingSystem': {
         'softwareLicense': {
             'softwareDescription': {
-                'referenceCode': 'Ubuntu',
-                'name': 'Ubuntu 12.04 LTS',
+                'referenceCode': 'UBUNTU_12_64',
+                'name': 'Ubuntu',
+                'version': 'Ubuntu 12.04 LTS',
             }
         },
         'passwords': [

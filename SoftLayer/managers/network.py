@@ -36,7 +36,13 @@ DEFAULT_GET_VLAN_MASK = ','.join([
 
 
 class NetworkManager(object):
-    """Manage Networks."""
+    """Manage SoftLayer network objects: VLANs, subnets, IPs and rwhois
+
+    See product information here: http://www.softlayer.com/networking
+
+    :param SoftLayer.API.BaseClient client: the client instance
+
+    """
     def __init__(self, client):
         self.client = client
         self.account = client['Account']

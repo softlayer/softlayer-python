@@ -7,17 +7,17 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 
 
-CONTEXT_SETTINGS = dict(token_normalize_func=lambda x: x.upper())
+CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 
 
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.option('--storage-type',
-              help='Type of storage volume',
+              help='Type of block storage volume',
               type=click.Choice(['performance', 'endurance']),
               required=True)
 @click.option('--size',
               type=int,
-              help='Size of storage volume in GB',
+              help='Size of block storage volume in GB',
               required=True)
 @click.option('--iops',
               type=int,
@@ -27,7 +27,7 @@ CONTEXT_SETTINGS = dict(token_normalize_func=lambda x: x.upper())
 @click.option('--tier',
               help='Endurance Storage Tier (IOP per GB)'
               '  [required for storage-type endurance]',
-              type=click.Choice(['0.25', '2', '4']))
+              type=click.Choice(['0.25', '2', '4', '10']))
 @click.option('--os-type',
               help='Operating System',
               type=click.Choice([
@@ -42,8 +42,14 @@ CONTEXT_SETTINGS = dict(token_normalize_func=lambda x: x.upper())
 @click.option('--location',
               help='Datacenter short name (e.g.: dal09)',
               required=True)
+@click.option('--snapshot-size',
+              type=int,
+              help='Optional parameter for ordering snapshot '
+              'space along with endurance block storage; specifies '
+              'the size (in GB) of snapshot space to order')
 @environment.pass_env
-def cli(env, storage_type, size, iops, tier, os_type, location):
+def cli(env, storage_type, size, iops, tier, os_type,
+        location, snapshot_size):
     """Order a block storage volume."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
     storage_type = storage_type.lower()
@@ -62,6 +68,12 @@ def cli(env, storage_type, size, iops, tier, os_type, location):
                 'Option --iops must be a multiple of 100'
             )
 
+        if snapshot_size is not None:
+            raise exceptions.CLIAbort(
+                'Option --snapshot-size not allowed for performance volumes.'
+                ' Snapshots are only available for endurance storage.'
+            )
+
         try:
             order = block_manager.order_block_volume(
                 storage_type='performance_storage_iscsi',
@@ -76,7 +88,9 @@ def cli(env, storage_type, size, iops, tier, os_type, location):
     if storage_type == 'endurance':
         if tier is None:
             raise exceptions.CLIAbort(
-                'Option --tier required with Endurance in IOPS/GB [0.25,2,4]')
+                'Option --tier required with Endurance in IOPS/GB '
+                '[0.25,2,4,10]'
+            )
 
         try:
             order = block_manager.order_block_volume(
@@ -84,7 +98,8 @@ def cli(env, storage_type, size, iops, tier, os_type, location):
                 location=location,
                 size=size,
                 tier_level=float(tier),
-                os_type=os_type
+                os_type=os_type,
+                snapshot_size=snapshot_size
             )
         except ValueError as ex:
             raise exceptions.ArgumentError(str(ex))

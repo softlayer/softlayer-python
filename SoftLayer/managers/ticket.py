@@ -10,9 +10,12 @@ from SoftLayer import utils
 
 
 class TicketManager(utils.IdentifierMixin, object):
-    """Manages support Tickets.
+    """Manages SoftLayer support tickets.
 
-    :param SoftLayer.API.Client client: an API client instance
+    See product information here: http://www.softlayer.com/support
+
+    :param SoftLayer.API.BaseClient client: the client instance
+
     """
 
     def __init__(self, client):
@@ -46,8 +49,7 @@ class TicketManager(utils.IdentifierMixin, object):
         """Get details about a ticket.
 
         :param integer ticket_id: the ticket ID
-        :returns: A dictionary containing a large amount of information about
-                  the specified ticket.
+        :returns: dict -- information about the specified ticket
 
         """
         mask = ('id, title, assignedUser[firstName, lastName],status,'
@@ -91,7 +93,8 @@ class TicketManager(utils.IdentifierMixin, object):
         :param string file_name:
                                   The name of the attachment shown
                                   in the ticket
-        :returns The uploaded attachment
+
+        :returns: dict -- The uploaded attachment
         """
         file_content = None
         with open(file_path, 'rb') as attached_file:
@@ -109,7 +112,8 @@ class TicketManager(utils.IdentifierMixin, object):
 
         :param integer ticket_id: the id of the ticket to attach to
         :param integer hardware_id: the id of the hardware to attach
-        :returns The new ticket attachment
+
+        :returns: dict -- The new ticket attachment
         """
         return self.ticket.addAttachedHardware(hardware_id, id=ticket_id)
 
@@ -118,7 +122,8 @@ class TicketManager(utils.IdentifierMixin, object):
 
         :param integer ticket_id: the id of the ticket to attach to
         :param integer virtual_id: the id of the virtual server to attach
-        :returns The new ticket attachment
+
+        :returns: dict -- The new ticket attachment
         """
         return self.ticket.addAttachedVirtualGuest(virtual_id, id=ticket_id)
 
@@ -127,7 +132,8 @@ class TicketManager(utils.IdentifierMixin, object):
 
         :param ticket_id: the id of the ticket to detach from
         :param hardware_id: the id of the hardware to detach
-        :return: Whether the detachment was successful
+
+        :returns: bool -- Whether the detachment was successful
         """
         return self.ticket.removeAttachedHardware(hardware_id, id=ticket_id)
 
@@ -136,6 +142,7 @@ class TicketManager(utils.IdentifierMixin, object):
 
         :param ticket_id: the id of the ticket to detach from
         :param virtual_id: the id of the virtual server to detach
-        :return: Whether the detachment was successful
+
+        :returns: bool -- Whether the detachment was successful
         """
         return self.ticket.removeAttachedVirtualGuest(virtual_id, id=ticket_id)

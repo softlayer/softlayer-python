@@ -10,7 +10,7 @@ from SoftLayer import utils
 RULE_MASK = ('mask[orderValue,action,destinationIpAddress,'
              'destinationIpSubnetMask,protocol,destinationPortRangeStart,'
              'destinationPortRangeEnd,sourceIpAddress,sourceIpSubnetMask,'
-             'version]')
+             'version,notes]')
 
 
 def has_firewall(vlan):
@@ -29,9 +29,11 @@ def has_firewall(vlan):
 
 
 class FirewallManager(utils.IdentifierMixin, object):
-    """Manages firewalls.
+    """Manages SoftLayer firewalls
 
-    :param SoftLayer.API.Client client: the API client instance
+    See product information here: http://www.softlayer.com/firewalls
+
+    :param SoftLayer.API.BaseClient client: the client instance
 
     """
 

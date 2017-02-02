@@ -46,7 +46,8 @@ def create_client_from_env(username=None,
                            config_file=None,
                            proxy=None,
                            user_agent=None,
-                           transport=None):
+                           transport=None,
+                           verify=True):
     """Creates a SoftLayer API client using your environment.
 
     Settings are loaded via keyword arguments, environemtal variables and
@@ -68,6 +69,8 @@ def create_client_from_env(username=None,
         calls if you wish to bypass the packages built in User Agent string
     :param transport: An object that's callable with this signature:
                       transport(SoftLayer.transports.Request)
+    :param bool verify: decide to verify the server's SSL/TLS cert. DO NOT SET
+                        TO FALSE WITHOUT UNDERSTANDING THE IMPLICATIONS.
 
     Usage:
 
@@ -83,16 +86,29 @@ def create_client_from_env(username=None,
                                           endpoint_url=endpoint_url,
                                           timeout=timeout,
                                           proxy=proxy,
+                                          verify=verify,
                                           config_file=config_file)
 
-    # Default the transport to use XMLRPC
     if transport is None:
-        transport = transports.XmlRpcTransport(
-            endpoint_url=settings.get('endpoint_url'),
-            proxy=settings.get('proxy'),
-            timeout=settings.get('timeout'),
-            user_agent=user_agent,
-        )
+        url = settings.get('endpoint_url')
+        if url is not None and '/rest' in url:
+            # If this looks like a rest endpoint, use the rest transport
+            transport = transports.RestTransport(
+                endpoint_url=settings.get('endpoint_url'),
+                proxy=settings.get('proxy'),
+                timeout=settings.get('timeout'),
+                user_agent=user_agent,
+                verify=verify,
+            )
+        else:
+            # Default the transport to use XMLRPC
+            transport = transports.XmlRpcTransport(
+                endpoint_url=settings.get('endpoint_url'),
+                proxy=settings.get('proxy'),
+                timeout=settings.get('timeout'),
+                user_agent=user_agent,
+                verify=verify,
+            )
 
     # If we have enough information to make an auth driver, let's do it
     if auth is None and settings.get('username') and settings.get('api_key'):
@@ -230,7 +246,8 @@ class BaseClient(object):
         request.filter = kwargs.get('filter')
         request.limit = kwargs.get('limit')
         request.offset = kwargs.get('offset')
-        request.verify = kwargs.get('verify')
+        if kwargs.get('verify') is not None:
+            request.verify = kwargs.get('verify')
 
         if self.auth:
             extra_headers = self.auth.get_headers()

@@ -50,14 +50,13 @@ def cli(env, identifier, passwords, price):
                    result['primaryBackendIpAddress'] or formatting.blank()])
     table.add_row(['ipmi_ip',
                    result['networkManagementIpAddress'] or formatting.blank()])
-    table.add_row([
-        'os',
-        formatting.FormattedItem(
-            result['operatingSystem']['softwareLicense']
-            ['softwareDescription']['referenceCode'] or formatting.blank(),
-            result['operatingSystem']['softwareLicense']
-            ['softwareDescription']['name'] or formatting.blank()
-        )])
+    operating_system = utils.lookup(result,
+                                    'operatingSystem',
+                                    'softwareLicense',
+                                    'softwareDescription') or {}
+    table.add_row(['os', operating_system.get('name') or formatting.blank()])
+    table.add_row(['os_version',
+                   operating_system.get('version') or formatting.blank()])
 
     table.add_row(
         ['created', result['provisionDate'] or formatting.blank()])
@@ -82,10 +81,15 @@ def cli(env, identifier, passwords, price):
         table.add_row(['notes', result['notes']])
 
     if price:
-        table.add_row(['price rate',
-                       utils.lookup(result,
-                                    'billingItem',
-                                    'nextInvoiceTotalRecurringAmount')])
+        total_price = utils.lookup(result,
+                                   'billingItem',
+                                   'nextInvoiceTotalRecurringAmount') or 0
+        total_price += sum(p['nextInvoiceTotalRecurringAmount']
+                           for p
+                           in utils.lookup(result,
+                                           'billingItem',
+                                           'children') or [])
+        table.add_row(['price_rate', total_price])
 
     if passwords:
         pass_table = formatting.Table(['username', 'password'])

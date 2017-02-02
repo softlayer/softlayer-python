@@ -23,7 +23,7 @@ ENDPOINTS = {
 
 
 class QueueAuth(requests.auth.AuthBase):
-    """Message Queue authentication for requests.
+    """SoftLayer Message Queue authentication for requests.
 
     :param endpoint: endpoint URL
     :param username: SoftLayer username
@@ -72,7 +72,13 @@ class QueueAuth(requests.auth.AuthBase):
 
 
 class MessagingManager(object):
-    """Manage SoftLayer Message Queue."""
+    """Manage SoftLayer Message Queue accounts.
+
+    See product information here: http://www.softlayer.com/message-queue
+
+    :param SoftLayer.API.BaseClient client: the client instance
+
+    """
     def __init__(self, client):
         self.client = client
 

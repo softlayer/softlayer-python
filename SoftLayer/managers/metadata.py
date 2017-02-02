@@ -35,7 +35,10 @@ METADATA_ATTRIBUTES = METADATA_MAPPING.keys()
 
 
 class MetadataManager(object):
-    """Provides an interface for the metadata service.
+    """Provides an interface for the SoftLayer metadata service.
+
+    See product information here:
+    http://sldn.softlayer.com/reference/services/SoftLayer_Resource_Metadata
 
     This provides metadata about the resourse it is called from.
     See `METADATA_ATTRIBUTES` for full list of attributes.
@@ -50,6 +53,8 @@ class MetadataManager(object):
             'dal05'
             >>> meta.get('fqdn')
             'test.example.com'
+
+    :param SoftLayer.API.BaseClient client: the client instance
 
     """
 

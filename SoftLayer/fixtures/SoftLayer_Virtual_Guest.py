@@ -6,7 +6,14 @@ getObject = {
     'status': {'keyName': 'ACTIVE', 'name': 'Active'},
     'billingItem': {
         'id': 6327,
-        'recurringFee': 1.54,
+        'nextInvoiceTotalRecurringAmount': 1.54,
+        'children': [
+            {'nextInvoiceTotalRecurringAmount': 1},
+            {'nextInvoiceTotalRecurringAmount': 1},
+            {'nextInvoiceTotalRecurringAmount': 1},
+            {'nextInvoiceTotalRecurringAmount': 1},
+            {'nextInvoiceTotalRecurringAmount': 1},
+        ],
         'orderItem': {
             'order': {
                 'userRecord': {
@@ -26,10 +33,13 @@ getObject = {
     "primaryNetworkComponent": {"speed": 10, "maxSpeed": 100},
     'hourlyBillingFlag': False,
     'createDate': '2013-08-01 15:23:45',
-    'blockDevices': [{"device": 0, 'mountType': 'Disk', "uuid": 1},
-                     {"device": 1, 'mountType': 'Disk'},
-                     {"device": 2, 'mountType': 'CD'},
-                     {"device": 3, 'mountType': 'Disk', "uuid": 3}],
+    'blockDevices': [{'device': 0, 'mountType': 'Disk', "uuid": 1},
+                     {'device': 1, 'mountType': 'Disk',
+                      'diskImage': {'type': {'keyName': 'SWAP'}}},
+                     {'device': 2, 'mountType': 'CD'},
+                     {'device': 3, 'mountType': 'Disk', 'uuid': 3},
+                     {'device': 4, 'mountType': 'Disk', 'uuid': 4,
+                      'diskImage': {'metadataFlag': True}}],
     'notes': 'notes',
     'networkVlans': [{'networkSpace': 'PUBLIC',
                       'vlanNumber': 23,

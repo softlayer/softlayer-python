@@ -7,6 +7,7 @@
     :license: MIT, see LICENSE for more details.
 """
 # pylint: disable=E0202
+import collections
 import json
 import os
 
@@ -27,7 +28,7 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
     :param string fmt (optional): One of: table, raw, json, python
     """
     if isinstance(data, utils.string_types):
-        if fmt == 'json':
+        if fmt in ('json', 'jsonraw'):
             return json.dumps(data)
         return data
 
@@ -45,6 +46,9 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
                 format_output(data, fmt='python'),
                 indent=4,
                 cls=CLIJSONEncoder)
+        elif fmt == 'jsonraw':
+            return json.dumps(format_output(data, fmt='python'),
+                              CLIJSONEncoder)
         elif fmt == 'python':
             return data.to_python()
 
@@ -252,6 +256,13 @@ class Table(object):
     :param list columns: a list of column names
     """
     def __init__(self, columns):
+        duplicated_cols = [col for col, count
+                           in collections.Counter(columns).items()
+                           if count > 1]
+        if len(duplicated_cols) > 0:
+            raise exceptions.CLIAbort("Duplicated columns are not allowed: %s"
+                                      % ','.join(duplicated_cols))
+
         self.columns = columns
         self.rows = []
         self.align = {}

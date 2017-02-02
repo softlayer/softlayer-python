@@ -19,7 +19,7 @@ EXTRA_CATEGORIES = ['pri_ipv6_addresses',
 
 
 class HardwareManager(utils.IdentifierMixin, object):
-    """Manage hardware devices.
+    """Manage SoftLayer hardware servers.
 
     Example::
 
@@ -32,7 +32,9 @@ class HardwareManager(utils.IdentifierMixin, object):
        client = SoftLayer.Client()
        mgr = SoftLayer.HardwareManager(client)
 
-    :param SoftLayer.API.Client client: an API client instance
+    See product information here: http://www.softlayer.com/bare-metal-servers
+
+    :param SoftLayer.API.BaseClient client: the client instance
     :param SoftLayer.managers.OrderingManager ordering_manager: an optional
                                               manager to handle ordering.
                                               If none is provided, one will be
@@ -182,43 +184,45 @@ class HardwareManager(utils.IdentifierMixin, object):
         """
 
         if 'mask' not in kwargs:
-            items = [
-                'id',
-                'globalIdentifier',
-                'fullyQualifiedDomainName',
-                'hostname',
-                'domain',
-                'provisionDate',
-                'hardwareStatus',
-                'processorPhysicalCoreAmount',
-                'memoryCapacity',
-                'notes',
-                'privateNetworkOnlyFlag',
-                'primaryBackendIpAddress',
-                'primaryIpAddress',
-                'networkManagementIpAddress',
-                'userData',
-                'datacenter',
+            kwargs['mask'] = (
+                'id,'
+                'globalIdentifier,'
+                'fullyQualifiedDomainName,'
+                'hostname,'
+                'domain,'
+                'provisionDate,'
+                'hardwareStatus,'
+                'processorPhysicalCoreAmount,'
+                'memoryCapacity,'
+                'notes,'
+                'privateNetworkOnlyFlag,'
+                'primaryBackendIpAddress,'
+                'primaryIpAddress,'
+                'networkManagementIpAddress,'
+                'userData,'
+                'datacenter,'
                 '''networkComponents[id, status, speed, maxSpeed, name,
                    ipmiMacAddress, ipmiIpAddress, macAddress, primaryIpAddress,
                    port, primarySubnet[id, netmask, broadcastAddress,
-                                       networkIdentifier, gateway]]''',
-                'hardwareChassis[id,name]',
-                'activeTransaction[id, transactionStatus[friendlyName,name]]',
+                                       networkIdentifier, gateway]],'''
+                'hardwareChassis[id,name],'
+                'activeTransaction[id, transactionStatus[friendlyName,name]],'
                 '''operatingSystem[
                     softwareLicense[softwareDescription[manufacturer,
                                                         name,
                                                         version,
                                                         referenceCode]],
-                    passwords[username,password]]''',
-                'billingItem.nextInvoiceTotalRecurringAmount',
-                'hourlyBillingFlag',
-                'tagReferences[id,tag[name,id]]',
-                'networkVlans[id,vlanNumber,networkSpace]',
-                'billingItem.orderItem.order.userRecord[username]',
-                'remoteManagementAccounts[username,password]',
-            ]
-            kwargs['mask'] = "mask[%s]" % ','.join(items)
+                    passwords[username,password]],'''
+                'billingItem['
+                'id,nextInvoiceTotalRecurringAmount,'
+                'children[nextInvoiceTotalRecurringAmount],'
+                'orderItem.order.userRecord[username]'
+                '],'
+                'hourlyBillingFlag,'
+                'tagReferences[id,tag[name,id]],'
+                'networkVlans[id,vlanNumber,networkSpace],'
+                'remoteManagementAccounts[username,password]'
+            )
 
         return self.hardware.getObject(id=hardware_id, **kwargs)
 

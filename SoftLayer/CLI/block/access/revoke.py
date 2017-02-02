@@ -1,4 +1,4 @@
-"""Create a block storage snapshot."""
+"""Revokes hosts' access on a specific block volume."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -14,7 +14,7 @@ from SoftLayer.CLI import environment
 @click.option('--virtual-id', '-v', multiple=True,
               help='The id of one SoftLayer_Virtual_Guest'
               ' to revoke authorization')
-@click.option('--ip_address-id', '-i', multiple=True,
+@click.option('--ip-address-id', '-i', multiple=True,
               help='The id of one SoftLayer_Network_Subnet_IpAddress'
               ' to revoke authorization')
 @click.option('--ip-address', multiple=True,
@@ -36,3 +36,6 @@ def cli(env, volume_id, hardware_id, virtual_id, ip_address_id, ip_address):
                                              hardware_id,
                                              virtual_id,
                                              ip_address_id_list)
+
+    # If no exception was raised, the command succeeded
+    click.echo('Access to %s was revoked for the specified hosts' % volume_id)

@@ -1,4 +1,4 @@
-"""Create a block storage snapshot."""
+"""Authorizes hosts on a specific block volume."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -40,3 +40,6 @@ def cli(env, volume_id, hardware_id, virtual_id, ip_address_id, ip_address):
                                            hardware_id,
                                            virtual_id,
                                            ip_address_id_list)
+
+    # If no exception was raised, the command succeeded
+    click.echo('The specified hosts were authorized to access %s' % volume_id)

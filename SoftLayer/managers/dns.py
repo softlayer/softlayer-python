@@ -11,9 +11,11 @@ from SoftLayer import utils
 
 
 class DNSManager(utils.IdentifierMixin, object):
-    """Domain Name System manager.
+    """Manage SoftLayer DNS.
 
-    :param SoftLayer.API.Client client: the client instance
+    See product information here: http://www.softlayer.com/DOMAIN-SERVICES
+
+    :param SoftLayer.API.BaseClient client: the client instance
 
     """
 

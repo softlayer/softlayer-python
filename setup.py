@@ -1,6 +1,5 @@
 from __future__ import print_function
-import sys
-from codecs import open
+import codecs
 import os
 
 from setuptools import setup, find_packages
@@ -8,14 +7,14 @@ from setuptools import setup, find_packages
 DESCRIPTION = "A library for SoftLayer's API"
 
 if os.path.exists('README.rst'):
-    with open('README.rst', 'r', 'utf-8') as readme_file:
+    with codecs.open('README.rst', 'r', 'utf-8') as readme_file:
         LONG_DESCRIPTION = readme_file.read()
 else:
     LONG_DESCRIPTION = DESCRIPTION
 
 setup(
     name='SoftLayer',
-    version='5.1.0',
+    version='5.2.1',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     author='SoftLayer Technologies, Inc.',

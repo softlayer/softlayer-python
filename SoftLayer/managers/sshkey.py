@@ -10,9 +10,12 @@ from SoftLayer import utils
 
 
 class SshKeyManager(utils.IdentifierMixin, object):
-    """Manages account SSH keys.
+    """Manages account SSH keys in SoftLayer.
 
-    :param SoftLayer.API.Client client: an API client instance
+    See product information here:
+    https://knowledgelayer.softlayer.com/procedure/ssh-keys
+
+    :param SoftLayer.API.BaseClient client: the client instance
     """
 
     def __init__(self, client):

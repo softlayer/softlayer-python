@@ -17,13 +17,9 @@ from SoftLayer import utils
 
 
 class VSManager(utils.IdentifierMixin, object):
-    """Manages Virtual Servers.
+    """Manages SoftLayer Virtual Servers.
 
-    :param SoftLayer.API.Client client: an API client instance
-    :param SoftLayer.managers.OrderingManager ordering_manager: an optional
-                                              manager to handle ordering.
-                                              If none is provided, one will be
-                                              auto initialized.
+    See product information here: http://www.softlayer.com/virtual-servers
 
     Example::
 
@@ -35,6 +31,13 @@ class VSManager(utils.IdentifierMixin, object):
            import SoftLayer
            client = SoftLayer.Client()
            mgr = SoftLayer.VSManager(client)
+
+
+    :param SoftLayer.API.BaseClient client: the client instance
+    :param SoftLayer.managers.OrderingManager ordering_manager: an optional
+                                              manager to handle ordering.
+                                              If none is provided, one will be
+                                              auto initialized.
 
     """
 
@@ -172,49 +175,53 @@ class VSManager(utils.IdentifierMixin, object):
         """
 
         if 'mask' not in kwargs:
-            items = [
-                'id',
-                'globalIdentifier',
-                'fullyQualifiedDomainName',
-                'hostname',
-                'domain',
-                'createDate',
-                'modifyDate',
-                'provisionDate',
-                'notes',
-                'dedicatedAccountHostOnlyFlag',
-                'privateNetworkOnlyFlag',
-                'primaryBackendIpAddress',
-                'primaryIpAddress',
+            kwargs['mask'] = (
+                'id,'
+                'globalIdentifier,'
+                'fullyQualifiedDomainName,'
+                'hostname,'
+                'domain,'
+                'createDate,'
+                'modifyDate,'
+                'provisionDate,'
+                'notes,'
+                'dedicatedAccountHostOnlyFlag,'
+                'privateNetworkOnlyFlag,'
+                'primaryBackendIpAddress,'
+                'primaryIpAddress,'
                 '''networkComponents[id, status, speed, maxSpeed, name,
                                      macAddress, primaryIpAddress, port,
-                                     primarySubnet]''',
-                'lastKnownPowerState.name',
-                'powerState',
-                'status',
-                'maxCpu',
-                'maxMemory',
-                'datacenter',
-                'activeTransaction[id, transactionStatus[friendlyName,name]]',
-                'lastOperatingSystemReload.id',
-                'blockDevices',
-                'blockDeviceTemplateGroup[id, name, globalIdentifier]',
-                'postInstallScriptUri',
-                '''softwareComponents[
-                    passwords[username,password,notes],
-                    softwareLicense[softwareDescription[name]]]''',
+                                     primarySubnet],'''
+                'lastKnownPowerState.name,'
+                'powerState,'
+                'status,'
+                'maxCpu,'
+                'maxMemory,'
+                'datacenter,'
+                'activeTransaction[id, transactionStatus[friendlyName,name]],'
+                'lastOperatingSystemReload.id,'
+                'blockDevices,'
+                'blockDeviceTemplateGroup[id, name, globalIdentifier],'
+                'postInstallScriptUri,'
                 '''operatingSystem[passwords[username,password],
                                    softwareLicense.softwareDescription[
                                        manufacturer,name,version,
-                                       referenceCode]]''',
-                'hourlyBillingFlag',
-                'userData',
-                'billingItem.recurringFee',
-                'tagReferences[id,tag[name,id]]',
-                'networkVlans[id,vlanNumber,networkSpace]',
-                'billingItem.orderItem.order.userRecord[username]'
-            ]
-            kwargs['mask'] = "mask[%s]" % ','.join(items)
+                                       referenceCode]],'''
+                '''softwareComponents[
+                    passwords[username,password,notes],
+                    softwareLicense[softwareDescription[
+                                        manufacturer,name,version,
+                                        referenceCode]]],'''
+                'hourlyBillingFlag,'
+                'userData,'
+                'billingItem['
+                'id,nextInvoiceTotalRecurringAmount,'
+                'children[categoryCode,nextInvoiceTotalRecurringAmount],'
+                'orderItem.order.userRecord[username]'
+                '],'
+                'tagReferences[id,tag[name,id]],'
+                'networkVlans[id,vlanNumber,networkSpace]'
+            )
 
         return self.guest.getObject(id=instance_id, **kwargs)
 
@@ -714,19 +721,42 @@ class VSManager(utils.IdentifierMixin, object):
             notes = "Some notes about this image"
             result = mgr.capture(instance_id=12345, name=name, notes=notes)
         """
-        vsi = self.get_instance(instance_id)
 
-        disk_filter = lambda x: x['device'] == '0'
-        # Skip disk 1 (swap partition) and CD mounts
-        if additional_disks:
-            disk_filter = lambda x: (str(x['device']) != '1' and
-                                     x['mountType'] != 'CD')
+        vsi = self.client.call(
+            'Virtual_Guest',
+            'getObject',
+            id=instance_id,
+            mask="""id,
+            blockDevices[id,device,mountType,
+            diskImage[id,metadataFlag,type[keyName]]]""")
 
-        disks = [block_device for block_device in vsi['blockDevices']
-                 if disk_filter(block_device)]
+        disks_to_capture = []
+        for block_device in vsi['blockDevices']:
+
+            # We never want metadata disks
+            if utils.lookup(block_device, 'diskImage', 'metadataFlag'):
+                continue
+
+            # We never want swap devices
+            type_name = utils.lookup(block_device,
+                                     'diskImage',
+                                     'type',
+                                     'keyName')
+            if type_name == 'SWAP':
+                continue
+
+            # We never want CD images
+            if block_device['mountType'] == 'CD':
+                continue
+
+            # Only use the first block device if we don't want additional disks
+            if not additional_disks and str(block_device['device']) != '0':
+                continue
+
+            disks_to_capture.append(block_device)
 
         return self.guest.createArchiveTransaction(
-            name, disks, notes, id=instance_id)
+            name, disks_to_capture, notes, id=instance_id)
 
     def upgrade(self, instance_id, cpus=None, memory=None,
                 nic_speed=None, public=True):

@@ -16,12 +16,21 @@ COLUMNS = [
                          mask="serviceResource.datacenter.name"),
     column_helper.Column(
         'storage_type',
-        lambda b: b['storageType']['keyName'].split('_').pop(0),
+        lambda b: b['storageType']['keyName'].split('_').pop(0)
+        if 'storageType' in b and 'keyName' in b['storageType']
+        and isinstance(b['storageType']['keyName'], str)
+        else '-',
         mask="storageType.keyName"),
     column_helper.Column('capacity_gb', ('capacityGb',), mask="capacityGb"),
     column_helper.Column('bytes_used', ('bytesUsed',), mask="bytesUsed"),
     column_helper.Column('ip_addr', ('serviceResourceBackendIpAddress',),
                          mask="serviceResourceBackendIpAddress"),
+    column_helper.Column('lunId', ('lunId',), mask="lunId"),
+    column_helper.Column('active_transactions', ('activeTransactionCount',),
+                         mask="activeTransactionCount"),
+    column_helper.Column(
+        'created_by',
+        ('billingItem', 'orderItem', 'order', 'userRecord', 'username')),
 ]
 
 DEFAULT_COLUMNS = [
@@ -31,7 +40,9 @@ DEFAULT_COLUMNS = [
     'storage_type',
     'capacity_gb',
     'bytes_used',
-    'ip_addr'
+    'ip_addr',
+    'lunId',
+    'active_transactions'
 ]
 
 

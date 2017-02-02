@@ -51,9 +51,52 @@ def cli(env, volume_id):
             'Snapshot Capacity (GB)',
             block_volume['snapshotCapacityGb'],
         ])
-        table.add_row([
-            'Snapshot Used (Bytes)',
-            block_volume['parentVolume']['snapshotSizeBytes'],
-        ])
+        if 'snapshotSizeBytes' in block_volume['parentVolume']:
+            table.add_row([
+                'Snapshot Used (Bytes)',
+                block_volume['parentVolume']['snapshotSizeBytes'],
+            ])
+
+    table.add_row(['# of Active Transactions', "%i"
+                   % block_volume['activeTransactionCount']])
+
+    if block_volume['activeTransactions']:
+        for trans in block_volume['activeTransactions']:
+            table.add_row([
+                'Ongoing Transactions',
+                trans['transactionStatus']['friendlyName']])
+
+    table.add_row(['Replicant Count', "%u"
+                   % block_volume['replicationPartnerCount']])
+
+    if block_volume['replicationPartnerCount'] > 0:
+        # This if/else temporarily handles a bug in which the SL API
+        # returns a string or object for 'replicationStatus'; it seems that
+        # the type is string for File volumes and object for Block volumes
+        if 'message' in block_volume['replicationStatus']:
+            table.add_row(['Replication Status', "%s"
+                           % block_volume['replicationStatus']['message']])
+        else:
+            table.add_row(['Replication Status', "%s"
+                           % block_volume['replicationStatus']])
+
+        replicant_list = []
+        for replicant in block_volume['replicationPartners']:
+            replicant_table = formatting.Table(['Replicant ID',
+                                                replicant['id']])
+            replicant_table.add_row([
+                'Volume Name',
+                replicant['username']])
+            replicant_table.add_row([
+                'Target IP',
+                replicant['serviceResourceBackendIpAddress']])
+            replicant_table.add_row([
+                'Data Center',
+                replicant['serviceResource']['datacenter']['name']])
+            replicant_table.add_row([
+                'Schedule',
+                replicant['replicationSchedule']['type']['keyname']])
+            replicant_list.append(replicant_table)
+        table.add_row(['Replicant Volumes', replicant_list])
 
     env.fout(table)
