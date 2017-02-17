@@ -16,7 +16,8 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
               type=click.Choice(['performance', 'endurance']),
               required=True)
 @click.option('--size',
-              type=int,
+              type=click.Choice(['20', '40', '80', '100', '250', '500', '1000', '2000', '4000', \
+              '8000', '12000']),
               help='Size of block storage volume in GB',
               required=True)
 @click.option('--iops',
@@ -71,14 +72,14 @@ def cli(env, storage_type, size, iops, tier, os_type,
         if snapshot_size is not None:
             raise exceptions.CLIAbort(
                 'Option --snapshot-size not allowed for performance volumes.'
-                ' Snapshots are only available for endurance storage.'
+                'Snapshots are only available for endurance storage.'
             )
 
         try:
             order = block_manager.order_block_volume(
                 storage_type='performance_storage_iscsi',
                 location=location,
-                size=size,
+                size=int(size),
                 iops=iops,
                 os_type=os_type
             )
@@ -96,7 +97,7 @@ def cli(env, storage_type, size, iops, tier, os_type,
             order = block_manager.order_block_volume(
                 storage_type='storage_service_enterprise',
                 location=location,
-                size=size,
+                size=int(size),
                 tier_level=float(tier),
                 os_type=os_type,
                 snapshot_size=snapshot_size
