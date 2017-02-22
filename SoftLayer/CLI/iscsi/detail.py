@@ -47,8 +47,10 @@ def cli(env, identifier, password):
         table.add_row(['notes', result['notes']])
 
     if password:
+        # print ("PASSWORD = {", password, "} ; {", result['password'], "}")
         pass_table = formatting.Table(['username', 'password'])
         pass_table.add_row([result['username'], result['password']])
         table.add_row(['users', pass_table])
+
 
     env.fout(table)

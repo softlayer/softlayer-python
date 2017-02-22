@@ -27,6 +27,7 @@ class ISCSIManager(utils.IdentifierMixin, object):
 
     def _find_item_prices(self, size, categorycode=''):
         """Retrieves the Item Price IDs."""
+        print ("HERE")
         item_prices = self.client['Product_Package'].getItems(
             id=0,
             mask='id,capacity,prices[id]',
@@ -36,7 +37,7 @@ class ISCSIManager(utils.IdentifierMixin, object):
                     'categories': {
                         'categoryCode': {'operation': categorycode}
                     }}})
-
+        print(">>>>>>>>>>>>>>>   ", item_prices)
         for item_price in item_prices:
             for price in item_price['prices']:
                 return price['id']
