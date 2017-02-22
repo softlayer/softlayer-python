@@ -42,14 +42,17 @@ class ObjectStorageManager(object):
             'hubNetworkStorage': {'vendorName': {'operation': 'Swift'}},
         }
         endpoints = []
-        for node in self.client.call('Account', 'getHubNetworkStorage',
-                                     mask=ENDPOINT_MASK,
-                                     limit=1,
-                                     filter=_filter)['storageNodes']:
-            endpoints.append({
-                'datacenter': node['datacenter'],
-                'public': node['frontendIpAddress'],
-                'private': node['backendIpAddress'],
-            })
+        network_storage = self.client.call('Account',
+                                           'getHubNetworkStorage',
+                                           mask=ENDPOINT_MASK,
+                                           limit=1,
+                                           filter=_filter)
+        if network_storage:
+            for node in network_storage['storageNodes']:
+                endpoints.append({
+                    'datacenter': node['datacenter'],
+                    'public': node['frontendIpAddress'],
+                    'private': node['backendIpAddress'],
+                })
 
         return endpoints

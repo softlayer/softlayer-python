@@ -33,3 +33,12 @@ class ObjectStorageTests(testing.TestCase):
                          [{'datacenter': {'name': 'dal05'},
                            'private': 'https://dal05/auth/v1.0/',
                            'public': 'https://dal05/auth/v1.0/'}])
+
+    def test_list_endpoints_no_results(self):
+        accounts = self.set_mock('SoftLayer_Account', 'getHubNetworkStorage')
+        accounts.return_value = {
+            'storageNodes': [],
+        }
+        endpoints = self.object_storage.list_endpoints()
+        self.assertEqual(endpoints,
+                         [])
