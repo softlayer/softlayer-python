@@ -9,8 +9,8 @@ SoftLayer API Python Client
 .. image:: https://badge.fury.io/py/SoftLayer.svg
     :target: http://badge.fury.io/py/SoftLayer
 
-.. image:: https://coveralls.io/repos/softlayer/softlayer-python/badge.svg
-    :target: https://coveralls.io/r/softlayer/softlayer-python
+.. image:: https://coveralls.io/repos/github/softlayer/softlayer-python/badge.svg?branch=master
+    :target: https://coveralls.io/github/softlayer/softlayer-python?branch=master
 
 
 This library provides a simple Python client to interact with `SoftLayer's
