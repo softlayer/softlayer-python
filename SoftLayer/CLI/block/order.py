@@ -16,8 +16,8 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
               type=click.Choice(['performance', 'endurance']),
               required=True)
 @click.option('--size',
-              type=click.Choice(['20', '40', '80', '100', '250', '500', '1000', '2000', '4000', \
-              '8000', '12000']),
+              type=click.Choice(['20', '40', '80', '100', '250', '500', '1000',
+                                 '2000', '4000', '8000', '12000']),
               help='Size of block storage volume in GB',
               required=True)
 @click.option('--iops',
