@@ -118,12 +118,6 @@ ALL_ROUTES = [
     ('image:import', 'SoftLayer.CLI.image.import:cli'),
     ('image:export', 'SoftLayer.CLI.image.export:cli'),
 
-    ('iscsi', 'SoftLayer.CLI.iscsi'),
-    ('iscsi:cancel', 'SoftLayer.CLI.iscsi.cancel:cli'),
-    ('iscsi:create', 'SoftLayer.CLI.iscsi.create:cli'),
-    ('iscsi:detail', 'SoftLayer.CLI.iscsi.detail:cli'),
-    ('iscsi:list', 'SoftLayer.CLI.iscsi.list:cli'),
-
     ('loadbal', 'SoftLayer.CLI.loadbal'),
     ('loadbal:cancel', 'SoftLayer.CLI.loadbal.cancel:cli'),
     ('loadbal:create', 'SoftLayer.CLI.loadbal.create:cli'),
@@ -192,13 +186,6 @@ ALL_ROUTES = [
     ('hardware:reload', 'SoftLayer.CLI.hardware.reload:cli'),
     ('hardware:credentials', 'SoftLayer.CLI.hardware.credentials:cli'),
     ('hardware:update-firmware', 'SoftLayer.CLI.hardware.update_firmware:cli'),
-
-    ('snapshot', 'SoftLayer.CLI.snapshot'),
-    ('snapshot:cancel', 'SoftLayer.CLI.snapshot.cancel:cli'),
-    ('snapshot:create', 'SoftLayer.CLI.snapshot.create:cli'),
-    ('snapshot:create-space', 'SoftLayer.CLI.snapshot.create_space:cli'),
-    ('snapshot:list', 'SoftLayer.CLI.snapshot.list:cli'),
-    ('snapshot:restore-volume', 'SoftLayer.CLI.snapshot.restore_volume:cli'),
 
     ('sshkey', 'SoftLayer.CLI.sshkey'),
     ('sshkey:add', 'SoftLayer.CLI.sshkey.add:cli'),

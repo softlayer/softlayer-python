@@ -17,7 +17,8 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
               required=True)
 @click.option('--size',
               type=int,
-              help='Size of block storage volume in GB',
+              help='Size of block storage volume in GB. Permitted Sizes:\n'
+                   '20, 40, 80, 100, 250, 500, 1000, 2000, 4000, 8000, 12000',
               required=True)
 @click.option('--iops',
               type=int,
@@ -71,7 +72,7 @@ def cli(env, storage_type, size, iops, tier, os_type,
         if snapshot_size is not None:
             raise exceptions.CLIAbort(
                 'Option --snapshot-size not allowed for performance volumes.'
-                ' Snapshots are only available for endurance storage.'
+                'Snapshots are only available for endurance storage.'
             )
 
         try:
