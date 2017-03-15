@@ -185,7 +185,6 @@ def main(reraise_exceptions=False, **kwargs):
         print("Feel free to report this error as it is likely a bug:")
         print("    https://github.com/softlayer/softlayer-python/issues")
         exit_status = 1
-
     sys.exit(exit_status)
 
 
