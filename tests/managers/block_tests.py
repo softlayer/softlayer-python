@@ -157,6 +157,24 @@ class BlockTests(testing.TestCase):
             identifier=1234,
         )
 
+    def test_get_replication_partners(self):
+        self.block.get_replication_partners(1234)
+
+        self.assert_called_with(
+            'SoftLayer_Network_Storage',
+            'getReplicationPartners',
+            identifier=1234,
+        )
+
+    def test_get_replication_locations(self):
+        self.block.get_replication_locations(1234)
+
+        self.assert_called_with(
+            'SoftLayer_Network_Storage',
+            'getValidReplicationTargetDatacenterLocations',
+            identifier=1234,
+        )
+
     def test_order_block_volume_invalid_storage_type(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [{}]
