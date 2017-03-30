@@ -411,13 +411,13 @@ activePresets,
 regions[location[location[priceGroups]]]
 '''
 
-        package_type = 'BARE_METAL_CPU_FAST_PROVISION'
-        packages = self.ordering_manager.get_packages_of_type([package_type],
-                                                              mask=mask)
-        if len(packages) != 1:
+        package_keyname = 'BARE_METAL_SERVER'
+        package = self.ordering_manager.get_package_by_key(package_keyname,
+                                                           mask=mask)
+        if package is None:
             raise SoftLayer.SoftLayerError("Ordering package not found")
 
-        return packages[0]
+        return package
 
     def _generate_create_dict(self,
                               size=None,
