@@ -123,3 +123,17 @@ class OrderingTests(testing.TestCase):
         self.assertRaises(ValueError,
                           self.ordering.generate_order_template,
                           1234, [], quantity=1)
+
+    def test_get_package_by_key_returns_if_found(self):
+        package_keyname = "BARE_METAL_SERVER"
+        mask = "mask[id, name]"
+        package = self.ordering.get_package_by_key(package_keyname, mask)
+        self.assertIsNotNone(package)
+
+    def test_get_package_by_key_returns_none_if_not_found(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = []
+
+        package = self.ordering.get_package_by_key("WILLY_NILLY_SERVERS")
+
+        self.assertIsNone(package)

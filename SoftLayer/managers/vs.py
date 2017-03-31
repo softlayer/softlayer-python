@@ -823,11 +823,14 @@ class VSManager(utils.IdentifierMixin, object):
         ]
         mask = "mask[%s]" % ','.join(mask)
 
-        package_type = "VIRTUAL_SERVER_INSTANCE"
-        package_id = self.ordering_manager.get_package_id_by_type(package_type)
-        package_service = self.client['Product_Package']
+        package_keyname = "CLOUD_SERVER"
+        package = self.ordering_manager.get_package_by_key(package_keyname)
 
-        return package_service.getItems(id=package_id, mask=mask)
+        if package is None:
+            raise ValueError("No package found for key: " + package_keyname)
+
+        package_service = self.client['Product_Package']
+        return package_service.getItems(id=package['id'], mask=mask)
 
     def _get_price_id_for_upgrade(self, package_items, option, value,
                                   public=True):
