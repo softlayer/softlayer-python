@@ -344,6 +344,54 @@ class BlockTests(testing.TestCase):
         self.assertEqual('Failover to replicant is now in progress.\n',
                          result.output)
 
+    def test_replication_locations(self):
+        result = self.run_command(['block', 'replica-locations', '1234'])
+        self.assert_no_fail(result)
+        self.assertEqual(
+            {
+                '12345': 'Dallas 05',
+            },
+            json.loads(result.output))
+
+    @mock.patch('SoftLayer.BlockStorageManager.get_replication_locations')
+    def test_replication_locations_unsuccessful(self, locations_mock):
+        locations_mock.return_value = False
+        result = self.run_command(['block', 'replica-locations', '1234'])
+        self.assertEqual('No data centers compatible for replication.\n',
+                         result.output)
+
+    def test_replication_partners(self):
+        result = self.run_command(['block', 'replica-partners', '1234'])
+        self.assert_no_fail(result)
+        self.assertEqual([
+            {
+                'ID': 1784,
+                'Account ID': 3000,
+                'Capacity (GB)': 20,
+                'Host ID': None,
+                'Guest ID': None,
+                'Hardware ID': None,
+                'Username': 'TEST_REP_1',
+            },
+            {
+                'ID': 1785,
+                'Account ID': 3001,
+                'Host ID': None,
+                'Guest ID': None,
+                'Hardware ID': None,
+                'Capacity (GB)': 20,
+                'Username': 'TEST_REP_2',
+            }],
+            json.loads(result.output))
+
+    @mock.patch('SoftLayer.BlockStorageManager.get_replication_partners')
+    def test_replication_partners_unsuccessful(self, partners_mock):
+        partners_mock.return_value = False
+        result = self.run_command(['block', 'replica-partners', '1234'])
+        self.assertEqual(
+            'There are no replication partners for the given volume.\n',
+            result.output)
+
     @mock.patch('SoftLayer.BlockStorageManager.failover_to_replicant')
     def test_replicant_failover_unsuccessful(self, failover_mock):
         failover_mock.return_value = False

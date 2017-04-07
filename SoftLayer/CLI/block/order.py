@@ -79,7 +79,7 @@ def cli(env, storage_type, size, iops, tier, os_type,
             order = block_manager.order_block_volume(
                 storage_type='performance_storage_iscsi',
                 location=location,
-                size=size,
+                size=int(size),
                 iops=iops,
                 os_type=os_type
             )
@@ -97,7 +97,7 @@ def cli(env, storage_type, size, iops, tier, os_type,
             order = block_manager.order_block_volume(
                 storage_type='storage_service_enterprise',
                 location=location,
-                size=size,
+                size=int(size),
                 tier_level=float(tier),
                 os_type=os_type,
                 snapshot_size=snapshot_size

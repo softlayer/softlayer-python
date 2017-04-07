@@ -220,6 +220,26 @@ class FileStorageManager(utils.IdentifierMixin, object):
 
         return self.client.call('Product_Order', 'placeOrder', order)
 
+    def get_replication_partners(self, volume_id):
+        """Acquires list of replicant volumes pertaining to the given volume.
+
+        :param volume_id: The ID of the primary volume to be replicated
+        :return: Returns an array of SoftLayer_Location objects
+        """
+        return self.client.call('Network_Storage',
+                                'getReplicationPartners',
+                                id=volume_id)
+
+    def get_replication_locations(self, volume_id):
+        """Acquires list of the datacenters to which a volume can be replicated.
+
+        :param volume_id: The ID of the primary volume to be replicated
+        :return: Returns an array of SoftLayer_Network_Storage objects
+        """
+        return self.client.call('Network_Storage',
+                                'getValidReplicationTargetDatacenterLocations',
+                                id=volume_id)
+
     def delete_snapshot(self, snapshot_id):
         """Deletes the specified snapshot object.
 
