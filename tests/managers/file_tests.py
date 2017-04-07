@@ -166,6 +166,24 @@ class FileTests(testing.TestCase):
             identifier=1234,
         )
 
+    def test_get_replication_partners(self):
+        self.file.get_replication_partners(1234)
+
+        self.assert_called_with(
+            'SoftLayer_Network_Storage',
+            'getReplicationPartners',
+            identifier=1234,
+        )
+
+    def test_get_replication_locations(self):
+        self.file.get_replication_locations(1234)
+
+        self.assert_called_with(
+            'SoftLayer_Network_Storage',
+            'getValidReplicationTargetDatacenterLocations',
+            identifier=1234,
+        )
+
     def test_delete_snapshot(self):
         result = self.file.delete_snapshot(100)
 
