@@ -6,7 +6,12 @@
 ### Added
 
 ### Changed
-
+## [5.2.4] - 2017-04-06
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.3...v5.2.4
+ 
+### Changed
+Removed some debug code that was accidently added in the pypi release
+ 
 ## [5.2.3] - 2017-04-05
  - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.2...v5.2.3
 
