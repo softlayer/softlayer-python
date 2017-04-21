@@ -78,6 +78,7 @@ ALL_ROUTES = [
     ('block:volume-detail', 'SoftLayer.CLI.block.detail:cli'),
     ('block:volume-list', 'SoftLayer.CLI.block.list:cli'),
     ('block:volume-order', 'SoftLayer.CLI.block.order:cli'),
+    ('block:volume-count', 'SoftLayer.CLI.block.count:cli'),
 
     ('file', 'SoftLayer.CLI.file'),
     ('file:access-authorize', 'SoftLayer.CLI.file.access.authorize:cli'),
@@ -100,6 +101,7 @@ ALL_ROUTES = [
     ('file:volume-detail', 'SoftLayer.CLI.file.detail:cli'),
     ('file:volume-list', 'SoftLayer.CLI.file.list:cli'),
     ('file:volume-order', 'SoftLayer.CLI.file.order:cli'),
+    ('file:volume-count', 'SoftLayer.CLI.file.count:cli'),
 
     ('firewall', 'SoftLayer.CLI.firewall'),
     ('firewall:add', 'SoftLayer.CLI.firewall.add:cli'),

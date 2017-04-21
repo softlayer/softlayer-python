@@ -87,8 +87,19 @@ class FileTests(testing.TestCase):
                 'storage_type': 'ENDURANCE',
                 'username': 'user',
                 'active_transactions': None,
-                'mount_addr': '127.0.0.1:/TEST'
+                'mount_addr': '127.0.0.1:/TEST',
+                'rep_partner_count': None
             }],
+            json.loads(result.output))
+
+    def test_volume_count(self):
+        result = self.run_command(['block', 'volume-count'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(
+            {
+                'dal05': 1
+            },
             json.loads(result.output))
 
     def test_snapshot_list(self):

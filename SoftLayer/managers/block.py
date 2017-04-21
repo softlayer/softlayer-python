@@ -41,9 +41,24 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 'bytesUsed',
                 'serviceResource.datacenter[name]',
                 'serviceResourceBackendIpAddress',
-                'activeTransactionCount'
+                'activeTransactionCount',
+                'replicationPartnerCount',
+                ',replicationPartners[id,username,'
+                'serviceResourceBackendIpAddress,'
+                'serviceResource[datacenter[name]],'
+                'storageType,capacityGb,lunId,bytesUsed,'
+                'activeTransactionCount,'
+                'replicationSchedule[type[keyname]]]',
             ]
             kwargs['mask'] = ','.join(items)
+
+        # Retrieve relevant replicant information to be displayed.
+        kwargs['mask'] += ',replicationPartners[id,username,'\
+                          'serviceResourceBackendIpAddress,'\
+                          'serviceResource[datacenter[name]],'\
+                          'storageType,capacityGb,lunId,bytesUsed,'\
+                          'activeTransactionCount,'\
+                          'replicationSchedule[type[keyname]]]'
 
         _filter = utils.NestedDict(kwargs.get('filter') or {})
 
@@ -52,6 +67,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
 
         _filter['iscsiNetworkStorage']['storageType']['keyName'] = (
             utils.query_filter('*BLOCK_STORAGE*'))
+
         if storage_type:
             _filter['iscsiNetworkStorage']['storageType']['keyName'] = (
                 utils.query_filter('%s_BLOCK_STORAGE' % storage_type.upper()))
