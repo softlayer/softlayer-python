@@ -55,7 +55,8 @@ def rule_list(env, securitygroup_id, sortby):
 @click.option('--remote-group', '-s', type=click.INT,
               help='The ID of the remote security group to enforce')
 @click.option('--direction', '-d',
-              help='The direction of traffic to enforce')
+              help=('The direction of traffic to enforce '
+                    '(ingress, egress)'))
 @click.option('--ethertype', '-e',
               help='The ethertype (IPv4 or IPv6) to enforce')
 @click.option('--port-range-max', '-M', type=click.INT,
