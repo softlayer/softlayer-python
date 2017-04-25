@@ -418,3 +418,51 @@ class FileTests(testing.TestCase):
                          ' > 20 GB Storage Space\n'
                          ' > 10 GB Storage Space (Snapshot Space)\n'
                          ' > 20 GB Storage Space Replicant of: TEST\n')
+
+    def test_replication_locations(self):
+        result = self.run_command(['file', 'replica-locations', '1234'])
+        self.assert_no_fail(result)
+        self.assertEqual(
+            {
+                '12345': 'Dallas 05',
+            },
+            json.loads(result.output))
+
+    @mock.patch('SoftLayer.FileStorageManager.get_replication_locations')
+    def test_replication_locations_unsuccessful(self, locations_mock):
+        locations_mock.return_value = False
+        result = self.run_command(['file', 'replica-locations', '1234'])
+        self.assertEqual('No data centers compatible for replication.\n',
+                         result.output)
+
+    def test_replication_partners(self):
+        result = self.run_command(['file', 'replica-partners', '1234'])
+        self.assert_no_fail(result)
+        self.assertEqual([
+            {
+                'ID': 1784,
+                'Account ID': 3000,
+                'Capacity (GB)': 20,
+                'Host ID': None,
+                'Guest ID': None,
+                'Hardware ID': None,
+                'Username': 'TEST_REP_1',
+            },
+            {
+                'ID': 1785,
+                'Account ID': 3001,
+                'Host ID': None,
+                'Guest ID': None,
+                'Hardware ID': None,
+                'Capacity (GB)': 20,
+                'Username': 'TEST_REP_2',
+            }],
+            json.loads(result.output))
+
+    @mock.patch('SoftLayer.FileStorageManager.get_replication_partners')
+    def test_replication_partners_unsuccessful(self, partners_mock):
+        partners_mock.return_value = False
+        result = self.run_command(['file', 'replica-partners', '1234'])
+        self.assertEqual(
+            'There are no replication partners for the given volume.\n',
+            result.output)
