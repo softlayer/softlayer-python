@@ -273,6 +273,7 @@ ALL_ALIASES = {
     'lb': 'loadbal',
     'meta': 'metadata',
     'my': 'metadata',
+    'sg': 'securitygroup',
     'server': 'hardware',
     'vm': 'virtual',
     'vs': 'virtual',
