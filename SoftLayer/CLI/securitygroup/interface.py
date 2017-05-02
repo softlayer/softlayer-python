@@ -52,7 +52,8 @@ def interface_list(env, securitygroup_id, sortby):
             vsi_id = vsi['id']
             hostname = vsi['hostname']
             priv_pub = 'PRIVATE' if interface['port'] == 0 else 'PUBLIC'
-            ip_address = (vsi['primaryBackendIpAddress'] if interface['port'] == 0
+            ip_address = (vsi['primaryBackendIpAddress']
+                          if interface['port'] == 0
                           else vsi['primaryIpAddress'])
         except KeyError:
             vsi_id = "N/A"
