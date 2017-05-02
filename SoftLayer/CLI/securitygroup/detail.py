@@ -23,23 +23,23 @@ def cli(env, identifier):
     table.align['value'] = 'l'
 
     table.add_row(['id', secgroup['id']])
-    table.add_row(['name', secgroup.get('name', formatting.blank())])
+    table.add_row(['name', secgroup.get('name') or formatting.blank()])
     table.add_row(['description',
-                   secgroup.get('description', formatting.blank())])
+                   secgroup.get('description') or formatting.blank()])
 
     rule_table = formatting.Table(['id', 'remoteIp', 'remoteGroupId',
                                    'direction', 'ethertype', 'portRangeMin',
                                    'portRangeMax', 'protocol'])
     for rule in secgroup.get('rules', []):
-        rg_id = rule.get('remoteGroup', {}).get('id', formatting.blank())
+        rg_id = rule.get('remoteGroup', {}).get('id') or formatting.blank()
         rule_table.add_row([rule['id'],
-                            rule.get('remoteIp', formatting.blank()),
+                            rule.get('remoteIp') or formatting.blank(),
                             rule.get('remoteGroupId', rg_id),
                             rule['direction'],
-                            rule.get('ethertype', formatting.blank()),
-                            rule.get('portRangeMin', formatting.blank()),
-                            rule.get('portRangeMax', formatting.blank()),
-                            rule.get('protocol', formatting.blank())])
+                            rule.get('ethertype') or formatting.blank(),
+                            rule.get('portRangeMin') or formatting.blank(),
+                            rule.get('portRangeMax') or formatting.blank(),
+                            rule.get('protocol') or formatting.blank()])
 
     table.add_row(['rules', rule_table])
 

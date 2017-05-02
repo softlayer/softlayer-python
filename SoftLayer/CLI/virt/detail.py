@@ -86,7 +86,8 @@ def cli(env, identifier, passwords=False, price=False):
                 has_secgroups = True
                 secgroup = binding['securityGroup']
                 secgroup_table.add_row([
-                    interface, secgroup['id'], secgroup['name']])
+                    interface, secgroup['id'],
+                    secgroup.get('name') or formatting.blank()])
         if has_secgroups:
             table.add_row(['security_groups', secgroup_table])
 

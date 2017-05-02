@@ -23,9 +23,10 @@ def cli(env, name, description):
     table.align['name'] = 'r'
     table.align['value'] = 'l'
     table.add_row(['id', result['id']])
-    table.add_row(['name', result.get('name', formatting.blank())])
+    table.add_row(['name',
+                   result.get('name') or formatting.blank()])
     table.add_row(['description',
-                   result.get('description', formatting.blank())])
+                   result.get('description') or formatting.blank()])
     table.add_row(['created', result['createDate']])
 
     env.fout(table)

@@ -36,13 +36,13 @@ def rule_list(env, securitygroup_id, sortby):
     for rule in rules:
         table.add_row([
             rule['id'],
-            rule.get('remoteIp', formatting.blank()),
-            rule.get('remoteGroupId', formatting.blank()),
+            rule.get('remoteIp') or formatting.blank(),
+            rule.get('remoteGroupId') or formatting.blank(),
             rule['direction'],
-            rule.get('ethertype', formatting.blank()),
-            rule.get('portRangeMin', formatting.blank()),
-            rule.get('portRangeMax', formatting.blank()),
-            rule.get('protocol', formatting.blank())
+            rule.get('ethertype') or formatting.blank(),
+            rule.get('portRangeMin') or formatting.blank(),
+            rule.get('portRangeMax') or formatting.blank(),
+            rule.get('protocol') or formatting.blank()
         ])
 
     env.fout(table)
