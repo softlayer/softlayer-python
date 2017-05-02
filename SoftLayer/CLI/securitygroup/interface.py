@@ -45,15 +45,25 @@ def interface_list(env, securitygroup_id, sortby):
 
     secgroup = mgr.get_securitygroup(securitygroup_id, mask=mask)
     for binding in secgroup.get('networkComponentBindings'):
-        interface = binding['networkComponent']
-        vsi = interface['guest']
-        priv_pub = 'PRIVATE' if interface['port'] == 0 else 'PUBLIC'
-        ip_address = (vsi['primaryBackendIpAddress'] if interface['port'] == 0
-                      else vsi['primaryIpAddress'])
+        interface_id = binding['networkComponentId']
+        try:
+            interface = binding['networkComponent']
+            vsi = interface['guest']
+            vsi_id = vsi['id']
+            hostname = vsi['hostname']
+            priv_pub = 'PRIVATE' if interface['port'] == 0 else 'PUBLIC'
+            ip_address = (vsi['primaryBackendIpAddress'] if interface['port'] == 0
+                          else vsi['primaryIpAddress'])
+        except KeyError:
+            vsi_id = "N/A"
+            hostname = "Not enough permission to view"
+            priv_pub = "N/A"
+            ip_address = "N/A"
+
         table.add_row([
-            interface['id'],
-            vsi['id'],
-            vsi['hostname'],
+            interface_id,
+            vsi_id,
+            hostname,
             priv_pub,
             ip_address
         ])

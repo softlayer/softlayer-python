@@ -46,13 +46,21 @@ def cli(env, identifier):
     vsi_table = formatting.Table(['id', 'hostname', 'interface', 'ipAddress'])
 
     for binding in secgroup.get('networkComponentBindings'):
-        vsi = binding['networkComponent']['guest']
-        interface = ('PRIVATE' if binding['networkComponent']['port'] == 0
-                     else 'PUBLIC')
-        ip_address = (vsi['primaryBackendIpAddress']
-                      if binding['networkComponent']['port'] == 0
-                      else vsi['primaryIpAddress'])
-        vsi_table.add_row([vsi['id'], vsi['hostname'], interface, ip_address])
+        try:
+            vsi = binding['networkComponent']['guest']
+            vsi_id = vsi['id']
+            hostname = vsi['hostname']
+            interface = ('PRIVATE' if binding['networkComponent']['port'] == 0
+                         else 'PUBLIC')
+            ip_address = (vsi['primaryBackendIpAddress']
+                          if binding['networkComponent']['port'] == 0
+                          else vsi['primaryIpAddress'])
+        except KeyError:
+            vsi_id = "N/A"
+            hostname = "Not enough permission to view"
+            interface = "N/A"
+            ip_address = "N/A"
+        vsi_table.add_row([vsi_id, hostname, interface, ip_address])
 
     table.add_row(['servers', vsi_table])
 
