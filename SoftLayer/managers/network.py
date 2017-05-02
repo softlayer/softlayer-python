@@ -361,7 +361,7 @@ class NetworkManager(object):
                 'id,'
                 'name,'
                 'description,'
-                '''rules[id, remoteIp, remoteGroup,
+                '''rules[id, remoteIp, remoteGroupId,
                          direction, ethertype, portRangeMin,
                          portRangeMax, protocol],'''
                 '''networkComponentBindings[
