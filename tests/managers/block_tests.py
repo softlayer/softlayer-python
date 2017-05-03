@@ -44,6 +44,9 @@ class BlockTests(testing.TestCase):
 
         self.assert_called_with('SoftLayer_Account', 'getIscsiNetworkStorage')
 
+        result = self.block.list_block_volumes(datacenter="dal09", storage_type="Endurance", username="username")
+        self.assert_called_with('SoftLayer_Account', 'getIscsiNetworkStorage')
+
     def test_get_block_volume_access_list(self):
         result = self.block.get_block_volume_access_list(100)
 
@@ -576,6 +579,26 @@ class BlockTests(testing.TestCase):
             None,
             False,
             )
+
+        self.assertEqual(
+            result,
+            {
+                'orderId': 1234,
+                'orderDate': '2013-08-01 15:23:45',
+                'prices': [{
+                    'hourlyRecurringFee': '2',
+                    'id': 1,
+                    'item': {'description': 'this is a thing', 'id': 1},
+                    'laborFee': '2',
+                    'oneTimeFee': '2',
+                    'oneTimeFeeTax': '.1',
+                    'quantity': 1,
+                    'recurringFee': '2',
+                    'recurringFeeTax': '.1',
+                    'setupFee': '1'}],
+                },
+            )
+        result = self.block.order_snapshot_space(100, 5, None, False)
 
         self.assertEqual(
             result,

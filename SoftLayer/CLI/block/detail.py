@@ -7,6 +7,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer import utils
 
+
 @click.command()
 @click.argument('volume_id')
 @environment.pass_env

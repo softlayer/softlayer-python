@@ -21,7 +21,7 @@ getObject = {
     'password': '',
     'serviceProviderId': 1,
     'iops': 1000,
-    'storageTierLevel': {'description': '2 IOPS per GB'},
+    'storageTierLevel': 'READHEAVY_TIER',
     'snapshotCapacityGb': '10',
     'parentVolume': {'snapshotSizeBytes': 1024},
     'osType': {'keyName': 'LINUX'},

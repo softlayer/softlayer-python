@@ -121,7 +121,7 @@ class FileTests(testing.TestCase):
         self.assertEqual({
             'Username': 'username',
             'Used Space': '0B',
-            'Endurance Tier': '2 IOPS per GB',
+            'Endurance Tier': 'READHEAVY_TIER',
             'IOPs': 1000,
             'Mount Address': '127.0.0.1:/TEST',
             'Snapshot Capacity (GB)': '10',
