@@ -34,7 +34,7 @@ def cli(env, volume_id):
     if block_volume.get('storageTierLevel'):
         table.add_row([
             'Endurance Tier',
-            block_volume['storageTierLevel']['description'],
+            block_volume['storageTierLevel'],
         ])
 
     table.add_row([

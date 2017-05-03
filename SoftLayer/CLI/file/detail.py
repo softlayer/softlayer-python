@@ -43,7 +43,7 @@ def cli(env, volume_id):
     if file_volume.get('storageTierLevel'):
         table.add_row([
             'Endurance Tier',
-            file_volume['storageTierLevel']['description'],
+            file_volume['storageTierLevel'],
         ])
 
     table.add_row([
