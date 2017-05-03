@@ -136,6 +136,47 @@ class BlockTests(testing.TestCase):
             identifier=123,
         )
 
+    def test_cancel_snapshot_exception_1(self):
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        mock.return_value = {
+            'capacityGb': 20,
+            'snapshotCapacityGb': '10',
+            'schedules': [{
+                'id': 7770,
+                'type': {'keyname': 'SNAPSHOT_WEEKLY'}
+            }],
+            'billingItem': {
+                'categoryCode': 'storage_service_enterprise',
+                'cancellationDate': '2016-09-04T22:00:00-07:00'
+            }
+        }
+        self.assertRaises(
+            exceptions.SoftLayerError,
+            self.block.cancel_snapshot_space,
+            12345,
+            immediate=True
+        )
+
+    def test_cancel_snapshot_exception_2(self):
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        mock.return_value = {
+            'capacityGb': 20,
+            'snapshotCapacityGb': '10',
+            'schedules': [{
+                'id': 7770,
+                'type': {'keyname': 'SNAPSHOT_WEEKLY'}
+            }],
+            'billingItem': {
+                'activeChildren': []
+            }
+        }
+        self.assertRaises(
+            exceptions.SoftLayerError,
+            self.block.cancel_snapshot_space,
+            12345,
+            immediate=True
+        )
+
     def test_replicant_failover(self):
         result = self.block.failover_to_replicant(1234, 5678, immediate=True)
 
@@ -598,7 +639,7 @@ class BlockTests(testing.TestCase):
                     'setupFee': '1'}],
                 },
             )
-        result = self.block.order_snapshot_space(100, 5, None, False)
+        result = self.block.order_snapshot_space(100, 5, None, True)
 
         self.assertEqual(
             result,
