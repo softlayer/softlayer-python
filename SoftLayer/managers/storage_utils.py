@@ -189,24 +189,21 @@ def find_endurance_tier_iops_per_gb(volume):
     :param volume: The volume for which the tier level is desired
     :return: Returns a float value indicating the IOPS per GB for the volume
     """
-    tier_description_split = volume['storageTierLevel']['description'].split()
+    tier = volume['storageTierLevel']
+    iops_per_gb = 0.25
 
-    if tier_description_split != []:
-        iops_per_gb = tier_description_split[0]
+    if tier == "LOW_INTENSITY_TIER":
+        iops_per_gb = 0.25
+    elif tier == "READHEAVY_TIER":
+        iops_per_gb = 2
+    elif tier == "WRITEHEAVY_TIER":
+        iops_per_gb = 4
+    elif tier == "10_IOPS_PER_GB":
+        iops_per_gb = 10
+    else:
+        raise ValueError("Could not find tier IOPS per GB for this volume")
 
-        if iops_per_gb == '0.25':
-            return 0.25
-
-        if iops_per_gb == '2':
-            return 2.0
-
-        if iops_per_gb == '4':
-            return 4.0
-
-        if iops_per_gb == '10':
-            return 10.0
-
-    raise ValueError("Could not find tier IOPS per GB for this volume")
+    return iops_per_gb
 
 
 def find_performance_price(package, price_category):
