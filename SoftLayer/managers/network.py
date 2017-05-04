@@ -79,11 +79,15 @@ class NetworkManager(object):
         :param int port_min: The lower port bound to enforce
         :param str protocol: The protocol to enforce (icmp, udp, tcp)
         """
-        rule = {'direction': direction,
-                'ethertype': ethertype,
-                'portRangeMax': port_max,
-                'portRangeMin': port_min,
-                'protocol': protocol}
+        rule = {'direction': direction}
+        if ethertype is not None:
+            rule['ethertype'] = ethertype
+        if port_max is not None:
+            rule['portRangeMax'] = port_max
+        if port_min is not None:
+            rule['portRangeMin'] = port_min
+        if protocol is not None:
+            rule['protocol'] = protocol
         if remote_ip is not None:
             rule['remoteIp'] = remote_ip
         if remote_group is not None:
@@ -228,7 +232,7 @@ class NetworkManager(object):
         :param int group_id: The ID of the security group
         """
         delete_dict = {'id': group_id}
-        self.security_group.deleteObjects([delete_dict])
+        return self.security_group.deleteObjects([delete_dict])
 
     def detach_securitygroup_component(self, group_id, component_id):
         """Detaches a network component from a security group.
@@ -236,7 +240,7 @@ class NetworkManager(object):
         :param int group_id: The ID of the security group
         :param int component_id: The ID of the component to detach
         """
-        self.detach_securitygroup_components(group_id, [component_id])
+        return self.detach_securitygroup_components(group_id, [component_id])
 
     def detach_securitygroup_components(self, group_id, component_ids):
         """Detaches network components from a security group.
@@ -244,7 +248,8 @@ class NetworkManager(object):
         :param int group_id: The ID of the security group
         :param list component_ids: The IDs of the network components to detach
         """
-        self.security_group.detachNetworkComponents(component_ids, id=group_id)
+        return self.security_group.detachNetworkComponents(component_ids,
+                                                           id=group_id)
 
     def edit_rwhois(self, abuse_email=None, address1=None, address2=None,
                     city=None, company_name=None, country=None,
@@ -281,6 +286,7 @@ class NetworkManager(object):
         :param string name: The name of the security group
         :param string description: The description of the security group
         """
+        successful = False
         obj = {}
         if name:
             obj['name'] = name
@@ -289,9 +295,9 @@ class NetworkManager(object):
 
         if obj:
             obj['id'] = group_id
-            self.security_group.editObjects([obj])
+            successful = self.security_group.editObjects([obj])
 
-        return bool(name or description)
+        return successful
 
     def edit_securitygroup_rule(self, group_id, rule_id, remote_ip=None,
                                 remote_group=None, direction=None,
@@ -310,6 +316,7 @@ class NetworkManager(object):
         :param str port_range_min: The lower port bound to enforce
         :param str protocol: The protocol to enforce (icmp, udp, tcp)
         """
+        successful = False
         obj = {}
         if remote_ip:
             obj['remoteIp'] = remote_ip
@@ -328,10 +335,9 @@ class NetworkManager(object):
 
         if obj:
             obj['id'] = rule_id
-            self.security_group.editRules([obj], id=group_id)
+            successful = self.security_group.editRules([obj], id=group_id)
 
-        return bool(remote_ip or remote_group or direction or ethertype
-                    or port_range_max or port_range_min or protocol)
+        return successful
 
     def ip_lookup(self, ip_address):
         """Looks up an IP address and returns network information about it.
@@ -524,7 +530,7 @@ class NetworkManager(object):
         :param int group_id: The ID of the security group
         :param int rule_id: The ID of the rule to remove
         """
-        self.remove_securitygroup_rules(group_id, [rule_id])
+        return self.remove_securitygroup_rules(group_id, [rule_id])
 
     def remove_securitygroup_rules(self, group_id, rules):
         """Remove rules from a security group.
@@ -532,7 +538,7 @@ class NetworkManager(object):
         :param int group_id: The ID of the security group
         :param list rules: The list of IDs to remove
         """
-        self.security_group.removeRules(rules, id=group_id)
+        return self.security_group.removeRules(rules, id=group_id)
 
     def resolve_global_ip_ids(self, identifier):
         """Resolve global ip ids."""

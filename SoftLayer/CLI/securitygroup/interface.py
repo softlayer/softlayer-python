@@ -30,6 +30,7 @@ def interface_list(env, securitygroup_id, sortby):
 
     mask = (
         '''networkComponentBindings[
+            networkComponentId,
             networkComponent[
                 id,
                 port,
@@ -44,7 +45,7 @@ def interface_list(env, securitygroup_id, sortby):
     )
 
     secgroup = mgr.get_securitygroup(securitygroup_id, mask=mask)
-    for binding in secgroup.get('networkComponentBindings'):
+    for binding in secgroup.get('networkComponentBindings', []):
         interface_id = binding['networkComponentId']
         try:
             interface = binding['networkComponent']
@@ -89,7 +90,10 @@ def add(env, securitygroup_id, network_component, server, interface):
     mgr = SoftLayer.NetworkManager(env.client)
     component_id = _get_component_id(env, network_component, server, interface)
 
-    mgr.attach_securitygroup_component(securitygroup_id, component_id)
+    success = mgr.attach_securitygroup_component(securitygroup_id,
+                                                 component_id)
+    if not success:
+        raise exceptions.CLIAbort("Could not attach network component")
 
 
 @click.command()
@@ -109,7 +113,10 @@ def remove(env, securitygroup_id, network_component, server, interface):
     mgr = SoftLayer.NetworkManager(env.client)
     component_id = _get_component_id(env, network_component, server, interface)
 
-    mgr.detach_securitygroup_component(securitygroup_id, component_id)
+    success = mgr.detach_securitygroup_component(securitygroup_id,
+                                                 component_id)
+    if not success:
+        raise exceptions.CLIAbort("Could not detach network component")
 
 
 def _validate_args(network_component, server, interface):

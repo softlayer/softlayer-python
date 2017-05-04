@@ -45,7 +45,7 @@ def cli(env, identifier):
 
     vsi_table = formatting.Table(['id', 'hostname', 'interface', 'ipAddress'])
 
-    for binding in secgroup.get('networkComponentBindings'):
+    for binding in secgroup.get('networkComponentBindings', []):
         try:
             vsi = binding['networkComponent']['guest']
             vsi_id = vsi['id']

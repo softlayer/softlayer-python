@@ -12,7 +12,7 @@ COLUMNS = ['id',
            'remoteIp',
            'remoteGroupId',
            'direction',
-           'etherype',
+           'ethertype',
            'portRangeMin',
            'portRangeMax',
            'protocol']
@@ -71,9 +71,12 @@ def add(env, securitygroup_id, remote_ip, remote_group,
     """Add a security group rule to a security group."""
     mgr = SoftLayer.NetworkManager(env.client)
 
-    mgr.add_securitygroup_rule(securitygroup_id, remote_ip, remote_group,
-                               direction, ethertype, port_range_max,
-                               port_range_min, protocol)
+    ret = mgr.add_securitygroup_rule(securitygroup_id, remote_ip, remote_group,
+                                     direction, ethertype, port_range_max,
+                                     port_range_min, protocol)
+
+    if not ret:
+        raise exceptions.CLIAbort("Failed to add security group rule")
 
 
 @click.command()
@@ -126,4 +129,5 @@ def edit(env, securitygroup_id, rule_id, remote_ip, remote_group,
 def remove(env, securitygroup_id, rule_id):
     """Remove a rule from a security group."""
     mgr = SoftLayer.NetworkManager(env.client)
-    mgr.remove_securitygroup_rule(securitygroup_id, rule_id)
+    if not mgr.remove_securitygroup_rule(securitygroup_id, rule_id):
+        raise exceptions.CLIAbort("Failed to remove security group rule")
