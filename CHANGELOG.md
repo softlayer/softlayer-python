@@ -1,11 +1,14 @@
 # Change Log
 
-## [Unreleased]
- - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.1...HEAD
-
-### Added
+## [5.2.5] - 2017-05-05
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.1...v5.2.5
+ 
+The SoftLayer_Network_Storage::storageTierLevel relational property changed in https://softlayer.github.io/release_notes/20170503/ , this version fixes problems caused by that.
 
 ### Changed
+ - https://github.com/softlayer/softlayer-python/issues/818
+ - https://github.com/softlayer/softlayer-python/pull/817
+ 
 ## [5.2.4] - 2017-04-06
  - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.3...v5.2.4
  
