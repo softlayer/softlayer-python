@@ -510,11 +510,6 @@ class HardwareManager(utils.IdentifierMixin, object):
             prices.append(_get_extra_price_id(package['items'],
                                               extra, hourly,
                                               location=location))
-
-        # Hack to add Disk Controller for K80 order to go through
-        if size == 'D2620V4_128GB_2X800GB_SSD_RAID_1_K80_GPU2':
-            prices.append(22482)
-
         hardware = [{
             'hostname': hostname,
             'domain': domain,
