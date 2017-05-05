@@ -71,7 +71,7 @@ class BlockTests(testing.TestCase):
         self.assertEqual({
             'Username': 'username',
             'LUN Id': '2',
-            'Endurance Tier': '2 IOPS per GB',
+            'Endurance Tier': 'READHEAVY_TIER',
             'IOPs': 1000,
             'Snapshot Capacity (GB)': '10',
             'Snapshot Used (Bytes)': 1024,
