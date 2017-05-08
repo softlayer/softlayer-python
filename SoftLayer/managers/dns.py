@@ -43,7 +43,7 @@ class DNSManager(utils.IdentifierMixin, object):
     def get_zone(self, zone_id, records=True):
         """Get a zone and its records.
 
-        :param zone: the zone name
+        :param zone_id: the zone id
         :returns: A dictionary containing a large amount of information about
                   the specified zone.
 
@@ -87,7 +87,7 @@ class DNSManager(utils.IdentifierMixin, object):
     def create_record(self, zone_id, record, record_type, data, ttl=60):
         """Create a resource record on a domain.
 
-        :param integer id: the zone's ID
+        :param integer zone_id: the zone's ID
         :param record: the name of the record to add
         :param record_type: the type of record (A, AAAA, CNAME, MX, TXT, etc.)
         :param data: the record's value
@@ -104,7 +104,7 @@ class DNSManager(utils.IdentifierMixin, object):
     def delete_record(self, record_id):
         """Delete a resource record by its ID.
 
-        :param integer id: the record's ID
+        :param integer record_id: the record's ID
 
         """
         self.record.deleteObject(id=record_id)
@@ -112,7 +112,7 @@ class DNSManager(utils.IdentifierMixin, object):
     def get_record(self, record_id):
         """Get a DNS record.
 
-        :param integer id: the record's ID
+        :param integer record_id: the record's ID
         """
         return self.record.getObject(id=record_id)
 
@@ -120,7 +120,7 @@ class DNSManager(utils.IdentifierMixin, object):
                     record_type=None):
         """List, and optionally filter, records within a zone.
 
-        :param zone: the zone name in which to search.
+        :param int zone_id: the zone id in which to search.
         :param int ttl: time in seconds
         :param str data: the records data
         :param str host: record's host
