@@ -153,7 +153,24 @@ HARDWARE_ITEMS = [
                  'oneTimeFee': '0',
                  'quantity': '',
                  'setupFee': '0',
-                 'sort': 99}]}]
+                 'sort': 99}]},
+    {'attributes': [],
+     'capacity': '1',
+     'description': 'None',
+     'itemCategory': {'categoryCode': 'other', 'id': 194},
+     'keyName': 'NONE',
+     'prices': [{'currentPriceFlag': '',
+                 'hourlyRecurringFee': '0',
+                 'id': 178117,
+                 'itemId': 8195,
+                 'laborFee': '0',
+                 'locationGroupId': '',
+                 'onSaleFlag': '',
+                 'oneTimeFee': '0',
+                 'quantity': '',
+                 'recurringFee': '0',
+                 'setupFee': '0',
+                 'sort': 0}]}]
 
 
 getAllObjects = [{
