@@ -34,14 +34,21 @@ def rule_list(env, securitygroup_id, sortby):
 
     rules = mgr.list_securitygroup_rules(securitygroup_id)
     for rule in rules:
+        port_min = rule.get('portRangeMin')
+        port_max = rule.get('portRangeMax')
+        if port_min is None:
+            port_min = formatting.blank()
+        if port_max is None:
+            port_max = formatting.blank()
+
         table.add_row([
             rule['id'],
             rule.get('remoteIp') or formatting.blank(),
             rule.get('remoteGroupId') or formatting.blank(),
             rule['direction'],
             rule.get('ethertype') or formatting.blank(),
-            rule.get('portRangeMin') or formatting.blank(),
-            rule.get('portRangeMax') or formatting.blank(),
+            port_min,
+            port_max,
             rule.get('protocol') or formatting.blank()
         ])
 
@@ -111,9 +118,9 @@ def edit(env, securitygroup_id, rule_id, remote_ip, remote_group,
         data['direction'] = direction
     if ethertype:
         data['ethertype'] = ethertype
-    if port_range_max:
+    if port_range_max is not None:
         data['port_range_max'] = port_range_max
-    if port_range_min:
+    if port_range_min is not None:
         data['port_range_min'] = port_range_min
     if protocol:
         data['protocol'] = protocol

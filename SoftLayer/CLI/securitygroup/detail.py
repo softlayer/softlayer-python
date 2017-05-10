@@ -32,13 +32,19 @@ def cli(env, identifier):
                                    'portRangeMax', 'protocol'])
     for rule in secgroup.get('rules', []):
         rg_id = rule.get('remoteGroup', {}).get('id') or formatting.blank()
+        port_min = rule.get('portRangeMin')
+        port_max = rule.get('portRangeMax')
+        if port_min is None:
+            port_min = formatting.blank()
+        if port_max is None:
+            port_max = formatting.blank()
         rule_table.add_row([rule['id'],
                             rule.get('remoteIp') or formatting.blank(),
                             rule.get('remoteGroupId', rg_id),
                             rule['direction'],
                             rule.get('ethertype') or formatting.blank(),
-                            rule.get('portRangeMin') or formatting.blank(),
-                            rule.get('portRangeMax') or formatting.blank(),
+                            port_min,
+                            port_max,
                             rule.get('protocol') or formatting.blank()])
 
     table.add_row(['rules', rule_table])
