@@ -298,7 +298,7 @@ class IPSECTests(testing.TestCase):
         account_mock.return_value = [{'id': 445, 'accountId': 999000}]
 
         tunnel_mock = self.set_mock('SoftLayer_Network_Tunnel_Module_Context',
-                                    'addPrivateSubnetToNetworkTunnel')
+                                    'addCustomerSubnetToNetworkTunnel')
         tunnel_mock.return_value = True
 
         subnet_mock = self.set_mock('SoftLayer_Network_Customer_Subnet',
