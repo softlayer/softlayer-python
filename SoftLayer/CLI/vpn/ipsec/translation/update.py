@@ -26,11 +26,11 @@ from SoftLayer.CLI.exceptions import CLIHalt
               default=None,
               help='Remote IP address value')
 @click.option('-n',
-              '--notes',
+              '--note',
               default=None,
-              help='Notes value')
+              help='Note value')
 @environment.pass_env
-def cli(env, context_id, translation_id, static_ip, remote_ip, notes):
+def cli(env, context_id, translation_id, static_ip, remote_ip, note):
     """Update an address translation for an IPSEC tunnel context.
 
     A separate configuration request should be made to realize changes on
@@ -41,7 +41,7 @@ def cli(env, context_id, translation_id, static_ip, remote_ip, notes):
                                            translation_id,
                                            static_ip=static_ip,
                                            remote_ip=remote_ip,
-                                           notes=notes)
+                                           notes=note)
     if succeeded:
         env.out('Updated translation #{}'.format(translation_id))
     else:

@@ -22,11 +22,11 @@ from SoftLayer.CLI import environment
               required=True,
               help='Remote IP address value')
 @click.option('-n',
-              '--notes',
+              '--note',
               default=None,
-              help='Notes value')
+              help='Note value')
 @environment.pass_env
-def cli(env, context_id, static_ip, remote_ip, notes):
+def cli(env, context_id, static_ip, remote_ip, note):
     """Add an address translation to an IPSEC tunnel context.
 
     A separate configuration request should be made to realize changes on
@@ -39,6 +39,6 @@ def cli(env, context_id, static_ip, remote_ip, notes):
     translation = manager.create_translation(context_id,
                                              static_ip=static_ip,
                                              remote_ip=remote_ip,
-                                             notes=notes)
+                                             notes=note)
     env.out('Created translation from {} to {} #{}'
             .format(static_ip, remote_ip, translation['id']))
