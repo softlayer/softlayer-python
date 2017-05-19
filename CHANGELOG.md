@@ -1,5 +1,20 @@
 # Change Log
 
+## [5.2.6] - TBD
+
+
+#### Added To CLI
+* ipsec list
+* ipsec detail
+* ipsec configure
+* ipsec update
+* ipsec subnet-add
+* ipsec subnet-remove
+* ipsec translation-add
+* ipsec translation-remove
+* ipsec translation-update
+
+
 ## [5.2.5] - 2017-05-05
  - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.1...v5.2.5
  
