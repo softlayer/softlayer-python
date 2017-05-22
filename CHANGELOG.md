@@ -1,8 +1,8 @@
 # Change Log
 
-## [5.2.6] - TBD
-
-
+## [5.2.6] - 2017-05-22
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.5...v5.2.6
+ 
 #### Added To CLI
 * ipsec list
 * ipsec detail
