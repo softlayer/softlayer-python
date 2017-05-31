@@ -301,8 +301,8 @@ class NetworkManager(object):
 
     def edit_securitygroup_rule(self, group_id, rule_id, remote_ip=None,
                                 remote_group=None, direction=None,
-                                ethertype=None, port_range_max=None,
-                                port_range_min=None, protocol=None):
+                                ethertype=None, port_max=None,
+                                port_min=None, protocol=None):
         """Edit a security group rule.
 
         :param int group_id: The ID of the security group the rule belongs to
@@ -312,8 +312,8 @@ class NetworkManager(object):
                                           the rule on
         :param str direction: The direction to enforce (egress or ingress)
         :param str ethertype: The ethertype to enforce (IPv4 or IPv6)
-        :param str port_range_max: The upper port bound to enforce
-        :param str port_range_min: The lower port bound to enforce
+        :param str port_max: The upper port bound to enforce
+        :param str port_min: The lower port bound to enforce
         :param str protocol: The protocol to enforce (icmp, udp, tcp)
         """
         successful = False
@@ -326,10 +326,10 @@ class NetworkManager(object):
             obj['direction'] = direction
         if ethertype:
             obj['ethertype'] = ethertype
-        if port_range_max:
-            obj['portRangeMax'] = port_range_max
-        if port_range_min:
-            obj['portRangeMin'] = port_range_min
+        if port_max:
+            obj['portRangeMax'] = port_max
+        if port_min:
+            obj['portRangeMin'] = port_min
         if protocol:
             obj['protocol'] = protocol
 

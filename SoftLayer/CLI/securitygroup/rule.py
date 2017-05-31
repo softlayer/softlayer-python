@@ -66,21 +66,21 @@ def rule_list(env, securitygroup_id, sortby):
                     '(ingress, egress)'))
 @click.option('--ethertype', '-e',
               help='The ethertype (IPv4 or IPv6) to enforce')
-@click.option('--port-range-max', '-M', type=click.INT,
+@click.option('--port-max', '-M', type=click.INT,
               help='The upper port bound to enforce')
-@click.option('--port-range-min', '-m', type=click.INT,
+@click.option('--port-min', '-m', type=click.INT,
               help='The lower port bound to enforce')
 @click.option('--protocol', '-p',
               help='The protocol (icmp, tcp, udp) to enforce')
 @environment.pass_env
 def add(env, securitygroup_id, remote_ip, remote_group,
-        direction, ethertype, port_range_max, port_range_min, protocol):
+        direction, ethertype, port_max, port_min, protocol):
     """Add a security group rule to a security group."""
     mgr = SoftLayer.NetworkManager(env.client)
 
     ret = mgr.add_securitygroup_rule(securitygroup_id, remote_ip, remote_group,
-                                     direction, ethertype, port_range_max,
-                                     port_range_min, protocol)
+                                     direction, ethertype, port_max,
+                                     port_min, protocol)
 
     if not ret:
         raise exceptions.CLIAbort("Failed to add security group rule")
@@ -97,15 +97,15 @@ def add(env, securitygroup_id, remote_ip, remote_group,
               help='The direction of traffic to enforce')
 @click.option('--ethertype', '-e',
               help='The ethertype (IPv4 or IPv6) to enforce')
-@click.option('--port-range-max', '-M',
+@click.option('--port-max', '-M',
               help='The upper port bound to enforce')
-@click.option('--port-range-min', '-m',
+@click.option('--port-min', '-m',
               help='The lower port bound to enforce')
 @click.option('--protocol', '-p',
               help='The protocol (icmp, tcp, udp) to enforce')
 @environment.pass_env
 def edit(env, securitygroup_id, rule_id, remote_ip, remote_group,
-         direction, ethertype, port_range_max, port_range_min, protocol):
+         direction, ethertype, port_max, port_min, protocol):
     """Edit a security group rule in a security group."""
     mgr = SoftLayer.NetworkManager(env.client)
 
@@ -118,10 +118,10 @@ def edit(env, securitygroup_id, rule_id, remote_ip, remote_group,
         data['direction'] = direction
     if ethertype:
         data['ethertype'] = ethertype
-    if port_range_max is not None:
-        data['port_range_max'] = port_range_max
-    if port_range_min is not None:
-        data['port_range_min'] = port_range_min
+    if port_max is not None:
+        data['port_max'] = port_max
+    if port_min is not None:
+        data['port_min'] = port_min
     if protocol:
         data['protocol'] = protocol
 
