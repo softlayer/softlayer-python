@@ -399,7 +399,6 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         block_volume = self.get_block_volume_details(
             volume_id,
             mask='mask[id,billingItem[activeChildren]]')
-
         if 'activeChildren' not in block_volume['billingItem']:
             raise exceptions.SoftLayerError(
                 'No snapshot space found to cancel')
