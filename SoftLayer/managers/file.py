@@ -266,12 +266,6 @@ class FileStorageManager(utils.IdentifierMixin, object):
         origin_volume = self.get_file_volume_details(origin_volume_id,
                                                      mask=file_mask)
 
-        # 47474747 remove this if not used
-        # duplicate_parameters = self.client.call(
-        #     'Network_Storage',
-        #     'getVolumeDuplicateParameters',
-        #     id=origin_volume_id)
-
         order = storage_utils.prepare_duplicate_order_object(
             self, origin_volume, duplicate_iops, duplicate_tier_level,
             duplicate_size, duplicate_snapshot_size, 'file'

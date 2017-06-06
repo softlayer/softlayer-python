@@ -278,12 +278,6 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         origin_volume = self.get_block_volume_details(origin_volume_id,
                                                       mask=block_mask)
 
-        # 47474747 remove this if not used
-        # duplicate_parameters = self.client.call(
-        #     'Network_Storage',
-        #     'getVolumeDuplicateParameters',
-        #     id=origin_volume_id)
-
         if isinstance(utils.lookup(origin_volume, 'osType', 'keyName'), str):
             os_type = origin_volume['osType']['keyName']
         else:
