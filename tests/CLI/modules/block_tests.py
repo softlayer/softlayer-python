@@ -462,3 +462,45 @@ class BlockTests(testing.TestCase):
                          ' > 20 GB Storage Space\n'
                          ' > 10 GB Storage Space (Snapshot Space)\n'
                          ' > 20 GB Storage Space Replicant of: TEST\n')
+
+    @mock.patch('SoftLayer.BlockStorageManager.order_duplicate_volume')
+    def test_duplicate_order_exception_caught(self, order_mock):
+        order_mock.side_effect = ValueError('order attempt failed, oh noooo!')
+
+        result = self.run_command(['block', 'volume-duplicate', '102'])
+
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual('Argument Error: order attempt failed, oh noooo!',
+                         result.exception.message)
+
+    @mock.patch('SoftLayer.BlockStorageManager.order_duplicate_volume')
+    def test_duplicate_order_order_not_placed(self, order_mock):
+        order_mock.return_value = {}
+
+        result = self.run_command(['block', 'volume-duplicate', '102',
+                                   '--duplicate-iops=1400'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.output,
+                         'Order could not be placed! Please verify '
+                         'your options and try again.\n')
+
+    @mock.patch('SoftLayer.BlockStorageManager.order_duplicate_volume')
+    def test_duplicate_order(self, order_mock):
+        order_mock.return_value = {
+            'placedOrder': {
+                'id': 24601,
+                'items': [{'description': 'Storage as a Service'}]
+            }
+        }
+
+        result = self.run_command(['block', 'volume-duplicate', '102',
+                                   '--origin-snapshot-id=470',
+                                   '--duplicate-size=250',
+                                   '--duplicate-tier=2',
+                                   '--duplicate-snapshot-size=20'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.output,
+                         'Order #24601 placed successfully!\n'
+                         ' > Storage as a Service\n')

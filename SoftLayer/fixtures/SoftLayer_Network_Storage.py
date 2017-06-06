@@ -1,3 +1,34 @@
+DUPLICATABLE_VOLUME = {
+    'accountId': 1234,
+    'activeTransactions': None,
+    'activeTransactionCount': 0,
+    'billingItem': {
+        'activeChildren': [{
+            'categoryCode': 'storage_snapshot_space',
+            'id': 125,
+            'cancellationDate': '',
+        }],
+        'cancellationDate': '',
+        'id': 454,
+        'location': {'id': 449500}
+    },
+    'capacityGb': 500,
+    'id': 102,
+    'iops': 1000,
+    'lunId': 2,
+    'osType': {'keyName': 'LINUX'},
+    'originalVolumeSize': '500',
+    'parentVolume': {'snapshotSizeBytes': 1024},
+    'provisionedIops': '1000',
+    'replicationPartnerCount': 0,
+    'serviceResource': {'datacenter': {'id': 449500, 'name': 'dal05'}},
+    'serviceResourceBackendIpAddress': '10.1.2.3',
+    'snapshotCapacityGb': '10',
+    'storageTierLevel': 'READHEAVY_TIER',
+    'storageType': {'keyName': 'ENDURANCE_BLOCK_STORAGE'},
+    'username': 'duplicatable_volume_username'
+}
+
 getObject = {
     'accountId': 1234,
     'billingItem': {
@@ -8,7 +39,8 @@ getObject = {
             'categoryCode': 'storage_snapshot_space',
             'id': 123,
             'cancellationDate': '',
-        }]
+        }],
+        'location': {'id': 449500}
     },
     'capacityGb': 20,
     'createDate': '2015:50:15-04:00',

@@ -9,6 +9,8 @@ from SoftLayer import exceptions
 from SoftLayer.managers import storage_utils
 from SoftLayer import utils
 
+# pylint: disable=too-many-public-methods
+
 
 class FileStorageManager(utils.IdentifierMixin, object):
     """Manages file Storage volumes."""
@@ -239,6 +241,43 @@ class FileStorageManager(utils.IdentifierMixin, object):
         return self.client.call('Network_Storage',
                                 'getValidReplicationTargetDatacenterLocations',
                                 id=volume_id)
+
+    def order_duplicate_volume(self, origin_volume_id, origin_snapshot_id=None,
+                               duplicate_size=None, duplicate_iops=None,
+                               duplicate_tier_level=None,
+                               duplicate_snapshot_size=None):
+        """Places an order for a duplicate file volume.
+
+        :param origin_volume_id: The ID of the origin volume to be duplicated
+        :param origin_snapshot_id: Origin snapshot ID to use for duplication
+        :param duplicate_size: Size/capacity for the duplicate volume
+        :param duplicate_iops: The IOPS per GB for the duplicate volume
+        :param duplicate_tier_level: Tier level for the duplicate volume
+        :param duplicate_snapshot_size: Snapshot space size for the duplicate
+        :return: Returns a SoftLayer_Container_Product_Order_Receipt
+        """
+
+        file_mask = 'id,billingItem[location],snapshotCapacityGb,'\
+                    'storageType[keyName],capacityGb,originalVolumeSize,'\
+                    'provisionedIops,storageTierLevel'
+        origin_volume = self.get_file_volume_details(origin_volume_id,
+                                                     mask=file_mask)
+
+        # 47474747 remove this if not used
+        # duplicate_parameters = self.client.call(
+        #     'Network_Storage',
+        #     'getVolumeDuplicateParameters',
+        #     id=origin_volume_id)
+
+        order = storage_utils.prepare_duplicate_order_object(
+            self, origin_volume, duplicate_iops, duplicate_tier_level,
+            duplicate_size, duplicate_snapshot_size, 'file'
+        )
+
+        if origin_snapshot_id is not None:
+            order['duplicateOriginSnapshotId'] = origin_snapshot_id
+
+        return self.client.call('Product_Order', 'placeOrder', order)
 
     def delete_snapshot(self, snapshot_id):
         """Deletes the specified snapshot object.
