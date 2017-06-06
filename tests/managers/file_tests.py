@@ -105,10 +105,37 @@ class FileTests(testing.TestCase):
 
         self.assertEqual(fixtures.SoftLayer_Network_Storage.getObject, result)
 
+        expected_mask = 'id,'\
+                        'username,'\
+                        'password,'\
+                        'capacityGb,'\
+                        'bytesUsed,'\
+                        'snapshotCapacityGb,'\
+                        'parentVolume.snapshotSizeBytes,'\
+                        'storageType.keyName,'\
+                        'serviceResource.datacenter[name],'\
+                        'serviceResourceBackendIpAddress,'\
+                        'fileNetworkMountAddress,'\
+                        'storageTierLevel,'\
+                        'iops,'\
+                        'lunId,'\
+                        'originalVolumeName,'\
+                        'originalSnapshotName,'\
+                        'originalVolumeSize,'\
+                        'activeTransactionCount,'\
+                        'activeTransactions.transactionStatus[friendlyName],'\
+                        'replicationPartnerCount,'\
+                        'replicationStatus,'\
+                        'replicationPartners[id,username,'\
+                        'serviceResourceBackendIpAddress,'\
+                        'serviceResource[datacenter[name]],'\
+                        'replicationSchedule[type[keyname]]]'
+
         self.assert_called_with(
             'SoftLayer_Network_Storage',
             'getObject',
-            identifier=100)
+            identifier=100,
+            mask='mask[%s]' % expected_mask)
 
     def test_get_file_volume_snapshot_list(self):
         result = self.file.get_file_volume_snapshot_list(100)

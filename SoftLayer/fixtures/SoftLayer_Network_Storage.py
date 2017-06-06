@@ -57,6 +57,9 @@ getObject = {
     'snapshotCapacityGb': '10',
     'parentVolume': {'snapshotSizeBytes': 1024},
     'osType': {'keyName': 'LINUX'},
+    'originalSnapshotName': 'test-origin-snapshot-name',
+    'originalVolumeName': 'test-origin-volume-name',
+    'originalVolumeSize': '20',
     'schedules': [{
         'id': 978,
         'type': {'keyname': 'SNAPSHOT_WEEKLY'},

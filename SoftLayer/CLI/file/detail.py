@@ -114,4 +114,13 @@ def cli(env, volume_id):
             replicant_list.append(replicant_table)
         table.add_row(['Replicant Volumes', replicant_list])
 
+    if file_volume.get('originalVolumeSize'):
+        duplicate_info = formatting.Table(['Original Volume Name',
+                                           file_volume['originalVolumeName']])
+        duplicate_info.add_row(['Original Volume Size',
+                                file_volume['originalVolumeSize']])
+        duplicate_info.add_row(['Original Snapshot Name',
+                                file_volume['originalSnapshotName']])
+        table.add_row(['Duplicate Volume Properties', duplicate_info])
+
     env.fout(table)
