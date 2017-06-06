@@ -145,7 +145,13 @@ class FileTests(testing.TestCase):
                 {'Replicant ID': 'Target IP', '1785': '10.3.177.84'},
                 {'Replicant ID': 'Data Center', '1785': 'dal01'},
                 {'Replicant ID': 'Schedule', '1785': 'REPLICATION_DAILY'},
-            ]]
+            ]],
+            'Duplicate Volume Properties': [
+                {'Original Volume Name': 'Original Volume Size',
+                 'test-origin-volume-name': '20'},
+                {'Original Volume Name': 'Original Snapshot Name',
+                 'test-origin-volume-name': 'test-origin-snapshot-name'}
+            ]
         }, json.loads(result.output))
 
     def test_volume_order_performance_iops_not_given(self):
