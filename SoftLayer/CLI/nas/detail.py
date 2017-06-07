@@ -5,7 +5,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer import utils
 
-NAS_PROPERTIES = 'id,username,serviceResourceBackendIpAddress'
+NAS_PROPERTIES = 'id,username,serviceResourceBackendIpAddress,fileNetworkMountAddress'
 
 
 @click.command()
