@@ -16,7 +16,8 @@ def cli(env, volume_id):
     file_manager = SoftLayer.FileStorageManager(env.client)
     file_volume = file_manager.get_file_volume_details(volume_id)
     file_volume = utils.NestedDict(file_volume)
-    used_space = int(file_volume['bytesUsed'])
+    used_space = int(file_volume['bytesUsed'])\
+        if file_volume['bytesUsed'] else 0
 
     table = formatting.KeyValueTable(['Name', 'Value'])
     table.align['Name'] = 'r'
