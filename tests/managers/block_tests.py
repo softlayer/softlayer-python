@@ -30,10 +30,35 @@ class BlockTests(testing.TestCase):
 
         self.assertEqual(fixtures.SoftLayer_Network_Storage.getObject, result)
 
+        expected_mask = 'id,'\
+                        'username,'\
+                        'password,'\
+                        'capacityGb,'\
+                        'snapshotCapacityGb,'\
+                        'parentVolume.snapshotSizeBytes,'\
+                        'storageType.keyName,'\
+                        'serviceResource.datacenter[name],'\
+                        'serviceResourceBackendIpAddress,'\
+                        'storageTierLevel,'\
+                        'iops,'\
+                        'lunId,'\
+                        'originalVolumeName,'\
+                        'originalSnapshotName,'\
+                        'originalVolumeSize,'\
+                        'activeTransactionCount,'\
+                        'activeTransactions.transactionStatus[friendlyName],'\
+                        'replicationPartnerCount,'\
+                        'replicationStatus,'\
+                        'replicationPartners[id,username,'\
+                        'serviceResourceBackendIpAddress,'\
+                        'serviceResource[datacenter[name]],'\
+                        'replicationSchedule[type[keyname]]]'
+
         self.assert_called_with(
             'SoftLayer_Network_Storage',
             'getObject',
-            identifier=100
+            identifier=100,
+            mask='mask[%s]' % expected_mask
             )
 
     def test_list_block_volumes(self):
@@ -969,3 +994,184 @@ class BlockTests(testing.TestCase):
                     'setupFee': '1'}],
                 },
             )
+
+    def test_order_block_duplicate_origin_os_type_not_found(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = fixtures.SoftLayer_Network_Storage.DUPLICATABLE_VOLUME
+        prev_os_type = mock_volume['osType']
+        del mock_volume['osType']
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        mock.return_value = mock_volume
+
+        exception = self.assertRaises(
+            exceptions.SoftLayerError,
+            self.block.order_duplicate_volume,
+            102
+        )
+
+        self.assertEqual(str(exception),
+                         "Cannot find origin volume's os-type")
+
+        mock_volume['osType'] = prev_os_type
+
+    def test_order_block_duplicate_performance_no_duplicate_snapshot(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = fixtures.SoftLayer_Network_Storage.DUPLICATABLE_VOLUME
+        prev_storage_type_keyname = mock_volume['storageType']['keyName']
+        mock_volume['storageType']['keyName'] = 'PERFORMANCE_BLOCK_STORAGE'
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        mock.return_value = mock_volume
+
+        result = self.block.order_duplicate_volume(
+            102,
+            duplicate_snapshot_size=0)
+
+        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+
+        self.assert_called_with(
+            'SoftLayer_Product_Order',
+            'placeOrder',
+            args=({
+                'complexType': 'SoftLayer_Container_Product_Order_'
+                               'Network_Storage_AsAService',
+                'packageId': 759,
+                'prices': [
+                    {'id': 189433},
+                    {'id': 189443},
+                    {'id': 189993},
+                    {'id': 190053}
+                ],
+                'volumeSize': 500,
+                'quantity': 1,
+                'location': 449500,
+                'duplicateOriginVolumeId': 102,
+                'osFormatType': {'keyName': 'LINUX'},
+                'iops': 1000
+            },))
+
+        mock_volume['storageType']['keyName'] = prev_storage_type_keyname
+
+    def test_order_block_duplicate_performance(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = fixtures.SoftLayer_Network_Storage.DUPLICATABLE_VOLUME
+        prev_storage_type_keyname = mock_volume['storageType']['keyName']
+        mock_volume['storageType']['keyName'] = 'PERFORMANCE_BLOCK_STORAGE'
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        mock.return_value = mock_volume
+
+        result = self.block.order_duplicate_volume(
+            102,
+            origin_snapshot_id=470,
+            duplicate_size=1000,
+            duplicate_iops=2000,
+            duplicate_tier_level=None,
+            duplicate_snapshot_size=10
+            )
+
+        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+
+        self.assert_called_with(
+            'SoftLayer_Product_Order',
+            'placeOrder',
+            args=({
+                'complexType': 'SoftLayer_Container_Product_Order_'
+                               'Network_Storage_AsAService',
+                'packageId': 759,
+                'prices': [
+                    {'id': 189433},
+                    {'id': 189443},
+                    {'id': 190113},
+                    {'id': 190173},
+                    {'id': 191193}
+                ],
+                'volumeSize': 1000,
+                'quantity': 1,
+                'location': 449500,
+                'duplicateOriginVolumeId': 102,
+                'osFormatType': {'keyName': 'LINUX'},
+                'duplicateOriginSnapshotId': 470,
+                'iops': 2000
+            },))
+
+        mock_volume['storageType']['keyName'] = prev_storage_type_keyname
+
+    def test_order_block_duplicate_endurance_no_duplicate_snapshot(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = fixtures.SoftLayer_Network_Storage.DUPLICATABLE_VOLUME
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        mock.return_value = mock_volume
+
+        result = self.block.order_duplicate_volume(
+            102,
+            duplicate_snapshot_size=0)
+
+        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+
+        self.assert_called_with(
+            'SoftLayer_Product_Order',
+            'placeOrder',
+            args=({
+                'complexType': 'SoftLayer_Container_Product_Order_'
+                               'Network_Storage_AsAService',
+                'packageId': 759,
+                'prices': [
+                    {'id': 189433},
+                    {'id': 189443},
+                    {'id': 193433},
+                    {'id': 193373}
+                ],
+                'volumeSize': 500,
+                'quantity': 1,
+                'location': 449500,
+                'duplicateOriginVolumeId': 102,
+                'osFormatType': {'keyName': 'LINUX'}
+            },))
+
+    def test_order_block_duplicate_endurance(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = fixtures.SoftLayer_Network_Storage.DUPLICATABLE_VOLUME
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        mock.return_value = mock_volume
+
+        result = self.block.order_duplicate_volume(
+            102,
+            origin_snapshot_id=470,
+            duplicate_size=1000,
+            duplicate_iops=None,
+            duplicate_tier_level=4,
+            duplicate_snapshot_size=10
+            )
+
+        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+
+        self.assert_called_with(
+            'SoftLayer_Product_Order',
+            'placeOrder',
+            args=({
+                'complexType': 'SoftLayer_Container_Product_Order_'
+                               'Network_Storage_AsAService',
+                'packageId': 759,
+                'prices': [
+                    {'id': 189433},
+                    {'id': 189443},
+                    {'id': 194763},
+                    {'id': 194703},
+                    {'id': 194943}
+                ],
+                'volumeSize': 1000,
+                'quantity': 1,
+                'location': 449500,
+                'duplicateOriginVolumeId': 102,
+                'osFormatType': {'keyName': 'LINUX'},
+                'duplicateOriginSnapshotId': 470
+            },))

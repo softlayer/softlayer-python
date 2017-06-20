@@ -145,7 +145,13 @@ class FileTests(testing.TestCase):
                 {'Replicant ID': 'Target IP', '1785': '10.3.177.84'},
                 {'Replicant ID': 'Data Center', '1785': 'dal01'},
                 {'Replicant ID': 'Schedule', '1785': 'REPLICATION_DAILY'},
-            ]]
+            ]],
+            'Duplicate Volume Properties': [
+                {'Original Volume Name': 'Original Volume Size',
+                 'test-origin-volume-name': '20'},
+                {'Original Volume Name': 'Original Snapshot Name',
+                 'test-origin-volume-name': 'test-origin-snapshot-name'}
+            ]
         }, json.loads(result.output))
 
     def test_volume_order_performance_iops_not_given(self):
@@ -466,3 +472,45 @@ class FileTests(testing.TestCase):
         self.assertEqual(
             'There are no replication partners for the given volume.\n',
             result.output)
+
+    @mock.patch('SoftLayer.FileStorageManager.order_duplicate_volume')
+    def test_duplicate_order_exception_caught(self, order_mock):
+        order_mock.side_effect = ValueError('order attempt failed, oh noooo!')
+
+        result = self.run_command(['file', 'volume-duplicate', '100'])
+
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual('Argument Error: order attempt failed, oh noooo!',
+                         result.exception.message)
+
+    @mock.patch('SoftLayer.FileStorageManager.order_duplicate_volume')
+    def test_duplicate_order_order_not_placed(self, order_mock):
+        order_mock.return_value = {}
+
+        result = self.run_command(['file', 'volume-duplicate', '100',
+                                   '--duplicate-iops=1400'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.output,
+                         'Order could not be placed! Please verify '
+                         'your options and try again.\n')
+
+    @mock.patch('SoftLayer.FileStorageManager.order_duplicate_volume')
+    def test_duplicate_order(self, order_mock):
+        order_mock.return_value = {
+            'placedOrder': {
+                'id': 24602,
+                'items': [{'description': 'Storage as a Service'}]
+            }
+        }
+
+        result = self.run_command(['file', 'volume-duplicate', '100',
+                                   '--origin-snapshot-id=470',
+                                   '--duplicate-size=250',
+                                   '--duplicate-tier=2',
+                                   '--duplicate-snapshot-size=20'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.output,
+                         'Order #24602 placed successfully!\n'
+                         ' > Storage as a Service\n')

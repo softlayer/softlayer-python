@@ -76,6 +76,7 @@ ALL_ROUTES = [
     ('block:snapshot-restore', 'SoftLayer.CLI.block.snapshot.restore:cli'),
     ('block:volume-cancel', 'SoftLayer.CLI.block.cancel:cli'),
     ('block:volume-detail', 'SoftLayer.CLI.block.detail:cli'),
+    ('block:volume-duplicate', 'SoftLayer.CLI.block.duplicate:cli'),
     ('block:volume-list', 'SoftLayer.CLI.block.list:cli'),
     ('block:volume-order', 'SoftLayer.CLI.block.order:cli'),
 
@@ -98,6 +99,7 @@ ALL_ROUTES = [
     ('file:snapshot-restore', 'SoftLayer.CLI.file.snapshot.restore:cli'),
     ('file:volume-cancel', 'SoftLayer.CLI.file.cancel:cli'),
     ('file:volume-detail', 'SoftLayer.CLI.file.detail:cli'),
+    ('file:volume-duplicate', 'SoftLayer.CLI.file.duplicate:cli'),
     ('file:volume-list', 'SoftLayer.CLI.file.list:cli'),
     ('file:volume-order', 'SoftLayer.CLI.file.order:cli'),
 

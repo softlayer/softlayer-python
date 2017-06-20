@@ -16,7 +16,8 @@ def cli(env, volume_id):
     file_manager = SoftLayer.FileStorageManager(env.client)
     file_volume = file_manager.get_file_volume_details(volume_id)
     file_volume = utils.NestedDict(file_volume)
-    used_space = int(file_volume['bytesUsed'])
+    used_space = int(file_volume['bytesUsed'])\
+        if file_volume['bytesUsed'] else 0
 
     table = formatting.KeyValueTable(['Name', 'Value'])
     table.align['Name'] = 'r'
@@ -113,5 +114,14 @@ def cli(env, volume_id):
                 replicant['replicationSchedule']['type']['keyname']])
             replicant_list.append(replicant_table)
         table.add_row(['Replicant Volumes', replicant_list])
+
+    if file_volume.get('originalVolumeSize'):
+        duplicate_info = formatting.Table(['Original Volume Name',
+                                           file_volume['originalVolumeName']])
+        duplicate_info.add_row(['Original Volume Size',
+                                file_volume['originalVolumeSize']])
+        duplicate_info.add_row(['Original Snapshot Name',
+                                file_volume['originalSnapshotName']])
+        table.add_row(['Duplicate Volume Properties', duplicate_info])
 
     env.fout(table)

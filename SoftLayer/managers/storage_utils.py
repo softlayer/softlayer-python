@@ -350,6 +350,215 @@ def find_snapshot_space_price(package, size, tier_level):
     raise ValueError("Could not find price for snapshot space")
 
 
+def find_saas_price_by_category(package, price_category):
+    """Find a price in the SaaS package with the specified category
+
+    :param package: The Storage As A Service product package
+    :param price_category: The price category to search for
+    :return: Returns a price for the given category, or an error if not found
+    """
+    for item in package['items']:
+        for price in item['prices']:
+            if price['locationGroupId'] != '':
+                continue
+
+            if not _has_category(price['categories'], price_category):
+                continue
+
+            return {'id': price['id']}
+
+    raise ValueError("Could not find price with the category, %s"
+                     % price_category)
+
+
+def find_saas_endurance_space_price(package, size, tier_level):
+    """Find the SaaS endurance storage space price for the size and tier
+
+    :param package: The Storage As A Service product package
+    :param size: The volume size for which a price is desired
+    :param tier_level: The endurance tier for which a price is desired
+    :return: Returns the price for the size and tier, or an error if not found
+    """
+    key_name = 'STORAGE_SPACE_FOR_{0}_IOPS_PER_GB'.format(tier_level)
+    key_name = key_name.replace(".", "_")
+    for item in package['items']:
+        if item['keyName'] != key_name:
+            continue
+
+        if 'capacityMinimum' not in item or 'capacityMaximum' not in item:
+            continue
+
+        capacity_minimum = int(item['capacityMinimum'])
+        capacity_maximum = int(item['capacityMaximum'])
+        if size < capacity_minimum or size > capacity_maximum:
+            continue
+
+        for price in item['prices']:
+            # Only collect prices from valid location groups.
+            if price['locationGroupId'] != '':
+                continue
+
+            if not _has_category(price['categories'],
+                                 'performance_storage_space'):
+                continue
+
+            return {'id': price['id']}
+
+    raise ValueError("Could not find price for endurance storage space")
+
+
+def find_saas_endurance_tier_price(package, tier_level):
+    """Find the SaaS storage tier level price for the specified tier level
+
+    :param package: The Storage As A Service product package
+    :param tier_level: The endurance tier for which a price is desired
+    :return: Returns the price for the given tier, or an error if not found
+    """
+    target_capacity = ENDURANCE_TIERS.get(tier_level)
+    for item in package['items']:
+        if 'itemCategory' not in item\
+                or 'categoryCode' not in item['itemCategory']\
+                or item['itemCategory']['categoryCode']\
+                != 'storage_tier_level':
+            continue
+
+        if int(item['capacity']) != target_capacity:
+            continue
+
+        for price in item['prices']:
+            # Only collect prices from valid location groups.
+            if price['locationGroupId'] != '':
+                continue
+
+            if not _has_category(price['categories'], 'storage_tier_level'):
+                continue
+
+            return {'id': price['id']}
+
+    raise ValueError("Could not find price for endurance tier level")
+
+
+def find_saas_perform_space_price(package, size):
+    """Find the SaaS performance storage space price for the given size
+
+    :param package: The Storage As A Service product package
+    :param size: The volume size for which a price is desired
+    :return: Returns the price for the size and tier, or an error if not found
+    """
+    for item in package['items']:
+        if 'itemCategory' not in item\
+                or 'categoryCode' not in item['itemCategory']\
+                or item['itemCategory']['categoryCode']\
+                != 'performance_storage_space':
+            continue
+
+        if 'capacityMinimum' not in item or 'capacityMaximum' not in item:
+            continue
+
+        capacity_minimum = int(item['capacityMinimum'])
+        capacity_maximum = int(item['capacityMaximum'])
+        if size < capacity_minimum or size > capacity_maximum:
+            continue
+
+        key_name = '{0}_{1}_GBS'.format(capacity_minimum, capacity_maximum)
+        if item['keyName'] != key_name:
+            continue
+
+        for price in item['prices']:
+            # Only collect prices from valid location groups.
+            if price['locationGroupId'] != '':
+                continue
+
+            if not _has_category(price['categories'],
+                                 'performance_storage_space'):
+                continue
+
+            return {'id': price['id']}
+
+    raise ValueError("Could not find price for performance storage space")
+
+
+def find_saas_perform_iops_price(package, size, iops):
+    """Find the SaaS IOPS price for the specified size and iops
+
+    :param package: The Storage As A Service product package
+    :param size: The volume size for which a price is desired
+    :param iops: The number of IOPS for which a price is desired
+    :return: Returns the price for the size and IOPS, or an error if not found
+    """
+    for item in package['items']:
+        if 'itemCategory' not in item\
+                or 'categoryCode' not in item['itemCategory']\
+                or item['itemCategory']['categoryCode']\
+                != 'performance_storage_iops':
+            continue
+
+        if 'capacityMinimum' not in item or 'capacityMaximum' not in item:
+            continue
+
+        capacity_minimum = int(item['capacityMinimum'])
+        capacity_maximum = int(item['capacityMaximum'])
+        if iops < capacity_minimum or iops > capacity_maximum:
+            continue
+
+        for price in item['prices']:
+            # Only collect prices from valid location groups.
+            if price['locationGroupId'] != '':
+                continue
+
+            if not _has_category(price['categories'],
+                                 'performance_storage_iops'):
+                continue
+
+            if price['capacityRestrictionType'] != 'STORAGE_SPACE'\
+                    or size < int(price['capacityRestrictionMinimum'])\
+                    or size > int(price['capacityRestrictionMaximum']):
+                continue
+
+            return {'id': price['id']}
+
+    raise ValueError("Could not find price for iops for the given volume")
+
+
+def find_saas_snapshot_space_price(package, size, tier_level=None, iops=None):
+    """Find the price in the SaaS package for the desired snapshot space size
+
+    :param package: The product package of the endurance storage type
+    :param size: The snapshot space size for which a price is desired
+    :param tier_level: The tier of the volume for which space is being ordered
+    :param iops: The IOPS of the volume for which space is being ordered
+    :return: Returns the price for the given size, or an error if not found
+    """
+    if tier_level is not None:
+        target_value = ENDURANCE_TIERS.get(tier_level)
+        target_restriction_type = 'STORAGE_TIER_LEVEL'
+    else:
+        target_value = iops
+        target_restriction_type = 'IOPS'
+
+    for item in package['items']:
+        if int(item['capacity']) != size:
+            continue
+
+        for price in item['prices']:
+            # Only collect prices from valid location groups.
+            if price['locationGroupId'] != '':
+                continue
+
+            if target_restriction_type != price['capacityRestrictionType']\
+                    or target_value < int(price['capacityRestrictionMinimum'])\
+                    or target_value > int(price['capacityRestrictionMaximum']):
+                continue
+
+            if not _has_category(price['categories'],
+                                 'storage_snapshot_space'):
+                continue
+
+            return {'id': price['id']}
+
+    raise ValueError("Could not find price for snapshot space")
+
+
 def find_snapshot_schedule_id(volume, snapshot_schedule_keyname):
     """Find the snapshot schedule ID for the given volume and keyname
 
@@ -444,6 +653,211 @@ def prepare_replicant_order_object(manager, volume_id, snapshot_schedule,
     }
 
     return replicant_order
+
+
+def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
+                                   duplicate_size,
+                                   duplicate_snapshot_size, volume_type):
+    """Prepare the duplicate order to submit to SoftLayer_Product::placeOrder()
+
+    :param manager: The File or Block manager calling this function
+    :param origin_volume: The origin volume which is being duplicated
+    :param iops: The IOPS per GB for the duplicant volume (performance)
+    :param tier: The tier level for the duplicant volume (endurance)
+    :param duplicate_size: The requested size for the duplicate volume
+    :param duplicate_snapshot_size: The size for the duplicate snapshot space
+    :param volume_type: The type of the origin volume ('file' or 'block')
+    :return: Returns the order object to be passed to the
+             placeOrder() method of the Product_Order service
+    """
+
+    # Verify that the origin volume has not been cancelled
+    if 'billingItem' not in origin_volume:
+        raise exceptions.SoftLayerError(
+            "The origin volume has been cancelled; "
+            "unable to order duplicate volume")
+
+    # Verify that the origin volume has snapshot space (needed for duplication)
+    if isinstance(utils.lookup(origin_volume, 'snapshotCapacityGb'), str):
+        origin_snapshot_size = int(origin_volume['snapshotCapacityGb'])
+    else:
+        raise exceptions.SoftLayerError(
+            "Snapshot space not found for the origin volume. "
+            "Origin snapshot space is needed for duplication.")
+
+    # Obtain the datacenter location ID for the duplicate
+    if isinstance(utils.lookup(origin_volume, 'billingItem',
+                               'location', 'id'), int):
+        location_id = origin_volume['billingItem']['location']['id']
+    else:
+        raise exceptions.SoftLayerError(
+            "Cannot find origin volume's location")
+
+    # If no specific snapshot space was requested for the duplicate,
+    # use the origin snapshot space size
+    if duplicate_snapshot_size is None:
+        duplicate_snapshot_size = origin_snapshot_size
+
+    # Validate the requested duplicate size, and set the size if none was given
+    duplicate_size = _validate_duplicate_size(
+        origin_volume, duplicate_size, volume_type)
+
+    # Get the appropriate package for the order
+    # ('storage_as_a_service' is currently used for duplicate volumes)
+    package = get_package(manager, 'storage_as_a_service')
+
+    # Determine the IOPS or tier level for the duplicate volume, along with
+    # the type and prices for the order
+    origin_storage_type = origin_volume['storageType']['keyName']
+    if origin_storage_type == 'PERFORMANCE_BLOCK_STORAGE'\
+            or origin_storage_type == 'PERFORMANCE_BLOCK_STORAGE_REPLICANT'\
+            or origin_storage_type == 'PERFORMANCE_FILE_STORAGE'\
+            or origin_storage_type == 'PERFORMANCE_FILE_STORAGE_REPLICANT':
+        volume_is_performance = True
+        iops = _validate_dupl_performance_iops(
+            origin_volume, iops, duplicate_size)
+        # Set up the price array for the order
+        prices = [
+            find_saas_price_by_category(package, 'storage_as_a_service'),
+            find_saas_price_by_category(package, 'storage_' + volume_type),
+            find_saas_perform_space_price(package, duplicate_size),
+            find_saas_perform_iops_price(package, duplicate_size, iops),
+        ]
+        # Add the price code for snapshot space as well, unless 0 GB was given
+        if duplicate_snapshot_size > 0:
+            prices.append(find_saas_snapshot_space_price(
+                package, duplicate_snapshot_size, iops=iops))
+
+    elif origin_storage_type == 'ENDURANCE_BLOCK_STORAGE'\
+            or origin_storage_type == 'ENDURANCE_BLOCK_STORAGE_REPLICANT'\
+            or origin_storage_type == 'ENDURANCE_FILE_STORAGE'\
+            or origin_storage_type == 'ENDURANCE_FILE_STORAGE_REPLICANT':
+        volume_is_performance = False
+        tier = _validate_dupl_endurance_tier(origin_volume, tier)
+        # Set up the price array for the order
+        prices = [
+            find_saas_price_by_category(package, 'storage_as_a_service'),
+            find_saas_price_by_category(package, 'storage_' + volume_type),
+            find_saas_endurance_space_price(package, duplicate_size, tier),
+            find_saas_endurance_tier_price(package, tier),
+        ]
+        # Add the price code for snapshot space as well, unless 0 GB was given
+        if duplicate_snapshot_size > 0:
+            prices.append(find_saas_snapshot_space_price(
+                package, duplicate_snapshot_size, tier_level=tier))
+
+    else:
+        raise exceptions.SoftLayerError(
+            "Origin volume does not have a valid storage type "
+            "(with an appropriate keyName to indicate the "
+            "volume is a PERFORMANCE or ENDURANCE volume)")
+
+    duplicate_order = {
+        'complexType': 'SoftLayer_Container_Product_Order_'
+                       'Network_Storage_AsAService',
+        'packageId': package['id'],
+        'prices': prices,
+        'volumeSize': duplicate_size,
+        'quantity': 1,
+        'location': location_id,
+        'duplicateOriginVolumeId': origin_volume['id'],
+    }
+
+    if volume_is_performance:
+        duplicate_order['iops'] = iops
+
+    return duplicate_order
+
+
+def _validate_duplicate_size(origin_volume, duplicate_volume_size,
+                             volume_type):
+    # Ensure the origin volume's size is found
+    if not isinstance(utils.lookup(origin_volume, 'capacityGb'), int):
+        raise exceptions.SoftLayerError("Cannot find origin volume's size.")
+
+    # Determine the volume size/capacity for the duplicate
+    if duplicate_volume_size is None:
+        duplicate_volume_size = origin_volume['capacityGb']
+    # Ensure the duplicate volume size is not below the minimum
+    elif duplicate_volume_size < origin_volume['capacityGb']:
+        raise exceptions.SoftLayerError(
+            "The requested duplicate volume size is too small. Duplicate "
+            "volumes must be at least as large as their origin volumes.")
+
+    # Ensure the duplicate volume size is not above the maximum
+    if volume_type == 'block':
+        # Determine the base size for validating the requested duplicate size
+        if 'originalVolumeSize' in origin_volume:
+            base_volume_size = int(origin_volume['originalVolumeSize'])
+        else:
+            base_volume_size = origin_volume['capacityGb']
+
+        # Current limit for block volumes: 10*[origin size]
+        if duplicate_volume_size > base_volume_size * 10:
+            raise exceptions.SoftLayerError(
+                "The requested duplicate volume size is too large. The "
+                "maximum size for duplicate block volumes is 10 times the "
+                "size of the origin volume or, if the origin volume was also "
+                "a duplicate, 10 times the size of the initial origin volume "
+                "(i.e. the origin volume from which the first duplicate was "
+                "created in the chain of duplicates). "
+                "Requested: %s GB. Base origin size: %s GB."
+                % (duplicate_volume_size, base_volume_size))
+
+    return duplicate_volume_size
+
+
+def _validate_dupl_performance_iops(origin_volume, duplicate_iops,
+                                    duplicate_size):
+    if not isinstance(utils.lookup(origin_volume, 'provisionedIops'), str):
+        raise exceptions.SoftLayerError(
+            "Cannot find origin volume's provisioned IOPS")
+
+    if duplicate_iops is None:
+        duplicate_iops = int(origin_volume['provisionedIops'])
+    else:
+        origin_iops_per_gb = float(origin_volume['provisionedIops'])\
+            / float(origin_volume['capacityGb'])
+        duplicate_iops_per_gb = float(duplicate_iops) / float(duplicate_size)
+        if origin_iops_per_gb < 0.3 and duplicate_iops_per_gb >= 0.3:
+            raise exceptions.SoftLayerError(
+                "Origin volume performance is < 0.3 IOPS/GB, "
+                "duplicate volume performance must also be < 0.3 "
+                "IOPS/GB. %s IOPS/GB (%s/%s) requested."
+                % (duplicate_iops_per_gb, duplicate_iops, duplicate_size))
+        elif origin_iops_per_gb >= 0.3 and duplicate_iops_per_gb < 0.3:
+            raise exceptions.SoftLayerError(
+                "Origin volume performance is >= 0.3 IOPS/GB, "
+                "duplicate volume performance must also be >= 0.3 "
+                "IOPS/GB. %s IOPS/GB (%s/%s) requested."
+                % (duplicate_iops_per_gb, duplicate_iops, duplicate_size))
+    return duplicate_iops
+
+
+def _validate_dupl_endurance_tier(origin_volume, duplicate_tier):
+    try:
+        origin_tier = find_endurance_tier_iops_per_gb(origin_volume)
+    except ValueError:
+        raise exceptions.SoftLayerError(
+            "Cannot find origin volume's tier level")
+
+    if duplicate_tier is None:
+        duplicate_tier = origin_tier
+    else:
+        if duplicate_tier != 0.25:
+            duplicate_tier = int(duplicate_tier)
+
+        if origin_tier == 0.25 and duplicate_tier != 0.25:
+            raise exceptions.SoftLayerError(
+                "Origin volume performance tier is 0.25 IOPS/GB, "
+                "duplicate volume performance tier must also be 0.25 "
+                "IOPS/GB. %s IOPS/GB requested." % duplicate_tier)
+        elif origin_tier != 0.25 and duplicate_tier == 0.25:
+            raise exceptions.SoftLayerError(
+                "Origin volume performance tier is above 0.25 IOPS/GB, "
+                "duplicate volume performance tier must also be above 0.25 "
+                "IOPS/GB. %s IOPS/GB requested." % duplicate_tier)
+    return duplicate_tier
 
 
 def _has_category(categories, category_code):

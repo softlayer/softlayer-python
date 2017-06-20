@@ -9,6 +9,8 @@ from SoftLayer import exceptions
 from SoftLayer.managers import storage_utils
 from SoftLayer import utils
 
+# pylint: disable=too-many-public-methods
+
 
 class BlockStorageManager(utils.IdentifierMixin, object):
     """Manages SoftLayer Block Storage volumes.
@@ -89,6 +91,9 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 'storageTierLevel',
                 'iops',
                 'lunId',
+                'originalVolumeName',
+                'originalSnapshotName',
+                'originalVolumeSize',
                 'activeTransactionCount',
                 'activeTransactions.transactionStatus[friendlyName]',
                 'replicationPartnerCount',
@@ -249,6 +254,45 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         )
 
         order['osFormatType'] = {'keyName': os_type}
+
+        return self.client.call('Product_Order', 'placeOrder', order)
+
+    def order_duplicate_volume(self, origin_volume_id, origin_snapshot_id=None,
+                               duplicate_size=None, duplicate_iops=None,
+                               duplicate_tier_level=None,
+                               duplicate_snapshot_size=None):
+        """Places an order for a duplicate block volume.
+
+        :param origin_volume_id: The ID of the origin volume to be duplicated
+        :param origin_snapshot_id: Origin snapshot ID to use for duplication
+        :param duplicate_size: Size/capacity for the duplicate volume
+        :param duplicate_iops: The IOPS per GB for the duplicate volume
+        :param duplicate_tier_level: Tier level for the duplicate volume
+        :param duplicate_snapshot_size: Snapshot space size for the duplicate
+        :return: Returns a SoftLayer_Container_Product_Order_Receipt
+        """
+
+        block_mask = 'id,billingItem[location],snapshotCapacityGb,'\
+                     'storageType[keyName],capacityGb,originalVolumeSize,'\
+                     'provisionedIops,storageTierLevel,osType[keyName]'
+        origin_volume = self.get_block_volume_details(origin_volume_id,
+                                                      mask=block_mask)
+
+        if isinstance(utils.lookup(origin_volume, 'osType', 'keyName'), str):
+            os_type = origin_volume['osType']['keyName']
+        else:
+            raise exceptions.SoftLayerError(
+                "Cannot find origin volume's os-type")
+
+        order = storage_utils.prepare_duplicate_order_object(
+            self, origin_volume, duplicate_iops, duplicate_tier_level,
+            duplicate_size, duplicate_snapshot_size, 'block'
+        )
+
+        order['osFormatType'] = {'keyName': os_type}
+
+        if origin_snapshot_id is not None:
+            order['duplicateOriginSnapshotId'] = origin_snapshot_id
 
         return self.client.call('Product_Order', 'placeOrder', order)
 
