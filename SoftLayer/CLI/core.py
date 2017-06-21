@@ -21,7 +21,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer import consts
 
 # pylint: disable=too-many-public-methods, broad-except, unused-argument
-# pylint: disable=redefined-builtin, super-init-not-called
+# pylint: disable=redefined-builtin, super-init-not-called, arguments-differ
 
 START_TIME = time.time()
 DEBUG_LOGGING_MAP = {

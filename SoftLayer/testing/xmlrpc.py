@@ -14,7 +14,7 @@ import SoftLayer
 from SoftLayer import transports
 from SoftLayer import utils
 
-# pylint: disable=invalid-name, broad-except
+# pylint: disable=invalid-name, broad-except, arguments-differ
 
 
 class TestServer(six.moves.BaseHTTPServer.HTTPServer):
