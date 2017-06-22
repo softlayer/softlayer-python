@@ -1,5 +1,13 @@
 # Change Log
 
+## [5.2.7] - 2017-06-22
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.6...v5.2.7
+
+Adds support for duplicating block and file storage volumes. Only works on Storage as a Service volumes (Volumes that support encryption at rest). 
+
+#### Added to CLI
+ * [block|file] volume-duplicate
+
 ## [5.2.6] - 2017-05-22
  - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.5...v5.2.6
  
