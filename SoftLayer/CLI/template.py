@@ -7,6 +7,8 @@
 
     :license: MIT, see LICENSE for more details.
 """
+
+# pylint: disable=redefined-argument-from-local
 import os.path
 
 from SoftLayer import utils

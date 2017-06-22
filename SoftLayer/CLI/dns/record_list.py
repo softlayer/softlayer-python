@@ -7,7 +7,7 @@ import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
-# pylint: disable=redefined-builtin
+# pylint: disable=redefined-builtin, redefined-argument-from-local
 
 
 @click.command()
@@ -37,13 +37,13 @@ def cli(env, zone, data, record, ttl, type):
                                   ttl=ttl,
                                   data=data)
 
-    for record in records:
+    for the_record in records:
         table.add_row([
-            record['id'],
-            record['host'],
-            record['type'].upper(),
-            record['ttl'],
-            record['data']
+            the_record['id'],
+            the_record['host'],
+            the_record['type'].upper(),
+            the_record['ttl'],
+            the_record['data']
         ])
 
     env.fout(table)
