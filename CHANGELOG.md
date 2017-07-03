@@ -1,5 +1,10 @@
 # Change Log
 
+## [5.2.8] - TBD
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.7...master
+ 
+ Resolved https://github.com/softlayer/softlayer-python/issues/835
+
 ## [5.2.7] - 2017-06-22
  - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.6...v5.2.7
 
