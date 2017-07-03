@@ -6,6 +6,7 @@
 """
 
 import SoftLayer
+from SoftLayer import exceptions
 from SoftLayer import fixtures
 from SoftLayer import testing
 
@@ -137,6 +138,23 @@ class FirewallTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Billing_Item', 'cancelService',
                                 identifier=21370814)
 
+    def test_cancel_firewall_no_firewall(self):
+        mock = self.set_mock('SoftLayer_Network_Component_Firewall', 'getObject')
+        mock.return_value = None
+
+        self.assertRaises(exceptions.SoftLayerError,
+                          self.firewall.cancel_firewall, 6327, dedicated=False)
+
+    def test_cancel_firewall_no_billing(self):
+        mock = self.set_mock('SoftLayer_Network_Component_Firewall', 'getObject')
+        mock.return_value = {
+            'id': 6327,
+            'billingItem': None
+        }
+
+        self.assertRaises(exceptions.SoftLayerError,
+                          self.firewall.cancel_firewall, 6327, dedicated=False)
+
     def test_cancel_dedicated_firewall(self):
         # test dedicated firewalls
         result = self.firewall.cancel_firewall(6327, dedicated=True)
@@ -148,6 +166,22 @@ class FirewallTests(testing.TestCase):
                                 mask='mask[id,billingItem[id]]')
         self.assert_called_with('SoftLayer_Billing_Item', 'cancelService',
                                 identifier=21370815)
+
+    def test_cancel_dedicated_firewall_no_firewall(self):
+        mock = self.set_mock('SoftLayer_Network_Vlan_Firewall', 'getObject')
+        mock.return_value = None
+
+        self.assertRaises(exceptions.SoftLayerError,
+                          self.firewall.cancel_firewall, 6327, dedicated=True)
+
+    def test_cancel_dedicated_firewall_no_billing(self):
+        mock = self.set_mock('SoftLayer_Network_Vlan_Firewall', 'getObject')
+        mock.return_value = {
+            'id': 6327,
+            'billingItem': None
+        }
+        self.assertRaises(exceptions.SoftLayerError,
+                          self.firewall.cancel_firewall, 6327, dedicated=True)
 
     def test_add_standard_firewall_virtual_server(self):
         # test standard firewalls for virtual servers

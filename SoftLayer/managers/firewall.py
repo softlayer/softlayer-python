@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+from SoftLayer import exceptions
 from SoftLayer import utils
 
 RULE_MASK = ('mask[orderValue,action,destinationIpAddress,'
@@ -87,9 +88,8 @@ class FirewallManager(utils.IdentifierMixin, object):
         """
 
         fwl_billing = self._get_fwl_billing_item(firewall_id, dedicated)
-        billing_id = fwl_billing['billingItem']['id']
-        billing_item = self.client['Billing_Item']
-        return billing_item.cancelService(id=billing_id)
+        billing_item_service = self.client['Billing_Item']
+        return billing_item_service.cancelService(id=fwl_billing['id'])
 
     def add_standard_firewall(self, server_id, is_virt=True):
         """Creates a firewall for the specified virtual/hardware server.
@@ -150,12 +150,20 @@ class FirewallManager(utils.IdentifierMixin, object):
         :returns: A dictionary of the firewall billing item.
         """
 
-        mask = ('mask[id,billingItem[id]]')
+        mask = 'mask[id,billingItem[id]]'
         if dedicated:
-            fwl_svc = self.client['Network_Vlan_Firewall']
+            firewall_service = self.client['Network_Vlan_Firewall']
         else:
-            fwl_svc = self.client['Network_Component_Firewall']
-        return fwl_svc.getObject(id=firewall_id, mask=mask)
+            firewall_service = self.client['Network_Component_Firewall']
+        firewall = firewall_service.getObject(id=firewall_id, mask=mask)
+        if firewall is None:
+            raise exceptions.SoftLayerError(
+                "Unable to find firewall %d" % firewall_id)
+        if firewall.get('billingItem') is None:
+            raise exceptions.SoftLayerError(
+                "Unable to find billing item for firewall %d" % firewall_id)
+
+        return firewall['billingItem']
 
     def _get_fwl_port_speed(self, server_id, is_virt=True):
         """Determines the appropriate speed for a firewall.
