@@ -8,6 +8,8 @@
 from SoftLayer import exceptions
 from SoftLayer import utils
 
+# pylint: disable=too-many-lines
+
 
 ENDURANCE_TIERS = {
     0.25: 100,
@@ -102,35 +104,43 @@ def get_location_id(manager, location):
     raise ValueError('Invalid datacenter name specified.')
 
 
-def find_endurance_price(package, price_category):
+def find_price_by_category(package, price_category):
     """Find the price in the given package that has the specified category
 
-    :param package: The product package of the endurance storage type
-    :param price_category: The price category to search for
+    :param package: The AsAService, Enterprise, or Performance product package
+    :param price_category: The price category code to search for
     :return: Returns the price for the given category, or an error if not found
     """
     for item in package['items']:
         for price in item['prices']:
-            # Only collect prices from valid location groups.
             if price['locationGroupId'] != '':
                 continue
 
             if not _has_category(price['categories'], price_category):
                 continue
 
-            return price
+            return {'id': price['id']}
 
-    raise ValueError("Could not find price for endurance storage")
+    raise ValueError("Could not find price with the category, %s"
+                     % price_category)
 
 
-def find_endurance_space_price(package, size, tier_level):
-    """Find the price in the given package with the specified size and tier
+def find_ent_space_price(package, category, size, tier_level):
+    """Find the space price for the given category, size, and tier
 
-    :param package: The product package of the endurance storage type
+    :param package: The Enterprise (Endurance) product package
+    :param category: The category of space (endurance, replication, snapshot)
     :param size: The size for which a price is desired
     :param tier_level: The endurance tier for which a price is desired
-    :return: Returns the price for the size and tier, or an error if not found
+    :return: Returns the matching price, or an error if not found
     """
+    if category == 'snapshot':
+        category_code = 'storage_snapshot_space'
+    elif category == 'replication':
+        category_code = 'performance_storage_replication'
+    else:  # category == 'endurance'
+        category_code = 'performance_storage_space'
+
     for item in package['items']:
         if int(item['capacity']) != size:
             continue
@@ -140,26 +150,24 @@ def find_endurance_space_price(package, size, tier_level):
             if price['locationGroupId'] != '':
                 continue
 
-            if not _has_category(price['categories'],
-                                 'performance_storage_space'):
-                continue
-
             level = ENDURANCE_TIERS.get(tier_level)
-            if level < int(price['capacityRestrictionMinimum']):
+            if price['capacityRestrictionType'] != 'STORAGE_TIER_LEVEL'\
+                    or level < int(price['capacityRestrictionMinimum'])\
+                    or level > int(price['capacityRestrictionMaximum']):
                 continue
 
-            if level > int(price['capacityRestrictionMaximum']):
+            if not _has_category(price['categories'], category_code):
                 continue
 
-            return price
+            return {'id': price['id']}
 
-    raise ValueError("Could not find price for disk space")
+    raise ValueError("Could not find price for %s storage space" % category)
 
 
-def find_endurance_tier_price(package, tier_level):
+def find_ent_endurance_tier_price(package, tier_level):
     """Find the price in the given package with the specified tier level
 
-    :param package: The product package of the endurance storage type
+    :param package: The Enterprise (Endurance) product package
     :param tier_level: The endurance tier for which a price is desired
     :return: Returns the price for the given tier, or an error if not found
     """
@@ -178,9 +186,9 @@ def find_endurance_tier_price(package, tier_level):
             if not _has_category(price['categories'], 'storage_tier_level'):
                 continue
 
-            return price
+            return {'id': price['id']}
 
-    raise ValueError("Could not find price for tier")
+    raise ValueError("Could not find price for endurance tier level")
 
 
 def find_endurance_tier_iops_per_gb(volume):
@@ -206,32 +214,11 @@ def find_endurance_tier_iops_per_gb(volume):
     return iops_per_gb
 
 
-def find_performance_price(package, price_category):
-    """Find the price in the given package that has the specified category
-
-    :param package: The product package of the performance storage type
-    :param price_category: The price category to search for
-    :return: Returns the price for the given category, or an error if not found
-    """
-    for item in package['items']:
-        for price in item['prices']:
-            # Only collect prices from valid location groups.
-            if price['locationGroupId'] != '':
-                continue
-
-            if not _has_category(price['categories'], price_category):
-                continue
-
-            return price
-
-    raise ValueError("Could not find price for performance storage")
-
-
-def find_performance_space_price(package, size):
+def find_perf_space_price(package, size):
     """Find the price in the given package with the specified size
 
-    :param package: The product package of the performance storage type
-    :param size: The size for which a price is desired
+    :param package: The Performance product package
+    :param size: The storage space size for which a price is desired
     :return: Returns the price for the given size, or an error if not found
     """
     for item in package['items']:
@@ -247,16 +234,16 @@ def find_performance_space_price(package, size):
                                  'performance_storage_space'):
                 continue
 
-            return price
+            return {'id': price['id']}
 
-    raise ValueError("Could not find disk space price for the given volume")
+    raise ValueError("Could not find performance space price for this volume")
 
 
-def find_performance_iops_price(package, size, iops):
+def find_perf_iops_price(package, size, iops):
     """Find the price in the given package with the specified size and iops
 
-    :param package: The product package of the performance storage type
-    :param size: The size for which a price is desired
+    :param package: The Performance product package
+    :param size: The size of storage space for which an IOPS price is desired
     :param iops: The number of IOPS for which a price is desired
     :return: Returns the price for the size and IOPS, or an error if not found
     """
@@ -273,102 +260,14 @@ def find_performance_iops_price(package, size, iops):
                                  'performance_storage_iops'):
                 continue
 
-            if size < int(price['capacityRestrictionMinimum']):
-                continue
-
-            if size > int(price['capacityRestrictionMaximum']):
-                continue
-
-            return price
-
-    raise ValueError("Could not find price for iops for the given volume")
-
-
-def find_replication_price(package, capacity, tier_level):
-    """Find the price in the given package for the desired replicant volume
-
-    :param package: The product package of the endurance storage type
-    :param capacity: The capacity of the primary storage volume
-    :param tier_level: The tier of the primary storage volume
-    :return: Returns the price for the given size, or an error if not found
-    """
-    for item in package['items']:
-        if int(item['capacity']) != capacity:
-            continue
-
-        for price in item['prices']:
-            # Only collect prices from valid location groups.
-            if price['locationGroupId'] != '':
-                continue
-
-            if not _has_category(price['categories'],
-                                 'performance_storage_replication'):
-                continue
-
-            level = ENDURANCE_TIERS.get(tier_level)
-            if level < int(price['capacityRestrictionMinimum']):
-                continue
-
-            if level > int(price['capacityRestrictionMaximum']):
-                continue
-
-            return price
-
-    raise ValueError("Could not find price for replicant volume")
-
-
-def find_snapshot_space_price(package, size, tier_level):
-    """Find the price in the given package for the desired snapshot space size
-
-    :param package: The product package of the endurance storage type
-    :param size: The snapshot space size for which a price is desired
-    :param tier_level: The tier of the volume for which space is being ordered
-    :return: Returns the price for the given size, or an error if not found
-    """
-    for item in package['items']:
-        if int(item['capacity']) != size:
-            continue
-
-        for price in item['prices']:
-            # Only collect prices from valid location groups.
-            if price['locationGroupId'] != '':
-                continue
-
-            if not _has_category(price['categories'],
-                                 'storage_snapshot_space'):
-                continue
-
-            level = ENDURANCE_TIERS.get(tier_level)
-            if level < int(price['capacityRestrictionMinimum']):
-                continue
-
-            if level > int(price['capacityRestrictionMaximum']):
-                continue
-
-            return price
-
-    raise ValueError("Could not find price for snapshot space")
-
-
-def find_saas_price_by_category(package, price_category):
-    """Find a price in the SaaS package with the specified category
-
-    :param package: The Storage As A Service product package
-    :param price_category: The price category to search for
-    :return: Returns a price for the given category, or an error if not found
-    """
-    for item in package['items']:
-        for price in item['prices']:
-            if price['locationGroupId'] != '':
-                continue
-
-            if not _has_category(price['categories'], price_category):
+            if price['capacityRestrictionType'] != 'STORAGE_SPACE'\
+                    or size < int(price['capacityRestrictionMinimum'])\
+                    or size > int(price['capacityRestrictionMaximum']):
                 continue
 
             return {'id': price['id']}
 
-    raise ValueError("Could not find price with the category, %s"
-                     % price_category)
+    raise ValueError("Could not find price for iops for the given volume")
 
 
 def find_saas_endurance_space_price(package, size, tier_level):
@@ -520,17 +419,17 @@ def find_saas_perform_iops_price(package, size, iops):
     raise ValueError("Could not find price for iops for the given volume")
 
 
-def find_saas_snapshot_space_price(package, size, tier_level=None, iops=None):
+def find_saas_snapshot_space_price(package, size, tier=None, iops=None):
     """Find the price in the SaaS package for the desired snapshot space size
 
     :param package: The product package of the endurance storage type
     :param size: The snapshot space size for which a price is desired
-    :param tier_level: The tier of the volume for which space is being ordered
+    :param tier: The tier of the volume for which space is being ordered
     :param iops: The IOPS of the volume for which space is being ordered
     :return: Returns the price for the given size, or an error if not found
     """
-    if tier_level is not None:
-        target_value = ENDURANCE_TIERS.get(tier_level)
+    if tier is not None:
+        target_value = ENDURANCE_TIERS.get(tier)
         target_restriction_type = 'STORAGE_TIER_LEVEL'
     else:
         target_value = iops
@@ -559,6 +458,46 @@ def find_saas_snapshot_space_price(package, size, tier_level=None, iops=None):
     raise ValueError("Could not find price for snapshot space")
 
 
+def find_saas_replication_price(package, tier=None, iops=None):
+    """Find the price in the given package for the desired replicant volume
+
+    :param package: The product package of the endurance storage type
+    :param tier: The tier of the primary storage volume
+    :param iops: The IOPS of the primary storage volume
+    :return: Returns the replication price, or an error if not found
+    """
+    if tier is not None:
+        target_value = ENDURANCE_TIERS.get(tier)
+        target_item_keyname = 'REPLICATION_FOR_TIERBASED_PERFORMANCE'
+        target_restriction_type = 'STORAGE_TIER_LEVEL'
+    else:
+        target_value = iops
+        target_item_keyname = 'REPLICATION_FOR_IOPSBASED_PERFORMANCE'
+        target_restriction_type = 'IOPS'
+
+    for item in package['items']:
+        if item['keyName'] != target_item_keyname:
+            continue
+
+        for price in item['prices']:
+            # Only collect prices from valid location groups.
+            if price['locationGroupId'] != '':
+                continue
+
+            if target_restriction_type != price['capacityRestrictionType']\
+                    or target_value < int(price['capacityRestrictionMinimum'])\
+                    or target_value > int(price['capacityRestrictionMaximum']):
+                continue
+
+            if not _has_category(price['categories'],
+                                 'performance_storage_replication'):
+                continue
+
+            return {'id': price['id']}
+
+    raise ValueError("Could not find price for replicant volume")
+
+
 def find_snapshot_schedule_id(volume, snapshot_schedule_keyname):
     """Find the snapshot schedule ID for the given volume and keyname
 
@@ -575,12 +514,225 @@ def find_snapshot_schedule_id(volume, snapshot_schedule_keyname):
                      "the given storage volume")
 
 
-def prepare_replicant_order_object(manager, volume_id, snapshot_schedule,
-                                   location, tier, volume, volume_type):
+def prepare_snapshot_order_object(manager, volume, capacity, tier, upgrade):
+    """Prepare the snapshot space order object for the placeOrder() method
+
+    :param manager: The File or Block manager calling this function
+    :param integer volume: The volume for which snapshot space is ordered
+    :param integer capacity: The snapshot space size to order, in GB
+    :param float tier: The tier level of the volume, in IOPS per GB (optional)
+    :param boolean upgrade: Flag to indicate if this order is an upgrade
+    :return: Returns the order object for the
+             Product_Order service's placeOrder() method
+    """
+    # Ensure the storage volume has not been cancelled
+    if 'billingItem' not in volume:
+        raise exceptions.SoftLayerError(
+            'This volume has been cancelled; unable to order snapshot space')
+
+    # Determine and validate the storage volume's billing item category
+    billing_item_category_code = volume['billingItem']['categoryCode']
+    if billing_item_category_code == 'storage_as_a_service':
+        order_type_is_saas = True
+    elif billing_item_category_code == 'storage_service_enterprise':
+        order_type_is_saas = False
+    else:
+        raise exceptions.SoftLayerError(
+            "Snapshot space cannot be ordered for a primary volume with a "
+            "billing item category code of '%s'" % billing_item_category_code)
+
+    # Use the volume's billing item category code to get the product package
+    package = get_package(manager, billing_item_category_code)
+
+    # Find prices based on the volume's type and billing item category
+    if order_type_is_saas:  # 'storage_as_a_service' package
+        volume_storage_type = volume['storageType']['keyName']
+        if 'ENDURANCE' in volume_storage_type:
+            if tier is None:
+                tier = find_endurance_tier_iops_per_gb(volume)
+            prices = [find_saas_snapshot_space_price(
+                package, capacity, tier=tier)]
+        elif 'PERFORMANCE' in volume_storage_type:
+            if not _staas_version_is_v2_or_above(volume):
+                raise exceptions.SoftLayerError(
+                    "Snapshot space cannot be ordered for this performance "
+                    "volume since it does not support Encryption at Rest.")
+            iops = int(volume['provisionedIops'])
+            prices = [find_saas_snapshot_space_price(
+                package, capacity, iops=iops)]
+        else:
+            raise exceptions.SoftLayerError(
+                "Storage volume does not have a valid storage type "
+                "(with an appropriate keyName to indicate the "
+                "volume is a PERFORMANCE or an ENDURANCE volume)")
+    else:  # 'storage_service_enterprise' package
+        if tier is None:
+            tier = find_endurance_tier_iops_per_gb(volume)
+        prices = [find_ent_space_price(package, 'snapshot', capacity, tier)]
+
+    # Currently, these types are valid for snapshot space orders, whether
+    # the base volume's order container was Enterprise or AsAService
+    if upgrade:
+        complex_type = 'SoftLayer_Container_Product_Order_'\
+                       'Network_Storage_Enterprise_SnapshotSpace_Upgrade'
+    else:
+        complex_type = 'SoftLayer_Container_Product_Order_'\
+                       'Network_Storage_Enterprise_SnapshotSpace'
+
+    # Build and return the order object
+    snapshot_space_order = {
+        'complexType': complex_type,
+        'packageId': package['id'],
+        'prices': prices,
+        'quantity': 1,
+        'location': volume['billingItem']['location']['id'],
+        'volumeId': volume['id']
+    }
+
+    return snapshot_space_order
+
+
+def prepare_volume_order_object(manager, storage_type, location, size,
+                                iops, tier, snapshot_size,
+                                service_offering, volume_type):
     """Prepare the order object which is submitted to the placeOrder() method
 
     :param manager: The File or Block manager calling this function
-    :param volume_id: The ID of the primary volume to be replicated
+    :param storage_type: "performance" or "endurance"
+    :param location: Requested datacenter location name for the ordered volume
+    :param size: Desired size of the volume, in GB
+    :param iops: Number of IOPs for a "Performance" volume order
+    :param tier: Tier level to use for an "Endurance" volume order
+    :param snapshot_size: The size of snapshot space for the volume (optional)
+    :param service_offering: Requested offering package to use for the order
+    :param volume_type: The type of the volume to order ('file' or 'block')
+    :return: Returns the order object for the
+             Product_Order service's placeOrder() method
+    """
+    # Ensure the volume storage type is valid
+    if storage_type != 'performance' and storage_type != 'endurance':
+        raise exceptions.SoftLayerError(
+            "Volume storage type must be either performance or endurance")
+
+    # Find the ID for the requested location
+    try:
+        location_id = get_location_id(manager, location)
+    except ValueError:
+        raise exceptions.SoftLayerError(
+            "Invalid datacenter name specified. "
+            "Please provide the lower case short name (e.g.: dal09)")
+
+    # Determine the category code to use for the order (and product package)
+    order_type_is_saas, order_category_code = _get_order_type_and_category(
+        service_offering,
+        storage_type,
+        volume_type
+    )
+
+    # Get the product package for the given category code
+    package = get_package(manager, order_category_code)
+
+    # Based on the storage type and product package, build up the complex type
+    # and array of price codes to include in the order object
+    base_type_name = 'SoftLayer_Container_Product_Order_Network_'
+    if order_type_is_saas:
+        complex_type = base_type_name + 'Storage_AsAService'
+        if storage_type == 'performance':
+            prices = [
+                find_price_by_category(package, order_category_code),
+                find_price_by_category(package, 'storage_' + volume_type),
+                find_saas_perform_space_price(package, size),
+                find_saas_perform_iops_price(package, size, iops)
+            ]
+            if snapshot_size is not None:
+                prices.append(find_saas_snapshot_space_price(
+                    package, snapshot_size, iops=iops))
+        else:  # storage_type == 'endurance'
+            prices = [
+                find_price_by_category(package, order_category_code),
+                find_price_by_category(package, 'storage_' + volume_type),
+                find_saas_endurance_space_price(package, size, tier),
+                find_saas_endurance_tier_price(package, tier)
+            ]
+            if snapshot_size is not None:
+                prices.append(find_saas_snapshot_space_price(
+                    package, snapshot_size, tier=tier))
+    else:  # offering package is enterprise or performance
+        if storage_type == 'performance':
+            if volume_type == 'block':
+                complex_type = base_type_name + 'PerformanceStorage_Iscsi'
+            else:
+                complex_type = base_type_name + 'PerformanceStorage_Nfs'
+            prices = [
+                find_price_by_category(package, order_category_code),
+                find_perf_space_price(package, size),
+                find_perf_iops_price(package, size, iops),
+            ]
+        else:  # storage_type == 'endurance'
+            complex_type = base_type_name + 'Storage_Enterprise'
+            prices = [
+                find_price_by_category(package, order_category_code),
+                find_price_by_category(package, 'storage_' + volume_type),
+                find_ent_space_price(package, 'endurance', size, tier),
+                find_ent_endurance_tier_price(package, tier),
+            ]
+            if snapshot_size is not None:
+                prices.append(find_ent_space_price(
+                    package, 'snapshot', snapshot_size, tier))
+
+    # Build and return the order object
+    order = {
+        'complexType': complex_type,
+        'packageId': package['id'],
+        'prices': prices,
+        'quantity': 1,
+        'location': location_id,
+    }
+
+    if order_type_is_saas:
+        order['volumeSize'] = size
+        if storage_type == 'performance':
+            order['iops'] = iops
+
+    return order
+
+
+def _get_order_type_and_category(service_offering, storage_type, volume_type):
+    if service_offering == 'storage_as_a_service':
+        order_type_is_saas = True
+        order_category_code = 'storage_as_a_service'
+    elif service_offering == 'enterprise':
+        order_type_is_saas = False
+        if storage_type == 'endurance':
+            order_category_code = 'storage_service_enterprise'
+        else:
+            raise exceptions.SoftLayerError(
+                "The requested offering package, '%s', is not available for "
+                "the '%s' storage type." % (service_offering, storage_type))
+    elif service_offering == 'performance':
+        order_type_is_saas = False
+        if storage_type == 'performance':
+            if volume_type == 'block':
+                order_category_code = 'performance_storage_iscsi'
+            else:
+                order_category_code = 'performance_storage_nfs'
+        else:
+            raise exceptions.SoftLayerError(
+                "The requested offering package, '%s', is not available for "
+                "the '%s' storage type." % (service_offering, storage_type))
+    else:
+        raise exceptions.SoftLayerError(
+            "The requested service offering package is not valid. "
+            "Please check the available options and try again.")
+
+    return order_type_is_saas, order_category_code
+
+
+def prepare_replicant_order_object(manager, snapshot_schedule, location,
+                                   tier, volume, volume_type):
+    """Prepare the order object which is submitted to the placeOrder() method
+
+    :param manager: The File or Block manager calling this function
     :param snapshot_schedule: The primary volume's snapshot
                               schedule to use for replication
     :param location: The location for the ordered replicant volume
@@ -590,33 +742,9 @@ def prepare_replicant_order_object(manager, volume_id, snapshot_schedule,
     :return: Returns the order object for the
              Product_Order service's placeOrder() method
     """
-
-    try:
-        location_id = get_location_id(manager, location)
-    except ValueError:
-        raise exceptions.SoftLayerError(
-            "Invalid data center name specified. "
-            "Please provide the lower case short name (e.g.: dal09)")
-
-    volume_capacity = int(volume['capacityGb'])
-    storage_type = volume['billingItem']['categoryCode']
-
-    if storage_type != 'storage_service_enterprise':
-        raise exceptions.SoftLayerError(
-            "Primary volume storage_type must be Endurance")
-
-    if 'snapshotCapacityGb' in volume:
-        volume_snapshot_capacity = int(volume['snapshotCapacityGb'])
-    else:
-        raise exceptions.SoftLayerError(
-            "Snapshot capacity not found for the given primary volume")
-
-    snapshot_schedule_id = find_snapshot_schedule_id(
-        volume,
-        'SNAPSHOT_' + snapshot_schedule
-    )
-
-    if volume['billingItem']['cancellationDate'] != '':
+    # Ensure the primary volume and snapshot space are not set for cancellation
+    if 'billingItem' not in volume\
+            or volume['billingItem']['cancellationDate'] != '':
         raise exceptions.SoftLayerError(
             'This volume is set for cancellation; '
             'unable to order replicant volume')
@@ -628,29 +756,110 @@ def prepare_replicant_order_object(manager, volume_id, snapshot_schedule,
                 'The snapshot space for this volume is set for '
                 'cancellation; unable to order replicant volume')
 
-    if tier is None:
-        tier = find_endurance_tier_iops_per_gb(volume)
+    # Find the ID for the requested location
+    try:
+        location_id = get_location_id(manager, location)
+    except ValueError:
+        raise exceptions.SoftLayerError(
+            "Invalid datacenter name specified. "
+            "Please provide the lower case short name (e.g.: dal09)")
 
-    package = get_package(manager, storage_type)
-    prices = [
-        find_endurance_price(package, 'storage_service_enterprise'),
-        find_endurance_price(package, 'storage_' + volume_type),
-        find_endurance_tier_price(package, tier),
-        find_endurance_space_price(package, volume_capacity, tier),
-        find_snapshot_space_price(package, volume_snapshot_capacity, tier),
-        find_replication_price(package, volume_capacity, tier),
-    ]
+    # Get sizes and properties needed for the order
+    volume_size = int(volume['capacityGb'])
 
+    billing_item_category_code = volume['billingItem']['categoryCode']
+    if billing_item_category_code == 'storage_as_a_service':
+        order_type_is_saas = True
+    elif billing_item_category_code == 'storage_service_enterprise':
+        order_type_is_saas = False
+    else:
+        raise exceptions.SoftLayerError(
+            "A replicant volume cannot be ordered for a primary volume with a "
+            "billing item category code of '%s'" % billing_item_category_code)
+
+    if 'snapshotCapacityGb' in volume:
+        snapshot_size = int(volume['snapshotCapacityGb'])
+    else:
+        raise exceptions.SoftLayerError(
+            "Snapshot capacity not found for the given primary volume")
+
+    snapshot_schedule_id = find_snapshot_schedule_id(
+        volume,
+        'SNAPSHOT_' + snapshot_schedule
+    )
+
+    # Use the volume's billing item category code to get the product package
+    package = get_package(manager, billing_item_category_code)
+
+    # Find prices based on the primary volume's type and billing item category
+    if order_type_is_saas:  # 'storage_as_a_service' package
+        complex_type = 'SoftLayer_Container_Product_Order_'\
+                       'Network_Storage_AsAService'
+        volume_storage_type = volume['storageType']['keyName']
+        if 'ENDURANCE' in volume_storage_type:
+            volume_is_performance = False
+            if tier is None:
+                tier = find_endurance_tier_iops_per_gb(volume)
+            prices = [
+                find_price_by_category(package, billing_item_category_code),
+                find_price_by_category(package, 'storage_' + volume_type),
+                find_saas_endurance_space_price(package, volume_size, tier),
+                find_saas_endurance_tier_price(package, tier),
+                find_saas_snapshot_space_price(
+                    package, snapshot_size, tier=tier),
+                find_saas_replication_price(package, tier=tier)
+            ]
+        elif 'PERFORMANCE' in volume_storage_type:
+            if not _staas_version_is_v2_or_above(volume):
+                raise exceptions.SoftLayerError(
+                    "A replica volume cannot be ordered for this performance "
+                    "volume since it does not support Encryption at Rest.")
+            volume_is_performance = True
+            iops = int(volume['provisionedIops'])
+            prices = [
+                find_price_by_category(package, billing_item_category_code),
+                find_price_by_category(package, 'storage_' + volume_type),
+                find_saas_perform_space_price(package, volume_size),
+                find_saas_perform_iops_price(package, volume_size, iops),
+                find_saas_snapshot_space_price(
+                    package, snapshot_size, iops=iops),
+                find_saas_replication_price(package, iops=iops)
+            ]
+        else:
+            raise exceptions.SoftLayerError(
+                "Storage volume does not have a valid storage type "
+                "(with an appropriate keyName to indicate the "
+                "volume is a PERFORMANCE or an ENDURANCE volume)")
+    else:  # 'storage_service_enterprise' package
+        complex_type = 'SoftLayer_Container_Product_Order_'\
+                       'Network_Storage_Enterprise'
+        volume_is_performance = False
+        if tier is None:
+            tier = find_endurance_tier_iops_per_gb(volume)
+        prices = [
+            find_price_by_category(package, billing_item_category_code),
+            find_price_by_category(package, 'storage_' + volume_type),
+            find_ent_space_price(package, 'endurance', volume_size, tier),
+            find_ent_endurance_tier_price(package, tier),
+            find_ent_space_price(package, 'snapshot', snapshot_size, tier),
+            find_ent_space_price(package, 'replication', volume_size, tier)
+        ]
+
+    # Build and return the order object
     replicant_order = {
-        'complexType': 'SoftLayer_Container_Product_Order_'
-                       'Network_Storage_Enterprise',
+        'complexType': complex_type,
         'packageId': package['id'],
         'prices': prices,
         'quantity': 1,
         'location': location_id,
-        'originVolumeId': int(volume_id),
+        'originVolumeId': volume['id'],
         'originVolumeScheduleId': snapshot_schedule_id,
     }
+
+    if order_type_is_saas:
+        replicant_order['volumeSize'] = volume_size
+        if volume_is_performance:
+            replicant_order['iops'] = iops
 
     return replicant_order
 
@@ -693,6 +902,13 @@ def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
         raise exceptions.SoftLayerError(
             "Cannot find origin volume's location")
 
+    # Ensure the origin volume is STaaS v2 or higher
+    # and supports Encryption at Rest
+    if not _staas_version_is_v2_or_above(origin_volume):
+        raise exceptions.SoftLayerError(
+            "This volume cannot be duplicated since it "
+            "does not support Encryption at Rest.")
+
     # If no specific snapshot space was requested for the duplicate,
     # use the origin snapshot space size
     if duplicate_snapshot_size is None:
@@ -718,8 +934,8 @@ def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
             origin_volume, iops, duplicate_size)
         # Set up the price array for the order
         prices = [
-            find_saas_price_by_category(package, 'storage_as_a_service'),
-            find_saas_price_by_category(package, 'storage_' + volume_type),
+            find_price_by_category(package, 'storage_as_a_service'),
+            find_price_by_category(package, 'storage_' + volume_type),
             find_saas_perform_space_price(package, duplicate_size),
             find_saas_perform_iops_price(package, duplicate_size, iops),
         ]
@@ -736,21 +952,21 @@ def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
         tier = _validate_dupl_endurance_tier(origin_volume, tier)
         # Set up the price array for the order
         prices = [
-            find_saas_price_by_category(package, 'storage_as_a_service'),
-            find_saas_price_by_category(package, 'storage_' + volume_type),
+            find_price_by_category(package, 'storage_as_a_service'),
+            find_price_by_category(package, 'storage_' + volume_type),
             find_saas_endurance_space_price(package, duplicate_size, tier),
             find_saas_endurance_tier_price(package, tier),
         ]
         # Add the price code for snapshot space as well, unless 0 GB was given
         if duplicate_snapshot_size > 0:
             prices.append(find_saas_snapshot_space_price(
-                package, duplicate_snapshot_size, tier_level=tier))
+                package, duplicate_snapshot_size, tier=tier))
 
     else:
         raise exceptions.SoftLayerError(
             "Origin volume does not have a valid storage type "
             "(with an appropriate keyName to indicate the "
-            "volume is a PERFORMANCE or ENDURANCE volume)")
+            "volume is a PERFORMANCE or an ENDURANCE volume)")
 
     duplicate_order = {
         'complexType': 'SoftLayer_Container_Product_Order_'
@@ -867,3 +1083,7 @@ def _has_category(categories, category_code):
         in categories
         if category['categoryCode'] == category_code
     )
+
+
+def _staas_version_is_v2_or_above(volume):
+    return int(volume['staasVersion']) > 1 and volume['hasEncryptionAtRest']
