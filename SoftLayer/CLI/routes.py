@@ -80,6 +80,7 @@ ALL_ROUTES = [
     ('block:volume-duplicate', 'SoftLayer.CLI.block.duplicate:cli'),
     ('block:volume-list', 'SoftLayer.CLI.block.list:cli'),
     ('block:volume-order', 'SoftLayer.CLI.block.order:cli'),
+    ('block:volume-set-lun-id', 'SoftLayer.CLI.block.lun:cli'),
 
     ('file', 'SoftLayer.CLI.file'),
     ('file:access-authorize', 'SoftLayer.CLI.file.access.authorize:cli'),
