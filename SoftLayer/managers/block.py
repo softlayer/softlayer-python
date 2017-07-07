@@ -553,3 +553,13 @@ class BlockStorageManager(utils.IdentifierMixin, object):
 
         return self.client.call('Network_Storage', 'failbackFromReplicant',
                                 replicant_id, id=volume_id)
+
+    def set_credential_password(self, access_id, password):
+        """Sets the password for an access host
+
+        :param integer access_id: id of the access host
+        :param string password: password to  set
+        """
+
+        return self.client.call('Network_Storage_Allowed_Host', 'setCredentialPassword',
+                                password, id=access_id)

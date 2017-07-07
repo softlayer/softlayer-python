@@ -16,44 +16,7 @@ class BlockTests(testing.TestCase):
         result = self.run_command(['block', 'access-list', '1234'])
 
         self.assert_no_fail(result)
-        self.assertEqual([
-            {
-                'username': 'joe',
-                'name': 'test-server.example.com',
-                'type': 'VIRTUAL',
-                'host_iqn': 'test-server',
-                'password': '12345',
-                'private_ip_address': '10.0.0.1',
-                'id': 1234,
-            },
-            {
-                'username': 'joe',
-                'name': 'test-server.example.com',
-                'type': 'HARDWARE',
-                'host_iqn': 'test-server',
-                'password': '12345',
-                'private_ip_address': '10.0.0.2',
-                'id': 1234,
-            },
-            {
-                'username': 'joe',
-                'name': '10.0.0.1/24 (backend subnet)',
-                'type': 'SUBNET',
-                'host_iqn': 'test-server',
-                'password': '12345',
-                'private_ip_address': None,
-                'id': 1234,
-            },
-            {
-                'username': 'joe',
-                'name': '10.0.0.1 (backend ip)',
-                'type': 'IP',
-                'host_iqn': 'test-server',
-                'password': '12345',
-                'private_ip_address': None,
-                'id': 1234,
-            }],
-            json.loads(result.output),)
+        self.assert_called_with('SoftLayer_Network_Storage', 'getObject')
 
     def test_volume_cancel(self):
         result = self.run_command([
@@ -511,3 +474,7 @@ class BlockTests(testing.TestCase):
         self.assertEqual(result.output,
                          'Order #24601 placed successfully!\n'
                          ' > Storage as a Service\n')
+
+    def test_set_password(self):
+        result = self.run_command(['block', 'access-edit', '1234', '--password=AAAAA'])
+        self.assert_no_fail(result)
