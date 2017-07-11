@@ -476,5 +476,5 @@ class BlockTests(testing.TestCase):
                          ' > Storage as a Service\n')
 
     def test_set_password(self):
-        result = self.run_command(['block', 'access-edit', '1234', '--password=AAAAA'])
+        result = self.run_command(['block', 'access-password', '1234', '--password=AAAAA'])
         self.assert_no_fail(result)
