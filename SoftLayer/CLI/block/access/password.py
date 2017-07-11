@@ -7,7 +7,7 @@ from SoftLayer.CLI import environment
 
 
 @click.command()
-@click.argument('access_id', "")
+@click.argument('access_id')
 @click.option('--password', '-p', multiple=False,
               help='Password you want to set, this command will fail if the password is not strong')
 @environment.pass_env
