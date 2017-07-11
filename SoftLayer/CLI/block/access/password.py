@@ -7,12 +7,12 @@ from SoftLayer.CLI import environment
 
 
 @click.command()
-@click.argument('access_id', help="allowed_host_id for the password you want to change")
+@click.argument('access_id', "")
 @click.option('--password', '-p', multiple=False,
               help='Password you want to set, this command will fail if the password is not strong')
 @environment.pass_env
 def cli(env, access_id, password):
-    """Modifies a password for a volume's access"""
+    """Modifies a password for a volume's access, requires the allowed_host_id for the password you want to change"""
     block_manager = SoftLayer.BlockStorageManager(env.client)
 
     result = block_manager.set_credential_password(access_id=access_id, password=password)
