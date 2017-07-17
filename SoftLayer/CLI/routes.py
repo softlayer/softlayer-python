@@ -60,6 +60,7 @@ ALL_ROUTES = [
     ('block:access-authorize', 'SoftLayer.CLI.block.access.authorize:cli'),
     ('block:access-list', 'SoftLayer.CLI.block.access.list:cli'),
     ('block:access-revoke', 'SoftLayer.CLI.block.access.revoke:cli'),
+    ('block:access-password', 'SoftLayer.CLI.block.access.password:cli'),
     ('block:replica-failback', 'SoftLayer.CLI.block.replication.failback:cli'),
     ('block:replica-failover', 'SoftLayer.CLI.block.replication.failover:cli'),
     ('block:replica-order', 'SoftLayer.CLI.block.replication.order:cli'),

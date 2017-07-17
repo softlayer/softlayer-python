@@ -1175,3 +1175,10 @@ class BlockTests(testing.TestCase):
                 'osFormatType': {'keyName': 'LINUX'},
                 'duplicateOriginSnapshotId': 470
             },))
+
+    def test_setCredentialPassword(self):
+        mock = self.set_mock('SoftLayer_Network_Storage_Allowed_Host', 'setCredentialPassword')
+        mock.return_value = True
+        result = self.block.set_credential_password(access_id=102, password='AAAaaa')
+        self.assertEqual(True, result)
+        self.assert_called_with('SoftLayer_Network_Storage_Allowed_Host', 'setCredentialPassword')

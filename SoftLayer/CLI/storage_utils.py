@@ -76,6 +76,15 @@ allowedHardware.allowedHost.credential.password
 allowedSubnets.allowedHost.credential.password
 allowedIpAddresses.allowedHost.credential.password
 """),
+    column_helper.Column(
+        'allowed_host_id',
+        ('allowedHost', 'id',),
+        """
+allowedVirtualGuests.allowedHost.id
+allowedHardware.allowedHost.id
+allowedSubnets.allowedHost.id
+allowedIpAddresses.allowedHost.id
+"""),
 ]
 
 
@@ -87,4 +96,5 @@ DEFAULT_COLUMNS = [
     'host_iqn',
     'username',
     'password',
+    'allowed_host_id',
 ]

@@ -58,10 +58,7 @@ class FileTests(testing.TestCase):
             identifier=50)
 
     def test_get_file_volume_access_list(self):
-        result = self.file.get_file_volume_access_list(100)
-
-        self.assertEqual(fixtures.SoftLayer_Network_Storage.getObject, result)
-
+        self.file.get_file_volume_access_list(100)
         self.assert_called_with(
             'SoftLayer_Network_Storage',
             'getObject',
