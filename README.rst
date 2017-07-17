@@ -57,7 +57,7 @@ This library relies on the `requests <http://docs.python-requests.org/>`_ librar
 
 System Requirements
 -------------------
-* Python 2.7, 3.3, 3.4 or 3.5.
+* Python 2.7, 3.3, 3.4, 3.5 or 3.6.
 * A valid SoftLayer API username and key.
 * A connection to SoftLayer's private network is required to use
   our private network API endpoints.
