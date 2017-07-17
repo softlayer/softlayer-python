@@ -38,7 +38,8 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
               'the size (in GB) of snapshot space to order')
 @click.option('--service-offering',
               help='The service offering package to use for placing '
-              'the order [optional, default is \'storage_as_a_service\'',
+              'the order [optional, default is \'storage_as_a_service\']',
+              default='storage_as_a_service',
               type=click.Choice([
                   'storage_as_a_service',
                   'enterprise',
@@ -49,9 +50,6 @@ def cli(env, storage_type, size, iops, tier,
     """Order a file storage volume."""
     file_manager = SoftLayer.FileStorageManager(env.client)
     storage_type = storage_type.lower()
-
-    if service_offering is None:
-        service_offering = 'storage_as_a_service'
 
     if storage_type == 'performance':
         if iops is None:

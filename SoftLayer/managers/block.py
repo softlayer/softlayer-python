@@ -319,6 +319,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         :param snapshot_size: The size of optional snapshot space,
             if snapshot space should also be ordered (None if not ordered)
         :param service_offering: Requested offering package to use in the order
+            ('storage_as_a_service', 'enterprise', or 'performance')
         """
         order = storage_utils.prepare_volume_order_object(
             self, storage_type, location, size, iops, tier_level,
