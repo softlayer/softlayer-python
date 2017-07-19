@@ -29,6 +29,8 @@ COLUMNS = [
                          mask="activeTransactionCount"),
     column_helper.Column('mount_addr', ('fileNetworkMountAddress',),
                          mask="fileNetworkMountAddress",),
+    column_helper.Column('rep_partner_count', ('replicationPartnerCount',),
+                         mask="replicationPartnerCount"),
     column_helper.Column(
         'created_by',
         ('billingItem', 'orderItem', 'order', 'userRecord', 'username')),
@@ -43,7 +45,8 @@ DEFAULT_COLUMNS = [
     'bytes_used',
     'ip_addr',
     'active_transactions',
-    'mount_addr'
+    'mount_addr',
+    'rep_partner_count'
 ]
 
 

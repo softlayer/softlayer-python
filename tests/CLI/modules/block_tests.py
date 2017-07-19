@@ -75,14 +75,25 @@ class BlockTests(testing.TestCase):
             {
                 'bytes_used': None,
                 'capacity_gb': 20,
-                'datacenter': None,
+                'datacenter': 'dal05',
                 'id': 100,
                 'ip_addr': '10.1.2.3',
                 'lunId': None,
+                'rep_partner_count': None,
                 'storage_type': 'ENDURANCE',
                 'username': 'username',
                 'active_transactions': None
             }],
+            json.loads(result.output))
+
+    def test_volume_count(self):
+        result = self.run_command(['block', 'volume-count'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(
+            {
+                'dal05': 1
+            },
             json.loads(result.output))
 
     def test_volume_order_performance_iops_not_given(self):
@@ -327,6 +338,7 @@ class BlockTests(testing.TestCase):
     def test_replication_locations_unsuccessful(self, locations_mock):
         locations_mock.return_value = False
         result = self.run_command(['block', 'replica-locations', '1234'])
+        self.assert_no_fail(result)
         self.assertEqual('No data centers compatible for replication.\n',
                          result.output)
 
