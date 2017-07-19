@@ -278,6 +278,8 @@ def find_saas_endurance_space_price(package, size, tier_level):
     :param tier_level: The endurance tier for which a price is desired
     :return: Returns the price for the size and tier, or an error if not found
     """
+    if tier_level != 0.25:
+        tier_level = int(tier_level)
     key_name = 'STORAGE_SPACE_FOR_{0}_IOPS_PER_GB'.format(tier_level)
     key_name = key_name.replace(".", "_")
     for item in package['items']:

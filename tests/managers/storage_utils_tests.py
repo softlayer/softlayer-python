@@ -2672,7 +2672,7 @@ class StorageUtilsTests(testing.TestCase):
     # Tests for prepare_snapshot_order_object()
     # ---------------------------------------------------------------------
     def test_prep_snapshot_order_billing_item_cancelled(self):
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_billing_item = mock_volume['billingItem']
         del mock_volume['billingItem']
 
@@ -2690,7 +2690,7 @@ class StorageUtilsTests(testing.TestCase):
         mock_volume['billingItem'] = prev_billing_item
 
     def test_prep_snapshot_order_invalid_billing_item_category_code(self):
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_billing_item_category = mock_volume['billingItem']['categoryCode']
         mock_volume['billingItem']['categoryCode'] = 'invalid_type_ninja_cat'
 
@@ -2712,7 +2712,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
 
         expected_object = {
             'complexType': 'SoftLayer_Container_Product_Order_'
@@ -2734,7 +2734,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
 
         expected_object = {
             'complexType': 'SoftLayer_Container_Product_Order_'
@@ -2756,7 +2756,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_storage_type_keyname = mock_volume['storageType']['keyName']
         prev_staas_version = mock_volume['staasVersion']
         mock_volume['storageType']['keyName'] = 'PERFORMANCE_BLOCK_STORAGE'
@@ -2781,7 +2781,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_storage_type_keyname = mock_volume['storageType']['keyName']
         mock_volume['storageType']['keyName'] = 'PERFORMANCE_BLOCK_STORAGE'
 
@@ -2807,7 +2807,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_storage_type_keyname = mock_volume['storageType']['keyName']
         mock_volume['storageType']['keyName'] = 'TASTY_PASTA_STORAGE'
 
@@ -3193,7 +3193,7 @@ class StorageUtilsTests(testing.TestCase):
     # Tests for prepare_replicant_order_object()
     # ---------------------------------------------------------------------
     def test_prep_replicant_order_volume_cancelled(self):
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_billing_item = mock_volume['billingItem']
         del mock_volume['billingItem']
 
@@ -3212,7 +3212,7 @@ class StorageUtilsTests(testing.TestCase):
         mock_volume['billingItem'] = prev_billing_item
 
     def test_prep_replicant_order_volume_cancellation_date_set(self):
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_cancellation_date = mock_volume['billingItem']['cancellationDate']
         mock_volume['billingItem']['cancellationDate'] = 'y2k, oh nooooo'
 
@@ -3231,7 +3231,7 @@ class StorageUtilsTests(testing.TestCase):
         mock_volume['billingItem']['cancellationDate'] = prev_cancellation_date
 
     def test_prep_replicant_order_snapshot_space_cancelled(self):
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         snapshot_billing_item = mock_volume['billingItem']['activeChildren'][0]
         prev_cancellation_date = snapshot_billing_item['cancellationDate']
         snapshot_billing_item['cancellationDate'] = 'daylight saving time, no!'
@@ -3254,7 +3254,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Location_Datacenter', 'getDatacenters')
         mock.return_value = []
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
 
         exception = self.assertRaises(
             exceptions.SoftLayerError,
@@ -3268,11 +3268,11 @@ class StorageUtilsTests(testing.TestCase):
             str(exception)
         )
 
-    def test_prep_replicant_order_enterprise_offering_invalid_storage_type(self):
+    def test_prep_replicant_order_enterprise_offering_invalid_type(self):
         mock = self.set_mock('SoftLayer_Location_Datacenter', 'getDatacenters')
         mock.return_value = [{'id': 51, 'name': 'wdc04'}]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_billing_item_category = mock_volume['billingItem']['categoryCode']
         mock_volume['billingItem']['categoryCode'] = 'invalid_type_ninja_cat'
 
@@ -3294,7 +3294,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Location_Datacenter', 'getDatacenters')
         mock.return_value = [{'id': 51, 'name': 'wdc04'}]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_snapshot_capacity = mock_volume['snapshotCapacityGb']
         del mock_volume['snapshotCapacityGb']
 
@@ -3317,7 +3317,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
 
         expected_object = {
             'complexType': 'SoftLayer_Container_Product_Order_'
@@ -3350,7 +3350,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
 
         expected_object = {
             'complexType': 'SoftLayer_Container_Product_Order_'
@@ -3383,7 +3383,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_storage_type = mock_volume['storageType']['keyName']
         prev_has_encryption_at_rest_flag = mock_volume['hasEncryptionAtRest']
         mock_volume['storageType']['keyName'] = 'PERFORMANCE_BLOCK_STORAGE'
@@ -3410,7 +3410,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_storage_type = mock_volume['storageType']['keyName']
         mock_volume['storageType']['keyName'] = 'PERFORMANCE_BLOCK_STORAGE'
 
@@ -3448,7 +3448,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_storage_type = mock_volume['storageType']['keyName']
         mock_volume['storageType']['keyName'] = 'CATS_LIKE_PIANO_MUSIC'
 
@@ -3542,7 +3542,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_billing_item = mock_volume['billingItem']
         del mock_volume['billingItem']
 
@@ -3562,7 +3562,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_snapshot_capacity_gb = mock_volume['snapshotCapacityGb']
         del mock_volume['snapshotCapacityGb']
 
@@ -3582,7 +3582,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_location = mock_volume['billingItem']['location']
         del mock_volume['billingItem']['location']
 
@@ -3601,7 +3601,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_staas_version = mock_volume['staasVersion']
         mock_volume['staasVersion'] = 1
 
@@ -3621,7 +3621,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_capacity_gb = mock_volume['capacityGb']
         mock_volume['capacityGb'] = None
 
@@ -3639,7 +3639,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_original_volume_size = mock_volume['originalVolumeSize']
         del mock_volume['originalVolumeSize']
 
@@ -3670,7 +3670,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
 
         exception = self.assertRaises(
             exceptions.SoftLayerError,
@@ -3687,7 +3687,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
 
         exception = self.assertRaises(
             exceptions.SoftLayerError,
@@ -3709,7 +3709,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_storage_type_keyname = mock_volume['storageType']['keyName']
         prev_provisioned_iops = mock_volume['provisionedIops']
         mock_volume['storageType']['keyName'] = 'PERFORMANCE_BLOCK_'\
@@ -3732,7 +3732,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_storage_type_keyname = mock_volume['storageType']['keyName']
         prev_provisioned_iops = mock_volume['provisionedIops']
         mock_volume['storageType']['keyName'] = 'PERFORMANCE_BLOCK_STORAGE'
@@ -3756,7 +3756,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_storage_type_keyname = mock_volume['storageType']['keyName']
         mock_volume['storageType']['keyName'] = 'PERFORMANCE_BLOCK_STORAGE'
 
@@ -3777,7 +3777,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_storage_type_keyname = mock_volume['storageType']['keyName']
         mock_volume['storageType']['keyName'] = 'PERFORMANCE_FILE_'\
                                                 'STORAGE_REPLICANT'
@@ -3810,7 +3810,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_storage_type_keyname = mock_volume['storageType']['keyName']
         mock_volume['storageType']['keyName'] = 'PERFORMANCE_BLOCK_STORAGE'
 
@@ -3842,7 +3842,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_storage_type_keyname = mock_volume['storageType']['keyName']
         mock_volume['storageType']['keyName'] = 'PERFORMANCE_FILE_STORAGE'
 
@@ -3874,7 +3874,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_tier_level = mock_volume['storageTierLevel']
         prev_storage_type_keyname = mock_volume['storageType']['keyName']
         mock_volume['storageTierLevel'] = 'NINJA_PENGUINS'
@@ -3897,7 +3897,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_tier_level = mock_volume['storageTierLevel']
         mock_volume['storageTierLevel'] = 'LOW_INTENSITY_TIER'
 
@@ -3918,7 +3918,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
 
         exception = self.assertRaises(
             exceptions.SoftLayerError,
@@ -3935,7 +3935,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_storage_type_keyname = mock_volume['storageType']['keyName']
         mock_volume['storageType']['keyName'] = 'ENDURANCE_FILE_'\
                                                 'STORAGE_REPLICANT'
@@ -3967,7 +3967,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
 
         expected_object = {
             'complexType': 'SoftLayer_Container_Product_Order_'
@@ -3994,7 +3994,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_storage_type_keyname = mock_volume['storageType']['keyName']
         mock_volume['storageType']['keyName'] = 'ENDURANCE_FILE_STORAGE'
 
@@ -4025,7 +4025,7 @@ class StorageUtilsTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = fixtures.SoftLayer_Network_Storage.SAAS_TEST_VOLUME
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
         prev_storage_type_keyname = mock_volume['storageType']['keyName']
         mock_volume['storageType']['keyName'] = 'NINJA_CATS'
 
