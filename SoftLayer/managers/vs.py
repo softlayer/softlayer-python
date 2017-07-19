@@ -819,6 +819,7 @@ class VSManager(utils.IdentifierMixin, object):
         mask = [
             'description',
             'capacity',
+            'units',
             'prices[id,locationGroupId,categories[name,id,categoryCode]]'
         ]
         mask = "mask[%s]" % ','.join(mask)
@@ -848,7 +849,7 @@ class VSManager(utils.IdentifierMixin, object):
         }
         category_code = option_category[option]
         for item in package_items:
-            is_private = str(item['description']).startswith('Private')
+            is_private = (item.get('units') == 'PRIVATE_CORE')
             for price in item['prices']:
                 if 'locationGroupId' in price and price['locationGroupId']:
                     # Skip location based prices
