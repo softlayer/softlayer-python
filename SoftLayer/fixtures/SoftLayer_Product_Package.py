@@ -348,7 +348,8 @@ getItems = [
     {
         'id': 1240,
         'capacity': '4',
-        'description': 'Private Computing Instance',
+        'units': 'PRIVATE_CORE',
+        'description': 'Computing Instance (Dedicated)',
         'itemCategory': {'categoryCode': 'Computing Instance'},
         'prices': [{'id': 1007,
                     'categories': [{'id': 80,
@@ -358,6 +359,7 @@ getItems = [
     {
         'id': 1250,
         'capacity': '4',
+        'units': 'CORE',
         'description': 'Computing Instance',
         'itemCategory': {'categoryCode': 'Computing Instance'},
         'prices': [{'id': 1144,
@@ -369,6 +371,7 @@ getItems = [
     {
         'id': 112233,
         'capacity': '55',
+        'units': 'CORE',
         'description': 'Computing Instance',
         'itemCategory': {'categoryCode': 'Computing Instance'},
         'prices': [{'id': 332211,
