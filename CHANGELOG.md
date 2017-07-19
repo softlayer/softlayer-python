@@ -1,10 +1,11 @@
 # Change Log
 
-## [5.2.8] - TBD
+## [5.2.8] - 2017-07-19
  - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.7...master
  
  * Resolved https://github.com/softlayer/softlayer-python/issues/835
  * Resolved https://github.com/softlayer/softlayer-python/issues/826
+ * Fix dedicated/private VSI price retrieval for upgrades
  
 #### Added to CLI
 * block access-password
