@@ -1,5 +1,11 @@
 # Change Log
 
+## [5.2.9] - TBD
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.8...master
+ 
+#### Added to CLI
+* block volume-set-lun-id
+
 ## [5.2.8] - 2017-07-19
  - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.7...master
  
