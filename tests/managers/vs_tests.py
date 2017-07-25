@@ -636,13 +636,6 @@ class VSTests(testing.TestCase):
                                 identifier=1)
 
     def test_upgrade(self):
-        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        mock.return_value = [
-            {'id': 46, 'name': 'Virtual Servers',
-             'description': 'Virtual Server Instances',
-             'type': {'keyName': 'VIRTUAL_SERVER_INSTANCE'}, 'isActive': 1},
-        ]
-
         # test single upgrade
         result = self.vs.upgrade(1, cpus=4, public=False)
 
@@ -676,6 +669,20 @@ class VSTests(testing.TestCase):
         self.assertIn({'id': 1144}, order_container['prices'])
         self.assertIn({'id': 1133}, order_container['prices'])
         self.assertIn({'id': 1122}, order_container['prices'])
+        self.assertEqual(order_container['virtualGuests'], [{'id': 1}])
+
+    def test_upgrade_dedicated_host_instance(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getUpgradeItemPrices')
+        mock.return_value = fixtures.SoftLayer_Virtual_Guest.DEDICATED_GET_UPGRADE_ITEM_PRICES
+
+        # test single upgrade
+        result = self.vs.upgrade(1, cpus=4, public=False)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
+        call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
+        order_container = call.args[0]
+        self.assertEqual(order_container['prices'], [{'id': 115566}])
         self.assertEqual(order_container['virtualGuests'], [{'id': 1}])
 
     def test_upgrade_skips_location_based_prices(self):

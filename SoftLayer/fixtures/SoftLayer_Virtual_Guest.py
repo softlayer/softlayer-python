@@ -252,3 +252,85 @@ reloadOperatingSystem = 'OK'
 setTags = True
 createArchiveTransaction = {}
 executeRescueLayer = True
+
+getUpgradeItemPrices = [
+    {
+        'id': 1007,
+        'categories': [{'id': 80,
+                        'name': 'Computing Instance',
+                        'categoryCode': 'guest_core'}],
+        'item': {
+            'capacity': '4',
+            'units': 'PRIVATE_CORE',
+            'description': 'Computing Instance (Dedicated)',
+        }
+    },
+    {
+        'id': 1144,
+        'locationGroupId': None,
+        'categories': [{'id': 80,
+                        'name': 'Computing Instance',
+                        'categoryCode': 'guest_core'}],
+        'item': {
+            'capacity': '4',
+            'units': 'CORE',
+            'description': 'Computing Instance',
+        }
+    },
+    {
+        'id': 332211,
+        'locationGroupId': 1,
+        'categories': [{'id': 80,
+                        'name': 'Computing Instance',
+                        'categoryCode': 'guest_core'}],
+        'item': {
+            'capacity': '4',
+            'units': 'CORE',
+            'description': 'Computing Instance',
+        }
+    },
+    {
+        'id': 1122,
+        'categories': [{'id': 26,
+                        'name': 'Uplink Port Speeds',
+                        'categoryCode': 'port_speed'}],
+        'item': {
+            'capacity': '1000',
+            'description': 'Public & Private Networks',
+        }
+    },
+    {
+        'id': 1144,
+        'categories': [{'id': 26,
+                        'name': 'Uplink Port Speeds',
+                        'categoryCode': 'port_speed'}],
+        'item': {
+            'capacity': '1000',
+            'description': 'Private Networks',
+        }
+    },
+    {
+        'id': 1133,
+        'categories': [{'id': 3,
+                        'name': 'RAM',
+                        'categoryCode': 'ram'}],
+        'item': {
+            'capacity': '2',
+            'description': 'RAM',
+        }
+    },
+]
+
+DEDICATED_GET_UPGRADE_ITEM_PRICES = [
+    {
+        'id': 115566,
+        'categories': [{'id': 80,
+                        'name': 'Computing Instance',
+                        'categoryCode': 'guest_core'}],
+        'item': {
+            'capacity': '4',
+            'units': 'DEDICATED_CORE',
+            'description': 'Computing Instance (Dedicated Host)',
+        }
+    },
+]

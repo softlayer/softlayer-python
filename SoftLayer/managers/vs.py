@@ -773,13 +773,13 @@ class VSManager(utils.IdentifierMixin, object):
         :param int instance_id: Instance id of the VS to be upgraded
         :param int cpus: The number of virtual CPUs to upgrade to
                             of a VS instance.
-        :param bool public: CPU will be in Private/Public Node.
         :param int memory: RAM of the VS to be upgraded to.
         :param int nic_speed: The port speed to set
+        :param bool public: CPU will be in Private/Public Node.
 
         :returns: bool
         """
-        package_items = self._get_package_items()
+        upgrade_prices = self._get_upgrade_prices(instance_id)
         prices = []
 
         for option, value in {'cpus': cpus,
@@ -787,7 +787,7 @@ class VSManager(utils.IdentifierMixin, object):
                               'nic_speed': nic_speed}.items():
             if not value:
                 continue
-            price_id = self._get_price_id_for_upgrade(package_items,
+            price_id = self._get_price_id_for_upgrade_option(upgrade_prices,
                                                       option,
                                                       value,
                                                       public)
@@ -833,9 +833,74 @@ class VSManager(utils.IdentifierMixin, object):
         package_service = self.client['Product_Package']
         return package_service.getItems(id=package['id'], mask=mask)
 
+    def _get_upgrade_prices(self, instance_id):
+        """Following Method gets all the price ids related to upgrading a VS.
+
+        :param int instance_id: Instance id of the VS to be upgraded
+
+        :returns: list
+        """
+        mask = [
+            'id',
+            'locationGroupId',
+            'categories[name,id,categoryCode]',
+            'item[description,capacity,units]'
+        ]
+        mask = "mask[%s]" % ','.join(mask)
+        return self.guest.getUpgradeItemPrices(id=instance_id, mask=mask)
+
+    def _get_price_id_for_upgrade_option(self, upgrade_prices, option, value,
+                                  public=True):
+        """Find the price id for the option and value to upgrade. This
+
+        :param list upgrade_prices: Contains all the prices related to a VS upgrade
+        :param string option: Describes type of parameter to be upgraded
+        :param int value: The value of the parameter to be upgraded
+        :param bool public: CPU will be in Private/Public Node.
+        """
+        option_category = {
+            'memory': 'ram',
+            'cpus': 'guest_core',
+            'nic_speed': 'port_speed'
+        }
+        category_code = option_category[option]
+        for price in upgrade_prices:
+            if 'locationGroupId' in price and price['locationGroupId']:
+                # Skip location based prices
+                continue
+
+            if 'categories' not in price:
+                continue
+
+            if 'item' not in price:
+                continue
+
+            product = price['item']
+            is_private = (product.get('units') == 'PRIVATE_CORE'
+                          or product.get('units') == 'DEDICATED_CORE')
+
+            categories = price['categories']
+            for category in categories:
+                if not (category['categoryCode'] == category_code
+                        and str(product['capacity']) == str(value)):
+                    continue
+                if option == 'cpus':
+                    if public and not is_private:
+                        return price['id']
+                    elif not public and is_private:
+                        return price['id']
+                elif option == 'nic_speed':
+                    if 'Public' in product['description']:
+                        return price['id']
+                else:
+                    return price['id']
+
+
     def _get_price_id_for_upgrade(self, package_items, option, value,
                                   public=True):
         """Find the price id for the option and value to upgrade.
+
+        Deprecated in favor of _get_price_id_for_upgrade_option()
 
         :param list package_items: Contains all the items related to an VS
         :param string option: Describes type of parameter to be upgraded
