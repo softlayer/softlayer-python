@@ -547,7 +547,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         """Failback from a volume replicant.
 
         :param integer volume_id: The id of the volume
-        :param integer: ID of replicant to failback from
+        :param integer replicant_id: ID of replicant to failback from
         :return: Returns whether failback was successful or not
         """
 
@@ -563,3 +563,13 @@ class BlockStorageManager(utils.IdentifierMixin, object):
 
         return self.client.call('Network_Storage_Allowed_Host', 'setCredentialPassword',
                                 password, id=access_id)
+
+    def create_or_update_lun_id(self, volume_id, lun_id):
+        """Set the LUN ID on a volume.
+
+        :param integer volume_id: The id of the volume
+        :param integer lun_id: LUN ID to set on the volume
+        :return: a SoftLayer_Network_Storage_Property object
+        """
+        return self.client.call('Network_Storage', 'createOrUpdateLunId',
+                                lun_id, id=volume_id)

@@ -4,6 +4,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+from SoftLayer import exceptions
 from SoftLayer import testing
 
 import json
@@ -27,6 +28,32 @@ class BlockTests(testing.TestCase):
                          ' for cancellation\n', result.output)
         self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
                                 args=(False, True, None))
+
+    def test_volume_set_lun_id_in_range(self):
+        lun_mock = self.set_mock('SoftLayer_Network_Storage', 'createOrUpdateLunId')
+        lun_mock.return_value = dict(volumeId=1234, value='42')
+        result = self.run_command('block volume-set-lun-id 1234 42'.split())
+        self.assert_no_fail(result)
+        self.assertEqual('Block volume with id 1234 is reporting LUN ID 42\n',
+                         result.output)
+
+    def test_volume_set_lun_id_in_range_missing_value(self):
+        lun_mock = self.set_mock('SoftLayer_Network_Storage', 'createOrUpdateLunId')
+        lun_mock.return_value = dict(volumeId=1234)
+        result = self.run_command('block volume-set-lun-id 1234 42'.split())
+        self.assert_no_fail(result)
+        self.assertEqual('Failed to confirm the new LUN ID on volume 1234\n',
+                         result.output)
+
+    def test_volume_set_lun_id_not_in_range(self):
+        value = '-1'
+        lun_mock = self.set_mock('SoftLayer_Network_Storage', 'createOrUpdateLunId')
+        lun_mock.side_effect = exceptions.SoftLayerAPIError(
+            'SoftLayer_Exception_Network_Storage_Iscsi_InvalidLunId',
+            'The LUN ID specified is out of the valid range: %s [min: 0 max: 4095]' % (value))
+        result = self.run_command('block volume-set-lun-id 1234 42'.split())
+        self.assertIsNotNone(result.exception)
+        self.assertIn('The LUN ID specified is out of the valid range', result.exception.faultString)
 
     def test_volume_detail(self):
         result = self.run_command(['block', 'volume-detail', '1234'])
