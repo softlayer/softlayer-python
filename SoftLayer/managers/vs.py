@@ -789,9 +789,9 @@ class VSManager(utils.IdentifierMixin, object):
             if not value:
                 continue
             price_id = self._get_price_id_for_upgrade_option(upgrade_prices,
-                                                      option,
-                                                      value,
-                                                      public)
+                                                             option,
+                                                             value,
+                                                             public)
             if not price_id:
                 # Every option provided is expected to have a price
                 raise exceptions.SoftLayerError(
@@ -851,7 +851,7 @@ class VSManager(utils.IdentifierMixin, object):
         return self.guest.getUpgradeItemPrices(id=instance_id, mask=mask)
 
     def _get_price_id_for_upgrade_option(self, upgrade_prices, option, value,
-                                  public=True):
+                                         public=True):
         """Find the price id for the option and value to upgrade. This
 
         :param list upgrade_prices: Contains all the prices related to a VS upgrade
