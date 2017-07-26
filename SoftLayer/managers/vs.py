@@ -9,6 +9,7 @@ import datetime
 import itertools
 import socket
 import time
+import warnings
 
 from SoftLayer import exceptions
 from SoftLayer.managers import ordering
@@ -901,6 +902,8 @@ class VSManager(utils.IdentifierMixin, object):
         :param int value: The value of the parameter to be upgraded
         :param bool public: CPU will be in Private/Public Node.
         """
+        warnings.warn("use _get_price_id_for_upgrade_option() instead",
+                      DeprecationWarning)
         option_category = {
             'memory': 'ram',
             'cpus': 'guest_core',
