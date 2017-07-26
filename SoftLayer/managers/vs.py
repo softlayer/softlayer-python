@@ -863,38 +863,32 @@ class VSManager(utils.IdentifierMixin, object):
             'cpus': 'guest_core',
             'nic_speed': 'port_speed'
         }
-        category_code = option_category[option]
+        category_code = option_category.get(option)
         for price in upgrade_prices:
-            if 'locationGroupId' in price and price['locationGroupId']:
-                # Skip location based prices
+            if price.get('categories') is None or price.get('item') is None:
                 continue
 
-            if 'categories' not in price:
-                continue
-
-            if 'item' not in price:
-                continue
-
-            product = price['item']
+            product = price.get('item')
             is_private = (product.get('units') == 'PRIVATE_CORE'
                           or product.get('units') == 'DEDICATED_CORE')
 
-            categories = price['categories']
-            for category in categories:
-                if not (category['categoryCode'] == category_code
-                        and str(product['capacity']) == str(value)):
+            for category in price.get('categories'):
+                if not (category.get('categoryCode') == category_code
+                        and str(product.get('capacity')) == str(value)):
                     continue
-                if option == 'cpus':
-                    if public and not is_private:
-                        return price['id']
-                    elif not public and is_private:
-                        return price['id']
-                elif option == 'nic_speed':
-                    if 'Public' in product['description']:
-                        return price['id']
-                else:
-                    return price['id']
 
+                if option == 'cpus':
+                    # Public upgrade and public guest_core price
+                    if public and not is_private:
+                        return price.get('id')
+                    # Private upgrade and private guest_core price
+                    elif not public and is_private:
+                        return price.get('id')
+                elif option == 'nic_speed':
+                    if 'Public' in product.get('description'):
+                        return price.get('id')
+                else:
+                    return price.get('id')
 
     def _get_price_id_for_upgrade(self, package_items, option, value,
                                   public=True):
