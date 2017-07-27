@@ -43,7 +43,8 @@ def cli(env, identifier, passwords, price):
     table.add_row(['datacenter',
                    result['datacenter']['name'] or formatting.blank()])
     table.add_row(['cores', result['processorPhysicalCoreAmount']])
-    table.add_row(['memory', formatting.gb(result['memoryCapacity'])])
+    memory = formatting.gb(result['memoryCapacity']) if result.get('memoryCapacity') else formatting.blank()
+    table.add_row(['memory', memory])
     table.add_row(['public_ip',
                    result['primaryIpAddress'] or formatting.blank()])
     table.add_row(['private_ip',
