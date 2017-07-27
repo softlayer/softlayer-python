@@ -102,16 +102,18 @@ def cli(env, volume_id):
                                                 replicant['id']])
             replicant_table.add_row([
                 'Volume Name',
-                replicant['username']])
+                utils.lookup(replicant, 'username')])
             replicant_table.add_row([
                 'Target IP',
-                replicant['serviceResourceBackendIpAddress']])
+                utils.lookup(replicant, 'serviceResourceBackendIpAddress')])
             replicant_table.add_row([
                 'Data Center',
-                replicant['serviceResource']['datacenter']['name']])
+                utils.lookup(replicant,
+                             'serviceResource', 'datacenter', 'name')])
             replicant_table.add_row([
                 'Schedule',
-                replicant['replicationSchedule']['type']['keyname']])
+                utils.lookup(replicant,
+                             'replicationSchedule', 'type', 'keyname')])
             replicant_list.append(replicant_table)
         table.add_row(['Replicant Volumes', replicant_list])
 
