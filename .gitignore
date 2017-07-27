@@ -13,4 +13,4 @@ build/*
 dist/*
 *.egg-info
 .cache
-
+.idea

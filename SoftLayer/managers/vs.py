@@ -9,6 +9,7 @@ import datetime
 import itertools
 import socket
 import time
+import warnings
 
 from SoftLayer import exceptions
 from SoftLayer.managers import ordering
@@ -773,13 +774,13 @@ class VSManager(utils.IdentifierMixin, object):
         :param int instance_id: Instance id of the VS to be upgraded
         :param int cpus: The number of virtual CPUs to upgrade to
                             of a VS instance.
-        :param bool public: CPU will be in Private/Public Node.
         :param int memory: RAM of the VS to be upgraded to.
         :param int nic_speed: The port speed to set
+        :param bool public: CPU will be in Private/Public Node.
 
         :returns: bool
         """
-        package_items = self._get_package_items()
+        upgrade_prices = self._get_upgrade_prices(instance_id)
         prices = []
 
         for option, value in {'cpus': cpus,
@@ -787,10 +788,10 @@ class VSManager(utils.IdentifierMixin, object):
                               'nic_speed': nic_speed}.items():
             if not value:
                 continue
-            price_id = self._get_price_id_for_upgrade(package_items,
-                                                      option,
-                                                      value,
-                                                      public)
+            price_id = self._get_price_id_for_upgrade_option(upgrade_prices,
+                                                             option,
+                                                             value,
+                                                             public)
             if not price_id:
                 # Every option provided is expected to have a price
                 raise exceptions.SoftLayerError(
@@ -815,7 +816,12 @@ class VSManager(utils.IdentifierMixin, object):
         return False
 
     def _get_package_items(self):
-        """Following Method gets all the item ids related to VS."""
+        """Following Method gets all the item ids related to VS.
+
+        Deprecated in favor of _get_upgrade_prices()
+        """
+        warnings.warn("use _get_upgrade_prices() instead",
+                      DeprecationWarning)
         mask = [
             'description',
             'capacity',
@@ -833,15 +839,76 @@ class VSManager(utils.IdentifierMixin, object):
         package_service = self.client['Product_Package']
         return package_service.getItems(id=package['id'], mask=mask)
 
+    def _get_upgrade_prices(self, instance_id, include_downgrade_options=True):
+        """Following Method gets all the price ids related to upgrading a VS.
+
+        :param int instance_id: Instance id of the VS to be upgraded
+
+        :returns: list
+        """
+        mask = [
+            'id',
+            'locationGroupId',
+            'categories[name,id,categoryCode]',
+            'item[description,capacity,units]'
+        ]
+        mask = "mask[%s]" % ','.join(mask)
+        return self.guest.getUpgradeItemPrices(include_downgrade_options, id=instance_id, mask=mask)
+
+    def _get_price_id_for_upgrade_option(self, upgrade_prices, option, value,
+                                         public=True):
+        """Find the price id for the option and value to upgrade. This
+
+        :param list upgrade_prices: Contains all the prices related to a VS upgrade
+        :param string option: Describes type of parameter to be upgraded
+        :param int value: The value of the parameter to be upgraded
+        :param bool public: CPU will be in Private/Public Node.
+        """
+        option_category = {
+            'memory': 'ram',
+            'cpus': 'guest_core',
+            'nic_speed': 'port_speed'
+        }
+        category_code = option_category.get(option)
+        for price in upgrade_prices:
+            if price.get('categories') is None or price.get('item') is None:
+                continue
+
+            product = price.get('item')
+            is_private = (product.get('units') == 'PRIVATE_CORE'
+                          or product.get('units') == 'DEDICATED_CORE')
+
+            for category in price.get('categories'):
+                if not (category.get('categoryCode') == category_code
+                        and str(product.get('capacity')) == str(value)):
+                    continue
+
+                if option == 'cpus':
+                    # Public upgrade and public guest_core price
+                    if public and not is_private:
+                        return price.get('id')
+                    # Private upgrade and private guest_core price
+                    elif not public and is_private:
+                        return price.get('id')
+                elif option == 'nic_speed':
+                    if 'Public' in product.get('description'):
+                        return price.get('id')
+                else:
+                    return price.get('id')
+
     def _get_price_id_for_upgrade(self, package_items, option, value,
                                   public=True):
         """Find the price id for the option and value to upgrade.
+
+        Deprecated in favor of _get_price_id_for_upgrade_option()
 
         :param list package_items: Contains all the items related to an VS
         :param string option: Describes type of parameter to be upgraded
         :param int value: The value of the parameter to be upgraded
         :param bool public: CPU will be in Private/Public Node.
         """
+        warnings.warn("use _get_price_id_for_upgrade_option() instead",
+                      DeprecationWarning)
         option_category = {
             'memory': 'ram',
             'cpus': 'guest_core',
