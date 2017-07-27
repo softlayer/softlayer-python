@@ -1,8 +1,8 @@
 # Change Log
 
-## [5.2.9] - TBD
+## [5.2.9] - 2017-07-27
  - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.8...master
- 
+ - Add support for dedicated host instances to virtual server upgrades
 #### Added to CLI
 * block volume-set-lun-id
 
