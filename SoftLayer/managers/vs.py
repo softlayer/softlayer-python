@@ -816,7 +816,12 @@ class VSManager(utils.IdentifierMixin, object):
         return False
 
     def _get_package_items(self):
-        """Following Method gets all the item ids related to VS."""
+        """Following Method gets all the item ids related to VS.
+
+        Deprecated in favor of _get_upgrade_prices()
+        """
+        warnings.warn("use _get_upgrade_prices() instead",
+                      DeprecationWarning)
         mask = [
             'description',
             'capacity',
@@ -834,7 +839,7 @@ class VSManager(utils.IdentifierMixin, object):
         package_service = self.client['Product_Package']
         return package_service.getItems(id=package['id'], mask=mask)
 
-    def _get_upgrade_prices(self, instance_id):
+    def _get_upgrade_prices(self, instance_id, include_downgrade_options=True):
         """Following Method gets all the price ids related to upgrading a VS.
 
         :param int instance_id: Instance id of the VS to be upgraded
@@ -848,7 +853,7 @@ class VSManager(utils.IdentifierMixin, object):
             'item[description,capacity,units]'
         ]
         mask = "mask[%s]" % ','.join(mask)
-        return self.guest.getUpgradeItemPrices(id=instance_id, mask=mask)
+        return self.guest.getUpgradeItemPrices(include_downgrade_options, id=instance_id, mask=mask)
 
     def _get_price_id_for_upgrade_option(self, upgrade_prices, option, value,
                                          public=True):

@@ -7,7 +7,6 @@
 import mock
 
 import SoftLayer
-from SoftLayer import exceptions
 from SoftLayer import fixtures
 from SoftLayer import testing
 
@@ -685,11 +684,6 @@ class VSTests(testing.TestCase):
         self.assertEqual(order_container['prices'], [{'id': 115566}])
         self.assertEqual(order_container['virtualGuests'], [{'id': 1}])
 
-    def test_upgrade_skips_location_based_prices(self):
-        # Test that no prices that have locationGroupId set are used
-        self.assertRaises(exceptions.SoftLayerError,
-                          self.vs.upgrade, 1, cpus=55, memory=2, public=True)
-
     def test_get_item_id_for_upgrade(self):
         item_id = 0
         package_items = self.client['Product_Package'].getItems(id=46)
@@ -699,6 +693,48 @@ class VSTests(testing.TestCase):
                 item_id = item['prices'][0]['id']
                 break
         self.assertEqual(1133, item_id)
+
+    def test_get_package_items(self):
+        self.vs._get_package_items()
+        self.assert_called_with('SoftLayer_Product_Package', 'getItems')
+
+    def test_get_package_items_errors(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = []
+
+        self.assertRaises(ValueError, self.vs._get_package_items)
+
+    def test_get_price_id_for_upgrade(self):
+        package_items = self.vs._get_package_items()
+
+        price_id = self.vs._get_price_id_for_upgrade(package_items=package_items,
+                                                     option='cpus',
+                                                     value='4')
+        self.assertEqual(1144, price_id)
+
+    def test_get_price_id_for_upgrade_skips_location_price(self):
+        package_items = self.vs._get_package_items()
+
+        price_id = self.vs._get_price_id_for_upgrade(package_items=package_items,
+                                                     option='cpus',
+                                                     value='55')
+        self.assertEqual(None, price_id)
+
+    def test_get_price_id_for_upgrade_finds_nic_price(self):
+        package_items = self.vs._get_package_items()
+
+        price_id = self.vs._get_price_id_for_upgrade(package_items=package_items,
+                                                     option='memory',
+                                                     value='2')
+        self.assertEqual(1133, price_id)
+
+    def test_get_price_id_for_upgrade_finds_memory_price(self):
+        package_items = self.vs._get_package_items()
+
+        price_id = self.vs._get_price_id_for_upgrade(package_items=package_items,
+                                                     option='nic_speed',
+                                                     value='1000')
+        self.assertEqual(1122, price_id)
 
 
 class VSWaitReadyGoTests(testing.TestCase):
