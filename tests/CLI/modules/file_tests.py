@@ -158,6 +158,50 @@ class FileTests(testing.TestCase):
         self.assertEqual(2, result.exit_code)
 
     @mock.patch('SoftLayer.FileStorageManager.order_file_volume')
+    def test_volume_order_performance_hourly_billing_not_available(
+            self, order_mock):
+        order_mock.return_value = {}
+        result = self.run_command(['file', 'volume-order',
+                                   '--storage-type=performance', '--size=20',
+                                   '--os-type=linux', '--location=dal10',
+                                   '--service-offering=enterprise',
+                                   '--billing=hourly', '--iops=200'])
+
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual(result.output,
+                         '--billing : hourly billing is only available '
+                         'for storage_as_a_service ')
+
+
+    @mock.patch('SoftLayer.FileStorageManager.order_file_volume')
+    def test_volume_order_performance_hourly_billing(self, order_mock):
+        order_mock.return_value = {
+            'placedOrder': {
+                'id': 479,
+                'items': [
+                    {'description': 'Performance Storage'},
+                    {'description': 'File Storage'},
+                    {'description': '0.25 IOPS per GB'},
+                    {'description': '20 GB Storage Space'},
+                    {'description': '10 GB Storage Space (Snapshot Space)'}]
+            }
+        }
+
+        result = self.run_command(['file', 'volume-order',
+                                   '--storage-type=performance', '--size=20',
+                                   '--iops=100', '--location=dal05',
+                                   '--service-offering=storage_as_a_service',
+                                   '--snapshot-size=10'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.output,
+                         'Order #478 placed successfully!\n'
+                         ' > Performance Storage\n > File Storage\n'
+                         ' > 0.25 IOPS per GB\n > 20 GB Storage Space\n'
+                         ' > 10 GB Storage Space (Snapshot Space)\n')
+
+
+    @mock.patch('SoftLayer.FileStorageManager.order_file_volume')
     def test_volume_order_performance(self, order_mock):
         order_mock.return_value = {
             'placedOrder': {
@@ -189,6 +233,48 @@ class FileTests(testing.TestCase):
                                    '--location=dal05'])
 
         self.assertEqual(2, result.exit_code)
+
+    @mock.patch('SoftLayer.FileStorageManager.order_file_volume')
+    def test_volume_order_endurance_hourly_billing_not_available(
+            self, order_mock):
+        order_mock.return_value = {}
+        result = self.run_command(['file', 'volume-order',
+                                   '--storage-type=endurance', '--size=20',
+                                   '--os-type=linux', '--location=dal10',
+                                   '--service-offering enterprise',
+                                   '--billing hourly', '--iops 200'])
+
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual(result.output,
+                         '--billing : hourly billing is only available '
+                         'for storage_as_a_service ')
+
+    @mock.patch('SoftLayer.FileStorageManager.order_file_volume')
+    def test_volume_order_endurance_hourly_billing(self, order_mock):
+        order_mock.return_value = {
+            'placedOrder': {
+                'id': 479,
+                'items': [
+                    {'description': 'Endurance Storage'},
+                    {'description': 'File Storage'},
+                    {'description': '0.25 IOPS per GB'},
+                    {'description': '20 GB Storage Space'},
+                    {'description': '10 GB Storage Space (Snapshot Space)'}]
+            }
+        }
+
+        result = self.run_command(['file', 'volume-order',
+                                   '--storage-type=endurance', '--size=20',
+                                   '--iops=100', '--location=dal05',
+                                   '--service-offering storage_as_a_service',
+                                   '--snapshot-size=10'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.output,
+                         'Order #478 placed successfully!\n'
+                         ' > Performance Storage\n > File Storage\n'
+                         ' > 0.25 IOPS per GB\n > 20 GB Storage Space\n'
+                         ' > 10 GB Storage Space (Snapshot Space)\n')
 
     @mock.patch('SoftLayer.FileStorageManager.order_file_volume')
     def test_volume_order_endurance(self, order_mock):

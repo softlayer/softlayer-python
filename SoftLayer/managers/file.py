@@ -213,9 +213,10 @@ class FileStorageManager(utils.IdentifierMixin, object):
         :return: Returns a SoftLayer_Container_Product_Order_Receipt
         """
 
-        file_mask = 'billingItem[activeChildren],storageTierLevel,'\
-                    'staasVersion,hasEncryptionAtRest,snapshotCapacityGb,'\
-                    'schedules,hourlySchedule,dailySchedule,weeklySchedule,'\
+        file_mask = 'billingItem[activeChildren,hourlyFlag],'\
+                    'storageTierLevel,staasVersion,'\
+                    'hasEncryptionAtRest,snapshotCapacityGb,schedules,'\
+                    'hourlySchedule,dailySchedule,weeklySchedule,'\
                     'storageType[keyName],provisionedIops'
         file_volume = self.get_file_volume_details(volume_id,
                                                    mask=file_mask)
@@ -288,7 +289,8 @@ class FileStorageManager(utils.IdentifierMixin, object):
 
     def order_file_volume(self, storage_type, location, size,
                           iops=None, tier_level=None, snapshot_size=None,
-                          service_offering='storage_as_a_service'):
+                          service_offering='storage_as_a_service',
+                          hourly_billing_flag=False):
         """Places an order for a file volume.
 
         :param storage_type: 'performance' or 'endurance'
@@ -300,10 +302,12 @@ class FileStorageManager(utils.IdentifierMixin, object):
             if snapshot space should also be ordered (None if not ordered)
         :param service_offering: Requested offering package to use in the order
             ('storage_as_a_service', 'enterprise', or 'performance')
+        :param hourly_billing_flag: Billing type, monthly (False)
+            or hourly (True), default to monthly.
         """
         order = storage_utils.prepare_volume_order_object(
             self, storage_type, location, size, iops, tier_level,
-            snapshot_size, service_offering, 'file'
+            snapshot_size, service_offering, 'file', hourly_billing_flag
         )
 
         return self.client.call('Product_Order', 'placeOrder', order)
@@ -367,8 +371,9 @@ class FileStorageManager(utils.IdentifierMixin, object):
         :param boolean upgrade: Flag to indicate if this order is an upgrade
         :return: Returns a SoftLayer_Container_Product_Order_Receipt
         """
-        file_mask = 'id,billingItem[location],storageType[keyName],'\
-            'storageTierLevel,provisionedIops,staasVersion,hasEncryptionAtRest'
+        file_mask = 'id,billingItem[location,hourlyFlag],'\
+            'storageType[keyName],storageTierLevel,provisionedIops,'\
+            'staasVersion,hasEncryptionAtRest'
         file_volume = self.get_file_volume_details(volume_id,
                                                    mask=file_mask,
                                                    **kwargs)
@@ -391,7 +396,7 @@ class FileStorageManager(utils.IdentifierMixin, object):
 
         file_volume = self.get_file_volume_details(
             volume_id,
-            mask='mask[id,billingItem[activeChildren]]')
+            mask='mask[id,billingItem[activeChildren,hourlyFlag]]')
 
         if 'activeChildren' not in file_volume['billingItem']:
             raise exceptions.SoftLayerError(
@@ -408,6 +413,9 @@ class FileStorageManager(utils.IdentifierMixin, object):
         if not billing_item_id:
             raise exceptions.SoftLayerError(
                 'No snapshot space found to cancel')
+
+        if utils.lookup(file_volume, 'billingItem', 'hourlyFlag'):
+            immediate = True
 
         return self.client['Billing_Item'].cancelItem(
             immediate,
@@ -438,8 +446,11 @@ class FileStorageManager(utils.IdentifierMixin, object):
         """
         file_volume = self.get_file_volume_details(
             volume_id,
-            mask='mask[id,billingItem[id]]')
+            mask='mask[id,billingItem[id,hourlyFlag]]')
         billing_item_id = file_volume['billingItem']['id']
+
+        if utils.lookup(file_volume, 'billingItem', 'hourlyFlag'):
+            immediate = True
 
         return self.client['Billing_Item'].cancelItem(
             immediate,
