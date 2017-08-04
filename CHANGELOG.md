@@ -1,13 +1,21 @@
 # Change Log
 
+## [5.2.11] - 2017-08-04
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.10...master
+ - Sync VLAN and subnet detail CLI output
+
+## [5.2.10] - 2017-07-27
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.9...v5.2.10
+ - Avoid blindly passing memory result to formatter
+
 ## [5.2.9] - 2017-07-27
- - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.8...master
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.8...v5.2.9
  - Add support for dedicated host instances to virtual server upgrades
 #### Added to CLI
 * block volume-set-lun-id
 
 ## [5.2.8] - 2017-07-19
- - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.7...master
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.7...v5.2.8
  
  * Resolved https://github.com/softlayer/softlayer-python/issues/835
  * Resolved https://github.com/softlayer/softlayer-python/issues/826
