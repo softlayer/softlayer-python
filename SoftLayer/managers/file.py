@@ -39,23 +39,9 @@ class FileStorageManager(utils.IdentifierMixin, object):
                 'serviceResourceBackendIpAddress',
                 'activeTransactionCount',
                 'fileNetworkMountAddress',
-                'replicationPartnerCount',
-                ',replicationPartners[id,username,'
-                'serviceResourceBackendIpAddress,'
-                'serviceResource[datacenter[name]],'
-                'storageType,capacityGb,lunId,bytesUsed,'
-                'activeTransactionCount,'
-                'replicationSchedule[type[keyname]]]',
+                'replicationPartnerCount'
             ]
             kwargs['mask'] = ','.join(items)
-
-        # Retrieve relevant replicant information to be displayed.
-        kwargs['mask'] += ',replicationPartners[id,username,'\
-                          'serviceResourceBackendIpAddress,'\
-                          'serviceResource[datacenter[name]],'\
-                          'storageType,capacityGb,lunId,bytesUsed,'\
-                          'activeTransactionCount,'\
-                          'replicationSchedule[type[keyname]]]'
 
         _filter = utils.NestedDict(kwargs.get('filter') or {})
 

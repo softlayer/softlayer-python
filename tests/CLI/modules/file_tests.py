@@ -53,13 +53,21 @@ class FileTests(testing.TestCase):
             }],
             json.loads(result.output))
 
-    def test_volume_count(self):
-        result = self.run_command(['block', 'volume-count'])
+    @mock.patch('SoftLayer.FileStorageManager.list_file_volumes')
+    def test_volume_count(self, list_mock):
+        list_mock.return_value = [
+            {'serviceResource': {'datacenter': {'name': 'dal09'}}},
+            {'serviceResource': {'datacenter': {'name': 'ams01'}}},
+            {'serviceResource': {'datacenter': {'name': 'ams01'}}}
+        ]
+
+        result = self.run_command(['file', 'volume-count'])
 
         self.assert_no_fail(result)
         self.assertEqual(
             {
-                'dal05': 1
+                'ams01': 2,
+                'dal09': 1
             },
             json.loads(result.output))
 
@@ -410,6 +418,7 @@ class FileTests(testing.TestCase):
     def test_replication_locations_unsuccessful(self, locations_mock):
         locations_mock.return_value = False
         result = self.run_command(['file', 'replica-locations', '1234'])
+        self.assert_no_fail(result)
         self.assertEqual('No data centers compatible for replication.\n',
                          result.output)
 

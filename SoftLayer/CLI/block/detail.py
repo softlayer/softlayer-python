@@ -16,6 +16,7 @@ def cli(env, volume_id):
     block_manager = SoftLayer.BlockStorageManager(env.client)
     block_volume = block_manager.get_block_volume_details(volume_id)
     block_volume = utils.NestedDict(block_volume)
+
     table = formatting.KeyValueTable(['Name', 'Value'])
     table.align['Name'] = 'r'
     table.align['Value'] = 'l'

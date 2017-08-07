@@ -113,13 +113,21 @@ class BlockTests(testing.TestCase):
             }],
             json.loads(result.output))
 
-    def test_volume_count(self):
+    @mock.patch('SoftLayer.BlockStorageManager.list_block_volumes')
+    def test_volume_count(self, list_mock):
+        list_mock.return_value = [
+            {'serviceResource': {'datacenter': {'name': 'dal05'}}},
+            {'serviceResource': {'datacenter': {'name': 'ams01'}}},
+            {'serviceResource': {'datacenter': {'name': 'dal05'}}}
+        ]
+
         result = self.run_command(['block', 'volume-count'])
 
         self.assert_no_fail(result)
         self.assertEqual(
             {
-                'dal05': 1
+                'dal05': 2,
+                'ams01': 1
             },
             json.loads(result.output))
 
