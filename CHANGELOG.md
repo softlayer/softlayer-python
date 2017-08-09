@@ -1,7 +1,28 @@
 # Change Log
 
+## [5.2.12] - 2017-08-09
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.11...master
+ - Support for storage_as_a_service block and file storage
+ 
+#### Added to CLI
+ - block volume-count
+ - file volume-count
+ - securitygroups
+   - create            Create a security group.
+   - delete            Deletes the given security group
+   - detail            Get details about a security group.
+   - edit              Edit details of a security group.
+   - interface-add     Attach an interface to a security group.
+   - interface-list    List interfaces associated with security...
+   - interface-remove  Detach an interface from a security group.
+   - list              List security groups.
+   - rule-add          Add a security group rule to a security...
+   - rule-edit         Edit a security group rule in a security...
+   - rule-list         List security group rules.
+   - rule-remove 
+
 ## [5.2.11] - 2017-08-04
- - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.10...master
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.10...v5.2.11
  - Sync VLAN and subnet detail CLI output
 
 ## [5.2.10] - 2017-07-27
