@@ -100,6 +100,8 @@ class NetworkManager(object):
         :param int group_id: The ID of the security group to add the rules to
         :param list rules: The list of rule dictionaries to add
         """
+        if not isinstance(rules, list):
+            raise TypeError("The rules provided must be a list of dictionaries")
         return self.security_group.addRules(rules, id=group_id)
 
     def add_subnet(self, subnet_type, quantity=None, vlan_id=None, version=4,

@@ -70,6 +70,12 @@ class NetworkTests(testing.TestCase):
                                 'addRules', identifier=100,
                                 args=([rule1, rule2],))
 
+    def test_add_securitygroup_rules_with_dict_error(self):
+        rule = {'remoteIp': '10.0.0.0/24',
+                'direction': 'ingress'}
+        self.assertRaises(TypeError, self.network.add_securitygroup_rules,
+                          rule)
+
     def test_add_subnet_for_ipv4(self):
         # Test a four public address IPv4 order
         result = self.network.add_subnet('public',
