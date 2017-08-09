@@ -536,7 +536,7 @@ getIscsiNetworkStorage = [{
     'notes': """{'status': 'available'}""",
     'password': '',
     'serviceProviderId': 1,
-    'serviceResource': {'datacenter': {'id': 449500}},
+    'serviceResource': {'datacenter': {'name': 'dal05', 'id': 449500}},
     'serviceResourceBackendIpAddress': '10.1.2.3',
     'serviceResourceName': 'Storage Type 01 Aggregate staaspar0101_pc01',
     'username': 'username',

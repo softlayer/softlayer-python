@@ -43,7 +43,8 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 'bytesUsed',
                 'serviceResource.datacenter[name]',
                 'serviceResourceBackendIpAddress',
-                'activeTransactionCount'
+                'activeTransactionCount',
+                'replicationPartnerCount'
             ]
             kwargs['mask'] = ','.join(items)
 

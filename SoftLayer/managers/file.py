@@ -38,7 +38,8 @@ class FileStorageManager(utils.IdentifierMixin, object):
                 'serviceResource.datacenter[name]',
                 'serviceResourceBackendIpAddress',
                 'activeTransactionCount',
-                'fileNetworkMountAddress'
+                'fileNetworkMountAddress',
+                'replicationPartnerCount'
             ]
             kwargs['mask'] = ','.join(items)
 

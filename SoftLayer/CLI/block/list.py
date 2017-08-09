@@ -28,6 +28,8 @@ COLUMNS = [
     column_helper.Column('lunId', ('lunId',), mask="lunId"),
     column_helper.Column('active_transactions', ('activeTransactionCount',),
                          mask="activeTransactionCount"),
+    column_helper.Column('rep_partner_count', ('replicationPartnerCount',),
+                         mask="replicationPartnerCount"),
     column_helper.Column(
         'created_by',
         ('billingItem', 'orderItem', 'order', 'userRecord', 'username')),
@@ -42,7 +44,8 @@ DEFAULT_COLUMNS = [
     'bytes_used',
     'ip_addr',
     'lunId',
-    'active_transactions'
+    'active_transactions',
+    'rep_partner_count'
 ]
 
 
