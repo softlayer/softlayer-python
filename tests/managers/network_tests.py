@@ -33,6 +33,49 @@ class NetworkTests(testing.TestCase):
 
         self.assertEqual(fixtures.SoftLayer_Product_Order.verifyOrder, result)
 
+    def test_add_securitygroup_rule(self):
+        result = self.network.add_securitygroup_rule(100,
+                                                     remote_ip='10.0.0.0/24',
+                                                     direction='ingress',
+                                                     ethertype='IPv4',
+                                                     port_min=95,
+                                                     port_max=100,
+                                                     protocol='tcp')
+
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Network_SecurityGroup',
+                                'addRules', identifier=100,
+                                args=([{'remoteIp': '10.0.0.0/24',
+                                        'direction': 'ingress',
+                                        'ethertype': 'IPv4',
+                                        'portRangeMin': 95,
+                                        'portRangeMax': 100,
+                                        'protocol': 'tcp'}],))
+
+    def test_add_securitygroup_rules(self):
+        rule1 = {'remoteIp': '10.0.0.0/24',
+                 'direction': 'ingress',
+                 'ethertype': 'IPv4',
+                 'portRangeMin': 95,
+                 'portRangeMax': 100,
+                 'protocol': 'tcp'}
+        rule2 = {'remoteGroupId': 102,
+                 'direction': 'egress',
+                 'ethertype': 'IPv4'}
+
+        result = self.network.add_securitygroup_rules(100, [rule1, rule2])
+
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Network_SecurityGroup',
+                                'addRules', identifier=100,
+                                args=([rule1, rule2],))
+
+    def test_add_securitygroup_rules_with_dict_error(self):
+        rule = {'remoteIp': '10.0.0.0/24',
+                'direction': 'ingress'}
+        self.assertRaises(TypeError, self.network.add_securitygroup_rules,
+                          rule)
+
     def test_add_subnet_for_ipv4(self):
         # Test a four public address IPv4 order
         result = self.network.add_subnet('public',
@@ -82,6 +125,24 @@ class NetworkTests(testing.TestCase):
                                 identifier=9876,
                                 args=('172.16.24.76',))
 
+    def test_attach_securitygroup_component(self):
+        result = self.network.attach_securitygroup_component(100, 500)
+
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Network_SecurityGroup',
+                                'attachNetworkComponents',
+                                identifier=100,
+                                args=([500],))
+
+    def test_attach_securitygroup_components(self):
+        result = self.network.attach_securitygroup_components(100, [500, 600])
+
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Network_SecurityGroup',
+                                'attachNetworkComponents',
+                                identifier=100,
+                                args=([500, 600],))
+
     def test_cancel_global_ip(self):
         result = self.network.cancel_global_ip(1234)
 
@@ -95,6 +156,38 @@ class NetworkTests(testing.TestCase):
         self.assertEqual(result, True)
         self.assert_called_with('SoftLayer_Billing_Item', 'cancelService',
                                 identifier=1056)
+
+    def test_create_securitygroup(self):
+        result = self.network.create_securitygroup(name='foo',
+                                                   description='bar')
+
+        sg_fixture = fixtures.SoftLayer_Network_SecurityGroup
+        self.assertEqual(sg_fixture.createObjects, [result])
+
+    def test_delete_securitygroup(self):
+        result = self.network.delete_securitygroup(100)
+
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Network_SecurityGroup',
+                                'deleteObjects',
+                                args=([{'id': 100}],))
+
+    def test_detach_securitygroup_component(self):
+        result = self.network.detach_securitygroup_component(100, 500)
+
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Network_SecurityGroup',
+                                'detachNetworkComponents',
+                                identifier=100, args=([500],))
+
+    def test_detach_securitygroup_components(self):
+        result = self.network.detach_securitygroup_components(100,
+                                                              [500, 600])
+
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Network_SecurityGroup',
+                                'detachNetworkComponents',
+                                identifier=100, args=([500, 600],))
 
     def test_edit_rwhois(self):
         result = self.network.edit_rwhois(
@@ -129,11 +222,36 @@ class NetworkTests(testing.TestCase):
                                 identifier='id',
                                 args=(expected,))
 
+    def test_edit_securitygroup(self):
+        result = self.network.edit_securitygroup(100, name='foobar')
+
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Network_SecurityGroup',
+                                'editObjects',
+                                args=([{'id': 100,
+                                        'name': 'foobar'}],))
+
+    def test_edit_securitygroup_rule(self):
+        result = self.network.edit_securitygroup_rule(100, 500,
+                                                      direction='ingress')
+
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Network_SecurityGroup',
+                                'editRules', identifier=100,
+                                args=([{'id': 500,
+                                        'direction': 'ingress'}],))
+
     def test_get_rwhois(self):
         result = self.network.get_rwhois()
 
         self.assertEqual(result, fixtures.SoftLayer_Account.getRwhoisData)
         self.assert_called_with('SoftLayer_Account', 'getRwhoisData')
+
+    def test_get_securitygroup(self):
+        result = self.network.get_securitygroup(100)
+
+        sg_fixture = fixtures.SoftLayer_Network_SecurityGroup
+        self.assertEqual(sg_fixture.getObject, result)
 
     def test_get_subnet(self):
         result = self.network.get_subnet(9876)
@@ -239,6 +357,36 @@ class NetworkTests(testing.TestCase):
         }
         self.assert_called_with('SoftLayer_Account', 'getNetworkVlans',
                                 filter=_filter)
+
+    def test_list_securitygroups(self):
+        result = self.network.list_securitygroups()
+
+        sg_fixture = fixtures.SoftLayer_Network_SecurityGroup
+        self.assertEqual(sg_fixture.getAllObjects, result)
+
+    def test_list_securitygroup_rules(self):
+        result = self.network.list_securitygroup_rules(100)
+
+        sg_fixture = fixtures.SoftLayer_Network_SecurityGroup
+        self.assert_called_with('SoftLayer_Network_SecurityGroup',
+                                'getRules', identifier=100)
+        self.assertEqual(sg_fixture.getRules, result)
+
+    def test_remove_securitygroup_rule(self):
+        result = self.network.remove_securitygroup_rule(100, 500)
+
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Network_SecurityGroup',
+                                'removeRules', identifier=100,
+                                args=([500],))
+
+    def test_remove_securitygroup_rules(self):
+        result = self.network.remove_securitygroup_rules(100, [500, 600])
+
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Network_SecurityGroup',
+                                'removeRules', identifier=100,
+                                args=([500, 600],))
 
     def test_summary_by_datacenter(self):
         result = self.network.summary_by_datacenter()

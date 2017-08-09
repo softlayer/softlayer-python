@@ -77,6 +77,20 @@ def cli(env, identifier, passwords=False, price=False):
             vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
     table.add_row(['vlans', vlan_table])
 
+    if result.get('networkComponents'):
+        secgroup_table = formatting.Table(['interface', 'id', 'name'])
+        has_secgroups = False
+        for comp in result.get('networkComponents'):
+            interface = 'PRIVATE' if comp['port'] == 0 else 'PUBLIC'
+            for binding in comp['securityGroupBindings']:
+                has_secgroups = True
+                secgroup = binding['securityGroup']
+                secgroup_table.add_row([
+                    interface, secgroup['id'],
+                    secgroup.get('name') or formatting.blank()])
+        if has_secgroups:
+            table.add_row(['security_groups', secgroup_table])
+
     if result.get('notes'):
         table.add_row(['notes', result['notes']])
 

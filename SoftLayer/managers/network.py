@@ -49,6 +49,7 @@ class NetworkManager(object):
         self.vlan = client['Network_Vlan']
         self.subnet = client['Network_Subnet']
         self.network_storage = self.client['Network_Storage']
+        self.security_group = self.client['Network_SecurityGroup']
 
     def add_global_ip(self, version=4, test_order=False):
         """Adds a global IP address to the account.
@@ -61,6 +62,47 @@ class NetworkManager(object):
         # interface is not intuitive.
         return self.add_subnet('global', version=version,
                                test_order=test_order)
+
+    def add_securitygroup_rule(self, group_id, remote_ip=None,
+                               remote_group=None, direction=None,
+                               ethertype=None, port_max=None,
+                               port_min=None, protocol=None):
+        """Add a rule to a security group
+
+        :param int group_id: The ID of the security group to add this rule to
+        :param str remote_ip: The remote IP or CIDR to enforce the rule on
+        :param int remote_group: The remote security group ID to enforce
+                                 the rule on
+        :param str direction: The direction to enforce (egress or ingress)
+        :param str ethertype: The ethertype to enforce (IPv4 or IPv6)
+        :param int port_max: The upper port bound to enforce
+        :param int port_min: The lower port bound to enforce
+        :param str protocol: The protocol to enforce (icmp, udp, tcp)
+        """
+        rule = {'direction': direction}
+        if ethertype is not None:
+            rule['ethertype'] = ethertype
+        if port_max is not None:
+            rule['portRangeMax'] = port_max
+        if port_min is not None:
+            rule['portRangeMin'] = port_min
+        if protocol is not None:
+            rule['protocol'] = protocol
+        if remote_ip is not None:
+            rule['remoteIp'] = remote_ip
+        if remote_group is not None:
+            rule['remoteGroupId'] = remote_group
+        return self.add_securitygroup_rules(group_id, [rule])
+
+    def add_securitygroup_rules(self, group_id, rules):
+        """Add rules to a security group
+
+        :param int group_id: The ID of the security group to add the rules to
+        :param list rules: The list of rule dictionaries to add
+        """
+        if not isinstance(rules, list):
+            raise TypeError("The rules provided must be a list of dictionaries")
+        return self.security_group.addRules(rules, id=group_id)
 
     def add_subnet(self, subnet_type, quantity=None, vlan_id=None, version=4,
                    test_order=False):
@@ -135,6 +177,24 @@ class NetworkManager(object):
         return self.client['Network_Subnet_IpAddress_Global'].route(
             target, id=global_ip_id)
 
+    def attach_securitygroup_component(self, group_id, component_id):
+        """Attaches a network component to a security group.
+
+        :param int group_id: The ID of the security group
+        :param int component_id: The ID of the network component to attach
+        """
+        return self.attach_securitygroup_components(group_id,
+                                                    [component_id])
+
+    def attach_securitygroup_components(self, group_id, component_ids):
+        """Attaches network components to a security group.
+
+        :param int group_id: The ID of the security group
+        :param list component_ids: The IDs of the network components to attach
+        """
+        return self.security_group.attachNetworkComponents(component_ids,
+                                                           id=group_id)
+
     def cancel_global_ip(self, global_ip_id):
         """Cancels the specified global IP address.
 
@@ -157,6 +217,41 @@ class NetworkManager(object):
                                             " " % subnet_id)
         billing_id = subnet['billingItem']['id']
         return self.client['Billing_Item'].cancelService(id=billing_id)
+
+    def create_securitygroup(self, name=None, description=None):
+        """Creates a security group.
+
+        :param string name: The name of the security group
+        :param string description: The description of the security group
+        """
+
+        create_dict = {'name': name, 'description': description}
+        return self.security_group.createObjects([create_dict])[0]
+
+    def delete_securitygroup(self, group_id):
+        """Deletes the specified security group.
+
+        :param int group_id: The ID of the security group
+        """
+        delete_dict = {'id': group_id}
+        return self.security_group.deleteObjects([delete_dict])
+
+    def detach_securitygroup_component(self, group_id, component_id):
+        """Detaches a network component from a security group.
+
+        :param int group_id: The ID of the security group
+        :param int component_id: The ID of the component to detach
+        """
+        return self.detach_securitygroup_components(group_id, [component_id])
+
+    def detach_securitygroup_components(self, group_id, component_ids):
+        """Detaches network components from a security group.
+
+        :param int group_id: The ID of the security group
+        :param list component_ids: The IDs of the network components to detach
+        """
+        return self.security_group.detachNetworkComponents(component_ids,
+                                                           id=group_id)
 
     def edit_rwhois(self, abuse_email=None, address1=None, address2=None,
                     city=None, company_name=None, country=None,
@@ -186,6 +281,66 @@ class NetworkManager(object):
 
         return True
 
+    def edit_securitygroup(self, group_id, name=None, description=None):
+        """Edit security group details.
+
+        :param int group_id: The ID of the security group
+        :param string name: The name of the security group
+        :param string description: The description of the security group
+        """
+        successful = False
+        obj = {}
+        if name:
+            obj['name'] = name
+        if description:
+            obj['description'] = description
+
+        if obj:
+            obj['id'] = group_id
+            successful = self.security_group.editObjects([obj])
+
+        return successful
+
+    def edit_securitygroup_rule(self, group_id, rule_id, remote_ip=None,
+                                remote_group=None, direction=None,
+                                ethertype=None, port_max=None,
+                                port_min=None, protocol=None):
+        """Edit a security group rule.
+
+        :param int group_id: The ID of the security group the rule belongs to
+        :param int rule_id: The ID of the rule to edit
+        :param str remote_ip: The remote IP or CIDR to enforce the rule on
+        :param int remote_group: The remote security group ID to enforce
+                                          the rule on
+        :param str direction: The direction to enforce (egress or ingress)
+        :param str ethertype: The ethertype to enforce (IPv4 or IPv6)
+        :param str port_max: The upper port bound to enforce
+        :param str port_min: The lower port bound to enforce
+        :param str protocol: The protocol to enforce (icmp, udp, tcp)
+        """
+        successful = False
+        obj = {}
+        if remote_ip:
+            obj['remoteIp'] = remote_ip
+        if remote_group:
+            obj['remoteGroupId'] = remote_group
+        if direction:
+            obj['direction'] = direction
+        if ethertype:
+            obj['ethertype'] = ethertype
+        if port_max:
+            obj['portRangeMax'] = port_max
+        if port_min:
+            obj['portRangeMin'] = port_min
+        if protocol:
+            obj['protocol'] = protocol
+
+        if obj:
+            obj['id'] = rule_id
+            successful = self.security_group.editRules([obj], id=group_id)
+
+        return successful
+
     def ip_lookup(self, ip_address):
         """Looks up an IP address and returns network information about it.
 
@@ -202,6 +357,36 @@ class NetworkManager(object):
         :returns: A dictionary containing the account's RWhois information.
         """
         return self.account.getRwhoisData()
+
+    def get_securitygroup(self, group_id, **kwargs):
+        """Returns the information about the given security group.
+
+        :param string id: The ID for the security group
+        :returns: A diction of information about the security group
+        """
+        if 'mask' not in kwargs:
+            kwargs['mask'] = (
+                'id,'
+                'name,'
+                'description,'
+                '''rules[id, remoteIp, remoteGroupId,
+                         direction, ethertype, portRangeMin,
+                         portRangeMax, protocol],'''
+                '''networkComponentBindings[
+                    networkComponent[
+                        id,
+                        port,
+                        guest[
+                            id,
+                            hostname,
+                            primaryBackendIpAddress,
+                            primaryIpAddress
+                        ]
+                    ]
+                ]'''
+            )
+
+        return self.security_group.getObject(id=group_id, **kwargs)
 
     def get_subnet(self, subnet_id, **kwargs):
         """Returns information about a single subnet.
@@ -329,6 +514,33 @@ class NetworkManager(object):
             kwargs['mask'] = DEFAULT_VLAN_MASK
 
         return self.account.getNetworkVlans(**kwargs)
+
+    def list_securitygroups(self, **kwargs):
+        """List security groups."""
+        return self.security_group.getAllObjects(**kwargs)
+
+    def list_securitygroup_rules(self, group_id):
+        """List security group rules associated with a security group.
+
+        :param int group_id: The security group to list rules for
+        """
+        return self.security_group.getRules(id=group_id)
+
+    def remove_securitygroup_rule(self, group_id, rule_id):
+        """Remove a rule from a security group.
+
+        :param int group_id: The ID of the security group
+        :param int rule_id: The ID of the rule to remove
+        """
+        return self.remove_securitygroup_rules(group_id, [rule_id])
+
+    def remove_securitygroup_rules(self, group_id, rules):
+        """Remove rules from a security group.
+
+        :param int group_id: The ID of the security group
+        :param list rules: The list of IDs to remove
+        """
+        return self.security_group.removeRules(rules, id=group_id)
 
     def resolve_global_ip_ids(self, identifier):
         """Resolve global ip ids."""

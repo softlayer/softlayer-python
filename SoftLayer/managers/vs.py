@@ -192,7 +192,9 @@ class VSManager(utils.IdentifierMixin, object):
                 'primaryIpAddress,'
                 '''networkComponents[id, status, speed, maxSpeed, name,
                                      macAddress, primaryIpAddress, port,
-                                     primarySubnet],'''
+                                     primarySubnet,
+                                     securityGroupBindings[
+                                        securityGroup[id, name]]],'''
                 'lastKnownPowerState.name,'
                 'powerState,'
                 'status,'
@@ -296,7 +298,8 @@ class VSManager(utils.IdentifierMixin, object):
             datacenter=None, os_code=None, image_id=None,
             dedicated=False, public_vlan=None, private_vlan=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
-            private=False, ssh_keys=None):
+            private=False, ssh_keys=None, public_security_groups=None,
+            private_security_groups=None):
         """Returns a dict appropriate to pass into Virtual_Guest::createObject
 
             See :func:`create_instance` for a list of available options.
@@ -347,6 +350,20 @@ class VSManager(utils.IdentifierMixin, object):
             data.update({
                 "primaryBackendNetworkComponent": {
                     "networkVlan": {"id": int(private_vlan)}}})
+
+        if public_security_groups:
+            secgroups = [{'securityGroup': {'id': int(sg)}}
+                         for sg in public_security_groups]
+            pnc = data.get('primaryNetworkComponent', {})
+            pnc['securityGroupBindings'] = secgroups
+            data.update({'primaryNetworkComponent': pnc})
+
+        if private_security_groups:
+            secgroups = [{'securityGroup': {'id': int(sg)}}
+                         for sg in private_security_groups]
+            pbnc = data.get('primaryBackendNetworkComponent', {})
+            pbnc['securityGroupBindings'] = secgroups
+            data.update({'primaryBackendNetworkComponent': pbnc})
 
         if userdata:
             data['userData'] = [{'value': userdata}]
@@ -504,7 +521,8 @@ class VSManager(utils.IdentifierMixin, object):
                 'disks': ('100','25'),
                 'local_disk': True,
                 'memory': 1024,
-                'tags': 'test, pleaseCancel'
+                'tags': 'test, pleaseCancel',
+                'public_security_groups': [12, 15]
             }
 
             vsi = mgr.create_instance(**new_vsi)
@@ -530,6 +548,10 @@ class VSManager(utils.IdentifierMixin, object):
                                incur a fee on your account.
         :param int public_vlan: The ID of the public VLAN on which you want
                                 this VS placed.
+        :param list public_security_groups: The list of security group IDs
+                                            to apply to the public interface
+        :param list private_security_groups: The list of security group IDs
+                                             to apply to the private interface
         :param int private_vlan: The ID of the private VLAN on which you want
                                  this VS placed.
         :param list disks: A list of disk capacities for this server.
@@ -573,7 +595,8 @@ class VSManager(utils.IdentifierMixin, object):
                 'disks': ('100','25'),
                 'local_disk': True,
                 'memory': 1024,
-                'tags': 'test, pleaseCancel'
+                'tags': 'test, pleaseCancel',
+                'public_security_groups': [12, 15]
             }
 
             # using .copy() so we can make changes to individual nodes
