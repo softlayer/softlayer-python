@@ -15,8 +15,9 @@ from SoftLayer.CLI import exceptions
               required=True)
 @click.option('--tier',
               help='Endurance Storage Tier (IOPS per GB) of the block'
-              ' volume for which space is ordered [optional]',
-              type=click.Choice(['0.25', '2', '4']))
+              ' volume for which space is ordered [optional, and only'
+              ' valid for endurance storage volumes]',
+              type=click.Choice(['0.25', '2', '4', '10']))
 @click.option('--upgrade',
               type=bool,
               help='Flag to indicate that the order is an upgrade',

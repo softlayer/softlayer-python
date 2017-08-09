@@ -48,9 +48,17 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
               help='Optional parameter for ordering snapshot '
               'space along with endurance block storage; specifies '
               'the size (in GB) of snapshot space to order')
+@click.option('--service-offering',
+              help='The service offering package to use for placing '
+              'the order [optional, default is \'storage_as_a_service\']',
+              default='storage_as_a_service',
+              type=click.Choice([
+                  'storage_as_a_service',
+                  'enterprise',
+                  'performance']))
 @environment.pass_env
 def cli(env, storage_type, size, iops, tier, os_type,
-        location, snapshot_size):
+        location, snapshot_size, service_offering):
     """Order a block storage volume."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
     storage_type = storage_type.lower()
@@ -60,28 +68,26 @@ def cli(env, storage_type, size, iops, tier, os_type,
             raise exceptions.CLIAbort(
                 'Option --iops required with Performance')
 
-        if iops < 100 or iops > 6000:
-            raise exceptions.CLIAbort(
-                'Option --iops must be between 100 and 6000, inclusive')
-
         if iops % 100 != 0:
             raise exceptions.CLIAbort(
                 'Option --iops must be a multiple of 100'
             )
 
-        if snapshot_size is not None:
+        if service_offering == 'performance' and snapshot_size is not None:
             raise exceptions.CLIAbort(
-                'Option --snapshot-size not allowed for performance volumes.'
-                'Snapshots are only available for endurance storage.'
+                '--snapshot-size is not available for performance volumes '
+                'ordered with the \'performance\' service offering option'
             )
 
         try:
             order = block_manager.order_block_volume(
-                storage_type='performance_storage_iscsi',
+                storage_type=storage_type,
                 location=location,
                 size=int(size),
                 iops=iops,
-                os_type=os_type
+                os_type=os_type,
+                snapshot_size=snapshot_size,
+                service_offering=service_offering
             )
         except ValueError as ex:
             raise exceptions.ArgumentError(str(ex))
@@ -95,12 +101,13 @@ def cli(env, storage_type, size, iops, tier, os_type,
 
         try:
             order = block_manager.order_block_volume(
-                storage_type='storage_service_enterprise',
+                storage_type=storage_type,
                 location=location,
                 size=int(size),
                 tier_level=float(tier),
                 os_type=os_type,
-                snapshot_size=snapshot_size
+                snapshot_size=snapshot_size,
+                service_offering=service_offering
             )
         except ValueError as ex:
             raise exceptions.ArgumentError(str(ex))

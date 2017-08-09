@@ -156,134 +156,515 @@ HARDWARE_ITEMS = [
                  'sort': 99}]}]
 
 
+ENTERPRISE_PACKAGE = {
+    'categories': [
+        {'categoryCode': 'storage_service_enterprise'}
+    ],
+    'id': 240,
+    'name': 'Endurance',
+    'items': [
+        {
+            'capacity': '0',
+            'itemCategory': {'categoryCode': 'storage_service_enterprise'},
+            'keyName': 'CODENAME_PRIME_STORAGE_SERVICE',
+            'prices': [
+                {
+                    'categories': [
+                        {'categoryCode': 'storage_service_enterprise'}
+                    ],
+                    'id': 45058,
+                    'locationGroupId': ''
+                }
+            ]
+        }, {
+            'capacity': '0',
+            'itemCategory': {'categoryCode': 'storage_file'},
+            'keyName': 'FILE_STORAGE_2',
+            'prices': [
+                {
+                    'categories': [
+                        {'categoryCode': 'storage_file'}
+                    ],
+                    'id': 45108,
+                    'locationGroupId': ''
+                }
+            ]
+        }, {
+            'capacity': '0',
+            'itemCategory': {'categoryCode': 'storage_block'},
+            'keyName': 'BLOCK_STORAGE_2',
+            'prices': [
+                {
+                    'categories': [
+                        {'categoryCode': 'storage_block'}
+                    ],
+                    'id': 45098,
+                    'locationGroupId': ''
+                }
+            ]
+        }, {
+            'capacity': '10',
+            'itemCategory': {'categoryCode': 'performance_storage_space'},
+            'keyName': '10_GB_STORAGE_SPACE',
+            'prices': [
+                {
+                    'capacityRestrictionMaximum': '200',
+                    'capacityRestrictionMinimum': '200',
+                    'capacityRestrictionType': 'STORAGE_TIER_LEVEL',
+                    'categories': [
+                        {'categoryCode': 'storage_snapshot_space'}
+                    ],
+                    'id': 46160,
+                    'locationGroupId': ''
+                }, {
+                    'capacityRestrictionMaximum': '300',
+                    'capacityRestrictionMinimum': '300',
+                    'capacityRestrictionType': 'STORAGE_TIER_LEVEL',
+                    'categories': [
+                        {'categoryCode': 'storage_snapshot_space'}
+                    ],
+                    'id': 46170,
+                    'locationGroupId': ''
+                }
+            ]
+        }, {
+            'capacity': '20',
+            'itemCategory': {'categoryCode': 'performance_storage_space'},
+            'keyName': '20_GB_PERFORMANCE_STORAGE_SPACE',
+            'prices': [
+                {
+                    'capacityRestrictionMaximum': '200',
+                    'capacityRestrictionMinimum': '200',
+                    'capacityRestrictionType': 'STORAGE_TIER_LEVEL',
+                    'categories': [
+                        {'categoryCode': 'storage_snapshot_space'}
+                    ],
+                    'id': 45860,
+                    'locationGroupId': ''
+                }, {
+                    'capacityRestrictionMaximum': '200',
+                    'capacityRestrictionMinimum': '200',
+                    'capacityRestrictionType': 'STORAGE_TIER_LEVEL',
+                    'categories': [
+                        {'categoryCode': 'performance_storage_replication'}
+                    ],
+                    'id': 46659,
+                    'locationGroupId': ''
+                }, {
+                    'capacityRestrictionMaximum': '200',
+                    'capacityRestrictionMinimum': '200',
+                    'capacityRestrictionType': 'STORAGE_TIER_LEVEL',
+                    'categories': [
+                        {'categoryCode': 'performance_storage_space'}
+                    ],
+                    'id': 45128,
+                    'locationGroupId': ''
+                }
+            ]
+        }, {
+            'capacity': '1000',
+            'itemCategory': {'categoryCode': 'performance_storage_space'},
+            'keyName': '1000_GB_PERFORMANCE_STORAGE_SPACE',
+            'prices': [
+                {
+                    'capacityRestrictionMaximum': '300',
+                    'capacityRestrictionMinimum': '300',
+                    'capacityRestrictionType': 'STORAGE_TIER_LEVEL',
+                    'categories': [
+                        {'categoryCode': 'performance_storage_replication'}
+                    ],
+                    'id': 46789,
+                    'locationGroupId': ''
+                }, {
+                    'capacityRestrictionMaximum': '300',
+                    'capacityRestrictionMinimum': '300',
+                    'capacityRestrictionType': 'STORAGE_TIER_LEVEL',
+                    'categories': [
+                        {'categoryCode': 'performance_storage_space'}
+                    ],
+                    'id': 45318,
+                    'locationGroupId': ''
+                }
+            ]
+        }, {
+            'attributes': [
+                {'value': '300'}
+            ],
+            'capacity': '300',
+            'itemCategory': {'categoryCode': 'storage_tier_level'},
+            'keyName': 'WRITEHEAVY_TIER',
+            'prices': [
+                {
+                    'categories': [
+                        {'categoryCode': 'storage_tier_level'}
+                    ],
+                    'id': 45088,
+                    'locationGroupId': ''
+                }
+            ]
+        }, {
+            'attributes': [
+                {'value': '200'}
+            ],
+            'capacity': '200',
+            'itemCategory': {'categoryCode': 'storage_tier_level'},
+            'keyName': 'READHEAVY_TIER',
+            'prices': [
+                {
+                    'categories': [
+                        {'categoryCode': 'storage_tier_level'}
+                    ],
+                    'id': 45078,
+                    'locationGroupId': ''
+                }
+            ]
+        }
+    ]
+}
+
+
+PERFORMANCE_PACKAGE = {
+    'categories': [
+        {'categoryCode': 'performance_storage_iscsi'},
+        {'categoryCode': 'performance_storage_nfs'}
+    ],
+    'id': 222,
+    'name': 'Performance',
+    'items': [
+        {
+            'capacity': '0',
+            'itemCategory': {'categoryCode': 'performance_storage_iscsi'},
+            'keyName': 'BLOCK_STORAGE_PERFORMANCE_ISCSI',
+            'prices': [
+                {
+                    'categories': [
+                        {'categoryCode': 'performance_storage_iscsi'}
+                    ],
+                    'id': 40672,
+                    'locationGroupId': ''
+                }
+            ]
+        }, {
+            'capacity': '0',
+            'itemCategory': {'categoryCode': 'performance_storage_nfs'},
+            'keyName': 'FILE_STORAGE_PERFORMANCE_NFS',
+            'prices': [
+                {
+                    'categories': [
+                        {'categoryCode': 'performance_storage_nfs'}
+                    ],
+                    'id': 40662,
+                    'locationGroupId': ''
+                }
+            ]
+        }, {
+            'capacity': '20',
+            'itemCategory': {'categoryCode': 'performance_storage_space'},
+            'keyName': '20_GB_PERFORMANCE_STORAGE_SPACE',
+            'prices': [
+                {
+                    'categories': [
+                        {'categoryCode': 'performance_storage_space'}
+                    ],
+                    'id': 40682,
+                    'locationGroupId': ''
+                }
+            ]
+        }, {
+            'capacity': '1000',
+            'itemCategory': {'categoryCode': 'performance_storage_space'},
+            'keyName': '1000_GB_PERFORMANCE_STORAGE_SPACE',
+            'prices': [
+                {
+                    'categories': [
+                        {'categoryCode': 'performance_storage_space'}
+                    ],
+                    'id': 40742,
+                    'locationGroupId': ''
+                }
+            ]
+        }, {
+            'capacity': '800',
+            'itemCategory': {'categoryCode': 'performance_storage_iops'},
+            'keyName': '800_IOPS_4',
+            'prices': [
+                {
+                    'capacityRestrictionMaximum': '1000',
+                    'capacityRestrictionMinimum': '100',
+                    'capacityRestrictionType': 'STORAGE_SPACE',
+                    'categories': [
+                        {'categoryCode': 'performance_storage_iops'}
+                    ],
+                    'id': 41562,
+                    'locationGroupId': ''
+                }
+            ]
+        }, {
+            'capacity': '1000',
+            'itemCategory': {'categoryCode': 'performance_storage_iops'},
+            'keyName': '1000_IOPS',
+            'prices': [
+                {
+                    'capacityRestrictionMaximum': '20',
+                    'capacityRestrictionMinimum': '20',
+                    'capacityRestrictionType': 'STORAGE_SPACE',
+                    'categories': [
+                        {'categoryCode': 'performance_storage_iops'}
+                    ],
+                    'id': 40882,
+                    'locationGroupId': ''
+                }
+            ]
+        }
+    ]
+}
+
+
 SAAS_PACKAGE = {
+    'categories': [
+        {'categoryCode': 'storage_as_a_service'}
+    ],
     'id': 759,
     'name': 'Storage As A Service (StaaS)',
-    'categories': [{'categoryCode': 'storage_as_a_service'}],
     'items': [
         {
             'capacity': '0',
             'keyName': '',
-            'prices': [{'id': 189433,
-                        'categories': [{
-                            'categoryCode': 'storage_as_a_service'}],
-                        'locationGroupId': ''}]
+            'prices': [
+                {
+                    'id': 189433,
+                    'categories': [
+                        {'categoryCode': 'storage_as_a_service'}
+                    ],
+                    'locationGroupId': ''
+                }
+            ]
         }, {
             'capacity': '0',
             'keyName': '',
-            'prices': [{'categories': [{'categoryCode': 'storage_block'}],
-                        'id': 189443,
-                        'locationGroupId': ''}]
+            'prices': [
+                {
+                    'categories': [
+                        {'categoryCode': 'storage_block'}
+                    ],
+                    'id': 189443,
+                    'locationGroupId': ''
+                }
+            ]
         }, {
             'capacity': '0',
             'keyName': '',
-            'prices': [{'categories': [{'categoryCode': 'storage_file'}],
-                        'id': 189453,
-                        'locationGroupId': ''}]
+            'prices': [
+                {
+                    'categories': [
+                        {'categoryCode': 'storage_file'}
+                    ],
+                    'id': 189453,
+                    'locationGroupId': ''
+                }
+            ]
         }, {
             'capacity': '0',
             'capacityMaximum': '999',
             'capacityMinimum': '500',
             'itemCategory': {'categoryCode': 'performance_storage_space'},
             'keyName': '500_999_GBS',
-            'prices': [{'id': 189993,
-                        'categories': [{
-                            'categoryCode': 'performance_storage_space'}],
-                        'locationGroupId': ''}]
+            'prices': [
+                {
+                    'id': 189993,
+                    'categories': [
+                        {'categoryCode': 'performance_storage_space'}
+                    ],
+                    'locationGroupId': ''
+                }
+            ]
         }, {
             'capacity': '0',
             'capacityMaximum': '1999',
             'capacityMinimum': '1000',
             'itemCategory': {'categoryCode': 'performance_storage_space'},
             'keyName': '1000_1999_GBS',
-            'prices': [{'id': 190113,
-                        'categories': [{
-                            'categoryCode': 'performance_storage_space'}],
-                        'locationGroupId': ''}]
+            'prices': [
+                {
+                    'id': 190113,
+                    'categories': [
+                        {'categoryCode': 'performance_storage_space'}
+                    ],
+                    'locationGroupId': ''
+                }
+            ]
         }, {
             'capacity': '0',
             'capacityMaximum': '12000',
             'capacityMinimum': '1',
             'keyName': 'STORAGE_SPACE_FOR_2_IOPS_PER_GB',
-            'prices': [{'id': 193433,
-                        'categories': [{
-                            'categoryCode': 'performance_storage_space'}],
-                        'locationGroupId': ''}]
+            'prices': [
+                {
+                    'id': 193433,
+                    'categories': [
+                        {'categoryCode': 'performance_storage_space'}
+                    ],
+                    'locationGroupId': ''
+                }
+            ]
         }, {
             'capacity': '0',
             'capacityMaximum': '12000',
             'capacityMinimum': '1',
             'keyName': 'STORAGE_SPACE_FOR_4_IOPS_PER_GB',
-            'prices': [{'id': 194763,
-                        'categories': [{
-                            'categoryCode': 'performance_storage_space'}],
-                        'locationGroupId': ''}]
+            'prices': [
+                {
+                    'id': 194763,
+                    'categories': [
+                        {'categoryCode': 'performance_storage_space'}
+                    ],
+                    'locationGroupId': ''
+                }
+            ]
         }, {
             'capacity': '0',
             'capacityMaximum': '10000',
             'capacityMinimum': '100',
             'keyName': '',
             'itemCategory': {'categoryCode': 'performance_storage_iops'},
-            'prices': [{'capacityRestrictionMaximum': '999',
-                        'capacityRestrictionMinimum': '500',
-                        'capacityRestrictionType': 'STORAGE_SPACE',
-                        'categories': [{
-                            'categoryCode': 'performance_storage_iops'}],
-                        'id': 190053,
-                        'locationGroupId': ''}]
+            'prices': [
+                {
+                    'capacityRestrictionMaximum': '999',
+                    'capacityRestrictionMinimum': '500',
+                    'capacityRestrictionType': 'STORAGE_SPACE',
+                    'categories': [
+                        {'categoryCode': 'performance_storage_iops'}
+                    ],
+                    'id': 190053,
+                    'locationGroupId': ''
+                }
+            ]
         }, {
             'capacity': '0',
             'capacityMaximum': '20000',
             'capacityMinimum': '100',
             'keyName': '',
             'itemCategory': {'categoryCode': 'performance_storage_iops'},
-            'prices': [{'capacityRestrictionMaximum': '1999',
-                        'capacityRestrictionMinimum': '1000',
-                        'capacityRestrictionType': 'STORAGE_SPACE',
-                        'categories': [{
-                            'categoryCode': 'performance_storage_iops'}],
-                        'id': 190173,
-                        'locationGroupId': ''}]
+            'prices': [
+                {
+                    'capacityRestrictionMaximum': '1999',
+                    'capacityRestrictionMinimum': '1000',
+                    'capacityRestrictionType': 'STORAGE_SPACE',
+                    'categories': [
+                        {'categoryCode': 'performance_storage_iops'}
+                    ],
+                    'id': 190173,
+                    'locationGroupId': ''
+                }
+            ]
         }, {
             'capacity': '200',
             'itemCategory': {'categoryCode': 'storage_tier_level'},
             'keyName': '',
-            'prices': [{'id': 193373,
-                        'categories': [{
-                            'categoryCode': 'storage_tier_level'}],
-                        'locationGroupId': ''}]
+            'prices': [
+                {
+                    'id': 193373,
+                    'categories': [
+                        {'categoryCode': 'storage_tier_level'}
+                    ],
+                    'locationGroupId': ''
+                }
+            ]
         }, {
             'capacity': '300',
             'itemCategory': {'categoryCode': 'storage_tier_level'},
             'keyName': '',
-            'prices': [{'id': 194703,
-                        'categories': [{
-                            'categoryCode': 'storage_tier_level'}],
-                        'locationGroupId': ''}]
+            'prices': [
+                {
+                    'id': 194703,
+                    'categories': [
+                        {'categoryCode': 'storage_tier_level'}
+                    ],
+                    'locationGroupId': ''
+                }
+            ]
         }, {
             'capacity': '10',
             'keyName': '',
-            'prices': [{'capacityRestrictionMaximum': '48000',
-                        'capacityRestrictionMinimum': '100',
-                        'capacityRestrictionType': 'IOPS',
-                        'categories': [{
-                            'categoryCode': 'storage_snapshot_space'}],
-                        'id': 191193,
-                        'locationGroupId': ''},
-                       {'capacityRestrictionMaximum': '200',
-                        'capacityRestrictionMinimum': '200',
-                        'capacityRestrictionType': 'STORAGE_TIER_LEVEL',
-                        'categories': [{
-                            'categoryCode': 'storage_snapshot_space'}],
-                        'id': 193613,
-                        'locationGroupId': ''},
-                       {'capacityRestrictionMaximum': '300',
-                        'capacityRestrictionMinimum': '300',
-                        'capacityRestrictionType': 'STORAGE_TIER_LEVEL',
-                        'categories': [{
-                            'categoryCode': 'storage_snapshot_space'}],
-                        'id': 194943,
-                        'locationGroupId': ''}]
+            'prices': [
+                {
+                    'capacityRestrictionMaximum': '48000',
+                    'capacityRestrictionMinimum': '100',
+                    'capacityRestrictionType': 'IOPS',
+                    'categories': [
+                        {'categoryCode': 'storage_snapshot_space'}
+                    ],
+                    'id': 191193,
+                    'locationGroupId': ''
+                }, {
+                    'capacityRestrictionMaximum': '200',
+                    'capacityRestrictionMinimum': '200',
+                    'capacityRestrictionType': 'STORAGE_TIER_LEVEL',
+                    'categories': [
+                        {'categoryCode': 'storage_snapshot_space'}
+                    ],
+                    'id': 193613,
+                    'locationGroupId': ''
+                }, {
+                    'capacityRestrictionMaximum': '300',
+                    'capacityRestrictionMinimum': '300',
+                    'capacityRestrictionType': 'STORAGE_TIER_LEVEL',
+                    'categories': [
+                        {'categoryCode': 'storage_snapshot_space'}
+                    ],
+                    'id': 194943,
+                    'locationGroupId': ''}]
+        }, {
+            'capacity': '20',
+            'keyName': '',
+            'prices': [
+                {
+                    'capacityRestrictionMaximum': '200',
+                    'capacityRestrictionMinimum': '200',
+                    'capacityRestrictionType': 'STORAGE_TIER_LEVEL',
+                    'categories': [
+                        {'categoryCode': 'storage_snapshot_space'}
+                    ],
+                    'id': 193853,
+                    'locationGroupId': ''
+                }
+            ]
+        }, {
+            'capacity': '0',
+            'itemCategory': {
+                'categoryCode': 'performance_storage_replication'
+            },
+            'keyName': 'REPLICATION_FOR_IOPSBASED_PERFORMANCE',
+            'prices': [
+                {
+                    'capacityRestrictionMaximum': '48000',
+                    'capacityRestrictionMinimum': '1',
+                    'capacityRestrictionType': 'IOPS',
+                    'categories': [
+                        {'categoryCode': 'performance_storage_replication'}
+                    ],
+                    'id': 192033,
+                    'locationGroupId': ''
+                }
+            ]
+        }, {
+            'capacity': '0',
+            'itemCategory': {
+                'categoryCode': 'performance_storage_replication'
+            },
+            'keyName': 'REPLICATION_FOR_TIERBASED_PERFORMANCE',
+            'prices': [
+                {
+                    'capacityRestrictionMaximum': '200',
+                    'capacityRestrictionMinimum': '200',
+                    'capacityRestrictionType': 'STORAGE_TIER_LEVEL',
+                    'categories': [
+                        {'categoryCode': 'performance_storage_replication'}
+                    ],
+                    'id': 194693,
+                    'locationGroupId': ''
+                }
+            ]
         }
     ]
 }
