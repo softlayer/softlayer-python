@@ -294,7 +294,8 @@ class FileTests(testing.TestCase):
                         'serviceResource.datacenter[name],'\
                         'serviceResourceBackendIpAddress,'\
                         'activeTransactionCount,'\
-                        'fileNetworkMountAddress'
+                        'fileNetworkMountAddress,'\
+                        'replicationPartnerCount'
 
         self.assert_called_with(
             'SoftLayer_Account',
@@ -335,7 +336,8 @@ class FileTests(testing.TestCase):
                         'serviceResource.datacenter[name],'\
                         'serviceResourceBackendIpAddress,'\
                         'activeTransactionCount,'\
-                        'fileNetworkMountAddress'
+                        'fileNetworkMountAddress,'\
+                        'replicationPartnerCount'
 
         self.assert_called_with(
             'SoftLayer_Account',

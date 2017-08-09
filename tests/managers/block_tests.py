@@ -87,7 +87,8 @@ class BlockTests(testing.TestCase):
                         'bytesUsed,'\
                         'serviceResource.datacenter[name],'\
                         'serviceResourceBackendIpAddress,'\
-                        'activeTransactionCount'
+                        'activeTransactionCount,'\
+                        'replicationPartnerCount'
 
         self.assert_called_with(
             'SoftLayer_Account',
@@ -128,7 +129,8 @@ class BlockTests(testing.TestCase):
                         'bytesUsed,'\
                         'serviceResource.datacenter[name],'\
                         'serviceResourceBackendIpAddress,'\
-                        'activeTransactionCount'
+                        'activeTransactionCount,'\
+                        'replicationPartnerCount'
 
         self.assert_called_with(
             'SoftLayer_Account',
