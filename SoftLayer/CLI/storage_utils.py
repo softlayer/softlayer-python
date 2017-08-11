@@ -51,7 +51,7 @@ allowedIpAddresses.primaryBackendIpAddress
 """),
     column_helper.Column(
         'source_subnet',
-        ('allowedHost','sourceSubnet',),
+        ('allowedHost', 'sourceSubnet',),
         """
 allowedVirtualGuests.allowedHost.sourceSubnet
 allowedHardware.allowedHost.sourceSubnet
