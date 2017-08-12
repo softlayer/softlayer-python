@@ -181,50 +181,6 @@ class BlockTests(testing.TestCase):
                          ' > 0.25 IOPS per GB\n > 20 GB Storage Space\n'
                          ' > 10 GB Storage Space (Snapshot Space)\n')
 
-    @mock.patch('SoftLayer.BlockStorageManager.order_block_volume')
-    def test_volume_order_performance_hourly_billing_not_available(
-            self, order_mock):
-        order_mock.return_value = {}
-        result = self.run_command(['block', 'volume-order',
-                                   '--storage-type=performance', '--size=20',
-                                   '--os-type=linux', '--location=dal10',
-                                   '--service-offering=enterprise',
-                                   '--billing=hourly', '--iops=200'])
-
-        self.assertEqual(2, result.exit_code)
-        self.assertEqual(result.output,
-                         '--billing : hourly billing is only available '
-                         'for storage_as_a_service ')
-
-    @mock.patch('SoftLayer.BlockStorageManager.order_block_volume')
-    def test_volume_order_performance_hourly(self, order_mock):
-
-        order_mock.return_value = {
-            'placedOrder': {
-                'id': 10983646,
-                'items': [
-                    {'description': 'Storage as a Service'},
-                    {'description': 'Block Storage'},
-                    {'description': '20 GBs'},
-                    {'description': '200 IOPS'},
-                    {'description': '0.25 IOPS per GB'}]
-                }
-        }
-
-        result = self.run_command(['block', 'volume-order',
-                                   '--storage-type=performance', '--size=20',
-                                   '--os-type=linux',
-                                   '--location=dal10',
-                                   '--service-offering=storage_as_a_service',
-                                   '--billing=hourly', '--iops=200'])
-        self.assert_no_fail(result)
-        self.assertEqual(result.output,
-                         'Order #10983646 placed successfully!\n'
-                         ' > Storage as a Service'
-                         ' > Block Storage\n'
-                         ' > 20 GBs \n'
-                         ' > 200 IOPS \n')
-
     def test_volume_order_endurance_tier_not_given(self):
         result = self.run_command(['block', 'volume-order',
                                    '--storage-type=endurance', '--size=20',
@@ -272,33 +228,24 @@ class BlockTests(testing.TestCase):
                          'Order could not be placed! Please verify '
                          'your options and try again.\n')
 
-
-    @mock.patch('SoftLayer.BlockStorageManager.order_block_volume')
-    def test_volume_order_endurance_hourly_billing_not_available(
-            self, order_mock):
-        order_mock.return_value = {}
+    def test_volume_order_hourly_billing_not_available(self):
         result = self.run_command(['block', 'volume-order',
                                    '--storage-type=endurance', '--size=20',
                                    '--tier=0.25', '--os-type=linux',
-                                   '--location=dal10',
-                                   '--service-offering enterprise',
-                                   '--billing hourly', '--iops 200'])
+                                   '--location=dal10', '--billing=hourly',
+                                   '--service-offering=enterprise'])
 
         self.assertEqual(2, result.exit_code)
-        self.assertEqual(result.output,
-                         '--billing : hourly billing is only available '
-                         'for storage_as_a_service ')
 
     @mock.patch('SoftLayer.BlockStorageManager.order_block_volume')
-    def test_volume_order_endurance_hourly(self, order_mock):
-
+    def test_volume_order_hourly_billing(self, order_mock):
         order_mock.return_value = {
             'placedOrder': {
                 'id': 10983647,
                 'items': [
                     {'description': 'Storage as a Service'},
                     {'description': 'Block Storage'},
-                    {'description': '20 GBs'},
+                    {'description': '20 GB Storage Space'},
                     {'description': '200 IOPS'}]
                 }
         }
@@ -306,17 +253,15 @@ class BlockTests(testing.TestCase):
         result = self.run_command(['block', 'volume-order',
                                    '--storage-type=endurance', '--size=20',
                                    '--tier=0.25', '--os-type=linux',
-                                   '--location=dal10',
-                                   '--service-offering storage_as_a_service',
-                                   '--billing hourly', '--iops 200'])
+                                   '--location=dal10', '--billing=hourly',
+                                   '--service-offering=storage_as_a_service'])
         self.assert_no_fail(result)
         self.assertEqual(result.output,
                          'Order #10983647 placed successfully!\n'
-                         ' > Storage as a Service'
+                         ' > Storage as a Service\n'
                          ' > Block Storage\n'
-                         ' > 20 GBs \n'
-                         ' > 200 IOPS \n')
-
+                         ' > 20 GB Storage Space\n'
+                         ' > 200 IOPS\n')
 
     @mock.patch('SoftLayer.BlockStorageManager.order_block_volume')
     def test_volume_order_performance_manager_error(self, order_mock):
