@@ -30,10 +30,10 @@ getObject = {
     'primaryIpAddress': '172.16.240.2',
     'globalIdentifier': '1a2b3c-1701',
     'primaryBackendIpAddress': '10.45.19.37',
-    "primaryNetworkComponent": {"speed": 10, "maxSpeed": 100},
+    'primaryNetworkComponent': {'speed': 10, 'maxSpeed': 100},
     'hourlyBillingFlag': False,
     'createDate': '2013-08-01 15:23:45',
-    'blockDevices': [{'device': 0, 'mountType': 'Disk', "uuid": 1},
+    'blockDevices': [{'device': 0, 'mountType': 'Disk', 'uuid': 1},
                      {'device': 1, 'mountType': 'Disk',
                       'diskImage': {'type': {'keyName': 'SWAP'}}},
                      {'device': 2, 'mountType': 'CD'},
@@ -59,6 +59,68 @@ getObject = {
 }
 
 getCreateObjectOptions = {
+    'flavors': [
+        {
+            'flavor': {
+                'keyName': 'B1_1X2X25'
+            },
+            'template': {
+                'supplementalCreateObjectOptions': {
+                    'flavorKeyName': 'B1_1X2X25'
+                }
+            }
+        },
+        {
+            'flavor': {
+                'keyName': 'B1_1X2X100'
+            },
+            'template': {
+                'supplementalCreateObjectOptions': {
+                    'flavorKeyName': 'B1_1X2X100'
+                }
+            }
+        },
+        {
+            'flavor': {
+                'keyName': 'BL1_1X2X100'
+            },
+            'template': {
+                'supplementalCreateObjectOptions': {
+                    'flavorKeyName': 'BL1_1X2X100'
+                }
+            }
+        },
+        {
+            'flavor': {
+                'keyName': 'BL2_1X2X100'
+            },
+            'template': {
+                'supplementalCreateObjectOptions': {
+                    'flavorKeyName': 'BL2_1X2X100'
+                }
+            }
+        },
+        {
+            'flavor': {
+                'keyName': 'C1_1X2X25'
+            },
+            'template': {
+                'supplementalCreateObjectOptions': {
+                    'flavorKeyName': 'C1_1X2X25'
+                }
+            }
+        },
+        {
+            'flavor': {
+                'keyName': 'M1_1X2X100'
+            },
+            'template': {
+                'supplementalCreateObjectOptions': {
+                    'flavorKeyName': 'M1_1X2X100'
+                }
+            }
+        },
+    ],
     'processors': [
         {
             'itemPrice': {
@@ -92,6 +154,52 @@ getCreateObjectOptions = {
             },
             'template': {'startCpus': 4}
         },
+        {
+            'itemPrice': {
+                'hourlyRecurringFee': '.209',
+                'recurringFee': '139',
+                'dedicatedHostInstanceFlag': False,
+                'item': {
+                    'description': '1 x 2.0 GHz Cores (Dedicated)'
+                }
+            },
+            'template': {
+                'dedicatedAccountHostOnlyFlag': True,
+                'startCpus': 1
+            }
+        },
+        {
+            'itemPrice': {
+                'hourlyRecurringFee': '0',
+                'recurringFee': '0',
+                'dedicatedHostInstanceFlag': True,
+                'item': {
+                    'description': '56 x 2.0 GHz Cores (Dedicated Host)'
+                }
+            },
+            'template': {
+                'startCpus': 56,
+                'dedicatedHost': {
+                    'id': None
+                }
+            }
+        },
+        {
+            'itemPrice': {
+                'hourlyRecurringFee': '0',
+                'recurringFee': '0',
+                'dedicatedHostInstanceFlag': True,
+                'item': {
+                    'description': '4 x 2.0 GHz Cores (Dedicated Host)'
+                }
+            },
+            'template': {
+                'startCpus': 4,
+                'dedicatedHost': {
+                    'id': None
+                }
+            }
+        },
     ],
     'memory': [
         {
@@ -124,6 +232,32 @@ getCreateObjectOptions = {
                 'recurringFee': '77'
             },
             'template': {'maxMemory': 4096}
+        },
+        {
+            'itemPrice': {
+                'hourlyRecurringFee': '0',
+                'recurringFee': '0',
+                'dedicatedHostInstanceFlag': True,
+                'item': {
+                    'description': '64 GB (Dedicated Host)'
+                }
+            },
+            'template': {
+                'maxMemory': 65536
+            }
+        },
+        {
+            'itemPrice': {
+                'hourlyRecurringFee': '0',
+                'recurringFee': '0',
+                'dedicatedHostInstanceFlag': True,
+                'item': {
+                    'description': '8 GB (Dedicated Host)'
+                }
+            },
+            'template': {
+                'maxMemory': 8192
+            }
         },
     ],
     'blockDevices': [
@@ -223,7 +357,25 @@ getCreateObjectOptions = {
             'template': {
                 'networkComponents': [{'maxSpeed': 1000}]
             }
-        }
+        },
+        {
+            'itemPrice': {
+                'hourlyRecurringFee': '0',
+                'recurringFee': '0',
+                'dedicatedHostInstanceFlag': True,
+                'item': {
+                    'description': '1 Gbps Public & Private Network Uplinks (Dedicated Host)'
+                }
+            },
+            'template': {
+                'networkComponents': [
+                    {
+                        'maxSpeed': 1000
+                    }
+                ],
+                'privateNetworkOnlyFlag': False
+            }
+        },
     ],
     'datacenters': [
         {'template': {'datacenter': {'name': 'ams01'}}},

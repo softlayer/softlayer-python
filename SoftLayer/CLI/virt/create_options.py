@@ -25,34 +25,60 @@ def cli(env):
     # Datacenters
     datacenters = [dc['template']['datacenter']['name']
                    for dc in result['datacenters']]
+    datacenters = sorted(datacenters)
+
     table.add_row(['datacenter',
                    formatting.listing(datacenters, separator='\n')])
 
+    bal_flavors = [str(x['flavor']['keyName']) for x in result['flavors']
+                   if x['flavor']['keyName'].startswith('B1')]
+    bal_loc_hdd_flavors = [str(x['flavor']['keyName']) for x in result['flavors']
+                           if x['flavor']['keyName'].startswith('BL1')]
+    bal_loc_ssd_flavors = [str(x['flavor']['keyName']) for x in result['flavors']
+                           if x['flavor']['keyName'].startswith('BL2')]
+    compute_flavors = [str(x['flavor']['keyName']) for x in result['flavors']
+                       if x['flavor']['keyName'].startswith('C1')]
+    memory_flavors = [str(x['flavor']['keyName']) for x in result['flavors']
+                      if x['flavor']['keyName'].startswith('M1')]
+
+    table.add_row(['flavors (balanced)', formatting.listing(bal_flavors, separator='\n')])
+    table.add_row(['flavors (balanced local - hdd)',
+                   formatting.listing(bal_loc_hdd_flavors, separator='\n')])
+    table.add_row(['flavors (balanced local - ssd)',
+                   formatting.listing(bal_loc_ssd_flavors, separator='\n')])
+    table.add_row(['flavors (compute)', formatting.listing(compute_flavors, separator='\n')])
+    table.add_row(['flavors (memory)', formatting.listing(memory_flavors, separator='\n')])
+
     # CPUs
-    standard_cpu = [x for x in result['processors']
-                    if not x['template'].get(
-                        'dedicatedAccountHostOnlyFlag', False)]
+    standard_cpus = [int(x['template']['startCpus']) for x in result['processors']
+                     if not x['template'].get('dedicatedAccountHostOnlyFlag',
+                                              False)
+                     and not x['template'].get('dedicatedHost', None)]
+    ded_cpus = [int(x['template']['startCpus']) for x in result['processors']
+                if x['template'].get('dedicatedAccountHostOnlyFlag', False)]
+    ded_host_cpus = [int(x['template']['startCpus']) for x in result['processors']
+                     if x['template'].get('dedicatedHost', None)]
 
-    ded_cpu = [x for x in result['processors']
-               if x['template'].get('dedicatedAccountHostOnlyFlag',
-                                    False)]
-
-    def add_cpus_row(cpu_options, name):
-        """Add CPU rows to the table."""
-        cpus = []
-        for cpu_option in cpu_options:
-            cpus.append(str(cpu_option['template']['startCpus']))
-
-        table.add_row(['cpus (%s)' % name,
-                       formatting.listing(cpus, separator=',')])
-
-    add_cpus_row(ded_cpu, 'private')
-    add_cpus_row(standard_cpu, 'standard')
+    standard_cpus = sorted(standard_cpus)
+    table.add_row(['cpus (standard)', formatting.listing(standard_cpus, separator=',')])
+    ded_cpus = sorted(ded_cpus)
+    table.add_row(['cpus (dedicated)', formatting.listing(ded_cpus, separator=',')])
+    ded_host_cpus = sorted(ded_host_cpus)
+    table.add_row(['cpus (dedicated host)', formatting.listing(ded_host_cpus, separator=',')])
 
     # Memory
-    memory = [str(m['template']['maxMemory']) for m in result['memory']]
+    memory = [int(m['template']['maxMemory']) for m in result['memory']
+              if not m['itemPrice'].get('dedicatedHostInstanceFlag', False)]
+    ded_host_memory = [int(m['template']['maxMemory']) for m in result['memory']
+                       if m['itemPrice'].get('dedicatedHostInstanceFlag', False)]
+
+    memory = sorted(memory)
     table.add_row(['memory',
                    formatting.listing(memory, separator=',')])
+
+    ded_host_memory = sorted(ded_host_memory)
+    table.add_row(['memory (dedicated host)',
+                   formatting.listing(ded_host_memory, separator=',')])
 
     # Operating Systems
     op_sys = [o['template']['operatingSystemReferenceCode'] for o in
@@ -73,7 +99,14 @@ def cli(env):
 
     # Disk
     local_disks = [x for x in result['blockDevices']
-                   if x['template'].get('localDiskFlag', False)]
+                   if x['template'].get('localDiskFlag', False)
+                   and not x['itemPrice'].get('dedicatedHostInstanceFlag',
+                                              False)]
+
+    ded_host_local_disks = [x for x in result['blockDevices']
+                            if x['template'].get('localDiskFlag', False)
+                            and x['itemPrice'].get('dedicatedHostInstanceFlag',
+                                                   False)]
 
     san_disks = [x for x in result['blockDevices']
                  if not x['template'].get('localDiskFlag', False)]
@@ -95,17 +128,37 @@ def cli(env):
                            formatting.listing(simple[label],
                                               separator=',')])
 
-    add_block_rows(local_disks, 'local')
     add_block_rows(san_disks, 'san')
+    add_block_rows(local_disks, 'local')
+    add_block_rows(ded_host_local_disks, 'local (dedicated host)')
 
     # Network
     speeds = []
-    for comp in result['networkComponents']:
-        speed = comp['template']['networkComponents'][0]['maxSpeed']
-        speeds.append(str(speed))
+    ded_host_speeds = []
+    for option in result['networkComponents']:
+        template = option.get('template', None)
+        price = option.get('itemPrice', None)
+
+        if not template or not price \
+                or not template.get('networkComponents', None):
+            continue
+
+        if not template['networkComponents'][0] \
+                or not template['networkComponents'][0].get('maxSpeed', None):
+            continue
+
+        max_speed = str(template['networkComponents'][0]['maxSpeed'])
+        if price.get('dedicatedHostInstanceFlag', False) \
+                and max_speed not in ded_host_speeds:
+            ded_host_speeds.append(max_speed)
+        elif max_speed not in speeds:
+            speeds.append(max_speed)
 
     speeds = sorted(speeds)
-
     table.add_row(['nic', formatting.listing(speeds, separator=',')])
+
+    ded_host_speeds = sorted(ded_host_speeds)
+    table.add_row(['nic (dedicated host)',
+                   formatting.listing(ded_host_speeds, separator=',')])
 
     env.fout(table)
