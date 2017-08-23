@@ -14,6 +14,8 @@ COLUMNS = ['networkComponentId',
            'interface',
            'ipAddress', ]
 
+REQUEST_COLUMNS = ['requestId']
+
 
 @click.command()
 @click.argument('securitygroup_id')
@@ -95,6 +97,11 @@ def add(env, securitygroup_id, network_component, server, interface):
     if not success:
         raise exceptions.CLIAbort("Could not attach network component")
 
+    table = formatting.Table(REQUEST_COLUMNS)
+    table.add_row([success['id']])
+
+    env.fout(table)
+
 
 @click.command()
 @click.argument('securitygroup_id')
@@ -117,6 +124,11 @@ def remove(env, securitygroup_id, network_component, server, interface):
                                                  component_id)
     if not success:
         raise exceptions.CLIAbort("Could not detach network component")
+
+    table = formatting.Table(REQUEST_COLUMNS)
+    table.add_row([success['id']])
+
+    env.fout(table)
 
 
 def _validate_args(network_component, server, interface):
