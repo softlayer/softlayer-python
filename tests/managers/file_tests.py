@@ -202,6 +202,27 @@ class FileTests(testing.TestCase):
             identifier=417,
         )
 
+    def test_cancel_snapshot_immediately_hourly_billing_false(self):
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        mock.return_value = {
+            'billingItem': {
+                'activeChildren': [
+                    {'categoryCode': 'storage_snapshot_space', 'id': 417}
+                ],
+                'hourlyFlag': True,
+                'id': 449
+            },
+        }
+
+        self.file.cancel_snapshot_space(1234, immediate=False)
+
+        self.assert_called_with(
+            'SoftLayer_Billing_Item',
+            'cancelItem',
+            args=(True, True, 'No longer needed'),
+            identifier=417,
+        )
+
     def test_cancel_snapshot_exception_no_billing_item_active_children(self):
         mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
         mock.return_value = {
@@ -786,6 +807,97 @@ class FileTests(testing.TestCase):
                 'location': 449500,
                 'duplicateOriginVolumeId': 102,
                 'duplicateOriginSnapshotId': 470
+            },))
+
+        mock_volume['storageType']['keyName'] = prev_storage_type_keyname
+
+    def test_order_file_duplicate_endurance_hourly(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
+        prev_storage_type_keyname = mock_volume['storageType']['keyName']
+        mock_volume['storageType']['keyName'] = 'ENDURANCE_FILE_STORAGE'
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        mock.return_value = mock_volume
+
+        result = self.file.order_duplicate_volume(
+            102,
+            origin_snapshot_id=470,
+            duplicate_size=1000,
+            duplicate_iops=None,
+            duplicate_tier_level=4,
+            duplicate_snapshot_size=10
+            )
+
+        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+
+        self.assert_called_with(
+            'SoftLayer_Product_Order',
+            'placeOrder',
+            args=({
+                'complexType': 'SoftLayer_Container_Product_Order_'
+                               'Network_Storage_AsAService',
+                'packageId': 759,
+                'prices': [
+                    {'id': 189433},
+                    {'id': 189453},
+                    {'id': 194763},
+                    {'id': 194703},
+                    {'id': 194943}
+                ],
+                'volumeSize': 1000,
+                'quantity': 1,
+                'location': 449500,
+                'duplicateOriginVolumeId': 102,
+                'duplicateOriginSnapshotId': 470,
+                'useHourlyPricing': True
+            },))
+
+        mock_volume['storageType']['keyName'] = prev_storage_type_keyname
+
+    def test_order_file_duplicate_performance_hourly(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
+        prev_storage_type_keyname = mock_volume['storageType']['keyName']
+        mock_volume['storageType']['keyName'] = 'PERFORMANCE_FILE_STORAGE'
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        mock.return_value = mock_volume
+
+        result = self.file.order_duplicate_volume(
+            102,
+            origin_snapshot_id=470,
+            duplicate_size=1000,
+            duplicate_iops=2000,
+            duplicate_tier_level=None,
+            duplicate_snapshot_size=10
+            )
+
+        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+
+        self.assert_called_with(
+            'SoftLayer_Product_Order',
+            'placeOrder',
+            args=({
+                'complexType': 'SoftLayer_Container_Product_Order_'
+                               'Network_Storage_AsAService',
+                'packageId': 759,
+                'prices': [
+                    {'id': 189433},
+                    {'id': 189453},
+                    {'id': 190113},
+                    {'id': 190173},
+                    {'id': 191193}
+                ],
+                'volumeSize': 1000,
+                'quantity': 1,
+                'location': 449500,
+                'duplicateOriginVolumeId': 102,
+                'duplicateOriginSnapshotId': 470,
+                'iops': 2000,
+                'useHourlyPricing': True
             },))
 
         mock_volume['storageType']['keyName'] = prev_storage_type_keyname
