@@ -59,7 +59,6 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 @click.option('--billing',
               type=click.Choice(['hourly', 'monthly']),
               default='monthly',
-              show_default=True,
               help="Optional parameter for Billing rate. Default to monthly")
 @environment.pass_env
 def cli(env, storage_type, size, iops, tier, os_type,

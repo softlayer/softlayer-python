@@ -250,7 +250,8 @@ class FileStorageManager(utils.IdentifierMixin, object):
     def order_duplicate_volume(self, origin_volume_id, origin_snapshot_id=None,
                                duplicate_size=None, duplicate_iops=None,
                                duplicate_tier_level=None,
-                               duplicate_snapshot_size=None):
+                               duplicate_snapshot_size=None,
+                               hourly_billing_flag=False):
         """Places an order for a duplicate file volume.
 
         :param origin_volume_id: The ID of the origin volume to be duplicated
@@ -259,10 +260,11 @@ class FileStorageManager(utils.IdentifierMixin, object):
         :param duplicate_iops: The IOPS per GB for the duplicate volume
         :param duplicate_tier_level: Tier level for the duplicate volume
         :param duplicate_snapshot_size: Snapshot space size for the duplicate
+        :param hourly_billing_flag: Billing type, monthly (False)
         :return: Returns a SoftLayer_Container_Product_Order_Receipt
         """
 
-        file_mask = 'id,billingItem[location],snapshotCapacityGb,'\
+        file_mask = 'id,billingItem[location,hourlyFlag],snapshotCapacityGb,'\
                     'storageType[keyName],capacityGb,originalVolumeSize,'\
                     'provisionedIops,storageTierLevel,'\
                     'staasVersion,hasEncryptionAtRest'
@@ -271,7 +273,7 @@ class FileStorageManager(utils.IdentifierMixin, object):
 
         order = storage_utils.prepare_duplicate_order_object(
             self, origin_volume, duplicate_iops, duplicate_tier_level,
-            duplicate_size, duplicate_snapshot_size, 'file'
+            duplicate_size, duplicate_snapshot_size, 'file', hourly_billing_flag
         )
 
         if origin_snapshot_id is not None:

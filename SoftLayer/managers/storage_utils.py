@@ -883,7 +883,7 @@ def prepare_replicant_order_object(manager, snapshot_schedule, location,
 
 def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
                                    duplicate_size,
-                                   duplicate_snapshot_size, volume_type):
+                                   duplicate_snapshot_size, volume_type, hourly_billing_flag):
     """Prepare the duplicate order to submit to SoftLayer_Product::placeOrder()
 
     :param manager: The File or Block manager calling this function
@@ -893,6 +893,7 @@ def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
     :param duplicate_size: The requested size for the duplicate volume
     :param duplicate_snapshot_size: The size for the duplicate snapshot space
     :param volume_type: The type of the origin volume ('file' or 'block')
+    :param hourly_billing_flag: Billing type, monthly (False) or hourly (True)
     :return: Returns the order object to be passed to the
              placeOrder() method of the Product_Order service
     """
@@ -994,6 +995,7 @@ def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
         'quantity': 1,
         'location': location_id,
         'duplicateOriginVolumeId': origin_volume['id'],
+        'useHourlyPricing': hourly_billing_flag
     }
 
     if volume_is_performance:
