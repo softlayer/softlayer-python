@@ -454,8 +454,8 @@ class VSManager(utils.IdentifierMixin, object):
             if pending:
                 outstanding = active_transaction
 
-            # return True if the instance has only if the instance has
-            # finished provisioning and isn't currently reloading the OS.
+            # return True if the instance has finished provisioning
+            # and isn't currently reloading the OS.
             if all([instance.get('provisionDate'),
                     not reloading,
                     not outstanding]):
