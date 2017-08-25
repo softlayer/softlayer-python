@@ -39,8 +39,8 @@ createObjects = [{'id': 100,
                   'createDate': '2017-05-05T12:44:43-06:00'}]
 editObjects = True
 deleteObjects = True
-addRules = True
-editRules = True
-removeRules = True
-attachNetworkComponents = True
-detachNetworkComponents = True
+addRules = {'id': 'addRules'}
+editRules = {'id': 'editRules'}
+removeRules = {'id': 'removeRules'}
+attachNetworkComponents = {'id': 'interfaceAdd'}
+detachNetworkComponents = {'id': 'interfaceRemove'}

@@ -129,6 +129,8 @@ class SecurityGroupTests(testing.TestCase):
                                 identifier='100',
                                 args=([{'direction': 'ingress'}],))
 
+        self.assertEqual([{'requestId': 'addRules'}], json.loads(result.output))
+
     def test_securitygroup_rule_add_fail(self):
         fixture = self.set_mock('SoftLayer_Network_SecurityGroup', 'addRules')
         fixture.return_value = False
@@ -148,6 +150,8 @@ class SecurityGroupTests(testing.TestCase):
                                 args=([{'id': '520',
                                         'direction': 'ingress'}],))
 
+        self.assertEqual([{'requestId': 'editRules'}], json.loads(result.output))
+
     def test_securitygroup_rule_edit_fail(self):
         fixture = self.set_mock('SoftLayer_Network_SecurityGroup', 'editRules')
         fixture.return_value = False
@@ -164,6 +168,8 @@ class SecurityGroupTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Network_SecurityGroup',
                                 'removeRules', identifier='100',
                                 args=(['520'],))
+
+        self.assertEqual([{'requestId': 'removeRules'}], json.loads(result.output))
 
     def test_securitygroup_rule_remove_fail(self):
         fixture = self.set_mock('SoftLayer_Network_SecurityGroup',
@@ -202,6 +208,8 @@ class SecurityGroupTests(testing.TestCase):
                                 identifier='100',
                                 args=(['1000'],))
 
+        self.assertEqual([{'requestId': 'interfaceAdd'}], json.loads(result.output))
+
     def test_securitygroup_interface_add_fail(self):
         fixture = self.set_mock('SoftLayer_Network_SecurityGroup',
                                 'attachNetworkComponents')
@@ -221,6 +229,8 @@ class SecurityGroupTests(testing.TestCase):
                                 'detachNetworkComponents',
                                 identifier='100',
                                 args=(['500'],))
+
+        self.assertEqual([{'requestId': 'interfaceRemove'}], json.loads(result.output))
 
     def test_securitygroup_interface_remove_fail(self):
         fixture = self.set_mock('SoftLayer_Network_SecurityGroup',

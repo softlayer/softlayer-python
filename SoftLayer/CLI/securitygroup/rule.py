@@ -143,8 +143,6 @@ def edit(env, securitygroup_id, rule_id, remote_ip, remote_group,
     env.fout(table)
 
 
-
-
 @click.command()
 @click.argument('securitygroup_id')
 @click.argument('rule_id')
