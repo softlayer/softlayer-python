@@ -902,7 +902,7 @@ class BlockTests(testing.TestCase):
 
         mock_volume['storageType']['keyName'] = prev_storage_type_keyname
 
-    def test_order_block_duplicate_endurance(self):
+    def test_order_block_duplicate_endurance_hourly(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
