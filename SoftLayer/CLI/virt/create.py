@@ -34,18 +34,14 @@ def _update_with_like_args(ctx, _, value):
         'private': like_details['privateNetworkOnlyFlag'],
     }
 
-    if like_details.get('billingItem', None) \
-            and like_details['billingItem'].get('orderItem', None) \
-            and like_details['billingItem']['orderItem'].get('preset', None):
-        flavor = like_details['billingItem']['orderItem']['preset']['keyName']
-        like_args['flavor'] = flavor
-    else:
+    like_args['flavor'] = utils.lookup(like_details,
+                                       'billingItem',
+                                       'orderItem',
+                                       'preset',
+                                       'keyName')
+    if not like_args['flavor']:
         like_args['cpu'] = like_details['maxCpu']
         like_args['memory'] = '%smb' % like_details['maxMemory']
-
-    if like_details.get('dedicatedHost', None):
-        like_args['dedicated'] = True
-        like_args['host-id'] = like_details['dedicatedHost']['id']
 
     tag_refs = like_details.get('tagReferences', None)
     if tag_refs is not None and len(tag_refs) > 0:
@@ -338,6 +334,10 @@ def _validate_args(env, args):
     if all([args['dedicated'], args['flavor']]):
         raise exceptions.ArgumentError(
             '[-d | --dedicated] not allowed with [-f | --flavor]')
+
+    if all([args['host_id'], args['flavor']]):
+        raise exceptions.ArgumentError(
+            '[-h | --host-id] not allowed with [-f | --flavor]')
 
     if all([args['userdata'], args['userfile']]):
         raise exceptions.ArgumentError(

@@ -8,6 +8,7 @@ import click
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer import utils
 
 
 @click.command()
@@ -30,24 +31,26 @@ def cli(env):
     table.add_row(['datacenter',
                    formatting.listing(datacenters, separator='\n')])
 
-    bal_flavors = [str(x['flavor']['keyName']) for x in result['flavors']
-                   if x['flavor']['keyName'].startswith('B1')]
-    bal_loc_hdd_flavors = [str(x['flavor']['keyName']) for x in result['flavors']
-                           if x['flavor']['keyName'].startswith('BL1')]
-    bal_loc_ssd_flavors = [str(x['flavor']['keyName']) for x in result['flavors']
-                           if x['flavor']['keyName'].startswith('BL2')]
-    compute_flavors = [str(x['flavor']['keyName']) for x in result['flavors']
-                       if x['flavor']['keyName'].startswith('C1')]
-    memory_flavors = [str(x['flavor']['keyName']) for x in result['flavors']
-                      if x['flavor']['keyName'].startswith('M1')]
+    def _add_flavor_rows(flavor_key, flavor_label, flavor_options):
+        flavors = []
 
-    table.add_row(['flavors (balanced)', formatting.listing(bal_flavors, separator='\n')])
-    table.add_row(['flavors (balanced local - hdd)',
-                   formatting.listing(bal_loc_hdd_flavors, separator='\n')])
-    table.add_row(['flavors (balanced local - ssd)',
-                   formatting.listing(bal_loc_ssd_flavors, separator='\n')])
-    table.add_row(['flavors (compute)', formatting.listing(compute_flavors, separator='\n')])
-    table.add_row(['flavors (memory)', formatting.listing(memory_flavors, separator='\n')])
+        for flavor_option in flavor_options:
+            flavor_key_name = utils.lookup(flavor_option, 'flavor', 'keyName')
+            if not flavor_key_name.startswith(flavor_key):
+                continue
+
+            flavors.append(flavor_key_name)
+
+        if len(flavors) > 0:
+            table.add_row(['flavors (%s)' % flavor_label,
+                           formatting.listing(flavors, separator='\n')])
+
+    if result.get('flavors', None):
+        _add_flavor_rows('B1', 'balanced', result['flavors'])
+        _add_flavor_rows('BL1', 'balanced local - hdd', result['flavors'])
+        _add_flavor_rows('BL2', 'balanced local - ssd', result['flavors'])
+        _add_flavor_rows('C1', 'compute', result['flavors'])
+        _add_flavor_rows('M1', 'memory', result['flavors'])
 
     # CPUs
     standard_cpus = [int(x['template']['startCpus']) for x in result['processors']

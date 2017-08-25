@@ -217,11 +217,11 @@ class VSManager(utils.IdentifierMixin, object):
                                         referenceCode]]],'''
                 'hourlyBillingFlag,'
                 'userData,'
-                'billingItem['
-                'id,nextInvoiceTotalRecurringAmount,'
-                'children[categoryCode,nextInvoiceTotalRecurringAmount],'
-                'orderItem[id,order.userRecord[username],preset.keyName]'
-                '],'
+                '''billingItem[id,nextInvoiceTotalRecurringAmount,
+                               children[categoryCode,nextInvoiceTotalRecurringAmount],
+                               orderItem[id,
+                                         order.userRecord[username],
+                                         preset.keyName]],'''
                 'tagReferences[id,tag[name,id]],'
                 'networkVlans[id,vlanNumber,networkSpace],'
                 'dedicatedHost.id'
@@ -311,10 +311,11 @@ class VSManager(utils.IdentifierMixin, object):
         host_id = kwargs.get('host_id', None)
 
         mutually_exclusive = [
-            {'os_code': os_code, "image_id": image_id},
+            {'os_code': os_code, 'image_id': image_id},
             {'cpu': cpus, 'flavor': flavor},
             {'memory': memory, 'flavor': flavor},
-            {'flavor': flavor, 'dedicated': dedicated}
+            {'flavor': flavor, 'dedicated': dedicated},
+            {'flavor': flavor, 'host_id': host_id}
         ]
 
         if not all(required):
