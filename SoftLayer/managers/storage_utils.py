@@ -603,7 +603,7 @@ def prepare_snapshot_order_object(manager, volume, capacity, tier, upgrade):
 def prepare_volume_order_object(manager, storage_type, location, size,
                                 iops, tier, snapshot_size,
                                 service_offering, volume_type,
-                                hourly_billing_flag):
+                                hourly_billing_flag=False):
     """Prepare the order object which is submitted to the placeOrder() method
 
     :param manager: The File or Block manager calling this function
@@ -883,7 +883,7 @@ def prepare_replicant_order_object(manager, snapshot_schedule, location,
 
 def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
                                    duplicate_size,
-                                   duplicate_snapshot_size, volume_type, hourly_billing_flag):
+                                   duplicate_snapshot_size, volume_type, hourly_billing_flag=False):
     """Prepare the duplicate order to submit to SoftLayer_Product::placeOrder()
 
     :param manager: The File or Block manager calling this function

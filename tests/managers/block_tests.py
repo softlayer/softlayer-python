@@ -25,21 +25,6 @@ class BlockTests(testing.TestCase):
             identifier=449,
         )
 
-    def test_cancel_block_volume_immediately_hourly_billing(self):
-        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
-        mock.return_value = {
-            'billingItem': {'hourlyFlag': True, 'id': 449},
-        }
-
-        self.block.cancel_block_volume(123, immediate=False)
-
-        self.assert_called_with(
-            'SoftLayer_Billing_Item',
-            'cancelItem',
-            args=(True, True, 'No longer needed'),
-            identifier=449,
-        )
-
     def test_get_block_volume_details(self):
         result = self.block.get_block_volume_details(100)
 
@@ -196,27 +181,6 @@ class BlockTests(testing.TestCase):
             identifier=123,
         )
 
-    def test_cancel_snapshot_immediately_hourly_billing(self):
-        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
-        mock.return_value = {
-            'billingItem': {
-                'activeChildren': [
-                    {'categoryCode': 'storage_snapshot_space', 'id': 417}
-                ],
-                'hourlyFlag': True,
-                'id': 449
-            },
-        }
-
-        self.block.cancel_snapshot_space(1234, immediate=True)
-
-        self.assert_called_with(
-            'SoftLayer_Billing_Item',
-            'cancelItem',
-            args=(True, True, 'No longer needed'),
-            identifier=417,
-        )
-
     def test_cancel_snapshot_exception_no_billing_item_active_children(self):
         mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
         mock.return_value = {
@@ -349,8 +313,8 @@ class BlockTests(testing.TestCase):
                 'quantity': 1,
                 'location': 449494,
                 'iops': 2000,
+                'osFormatType': {'keyName': 'LINUX'},
                 'useHourlyPricing': False,
-                'osFormatType': {'keyName': 'LINUX'}
             },)
         )
 
@@ -394,8 +358,8 @@ class BlockTests(testing.TestCase):
                 'volumeSize': 1000,
                 'quantity': 1,
                 'location': 449494,
+                'osFormatType': {'keyName': 'LINUX'},
                 'useHourlyPricing': False,
-                'osFormatType': {'keyName': 'LINUX'}
             },)
         )
 
@@ -500,7 +464,7 @@ class BlockTests(testing.TestCase):
                 'quantity': 1,
                 'location': 449500,
                 'volumeId': 102,
-                'useHourlyPricing': False
+                'useHourlyPricing': False,
             },)
         )
 
@@ -531,7 +495,7 @@ class BlockTests(testing.TestCase):
                 'quantity': 1,
                 'location': 449500,
                 'volumeId': 102,
-                'useHourlyPricing': False
+                'useHourlyPricing': False,
             },)
         )
 
@@ -599,8 +563,8 @@ class BlockTests(testing.TestCase):
                 'iops': 1000,
                 'originVolumeId': 102,
                 'originVolumeScheduleId': 978,
+                'osFormatType': {'keyName': 'XEN'},
                 'useHourlyPricing': False,
-                'osFormatType': {'keyName': 'XEN'}
             },)
         )
 
@@ -641,8 +605,8 @@ class BlockTests(testing.TestCase):
                 'location': 449494,
                 'originVolumeId': 102,
                 'originVolumeScheduleId': 978,
+                'osFormatType': {'keyName': 'LINUX'},
                 'useHourlyPricing': False,
-                'osFormatType': {'keyName': 'LINUX'}
             },)
         )
 
@@ -701,7 +665,8 @@ class BlockTests(testing.TestCase):
                 'location': 449500,
                 'duplicateOriginVolumeId': 102,
                 'osFormatType': {'keyName': 'LINUX'},
-                'iops': 1000
+                'iops': 1000,
+                'useHourlyPricing': False,
             },))
 
         mock_volume['storageType']['keyName'] = prev_storage_type_keyname
@@ -747,7 +712,8 @@ class BlockTests(testing.TestCase):
                 'duplicateOriginVolumeId': 102,
                 'osFormatType': {'keyName': 'LINUX'},
                 'duplicateOriginSnapshotId': 470,
-                'iops': 2000
+                'iops': 2000,
+                'useHourlyPricing': False,
             },))
 
         mock_volume['storageType']['keyName'] = prev_storage_type_keyname
@@ -783,7 +749,8 @@ class BlockTests(testing.TestCase):
                 'quantity': 1,
                 'location': 449500,
                 'duplicateOriginVolumeId': 102,
-                'osFormatType': {'keyName': 'LINUX'}
+                'osFormatType': {'keyName': 'LINUX'},
+                'useHourlyPricing': False,
             },))
 
     def test_order_block_duplicate_endurance(self):
@@ -824,7 +791,8 @@ class BlockTests(testing.TestCase):
                 'location': 449500,
                 'duplicateOriginVolumeId': 102,
                 'osFormatType': {'keyName': 'LINUX'},
-                'duplicateOriginSnapshotId': 470
+                'duplicateOriginSnapshotId': 470,
+                'useHourlyPricing': False,
             },))
 
     def test_setCredentialPassword(self):
@@ -833,4 +801,3 @@ class BlockTests(testing.TestCase):
         result = self.block.set_credential_password(access_id=102, password='AAAaaa')
         self.assertEqual(True, result)
         self.assert_called_with('SoftLayer_Network_Storage_Allowed_Host', 'setCredentialPassword')
-        
