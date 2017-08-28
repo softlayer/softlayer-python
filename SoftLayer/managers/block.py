@@ -234,9 +234,10 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         :return: Returns a SoftLayer_Container_Product_Order_Receipt
         """
 
-        block_mask = 'billingItem[activeChildren],storageTierLevel,osType,'\
-                     'staasVersion,hasEncryptionAtRest,snapshotCapacityGb,'\
-                     'schedules,hourlySchedule,dailySchedule,weeklySchedule,'\
+        block_mask = 'billingItem[activeChildren,hourlyFlag],'\
+                     'storageTierLevel,osType,staasVersion,'\
+                     'hasEncryptionAtRest,snapshotCapacityGb,schedules,'\
+                     'hourlySchedule,dailySchedule,weeklySchedule,'\
                      'storageType[keyName],provisionedIops'
         block_volume = self.get_block_volume_details(volume_id,
                                                      mask=block_mask)
@@ -261,7 +262,8 @@ class BlockStorageManager(utils.IdentifierMixin, object):
     def order_duplicate_volume(self, origin_volume_id, origin_snapshot_id=None,
                                duplicate_size=None, duplicate_iops=None,
                                duplicate_tier_level=None,
-                               duplicate_snapshot_size=None):
+                               duplicate_snapshot_size=None,
+                               hourly_billing_flag=False):
         """Places an order for a duplicate block volume.
 
         :param origin_volume_id: The ID of the origin volume to be duplicated
@@ -270,10 +272,11 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         :param duplicate_iops: The IOPS per GB for the duplicate volume
         :param duplicate_tier_level: Tier level for the duplicate volume
         :param duplicate_snapshot_size: Snapshot space size for the duplicate
+        :param hourly_billing_flag: Billing type, monthly (False)
         :return: Returns a SoftLayer_Container_Product_Order_Receipt
         """
 
-        block_mask = 'id,billingItem[location],snapshotCapacityGb,'\
+        block_mask = 'id,billingItem[location,hourlyFlag],snapshotCapacityGb,'\
                      'storageType[keyName],capacityGb,originalVolumeSize,'\
                      'provisionedIops,storageTierLevel,osType[keyName],'\
                      'staasVersion,hasEncryptionAtRest'
@@ -288,7 +291,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
 
         order = storage_utils.prepare_duplicate_order_object(
             self, origin_volume, duplicate_iops, duplicate_tier_level,
-            duplicate_size, duplicate_snapshot_size, 'block'
+            duplicate_size, duplicate_snapshot_size, 'block',hourly_billing_flag
         )
 
         order['osFormatType'] = {'keyName': os_type}
@@ -308,7 +311,8 @@ class BlockStorageManager(utils.IdentifierMixin, object):
 
     def order_block_volume(self, storage_type, location, size, os_type,
                            iops=None, tier_level=None, snapshot_size=None,
-                           service_offering='storage_as_a_service'):
+                           service_offering='storage_as_a_service',
+                           hourly_billing_flag=False):
         """Places an order for a block volume.
 
         :param storage_type: 'performance' or 'endurance'
@@ -321,10 +325,12 @@ class BlockStorageManager(utils.IdentifierMixin, object):
             if snapshot space should also be ordered (None if not ordered)
         :param service_offering: Requested offering package to use in the order
             ('storage_as_a_service', 'enterprise', or 'performance')
+        :param hourly_billing_flag: Billing type, monthly (False)
+            or hourly (True), default to monthly.
         """
         order = storage_utils.prepare_volume_order_object(
             self, storage_type, location, size, iops, tier_level,
-            snapshot_size, service_offering, 'block'
+            snapshot_size, service_offering, 'block', hourly_billing_flag
         )
 
         order['osFormatType'] = {'keyName': os_type}
@@ -352,8 +358,9 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         :param boolean upgrade: Flag to indicate if this order is an upgrade
         :return: Returns a SoftLayer_Container_Product_Order_Receipt
         """
-        block_mask = 'id,billingItem[location],storageType[keyName],'\
-            'storageTierLevel,provisionedIops,staasVersion,hasEncryptionAtRest'
+        block_mask = 'id,billingItem[location,hourlyFlag],'\
+            'storageType[keyName],storageTierLevel,provisionedIops,'\
+            'staasVersion,hasEncryptionAtRest'
         block_volume = self.get_block_volume_details(volume_id,
                                                      mask=block_mask,
                                                      **kwargs)
@@ -376,7 +383,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
 
         block_volume = self.get_block_volume_details(
             volume_id,
-            mask='mask[id,billingItem[activeChildren]]')
+            mask='mask[id,billingItem[activeChildren,hourlyFlag]]')
 
         if 'activeChildren' not in block_volume['billingItem']:
             raise exceptions.SoftLayerError(
@@ -393,6 +400,9 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         if not billing_item_id:
             raise exceptions.SoftLayerError(
                 'No snapshot space found to cancel')
+
+        if utils.lookup(block_volume, 'billingItem', 'hourlyFlag'):
+            immediate = True
 
         return self.client['Billing_Item'].cancelItem(
             immediate,
@@ -456,8 +466,11 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         """
         block_volume = self.get_block_volume_details(
             volume_id,
-            mask='mask[id,billingItem[id]]')
+            mask='mask[id,billingItem[id,hourlyFlag]]')
         billing_item_id = block_volume['billingItem']['id']
+
+        if utils.lookup(block_volume, 'billingItem', 'hourlyFlag'):
+            immediate = True
 
         return self.client['Billing_Item'].cancelItem(
             immediate,

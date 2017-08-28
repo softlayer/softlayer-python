@@ -228,6 +228,41 @@ class BlockTests(testing.TestCase):
                          'Order could not be placed! Please verify '
                          'your options and try again.\n')
 
+    def test_volume_order_hourly_billing_not_available(self):
+        result = self.run_command(['block', 'volume-order',
+                                   '--storage-type=endurance', '--size=20',
+                                   '--tier=0.25', '--os-type=linux',
+                                   '--location=dal10', '--billing=hourly',
+                                   '--service-offering=enterprise'])
+
+        self.assertEqual(2, result.exit_code)
+
+    @mock.patch('SoftLayer.BlockStorageManager.order_block_volume')
+    def test_volume_order_hourly_billing(self, order_mock):
+        order_mock.return_value = {
+            'placedOrder': {
+                'id': 10983647,
+                'items': [
+                    {'description': 'Storage as a Service'},
+                    {'description': 'Block Storage'},
+                    {'description': '20 GB Storage Space'},
+                    {'description': '200 IOPS'}]
+                }
+        }
+
+        result = self.run_command(['block', 'volume-order',
+                                   '--storage-type=endurance', '--size=20',
+                                   '--tier=0.25', '--os-type=linux',
+                                   '--location=dal10', '--billing=hourly',
+                                   '--service-offering=storage_as_a_service'])
+        self.assert_no_fail(result)
+        self.assertEqual(result.output,
+                         'Order #10983647 placed successfully!\n'
+                         ' > Storage as a Service\n'
+                         ' > Block Storage\n'
+                         ' > 20 GB Storage Space\n'
+                         ' > 200 IOPS\n')
+
     @mock.patch('SoftLayer.BlockStorageManager.order_block_volume')
     def test_volume_order_performance_manager_error(self, order_mock):
         order_mock.side_effect = ValueError('failure!')

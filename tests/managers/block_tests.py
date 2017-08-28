@@ -313,7 +313,8 @@ class BlockTests(testing.TestCase):
                 'quantity': 1,
                 'location': 449494,
                 'iops': 2000,
-                'osFormatType': {'keyName': 'LINUX'}
+                'osFormatType': {'keyName': 'LINUX'},
+                'useHourlyPricing': False,
             },)
         )
 
@@ -357,7 +358,8 @@ class BlockTests(testing.TestCase):
                 'volumeSize': 1000,
                 'quantity': 1,
                 'location': 449494,
-                'osFormatType': {'keyName': 'LINUX'}
+                'osFormatType': {'keyName': 'LINUX'},
+                'useHourlyPricing': False,
             },)
         )
 
@@ -461,7 +463,8 @@ class BlockTests(testing.TestCase):
                 ],
                 'quantity': 1,
                 'location': 449500,
-                'volumeId': 102
+                'volumeId': 102,
+                'useHourlyPricing': False,
             },)
         )
 
@@ -491,7 +494,8 @@ class BlockTests(testing.TestCase):
                 ],
                 'quantity': 1,
                 'location': 449500,
-                'volumeId': 102
+                'volumeId': 102,
+                'useHourlyPricing': False,
             },)
         )
 
@@ -559,7 +563,8 @@ class BlockTests(testing.TestCase):
                 'iops': 1000,
                 'originVolumeId': 102,
                 'originVolumeScheduleId': 978,
-                'osFormatType': {'keyName': 'XEN'}
+                'osFormatType': {'keyName': 'XEN'},
+                'useHourlyPricing': False,
             },)
         )
 
@@ -600,7 +605,8 @@ class BlockTests(testing.TestCase):
                 'location': 449494,
                 'originVolumeId': 102,
                 'originVolumeScheduleId': 978,
-                'osFormatType': {'keyName': 'LINUX'}
+                'osFormatType': {'keyName': 'LINUX'},
+                'useHourlyPricing': False,
             },)
         )
 
@@ -659,7 +665,8 @@ class BlockTests(testing.TestCase):
                 'location': 449500,
                 'duplicateOriginVolumeId': 102,
                 'osFormatType': {'keyName': 'LINUX'},
-                'iops': 1000
+                'iops': 1000,
+                'useHourlyPricing': False,
             },))
 
         mock_volume['storageType']['keyName'] = prev_storage_type_keyname
@@ -705,7 +712,8 @@ class BlockTests(testing.TestCase):
                 'duplicateOriginVolumeId': 102,
                 'osFormatType': {'keyName': 'LINUX'},
                 'duplicateOriginSnapshotId': 470,
-                'iops': 2000
+                'iops': 2000,
+                'useHourlyPricing': False,
             },))
 
         mock_volume['storageType']['keyName'] = prev_storage_type_keyname
@@ -741,7 +749,8 @@ class BlockTests(testing.TestCase):
                 'quantity': 1,
                 'location': 449500,
                 'duplicateOriginVolumeId': 102,
-                'osFormatType': {'keyName': 'LINUX'}
+                'osFormatType': {'keyName': 'LINUX'},
+                'useHourlyPricing': False,
             },))
 
     def test_order_block_duplicate_endurance(self):
@@ -782,7 +791,8 @@ class BlockTests(testing.TestCase):
                 'location': 449500,
                 'duplicateOriginVolumeId': 102,
                 'osFormatType': {'keyName': 'LINUX'},
-                'duplicateOriginSnapshotId': 470
+                'duplicateOriginSnapshotId': 470,
+                'useHourlyPricing': False,
             },))
 
     def test_setCredentialPassword(self):

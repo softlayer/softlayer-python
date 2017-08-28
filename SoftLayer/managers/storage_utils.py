@@ -581,6 +581,11 @@ def prepare_snapshot_order_object(manager, volume, capacity, tier, upgrade):
         complex_type = 'SoftLayer_Container_Product_Order_'\
                        'Network_Storage_Enterprise_SnapshotSpace'
 
+    # Determine if hourly billing should be used
+    hourly_billing_flag = utils.lookup(volume, 'billingItem', 'hourlyFlag')
+    if hourly_billing_flag is None:
+        hourly_billing_flag = False
+
     # Build and return the order object
     snapshot_space_order = {
         'complexType': complex_type,
@@ -588,7 +593,8 @@ def prepare_snapshot_order_object(manager, volume, capacity, tier, upgrade):
         'prices': prices,
         'quantity': 1,
         'location': volume['billingItem']['location']['id'],
-        'volumeId': volume['id']
+        'volumeId': volume['id'],
+        'useHourlyPricing': hourly_billing_flag
     }
 
     return snapshot_space_order
@@ -596,7 +602,8 @@ def prepare_snapshot_order_object(manager, volume, capacity, tier, upgrade):
 
 def prepare_volume_order_object(manager, storage_type, location, size,
                                 iops, tier, snapshot_size,
-                                service_offering, volume_type):
+                                service_offering, volume_type,
+                                hourly_billing_flag=False):
     """Prepare the order object which is submitted to the placeOrder() method
 
     :param manager: The File or Block manager calling this function
@@ -608,6 +615,7 @@ def prepare_volume_order_object(manager, storage_type, location, size,
     :param snapshot_size: The size of snapshot space for the volume (optional)
     :param service_offering: Requested offering package to use for the order
     :param volume_type: The type of the volume to order ('file' or 'block')
+    :param hourly_billing_flag: Billing type, monthly (False) or hourly (True)
     :return: Returns the order object for the
              Product_Order service's placeOrder() method
     """
@@ -689,6 +697,7 @@ def prepare_volume_order_object(manager, storage_type, location, size,
         'prices': prices,
         'quantity': 1,
         'location': location_id,
+        'useHourlyPricing': hourly_billing_flag
     }
 
     if order_type_is_saas:
@@ -847,6 +856,11 @@ def prepare_replicant_order_object(manager, snapshot_schedule, location,
             find_ent_space_price(package, 'replication', volume_size, tier)
         ]
 
+    # Determine if hourly billing should be used
+    hourly_billing_flag = utils.lookup(volume, 'billingItem', 'hourlyFlag')
+    if hourly_billing_flag is None:
+        hourly_billing_flag = False
+
     # Build and return the order object
     replicant_order = {
         'complexType': complex_type,
@@ -856,6 +870,7 @@ def prepare_replicant_order_object(manager, snapshot_schedule, location,
         'location': location_id,
         'originVolumeId': volume['id'],
         'originVolumeScheduleId': snapshot_schedule_id,
+        'useHourlyPricing': hourly_billing_flag
     }
 
     if order_type_is_saas:
@@ -868,7 +883,7 @@ def prepare_replicant_order_object(manager, snapshot_schedule, location,
 
 def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
                                    duplicate_size,
-                                   duplicate_snapshot_size, volume_type):
+                                   duplicate_snapshot_size, volume_type, hourly_billing_flag=False):
     """Prepare the duplicate order to submit to SoftLayer_Product::placeOrder()
 
     :param manager: The File or Block manager calling this function
@@ -878,6 +893,7 @@ def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
     :param duplicate_size: The requested size for the duplicate volume
     :param duplicate_snapshot_size: The size for the duplicate snapshot space
     :param volume_type: The type of the origin volume ('file' or 'block')
+    :param hourly_billing_flag: Billing type, monthly (False) or hourly (True)
     :return: Returns the order object to be passed to the
              placeOrder() method of the Product_Order service
     """
@@ -979,6 +995,7 @@ def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
         'quantity': 1,
         'location': location_id,
         'duplicateOriginVolumeId': origin_volume['id'],
+        'useHourlyPricing': hourly_billing_flag
     }
 
     if volume_is_performance:

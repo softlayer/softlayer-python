@@ -44,12 +44,26 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
                   'storage_as_a_service',
                   'enterprise',
                   'performance']))
+@click.option('--billing',
+              type=click.Choice(['hourly', 'monthly']),
+              default='monthly',
+              help="Optional parameter for Billing rate. Default to monthly")
 @environment.pass_env
 def cli(env, storage_type, size, iops, tier,
-        location, snapshot_size, service_offering):
+        location, snapshot_size, service_offering, billing):
     """Order a file storage volume."""
     file_manager = SoftLayer.FileStorageManager(env.client)
     storage_type = storage_type.lower()
+
+    hourly_billing_flag = False
+    if billing.lower() == "hourly":
+        hourly_billing_flag = True
+
+    if hourly_billing_flag and service_offering != 'storage_as_a_service':
+        raise exceptions.CLIAbort(
+            'Hourly billing is only available for the storage_as_a_service '
+            'service offering'
+        )
 
     if storage_type == 'performance':
         if iops is None:
@@ -74,7 +88,8 @@ def cli(env, storage_type, size, iops, tier,
                 size=size,
                 iops=iops,
                 snapshot_size=snapshot_size,
-                service_offering=service_offering
+                service_offering=service_offering,
+                hourly_billing_flag=hourly_billing_flag
             )
         except ValueError as ex:
             raise exceptions.ArgumentError(str(ex))
@@ -93,7 +108,8 @@ def cli(env, storage_type, size, iops, tier,
                 size=size,
                 tier_level=float(tier),
                 snapshot_size=snapshot_size,
-                service_offering=service_offering
+                service_offering=service_offering,
+                hourly_billing_flag=hourly_billing_flag
             )
         except ValueError as ex:
             raise exceptions.ArgumentError(str(ex))

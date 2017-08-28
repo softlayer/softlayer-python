@@ -385,7 +385,8 @@ class FileTests(testing.TestCase):
                 'volumeSize': 1000,
                 'quantity': 1,
                 'location': 449494,
-                'iops': 2000
+                'iops': 2000,
+                'useHourlyPricing': False,
             },)
         )
 
@@ -429,7 +430,8 @@ class FileTests(testing.TestCase):
                 ],
                 'volumeSize': 1000,
                 'quantity': 1,
-                'location': 449494
+                'location': 449494,
+                'useHourlyPricing': False,
             },)
         )
 
@@ -461,7 +463,8 @@ class FileTests(testing.TestCase):
                 ],
                 'quantity': 1,
                 'location': 449500,
-                'volumeId': 102
+                'volumeId': 102,
+                'useHourlyPricing': False
             },)
         )
 
@@ -493,7 +496,8 @@ class FileTests(testing.TestCase):
                 ],
                 'quantity': 1,
                 'location': 449500,
-                'volumeId': 102
+                'volumeId': 102,
+                'useHourlyPricing': False
             },)
         )
 
@@ -536,7 +540,8 @@ class FileTests(testing.TestCase):
                 'location': 449494,
                 'iops': 1000,
                 'originVolumeId': 102,
-                'originVolumeScheduleId': 978
+                'originVolumeScheduleId': 978,
+                'useHourlyPricing': False
             },)
         )
 
@@ -578,7 +583,8 @@ class FileTests(testing.TestCase):
                 'quantity': 1,
                 'location': 449494,
                 'originVolumeId': 102,
-                'originVolumeScheduleId': 978
+                'originVolumeScheduleId': 978,
+                'useHourlyPricing': False
             },)
         )
 
@@ -617,7 +623,8 @@ class FileTests(testing.TestCase):
                 'quantity': 1,
                 'location': 449500,
                 'duplicateOriginVolumeId': 102,
-                'iops': 1000
+                'iops': 1000,
+                'useHourlyPricing': False
             },))
 
         mock_volume['storageType']['keyName'] = prev_storage_type_keyname
@@ -662,7 +669,8 @@ class FileTests(testing.TestCase):
                 'location': 449500,
                 'duplicateOriginVolumeId': 102,
                 'duplicateOriginSnapshotId': 470,
-                'iops': 2000
+                'iops': 2000,
+                'useHourlyPricing': False,
             },))
 
         mock_volume['storageType']['keyName'] = prev_storage_type_keyname
@@ -699,7 +707,8 @@ class FileTests(testing.TestCase):
                 'volumeSize': 500,
                 'quantity': 1,
                 'location': 449500,
-                'duplicateOriginVolumeId': 102
+                'duplicateOriginVolumeId': 102,
+                'useHourlyPricing': False,
             },))
 
         mock_volume['storageType']['keyName'] = prev_storage_type_keyname
@@ -743,7 +752,8 @@ class FileTests(testing.TestCase):
                 'quantity': 1,
                 'location': 449500,
                 'duplicateOriginVolumeId': 102,
-                'duplicateOriginSnapshotId': 470
+                'duplicateOriginSnapshotId': 470,
+                'useHourlyPricing': False,
             },))
 
         mock_volume['storageType']['keyName'] = prev_storage_type_keyname
