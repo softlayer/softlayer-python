@@ -542,3 +542,65 @@ class BlockTests(testing.TestCase):
     def test_set_password(self):
         result = self.run_command(['block', 'access-password', '1234', '--password=AAAAA'])
         self.assert_no_fail(result)
+
+    def test_block_volume_order_performance_hourly_billing_not_available(self):
+        result = self.run_command(['block', 'volume-order',
+                                   '--storage-type=performance', '--size=20',
+                                   '--os-type=LINUX'
+                                   '--location=dal10',
+                                   '--service-offering=performance',
+                                   '--billing=hourly',
+                                   '--iops=200'])
+
+        self.assertEqual(2, result.exit_code)
+
+    @mock.patch('SoftLayer.BlockStorageManager.order_block_volume')
+    def test_volume_order_performance_hourly(self, order_mock):
+        order_mock.return_value = {
+            'placedOrder': {
+                'id': 478,
+                'items': [
+                    {'description': 'Storage as a Service'},
+                    {'description': 'Block Storage'},
+                    {'description': '0.25 IOPS per GB'},
+                    {'description': '20 GB Storage Space'},
+                    {'description': '10 GB Storage Space (Snapshot Space)'}]
+            }
+        }
+
+        result = self.run_command(['block', 'volume-order',
+                                   '--storage-type=performance',
+                                   '--size=20',
+                                   '--iops=100',
+                                   '--os-type=LINUX',
+                                   '--location=dal10',
+                                   '--snapshot-size=10',
+                                   '--billing=hourly'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.output,
+                         'Order #478 placed successfully!\n'
+                         ' > Storage as a Service\n > Block Storage\n'
+                         ' > 0.25 IOPS per GB\n > 20 GB Storage Space\n'
+                         ' > 10 GB Storage Space (Snapshot Space)\n')
+
+    @mock.patch('SoftLayer.BlockStorageManager.order_duplicate_volume')
+    def test_duplicate_order_hourly(self, order_mock):
+        order_mock.return_value = {
+            'placedOrder': {
+                'id': 24601,
+                'items': [{'description': 'Storage as a Service'}]
+            }
+        }
+
+        result = self.run_command(['block', 'volume-duplicate', '102',
+                                   '--origin-snapshot-id=470',
+                                   '--duplicate-size=250',
+                                   '--duplicate-tier=2',
+                                   '--duplicate-snapshot-size=20',
+                                   '--billing=hourly'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.output,
+                         'Order #24601 placed successfully!\n'
+                         ' > Storage as a Service\n')

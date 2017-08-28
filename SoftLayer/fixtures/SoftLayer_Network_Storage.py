@@ -10,6 +10,7 @@ STAAS_TEST_VOLUME = {
         }],
         'cancellationDate': '',
         'categoryCode': 'storage_as_a_service',
+        'hourlyFlag': None,
         'id': 454,
         'location': {'id': 449500}
     },
