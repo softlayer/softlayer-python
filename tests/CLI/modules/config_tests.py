@@ -5,6 +5,7 @@
     :license: MIT, see LICENSE for more details.
 """
 import json
+import sys
 import tempfile
 
 import mock
@@ -54,6 +55,8 @@ class TestHelpSetup(testing.TestCase):
     @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
     @mock.patch('SoftLayer.CLI.environment.Environment.input')
     def test_setup(self, mocked_input, getpass, confirm_mock):
+        if(sys.platform.startswith("win")):
+            self.skipTest("Test doesn't work in Windows")
         with tempfile.NamedTemporaryFile() as config_file:
             confirm_mock.return_value = True
             getpass.return_value = 'A' * 64
