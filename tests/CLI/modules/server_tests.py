@@ -388,6 +388,8 @@ class ServerCLITests(testing.TestCase):
         if(sys.platform.startswith("win")):
             self.skipTest("Test doesn't work in Windows")
         with tempfile.NamedTemporaryFile() as userfile:
+            userfile.write(b"some data")
+            userfile.flush()
             result = self.run_command(['server', 'edit', '1000',
                                        '--userfile=%s' % userfile.name])
 
