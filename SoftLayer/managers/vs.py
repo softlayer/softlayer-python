@@ -10,10 +10,14 @@ import itertools
 import socket
 import time
 import warnings
+import logging
+import random
 
 from SoftLayer import exceptions
 from SoftLayer.managers import ordering
 from SoftLayer import utils
+
+LOGGER = logging.getLogger(__name__)
 # pylint: disable=no-self-use
 
 
@@ -46,6 +50,7 @@ class VSManager(utils.IdentifierMixin, object):
         self.client = client
         self.account = client['Account']
         self.guest = client['Virtual_Guest']
+        self.retry_attempts = 0
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
         if ordering_manager is None:
             self.ordering_manager = ordering.OrderingManager(client)
@@ -431,40 +436,56 @@ class VSManager(utils.IdentifierMixin, object):
             ready = mgr.wait_for_ready(12345, 10)
         """
         until = time.time() + limit
+        attempt = 1
         for new_instance in itertools.repeat(instance_id):
             mask = """id,
                       lastOperatingSystemReload.id,
                       activeTransaction.id,provisionDate"""
-            instance = self.get_instance(new_instance, mask=mask)
-            last_reload = utils.lookup(instance,
-                                       'lastOperatingSystemReload',
-                                       'id')
-            active_transaction = utils.lookup(instance,
-                                              'activeTransaction',
-                                              'id')
+            try :
+                instance = self.get_instance(new_instance, mask=mask)
+                          
+                last_reload = utils.lookup(instance,
+                                           'lastOperatingSystemReload',
+                                           'id')
+                active_transaction = utils.lookup(instance,
+                                                  'activeTransaction',
+                                                  'id')
+    
+                reloading = all((
+                    active_transaction,
+                    last_reload,
+                    last_reload == active_transaction,
+                ))
+    
+                # only check for outstanding transactions if requested
+                outstanding = False
+                if pending:
+                    outstanding = active_transaction
+    
+                # return True if the instance has finished provisioning
+                # and isn't currently reloading the OS.
+                if all([instance.get('provisionDate'),
+                        not reloading,
+                        not outstanding]):
+                    return True
 
-            reloading = all((
-                active_transaction,
-                last_reload,
-                last_reload == active_transaction,
-            ))
-
-            # only check for outstanding transactions if requested
-            outstanding = False
-            if pending:
-                outstanding = active_transaction
-
-            # return True if the instance has finished provisioning
-            # and isn't currently reloading the OS.
-            if all([instance.get('provisionDate'),
-                    not reloading,
-                    not outstanding]):
-                return True
-
+            except Exception as e :
+                
+                if attempt < self.retry_attempts :
+                    LOGGER.info('Exception: %s', str(e))
+                    LOGGER.info('Auto re-try: %s out of %s', str(attempt), str(self.retry_attempts))
+                    time_to_sleep = self.delay_backoff(attempt)
+                    attempt = attempt + 1
+                    time.sleep(time_to_sleep)
+                    pass
+                
+                else :
+                    raise
+            
             now = time.time()
             if now >= until:
                 return False
-
+                    
             time.sleep(min(delay, until - now))
 
     def verify_create_instance(self, **kwargs):
@@ -963,3 +984,12 @@ class VSManager(utils.IdentifierMixin, object):
                             return price['id']
                     else:
                         return price['id']
+    
+    def delay_backoff(self, attempts):
+        '''
+        Calculate time to sleep based on attempts had been made
+        '''
+        time_to_sleep = random.random() * ( 2 ** attempts)
+        return time_to_sleep
+        
+        
