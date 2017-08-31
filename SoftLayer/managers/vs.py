@@ -398,14 +398,12 @@ class VSManager(utils.IdentifierMixin, object):
     def wait_for_transaction(self, instance_id, limit, delay=10):
         """Waits on a VS transaction for the specified amount of time.
 
-        This is really just a wrapper for wait_for_ready(pending=True).
+        This is really just a wrapper for wait_for_ready(pending=True). 
         Provided for backwards compatibility.
-
 
         :param int instance_id: The instance ID with the pending transaction
         :param int limit: The maximum amount of time to wait.
-        :param int delay: The number of seconds to sleep before checks.
-                          Defaults to 1.
+        :param int delay: The number of seconds to sleep before checks. Defaults to 10.
         """
 
         return self.wait_for_ready(instance_id, limit, delay=delay,
@@ -423,8 +421,7 @@ class VSManager(utils.IdentifierMixin, object):
 
         :param int instance_id: The instance ID with the pending transaction
         :param int limit: The maximum amount of time to wait.
-        :param int delay: The number of seconds to sleep before checks.
-                          Defaults to 1.
+        :param int delay: The number of seconds to sleep before checks. Defaults to 10.
         :param bool pending: Wait for pending transactions not related to
                              provisioning or reloads such as monitoring.
 
