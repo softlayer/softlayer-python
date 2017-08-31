@@ -7,7 +7,9 @@
 """
 import json
 import os
+import sys
 import tempfile
+
 
 import click
 import mock
@@ -369,7 +371,8 @@ class TestFormatOutput(testing.TestCase):
         self.assertEqual({}, t)
 
     def test_sequentialoutput(self):
-        t = formatting.SequentialOutput()
+        # specifying the separator prevents windows from using \n\r
+        t = formatting.SequentialOutput(separator="\n")
         self.assertTrue(hasattr(t, 'append'))
         t.append('This is a test')
         t.append('')
@@ -446,7 +449,11 @@ class TestTemplateArgs(testing.TestCase):
 
 
 class TestExportToTemplate(testing.TestCase):
+
     def test_export_to_template(self):
+        if(sys.platform.startswith("win")):
+            self.skipTest("Test doesn't work in Windows")
+        # Tempfile creation is wonky on windows
         with tempfile.NamedTemporaryFile() as tmp:
 
             template.export_to_template(tmp.name, {

@@ -9,6 +9,7 @@
 """
 
 import mock
+import sys
 
 from SoftLayer.CLI import exceptions
 from SoftLayer import testing
@@ -310,6 +311,8 @@ class ServerCLITests(testing.TestCase):
 
     @mock.patch('SoftLayer.CLI.template.export_to_template')
     def test_create_server_with_export(self, export_mock):
+        if(sys.platform.startswith("win")):
+            self.skipTest("Test doesn't work in Windows")
         result = self.run_command(['--really', 'server', 'create',
                                    '--size=S1270_8GB_2X1TBSATA_NORAID',
                                    '--hostname=test',
@@ -382,10 +385,11 @@ class ServerCLITests(testing.TestCase):
                                      hostname='hardware-test1')
 
     def test_edit_server_userfile(self):
+        if(sys.platform.startswith("win")):
+            self.skipTest("Test doesn't work in Windows")
         with tempfile.NamedTemporaryFile() as userfile:
             userfile.write(b"some data")
             userfile.flush()
-
             result = self.run_command(['server', 'edit', '1000',
                                        '--userfile=%s' % userfile.name])
 
