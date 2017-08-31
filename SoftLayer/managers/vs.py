@@ -7,11 +7,10 @@
 """
 import datetime
 import itertools
+import logging
 import socket
 import time
 import warnings
-import logging
-import random
 
 from SoftLayer import exceptions
 from SoftLayer.managers import ordering
@@ -441,32 +440,31 @@ class VSManager(utils.IdentifierMixin, object):
                       activeTransaction.id,provisionDate"""
             try:
                 instance = self.get_instance(new_instance, mask=mask)
-                          
                 last_reload = utils.lookup(instance, 'lastOperatingSystemReload', 'id')
                 active_transaction = utils.lookup(instance, 'activeTransaction', 'id')
-    
+
                 reloading = all((
                     active_transaction,
                     last_reload,
                     last_reload == active_transaction,
                 ))
-    
+
                 # only check for outstanding transactions if requested
                 outstanding = False
                 if pending:
                     outstanding = active_transaction
-    
+
                 # return True if the instance has finished provisioning
                 # and isn't currently reloading the OS.
                 if all([instance.get('provisionDate'),
                         not reloading,
                         not outstanding]):
                     return True
-            except Exception as e:
+            except exceptions.SoftLayerAPIError as exception:
                 delay = delay * 2
-                LOGGER.info('Exception: %s', str(e))
+                LOGGER.info('Exception: %s', str(exception))
                 LOGGER.info('Auto retry in %s seconds', str(delay))
-            
+
             now = time.time()
             if now >= until:
                 return False
@@ -968,12 +966,3 @@ class VSManager(utils.IdentifierMixin, object):
                             return price['id']
                     else:
                         return price['id']
-    
-    def delay_backoff(self, attempts):
-        '''
-        Calculate time to sleep based on attempts had been made
-        '''
-        time_to_sleep = random.random() * ( 2 ** attempts)
-        return time_to_sleep
-        
-        
