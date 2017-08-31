@@ -3,13 +3,14 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :license: MIT, see LICENSE for more details.
+
 """
 import mock
 
 import SoftLayer
 from SoftLayer import fixtures
 from SoftLayer import testing
-
+from SoftLayer import exceptions
 
 class VSTests(testing.TestCase):
 
@@ -748,7 +749,7 @@ class VSWaitReadyGoTests(testing.TestCase):
     def test_wait_interface(self, ready):
         # verify interface to wait_for_ready is intact
         self.vs.wait_for_transaction(1, 1)
-        ready.assert_called_once_with(1, 1, delay=1, pending=True)
+        ready.assert_called_once_with(1, 1, delay=10, pending=True)
 
     def test_active_not_provisioned(self):
         # active transaction and no provision date should be false
@@ -820,7 +821,7 @@ class VSWaitReadyGoTests(testing.TestCase):
         self.guestObject.side_effect = [
             {'activeTransaction': {'id': 1}},
         ]
-        value = self.vs.wait_for_ready(1, 0)
+        value = self.vs.wait_for_ready(1, 0, delay=1)
         self.assertFalse(value)
         self.assertFalse(_sleep.called)
 
@@ -830,7 +831,7 @@ class VSWaitReadyGoTests(testing.TestCase):
         self.guestObject.side_effect = [
             {'provisionDate': 'aaa'},
         ]
-        value = self.vs.wait_for_ready(1, 1)
+        value = self.vs.wait_for_ready(1, 1, delay=1)
         self.assertTrue(value)
         self.assertFalse(_sleep.called)
 
@@ -844,7 +845,7 @@ class VSWaitReadyGoTests(testing.TestCase):
             {'provisionDate': 'aaa'},
         ]
 
-        value = self.vs.wait_for_ready(1, 4)
+        value = self.vs.wait_for_ready(1, 4, delay=1)
         self.assertTrue(value)
         _sleep.assert_has_calls([mock.call(1), mock.call(1), mock.call(1)])
         self.guestObject.assert_has_calls([
@@ -862,7 +863,7 @@ class VSWaitReadyGoTests(testing.TestCase):
             {'provisionDate': 'aaa'}
         ]
         _time.side_effect = [0, 1, 2]
-        value = self.vs.wait_for_ready(1, 2)
+        value = self.vs.wait_for_ready(1, 2, delay=1)
         self.assertFalse(value)
         _sleep.assert_called_once_with(1)
         self.guestObject.assert_has_calls([
@@ -881,3 +882,20 @@ class VSWaitReadyGoTests(testing.TestCase):
         self.guestObject.assert_has_calls([mock.call(id=1, mask=mock.ANY)])
 
         _sleep.assert_has_calls([mock.call(10)])
+
+
+    @mock.patch('SoftLayer.managers.vs.VSManager.get_instance')
+    @mock.patch('time.time')
+    @mock.patch('time.sleep')
+    def test_exception_from_api(self, _sleep, _time, vs):
+        """Tests escalating scale back when an excaption is thrown"""
+        self.guestObject.return_value = {'activeTransaction': {'id': 1}}
+        vs.side_effect = exceptions.TransportError(104, "Its broken")
+        _time.side_effect = [0,0,2,6,14,20,100]
+        value = self.vs.wait_for_ready(1, 20, delay=1)
+        _sleep.assert_has_calls([
+            mock.call(2),
+            mock.call(4),
+            mock.call(8),
+            mock.call(6)
+        ])

@@ -50,7 +50,6 @@ class VSManager(utils.IdentifierMixin, object):
         self.client = client
         self.account = client['Account']
         self.guest = client['Virtual_Guest']
-        self.retry_attempts = 0
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
         if ordering_manager is None:
             self.ordering_manager = ordering.OrderingManager(client)
@@ -397,7 +396,7 @@ class VSManager(utils.IdentifierMixin, object):
 
         return data
 
-    def wait_for_transaction(self, instance_id, limit, delay=1):
+    def wait_for_transaction(self, instance_id, limit, delay=10):
         """Waits on a VS transaction for the specified amount of time.
 
         This is really just a wrapper for wait_for_ready(pending=True).
@@ -413,7 +412,7 @@ class VSManager(utils.IdentifierMixin, object):
         return self.wait_for_ready(instance_id, limit, delay=delay,
                                    pending=True)
 
-    def wait_for_ready(self, instance_id, limit, delay=1, pending=False):
+    def wait_for_ready(self, instance_id, limit, delay=10, pending=False):
         """Determine if a VS is ready and available.
 
         In some cases though, that can mean that no transactions are running.
@@ -436,20 +435,15 @@ class VSManager(utils.IdentifierMixin, object):
             ready = mgr.wait_for_ready(12345, 10)
         """
         until = time.time() + limit
-        attempt = 1
         for new_instance in itertools.repeat(instance_id):
             mask = """id,
                       lastOperatingSystemReload.id,
                       activeTransaction.id,provisionDate"""
-            try :
+            try:
                 instance = self.get_instance(new_instance, mask=mask)
                           
-                last_reload = utils.lookup(instance,
-                                           'lastOperatingSystemReload',
-                                           'id')
-                active_transaction = utils.lookup(instance,
-                                                  'activeTransaction',
-                                                  'id')
+                last_reload = utils.lookup(instance, 'lastOperatingSystemReload', 'id')
+                active_transaction = utils.lookup(instance, 'activeTransaction', 'id')
     
                 reloading = all((
                     active_transaction,
@@ -468,24 +462,14 @@ class VSManager(utils.IdentifierMixin, object):
                         not reloading,
                         not outstanding]):
                     return True
-
-            except Exception as e :
-                
-                if attempt < self.retry_attempts :
-                    LOGGER.info('Exception: %s', str(e))
-                    LOGGER.info('Auto re-try: %s out of %s', str(attempt), str(self.retry_attempts))
-                    time_to_sleep = self.delay_backoff(attempt)
-                    attempt = attempt + 1
-                    time.sleep(time_to_sleep)
-                    pass
-                
-                else :
-                    raise
+            except Exception as e:
+                delay = delay * 2
+                LOGGER.info('Exception: %s', str(e))
+                LOGGER.info('Auto retry in %s seconds', str(delay))
             
             now = time.time()
             if now >= until:
                 return False
-                    
             time.sleep(min(delay, until - now))
 
     def verify_create_instance(self, **kwargs):
