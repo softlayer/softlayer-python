@@ -398,7 +398,7 @@ class VSManager(utils.IdentifierMixin, object):
     def wait_for_transaction(self, instance_id, limit, delay=10):
         """Waits on a VS transaction for the specified amount of time.
 
-        This is really just a wrapper for wait_for_ready(pending=True). 
+        This is really just a wrapper for wait_for_ready(pending=True).
         Provided for backwards compatibility.
 
         :param int instance_id: The instance ID with the pending transaction
