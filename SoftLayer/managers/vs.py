@@ -8,6 +8,7 @@
 import datetime
 import itertools
 import logging
+import random
 import socket
 import time
 import warnings
@@ -406,8 +407,7 @@ class VSManager(utils.IdentifierMixin, object):
         :param int delay: The number of seconds to sleep before checks. Defaults to 10.
         """
 
-        return self.wait_for_ready(instance_id, limit, delay=delay,
-                                   pending=True)
+        return self.wait_for_ready(instance_id, limit, delay=delay, pending=True)
 
     def wait_for_ready(self, instance_id, limit, delay=10, pending=False):
         """Determine if a VS is ready and available.
@@ -457,14 +457,15 @@ class VSManager(utils.IdentifierMixin, object):
                         not reloading,
                         not outstanding]):
                     return True
+                LOGGER.info("%s not ready.", str(instance_id))
             except exceptions.SoftLayerAPIError as exception:
-                delay = delay * 2
+                delay = (delay * 2) + random.randint(0, 9)
                 LOGGER.info('Exception: %s', str(exception))
-                LOGGER.info('Auto retry in %s seconds', str(delay))
 
             now = time.time()
             if now >= until:
                 return False
+            LOGGER.info('Auto retry in %s seconds', str(min(delay, until - now)))
             time.sleep(min(delay, until - now))
 
     def verify_create_instance(self, **kwargs):

@@ -885,13 +885,15 @@ class VSWaitReadyGoTests(testing.TestCase):
         _sleep.assert_has_calls([mock.call(10)])
 
     @mock.patch('SoftLayer.managers.vs.VSManager.get_instance')
+    @mock.patch('random.randint')
     @mock.patch('time.time')
     @mock.patch('time.sleep')
-    def test_exception_from_api(self, _sleep, _time, vs):
+    def test_exception_from_api(self, _sleep, _time, _random, vs):
         """Tests escalating scale back when an excaption is thrown"""
         self.guestObject.return_value = {'activeTransaction': {'id': 1}}
         vs.side_effect = exceptions.TransportError(104, "Its broken")
         _time.side_effect = [0, 0, 2, 6, 14, 20, 100]
+        _random.side_effect = [0, 0, 0, 0, 0]
         value = self.vs.wait_for_ready(1, 20, delay=1)
         _sleep.assert_has_calls([
             mock.call(2),
