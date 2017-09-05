@@ -1,7 +1,14 @@
 # Change Log
 
+## [5.2.13] - 2017-09-05
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.12...master
+ - Support for hourly billing of storage
+ - Added exception handling for Managers.VSManager.wait_for_ready()
+ - Added windows support for unit testing
+ - Updated pypy version
+ 
 ## [5.2.12] - 2017-08-09
- - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.11...master
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.11...v5.2.12
  - Support for storage_as_a_service block and file storage
  
 #### Added to CLI
