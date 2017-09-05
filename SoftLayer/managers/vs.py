@@ -7,6 +7,8 @@
 """
 import datetime
 import itertools
+import logging
+import random
 import socket
 import time
 import warnings
@@ -14,6 +16,8 @@ import warnings
 from SoftLayer import exceptions
 from SoftLayer.managers import ordering
 from SoftLayer import utils
+
+LOGGER = logging.getLogger(__name__)
 # pylint: disable=no-self-use
 
 
@@ -392,23 +396,20 @@ class VSManager(utils.IdentifierMixin, object):
 
         return data
 
-    def wait_for_transaction(self, instance_id, limit, delay=1):
+    def wait_for_transaction(self, instance_id, limit, delay=10):
         """Waits on a VS transaction for the specified amount of time.
 
         This is really just a wrapper for wait_for_ready(pending=True).
         Provided for backwards compatibility.
 
-
         :param int instance_id: The instance ID with the pending transaction
         :param int limit: The maximum amount of time to wait.
-        :param int delay: The number of seconds to sleep before checks.
-                          Defaults to 1.
+        :param int delay: The number of seconds to sleep before checks. Defaults to 10.
         """
 
-        return self.wait_for_ready(instance_id, limit, delay=delay,
-                                   pending=True)
+        return self.wait_for_ready(instance_id, limit, delay=delay, pending=True)
 
-    def wait_for_ready(self, instance_id, limit, delay=1, pending=False):
+    def wait_for_ready(self, instance_id, limit, delay=10, pending=False):
         """Determine if a VS is ready and available.
 
         In some cases though, that can mean that no transactions are running.
@@ -420,8 +421,7 @@ class VSManager(utils.IdentifierMixin, object):
 
         :param int instance_id: The instance ID with the pending transaction
         :param int limit: The maximum amount of time to wait.
-        :param int delay: The number of seconds to sleep before checks.
-                          Defaults to 1.
+        :param int delay: The number of seconds to sleep before checks. Defaults to 10.
         :param bool pending: Wait for pending transactions not related to
                              provisioning or reloads such as monitoring.
 
@@ -435,36 +435,37 @@ class VSManager(utils.IdentifierMixin, object):
             mask = """id,
                       lastOperatingSystemReload.id,
                       activeTransaction.id,provisionDate"""
-            instance = self.get_instance(new_instance, mask=mask)
-            last_reload = utils.lookup(instance,
-                                       'lastOperatingSystemReload',
-                                       'id')
-            active_transaction = utils.lookup(instance,
-                                              'activeTransaction',
-                                              'id')
+            try:
+                instance = self.get_instance(new_instance, mask=mask)
+                last_reload = utils.lookup(instance, 'lastOperatingSystemReload', 'id')
+                active_transaction = utils.lookup(instance, 'activeTransaction', 'id')
 
-            reloading = all((
-                active_transaction,
-                last_reload,
-                last_reload == active_transaction,
-            ))
+                reloading = all((
+                    active_transaction,
+                    last_reload,
+                    last_reload == active_transaction,
+                ))
 
-            # only check for outstanding transactions if requested
-            outstanding = False
-            if pending:
-                outstanding = active_transaction
+                # only check for outstanding transactions if requested
+                outstanding = False
+                if pending:
+                    outstanding = active_transaction
 
-            # return True if the instance has finished provisioning
-            # and isn't currently reloading the OS.
-            if all([instance.get('provisionDate'),
-                    not reloading,
-                    not outstanding]):
-                return True
+                # return True if the instance has finished provisioning
+                # and isn't currently reloading the OS.
+                if all([instance.get('provisionDate'),
+                        not reloading,
+                        not outstanding]):
+                    return True
+                LOGGER.info("%s not ready.", str(instance_id))
+            except exceptions.SoftLayerAPIError as exception:
+                delay = (delay * 2) + random.randint(0, 9)
+                LOGGER.info('Exception: %s', str(exception))
 
             now = time.time()
             if now >= until:
                 return False
-
+            LOGGER.info('Auto retry in %s seconds', str(min(delay, until - now)))
             time.sleep(min(delay, until - now))
 
     def verify_create_instance(self, **kwargs):
