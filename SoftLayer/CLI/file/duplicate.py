@@ -45,14 +45,22 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
               type=int,
               help='The size of snapshot space to order for the duplicate. '
                    '***If no snapshot space size is specified, the snapshot '
-                   'space size of the origin volume will be used.***\n'
+                   'space size of the origin file volume will be used.***\n'
                    'Input "0" for this parameter to order a duplicate volume '
                    'with no snapshot space.')
+@click.option('--billing',
+              type=click.Choice(['hourly', 'monthly']),
+              default='monthly',
+              help="Optional parameter for Billing rate (default to monthly)")
 @environment.pass_env
 def cli(env, origin_volume_id, origin_snapshot_id, duplicate_size,
-        duplicate_iops, duplicate_tier, duplicate_snapshot_size):
+        duplicate_iops, duplicate_tier, duplicate_snapshot_size, billing):
     """Order a duplicate file storage volume."""
     file_manager = SoftLayer.FileStorageManager(env.client)
+
+    hourly_billing_flag = False
+    if billing.lower() == "hourly":
+        hourly_billing_flag = True
 
     if duplicate_tier is not None:
         duplicate_tier = float(duplicate_tier)
@@ -64,7 +72,8 @@ def cli(env, origin_volume_id, origin_snapshot_id, duplicate_size,
             duplicate_size=duplicate_size,
             duplicate_iops=duplicate_iops,
             duplicate_tier_level=duplicate_tier,
-            duplicate_snapshot_size=duplicate_snapshot_size
+            duplicate_snapshot_size=duplicate_snapshot_size,
+            hourly_billing_flag=hourly_billing_flag
         )
     except ValueError as ex:
         raise exceptions.ArgumentError(str(ex))

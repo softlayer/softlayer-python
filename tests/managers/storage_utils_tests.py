@@ -2721,7 +2721,8 @@ class StorageUtilsTests(testing.TestCase):
             'prices': [{'id': 193613}],
             'quantity': 1,
             'location': 449500,
-            'volumeId': 102
+            'volumeId': 102,
+            'useHourlyPricing': False
         }
 
         result = storage_utils.prepare_snapshot_order_object(
@@ -2743,7 +2744,8 @@ class StorageUtilsTests(testing.TestCase):
             'prices': [{'id': 193853}],
             'quantity': 1,
             'location': 449500,
-            'volumeId': 102
+            'volumeId': 102,
+            'useHourlyPricing': False
         }
 
         result = storage_utils.prepare_snapshot_order_object(
@@ -2792,7 +2794,8 @@ class StorageUtilsTests(testing.TestCase):
             'prices': [{'id': 191193}],
             'quantity': 1,
             'location': 449500,
-            'volumeId': 102
+            'volumeId': 102,
+            'useHourlyPricing': False
         }
 
         result = storage_utils.prepare_snapshot_order_object(
@@ -2841,7 +2844,8 @@ class StorageUtilsTests(testing.TestCase):
             'prices': [{'id': 46160}],
             'quantity': 1,
             'location': 449500,
-            'volumeId': 100
+            'volumeId': 100,
+            'useHourlyPricing': False
         }
 
         result = storage_utils.prepare_snapshot_order_object(
@@ -2865,7 +2869,8 @@ class StorageUtilsTests(testing.TestCase):
             'prices': [{'id': 45860}],
             'quantity': 1,
             'location': 449500,
-            'volumeId': 100
+            'volumeId': 100,
+            'useHourlyPricing': False
         }
 
         result = storage_utils.prepare_snapshot_order_object(
@@ -2873,6 +2878,33 @@ class StorageUtilsTests(testing.TestCase):
         )
 
         self.assertEqual(expected_object, result)
+
+    def test_prep_snapshot_order_hourly_billing(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
+        prev_hourly_flag = mock_volume['billingItem']['hourlyFlag']
+        mock_volume['billingItem']['hourlyFlag'] = True
+
+        expected_object = {
+            'complexType': 'SoftLayer_Container_Product_Order_'
+                           'Network_Storage_Enterprise_SnapshotSpace',
+            'packageId': 759,
+            'prices': [{'id': 193853}],
+            'quantity': 1,
+            'location': 449500,
+            'volumeId': 102,
+            'useHourlyPricing': True
+        }
+
+        result = storage_utils.prepare_snapshot_order_object(
+            self.block, mock_volume, 20, None, False
+        )
+
+        self.assertEqual(expected_object, result)
+
+        mock_volume['billingItem']['hourlyFlag'] = prev_hourly_flag
 
     # ---------------------------------------------------------------------
     # Tests for prepare_volume_order_object()
@@ -2977,7 +3009,8 @@ class StorageUtilsTests(testing.TestCase):
             'quantity': 1,
             'location': 29,
             'volumeSize': 1000,
-            'iops': 800
+            'iops': 800,
+            'useHourlyPricing': False
         }
 
         result = storage_utils.prepare_volume_order_object(
@@ -3007,7 +3040,8 @@ class StorageUtilsTests(testing.TestCase):
             'quantity': 1,
             'location': 29,
             'volumeSize': 1000,
-            'iops': 800
+            'iops': 800,
+            'useHourlyPricing': False
         }
 
         result = storage_utils.prepare_volume_order_object(
@@ -3035,7 +3069,8 @@ class StorageUtilsTests(testing.TestCase):
             ],
             'quantity': 1,
             'location': 29,
-            'volumeSize': 1000
+            'volumeSize': 1000,
+            'useHourlyPricing': False
         }
 
         result = storage_utils.prepare_volume_order_object(
@@ -3064,7 +3099,8 @@ class StorageUtilsTests(testing.TestCase):
             ],
             'quantity': 1,
             'location': 29,
-            'volumeSize': 1000
+            'volumeSize': 1000,
+            'useHourlyPricing': False
         }
 
         result = storage_utils.prepare_volume_order_object(
@@ -3092,7 +3128,8 @@ class StorageUtilsTests(testing.TestCase):
                 {'id': 41562}
             ],
             'quantity': 1,
-            'location': 29
+            'location': 29,
+            'useHourlyPricing': False
         }
 
         result = storage_utils.prepare_volume_order_object(
@@ -3120,7 +3157,8 @@ class StorageUtilsTests(testing.TestCase):
                 {'id': 41562}
             ],
             'quantity': 1,
-            'location': 29
+            'location': 29,
+            'useHourlyPricing': False
         }
 
         result = storage_utils.prepare_volume_order_object(
@@ -3149,7 +3187,8 @@ class StorageUtilsTests(testing.TestCase):
                 {'id': 45088}
             ],
             'quantity': 1,
-            'location': 29
+            'location': 29,
+            'useHourlyPricing': False
         }
 
         result = storage_utils.prepare_volume_order_object(
@@ -3179,7 +3218,8 @@ class StorageUtilsTests(testing.TestCase):
                 {'id': 46170}
             ],
             'quantity': 1,
-            'location': 29
+            'location': 29,
+            'useHourlyPricing': False
         }
 
         result = storage_utils.prepare_volume_order_object(
@@ -3335,7 +3375,8 @@ class StorageUtilsTests(testing.TestCase):
             'location': 51,
             'originVolumeId': 102,
             'originVolumeScheduleId': 978,
-            'volumeSize': 500
+            'volumeSize': 500,
+            'useHourlyPricing': False
         }
 
         result = storage_utils.prepare_replicant_order_object(
@@ -3368,7 +3409,8 @@ class StorageUtilsTests(testing.TestCase):
             'location': 51,
             'originVolumeId': 102,
             'originVolumeScheduleId': 978,
-            'volumeSize': 500
+            'volumeSize': 500,
+            'useHourlyPricing': False
         }
 
         result = storage_utils.prepare_replicant_order_object(
@@ -3431,7 +3473,8 @@ class StorageUtilsTests(testing.TestCase):
             'originVolumeId': 102,
             'originVolumeScheduleId': 978,
             'volumeSize': 500,
-            'iops': 1000
+            'iops': 1000,
+            'useHourlyPricing': False
         }
 
         result = storage_utils.prepare_replicant_order_object(
@@ -3492,7 +3535,8 @@ class StorageUtilsTests(testing.TestCase):
             'quantity': 1,
             'location': 51,
             'originVolumeId': 100,
-            'originVolumeScheduleId': 978
+            'originVolumeScheduleId': 978,
+            'useHourlyPricing': False
         }
 
         result = storage_utils.prepare_replicant_order_object(
@@ -3526,7 +3570,8 @@ class StorageUtilsTests(testing.TestCase):
             'quantity': 1,
             'location': 51,
             'originVolumeId': 100,
-            'originVolumeScheduleId': 978
+            'originVolumeScheduleId': 978,
+            'useHourlyPricing': False
         }
 
         result = storage_utils.prepare_replicant_order_object(
@@ -3534,6 +3579,44 @@ class StorageUtilsTests(testing.TestCase):
         )
 
         self.assertEqual(expected_object, result)
+
+    def test_prep_replicant_order_hourly_billing(self):
+        mock = self.set_mock('SoftLayer_Location_Datacenter', 'getDatacenters')
+        mock.return_value = [{'id': 51, 'name': 'wdc04'}]
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
+        prev_hourly_flag = mock_volume['billingItem']['hourlyFlag']
+        mock_volume['billingItem']['hourlyFlag'] = True
+
+        expected_object = {
+            'complexType': 'SoftLayer_Container_Product_Order_'
+                           'Network_Storage_AsAService',
+            'packageId': 759,
+            'prices': [
+                {'id': 189433},
+                {'id': 189443},
+                {'id': 193433},
+                {'id': 193373},
+                {'id': 193613},
+                {'id': 194693}
+            ],
+            'quantity': 1,
+            'location': 51,
+            'originVolumeId': 102,
+            'originVolumeScheduleId': 978,
+            'volumeSize': 500,
+            'useHourlyPricing': True
+        }
+
+        result = storage_utils.prepare_replicant_order_object(
+            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block'
+        )
+
+        self.assertEqual(expected_object, result)
+
+        mock_volume['billingItem']['hourlyFlag'] = prev_hourly_flag
 
     # ---------------------------------------------------------------------
     # Tests for prepare_duplicate_order_object()
@@ -3657,7 +3740,8 @@ class StorageUtilsTests(testing.TestCase):
             'volumeSize': 500,
             'quantity': 1,
             'location': 449500,
-            'duplicateOriginVolumeId': 102}
+            'duplicateOriginVolumeId': 102,
+            'useHourlyPricing': False}
 
         result = storage_utils.prepare_duplicate_order_object(
             self.block, mock_volume, None, None, None, None, 'block')
@@ -3797,7 +3881,8 @@ class StorageUtilsTests(testing.TestCase):
             'quantity': 1,
             'location': 449500,
             'duplicateOriginVolumeId': 102,
-            'iops': 1000}
+            'iops': 1000,
+            'useHourlyPricing': False}
 
         result = storage_utils.prepare_duplicate_order_object(
             self.file, mock_volume, None, None, None, None, 'file')
@@ -3829,7 +3914,8 @@ class StorageUtilsTests(testing.TestCase):
             'quantity': 1,
             'location': 449500,
             'duplicateOriginVolumeId': 102,
-            'iops': 2000}
+            'iops': 2000,
+            'useHourlyPricing': False}
 
         result = storage_utils.prepare_duplicate_order_object(
             self.block, mock_volume, 2000, None, 1000, 10, 'block')
@@ -3861,7 +3947,8 @@ class StorageUtilsTests(testing.TestCase):
             'quantity': 1,
             'location': 449500,
             'duplicateOriginVolumeId': 102,
-            'iops': 2000}
+            'iops': 2000,
+            'useHourlyPricing': False}
 
         result = storage_utils.prepare_duplicate_order_object(
             self.file, mock_volume, 2000, None, 1000, 10, 'file')
@@ -3954,7 +4041,8 @@ class StorageUtilsTests(testing.TestCase):
             'volumeSize': 500,
             'quantity': 1,
             'location': 449500,
-            'duplicateOriginVolumeId': 102}
+            'duplicateOriginVolumeId': 102,
+            'useHourlyPricing': False}
 
         result = storage_utils.prepare_duplicate_order_object(
             self.file, mock_volume, None, None, None, None, 'file')
@@ -3983,7 +4071,8 @@ class StorageUtilsTests(testing.TestCase):
             'volumeSize': 1000,
             'quantity': 1,
             'location': 449500,
-            'duplicateOriginVolumeId': 102}
+            'duplicateOriginVolumeId': 102,
+            'useHourlyPricing': False}
 
         result = storage_utils.prepare_duplicate_order_object(
             self.block, mock_volume, None, 4.0, 1000, 10, 'block')
@@ -4012,7 +4101,8 @@ class StorageUtilsTests(testing.TestCase):
             'volumeSize': 1000,
             'quantity': 1,
             'location': 449500,
-            'duplicateOriginVolumeId': 102}
+            'duplicateOriginVolumeId': 102,
+            'useHourlyPricing': False}
 
         result = storage_utils.prepare_duplicate_order_object(
             self.file, mock_volume, None, 4.0, 1000, 10, 'file')

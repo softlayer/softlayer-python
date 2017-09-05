@@ -25,6 +25,21 @@ class FileTests(testing.TestCase):
             identifier=449,
         )
 
+    def test_cancel_file_volume_immediately_hourly_billing(self):
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        mock.return_value = {
+            'billingItem': {'hourlyFlag': True, 'id': 449},
+        }
+
+        self.file.cancel_file_volume(123, immediate=False)
+
+        self.assert_called_with(
+            'SoftLayer_Billing_Item',
+            'cancelItem',
+            args=(True, True, 'No longer needed'),
+            identifier=449,
+        )
+
     def test_authorize_host_to_volume(self):
         result = self.file.authorize_host_to_volume(
             50,
@@ -164,6 +179,48 @@ class FileTests(testing.TestCase):
             'cancelItem',
             args=(True, True, 'No longer needed'),
             identifier=123,
+        )
+
+    def test_cancel_snapshot_hourly_billing_immediate_true(self):
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        mock.return_value = {
+            'billingItem': {
+                'activeChildren': [
+                    {'categoryCode': 'storage_snapshot_space', 'id': 417}
+                ],
+                'hourlyFlag': True,
+                'id': 449
+            },
+        }
+
+        self.file.cancel_snapshot_space(1234, immediate=True)
+
+        self.assert_called_with(
+            'SoftLayer_Billing_Item',
+            'cancelItem',
+            args=(True, True, 'No longer needed'),
+            identifier=417,
+        )
+
+    def test_cancel_snapshot_hourly_billing_immediate_false(self):
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        mock.return_value = {
+            'billingItem': {
+                'activeChildren': [
+                    {'categoryCode': 'storage_snapshot_space', 'id': 417}
+                ],
+                'hourlyFlag': True,
+                'id': 449
+            },
+        }
+
+        self.file.cancel_snapshot_space(1234, immediate=False)
+
+        self.assert_called_with(
+            'SoftLayer_Billing_Item',
+            'cancelItem',
+            args=(True, True, 'No longer needed'),
+            identifier=417,
         )
 
     def test_cancel_snapshot_exception_no_billing_item_active_children(self):
@@ -385,7 +442,8 @@ class FileTests(testing.TestCase):
                 'volumeSize': 1000,
                 'quantity': 1,
                 'location': 449494,
-                'iops': 2000
+                'iops': 2000,
+                'useHourlyPricing': False
             },)
         )
 
@@ -429,7 +487,8 @@ class FileTests(testing.TestCase):
                 ],
                 'volumeSize': 1000,
                 'quantity': 1,
-                'location': 449494
+                'location': 449494,
+                'useHourlyPricing': False
             },)
         )
 
@@ -461,7 +520,8 @@ class FileTests(testing.TestCase):
                 ],
                 'quantity': 1,
                 'location': 449500,
-                'volumeId': 102
+                'volumeId': 102,
+                'useHourlyPricing': False
             },)
         )
 
@@ -493,7 +553,8 @@ class FileTests(testing.TestCase):
                 ],
                 'quantity': 1,
                 'location': 449500,
-                'volumeId': 102
+                'volumeId': 102,
+                'useHourlyPricing': False
             },)
         )
 
@@ -536,7 +597,8 @@ class FileTests(testing.TestCase):
                 'location': 449494,
                 'iops': 1000,
                 'originVolumeId': 102,
-                'originVolumeScheduleId': 978
+                'originVolumeScheduleId': 978,
+                'useHourlyPricing': False
             },)
         )
 
@@ -578,7 +640,8 @@ class FileTests(testing.TestCase):
                 'quantity': 1,
                 'location': 449494,
                 'originVolumeId': 102,
-                'originVolumeScheduleId': 978
+                'originVolumeScheduleId': 978,
+                'useHourlyPricing': False
             },)
         )
 
@@ -617,7 +680,8 @@ class FileTests(testing.TestCase):
                 'quantity': 1,
                 'location': 449500,
                 'duplicateOriginVolumeId': 102,
-                'iops': 1000
+                'iops': 1000,
+                'useHourlyPricing': False
             },))
 
         mock_volume['storageType']['keyName'] = prev_storage_type_keyname
@@ -662,7 +726,8 @@ class FileTests(testing.TestCase):
                 'location': 449500,
                 'duplicateOriginVolumeId': 102,
                 'duplicateOriginSnapshotId': 470,
-                'iops': 2000
+                'iops': 2000,
+                'useHourlyPricing': False
             },))
 
         mock_volume['storageType']['keyName'] = prev_storage_type_keyname
@@ -699,7 +764,8 @@ class FileTests(testing.TestCase):
                 'volumeSize': 500,
                 'quantity': 1,
                 'location': 449500,
-                'duplicateOriginVolumeId': 102
+                'duplicateOriginVolumeId': 102,
+                'useHourlyPricing': False
             },))
 
         mock_volume['storageType']['keyName'] = prev_storage_type_keyname
@@ -743,7 +809,8 @@ class FileTests(testing.TestCase):
                 'quantity': 1,
                 'location': 449500,
                 'duplicateOriginVolumeId': 102,
-                'duplicateOriginSnapshotId': 470
+                'duplicateOriginSnapshotId': 470,
+                'useHourlyPricing': False
             },))
 
         mock_volume['storageType']['keyName'] = prev_storage_type_keyname
