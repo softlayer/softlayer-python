@@ -221,13 +221,14 @@ class VSManager(utils.IdentifierMixin, object):
                                         referenceCode]]],'''
                 'hourlyBillingFlag,'
                 'userData,'
-                'billingItem['
-                'id,nextInvoiceTotalRecurringAmount,'
-                'children[categoryCode,nextInvoiceTotalRecurringAmount],'
-                'orderItem.order.userRecord[username]'
-                '],'
+                '''billingItem[id,nextInvoiceTotalRecurringAmount,
+                               children[categoryCode,nextInvoiceTotalRecurringAmount],
+                               orderItem[id,
+                                         order.userRecord[username],
+                                         preset.keyName]],'''
                 'tagReferences[id,tag[name,id]],'
-                'networkVlans[id,vlanNumber,networkSpace]'
+                'networkVlans[id,vlanNumber,networkSpace],'
+                'dedicatedHost.id'
             )
 
         return self.guest.getObject(id=instance_id, **kwargs)
@@ -303,19 +304,26 @@ class VSManager(utils.IdentifierMixin, object):
             dedicated=False, public_vlan=None, private_vlan=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
             private=False, ssh_keys=None, public_security_groups=None,
-            private_security_groups=None):
+            private_security_groups=None, **kwargs):
         """Returns a dict appropriate to pass into Virtual_Guest::createObject
 
             See :func:`create_instance` for a list of available options.
         """
-        required = [cpus, memory, hostname, domain]
+        required = [hostname, domain]
+
+        flavor = kwargs.get('flavor', None)
+        host_id = kwargs.get('host_id', None)
 
         mutually_exclusive = [
-            {'os_code': os_code, "image_id": image_id},
+            {'os_code': os_code, 'image_id': image_id},
+            {'cpu': cpus, 'flavor': flavor},
+            {'memory': memory, 'flavor': flavor},
+            {'flavor': flavor, 'dedicated': dedicated},
+            {'flavor': flavor, 'host_id': host_id}
         ]
 
         if not all(required):
-            raise ValueError("cpu, memory, hostname, and domain are required")
+            raise ValueError("hostname, and domain are required")
 
         for mu_ex in mutually_exclusive:
             if all(mu_ex.values()):
@@ -323,17 +331,22 @@ class VSManager(utils.IdentifierMixin, object):
                     'Can only specify one of: %s' % (','.join(mu_ex.keys())))
 
         data = {
-            "startCpus": int(cpus),
-            "maxMemory": int(memory),
+            "startCpus": cpus,
+            "maxMemory": memory,
             "hostname": hostname,
             "domain": domain,
             "localDiskFlag": local_disk,
+            "hourlyBillingFlag": hourly
         }
 
-        data["hourlyBillingFlag"] = hourly
+        if flavor:
+            data["supplementalCreateObjectOptions"] = {"flavorKeyName": flavor}
 
-        if dedicated:
+        if dedicated and not host_id:
             data["dedicatedAccountHostOnlyFlag"] = dedicated
+
+        if host_id:
+            data["dedicatedHost"] = {"id": host_id}
 
         if private:
             data['privateNetworkOnlyFlag'] = private
@@ -563,6 +576,10 @@ class VSManager(utils.IdentifierMixin, object):
         :param list ssh_keys: The SSH keys to add to the root user
         :param int nic_speed: The port speed to set
         :param string tags: tags to set on the VS as a comma separated list
+        :param string flavor: The key name of the public virtual server flavor
+                              being ordered.
+        :param int host_id: The host id of a dedicated host to provision a
+                            dedicated host virtual server on.
         """
         tags = kwargs.pop('tags', None)
         inst = self.guest.createObject(self._generate_create_dict(**kwargs))
