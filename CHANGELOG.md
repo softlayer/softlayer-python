@@ -1,7 +1,12 @@
 # Change Log
 
+## [5.2.14] - 2017-09-13
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.13...master
+ - Improved slcli vs create-options output
+ - Updated slcli vs create to support new virtual server public and dedicated host offerings
+
 ## [5.2.13] - 2017-09-05
- - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.12...master
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.12...v5.2.13
  - Support for hourly billing of storage
  - Added exception handling for Managers.VSManager.wait_for_ready()
  - Added windows support for unit testing
