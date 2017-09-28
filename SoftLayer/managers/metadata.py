@@ -12,24 +12,24 @@ from SoftLayer import transports
 
 
 METADATA_MAPPING = {
-    'backend_mac': {'call': 'BackendMacAddresses'},
-    'datacenter': {'call': 'Datacenter'},
-    'datacenter_id': {'call': 'DatacenterId'},
-    'domain': {'call': 'Domain'},
-    'frontend_mac': {'call': 'FrontendMacAddresses'},
-    'fqdn': {'call': 'FullyQualifiedDomainName'},
-    'hostname': {'call': 'Hostname'},
-    'id': {'call': 'Id'},
-    'primary_backend_ip': {'call': 'PrimaryBackendIpAddress'},
-    'primary_ip': {'call': 'PrimaryIpAddress'},
-    'primary_frontend_ip': {'call': 'PrimaryIpAddress'},
-    'provision_state': {'call': 'ProvisionState'},
-    'router': {'call': 'Router', 'param_req': True},
-    'tags': {'call': 'Tags'},
-    'user_data': {'call': 'UserMetadata'},
-    'user_metadata': {'call': 'UserMetadata'},
-    'vlan_ids': {'call': 'VlanIds', 'param_req': True},
-    'vlans': {'call': 'Vlans', 'param_req': True},
+    'backend_mac': {'call': 'getBackendMacAddresses'},
+    'datacenter': {'call': 'getDatacenter'},
+    'datacenter_id': {'call': 'getDatacenterId'},
+    'domain': {'call': 'getDomain'},
+    'frontend_mac': {'call': 'getFrontendMacAddresses'},
+    'fqdn': {'call': 'getFullyQualifiedDomainName'},
+    'hostname': {'call': 'getHostname'},
+    'id': {'call': 'getId'},
+    'primary_backend_ip': {'call': 'getPrimaryBackendIpAddress'},
+    'primary_ip': {'call': 'getPrimaryIpAddress'},
+    'primary_frontend_ip': {'call': 'getPrimaryIpAddress'},
+    'provision_state': {'call': 'getProvisionState'},
+    'router': {'call': 'getRouter', 'param_req': True},
+    'tags': {'call': 'getTags'},
+    'user_data': {'call': 'getUserMetadata'},
+    'user_metadata': {'call': 'getUserMetadata'},
+    'vlan_ids': {'call': 'getVlanIds', 'param_req': True},
+    'vlans': {'call': 'getVlans', 'param_req': True},
 }
 METADATA_ATTRIBUTES = METADATA_MAPPING.keys()
 
@@ -92,7 +92,7 @@ class MetadataManager(object):
             params = (param,)
         try:
             return self.client.call('Resource_Metadata',
-                                    "get"+self.attribs[name]['call'],
+                                    self.attribs[name]['call'],
                                     *params)
         except exceptions.SoftLayerAPIError as ex:
             if ex.faultCode == 404:

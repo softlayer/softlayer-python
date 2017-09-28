@@ -15,19 +15,19 @@ class MetadataTests(testing.TestCase):
         self.metadata = SoftLayer.MetadataManager(client=self.client)
 
     def test_get(self):
-        mock = self.set_mock('SoftLayer_Resource_Metadata', 'Datacenter')
+        mock = self.set_mock('SoftLayer_Resource_Metadata', 'getDatacenter')
         mock.return_value = 'dal01'
         resp = self.metadata.get('datacenter')
 
         self.assertEqual('dal01', resp)
-        self.assert_called_with('SoftLayer_Resource_Metadata', 'Datacenter',
+        self.assert_called_with('SoftLayer_Resource_Metadata', 'getDatacenter',
                                 identifier=None)
 
     def test_no_param(self):
         resp = self.metadata.get('datacenter')
 
         self.assertEqual('dal01', resp)
-        self.assert_called_with('SoftLayer_Resource_Metadata', 'Datacenter',
+        self.assert_called_with('SoftLayer_Resource_Metadata', 'getDatacenter',
                                 identifier=None,
                                 args=tuple())
 
@@ -35,18 +35,18 @@ class MetadataTests(testing.TestCase):
         resp = self.metadata.get('vlans', '1:2:3:4:5')
 
         self.assertEqual([10, 124], resp)
-        self.assert_called_with('SoftLayer_Resource_Metadata', 'Vlans',
+        self.assert_called_with('SoftLayer_Resource_Metadata', 'getVlans',
                                 args=('1:2:3:4:5',))
 
     def test_user_data(self):
         resp = self.metadata.get('user_data')
 
         self.assertEqual(resp, 'User-supplied data')
-        self.assert_called_with('SoftLayer_Resource_Metadata', 'UserMetadata',
+        self.assert_called_with('SoftLayer_Resource_Metadata', 'getUserMetadata',
                                 identifier=None)
 
     def test_return_none(self):
-        mock = self.set_mock('SoftLayer_Resource_Metadata', 'Datacenter')
+        mock = self.set_mock('SoftLayer_Resource_Metadata', 'getDatacenter')
         mock.return_value = None
 
         resp = self.metadata.get('datacenter')
@@ -54,7 +54,7 @@ class MetadataTests(testing.TestCase):
         self.assertEqual(None, resp)
 
     def test_404(self):
-        mock = self.set_mock('SoftLayer_Resource_Metadata', 'UserMetadata')
+        mock = self.set_mock('SoftLayer_Resource_Metadata', 'getUserMetadata')
         mock.side_effect = SoftLayer.SoftLayerAPIError(404, 'Not Found')
         resp = self.metadata.get('user_data')
 
@@ -62,7 +62,7 @@ class MetadataTests(testing.TestCase):
 
     def test_error(self):
         exception = SoftLayer.SoftLayerAPIError(500, 'Error')
-        mock = self.set_mock('SoftLayer_Resource_Metadata', 'UserMetadata')
+        mock = self.set_mock('SoftLayer_Resource_Metadata', 'getUserMetadata')
         mock.side_effect = exception
 
         self.assertRaises(SoftLayer.SoftLayerAPIError,
