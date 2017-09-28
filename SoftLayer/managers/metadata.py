@@ -92,7 +92,7 @@ class MetadataManager(object):
             params = (param,)
         try:
             return self.client.call('Resource_Metadata',
-                                    self.attribs[name]['call'],
+                                    "get"+self.attribs[name]['call'],
                                     *params)
         except exceptions.SoftLayerAPIError as ex:
             if ex.faultCode == 404:
