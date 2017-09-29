@@ -1,8 +1,8 @@
-FrontendMacAddresses = ['06-00-00-00-00-00']
-BackendMacAddresses = ['07-00-00-00-00-00']
-FrontendMacAddresses = ['06-00-00-00-00-00']
-Router = 'brc01'
-Vlans = [10, 124]
-VlanIds = [8384, 12446]
-Datacenter = 'dal01'
-UserMetadata = 'User-supplied data'
+getFrontendMacAddresses = ['06-00-00-00-00-00']
+getBackendMacAddresses = ['07-00-00-00-00-00']
+getFrontendMacAddresses = ['06-00-00-00-00-00']
+getRouter = 'brc01'
+getVlans = [10, 124]
+getVlanIds = [8384, 12446]
+getDatacenter = 'dal01'
+getUserMetadata = 'User-supplied data'
