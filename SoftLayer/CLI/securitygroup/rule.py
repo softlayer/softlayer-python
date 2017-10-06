@@ -17,7 +17,8 @@ COLUMNS = ['id',
            'portRangeMax',
            'protocol']
 
-REQUEST_COLUMNS = ['requestId']
+REQUEST_BOOL_COLUMNS = ['requestId', 'response']
+REQUEST_RULES_COLUMNS = ['requestId', 'rules']
 
 
 @click.command()
@@ -84,11 +85,13 @@ def add(env, securitygroup_id, remote_ip, remote_group,
                                      direction, ethertype, port_max,
                                      port_min, protocol)
 
+    print ret
+
     if not ret:
         raise exceptions.CLIAbort("Failed to add security group rule")
 
-    table = formatting.Table(REQUEST_COLUMNS)
-    table.add_row([ret['id']])
+    table = formatting.Table(REQUEST_RULES_COLUMNS)
+    table.add_row([ret['requestId'], str(ret['rules'])])
 
     env.fout(table)
 
@@ -137,8 +140,9 @@ def edit(env, securitygroup_id, rule_id, remote_ip, remote_group,
     if not ret:
         raise exceptions.CLIAbort("Failed to edit security group rule")
 
-    table = formatting.Table(REQUEST_COLUMNS)
-    table.add_row([ret['id']])
+    table = formatting.Table(REQUEST_BOOL_COLUMNS)
+    table.add_row([ret['requestId']])
+    table.add_row([ret['response']])
 
     env.fout(table)
 
@@ -156,7 +160,8 @@ def remove(env, securitygroup_id, rule_id):
     if not ret:
         raise exceptions.CLIAbort("Failed to remove security group rule")
 
-    table = formatting.Table(REQUEST_COLUMNS)
-    table.add_row([ret['id']])
+    table = formatting.Table(REQUEST_BOOL_COLUMNS)
+    table.add_row([ret['requestId']])
+    table.add_row([ret['response']])
 
     env.fout(table)
