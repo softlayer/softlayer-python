@@ -272,9 +272,7 @@ class RestTransport(object):
         if request.identifier is not None:
             url_parts.append(str(request.identifier))
 
-        # Special methods (createObject, editObject, etc) use the HTTP verb
-        # to determine the action on the resource
-        if request.method is not None and not is_special_method:
+        if request.method is not None:
             url_parts.append(request.method)
 
         url = '%s.%s' % ('/'.join(url_parts), 'json')
