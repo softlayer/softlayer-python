@@ -445,3 +445,12 @@ class ServerCLITests(testing.TestCase):
             args=(100,),
             identifier=100,
         )
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_rescue(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['server', 'rescue', '1000'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.output, "")
+        self.assert_called_with('SoftLayer_Hardware_Server', 'bootToRescueLayer', identifier=1000)
