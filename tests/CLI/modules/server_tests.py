@@ -454,3 +454,11 @@ class ServerCLITests(testing.TestCase):
         self.assert_no_fail(result)
         self.assertEqual(result.output, "")
         self.assert_called_with('SoftLayer_Hardware_Server', 'bootToRescueLayer', identifier=1000)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_server_rescue_negative(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['server', 'rescue', '1000'])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
