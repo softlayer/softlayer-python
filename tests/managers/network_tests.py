@@ -162,15 +162,19 @@ class NetworkTests(testing.TestCase):
                                                    description='bar')
 
         sg_fixture = fixtures.SoftLayer_Network_SecurityGroup
-        self.assertEqual(sg_fixture.createObjects, [result])
+        self.assertEqual(sg_fixture.createObject, result)
+        self.assert_called_with('SoftLayer_Network_SecurityGroup',
+                                'createObject',
+                                args=({'name': 'foo',
+                                       'description': 'bar'},))
 
     def test_delete_securitygroup(self):
         result = self.network.delete_securitygroup(100)
 
         self.assertTrue(result)
         self.assert_called_with('SoftLayer_Network_SecurityGroup',
-                                'deleteObjects',
-                                args=([{'id': 100}],))
+                                'deleteObject',
+                                identifier=100)
 
     def test_detach_securitygroup_component(self):
         result = self.network.detach_securitygroup_component(100, 500)
@@ -227,9 +231,8 @@ class NetworkTests(testing.TestCase):
 
         self.assertTrue(result)
         self.assert_called_with('SoftLayer_Network_SecurityGroup',
-                                'editObjects',
-                                args=([{'id': 100,
-                                        'name': 'foobar'}],))
+                                'editObject', identifier=100,
+                                args=({'name': 'foobar'},))
 
     def test_edit_securitygroup_rule(self):
         result = self.network.edit_securitygroup_rule(100, 500,
@@ -252,6 +255,8 @@ class NetworkTests(testing.TestCase):
 
         sg_fixture = fixtures.SoftLayer_Network_SecurityGroup
         self.assertEqual(sg_fixture.getObject, result)
+        self.assert_called_with('SoftLayer_Network_SecurityGroup',
+                                'getObject', identifier=100)
 
     def test_get_subnet(self):
         result = self.network.get_subnet(9876)
