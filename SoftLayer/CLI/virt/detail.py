@@ -45,6 +45,7 @@ def cli(env, identifier, passwords=False, price=False):
     table.add_row(['active_transaction', formatting.active_txn(result)])
     table.add_row(['datacenter',
                    result['datacenter']['name'] or formatting.blank()])
+    _cli_helper_dedicated_host(env, result, table)
     operating_system = utils.lookup(result,
                                     'operatingSystem',
                                     'softwareLicense',
@@ -138,3 +139,19 @@ def cli(env, identifier, passwords=False, price=False):
         pass
 
     env.fout(table)
+
+
+def _cli_helper_dedicated_host(env, result, table):
+    """Get details on dedicated host for a virtual server."""
+
+    dedicated_host_id = utils.lookup(result, 'dedicatedHost', 'id')
+    if dedicated_host_id:
+        table.add_row(['dedicated_host_id', dedicated_host_id])
+        # Try to find name of dedicated host
+        try:
+            dedicated_host = env.client.call('Virtual_DedicatedHost', 'getObject',
+                                             id=dedicated_host_id)
+        except SoftLayer.SoftLayerAPIError:
+            dedicated_host = {}
+        table.add_row(['dedicated_host',
+                       dedicated_host.get('name') or formatting.blank()])
