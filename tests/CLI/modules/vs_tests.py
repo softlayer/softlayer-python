@@ -9,6 +9,7 @@ import json
 import mock
 
 from SoftLayer.CLI import exceptions
+from SoftLayer import SoftLayerAPIError
 from SoftLayer import testing
 
 
@@ -42,6 +43,8 @@ class VirtTests(testing.TestCase):
                           'cores': 2,
                           'created': '2013-08-01 15:23:45',
                           'datacenter': 'TEST00',
+                          'dedicated_host': 'test-dedicated',
+                          'dedicated_host_id': 37401,
                           'hostname': 'vs-test1',
                           'domain': 'test.sftlyr.ws',
                           'fqdn': 'vs-test1.test.sftlyr.ws',
@@ -87,6 +90,24 @@ class VirtTests(testing.TestCase):
             json.loads(result.output)['tags'],
             ['example-tag'],
         )
+
+    def test_detail_vs_dedicated_host_not_found(self):
+        ex = SoftLayerAPIError('SoftLayer_Exception', 'Not found')
+        mock = self.set_mock('SoftLayer_Virtual_DedicatedHost', 'getObject')
+        mock.side_effect = ex
+        result = self.run_command(['vs', 'detail', '100'])
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output)['dedicated_host_id'], 37401)
+        self.assertIsNone(json.loads(result.output)['dedicated_host'])
+
+    def test_detail_vs_no_dedicated_host_hostname(self):
+        mock = self.set_mock('SoftLayer_Virtual_DedicatedHost', 'getObject')
+        mock.return_value = {'this_is_a_fudged_Virtual_DedicatedHost': True,
+                             'name_is_not_provided': ''}
+        result = self.run_command(['vs', 'detail', '100'])
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output)['dedicated_host_id'], 37401)
+        self.assertIsNone(json.loads(result.output)['dedicated_host'])
 
     def test_create_options(self):
         result = self.run_command(['vs', 'create-options'])

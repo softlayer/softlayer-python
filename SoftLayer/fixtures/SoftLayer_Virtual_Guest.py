@@ -44,6 +44,7 @@ getObject = {
     'networkVlans': [{'networkSpace': 'PUBLIC',
                       'vlanNumber': 23,
                       'id': 1}],
+    'dedicatedHost': {'id': 37401},
     'operatingSystem': {
         'passwords': [{'username': 'user', 'password': 'pass'}],
         'softwareLicense': {
