@@ -34,6 +34,14 @@ DEFAULT_GET_VLAN_MASK = ','.join([
     'virtualGuests',
 ])
 
+CCI_SECURITY_GROUP_EVENT_NAMES = [
+    'Security Group Added',
+    'Security Group Rule Added',
+    'Security Group Rule Edited',
+    'Security Group Rule Removed',
+    'Security Group Removed'
+]
+
 
 class NetworkManager(object):
     """Manage SoftLayer network objects: VLANs, subnets, IPs and rwhois
@@ -639,3 +647,14 @@ class NetworkManager(object):
         """
         result = self.network_storage.getObject(id=identifier, **kwargs)
         return result
+
+    def get_event_logs(self, filter):
+        """Returns a list of event logs
+        
+        :param dict filter: filter dict
+        :returns: List of event logs
+        """
+        results = self.client.call("Event_Log",
+                'getAllObjects',
+                filter=filter)
+        return results

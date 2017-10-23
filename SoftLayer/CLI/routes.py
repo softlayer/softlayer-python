@@ -83,6 +83,9 @@ ALL_ROUTES = [
     ('block:volume-order', 'SoftLayer.CLI.block.order:cli'),
     ('block:volume-set-lun-id', 'SoftLayer.CLI.block.lun:cli'),
 
+    ('event-log', 'SoftLayer.CLI.event_log'),
+    ('event-log:get', 'SoftLayer.CLI.event_log.get:cli'),
+
     ('file', 'SoftLayer.CLI.file'),
     ('file:access-authorize', 'SoftLayer.CLI.file.access.authorize:cli'),
     ('file:access-list', 'SoftLayer.CLI.file.access.list:cli'),
