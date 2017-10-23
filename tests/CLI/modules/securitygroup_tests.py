@@ -4,6 +4,7 @@
     :license: MIT, see LICENSE for more details.
 """
 import json
+import pprint
 
 from SoftLayer import testing
 
@@ -124,12 +125,16 @@ class SecurityGroupTests(testing.TestCase):
         result = self.run_command(['sg', 'rule-add', '100',
                                    '--direction=ingress'])
 
+        print result.output
+
+        json.loads(result.output)
+
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Network_SecurityGroup', 'addRules',
                                 identifier='100',
                                 args=([{'direction': 'ingress'}],))
 
-        self.assertEqual([{'requestId': 'addRules'}], json.loads(result.output))
+        self.assertEqual([{"requestId": "addRules", "rules": "[{'direction': 'ingress', 'portRangeMax': '', 'portRangeMin': '', 'ethertype': 'IPv4', 'securityGroupId': 100, 'remoteGroupId': '', 'id': 100}]"}], json.loads(result.output))
 
     def test_securitygroup_rule_add_fail(self):
         fixture = self.set_mock('SoftLayer_Network_SecurityGroup', 'addRules')

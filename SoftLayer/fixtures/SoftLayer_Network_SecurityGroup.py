@@ -39,8 +39,8 @@ createObjects = [{'id': 100,
                   'createDate': '2017-05-05T12:44:43-06:00'}]
 editObjects = True
 deleteObjects = True
-addRules = {'id': 'addRules'}
-editRules = {'id': 'editRules'}
-removeRules = {'id': 'removeRules'}
-attachNetworkComponents = {'id': 'interfaceAdd'}
-detachNetworkComponents = {'id': 'interfaceRemove'}
+addRules = {"requestId": "addRules", "rules": "[{'direction': 'ingress', 'portRangeMax': '', 'portRangeMin': '', 'ethertype': 'IPv4', 'securityGroupId': 100, 'remoteGroupId': '', 'id': 100}]"}
+editRules = {'requestId': 'editRules'}
+removeRules = {'requestId': 'removeRules'}
+attachNetworkComponents = {'requestId': 'interfaceAdd'}
+detachNetworkComponents = {'requestId': 'interfaceRemove'}

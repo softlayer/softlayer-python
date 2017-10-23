@@ -98,7 +98,7 @@ def add(env, securitygroup_id, network_component, server, interface):
         raise exceptions.CLIAbort("Could not attach network component")
 
     table = formatting.Table(REQUEST_COLUMNS)
-    table.add_row([success['id']])
+    table.add_row([success['requestId']])
 
     env.fout(table)
 
@@ -126,7 +126,7 @@ def remove(env, securitygroup_id, network_component, server, interface):
         raise exceptions.CLIAbort("Could not detach network component")
 
     table = formatting.Table(REQUEST_COLUMNS)
-    table.add_row([success['id']])
+    table.add_row([success['requestId']])
 
     env.fout(table)
 
