@@ -1,6 +1,8 @@
 """Get details for a virtual server."""
 # :license: MIT, see LICENSE for more details.
 
+import logging
+
 import click
 
 import SoftLayer
@@ -8,6 +10,8 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 from SoftLayer import utils
+
+LOGGER = logging.getLogger(__name__)
 
 
 @click.command()
@@ -152,6 +156,7 @@ def _cli_helper_dedicated_host(env, result, table):
             dedicated_host = env.client.call('Virtual_DedicatedHost', 'getObject',
                                              id=dedicated_host_id)
         except SoftLayer.SoftLayerAPIError:
+            LOGGER.error('Unable to get dedicated host id %s', dedicated_host_id)
             dedicated_host = {}
         table.add_row(['dedicated_host',
                        dedicated_host.get('name') or formatting.blank()])
