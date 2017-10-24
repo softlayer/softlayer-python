@@ -41,12 +41,12 @@ editObjects = True
 deleteObjects = True
 addRules = {"requestId": "addRules",
             "rules": "[{'direction': 'ingress', "
-            "'portRangeMax': '', "
-            "'portRangeMin': '', "
-            "'ethertype': 'IPv4', "
-            "'securityGroupId': 100, "
-            "'remoteGroupId': '', "
-            "'id': 100}]"}
+                     "'portRangeMax': '', "
+                     "'portRangeMin': '', "
+                     "'ethertype': 'IPv4', "
+                     "'securityGroupId': 100, "
+                     "'remoteGroupId': '', "
+                     "'id': 100}]"}
 editRules = {'requestId': 'editRules'}
 removeRules = {'requestId': 'removeRules'}
 attachNetworkComponents = {'requestId': 'interfaceAdd'}

@@ -2,6 +2,7 @@
 # :license: MIT, see LICENSE for more details.
 
 import json
+
 import click
 
 import SoftLayer
