@@ -647,14 +647,3 @@ class NetworkManager(object):
         """
         result = self.network_storage.getObject(id=identifier, **kwargs)
         return result
-
-    def get_event_logs(self, filter):
-        """Returns a list of event logs
-        
-        :param dict filter: filter dict
-        :returns: List of event logs
-        """
-        results = self.client.call("Event_Log",
-                'getAllObjects',
-                filter=filter)
-        return results
