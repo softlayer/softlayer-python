@@ -1,5 +1,5 @@
 """
-    SoftLayer.network
+    SoftLayer.event_log
     ~~~~~~~~~~~~~~~~~
     Network Manager/helpers
 

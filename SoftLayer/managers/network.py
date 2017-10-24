@@ -34,14 +34,6 @@ DEFAULT_GET_VLAN_MASK = ','.join([
     'virtualGuests',
 ])
 
-CCI_SECURITY_GROUP_EVENT_NAMES = [
-    'Security Group Added',
-    'Security Group Rule Added',
-    'Security Group Rule Edited',
-    'Security Group Rule Removed',
-    'Security Group Removed'
-]
-
 
 class NetworkManager(object):
     """Manage SoftLayer network objects: VLANs, subnets, IPs and rwhois
