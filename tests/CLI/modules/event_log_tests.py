@@ -117,7 +117,7 @@ class EventLogTests(testing.TestCase):
             }
         ]
 
-        self.assertEqual(correctResponse, json.loads(result.output))
+        self.assertEqual(json.loads(result.output), correctResponse)
 
     def test_get_event_log_id(self):
         test_filter = event_log_get._build_filter(1, None)
@@ -148,4 +148,4 @@ class EventLogTests(testing.TestCase):
             }
         ]
 
-        self.assertEqual(correctResponse, json.loads(result.output))
+        self.assertEqual(json.loads(result.output), correctResponse)
