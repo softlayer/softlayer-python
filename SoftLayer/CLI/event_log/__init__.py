@@ -1,1 +1,1 @@
-"""Event Logs."""
+"""Audit Logs."""

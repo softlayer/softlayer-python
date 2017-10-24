@@ -1,4 +1,4 @@
-"""Get Event Logs."""
+"""Get Audit Logs."""
 # :license: MIT, see LICENSE for more details.
 
 import json
@@ -14,12 +14,12 @@ COLUMNS = ['event', 'label', 'date', 'metadata']
 
 @click.command()
 @click.option('--obj_id', '-i',
-              help="The id of the object we want to get event logs for")
+              help="The id of the object we want to get audit logs for")
 @click.option('--obj_type', '-t',
-              help="The type of the object we want to get event logs for")
+              help="The type of the object we want to get audit logs for")
 @environment.pass_env
 def cli(env, obj_id, obj_type):
-    """Get Event Logs"""
+    """Get Audit Logs"""
     mgr = SoftLayer.EventLogManager(env.client)
 
     request_filter = _build_filter(obj_id, obj_type)

@@ -13,7 +13,7 @@ from SoftLayer import testing
 class EventLogTests(testing.TestCase):
 
     def test_get_event_log(self):
-        result = self.run_command(['event-log', 'get'])
+        result = self.run_command(['audit-log', 'get'])
 
         self.assert_no_fail(result)
 
@@ -133,3 +133,19 @@ class EventLogTests(testing.TestCase):
         test_filter = event_log_get._build_filter(1, 'CCI')
 
         self.assertEqual(test_filter, {'objectId': {'operation': 1}, 'objectName': {'operation': 'CCI'}})
+
+    def test_get_event_log_types(self):
+        result = self.run_command(['audit-log', 'types'])
+
+        self.assert_no_fail(result)
+
+        correctResponse = [
+            {
+                'types': 'CCI'
+            },
+            {
+                'types': 'Security Group'
+            }
+        ]
+
+        self.assertEqual(correctResponse, json.loads(result.output))

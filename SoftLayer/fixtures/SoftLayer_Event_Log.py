@@ -123,3 +123,5 @@ getAllObjects = [
         'username': 'user'
     }
 ]
+
+getAllEventObjectNames = ['CCI', 'Security Group']

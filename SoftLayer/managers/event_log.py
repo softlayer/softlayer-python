@@ -26,3 +26,13 @@ class EventLogManager(object):
                                    'getAllObjects',
                                    filter=request_filter)
         return results
+
+    def get_event_log_types(self):
+        """Returns a list of event log types
+
+        :returns: List of event log types
+        """
+        results = self.client.call("Event_Log",
+                                   'getAllEventObjectNames')
+
+        return results
