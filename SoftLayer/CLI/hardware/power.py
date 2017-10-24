@@ -77,3 +77,20 @@ def power_cycle(env, identifier):
         raise exceptions.CLIAbort('Aborted.')
 
     env.client['Hardware_Server'].powerCycle(id=hw_id)
+
+
+@click.command()
+@click.argument('identifier')
+@environment.pass_env
+def rescue(env, identifier):
+    """Reboot server into a rescue image."""
+
+    mgr = SoftLayer.HardwareManager(env.client)
+    hw_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'hardware')
+
+    if not (env.skip_confirmations or
+            formatting.confirm("This action will reboot this server. Continue?")):
+
+        raise exceptions.CLIAbort('Aborted')
+
+    env.client['Hardware_Server'].bootToRescueLayer(id=hw_id)

@@ -99,12 +99,7 @@ class SoftLayerListResult(list):
 
 class XmlRpcTransport(object):
     """XML-RPC transport."""
-    def __init__(self,
-                 endpoint_url=None,
-                 timeout=None,
-                 proxy=None,
-                 user_agent=None,
-                 verify=True):
+    def __init__(self, endpoint_url=None, timeout=None, proxy=None, user_agent=None, verify=True):
 
         self.endpoint_url = (endpoint_url or
                              consts.API_PUBLIC_ENDPOINT).rstrip('/')
@@ -202,19 +197,13 @@ class XmlRpcTransport(object):
 class RestTransport(object):
     """REST transport.
 
-    Currently only supports GET requests (no POST, PUT, DELETE) and lacks
-    support for masks, filters, limits and offsets.
+    REST calls should mostly work, but is not fully tested.
+    XML-RPC should be used when in doubt
     """
 
-    def __init__(self,
-                 endpoint_url=None,
-                 timeout=None,
-                 proxy=None,
-                 user_agent=None,
-                 verify=True):
+    def __init__(self, endpoint_url=None, timeout=None, proxy=None, user_agent=None, verify=True):
 
-        self.endpoint_url = (endpoint_url or
-                             consts.API_PUBLIC_ENDPOINT_REST).rstrip('/')
+        self.endpoint_url = (endpoint_url or consts.API_PUBLIC_ENDPOINT_REST).rstrip('/')
         self.timeout = timeout or None
         self.proxy = proxy
         self.user_agent = user_agent or consts.USER_AGENT
@@ -223,12 +212,12 @@ class RestTransport(object):
     def __call__(self, request):
         """Makes a SoftLayer API call against the REST endpoint.
 
-        This currently only works with GET requests
+        REST calls should mostly work, but is not fully tested.
+        XML-RPC should be used when in doubt
 
         :param request request: Request object
         """
-        request.transport_headers.setdefault('Content-Type',
-                                             'application/json')
+        request.transport_headers.setdefault('Content-Type', 'application/json')
         request.transport_headers.setdefault('User-Agent', self.user_agent)
 
         params = request.headers.copy()
@@ -252,9 +241,8 @@ class RestTransport(object):
             )
 
         method = REST_SPECIAL_METHODS.get(request.method)
-        is_special_method = True
+
         if method is None:
-            is_special_method = False
             method = 'GET'
 
         body = {}
@@ -272,9 +260,7 @@ class RestTransport(object):
         if request.identifier is not None:
             url_parts.append(str(request.identifier))
 
-        # Special methods (createObject, editObject, etc) use the HTTP verb
-        # to determine the action on the resource
-        if request.method is not None and not is_special_method:
+        if request.method is not None:
             url_parts.append(request.method)
 
         url = '%s.%s' % ('/'.join(url_parts), 'json')
