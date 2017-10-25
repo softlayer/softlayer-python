@@ -119,20 +119,35 @@ class EventLogTests(testing.TestCase):
 
         self.assertEqual(json.loads(result.output), correctResponse)
 
+    def test_get_event_log_event(self):
+        test_filter = event_log_get._build_filter('Security Group Rule Added', None, None)
+
+        self.assertEqual(test_filter, {'eventName': {'operation': 'Security Group Rule Added'}})
+
     def test_get_event_log_id(self):
-        test_filter = event_log_get._build_filter(1, None)
+        test_filter = event_log_get._build_filter(None, 1, None)
 
         self.assertEqual(test_filter, {'objectId': {'operation': 1}})
 
     def test_get_event_log_type(self):
-        test_filter = event_log_get._build_filter(None, 'CCI')
+        test_filter = event_log_get._build_filter(None, None, 'CCI')
 
         self.assertEqual(test_filter, {'objectName': {'operation': 'CCI'}})
 
-    def test_get_event_log_id_type(self):
-        test_filter = event_log_get._build_filter(1, 'CCI')
+    def test_get_event_log_event_id_type(self):
+        test_filter = event_log_get._build_filter('Security Group Rule Added', 1, 'CCI')
 
-        self.assertEqual(test_filter, {'objectId': {'operation': 1}, 'objectName': {'operation': 'CCI'}})
+        self.assertEqual(test_filter, {
+            'eventName': {
+                'operation': 'Security Group Rule Added'
+            },
+            'objectId': {
+                'operation': 1
+            },
+            'objectName': {
+                'operation': 'CCI'
+            }
+        })
 
     def test_get_event_log_types(self):
         result = self.run_command(['audit-log', 'types'])
