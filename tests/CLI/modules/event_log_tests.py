@@ -119,25 +119,279 @@ class EventLogTests(testing.TestCase):
 
         self.assertEqual(json.loads(result.output), correctResponse)
 
+    def test_get_event_log_date_min(self):
+        test_filter = event_log_get._build_filter('10/30/2017', None, None, None, None, None)
+
+        self.assertEqual(test_filter, {
+            'eventCreateDate': {
+                'operation': 'greaterThanDate',
+                'options': [{
+                    'name': 'date',
+                    'value': ['2017-10-30T00:00:00.000000-05:00']
+                }]
+            }
+        })
+
+    def test_get_event_log_date_max(self):
+        test_filter = event_log_get._build_filter(None, '10/31/2017', None, None, None, None)
+
+        self.assertEqual(test_filter, {
+            'eventCreateDate': {
+                'operation': 'lessThanDate',
+                'options': [{
+                    'name': 'date',
+                    'value': ['2017-10-31T00:00:00.000000-05:00']
+                }]
+            }
+        })
+
+    def test_get_event_log_date_min_max(self):
+        test_filter = event_log_get._build_filter('10/30/2017', '10/31/2017', None, None, None, None)
+
+        self.assertEqual(test_filter, {
+            'eventCreateDate': {
+                'operation': 'betweenDate',
+                'options': [
+                    {
+                        'name': 'startDate',
+                        'value': ['2017-10-30T00:00:00.000000-05:00']
+                    },
+                    {
+                        'name': 'endDate',
+                        'value': ['2017-10-31T00:00:00.000000-05:00']
+                    }
+                ]
+            }
+        })
+
+    def test_get_event_log_date_min_utc_offset(self):
+        test_filter = event_log_get._build_filter('10/30/2017', None, None, None, None, "-0600")
+
+        self.assertEqual(test_filter, {
+            'eventCreateDate': {
+                'operation': 'greaterThanDate',
+                'options': [{
+                    'name': 'date',
+                    'value': ['2017-10-30T00:00:00.000000-06:00']
+                }]
+            }
+        })
+
+    def test_get_event_log_date_max_utc_offset(self):
+        test_filter = event_log_get._build_filter(None, '10/31/2017', None, None, None, "-0600")
+
+        self.assertEqual(test_filter, {
+            'eventCreateDate': {
+                'operation': 'lessThanDate',
+                'options': [{
+                    'name': 'date',
+                    'value': ['2017-10-31T00:00:00.000000-06:00']
+                }]
+            }
+        })
+
+    def test_get_event_log_date_min_max_utc_offset(self):
+        test_filter = event_log_get._build_filter('10/30/2017', '10/31/2017', None, None, None, "-0600")
+
+        self.assertEqual(test_filter, {
+            'eventCreateDate': {
+                'operation': 'betweenDate',
+                'options': [
+                    {
+                        'name': 'startDate',
+                        'value': ['2017-10-30T00:00:00.000000-06:00']
+                    },
+                    {
+                        'name': 'endDate',
+                        'value': ['2017-10-31T00:00:00.000000-06:00']
+                    }
+                ]
+            }
+        })
+
     def test_get_event_log_event(self):
-        test_filter = event_log_get._build_filter('Security Group Rule Added', None, None)
+        test_filter = event_log_get._build_filter(None, None, 'Security Group Rule Added', None, None, None)
 
         self.assertEqual(test_filter, {'eventName': {'operation': 'Security Group Rule Added'}})
 
     def test_get_event_log_id(self):
-        test_filter = event_log_get._build_filter(None, 1, None)
+        test_filter = event_log_get._build_filter(None, None, None, 1, None, None)
 
         self.assertEqual(test_filter, {'objectId': {'operation': 1}})
 
     def test_get_event_log_type(self):
-        test_filter = event_log_get._build_filter(None, None, 'CCI')
+        test_filter = event_log_get._build_filter(None, None, None, None, 'CCI', None)
 
         self.assertEqual(test_filter, {'objectName': {'operation': 'CCI'}})
 
-    def test_get_event_log_event_id_type(self):
-        test_filter = event_log_get._build_filter('Security Group Rule Added', 1, 'CCI')
+    def test_get_event_log_event_all_args(self):
+        test_filter = event_log_get._build_filter(None, None, 'Security Group Rule Added', 1, 'CCI', None)
 
         self.assertEqual(test_filter, {
+            'eventName': {
+                'operation': 'Security Group Rule Added'
+            },
+            'objectId': {
+                'operation': 1
+            },
+            'objectName': {
+                'operation': 'CCI'
+            }
+        })
+
+    def test_get_event_log_event_all_args_min_date(self):
+        test_filter = event_log_get._build_filter('10/30/2017', None, 'Security Group Rule Added', 1, 'CCI', None)
+
+        self.assertEqual(test_filter, {
+            'eventCreateDate': {
+                'operation': 'greaterThanDate',
+                'options': [{
+                    'name': 'date',
+                    'value': ['2017-10-30T00:00:00.000000-05:00']
+                }]
+            },
+            'eventName': {
+                'operation': 'Security Group Rule Added'
+            },
+            'objectId': {
+                'operation': 1
+            },
+            'objectName': {
+                'operation': 'CCI'
+            }
+        })
+
+    def test_get_event_log_event_all_args_max_date(self):
+        test_filter = event_log_get._build_filter(None, '10/31/2017', 'Security Group Rule Added', 1, 'CCI', None)
+
+        self.assertEqual(test_filter, {
+            'eventCreateDate': {
+                'operation': 'lessThanDate',
+                'options': [{
+                    'name': 'date',
+                    'value': ['2017-10-31T00:00:00.000000-05:00']
+                }]
+            },
+            'eventName': {
+                'operation': 'Security Group Rule Added'
+            },
+            'objectId': {
+                'operation': 1
+            },
+            'objectName': {
+                'operation': 'CCI'
+            }
+        })
+
+    def test_get_event_log_event_all_args_min_max_date(self):
+        test_filter = event_log_get._build_filter(
+            '10/30/2017',
+            '10/31/2017',
+            'Security Group Rule Added',
+            1,
+            'CCI',
+            None
+        )
+
+        self.assertEqual(test_filter, {
+            'eventCreateDate': {
+                'operation': 'betweenDate',
+                'options': [
+                    {
+                        'name': 'startDate',
+                        'value': ['2017-10-30T00:00:00.000000-05:00']
+                    },
+                    {
+                        'name': 'endDate',
+                        'value': ['2017-10-31T00:00:00.000000-05:00']
+                    }
+                ]
+            },
+            'eventName': {
+                'operation': 'Security Group Rule Added'
+            },
+            'objectId': {
+                'operation': 1
+            },
+            'objectName': {
+                'operation': 'CCI'
+            }
+        })
+
+        def test_get_event_log_event_all_args_min_date_utc_offset(self):
+            test_filter = event_log_get._build_filter(
+                '10/30/2017',
+                None,
+                'Security Group Rule Added',
+                1,
+                'CCI',
+                '-0600'
+            )
+
+            self.assertEqual(test_filter, {
+                'eventCreateDate': {
+                    'operation': 'greaterThanDate',
+                    'options': [{
+                        'name': 'date',
+                        'value': ['2017-10-30T00:00:00.000000-06:00']
+                    }]
+                },
+                'eventName': {
+                    'operation': 'Security Group Rule Added'
+                },
+                'objectId': {
+                    'operation': 1
+                },
+                'objectName': {
+                    'operation': 'CCI'
+                }
+            })
+
+    def test_get_event_log_event_all_args_max_date_utc_offset(self):
+        test_filter = event_log_get._build_filter(None, '10/31/2017', 'Security Group Rule Added', 1, 'CCI', '-0600')
+
+        self.assertEqual(test_filter, {
+            'eventCreateDate': {
+                'operation': 'lessThanDate',
+                'options': [{
+                    'name': 'date',
+                    'value': ['2017-10-31T00:00:00.000000-06:00']
+                }]
+            },
+            'eventName': {
+                'operation': 'Security Group Rule Added'
+            },
+            'objectId': {
+                'operation': 1
+            },
+            'objectName': {
+                'operation': 'CCI'
+            }
+        })
+
+    def test_get_event_log_event_all_args_min_max_date_utc_offset(self):
+        test_filter = event_log_get._build_filter(
+            '10/30/2017',
+            '10/31/2017',
+            'Security Group Rule Added',
+            1,
+            'CCI',
+            '-0600')
+
+        self.assertEqual(test_filter, {
+            'eventCreateDate': {
+                'operation': 'betweenDate',
+                'options': [
+                    {
+                        'name': 'startDate',
+                        'value': ['2017-10-30T00:00:00.000000-06:00']
+                    },
+                    {
+                        'name': 'endDate',
+                        'value': ['2017-10-31T00:00:00.000000-06:00']
+                    }
+                ]
+            },
             'eventName': {
                 'operation': 'Security Group Rule Added'
             },
