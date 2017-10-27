@@ -22,18 +22,22 @@ COLUMNS = ['event', 'label', 'date', 'metadata']
               help="The event we want to get audit logs for")
 @click.option('--obj_id', '-i',
               help="The id of the object we want to get audit logs for")
+@click.option('--request_id', '-r',
+              help="The request id we want to look for. If this is set, we will ignore all other arguments.")
 @click.option('--obj_type', '-t',
               help="The type of the object we want to get audit logs for")
 @click.option('--utc_offset', '-z',
               help="UTC Offset for seatching with dates. The default is -0500")
 @environment.pass_env
-def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset):
+def cli(env, date_min, date_max, obj_event, obj_id, request_id, obj_type, utc_offset):
     """Get Audit Logs"""
     mgr = SoftLayer.EventLogManager(env.client)
 
-    request_filter = _build_filter(date_min, date_max, obj_event, obj_id, obj_type, utc_offset)
-
-    logs = mgr.get_event_logs(request_filter)
+    if request_id is not None:
+        logs = _get_event_logs_by_request_id(mgr, request_id)
+    else:
+        request_filter = _build_filter(date_min, date_max, obj_event, obj_id, obj_type, utc_offset)
+        logs = mgr.get_event_logs(request_filter)
 
     table = formatting.Table(COLUMNS)
     table.align['metadata'] = "l"
@@ -103,6 +107,39 @@ def _build_filter(date_min, date_max, obj_event, obj_id, obj_type, utc_offset):
         request_filter['objectName'] = {'operation': obj_type}
 
     return request_filter
+
+
+def _get_event_logs_by_request_id(mgr, request_id):
+    cci_filter = {
+        'objectName': {
+            'operation': 'CCI'
+        }
+    }
+
+    cci_logs = mgr.get_event_logs(cci_filter)
+
+    security_group_filter = {
+        'objectName': {
+            'operation': 'Security Group'
+        }
+    }
+
+    security_group_logs = mgr.get_event_logs(security_group_filter)
+
+    unfiltered_logs = cci_logs + security_group_logs
+
+    filtered_logs = []
+
+    for unfiltered_log in unfiltered_logs:
+        try:
+            metadata = json.loads(unfiltered_log['metaData'])
+            if 'requestId' in metadata:
+                if metadata['requestId'] == request_id:
+                    filtered_logs.append(unfiltered_log)
+        except ValueError:
+            continue
+
+    return filtered_logs
 
 
 def _parse_date(date_string, utc_offset):
