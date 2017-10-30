@@ -1,7 +1,16 @@
 # Change Log
 
+
+## [5.2.15] - 2017-10-30
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.14...master
+ - Added dedicated host info to virt detail
+ - #885 - Fixed createObjects on the rest api endpoint
+ - changed securityGroups to use createObject instead of createObjects
+ - Always set the endpoint_url by defaulting to the public URL if the endpoint type cannot be determined.
+ - resource metadata update
+
 ## [5.2.14] - 2017-09-13
- - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.13...master
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.13...v5.2.14
  - Improved slcli vs create-options output
  - Updated slcli vs create to support new virtual server public and dedicated host offerings
 
