@@ -31,6 +31,9 @@ ALL_ROUTES = [
     ('virtual:upgrade', 'SoftLayer.CLI.virt.upgrade:cli'),
     ('virtual:credentials', 'SoftLayer.CLI.virt.credentials:cli'),
 
+    ('dedicatedhost', 'SoftLayer.CLI.dedicatedhost'),
+    ('dedicatedhost:list', 'SoftLayer.CLI.dedicatedhost.list:cli'),
+
     ('cdn', 'SoftLayer.CLI.cdn'),
     ('cdn:detail', 'SoftLayer.CLI.cdn.detail:cli'),
     ('cdn:list', 'SoftLayer.CLI.cdn.list:cli'),
@@ -280,4 +283,5 @@ ALL_ALIASES = {
     'server': 'hardware',
     'vm': 'virtual',
     'vs': 'virtual',
+    'dh': 'dedicatedhopst',
 }

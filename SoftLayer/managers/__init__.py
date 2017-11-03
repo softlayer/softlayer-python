@@ -9,6 +9,7 @@
 """
 from SoftLayer.managers.block import BlockStorageManager
 from SoftLayer.managers.cdn import CDNManager
+from SoftLayer.managers.dh import DHManager
 from SoftLayer.managers.dns import DNSManager
 from SoftLayer.managers.file import FileStorageManager
 from SoftLayer.managers.firewall import FirewallManager
@@ -29,6 +30,7 @@ from SoftLayer.managers.vs import VSManager
 __all__ = [
     'BlockStorageManager',
     'CDNManager',
+    'DHManager',
     'DNSManager',
     'FileStorageManager',
     'FirewallManager',
