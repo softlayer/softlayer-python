@@ -13,9 +13,11 @@ import socket
 import time
 import warnings
 
+from SoftLayer.decoration import retry
 from SoftLayer import exceptions
 from SoftLayer.managers import ordering
 from SoftLayer import utils
+
 
 LOGGER = logging.getLogger(__name__)
 # pylint: disable=no-self-use
@@ -584,8 +586,16 @@ class VSManager(utils.IdentifierMixin, object):
         tags = kwargs.pop('tags', None)
         inst = self.guest.createObject(self._generate_create_dict(**kwargs))
         if tags is not None:
-            self.guest.setTags(tags, id=inst['id'])
+            self.set_tags(tags, guest_id=inst['id'])
         return inst
+
+    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
+    def set_tags(self, tags, guest_id):
+        """Sets tags on a guest with a retry decorator
+
+        Just calls guest.setTags, but lets if it fails from an APIError will retry
+        """
+        self.guest.setTags(tags, id=guest_id)
 
     def create_instances(self, config_list):
         """Creates multiple virtual server instances.
@@ -636,7 +646,7 @@ class VSManager(utils.IdentifierMixin, object):
 
         for instance, tag in zip(resp, tags):
             if tag is not None:
-                self.guest.setTags(tag, id=instance['id'])
+                self.set_tags(tag, guest_id=instance['id'])
 
         return resp
 
@@ -717,7 +727,7 @@ class VSManager(utils.IdentifierMixin, object):
             self.guest.setUserMetadata([userdata], id=instance_id)
 
         if tags is not None:
-            self.guest.setTags(tags, id=instance_id)
+            self.set_tags(tags, guest_id=instance_id)
 
         if hostname:
             obj['hostname'] = hostname
