@@ -1001,6 +1001,182 @@ def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
     return duplicate_order
 
 
+def prepare_modify_order_object(manager, origin_volume, new_iops, new_tier,
+                                new_size, volume_type):
+    """Prepare the duplicate order to submit to SoftLayer_Product::placeOrder()
+
+    :param manager: The File or Block manager calling this function
+    :param origin_volume: The origin volume which is being modified
+    :param new_iops: The new IOPS per GB for the volume (performance)
+    :param new_tier: The new tier level for the volume (endurance)
+    :param new_size: The requested new size for the volume
+    :param volume_type: The type of the origin volume ('file' or 'block')
+    :return: Returns the order object to be passed to the
+             placeOrder() method of the Product_Order service
+    """
+
+    # Verify that the origin volume has not been cancelled
+    if 'billingItem' not in origin_volume:
+        raise exceptions.SoftLayerError(
+            "The origin volume has been cancelled; "
+            "unable to order modify volume")
+
+    # Ensure the origin volume is STaaS v2 or higher
+    # and supports Encryption at Rest
+    if not _staas_version_is_v2_or_above(origin_volume):
+        raise exceptions.SoftLayerError(
+            "This volume cannot be modified since it "
+            "does not support Encryption at Rest.")
+
+    # Validate the requested new size, and set the size if none was given
+    new_size = _validate_new_size(
+        origin_volume, new_size, volume_type)
+
+    # Get the appropriate package for the order
+    # ('storage_as_a_service' is currently used for modifying volumes)
+    package = get_package(manager, 'storage_as_a_service')
+
+    # Determine the new IOPS or new tier level for the volume, along with
+    # the type and prices for the order
+    origin_storage_type = origin_volume['storageType']['keyName']
+    if origin_storage_type == 'PERFORMANCE_BLOCK_STORAGE'\
+            or origin_storage_type == 'PERFORMANCE_BLOCK_STORAGE_REPLICANT'\
+            or origin_storage_type == 'PERFORMANCE_FILE_STORAGE'\
+            or origin_storage_type == 'PERFORMANCE_FILE_STORAGE_REPLICANT':
+        volume_is_performance = True
+        new_iops = _validate_new_performance_iops(
+            origin_volume, new_iops, new_size)
+        # Set up the price array for the order
+        prices = [
+            find_price_by_category(package, 'storage_as_a_service'),
+            find_saas_perform_space_price(package, new_size),
+            find_saas_perform_iops_price(package, new_size, new_iops),
+        ]
+
+    elif origin_storage_type == 'ENDURANCE_BLOCK_STORAGE'\
+            or origin_storage_type == 'ENDURANCE_BLOCK_STORAGE_REPLICANT'\
+            or origin_storage_type == 'ENDURANCE_FILE_STORAGE'\
+            or origin_storage_type == 'ENDURANCE_FILE_STORAGE_REPLICANT':
+        volume_is_performance = False
+        new_tier = _validate_new_endurance_tier(origin_volume, new_tier)
+        # Set up the price array for the order
+        prices = [
+            find_price_by_category(package, 'storage_as_a_service'),
+            find_saas_endurance_space_price(package, new_size, new_tier),
+            find_saas_endurance_tier_price(package, new_tier),
+        ]
+
+    else:
+        raise exceptions.SoftLayerError(
+            "Origin volume does not have a valid storage type "
+            "(with an appropriate keyName to indicate the "
+            "volume is a PERFORMANCE or an ENDURANCE volume)")
+
+    modify_order = {
+        'complexType': 'SoftLayer_Container_Product_Order_'
+                       'Network_Storage_AsAService_Upgrade',
+        'packageId': package['id'],
+        'prices': prices,
+        'volume': origin_volume,
+        #'useHourlyPricing' : 'true',
+        'volumeSize': new_size
+    }
+
+    if volume_is_performance:
+        modify_order['iops'] = new_iops
+
+    return modify_order
+
+
+def _validate_new_size(origin_volume, new_volume_size,
+                       volume_type):
+    # Ensure the volume's current size is found
+    if not isinstance(utils.lookup(origin_volume, 'capacityGb'), int):
+        raise exceptions.SoftLayerError("Cannot find the Volume's current size.")
+
+    # Determine the new volume size/capacity
+    if new_volume_size is None:
+        new_volume_size = origin_volume['capacityGb']
+    # Ensure the new volume size is not below the minimum
+    elif new_volume_size < origin_volume['capacityGb']:
+        raise exceptions.SoftLayerError(
+            "The requested new size is too small. Specify a new size "
+            "that is at least as large as the current size.")
+
+    # Ensure the new volume size is not above the maximum
+    if volume_type == 'block':
+        # Determine the base size for validating the requested new size
+        if 'originalVolumeSize' in origin_volume:
+            base_volume_size = int(origin_volume['originalVolumeSize'])
+        else:
+            base_volume_size = origin_volume['capacityGb']
+
+        # Current limit for block volumes: 10*[origin size]
+        if new_volume_size > base_volume_size * 10:
+            raise exceptions.SoftLayerError(
+                "The requested new volume size is too large. The "
+                "maximum size for block volumes is 10 times the "
+                "size of the origin volume or, if the origin volume was "
+                "a duplicate or was modified, 10 times the size of the initial origin volume "
+                "(i.e. the origin volume from which the first duplicate was "
+                "created in the chain of duplicates). "
+                "Requested: %s GB. Base origin size: %s GB."
+                % (new_volume_size, base_volume_size))
+
+    return new_volume_size
+
+
+def _validate_new_performance_iops(origin_volume, new_iops,
+                                   new_size):
+    if not isinstance(utils.lookup(origin_volume, 'provisionedIops'), str):
+        raise exceptions.SoftLayerError(
+            "Cannot find the volume's provisioned IOPS")
+
+    if new_iops is None:
+        new_iops = int(origin_volume['provisionedIops'])
+    else:
+        origin_iops_per_gb = float(origin_volume['provisionedIops'])\
+            / float(origin_volume['capacityGb'])
+        new_iops_per_gb = float(new_iops) / float(new_size)
+        if origin_iops_per_gb < 0.3 and new_iops_per_gb >= 0.3:
+            raise exceptions.SoftLayerError(
+                "Current volume performance is < 0.3 IOPS/GB, "
+                "new volume performance must also be < 0.3 "
+                "IOPS/GB. %s IOPS/GB (%s/%s) requested."
+                % (new_iops_per_gb, new_iops, new_size))
+        elif origin_iops_per_gb >= 0.3 and new_iops_per_gb < 0.3:
+            raise exceptions.SoftLayerError(
+                "Current volume performance is >= 0.3 IOPS/GB, "
+                "new volume performance must also be >= 0.3 "
+                "IOPS/GB. %s IOPS/GB (%s/%s) requested."
+                % (new_iops_per_gb, new_iops, new_size))
+    return new_iops
+
+
+def _validate_new_endurance_tier(origin_volume, new_tier):
+    try:
+        origin_tier = find_endurance_tier_iops_per_gb(origin_volume)
+    except ValueError:
+        raise exceptions.SoftLayerError(
+            "Cannot find origin volume's tier level")
+
+    if new_tier is None:
+        new_tier = origin_tier
+    else:
+        if new_tier != 0.25:
+            new_tier = int(new_tier)
+
+        if origin_tier == 0.25:
+            raise exceptions.SoftLayerError(
+                "IOPS change is not available for Endurance volumes with 0.25 IOPS tier ")
+        elif origin_tier != 0.25 and new_tier == 0.25:
+            raise exceptions.SoftLayerError(
+                "Current volume performance tier is above 0.25 IOPS/GB, "
+                "new volume performance tier must also be above 0.25 "
+                "IOPS/GB. %s IOPS/GB requested." % new_tier)
+    return new_tier
+
+
 def _has_category(categories, category_code):
     return any(
         True

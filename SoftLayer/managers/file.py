@@ -283,6 +283,32 @@ class FileStorageManager(utils.IdentifierMixin, object):
 
         return self.client.call('Product_Order', 'placeOrder', order)
 
+    def order_modified_volume(self, volume_id,
+                              new_size=None, new_iops=None,
+                              new_tier_level=None):
+        """Places an order for modifying an existing file volume.
+
+        :param volume_id: The ID of the volume to be modified
+        :param new_size: New Size/capacity for the volume
+        :param new_iops: The new IOPS per GB for the volume
+        :param new_tier_level: New Tier level for the volume
+        :return: Returns a SoftLayer_Container_Product_Order_Receipt
+        """
+
+        file_mask = 'id,billingItem[location,hourlyFlag],snapshotCapacityGb,'\
+                    'storageType[keyName],capacityGb,originalVolumeSize,'\
+                    'provisionedIops,storageTierLevel,osType[keyName],'\
+                    'staasVersion,hasEncryptionAtRest'
+        origin_volume = self.get_file_volume_details(volume_id,
+                                                     mask=file_mask)
+
+        order = storage_utils.prepare_modify_order_object(
+            self, origin_volume, new_iops, new_tier_level,
+            new_size, 'file'
+        )
+
+        return self.client.call('Product_Order', 'placeOrder', order)
+
     def delete_snapshot(self, snapshot_id):
         """Deletes the specified snapshot object.
 
