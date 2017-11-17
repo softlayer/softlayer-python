@@ -62,11 +62,13 @@ def cli(env, volume_id):
 
     if block_volume['activeTransactions']:
         for trans in block_volume['activeTransactions']:
-            table.add_row([
-                'Ongoing Transactions',
-                trans['transactionStatus']['friendlyName']])
+            if trans['transactionStatus']:
+                table.add_row([
+                    'Ongoing Transactions',
+                    trans['transactionStatus']['friendlyName']])
 
-    table.add_row(['Replicant Count', "%u"
+    if block_volume['replicationPartnerCount']:
+        table.add_row(['Replicant Count', "%u"
                    % block_volume['replicationPartnerCount']])
 
     if block_volume['replicationPartnerCount'] > 0:
@@ -105,7 +107,7 @@ def cli(env, volume_id):
         if block_volume.get('originalVolumeSize'):
 
             origin_volume_info = formatting.Table(['Property',
-                                'Value'])
+                                                   'Value'])
             origin_volume_info.add_row(['Original Volume Size',
                                         block_volume['originalVolumeSize']])
         if block_volume.get('originalVolumeName'):

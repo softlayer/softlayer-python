@@ -1003,7 +1003,7 @@ def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
 
 def prepare_modify_order_object(manager, origin_volume, new_iops, new_tier,
                                 new_size, volume_type):
-    """Prepare the duplicate order to submit to SoftLayer_Product::placeOrder()
+    """Prepare the modification order to submit to SoftLayer_Product::placeOrder()
 
     :param manager: The File or Block manager calling this function
     :param origin_volume: The origin volume which is being modified
@@ -1078,7 +1078,6 @@ def prepare_modify_order_object(manager, origin_volume, new_iops, new_tier,
         'packageId': package['id'],
         'prices': prices,
         'volume': origin_volume,
-        #'useHourlyPricing' : 'true',
         'volumeSize': new_size
     }
 

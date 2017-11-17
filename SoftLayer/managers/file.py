@@ -297,7 +297,7 @@ class FileStorageManager(utils.IdentifierMixin, object):
 
         file_mask = 'id,billingItem[location,hourlyFlag],snapshotCapacityGb,'\
                     'storageType[keyName],capacityGb,originalVolumeSize,'\
-                    'provisionedIops,storageTierLevel,osType[keyName],'\
+                    'provisionedIops,storageTierLevel,'\
                     'staasVersion,hasEncryptionAtRest'
         origin_volume = self.get_file_volume_details(volume_id,
                                                      mask=file_mask)
