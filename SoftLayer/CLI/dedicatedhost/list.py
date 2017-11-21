@@ -1,3 +1,6 @@
+"""List dedicated servers."""
+# :license: MIT, see LICENSE for more details.
+
 import click
 
 import SoftLayer
@@ -27,6 +30,7 @@ DEFAULT_COLUMNS = [
     'guestCount',
 ]
 
+
 @click.command()
 @click.option('--cpu', '-c', help='Number of CPU cores', type=click.INT)
 @helpers.multi_option('--tag', help='Filter by tags')
@@ -41,23 +45,24 @@ DEFAULT_COLUMNS = [
               show_default=True)
 @click.option('--datacenter', '-d', help='Datacenter shortname')
 @click.option('--name', '-H', help='Host portion of the FQDN')
-@click.option('--memory', '-m', help='Memory capacity in mebibytes'
-    , type=click.INT)
-@click.option('--disk', '-d', help='Disk capacity')
+@click.option('--memory', '-m', help='Memory capacity in mebibytes',
+              type=click.INT)
+@click.option('--disk', '-D', help='Disk capacity')
 @environment.pass_env
 def cli(env, sortby, cpu, columns, datacenter, name, memory, disk, tag):
-    dh = SoftLayer.DHManager(env.client)
-    hosts = dh.list_instances(cpus=cpu,
-                              datacenter=datacenter,
-                              name=name,
-                              memory=memory,
-                              disk=disk,
-                              tags=tag,
-                              mask=columns.mask())
+    """List dedicated host."""
+    mgr = SoftLayer.DedicatedHostManager(env.client)
+    hosts = mgr.list_instances(cpus=cpu,
+                               datacenter=datacenter,
+                               hostname=name,
+                               memory=memory,
+                               disk=disk,
+                               tags=tag,
+                               mask=columns.mask())
 
     table = formatting.Table(columns.columns)
-    table.sortby =sortby
-    #print hosts
+    table.sortby = sortby
+
     for host in hosts:
         table.add_row([value or formatting.blank()
                        for value in columns.row(host)])

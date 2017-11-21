@@ -155,7 +155,6 @@ HARDWARE_ITEMS = [
                  'setupFee': '0',
                  'sort': 99}]}]
 
-
 ENTERPRISE_PACKAGE = {
     'categories': [
         {'categoryCode': 'storage_service_enterprise'}
@@ -322,7 +321,6 @@ ENTERPRISE_PACKAGE = {
     ]
 }
 
-
 PERFORMANCE_PACKAGE = {
     'categories': [
         {'categoryCode': 'performance_storage_iscsi'},
@@ -418,7 +416,6 @@ PERFORMANCE_PACKAGE = {
         }
     ]
 }
-
 
 SAAS_PACKAGE = {
     'categories': [
@@ -669,7 +666,6 @@ SAAS_PACKAGE = {
     ]
 }
 
-
 getAllObjects = [{
     'activePresets': [{
         'description': 'Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID',
@@ -825,7 +821,6 @@ getItems = [
         'prices': [{'id': 611}],
     }]
 
-
 getItemPrices = [
     {
         'currentPriceFlag': '',
@@ -892,3 +887,296 @@ getItemPrices = [
         'setupFee': '0',
         'sort': 0
     }]
+
+getAllObjectsDH = [{
+    'subDescription': 'Dedicated Host',
+    'name': 'Dedicated Host',
+    'items': [{
+        'prices': [{
+            'itemId': 10195,
+            'setupFee': '0',
+            'recurringFee': '2099',
+            'tierMinimumThreshold': '',
+            'hourlyRecurringFee': '3.164',
+            'oneTimeFee': '0',
+            'currentPriceFlag': '',
+            'id': 200269,
+            'sort': 0,
+            'onSaleFlag': '',
+            'laborFee': '0',
+            'locationGroupId': '',
+            'quantity': ''
+        },
+            {
+                'itemId': 10195,
+                'setupFee': '0',
+                'recurringFee': '2161.97',
+                'tierMinimumThreshold': '',
+                'hourlyRecurringFee': '3.258',
+                'oneTimeFee': '0',
+                'currentPriceFlag': '',
+                'id': 200271,
+                'sort': 0,
+                'onSaleFlag': '',
+                'laborFee': '0',
+                'locationGroupId': 503,
+                'quantity': ''
+            }
+        ],
+        'itemCategory': {
+            'categoryCode': 'dedicated_virtual_hosts'
+        },
+        'description': '56 Cores X 242 RAM X 1.2 TB',
+        'id': 10195
+    }],
+    'keyName': 'DEDICATED_HOST',
+    'unitSize': '',
+    'regions': [{
+        'location': {
+            'locationPackageDetails': [{
+                'isAvailable': 1,
+                'locationId': 265592,
+                'packageId': 813
+            }],
+            'location': {
+                'statusId': 2,
+                'priceGroups': [{
+                    'locationGroupTypeId': 82,
+                    'description': 'Location Group 2',
+                    'locationGroupType': {
+                        'name': 'PRICING'
+                    },
+                    'securityLevelId': '',
+                    'id': 503,
+                    'name': 'Location Group 2'
+                }],
+                'id': 265592,
+                'name': 'ams01',
+                'longName': 'Amsterdam 1'
+            }
+        },
+        'keyname': 'AMSTERDAM',
+        'description': 'AMS01 - Amsterdam',
+        'sortOrder': 0
+    },
+        {
+            'location': {
+                'locationPackageDetails': [{
+                    'isAvailable': 1,
+                    'locationId': 814994,
+                    'packageId': 813
+                }],
+                'location': {
+                    'statusId': 2,
+                    'priceGroups': [{
+                        'locationGroupTypeId': 82,
+                        'description': 'Location Group 2',
+                        'locationGroupType': {
+                            'name': 'PRICING'
+                        },
+                        'securityLevelId': '',
+                        'id': 503,
+                        'name': 'Location Group 2'
+                    },
+                        {
+                            'locationGroupTypeId': 82,
+                            'description': 'COS Cross Region - EU',
+                            'locationGroupType': {
+                                'name': 'PRICING'},
+                            'securityLevelId': '',
+                            'id': 1303,
+                            'name': 'eu'}],
+                    'id': 814994,
+                    'name': 'ams03',
+                    'longName': 'Amsterdam 3'}},
+            'keyname': 'AMSTERDAM03',
+            'description': 'AMS03 - Amsterdam',
+            'sortOrder': 2},
+        {'location': {
+            'locationPackageDetails': [
+                {
+                    'isAvailable': 1,
+                    'locationId': 138124,
+                    'packageId': 813}],
+            'location': {
+                'statusId': 2,
+                'priceGroups': [
+                    {
+                        'locationGroupTypeId': 82,
+                        'description': 'CDN - North America - Akamai',
+                        'locationGroupType': {
+                            'name': 'PRICING'},
+                        'securityLevelId': '',
+                        'id': 1463,
+                        'name': 'NORTH-AMERICA-AKAMAI'}],
+                'id': 138124,
+                'name': 'dal05',
+                'longName': 'Dallas 5'}},
+            'keyname': 'DALLAS05',
+            'description': 'DAL05 - Dallas',
+            'sortOrder': 12},
+        {'location': {
+            'locationPackageDetails': [
+                {
+                    'isAvailable': 1,
+                    'locationId': 2017603,
+                    'packageId': 813}],
+            'location': {
+                'statusId': 2,
+                'priceGroups': [
+                    {
+                        'locationGroupTypeId': 82,
+                        'description': 'COS Regional - US East',
+                        'locationGroupType': {
+                            'name': 'PRICING'},
+                        'securityLevelId': '',
+                        'id': 1305,
+                        'name': 'us-east'}],
+                'id': 2017603,
+                'name': 'wdc07',
+                'longName': 'Washington 7'}},
+            'keyname': 'WASHINGTON07',
+            'description': 'WDC07 - Washington, DC',
+            'sortOrder': 76}],
+    'firstOrderStepId': '', 'id': 813, 'isActive': 1,
+    'description': 'Dedicated Host'}]
+
+verifyOrderDH = {
+    'preTaxSetup': '0',
+    'storageGroups': [],
+    'postTaxRecurring': '3.164',
+    'billingOrderItemId': '',
+    'presetId': '',
+    'hardware': [
+        {
+            'domain': 't.com',
+            'hostname': 't',
+            'bareMetalInstanceFlag': '',
+            'hardwareStatusId': '',
+            'primaryBackendNetworkComponent': {
+                'router': {
+                    'id': 51218
+                },
+                'networkVlanId': ''
+            },
+            'accountId': ''
+        }
+    ],
+    'prices': [
+        {
+            'itemId': 10195,
+            'setupFee': '0',
+            'recurringFee': '0',
+            'hourlyRecurringFee': '3.164',
+            'oneTimeFee': '0',
+            'id': 200269,
+            'item': {
+                'thirdPartyPolicyAssignments': [],
+                'capacity': '56',
+                'description': '56 Cores X 242 RAM X 1.2 TB',
+                'bundle': [
+                    {
+                        'category': {
+                            'categoryCode': 'dedicated_host_ram',
+                            'id': 850,
+                            'name': 'Dedicated Host RAM'
+                        },
+                        'itemPriceId': 200301,
+                        'itemPrice': {
+                            'itemId': 10199,
+                            'setupFee': '0',
+                            'recurringFee': '0',
+                            'hourlyRecurringFee': '0',
+                            'oneTimeFee': '0',
+                            'id': 200301,
+                            'laborFee': '0'
+                        },
+                        'bundleItemId': 10195,
+                        'bundleItem': {
+                            'units': 'CORE',
+                            'keyName': '56_CORES_X_242_RAM_X_1_4_TB',
+                            'capacity': '56',
+                            'description': '56 Cores X 242 RAM X 1.2 TB',
+                            'id': 10195
+                        },
+                        'id': 41763
+                    },
+                    {
+                        'category': {
+                            'categoryCode': 'dedicated_host_disk',
+                            'id': 851,
+                            'name': 'Dedicated Host Disk'
+                        },
+                        'itemPriceId': 200299,
+                        'itemPrice': {
+                            'itemId': 10197,
+                            'setupFee': '0',
+                            'recurringFee': '0',
+                            'hourlyRecurringFee': '0',
+                            'oneTimeFee': '0',
+                            'id': 200299,
+                            'laborFee': '0'
+                        },
+                        'bundleItemId': 10195,
+                        'bundleItem': {
+                            'units': 'CORE',
+                            'keyName': '56_CORES_X_242_RAM_X_1_4_TB',
+                            'capacity': '56',
+                            'description': '56 Cores X 242 RAM X 1.2 TB',
+                            'id': 10195
+                        },
+                        'id': 41761
+                    }
+                ],
+                'keyName': '56_CORES_X_242_RAM_X_1_4_TB',
+                'units': 'CORE',
+                'id': 10195
+            },
+            'laborFee': '0',
+            'categories': [
+                {
+                    'categoryCode': 'dedicated_virtual_hosts',
+                    'id': 848,
+                    'name': 'Dedicated Host'
+                }
+            ]
+        }
+    ],
+    'sendQuoteEmailFlag': '',
+    'packageId': 813,
+    'useHourlyPricing': True,
+    'preTaxRecurringMonthly': '0',
+    'message': '',
+    'preTaxRecurring': '3.164',
+    'primaryDiskPartitionId': '',
+    'locationObject': {
+        'id': 138124,
+        'name': 'dal05',
+        'longName': 'Dallas 5'
+    },
+    'taxCompletedFlag': False,
+    'isManagedOrder': '',
+    'imageTemplateId': '',
+    'postTaxRecurringMonthly': '0',
+    'resourceGroupTemplateId': '',
+    'postTaxSetup': '0',
+    'sshKeys': [],
+    'location': '138124',
+    'stepId': '',
+    'proratedInitialCharge': '0',
+    'totalRecurringTax': '0',
+    'paymentType': '',
+    'resourceGroupId': '',
+    'sourceVirtualGuestId': '',
+    'bigDataOrderFlag': False,
+    'extendedHardwareTesting': '',
+    'preTaxRecurringHourly': '3.164',
+    'postTaxRecurringHourly': '3.164',
+    'currencyShortName': 'USD',
+    'containerSplHash': '000000003699c54000007f38ef8b0102',
+    'proratedOrderTotal': '0',
+    'serverCoreCount': '',
+    'privateCloudOrderFlag': False,
+    'totalSetupTax': '0',
+    'quantity': 1
+}
