@@ -8,3 +8,11 @@ getObject = {
     'cpuCount': 56,
     'accountId': 1199911
 }
+
+
+getAvailableRouters = [
+    {'hostname': 'bcr01a.dal05', 'id': 51218},
+    {'hostname': 'bcr02a.dal05', 'id': 83361},
+    {'hostname': 'bcr03a.dal05', 'id': 122762},
+    {'hostname': 'bcr04a.dal05', 'id': 147566}
+]
