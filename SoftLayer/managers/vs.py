@@ -547,41 +547,28 @@ class VSManager(utils.IdentifierMixin, object):
 
         :param int cpus: The number of virtual CPUs to include in the instance.
         :param int memory: The amount of RAM to order.
-        :param bool hourly: Flag to indicate if this server should be billed
-                            hourly (default) or monthly.
+        :param bool hourly: Flag to indicate if this server should be billed hourly (default) or monthly.
         :param string hostname: The hostname to use for the new server.
         :param string domain: The domain to use for the new server.
-        :param bool local_disk: Flag to indicate if this should be a local disk
-                                (default) or a SAN disk.
-        :param string datacenter: The short name of the data center in which
-                                  the VS should reside.
-        :param string os_code: The operating system to use. Cannot be specified
-                               if image_id is specified.
-        :param int image_id: The ID of the image to load onto the server.
-                             Cannot be specified if os_code is specified.
-        :param bool dedicated: Flag to indicate if this should be housed on a
-                               dedicated or shared host (default). This will
-                               incur a fee on your account.
-        :param int public_vlan: The ID of the public VLAN on which you want
-                                this VS placed.
-        :param list public_security_groups: The list of security group IDs
-                                            to apply to the public interface
-        :param list private_security_groups: The list of security group IDs
-                                             to apply to the private interface
-        :param int private_vlan: The ID of the private VLAN on which you want
-                                 this VS placed.
+        :param bool local_disk: Flag to indicate if this should be a local disk (default) or a SAN disk.
+        :param string datacenter: The short name of the data center in which the VS should reside.
+        :param string os_code: The operating system to use. Cannot be specified  if image_id is specified.
+        :param int image_id: The ID of the image to load onto the server. Cannot be specified if os_code is specified.
+        :param bool dedicated: Flag to indicate if this should be housed on adedicated or shared host (default).
+                               This will incur a fee on your account.
+        :param int public_vlan: The ID of the public VLAN on which you want this VS placed.
+        :param list public_security_groups: The list of security group IDs to apply to the public interface
+        :param list private_security_groups: The list of security group IDs to apply to the private interface
+        :param int private_vlan: The ID of the private VLAN on which you want  this VS placed.
         :param list disks: A list of disk capacities for this server.
-        :param string post_uri: The URI of the post-install script to run
-                                after reload
-        :param bool private: If true, the VS will be provisioned only with
-                             access to the private network. Defaults to false
+        :param string post_uri: The URI of the post-install script to run  after reload
+        :param bool private: If true, the VS will be provisioned only with access to the private network.
+                             Defaults to false
         :param list ssh_keys: The SSH keys to add to the root user
         :param int nic_speed: The port speed to set
         :param string tags: tags to set on the VS as a comma separated list
-        :param string flavor: The key name of the public virtual server flavor
-                              being ordered.
-        :param int host_id: The host id of a dedicated host to provision a
-                            dedicated host virtual server on.
+        :param string flavor: The key name of the public virtual server flavor being ordered.
+        :param int host_id: The host id of a dedicated host to provision a dedicated host virtual server on.
         """
         tags = kwargs.pop('tags', None)
         inst = self.guest.createObject(self._generate_create_dict(**kwargs))
@@ -593,7 +580,7 @@ class VSManager(utils.IdentifierMixin, object):
     def set_tags(self, tags, guest_id):
         """Sets tags on a guest with a retry decorator
 
-        Just calls guest.setTags, but lets if it fails from an APIError will retry
+        Just calls guest.setTags, but if it fails from an APIError will retry
         """
         self.guest.setTags(tags, id=guest_id)
 
