@@ -119,8 +119,10 @@ class DedicatedHostsTests(testing.TestCase):
         args = ({
             'useHourlyPricing': True,
             'hardware': [{
+
                 'hostname': 'host',
                 'domain': 'example.com',
+
                 'primaryBackendNetworkComponent': {
                     'router': {
                         'id': 51218
