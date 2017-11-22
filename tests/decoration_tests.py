@@ -5,8 +5,8 @@
     :license: MIT, see LICENSE for more details.
 """
 
-import mock
 import logging
+import mock
 import unittest
 
 from SoftLayer.decoration import retry
