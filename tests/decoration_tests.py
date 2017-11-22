@@ -4,9 +4,10 @@
 
     :license: MIT, see LICENSE for more details.
 """
+
+import mock
 import logging
 import unittest
-import unittest.mock
 
 from SoftLayer.decoration import retry
 from SoftLayer import exceptions
@@ -17,7 +18,7 @@ class TestDecoration(testing.TestCase):
 
     def setUp(self):
         super(TestDecoration, self).setUp()
-        self.patcher = unittest.mock.patch('SoftLayer.decoration.sleep')
+        self.patcher = mock.patch('SoftLayer.decoration.sleep')
         self.patcher.return_value = False
         self.patcher.start()
         self.addCleanup(self.patcher.stop)
@@ -35,7 +36,7 @@ class TestDecoration(testing.TestCase):
         self.assertEqual(r, 'success')
         self.assertEqual(self.counter, 1)
 
-    @unittest.mock.patch('SoftLayer.decoration.randint')
+    @mock.patch('SoftLayer.decoration.randint')
     def test_retries_once(self, _random):
 
         _random.side_effect = [0, 0, 0, 0]
