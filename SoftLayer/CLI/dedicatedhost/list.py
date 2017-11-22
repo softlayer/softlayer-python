@@ -47,7 +47,9 @@ DEFAULT_COLUMNS = [
 @click.option('--name', '-H', help='Host portion of the FQDN')
 @click.option('--memory', '-m', help='Memory capacity in mebibytes',
               type=click.INT)
+
 @click.option('--disk', '-D', help='Disk capacity')
+
 @environment.pass_env
 def cli(env, sortby, cpu, columns, datacenter, name, memory, disk, tag):
     """List dedicated host."""

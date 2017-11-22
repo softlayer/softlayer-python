@@ -119,8 +119,10 @@ class DedicatedHostsTests(testing.TestCase):
         args = ({
             'useHourlyPricing': True,
             'hardware': [{
+
                 'hostname': 'host',
                 'domain': 'example.com',
+
                 'primaryBackendNetworkComponent': {
                     'router': {
                         'id': 51218
@@ -174,3 +176,4 @@ class DedicatedHostsTests(testing.TestCase):
                                    '--billing=monthly'])
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
