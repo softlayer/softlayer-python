@@ -191,6 +191,13 @@ ALL_ROUTES = [
     ('object-storage:endpoints',
      'SoftLayer.CLI.object_storage.list_endpoints:cli'),
 
+    ('order', 'SoftLayer.CLI.order'),
+    ('order:category-list', 'SoftLayer.CLI.order.category_list:cli'),
+    ('order:item-list', 'SoftLayer.CLI.order.item_list:cli'),
+    ('order:package-list', 'SoftLayer.CLI.order.package_list:cli'),
+    ('order:place', 'SoftLayer.CLI.order.place:cli'),
+    ('order:preset-list', 'SoftLayer.CLI.order.preset_list:cli'),
+
     ('rwhois', 'SoftLayer.CLI.rwhois'),
     ('rwhois:edit', 'SoftLayer.CLI.rwhois.edit:cli'),
     ('rwhois:show', 'SoftLayer.CLI.rwhois.show:cli'),
