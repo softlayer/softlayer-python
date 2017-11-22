@@ -34,8 +34,8 @@ ALL_ROUTES = [
     ('dedicatedhost', 'SoftLayer.CLI.dedicatedhost'),
     ('dedicatedhost:list', 'SoftLayer.CLI.dedicatedhost.list:cli'),
     ('dedicatedhost:create', 'SoftLayer.CLI.dedicatedhost.create:cli'),
-
     ('dedicatedhost:create-options', 'SoftLayer.CLI.dedicatedhost.create_options:cli'),
+    ('dedicatedhost:detail', 'SoftLayer.CLI.dedicatedhost.detail:cli'),
 
     ('cdn', 'SoftLayer.CLI.cdn'),
     ('cdn:detail', 'SoftLayer.CLI.cdn.detail:cli'),

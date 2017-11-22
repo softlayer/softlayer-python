@@ -34,6 +34,37 @@ class DedicatedHostsTests(testing.TestCase):
                          }]
                          )
 
+    def test_details(self):
+        mock = self.set_mock('SoftLayer_Virtual_DedicatedHost', 'getObject')
+        mock.return_value = SoftLayer_Virtual_DedicatedHost.getObjectById
+
+        result = self.run_command(['dedicatedhost', 'detail', '44701', '--price', '--guests'])
+        self.assert_no_fail(result)
+
+        self.assertEqual(json.loads(result.output), {
+            "datacenter": "dal05",
+            "id": 44701,
+            "name": "khnguyendh",
+            "create date": "2017-11-02T11:40:56-07:00",
+            "price_rate": 1515.556,
+            "owner": "232298_khuong",
+            "modify date": "2017-11-06T11:38:20-06:00",
+            "memory capacity": 242,
+            "guests": [
+                {
+                    "uuid": "806a56ec-0383-4c2e-e6a9-7dc89c4b29a2",
+                    "hostname": "khnguyenDHI",
+                    "domain": "Softlayer.com",
+                    "id": 43546081
+                }
+            ],
+            "guest count": 1,
+            "cpu count": 56,
+            "router id": 51218,
+            "disk capacity": 1200
+        }
+        )
+
     def test_create_options(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = SoftLayer_Product_Package.getAllObjectsDH

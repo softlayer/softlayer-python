@@ -33,6 +33,31 @@ class DedicatedHostTests(testing.TestCase):
         )
         self.assertEqual(results, fixtures.SoftLayer_Account.getDedicatedHosts)
 
+    def test_get_host(self):
+
+        self.dedicated_host.host = mock.Mock()
+        self.dedicated_host.host.getObject.return_value = 'test'
+
+        self.dedicated_host.get_host(12345)
+
+        mask = (
+            'id,'
+            'name,'
+            'cpuCount,'
+            'memoryCapacity,'
+            'diskCapacity,'
+            'createDate,'
+            'modifyDate,'
+            'backendRouter[id, hostname, domain],'
+            'billingItem[id, nextInvoiceTotalRecurringAmount, '
+            'children[categoryCode,nextInvoiceTotalRecurringAmount],'
+            'orderItem[id, order.userRecord[username]]],'
+            'datacenter[id, name, longName],'
+            'guests[id, hostname, domain, uuid],'
+            'guestCount'
+        )
+        self.dedicated_host.host.getObject.assert_called_once_with(id=12345, mask=mask)
+
     def test_place_order(self):
         create_dict = self.dedicated_host._generate_create_dict = mock.Mock()
 

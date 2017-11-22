@@ -109,6 +109,45 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         func = getattr(self.account, call)
         return func(**kwargs)
 
+    def get_host(self, host_id, **kwargs):
+        """Get details about a dedicated host.
+
+        :param integer : the host ID
+        :returns: A dictionary containing a large amount of information about
+                  the specified instance.
+
+        Example::
+
+            # Print out host ID 12345.
+            dh = mgr.get_host(12345)
+            print dh
+
+            # Print out only name and backendRouter for instance 12345
+            object_mask = "mask[name,backendRouter[id]]"
+            dh = mgr.get_host(12345, mask=mask)
+            print dh
+
+        """
+        if 'mask' not in kwargs:
+            kwargs['mask'] = (
+                'id,'
+                'name,'
+                'cpuCount,'
+                'memoryCapacity,'
+                'diskCapacity,'
+                'createDate,'
+                'modifyDate,'
+                'backendRouter[id, hostname, domain],'
+                'billingItem[id, nextInvoiceTotalRecurringAmount, '
+                'children[categoryCode,nextInvoiceTotalRecurringAmount],'
+                'orderItem[id, order.userRecord[username]]],'
+                'datacenter[id, name, longName],'
+                'guests[id, hostname, domain, uuid],'
+                'guestCount'
+            )
+
+        return self.host.getObject(id=host_id, **kwargs)
+
     def place_order(self, hostname, domain, location, hourly, router=None):
         """Places an order for a dedicated host.
 
