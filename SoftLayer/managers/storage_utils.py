@@ -945,9 +945,8 @@ def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
     if 'PERFORMANCE' in origin_storage_type:
         volume_is_performance = True
         if iops is None:
-            if isinstance(utils.lookup(origin_volume, 'provisionedIops'), str):
-                iops = int(origin_volume['provisionedIops'])
-            else:
+            iops = int(origin_volume.get('provisionedIops', 0))
+            if iops <= 0:
                 raise exceptions.SoftLayerError(
                     "Cannot find origin volume's provisioned IOPS")
         # Set up the price array for the order

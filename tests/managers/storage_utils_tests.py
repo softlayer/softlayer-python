@@ -3645,9 +3645,8 @@ class StorageUtilsTests(testing.TestCase):
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
 
         mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
-        mock_volume['storageType']['keyName'] = 'PERFORMANCE_BLOCK_'\
-                                                'STORAGE_REPLICANT'
-        mock_volume['provisionedIops'] = None
+        mock_volume['storageType']['keyName'] = 'PERFORMANCE_BLOCK_STORAGE_REPLICANT'
+        del mock_volume['provisionedIops']
 
         exception = self.assertRaises(
             exceptions.SoftLayerError,
