@@ -62,14 +62,10 @@ def cli(env, volume_id):
 
     if block_volume['activeTransactions']:
         for trans in block_volume['activeTransactions']:
-            if trans['transactionStatus']:
-                table.add_row([
-                    'Ongoing Transactions',
-                    trans['transactionStatus']['friendlyName']])
+            if isinstance(utils.lookup(trans, 'transactionStatus', 'friendlyName'), str):
+                table.add_row(['Ongoing Transaction', trans['transactionStatus']['friendlyName']])
 
-    if block_volume['replicationPartnerCount']:
-        table.add_row(['Replicant Count', "%u"
-                   % block_volume['replicationPartnerCount']])
+    table.add_row(['Replicant Count', "%u" % block_volume.get('replicationPartnerCount', 0)])
 
     if block_volume['replicationPartnerCount'] > 0:
         # This if/else temporarily handles a bug in which the SL API
@@ -104,18 +100,12 @@ def cli(env, volume_id):
         table.add_row(['Replicant Volumes', replicant_list])
 
     if block_volume.get('originalVolumeSize'):
-        if block_volume.get('originalVolumeSize'):
-
-            origin_volume_info = formatting.Table(['Property',
-                                                   'Value'])
-            origin_volume_info.add_row(['Original Volume Size',
-                                        block_volume['originalVolumeSize']])
+        original_volume_info = formatting.Table(['Property', 'Value'])
+        original_volume_info.add_row(['Original Volume Size', block_volume['originalVolumeSize']])
         if block_volume.get('originalVolumeName'):
-            origin_volume_info.add_row(['Original Volume Name',
-                                        block_volume['originalVolumeName']])
+            original_volume_info.add_row(['Original Volume Name', block_volume['originalVolumeName']])
         if block_volume.get('originalSnapshotName'):
-            origin_volume_info.add_row(['Original Snapshot Name',
-                                        block_volume['originalSnapshotName']])
-        table.add_row(['Original Volume Properties', origin_volume_info])
+            original_volume_info.add_row(['Original Snapshot Name', block_volume['originalSnapshotName']])
+        table.add_row(['Original Volume Properties', original_volume_info])
 
     env.fout(table)

@@ -130,9 +130,9 @@ class FileTests(testing.TestCase):
                 {'Property': 'Original Volume Size',
                  'Value': '20'},
                 {'Property': 'Original Volume Name',
-                 'Value': 'test-origin-volume-name'},
+                 'Value': 'test-original-volume-name'},
                 {'Property': 'Original Snapshot Name',
-                 'Value': 'test-origin-snapshot-name'}
+                 'Value': 'test-original-snapshot-name'}
             ]
         }, json.loads(result.output))
 
