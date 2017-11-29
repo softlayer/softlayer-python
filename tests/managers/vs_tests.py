@@ -5,7 +5,6 @@
     :license: MIT, see LICENSE for more details.
 
 """
-import logging
 import mock
 
 import SoftLayer
@@ -873,7 +872,6 @@ class VSWaitReadyGoTests(testing.TestCase):
             mock.call(id=1, mask=mock.ANY),
             mock.call(id=1, mask=mock.ANY),
         ])
-
 
     @mock.patch('time.time')
     @mock.patch('time.sleep')
