@@ -425,7 +425,7 @@ class OrderingManager(object):
             preset_id = self.get_preset_by_key(package_keyname, preset_keyname)['id']
             order['presetId'] = preset_id
 
-        price_ids = self.get_price_id_list(package_keyname, price_keynames)
+        price_ids = self.get_price_id_list(package_keyname, item_keynames)
         order['prices'] = [{'id': price_id} for price_id in price_ids]
 
         return self.order_svc.verifyOrder(order)
@@ -455,7 +455,7 @@ class OrderingManager(object):
         """
         # verify the order, and if the order is valid, the proper prices will be filled
         # into the order template, so we can just send that to placeOrder to order it
-        verified_order = self.verify_order(package_keyname, location, price_keynames,
+        verified_order = self.verify_order(package_keyname, location, item_keynames,
                                            hourly=hourly,
                                            preset_keyname=preset_keyname,
                                            extras=extras, quantity=quantity)
