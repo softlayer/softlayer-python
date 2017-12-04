@@ -8,6 +8,32 @@
 
 from SoftLayer import exceptions
 
+CATEGORY_MASK = '''id,
+                   isRequired,
+                   itemCategory[
+                     id,
+                     name,
+                     categoryCode
+                   ]
+                '''
+
+ITEM_MASK = '''id,
+               keyName,
+               description
+            '''
+
+PACKAGE_MASK = '''id,
+                  name,
+                  keyName,
+                  isActive
+               '''
+
+PRESET_MASK = '''id,
+                 name,
+                 keyName,
+                 description
+              '''
+
 
 class OrderingManager(object):
     """Manager to help ordering via the SoftLayer API.
@@ -232,15 +258,7 @@ class OrderingManager(object):
         :returns: List of categories associated with the package
         """
         get_kwargs = {}
-        default_mask = '''id,
-                          isRequired,
-                          itemCategory[
-                            id,
-                            name,
-                            categoryCode
-                          ]
-                       '''
-        get_kwargs['mask'] = kwargs.get('mask', default_mask)
+        get_kwargs['mask'] = kwargs.get('mask', CATEGORY_MASK)
 
         if 'filter' in kwargs:
             get_kwargs['filter'] = kwargs['filter']
@@ -260,11 +278,7 @@ class OrderingManager(object):
 
         """
         get_kwargs = {}
-        default_mask = '''id,
-                          keyName,
-                          description
-                       '''
-        get_kwargs['mask'] = kwargs.get('mask', default_mask)
+        get_kwargs['mask'] = kwargs.get('mask', ITEM_MASK)
 
         if 'filter' in kwargs:
             get_kwargs['filter'] = kwargs['filter']
@@ -283,12 +297,7 @@ class OrderingManager(object):
 
         """
         get_kwargs = {}
-        default_mask = '''id,
-                          name,
-                          keyName,
-                          isActive
-                       '''
-        get_kwargs['mask'] = kwargs.get('mask', default_mask)
+        get_kwargs['mask'] = kwargs.get('mask', PACKAGE_MASK)
 
         if 'filter' in kwargs:
             get_kwargs['filter'] = kwargs['filter']
@@ -305,12 +314,7 @@ class OrderingManager(object):
 
         """
         get_kwargs = {}
-        default_mask = '''id,
-                          name,
-                          keyName,
-                          description
-                       '''
-        get_kwargs['mask'] = kwargs.get('mask', default_mask)
+        get_kwargs['mask'] = kwargs.get('mask', PRESET_MASK)
 
         if 'filter' in kwargs:
             get_kwargs['filter'] = kwargs['filter']
@@ -322,7 +326,7 @@ class OrderingManager(object):
         acc_presets = self.package_svc.getAccountRestrictedActivePresets(
             id=package['id'], **get_kwargs)
         active_presets = self.package_svc.getActivePresets(id=package['id'], **get_kwargs)
-        return acc_presets + active_presets
+        return active_presets + acc_presets
 
     def get_preset_by_key(self, package_keyname, preset_keyname, mask=None):
         """Gets a single preset with the given key."""
@@ -351,10 +355,6 @@ class OrderingManager(object):
                   keynames in the given package
 
         """
-        package = self.get_package_by_key(package_keyname, mask='id')
-        if not package:
-            raise exceptions.SoftLayerError("Package {} does not exist".format(package_keyname))
-
         mask = 'id, keyName, prices'
         items = self.list_items(package_keyname, mask=mask)
 
