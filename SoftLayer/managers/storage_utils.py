@@ -1013,7 +1013,7 @@ def prepare_modify_order_object(manager, volume, new_iops, new_tier, new_size):
 
     # Verify that the origin volume has not been cancelled
     if 'billingItem' not in volume:
-        raise exceptions.SoftLayerError("The volume has been cancelled; unable to modify volume")
+        raise exceptions.SoftLayerError("The volume has been cancelled; unable to modify volume.")
 
     # Ensure the origin volume is STaaS v2 or higher and supports Encryption at Rest
     if not _staas_version_is_v2_or_above(volume):
@@ -1035,7 +1035,7 @@ def prepare_modify_order_object(manager, volume, new_iops, new_tier, new_size):
         elif new_iops is None:
             new_iops = int(volume.get('provisionedIops', 0))
             if new_iops <= 0:
-                raise exceptions.SoftLayerError("Cannot find volume's provisioned IOPS")
+                raise exceptions.SoftLayerError("Cannot find volume's provisioned IOPS.")
 
         # Set up the prices array for the order
         prices = [
@@ -1062,8 +1062,8 @@ def prepare_modify_order_object(manager, volume, new_iops, new_tier, new_size):
         ]
 
     else:
-        raise exceptions.SoftLayerError("Origin volume does not have a valid storage type (with an appropriate "
-                                        "keyName to indicate the volume is a PERFORMANCE or an ENDURANCE volume)")
+        raise exceptions.SoftLayerError("Volume does not have a valid storage type (with an appropriate "
+                                        "keyName to indicate the volume is a PERFORMANCE or an ENDURANCE volume).")
 
     modify_order = {
         'complexType': 'SoftLayer_Container_Product_Order_Network_Storage_AsAService_Upgrade',

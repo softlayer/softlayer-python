@@ -71,7 +71,8 @@ class BlockTests(testing.TestCase):
             'Data Center': 'dal05',
             'Type': 'ENDURANCE',
             'ID': 100,
-            '# of Active Transactions': '0',
+            '# of Active Transactions': '1',
+            'Ongoing Transaction': 'This is a buffer time in which the customer may cancel the server',
             'Replicant Count': '1',
             'Replication Status': 'Replicant Volume Provisioning '
                                   'has completed.',
@@ -600,6 +601,37 @@ class BlockTests(testing.TestCase):
         self.assertEqual(result.output,
                          'Order #24602 placed successfully!\n'
                          ' > Storage as a Service\n')
+
+    @mock.patch('SoftLayer.BlockStorageManager.order_modified_volume')
+    def test_modify_order_exception_caught(self, order_mock):
+        order_mock.side_effect = ValueError('order attempt failed, noooo!')
+
+        result = self.run_command(['block', 'volume-modify', '102', '--new-size=1000'])
+
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual('Argument Error: order attempt failed, noooo!', result.exception.message)
+
+    @mock.patch('SoftLayer.BlockStorageManager.order_modified_volume')
+    def test_modify_order_order_not_placed(self, order_mock):
+        order_mock.return_value = {}
+
+        result = self.run_command(['block', 'volume-modify', '102', '--new-iops=1400'])
+
+        self.assert_no_fail(result)
+        self.assertEqual('Order could not be placed! Please verify your options and try again.\n', result.output)
+
+    @mock.patch('SoftLayer.BlockStorageManager.order_modified_volume')
+    def test_modify_order(self, order_mock):
+        order_mock.return_value = {'placedOrder': {'id': 24602, 'items': [{'description': 'Storage as a Service'},
+                                                                          {'description': '1000 GBs'},
+                                                                          {'description': '4 IOPS per GB'}]}}
+
+        result = self.run_command(['block', 'volume-modify', '102', '--new-size=1000', '--new-tier=4'])
+
+        order_mock.assert_called_with('102', new_size=1000, new_iops=None, new_tier_level=4)
+        self.assert_no_fail(result)
+        self.assertEqual('Order #24602 placed successfully!\n > Storage as a Service\n > 1000 GBs\n > 4 IOPS per GB\n',
+                         result.output)
 
     def test_set_password(self):
         result = self.run_command(['block', 'access-password', '1234', '--password=AAAAA'])

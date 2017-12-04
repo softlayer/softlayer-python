@@ -3851,3 +3851,187 @@ class StorageUtilsTests(testing.TestCase):
                          "Origin volume does not have a valid storage type "
                          "(with an appropriate keyName to indicate the "
                          "volume is a PERFORMANCE or an ENDURANCE volume)")
+
+    # ---------------------------------------------------------------------
+    # Tests for prepare_modify_order_object()
+    # ---------------------------------------------------------------------
+    def test_prep_modify_order_origin_volume_cancelled(self):
+        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        del mock_volume['billingItem']
+
+        exception = self.assertRaises(exceptions.SoftLayerError, storage_utils.prepare_modify_order_object,
+                                      self.block, mock_volume, None, None, None)
+
+        self.assertEqual("The volume has been cancelled; unable to modify volume.", str(exception))
+
+    def test_prep_modify_order_origin_volume_staas_version_below_v2(self):
+        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume['staasVersion'] = 1
+
+        exception = self.assertRaises(exceptions.SoftLayerError, storage_utils.prepare_modify_order_object,
+                                      self.block, mock_volume, None, None, None)
+
+        self.assertEqual("This volume cannot be modified since it does not support Encryption at Rest.",
+                         str(exception))
+
+    def test_prep_modify_order_performance_values_not_given(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume['storageType']['keyName'] = 'PERFORMANCE_BLOCK_STORAGE'
+
+        exception = self.assertRaises(exceptions.SoftLayerError, storage_utils.prepare_modify_order_object,
+                                      self.block, mock_volume, None, None, None)
+
+        self.assertEqual("A size or IOPS value must be given to modify this performance volume.", str(exception))
+
+    def test_prep_modify_order_performance_iops_not_found(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume['storageType']['keyName'] = 'PERFORMANCE_BLOCK_STORAGE'
+        del mock_volume['provisionedIops']
+
+        exception = self.assertRaises(exceptions.SoftLayerError, storage_utils.prepare_modify_order_object,
+                                      self.block, mock_volume, None, None, 40)
+
+        self.assertEqual("Cannot find volume's provisioned IOPS.", str(exception))
+
+    def test_prep_modify_order_performance_use_existing_iops(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume['storageType']['keyName'] = 'PERFORMANCE_FILE_STORAGE'
+
+        expected_object = {
+            'complexType': 'SoftLayer_Container_Product_Order_Network_Storage_AsAService_Upgrade',
+            'packageId': 759,
+            'prices': [{'id': 189433}, {'id': 190113}, {'id': 190173}],
+            'volume': {'id': 102},
+            'volumeSize': 1000,
+            'iops': 1000
+        }
+
+        result = storage_utils.prepare_modify_order_object(self.file, mock_volume, None, None, 1000)
+        self.assertEqual(expected_object, result)
+
+    def test_prep_modify_order_performance_use_existing_size(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume['storageType']['keyName'] = 'PERFORMANCE_BLOCK_STORAGE'
+
+        expected_object = {
+            'complexType': 'SoftLayer_Container_Product_Order_Network_Storage_AsAService_Upgrade',
+            'packageId': 759,
+            'prices': [{'id': 189433}, {'id': 189993}, {'id': 190053}],
+            'volume': {'id': 102},
+            'volumeSize': 500,
+            'iops': 2000
+        }
+
+        result = storage_utils.prepare_modify_order_object(self.block, mock_volume, 2000, None, None)
+        self.assertEqual(expected_object, result)
+
+    def test_prep_modify_order_performance(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume['storageType']['keyName'] = 'PERFORMANCE_FILE_STORAGE'
+
+        expected_object = {
+            'complexType': 'SoftLayer_Container_Product_Order_Network_Storage_AsAService_Upgrade',
+            'packageId': 759,
+            'prices': [{'id': 189433}, {'id': 190113}, {'id': 190173}],
+            'volume': {'id': 102},
+            'volumeSize': 1000,
+            'iops': 2000
+        }
+
+        result = storage_utils.prepare_modify_order_object(self.file, mock_volume, 2000, None, 1000)
+        self.assertEqual(expected_object, result)
+
+    def test_prep_modify_order_endurance_values_not_given(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume['storageType']['keyName'] = 'ENDURANCE_BLOCK_STORAGE'
+
+        exception = self.assertRaises(exceptions.SoftLayerError, storage_utils.prepare_modify_order_object,
+                                      self.block, mock_volume, None, None, None)
+
+        self.assertEqual("A size or tier value must be given to modify this endurance volume.", str(exception))
+
+    def test_prep_modify_order_endurance_use_existing_tier(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume['storageType']['keyName'] = 'ENDURANCE_FILE_STORAGE'
+
+        expected_object = {
+            'complexType': 'SoftLayer_Container_Product_Order_Network_Storage_AsAService_Upgrade',
+            'packageId': 759,
+            'prices': [{'id': 189433}, {'id': 193433}, {'id': 193373}],
+            'volume': {'id': 102},
+            'volumeSize': 1000
+        }
+
+        result = storage_utils.prepare_modify_order_object(self.file, mock_volume, None, None, 1000)
+        self.assertEqual(expected_object, result)
+
+    def test_prep_modify_order_endurance_use_existing_size(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume['storageType']['keyName'] = 'ENDURANCE_BLOCK_STORAGE'
+
+        expected_object = {
+            'complexType': 'SoftLayer_Container_Product_Order_Network_Storage_AsAService_Upgrade',
+            'packageId': 759,
+            'prices': [{'id': 189433}, {'id': 194763}, {'id': 194703}],
+            'volume': {'id': 102},
+            'volumeSize': 500
+        }
+
+        result = storage_utils.prepare_modify_order_object(self.block, mock_volume, None, 4, None)
+        self.assertEqual(expected_object, result)
+
+    def test_prep_modify_order_endurance(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume['storageType']['keyName'] = 'ENDURANCE_FILE_STORAGE'
+
+        expected_object = {
+            'complexType': 'SoftLayer_Container_Product_Order_Network_Storage_AsAService_Upgrade',
+            'packageId': 759,
+            'prices': [{'id': 189433}, {'id': 194763}, {'id': 194703}],
+            'volume': {'id': 102},
+            'volumeSize': 1000
+        }
+
+        result = storage_utils.prepare_modify_order_object(self.file, mock_volume, None, 4, 1000)
+        self.assertEqual(expected_object, result)
+
+    def test_prep_modify_order_invalid_volume_storage_type(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume['storageType']['keyName'] = 'NINJA_PENGUINS'
+
+        exception = self.assertRaises(exceptions.SoftLayerError, storage_utils.prepare_modify_order_object,
+                                      self.block, mock_volume, None, None, None)
+
+        self.assertEqual("Volume does not have a valid storage type (with an appropriate "
+                         "keyName to indicate the volume is a PERFORMANCE or an ENDURANCE volume).",
+                         str(exception))

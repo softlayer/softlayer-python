@@ -39,8 +39,10 @@ STAAS_TEST_VOLUME = {
 
 getObject = {
     'accountId': 1234,
-    'activeTransactionCount': 0,
-    'activeTransactions': None,
+    'activeTransactionCount': 1,
+    'activeTransactions': [{
+        'transactionStatus': {'friendlyName': 'This is a buffer time in which the customer may cancel the server'}
+    }],
     'allowedHardware': [{
         'allowedHost': {
             'credential': {'username': 'joe', 'password': '12345'},
