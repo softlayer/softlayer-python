@@ -62,15 +62,17 @@ getObjectById = {
             }
         },
         'id': 235379377,
-        'children': [{
-            'nextInvoiceTotalRecurringAmount': 0.0,
-            'categoryCode': 'dedicated_host_ram'
-        },
+        'children': [
+            {
+                'nextInvoiceTotalRecurringAmount': 0.0,
+                'categoryCode': 'dedicated_host_ram'
+            },
             {
                 'nextInvoiceTotalRecurringAmount': 0.0,
                 'categoryCode': 'dedicated_host_disk'
             }
-        ]},
+        ]
+    },
     'id': 44701,
     'createDate': '2017-11-02T11:40:56-07:00'
 }

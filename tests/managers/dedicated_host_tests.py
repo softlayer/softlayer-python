@@ -86,20 +86,23 @@ class DedicatedHostTests(testing.TestCase):
         }
         create_dict.return_value = values
 
-        location = 'ams01'
+        location = 'dal05'
         hostname = 'test'
         domain = 'test.com'
         hourly = True
+        flavor = '56_CORES_X_242_RAM_X_1_4_TB'
 
         self.dedicated_host.place_order(hostname=hostname,
                                         domain=domain,
                                         location=location,
+                                        flavor=flavor,
                                         hourly=hourly)
 
         create_dict.assert_called_once_with(hostname=hostname,
                                             router=None,
                                             domain=domain,
                                             datacenter=location,
+                                            flavor=flavor,
                                             hourly=True)
 
         self.assert_called_with('SoftLayer_Product_Order',
@@ -117,8 +120,8 @@ class DedicatedHostTests(testing.TestCase):
                             'id': 51218
                         }
                     },
-                    'domain': u'test.com',
-                    'hostname': u'test'
+                    'domain': 'test.com',
+                    'hostname': 'test'
                 }
             ],
             'useHourlyPricing': True,
@@ -134,20 +137,23 @@ class DedicatedHostTests(testing.TestCase):
         }
         create_dict.return_value = values
 
-        location = 'ams01'
+        location = 'dal05'
         hostname = 'test'
         domain = 'test.com'
         hourly = True
+        flavor = '56_CORES_X_242_RAM_X_1_4_TB'
 
         self.dedicated_host.verify_order(hostname=hostname,
                                          domain=domain,
                                          location=location,
+                                         flavor=flavor,
                                          hourly=hourly)
 
         create_dict.assert_called_once_with(hostname=hostname,
                                             router=None,
                                             domain=domain,
                                             datacenter=location,
+                                            flavor=flavor,
                                             hourly=True)
 
         self.assert_called_with('SoftLayer_Product_Order',
@@ -161,14 +167,16 @@ class DedicatedHostTests(testing.TestCase):
         self.dedicated_host._get_backend_router.return_value = self \
             ._get_routers_sample()
 
-        location = 'ams01'
+        location = 'dal05'
         hostname = 'test'
         domain = 'test.com'
         hourly = True
+        flavor = '56_CORES_X_242_RAM_X_1_4_TB'
 
         results = self.dedicated_host._generate_create_dict(hostname=hostname,
                                                             domain=domain,
                                                             datacenter=location,
+                                                            flavor=flavor,
                                                             hourly=hourly)
 
         testResults = {
@@ -179,12 +187,12 @@ class DedicatedHostTests(testing.TestCase):
                             'id': 51218
                         }
                     },
-                    'domain': u'test.com',
-                    'hostname': u'test'
+                    'domain': 'test.com',
+                    'hostname': 'test'
                 }
             ],
             'useHourlyPricing': True,
-            'location': 'AMSTERDAM',
+            'location': 'DALLAS05',
             'packageId': 813,
             'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
             'prices': [
@@ -200,18 +208,22 @@ class DedicatedHostTests(testing.TestCase):
     def test_generate_create_dict_with_router(self):
         self.dedicated_host._get_package = mock.MagicMock()
         self.dedicated_host._get_package.return_value = self._get_package()
+        self.dedicated_host._get_default_router = mock.Mock()
+        self.dedicated_host._get_default_router.return_value = 51218
 
-        location = 'ams01'
-        router = 55901
+        location = 'dal05'
+        router = 51218
         hostname = 'test'
         domain = 'test.com'
         hourly = True
+        flavor = '56_CORES_X_242_RAM_X_1_4_TB'
 
         results = self.dedicated_host._generate_create_dict(
             hostname=hostname,
             router=router,
             domain=domain,
             datacenter=location,
+            flavor=flavor,
             hourly=hourly)
 
         testResults = {
@@ -219,15 +231,15 @@ class DedicatedHostTests(testing.TestCase):
                 {
                     'primaryBackendNetworkComponent': {
                         'router': {
-                            'id': 55901
+                            'id': 51218
                         }
                     },
-                    'domain': u'test.com',
-                    'hostname': u'test'
+                    'domain': 'test.com',
+                    'hostname': 'test'
                 }
             ],
             'useHourlyPricing': True,
-            'location': 'AMSTERDAM',
+            'location': 'DALLAS05',
             'packageId': 813,
             'complexType':
                 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
@@ -247,7 +259,10 @@ class DedicatedHostTests(testing.TestCase):
             id,
             description,
             prices,
-            itemCategory[categoryCode]
+            capacity,
+            keyName,
+            itemCategory[categoryCode],
+            bundleItems[capacity, categories[categoryCode]]
         ],
         regions[location[location[priceGroups]]]
         '''
@@ -270,7 +285,10 @@ class DedicatedHostTests(testing.TestCase):
             id,
             description,
             prices,
-            itemCategory[categoryCode]
+            capacity,
+            keyName,
+            itemCategory[categoryCode],
+            bundleItems[capacity, categories[categoryCode]]
         ],
         regions[location[location[priceGroups]]]
         '''
@@ -326,16 +344,18 @@ class DedicatedHostTests(testing.TestCase):
         self.dedicated_host._get_package.return_value = self._get_package()
 
         results = {
-            'dedicated_host': [
-                {
-                    'key': 10195,
-                    'name': '56 Cores X 242 RAM X 1.2 TB'
-                }
-            ],
+            'dedicated_host': [{
+                'key': '56_CORES_X_242_RAM_X_1_4_TB',
+                'name': '56 Cores X 242 RAM X 1.2 TB'
+            }],
             'locations': [
                 {
                     'key': 'ams01',
                     'name': 'Amsterdam 1'
+                },
+                {
+                    'key': 'dal05',
+                    'name': 'Dallas 5'
                 }
             ]
         }
@@ -360,41 +380,46 @@ class DedicatedHostTests(testing.TestCase):
     def test_get_item(self):
         """Returns the item for ordering a dedicated host."""
         package = self._get_package()
+        flavor = '56_CORES_X_242_RAM_X_1_4_TB'
 
         item = {
+            'bundleItems': [{
+                'capacity': '1200',
+                'categories': [{
+                    'categoryCode': 'dedicated_host_disk'
+                }]
+            },
+                {
+                    'capacity': '242',
+                    'categories': [{
+                        'categoryCode': 'dedicated_host_ram'
+                    }]
+                }],
+            'capacity': '56',
             'description': '56 Cores X 242 RAM X 1.2 TB',
             'id': 10195,
             'itemCategory': {
                 'categoryCode': 'dedicated_virtual_hosts'
             },
-            'prices': [
-                {
-                    'currentPriceFlag': '',
-                    'hourlyRecurringFee': '3.164',
-                    'id': 200269,
-                    'itemId': 10195,
-                    'laborFee': '0',
-                    'locationGroupId': '',
-                    'onSaleFlag': '',
-                    'oneTimeFee': '0',
-                    'quantity': '',
-                    'recurringFee': '2099',
-                    'setupFee': '0',
-                    'sort': 0,
-                    'tierMinimumThreshold': ''
-                }
-            ]
+            'keyName': '56_CORES_X_242_RAM_X_1_4_TB',
+            'prices': [{
+                'hourlyRecurringFee': '3.164',
+                'id': 200269,
+                'itemId': 10195,
+                'recurringFee': '2099',
+            }]
         }
 
-        self.assertEqual(self.dedicated_host._get_item(package), item)
+        self.assertEqual(self.dedicated_host._get_item(package, flavor), item)
 
     def test_get_item_no_item_found(self):
         package = self._get_package()
 
-        package['items'][0]['description'] = 'not found'
+        flavor = '56_CORES_X_242_RAM_X_1_4_TB'
+        package['items'][0]['keyName'] = 'not found'
 
         self.assertRaises(exceptions.SoftLayerError,
-                          self.dedicated_host._get_item, package)
+                          self.dedicated_host._get_item, package, flavor)
 
     def test_get_backend_router(self):
         location = [
@@ -413,9 +438,9 @@ class DedicatedHostTests(testing.TestCase):
         '''
 
         host = {
-            'cpuCount': 56,
-            'memoryCapacity': 242,
-            'diskCapacity': 1200,
+            'cpuCount': '56',
+            'memoryCapacity': '242',
+            'diskCapacity': '1200',
             'datacenter': {
                 'id': locId
             }
@@ -426,7 +451,9 @@ class DedicatedHostTests(testing.TestCase):
         routers = self.dedicated_host.host.getAvailableRouters.return_value = \
             self._get_routers_sample()
 
-        routers_test = self.dedicated_host._get_backend_router(location)
+        item = self._get_package()['items'][0]
+
+        routers_test = self.dedicated_host._get_backend_router(location, item)
 
         self.assertEqual(routers, routers_test)
         self.dedicated_host.host.getAvailableRouters. \
@@ -439,14 +466,16 @@ class DedicatedHostTests(testing.TestCase):
 
         routers_test = self.dedicated_host._get_backend_router
 
-        self.assertRaises(exceptions.SoftLayerError, routers_test, location)
+        item = self._get_package()['items'][0]
+
+        self.assertRaises(exceptions.SoftLayerError, routers_test, location, item)
 
     def test_get_default_router(self):
         routers = self._get_routers_sample()
 
         router = 51218
 
-        router_test = self.dedicated_host._get_default_router(routers)
+        router_test = self.dedicated_host._get_default_router(routers, 'bcr01a.dal05')
 
         self.assertEqual(router_test, router)
 
@@ -454,7 +483,7 @@ class DedicatedHostTests(testing.TestCase):
         routers = []
 
         self.assertRaises(exceptions.SoftLayerError,
-                          self.dedicated_host._get_default_router, routers)
+                          self.dedicated_host._get_default_router, routers, 'notFound')
 
     def _get_routers_sample(self):
         routers = [
@@ -482,28 +511,39 @@ class DedicatedHostTests(testing.TestCase):
         package = {
             "items": [
                 {
+                    "capacity": "56",
+                    "description": "56 Cores X 242 RAM X 1.2 TB",
+                    "bundleItems": [
+                        {
+                            "capacity": "1200",
+                            "categories": [
+                                {
+                                    "categoryCode": "dedicated_host_disk"
+                                }
+                            ]
+                        },
+                        {
+                            "capacity": "242",
+                            "categories": [
+                                {
+                                    "categoryCode": "dedicated_host_ram"
+                                }
+                            ]
+                        }
+                    ],
                     "prices": [
                         {
                             "itemId": 10195,
-                            "setupFee": "0",
                             "recurringFee": "2099",
-                            "tierMinimumThreshold": "",
                             "hourlyRecurringFee": "3.164",
-                            "oneTimeFee": "0",
-                            "currentPriceFlag": "",
                             "id": 200269,
-                            "sort": 0,
-                            "onSaleFlag": "",
-                            "laborFee": "0",
-                            "locationGroupId": "",
-                            "quantity": ""
                         }
                     ],
+                    "keyName": "56_CORES_X_242_RAM_X_1_4_TB",
+                    "id": 10195,
                     "itemCategory": {
                         "categoryCode": "dedicated_virtual_hosts"
                     },
-                    "description": "56 Cores X 242 RAM X 1.2 TB",
-                    "id": 10195
                 }
             ],
             "regions": [
@@ -511,25 +551,11 @@ class DedicatedHostTests(testing.TestCase):
                     "location": {
                         "locationPackageDetails": [
                             {
-                                "isAvailable": 1,
                                 "locationId": 265592,
                                 "packageId": 813
                             }
                         ],
                         "location": {
-                            "statusId": 2,
-                            "priceGroups": [
-                                {
-                                    "locationGroupTypeId": 82,
-                                    "description": "Location Group 2",
-                                    "locationGroupType": {
-                                        "name": "PRICING"
-                                    },
-                                    "securityLevelId": "",
-                                    "id": 503,
-                                    "name": "Location Group 2"
-                                }
-                            ],
                             "id": 265592,
                             "name": "ams01",
                             "longName": "Amsterdam 1"
@@ -538,11 +564,28 @@ class DedicatedHostTests(testing.TestCase):
                     "keyname": "AMSTERDAM",
                     "description": "AMS01 - Amsterdam",
                     "sortOrder": 0
+                },
+                {
+                    "location": {
+                        "locationPackageDetails": [
+                            {
+                                "isAvailable": 1,
+                                "locationId": 138124,
+                                "packageId": 813
+                            }
+                        ],
+                        "location": {
+                            "id": 138124,
+                            "name": "dal05",
+                            "longName": "Dallas 5"
+                        }
+                    },
+                    "keyname": "DALLAS05",
+                    "description": "DAL05 - Dallas",
                 }
+
             ],
-            "firstOrderStepId": "",
             "id": 813,
-            "isActive": 1,
             "description": "Dedicated Host"
         }
 

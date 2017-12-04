@@ -888,159 +888,6 @@ getItemPrices = [
         'sort': 0
     }]
 
-getAllObjectsDH = [{
-    'subDescription': 'Dedicated Host',
-    'name': 'Dedicated Host',
-    'items': [{
-        'prices': [{
-            'itemId': 10195,
-            'setupFee': '0',
-            'recurringFee': '2099',
-            'tierMinimumThreshold': '',
-            'hourlyRecurringFee': '3.164',
-            'oneTimeFee': '0',
-            'currentPriceFlag': '',
-            'id': 200269,
-            'sort': 0,
-            'onSaleFlag': '',
-            'laborFee': '0',
-            'locationGroupId': '',
-            'quantity': ''
-        },
-            {
-                'itemId': 10195,
-                'setupFee': '0',
-                'recurringFee': '2161.97',
-                'tierMinimumThreshold': '',
-                'hourlyRecurringFee': '3.258',
-                'oneTimeFee': '0',
-                'currentPriceFlag': '',
-                'id': 200271,
-                'sort': 0,
-                'onSaleFlag': '',
-                'laborFee': '0',
-                'locationGroupId': 503,
-                'quantity': ''
-            }
-        ],
-        'itemCategory': {
-            'categoryCode': 'dedicated_virtual_hosts'
-        },
-        'description': '56 Cores X 242 RAM X 1.2 TB',
-        'id': 10195
-    }],
-    'keyName': 'DEDICATED_HOST',
-    'unitSize': '',
-    'regions': [{
-        'location': {
-            'locationPackageDetails': [{
-                'isAvailable': 1,
-                'locationId': 265592,
-                'packageId': 813
-            }],
-            'location': {
-                'statusId': 2,
-                'priceGroups': [{
-                    'locationGroupTypeId': 82,
-                    'description': 'Location Group 2',
-                    'locationGroupType': {
-                        'name': 'PRICING'
-                    },
-                    'securityLevelId': '',
-                    'id': 503,
-                    'name': 'Location Group 2'
-                }],
-                'id': 265592,
-                'name': 'ams01',
-                'longName': 'Amsterdam 1'
-            }
-        },
-        'keyname': 'AMSTERDAM',
-        'description': 'AMS01 - Amsterdam',
-        'sortOrder': 0
-    },
-        {
-            'location': {
-                'locationPackageDetails': [{
-                    'isAvailable': 1,
-                    'locationId': 814994,
-                    'packageId': 813
-                }],
-                'location': {
-                    'statusId': 2,
-                    'priceGroups': [{
-                        'locationGroupTypeId': 82,
-                        'description': 'Location Group 2',
-                        'locationGroupType': {
-                            'name': 'PRICING'
-                        },
-                        'securityLevelId': '',
-                        'id': 503,
-                        'name': 'Location Group 2'
-                    },
-                        {
-                            'locationGroupTypeId': 82,
-                            'description': 'COS Cross Region - EU',
-                            'locationGroupType': {
-                                'name': 'PRICING'},
-                            'securityLevelId': '',
-                            'id': 1303,
-                            'name': 'eu'}],
-                    'id': 814994,
-                    'name': 'ams03',
-                    'longName': 'Amsterdam 3'}},
-            'keyname': 'AMSTERDAM03',
-            'description': 'AMS03 - Amsterdam',
-            'sortOrder': 2},
-        {'location': {
-            'locationPackageDetails': [
-                {
-                    'isAvailable': 1,
-                    'locationId': 138124,
-                    'packageId': 813}],
-            'location': {
-                'statusId': 2,
-                'priceGroups': [
-                    {
-                        'locationGroupTypeId': 82,
-                        'description': 'CDN - North America - Akamai',
-                        'locationGroupType': {
-                            'name': 'PRICING'},
-                        'securityLevelId': '',
-                        'id': 1463,
-                        'name': 'NORTH-AMERICA-AKAMAI'}],
-                'id': 138124,
-                'name': 'dal05',
-                'longName': 'Dallas 5'}},
-            'keyname': 'DALLAS05',
-            'description': 'DAL05 - Dallas',
-            'sortOrder': 12},
-        {'location': {
-            'locationPackageDetails': [
-                {
-                    'isAvailable': 1,
-                    'locationId': 2017603,
-                    'packageId': 813}],
-            'location': {
-                'statusId': 2,
-                'priceGroups': [
-                    {
-                        'locationGroupTypeId': 82,
-                        'description': 'COS Regional - US East',
-                        'locationGroupType': {
-                            'name': 'PRICING'},
-                        'securityLevelId': '',
-                        'id': 1305,
-                        'name': 'us-east'}],
-                'id': 2017603,
-                'name': 'wdc07',
-                'longName': 'Washington 7'}},
-            'keyname': 'WASHINGTON07',
-            'description': 'WDC07 - Washington, DC',
-            'sortOrder': 76}],
-    'firstOrderStepId': '', 'id': 813, 'isActive': 1,
-    'description': 'Dedicated Host'}]
-
 verifyOrderDH = {
     'preTaxSetup': '0',
     'storageGroups': [],
@@ -1180,3 +1027,97 @@ verifyOrderDH = {
     'totalSetupTax': '0',
     'quantity': 1
 }
+
+getAllObjectsDH = [{
+    "subDescription": "Dedicated Host",
+    "name": "Dedicated Host",
+    "items": [{
+        "capacity": "56",
+        "description": "56 Cores X 242 RAM X 1.2 TB",
+        "bundleItems": [
+            {
+                "capacity": "1200",
+                "categories": [{
+                    "categoryCode": "dedicated_host_disk"
+                }]
+            },
+            {
+                "capacity": "242",
+                "categories": [{
+                    "categoryCode": "dedicated_host_ram"
+                }]
+            }
+        ],
+        "prices": [
+            {
+                "itemId": 10195,
+                "setupFee": "0",
+                "recurringFee": "2099",
+                "tierMinimumThreshold": "",
+                "hourlyRecurringFee": "3.164",
+                "oneTimeFee": "0",
+                "currentPriceFlag": "",
+                "id": 200269,
+                "sort": 0,
+                "onSaleFlag": "",
+                "laborFee": "0",
+                "locationGroupId": "",
+                "quantity": ""
+            },
+            {
+                "itemId": 10195,
+                "setupFee": "0",
+                "recurringFee": "2161.97",
+                "tierMinimumThreshold": "",
+                "hourlyRecurringFee": "3.258",
+                "oneTimeFee": "0",
+                "currentPriceFlag": "",
+                "id": 200271,
+                "sort": 0,
+                "onSaleFlag": "",
+                "laborFee": "0",
+                "locationGroupId": 503,
+                "quantity": ""
+            }
+        ],
+        "keyName": "56_CORES_X_242_RAM_X_1_4_TB",
+        "id": 10195,
+        "itemCategory": {
+            "categoryCode": "dedicated_virtual_hosts"
+        }
+    }],
+    "keyName": "DEDICATED_HOST",
+    "unitSize": "",
+    "regions": [{
+        "location": {
+            "locationPackageDetails": [{
+                "isAvailable": 1,
+                "locationId": 138124,
+                "packageId": 813
+            }],
+            "location": {
+                "statusId": 2,
+                "priceGroups": [{
+                    "locationGroupTypeId": 82,
+                    "description": "CDN - North America - Akamai",
+                    "locationGroupType": {
+                        "name": "PRICING"
+                    },
+                    "securityLevelId": "",
+                    "id": 1463,
+                    "name": "NORTH-AMERICA-AKAMAI"
+                }],
+                "id": 138124,
+                "name": "dal05",
+                "longName": "Dallas 5"
+            }
+        },
+        "keyname": "DALLAS05",
+        "description": "DAL05 - Dallas",
+        "sortOrder": 12
+    }],
+    "firstOrderStepId": "",
+    "id": 813,
+    "isActive": 1,
+    "description": "Dedicated Host"
+}]

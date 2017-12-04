@@ -20,13 +20,13 @@ LOGGER = logging.getLogger(__name__)
 @environment.pass_env
 def cli(env, identifier, price=False, guests=False):
     """Get details for a virtual server."""
-    dh = SoftLayer.DedicatedHostManager(env.client)
+    dhost = SoftLayer.DedicatedHostManager(env.client)
 
     table = formatting.KeyValueTable(['name', 'value'])
     table.align['name'] = 'r'
     table.align['value'] = 'l'
 
-    result = dh.get_host(identifier)
+    result = dhost.get_host(identifier)
     result = utils.NestedDict(result)
 
     table.add_row(['id', result['id']])
@@ -37,7 +37,8 @@ def cli(env, identifier, price=False, guests=False):
     table.add_row(['create date', result['createDate']])
     table.add_row(['modify date', result['modifyDate']])
     table.add_row(['router id', result['backendRouter']['id']])
-    if utils.lookup(result, 'billingItem') != []:
+    table.add_row(['router hostname', result['backendRouter']['hostname']])
+    if utils.lookup(result, 'billingItem') != {}:
         table.add_row(['owner', formatting.FormattedItem(
             utils.lookup(result, 'billingItem', 'orderItem',
                          'order', 'userRecord',

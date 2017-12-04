@@ -12,6 +12,9 @@ import SoftLayer
 from SoftLayer.managers import ordering
 from SoftLayer import utils
 
+# Invalid names are ignored due to long method names and short argument names
+# pylint: disable=invalid-name, no-self-use
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -148,7 +151,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
 
         return self.host.getObject(id=host_id, **kwargs)
 
-    def place_order(self, hostname, domain, location, hourly, router=None):
+    def place_order(self, hostname, domain, location, flavor, hourly, router=None):
         """Places an order for a dedicated host.
 
         See get_create_options() for valid arguments.
@@ -163,12 +166,13 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         create_options = self._generate_create_dict(hostname=hostname,
                                                     router=router,
                                                     domain=domain,
+                                                    flavor=flavor,
                                                     datacenter=location,
                                                     hourly=hourly)
 
         return self.client['Product_Order'].placeOrder(create_options)
 
-    def verify_order(self, hostname, domain, location, hourly, router=None):
+    def verify_order(self, hostname, domain, location, hourly, flavor, router=None):
         """Verifies an order for a dedicated host.
 
         See :func:`place_order` for a list of available options.
@@ -177,6 +181,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         create_options = self._generate_create_dict(hostname=hostname,
                                                     router=router,
                                                     domain=domain,
+                                                    flavor=flavor,
                                                     datacenter=location,
                                                     hourly=hourly)
 
@@ -184,20 +189,22 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
 
     def _generate_create_dict(self,
                               hostname=None,
-                              router=None,
                               domain=None,
+                              flavor=None,
+                              router=None,
                               datacenter=None,
                               hourly=True):
         """Translates args into a dictionary for creating a dedicated host."""
         package = self._get_package()
-        item = self._get_item(package)
+        item = self._get_item(package, flavor)
+
         location = self._get_location(package['regions'], datacenter)
         price = self._get_price(item)
 
-        if router is None:
-            routers = self._get_backend_router(
-                location['location']['locationPackageDetails'])
-            router = self._get_default_router(routers)
+        routers = self._get_backend_router(
+            location['location']['locationPackageDetails'], item)
+
+        router = self._get_default_router(routers, router)
 
         hardware = {
             'hostname': hostname,
@@ -229,7 +236,10 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
             id,
             description,
             prices,
-            itemCategory[categoryCode]
+            capacity,
+            keyName,
+            itemCategory[categoryCode],
+            bundleItems[capacity, categories[categoryCode]]
         ],
         regions[location[location[priceGroups]]]
         '''
@@ -241,7 +251,6 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
 
         if package is None:
             raise SoftLayer.SoftLayerError("Ordering package not found")
-
         return package
 
     def _get_location(self, regions, datacenter):
@@ -256,7 +265,6 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
 
     def get_create_options(self):
         """Returns valid options for ordering a dedicated host."""
-
         package = self._get_package()
         # Locations
         locations = []
@@ -265,13 +273,14 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                 'name': region['location']['location']['longName'],
                 'key': region['location']['location']['name'],
             })
+        # flavors
         dedicated_host = []
         for item in package['items']:
             if item['itemCategory']['categoryCode'] == \
                     'dedicated_virtual_hosts':
                 dedicated_host.append({
                     'name': item['description'],
-                    'key': item['id'],
+                    'key': item['keyName'],
                 })
 
         return {
@@ -283,38 +292,45 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         """Returns valid price for ordering a dedicated host."""
 
         for price in package['prices']:
-            if price.get('locationGroupId') is '':
+            if not price.get('locationGroupId'):
                 return price['id']
 
         raise SoftLayer.SoftLayerError(
             "Could not find valid price")
 
-    def _get_item(self, package):
+    def _get_item(self, package, flavor):
         """Returns the item for ordering a dedicated host."""
-        description = '56 Cores X 242 RAM X 1.2 TB'
 
         for item in package['items']:
-            if item['description'] == description:
+            if item['keyName'] == flavor:
                 return item
 
         raise SoftLayer.SoftLayerError("Could not find valid item for: '%s'"
-                                       % description)
+                                       % flavor)
 
-    def _get_backend_router(self, locations):
+    def _get_backend_router(self, locations, item):
         """Returns valid router options for ordering a dedicated host."""
         mask = '''
             id,
             hostname
         '''
+        cpu_count = item['capacity']
+
+        for capacity in item['bundleItems']:
+            for category in capacity['categories']:
+                if category['categoryCode'] == 'dedicated_host_ram':
+                    mem_capacity = capacity['capacity']
+                if category['categoryCode'] == 'dedicated_host_disk':
+                    disk_capacity = capacity['capacity']
 
         if locations is not None:
             for location in locations:
                 if location['locationId'] is not None:
                     loc_id = location['locationId']
                     host = {
-                        'cpuCount': 56,
-                        'memoryCapacity': 242,
-                        'diskCapacity': 1200,
+                        'cpuCount': cpu_count,
+                        'memoryCapacity': mem_capacity,
+                        'diskCapacity': disk_capacity,
                         'datacenter': {
                             'id': loc_id
                         }
@@ -324,10 +340,24 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
 
         raise SoftLayer.SoftLayerError("Could not find available routers")
 
-    def _get_default_router(self, routers):
+    def _get_default_router(self, routers, router_name):
         """Returns the default router for ordering a dedicated host."""
-        for router in routers:
-            if router['id'] is not None:
-                return router['id']
+        if router_name is None:
+            for router in routers:
+                if router['id'] is not None:
+                    return router['id']
+        else:
+            for router in routers:
+                if router['hostname'] == router_name:
+                    return router['id']
 
         raise SoftLayer.SoftLayerError("Could not find valid default router")
+
+    def get_router_options(self, datacenter=None, flavor=None):
+        """Returns available backend routers for the dedicated host."""
+        package = self._get_package()
+
+        location = self._get_location(package['regions'], datacenter)
+        item = self._get_item(package, flavor)
+
+        return self._get_backend_router(location['location']['locationPackageDetails'], item)

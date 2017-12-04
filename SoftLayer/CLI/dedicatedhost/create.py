@@ -7,7 +7,7 @@ import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
-from SoftLayer.CLI import helpers
+from SoftLayer.CLI import template
 
 
 @click.command(
@@ -17,13 +17,16 @@ from SoftLayer.CLI import helpers
               required=True,
               prompt=True)
 @click.option('--router', '-r',
-              help="Router id",
+              help="Router hostname ex. fcr02a.dal13",
               show_default=True)
 @click.option('--domain', '-D',
               help="Domain portion of the FQDN",
               required=True,
               prompt=True)
 @click.option('--datacenter', '-d', help="Datacenter shortname",
+              required=True,
+              prompt=True)
+@click.option('--flavor', '-f', help="Dedicated Virtual Host flavor",
               required=True,
               prompt=True)
 @click.option('--billing',
@@ -34,7 +37,14 @@ from SoftLayer.CLI import helpers
 @click.option('--test',
               is_flag=True,
               help="Do not actually create the server")
-@helpers.multi_option('--extra', '-e', help="Extra options")
+@click.option('--template', '-t',
+              is_eager=True,
+              callback=template.TemplateCallback(list_args=['key']),
+              help="A template file that defaults the command-line options",
+              type=click.Path(exists=True, readable=True, resolve_path=True))
+@click.option('--export',
+              type=click.Path(writable=True, resolve_path=True),
+              help="Exports options to a template file")
 @environment.pass_env
 def cli(env, **args):
     """Order/create a dedicated host."""
@@ -43,48 +53,51 @@ def cli(env, **args):
     order = {
         'hostname': args['hostname'],
         'domain': args['domain'],
+        'flavor': args['flavor'],
         'router': args['router'],
         'location': args.get('datacenter'),
         'hourly': args.get('billing') == 'hourly',
     }
 
-    do_create = not (args['test'])
+    do_create = not (args['export'] or args['test'])
 
     output = None
 
-    if args.get('test'):
-        result = mgr.verify_order(**order)
+    result = mgr.verify_order(**order)
+    table = formatting.Table(['Item', 'cost'])
+    table.align['Item'] = 'r'
+    table.align['cost'] = 'r'
+    if len(result['prices']) != 1:
+        raise exceptions.ArgumentError("More than 1 price was found or no "
+                                       "prices found")
+    price = result['prices']
+    if order['hourly']:
+        total = float(price[0].get('hourlyRecurringFee', 0.0))
+    else:
+        total = float(price[0].get('recurringFee', 0.0))
 
-        table = formatting.Table(['Item', 'cost'])
-        table.align['Item'] = 'r'
-        table.align['cost'] = 'r'
+    if order['hourly']:
+        table.add_row(['Total hourly cost', "%.2f" % total])
+    else:
+        table.add_row(['Total monthly cost', "%.2f" % total])
 
-        for price in result['prices']:
-            if order['hourly']:
-                total = float(price.get('hourlyRecurringFee', 0.0))
-                rate = "%.2f" % float(price['hourlyRecurringFee'])
-            else:
-                total = float(price.get('recurringFee', 0.0))
-                rate = "%.2f" % float(price['recurringFee'])
+    output = []
+    output.append(table)
+    output.append(formatting.FormattedItem(
+        '',
+        ' -- ! Prices reflected here are retail and do not '
+        'take account level discounts and are not guaranteed.'))
 
-        table.add_row([price['item']['description'], rate])
-
-        if order['hourly']:
-            table.add_row(['Total hourly cost', "%.2f" % total])
-        else:
-            table.add_row(['Total monthly cost', "%.2f" % total])
-
-        output = []
-        output.append(table)
-        output.append(formatting.FormattedItem(
-            '',
-            ' -- ! Prices reflected here are retail and do not '
-            'take account level discounts and are not guaranteed.'))
+    if args['export']:
+        export_file = args.pop('export')
+        template.export_to_template(export_file, args,
+                                    exclude=['wait', 'test'])
+        env.fout('Successfully exported options to a template file.')
 
     if do_create:
-        if not (env.skip_confirmations or formatting.confirm(
+        if not env.skip_confirmations and not formatting.confirm(
                 "This action will incur charges on your account. "
-                "Continue?")):
+                "Continue?"):
             raise exceptions.CLIAbort('Aborting dedicated host order.')
 
         result = mgr.place_order(**order)
@@ -94,6 +107,6 @@ def cli(env, **args):
         table.align['value'] = 'l'
         table.add_row(['id', result['orderId']])
         table.add_row(['created', result['orderDate']])
-        output = table
+        output.append(table)
 
     env.fout(output)
