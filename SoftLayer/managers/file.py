@@ -293,8 +293,17 @@ class FileStorageManager(utils.IdentifierMixin, object):
         :return: Returns a SoftLayer_Container_Product_Order_Receipt
         """
 
-        file_mask = 'id,billingItem,storageType[keyName],capacityGb,provisionedIops,'\
-                    'storageTierLevel,staasVersion,hasEncryptionAtRest'
+        mask_items = [
+            'id',
+            'billingItem',
+            'storageType[keyName]',
+            'capacityGb',
+            'provisionedIops',
+            'storageTierLevel',
+            'staasVersion',
+            'hasEncryptionAtRest',
+        ]
+        file_mask = ','.join(mask_items)
         volume = self.get_file_volume_details(volume_id, mask=file_mask)
 
         order = storage_utils.prepare_modify_order_object(

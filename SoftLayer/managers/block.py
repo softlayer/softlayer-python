@@ -313,8 +313,17 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         :return: Returns a SoftLayer_Container_Product_Order_Receipt
         """
 
-        block_mask = 'id,billingItem,storageType[keyName],capacityGb,provisionedIops,'\
-                     'storageTierLevel,staasVersion,hasEncryptionAtRest'
+        mask_items = [
+            'id',
+            'billingItem',
+            'storageType[keyName]',
+            'capacityGb',
+            'provisionedIops',
+            'storageTierLevel',
+            'staasVersion',
+            'hasEncryptionAtRest',
+        ]
+        block_mask = ','.join(mask_items)
         volume = self.get_block_volume_details(volume_id, mask=block_mask)
 
         order = storage_utils.prepare_modify_order_object(
