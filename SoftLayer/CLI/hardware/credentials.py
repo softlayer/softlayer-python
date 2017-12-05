@@ -1,4 +1,4 @@
-"""List virtual server credentials."""
+"""List server credentials."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -13,7 +13,7 @@ from SoftLayer.CLI import helpers
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """List virtual server credentials."""
+    """List server credentials."""
 
     manager = SoftLayer.HardwareManager(env.client)
     hardware_id = helpers.resolve_id(manager.resolve_ids,

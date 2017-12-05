@@ -581,6 +581,11 @@ def prepare_snapshot_order_object(manager, volume, capacity, tier, upgrade):
         complex_type = 'SoftLayer_Container_Product_Order_'\
                        'Network_Storage_Enterprise_SnapshotSpace'
 
+    # Determine if hourly billing should be used
+    hourly_billing_flag = utils.lookup(volume, 'billingItem', 'hourlyFlag')
+    if hourly_billing_flag is None:
+        hourly_billing_flag = False
+
     # Build and return the order object
     snapshot_space_order = {
         'complexType': complex_type,
@@ -588,15 +593,16 @@ def prepare_snapshot_order_object(manager, volume, capacity, tier, upgrade):
         'prices': prices,
         'quantity': 1,
         'location': volume['billingItem']['location']['id'],
-        'volumeId': volume['id']
+        'volumeId': volume['id'],
+        'useHourlyPricing': hourly_billing_flag
     }
 
     return snapshot_space_order
 
 
 def prepare_volume_order_object(manager, storage_type, location, size,
-                                iops, tier, snapshot_size,
-                                service_offering, volume_type):
+                                iops, tier, snapshot_size, service_offering,
+                                volume_type, hourly_billing_flag=False):
     """Prepare the order object which is submitted to the placeOrder() method
 
     :param manager: The File or Block manager calling this function
@@ -608,6 +614,7 @@ def prepare_volume_order_object(manager, storage_type, location, size,
     :param snapshot_size: The size of snapshot space for the volume (optional)
     :param service_offering: Requested offering package to use for the order
     :param volume_type: The type of the volume to order ('file' or 'block')
+    :param hourly_billing_flag: Billing type, monthly (False) or hourly (True)
     :return: Returns the order object for the
              Product_Order service's placeOrder() method
     """
@@ -689,6 +696,7 @@ def prepare_volume_order_object(manager, storage_type, location, size,
         'prices': prices,
         'quantity': 1,
         'location': location_id,
+        'useHourlyPricing': hourly_billing_flag
     }
 
     if order_type_is_saas:
@@ -847,6 +855,11 @@ def prepare_replicant_order_object(manager, snapshot_schedule, location,
             find_ent_space_price(package, 'replication', volume_size, tier)
         ]
 
+    # Determine if hourly billing should be used
+    hourly_billing_flag = utils.lookup(volume, 'billingItem', 'hourlyFlag')
+    if hourly_billing_flag is None:
+        hourly_billing_flag = False
+
     # Build and return the order object
     replicant_order = {
         'complexType': complex_type,
@@ -856,6 +869,7 @@ def prepare_replicant_order_object(manager, snapshot_schedule, location,
         'location': location_id,
         'originVolumeId': volume['id'],
         'originVolumeScheduleId': snapshot_schedule_id,
+        'useHourlyPricing': hourly_billing_flag
     }
 
     if order_type_is_saas:
@@ -867,17 +881,18 @@ def prepare_replicant_order_object(manager, snapshot_schedule, location,
 
 
 def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
-                                   duplicate_size,
-                                   duplicate_snapshot_size, volume_type):
+                                   duplicate_size, duplicate_snapshot_size,
+                                   volume_type, hourly_billing_flag=False):
     """Prepare the duplicate order to submit to SoftLayer_Product::placeOrder()
 
     :param manager: The File or Block manager calling this function
     :param origin_volume: The origin volume which is being duplicated
-    :param iops: The IOPS per GB for the duplicant volume (performance)
-    :param tier: The tier level for the duplicant volume (endurance)
+    :param iops: The IOPS for the duplicate volume (performance)
+    :param tier: The tier level for the duplicate volume (endurance)
     :param duplicate_size: The requested size for the duplicate volume
     :param duplicate_snapshot_size: The size for the duplicate snapshot space
     :param volume_type: The type of the origin volume ('file' or 'block')
+    :param hourly_billing_flag: Billing type, monthly (False) or hourly (True)
     :return: Returns the order object to be passed to the
              placeOrder() method of the Product_Order service
     """
@@ -916,9 +931,9 @@ def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
     if duplicate_snapshot_size is None:
         duplicate_snapshot_size = origin_snapshot_size
 
-    # Validate the requested duplicate size, and set the size if none was given
-    duplicate_size = _validate_duplicate_size(
-        origin_volume, duplicate_size, volume_type)
+    # Use the origin volume size if no size was specified for the duplicate
+    if duplicate_size is None:
+        duplicate_size = origin_volume['capacityGb']
 
     # Get the appropriate package for the order
     # ('storage_as_a_service' is currently used for duplicate volumes)
@@ -927,13 +942,13 @@ def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
     # Determine the IOPS or tier level for the duplicate volume, along with
     # the type and prices for the order
     origin_storage_type = origin_volume['storageType']['keyName']
-    if origin_storage_type == 'PERFORMANCE_BLOCK_STORAGE'\
-            or origin_storage_type == 'PERFORMANCE_BLOCK_STORAGE_REPLICANT'\
-            or origin_storage_type == 'PERFORMANCE_FILE_STORAGE'\
-            or origin_storage_type == 'PERFORMANCE_FILE_STORAGE_REPLICANT':
+    if 'PERFORMANCE' in origin_storage_type:
         volume_is_performance = True
-        iops = _validate_dupl_performance_iops(
-            origin_volume, iops, duplicate_size)
+        if iops is None:
+            iops = int(origin_volume.get('provisionedIops', 0))
+            if iops <= 0:
+                raise exceptions.SoftLayerError(
+                    "Cannot find origin volume's provisioned IOPS")
         # Set up the price array for the order
         prices = [
             find_price_by_category(package, 'storage_as_a_service'),
@@ -946,12 +961,10 @@ def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
             prices.append(find_saas_snapshot_space_price(
                 package, duplicate_snapshot_size, iops=iops))
 
-    elif origin_storage_type == 'ENDURANCE_BLOCK_STORAGE'\
-            or origin_storage_type == 'ENDURANCE_BLOCK_STORAGE_REPLICANT'\
-            or origin_storage_type == 'ENDURANCE_FILE_STORAGE'\
-            or origin_storage_type == 'ENDURANCE_FILE_STORAGE_REPLICANT':
+    elif 'ENDURANCE' in origin_storage_type:
         volume_is_performance = False
-        tier = _validate_dupl_endurance_tier(origin_volume, tier)
+        if tier is None:
+            tier = find_endurance_tier_iops_per_gb(origin_volume)
         # Set up the price array for the order
         prices = [
             find_price_by_category(package, 'storage_as_a_service'),
@@ -979,103 +992,13 @@ def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
         'quantity': 1,
         'location': location_id,
         'duplicateOriginVolumeId': origin_volume['id'],
+        'useHourlyPricing': hourly_billing_flag
     }
 
     if volume_is_performance:
         duplicate_order['iops'] = iops
 
     return duplicate_order
-
-
-def _validate_duplicate_size(origin_volume, duplicate_volume_size,
-                             volume_type):
-    # Ensure the origin volume's size is found
-    if not isinstance(utils.lookup(origin_volume, 'capacityGb'), int):
-        raise exceptions.SoftLayerError("Cannot find origin volume's size.")
-
-    # Determine the volume size/capacity for the duplicate
-    if duplicate_volume_size is None:
-        duplicate_volume_size = origin_volume['capacityGb']
-    # Ensure the duplicate volume size is not below the minimum
-    elif duplicate_volume_size < origin_volume['capacityGb']:
-        raise exceptions.SoftLayerError(
-            "The requested duplicate volume size is too small. Duplicate "
-            "volumes must be at least as large as their origin volumes.")
-
-    # Ensure the duplicate volume size is not above the maximum
-    if volume_type == 'block':
-        # Determine the base size for validating the requested duplicate size
-        if 'originalVolumeSize' in origin_volume:
-            base_volume_size = int(origin_volume['originalVolumeSize'])
-        else:
-            base_volume_size = origin_volume['capacityGb']
-
-        # Current limit for block volumes: 10*[origin size]
-        if duplicate_volume_size > base_volume_size * 10:
-            raise exceptions.SoftLayerError(
-                "The requested duplicate volume size is too large. The "
-                "maximum size for duplicate block volumes is 10 times the "
-                "size of the origin volume or, if the origin volume was also "
-                "a duplicate, 10 times the size of the initial origin volume "
-                "(i.e. the origin volume from which the first duplicate was "
-                "created in the chain of duplicates). "
-                "Requested: %s GB. Base origin size: %s GB."
-                % (duplicate_volume_size, base_volume_size))
-
-    return duplicate_volume_size
-
-
-def _validate_dupl_performance_iops(origin_volume, duplicate_iops,
-                                    duplicate_size):
-    if not isinstance(utils.lookup(origin_volume, 'provisionedIops'), str):
-        raise exceptions.SoftLayerError(
-            "Cannot find origin volume's provisioned IOPS")
-
-    if duplicate_iops is None:
-        duplicate_iops = int(origin_volume['provisionedIops'])
-    else:
-        origin_iops_per_gb = float(origin_volume['provisionedIops'])\
-            / float(origin_volume['capacityGb'])
-        duplicate_iops_per_gb = float(duplicate_iops) / float(duplicate_size)
-        if origin_iops_per_gb < 0.3 and duplicate_iops_per_gb >= 0.3:
-            raise exceptions.SoftLayerError(
-                "Origin volume performance is < 0.3 IOPS/GB, "
-                "duplicate volume performance must also be < 0.3 "
-                "IOPS/GB. %s IOPS/GB (%s/%s) requested."
-                % (duplicate_iops_per_gb, duplicate_iops, duplicate_size))
-        elif origin_iops_per_gb >= 0.3 and duplicate_iops_per_gb < 0.3:
-            raise exceptions.SoftLayerError(
-                "Origin volume performance is >= 0.3 IOPS/GB, "
-                "duplicate volume performance must also be >= 0.3 "
-                "IOPS/GB. %s IOPS/GB (%s/%s) requested."
-                % (duplicate_iops_per_gb, duplicate_iops, duplicate_size))
-    return duplicate_iops
-
-
-def _validate_dupl_endurance_tier(origin_volume, duplicate_tier):
-    try:
-        origin_tier = find_endurance_tier_iops_per_gb(origin_volume)
-    except ValueError:
-        raise exceptions.SoftLayerError(
-            "Cannot find origin volume's tier level")
-
-    if duplicate_tier is None:
-        duplicate_tier = origin_tier
-    else:
-        if duplicate_tier != 0.25:
-            duplicate_tier = int(duplicate_tier)
-
-        if origin_tier == 0.25 and duplicate_tier != 0.25:
-            raise exceptions.SoftLayerError(
-                "Origin volume performance tier is 0.25 IOPS/GB, "
-                "duplicate volume performance tier must also be 0.25 "
-                "IOPS/GB. %s IOPS/GB requested." % duplicate_tier)
-        elif origin_tier != 0.25 and duplicate_tier == 0.25:
-            raise exceptions.SoftLayerError(
-                "Origin volume performance tier is above 0.25 IOPS/GB, "
-                "duplicate volume performance tier must also be above 0.25 "
-                "IOPS/GB. %s IOPS/GB requested." % duplicate_tier)
-    return duplicate_tier
 
 
 def _has_category(categories, category_code):

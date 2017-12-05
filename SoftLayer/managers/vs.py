@@ -7,13 +7,19 @@
 """
 import datetime
 import itertools
+import logging
+import random
 import socket
 import time
 import warnings
 
+from SoftLayer.decoration import retry
 from SoftLayer import exceptions
 from SoftLayer.managers import ordering
 from SoftLayer import utils
+
+
+LOGGER = logging.getLogger(__name__)
 # pylint: disable=no-self-use
 
 
@@ -217,13 +223,14 @@ class VSManager(utils.IdentifierMixin, object):
                                         referenceCode]]],'''
                 'hourlyBillingFlag,'
                 'userData,'
-                'billingItem['
-                'id,nextInvoiceTotalRecurringAmount,'
-                'children[categoryCode,nextInvoiceTotalRecurringAmount],'
-                'orderItem.order.userRecord[username]'
-                '],'
+                '''billingItem[id,nextInvoiceTotalRecurringAmount,
+                               children[categoryCode,nextInvoiceTotalRecurringAmount],
+                               orderItem[id,
+                                         order.userRecord[username],
+                                         preset.keyName]],'''
                 'tagReferences[id,tag[name,id]],'
-                'networkVlans[id,vlanNumber,networkSpace]'
+                'networkVlans[id,vlanNumber,networkSpace],'
+                'dedicatedHost.id'
             )
 
         return self.guest.getObject(id=instance_id, **kwargs)
@@ -299,19 +306,26 @@ class VSManager(utils.IdentifierMixin, object):
             dedicated=False, public_vlan=None, private_vlan=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
             private=False, ssh_keys=None, public_security_groups=None,
-            private_security_groups=None):
+            private_security_groups=None, **kwargs):
         """Returns a dict appropriate to pass into Virtual_Guest::createObject
 
             See :func:`create_instance` for a list of available options.
         """
-        required = [cpus, memory, hostname, domain]
+        required = [hostname, domain]
+
+        flavor = kwargs.get('flavor', None)
+        host_id = kwargs.get('host_id', None)
 
         mutually_exclusive = [
-            {'os_code': os_code, "image_id": image_id},
+            {'os_code': os_code, 'image_id': image_id},
+            {'cpu': cpus, 'flavor': flavor},
+            {'memory': memory, 'flavor': flavor},
+            {'flavor': flavor, 'dedicated': dedicated},
+            {'flavor': flavor, 'host_id': host_id}
         ]
 
         if not all(required):
-            raise ValueError("cpu, memory, hostname, and domain are required")
+            raise ValueError("hostname, and domain are required")
 
         for mu_ex in mutually_exclusive:
             if all(mu_ex.values()):
@@ -319,17 +333,22 @@ class VSManager(utils.IdentifierMixin, object):
                     'Can only specify one of: %s' % (','.join(mu_ex.keys())))
 
         data = {
-            "startCpus": int(cpus),
-            "maxMemory": int(memory),
+            "startCpus": cpus,
+            "maxMemory": memory,
             "hostname": hostname,
             "domain": domain,
             "localDiskFlag": local_disk,
+            "hourlyBillingFlag": hourly
         }
 
-        data["hourlyBillingFlag"] = hourly
+        if flavor:
+            data["supplementalCreateObjectOptions"] = {"flavorKeyName": flavor}
 
-        if dedicated:
+        if dedicated and not host_id:
             data["dedicatedAccountHostOnlyFlag"] = dedicated
+
+        if host_id:
+            data["dedicatedHost"] = {"id": host_id}
 
         if private:
             data['privateNetworkOnlyFlag'] = private
@@ -392,23 +411,20 @@ class VSManager(utils.IdentifierMixin, object):
 
         return data
 
-    def wait_for_transaction(self, instance_id, limit, delay=1):
+    def wait_for_transaction(self, instance_id, limit, delay=10):
         """Waits on a VS transaction for the specified amount of time.
 
         This is really just a wrapper for wait_for_ready(pending=True).
         Provided for backwards compatibility.
 
-
         :param int instance_id: The instance ID with the pending transaction
         :param int limit: The maximum amount of time to wait.
-        :param int delay: The number of seconds to sleep before checks.
-                          Defaults to 1.
+        :param int delay: The number of seconds to sleep before checks. Defaults to 10.
         """
 
-        return self.wait_for_ready(instance_id, limit, delay=delay,
-                                   pending=True)
+        return self.wait_for_ready(instance_id, limit, delay=delay, pending=True)
 
-    def wait_for_ready(self, instance_id, limit, delay=1, pending=False):
+    def wait_for_ready(self, instance_id, limit, delay=10, pending=False):
         """Determine if a VS is ready and available.
 
         In some cases though, that can mean that no transactions are running.
@@ -420,8 +436,7 @@ class VSManager(utils.IdentifierMixin, object):
 
         :param int instance_id: The instance ID with the pending transaction
         :param int limit: The maximum amount of time to wait.
-        :param int delay: The number of seconds to sleep before checks.
-                          Defaults to 1.
+        :param int delay: The number of seconds to sleep before checks. Defaults to 10.
         :param bool pending: Wait for pending transactions not related to
                              provisioning or reloads such as monitoring.
 
@@ -435,36 +450,37 @@ class VSManager(utils.IdentifierMixin, object):
             mask = """id,
                       lastOperatingSystemReload.id,
                       activeTransaction.id,provisionDate"""
-            instance = self.get_instance(new_instance, mask=mask)
-            last_reload = utils.lookup(instance,
-                                       'lastOperatingSystemReload',
-                                       'id')
-            active_transaction = utils.lookup(instance,
-                                              'activeTransaction',
-                                              'id')
+            try:
+                instance = self.get_instance(new_instance, mask=mask)
+                last_reload = utils.lookup(instance, 'lastOperatingSystemReload', 'id')
+                active_transaction = utils.lookup(instance, 'activeTransaction', 'id')
 
-            reloading = all((
-                active_transaction,
-                last_reload,
-                last_reload == active_transaction,
-            ))
+                reloading = all((
+                    active_transaction,
+                    last_reload,
+                    last_reload == active_transaction,
+                ))
 
-            # only check for outstanding transactions if requested
-            outstanding = False
-            if pending:
-                outstanding = active_transaction
+                # only check for outstanding transactions if requested
+                outstanding = False
+                if pending:
+                    outstanding = active_transaction
 
-            # return True if the instance has only if the instance has
-            # finished provisioning and isn't currently reloading the OS.
-            if all([instance.get('provisionDate'),
-                    not reloading,
-                    not outstanding]):
-                return True
+                # return True if the instance has finished provisioning
+                # and isn't currently reloading the OS.
+                if all([instance.get('provisionDate'),
+                        not reloading,
+                        not outstanding]):
+                    return True
+                LOGGER.info("%s not ready.", str(instance_id))
+            except exceptions.SoftLayerAPIError as exception:
+                delay = (delay * 2) + random.randint(0, 9)
+                LOGGER.info('Exception: %s', str(exception))
 
             now = time.time()
             if now >= until:
                 return False
-
+            LOGGER.info('Auto retry in %s seconds', str(min(delay, until - now)))
             time.sleep(min(delay, until - now))
 
     def verify_create_instance(self, **kwargs):
@@ -531,43 +547,42 @@ class VSManager(utils.IdentifierMixin, object):
 
         :param int cpus: The number of virtual CPUs to include in the instance.
         :param int memory: The amount of RAM to order.
-        :param bool hourly: Flag to indicate if this server should be billed
-                            hourly (default) or monthly.
+        :param bool hourly: Flag to indicate if this server should be billed hourly (default) or monthly.
         :param string hostname: The hostname to use for the new server.
         :param string domain: The domain to use for the new server.
-        :param bool local_disk: Flag to indicate if this should be a local disk
-                                (default) or a SAN disk.
-        :param string datacenter: The short name of the data center in which
-                                  the VS should reside.
-        :param string os_code: The operating system to use. Cannot be specified
-                               if image_id is specified.
-        :param int image_id: The ID of the image to load onto the server.
-                             Cannot be specified if os_code is specified.
-        :param bool dedicated: Flag to indicate if this should be housed on a
-                               dedicated or shared host (default). This will
-                               incur a fee on your account.
-        :param int public_vlan: The ID of the public VLAN on which you want
-                                this VS placed.
-        :param list public_security_groups: The list of security group IDs
-                                            to apply to the public interface
-        :param list private_security_groups: The list of security group IDs
-                                             to apply to the private interface
-        :param int private_vlan: The ID of the private VLAN on which you want
-                                 this VS placed.
+        :param bool local_disk: Flag to indicate if this should be a local disk (default) or a SAN disk.
+        :param string datacenter: The short name of the data center in which the VS should reside.
+        :param string os_code: The operating system to use. Cannot be specified  if image_id is specified.
+        :param int image_id: The ID of the image to load onto the server. Cannot be specified if os_code is specified.
+        :param bool dedicated: Flag to indicate if this should be housed on adedicated or shared host (default).
+                               This will incur a fee on your account.
+        :param int public_vlan: The ID of the public VLAN on which you want this VS placed.
+        :param list public_security_groups: The list of security group IDs to apply to the public interface
+        :param list private_security_groups: The list of security group IDs to apply to the private interface
+        :param int private_vlan: The ID of the private VLAN on which you want  this VS placed.
         :param list disks: A list of disk capacities for this server.
-        :param string post_uri: The URI of the post-install script to run
-                                after reload
-        :param bool private: If true, the VS will be provisioned only with
-                             access to the private network. Defaults to false
+        :param string post_uri: The URI of the post-install script to run  after reload
+        :param bool private: If true, the VS will be provisioned only with access to the private network.
+                             Defaults to false
         :param list ssh_keys: The SSH keys to add to the root user
         :param int nic_speed: The port speed to set
         :param string tags: tags to set on the VS as a comma separated list
+        :param string flavor: The key name of the public virtual server flavor being ordered.
+        :param int host_id: The host id of a dedicated host to provision a dedicated host virtual server on.
         """
         tags = kwargs.pop('tags', None)
         inst = self.guest.createObject(self._generate_create_dict(**kwargs))
         if tags is not None:
-            self.guest.setTags(tags, id=inst['id'])
+            self.set_tags(tags, guest_id=inst['id'])
         return inst
+
+    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
+    def set_tags(self, tags, guest_id):
+        """Sets tags on a guest with a retry decorator
+
+        Just calls guest.setTags, but if it fails from an APIError will retry
+        """
+        self.guest.setTags(tags, id=guest_id)
 
     def create_instances(self, config_list):
         """Creates multiple virtual server instances.
@@ -618,7 +633,7 @@ class VSManager(utils.IdentifierMixin, object):
 
         for instance, tag in zip(resp, tags):
             if tag is not None:
-                self.guest.setTags(tag, id=instance['id'])
+                self.set_tags(tag, guest_id=instance['id'])
 
         return resp
 
@@ -699,7 +714,7 @@ class VSManager(utils.IdentifierMixin, object):
             self.guest.setUserMetadata([userdata], id=instance_id)
 
         if tags is not None:
-            self.guest.setTags(tags, id=instance_id)
+            self.set_tags(tags, guest_id=instance_id)
 
         if hostname:
             obj['hostname'] = hostname
