@@ -141,6 +141,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 'snapshotSizeBytes',
                 'storageType[keyName]',
                 'snapshotCreationTimestamp',
+                'intervalSchedule',
                 'hourlySchedule',
                 'dailySchedule',
                 'weeklySchedule'
@@ -236,7 +237,8 @@ class BlockStorageManager(utils.IdentifierMixin, object):
 
         block_mask = 'billingItem[activeChildren],storageTierLevel,osType,'\
                      'staasVersion,hasEncryptionAtRest,snapshotCapacityGb,'\
-                     'schedules,hourlySchedule,dailySchedule,weeklySchedule,'\
+                     'schedules,intervalSchedule'\
+                     ',hourlySchedule,dailySchedule,weeklySchedule,'\
                      'storageType[keyName],provisionedIops'
         block_volume = self.get_block_volume_details(volume_id,
                                                      mask=block_mask)

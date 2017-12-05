@@ -10,16 +10,15 @@ from SoftLayer.CLI import exceptions
 @click.command()
 @click.argument('volume_id')
 @click.option('--schedule-type',
-              help='Snapshot schedule [HOURLY|DAILY|WEEKLY]',
+              help='Snapshot schedule [INTERVAL|HOURLY|DAILY|WEEKLY]',
               required=True)
 @environment.pass_env
 def cli(env, volume_id, schedule_type):
     """Disables snapshots on the specified schedule for a given volume"""
 
-    if (schedule_type != 'HOURLY' and schedule_type != 'DAILY'
-            and schedule_type != 'WEEKLY'):
+    if (schedule_type not in ['INTERVAL', 'HOURLY', 'DAILY', 'WEEKLY']):
         raise exceptions.CLIAbort(
-            '--schedule_type must be HOURLY, DAILY, or WEEKLY')
+            '--schedule_type must be INTERVAL, HOURLY, DAILY, or WEEKLY')
 
     file_manager = SoftLayer.FileStorageManager(env.client)
     disabled = file_manager.disable_snapshots(volume_id, schedule_type)
