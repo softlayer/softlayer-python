@@ -62,7 +62,7 @@ def cli(env, volume_id):
 
     if block_volume['activeTransactions']:
         for trans in block_volume['activeTransactions']:
-            if isinstance(utils.lookup(trans, 'transactionStatus', 'friendlyName'), str):
+            if 'transactionStatus' in trans and 'friendlyName' in trans['transactionStatus']:
                 table.add_row(['Ongoing Transaction', trans['transactionStatus']['friendlyName']])
 
     table.add_row(['Replicant Count', "%u" % block_volume.get('replicationPartnerCount', 0)])
