@@ -115,7 +115,7 @@ class FileStorageManager(utils.IdentifierMixin, object):
         if 'mask' not in kwargs:
             items = [
                 'id',
-                'allowedVirtualGuests[allowedHost[credential]]',
+                'allowedVirtualGuests[allowedHost[credential, sourceSubnet]]',
                 'allowedHardware[allowedHost[credential]]',
                 'allowedSubnets[allowedHost[credential]]',
                 'allowedIpAddresses[allowedHost[credential]]',

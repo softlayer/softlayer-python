@@ -1,8 +1,12 @@
 # Change Log
 
+## [5.3.0] - 2017-12-01
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.15...master
+ - Added a retry decorator. currently only used in setTags for VSI creation, which should allos VSI creation to be a bit more robust.
+ - Updated unit tests to work with pytest3.3
 
 ## [5.2.15] - 2017-10-30
- - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.14...master
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.14...v5.2.15
  - Added dedicated host info to virt detail
  - #885 - Fixed createObjects on the rest api endpoint
  - changed securityGroups to use createObject instead of createObjects

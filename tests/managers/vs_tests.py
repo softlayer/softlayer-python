@@ -863,7 +863,8 @@ class VSWaitReadyGoTests(testing.TestCase):
             {'activeTransaction': {'id': 1}},
             {'provisionDate': 'aaa'}
         ]
-        _time.side_effect = [0, 1, 2]
+        # logging calls time.time as of pytest3.3, not sure if there is a better way of getting around that.
+        _time.side_effect = [0, 0, 1, 1, 2, 2, 2]
         value = self.vs.wait_for_ready(1, 2, delay=1)
         self.assertFalse(value)
         _sleep.assert_called_once_with(1)
@@ -877,7 +878,8 @@ class VSWaitReadyGoTests(testing.TestCase):
     def test_iter_20_incomplete(self, _sleep, _time):
         """Wait for up to 20 seconds (sleeping for 10 seconds) for a server."""
         self.guestObject.return_value = {'activeTransaction': {'id': 1}}
-        _time.side_effect = [0, 10, 20]
+        # logging calls time.time as of pytest3.3, not sure if there is a better way of getting around that.
+        _time.side_effect = [0, 0, 10, 10, 20, 20, 50, 60]
         value = self.vs.wait_for_ready(1, 20, delay=10)
         self.assertFalse(value)
         self.guestObject.assert_has_calls([mock.call(id=1, mask=mock.ANY)])
@@ -888,11 +890,12 @@ class VSWaitReadyGoTests(testing.TestCase):
     @mock.patch('random.randint')
     @mock.patch('time.time')
     @mock.patch('time.sleep')
-    def test_exception_from_api(self, _sleep, _time, _random, vs):
+    def test_exception_from_api(self, _sleep, _time, _random, _vs):
         """Tests escalating scale back when an excaption is thrown"""
         self.guestObject.return_value = {'activeTransaction': {'id': 1}}
-        vs.side_effect = exceptions.TransportError(104, "Its broken")
-        _time.side_effect = [0, 0, 2, 6, 14, 20, 100]
+        _vs.side_effect = exceptions.TransportError(104, "Its broken")
+        # logging calls time.time as of pytest3.3, not sure if there is a better way of getting around that.
+        _time.side_effect = [0, 0, 0, 0, 2, 2, 2, 6, 6, 6, 14, 14, 14, 20, 20, 20, 100, 100, 100]
         _random.side_effect = [0, 0, 0, 0, 0]
         value = self.vs.wait_for_ready(1, 20, delay=1)
         _sleep.assert_has_calls([
