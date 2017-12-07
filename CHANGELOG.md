@@ -1,7 +1,15 @@
 # Change Log
 
+## [5.3.1] - 2017-12-07
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.3.01...master
+ - Added support for storage volume modifications
+
+### Added to CLI
+- slcli block volume-modify
+- slcli file volume-modify
+
 ## [5.3.0] - 2017-12-01
- - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.15...master
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.15...v5.3.0
  - Added a retry decorator. currently only used in setTags for VSI creation, which should allos VSI creation to be a bit more robust.
  - Updated unit tests to work with pytest3.3
 
