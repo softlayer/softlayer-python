@@ -1,7 +1,7 @@
 # Change Log
 
 ## [5.3.1] - 2017-12-07
- - Changes: https://github.com/softlayer/softlayer-python/compare/v5.3.01...master
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.3.1...master
  - Added support for storage volume modifications
 
 ### Added to CLI
