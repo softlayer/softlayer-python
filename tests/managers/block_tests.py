@@ -832,6 +832,50 @@ class BlockTests(testing.TestCase):
                 'useHourlyPricing': False
             },))
 
+    def test_order_block_modified_performance(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume['storageType']['keyName'] = 'PERFORMANCE_BLOCK_STORAGE'
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        mock.return_value = mock_volume
+
+        result = self.block.order_modified_volume(102, new_size=1000, new_iops=2000, new_tier_level=None)
+
+        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+        self.assert_called_with(
+            'SoftLayer_Product_Order',
+            'placeOrder',
+            args=({'complexType': 'SoftLayer_Container_Product_Order_Network_Storage_AsAService_Upgrade',
+                   'packageId': 759,
+                   'prices': [{'id': 189433}, {'id': 190113}, {'id': 190173}],
+                   'volume': {'id': 102},
+                   'volumeSize': 1000,
+                   'iops': 2000},)
+        )
+
+    def test_order_block_modified_endurance(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        mock.return_value = mock_volume
+
+        result = self.block.order_modified_volume(102, new_size=1000, new_iops=None, new_tier_level=4)
+
+        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+        self.assert_called_with(
+            'SoftLayer_Product_Order',
+            'placeOrder',
+            args=({'complexType': 'SoftLayer_Container_Product_Order_Network_Storage_AsAService_Upgrade',
+                   'packageId': 759,
+                   'prices': [{'id': 189433}, {'id': 194763}, {'id': 194703}],
+                   'volume': {'id': 102},
+                   'volumeSize': 1000},)
+        )
+
     def test_setCredentialPassword(self):
         mock = self.set_mock('SoftLayer_Network_Storage_Allowed_Host', 'setCredentialPassword')
         mock.return_value = True

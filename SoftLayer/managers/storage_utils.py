@@ -947,8 +947,7 @@ def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
         if iops is None:
             iops = int(origin_volume.get('provisionedIops', 0))
             if iops <= 0:
-                raise exceptions.SoftLayerError(
-                    "Cannot find origin volume's provisioned IOPS")
+                raise exceptions.SoftLayerError("Cannot find origin volume's provisioned IOPS")
         # Set up the price array for the order
         prices = [
             find_price_by_category(package, 'storage_as_a_service'),
@@ -999,6 +998,85 @@ def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
         duplicate_order['iops'] = iops
 
     return duplicate_order
+
+
+def prepare_modify_order_object(manager, volume, new_iops, new_tier, new_size):
+    """Prepare the modification order to submit to SoftLayer_Product::placeOrder()
+
+    :param manager: The File or Block manager calling this function
+    :param volume: The volume which is being modified
+    :param new_iops: The new IOPS for the volume (performance)
+    :param new_tier: The new tier level for the volume (endurance)
+    :param new_size: The requested new size for the volume
+    :return: Returns the order object to be passed to the placeOrder() method of the Product_Order service
+    """
+
+    # Verify that the origin volume has not been cancelled
+    if 'billingItem' not in volume:
+        raise exceptions.SoftLayerError("The volume has been cancelled; unable to modify volume.")
+
+    # Ensure the origin volume is STaaS v2 or higher and supports Encryption at Rest
+    if not _staas_version_is_v2_or_above(volume):
+        raise exceptions.SoftLayerError("This volume cannot be modified since it does not support Encryption at Rest.")
+
+    # Get the appropriate package for the order ('storage_as_a_service' is currently used for modifying volumes)
+    package = get_package(manager, 'storage_as_a_service')
+
+    # Based on volume storage type, ensure at least one volume property is being modified,
+    # use current values if some are not specified, and lookup price codes for the order
+    volume_storage_type = volume['storageType']['keyName']
+    if 'PERFORMANCE' in volume_storage_type:
+        volume_is_performance = True
+        if new_size is None and new_iops is None:
+            raise exceptions.SoftLayerError("A size or IOPS value must be given to modify this performance volume.")
+
+        if new_size is None:
+            new_size = volume['capacityGb']
+        elif new_iops is None:
+            new_iops = int(volume.get('provisionedIops', 0))
+            if new_iops <= 0:
+                raise exceptions.SoftLayerError("Cannot find volume's provisioned IOPS.")
+
+        # Set up the prices array for the order
+        prices = [
+            find_price_by_category(package, 'storage_as_a_service'),
+            find_saas_perform_space_price(package, new_size),
+            find_saas_perform_iops_price(package, new_size, new_iops),
+        ]
+
+    elif 'ENDURANCE' in volume_storage_type:
+        volume_is_performance = False
+        if new_size is None and new_tier is None:
+            raise exceptions.SoftLayerError("A size or tier value must be given to modify this endurance volume.")
+
+        if new_size is None:
+            new_size = volume['capacityGb']
+        elif new_tier is None:
+            new_tier = find_endurance_tier_iops_per_gb(volume)
+
+        # Set up the prices array for the order
+        prices = [
+            find_price_by_category(package, 'storage_as_a_service'),
+            find_saas_endurance_space_price(package, new_size, new_tier),
+            find_saas_endurance_tier_price(package, new_tier),
+        ]
+
+    else:
+        raise exceptions.SoftLayerError("Volume does not have a valid storage type (with an appropriate "
+                                        "keyName to indicate the volume is a PERFORMANCE or an ENDURANCE volume).")
+
+    modify_order = {
+        'complexType': 'SoftLayer_Container_Product_Order_Network_Storage_AsAService_Upgrade',
+        'packageId': package['id'],
+        'prices': prices,
+        'volume': {'id': volume['id']},
+        'volumeSize': new_size
+    }
+
+    if volume_is_performance:
+        modify_order['iops'] = new_iops
+
+    return modify_order
 
 
 def _has_category(categories, category_code):
