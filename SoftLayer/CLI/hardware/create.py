@@ -122,7 +122,6 @@ def cli(env, **args):
         return
 
     if do_create:
-
         if not (env.skip_confirmations or formatting.confirm(
                 "This action will incur charges on your account. "
                 "Continue?")):

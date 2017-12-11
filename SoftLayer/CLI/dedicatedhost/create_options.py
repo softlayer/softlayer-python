@@ -19,7 +19,7 @@ from SoftLayer.CLI import formatting
                    " ex. 56_CORES_X_242_RAM_X_1_4_TB",
               show_default=True)
 @environment.pass_env
-def cli(env, **args):
+def cli(env, **kwargs):
     """host order options for a given dedicated host.
 
     To get a list of available backend routers see example:
@@ -29,7 +29,7 @@ def cli(env, **args):
     mgr = SoftLayer.DedicatedHostManager(env.client)
     tables = []
 
-    if not args['flavor'] and not args['datacenter']:
+    if not kwargs['flavor'] and not kwargs['datacenter']:
         options = mgr.get_create_options()
 
         # Datacenters
@@ -45,13 +45,13 @@ def cli(env, **args):
             dh_table.add_row([item['name'], item['key']])
         tables.append(dh_table)
     else:
-        if args['flavor'] is None or args['datacenter'] is None:
+        if kwargs['flavor'] is None or kwargs['datacenter'] is None:
             raise exceptions.ArgumentError('Both a flavor and datacenter need '
-                                           'to be passed as arguments\n'
+                                           'to be passed as arguments '
                                            'ex. slcli dh create-options -d '
                                            'ams01 -f '
                                            '56_CORES_X_242_RAM_X_1_4_TB')
-        router_opt = mgr.get_router_options(args['datacenter'], args['flavor'])
+        router_opt = mgr.get_router_options(kwargs['datacenter'], kwargs['flavor'])
         br_table = formatting.Table(
             ['Available Backend Routers'])
         for router in router_opt:

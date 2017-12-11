@@ -34,9 +34,9 @@ from SoftLayer.CLI import template
               default='hourly',
               show_default=True,
               help="Billing rate")
-@click.option('--test',
+@click.option('--verify',
               is_flag=True,
-              help="Do not actually create the server")
+              help="Verify dedicatedhost without creating it.")
 @click.option('--template', '-t',
               is_eager=True,
               callback=template.TemplateCallback(list_args=['key']),
@@ -46,20 +46,22 @@ from SoftLayer.CLI import template
               type=click.Path(writable=True, resolve_path=True),
               help="Exports options to a template file")
 @environment.pass_env
-def cli(env, **args):
+def cli(env, **kwargs):
     """Order/create a dedicated host."""
     mgr = SoftLayer.DedicatedHostManager(env.client)
 
     order = {
-        'hostname': args['hostname'],
-        'domain': args['domain'],
-        'flavor': args['flavor'],
-        'router': args['router'],
-        'location': args.get('datacenter'),
-        'hourly': args.get('billing') == 'hourly',
+        'hostname': kwargs['hostname'],
+        'domain': kwargs['domain'],
+        'flavor': kwargs['flavor'],
+        'location': kwargs['datacenter'],
+        'hourly': kwargs.get('billing') == 'hourly',
     }
 
-    do_create = not (args['export'] or args['test'])
+    if kwargs['router']:
+        order['router'] = kwargs['router']
+
+    do_create = not (kwargs['export'] or kwargs['verify'])
 
     output = None
 
@@ -88,10 +90,10 @@ def cli(env, **args):
         ' -- ! Prices reflected here are retail and do not '
         'take account level discounts and are not guaranteed.'))
 
-    if args['export']:
-        export_file = args.pop('export')
-        template.export_to_template(export_file, args,
-                                    exclude=['wait', 'test'])
+    if kwargs['export']:
+        export_file = kwargs.pop('export')
+        template.export_to_template(export_file, kwargs,
+                                    exclude=['wait', 'verify'])
         env.fout('Successfully exported options to a template file.')
 
     if do_create:

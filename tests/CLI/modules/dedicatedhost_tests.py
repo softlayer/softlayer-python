@@ -198,7 +198,7 @@ class DedicatedHostsTests(testing.TestCase):
         mock_package.return_value = SoftLayer_Product_Package.verifyOrderDH
 
         result = self.run_command(['dedicatedhost', 'create',
-                                   '--test',
+                                   '--verify',
                                    '--hostname=host',
                                    '--domain=example.com',
                                    '--datacenter=dal05',
@@ -228,7 +228,7 @@ class DedicatedHostsTests(testing.TestCase):
                                 args=args)
 
         result = self.run_command(['dh', 'create',
-                                   '--test',
+                                   '--verify',
                                    '--hostname=host',
                                    '--domain=example.com',
                                    '--datacenter=dal05',
@@ -278,7 +278,7 @@ class DedicatedHostsTests(testing.TestCase):
         mock_package.return_value = SoftLayer_Product_Package.verifyOrderDH
 
         self.run_command(['dedicatedhost', 'create',
-                          '--test',
+                          '--verify',
                           '--hostname=host',
                           '--domain=example.com',
                           '--datacenter=dal05',
@@ -297,7 +297,7 @@ class DedicatedHostsTests(testing.TestCase):
         mock_package.return_value = ret_val
 
         result = self.run_command(['dedicatedhost', 'create',
-                                   '--test',
+                                   '--verify',
                                    '--hostname=host',
                                    '--domain=example.com',
                                    '--datacenter=dal05',

@@ -79,8 +79,6 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
             ]
             kwargs['mask'] = "mask[%s]" % ','.join(items)
 
-        call = 'getDedicatedHosts'
-
         _filter = utils.NestedDict(kwargs.get('filter') or {})
         if tags:
             _filter['dedicatedHosts']['tagReferences']['tag']['name'] = {
@@ -109,8 +107,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                 utils.query_filter(datacenter))
 
         kwargs['filter'] = _filter.to_dict()
-        func = getattr(self.account, call)
-        return func(**kwargs)
+        return self.account.getDedicatedHosts(**kwargs)
 
     def get_host(self, host_id, **kwargs):
         """Get details about a dedicated host.
@@ -132,22 +129,46 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
 
         """
         if 'mask' not in kwargs:
-            kwargs['mask'] = (
-                'id,'
-                'name,'
-                'cpuCount,'
-                'memoryCapacity,'
-                'diskCapacity,'
-                'createDate,'
-                'modifyDate,'
-                'backendRouter[id, hostname, domain],'
-                'billingItem[id, nextInvoiceTotalRecurringAmount, '
-                'children[categoryCode,nextInvoiceTotalRecurringAmount],'
-                'orderItem[id, order.userRecord[username]]],'
-                'datacenter[id, name, longName],'
-                'guests[id, hostname, domain, uuid],'
-                'guestCount'
-            )
+            kwargs['mask'] = ('''
+                id,
+                name,
+                cpuCount,
+                memoryCapacity,
+                diskCapacity,
+                createDate,
+                modifyDate,
+                backendRouter[
+                    id,
+                    hostname,
+                    domain
+                ],
+                billingItem[
+                    id,
+                    nextInvoiceTotalRecurringAmount,
+                    children[
+                        categoryCode,
+                        nextInvoiceTotalRecurringAmount
+                    ],
+                    orderItem[
+                        id,
+                        order.userRecord[
+                            username
+                        ]
+                    ]
+                ],
+                datacenter[
+                    id,
+                    name,
+                    longName
+                ],
+                guests[
+                    id,
+                    hostname,
+                    domain,
+                    uuid
+                ],
+                guestCount
+            ''')
 
         return self.host.getObject(id=host_id, **kwargs)
 
@@ -340,7 +361,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
 
         raise SoftLayer.SoftLayerError("Could not find available routers")
 
-    def _get_default_router(self, routers, router_name):
+    def _get_default_router(self, routers, router_name=None):
         """Returns the default router for ordering a dedicated host."""
         if router_name is None:
             for router in routers:

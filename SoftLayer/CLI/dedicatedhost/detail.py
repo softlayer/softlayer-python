@@ -38,14 +38,8 @@ def cli(env, identifier, price=False, guests=False):
     table.add_row(['modify date', result['modifyDate']])
     table.add_row(['router id', result['backendRouter']['id']])
     table.add_row(['router hostname', result['backendRouter']['hostname']])
-    if utils.lookup(result, 'billingItem') != {}:
-        table.add_row(['owner', formatting.FormattedItem(
-            utils.lookup(result, 'billingItem', 'orderItem',
-                         'order', 'userRecord',
-                         'username') or formatting.blank(),
-        )])
-    else:
-        table.add_row(['owner', formatting.blank()])
+    table.add_row(['owner', formatting.FormattedItem(
+        utils.lookup(result, 'billingItem', 'orderItem', 'order', 'userRecord', 'username') or formatting.blank(),)])
 
     if price:
         total_price = utils.lookup(result,
