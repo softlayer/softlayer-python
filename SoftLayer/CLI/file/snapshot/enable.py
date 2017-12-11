@@ -39,6 +39,9 @@ def cli(env, volume_id, schedule_type, retention_count,
             '--schedule-type must be INTERVAL, HOURLY, ' +
             'DAILY, or WEEKLY, not ' + schedule_type)
 
+    if schedule_type == 'INTERVAL' and (minute < 30 or minute > 59):
+        raise exceptions.CLIAbort(
+            '--minute value must be between 30 and 59')
     if minute < 0 or minute > 59:
         raise exceptions.CLIAbort(
             '--minute value must be between 0 and 59')
