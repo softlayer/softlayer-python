@@ -492,6 +492,22 @@ class BlockTests(testing.TestCase):
             'disableSnapshots',
             identifier=12345678)
 
+    def test_list_volume_schedules(self):
+        result = self.block.list_volume_schedules(12345678)
+
+        self.assertEqual(
+            fixtures.SoftLayer_Network_Storage.listVolumeSchedules,
+            result)
+
+        expected_mask = 'schedules[type,properties[type]]'
+
+        self.assert_called_with(
+            'SoftLayer_Network_Storage',
+            'getObject',
+            identifier=12345678,
+            mask='mask[%s]' % expected_mask
+        )
+
     def test_order_block_snapshot_space_upgrade(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]

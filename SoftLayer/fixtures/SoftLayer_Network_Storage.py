@@ -188,6 +188,7 @@ getValidReplicationTargetDatacenterLocations = [{
     'name': 'dal05'
 }]
 
+listVolumeSchedules = [{'id': 978, 'type': {'keyname': 'SNAPSHOT_WEEKLY'}}]
 
 deleteObject = True
 allowAccessFromHostList = True

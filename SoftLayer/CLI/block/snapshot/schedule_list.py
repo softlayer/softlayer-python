@@ -60,10 +60,10 @@ def cli(env, volume_id):
 
         table_row = [
             schedule['id'],
-            '*' if schedule['active'] else '',
+            '*' if schedule.get('active', '') else '',
             schedule_type,
             replication,
-            schedule['createDate']]
+            schedule.get('createDate', '')]
         table_row.extend(schedule_properties)
 
         table.add_row(table_row)
