@@ -136,14 +136,14 @@ getObject = {
         {
             'id': 978,
             'type': {'keyname': 'SNAPSHOT_WEEKLY'},
-            'properties' : [
+            'properties': [
                 {'type': {'keyname': 'MINUTE'}, 'value': '30'},
             ]
         },
         {
             'id': 988,
             'type': {'keyname': 'REPLICATION_INTERVAL'},
-            'properties' : [
+            'properties': [
                 {'type': {'keyname': 'MINUTE'}, 'value': '-1'},
             ]
         }
