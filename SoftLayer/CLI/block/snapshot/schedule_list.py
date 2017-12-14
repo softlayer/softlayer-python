@@ -39,7 +39,7 @@ def cli(env, volume_id):
             replication = formatting.blank()
 
         block_schedule_type = schedule['type']['keyname'].replace('REPLICATION_', '')
-        block_schedule_type = schedule_type.replace('SNAPSHOT_', '')
+        block_schedule_type = block_schedule_type.replace('SNAPSHOT_', '')
 
         property_list = ['MINUTE', 'HOUR', 'DAY', 'WEEK',
                          'DAY_OF_WEEK', 'DAY_OF_MONTH',
