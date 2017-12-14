@@ -132,10 +132,22 @@ getObject = {
         'username': 'TEST_REP_2',
     }],
     'replicationStatus': 'Replicant Volume Provisioning has completed.',
-    'schedules': [{
-        'id': 978,
-        'type': {'keyname': 'SNAPSHOT_WEEKLY'},
-    }],
+    'schedules': [
+        {
+            'id': 978,
+            'type': {'keyname': 'SNAPSHOT_WEEKLY'},
+            'properties' : [
+                {'type': {'keyname': 'MINUTE'}, 'value': '30'},
+            ]
+        },
+        {
+            'id': 988,
+            'type': {'keyname': 'REPLICATION_INTERVAL'},
+            'properties' : [
+                {'type': {'keyname': 'MINUTE'}, 'value': '-1'},
+            ]
+        }
+    ],
     'serviceProviderId': 1,
     'serviceResource': {'datacenter': {'id': 449500, 'name': 'dal05'}},
     'serviceResourceBackendIpAddress': '10.1.2.3',
@@ -188,7 +200,18 @@ getValidReplicationTargetDatacenterLocations = [{
     'name': 'dal05'
 }]
 
-listVolumeSchedules = [{'id': 978, 'type': {'keyname': 'SNAPSHOT_WEEKLY'}}]
+listVolumeSchedules = [
+    {
+        'id': 978,
+        'type': {'keyname': 'SNAPSHOT_WEEKLY'},
+        'properties': [{'type': {'keyname': 'MINUTE'}, 'value': '30'}]
+    },
+    {
+        'id': 988,
+        'type': {'keyname': 'REPLICATION_INTERVAL'},
+        'properties': [{'type': {'keyname': 'MINUTE'}, 'value': '-1'}]
+    }
+]
 
 deleteObject = True
 allowAccessFromHostList = True
