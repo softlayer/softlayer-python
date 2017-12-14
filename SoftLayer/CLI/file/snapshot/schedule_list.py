@@ -29,8 +29,7 @@ def cli(env, volume_id):
                               'day_of_week',
                               'date_of_month',
                               'month_of_year',
-                              'maximum_snapshots',
-                              ])
+                              'maximum_snapshots'])
 
     for schedule in snapshot_schedules:
 
