@@ -58,6 +58,7 @@ class VSManager(utils.IdentifierMixin, object):
         else:
             self.ordering_manager = ordering_manager
 
+    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
     def list_instances(self, hourly=True, monthly=True, tags=None, cpus=None,
                        memory=None, hostname=None, domain=None,
                        local_disk=None, datacenter=None, nic_speed=None,
@@ -161,6 +162,7 @@ class VSManager(utils.IdentifierMixin, object):
         func = getattr(self.account, call)
         return func(**kwargs)
 
+    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
     def get_instance(self, instance_id, **kwargs):
         """Get details about a virtual server instance.
 
@@ -235,6 +237,7 @@ class VSManager(utils.IdentifierMixin, object):
 
         return self.guest.getObject(id=instance_id, **kwargs)
 
+    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
     def get_create_options(self):
         """Retrieves the available options for creating a VS.
 
@@ -411,6 +414,7 @@ class VSManager(utils.IdentifierMixin, object):
 
         return data
 
+    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
     def wait_for_transaction(self, instance_id, limit, delay=10):
         """Waits on a VS transaction for the specified amount of time.
 
