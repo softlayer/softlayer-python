@@ -138,6 +138,7 @@ class FileStorageManager(utils.IdentifierMixin, object):
                 'snapshotSizeBytes',
                 'storageType[keyName]',
                 'snapshotCreationTimestamp',
+                'intervalSchedule',
                 'hourlySchedule',
                 'dailySchedule',
                 'weeklySchedule'
@@ -214,10 +215,10 @@ class FileStorageManager(utils.IdentifierMixin, object):
         """
 
         file_mask = 'billingItem[activeChildren,hourlyFlag],'\
-                    'storageTierLevel,staasVersion,'\
+                    'storageTierLevel,osType,staasVersion,'\
                     'hasEncryptionAtRest,snapshotCapacityGb,schedules,'\
-                    'hourlySchedule,dailySchedule,weeklySchedule,'\
-                    'storageType[keyName],provisionedIops'
+                    'intervalSchedule,hourlySchedule,dailySchedule,'\
+                    'weeklySchedule,storageType[keyName],provisionedIops'
         file_volume = self.get_file_volume_details(volume_id,
                                                    mask=file_mask)
 

@@ -14,9 +14,9 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 @click.argument('volume_id')
 @click.option('--snapshot-schedule', '-s',
               help='Snapshot schedule to use for replication, '
-              '(HOURLY | DAILY | WEEKLY)',
+              '(INTERVAL | HOURLY | DAILY | WEEKLY)',
               required=True,
-              type=click.Choice(['HOURLY', 'DAILY', 'WEEKLY']))
+              type=click.Choice(['INTERVAL', 'HOURLY', 'DAILY', 'WEEKLY']))
 @click.option('--location', '-l',
               help='Short name of the data center for the replicant '
               '(e.g.: dal09)',
