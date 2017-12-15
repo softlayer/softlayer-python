@@ -474,6 +474,20 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         return self.client.call('Network_Storage', 'disableSnapshots',
                                 schedule_type, id=volume_id)
 
+    def list_volume_schedules(self, volume_id):
+        """Lists schedules for a given volume
+
+        :param integer volume_id: The id of the volume
+        :return: Returns list of schedules assigned to a given volume
+        """
+        volume_detail = self.client.call(
+            'Network_Storage',
+            'getObject',
+            id=volume_id,
+            mask='schedules[type,properties[type]]')
+
+        return utils.lookup(volume_detail, 'schedules')
+
     def restore_from_snapshot(self, volume_id, snapshot_id):
         """Restores a specific volume from a snapshot
 

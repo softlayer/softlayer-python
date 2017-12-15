@@ -304,6 +304,43 @@ class FileTests(testing.TestCase):
                                    '--schedule-type=HOURLY'])
         self.assert_no_fail(result)
 
+    def test_list_volume_schedules(self):
+        result = self.run_command([
+            'file', 'snapshot-schedule-list', '12345678'])
+        self.assert_no_fail(result)
+        self.assertEqual([
+            {
+                "week": None,
+                "maximum_snapshots": None,
+                "hour": None,
+                "day_of_week": None,
+                "day": None,
+                "replication": None,
+                "date_of_month": None,
+                "month_of_year": None,
+                "active": "",
+                "date_created": "",
+                "type": "WEEKLY",
+                "id": 978,
+                "minute": '30'
+            },
+            {
+                "week": None,
+                "maximum_snapshots": None,
+                "hour": None,
+                "day_of_week": None,
+                "day": None,
+                "replication": '*',
+                "date_of_month": None,
+                "month_of_year": None,
+                "active": "",
+                "date_created": "",
+                "type": "INTERVAL",
+                "id": 988,
+                "minute": '*'
+            }
+        ], json.loads(result.output))
+
     def test_create_snapshot(self):
         result = self.run_command(['file', 'snapshot-create', '12345678'])
 
