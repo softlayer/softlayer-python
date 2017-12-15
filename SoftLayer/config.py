@@ -61,7 +61,7 @@ def get_client_settings_config_file(**kwargs):
     config.read(config_files)
 
     if not config.has_section('softlayer'):
-        return
+        raise KeyError("Softlayer section not found in config file")
 
     return {
         'endpoint_url': config.get('softlayer', 'endpoint_url'),

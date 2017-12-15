@@ -23,6 +23,7 @@ class ShellCompleter(completion.Completer):
         return _click_autocomplete(self.root, document.text_before_cursor)
 
 
+# pylint: disable=stop-iteration-return
 def _click_autocomplete(root, text):
     """Completer generator for click applications."""
     try:
@@ -41,8 +42,7 @@ def _click_autocomplete(root, text):
                 continue
             for opt in itertools.chain(param.opts, param.secondary_opts):
                 if opt.startswith(incomplete):
-                    yield completion.Completion(opt, -len(incomplete),
-                                                display_meta=param.help)
+                    yield completion.Completion(opt, -len(incomplete), display_meta=param.help)
 
     elif isinstance(location, (click.MultiCommand, click.core.Group)):
         ctx = click.Context(location)
@@ -50,8 +50,7 @@ def _click_autocomplete(root, text):
         for command in commands:
             if command.startswith(incomplete):
                 cmd = location.get_command(ctx, command)
-                yield completion.Completion(command, -len(incomplete),
-                                            display_meta=cmd.short_help)
+                yield completion.Completion(command, -len(incomplete), display_meta=cmd.short_help)
 
 
 def _click_resolve_command(root, parts):

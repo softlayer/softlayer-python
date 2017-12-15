@@ -482,6 +482,7 @@ class VSManager(utils.IdentifierMixin, object):
                 return False
             LOGGER.info('Auto retry in %s seconds', str(min(delay, until - now)))
             time.sleep(min(delay, until - now))
+        return False
 
     def verify_create_instance(self, **kwargs):
         """Verifies an instance creation command.
@@ -670,7 +671,7 @@ class VSManager(utils.IdentifierMixin, object):
         results = self.list_instances(hostname=hostname, mask="id")
         return [result['id'] for result in results]
 
-    def _get_ids_from_ip(self, ip_address):
+    def _get_ids_from_ip(self, ip_address):  # pylint: disable=inconsistent-return-statements
         """List VS ids which match the given ip address."""
         try:
             # Does it look like an ip address?
@@ -893,8 +894,8 @@ class VSManager(utils.IdentifierMixin, object):
         mask = "mask[%s]" % ','.join(mask)
         return self.guest.getUpgradeItemPrices(include_downgrade_options, id=instance_id, mask=mask)
 
-    def _get_price_id_for_upgrade_option(self, upgrade_prices, option, value,
-                                         public=True):
+    # pylint: disable=inconsistent-return-statements
+    def _get_price_id_for_upgrade_option(self, upgrade_prices, option, value, public=True):
         """Find the price id for the option and value to upgrade. This
 
         :param list upgrade_prices: Contains all the prices related to a VS upgrade
@@ -934,8 +935,8 @@ class VSManager(utils.IdentifierMixin, object):
                 else:
                     return price.get('id')
 
-    def _get_price_id_for_upgrade(self, package_items, option, value,
-                                  public=True):
+    # pylint: disable=inconsistent-return-statements
+    def _get_price_id_for_upgrade(self, package_items, option, value, public=True):
         """Find the price id for the option and value to upgrade.
 
         Deprecated in favor of _get_price_id_for_upgrade_option()

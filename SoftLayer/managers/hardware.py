@@ -490,7 +490,7 @@ regions[location[location[priceGroups]]]
         results = self.list_hardware(hostname=hostname, mask="id")
         return [result['id'] for result in results]
 
-    def _get_ids_from_ip(self, ip):
+    def _get_ids_from_ip(self, ip):  # pylint: disable=inconsistent-return-statements
         """Returns list of matching hardware IDs for a given ip address."""
         try:
             # Does it look like an ip address?

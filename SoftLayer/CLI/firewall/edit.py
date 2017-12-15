@@ -104,8 +104,6 @@ def open_editor(rules=None, content=None):
         data = tfile.read()
         return data
 
-    return
-
 
 def get_formatted_rule(rule=None):
     """Helper to format the rule into a user friendly format.
