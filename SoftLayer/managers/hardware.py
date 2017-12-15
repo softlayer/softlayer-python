@@ -5,11 +5,17 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import logging
 import socket
 
 import SoftLayer
+from SoftLayer.decoration import retry
+from SoftLayer import exceptions
 from SoftLayer.managers import ordering
 from SoftLayer import utils
+
+LOGGER = logging.getLogger(__name__)
+
 # Invalid names are ignored due to long method names and short argument names
 # pylint: disable=invalid-name, no-self-use
 
@@ -82,6 +88,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                                 immediate, False, cancel_reason, comment,
                                 id=billing_id)
 
+    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
     def list_hardware(self, tags=None, cpus=None, memory=None, hostname=None,
                       domain=None, datacenter=None, nic_speed=None,
                       public_ip=None, private_ip=None, **kwargs):
@@ -169,6 +176,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         kwargs['filter'] = _filter.to_dict()
         return self.account.getHardware(**kwargs)
 
+    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
     def get_hardware(self, hardware_id, **kwargs):
         """Get details about a hardware device.
 
@@ -335,6 +343,7 @@ class HardwareManager(utils.IdentifierMixin, object):
             'moving': 'Moving to competitor',
         }
 
+    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
     def get_create_options(self):
         """Returns valid options for ordering hardware."""
 
@@ -395,6 +404,7 @@ class HardwareManager(utils.IdentifierMixin, object):
             'extras': extras,
         }
 
+    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
     def _get_package(self):
         """Get the package related to simple hardware ordering."""
         mask = '''
@@ -490,7 +500,7 @@ regions[location[location[priceGroups]]]
         results = self.list_hardware(hostname=hostname, mask="id")
         return [result['id'] for result in results]
 
-    def _get_ids_from_ip(self, ip):
+    def _get_ids_from_ip(self, ip):  # pylint: disable=inconsistent-return-statements
         """Returns list of matching hardware IDs for a given ip address."""
         try:
             # Does it look like an ip address?

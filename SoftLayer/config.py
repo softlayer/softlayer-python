@@ -42,7 +42,7 @@ def get_client_settings_env(**_):
     }
 
 
-def get_client_settings_config_file(**kwargs):
+def get_client_settings_config_file(**kwargs):  # pylint: disable=inconsistent-return-statements
     """Retrieve client settings from the possible config file locations.
 
         :param \\*\\*kwargs: Arguments that are passed into the client instance
@@ -60,16 +60,14 @@ def get_client_settings_config_file(**kwargs):
     })
     config.read(config_files)
 
-    if not config.has_section('softlayer'):
-        return
-
-    return {
-        'endpoint_url': config.get('softlayer', 'endpoint_url'),
-        'timeout': config.getfloat('softlayer', 'timeout'),
-        'proxy': config.get('softlayer', 'proxy'),
-        'username': config.get('softlayer', 'username'),
-        'api_key': config.get('softlayer', 'api_key'),
-    }
+    if config.has_section('softlayer'):
+        return {
+            'endpoint_url': config.get('softlayer', 'endpoint_url'),
+            'timeout': config.getfloat('softlayer', 'timeout'),
+            'proxy': config.get('softlayer', 'proxy'),
+            'username': config.get('softlayer', 'username'),
+            'api_key': config.get('softlayer', 'api_key'),
+        }
 
 
 SETTING_RESOLVERS = [get_client_settings_args,

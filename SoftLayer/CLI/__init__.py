@@ -5,6 +5,6 @@
 
     :license: MIT, see LICENSE for more details.
 """
-# pylint: disable=w0401
+# pylint: disable=w0401, invalid-name
 
 from SoftLayer.CLI.helpers import *  # NOQA

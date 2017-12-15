@@ -5,15 +5,13 @@
 
     :license: MIT, see LICENSE for more details.
 """
+# pylint: disable=invalid-name
 import warnings
 
 from SoftLayer import auth as slauth
 from SoftLayer import config
 from SoftLayer import consts
 from SoftLayer import transports
-
-# pylint: disable=invalid-name
-
 
 API_PUBLIC_ENDPOINT = consts.API_PUBLIC_ENDPOINT
 API_PRIVATE_ENDPOINT = consts.API_PRIVATE_ENDPOINT
