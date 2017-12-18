@@ -47,7 +47,6 @@ class ServerCLITests(testing.TestCase):
             'prices': [{'Item': 'Total', 'Recurring Price': 16.08},
                        {'Item': 'test', 'Recurring Price': 1}],
             'private_ip': '10.1.0.2',
-            'ptr': '2.0.1.10.in-addr.arpa',
             'public_ip': '172.16.1.100',
             'remote users': [{'password': 'abc123', 'ipmi_username': 'root'}],
             'status': 'ACTIVE',
