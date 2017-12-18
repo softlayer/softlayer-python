@@ -1,7 +1,19 @@
 # Change Log
 
+## [5.3.2] - 2017-12-18
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.3.1...master
+
+ - Expanded `@retry` useage to a few areas in the hardware manager
+ - Added INTERVAL options to block and file replication
+ - Fixed pricing error on `hw detail --price`
+ - Added sub items to `hw detail --price`, removed reverse PTR entries
+
+### Added to CLI
+- slcli dedicatedhost 
+
+
 ## [5.3.1] - 2017-12-07
- - Changes: https://github.com/softlayer/softlayer-python/compare/v5.3.0...master
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.3.0...v5.3.1
  - Added support for storage volume modifications
 
 ### Added to CLI
