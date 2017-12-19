@@ -19,7 +19,28 @@ COLUMNS = ['keyName',
               help="Category code to filter items by")
 @environment.pass_env
 def cli(env, package_keyname, keyword, category):
-    """List package items."""
+    """List package items used for ordering.
+
+    The items listed can be used with `slcli order place` to specify
+    the items that are being ordered in the package.
+
+    Package keynames can be retrieved using `slcli order package-list`
+
+    \b
+    Example:
+        # List all items in the VSI package
+        slcli order item-list CLOUD_SERVER
+
+    The --keyword option is used to filter items by name.
+    The --category option is used to filter items by category.
+    Both --keyword and --category can be used together.
+
+    \b
+    Example:
+        # List Ubuntu OSes from the os category of the Bare Metal package
+        slcli order item-list BARE_METAL_SERVER --category os --keyword ubuntu
+
+    """
     table = formatting.Table(COLUMNS)
     manager = ordering.OrderingManager(env.client)
 

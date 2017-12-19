@@ -281,41 +281,98 @@ class OrderingTests(testing.TestCase):
         self.assertEqual("Item ITEM2 does not exist for package PACKAGE_KEYNAME",
                          str(exc))
 
-    def test_verify_order(self):
+    def test_generate_order(self):
         ord_mock = self.set_mock('SoftLayer_Product_Order', 'verifyOrder')
         ord_mock.return_value = {'id': 1234}
         pkg = 'PACKAGE_KEYNAME'
+        complex_type = 'SoftLayer_Container_Foo'
         items = ['ITEM1', 'ITEM2']
 
-        mock_pkg, mock_preset, mock_get_ids = self._patch_for_verify()
+        mock_pkg, mock_preset, mock_get_ids = self._patch_for_generate()
 
-        order = self.ordering.verify_order(pkg, 'DALLAS13', items)
+        order = self.ordering.verify_order(pkg, 'DALLAS13', items,
+                                           complex_type=complex_type)
 
         mock_pkg.assert_called_once_with(pkg, mask='id')
         mock_preset.assert_not_called()
         mock_get_ids.assert_called_once_with(pkg, items)
         self.assertEqual(ord_mock.return_value, order)
 
-    def test_verify_order_package_not_found(self):
-        self._assert_package_error(self.ordering.verify_order,
+    def test_generate_order_package_not_found(self):
+        self._assert_package_error(self.ordering.generate_order,
                                    'PACKAGE_KEYNAME', 'DALLAS13',
                                    ['item1', 'item2'])
 
-    def test_verify_order_with_preset(self):
-        ord_mock = self.set_mock('SoftLayer_Product_Order', 'verifyOrder')
-        ord_mock.return_value = {'id': 1234}
+    def test_generate_no_complex_type(self):
         pkg = 'PACKAGE_KEYNAME'
         items = ['ITEM1', 'ITEM2']
-        preset = 'PRESET_KEYNAME'
+        exc = self.assertRaises(exceptions.SoftLayerError,
+                                self.ordering.generate_order,
+                                pkg, 'DALLAS13', items)
 
-        mock_pkg, mock_preset, mock_get_ids = self._patch_for_verify()
+        self.assertEqual("A complex type must be specified with the order",
+                         str(exc))
+
+    def test_generate_order_with_preset(self):
+        pkg = 'PACKAGE_KEYNAME'
+        complex_type = 'SoftLayer_Container_Foo'
+        items = ['ITEM1', 'ITEM2']
+        preset = 'PRESET_KEYNAME'
+        expected_order = {}
+
+        mock_pkg, mock_preset, mock_get_ids = self._patch_for_generate()
 
         order = self.ordering.verify_order(pkg, 'DALLAS13', items,
-                                           preset_keyname=preset)
+                                           preset_keyname=preset,
+                                           complex_type=complex_type)
 
         mock_pkg.assert_called_once_with(pkg, mask='id')
         mock_preset.assert_called_once_with(pkg, preset)
         mock_get_ids.assert_called_once_with(pkg, items)
+        self.assertEqual(expected_order, order)
+
+    def test_generate_order(self):
+        ord_mock = self.set_mock('SoftLayer_Product_Order', 'placeOrder')
+        ord_mock.return_value = {'id': 1234}
+        pkg = 'PACKAGE_KEYNAME'
+        items = ['ITEM1', 'ITEM2']
+        complex_type = 'My_Type'
+        expected_order = {}
+
+        mock_pkg, mock_preset, mock_get_ids = self._patch_for_generate()
+
+        order = self.ordering.verify_order(pkg, 'DALLAS13', items,
+                                           complex_type=complex_type)
+
+        mock_pkg.assert_called_once_with(pkg, mask='id')
+        mock_preset.assert_not_called()
+        mock_get_ids.assert_called_once_with(pkg, items)
+        self.assertEqual(expected_order, order)
+
+    def test_verify_order(self):
+        ord_mock = self.set_mock('SoftLayer_Product_Order', 'verifyOrder')
+        ord_mock.return_value = {'id': 1234}
+        pkg = 'PACKAGE_KEYNAME'
+        location = 'DALLAS13'
+        items = ['ITEM1', 'ITEM2']
+        hourly = True
+        preset_keyname = 'PRESET'
+        complex_type = 'Complex_Type'
+        extras = {'foo': 'bar'}
+        quantity = 1
+
+        with mock.patch.object(self.ordering, 'generate_order') as gen_mock:
+            gen_mock.return_value = {'order': {}}
+
+            order = self.ordering.verify_order(pkg, location, items, hourly=hourly,
+                                               preset_keyname=preset_keyname,
+                                               complex_type=complex_type,
+                                               extras=extras, quantity=quantity)
+
+        gen_mock.assert_called_once_with(pkg, location, items, hourly=hourly,
+                                         preset_keyname=preset_keyname,
+                                         complex_type=complex_type,
+                                         extras=extras, quantity=quantity)
         self.assertEqual(ord_mock.return_value, order)
 
     def test_place_order(self):
@@ -326,22 +383,25 @@ class OrderingTests(testing.TestCase):
         items = ['ITEM1', 'ITEM2']
         hourly = True
         preset_keyname = 'PRESET'
+        complex_type = 'Complex_Type'
         extras = {'foo': 'bar'}
         quantity = 1
 
-        with mock.patch.object(self.ordering, 'verify_order') as verify_mock:
-            verify_mock.return_value = {'orderContainers': {}}
+        with mock.patch.object(self.ordering, 'generate_order') as gen_mock:
+            gen_mock.return_value = {'order': {}}
 
             order = self.ordering.place_order(pkg, location, items, hourly=hourly,
                                               preset_keyname=preset_keyname,
+                                              complex_type=complex_type,
                                               extras=extras, quantity=quantity)
 
-        verify_mock.assert_called_once_with(pkg, location, items, hourly=hourly,
-                                            preset_keyname=preset_keyname,
-                                            extras=extras, quantity=quantity)
+        gen_mock.assert_called_once_with(pkg, location, items, hourly=hourly,
+                                         preset_keyname=preset_keyname,
+                                         complex_type=complex_type,
+                                         extras=extras, quantity=quantity)
         self.assertEqual(ord_mock.return_value, order)
 
-    def _patch_for_verify(self):
+    def _patch_for_generate(self):
         # mock out get_package_by_key, get_preset_by_key, and get_price_id_list
         # with patchers
         mock_pkg = mock.patch.object(self.ordering, 'get_package_by_key')

@@ -1,4 +1,4 @@
-"""List package presets."""
+"""List packages."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -16,7 +16,23 @@ COLUMNS = ['name',
               help="A word (or string) used to filter package names.")
 @environment.pass_env
 def cli(env, keyword):
-    """List package presets."""
+    """List packages that can be ordered via the placeOrder API.
+
+    \b
+    Example:
+        # List out all packages for ordering
+        slcli order package-list
+
+
+    Keywords can also be used for some simple filtering functionality
+    to help find a package easier.
+
+    \b
+    Example:
+        # List out all packages with "server" in the name
+        slcli order package-list --keyword server
+
+    """
     manager = ordering.OrderingManager(env.client)
     table = formatting.Table(COLUMNS)
 

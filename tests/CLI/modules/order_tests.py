@@ -75,10 +75,10 @@ class OrderTests(testing.TestCase):
         place_mock.return_value = order
         items_mock.return_value = self._get_order_items()
 
-        result = self.run_command(['-y', 'order', 'place', 'package', 'DALLAS13', 'ITEM1'])
+        result = self.run_command(['-y', 'order', 'place', 'package', 'DALLAS13', 'ITEM1',
+                                   '--complex-type', 'SoftLayer_Container_Product_Order_Thing'])
 
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder')
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
         self.assertEqual({'id': 1234,
                           'created': order_date,
@@ -97,6 +97,7 @@ class OrderTests(testing.TestCase):
         items_mock.return_value = self._get_order_items()
 
         result = self.run_command(['order', 'place', '--billing', 'hourly', '--verify',
+                                   '--complex-type', 'SoftLayer_Container_Product_Order_Thing',
                                    'package', 'DALLAS13', 'ITEM1', 'ITEM2'])
 
         self.assert_no_fail(result)
@@ -123,6 +124,7 @@ class OrderTests(testing.TestCase):
         items_mock.return_value = self._get_order_items()
 
         result = self.run_command(['order', 'place', '--billing', 'monthly', '--verify',
+                                   '--complex-type', 'SoftLayer_Container_Product_Order_Thing',
                                    'package', 'DALLAS13', 'ITEM1', 'ITEM2'])
 
         self.assert_no_fail(result)

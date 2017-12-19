@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+# pylint: disable=no-self-use
 
 from SoftLayer import exceptions
 
@@ -380,7 +381,7 @@ class OrderingManager(object):
 
         return prices
 
-    def verify_order(self, package_keyname, location, item_keynames,
+    def verify_order(self, package_keyname, location, item_keynames, complex_type=None,
                      hourly=True, preset_keyname=None, extras=None, quantity=1):
         """Verifies an order with the given package and prices.
 
@@ -392,6 +393,71 @@ class OrderingManager(object):
         :param list item_keynames: The list of item keyname strings to order. To see list of
                                    possible keynames for a package, use list_items()
                                    (or `slcli order item-list`)
+        :param str complex_type: The complex type to send with the order. Typically begins
+                                 with 'SoftLayer_Container_Product_Order_'.
+        :param bool hourly: If true, uses hourly billing, otherwise uses monthly billing
+        :param string preset_keyname: If needed, specifies a preset to use for that package.
+                                      To see a list of possible keynames for a package, use
+                                      list_preset() (or `slcli order preset-list`)
+        :param dict extras: The extra data for the order in dictionary format.
+                            Example: A VSI order requires hostname and domain to be set, so
+                            extras will look like the following:
+                                {'virtualGuests': [{'hostname': 'test',
+                                                    'domain': 'softlayer.com'}]}
+        :param int quantity: The number of resources to order
+
+        """
+        order = self.generate_order(package_keyname, location, item_keynames,
+                                    complex_type=complex_type, hourly=hourly,
+                                    preset_keyname=preset_keyname,
+                                    extras=extras, quantity=quantity)
+        return self.order_svc.verifyOrder(order)
+
+    def place_order(self, package_keyname, location, item_keynames, complex_type=None,
+                    hourly=True, preset_keyname=None, extras=None, quantity=1):
+        """Places an order with the given package and prices.
+
+        This function takes in parameters needed for an order and places the order.
+
+        :param str package_keyname: The keyname for the package being ordered
+        :param str location: The datacenter location string for ordering (Ex: DALLAS13)
+        :param list item_keynames: The list of item keyname strings to order. To see list of
+                                   possible keynames for a package, use list_items()
+                                   (or `slcli order item-list`)
+        :param str complex_type: The complex type to send with the order. Typically begins
+                                 with 'SoftLayer_Container_Product_Order_'.
+        :param bool hourly: If true, uses hourly billing, otherwise uses monthly billing
+        :param string preset_keyname: If needed, specifies a preset to use for that package.
+                                      To see a list of possible keynames for a package, use
+                                      list_preset() (or `slcli order preset-list`)
+        :param dict extras: The extra data for the order in dictionary format.
+                            Example: A VSI order requires hostname and domain to be set, so
+                            extras will look like the following:
+                                {'virtualGuests': [{'hostname': 'test',
+                                                    'domain': 'softlayer.com'}]}
+        :param int quantity: The number of resources to order
+
+        """
+        order = self.generate_order(package_keyname, location, item_keynames,
+                                    complex_type=complex_type, hourly=hourly,
+                                    preset_keyname=preset_keyname,
+                                    extras=extras, quantity=quantity)
+        return self.order_svc.placeOrder(order)
+
+    def generate_order(self, package_keyname, location, item_keynames, complex_type=None,
+                       hourly=True, preset_keyname=None, extras=None, quantity=1):
+        """Generates an order with the given package and prices.
+
+        This function takes in parameters needed for an order and generates an order
+        dictionary. This dictionary can then be used in either verify or placeOrder().
+
+        :param str package_keyname: The keyname for the package being ordered
+        :param str location: The datacenter location string for ordering (Ex: DALLAS13)
+        :param list item_keynames: The list of item keyname strings to order. To see list of
+                                   possible keynames for a package, use list_items()
+                                   (or `slcli order item-list`)
+        :param str complex_type: The complex type to send with the order. Typically begins
+                                 with 'SoftLayer_Container_Product_Order_'.
         :param bool hourly: If true, uses hourly billing, otherwise uses monthly billing
         :param string preset_keyname: If needed, specifies a preset to use for that package.
                                       To see a list of possible keynames for a package, use
@@ -425,38 +491,10 @@ class OrderingManager(object):
             preset_id = self.get_preset_by_key(package_keyname, preset_keyname)['id']
             order['presetId'] = preset_id
 
+        if not complex_type:
+            raise exceptions.SoftLayerError("A complex type must be specified with the order")
+        order['complexType'] = complex_type
+
         price_ids = self.get_price_id_list(package_keyname, item_keynames)
         order['prices'] = [{'id': price_id} for price_id in price_ids]
-
-        return self.order_svc.verifyOrder(order)
-
-    def place_order(self, package_keyname, location, item_keynames,
-                    hourly=True, preset_keyname=None, extras=None, quantity=1):
-        """Places an order with the given package and prices.
-
-        This function takes in parameters needed for an order and places the order.
-
-        :param str package_keyname: The keyname for the package being ordered
-        :param str location: The datacenter location string for ordering (Ex: DALLAS13)
-        :param list item_keynames: The list of item keyname strings to order. To see list of
-                                   possible keynames for a package, use list_items()
-                                   (or `slcli order item-list`)
-        :param bool hourly: If true, uses hourly billing, otherwise uses monthly billing
-        :param string preset_keyname: If needed, specifies a preset to use for that package.
-                                      To see a list of possible keynames for a package, use
-                                      list_preset() (or `slcli order preset-list`)
-        :param dict extras: The extra data for the order in dictionary format.
-                            Example: A VSI order requires hostname and domain to be set, so
-                            extras will look like the following:
-                                {'virtualGuests': [{'hostname': 'test',
-                                                    'domain': 'softlayer.com'}]}
-        :param int quantity: The number of resources to order
-
-        """
-        # verify the order, and if the order is valid, the proper prices will be filled
-        # into the order template, so we can just send that to placeOrder to order it
-        verified_order = self.verify_order(package_keyname, location, item_keynames,
-                                           hourly=hourly,
-                                           preset_keyname=preset_keyname,
-                                           extras=extras, quantity=quantity)
-        return self.order_svc.placeOrder(verified_order)
+        return order
