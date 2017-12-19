@@ -90,7 +90,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 'serviceResource.datacenter[name]',
                 'serviceResourceBackendIpAddress',
                 'storageTierLevel',
-                'iops',
+                'provisionedIops',
                 'lunId',
                 'originalVolumeName',
                 'originalSnapshotName',

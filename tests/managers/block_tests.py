@@ -46,35 +46,10 @@ class BlockTests(testing.TestCase):
 
         self.assertEqual(fixtures.SoftLayer_Network_Storage.getObject, result)
 
-        expected_mask = 'id,'\
-                        'username,'\
-                        'password,'\
-                        'capacityGb,'\
-                        'snapshotCapacityGb,'\
-                        'parentVolume.snapshotSizeBytes,'\
-                        'storageType.keyName,'\
-                        'serviceResource.datacenter[name],'\
-                        'serviceResourceBackendIpAddress,'\
-                        'storageTierLevel,'\
-                        'iops,'\
-                        'lunId,'\
-                        'originalVolumeName,'\
-                        'originalSnapshotName,'\
-                        'originalVolumeSize,'\
-                        'activeTransactionCount,'\
-                        'activeTransactions.transactionStatus[friendlyName],'\
-                        'replicationPartnerCount,'\
-                        'replicationStatus,'\
-                        'replicationPartners[id,username,'\
-                        'serviceResourceBackendIpAddress,'\
-                        'serviceResource[datacenter[name]],'\
-                        'replicationSchedule[type[keyname]]]'
-
         self.assert_called_with(
             'SoftLayer_Network_Storage',
             'getObject',
-            identifier=100,
-            mask='mask[%s]' % expected_mask
+            identifier=100
             )
 
     def test_list_block_volumes(self):
