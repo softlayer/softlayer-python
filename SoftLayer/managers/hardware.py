@@ -298,7 +298,7 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         See get_create_options() for valid arguments.
 
-        :param string size: server size name
+        :param string size: server size name or presetId
         :param string hostname: server hostname
         :param string domain: server domain name
         :param string location: location (datacenter) name
