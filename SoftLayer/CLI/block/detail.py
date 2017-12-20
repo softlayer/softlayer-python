@@ -28,8 +28,8 @@ def cli(env, volume_id):
     table.add_row(['Capacity (GB)', "%iGB" % block_volume['capacityGb']])
     table.add_row(['LUN Id', "%s" % block_volume['lunId']])
 
-    if block_volume.get('iops'):
-        table.add_row(['IOPs', block_volume['iops']])
+    if block_volume.get('provisionedIops'):
+        table.add_row(['IOPs', int(block_volume['provisionedIops'])])
 
     if block_volume.get('storageTierLevel'):
         table.add_row([

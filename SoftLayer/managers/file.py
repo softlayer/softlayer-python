@@ -87,7 +87,7 @@ class FileStorageManager(utils.IdentifierMixin, object):
                 'serviceResourceBackendIpAddress',
                 'fileNetworkMountAddress',
                 'storageTierLevel',
-                'iops',
+                'provisionedIops',
                 'lunId',
                 'originalVolumeName',
                 'originalSnapshotName',

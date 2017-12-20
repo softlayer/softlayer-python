@@ -56,7 +56,7 @@ class BlockTests(testing.TestCase):
                         'serviceResource.datacenter[name],'\
                         'serviceResourceBackendIpAddress,'\
                         'storageTierLevel,'\
-                        'iops,'\
+                        'provisionedIops,'\
                         'lunId,'\
                         'originalVolumeName,'\
                         'originalSnapshotName,'\

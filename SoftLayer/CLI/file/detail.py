@@ -38,8 +38,8 @@ def cli(env, volume_id):
     else:
         table.add_row(['Used Space', "%dGB" % (used_space / (1 << 30))])
 
-    if file_volume.get('iops'):
-        table.add_row(['IOPs', file_volume['iops']])
+    if file_volume.get('provisionedIops'):
+        table.add_row(['IOPs', int(file_volume['provisionedIops'])])
 
     if file_volume.get('storageTierLevel'):
         table.add_row([
