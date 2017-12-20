@@ -298,7 +298,7 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         See get_create_options() for valid arguments.
 
-        :param string size: server size name
+        :param string size: server size name or presetId
         :param string hostname: server hostname
         :param string domain: server domain name
         :param string location: location (datacenter) name
@@ -477,13 +477,18 @@ regions[location[location[priceGroups]]]
             'hostname': hostname,
             'domain': domain,
         }
-
+        try:
+            size = _get_preset_id(package, size)
+        except SoftLayer.SoftLayerError as err:
+            if not err.message.startswith('Could not find valid size for'):
+                raise
+            size = size
         order = {
             'hardware': [hardware],
             'location': location['keyname'],
             'prices': [{'id': price} for price in prices],
             'packageId': package['id'],
-            'presetId': _get_preset_id(package, size),
+            'presetId': size,
             'useHourlyPricing': hourly,
         }
 
