@@ -40,6 +40,18 @@ REST_SPECIAL_METHODS = {
 }
 
 
+def get_session(user_agent):
+    client = requests.Session()
+    client.headers.update({
+        'Content-Type': 'application/json',
+        'User-Agent': user_agent,
+    })
+    retry = Retry(connect=3, backoff_factor=3)
+    adapter = HTTPAdapter(max_retries=retry)
+    client.mount('https://', adapter)
+    return client
+
+
 class Request(object):
     """Transport request object."""
 
@@ -113,14 +125,7 @@ class XmlRpcTransport(object):
     @property
     def client(self):
         if not hasattr(self, '_client'):
-            self._client = requests.Session()
-            self._client.headers.update({
-                'Content-Type': 'application/json',
-                'User-Agent': self.user_agent,
-            })
-            retry = Retry(connect=3, backoff_factor=3)
-            adapter = HTTPAdapter(max_retries=retry)
-            self._client.mount('https://', adapter)
+            self._client = get_session(self.user_agent)
         return self._client
 
     def __call__(self, request):
@@ -227,14 +232,7 @@ class RestTransport(object):
     @property
     def client(self):
         if not hasattr(self, '_client'):
-            self._client = requests.Session()
-            self._client.headers.update({
-                'Content-Type': 'application/json',
-                'User-Agent': self.user_agent,
-            })
-            retry = Retry(connect=3, backoff_factor=3)
-            adapter = HTTPAdapter(max_retries=retry)
-            self._client.mount('https://', adapter)
+            self._client = get_session(self.user_agent)
         return self._client
 
     def __call__(self, request):
