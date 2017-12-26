@@ -298,7 +298,7 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         See get_create_options() for valid arguments.
 
-        :param string size: server size name
+        :param string size: server size name or presetId
         :param string hostname: server hostname
         :param string domain: server domain name
         :param string location: location (datacenter) name
@@ -748,15 +748,13 @@ def _get_location(package, location):
         if region['location']['location']['name'] == location:
             return region
 
-    raise SoftLayer.SoftLayerError("Could not find valid location for: '%s'"
-                                   % location)
+    raise SoftLayer.SoftLayerError("Could not find valid location for: '%s'" % location)
 
 
 def _get_preset_id(package, size):
     """Get the preset id given the keyName of the preset."""
     for preset in package['activePresets']:
-        if preset['keyName'] == size:
+        if preset['keyName'] == size or preset['id'] == size:
             return preset['id']
 
-    raise SoftLayer.SoftLayerError("Could not find valid size for: '%s'"
-                                   % size)
+    raise SoftLayer.SoftLayerError("Could not find valid size for: '%s'" % size)

@@ -90,7 +90,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 'serviceResource.datacenter[name]',
                 'serviceResourceBackendIpAddress',
                 'storageTierLevel',
-                'iops',
+                'provisionedIops',
                 'lunId',
                 'originalVolumeName',
                 'originalSnapshotName',
@@ -105,8 +105,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 'replicationSchedule[type[keyname]]]',
             ]
             kwargs['mask'] = ','.join(items)
-        return self.client.call('Network_Storage', 'getObject',
-                                id=volume_id, **kwargs)
+        return self.client.call('Network_Storage', 'getObject', id=volume_id, **kwargs)
 
     def get_block_volume_access_list(self, volume_id, **kwargs):
         """Returns a list of authorized hosts for a specified volume.

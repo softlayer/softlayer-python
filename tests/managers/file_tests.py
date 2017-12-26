@@ -130,7 +130,7 @@ class FileTests(testing.TestCase):
                         'serviceResourceBackendIpAddress,'\
                         'fileNetworkMountAddress,'\
                         'storageTierLevel,'\
-                        'iops,'\
+                        'provisionedIops,'\
                         'lunId,'\
                         'originalVolumeName,'\
                         'originalSnapshotName,'\
