@@ -12,7 +12,7 @@ import time
 
 import requests
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+from urllib3.util.retry import Retry
 
 from SoftLayer import consts
 from SoftLayer import exceptions
@@ -41,6 +41,8 @@ REST_SPECIAL_METHODS = {
 
 
 def get_session(user_agent):
+    """Sets up urllib sessions"""
+
     client = requests.Session()
     client.headers.update({
         'Content-Type': 'application/json',
@@ -121,10 +123,13 @@ class XmlRpcTransport(object):
         self.proxy = proxy
         self.user_agent = user_agent or consts.USER_AGENT
         self.verify = verify
+        self._client = None
 
     @property
     def client(self):
-        if not hasattr(self, '_client'):
+        """Returns client session object"""
+
+        if self._client is None:
             self._client = get_session(self.user_agent)
         return self._client
 
@@ -228,10 +233,13 @@ class RestTransport(object):
         self.proxy = proxy
         self.user_agent = user_agent or consts.USER_AGENT
         self.verify = verify
+        self._client = None
 
     @property
     def client(self):
-        if not hasattr(self, '_client'):
+        """Returns client session object"""
+
+        if self._client is None:
             self._client = get_session(self.user_agent)
         return self._client
 
@@ -362,13 +370,11 @@ class FixtureTransport(object):
             module_path = 'SoftLayer.fixtures.%s' % call.service
             module = importlib.import_module(module_path)
         except ImportError:
-            raise NotImplementedError('%s fixture is not implemented'
-                                      % call.service)
+            raise NotImplementedError('%s fixture is not implemented' % call.service)
         try:
             return getattr(module, call.method)
         except AttributeError:
-            raise NotImplementedError('%s::%s fixture is not implemented'
-                                      % (call.service, call.method))
+            raise NotImplementedError('%s::%s fixture is not implemented' % (call.service, call.method))
 
 
 def _proxies_dict(proxy):

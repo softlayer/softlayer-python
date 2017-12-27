@@ -523,3 +523,81 @@ class TestRestAPICall(testing.TestCase):
         req.method = 'getObject'
 
         self.assertRaises(SoftLayer.TransportError, self.transport, req)
+
+    @mock.patch('SoftLayer.transports.requests.Session.request')
+    def test_with_limits(self, request):
+        request().text = '{}'
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        req.limit = 10
+        req.offset = 10
+
+        resp = self.transport(req)
+
+        self.assertEqual(resp, {})
+        request.assert_called_with(
+            'GET',
+            'http://something.com/SoftLayer_Service/getObject.json',
+            headers=mock.ANY,
+            auth=None,
+            data=None,
+            params={'limit': 10, 'offset': 10},
+            verify=True,
+            cert=None,
+            proxies=None,
+            timeout=None)
+
+    @mock.patch('SoftLayer.transports.requests.Session.request')
+    def test_with_username(self, request):
+        request().text = '{}'
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        req.transport_user = 'Bob'
+        req.transport_password = '123456'
+        auth = requests.auth.HTTPBasicAuth(req.transport_user, req.transport_password)
+
+        resp = self.transport(req)
+
+        self.assertEqual(resp, {})
+        request.assert_called_with(
+            'GET',
+            'http://something.com/SoftLayer_Service/getObject.json',
+            headers=mock.ANY,
+            auth=auth,
+            data=None,
+            params={},
+            verify=True,
+            cert=None,
+            proxies=None,
+            timeout=None)
+
+
+class TestFixtureTransport(testing.TestCase):
+
+    def set_up(self):
+        transport = testing.MockableTransport(SoftLayer.FixtureTransport())
+        self.env.client = SoftLayer.BaseClient(transport=transport)
+
+    def test_base_case(self):
+        result = self.env.client.call('SoftLayer_Account', 'getObject')
+        self.assertEqual(result['accountId'], 1234)
+
+    def test_Import_Service_Error(self):
+        # assertRaises doesn't work here for some reason
+        try:
+            self.env.client.call('FAKE', 'getObject')
+            self.assertTrue(False)
+        except NotImplementedError:
+            self.assertTrue(True)
+
+    def test_Import_Method_Error(self):
+        # assertRaises doesn't work here for some reason
+        try:
+            self.env.client.call('SoftLayer_Account', 'getObject111')
+            self.assertTrue(False)
+        except NotImplementedError:
+            self.assertTrue(True)

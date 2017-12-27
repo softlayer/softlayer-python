@@ -7,7 +7,6 @@
 
 import logging
 import mock
-import unittest
 
 from SoftLayer.decoration import retry
 from SoftLayer import exceptions
@@ -89,7 +88,3 @@ class TestDecoration(testing.TestCase):
             raise TypeError('unexpected error')
 
         self.assertRaises(TypeError, raise_unexpected_error)
-
-if __name__ == '__main__':
-
-    unittest.main()
