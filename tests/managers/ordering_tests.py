@@ -281,23 +281,6 @@ class OrderingTests(testing.TestCase):
         self.assertEqual("Item ITEM2 does not exist for package PACKAGE_KEYNAME",
                          str(exc))
 
-    def test_generate_order(self):
-        ord_mock = self.set_mock('SoftLayer_Product_Order', 'verifyOrder')
-        ord_mock.return_value = {'id': 1234}
-        pkg = 'PACKAGE_KEYNAME'
-        complex_type = 'SoftLayer_Container_Foo'
-        items = ['ITEM1', 'ITEM2']
-
-        mock_pkg, mock_preset, mock_get_ids = self._patch_for_generate()
-
-        order = self.ordering.verify_order(pkg, 'DALLAS13', items,
-                                           complex_type=complex_type)
-
-        mock_pkg.assert_called_once_with(pkg, mask='id')
-        mock_preset.assert_not_called()
-        mock_get_ids.assert_called_once_with(pkg, items)
-        self.assertEqual(ord_mock.return_value, order)
-
     def test_generate_order_package_not_found(self):
         self._assert_package_error(self.ordering.generate_order,
                                    'PACKAGE_KEYNAME', 'DALLAS13',
@@ -318,13 +301,19 @@ class OrderingTests(testing.TestCase):
         complex_type = 'SoftLayer_Container_Foo'
         items = ['ITEM1', 'ITEM2']
         preset = 'PRESET_KEYNAME'
-        expected_order = {}
+        expected_order = {'complexType': 'SoftLayer_Container_Foo',
+                          'location': 'DALLAS13',
+                          'packageId': 1234,
+                          'presetId': 5678,
+                          'prices': [{'id': 1111}, {'id': 2222}],
+                          'quantity': 1,
+                          'useHourlyPricing': True}
 
         mock_pkg, mock_preset, mock_get_ids = self._patch_for_generate()
 
-        order = self.ordering.verify_order(pkg, 'DALLAS13', items,
-                                           preset_keyname=preset,
-                                           complex_type=complex_type)
+        order = self.ordering.generate_order(pkg, 'DALLAS13', items,
+                                             preset_keyname=preset,
+                                             complex_type=complex_type)
 
         mock_pkg.assert_called_once_with(pkg, mask='id')
         mock_preset.assert_called_once_with(pkg, preset)
@@ -332,17 +321,20 @@ class OrderingTests(testing.TestCase):
         self.assertEqual(expected_order, order)
 
     def test_generate_order(self):
-        ord_mock = self.set_mock('SoftLayer_Product_Order', 'placeOrder')
-        ord_mock.return_value = {'id': 1234}
         pkg = 'PACKAGE_KEYNAME'
         items = ['ITEM1', 'ITEM2']
         complex_type = 'My_Type'
-        expected_order = {}
+        expected_order = {'complexType': 'My_Type',
+                          'location': 'DALLAS13',
+                          'packageId': 1234,
+                          'prices': [{'id': 1111}, {'id': 2222}],
+                          'quantity': 1,
+                          'useHourlyPricing': True}
 
         mock_pkg, mock_preset, mock_get_ids = self._patch_for_generate()
 
-        order = self.ordering.verify_order(pkg, 'DALLAS13', items,
-                                           complex_type=complex_type)
+        order = self.ordering.generate_order(pkg, 'DALLAS13', items,
+                                             complex_type=complex_type)
 
         mock_pkg.assert_called_once_with(pkg, mask='id')
         mock_preset.assert_not_called()
