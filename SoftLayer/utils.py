@@ -185,3 +185,27 @@ class UTC(datetime.tzinfo):
 
     def dst(self, _):
         return datetime.timedelta(0)
+
+
+def is_ready(instance, pending=False):
+    """Returns True if instance is ready to be used
+
+    :param Object instance: Hardware or Virt with transaction data retrieved from the API
+    :param bool pending: Wait for ALL transactions to finish?
+    :returns bool:
+    """
+
+    last_reload = lookup(instance, 'lastOperatingSystemReload', 'id')
+    active_transaction = lookup(instance, 'activeTransaction', 'id')
+
+    reloading = all((
+        active_transaction,
+        last_reload,
+        last_reload == active_transaction,
+    ))
+    outstanding = False
+    if pending:
+        outstanding = active_transaction
+    if instance.get('provisionDate') and not reloading and not outstanding:
+        return True
+    return False

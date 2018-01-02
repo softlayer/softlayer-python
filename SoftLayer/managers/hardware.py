@@ -7,6 +7,7 @@
 """
 import logging
 import socket
+import time
 
 import SoftLayer
 from SoftLayer.decoration import retry
@@ -586,6 +587,31 @@ regions[location[location[priceGroups]]]
         return self.hardware.createFirmwareUpdateTransaction(
             bool(ipmi), bool(raid_controller), bool(bios), bool(hard_drive),
             id=hardware_id)
+
+    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
+    def wait_for_ready(self, instance_id, limit=14400, delay=10):
+        """Determine if a Server is ready.
+
+        A server is ready when no transactions are running on it.
+
+        :param int instance_id: The instance ID with the pending transaction
+        :param int limit: The maximum amount of seconds to wait.
+        :param int delay: The number of seconds to sleep before checks. Defaults to 10.
+        """
+        now = time.time()
+        until = now + limit
+        mask = "mask[id, lastOperatingSystemReload[id], activeTransaction[id, keyName], provisionDate]"
+        instance = self.get_hardware(instance_id, mask=mask)
+        while now < until and not utils.is_ready(instance):
+            snooze = min(delay, until - now)
+            LOGGER.info("%d not ready. Auto retry in %ds", instance_id, snooze)
+            time.sleep(snooze)
+            instance = self.get_hardware(instance_id, mask=mask)
+            now = time.time()
+        if now >= until:
+            LOGGER.info("Waiting for %d expired.", instance_id)
+            return False
+        return True
 
 
 def _get_extra_price_id(items, key_name, hourly, location):
