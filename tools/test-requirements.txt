@@ -4,3 +4,4 @@ pytest-cov
 mock
 sphinx
 testtools
+urllib3

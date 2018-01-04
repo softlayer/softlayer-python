@@ -266,7 +266,8 @@ getObject = {
             "statusId": 4,
             "accountId": 1234
         }
-    ]
+    ],
+    'accountId': 1234
 }
 
 getRwhoisData = {

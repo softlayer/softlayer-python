@@ -44,7 +44,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         )
         self.response = get_xmlrpc_response()
 
-    @mock.patch('requests.request')
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_call(self, request):
         request.return_value = self.response
 
@@ -95,7 +95,7 @@ class TestXmlRpcAPICall(testing.TestCase):
             warnings.warn("Incorrect Exception raised. Expected a "
                           "SoftLayer.TransportError error")
 
-    @mock.patch('requests.request')
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_valid_proxy(self, request):
         request.return_value = self.response
         self.transport.proxy = 'http://localhost:3128'
@@ -116,7 +116,7 @@ class TestXmlRpcAPICall(testing.TestCase):
             cert=None,
             verify=True)
 
-    @mock.patch('requests.request')
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_identifier(self, request):
         request.return_value = self.response
 
@@ -134,7 +134,7 @@ class TestXmlRpcAPICall(testing.TestCase):
 <value><int>1234</int></value>
 </member>""", kwargs['data'])
 
-    @mock.patch('requests.request')
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_filter(self, request):
         request.return_value = self.response
 
@@ -152,7 +152,7 @@ class TestXmlRpcAPICall(testing.TestCase):
 <value><string>^= prefix</string></value>
 </member>""", kwargs['data'])
 
-    @mock.patch('requests.request')
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_limit_offset(self, request):
         request.return_value = self.response
 
@@ -172,7 +172,7 @@ class TestXmlRpcAPICall(testing.TestCase):
 <value><int>10</int></value>
 </member>""", kwargs['data'])
 
-    @mock.patch('requests.request')
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_old_mask(self, request):
         request.return_value = self.response
 
@@ -194,7 +194,7 @@ class TestXmlRpcAPICall(testing.TestCase):
 </struct></value>
 </member>""", kwargs['data'])
 
-    @mock.patch('requests.request')
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_mask_call_no_mask_prefix(self, request):
         request.return_value = self.response
 
@@ -210,7 +210,7 @@ class TestXmlRpcAPICall(testing.TestCase):
             "<value><string>mask[something.nested]</string></value>",
             kwargs['data'])
 
-    @mock.patch('requests.request')
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_mask_call_v2(self, request):
         request.return_value = self.response
 
@@ -226,7 +226,7 @@ class TestXmlRpcAPICall(testing.TestCase):
             "<value><string>mask[something[nested]]</string></value>",
             kwargs['data'])
 
-    @mock.patch('requests.request')
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_mask_call_v2_dot(self, request):
         request.return_value = self.response
 
@@ -241,7 +241,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         self.assertIn("<value><string>mask.something.nested</string></value>",
                       kwargs['data'])
 
-    @mock.patch('requests.request')
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_request_exception(self, request):
         # Test Text Error
         e = requests.HTTPError('error')
@@ -257,7 +257,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         self.assertRaises(SoftLayer.TransportError, self.transport, req)
 
 
-@mock.patch('requests.request')
+@mock.patch('SoftLayer.transports.requests.Session.request')
 @pytest.mark.parametrize(
     "transport_verify,request_verify,expected",
     [
@@ -313,7 +313,7 @@ class TestRestAPICall(testing.TestCase):
             endpoint_url='http://something.com',
         )
 
-    @mock.patch('requests.request')
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_basic(self, request):
         request().content = '[]'
         request().text = '[]'
@@ -340,7 +340,7 @@ class TestRestAPICall(testing.TestCase):
             proxies=None,
             timeout=None)
 
-    @mock.patch('requests.request')
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_error(self, request):
         # Test JSON Error
         e = requests.HTTPError('error')
@@ -369,7 +369,7 @@ class TestRestAPICall(testing.TestCase):
             warnings.warn("AssertionError raised instead of a "
                           "SoftLayer.TransportError error")
 
-    @mock.patch('requests.request')
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_valid_proxy(self, request):
         request().text = '{}'
         self.transport.proxy = 'http://localhost:3128'
@@ -392,7 +392,7 @@ class TestRestAPICall(testing.TestCase):
             timeout=mock.ANY,
             headers=mock.ANY)
 
-    @mock.patch('requests.request')
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_with_id(self, request):
         request().text = '{}'
 
@@ -416,7 +416,7 @@ class TestRestAPICall(testing.TestCase):
             proxies=None,
             timeout=None)
 
-    @mock.patch('requests.request')
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_with_args(self, request):
         request().text = '{}'
 
@@ -440,7 +440,7 @@ class TestRestAPICall(testing.TestCase):
             proxies=None,
             timeout=None)
 
-    @mock.patch('requests.request')
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_with_filter(self, request):
         request().text = '{}'
 
@@ -465,7 +465,7 @@ class TestRestAPICall(testing.TestCase):
             proxies=None,
             timeout=None)
 
-    @mock.patch('requests.request')
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_with_mask(self, request):
         request().text = '{}'
 
@@ -510,7 +510,7 @@ class TestRestAPICall(testing.TestCase):
             proxies=None,
             timeout=None)
 
-    @mock.patch('requests.request')
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_unknown_error(self, request):
         e = requests.RequestException('error')
         e.response = mock.MagicMock()
@@ -523,3 +523,81 @@ class TestRestAPICall(testing.TestCase):
         req.method = 'getObject'
 
         self.assertRaises(SoftLayer.TransportError, self.transport, req)
+
+    @mock.patch('SoftLayer.transports.requests.Session.request')
+    def test_with_limits(self, request):
+        request().text = '{}'
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        req.limit = 10
+        req.offset = 10
+
+        resp = self.transport(req)
+
+        self.assertEqual(resp, {})
+        request.assert_called_with(
+            'GET',
+            'http://something.com/SoftLayer_Service/getObject.json',
+            headers=mock.ANY,
+            auth=None,
+            data=None,
+            params={'limit': 10, 'offset': 10},
+            verify=True,
+            cert=None,
+            proxies=None,
+            timeout=None)
+
+    @mock.patch('SoftLayer.transports.requests.Session.request')
+    def test_with_username(self, request):
+        request().text = '{}'
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        req.transport_user = 'Bob'
+        req.transport_password = '123456'
+        auth = requests.auth.HTTPBasicAuth(req.transport_user, req.transport_password)
+
+        resp = self.transport(req)
+
+        self.assertEqual(resp, {})
+        request.assert_called_with(
+            'GET',
+            'http://something.com/SoftLayer_Service/getObject.json',
+            headers=mock.ANY,
+            auth=auth,
+            data=None,
+            params={},
+            verify=True,
+            cert=None,
+            proxies=None,
+            timeout=None)
+
+
+class TestFixtureTransport(testing.TestCase):
+
+    def set_up(self):
+        transport = testing.MockableTransport(SoftLayer.FixtureTransport())
+        self.env.client = SoftLayer.BaseClient(transport=transport)
+
+    def test_base_case(self):
+        result = self.env.client.call('SoftLayer_Account', 'getObject')
+        self.assertEqual(result['accountId'], 1234)
+
+    def test_Import_Service_Error(self):
+        # assertRaises doesn't work here for some reason
+        try:
+            self.env.client.call('FAKE', 'getObject')
+            self.assertTrue(False)
+        except NotImplementedError:
+            self.assertTrue(True)
+
+    def test_Import_Method_Error(self):
+        # assertRaises doesn't work here for some reason
+        try:
+            self.env.client.call('SoftLayer_Account', 'getObject111')
+            self.assertTrue(False)
+        except NotImplementedError:
+            self.assertTrue(True)
