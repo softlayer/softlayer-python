@@ -9,8 +9,17 @@ from functools import wraps
 from random import randint
 from time import sleep
 
+from SoftLayer import exceptions
 
-def retry(ex, tries=4, delay=5, backoff=2, logger=None):
+RETRIABLE = (
+    exceptions.ServerError,
+    exceptions.ApplicationError,
+    exceptions.RemoteSystemError,
+    exceptions.TransportError
+)
+
+
+def retry(ex=RETRIABLE, tries=4, delay=5, backoff=2, logger=None):
     """Retry calling the decorated function using an exponential backoff.
 
     http://www.saltycrane.com/blog/2009/11/trying-out-retry-decorator-python/

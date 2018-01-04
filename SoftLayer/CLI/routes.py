@@ -223,6 +223,7 @@ ALL_ROUTES = [
     ('hardware:credentials', 'SoftLayer.CLI.hardware.credentials:cli'),
     ('hardware:update-firmware', 'SoftLayer.CLI.hardware.update_firmware:cli'),
     ('hardware:rescue', 'SoftLayer.CLI.hardware.power:rescue'),
+    ('hardware:ready', 'SoftLayer.CLI.hardware.ready:cli'),
 
     ('securitygroup', 'SoftLayer.CLI.securitygroup'),
     ('securitygroup:list', 'SoftLayer.CLI.securitygroup.list:cli'),

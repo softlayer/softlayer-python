@@ -754,9 +754,7 @@ class VSWaitReadyGoTests(testing.TestCase):
 
     def test_active_not_provisioned(self):
         # active transaction and no provision date should be false
-        self.guestObject.side_effect = [
-            {'activeTransaction': {'id': 1}},
-        ]
+        self.guestObject.return_value = {'activeTransaction': {'id': 1}}
         value = self.vs.wait_for_ready(1, 0)
         self.assertFalse(value)
 
@@ -769,11 +767,14 @@ class VSWaitReadyGoTests(testing.TestCase):
         value = self.vs.wait_for_ready(1, 1)
         self.assertTrue(value)
 
+
     def test_active_provision_pending(self):
         # active transaction and provision date
         # and pending should be false
         self.guestObject.side_effect = [
-            {'activeTransaction': {'id': 1}, 'provisionDate': 'aaa'},
+            {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1},
+             'provisionDate': 'aaa'},
         ]
         value = self.vs.wait_for_ready(1, 0, pending=True)
         self.assertFalse(value)
@@ -781,6 +782,7 @@ class VSWaitReadyGoTests(testing.TestCase):
     def test_active_reload(self):
         # actively running reload
         self.guestObject.side_effect = [
+            {'activeTransaction': {'id': 1}},
             {
                 'activeTransaction': {'id': 1},
                 'provisionDate': 'aaa',
@@ -792,19 +794,19 @@ class VSWaitReadyGoTests(testing.TestCase):
 
     def test_reload_no_pending(self):
         # reload complete, maintance transactions
-        self.guestObject.side_effect = [
-            {
+        self.guestObject.return_value = {
                 'activeTransaction': {'id': 2},
                 'provisionDate': 'aaa',
                 'lastOperatingSystemReload': {'id': 1},
-            },
-        ]
+            }
+
         value = self.vs.wait_for_ready(1, 1)
         self.assertTrue(value)
 
     def test_reload_pending(self):
         # reload complete, pending maintance transactions
         self.guestObject.side_effect = [
+            {'activeTransaction': {'id': 1}},
             {
                 'activeTransaction': {'id': 2},
                 'provisionDate': 'aaa',
@@ -816,22 +818,17 @@ class VSWaitReadyGoTests(testing.TestCase):
 
     @mock.patch('time.sleep')
     def test_ready_iter_once_incomplete(self, _sleep):
-        self.guestObject = self.client['Virtual_Guest'].getObject
-
         # no iteration, false
-        self.guestObject.side_effect = [
-            {'activeTransaction': {'id': 1}},
-        ]
+        self.guestObject.return_value = {'activeTransaction': {'id': 1}}
         value = self.vs.wait_for_ready(1, 0, delay=1)
         self.assertFalse(value)
-        self.assertFalse(_sleep.called)
+        _sleep.assert_has_calls([mock.call(0)])
+
 
     @mock.patch('time.sleep')
     def test_iter_once_complete(self, _sleep):
         # no iteration, true
-        self.guestObject.side_effect = [
-            {'provisionDate': 'aaa'},
-        ]
+        self.guestObject.return_value = {'provisionDate': 'aaa'}
         value = self.vs.wait_for_ready(1, 1, delay=1)
         self.assertTrue(value)
         self.assertFalse(_sleep.called)
@@ -861,13 +858,14 @@ class VSWaitReadyGoTests(testing.TestCase):
         self.guestObject.side_effect = [
             {'activeTransaction': {'id': 1}},
             {'activeTransaction': {'id': 1}},
+            {'activeTransaction': {'id': 1}},
             {'provisionDate': 'aaa'}
         ]
         # logging calls time.time as of pytest3.3, not sure if there is a better way of getting around that.
-        _time.side_effect = [0, 0, 1, 1, 2, 2, 2]
+        _time.side_effect = [0, 1, 2, 3, 4, 5, 6]
         value = self.vs.wait_for_ready(1, 2, delay=1)
         self.assertFalse(value)
-        _sleep.assert_called_once_with(1)
+        _sleep.assert_has_calls([mock.call(1), mock.call(0)])
         self.guestObject.assert_has_calls([
             mock.call(id=1, mask=mock.ANY),
             mock.call(id=1, mask=mock.ANY),
@@ -887,21 +885,21 @@ class VSWaitReadyGoTests(testing.TestCase):
         _sleep.assert_has_calls([mock.call(10)])
 
     @mock.patch('SoftLayer.decoration.sleep')
-    @mock.patch('SoftLayer.managers.vs.VSManager.get_instance')
+    @mock.patch('SoftLayer.transports.FixtureTransport.__call__')
     @mock.patch('time.time')
     @mock.patch('time.sleep')
     def test_exception_from_api(self, _sleep, _time, _vs, _dsleep):
         """Tests escalating scale back when an excaption is thrown"""
         _dsleep.return_value = False
-        self.guestObject.return_value = {'activeTransaction': {'id': 1}}
-        _vs.side_effect = [
+
+        self.guestObject.side_effect = [
             exceptions.TransportError(104, "Its broken"),
             {'activeTransaction': {'id': 1}},
             {'provisionDate': 'aaa'}
         ]
         # logging calls time.time as of pytest3.3, not sure if there is a better way of getting around that.
-        _time.side_effect = [0, 0, 0, 0, 2, 2, 2, 6, 6, 6, 14, 14, 14, 20, 20, 20, 100, 100, 100]
+        _time.side_effect = [0, 1, 2, 3, 4]
         value = self.vs.wait_for_ready(1, 20, delay=1)
-        _sleep.assert_has_calls([mock.call(1)])
+        _sleep.assert_called_once()
         _dsleep.assert_called_once()
         self.assertTrue(value)

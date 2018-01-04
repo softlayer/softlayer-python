@@ -27,14 +27,10 @@ class SoftLayerAPIError(SoftLayerError):
         self.reason = self.faultString = fault_string
 
     def __repr__(self):
-        return '<%s(%s): %s>' % (self.__class__.__name__,
-                                 self.faultCode,
-                                 self.faultString)
+        return '<%s(%s): %s>' % (self.__class__.__name__, self.faultCode, self.faultString)
 
     def __str__(self):
-        return '%s(%s): %s' % (self.__class__.__name__,
-                               self.faultCode,
-                               self.faultString)
+        return '%s(%s): %s' % (self.__class__.__name__, self.faultCode, self.faultString)
 
 
 class ParseError(SoftLayerAPIError):
@@ -78,12 +74,12 @@ class SpecViolation(ServerError):
     pass
 
 
-class MethodNotFound(ServerError):
+class MethodNotFound(SoftLayerAPIError):
     """Method name not found."""
     pass
 
 
-class InvalidMethodParameters(ServerError):
+class InvalidMethodParameters(SoftLayerAPIError):
     """Invalid method paramters."""
     pass
 

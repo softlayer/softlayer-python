@@ -56,7 +56,7 @@ class VSManager(utils.IdentifierMixin, object):
         else:
             self.ordering_manager = ordering_manager
 
-    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
+    @retry(logger=LOGGER)
     def list_instances(self, hourly=True, monthly=True, tags=None, cpus=None,
                        memory=None, hostname=None, domain=None,
                        local_disk=None, datacenter=None, nic_speed=None,
@@ -160,7 +160,7 @@ class VSManager(utils.IdentifierMixin, object):
         func = getattr(self.account, call)
         return func(**kwargs)
 
-    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
+    @retry(logger=LOGGER)
     def get_instance(self, instance_id, **kwargs):
         """Get details about a virtual server instance.
 
@@ -235,7 +235,7 @@ class VSManager(utils.IdentifierMixin, object):
 
         return self.guest.getObject(id=instance_id, **kwargs)
 
-    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
+    @retry(logger=LOGGER)
     def get_create_options(self):
         """Retrieves the available options for creating a VS.
 
@@ -412,7 +412,7 @@ class VSManager(utils.IdentifierMixin, object):
 
         return data
 
-    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
+    @retry(logger=LOGGER)
     def wait_for_transaction(self, instance_id, limit, delay=10):
         """Waits on a VS transaction for the specified amount of time.
 
@@ -426,7 +426,6 @@ class VSManager(utils.IdentifierMixin, object):
 
         return self.wait_for_ready(instance_id, limit, delay=delay, pending=True)
 
-    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
     def wait_for_ready(self, instance_id, limit=3600, delay=10, pending=False):
         """Determine if a VS is ready and available.
 
@@ -450,18 +449,20 @@ class VSManager(utils.IdentifierMixin, object):
         """
         now = time.time()
         until = now + limit
-        mask = "mask[id, lastOperatingSystemReload[id], activeTransaction[id, keyName], provisionDate]"
-        instance = self.get_instance(instance_id, mask=mask)
-        while now < until and not utils.is_ready(instance, pending):
-            snooze = min(delay, until - now)
-            LOGGER.info("%d not ready. Auto retry in %ds", instance_id, snooze)
-            time.sleep(snooze)
+        mask = "mask[id, lastOperatingSystemReload[id], activeTransaction, provisionDate]"
+
+        while now <= until:
             instance = self.get_instance(instance_id, mask=mask)
+            if utils.is_ready(instance, pending):
+                return True
+            transaction = utils.lookup(instance, 'activeTransaction', 'transactionStatus', 'friendlyName')
+            snooze = min(delay, until - now)
+            LOGGER.info("%s - %d not ready. Auto retry in %ds", transaction, instance_id, snooze)
+            time.sleep(snooze)
             now = time.time()
-        if now >= until:
-            LOGGER.info("Waiting for %d expired.", instance_id)
-            return False
-        return True
+
+        LOGGER.info("Waiting for %d expired.", instance_id)
+        return False
 
     def verify_create_instance(self, **kwargs):
         """Verifies an instance creation command.
@@ -556,7 +557,7 @@ class VSManager(utils.IdentifierMixin, object):
             self.set_tags(tags, guest_id=inst['id'])
         return inst
 
-    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
+    @retry(logger=LOGGER)
     def set_tags(self, tags, guest_id):
         """Sets tags on a guest with a retry decorator
 

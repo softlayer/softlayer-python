@@ -149,7 +149,7 @@ class XmlRpcTransport(object):
             verify = self.verify
 
         LOGGER.debug("=== REQUEST ===")
-        LOGGER.info('POST %s', url)
+        LOGGER.debug('POST %s', url)
         LOGGER.debug(request.transport_headers)
         LOGGER.debug(payload)
 
@@ -271,7 +271,7 @@ class RestTransport(object):
             verify = self.verify
 
         LOGGER.debug("=== REQUEST ===")
-        LOGGER.info(url)
+        LOGGER.debug(url)
         LOGGER.debug(request.transport_headers)
         LOGGER.debug(raw_body)
         try:
