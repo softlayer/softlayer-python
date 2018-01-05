@@ -19,8 +19,7 @@ import mock
 class CoreTests(testing.TestCase):
 
     def test_load_all(self):
-        for path, cmd in recursive_subcommand_loader(core.cli,
-                                                     current_path='root'):
+        for path, cmd in recursive_subcommand_loader(core.cli, current_path='root'):
             try:
                 cmd.main(args=['--help'])
             except SystemExit as ex:
