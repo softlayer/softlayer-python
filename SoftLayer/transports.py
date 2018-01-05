@@ -339,13 +339,11 @@ class FixtureTransport(object):
             module_path = 'SoftLayer.fixtures.%s' % call.service
             module = importlib.import_module(module_path)
         except ImportError:
-            raise NotImplementedError('%s fixture is not implemented'
-                                      % call.service)
+            raise NotImplementedError('%s fixture is not implemented' % call.service)
         try:
             return getattr(module, call.method)
         except AttributeError:
-            raise NotImplementedError('%s::%s fixture is not implemented'
-                                      % (call.service, call.method))
+            raise NotImplementedError('%s::%s fixture is not implemented' % (call.service, call.method))
 
 
 def _proxies_dict(proxy):

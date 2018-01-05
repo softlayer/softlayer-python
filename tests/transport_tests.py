@@ -511,6 +511,32 @@ class TestRestAPICall(testing.TestCase):
             timeout=None)
 
     @mock.patch('requests.request')
+    def test_with_limit_offset(self, request):
+        request().text = '{}'
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        req.identifier = 2
+        req.limit = 10
+        req.offset = 5
+
+        resp = self.transport(req)
+
+        self.assertEqual(resp, {})
+        request.assert_called_with(
+            'GET',
+            'http://something.com/SoftLayer_Service/2/getObject.json',
+            headers=mock.ANY,
+            auth=None,
+            data=None,
+            params={'limit': 10, 'offset': 5},
+            verify=True,
+            cert=None,
+            proxies=None,
+            timeout=None)
+
+    @mock.patch('requests.request')
     def test_unknown_error(self, request):
         e = requests.RequestException('error')
         e.response = mock.MagicMock()
@@ -523,3 +549,62 @@ class TestRestAPICall(testing.TestCase):
         req.method = 'getObject'
 
         self.assertRaises(SoftLayer.TransportError, self.transport, req)
+
+
+    @mock.patch('requests.request')
+    @mock.patch('requests.auth.HTTPBasicAuth')
+    def test_with_special_auth(self, auth, request):
+        request().text = '{}'
+
+        user = 'asdf'
+        password = 'zxcv'
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        req.identifier = 2
+        req.transport_user = user
+        req.transport_password = password
+
+        
+        resp = self.transport(req)
+        auth.assert_called_with(user, password)
+        request.assert_called_with(
+            'GET',
+            'http://something.com/SoftLayer_Service/2/getObject.json',
+            headers=mock.ANY,
+            auth=mock.ANY,
+            data=None,
+            params={},
+            verify=True,
+            cert=None,
+            proxies=None,
+            timeout=None)
+
+
+class TestFixtureTransport(testing.TestCase):
+
+    def set_up(self):
+        self.transport = transports.FixtureTransport()
+
+    def test_basic(self):
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Account'
+        req.method = 'getObject'
+        resp = self.transport(req)
+
+        self.assertEqual(resp['cdnAccounts'][0]['accountId'], 1234)
+
+    def test_no_module(self):
+
+        req = transports.Request()
+        req.service = 'Doesnt_Exist'
+        req.method = 'getObject'
+        self.assertRaises(NotImplementedError, self.transport, req)
+
+    def test_no_method(self):
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Account'
+        req.method = 'getObjectzzzz'
+        self.assertRaises(NotImplementedError, self.transport, req)
