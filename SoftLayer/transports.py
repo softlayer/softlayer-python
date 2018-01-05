@@ -11,6 +11,8 @@ import logging
 import time
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from SoftLayer import consts
 from SoftLayer import exceptions
@@ -36,6 +38,20 @@ REST_SPECIAL_METHODS = {
     'editObject': 'PUT',
     'editObjects': 'PUT',
 }
+
+
+def get_session(user_agent):
+    """Sets up urllib sessions"""
+
+    client = requests.Session()
+    client.headers.update({
+        'Content-Type': 'application/json',
+        'User-Agent': user_agent,
+    })
+    retry = Retry(connect=3, backoff_factor=3)
+    adapter = HTTPAdapter(max_retries=retry)
+    client.mount('https://', adapter)
+    return client
 
 
 class Request(object):
@@ -107,6 +123,15 @@ class XmlRpcTransport(object):
         self.proxy = proxy
         self.user_agent = user_agent or consts.USER_AGENT
         self.verify = verify
+        self._client = None
+
+    @property
+    def client(self):
+        """Returns client session object"""
+
+        if self._client is None:
+            self._client = get_session(self.user_agent)
+        return self._client
 
     def __call__(self, request):
         """Makes a SoftLayer API call against the XML-RPC endpoint.
@@ -154,13 +179,13 @@ class XmlRpcTransport(object):
         LOGGER.debug(payload)
 
         try:
-            resp = requests.request('POST', url,
-                                    data=payload,
-                                    headers=request.transport_headers,
-                                    timeout=self.timeout,
-                                    verify=verify,
-                                    cert=request.cert,
-                                    proxies=_proxies_dict(self.proxy))
+            resp = self.client.request('POST', url,
+                                       data=payload,
+                                       headers=request.transport_headers,
+                                       timeout=self.timeout,
+                                       verify=verify,
+                                       cert=request.cert,
+                                       proxies=_proxies_dict(self.proxy))
             LOGGER.debug("=== RESPONSE ===")
             LOGGER.debug(resp.headers)
             LOGGER.debug(resp.content)
@@ -208,6 +233,15 @@ class RestTransport(object):
         self.proxy = proxy
         self.user_agent = user_agent or consts.USER_AGENT
         self.verify = verify
+        self._client = None
+
+    @property
+    def client(self):
+        """Returns client session object"""
+
+        if self._client is None:
+            self._client = get_session(self.user_agent)
+        return self._client
 
     def __call__(self, request):
         """Makes a SoftLayer API call against the REST endpoint.
@@ -217,9 +251,6 @@ class RestTransport(object):
 
         :param request request: Request object
         """
-        request.transport_headers.setdefault('Content-Type', 'application/json')
-        request.transport_headers.setdefault('User-Agent', self.user_agent)
-
         params = request.headers.copy()
         if request.mask:
             params['objectMask'] = _format_object_mask(request.mask)
@@ -275,15 +306,15 @@ class RestTransport(object):
         LOGGER.debug(request.transport_headers)
         LOGGER.debug(raw_body)
         try:
-            resp = requests.request(method, url,
-                                    auth=auth,
-                                    headers=request.transport_headers,
-                                    params=params,
-                                    data=raw_body,
-                                    timeout=self.timeout,
-                                    verify=verify,
-                                    cert=request.cert,
-                                    proxies=_proxies_dict(self.proxy))
+            resp = self.client.request(method, url,
+                                       auth=auth,
+                                       headers=request.transport_headers,
+                                       params=params,
+                                       data=raw_body,
+                                       timeout=self.timeout,
+                                       verify=verify,
+                                       cert=request.cert,
+                                       proxies=_proxies_dict(self.proxy))
             LOGGER.debug("=== RESPONSE ===")
             LOGGER.debug(resp.headers)
             LOGGER.debug(resp.text)
