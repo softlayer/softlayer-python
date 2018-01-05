@@ -767,7 +767,6 @@ class VSWaitReadyGoTests(testing.TestCase):
         value = self.vs.wait_for_ready(1, 1)
         self.assertTrue(value)
 
-
     def test_active_provision_pending(self):
         # active transaction and provision date
         # and pending should be false
@@ -795,10 +794,10 @@ class VSWaitReadyGoTests(testing.TestCase):
     def test_reload_no_pending(self):
         # reload complete, maintance transactions
         self.guestObject.return_value = {
-                'activeTransaction': {'id': 2},
-                'provisionDate': 'aaa',
-                'lastOperatingSystemReload': {'id': 1},
-            }
+            'activeTransaction': {'id': 2},
+            'provisionDate': 'aaa',
+            'lastOperatingSystemReload': {'id': 1},
+        }
 
         value = self.vs.wait_for_ready(1, 1)
         self.assertTrue(value)
@@ -823,7 +822,6 @@ class VSWaitReadyGoTests(testing.TestCase):
         value = self.vs.wait_for_ready(1, 0, delay=1)
         self.assertFalse(value)
         _sleep.assert_has_calls([mock.call(0)])
-
 
     @mock.patch('time.sleep')
     def test_iter_once_complete(self, _sleep):
