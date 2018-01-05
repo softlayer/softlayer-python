@@ -462,3 +462,50 @@ class ServerCLITests(testing.TestCase):
 
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    def test_ready(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        mock.return_value = {
+            "provisionDate": "2017-10-17T11:21:53-07:00",
+            "id": 41957081
+        }
+        result = self.run_command(['hw', 'ready', '100'])
+        self.assert_no_fail(result)
+        self.assertEqual(result.output, '"READY"\n')
+
+    def test_not_ready(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        not_ready = {
+            'activeTransaction': {
+                'transactionStatus': {'friendlyName': 'Attach Primary Disk'}
+            },
+            'provisionDate': '',
+            'id': 47392219
+        }
+        ready = {
+            "provisionDate": "2017-10-17T11:21:53-07:00",
+            "id": 41957081
+        }
+        mock.side_effect = [not_ready, ready]
+        result = self.run_command(['hw', 'ready', '100'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    @mock.patch('time.sleep')
+    def test_going_ready(self, _sleep):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        not_ready = {
+            'activeTransaction': {
+                'transactionStatus': {'friendlyName': 'Attach Primary Disk'}
+            },
+            'provisionDate': '',
+            'id': 47392219
+        }
+        ready = {
+            "provisionDate": "2017-10-17T11:21:53-07:00",
+            "id": 41957081
+        }
+        mock.side_effect = [not_ready, ready]
+        result = self.run_command(['hw', 'ready', '100', '--wait=100'])
+        self.assert_no_fail(result)
+        self.assertEqual(result.output, '"READY"\n')

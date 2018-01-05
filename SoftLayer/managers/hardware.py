@@ -7,10 +7,10 @@
 """
 import logging
 import socket
+import time
 
 import SoftLayer
 from SoftLayer.decoration import retry
-from SoftLayer import exceptions
 from SoftLayer.managers import ordering
 from SoftLayer import utils
 
@@ -88,7 +88,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                                 immediate, False, cancel_reason, comment,
                                 id=billing_id)
 
-    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
+    @retry(logger=LOGGER)
     def list_hardware(self, tags=None, cpus=None, memory=None, hostname=None,
                       domain=None, datacenter=None, nic_speed=None,
                       public_ip=None, private_ip=None, **kwargs):
@@ -176,7 +176,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         kwargs['filter'] = _filter.to_dict()
         return self.account.getHardware(**kwargs)
 
-    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
+    @retry(logger=LOGGER)
     def get_hardware(self, hardware_id, **kwargs):
         """Get details about a hardware device.
 
@@ -343,7 +343,7 @@ class HardwareManager(utils.IdentifierMixin, object):
             'moving': 'Moving to competitor',
         }
 
-    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
+    @retry(logger=LOGGER)
     def get_create_options(self):
         """Returns valid options for ordering hardware."""
 
@@ -404,7 +404,7 @@ class HardwareManager(utils.IdentifierMixin, object):
             'extras': extras,
         }
 
-    @retry(exceptions.SoftLayerAPIError, logger=LOGGER)
+    @retry(logger=LOGGER)
     def _get_package(self):
         """Get the package related to simple hardware ordering."""
         mask = '''
@@ -584,8 +584,33 @@ regions[location[location[priceGroups]]]
         """
 
         return self.hardware.createFirmwareUpdateTransaction(
-            bool(ipmi), bool(raid_controller), bool(bios), bool(hard_drive),
-            id=hardware_id)
+            bool(ipmi), bool(raid_controller), bool(bios), bool(hard_drive), id=hardware_id)
+
+    def wait_for_ready(self, instance_id, limit=14400, delay=10, pending=False):
+        """Determine if a Server is ready.
+
+        A server is ready when no transactions are running on it.
+
+        :param int instance_id: The instance ID with the pending transaction
+        :param int limit: The maximum amount of seconds to wait.
+        :param int delay: The number of seconds to sleep before checks. Defaults to 10.
+        """
+        now = time.time()
+        until = now + limit
+        mask = "mask[id, lastOperatingSystemReload[id], activeTransaction, provisionDate]"
+        instance = self.get_hardware(instance_id, mask=mask)
+        while now <= until:
+            if utils.is_ready(instance, pending):
+                return True
+            transaction = utils.lookup(instance, 'activeTransaction', 'transactionStatus', 'friendlyName')
+            snooze = min(delay, until - now)
+            LOGGER.info("%s - %d not ready. Auto retry in %ds", transaction, instance_id, snooze)
+            time.sleep(snooze)
+            instance = self.get_hardware(instance_id, mask=mask)
+            now = time.time()
+
+        LOGGER.info("Waiting for %d expired.", instance_id)
+        return False
 
 
 def _get_extra_price_id(items, key_name, hourly, location):

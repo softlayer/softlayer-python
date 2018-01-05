@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import datetime
 import SoftLayer
 from SoftLayer import testing
 
@@ -58,6 +59,25 @@ class TestUtils(testing.TestCase):
 
         result = SoftLayer.utils.query_filter(10)
         self.assertEqual({'operation': 10}, result)
+
+    def test_query_filter_date(self):
+        result = SoftLayer.utils.query_filter_date("2018-01-01", "2018-01-02")
+        expected = {
+            'operation': 'betweenDate',
+            'options': [
+                {'name': 'startDate', 'value': ['1/1/2018 0:0:0']},
+                {'name': 'endDate', 'value': ['1/2/2018 0:0:0']}
+            ]
+        }
+        self.assertEqual(expected, result)
+
+    def test_timezone(self):
+        utc = SoftLayer.utils.UTC()
+        time = datetime.datetime(2018, 1, 1, tzinfo=utc)
+        self.assertEqual('2018-01-01 00:00:00+00:00', time.__str__())
+        self.assertEqual('UTC', time.tzname())
+        self.assertEqual(datetime.timedelta(0), time.dst())
+        self.assertEqual(datetime.timedelta(0), time.utcoffset())
 
 
 class TestNestedDict(testing.TestCase):
