@@ -5,6 +5,35 @@
 
     :license: MIT, see LICENSE for more details.
 """
+# pylint: disable=no-self-use
+
+from SoftLayer import exceptions
+
+CATEGORY_MASK = '''id,
+                   isRequired,
+                   itemCategory[
+                     id,
+                     name,
+                     categoryCode
+                   ]
+                '''
+
+ITEM_MASK = '''id,
+               keyName,
+               description
+            '''
+
+PACKAGE_MASK = '''id,
+                  name,
+                  keyName,
+                  isActive
+               '''
+
+PRESET_MASK = '''id,
+                 name,
+                 keyName,
+                 description
+              '''
 
 
 class OrderingManager(object):
@@ -15,6 +44,9 @@ class OrderingManager(object):
 
     def __init__(self, client):
         self.client = client
+        self.package_svc = client['Product_Package']
+        self.order_svc = client['Product_Order']
+        self.billing_svc = client['Billing_Order']
 
     def get_packages_of_type(self, package_types, mask=None):
         """Get packages that match a certain type.
@@ -27,7 +59,6 @@ class OrderingManager(object):
         :param string mask: Mask to specify the properties we want to retrieve
         """
 
-        package_service = self.client['Product_Package']
         _filter = {
             'type': {
                 'keyName': {
@@ -40,7 +71,7 @@ class OrderingManager(object):
             },
         }
 
-        packages = package_service.getAllObjects(mask=mask, filter=_filter)
+        packages = self.package_svc.getAllObjects(mask=mask, filter=_filter)
         packages = self.filter_outlet_packages(packages)
         return packages
 
@@ -185,7 +216,7 @@ class OrderingManager(object):
 
         container = self.generate_order_template(quote_id, extra,
                                                  quantity=quantity)
-        return self.client['Product_Order'].verifyOrder(container)
+        return self.order_svc.verifyOrder(container)
 
     def order_quote(self, quote_id, extra, quantity=1):
         """Places an order using a quote
@@ -198,7 +229,7 @@ class OrderingManager(object):
 
         container = self.generate_order_template(quote_id, extra,
                                                  quantity=quantity)
-        return self.client['Product_Order'].placeOrder(container)
+        return self.order_svc.placeOrder(container)
 
     def get_package_by_key(self, package_keyname, mask=None):
         """Get a single package with a given key.
@@ -209,15 +240,261 @@ class OrderingManager(object):
                             we are interested in.
         :param string mask: Mask to specify the properties we want to retrieve
         """
-        package_service = self.client['Product_Package']
         _filter = {
             'keyName': {
                 'operation': package_keyname,
             },
         }
 
-        packages = package_service.getAllObjects(mask=mask, filter=_filter)
+        packages = self.package_svc.getAllObjects(mask=mask, filter=_filter)
         if len(packages) == 0:
             return None
         else:
             return packages.pop()
+
+    def list_categories(self, package_keyname, **kwargs):
+        """List the categories for the given package.
+
+        :param str package_keyname: The package for which to get the categories.
+        :returns: List of categories associated with the package
+        """
+        get_kwargs = {}
+        get_kwargs['mask'] = kwargs.get('mask', CATEGORY_MASK)
+
+        if 'filter' in kwargs:
+            get_kwargs['filter'] = kwargs['filter']
+
+        package = self.get_package_by_key(package_keyname, mask='id')
+        if not package:
+            raise exceptions.SoftLayerError("Package {} does not exist".format(package_keyname))
+
+        categories = self.package_svc.getConfiguration(id=package['id'], **get_kwargs)
+        return categories
+
+    def list_items(self, package_keyname, **kwargs):
+        """List the items for the given package.
+
+        :param str package_keyname: The package for which to get the items.
+        :returns: List of items in the package
+
+        """
+        get_kwargs = {}
+        get_kwargs['mask'] = kwargs.get('mask', ITEM_MASK)
+
+        if 'filter' in kwargs:
+            get_kwargs['filter'] = kwargs['filter']
+
+        package = self.get_package_by_key(package_keyname, mask='id')
+        if not package:
+            raise exceptions.SoftLayerError("Package {} does not exist".format(package_keyname))
+
+        items = self.package_svc.getItems(id=package['id'], **get_kwargs)
+        return items
+
+    def list_packages(self, **kwargs):
+        """List active packages.
+
+        :returns: List of active packages.
+
+        """
+        get_kwargs = {}
+        get_kwargs['mask'] = kwargs.get('mask', PACKAGE_MASK)
+
+        if 'filter' in kwargs:
+            get_kwargs['filter'] = kwargs['filter']
+
+        packages = self.package_svc.getAllObjects(**get_kwargs)
+
+        return [package for package in packages if package['isActive']]
+
+    def list_presets(self, package_keyname, **kwargs):
+        """Gets active presets for the given package.
+
+        :param str package_keyname: The package for which to get presets
+        :returns: A list of package presets that can be used for ordering
+
+        """
+        get_kwargs = {}
+        get_kwargs['mask'] = kwargs.get('mask', PRESET_MASK)
+
+        if 'filter' in kwargs:
+            get_kwargs['filter'] = kwargs['filter']
+
+        package = self.get_package_by_key(package_keyname, mask='id')
+        if not package:
+            raise exceptions.SoftLayerError("Package {} does not exist".format(package_keyname))
+
+        acc_presets = self.package_svc.getAccountRestrictedActivePresets(
+            id=package['id'], **get_kwargs)
+        active_presets = self.package_svc.getActivePresets(id=package['id'], **get_kwargs)
+        return active_presets + acc_presets
+
+    def get_preset_by_key(self, package_keyname, preset_keyname, mask=None):
+        """Gets a single preset with the given key."""
+        preset_operation = '_= %s' % preset_keyname
+        _filter = {'activePresets': {'keyName': {'operation': preset_operation}}}
+
+        presets = self.list_presets(package_keyname, mask=mask, filter=_filter)
+
+        if len(presets) == 0:
+            raise exceptions.SoftLayerError(
+                "Preset {} does not exist in package {}".format(preset_keyname,
+                                                                package_keyname))
+
+        return presets[0]
+
+    def get_price_id_list(self, package_keyname, item_keynames):
+        """Converts a list of item keynames to a list of price IDs.
+
+        This function is used to convert a list of item keynames into
+        a list of price IDs that are used in the Product_Order verifyOrder()
+        and placeOrder() functions.
+
+        :param str package_keyname: The package associated with the prices
+        :param list item_keynames: A list of item keyname strings
+        :returns: A list of price IDs associated with the given item
+                  keynames in the given package
+
+        """
+        mask = 'id, keyName, prices'
+        items = self.list_items(package_keyname, mask=mask)
+
+        prices = []
+        for item_keyname in item_keynames:
+            try:
+                # Need to find the item in the package that has a matching
+                # keyName with the current item we are searching for
+                matching_item = [i for i in items
+                                 if i['keyName'] == item_keyname][0]
+            except IndexError:
+                raise exceptions.SoftLayerError(
+                    "Item {} does not exist for package {}".format(item_keyname,
+                                                                   package_keyname))
+
+            # we want to get the price ID that has no location attached to it,
+            # because that is the most generic price. verifyOrder/placeOrder
+            # can take that ID and create the proper price for us in the location
+            # in which the order is made
+            price_id = [p['id'] for p in matching_item['prices']
+                        if p['locationGroupId'] == ''][0]
+            prices.append(price_id)
+
+        return prices
+
+    def verify_order(self, package_keyname, location, item_keynames, complex_type=None,
+                     hourly=True, preset_keyname=None, extras=None, quantity=1):
+        """Verifies an order with the given package and prices.
+
+        This function takes in parameters needed for an order and verifies the order
+        to ensure the given items are compatible with the given package.
+
+        :param str package_keyname: The keyname for the package being ordered
+        :param str location: The datacenter location string for ordering (Ex: DALLAS13)
+        :param list item_keynames: The list of item keyname strings to order. To see list of
+                                   possible keynames for a package, use list_items()
+                                   (or `slcli order item-list`)
+        :param str complex_type: The complex type to send with the order. Typically begins
+                                 with 'SoftLayer_Container_Product_Order_'.
+        :param bool hourly: If true, uses hourly billing, otherwise uses monthly billing
+        :param string preset_keyname: If needed, specifies a preset to use for that package.
+                                      To see a list of possible keynames for a package, use
+                                      list_preset() (or `slcli order preset-list`)
+        :param dict extras: The extra data for the order in dictionary format.
+                            Example: A VSI order requires hostname and domain to be set, so
+                            extras will look like the following:
+                                {'virtualGuests': [{'hostname': 'test',
+                                                    'domain': 'softlayer.com'}]}
+        :param int quantity: The number of resources to order
+
+        """
+        order = self.generate_order(package_keyname, location, item_keynames,
+                                    complex_type=complex_type, hourly=hourly,
+                                    preset_keyname=preset_keyname,
+                                    extras=extras, quantity=quantity)
+        return self.order_svc.verifyOrder(order)
+
+    def place_order(self, package_keyname, location, item_keynames, complex_type=None,
+                    hourly=True, preset_keyname=None, extras=None, quantity=1):
+        """Places an order with the given package and prices.
+
+        This function takes in parameters needed for an order and places the order.
+
+        :param str package_keyname: The keyname for the package being ordered
+        :param str location: The datacenter location string for ordering (Ex: DALLAS13)
+        :param list item_keynames: The list of item keyname strings to order. To see list of
+                                   possible keynames for a package, use list_items()
+                                   (or `slcli order item-list`)
+        :param str complex_type: The complex type to send with the order. Typically begins
+                                 with 'SoftLayer_Container_Product_Order_'.
+        :param bool hourly: If true, uses hourly billing, otherwise uses monthly billing
+        :param string preset_keyname: If needed, specifies a preset to use for that package.
+                                      To see a list of possible keynames for a package, use
+                                      list_preset() (or `slcli order preset-list`)
+        :param dict extras: The extra data for the order in dictionary format.
+                            Example: A VSI order requires hostname and domain to be set, so
+                            extras will look like the following:
+                                {'virtualGuests': [{'hostname': 'test',
+                                                    'domain': 'softlayer.com'}]}
+        :param int quantity: The number of resources to order
+
+        """
+        order = self.generate_order(package_keyname, location, item_keynames,
+                                    complex_type=complex_type, hourly=hourly,
+                                    preset_keyname=preset_keyname,
+                                    extras=extras, quantity=quantity)
+        return self.order_svc.placeOrder(order)
+
+    def generate_order(self, package_keyname, location, item_keynames, complex_type=None,
+                       hourly=True, preset_keyname=None, extras=None, quantity=1):
+        """Generates an order with the given package and prices.
+
+        This function takes in parameters needed for an order and generates an order
+        dictionary. This dictionary can then be used in either verify or placeOrder().
+
+        :param str package_keyname: The keyname for the package being ordered
+        :param str location: The datacenter location string for ordering (Ex: DALLAS13)
+        :param list item_keynames: The list of item keyname strings to order. To see list of
+                                   possible keynames for a package, use list_items()
+                                   (or `slcli order item-list`)
+        :param str complex_type: The complex type to send with the order. Typically begins
+                                 with 'SoftLayer_Container_Product_Order_'.
+        :param bool hourly: If true, uses hourly billing, otherwise uses monthly billing
+        :param string preset_keyname: If needed, specifies a preset to use for that package.
+                                      To see a list of possible keynames for a package, use
+                                      list_preset() (or `slcli order preset-list`)
+        :param dict extras: The extra data for the order in dictionary format.
+                            Example: A VSI order requires hostname and domain to be set, so
+                            extras will look like the following:
+                                {'virtualGuests': [{'hostname': 'test',
+                                                    'domain': 'softlayer.com'}]}
+        :param int quantity: The number of resources to order
+
+        """
+        order = {}
+        extras = extras or {}
+
+        package = self.get_package_by_key(package_keyname, mask='id')
+        if not package:
+            raise exceptions.SoftLayerError("Package {} does not exist".format(package_keyname))
+
+        # if there was extra data given for the order, add it to the order
+        # example: VSIs require hostname and domain set on the order, so
+        # extras will be {'virtualGuests': [{'hostname': 'test',
+        #                                    'domain': 'softlayer.com'}]}
+        order.update(extras)
+        order['packageId'] = package['id']
+        order['location'] = location
+        order['quantity'] = quantity
+        order['useHourlyPricing'] = hourly
+
+        if preset_keyname:
+            preset_id = self.get_preset_by_key(package_keyname, preset_keyname)['id']
+            order['presetId'] = preset_id
+
+        if not complex_type:
+            raise exceptions.SoftLayerError("A complex type must be specified with the order")
+        order['complexType'] = complex_type
+
+        price_ids = self.get_price_id_list(package_keyname, item_keynames)
+        order['prices'] = [{'id': price_id} for price_id in price_ids]
+        return order
