@@ -19,7 +19,6 @@ XML-RPC API <http://developer.softlayer.com/reference/softlayerapi>`_.
 A command-line interface is also included and can be used to manage various
 SoftLayer products and services.
 
-Development on this library is done as a best-effort delivery, and some features of the SoftLayer API may not be available through the client.
 
 Documentation
 -------------
