@@ -1,6 +1,6 @@
 """
     SoftLayer.dedicatedhost
-    ~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~
     DH Manager/helpers
 
     :license: MIT, see License for more details.
@@ -23,21 +23,10 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
 
         See product information here https://www.ibm.com/cloud/dedicated
 
-        Example::
-            # Initialize the DedicatedHostManager.
-            # env variables. These can also be specified in ~/.softlayer,
-            # or passed directly to SoftLayer.Client()
-            # SL_USERNAME = YOUR_USERNAME
-            # SL_API_KEY = YOUR_API_KEY
-            import SoftLayer
-            client = SoftLayer.Client()
-            mgr = SoftLayer.DedicatedHostManager(client)
 
     :param SoftLayer.API.BaseClient client: the client instance
-    :param SoftLayer.managers.OrderingManager ordering_manager: an optional
-                                              manager to handle ordering.
-                                              If none is provided, one will be
-                                              auto initialized.
+    :param SoftLayer.managers.OrderingManager ordering_manager: an optional manager to handle ordering.
+                                              If none is provided, one will be auto initialized.
     """
 
     def __init__(self, client, ordering_manager=None):
@@ -52,8 +41,6 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                        disk=None, datacenter=None, **kwargs):
         """Retrieve a list of all dedicated hosts on the account
 
-        Example::
-
         :param list tags: filter based on list of tags
         :param integer cpus: filter based on number of CPUS
         :param integer memory: filter based on amount of memory
@@ -61,10 +48,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         :param string disk: filter based on disk
         :param string datacenter: filter based on datacenter
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
-        :returns: Returns a list of dictionaries representing the matching
-                  dedicated host.
-
-
+        :returns: Returns a list of dictionaries representing the matching dedicated host.
 
         """
         if 'mask' not in kwargs:
@@ -113,8 +97,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         """Get details about a dedicated host.
 
         :param integer : the host ID
-        :returns: A dictionary containing a large amount of information about
-                  the specified instance.
+        :returns: A dictionary containing host information.
 
         Example::
 

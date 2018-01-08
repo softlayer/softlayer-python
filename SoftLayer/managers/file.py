@@ -357,21 +357,16 @@ class FileStorageManager(utils.IdentifierMixin, object):
         return self.client.call('Network_Storage', 'createSnapshot',
                                 notes, id=volume_id, **kwargs)
 
-    def enable_snapshots(self, volume_id, schedule_type, retention_count,
-                         minute, hour, day_of_week, **kwargs):
+    def enable_snapshots(self, volume_id, schedule_type, retention_count, minute, hour, day_of_week, **kwargs):
         """Enables snapshots for a specific file volume at a given schedule
 
         :param integer volume_id: The id of the volume
         :param string schedule_type: 'HOURLY'|'DAILY'|'WEEKLY'
-        :param integer retention_count: The number of snapshots to attempt to
-        retain in this schedule
-        :param integer minute: The minute of the hour at which HOURLY, DAILY,
-        and WEEKLY snapshots should be taken
-        :param integer hour: The hour of the day at which DAILY and WEEKLY
-        snapshots should be taken
-        :param string|integer day_of_week: The day of the week on which WEEKLY
-        snapshots should be taken, either as a string ('SUNDAY') or integer
-        ('0' is Sunday)
+        :param integer retention_count: The number of snapshots to attempt to retain in this schedule
+        :param integer minute: The minute of the hour at which HOURLY, DAILY, and WEEKLY snapshots should be taken
+        :param integer hour: The hour of the day at which DAILY and WEEKLY snapshots should be taken
+        :param string|integer day_of_week: The day of the week on which WEEKLY snapshots should be taken, 
+                              either as a string ('SUNDAY') or integer ('0' is Sunday)
         :return: Returns whether successfully scheduled or not
         """
 
@@ -392,8 +387,7 @@ class FileStorageManager(utils.IdentifierMixin, object):
         :return: Returns whether successfully disabled or not
         """
 
-        return self.client.call('Network_Storage', 'disableSnapshots',
-                                schedule_type, id=volume_id)
+        return self.client.call('Network_Storage', 'disableSnapshots', schedule_type, id=volume_id)
 
     def list_volume_schedules(self, volume_id):
         """Lists schedules for a given volume
@@ -409,8 +403,7 @@ class FileStorageManager(utils.IdentifierMixin, object):
 
         return utils.lookup(volume_detail, 'schedules')
 
-    def order_snapshot_space(self, volume_id, capacity, tier,
-                             upgrade, **kwargs):
+    def order_snapshot_space(self, volume_id, capacity, tier, upgrade, **kwargs):
         """Orders snapshot space for the given file volume.
 
         :param integer volume_id: The ID of the volume
@@ -431,15 +424,12 @@ class FileStorageManager(utils.IdentifierMixin, object):
 
         return self.client.call('Product_Order', 'placeOrder', order)
 
-    def cancel_snapshot_space(self, volume_id,
-                              reason='No longer needed',
-                              immediate=False):
+    def cancel_snapshot_space(self, volume_id, reason='No longer needed', immediate=False):
         """Cancels snapshot space for a given volume.
 
         :param integer volume_id: The volume ID
         :param string reason: The reason for cancellation
-        :param boolean immediate: Cancel immediately or
-        on anniversary date
+        :param boolean immediate: Cancel immediately or on anniversary date
         """
 
         file_volume = self.get_file_volume_details(
@@ -482,15 +472,12 @@ class FileStorageManager(utils.IdentifierMixin, object):
         return self.client.call('Network_Storage', 'restoreFromSnapshot',
                                 snapshot_id, id=volume_id)
 
-    def cancel_file_volume(self, volume_id,
-                           reason='No longer needed',
-                           immediate=False):
+    def cancel_file_volume(self, volume_id, reason='No longer needed', immediate=False):
         """Cancels the given file storage volume.
 
         :param integer volume_id: The volume ID
         :param string reason: The reason for cancellation
-        :param boolean immediate: Cancel immediately or
-        on anniversary date
+        :param boolean immediate: Cancel immediately or on anniversary date
         """
         file_volume = self.get_file_volume_details(
             volume_id,

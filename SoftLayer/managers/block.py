@@ -408,8 +408,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
 
         :param integer volume_id: The volume ID
         :param string reason: The reason for cancellation
-        :param boolean immediate_flag: Cancel immediately or
-        on anniversary date
+        :param boolean immediate_flag: Cancel immediately or on anniversary date
         """
 
         block_volume = self.get_block_volume_details(
@@ -506,8 +505,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
 
         :param integer volume_id: The volume ID
         :param string reason: The reason for cancellation
-        :param boolean immediate_flag: Cancel immediately or
-        on anniversary date
+        :param boolean immediate_flag: Cancel immediately or on anniversary date
         """
         block_volume = self.get_block_volume_details(
             volume_id,
