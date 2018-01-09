@@ -1,6 +1,6 @@
 .. _cli_order:
 
-The Basics
+Ordering
 ==========
 The Order :ref:`cli` commands can be used to build an order for any product in the SoftLayer catalog.
 
@@ -75,20 +75,21 @@ order place <preset>
 ^^^^^^^^^^^^^^^^^^^^
 
 ::
-    $ slcli --really order place --preset D2620V4_64GB_2X1TB_SATA_RAID_1 \
-    BARE_METAL_SERVER  TORONTO  \
-    OS_UBUNTU_16_04_LTS_XENIAL_XERUS_64_BIT \
-    BANDWIDTH_0_GB_2  \
-    1_GBPS_PRIVATE_NETWORK_UPLINK  \
-    REBOOT_KVM_OVER_IP 1_IP_ADDRESS  \
-    UNLIMITED_SSL_VPN_USERS_1_PPTP_VPN_USER_PER_ACCOUNT \
-    --extras '{"hardware": [{"hostname" : "testOrder", "domain": "cgallo.com"}]}' \
-    --complex-type SoftLayer_Container_Product_Order_Hardware_Server
+
+    $ slcli --really order place --preset D2620V4_64GB_2X1TB_SATA_RAID_1 BARE_METAL_SERVER  TORONTO  \
+        OS_UBUNTU_16_04_LTS_XENIAL_XERUS_64_BIT \
+        BANDWIDTH_0_GB_2  \
+        1_GBPS_PRIVATE_NETWORK_UPLINK  \
+        REBOOT_KVM_OVER_IP 1_IP_ADDRESS  \
+        UNLIMITED_SSL_VPN_USERS_1_PPTP_VPN_USER_PER_ACCOUNT \
+        --extras '{"hardware": [{"hostname" : "testOrder", "domain": "cgallo.com"}]}' \
+        --complex-type SoftLayer_Container_Product_Order_Hardware_Server
 
 order place <Virtual Server>
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
+
     $ slcli order place --billing hourly CLOUD_SERVER DALLAS13 \
         GUEST_CORES_4 \
         RAM_16_GB \

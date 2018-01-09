@@ -14,6 +14,7 @@ functionality not fully documented here.
 
    cli/ipsec
    cli/vs
+   cli/ordering
 
 
 .. _config_setup:
