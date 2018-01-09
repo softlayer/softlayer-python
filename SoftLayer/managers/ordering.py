@@ -11,29 +11,14 @@ from SoftLayer import exceptions
 
 CATEGORY_MASK = '''id,
                    isRequired,
-                   itemCategory[
-                     id,
-                     name,
-                     categoryCode
-                   ]
+                   itemCategory[id, name, categoryCode]
                 '''
 
-ITEM_MASK = '''id,
-               keyName,
-               description
-            '''
+ITEM_MASK = '''id, keyName, description'''
 
-PACKAGE_MASK = '''id,
-                  name,
-                  keyName,
-                  isActive
-               '''
+PACKAGE_MASK = '''id, name, keyName, isActive'''
 
-PRESET_MASK = '''id,
-                 name,
-                 keyName,
-                 description
-              '''
+PRESET_MASK = '''id, name, keyName, description'''
 
 
 class OrderingManager(object):
@@ -102,7 +87,7 @@ class OrderingManager(object):
         If a package is active, it is eligible for ordering
         This will inspect the 'isActive' property on the provided packages
 
-        :param packages Dictionary of packages, isActive key must be present
+        :param packages: Dictionary of packages, isActive key must be present
         """
 
         active_packages = []
@@ -121,8 +106,7 @@ class OrderingManager(object):
         one returned by the API.
         If no packages are found, returns None
 
-        :param package_type string representing the package type key name
-                            we are interested in
+        :param string package_type: representing the package type key name we are interested in
         """
         packages = self.get_packages_of_type([package_type], mask)
         if len(packages) == 0:
@@ -133,9 +117,8 @@ class OrderingManager(object):
     def get_package_id_by_type(self, package_type):
         """Return the package ID of a Product Package with a given type.
 
-        :param package_type string representing the package type key name
-                            we are interested in
-        :raises ValueError when no package of the given type is found
+        :param string package_type: representing the package type key name we are interested in
+        :raises ValueError: when no package of the given type is found
         """
 
         mask = "mask[id, name, description, isActive, type[keyName]]"
@@ -148,7 +131,7 @@ class OrderingManager(object):
     def get_quotes(self):
         """Retrieve a list of quotes.
 
-        :return a list of SoftLayer_Billing_Order_Quote
+        :returns: a list of SoftLayer_Billing_Order_Quote
         """
 
         quotes = self.client['Account'].getActiveQuotes()
@@ -157,7 +140,7 @@ class OrderingManager(object):
     def get_quote_details(self, quote_id):
         """Retrieve quote details.
 
-        :param quote_id ID number of target quote
+        :param quote_id: ID number of target quote
         """
 
         quote = self.client['Billing_Order_Quote'].getObject(id=quote_id)
@@ -166,7 +149,7 @@ class OrderingManager(object):
     def get_order_container(self, quote_id):
         """Generate an order container from a quote object.
 
-        :param quote_id ID number of target quote
+        :param quote_id: ID number of target quote
         """
 
         quote = self.client['Billing_Order_Quote']
@@ -196,8 +179,7 @@ class OrderingManager(object):
             product_type = 'hardware'
 
         if len(extra) != quantity:
-            raise ValueError("You must specify extra for each server in the "
-                             "quote")
+            raise ValueError("You must specify extra for each server in the quote")
 
         container[product_type] = []
         for extra_details in extra:
@@ -236,8 +218,7 @@ class OrderingManager(object):
 
         If no packages are found, returns None
 
-        :param package_keyname string representing the package key name
-                            we are interested in.
+        :param package_keyname: string representing the package key name we are interested in.
         :param string mask: Mask to specify the properties we want to retrieve
         """
         _filter = {
@@ -394,7 +375,7 @@ class OrderingManager(object):
                                    possible keynames for a package, use list_items()
                                    (or `slcli order item-list`)
         :param str complex_type: The complex type to send with the order. Typically begins
-                                 with 'SoftLayer_Container_Product_Order_'.
+                                 with `SoftLayer_Container_Product_Order_`.
         :param bool hourly: If true, uses hourly billing, otherwise uses monthly billing
         :param string preset_keyname: If needed, specifies a preset to use for that package.
                                       To see a list of possible keynames for a package, use
@@ -402,8 +383,7 @@ class OrderingManager(object):
         :param dict extras: The extra data for the order in dictionary format.
                             Example: A VSI order requires hostname and domain to be set, so
                             extras will look like the following:
-                                {'virtualGuests': [{'hostname': 'test',
-                                                    'domain': 'softlayer.com'}]}
+                            'virtualGuests': [{'hostname': 'test', 'domain': 'softlayer.com'}]}
         :param int quantity: The number of resources to order
 
         """
@@ -425,7 +405,7 @@ class OrderingManager(object):
                                    possible keynames for a package, use list_items()
                                    (or `slcli order item-list`)
         :param str complex_type: The complex type to send with the order. Typically begins
-                                 with 'SoftLayer_Container_Product_Order_'.
+                                 with `SoftLayer_Container_Product_Order_`.
         :param bool hourly: If true, uses hourly billing, otherwise uses monthly billing
         :param string preset_keyname: If needed, specifies a preset to use for that package.
                                       To see a list of possible keynames for a package, use
@@ -433,8 +413,7 @@ class OrderingManager(object):
         :param dict extras: The extra data for the order in dictionary format.
                             Example: A VSI order requires hostname and domain to be set, so
                             extras will look like the following:
-                                {'virtualGuests': [{'hostname': 'test',
-                                                    'domain': 'softlayer.com'}]}
+                            {'virtualGuests': [{'hostname': 'test', domain': 'softlayer.com'}]}
         :param int quantity: The number of resources to order
 
         """
@@ -457,7 +436,7 @@ class OrderingManager(object):
                                    possible keynames for a package, use list_items()
                                    (or `slcli order item-list`)
         :param str complex_type: The complex type to send with the order. Typically begins
-                                 with 'SoftLayer_Container_Product_Order_'.
+                                 with `SoftLayer_Container_Product_Order_`.
         :param bool hourly: If true, uses hourly billing, otherwise uses monthly billing
         :param string preset_keyname: If needed, specifies a preset to use for that package.
                                       To see a list of possible keynames for a package, use
@@ -465,8 +444,7 @@ class OrderingManager(object):
         :param dict extras: The extra data for the order in dictionary format.
                             Example: A VSI order requires hostname and domain to be set, so
                             extras will look like the following:
-                                {'virtualGuests': [{'hostname': 'test',
-                                                    'domain': 'softlayer.com'}]}
+                            {'virtualGuests': [{'hostname': 'test', 'domain': 'softlayer.com'}]}
         :param int quantity: The number of resources to order
 
         """
