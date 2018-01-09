@@ -226,15 +226,14 @@ class NetworkManager(object):
         """
 
         create_dict = {'name': name, 'description': description}
-        return self.security_group.createObjects([create_dict])[0]
+        return self.security_group.createObject(create_dict)
 
     def delete_securitygroup(self, group_id):
         """Deletes the specified security group.
 
         :param int group_id: The ID of the security group
         """
-        delete_dict = {'id': group_id}
-        return self.security_group.deleteObjects([delete_dict])
+        return self.security_group.deleteObject(id=group_id)
 
     def detach_securitygroup_component(self, group_id, component_id):
         """Detaches a network component from a security group.
@@ -296,8 +295,7 @@ class NetworkManager(object):
             obj['description'] = description
 
         if obj:
-            obj['id'] = group_id
-            successful = self.security_group.editObjects([obj])
+            successful = self.security_group.editObject(obj, id=group_id)
 
         return successful
 

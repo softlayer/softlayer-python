@@ -84,7 +84,6 @@ getMonthlyVirtualGuests = [vs for vs in getVirtualGuests
 getHourlyVirtualGuests = [vs for vs in getVirtualGuests
                           if vs['hourlyBillingFlag']]
 
-
 getHardware = [{
     'id': 1000,
     'metricTrackingObject': {'id': 3},
@@ -267,7 +266,8 @@ getObject = {
             "statusId": 4,
             "accountId": 1234
         }
-    ]
+    ],
+    'accountId': 1234
 }
 
 getRwhoisData = {
@@ -488,7 +488,6 @@ getActiveQuotes = [{
     'quoteKey': '1234test4321',
 }]
 
-
 getOrders = [{
     'id': 1234,
     'resourceType': '1 x 2.0 GHz Core',
@@ -547,4 +546,16 @@ getVirtualDedicatedRacks = [{
     'id': 1,
     'name': 'my first pool',
     'metricTrackingObjectId': 10,
+}]
+
+getDedicatedHosts = [{
+    'datacenter': {
+        'name': 'dal05'
+    },
+    'memoryCapacity': 242,
+    'name': 'khnguyendh',
+    'diskCapacity': 1200,
+    'guestCount': 1,
+    'cpuCount': 56,
+    'id': 44701
 }]

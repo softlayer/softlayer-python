@@ -111,7 +111,8 @@ class FileTests(testing.TestCase):
             'Data Center': 'dal05',
             'Type': 'ENDURANCE',
             'ID': 100,
-            '# of Active Transactions': '0',
+            '# of Active Transactions': '1',
+            'Ongoing Transaction': 'This is a buffer time in which the customer may cancel the server',
             'Replicant Count': '1',
             'Replication Status': 'Replicant Volume Provisioning '
                                   'has completed.',
@@ -126,11 +127,13 @@ class FileTests(testing.TestCase):
                 {'Replicant ID': 'Data Center', '1785': 'dal01'},
                 {'Replicant ID': 'Schedule', '1785': 'REPLICATION_DAILY'},
             ]],
-            'Duplicate Volume Properties': [
-                {'Original Volume Name': 'Original Volume Size',
-                 'test-origin-volume-name': '20'},
-                {'Original Volume Name': 'Original Snapshot Name',
-                 'test-origin-volume-name': 'test-origin-snapshot-name'}
+            'Original Volume Properties': [
+                {'Property': 'Original Volume Size',
+                 'Value': '20'},
+                {'Property': 'Original Volume Name',
+                 'Value': 'test-original-volume-name'},
+                {'Property': 'Original Snapshot Name',
+                 'Value': 'test-original-snapshot-name'}
             ]
         }, json.loads(result.output))
 
@@ -229,6 +232,44 @@ class FileTests(testing.TestCase):
                          'Order could not be placed! Please verify '
                          'your options and try again.\n')
 
+    def test_volume_order_hourly_billing_not_available(self):
+        result = self.run_command(['file', 'volume-order',
+                                   '--storage-type=endurance', '--size=20',
+                                   '--tier=0.25', '--location=dal10',
+                                   '--billing=hourly',
+                                   '--service-offering=enterprise'])
+
+        self.assertEqual(2, result.exit_code)
+
+    @mock.patch('SoftLayer.FileStorageManager.order_file_volume')
+    def test_volume_order_hourly_billing(self, order_mock):
+        order_mock.return_value = {
+            'placedOrder': {
+                'id': 479,
+                'items': [
+                    {'description': 'Storage as a Service'},
+                    {'description': 'File Storage'},
+                    {'description': '20 GB Storage Space'},
+                    {'description': '0.25 IOPS per GB'},
+                    {'description': '10 GB Storage Space (Snapshot Space)'}]
+            }
+        }
+
+        result = self.run_command(['file', 'volume-order',
+                                   '--storage-type=endurance', '--size=20',
+                                   '--tier=0.25', '--location=dal05',
+                                   '--service-offering=storage_as_a_service',
+                                   '--billing=hourly', '--snapshot-size=10'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.output,
+                         'Order #479 placed successfully!\n'
+                         ' > Storage as a Service\n'
+                         ' > File Storage\n'
+                         ' > 20 GB Storage Space\n'
+                         ' > 0.25 IOPS per GB\n'
+                         ' > 10 GB Storage Space (Snapshot Space)\n')
+
     @mock.patch('SoftLayer.FileStorageManager.order_file_volume')
     def test_volume_order_performance_manager_error(self, order_mock):
         order_mock.side_effect = ValueError('failure!')
@@ -262,6 +303,43 @@ class FileTests(testing.TestCase):
         result = self.run_command(['file', 'snapshot-disable', '12345678',
                                    '--schedule-type=HOURLY'])
         self.assert_no_fail(result)
+
+    def test_list_volume_schedules(self):
+        result = self.run_command([
+            'file', 'snapshot-schedule-list', '12345678'])
+        self.assert_no_fail(result)
+        self.assertEqual([
+            {
+                "week": None,
+                "maximum_snapshots": None,
+                "hour": None,
+                "day_of_week": None,
+                "day": None,
+                "replication": None,
+                "date_of_month": None,
+                "month_of_year": None,
+                "active": "",
+                "date_created": "",
+                "type": "WEEKLY",
+                "id": 978,
+                "minute": '30'
+            },
+            {
+                "week": None,
+                "maximum_snapshots": None,
+                "hour": None,
+                "day_of_week": None,
+                "day": None,
+                "replication": '*',
+                "date_of_month": None,
+                "month_of_year": None,
+                "active": "",
+                "date_created": "",
+                "type": "INTERVAL",
+                "id": 988,
+                "minute": '*'
+            }
+        ], json.loads(result.output))
 
     def test_create_snapshot(self):
         result = self.run_command(['file', 'snapshot-create', '12345678'])
@@ -514,3 +592,59 @@ class FileTests(testing.TestCase):
         self.assertEqual(result.output,
                          'Order #24602 placed successfully!\n'
                          ' > Storage as a Service\n')
+
+    @mock.patch('SoftLayer.FileStorageManager.order_duplicate_volume')
+    def test_duplicate_order_hourly_billing(self, order_mock):
+        order_mock.return_value = {
+            'placedOrder': {
+                'id': 24602,
+                'items': [{'description': 'Storage as a Service'}]
+            }
+        }
+
+        result = self.run_command(['file', 'volume-duplicate', '100',
+                                   '--origin-snapshot-id=470',
+                                   '--duplicate-size=250',
+                                   '--duplicate-tier=2', '--billing=hourly',
+                                   '--duplicate-snapshot-size=20'])
+
+        order_mock.assert_called_with('100', origin_snapshot_id=470,
+                                      duplicate_size=250, duplicate_iops=None,
+                                      duplicate_tier_level=2,
+                                      duplicate_snapshot_size=20,
+                                      hourly_billing_flag=True)
+        self.assert_no_fail(result)
+        self.assertEqual(result.output,
+                         'Order #24602 placed successfully!\n'
+                         ' > Storage as a Service\n')
+
+    @mock.patch('SoftLayer.FileStorageManager.order_modified_volume')
+    def test_modify_order_exception_caught(self, order_mock):
+        order_mock.side_effect = ValueError('order attempt failed, noooo!')
+
+        result = self.run_command(['file', 'volume-modify', '102', '--new-size=1000'])
+
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual('Argument Error: order attempt failed, noooo!', result.exception.message)
+
+    @mock.patch('SoftLayer.FileStorageManager.order_modified_volume')
+    def test_modify_order_order_not_placed(self, order_mock):
+        order_mock.return_value = {}
+
+        result = self.run_command(['file', 'volume-modify', '102', '--new-iops=1400'])
+
+        self.assert_no_fail(result)
+        self.assertEqual('Order could not be placed! Please verify your options and try again.\n', result.output)
+
+    @mock.patch('SoftLayer.FileStorageManager.order_modified_volume')
+    def test_modify_order(self, order_mock):
+        order_mock.return_value = {'placedOrder': {'id': 24602, 'items': [{'description': 'Storage as a Service'},
+                                                                          {'description': '1000 GBs'},
+                                                                          {'description': '4 IOPS per GB'}]}}
+
+        result = self.run_command(['file', 'volume-modify', '102', '--new-size=1000', '--new-tier=4'])
+
+        order_mock.assert_called_with('102', new_size=1000, new_iops=None, new_tier_level=4)
+        self.assert_no_fail(result)
+        self.assertEqual('Order #24602 placed successfully!\n > Storage as a Service\n > 1000 GBs\n > 4 IOPS per GB\n',
+                         result.output)

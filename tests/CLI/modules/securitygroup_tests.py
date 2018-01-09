@@ -60,9 +60,9 @@ class SecurityGroupTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Network_SecurityGroup',
-                                'createObjects',
-                                args=([{'name': 'secgroup1',
-                                       'description': 'Securitygroup1'}],))
+                                'createObject',
+                                args=({'name': 'secgroup1',
+                                       'description': 'Securitygroup1'},))
         self.assertEqual({'id': 100,
                           'name': 'secgroup1',
                           'description': 'Securitygroup1',
@@ -74,12 +74,13 @@ class SecurityGroupTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Network_SecurityGroup',
-                                'editObjects',
-                                args=([{'id': '104', 'name': 'foo'}],))
+                                'editObject',
+                                identifier='104',
+                                args=({'name': 'foo'},))
 
     def test_securitygroup_edit_fail(self):
         fixture = self.set_mock('SoftLayer_Network_SecurityGroup',
-                                'editObjects')
+                                'editObject')
         fixture.return_value = False
 
         result = self.run_command(['sg', 'edit', '100',
@@ -92,12 +93,12 @@ class SecurityGroupTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Network_SecurityGroup',
-                                'deleteObjects',
-                                args=([{'id': '104'}],))
+                                'deleteObject',
+                                identifier='104')
 
     def test_securitygroup_delete_fail(self):
         fixture = self.set_mock('SoftLayer_Network_SecurityGroup',
-                                'deleteObjects')
+                                'deleteObject')
         fixture.return_value = False
 
         result = self.run_command(['sg', 'delete', '100'])

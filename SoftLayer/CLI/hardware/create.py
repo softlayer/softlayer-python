@@ -49,7 +49,7 @@ from SoftLayer.CLI import template
 @helpers.multi_option('--extra', '-e', help="Extra options")
 @click.option('--test',
               is_flag=True,
-              help="Do not actually create the virtual server")
+              help="Do not actually create the server")
 @click.option('--template', '-t',
               is_eager=True,
               callback=template.TemplateCallback(list_args=['key']),

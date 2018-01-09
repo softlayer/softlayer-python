@@ -6,7 +6,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
-# pylint: disable=E0202, consider-merging-isinstance, arguments-differ
+# pylint: disable=E0202, consider-merging-isinstance, arguments-differ, keyword-arg-before-vararg
 import collections
 import json
 import os

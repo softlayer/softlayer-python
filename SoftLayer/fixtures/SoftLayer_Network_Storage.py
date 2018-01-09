@@ -10,6 +10,7 @@ STAAS_TEST_VOLUME = {
         }],
         'cancellationDate': '',
         'categoryCode': 'storage_as_a_service',
+        'hourlyFlag': None,
         'id': 454,
         'location': {'id': 449500}
     },
@@ -38,8 +39,10 @@ STAAS_TEST_VOLUME = {
 
 getObject = {
     'accountId': 1234,
-    'activeTransactionCount': 0,
-    'activeTransactions': None,
+    'activeTransactionCount': 1,
+    'activeTransactions': [{
+        'transactionStatus': {'friendlyName': 'This is a buffer time in which the customer may cancel the server'}
+    }],
     'allowedHardware': [{
         'allowedHost': {
             'credential': {'username': 'joe', 'password': '12345'},
@@ -103,8 +106,8 @@ getObject = {
     'lunId': 2,
     'nasType': 'ISCSI',
     'notes': """{'status': 'available'}""",
-    'originalSnapshotName': 'test-origin-snapshot-name',
-    'originalVolumeName': 'test-origin-volume-name',
+    'originalSnapshotName': 'test-original-snapshot-name',
+    'originalVolumeName': 'test-original-volume-name',
     'originalVolumeSize': '20',
     'osType': {'keyName': 'LINUX'},
     'parentVolume': {'snapshotSizeBytes': 1024},
@@ -129,10 +132,22 @@ getObject = {
         'username': 'TEST_REP_2',
     }],
     'replicationStatus': 'Replicant Volume Provisioning has completed.',
-    'schedules': [{
-        'id': 978,
-        'type': {'keyname': 'SNAPSHOT_WEEKLY'},
-    }],
+    'schedules': [
+        {
+            'id': 978,
+            'type': {'keyname': 'SNAPSHOT_WEEKLY'},
+            'properties': [
+                {'type': {'keyname': 'MINUTE'}, 'value': '30'},
+            ]
+        },
+        {
+            'id': 988,
+            'type': {'keyname': 'REPLICATION_INTERVAL'},
+            'properties': [
+                {'type': {'keyname': 'MINUTE'}, 'value': '-1'},
+            ]
+        }
+    ],
     'serviceProviderId': 1,
     'serviceResource': {'datacenter': {'id': 449500, 'name': 'dal05'}},
     'serviceResourceBackendIpAddress': '10.1.2.3',
@@ -185,6 +200,18 @@ getValidReplicationTargetDatacenterLocations = [{
     'name': 'dal05'
 }]
 
+listVolumeSchedules = [
+    {
+        'id': 978,
+        'type': {'keyname': 'SNAPSHOT_WEEKLY'},
+        'properties': [{'type': {'keyname': 'MINUTE'}, 'value': '30'}]
+    },
+    {
+        'id': 988,
+        'type': {'keyname': 'REPLICATION_INTERVAL'},
+        'properties': [{'type': {'keyname': 'MINUTE'}, 'value': '-1'}]
+    }
+]
 
 deleteObject = True
 allowAccessFromHostList = True

@@ -31,6 +31,12 @@ ALL_ROUTES = [
     ('virtual:upgrade', 'SoftLayer.CLI.virt.upgrade:cli'),
     ('virtual:credentials', 'SoftLayer.CLI.virt.credentials:cli'),
 
+    ('dedicatedhost', 'SoftLayer.CLI.dedicatedhost'),
+    ('dedicatedhost:list', 'SoftLayer.CLI.dedicatedhost.list:cli'),
+    ('dedicatedhost:create', 'SoftLayer.CLI.dedicatedhost.create:cli'),
+    ('dedicatedhost:create-options', 'SoftLayer.CLI.dedicatedhost.create_options:cli'),
+    ('dedicatedhost:detail', 'SoftLayer.CLI.dedicatedhost.detail:cli'),
+
     ('cdn', 'SoftLayer.CLI.cdn'),
     ('cdn:detail', 'SoftLayer.CLI.cdn.detail:cli'),
     ('cdn:list', 'SoftLayer.CLI.cdn.list:cli'),
@@ -72,6 +78,8 @@ ALL_ROUTES = [
     ('block:snapshot-delete', 'SoftLayer.CLI.block.snapshot.delete:cli'),
     ('block:snapshot-disable', 'SoftLayer.CLI.block.snapshot.disable:cli'),
     ('block:snapshot-enable', 'SoftLayer.CLI.block.snapshot.enable:cli'),
+    ('block:snapshot-schedule-list',
+     'SoftLayer.CLI.block.snapshot.schedule_list:cli'),
     ('block:snapshot-list', 'SoftLayer.CLI.block.snapshot.list:cli'),
     ('block:snapshot-order', 'SoftLayer.CLI.block.snapshot.order:cli'),
     ('block:snapshot-restore', 'SoftLayer.CLI.block.snapshot.restore:cli'),
@@ -80,6 +88,7 @@ ALL_ROUTES = [
     ('block:volume-detail', 'SoftLayer.CLI.block.detail:cli'),
     ('block:volume-duplicate', 'SoftLayer.CLI.block.duplicate:cli'),
     ('block:volume-list', 'SoftLayer.CLI.block.list:cli'),
+    ('block:volume-modify', 'SoftLayer.CLI.block.modify:cli'),
     ('block:volume-order', 'SoftLayer.CLI.block.order:cli'),
     ('block:volume-set-lun-id', 'SoftLayer.CLI.block.lun:cli'),
 
@@ -101,6 +110,8 @@ ALL_ROUTES = [
     ('file:snapshot-delete', 'SoftLayer.CLI.file.snapshot.delete:cli'),
     ('file:snapshot-disable', 'SoftLayer.CLI.file.snapshot.disable:cli'),
     ('file:snapshot-enable', 'SoftLayer.CLI.file.snapshot.enable:cli'),
+    ('file:snapshot-schedule-list',
+     'SoftLayer.CLI.file.snapshot.schedule_list:cli'),
     ('file:snapshot-list', 'SoftLayer.CLI.file.snapshot.list:cli'),
     ('file:snapshot-order', 'SoftLayer.CLI.file.snapshot.order:cli'),
     ('file:snapshot-restore', 'SoftLayer.CLI.file.snapshot.restore:cli'),
@@ -109,6 +120,7 @@ ALL_ROUTES = [
     ('file:volume-detail', 'SoftLayer.CLI.file.detail:cli'),
     ('file:volume-duplicate', 'SoftLayer.CLI.file.duplicate:cli'),
     ('file:volume-list', 'SoftLayer.CLI.file.list:cli'),
+    ('file:volume-modify', 'SoftLayer.CLI.file.modify:cli'),
     ('file:volume-order', 'SoftLayer.CLI.file.order:cli'),
 
     ('firewall', 'SoftLayer.CLI.firewall'),
@@ -195,6 +207,13 @@ ALL_ROUTES = [
     ('object-storage:endpoints',
      'SoftLayer.CLI.object_storage.list_endpoints:cli'),
 
+    ('order', 'SoftLayer.CLI.order'),
+    ('order:category-list', 'SoftLayer.CLI.order.category_list:cli'),
+    ('order:item-list', 'SoftLayer.CLI.order.item_list:cli'),
+    ('order:package-list', 'SoftLayer.CLI.order.package_list:cli'),
+    ('order:place', 'SoftLayer.CLI.order.place:cli'),
+    ('order:preset-list', 'SoftLayer.CLI.order.preset_list:cli'),
+
     ('rwhois', 'SoftLayer.CLI.rwhois'),
     ('rwhois:edit', 'SoftLayer.CLI.rwhois.edit:cli'),
     ('rwhois:show', 'SoftLayer.CLI.rwhois.show:cli'),
@@ -214,6 +233,8 @@ ALL_ROUTES = [
     ('hardware:reload', 'SoftLayer.CLI.hardware.reload:cli'),
     ('hardware:credentials', 'SoftLayer.CLI.hardware.credentials:cli'),
     ('hardware:update-firmware', 'SoftLayer.CLI.hardware.update_firmware:cli'),
+    ('hardware:rescue', 'SoftLayer.CLI.hardware.power:rescue'),
+    ('hardware:ready', 'SoftLayer.CLI.hardware.ready:cli'),
 
     ('securitygroup', 'SoftLayer.CLI.securitygroup'),
     ('securitygroup:list', 'SoftLayer.CLI.securitygroup.list:cli'),
@@ -283,4 +304,5 @@ ALL_ALIASES = {
     'server': 'hardware',
     'vm': 'virtual',
     'vs': 'virtual',
+    'dh': 'dedicatedhost',
 }

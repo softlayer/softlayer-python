@@ -14,7 +14,7 @@ SoftLayer API Python Client
 
 
 This library provides a simple Python client to interact with `SoftLayer's
-XML-RPC API <http://developer.softlayer.com/reference/softlayerapi>`_.
+XML-RPC API <http://developer.softlayer.com/reference/softlayerapi>`_. 
 
 A command-line interface is also included and can be used to manage various
 SoftLayer products and services.
@@ -49,7 +49,7 @@ Or you can install from source. Download source and run:
 
 
 The most up-to-date version of this library can be found on the SoftLayer
-GitHub public repositories at http://github.com/softlayer. Please post to Stack Overflow at https://stackoverflow.com/ or open a support ticket in the customer portal if you have any questions regarding use of this library. If you use Stack Overflow please tag your posts with “SoftLayer” so our team can easily find your post. 
+GitHub public repositories at http://github.com/softlayer. For questions regarding the use of this library please post to Stack Overflow at https://stackoverflow.com/ and  your posts with “SoftLayer” so our team can easily find your post. To report a bug with this library please create an Issue on github.
 
 InsecurePlatformWarning Notice
 ------------------------------

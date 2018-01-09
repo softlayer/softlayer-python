@@ -11,6 +11,8 @@ import logging
 import time
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from SoftLayer import consts
 from SoftLayer import exceptions
@@ -36,6 +38,20 @@ REST_SPECIAL_METHODS = {
     'editObject': 'PUT',
     'editObjects': 'PUT',
 }
+
+
+def get_session(user_agent):
+    """Sets up urllib sessions"""
+
+    client = requests.Session()
+    client.headers.update({
+        'Content-Type': 'application/json',
+        'User-Agent': user_agent,
+    })
+    retry = Retry(connect=3, backoff_factor=3)
+    adapter = HTTPAdapter(max_retries=retry)
+    client.mount('https://', adapter)
+    return client
 
 
 class Request(object):
@@ -99,12 +115,7 @@ class SoftLayerListResult(list):
 
 class XmlRpcTransport(object):
     """XML-RPC transport."""
-    def __init__(self,
-                 endpoint_url=None,
-                 timeout=None,
-                 proxy=None,
-                 user_agent=None,
-                 verify=True):
+    def __init__(self, endpoint_url=None, timeout=None, proxy=None, user_agent=None, verify=True):
 
         self.endpoint_url = (endpoint_url or
                              consts.API_PUBLIC_ENDPOINT).rstrip('/')
@@ -112,6 +123,15 @@ class XmlRpcTransport(object):
         self.proxy = proxy
         self.user_agent = user_agent or consts.USER_AGENT
         self.verify = verify
+        self._client = None
+
+    @property
+    def client(self):
+        """Returns client session object"""
+
+        if self._client is None:
+            self._client = get_session(self.user_agent)
+        return self._client
 
     def __call__(self, request):
         """Makes a SoftLayer API call against the XML-RPC endpoint.
@@ -154,18 +174,18 @@ class XmlRpcTransport(object):
             verify = self.verify
 
         LOGGER.debug("=== REQUEST ===")
-        LOGGER.info('POST %s', url)
+        LOGGER.debug('POST %s', url)
         LOGGER.debug(request.transport_headers)
         LOGGER.debug(payload)
 
         try:
-            resp = requests.request('POST', url,
-                                    data=payload,
-                                    headers=request.transport_headers,
-                                    timeout=self.timeout,
-                                    verify=verify,
-                                    cert=request.cert,
-                                    proxies=_proxies_dict(self.proxy))
+            resp = self.client.request('POST', url,
+                                       data=payload,
+                                       headers=request.transport_headers,
+                                       timeout=self.timeout,
+                                       verify=verify,
+                                       cert=request.cert,
+                                       proxies=_proxies_dict(self.proxy))
             LOGGER.debug("=== RESPONSE ===")
             LOGGER.debug(resp.headers)
             LOGGER.debug(resp.content)
@@ -202,35 +222,35 @@ class XmlRpcTransport(object):
 class RestTransport(object):
     """REST transport.
 
-    Currently only supports GET requests (no POST, PUT, DELETE) and lacks
-    support for masks, filters, limits and offsets.
+    REST calls should mostly work, but is not fully tested.
+    XML-RPC should be used when in doubt
     """
 
-    def __init__(self,
-                 endpoint_url=None,
-                 timeout=None,
-                 proxy=None,
-                 user_agent=None,
-                 verify=True):
+    def __init__(self, endpoint_url=None, timeout=None, proxy=None, user_agent=None, verify=True):
 
-        self.endpoint_url = (endpoint_url or
-                             consts.API_PUBLIC_ENDPOINT_REST).rstrip('/')
+        self.endpoint_url = (endpoint_url or consts.API_PUBLIC_ENDPOINT_REST).rstrip('/')
         self.timeout = timeout or None
         self.proxy = proxy
         self.user_agent = user_agent or consts.USER_AGENT
         self.verify = verify
+        self._client = None
+
+    @property
+    def client(self):
+        """Returns client session object"""
+
+        if self._client is None:
+            self._client = get_session(self.user_agent)
+        return self._client
 
     def __call__(self, request):
         """Makes a SoftLayer API call against the REST endpoint.
 
-        This currently only works with GET requests
+        REST calls should mostly work, but is not fully tested.
+        XML-RPC should be used when in doubt
 
         :param request request: Request object
         """
-        request.transport_headers.setdefault('Content-Type',
-                                             'application/json')
-        request.transport_headers.setdefault('User-Agent', self.user_agent)
-
         params = request.headers.copy()
         if request.mask:
             params['objectMask'] = _format_object_mask(request.mask)
@@ -252,9 +272,8 @@ class RestTransport(object):
             )
 
         method = REST_SPECIAL_METHODS.get(request.method)
-        is_special_method = True
+
         if method is None:
-            is_special_method = False
             method = 'GET'
 
         body = {}
@@ -272,9 +291,7 @@ class RestTransport(object):
         if request.identifier is not None:
             url_parts.append(str(request.identifier))
 
-        # Special methods (createObject, editObject, etc) use the HTTP verb
-        # to determine the action on the resource
-        if request.method is not None and not is_special_method:
+        if request.method is not None:
             url_parts.append(request.method)
 
         url = '%s.%s' % ('/'.join(url_parts), 'json')
@@ -285,19 +302,19 @@ class RestTransport(object):
             verify = self.verify
 
         LOGGER.debug("=== REQUEST ===")
-        LOGGER.info(url)
+        LOGGER.debug(url)
         LOGGER.debug(request.transport_headers)
         LOGGER.debug(raw_body)
         try:
-            resp = requests.request(method, url,
-                                    auth=auth,
-                                    headers=request.transport_headers,
-                                    params=params,
-                                    data=raw_body,
-                                    timeout=self.timeout,
-                                    verify=verify,
-                                    cert=request.cert,
-                                    proxies=_proxies_dict(self.proxy))
+            resp = self.client.request(method, url,
+                                       auth=auth,
+                                       headers=request.transport_headers,
+                                       params=params,
+                                       data=raw_body,
+                                       timeout=self.timeout,
+                                       verify=verify,
+                                       cert=request.cert,
+                                       proxies=_proxies_dict(self.proxy))
             LOGGER.debug("=== RESPONSE ===")
             LOGGER.debug(resp.headers)
             LOGGER.debug(resp.text)
@@ -353,13 +370,11 @@ class FixtureTransport(object):
             module_path = 'SoftLayer.fixtures.%s' % call.service
             module = importlib.import_module(module_path)
         except ImportError:
-            raise NotImplementedError('%s fixture is not implemented'
-                                      % call.service)
+            raise NotImplementedError('%s fixture is not implemented' % call.service)
         try:
             return getattr(module, call.method)
         except AttributeError:
-            raise NotImplementedError('%s::%s fixture is not implemented'
-                                      % (call.service, call.method))
+            raise NotImplementedError('%s::%s fixture is not implemented' % (call.service, call.method))
 
 
 def _proxies_dict(proxy):

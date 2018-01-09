@@ -37,6 +37,10 @@ createObjects = [{'id': 100,
                   'name': 'secgroup1',
                   'description': 'Securitygroup1',
                   'createDate': '2017-05-05T12:44:43-06:00'}]
+createObject = {'id': 100,
+                'name': 'secgroup1',
+                'description': 'Securitygroup1',
+                'createDate': '2017-05-05T12:44:43-06:00'}
 editObjects = True
 deleteObjects = True
 addRules = {"requestId": "addRules",

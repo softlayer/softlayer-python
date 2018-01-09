@@ -106,15 +106,14 @@ def get_user_input(env):
     endpoint_type = env.input(
         'Endpoint (public|private|custom)', default='public')
     endpoint_type = endpoint_type.lower()
-    if endpoint_type is None:
-        endpoint_url = SoftLayer.API_PUBLIC_ENDPOINT
-    if endpoint_type == 'public':
-        endpoint_url = SoftLayer.API_PUBLIC_ENDPOINT
-    elif endpoint_type == 'private':
-        endpoint_url = SoftLayer.API_PRIVATE_ENDPOINT
-    elif endpoint_type == 'custom':
+
+    if endpoint_type == 'custom':
         endpoint_url = env.input('Endpoint URL',
                                  default=defaults['endpoint_url'])
+    elif endpoint_type == 'private':
+        endpoint_url = SoftLayer.API_PRIVATE_ENDPOINT
+    else:
+        endpoint_url = SoftLayer.API_PUBLIC_ENDPOINT
 
     # Ask for timeout
     timeout = env.input('Timeout', default=defaults['timeout'] or 0)

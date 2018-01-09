@@ -1,7 +1,52 @@
 # Change Log
 
+## [5.3.2] - 2017-12-18
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.3.1...master
+
+ - Expanded `@retry` useage to a few areas in the hardware manager
+ - Added INTERVAL options to block and file replication
+ - Fixed pricing error on `hw detail --price`
+ - Added sub items to `hw detail --price`, removed reverse PTR entries
+
+### Added to CLI
+- slcli dedicatedhost 
+
+
+## [5.3.1] - 2017-12-07
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.3.0...v5.3.1
+ - Added support for storage volume modifications
+
+### Added to CLI
+- slcli block volume-modify
+- slcli file volume-modify
+
+## [5.3.0] - 2017-12-01
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.15...v5.3.0
+ - Added a retry decorator. currently only used in setTags for VSI creation, which should allos VSI creation to be a bit more robust.
+ - Updated unit tests to work with pytest3.3
+
+## [5.2.15] - 2017-10-30
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.14...v5.2.15
+ - Added dedicated host info to virt detail
+ - #885 - Fixed createObjects on the rest api endpoint
+ - changed securityGroups to use createObject instead of createObjects
+ - Always set the endpoint_url by defaulting to the public URL if the endpoint type cannot be determined.
+ - resource metadata update
+
+## [5.2.14] - 2017-09-13
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.13...v5.2.14
+ - Improved slcli vs create-options output
+ - Updated slcli vs create to support new virtual server public and dedicated host offerings
+
+## [5.2.13] - 2017-09-05
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.12...v5.2.13
+ - Support for hourly billing of storage
+ - Added exception handling for Managers.VSManager.wait_for_ready()
+ - Added windows support for unit testing
+ - Updated pypy version
+ 
 ## [5.2.12] - 2017-08-09
- - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.11...master
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.2.11...v5.2.12
  - Support for storage_as_a_service block and file storage
  
 #### Added to CLI

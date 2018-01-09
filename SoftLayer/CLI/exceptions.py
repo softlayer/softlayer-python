@@ -7,6 +7,7 @@
 """
 
 
+# pylint: disable=keyword-arg-before-vararg
 class CLIHalt(SystemExit):
     """Smoothly halt the execution of the command. No error."""
     def __init__(self, code=0, *args):
