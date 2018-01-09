@@ -365,7 +365,7 @@ class FileStorageManager(utils.IdentifierMixin, object):
         :param integer retention_count: The number of snapshots to attempt to retain in this schedule
         :param integer minute: The minute of the hour at which HOURLY, DAILY, and WEEKLY snapshots should be taken
         :param integer hour: The hour of the day at which DAILY and WEEKLY snapshots should be taken
-        :param string|integer day_of_week: The day of the week on which WEEKLY snapshots should be taken, 
+        :param string|integer day_of_week: The day of the week on which WEEKLY snapshots should be taken,
                               either as a string ('SUNDAY') or integer ('0' is Sunday)
         :return: Returns whether successfully scheduled or not
         """
