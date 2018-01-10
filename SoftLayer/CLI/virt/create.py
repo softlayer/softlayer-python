@@ -132,6 +132,9 @@ def _parse_create_args(client, args):
     if args.get('vlan_private'):
         data['private_vlan'] = args['vlan_private']
 
+    if args.get('vlan_private_subnet'):
+        data['private_vlan_subnet'] = args['vlan_private_subnet']
+
     if args.get('public_security_group'):
         pub_groups = args.get('public_security_group')
         data['public_security_groups'] = [group for group in pub_groups]
@@ -225,6 +228,10 @@ def _parse_create_args(client, args):
               type=click.INT)
 @click.option('--vlan-private',
               help="The ID of the private VLAN on which you want the virtual "
+                   "server placed",
+              type=click.INT)
+@click.option('--vlan-private-subnet',
+              help="The ID of the private VLAN subnet on which you want the virtual "
                    "server placed",
               type=click.INT)
 @helpers.multi_option('--public-security-group',
