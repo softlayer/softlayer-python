@@ -24,12 +24,19 @@ def cli(env, package_keyname, keyword, category):
     Package keynames can be retrieved using `slcli order package-list`
 
     \b
+    Note:
+        Items with a numbered category, like disk0 or gpu0, need to be included 
+        multiple times in an order to match how many of the item you want to order.
+
+    \b
     Example:
         # List all items in the VSI package
         slcli order item-list CLOUD_SERVER
 
     The --keyword option is used to filter items by name.
+
     The --category option is used to filter items by category.
+    
     Both --keyword and --category can be used together.
 
     \b
