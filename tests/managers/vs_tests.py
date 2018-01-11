@@ -700,12 +700,6 @@ class VSTests(testing.TestCase):
         self.vs._get_package_items()
         self.assert_called_with('SoftLayer_Product_Package', 'getItems')
 
-    def test_get_package_items_errors(self):
-        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        mock.return_value = []
-
-        self.assertRaises(ValueError, self.vs._get_package_items)
-
     def test_get_price_id_for_upgrade(self):
         package_items = self.vs._get_package_items()
 
@@ -767,15 +761,16 @@ class VSWaitReadyGoTests(testing.TestCase):
         value = self.vs.wait_for_ready(1, 1)
         self.assertTrue(value)
 
-    def test_active_provision_pending(self):
+    @mock.patch('time.sleep')
+    @mock.patch('time.time')
+    def test_active_provision_pending(self, _now, _sleep):
+        _now.side_effect = [0, 0, 1, 1, 2, 2]
         # active transaction and provision date
         # and pending should be false
-        self.guestObject.side_effect = [
-            {'activeTransaction': {'id': 1}},
-            {'activeTransaction': {'id': 1},
-             'provisionDate': 'aaa'},
-        ]
-        value = self.vs.wait_for_ready(1, 0, pending=True)
+        self.guestObject.return_value = {'activeTransaction': {'id': 2}, 'provisionDate': 'aaa'}
+
+        value = self.vs.wait_for_ready(instance_id=1, limit=1, delay=1, pending=True)
+        _sleep.assert_has_calls([mock.call(0)])
         self.assertFalse(value)
 
     def test_active_reload(self):
@@ -802,17 +797,16 @@ class VSWaitReadyGoTests(testing.TestCase):
         value = self.vs.wait_for_ready(1, 1)
         self.assertTrue(value)
 
-    def test_reload_pending(self):
+    @mock.patch('time.sleep')
+    @mock.patch('time.time')
+    def test_reload_pending(self, _now, _sleep):
+        _now.side_effect = [0, 0, 1, 1, 2, 2]
         # reload complete, pending maintance transactions
-        self.guestObject.side_effect = [
-            {'activeTransaction': {'id': 1}},
-            {
-                'activeTransaction': {'id': 2},
-                'provisionDate': 'aaa',
-                'lastOperatingSystemReload': {'id': 1},
-            },
-        ]
-        value = self.vs.wait_for_ready(1, 0, pending=True)
+        self.guestObject.return_value = {'activeTransaction': {'id': 2},
+                                         'provisionDate': 'aaa',
+                                         'lastOperatingSystemReload': {'id': 1}}
+        value = self.vs.wait_for_ready(instance_id=1, limit=1, delay=1, pending=True)
+        _sleep.assert_has_calls([mock.call(0)])
         self.assertFalse(value)
 
     @mock.patch('time.sleep')

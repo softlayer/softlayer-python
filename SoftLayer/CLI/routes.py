@@ -209,6 +209,7 @@ ALL_ROUTES = [
     ('order:package-list', 'SoftLayer.CLI.order.package_list:cli'),
     ('order:place', 'SoftLayer.CLI.order.place:cli'),
     ('order:preset-list', 'SoftLayer.CLI.order.preset_list:cli'),
+    ('order:package-locations', 'SoftLayer.CLI.order.package_locations:cli'),
 
     ('rwhois', 'SoftLayer.CLI.rwhois'),
     ('rwhois:edit', 'SoftLayer.CLI.rwhois.edit:cli'),

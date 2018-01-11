@@ -138,9 +138,8 @@ class HardwareTests(testing.TestCase):
         packages = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         packages.return_value = []
 
-        ex = self.assertRaises(SoftLayer.SoftLayerError,
-                               self.hardware.get_create_options)
-        self.assertEqual("Ordering package not found", str(ex))
+        ex = self.assertRaises(SoftLayer.SoftLayerError, self.hardware.get_create_options)
+        self.assertEqual("Package BARE_METAL_SERVER does not exist", str(ex))
 
     def test_generate_create_dict_no_items(self):
         packages = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')

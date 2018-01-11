@@ -10,10 +10,8 @@ from SoftLayer import testing
 
 class OrderTests(testing.TestCase):
     def test_category_list(self):
-        cat1 = {'itemCategory': {'name': 'cat1', 'categoryCode': 'code1'},
-                'isRequired': 1}
-        cat2 = {'itemCategory': {'name': 'cat2', 'categoryCode': 'code2'},
-                'isRequired': 0}
+        cat1 = {'itemCategory': {'name': 'cat1', 'categoryCode': 'code1'}, 'isRequired': 1}
+        cat2 = {'itemCategory': {'name': 'cat2', 'categoryCode': 'code2'}, 'isRequired': 0}
         p_mock = self.set_mock('SoftLayer_Product_Package', 'getConfiguration')
         p_mock.return_value = [cat1, cat2]
 
@@ -30,8 +28,9 @@ class OrderTests(testing.TestCase):
                          json.loads(result.output))
 
     def test_item_list(self):
-        item1 = {'keyName': 'item1', 'description': 'description1'}
-        item2 = {'keyName': 'item2', 'description': 'description2'}
+        category = {'categoryCode': 'testing'}
+        item1 = {'keyName': 'item1', 'description': 'description1', 'itemCategory': category}
+        item2 = {'keyName': 'item2', 'description': 'description2', 'itemCategory': category}
         p_mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
         p_mock.return_value = [item1, item2]
 
@@ -39,17 +38,17 @@ class OrderTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Package', 'getItems')
-        self.assertEqual([{'keyName': 'item1',
-                           'description': 'description1'},
-                          {'keyName': 'item2',
-                           'description': 'description2'}],
-                         json.loads(result.output))
+        expected_results = [{'category': 'testing',
+                             'keyName': 'item1',
+                             'description': 'description1'},
+                            {'category': 'testing',
+                             'keyName': 'item2',
+                             'description': 'description2'}]
+        self.assertEqual(expected_results, json.loads(result.output))
 
     def test_package_list(self):
-        item1 = {'name': 'package1', 'keyName': 'PACKAGE1',
-                 'isActive': 1}
-        item2 = {'name': 'package2', 'keyName': 'PACKAGE2',
-                 'isActive': 1}
+        item1 = {'name': 'package1', 'keyName': 'PACKAGE1', 'isActive': 1}
+        item2 = {'name': 'package2', 'keyName': 'PACKAGE2', 'isActive': 1}
         p_mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         p_mock.return_value = [item1, item2]
 
@@ -57,16 +56,13 @@ class OrderTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects')
-        self.assertEqual([{'name': 'package1',
-                           'keyName': 'PACKAGE1'},
-                          {'name': 'package2',
-                           'keyName': 'PACKAGE2'}],
-                         json.loads(result.output))
+        expected_results = [{'name': 'package1', 'keyName': 'PACKAGE1'},
+                            {'name': 'package2', 'keyName': 'PACKAGE2'}]
+        self.assertEqual(expected_results, json.loads(result.output))
 
     def test_place(self):
         order_date = '2017-04-04 07:39:20'
-        order = {'orderId': 1234, 'orderDate': order_date,
-                 'placedOrder': {'status': 'APPROVED'}}
+        order = {'orderId': 1234, 'orderDate': order_date, 'placedOrder': {'status': 'APPROVED'}}
         verify_mock = self.set_mock('SoftLayer_Product_Order', 'verifyOrder')
         place_mock = self.set_mock('SoftLayer_Product_Order', 'placeOrder')
         items_mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
@@ -168,6 +164,16 @@ class OrderTests(testing.TestCase):
                            'keyName': 'PRESET3',
                            'description': 'description3'}],
                          json.loads(result.output))
+
+    def test_location_list(self):
+        result = self.run_command(['order', 'package-locations', 'package'])
+        self.assert_no_fail(result)
+        expected_results = [
+            {'id': 2017603, 'dc': 'wdc07', 'description': 'WDC07 - Washington, DC', 'keyName': 'WASHINGTON07'}
+        ]
+        print("FUCK")
+        print(result.output)
+        self.assertEqual(expected_results, json.loads(result.output))
 
     def _get_order_items(self):
         item1 = {'keyName': 'ITEM1', 'description': 'description1',

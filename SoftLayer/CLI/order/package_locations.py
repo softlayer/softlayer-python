@@ -22,10 +22,10 @@ def cli(env, package_keyname):
 
     locations = manager.package_locations(package_keyname)
     for region in locations:
-        for dc in region['locations']:
+        for datacenter in region['locations']:
             table.add_row([
-                dc['location']['id'],
-                dc['location']['name'],
+                datacenter['location']['id'],
+                datacenter['location']['name'],
                 region['description'],
                 region['keyname']
             ])

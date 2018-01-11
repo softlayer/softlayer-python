@@ -14,7 +14,7 @@ CATEGORY_MASK = '''id,
                    itemCategory[id, name, categoryCode]
                 '''
 
-ITEM_MASK = '''id, keyName, description'''
+ITEM_MASK = '''id, keyName, description, itemCategory, categories'''
 
 PACKAGE_MASK = '''id, name, keyName, isActive'''
 
@@ -196,8 +196,7 @@ class OrderingManager(object):
         :param int quantity: Quantity to override default
         """
 
-        container = self.generate_order_template(quote_id, extra,
-                                                 quantity=quantity)
+        container = self.generate_order_template(quote_id, extra, quantity=quantity)
         return self.order_svc.verifyOrder(container)
 
     def order_quote(self, quote_id, extra, quantity=1):
@@ -209,8 +208,7 @@ class OrderingManager(object):
         :param int quantity: Quantity to override default
         """
 
-        container = self.generate_order_template(quote_id, extra,
-                                                 quantity=quantity)
+        container = self.generate_order_template(quote_id, extra, quantity=quantity)
         return self.order_svc.placeOrder(container)
 
     def get_package_by_key(self, package_keyname, mask=None):
@@ -221,17 +219,13 @@ class OrderingManager(object):
         :param package_keyname: string representing the package key name we are interested in.
         :param string mask: Mask to specify the properties we want to retrieve
         """
-        _filter = {
-            'keyName': {
-                'operation': package_keyname,
-            },
-        }
+        _filter = {'keyName': {'operation': package_keyname}}
 
         packages = self.package_svc.getAllObjects(mask=mask, filter=_filter)
         if len(packages) == 0:
-            return None
-        else:
-            return packages.pop()
+            raise exceptions.SoftLayerError("Package {} does not exist".format(package_keyname))
+
+        return packages.pop()
 
     def list_categories(self, package_keyname, **kwargs):
         """List the categories for the given package.
@@ -246,9 +240,6 @@ class OrderingManager(object):
             get_kwargs['filter'] = kwargs['filter']
 
         package = self.get_package_by_key(package_keyname, mask='id')
-        if not package:
-            raise exceptions.SoftLayerError("Package {} does not exist".format(package_keyname))
-
         categories = self.package_svc.getConfiguration(id=package['id'], **get_kwargs)
         return categories
 
@@ -266,9 +257,6 @@ class OrderingManager(object):
             get_kwargs['filter'] = kwargs['filter']
 
         package = self.get_package_by_key(package_keyname, mask='id')
-        if not package:
-            raise exceptions.SoftLayerError("Package {} does not exist".format(package_keyname))
-
         items = self.package_svc.getItems(id=package['id'], **get_kwargs)
         return items
 
@@ -302,11 +290,7 @@ class OrderingManager(object):
             get_kwargs['filter'] = kwargs['filter']
 
         package = self.get_package_by_key(package_keyname, mask='id')
-        if not package:
-            raise exceptions.SoftLayerError("Package {} does not exist".format(package_keyname))
-
-        acc_presets = self.package_svc.getAccountRestrictedActivePresets(
-            id=package['id'], **get_kwargs)
+        acc_presets = self.package_svc.getAccountRestrictedActivePresets(id=package['id'], **get_kwargs)
         active_presets = self.package_svc.getActivePresets(id=package['id'], **get_kwargs)
         return active_presets + acc_presets
 
@@ -452,8 +436,6 @@ class OrderingManager(object):
         extras = extras or {}
 
         package = self.get_package_by_key(package_keyname, mask='id')
-        if not package:
-            raise exceptions.SoftLayerError("Package {} does not exist".format(package_keyname))
 
         # if there was extra data given for the order, add it to the order
         # example: VSIs require hostname and domain set on the order, so
@@ -476,3 +458,16 @@ class OrderingManager(object):
         price_ids = self.get_price_id_list(package_keyname, item_keynames)
         order['prices'] = [{'id': price_id} for price_id in price_ids]
         return order
+
+    def package_locations(self, package_keyname):
+        """List datacenter locations for a package keyname
+
+        :param str package_keyname: The package for which to get the items.
+        :returns: List of locations a package is orderable in
+        """
+        mask = "mask[description, keyname, locations]"
+
+        package = self.get_package_by_key(package_keyname, mask='id')
+
+        regions = self.package_svc.getRegions(id=package['id'], mask=mask)
+        return regions
