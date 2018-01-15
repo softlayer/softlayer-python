@@ -11,10 +11,25 @@ import tempfile
 
 import mock
 
+from SoftLayer.CLI import exceptions
 from SoftLayer import testing
 
 
 class SshKeyTests(testing.TestCase):
+    def test_add_without_key_errors(self):
+        result = self.run_command(['sshkey', 'add', 'key1'])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.ArgumentError)
+
+    def test_add_with_key_file_and_key_argument_errors(self):
+        path = os.path.join(testing.FIXTURE_PATH, 'id_rsa.pub')
+        result = self.run_command(['sshkey', 'add', 'key1',
+                                   '--key=some_key',
+                                   '--in-file=%s' % path])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.ArgumentError)
 
     def test_add_by_option(self):
         service = self.client['Security_Ssh_Key']
