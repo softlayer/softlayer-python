@@ -28,6 +28,7 @@ class SshKeyManager(utils.IdentifierMixin, object):
 
         :param string key: The SSH key to add
         :param string label: The label for the key
+        :param string notes: Additional notes for the key
         :returns: A dictionary of the new key's information.
         """
         order = {
