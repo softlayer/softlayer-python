@@ -123,6 +123,7 @@ class VirtTests(testing.TestCase):
                           'flavors (balanced local - ssd)': ['BL2_1X2X100'],
                           'flavors (compute)': ['C1_1X2X25'],
                           'flavors (memory)': ['M1_1X2X100'],
+                          'flavors (GPU)': ['AC1_1X2X100', 'ACL1_1X2X100'],
                           'local disk(0)': ['25', '100'],
                           'memory': [1024, 2048, 3072, 4096],
                           'memory (dedicated host)': [8192, 65536],
