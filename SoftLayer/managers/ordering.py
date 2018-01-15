@@ -16,7 +16,7 @@ CATEGORY_MASK = '''id,
 
 ITEM_MASK = '''id, keyName, description, itemCategory, categories'''
 
-PACKAGE_MASK = '''id, name, keyName, isActive'''
+PACKAGE_MASK = '''id, name, keyName, isActive, type'''
 
 PRESET_MASK = '''id, name, keyName, description'''
 
