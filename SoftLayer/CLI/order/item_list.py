@@ -25,7 +25,7 @@ def cli(env, package_keyname, keyword, category):
 
     \b
     Note:
-        Items with a numbered category, like disk0 or gpu0, need to be included
+        Items with a numbered category, like disk0 or gpu0, can be included
         multiple times in an order to match how many of the item you want to order.
 
     \b
