@@ -11,8 +11,8 @@ import tempfile
 
 import mock
 
-from SoftLayer import testing
 from SoftLayer.CLI import exceptions
+from SoftLayer import testing
 
 
 class SshKeyTests(testing.TestCase):
