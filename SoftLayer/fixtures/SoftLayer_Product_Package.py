@@ -1121,3 +1121,21 @@ getAllObjectsDH = [{
     "isActive": 1,
     "description": "Dedicated Host"
 }]
+
+getRegions = [{
+    "description": "WDC07 - Washington, DC",
+    "keyname": "WASHINGTON07",
+    "locations": [{
+        "location": {
+            "euCompliantFlag": False,
+            "id": 2017603,
+            "longName": "Washington 7",
+            "name": "wdc07",
+            "statusId": 2},
+        "locationPackageDetails": [{
+            "isAvailable": 1,
+            "locationId": 2017603,
+            "packageId": 46
+        }]
+    }]
+}]

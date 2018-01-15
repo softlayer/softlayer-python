@@ -136,10 +136,7 @@ class OrderingTests(testing.TestCase):
     def test_get_package_by_key_returns_none_if_not_found(self):
         p_mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         p_mock.return_value = []
-
-        package = self.ordering.get_package_by_key("WILLY_NILLY_SERVERS")
-
-        self.assertIsNone(package)
+        self.assertRaises(exceptions.SoftLayerError, self.ordering.get_package_by_key, 'WILLY_NILLY_SERVERS')
 
     def test_list_categories(self):
         p_mock = self.set_mock('SoftLayer_Product_Package', 'getConfiguration')
@@ -153,10 +150,6 @@ class OrderingTests(testing.TestCase):
         mock_get_pkg.assert_called_once_with('PACKAGE_KEYNAME', mask='id')
         self.assertEqual(p_mock.return_value, cats)
 
-    def test_list_categories_package_not_found(self):
-        self._assert_package_error(self.ordering.list_categories,
-                                   'PACKAGE_KEYNAME')
-
     def test_list_items(self):
         p_mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
         p_mock.return_value = ['item1', 'item2']
@@ -168,10 +161,6 @@ class OrderingTests(testing.TestCase):
 
         mock_get_pkg.assert_called_once_with('PACKAGE_KEYNAME', mask='id')
         self.assertEqual(p_mock.return_value, items)
-
-    def test_list_items_package_not_found(self):
-        self._assert_package_error(self.ordering.list_items,
-                                   'PACKAGE_KEYNAME')
 
     def test_list_packages(self):
         packages = [{'id': 1234, 'isActive': True},
@@ -199,10 +188,8 @@ class OrderingTests(testing.TestCase):
         acct_presets = ['acctPreset1', 'acctPreset2']
         active_presets = ['activePreset3', 'activePreset4']
 
-        acct_preset_mock = self.set_mock('SoftLayer_Product_Package',
-                                         'getAccountRestrictedActivePresets')
-        active_preset_mock = self.set_mock('SoftLayer_Product_Package',
-                                           'getActivePresets')
+        acct_preset_mock = self.set_mock('SoftLayer_Product_Package', 'getAccountRestrictedActivePresets')
+        active_preset_mock = self.set_mock('SoftLayer_Product_Package', 'getActivePresets')
         acct_preset_mock.return_value = acct_presets
         active_preset_mock.return_value = active_presets
 
@@ -211,10 +198,6 @@ class OrderingTests(testing.TestCase):
         # Make sure the preset list returns both active presets and
         # account restricted presets
         self.assertEqual(active_presets + acct_presets, presets)
-
-    def test_list_presets_package_not_found(self):
-        self._assert_package_error(self.ordering.list_presets,
-                                   'PACKAGE_KEYNAME')
 
     def test_get_preset_by_key(self):
         keyname = 'PRESET_KEYNAME'
@@ -225,8 +208,7 @@ class OrderingTests(testing.TestCase):
 
             preset = self.ordering.get_preset_by_key('PACKAGE_KEYNAME', keyname)
 
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', filter=preset_filter,
-                                          mask=None)
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', filter=preset_filter, mask=None)
         self.assertEqual(list_mock.return_value[0], preset)
 
     def test_get_preset_by_key_preset_not_found(self):
@@ -237,39 +219,28 @@ class OrderingTests(testing.TestCase):
             list_mock.return_value = []
 
             exc = self.assertRaises(exceptions.SoftLayerError,
-                                    self.ordering.get_preset_by_key,
-                                    'PACKAGE_KEYNAME', keyname)
+                                    self.ordering.get_preset_by_key, 'PACKAGE_KEYNAME', keyname)
 
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', filter=preset_filter,
-                                          mask=None)
-        self.assertEqual('Preset {} does not exist in package {}'.format(keyname,
-                                                                         'PACKAGE_KEYNAME'),
-                         str(exc))
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', filter=preset_filter, mask=None)
+        self.assertEqual('Preset {} does not exist in package {}'.format(keyname, 'PACKAGE_KEYNAME'), str(exc))
 
     def test_get_price_id_list(self):
         price1 = {'id': 1234, 'locationGroupId': ''}
-        item1 = {'id': 1111,
-                 'keyName': 'ITEM1',
-                 'prices': [price1]}
+        item1 = {'id': 1111, 'keyName': 'ITEM1', 'prices': [price1]}
         price2 = {'id': 5678, 'locationGroupId': ''}
-        item2 = {'id': 2222,
-                 'keyName': 'ITEM2',
-                 'prices': [price2]}
+        item2 = {'id': 2222, 'keyName': 'ITEM2', 'prices': [price2]}
 
         with mock.patch.object(self.ordering, 'list_items') as list_mock:
             list_mock.return_value = [item1, item2]
 
-            prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME',
-                                                     ['ITEM1', 'ITEM2'])
+            prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'])
 
         list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, keyName, prices')
         self.assertEqual([price1['id'], price2['id']], prices)
 
     def test_get_price_id_list_item_not_found(self):
         price1 = {'id': 1234, 'locationGroupId': ''}
-        item1 = {'id': 1111,
-                 'keyName': 'ITEM1',
-                 'prices': [price1]}
+        item1 = {'id': 1111, 'keyName': 'ITEM1', 'prices': [price1]}
 
         with mock.patch.object(self.ordering, 'list_items') as list_mock:
             list_mock.return_value = [item1]
@@ -278,23 +249,14 @@ class OrderingTests(testing.TestCase):
                                     self.ordering.get_price_id_list,
                                     'PACKAGE_KEYNAME', ['ITEM2'])
         list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, keyName, prices')
-        self.assertEqual("Item ITEM2 does not exist for package PACKAGE_KEYNAME",
-                         str(exc))
-
-    def test_generate_order_package_not_found(self):
-        self._assert_package_error(self.ordering.generate_order,
-                                   'PACKAGE_KEYNAME', 'DALLAS13',
-                                   ['item1', 'item2'])
+        self.assertEqual("Item ITEM2 does not exist for package PACKAGE_KEYNAME", str(exc))
 
     def test_generate_no_complex_type(self):
         pkg = 'PACKAGE_KEYNAME'
         items = ['ITEM1', 'ITEM2']
-        exc = self.assertRaises(exceptions.SoftLayerError,
-                                self.ordering.generate_order,
-                                pkg, 'DALLAS13', items)
+        exc = self.assertRaises(exceptions.SoftLayerError, self.ordering.generate_order, pkg, 'DALLAS13', items)
 
-        self.assertEqual("A complex type must be specified with the order",
-                         str(exc))
+        self.assertEqual("A complex type must be specified with the order", str(exc))
 
     def test_generate_order_with_preset(self):
         pkg = 'PACKAGE_KEYNAME'
@@ -311,9 +273,7 @@ class OrderingTests(testing.TestCase):
 
         mock_pkg, mock_preset, mock_get_ids = self._patch_for_generate()
 
-        order = self.ordering.generate_order(pkg, 'DALLAS13', items,
-                                             preset_keyname=preset,
-                                             complex_type=complex_type)
+        order = self.ordering.generate_order(pkg, 'DALLAS13', items, preset_keyname=preset, complex_type=complex_type)
 
         mock_pkg.assert_called_once_with(pkg, mask='id')
         mock_preset.assert_called_once_with(pkg, preset)
@@ -333,8 +293,7 @@ class OrderingTests(testing.TestCase):
 
         mock_pkg, mock_preset, mock_get_ids = self._patch_for_generate()
 
-        order = self.ordering.generate_order(pkg, 'DALLAS13', items,
-                                             complex_type=complex_type)
+        order = self.ordering.generate_order(pkg, 'DALLAS13', items, complex_type=complex_type)
 
         mock_pkg.assert_called_once_with(pkg, mask='id')
         mock_preset.assert_not_called()
@@ -393,6 +352,10 @@ class OrderingTests(testing.TestCase):
                                          extras=extras, quantity=quantity)
         self.assertEqual(ord_mock.return_value, order)
 
+    def test_locations(self):
+        locations = self.ordering.package_locations('BARE_METAL_CPU')
+        self.assertEqual('WASHINGTON07', locations[0]['keyname'])
+
     def _patch_for_generate(self):
         # mock out get_package_by_key, get_preset_by_key, and get_price_id_list
         # with patchers
@@ -411,12 +374,3 @@ class OrderingTests(testing.TestCase):
         to_return[1].return_value = {'id': 5678}
         to_return[2].return_value = [1111, 2222]
         return to_return
-
-    def _assert_package_error(self, order_callable, pkg_key, *args, **kwargs):
-        with mock.patch.object(self.ordering, 'get_package_by_key') as mock_get_pkg:
-            mock_get_pkg.return_value = None
-
-            exc = self.assertRaises(exceptions.SoftLayerError, order_callable,
-                                    pkg_key, *args, **kwargs)
-            self.assertEqual('Package {} does not exist'.format(pkg_key),
-                             str(exc))

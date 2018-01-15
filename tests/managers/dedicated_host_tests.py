@@ -304,30 +304,10 @@ class DedicatedHostTests(testing.TestCase):
             assert_called_once_with(package_keyname, mask=mask)
 
     def test_get_package_no_package_found(self):
-        mask = '''
-        items[
-            id,
-            description,
-            prices,
-            capacity,
-            keyName,
-            itemCategory[categoryCode],
-            bundleItems[capacity, categories[categoryCode]]
-        ],
-        regions[location[location[priceGroups]]]
-        '''
-        self.dedicated_host.ordering_manager = mock.Mock()
+        packages = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        packages.return_value = []
 
-        self.dedicated_host.ordering_manager.get_package_by_key.return_value = \
-            None
-
-        package_keyname = 'DEDICATED_HOST'
-
-        self.assertRaises(exceptions.SoftLayerError,
-                          self.dedicated_host._get_package)
-
-        self.dedicated_host.ordering_manager.get_package_by_key. \
-            assert_called_once_with(package_keyname, mask=mask)
+        self.assertRaises(exceptions.SoftLayerError, self.dedicated_host._get_package)
 
     def test_get_location(self):
         regions = [{
@@ -398,8 +378,7 @@ class DedicatedHostTests(testing.TestCase):
         package['items'][0]['prices'][0]['locationGroupId'] = 33
         item = package['items'][0]
 
-        self.assertRaises(exceptions.SoftLayerError,
-                          self.dedicated_host._get_price, item)
+        self.assertRaises(exceptions.SoftLayerError, self.dedicated_host._get_price, item)
 
     def test_get_item(self):
         """Returns the item for ordering a dedicated host."""
@@ -442,8 +421,7 @@ class DedicatedHostTests(testing.TestCase):
         flavor = '56_CORES_X_242_RAM_X_1_4_TB'
         package['items'][0]['keyName'] = 'not found'
 
-        self.assertRaises(exceptions.SoftLayerError,
-                          self.dedicated_host._get_item, package, flavor)
+        self.assertRaises(exceptions.SoftLayerError, self.dedicated_host._get_item, package, flavor)
 
     def test_get_backend_router(self):
         location = [
@@ -480,8 +458,7 @@ class DedicatedHostTests(testing.TestCase):
         routers_test = self.dedicated_host._get_backend_router(location, item)
 
         self.assertEqual(routers, routers_test)
-        self.dedicated_host.host.getAvailableRouters. \
-            assert_called_once_with(host, mask=mask)
+        self.dedicated_host.host.getAvailableRouters.assert_called_once_with(host, mask=mask)
 
     def test_get_backend_router_no_routers_found(self):
         location = []

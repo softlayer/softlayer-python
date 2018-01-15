@@ -249,12 +249,8 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         '''
 
         package_keyname = 'DEDICATED_HOST'
+        package = self.ordering_manager.get_package_by_key(package_keyname, mask=mask)
 
-        package = self.ordering_manager.get_package_by_key(package_keyname,
-                                                           mask=mask)
-
-        if package is None:
-            raise SoftLayer.SoftLayerError("Ordering package not found")
         return package
 
     def _get_location(self, regions, datacenter):
@@ -264,8 +260,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
             if region['location']['location']['name'] == datacenter:
                 return region
 
-        raise SoftLayer.SoftLayerError("Could not find valid location for: '%s'"
-                                       % datacenter)
+        raise SoftLayer.SoftLayerError("Could not find valid location for: '%s'" % datacenter)
 
     def get_create_options(self):
         """Returns valid options for ordering a dedicated host."""
@@ -287,10 +282,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                     'key': item['keyName'],
                 })
 
-        return {
-            'locations': locations,
-            'dedicated_host': dedicated_host,
-        }
+        return {'locations': locations, 'dedicated_host': dedicated_host}
 
     def _get_price(self, package):
         """Returns valid price for ordering a dedicated host."""
@@ -299,8 +291,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
             if not price.get('locationGroupId'):
                 return price['id']
 
-        raise SoftLayer.SoftLayerError(
-            "Could not find valid price")
+        raise SoftLayer.SoftLayerError("Could not find valid price")
 
     def _get_item(self, package, flavor):
         """Returns the item for ordering a dedicated host."""
@@ -309,8 +300,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
             if item['keyName'] == flavor:
                 return item
 
-        raise SoftLayer.SoftLayerError("Could not find valid item for: '%s'"
-                                       % flavor)
+        raise SoftLayer.SoftLayerError("Could not find valid item for: '%s'" % flavor)
 
     def _get_backend_router(self, locations, item):
         """Returns valid router options for ordering a dedicated host."""

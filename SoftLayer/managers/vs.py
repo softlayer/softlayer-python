@@ -852,9 +852,6 @@ class VSManager(utils.IdentifierMixin, object):
         package_keyname = "CLOUD_SERVER"
         package = self.ordering_manager.get_package_by_key(package_keyname)
 
-        if package is None:
-            raise ValueError("No package found for key: " + package_keyname)
-
         package_service = self.client['Product_Package']
         return package_service.getItems(id=package['id'], mask=mask)
 
