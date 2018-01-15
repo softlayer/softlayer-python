@@ -1,7 +1,35 @@
 # Change Log
 
+
+## [5.4.0] - 2018-01-15
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.3.2...master
+
+ - Upgraded Requests and Urllib3 library to latest. This allows the library to make use of connection retries, and connection pools. This should prevent the client from crashing if the API gives a connection reset / connection timeout error
+ - reworked wait_for_ready function for virtual, and added to hardware managers. 
+ - fixed block/file iops in the `slcli block|file detail` view
+ - Added sub items to `hw detail --price`, removed reverse PTR entries
+
+### Added to CLI
+- slcli order
+```
+$ ./slcli order
+Usage: slcli order [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  -h, --help  Show this message and exit.
+
+Commands:
+  category-list      List the categories of a package.
+  item-list          List package items used for ordering.
+  package-list       List packages that can be ordered via the...
+  package-locations  List Datacenters a package can be ordered in.
+  place              Place or verify an order.
+  preset-list        List package presets.
+```
+
+
 ## [5.3.2] - 2017-12-18
- - Changes: https://github.com/softlayer/softlayer-python/compare/v5.3.1...master
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.3.1...v5.3.2
 
  - Expanded `@retry` useage to a few areas in the hardware manager
  - Added INTERVAL options to block and file replication

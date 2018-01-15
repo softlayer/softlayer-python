@@ -31,6 +31,8 @@ Additional API documentation can be found on the SoftLayer Development Network:
   <http://developer.softlayer.com/reference/softlayerapi>`_
 * `Object mask information and examples
   <http://developer.softlayer.com/article/Object-Masks>`_
+* `Code Examples
+  <https://softlayer.github.io/python/>`_
 
 Installation
 ------------
@@ -55,6 +57,12 @@ InsecurePlatformWarning Notice
 ------------------------------
 This library relies on the `requests <http://docs.python-requests.org/>`_ library to make HTTP requests. On Python versions below Python 2.7.9, requests has started emitting a security warning (InsecurePlatformWarning) due to insecurities with creating SSL connections. To resolve this, upgrade to Python 2.7.9+ or follow the instructions here: http://stackoverflow.com/a/29099439.
 
+Getting Help
+------------
+Bugs and feature requests about this library should have a `GitHub issue <https://github.com/softlayer/softlayer-python/issues>`_ opened about them. 
+
+Issues with the Softlayer API itself should be addressed by opening a ticket.
+
 System Requirements
 -------------------
 * Python 2.7, 3.3, 3.4, 3.5 or 3.6.
@@ -62,9 +70,18 @@ System Requirements
 * A connection to SoftLayer's private network is required to use
   our private network API endpoints.
 
+Python Packages
+---------------
+* six >= 1.7.0
+* prettytable >= 0.7.0
+* click >= 5
+* requests >= 2.18.4
+* prompt_toolkit >= 0.53
+* pygments >= 2.0.0
+* urllib3 >= 1.22
 
 Copyright
 ---------
-This software is Copyright (c) 2016 SoftLayer Technologies, Inc.
+This software is Copyright (c) 2016-2018 SoftLayer Technologies, Inc.
 
 See the bundled LICENSE file for more information.

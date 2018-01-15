@@ -1,4 +1,4 @@
-requests
+requests >= 2.18.4
 click >= 5
 prettytable >= 0.7.0
 six >= 1.7.0
