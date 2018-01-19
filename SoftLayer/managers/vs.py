@@ -307,7 +307,7 @@ class VSManager(utils.IdentifierMixin, object):
             dedicated=False, public_vlan=None, private_vlan=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
             private=False, ssh_keys=None, public_security_groups=None,
-            private_security_groups=None, **kwargs):
+            private_security_groups=None, boot_mode=None, **kwargs):
         """Returns a dict appropriate to pass into Virtual_Guest::createObject
 
             See :func:`create_instance` for a list of available options.
@@ -409,6 +409,11 @@ class VSManager(utils.IdentifierMixin, object):
 
         if ssh_keys:
             data['sshKeys'] = [{'id': key_id} for key_id in ssh_keys]
+
+        if boot_mode:
+            supplemental_options = data.get('supplementalObjectOptions', {})
+            supplemental_options['bootMode'] = supplemental_options
+            data['supplementalObjectOptions'] = supplemental_options
 
         return data
 

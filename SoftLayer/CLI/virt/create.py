@@ -80,7 +80,8 @@ def _parse_create_args(client, args):
         "disks": args['disk'],
         "cpus": args.get('cpu', None),
         "memory": args.get('memory', None),
-        "flavor": args.get('flavor', None)
+        "flavor": args.get('flavor', None),
+        "boot_mode": args.get('boot_mode', None)
     }
 
     # The primary disk is included in the flavor and the local_disk flag is not needed
@@ -175,6 +176,9 @@ def _parse_create_args(client, args):
               help="OS install code. Tip: you can specify <OS>_LATEST")
 @click.option('--image',
               help="Image ID. See: 'slcli image list' for reference")
+@click.option('--boot-mode',
+              help="Specify the mode to boot the OS in",
+              type=click.STRING)
 @click.option('--billing',
               type=click.Choice(['hourly', 'monthly']),
               default='hourly',
