@@ -47,17 +47,50 @@ class OrderTests(testing.TestCase):
         self.assertEqual(expected_results, json.loads(result.output))
 
     def test_package_list(self):
-        item1 = {'name': 'package1', 'keyName': 'PACKAGE1', 'isActive': 1}
-        item2 = {'name': 'package2', 'keyName': 'PACKAGE2', 'isActive': 1}
+        item1 = {'name': 'package1', 'keyName': 'PACKAGE1', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1}
+        item2 = {'name': 'package2', 'keyName': 'PACKAGE2', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1}
+        item3 = {'name': 'package2', 'keyName': 'PACKAGE2', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 0}
         p_mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        p_mock.return_value = [item1, item2]
+        p_mock.return_value = [item1, item2, item3]
+        _filter = {'type': {'keyName': {'operation': '!= BLUEMIX_SERVICE'}}}
 
         result = self.run_command(['order', 'package-list'])
 
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects')
-        expected_results = [{'name': 'package1', 'keyName': 'PACKAGE1'},
-                            {'name': 'package2', 'keyName': 'PACKAGE2'}]
+        self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects', filter=_filter)
+        expected_results = [{'name': 'package1', 'keyName': 'PACKAGE1', 'type': 'BARE_METAL_CPU'},
+                            {'name': 'package2', 'keyName': 'PACKAGE2', 'type': 'BARE_METAL_CPU'}]
+        self.assertEqual(expected_results, json.loads(result.output))
+
+    def test_package_list_keyword(self):
+        item1 = {'name': 'package1', 'keyName': 'PACKAGE1', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1}
+        item2 = {'name': 'package2', 'keyName': 'PACKAGE2', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1}
+        p_mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        p_mock.return_value = [item1, item2]
+
+        _filter = {'type': {'keyName': {'operation': '!= BLUEMIX_SERVICE'}}}
+        _filter['name'] = {'operation': '*= package1'}
+        result = self.run_command(['order', 'package-list', '--keyword', 'package1'])
+
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects', filter=_filter)
+        expected_results = [{'name': 'package1', 'keyName': 'PACKAGE1', 'type': 'BARE_METAL_CPU'},
+                            {'name': 'package2', 'keyName': 'PACKAGE2', 'type': 'BARE_METAL_CPU'}]
+        self.assertEqual(expected_results, json.loads(result.output))
+
+    def test_package_list_type(self):
+        item1 = {'name': 'package1', 'keyName': 'PACKAGE1', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1}
+        item2 = {'name': 'package2', 'keyName': 'PACKAGE2', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1}
+        p_mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        p_mock.return_value = [item1, item2]
+
+        _filter = {'type': {'keyName': {'operation': 'BARE_METAL_CPU'}}}
+        result = self.run_command(['order', 'package-list', '--package_type', 'BARE_METAL_CPU'])
+
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects', filter=_filter)
+        expected_results = [{'name': 'package1', 'keyName': 'PACKAGE1', 'type': 'BARE_METAL_CPU'},
+                            {'name': 'package2', 'keyName': 'PACKAGE2', 'type': 'BARE_METAL_CPU'}]
         self.assertEqual(expected_results, json.loads(result.output))
 
     def test_place(self):
