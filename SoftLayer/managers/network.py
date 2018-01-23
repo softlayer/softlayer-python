@@ -76,7 +76,9 @@ class NetworkManager(object):
         :param str direction: The direction to enforce (egress or ingress)
         :param str ethertype: The ethertype to enforce (IPv4 or IPv6)
         :param int port_max: The upper port bound to enforce
+                             (icmp code if the protocol is icmp)
         :param int port_min: The lower port bound to enforce
+                             (icmp type if the protocol is icmp)
         :param str protocol: The protocol to enforce (icmp, udp, tcp)
         """
         rule = {'direction': direction}
