@@ -67,15 +67,35 @@ def rule_list(env, securitygroup_id, sortby):
 @click.option('--ethertype', '-e',
               help='The ethertype (IPv4 or IPv6) to enforce')
 @click.option('--port-max', '-M', type=click.INT,
-              help='The upper port bound to enforce')
+              help=('The upper port bound to enforce. When the protocol is ICMP, '
+                    'this specifies the ICMP code to permit'))
 @click.option('--port-min', '-m', type=click.INT,
-              help='The lower port bound to enforce')
+              help=('The lower port bound to enforce. When the protocol is ICMP, '
+                    'this specifies the ICMP type to permit'))
 @click.option('--protocol', '-p',
               help='The protocol (icmp, tcp, udp) to enforce')
 @environment.pass_env
 def add(env, securitygroup_id, remote_ip, remote_group,
         direction, ethertype, port_max, port_min, protocol):
-    """Add a security group rule to a security group."""
+    """Add a security group rule to a security group.
+
+    \b
+    Examples:
+        # Add an SSH rule (TCP port 22) to a security group
+        slcli sg rule-add 384727 \\
+            --direction ingress \\
+            --protocol tcp \\
+            --port-min 22 \\
+            --port-max 22
+
+    \b
+        # Add a ping rule (ICMP type 8 code 0) to a security group
+        slcli sg rule-add 384727 \\
+            --direction ingress \\
+            --protocol icmp \\
+            --port-min 8 \\
+            --port-max 0
+    """
     mgr = SoftLayer.NetworkManager(env.client)
 
     ret = mgr.add_securitygroup_rule(securitygroup_id, remote_ip, remote_group,
