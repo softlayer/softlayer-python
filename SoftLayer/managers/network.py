@@ -318,19 +318,19 @@ class NetworkManager(object):
         """
         successful = False
         obj = {}
-        if remote_ip:
+        if remote_ip is not None:
             obj['remoteIp'] = remote_ip
-        if remote_group:
+        if remote_group is not None:
             obj['remoteGroupId'] = remote_group
-        if direction:
+        if direction is not None:
             obj['direction'] = direction
-        if ethertype:
+        if ethertype is not None:
             obj['ethertype'] = ethertype
-        if port_max:
+        if port_max is not None:
             obj['portRangeMax'] = port_max
-        if port_min:
+        if port_min is not None:
             obj['portRangeMin'] = port_min
-        if protocol:
+        if protocol is not None:
             obj['protocol'] = protocol
 
         if obj:
