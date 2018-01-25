@@ -307,7 +307,7 @@ class VSManager(utils.IdentifierMixin, object):
             dedicated=False, public_vlan=None, private_vlan=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
             private=False, ssh_keys=None, public_security_groups=None,
-            private_security_groups=None, **kwargs):
+            private_security_groups=None, private_vlan_subnet=None, **kwargs):
         """Returns a dict appropriate to pass into Virtual_Guest::createObject
 
             See :func:`create_instance` for a list of available options.
@@ -366,10 +366,25 @@ class VSManager(utils.IdentifierMixin, object):
             data.update({
                 'primaryNetworkComponent': {
                     "networkVlan": {"id": int(public_vlan)}}})
+
         if private_vlan:
-            data.update({
-                "primaryBackendNetworkComponent": {
-                    "networkVlan": {"id": int(private_vlan)}}})
+            # As per https://stackoverflow.com/questions/37592080/create-a-softlayer-virtual-guest-on-a-specific-subnet
+            # we can specify a subnet under the VLAN
+            if private_vlan_subnet:
+                data.update({
+                    "primaryBackendNetworkComponent": {
+                        "networkVlanId": int(private_vlan),
+                        "networkVlan": {
+                            "primarySubnet": {
+                                "id": int(private_vlan_subnet)
+                            }
+                        }
+                    }
+                })
+            else:
+                data.update({
+                    "primaryBackendNetworkComponent": {
+                        "networkVlan": {"id": int(private_vlan)}}})
 
         if public_security_groups:
             secgroups = [{'securityGroup': {'id': int(sg)}}
@@ -541,6 +556,7 @@ class VSManager(utils.IdentifierMixin, object):
         :param list public_security_groups: The list of security group IDs to apply to the public interface
         :param list private_security_groups: The list of security group IDs to apply to the private interface
         :param int private_vlan: The ID of the private VLAN on which you want  this VS placed.
+        :param int private_vlan_subnet: The ID of the private VLAN subnet on which you want  this VS placed.
         :param list disks: A list of disk capacities for this server.
         :param string post_uri: The URI of the post-install script to run  after reload
         :param bool private: If true, the VS will be provisioned only with access to the private network.
