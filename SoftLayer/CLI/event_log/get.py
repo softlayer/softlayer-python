@@ -1,8 +1,8 @@
 """Get Audit Logs."""
 # :license: MIT, see LICENSE for more details.
 
-import json
 from datetime import datetime
+import json
 
 import click
 

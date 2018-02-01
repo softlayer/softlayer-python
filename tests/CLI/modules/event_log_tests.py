@@ -414,7 +414,14 @@ class EventLogTests(testing.TestCase):
             self.assertEqual(expected_filter, observed_filter)
 
     def test_get_event_log_event_all_args_max_date_utc_offset(self):
-        observed_filter = event_log_get._build_filter(None, '10/31/2017', 'Security Group Rule Added', 1, 'CCI', '-0600')
+        observed_filter = event_log_get._build_filter(
+            None,
+            '10/31/2017',
+            'Security Group Rule Added',
+            1,
+            'CCI',
+            '-0600'
+        )
 
         correct_filter = {
             'eventCreateDate': {
