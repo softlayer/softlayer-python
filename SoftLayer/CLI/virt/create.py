@@ -177,7 +177,7 @@ def _parse_create_args(client, args):
 @click.option('--image',
               help="Image ID. See: 'slcli image list' for reference")
 @click.option('--boot-mode',
-              help="Specify the mode to boot the OS in",
+              help="Specify the mode to boot the OS in. Supported modes are HVM and PV.",
               type=click.STRING)
 @click.option('--billing',
               type=click.Choice(['hourly', 'monthly']),
