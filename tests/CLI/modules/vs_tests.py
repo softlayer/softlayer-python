@@ -161,7 +161,8 @@ class VirtTests(testing.TestCase):
                  'hostname': 'host',
                  'startCpus': 2,
                  'operatingSystemReferenceCode': 'UBUNTU_LATEST',
-                 'networkComponents': [{'maxSpeed': '100'}]},)
+                 'networkComponents': [{'maxSpeed': '100'}],
+                 'supplementalCreateObjectOptions': {'bootMode': None}},)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
                                 args=args)
 
@@ -195,7 +196,8 @@ class VirtTests(testing.TestCase):
             'blockDeviceTemplateGroup': {
                 'globalIdentifier': '0B5DEAF4-643D-46CA-A695-CECBE8832C9D',
             },
-            'networkComponents': [{'maxSpeed': '100'}]
+            'networkComponents': [{'maxSpeed': '100'}],
+            'supplementalCreateObjectOptions': {'bootMode': None}
         },)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
                                 args=args)
@@ -225,7 +227,9 @@ class VirtTests(testing.TestCase):
                  'startCpus': None,
                  'maxMemory': None,
                  'localDiskFlag': None,
-                 'supplementalCreateObjectOptions': {'flavorKeyName': 'B1_1X2X25'},
+                 'supplementalCreateObjectOptions': {
+                     'bootMode': None,
+                     'flavorKeyName': 'B1_1X2X25'},
                  'operatingSystemReferenceCode': 'UBUNTU_LATEST',
                  'networkComponents': [{'maxSpeed': '100'}]},)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
@@ -261,7 +265,8 @@ class VirtTests(testing.TestCase):
                  'startCpus': 2,
                  'operatingSystemReferenceCode': 'UBUNTU_LATEST',
                  'networkComponents': [{'maxSpeed': '100'}],
-                 'dedicatedHost': {'id': 123}},)
+                 'dedicatedHost': {'id': 123},
+                 'supplementalCreateObjectOptions': {'bootMode': None}},)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
                                 args=args)
 
@@ -306,7 +311,8 @@ class VirtTests(testing.TestCase):
                  'maxMemory': 1024,
                  'localDiskFlag': False,
                  'operatingSystemReferenceCode': 'UBUNTU_LATEST',
-                 'networkComponents': [{'maxSpeed': 100}]},)
+                 'networkComponents': [{'maxSpeed': 100}],
+                 'supplementalCreateObjectOptions': {'bootMode': None}},)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
                                 args=args)
 
@@ -347,7 +353,9 @@ class VirtTests(testing.TestCase):
                  'startCpus': None,
                  'maxMemory': None,
                  'localDiskFlag': None,
-                 'supplementalCreateObjectOptions': {'flavorKeyName': 'B1_1X2X25'},
+                 'supplementalCreateObjectOptions': {
+                     'bootMode': None,
+                     'flavorKeyName': 'B1_1X2X25'},
                  'operatingSystemReferenceCode': 'UBUNTU_LATEST',
                  'networkComponents': [{'maxSpeed': 100}]},)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',

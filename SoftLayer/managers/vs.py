@@ -307,7 +307,7 @@ class VSManager(utils.IdentifierMixin, object):
             dedicated=False, public_vlan=None, private_vlan=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
             private=False, ssh_keys=None, public_security_groups=None,
-            private_security_groups=None, **kwargs):
+            private_security_groups=None, boot_mode=None, **kwargs):
         """Returns a dict appropriate to pass into Virtual_Guest::createObject
 
             See :func:`create_instance` for a list of available options.
@@ -339,11 +339,14 @@ class VSManager(utils.IdentifierMixin, object):
             "hostname": hostname,
             "domain": domain,
             "localDiskFlag": local_disk,
-            "hourlyBillingFlag": hourly
+            "hourlyBillingFlag": hourly,
+            "supplementalCreateObjectOptions": {
+                "bootMode": boot_mode
+            }
         }
 
         if flavor:
-            data["supplementalCreateObjectOptions"] = {"flavorKeyName": flavor}
+            data["supplementalCreateObjectOptions"]["flavorKeyName"] = flavor
 
         if dedicated and not host_id:
             data["dedicatedAccountHostOnlyFlag"] = dedicated
