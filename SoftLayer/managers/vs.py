@@ -339,11 +339,14 @@ class VSManager(utils.IdentifierMixin, object):
             "hostname": hostname,
             "domain": domain,
             "localDiskFlag": local_disk,
-            "hourlyBillingFlag": hourly
+            "hourlyBillingFlag": hourly,
+            "supplementalCreateObjectOptions": {
+                "bootMode": boot_mode
+            }
         }
 
         if flavor:
-            data["supplementalCreateObjectOptions"] = {"flavorKeyName": flavor}
+            data["supplementalCreateObjectOptions"]["flavorKeyName"] = flavor
 
         if dedicated and not host_id:
             data["dedicatedAccountHostOnlyFlag"] = dedicated
@@ -409,11 +412,6 @@ class VSManager(utils.IdentifierMixin, object):
 
         if ssh_keys:
             data['sshKeys'] = [{'id': key_id} for key_id in ssh_keys]
-
-        if boot_mode:
-            supplemental_options = data.get('supplementalObjectOptions', {})
-            supplemental_options['bootMode'] = supplemental_options
-            data['supplementalObjectOptions'] = supplemental_options
 
         return data
 

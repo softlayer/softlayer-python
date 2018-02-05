@@ -192,7 +192,8 @@ class VSTests(testing.TestCase):
                   'localDiskFlag': True,
                   'maxMemory': 1024,
                   'hostname': 'server',
-                  'startCpus': 1}],)
+                  'startCpus': 1,
+                  'supplementalCreateObjectOptions': {'bootMode': None}}],)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'createObjects',
                                 args=args)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'setTags',
@@ -232,6 +233,7 @@ class VSTests(testing.TestCase):
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
             'hourlyBillingFlag': True,
+            'supplementalCreateObjectOptions': {'bootMode': None},
         }
 
         self.assertEqual(data, assert_data)
@@ -254,6 +256,7 @@ class VSTests(testing.TestCase):
             'domain': 'example.com',
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
+            'supplementalCreateObjectOptions': {'bootMode': None},
         }
 
         self.assertEqual(data, assert_data)
@@ -275,6 +278,7 @@ class VSTests(testing.TestCase):
             'localDiskFlag': True,
             'blockDeviceTemplateGroup': {"globalIdentifier": "45"},
             'hourlyBillingFlag': True,
+            'supplementalCreateObjectOptions': {'bootMode': None},
         }
 
         self.assertEqual(data, assert_data)
@@ -298,6 +302,7 @@ class VSTests(testing.TestCase):
             'operatingSystemReferenceCode': "STRING",
             'hourlyBillingFlag': True,
             'dedicatedAccountHostOnlyFlag': True,
+            'supplementalCreateObjectOptions': {'bootMode': None},
         }
 
         self.assertEqual(data, assert_data)
@@ -321,6 +326,7 @@ class VSTests(testing.TestCase):
             'operatingSystemReferenceCode': "STRING",
             'hourlyBillingFlag': True,
             'datacenter': {"name": 'sng01'},
+            'supplementalCreateObjectOptions': {'bootMode': None},
         }
 
         self.assertEqual(data, assert_data)
@@ -344,6 +350,7 @@ class VSTests(testing.TestCase):
             'operatingSystemReferenceCode': "STRING",
             'hourlyBillingFlag': True,
             'primaryNetworkComponent': {"networkVlan": {"id": 1}},
+            'supplementalCreateObjectOptions': {'bootMode': None},
         }
 
         self.assertEqual(data, assert_data)
@@ -367,6 +374,7 @@ class VSTests(testing.TestCase):
             'operatingSystemReferenceCode': "STRING",
             'hourlyBillingFlag': True,
             'primaryBackendNetworkComponent': {"networkVlan": {"id": 1}},
+            'supplementalCreateObjectOptions': {'bootMode': None},
         }
 
         self.assertEqual(data, assert_data)
@@ -390,6 +398,7 @@ class VSTests(testing.TestCase):
             'operatingSystemReferenceCode': "STRING",
             'hourlyBillingFlag': True,
             'userData': [{'value': "ICANHAZVSI"}],
+            'supplementalCreateObjectOptions': {'bootMode': None},
         }
 
         self.assertEqual(data, assert_data)
@@ -413,6 +422,7 @@ class VSTests(testing.TestCase):
             'operatingSystemReferenceCode': "STRING",
             'hourlyBillingFlag': True,
             'networkComponents': [{'maxSpeed': 9001}],
+            'supplementalCreateObjectOptions': {'bootMode': None},
         }
 
         self.assertEqual(data, assert_data)
@@ -438,6 +448,7 @@ class VSTests(testing.TestCase):
             'privateNetworkOnlyFlag': True,
             'hourlyBillingFlag': True,
             'networkComponents': [{'maxSpeed': 9001}],
+            'supplementalCreateObjectOptions': {'bootMode': None},
         }
 
         self.assertEqual(data, assert_data)
@@ -461,6 +472,7 @@ class VSTests(testing.TestCase):
             'operatingSystemReferenceCode': "STRING",
             'hourlyBillingFlag': True,
             'postInstallScriptUri': 'https://example.com/boostrap.sh',
+            'supplementalCreateObjectOptions': {'bootMode': None},
         }
 
         self.assertEqual(data, assert_data)
@@ -484,6 +496,7 @@ class VSTests(testing.TestCase):
             'operatingSystemReferenceCode': "STRING",
             'hourlyBillingFlag': True,
             'sshKeys': [{'id': 543}],
+            'supplementalCreateObjectOptions': {'bootMode': None},
         }
 
         self.assertEqual(data, assert_data)
@@ -536,6 +549,29 @@ class VSTests(testing.TestCase):
 
         self.assertTrue(data.get('blockDevices'))
         self.assertEqual(data['blockDevices'], assert_data['blockDevices'])
+
+    def test_generate_boot_mode(self):
+        data = self.vs._generate_create_dict(
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='example.com',
+            os_code="STRING",
+            boot_mode="HVM"
+        )
+
+        assert_data = {
+            'startCpus': 1,
+            'maxMemory': 1,
+            'hostname': 'test',
+            'domain': 'example.com',
+            'localDiskFlag': True,
+            'operatingSystemReferenceCode': "STRING",
+            'hourlyBillingFlag': True,
+            'supplementalCreateObjectOptions': {'bootMode': 'HVM'},
+        }
+
+        self.assertEqual(data, assert_data)
 
     def test_change_port_speed_public(self):
         result = self.vs.change_port_speed(1, True, 100)
