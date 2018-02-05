@@ -1,8 +1,16 @@
 # Change Log
 
+## [5.4.1] - 2018-02-05
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.0...master
+
+- Improve error conditions when adding SSH keys
+- added type filters to package-list, auto-removes bluemix_services on package listing
+- Add boot mode option to virtual guest creation
+- Update documentation for security group rule add
+- Add fix for unsetting of values in edit SG rules
 
 ## [5.4.0] - 2018-01-15
- - Changes: https://github.com/softlayer/softlayer-python/compare/v5.3.2...master
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.3.2...v5.4.0
 
  - Upgraded Requests and Urllib3 library to latest. This allows the library to make use of connection retries, and connection pools. This should prevent the client from crashing if the API gives a connection reset / connection timeout error
  - reworked wait_for_ready function for virtual, and added to hardware managers. 
