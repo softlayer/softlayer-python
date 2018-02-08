@@ -4,11 +4,16 @@
     :license: MIT, see LICENSE for more details.
 """
 import json
+import mock
 
+import SoftLayer
 from SoftLayer import testing
 
 
 class SecurityGroupTests(testing.TestCase):
+    def set_up(self):
+        self.network = SoftLayer.NetworkManager(self.client)
+
     def test_list_securitygroup(self):
         result = self.run_command(['sg', 'list'])
 
@@ -250,3 +255,85 @@ class SecurityGroupTests(testing.TestCase):
                                    '--network-component=500'])
 
         self.assertEqual(result.exit_code, 2)
+
+    @mock.patch('SoftLayer.NetworkManager.get_event_logs_by_request_id')
+    def test_securitygroup_get_by_request_id(self, event_mock):
+        event_mock.return_value = [
+            {
+                'accountId': 100,
+                'eventCreateDate': '2017-10-18T09:40:32.238869-05:00',
+                'eventName': 'Security Group Added',
+                'ipAddress': '192.168.0.1',
+                'label': 'test.softlayer.com',
+                'metaData': '{"securityGroupId":"200",'
+                            '"securityGroupName":"test_SG",'
+                            '"networkComponentId":"100",'
+                            '"networkInterfaceType":"public",'
+                            '"requestId":"96c9b47b9e102d2e1d81fba"}',
+                'objectId': 300,
+                'objectName': 'CCI',
+                'traceId': '59e767e03a57e',
+                'userId': 400,
+                'userType': 'CUSTOMER',
+                'username': 'user'
+            },
+            {
+                'accountId': 100,
+                'eventCreateDate': '2017-10-18T10:42:13.089536-05:00',
+                'eventName': 'Security Group Rule(s) Removed',
+                'ipAddress': '192.168.0.1',
+                'label': 'test_SG',
+                'metaData': '{"requestId":"96c9b47b9e102d2e1d81fba",'
+                            '"rules":[{"ruleId":"800",'
+                            '"remoteIp":null,"remoteGroupId":null,"direction":"ingress",'
+                            '"ethertype":"IPv4",'
+                            '"portRangeMin":2000,"portRangeMax":2001,"protocol":"tcp"}]}',
+                'objectId': 700,
+                'objectName': 'Security Group',
+                'traceId': '59e7765515e28',
+                'userId': 400,
+                'userType': 'CUSTOMER',
+                'username': 'user'
+            }
+        ]
+
+        expected = [
+            {
+                'date': '2017-10-18T09:40:32.238869-05:00',
+                'event': 'Security Group Added',
+                'label': 'test.softlayer.com',
+                'metadata': json.dumps(json.loads(
+                        '{"networkComponentId": "100",'
+                        '"networkInterfaceType": "public",'
+                        '"requestId": "96c9b47b9e102d2e1d81fba",'
+                        '"securityGroupId": "200",'
+                        '"securityGroupName": "test_SG"}'
+                    ),
+                    indent=4,
+                    sort_keys=True
+                )
+            },
+            {
+                'date': '2017-10-18T10:42:13.089536-05:00',
+                'event': 'Security Group Rule(s) Removed',
+                'label': 'test_SG',
+                'metadata': json.dumps(json.loads(
+                        '{"requestId": "96c9b47b9e102d2e1d81fba",'
+                        '"rules": [{"direction": "ingress",'
+                        '"ethertype": "IPv4",'
+                        '"portRangeMax": 2001,'
+                        '"portRangeMin": 2000,'
+                        '"protocol": "tcp",'
+                        '"remoteGroupId": null,'
+                        '"remoteIp": null,'
+                        '"ruleId": "800"}]}'
+                    ),
+                    indent=4,
+                    sort_keys=True
+                )
+            }
+        ]
+
+        result = self.run_command(['sg', 'audit-log', '96c9b47b9e102d2e1d81fba'])
+
+        self.assertEqual(expected, json.loads(result.output))

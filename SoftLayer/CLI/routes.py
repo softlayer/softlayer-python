@@ -252,6 +252,7 @@ ALL_ROUTES = [
      'SoftLayer.CLI.securitygroup.interface:add'),
     ('securitygroup:interface-remove',
      'SoftLayer.CLI.securitygroup.interface:remove'),
+    ('securitygroup:audit-log', 'SoftLayer.CLI.securitygroup.event_log:get_by_request_id'),
 
     ('sshkey', 'SoftLayer.CLI.sshkey'),
     ('sshkey:add', 'SoftLayer.CLI.sshkey.add:cli'),

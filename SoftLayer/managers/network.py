@@ -6,9 +6,12 @@
     :license: MIT, see LICENSE for more details.
 """
 import collections
+import json
 
 from SoftLayer import exceptions
 from SoftLayer import utils
+
+from SoftLayer.managers import event_log
 
 DEFAULT_SUBNET_MASK = ','.join(['hardware',
                                 'datacenter',
@@ -539,6 +542,43 @@ class NetworkManager(object):
         :param list rules: The list of IDs to remove
         """
         return self.security_group.removeRules(rules, id=group_id)
+
+    def get_event_logs_by_request_id(self, request_id):
+        """Gets all event logs by the given request id
+
+        :param string request_id: The request id we want to filter on
+        """
+
+        # Get all relevant event logs
+        unfiltered_logs = self._get_cci_event_logs() + self._get_security_group_event_logs()
+
+        # Grab only those that have the specific request id
+        filtered_logs = []
+
+        for unfiltered_log in unfiltered_logs:
+            try:
+                metadata = json.loads(unfiltered_log['metaData'])
+                if 'requestId' in metadata:
+                    if metadata['requestId'] == request_id:
+                        filtered_logs.append(unfiltered_log)
+            except ValueError:
+                continue
+
+        return filtered_logs
+
+    def _get_cci_event_logs(self):
+        # Load the event log manager
+        event_log_mgr = event_log.EventLogManager(self.client)
+
+        # Get CCI Event Logs
+        return event_log_mgr.get_event_logs_by_type('CCI')
+
+    def _get_security_group_event_logs(self):
+        # Load the event log manager
+        event_log_mgr = event_log.EventLogManager(self.client)
+
+        # Get CCI Event Logs
+        return event_log_mgr.get_event_logs_by_type('Security Group')
 
     def resolve_global_ip_ids(self, identifier):
         """Resolve global ip ids."""
