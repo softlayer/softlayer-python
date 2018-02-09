@@ -51,6 +51,7 @@ def cli(env):
         _add_flavor_rows('BL2', 'balanced local - ssd', result['flavors'])
         _add_flavor_rows('C1', 'compute', result['flavors'])
         _add_flavor_rows('M1', 'memory', result['flavors'])
+        _add_flavor_rows('AC', 'GPU', result['flavors'])
 
     # CPUs
     standard_cpus = [int(x['template']['startCpus']) for x in result['processors']

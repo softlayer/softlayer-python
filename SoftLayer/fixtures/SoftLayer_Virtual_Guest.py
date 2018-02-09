@@ -121,6 +121,26 @@ getCreateObjectOptions = {
                 }
             }
         },
+        {
+            'flavor': {
+                'keyName': 'AC1_1X2X100'
+            },
+            'template': {
+                'supplementalCreateObjectOptions': {
+                    'flavorKeyName': 'AC1_1X2X100'
+                }
+            }
+        },
+        {
+            'flavor': {
+                'keyName': 'ACL1_1X2X100'
+            },
+            'template': {
+                'supplementalCreateObjectOptions': {
+                    'flavorKeyName': 'ACL1_1X2X100'
+                }
+            }
+        },
     ],
     'processors': [
         {
