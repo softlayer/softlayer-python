@@ -41,7 +41,10 @@ class ReportTests(testing.TestCase):
         }, {
             'id': 2,
             'name': 'pool2',
-            'metricTrackingObjectId': 2,
+        }, {
+            'id': 3,
+            'name': 'pool3',
+            'metricTrackingObjectId': 3,
         }]
         hardware = self.set_mock('SoftLayer_Account', 'getHardware')
         hardware.return_value = [{
@@ -50,8 +53,12 @@ class ReportTests(testing.TestCase):
             'hostname': 'host1',
         }, {
             'id': 102,
-            'metricTrackingObject': {'id': 102},
-            'hostname': 'host1',
+            'hostname': 'host2',
+            'virtualRack': {'id': 1, 'bandwidthAllotmentTypeId': 2},
+        }, {
+            'id': 103,
+            'metricTrackingObject': {'id': 103},
+            'hostname': 'host3',
             'virtualRack': {'id': 1, 'bandwidthAllotmentTypeId': 2},
         }]
         guests = self.set_mock('SoftLayer_Account', 'getVirtualGuests')
@@ -61,8 +68,12 @@ class ReportTests(testing.TestCase):
             'hostname': 'host1',
         }, {
             'id': 202,
-            'metricTrackingObjectId': 202,
-            'hostname': 'host1',
+            'hostname': 'host2',
+            'virtualRack': {'id': 2, 'bandwidthAllotmentTypeId': 2},
+        }, {
+            'id': 203,
+            'metricTrackingObjectId': 203,
+            'hostname': 'host3',
             'virtualRack': {'id': 2, 'bandwidthAllotmentTypeId': 2},
         }]
         summary_data = self.set_mock('SoftLayer_Metric_Tracking_Object',
@@ -93,7 +104,7 @@ class ReportTests(testing.TestCase):
                 'public_out': 20,
                 'type': 'pool',
             }, {
-                'name': 'pool2',
+                'name': 'pool3',
                 'pool': None,
                 'private_in': 30,
                 'private_out': 40,
@@ -109,7 +120,7 @@ class ReportTests(testing.TestCase):
                 'public_out': 20,
                 'type': 'virtual',
             }, {
-                'name': 'host1',
+                'name': 'host3',
                 'pool': 2,
                 'private_in': 30,
                 'private_out': 40,
@@ -125,7 +136,7 @@ class ReportTests(testing.TestCase):
                 'public_out': 20,
                 'type': 'hardware',
             }, {
-                'name': 'host1',
+                'name': 'host3',
                 'pool': None,
                 'private_in': 30,
                 'private_out': 40,
@@ -145,19 +156,19 @@ class ReportTests(testing.TestCase):
                                 identifier=1)
         self.assert_called_with('SoftLayer_Metric_Tracking_Object',
                                 'getSummaryData',
-                                identifier=2)
+                                identifier=3)
         self.assert_called_with('SoftLayer_Metric_Tracking_Object',
                                 'getSummaryData',
                                 identifier=101)
         self.assert_called_with('SoftLayer_Metric_Tracking_Object',
                                 'getSummaryData',
-                                identifier=102)
+                                identifier=103)
         self.assert_called_with('SoftLayer_Metric_Tracking_Object',
                                 'getSummaryData',
                                 identifier=201)
         self.assert_called_with('SoftLayer_Metric_Tracking_Object',
                                 'getSummaryData',
-                                identifier=202)
+                                identifier=203)
         call = self.calls('SoftLayer_Metric_Tracking_Object', 'getSummaryData',
                           identifier=1)[0]
         expected_args = (

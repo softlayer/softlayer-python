@@ -143,6 +143,12 @@ def _get_virtual_bandwidth(env, start, end):
                            label='Calculating for virtual',
                            file=sys.stderr) as vms:
         for instance in vms:
+            metric_tracking_id = utils.lookup(instance,
+                                              'metricTrackingObjectId')
+
+            if metric_tracking_id is None:
+                continue
+
             pool_name = None
             if utils.lookup(instance,
                             'virtualRack',
@@ -161,7 +167,7 @@ def _get_virtual_bandwidth(env, start, end):
                     end.strftime('%Y-%m-%d %H:%M:%S %Z'),
                     types,
                     3600,
-                    id=instance['metricTrackingObjectId'],
+                    id=metric_tracking_id,
                 ),
             }
 
