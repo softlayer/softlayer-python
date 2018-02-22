@@ -9,6 +9,7 @@ from SoftLayer.CLI import firewall
 from SoftLayer.CLI import formatting
 from SoftLayer import utils
 
+
 @click.command()
 @click.argument('identifier')
 @environment.pass_env
