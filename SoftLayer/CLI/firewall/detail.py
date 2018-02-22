@@ -7,7 +7,7 @@ import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import firewall
 from SoftLayer.CLI import formatting
-
+from SoftLayer import utils
 
 @click.command()
 @click.argument('identifier')
@@ -41,9 +41,9 @@ def get_rules_table(rules):
             rule['action'],
             rule['protocol'],
             rule['sourceIpAddress'],
-            rule['sourceIpSubnetMask'],
+            utils.lookup(rule, 'sourceIpSubnetMask'),
             '%s:%s-%s' % (rule['destinationIpAddress'],
                           rule['destinationPortRangeStart'],
                           rule['destinationPortRangeEnd']),
-            rule['destinationIpSubnetMask']])
+            utils.lookup(rule, 'destinationIpSubnetMask')])
     return table
