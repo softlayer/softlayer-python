@@ -1,0 +1,29 @@
+name: slcli # check to see if it's available
+version: '5.4.2.0+git' # check versioning
+summary: Python based SoftLayer API Tool. # 79 char long summary
+description: |
+    A command-line interface is also included and can be used to manage various SoftLayer products and services.
+grade: stable # must be 'stable' to release into candidate/stable channels
+confinement: strict # use 'strict' once you have the right plugs
+
+apps:
+  slcli:
+    command: slcli
+    environment: 
+      LC_ALL: C.UTF-8
+    plugs:
+      - home
+      - network
+      - network-bind
+     
+parts: 
+  my-part:
+    source: https://github.com/softlayer/softlayer-python
+    source-type: git
+    plugin: python3
+    
+    build-packages:
+      - python3
+      
+    stage-packages:
+      - python3
