@@ -49,6 +49,15 @@ Or you can install from source. Download source and run:
 
 	$ python setup.py install
 
+Another (safer) method of installation is to use the published snap. Snaps are available for any Linux OS running snapd, the service that runs and manage snaps. Snaps are "auto-updating" packages and will not disrupt the current versions of libraries and software packages on your Linux-based system. To learn more, please visit: https://snapcraft.io/ 
+
+To install the slcli snap:
+
+.. code-block:: bash
+
+	$ sudo snap install slcli
+	
+
 
 The most up-to-date version of this library can be found on the SoftLayer
 GitHub public repositories at http://github.com/softlayer. For questions regarding the use of this library please post to Stack Overflow at https://stackoverflow.com/ and  your posts with “SoftLayer” so our team can easily find your post. To report a bug with this library please create an Issue on github.
