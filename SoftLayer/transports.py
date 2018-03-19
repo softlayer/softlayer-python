@@ -8,6 +8,7 @@
 import importlib
 import json
 import logging
+import re
 import time
 
 import requests
@@ -27,6 +28,7 @@ __all__ = [
     'XmlRpcTransport',
     'RestTransport',
     'TimingTransport',
+    'DebugTransport',
     'FixtureTransport',
     'SoftLayerListResult',
 ]
@@ -100,6 +102,24 @@ class Request(object):
         #: Integer result offset.
         self.offset = None
 
+        #: Integer call start time
+        self.start_time = None
+
+        #: Integer call end time
+        self.end_time = None
+
+        #: String full url
+        self.url = None
+
+        #: String result of api call
+        self.result = None
+
+        #: String payload to send in
+        self.payload = None
+
+        #: Exception any exceptions that got caught
+        self.exception = None
+
 
 class SoftLayerListResult(list):
     """A SoftLayer API list result."""
@@ -117,8 +137,7 @@ class XmlRpcTransport(object):
     """XML-RPC transport."""
     def __init__(self, endpoint_url=None, timeout=None, proxy=None, user_agent=None, verify=True):
 
-        self.endpoint_url = (endpoint_url or
-                             consts.API_PUBLIC_ENDPOINT).rstrip('/')
+        self.endpoint_url = (endpoint_url or consts.API_PUBLIC_ENDPOINT).rstrip('/')
         self.timeout = timeout or None
         self.proxy = proxy
         self.user_agent = user_agent or consts.USER_AGENT
@@ -139,7 +158,6 @@ class XmlRpcTransport(object):
         :param request request: Request object
         """
         largs = list(request.args)
-
         headers = request.headers
 
         if request.identifier is not None:
@@ -163,32 +181,26 @@ class XmlRpcTransport(object):
         request.transport_headers.setdefault('Content-Type', 'application/xml')
         request.transport_headers.setdefault('User-Agent', self.user_agent)
 
-        url = '/'.join([self.endpoint_url, request.service])
-        payload = utils.xmlrpc_client.dumps(tuple(largs),
+        request.url = '/'.join([self.endpoint_url, request.service])
+        request.payload = utils.xmlrpc_client.dumps(tuple(largs),
                                             methodname=request.method,
                                             allow_none=True)
 
         # Prefer the request setting, if it's not None
         verify = request.verify
         if verify is None:
-            verify = self.verify
+            request.verify = self.verify
 
-        LOGGER.debug("=== REQUEST ===")
-        LOGGER.debug('POST %s', url)
-        LOGGER.debug(request.transport_headers)
-        LOGGER.debug(payload)
 
         try:
-            resp = self.client.request('POST', url,
-                                       data=payload,
+            resp = self.client.request('POST', request.url,
+                                       data=request.payload,
                                        headers=request.transport_headers,
                                        timeout=self.timeout,
-                                       verify=verify,
+                                       verify=request.verify,
                                        cert=request.cert,
                                        proxies=_proxies_dict(self.proxy))
-            LOGGER.debug("=== RESPONSE ===")
-            LOGGER.debug(resp.headers)
-            LOGGER.debug(resp.content)
+
             resp.raise_for_status()
             result = utils.xmlrpc_client.loads(resp.content)[0][0]
             if isinstance(result, list):
@@ -217,6 +229,42 @@ class XmlRpcTransport(object):
             raise exceptions.TransportError(ex.response.status_code, str(ex))
         except requests.RequestException as ex:
             raise exceptions.TransportError(0, str(ex))
+
+    def print_reproduceable(self, request):
+        """Prints out the minimal python code to reproduce a specific request
+
+        The will also automatically replace the API key so its not accidently exposed.
+
+        :param request request: Request object
+        """
+        from string import Template
+        output = Template('''============= testing.py =============
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+from xml.etree import ElementTree
+client = requests.Session()
+client.headers.update({'Content-Type': 'application/json', 'User-Agent': 'softlayer-python/testing',})
+retry = Retry(connect=3, backoff_factor=3)
+adapter = HTTPAdapter(max_retries=retry)
+client.mount('https://', adapter)
+url = '$url'
+payload = """$payload"""
+transport_headers = $transport_headers
+timeout = $timeout
+verify = $verify
+cert = $cert
+proxy = $proxy
+response = client.request('POST', url, data=payload, headers=transport_headers, timeout=timeout, 
+               verify=verify, cert=cert, proxies=proxy)
+xml = ElementTree.fromstring(response.content)
+ElementTree.dump(xml)
+==========================''')
+
+        safe_payload = re.sub(r'<string>[a-z0-9]{64}</string>', r'<string>API_KEY_GOES_HERE</string>', request.payload)
+        substitutions = dict(url=request.url, payload=safe_payload, transport_headers=request.transport_headers, 
+                             timeout=self.timeout, verify=request.verify, cert=request.cert, proxy=_proxies_dict(self.proxy))
+        return output.substitute(substitutions)
 
 
 class RestTransport(object):
@@ -333,6 +381,43 @@ class RestTransport(object):
         except requests.RequestException as ex:
             raise exceptions.TransportError(0, str(ex))
 
+
+class DebugTransport(object):
+    """Transport that records API call timings."""
+
+    def __init__(self, transport):
+        self.transport = transport
+
+        #: List All API calls made during a session
+        self.requests = []
+
+    def __call__(self, call):
+        call.start_time = time.time()
+
+        self.pre_transport_log(call)
+        try:
+            call.result = self.transport(call)
+        except (exceptions.SoftLayerAPIError, exceptions.TransportError) as ex:
+            call.exception = ex
+
+        self.post_transport_log(call)
+
+        call.end_time = time.time()
+        self.requests.append(call)
+
+        if call.exception is not None:
+            raise call.exception
+
+        return call.result
+
+    def pre_transport_log(self, call):
+        LOGGER.warning("Calling: {}::{}(id={})".format(call.service, call.method, call.identifier))
+
+    def post_transport_log(self, call):
+        LOGGER.debug(self.transport.print_reproduceable(call))
+
+    def get_last_calls(self):
+        return self.requests
 
 class TimingTransport(object):
     """Transport that records API call timings."""
