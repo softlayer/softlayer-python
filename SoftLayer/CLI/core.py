@@ -151,13 +151,13 @@ def output_diagnostics(env, verbose=0, **kwargs):
 
     if verbose > 1:
         for call in env.client.transport.get_last_calls():
-            call_table = formatting.Table(['','{}::{}'.format(call.service, call.method)])
+            call_table = formatting.Table(['', '{}::{}'.format(call.service, call.method)])
             nice_mask = ''
             if call.mask is not None:
                 nice_mask = call.mask
 
             call_table.add_row(['id', call.identifier])
-            call_table.add_row(['mask', call.mask])
+            call_table.add_row(['mask', nice_mask])
             call_table.add_row(['filter', call.filter])
             call_table.add_row(['limit', call.limit])
             call_table.add_row(['offset', call.offset])

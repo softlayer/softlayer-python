@@ -120,9 +120,6 @@ class Request(object):
         #: Exception any exceptions that got caught
         self.exception = None
 
-        #: String Url parameters used in the Rest transport
-        self.params = None
-
 
 class SoftLayerListResult(list):
     """A SoftLayer API list result."""
@@ -168,9 +165,12 @@ class XmlRpcTransport(object):
             headers[header_name] = {'id': request.identifier}
 
         if request.mask is not None:
-            request.mask = _format_object_mask(request.mask)
-            headers.update(_format_object_mask_xmlrpc(request.mask, request.service))
-
+            if isinstance(request.mask, dict):
+                mheader = '%sObjectMask' % request.service
+            else:
+                mheader = 'SoftLayer_ObjectMask'
+                request.mask = _format_object_mask(request.mask)
+            headers.update({mheader: {'mask': request.mask}})
 
         if request.filter is not None:
             headers['%sObjectFilter' % request.service] = request.filter
@@ -187,14 +187,13 @@ class XmlRpcTransport(object):
 
         request.url = '/'.join([self.endpoint_url, request.service])
         request.payload = utils.xmlrpc_client.dumps(tuple(largs),
-                                            methodname=request.method,
-                                            allow_none=True)
+                                                    methodname=request.method,
+                                                    allow_none=True)
 
         # Prefer the request setting, if it's not None
         verify = request.verify
         if verify is None:
             request.verify = self.verify
-
 
         try:
             resp = self.client.request('POST', request.url,
@@ -259,17 +258,17 @@ timeout = $timeout
 verify = $verify
 cert = $cert
 proxy = $proxy
-response = client.request('POST', url, data=payload, headers=transport_headers, timeout=timeout, 
+response = client.request('POST', url, data=payload, headers=transport_headers, timeout=timeout,
                verify=verify, cert=cert, proxies=proxy)
 xml = ElementTree.fromstring(response.content)
 ElementTree.dump(xml)
 ==========================''')
 
-
         safe_payload = re.sub(r'<string>[a-z0-9]{64}</string>', r'<string>API_KEY_GOES_HERE</string>', request.payload)
         safe_payload = re.sub(r'(\s+)', r' ', safe_payload)
-        substitutions = dict(url=request.url, payload=safe_payload, transport_headers=request.transport_headers, 
-                             timeout=self.timeout, verify=request.verify, cert=request.cert, proxy=_proxies_dict(self.proxy))
+        substitutions = dict(url=request.url, payload=safe_payload, transport_headers=request.transport_headers,
+                             timeout=self.timeout, verify=request.verify, cert=request.cert,
+                             proxy=_proxies_dict(self.proxy))
         return output.substitute(substitutions)
 
 
@@ -340,7 +339,6 @@ class RestTransport(object):
             method = 'POST'
             body['parameters'] = request.args
 
-
         if body:
             request.payload = json.dumps(body)
 
@@ -385,7 +383,6 @@ class RestTransport(object):
             request.url = ex.response.url
             raise exceptions.SoftLayerAPIError(ex.response.status_code, message)
         except requests.RequestException as ex:
-            request.url = ex.response.url
             raise exceptions.TransportError(0, str(ex))
 
     def print_reproduceable(self, request):
@@ -442,16 +439,23 @@ class DebugTransport(object):
         return call.result
 
     def pre_transport_log(self, call):
-        LOGGER.warning("Calling: {}::{}(id={})".format(call.service, call.method, call.identifier))
+        """Prints a warning before calling the API """
+        output = "Calling: {}::{}(id={})".format(call.service, call.method, call.identifier)
+        LOGGER.warning(output)
 
     def post_transport_log(self, call):
-        LOGGER.debug("Returned Data: \n{}".format(call.result))
+        """Prints the result "Returned Data: \n%s" % (call.result)of an API call"""
+        output = "Returned Data: \n{}".format(call.result)
+        LOGGER.debug(output)
 
     def get_last_calls(self):
+        """Returns all API calls for a session"""
         return self.requests
 
     def print_reproduceable(self, call):
+        """Prints a reproduceable debugging output"""
         return self.transport.print_reproduceable(call)
+
 
 class TimingTransport(object):
     """Transport that records API call timings."""
@@ -480,6 +484,10 @@ class TimingTransport(object):
         self.last_calls = []
         return last_calls
 
+    def print_reproduceable(self, call):
+        """Not Implemented"""
+        return "Not Implemented"
+
 
 class FixtureTransport(object):
     """Implements a transport which returns fixtures."""
@@ -495,27 +503,16 @@ class FixtureTransport(object):
         except AttributeError:
             raise NotImplementedError('%s::%s fixture is not implemented' % (call.service, call.method))
 
+    def print_reproduceable(self, call):
+        """Not Implemented"""
+        return "Not Implemented"
+
 
 def _proxies_dict(proxy):
     """Makes a proxy dict appropriate to pass to requests."""
     if not proxy:
         return None
     return {'http': proxy, 'https': proxy}
-
-
-def _format_object_mask_xmlrpc(objectmask, service):
-    """Format new and old style object masks into proper headers.
-
-    :param objectmask: a string- or dict-based object mask
-    :param service: a SoftLayer API service name
-
-    """
-    if isinstance(objectmask, dict):
-        mheader = '%sObjectMask' % service
-    else:
-        mheader = 'SoftLayer_ObjectMask'
-
-    return {mheader: {'mask': objectmask}}
 
 
 def _format_object_mask(objectmask):
@@ -528,7 +525,7 @@ def _format_object_mask(objectmask):
 
     """
     objectmask = objectmask.strip()
-    objectmask = re.sub(r'(\s+)', r' ', objectmask)
+
     if (not objectmask.startswith('mask') and
             not objectmask.startswith('[')):
         objectmask = "mask[%s]" % objectmask
