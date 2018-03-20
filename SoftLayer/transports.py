@@ -120,6 +120,9 @@ class Request(object):
         #: Exception any exceptions that got caught
         self.exception = None
 
+        #: String Url parameters used in the Rest transport
+        self.params = None
+
 
 class SoftLayerListResult(list):
     """A SoftLayer API list result."""
@@ -165,8 +168,9 @@ class XmlRpcTransport(object):
             headers[header_name] = {'id': request.identifier}
 
         if request.mask is not None:
-            headers.update(_format_object_mask_xmlrpc(request.mask,
-                                                      request.service))
+            request.mask = _format_object_mask(request.mask)
+            headers.update(_format_object_mask_xmlrpc(request.mask, request.service))
+
 
         if request.filter is not None:
             headers['%sObjectFilter' % request.service] = request.filter
@@ -261,7 +265,9 @@ xml = ElementTree.fromstring(response.content)
 ElementTree.dump(xml)
 ==========================''')
 
+
         safe_payload = re.sub(r'<string>[a-z0-9]{64}</string>', r'<string>API_KEY_GOES_HERE</string>', request.payload)
+        safe_payload = re.sub(r'(\s+)', r' ', safe_payload)
         substitutions = dict(url=request.url, payload=safe_payload, transport_headers=request.transport_headers, 
                              timeout=self.timeout, verify=request.verify, cert=request.cert, proxy=_proxies_dict(self.proxy))
         return output.substitute(substitutions)
@@ -301,7 +307,8 @@ class RestTransport(object):
         """
         params = request.headers.copy()
         if request.mask:
-            params['objectMask'] = _format_object_mask(request.mask)
+            request.mask = _format_object_mask(request.mask)
+            params['objectMask'] = request.mask
 
         if request.limit:
             params['limit'] = request.limit
@@ -311,6 +318,8 @@ class RestTransport(object):
 
         if request.filter:
             params['objectFilter'] = json.dumps(request.filter)
+
+        request.params = params
 
         auth = None
         if request.transport_user:
@@ -331,9 +340,9 @@ class RestTransport(object):
             method = 'POST'
             body['parameters'] = request.args
 
-        raw_body = None
+
         if body:
-            raw_body = json.dumps(body)
+            request.payload = json.dumps(body)
 
         url_parts = [self.endpoint_url, request.service]
         if request.identifier is not None:
@@ -342,32 +351,29 @@ class RestTransport(object):
         if request.method is not None:
             url_parts.append(request.method)
 
-        url = '%s.%s' % ('/'.join(url_parts), 'json')
+        request.url = '%s.%s' % ('/'.join(url_parts), 'json')
 
         # Prefer the request setting, if it's not None
-        verify = request.verify
-        if verify is None:
-            verify = self.verify
 
-        LOGGER.debug("=== REQUEST ===")
-        LOGGER.debug(url)
-        LOGGER.debug(request.transport_headers)
-        LOGGER.debug(raw_body)
+        if request.verify is None:
+            request.verify = self.verify
+
         try:
-            resp = self.client.request(method, url,
+            resp = self.client.request(method, request.url,
                                        auth=auth,
                                        headers=request.transport_headers,
-                                       params=params,
-                                       data=raw_body,
+                                       params=request.params,
+                                       data=request.payload,
                                        timeout=self.timeout,
-                                       verify=verify,
+                                       verify=request.verify,
                                        cert=request.cert,
                                        proxies=_proxies_dict(self.proxy))
-            LOGGER.debug("=== RESPONSE ===")
-            LOGGER.debug(resp.headers)
-            LOGGER.debug(resp.text)
+
+            request.url = resp.url
+
             resp.raise_for_status()
             result = json.loads(resp.text)
+            request.result = result
 
             if isinstance(result, list):
                 return SoftLayerListResult(
@@ -376,10 +382,35 @@ class RestTransport(object):
                 return result
         except requests.HTTPError as ex:
             message = json.loads(ex.response.text)['error']
-            raise exceptions.SoftLayerAPIError(ex.response.status_code,
-                                               message)
+            request.url = ex.response.url
+            raise exceptions.SoftLayerAPIError(ex.response.status_code, message)
         except requests.RequestException as ex:
+            request.url = ex.response.url
             raise exceptions.TransportError(0, str(ex))
+
+    def print_reproduceable(self, request):
+        """Prints out the minimal python code to reproduce a specific request
+
+        The will also automatically replace the API key so its not accidently exposed.
+
+        :param request request: Request object
+        """
+        command = "curl -u $SL_USER:$SL_APIKEY -X {method} -H {headers} {data} '{uri}'"
+
+        method = REST_SPECIAL_METHODS.get(request.method)
+
+        if method is None:
+            method = 'GET'
+        if request.args:
+            method = 'POST'
+
+        data = ''
+        if request.payload is not None:
+            data = "-d '{}'".format(request.payload)
+
+        headers = ['"{0}: {1}"'.format(k, v) for k, v in request.transport_headers.items()]
+        headers = " -H ".join(headers)
+        return command.format(method=method, headers=headers, data=data, uri=request.url)
 
 
 class DebugTransport(object):
@@ -414,10 +445,13 @@ class DebugTransport(object):
         LOGGER.warning("Calling: {}::{}(id={})".format(call.service, call.method, call.identifier))
 
     def post_transport_log(self, call):
-        LOGGER.debug(self.transport.print_reproduceable(call))
+        LOGGER.debug("Returned Data: \n{}".format(call.result))
 
     def get_last_calls(self):
         return self.requests
+
+    def print_reproduceable(self, call):
+        return self.transport.print_reproduceable(call)
 
 class TimingTransport(object):
     """Transport that records API call timings."""
@@ -480,7 +514,6 @@ def _format_object_mask_xmlrpc(objectmask, service):
         mheader = '%sObjectMask' % service
     else:
         mheader = 'SoftLayer_ObjectMask'
-        objectmask = _format_object_mask(objectmask)
 
     return {mheader: {'mask': objectmask}}
 
@@ -495,6 +528,7 @@ def _format_object_mask(objectmask):
 
     """
     objectmask = objectmask.strip()
+    objectmask = re.sub(r'(\s+)', r' ', objectmask)
     if (not objectmask.startswith('mask') and
             not objectmask.startswith('[')):
         objectmask = "mask[%s]" % objectmask
