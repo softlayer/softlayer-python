@@ -359,7 +359,7 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         # Sizes
         sizes = []
-        for preset in package['activePresets']:
+        for preset in package['activePresets'] + package['accountRestrictedActivePresets']:
             sizes.append({
                 'name': preset['description'],
                 'key': preset['keyName']
@@ -418,6 +418,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                 prices
             ],
             activePresets,
+            accountRestrictedActivePresets,
             regions[location[location[priceGroups]]]
             '''
 
@@ -774,7 +775,7 @@ def _get_location(package, location):
 
 def _get_preset_id(package, size):
     """Get the preset id given the keyName of the preset."""
-    for preset in package['activePresets']:
+    for preset in package['activePresets'] + package['accountRestrictedActivePresets']:
         if preset['keyName'] == size or preset['id'] == size:
             return preset['id']
 

@@ -264,7 +264,9 @@ class ServerCLITests(testing.TestCase):
         expected = [
             [{'datacenter': 'Washington 1', 'value': 'wdc01'}],
             [{'size': 'Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID',
-              'value': 'S1270_8GB_2X1TBSATA_NORAID'}],
+              'value': 'S1270_8GB_2X1TBSATA_NORAID'},
+             {'size': 'Dual Xeon Gold, 384GB Ram, 4x960GB SSD, RAID 10',
+              'value': 'DGOLD_6140_384GB_4X960GB_SSD_SED_RAID_10'}],
             [{'operating_system': 'Ubuntu / 14.04-64',
               'value': 'UBUNTU_14_64'}],
             [{'port_speed': '10 Mbps Public & Private Network Uplinks',
