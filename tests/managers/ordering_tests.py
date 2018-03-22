@@ -264,7 +264,7 @@ class OrderingTests(testing.TestCase):
         items = ['ITEM1', 'ITEM2']
         preset = 'PRESET_KEYNAME'
         expected_order = {'complexType': 'SoftLayer_Container_Foo',
-                          'location': 'DALLAS13',
+                          'location': 1854895,
                           'packageId': 1234,
                           'presetId': 5678,
                           'prices': [{'id': 1111}, {'id': 2222}],
@@ -285,7 +285,7 @@ class OrderingTests(testing.TestCase):
         items = ['ITEM1', 'ITEM2']
         complex_type = 'My_Type'
         expected_order = {'complexType': 'My_Type',
-                          'location': 'DALLAS13',
+                          'location': 1854895,
                           'packageId': 1234,
                           'prices': [{'id': 1111}, {'id': 2222}],
                           'quantity': 1,
@@ -374,3 +374,21 @@ class OrderingTests(testing.TestCase):
         to_return[1].return_value = {'id': 5678}
         to_return[2].return_value = [1111, 2222]
         return to_return
+
+    def test_get_location_id_short(self):
+        locations = self.set_mock('SoftLayer_Location', 'getDatacenters')
+        locations.return_value = [{'id': 1854895, 'name': 'dal13', 'regions': [{'keyname': 'DALLAS13'}]}]
+        dc_id = self.ordering.get_location_id('dal13')
+        self.assertEqual(1854895, dc_id)
+
+    def test_get_location_id_keyname(self):
+        locations = self.set_mock('SoftLayer_Location', 'getDatacenters')
+        locations.return_value =[{'id': 1854895, 'name': 'dal13', 'regions': [{'keyname': 'DALLAS13'}]}]
+        dc_id = self.ordering.get_location_id('DALLAS13')
+        self.assertEqual(1854895, dc_id)
+
+    def test_get_location_id_exception(self):
+        locations = self.set_mock('SoftLayer_Location', 'getDatacenters')
+        locations.return_value = []
+        self.assertRaises(exceptions.SoftLayerError,  self.ordering.get_location_id, "BURMUDA")
+

@@ -7,6 +7,8 @@
 """
 # pylint: disable=no-self-use
 
+from re import match
+
 from SoftLayer import exceptions
 
 CATEGORY_MASK = '''id,
@@ -443,7 +445,7 @@ class OrderingManager(object):
         #                                    'domain': 'softlayer.com'}]}
         order.update(extras)
         order['packageId'] = package['id']
-        order['location'] = location
+        order['location'] = self.get_location_id(location)
         order['quantity'] = quantity
         order['useHourlyPricing'] = hourly
 
@@ -471,3 +473,23 @@ class OrderingManager(object):
 
         regions = self.package_svc.getRegions(id=package['id'], mask=mask)
         return regions
+
+    def get_location_id(self, location):
+        """Finds the location ID of a given datacenter
+
+        This is mostly used so either a dc name, or regions keyname can be used when ordering
+        :param str location: Region Keyname (DALLAS13) or datacenter name (dal13)
+        :returns: integer id of the datacenter
+        """
+
+        mask = "mask[id,name,regions[keyname]]"
+        if match(r'[a-zA-Z]{3}[0-9]{2}', location) is not None:
+            search = {'name' : {'operation': location}}
+        else:
+            search = {'regions' : {'keyname' : {'operation': location}}}
+        datacenter = self.client.call('SoftLayer_Location', 'getDatacenters', mask=mask, filter=search)
+        # [{'id': 1854895, 'name': 'dal13', 'regions': [{'keyname': 'DALLAS13'}]}]
+        if len(datacenter) != 1:
+            raise exceptions.SoftLayerError("Unable to find location: %s" % location)
+        return datacenter[0]['id']
+
