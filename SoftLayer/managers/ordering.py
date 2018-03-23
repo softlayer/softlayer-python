@@ -484,12 +484,11 @@ class OrderingManager(object):
 
         mask = "mask[id,name,regions[keyname]]"
         if match(r'[a-zA-Z]{3}[0-9]{2}', location) is not None:
-            search = {'name' : {'operation': location}}
+            search = {'name': {'operation': location}}
         else:
-            search = {'regions' : {'keyname' : {'operation': location}}}
+            search = {'regions': {'keyname': {'operation': location}}}
         datacenter = self.client.call('SoftLayer_Location', 'getDatacenters', mask=mask, filter=search)
         # [{'id': 1854895, 'name': 'dal13', 'regions': [{'keyname': 'DALLAS13'}]}]
         if len(datacenter) != 1:
             raise exceptions.SoftLayerError("Unable to find location: %s" % location)
         return datacenter[0]['id']
-

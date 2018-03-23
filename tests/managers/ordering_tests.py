@@ -383,7 +383,7 @@ class OrderingTests(testing.TestCase):
 
     def test_get_location_id_keyname(self):
         locations = self.set_mock('SoftLayer_Location', 'getDatacenters')
-        locations.return_value =[{'id': 1854895, 'name': 'dal13', 'regions': [{'keyname': 'DALLAS13'}]}]
+        locations.return_value = [{'id': 1854895, 'name': 'dal13', 'regions': [{'keyname': 'DALLAS13'}]}]
         dc_id = self.ordering.get_location_id('DALLAS13')
         self.assertEqual(1854895, dc_id)
 
@@ -391,4 +391,3 @@ class OrderingTests(testing.TestCase):
         locations = self.set_mock('SoftLayer_Location', 'getDatacenters')
         locations.return_value = []
         self.assertRaises(exceptions.SoftLayerError,  self.ordering.get_location_id, "BURMUDA")
-
