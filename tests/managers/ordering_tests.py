@@ -225,9 +225,9 @@ class OrderingTests(testing.TestCase):
         self.assertEqual('Preset {} does not exist in package {}'.format(keyname, 'PACKAGE_KEYNAME'), str(exc))
 
     def test_get_price_id_list(self):
-        price1 = {'id': 1234, 'locationGroupId': ''}
+        price1 = {'id': 1234, 'locationGroupId': None}
         item1 = {'id': 1111, 'keyName': 'ITEM1', 'prices': [price1]}
-        price2 = {'id': 5678, 'locationGroupId': ''}
+        price2 = {'id': 5678, 'locationGroupId': None}
         item2 = {'id': 2222, 'keyName': 'ITEM2', 'prices': [price2]}
 
         with mock.patch.object(self.ordering, 'list_items') as list_mock:
