@@ -126,10 +126,16 @@ class HardwareTests(testing.TestCase):
                 'key': '10',
                 'name': '10 Mbps Public & Private Network Uplinks'
             }],
-            'sizes': [{
-                'key': 'S1270_8GB_2X1TBSATA_NORAID',
-                'name': 'Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID'
-            }]
+            'sizes': [
+                {
+                    'key': 'S1270_8GB_2X1TBSATA_NORAID',
+                    'name': 'Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID'
+                },
+                {
+                    'key': 'DGOLD_6140_384GB_4X960GB_SSD_SED_RAID_10',
+                    'name': 'Dual Xeon Gold, 384GB Ram, 4x960GB SSD, RAID 10'
+                }
+            ]
         }
 
         self.assertEqual(options, expected)
