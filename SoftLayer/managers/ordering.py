@@ -341,7 +341,7 @@ class OrderingManager(object):
             # can take that ID and create the proper price for us in the location
             # in which the order is made
             price_id = [p['id'] for p in matching_item['prices']
-                        if p['locationGroupId'] == ''][0]
+                        if not p.get('locationGroupId')][0]
             prices.append(price_id)
 
         return prices
