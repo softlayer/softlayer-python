@@ -15,13 +15,11 @@ from SoftLayer.CLI import helpers
 @click.option('--immediate',
               is_flag=True,
               default=False,
-              help="""Cancels the server immediately (instead of on the billing
- anniversary)""")
+              help="Cancels the server immediately (instead of on the billing anniversary)")
 @click.option('--comment',
               help="An optional comment to add to the cancellation ticket")
 @click.option('--reason',
-              help="""An optional cancellation reason. See cancel-reasons for
- a list of available options""")
+              help="An optional cancellation reason. See cancel-reasons for a list of available options")
 @environment.pass_env
 def cli(env, identifier, immediate, comment, reason):
     """Cancel a dedicated server."""
