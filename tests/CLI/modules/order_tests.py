@@ -210,9 +210,9 @@ class OrderTests(testing.TestCase):
 
     def _get_order_items(self):
         item1 = {'keyName': 'ITEM1', 'description': 'description1',
-                 'prices': [{'id': 1111, 'locationGroupId': ''}]}
+                 'prices': [{'id': 1111, 'locationGroupId': None}]}
         item2 = {'keyName': 'ITEM2', 'description': 'description2',
-                 'prices': [{'id': 2222, 'locationGroupId': ''}]}
+                 'prices': [{'id': 2222, 'locationGroupId': None}]}
 
         return [item1, item2]
 
