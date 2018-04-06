@@ -21,7 +21,7 @@ from SoftLayer import utils
 
 LOGGER = logging.getLogger(__name__)
 # transports.Request does have a lot of instance attributes. :(
-# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-instance-attributes, no-self-use
 
 __all__ = [
     'Request',
@@ -486,7 +486,7 @@ class TimingTransport(object):
 
     def print_reproduceable(self, call):
         """Not Implemented"""
-        return "Not Implemented"
+        return call.service
 
 
 class FixtureTransport(object):
@@ -505,7 +505,7 @@ class FixtureTransport(object):
 
     def print_reproduceable(self, call):
         """Not Implemented"""
-        return "Not Implemented"
+        return call.service
 
 
 def _proxies_dict(proxy):
