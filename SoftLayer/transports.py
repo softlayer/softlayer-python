@@ -310,9 +310,9 @@ class RestTransport(object):
             params['objectMask'] = request.mask
 
         if request.limit or request.offset:
-            limit = request.limit  or 0 
-            offset = request.offset or 0 
-            params['resultLimit'] = "%d,%d" % (offset,limit)
+            limit = request.limit or 0
+            offset = request.offset or 0
+            params['resultLimit'] = "%d,%d" % (offset, limit)
 
         if request.filter:
             params['objectFilter'] = json.dumps(request.filter)

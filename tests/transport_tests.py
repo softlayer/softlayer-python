@@ -256,12 +256,11 @@ class TestXmlRpcAPICall(testing.TestCase):
 
         self.assertRaises(SoftLayer.TransportError, self.transport, req)
 
-
     def test_print_reproduceable(self):
         req = transports.Request()
         req.url = "https://test.com"
         req.payload = "testing"
-        req.transport_headers = {"test-headers" : 'aaaa'}
+        req.transport_headers = {"test-headers": 'aaaa'}
         output_text = self.transport.print_reproduceable(req)
         self.assertIn("https://test.com", output_text)
 
@@ -591,9 +590,10 @@ class TestRestAPICall(testing.TestCase):
         req = transports.Request()
         req.url = "https://test.com"
         req.payload = "testing"
-        req.transport_headers = {"test-headers" : 'aaaa'}
+        req.transport_headers = {"test-headers": 'aaaa'}
         output_text = self.transport.print_reproduceable(req)
         self.assertIn("https://test.com", output_text)
+
 
 class TestFixtureTransport(testing.TestCase):
 
@@ -619,8 +619,8 @@ class TestFixtureTransport(testing.TestCase):
         req.method = 'getObjectzzzz'
         self.assertRaises(NotImplementedError, self.transport, req)
 
-class TestTimingTransport(testing.TestCase):
 
+class TestTimingTransport(testing.TestCase):
 
     def set_up(self):
         fixture_transport = transports.FixtureTransport()
@@ -649,8 +649,8 @@ class TestTimingTransport(testing.TestCase):
         output_text = self.transport.print_reproduceable(req)
         self.assertEqual('SoftLayer_Account', output_text)
 
-class TestDebugTransport(testing.TestCase):
 
+class TestDebugTransport(testing.TestCase):
 
     def set_up(self):
         fixture_transport = transports.FixtureTransport()
@@ -683,7 +683,7 @@ class TestDebugTransport(testing.TestCase):
         req = transports.Request()
         req.url = "https://test.com"
         req.payload = "testing"
-        req.transport_headers = {"test-headers" : 'aaaa'}
+        req.transport_headers = {"test-headers": 'aaaa'}
         req.args = 'createObject'
 
         rest_transport = transports.RestTransport()
@@ -693,7 +693,6 @@ class TestDebugTransport(testing.TestCase):
 
         self.assertIn("https://test.com", output_text)
         self.assertIn("-X POST", output_text)
-
 
     @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_error(self, request):
@@ -715,7 +714,3 @@ class TestDebugTransport(testing.TestCase):
         self.assertRaises(SoftLayer.SoftLayerAPIError, transport, req)
         calls = transport.get_last_calls()
         self.assertEqual(404, calls[0].exception.faultCode)
-
-
-
-
