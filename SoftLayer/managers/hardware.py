@@ -78,8 +78,11 @@ class HardwareManager(utils.IdentifierMixin, object):
         reasons = self.get_cancellation_reasons()
         cancel_reason = reasons.get(reason, reasons['unneeded'])
         ticket_mgr = SoftLayer.TicketManager(self.client)
-        mask = 'mask[id, hourlyBillingFlag, billingItem[id], openCancellationTicket[id]]'
+        mask = 'mask[id, hourlyBillingFlag, billingItem[id], openCancellationTicket[id], activeTransaction]'
         hw_billing = self.get_hardware(hardware_id, mask=mask)
+
+        if 'activeTransaction' in hw_billing:
+            raise SoftLayer.SoftLayerError("Unable to cancel hardware with running transaction")
 
         if 'billingItem' not in hw_billing:
             raise SoftLayer.SoftLayerError("Ticket #%s already exists for this server" %
