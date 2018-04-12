@@ -809,19 +809,6 @@ class VSWaitReadyGoTests(testing.TestCase):
         _sleep.assert_has_calls([mock.call(0)])
         self.assertFalse(value)
 
-    def test_active_reload(self):
-        # actively running reload
-        self.guestObject.side_effect = [
-            {'activeTransaction': {'id': 1}},
-            {
-                'activeTransaction': {'id': 1},
-                'provisionDate': 'aaa',
-                'lastOperatingSystemReload': {'id': 1},
-            },
-        ]
-        value = self.vs.wait_for_ready(1, 0)
-        self.assertFalse(value)
-
     def test_reload_no_pending(self):
         # reload complete, maintance transactions
         self.guestObject.return_value = {
