@@ -201,7 +201,18 @@ class OrderingTests(testing.TestCase):
 
     def test_get_preset_by_key(self):
         keyname = 'PRESET_KEYNAME'
-        preset_filter = {'activePresets': {'keyName': {'operation': '_= %s' % keyname}}}
+        preset_filter = {
+            'activePresets': {
+                'keyName': {
+                    'operation': '_= %s' % keyname
+                }
+            },
+            'accountRestrictedActivePresets': {
+                'keyName': {
+                    'operation': '_= %s' % keyname
+                }
+            }
+        }
 
         with mock.patch.object(self.ordering, 'list_presets') as list_mock:
             list_mock.return_value = ['preset1']
@@ -213,8 +224,18 @@ class OrderingTests(testing.TestCase):
 
     def test_get_preset_by_key_preset_not_found(self):
         keyname = 'PRESET_KEYNAME'
-        preset_filter = {'activePresets': {'keyName': {'operation': '_= %s' % keyname}}}
-
+        preset_filter = {
+            'activePresets': {
+                'keyName': {
+                    'operation': '_= %s' % keyname
+                }
+            },
+            'accountRestrictedActivePresets': {
+                'keyName': {
+                    'operation': '_= %s' % keyname
+                }
+            }
+        }
         with mock.patch.object(self.ordering, 'list_presets') as list_mock:
             list_mock.return_value = []
 

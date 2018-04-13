@@ -299,7 +299,18 @@ class OrderingManager(object):
     def get_preset_by_key(self, package_keyname, preset_keyname, mask=None):
         """Gets a single preset with the given key."""
         preset_operation = '_= %s' % preset_keyname
-        _filter = {'activePresets': {'keyName': {'operation': preset_operation}}}
+        _filter = {
+            'activePresets': {
+                'keyName': {
+                    'operation': preset_operation
+                }
+            },
+            'accountRestrictedActivePresets': {
+                'keyName': {
+                    'operation': preset_operation
+                }
+            }
+        }
 
         presets = self.list_presets(package_keyname, mask=mask, filter=_filter)
 
