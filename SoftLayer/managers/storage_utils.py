@@ -112,17 +112,11 @@ def find_price_by_category(package, price_category):
     :return: Returns the price for the given category, or an error if not found
     """
     for item in package['items']:
-        for price in item['prices']:
-            if price['locationGroupId'] != '':
-                continue
+        price_id = _find_price_id(item['prices'], price_category)
+        if price_id:
+            return price_id
 
-            if not _has_category(price['categories'], price_category):
-                continue
-
-            return {'id': price['id']}
-
-    raise ValueError("Could not find price with the category, %s"
-                     % price_category)
+    raise ValueError("Could not find price with the category, %s" % price_category)
 
 
 def find_ent_space_price(package, category, size, tier_level):
@@ -141,25 +135,14 @@ def find_ent_space_price(package, category, size, tier_level):
     else:  # category == 'endurance'
         category_code = 'performance_storage_space'
 
+    level = ENDURANCE_TIERS.get(tier_level)
+
     for item in package['items']:
         if int(item['capacity']) != size:
             continue
-
-        for price in item['prices']:
-            # Only collect prices from valid location groups.
-            if price['locationGroupId'] != '':
-                continue
-
-            level = ENDURANCE_TIERS.get(tier_level)
-            if price['capacityRestrictionType'] != 'STORAGE_TIER_LEVEL'\
-                    or level < int(price['capacityRestrictionMinimum'])\
-                    or level > int(price['capacityRestrictionMaximum']):
-                continue
-
-            if not _has_category(price['categories'], category_code):
-                continue
-
-            return {'id': price['id']}
+        price_id = _find_price_id(item['prices'], category_code, 'STORAGE_TIER_LEVEL', level)
+        if price_id:
+            return price_id
 
     raise ValueError("Could not find price for %s storage space" % category)
 
@@ -178,15 +161,9 @@ def find_ent_endurance_tier_price(package, tier_level):
         else:
             continue
 
-        for price in item['prices']:
-            # Only collect prices from valid location groups.
-            if price['locationGroupId'] != '':
-                continue
-
-            if not _has_category(price['categories'], 'storage_tier_level'):
-                continue
-
-            return {'id': price['id']}
+        price_id = _find_price_id(item['prices'], 'storage_tier_level')
+        if price_id:
+            return price_id
 
     raise ValueError("Could not find price for endurance tier level")
 
@@ -225,16 +202,9 @@ def find_perf_space_price(package, size):
         if int(item['capacity']) != size:
             continue
 
-        for price in item['prices']:
-            # Only collect prices from valid location groups.
-            if price['locationGroupId'] != '':
-                continue
-
-            if not _has_category(price['categories'],
-                                 'performance_storage_space'):
-                continue
-
-            return {'id': price['id']}
+        price_id = _find_price_id(item['prices'], 'performance_storage_space')
+        if price_id:
+            return price_id
 
     raise ValueError("Could not find performance space price for this volume")
 
@@ -251,21 +221,9 @@ def find_perf_iops_price(package, size, iops):
         if int(item['capacity']) != int(iops):
             continue
 
-        for price in item['prices']:
-            # Only collect prices from valid location groups.
-            if price['locationGroupId'] != '':
-                continue
-
-            if not _has_category(price['categories'],
-                                 'performance_storage_iops'):
-                continue
-
-            if price['capacityRestrictionType'] != 'STORAGE_SPACE'\
-                    or size < int(price['capacityRestrictionMinimum'])\
-                    or size > int(price['capacityRestrictionMaximum']):
-                continue
-
-            return {'id': price['id']}
+        price_id = _find_price_id(item['prices'], 'performance_storage_iops', 'STORAGE_SPACE', size)
+        if price_id:
+            return price_id
 
     raise ValueError("Could not find price for iops for the given volume")
 
@@ -294,16 +252,9 @@ def find_saas_endurance_space_price(package, size, tier_level):
         if size < capacity_minimum or size > capacity_maximum:
             continue
 
-        for price in item['prices']:
-            # Only collect prices from valid location groups.
-            if price['locationGroupId'] != '':
-                continue
-
-            if not _has_category(price['categories'],
-                                 'performance_storage_space'):
-                continue
-
-            return {'id': price['id']}
+        price_id = _find_price_id(item['prices'], 'performance_storage_space')
+        if price_id:
+            return price_id
 
     raise ValueError("Could not find price for endurance storage space")
 
@@ -326,15 +277,9 @@ def find_saas_endurance_tier_price(package, tier_level):
         if int(item['capacity']) != target_capacity:
             continue
 
-        for price in item['prices']:
-            # Only collect prices from valid location groups.
-            if price['locationGroupId'] != '':
-                continue
-
-            if not _has_category(price['categories'], 'storage_tier_level'):
-                continue
-
-            return {'id': price['id']}
+        price_id = _find_price_id(item['prices'], 'storage_tier_level')
+        if price_id:
+            return price_id
 
     raise ValueError("Could not find price for endurance tier level")
 
@@ -364,17 +309,9 @@ def find_saas_perform_space_price(package, size):
         key_name = '{0}_{1}_GBS'.format(capacity_minimum, capacity_maximum)
         if item['keyName'] != key_name:
             continue
-
-        for price in item['prices']:
-            # Only collect prices from valid location groups.
-            if price['locationGroupId'] != '':
-                continue
-
-            if not _has_category(price['categories'],
-                                 'performance_storage_space'):
-                continue
-
-            return {'id': price['id']}
+        price_id = _find_price_id(item['prices'], 'performance_storage_space')
+        if price_id:
+            return price_id
 
     raise ValueError("Could not find price for performance storage space")
 
@@ -402,21 +339,9 @@ def find_saas_perform_iops_price(package, size, iops):
         if iops < capacity_minimum or iops > capacity_maximum:
             continue
 
-        for price in item['prices']:
-            # Only collect prices from valid location groups.
-            if price['locationGroupId'] != '':
-                continue
-
-            if not _has_category(price['categories'],
-                                 'performance_storage_iops'):
-                continue
-
-            if price['capacityRestrictionType'] != 'STORAGE_SPACE'\
-                    or size < int(price['capacityRestrictionMinimum'])\
-                    or size > int(price['capacityRestrictionMaximum']):
-                continue
-
-            return {'id': price['id']}
+        price_id = _find_price_id(item['prices'], 'performance_storage_iops', 'STORAGE_SPACE', size)
+        if price_id:
+            return price_id
 
     raise ValueError("Could not find price for iops for the given volume")
 
@@ -441,21 +366,9 @@ def find_saas_snapshot_space_price(package, size, tier=None, iops=None):
         if int(item['capacity']) != size:
             continue
 
-        for price in item['prices']:
-            # Only collect prices from valid location groups.
-            if price['locationGroupId'] != '':
-                continue
-
-            if target_restriction_type != price['capacityRestrictionType']\
-                    or target_value < int(price['capacityRestrictionMinimum'])\
-                    or target_value > int(price['capacityRestrictionMaximum']):
-                continue
-
-            if not _has_category(price['categories'],
-                                 'storage_snapshot_space'):
-                continue
-
-            return {'id': price['id']}
+        price_id = _find_price_id(item['prices'], 'storage_snapshot_space', target_restriction_type, target_value)
+        if price_id:
+            return price_id
 
     raise ValueError("Could not find price for snapshot space")
 
@@ -481,21 +394,14 @@ def find_saas_replication_price(package, tier=None, iops=None):
         if item['keyName'] != target_item_keyname:
             continue
 
-        for price in item['prices']:
-            # Only collect prices from valid location groups.
-            if price['locationGroupId'] != '':
-                continue
-
-            if target_restriction_type != price['capacityRestrictionType']\
-                    or target_value < int(price['capacityRestrictionMinimum'])\
-                    or target_value > int(price['capacityRestrictionMaximum']):
-                continue
-
-            if not _has_category(price['categories'],
-                                 'performance_storage_replication'):
-                continue
-
-            return {'id': price['id']}
+        price_id = _find_price_id(
+            item['prices'],
+            'performance_storage_replication',
+            target_restriction_type,
+            target_value
+        )
+        if price_id:
+            return price_id
 
     raise ValueError("Could not find price for replicant volume")
 
@@ -1090,3 +996,21 @@ def _has_category(categories, category_code):
 
 def _staas_version_is_v2_or_above(volume):
     return int(volume['staasVersion']) > 1 and volume['hasEncryptionAtRest']
+
+
+def _find_price_id(prices, category, restriction_type=None, restriction_value=None):
+    for price in prices:
+        # Only collect prices from valid location groups.
+        if price['locationGroupId']:
+            continue
+
+        if restriction_type is not None and restriction_value is not None:
+            if restriction_type != price['capacityRestrictionType']\
+                    or restriction_value < int(price['capacityRestrictionMinimum'])\
+                    or restriction_value > int(price['capacityRestrictionMaximum']):
+                continue
+
+        if not _has_category(price['categories'], category):
+            continue
+
+        return {'id': price['id']}

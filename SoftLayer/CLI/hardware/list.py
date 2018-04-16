@@ -20,10 +20,7 @@ COLUMNS = [
     column_helper.Column(
         'action',
         lambda server: formatting.active_txn(server),
-        mask='''
-        mask(SoftLayer_Hardware_Server)[activeTransaction[
-            id,transactionStatus[name,friendlyName]
-        ]]'''),
+        mask='activeTransaction[id, transactionStatus[name, friendlyName]]'),
     column_helper.Column('power_state', ('powerState', 'name')),
     column_helper.Column(
         'created_by',
@@ -52,22 +49,17 @@ DEFAULT_COLUMNS = [
 @click.option('--memory', '-m', help='Filter by memory in gigabytes')
 @click.option('--network', '-n', help='Filter by network port speed in Mbps')
 @helpers.multi_option('--tag', help='Filter by tags')
-@click.option('--sortby', help='Column to sort by',
-              default='hostname',
-              show_default=True)
+@click.option('--sortby', help='Column to sort by', default='hostname', show_default=True)
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
-              help='Columns to display. [options: %s]'
-              % ', '.join(column.name for column in COLUMNS),
+              help='Columns to display. [options: %s]' % ', '.join(column.name for column in COLUMNS),
               default=','.join(DEFAULT_COLUMNS),
               show_default=True)
 @environment.pass_env
-def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag,
-        columns):
+def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag, columns):
     """List hardware servers."""
 
     manager = SoftLayer.HardwareManager(env.client)
-
     servers = manager.list_hardware(hostname=hostname,
                                     domain=domain,
                                     cpus=cpu,
@@ -75,7 +67,7 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag,
                                     datacenter=datacenter,
                                     nic_speed=network,
                                     tags=tag,
-                                    mask=columns.mask())
+                                    mask="mask(SoftLayer_Hardware_Server)[%s]" % columns.mask())
 
     table = formatting.Table(columns.columns)
     table.sortby = sortby
