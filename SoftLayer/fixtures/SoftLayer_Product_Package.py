@@ -686,7 +686,7 @@ SAAS_REST_PACKAGE = {
                     'locationGroupId': None
                 }
             ]
-        },{
+        }, {
             'capacity': '20',
             'keyName': '',
             'prices': [

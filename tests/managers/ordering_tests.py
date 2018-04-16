@@ -102,7 +102,21 @@ class OrderingTests(testing.TestCase):
         self.assertEqual(result, fixtures.SoftLayer_Product_Order.verifyOrder)
         self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder')
 
-    def test_order_quote(self):
+    def test_order_quote_virtual_guest(self):
+        guest_quote = {
+            'orderContainers': [{
+                'presetId': '',
+                'prices': [{
+                    'id': 1921
+                }],
+                'quantity': 1,
+                'packageId': 46,
+                'useHourlyPricing': '',
+            }],
+        }
+
+        mock = self.set_mock('SoftLayer_Billing_Order_Quote', 'getRecalculatedOrderContainer')
+        mock.return_value = guest_quote
         result = self.ordering.order_quote(1234,
                                            [{'hostname': 'test1',
                                              'domain': 'example.com'}],
@@ -112,6 +126,17 @@ class OrderingTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
 
     def test_generate_order_template(self):
+        result = self.ordering.generate_order_template(
+            1234, [{'hostname': 'test1', 'domain': 'example.com'}], quantity=1)
+        self.assertEqual(result, {'presetId': None,
+                                  'hardware': [{'domain': 'example.com',
+                                                'hostname': 'test1'}],
+                                  'useHourlyPricing': '',
+                                  'packageId': 50,
+                                  'prices': [{'id': 1921}],
+                                  'quantity': 1})
+
+    def test_generate_order_template_virtual(self):
         result = self.ordering.generate_order_template(
             1234, [{'hostname': 'test1', 'domain': 'example.com'}], quantity=1)
         self.assertEqual(result, {'presetId': None,
@@ -148,6 +173,18 @@ class OrderingTests(testing.TestCase):
             cats = self.ordering.list_categories('PACKAGE_KEYNAME')
 
         mock_get_pkg.assert_called_once_with('PACKAGE_KEYNAME', mask='id')
+        self.assertEqual(p_mock.return_value, cats)
+
+    def test_list_categories_filters(self):
+        p_mock = self.set_mock('SoftLayer_Product_Package', 'getConfiguration')
+        p_mock.return_value = ['cat1', 'cat2']
+        fake_filter = {'test': {'operation': 1234}}
+        with mock.patch.object(self.ordering, 'get_package_by_key') as mock_get_pkg:
+            mock_get_pkg.return_value = {'id': 1234}
+
+            cats = self.ordering.list_categories('PACKAGE_KEYNAME', filter=fake_filter)
+
+        self.assert_called_with('SoftLayer_Product_Package', 'getConfiguration', filter=fake_filter)
         self.assertEqual(p_mock.return_value, cats)
 
     def test_list_items(self):
@@ -412,6 +449,10 @@ class OrderingTests(testing.TestCase):
         locations = self.set_mock('SoftLayer_Location', 'getDatacenters')
         locations.return_value = []
         self.assertRaises(exceptions.SoftLayerError,  self.ordering.get_location_id, "BURMUDA")
+
+    def test_get_location_id_int(self):
+        dc_id = self.ordering.get_location_id(1234)
+        self.assertEqual(1234, dc_id)
 
     def test_location_group_id_none(self):
         # RestTransport uses None for empty locationGroupId
