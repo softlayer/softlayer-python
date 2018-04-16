@@ -412,3 +412,33 @@ class OrderingTests(testing.TestCase):
         locations = self.set_mock('SoftLayer_Location', 'getDatacenters')
         locations.return_value = []
         self.assertRaises(exceptions.SoftLayerError,  self.ordering.get_location_id, "BURMUDA")
+
+    def test_location_group_id_none(self):
+        # RestTransport uses None for empty locationGroupId
+        price1 = {'id': 1234, 'locationGroupId': None}
+        item1 = {'id': 1111, 'keyName': 'ITEM1', 'prices': [price1]}
+        price2 = {'id': 5678, 'locationGroupId': None}
+        item2 = {'id': 2222, 'keyName': 'ITEM2', 'prices': [price2]}
+
+        with mock.patch.object(self.ordering, 'list_items') as list_mock:
+            list_mock.return_value = [item1, item2]
+
+            prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'])
+
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, keyName, prices')
+        self.assertEqual([price1['id'], price2['id']], prices)
+
+    def test_location_groud_id_empty(self):
+        # XMLRPCtransport uses '' for empty locationGroupId
+        price1 = {'id': 1234, 'locationGroupId': ''}
+        item1 = {'id': 1111, 'keyName': 'ITEM1', 'prices': [price1]}
+        price2 = {'id': 5678, 'locationGroupId': ""}
+        item2 = {'id': 2222, 'keyName': 'ITEM2', 'prices': [price2]}
+
+        with mock.patch.object(self.ordering, 'list_items') as list_mock:
+            list_mock.return_value = [item1, item2]
+
+            prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'])
+
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, keyName, prices')
+        self.assertEqual([price1['id'], price2['id']], prices)
