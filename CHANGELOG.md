@@ -1,7 +1,17 @@
 # Change Log
 
+
+## [5.4.4] - 2018-04-18
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.3...master
+
+- fixed hw list not showing transactions
+- Re-factored RestTransport and XMLRPCTransport, logging is now only done in the DebugTransport
+- Added print_reproduceable to XMLRPCTransport and RestTransport, which should be very useful in printing out pure API calls.
+- Fixed an issue with RestTransport and locationGroupId
+
+
 ## [5.4.3] - 2018-03-30
- - Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.2...master
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.2...v5.4.3
 
 - Corrected to current create-options output
 - Allow ordering of account restricted presets
