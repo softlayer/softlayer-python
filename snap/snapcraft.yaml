@@ -18,7 +18,7 @@ apps:
      
 parts: 
   my-part:
-    source: https://github.com/kz6fittycent/softlayer-python-1
+    source: https://github.com/softlayer/softlayer-python
     source-type: git
     plugin: python3
     
