@@ -102,7 +102,21 @@ class OrderingTests(testing.TestCase):
         self.assertEqual(result, fixtures.SoftLayer_Product_Order.verifyOrder)
         self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder')
 
-    def test_order_quote(self):
+    def test_order_quote_virtual_guest(self):
+        guest_quote = {
+            'orderContainers': [{
+                'presetId': '',
+                'prices': [{
+                    'id': 1921
+                }],
+                'quantity': 1,
+                'packageId': 46,
+                'useHourlyPricing': '',
+            }],
+        }
+
+        mock = self.set_mock('SoftLayer_Billing_Order_Quote', 'getRecalculatedOrderContainer')
+        mock.return_value = guest_quote
         result = self.ordering.order_quote(1234,
                                            [{'hostname': 'test1',
                                              'domain': 'example.com'}],
@@ -112,6 +126,17 @@ class OrderingTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
 
     def test_generate_order_template(self):
+        result = self.ordering.generate_order_template(
+            1234, [{'hostname': 'test1', 'domain': 'example.com'}], quantity=1)
+        self.assertEqual(result, {'presetId': None,
+                                  'hardware': [{'domain': 'example.com',
+                                                'hostname': 'test1'}],
+                                  'useHourlyPricing': '',
+                                  'packageId': 50,
+                                  'prices': [{'id': 1921}],
+                                  'quantity': 1})
+
+    def test_generate_order_template_virtual(self):
         result = self.ordering.generate_order_template(
             1234, [{'hostname': 'test1', 'domain': 'example.com'}], quantity=1)
         self.assertEqual(result, {'presetId': None,
@@ -148,6 +173,18 @@ class OrderingTests(testing.TestCase):
             cats = self.ordering.list_categories('PACKAGE_KEYNAME')
 
         mock_get_pkg.assert_called_once_with('PACKAGE_KEYNAME', mask='id')
+        self.assertEqual(p_mock.return_value, cats)
+
+    def test_list_categories_filters(self):
+        p_mock = self.set_mock('SoftLayer_Product_Package', 'getConfiguration')
+        p_mock.return_value = ['cat1', 'cat2']
+        fake_filter = {'test': {'operation': 1234}}
+        with mock.patch.object(self.ordering, 'get_package_by_key') as mock_get_pkg:
+            mock_get_pkg.return_value = {'id': 1234}
+
+            cats = self.ordering.list_categories('PACKAGE_KEYNAME', filter=fake_filter)
+
+        self.assert_called_with('SoftLayer_Product_Package', 'getConfiguration', filter=fake_filter)
         self.assertEqual(p_mock.return_value, cats)
 
     def test_list_items(self):
@@ -201,7 +238,18 @@ class OrderingTests(testing.TestCase):
 
     def test_get_preset_by_key(self):
         keyname = 'PRESET_KEYNAME'
-        preset_filter = {'activePresets': {'keyName': {'operation': '_= %s' % keyname}}}
+        preset_filter = {
+            'activePresets': {
+                'keyName': {
+                    'operation': '_= %s' % keyname
+                }
+            },
+            'accountRestrictedActivePresets': {
+                'keyName': {
+                    'operation': '_= %s' % keyname
+                }
+            }
+        }
 
         with mock.patch.object(self.ordering, 'list_presets') as list_mock:
             list_mock.return_value = ['preset1']
@@ -213,8 +261,18 @@ class OrderingTests(testing.TestCase):
 
     def test_get_preset_by_key_preset_not_found(self):
         keyname = 'PRESET_KEYNAME'
-        preset_filter = {'activePresets': {'keyName': {'operation': '_= %s' % keyname}}}
-
+        preset_filter = {
+            'activePresets': {
+                'keyName': {
+                    'operation': '_= %s' % keyname
+                }
+            },
+            'accountRestrictedActivePresets': {
+                'keyName': {
+                    'operation': '_= %s' % keyname
+                }
+            }
+        }
         with mock.patch.object(self.ordering, 'list_presets') as list_mock:
             list_mock.return_value = []
 
@@ -225,9 +283,9 @@ class OrderingTests(testing.TestCase):
         self.assertEqual('Preset {} does not exist in package {}'.format(keyname, 'PACKAGE_KEYNAME'), str(exc))
 
     def test_get_price_id_list(self):
-        price1 = {'id': 1234, 'locationGroupId': ''}
+        price1 = {'id': 1234, 'locationGroupId': None}
         item1 = {'id': 1111, 'keyName': 'ITEM1', 'prices': [price1]}
-        price2 = {'id': 5678, 'locationGroupId': ''}
+        price2 = {'id': 5678, 'locationGroupId': None}
         item2 = {'id': 2222, 'keyName': 'ITEM2', 'prices': [price2]}
 
         with mock.patch.object(self.ordering, 'list_items') as list_mock:
@@ -264,7 +322,7 @@ class OrderingTests(testing.TestCase):
         items = ['ITEM1', 'ITEM2']
         preset = 'PRESET_KEYNAME'
         expected_order = {'complexType': 'SoftLayer_Container_Foo',
-                          'location': 'DALLAS13',
+                          'location': 1854895,
                           'packageId': 1234,
                           'presetId': 5678,
                           'prices': [{'id': 1111}, {'id': 2222}],
@@ -285,7 +343,7 @@ class OrderingTests(testing.TestCase):
         items = ['ITEM1', 'ITEM2']
         complex_type = 'My_Type'
         expected_order = {'complexType': 'My_Type',
-                          'location': 'DALLAS13',
+                          'location': 1854895,
                           'packageId': 1234,
                           'prices': [{'id': 1111}, {'id': 2222}],
                           'quantity': 1,
@@ -374,3 +432,54 @@ class OrderingTests(testing.TestCase):
         to_return[1].return_value = {'id': 5678}
         to_return[2].return_value = [1111, 2222]
         return to_return
+
+    def test_get_location_id_short(self):
+        locations = self.set_mock('SoftLayer_Location', 'getDatacenters')
+        locations.return_value = [{'id': 1854895, 'name': 'dal13', 'regions': [{'keyname': 'DALLAS13'}]}]
+        dc_id = self.ordering.get_location_id('dal13')
+        self.assertEqual(1854895, dc_id)
+
+    def test_get_location_id_keyname(self):
+        locations = self.set_mock('SoftLayer_Location', 'getDatacenters')
+        locations.return_value = [{'id': 1854895, 'name': 'dal13', 'regions': [{'keyname': 'DALLAS13'}]}]
+        dc_id = self.ordering.get_location_id('DALLAS13')
+        self.assertEqual(1854895, dc_id)
+
+    def test_get_location_id_exception(self):
+        locations = self.set_mock('SoftLayer_Location', 'getDatacenters')
+        locations.return_value = []
+        self.assertRaises(exceptions.SoftLayerError,  self.ordering.get_location_id, "BURMUDA")
+
+    def test_get_location_id_int(self):
+        dc_id = self.ordering.get_location_id(1234)
+        self.assertEqual(1234, dc_id)
+
+    def test_location_group_id_none(self):
+        # RestTransport uses None for empty locationGroupId
+        price1 = {'id': 1234, 'locationGroupId': None}
+        item1 = {'id': 1111, 'keyName': 'ITEM1', 'prices': [price1]}
+        price2 = {'id': 5678, 'locationGroupId': None}
+        item2 = {'id': 2222, 'keyName': 'ITEM2', 'prices': [price2]}
+
+        with mock.patch.object(self.ordering, 'list_items') as list_mock:
+            list_mock.return_value = [item1, item2]
+
+            prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'])
+
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, keyName, prices')
+        self.assertEqual([price1['id'], price2['id']], prices)
+
+    def test_location_groud_id_empty(self):
+        # XMLRPCtransport uses '' for empty locationGroupId
+        price1 = {'id': 1234, 'locationGroupId': ''}
+        item1 = {'id': 1111, 'keyName': 'ITEM1', 'prices': [price1]}
+        price2 = {'id': 5678, 'locationGroupId': ""}
+        item2 = {'id': 2222, 'keyName': 'ITEM2', 'prices': [price2]}
+
+        with mock.patch.object(self.ordering, 'list_items') as list_mock:
+            list_mock.return_value = [item1, item2]
+
+            prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'])
+
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, keyName, prices')
+        self.assertEqual([price1['id'], price2['id']], prices)

@@ -1,7 +1,26 @@
 # Change Log
 
+
+## [5.4.4] - 2018-04-18
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.3...master
+
+- fixed hw list not showing transactions
+- Re-factored RestTransport and XMLRPCTransport, logging is now only done in the DebugTransport
+- Added print_reproduceable to XMLRPCTransport and RestTransport, which should be very useful in printing out pure API calls.
+- Fixed an issue with RestTransport and locationGroupId
+
+
+## [5.4.3] - 2018-03-30
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.2...v5.4.3
+
+- Corrected to current create-options output
+- Allow ordering of account restricted presets
+- Added lookup function for datacenter names and ability to use `slcli order` with short DC names
+- Changed locatoinGroupId to check for None instead of empty string
+- Added a way to try to cancel montly bare metal immediately. THis is done by automatically updating the cancellation request. A human still needs to read the ticket and process it for the reclaim to complete.
+
 ## [5.4.2] - 2018-02-22
- - Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.1...master
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.1...v5.4.2
 
 - add GPU to the virtual create-options table
 - Remove 'virtual' from the hardware ready command.

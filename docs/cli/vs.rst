@@ -31,84 +31,249 @@ Luckily, there's a simple command to show all options: `slcli vs create-options`
 ::
 
 	$ slcli vs create-options
-	:.................:...........................................................................................:
-	:            Name : Value                                                                                     :
-	:.................:...........................................................................................:
-	:      datacenter : ams01,dal01,dal05,dal06,dal09,hkg02,hou02,lon02,mel01,par01,sea01,sjc01,sng01,tor01,wdc01 :
-	:  cpus (private) : 1,2,4,8                                                                                   :
-	: cpus (standard) : 1,2,4,8,12,16                                                                             :
-	:          memory : 1024,2048,4096,6144,8192,12288,16384,32768,49152,65536                                    :
-	:     os (CENTOS) : CENTOS_5_32                                                                               :
-	:                 : CENTOS_5_64                                                                               :
-	:                 : CENTOS_6_32                                                                               :
-	:                 : CENTOS_6_64                                                                               :
-	:                 : CENTOS_7_64                                                                               :
-	:                 : CENTOS_LATEST                                                                             :
-	:                 : CENTOS_LATEST_32                                                                          :
-	:                 : CENTOS_LATEST_64                                                                          :
-	: os (CLOUDLINUX) : CLOUDLINUX_5_32                                                                           :
-	:                 : CLOUDLINUX_5_64                                                                           :
-	:                 : CLOUDLINUX_6_32                                                                           :
-	:                 : CLOUDLINUX_6_64                                                                           :
-	:                 : CLOUDLINUX_LATEST                                                                         :
-	:                 : CLOUDLINUX_LATEST_32                                                                      :
-	:                 : CLOUDLINUX_LATEST_64                                                                      :
-	:     os (DEBIAN) : DEBIAN_6_32                                                                               :
-	:                 : DEBIAN_6_64                                                                               :
-	:                 : DEBIAN_7_32                                                                               :
-	:                 : DEBIAN_7_64                                                                               :
-	:                 : DEBIAN_LATEST                                                                             :
-	:                 : DEBIAN_LATEST_32                                                                          :
-	:                 : DEBIAN_LATEST_64                                                                          :
-	:     os (REDHAT) : REDHAT_5_32                                                                               :
-	:                 : REDHAT_5_64                                                                               :
-	:                 : REDHAT_6_32                                                                               :
-	:                 : REDHAT_6_64                                                                               :
-	:                 : REDHAT_LATEST                                                                             :
-	:                 : REDHAT_LATEST_32                                                                          :
-	:                 : REDHAT_LATEST_64                                                                          :
-	:     os (UBUNTU) : UBUNTU_10_32                                                                              :
-	:                 : UBUNTU_10_64                                                                              :
-	:                 : UBUNTU_12_32                                                                              :
-	:                 : UBUNTU_12_64                                                                              :
-	:                 : UBUNTU_14_32                                                                              :
-	:                 : UBUNTU_14_64                                                                              :
-	:                 : UBUNTU_LATEST                                                                             :
-	:                 : UBUNTU_LATEST_32                                                                          :
-	:                 : UBUNTU_LATEST_64                                                                          :
-	:   os (VYATTACE) : VYATTACE_6.5_64                                                                           :
-	:                 : VYATTACE_6.6_64                                                                           :
-	:                 : VYATTACE_LATEST                                                                           :
-	:                 : VYATTACE_LATEST_64                                                                        :
-	:        os (WIN) : WIN_2003-DC-SP2-1_32                                                                      :
-	:                 : WIN_2003-DC-SP2-1_64                                                                      :
-	:                 : WIN_2003-ENT-SP2-5_32                                                                     :
-	:                 : WIN_2003-ENT-SP2-5_64                                                                     :
-	:                 : WIN_2003-STD-SP2-5_32                                                                     :
-	:                 : WIN_2003-STD-SP2-5_64                                                                     :
-	:                 : WIN_2008-DC-R2_64                                                                         :
-	:                 : WIN_2008-DC-SP2_64                                                                        :
-	:                 : WIN_2008-ENT-R2_64                                                                        :
-	:                 : WIN_2008-ENT-SP2_32                                                                       :
-	:                 : WIN_2008-ENT-SP2_64                                                                       :
-	:                 : WIN_2008-STD-R2-SP1_64                                                                    :
-	:                 : WIN_2008-STD-R2_64                                                                        :
-	:                 : WIN_2008-STD-SP2_32                                                                       :
-	:                 : WIN_2008-STD-SP2_64                                                                       :
-	:                 : WIN_2012-DC_64                                                                            :
-	:                 : WIN_2012-STD_64                                                                           :
-	:                 : WIN_LATEST                                                                                :
-	:                 : WIN_LATEST_32                                                                             :
-	:                 : WIN_LATEST_64                                                                             :
-	:   local disk(0) : 25,100                                                                                    :
-	:   local disk(2) : 25,100,150,200,300                                                                        :
-	:     san disk(0) : 25,100                                                                                    :
-	:     san disk(2) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000           :
-	:     san disk(3) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000           :
-	:     san disk(4) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000           :
-	:     san disk(5) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000           :
-	:             nic : 10,100,1000                                                                               :
-	:.................:...........................................................................................:
+	:................................:.................................................................................:
+	:                           name : value                                                                           :
+	:................................:.................................................................................:
+	:                     datacenter : ams01                                                                           :
+	:                                : ams03                                                                           :
+	:                                : che01                                                                           :
+	:                                : dal01                                                                           :
+	:                                : dal05                                                                           :
+	:                                : dal06                                                                           :
+	:                                : dal09                                                                           :
+	:                                : dal10                                                                           :
+	:                                : dal12                                                                           :
+	:                                : dal13                                                                           :
+	:                                : fra02                                                                           :
+	:                                : hkg02                                                                           :
+	:                                : hou02                                                                           :
+	:                                : lon02                                                                           :
+	:                                : lon04                                                                           :
+	:                                : lon06                                                                           :
+	:                                : mel01                                                                           :
+	:                                : mex01                                                                           :
+	:                                : mil01                                                                           :
+	:                                : mon01                                                                           :
+	:                                : osl01                                                                           :
+	:                                : par01                                                                           :
+	:                                : sao01                                                                           :
+	:                                : sea01                                                                           :
+	:                                : seo01                                                                           :
+	:                                : sjc01                                                                           :
+	:                                : sjc03                                                                           :
+	:                                : sjc04                                                                           :
+	:                                : sng01                                                                           :
+	:                                : syd01                                                                           :
+	:                                : syd04                                                                           :
+	:                                : tok02                                                                           :
+	:                                : tor01                                                                           :
+	:                                : wdc01                                                                           :
+	:                                : wdc04                                                                           :
+	:                                : wdc06                                                                           :
+	:                                : wdc07                                                                           :
+	:             flavors (balanced) : B1_1X2X25                                                                       :
+	:                                : B1_1X2X25                                                                       :
+	:                                : B1_1X2X100                                                                      :
+	:                                : B1_1X2X100                                                                      :
+	:                                : B1_1X4X25                                                                       :
+	:                                : B1_1X4X25                                                                       :
+	:                                : B1_1X4X100                                                                      :
+	:                                : B1_1X4X100                                                                      :
+	:                                : B1_2X4X25                                                                       :
+	:                                : B1_2X4X25                                                                       :
+	:                                : B1_2X4X100                                                                      :
+	:                                : B1_2X4X100                                                                      :
+	:                                : B1_2X8X25                                                                       :
+	:                                : B1_2X8X25                                                                       :
+	:                                : B1_2X8X100                                                                      :
+	:                                : B1_2X8X100                                                                      :
+	:                                : B1_4X8X25                                                                       :
+	:                                : B1_4X8X25                                                                       :
+	:                                : B1_4X8X100                                                                      :
+	:                                : B1_4X8X100                                                                      :
+	:                                : B1_4X16X25                                                                      :
+	:                                : B1_4X16X25                                                                      :
+	:                                : B1_4X16X100                                                                     :
+	:                                : B1_4X16X100                                                                     :
+	:                                : B1_8X16X25                                                                      :
+	:                                : B1_8X16X25                                                                      :
+	:                                : B1_8X16X100                                                                     :
+	:                                : B1_8X16X100                                                                     :
+	:                                : B1_8X32X25                                                                      :
+	:                                : B1_8X32X25                                                                      :
+	:                                : B1_8X32X100                                                                     :
+	:                                : B1_8X32X100                                                                     :
+	:                                : B1_16X32X25                                                                     :
+	:                                : B1_16X32X25                                                                     :
+	:                                : B1_16X32X100                                                                    :
+	:                                : B1_16X32X100                                                                    :
+	:                                : B1_16X64X25                                                                     :
+	:                                : B1_16X64X25                                                                     :
+	:                                : B1_16X64X100                                                                    :
+	:                                : B1_16X64X100                                                                    :
+	:                                : B1_32X64X25                                                                     :
+	:                                : B1_32X64X25                                                                     :
+	:                                : B1_32X64X100                                                                    :
+	:                                : B1_32X64X100                                                                    :
+	:                                : B1_32X128X25                                                                    :
+	:                                : B1_32X128X25                                                                    :
+	:                                : B1_32X128X100                                                                   :
+	:                                : B1_32X128X100                                                                   :
+	:                                : B1_48X192X25                                                                    :
+	:                                : B1_48X192X25                                                                    :
+	:                                : B1_48X192X100                                                                   :
+	:                                : B1_48X192X100                                                                   :
+	: flavors (balanced local - hdd) : BL1_1X2X100                                                                     :
+	:                                : BL1_1X4X100                                                                     :
+	:                                : BL1_2X4X100                                                                     :
+	:                                : BL1_2X8X100                                                                     :
+	:                                : BL1_4X8X100                                                                     :
+	:                                : BL1_4X16X100                                                                    :
+	:                                : BL1_8X16X100                                                                    :
+	:                                : BL1_8X32X100                                                                    :
+	:                                : BL1_16X32X100                                                                   :
+	:                                : BL1_16X64X100                                                                   :
+	:                                : BL1_32X64X100                                                                   :
+	:                                : BL1_32X128X100                                                                  :
+	:                                : BL1_56X242X100                                                                  :
+	: flavors (balanced local - ssd) : BL2_1X2X100                                                                     :
+	:                                : BL2_1X4X100                                                                     :
+	:                                : BL2_2X4X100                                                                     :
+	:                                : BL2_2X8X100                                                                     :
+	:                                : BL2_4X8X100                                                                     :
+	:                                : BL2_4X16X100                                                                    :
+	:                                : BL2_8X16X100                                                                    :
+	:                                : BL2_8X32X100                                                                    :
+	:                                : BL2_16X32X100                                                                   :
+	:                                : BL2_16X64X100                                                                   :
+	:                                : BL2_32X64X100                                                                   :
+	:                                : BL2_32X128X100                                                                  :
+	:                                : BL2_56X242X100                                                                  :
+	:              flavors (compute) : C1_1X1X25                                                                       :
+	:                                : C1_1X1X25                                                                       :
+	:                                : C1_1X1X100                                                                      :
+	:                                : C1_1X1X100                                                                      :
+	:                                : C1_2X2X25                                                                       :
+	:                                : C1_2X2X25                                                                       :
+	:                                : C1_2X2X100                                                                      :
+	:                                : C1_2X2X100                                                                      :
+	:                                : C1_4X4X25                                                                       :
+	:                                : C1_4X4X25                                                                       :
+	:                                : C1_4X4X100                                                                      :
+	:                                : C1_4X4X100                                                                      :
+	:                                : C1_8X8X25                                                                       :
+	:                                : C1_8X8X25                                                                       :
+	:                                : C1_8X8X100                                                                      :
+	:                                : C1_8X8X100                                                                      :
+	:                                : C1_16X16X25                                                                     :
+	:                                : C1_16X16X25                                                                     :
+	:                                : C1_16X16X100                                                                    :
+	:                                : C1_16X16X100                                                                    :
+	:                                : C1_32X32X25                                                                     :
+	:                                : C1_32X32X25                                                                     :
+	:                                : C1_32X32X100                                                                    :
+	:                                : C1_32X32X100                                                                    :
+	:               flavors (memory) : M1_1X8X25                                                                       :
+	:                                : M1_1X8X25                                                                       :
+	:                                : M1_1X8X100                                                                      :
+	:                                : M1_1X8X100                                                                      :
+	:                                : M1_2X16X25                                                                      :
+	:                                : M1_2X16X25                                                                      :
+	:                                : M1_2X16X100                                                                     :
+	:                                : M1_2X16X100                                                                     :
+	:                                : M1_4X32X25                                                                      :
+	:                                : M1_4X32X25                                                                      :
+	:                                : M1_4X32X100                                                                     :
+	:                                : M1_4X32X100                                                                     :
+	:                                : M1_8X64X25                                                                      :
+	:                                : M1_8X64X25                                                                      :
+	:                                : M1_8X64X100                                                                     :
+	:                                : M1_8X64X100                                                                     :
+	:                                : M1_16X128X25                                                                    :
+	:                                : M1_16X128X25                                                                    :
+	:                                : M1_16X128X100                                                                   :
+	:                                : M1_16X128X100                                                                   :
+	:                                : M1_30X240X25                                                                    :
+	:                                : M1_30X240X25                                                                    :
+	:                                : M1_30X240X100                                                                   :
+	:                                : M1_30X240X100                                                                   :
+	:                  flavors (GPU) : AC1_8X60X25                                                                     :
+	:                                : AC1_8X60X100                                                                    :
+	:                                : AC1_16X120X25                                                                   :
+	:                                : AC1_16X120X100                                                                  :
+	:                                : ACL1_8X60X100                                                                   :
+	:                                : ACL1_16X120X100                                                                 :
+	:                cpus (standard) : 1,2,4,8,12,16,32,56                                                             :
+	:               cpus (dedicated) : 1,2,4,8,16,32,56                                                                :
+	:          cpus (dedicated host) : 1,2,4,8,12,16,32,56                                                             :
+	:                         memory : 1024,2048,4096,6144,8192,12288,16384,32768,49152,65536,131072,247808            :
+	:        memory (dedicated host) : 1024,2048,4096,6144,8192,12288,16384,32768,49152,65536,131072,247808            :
+	:                    os (CENTOS) : CENTOS_5_64                                                                     :
+	:                                : CENTOS_6_64                                                                     :
+	:                                : CENTOS_7_64                                                                     :
+	:                                : CENTOS_LATEST                                                                   :
+	:                                : CENTOS_LATEST_64                                                                :
+	:                os (CLOUDLINUX) : CLOUDLINUX_5_64                                                                 :
+	:                                : CLOUDLINUX_6_64                                                                 :
+	:                                : CLOUDLINUX_LATEST                                                               :
+	:                                : CLOUDLINUX_LATEST_64                                                            :
+	:                    os (COREOS) : COREOS_CURRENT_64                                                               :
+	:                                : COREOS_LATEST                                                                   :
+	:                                : COREOS_LATEST_64                                                                :
+	:                    os (DEBIAN) : DEBIAN_6_64                                                                     :
+	:                                : DEBIAN_7_64                                                                     :
+	:                                : DEBIAN_8_64                                                                     :
+	:                                : DEBIAN_9_64                                                                     :
+	:                                : DEBIAN_LATEST                                                                   :
+	:                                : DEBIAN_LATEST_64                                                                :
+	:            os (OTHERUNIXLINUX) : OTHERUNIXLINUX_1_64                                                             :
+	:                                : OTHERUNIXLINUX_LATEST                                                           :
+	:                                : OTHERUNIXLINUX_LATEST_64                                                        :
+	:                    os (REDHAT) : REDHAT_5_64                                                                     :
+	:                                : REDHAT_6_64                                                                     :
+	:                                : REDHAT_7_64                                                                     :
+	:                                : REDHAT_LATEST                                                                   :
+	:                                : REDHAT_LATEST_64                                                                :
+	:                    os (UBUNTU) : UBUNTU_12_64                                                                    :
+	:                                : UBUNTU_14_64                                                                    :
+	:                                : UBUNTU_16_64                                                                    :
+	:                                : UBUNTU_LATEST                                                                   :
+	:                                : UBUNTU_LATEST_64                                                                :
+	:                  os (VYATTACE) : VYATTACE_6.5_64                                                                 :
+	:                                : VYATTACE_6.6_64                                                                 :
+	:                                : VYATTACE_LATEST                                                                 :
+	:                                : VYATTACE_LATEST_64                                                              :
+	:                       os (WIN) : WIN_2003-DC-SP2-1_32                                                            :
+	:                                : WIN_2003-DC-SP2-1_64                                                            :
+	:                                : WIN_2003-ENT-SP2-5_32                                                           :
+	:                                : WIN_2003-ENT-SP2-5_64                                                           :
+	:                                : WIN_2003-STD-SP2-5_32                                                           :
+	:                                : WIN_2003-STD-SP2-5_64                                                           :
+	:                                : WIN_2008-STD-R2-SP1_64                                                          :
+	:                                : WIN_2008-STD-SP2_32                                                             :
+	:                                : WIN_2008-STD-SP2_64                                                             :
+	:                                : WIN_2012-STD-R2_64                                                              :
+	:                                : WIN_2012-STD_64                                                                 :
+	:                                : WIN_2016-STD_64                                                                 :
+	:                                : WIN_LATEST                                                                      :
+	:                                : WIN_LATEST_32                                                                   :
+	:                                : WIN_LATEST_64                                                                   :
+	:                    san disk(0) : 25,100                                                                          :
+	:                    san disk(2) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000 :
+	:                    san disk(3) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000 :
+	:                    san disk(4) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000 :
+	:                    san disk(5) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000 :
+	:                  local disk(0) : 25,100                                                                          :
+	:                  local disk(2) : 25,100,150,200,300                                                              :
+	: local (dedicated host) disk(0) : 25,100                                                                          :
+	: local (dedicated host) disk(2) : 25,100,150,200,300,400                                                          :
+	: local (dedicated host) disk(3) : 25,100,150,200,300,400                                                          :
+	: local (dedicated host) disk(4) : 25,100,150,200,300,400                                                          :
+	: local (dedicated host) disk(5) : 25,100,150,200,300,400                                                          :
+	:                            nic : 10,100,1000                                                                     :
+	:           nic (dedicated host) : 100,1000                                                                        :
+	:................................:.................................................................................:
+
 
 Here's the command to create a 2-core virtual server with 1GiB memory, running
 Ubuntu 14.04 LTS, and that is billed on an hourly basis in the San Jose 1

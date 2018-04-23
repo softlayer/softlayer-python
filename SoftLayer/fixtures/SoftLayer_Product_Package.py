@@ -666,15 +666,111 @@ SAAS_PACKAGE = {
     ]
 }
 
+
+SAAS_REST_PACKAGE = {
+    'categories': [
+        {'categoryCode': 'storage_as_a_service'}
+    ],
+    'id': 759,
+    'name': 'Storage As A Service (StaaS)',
+    'items': [
+        {
+            'capacity': '0',
+            'keyName': '',
+            'prices': [
+                {
+                    'id': 189433,
+                    'categories': [
+                        {'categoryCode': 'storage_as_a_service'}
+                    ],
+                    'locationGroupId': None
+                }
+            ]
+        }, {
+            'capacity': '20',
+            'keyName': '',
+            'prices': [
+                {
+                    'capacityRestrictionMaximum': '200',
+                    'capacityRestrictionMinimum': '200',
+                    'capacityRestrictionType': 'STORAGE_TIER_LEVEL',
+                    'categories': [
+                        {'categoryCode': 'storage_snapshot_space'}
+                    ],
+                    'id': 193853,
+                    'locationGroupId': None
+                }
+            ]
+        }, {
+            'capacity': '0',
+            'capacityMaximum': '1999',
+            'capacityMinimum': '1000',
+            'itemCategory': {'categoryCode': 'performance_storage_space'},
+            'keyName': '1000_1999_GBS',
+            'prices': [
+                {
+                    'id': 190113,
+                    'categories': [
+                        {'categoryCode': 'performance_storage_space'}
+                    ],
+                    'locationGroupId': None
+                }
+            ]
+        }, {
+            'capacity': '0',
+            'capacityMaximum': '20000',
+            'capacityMinimum': '100',
+            'keyName': '',
+            'itemCategory': {'categoryCode': 'performance_storage_iops'},
+            'prices': [
+                {
+                    'capacityRestrictionMaximum': '1999',
+                    'capacityRestrictionMinimum': '1000',
+                    'capacityRestrictionType': 'STORAGE_SPACE',
+                    'categories': [
+                        {'categoryCode': 'performance_storage_iops'}
+                    ],
+                    'id': 190173,
+                    'locationGroupId': None
+                }
+            ]
+        }, {
+            'capacity': '0',
+            'keyName': '',
+            'prices': [
+                {
+                    'categories': [
+                        {'categoryCode': 'storage_file'}
+                    ],
+                    'id': 189453,
+                    'locationGroupId': None
+                }
+            ]
+        }
+    ]
+}
+
+activePreset1 = {
+    'description': 'Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID',
+    'id': 64,
+    'isActive': '1',
+    'keyName': 'S1270_8GB_2X1TBSATA_NORAID',
+    'name': 'S1270 8GB 2X1TBSATA NORAID',
+    'packageId': 200
+}
+
+activePreset2 = {
+    'description': 'Dual Xeon Gold, 384GB Ram, 4x960GB SSD, RAID 10',
+    'id': 65,
+    'isActive': '1',
+    'keyName': 'DGOLD_6140_384GB_4X960GB_SSD_SED_RAID_10',
+    'name': 'DGOLD 6140 384GB 4X960GB SSD SED RAID 10',
+    'packageId': 200
+}
+
 getAllObjects = [{
-    'activePresets': [{
-        'description': 'Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID',
-        'id': 64,
-        'isActive': '1',
-        'keyName': 'S1270_8GB_2X1TBSATA_NORAID',
-        'name': 'S1270 8GB 2X1TBSATA NORAID',
-        'packageId': 200
-    }],
+    'activePresets': [activePreset1],
+    'accountRestrictedActivePresets': [activePreset2],
     'description': 'Bare Metal Server',
     'firstOrderStepId': 1,
     'id': 200,

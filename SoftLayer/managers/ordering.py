@@ -7,6 +7,8 @@
 """
 # pylint: disable=no-self-use
 
+from re import match
+
 from SoftLayer import exceptions
 
 CATEGORY_MASK = '''id,
@@ -297,7 +299,18 @@ class OrderingManager(object):
     def get_preset_by_key(self, package_keyname, preset_keyname, mask=None):
         """Gets a single preset with the given key."""
         preset_operation = '_= %s' % preset_keyname
-        _filter = {'activePresets': {'keyName': {'operation': preset_operation}}}
+        _filter = {
+            'activePresets': {
+                'keyName': {
+                    'operation': preset_operation
+                }
+            },
+            'accountRestrictedActivePresets': {
+                'keyName': {
+                    'operation': preset_operation
+                }
+            }
+        }
 
         presets = self.list_presets(package_keyname, mask=mask, filter=_filter)
 
@@ -341,7 +354,7 @@ class OrderingManager(object):
             # can take that ID and create the proper price for us in the location
             # in which the order is made
             price_id = [p['id'] for p in matching_item['prices']
-                        if p['locationGroupId'] == ''][0]
+                        if not p['locationGroupId']][0]
             prices.append(price_id)
 
         return prices
@@ -443,7 +456,7 @@ class OrderingManager(object):
         #                                    'domain': 'softlayer.com'}]}
         order.update(extras)
         order['packageId'] = package['id']
-        order['location'] = location
+        order['location'] = self.get_location_id(location)
         order['quantity'] = quantity
         order['useHourlyPricing'] = hourly
 
@@ -471,3 +484,23 @@ class OrderingManager(object):
 
         regions = self.package_svc.getRegions(id=package['id'], mask=mask)
         return regions
+
+    def get_location_id(self, location):
+        """Finds the location ID of a given datacenter
+
+        This is mostly used so either a dc name, or regions keyname can be used when ordering
+        :param str location: Region Keyname (DALLAS13) or datacenter name (dal13)
+        :returns: integer id of the datacenter
+        """
+
+        if isinstance(location, int):
+            return location
+        mask = "mask[id,name,regions[keyname]]"
+        if match(r'[a-zA-Z]{3}[0-9]{2}', location) is not None:
+            search = {'name': {'operation': location}}
+        else:
+            search = {'regions': {'keyname': {'operation': location}}}
+        datacenter = self.client.call('SoftLayer_Location', 'getDatacenters', mask=mask, filter=search)
+        if len(datacenter) != 1:
+            raise exceptions.SoftLayerError("Unable to find location: %s" % location)
+        return datacenter[0]['id']

@@ -272,7 +272,7 @@ class VSManager(utils.IdentifierMixin, object):
         :param string post_url: The URI of the post-install script to run
                                 after reload
         :param list ssh_keys: The SSH keys to add to the root user
-        :param int image_id: The ID of the image to load onto the server
+        :param int image_id: The GUID of the image to load onto the server
 
         .. warning::
             This will reformat the primary drive.
@@ -537,7 +537,7 @@ class VSManager(utils.IdentifierMixin, object):
         :param bool local_disk: Flag to indicate if this should be a local disk (default) or a SAN disk.
         :param string datacenter: The short name of the data center in which the VS should reside.
         :param string os_code: The operating system to use. Cannot be specified  if image_id is specified.
-        :param int image_id: The ID of the image to load onto the server. Cannot be specified if os_code is specified.
+        :param int image_id: The GUID of the image to load onto the server. Cannot be specified if os_code is specified.
         :param bool dedicated: Flag to indicate if this should be housed on adedicated or shared host (default).
                                This will incur a fee on your account.
         :param int public_vlan: The ID of the public VLAN on which you want this VS placed.
