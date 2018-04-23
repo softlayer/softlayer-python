@@ -144,13 +144,6 @@ class FileTests(testing.TestCase):
 
         self.assertEqual(2, result.exit_code)
 
-    def test_volume_order_performance_iops_not_multiple_of_100(self):
-        result = self.run_command(['file', 'volume-order',
-                                   '--storage-type=performance', '--size=20',
-                                   '--iops=122', '--location=dal05'])
-
-        self.assertEqual(2, result.exit_code)
-
     def test_volume_order_performance_snapshot_error(self):
         result = self.run_command(['file', 'volume-order',
                                    '--storage-type=performance', '--size=20',
