@@ -35,8 +35,8 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
               'space along with endurance file storage; specifies '
               'the size (in GB) of snapshot space to order')
 @click.option('--service-offering',
-              help='The service offering package to use for placing '
-              'the order [optional, default is \'storage_as_a_service\']',
+              help="""The service offering package to use for placing the order.
+[optional, default is \'storage_as_a_service\']. enterprise and performance are depreciated""",
               default='storage_as_a_service',
               type=click.Choice([
                   'storage_as_a_service',
@@ -70,13 +70,12 @@ def cli(env, storage_type, size, iops, tier,
 
     if storage_type == 'performance':
         if iops is None:
-            raise exceptions.CLIAbort(
-                'Option --iops required with Performance')
+            raise exceptions.CLIAbort('Option --iops required with Performance')
 
         if service_offering == 'performance' and snapshot_size is not None:
             raise exceptions.CLIAbort(
-                '--snapshot-size is not available for performance volumes '
-                'ordered with the \'performance\' service offering option'
+                '--snapshot-size is not available for performance service offerings. '
+                'Use --service-offering storage_as_a_service'
             )
 
         try:
