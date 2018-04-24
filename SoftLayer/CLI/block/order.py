@@ -60,9 +60,9 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 @environment.pass_env
 def cli(env, storage_type, size, iops, tier, os_type,
         location, snapshot_size, service_offering, billing):
-    """Order a block storage volume. 
+    """Order a block storage volume.
 
-    Valid size and iops options can be found here: 
+    Valid size and iops options can be found here:
     https://console.bluemix.net/docs/infrastructure/BlockStorage/index.html#provisioning
     """
     block_manager = SoftLayer.BlockStorageManager(env.client)
