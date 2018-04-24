@@ -75,7 +75,8 @@ username and api_key need to be configured. The easiest way to do that is to
 use: 'slcli setup'""",
              cls=CommandLoader,
              context_settings={'help_option_names': ['-h', '--help'],
-                               'auto_envvar_prefix': 'SLCLI'})
+                               'auto_envvar_prefix': 'SLCLI',
+                               'max_content_width': 999})
 @click.option('--format',
               default=DEFAULT_FORMAT,
               show_default=True,

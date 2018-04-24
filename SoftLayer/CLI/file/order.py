@@ -49,7 +49,11 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 @environment.pass_env
 def cli(env, storage_type, size, iops, tier,
         location, snapshot_size, service_offering, billing):
-    """Order a file storage volume."""
+    """Order a file storage volume.
+    
+    Valid size and iops options can be found here: 
+    https://console.bluemix.net/docs/infrastructure/FileStorage/index.html#provisioning
+    """
     file_manager = SoftLayer.FileStorageManager(env.client)
     storage_type = storage_type.lower()
 
