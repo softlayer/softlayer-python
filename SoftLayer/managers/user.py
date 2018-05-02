@@ -5,7 +5,9 @@
 
     :license: MIT, see LICENSE for more details.
 """
+from SoftLayer import exceptions
 from SoftLayer import utils
+
 
 class UserManager(utils.IdentifierMixin, object):
     """Manages Users.
@@ -47,17 +49,16 @@ class UserManager(utils.IdentifierMixin, object):
 
     def get_user(self, user_id, objectMask=None):
         if objectMask is None:
-            objectMask = """mask[id, address1, city, companyName, country, createDate, 
-                            denyAllResourceAccessOnCreateFlag, displayName, email, firstName, lastName,
-                            modifyDate, officePhone, parentId, passwordExpireDate, postalCode, pptpVpnAllowedFlag,
-                            sslVpnAllowedFlag, state, username, apiAuthenticationKeys[authenticationKey],
-                            userStatus[name]]"""
+            objectMask = """mask[userStatus[name], parent[id, username]]"""
         return self.userService.getObject(id=user_id, mask=objectMask)
 
     def _get_id_from_username(self, username):
         _mask = "mask[id, username]"
-        _filter = {'username': utils.query_filter(name)}
+        _filter = {'users' : {'username': utils.query_filter(username)}}
         user = self.list_users(_mask, _filter)
-        return [result['id']]
+        if len(user) == 1:
+            return [user[0]['id']]
+        else:
+            raise exceptions.SoftLayerError("Unable to find user id for %s" % username)
 
 
