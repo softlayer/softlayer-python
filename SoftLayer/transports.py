@@ -433,6 +433,7 @@ class DebugTransport(object):
         self.requests.append(call)
 
         if call.exception is not None:
+            LOGGER.debug(self.print_reproduceable(call))
             raise call.exception
 
         return call.result

@@ -285,7 +285,8 @@ ALL_ROUTES = [
     ('user', 'SoftLayer.CLI.user'),
     ('user:list', 'SoftLayer.CLI.user.list:cli'),
     ('user:detail', 'SoftLayer.CLI.user.detail:cli'),
-
+    ('user:permissions', 'SoftLayer.CLI.user.permissions:cli'),
+    ('user:edit-permissions', 'SoftLayer.CLI.user.edit_permissions:cli'),
 
     ('vlan', 'SoftLayer.CLI.vlan'),
     ('vlan:detail', 'SoftLayer.CLI.vlan.detail:cli'),

@@ -8,6 +8,8 @@
 from SoftLayer import exceptions
 from SoftLayer import utils
 
+from operator import itemgetter
+
 
 class UserManager(utils.IdentifierMixin, object):
     """Manages Users.
@@ -52,6 +54,18 @@ class UserManager(utils.IdentifierMixin, object):
             objectMask = """mask[userStatus[name], parent[id, username]]"""
         return self.userService.getObject(id=user_id, mask=objectMask)
 
+    def get_all_permissions(self):
+        permissions = self.client.call('User_Customer_CustomerPermission_Permission', 'getAllObjects')
+        return sorted(permissions, key=itemgetter('keyName'))
+
+    def add_permissions(self, user_id, permissions):
+        pretty_permissions = format_permission_object(permissions)
+        return self.userService.addBulkPortalPermission(pretty_permissions, id=user_id)
+
+    def remove_permissions(self, user_id, permissions):
+        pretty_permissions = format_permission_object(permissions)
+        return self.userService.removeBulkPortalPermission(pretty_permissions, id=user_id)
+
     def _get_id_from_username(self, username):
         _mask = "mask[id, username]"
         _filter = {'users' : {'username': utils.query_filter(username)}}
@@ -60,5 +74,11 @@ class UserManager(utils.IdentifierMixin, object):
             return [user[0]['id']]
         else:
             raise exceptions.SoftLayerError("Unable to find user id for %s" % username)
+
+def format_permission_object(permissions):
+    pretty_permissions = []
+    for permission in permissions:
+        pretty_permissions.append({'keyName': permission})
+    return pretty_permissions
 
 
