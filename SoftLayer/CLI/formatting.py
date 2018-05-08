@@ -12,7 +12,7 @@ import json
 import os
 
 import click
-import prettytable
+from prettytable import prettytable
 
 from SoftLayer.CLI import exceptions
 from SoftLayer import utils
@@ -255,7 +255,7 @@ class Table(object):
 
     :param list columns: a list of column names
     """
-    def __init__(self, columns):
+    def __init__(self, columns, title=None):
         duplicated_cols = [col for col, count
                            in collections.Counter(columns).items()
                            if count > 1]
@@ -267,6 +267,7 @@ class Table(object):
         self.rows = []
         self.align = {}
         self.sortby = None
+        self.title = title
 
     def add_row(self, row):
         """Add a row to the table.
@@ -287,6 +288,7 @@ class Table(object):
     def prettytable(self):
         """Returns a new prettytable instance."""
         table = prettytable.PrettyTable(self.columns)
+
         if self.sortby:
             if self.sortby in self.columns:
                 table.sortby = self.sortby
@@ -296,6 +298,8 @@ class Table(object):
         for a_col, alignment in self.align.items():
             table.align[a_col] = alignment
 
+        if self.title:
+            table.title = self.title
         # Adding rows
         for row in self.rows:
             table.add_row(row)

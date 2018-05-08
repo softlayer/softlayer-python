@@ -20,7 +20,7 @@ from pprint import pprint as pp
                 help="Permission keyName to set, multiple instances allowed.")
 @environment.pass_env
 def cli(env, identifier, enable, permission):
-    """Enable or Disable specific permissions for a user"""
+    """Enable or Disable specific permissions."""
     
     mgr = SoftLayer.UserManager(env.client)
     user_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'username')

@@ -1,4 +1,4 @@
-"""List images."""
+"""List Users."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -29,7 +29,7 @@ DEFAULT_COLUMNS = [
     'virtualGuestCount'
 ]
 @click.command()
-@click.option('--name', default=None, help='Filter on user name')
+@click.option('--name', default=None, help='Filter on username')
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
               help='Columns to display. [options: %s]' % ', '.join(column.name for column in COLUMNS),
@@ -37,13 +37,11 @@ DEFAULT_COLUMNS = [
               show_default=True)
 @environment.pass_env
 def cli(env, name, columns):
-    """List images."""
+    """List Users."""
 
     mgr = SoftLayer.UserManager(env.client)
     users = mgr.list_users()
 
-
-    # pp(users)
     table = formatting.Table(columns.columns)
     for user in users:
         table.add_row([value or formatting.blank()

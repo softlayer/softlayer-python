@@ -11,7 +11,7 @@ from pprint import pprint as pp
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """User Permissions."""
+    """User Permissions. TODO change to list all permissions, and which users have them"""
     
     mgr = SoftLayer.UserManager(env.client)
     user_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'username')

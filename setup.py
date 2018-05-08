@@ -31,7 +31,7 @@ setup(
     },
     install_requires=[
         'six >= 1.7.0',
-        'prettytable >= 0.7.0',
+        'ptable >= 0.9.2',
         'click >= 5',
         'requests >= 2.18.4',
         'prompt_toolkit >= 0.53',

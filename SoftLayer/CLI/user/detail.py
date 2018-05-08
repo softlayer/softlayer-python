@@ -11,15 +11,22 @@ from SoftLayer import utils
 
 from pprint import pprint as pp
 
-
-
-
-
 @click.command()
 @click.argument('identifier')
-@click.option('--keys', is_flag=True, default=False)
+@click.option('--keys', is_flag=True, default=False,
+              help="Show the users API key.")
+@click.option('--permissions', '-p', is_flag=True, default=False,
+              help="Display permissions assigned to this user. Master users will show no permissions")
+@click.option('--hardware', '-h', is_flag=True, default=False,
+              help="Display hardware this user has access to.")
+@click.option('--virtual', '-v', is_flag=True, default=False,
+              help="Display virtual guests this user has access to.")
+@click.option('--logins', '-l', is_flag=True, default=False,
+              help="Show login history of this user for the last 30 days")
+@click.option('--events', '-e', is_flag=True, default=False,
+              help="Show audit log for this user.")
 @environment.pass_env
-def cli(env, identifier, keys):
+def cli(env, identifier, keys, permissions, hardware, virtual, logins, events):
     """User details."""
     
     mgr = SoftLayer.UserManager(env.client)
@@ -29,6 +36,27 @@ def cli(env, identifier, keys):
 
     user = mgr.get_user(user_id, object_mask)
     env.fout(basic_info(user, keys))
+
+    if permissions:
+        perms = mgr.get_user_permissions(user_id)
+        env.fout(print_permissions(perms))
+    if hardware:
+        mask = "id, hardware, dedicatedHosts"
+        access = mgr.get_user(user_id, mask)
+        env.fout(print_dedicated_access(access['dedicatedHosts']))
+        env.fout(print_access(access['hardware'], 'Hardware'))
+    if virtual:
+        mask = "id, virtualGuests"
+        access = mgr.get_user(user_id, mask)
+        env.fout(print_access(access['virtualGuests'], 'Virtual Guests'))
+    if logins:
+        mask = "id, unsuccessfulLogins, successfulLogins"
+        login_log = mgr.get_logins(user_id)
+        env.fout(print_logins(login_log))
+    if events:
+        event_log = mgr.get_events(user_id)
+        env.fout(print_events(event_log))
+        
 
 
 def basic_info(user, keys):
@@ -67,5 +95,58 @@ def basic_info(user, keys):
         table.add_row(['Last Login', login_string])
         break
 
+    return table
+
+def print_permissions(permissions):
+    """Prints out a users permissions"""
+
+    table = formatting.Table(['keyName', 'Description'])
+    for perm in permissions:
+        table.add_row([perm['keyName'], perm['name']])
+    return table
+
+def print_access(access, title):
+    """Prints out the hardware or virtual guests a user can access"""
+
+    columns = ['id', 'hostname', 'Primary Public IP', 'Primary Private IP', 'Created']
+    table = formatting.Table(columns, title)
+      
+    for host in access:
+        host_id = host.get('id')
+        host_fqdn = host.get('fullyQualifiedDomainName', '-')
+        host_primary = host.get('primaryIpAddress')
+        host_private = host.get('primaryBackendIpAddress')
+        host_created = host.get('provisionDate')
+        table.add_row([host_id, host_fqdn, host_primary, host_private, host_created])
+    return table
+
+def print_dedicated_access(access):
+    """Prints out the dedicated hosts a user can access"""
+
+    table = formatting.Table(['id', 'Name', 'Cpus', 'Memory', 'Disk', 'Created'], 'Dedicated Access')
+    for host in access:
+        host_id = host.get('id')
+        host_fqdn = host.get('name')
+        host_cpu = host.get('cpuCount')
+        host_mem = host.get('memoryCapacity')
+        host_disk = host.get('diskCapacity')
+        host_created = host.get('createDate')
+        table.add_row([host_id, host_fqdn, host_cpu, host_mem, host_disk, host_created])
+    return table
+
+def print_logins(logins):
+    """Prints out the login history for a user"""
+    table = formatting.Table(['Date', 'IP Address', 'Successufl Login?'])
+    for login in logins:
+        table.add_row([login.get('createDate'), login.get('ipAddress'), login.get('successFlag')])
+    return table
+
+def print_events(events):
+    """Prints out the event log for a user"""
+    columns = ['Date', 'Type', 'IP Address', 'label', 'username']
+    table = formatting.Table(columns)
+    for event in events:
+        table.add_row([event.get('eventCreateDate'), event.get('eventName'), 
+                      event.get('ipAddress'), event.get('label'), event.get('username')])
     return table
 

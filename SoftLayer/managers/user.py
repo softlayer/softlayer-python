@@ -8,6 +8,7 @@
 from SoftLayer import exceptions
 from SoftLayer import utils
 
+import datetime
 from operator import itemgetter
 
 
@@ -65,6 +66,60 @@ class UserManager(utils.IdentifierMixin, object):
     def remove_permissions(self, user_id, permissions):
         pretty_permissions = format_permission_object(permissions)
         return self.userService.removeBulkPortalPermission(pretty_permissions, id=user_id)
+
+    def get_user_permissions(self, user_id):
+        """Returns a sorted list of a users permissions"""
+        permissions = self.userService.getPermissions(id=user_id)
+        return sorted(permissions, key=itemgetter('keyName'))
+
+    def get_logins(self, user_id, start_date=None):
+        """Gets the login history for a user, default start_date is 30 days ago
+
+        :param int id: User id to get
+        :param string start_date: "%m/%d/%Y %H:%M:%s" formatted string. 
+        :returns: list https://softlayer.github.io/reference/datatypes/SoftLayer_User_Customer_Access_Authentication/
+        Example::
+            get_logins(123, '04/08/2018 0:0:0')
+        """
+
+        if start_date is None:
+            date_object = datetime.date.today() - datetime.timedelta(days=30)
+            start_date = date_object.strftime("%m/%d/%Y 0:0:0")
+
+        date_filter = {
+            'loginAttempts': {
+                'createDate': {
+                    'operation': 'greaterThanDate', 
+                    'options': [{'name': 'date', 'value': [start_date]}]
+                    }
+                }
+            }
+        login_log = self.userService.getLoginAttempts(id=user_id, filter=date_filter)
+        return login_log
+
+    def get_events(self, user_id, start_date=None):
+        """Gets the event log for a specific user, default start_date is 30 days ago
+
+        :param int id: User id to view
+        :param string start_date: "%Y-%m-%dT%H:%M:%s.0000-06:00" formatted string. Anything else wont work
+        :returns: https://softlayer.github.io/reference/datatypes/SoftLayer_Event_Log/
+        """
+
+        if start_date is None:
+            date_object = datetime.date.today() - datetime.timedelta(days=30)
+            start_date = date_object.strftime("%Y-%m-%dT00:00:00.0000-06:00")
+
+        object_filter = {
+            'userId': {
+                'operation': user_id
+            },
+            'eventCreateDate': {
+                'operation': 'greaterThanDate', 
+                'options': [{'name': 'date', 'value': [start_date]}]
+            }
+        }
+
+        return self.client.call('Event_Log', 'getAllObjects', filter=object_filter)
 
     def _get_id_from_username(self, username):
         _mask = "mask[id, username]"
