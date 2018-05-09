@@ -9,8 +9,6 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
-from pprint import pprint as pp
-
 COLUMNS = [
     column_helper.Column('id', ('id',)),
     column_helper.Column('username', ('username',)),
@@ -29,14 +27,13 @@ DEFAULT_COLUMNS = [
     'virtualGuestCount'
 ]
 @click.command()
-@click.option('--name', default=None, help='Filter on username')
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
               help='Columns to display. [options: %s]' % ', '.join(column.name for column in COLUMNS),
               default=','.join(DEFAULT_COLUMNS),
               show_default=True)
 @environment.pass_env
-def cli(env, name, columns):
+def cli(env, columns):
     """List Users."""
 
     mgr = SoftLayer.UserManager(env.client)

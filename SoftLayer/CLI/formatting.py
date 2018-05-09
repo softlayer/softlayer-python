@@ -1,10 +1,8 @@
 """
     SoftLayer.formatting
     ~~~~~~~~~~~~~~~~~~~~
-    Provider classes and helper functions to display output onto a
-    command-line.
+    Provider classes and helper functions to display output onto a command-line.
 
-    :license: MIT, see LICENSE for more details.
 """
 # pylint: disable=E0202, consider-merging-isinstance, arguments-differ, keyword-arg-before-vararg
 import collections
@@ -12,7 +10,12 @@ import json
 import os
 
 import click
-from prettytable import prettytable
+
+# If both PTable and prettytable are installed, its impossible to use the new version
+try:
+    from prettytable import prettytable
+except ImportError:
+    import prettytable
 
 from SoftLayer.CLI import exceptions
 from SoftLayer import utils

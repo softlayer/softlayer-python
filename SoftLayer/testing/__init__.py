@@ -185,7 +185,7 @@ def call_has_props(call, props):
     for prop, expected_value in props.items():
         actual_value = getattr(call, prop)
         if actual_value != expected_value:
-            logging.info(
+            logging.critical(
                 '%s::%s property mismatch, %s: expected=%r; actual=%r',
                 call.service,
                 call.method,

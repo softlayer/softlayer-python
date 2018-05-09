@@ -13,7 +13,7 @@ from pprint import pprint as pp
 
 @click.command()
 @click.argument('identifier')
-@click.option('--keys', is_flag=True, default=False,
+@click.option('--keys', '-k', is_flag=True, default=False,
               help="Show the users API key.")
 @click.option('--permissions', '-p', is_flag=True, default=False,
               help="Display permissions assigned to this user. Master users will show no permissions")
@@ -43,12 +43,12 @@ def cli(env, identifier, keys, permissions, hardware, virtual, logins, events):
     if hardware:
         mask = "id, hardware, dedicatedHosts"
         access = mgr.get_user(user_id, mask)
-        env.fout(print_dedicated_access(access['dedicatedHosts']))
-        env.fout(print_access(access['hardware'], 'Hardware'))
+        env.fout(print_dedicated_access(access.get('dedicatedHosts', [])))
+        env.fout(print_access(access.get('hardware', []), 'Hardware'))
     if virtual:
         mask = "id, virtualGuests"
         access = mgr.get_user(user_id, mask)
-        env.fout(print_access(access['virtualGuests'], 'Virtual Guests'))
+        env.fout(print_access(access.get('virtualGuests', []), 'Virtual Guests'))
     if logins:
         mask = "id, unsuccessfulLogins, successfulLogins"
         login_log = mgr.get_logins(user_id)
