@@ -160,11 +160,7 @@ class TestCase(testtools.TestCase):
         """Set and return mock on the current client."""
         return self.mocks.set_mock(service, method)
 
-    def run_command(self,
-                    args=None,
-                    env=None,
-                    fixtures=True,
-                    fmt='json'):
+    def run_command(self, args=None, env=None, fixtures=True, fmt='json'):
         """A helper that runs a SoftLayer CLI command.
 
         This returns a click.testing.Result object.

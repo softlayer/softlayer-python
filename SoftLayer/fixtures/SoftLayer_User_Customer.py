@@ -42,7 +42,13 @@ getObject = {
     'userStatus': {'name': 'Active'},
     'userStatusId': 1001,
     'username': 'SL12345-test',
-    'vpnManualConfig': False
+    'vpnManualConfig': False,
+    'permissions': [
+        {'key': 'ALL_1',
+         'keyName': 'ACCESS_ALL_HARDWARE',
+         'name': 'All Hardware Access'}
+    ],
+    'roles': []
 }
 
 getPermissions = [
@@ -56,3 +62,18 @@ getPermissions = [
  'keyName': 'ADD_SERVICE_STORAGE',
  'name': 'Add/Upgrade Storage (StorageLayer)'}
 ]
+
+
+getLoginAttempts = [
+    {
+        "createDate": "2017-10-03T09:28:33-06:00",
+        "ipAddress": "1.2.3.4",
+        "successFlag": False,
+        "userId": 1111,
+        "username": "sl1234"
+    }
+]
+
+addBulkPortalPermission = True
+removeBulkPortalPermission = True
+

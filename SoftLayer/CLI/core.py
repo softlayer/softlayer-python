@@ -115,18 +115,23 @@ def cli(env,
         **kwargs):
     """Main click CLI entry-point."""
 
-    logger = logging.getLogger()
-    logger.addHandler(logging.StreamHandler())
-    logger.setLevel(DEBUG_LOGGING_MAP.get(verbose, logging.DEBUG))
-
     # Populate environement with client and set it as the context object
     env.skip_confirmations = really
     env.config_file = config
     env.format = format
     env.ensure_client(config_file=config, is_demo=demo, proxy=proxy)
-
     env.vars['_start'] = time.time()
-    env.vars['_timings'] = SoftLayer.DebugTransport(env.client.transport)
+
+    if demo is False:
+        logger = logging.getLogger()
+        logger.addHandler(logging.StreamHandler())
+        logger.setLevel(DEBUG_LOGGING_MAP.get(verbose, logging.DEBUG))
+        env.vars['_timings'] = SoftLayer.DebugTransport(env.client.transport)
+    else:
+        # This section is for running CLI tests.
+        logging.getLogger("urllib3").setLevel(logging.WARNING)
+        env.vars['_timings'] = SoftLayer.TimingTransport(env.client.transport)
+
     env.client.transport = env.vars['_timings']
 
 

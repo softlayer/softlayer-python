@@ -26,9 +26,9 @@ def cli(env, identifier, enable, permission):
     user_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'username')
     object_mask = "mask[id,permissions,isMasterUserFlag]"
     if enable:
-        result = mgr.add_permissions(identifier, permission)
+        result = mgr.add_permissions(user_id, permission)
         click.secho("Permissions added successfully: %s" % ", ".join(permission), fg='green')
     else:
-        result = mgr.remove_permissions(identifier, permission)
+        result = mgr.remove_permissions(user_id, permission)
         click.secho("Permissions removed successfully: %s" % ", ".join(permission), fg='green')
 

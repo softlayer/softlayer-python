@@ -50,7 +50,6 @@ def cli(env, identifier, keys, permissions, hardware, virtual, logins, events):
         access = mgr.get_user(user_id, mask)
         env.fout(print_access(access.get('virtualGuests', []), 'Virtual Guests'))
     if logins:
-        mask = "id, unsuccessfulLogins, successfulLogins"
         login_log = mgr.get_logins(user_id)
         env.fout(print_logins(login_log))
     if events:

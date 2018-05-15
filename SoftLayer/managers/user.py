@@ -53,7 +53,7 @@ class UserManager(utils.IdentifierMixin, object):
 
     def get_user(self, user_id, objectMask=None):
         if objectMask is None:
-            objectMask = """mask[userStatus[name], parent[id, username]]"""
+            objectMask = "mask[userStatus[name], parent[id, username]]"
         return self.userService.getObject(id=user_id, mask=objectMask)
 
     def get_all_permissions(self):
@@ -61,10 +61,28 @@ class UserManager(utils.IdentifierMixin, object):
         return sorted(permissions, key=itemgetter('keyName'))
 
     def add_permissions(self, user_id, permissions):
+        """Enables a list of permissions for a user
+
+        :param int id: user id to set
+        :param list permissions: List of permissions keynames to enable
+        :returns: True on success, Exception otherwise
+
+        Example::
+            add_permissions(123, ['BANDWIDTH_MANAGE'])
+        """
         pretty_permissions = format_permission_object(permissions)
         return self.userService.addBulkPortalPermission(pretty_permissions, id=user_id)
 
     def remove_permissions(self, user_id, permissions):
+        """Disables a list of permissions for a user
+
+        :param int id: user id to set
+        :param list permissions: List of permissions keynames to disable
+        :returns: True on success, Exception otherwise
+
+        Example::
+            remove_permissions(123, ['BANDWIDTH_MANAGE'])
+        """
         pretty_permissions = format_permission_object(permissions)
         return self.userService.removeBulkPortalPermission(pretty_permissions, id=user_id)
 
