@@ -7,7 +7,7 @@ import SoftLayer
 from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-from SoftLayer.CLI import helpers
+
 
 COLUMNS = [
     column_helper.Column('id', ('id',)),
@@ -26,6 +26,8 @@ DEFAULT_COLUMNS = [
     'hardwareCount',
     'virtualGuestCount'
 ]
+
+
 @click.command()
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
@@ -45,4 +47,3 @@ def cli(env, columns):
                        for value in columns.row(user)])
 
     env.fout(table)
-

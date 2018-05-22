@@ -561,16 +561,17 @@ getDedicatedHosts = [{
 }]
 
 
-getUsers = [{'displayName': 'ChristopherG',
-  'hardwareCount': 138,
-  'id': 11100,
-  'userStatus': {'name': 'Active'},
-  'username': 'SL1234',
-  'virtualGuestCount': 99},
- {'displayName': 'PulseL',
-  'hardwareCount': 100,
-  'id': 11111,
-  'userStatus': {'name': 'Active'},
-  'username': 'sl1234-abob',
-  'virtualGuestCount': 99}
+getUsers = [
+    {'displayName': 'ChristopherG',
+     'hardwareCount': 138,
+     'id': 11100,
+     'userStatus': {'name': 'Active'},
+     'username': 'SL1234',
+     'virtualGuestCount': 99},
+    {'displayName': 'PulseL',
+     'hardwareCount': 100,
+     'id': 11111,
+     'userStatus': {'name': 'Active'},
+     'username': 'sl1234-abob',
+     'virtualGuestCount': 99}
 ]

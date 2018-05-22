@@ -21,6 +21,7 @@ class SoftLayerAPIError(SoftLayerError):
 
     Provides faultCode and faultString properties.
     """
+
     def __init__(self, fault_code, fault_string, *args):
         SoftLayerError.__init__(self, fault_string, *args)
         self.faultCode = fault_code

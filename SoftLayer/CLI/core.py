@@ -121,17 +121,17 @@ def cli(env,
     env.format = format
     env.ensure_client(config_file=config, is_demo=demo, proxy=proxy)
     env.vars['_start'] = time.time()
+    logger = logging.getLogger()
 
     if demo is False:
-        logger = logging.getLogger()
         logger.addHandler(logging.StreamHandler())
-        logger.setLevel(DEBUG_LOGGING_MAP.get(verbose, logging.DEBUG))
-        env.vars['_timings'] = SoftLayer.DebugTransport(env.client.transport)
     else:
         # This section is for running CLI tests.
         logging.getLogger("urllib3").setLevel(logging.WARNING)
-        env.vars['_timings'] = SoftLayer.TimingTransport(env.client.transport)
+        logger.addHandler(logging.NullHandler())
 
+    logger.setLevel(DEBUG_LOGGING_MAP.get(verbose, logging.DEBUG))
+    env.vars['_timings'] = SoftLayer.DebugTransport(env.client.transport)
     env.client.transport = env.vars['_timings']
 
 

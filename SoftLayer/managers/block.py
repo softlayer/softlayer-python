@@ -144,7 +144,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 'hourlySchedule',
                 'dailySchedule',
                 'weeklySchedule'
-                ]
+            ]
 
             kwargs['mask'] = ','.join(items)
 

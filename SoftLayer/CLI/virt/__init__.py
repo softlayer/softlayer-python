@@ -30,4 +30,5 @@ class MemoryType(click.ParamType):
         elif unit in ['g', 'gb']:
             return amount * 1024
 
+
 MEM_TYPE = MemoryType()

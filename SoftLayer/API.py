@@ -333,6 +333,7 @@ class Service(object):
         :param name str: The service name
 
     """
+
     def __init__(self, client, name):
         self.client = client
         self.name = name

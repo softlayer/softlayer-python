@@ -75,7 +75,7 @@ class BlockTests(testing.TestCase):
             'getObject',
             identifier=100,
             mask='mask[%s]' % expected_mask
-            )
+        )
 
     def test_list_block_volumes(self):
         result = self.block.list_block_volumes()
@@ -743,7 +743,7 @@ class BlockTests(testing.TestCase):
             duplicate_iops=2000,
             duplicate_tier_level=None,
             duplicate_snapshot_size=10
-            )
+        )
 
         self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
 
@@ -821,7 +821,7 @@ class BlockTests(testing.TestCase):
             duplicate_iops=None,
             duplicate_tier_level=4,
             duplicate_snapshot_size=10
-            )
+        )
 
         self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
 

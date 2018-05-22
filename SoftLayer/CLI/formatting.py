@@ -232,6 +232,7 @@ class SequentialOutput(list):
 
     :param separator str: string to use as a default separator
     """
+
     def __init__(self, separator=os.linesep, *args, **kwargs):
         self.separator = separator
         super(SequentialOutput, self).__init__(*args, **kwargs)
@@ -246,6 +247,7 @@ class SequentialOutput(list):
 
 class CLIJSONEncoder(json.JSONEncoder):
     """A JSON encoder which is able to use a .to_python() method on objects."""
+
     def default(self, obj):
         """Encode object if it implements to_python()."""
         if hasattr(obj, 'to_python'):
@@ -258,6 +260,7 @@ class Table(object):
 
     :param list columns: a list of column names
     """
+
     def __init__(self, columns, title=None):
         duplicated_cols = [col for col, count
                            in collections.Counter(columns).items()
@@ -311,6 +314,7 @@ class Table(object):
 
 class KeyValueTable(Table):
     """A table that is oriented towards key-value pairs."""
+
     def to_python(self):
         """Decode this KeyValueTable object to standard Python types."""
         mapping = {}
@@ -325,6 +329,7 @@ class FormattedItem(object):
         :param original: raw (machine-readable) value
         :param string formatted: human-readable value
     """
+
     def __init__(self, original, formatted=None):
         self.original = original
         if formatted is not None:

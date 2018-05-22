@@ -6,13 +6,13 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
-from pprint import pprint as pp
+
 @click.command()
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
     """User Permissions. TODO change to list all permissions, and which users have them"""
-    
+
     mgr = SoftLayer.UserManager(env.client)
     user_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'username')
     object_mask = "mask[id, permissions, isMasterUserFlag, roles]"
@@ -27,12 +27,14 @@ def cli(env, identifier):
     env.fout(roles_table(user))
     env.fout(permission_table(user_permissions, all_permissions))
 
+
 def perms_to_dict(perms):
     """Takes a list of permissions and transforms it into a dictionary for better searching"""
     permission_dict = {}
     for perm in perms:
         permission_dict[perm['keyName']] = True
     return permission_dict
+
 
 def permission_table(user_permissions, all_permissions):
     """Creates a table of available permissions"""
@@ -46,10 +48,10 @@ def permission_table(user_permissions, all_permissions):
         table.add_row([perm['name'], perm['keyName'], assigned])
     return table
 
+
 def roles_table(user):
     """Creates a table for a users roles"""
     table = formatting.Table(['id', 'Role Name', 'Description'])
     for role in user['roles']:
         table.add_row([role['id'], role['name'], role['description']])
     return table
-

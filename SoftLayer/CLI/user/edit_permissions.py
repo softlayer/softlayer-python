@@ -5,30 +5,28 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
-from SoftLayer import utils
-
-from pprint import pprint as pp
 
 
 @click.command()
 @click.argument('identifier')
 @click.option('--enable/--disable', default=True,
-                help="Enable or Disable selected permissions")
+              help="Enable or Disable selected permissions")
 @click.option('--permission', '-p', multiple=True,
-                help="Permission keyName to set, multiple instances allowed.")
+              help="Permission keyName to set, multiple instances allowed.")
 @environment.pass_env
 def cli(env, identifier, enable, permission):
     """Enable or Disable specific permissions."""
-    
+
     mgr = SoftLayer.UserManager(env.client)
     user_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'username')
-    object_mask = "mask[id,permissions,isMasterUserFlag]"
+    result = False
     if enable:
         result = mgr.add_permissions(user_id, permission)
-        click.secho("Permissions added successfully: %s" % ", ".join(permission), fg='green')
     else:
         result = mgr.remove_permissions(user_id, permission)
-        click.secho("Permissions removed successfully: %s" % ", ".join(permission), fg='green')
 
+    if result:
+        click.secho("Permissions updated successfully: %s" % ", ".join(permission), fg='green')
+    else:
+        click.secho("Failed to update permissions: %s" % ", ".join(permission), fg='red')

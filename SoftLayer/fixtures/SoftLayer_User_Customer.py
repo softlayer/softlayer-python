@@ -21,10 +21,10 @@ getObject = {
     'state': 'TX',
     'statusDate': None,
     'successfulLogins': [
-    {'createDate': '2018-05-08T15:28:32-06:00',
-     'ipAddress': '175.125.126.118',
-     'successFlag': True,
-     'userId': 244956},
+        {'createDate': '2018-05-08T15:28:32-06:00',
+         'ipAddress': '175.125.126.118',
+         'successFlag': True,
+         'userId': 244956},
     ],
     'timezone': {
         'id': 113,
@@ -52,15 +52,15 @@ getObject = {
 }
 
 getPermissions = [
-{'key': 'ALL_1',
- 'keyName': 'ACCESS_ALL_HARDWARE',
- 'name': 'All Hardware Access'},
-{'key': 'A_1',
- 'keyName': 'ACCOUNT_SUMMARY_VIEW',
- 'name': 'View Account Summary'},
-{'key': 'A_10',
- 'keyName': 'ADD_SERVICE_STORAGE',
- 'name': 'Add/Upgrade Storage (StorageLayer)'}
+    {'key': 'ALL_1',
+     'keyName': 'ACCESS_ALL_HARDWARE',
+     'name': 'All Hardware Access'},
+    {'key': 'A_1',
+     'keyName': 'ACCOUNT_SUMMARY_VIEW',
+     'name': 'View Account Summary'},
+    {'key': 'A_10',
+     'keyName': 'ADD_SERVICE_STORAGE',
+     'name': 'Add/Upgrade Storage (StorageLayer)'}
 ]
 
 
@@ -76,4 +76,3 @@ getLoginAttempts = [
 
 addBulkPortalPermission = True
 removeBulkPortalPermission = True
-
