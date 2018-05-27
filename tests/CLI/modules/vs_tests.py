@@ -23,7 +23,7 @@ class VirtTests(testing.TestCase):
         self.assert_no_fail(result)
   
     @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_rescue_vs_no_confirm(self, confirm_mock):    
+    def test_rescue_no_confirm_vs(self, confirm_mock):    
         confirm_mock.return_value = False
         result = self.run_command(['vs', 'rescue', '100'])
     
@@ -135,7 +135,7 @@ class VirtTests(testing.TestCase):
         result = self.run_command(['vs', 'resume', '100'])
             
         self.assert_no_fail(result)        
-        
+
     def test_list_vs(self):
         result = self.run_command(['vs', 'list', '--tag=tag'])
 
