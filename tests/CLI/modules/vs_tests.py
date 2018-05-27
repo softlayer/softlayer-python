@@ -15,6 +15,98 @@ from SoftLayer import testing
 
 class VirtTests(testing.TestCase):
 
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_rescue_vs(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['vs', 'rescue', '100'])
+    
+        self.assert_no_fail(result)
+  
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_rescue_vs_no_confirm(self, confirm_mock):    
+        confirm_mock.return_value = False
+        result = self.run_command(['vs', 'rescue', '100'])
+    
+        self.assertEqual(result.exit_code, 2)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_reboot_default_vs(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'rebootDefault')
+        mock.return_value = 'true'
+        confirm_mock.return_value = True
+        result = self.run_command(['vs', 'reboot', '100'])
+        
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_reboot_soft_vs(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'rebootSoft')
+        mock.return_value = 'true'
+        confirm_mock.return_value = True
+        
+        result = self.run_command(['vs', 'reboot', '--soft', '100'])
+  
+        self.assert_no_fail(result)
+    
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_reboot_hard_vs(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'rebootHard')
+        mock.return_value = 'true'
+        confirm_mock.return_value = True
+        result = self.run_command(['vs', 'reboot', '--hard', '100'])
+            
+        self.assert_no_fail(result)    
+        
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_power_off_soft_vs(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'powerOffSoft')
+        mock.return_value = 'true'
+        confirm_mock.return_value = True
+            
+        result = self.run_command(['vs', 'power-off', '100'])
+
+        self.assert_no_fail(result)
+        
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_power_off_hard_vs(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'powerOff')
+        mock.return_value = 'true'
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'power-off', '--hard', '100'])
+
+        self.assert_no_fail(result)
+        
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_power_on_vs(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'powerOn')
+        mock.return_value = 'true'
+        confirm_mock.return_value = True
+          
+        result = self.run_command(['vs', 'power-on', '100'])
+        
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_pause_vs(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'pause')
+        mock.return_value = 'true'
+        confirm_mock.return_value = True
+            
+        result = self.run_command(['vs', 'pause', '100'])
+          
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_resume_vs(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'resume')
+        mock.return_value = 'true'
+        confirm_mock.return_value = True
+            
+        result = self.run_command(['vs', 'resume', '100'])
+            
+        self.assert_no_fail(result)        
+        
     def test_list_vs(self):
         result = self.run_command(['vs', 'list', '--tag=tag'])
 
