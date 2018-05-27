@@ -252,16 +252,19 @@ class CLIAbortTests(testing.TestCase):
 class ResolveIdTests(testing.TestCase):
 
     def test_resolve_id_one(self):
-        resolver = lambda r: [12345]
+        def resolver():
+            return [12345]
         self.assertEqual(helpers.resolve_id(resolver, 'test'), 12345)
 
     def test_resolve_id_none(self):
-        resolver = lambda r: []
+        def resolver():
+            return []
         self.assertRaises(
             exceptions.CLIAbort, helpers.resolve_id, resolver, 'test')
 
     def test_resolve_id_multiple(self):
-        resolver = lambda r: [12345, 54321]
+        def resolver():
+            return [12345, 54321]
         self.assertRaises(
             exceptions.CLIAbort, helpers.resolve_id, resolver, 'test')
 
