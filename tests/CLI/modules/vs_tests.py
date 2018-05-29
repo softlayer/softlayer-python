@@ -23,14 +23,14 @@ class VirtTests(testing.TestCase):
         self.assert_no_fail(result)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_rescue_no_confirm_vs(self, confirm_mock):
+    def test_rescue_vs_no_confirm(self, confirm_mock):
         confirm_mock.return_value = False
         result = self.run_command(['vs', 'rescue', '100'])
 
         self.assertEqual(result.exit_code, 2)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_reboot_default_vs(self, confirm_mock):
+    def test_reboot_vs_default(self, confirm_mock):
         mock = self.set_mock('SoftLayer_Virtual_Guest', 'rebootDefault')
         mock.return_value = 'true'
         confirm_mock.return_value = True
@@ -39,7 +39,7 @@ class VirtTests(testing.TestCase):
         self.assert_no_fail(result)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_reboot_no_confirm_vs(self, confirm_mock):
+    def test_reboot_vs_no_confirm(self, confirm_mock):
         mock = self.set_mock('SoftLayer_Virtual_Guest', 'rebootDefault')
         mock.return_value = 'true'
         confirm_mock.return_value = False
@@ -48,7 +48,7 @@ class VirtTests(testing.TestCase):
         self.assertEqual(result.exit_code, 2)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_reboot_soft_vs(self, confirm_mock):
+    def test_reboot_vs_soft(self, confirm_mock):
         mock = self.set_mock('SoftLayer_Virtual_Guest', 'rebootSoft')
         mock.return_value = 'true'
         confirm_mock.return_value = True
@@ -58,7 +58,7 @@ class VirtTests(testing.TestCase):
         self.assert_no_fail(result)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_reboot_hard_vs(self, confirm_mock):
+    def test_reboot_vs_hard(self, confirm_mock):
         mock = self.set_mock('SoftLayer_Virtual_Guest', 'rebootHard')
         mock.return_value = 'true'
         confirm_mock.return_value = True
@@ -67,7 +67,7 @@ class VirtTests(testing.TestCase):
         self.assert_no_fail(result)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_power_off_soft_vs(self, confirm_mock):
+    def test_power_vs_off_soft(self, confirm_mock):
         mock = self.set_mock('SoftLayer_Virtual_Guest', 'powerOffSoft')
         mock.return_value = 'true'
         confirm_mock.return_value = True
@@ -77,7 +77,7 @@ class VirtTests(testing.TestCase):
         self.assert_no_fail(result)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_power_off_no_confirm_vs(self, confirm_mock):
+    def test_power_off_vs_no_confirm(self, confirm_mock):
         mock = self.set_mock('SoftLayer_Virtual_Guest', 'powerOffSoft')
         mock.return_value = 'true'
         confirm_mock.return_value = False
@@ -87,7 +87,7 @@ class VirtTests(testing.TestCase):
         self.assertEqual(result.exit_code, 2)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_power_off_hard_vs(self, confirm_mock):
+    def test_power_off_vs_hard(self, confirm_mock):
         mock = self.set_mock('SoftLayer_Virtual_Guest', 'powerOff')
         mock.return_value = 'true'
         confirm_mock.return_value = True
@@ -117,7 +117,7 @@ class VirtTests(testing.TestCase):
         self.assert_no_fail(result)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_pause_no_confirm_vs(self, confirm_mock):
+    def test_pause_vs_no_confirm(self, confirm_mock):
         mock = self.set_mock('SoftLayer_Virtual_Guest', 'pause')
         mock.return_value = 'true'
         confirm_mock.return_value = False
@@ -153,7 +153,7 @@ class VirtTests(testing.TestCase):
                            'action': None,
                            'id': 104,
                            'backend_ip': '10.45.19.35'}])
-
+    
     def test_detail_vs(self):
         result = self.run_command(['vs', 'detail', '100',
                                    '--passwords', '--price'])
@@ -783,3 +783,19 @@ class VirtTests(testing.TestCase):
         result = self.run_command(['vs', 'ready', '100', '--wait=100'])
         self.assert_no_fail(result)
         self.assertEqual(result.output, '"READY"\n')
+
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    def test_reload(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'reloadCurrentOperatingSystemConfguration')
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'reload', '--postinstall', '100', '--key', '100', '--image', '100', '100'])
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    def test_reload_no_confirm(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'reloadCurrentOperatingSystemConfiguration')
+        confirm_mock.return_value = False
+
+        result = self.run_command(['vs', 'reload', '--postinstall', '100', '--key', '100', '--image', '100', '100'])
+        self.assertEqual(result.exit_code, 2)
