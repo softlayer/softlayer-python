@@ -153,7 +153,7 @@ class VirtTests(testing.TestCase):
                            'action': None,
                            'id': 104,
                            'backend_ip': '10.45.19.35'}])
-    
+
     def test_detail_vs(self):
         result = self.run_command(['vs', 'detail', '100',
                                    '--passwords', '--price'])
@@ -788,6 +788,7 @@ class VirtTests(testing.TestCase):
     def test_reload(self, confirm_mock):
         mock = self.set_mock('SoftLayer_Virtual_Guest', 'reloadCurrentOperatingSystemConfguration')
         confirm_mock.return_value = True
+        mock.return_value = 'true'
 
         result = self.run_command(['vs', 'reload', '--postinstall', '100', '--key', '100', '--image', '100', '100'])
         self.assert_no_fail(result)
@@ -796,6 +797,7 @@ class VirtTests(testing.TestCase):
     def test_reload_no_confirm(self, confirm_mock):
         mock = self.set_mock('SoftLayer_Virtual_Guest', 'reloadCurrentOperatingSystemConfiguration')
         confirm_mock.return_value = False
+        mock.return_value = 'false'
 
         result = self.run_command(['vs', 'reload', '--postinstall', '100', '--key', '100', '--image', '100', '100'])
         self.assertEqual(result.exit_code, 2)
