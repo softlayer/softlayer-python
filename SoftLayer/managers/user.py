@@ -11,6 +11,7 @@ from operator import itemgetter
 from SoftLayer import exceptions
 from SoftLayer import utils
 
+from pprint import pprint as pp
 
 class UserManager(utils.IdentifierMixin, object):
     """Manages Users.
@@ -46,7 +47,8 @@ class UserManager(utils.IdentifierMixin, object):
         """
 
         if objectmask is None:
-            objectmask = "mask[id, username, displayName, userStatus[name], hardwareCount, virtualGuestCount]"
+            objectmask = """mask[id, username, displayName, userStatus[name], hardwareCount, virtualGuestCount,
+                                 email, roles]"""
 
         return self.account_service.getUsers(mask=objectmask, filter=objectfilter)
 
@@ -79,7 +81,7 @@ class UserManager(utils.IdentifierMixin, object):
         Example::
             add_permissions(123, ['BANDWIDTH_MANAGE'])
         """
-        pretty_permissions = format_permission_object(permissions)
+        pretty_permissions = self.format_permission_object(permissions)
         return self.user_service.addBulkPortalPermission(pretty_permissions, id=user_id)
 
     def remove_permissions(self, user_id, permissions):
@@ -92,7 +94,7 @@ class UserManager(utils.IdentifierMixin, object):
         Example::
             remove_permissions(123, ['BANDWIDTH_MANAGE'])
         """
-        pretty_permissions = format_permission_object(permissions)
+        pretty_permissions = self.format_permission_object(permissions)
         return self.user_service.removeBulkPortalPermission(pretty_permissions, id=user_id)
 
     def get_user_permissions(self, user_id):
@@ -165,9 +167,19 @@ class UserManager(utils.IdentifierMixin, object):
             raise exceptions.SoftLayerError("Unable to find user id for %s" % username)
 
 
-def format_permission_object(permissions):
-    """Formats a list of permission key names into something the SLAPI will respect"""
-    pretty_permissions = []
-    for permission in permissions:
-        pretty_permissions.append({'keyName': permission})
-    return pretty_permissions
+    def format_permission_object(self, permissions):
+        """Formats a list of permission key names into something the SLAPI will respect"""
+        pretty_permissions = []
+        available_permissions = self.get_all_permissions()
+        # pp(available_permissions)
+        for permission in permissions:
+            permission = permission.upper()
+            if permission == 'ALL':
+                return available_permissions
+            # Search through available_permissions to make sure what the user entered was valid
+            if next(filter(lambda x: x['keyName'] == permission, available_permissions), False):
+                pretty_permissions.append({'keyName': permission})
+            else:
+                raise exceptions.SoftLayerError("%s is not a valid permission" % permission)
+        pp(pretty_permissions)
+        return pretty_permissions

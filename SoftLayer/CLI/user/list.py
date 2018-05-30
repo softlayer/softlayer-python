@@ -8,23 +8,23 @@ from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 
+from pprint import pprint as pp
 
 COLUMNS = [
     column_helper.Column('id', ('id',)),
     column_helper.Column('username', ('username',)),
+    column_helper.Column('email', ('email',)),
     column_helper.Column('displayName', ('displayName',)),
     column_helper.Column('status', ('userStatus', 'name')),
     column_helper.Column('hardwareCount', ('hardwareCount',)),
-    column_helper.Column('virtualGuestCount', ('virtualGuestCount',)),
+    column_helper.Column('virtualGuestCount', ('virtualGuestCount',))
 ]
 
 DEFAULT_COLUMNS = [
     'id',
     'username',
-    'displayName',
-    'status',
-    'hardwareCount',
-    'virtualGuestCount'
+    'email',
+    'displayName'
 ]
 
 
