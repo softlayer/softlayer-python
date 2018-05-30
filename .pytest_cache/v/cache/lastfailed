@@ -1,5 +1,0 @@
-{
-  "tests/CLI/modules/block_tests.py::BlockTests::test_volume_order_performance_iops_not_multiple_of_100": true,
-  "tests/CLI/modules/file_tests.py::FileTests::test_volume_order_performance_iops_not_multiple_of_100": true,
-  "tests/managers/ordering_tests.py::OrderingTests::test_get_location_id_fixture": true
-}

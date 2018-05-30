@@ -8,7 +8,6 @@ from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 
-from pprint import pprint as pp
 
 COLUMNS = [
     column_helper.Column('id', ('id',)),

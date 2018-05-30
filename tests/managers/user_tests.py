@@ -15,8 +15,7 @@ class UserTests(testing.TestCase):
 
     def test_list_user_defaults(self):
         self.manager.list_users()
-        expected_mask = "mask[id, username, displayName, userStatus[name], hardwareCount, virtualGuestCount]"
-        self.assert_called_with('SoftLayer_Account', 'getUsers', mask=expected_mask)
+        self.assert_called_with('SoftLayer_Account', 'getUsers', mask=mock.ANY)
 
     def test_list_user_mask(self):
         self.manager.list_users(objectmask="mask[id]")
@@ -86,7 +85,7 @@ class UserTests(testing.TestCase):
                 },
                 'eventCreateDate': {
                     'operation': 'greaterThanDate',
-                    'options': [{'name': 'date', 'value': ['2018-04-15T00:00:00.0000-06:00']}]
+                    'options': [{'name': 'date', 'value': ['2018-04-15T00:00:00']}]
                 }
             }
             self.assert_called_with('SoftLayer_Event_Log', 'getAllObjects', filter=expected_filter)

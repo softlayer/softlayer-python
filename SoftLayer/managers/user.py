@@ -6,12 +6,14 @@
     :license: MIT, see LICENSE for more details.
 """
 import datetime
+import logging
 from operator import itemgetter
 
 from SoftLayer import exceptions
 from SoftLayer import utils
 
-from pprint import pprint as pp
+LOGGER = logging.getLogger(__name__)
+
 
 class UserManager(utils.IdentifierMixin, object):
     """Manages Users.
@@ -34,6 +36,7 @@ class UserManager(utils.IdentifierMixin, object):
         self.user_service = self.client['SoftLayer_User_Customer']
         self.account_service = self.client['SoftLayer_Account']
         self.resolvers = [self._get_id_from_username]
+        self.all_permissions = None
 
     def list_users(self, objectmask=None, objectfilter=None):
         """Lists all users on an account
@@ -66,10 +69,13 @@ class UserManager(utils.IdentifierMixin, object):
     def get_all_permissions(self):
         """Calls SoftLayer_User_CustomerPermissions_Permission::getAllObjects
 
+        Stores the result in self.all_permissions
         :returns: A list of dictionaries that contains all valid permissions
         """
-        permissions = self.client.call('User_Customer_CustomerPermission_Permission', 'getAllObjects')
-        return sorted(permissions, key=itemgetter('keyName'))
+        if self.all_permissions is None:
+            permissions = self.client.call('User_Customer_CustomerPermission_Permission', 'getAllObjects')
+            self.all_permissions = sorted(permissions, key=itemgetter('keyName'))
+        return self.all_permissions
 
     def add_permissions(self, user_id, permissions):
         """Enables a list of permissions for a user
@@ -82,6 +88,7 @@ class UserManager(utils.IdentifierMixin, object):
             add_permissions(123, ['BANDWIDTH_MANAGE'])
         """
         pretty_permissions = self.format_permission_object(permissions)
+        LOGGER.warning("Adding the following permissions to %s: %s", user_id, pretty_permissions)
         return self.user_service.addBulkPortalPermission(pretty_permissions, id=user_id)
 
     def remove_permissions(self, user_id, permissions):
@@ -95,7 +102,31 @@ class UserManager(utils.IdentifierMixin, object):
             remove_permissions(123, ['BANDWIDTH_MANAGE'])
         """
         pretty_permissions = self.format_permission_object(permissions)
+        LOGGER.warning("Removing the following permissions to %s: %s", user_id, pretty_permissions)
         return self.user_service.removeBulkPortalPermission(pretty_permissions, id=user_id)
+
+    def permissions_from_user(self, user_id, from_user_id):
+        """Sets user_id's permission to be the same as from_user_id's
+
+        Any permissions from_user_id has will be added to user_id.
+        Any permissions from_user_id doesn't have will be removed from user_id.
+
+        :param int user_id: The user to change permissions.
+        :param int from_user_id: The use to base permissions from.
+        :returns: True on success, Exception otherwise.
+        """
+        from_permissions = self.get_user_permissions(from_user_id)
+        self.add_permissions(user_id, from_permissions)
+        all_permissions = self.get_all_permissions()
+        remove_permissions = []
+        for permission in all_permissions:
+            # If permission does not exist for from_user_id add it to the list to be removed
+            if _keyname_search(all_permissions, permission):
+                continue
+            else:
+                remove_permissions.append({'keyName': permission['keyName']})
+        self.remove_permissions(user_id, remove_permissions)
+        return True
 
     def get_user_permissions(self, user_id):
         """Returns a sorted list of a users permissions"""
@@ -131,13 +162,14 @@ class UserManager(utils.IdentifierMixin, object):
         """Gets the event log for a specific user, default start_date is 30 days ago
 
         :param int id: User id to view
-        :param string start_date: "%Y-%m-%dT%H:%M:%s.0000-06:00" formatted string. Anything else wont work
+        :param string start_date: "%Y-%m-%dT%H:%M:%s.0000-06:00" is the full formatted string.
+                                  The Timezone part has to be HH:MM, notice the : there.
         :returns: https://softlayer.github.io/reference/datatypes/SoftLayer_Event_Log/
         """
 
         if start_date is None:
             date_object = datetime.date.today() - datetime.timedelta(days=30)
-            start_date = date_object.strftime("%Y-%m-%dT00:00:00.0000-06:00")
+            start_date = date_object.strftime("%Y-%m-%dT00:00:00")
 
         object_filter = {
             'userId': {
@@ -149,7 +181,10 @@ class UserManager(utils.IdentifierMixin, object):
             }
         }
 
-        return self.client.call('Event_Log', 'getAllObjects', filter=object_filter)
+        events = self.client.call('Event_Log', 'getAllObjects', filter=object_filter)
+        if events is None:
+            events = [{'eventName': 'No Events Found'}]
+        return events
 
     def _get_id_from_username(self, username):
         """Looks up a username's id
@@ -162,24 +197,39 @@ class UserManager(utils.IdentifierMixin, object):
         user = self.list_users(_mask, _filter)
         if len(user) == 1:
             return [user[0]['id']]
+        elif len(user) > 1:
+            raise exceptions.SoftLayerError("Multiple users found with the name: %s" % username)
         else:
-            # Might eventually want to throw an exception if len(user) > 1
             raise exceptions.SoftLayerError("Unable to find user id for %s" % username)
 
-
     def format_permission_object(self, permissions):
-        """Formats a list of permission key names into something the SLAPI will respect"""
+        """Formats a list of permission key names into something the SLAPI will respect.
+
+        :param list permissions: A list of SLAPI permissions keyNames.
+                                 keyName of ALL will return all permissions.
+        :returns: list of dictionaries that can be sent to the api to add or remove permissions
+        :throws SoftLayerError: If any permission is invalid this exception will be thrown.
+        """
         pretty_permissions = []
         available_permissions = self.get_all_permissions()
         # pp(available_permissions)
         for permission in permissions:
+            # Handle data retrieved directly from the API
+            if isinstance(permission, dict):
+                permission = permission['keyName']
             permission = permission.upper()
             if permission == 'ALL':
                 return available_permissions
             # Search through available_permissions to make sure what the user entered was valid
-            if next(filter(lambda x: x['keyName'] == permission, available_permissions), False):
+            if _keyname_search(available_permissions, permission):
                 pretty_permissions.append({'keyName': permission})
             else:
-                raise exceptions.SoftLayerError("%s is not a valid permission" % permission)
-        pp(pretty_permissions)
+                raise exceptions.SoftLayerError("|%s| is not a valid permission" % permission)
         return pretty_permissions
+
+
+def _keyname_search(haystack, needle):
+    for item in haystack:
+        if item.get('keyName') == needle:
+            return True
+    return False

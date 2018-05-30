@@ -9,7 +9,7 @@ from SoftLayer import testing
 import json
 
 
-class UserTests(testing.TestCase):
+class UserCLITests(testing.TestCase):
 
     """User list tests"""
 
@@ -83,11 +83,15 @@ class UserTests(testing.TestCase):
     """User edit-permissions tests"""
 
     def test_edit_perms_on(self):
-        result = self.run_command(['user', 'edit-permissions', '11100', '--enable', '-p TEST'])
+        result = self.run_command(['user', 'edit-permissions', '11100', '--enable', '-p', 'TEST'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_User_Customer', 'addBulkPortalPermission', identifier=11100)
 
+    def test_edit_perms_on_bad(self):
+        result = self.run_command(['user', 'edit-permissions', '11100', '--enable', '-p', 'TEST_NOt_exist'])
+        self.assertEqual(result.exit_code, -1)
+
     def test_edit_perms_off(self):
-        result = self.run_command(['user', 'edit-permissions', '11100', '--disable', '-p TEST'])
+        result = self.run_command(['user', 'edit-permissions', '11100', '--disable', '-p', 'TEST'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_User_Customer', 'removeBulkPortalPermission', identifier=11100)
