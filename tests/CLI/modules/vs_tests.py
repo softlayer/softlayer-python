@@ -154,6 +154,54 @@ class VirtTests(testing.TestCase):
                            'id': 104,
                            'backend_ip': '10.45.19.35'}])
 
+    @mock.patch('SoftLayer.utils.lookup')
+    def test_detail_vs_empty_billing(self, mock_lookup):
+        def mock_lookup_func(dic, key, *keys):
+            if key == 'billingItem':
+                return []
+            if keys:
+                return mock_lookup_func(dic.get(key, {}), keys[0], *keys[1:])
+            return dic.get(key)
+
+        mock_lookup.side_effect = mock_lookup_func
+
+        result = self.run_command(['vs', 'detail', '100', '--passwords', '--price'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output),
+                         {'active_transaction': None,
+                          'cores': 2,
+                          'created': '2013-08-01 15:23:45',
+                          'datacenter': 'TEST00',
+                          'dedicated_host': 'test-dedicated',
+                          'dedicated_host_id': 37401,
+                          'hostname': 'vs-test1',
+                          'domain': 'test.sftlyr.ws',
+                          'fqdn': 'vs-test1.test.sftlyr.ws',
+                          'id': 100,
+                          'guid': '1a2b3c-1701',
+                          'memory': 1024,
+                          'modified': {},
+                          'os': 'Ubuntu',
+                          'os_version': '12.04-64 Minimal for VSI',
+                          'notes': 'notes',
+                          'price_rate': 0,
+                          'tags': ['production'],
+                          'private_cpu': {},
+                          'private_ip': '10.45.19.37',
+                          'private_only': {},
+                          'ptr': 'test.softlayer.com.',
+                          'public_ip': '172.16.240.2',
+                          'state': 'RUNNING',
+                          'status': 'ACTIVE',
+                          'users': [{'software': 'Ubuntu',
+                                     'password': 'pass',
+                                     'username': 'user'}],
+                          'vlans': [{'type': 'PUBLIC',
+                                     'number': 23,
+                                     'id': 1}],
+                          'owner': None})
+
     def test_detail_vs(self):
         result = self.run_command(['vs', 'detail', '100',
                                    '--passwords', '--price'])
