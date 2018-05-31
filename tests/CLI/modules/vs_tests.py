@@ -849,3 +849,17 @@ class VirtTests(testing.TestCase):
 
         result = self.run_command(['vs', 'reload', '--postinstall', '100', '--key', '100', '--image', '100', '100'])
         self.assertEqual(result.exit_code, 2)
+
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    def test_cancel(self, confirm_mock):
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'cancel', '100'])
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    def test_cancel_no_confirm(self, confirm_mock):
+        confirm_mock.return_value = False
+
+        result = self.run_command(['vs', 'cancel', '100'])
+        self.assertEqual(result.exit_code, 2)
