@@ -66,6 +66,13 @@ class UserManager(utils.IdentifierMixin, object):
             objectmask = "mask[userStatus[name], parent[id, username]]"
         return self.user_service.getObject(id=user_id, mask=objectmask)
 
+    def get_current_user(self, objectmask=None):
+        """Calls SoftLayer_Account::getCurrentUser"""
+
+        if objectmask is None:
+            objectmask = "mask[userStatus[name], parent[id, username]]"
+        return self.account_service.getCurrentUser(mask=objectmask)
+
     def get_all_permissions(self):
         """Calls SoftLayer_User_CustomerPermissions_Permission::getAllObjects
 
@@ -115,16 +122,19 @@ class UserManager(utils.IdentifierMixin, object):
         :param int from_user_id: The use to base permissions from.
         :returns: True on success, Exception otherwise.
         """
+
         from_permissions = self.get_user_permissions(from_user_id)
         self.add_permissions(user_id, from_permissions)
         all_permissions = self.get_all_permissions()
         remove_permissions = []
+
         for permission in all_permissions:
             # If permission does not exist for from_user_id add it to the list to be removed
-            if _keyname_search(all_permissions, permission):
+            if _keyname_search(from_permissions, permission['keyName']):
                 continue
             else:
                 remove_permissions.append({'keyName': permission['keyName']})
+
         self.remove_permissions(user_id, remove_permissions)
         return True
 
@@ -224,9 +234,19 @@ class UserManager(utils.IdentifierMixin, object):
             if _keyname_search(available_permissions, permission):
                 pretty_permissions.append({'keyName': permission})
             else:
-                raise exceptions.SoftLayerError("|%s| is not a valid permission" % permission)
+                raise exceptions.SoftLayerError("'%s' is not a valid permission" % permission)
         return pretty_permissions
 
+    def create_user(self, user_object, password):
+        """Blindly sends user_object to SoftLayer_User_Customer::createObject
+
+        :param dictionary user_object: https://softlayer.github.io/reference/datatypes/SoftLayer_User_Customer/
+        """
+        LOGGER.warning("Creating User %s", user_object['username'])
+        return self.user_service.createObject(user_object, password, None)
+
+    def addApiAuthenticationKey(self, user_id):
+        return self.user_service.addApiAuthenticationKey(id=user_id)
 
 def _keyname_search(haystack, needle):
     for item in haystack:

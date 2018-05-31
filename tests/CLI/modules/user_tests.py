@@ -9,6 +9,10 @@ from SoftLayer import testing
 import json
 
 
+#SoftLayer/CLI/user/detail.py  114-119, 128-134
+#SoftLayer/CLI/user/edit_permissions.py    28-29, 38
+#SoftLayer/CLI/user/permissions.py   25, 56
+
 class UserCLITests(testing.TestCase):
 
     """User list tests"""
