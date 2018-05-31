@@ -532,6 +532,25 @@ class VirtTests(testing.TestCase):
                                 args=args)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_create_vs_test(self, confirm_mock):
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'create', '--test', '--hostname', 'TEST',
+                                   '--domain', 'TESTING', '--cpu', '1',
+                                   '--memory', '2048MB', '--datacenter',
+                                   'TEST00', '--os', 'UBUNTU_LATEST'])
+
+        self.assertEqual(result.exit_code, -1)
+
+    def test_create_vs_bad_memory(self):
+        result = self.run_command(['vs', 'create', '--hostname', 'TEST',
+                                   '--domain', 'TESTING', '--cpu', '1',
+                                   '--memory', '2034MB', '--flavor',
+                                   'UBUNTU', '--datacenter', 'TEST00'])
+
+        self.assertEqual(result.exit_code, 2)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_both(self, confirm_mock):
         confirm_mock.return_value = True
         getReverseDomainRecords = self.set_mock('SoftLayer_Virtual_Guest',
