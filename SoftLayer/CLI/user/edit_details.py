@@ -1,11 +1,14 @@
 """List Users."""
 # :license: MIT, see LICENSE for more details.
 
-import click
+
 import json
+
+import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import helpers
 
 
@@ -20,7 +23,7 @@ def cli(env, user, template):
     JSON strings should be enclosed in '' and each item should be enclosed in ""
 
     :Example: slcli user edit-details testUser -t '{"firstName": "Test", "lastName": "Testerson"}'
-    ."""
+    """
     mgr = SoftLayer.UserManager(env.client)
     user_id = helpers.resolve_id(mgr.resolve_ids, user, 'username')
 
@@ -30,8 +33,8 @@ def cli(env, user, template):
             template_object = json.loads(template)
             for key in template_object:
                 user_template[key] = template_object[key]
-        except json.decoder.JSONDecodeError as ex:
-            raise exceptions.ArgumentError("Unable to parse --template. %s" % ex.msg)
+        except ValueError as ex:
+            raise exceptions.ArgumentError("Unable to parse --template. %s" % ex)
 
     result = mgr.edit_user(user_id, user_template)
     if result:

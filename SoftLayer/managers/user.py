@@ -253,8 +253,13 @@ class UserManager(utils.IdentifierMixin, object):
         """
         return self.user_service.editObject(user_object, id=user_id)
 
-    def addApiAuthenticationKey(self, user_id):
+    def add_api_authentication_key(self, user_id):
+        """Calls SoftLayer_User_Customer::addApiAuthenticationKey
+
+        :param int user_id: User to add API key to
+        """
         return self.user_service.addApiAuthenticationKey(id=user_id)
+
 
 def _keyname_search(haystack, needle):
     for item in haystack:

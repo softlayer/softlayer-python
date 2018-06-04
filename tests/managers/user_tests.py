@@ -111,9 +111,9 @@ class UserTests(testing.TestCase):
         ]
         self.manager.permissions_from_user(1234, 5678)
         self.assert_called_with('SoftLayer_User_Customer', 'addBulkPortalPermission',
-                                 args=(user_permissions.return_value,))
+                                args=(user_permissions.return_value,))
         self.assert_called_with('SoftLayer_User_Customer', 'removeBulkPortalPermission',
-                                 args=(removed_permissions,))
+                                args=(removed_permissions,))
 
     def test_get_id_from_username_one_match(self):
         account_mock = self.set_mock('SoftLayer_Account', 'getUsers')

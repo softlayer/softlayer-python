@@ -1,29 +1,29 @@
 """Creates a user """
 # :license: MIT, see LICENSE for more details.
 
-import click
 import json
-import secrets
 import string
+import sys
+
+import click
 
 import SoftLayer
-from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 
-
-from pprint import pprint as pp
 
 @click.command()
 @click.argument('username')
-@click.option('--email', '-e', required=True, 
+@click.option('--email', '-e', required=True,
               help="Email address for this user. Required for creation.")
 @click.option('--password', '-p', default=None, show_default=True,
               help="Password to set for this user. If no password is provided, user will be sent an email "
-                   "to generate one, which expires in 24 hours.  '-p generate' will create a password for you. "
-                   "Passwords require 8+ characters, upper and lowercase, a number and a symbol.")
-@click.option('--from-user', '-u', default=None, 
+                   "to generate one, which expires in 24 hours.  '-p generate' will create a password for you "
+                   "(Requires Python 3.6+). Passwords require 8+ characters, upper and lowercase, a number "
+                   "and a symbol.")
+@click.option('--from-user', '-u', default=None,
               help="Base user to use as a template for creating this user. "
                    "Will default to the user running this command. Information provided in --template "
                    "supersedes this template.")
@@ -34,13 +34,15 @@ from pprint import pprint as pp
 def cli(env, username, email, password, from_user, template, api_key):
     """Creates a user Users.
 
-    :Example: slcli user create my@email.com -e my@email.com -p generate -a -t '{"firstName": "Test", "lastName": "Testerson"}'
+    :Example: slcli user create my@email.com -e my@email.com -p generate -a
+    -t '{"firstName": "Test", "lastName": "Testerson"}'
+
     Remember to set the permissions and access for this new user.
     """
 
     mgr = SoftLayer.UserManager(env.client)
     user_mask = ("mask[id, firstName, lastName, email, companyName, address1, city, country, postalCode, "
-                "state, userStatusId, timezoneId]")
+                 "state, userStatusId, timezoneId]")
     from_user_id = None
     if from_user is None:
         user_template = mgr.get_current_user(objectmask=user_mask)
@@ -56,8 +58,8 @@ def cli(env, username, email, password, from_user, template, api_key):
             template_object = json.loads(template)
             for key in template_object:
                 user_template[key] = template_object[key]
-        except json.decoder.JSONDecodeError as ex:
-            raise exceptions.ArgumentError("Unable to parse --template. %s" % ex.msg)
+        except ValueError as ex:
+            raise exceptions.ArgumentError("Unable to parse --template. %s" % ex)
 
     user_template['username'] = username
     if password == 'generate':
@@ -79,15 +81,20 @@ def cli(env, username, email, password, from_user, template, api_key):
     new_api_key = None
     if api_key:
         click.secho("Adding API key...", fg='green')
-        new_api_key = mgr.addApiAuthenticationKey(result['id'])
+        new_api_key = mgr.add_api_authentication_key(result['id'])
 
     table = formatting.Table(['Username', 'Email', 'Password', 'API Key'])
     table.add_row([result['username'], result['email'], password, new_api_key])
     env.fout(table)
 
-def generate_password():
-    alphabet = string.ascii_letters + string.digits
-    password = ''.join(secrets.choice(alphabet) for i in range(20)) # for a 20-character password
-    special = ''.join(secrets.choice(string.punctuation) for i in range(3))
-    return password + special
 
+def generate_password():
+    """Returns a 23 character random string, with 3 special characters at the end"""
+    if sys.version_info > (3, 6):
+        import secrets  # pylint: disable=import-error
+        alphabet = string.ascii_letters + string.digits
+        password = ''.join(secrets.choice(alphabet) for i in range(20))
+        special = ''.join(secrets.choice(string.punctuation) for i in range(3))
+        return password + special
+    else:
+        raise ImportError("Generating passwords require python 3.6 or higher")
