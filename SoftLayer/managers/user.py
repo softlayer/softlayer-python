@@ -245,6 +245,14 @@ class UserManager(utils.IdentifierMixin, object):
         LOGGER.warning("Creating User %s", user_object['username'])
         return self.user_service.createObject(user_object, password, None)
 
+    def edit_user(self, user_id, user_object):
+        """Blindly sends user_object to SoftLayer_User_Customer::editObject
+
+        :param int user_id: User to edit
+        :param dictionary user_object: https://softlayer.github.io/reference/datatypes/SoftLayer_User_Customer/
+        """
+        return self.user_service.editObject(user_object, id=user_id)
+
     def addApiAuthenticationKey(self, user_id):
         return self.user_service.addApiAuthenticationKey(id=user_id)
 

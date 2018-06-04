@@ -34,7 +34,7 @@ from pprint import pprint as pp
 def cli(env, username, email, password, from_user, template, api_key):
     """Creates a user Users.
 
-    slcli user create my@email.com -e my@email.com -p generate -a -t '{"firstName": "Test", "lastName": "Testerson"}'
+    :Example: slcli user create my@email.com -e my@email.com -p generate -a -t '{"firstName": "Test", "lastName": "Testerson"}'
     Remember to set the permissions and access for this new user.
     """
 

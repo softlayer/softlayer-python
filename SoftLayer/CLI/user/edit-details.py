@@ -2,47 +2,39 @@
 # :license: MIT, see LICENSE for more details.
 
 import click
+import json
 
 import SoftLayer
-from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import formatting
-
-
-COLUMNS = [
-    column_helper.Column('id', ('id',)),
-    column_helper.Column('username', ('username',)),
-    column_helper.Column('email', ('email',)),
-    column_helper.Column('displayName', ('displayName',)),
-    column_helper.Column('status', ('userStatus', 'name')),
-    column_helper.Column('hardwareCount', ('hardwareCount',)),
-    column_helper.Column('virtualGuestCount', ('virtualGuestCount',))
-]
-
-DEFAULT_COLUMNS = [
-    'id',
-    'username',
-    'email',
-    'displayName'
-]
+from SoftLayer.CLI import helpers
 
 
 @click.command()
-@click.option('--columns',
-              callback=column_helper.get_formatter(COLUMNS),
-              help='Columns to display. [options: %s]' % ', '.join(column.name for column in COLUMNS),
-              default=','.join(DEFAULT_COLUMNS),
-              show_default=True)
+@click.argument('user')
+@click.option('--template', '-t', required=True,
+              help="A json string describing https://softlayer.github.io/reference/datatypes/SoftLayer_User_Customer/")
 @environment.pass_env
-def cli(env, columns):
-    """List Users."""
+def cli(env, user, template):
+    """Edit a Users details
 
+    JSON strings should be enclosed in '' and each item should be enclosed in ""
+
+    :Example: slcli user edit-details testUser -t '{"firstName": "Test", "lastName": "Testerson"}'
+    ."""
     mgr = SoftLayer.UserManager(env.client)
-    users = mgr.list_users()
+    user_id = helpers.resolve_id(mgr.resolve_ids, user, 'username')
 
-    table = formatting.Table(columns.columns)
-    for user in users:
-        table.add_row([value or formatting.blank()
-                       for value in columns.row(user)])
+    user_template = {}
+    if template is not None:
+        try:
+            template_object = json.loads(template)
+            for key in template_object:
+                user_template[key] = template_object[key]
+        except json.decoder.JSONDecodeError as ex:
+            raise exceptions.ArgumentError("Unable to parse --template. %s" % ex.msg)
 
-    env.fout(table)
+    result = mgr.edit_user(user_id, user_template)
+    if result:
+        click.secho("%s updated successfully" % (user), fg='green')
+    else:
+        click.secho("Failed to update %s" % (user), fg='red')
