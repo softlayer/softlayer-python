@@ -154,7 +154,7 @@ class UserManager(utils.IdentifierMixin, object):
         """
 
         if start_date is None:
-            date_object = datetime.date.today() - datetime.timedelta(days=30)
+            date_object = datetime.datetime.today() - datetime.timedelta(days=30)
             start_date = date_object.strftime("%m/%d/%Y 0:0:0")
 
         date_filter = {
@@ -178,7 +178,7 @@ class UserManager(utils.IdentifierMixin, object):
         """
 
         if start_date is None:
-            date_object = datetime.date.today() - datetime.timedelta(days=30)
+            date_object = datetime.datetime.today() - datetime.timedelta(days=30)
             start_date = date_object.strftime("%Y-%m-%dT00:00:00")
 
         object_filter = {

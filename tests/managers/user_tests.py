@@ -3,13 +3,46 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
+import datetime
 import mock
 import SoftLayer
 from SoftLayer import exceptions
 from SoftLayer import testing
 
 
-class UserTests(testing.TestCase):
+real_datetime_class = datetime.datetime
+
+
+def mock_datetime(target, datetime_module):
+    """A way to use specific datetimes in tests. Just mocking datetime doesn't work because of pypy
+
+    https://solidgeargroup.com/mocking-the-time
+    """
+    class DatetimeSubclassMeta(type):
+        @classmethod
+        def __instancecheck__(mcs, obj):
+            return isinstance(obj, real_datetime_class)
+
+    class BaseMockedDatetime(real_datetime_class):
+        @classmethod
+        def now(cls, tz=None):
+            return target.replace(tzinfo=tz)
+
+        @classmethod
+        def utcnow(cls):
+            return target
+
+        @classmethod
+        def today(cls):
+            return target
+
+    # Python2 & Python3-compatible metaclass
+    MockedDatetime = DatetimeSubclassMeta('datetime', (BaseMockedDatetime,), {})
+
+    return mock.patch.object(datetime_module, 'datetime', MockedDatetime)
+
+
+class UserManagerTests(testing.TestCase):
 
     def set_up(self):
         self.manager = SoftLayer.UserManager(self.client)
@@ -57,11 +90,8 @@ class UserTests(testing.TestCase):
                                 args=expected_args, identifier=1234)
 
     def test_get_logins_default(self):
-        from datetime import date
-        with mock.patch('SoftLayer.managers.user.datetime.date') as mock_date:
-            mock_date.today.return_value = date(2018, 5, 15)
-            mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
-
+        target = datetime.datetime(2018, 5, 15)
+        with mock_datetime(target, datetime):
             self.manager.get_logins(1234)
             expected_filter = {
                 'loginAttempts': {
@@ -74,10 +104,8 @@ class UserTests(testing.TestCase):
             self.assert_called_with('SoftLayer_User_Customer', 'getLoginAttempts', filter=expected_filter)
 
     def test_get_events_default(self):
-        from datetime import date
-        with mock.patch('SoftLayer.managers.user.datetime.date') as mock_date:
-            mock_date.today.return_value = date(2018, 5, 15)
-            mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
+        target = datetime.datetime(2018, 5, 15)
+        with mock_datetime(target, datetime):
 
             self.manager.get_events(1234)
             expected_filter = {
@@ -106,8 +134,12 @@ class UserTests(testing.TestCase):
             {"keyName": "TEST"}
         ]
         removed_permissions = [
-            {"keyName": "TEST_3"},
-            {"keyName": "TEST_4"}
+            {'keyName': 'ACCESS_ALL_HARDWARE'},
+            {'keyName': 'ACCESS_ALL_HARDWARE'},
+            {'keyName': 'ACCOUNT_SUMMARY_VIEW'},
+            {'keyName': 'ADD_SERVICE_STORAGE'},
+            {'keyName': 'TEST_3'},
+            {'keyName': 'TEST_4'}
         ]
         self.manager.permissions_from_user(1234, 5678)
         self.assert_called_with('SoftLayer_User_Customer', 'addBulkPortalPermission',
@@ -139,13 +171,23 @@ class UserTests(testing.TestCase):
         self.assertEqual([{'keyName': 'TEST'}], result)
 
     def test_format_permission_object_all(self):
-        result = self.manager.format_permission_object(['ALL'])
-        service_name = 'SoftLayer_User_Customer_CustomerPermission_Permission'
         expected = [
             {'key': 'T_2', 'keyName': 'TEST', 'name': 'A Testing Permission'},
-            {'key': 'T_3', 'keyName': 'TEST_3', 'name': 'A Testing Permission 3'},
-            {'key': 'T_4', 'keyName': 'TEST_4', 'name': 'A Testing Permission 4'},
             {'key': 'T_1', 'keyName': 'TICKET_VIEW', 'name': 'View Tickets'}
         ]
+        service_name = 'SoftLayer_User_Customer_CustomerPermission_Permission'
+        permission_mock = self.set_mock(service_name, 'getAllObjects')
+        permission_mock.return_value = expected
+        result = self.manager.format_permission_object(['ALL'])
         self.assert_called_with(service_name, 'getAllObjects')
         self.assertEqual(expected, result)
+
+    def test_get_current_user(self):
+        result = self.manager.get_current_user()
+        self.assert_called_with('SoftLayer_Account', 'getCurrentUser', mask=mock.ANY)
+        self.assertEqual(result['id'], 12345)
+
+    def test_get_current_user_mask(self):
+        result = self.manager.get_current_user(objectmask="mask[id]")
+        self.assert_called_with('SoftLayer_Account', 'getCurrentUser', mask="mask[id]")
+        self.assertEqual(result['id'], 12345)

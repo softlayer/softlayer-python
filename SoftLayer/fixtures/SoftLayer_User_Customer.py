@@ -76,3 +76,6 @@ getLoginAttempts = [
 
 addBulkPortalPermission = True
 removeBulkPortalPermission = True
+createObject = getObject
+editObject = True
+addApiAuthenticationKey = True

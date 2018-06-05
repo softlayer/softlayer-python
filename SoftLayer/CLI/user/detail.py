@@ -78,16 +78,16 @@ def basic_info(user, keys):
     table.add_row(['Company', user.get('companyName')])
     table.add_row(['Created', user.get('createDate')])
     table.add_row(['Phone Number', user.get('officePhone')])
-    if user['parentId']:
+    if user.get('parentId', False):
         table.add_row(['Parent User', utils.lookup(user, 'parent', 'username')])
     table.add_row(['Status', utils.lookup(user, 'userStatus', 'name')])
     table.add_row(['PPTP VPN', user.get('pptpVpnAllowedFlag', 'No')])
     table.add_row(['SSL VPN', user.get('sslVpnAllowedFlag', 'No')])
-    for login in user.get('unsuccessfulLogins'):
+    for login in user.get('unsuccessfulLogins', {}):
         login_string = "%s From: %s" % (login.get('createDate'), login.get('ipAddress'))
         table.add_row(['Last Failed Login', login_string])
         break
-    for login in user.get('successfulLogins'):
+    for login in user.get('successfulLogins', {}):
         login_string = "%s From: %s" % (login.get('createDate'), login.get('ipAddress'))
         table.add_row(['Last Login', login_string])
         break
