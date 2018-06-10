@@ -334,7 +334,8 @@ class VirtTests(testing.TestCase):
                  'operatingSystemReferenceCode': 'UBUNTU_LATEST',
                  'networkComponents': [{'maxSpeed': '100'}],
                  'supplementalCreateObjectOptions': {'bootMode': None}},)
-        self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject', args=args)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
+                                args=args)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_with_wait_ready(self, confirm_mock):
