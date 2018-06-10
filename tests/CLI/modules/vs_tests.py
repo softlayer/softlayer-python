@@ -305,6 +305,7 @@ class VirtTests(testing.TestCase):
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create(self, confirm_mock):
         confirm_mock.return_value = True
+
         result = self.run_command(['vs', 'create',
                                    '--cpu=2',
                                    '--domain=example.com',
@@ -333,8 +334,53 @@ class VirtTests(testing.TestCase):
                  'operatingSystemReferenceCode': 'UBUNTU_LATEST',
                  'networkComponents': [{'maxSpeed': '100'}],
                  'supplementalCreateObjectOptions': {'bootMode': None}},)
-        self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
-                                args=args)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject', args=args)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_create_with_wait_ready(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getObject')
+        mock.return_value = {
+            "provisionDate": "2018-06-10T12:00:00-05:00",
+            "id": 100
+        }
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'create',
+                                   '--cpu=2',
+                                   '--domain=example.com',
+                                   '--hostname=host',
+                                   '--os=UBUNTU_LATEST',
+                                   '--memory=1',
+                                   '--network=100',
+                                   '--billing=hourly',
+                                   '--datacenter=dal05',
+                                   '--wait=1'])
+
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_create_with_wait_not_ready(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getObject')
+        mock.return_value = {
+            "ready": False,
+            "guid": "1a2b3c-1701",
+            "id": 100,
+            "created": "2018-06-10 12:00:00"
+        }
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'create',
+                                   '--cpu=2',
+                                   '--domain=example.com',
+                                   '--hostname=host',
+                                   '--os=UBUNTU_LATEST',
+                                   '--memory=1',
+                                   '--network=100',
+                                   '--billing=hourly',
+                                   '--datacenter=dal05',
+                                   '--wait=10'])
+
+        self.assertEqual(result.exit_code, 1)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_with_integer_image_id(self, confirm_mock):
@@ -404,6 +450,66 @@ class VirtTests(testing.TestCase):
                  'networkComponents': [{'maxSpeed': '100'}]},)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
                                 args=args)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_create_with_flavor_and_memory(self, confirm_mock):
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'create',
+                                   '--domain=example.com',
+                                   '--hostname=host',
+                                   '--os=UBUNTU_LATEST',
+                                   '--network=100',
+                                   '--datacenter=TEST00',
+                                   '--flavor=BL_1X2X25',
+                                   '--memory=2048MB'])
+
+        self.assertEqual(result.exit_code, 2)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_create_with_dedicated_and_flavor(self, confirm_mock):
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'create',
+                                   '--domain=example.com',
+                                   '--hostname=host',
+                                   '--os=UBUNTU_LATEST',
+                                   '--network=100',
+                                   '--datacenter=TEST00',
+                                   '--dedicated',
+                                   '--flavor=BL_1X2X25'])
+
+        self.assertEqual(result.exit_code, 2)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_create_with_hostid_and_flavor(self, confirm_mock):
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'create',
+                                   '--domain=example.com',
+                                   '--hostname=host',
+                                   '--os=UBUNTU_LATEST',
+                                   '--network=100',
+                                   '--datacenter=dal05',
+                                   '--host-id=100',
+                                   '--flavor=BL_1X2X25'])
+
+        self.assertEqual(result.exit_code, 2)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_create_with_flavor_and_cpu(self, confirm_mock):
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'create',
+                                   '--domain=example.com',
+                                   '--hostname=host',
+                                   '--os=UBUNTU_LATEST',
+                                   '--network=100',
+                                   '--datacenter=TEST00',
+                                   '--flavor=BL_1X2X25',
+                                   '--cpu=2'])
+
+        self.assertEqual(result.exit_code, 2)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_with_host_id(self, confirm_mock):
