@@ -59,6 +59,7 @@ class BlockTests(testing.TestCase):
         result = self.run_command(['block', 'volume-detail', '1234'])
 
         self.assert_no_fail(result)
+        isinstance(json.loads(result.output)['IOPs'], float)
         self.assertEqual({
             'Username': 'username',
             'LUN Id': '2',
