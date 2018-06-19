@@ -510,16 +510,20 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         block_volume = self.get_block_volume_details(
             volume_id,
             mask='mask[id,billingItem[id,hourlyFlag]]')
-        billing_item_id = block_volume['billingItem']['id']
+        billingItem = 'billingItem' in block_volume
+        if billingItem == False:
+            print('The block storage was cancelled')
+        else:
+            billing_item_id = block_volume['billingItem']['id']
 
-        if utils.lookup(block_volume, 'billingItem', 'hourlyFlag'):
-            immediate = True
+            if utils.lookup(block_volume, 'billingItem', 'hourlyFlag'):
+                immediate = True
 
-        return self.client['Billing_Item'].cancelItem(
-            immediate,
-            True,
-            reason,
-            id=billing_item_id)
+            return self.client['Billing_Item'].cancelItem(
+                immediate,
+                True,
+                reason,
+                id=billing_item_id)
 
     def failover_to_replicant(self, volume_id, replicant_id, immediate=False):
         """Failover to a volume replicant.
