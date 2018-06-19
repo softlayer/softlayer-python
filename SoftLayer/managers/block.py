@@ -511,7 +511,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
             volume_id,
             mask='mask[id,billingItem[id,hourlyFlag]]')
         billingItem = 'billingItem' in block_volume
-        if billingItem == False:
+        if billingItem is False:
             print('The block storage was cancelled')
         else:
             billing_item_id = block_volume['billingItem']['id']
