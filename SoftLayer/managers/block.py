@@ -510,6 +510,10 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         block_volume = self.get_block_volume_details(
             volume_id,
             mask='mask[id,billingItem[id,hourlyFlag]]')
+
+        if 'billingItem' not in block_volume:
+            raise exceptions.SoftLayerError("Block Storage was already cancelled")
+
         billing_item_id = block_volume['billingItem']['id']
 
         if utils.lookup(block_volume, 'billingItem', 'hourlyFlag'):
