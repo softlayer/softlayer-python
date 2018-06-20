@@ -48,7 +48,7 @@ class BlockTests(testing.TestCase):
             'createDate': '2017-06-20T14:24:21-06:00',
             'nasType': 'ISCSI',
             'storageTypeId': '7',
-            'serviceResourceName':'PerfStor Aggr aggr_staasdal0601_pc01'
+            'serviceResourceName': 'PerfStor Aggr aggr_staasdal0601_pc01'
         }
         exception = self.assertRaises(
             exceptions.SoftLayerError,
@@ -68,7 +68,7 @@ class BlockTests(testing.TestCase):
             'createDate': '2017-06-20T14:24:21-06:00',
             'nasType': 'ISCSI',
             'storageTypeId': '7',
-            'serviceResourceName':'PerfStor Aggr aggr_staasdal0601_pc01',
+            'serviceResourceName': 'PerfStor Aggr aggr_staasdal0601_pc01',
             'billingItem': {'hourlyFlag': True, 'id': 449},
         }
         self.block.cancel_block_volume(123, immediate=False)
@@ -79,7 +79,6 @@ class BlockTests(testing.TestCase):
             args=(True, True, 'No longer needed'),
             identifier=449,
         )
-
 
     def test_get_block_volume_details(self):
         result = self.block.get_block_volume_details(100)
