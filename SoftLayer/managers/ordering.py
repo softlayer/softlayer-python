@@ -445,6 +445,7 @@ class OrderingManager(object):
         :param int quantity: The number of resources to order
 
         """
+        container = {}
         order = {}
         extras = extras or {}
 
@@ -470,7 +471,10 @@ class OrderingManager(object):
 
         price_ids = self.get_price_id_list(package_keyname, item_keynames)
         order['prices'] = [{'id': price_id} for price_id in price_ids]
-        return order
+
+        container['orderContainers'] = [order]
+
+        return container
 
     def package_locations(self, package_keyname):
         """List datacenter locations for a package keyname
