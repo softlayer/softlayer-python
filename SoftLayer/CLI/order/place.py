@@ -88,7 +88,7 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
     if verify:
         table = formatting.Table(COLUMNS)
         order_to_place = manager.verify_order(*args, **kwargs)
-        for price in order_to_place['prices']:
+        for price in order_to_place['orderContainers'][0]['prices']:
             cost_key = 'hourlyRecurringFee' if billing == 'hourly' else 'recurringFee'
             table.add_row([
                 price['item']['keyName'],
