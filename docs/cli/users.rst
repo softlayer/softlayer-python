@@ -4,6 +4,23 @@ Users
 =============
 Version 5.6.0 introduces the ability to interact with user accounts from the cli. 
 
+.. _cli_user_create:
+user create
+-----------
+This command will create a user on your account.
+
+Options
+^^^^^^^
+-e, --email TEXT      Email address for this user. Required for creation.  [required]
+-p, --password TEXT   Password to set for this user. If no password is provided, user will be sent an email to generate one, which expires in 24 hours.  '-p generate' will create a password for you (Requires Python 3.6+). Passwords require 8+ characters, upper and lowercase, a number and a symbol.
+-u, --from-user TEXT  Base user to use as a template for creating this user. Will default to the user running this command. Information provided in --template supersedes this template.
+-t, --template TEXT   A json string describing https://softlayer.github.io/reference/datatypes/SoftLayer_User_Customer/
+-a, --api-key         Create an API key for this user.
+-h, --help            Show this message and exit.
+
+::
+    slcli user create my@email.com -e my@email.com -p generate -a -t '{"firstName": "Test", "lastName": "Testerson"}'
+
 .. _cli_user_list:
 
 user list
@@ -20,7 +37,7 @@ Gives a variety of details about a specific user. <user> can be a user id, or us
 
 user detail <user> -p, --permissions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Will list the permissions the user has. To see a list of all possible permissions, or to change a users permissions, see :ref:`cli_user_permissions`
+Will list the permissions the user has. To see a list of all possible permissions, or to change a user's permissions, see :ref:`cli_user_permissions`
 
 user detail <user> -h, --hardware
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -62,5 +79,19 @@ Enable or Disable specific permissions. It is possible to set multiple permissio
 
 Will enable TICKET_EDIT, TICKET_ADD, and TICKET_SEARCH permissions for the USERID
 
+.. _cli_user_edit_details:
 
+user edit-details
+-----------------
+Edit a User's details
+
+JSON strings should be enclosed in '' and each item should be enclosed in ""
+
+::
+  slcli user edit-details testUser -t '{"firstName": "Test", "lastName": "Testerson"}'
+
+Options
+^^^^^^^
+-t, --template TEXT  A json string describing https://softlayer.github.io/reference/datatypes/SoftLayer_User_Customer/  [required]
+-h, --help           Show this message and exit.
 
