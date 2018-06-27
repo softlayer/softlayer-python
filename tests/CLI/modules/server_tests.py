@@ -25,7 +25,7 @@ class ServerCLITests(testing.TestCase):
         output = json.loads(result.output)
         self.assert_no_fail(result)
         self.assertEqual(len(output), 10)
-        
+
     def test_server_credentials(self):
         result = self.run_command(['hardware', 'credentials', '12345'])
 
@@ -39,14 +39,14 @@ class ServerCLITests(testing.TestCase):
     def test_server_credentials_exception_passwords_not_found(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
         mock.return_value = {
-        "accountId": 11111,
-        "domain": "chechu.com",
-        "fullyQualifiedDomainName": "host3.vmware.chechu.com",
-        "hardwareStatusId": 5,
-        "hostname": "host3.vmware",
-        "id": 12345,
-        "operatingSystem": {}
-    }
+            "accountId": 11111,
+            "domain": "chechu.com",
+            "fullyQualifiedDomainName": "host3.vmware.chechu.com",
+            "hardwareStatusId": 5,
+            "hostname": "host3.vmware",
+            "id": 12345,
+            "operatingSystem": {}
+        }
 
         result = self.run_command(['hardware', 'credentials', '12345'])
 
@@ -58,17 +58,17 @@ class ServerCLITests(testing.TestCase):
     def test_server_credentials_exception_password_not_found(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
         mock.return_value = {
-        "accountId": 11111,
-        "domain": "chechu.com",
-        "fullyQualifiedDomainName": "host3.vmware.chechu.com",
-        "hardwareStatusId": 5,
-        "hostname": "host3.vmware",
-        "id": 12345,
-        "operatingSystem": {
-            "hardwareId": 22222,
-            "id": 333333,
-            "passwords": [{}]
-          }
+            "accountId": 11111,
+            "domain": "chechu.com",
+            "fullyQualifiedDomainName": "host3.vmware.chechu.com",
+            "hardwareStatusId": 5,
+            "hostname": "host3.vmware",
+            "id": 12345,
+            "operatingSystem": {
+                "hardwareId": 22222,
+                "id": 333333,
+                "passwords": [{}]
+            }
         }
 
         result = self.run_command(['hardware', 'credentials', '12345'])
@@ -365,7 +365,7 @@ class ServerCLITests(testing.TestCase):
 
     @mock.patch('SoftLayer.CLI.template.export_to_template')
     def test_create_server_with_export(self, export_mock):
-        if(sys.platform.startswith("win")):
+        if (sys.platform.startswith("win")):
             self.skipTest("Test doesn't work in Windows")
         result = self.run_command(['--really', 'server', 'create',
                                    '--size=S1270_8GB_2X1TBSATA_NORAID',
@@ -439,7 +439,7 @@ class ServerCLITests(testing.TestCase):
                                      hostname='hardware-test1')
 
     def test_edit_server_userfile(self):
-        if(sys.platform.startswith("win")):
+        if (sys.platform.startswith("win")):
             self.skipTest("Test doesn't work in Windows")
         with tempfile.NamedTemporaryFile() as userfile:
             userfile.write(b"some data")
