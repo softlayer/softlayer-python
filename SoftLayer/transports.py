@@ -135,6 +135,7 @@ class SoftLayerListResult(list):
 
 class XmlRpcTransport(object):
     """XML-RPC transport."""
+
     def __init__(self, endpoint_url=None, timeout=None, proxy=None, user_agent=None, verify=True):
 
         self.endpoint_url = (endpoint_url or consts.API_PUBLIC_ENDPOINT).rstrip('/')
@@ -433,6 +434,7 @@ class DebugTransport(object):
         self.requests.append(call)
 
         if call.exception is not None:
+            LOGGER.debug(self.print_reproduceable(call))
             raise call.exception
 
         return call.result
@@ -490,6 +492,7 @@ class TimingTransport(object):
 
 class FixtureTransport(object):
     """Implements a transport which returns fixtures."""
+
     def __call__(self, call):
         """Load fixture from the default fixture path."""
         try:

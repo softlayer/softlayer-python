@@ -282,6 +282,14 @@ ALL_ROUTES = [
     ('ticket:attach', 'SoftLayer.CLI.ticket.attach:cli'),
     ('ticket:detach', 'SoftLayer.CLI.ticket.detach:cli'),
 
+    ('user', 'SoftLayer.CLI.user'),
+    ('user:list', 'SoftLayer.CLI.user.list:cli'),
+    ('user:detail', 'SoftLayer.CLI.user.detail:cli'),
+    ('user:permissions', 'SoftLayer.CLI.user.permissions:cli'),
+    ('user:edit-permissions', 'SoftLayer.CLI.user.edit_permissions:cli'),
+    ('user:edit-details', 'SoftLayer.CLI.user.edit_details:cli'),
+    ('user:create', 'SoftLayer.CLI.user.create:cli'),
+
     ('vlan', 'SoftLayer.CLI.vlan'),
     ('vlan:detail', 'SoftLayer.CLI.vlan.detail:cli'),
     ('vlan:list', 'SoftLayer.CLI.vlan.list:cli'),

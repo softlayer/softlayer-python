@@ -116,7 +116,7 @@ class DedicatedHostsTests(testing.TestCase):
                     '56 Cores X 242 RAM X 1.2 TB',
                 'value': '56_CORES_X_242_RAM_X_1_4_TB'
             }
-            ]]
+        ]]
         )
 
     def test_create_options_with_only_datacenter(self):
@@ -148,7 +148,7 @@ class DedicatedHostsTests(testing.TestCase):
             {
                 "Available Backend Routers": "bcr04a.dal05"
             }
-            ]]
+        ]]
         )
 
     def test_create(self):

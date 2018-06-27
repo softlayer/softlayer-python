@@ -30,6 +30,7 @@ class QueueAuth(requests.auth.AuthBase):
     :param api_key: SoftLayer API Key
     :param auth_token: (optional) Starting auth token
     """
+
     def __init__(self, endpoint, username, api_key, auth_token=None):
         self.endpoint = endpoint
         self.username = username
@@ -79,6 +80,7 @@ class MessagingManager(object):
     :param SoftLayer.API.BaseClient client: the client instance
 
     """
+
     def __init__(self, client):
         self.client = client
 
@@ -152,6 +154,7 @@ class MessagingConnection(object):
     :param account_id: Message Queue Account id
     :param endpoint: Endpoint URL
     """
+
     def __init__(self, account_id, endpoint=None):
         self.account_id = account_id
         self.endpoint = endpoint

@@ -14,6 +14,7 @@ from prompt_toolkit import completion as completion
 
 class ShellCompleter(completion.Completer):
     """Completer for the shell."""
+
     def __init__(self, click_root):
         self.root = click_root
 

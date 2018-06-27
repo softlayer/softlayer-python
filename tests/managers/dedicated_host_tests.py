@@ -397,7 +397,7 @@ class DedicatedHostTests(testing.TestCase):
                     'categories': [{
                         'categoryCode': 'dedicated_host_ram'
                     }]
-                }],
+            }],
             'capacity': '56',
             'description': '56 Cores X 242 RAM X 1.2 TB',
             'id': 10195,

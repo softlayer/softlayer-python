@@ -160,11 +160,7 @@ class TestCase(testtools.TestCase):
         """Set and return mock on the current client."""
         return self.mocks.set_mock(service, method)
 
-    def run_command(self,
-                    args=None,
-                    env=None,
-                    fixtures=True,
-                    fmt='json'):
+    def run_command(self, args=None, env=None, fixtures=True, fmt='json'):
         """A helper that runs a SoftLayer CLI command.
 
         This returns a click.testing.Result object.
@@ -185,7 +181,7 @@ def call_has_props(call, props):
     for prop, expected_value in props.items():
         actual_value = getattr(call, prop)
         if actual_value != expected_value:
-            logging.info(
+            logging.critical(
                 '%s::%s property mismatch, %s: expected=%r; actual=%r',
                 call.service,
                 call.method,

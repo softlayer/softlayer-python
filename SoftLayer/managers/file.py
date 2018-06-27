@@ -142,7 +142,7 @@ class FileStorageManager(utils.IdentifierMixin, object):
                 'hourlySchedule',
                 'dailySchedule',
                 'weeklySchedule'
-                ]
+            ]
             kwargs['mask'] = ','.join(items)
 
         return self.client.call('Network_Storage', 'getSnapshots',

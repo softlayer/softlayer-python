@@ -42,6 +42,7 @@ class TokenAuthentication(AuthenticationBase):
         :param auth_token str: a user's auth token, attained through
                                User_Customer::getPortalLoginToken
     """
+
     def __init__(self, user_id, auth_token):
         self.user_id = user_id
         self.auth_token = auth_token
@@ -65,6 +66,7 @@ class BasicAuthentication(AuthenticationBase):
         :param username str: a user's username
         :param api_key str: a user's API key
     """
+
     def __init__(self, username, api_key):
         self.username = username
         self.api_key = api_key
@@ -87,6 +89,7 @@ class BasicHTTPAuthentication(AuthenticationBase):
         :param username str: a user's username
         :param api_key str: a user's API key
     """
+
     def __init__(self, username, api_key):
         self.username = username
         self.api_key = api_key
