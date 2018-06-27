@@ -25,6 +25,58 @@ class ServerCLITests(testing.TestCase):
         output = json.loads(result.output)
         self.assert_no_fail(result)
         self.assertEqual(len(output), 10)
+        
+    def test_server_credentials(self):
+        result = self.run_command(['hardware', 'credentials', '12345'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output),
+                         [{
+                             'username': 'root',
+                             'password': 'abc123'
+                         }])
+
+    def test_server_credentials_exception_passwords_not_found(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        mock.return_value = {
+        "accountId": 11111,
+        "domain": "chechu.com",
+        "fullyQualifiedDomainName": "host3.vmware.chechu.com",
+        "hardwareStatusId": 5,
+        "hostname": "host3.vmware",
+        "id": 12345,
+        "operatingSystem": {}
+    }
+
+        result = self.run_command(['hardware', 'credentials', '12345'])
+
+        self.assertEqual(
+            'No passwords found in operatingSystem',
+            str(result.exception)
+        )
+
+    def test_server_credentials_exception_password_not_found(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        mock.return_value = {
+        "accountId": 11111,
+        "domain": "chechu.com",
+        "fullyQualifiedDomainName": "host3.vmware.chechu.com",
+        "hardwareStatusId": 5,
+        "hostname": "host3.vmware",
+        "id": 12345,
+        "operatingSystem": {
+            "hardwareId": 22222,
+            "id": 333333,
+            "passwords": [{}]
+          }
+        }
+
+        result = self.run_command(['hardware', 'credentials', '12345'])
+
+        self.assertEqual(
+            'No password found in operatingSystem passwords',
+            str(result.exception)
+        )
 
     def test_server_details(self):
         result = self.run_command(['server', 'detail', '1234',

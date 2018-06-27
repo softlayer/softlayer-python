@@ -4,6 +4,7 @@
 import click
 
 import SoftLayer
+from SoftLayer import exceptions
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
@@ -22,6 +23,12 @@ def cli(env, identifier):
     instance = manager.get_hardware(hardware_id)
 
     table = formatting.Table(['username', 'password'])
+    if 'passwords' not in instance['operatingSystem']:
+        raise exceptions.SoftLayerError("No passwords found in operatingSystem")
+
     for item in instance['operatingSystem']['passwords']:
-        table.add_row([item['username'], item['password']])
+        if 'password' not in item:
+            raise exceptions.SoftLayerError("No password found in operatingSystem passwords")
+        else:
+            table.add_row([item['username'], item['password']])
     env.fout(table)
