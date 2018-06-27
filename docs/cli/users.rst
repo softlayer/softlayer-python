@@ -58,11 +58,6 @@ Shows things that are logged in the Event_Log service. Logins, reboots, reloads,
 
 .. _cli_user_permissions:
 
-user permissions
-----------------
-
-Will list off all permission keyNames, along with wich usernames have that permissions.
-
 user permissions <user>
 ^^^^^^^^^^^^^^^^^^^^^^^
 Will list off all permission keyNames, along with which are assigned to that specific user.
@@ -85,13 +80,14 @@ user edit-details
 -----------------
 Edit a User's details
 
-JSON strings should be enclosed in '' and each item should be enclosed in ""
+JSON strings should be enclosed in '' and each item should be enclosed in "\"
 
 ::
   slcli user edit-details testUser -t '{"firstName": "Test", "lastName": "Testerson"}'
 
 Options
 ^^^^^^^
--t, --template TEXT  A json string describing https://softlayer.github.io/reference/datatypes/SoftLayer_User_Customer/  [required]
+-t, --template TEXT  A json string describing `SoftLayer_User_Customer
+https://softlayer.github.io/reference/datatypes/SoftLayer_User_Customer/`_.  [required]
 -h, --help           Show this message and exit.
 
