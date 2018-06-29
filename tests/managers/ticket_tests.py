@@ -49,7 +49,7 @@ class TicketTests(testing.TestCase):
                                       open_status=False,
                                       closed_status=False)
 
-        self.assertEquals('open_status and closed_status cannot both be False', str(exception))
+        self.assertEqual('open_status and closed_status cannot both be False', str(exception))
 
     def test_list_subjects(self):
         list_expected_ids = [1001, 1002, 1003, 1004, 1005]
