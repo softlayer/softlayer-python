@@ -5,7 +5,6 @@
 
     :license: MIT, see LICENSE for more details.
 """
-
 from SoftLayer import utils
 
 
@@ -38,6 +37,8 @@ class TicketManager(utils.IdentifierMixin, object):
                 call = 'getOpenTickets'
             elif closed_status:
                 call = 'getClosedTickets'
+            else:
+                raise ValueError("open_status and closed_status cannot both be False")
 
         return self.client.call('Account', call, mask=mask)
 
