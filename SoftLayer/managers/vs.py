@@ -198,7 +198,7 @@ class VSManager(utils.IdentifierMixin, object):
                 'primaryIpAddress,'
                 '''networkComponents[id, status, speed, maxSpeed, name,
                                      macAddress, primaryIpAddress, port,
-                                     primarySubnet,
+                                     primarySubnet[addressSpace],
                                      securityGroupBindings[
                                         securityGroup[id, name]]],'''
                 'lastKnownPowerState.name,'
