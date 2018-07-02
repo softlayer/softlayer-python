@@ -74,7 +74,7 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['hardware', 'credentials', '12345'])
 
         self.assertEqual(
-            'No password found in operatingSystem passwords',
+            'None',
             str(result.exception)
         )
 

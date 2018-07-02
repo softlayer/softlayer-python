@@ -27,8 +27,5 @@ def cli(env, identifier):
         raise exceptions.SoftLayerError("No passwords found in operatingSystem")
 
     for item in instance['operatingSystem']['passwords']:
-        if 'password' not in item:
-            raise exceptions.SoftLayerError("No password found in operatingSystem passwords")
-        else:
-            table.add_row([item['username'], item['password']])
+        table.add_row([item.get('username', 'None'), item.get('password', 'None')])
     env.fout(table)
