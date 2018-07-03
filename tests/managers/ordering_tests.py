@@ -312,6 +312,20 @@ class OrderingTests(testing.TestCase):
         list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
         self.assertEqual("Item ITEM2 does not exist for package PACKAGE_KEYNAME", str(exc))
 
+    def test_get_price_id_list_gpu_items_with_two_categories(self):
+        # Specific for GPU prices which are differentiated by their category (gpu0, gpu1)
+        price1 = {'id': 1234, 'locationGroupId': None, 'categories': [{'categoryCode': 'gpu1'}]}
+        price2 = {'id': 5678, 'locationGroupId': None, 'categories': [{'categoryCode': 'gpu0'}]}
+        item1 = {'id': 1111, 'keyName': 'ITEM1', 'itemCategory': {'categoryCode': 'gpu0'}, 'prices': [price1, price2]}
+
+        with mock.patch.object(self.ordering, 'list_items') as list_mock:
+            list_mock.return_value = [item1, item1]
+
+            prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM1'])
+
+            list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
+            self.assertEqual([price2['id'], price1['id']], prices)
+
     def test_generate_no_complex_type(self):
         pkg = 'PACKAGE_KEYNAME'
         items = ['ITEM1', 'ITEM2']
