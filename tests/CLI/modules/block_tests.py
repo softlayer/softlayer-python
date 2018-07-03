@@ -108,6 +108,7 @@ class BlockTests(testing.TestCase):
                 'capacity_gb': 20,
                 'datacenter': 'dal05',
                 'id': 100,
+                'iops': None,
                 'ip_addr': '10.1.2.3',
                 'lunId': None,
                 'rep_partner_count': None,
