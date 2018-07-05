@@ -15,7 +15,6 @@ import traceback
 import click
 from prompt_toolkit import auto_suggest as p_auto_suggest
 from prompt_toolkit import shortcuts as p_shortcuts
-from pygments import token
 
 from SoftLayer.CLI import core
 from SoftLayer.CLI import environment
