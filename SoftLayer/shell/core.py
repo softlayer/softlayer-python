@@ -76,7 +76,6 @@ def cli(ctx, env):
                 auto_suggest=p_auto_suggest.AutoSuggestFromHistory(),
             )
 
-
             # Parse arguments
             try:
                 args = shlex.split(line)
