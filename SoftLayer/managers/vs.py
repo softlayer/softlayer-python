@@ -305,6 +305,7 @@ class VSManager(utils.IdentifierMixin, object):
             hostname=None, domain=None, local_disk=True,
             datacenter=None, os_code=None, image_id=None,
             dedicated=False, public_vlan=None, private_vlan=None,
+            private_subnet=None, public_subnet=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
             private=False, ssh_keys=None, public_security_groups=None,
             private_security_groups=None, boot_mode=None, **kwargs):
@@ -366,13 +367,26 @@ class VSManager(utils.IdentifierMixin, object):
             data["datacenter"] = {"name": datacenter}
 
         if public_vlan:
-            data.update({
-                'primaryNetworkComponent': {
-                    "networkVlan": {"id": int(public_vlan)}}})
+            if public_subnet:
+                data.update({
+                    'primaryNetworkComponent': {
+                        "networkVlan": {"id": int(public_vlan),
+                                        "primarySubnet": {"id": int(public_subnet)}}}})
+            else:
+                data.update({
+                    'primaryNetworkComponent': {
+                        "networkVlan": {"id": int(public_vlan)}}})
+
         if private_vlan:
-            data.update({
-                "primaryBackendNetworkComponent": {
-                    "networkVlan": {"id": int(private_vlan)}}})
+            if private_subnet:
+                data.update({
+                    'primaryBackendNetworkComponent': {
+                        "networkVlan": {"id": int(private_vlan),
+                                        "primarySubnet": {"id": int(private_subnet)}}}})
+            else:
+                data.update({
+                    "primaryBackendNetworkComponent": {
+                        "networkVlan": {"id": int(private_vlan)}}})
 
         if public_security_groups:
             secgroups = [{'securityGroup': {'id': int(sg)}}
