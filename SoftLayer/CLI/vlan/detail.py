@@ -60,8 +60,8 @@ def cli(env, identifier, no_vs, no_hardware):
         if vlan.get('virtualGuests'):
             vs_table = formatting.KeyValueTable(server_columns)
             for vsi in vlan['virtualGuests']:
-                vs_table.add_row([vsi['hostname'],
-                                  vsi['domain'],
+                vs_table.add_row([vsi.get('hostname'),
+                                  vsi.get('domain'),
                                   vsi.get('primaryIpAddress'),
                                   vsi.get('primaryBackendIpAddress')])
             table.add_row(['vs', vs_table])
@@ -72,8 +72,8 @@ def cli(env, identifier, no_vs, no_hardware):
         if vlan.get('hardware'):
             hw_table = formatting.Table(server_columns)
             for hardware in vlan['hardware']:
-                hw_table.add_row([hardware['hostname'],
-                                  hardware['domain'],
+                hw_table.add_row([hardware.get('hostname'),
+                                  hardware.get('domain'),
                                   hardware.get('primaryIpAddress'),
                                   hardware.get('primaryBackendIpAddress')])
             table.add_row(['hardware', hw_table])
