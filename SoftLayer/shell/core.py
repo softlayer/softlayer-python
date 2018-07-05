@@ -69,14 +69,13 @@ def cli(ctx, env):
                 tokens.append((token.Token.Prompt, '> '))
 
             return tokens
-
         try:
             line = p_shortcuts.prompt(
                 completer=complete,
-                history=history,
+                complete_while_typing=True,
                 auto_suggest=p_auto_suggest.AutoSuggestFromHistory(),
-                get_prompt_tokens=get_prompt_tokens,
             )
+
 
             # Parse arguments
             try:
