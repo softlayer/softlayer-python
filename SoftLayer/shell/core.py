@@ -14,7 +14,6 @@ import traceback
 
 import click
 from prompt_toolkit import auto_suggest as p_auto_suggest
-from prompt_toolkit import history as p_history
 from prompt_toolkit import shortcuts as p_shortcuts
 from pygments import token
 
