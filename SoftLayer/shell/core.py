@@ -49,7 +49,6 @@ def cli(ctx, env):
     app_path = click.get_app_dir('softlayer_shell')
     if not os.path.exists(app_path):
         os.makedirs(app_path)
-    history = p_history.FileHistory(os.path.join(app_path, 'history'))
     complete = completer.ShellCompleter(core.cli)
 
     while True:
