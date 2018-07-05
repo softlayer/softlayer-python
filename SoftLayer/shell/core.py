@@ -51,22 +51,6 @@ def cli(ctx, env):
     complete = completer.ShellCompleter(core.cli)
 
     while True:
-        def get_prompt_tokens(_):
-            """Returns tokens for the command prompt"""
-            tokens = []
-            try:
-                tokens.append((token.Token.Username, env.client.auth.username))
-                tokens.append((token.Token.At, "@"))
-            except AttributeError:
-                pass
-
-            tokens.append((token.Token.Host, "slcli-shell"))
-            if env.vars['last_exit_code']:
-                tokens.append((token.Token.ErrorPrompt, '> '))
-            else:
-                tokens.append((token.Token.Prompt, '> '))
-
-            return tokens
         try:
             line = p_shortcuts.prompt(
                 completer=complete,
