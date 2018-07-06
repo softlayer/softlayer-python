@@ -373,7 +373,7 @@ class VSTests(testing.TestCase):
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
             'hourlyBillingFlag': True,
-            'primaryBackendNetworkComponent': {"networkVlan": {"id": 1}},
+            'primaryBackendNetworkComponent': {'networkVlan': {'id': 1}},
             'supplementalCreateObjectOptions': {'bootMode': None},
         }
 

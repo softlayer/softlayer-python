@@ -367,7 +367,7 @@ class VSManager(utils.IdentifierMixin, object):
         if datacenter:
             data["datacenter"] = {"name": datacenter}
 
-        if private_vlan and public_vlan:
+        if private_vlan or public_vlan:
             network_components = self._create_network_components(public_vlan, private_vlan,
                                                                  private_subnet, public_subnet)
             data.update(network_components)
