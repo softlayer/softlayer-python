@@ -65,6 +65,7 @@ def _update_with_like_args(ctx, _, value):
         ctx.default_map = {}
     ctx.default_map.update(like_args)
 
+
 def _parse_create_args(client, args):
     """Converts CLI arguments to args for VSManager.create_instance.
 
