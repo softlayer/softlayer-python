@@ -65,7 +65,6 @@ def _update_with_like_args(ctx, _, value):
         ctx.default_map = {}
     ctx.default_map.update(like_args)
 
-
 def _parse_create_args(client, args):
     """Converts CLI arguments to args for VSManager.create_instance.
 
@@ -121,10 +120,7 @@ def _parse_create_args(client, args):
     # Get the SSH keys
     if args.get('key'):
         keys = []
-        for key in args.get('key'):
-            resolver = SoftLayer.SshKeyManager(client).resolve_ids
-            key_id = helpers.resolve_id(resolver, key, 'SshKey')
-            keys.append(key_id)
+        _add_keys(args, client, keys)
         data['ssh_keys'] = keys
 
     if args.get('vlan_public'):
@@ -154,6 +150,13 @@ def _parse_create_args(client, args):
         data['host_id'] = args['host_id']
 
     return data
+
+
+def _add_keys(args, client, keys):
+    for key in args.get('key'):
+        resolver = SoftLayer.SshKeyManager(client).resolve_ids
+        key_id = helpers.resolve_id(resolver, key, 'SshKey')
+        keys.append(key_id)
 
 
 @click.command(epilog="See 'slcli vs create-options' for valid options")
@@ -231,7 +234,7 @@ def _parse_create_args(client, args):
               type=click.Path(exists=True, readable=True, resolve_path=True))
 @click.option('--vlan-public',
               help="The ID of the public VLAN on which you want the virtual "
-              "server placed",
+                   "server placed",
               type=click.INT)
 @click.option('--vlan-private',
               help="The ID of the private VLAN on which you want the virtual "

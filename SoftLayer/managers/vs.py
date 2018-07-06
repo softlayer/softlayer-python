@@ -16,8 +16,9 @@ from SoftLayer import exceptions
 from SoftLayer.managers import ordering
 from SoftLayer import utils
 
-
 LOGGER = logging.getLogger(__name__)
+
+
 # pylint: disable=no-self-use
 
 
@@ -366,27 +367,10 @@ class VSManager(utils.IdentifierMixin, object):
         if datacenter:
             data["datacenter"] = {"name": datacenter}
 
-        if public_vlan:
-            if public_subnet:
-                data.update({
-                    'primaryNetworkComponent': {
-                        "networkVlan": {"id": int(public_vlan),
-                                        "primarySubnet": {"id": int(public_subnet)}}}})
-            else:
-                data.update({
-                    'primaryNetworkComponent': {
-                        "networkVlan": {"id": int(public_vlan)}}})
-
-        if private_vlan:
-            if private_subnet:
-                data.update({
-                    'primaryBackendNetworkComponent': {
-                        "networkVlan": {"id": int(private_vlan),
-                                        "primarySubnet": {"id": int(private_subnet)}}}})
-            else:
-                data.update({
-                    "primaryBackendNetworkComponent": {
-                        "networkVlan": {"id": int(private_vlan)}}})
+        if private_vlan and public_vlan:
+            network_components = self._create_network_components(public_vlan, private_vlan,
+                                                                 private_subnet, public_subnet)
+            data.update(network_components)
 
         if public_security_groups:
             secgroups = [{'securityGroup': {'id': int(sg)}}
@@ -428,6 +412,46 @@ class VSManager(utils.IdentifierMixin, object):
             data['sshKeys'] = [{'id': key_id} for key_id in ssh_keys]
 
         return data
+
+    def _create_network_components(
+            self, public_vlan=None, private_vlan=None,
+            private_subnet=None, public_subnet=None, **kwargs):
+
+        if private_vlan and public_vlan:
+            if private_subnet and public_subnet:
+                parameters = {
+                    'primaryNetworkComponent': {
+                        "networkVlan": {"primarySubnet": {"id": int(public_subnet)}}},
+                    'primaryBackendNetworkComponent': {
+                        "networkVlan": {"primarySubnet": {"id": int(private_subnet)}}}}
+            else:
+                if private_subnet:
+                    parameters = {
+                        'primaryNetworkComponent': {
+                            "networkVlan": {"id": int(public_vlan)}},
+                        'primaryBackendNetworkComponent': {
+                            "networkVlan": {"primarySubnet": {"id": int(private_subnet)}}}
+                    }
+                else:
+                    parameters = {
+                        'primaryNetworkComponent': {
+                            "networkVlan": {"primarySubnet": {"id": int(public_subnet)}}},
+                        'primaryBackendNetworkComponent': {
+                            "networkVlan": {"id": int(private_vlan)}}
+                    }
+        else:
+            if private_vlan:
+                parameters = {
+                    'primaryBackendNetworkComponent': {
+                        "networkVlan": {"id": int(private_vlan)}}
+                }
+            else:
+                parameters = {
+                    'primaryNetworkComponent': {
+                        "networkVlan": {"id": int(public_vlan)}}
+                }
+
+        return parameters
 
     @retry(logger=LOGGER)
     def wait_for_transaction(self, instance_id, limit, delay=10):
