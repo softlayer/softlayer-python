@@ -72,6 +72,49 @@ Bugs and feature requests about this library should have a `GitHub issue <https:
 
 Issues with the Softlayer API itself should be addressed by opening a ticket.
 
+
+Examples
+--------
+
+A curated list of examples on how to use this library can be found at `softlayer.github.io <https://softlayer.github.io/python/>`_
+
+Debugging
+---------
+To get the exact API call that this library makes, you can do the following.
+
+For the CLI, just use the -vvv option. If you are using the REST endpoint, this will print out a curl command that you can use, if using XML, this will print the minimal python code to make the request without the softlayer library.
+
+.. code-block:: bash
+  $ slcli -vvv vs list
+
+
+If you are using the library directly in python, you can do something like this.
+
+.. code-bock:: python
+  import SoftLayer
+  import logging
+
+  class invoices():
+
+      def __init__(self):
+          self.client = SoftLayer.Client()
+          debugger = SoftLayer.DebugTransport(self.client.transport)
+          self.client.transport = debugger
+
+      def main(self):
+          mask = "mask[id]"
+          account = self.client.call('Account', 'getObject', mask=mask);
+          print("AccountID: %s" % account['id'])
+
+      def debug(self):
+          for call in self.client.transport.get_last_calls():
+              print(self.client.transport.print_reproduceable(call))
+
+  if __name__ == "__main__":
+      main = example()
+      main.main()
+      main.debug()
+
 System Requirements
 -------------------
 * Python 2.7, 3.3, 3.4, 3.5 or 3.6.
