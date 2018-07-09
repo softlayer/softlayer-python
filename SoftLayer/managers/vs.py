@@ -415,7 +415,7 @@ class VSManager(utils.IdentifierMixin, object):
 
     def _create_network_components(
             self, public_vlan=None, private_vlan=None,
-            private_subnet=None, public_subnet=None, **kwargs):
+            private_subnet=None, public_subnet=None):
 
         if private_vlan and public_vlan:
             if private_subnet and public_subnet:
