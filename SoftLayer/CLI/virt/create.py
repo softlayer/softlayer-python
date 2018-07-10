@@ -121,7 +121,10 @@ def _parse_create_args(client, args):
     # Get the SSH keys
     if args.get('key'):
         keys = []
-        _add_keys(args, client, keys)
+        for key in args.get('key'):
+            resolver = SoftLayer.SshKeyManager(client).resolve_ids
+            key_id = helpers.resolve_id(resolver, key, 'SshKey')
+            keys.append(key_id)
         data['ssh_keys'] = keys
 
     if args.get('vlan_public'):
@@ -151,13 +154,6 @@ def _parse_create_args(client, args):
         data['host_id'] = args['host_id']
 
     return data
-
-
-def _add_keys(args, client, keys):
-    for key in args.get('key'):
-        resolver = SoftLayer.SshKeyManager(client).resolve_ids
-        key_id = helpers.resolve_id(resolver, key, 'SshKey')
-        keys.append(key_id)
 
 
 @click.command(epilog="See 'slcli vs create-options' for valid options")

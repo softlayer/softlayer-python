@@ -367,7 +367,7 @@ class VSManager(utils.IdentifierMixin, object):
         if datacenter:
             data["datacenter"] = {"name": datacenter}
 
-        if private_vlan or public_vlan:
+        if private_vlan or public_vlan or private_subnet or public_subnet:
             network_components = self._create_network_components(public_vlan, private_vlan,
                                                                  private_subnet, public_subnet)
             data.update(network_components)
@@ -417,39 +417,21 @@ class VSManager(utils.IdentifierMixin, object):
             self, public_vlan=None, private_vlan=None,
             private_subnet=None, public_subnet=None):
 
-        if private_vlan and public_vlan:
-            if private_subnet and public_subnet:
-                parameters = {
-                    'primaryNetworkComponent': {
-                        "networkVlan": {"primarySubnet": {"id": int(public_subnet)}}},
-                    'primaryBackendNetworkComponent': {
-                        "networkVlan": {"primarySubnet": {"id": int(private_subnet)}}}}
+        parameters = {}
+        if private_vlan:
+            parameters['primaryBackendNetworkComponent'] = {"networkVlan": {"id": int(private_vlan)}}
+        if public_vlan:
+            parameters['primaryNetworkComponent'] = {"networkVlan": {"id": int(public_vlan)}}
+        if public_subnet:
+            if public_vlan is None:
+                raise exceptions.SoftLayerError("You need to specify a public_vlan with public_subnet")
             else:
-                if private_subnet:
-                    parameters = {
-                        'primaryNetworkComponent': {
-                            "networkVlan": {"id": int(public_vlan)}},
-                        'primaryBackendNetworkComponent': {
-                            "networkVlan": {"primarySubnet": {"id": int(private_subnet)}}}
-                    }
-                else:
-                    parameters = {
-                        'primaryNetworkComponent': {
-                            "networkVlan": {"primarySubnet": {"id": int(public_subnet)}}},
-                        'primaryBackendNetworkComponent': {
-                            "networkVlan": {"id": int(private_vlan)}}
-                    }
-        else:
-            if private_vlan:
-                parameters = {
-                    'primaryBackendNetworkComponent': {
-                        "networkVlan": {"id": int(private_vlan)}}
-                }
+                parameters['primaryNetworkComponent']['networkVlan']['primarySubnet'] = {'id':int(public_subnet)}
+        if private_subnet:
+            if private_vlan is None:
+                raise exceptions.SoftLayerError("You need to specify a private_vlan with private_subnet")
             else:
-                parameters = {
-                    'primaryNetworkComponent': {
-                        "networkVlan": {"id": int(public_vlan)}}
-                }
+                parameters['primaryBackendNetworkComponent']['networkVlan']['primarySubnet'] = {"id": int(private_subnet)}
 
         return parameters
 
