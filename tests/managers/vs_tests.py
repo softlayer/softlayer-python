@@ -449,7 +449,7 @@ class VSTests(testing.TestCase):
             private_subnet=1,
         )
 
-        self.assertEquals(str(actual), "You need to specify a private_vlan with private_subnet")
+        self.assertEqual(str(actual), "You need to specify a private_vlan with private_subnet")
 
     def test_generate_public_subnet(self):
         actual = self.assertRaises(
@@ -463,7 +463,7 @@ class VSTests(testing.TestCase):
             public_subnet=1,
         )
 
-        self.assertEquals(str(actual), "You need to specify a public_vlan with public_subnet")
+        self.assertEqual(str(actual), "You need to specify a public_vlan with public_subnet")
 
     def test_generate_private_vlan(self):
         data = self.vs._generate_create_dict(
@@ -539,7 +539,7 @@ class VSTests(testing.TestCase):
             private_subnet=1,
         )
 
-        self.assertEquals(str(actual), "You need to specify a private_vlan with private_subnet")
+        self.assertEqual(str(actual), "You need to specify a private_vlan with private_subnet")
 
     def test_create_network_components_public_subnet(self):
         actual = self.assertRaises(
@@ -548,7 +548,7 @@ class VSTests(testing.TestCase):
             public_subnet=1,
         )
 
-        self.assertEquals(str(actual), "You need to specify a public_vlan with public_subnet")
+        self.assertEqual(str(actual), "You need to specify a public_vlan with public_subnet")
 
     def test_generate_userdata(self):
         data = self.vs._generate_create_dict(
