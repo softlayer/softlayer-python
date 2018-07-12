@@ -133,11 +133,9 @@ def _parse_create_args(client, args):
     if args.get('vlan_private'):
         data['private_vlan'] = args['vlan_private']
 
-    if args.get('subnet_public'):
-        data['public_subnet'] = args['subnet_public']
+    data['public_subnet'] = args.get('subnet_public', None)
 
-    if args.get('subnet_private'):
-        data['private_subnet'] = args['subnet_private']
+    data['private_subnet'] = args.get('subnet_private', None)
 
     if args.get('public_security_group'):
         pub_groups = args.get('public_security_group')
