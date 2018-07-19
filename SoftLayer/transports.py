@@ -120,16 +120,26 @@ class Request(object):
         #: Exception any exceptions that got caught
         self.exception = None
 
+    def __repr__(self):
+        """Prints out what this call is all about"""
+        param_list = ['identifier', 'mask', 'filter', 'args', 'limit', 'offset']
+        pretty_mask = utils.clean_string(self.mask)
+        pretty_filter = self.filter
+        param_string = "id={id}, mask='{mask}', filter='{filter}', args={args}, limit={limit}, offset={offset}".format(
+                        id=self.identifier, mask=pretty_mask, filter=pretty_filter, 
+                        args=self.args, limit=self.limit, offset=self.offset)
+        return "{service}::{method}({params})".format(
+            service=self.service, method=self.method, params=param_string)
+
 
 class SoftLayerListResult(list):
     """A SoftLayer API list result."""
 
-    def __init__(self, items, total_count):
+    def __init__(self, items=[], total_count=0):
 
         #: total count of items that exist on the server. This is useful when
         #: paginating through a large list of objects.
         self.total_count = total_count
-
         super(SoftLayerListResult, self).__init__(items)
 
 
@@ -441,7 +451,7 @@ class DebugTransport(object):
 
     def pre_transport_log(self, call):
         """Prints a warning before calling the API """
-        output = "Calling: {}::{}(id={})".format(call.service, call.method, call.identifier)
+        output = "Calling: {})".format(call)
         LOGGER.warning(output)
 
     def post_transport_log(self, call):

@@ -477,11 +477,11 @@ class NetworkManager(object):
                 utils.query_filter(network_space))
 
         kwargs['filter'] = _filter.to_dict()
+        kwargs['iter'] = True
+        return self.client.call('Account', 'getSubnets', **kwargs)
 
-        return self.account.getSubnets(**kwargs)
 
-    def list_vlans(self, datacenter=None, vlan_number=None, name=None,
-                   **kwargs):
+    def list_vlans(self, datacenter=None, vlan_number=None, name=None, **kwargs):
         """Display a list of all VLANs on the account.
 
         This provides a quick overview of all VLANs including information about
@@ -514,10 +514,12 @@ class NetworkManager(object):
         if 'mask' not in kwargs:
             kwargs['mask'] = DEFAULT_VLAN_MASK
 
+        kwargs['iter'] = True
         return self.account.getNetworkVlans(**kwargs)
 
     def list_securitygroups(self, **kwargs):
         """List security groups."""
+        kwargs['iter'] = True
         return self.security_group.getAllObjects(**kwargs)
 
     def list_securitygroup_rules(self, group_id):
@@ -525,7 +527,7 @@ class NetworkManager(object):
 
         :param int group_id: The security group to list rules for
         """
-        return self.security_group.getRules(id=group_id)
+        return self.security_group.getRules(id=group_id, iter=True)
 
     def remove_securitygroup_rule(self, group_id, rule_id):
         """Remove a rule from a security group.

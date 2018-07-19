@@ -209,3 +209,9 @@ def is_ready(instance, pending=False):
     if instance.get('provisionDate') and not reloading and not outstanding:
         return True
     return False
+
+def clean_string(string):
+    if string is None:
+        return ''
+    else:
+        return " ".join(string.split())

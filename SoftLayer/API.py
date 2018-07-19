@@ -267,40 +267,25 @@ class BaseClient(object):
 
         :param service: the name of the SoftLayer API service
         :param method: the method to call on the service
-        :param integer chunk: result size for each API call (defaults to 100)
+        :param integer limit: result size for each API call (defaults to 100)
         :param \\*args: same optional arguments that ``Service.call`` takes
-        :param \\*\\*kwargs: same optional keyword arguments that
-                           ``Service.call`` takes
+        :param \\*\\*kwargs: same optional keyword arguments that ``Service.call`` takes
 
         """
-        chunk = kwargs.pop('chunk', 100)
-        limit = kwargs.pop('limit', None)
+
+        limit = kwargs.pop('limit', 100)
         offset = kwargs.pop('offset', 0)
 
-        if chunk <= 0:
-            raise AttributeError("Chunk size should be greater than zero.")
-
-        if limit:
-            chunk = min(chunk, limit)
+        if limit <= 0:
+            raise AttributeError("Limit size should be greater than zero.")
 
         result_count = 0
-        kwargs['iter'] = False
-        while True:
-            if limit:
-                # We've reached the end of the results
-                if result_count >= limit:
-                    break
+        results = self.call(service, method, offset=offset, limit=limit, *args, **kwargs)
 
-                # Don't over-fetch past the given limit
-                if chunk + result_count > limit:
-                    chunk = limit - result_count
+        if results.total_count <= 0:
+            raise StopIteration
 
-            results = self.call(service, method,
-                                offset=offset, limit=chunk, *args, **kwargs)
-
-            # It looks like we ran out results
-            if not results:
-                break
+        while result_count < results.total_count:
 
             # Apparently this method doesn't return a list.
             # Why are you even iterating over this?
@@ -312,10 +297,14 @@ class BaseClient(object):
                 yield item
                 result_count += 1
 
-            offset += chunk
-
-            if len(results) < chunk:
+            # Got less results than requested, we are at the end
+            if len(results) < limit:
                 break
+
+            offset += limit
+            # Get the next results
+            results = self.call(service, method, offset=offset, limit=limit, *args, **kwargs)
+        raise StopIteration
 
     def __repr__(self):
         return "Client(transport=%r, auth=%r)" % (self.transport, self.auth)

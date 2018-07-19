@@ -62,9 +62,13 @@ DEFAULT_COLUMNS = [
               % ', '.join(column.name for column in COLUMNS),
               default=','.join(DEFAULT_COLUMNS),
               show_default=True)
+@click.option('--limit', '-l',
+              help='How many results to get in one api call, default is 100',
+              default=100, 
+              show_default=True)
 @environment.pass_env
 def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
-        hourly, monthly, tag, columns):
+        hourly, monthly, tag, columns, limit):
     """List virtual servers."""
 
     vsi = SoftLayer.VSManager(env.client)
@@ -77,7 +81,8 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
                                 datacenter=datacenter,
                                 nic_speed=network,
                                 tags=tag,
-                                mask=columns.mask())
+                                mask=columns.mask(),
+                                limit=limit)
 
     table = formatting.Table(columns.columns)
     table.sortby = sortby
