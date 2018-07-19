@@ -16,8 +16,9 @@ from SoftLayer import exceptions
 from SoftLayer.managers import ordering
 from SoftLayer import utils
 
-
 LOGGER = logging.getLogger(__name__)
+
+
 # pylint: disable=no-self-use
 
 
@@ -305,6 +306,7 @@ class VSManager(utils.IdentifierMixin, object):
             hostname=None, domain=None, local_disk=True,
             datacenter=None, os_code=None, image_id=None,
             dedicated=False, public_vlan=None, private_vlan=None,
+            private_subnet=None, public_subnet=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
             private=False, ssh_keys=None, public_security_groups=None,
             private_security_groups=None, boot_mode=None, **kwargs):
@@ -365,14 +367,10 @@ class VSManager(utils.IdentifierMixin, object):
         if datacenter:
             data["datacenter"] = {"name": datacenter}
 
-        if public_vlan:
-            data.update({
-                'primaryNetworkComponent': {
-                    "networkVlan": {"id": int(public_vlan)}}})
-        if private_vlan:
-            data.update({
-                "primaryBackendNetworkComponent": {
-                    "networkVlan": {"id": int(private_vlan)}}})
+        if private_vlan or public_vlan or private_subnet or public_subnet:
+            network_components = self._create_network_components(public_vlan, private_vlan,
+                                                                 private_subnet, public_subnet)
+            data.update(network_components)
 
         if public_security_groups:
             secgroups = [{'securityGroup': {'id': int(sg)}}
@@ -414,6 +412,29 @@ class VSManager(utils.IdentifierMixin, object):
             data['sshKeys'] = [{'id': key_id} for key_id in ssh_keys]
 
         return data
+
+    def _create_network_components(
+            self, public_vlan=None, private_vlan=None,
+            private_subnet=None, public_subnet=None):
+
+        parameters = {}
+        if private_vlan:
+            parameters['primaryBackendNetworkComponent'] = {"networkVlan": {"id": int(private_vlan)}}
+        if public_vlan:
+            parameters['primaryNetworkComponent'] = {"networkVlan": {"id": int(public_vlan)}}
+        if public_subnet:
+            if public_vlan is None:
+                raise exceptions.SoftLayerError("You need to specify a public_vlan with public_subnet")
+            else:
+                parameters['primaryNetworkComponent']['networkVlan']['primarySubnet'] = {'id': int(public_subnet)}
+        if private_subnet:
+            if private_vlan is None:
+                raise exceptions.SoftLayerError("You need to specify a private_vlan with private_subnet")
+            else:
+                parameters['primaryBackendNetworkComponent']['networkVlan']['primarySubnet'] = {
+                    "id": int(private_subnet)}
+
+        return parameters
 
     @retry(logger=LOGGER)
     def wait_for_transaction(self, instance_id, limit, delay=10):

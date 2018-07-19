@@ -355,6 +355,116 @@ class VSTests(testing.TestCase):
 
         self.assertEqual(data, assert_data)
 
+    def test_generate_public_vlan_with_public_subnet(self):
+        data = self.vs._generate_create_dict(
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='example.com',
+            os_code="STRING",
+            public_vlan=1,
+            public_subnet=1
+        )
+
+        assert_data = {
+            'startCpus': 1,
+            'maxMemory': 1,
+            'hostname': 'test',
+            'domain': 'example.com',
+            'localDiskFlag': True,
+            'operatingSystemReferenceCode': "STRING",
+            'hourlyBillingFlag': True,
+            'primaryNetworkComponent': {'networkVlan': {'id': 1,
+                                                        'primarySubnet': {'id': 1}}},
+            'supplementalCreateObjectOptions': {'bootMode': None},
+        }
+
+        self.assertEqual(data, assert_data)
+
+    def test_generate_private_vlan_with_private_subnet(self):
+        data = self.vs._generate_create_dict(
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='example.com',
+            os_code="STRING",
+            private_vlan=1,
+            private_subnet=1
+        )
+
+        assert_data = {
+            'startCpus': 1,
+            'maxMemory': 1,
+            'hostname': 'test',
+            'domain': 'example.com',
+            'localDiskFlag': True,
+            'operatingSystemReferenceCode': "STRING",
+            'hourlyBillingFlag': True,
+            'primaryBackendNetworkComponent': {'networkVlan': {'id': 1,
+                                                               'primarySubnet': {'id': 1}}},
+            'supplementalCreateObjectOptions': {'bootMode': None},
+        }
+
+        self.assertEqual(data, assert_data)
+
+    def test_generate_private_vlan_subnet_public_vlan_subnet(self):
+        data = self.vs._generate_create_dict(
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='example.com',
+            os_code="STRING",
+            private_vlan=1,
+            private_subnet=1,
+            public_vlan=1,
+            public_subnet=1,
+        )
+
+        assert_data = {
+            'startCpus': 1,
+            'maxMemory': 1,
+            'hostname': 'test',
+            'domain': 'example.com',
+            'localDiskFlag': True,
+            'operatingSystemReferenceCode': "STRING",
+            'hourlyBillingFlag': True,
+            'primaryBackendNetworkComponent': {'networkVlan': {'id': 1,
+                                                               'primarySubnet': {'id': 1}}},
+            'primaryNetworkComponent': {'networkVlan': {'id': 1,
+                                                        'primarySubnet': {'id': 1}}},
+            'supplementalCreateObjectOptions': {'bootMode': None},
+        }
+
+        self.assertEqual(data, assert_data)
+
+    def test_generate_private_subnet(self):
+        actual = self.assertRaises(
+            exceptions.SoftLayerError,
+            self.vs._generate_create_dict,
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='example.com',
+            os_code="STRING",
+            private_subnet=1,
+        )
+
+        self.assertEqual(str(actual), "You need to specify a private_vlan with private_subnet")
+
+    def test_generate_public_subnet(self):
+        actual = self.assertRaises(
+            exceptions.SoftLayerError,
+            self.vs._generate_create_dict,
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='example.com',
+            os_code="STRING",
+            public_subnet=1,
+        )
+
+        self.assertEqual(str(actual), "You need to specify a public_vlan with public_subnet")
+
     def test_generate_private_vlan(self):
         data = self.vs._generate_create_dict(
             cpus=1,
@@ -373,11 +483,72 @@ class VSTests(testing.TestCase):
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
             'hourlyBillingFlag': True,
-            'primaryBackendNetworkComponent': {"networkVlan": {"id": 1}},
+            'primaryBackendNetworkComponent': {'networkVlan': {'id': 1}},
             'supplementalCreateObjectOptions': {'bootMode': None},
         }
 
         self.assertEqual(data, assert_data)
+
+    def test_create_network_components_vlan_subnet_private_vlan_subnet_public(self):
+        data = self.vs._create_network_components(
+            private_vlan=1,
+            private_subnet=1,
+            public_vlan=1,
+            public_subnet=1,
+        )
+
+        assert_data = {
+            'primaryBackendNetworkComponent': {'networkVlan': {'id': 1,
+                                                               'primarySubnet': {'id': 1}}},
+            'primaryNetworkComponent': {'networkVlan': {'id': 1,
+                                                        'primarySubnet': {'id': 1}}},
+        }
+
+        self.assertEqual(data, assert_data)
+
+    def test_create_network_components_vlan_subnet_private(self):
+        data = self.vs._create_network_components(
+            private_vlan=1,
+            private_subnet=1,
+        )
+
+        assert_data = {
+            'primaryBackendNetworkComponent': {'networkVlan': {'id': 1,
+                                                               'primarySubnet': {'id': 1}}},
+        }
+
+        self.assertEqual(data, assert_data)
+
+    def test_create_network_components_vlan_subnet_public(self):
+        data = self.vs._create_network_components(
+            public_vlan=1,
+            public_subnet=1,
+        )
+
+        assert_data = {
+            'primaryNetworkComponent': {'networkVlan': {'id': 1,
+                                                        'primarySubnet': {'id': 1}}},
+        }
+
+        self.assertEqual(data, assert_data)
+
+    def test_create_network_components_private_subnet(self):
+        actual = self.assertRaises(
+            exceptions.SoftLayerError,
+            self.vs._create_network_components,
+            private_subnet=1,
+        )
+
+        self.assertEqual(str(actual), "You need to specify a private_vlan with private_subnet")
+
+    def test_create_network_components_public_subnet(self):
+        actual = self.assertRaises(
+            exceptions.SoftLayerError,
+            self.vs._create_network_components,
+            public_subnet=1,
+        )
+
+        self.assertEqual(str(actual), "You need to specify a public_vlan with public_subnet")
 
     def test_generate_userdata(self):
         data = self.vs._generate_create_dict(
@@ -621,10 +792,10 @@ class VSTests(testing.TestCase):
 
         self.assertEqual(result, True)
         args = ({
-            'hostname': 'new-host',
-            'domain': 'new.sftlyr.ws',
-            'notes': 'random notes',
-        },)
+                    'hostname': 'new-host',
+                    'domain': 'new.sftlyr.ws',
+                    'notes': 'random notes',
+                },)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'editObject',
                                 identifier=100,
                                 args=args)

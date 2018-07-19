@@ -338,6 +338,31 @@ class VirtTests(testing.TestCase):
                                 args=args)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_create_vlan_subnet(self, confirm_mock):
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'create',
+                                   '--cpu=2',
+                                   '--domain=example.com',
+                                   '--hostname=host',
+                                   '--os=UBUNTU_LATEST',
+                                   '--memory=1',
+                                   '--billing=hourly',
+                                   '--datacenter=dal05',
+                                   '--vlan-private=577940',
+                                   '--subnet-private=478700',
+                                   '--vlan-public=1639255',
+                                   '--subnet-public=297614',
+                                   '--tag=dev',
+                                   '--tag=green'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output),
+                         {'guid': '1a2b3c-1701',
+                          'id': 100,
+                          'created': '2013-08-01 15:23:45'})
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_with_wait_ready(self, confirm_mock):
         mock = self.set_mock('SoftLayer_Virtual_Guest', 'getObject')
         mock.return_value = {
