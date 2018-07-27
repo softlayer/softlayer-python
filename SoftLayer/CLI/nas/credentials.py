@@ -17,6 +17,6 @@ def cli(env, identifier):
     nw_mgr = SoftLayer.NetworkManager(env.client)
     result = nw_mgr.get_nas_credentials(identifier)
     table = formatting.Table(['username', 'password'])
-    table.add_row([result['username'],
-                   result['password']])
+    table.add_row([result.get('username', 'None'),
+                   result.get('password', 'None')])
     env.fout(table)
