@@ -214,7 +214,9 @@ class BaseClient(object):
 
         """
         if kwargs.pop('iter', False):
-            return self.iter_call(service, method, *args, **kwargs)
+            # Most of the codebase assumes a non-generator will be returned, so casting to list
+            # keeps thsoe sections working
+            return list(self.iter_call(service, method, *args, **kwargs))
 
         invalid_kwargs = set(kwargs.keys()) - VALID_CALL_ARGS
         if invalid_kwargs:
@@ -279,19 +281,24 @@ class BaseClient(object):
         if limit <= 0:
             raise AttributeError("Limit size should be greater than zero.")
 
+        # Set to make unit tests, which call this function directly, play nice.
+        kwargs['iter'] = False
         result_count = 0
-        results = self.call(service, method, offset=offset, limit=limit, *args, **kwargs)
+        keep_looping = True
 
-        if results.total_count <= 0:
-            raise StopIteration
-
-        while result_count < results.total_count:
+        while keep_looping:
+            # Get the next results
+            results = self.call(service, method, offset=offset, limit=limit, *args, **kwargs)
 
             # Apparently this method doesn't return a list.
             # Why are you even iterating over this?
-            if not isinstance(results, list):
-                yield results
-                break
+            if not isinstance(results, transports.SoftLayerListResult):
+                if isinstance(results, list):
+                    # Close enough, this makes testing a lot easier
+                    results = transports.SoftLayerListResult(results, len(results))
+                else:
+                    yield results
+                    raise StopIteration
 
             for item in results:
                 yield item
@@ -299,11 +306,13 @@ class BaseClient(object):
 
             # Got less results than requested, we are at the end
             if len(results) < limit:
-                break
+                keep_looping = False
+            # Got all the needed items
+            if result_count >= results.total_count:
+                keep_looping = False
 
             offset += limit
-            # Get the next results
-            results = self.call(service, method, offset=offset, limit=limit, *args, **kwargs)
+
         raise StopIteration
 
     def __repr__(self):

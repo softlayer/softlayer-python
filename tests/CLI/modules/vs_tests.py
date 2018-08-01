@@ -379,7 +379,7 @@ class VirtTests(testing.TestCase):
                                    '--network=100',
                                    '--billing=hourly',
                                    '--datacenter=dal05',
-                                   '--wait=10'])
+                                   '--wait=1'])
 
         self.assertEqual(result.exit_code, 1)
 

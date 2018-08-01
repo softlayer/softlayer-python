@@ -339,14 +339,14 @@ class OrderingTests(testing.TestCase):
         items = ['ITEM1', 'ITEM2']
         preset = 'PRESET_KEYNAME'
         expected_order = {'orderContainers': [
-                            {'complexType': 'SoftLayer_Container_Foo',
-                             'location': 1854895,
-                             'packageId': 1234,
-                             'presetId': 5678,
-                             'prices': [{'id': 1111}, {'id': 2222}],
-                             'quantity': 1,
-                             'useHourlyPricing': True}
-                         ]}
+            {'complexType': 'SoftLayer_Container_Foo',
+             'location': 1854895,
+             'packageId': 1234,
+             'presetId': 5678,
+             'prices': [{'id': 1111}, {'id': 2222}],
+             'quantity': 1,
+             'useHourlyPricing': True}
+        ]}
 
         mock_pkg, mock_preset, mock_get_ids = self._patch_for_generate()
 
@@ -362,13 +362,13 @@ class OrderingTests(testing.TestCase):
         items = ['ITEM1', 'ITEM2']
         complex_type = 'My_Type'
         expected_order = {'orderContainers': [
-                            {'complexType': 'My_Type',
-                             'location': 1854895,
-                             'packageId': 1234,
-                             'prices': [{'id': 1111}, {'id': 2222}],
-                             'quantity': 1,
-                             'useHourlyPricing': True}
-                         ]}
+            {'complexType': 'My_Type',
+             'location': 1854895,
+             'packageId': 1234,
+             'prices': [{'id': 1111}, {'id': 2222}],
+             'quantity': 1,
+             'useHourlyPricing': True}
+        ]}
 
         mock_pkg, mock_preset, mock_get_ids = self._patch_for_generate()
 

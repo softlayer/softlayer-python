@@ -532,10 +532,12 @@ class HardwareManager(utils.IdentifierMixin, object):
         # Find the server via ip address. First try public ip, then private
         results = self.list_hardware(public_ip=ip, mask="id")
         if results:
+            print("PUB")
             return [result['id'] for result in results]
 
         results = self.list_hardware(private_ip=ip, mask="id")
         if results:
+            print("Found privet")
             return [result['id'] for result in results]
 
     def edit(self, hardware_id, userdata=None, hostname=None, domain=None,

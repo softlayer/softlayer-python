@@ -18,6 +18,7 @@ import SoftLayer
 from SoftLayer.CLI import core
 from SoftLayer.CLI import environment
 from SoftLayer.testing import xmlrpc
+from SoftLayer.transports import SoftLayerListResult
 
 
 FIXTURE_PATH = os.path.abspath(os.path.join(__file__, '..', '..', 'fixtures'))
@@ -39,7 +40,8 @@ class MockableTransport(object):
             return self.mocked[key](call)
 
         # Fall back to another transport (usually with fixtures)
-        return self.transport(call)
+        return  self.transport(call)
+
 
     def set_mock(self, service, method):
         """Create a mock and return the mock object for the specific API call.

@@ -86,7 +86,6 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
 
     table = formatting.Table(columns.columns)
     table.sortby = sortby
-
     for guest in guests:
         table.add_row([value or formatting.blank()
                        for value in columns.row(guest)])
