@@ -12,7 +12,8 @@ from SoftLayer.CLI import helpers
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """Delete a User
+    """Delete a User.
+
     Example: slcli user delete userId
     """
 
