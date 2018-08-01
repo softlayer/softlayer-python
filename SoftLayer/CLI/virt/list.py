@@ -64,7 +64,7 @@ DEFAULT_COLUMNS = [
               show_default=True)
 @click.option('--limit', '-l',
               help='How many results to get in one api call, default is 100',
-              default=100, 
+              default=100,
               show_default=True)
 @environment.pass_env
 def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,

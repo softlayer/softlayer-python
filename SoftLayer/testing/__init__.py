@@ -40,8 +40,7 @@ class MockableTransport(object):
             return self.mocked[key](call)
 
         # Fall back to another transport (usually with fixtures)
-        return  self.transport(call)
-
+        return self.transport(call)
 
     def set_mock(self, service, method):
         """Create a mock and return the mock object for the specific API call.

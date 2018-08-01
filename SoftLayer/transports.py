@@ -126,8 +126,8 @@ class Request(object):
         pretty_mask = utils.clean_string(self.mask)
         pretty_filter = self.filter
         param_string = "id={id}, mask='{mask}', filter='{filter}', args={args}, limit={limit}, offset={offset}".format(
-                        id=self.identifier, mask=pretty_mask, filter=pretty_filter, 
-                        args=self.args, limit=self.limit, offset=self.offset)
+            id=self.identifier, mask=pretty_mask, filter=pretty_filter,
+            args=self.args, limit=self.limit, offset=self.offset)
         return "{service}::{method}({params})".format(
             service=self.service, method=self.method, params=param_string)
 

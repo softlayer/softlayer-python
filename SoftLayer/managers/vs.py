@@ -159,7 +159,6 @@ class VSManager(utils.IdentifierMixin, object):
         kwargs['filter'] = _filter.to_dict()
         kwargs['iter'] = True
         return self.client.call('Account', call, **kwargs)
-        
 
     @retry(logger=LOGGER)
     def get_instance(self, instance_id, **kwargs):

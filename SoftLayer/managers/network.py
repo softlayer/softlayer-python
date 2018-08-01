@@ -480,7 +480,6 @@ class NetworkManager(object):
         kwargs['iter'] = True
         return self.client.call('Account', 'getSubnets', **kwargs)
 
-
     def list_vlans(self, datacenter=None, vlan_number=None, name=None, **kwargs):
         """Display a list of all VLANs on the account.
 

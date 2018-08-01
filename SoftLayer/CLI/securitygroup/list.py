@@ -18,7 +18,7 @@ COLUMNS = ['id',
               type=click.Choice(COLUMNS))
 @click.option('--limit', '-l',
               help='How many results to get in one api call, default is 100',
-              default=100, 
+              default=100,
               show_default=True)
 @environment.pass_env
 def cli(env, sortby, limit):

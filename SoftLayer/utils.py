@@ -210,6 +210,7 @@ def is_ready(instance, pending=False):
         return True
     return False
 
+
 def clean_string(string):
     if string is None:
         return ''
