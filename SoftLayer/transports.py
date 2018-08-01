@@ -122,7 +122,6 @@ class Request(object):
 
     def __repr__(self):
         """Prints out what this call is all about"""
-        param_list = ['identifier', 'mask', 'filter', 'args', 'limit', 'offset']
         pretty_mask = utils.clean_string(self.mask)
         pretty_filter = self.filter
         param_string = "id={id}, mask='{mask}', filter='{filter}', args={args}, limit={limit}, offset={offset}".format(
@@ -135,7 +134,7 @@ class Request(object):
 class SoftLayerListResult(list):
     """A SoftLayer API list result."""
 
-    def __init__(self, items=[], total_count=0):
+    def __init__(self, items=None, total_count=0):
 
         #: total count of items that exist on the server. This is useful when
         #: paginating through a large list of objects.
