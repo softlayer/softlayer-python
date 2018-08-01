@@ -43,6 +43,7 @@ class NetworkManager(object):
     :param SoftLayer.API.BaseClient client: the client instance
 
     """
+
     def __init__(self, client):
         self.client = client
         self.account = client['Account']

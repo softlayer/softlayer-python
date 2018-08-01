@@ -47,6 +47,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                                               If none is provided, one will be
                                               auto initialized.
     """
+
     def __init__(self, client, ordering_manager=None):
         self.client = client
         self.hardware = self.client['Hardware_Server']

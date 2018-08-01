@@ -133,7 +133,7 @@ class OrderTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder')
         expected_results = []
 
-        for price in order['prices']:
+        for price in order['orderContainers'][0]['prices']:
             expected_results.append({'keyName': price['item']['keyName'],
                                      'description': price['item']['description'],
                                      'cost': price['hourlyRecurringFee']})
@@ -160,7 +160,7 @@ class OrderTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder')
         expected_results = []
 
-        for price in order['prices']:
+        for price in order['orderContainers'][0]['prices']:
             expected_results.append({'keyName': price['item']['keyName'],
                                      'description': price['item']['description'],
                                      'cost': price['recurringFee']})
@@ -210,9 +210,13 @@ class OrderTests(testing.TestCase):
 
     def _get_order_items(self):
         item1 = {'keyName': 'ITEM1', 'description': 'description1',
-                 'prices': [{'id': 1111, 'locationGroupId': None}]}
+                 'itemCategory': {'categoryCode': 'cat1'},
+                 'prices': [{'id': 1111, 'locationGroupId': None,
+                             'categories': [{'categoryCode': 'cat1'}]}]}
         item2 = {'keyName': 'ITEM2', 'description': 'description2',
-                 'prices': [{'id': 2222, 'locationGroupId': None}]}
+                 'itemCategory': {'categoryCode': 'cat2'},
+                 'prices': [{'id': 2222, 'locationGroupId': None,
+                             'categories': [{'categoryCode': 'cat2'}]}]}
 
         return [item1, item2]
 
@@ -222,4 +226,4 @@ class OrderTests(testing.TestCase):
                   'recurringFee': '120'}
         price2 = {'item': item2, 'hourlyRecurringFee': '0.05',
                   'recurringFee': '150'}
-        return {'prices': [price1, price2]}
+        return {'orderContainers': [{'prices': [price1, price2]}]}

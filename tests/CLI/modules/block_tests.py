@@ -59,6 +59,7 @@ class BlockTests(testing.TestCase):
         result = self.run_command(['block', 'volume-detail', '1234'])
 
         self.assert_no_fail(result)
+        isinstance(json.loads(result.output)['IOPs'], float)
         self.assertEqual({
             'Username': 'username',
             'LUN Id': '2',
@@ -107,6 +108,7 @@ class BlockTests(testing.TestCase):
                 'capacity_gb': 20,
                 'datacenter': 'dal05',
                 'id': 100,
+                'iops': None,
                 'ip_addr': '10.1.2.3',
                 'lunId': None,
                 'rep_partner_count': None,
@@ -194,7 +196,7 @@ class BlockTests(testing.TestCase):
                     {'description': '0.25 IOPS per GB'},
                     {'description': '20 GB Storage Space'},
                     {'description': '10 GB Storage Space (Snapshot Space)'}]
-                }
+            }
         }
 
         result = self.run_command(['block', 'volume-order',
@@ -242,7 +244,7 @@ class BlockTests(testing.TestCase):
                     {'description': 'Block Storage'},
                     {'description': '20 GB Storage Space'},
                     {'description': '200 IOPS'}]
-                }
+            }
         }
 
         result = self.run_command(['block', 'volume-order',
@@ -408,7 +410,7 @@ class BlockTests(testing.TestCase):
                 'items': [{'description':
                            '10 GB Storage Space (Snapshot Space)'}],
                 'status': 'PENDING_APPROVAL',
-                }
+            }
         }
 
         result = self.run_command(['block', 'snapshot-order', '1234',

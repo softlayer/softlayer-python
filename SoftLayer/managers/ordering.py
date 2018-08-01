@@ -334,10 +334,11 @@ class OrderingManager(object):
                   keynames in the given package
 
         """
-        mask = 'id, keyName, prices'
+        mask = 'id, itemCategory, keyName, prices[categories]'
         items = self.list_items(package_keyname, mask=mask)
 
         prices = []
+        gpu_number = -1
         for item_keyname in item_keynames:
             try:
                 # Need to find the item in the package that has a matching
@@ -353,8 +354,17 @@ class OrderingManager(object):
             # because that is the most generic price. verifyOrder/placeOrder
             # can take that ID and create the proper price for us in the location
             # in which the order is made
-            price_id = [p['id'] for p in matching_item['prices']
-                        if not p['locationGroupId']][0]
+            if matching_item['itemCategory']['categoryCode'] != "gpu0":
+                price_id = [p['id'] for p in matching_item['prices']
+                            if not p['locationGroupId']][0]
+            else:
+                # GPU items has two generic prices and they are added to the list
+                # according to the number of gpu items added in the order.
+                gpu_number += 1
+                price_id = [p['id'] for p in matching_item['prices']
+                            if not p['locationGroupId']
+                            and p['categories'][0]['categoryCode'] == "gpu" + str(gpu_number)][0]
+
             prices.append(price_id)
 
         return prices
@@ -445,6 +455,7 @@ class OrderingManager(object):
         :param int quantity: The number of resources to order
 
         """
+        container = {}
         order = {}
         extras = extras or {}
 
@@ -470,7 +481,10 @@ class OrderingManager(object):
 
         price_ids = self.get_price_id_list(package_keyname, item_keynames)
         order['prices'] = [{'id': price_id} for price_id in price_ids]
-        return order
+
+        container['orderContainers'] = [order]
+
+        return container
 
     def package_locations(self, package_keyname):
         """List datacenter locations for a package keyname

@@ -14,6 +14,7 @@ from SoftLayer import utils
 
 class Column(object):
     """Column desctribes an attribute and how to fetch/display it."""
+
     def __init__(self, name, path, mask=None):
         self.name = name
         self.path = path
@@ -26,6 +27,7 @@ class Column(object):
 
 class ColumnFormatter(object):
     """Maps each column using a function"""
+
     def __init__(self):
         self.columns = []
         self.column_funcs = []

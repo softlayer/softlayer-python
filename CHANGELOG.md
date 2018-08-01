@@ -1,8 +1,24 @@
 # Change Log
 
+## [5.5.0] - 2018-07-09
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.4...master
+
+- Added a warning when ordering legacy storage volumes
+- Added documentation link to volume-order
+- Increased slcli output width limit to 999 characters
+- More unit tests
+- Fixed an issue canceling some block storage volumes
+- Fixed `slcli order` to work with network gateways
+- Fixed an issue showing hardware credentials when they do not exist
+- Fixed an issue showing addressSpace when listing virtual servers
+- Updated ordering class to support baremetal servers with multiple GPU
+- Updated prompt-toolkit as a fix for `slcli shell`
+- Fixed `slcli vlan detail` to not fail when objects don't have a hostname
+- Added user management
+
 
 ## [5.4.4] - 2018-04-18
-- Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.3...master
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.3...v5.4.4
 
 - fixed hw list not showing transactions
 - Re-factored RestTransport and XMLRPCTransport, logging is now only done in the DebugTransport

@@ -283,22 +283,25 @@ class OrderingTests(testing.TestCase):
         self.assertEqual('Preset {} does not exist in package {}'.format(keyname, 'PACKAGE_KEYNAME'), str(exc))
 
     def test_get_price_id_list(self):
-        price1 = {'id': 1234, 'locationGroupId': None}
-        item1 = {'id': 1111, 'keyName': 'ITEM1', 'prices': [price1]}
-        price2 = {'id': 5678, 'locationGroupId': None}
-        item2 = {'id': 2222, 'keyName': 'ITEM2', 'prices': [price2]}
+        category1 = {'categoryCode': 'cat1'}
+        price1 = {'id': 1234, 'locationGroupId': None, 'itemCategory': [category1]}
+        item1 = {'id': 1111, 'keyName': 'ITEM1', 'itemCategory': category1, 'prices': [price1]}
+        category2 = {'categoryCode': 'cat2'}
+        price2 = {'id': 5678, 'locationGroupId': None, 'categories': [category2]}
+        item2 = {'id': 2222, 'keyName': 'ITEM2', 'itemCategory': category2, 'prices': [price2]}
 
         with mock.patch.object(self.ordering, 'list_items') as list_mock:
             list_mock.return_value = [item1, item2]
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'])
 
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, keyName, prices')
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
         self.assertEqual([price1['id'], price2['id']], prices)
 
     def test_get_price_id_list_item_not_found(self):
-        price1 = {'id': 1234, 'locationGroupId': ''}
-        item1 = {'id': 1111, 'keyName': 'ITEM1', 'prices': [price1]}
+        category1 = {'categoryCode': 'cat1'}
+        price1 = {'id': 1234, 'locationGroupId': '', 'categories': [category1]}
+        item1 = {'id': 1111, 'keyName': 'ITEM1', 'itemCategory': category1, 'prices': [price1]}
 
         with mock.patch.object(self.ordering, 'list_items') as list_mock:
             list_mock.return_value = [item1]
@@ -306,8 +309,22 @@ class OrderingTests(testing.TestCase):
             exc = self.assertRaises(exceptions.SoftLayerError,
                                     self.ordering.get_price_id_list,
                                     'PACKAGE_KEYNAME', ['ITEM2'])
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, keyName, prices')
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
         self.assertEqual("Item ITEM2 does not exist for package PACKAGE_KEYNAME", str(exc))
+
+    def test_get_price_id_list_gpu_items_with_two_categories(self):
+        # Specific for GPU prices which are differentiated by their category (gpu0, gpu1)
+        price1 = {'id': 1234, 'locationGroupId': None, 'categories': [{'categoryCode': 'gpu1'}]}
+        price2 = {'id': 5678, 'locationGroupId': None, 'categories': [{'categoryCode': 'gpu0'}]}
+        item1 = {'id': 1111, 'keyName': 'ITEM1', 'itemCategory': {'categoryCode': 'gpu0'}, 'prices': [price1, price2]}
+
+        with mock.patch.object(self.ordering, 'list_items') as list_mock:
+            list_mock.return_value = [item1, item1]
+
+            prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM1'])
+
+            list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
+            self.assertEqual([price2['id'], price1['id']], prices)
 
     def test_generate_no_complex_type(self):
         pkg = 'PACKAGE_KEYNAME'
@@ -321,13 +338,15 @@ class OrderingTests(testing.TestCase):
         complex_type = 'SoftLayer_Container_Foo'
         items = ['ITEM1', 'ITEM2']
         preset = 'PRESET_KEYNAME'
-        expected_order = {'complexType': 'SoftLayer_Container_Foo',
-                          'location': 1854895,
-                          'packageId': 1234,
-                          'presetId': 5678,
-                          'prices': [{'id': 1111}, {'id': 2222}],
-                          'quantity': 1,
-                          'useHourlyPricing': True}
+        expected_order = {'orderContainers': [
+                            {'complexType': 'SoftLayer_Container_Foo',
+                             'location': 1854895,
+                             'packageId': 1234,
+                             'presetId': 5678,
+                             'prices': [{'id': 1111}, {'id': 2222}],
+                             'quantity': 1,
+                             'useHourlyPricing': True}
+                         ]}
 
         mock_pkg, mock_preset, mock_get_ids = self._patch_for_generate()
 
@@ -342,12 +361,14 @@ class OrderingTests(testing.TestCase):
         pkg = 'PACKAGE_KEYNAME'
         items = ['ITEM1', 'ITEM2']
         complex_type = 'My_Type'
-        expected_order = {'complexType': 'My_Type',
-                          'location': 1854895,
-                          'packageId': 1234,
-                          'prices': [{'id': 1111}, {'id': 2222}],
-                          'quantity': 1,
-                          'useHourlyPricing': True}
+        expected_order = {'orderContainers': [
+                            {'complexType': 'My_Type',
+                             'location': 1854895,
+                             'packageId': 1234,
+                             'prices': [{'id': 1111}, {'id': 2222}],
+                             'quantity': 1,
+                             'useHourlyPricing': True}
+                         ]}
 
         mock_pkg, mock_preset, mock_get_ids = self._patch_for_generate()
 
@@ -456,30 +477,34 @@ class OrderingTests(testing.TestCase):
 
     def test_location_group_id_none(self):
         # RestTransport uses None for empty locationGroupId
-        price1 = {'id': 1234, 'locationGroupId': None}
-        item1 = {'id': 1111, 'keyName': 'ITEM1', 'prices': [price1]}
-        price2 = {'id': 5678, 'locationGroupId': None}
-        item2 = {'id': 2222, 'keyName': 'ITEM2', 'prices': [price2]}
+        category1 = {'categoryCode': 'cat1'}
+        price1 = {'id': 1234, 'locationGroupId': None, 'categories': [category1]}
+        item1 = {'id': 1111, 'keyName': 'ITEM1', 'itemCategory': category1, 'prices': [price1]}
+        category2 = {'categoryCode': 'cat2'}
+        price2 = {'id': 5678, 'locationGroupId': None, 'categories': [category2]}
+        item2 = {'id': 2222, 'keyName': 'ITEM2', 'itemCategory': category2, 'prices': [price2]}
 
         with mock.patch.object(self.ordering, 'list_items') as list_mock:
             list_mock.return_value = [item1, item2]
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'])
 
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, keyName, prices')
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
         self.assertEqual([price1['id'], price2['id']], prices)
 
     def test_location_groud_id_empty(self):
         # XMLRPCtransport uses '' for empty locationGroupId
-        price1 = {'id': 1234, 'locationGroupId': ''}
-        item1 = {'id': 1111, 'keyName': 'ITEM1', 'prices': [price1]}
-        price2 = {'id': 5678, 'locationGroupId': ""}
-        item2 = {'id': 2222, 'keyName': 'ITEM2', 'prices': [price2]}
+        category1 = {'categoryCode': 'cat1'}
+        price1 = {'id': 1234, 'locationGroupId': '', 'categories': [category1]}
+        item1 = {'id': 1111, 'keyName': 'ITEM1', 'itemCategory': category1, 'prices': [price1]}
+        category2 = {'categoryCode': 'cat2'}
+        price2 = {'id': 5678, 'locationGroupId': "", 'categories': [category2]}
+        item2 = {'id': 2222, 'keyName': 'ITEM2', 'itemCategory': category2, 'prices': [price2]}
 
         with mock.patch.object(self.ordering, 'list_items') as list_mock:
             list_mock.return_value = [item1, item2]
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'])
 
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, keyName, prices')
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
         self.assertEqual([price1['id'], price2['id']], prices)
