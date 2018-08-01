@@ -213,12 +213,12 @@ def is_ready(instance, pending=False):
 
 def clean_string(string):
     """Returns a string with all newline and other whitespace garbage removed.
-    
-    Mostly this method is used to print out objectMasks that have a lot of extra whitespace 
+
+    Mostly this method is used to print out objectMasks that have a lot of extra whitespace
     in them because making compact masks in python means they don't look nice in the IDE.
-    
+
     :param string: The string to clean.
-    :returns string: A string without extra whitespace
+    :returns string: A string without extra whitespace.
     """
     if string is None:
         return ''
