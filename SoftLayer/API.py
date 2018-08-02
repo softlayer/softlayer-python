@@ -215,7 +215,7 @@ class BaseClient(object):
         """
         if kwargs.pop('iter', False):
             # Most of the codebase assumes a non-generator will be returned, so casting to list
-            # keeps thsoe sections working
+            # keeps those sections working
             return list(self.iter_call(service, method, *args, **kwargs))
 
         invalid_kwargs = set(kwargs.keys()) - VALID_CALL_ARGS
