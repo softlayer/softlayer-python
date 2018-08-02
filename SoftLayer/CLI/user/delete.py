@@ -12,7 +12,9 @@ from SoftLayer.CLI import helpers
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """Delete a User.
+    """Sets a user's status to CANCEL_PENDING, which will immediately disable the account,
+
+    and will eventually be fully removed from the account by an automated internal process.
 
     Example: slcli user delete userId
     """
