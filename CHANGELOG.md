@@ -1,7 +1,15 @@
 # Change Log
 
+## [5.5.1] - 2018-08-06
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.5.0...master
+
+- #1006, added paginations to several slcli methods, making them work better with large result sets. 
+- #995, Fixed an issue displaying VLANs.
+- #1011, Fixed an issue displaying some NAS passwords
+- #1014, Ability to delete users
+
 ## [5.5.0] - 2018-07-09
-- Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.4...master
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.4...v5.5.0
 
 - Added a warning when ordering legacy storage volumes
 - Added documentation link to volume-order
