@@ -19,7 +19,6 @@ from SoftLayer.CLI import core
 from SoftLayer.CLI import environment
 from SoftLayer.testing import xmlrpc
 
-
 FIXTURE_PATH = os.path.abspath(os.path.join(__file__, '..', '..', 'fixtures'))
 
 

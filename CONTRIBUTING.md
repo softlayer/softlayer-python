@@ -12,3 +12,18 @@ guidelines below.
 * Additional infomration can be found in our [contribution guide](http://softlayer-python.readthedocs.org/en/latest/dev/index.html)
 
 
+## Code style
+
+Code is tested and style checked with tox, you can run the tox tests individually by doing `tox -e <TEST>`
+
+* `autopep8 -r  -v -i --max-line-length 119  SoftLayer/`
+* `autopep8 -r  -v -i --max-line-length 119  tests/`
+* `tox -e analysis`
+* `tox -e py36`
+* `git commit --message="#<ISSUENUMBER> <whatever you did>`
+* `git push origin <issueBranch>`
+* create pull request
+
+
+
+

@@ -158,8 +158,8 @@ class VSManager(utils.IdentifierMixin, object):
                 utils.query_filter(private_ip))
 
         kwargs['filter'] = _filter.to_dict()
-        func = getattr(self.account, call)
-        return func(**kwargs)
+        kwargs['iter'] = True
+        return self.client.call('Account', call, **kwargs)
 
     @retry(logger=LOGGER)
     def get_instance(self, instance_id, **kwargs):

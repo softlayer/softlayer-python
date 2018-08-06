@@ -26,8 +26,12 @@ COLUMNS = ['id',
               help='Filter by datacenter shortname (sng01, dal05, ...)')
 @click.option('--number', '-n', help='Filter by VLAN number')
 @click.option('--name', help='Filter by VLAN name')
+@click.option('--limit', '-l',
+              help='How many results to get in one api call, default is 100',
+              default=100,
+              show_default=True)
 @environment.pass_env
-def cli(env, sortby, datacenter, number, name):
+def cli(env, sortby, datacenter, number, name, limit):
     """List VLANs."""
 
     mgr = SoftLayer.NetworkManager(env.client)
@@ -37,7 +41,8 @@ def cli(env, sortby, datacenter, number, name):
 
     vlans = mgr.list_vlans(datacenter=datacenter,
                            vlan_number=number,
-                           name=name)
+                           name=name,
+                           limit=limit)
     for vlan in vlans:
         table.add_row([
             vlan['id'],

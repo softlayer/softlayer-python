@@ -214,7 +214,9 @@ class BaseClient(object):
 
         """
         if kwargs.pop('iter', False):
-            return self.iter_call(service, method, *args, **kwargs)
+            # Most of the codebase assumes a non-generator will be returned, so casting to list
+            # keeps those sections working
+            return list(self.iter_call(service, method, *args, **kwargs))
 
         invalid_kwargs = set(kwargs.keys()) - VALID_CALL_ARGS
         if invalid_kwargs:
@@ -267,55 +269,51 @@ class BaseClient(object):
 
         :param service: the name of the SoftLayer API service
         :param method: the method to call on the service
-        :param integer chunk: result size for each API call (defaults to 100)
+        :param integer limit: result size for each API call (defaults to 100)
         :param \\*args: same optional arguments that ``Service.call`` takes
-        :param \\*\\*kwargs: same optional keyword arguments that
-                           ``Service.call`` takes
+        :param \\*\\*kwargs: same optional keyword arguments that ``Service.call`` takes
 
         """
-        chunk = kwargs.pop('chunk', 100)
-        limit = kwargs.pop('limit', None)
+
+        limit = kwargs.pop('limit', 100)
         offset = kwargs.pop('offset', 0)
 
-        if chunk <= 0:
-            raise AttributeError("Chunk size should be greater than zero.")
+        if limit <= 0:
+            raise AttributeError("Limit size should be greater than zero.")
 
-        if limit:
-            chunk = min(chunk, limit)
-
-        result_count = 0
+        # Set to make unit tests, which call this function directly, play nice.
         kwargs['iter'] = False
-        while True:
-            if limit:
-                # We've reached the end of the results
-                if result_count >= limit:
-                    break
+        result_count = 0
+        keep_looping = True
 
-                # Don't over-fetch past the given limit
-                if chunk + result_count > limit:
-                    chunk = limit - result_count
-
-            results = self.call(service, method,
-                                offset=offset, limit=chunk, *args, **kwargs)
-
-            # It looks like we ran out results
-            if not results:
-                break
+        while keep_looping:
+            # Get the next results
+            results = self.call(service, method, offset=offset, limit=limit, *args, **kwargs)
 
             # Apparently this method doesn't return a list.
             # Why are you even iterating over this?
-            if not isinstance(results, list):
-                yield results
-                break
+            if not isinstance(results, transports.SoftLayerListResult):
+                if isinstance(results, list):
+                    # Close enough, this makes testing a lot easier
+                    results = transports.SoftLayerListResult(results, len(results))
+                else:
+                    yield results
+                    raise StopIteration
 
             for item in results:
                 yield item
                 result_count += 1
 
-            offset += chunk
+            # Got less results than requested, we are at the end
+            if len(results) < limit:
+                keep_looping = False
+            # Got all the needed items
+            if result_count >= results.total_count:
+                keep_looping = False
 
-            if len(results) < chunk:
-                break
+            offset += limit
+
+        raise StopIteration
 
     def __repr__(self):
         return "Client(transport=%r, auth=%r)" % (self.transport, self.auth)
