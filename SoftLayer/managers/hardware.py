@@ -245,6 +245,12 @@ class HardwareManager(utils.IdentifierMixin, object):
                                                         version,
                                                         referenceCode]],
                     passwords[username,password]],'''
+                '''softwareComponents[
+                    softwareLicense[softwareDescription[manufacturer,
+                                                        name,
+                                                        version,
+                                                        referenceCode]],
+                    passwords[username,password]],'''
                 'billingItem['
                 'id,nextInvoiceTotalRecurringAmount,'
                 'children[nextInvoiceTotalRecurringAmount],'
