@@ -298,7 +298,7 @@ class BaseClient(object):
                     results = transports.SoftLayerListResult(results, len(results))
                 else:
                     yield results
-                    raise StopIteration
+                    return
 
             for item in results:
                 yield item
@@ -312,8 +312,6 @@ class BaseClient(object):
                 keep_looping = False
 
             offset += limit
-
-        raise StopIteration
 
     def __repr__(self):
         return "Client(transport=%r, auth=%r)" % (self.transport, self.auth)
