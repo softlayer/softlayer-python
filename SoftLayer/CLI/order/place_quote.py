@@ -1,4 +1,4 @@
-"""Save an order as quote"""
+"""Place quote"""
 # :license: MIT, see LICENSE for more details.
 
 import json
@@ -6,13 +6,9 @@ import json
 import click
 
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import ordering
 
-COLUMNS = ['keyName',
-           'description',
-           'cost', ]
 
 @click.command()
 @click.argument('package_keyname')
@@ -20,24 +16,24 @@ COLUMNS = ['keyName',
 @click.option('--preset',
               help="The order preset (if required by the package)")
 @click.option('--name',
-              help="Quote name (optional)")
+              help="A custom name to be assigned to the quote (optional)")
 @click.option('--send-email',
               is_flag=True,
-              help="Quote will be sent to the email address")
+              help="The quote will be sent to the email address associated.")
 @click.option('--complex-type', help=("The complex type of the order. This typically begins"
                                       " with 'SoftLayer_Container_Product_Order_'."))
 @click.option('--extras',
               help="JSON string denoting extra data that needs to be sent with the order")
 @click.argument('order_items', nargs=-1)
 @environment.pass_env
-def cli(env, package_keyname, location, preset, name, email, complex_type,
+def cli(env, package_keyname, location, preset, name, send_email, complex_type,
         extras, order_items):
-    """Save an order as quote.
+    """Place a quote.
 
-    This CLI command is used for saving an order in quote of the specified package in
+    This CLI command is used for placing a quote of the specified package in
     the given location (denoted by a datacenter's long name). Orders made via the CLI
     can then be converted to be made programmatically by calling
-    SoftLayer.OrderingManager.place_order() with the same keynames.
+    SoftLayer.OrderingManager.place_quote() with the same keynames.
 
     Packages for ordering can be retrieved from `slcli order package-list`
     Presets for ordering can be retrieved from `slcli order preset-list` (not all packages
@@ -49,9 +45,9 @@ def cli(env, package_keyname, location, preset, name, email, complex_type,
 
     \b
     Example:
-        # Order an hourly VSI with 4 CPU, 16 GB RAM, 100 GB SAN disk,
+        # Place quote a VSI with 4 CPU, 16 GB RAM, 100 GB SAN disk,
         # Ubuntu 16.04, and 1 Gbps public & private uplink in dal13
-        slcli order quote --name " My quote name" --email CLOUD_SERVER DALLAS13 \\
+        slcli order place-quote --name " My quote name" --send-email CLOUD_SERVER DALLAS13 \\
             GUEST_CORES_4 \\
             RAM_16_GB \\
             REBOOT_REMOTE_CONSOLE \\
@@ -78,16 +74,18 @@ def cli(env, package_keyname, location, preset, name, email, complex_type,
     kwargs = {'preset_keyname': preset,
               'extras': extras,
               'quantity': 1,
-              'quoteName': name,
-              'sendQuoteEmailFlag': email,
+              'quote_name': name,
+              'send_email': send_email,
               'complex_type': complex_type}
 
-    order = manager.save_quote(*args, **kwargs)
+    order = manager.place_quote(*args, **kwargs)
 
     table = formatting.KeyValueTable(['name', 'value'])
     table.align['name'] = 'r'
     table.align['value'] = 'l'
-    table.add_row(['id', order['orderId']])
+    table.add_row(['id', order['quote']['id']])
+    table.add_row(['name', order['quote']['name']])
     table.add_row(['created', order['orderDate']])
-    table.add_row(['status', order['placedOrder']['status']])
+    table.add_row(['expires', order['quote']['expirationDate']])
+    table.add_row(['status', order['quote']['status']])
     env.fout(table)
