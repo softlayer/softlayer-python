@@ -47,7 +47,7 @@ def cli(env, package_keyname, location, preset, name, send_email, complex_type,
     Example:
         # Place quote a VSI with 4 CPU, 16 GB RAM, 100 GB SAN disk,
         # Ubuntu 16.04, and 1 Gbps public & private uplink in dal13
-        slcli order place-quote --name " My quote name" --send-email CLOUD_SERVER DALLAS13 \\
+        slcli order place-quote --name "foobar" --send-email CLOUD_SERVER DALLAS13 \\
             GUEST_CORES_4 \\
             RAM_16_GB \\
             REBOOT_REMOTE_CONSOLE \\

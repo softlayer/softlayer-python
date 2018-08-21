@@ -431,6 +431,33 @@ class OrderingTests(testing.TestCase):
                                          extras=extras, quantity=quantity)
         self.assertEqual(ord_mock.return_value, order)
 
+    def test_place_quote(self):
+        ord_mock = self.set_mock('SoftLayer_Product_Order', 'placeQuote')
+        ord_mock.return_value = {'id': 1234}
+        pkg = 'PACKAGE_KEYNAME'
+        location = 'DALLAS13'
+        items = ['ITEM1', 'ITEM2']
+        hourly = False
+        preset_keyname = 'PRESET'
+        complex_type = 'Complex_Type'
+        extras = {'foo': 'bar'}
+        quantity = 1
+        name = 'wombat'
+        send_email = True
+
+        with mock.patch.object(self.ordering, 'generate_order') as gen_mock:
+            gen_mock.return_value = {'order': {}}
+
+            order = self.ordering.place_quote(pkg, location, items, preset_keyname=preset_keyname,
+                                              complex_type=complex_type, extras=extras, quantity=quantity,
+                                              quote_name=name, send_email=send_email)
+
+        gen_mock.assert_called_once_with(pkg, location, items, hourly=hourly,
+                                         preset_keyname=preset_keyname,
+                                         complex_type=complex_type,
+                                         extras=extras, quantity=quantity)
+        self.assertEqual(ord_mock.return_value, order)
+
     def test_locations(self):
         locations = self.ordering.package_locations('BARE_METAL_CPU')
         self.assertEqual('WASHINGTON07', locations[0]['keyname'])

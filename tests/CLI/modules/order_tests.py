@@ -114,6 +114,35 @@ class OrderTests(testing.TestCase):
                           'status': 'APPROVED'},
                          json.loads(result.output))
 
+    def test_place_quote(self):
+        order_date = '2018-04-04 07:39:20'
+        expiration_date = '2018-05-04 07:39:20'
+        quote_name = 'foobar'
+        order = {'orderDate': order_date,
+                 'quote': {
+                     'id': 1234,
+                     'name': quote_name,
+                     'expirationDate': expiration_date,
+                     'status': 'PENDING'
+                 }}
+        place_quote_mock = self.set_mock('SoftLayer_Product_Order', 'placeQuote')
+        items_mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
+
+        place_quote_mock.return_value = order
+        items_mock.return_value = self._get_order_items()
+
+        result = self.run_command(['order', 'place-quote', '--name', 'foobar', 'package', 'DALLAS13',
+                                   'ITEM1', '--complex-type', 'SoftLayer_Container_Product_Order_Thing'])
+
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeQuote')
+        self.assertEqual({'id': 1234,
+                          'name': quote_name,
+                          'created': order_date,
+                          'expires': expiration_date,
+                          'status': 'PENDING'},
+                         json.loads(result.output))
+
     def test_verify_hourly(self):
         order_date = '2017-04-04 07:39:20'
         order = {'orderId': 1234, 'orderDate': order_date,
