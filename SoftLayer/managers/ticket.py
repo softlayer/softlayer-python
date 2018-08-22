@@ -28,8 +28,8 @@ class TicketManager(utils.IdentifierMixin, object):
         :param boolean open_status: include open tickets
         :param boolean closed_status: include closed tickets
         """
-        mask = ('id, title, assignedUser[firstName, lastName],'
-                'createDate,lastEditDate,accountId,status')
+        mask = """mask[id, title, assignedUser[firstName, lastName], priority,
+                  createDate, lastEditDate, accountId, status, updateCount]"""
 
         call = 'getTickets'
         if not all([open_status, closed_status]):
@@ -53,18 +53,18 @@ class TicketManager(utils.IdentifierMixin, object):
         :returns: dict -- information about the specified ticket
 
         """
-        mask = ('id, title, assignedUser[firstName, lastName],status,'
-                'createDate,lastEditDate,updates[entry,editor],updateCount')
+        mask = """mask[id, title, assignedUser[firstName, lastName],status,
+                  createDate,lastEditDate,updates[entry,editor],updateCount, priority]"""
         return self.ticket.getObject(id=ticket_id, mask=mask)
 
-    def create_ticket(self, title=None, body=None, subject=None):
+    def create_ticket(self, title=None, body=None, subject=None, priority=None):
         """Create a new ticket.
 
         :param string title: title for the new ticket
         :param string body: body for the new ticket
         :param integer subject: id of the subject to be assigned to the ticket
+        :param integer priority: Value from 1 (highest) to 4 (lowest)
         """
-
         current_user = self.account.getCurrentUser()
         new_ticket = {
             'subjectId': subject,
@@ -72,6 +72,9 @@ class TicketManager(utils.IdentifierMixin, object):
             'assignedUserId': current_user['id'],
             'title': title,
         }
+        if priority is not None:
+            new_ticket['priority'] = priority
+
         created_ticket = self.ticket.createStandardTicket(new_ticket, body)
         return created_ticket
 
