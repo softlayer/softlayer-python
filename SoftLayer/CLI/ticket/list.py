@@ -31,8 +31,8 @@ def cli(env, is_open):
             click.wrap_text(ticket['title']),
             ticket['lastEditDate'],
             ticket['status']['name'],
-            ticket['updateCount'],
-            ticket['priority']
+            ticket.get('updateCount', 0),
+            ticket.get('priority', 0)
         ])
 
     env.fout(table)

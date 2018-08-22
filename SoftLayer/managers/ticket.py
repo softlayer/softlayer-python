@@ -73,7 +73,7 @@ class TicketManager(utils.IdentifierMixin, object):
             'title': title,
         }
         if priority is not None:
-            new_ticket['priority'] = priority
+            new_ticket['priority'] = int(priority)
 
         created_ticket = self.ticket.createStandardTicket(new_ticket, body)
         return created_ticket
@@ -86,18 +86,12 @@ class TicketManager(utils.IdentifierMixin, object):
         """
         return self.ticket.addUpdate({'entry': body}, id=ticket_id)
 
-    def upload_attachment(self, ticket_id=None, file_path=None,
-                          file_name=None):
+    def upload_attachment(self, ticket_id=None, file_path=None, file_name=None):
         """Upload an attachment to a ticket.
 
-        :param integer ticket_id: the id of the ticket to
-                                  upload the attachment to
-        :param string file_path:
-                                  The path of the attachment to be uploaded
-        :param string file_name:
-                                  The name of the attachment shown
-                                  in the ticket
-
+        :param integer ticket_id: the id of the ticket to upload the attachment to
+        :param string file_path: The path of the attachment to be uploaded
+        :param string file_name: The name of the attachment shown in the ticket
         :returns: dict -- The uploaded attachment
         """
         file_content = None
