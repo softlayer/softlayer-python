@@ -180,11 +180,9 @@ class DedicatedHostsTests(testing.TestCase):
                     }],
                     'location': 'DALLAS05',
                     'packageId': 813,
-                    'complexType':
-                        'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
+                    'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
                     'useHourlyPricing': True,
-                    'quantity': 1},
-        )
+                    'quantity': 1},)
 
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder',
                                 args=args)
@@ -218,11 +216,9 @@ class DedicatedHostsTests(testing.TestCase):
                     }],
                     'location': 'DALLAS05',
                     'packageId': 813,
-                    'complexType':
-                        'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
+                    'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
                     'useHourlyPricing': True,
-                    'quantity': 1},
-        )
+                    'quantity': 1},)
 
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder',
                                 args=args)

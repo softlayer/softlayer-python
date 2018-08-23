@@ -348,16 +348,16 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                             },
                             'pciDevices': [
                                 {'hardwareComponentModel':
-                                     {'hardwareGenericComponentModel':
-                                          {'id': hardwareGenericComponentModelId,
-                                           'hardwareComponentType':
-                                               {'keyName': hardwareComponentTypeKeyName}}}
+                                    {'hardwareGenericComponentModel':
+                                        {'id': hardwareGenericComponentModelId,
+                                            'hardwareComponentType':
+                                                {'keyName': hardwareComponentTypeKeyName}}}
                                  },
                                 {'hardwareComponentModel':
-                                     {'hardwareGenericComponentModel':
-                                          {'id': hardwareGenericComponentModelId,
-                                           'hardwareComponentType':
-                                               {'keyName': hardwareComponentTypeKeyName}}}
+                                    {'hardwareGenericComponentModel':
+                                        {'id': hardwareGenericComponentModelId,
+                                            'hardwareComponentType':
+                                                {'keyName': hardwareComponentTypeKeyName}}}
                                  }
                             ]
                         }
