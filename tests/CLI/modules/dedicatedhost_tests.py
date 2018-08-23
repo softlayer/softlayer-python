@@ -149,7 +149,7 @@ class DedicatedHostsTests(testing.TestCase):
                 "Available Backend Routers": "bcr04a.dal05"
             }
         ]]
-        )
+                         )
 
     def test_create(self):
         SoftLayer.CLI.formatting.confirm = mock.Mock()
