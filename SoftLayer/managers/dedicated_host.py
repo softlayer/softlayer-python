@@ -356,7 +356,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                                             }
                                         }
                                     }
-                                 },
+                                },
                                 {
                                     'hardwareComponentModel': {
                                         'hardwareGenericComponentModel': {
