@@ -243,7 +243,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
             capacity,
             keyName,
             itemCategory[categoryCode],
-            bundleItems[capacity, keyName, categories[categoryCode], hardwareGenericComponentModel[id,
+            bundleItems[capacity,keyName,categories[categoryCode],hardwareGenericComponentModel[id,
             hardwareComponentType[keyName]]]
         ],
         regions[location[location[priceGroups]]]

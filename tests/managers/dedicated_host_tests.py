@@ -133,6 +133,57 @@ class DedicatedHostTests(testing.TestCase):
                                 'placeOrder',
                                 args=(values,))
 
+    def test_place_order_with_gpu(self):
+        create_dict = self.dedicated_host._generate_create_dict = mock.Mock()
+
+        values = {
+            'hardware': [
+                {
+                    'primaryBackendNetworkComponent': {
+                        'router': {
+                            'id': 51218
+                        }
+                    },
+                    'domain': u'test.com',
+                    'hostname': u'test'
+                }
+            ],
+            'useHourlyPricing': True,
+            'location': 'AMSTERDAM',
+            'packageId': 813,
+            'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
+            'prices': [
+                {
+                    'id': 200269
+                }
+            ],
+            'quantity': 1
+        }
+        create_dict.return_value = values
+
+        location = 'dal05'
+        hostname = 'test'
+        domain = 'test.com'
+        hourly = True
+        flavor = '56_CORES_X_484_RAM_X_1_5_TB_X_2_GPU_P100'
+
+        self.dedicated_host.place_order(hostname=hostname,
+                                        domain=domain,
+                                        location=location,
+                                        flavor=flavor,
+                                        hourly=hourly)
+
+        create_dict.assert_called_once_with(hostname=hostname,
+                                            router=None,
+                                            domain=domain,
+                                            datacenter=location,
+                                            flavor=flavor,
+                                            hourly=True)
+
+        self.assert_called_with('SoftLayer_Product_Order',
+                                'placeOrder',
+                                args=(values,))
+
     def test_verify_order(self):
         create_dict = self.dedicated_host._generate_create_dict = mock.Mock()
 
@@ -286,7 +337,8 @@ class DedicatedHostTests(testing.TestCase):
             capacity,
             keyName,
             itemCategory[categoryCode],
-            bundleItems[capacity, categories[categoryCode]]
+            bundleItems[capacity,keyName,categories[categoryCode],hardwareGenericComponentModel[id,
+            hardwareComponentType[keyName]]]
         ],
         regions[location[location[priceGroups]]]
         '''
@@ -388,12 +440,14 @@ class DedicatedHostTests(testing.TestCase):
         item = {
             'bundleItems': [{
                 'capacity': '1200',
+                'keyName': '1_4_TB_LOCAL_STORAGE_DEDICATED_HOST_CAPACITY',
                 'categories': [{
                     'categoryCode': 'dedicated_host_disk'
                 }]
             },
                 {
                     'capacity': '242',
+                    'keyName': '242_GB_RAM',
                     'categories': [{
                         'categoryCode': 'dedicated_host_ram'
                     }]
@@ -517,6 +571,7 @@ class DedicatedHostTests(testing.TestCase):
                     "bundleItems": [
                         {
                             "capacity": "1200",
+                            "keyName": "1_4_TB_LOCAL_STORAGE_DEDICATED_HOST_CAPACITY",
                             "categories": [
                                 {
                                     "categoryCode": "dedicated_host_disk"
@@ -525,6 +580,7 @@ class DedicatedHostTests(testing.TestCase):
                         },
                         {
                             "capacity": "242",
+                            "keyName": "242_GB_RAM",
                             "categories": [
                                 {
                                     "categoryCode": "dedicated_host_ram"
