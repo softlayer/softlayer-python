@@ -7,10 +7,10 @@
 """
 
 import logging
-import SoftLayer
 
-from SoftLayer.managers import ordering
+import SoftLayer
 from SoftLayer import utils
+from SoftLayer.managers import ordering
 
 # Invalid names are ignored due to long method names and short argument names
 # pylint: disable=invalid-name, no-self-use
@@ -347,18 +347,26 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                                 'id': loc_id
                             },
                             'pciDevices': [
-                                {'hardwareComponentModel':
-                                    {'hardwareGenericComponentModel':
-                                        {'id': hardwareGenericComponentModelId,
-                                            'hardwareComponentType':
-                                                {'keyName': hardwareComponentTypeKeyName}}}
+                                {
+                                    'hardwareComponentModel': {
+                                        'hardwareGenericComponentModel': {
+                                            'id': hardwareGenericComponentModelId,
+                                            'hardwareComponentType': {
+                                                'keyName': hardwareComponentTypeKeyName
+                                            }
+                                        }
+                                    }
                                  },
-                                {'hardwareComponentModel':
-                                    {'hardwareGenericComponentModel':
-                                        {'id': hardwareGenericComponentModelId,
-                                            'hardwareComponentType':
-                                                {'keyName': hardwareComponentTypeKeyName}}}
-                                 }
+                                {
+                                    'hardwareComponentModel': {
+                                        'hardwareGenericComponentModel': {
+                                            'id': hardwareGenericComponentModelId,
+                                            'hardwareComponentType': {
+                                                'keyName': hardwareComponentTypeKeyName
+                                            }
+                                        }
+                                    }
+                                }
                             ]
                         }
                     routers = self.host.getAvailableRouters(host, mask=mask)
