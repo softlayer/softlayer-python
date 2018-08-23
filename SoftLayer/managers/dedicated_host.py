@@ -243,7 +243,8 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
             capacity,
             keyName,
             itemCategory[categoryCode],
-            bundleItems[capacity, categories[categoryCode]]
+            bundleItems[capacity, keyName, categories[categoryCode], hardwareGenericComponentModel[id,
+            hardwareComponentType[keyName]]]
         ],
         regions[location[location[priceGroups]]]
         '''
@@ -317,18 +318,49 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                 if category['categoryCode'] == 'dedicated_host_disk':
                     disk_capacity = capacity['capacity']
 
+        for hardwareComponent in item['bundleItems']:
+            if hardwareComponent['keyName'].find("GPU") != -1:
+                hardwareComponentModel = hardwareComponent['hardwareGenericComponentModel']
+                hardwareGenericComponentModelId = hardwareComponentModel['id']
+                hardwareComponentType = hardwareComponentModel['hardwareComponentType']
+                hardwareComponentTypeKeyName = hardwareComponentType['keyName']
+
         if locations is not None:
             for location in locations:
                 if location['locationId'] is not None:
                     loc_id = location['locationId']
-                    host = {
-                        'cpuCount': cpu_count,
-                        'memoryCapacity': mem_capacity,
-                        'diskCapacity': disk_capacity,
-                        'datacenter': {
-                            'id': loc_id
+                    if item['keyName'].find("GPU") == -1:
+                        host = {
+                            'cpuCount': cpu_count,
+                            'memoryCapacity': mem_capacity,
+                            'diskCapacity': disk_capacity,
+                            'datacenter': {
+                                'id': loc_id
+                            }
                         }
-                    }
+                    else:
+                        host = {
+                            'cpuCount': cpu_count,
+                            'memoryCapacity': mem_capacity,
+                            'diskCapacity': disk_capacity,
+                            'datacenter': {
+                                'id': loc_id
+                            },
+                            'pciDevices': [
+                                {'hardwareComponentModel':
+                                     {'hardwareGenericComponentModel':
+                                          {'id': hardwareGenericComponentModelId,
+                                           'hardwareComponentType':
+                                               {'keyName': hardwareComponentTypeKeyName}}}
+                                 },
+                                {'hardwareComponentModel':
+                                     {'hardwareGenericComponentModel':
+                                          {'id': hardwareGenericComponentModelId,
+                                           'hardwareComponentType':
+                                               {'keyName': hardwareComponentTypeKeyName}}}
+                                 }
+                            ]
+                        }
                     routers = self.host.getAvailableRouters(host, mask=mask)
                     return routers
 
