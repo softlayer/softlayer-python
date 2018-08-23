@@ -7,10 +7,10 @@
 """
 
 import logging
-
 import SoftLayer
-from SoftLayer import utils
+
 from SoftLayer.managers import ordering
+from SoftLayer import utils
 
 # Invalid names are ignored due to long method names and short argument names
 # pylint: disable=invalid-name, no-self-use
