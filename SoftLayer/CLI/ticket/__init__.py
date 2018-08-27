@@ -7,6 +7,15 @@ from SoftLayer.CLI import formatting
 
 TEMPLATE_MSG = "***** SoftLayer Ticket Content ******"
 
+# https://softlayer.github.io/reference/services/SoftLayer_Ticket_Priority/getPriorities/
+PRIORITY_MAP = [
+    'No Priority',
+    'Severity 1 - Critical Impact / Service Down',
+    'Severity 2 - Significant Business Impact',
+    'Severity 3 - Minor Business Impact',
+    'Severity 4 - Minimal Business Impact'
+]
+
 
 def get_ticket_results(mgr, ticket_id, update_count=1):
     """Get output about a ticket.
@@ -24,6 +33,7 @@ def get_ticket_results(mgr, ticket_id, update_count=1):
 
     table.add_row(['id', ticket['id']])
     table.add_row(['title', ticket['title']])
+    table.add_row(['priority', PRIORITY_MAP[ticket.get('priority', 0)]])
     if ticket.get('assignedUser'):
         user = ticket['assignedUser']
         table.add_row([
