@@ -320,17 +320,35 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
 
         for hardwareComponent in item['bundleItems']:
             if hardwareComponent['keyName'].find("GPU") != -1:
-                hardwareComponentModel = hardwareComponent['hardwareGenericComponentModel']
-                hardwareGenericComponentModelId = hardwareComponentModel['id']
-                hardwareComponentType = hardwareComponentModel['hardwareComponentType']
-                hardwareComponentTypeKeyName = hardwareComponentType['keyName']
+                hardwareComponentType = hardwareComponent['hardwareGenericComponentModel']['hardwareComponentType']
+                gpuComponents = [
+                    {
+                        'hardwareComponentModel': {
+                            'hardwareGenericComponentModel': {
+                                'id': hardwareComponent['hardwareGenericComponentModel']['id'],
+                                'hardwareComponentType': {
+                                    'keyName': hardwareComponentType['keyName']
+                                }
+                            }
+                        }
+                    },
+                    {
+                        'hardwareComponentModel': {
+                            'hardwareGenericComponentModel': {
+                                'id': hardwareComponent['hardwareGenericComponentModel']['id'],
+                                'hardwareComponentType': {
+                                    'keyName': hardwareComponentType['keyName']
+                                }
+                            }
+                        }
+                    }
+                ]
 
         if locations is not None:
             for location in locations:
                 if location['locationId'] is not None:
                     loc_id = location['locationId']
-                    if item['keyName'].find("GPU") == -1:
-                        host = {
+                    host = {
                             'cpuCount': cpu_count,
                             'memoryCapacity': mem_capacity,
                             'diskCapacity': disk_capacity,
@@ -338,37 +356,8 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                                 'id': loc_id
                             }
                         }
-                    else:
-                        host = {
-                            'cpuCount': cpu_count,
-                            'memoryCapacity': mem_capacity,
-                            'diskCapacity': disk_capacity,
-                            'datacenter': {
-                                'id': loc_id
-                            },
-                            'pciDevices': [
-                                {
-                                    'hardwareComponentModel': {
-                                        'hardwareGenericComponentModel': {
-                                            'id': hardwareGenericComponentModelId,
-                                            'hardwareComponentType': {
-                                                'keyName': hardwareComponentTypeKeyName
-                                            }
-                                        }
-                                    }
-                                },
-                                {
-                                    'hardwareComponentModel': {
-                                        'hardwareGenericComponentModel': {
-                                            'id': hardwareGenericComponentModelId,
-                                            'hardwareComponentType': {
-                                                'keyName': hardwareComponentTypeKeyName
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
+                    if item['keyName'].find("GPU") != -1:
+                        host['pciDevices'] = gpuComponents
                     routers = self.host.getAvailableRouters(host, mask=mask)
                     return routers
 
