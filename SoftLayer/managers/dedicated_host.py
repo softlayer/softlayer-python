@@ -349,13 +349,13 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                 if location['locationId'] is not None:
                     loc_id = location['locationId']
                     host = {
-                            'cpuCount': cpu_count,
-                            'memoryCapacity': mem_capacity,
-                            'diskCapacity': disk_capacity,
-                            'datacenter': {
-                                'id': loc_id
-                            }
+                        'cpuCount': cpu_count,
+                        'memoryCapacity': mem_capacity,
+                        'diskCapacity': disk_capacity,
+                        'datacenter': {
+                            'id': loc_id
                         }
+                    }
                     if item['keyName'].find("GPU") != -1:
                         host['pciDevices'] = gpuComponents
                     routers = self.host.getAvailableRouters(host, mask=mask)
