@@ -666,7 +666,6 @@ SAAS_PACKAGE = {
     ]
 }
 
-
 SAAS_REST_PACKAGE = {
     'categories': [
         {'categoryCode': 'storage_as_a_service'}
@@ -1133,12 +1132,14 @@ getAllObjectsDH = [{
         "bundleItems": [
             {
                 "capacity": "1200",
+                "keyName": "1_4_TB_LOCAL_STORAGE_DEDICATED_HOST_CAPACITY",
                 "categories": [{
                     "categoryCode": "dedicated_host_disk"
                 }]
             },
             {
                 "capacity": "242",
+                "keyName": "242_GB_RAM",
                 "categories": [{
                     "categoryCode": "dedicated_host_ram"
                 }]
@@ -1177,6 +1178,110 @@ getAllObjectsDH = [{
             }
         ],
         "keyName": "56_CORES_X_242_RAM_X_1_4_TB",
+        "id": 10195,
+        "itemCategory": {
+            "categoryCode": "dedicated_virtual_hosts"
+        }
+    }],
+    "keyName": "DEDICATED_HOST",
+    "unitSize": "",
+    "regions": [{
+        "location": {
+            "locationPackageDetails": [{
+                "isAvailable": 1,
+                "locationId": 138124,
+                "packageId": 813
+            }],
+            "location": {
+                "statusId": 2,
+                "priceGroups": [{
+                    "locationGroupTypeId": 82,
+                    "description": "CDN - North America - Akamai",
+                    "locationGroupType": {
+                        "name": "PRICING"
+                    },
+                    "securityLevelId": "",
+                    "id": 1463,
+                    "name": "NORTH-AMERICA-AKAMAI"
+                }],
+                "id": 138124,
+                "name": "dal05",
+                "longName": "Dallas 5"
+            }
+        },
+        "keyname": "DALLAS05",
+        "description": "DAL05 - Dallas",
+        "sortOrder": 12
+    }],
+    "firstOrderStepId": "",
+    "id": 813,
+    "isActive": 1,
+    "description": "Dedicated Host"
+}]
+
+getAllObjectsDHGpu = [{
+    "subDescription": "Dedicated Host",
+    "name": "Dedicated Host",
+    "items": [{
+        "capacity": "56",
+        "description": "56 Cores x 360 RAM x 1.2 TB x 2 GPU P100 [encryption enabled]",
+        "bundleItems": [
+            {
+                "capacity": "1200",
+                "keyName": "1.2 TB Local Storage (Dedicated Host Capacity)",
+                "categories": [{
+                    "categoryCode": "dedicated_host_disk"
+                }]
+            },
+            {
+                "capacity": "242",
+                "keyName": "2_GPU_P100_DEDICATED",
+                "hardwareGenericComponentModel": {
+                    "capacity": "16",
+                    "id": 849,
+                    "hardwareComponentType": {
+                        "id": 20,
+                        "keyName": "GPU"
+                    }
+                },
+                "categories": [{
+                    "categoryCode": "dedicated_host_ram"
+                }]
+            }
+        ],
+        "prices": [
+            {
+                "itemId": 10195,
+                "setupFee": "0",
+                "recurringFee": "2099",
+                "tierMinimumThreshold": "",
+                "hourlyRecurringFee": "3.164",
+                "oneTimeFee": "0",
+                "currentPriceFlag": "",
+                "id": 200269,
+                "sort": 0,
+                "onSaleFlag": "",
+                "laborFee": "0",
+                "locationGroupId": "",
+                "quantity": ""
+            },
+            {
+                "itemId": 10195,
+                "setupFee": "0",
+                "recurringFee": "2161.97",
+                "tierMinimumThreshold": "",
+                "hourlyRecurringFee": "3.258",
+                "oneTimeFee": "0",
+                "currentPriceFlag": "",
+                "id": 200271,
+                "sort": 0,
+                "onSaleFlag": "",
+                "laborFee": "0",
+                "locationGroupId": 503,
+                "quantity": ""
+            }
+        ],
+        "keyName": "56_CORES_X_484_RAM_X_1_5_TB_X_2_GPU_P100",
         "id": 10195,
         "itemCategory": {
             "categoryCode": "dedicated_virtual_hosts"
