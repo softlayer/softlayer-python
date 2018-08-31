@@ -473,6 +473,10 @@ class HardwareManager(utils.IdentifierMixin, object):
                               location=None,
                               os=None,
                               port_speed=None,
+                              public_vlan=None,
+                              private_vlan=None,
+                              private_subnet=None,
+                              public_subnet=None,
                               ssh_keys=None,
                               post_uri=None,
                               hourly=True,
@@ -525,6 +529,11 @@ class HardwareManager(utils.IdentifierMixin, object):
             'quantity': quantity
         }
 
+        if private_vlan or public_vlan or private_subnet or public_subnet:
+            network_components = self._create_network_components(public_vlan, private_vlan,
+                                                                 private_subnet, public_subnet)
+            order.update(network_components)
+
         if post_uri:
             order['provisionScripts'] = [post_uri]
 
@@ -534,6 +543,29 @@ class HardwareManager(utils.IdentifierMixin, object):
             order['sshKeys'] = [{'sshKeyIds': ssh_keys}] * quantity
 
         return order
+
+    def _create_network_components(
+            self, public_vlan=None, private_vlan=None,
+            private_subnet=None, public_subnet=None):
+
+        parameters = {}
+        if private_vlan:
+            parameters['primaryBackendNetworkComponent'] = {"networkVlan": {"id": int(private_vlan)}}
+        if public_vlan:
+            parameters['primaryNetworkComponent'] = {"networkVlan": {"id": int(public_vlan)}}
+        if public_subnet:
+            if public_vlan is None:
+                raise exceptions.SoftLayerError("You need to specify a public_vlan with public_subnet")
+            else:
+                parameters['primaryNetworkComponent']['networkVlan']['primarySubnet'] = {'id': int(public_subnet)}
+        if private_subnet:
+            if private_vlan is None:
+                raise exceptions.SoftLayerError("You need to specify a private_vlan with private_subnet")
+            else:
+                parameters['primaryBackendNetworkComponent']['networkVlan']['primarySubnet'] = {
+                    "id": int(private_subnet)}
+
+        return parameters
 
     def _get_ids_from_hostname(self, hostname):
         """Returns list of matching hardware IDs for a given hostname."""
