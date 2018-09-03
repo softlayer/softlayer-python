@@ -226,6 +226,7 @@ class VSManager(utils.IdentifierMixin, object):
                 'hourlyBillingFlag,'
                 'userData,'
                 '''billingItem[id,nextInvoiceTotalRecurringAmount,
+                               package['id'],
                                children[categoryCode,nextInvoiceTotalRecurringAmount],
                                orderItem[id,
                                          order.userRecord[username],
@@ -867,7 +868,7 @@ class VSManager(utils.IdentifierMixin, object):
         order['prices'] = prices
 
         if preset is not None:
-            presetId = self._get_active_presets(preset)
+            presetId = self._get_active_presets(preset, instance_id)
             order['presetId'] = presetId
 
         if prices or preset:
@@ -875,11 +876,9 @@ class VSManager(utils.IdentifierMixin, object):
             return True
         return False
 
-    def _get_active_presets(self, preset):
+    def _get_active_presets(self, preset, instance_id):
         """Following Method gets the active presets.
         """
-        packageId = 835
-
         _filter = {
             'activePresets': {
                 'keyName': {
@@ -892,6 +891,10 @@ class VSManager(utils.IdentifierMixin, object):
                 }
             }
         }
+
+        vs_object = self.get_instance(instance_id, mask='mask[billingItem[package[id]]]')
+        package = vs_object['billingItem']['package']
+        packageId = package['id']
 
         mask = 'mask[id]'
         active_presets = self.package_svc.getActivePresets(id=packageId, mask=mask, filter=_filter)
