@@ -909,15 +909,14 @@ class VirtTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
         call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
         order_container = call.args[0]
-        self.assertEquals(801, order_container['presetId'])
+        self.assertEqual(801, order_container['presetId'])
         self.assertIn({'id': 100}, order_container['virtualGuests'])
         self.assertEqual(order_container['virtualGuests'], [{'id': 100}])
 
     def test_upgrade_with_cpu_memory_and_flavor(self):
         result = self.run_command(['vs', 'upgrade', '100', '--cpu=4',
                                    '--memory=1024', '--flavor=M1_64X512X100'])
-        self.assertEqual(result.exit_code, 2)
-        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+        self.assertEqual("Do not use cpu, private and memory if you are using flavors", str(result.exception))
 
     def test_edit(self):
         result = self.run_command(['vs', 'edit',

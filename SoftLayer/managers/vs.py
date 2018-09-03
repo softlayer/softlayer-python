@@ -210,6 +210,7 @@ class VSManager(utils.IdentifierMixin, object):
                 'maxMemory,'
                 'datacenter,'
                 'activeTransaction[id, transactionStatus[friendlyName,name]],'
+                'lastTransaction[transactionStatus],'
                 'lastOperatingSystemReload.id,'
                 'blockDevices,'
                 'blockDeviceTemplateGroup[id, name, globalIdentifier],'
@@ -878,6 +879,9 @@ class VSManager(utils.IdentifierMixin, object):
 
     def _get_active_presets(self, preset, instance_id):
         """Following Method gets the active presets.
+
+        :param string preset: preset data to be upgrade de vs.
+        :param int instance_id: To get the instance information.
         """
         _filter = {
             'activePresets': {
