@@ -21,15 +21,17 @@ completed. However for Network, no reboot is required.""")
               help="CPU core will be on a dedicated host server.")
 @click.option('--memory', type=virt.MEM_TYPE, help="Memory in megabytes")
 @click.option('--network', type=click.INT, help="Network port speed in Mbps")
+@click.option('--flavor', type=click.STRING, help="Flavor keyName\n"
+                                                  "Do not use --memory, --cpu or --private, if you are using flavors")
 @environment.pass_env
-def cli(env, identifier, cpu, private, memory, network):
+def cli(env, identifier, cpu, private, memory, network, flavor):
     """Upgrade a virtual server."""
 
     vsi = SoftLayer.VSManager(env.client)
 
-    if not any([cpu, memory, network]):
+    if not any([cpu, memory, network, flavor]):
         raise exceptions.ArgumentError(
-            "Must provide [--cpu], [--memory], or [--network] to upgrade")
+            "Must provide [--cpu], [--memory], [--network], or [--flavor] to upgrade")
 
     if private and not cpu:
         raise exceptions.ArgumentError(
@@ -48,5 +50,6 @@ def cli(env, identifier, cpu, private, memory, network):
                        cpus=cpu,
                        memory=memory,
                        nic_speed=network,
-                       public=not private):
+                       public=not private,
+                       preset=flavor):
         raise exceptions.CLIAbort('VS Upgrade Failed')
