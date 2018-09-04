@@ -47,6 +47,13 @@ from SoftLayer.CLI import template
 @click.option('--no-public',
               is_flag=True,
               help="Private network only")
+@click.option('--vlan-private',
+              help="The ID of the private VLAN on which you want the virtual "
+                   "server placed",
+              type=click.INT)
+@click.option('--subnet-private',
+              help="The ID of the private SUBNET on which you want the virtual server placed",
+              type=click.INT)
 @helpers.multi_option('--extra', '-e', help="Extra options")
 @click.option('--test',
               is_flag=True,
@@ -91,6 +98,8 @@ def cli(env, **args):
         'extras': args.get('extra'),
         'quantity': args.get('quantity'),
     }
+    order['private_subnet'] = args.get('subnet_private', None)
+    order['private_vlan'] = args.get('vlan_private', None)
 
     # Do not create hardware server with --test or --export
     do_create = not (args['export'] or args['test'])
