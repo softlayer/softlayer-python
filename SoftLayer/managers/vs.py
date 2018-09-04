@@ -227,7 +227,7 @@ class VSManager(utils.IdentifierMixin, object):
                 'hourlyBillingFlag,'
                 'userData,'
                 '''billingItem[id,nextInvoiceTotalRecurringAmount,
-                               package['id'],
+                               package[id,keyName],
                                children[categoryCode,nextInvoiceTotalRecurringAmount],
                                orderItem[id,
                                          order.userRecord[username],
@@ -834,13 +834,11 @@ class VSManager(utils.IdentifierMixin, object):
 
         if cpus is not None and preset is not None:
             raise exceptions.SoftLayerError("Do not use cpu, private and memory if you are using flavors")
-        else:
-            data['cpus'] = cpus
+        data['cpus'] = cpus
 
         if memory is not None and preset is not None:
             raise exceptions.SoftLayerError("Do not use memory, private or cpu if you are using flavors")
-        else:
-            data['memory'] = memory
+        data['memory'] = memory
 
         maintenance_window = datetime.datetime.now(utils.UTC())
         order = {
@@ -869,48 +867,13 @@ class VSManager(utils.IdentifierMixin, object):
         order['prices'] = prices
 
         if preset is not None:
-            presetId = self._get_active_presets(preset, instance_id)
-            order['presetId'] = presetId
+            vs_object = self.get_instance(instance_id)['billingItem']['package']
+            order['presetId'] = self.ordering_manager.get_preset_by_key(vs_object['keyName'], preset)['id']
 
         if prices or preset:
             self.client['Product_Order'].placeOrder(order)
             return True
         return False
-
-    def _get_active_presets(self, preset, instance_id):
-        """Following Method gets the active presets.
-
-        :param string preset: preset data to be upgrade de vs.
-        :param int instance_id: To get the instance information.
-        """
-        _filter = {
-            'activePresets': {
-                'keyName': {
-                    'operation': preset
-                }
-            },
-            'accountRestrictedActivePresets': {
-                'keyName': {
-                    'operation': preset
-                }
-            }
-        }
-
-        vs_object = self.get_instance(instance_id, mask='mask[billingItem[package[id]]]')
-        package = vs_object['billingItem']['package']
-        packageId = package['id']
-
-        mask = 'mask[id]'
-        active_presets = self.package_svc.getActivePresets(id=packageId, mask=mask, filter=_filter)
-
-        if len(active_presets) == 0:
-            raise exceptions.SoftLayerError(
-                "Preset {} does not exist in package {}".format(preset,
-                                                                packageId))
-
-        for presetId in active_presets:
-            id = presetId['id']
-        return id
 
     def _get_package_items(self):
         """Following Method gets all the item ids related to VS.

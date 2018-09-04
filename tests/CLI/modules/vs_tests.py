@@ -909,7 +909,7 @@ class VirtTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
         call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
         order_container = call.args[0]
-        self.assertEqual(801, order_container['presetId'])
+        self.assertEqual(799, order_container['presetId'])
         self.assertIn({'id': 100}, order_container['virtualGuests'])
         self.assertEqual(order_container['virtualGuests'], [{'id': 100}])
 
