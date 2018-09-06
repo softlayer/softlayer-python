@@ -7,7 +7,8 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import ordering
 
-COLUMNS = ['name',
+COLUMNS = ['id', 
+           'name',
            'keyName',
            'type']
 
@@ -51,6 +52,7 @@ def cli(env, keyword, package_type):
 
     for package in packages:
         table.add_row([
+            package['id'],
             package['name'],
             package['keyName'],
             package['type']['keyName']
