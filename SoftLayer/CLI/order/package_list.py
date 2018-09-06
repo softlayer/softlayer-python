@@ -7,7 +7,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import ordering
 
-COLUMNS = ['id', 
+COLUMNS = ['id',
            'name',
            'keyName',
            'type']

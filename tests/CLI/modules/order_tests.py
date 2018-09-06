@@ -221,11 +221,12 @@ class OrderTests(testing.TestCase):
                   'recurringFee': '150'}
         return {'orderContainers': [{'prices': [price1, price2]}]}
 
+
 def _get_all_packages():
     package_type = {'keyName': 'BARE_METAL_CPU'}
     all_packages = [
-        {'id': 1, 'name': 'package1', 'keyName': 'PACKAGE1', 'type': package_type, 'isActive': 1}, 
-        {'id': 2, 'name': 'package2', 'keyName': 'PACKAGE2', 'type': package_type, 'isActive': 1}, 
+        {'id': 1, 'name': 'package1', 'keyName': 'PACKAGE1', 'type': package_type, 'isActive': 1},
+        {'id': 2, 'name': 'package2', 'keyName': 'PACKAGE2', 'type': package_type, 'isActive': 1},
         {'id': 3, 'name': 'package2', 'keyName': 'PACKAGE2', 'type': package_type, 'isActive': 0}
     ]
     return all_packages
