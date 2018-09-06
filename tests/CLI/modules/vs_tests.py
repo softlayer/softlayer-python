@@ -672,7 +672,18 @@ class VirtTests(testing.TestCase):
                                    '--memory', '2048MB', '--datacenter',
                                    'TEST00', '--os', 'UBUNTU_LATEST'])
 
-        self.assertEqual(result.exit_code, -1)
+        self.assertEqual(result.exit_code, 0)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_create_vs_flavor_test(self, confirm_mock):
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'create', '--test', '--hostname', 'TEST',
+                                   '--domain', 'TESTING', '--flavor', 'B1_2X8X25',
+                                   '--datacenter', 'TEST00', '--os', 'UBUNTU_LATEST'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.exit_code, 0)
 
     def test_create_vs_bad_memory(self):
         result = self.run_command(['vs', 'create', '--hostname', 'TEST',

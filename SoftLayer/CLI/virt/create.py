@@ -272,26 +272,26 @@ def cli(env, **args):
         result = vsi.verify_create_instance(**data)
         total_monthly = 0.0
         total_hourly = 0.0
+        total_preset_monthly = 0.0
+        total_preset_hourly = 0.0
 
         table = formatting.Table(['Item', 'cost'])
         table.align['Item'] = 'r'
         table.align['cost'] = 'r'
 
-        for price in result['prices']:
-            total_monthly += float(price.get('recurringFee', 0.0))
-            total_hourly += float(price.get('hourlyRecurringFee', 0.0))
-            if args.get('billing') == 'hourly':
-                rate = "%.2f" % float(price['hourlyRecurringFee'])
-            elif args.get('billing') == 'monthly':
-                rate = "%.2f" % float(price['recurringFee'])
+        if str(result['presetId']) is not "":
+            ordering_mgr = SoftLayer.OrderingManager(env.client)
+            preset_prices = ordering_mgr.get_preset_prices(result['presetId'])
+            rate, total_preset_hourly, total_preset_monthly = get_total_recurring_fee(args, preset_prices, table,
+                                                                                      total_preset_hourly, total_preset_monthly)
 
-            table.add_row([price['item']['description'], rate])
+        rate, total_hourly, total_monthly = get_total_recurring_fee(args, result, table, total_hourly, total_monthly)
 
         total = 0
         if args.get('billing') == 'hourly':
-            total = total_hourly
+            total = total_hourly + total_preset_hourly
         elif args.get('billing') == 'monthly':
-            total = total_monthly
+            total = total_monthly + total_preset_monthly
 
         billing_rate = 'monthly'
         if args.get('billing') == 'hourly':
@@ -332,6 +332,19 @@ def cli(env, **args):
                 raise exceptions.CLIHalt(code=1)
 
     env.fout(output)
+
+
+def get_total_recurring_fee(args, result, table, total_hourly, total_monthly):
+    for price in result['prices']:
+        total_monthly += float(price.get('recurringFee', 0.0))
+        total_hourly += float(price.get('hourlyRecurringFee', 0.0))
+        if args.get('billing') == 'hourly':
+            rate = "%.2f" % float(price['hourlyRecurringFee'])
+        elif args.get('billing') == 'monthly':
+            rate = "%.2f" % float(price['recurringFee'])
+
+        table.add_row([price['item']['description'], rate])
+    return rate, total_hourly, total_monthly
 
 
 def _validate_args(env, args):

@@ -34,6 +34,7 @@ class OrderingManager(object):
         self.package_svc = client['Product_Package']
         self.order_svc = client['Product_Order']
         self.billing_svc = client['Billing_Order']
+        self.package_preset = client['Product_Package_Preset']
 
     def get_packages_of_type(self, package_types, mask=None):
         """Get packages that match a certain type.
@@ -367,6 +368,20 @@ class OrderingManager(object):
 
             prices.append(price_id)
 
+        return prices
+
+    def get_preset_prices(self, preset):
+        """Get preset item prices.
+
+        Retrieve a SoftLayer_Product_Package_Preset record.
+
+        :param int preset: preset identifier.
+        :returns: A list of price IDs associated with the given preset_id.
+
+        """
+        mask = 'mask[prices[item]]'
+
+        prices = self.package_preset.getObject(id=preset, mask=mask)
         return prices
 
     def verify_order(self, package_keyname, location, item_keynames, complex_type=None,
