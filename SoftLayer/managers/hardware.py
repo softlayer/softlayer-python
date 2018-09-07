@@ -197,7 +197,8 @@ class HardwareManager(utils.IdentifierMixin, object):
                 utils.query_filter(private_ip))
 
         kwargs['filter'] = _filter.to_dict()
-        return self.account.getHardware(**kwargs)
+        kwargs['iter'] = True
+        return self.client.call('Account', 'getHardware', **kwargs)
 
     @retry(logger=LOGGER)
     def get_hardware(self, hardware_id, **kwargs):
@@ -239,6 +240,12 @@ class HardwareManager(utils.IdentifierMixin, object):
                 'hardwareChassis[id,name],'
                 'activeTransaction[id, transactionStatus[friendlyName,name]],'
                 '''operatingSystem[
+                    softwareLicense[softwareDescription[manufacturer,
+                                                        name,
+                                                        version,
+                                                        referenceCode]],
+                    passwords[username,password]],'''
+                '''softwareComponents[
                     softwareLicense[softwareDescription[manufacturer,
                                                         name,
                                                         version,

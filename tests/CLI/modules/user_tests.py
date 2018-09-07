@@ -269,4 +269,3 @@ class UserCLITests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_User_Customer', 'editObject',
                                 args=({'userStatusId': 1021},), identifier=12345)
-

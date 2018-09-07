@@ -37,6 +37,7 @@ class HardwareTests(testing.TestCase):
         self.assertEqual(mgr.ordering_manager, ordering_manager)
 
     def test_list_hardware(self):
+        # Cast result back to list because list_hardware is now a generator
         results = self.hardware.list_hardware()
 
         self.assertEqual(results, fixtures.SoftLayer_Account.getHardware)

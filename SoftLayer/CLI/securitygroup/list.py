@@ -16,8 +16,12 @@ COLUMNS = ['id',
 @click.option('--sortby',
               help='Column to sort by',
               type=click.Choice(COLUMNS))
+@click.option('--limit', '-l',
+              help='How many results to get in one api call, default is 100',
+              default=100,
+              show_default=True)
 @environment.pass_env
-def cli(env, sortby):
+def cli(env, sortby, limit):
     """List security groups."""
 
     mgr = SoftLayer.NetworkManager(env.client)
@@ -25,7 +29,7 @@ def cli(env, sortby):
     table = formatting.Table(COLUMNS)
     table.sortby = sortby
 
-    sgs = mgr.list_securitygroups()
+    sgs = mgr.list_securitygroups(limit=limit)
     for secgroup in sgs:
         table.add_row([
             secgroup['id'],

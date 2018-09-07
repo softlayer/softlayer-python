@@ -243,7 +243,8 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
             capacity,
             keyName,
             itemCategory[categoryCode],
-            bundleItems[capacity, categories[categoryCode]]
+            bundleItems[capacity,keyName,categories[categoryCode],hardwareGenericComponentModel[id,
+            hardwareComponentType[keyName]]]
         ],
         regions[location[location[priceGroups]]]
         '''
@@ -317,6 +318,32 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                 if category['categoryCode'] == 'dedicated_host_disk':
                     disk_capacity = capacity['capacity']
 
+        for hardwareComponent in item['bundleItems']:
+            if hardwareComponent['keyName'].find("GPU") != -1:
+                hardwareComponentType = hardwareComponent['hardwareGenericComponentModel']['hardwareComponentType']
+                gpuComponents = [
+                    {
+                        'hardwareComponentModel': {
+                            'hardwareGenericComponentModel': {
+                                'id': hardwareComponent['hardwareGenericComponentModel']['id'],
+                                'hardwareComponentType': {
+                                    'keyName': hardwareComponentType['keyName']
+                                }
+                            }
+                        }
+                    },
+                    {
+                        'hardwareComponentModel': {
+                            'hardwareGenericComponentModel': {
+                                'id': hardwareComponent['hardwareGenericComponentModel']['id'],
+                                'hardwareComponentType': {
+                                    'keyName': hardwareComponentType['keyName']
+                                }
+                            }
+                        }
+                    }
+                ]
+
         if locations is not None:
             for location in locations:
                 if location['locationId'] is not None:
@@ -329,6 +356,8 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                             'id': loc_id
                         }
                     }
+                    if item['keyName'].find("GPU") != -1:
+                        host['pciDevices'] = gpuComponents
                     routers = self.host.getAvailableRouters(host, mask=mask)
                     return routers
 

@@ -339,14 +339,14 @@ class OrderingTests(testing.TestCase):
         items = ['ITEM1', 'ITEM2']
         preset = 'PRESET_KEYNAME'
         expected_order = {'orderContainers': [
-                            {'complexType': 'SoftLayer_Container_Foo',
-                             'location': 1854895,
-                             'packageId': 1234,
-                             'presetId': 5678,
-                             'prices': [{'id': 1111}, {'id': 2222}],
-                             'quantity': 1,
-                             'useHourlyPricing': True}
-                         ]}
+            {'complexType': 'SoftLayer_Container_Foo',
+             'location': 1854895,
+             'packageId': 1234,
+             'presetId': 5678,
+             'prices': [{'id': 1111}, {'id': 2222}],
+             'quantity': 1,
+             'useHourlyPricing': True}
+        ]}
 
         mock_pkg, mock_preset, mock_get_ids = self._patch_for_generate()
 
@@ -362,13 +362,13 @@ class OrderingTests(testing.TestCase):
         items = ['ITEM1', 'ITEM2']
         complex_type = 'My_Type'
         expected_order = {'orderContainers': [
-                            {'complexType': 'My_Type',
-                             'location': 1854895,
-                             'packageId': 1234,
-                             'prices': [{'id': 1111}, {'id': 2222}],
-                             'quantity': 1,
-                             'useHourlyPricing': True}
-                         ]}
+            {'complexType': 'My_Type',
+             'location': 1854895,
+             'packageId': 1234,
+             'prices': [{'id': 1111}, {'id': 2222}],
+             'quantity': 1,
+             'useHourlyPricing': True}
+        ]}
 
         mock_pkg, mock_preset, mock_get_ids = self._patch_for_generate()
 
@@ -424,6 +424,33 @@ class OrderingTests(testing.TestCase):
                                               preset_keyname=preset_keyname,
                                               complex_type=complex_type,
                                               extras=extras, quantity=quantity)
+
+        gen_mock.assert_called_once_with(pkg, location, items, hourly=hourly,
+                                         preset_keyname=preset_keyname,
+                                         complex_type=complex_type,
+                                         extras=extras, quantity=quantity)
+        self.assertEqual(ord_mock.return_value, order)
+
+    def test_place_quote(self):
+        ord_mock = self.set_mock('SoftLayer_Product_Order', 'placeQuote')
+        ord_mock.return_value = {'id': 1234}
+        pkg = 'PACKAGE_KEYNAME'
+        location = 'DALLAS13'
+        items = ['ITEM1', 'ITEM2']
+        hourly = False
+        preset_keyname = 'PRESET'
+        complex_type = 'Complex_Type'
+        extras = {'foo': 'bar'}
+        quantity = 1
+        name = 'wombat'
+        send_email = True
+
+        with mock.patch.object(self.ordering, 'generate_order') as gen_mock:
+            gen_mock.return_value = {'order': {}}
+
+            order = self.ordering.place_quote(pkg, location, items, preset_keyname=preset_keyname,
+                                              complex_type=complex_type, extras=extras, quantity=quantity,
+                                              quote_name=name, send_email=send_email)
 
         gen_mock.assert_called_once_with(pkg, location, items, hourly=hourly,
                                          preset_keyname=preset_keyname,
