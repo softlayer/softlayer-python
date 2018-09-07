@@ -72,11 +72,11 @@ class DnsTests(testing.TestCase):
                           'ttl': 7200})
 
     def test_add_record(self):
-        result = self.run_command(['dns', 'record-add', '1234', 'hostname',
-                                   'A', 'd', '--ttl=100'])
+        result = self.run_command(['dns', 'record-add', 'hostname', 'A',
+                                   'data', '--zone=1234', '--ttl=100'])
 
         self.assert_no_fail(result)
-        self.assertEqual(result.output, "")
+        self.assertEqual(str(result.output), 'A record added successfully\n')
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
     def test_delete_record(self, no_going_back_mock):
