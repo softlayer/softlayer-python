@@ -279,7 +279,7 @@ def cli(env, **args):
         table.align['Item'] = 'r'
         table.align['cost'] = 'r'
 
-        if str(result['presetId']) is not "":
+        if result['presetId']:
             ordering_mgr = SoftLayer.OrderingManager(env.client)
             preset_prices = ordering_mgr.get_preset_prices(result['presetId'])
             total_preset_hourly, total_preset_monthly = get_total_recurring_fee(args, preset_prices, table,
