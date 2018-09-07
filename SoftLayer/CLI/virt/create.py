@@ -282,11 +282,11 @@ def cli(env, **args):
         if str(result['presetId']) is not "":
             ordering_mgr = SoftLayer.OrderingManager(env.client)
             preset_prices = ordering_mgr.get_preset_prices(result['presetId'])
-            rate, total_preset_hourly, total_preset_monthly = get_total_recurring_fee(args, preset_prices, table,
-                                                                                      total_preset_hourly,
-                                                                                      total_preset_monthly)
+            total_preset_hourly, total_preset_monthly = get_total_recurring_fee(args, preset_prices, table,
+                                                                                total_preset_hourly,
+                                                                                total_preset_monthly)
 
-        rate, total_hourly, total_monthly = get_total_recurring_fee(args, result, table, total_hourly, total_monthly)
+        total_hourly, total_monthly = get_total_recurring_fee(args, result, table, total_hourly, total_monthly)
 
         total = 0
         if args.get('billing') == 'hourly':
@@ -336,6 +336,7 @@ def cli(env, **args):
 
 
 def get_total_recurring_fee(args, result, table, total_hourly, total_monthly):
+    """Retrieve the total recurring fee of the items prices"""
     for price in result['prices']:
         total_monthly += float(price.get('recurringFee', 0.0))
         total_hourly += float(price.get('hourlyRecurringFee', 0.0))
@@ -345,7 +346,7 @@ def get_total_recurring_fee(args, result, table, total_hourly, total_monthly):
             rate = "%.2f" % float(price['recurringFee'])
 
         table.add_row([price['item']['description'], rate])
-    return rate, total_hourly, total_monthly
+    return total_hourly, total_monthly
 
 
 def _validate_args(env, args):
