@@ -283,7 +283,8 @@ def cli(env, **args):
             ordering_mgr = SoftLayer.OrderingManager(env.client)
             preset_prices = ordering_mgr.get_preset_prices(result['presetId'])
             rate, total_preset_hourly, total_preset_monthly = get_total_recurring_fee(args, preset_prices, table,
-                                                                                      total_preset_hourly, total_preset_monthly)
+                                                                                      total_preset_hourly,
+                                                                                      total_preset_monthly)
 
         rate, total_hourly, total_monthly = get_total_recurring_fee(args, result, table, total_hourly, total_monthly)
 
