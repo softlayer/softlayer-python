@@ -51,6 +51,7 @@ class VSManager(utils.IdentifierMixin, object):
         self.client = client
         self.account = client['Account']
         self.guest = client['Virtual_Guest']
+        self.package_svc = client['Product_Package']
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
         if ordering_manager is None:
             self.ordering_manager = ordering.OrderingManager(client)
@@ -209,6 +210,7 @@ class VSManager(utils.IdentifierMixin, object):
                 'maxMemory,'
                 'datacenter,'
                 'activeTransaction[id, transactionStatus[friendlyName,name]],'
+                'lastTransaction[transactionStatus],'
                 'lastOperatingSystemReload.id,'
                 'blockDevices,'
                 'blockDeviceTemplateGroup[id, name, globalIdentifier],'
@@ -225,6 +227,7 @@ class VSManager(utils.IdentifierMixin, object):
                 'hourlyBillingFlag,'
                 'userData,'
                 '''billingItem[id,nextInvoiceTotalRecurringAmount,
+                               package[id,keyName],
                                children[categoryCode,nextInvoiceTotalRecurringAmount],
                                orderItem[id,
                                          order.userRecord[username],
@@ -803,7 +806,7 @@ class VSManager(utils.IdentifierMixin, object):
             name, disks_to_capture, notes, id=instance_id)
 
     def upgrade(self, instance_id, cpus=None, memory=None,
-                nic_speed=None, public=True):
+                nic_speed=None, public=True, preset=None):
         """Upgrades a VS instance.
 
         Example::
@@ -817,6 +820,7 @@ class VSManager(utils.IdentifierMixin, object):
         :param int instance_id: Instance id of the VS to be upgraded
         :param int cpus: The number of virtual CPUs to upgrade to
                             of a VS instance.
+        :param string preset: preset assigned to the vsi
         :param int memory: RAM of the VS to be upgraded to.
         :param int nic_speed: The port speed to set
         :param bool public: CPU will be in Private/Public Node.
@@ -826,9 +830,28 @@ class VSManager(utils.IdentifierMixin, object):
         upgrade_prices = self._get_upgrade_prices(instance_id)
         prices = []
 
-        for option, value in {'cpus': cpus,
-                              'memory': memory,
-                              'nic_speed': nic_speed}.items():
+        data = {'nic_speed': nic_speed}
+
+        if cpus is not None and preset is not None:
+            raise exceptions.SoftLayerError("Do not use cpu, private and memory if you are using flavors")
+        data['cpus'] = cpus
+
+        if memory is not None and preset is not None:
+            raise exceptions.SoftLayerError("Do not use memory, private or cpu if you are using flavors")
+        data['memory'] = memory
+
+        maintenance_window = datetime.datetime.now(utils.UTC())
+        order = {
+            'complexType': 'SoftLayer_Container_Product_Order_Virtual_Guest_'
+                           'Upgrade',
+            'properties': [{
+                'name': 'MAINTENANCE_WINDOW',
+                'value': maintenance_window.strftime("%Y-%m-%d %H:%M:%S%z")
+            }],
+            'virtualGuests': [{'id': int(instance_id)}],
+        }
+
+        for option, value in data.items():
             if not value:
                 continue
             price_id = self._get_price_id_for_upgrade_option(upgrade_prices,
@@ -841,19 +864,13 @@ class VSManager(utils.IdentifierMixin, object):
                     "Unable to find %s option with value %s" % (option, value))
 
             prices.append({'id': price_id})
+        order['prices'] = prices
 
-        maintenance_window = datetime.datetime.now(utils.UTC())
-        order = {
-            'complexType': 'SoftLayer_Container_Product_Order_Virtual_Guest_'
-                           'Upgrade',
-            'prices': prices,
-            'properties': [{
-                'name': 'MAINTENANCE_WINDOW',
-                'value': maintenance_window.strftime("%Y-%m-%d %H:%M:%S%z")
-            }],
-            'virtualGuests': [{'id': int(instance_id)}],
-        }
-        if prices:
+        if preset is not None:
+            vs_object = self.get_instance(instance_id)['billingItem']['package']
+            order['presetId'] = self.ordering_manager.get_preset_by_key(vs_object['keyName'], preset)['id']
+
+        if prices or preset:
             self.client['Product_Order'].placeOrder(order)
             return True
         return False
