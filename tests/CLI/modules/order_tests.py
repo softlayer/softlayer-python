@@ -47,26 +47,21 @@ class OrderTests(testing.TestCase):
         self.assertEqual(expected_results, json.loads(result.output))
 
     def test_package_list(self):
-        item1 = {'name': 'package1', 'keyName': 'PACKAGE1', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1}
-        item2 = {'name': 'package2', 'keyName': 'PACKAGE2', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1}
-        item3 = {'name': 'package2', 'keyName': 'PACKAGE2', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 0}
         p_mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        p_mock.return_value = [item1, item2, item3]
+        p_mock.return_value = _get_all_packages()
         _filter = {'type': {'keyName': {'operation': '!= BLUEMIX_SERVICE'}}}
 
         result = self.run_command(['order', 'package-list'])
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects', filter=_filter)
-        expected_results = [{'name': 'package1', 'keyName': 'PACKAGE1', 'type': 'BARE_METAL_CPU'},
-                            {'name': 'package2', 'keyName': 'PACKAGE2', 'type': 'BARE_METAL_CPU'}]
+        expected_results = [{'id': 1, 'name': 'package1', 'keyName': 'PACKAGE1', 'type': 'BARE_METAL_CPU'},
+                            {'id': 2, 'name': 'package2', 'keyName': 'PACKAGE2', 'type': 'BARE_METAL_CPU'}]
         self.assertEqual(expected_results, json.loads(result.output))
 
     def test_package_list_keyword(self):
-        item1 = {'name': 'package1', 'keyName': 'PACKAGE1', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1}
-        item2 = {'name': 'package2', 'keyName': 'PACKAGE2', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1}
         p_mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        p_mock.return_value = [item1, item2]
+        p_mock.return_value = _get_all_packages()
 
         _filter = {'type': {'keyName': {'operation': '!= BLUEMIX_SERVICE'}}}
         _filter['name'] = {'operation': '*= package1'}
@@ -74,23 +69,21 @@ class OrderTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects', filter=_filter)
-        expected_results = [{'name': 'package1', 'keyName': 'PACKAGE1', 'type': 'BARE_METAL_CPU'},
-                            {'name': 'package2', 'keyName': 'PACKAGE2', 'type': 'BARE_METAL_CPU'}]
+        expected_results = [{'id': 1, 'name': 'package1', 'keyName': 'PACKAGE1', 'type': 'BARE_METAL_CPU'},
+                            {'id': 2, 'name': 'package2', 'keyName': 'PACKAGE2', 'type': 'BARE_METAL_CPU'}]
         self.assertEqual(expected_results, json.loads(result.output))
 
     def test_package_list_type(self):
-        item1 = {'name': 'package1', 'keyName': 'PACKAGE1', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1}
-        item2 = {'name': 'package2', 'keyName': 'PACKAGE2', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1}
         p_mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        p_mock.return_value = [item1, item2]
+        p_mock.return_value = _get_all_packages()
 
         _filter = {'type': {'keyName': {'operation': 'BARE_METAL_CPU'}}}
         result = self.run_command(['order', 'package-list', '--package_type', 'BARE_METAL_CPU'])
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects', filter=_filter)
-        expected_results = [{'name': 'package1', 'keyName': 'PACKAGE1', 'type': 'BARE_METAL_CPU'},
-                            {'name': 'package2', 'keyName': 'PACKAGE2', 'type': 'BARE_METAL_CPU'}]
+        expected_results = [{'id': 1, 'name': 'package1', 'keyName': 'PACKAGE1', 'type': 'BARE_METAL_CPU'},
+                            {'id': 2, 'name': 'package2', 'keyName': 'PACKAGE2', 'type': 'BARE_METAL_CPU'}]
         self.assertEqual(expected_results, json.loads(result.output))
 
     def test_place(self):
@@ -256,3 +249,13 @@ class OrderTests(testing.TestCase):
         price2 = {'item': item2, 'hourlyRecurringFee': '0.05',
                   'recurringFee': '150'}
         return {'orderContainers': [{'prices': [price1, price2]}]}
+
+
+def _get_all_packages():
+    package_type = {'keyName': 'BARE_METAL_CPU'}
+    all_packages = [
+        {'id': 1, 'name': 'package1', 'keyName': 'PACKAGE1', 'type': package_type, 'isActive': 1},
+        {'id': 2, 'name': 'package2', 'keyName': 'PACKAGE2', 'type': package_type, 'isActive': 1},
+        {'id': 3, 'name': 'package2', 'keyName': 'PACKAGE2', 'type': package_type, 'isActive': 0}
+    ]
+    return all_packages
