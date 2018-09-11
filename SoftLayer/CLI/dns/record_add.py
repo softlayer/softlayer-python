@@ -75,19 +75,16 @@ def cli(env, record, type, data, zone, ttl, priority, protocol, port, service, w
         zone_id = helpers.resolve_id(manager.resolve_ids, zone, name='zone')
 
         if type == 'MX':
-            result = manager.create_record_mx(zone_id, record, data, ttl=ttl, priority=priority)
+            manager.create_record_mx(zone_id, record, data, ttl=ttl, priority=priority)
         elif type == 'SRV':
-            result = manager.create_record_srv(zone_id, record, data, protocol, port, service,
-                                               ttl=ttl, priority=priority, weight=weight)
+            manager.create_record_srv(zone_id, record, data, protocol, port, service,
+                                      ttl=ttl, priority=priority, weight=weight)
         else:
-            result = manager.create_record(zone_id, record, type, data, ttl=ttl)
+            manager.create_record(zone_id, record, type, data, ttl=ttl)
 
     elif type == 'PTR':
-        result = manager.create_record_ptr(record, data, ttl=ttl)
+        manager.create_record_ptr(record, data, ttl=ttl)
     else:
         raise exceptions.CLIAbort("%s isn't a valid record type or zone is missing" % (type))
 
-    if result:
-        click.secho("%s record added successfully" % (type), fg='green')
-    else:
-        click.secho("Failed to add %s record" % (type), fg='red')
+    click.secho("%s record added successfully" % (type), fg='green')
