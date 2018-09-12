@@ -55,7 +55,7 @@ def cli(env, identifier, no_vs, no_hardware):
                                   vsi.get('primaryBackendIpAddress')])
             table.add_row(['vs', vs_table])
         else:
-            table.add_row(['vs', 'none'])
+            table.add_row(['vs', []])
 
     if not no_hardware:
         if subnet['hardware']:
@@ -67,6 +67,6 @@ def cli(env, identifier, no_vs, no_hardware):
                                   hardware.get('primaryBackendIpAddress')])
             table.add_row(['hardware', hw_table])
         else:
-            table.add_row(['hardware', 'none'])
+            table.add_row(['hardware',[]])
 
     env.fout(table)
