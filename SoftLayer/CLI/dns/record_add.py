@@ -12,7 +12,7 @@ from SoftLayer.CLI import helpers
 
 @click.command()
 @click.argument('record')
-@click.argument('type')
+@click.argument('record_type')
 @click.argument('data')
 @click.option('--zone',
               help="Zone name or identifier that the resource record will be associated with.\n"
@@ -40,7 +40,7 @@ from SoftLayer.CLI import helpers
               show_default=True,
               help='Relative weight for records with same priority. (SRV type only)')
 @environment.pass_env
-def cli(env, record, type, data, zone, ttl, priority, protocol, port, service, weight):
+def cli(env, record, record_type, data, zone, ttl, priority, protocol, port, service, weight):
     """Add resource record.
 
     Each resource record contains a RECORD and DATA property, defining a resource's name and it's target data.
@@ -69,7 +69,7 @@ def cli(env, record, type, data, zone, ttl, priority, protocol, port, service, w
     """
 
     manager = SoftLayer.DNSManager(env.client)
-    record_type = type.upper()
+    record_type = record_type.upper()
 
     if zone and record_type != 'PTR':
         zone_id = helpers.resolve_id(manager.resolve_ids, zone, name='zone')
