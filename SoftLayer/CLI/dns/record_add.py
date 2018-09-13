@@ -69,22 +69,22 @@ def cli(env, record, type, data, zone, ttl, priority, protocol, port, service, w
     """
 
     manager = SoftLayer.DNSManager(env.client)
-    type = type.upper()
+    record_type = type.upper()
 
-    if zone and type != 'PTR':
+    if zone and record_type != 'PTR':
         zone_id = helpers.resolve_id(manager.resolve_ids, zone, name='zone')
 
-        if type == 'MX':
+        if record_type == 'MX':
             manager.create_record_mx(zone_id, record, data, ttl=ttl, priority=priority)
-        elif type == 'SRV':
+        elif record_type == 'SRV':
             manager.create_record_srv(zone_id, record, data, protocol, port, service,
                                       ttl=ttl, priority=priority, weight=weight)
         else:
-            manager.create_record(zone_id, record, type, data, ttl=ttl)
+            manager.create_record(zone_id, record, record_type, data, ttl=ttl)
 
-    elif type == 'PTR':
+    elif record_type == 'PTR':
         manager.create_record_ptr(record, data, ttl=ttl)
     else:
-        raise exceptions.CLIAbort("%s isn't a valid record type or zone is missing" % (type))
+        raise exceptions.CLIAbort("%s isn't a valid record type or zone is missing" % record_type)
 
-    click.secho("%s record added successfully" % (type), fg='green')
+    click.secho("%s record added successfully" % record_type, fg='green')
