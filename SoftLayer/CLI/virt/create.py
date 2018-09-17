@@ -270,34 +270,17 @@ def cli(env, **args):
     output = []
     if args.get('test'):
         result = vsi.verify_create_instance(**data)
-        total_monthly = 0.0
-        total_hourly = 0.0
-        total_preset_monthly = 0.0
-        total_preset_hourly = 0.0
-
-        table = formatting.Table(['Item', 'cost'])
-        table.align['Item'] = 'r'
-        table.align['cost'] = 'r'
 
         if result['presetId']:
             ordering_mgr = SoftLayer.OrderingManager(env.client)
             preset_prices = ordering_mgr.get_preset_prices(result['presetId'])
-            total_preset_hourly, total_preset_monthly = get_total_recurring_fee(args, preset_prices, table,
-                                                                                total_preset_hourly,
-                                                                                total_preset_monthly)
+            search_keys = ["guest_core", "ram"]
+            for price in preset_prices['prices']:
+                if price['item']['itemCategory']['categoryCode'] in search_keys:
+                    result['prices'].append(price)
 
-        total_hourly, total_monthly = get_total_recurring_fee(args, result, table, total_hourly, total_monthly)
+        table = _build_receipt_table(result['prices'], args.get('billing'))
 
-        total = 0
-        if args.get('billing') == 'hourly':
-            total = total_hourly + total_preset_hourly
-        elif args.get('billing') == 'monthly':
-            total = total_monthly + total_preset_monthly
-
-        billing_rate = 'monthly'
-        if args.get('billing') == 'hourly':
-            billing_rate = 'hourly'
-        table.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
         output.append(table)
         output.append(formatting.FormattedItem(
             None,
@@ -335,18 +318,23 @@ def cli(env, **args):
     env.fout(output)
 
 
-def get_total_recurring_fee(args, result, table, total_hourly, total_monthly):
+def _build_receipt_table(prices, billing="hourly"):
     """Retrieve the total recurring fee of the items prices"""
-    for price in result['prices']:
-        total_monthly += float(price.get('recurringFee', 0.0))
-        total_hourly += float(price.get('hourlyRecurringFee', 0.0))
-        if args.get('billing') == 'hourly':
-            rate = "%.2f" % float(price['hourlyRecurringFee'])
-        elif args.get('billing') == 'monthly':
-            rate = "%.2f" % float(price['recurringFee'])
+    total = 0.000
+    table = formatting.Table(['Cost', 'Item'])
+    table.align['Cost'] = 'r'
+    table.align['Item'] = 'l'
+    for price in prices:
+        rate = 0.000
+        if billing == "hourly":
+            rate += float(price.get('hourlyRecurringFee', 0.000))
+        else:
+            rate += float(price.get('recurringFee', 0.000))
+        total += rate
 
-        table.add_row([price['item']['description'], rate])
-    return total_hourly, total_monthly
+        table.add_row(["%.3f" % rate, price['item']['description']])
+    table.add_row(["%.3f" % total, "Total %s cost" % billing])
+    return table
 
 
 def _validate_args(env, args):

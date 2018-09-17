@@ -10,6 +10,10 @@ getObject = {
                 "description": "1 x P100 GPU",
                 "id": 10933,
                 "keyName": "1_X_P100_GPU",
+                "itemCategory": {
+                    "categoryCode": "guest_pcie_device0",
+                    "id": 1259
+                }
             }
         },
         {
@@ -20,6 +24,10 @@ getObject = {
                 "description": "25 GB (SAN)",
                 "id": 1178,
                 "keyName": "GUEST_DISK_25_GB_SAN",
+                "itemCategory": {
+                    "categoryCode": "guest_disk0",
+                    "id": 81
+                }
             }
         },
         {
@@ -30,6 +38,10 @@ getObject = {
                 "description": "60 GB",
                 "id": 10939,
                 "keyName": "RAM_0_UNIT_PLACEHOLDER_10",
+                "itemCategory": {
+                    "categoryCode": "ram",
+                    "id": 3
+                }
             }
         },
         {
@@ -40,6 +52,10 @@ getObject = {
                 "description": "8 x 2.0 GHz or higher Cores",
                 "id": 11307,
                 "keyName": "GUEST_CORE_8",
+                "itemCategory": {
+                    "categoryCode": "guest_core",
+                    "id": 80
+                }
             }
         }
     ]

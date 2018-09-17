@@ -69,55 +69,10 @@ class OrderingTests(testing.TestCase):
         self.assertEqual(46, package_id)
 
     def test_get_preset_prices(self):
-        preset_id = 405
-        preset_prices = self.ordering.get_preset_prices(preset_id)
+        result = self.ordering.get_preset_prices(405)
 
-        self.assertEqual(preset_prices, {
-            "id": 405,
-            "keyName": "AC1_8X60X25",
-            "prices": [
-                {
-                    "hourlyRecurringFee": "1.425",
-                    "id": 207345,
-                    "recurringFee": "936.23",
-                    "item": {
-                        "description": "1 x P100 GPU",
-                        "id": 10933,
-                        "keyName": "1_X_P100_GPU",
-                    }
-                },
-                {
-                    "hourlyRecurringFee": "0",
-                    "id": 2202,
-                    "recurringFee": "0",
-                    "item": {
-                        "description": "25 GB (SAN)",
-                        "id": 1178,
-                        "keyName": "GUEST_DISK_25_GB_SAN",
-                    }
-                },
-                {
-                    "hourlyRecurringFee": ".342",
-                    "id": 207361,
-                    "recurringFee": "224.69",
-                    "item": {
-                        "description": "60 GB",
-                        "id": 10939,
-                        "keyName": "RAM_0_UNIT_PLACEHOLDER_10",
-                    }
-                },
-                {
-                    "hourlyRecurringFee": ".181",
-                    "id": 209595,
-                    "recurringFee": "118.26",
-                    "item": {
-                        "description": "8 x 2.0 GHz or higher Cores",
-                        "id": 11307,
-                        "keyName": "GUEST_CORE_8",
-                    }
-                }
-            ]
-        })
+        self.assertEqual(result, fixtures.SoftLayer_Product_Package_Preset.getObject)
+        self.assert_called_with('SoftLayer_Product_Package_Preset', 'getObject')
 
     def test_get_package_id_by_type_fails_for_nonexistent_package_type(self):
         p_mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
