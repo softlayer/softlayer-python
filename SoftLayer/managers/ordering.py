@@ -384,6 +384,20 @@ class OrderingManager(object):
         prices = self.package_preset.getObject(id=preset, mask=mask)
         return prices
 
+    def get_item_prices(self, package_id):
+        """Get item prices.
+
+        Retrieve a SoftLayer_Product_Package item prices record.
+
+        :param int package_id: package identifier.
+        :returns: A list of price IDs associated with the given package.
+
+        """
+        mask = 'mask[pricingLocationGroup[locations]]'
+
+        prices = self.package_svc.getItemPrices(id=package_id, mask=mask)
+        return prices
+
     def verify_order(self, package_keyname, location, item_keynames, complex_type=None,
                      hourly=True, preset_keyname=None, extras=None, quantity=1):
         """Verifies an order with the given package and prices.

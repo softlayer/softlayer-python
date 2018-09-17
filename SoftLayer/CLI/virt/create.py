@@ -273,11 +273,13 @@ def cli(env, **args):
 
         if result['presetId']:
             ordering_mgr = SoftLayer.OrderingManager(env.client)
+            item_prices = ordering_mgr.get_item_prices(result['packageId'])
             preset_prices = ordering_mgr.get_preset_prices(result['presetId'])
             search_keys = ["guest_core", "ram"]
             for price in preset_prices['prices']:
                 if price['item']['itemCategory']['categoryCode'] in search_keys:
-                    result['prices'].append(price)
+                    item_key_name = price['item']['keyName']
+                    _add_item_prices(item_key_name, item_prices, result)
 
         table = _build_receipt_table(result['prices'], args.get('billing'))
 
@@ -316,6 +318,16 @@ def cli(env, **args):
                 raise exceptions.CLIHalt(code=1)
 
     env.fout(output)
+
+
+def _add_item_prices(item_key_name, item_prices, result):
+    """Add the flavor item prices to the rest o the items prices"""
+    for item in item_prices:
+        if item_key_name == item['item']['keyName']:
+            if 'pricingLocationGroup' in item:
+                for location in item['pricingLocationGroup']['locations']:
+                    if result['location'] == str(location['id']):
+                        result['prices'].append(item)
 
 
 def _build_receipt_table(prices, billing="hourly"):
