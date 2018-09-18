@@ -89,17 +89,81 @@ class DNSManager(utils.IdentifierMixin, object):
 
         :param integer id: the zone's ID
         :param record: the name of the record to add
-        :param record_type: the type of record (A, AAAA, CNAME, MX, TXT, etc.)
+        :param record_type: the type of record (A, AAAA, CNAME, TXT, etc.)
         :param data: the record's value
         :param integer ttl: the TTL or time-to-live value (default: 60)
 
         """
-        return self.record.createObject({
-            'domainId': zone_id,
-            'ttl': ttl,
+        resource_record = self._generate_create_dict(record, record_type, data,
+                                                     ttl, domainId=zone_id)
+        return self.record.createObject(resource_record)
+
+    def create_record_mx(self, zone_id, record, data, ttl=60, priority=10):
+        """Create a mx resource record on a domain.
+
+        :param integer id: the zone's ID
+        :param record: the name of the record to add
+        :param data: the record's value
+        :param integer ttl: the TTL or time-to-live value (default: 60)
+        :param integer priority: the priority of the target host
+
+        """
+        resource_record = self._generate_create_dict(record, 'MX', data, ttl,
+                                                     domainId=zone_id, mxPriority=priority)
+        return self.record.createObject(resource_record)
+
+    def create_record_srv(self, zone_id, record, data, protocol, port, service,
+                          ttl=60, priority=20, weight=10):
+        """Create a resource record on a domain.
+
+        :param integer id: the zone's ID
+        :param record: the name of the record to add
+        :param data: the record's value
+        :param string protocol: the protocol of the service, usually either TCP or UDP.
+        :param integer port: the TCP or UDP port on which the service is to be found.
+        :param string service: the symbolic name of the desired service.
+        :param integer ttl: the TTL or time-to-live value (default: 60)
+        :param integer priority: the priority of the target host (default: 20)
+        :param integer weight: relative weight for records with same priority (default: 10)
+
+        """
+        resource_record = self._generate_create_dict(record, 'SRV', data, ttl, domainId=zone_id,
+                                                     priority=priority, protocol=protocol, port=port,
+                                                     service=service, weight=weight)
+
+        # The createObject won't creates SRV records unless we send the following complexType.
+        resource_record['complexType'] = 'SoftLayer_Dns_Domain_ResourceRecord_SrvType'
+
+        return self.record.createObject(resource_record)
+
+    def create_record_ptr(self, record, data, ttl=60):
+        """Create a reverse record.
+
+        :param record: the public ip address of device for which you would like to manage reverse DNS.
+        :param data: the record's value
+        :param integer ttl: the TTL or time-to-live value (default: 60)
+
+        """
+        resource_record = self._generate_create_dict(record, 'PTR', data, ttl)
+
+        return self.record.createObject(resource_record)
+
+    @staticmethod
+    def _generate_create_dict(record, record_type, data, ttl, **kwargs):
+        """Returns a dict appropriate to pass into Dns_Domain_ResourceRecord::createObject"""
+
+        # Basic dns record structure
+        resource_record = {
             'host': record,
-            'type': record_type,
-            'data': data})
+            'data': data,
+            'ttl': ttl,
+            'type': record_type
+        }
+
+        for (key, value) in kwargs.items():
+            resource_record.setdefault(key, value)
+
+        return resource_record
 
     def delete_record(self, record_id):
         """Delete a resource record by its ID.
