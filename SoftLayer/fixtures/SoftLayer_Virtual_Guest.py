@@ -14,6 +14,10 @@ getObject = {
             {'nextInvoiceTotalRecurringAmount': 1},
             {'nextInvoiceTotalRecurringAmount': 1},
         ],
+        'package': {
+            "id": 835,
+            "keyName": "PUBLIC_CLOUD_SERVER"
+        },
         'orderItem': {
             'order': {
                 'userRecord': {

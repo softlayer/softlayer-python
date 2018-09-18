@@ -1514,3 +1514,31 @@ getItemPrices = [
         }
     }
 ]
+getActivePresets = [
+    {
+        "description": "M1.64x512x25",
+        "id": 799,
+        "isActive": "1",
+        "keyName": "M1_64X512X25",
+        "name": "M1.64x512x25",
+        "packageId": 835
+    },
+    {
+        "description": "M1.56x448x100",
+        "id": 797,
+        "isActive": "1",
+        "keyName": "M1_56X448X100",
+        "name": "M1.56x448x100",
+        "packageId": 835
+    },
+    {
+        "description": "M1.64x512x100",
+        "id": 801,
+        "isActive": "1",
+        "keyName": "M1_64X512X100",
+        "name": "M1.64x512x100",
+        "packageId": 835
+    }
+]
+
+getAccountRestrictedActivePresets = []
