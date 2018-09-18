@@ -68,6 +68,18 @@ class OrderingTests(testing.TestCase):
 
         self.assertEqual(46, package_id)
 
+    def test_get_preset_prices(self):
+        result = self.ordering.get_preset_prices(405)
+
+        self.assertEqual(result, fixtures.SoftLayer_Product_Package_Preset.getObject)
+        self.assert_called_with('SoftLayer_Product_Package_Preset', 'getObject')
+
+    def test_get_item_prices(self):
+        result = self.ordering.get_item_prices(835)
+
+        self.assertEqual(result, fixtures.SoftLayer_Product_Package.getItemPrices)
+        self.assert_called_with('SoftLayer_Product_Package', 'getItemPrices')
+
     def test_get_package_id_by_type_fails_for_nonexistent_package_type(self):
         p_mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         p_mock.return_value = []
