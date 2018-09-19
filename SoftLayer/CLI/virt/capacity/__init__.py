@@ -26,7 +26,6 @@ class capacityCommands(click.MultiCommand):
             if filename.endswith('.py'):
                 rv.append(filename[:-3])
         rv.sort()
-        pp(rv)
         return rv
 
     def get_command(self, ctx, name):

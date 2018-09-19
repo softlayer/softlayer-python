@@ -1,4 +1,4 @@
-"""List Reserved Capacity"""
+"""Create a Reserved Capacity instance"""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -14,7 +14,6 @@ from pprint import pprint as pp
 @click.command()
 @environment.pass_env
 def cli(env):
-    """List Reserved Capacity"""
+    """Create a Reserved Capacity instance"""
     manager = CapacityManager(env.client)
-    result = manager.list()
-    pp(result)
+
