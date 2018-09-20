@@ -26,8 +26,15 @@ def cli(env):
         table.add_row([
             item['keyName'], item['description'], item['capacity'], get_price(item)
         ])
-    # pp(items)
     env.fout(table)
+
+    regions = manager.get_available_routers()
+    location_table = formatting.Table(['Location', 'POD', 'BackendRouterId'], 'Orderable Locations')
+    for region in regions:
+        for location in region['locations']:
+            for pod in location['location']['pods']:
+                location_table.add_row([region['keyname'], pod['backendRouterName'], pod['backendRouterId']])
+    env.fout(location_table)
 
 
 def get_price(item):
@@ -37,4 +44,5 @@ def get_price(item):
             the_price = "%0.4f"  % float(price['hourlyRecurringFee'])
     return the_price
 
-
+def get_router_ids():
+    pass
