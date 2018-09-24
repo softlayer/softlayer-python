@@ -36,4 +36,4 @@ def cli(env):
         capacity = "%s%s" % (occupied_string, available_string)
         table.add_row([rc['id'], rc['name'], capacity, flavor, cost_string, rc['createDate']])
     env.fout(table)
-    # pp(result)
+    pp(result)

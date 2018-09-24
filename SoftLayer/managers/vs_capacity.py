@@ -92,6 +92,9 @@ class CapacityManager(utils.IdentifierMixin, object):
             receipt = self.ordering_manager.place_order(*args, **kwargs)
         return receipt
 
+    def create_guest(self):
+        
+
 
 
 """
