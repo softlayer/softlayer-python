@@ -33,13 +33,20 @@ class CapacityManager(utils.IdentifierMixin, object):
         self.client = client
         self.account = client['Account']
         self.capacity_package = 'RESERVED_CAPACITY'
+        self.rcg_service = 'Virtual_ReservedCapacityGroup'
 
         if ordering_manager is None:
             self.ordering_manager = ordering.OrderingManager(client)
 
     def list(self):
-        results = self.client.call('Account', 'getReservedCapacityGroups')
+        mask = "mask[availableInstanceCount, occupiedInstanceCount, instances[billingItem], instanceCount]"
+        results = self.client.call('Account', 'getReservedCapacityGroups', mask=mask)
         return results
+
+    def get_object(self, identifier):
+        mask = "mask[instances[billingItem]]"
+        result = self.client.call(self.rcg_service, 'getObject', id=identifier, mask=mask)
+        return result
 
     def get_create_options(self):
         mask = "mask[attributes,prices[pricingLocationGroup]]"
