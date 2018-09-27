@@ -5,7 +5,7 @@ from os import path
 import click
 
 import SoftLayer
-from SoftLayer.CLI import environment
+from SoftLayer.CLI import environment, formatting
 from SoftLayer.CLI import exceptions
 
 
@@ -40,4 +40,12 @@ def cli(env, label, in_file, key, note):
     mgr = SoftLayer.SshKeyManager(env.client)
     result = mgr.add_key(key_text, label, note)
 
-    env.fout("SSH key added: %s" % result.get('fingerprint'))
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
+
+    table.add_row(['id', result['id']])
+    table.add_row(['label', result['label']])
+    table.add_row(['fingerprint', result['fingerprint']])
+
+    env.fout(table)
