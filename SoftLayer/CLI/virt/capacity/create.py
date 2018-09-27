@@ -11,7 +11,8 @@ from SoftLayer.managers.vs_capacity import CapacityManager as CapacityManager
 
 from pprint import pprint as pp
 
-@click.command(epilog="See 'slcli vs capacity create-options' for valid options")
+@click.command(epilog=click.style("""WARNING: Reserved Capacity is on a yearly contract"""
+                                  """ and not cancelable until the contract is expired.""", fg='red'))
 @click.option('--name', '-n', required=True, prompt=True,
               help="Name for your new reserved capacity")
 @click.option('--datacenter', '-d', required=True, prompt=True,

@@ -18,22 +18,24 @@ def cli(env):
     manager = CapacityManager(env.client)
     result = manager.list()
     table = formatting.Table(
-        ["ID", "Name", "Capacity", "Flavor", "Instance Cost", "Created"], 
+        ["ID", "Name", "Capacity", "Flavor", "Location",  "Created"], 
         title="Reserved Capacity"
     )
     for rc in result:
-        occupied_string = "#" * int(rc.get('occupiedInstancesCount',0))
+        occupied_string = "#" * int(rc.get('occupiedInstanceCount',0))
         available_string = "-" * int(rc.get('availableInstanceCount',0))
 
         try:
             flavor = rc['instances'][0]['billingItem']['description']
             cost = float(rc['instances'][0]['billingItem']['hourlyRecurringFee'])
-            instance_count = int(rc.get('instanceCount',0)) 
-            cost_string = "%s * %s = %s" % (cost, instance_count, cost * instance_count)
+            # instance_count = int(rc.get('instanceCount',0)) 
+            # cost_string = "%s * %s = %s" % (cost, instance_count, cost * instance_count)
         except KeyError:
             flavor = "Unknown Billing Item"
-            cost_string = "-"
+            # cost_string = "-"
+        location = rc['backendRouter']['hostname']
         capacity = "%s%s" % (occupied_string, available_string)
-        table.add_row([rc['id'], rc['name'], capacity, flavor, cost_string, rc['createDate']])
+        table.add_row([rc['id'], rc['name'], capacity, flavor, location, rc['createDate']])
     env.fout(table)
-    pp(result)
+    print("")
+    # pp(result)
