@@ -117,6 +117,7 @@ def _parse_create_args(client, args):
               help="Test order, will return the order container, but not actually order a server.")
 @environment.pass_env
 def cli(env, **args):
+    """Allows for creating a virtual guest in a reserved capacity."""
     create_args = _parse_create_args(env.client, args)
     manager = CapacityManager(env.client)
     capacity_id = args.get('capacity_id')

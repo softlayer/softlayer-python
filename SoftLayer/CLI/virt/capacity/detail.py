@@ -47,7 +47,7 @@ DEFAULT_COLUMNS = [
               show_default=True)
 @environment.pass_env
 def cli(env, identifier, columns):
-    """Reserved Capacity Group Details"""
+    """Reserved Capacity Group details. Will show which guests are assigned to a reservation."""
     manager = CapacityManager(env.client)
     mask = "mask[instances[billingItem[category], guest]]"
     result = manager.get_object(identifier, mask)

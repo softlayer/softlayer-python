@@ -14,7 +14,7 @@ from pprint import pprint as pp
 @click.command()
 @environment.pass_env
 def cli(env):
-    """List Reserved Capacity"""
+    """List Reserved Capacity groups."""
     manager = CapacityManager(env.client)
     result = manager.list()
     table = formatting.Table(

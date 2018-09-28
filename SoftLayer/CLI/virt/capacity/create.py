@@ -1,4 +1,7 @@
-"""Create a Reserved Capacity instance"""
+"""Create a Reserved Capacity instance. 
+
+
+"""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -27,7 +30,7 @@ from pprint import pprint as pp
               help="Do not actually create the virtual server")
 @environment.pass_env
 def cli(env, name, datacenter, backend_router_id, capacity, quantity, test=False):
-    """Create a Reserved Capacity instance"""
+    """Create a Reserved Capacity instance. *WARNING*: Reserved Capacity is on a yearly contract and not cancelable until the contract is expired."""
     manager = CapacityManager(env.client)
     result = manager.create(
         name=name,

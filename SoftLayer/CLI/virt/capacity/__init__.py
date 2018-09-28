@@ -9,6 +9,8 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 
 from pprint import pprint as pp
+CONTEXT = {'help_option_names': ['-h', '--help'],
+           'max_content_width': 999}
 class capacityCommands(click.MultiCommand):
     """Loads module for capacity related commands."""
 
@@ -18,7 +20,6 @@ class capacityCommands(click.MultiCommand):
 
     def list_commands(self, ctx):
         """List all sub-commands."""
- 
         rv = []
         for filename in os.listdir(self.path):
             if filename == '__init__.py':
@@ -34,9 +35,9 @@ class capacityCommands(click.MultiCommand):
         module = importlib.import_module(path)
         return getattr(module, 'cli')
 
-@click.group(cls=capacityCommands, 
-             help="Manages virtual server reserved capacity")
+@click.group(cls=capacityCommands,
+             context_settings=CONTEXT)
 @environment.pass_env
 def cli(env):
-    """Manages Capacity"""
+    """Manages Reserved Capacity"""
     pass
