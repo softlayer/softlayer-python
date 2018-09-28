@@ -37,6 +37,43 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         if ordering_manager is None:
             self.ordering_manager = ordering.OrderingManager(client)
 
+    def cancel_host(self, host_id, reason='unneeded', comment='', immediate=True):
+        """Cancels the specified dedicated server.
+
+        Example::
+
+            # Cancels dedicated host id 1234
+            result = mgr.cancel_host(host_id=1234)
+
+        :param int host_id: The ID of the dedicated host to be cancelled.
+        :param string reason: The reason code for the cancellation. This should come from
+                              :func:`get_cancellation_reasons`.
+        :param string comment: An optional comment to include with the cancellation.
+        :param bool immediate: If set to True, will automatically update the cancelation ticket to request
+                               the resource be reclaimed asap. This request still has to be reviewed by a human
+        :returns: True on success or an exception
+        """
+
+        # Get cancel reason
+        reasons = self.get_cancellation_reasons()
+        cancel_reason = reasons.get(reason, reasons['unneeded'])
+        ticket_mgr = SoftLayer.TicketManager(self.client)
+        mask = 'mask[id, billingItem[id]]'
+        host_billing = self.get_host(host_id, mask=mask)
+
+
+        if 'billingItem' not in host_billing:
+            raise SoftLayer.SoftLayerError("Ticket #%s already exists for this server" %
+                                           host_billing['openCancellationTicket']['id'])
+
+        billing_id = host_billing['billingItem']['id']
+
+        result = self.client.call('Billing_Item', 'cancelItem',
+                                  immediate, False, cancel_reason, comment, id=billing_id)
+        host_billing = self.get_host(host_id, mask=mask)
+
+        return result
+
     def list_instances(self, tags=None, cpus=None, memory=None, hostname=None,
                        disk=None, datacenter=None, **kwargs):
         """Retrieve a list of all dedicated hosts on the account
@@ -92,6 +129,27 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
 
         kwargs['filter'] = _filter.to_dict()
         return self.account.getDedicatedHosts(**kwargs)
+
+
+    def get_cancellation_reasons(self):
+        """Returns a dictionary of valid cancellation reasons.
+
+        These can be used when cancelling a dedicated server
+        via :func:`cancel_host`.
+        """
+        return {
+            'unneeded': 'No longer needed',
+            'closing': 'Business closing down',
+            'cost': 'Server / Upgrade Costs',
+            'migrate_larger': 'Migrating to larger server',
+            'migrate_smaller': 'Migrating to smaller server',
+            'datacenter': 'Migrating to a different SoftLayer datacenter',
+            'performance': 'Network performance / latency',
+            'support': 'Support response / timing',
+            'sales': 'Sales process / upgrades',
+            'moving': 'Moving to competitor',
+        }
+
 
     def get_host(self, host_id, **kwargs):
         """Get details about a dedicated host.
