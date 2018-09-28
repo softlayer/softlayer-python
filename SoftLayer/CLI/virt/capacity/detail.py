@@ -49,7 +49,8 @@ DEFAULT_COLUMNS = [
 def cli(env, identifier, columns):
     """Reserved Capacity Group details. Will show which guests are assigned to a reservation."""
     manager = CapacityManager(env.client)
-    mask = "mask[instances[billingItem[category], guest]]"
+    mask = """mask[instances[id,createDate,guestId,billingItem[id, recurringFee, category[name]], 
+              guest[modifyDate,id, primaryBackendIpAddress, primaryIpAddress,domain, hostname]]]"""
     result = manager.get_object(identifier, mask)
     try:
         flavor = result['instances'][0]['billingItem']['description']

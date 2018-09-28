@@ -53,34 +53,49 @@ instances[id, billingItem[description, hourlyRecurringFee]], instanceCount, back
 
     def get_create_options(self):
         mask = "mask[attributes,prices[pricingLocationGroup]]"
-        # mask = "mask[id, description, capacity, units]"
         results = self.ordering_manager.list_items(self.capacity_package, mask=mask)
         return results
 
-    def get_available_routers(self):
-        """Pulls down all backendRouterIds that are available"""
+    def get_available_routers(self, dc=None):
+        """Pulls down all backendRouterIds that are available
+
+        :param string dc: A specific location to get routers for, like 'dal13'.
+        :returns list: A list of locations where RESERVED_CAPACITY can be ordered.
+        """
         mask = "mask[locations]"
         # Step 1, get the package id
         package = self.ordering_manager.get_package_by_key(self.capacity_package, mask="id")
 
         # Step 2, get the regions this package is orderable in
-        regions = self.client.call('Product_Package', 'getRegions', id=package['id'], mask=mask)
-        _filter = {'datacenterName': {'operation': ''}}
+        regions = self.client.call('Product_Package', 'getRegions', id=package['id'], mask=mask, iter=True)
+        _filter = None
         routers = {}
+        if dc is not None:
+            _filter = {'datacenterName': {'operation': dc}}
 
         # Step 3, for each location in each region, get the pod details, which contains the router id
+        pods = self.client.call('Network_Pod', 'getAllObjects', filter=_filter, iter=True)
         for region  in regions:
             routers[region['keyname']] = []
             for location in region['locations']:
                 location['location']['pods'] = list()
-                _filter['datacenterName']['operation'] = location['location']['name']
-                location['location']['pods'] = self.client.call('Network_Pod', 'getAllObjects', filter=_filter)
+                for pod in pods:
+                    if pod['datacenterName'] == location['location']['name']:
+                        location['location']['pods'].append(pod)
 
         # Step 4, return the data.
         return regions
 
     def create(self, name, datacenter, backend_router_id, capacity, quantity, test=False):
-        """Orders a Virtual_ReservedCapacityGroup"""
+        """Orders a Virtual_ReservedCapacityGroup
+
+        :params string name: Name for the new reserved capacity
+        :params string datacenter: like 'dal13'
+        :params int backend_router_id: This selects the pod. See create_options for a list
+        :params string capacity: Capacity KeyName, see create_options for a list
+        :params int quantity: Number of guest this capacity can support
+        :params bool test: If True, don't actually order, just test.
+        """
         args = (self.capacity_package, datacenter, [capacity])
         extras = {"backendRouterId": backend_router_id, "name": name}
         kwargs = {
@@ -96,6 +111,18 @@ instances[id, billingItem[description, hourlyRecurringFee]], instanceCount, back
         return receipt
 
     def create_guest(self, capacity_id, test, guest_object):
+        """Turns an empty Reserve Capacity into a real Virtual Guest
+
+        :params int capacity_id: ID of the RESERVED_CAPACITY_GROUP to create this guest into
+        :params bool test: True will use verifyOrder, False will use placeOrder
+        :params dictionary guest_object:  Below is the minimum info you need to send in
+            guest_object = {
+                'domain': 'test.com',
+                'hostname': 'A1538172419',
+                'os_code': 'UBUNTU_LATEST_64',
+                'primary_disk': '25',
+            }
+        """
         vs_manager = VSManager(self.client)
         mask = "mask[instances[id, billingItem[id, item[id,keyName]]], backendRouter[id, datacenter[name]]]"
         capacity = self.get_object(capacity_id)

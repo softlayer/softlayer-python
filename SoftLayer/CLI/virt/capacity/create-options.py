@@ -43,6 +43,3 @@ def get_price(item):
         if price.get('locationGroupId') == '':
             the_price = "%0.4f"  % float(price['hourlyRecurringFee'])
     return the_price
-
-def get_router_ids():
-    pass

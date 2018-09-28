@@ -1542,3 +1542,83 @@ getActivePresets = [
 ]
 
 getAccountRestrictedActivePresets = []
+
+RESERVED_CAPACITY = [{"id": 1059}]
+getItems_RESERVED_CAPACITY = [
+    {
+        'id': 12273,
+        'keyName': 'B1_1X2_1_YEAR_TERM',
+        'itemCategory': {
+            'categoryCode': 'reserved_capacity',
+            'id': 2060,
+            'name': 'Reserved Capacity',
+            'quantityLimit': 20,
+            'sortOrder': ''
+        },
+        'prices': [
+            {
+                'currentPriceFlag': '',
+                'hourlyRecurringFee': '.032',
+                'id': 217561,
+                'itemId': 12273,
+                'laborFee': '0',
+                'locationGroupId': '',
+                'onSaleFlag': '',
+                'oneTimeFee': '0',
+                'quantity': '',
+                'setupFee': '0',
+                'sort': 0,
+                'tierMinimumThreshold': '',
+                'categories': [
+                    {
+                        'categoryCode': 'reserved_capacity',
+                        'id': 2060,
+                        'name': 'Reserved Capacity',
+                        'quantityLimit': 20,
+                        'sortOrder': ''
+                    }
+                ]
+            }
+        ]
+    }
+]
+
+getItems_1_IPV6_ADDRESS = [
+    {
+        'id': 4097,
+        'keyName': '1_IPV6_ADDRESS',
+        'itemCategory': {
+            'categoryCode': 'pri_ipv6_addresses',
+            'id': 325,
+            'name': 'Primary IPv6 Addresses',
+            'quantityLimit': 0,
+            'sortOrder': 34
+        },
+        'prices': [
+            {
+                'currentPriceFlag': '',
+                'hourlyRecurringFee': '0',
+                'id': 17129,
+                'itemId': 4097,
+                'laborFee': '0',
+                'locationGroupId': '',
+                'onSaleFlag': '',
+                'oneTimeFee': '0',
+                'quantity': '',
+                'recurringFee': '0',
+                'setupFee': '0',
+                'sort': 0,
+                'tierMinimumThreshold': '',
+                'categories': [
+                    {
+                        'categoryCode': 'pri_ipv6_addresses',
+                        'id': 325,
+                        'name': 'Primary IPv6 Addresses',
+                        'quantityLimit': 0,
+                        'sortOrder': 34
+                    }
+                ]
+            }
+        ]
+    }
+]
