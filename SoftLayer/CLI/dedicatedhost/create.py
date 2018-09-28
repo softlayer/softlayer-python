@@ -12,7 +12,7 @@ from SoftLayer.CLI import template
 
 @click.command(
     epilog="See 'slcli dedicatedhost create-options' for valid options.")
-@click.option('--hostname', '-H',
+@click.option('--hostnames', '-H',
               help="Host portion of the FQDN",
               required=True,
               prompt=True)
@@ -51,7 +51,7 @@ def cli(env, **kwargs):
     mgr = SoftLayer.DedicatedHostManager(env.client)
 
     order = {
-        'hostname': kwargs['hostname'],
+        'hostnames': kwargs['hostnames'].split(','),
         'domain': kwargs['domain'],
         'flavor': kwargs['flavor'],
         'location': kwargs['datacenter'],

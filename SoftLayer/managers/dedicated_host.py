@@ -213,7 +213,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
 
         return self.host.getObject(id=host_id, **kwargs)
 
-    def place_order(self, hostname, domain, location, flavor, hourly, router=None):
+    def place_order(self, hostnames, domain, location, flavor, hourly, router=None):
         """Places an order for a dedicated host.
 
         See get_create_options() for valid arguments.
@@ -225,7 +225,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                                False for monthly.
         :param int router: an optional value for selecting a backend router
         """
-        create_options = self._generate_create_dict(hostname=hostname,
+        create_options = self._generate_create_dict(hostnames=hostnames,
                                                     router=router,
                                                     domain=domain,
                                                     flavor=flavor,
@@ -234,14 +234,15 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
 
         return self.client['Product_Order'].placeOrder(create_options)
 
-    def verify_order(self, hostname, domain, location, hourly, flavor, router=None):
+    def verify_order(self, hostnames, domain, location, hourly, flavor, router=None):
         """Verifies an order for a dedicated host.
 
         See :func:`place_order` for a list of available options.
         """
 
-        create_options = self._generate_create_dict(hostname=hostname,
-                                                    router=router,
+        for hostname in hostnames:
+            create_options = self._generate_create_dict(hostnames=[hostname],
+                                                        router=router,
                                                     domain=domain,
                                                     flavor=flavor,
                                                     datacenter=location,
@@ -250,7 +251,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         return self.client['Product_Order'].verifyOrder(create_options)
 
     def _generate_create_dict(self,
-                              hostname=None,
+                              hostnames=None,
                               domain=None,
                               flavor=None,
                               router=None,
@@ -268,25 +269,28 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
 
         router = self._get_default_router(routers, router)
 
-        hardware = {
-            'hostname': hostname,
-            'domain': domain,
-            'primaryBackendNetworkComponent': {
-                'router': {
-                    'id': router
+        hardwares = []
+        for hostname in hostnames:
+            hardware = {
+                'hostname': hostname,
+                'domain': domain,
+                'primaryBackendNetworkComponent': {
+                    'router': {
+                        'id': router
+                    }
                 }
             }
-        }
+            hardwares.append(hardware)
 
         complex_type = "SoftLayer_Container_Product_Order_Virtual_DedicatedHost"
 
         order = {
             "complexType": complex_type,
-            "quantity": 1,
+            "quantity": len(hardwares),
             'location': location['keyname'],
             'packageId': package['id'],
             'prices': [{'id': price}],
-            'hardware': [hardware],
+            'hardware': hardwares,
             'useHourlyPricing': hourly,
         }
         return order
