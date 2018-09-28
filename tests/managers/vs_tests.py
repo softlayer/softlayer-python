@@ -879,6 +879,22 @@ class VSTests(testing.TestCase):
         self.assertIn({'id': 1122}, order_container['prices'])
         self.assertEqual(order_container['virtualGuests'], [{'id': 1}])
 
+    def test_upgrade_with_flavor(self):
+        # Testing Upgrade with parameter preset
+        result = self.vs.upgrade(1,
+                                 preset="M1_64X512X100",
+                                 nic_speed=1000,
+                                 public=True)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
+        call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
+        order_container = call.args[0]
+        self.assertEqual(799, order_container['presetId'])
+        self.assertIn({'id': 1}, order_container['virtualGuests'])
+        self.assertIn({'id': 1122}, order_container['prices'])
+        self.assertEqual(order_container['virtualGuests'], [{'id': 1}])
+
     def test_upgrade_dedicated_host_instance(self):
         mock = self.set_mock('SoftLayer_Virtual_Guest', 'getUpgradeItemPrices')
         mock.return_value = fixtures.SoftLayer_Virtual_Guest.DEDICATED_GET_UPGRADE_ITEM_PRICES

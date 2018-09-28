@@ -68,6 +68,18 @@ class OrderingTests(testing.TestCase):
 
         self.assertEqual(46, package_id)
 
+    def test_get_preset_prices(self):
+        result = self.ordering.get_preset_prices(405)
+
+        self.assertEqual(result, fixtures.SoftLayer_Product_Package_Preset.getObject)
+        self.assert_called_with('SoftLayer_Product_Package_Preset', 'getObject')
+
+    def test_get_item_prices(self):
+        result = self.ordering.get_item_prices(835)
+
+        self.assertEqual(result, fixtures.SoftLayer_Product_Package.getItemPrices)
+        self.assert_called_with('SoftLayer_Product_Package', 'getItemPrices')
+
     def test_get_package_id_by_type_fails_for_nonexistent_package_type(self):
         p_mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         p_mock.return_value = []
@@ -424,6 +436,33 @@ class OrderingTests(testing.TestCase):
                                               preset_keyname=preset_keyname,
                                               complex_type=complex_type,
                                               extras=extras, quantity=quantity)
+
+        gen_mock.assert_called_once_with(pkg, location, items, hourly=hourly,
+                                         preset_keyname=preset_keyname,
+                                         complex_type=complex_type,
+                                         extras=extras, quantity=quantity)
+        self.assertEqual(ord_mock.return_value, order)
+
+    def test_place_quote(self):
+        ord_mock = self.set_mock('SoftLayer_Product_Order', 'placeQuote')
+        ord_mock.return_value = {'id': 1234}
+        pkg = 'PACKAGE_KEYNAME'
+        location = 'DALLAS13'
+        items = ['ITEM1', 'ITEM2']
+        hourly = False
+        preset_keyname = 'PRESET'
+        complex_type = 'Complex_Type'
+        extras = {'foo': 'bar'}
+        quantity = 1
+        name = 'wombat'
+        send_email = True
+
+        with mock.patch.object(self.ordering, 'generate_order') as gen_mock:
+            gen_mock.return_value = {'order': {}}
+
+            order = self.ordering.place_quote(pkg, location, items, preset_keyname=preset_keyname,
+                                              complex_type=complex_type, extras=extras, quantity=quantity,
+                                              quote_name=name, send_email=send_email)
 
         gen_mock.assert_called_once_with(pkg, location, items, hourly=hourly,
                                          preset_keyname=preset_keyname,
