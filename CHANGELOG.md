@@ -1,7 +1,16 @@
 # Change Log
 
+
+## [5.5.1] - 2018-08-31
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.5.1...v5.5.2
+
++ #1018 Fixed hardware credentials.
++ #1019 support for ticket priorities
++ #1025 create dedicated host with gpu fixed.
+
+
 ## [5.5.1] - 2018-08-06
-- Changes: https://github.com/softlayer/softlayer-python/compare/v5.5.0...master
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.5.0...v5.5.1
 
 - #1006, added paginations to several slcli methods, making them work better with large result sets. 
 - #995, Fixed an issue displaying VLANs.
