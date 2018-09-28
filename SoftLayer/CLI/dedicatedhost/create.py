@@ -2,6 +2,7 @@
 # :license: MIT, see LICENSE for more details.
 
 import click
+import time
 
 import SoftLayer
 from SoftLayer.CLI import environment
@@ -84,11 +85,6 @@ def cli(env, **kwargs):
         table.add_row(['Total monthly cost', "%.2f" % total])
 
     output = []
-    output.append(table)
-    output.append(formatting.FormattedItem(
-        '',
-        ' -- ! Prices reflected here are retail and do not '
-        'take account level discounts and are not guaranteed.'))
 
     if kwargs['export']:
         export_file = kwargs.pop('export')
@@ -104,11 +100,31 @@ def cli(env, **kwargs):
 
         result = mgr.place_order(**order)
 
+        host_ids = _wait_for_host_ids(result['orderId'], mgr)
+
         table = formatting.KeyValueTable(['name', 'value'])
         table.align['name'] = 'r'
         table.align['value'] = 'l'
         table.add_row(['id', result['orderId']])
         table.add_row(['created', result['orderDate']])
+        table.add_row(['hostIds', host_ids])
         output.append(table)
 
     env.fout(output)
+
+
+def _wait_for_host_ids(order_id, mgr):
+    host_ids = []
+    while not host_ids:
+        host_ids = _extract_host_ids(order_id, mgr)
+        time.sleep(60)
+    return host_ids
+
+
+def _extract_host_ids(order_id, mgr):
+    instances = mgr.list_instances(mask='mask[id,billingItem[orderItem[order]]]')
+    return [instance['id'] for instance in instances
+            if int(order_id) == instance.get('billingItem', {})\
+                                        .get('orderItem', {})\
+                                        .get('order', {})\
+                                        .get('id', None)]
