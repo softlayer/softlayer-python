@@ -26,8 +26,4 @@ def cli(env, identifier, immediate, comment, reason):
 
     mgr = SoftLayer.DedicatedHostManager(env.client)
     host_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'dedicatedhost')
-
-    if not (env.skip_confirmations or formatting.no_going_back(host_id)):
-        raise exceptions.CLIAbort('Aborted')
-
     mgr.cancel_host(host_id, reason, comment, immediate)
