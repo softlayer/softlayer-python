@@ -100,14 +100,14 @@ def cli(env, **kwargs):
 
         result = mgr.place_order(**order)
 
-        host_ids = _wait_for_host_ids(result['orderId'], mgr)
+        hosts = _wait_for_host_ids(result['orderId'], mgr)
 
         table = formatting.KeyValueTable(['name', 'value'])
         table.align['name'] = 'r'
         table.align['value'] = 'l'
         table.add_row(['id', result['orderId']])
         table.add_row(['created', result['orderDate']])
-        table.add_row(['hostIds', host_ids])
+        table.add_row(['hosts', hosts])
         output.append(table)
 
     env.fout(output)
@@ -122,9 +122,13 @@ def _wait_for_host_ids(order_id, mgr):
 
 
 def _extract_host_ids(order_id, mgr):
-    instances = mgr.list_instances(mask='mask[id,billingItem[orderItem[order]]]')
-    return [instance['id'] for instance in instances
-            if int(order_id) == instance.get('billingItem', {})\
-                                        .get('orderItem', {})\
-                                        .get('order', {})\
-                                        .get('id', None)]
+    instances = mgr.list_instances(mask='mask[id,name,datacenter[name],'
+                                        'billingItem[orderItem[order]]]')
+    return [{'hostName': instance.get('billingItem', {})['hostName'],
+             'hostId': instance['id'],
+             'datacenter': instance.get('datacenter', {})['name']}
+            for instance in instances
+            if order_id == instance.get('billingItem', {})\
+                                   .get('orderItem', {})\
+                                   .get('order', {})\
+                                   .get('id', None)]
