@@ -1548,6 +1548,8 @@ getItems_RESERVED_CAPACITY = [
     {
         'id': 12273,
         'keyName': 'B1_1X2_1_YEAR_TERM',
+        'description': 'B1 1x2 1 year term',
+        'capacity': 12,
         'itemCategory': {
             'categoryCode': 'reserved_capacity',
             'id': 2060,

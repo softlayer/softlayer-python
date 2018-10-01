@@ -9,8 +9,6 @@ from SoftLayer.CLI import formatting
 from SoftLayer.managers.vs_capacity import CapacityManager as CapacityManager
 
 
-from pprint import pprint as pp
-
 @click.command()
 @environment.pass_env
 def cli(env):
@@ -28,14 +26,9 @@ def cli(env):
         try:
             flavor = rc['instances'][0]['billingItem']['description']
             cost = float(rc['instances'][0]['billingItem']['hourlyRecurringFee'])
-            # instance_count = int(rc.get('instanceCount',0)) 
-            # cost_string = "%s * %s = %s" % (cost, instance_count, cost * instance_count)
         except KeyError:
             flavor = "Unknown Billing Item"
-            # cost_string = "-"
         location = rc['backendRouter']['hostname']
         capacity = "%s%s" % (occupied_string, available_string)
         table.add_row([rc['id'], rc['name'], capacity, flavor, location, rc['createDate']])
     env.fout(table)
-    print("")
-    # pp(result)

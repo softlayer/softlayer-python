@@ -10,23 +10,11 @@ from SoftLayer.CLI import formatting
 from SoftLayer.managers.vs_capacity import CapacityManager as CapacityManager
 
 COLUMNS = [
-    column_helper.Column('guid', ('globalIdentifier',)),
+    column_helper.Column('Id', ('id',)),
+    column_helper.Column('hostname', ('hostname',)),
+    column_helper.Column('domain', ('domain',)),
     column_helper.Column('primary_ip', ('primaryIpAddress',)),
     column_helper.Column('backend_ip', ('primaryBackendIpAddress',)),
-    column_helper.Column('datacenter', ('datacenter', 'name')),
-    column_helper.Column('action', lambda guest: formatting.active_txn(guest),
-                         mask='''
-                         activeTransaction[
-                            id,transactionStatus[name,friendlyName]
-                         ]'''),
-    column_helper.Column('power_state', ('powerState', 'name')),
-    column_helper.Column(
-        'created_by',
-        ('billingItem', 'orderItem', 'order', 'userRecord', 'username')),
-    column_helper.Column(
-        'tags',
-        lambda server: formatting.tags(server.get('tagReferences')),
-        mask="tagReferences.tag.name"),
 ]
 
 DEFAULT_COLUMNS = [
@@ -48,6 +36,7 @@ DEFAULT_COLUMNS = [
 @environment.pass_env
 def cli(env, identifier, columns):
     """Reserved Capacity Group details. Will show which guests are assigned to a reservation."""
+
     manager = CapacityManager(env.client)
     mask = """mask[instances[id,createDate,guestId,billingItem[id, recurringFee, category[name]], 
               guest[modifyDate,id, primaryBackendIpAddress, primaryIpAddress,domain, hostname]]]"""
@@ -60,6 +49,7 @@ def cli(env, identifier, columns):
     table = formatting.Table(columns.columns, 
         title = "%s - %s" % (result.get('name'), flavor)
     )
+    # RCI = Reserved Capacity Instance
     for rci in result['instances']:
         guest = rci.get('guest', None)
         guest_string = "---"

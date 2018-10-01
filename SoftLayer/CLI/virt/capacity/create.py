@@ -32,6 +32,7 @@ from pprint import pprint as pp
 def cli(env, name, datacenter, backend_router_id, capacity, quantity, test=False):
     """Create a Reserved Capacity instance. *WARNING*: Reserved Capacity is on a yearly contract and not cancelable until the contract is expired."""
     manager = CapacityManager(env.client)
+
     result = manager.create(
         name=name,
         datacenter=datacenter,
@@ -40,12 +41,11 @@ def cli(env, name, datacenter, backend_router_id, capacity, quantity, test=False
         quantity=quantity,
         test=test)
 
-    pp(result)
     if test:
-        table = formating.Table(['Name', 'Value'], "Test Order")
+        table = formatting.Table(['Name', 'Value'], "Test Order")
         container = result['orderContainers'][0]
         table.add_row(['Name', container['name']])
-        table.add_row(['Location'], container['locationObject']['longName'])
+        table.add_row(['Location', container['locationObject']['longName']])
         for price in container['prices']:
             table.add_row([price['item']['keyName'], price['item']['description']])
         table.add_row(['Total', result['postTaxRecurring']])
