@@ -3,13 +3,10 @@
 
 import click
 
-import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.vs_capacity import CapacityManager as CapacityManager
 
-
-from pprint import pprint as pp
 
 @click.command()
 @environment.pass_env
@@ -38,8 +35,9 @@ def cli(env):
 
 
 def get_price(item):
+    """Finds the price with the default locationGroupId"""
     the_price = "No Default Pricing"
-    for price in item.get('prices',[]):
+    for price in item.get('prices', []):
         if price.get('locationGroupId') == '':
-            the_price = "%0.4f"  % float(price['hourlyRecurringFee'])
+            the_price = "%0.4f" % float(price['hourlyRecurringFee'])
     return the_price

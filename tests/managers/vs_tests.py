@@ -792,10 +792,10 @@ class VSTests(testing.TestCase):
 
         self.assertEqual(result, True)
         args = ({
-                    'hostname': 'new-host',
-                    'domain': 'new.sftlyr.ws',
-                    'notes': 'random notes',
-                },)
+            'hostname': 'new-host',
+            'domain': 'new.sftlyr.ws',
+            'notes': 'random notes',
+        },)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'editObject',
                                 identifier=100,
                                 args=args)

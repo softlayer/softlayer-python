@@ -1,9 +1,7 @@
 """List Reserved Capacity"""
-# :license: MIT, see LICENSE for more details.
 
 import click
 
-import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.vs_capacity import CapacityManager as CapacityManager
@@ -16,19 +14,19 @@ def cli(env):
     manager = CapacityManager(env.client)
     result = manager.list()
     table = formatting.Table(
-        ["ID", "Name", "Capacity", "Flavor", "Location",  "Created"], 
+        ["ID", "Name", "Capacity", "Flavor", "Location", "Created"],
         title="Reserved Capacity"
     )
-    for rc in result:
-        occupied_string = "#" * int(rc.get('occupiedInstanceCount',0))
-        available_string = "-" * int(rc.get('availableInstanceCount',0))
+    for r_c in result:
+        occupied_string = "#" * int(r_c.get('occupiedInstanceCount', 0))
+        available_string = "-" * int(r_c.get('availableInstanceCount', 0))
 
         try:
-            flavor = rc['instances'][0]['billingItem']['description']
-            cost = float(rc['instances'][0]['billingItem']['hourlyRecurringFee'])
+            flavor = r_c['instances'][0]['billingItem']['description']
+            # cost = float(r_c['instances'][0]['billingItem']['hourlyRecurringFee'])
         except KeyError:
             flavor = "Unknown Billing Item"
-        location = rc['backendRouter']['hostname']
+        location = r_c['backendRouter']['hostname']
         capacity = "%s%s" % (occupied_string, available_string)
-        table.add_row([rc['id'], rc['name'], capacity, flavor, location, rc['createDate']])
+        table.add_row([r_c['id'], r_c['name'], capacity, flavor, location, r_c['createDate']])
     env.fout(table)

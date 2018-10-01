@@ -15,7 +15,7 @@ verifyOrder = {
     }]}
 placeOrder = verifyOrder
 
-#Reserved Capacity Stuff
+# Reserved Capacity Stuff
 
 rsc_verifyOrder = {
     'orderContainers': [
@@ -48,21 +48,20 @@ rsc_placeOrder = {
         'postTaxRecurring': '0.32',
     },
     'placedOrder': {
-            'status': 'Great, thanks for asking',
-            'locationObject': {
-                'id': 1854895,
-                'longName': 'Dallas 13',
-                'name': 'dal13'
-            },
-            'name': 'test-capacity',
-            'items': [
-                {   
-                    'description': 'B1.1x2 (1 Year ''Term)',
-                    'keyName': 'B1_1X2_1_YEAR_TERM',
-                    'categoryCode': 'guest_core',
-                    
-                }
-            ]
+        'status': 'Great, thanks for asking',
+        'locationObject': {
+            'id': 1854895,
+            'longName': 'Dallas 13',
+            'name': 'dal13'
+        },
+        'name': 'test-capacity',
+        'items': [
+            {
+                'description': 'B1.1x2 (1 Year ''Term)',
+                'keyName': 'B1_1X2_1_YEAR_TERM',
+                'categoryCode': 'guest_core',
+            }
+        ]
     }
 }
 
@@ -70,7 +69,7 @@ rsi_placeOrder = {
     'orderId': 1234,
     'orderDetails': {
         'prices': [
-            {   
+            {
                 'id': 4,
                 'item': {
                     'id': 1,

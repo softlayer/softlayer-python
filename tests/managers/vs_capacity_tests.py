@@ -8,12 +8,11 @@
 import mock
 
 import SoftLayer
-from SoftLayer import exceptions
 from SoftLayer import fixtures
 from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer import testing
 
-from pprint import pprint as pp
+
 class VSCapacityTests(testing.TestCase):
 
     def set_up(self):
@@ -22,20 +21,20 @@ class VSCapacityTests(testing.TestCase):
         amock.return_value = fixtures.SoftLayer_Product_Package.RESERVED_CAPACITY
 
     def test_list(self):
-        result = self.manager.list()
+        self.manager.list()
         self.assert_called_with('SoftLayer_Account', 'getReservedCapacityGroups')
 
     def test_get_object(self):
-        result = self.manager.get_object(100)
+        self.manager.get_object(100)
         self.assert_called_with('SoftLayer_Virtual_ReservedCapacityGroup', 'getObject', identifier=100)
 
     def test_get_object_mask(self):
         mask = "mask[id]"
-        result = self.manager.get_object(100, mask=mask)
+        self.manager.get_object(100, mask=mask)
         self.assert_called_with('SoftLayer_Virtual_ReservedCapacityGroup', 'getObject', identifier=100, mask=mask)
 
     def test_get_create_options(self):
-        result = self.manager.get_create_options()
+        self.manager.get_create_options()
         self.assert_called_with('SoftLayer_Product_Package', 'getItems', identifier=1059, mask=mock.ANY)
 
     def test_get_available_routers(self):
@@ -50,7 +49,7 @@ class VSCapacityTests(testing.TestCase):
     def test_create(self):
         item_mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
         item_mock.return_value = SoftLayer_Product_Package.getItems_RESERVED_CAPACITY
-        result = self.manager.create(
+        self.manager.create(
             name='TEST', datacenter='dal13', backend_router_id=1, capacity='B1_1X2_1_YEAR_TERM', quantity=5)
 
         expected_args = {
@@ -63,8 +62,8 @@ class VSCapacityTests(testing.TestCase):
                     'quantity': 5,
                     'useHourlyPricing': True,
                     'complexType': 'SoftLayer_Container_Product_Order_Virtual_ReservedCapacity',
-                    'prices': [ { 'id': 217561 }
-                    ]
+                    'prices': [{'id': 217561}
+                               ]
                 }
             ]
         }
@@ -73,12 +72,11 @@ class VSCapacityTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Location', 'getDatacenters')
         self.assert_called_with('SoftLayer_Product_Package', 'getItems', identifier=1059)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder', args=(expected_args,))
-        
 
     def test_create_test(self):
         item_mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
         item_mock.return_value = SoftLayer_Product_Package.getItems_RESERVED_CAPACITY
-        result = self.manager.create(
+        self.manager.create(
             name='TEST', datacenter='dal13', backend_router_id=1, capacity='B1_1X2_1_YEAR_TERM', quantity=5, test=True)
 
         expected_args = {
@@ -91,8 +89,8 @@ class VSCapacityTests(testing.TestCase):
                     'quantity': 5,
                     'useHourlyPricing': True,
                     'complexType': 'SoftLayer_Container_Product_Order_Virtual_ReservedCapacity',
-                    'prices': [ { 'id': 217561 }
-                    ]
+                    'prices': [{'id': 217561}
+                               ]
                 }
             ]
         }
@@ -101,7 +99,6 @@ class VSCapacityTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Location', 'getDatacenters')
         self.assert_called_with('SoftLayer_Product_Package', 'getItems', identifier=1059)
         self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder', args=(expected_args,))
-
 
     def test_create_guest(self):
         amock = self.set_mock('SoftLayer_Product_Package', 'getItems')
@@ -121,7 +118,7 @@ class VSCapacityTests(testing.TestCase):
             'public_subnet': None,
             'ssh_keys': [1234]
         }
-        result = self.manager.create_guest(123, False, guest_object)
+        self.manager.create_guest(123, False, guest_object)
         expectedGenerate = {
             'startCpus': None,
             'maxMemory': None,
@@ -186,7 +183,7 @@ class VSCapacityTests(testing.TestCase):
             'public_subnet': None,
             'ssh_keys': [1234]
         }
-        result = self.manager.create_guest(123, True, guest_object)
+        self.manager.create_guest(123, True, guest_object)
         self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder')
 
     def test_flavor_string(self):

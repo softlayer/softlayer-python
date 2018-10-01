@@ -27,7 +27,7 @@ from SoftLayer.managers.ssl import SSLManager
 from SoftLayer.managers.ticket import TicketManager
 from SoftLayer.managers.user import UserManager
 from SoftLayer.managers.vs import VSManager
-from SoftLayer.managers.vs_capacity import CapacityManager 
+from SoftLayer.managers.vs_capacity import CapacityManager
 
 
 __all__ = [

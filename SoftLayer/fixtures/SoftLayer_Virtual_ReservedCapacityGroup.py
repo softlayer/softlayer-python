@@ -24,7 +24,7 @@ getObject = {
             'billingItem': {
                 'id': 348319479,
                 'recurringFee': '3.04',
-                'category': { 'name': 'Reserved Capacity' },
+                'category': {'name': 'Reserved Capacity'},
                 'item': {
                     'keyName': 'B1_1X2_1_YEAR_TERM'
                 }

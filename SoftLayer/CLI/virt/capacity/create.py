@@ -1,18 +1,12 @@
-"""Create a Reserved Capacity instance. 
-
-
-"""
-# :license: MIT, see LICENSE for more details.
+"""Create a Reserved Capacity instance."""
 
 import click
 
-import SoftLayer
+
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.vs_capacity import CapacityManager as CapacityManager
 
-
-from pprint import pprint as pp
 
 @click.command(epilog=click.style("""WARNING: Reserved Capacity is on a yearly contract"""
                                   """ and not cancelable until the contract is expired.""", fg='red'))
@@ -30,7 +24,10 @@ from pprint import pprint as pp
               help="Do not actually create the virtual server")
 @environment.pass_env
 def cli(env, name, datacenter, backend_router_id, capacity, quantity, test=False):
-    """Create a Reserved Capacity instance. *WARNING*: Reserved Capacity is on a yearly contract and not cancelable until the contract is expired."""
+    """Create a Reserved Capacity instance.
+
+    *WARNING*: Reserved Capacity is on a yearly contract and not cancelable until the contract is expired.
+    """
     manager = CapacityManager(env.client)
 
     result = manager.create(
@@ -58,22 +55,3 @@ def cli(env, name, datacenter, backend_router_id, capacity, quantity, test=False
             table.add_row([item['categoryCode'], item['description']])
         table.add_row(['Total', result['orderDetails']['postTaxRecurring']])
     env.fout(table)
-
-
-"""
-Calling: SoftLayer_Product_Order::placeOrder(
-id=None, 
-mask='', 
-filter='None', 
-args=(
-    {'orderContainers': [
-        {'backendRouterId': 1079095, 
-        'name': 'cgallo-test-capacity', 
-        'quantity': 1, 
-        'packageId': 1059, 
-        'location': 1854895, 
-        'useHourlyPricing': True, 
-        'complexType': 'SoftLayer_Container_Product_Order_Virtual_ReservedCapacity', 
-        'prices': [{'id': 217633}]}]},), limit=None, offset=None))
-Resetting dropped connection: r237377.application.qadal0501.softlayer.local
-"""

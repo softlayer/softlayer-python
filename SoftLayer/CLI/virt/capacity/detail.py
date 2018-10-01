@@ -1,9 +1,7 @@
 """Shows the details of a reserved capacity group"""
-# :license: MIT, see LICENSE for more details.
 
 import click
 
-import SoftLayer
 from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
@@ -25,6 +23,7 @@ DEFAULT_COLUMNS = [
     'backend_ip'
 ]
 
+
 @click.command(epilog="Once provisioned, virtual guests can be managed with the slcli vs commands")
 @click.argument('identifier')
 @click.option('--columns',
@@ -38,7 +37,7 @@ def cli(env, identifier, columns):
     """Reserved Capacity Group details. Will show which guests are assigned to a reservation."""
 
     manager = CapacityManager(env.client)
-    mask = """mask[instances[id,createDate,guestId,billingItem[id, recurringFee, category[name]], 
+    mask = """mask[instances[id,createDate,guestId,billingItem[id, recurringFee, category[name]],
               guest[modifyDate,id, primaryBackendIpAddress, primaryIpAddress,domain, hostname]]]"""
     result = manager.get_object(identifier, mask)
     try:
@@ -46,23 +45,12 @@ def cli(env, identifier, columns):
     except KeyError:
         flavor = "Pending Approval..."
 
-    table = formatting.Table(columns.columns, 
-        title = "%s - %s" % (result.get('name'), flavor)
-    )
+    table = formatting.Table(columns.columns, title="%s - %s" % (result.get('name'), flavor))
     # RCI = Reserved Capacity Instance
     for rci in result['instances']:
         guest = rci.get('guest', None)
-        guest_string = "---"
-        createDate = rci['createDate']
         if guest is not None:
-            guest_string = "%s (%s)" % (
-                guest.get('fullyQualifiedDomainName', 'No FQDN'), 
-                guest.get('primaryIpAddress', 'No Public Ip')
-            )
-            createDate = guest['modifyDate']
             table.add_row([value or formatting.blank() for value in columns.row(guest)])
         else:
             table.add_row(['-' for value in columns.columns])
     env.fout(table)
-
-

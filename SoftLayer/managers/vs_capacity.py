@@ -13,11 +13,11 @@ from SoftLayer.managers import ordering
 from SoftLayer.managers.vs import VSManager
 from SoftLayer import utils
 
-from pprint import pprint as pp
 # Invalid names are ignored due to long method names and short argument names
 # pylint: disable=invalid-name, no-self-use
 
 LOGGER = logging.getLogger(__name__)
+
 
 class CapacityManager(utils.IdentifierMixin, object):
     """Manages SoftLayer Dedicated Hosts.
@@ -40,18 +40,25 @@ class CapacityManager(utils.IdentifierMixin, object):
             self.ordering_manager = ordering.OrderingManager(client)
 
     def list(self):
-        mask = """mask[availableInstanceCount, occupiedInstanceCount, 
+        """List Reserved Capacities"""
+        mask = """mask[availableInstanceCount, occupiedInstanceCount,
 instances[id, billingItem[description, hourlyRecurringFee]], instanceCount, backendRouter[datacenter]]"""
         results = self.client.call('Account', 'getReservedCapacityGroups', mask=mask)
         return results
 
     def get_object(self, identifier, mask=None):
+        """Get a Reserved Capacity Group
+
+        :param int identifier: Id of the SoftLayer_Virtual_ReservedCapacityGroup
+        :parm string mask: override default object Mask
+        """
         if mask is None:
             mask = "mask[instances[billingItem[item[keyName],category], guest], backendRouter[datacenter]]"
         result = self.client.call(self.rcg_service, 'getObject', id=identifier, mask=mask)
         return result
 
     def get_create_options(self):
+        """List available reserved capacity plans"""
         mask = "mask[attributes,prices[pricingLocationGroup]]"
         results = self.ordering_manager.list_items(self.capacity_package, mask=mask)
         return results
@@ -75,7 +82,7 @@ instances[id, billingItem[description, hourlyRecurringFee]], instanceCount, back
 
         # Step 3, for each location in each region, get the pod details, which contains the router id
         pods = self.client.call('Network_Pod', 'getAllObjects', filter=_filter, iter=True)
-        for region  in regions:
+        for region in regions:
             routers[region['keyname']] = []
             for location in region['locations']:
                 location['location']['pods'] = list()
@@ -125,24 +132,22 @@ instances[id, billingItem[description, hourlyRecurringFee]], instanceCount, back
         """
         vs_manager = VSManager(self.client)
         mask = "mask[instances[id, billingItem[id, item[id,keyName]]], backendRouter[id, datacenter[name]]]"
-        capacity = self.get_object(capacity_id)
+        capacity = self.get_object(capacity_id, mask=mask)
         try:
             capacity_flavor = capacity['instances'][0]['billingItem']['item']['keyName']
             flavor = _flavor_string(capacity_flavor, guest_object['primary_disk'])
         except KeyError:
-            raise SoftLayer.SoftLayerError("Unable to find capacity Flavor.") 
+            raise SoftLayer.SoftLayerError("Unable to find capacity Flavor.")
 
-        guest_object['flavor'] =  flavor
+        guest_object['flavor'] = flavor
         guest_object['datacenter'] = capacity['backendRouter']['datacenter']['name']
-        # pp(guest_object)
-        
+
         template = vs_manager.verify_create_instance(**guest_object)
         template['reservedCapacityId'] = capacity_id
         if guest_object.get('ipv6'):
             ipv6_price = self.ordering_manager.get_price_id_list('PUBLIC_CLOUD_SERVER', ['1_IPV6_ADDRESS'])
             template['prices'].append({'id': ipv6_price[0]})
-            
-        # pp(template)
+
         if test:
             result = self.client.call('Product_Order', 'verifyOrder', template)
         else:
@@ -158,4 +163,3 @@ def _flavor_string(capacity_key, primary_disk):
     """
     flavor = "%sX%s" % (capacity_key[:-12], primary_disk)
     return flavor
-

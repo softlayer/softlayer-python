@@ -116,8 +116,8 @@ class DedicatedHostsTests(testing.TestCase):
                     '56 Cores X 242 RAM X 1.2 TB',
                 'value': '56_CORES_X_242_RAM_X_1_4_TB'
             }
-            ]]
-                         )
+        ]]
+        )
 
     def test_create_options_with_only_datacenter(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
@@ -149,7 +149,7 @@ class DedicatedHostsTests(testing.TestCase):
                 'Available Backend Routers': 'bcr04a.dal05'
             }
         ]]
-                         )
+        )
 
     def test_create(self):
         SoftLayer.CLI.formatting.confirm = mock.Mock()
@@ -166,23 +166,23 @@ class DedicatedHostsTests(testing.TestCase):
                                    '--billing=hourly'])
         self.assert_no_fail(result)
         args = ({
-                    'hardware': [{
-                        'domain': 'example.com',
-                        'primaryBackendNetworkComponent': {
-                            'router': {
-                                'id': 51218
-                            }
-                        },
-                        'hostname': 'host'
-                    }],
-                    'prices': [{
-                        'id': 200269
-                    }],
-                    'location': 'DALLAS05',
-                    'packageId': 813,
-                    'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
-                    'useHourlyPricing': True,
-                    'quantity': 1},)
+            'hardware': [{
+                'domain': 'example.com',
+                'primaryBackendNetworkComponent': {
+                    'router': {
+                        'id': 51218
+                    }
+                },
+                'hostname': 'host'
+            }],
+            'prices': [{
+                'id': 200269
+            }],
+            'location': 'DALLAS05',
+            'packageId': 813,
+            'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
+            'useHourlyPricing': True,
+            'quantity': 1},)
 
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder',
                                 args=args)
@@ -202,23 +202,23 @@ class DedicatedHostsTests(testing.TestCase):
                                    '--billing=hourly'])
         self.assert_no_fail(result)
         args = ({
-                    'hardware': [{
-                        'domain': 'example.com',
-                        'primaryBackendNetworkComponent': {
-                            'router': {
-                                'id': 51218
-                            }
-                        },
-                        'hostname': 'host'
-                    }],
-                    'prices': [{
-                        'id': 200269
-                    }],
-                    'location': 'DALLAS05',
-                    'packageId': 813,
-                    'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
-                    'useHourlyPricing': True,
-                    'quantity': 1},)
+            'hardware': [{
+                'domain': 'example.com',
+                'primaryBackendNetworkComponent': {
+                    'router': {
+                        'id': 51218
+                    }
+                },
+                'hostname': 'host'
+            }],
+            'prices': [{
+                'id': 200269
+            }],
+            'location': 'DALLAS05',
+            'packageId': 813,
+            'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
+            'useHourlyPricing': True,
+            'quantity': 1},)
 
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder',
                                 args=args)
@@ -241,22 +241,22 @@ class DedicatedHostsTests(testing.TestCase):
         self.assert_no_fail(result)
 
         args = ({
-                    'useHourlyPricing': True,
-                    'hardware': [{
+            'useHourlyPricing': True,
+            'hardware': [{
 
-                        'hostname': 'host',
-                        'domain': 'example.com',
+                'hostname': 'host',
+                'domain': 'example.com',
 
-                        'primaryBackendNetworkComponent': {
+                'primaryBackendNetworkComponent': {
                             'router': {
                                 'id': 51218
                             }
-                        }
-                    }],
-                    'packageId': 813, 'prices': [{'id': 200269}],
-                    'location': 'DALLAS05',
-                    'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
-                    'quantity': 1},)
+                }
+            }],
+            'packageId': 813, 'prices': [{'id': 200269}],
+            'location': 'DALLAS05',
+            'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
+            'quantity': 1},)
 
         self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder',
                                 args=args)
@@ -271,20 +271,20 @@ class DedicatedHostsTests(testing.TestCase):
         self.assert_no_fail(result)
 
         args = ({
-                    'useHourlyPricing': True,
-                    'hardware': [{
-                        'hostname': 'host',
-                        'domain': 'example.com',
-                        'primaryBackendNetworkComponent': {
+            'useHourlyPricing': True,
+            'hardware': [{
+                'hostname': 'host',
+                'domain': 'example.com',
+                'primaryBackendNetworkComponent': {
                             'router': {
                                 'id': 51218
                             }
-                        }
-                    }],
-                    'packageId': 813, 'prices': [{'id': 200269}],
-                    'location': 'DALLAS05',
-                    'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
-                    'quantity': 1},)
+                }
+            }],
+            'packageId': 813, 'prices': [{'id': 200269}],
+            'location': 'DALLAS05',
+            'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
+            'quantity': 1},)
 
         self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder',
                                 args=args)
@@ -340,22 +340,22 @@ class DedicatedHostsTests(testing.TestCase):
 
         self.assertIsInstance(result.exception, exceptions.ArgumentError)
         args = ({
-                    'hardware': [{
-                        'domain': 'example.com',
-                        'primaryBackendNetworkComponent': {
-                            'router': {
-                                'id': 51218
-                            }
-                        },
-                        'hostname': 'host'
-                    }],
-                    'prices': [{
-                        'id': 200269
-                    }],
-                    'location': 'DALLAS05',
-                    'packageId': 813,
-                    'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
-                    'useHourlyPricing': True,
-                    'quantity': 1},)
+            'hardware': [{
+                'domain': 'example.com',
+                'primaryBackendNetworkComponent': {
+                    'router': {
+                        'id': 51218
+                    }
+                },
+                'hostname': 'host'
+            }],
+            'prices': [{
+                'id': 200269
+            }],
+            'location': 'DALLAS05',
+            'packageId': 813,
+            'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
+            'useHourlyPricing': True,
+            'quantity': 1},)
 
         self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder', args=args)
