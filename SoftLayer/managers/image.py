@@ -120,28 +120,68 @@ class ImageManager(utils.IdentifierMixin, object):
 
         return bool(name or note or tag)
 
-    def import_image_from_uri(self, name, uri, os_code=None, note=None):
+    def import_image_from_uri(self, name, uri, os_code=None, note=None,
+                              ibm_api_key=None, root_key_id=None,
+                              wrapped_dek=None, kp_id=None, cloud_init=None,
+                              byol=None, is_encrypted=None):
         """Import a new image from object storage.
 
         :param string name: Name of the new image
         :param string uri: The URI for an object storage object
             (.vhd/.iso file) of the format:
             swift://<objectStorageAccount>@<cluster>/<container>/<objectPath>
+            or (.vhd/.iso/.raw file) of the format:
+            cos://<clusterName>/<bucketName>/<objectPath> if using IBM Cloud
+            Object Storage
         :param string os_code: The reference code of the operating system
         :param string note: Note to add to the image
+        :param string ibm_api_key: Ibm Api Key needed to communicate with ICOS
+        and Key Protect
+        :param string root_key_id: ID of the root key in Key Protect
+        :param string wrapped_dek: Wrapped Decryption Key provided by IBM
+         KeyProtect
+        :param string kp_id: ID of the IBM Key Protect Instance
+        :param bool cloud_init: Specifies if image is cloud init
+        :param bool byol: Specifies if image is bring your own license
+        :param bool is_encrypted: Specifies if image is encrypted
         """
-        return self.vgbdtg.createFromExternalSource({
-            'name': name,
-            'note': note,
-            'operatingSystemReferenceCode': os_code,
-            'uri': uri,
-        })
+        if 'cos://' in uri:
+            return self.vgbdtg.createFromIcos({
+                'name': name,
+                'note': note,
+                'operatingSystemReferenceCode': os_code,
+                'uri': uri,
+                'ibmApiKey': ibm_api_key,
+                'rootKeyid': root_key_id,
+                'wrappedDek': wrapped_dek,
+                'keyProtectId': kp_id,
+                'cloudInit': cloud_init,
+                'byol': byol,
+                'isEncrypted': is_encrypted
+            })
+        else:
+            return self.vgbdtg.createFromExternalSource({
+                'name': name,
+                'note': note,
+                'operatingSystemReferenceCode': os_code,
+                'uri': uri,
+            })
 
-    def export_image_to_uri(self, image_id, uri):
+    def export_image_to_uri(self, image_id, uri, ibm_api_key=None):
         """Export image into the given object storage
 
         :param int image_id: The ID of the image
         :param string uri: The URI for object storage of the format
             swift://<objectStorageAccount>@<cluster>/<container>/<objectPath>
+            or cos://<clusterName>/<bucketName>/<objectPath> if using IBM Cloud
+            Object Storage
+        :param string ibm_api_key: Ibm Api Key needed to communicate with IBM
+        Cloud Object Storage
         """
-        return self.vgbdtg.copyToExternalSource({'uri': uri}, id=image_id)
+        if 'cos://' in uri:
+            return self.vgbdtg.copyToIcos({
+                'uri': uri,
+                'ibmApiKey': ibm_api_key
+            }, id=image_id)
+        else:
+            return self.vgbdtg.copyToExternalSource({'uri': uri}, id=image_id)
