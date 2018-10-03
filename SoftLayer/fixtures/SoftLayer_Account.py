@@ -554,11 +554,11 @@ getDedicatedHosts = [{
         'name': 'dal05'
     },
     'memoryCapacity': 242,
-    'name': 'khnguyendh',
+    'name': 'test-dedicated',
     'diskCapacity': 1200,
     'guestCount': 1,
     'cpuCount': 56,
-    'id': 44701
+    'id': 12345
 }]
 
 

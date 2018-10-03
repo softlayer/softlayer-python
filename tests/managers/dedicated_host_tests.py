@@ -90,7 +90,7 @@ class DedicatedHostTests(testing.TestCase):
                 {
                     'primaryBackendNetworkComponent': {
                         'router': {
-                            'id': 51218
+                            'id': 12345
                         }
                     },
                     'domain': u'test.com',
@@ -103,7 +103,7 @@ class DedicatedHostTests(testing.TestCase):
             'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
             'prices': [
                 {
-                    'id': 200269
+                    'id': 12345
                 }
             ],
             'quantity': 1
@@ -141,7 +141,7 @@ class DedicatedHostTests(testing.TestCase):
                 {
                     'primaryBackendNetworkComponent': {
                         'router': {
-                            'id': 51218
+                            'id': 12345
                         }
                     },
                     'domain': u'test.com',
@@ -154,7 +154,7 @@ class DedicatedHostTests(testing.TestCase):
             'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
             'prices': [
                 {
-                    'id': 200269
+                    'id': 12345
                 }
             ],
             'quantity': 1
@@ -192,7 +192,7 @@ class DedicatedHostTests(testing.TestCase):
                 {
                     'primaryBackendNetworkComponent': {
                         'router': {
-                            'id': 51218
+                            'id': 12345
                         }
                     },
                     'domain': 'test.com',
@@ -205,7 +205,7 @@ class DedicatedHostTests(testing.TestCase):
             'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
             'prices': [
                 {
-                    'id': 200269
+                    'id': 12345
                 }
             ],
             'quantity': 1
@@ -259,7 +259,7 @@ class DedicatedHostTests(testing.TestCase):
                 {
                     'primaryBackendNetworkComponent': {
                         'router': {
-                            'id': 51218
+                            'id': 12345
                         }
                     },
                     'domain': 'test.com',
@@ -272,7 +272,7 @@ class DedicatedHostTests(testing.TestCase):
             'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
             'prices': [
                 {
-                    'id': 200269
+                    'id': 12345
                 }
             ],
             'quantity': 1
@@ -284,10 +284,10 @@ class DedicatedHostTests(testing.TestCase):
         self.dedicated_host._get_package = mock.MagicMock()
         self.dedicated_host._get_package.return_value = self._get_package()
         self.dedicated_host._get_default_router = mock.Mock()
-        self.dedicated_host._get_default_router.return_value = 51218
+        self.dedicated_host._get_default_router.return_value = 12345
 
         location = 'dal05'
-        router = 51218
+        router = 12345
         hostname = 'test'
         domain = 'test.com'
         hourly = True
@@ -306,7 +306,7 @@ class DedicatedHostTests(testing.TestCase):
                 {
                     'primaryBackendNetworkComponent': {
                         'router': {
-                            'id': 51218
+                            'id': 12345
                         }
                     },
                     'domain': 'test.com',
@@ -320,7 +320,7 @@ class DedicatedHostTests(testing.TestCase):
                 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
             'prices': [
                 {
-                    'id': 200269
+                    'id': 12345
                 }
             ],
             'quantity': 1
@@ -421,7 +421,7 @@ class DedicatedHostTests(testing.TestCase):
     def test_get_price(self):
         package = self._get_package()
         item = package['items'][0]
-        price_id = 200269
+        price_id = 12345
 
         self.assertEqual(self.dedicated_host._get_price(item), price_id)
 
@@ -454,15 +454,15 @@ class DedicatedHostTests(testing.TestCase):
             }],
             'capacity': '56',
             'description': '56 Cores X 242 RAM X 1.2 TB',
-            'id': 10195,
+            'id': 12345,
             'itemCategory': {
                 'categoryCode': 'dedicated_virtual_hosts'
             },
             'keyName': '56_CORES_X_242_RAM_X_1_4_TB',
             'prices': [{
                 'hourlyRecurringFee': '3.164',
-                'id': 200269,
-                'itemId': 10195,
+                'id': 12345,
+                'itemId': 12345,
                 'recurringFee': '2099',
             }]
         }
@@ -481,7 +481,7 @@ class DedicatedHostTests(testing.TestCase):
         location = [
             {
                 'isAvailable': 1,
-                'locationId': 138124,
+                'locationId': 12345,
                 'packageId': 813
             }
         ]
@@ -528,7 +528,7 @@ class DedicatedHostTests(testing.TestCase):
     def test_get_default_router(self):
         routers = self._get_routers_sample()
 
-        router = 51218
+        router = 12345
 
         router_test = self.dedicated_host._get_default_router(routers, 'bcr01a.dal05')
 
@@ -544,19 +544,19 @@ class DedicatedHostTests(testing.TestCase):
         routers = [
             {
                 'hostname': 'bcr01a.dal05',
-                'id': 51218
+                'id': 12345
             },
             {
                 'hostname': 'bcr02a.dal05',
-                'id': 83361
+                'id': 12346
             },
             {
                 'hostname': 'bcr03a.dal05',
-                'id': 122762
+                'id': 12347
             },
             {
                 'hostname': 'bcr04a.dal05',
-                'id': 147566
+                'id': 12348
             }
         ]
 
@@ -590,14 +590,14 @@ class DedicatedHostTests(testing.TestCase):
                     ],
                     "prices": [
                         {
-                            "itemId": 10195,
+                            "itemId": 12345,
                             "recurringFee": "2099",
                             "hourlyRecurringFee": "3.164",
-                            "id": 200269,
+                            "id": 12345,
                         }
                     ],
                     "keyName": "56_CORES_X_242_RAM_X_1_4_TB",
-                    "id": 10195,
+                    "id": 12345,
                     "itemCategory": {
                         "categoryCode": "dedicated_virtual_hosts"
                     },
@@ -608,12 +608,12 @@ class DedicatedHostTests(testing.TestCase):
                     "location": {
                         "locationPackageDetails": [
                             {
-                                "locationId": 265592,
+                                "locationId": 12345,
                                 "packageId": 813
                             }
                         ],
                         "location": {
-                            "id": 265592,
+                            "id": 12345,
                             "name": "ams01",
                             "longName": "Amsterdam 1"
                         }
@@ -627,12 +627,12 @@ class DedicatedHostTests(testing.TestCase):
                         "locationPackageDetails": [
                             {
                                 "isAvailable": 1,
-                                "locationId": 138124,
+                                "locationId": 12345,
                                 "packageId": 813
                             }
                         ],
                         "location": {
-                            "id": 138124,
+                            "id": 12345,
                             "name": "dal05",
                             "longName": "Dallas 5"
                         }
