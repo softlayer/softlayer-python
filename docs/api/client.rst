@@ -144,6 +144,9 @@ SoftLayer's XML-RPC API also allows for pagination.
     client.call('Account', 'getVirtualGuests', limit=10, offset=0)  # Page 1
     client.call('Account', 'getVirtualGuests', limit=10, offset=10)  # Page 2
 
+    #Automatic Pagination (v5.5.3+)
+    client.call('Account', 'getVirtualGuests', iter=True)  # Page 2
+
 Here's how to create a new Cloud Compute Instance using
 `SoftLayer_Virtual_Guest.createObject <http://developer.softlayer.com/reference/services/SoftLayer_Virtual_Guest/createObject>`_.
 Be warned, this call actually creates an hourly virtual server so this will
@@ -159,6 +162,27 @@ have billing implications.
             'operatingSystemReferenceCode': 'UBUNTU_LATEST',
             'localDiskFlag': 'false'
         })
+
+
+Debugging
+-------------
+If you ever need to figure out what exact API call the client is making, you can do the following:
+
+*NOTE* the `print_reproduceable` method produces different output for REST and XML-RPC endpoints. If you are using REST, this will produce a CURL call. IF you are using XML-RPC, it will produce some pure python code you can use outside of the SoftLayer library. 
+
+::
+    # Setup the client as usual
+    client = SoftLayer.Client()
+    # Create an instance of the DebugTransport, which logs API calls
+    debugger = SoftLayer.DebugTransport(client.transport)
+    # Set that as the default client transport
+    client.transport = debugger
+    # Make your API call
+    client.call('Account', 'getObject')
+
+    # Print out the reproduceable call
+    for call in client.transport.get_last_calls():
+        print(client.transport.print_reproduceable(call))
 
 
 API Reference

@@ -161,23 +161,23 @@ class DedicatedHostsTests(testing.TestCase):
                                    '--billing=hourly'])
         self.assert_no_fail(result)
         args = ({
-                    'hardware': [{
-                        'domain': 'test.com',
-                        'primaryBackendNetworkComponent': {
-                            'router': {
-                                'id': 12345
-                            }
-                        },
-                        'hostname': 'test-dedicated'
-                    }],
-                    'useHourlyPricing': True,
-                    'location': 'DALLAS05',
-                    'packageId': 813,
-                    'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
-                    'prices': [{
+            'hardware': [{
+                'domain': 'test.com',
+                'primaryBackendNetworkComponent': {
+                    'router': {
+                        'id': 12345
+                    }
+                },
+                'hostname': 'test-dedicated'
+            }],
+            'useHourlyPricing': True,
+            'location': 'DALLAS05',
+            'packageId': 813,
+            'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
+            'prices': [{
                         'id': 200269
-                    }],
-                    'quantity': 1},)
+            }],
+            'quantity': 1},)
 
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder',
                                 args=args)
@@ -197,23 +197,23 @@ class DedicatedHostsTests(testing.TestCase):
                                    '--billing=hourly'])
         self.assert_no_fail(result)
         args = ({
-                    'hardware': [{
-                        'domain': 'test.com',
-                        'primaryBackendNetworkComponent': {
-                            'router': {
-                                'id': 12345
-                            }
-                        },
-                        'hostname': 'test-dedicated'
-                    }],
-                    'prices': [{
-                        'id': 200269
-                    }],
-                    'location': 'DALLAS05',
-                    'packageId': 813,
-                    'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
-                    'useHourlyPricing': True,
-                    'quantity': 1},)
+            'hardware': [{
+                'domain': 'test.com',
+                'primaryBackendNetworkComponent': {
+                    'router': {
+                        'id': 12345
+                    }
+                },
+                'hostname': 'test-dedicated'
+            }],
+            'prices': [{
+                'id': 200269
+            }],
+            'location': 'DALLAS05',
+            'packageId': 813,
+            'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
+            'useHourlyPricing': True,
+            'quantity': 1},)
 
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder',
                                 args=args)
@@ -239,13 +239,13 @@ class DedicatedHostsTests(testing.TestCase):
             'useHourlyPricing': True,
             'hardware': [{
 
-                        'hostname': 'test-dedicated',
-                        'domain': 'test.com',
+                'hostname': 'test-dedicated',
+                'domain': 'test.com',
 
                 'primaryBackendNetworkComponent': {
-                            'router': {
-                                'id': 12345
-                            }
+                    'router': {
+                        'id': 12345
+                    }
                 }
             }],
             'packageId': 813, 'prices': [{'id': 200269}],
@@ -266,11 +266,11 @@ class DedicatedHostsTests(testing.TestCase):
         self.assert_no_fail(result)
 
         args = ({
-                    'useHourlyPricing': True,
-                    'hardware': [{
-                        'hostname': 'test-dedicated',
-                        'domain': 'test.com',
-                        'primaryBackendNetworkComponent': {
+            'useHourlyPricing': True,
+            'hardware': [{
+                'hostname': 'test-dedicated',
+                'domain': 'test.com',
+                'primaryBackendNetworkComponent': {
                             'router': {
                                 'id': 12345
                             }
@@ -318,22 +318,22 @@ class DedicatedHostsTests(testing.TestCase):
 
         self.assertIsInstance(result.exception, exceptions.ArgumentError)
         args = ({
-                    'hardware': [{
-                        'domain': 'test.com',
-                        'primaryBackendNetworkComponent': {
-                            'router': {
-                                'id': 12345
-                            }
-                        },
-                        'hostname': 'test-dedicated'
-                    }],
-                    'prices': [{
-                        'id': 200269
-                    }],
-                    'location': 'DALLAS05',
-                    'packageId': 813,
-                    'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
-                    'useHourlyPricing': True,
-                    'quantity': 1},)
+            'hardware': [{
+                'domain': 'test.com',
+                'primaryBackendNetworkComponent': {
+                    'router': {
+                        'id': 12345
+                    }
+                },
+                'hostname': 'test-dedicated'
+            }],
+            'prices': [{
+                'id': 200269
+            }],
+            'location': 'DALLAS05',
+            'packageId': 813,
+            'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
+            'useHourlyPricing': True,
+            'quantity': 1},)
 
         self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder', args=args)
