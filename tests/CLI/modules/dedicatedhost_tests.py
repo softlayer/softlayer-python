@@ -6,7 +6,6 @@
 """
 import json
 import mock
-import os
 import SoftLayer
 
 from SoftLayer.CLI import exceptions
