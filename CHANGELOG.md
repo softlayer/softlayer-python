@@ -1,7 +1,17 @@
 # Change Log
 
 
-## [5.5.1] - 2018-08-31
+## [5.5.3] - 2018-08-31
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.5.2...v5.5.3
+
++ Added `slcli user delete`
++ #1023 Added `slcli order quote` to let users create a quote from the slcli.
++ #1032 Fixed vs upgrades when using flavors.
++ #1034 Added pagination to ticket list commands
++ #1037 Fixed DNS manager to be more flexible and support more zone types.
++ #1044 Pinned Click library version at >=5 < 7
+
+## [5.5.2] - 2018-08-31
 - Changes: https://github.com/softlayer/softlayer-python/compare/v5.5.1...v5.5.2
 
 + #1018 Fixed hardware credentials.
