@@ -171,6 +171,7 @@ If you ever need to figure out what exact API call the client is making, you can
 *NOTE* the `print_reproduceable` method produces different output for REST and XML-RPC endpoints. If you are using REST, this will produce a CURL call. IF you are using XML-RPC, it will produce some pure python code you can use outside of the SoftLayer library. 
 
 ::
+
     # Setup the client as usual
     client = SoftLayer.Client()
     # Create an instance of the DebugTransport, which logs API calls
