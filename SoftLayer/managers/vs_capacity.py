@@ -23,7 +23,7 @@ class CapacityManager(utils.IdentifierMixin, object):
     """Manages SoftLayer Reserved Capacity Groups.
 
         Product Information
-        
+
         - https://console.bluemix.net/docs/vsi/vsi_about_reserved.html
         - https://softlayer.github.io/reference/services/SoftLayer_Virtual_ReservedCapacityGroup/
         - https://softlayer.github.io/reference/services/SoftLayer_Virtual_ReservedCapacityGroup_Instance/
