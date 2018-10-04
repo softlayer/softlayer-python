@@ -15,7 +15,11 @@ The SLCLI supports some basic Reserved Capacity Features.
 
 vs capacity create
 ------------------
-This command will create a Reserved Capacity Group.  **These groups can not be canceled until their contract expires in 1 or 3 years!**
+This command will create a Reserved Capacity Group.  
+
+.. warning::
+
+    **These groups can not be canceled until their contract expires in 1 or 3 years!**
 
 ::
 

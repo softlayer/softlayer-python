@@ -20,9 +20,13 @@ LOGGER = logging.getLogger(__name__)
 
 
 class CapacityManager(utils.IdentifierMixin, object):
-    """Manages SoftLayer Dedicated Hosts.
+    """Manages SoftLayer Reserved Capacity Groups.
 
-        See product information here https://www.ibm.com/cloud/dedicated
+        Product Information
+        
+        - https://console.bluemix.net/docs/vsi/vsi_about_reserved.html
+        - https://softlayer.github.io/reference/services/SoftLayer_Virtual_ReservedCapacityGroup/
+        - https://softlayer.github.io/reference/services/SoftLayer_Virtual_ReservedCapacityGroup_Instance/
 
 
     :param SoftLayer.API.BaseClient client: the client instance
@@ -50,7 +54,7 @@ instances[id, billingItem[description, hourlyRecurringFee]], instanceCount, back
         """Get a Reserved Capacity Group
 
         :param int identifier: Id of the SoftLayer_Virtual_ReservedCapacityGroup
-        :parm string mask: override default object Mask
+        :param string mask: override default object Mask
         """
         if mask is None:
             mask = "mask[instances[billingItem[item[keyName],category], guest], backendRouter[datacenter]]"
@@ -96,12 +100,12 @@ instances[id, billingItem[description, hourlyRecurringFee]], instanceCount, back
     def create(self, name, datacenter, backend_router_id, capacity, quantity, test=False):
         """Orders a Virtual_ReservedCapacityGroup
 
-        :params string name: Name for the new reserved capacity
-        :params string datacenter: like 'dal13'
-        :params int backend_router_id: This selects the pod. See create_options for a list
-        :params string capacity: Capacity KeyName, see create_options for a list
-        :params int quantity: Number of guest this capacity can support
-        :params bool test: If True, don't actually order, just test.
+        :param string name: Name for the new reserved capacity
+        :param string datacenter: like 'dal13'
+        :param int backend_router_id: This selects the pod. See create_options for a list
+        :param string capacity: Capacity KeyName, see create_options for a list
+        :param int quantity: Number of guest this capacity can support
+        :param bool test: If True, don't actually order, just test.
         """
         args = (self.capacity_package, datacenter, [capacity])
         extras = {"backendRouterId": backend_router_id, "name": name}
@@ -120,15 +124,16 @@ instances[id, billingItem[description, hourlyRecurringFee]], instanceCount, back
     def create_guest(self, capacity_id, test, guest_object):
         """Turns an empty Reserve Capacity into a real Virtual Guest
 
-        :params int capacity_id: ID of the RESERVED_CAPACITY_GROUP to create this guest into
-        :params bool test: True will use verifyOrder, False will use placeOrder
-        :params dictionary guest_object:  Below is the minimum info you need to send in
+        :param int capacity_id: ID of the RESERVED_CAPACITY_GROUP to create this guest into
+        :param bool test: True will use verifyOrder, False will use placeOrder
+        :param dictionary guest_object:  Below is the minimum info you need to send in
             guest_object = {
-                'domain': 'test.com',
-                'hostname': 'A1538172419',
-                'os_code': 'UBUNTU_LATEST_64',
-                'primary_disk': '25',
+            'domain': 'test.com',
+            'hostname': 'A1538172419',
+            'os_code': 'UBUNTU_LATEST_64',
+            'primary_disk': '25',
             }
+
         """
         vs_manager = VSManager(self.client)
         mask = "mask[instances[id, billingItem[id, item[id,keyName]]], backendRouter[id, datacenter[name]]]"
