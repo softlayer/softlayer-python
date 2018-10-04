@@ -141,9 +141,9 @@ class ImageManager(utils.IdentifierMixin, object):
         :param string wrapped_dek: Wrapped Decryption Key provided by IBM
          KeyProtect
         :param string kp_id: ID of the IBM Key Protect Instance
-        :param bool cloud_init: Specifies if image is cloud init
-        :param bool byol: Specifies if image is bring your own license
-        :param bool is_encrypted: Specifies if image is encrypted
+        :param boolean cloud_init: Specifies if image is cloud init
+        :param boolean byol: Specifies if image is bring your own license
+        :param boolean is_encrypted: Specifies if image is encrypted
         """
         if 'cos://' in uri:
             return self.vgbdtg.createFromIcos({
@@ -152,7 +152,7 @@ class ImageManager(utils.IdentifierMixin, object):
                 'operatingSystemReferenceCode': os_code,
                 'uri': uri,
                 'ibmApiKey': ibm_api_key,
-                'rootKeyid': root_key_id,
+                'rootKeyId': root_key_id,
                 'wrappedDek': wrapped_dek,
                 'keyProtectId': kp_id,
                 'cloudInit': cloud_init,
