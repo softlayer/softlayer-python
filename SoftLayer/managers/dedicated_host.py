@@ -70,7 +70,6 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
 
         result = self.client.call('Billing_Item', 'cancelItem',
                                   immediate, False, cancel_reason, comment, id=billing_id)
-        host_billing = self.get_host(host_id, mask=mask)
 
         return result
 
