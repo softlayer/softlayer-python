@@ -12,7 +12,7 @@ from SoftLayer.CLI import helpers
 @click.command()
 @click.argument('identifier')
 @click.argument('uri')
-@click.option('--ibm_api_key',
+@click.option('--ibm-api-key',
               default="",
               help="The IBM Cloud API Key with access to IBM Cloud Object "
                    "Storage instance.")
