@@ -296,7 +296,8 @@ class OrderingTests(testing.TestCase):
 
     def test_get_price_id_list(self):
         category1 = {'categoryCode': 'cat1'}
-        price1 = {'id': 1234, 'locationGroupId': None, 'itemCategory': [category1]}
+        price1 = {'id': 1234, 'locationGroupId': None, 'categories': [{"categoryCode": "guest_core"}],
+                  'itemCategory': [category1]}
         item1 = {'id': 1111, 'keyName': 'ITEM1', 'itemCategory': category1, 'prices': [price1]}
         category2 = {'categoryCode': 'cat2'}
         price2 = {'id': 5678, 'locationGroupId': None, 'categories': [category2]}
@@ -305,7 +306,7 @@ class OrderingTests(testing.TestCase):
         with mock.patch.object(self.ordering, 'list_items') as list_mock:
             list_mock.return_value = [item1, item2]
 
-            prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'])
+            prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], "8")
 
         list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
         self.assertEqual([price1['id'], price2['id']], prices)
@@ -320,7 +321,7 @@ class OrderingTests(testing.TestCase):
 
             exc = self.assertRaises(exceptions.SoftLayerError,
                                     self.ordering.get_price_id_list,
-                                    'PACKAGE_KEYNAME', ['ITEM2'])
+                                    'PACKAGE_KEYNAME', ['ITEM2'], "8")
         list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
         self.assertEqual("Item ITEM2 does not exist for package PACKAGE_KEYNAME", str(exc))
 
@@ -333,7 +334,7 @@ class OrderingTests(testing.TestCase):
         with mock.patch.object(self.ordering, 'list_items') as list_mock:
             list_mock.return_value = [item1, item1]
 
-            prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM1'])
+            prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM1'], "8")
 
             list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
             self.assertEqual([price2['id'], price1['id']], prices)
@@ -366,7 +367,7 @@ class OrderingTests(testing.TestCase):
 
         mock_pkg.assert_called_once_with(pkg, mask='id')
         mock_preset.assert_called_once_with(pkg, preset)
-        mock_get_ids.assert_called_once_with(pkg, items)
+        mock_get_ids.assert_called_once_with(pkg, items, 8)
         self.assertEqual(expected_order, order)
 
     def test_generate_order(self):
@@ -388,7 +389,7 @@ class OrderingTests(testing.TestCase):
 
         mock_pkg.assert_called_once_with(pkg, mask='id')
         mock_preset.assert_not_called()
-        mock_get_ids.assert_called_once_with(pkg, items)
+        mock_get_ids.assert_called_once_with(pkg, items, None)
         self.assertEqual(expected_order, order)
 
     def test_verify_order(self):
@@ -526,7 +527,7 @@ class OrderingTests(testing.TestCase):
         with mock.patch.object(self.ordering, 'list_items') as list_mock:
             list_mock.return_value = [item1, item2]
 
-            prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'])
+            prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], "8")
 
         list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
         self.assertEqual([price1['id'], price2['id']], prices)
@@ -543,7 +544,7 @@ class OrderingTests(testing.TestCase):
         with mock.patch.object(self.ordering, 'list_items') as list_mock:
             list_mock.return_value = [item1, item2]
 
-            prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'])
+            prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], "8")
 
         list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
         self.assertEqual([price1['id'], price2['id']], prices)
