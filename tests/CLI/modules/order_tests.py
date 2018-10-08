@@ -47,26 +47,21 @@ class OrderTests(testing.TestCase):
         self.assertEqual(expected_results, json.loads(result.output))
 
     def test_package_list(self):
-        item1 = {'name': 'package1', 'keyName': 'PACKAGE1', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1}
-        item2 = {'name': 'package2', 'keyName': 'PACKAGE2', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1}
-        item3 = {'name': 'package2', 'keyName': 'PACKAGE2', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 0}
         p_mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        p_mock.return_value = [item1, item2, item3]
+        p_mock.return_value = _get_all_packages()
         _filter = {'type': {'keyName': {'operation': '!= BLUEMIX_SERVICE'}}}
 
         result = self.run_command(['order', 'package-list'])
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects', filter=_filter)
-        expected_results = [{'name': 'package1', 'keyName': 'PACKAGE1', 'type': 'BARE_METAL_CPU'},
-                            {'name': 'package2', 'keyName': 'PACKAGE2', 'type': 'BARE_METAL_CPU'}]
+        expected_results = [{'id': 1, 'name': 'package1', 'keyName': 'PACKAGE1', 'type': 'BARE_METAL_CPU'},
+                            {'id': 2, 'name': 'package2', 'keyName': 'PACKAGE2', 'type': 'BARE_METAL_CPU'}]
         self.assertEqual(expected_results, json.loads(result.output))
 
     def test_package_list_keyword(self):
-        item1 = {'name': 'package1', 'keyName': 'PACKAGE1', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1}
-        item2 = {'name': 'package2', 'keyName': 'PACKAGE2', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1}
         p_mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        p_mock.return_value = [item1, item2]
+        p_mock.return_value = _get_all_packages()
 
         _filter = {'type': {'keyName': {'operation': '!= BLUEMIX_SERVICE'}}}
         _filter['name'] = {'operation': '*= package1'}
@@ -74,23 +69,21 @@ class OrderTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects', filter=_filter)
-        expected_results = [{'name': 'package1', 'keyName': 'PACKAGE1', 'type': 'BARE_METAL_CPU'},
-                            {'name': 'package2', 'keyName': 'PACKAGE2', 'type': 'BARE_METAL_CPU'}]
+        expected_results = [{'id': 1, 'name': 'package1', 'keyName': 'PACKAGE1', 'type': 'BARE_METAL_CPU'},
+                            {'id': 2, 'name': 'package2', 'keyName': 'PACKAGE2', 'type': 'BARE_METAL_CPU'}]
         self.assertEqual(expected_results, json.loads(result.output))
 
     def test_package_list_type(self):
-        item1 = {'name': 'package1', 'keyName': 'PACKAGE1', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1}
-        item2 = {'name': 'package2', 'keyName': 'PACKAGE2', 'type': {'keyName': 'BARE_METAL_CPU'}, 'isActive': 1}
         p_mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        p_mock.return_value = [item1, item2]
+        p_mock.return_value = _get_all_packages()
 
         _filter = {'type': {'keyName': {'operation': 'BARE_METAL_CPU'}}}
         result = self.run_command(['order', 'package-list', '--package_type', 'BARE_METAL_CPU'])
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects', filter=_filter)
-        expected_results = [{'name': 'package1', 'keyName': 'PACKAGE1', 'type': 'BARE_METAL_CPU'},
-                            {'name': 'package2', 'keyName': 'PACKAGE2', 'type': 'BARE_METAL_CPU'}]
+        expected_results = [{'id': 1, 'name': 'package1', 'keyName': 'PACKAGE1', 'type': 'BARE_METAL_CPU'},
+                            {'id': 2, 'name': 'package2', 'keyName': 'PACKAGE2', 'type': 'BARE_METAL_CPU'}]
         self.assertEqual(expected_results, json.loads(result.output))
 
     def test_place(self):
@@ -112,6 +105,35 @@ class OrderTests(testing.TestCase):
         self.assertEqual({'id': 1234,
                           'created': order_date,
                           'status': 'APPROVED'},
+                         json.loads(result.output))
+
+    def test_place_quote(self):
+        order_date = '2018-04-04 07:39:20'
+        expiration_date = '2018-05-04 07:39:20'
+        quote_name = 'foobar'
+        order = {'orderDate': order_date,
+                 'quote': {
+                     'id': 1234,
+                     'name': quote_name,
+                     'expirationDate': expiration_date,
+                     'status': 'PENDING'
+                 }}
+        place_quote_mock = self.set_mock('SoftLayer_Product_Order', 'placeQuote')
+        items_mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
+
+        place_quote_mock.return_value = order
+        items_mock.return_value = self._get_order_items()
+
+        result = self.run_command(['order', 'place-quote', '--name', 'foobar', 'package', 'DALLAS13',
+                                   'ITEM1', '--complex-type', 'SoftLayer_Container_Product_Order_Thing'])
+
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeQuote')
+        self.assertEqual({'id': 1234,
+                          'name': quote_name,
+                          'created': order_date,
+                          'expires': expiration_date,
+                          'status': 'PENDING'},
                          json.loads(result.output))
 
     def test_verify_hourly(self):
@@ -227,3 +249,13 @@ class OrderTests(testing.TestCase):
         price2 = {'item': item2, 'hourlyRecurringFee': '0.05',
                   'recurringFee': '150'}
         return {'orderContainers': [{'prices': [price1, price2]}]}
+
+
+def _get_all_packages():
+    package_type = {'keyName': 'BARE_METAL_CPU'}
+    all_packages = [
+        {'id': 1, 'name': 'package1', 'keyName': 'PACKAGE1', 'type': package_type, 'isActive': 1},
+        {'id': 2, 'name': 'package2', 'keyName': 'PACKAGE2', 'type': package_type, 'isActive': 1},
+        {'id': 3, 'name': 'package2', 'keyName': 'PACKAGE2', 'type': package_type, 'isActive': 0}
+    ]
+    return all_packages

@@ -72,11 +72,11 @@ def _parse_create_args(client, args):
     :param dict args: CLI arguments
     """
     data = {
-        "hourly": args['billing'] == 'hourly',
+        "hourly": args.get('billing', 'hourly') == 'hourly',
         "domain": args['domain'],
         "hostname": args['hostname'],
-        "private": args['private'],
-        "dedicated": args['dedicated'],
+        "private": args.get('private', None),
+        "dedicated": args.get('dedicated', None),
         "disks": args['disk'],
         "cpus": args.get('cpu', None),
         "memory": args.get('memory', None),
@@ -89,7 +89,7 @@ def _parse_create_args(client, args):
     if not args.get('san') and args.get('flavor'):
         data['local_disk'] = None
     else:
-        data['local_disk'] = not args['san']
+        data['local_disk'] = not args.get('san')
 
     if args.get('os'):
         data['os_code'] = args['os']
@@ -270,33 +270,19 @@ def cli(env, **args):
     output = []
     if args.get('test'):
         result = vsi.verify_create_instance(**data)
-        total_monthly = 0.0
-        total_hourly = 0.0
 
-        table = formatting.Table(['Item', 'cost'])
-        table.align['Item'] = 'r'
-        table.align['cost'] = 'r'
+        if result['presetId']:
+            ordering_mgr = SoftLayer.OrderingManager(env.client)
+            item_prices = ordering_mgr.get_item_prices(result['packageId'])
+            preset_prices = ordering_mgr.get_preset_prices(result['presetId'])
+            search_keys = ["guest_core", "ram"]
+            for price in preset_prices['prices']:
+                if price['item']['itemCategory']['categoryCode'] in search_keys:
+                    item_key_name = price['item']['keyName']
+                    _add_item_prices(item_key_name, item_prices, result)
 
-        for price in result['prices']:
-            total_monthly += float(price.get('recurringFee', 0.0))
-            total_hourly += float(price.get('hourlyRecurringFee', 0.0))
-            if args.get('billing') == 'hourly':
-                rate = "%.2f" % float(price['hourlyRecurringFee'])
-            elif args.get('billing') == 'monthly':
-                rate = "%.2f" % float(price['recurringFee'])
+        table = _build_receipt_table(result['prices'], args.get('billing'))
 
-            table.add_row([price['item']['description'], rate])
-
-        total = 0
-        if args.get('billing') == 'hourly':
-            total = total_hourly
-        elif args.get('billing') == 'monthly':
-            total = total_monthly
-
-        billing_rate = 'monthly'
-        if args.get('billing') == 'hourly':
-            billing_rate = 'hourly'
-        table.add_row(['Total %s cost' % billing_rate, "%.2f" % total])
         output.append(table)
         output.append(formatting.FormattedItem(
             None,
@@ -332,6 +318,35 @@ def cli(env, **args):
                 raise exceptions.CLIHalt(code=1)
 
     env.fout(output)
+
+
+def _add_item_prices(item_key_name, item_prices, result):
+    """Add the flavor item prices to the rest o the items prices"""
+    for item in item_prices:
+        if item_key_name == item['item']['keyName']:
+            if 'pricingLocationGroup' in item:
+                for location in item['pricingLocationGroup']['locations']:
+                    if result['location'] == str(location['id']):
+                        result['prices'].append(item)
+
+
+def _build_receipt_table(prices, billing="hourly"):
+    """Retrieve the total recurring fee of the items prices"""
+    total = 0.000
+    table = formatting.Table(['Cost', 'Item'])
+    table.align['Cost'] = 'r'
+    table.align['Item'] = 'l'
+    for price in prices:
+        rate = 0.000
+        if billing == "hourly":
+            rate += float(price.get('hourlyRecurringFee', 0.000))
+        else:
+            rate += float(price.get('recurringFee', 0.000))
+        total += rate
+
+        table.add_row(["%.3f" % rate, price['item']['description']])
+    table.add_row(["%.3f" % total, "Total %s cost" % billing])
+    return table
 
 
 def _validate_args(env, args):

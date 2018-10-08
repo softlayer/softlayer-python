@@ -916,7 +916,7 @@ getItems = [
         'prices': [{'id': 611}],
     }]
 
-getItemPrices = [
+getItemPricesISCSI = [
     {
         'currentPriceFlag': '',
         'id': 2152,
@@ -1340,3 +1340,287 @@ getRegions = [{
         }]
     }]
 }]
+
+getItemPrices = [
+    {
+        "hourlyRecurringFee": ".093",
+        "id": 204015,
+        "recurringFee": "62",
+        "item": {
+            "description": "4 x 2.0 GHz or higher Cores",
+            "id": 859,
+            "keyName": "GUEST_CORES_4",
+        },
+        "pricingLocationGroup": {
+            "id": 503,
+            "locations": [
+                {
+                    "id": 449610,
+                    "longName": "Montreal 1",
+                    "name": "mon01",
+                    "statusId": 2
+                },
+                {
+                    "id": 449618,
+                    "longName": "Montreal 2",
+                    "name": "mon02",
+                    "statusId": 2
+                },
+                {
+                    "id": 448994,
+                    "longName": "Toronto 1",
+                    "name": "tor01",
+                    "statusId": 2
+                },
+                {
+                    "id": 350993,
+                    "longName": "Toronto 2",
+                    "name": "tor02",
+                    "statusId": 2
+                },
+                {
+                    "id": 221894,
+                    "longName": "Amsterdam 2",
+                    "name": "ams02",
+                    "statusId": 2
+                },
+                {
+                    "id": 265592,
+                    "longName": "Amsterdam 1",
+                    "name": "ams01",
+                    "statusId": 2
+                },
+                {
+                    "id": 814994,
+                    "longName": "Amsterdam 3",
+                    "name": "ams03",
+                    "statusId": 2
+                }
+            ]
+        }
+    },
+    {
+        "hourlyRecurringFee": ".006",
+        "id": 204663,
+        "recurringFee": "4.1",
+        "item": {
+            "description": "100 GB (LOCAL)",
+            "id": 3899,
+            "keyName": "GUEST_DISK_100_GB_LOCAL_3",
+        },
+        "pricingLocationGroup": {
+            "id": 503,
+            "locations": [
+                {
+                    "id": 449610,
+                    "longName": "Montreal 1",
+                    "name": "mon01",
+                    "statusId": 2
+                },
+                {
+                    "id": 449618,
+                    "longName": "Montreal 2",
+                    "name": "mon02",
+                    "statusId": 2
+                },
+                {
+                    "id": 448994,
+                    "longName": "Toronto 1",
+                    "name": "tor01",
+                    "statusId": 2
+                },
+                {
+                    "id": 350993,
+                    "longName": "Toronto 2",
+                    "name": "tor02",
+                    "statusId": 2
+                },
+                {
+                    "id": 221894,
+                    "longName": "Amsterdam 2",
+                    "name": "ams02",
+                    "statusId": 2
+                },
+                {
+                    "id": 265592,
+                    "longName": "Amsterdam 1",
+                    "name": "ams01",
+                    "statusId": 2
+                },
+                {
+                    "id": 814994,
+                    "longName": "Amsterdam 3",
+                    "name": "ams03",
+                    "statusId": 2
+                }
+            ]
+        }
+    },
+    {
+        "hourlyRecurringFee": ".217",
+        "id": 204255,
+        "recurringFee": "144",
+        "item": {
+            "description": "16 GB ",
+            "id": 1017,
+            "keyName": "RAM_16_GB",
+        },
+        "pricingLocationGroup": {
+            "id": 503,
+            "locations": [
+                {
+                    "id": 449610,
+                    "longName": "Montreal 1",
+                    "name": "mon01",
+                    "statusId": 2
+                },
+                {
+                    "id": 449618,
+                    "longName": "Montreal 2",
+                    "name": "mon02",
+                    "statusId": 2
+                },
+                {
+                    "id": 448994,
+                    "longName": "Toronto 1",
+                    "name": "tor01",
+                    "statusId": 2
+                },
+                {
+                    "id": 350993,
+                    "longName": "Toronto 2",
+                    "name": "tor02",
+                    "statusId": 2
+                },
+                {
+                    "id": 221894,
+                    "longName": "Amsterdam 2",
+                    "name": "ams02",
+                    "statusId": 2
+                },
+                {
+                    "id": 265592,
+                    "longName": "Amsterdam 1",
+                    "name": "ams01",
+                    "statusId": 2
+                },
+                {
+                    "id": 814994,
+                    "longName": "Amsterdam 3",
+                    "name": "ams03",
+                    "statusId": 2
+                }
+            ]
+        }
+    }
+]
+getActivePresets = [
+    {
+        "description": "M1.64x512x25",
+        "id": 799,
+        "isActive": "1",
+        "keyName": "M1_64X512X25",
+        "name": "M1.64x512x25",
+        "packageId": 835
+    },
+    {
+        "description": "M1.56x448x100",
+        "id": 797,
+        "isActive": "1",
+        "keyName": "M1_56X448X100",
+        "name": "M1.56x448x100",
+        "packageId": 835
+    },
+    {
+        "description": "M1.64x512x100",
+        "id": 801,
+        "isActive": "1",
+        "keyName": "M1_64X512X100",
+        "name": "M1.64x512x100",
+        "packageId": 835
+    }
+]
+
+getAccountRestrictedActivePresets = []
+
+RESERVED_CAPACITY = [{"id": 1059}]
+getItems_RESERVED_CAPACITY = [
+    {
+        'id': 12273,
+        'keyName': 'B1_1X2_1_YEAR_TERM',
+        'description': 'B1 1x2 1 year term',
+        'capacity': 12,
+        'itemCategory': {
+            'categoryCode': 'reserved_capacity',
+            'id': 2060,
+            'name': 'Reserved Capacity',
+            'quantityLimit': 20,
+            'sortOrder': ''
+        },
+        'prices': [
+            {
+                'currentPriceFlag': '',
+                'hourlyRecurringFee': '.032',
+                'id': 217561,
+                'itemId': 12273,
+                'laborFee': '0',
+                'locationGroupId': '',
+                'onSaleFlag': '',
+                'oneTimeFee': '0',
+                'quantity': '',
+                'setupFee': '0',
+                'sort': 0,
+                'tierMinimumThreshold': '',
+                'categories': [
+                    {
+                        'categoryCode': 'reserved_capacity',
+                        'id': 2060,
+                        'name': 'Reserved Capacity',
+                        'quantityLimit': 20,
+                        'sortOrder': ''
+                    }
+                ]
+            }
+        ]
+    }
+]
+
+getItems_1_IPV6_ADDRESS = [
+    {
+        'id': 4097,
+        'keyName': '1_IPV6_ADDRESS',
+        'itemCategory': {
+            'categoryCode': 'pri_ipv6_addresses',
+            'id': 325,
+            'name': 'Primary IPv6 Addresses',
+            'quantityLimit': 0,
+            'sortOrder': 34
+        },
+        'prices': [
+            {
+                'currentPriceFlag': '',
+                'hourlyRecurringFee': '0',
+                'id': 17129,
+                'itemId': 4097,
+                'laborFee': '0',
+                'locationGroupId': '',
+                'onSaleFlag': '',
+                'oneTimeFee': '0',
+                'quantity': '',
+                'recurringFee': '0',
+                'setupFee': '0',
+                'sort': 0,
+                'tierMinimumThreshold': '',
+                'categories': [
+                    {
+                        'categoryCode': 'pri_ipv6_addresses',
+                        'id': 325,
+                        'name': 'Primary IPv6 Addresses',
+                        'quantityLimit': 0,
+                        'sortOrder': 34
+                    }
+                ]
+            }
+        ]
+    }
+]

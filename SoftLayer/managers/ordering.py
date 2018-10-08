@@ -34,6 +34,7 @@ class OrderingManager(object):
         self.package_svc = client['Product_Package']
         self.order_svc = client['Product_Order']
         self.billing_svc = client['Billing_Order']
+        self.package_preset = client['Product_Package_Preset']
 
     def get_packages_of_type(self, package_types, mask=None):
         """Get packages that match a certain type.
@@ -369,6 +370,34 @@ class OrderingManager(object):
 
         return prices
 
+    def get_preset_prices(self, preset):
+        """Get preset item prices.
+
+        Retrieve a SoftLayer_Product_Package_Preset record.
+
+        :param int preset: preset identifier.
+        :returns: A list of price IDs associated with the given preset_id.
+
+        """
+        mask = 'mask[prices[item]]'
+
+        prices = self.package_preset.getObject(id=preset, mask=mask)
+        return prices
+
+    def get_item_prices(self, package_id):
+        """Get item prices.
+
+        Retrieve a SoftLayer_Product_Package item prices record.
+
+        :param int package_id: package identifier.
+        :returns: A list of price IDs associated with the given package.
+
+        """
+        mask = 'mask[pricingLocationGroup[locations]]'
+
+        prices = self.package_svc.getItemPrices(id=package_id, mask=mask)
+        return prices
+
     def verify_order(self, package_keyname, location, item_keynames, complex_type=None,
                      hourly=True, preset_keyname=None, extras=None, quantity=1):
         """Verifies an order with the given package and prices.
@@ -429,6 +458,39 @@ class OrderingManager(object):
                                     preset_keyname=preset_keyname,
                                     extras=extras, quantity=quantity)
         return self.order_svc.placeOrder(order)
+
+    def place_quote(self, package_keyname, location, item_keynames, complex_type=None,
+                    preset_keyname=None, extras=None, quantity=1, quote_name=None, send_email=False):
+        """Place a quote with the given package and prices.
+
+        This function takes in parameters needed for an order and places the quote.
+
+        :param str package_keyname: The keyname for the package being ordered
+        :param str location: The datacenter location string for ordering (Ex: DALLAS13)
+        :param list item_keynames: The list of item keyname strings to order. To see list of
+                                   possible keynames for a package, use list_items()
+                                   (or `slcli order item-list`)
+        :param str complex_type: The complex type to send with the order. Typically begins
+                                 with `SoftLayer_Container_Product_Order_`.
+        :param string preset_keyname: If needed, specifies a preset to use for that package.
+                                      To see a list of possible keynames for a package, use
+                                      list_preset() (or `slcli order preset-list`)
+        :param dict extras: The extra data for the order in dictionary format.
+                            Example: A VSI order requires hostname and domain to be set, so
+                            extras will look like the following:
+                            {'virtualGuests': [{'hostname': 'test', domain': 'softlayer.com'}]}
+        :param int quantity: The number of resources to order
+        :param string quote_name: A custom name to be assigned to the quote (optional).
+        :param bool send_email: This flag indicates that the quote should be sent to the email
+                                address associated with the account or order.
+        """
+        order = self.generate_order(package_keyname, location, item_keynames, complex_type=complex_type,
+                                    hourly=False, preset_keyname=preset_keyname, extras=extras, quantity=quantity)
+
+        order['quoteName'] = quote_name
+        order['sendQuoteEmailFlag'] = send_email
+
+        return self.order_svc.placeQuote(order)
 
     def generate_order(self, package_keyname, location, item_keynames, complex_type=None,
                        hourly=True, preset_keyname=None, extras=None, quantity=1):

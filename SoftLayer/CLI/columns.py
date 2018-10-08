@@ -57,7 +57,7 @@ class ColumnFormatter(object):
 def get_formatter(columns):
     """This function returns a callback to use with click options.
 
-    The retuend function parses a comma-separated value and returns a new
+    The returend function parses a comma-separated value and returns a new
     ColumnFormatter.
 
     :param columns: a list of Column instances

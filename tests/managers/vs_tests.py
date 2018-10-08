@@ -792,10 +792,10 @@ class VSTests(testing.TestCase):
 
         self.assertEqual(result, True)
         args = ({
-                    'hostname': 'new-host',
-                    'domain': 'new.sftlyr.ws',
-                    'notes': 'random notes',
-                },)
+            'hostname': 'new-host',
+            'domain': 'new.sftlyr.ws',
+            'notes': 'random notes',
+        },)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'editObject',
                                 identifier=100,
                                 args=args)
@@ -876,6 +876,22 @@ class VSTests(testing.TestCase):
         order_container = call.args[0]
         self.assertIn({'id': 1144}, order_container['prices'])
         self.assertIn({'id': 1133}, order_container['prices'])
+        self.assertIn({'id': 1122}, order_container['prices'])
+        self.assertEqual(order_container['virtualGuests'], [{'id': 1}])
+
+    def test_upgrade_with_flavor(self):
+        # Testing Upgrade with parameter preset
+        result = self.vs.upgrade(1,
+                                 preset="M1_64X512X100",
+                                 nic_speed=1000,
+                                 public=True)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
+        call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
+        order_container = call.args[0]
+        self.assertEqual(799, order_container['presetId'])
+        self.assertIn({'id': 1}, order_container['virtualGuests'])
         self.assertIn({'id': 1122}, order_container['prices'])
         self.assertEqual(order_container['virtualGuests'], [{'id': 1}])
 

@@ -94,7 +94,7 @@ class UserCLITests(testing.TestCase):
                  'fullyQualifiedDomainName': 'test.test.test',
                  'provisionDate': '2018-05-08T15:28:32-06:00',
                  'primaryBackendIpAddress': '175.125.126.118',
-                 'primaryIpAddress':  '175.125.126.118'}
+                 'primaryIpAddress': '175.125.126.118'}
             ],
             'dedicatedHosts': [
                 {'id': 1234,

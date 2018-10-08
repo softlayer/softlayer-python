@@ -91,6 +91,73 @@ class DNSTests(testing.TestCase):
                                 },))
         self.assertEqual(res, {'name': 'example.com'})
 
+    def test_create_record_mx(self):
+        res = self.dns_client.create_record_mx(1, 'test', 'testing', ttl=1200, priority=21)
+
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
+                                'createObject',
+                                args=({
+                                    'domainId': 1,
+                                    'ttl': 1200,
+                                    'host': 'test',
+                                    'type': 'MX',
+                                    'data': 'testing',
+                                    'mxPriority': 21
+                                },))
+        self.assertEqual(res, {'name': 'example.com'})
+
+    def test_create_record_srv(self):
+        res = self.dns_client.create_record_srv(1, 'record', 'test_data', 'SLS', 8080, 'foobar',
+                                                ttl=1200, priority=21, weight=15)
+
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
+                                'createObject',
+                                args=({
+                                    'complexType': 'SoftLayer_Dns_Domain_ResourceRecord_SrvType',
+                                    'domainId': 1,
+                                    'ttl': 1200,
+                                    'host': 'record',
+                                    'type': 'SRV',
+                                    'data': 'test_data',
+                                    'priority': 21,
+                                    'weight': 15,
+                                    'service': 'foobar',
+                                    'port': 8080,
+                                    'protocol': 'SLS'
+                                },))
+        self.assertEqual(res, {'name': 'example.com'})
+
+    def test_create_record_ptr(self):
+        res = self.dns_client.create_record_ptr('test', 'testing', ttl=1200)
+
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
+                                'createObject',
+                                args=({
+                                    'ttl': 1200,
+                                    'host': 'test',
+                                    'type': 'PTR',
+                                    'data': 'testing'
+                                },))
+        self.assertEqual(res, {'name': 'example.com'})
+
+    def test_generate_create_dict(self):
+        data = self.dns_client._generate_create_dict('foo', 'pmx', 'bar', 60, domainId=1234,
+                                                     mxPriority=18, port=80, protocol='TCP', weight=25)
+
+        assert_data = {
+            'host': 'foo',
+            'data': 'bar',
+            'ttl': 60,
+            'type': 'pmx',
+            'domainId': 1234,
+            'mxPriority': 18,
+            'port': 80,
+            'protocol': 'TCP',
+            'weight': 25
+        }
+
+        self.assertEqual(data, assert_data)
+
     def test_delete_record(self):
         self.dns_client.delete_record(1)
 

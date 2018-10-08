@@ -40,7 +40,7 @@ class TicketManager(utils.IdentifierMixin, object):
             else:
                 raise ValueError("open_status and closed_status cannot both be False")
 
-        return self.client.call('Account', call, mask=mask)
+        return self.client.call('Account', call, mask=mask, iter=True)
 
     def list_subjects(self):
         """List all ticket subjects."""

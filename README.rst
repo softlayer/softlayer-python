@@ -17,7 +17,7 @@ SoftLayer API Python Client
 
 
 This library provides a simple Python client to interact with `SoftLayer's
-XML-RPC API <http://developer.softlayer.com/reference/softlayerapi>`_. 
+XML-RPC API <https://softlayer.github.io/reference/softlayerapi>`_.
 
 A command-line interface is also included and can be used to manage various
 SoftLayer products and services.
@@ -120,7 +120,7 @@ If you are using the library directly in python, you can do something like this.
 
 System Requirements
 -------------------
-* Python 2.7, 3.3, 3.4, 3.5 or 3.6.
+* Python 2.7, 3.3, 3.4, 3.5, 3.6, or 3.7.
 * A valid SoftLayer API username and key.
 * A connection to SoftLayer's private network is required to use
   our private network API endpoints.
@@ -129,7 +129,7 @@ Python Packages
 ---------------
 * six >= 1.7.0
 * prettytable >= 0.7.0
-* click >= 5
+* click >= 5, < 7
 * requests >= 2.18.4
 * prompt_toolkit >= 0.53
 * pygments >= 2.0.0

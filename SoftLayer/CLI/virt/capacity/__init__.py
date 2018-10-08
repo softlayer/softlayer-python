@@ -1,42 +1,42 @@
 """Manages Reserved Capacity."""
 # :license: MIT, see LICENSE for more details.
-import importlib
-import click
-import types
-import SoftLayer
-import os
-from SoftLayer.CLI import environment
-from SoftLayer.CLI import formatting
 
-from pprint import pprint as pp
-class capacityCommands(click.MultiCommand):
+import importlib
+import os
+
+import click
+
+CONTEXT = {'help_option_names': ['-h', '--help'],
+           'max_content_width': 999}
+
+
+class CapacityCommands(click.MultiCommand):
     """Loads module for capacity related commands."""
 
-    def __init__(self, *path, **attrs):
+    def __init__(self, **attrs):
         click.MultiCommand.__init__(self, **attrs)
         self.path = os.path.dirname(__file__)
 
     def list_commands(self, ctx):
         """List all sub-commands."""
- 
-        rv = []
+        commands = []
         for filename in os.listdir(self.path):
             if filename == '__init__.py':
                 continue
             if filename.endswith('.py'):
-                rv.append(filename[:-3])
-        rv.sort()
-        return rv
+                commands.append(filename[:-3])
+        commands.sort()
+        return commands
 
-    def get_command(self, ctx, name):
+    def get_command(self, ctx, cmd_name):
         """Get command for click."""
-        path = "%s.%s" % (__name__, name)
+        path = "%s.%s" % (__name__, cmd_name)
         module = importlib.import_module(path)
         return getattr(module, 'cli')
 
-@click.group(cls=capacityCommands, 
-             help="Manages virtual server reserved capacity")
-@environment.pass_env
-def cli(env):
-    """Manages Capacity"""
+
+# Required to get the sub-sub-sub command to work.
+@click.group(cls=CapacityCommands, context_settings=CONTEXT)
+def cli():
+    """Base command for all capacity related concerns"""
     pass

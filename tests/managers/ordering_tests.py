@@ -68,6 +68,18 @@ class OrderingTests(testing.TestCase):
 
         self.assertEqual(46, package_id)
 
+    def test_get_preset_prices(self):
+        result = self.ordering.get_preset_prices(405)
+
+        self.assertEqual(result, fixtures.SoftLayer_Product_Package_Preset.getObject)
+        self.assert_called_with('SoftLayer_Product_Package_Preset', 'getObject')
+
+    def test_get_item_prices(self):
+        result = self.ordering.get_item_prices(835)
+
+        self.assertEqual(result, fixtures.SoftLayer_Product_Package.getItemPrices)
+        self.assert_called_with('SoftLayer_Product_Package', 'getItemPrices')
+
     def test_get_package_id_by_type_fails_for_nonexistent_package_type(self):
         p_mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         p_mock.return_value = []
@@ -431,6 +443,33 @@ class OrderingTests(testing.TestCase):
                                          extras=extras, quantity=quantity)
         self.assertEqual(ord_mock.return_value, order)
 
+    def test_place_quote(self):
+        ord_mock = self.set_mock('SoftLayer_Product_Order', 'placeQuote')
+        ord_mock.return_value = {'id': 1234}
+        pkg = 'PACKAGE_KEYNAME'
+        location = 'DALLAS13'
+        items = ['ITEM1', 'ITEM2']
+        hourly = False
+        preset_keyname = 'PRESET'
+        complex_type = 'Complex_Type'
+        extras = {'foo': 'bar'}
+        quantity = 1
+        name = 'wombat'
+        send_email = True
+
+        with mock.patch.object(self.ordering, 'generate_order') as gen_mock:
+            gen_mock.return_value = {'order': {}}
+
+            order = self.ordering.place_quote(pkg, location, items, preset_keyname=preset_keyname,
+                                              complex_type=complex_type, extras=extras, quantity=quantity,
+                                              quote_name=name, send_email=send_email)
+
+        gen_mock.assert_called_once_with(pkg, location, items, hourly=hourly,
+                                         preset_keyname=preset_keyname,
+                                         complex_type=complex_type,
+                                         extras=extras, quantity=quantity)
+        self.assertEqual(ord_mock.return_value, order)
+
     def test_locations(self):
         locations = self.ordering.package_locations('BARE_METAL_CPU')
         self.assertEqual('WASHINGTON07', locations[0]['keyname'])
@@ -469,7 +508,7 @@ class OrderingTests(testing.TestCase):
     def test_get_location_id_exception(self):
         locations = self.set_mock('SoftLayer_Location', 'getDatacenters')
         locations.return_value = []
-        self.assertRaises(exceptions.SoftLayerError,  self.ordering.get_location_id, "BURMUDA")
+        self.assertRaises(exceptions.SoftLayerError, self.ordering.get_location_id, "BURMUDA")
 
     def test_get_location_id_int(self):
         dc_id = self.ordering.get_location_id(1234)

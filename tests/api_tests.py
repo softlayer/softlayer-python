@@ -12,7 +12,7 @@ from SoftLayer import testing
 from SoftLayer import transports
 
 
-class Inititialization(testing.TestCase):
+class Initialization(testing.TestCase):
     def test_init(self):
         client = SoftLayer.Client(username='doesnotexist',
                                   api_key='issurelywrong',
