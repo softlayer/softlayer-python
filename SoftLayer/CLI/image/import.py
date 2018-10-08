@@ -22,9 +22,10 @@ from SoftLayer.CLI import formatting
 @click.option('--ibm-api-key',
               default="",
               help="The IBM Cloud API Key with access to IBM Cloud Object "
-                   "Storage instance. For help creating this key see "
-                   "https://console.bluemix.net/docs/services/cloud-object-"
-                   "storage/iam/users-serviceids.html#serviceidapikeys")
+                   "Storage instance and IBM KeyProtect instance. For help "
+                   "creating this key see https://console.bluemix.net/docs/"
+                   "services/cloud-object-storage/iam/users-serviceids.html"
+                   "#serviceidapikeys")
 @click.option('--root-key-id',
               default="",
               help="ID of the root key in Key Protect")
