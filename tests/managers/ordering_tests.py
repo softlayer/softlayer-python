@@ -548,3 +548,28 @@ class OrderingTests(testing.TestCase):
 
         list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
         self.assertEqual([price1['id'], price2['id']], prices)
+
+    def test_get_item_price_id_without_capacity_restriction(self):
+        category1 = {'categoryCode': 'cat1'}
+        price1 = {'id': 1234, 'locationGroupId': '', 'categories': [category1]}
+
+        with mock.patch.object(self.ordering, 'get_item_price_id') as list_mock:
+            list_mock.return_value = [price1]
+
+            prices = self.ordering.get_item_price_id("8", price1)
+
+        list_mock.assert_called_once_with("8", price1)
+        self.assertEqual(1234, prices[0]['id'])
+
+    def test_get_item_price_id_with_capacity_restriction(self):
+        category1 = {'categoryCode': 'cat1'}
+        price1 = {'id': 1234, 'locationGroupId': '', "capacityRestrictionMaximum": "16",
+                  "capacityRestrictionMinimum": "1", 'categories': [category1]}
+
+        with mock.patch.object(self.ordering, 'get_item_price_id') as list_mock:
+            list_mock.return_value = [price1]
+
+            prices = self.ordering.get_item_price_id("8", price1)
+
+        list_mock.assert_called_once_with("8", price1)
+        self.assertEqual(1234, prices[0]['id'])

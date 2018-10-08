@@ -358,10 +358,9 @@ class OrderingManager(object):
             # in which the order is made
             if matching_item['itemCategory']['categoryCode'] != "gpu0":
                 price_id = None
-                category_code = []
                 for price in matching_item['prices']:
                     if not price['locationGroupId']:
-                        price_id = self.save_price_id(category_code, core, price, price_id)
+                        price_id = self.get_item_price_id(core, price, price_id)
             else:
                 # GPU items has two generic prices and they are added to the list
                 # according to the number of gpu items added in the order.
@@ -375,8 +374,9 @@ class OrderingManager(object):
         return prices
 
     @staticmethod
-    def save_price_id(category_code, core, price, price_id):
-        """Save item prices ids"""
+    def get_item_price_id(core, price, price_id):
+        """get item price id"""
+        category_code = []
         if 'capacityRestrictionMinimum' not in price:
             if price['categories'][0]['categoryCode'] not in category_code:
                 category_code.append(price['categories'][0]['categoryCode'])
