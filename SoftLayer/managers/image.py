@@ -122,8 +122,8 @@ class ImageManager(utils.IdentifierMixin, object):
 
     def import_image_from_uri(self, name, uri, os_code=None, note=None,
                               ibm_api_key=None, root_key_id=None,
-                              wrapped_dek=None, kp_id=None, cloud_init=None,
-                              byol=None, is_encrypted=None):
+                              wrapped_dek=None, kp_id=None, cloud_init=False,
+                              byol=False, is_encrypted=False):
         """Import a new image from object storage.
 
         :param string name: Name of the new image
@@ -138,10 +138,10 @@ class ImageManager(utils.IdentifierMixin, object):
         :param string ibm_api_key: Ibm Api Key needed to communicate with ICOS
         and Key Protect
         :param string root_key_id: ID of the root key in Key Protect
-        :param string wrapped_dek: Wrapped Decryption Key provided by IBM
-         KeyProtect
+        :param string wrapped_dek: Wrapped Data Encryption Key provided by
+        IBM KeyProtect
         :param string kp_id: ID of the IBM Key Protect Instance
-        :param boolean cloud_init: Specifies if image is cloud init
+        :param boolean cloud_init: Specifies if image is cloud-init
         :param boolean byol: Specifies if image is bring your own license
         :param boolean is_encrypted: Specifies if image is encrypted
         """

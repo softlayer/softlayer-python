@@ -22,24 +22,28 @@ from SoftLayer.CLI import formatting
 @click.option('--ibm-api-key',
               default="",
               help="The IBM Cloud API Key with access to IBM Cloud Object "
-                   "Storage instance.")
+                   "Storage instance. For help creating this key see "
+                   "https://console.bluemix.net/docs/services/cloud-object-"
+                   "storage/iam/users-serviceids.html#serviceidapikeys")
 @click.option('--root-key-id',
               default="",
               help="ID of the root key in Key Protect")
 @click.option('--wrapped-dek',
               default="",
-              help="Wrapped Decryption Key provided by IBM KeyProtect")
+              help="Wrapped Data Encryption Key provided by IBM KeyProtect. "
+                   "For more info see https://console.bluemix.net/docs/"
+                   "services/key-protect/wrap-keys.html#wrap-keys")
 @click.option('--kp-id',
               default="",
               help="ID of the IBM Key Protect Instance")
 @click.option('--cloud-init',
-              default="",
-              help="Specifies if image is cloud init")
+              is_flag=True,
+              help="Specifies if image is cloud-init")
 @click.option('--byol',
-              default="",
+              is_flag=True,
               help="Specifies if image is bring your own license")
 @click.option('--is-encrypted',
-              default="",
+              is_flag=True,
               help="Specifies if image is encrypted")
 @environment.pass_env
 def cli(env, name, note, os_code, uri, ibm_api_key, root_key_id, wrapped_dek,

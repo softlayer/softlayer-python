@@ -15,7 +15,9 @@ from SoftLayer.CLI import helpers
 @click.option('--ibm-api-key',
               default="",
               help="The IBM Cloud API Key with access to IBM Cloud Object "
-                   "Storage instance.")
+                   "Storage instance. For help creating this key see "
+                   "https://console.bluemix.net/docs/services/cloud-object-"
+                   "storage/iam/users-serviceids.html#serviceidapikeys")
 @environment.pass_env
 def cli(env, identifier, uri, ibm_api_key):
     """Export an image to object storage.
