@@ -25,5 +25,4 @@ def cli(env, identifier, immediate, comment, reason):
     """Cancel a dedicated server."""
 
     mgr = SoftLayer.DedicatedHostManager(env.client)
-    host_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'dedicatedhost')
-    mgr.cancel_host(host_id, reason, comment, immediate)
+    mgr.cancel_host(identifier, reason, comment, immediate)
