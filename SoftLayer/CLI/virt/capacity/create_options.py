@@ -14,8 +14,10 @@ def cli(env):
     """List options for creating Reserved Capacity"""
     manager = CapacityManager(env.client)
     items = manager.get_create_options()
+    # pp(items)
     items.sort(key=lambda term: int(term['capacity']))
-    table = formatting.Table(["KeyName", "Description", "Term", "Hourly Price"], title="Reserved Capacity Options")
+    table = formatting.Table(["KeyName", "Description", "Term", "Default Hourly Price Per Instance"], 
+                             title="Reserved Capacity Options")
     table.align["Hourly Price"] = "l"
     table.align["Description"] = "l"
     table.align["KeyName"] = "l"
@@ -24,6 +26,7 @@ def cli(env):
             item['keyName'], item['description'], item['capacity'], get_price(item)
         ])
     env.fout(table)
+
 
     regions = manager.get_available_routers()
     location_table = formatting.Table(['Location', 'POD', 'BackendRouterId'], 'Orderable Locations')
@@ -38,6 +41,6 @@ def get_price(item):
     """Finds the price with the default locationGroupId"""
     the_price = "No Default Pricing"
     for price in item.get('prices', []):
-        if price.get('locationGroupId') == '':
+        if not price.get('locationGroupId'):
             the_price = "%0.4f" % float(price['hourlyRecurringFee'])
     return the_price

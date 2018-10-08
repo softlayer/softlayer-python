@@ -97,21 +97,22 @@ instances[id, billingItem[description, hourlyRecurringFee]], instanceCount, back
         # Step 4, return the data.
         return regions
 
-    def create(self, name, datacenter, backend_router_id, capacity, quantity, test=False):
+    def create(self, name, backend_router_id, flavor, instances, test=False):
         """Orders a Virtual_ReservedCapacityGroup
 
         :param string name: Name for the new reserved capacity
-        :param string datacenter: like 'dal13'
         :param int backend_router_id: This selects the pod. See create_options for a list
-        :param string capacity: Capacity KeyName, see create_options for a list
-        :param int quantity: Number of guest this capacity can support
+        :param string flavor: Capacity KeyName, see create_options for a list
+        :param int instances: Number of guest this capacity can support
         :param bool test: If True, don't actually order, just test.
         """
-        args = (self.capacity_package, datacenter, [capacity])
+
+        # Since orderManger needs a DC id, just send in 0, the API will ignore it
+        args = (self.capacity_package, 0, [flavor])
         extras = {"backendRouterId": backend_router_id, "name": name}
         kwargs = {
             'extras': extras,
-            'quantity': quantity,
+            'quantity': instances,
             'complex_type': 'SoftLayer_Container_Product_Order_Virtual_ReservedCapacity',
             'hourly': True
         }
@@ -135,6 +136,7 @@ instances[id, billingItem[description, hourlyRecurringFee]], instanceCount, back
             }
 
         """
+
         vs_manager = VSManager(self.client)
         mask = "mask[instances[id, billingItem[id, item[id,keyName]]], backendRouter[id, datacenter[name]]]"
         capacity = self.get_object(capacity_id, mask=mask)
@@ -147,6 +149,8 @@ instances[id, billingItem[description, hourlyRecurringFee]], instanceCount, back
         guest_object['flavor'] = flavor
         guest_object['datacenter'] = capacity['backendRouter']['datacenter']['name']
 
+        # Reserved capacity only supports SAN as of 20181008
+        guest_object['local_disk'] = False
         template = vs_manager.verify_create_instance(**guest_object)
         template['reservedCapacityId'] = capacity_id
         if guest_object.get('ipv6'):
