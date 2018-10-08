@@ -7,7 +7,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.vs_capacity import CapacityManager as CapacityManager
 
-from pprint import pprint as pp
+
 @click.command(epilog=click.style("""WARNING: Reserved Capacity is on a yearly contract"""
                                   """ and not cancelable until the contract is expired.""", fg='red'))
 @click.option('--name', '-n', required=True, prompt=True,
@@ -34,7 +34,6 @@ def cli(env, name, backend_router_id, flavor, instances, test=False):
         flavor=flavor,
         instances=instances,
         test=test)
-
     if test:
         table = formatting.Table(['Name', 'Value'], "Test Order")
         container = result['orderContainers'][0]
@@ -48,7 +47,5 @@ def cli(env, name, backend_router_id, flavor, instances, test=False):
         table.add_row(['Order Date', result['orderDate']])
         table.add_row(['Order ID', result['orderId']])
         table.add_row(['status', result['placedOrder']['status']])
-        for item in result['placedOrder']['items']:
-            table.add_row([item['categoryCode'], item['description']])
         table.add_row(['Hourly Total', result['orderDetails']['postTaxRecurring']])
     env.fout(table)

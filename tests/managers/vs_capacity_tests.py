@@ -50,7 +50,7 @@ class VSCapacityTests(testing.TestCase):
         item_mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
         item_mock.return_value = SoftLayer_Product_Package.getItems_RESERVED_CAPACITY
         self.manager.create(
-            name='TEST', datacenter='dal13', backend_router_id=1, capacity='B1_1X2_1_YEAR_TERM', quantity=5)
+            name='TEST', backend_router_id=1, flavor='B1_1X2_1_YEAR_TERM', instances=5)
 
         expected_args = {
             'orderContainers': [
@@ -58,7 +58,7 @@ class VSCapacityTests(testing.TestCase):
                     'backendRouterId': 1,
                     'name': 'TEST',
                     'packageId': 1059,
-                    'location': 1854895,
+                    'location': 0,
                     'quantity': 5,
                     'useHourlyPricing': True,
                     'complexType': 'SoftLayer_Container_Product_Order_Virtual_ReservedCapacity',
@@ -69,7 +69,6 @@ class VSCapacityTests(testing.TestCase):
         }
 
         self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects')
-        self.assert_called_with('SoftLayer_Location', 'getDatacenters')
         self.assert_called_with('SoftLayer_Product_Package', 'getItems', identifier=1059)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder', args=(expected_args,))
 
@@ -77,7 +76,7 @@ class VSCapacityTests(testing.TestCase):
         item_mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
         item_mock.return_value = SoftLayer_Product_Package.getItems_RESERVED_CAPACITY
         self.manager.create(
-            name='TEST', datacenter='dal13', backend_router_id=1, capacity='B1_1X2_1_YEAR_TERM', quantity=5, test=True)
+            name='TEST', backend_router_id=1, flavor='B1_1X2_1_YEAR_TERM', instances=5, test=True)
 
         expected_args = {
             'orderContainers': [
@@ -85,18 +84,17 @@ class VSCapacityTests(testing.TestCase):
                     'backendRouterId': 1,
                     'name': 'TEST',
                     'packageId': 1059,
-                    'location': 1854895,
+                    'location': 0,
                     'quantity': 5,
                     'useHourlyPricing': True,
                     'complexType': 'SoftLayer_Container_Product_Order_Virtual_ReservedCapacity',
-                    'prices': [{'id': 217561}
-                               ]
+                    'prices': [{'id': 217561}],
+
                 }
             ]
         }
 
         self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects')
-        self.assert_called_with('SoftLayer_Location', 'getDatacenters')
         self.assert_called_with('SoftLayer_Product_Package', 'getItems', identifier=1059)
         self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder', args=(expected_args,))
 
@@ -131,14 +129,9 @@ class VSCapacityTests(testing.TestCase):
                 'flavorKeyName': 'B1_1X2X25'
             },
             'operatingSystemReferenceCode': 'UBUNTU_LATEST_64',
-            'datacenter': {
-                'name': 'dal13'
-            },
-            'sshKeys': [
-                {
-                    'id': 1234
-                }
-            ]
+            'datacenter': {'name': 'dal13'},
+            'sshKeys': [{'id': 1234}],
+            'localDiskFlag': False
         }
 
         self.assert_called_with('SoftLayer_Virtual_ReservedCapacityGroup', 'getObject', mask=mock.ANY)

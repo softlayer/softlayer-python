@@ -41,9 +41,8 @@ class VSCapacityTests(testing.TestCase):
         item_mock.return_value = SoftLayer_Product_Package.getItems_RESERVED_CAPACITY
         order_mock = self.set_mock('SoftLayer_Product_Order', 'verifyOrder')
         order_mock.return_value = SoftLayer_Product_Order.rsc_verifyOrder
-        result = self.run_command(['vs', 'capacity', 'create', '--name=TEST', '--datacenter=dal13',
-                                   '--backend_router_id=1234', '--capacity=B1_1X2_1_YEAR_TERM', '--quantity=10',
-                                   '--test'])
+        result = self.run_command(['vs', 'capacity', 'create', '--name=TEST', '--test',
+                                   '--backend_router_id=1234', '--flavor=B1_1X2_1_YEAR_TERM', '--instances=10'])
         self.assert_no_fail(result)
 
     def test_create(self):
@@ -51,8 +50,8 @@ class VSCapacityTests(testing.TestCase):
         item_mock.return_value = SoftLayer_Product_Package.getItems_RESERVED_CAPACITY
         order_mock = self.set_mock('SoftLayer_Product_Order', 'placeOrder')
         order_mock.return_value = SoftLayer_Product_Order.rsc_placeOrder
-        result = self.run_command(['vs', 'capacity', 'create', '--name=TEST', '--datacenter=dal13',
-                                   '--backend_router_id=1234', '--capacity=B1_1X2_1_YEAR_TERM', '--quantity=10'])
+        result = self.run_command(['vs', 'capacity', 'create', '--name=TEST', '--instances=10',
+                                   '--backend_router_id=1234', '--flavor=B1_1X2_1_YEAR_TERM'])
         self.assert_no_fail(result)
 
     def test_create_options(self):

@@ -16,7 +16,7 @@ def cli(env):
     items = manager.get_create_options()
     # pp(items)
     items.sort(key=lambda term: int(term['capacity']))
-    table = formatting.Table(["KeyName", "Description", "Term", "Default Hourly Price Per Instance"], 
+    table = formatting.Table(["KeyName", "Description", "Term", "Default Hourly Price Per Instance"],
                              title="Reserved Capacity Options")
     table.align["Hourly Price"] = "l"
     table.align["Description"] = "l"
@@ -26,7 +26,6 @@ def cli(env):
             item['keyName'], item['description'], item['capacity'], get_price(item)
         ])
     env.fout(table)
-
 
     regions = manager.get_available_routers()
     location_table = formatting.Table(['Location', 'POD', 'BackendRouterId'], 'Orderable Locations')
