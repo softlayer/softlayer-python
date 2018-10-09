@@ -137,7 +137,7 @@ def cli(env,
 
 @cli.resultcallback()
 @environment.pass_env
-def output_diagnostics(env, verbose=0, **kwargs):
+def output_diagnostics(env, result, verbose=0, **kwargs):
     """Output diagnostic information."""
 
     if verbose > 0:
