@@ -13,7 +13,7 @@ from SoftLayer.CLI import helpers
 @click.argument('identifier')
 @click.argument('uri')
 @click.option('--ibm-api-key',
-              default="",
+              default=None,
               help="The IBM Cloud API Key with access to IBM Cloud Object "
                    "Storage instance. For help creating this key see "
                    "https://console.bluemix.net/docs/services/cloud-object-"

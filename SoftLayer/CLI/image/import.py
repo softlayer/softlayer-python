@@ -16,26 +16,25 @@ from SoftLayer.CLI import formatting
               default="",
               help="The note to be applied to the imported template")
 @click.option('--os-code',
-              default="",
               help="The referenceCode of the operating system software"
                    " description for the imported VHD, ISO, or RAW image")
 @click.option('--ibm-api-key',
-              default="",
+              default=None,
               help="The IBM Cloud API Key with access to IBM Cloud Object "
                    "Storage instance and IBM KeyProtect instance. For help "
                    "creating this key see https://console.bluemix.net/docs/"
                    "services/cloud-object-storage/iam/users-serviceids.html"
                    "#serviceidapikeys")
 @click.option('--root-key-id',
-              default="",
+              default=None,
               help="ID of the root key in Key Protect")
 @click.option('--wrapped-dek',
-              default="",
+              default=None,
               help="Wrapped Data Encryption Key provided by IBM KeyProtect. "
                    "For more info see https://console.bluemix.net/docs/"
                    "services/key-protect/wrap-keys.html#wrap-keys")
 @click.option('--kp-id',
-              default="",
+              default=None,
               help="ID of the IBM Key Protect Instance")
 @click.option('--cloud-init',
               is_flag=True,
