@@ -129,7 +129,7 @@ class UserCLITests(testing.TestCase):
 
     def test_edit_perms_on_bad(self):
         result = self.run_command(['user', 'edit-permissions', '11100', '--enable', '-p', 'TEST_NOt_exist'])
-        self.assertEqual(result.exit_code, -1)
+        self.assertEqual(result.exit_code, 1)
 
     def test_edit_perms_off(self):
         result = self.run_command(['user', 'edit-permissions', '11100', '--disable', '-p', 'TEST'])
