@@ -40,6 +40,7 @@ def cli(env, identifier, price=False, guests=False):
     table.add_row(['router hostname', result['backendRouter']['hostname']])
     table.add_row(['owner', formatting.FormattedItem(
         utils.lookup(result, 'billingItem', 'orderItem', 'order', 'userRecord', 'username') or formatting.blank(),)])
+    table.add_row(['tags', formatting.tags(result['tagReferences'])])
 
     if price:
         total_price = utils.lookup(result,

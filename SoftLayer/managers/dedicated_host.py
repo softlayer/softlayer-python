@@ -73,6 +73,50 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
 
         return result
 
+    def edit(self, host_id, userdata=None, hostname=None, domain=None,
+             notes=None, tags=None):
+        """Edit hostname, domain name, notes, user data of the dedicated host.
+
+        Parameters set to None will be ignored and not attempted to be updated.
+
+        :param integer host_id: the instance ID to edit
+        :param string userdata: user data on the dedicated host to edit.
+                                If none exist it will be created
+        :param string hostname: valid hostname
+        :param string domain: valid domain name
+        :param string notes: notes about this particular dedicated host
+        :param string tags: tags to set on the dedicated host as a comma
+                            separated list. Use the empty string to remove all
+                            tags.
+
+        Example::
+
+            # Change the hostname on instance 12345 to 'something'
+            result = mgr.edit(host_id=12345 , hostname="something")
+            #result will be True or an Exception
+        """
+
+        obj = {}
+        if userdata:
+            self.host.setUserMetadata([userdata], id=host_id)
+
+        if tags is not None:
+            self.host.setTags(tags, id=host_id)
+
+        if hostname:
+            obj['hostname'] = hostname
+
+        if domain:
+            obj['domain'] = domain
+
+        if notes:
+            obj['notes'] = notes
+
+        if not obj:
+            return True
+
+        return self.host.editObject(obj, id=host_id)
+
     def list_instances(self, tags=None, cpus=None, memory=None, hostname=None,
                        disk=None, datacenter=None, **kwargs):
         """Retrieve a list of all dedicated hosts on the account
@@ -207,7 +251,14 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                     domain,
                     uuid
                 ],
-                guestCount
+                guestCount,
+                tagReferences[
+                    id,
+                    tag[
+                        name,
+                        id
+                    ]
+                ]
             ''')
 
         return self.host.getObject(id=host_id, **kwargs)
@@ -416,3 +467,11 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         item = self._get_item(package, flavor)
 
         return self._get_backend_router(location['location']['locationPackageDetails'], item)
+
+    # @retry(logger=LOGGER)
+    def set_tags(self, tags, host_id):
+        """Sets tags on a dedicated_host with a retry decorator
+
+        Just calls guest.setTags, but if it fails from an APIError will retry
+        """
+        self.host.setTags(tags, id=host_id)
