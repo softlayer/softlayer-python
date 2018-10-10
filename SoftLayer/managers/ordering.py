@@ -322,7 +322,7 @@ class OrderingManager(object):
 
         return presets[0]
 
-    def get_price_id_list(self, package_keyname, item_keynames, core):
+    def get_price_id_list(self, package_keyname, item_keynames, core=None):
         """Converts a list of item keynames to a list of price IDs.
 
         This function is used to convert a list of item keynames into
@@ -377,12 +377,13 @@ class OrderingManager(object):
     def get_item_price_id(core, price, price_id):
         """get item price id"""
         category_code = []
-        if 'capacityRestrictionMinimum' not in price:
+        capacity_min = int(price.get('capacityRestrictionMinimum', -1))
+        capacity_max = int(price.get('capacityRestrictionMaximum', -1))
+        if capacity_min is -1:
             if price['categories'][0]['categoryCode'] not in category_code:
                 category_code.append(price['categories'][0]['categoryCode'])
                 price_id = price['id']
-        elif int(price['capacityRestrictionMinimum']) <= int(core) <= int(
-                price['capacityRestrictionMaximum']):
+        elif capacity_min <= int(core) <= capacity_max:
             if price['categories'][0]['categoryCode'] not in category_code:
                 category_code.append(price['categories'][0]['categoryCode'])
                 price_id = price['id']
