@@ -379,7 +379,7 @@ class OrderingManager(object):
         category_code = []
         capacity_min = int(price.get('capacityRestrictionMinimum', -1))
         capacity_max = int(price.get('capacityRestrictionMaximum', -1))
-        if capacity_min is -1:
+        if capacity_min == -1:
             if price['categories'][0]['categoryCode'] not in category_code:
                 category_code.append(price['categories'][0]['categoryCode'])
                 price_id = price['id']
