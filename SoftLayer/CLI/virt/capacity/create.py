@@ -12,11 +12,11 @@ from SoftLayer.managers.vs_capacity import CapacityManager as CapacityManager
                                   """ and not cancelable until the contract is expired.""", fg='red'))
 @click.option('--name', '-n', required=True, prompt=True,
               help="Name for your new reserved capacity")
-@click.option('--backend_router_id', '-b', required=True, prompt=True,
+@click.option('--backend_router_id', '-b', required=True, prompt=True, type=int,
               help="backendRouterId, create-options has a list of valid ids to use.")
 @click.option('--flavor', '-f', required=True, prompt=True,
               help="Capacity keyname (C1_2X2_1_YEAR_TERM for example).")
-@click.option('--instances', '-i', required=True, prompt=True,
+@click.option('--instances', '-i', required=True, prompt=True, type=int,
               help="Number of VSI instances this capacity reservation can support.")
 @click.option('--test', is_flag=True,
               help="Do not actually create the virtual server")

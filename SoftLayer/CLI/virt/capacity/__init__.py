@@ -11,7 +11,12 @@ CONTEXT = {'help_option_names': ['-h', '--help'],
 
 
 class CapacityCommands(click.MultiCommand):
-    """Loads module for capacity related commands."""
+    """Loads module for capacity related commands.
+
+    Will automatically replace _ with - where appropriate.
+    I'm not sure if this is better or worse than using a long list of manual routes, so I'm trying it here.
+    CLI/virt/capacity/create_guest.py -> slcli vs capacity create-guest
+    """
 
     def __init__(self, **attrs):
         click.MultiCommand.__init__(self, **attrs)
@@ -24,13 +29,14 @@ class CapacityCommands(click.MultiCommand):
             if filename == '__init__.py':
                 continue
             if filename.endswith('.py'):
-                commands.append(filename[:-3])
+                commands.append(filename[:-3].replace("_", "-"))
         commands.sort()
         return commands
 
     def get_command(self, ctx, cmd_name):
         """Get command for click."""
         path = "%s.%s" % (__name__, cmd_name)
+        path = path.replace("-", "_")
         module = importlib.import_module(path)
         return getattr(module, 'cli')
 

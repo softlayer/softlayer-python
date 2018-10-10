@@ -14,7 +14,7 @@ def cli(env):
     """List options for creating Reserved Capacity"""
     manager = CapacityManager(env.client)
     items = manager.get_create_options()
-    # pp(items)
+
     items.sort(key=lambda term: int(term['capacity']))
     table = formatting.Table(["KeyName", "Description", "Term", "Default Hourly Price Per Instance"],
                              title="Reserved Capacity Options")

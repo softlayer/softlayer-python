@@ -55,19 +55,17 @@ class VSCapacityTests(testing.TestCase):
         self.assert_no_fail(result)
 
     def test_create_options(self):
-        item_mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
-        item_mock.return_value = SoftLayer_Product_Package.getItems_RESERVED_CAPACITY
         result = self.run_command(['vs', 'capacity', 'create_options'])
         self.assert_no_fail(result)
 
     def test_create_guest_test(self):
-        result = self.run_command(['vs', 'capacity', 'create_guest', '--capacity-id=3103', '--primary-disk=25',
+        result = self.run_command(['vs', 'capacity', 'create-guest', '--capacity-id=3103', '--primary-disk=25',
                                    '-H ABCDEFG', '-D test_list.com', '-o UBUNTU_LATEST_64', '-kTest 1', '--test'])
         self.assert_no_fail(result)
 
     def test_create_guest(self):
         order_mock = self.set_mock('SoftLayer_Product_Order', 'placeOrder')
         order_mock.return_value = SoftLayer_Product_Order.rsi_placeOrder
-        result = self.run_command(['vs', 'capacity', 'create_guest', '--capacity-id=3103', '--primary-disk=25',
+        result = self.run_command(['vs', 'capacity', 'create-guest', '--capacity-id=3103', '--primary-disk=25',
                                    '-H ABCDEFG', '-D test_list.com', '-o UBUNTU_LATEST_64', '-kTest 1'])
         self.assert_no_fail(result)
