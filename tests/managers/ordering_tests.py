@@ -551,17 +551,21 @@ class OrderingTests(testing.TestCase):
 
     def test_get_item_price_id_without_capacity_restriction(self):
         category1 = {'categoryCode': 'cat1'}
-        price1 = {'id': 1234, 'locationGroupId': '', 'categories': [category1]}
+        category2 = {'categoryCode': 'cat2'}
+        prices = [{'id': 1234, 'locationGroupId': '', 'categories': [category1]},
+                  {'id': 2222, 'locationGroupId': 509, 'categories': [category2]}]
 
-        price_id = self.ordering.get_item_price_id("8", price1, None)
+        price_id = self.ordering.get_item_price_id("8", prices)
 
         self.assertEqual(1234, price_id)
 
     def test_get_item_price_id_with_capacity_restriction(self):
         category1 = {'categoryCode': 'cat1'}
-        price1 = {'id': 1234, 'locationGroupId': '', "capacityRestrictionMaximum": "16",
-                  "capacityRestrictionMinimum": "1", 'categories': [category1]}
+        price1 = [{'id': 1234, 'locationGroupId': '', "capacityRestrictionMaximum": "16",
+                   "capacityRestrictionMinimum": "1", 'categories': [category1]},
+                  {'id': 2222, 'locationGroupId': '', "capacityRestrictionMaximum": "56",
+                   "capacityRestrictionMinimum": "36", 'categories': [category1]}]
 
-        price_id = self.ordering.get_item_price_id("8", price1, None)
+        price_id = self.ordering.get_item_price_id("8", price1)
 
         self.assertEqual(1234, price_id)

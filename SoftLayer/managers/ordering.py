@@ -357,10 +357,7 @@ class OrderingManager(object):
             # can take that ID and create the proper price for us in the location
             # in which the order is made
             if matching_item['itemCategory']['categoryCode'] != "gpu0":
-                price_id = None
-                for price in matching_item['prices']:
-                    if not price['locationGroupId']:
-                        price_id = self.get_item_price_id(core, price, price_id)
+                price_id = self.get_item_price_id(core, matching_item['prices'])
             else:
                 # GPU items has two generic prices and they are added to the list
                 # according to the number of gpu items added in the order.
@@ -374,19 +371,17 @@ class OrderingManager(object):
         return prices
 
     @staticmethod
-    def get_item_price_id(core, price, price_id):
+    def get_item_price_id(core, prices):
         """get item price id"""
-        category_code = []
-        capacity_min = int(price.get('capacityRestrictionMinimum', -1))
-        capacity_max = int(price.get('capacityRestrictionMaximum', -1))
-        if capacity_min == -1:
-            if price['categories'][0]['categoryCode'] not in category_code:
-                category_code.append(price['categories'][0]['categoryCode'])
-                price_id = price['id']
-        elif capacity_min <= int(core) <= capacity_max:
-            if price['categories'][0]['categoryCode'] not in category_code:
-                category_code.append(price['categories'][0]['categoryCode'])
-                price_id = price['id']
+        price_id = None
+        for price in prices:
+            if not price['locationGroupId']:
+                capacity_min = int(price.get('capacityRestrictionMinimum', -1))
+                capacity_max = int(price.get('capacityRestrictionMaximum', -1))
+                if capacity_min == -1:
+                    price_id = price['id']
+                elif capacity_min <= int(core) <= capacity_max:
+                    price_id = price['id']
         return price_id
 
     def get_preset_prices(self, preset):
