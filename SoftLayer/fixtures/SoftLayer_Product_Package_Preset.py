@@ -49,6 +49,7 @@ getObject = {
             "id": 209595,
             "recurringFee": "118.26",
             "item": {
+                "capacity": 8,
                 "description": "8 x 2.0 GHz or higher Cores",
                 "id": 11307,
                 "keyName": "GUEST_CORE_8",

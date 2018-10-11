@@ -322,7 +322,7 @@ class OrderingManager(object):
 
         return presets[0]
 
-    def get_price_id_list(self, package_keyname, item_keynames):
+    def get_price_id_list(self, package_keyname, item_keynames, core=None):
         """Converts a list of item keynames to a list of price IDs.
 
         This function is used to convert a list of item keynames into
@@ -331,6 +331,7 @@ class OrderingManager(object):
 
         :param str package_keyname: The package associated with the prices
         :param list item_keynames: A list of item keyname strings
+        :param str core: preset guest core capacity.
         :returns: A list of price IDs associated with the given item
                   keynames in the given package
 
@@ -356,8 +357,7 @@ class OrderingManager(object):
             # can take that ID and create the proper price for us in the location
             # in which the order is made
             if matching_item['itemCategory']['categoryCode'] != "gpu0":
-                price_id = [p['id'] for p in matching_item['prices']
-                            if not p['locationGroupId']][0]
+                price_id = self.get_item_price_id(core, matching_item['prices'])
             else:
                 # GPU items has two generic prices and they are added to the list
                 # according to the number of gpu items added in the order.
@@ -369,6 +369,20 @@ class OrderingManager(object):
             prices.append(price_id)
 
         return prices
+
+    @staticmethod
+    def get_item_price_id(core, prices):
+        """get item price id"""
+        price_id = None
+        for price in prices:
+            if not price['locationGroupId']:
+                capacity_min = int(price.get('capacityRestrictionMinimum', -1))
+                capacity_max = int(price.get('capacityRestrictionMaximum', -1))
+                if capacity_min == -1:
+                    price_id = price['id']
+                elif capacity_min <= int(core) <= capacity_max:
+                    price_id = price['id']
+        return price_id
 
     def get_preset_prices(self, preset):
         """Get preset item prices.
@@ -534,15 +548,20 @@ class OrderingManager(object):
         order['quantity'] = quantity
         order['useHourlyPricing'] = hourly
 
+        preset_core = None
         if preset_keyname:
             preset_id = self.get_preset_by_key(package_keyname, preset_keyname)['id']
+            preset_items = self.get_preset_prices(preset_id)
+            for item in preset_items['prices']:
+                if item['item']['itemCategory']['categoryCode'] == "guest_core":
+                    preset_core = item['item']['capacity']
             order['presetId'] = preset_id
 
         if not complex_type:
             raise exceptions.SoftLayerError("A complex type must be specified with the order")
         order['complexType'] = complex_type
 
-        price_ids = self.get_price_id_list(package_keyname, item_keynames)
+        price_ids = self.get_price_id_list(package_keyname, item_keynames, preset_core)
         order['prices'] = [{'id': price_id} for price_id in price_ids]
 
         container['orderContainers'] = [order]

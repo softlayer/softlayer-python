@@ -1346,6 +1346,11 @@ getItemPrices = [
         "hourlyRecurringFee": ".093",
         "id": 204015,
         "recurringFee": "62",
+        "categories": [
+            {
+                "categoryCode": "guest_core"
+            }
+        ],
         "item": {
             "description": "4 x 2.0 GHz or higher Cores",
             "id": 859,
