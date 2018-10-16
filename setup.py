@@ -33,10 +33,10 @@ setup(
         'six >= 1.7.0',
         'ptable >= 0.9.2',
         'click >= 7',
-        'requests >= 2.18.4',
+        'requests == 2.19.1',
         'prompt_toolkit >= 0.53',
         'pygments >= 2.0.0',
-        'urllib3 >= 1.22'
+        'urllib3 == 1.22'
     ],
     keywords=['softlayer', 'cloud'],
     classifiers=[
