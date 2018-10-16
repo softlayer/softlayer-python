@@ -475,7 +475,6 @@ class OrderingManager(object):
 
     def place_quote(self, package_keyname, location, item_keynames, complex_type=None,
                     preset_keyname=None, extras=None, quantity=1, quote_name=None, send_email=False):
-
         """Place a quote with the given package and prices.
 
         This function takes in parameters needed for an order and places the quote.

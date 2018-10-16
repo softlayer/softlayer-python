@@ -277,12 +277,12 @@ class TicketTests(testing.TestCase):
         expected = [
             {'Status': 'Open',
              'count': [
-                {'Type': 'Accounting', 'count': 7},
-                {'Type': 'Billing', 'count': 3},
-                {'Type': 'Sales', 'count': 5},
-                {'Type': 'Support', 'count': 6},
-                {'Type': 'Other', 'count': 4},
-                {'Type': 'Total', 'count': 1}]},
+                 {'Type': 'Accounting', 'count': 7},
+                 {'Type': 'Billing', 'count': 3},
+                 {'Type': 'Sales', 'count': 5},
+                 {'Type': 'Support', 'count': 6},
+                 {'Type': 'Other', 'count': 4},
+                 {'Type': 'Total', 'count': 1}]},
             {'Status': 'Closed', 'count': 2}
         ]
         result = self.run_command(['ticket', 'summary'])

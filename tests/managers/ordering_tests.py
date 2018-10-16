@@ -509,7 +509,7 @@ class OrderingTests(testing.TestCase):
     def test_get_location_id_exception(self):
         locations = self.set_mock('SoftLayer_Location', 'getDatacenters')
         locations.return_value = []
-        self.assertRaises(exceptions.SoftLayerError,  self.ordering.get_location_id, "BURMUDA")
+        self.assertRaises(exceptions.SoftLayerError, self.ordering.get_location_id, "BURMUDA")
 
     def test_get_location_id_int(self):
         dc_id = self.ordering.get_location_id(1234)
