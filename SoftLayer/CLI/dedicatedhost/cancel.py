@@ -21,8 +21,8 @@ from SoftLayer.CLI import helpers
 @click.option('--reason',
               help="An optional cancellation reason. See cancel-reasons for a list of available options")
 @environment.pass_env
-def cli(env, identifier, comment, reason, immediate=True):
+def cli(env, identifier, immediate, comment, reason):
     """Cancel a dedicated server."""
-
+    immediate = True  # Enforce immediate cancellation
     mgr = SoftLayer.DedicatedHostManager(env.client)
     mgr.cancel_host(identifier, reason, comment, immediate)
