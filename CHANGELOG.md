@@ -1,5 +1,19 @@
 # Change Log
 
+## [5.6.0] - 2018-10-16
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.5.3...v5.6.0
+
++ #1026 Support for [Reserved Capacity](https://console.bluemix.net/docs/vsi/vsi_about_reserved.html#about-reserved-virtual-servers)
+  * `slcli vs capacity create`
+  * `slcli vs capacity create-guest`
+  * `slcli vs capacity create-options`
+  * `slcli vs capacity detail`
+  * `slcli vs capacity list`
++ #1050 Fix `post_uri` parameter name on docstring
++ #1039 Fixed suspend cloud server order.
++ #1055 Update to use click 7
++ #1053 Add export/import capabilities to/from IBM Cloud Object Storage to the image manager as well as the slcli. 
+
 
 ## [5.5.3] - 2018-08-31
 - Changes: https://github.com/softlayer/softlayer-python/compare/v5.5.2...v5.5.3
