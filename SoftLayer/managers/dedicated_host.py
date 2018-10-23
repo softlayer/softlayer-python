@@ -37,6 +37,30 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         if ordering_manager is None:
             self.ordering_manager = ordering.OrderingManager(client)
 
+    def cancel_host(self, host_id, immediate=True):
+        """Cancels a dedicated host server.
+
+        Example::
+            # Cancels dedicated host id 1234
+            result = mgr.cancel_host(host_id=1234)
+
+        :param host_id: The ID of the dedicated host to be cancelled.
+        :param immediate: If False the dedicated host will be reclaimed in the anniversary date.
+                          Default is True
+        :return: True on success or an exception
+        """
+        mask = 'mask[id,billingItem[id,hourlyFlag]]'
+        host_billing = self.get_host(host_id, mask=mask)
+        billing_id = host_billing['billingItem']['id']
+        is_hourly = host_billing['billingItem']['hourlyFlag']
+
+        if is_hourly and immediate is False:
+            raise SoftLayer.SoftLayerError("Hourly Dedicated Hosts can only be cancelled immediately.")
+        else:
+            # Monthly dedicated host can be reclaimed immediately and no reasons are required
+            result = self.client['Billing_Item'].cancelItem(immediate, False, id=billing_id)
+        return result
+
     def list_instances(self, tags=None, cpus=None, memory=None, hostname=None,
                        disk=None, datacenter=None, **kwargs):
         """Retrieve a list of all dedicated hosts on the account

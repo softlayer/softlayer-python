@@ -540,6 +540,28 @@ class DedicatedHostTests(testing.TestCase):
         self.assertRaises(exceptions.SoftLayerError,
                           self.dedicated_host._get_default_router, routers, 'notFound')
 
+    def test_cancel_host(self):
+        self.dedicated_host.host = mock.Mock()
+        self.dedicated_host.host.getObject.return_value = {'id': 987, 'billingItem': {
+                                                           'id': 1234, 'hourlyFlag': False}}
+        # Immediate cancellation
+        result = self.dedicated_host.cancel_host(987)
+        self.assertEqual(True, result)
+
+        # Cancellation on anniversary
+        result = self.dedicated_host.cancel_host(987, immediate=False)
+        self.assertEqual(True, result)
+
+    def test_cancel_host_billing_hourly_no_immediate(self):
+        self.dedicated_host.host = mock.Mock()
+        self.dedicated_host.host.getObject.return_value = {'id': 987, 'billingItem': {
+                                                           'id': 1234, 'hourlyFlag': True}}
+
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               self.dedicated_host.cancel_host,
+                               987, immediate=False)
+        self.assertEqual("Hourly Dedicated Hosts can only be cancelled immediately.", str(ex))
+
     def _get_routers_sample(self):
         routers = [
             {

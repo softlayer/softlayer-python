@@ -337,3 +337,15 @@ class DedicatedHostsTests(testing.TestCase):
             'quantity': 1},)
 
         self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder', args=args)
+
+    @mock.patch('SoftLayer.DedicatedHostManager.cancel_host')
+    def test_cancel_host(self, cancel_mock):
+        result = self.run_command(['--really', 'dedicatedhost', 'cancel', '12345'])
+        self.assert_no_fail(result)
+        cancel_mock.assert_called_with(12345, False)
+        self.assertEqual(str(result.output), 'Dedicated Host 12345 was successfully cancelled\n')
+
+    def test_cancel_host_abort(self):
+        result = self.run_command(['dedicatedhost', 'cancel', '12345'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
