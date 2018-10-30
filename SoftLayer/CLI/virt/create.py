@@ -72,11 +72,11 @@ def _parse_create_args(client, args):
     :param dict args: CLI arguments
     """
     data = {
-        "hourly": args['billing'] == 'hourly',
+        "hourly": args.get('billing', 'hourly') == 'hourly',
         "domain": args['domain'],
         "hostname": args['hostname'],
-        "private": args['private'],
-        "dedicated": args['dedicated'],
+        "private": args.get('private', None),
+        "dedicated": args.get('dedicated', None),
         "disks": args['disk'],
         "cpus": args.get('cpu', None),
         "memory": args.get('memory', None),
@@ -89,7 +89,7 @@ def _parse_create_args(client, args):
     if not args.get('san') and args.get('flavor'):
         data['local_disk'] = None
     else:
-        data['local_disk'] = not args['san']
+        data['local_disk'] = not args.get('san')
 
     if args.get('os'):
         data['os_code'] = args['os']

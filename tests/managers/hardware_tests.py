@@ -288,7 +288,7 @@ class HardwareTests(testing.TestCase):
         ex = self.assertRaises(SoftLayer.SoftLayerError,
                                self.hardware.cancel_hardware,
                                6327)
-        self.assertEqual("Ticket #1234 already exists for this server",  str(ex))
+        self.assertEqual("Ticket #1234 already exists for this server", str(ex))
 
     def test_cancel_hardware_monthly_now(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')

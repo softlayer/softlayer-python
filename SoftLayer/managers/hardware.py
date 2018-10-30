@@ -268,7 +268,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         """Perform an OS reload of a server with its current configuration.
 
         :param integer hardware_id: the instance ID to reload
-        :param string post_url: The URI of the post-install script to run
+        :param string post_uri: The URI of the post-install script to run
                                 after reload
         :param list ssh_keys: The SSH keys to add to the root user
         """

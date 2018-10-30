@@ -1,6 +1,6 @@
-requests >= 2.18.4
+requests == 2.19.1
 click >= 5, < 7
 prettytable >= 0.7.0
 six >= 1.7.0
 prompt_toolkit
-urllib3
+urllib3 == 1.22

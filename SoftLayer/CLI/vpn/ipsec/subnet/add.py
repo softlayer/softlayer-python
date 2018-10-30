@@ -18,14 +18,14 @@ from SoftLayer.CLI.exceptions import CLIHalt
               type=int,
               help='Subnet identifier to add')
 @click.option('-t',
-              '--type',
               '--subnet-type',
+              '--type',
               required=True,
               type=click.Choice(['internal', 'remote', 'service']),
               help='Subnet type to add')
 @click.option('-n',
-              '--network',
               '--network-identifier',
+              '--network',
               default=None,
               type=NetworkParamType(),
               help='Subnet network identifier to create')

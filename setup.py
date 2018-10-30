@@ -14,7 +14,7 @@ else:
 
 setup(
     name='SoftLayer',
-    version='5.5.2',
+    version='5.6.0',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     author='SoftLayer Technologies, Inc.',
@@ -32,11 +32,11 @@ setup(
     install_requires=[
         'six >= 1.7.0',
         'ptable >= 0.9.2',
-        'click >= 5, < 7',
-        'requests >= 2.18.4',
+        'click >= 7',
+        'requests == 2.19.1',
         'prompt_toolkit >= 0.53',
         'pygments >= 2.0.0',
-        'urllib3 >= 1.22'
+        'urllib3 == 1.22'
     ],
     keywords=['softlayer', 'cloud'],
     classifiers=[
