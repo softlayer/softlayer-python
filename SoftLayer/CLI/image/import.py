@@ -52,7 +52,7 @@ def cli(env, name, note, os_code, uri, ibm_api_key, root_key_id, wrapped_dek,
 
     The URI for an object storage object (.vhd/.iso file) of the format:
     swift://<objectStorageAccount>@<cluster>/<container>/<objectPath>
-    or cos://<clusterName>/<bucketName>/<objectPath> if using IBM Cloud
+    or cos://<regionName>/<bucketName>/<objectPath> if using IBM Cloud
     Object Storage
     """
 
