@@ -131,15 +131,15 @@ class ImageManager(utils.IdentifierMixin, object):
             (.vhd/.iso file) of the format:
             swift://<objectStorageAccount>@<cluster>/<container>/<objectPath>
             or (.vhd/.iso/.raw file) of the format:
-            cos://<clusterName>/<bucketName>/<objectPath> if using IBM Cloud
+            cos://<regionName>/<bucketName>/<objectPath> if using IBM Cloud
             Object Storage
         :param string os_code: The reference code of the operating system
         :param string note: Note to add to the image
         :param string ibm_api_key: Ibm Api Key needed to communicate with ICOS
-        and Key Protect
+            and Key Protect
         :param string root_key_id: ID of the root key in Key Protect
         :param string wrapped_dek: Wrapped Data Encryption Key provided by
-        IBM KeyProtect
+            IBM KeyProtect
         :param string kp_id: ID of the IBM Key Protect Instance
         :param boolean cloud_init: Specifies if image is cloud-init
         :param boolean byol: Specifies if image is bring your own license
@@ -173,10 +173,10 @@ class ImageManager(utils.IdentifierMixin, object):
         :param int image_id: The ID of the image
         :param string uri: The URI for object storage of the format
             swift://<objectStorageAccount>@<cluster>/<container>/<objectPath>
-            or cos://<clusterName>/<bucketName>/<objectPath> if using IBM Cloud
+            or cos://<regionName>/<bucketName>/<objectPath> if using IBM Cloud
             Object Storage
         :param string ibm_api_key: Ibm Api Key needed to communicate with IBM
-        Cloud Object Storage
+            Cloud Object Storage
         """
         if 'cos://' in uri:
             return self.vgbdtg.copyToIcos({
