@@ -1,5 +1,6 @@
 """Virtual server order options."""
 # :license: MIT, see LICENSE for more details.
+# pylint: disable=too-many-statements
 import os
 import os.path
 

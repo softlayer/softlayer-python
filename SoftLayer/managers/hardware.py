@@ -92,7 +92,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         billing_id = hw_billing['billingItem']['id']
 
         if immediate and not hw_billing['hourlyBillingFlag']:
-            LOGGER.warning("Immediate cancelation of montly servers is not guaranteed. " +
+            LOGGER.warning("Immediate cancelation of montly servers is not guaranteed."
                            "Please check the cancelation ticket for updates.")
 
             result = self.client.call('Billing_Item', 'cancelItem',
