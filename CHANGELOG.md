@@ -1,5 +1,12 @@
 # Change Log
 
+## [5.6.1] - 2018-11-07
+
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.6.0...v5.6.1
+
++ #1065 Updated urllib3 and requests libraries due to CVE-2018-18074
++ #1070 Fixed an ordering bug
+
 ## [5.6.0] - 2018-10-16
 - Changes: https://github.com/softlayer/softlayer-python/compare/v5.5.3...v5.6.0
 
