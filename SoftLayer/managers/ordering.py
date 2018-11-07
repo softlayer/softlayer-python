@@ -378,8 +378,10 @@ class OrderingManager(object):
             if not price['locationGroupId']:
                 capacity_min = int(price.get('capacityRestrictionMinimum', -1))
                 capacity_max = int(price.get('capacityRestrictionMaximum', -1))
-                if capacity_min == -1:
+                # return first match if no restirction, or no core to check
+                if capacity_min == -1 or core is None:
                     price_id = price['id']
+                # this check is mostly to work nicely with preset configs
                 elif capacity_min <= int(core) <= capacity_max:
                     price_id = price['id']
         return price_id
