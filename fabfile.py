@@ -12,8 +12,8 @@ def make_html():
 
 def upload():
     "Upload distribution to PyPi"
-    local('python setup.py sdist upload')
-    local('python setup.py bdist_wheel upload')
+    local('python setup.py sdist bdist_wheel')
+    local('twine upload dist/*')
 
 
 def clean():

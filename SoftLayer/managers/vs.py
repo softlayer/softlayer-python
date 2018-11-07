@@ -503,15 +503,16 @@ class VSManager(utils.IdentifierMixin, object):
                 'domain': u'test01.labs.sftlyr.ws',
                 'hostname': u'minion05',
                 'datacenter': u'hkg02',
+                'flavor': 'BL1_1X2X100'
                 'dedicated': False,
                 'private': False,
-                'cpus': 1,
                 'os_code' : u'UBUNTU_LATEST',
                 'hourly': True,
                 'ssh_keys': [1234],
                 'disks': ('100','25'),
                 'local_disk': True,
-                'memory': 1024
+                'tags': 'test, pleaseCancel',
+                'public_security_groups': [12, 15]
             }
 
             vsi = mgr.verify_create_instance(**new_vsi)
@@ -536,15 +537,14 @@ class VSManager(utils.IdentifierMixin, object):
                 'domain': u'test01.labs.sftlyr.ws',
                 'hostname': u'minion05',
                 'datacenter': u'hkg02',
+                'flavor': 'BL1_1X2X100'
                 'dedicated': False,
                 'private': False,
-                'cpus': 1,
                 'os_code' : u'UBUNTU_LATEST',
                 'hourly': True,
                 'ssh_keys': [1234],
                 'disks': ('100','25'),
                 'local_disk': True,
-                'memory': 1024,
                 'tags': 'test, pleaseCancel',
                 'public_security_groups': [12, 15]
             }
@@ -607,17 +607,16 @@ class VSManager(utils.IdentifierMixin, object):
             # Define the instance we want to create.
             new_vsi = {
                 'domain': u'test01.labs.sftlyr.ws',
-                'hostname': u'multi-test',
+                'hostname': u'minion05',
                 'datacenter': u'hkg02',
+                'flavor': 'BL1_1X2X100'
                 'dedicated': False,
                 'private': False,
-                'cpus': 1,
                 'os_code' : u'UBUNTU_LATEST',
                 'hourly': True,
-                'ssh_keys': [87634],
+                'ssh_keys': [1234],
                 'disks': ('100','25'),
                 'local_disk': True,
-                'memory': 1024,
                 'tags': 'test, pleaseCancel',
                 'public_security_groups': [12, 15]
             }
