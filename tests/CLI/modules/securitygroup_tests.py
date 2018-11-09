@@ -121,7 +121,7 @@ class SecurityGroupTests(testing.TestCase):
                            'portRangeMax': None,
                            'createDate': None,
                            'modifyDate': None}],
-                          json.loads(result.output))
+                         json.loads(result.output))
 
     def test_securitygroup_rule_add(self):
         result = self.run_command(['sg', 'rule-add', '100',
