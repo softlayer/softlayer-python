@@ -15,7 +15,9 @@ COLUMNS = ['id',
            'ethertype',
            'portRangeMin',
            'portRangeMax',
-           'protocol']
+           'protocol',
+           'createDate',
+           'modifyDate']
 
 
 @click.command()
@@ -49,7 +51,9 @@ def rule_list(env, securitygroup_id, sortby):
             rule.get('ethertype') or formatting.blank(),
             port_min,
             port_max,
-            rule.get('protocol') or formatting.blank()
+            rule.get('protocol') or formatting.blank(),
+            rule.get('createDate') or formatting.blank(),
+            rule.get('modifyDate') or formatting.blank()
         ])
 
     env.fout(table)

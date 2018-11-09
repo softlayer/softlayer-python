@@ -372,7 +372,7 @@ class NetworkManager(object):
                 'description,'
                 '''rules[id, remoteIp, remoteGroupId,
                          direction, ethertype, portRangeMin,
-                         portRangeMax, protocol],'''
+                         portRangeMax, protocol, createDate, modifyDate],'''
                 '''networkComponentBindings[
                     networkComponent[
                         id,
