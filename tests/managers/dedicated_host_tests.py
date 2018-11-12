@@ -541,26 +541,10 @@ class DedicatedHostTests(testing.TestCase):
                           self.dedicated_host._get_default_router, routers, 'notFound')
 
     def test_cancel_host(self):
-        self.dedicated_host.host = mock.Mock()
-        self.dedicated_host.host.getObject.return_value = {'id': 987, 'billingItem': {
-                                                           'id': 1234, 'hourlyFlag': False}}
-        # Immediate cancellation
-        result = self.dedicated_host.cancel_host(987)
-        self.assertEqual(True, result)
+        result = self.dedicated_host.cancel_host(789)
 
-        # Cancellation on anniversary
-        result = self.dedicated_host.cancel_host(987, immediate=False)
-        self.assertEqual(True, result)
-
-    def test_cancel_host_billing_hourly_no_immediate(self):
-        self.dedicated_host.host = mock.Mock()
-        self.dedicated_host.host.getObject.return_value = {'id': 987, 'billingItem': {
-                                                           'id': 1234, 'hourlyFlag': True}}
-
-        ex = self.assertRaises(SoftLayer.SoftLayerError,
-                               self.dedicated_host.cancel_host,
-                               987, immediate=False)
-        self.assertEqual("Hourly Dedicated Hosts can only be cancelled immediately.", str(ex))
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Virtual_DedicatedHost', 'deleteObject', identifier=789)
 
     def _get_routers_sample(self):
         routers = [
@@ -669,3 +653,34 @@ class DedicatedHostTests(testing.TestCase):
         }
 
         return package
+
+    def test_list_guests(self):
+        results = self.dedicated_host.list_guests(12345)
+
+        for result in results:
+            self.assertIn(result['id'], [100, 104])
+        self.assert_called_with('SoftLayer_Virtual_DedicatedHost', 'getGuests', identifier=12345)
+
+    def test_list_guests_with_filters(self):
+        self.dedicated_host.list_guests(12345, tags=['tag1', 'tag2'], cpus=2, memory=1024,
+                                        hostname='hostname', domain='example.com', nic_speed=100,
+                                        public_ip='1.2.3.4', private_ip='4.3.2.1')
+
+        _filter = {
+            'guests': {
+                'domain': {'operation': '_= example.com'},
+                'tagReferences': {
+                    'tag': {'name': {
+                        'operation': 'in',
+                        'options': [{
+                            'name': 'data', 'value': ['tag1', 'tag2']}]}}},
+                'maxCpu': {'operation': 2},
+                'maxMemory': {'operation': 1024},
+                'hostname': {'operation': '_= hostname'},
+                'networkComponents': {'maxSpeed': {'operation': 100}},
+                'primaryIpAddress': {'operation': '_= 1.2.3.4'},
+                'primaryBackendIpAddress': {'operation': '_= 4.3.2.1'}
+            }
+        }
+        self.assert_called_with('SoftLayer_Virtual_DedicatedHost', 'getGuests',
+                                identifier=12345, filter=_filter)

@@ -342,10 +342,40 @@ class DedicatedHostsTests(testing.TestCase):
     def test_cancel_host(self, cancel_mock):
         result = self.run_command(['--really', 'dedicatedhost', 'cancel', '12345'])
         self.assert_no_fail(result)
-        cancel_mock.assert_called_with(12345, False)
-        self.assertEqual(str(result.output), 'Dedicated Host 12345 was successfully cancelled\n')
+        cancel_mock.assert_called_with(12345)
+        self.assertEqual(str(result.output), 'Dedicated Host 12345 was cancelled\n')
 
     def test_cancel_host_abort(self):
         result = self.run_command(['dedicatedhost', 'cancel', '12345'])
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    @mock.patch('SoftLayer.DedicatedHostManager.cancel_host')
+    def test_cancel_all_guest(self, cancel_mock):
+        result = self.run_command(['--really', 'dedicatedhost', 'cancel', '12345'])
+        self.assert_no_fail(result)
+        cancel_mock.assert_called_with(12345)
+        self.assertEqual(str(result.output), 'Dedicated Host 12345 was cancelled\n')
+
+    def test_cancel_all_guest_empty_list(self):
+        result = self.run_command(['dedicatedhost', 'cancel', '12345'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    def test_list_guests(self):
+        result = self.run_command(['dh', 'list-guests', '123', '--tag=tag'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output),
+                         [{'hostname': 'vs-test1',
+                           'domain': 'test.sftlyr.ws',
+                           'primary_ip': '172.16.240.2',
+                           'id': 100,
+                           'power_state': 'Running',
+                           'backend_ip': '10.45.19.37'},
+                          {'hostname': 'vs-test2',
+                           'domain': 'test.sftlyr.ws',
+                           'primary_ip': '172.16.240.7',
+                           'id': 104,
+                           'power_state': 'Running',
+                           'backend_ip': '10.45.19.35'}])

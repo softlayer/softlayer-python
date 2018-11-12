@@ -37,29 +37,111 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         if ordering_manager is None:
             self.ordering_manager = ordering.OrderingManager(client)
 
-    def cancel_host(self, host_id, immediate=True):
-        """Cancels a dedicated host server.
-
-        Example::
-            # Cancels dedicated host id 1234
-            result = mgr.cancel_host(host_id=1234)
+    def cancel_host(self, host_id):
+        """Cancel a dedicated host immediately, it fails if there are still guests in the host.
 
         :param host_id: The ID of the dedicated host to be cancelled.
-        :param immediate: If False the dedicated host will be reclaimed in the anniversary date.
-                          Default is True
         :return: True on success or an exception
-        """
-        mask = 'mask[id,billingItem[id,hourlyFlag]]'
-        host_billing = self.get_host(host_id, mask=mask)
-        billing_id = host_billing['billingItem']['id']
-        is_hourly = host_billing['billingItem']['hourlyFlag']
 
-        if is_hourly and immediate is False:
-            raise SoftLayer.SoftLayerError("Hourly Dedicated Hosts can only be cancelled immediately.")
-        else:
-            # Monthly dedicated host can be reclaimed immediately and no reasons are required
-            result = self.client['Billing_Item'].cancelItem(immediate, False, id=billing_id)
-        return result
+        Example::
+            # Cancels dedicated host id 12345
+            result = mgr.cancel_host(12345)
+
+        """
+        return self.host.deleteObject(id=host_id)
+
+    def list_guests(self, host_id, tags=None, cpus=None, memory=None, hostname=None,
+                    domain=None, local_disk=None, nic_speed=None, public_ip=None,
+                    private_ip=None, **kwargs):
+        """Retrieve a list of all virtual servers on the dedicated host.
+
+        Example::
+
+            # Print out a list of hourly instances in the host id 12345.
+
+            for vsi in mgr.list_guests(host_id=12345, hourly=True):
+               print vsi['fullyQualifiedDomainName'], vsi['primaryIpAddress']
+
+            # Using a custom object-mask. Will get ONLY what is specified
+            object_mask = "mask[hostname,monitoringRobot[robotStatus]]"
+            for vsi in mgr.list_guests(mask=object_mask,hourly=True):
+                print vsi
+
+        :param integer host_id: the identifier of dedicated host
+        :param boolean hourly: include hourly instances
+        :param boolean monthly: include monthly instances
+        :param list tags: filter based on list of tags
+        :param integer cpus: filter based on number of CPUS
+        :param integer memory: filter based on amount of memory
+        :param string hostname: filter based on hostname
+        :param string domain: filter based on domain
+        :param string local_disk: filter based on local_disk
+        :param integer nic_speed: filter based on network speed (in MBPS)
+        :param string public_ip: filter based on public ip address
+        :param string private_ip: filter based on private ip address
+        :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
+        :returns: Returns a list of dictionaries representing the matching
+                  virtual servers
+        """
+        if 'mask' not in kwargs:
+            items = [
+                'id',
+                'globalIdentifier',
+                'hostname',
+                'domain',
+                'fullyQualifiedDomainName',
+                'primaryBackendIpAddress',
+                'primaryIpAddress',
+                'lastKnownPowerState.name',
+                'hourlyBillingFlag',
+                'powerState',
+                'maxCpu',
+                'maxMemory',
+                'datacenter',
+                'activeTransaction.transactionStatus[friendlyName,name]',
+                'status',
+            ]
+            kwargs['mask'] = "mask[%s]" % ','.join(items)
+
+        _filter = utils.NestedDict(kwargs.get('filter') or {})
+
+        if tags:
+            _filter['guests']['tagReferences']['tag']['name'] = {
+                'operation': 'in',
+                'options': [{'name': 'data', 'value': tags}],
+            }
+
+        if cpus:
+            _filter['guests']['maxCpu'] = utils.query_filter(cpus)
+
+        if memory:
+            _filter['guests']['maxMemory'] = utils.query_filter(memory)
+
+        if hostname:
+            _filter['guests']['hostname'] = utils.query_filter(hostname)
+
+        if domain:
+            _filter['guests']['domain'] = utils.query_filter(domain)
+
+        if local_disk is not None:
+            _filter['guests']['localDiskFlag'] = (
+                utils.query_filter(bool(local_disk)))
+
+        if nic_speed:
+            _filter['guests']['networkComponents']['maxSpeed'] = (
+                utils.query_filter(nic_speed))
+
+        if public_ip:
+            _filter['guests']['primaryIpAddress'] = (
+                utils.query_filter(public_ip))
+
+        if private_ip:
+            _filter['guests']['primaryBackendIpAddress'] = (
+                utils.query_filter(private_ip))
+
+        kwargs['filter'] = _filter.to_dict()
+        kwargs['iter'] = True
+        return self.host.getGuests(id=host_id, **kwargs)
 
     def list_instances(self, tags=None, cpus=None, memory=None, hostname=None,
                        disk=None, datacenter=None, **kwargs):

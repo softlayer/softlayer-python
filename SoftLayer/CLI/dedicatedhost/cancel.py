@@ -12,13 +12,9 @@ from SoftLayer.CLI import helpers
 
 @click.command()
 @click.argument('identifier')
-@click.option('--immediate',
-              is_flag=True,
-              default=False,
-              help="Cancels the dedicated host immediately (instead of on the billing anniversary)")
 @environment.pass_env
-def cli(env, identifier, immediate):
-    """Cancel a dedicated host server."""
+def cli(env, identifier):
+    """Cancel a dedicated host server immediately"""
 
     mgr = SoftLayer.DedicatedHostManager(env.client)
 
@@ -27,6 +23,6 @@ def cli(env, identifier, immediate):
     if not (env.skip_confirmations or formatting.no_going_back(host_id)):
         raise exceptions.CLIAbort('Aborted')
 
-    mgr.cancel_host(host_id, immediate)
+    mgr.cancel_host(host_id)
 
-    click.secho('Dedicated Host %s was successfully cancelled' % host_id, fg='green')
+    click.secho('Dedicated Host %s was cancelled' % host_id, fg='green')
