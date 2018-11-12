@@ -569,3 +569,31 @@ class OrderingTests(testing.TestCase):
         price_id = self.ordering.get_item_price_id("8", price1)
 
         self.assertEqual(1234, price_id)
+
+    def test_issues1067(self):
+        # https://github.com/softlayer/softlayer-python/issues/1067
+        item_mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
+        item_mock_return = [
+            {
+                'id': 10453,
+                'itemCategory': {'categoryCode': 'server'},
+                'keyName': 'INTEL_INTEL_XEON_4110_2_10',
+                'prices': [
+                    {
+                        'capacityRestrictionMaximum': '2',
+                        'capacityRestrictionMinimum': '2',
+                        'capacityRestrictionType': 'PROCESSOR',
+                        'categories': [{'categoryCode': 'os'}],
+                        'id': 201161,
+                        'locationGroupId': None,
+                        'recurringFee': '250',
+                        'setupFee': '0'
+                    }
+                ]
+            }
+        ]
+        item_mock.return_value = item_mock_return
+        item_keynames = ['INTEL_INTEL_XEON_4110_2_10']
+        package = 'DUAL_INTEL_XEON_PROCESSOR_SCALABLE_FAMILY_4_DRIVES'
+        result = self.ordering.get_price_id_list(package, item_keynames, None)
+        self.assertIn(201161, result)

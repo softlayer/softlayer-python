@@ -13,7 +13,6 @@ from SoftLayer.CLI.exceptions import CLIHalt
 @click.option('--friendly-name',
               default=None,
               help='Friendly name value')
-# todo: Update to utilize custom IP address type
 @click.option('--remote-peer',
               default=None,
               help='Remote peer IP address value')
