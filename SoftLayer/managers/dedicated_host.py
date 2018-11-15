@@ -33,6 +33,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         self.client = client
         self.account = client['Account']
         self.host = client['Virtual_DedicatedHost']
+        self.guest = client['Virtual_Guest']
 
         if ordering_manager is None:
             self.ordering_manager = ordering.OrderingManager(client)
@@ -50,6 +51,29 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         """
         return self.host.deleteObject(id=host_id)
 
+    def cancel_guests(self, host_id):
+        """Cancel all guests into the dedicated host immediately.
+
+        To cancel an specified guest use the method VSManager.cancel_instance()
+
+        :param host_id: The ID of the dedicated host.
+        :return: True on success, False if there isn't any guest or
+                 an exception from the API
+
+        Example::
+            # Cancel guests of dedicated host id 12345
+            result = mgr.cancel_guests(12345)
+        """
+        result = False
+
+        guest_list = self.host.getGuests(id=host_id, mask="id")
+
+        if guest_list:
+            for virtual_guest in guest_list:
+                result = self.guest.deleteObject(virtual_guest['id'])
+
+        return result
+
     def list_guests(self, host_id, tags=None, cpus=None, memory=None, hostname=None,
                     domain=None, local_disk=None, nic_speed=None, public_ip=None,
                     private_ip=None, **kwargs):
@@ -57,19 +81,17 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
 
         Example::
 
-            # Print out a list of hourly instances in the host id 12345.
+            # Print out a list of instances with 4 cpu cores in the host id 12345.
 
-            for vsi in mgr.list_guests(host_id=12345, hourly=True):
+            for vsi in mgr.list_guests(host_id=12345, cpus=4):
                print vsi['fullyQualifiedDomainName'], vsi['primaryIpAddress']
 
             # Using a custom object-mask. Will get ONLY what is specified
             object_mask = "mask[hostname,monitoringRobot[robotStatus]]"
-            for vsi in mgr.list_guests(mask=object_mask,hourly=True):
+            for vsi in mgr.list_guests(mask=object_mask,cpus=4):
                 print vsi
 
         :param integer host_id: the identifier of dedicated host
-        :param boolean hourly: include hourly instances
-        :param boolean monthly: include monthly instances
         :param list tags: filter based on list of tags
         :param integer cpus: filter based on number of CPUS
         :param integer memory: filter based on amount of memory

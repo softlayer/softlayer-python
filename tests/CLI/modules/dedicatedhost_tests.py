@@ -341,8 +341,10 @@ class DedicatedHostsTests(testing.TestCase):
     @mock.patch('SoftLayer.DedicatedHostManager.cancel_host')
     def test_cancel_host(self, cancel_mock):
         result = self.run_command(['--really', 'dedicatedhost', 'cancel', '12345'])
+
         self.assert_no_fail(result)
         cancel_mock.assert_called_with(12345)
+
         self.assertEqual(str(result.output), 'Dedicated Host 12345 was cancelled\n')
 
     def test_cancel_host_abort(self):
@@ -350,16 +352,28 @@ class DedicatedHostsTests(testing.TestCase):
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
-    @mock.patch('SoftLayer.DedicatedHostManager.cancel_host')
-    def test_cancel_all_guest(self, cancel_mock):
-        result = self.run_command(['--really', 'dedicatedhost', 'cancel', '12345'])
-        self.assert_no_fail(result)
-        cancel_mock.assert_called_with(12345)
-        self.assertEqual(str(result.output), 'Dedicated Host 12345 was cancelled\n')
+    def test_cancel_all_guests(self):
+        guests = self.set_mock('SoftLayer_Virtual_DedicatedHost', 'getGuests')
+        guests.return_value = [{'id': 987}, {'id': 654}]
 
-    def test_cancel_all_guest_empty_list(self):
+        result = self.run_command(['--really', 'dedicatedhost', 'cancel-all-guests', '12345'])
+        self.assert_no_fail(result)
+
+        self.assertEqual(str(result.output), 'All guests into the dedicated host 12345 were cancelled\n')
+
+    def test_cancel_all_guests_empty_list(self):
+        guests = self.set_mock('SoftLayer_Virtual_DedicatedHost', 'getGuests')
+        guests.return_value = []
+
+        result = self.run_command(['--really', 'dedicatedhost', 'cancel-all-guests', '12345'])
+        self.assert_no_fail(result)
+
+        self.assertEqual(str(result.output), 'There is not any guest into the dedicated host 12345\n')
+
+    def test_cancel_all_guests_abort(self):
         result = self.run_command(['dedicatedhost', 'cancel', '12345'])
         self.assertEqual(result.exit_code, 2)
+
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
     def test_list_guests(self):
@@ -370,12 +384,12 @@ class DedicatedHostsTests(testing.TestCase):
                          [{'hostname': 'vs-test1',
                            'domain': 'test.sftlyr.ws',
                            'primary_ip': '172.16.240.2',
-                           'id': 100,
+                           'id': 200,
                            'power_state': 'Running',
                            'backend_ip': '10.45.19.37'},
                           {'hostname': 'vs-test2',
                            'domain': 'test.sftlyr.ws',
                            'primary_ip': '172.16.240.7',
-                           'id': 104,
+                           'id': 202,
                            'power_state': 'Running',
                            'backend_ip': '10.45.19.35'}])

@@ -14,26 +14,21 @@ from SoftLayer.CLI import helpers
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """Cancel all virtual guests of the dedicated host immediately"""
+    """Cancel all virtual guests of the dedicated host immediately.
+
+       Use the 'slcli vs cancel' command to cancel an specific guest
+    """
 
     dh_mgr = SoftLayer.DedicatedHostManager(env.client)
-    vs_mgr = SoftLayer.VSManager(env.client)
 
     host_id = helpers.resolve_id(dh_mgr.resolve_ids, identifier, 'dedicated host')
 
-    guests = dh_mgr.list_guests(host_id)
+    if not (env.skip_confirmations or formatting.no_going_back(host_id)):
+        raise exceptions.CLIAbort('Aborted')
 
-    if guests:
-        msg = '%s guest(s) will be cancelled, ' \
-              'do you want to continue?' % len(guests)
+    result = dh_mgr.cancel_guests(host_id)
 
-        if not (env.skip_confirmations or formatting.confirm(msg)):
-            raise exceptions.CLIAbort('Aborted')
-
-        for guest in guests:
-            vs_mgr.cancel_instance(guest['id'])
-
+    if result is True:
         click.secho('All guests into the dedicated host %s were cancelled' % host_id, fg='green')
-
     else:
         click.secho('There is not any guest into the dedicated host %s' % host_id, fg='red')

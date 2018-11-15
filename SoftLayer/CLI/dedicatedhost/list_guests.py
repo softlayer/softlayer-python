@@ -1,4 +1,4 @@
-"""List dedicated servers."""
+"""List guests which are in a dedicated host server."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -55,12 +55,13 @@ DEFAULT_COLUMNS = [
               show_default=True)
 @environment.pass_env
 def cli(env, identifier, sortby, cpu, domain, hostname, memory, tag, columns):
-    """List guests into the dedicated host."""
+    """List guests which are in a dedicated host server."""
+
     mgr = SoftLayer.DedicatedHostManager(env.client)
     guests = mgr.list_guests(host_id=identifier,
                              cpus=cpu,
                              hostname=hostname,
-                             domain= domain,
+                             domain=domain,
                              memory=memory,
                              tags=tag,
                              mask=columns.mask())

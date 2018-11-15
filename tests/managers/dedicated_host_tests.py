@@ -546,6 +546,22 @@ class DedicatedHostTests(testing.TestCase):
         self.assertEqual(result, True)
         self.assert_called_with('SoftLayer_Virtual_DedicatedHost', 'deleteObject', identifier=789)
 
+    def test_cancel_guests(self):
+        self.dedicated_host.host = mock.Mock()
+        self.dedicated_host.host.getGuests.return_value = [{'id': 987}, {'id': 654}]
+
+        result = self.dedicated_host.cancel_guests(789)
+
+        self.assertEqual(result, True)
+
+    def test_cancel_guests_empty_list(self):
+        self.dedicated_host.host = mock.Mock()
+        self.dedicated_host.host.getGuests.return_value = []
+
+        result = self.dedicated_host.cancel_guests(789)
+
+        self.assertEqual(result, False)
+
     def _get_routers_sample(self):
         routers = [
             {
@@ -658,7 +674,7 @@ class DedicatedHostTests(testing.TestCase):
         results = self.dedicated_host.list_guests(12345)
 
         for result in results:
-            self.assertIn(result['id'], [100, 104])
+            self.assertIn(result['id'], [200, 202])
         self.assert_called_with('SoftLayer_Virtual_DedicatedHost', 'getGuests', identifier=12345)
 
     def test_list_guests_with_filters(self):

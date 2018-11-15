@@ -80,8 +80,7 @@ getObjectById = {
 deleteObject = True
 
 getGuests = [{
-    'id': 100,
-    'metricTrackingObjectId': 1,
+    'id': 200,
     'hostname': 'vs-test1',
     'domain': 'test.sftlyr.ws',
     'fullyQualifiedDomainName': 'vs-test1.test.sftlyr.ws',
@@ -95,7 +94,6 @@ getGuests = [{
     'globalIdentifier': '1a2b3c-1701',
     'primaryBackendIpAddress': '10.45.19.37',
     'hourlyBillingFlag': False,
-
     'billingItem': {
         'id': 6327,
         'recurringFee': 1.54,
@@ -108,8 +106,7 @@ getGuests = [{
         }
     },
 }, {
-    'id': 104,
-    'metricTrackingObjectId': 2,
+    'id': 202,
     'hostname': 'vs-test2',
     'domain': 'test.sftlyr.ws',
     'fullyQualifiedDomainName': 'vs-test2.test.sftlyr.ws',
@@ -133,6 +130,5 @@ getGuests = [{
                 }
             }
         }
-    },
-    'virtualRack': {'id': 1, 'bandwidthAllotmentTypeId': 2},
+    }
 }]
