@@ -66,11 +66,11 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         """
         result = False
 
-        guest_list = self.host.getGuests(id=host_id, mask="id")
+        guests = self.host.getGuests(id=host_id, mask='id')
 
-        if guest_list:
-            for virtual_guest in guest_list:
-                result = self.guest.deleteObject(virtual_guest['id'])
+        if guests:
+            for vs in guests:
+                result = self.guest.deleteObject(id=vs['id'])
 
         return result
 
