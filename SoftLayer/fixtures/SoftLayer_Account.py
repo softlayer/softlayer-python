@@ -316,9 +316,14 @@ getSubnets = [
     {
         'id': '100',
         'networkIdentifier': '10.0.0.1',
+        'cidr': '/24',
+        'networkVlanId': 123,
         'datacenter': {'name': 'dal00'},
         'version': 4,
-        'subnetType': 'PRIMARY'
+        'subnetType': 'PRIMARY',
+        'ipAddressCount': 10,
+        'virtualGuests': [],
+        'hardware': []
     }]
 
 getSshKeys = [{'id': '100', 'label': 'Test 1'},

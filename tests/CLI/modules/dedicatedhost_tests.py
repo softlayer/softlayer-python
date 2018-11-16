@@ -337,3 +337,70 @@ class DedicatedHostsTests(testing.TestCase):
             'quantity': 1},)
 
         self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder', args=args)
+
+    @mock.patch('SoftLayer.DedicatedHostManager.cancel_host')
+    def test_cancel_host(self, cancel_mock):
+        result = self.run_command(['--really', 'dedicatedhost', 'cancel', '12345'])
+
+        self.assert_no_fail(result)
+        cancel_mock.assert_called_with(12345)
+
+        self.assertEqual(str(result.output), 'Dedicated Host 12345 was cancelled\n')
+
+    def test_cancel_host_abort(self):
+        result = self.run_command(['dedicatedhost', 'cancel', '12345'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    def test_cancel_guests(self):
+        vs1 = {'id': 987, 'fullyQualifiedDomainName': 'foobar.example.com'}
+        vs2 = {'id': 654, 'fullyQualifiedDomainName': 'wombat.example.com'}
+        guests = self.set_mock('SoftLayer_Virtual_DedicatedHost', 'getGuests')
+        guests.return_value = [vs1, vs2]
+
+        vs_status1 = {'id': 987, 'server name': 'foobar.example.com', 'status': 'Cancelled'}
+        vs_status2 = {'id': 654, 'server name': 'wombat.example.com', 'status': 'Cancelled'}
+        expected_result = [vs_status1, vs_status2]
+
+        result = self.run_command(['--really', 'dedicatedhost', 'cancel-guests', '12345'])
+        self.assert_no_fail(result)
+
+        self.assertEqual(expected_result, json.loads(result.output))
+
+    def test_cancel_guests_empty_list(self):
+        guests = self.set_mock('SoftLayer_Virtual_DedicatedHost', 'getGuests')
+        guests.return_value = []
+
+        result = self.run_command(['--really', 'dedicatedhost', 'cancel-guests', '12345'])
+        self.assert_no_fail(result)
+
+        self.assertEqual(str(result.output), 'There is not any guest into the dedicated host 12345\n')
+
+    def test_cancel_guests_abort(self):
+        result = self.run_command(['dedicatedhost', 'cancel-guests', '12345'])
+        self.assertEqual(result.exit_code, 2)
+
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    def test_list_guests(self):
+        result = self.run_command(['dh', 'list-guests', '123', '--tag=tag'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output),
+                         [{'hostname': 'vs-test1',
+                           'domain': 'test.sftlyr.ws',
+                           'primary_ip': '172.16.240.2',
+                           'id': 200,
+                           'power_state': 'Running',
+                           'backend_ip': '10.45.19.37'},
+                          {'hostname': 'vs-test2',
+                           'domain': 'test.sftlyr.ws',
+                           'primary_ip': '172.16.240.7',
+                           'id': 202,
+                           'power_state': 'Running',
+                           'backend_ip': '10.45.19.35'}])
+
+    def _get_cancel_guests_return(self):
+        vs_status1 = {'id': 123, 'fqdn': 'foobar.example.com', 'status': 'Cancelled'}
+        vs_status2 = {'id': 456, 'fqdn': 'wombat.example.com', 'status': 'Cancelled'}
+        return [vs_status1, vs_status2]

@@ -76,3 +76,59 @@ getObjectById = {
     'id': 12345,
     'createDate': '2017-11-02T11:40:56-07:00'
 }
+
+deleteObject = True
+
+getGuests = [{
+    'id': 200,
+    'hostname': 'vs-test1',
+    'domain': 'test.sftlyr.ws',
+    'fullyQualifiedDomainName': 'vs-test1.test.sftlyr.ws',
+    'status': {'keyName': 'ACTIVE', 'name': 'Active'},
+    'datacenter': {'id': 50, 'name': 'TEST00',
+                   'description': 'Test Data Center'},
+    'powerState': {'keyName': 'RUNNING', 'name': 'Running'},
+    'maxCpu': 2,
+    'maxMemory': 1024,
+    'primaryIpAddress': '172.16.240.2',
+    'globalIdentifier': '1a2b3c-1701',
+    'primaryBackendIpAddress': '10.45.19.37',
+    'hourlyBillingFlag': False,
+    'billingItem': {
+        'id': 6327,
+        'recurringFee': 1.54,
+        'orderItem': {
+            'order': {
+                'userRecord': {
+                    'username': 'chechu',
+                }
+            }
+        }
+    },
+}, {
+    'id': 202,
+    'hostname': 'vs-test2',
+    'domain': 'test.sftlyr.ws',
+    'fullyQualifiedDomainName': 'vs-test2.test.sftlyr.ws',
+    'status': {'keyName': 'ACTIVE', 'name': 'Active'},
+    'datacenter': {'id': 50, 'name': 'TEST00',
+                   'description': 'Test Data Center'},
+    'powerState': {'keyName': 'RUNNING', 'name': 'Running'},
+    'maxCpu': 4,
+    'maxMemory': 4096,
+    'primaryIpAddress': '172.16.240.7',
+    'globalIdentifier': '05a8ac-6abf0',
+    'primaryBackendIpAddress': '10.45.19.35',
+    'hourlyBillingFlag': True,
+    'billingItem': {
+        'id': 6327,
+        'recurringFee': 1.54,
+        'orderItem': {
+            'order': {
+                'userRecord': {
+                    'username': 'chechu',
+                }
+            }
+        }
+    }
+}]
