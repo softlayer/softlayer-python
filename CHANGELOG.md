@@ -1,5 +1,16 @@
 # Change Log
 
+
+## [5.6.4] - 2018-11-16
+
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.6.3...v5.6.4
+
++ #1041 Dedicated host cancel, cancel-guests, list-guests
++ #1071 added createDate and modifyDate parameters to sg rule-list
++ #1060 Fixed slcli subnet list
++ #1056 Fixed documentation link in image manager
++ #1062 Added description to slcli order 
+
 ## [5.6.3] - 2018-11-07
 
 - Changes: https://github.com/softlayer/softlayer-python/compare/v5.6.0...v5.6.3
