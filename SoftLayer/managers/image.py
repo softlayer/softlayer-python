@@ -16,7 +16,7 @@ class ImageManager(utils.IdentifierMixin, object):
     """Manages SoftLayer server images.
 
     See product information here:
-    https://knowledgelayer.softlayer.com/topic/image-templates
+    https://console.bluemix.net/docs/infrastructure/image-templates/image_index.html
 
     :param SoftLayer.API.BaseClient client: the client instance
     """
