@@ -57,20 +57,26 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         To cancel an specified guest use the method VSManager.cancel_instance()
 
         :param host_id: The ID of the dedicated host.
-        :return: True on success, False if there isn't any guest or
-                 an exception from the API
+        :return: The id, fqdn and status of all guests into a dictionary. The status
+                 could be 'Cancelled' or an exception message, The dictionary is empty
+                 if there isn't any guest in the dedicated host.
 
         Example::
             # Cancel guests of dedicated host id 12345
             result = mgr.cancel_guests(12345)
         """
-        result = False
+        result = []
 
-        guests = self.host.getGuests(id=host_id, mask='id')
+        guests = self.host.getGuests(id=host_id, mask='id,fullyQualifiedDomainName')
 
         if guests:
             for vs in guests:
-                result = self.guest.deleteObject(id=vs['id'])
+                status_info = {
+                    'id': vs['id'],
+                    'fqdn': vs['fullyQualifiedDomainName'],
+                    'status': self._delete_guest(vs['id'])
+                }
+                result.append(status_info)
 
         return result
 
@@ -512,3 +518,13 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         item = self._get_item(package, flavor)
 
         return self._get_backend_router(location['location']['locationPackageDetails'], item)
+
+    def _delete_guest(self, guest_id):
+        """Deletes a guest and returns 'Cancelled' or and Exception message"""
+        msg = 'Cancelled'
+        try:
+            self.guest.deleteObject(id=guest_id)
+        except SoftLayer.SoftLayerAPIError as e:
+            msg = 'Exception: ' + e.faultString
+
+        return msg

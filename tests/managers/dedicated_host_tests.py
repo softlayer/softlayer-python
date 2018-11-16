@@ -547,12 +547,19 @@ class DedicatedHostTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Virtual_DedicatedHost', 'deleteObject', identifier=789)
 
     def test_cancel_guests(self):
+        vs1 = {'id': 987, 'fullyQualifiedDomainName': 'foobar.example.com'}
+        vs2 = {'id': 654, 'fullyQualifiedDomainName': 'wombat.example.com'}
         self.dedicated_host.host = mock.Mock()
-        self.dedicated_host.host.getGuests.return_value = [{'id': 987}, {'id': 654}]
+        self.dedicated_host.host.getGuests.return_value = [vs1, vs2]
+
+        # Expected result
+        vs_status1 = {'id': 987, 'fqdn': 'foobar.example.com', 'status': 'Cancelled'}
+        vs_status2 = {'id': 654, 'fqdn': 'wombat.example.com', 'status': 'Cancelled'}
+        delete_status = [vs_status1, vs_status2]
 
         result = self.dedicated_host.cancel_guests(789)
 
-        self.assertEqual(result, True)
+        self.assertEqual(result, delete_status)
 
     def test_cancel_guests_empty_list(self):
         self.dedicated_host.host = mock.Mock()
@@ -560,7 +567,19 @@ class DedicatedHostTests(testing.TestCase):
 
         result = self.dedicated_host.cancel_guests(789)
 
-        self.assertEqual(result, False)
+        self.assertEqual(result, [])
+
+    def test_delete_guest(self):
+        result = self.dedicated_host._delete_guest(123)
+        self.assertEqual(result, 'Cancelled')
+
+        # delete_guest should return the exception message in case it fails
+        error_raised = SoftLayer.SoftLayerAPIError('SL Exception', 'SL message')
+        self.dedicated_host.guest = mock.Mock()
+        self.dedicated_host.guest.deleteObject.side_effect = error_raised
+
+        result = self.dedicated_host._delete_guest(369)
+        self.assertEqual(result, 'Exception: SL message')
 
     def _get_routers_sample(self):
         routers = [

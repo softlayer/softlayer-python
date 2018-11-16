@@ -26,9 +26,18 @@ def cli(env, identifier):
     if not (env.skip_confirmations or formatting.no_going_back(host_id)):
         raise exceptions.CLIAbort('Aborted')
 
+    table = formatting.Table(['id', 'server name', 'status'])
+
     result = dh_mgr.cancel_guests(host_id)
 
-    if result is True:
-        click.secho('All guests into the dedicated host %s were cancelled' % host_id, fg='green')
+    if result:
+        for status in result:
+            table.add_row([
+                status['id'],
+                status['fqdn'],
+                status['status']
+            ])
+
+        env.fout(table)
     else:
         click.secho('There is not any guest into the dedicated host %s' % host_id, fg='red')
