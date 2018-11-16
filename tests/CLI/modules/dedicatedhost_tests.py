@@ -352,26 +352,26 @@ class DedicatedHostsTests(testing.TestCase):
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
-    def test_cancel_all_guests(self):
+    def test_cancel_guests(self):
         guests = self.set_mock('SoftLayer_Virtual_DedicatedHost', 'getGuests')
         guests.return_value = [{'id': 987}, {'id': 654}]
 
-        result = self.run_command(['--really', 'dedicatedhost', 'cancel-all-guests', '12345'])
+        result = self.run_command(['--really', 'dedicatedhost', 'cancel-guests', '12345'])
         self.assert_no_fail(result)
 
         self.assertEqual(str(result.output), 'All guests into the dedicated host 12345 were cancelled\n')
 
-    def test_cancel_all_guests_empty_list(self):
+    def test_cancel_guests_empty_list(self):
         guests = self.set_mock('SoftLayer_Virtual_DedicatedHost', 'getGuests')
         guests.return_value = []
 
-        result = self.run_command(['--really', 'dedicatedhost', 'cancel-all-guests', '12345'])
+        result = self.run_command(['--really', 'dedicatedhost', 'cancel-guests', '12345'])
         self.assert_no_fail(result)
 
         self.assertEqual(str(result.output), 'There is not any guest into the dedicated host 12345\n')
 
-    def test_cancel_all_guests_abort(self):
-        result = self.run_command(['dedicatedhost', 'cancel', '12345'])
+    def test_cancel_guests_abort(self):
+        result = self.run_command(['dedicatedhost', 'cancel-guests', '12345'])
         self.assertEqual(result.exit_code, 2)
 
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
