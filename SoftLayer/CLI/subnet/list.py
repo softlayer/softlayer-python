@@ -26,11 +26,10 @@ from SoftLayer import utils
 @click.option('--identifier', help="Filter by network identifier")
 @click.option('--subnet-type', '-t', help="Filter by subnet type")
 @click.option('--network-space', help="Filter by network space")
-@click.option('--v4', '--ipv4', is_flag=True, help="Display only IPv4 subnets")
-@click.option('--v6', '--ipv6', is_flag=True, help="Display only IPv6 subnets")
+@click.option('--ipv4', '--v4', is_flag=True, help="Display only IPv4 subnets")
+@click.option('--ipv6', '--v6', is_flag=True, help="Display only IPv6 subnets")
 @environment.pass_env
-def cli(env, sortby, datacenter, identifier, subnet_type, network_space,
-        ipv4, ipv6):
+def cli(env, sortby, datacenter, identifier, subnet_type, network_space, ipv4, ipv6):
     """List subnets."""
 
     mgr = SoftLayer.NetworkManager(env.client)
