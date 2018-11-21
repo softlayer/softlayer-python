@@ -237,6 +237,7 @@ ALL_ROUTES = [
     ('hardware:update-firmware', 'SoftLayer.CLI.hardware.update_firmware:cli'),
     ('hardware:rescue', 'SoftLayer.CLI.hardware.power:rescue'),
     ('hardware:ready', 'SoftLayer.CLI.hardware.ready:cli'),
+    ('hardware:toggle-ipmi', 'SoftLayer.CLI.hardware.toggle_ipmi:cli'),
 
     ('securitygroup', 'SoftLayer.CLI.securitygroup'),
     ('securitygroup:list', 'SoftLayer.CLI.securitygroup.list:cli'),
