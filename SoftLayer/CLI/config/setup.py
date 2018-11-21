@@ -10,6 +10,7 @@ from SoftLayer.CLI import config
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
+from SoftLayer import transports
 from SoftLayer import utils
 
 
@@ -22,7 +23,11 @@ def get_api_key(client, username, secret):
     # Try to use a client with username/api key
     if len(secret) == 64:
         try:
-            client.auth = auth.BasicAuthentication(username, secret)
+            # real_transport = getattr(client.transport, 'transport', transport)
+            if isinstance(client.transport.transport, transports.RestTransport):
+                client.auth = auth.BasicHTTPAuthentication(username, secret)
+            else:
+                client.auth = auth.BasicAuthentication(username, secret)
             client['Account'].getCurrentUser()
             return secret
         except SoftLayer.SoftLayerAPIError as ex:
@@ -103,17 +108,22 @@ def get_user_input(env):
     secret = env.getpass('API Key or Password', default=defaults['api_key'])
 
     # Ask for which endpoint they want to use
+    endpoint = defaults.get('endpoint_url', 'public')
     endpoint_type = env.input(
-        'Endpoint (public|private|custom)', default='public')
+        'Endpoint (public|private|custom)', default=endpoint)
     endpoint_type = endpoint_type.lower()
 
-    if endpoint_type == 'custom':
-        endpoint_url = env.input('Endpoint URL',
-                                 default=defaults['endpoint_url'])
+    if endpoint_type == 'public':
+        endpoint_url = SoftLayer.API_PUBLIC_ENDPOINT
     elif endpoint_type == 'private':
         endpoint_url = SoftLayer.API_PRIVATE_ENDPOINT
     else:
-        endpoint_url = SoftLayer.API_PUBLIC_ENDPOINT
+        if endpoint_type == 'custom':
+            endpoint_url = env.input('Endpoint URL', default=endpoint)
+        else:
+            endpoint_url = endpoint
+        
+    print("SETTING enpoint to %s "% endpoint_url)
 
     # Ask for timeout
     timeout = env.input('Timeout', default=defaults['timeout'] or 0)

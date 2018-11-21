@@ -7,7 +7,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer.managers import ordering
 from SoftLayer.utils import lookup
 
-COLUMNS = ['category', 'keyName', 'description']
+COLUMNS = ['category', 'keyName', 'description', 'priceId']
 
 
 @click.command()
@@ -60,7 +60,7 @@ def cli(env, package_keyname, keyword, category):
     categories = sorted_items.keys()
     for catname in sorted(categories):
         for item in sorted_items[catname]:
-            table.add_row([catname, item['keyName'], item['description']])
+            table.add_row([catname, item['keyName'], item['description'], get_price(item)])
     env.fout(table)
 
 
@@ -75,3 +75,10 @@ def sort_items(items):
         sorted_items[category].append(item)
 
     return sorted_items
+
+def get_price(item):
+
+    for price in item.get('prices', []):
+        if not price.get('locationGroupId'):
+            return price.get('id')
+    return 0
