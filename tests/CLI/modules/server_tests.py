@@ -581,8 +581,14 @@ class ServerCLITests(testing.TestCase):
         self.assert_no_fail(result)
         self.assertEqual(result.output, '"READY"\n')
 
-    def test_toggle_impi(self):
+    def test_toggle_ipmi_on(self):
         mock.return_value = True
-        result = self.run_command(['server', 'toggle-ipmi', '--enabled=True', '12345'])
+        result = self.run_command(['server', 'toggle-ipmi', '--enable', '12345'])
+        self.assert_no_fail(result)
+        self.assertEqual(result.output, 'True\n')
+
+    def test_toggle_ipmi_off(self):
+        mock.return_value = True
+        result = self.run_command(['server', 'toggle-ipmi', '--disable', '12345'])
         self.assert_no_fail(result)
         self.assertEqual(result.output, 'True\n')
