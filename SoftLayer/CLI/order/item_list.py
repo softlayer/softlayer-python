@@ -76,7 +76,9 @@ def sort_items(items):
 
     return sorted_items
 
+
 def get_price(item):
+    """Given an SoftLayer_Product_Item, returns its default price id"""
 
     for price in item.get('prices', []):
         if not price.get('locationGroupId'):

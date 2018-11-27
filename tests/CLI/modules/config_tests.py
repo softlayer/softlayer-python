@@ -73,7 +73,6 @@ class TestHelpSetup(testing.TestCase):
                             'AAAAAAAAAAAAAAAAAAAAAAAAAAAAA' in contents)
             self.assertTrue('endpoint_url = %s' % consts.API_PUBLIC_ENDPOINT in contents)
 
-
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
     @mock.patch('SoftLayer.CLI.environment.Environment.input')

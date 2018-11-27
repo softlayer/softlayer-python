@@ -38,13 +38,9 @@ class OrderTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Package', 'getItems')
-        expected_results = [{'category': 'testing',
-                             'keyName': 'item1',
-                             'description': 'description1'},
-                            {'category': 'testing',
-                             'keyName': 'item2',
-                             'description': 'description2'}]
-        self.assertEqual(expected_results, json.loads(result.output))
+        self.assertIn('description2', result.output)
+        self.assertIn('testing', result.output)
+        self.assertIn('item2', result.output)
 
     def test_package_list(self):
         p_mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
