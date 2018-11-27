@@ -482,6 +482,9 @@ class FileStorageManager(utils.IdentifierMixin, object):
         file_volume = self.get_file_volume_details(
             volume_id,
             mask='mask[id,billingItem[id,hourlyFlag]]')
+
+        if 'billingItem' not in file_volume:
+            raise exceptions.SoftLayerError('The volume has already been canceled')
         billing_item_id = file_volume['billingItem']['id']
 
         if utils.lookup(file_volume, 'billingItem', 'hourlyFlag'):
