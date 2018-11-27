@@ -23,11 +23,6 @@ def get_api_key(client, username, secret):
     # Try to use a client with username/api key
     if len(secret) == 64:
         try:
-            # real_transport = getattr(client.transport, 'transport', transport)
-            if isinstance(client.transport.transport, transports.RestTransport):
-                client.auth = auth.BasicHTTPAuthentication(username, secret)
-            else:
-                client.auth = auth.BasicAuthentication(username, secret)
             client['Account'].getCurrentUser()
             return secret
         except SoftLayer.SoftLayerAPIError as ex:
@@ -37,12 +32,10 @@ def get_api_key(client, username, secret):
         # Try to use a client with username/password
         client.authenticate_with_password(username, secret)
 
-        user_record = client['Account'].getCurrentUser(
-            mask='id, apiAuthenticationKeys')
+        user_record = client['Account'].getCurrentUser(mask='id, apiAuthenticationKeys')
         api_keys = user_record['apiAuthenticationKeys']
         if len(api_keys) == 0:
-            return client['User_Customer'].addApiAuthenticationKey(
-                id=user_record['id'])
+            return client['User_Customer'].addApiAuthenticationKey(id=user_record['id'])
         return api_keys[0]['authenticationKey']
 
 
@@ -54,7 +47,8 @@ def cli(env):
     username, secret, endpoint_url, timeout = get_user_input(env)
 
     env.client.transport.transport.endpoint_url = endpoint_url
-    api_key = get_api_key(env.client, username, secret)
+    new_client = SoftLayer.client(username=username, api_key=secret, endpoint_url=endpoint_url, timeout=timeout)
+    api_key = get_api_key(new_client, username, secret)
 
     path = '~/.softlayer'
     if env.config_file:
