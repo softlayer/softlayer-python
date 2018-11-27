@@ -45,9 +45,7 @@ def cli(env):
     """Edit configuration."""
 
     username, secret, endpoint_url, timeout = get_user_input(env)
-
-    env.client.transport.transport.endpoint_url = endpoint_url
-    new_client = SoftLayer.client(username=username, api_key=secret, endpoint_url=endpoint_url, timeout=timeout)
+    new_client = SoftLayer.Client(username=username, api_key=secret, endpoint_url=endpoint_url, timeout=timeout)
     api_key = get_api_key(new_client, username, secret)
 
     path = '~/.softlayer'
@@ -115,9 +113,7 @@ def get_user_input(env):
         if endpoint_type == 'custom':
             endpoint_url = env.input('Endpoint URL', default=endpoint)
         else:
-            endpoint_url = endpoint
-        
-    print("SETTING enpoint to %s "% endpoint_url)
+            endpoint_url = endpoint_type
 
     # Ask for timeout
     timeout = env.input('Timeout', default=defaults['timeout'] or 0)
