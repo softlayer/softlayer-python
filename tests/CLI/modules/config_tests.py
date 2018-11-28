@@ -51,10 +51,12 @@ class TestHelpSetup(testing.TestCase):
         transport = testing.MockableTransport(SoftLayer.FixtureTransport())
         self.env.client = SoftLayer.BaseClient(transport=transport)
 
+    @mock.patch('SoftLayer.Client')
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
     @mock.patch('SoftLayer.CLI.environment.Environment.input')
-    def test_setup(self, mocked_input, getpass, confirm_mock):
+    def test_setup(self, mocked_input, getpass, confirm_mock, client):
+        client.return_value = self.env.client
         if(sys.platform.startswith("win")):
             self.skipTest("Test doesn't work in Windows")
         with tempfile.NamedTemporaryFile() as config_file:
@@ -67,10 +69,10 @@ class TestHelpSetup(testing.TestCase):
             self.assert_no_fail(result)
             self.assertTrue('Configuration Updated Successfully' in result.output)
             contents = config_file.read().decode("utf-8")
+
             self.assertTrue('[softlayer]' in contents)
             self.assertTrue('username = user' in contents)
-            self.assertTrue('api_key = AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
-                            'AAAAAAAAAAAAAAAAAAAAAAAAAAAAA' in contents)
+            self.assertTrue('api_key = AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' in contents)
             self.assertTrue('endpoint_url = %s' % consts.API_PUBLIC_ENDPOINT in contents)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
