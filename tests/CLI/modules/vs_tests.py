@@ -924,10 +924,13 @@ class VirtTests(testing.TestCase):
         self.assertIn({'id': 100}, order_container['virtualGuests'])
         self.assertEqual(order_container['virtualGuests'], [{'id': 100}])
 
-    def test_upgrade_with_cpu_memory_and_flavor(self):
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_upgrade_with_cpu_memory_and_flavor(self, confirm_mock):
+        confirm_mock = True
         result = self.run_command(['vs', 'upgrade', '100', '--cpu=4',
                                    '--memory=1024', '--flavor=M1_64X512X100'])
-        self.assertEqual("Do not use cpu, private and memory if you are using flavors", str(result.exception))
+        self.assertEqual(result.exit_code, 1)
+        self.assertIsInstance(result.exception, ValueError)
 
     def test_edit(self):
         result = self.run_command(['vs', 'edit',

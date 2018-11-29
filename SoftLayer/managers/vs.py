@@ -804,8 +804,7 @@ class VSManager(utils.IdentifierMixin, object):
         return self.guest.createArchiveTransaction(
             name, disks_to_capture, notes, id=instance_id)
 
-    def upgrade(self, instance_id, cpus=None, memory=None,
-                nic_speed=None, public=True, preset=None):
+    def upgrade(self, instance_id, cpus=None, memory=None, nic_speed=None, public=True, preset=None):
         """Upgrades a VS instance.
 
         Example::
@@ -832,17 +831,16 @@ class VSManager(utils.IdentifierMixin, object):
         data = {'nic_speed': nic_speed}
 
         if cpus is not None and preset is not None:
-            raise exceptions.SoftLayerError("Do not use cpu, private and memory if you are using flavors")
+            raise ValueError("Do not use cpu, private and memory if you are using flavors")
         data['cpus'] = cpus
 
         if memory is not None and preset is not None:
-            raise exceptions.SoftLayerError("Do not use memory, private or cpu if you are using flavors")
+            raise ValueError("Do not use memory, private or cpu if you are using flavors")
         data['memory'] = memory
 
         maintenance_window = datetime.datetime.now(utils.UTC())
         order = {
-            'complexType': 'SoftLayer_Container_Product_Order_Virtual_Guest_'
-                           'Upgrade',
+            'complexType': 'SoftLayer_Container_Product_Order_Virtual_Guest_Upgrade',
             'properties': [{
                 'name': 'MAINTENANCE_WINDOW',
                 'value': maintenance_window.strftime("%Y-%m-%d %H:%M:%S%z")
