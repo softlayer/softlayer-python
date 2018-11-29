@@ -73,15 +73,25 @@ def _parse_create_args(client, args):
     """
     data = {
         "hourly": args.get('billing', 'hourly') == 'hourly',
-        "domain": args['domain'],
-        "hostname": args['hostname'],
-        "private": args.get('private', None),
-        "dedicated": args.get('dedicated', None),
-        "disks": args['disk'],
         "cpus": args.get('cpu', None),
+        "tags": args.get('tag', None),
+        "disks": args.get('disk', None),
+        "os_code": args.get('os', None),
         "memory": args.get('memory', None),
         "flavor": args.get('flavor', None),
-        "boot_mode": args.get('boot_mode', None)
+        "domain": args.get('domain', None),
+        "host_id": args.get('host_id', None),
+        "private": args.get('private', None),
+        "hostname": args.get('hostname', None),
+        "nic_speed": args.get('network', None),
+        "boot_mode": args.get('boot_mode', None),
+        "dedicated": args.get('dedicated', None),
+        "post_uri": args.get('postinstall', None),
+        "datacenter": args.get('datacenter', None),
+        "public_vlan": args.get('vlan_public', None),
+        "private_vlan": args.get('vlan_private', None),
+        "public_subnet": args.get('subnet_public', None),
+        "private_subnet": args.get('subnet_private', None),
     }
 
     # The primary disk is included in the flavor and the local_disk flag is not needed
@@ -91,32 +101,19 @@ def _parse_create_args(client, args):
     else:
         data['local_disk'] = not args.get('san')
 
-    if args.get('os'):
-        data['os_code'] = args['os']
-
     if args.get('image'):
         if args.get('image').isdigit():
             image_mgr = SoftLayer.ImageManager(client)
-            image_details = image_mgr.get_image(args.get('image'),
-                                                mask="id,globalIdentifier")
+            image_details = image_mgr.get_image(args.get('image'), mask="id,globalIdentifier")
             data['image_id'] = image_details['globalIdentifier']
         else:
             data['image_id'] = args['image']
-
-    if args.get('datacenter'):
-        data['datacenter'] = args['datacenter']
-
-    if args.get('network'):
-        data['nic_speed'] = args.get('network')
 
     if args.get('userdata'):
         data['userdata'] = args['userdata']
     elif args.get('userfile'):
         with open(args['userfile'], 'r') as userfile:
             data['userdata'] = userfile.read()
-
-    if args.get('postinstall'):
-        data['post_uri'] = args.get('postinstall')
 
     # Get the SSH keys
     if args.get('key'):
@@ -126,16 +123,6 @@ def _parse_create_args(client, args):
             key_id = helpers.resolve_id(resolver, key, 'SshKey')
             keys.append(key_id)
         data['ssh_keys'] = keys
-
-    if args.get('vlan_public'):
-        data['public_vlan'] = args['vlan_public']
-
-    if args.get('vlan_private'):
-        data['private_vlan'] = args['vlan_private']
-
-    data['public_subnet'] = args.get('subnet_public', None)
-
-    data['private_subnet'] = args.get('subnet_private', None)
 
     if args.get('public_security_group'):
         pub_groups = args.get('public_security_group')
@@ -155,104 +142,55 @@ def _parse_create_args(client, args):
 
 
 @click.command(epilog="See 'slcli vs create-options' for valid options")
-@click.option('--hostname', '-H',
-              help="Host portion of the FQDN",
-              required=True,
-              prompt=True)
-@click.option('--domain', '-D',
-              help="Domain portion of the FQDN",
-              required=True,
-              prompt=True)
-@click.option('--cpu', '-c',
-              help="Number of CPU cores (not available with flavors)",
-              type=click.INT)
-@click.option('--memory', '-m',
-              help="Memory in mebibytes (not available with flavors)",
-              type=virt.MEM_TYPE)
-@click.option('--flavor', '-f',
-              help="Public Virtual Server flavor key name",
-              type=click.STRING)
-@click.option('--datacenter', '-d',
-              help="Datacenter shortname",
-              required=True,
-              prompt=True)
-@click.option('--os', '-o',
-              help="OS install code. Tip: you can specify <OS>_LATEST")
-@click.option('--image',
-              help="Image ID. See: 'slcli image list' for reference")
-@click.option('--boot-mode',
-              help="Specify the mode to boot the OS in. Supported modes are HVM and PV.",
-              type=click.STRING)
-@click.option('--billing',
-              type=click.Choice(['hourly', 'monthly']),
-              default='hourly',
-              show_default=True,
+@click.option('--hostname', '-H', required=True, prompt=True, help="Host portion of the FQDN")
+@click.option('--domain', '-D', required=True, prompt=True, help="Domain portion of the FQDN")
+@click.option('--cpu', '-c', type=click.INT, help="Number of CPU cores (not available with flavors)")
+@click.option('--memory', '-m', type=virt.MEM_TYPE, help="Memory in mebibytes (not available with flavors)")
+@click.option('--flavor', '-f', type=click.STRING, help="Public Virtual Server flavor key name") 
+@click.option('--datacenter', '-d', required=True, prompt=True, help="Datacenter shortname")
+@click.option('--os', '-o', help="OS install code. Tip: you can specify <OS>_LATEST")
+@click.option('--image',  help="Image ID. See: 'slcli image list' for reference")
+@click.option('--boot-mode', type=click.STRING,
+              help="Specify the mode to boot the OS in. Supported modes are HVM and PV.")
+@click.option('--billing', type=click.Choice(['hourly', 'monthly']), default='hourly', show_default=True,
               help="Billing rate")
-@click.option('--dedicated/--public',
-              is_flag=True,
-              help="Create a Dedicated Virtual Server")
-@click.option('--host-id',
-              type=click.INT,
-              help="Host Id to provision a Dedicated Host Virtual Server onto")
-@click.option('--san',
-              is_flag=True,
-              help="Use SAN storage instead of local disk.")
-@click.option('--test',
-              is_flag=True,
-              help="Do not actually create the virtual server")
-@click.option('--export',
-              type=click.Path(writable=True, resolve_path=True),
+@click.option('--dedicated/--public', is_flag=True, help="Create a Dedicated Virtual Server")
+@click.option('--host-id', type=click.INT, help="Host Id to provision a Dedicated Host Virtual Server onto")
+@click.option('--san', is_flag=True, help="Use SAN storage instead of local disk.")
+@click.option('--test', is_flag=True,  help="Do not actually create the virtual server")
+@click.option('--export', type=click.Path(writable=True, resolve_path=True),
               help="Exports options to a template file")
 @click.option('--postinstall', '-i', help="Post-install script to download")
-@helpers.multi_option('--key', '-k',
-                      help="SSH keys to add to the root user")
+@helpers.multi_option('--key', '-k', help="SSH keys to add to the root user")
 @helpers.multi_option('--disk', help="Disk sizes")
-@click.option('--private',
-              is_flag=True,
+@click.option('--private', is_flag=True,
               help="Forces the VS to only have access the private network")
-@click.option('--like',
-              is_eager=True,
-              callback=_update_with_like_args,
+@click.option('--like', is_eager=True, callback=_update_with_like_args,
               help="Use the configuration from an existing VS")
 @click.option('--network', '-n', help="Network port speed in Mbps")
 @helpers.multi_option('--tag', '-g', help="Tags to add to the instance")
-@click.option('--template', '-t',
-              is_eager=True,
-              callback=template.TemplateCallback(list_args=['disk',
-                                                            'key',
-                                                            'tag']),
+@click.option('--template', '-t', is_eager=True,
+              callback=template.TemplateCallback(list_args=['disk', 'key', 'tag']),
               help="A template file that defaults the command-line options",
               type=click.Path(exists=True, readable=True, resolve_path=True))
 @click.option('--userdata', '-u', help="User defined metadata string")
-@click.option('--userfile', '-F',
-              help="Read userdata from file",
-              type=click.Path(exists=True, readable=True, resolve_path=True))
-@click.option('--vlan-public',
-              help="The ID of the public VLAN on which you want the virtual "
-                   "server placed",
-              type=click.INT)
-@click.option('--vlan-private',
-              help="The ID of the private VLAN on which you want the virtual "
-                   "server placed",
-              type=click.INT)
-@click.option('--subnet-public',
-              help="The ID of the public SUBNET on which you want the virtual server placed",
-              type=click.INT)
-@click.option('--subnet-private',
-              help="The ID of the private SUBNET on which you want the virtual server placed",
-              type=click.INT)
-@helpers.multi_option('--public-security-group',
-                      '-S',
-                      help=('Security group ID to associate with '
-                            'the public interface'))
-@helpers.multi_option('--private-security-group',
-                      '-s',
-                      help=('Security group ID to associate with '
-                            'the private interface'))
-@click.option('--wait',
-              type=click.INT,
-              help="Wait until VS is finished provisioning for up to X "
-                   "seconds before returning")
+@click.option('--userfile', '-F', type=click.Path(exists=True, readable=True, resolve_path=True),
+              help="Read userdata from file")
+@click.option('--vlan-public', type=click.INT,
+              help="The ID of the public VLAN on which you want the virtual server placed")
+@click.option('--vlan-private', type=click.INT,
+              help="The ID of the private VLAN on which you want the virtual server placed")
+@click.option('--subnet-public', type=click.INT,
+              help="The ID of the public SUBNET on which you want the virtual server placed")
+@click.option('--subnet-private', type=click.INT,
+              help="The ID of the private SUBNET on which you want the virtual server placed")
+@helpers.multi_option('--public-security-group', '-S',
+                      help=('Security group ID to associate with the public interface'))
+@helpers.multi_option('--private-security-group', '-s',
+                      help=('Security group ID to associate with the private interface'))
+@click.option('--wait', type=click.INT,
+              help="Wait until VS is finished provisioning for up to X seconds before returning")
+@click.option('--ipv6', is_flag=True, help="Adds an IPv6 address to this guest")
 @environment.pass_env
 def cli(env, **args):
     """Order/create virtual servers."""
