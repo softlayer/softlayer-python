@@ -872,6 +872,28 @@ class VSManager(utils.IdentifierMixin, object):
             return True
         return False
 
+    def order_guest(self, guest_object, test=False):
+        """Uses Product_Order::placeOrder to create a virtual guest.
+
+        Useful when creating a virtual guest with options not supported by Virtual_Guest::createObject
+        specifically ipv6 support.
+
+        :param dictionary guest_object: See SoftLayer.CLI.virt.create._parse_create_args
+        """
+
+        template = self.verify_create_instance(**guest_object)
+        if guest_object.get('ipv6'):
+            ipv6_price = self.ordering_manager.get_price_id_list('PUBLIC_CLOUD_SERVER', ['1_IPV6_ADDRESS'])
+            template['prices'].append({'id': ipv6_price[0]})
+
+        if test:
+            result = self.client.call('Product_Order', 'verifyOrder', template)
+        else:
+            result = self.client.call('Product_Order', 'placeOrder', template)
+            # return False
+
+        return result
+
     def _get_package_items(self):
         """Following Method gets all the item ids related to VS.
 

@@ -75,6 +75,7 @@ def _parse_create_args(client, args):
         "hourly": args.get('billing', 'hourly') == 'hourly',
         "cpus": args.get('cpu', None),
         "tags": args.get('tag', None),
+        "ipv6": args.get('ipv6', None),
         "disks": args.get('disk', None),
         "os_code": args.get('os', None),
         "memory": args.get('memory', None),
@@ -194,95 +195,57 @@ def _parse_create_args(client, args):
 @environment.pass_env
 def cli(env, **args):
     """Order/create virtual servers."""
+    from pprint import pprint as pp
     vsi = SoftLayer.VSManager(env.client)
     _validate_args(env, args)
+    create_args = _parse_create_args(env.client, args)
 
-    # Do not create a virtual server with test or export
-    do_create = not (args['export'] or args['test'])
+    test = args.get('test')
+    result = vsi.order_guest(create_args, test)
+    output = _build_receipt_table(result, args.get('billing'), test)
+    virtual_guests = utils.lookup(result,'orderDetails','virtualGuests')
 
-    table = formatting.Table(['Item', 'cost'])
-    table.align['Item'] = 'r'
-    table.align['cost'] = 'r'
-    data = _parse_create_args(env.client, args)
-
-    output = []
-    if args.get('test'):
-        result = vsi.verify_create_instance(**data)
-
-        if result['presetId']:
-            ordering_mgr = SoftLayer.OrderingManager(env.client)
-            item_prices = ordering_mgr.get_item_prices(result['packageId'])
-            preset_prices = ordering_mgr.get_preset_prices(result['presetId'])
-            search_keys = ["guest_core", "ram"]
-            for price in preset_prices['prices']:
-                if price['item']['itemCategory']['categoryCode'] in search_keys:
-                    item_key_name = price['item']['keyName']
-                    _add_item_prices(item_key_name, item_prices, result)
-
-        table = _build_receipt_table(result['prices'], args.get('billing'))
-
-        output.append(table)
-        output.append(formatting.FormattedItem(
-            None,
-            ' -- ! Prices reflected here are retail and do not '
-            'take account level discounts and are not guaranteed.'))
-
-    if args['export']:
-        export_file = args.pop('export')
-        template.export_to_template(export_file, args,
-                                    exclude=['wait', 'test'])
-        env.fout('Successfully exported options to a template file.')
-
-    if do_create:
-        if not (env.skip_confirmations or formatting.confirm(
-                "This action will incur charges on your account. Continue?")):
-            raise exceptions.CLIAbort('Aborting virtual server order.')
-
-        result = vsi.create_instance(**data)
-
+    if not test:
         table = formatting.KeyValueTable(['name', 'value'])
         table.align['name'] = 'r'
         table.align['value'] = 'l'
-        table.add_row(['id', result['id']])
-        table.add_row(['created', result['createDate']])
-        table.add_row(['guid', result['globalIdentifier']])
-        output.append(table)
-
-        if args.get('wait'):
-            ready = vsi.wait_for_ready(result['id'], args.get('wait') or 1)
-            table.add_row(['ready', ready])
-            if ready is False:
-                env.out(env.fmt(output))
-                raise exceptions.CLIHalt(code=1)
-
+        
+        for guest in virtual_guests:
+            table.add_row(['id', guest['id']])
+            table.add_row(['created', result['orderDate']])
+            table.add_row(['guid', guest['globalIdentifier']])
+        env.fout(table)
     env.fout(output)
 
-
-def _add_item_prices(item_key_name, item_prices, result):
-    """Add the flavor item prices to the rest o the items prices"""
-    for item in item_prices:
-        if item_key_name == item['item']['keyName']:
-            if 'pricingLocationGroup' in item:
-                for location in item['pricingLocationGroup']['locations']:
-                    if result['location'] == str(location['id']):
-                        result['prices'].append(item)
+    if args.get('wait'):
+        guest_id = virtual_guests[0]['id']
+        click.secho("Waiting for %s to finish provisioning..." % guest_id, fg='green')
+        ready = vsi.wait_for_ready(guest_id, args.get('wait') or 1)
+        if ready is False:
+            env.out(env.fmt(output))
+            raise exceptions.CLIHalt(code=1)
 
 
-def _build_receipt_table(prices, billing="hourly"):
+def _build_receipt_table(result, billing="hourly", test=False):
     """Retrieve the total recurring fee of the items prices"""
-    total = 0.000
-    table = formatting.Table(['Cost', 'Item'])
+    title = "OrderId: %s" % (result.get('orderId', 'No order placed'))
+    table = formatting.Table(['Cost', 'Description'], title=title)
     table.align['Cost'] = 'r'
-    table.align['Item'] = 'l'
-    for price in prices:
+    table.align['Description'] = 'l'
+    total = 0.000
+    if test:
+        prices = result['prices']
+    else:
+        prices = result['orderDetails']['prices']
+
+    for item in prices:
         rate = 0.000
         if billing == "hourly":
-            rate += float(price.get('hourlyRecurringFee', 0.000))
+            rate += float(item.get('hourlyRecurringFee', 0.000))
         else:
-            rate += float(price.get('recurringFee', 0.000))
+            rate += float(item.get('recurringFee', 0.000))
         total += rate
-
-        table.add_row(["%.3f" % rate, price['item']['description']])
+        table.add_row([rate, item['item']['description']])
     table.add_row(["%.3f" % total, "Total %s cost" % billing])
     return table
 
@@ -316,8 +279,6 @@ def _validate_args(env, args):
             '[-o | --os] not allowed with [--image]')
 
     while not any([args['os'], args['image']]):
-        args['os'] = env.input("Operating System Code",
-                               default="",
-                               show_default=False)
+        args['os'] = env.input("Operating System Code", default="", show_default=False)
         if not args['os']:
             args['image'] = env.input("Image", default="", show_default=False)

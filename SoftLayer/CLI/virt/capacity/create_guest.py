@@ -36,8 +36,7 @@ from SoftLayer.managers.vs_capacity import CapacityManager as CapacityManager
 def cli(env, **args):
     """Allows for creating a virtual guest in a reserved capacity."""
     create_args = _parse_create_args(env.client, args)
-    if args.get('ipv6'):
-        create_args['ipv6'] = True
+
     create_args['primary_disk'] = args.get('primary_disk')
     manager = CapacityManager(env.client)
     capacity_id = args.get('capacity_id')
