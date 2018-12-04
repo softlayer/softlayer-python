@@ -5,6 +5,7 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import formatting
 
 
 @click.command()
@@ -15,4 +16,14 @@ def cli(env, account_id, content_url):
     """Purge cached files from all edge nodes."""
 
     manager = SoftLayer.CDNManager(env.client)
-    manager.purge_content(account_id, content_url)
+    content_list = manager.purge_content(account_id, content_url)
+
+    table = formatting.Table(['url', 'status'])
+
+    for content in content_list:
+        table.add_row([
+            content['url'],
+            content['statusCode']
+        ])
+
+    env.fout(table)
