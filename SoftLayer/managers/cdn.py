@@ -129,8 +129,8 @@ class CDNManager(utils.IdentifierMixin, object):
                                be purged.
         :param urls: a string or a list of strings representing the CDN URLs
                      that should be purged.
-        :returns: true if all purge requests were successfully submitted;
-                  otherwise, returns the first error encountered.
+        :returns: a list of SoftLayer_Container_Network_ContentDelivery_PurgeService_Response objects
+                  which indicates if the purge for each url was SUCCESS, FAILED or INVALID_URL.
         """
 
         if isinstance(urls, six.string_types):

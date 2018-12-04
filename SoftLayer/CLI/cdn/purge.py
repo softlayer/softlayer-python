@@ -13,7 +13,12 @@ from SoftLayer.CLI import formatting
 @click.argument('content_url', nargs=-1)
 @environment.pass_env
 def cli(env, account_id, content_url):
-    """Purge cached files from all edge nodes."""
+    """Purge cached files from all edge nodes.
+
+    Examples:
+         slcli cdn purge 97794 http://example.com/cdn/file.txt
+         slcli cdn purge 97794 http://example.com/cdn/file.txt https://dal01.example.softlayer.net/image.png
+    """
 
     manager = SoftLayer.CDNManager(env.client)
     content_list = manager.purge_content(account_id, content_url)
