@@ -13,7 +13,28 @@ verifyOrder = {
         'setupFee': '1',
         'item': {'id': 1, 'description': 'this is a thing'},
     }]}
-placeOrder = verifyOrder
+placeOrder = {
+    'orderId': 1234,
+    'orderDate': '2013-08-01 15:23:45',
+    'orderDetails': {
+        'prices': [{
+            'id': 1,
+            'laborFee': '2',
+            'oneTimeFee': '2',
+            'oneTimeFeeTax': '.1',
+            'quantity': 1,
+            'recurringFee': '2',
+            'recurringFeeTax': '.1',
+            'hourlyRecurringFee': '2',
+            'setupFee': '1',
+            'item': {'id': 1, 'description': 'this is a thing'},
+        }],
+        'virtualGuests': [{
+            'id': 1234567,
+            'globalIdentifier': '1a2b3c-1701'
+        }]
+    }
+}
 
 # Reserved Capacity Stuff
 
@@ -75,8 +96,11 @@ rsi_placeOrder = {
                     'id': 1,
                     'description': 'B1.1x2 (1 Year ''Term)',
                     'keyName': 'B1_1X2_1_YEAR_TERM',
-                }
+                },
+                'hourlyRecurringFee': 1.0,
+                'recurringFee': 2.0
             }
         ]
     }
 }
+

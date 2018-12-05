@@ -202,6 +202,7 @@ def cli(env, **args):
 
     test = args.get('test')
     result = vsi.order_guest(create_args, test)
+    # pp(result)
     output = _build_receipt_table(result, args.get('billing'), test)
     virtual_guests = utils.lookup(result,'orderDetails','virtualGuests')
 
