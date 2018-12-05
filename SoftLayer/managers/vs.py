@@ -21,7 +21,7 @@ LOGGER = logging.getLogger(__name__)
 
 # pylint: disable=no-self-use
 
-
+from pprint import pprint as pp
 class VSManager(utils.IdentifierMixin, object):
     """Manages SoftLayer Virtual Servers.
 
@@ -880,8 +880,9 @@ class VSManager(utils.IdentifierMixin, object):
 
         :param dictionary guest_object: See SoftLayer.CLI.virt.create._parse_create_args
         """
-
+        tags = guest_object.pop('tags', None)
         template = self.verify_create_instance(**guest_object)
+
         if guest_object.get('ipv6'):
             ipv6_price = self.ordering_manager.get_price_id_list('PUBLIC_CLOUD_SERVER', ['1_IPV6_ADDRESS'])
             template['prices'].append({'id': ipv6_price[0]})
@@ -890,8 +891,10 @@ class VSManager(utils.IdentifierMixin, object):
             result = self.client.call('Product_Order', 'verifyOrder', template)
         else:
             result = self.client.call('Product_Order', 'placeOrder', template)
-            # return False
-
+            if tags is not None:
+                virtual_guests = utils.lookup(result,'orderDetails','virtualGuests')
+                for guest in virtual_guests:
+                    self.set_tags(tags, guest_id=guest['id'])
         return result
 
     def _get_package_items(self):

@@ -9,12 +9,14 @@ import json
 import mock
 
 from SoftLayer.CLI import exceptions
+from SoftLayer import fixtures
 from SoftLayer.fixtures import SoftLayer_Product_Order
-from SoftLayer import SoftLayerAPIError
+from SoftLayer.fixtures import SoftLayer_Product_Package
+from SoftLayer import SoftLayerAPIError, SoftLayerError
 from SoftLayer import testing
 
 from pprint import pprint as pp
-class VirtTests(testing.TestCase):
+class VirtCreateTests(testing.TestCase):
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create(self, confirm_mock):
@@ -407,10 +409,44 @@ class VirtTests(testing.TestCase):
         self.assertEqual(result.exit_code, 2)
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
-    def test_create_with_ipv6(self, confirm_mock)
+    def test_create_with_ipv6(self, confirm_mock):
+        amock = self.set_mock('SoftLayer_Product_Package', 'getItems')
+        amock.return_value = fixtures.SoftLayer_Product_Package.getItems_1_IPV6_ADDRESS
         result = self.run_command(['vs', 'create', '--test', '--hostname', 'TEST',
                                    '--domain', 'TESTING', '--flavor', 'B1_2X8X25',
                                    '--datacenter', 'TEST00', '--os', 'UBUNTU_LATEST', '--ipv6'])
 
         self.assert_no_fail(result)
+        pp(result.output)
         self.assertEqual(result.exit_code, 0)
+        self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder')
+        args =({
+            'startCpus': None,
+            'maxMemory': None,
+            'hostname': 'TEST',
+            'domain': 'TESTING',
+            'localDiskFlag': None,
+            'hourlyBillingFlag': True,
+            'supplementalCreateObjectOptions': {
+                'bootMode': None,
+                'flavorKeyName': 'B1_2X8X25'
+            },
+            'operatingSystemReferenceCode': 'UBUNTU_LATEST',
+            'datacenter': {
+                'name': 'TEST00'
+            }
+        },
+        )
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=args)
+
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    def test_create_with_ipv6_no_prices(self, confirm_mock):
+        """ 
+        Since its hard to test if the price ids gets added to placeOrder call, 
+        this test juse makes sure that code block isn't being skipped
+        """
+        result = self.run_command(['vs', 'create', '--test', '--hostname', 'TEST',
+                                   '--domain', 'TESTING', '--flavor', 'B1_2X8X25',
+                                   '--datacenter', 'TEST00', '--os', 'UBUNTU_LATEST', 
+                                   '--ipv6'])
+        self.assertEqual(result.exit_code, 1)
