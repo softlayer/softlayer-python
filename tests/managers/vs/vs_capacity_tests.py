@@ -1,5 +1,5 @@
 """
-    SoftLayer.tests.managers.vs_capacity_tests
+    SoftLayer.tests.managers.vs.vs_capacity_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :license: MIT, see LICENSE for more details.
@@ -13,7 +13,7 @@ from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer import testing
 
 
-class VSCapacityTests(testing.TestCase):
+class VSManagerCapacityTests(testing.TestCase):
 
     def set_up(self):
         self.manager = SoftLayer.CapacityManager(self.client)
