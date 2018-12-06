@@ -9,9 +9,9 @@ import json
 import mock
 
 from SoftLayer.CLI import exceptions
-from SoftLayer.fixtures import SoftLayer_Product_Order
 from SoftLayer import SoftLayerAPIError
 from SoftLayer import testing
+
 
 class VirtTests(testing.TestCase):
 
@@ -301,7 +301,7 @@ class VirtTests(testing.TestCase):
                           'os (CENTOS)': 'CENTOS_6_64',
                           'os (DEBIAN)': 'DEBIAN_7_64',
                           'os (UBUNTU)': 'UBUNTU_12_64'})
- 
+
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_both(self, confirm_mock):
         confirm_mock.return_value = True
@@ -535,7 +535,7 @@ class VirtTests(testing.TestCase):
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_upgrade_with_cpu_memory_and_flavor(self, confirm_mock):
-        confirm_mock = True
+        confirm_mock.return_value = True
         result = self.run_command(['vs', 'upgrade', '100', '--cpu=4',
                                    '--memory=1024', '--flavor=M1_64X512X100'])
         self.assertEqual(result.exit_code, 1)
@@ -654,4 +654,3 @@ class VirtTests(testing.TestCase):
 
         result = self.run_command(['vs', 'cancel', '100'])
         self.assertEqual(result.exit_code, 2)
-

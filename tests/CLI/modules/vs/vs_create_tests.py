@@ -4,18 +4,12 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import json
-
 import mock
 
-from SoftLayer.CLI import exceptions
 from SoftLayer import fixtures
-from SoftLayer.fixtures import SoftLayer_Product_Order
-from SoftLayer.fixtures import SoftLayer_Product_Package
-from SoftLayer import SoftLayerAPIError, SoftLayerError
 from SoftLayer import testing
 
-from pprint import pprint as pp
+
 class VirtCreateTests(testing.TestCase):
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
@@ -48,6 +42,7 @@ class VirtCreateTests(testing.TestCase):
                  'networkComponents': [{'maxSpeed': '100'}],
                  'supplementalCreateObjectOptions': {'bootMode': None}},)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=args)
+
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_vlan_subnet(self, confirm_mock):
         confirm_mock.return_value = True
@@ -417,10 +412,9 @@ class VirtCreateTests(testing.TestCase):
                                    '--datacenter', 'TEST00', '--os', 'UBUNTU_LATEST', '--ipv6'])
 
         self.assert_no_fail(result)
-        pp(result.output)
         self.assertEqual(result.exit_code, 0)
         self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder')
-        args =({
+        args = ({
             'startCpus': None,
             'maxMemory': None,
             'hostname': 'TEST',
@@ -441,12 +435,13 @@ class VirtCreateTests(testing.TestCase):
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
     def test_create_with_ipv6_no_prices(self, confirm_mock):
-        """ 
-        Since its hard to test if the price ids gets added to placeOrder call, 
+        """Test makes sure create fails if ipv6 price cannot be found.
+
+        Since its hard to test if the price ids gets added to placeOrder call,
         this test juse makes sure that code block isn't being skipped
         """
         result = self.run_command(['vs', 'create', '--test', '--hostname', 'TEST',
                                    '--domain', 'TESTING', '--flavor', 'B1_2X8X25',
-                                   '--datacenter', 'TEST00', '--os', 'UBUNTU_LATEST', 
+                                   '--datacenter', 'TEST00', '--os', 'UBUNTU_LATEST',
                                    '--ipv6'])
         self.assertEqual(result.exit_code, 1)

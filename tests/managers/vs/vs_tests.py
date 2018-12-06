@@ -830,4 +830,3 @@ class VSTests(testing.TestCase):
                                 'createArchiveTransaction',
                                 args=args,
                                 identifier=1)
-

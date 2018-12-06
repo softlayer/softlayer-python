@@ -20,8 +20,8 @@ completed. However for Network, no reboot is required.""")
               help="CPU core will be on a dedicated host server.")
 @click.option('--memory', type=virt.MEM_TYPE, help="Memory in megabytes")
 @click.option('--network', type=click.INT, help="Network port speed in Mbps")
-@click.option('--flavor', type=click.STRING, 
-    help="Flavor keyName\nDo not use --memory, --cpu or --private, if you are using flavors")
+@click.option('--flavor', type=click.STRING,
+              help="Flavor keyName\nDo not use --memory, --cpu or --private, if you are using flavors")
 @environment.pass_env
 def cli(env, identifier, cpu, private, memory, network, flavor):
     """Upgrade a virtual server."""

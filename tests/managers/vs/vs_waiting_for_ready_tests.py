@@ -9,8 +9,8 @@ import mock
 
 import SoftLayer
 from SoftLayer import exceptions
-from SoftLayer import fixtures
 from SoftLayer import testing
+
 
 class VSWaitReadyGoTests(testing.TestCase):
 

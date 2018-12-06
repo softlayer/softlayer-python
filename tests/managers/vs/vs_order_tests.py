@@ -2,19 +2,17 @@
     SoftLayer.tests.managers.vs.vs_order_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    These tests deal with ordering in the VS manager. 
+    These tests deal with ordering in the VS manager.
     :license: MIT, see LICENSE for more details.
 
 """
 import mock
 
 import SoftLayer
-from SoftLayer import exceptions
 from SoftLayer import fixtures
-from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer import testing
 
-from pprint import pprint as pp
+
 class VSOrderTests(testing.TestCase):
 
     def set_up(self):
@@ -30,6 +28,7 @@ class VSOrderTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Virtual_Guest',
                                 'generateOrderTemplate',
                                 args=({'test': 1, 'verify': 1},))
+
     def test_upgrade(self):
         # test single upgrade
         result = self.vs.upgrade(1, cpus=4, public=False)

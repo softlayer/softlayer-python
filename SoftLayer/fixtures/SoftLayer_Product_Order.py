@@ -103,4 +103,3 @@ rsi_placeOrder = {
         ]
     }
 }
-

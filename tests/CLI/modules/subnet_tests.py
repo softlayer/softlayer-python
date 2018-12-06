@@ -37,5 +37,5 @@ class SubnetTests(testing.TestCase):
             json.loads(result.output))
 
     def test_list(self):
-        result = self.run_command(['subnet',  'list'])
+        result = self.run_command(['subnet', 'list'])
         self.assert_no_fail(result)

@@ -18,10 +18,9 @@ from SoftLayer import utils
 
 LOGGER = logging.getLogger(__name__)
 
+# pylint: disable=no-self-use,too-many-lines
 
-# pylint: disable=no-self-use
 
-from pprint import pprint as pp
 class VSManager(utils.IdentifierMixin, object):
     """Manages SoftLayer Virtual Servers.
 
@@ -664,12 +663,10 @@ class VSManager(utils.IdentifierMixin, object):
             A port speed of 0 will disable the interface.
         """
         if public:
-            return self.client.call('Virtual_Guest',
-                                    'setPublicNetworkInterfaceSpeed',
+            return self.client.call('Virtual_Guest', 'setPublicNetworkInterfaceSpeed',
                                     speed, id=instance_id)
         else:
-            return self.client.call('Virtual_Guest',
-                                    'setPrivateNetworkInterfaceSpeed',
+            return self.client.call('Virtual_Guest', 'setPrivateNetworkInterfaceSpeed',
                                     speed, id=instance_id)
 
     def _get_ids_from_hostname(self, hostname):
@@ -784,10 +781,7 @@ class VSManager(utils.IdentifierMixin, object):
                 continue
 
             # We never want swap devices
-            type_name = utils.lookup(block_device,
-                                     'diskImage',
-                                     'type',
-                                     'keyName')
+            type_name = utils.lookup(block_device, 'diskImage', 'type', 'keyName')
             if type_name == 'SWAP':
                 continue
 
@@ -879,6 +873,29 @@ class VSManager(utils.IdentifierMixin, object):
         specifically ipv6 support.
 
         :param dictionary guest_object: See SoftLayer.CLI.virt.create._parse_create_args
+
+        Example::
+            new_vsi = {
+                'domain': u'test01.labs.sftlyr.ws',
+                'hostname': u'minion05',
+                'datacenter': u'hkg02',
+                'flavor': 'BL1_1X2X100'
+                'dedicated': False,
+                'private': False,
+                'os_code' : u'UBUNTU_LATEST',
+                'hourly': True,
+                'ssh_keys': [1234],
+                'disks': ('100','25'),
+                'local_disk': True,
+                'tags': 'test, pleaseCancel',
+                'public_security_groups': [12, 15],
+                'ipv6': True
+            }
+
+            vsi = mgr.order_guest(new_vsi)
+            # vsi will have the newly created vsi receipt.
+            # vsi['orderDetails']['virtualGuests'] will be an array of created Guests
+            print vsi
         """
         tags = guest_object.pop('tags', None)
         template = self.verify_create_instance(**guest_object)
@@ -892,7 +909,7 @@ class VSManager(utils.IdentifierMixin, object):
         else:
             result = self.client.call('Product_Order', 'placeOrder', template)
             if tags is not None:
-                virtual_guests = utils.lookup(result,'orderDetails','virtualGuests')
+                virtual_guests = utils.lookup(result, 'orderDetails', 'virtualGuests')
                 for guest in virtual_guests:
                     self.set_tags(tags, guest_id=guest['id'])
         return result

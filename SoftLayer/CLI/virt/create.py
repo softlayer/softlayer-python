@@ -147,10 +147,10 @@ def _parse_create_args(client, args):
 @click.option('--domain', '-D', required=True, prompt=True, help="Domain portion of the FQDN")
 @click.option('--cpu', '-c', type=click.INT, help="Number of CPU cores (not available with flavors)")
 @click.option('--memory', '-m', type=virt.MEM_TYPE, help="Memory in mebibytes (not available with flavors)")
-@click.option('--flavor', '-f', type=click.STRING, help="Public Virtual Server flavor key name") 
+@click.option('--flavor', '-f', type=click.STRING, help="Public Virtual Server flavor key name")
 @click.option('--datacenter', '-d', required=True, prompt=True, help="Datacenter shortname")
 @click.option('--os', '-o', help="OS install code. Tip: you can specify <OS>_LATEST")
-@click.option('--image',  help="Image ID. See: 'slcli image list' for reference")
+@click.option('--image', help="Image ID. See: 'slcli image list' for reference")
 @click.option('--boot-mode', type=click.STRING,
               help="Specify the mode to boot the OS in. Supported modes are HVM and PV.")
 @click.option('--billing', type=click.Choice(['hourly', 'monthly']), default='hourly', show_default=True,
@@ -158,7 +158,7 @@ def _parse_create_args(client, args):
 @click.option('--dedicated/--public', is_flag=True, help="Create a Dedicated Virtual Server")
 @click.option('--host-id', type=click.INT, help="Host Id to provision a Dedicated Host Virtual Server onto")
 @click.option('--san', is_flag=True, help="Use SAN storage instead of local disk.")
-@click.option('--test', is_flag=True,  help="Do not actually create the virtual server")
+@click.option('--test', is_flag=True, help="Do not actually create the virtual server")
 @click.option('--export', type=click.Path(writable=True, resolve_path=True),
               help="Exports options to a template file")
 @click.option('--postinstall', '-i', help="Post-install script to download")
@@ -195,7 +195,7 @@ def _parse_create_args(client, args):
 @environment.pass_env
 def cli(env, **args):
     """Order/create virtual servers."""
-    from pprint import pprint as pp
+
     vsi = SoftLayer.VSManager(env.client)
     _validate_args(env, args)
     create_args = _parse_create_args(env.client, args)
@@ -204,13 +204,13 @@ def cli(env, **args):
     result = vsi.order_guest(create_args, test)
     # pp(result)
     output = _build_receipt_table(result, args.get('billing'), test)
-    virtual_guests = utils.lookup(result,'orderDetails','virtualGuests')
+    virtual_guests = utils.lookup(result, 'orderDetails', 'virtualGuests')
 
     if not test:
         table = formatting.KeyValueTable(['name', 'value'])
         table.align['name'] = 'r'
         table.align['value'] = 'l'
-        
+
         for guest in virtual_guests:
             table.add_row(['id', guest['id']])
             table.add_row(['created', result['orderDate']])
