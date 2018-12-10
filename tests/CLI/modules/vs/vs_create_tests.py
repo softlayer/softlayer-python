@@ -5,8 +5,11 @@
     :license: MIT, see LICENSE for more details.
 """
 import mock
+import sys
+import tempfile
 
 from SoftLayer import fixtures
+from SoftLayer.fixtures import SoftLayer_Product_Package as SoftLayer_Product_Package
 from SoftLayer import testing
 
 
@@ -406,7 +409,7 @@ class VirtCreateTests(testing.TestCase):
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
     def test_create_with_ipv6(self, confirm_mock):
         amock = self.set_mock('SoftLayer_Product_Package', 'getItems')
-        amock.return_value = fixtures.SoftLayer_Product_Package.getItems_1_IPV6_ADDRESS
+        amock.return_value = SoftLayer_Product_Package.getItems_1_IPV6_ADDRESS
         result = self.run_command(['vs', 'create', '--test', '--hostname', 'TEST',
                                    '--domain', 'TESTING', '--flavor', 'B1_2X8X25',
                                    '--datacenter', 'TEST00', '--os', 'UBUNTU_LATEST', '--ipv6'])
@@ -432,6 +435,7 @@ class VirtCreateTests(testing.TestCase):
         },
         )
         self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=args)
+        self.assertEqual([], self.calls('SoftLayer_Virtual_Guest', 'setTags'))
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
     def test_create_with_ipv6_no_prices(self, confirm_mock):
@@ -445,3 +449,27 @@ class VirtCreateTests(testing.TestCase):
                                    '--datacenter', 'TEST00', '--os', 'UBUNTU_LATEST',
                                    '--ipv6'])
         self.assertEqual(result.exit_code, 1)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_create_vs_no_confirm(self, confirm_mock):
+        confirm_mock.return_value = False
+
+        result = self.run_command(['vs', 'create', '--hostname', 'TEST',
+                                   '--domain', 'TESTING', '--flavor', 'B1_2X8X25',
+                                   '--datacenter', 'TEST00', '--os', 'UBUNTU_LATEST'])
+
+        self.assertEqual(result.exit_code, 2)
+
+    def test_create_vs_export(self):
+        if(sys.platform.startswith("win")):
+            self.skipTest("Test doesn't work in Windows")
+        with tempfile.NamedTemporaryFile() as config_file:
+            result = self.run_command(['vs', 'create', '--hostname', 'TEST', '--export', config_file.name,
+                                       '--domain', 'TESTING', '--flavor', 'B1_2X8X25',
+                                       '--datacenter', 'TEST00', '--os', 'UBUNTU_LATEST'])
+            self.assert_no_fail(result)
+            self.assertTrue('Successfully exported options to a template file.'
+                            in result.output)
+            contents = config_file.read().decode("utf-8")
+            self.assertIn('hostname=TEST', contents)
+            self.assertIn('flavor=B1_2X8X25', contents)

@@ -654,3 +654,10 @@ class VirtTests(testing.TestCase):
 
         result = self.run_command(['vs', 'cancel', '100'])
         self.assertEqual(result.exit_code, 2)
+
+    def test_vs_capture(self):
+
+        result = self.run_command(['vs', 'capture', '100', '--name', 'TestName'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'createArchiveTransaction', identifier=100)
+

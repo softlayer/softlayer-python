@@ -31,7 +31,8 @@ placeOrder = {
         }],
         'virtualGuests': [{
             'id': 1234567,
-            'globalIdentifier': '1a2b3c-1701'
+            'globalIdentifier': '1a2b3c-1701',
+            'fullyQualifiedDomainName': 'test.guest.com'
         }]
     }
 }

@@ -74,7 +74,6 @@ def _parse_create_args(client, args):
     data = {
         "hourly": args.get('billing', 'hourly') == 'hourly',
         "cpus": args.get('cpu', None),
-        "tags": args.get('tag', None),
         "ipv6": args.get('ipv6', None),
         "disks": args.get('disk', None),
         "os_code": args.get('os', None),
@@ -133,7 +132,7 @@ def _parse_create_args(client, args):
         priv_groups = args.get('private_security_group')
         data['private_security_groups'] = [group for group in priv_groups]
 
-    if args.get('tag'):
+    if args.get('tag', False):
         data['tags'] = ','.join(args['tag'])
 
     if args.get('host_id'):
@@ -199,32 +198,35 @@ def cli(env, **args):
     vsi = SoftLayer.VSManager(env.client)
     _validate_args(env, args)
     create_args = _parse_create_args(env.client, args)
+    test = args.get('test', False)
+    do_create = not (args.get('export') or test)
 
-    test = args.get('test')
-    result = vsi.order_guest(create_args, test)
-    # pp(result)
-    output = _build_receipt_table(result, args.get('billing'), test)
-    virtual_guests = utils.lookup(result, 'orderDetails', 'virtualGuests')
+    if do_create:
+        if not (env.skip_confirmations or formatting.confirm(
+                "This action will incur charges on your account. Continue?")):
+            raise exceptions.CLIAbort('Aborting virtual server order.')
 
-    if not test:
-        table = formatting.KeyValueTable(['name', 'value'])
-        table.align['name'] = 'r'
-        table.align['value'] = 'l'
+    if args.get('export'):
+        export_file = args.pop('export')
+        template.export_to_template(export_file, args, exclude=['wait', 'test'])
+        env.fout('Successfully exported options to a template file.')
 
-        for guest in virtual_guests:
-            table.add_row(['id', guest['id']])
-            table.add_row(['created', result['orderDate']])
-            table.add_row(['guid', guest['globalIdentifier']])
-        env.fout(table)
-    env.fout(output)
+    else:
+        result = vsi.order_guest(create_args, test)
+        output = _build_receipt_table(result, args.get('billing'), test)
 
-    if args.get('wait'):
-        guest_id = virtual_guests[0]['id']
-        click.secho("Waiting for %s to finish provisioning..." % guest_id, fg='green')
-        ready = vsi.wait_for_ready(guest_id, args.get('wait') or 1)
-        if ready is False:
-            env.out(env.fmt(output))
-            raise exceptions.CLIHalt(code=1)
+        if do_create:
+            env.fout(_build_guest_table(result))
+        env.fout(output)
+
+        if args.get('wait'):
+            virtual_guests = utils.lookup(result, 'orderDetails', 'virtualGuests')
+            guest_id = virtual_guests[0]['id']
+            click.secho("Waiting for %s to finish provisioning..." % guest_id, fg='green')
+            ready = vsi.wait_for_ready(guest_id, args.get('wait') or 1)
+            if ready is False:
+                env.out(env.fmt(output))
+                raise exceptions.CLIHalt(code=1)
 
 
 def _build_receipt_table(result, billing="hourly", test=False):
@@ -248,6 +250,16 @@ def _build_receipt_table(result, billing="hourly", test=False):
         total += rate
         table.add_row([rate, item['item']['description']])
     table.add_row(["%.3f" % total, "Total %s cost" % billing])
+    return table
+
+
+def _build_guest_table(result):
+    table = formatting.Table(['ID', 'FQDN', 'guid', 'Order Date'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
+    virtual_guests = utils.lookup(result, 'orderDetails', 'virtualGuests')
+    for guest in virtual_guests:
+        table.add_row([guest['id'], guest['fullyQualifiedDomainName'], guest['globalIdentifier'], result['orderDate']])
     return table
 
 

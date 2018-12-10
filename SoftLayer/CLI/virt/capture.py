@@ -8,6 +8,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
+from pprint import pprint as pp
 
 # pylint: disable=redefined-builtin
 
@@ -24,7 +25,7 @@ def cli(env, identifier, name, all, note):
     vs_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
 
     capture = vsi.capture(vs_id, name, all, note)
-
+    pp(capture)
     table = formatting.KeyValueTable(['name', 'value'])
     table.align['name'] = 'r'
     table.align['value'] = 'l'
