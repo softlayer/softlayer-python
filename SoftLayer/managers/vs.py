@@ -904,6 +904,11 @@ class VSManager(utils.IdentifierMixin, object):
             ipv6_price = self.ordering_manager.get_price_id_list('PUBLIC_CLOUD_SERVER', ['1_IPV6_ADDRESS'])
             template['prices'].append({'id': ipv6_price[0]})
 
+        # Notice this is `userdata` from the cli, but we send it in as `userData`
+        if guest_object.get('userdata'):
+            # SL_Virtual_Guest::generateOrderTemplate() doesn't respect userData, so we need to add it ourself
+            template['virtualGuests'][0]['userData'] = [{"value": guest_object.get('userdata')}]
+
         if test:
             result = self.client.call('Product_Order', 'verifyOrder', template)
         else:
