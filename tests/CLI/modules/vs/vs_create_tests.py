@@ -8,7 +8,6 @@ import mock
 import sys
 import tempfile
 
-from SoftLayer import fixtures
 from SoftLayer.fixtures import SoftLayer_Product_Package as SoftLayer_Product_Package
 from SoftLayer import testing
 
@@ -184,7 +183,6 @@ class VirtCreateTests(testing.TestCase):
             'datacenter': {'name': 'dal05'},
             'networkComponents': [{'maxSpeed': '100'}]
         },)
-
 
         self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=args)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
@@ -544,7 +542,7 @@ class VirtCreateTests(testing.TestCase):
         self.assertEqual([], self.calls('SoftLayer_Virtual_Guest', 'setTags'))
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_create_with_ipv6(self, confirm_mock):
+    def test_create_with_ipv6_no_test(self, confirm_mock):
         confirm_mock.return_value = True
         amock = self.set_mock('SoftLayer_Product_Package', 'getItems')
         amock.return_value = SoftLayer_Product_Package.getItems_1_IPV6_ADDRESS
@@ -597,8 +595,8 @@ class VirtCreateTests(testing.TestCase):
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_with_userdata(self, confirm_mock):
         result = self.run_command(['vs', 'create', '--hostname', 'TEST', '--domain', 'TESTING',
-                            '--flavor', 'B1_2X8X25', '--datacenter', 'TEST00', '--os', 'UBUNTU_LATEST',
-                            '--userdata', 'This is my user data ok'])
+                                   '--flavor', 'B1_2X8X25', '--datacenter', 'TEST00', '--os', 'UBUNTU_LATEST',
+                                   '--userdata', 'This is my user data ok'])
         self.assert_no_fail(result)
         expected_guest = [
                 {
