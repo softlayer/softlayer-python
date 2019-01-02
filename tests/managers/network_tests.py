@@ -92,7 +92,7 @@ class NetworkTests(testing.TestCase):
                                          version=4,
                                          test_order=False)
 
-        self.assertEqual(fixtures.SoftLayer_Product_Order.verifyOrder, result)
+        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
 
         result = self.network.add_subnet('global',
                                          test_order=True)

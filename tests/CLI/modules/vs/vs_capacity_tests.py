@@ -1,5 +1,5 @@
 """
-    SoftLayer.tests.CLI.modules.vs_capacity_tests
+    SoftLayer.tests.CLI.modules.vs.vs_capacity_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :license: MIT, see LICENSE for more details.
