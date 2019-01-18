@@ -6,8 +6,6 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.vs_placement import PlacementManager as PlacementManager
 
-from pprint import pprint as pp
-
 @click.command()
 @environment.pass_env
 def cli(env):
@@ -29,4 +27,3 @@ def cli(env):
         ])
 
     env.fout(table)
-    # pp(result)

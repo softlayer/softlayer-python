@@ -642,3 +642,20 @@ getReservedCapacityGroups = [
         ]
     }
 ]
+
+
+getPlacementGroups = [{
+    "createDate": "2019-01-18T16:08:44-06:00",
+    "id": 12345,
+    "name": "test01",
+    "guestCount": 0,
+    "backendRouter": {
+        "hostname": "bcr01a.mex01",
+        "id": 329266
+    },
+    "rule": {
+        "id": 1,
+        "keyName": "SPREAD",
+        "name": "SPREAD"
+    }
+}]

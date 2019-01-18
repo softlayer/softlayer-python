@@ -6,7 +6,6 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.vs_placement import PlacementManager as PlacementManager
 
-from pprint import pprint as pp
 
 def _get_routers(ctx, _, value):
     if not value or ctx.resilient_parsing:

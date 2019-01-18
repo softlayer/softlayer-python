@@ -7,7 +7,6 @@ from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 from SoftLayer.managers.vs_placement import PlacementManager as PlacementManager
 
-from pprint import pprint as pp
 
 @click.command(epilog="Once provisioned, virtual guests can be managed with the slcli vs commands")
 @click.argument('identifier')

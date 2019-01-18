@@ -9,17 +9,18 @@ from SoftLayer.CLI import helpers
 from SoftLayer.managers.vs_placement import PlacementManager as PlacementManager
 from SoftLayer.managers.vs import VSManager as VSManager
 
-from pprint import pprint as pp
-
 
 @click.command(epilog="Once provisioned, virtual guests can be managed with the slcli vs commands")
 @click.argument('identifier')
-@click.option('--purge', is_flag=True, help="Delete all guests in this placement group.")
+@click.option('--purge', is_flag=True, 
+              help="Delete all guests in this placement group. " \
+                   "The group itself can be deleted once all VMs are fully reclaimed")
 @environment.pass_env
 def cli(env, identifier, purge):
     """Delete a placement group.
 
     Placement Group MUST be empty before you can delete it.
+
     IDENTIFIER can be either the Name or Id of the placement group you want to view
     """
     manager = PlacementManager(env.client)
@@ -27,7 +28,6 @@ def cli(env, identifier, purge):
 
 
     if purge:
-        # pass
         placement_group = manager.get_object(group_id)
         guest_list = ', '.join([guest['fullyQualifiedDomainName'] for guest in placement_group['guests']])
         if len(placement_group['guests']) < 1:
@@ -48,6 +48,3 @@ def cli(env, identifier, purge):
     cancel_result = manager.delete(group_id)
     if cancel_result:
         click.secho("Placement Group %s has been canceld." % identifier, fg='green')
-
-
-    # pp(result)
