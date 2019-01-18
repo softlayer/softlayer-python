@@ -32,6 +32,7 @@ def _update_with_like_args(ctx, _, value):
         'postinstall': like_details.get('postInstallScriptUri'),
         'dedicated': like_details['dedicatedAccountHostOnlyFlag'],
         'private': like_details['privateNetworkOnlyFlag'],
+        'placement_id': like_details['placementGroupId'] or None,
     }
 
     like_args['flavor'] = utils.lookup(like_details,
@@ -90,6 +91,7 @@ def _parse_create_args(client, args):
         "datacenter": args.get('datacenter', None),
         "public_vlan": args.get('vlan_public', None),
         "private_vlan": args.get('vlan_private', None),
+        "placement_id": args.get('placement_id', None),
         "public_subnet": args.get('subnet_public', None),
         "private_subnet": args.get('subnet_private', None),
     }
@@ -190,6 +192,8 @@ def _parse_create_args(client, args):
                       help=('Security group ID to associate with the private interface'))
 @click.option('--wait', type=click.INT,
               help="Wait until VS is finished provisioning for up to X seconds before returning")
+@click.option('--placement-id', type=click.INT,
+              help="Placement Group Id to order this guest on. See: slcli vs placementgroup list")
 @click.option('--ipv6', is_flag=True, help="Adds an IPv6 address to this guest")
 @environment.pass_env
 def cli(env, **args):
