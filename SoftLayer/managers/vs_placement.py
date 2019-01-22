@@ -7,7 +7,6 @@
 """
 
 import logging
-import SoftLayer
 
 from SoftLayer import utils
 
@@ -39,6 +38,10 @@ class PlacementManager(utils.IdentifierMixin, object):
         self.resolvers = [self._get_id_from_name]
 
     def list(self, mask=None):
+        """List existing placement groups
+
+        Calls SoftLayer_Account::getPlacementGroups
+         """
         if mask is None:
             mask = "mask[id, name, createDate, rule, guestCount, backendRouter[id, hostname]]"
         groups = self.client.call('Account', 'getPlacementGroups', mask=mask, iter=True)
@@ -54,7 +57,7 @@ class PlacementManager(utils.IdentifierMixin, object):
                 'name': 'Test Name',
                 'ruleId': 12345
             }
-            
+
         """
         return self.client.call('SoftLayer_Virtual_PlacementGroup', 'createObject', placement_object)
 
@@ -64,14 +67,13 @@ class PlacementManager(utils.IdentifierMixin, object):
 
     def get_object(self, group_id, mask=None):
         """Returns a PlacementGroup Object
-        
+
         https://softlayer.github.io/reference/services/SoftLayer_Virtual_PlacementGroup/getObject
         """
         if mask is None:
             mask = "mask[id, name, createDate, rule, backendRouter[id, hostname]," \
                    "guests[activeTransaction[id,transactionStatus[name,friendlyName]]]]"
         return self.client.call('SoftLayer_Virtual_PlacementGroup', 'getObject', id=group_id, mask=mask)
-
 
     def delete(self, group_id):
         """Deletes a PlacementGroup
@@ -84,13 +86,10 @@ class PlacementManager(utils.IdentifierMixin, object):
     def _get_id_from_name(self, name):
         """List placement group ids which match the given name."""
         _filter = {
-            'placementGroups' : {
+            'placementGroups': {
                 'name': {'operation': name}
             }
         }
         mask = "mask[id, name]"
         results = self.client.call('Account', 'getPlacementGroups', filter=_filter, mask=mask)
         return [result['id'] for result in results]
-
-
-

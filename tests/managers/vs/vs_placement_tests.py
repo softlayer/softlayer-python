@@ -7,18 +7,14 @@
 """
 import mock
 
-import SoftLayer
-from SoftLayer import fixtures
-# from SoftLayer.fixtures import SoftLayer_Product_Package
-from SoftLayer import testing
 from SoftLayer.managers.vs_placement import PlacementManager
+from SoftLayer import testing
 
 
 class VSPlacementManagerTests(testing.TestCase):
 
     def set_up(self):
         self.manager = PlacementManager(self.client)
-        amock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
 
     def test_list(self):
         self.manager.list()
@@ -39,7 +35,7 @@ class VSPlacementManagerTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Virtual_PlacementGroup', 'createObject', args=(placement_object,))
 
     def test_get_object(self):
-        result = self.manager.get_object(1234)
+        self.manager.get_object(1234)
         self.assert_called_with('SoftLayer_Virtual_PlacementGroup', 'getObject', identifier=1234, mask=mock.ANY)
 
     def test_get_object_with_mask(self):
@@ -54,7 +50,7 @@ class VSPlacementManagerTests(testing.TestCase):
     def test_get_id_from_name(self):
         self.manager._get_id_from_name('test')
         _filter = {
-            'placementGroups' : {
+            'placementGroups': {
                 'name': {'operation': 'test'}
             }
         }

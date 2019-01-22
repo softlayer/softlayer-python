@@ -6,6 +6,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.vs_placement import PlacementManager as PlacementManager
 
+
 @click.command()
 @environment.pass_env
 def cli(env):

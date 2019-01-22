@@ -911,7 +911,7 @@ class VSManager(utils.IdentifierMixin, object):
             template['virtualGuests'][0]['userData'] = [{"value": guest_object.get('userdata')}]
 
         if guest_object.get('placement_id'):
-                template['virtualGuests'][0]['placementGroupId'] = guest_object.get('placement_id')
+            template['virtualGuests'][0]['placementGroupId'] = guest_object.get('placement_id')
         if test:
             result = self.client.call('Product_Order', 'verifyOrder', template)
         else:

@@ -4,14 +4,9 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import json
-
 import mock
 
-from SoftLayer.CLI import exceptions
-from SoftLayer import SoftLayerAPIError
 from SoftLayer import testing
-
 
 
 class VSPlacementTests(testing.TestCase):
@@ -20,7 +15,7 @@ class VSPlacementTests(testing.TestCase):
         result = self.run_command(['vs', 'placementgroup', 'create', '--list_routers'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Virtual_PlacementGroup', 'getAvailableRouters')
-        self.assertEquals([], self.calls('SoftLayer_Virtual_PlacementGroup', 'createObject'))
+        self.assertEqual([], self.calls('SoftLayer_Virtual_PlacementGroup', 'createObject'))
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_group(self, confirm_mock):
@@ -33,7 +28,7 @@ class VSPlacementTests(testing.TestCase):
         }
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Virtual_PlacementGroup', 'createObject', args=(create_args,))
-        self.assertEquals([], self.calls('SoftLayer_Virtual_PlacementGroup', 'getAvailableRouters'))
+        self.assertEqual([], self.calls('SoftLayer_Virtual_PlacementGroup', 'getAvailableRouters'))
 
     def test_list_groups(self):
         result = self.run_command(['vs', 'placementgroup', 'list'])
@@ -49,7 +44,7 @@ class VSPlacementTests(testing.TestCase):
         result = self.run_command(['vs', 'placementgroup', 'detail', 'test'])
         self.assert_no_fail(result)
         group_filter = {
-            'placementGroups' : {
+            'placementGroups': {
                 'name': {'operation': 'test'}
             }
         }
@@ -68,7 +63,7 @@ class VSPlacementTests(testing.TestCase):
         confirm_mock.return_value = True
         result = self.run_command(['vs', 'placementgroup', 'delete', 'test'])
         group_filter = {
-            'placementGroups' : {
+            'placementGroups': {
                 'name': {'operation': 'test'}
             }
         }
@@ -77,7 +72,7 @@ class VSPlacementTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Virtual_PlacementGroup', 'deleteObject', identifier=12345)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_delete_group_purge(self,confirm_mock):
+    def test_delete_group_purge(self, confirm_mock):
         confirm_mock.return_value = True
         result = self.run_command(['vs', 'placementgroup', 'delete', '1234', '--purge'])
         self.assert_no_fail(result)
@@ -85,7 +80,7 @@ class VSPlacementTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Virtual_Guest', 'deleteObject', identifier=69131875)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_delete_group_purge_nothing(self,confirm_mock):
+    def test_delete_group_purge_nothing(self, confirm_mock):
         group_mock = self.set_mock('SoftLayer_Virtual_PlacementGroup', 'getObject')
         group_mock.return_value = {
             "id": 1234,
@@ -94,6 +89,6 @@ class VSPlacementTests(testing.TestCase):
         }
         confirm_mock.return_value = True
         result = self.run_command(['vs', 'placementgroup', 'delete', '1234', '--purge'])
-        self.assertEquals(result.exit_code, 2)
+        self.assertEqual(result.exit_code, 2)
         self.assert_called_with('SoftLayer_Virtual_PlacementGroup', 'getObject')
-        self.assertEquals([], self.calls('SoftLayer_Virtual_Guest', 'deleteObject'))
+        self.assertEqual([], self.calls('SoftLayer_Virtual_Guest', 'deleteObject'))
