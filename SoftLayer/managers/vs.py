@@ -233,7 +233,7 @@ class VSManager(utils.IdentifierMixin, object):
                                          preset.keyName]],'''
                 'tagReferences[id,tag[name,id]],'
                 'networkVlans[id,vlanNumber,networkSpace],'
-                'dedicatedHost.id',
+                'dedicatedHost.id,'
                 'placementGroupId'
             )
 

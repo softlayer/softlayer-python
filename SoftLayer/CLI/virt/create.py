@@ -32,7 +32,7 @@ def _update_with_like_args(ctx, _, value):
         'postinstall': like_details.get('postInstallScriptUri'),
         'dedicated': like_details['dedicatedAccountHostOnlyFlag'],
         'private': like_details['privateNetworkOnlyFlag'],
-        'placement_id': like_details['placementGroupId'] or None,
+        'placement_id': like_details.get('placementGroupId', None),
     }
 
     like_args['flavor'] = utils.lookup(like_details,
