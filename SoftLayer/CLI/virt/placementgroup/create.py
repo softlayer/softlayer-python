@@ -20,9 +20,11 @@ def _get_routers(ctx, _, value):
 
 @click.command()
 @click.option('--name', type=click.STRING, required=True, prompt=True, help="Name for this new placement group.")
-@click.option('--backend_router_id', '-b', type=click.INT, required=True, prompt=True,
-              help="backendRouterId, use --list_routers/-l to print out a list of available ids.")
+@click.option('--backend_router', '-b', required=True, prompt=True,
+              help="backendRouter, can be either the hostname or id.")
 @click.option('--list_routers', '-l', is_flag=True, callback=_get_routers, is_eager=True,
+              help="Prints available backend router ids and exit.")
+@click.option('--rules', '-r', is_flag=True, callback=_get_rules, is_eager=True,
               help="Prints available backend router ids and exit.")
 @environment.pass_env
 def cli(env, **args):

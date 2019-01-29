@@ -876,6 +876,7 @@ class VSManager(utils.IdentifierMixin, object):
         :param dictionary guest_object: See SoftLayer.CLI.virt.create._parse_create_args
 
         Example::
+
             new_vsi = {
                 'domain': u'test01.labs.sftlyr.ws',
                 'hostname': u'minion05',

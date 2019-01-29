@@ -25,5 +25,15 @@ Code is tested and style checked with tox, you can run the tox tests individuall
 * create pull request
 
 
+## Documentation
+
+CLI command should have a more human readable style of documentation.
+Manager methods should have a decent docblock describing any parameters and what the method does.
+
+Docs are generated with [Sphinx](https://docs.readthedocs.io/en/latest/intro/getting-started-with-sphinx.html) and once Sphinx is setup, you can simply do
+
+`make html` in the softlayer-python/docs directory, which should generate the HTML in softlayer-python/docs/_build/html for testing. 
+
+
 
 

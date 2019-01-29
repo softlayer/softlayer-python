@@ -194,3 +194,10 @@ Reserved Capacity
 
     vs/reserved_capacity
 
+Placement Groups
+----------------
+.. toctree::
+    :maxdepth: 2
+
+    vs/placement_group
+
