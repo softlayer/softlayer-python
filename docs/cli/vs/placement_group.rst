@@ -6,18 +6,18 @@ A `Placement Group <https://cloud.ibm.com/docs/vsi/vsi_placegroup.html#placement
 
 To create a  `Virtual_PlacementGroup <https://softlayer.github.io/reference/services/SoftLayer_Virtual_PlacementGroup/>`_ object, you will need to know the following:
 
-- backendRouterId,  from `getAvailableRouters <https://softlayer.github.io/reference/services/SoftLayer_Virtual_PlacementGroup/getAvailableRouters>`_)
+- backendRouterId,  from `getAvailableRouters <https://softlayer.github.io/reference/services/SoftLayer_Virtual_PlacementGroup/getAvailableRouters>`_
 - ruleId, from `getAllObjects <https://softlayer.github.io/reference/services/SoftLayer_Virtual_PlacementGroup_Rule/getAllObjects/>`_
 - name, can be any string, but most be unique on your account
 
 Once a placement group is created, you can create new virtual servers in that group. Existing VSIs cannot be moved into a placement group. When ordering a VSI in a placement group, make sure to set the `placementGroupId <https://softlayer.github.io/reference/datatypes/SoftLayer_Virtual_Guest/#placementGroupId>`_ for each guest in your order. 
 
-use the --placementGroup option with `vs create` to specify creating a VSI in a specific group.
+use the --placementgroup option with `vs create` to specify creating a VSI in a specific group.
 
 ::
 
     
-    $ slcli  vs create -H testGroup001 -D test.com -f  B1_1X2X25 -d mex01 -o DEBIAN_LATEST --placementGroup testGroup
+    $ slcli  vs create -H testGroup001 -D test.com -f  B1_1X2X25 -d mex01 -o DEBIAN_LATEST --placementgroup testGroup
 
 Placement groups can only be deleted once all the virtual guests in the group have been reclaimed.
 
@@ -25,7 +25,7 @@ Placement groups can only be deleted once all the virtual guests in the group ha
 
 vs placementgroup create
 ------------------------
-This command will create a placement group
+This command will create a placement group. 
 
 ::
 
@@ -34,9 +34,8 @@ This command will create a placement group
 Options
 ^^^^^^^
 --name TEXT                     Name for this new placement group.  [required]
--b, --backend_router            backendRouter, can be either the hostname or id.  [required]
--h, --help                      Show this message and exit.
-
+-b, --backend_router TEXT       backendRouter, can be either the hostname or id.  [required]
+-r, --rule TEXT            The keyName or Id of the rule to govern this placement group.  [required]
 
 
 .. _cli_vs_placementgroup_create_options:
@@ -48,6 +47,21 @@ This command will print out the available routers and rule sets for use in creat
 ::
 
     $ slcli vs placementgroup create-options
+    :.................................................:
+    :                Available Routers                :
+    :..............:..............:...................:
+    :  Datacenter  :   Hostname   : Backend Router Id :
+    :..............:..............:...................:
+    : Washington 1 : bcr01.wdc01  :       16358       :
+    :   Tokyo 5    : bcr01a.tok05 :      1587015      :
+    :..............:..............:...................:
+    :..............:
+    :    Rules     :
+    :....:.........:
+    : Id : KeyName :
+    :....:.........:
+    : 1  :  SPREAD :
+    :....:.........:
 
 .. _cli_vs_placementgroup_delete:
 
@@ -67,7 +81,14 @@ You can use the flag --purge to auto-cancel all VSIs in a placement group. You w
 
 ::
 
-    $ slcli vs placementgroup testGroup --purge
+    $ slcli vs placementgroup delete testGroup --purge
+        You are about to delete the following guests!
+        issues10691547768562.test.com, issues10691547768572.test.com, issues10691547768552.test.com, issues10691548718280.test.com
+        This action will cancel all guests! Continue? [y/N]: y
+        Deleting issues10691547768562.test.com...
+        Deleting issues10691547768572.test.com...
+        Deleting issues10691547768552.test.com...
+        Deleting issues10691548718280.test.com...
 
 
 .. _cli_vs_placementgroup_list:

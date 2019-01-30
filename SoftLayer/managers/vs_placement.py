@@ -83,6 +83,28 @@ class PlacementManager(utils.IdentifierMixin, object):
         """
         return self.client.call('SoftLayer_Virtual_PlacementGroup', 'deleteObject', id=group_id)
 
+    def get_all_rules(self):
+        """Returns all available rules for creating a placement group"""
+        return self.client.call('SoftLayer_Virtual_PlacementGroup_Rule', 'getAllObjects')
+
+    def _get_rule_id_from_name(self, name):
+        """Finds the rule that matches name.
+
+        SoftLayer_Virtual_PlacementGroup_Rule.getAllObjects doesn't support objectFilters.
+        """
+        results = self.client.call('SoftLayer_Virtual_PlacementGroup_Rule', 'getAllObjects')
+        return [result['id'] for result in results if result['keyName'] == name.upper()]       
+
+    def _get_backend_router_id_from_hostname(self, hostname):
+        """Finds the backend router Id that matches the hostname given
+
+        No way to use an objectFilter to find a backendRouter, so we have to search the hard way.
+        """
+        from pprint import pprint as pp
+        results = self.client.call('SoftLayer_Network_Pod', 'getAllObjects')
+        # pp(results)
+        return [result['backendRouterId'] for result in results if result['backendRouterName'] == hostname.lower()]
+
     def _get_id_from_name(self, name):
         """List placement group ids which match the given name."""
         _filter = {
