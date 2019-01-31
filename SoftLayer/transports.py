@@ -379,7 +379,12 @@ class RestTransport(object):
             request.url = resp.url
 
             resp.raise_for_status()
-            result = json.loads(resp.text)
+
+            if resp.text != "":
+              result = json.loads(resp.text)
+            else:
+              raise exceptions.SoftLayerAPIError(resp.status_code, "Empty response." )
+              
             request.result = result
 
             if isinstance(result, list):
@@ -388,8 +393,14 @@ class RestTransport(object):
             else:
                 return result
         except requests.HTTPError as ex:
-            message = json.loads(ex.response.text)['error']
-            request.url = ex.response.url
+            try:
+              message = json.loads(ex.response.text)['error']
+              request.url = ex.response.url
+            except:
+              if ex.response.text == "":
+                raise exceptions.SoftLayerAPIError(resp.status_code, "Empty response." )
+              else:
+                raise exceptions.SoftLayerAPIError(resp.status_code, ex.response.text )
             raise exceptions.SoftLayerAPIError(ex.response.status_code, message)
         except requests.RequestException as ex:
             raise exceptions.TransportError(0, str(ex))
