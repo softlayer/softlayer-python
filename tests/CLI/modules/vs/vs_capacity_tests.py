@@ -4,6 +4,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import json
 from SoftLayer.fixtures import SoftLayer_Product_Order
 from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer import testing
@@ -14,6 +15,26 @@ class VSCapacityTests(testing.TestCase):
     def test_list(self):
         result = self.run_command(['vs', 'capacity', 'list'])
         self.assert_no_fail(result)
+
+    def test_list_no_billing(self):
+        account_mock = self.set_mock('SoftLayer_Account', 'getReservedCapacityGroups')
+        account_mock.return_value = [
+            {
+                'id': 3103,
+                'name': 'test-capacity',
+                'createDate': '2018-09-24T16:33:09-06:00',
+                'availableInstanceCount': 1,
+                'instanceCount': 3,
+                'occupiedInstanceCount': 1,
+                'backendRouter': {
+                    'hostname': 'bcr02a.dal13',
+                },
+                'instances': [{'id': 3501}]
+            }
+        ]
+        result = self.run_command(['vs', 'capacity', 'list'])
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output)[0]['Flavor'], 'Unknown Billing Item')
 
     def test_detail(self):
         result = self.run_command(['vs', 'capacity', 'detail', '1234'])

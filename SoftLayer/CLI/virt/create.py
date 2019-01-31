@@ -195,7 +195,7 @@ def _parse_create_args(client, args):
                       help=('Security group ID to associate with the private interface'))
 @click.option('--wait', type=click.INT,
               help="Wait until VS is finished provisioning for up to X seconds before returning")
-@click.option('--placementgroup', 
+@click.option('--placementgroup',
               help="Placement Group name or Id to order this guest on. See: slcli vs placementgroup list")
 @click.option('--ipv6', is_flag=True, help="Adds an IPv6 address to this guest")
 @environment.pass_env

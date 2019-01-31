@@ -47,6 +47,7 @@ __all__ = [
     'NetworkManager',
     'ObjectStorageManager',
     'OrderingManager',
+    'PlacementManager',
     'SshKeyManager',
     'SSLManager',
     'TicketManager',

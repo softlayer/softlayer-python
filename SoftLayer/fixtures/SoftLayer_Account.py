@@ -591,7 +591,7 @@ getReservedCapacityGroups = [
         'modifyDate': '',
         'name': 'test-capacity',
         'availableInstanceCount': 1,
-        'instanceCount': 2,
+        'instanceCount': 3,
         'occupiedInstanceCount': 1,
         'backendRouter': {
             'accountId': 1,
@@ -638,6 +638,9 @@ getReservedCapacityGroups = [
                     'description': 'B1.1x2 (1 Year Term)',
                     'hourlyRecurringFee': '.032'
                 }
+            },
+            {
+                'id': 3519
             }
         ]
     }

@@ -55,3 +55,23 @@ class VSPlacementManagerTests(testing.TestCase):
             }
         }
         self.assert_called_with('SoftLayer_Account', 'getPlacementGroups', filter=_filter, mask="mask[id, name]")
+
+    def test_get_rule_id_from_name(self):
+        result = self.manager.get_rule_id_from_name('SPREAD')
+        self.assertEqual(result[0], 1)
+        result = self.manager.get_rule_id_from_name('SpReAd')
+        self.assertEqual(result[0], 1)
+
+    def test_get_rule_id_from_name_failure(self):
+        result = self.manager.get_rule_id_from_name('SPREAD1')
+        self.assertEqual(result, [])
+
+    def test_router_search(self):
+        result = self.manager.get_backend_router_id_from_hostname('bcr01a.ams01')
+        self.assertEqual(result[0], 117917)
+        result = self.manager.get_backend_router_id_from_hostname('bcr01A.AMS01')
+        self.assertEqual(result[0], 117917)
+
+    def test_router_search_failure(self):
+        result = self.manager.get_backend_router_id_from_hostname('1234.ams01')
+        self.assertEqual(result, [])
