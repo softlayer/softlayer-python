@@ -45,4 +45,3 @@ class CapacityCommands(click.MultiCommand):
 @click.group(cls=CapacityCommands, context_settings=CONTEXT)
 def cli():
     """Base command for all capacity related concerns"""
-    pass

@@ -14,7 +14,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
-# pylint: disable=w0401,invalid-name
+# pylint: disable=r0401,invalid-name
 from SoftLayer import consts
 
 from SoftLayer.API import *  # NOQA
