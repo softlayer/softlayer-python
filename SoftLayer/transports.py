@@ -384,7 +384,7 @@ class RestTransport(object):
               result = json.loads(resp.text)
             else:
               raise exceptions.SoftLayerAPIError(resp.status_code, "Empty response." )
-              
+
             request.result = result
 
             if isinstance(result, list):
