@@ -401,7 +401,8 @@ class RestTransport(object):
                     raise exceptions.SoftLayerAPIError(resp.status_code, "Empty response.")
                 else:
                     raise exceptions.SoftLayerAPIError(resp.status_code, ex.response.text)
-                raise exceptions.SoftLayerAPIError(ex.response.status_code, message)
+
+            raise exceptions.SoftLayerAPIError(ex.response.status_code, message)
         except requests.RequestException as ex:
             raise exceptions.TransportError(0, str(ex))
 
