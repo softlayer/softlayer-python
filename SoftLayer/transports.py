@@ -396,7 +396,7 @@ class RestTransport(object):
             try:
                 message = json.loads(ex.response.text)['error']
                 request.url = ex.response.url
-            except Exception:
+            except json.JSONDecodeError:
                 if ex.response.text == "":
                     raise exceptions.SoftLayerAPIError(resp.status_code, "Empty response.")
                 else:
