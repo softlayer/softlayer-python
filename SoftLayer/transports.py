@@ -381,7 +381,10 @@ class RestTransport(object):
             resp.raise_for_status()
 
             if resp.text != "":
-                result = json.loads(resp.text)
+                try:
+                    result = json.loads(resp.text)
+                except ValueError as json_ex:
+                    raise exceptions.SoftLayerAPIError(resp.status_code, str(json_ex))
             else:
                 raise exceptions.SoftLayerAPIError(resp.status_code, "Empty response.")
 
