@@ -30,17 +30,20 @@ def multi_option(*param_decls, **attrs):
 def resolve_id(resolver, identifier, name='object'):
     """Resolves a single id using a resolver function.
 
-    :param resolver: function that resolves ids. Should return None or a list
-                     of ids.
+    :param resolver: function that resolves ids. Should return None or a list of ids.
     :param string identifier: a string identifier used to resolve ids
     :param string name: the object type, to be used in error messages
 
     """
+    try:
+        return int(identifier)
+    except ValueError:
+        pass  # It was worth a shot
+
     ids = resolver(identifier)
 
     if len(ids) == 0:
-        raise exceptions.CLIAbort("Error: Unable to find %s '%s'"
-                                  % (name, identifier))
+        raise exceptions.CLIAbort("Error: Unable to find %s '%s'" % (name, identifier))
 
     if len(ids) > 1:
         raise exceptions.CLIAbort(

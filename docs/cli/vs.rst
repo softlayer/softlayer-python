@@ -81,15 +81,33 @@ datacenter using the command `slcli vs create`.
 
 ::
 
-	$ slcli vs create --hostname=example --domain=softlayer.com --cpu 2 --memory 1024 -o DEBIAN_LATEST_64  --datacenter=ams01 --billing=hourly
+	$ slcli vs create --hostname=example --domain=softlayer.com -f B1_1X2X25 -o DEBIAN_LATEST_64  --datacenter=ams01 --billing=hourly
 	This action will incur charges on your account. Continue? [y/N]: y
-	:.........:......................................:
-	:    name : value                                :
-	:.........:......................................:
-	:      id : 1234567                              :
-	: created : 2013-06-13T08:29:44-06:00            :
-	:    guid : 6e013cde-a863-46ee-8s9a-f806dba97c89 :
-	:.........:......................................:
+        :..........:.................................:......................................:...........................:
+        :    ID    :               FQDN              :                 guid                 :         Order Date        :
+        :..........:.................................:......................................:...........................:
+        : 70112999 : testtesttest.test.com : 1abc7afb-9618-4835-89c9-586f3711d8ea : 2019-01-30T17:16:58-06:00 :
+        :..........:.................................:......................................:...........................:
+        :.........................................................................:
+        :                            OrderId: 12345678                            :
+        :.......:.................................................................:
+        :  Cost : Description                                                     :
+        :.......:.................................................................:
+        :   0.0 : Debian GNU/Linux 9.x Stretch/Stable - Minimal Install (64 bit)  :
+        :   0.0 : 25 GB (SAN)                                                     :
+        :   0.0 : Reboot / Remote Console                                         :
+        :   0.0 : 100 Mbps Public & Private Network Uplinks                       :
+        :   0.0 : 0 GB Bandwidth Allotment                                        :
+        :   0.0 : 1 IP Address                                                    :
+        :   0.0 : Host Ping and TCP Service Monitoring                            :
+        :   0.0 : Email and Ticket                                                :
+        :   0.0 : Automated Reboot from Monitoring                                :
+        :   0.0 : Unlimited SSL VPN Users & 1 PPTP VPN User per account           :
+        :   0.0 : Nessus Vulnerability Assessment & Reporting                     :
+        :   0.0 : 2 GB                                                            :
+        :   0.0 : 1 x 2.0 GHz or higher Core                                      :
+        : 0.000 : Total hourly cost                                               :
+        :.......:.................................................................:
 
 
 After the last command, the virtual server is now being built. It should
@@ -193,4 +211,11 @@ Reserved Capacity
     :maxdepth: 2
 
     vs/reserved_capacity
+
+Placement Groups
+----------------
+.. toctree::
+    :maxdepth: 2
+
+    vs/placement_group
 

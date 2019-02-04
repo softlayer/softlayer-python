@@ -28,7 +28,7 @@ from SoftLayer.managers.ticket import TicketManager
 from SoftLayer.managers.user import UserManager
 from SoftLayer.managers.vs import VSManager
 from SoftLayer.managers.vs_capacity import CapacityManager
-
+from SoftLayer.managers.vs_placement import PlacementManager
 
 __all__ = [
     'BlockStorageManager',
@@ -47,6 +47,7 @@ __all__ = [
     'NetworkManager',
     'ObjectStorageManager',
     'OrderingManager',
+    'PlacementManager',
     'SshKeyManager',
     'SSLManager',
     'TicketManager',
