@@ -9,7 +9,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.shell import routes
 
 
-@click.command()
+@click.command(short_help="Print shell help text.")
 @environment.pass_env
 @click.pass_context
 def cli(ctx, env):
@@ -22,6 +22,8 @@ def cli(ctx, env):
     shell_commands = []
     for name in cli_core.cli.list_commands(ctx):
         command = cli_core.cli.get_command(ctx, name)
+        if command.short_help is None:
+          command.short_help = command.help
         details = (name, command.short_help)
         if name in dict(routes.ALL_ROUTES):
             shell_commands.append(details)
