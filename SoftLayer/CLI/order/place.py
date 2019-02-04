@@ -83,7 +83,7 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
               'extras': extras,
               'quantity': 1,
               'complex_type': complex_type,
-              'hourly': True if billing == 'hourly' else False}
+              'hourly': bool(billing == 'hourly')}
 
     if verify:
         table = formatting.Table(COLUMNS)

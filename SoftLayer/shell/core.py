@@ -26,7 +26,6 @@ from SoftLayer.shell import routes
 
 class ShellExit(Exception):
     """Exception raised to quit the shell."""
-    pass
 
 
 @click.command()

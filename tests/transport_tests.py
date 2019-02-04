@@ -349,16 +349,50 @@ class TestRestAPICall(testing.TestCase):
             timeout=None)
 
     @mock.patch('SoftLayer.transports.requests.Session.request')
-    def test_error(self, request):
+    def test_http_and_json_error(self, request):
         # Test JSON Error
         e = requests.HTTPError('error')
         e.response = mock.MagicMock()
         e.response.status_code = 404
-        e.response.text = '''{
+        e.response.text = '''
             "error": "description",
             "code": "Error Code"
-        }'''
+        '''
         request().raise_for_status.side_effect = e
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'Resource'
+        self.assertRaises(SoftLayer.SoftLayerAPIError, self.transport, req)
+
+    @mock.patch('SoftLayer.transports.requests.Session.request')
+    def test_http_and_empty_error(self, request):
+        # Test JSON Error
+        e = requests.HTTPError('error')
+        e.response = mock.MagicMock()
+        e.response.status_code = 404
+        e.response.text = ''
+        request().raise_for_status.side_effect = e
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'Resource'
+        self.assertRaises(SoftLayer.SoftLayerAPIError, self.transport, req)
+
+    @mock.patch('SoftLayer.transports.requests.Session.request')
+    def test_empty_error(self, request):
+        # Test empty response error.
+        request().text = ''
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'Resource'
+        self.assertRaises(SoftLayer.SoftLayerAPIError, self.transport, req)
+
+    @mock.patch('SoftLayer.transports.requests.Session.request')
+    def test_json_error(self, request):
+        # Test non-json response error.
+        request().text = 'Not JSON'
 
         req = transports.Request()
         req.service = 'SoftLayer_Service'

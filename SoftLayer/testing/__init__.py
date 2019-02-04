@@ -96,11 +96,9 @@ class TestCase(testtools.TestCase):
 
     def set_up(self):
         """Aliased from setUp."""
-        pass
 
     def tear_down(self):
         """Aliased from tearDown."""
-        pass
 
     def setUp(self):  # NOQA
         testtools.TestCase.setUp(self)
