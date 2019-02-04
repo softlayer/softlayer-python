@@ -1,5 +1,5 @@
 """
-    SoftLayer.tests.CLI.modules.summary_tests
+    SoftLayer.tests.CLI.modules.shell_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :license: MIT, see LICENSE for more details.
