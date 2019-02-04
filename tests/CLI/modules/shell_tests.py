@@ -6,13 +6,9 @@
 """
 from SoftLayer import testing
 
-import json
-import mock
 import io
-import shlex
+import mock
 
-from prompt_toolkit.shortcuts import prompt
-from SoftLayer.shell import core
 
 class ShellTests(testing.TestCase):
     def test_shell(self):
