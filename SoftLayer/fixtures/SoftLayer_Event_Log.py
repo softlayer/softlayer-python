@@ -124,4 +124,41 @@ getAllObjects = [
     }
 ]
 
-getAllEventObjectNames = ['CCI', 'Security Group']
+getAllEventObjectNames = [
+    {
+      'value': 'CCI'
+    }, 
+    {
+      'value':'Security Group'
+    }
+    {
+      'value': "User"
+    },
+    {
+      'value': "Bare Metal Instance"
+    },
+    {
+      'value': "API Authentication"
+    },
+    {
+      'value': "Server"
+    },
+    {
+      'value': "CCI"
+    },
+    {
+      'value': "Image"
+    },
+    {
+      'value': "Bluemix LB"
+    },
+    {
+      'value': "Facility"
+    },
+    {
+      'value': "Cloud Object Storage"
+    },
+    {
+      'value': "Security Group"
+    }
+]
