@@ -126,10 +126,10 @@ getAllObjects = [
 
 getAllEventObjectNames = [
     {
-        'value': 'CCI'
+        'value': "Account"
     },
     {
-        'value': 'Security Group'
+        'value': "CDN"
     },
     {
         'value': "User"

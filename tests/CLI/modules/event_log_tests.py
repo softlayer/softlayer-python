@@ -119,10 +119,40 @@ class EventLogTests(testing.TestCase):
     def test_get_event_log_types(self):
         expected = [
             {
-                'types': 'CCI'
+                "types": {"value": "Account"}
             },
             {
-                'types': 'Security Group'
+                "types": {"value": "CDN"}
+            },
+            {
+                "types": {"value": "User"}
+            },
+            {
+                "types": {"value": "Bare Metal Instance"}
+            },
+            {
+                "types": {"value": "API Authentication"}
+            },
+            {
+                "types": {"value": "Server"}
+            },
+            {
+                "types": {"value": "CCI"}
+            },
+            {
+                "types": {"value": "Image"}
+            },
+            {
+                "types": {"value": "Bluemix LB"}
+            },
+            {
+                "types": {"value": "Facility"}
+            },
+            {
+                "types": {"value": "Cloud Object Storage"}
+            },
+            {
+                "types": {"value": "Security Group"}
             }
         ]
 
