@@ -294,8 +294,13 @@ class VirtCreateTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assertIn('"guid": "1a2b3c-1701"', result.output)
+        # Argument testing Example
+        order_call = self.calls('SoftLayer_Product_Order', 'placeOrder')
+        order_args = getattr(order_call[0], 'args')[0]
+        self.assertEqual(123, order_args['hostId'])
+
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
-        args = ({
+        template_args = ({
             'startCpus': 2,
             'maxMemory': 1024,
             'hostname': 'host',
@@ -319,7 +324,7 @@ class VirtCreateTests(testing.TestCase):
             ]
         },)
 
-        self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=args)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=template_args)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_like(self, confirm_mock):
