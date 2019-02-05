@@ -16,7 +16,7 @@ def cli(ctx, env):
     """Print shell help text."""
     env.out("Welcome to the SoftLayer shell.")
     env.out("")
-
+    env.out("This is working.")
     formatter = formatting.HelpFormatter()
     commands = []
     shell_commands = []
