@@ -16,7 +16,7 @@ CATEGORY_MASK = '''id,
                    itemCategory[id, name, categoryCode]
                 '''
 
-ITEM_MASK = '''id, keyName, description, itemCategory, categories'''
+ITEM_MASK = '''id, keyName, description, itemCategory, categories, prices'''
 
 PACKAGE_MASK = '''id, name, keyName, isActive, type'''
 

@@ -533,7 +533,16 @@ generateOrderTemplate = {
 setUserMetadata = ['meta']
 reloadOperatingSystem = 'OK'
 setTags = True
-createArchiveTransaction = {}
+createArchiveTransaction = {
+    'createDate': '2018-12-10T17:29:18-06:00',
+    'elapsedSeconds': 0,
+    'guestId': 12345678,
+    'hardwareId': None,
+    'id': 12345,
+    'modifyDate': '2018-12-10T17:29:18-06:00',
+    'statusChangeDate': '2018-12-10T17:29:18-06:00'
+}
+
 executeRescueLayer = True
 
 getUpgradeItemPrices = [

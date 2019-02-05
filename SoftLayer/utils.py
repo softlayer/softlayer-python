@@ -121,8 +121,8 @@ def query_filter_date(start, end):
     return {
         'operation': 'betweenDate',
         'options': [
-            {'name': 'startDate', 'value': [startdate+' 0:0:0']},
-            {'name': 'endDate', 'value': [enddate+' 0:0:0']}
+            {'name': 'startDate', 'value': [startdate + ' 0:0:0']},
+            {'name': 'endDate', 'value': [enddate + ' 0:0:0']}
         ]
     }
 

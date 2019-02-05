@@ -18,8 +18,7 @@ from SoftLayer import utils
 
 LOGGER = logging.getLogger(__name__)
 
-
-# pylint: disable=no-self-use
+# pylint: disable=no-self-use,too-many-lines
 
 
 class VSManager(utils.IdentifierMixin, object):
@@ -234,7 +233,8 @@ class VSManager(utils.IdentifierMixin, object):
                                          preset.keyName]],'''
                 'tagReferences[id,tag[name,id]],'
                 'networkVlans[id,vlanNumber,networkSpace],'
-                'dedicatedHost.id'
+                'dedicatedHost.id,'
+                'placementGroupId'
             )
 
         return self.guest.getObject(id=instance_id, **kwargs)
@@ -664,12 +664,10 @@ class VSManager(utils.IdentifierMixin, object):
             A port speed of 0 will disable the interface.
         """
         if public:
-            return self.client.call('Virtual_Guest',
-                                    'setPublicNetworkInterfaceSpeed',
+            return self.client.call('Virtual_Guest', 'setPublicNetworkInterfaceSpeed',
                                     speed, id=instance_id)
         else:
-            return self.client.call('Virtual_Guest',
-                                    'setPrivateNetworkInterfaceSpeed',
+            return self.client.call('Virtual_Guest', 'setPrivateNetworkInterfaceSpeed',
                                     speed, id=instance_id)
 
     def _get_ids_from_hostname(self, hostname):
@@ -784,10 +782,7 @@ class VSManager(utils.IdentifierMixin, object):
                 continue
 
             # We never want swap devices
-            type_name = utils.lookup(block_device,
-                                     'diskImage',
-                                     'type',
-                                     'keyName')
+            type_name = utils.lookup(block_device, 'diskImage', 'type', 'keyName')
             if type_name == 'SWAP':
                 continue
 
@@ -804,8 +799,7 @@ class VSManager(utils.IdentifierMixin, object):
         return self.guest.createArchiveTransaction(
             name, disks_to_capture, notes, id=instance_id)
 
-    def upgrade(self, instance_id, cpus=None, memory=None,
-                nic_speed=None, public=True, preset=None):
+    def upgrade(self, instance_id, cpus=None, memory=None, nic_speed=None, public=True, preset=None):
         """Upgrades a VS instance.
 
         Example::
@@ -832,17 +826,16 @@ class VSManager(utils.IdentifierMixin, object):
         data = {'nic_speed': nic_speed}
 
         if cpus is not None and preset is not None:
-            raise exceptions.SoftLayerError("Do not use cpu, private and memory if you are using flavors")
+            raise ValueError("Do not use cpu, private and memory if you are using flavors")
         data['cpus'] = cpus
 
         if memory is not None and preset is not None:
-            raise exceptions.SoftLayerError("Do not use memory, private or cpu if you are using flavors")
+            raise ValueError("Do not use memory, private or cpu if you are using flavors")
         data['memory'] = memory
 
         maintenance_window = datetime.datetime.now(utils.UTC())
         order = {
-            'complexType': 'SoftLayer_Container_Product_Order_Virtual_Guest_'
-                           'Upgrade',
+            'complexType': 'SoftLayer_Container_Product_Order_Virtual_Guest_Upgrade',
             'properties': [{
                 'name': 'MAINTENANCE_WINDOW',
                 'value': maintenance_window.strftime("%Y-%m-%d %H:%M:%S%z")
@@ -873,6 +866,64 @@ class VSManager(utils.IdentifierMixin, object):
             self.client['Product_Order'].placeOrder(order)
             return True
         return False
+
+    def order_guest(self, guest_object, test=False):
+        """Uses Product_Order::placeOrder to create a virtual guest.
+
+        Useful when creating a virtual guest with options not supported by Virtual_Guest::createObject
+        specifically ipv6 support.
+
+        :param dictionary guest_object: See SoftLayer.CLI.virt.create._parse_create_args
+
+        Example::
+
+            new_vsi = {
+                'domain': u'test01.labs.sftlyr.ws',
+                'hostname': u'minion05',
+                'datacenter': u'hkg02',
+                'flavor': 'BL1_1X2X100'
+                'dedicated': False,
+                'private': False,
+                'os_code' : u'UBUNTU_LATEST',
+                'hourly': True,
+                'ssh_keys': [1234],
+                'disks': ('100','25'),
+                'local_disk': True,
+                'tags': 'test, pleaseCancel',
+                'public_security_groups': [12, 15],
+                'ipv6': True
+            }
+
+            vsi = mgr.order_guest(new_vsi)
+            # vsi will have the newly created vsi receipt.
+            # vsi['orderDetails']['virtualGuests'] will be an array of created Guests
+            print vsi
+        """
+        tags = guest_object.pop('tags', None)
+        template = self.verify_create_instance(**guest_object)
+
+        if guest_object.get('ipv6'):
+            ipv6_price = self.ordering_manager.get_price_id_list('PUBLIC_CLOUD_SERVER', ['1_IPV6_ADDRESS'])
+            template['prices'].append({'id': ipv6_price[0]})
+
+        # Notice this is `userdata` from the cli, but we send it in as `userData`
+        if guest_object.get('userdata'):
+            # SL_Virtual_Guest::generateOrderTemplate() doesn't respect userData, so we need to add it ourself
+            template['virtualGuests'][0]['userData'] = [{"value": guest_object.get('userdata')}]
+        if guest_object.get('host_id'):
+            template['hostId'] = guest_object.get('host_id')
+        if guest_object.get('placement_id'):
+            template['virtualGuests'][0]['placementGroupId'] = guest_object.get('placement_id')
+
+        if test:
+            result = self.client.call('Product_Order', 'verifyOrder', template)
+        else:
+            result = self.client.call('Product_Order', 'placeOrder', template)
+            if tags is not None:
+                virtual_guests = utils.lookup(result, 'orderDetails', 'virtualGuests')
+                for guest in virtual_guests:
+                    self.set_tags(tags, guest_id=guest['id'])
+        return result
 
     def _get_package_items(self):
         """Following Method gets all the item ids related to VS.

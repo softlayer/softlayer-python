@@ -34,7 +34,7 @@ __all__ = [
 ]
 
 REST_SPECIAL_METHODS = {
-    'deleteObject': 'DELETE',
+    # 'deleteObject': 'DELETE',
     'createObject': 'POST',
     'createObjects': 'POST',
     'editObject': 'PUT',
@@ -379,7 +379,15 @@ class RestTransport(object):
             request.url = resp.url
 
             resp.raise_for_status()
-            result = json.loads(resp.text)
+
+            if resp.text != "":
+                try:
+                    result = json.loads(resp.text)
+                except ValueError as json_ex:
+                    raise exceptions.SoftLayerAPIError(resp.status_code, str(json_ex))
+            else:
+                raise exceptions.SoftLayerAPIError(resp.status_code, "Empty response.")
+
             request.result = result
 
             if isinstance(result, list):
@@ -388,8 +396,15 @@ class RestTransport(object):
             else:
                 return result
         except requests.HTTPError as ex:
-            message = json.loads(ex.response.text)['error']
-            request.url = ex.response.url
+            try:
+                message = json.loads(ex.response.text)['error']
+                request.url = ex.response.url
+            except ValueError as json_ex:
+                if ex.response.text == "":
+                    raise exceptions.SoftLayerAPIError(resp.status_code, "Empty response.")
+                else:
+                    raise exceptions.SoftLayerAPIError(resp.status_code, str(json_ex))
+
             raise exceptions.SoftLayerAPIError(ex.response.status_code, message)
         except requests.RequestException as ex:
             raise exceptions.TransportError(0, str(ex))

@@ -73,6 +73,7 @@ editObject = True
 setTags = True
 setPrivateNetworkInterfaceSpeed = True
 setPublicNetworkInterfaceSpeed = True
+toggleManagementInterface = True
 powerOff = True
 powerOn = True
 powerCycle = True

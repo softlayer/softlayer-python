@@ -31,6 +31,7 @@ ALL_ROUTES = [
     ('virtual:upgrade', 'SoftLayer.CLI.virt.upgrade:cli'),
     ('virtual:credentials', 'SoftLayer.CLI.virt.credentials:cli'),
     ('virtual:capacity', 'SoftLayer.CLI.virt.capacity:cli'),
+    ('virtual:placementgroup', 'SoftLayer.CLI.virt.placementgroup:cli'),
 
     ('dedicatedhost', 'SoftLayer.CLI.dedicatedhost'),
     ('dedicatedhost:list', 'SoftLayer.CLI.dedicatedhost.list:cli'),
@@ -237,6 +238,7 @@ ALL_ROUTES = [
     ('hardware:update-firmware', 'SoftLayer.CLI.hardware.update_firmware:cli'),
     ('hardware:rescue', 'SoftLayer.CLI.hardware.power:rescue'),
     ('hardware:ready', 'SoftLayer.CLI.hardware.ready:cli'),
+    ('hardware:toggle-ipmi', 'SoftLayer.CLI.hardware.toggle_ipmi:cli'),
 
     ('securitygroup', 'SoftLayer.CLI.securitygroup'),
     ('securitygroup:list', 'SoftLayer.CLI.securitygroup.list:cli'),
@@ -316,4 +318,5 @@ ALL_ALIASES = {
     'vm': 'virtual',
     'vs': 'virtual',
     'dh': 'dedicatedhost',
+    'pg': 'placementgroup',
 }

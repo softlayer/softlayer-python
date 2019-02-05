@@ -1,5 +1,5 @@
 """
-    SoftLayer.tests.managers.vs_capacity_tests
+    SoftLayer.tests.managers.vs.vs_capacity_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :license: MIT, see LICENSE for more details.
@@ -13,7 +13,7 @@ from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer import testing
 
 
-class VSCapacityTests(testing.TestCase):
+class VSManagerCapacityTests(testing.TestCase):
 
     def set_up(self):
         self.manager = SoftLayer.CapacityManager(self.client)
@@ -44,6 +44,16 @@ class VSCapacityTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects', mask=mock.ANY, filter=package_filter)
         self.assert_called_with('SoftLayer_Product_Package', 'getRegions', mask=mock.ANY)
         self.assert_called_with('SoftLayer_Network_Pod', 'getAllObjects')
+        self.assertEqual(result[0]['keyname'], 'WASHINGTON07')
+
+    def test_get_available_routers_search(self):
+
+        result = self.manager.get_available_routers('wdc07')
+        package_filter = {'keyName': {'operation': 'RESERVED_CAPACITY'}}
+        pod_filter = {'datacenterName': {'operation': 'wdc07'}}
+        self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects', mask=mock.ANY, filter=package_filter)
+        self.assert_called_with('SoftLayer_Product_Package', 'getRegions', mask=mock.ANY)
+        self.assert_called_with('SoftLayer_Network_Pod', 'getAllObjects', filter=pod_filter)
         self.assertEqual(result[0]['keyname'], 'WASHINGTON07')
 
     def test_create(self):
