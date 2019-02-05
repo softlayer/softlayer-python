@@ -88,12 +88,14 @@ To get the exact API call that this library makes, you can do the following.
 For the CLI, just use the -vvv option. If you are using the REST endpoint, this will print out a curl command that you can use, if using XML, this will print the minimal python code to make the request without the softlayer library.
 
 .. code-block:: bash
+
   $ slcli -vvv vs list
 
 
 If you are using the library directly in python, you can do something like this.
 
 .. code-bock:: python
+
   import SoftLayer
   import logging
 
@@ -117,6 +119,8 @@ If you are using the library directly in python, you can do something like this.
       main = example()
       main.main()
       main.debug()
+
+
 
 System Requirements
 -------------------

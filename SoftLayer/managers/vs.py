@@ -233,7 +233,8 @@ class VSManager(utils.IdentifierMixin, object):
                                          preset.keyName]],'''
                 'tagReferences[id,tag[name,id]],'
                 'networkVlans[id,vlanNumber,networkSpace],'
-                'dedicatedHost.id'
+                'dedicatedHost.id,'
+                'placementGroupId'
             )
 
         return self.guest.getObject(id=instance_id, **kwargs)
@@ -875,6 +876,7 @@ class VSManager(utils.IdentifierMixin, object):
         :param dictionary guest_object: See SoftLayer.CLI.virt.create._parse_create_args
 
         Example::
+
             new_vsi = {
                 'domain': u'test01.labs.sftlyr.ws',
                 'hostname': u'minion05',
@@ -908,6 +910,10 @@ class VSManager(utils.IdentifierMixin, object):
         if guest_object.get('userdata'):
             # SL_Virtual_Guest::generateOrderTemplate() doesn't respect userData, so we need to add it ourself
             template['virtualGuests'][0]['userData'] = [{"value": guest_object.get('userdata')}]
+        if guest_object.get('host_id'):
+            template['hostId'] = guest_object.get('host_id')
+        if guest_object.get('placement_id'):
+            template['virtualGuests'][0]['placementGroupId'] = guest_object.get('placement_id')
 
         if test:
             result = self.client.call('Product_Order', 'verifyOrder', template)

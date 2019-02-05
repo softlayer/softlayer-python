@@ -5,6 +5,7 @@ Users
 Version 5.6.0 introduces the ability to interact with user accounts from the cli. 
 
 .. _cli_user_create:
+
 user create
 -----------
 This command will create a user on your account.
@@ -19,6 +20,7 @@ Options
 -h, --help            Show this message and exit.
 
 ::
+
     slcli user create my@email.com -e my@email.com -p generate -a -t '{"firstName": "Test", "lastName": "Testerson"}'
 
 .. _cli_user_list:
@@ -83,11 +85,12 @@ Edit a User's details
 JSON strings should be enclosed in '' and each item should be enclosed in "\"
 
 ::
+
   slcli user edit-details testUser -t '{"firstName": "Test", "lastName": "Testerson"}'
 
 Options
 ^^^^^^^
--t, --template TEXT  A json string describing `SoftLayer_User_Customer
-https://softlayer.github.io/reference/datatypes/SoftLayer_User_Customer/`_.  [required]
+
+-t, --template TEXT  A json string describing `SoftLayer_User_Customer <https://softlayer.github.io/reference/datatypes/SoftLayer_User_Customer/>`_ .  [required]
 -h, --help           Show this message and exit.
 

@@ -31,6 +31,7 @@ ALL_ROUTES = [
     ('virtual:upgrade', 'SoftLayer.CLI.virt.upgrade:cli'),
     ('virtual:credentials', 'SoftLayer.CLI.virt.credentials:cli'),
     ('virtual:capacity', 'SoftLayer.CLI.virt.capacity:cli'),
+    ('virtual:placementgroup', 'SoftLayer.CLI.virt.placementgroup:cli'),
 
     ('dedicatedhost', 'SoftLayer.CLI.dedicatedhost'),
     ('dedicatedhost:list', 'SoftLayer.CLI.dedicatedhost.list:cli'),
@@ -317,4 +318,5 @@ ALL_ALIASES = {
     'vm': 'virtual',
     'vs': 'virtual',
     'dh': 'dedicatedhost',
+    'pg': 'placementgroup',
 }

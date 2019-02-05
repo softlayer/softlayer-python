@@ -34,7 +34,7 @@ __all__ = [
 ]
 
 REST_SPECIAL_METHODS = {
-    'deleteObject': 'DELETE',
+    # 'deleteObject': 'DELETE',
     'createObject': 'POST',
     'createObjects': 'POST',
     'editObject': 'PUT',
