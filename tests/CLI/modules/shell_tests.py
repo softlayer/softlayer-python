@@ -8,6 +8,7 @@ from SoftLayer import testing
 
 import mock
 
+
 class ShellTests(testing.TestCase):
     @mock.patch('prompt_toolkit.shortcuts.prompt')
     def test_shell_quit(self, prompt):
