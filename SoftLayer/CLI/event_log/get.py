@@ -17,14 +17,14 @@ COLUMNS = ['event', 'label', 'date', 'metadata']
               help='The earliest date we want to search for audit logs in mm/dd/yyyy format.')
 @click.option('--date-max', '-D',
               help='The latest date we want to search for audit logs in mm/dd/yyyy format.')
-@click.option('--obj_event', '-e',
+@click.option('--obj-event', '-e',
               help="The event we want to get audit logs for")
-@click.option('--obj_id', '-i',
+@click.option('--obj-id', '-i',
               help="The id of the object we want to get audit logs for")
-@click.option('--obj_type', '-t',
+@click.option('--obj-type', '-t',
               help="The type of the object we want to get audit logs for")
-@click.option('--utc_offset', '-z',
-              help="UTC Offset for seatching with dates. The default is -0000")
+@click.option('--utc-offset', '-z',
+              help="UTC Offset for searching with dates. The default is -0000")
 @environment.pass_env
 def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset):
     """Get Audit Logs"""

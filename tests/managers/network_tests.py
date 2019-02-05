@@ -638,7 +638,7 @@ class NetworkTests(testing.TestCase):
 
         self.assertEqual(expected, result)
 
-    def test__get_cci_event_logs(self):
+    def test_get_cci_event_logs(self):
         expected = [
             {
                 'accountId': 100,
