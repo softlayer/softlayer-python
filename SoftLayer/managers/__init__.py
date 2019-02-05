@@ -26,10 +26,14 @@ from SoftLayer.managers.ordering import OrderingManager
 from SoftLayer.managers.sshkey import SshKeyManager
 from SoftLayer.managers.ssl import SSLManager
 from SoftLayer.managers.ticket import TicketManager
+from SoftLayer.managers.user import UserManager
 from SoftLayer.managers.vs import VSManager
+from SoftLayer.managers.vs_capacity import CapacityManager
+from SoftLayer.managers.vs_placement import PlacementManager
 
 __all__ = [
     'BlockStorageManager',
+    'CapacityManager',
     'CDNManager',
     'DedicatedHostManager',
     'DNSManager',
@@ -45,8 +49,10 @@ __all__ = [
     'NetworkManager',
     'ObjectStorageManager',
     'OrderingManager',
+    'PlacementManager',
     'SshKeyManager',
     'SSLManager',
     'TicketManager',
+    'UserManager',
     'VSManager',
 ]

@@ -49,9 +49,9 @@ class CdnTests(testing.TestCase):
     def test_purge_content(self):
         result = self.run_command(['cdn', 'purge', '1234',
                                    'http://example.com'])
-
+        expected = [{"url": "http://example.com", "status": "SUCCESS"}]
         self.assert_no_fail(result)
-        self.assertEqual(result.output, "")
+        self.assertEqual(json.loads(result.output), expected)
 
     def test_list_origins(self):
         result = self.run_command(['cdn', 'origin-list', '1234'])

@@ -80,7 +80,6 @@ class TestHandler(six.moves.BaseHTTPServer.BaseHTTPRequestHandler):
 
     def log_message(self, fmt, *args):
         """Override log_message."""
-        pass
 
 
 def _item_by_key_postfix(dictionary, key_prefix):

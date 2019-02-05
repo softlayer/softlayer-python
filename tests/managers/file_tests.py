@@ -682,7 +682,7 @@ class FileTests(testing.TestCase):
             duplicate_iops=2000,
             duplicate_tier_level=None,
             duplicate_snapshot_size=10
-            )
+        )
 
         self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
 
@@ -760,7 +760,7 @@ class FileTests(testing.TestCase):
             duplicate_iops=None,
             duplicate_tier_level=4,
             duplicate_snapshot_size=10
-            )
+        )
 
         self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
 

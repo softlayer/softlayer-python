@@ -1,22 +1,19 @@
 """List package items."""
 # :license: MIT, see LICENSE for more details.
-
 import click
 
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import ordering
+from SoftLayer.utils import lookup
 
-COLUMNS = ['keyName',
-           'description', ]
+COLUMNS = ['category', 'keyName', 'description', 'priceId']
 
 
 @click.command()
 @click.argument('package_keyname')
-@click.option('--keyword',
-              help="A word (or string) used to filter item names.")
-@click.option('--category',
-              help="Category code to filter items by")
+@click.option('--keyword', help="A word (or string) used to filter item names.")
+@click.option('--category', help="Category code to filter items by")
 @environment.pass_env
 def cli(env, package_keyname, keyword, category):
     """List package items used for ordering.
@@ -27,12 +24,19 @@ def cli(env, package_keyname, keyword, category):
     Package keynames can be retrieved using `slcli order package-list`
 
     \b
+    Note:
+        Items with a numbered category, like disk0 or gpu0, can be included
+        multiple times in an order to match how many of the item you want to order.
+
+    \b
     Example:
         # List all items in the VSI package
         slcli order item-list CLOUD_SERVER
 
     The --keyword option is used to filter items by name.
+
     The --category option is used to filter items by category.
+
     Both --keyword and --category can be used together.
 
     \b
@@ -51,10 +55,32 @@ def cli(env, package_keyname, keyword, category):
         _filter['items']['categories'] = {'categoryCode': {'operation': '_= %s' % category}}
 
     items = manager.list_items(package_keyname, filter=_filter)
+    sorted_items = sort_items(items)
 
-    for item in items:
-        table.add_row([
-            item['keyName'],
-            item['description'],
-        ])
+    categories = sorted_items.keys()
+    for catname in sorted(categories):
+        for item in sorted_items[catname]:
+            table.add_row([catname, item['keyName'], item['description'], get_price(item)])
     env.fout(table)
+
+
+def sort_items(items):
+    """sorts the items into a dictionary of categories, with a list of items"""
+
+    sorted_items = {}
+    for item in items:
+        category = lookup(item, 'itemCategory', 'categoryCode')
+        if sorted_items.get(category) is None:
+            sorted_items[category] = []
+        sorted_items[category].append(item)
+
+    return sorted_items
+
+
+def get_price(item):
+    """Given an SoftLayer_Product_Item, returns its default price id"""
+
+    for price in item.get('prices', []):
+        if not price.get('locationGroupId'):
+            return price.get('id')
+    return 0

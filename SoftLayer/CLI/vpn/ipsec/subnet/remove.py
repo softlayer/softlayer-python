@@ -16,8 +16,8 @@ from SoftLayer.CLI.exceptions import CLIHalt
               type=int,
               help='Subnet identifier to remove')
 @click.option('-t',
-              '--type',
               '--subnet-type',
+              '--type',
               required=True,
               type=click.Choice(['internal', 'remote', 'service']),
               help='Subnet type to add')

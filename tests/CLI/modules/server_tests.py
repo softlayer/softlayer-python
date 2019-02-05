@@ -26,6 +26,75 @@ class ServerCLITests(testing.TestCase):
         self.assert_no_fail(result)
         self.assertEqual(len(output), 10)
 
+    def test_server_credentials(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        mock.return_value = {
+            "accountId": 11111,
+            "domain": "chechu.com",
+            "fullyQualifiedDomainName": "host3.vmware.chechu.com",
+            "hardwareStatusId": 5,
+            "hostname": "host3.vmware",
+            "id": 12345,
+            "softwareComponents": [{"passwords": [
+                {
+                    "password": "abc123",
+                    "username": "root"
+                }
+            ]}]
+        }
+        result = self.run_command(['hardware', 'credentials', '12345'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output),
+                         [{
+                             'username': 'root',
+                             'password': 'abc123'
+                         }])
+
+    def test_server_credentials_exception_passwords_not_found(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        mock.return_value = {
+            "accountId": 11111,
+            "domain": "chechu.com",
+            "fullyQualifiedDomainName": "host3.vmware.chechu.com",
+            "hardwareStatusId": 5,
+            "hostname": "host3.vmware",
+            "id": 12345,
+            "softwareComponents": [{}]
+        }
+
+        result = self.run_command(['hardware', 'credentials', '12345'])
+
+        self.assertEqual(
+            'No passwords found in softwareComponents',
+            str(result.exception)
+        )
+
+    def test_server_credentials_exception_password_not_found(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        mock.return_value = {
+            "accountId": 11111,
+            "domain": "chechu.com",
+            "fullyQualifiedDomainName": "host3.vmware.chechu.com",
+            "hardwareStatusId": 5,
+            "hostname": "host3.vmware",
+            "id": 12345,
+            "softwareComponents": [
+                {
+                    "hardwareId": 22222,
+                    "id": 333333,
+                    "passwords": [{}]
+                }
+            ]
+        }
+
+        result = self.run_command(['hardware', 'credentials', '12345'])
+
+        self.assertEqual(
+            'None',
+            str(result.exception)
+        )
+
     def test_server_details(self):
         result = self.run_command(['server', 'detail', '1234',
                                    '--passwords', '--price'])
@@ -264,7 +333,9 @@ class ServerCLITests(testing.TestCase):
         expected = [
             [{'datacenter': 'Washington 1', 'value': 'wdc01'}],
             [{'size': 'Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID',
-              'value': 'S1270_8GB_2X1TBSATA_NORAID'}],
+              'value': 'S1270_8GB_2X1TBSATA_NORAID'},
+             {'size': 'Dual Xeon Gold, 384GB Ram, 4x960GB SSD, RAID 10',
+              'value': 'DGOLD_6140_384GB_4X960GB_SSD_SED_RAID_10'}],
             [{'operating_system': 'Ubuntu / 14.04-64',
               'value': 'UBUNTU_14_64'}],
             [{'port_speed': '10 Mbps Public & Private Network Uplinks',
@@ -311,7 +382,7 @@ class ServerCLITests(testing.TestCase):
 
     @mock.patch('SoftLayer.CLI.template.export_to_template')
     def test_create_server_with_export(self, export_mock):
-        if(sys.platform.startswith("win")):
+        if (sys.platform.startswith("win")):
             self.skipTest("Test doesn't work in Windows")
         result = self.run_command(['--really', 'server', 'create',
                                    '--size=S1270_8GB_2X1TBSATA_NORAID',
@@ -385,7 +456,7 @@ class ServerCLITests(testing.TestCase):
                                      hostname='hardware-test1')
 
     def test_edit_server_userfile(self):
-        if(sys.platform.startswith("win")):
+        if (sys.platform.startswith("win")):
             self.skipTest("Test doesn't work in Windows")
         with tempfile.NamedTemporaryFile() as userfile:
             userfile.write(b"some data")
@@ -509,3 +580,15 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['hw', 'ready', '100', '--wait=100'])
         self.assert_no_fail(result)
         self.assertEqual(result.output, '"READY"\n')
+
+    def test_toggle_ipmi_on(self):
+        mock.return_value = True
+        result = self.run_command(['server', 'toggle-ipmi', '--enable', '12345'])
+        self.assert_no_fail(result)
+        self.assertEqual(result.output, 'True\n')
+
+    def test_toggle_ipmi_off(self):
+        mock.return_value = True
+        result = self.run_command(['server', 'toggle-ipmi', '--disable', '12345'])
+        self.assert_no_fail(result)
+        self.assertEqual(result.output, 'True\n')

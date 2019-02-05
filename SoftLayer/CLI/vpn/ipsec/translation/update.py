@@ -15,12 +15,10 @@ from SoftLayer.CLI.exceptions import CLIHalt
               required=True,
               type=int,
               help='Translation identifier to update')
-# todo: Update to utilize custom IP address type
 @click.option('-s',
               '--static-ip',
               default=None,
               help='Static IP address value')
-# todo: Update to utilize custom IP address type
 @click.option('-r',
               '--remote-ip',
               default=None,

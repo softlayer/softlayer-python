@@ -94,7 +94,7 @@ class NetworkTests(testing.TestCase):
                                          version=4,
                                          test_order=False)
 
-        self.assertEqual(fixtures.SoftLayer_Product_Order.verifyOrder, result)
+        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
 
         result = self.network.add_subnet('global',
                                          test_order=True)
@@ -245,6 +245,23 @@ class NetworkTests(testing.TestCase):
                                 'editRules', identifier=100,
                                 args=([{'id': 500,
                                         'direction': 'ingress'}],))
+
+    def test_edit_securitygroup_rule_unset(self):
+        # Test calling edit rule with falsy values, which are used
+        # to unset those values in the API
+        result = self.network.edit_securitygroup_rule(100, 500,
+                                                      protocol='',
+                                                      port_min=-1,
+                                                      port_max=-1,
+                                                      ethertype='',
+                                                      remote_ip='')
+
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Network_SecurityGroup',
+                                'editRules', identifier=100,
+                                args=([{'id': 500, 'protocol': '',
+                                        'portRangeMin': -1, 'portRangeMax': -1,
+                                        'ethertype': '', 'remoteIp': ''}],))
 
     def test_get_rwhois(self):
         result = self.network.get_rwhois()

@@ -1,10 +1,8 @@
 """
     SoftLayer.formatting
     ~~~~~~~~~~~~~~~~~~~~
-    Provider classes and helper functions to display output onto a
-    command-line.
+    Provider classes and helper functions to display output onto a command-line.
 
-    :license: MIT, see LICENSE for more details.
 """
 # pylint: disable=E0202, consider-merging-isinstance, arguments-differ, keyword-arg-before-vararg
 import collections
@@ -12,7 +10,12 @@ import json
 import os
 
 import click
-import prettytable
+
+# If both PTable and prettytable are installed, its impossible to use the new version
+try:
+    from prettytable import prettytable
+except ImportError:
+    import prettytable
 
 from SoftLayer.CLI import exceptions
 from SoftLayer import utils
@@ -229,6 +232,7 @@ class SequentialOutput(list):
 
     :param separator str: string to use as a default separator
     """
+
     def __init__(self, separator=os.linesep, *args, **kwargs):
         self.separator = separator
         super(SequentialOutput, self).__init__(*args, **kwargs)
@@ -243,6 +247,7 @@ class SequentialOutput(list):
 
 class CLIJSONEncoder(json.JSONEncoder):
     """A JSON encoder which is able to use a .to_python() method on objects."""
+
     def default(self, obj):
         """Encode object if it implements to_python()."""
         if hasattr(obj, 'to_python'):
@@ -255,7 +260,8 @@ class Table(object):
 
     :param list columns: a list of column names
     """
-    def __init__(self, columns):
+
+    def __init__(self, columns, title=None):
         duplicated_cols = [col for col, count
                            in collections.Counter(columns).items()
                            if count > 1]
@@ -267,6 +273,7 @@ class Table(object):
         self.rows = []
         self.align = {}
         self.sortby = None
+        self.title = title
 
     def add_row(self, row):
         """Add a row to the table.
@@ -287,6 +294,7 @@ class Table(object):
     def prettytable(self):
         """Returns a new prettytable instance."""
         table = prettytable.PrettyTable(self.columns)
+
         if self.sortby:
             if self.sortby in self.columns:
                 table.sortby = self.sortby
@@ -296,6 +304,8 @@ class Table(object):
         for a_col, alignment in self.align.items():
             table.align[a_col] = alignment
 
+        if self.title:
+            table.title = self.title
         # Adding rows
         for row in self.rows:
             table.add_row(row)
@@ -304,6 +314,7 @@ class Table(object):
 
 class KeyValueTable(Table):
     """A table that is oriented towards key-value pairs."""
+
     def to_python(self):
         """Decode this KeyValueTable object to standard Python types."""
         mapping = {}
@@ -318,6 +329,7 @@ class FormattedItem(object):
         :param original: raw (machine-readable) value
         :param string formatted: human-readable value
     """
+
     def __init__(self, original, formatted=None):
         self.original = original
         if formatted is not None:

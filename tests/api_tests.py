@@ -12,7 +12,7 @@ from SoftLayer import testing
 from SoftLayer import transports
 
 
-class Inititialization(testing.TestCase):
+class Initialization(testing.TestCase):
     def test_init(self):
         client = SoftLayer.Client(username='doesnotexist',
                                   api_key='issurelywrong',
@@ -144,7 +144,10 @@ class APIClient(testing.TestCase):
     @mock.patch('SoftLayer.API.BaseClient.call')
     def test_iter_call(self, _call):
         # chunk=100, no limit
-        _call.side_effect = [list(range(100)), list(range(100, 125))]
+        _call.side_effect = [
+            transports.SoftLayerListResult(range(100), 125),
+            transports.SoftLayerListResult(range(100, 125), 125)
+        ]
         result = list(self.client.iter_call('SERVICE', 'METHOD', iter=True))
 
         self.assertEqual(list(range(125)), result)
@@ -155,7 +158,11 @@ class APIClient(testing.TestCase):
         _call.reset_mock()
 
         # chunk=100, no limit. Requires one extra request.
-        _call.side_effect = [list(range(100)), list(range(100, 200)), []]
+        _call.side_effect = [
+            transports.SoftLayerListResult(range(100), 201),
+            transports.SoftLayerListResult(range(100, 200), 201),
+            transports.SoftLayerListResult([], 201)
+        ]
         result = list(self.client.iter_call('SERVICE', 'METHOD', iter=True))
         self.assertEqual(list(range(200)), result)
         _call.assert_has_calls([
@@ -166,13 +173,16 @@ class APIClient(testing.TestCase):
         _call.reset_mock()
 
         # chunk=25, limit=30
-        _call.side_effect = [list(range(0, 25)), list(range(25, 30))]
+        _call.side_effect = [
+            transports.SoftLayerListResult(range(0, 25), 30),
+            transports.SoftLayerListResult(range(25, 30), 30)
+        ]
         result = list(self.client.iter_call(
-            'SERVICE', 'METHOD', iter=True, limit=30, chunk=25))
+            'SERVICE', 'METHOD', iter=True, limit=25))
         self.assertEqual(list(range(30)), result)
         _call.assert_has_calls([
             mock.call('SERVICE', 'METHOD', iter=False, limit=25, offset=0),
-            mock.call('SERVICE', 'METHOD', iter=False, limit=5, offset=25),
+            mock.call('SERVICE', 'METHOD', iter=False, limit=25, offset=25),
         ])
         _call.reset_mock()
 
@@ -185,26 +195,27 @@ class APIClient(testing.TestCase):
         ])
         _call.reset_mock()
 
-        # chunk=25, limit=30, offset=12
-        _call.side_effect = [list(range(0, 25)), list(range(25, 30))]
+        _call.side_effect = [
+            transports.SoftLayerListResult(range(0, 25), 30),
+            transports.SoftLayerListResult(range(25, 30), 30)
+        ]
         result = list(self.client.iter_call('SERVICE', 'METHOD', 'ARG',
                                             iter=True,
-                                            limit=30,
-                                            chunk=25,
+                                            limit=25,
                                             offset=12))
         self.assertEqual(list(range(30)), result)
         _call.assert_has_calls([
             mock.call('SERVICE', 'METHOD', 'ARG',
                       iter=False, limit=25, offset=12),
             mock.call('SERVICE', 'METHOD', 'ARG',
-                      iter=False, limit=5, offset=37),
+                      iter=False, limit=25, offset=37),
         ])
 
         # Chunk size of 0 is invalid
         self.assertRaises(
             AttributeError,
             lambda: list(self.client.iter_call('SERVICE', 'METHOD',
-                                               iter=True, chunk=0)))
+                                               iter=True, limit=0)))
 
     def test_call_invalid_arguments(self):
         self.assertRaises(

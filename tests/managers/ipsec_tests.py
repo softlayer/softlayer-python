@@ -125,7 +125,7 @@ class IPSECTests(testing.TestCase):
     def test_get_translation(self):
         mock = self.set_mock('SoftLayer_Account', 'getNetworkTunnelContexts')
         mock.return_value = [{'id': 445, 'addressTranslations':
-                             [{'id': 234123}, {'id': 872341}]}]
+                              [{'id': 234123}, {'id': 872341}]}]
         self.assertEqual(self.ipsec.get_translation(445, 872341),
                          {'id': 872341,
                           'customerIpAddress': '',
@@ -136,7 +136,7 @@ class IPSECTests(testing.TestCase):
     def test_get_translation_raises_error(self):
         mock = self.set_mock('SoftLayer_Account', 'getNetworkTunnelContexts')
         mock.return_value = [{'id': 445, 'addressTranslations':
-                             [{'id': 234123}]}]
+                              [{'id': 234123}]}]
         self.assertRaises(SoftLayerAPIError,
                           self.ipsec.get_translation,
                           445,

@@ -32,6 +32,10 @@ deleteOriginPullRule = True
 
 loadContent = True
 
-purgeContent = True
+purgeContent = [
+    {'url': 'http://z/img/0z020.png', 'statusCode': 'SUCCESS'},
+    {'url': 'http://y/img/0z010.png', 'statusCode': 'FAILED'},
+    {'url': 'http://', 'statusCode': 'INVALID_URL'}
+]
 
-purgeCache = True
+purgeCache = [{'url': 'http://example.com', 'statusCode': 'SUCCESS'}]

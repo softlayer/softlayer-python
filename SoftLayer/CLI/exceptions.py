@@ -10,6 +10,7 @@
 # pylint: disable=keyword-arg-before-vararg
 class CLIHalt(SystemExit):
     """Smoothly halt the execution of the command. No error."""
+
     def __init__(self, code=0, *args):
         super(CLIHalt, self).__init__(*args)
         self.code = code
@@ -23,6 +24,7 @@ class CLIHalt(SystemExit):
 
 class CLIAbort(CLIHalt):
     """Halt the execution of the command. Gives an exit code of 2."""
+
     def __init__(self, msg, *args):
         super(CLIAbort, self).__init__(code=2, *args)
         self.message = msg
@@ -30,6 +32,7 @@ class CLIAbort(CLIHalt):
 
 class ArgumentError(CLIAbort):
     """Halt the execution of the command because of invalid arguments."""
+
     def __init__(self, msg, *args):
         super(ArgumentError, self).__init__(msg, *args)
         self.message = "Argument Error: %s" % msg

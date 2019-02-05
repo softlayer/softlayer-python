@@ -43,7 +43,7 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
     can then be converted to be made programmatically by calling
     SoftLayer.OrderingManager.place_order() with the same keynames.
 
-    Packages for ordering can be retrived from `slcli order package-list`
+    Packages for ordering can be retrieved from `slcli order package-list`
     Presets for ordering can be retrieved from `slcli order preset-list` (not all packages
     have presets)
 
@@ -83,12 +83,12 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
               'extras': extras,
               'quantity': 1,
               'complex_type': complex_type,
-              'hourly': True if billing == 'hourly' else False}
+              'hourly': bool(billing == 'hourly')}
 
     if verify:
         table = formatting.Table(COLUMNS)
         order_to_place = manager.verify_order(*args, **kwargs)
-        for price in order_to_place['prices']:
+        for price in order_to_place['orderContainers'][0]['prices']:
             cost_key = 'hourlyRecurringFee' if billing == 'hourly' else 'recurringFee'
             table.add_row([
                 price['item']['keyName'],

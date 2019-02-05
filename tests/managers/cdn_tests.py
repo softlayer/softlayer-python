@@ -5,6 +5,7 @@
     :license: MIT, see LICENSE for more details.
 """
 import math
+import mock
 
 from SoftLayer import fixtures
 from SoftLayer.managers import cdn
@@ -110,25 +111,30 @@ class CDNTests(testing.TestCase):
                          math.ceil(len(urls) / float(cdn.MAX_URLS_PER_PURGE)))
 
     def test_purge_content_failure(self):
-        urls = ['http://z/img/0x004.png',
+        urls = ['http://',
                 'http://y/img/0x002.png',
                 'http://x/img/0x001.png']
 
-        mock = self.set_mock('SoftLayer_Network_ContentDelivery_Account',
-                             'purgeCache')
-        mock.return_value = False
+        contents = [
+            {'url': urls[0], 'statusCode': 'INVALID_URL'},
+            {'url': urls[1], 'statusCode': 'FAILED'},
+            {'url': urls[2], 'statusCode': 'FAILED'}
+        ]
 
-        self.cdn_client.purge_content(12345, urls)
-        calls = self.calls('SoftLayer_Network_ContentDelivery_Account',
-                           'purgeCache')
-        self.assertEqual(len(calls),
-                         math.ceil(len(urls) / float(cdn.MAX_URLS_PER_PURGE)))
+        self.cdn_client.account = mock.Mock()
+        self.cdn_client.account.purgeCache.return_value = contents
+
+        result = self.cdn_client.purge_content(12345, urls)
+
+        self.assertEqual(contents, result)
 
     def test_purge_content_single(self):
         url = 'http://geocities.com/Area51/Meteor/12345/under_construction.gif'
+        self.cdn_client.account = mock.Mock()
+        self.cdn_client.account.purgeCache.return_value = [{'url': url, 'statusCode': 'SUCCESS'}]
 
-        self.cdn_client.purge_content(12345, url)
-        self.assert_called_with('SoftLayer_Network_ContentDelivery_Account',
-                                'purgeCache',
-                                args=([url],),
-                                identifier=12345)
+        expected = [{'url': url, 'statusCode': 'SUCCESS'}]
+
+        result = self.cdn_client.purge_content(12345, url)
+
+        self.assertEqual(expected, result)

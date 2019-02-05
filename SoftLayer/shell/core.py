@@ -14,9 +14,7 @@ import traceback
 
 import click
 from prompt_toolkit import auto_suggest as p_auto_suggest
-from prompt_toolkit import history as p_history
 from prompt_toolkit import shortcuts as p_shortcuts
-from pygments import token
 
 from SoftLayer.CLI import core
 from SoftLayer.CLI import environment
@@ -28,7 +26,6 @@ from SoftLayer.shell import routes
 
 class ShellExit(Exception):
     """Exception raised to quit the shell."""
-    pass
 
 
 @click.command()
@@ -49,33 +46,14 @@ def cli(ctx, env):
     app_path = click.get_app_dir('softlayer_shell')
     if not os.path.exists(app_path):
         os.makedirs(app_path)
-    history = p_history.FileHistory(os.path.join(app_path, 'history'))
     complete = completer.ShellCompleter(core.cli)
 
     while True:
-        def get_prompt_tokens(_):
-            """Returns tokens for the command prompt"""
-            tokens = []
-            try:
-                tokens.append((token.Token.Username, env.client.auth.username))
-                tokens.append((token.Token.At, "@"))
-            except AttributeError:
-                pass
-
-            tokens.append((token.Token.Host, "slcli-shell"))
-            if env.vars['last_exit_code']:
-                tokens.append((token.Token.ErrorPrompt, '> '))
-            else:
-                tokens.append((token.Token.Prompt, '> '))
-
-            return tokens
-
         try:
             line = p_shortcuts.prompt(
                 completer=complete,
-                history=history,
+                complete_while_typing=True,
                 auto_suggest=p_auto_suggest.AutoSuggestFromHistory(),
-                get_prompt_tokens=get_prompt_tokens,
             )
 
             # Parse arguments

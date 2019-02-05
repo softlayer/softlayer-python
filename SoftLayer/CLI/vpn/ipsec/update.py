@@ -13,55 +13,54 @@ from SoftLayer.CLI.exceptions import CLIHalt
 @click.option('--friendly-name',
               default=None,
               help='Friendly name value')
-# todo: Update to utilize custom IP address type
 @click.option('--remote-peer',
               default=None,
               help='Remote peer IP address value')
 @click.option('--preshared-key',
               default=None,
               help='Preshared key value')
-@click.option('--p1-auth',
-              '--phase1-auth',
+@click.option('--phase1-auth',
+              '--p1-auth',
               default=None,
               type=click.Choice(['MD5', 'SHA1', 'SHA256']),
               help='Phase 1 authentication value')
-@click.option('--p1-crypto',
-              '--phase1-crypto',
+@click.option('--phase1-crypto',
+              '--p1-crypto',
               default=None,
               type=click.Choice(['DES', '3DES', 'AES128', 'AES192', 'AES256']),
               help='Phase 1 encryption value')
-@click.option('--p1-dh',
-              '--phase1-dh',
+@click.option('--phase1-dh',
+              '--p1-dh',
               default=None,
               type=click.Choice(['0', '1', '2', '5']),
               help='Phase 1 diffie hellman group value')
-@click.option('--p1-key-ttl',
-              '--phase1-key-ttl',
+@click.option('--phase1-key-ttl',
+              '--p1-key-ttl',
               default=None,
               type=click.IntRange(120, 172800),
               help='Phase 1 key life value')
-@click.option('--p2-auth',
-              '--phase2-auth',
+@click.option('--phase2-auth',
+              '--p2-auth',
               default=None,
               type=click.Choice(['MD5', 'SHA1', 'SHA256']),
               help='Phase 2 authentication value')
-@click.option('--p2-crypto',
-              '--phase2-crypto',
+@click.option('--phase2-crypto',
+              '--p2-crypto',
               default=None,
               type=click.Choice(['DES', '3DES', 'AES128', 'AES192', 'AES256']),
               help='Phase 2 encryption value')
-@click.option('--p2-dh',
-              '--phase2-dh',
+@click.option('--phase2-dh',
+              '--p2-dh',
               default=None,
               type=click.Choice(['0', '1', '2', '5']),
               help='Phase 2 diffie hellman group value')
-@click.option('--p2-forward-secrecy',
-              '--phase2-forward-secrecy',
+@click.option('--phase2-forward-secrecy',
+              '--p2-forward-secrecy',
               default=None,
               type=click.IntRange(0, 1),
               help='Phase 2 perfect forward secrecy value')
-@click.option('--p2-key-ttl',
-              '--phase2-key-ttl',
+@click.option('--phase2-key-ttl',
+              '--p2-key-ttl',
               default=None,
               type=click.IntRange(120, 172800),
               help='Phase 2 key life value')

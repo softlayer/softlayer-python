@@ -8,6 +8,7 @@ import copy
 
 import mock
 
+
 import SoftLayer
 from SoftLayer import fixtures
 from SoftLayer import managers
@@ -36,6 +37,7 @@ class HardwareTests(testing.TestCase):
         self.assertEqual(mgr.ordering_manager, ordering_manager)
 
     def test_list_hardware(self):
+        # Cast result back to list because list_hardware is now a generator
         results = self.hardware.list_hardware()
 
         self.assertEqual(results, fixtures.SoftLayer_Account.getHardware)
@@ -126,10 +128,16 @@ class HardwareTests(testing.TestCase):
                 'key': '10',
                 'name': '10 Mbps Public & Private Network Uplinks'
             }],
-            'sizes': [{
-                'key': 'S1270_8GB_2X1TBSATA_NORAID',
-                'name': 'Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID'
-            }]
+            'sizes': [
+                {
+                    'key': 'S1270_8GB_2X1TBSATA_NORAID',
+                    'name': 'Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID'
+                },
+                {
+                    'key': 'DGOLD_6140_384GB_4X960GB_SSD_SED_RAID_10',
+                    'name': 'Dual Xeon Gold, 384GB Ram, 4x960GB SSD, RAID 10'
+                }
+            ]
         }
 
         self.assertEqual(options, expected)
@@ -138,9 +146,8 @@ class HardwareTests(testing.TestCase):
         packages = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         packages.return_value = []
 
-        ex = self.assertRaises(SoftLayer.SoftLayerError,
-                               self.hardware.get_create_options)
-        self.assertEqual("Ordering package not found", str(ex))
+        ex = self.assertRaises(SoftLayer.SoftLayerError, self.hardware.get_create_options)
+        self.assertEqual("Package BARE_METAL_SERVER does not exist", str(ex))
 
     def test_generate_create_dict_no_items(self):
         packages = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
@@ -241,51 +248,77 @@ class HardwareTests(testing.TestCase):
 
     def test_cancel_hardware_without_reason(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
-        mock.return_value = {'id': 987, 'billingItem': {'id': 1234}}
+        mock.return_value = {'id': 987, 'billingItem': {'id': 1234},
+                             'openCancellationTicket': {'id': 1234}}
 
         result = self.hardware.cancel_hardware(987)
 
         self.assertEqual(result, True)
         reasons = self.hardware.get_cancellation_reasons()
         args = (False, False, reasons['unneeded'], '')
-        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
-                                identifier=1234,
-                                args=args)
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem', identifier=1234, args=args)
 
     def test_cancel_hardware_with_reason_and_comment(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
-        mock.return_value = {'id': 987, 'billingItem': {'id': 1234}}
+        mock.return_value = {'id': 987, 'billingItem': {'id': 1234},
+                             'openCancellationTicket': {'id': 1234}}
 
-        result = self.hardware.cancel_hardware(6327,
-                                               reason='sales',
-                                               comment='Test Comment')
+        result = self.hardware.cancel_hardware(6327, reason='sales', comment='Test Comment')
 
         self.assertEqual(result, True)
         reasons = self.hardware.get_cancellation_reasons()
         args = (False, False, reasons['sales'], 'Test Comment')
-        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
-                                identifier=1234,
-                                args=args)
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem', identifier=1234, args=args)
 
     def test_cancel_hardware(self):
-
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        mock.return_value = {'id': 987, 'billingItem': {'id': 6327},
+                             'openCancellationTicket': {'id': 4567}}
         result = self.hardware.cancel_hardware(6327)
 
         self.assertEqual(result, True)
-        self.assert_called_with('SoftLayer_Billing_Item',
-                                'cancelItem',
-                                identifier=6327,
-                                args=(False, False, 'No longer needed', ''))
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
+                                identifier=6327, args=(False, False, 'No longer needed', ''))
 
     def test_cancel_hardware_no_billing_item(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
-        mock.return_value = {'id': 987}
+        mock.return_value = {'id': 987, 'openCancellationTicket': {'id': 1234},
+                             'openCancellationTicket': {'id': 1234}}
 
         ex = self.assertRaises(SoftLayer.SoftLayerError,
                                self.hardware.cancel_hardware,
                                6327)
-        self.assertEqual("No billing item found for hardware",
-                         str(ex))
+        self.assertEqual("Ticket #1234 already exists for this server", str(ex))
+
+    def test_cancel_hardware_monthly_now(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        mock.return_value = {'id': 987, 'billingItem': {'id': 1234},
+                             'openCancellationTicket': {'id': 4567},
+                             'hourlyBillingFlag': False}
+        with self.assertLogs('SoftLayer.managers.hardware', level='INFO') as logs:
+            result = self.hardware.cancel_hardware(987, immediate=True)
+        # should be 2 infom essages here
+        self.assertEqual(len(logs.records), 2)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
+                                identifier=1234, args=(False, False, 'No longer needed', ''))
+        cancel_message = "Please reclaim this server ASAP, it is no longer needed. Thankyou."
+        self.assert_called_with('SoftLayer_Ticket', 'addUpdate',
+                                identifier=4567, args=({'entry': cancel_message},))
+
+    def test_cancel_hardware_monthly_whenever(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        mock.return_value = {'id': 987, 'billingItem': {'id': 6327},
+                             'openCancellationTicket': {'id': 4567}}
+
+        with self.assertLogs('SoftLayer.managers.hardware', level='INFO') as logs:
+            result = self.hardware.cancel_hardware(987, immediate=False)
+        # should be 2 infom essages here
+        self.assertEqual(len(logs.records), 1)
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
+                                identifier=6327, args=(False, False, 'No longer needed', ''))
 
     def test_change_port_speed_public(self):
         self.hardware.change_port_speed(2, True, 100)

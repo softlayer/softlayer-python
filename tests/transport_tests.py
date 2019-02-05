@@ -256,6 +256,14 @@ class TestXmlRpcAPICall(testing.TestCase):
 
         self.assertRaises(SoftLayer.TransportError, self.transport, req)
 
+    def test_print_reproduceable(self):
+        req = transports.Request()
+        req.url = "https://test.com"
+        req.payload = "testing"
+        req.transport_headers = {"test-headers": 'aaaa'}
+        output_text = self.transport.print_reproduceable(req)
+        self.assertIn("https://test.com", output_text)
+
 
 @mock.patch('SoftLayer.transports.requests.Session.request')
 @pytest.mark.parametrize(
@@ -341,16 +349,50 @@ class TestRestAPICall(testing.TestCase):
             timeout=None)
 
     @mock.patch('SoftLayer.transports.requests.Session.request')
-    def test_error(self, request):
+    def test_http_and_json_error(self, request):
         # Test JSON Error
         e = requests.HTTPError('error')
         e.response = mock.MagicMock()
         e.response.status_code = 404
-        e.response.text = '''{
+        e.response.text = '''
             "error": "description",
             "code": "Error Code"
-        }'''
+        '''
         request().raise_for_status.side_effect = e
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'Resource'
+        self.assertRaises(SoftLayer.SoftLayerAPIError, self.transport, req)
+
+    @mock.patch('SoftLayer.transports.requests.Session.request')
+    def test_http_and_empty_error(self, request):
+        # Test JSON Error
+        e = requests.HTTPError('error')
+        e.response = mock.MagicMock()
+        e.response.status_code = 404
+        e.response.text = ''
+        request().raise_for_status.side_effect = e
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'Resource'
+        self.assertRaises(SoftLayer.SoftLayerAPIError, self.transport, req)
+
+    @mock.patch('SoftLayer.transports.requests.Session.request')
+    def test_empty_error(self, request):
+        # Test empty response error.
+        request().text = ''
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'Resource'
+        self.assertRaises(SoftLayer.SoftLayerAPIError, self.transport, req)
+
+    @mock.patch('SoftLayer.transports.requests.Session.request')
+    def test_json_error(self, request):
+        # Test non-json response error.
+        request().text = 'Not JSON'
 
         req = transports.Request()
         req.service = 'SoftLayer_Service'
@@ -529,7 +571,7 @@ class TestRestAPICall(testing.TestCase):
             headers=mock.ANY,
             auth=None,
             data=None,
-            params={'limit': 10, 'offset': 5},
+            params={'resultLimit': '5,10'},
             verify=True,
             cert=None,
             proxies=None,
@@ -578,6 +620,14 @@ class TestRestAPICall(testing.TestCase):
             proxies=None,
             timeout=None)
 
+    def test_print_reproduceable(self):
+        req = transports.Request()
+        req.url = "https://test.com"
+        req.payload = "testing"
+        req.transport_headers = {"test-headers": 'aaaa'}
+        output_text = self.transport.print_reproduceable(req)
+        self.assertIn("https://test.com", output_text)
+
 
 class TestFixtureTransport(testing.TestCase):
 
@@ -602,3 +652,99 @@ class TestFixtureTransport(testing.TestCase):
         req.service = 'SoftLayer_Account'
         req.method = 'getObjectzzzz'
         self.assertRaises(NotImplementedError, self.transport, req)
+
+
+class TestTimingTransport(testing.TestCase):
+
+    def set_up(self):
+        fixture_transport = transports.FixtureTransport()
+        self.transport = transports.TimingTransport(fixture_transport)
+
+    def test_call(self):
+        req = transports.Request()
+        req.service = 'SoftLayer_Account'
+        req.method = 'getObject'
+        resp = self.transport(req)
+        self.assertEqual(resp['accountId'], 1234)
+
+    def test_get_last_calls(self):
+        req = transports.Request()
+        req.service = 'SoftLayer_Account'
+        req.method = 'getObject'
+        resp = self.transport(req)
+        self.assertEqual(resp['accountId'], 1234)
+        calls = self.transport.get_last_calls()
+        self.assertEqual(calls[0][0].service, 'SoftLayer_Account')
+
+    def test_print_reproduceable(self):
+        req = transports.Request()
+        req.service = 'SoftLayer_Account'
+        req.method = 'getObject'
+        output_text = self.transport.print_reproduceable(req)
+        self.assertEqual('SoftLayer_Account', output_text)
+
+
+class TestDebugTransport(testing.TestCase):
+
+    def set_up(self):
+        fixture_transport = transports.FixtureTransport()
+        self.transport = transports.DebugTransport(fixture_transport)
+        req = transports.Request()
+        req.service = 'SoftLayer_Account'
+        req.method = 'getObject'
+        self.req = req
+
+    def test_call(self):
+
+        resp = self.transport(self.req)
+        self.assertEqual(resp['accountId'], 1234)
+
+    def test_get_last_calls(self):
+
+        resp = self.transport(self.req)
+        self.assertEqual(resp['accountId'], 1234)
+        calls = self.transport.get_last_calls()
+        self.assertEqual(calls[0].service, 'SoftLayer_Account')
+
+    def test_print_reproduceable(self):
+        req = transports.Request()
+        req.service = 'SoftLayer_Account'
+        req.method = 'getObject'
+        output_text = self.transport.print_reproduceable(self.req)
+        self.assertEqual('SoftLayer_Account', output_text)
+
+    def test_print_reproduceable_post(self):
+        req = transports.Request()
+        req.url = "https://test.com"
+        req.payload = "testing"
+        req.transport_headers = {"test-headers": 'aaaa'}
+        req.args = 'createObject'
+
+        rest_transport = transports.RestTransport()
+        transport = transports.DebugTransport(rest_transport)
+
+        output_text = transport.print_reproduceable(req)
+
+        self.assertIn("https://test.com", output_text)
+        self.assertIn("-X POST", output_text)
+
+    @mock.patch('SoftLayer.transports.requests.Session.request')
+    def test_error(self, request):
+        # Test JSON Error
+        e = requests.HTTPError('error')
+        e.response = mock.MagicMock()
+        e.response.status_code = 404
+        e.response.text = '''{
+            "error": "description",
+            "code": "Error Code"
+        }'''
+        request().raise_for_status.side_effect = e
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'Resource'
+        rest_transport = transports.RestTransport()
+        transport = transports.DebugTransport(rest_transport)
+        self.assertRaises(SoftLayer.SoftLayerAPIError, transport, req)
+        calls = transport.get_last_calls()
+        self.assertEqual(404, calls[0].exception.faultCode)

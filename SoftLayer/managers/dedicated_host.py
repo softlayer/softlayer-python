@@ -1,6 +1,6 @@
 """
     SoftLayer.dedicatedhost
-    ~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~
     DH Manager/helpers
 
     :license: MIT, see License for more details.
@@ -23,36 +23,157 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
 
         See product information here https://www.ibm.com/cloud/dedicated
 
-        Example::
-            # Initialize the DedicatedHostManager.
-            # env variables. These can also be specified in ~/.softlayer,
-            # or passed directly to SoftLayer.Client()
-            # SL_USERNAME = YOUR_USERNAME
-            # SL_API_KEY = YOUR_API_KEY
-            import SoftLayer
-            client = SoftLayer.Client()
-            mgr = SoftLayer.DedicatedHostManager(client)
 
     :param SoftLayer.API.BaseClient client: the client instance
-    :param SoftLayer.managers.OrderingManager ordering_manager: an optional
-                                              manager to handle ordering.
-                                              If none is provided, one will be
-                                              auto initialized.
+    :param SoftLayer.managers.OrderingManager ordering_manager: an optional manager to handle ordering.
+                                              If none is provided, one will be auto initialized.
     """
 
     def __init__(self, client, ordering_manager=None):
         self.client = client
         self.account = client['Account']
         self.host = client['Virtual_DedicatedHost']
+        self.guest = client['Virtual_Guest']
 
         if ordering_manager is None:
             self.ordering_manager = ordering.OrderingManager(client)
 
+    def cancel_host(self, host_id):
+        """Cancel a dedicated host immediately, it fails if there are still guests in the host.
+
+        :param host_id: The ID of the dedicated host to be cancelled.
+        :return: True on success or an exception
+
+        Example::
+            # Cancels dedicated host id 12345
+            result = mgr.cancel_host(12345)
+
+        """
+        return self.host.deleteObject(id=host_id)
+
+    def cancel_guests(self, host_id):
+        """Cancel all guests into the dedicated host immediately.
+
+        To cancel an specified guest use the method VSManager.cancel_instance()
+
+        :param host_id: The ID of the dedicated host.
+        :return: The id, fqdn and status of all guests into a dictionary. The status
+                 could be 'Cancelled' or an exception message, The dictionary is empty
+                 if there isn't any guest in the dedicated host.
+
+        Example::
+            # Cancel guests of dedicated host id 12345
+            result = mgr.cancel_guests(12345)
+        """
+        result = []
+
+        guests = self.host.getGuests(id=host_id, mask='id,fullyQualifiedDomainName')
+
+        if guests:
+            for vs in guests:
+                status_info = {
+                    'id': vs['id'],
+                    'fqdn': vs['fullyQualifiedDomainName'],
+                    'status': self._delete_guest(vs['id'])
+                }
+                result.append(status_info)
+
+        return result
+
+    def list_guests(self, host_id, tags=None, cpus=None, memory=None, hostname=None,
+                    domain=None, local_disk=None, nic_speed=None, public_ip=None,
+                    private_ip=None, **kwargs):
+        """Retrieve a list of all virtual servers on the dedicated host.
+
+        Example::
+
+            # Print out a list of instances with 4 cpu cores in the host id 12345.
+
+            for vsi in mgr.list_guests(host_id=12345, cpus=4):
+               print vsi['fullyQualifiedDomainName'], vsi['primaryIpAddress']
+
+            # Using a custom object-mask. Will get ONLY what is specified
+            object_mask = "mask[hostname,monitoringRobot[robotStatus]]"
+            for vsi in mgr.list_guests(mask=object_mask,cpus=4):
+                print vsi
+
+        :param integer host_id: the identifier of dedicated host
+        :param list tags: filter based on list of tags
+        :param integer cpus: filter based on number of CPUS
+        :param integer memory: filter based on amount of memory
+        :param string hostname: filter based on hostname
+        :param string domain: filter based on domain
+        :param string local_disk: filter based on local_disk
+        :param integer nic_speed: filter based on network speed (in MBPS)
+        :param string public_ip: filter based on public ip address
+        :param string private_ip: filter based on private ip address
+        :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
+        :returns: Returns a list of dictionaries representing the matching
+                  virtual servers
+        """
+        if 'mask' not in kwargs:
+            items = [
+                'id',
+                'globalIdentifier',
+                'hostname',
+                'domain',
+                'fullyQualifiedDomainName',
+                'primaryBackendIpAddress',
+                'primaryIpAddress',
+                'lastKnownPowerState.name',
+                'hourlyBillingFlag',
+                'powerState',
+                'maxCpu',
+                'maxMemory',
+                'datacenter',
+                'activeTransaction.transactionStatus[friendlyName,name]',
+                'status',
+            ]
+            kwargs['mask'] = "mask[%s]" % ','.join(items)
+
+        _filter = utils.NestedDict(kwargs.get('filter') or {})
+
+        if tags:
+            _filter['guests']['tagReferences']['tag']['name'] = {
+                'operation': 'in',
+                'options': [{'name': 'data', 'value': tags}],
+            }
+
+        if cpus:
+            _filter['guests']['maxCpu'] = utils.query_filter(cpus)
+
+        if memory:
+            _filter['guests']['maxMemory'] = utils.query_filter(memory)
+
+        if hostname:
+            _filter['guests']['hostname'] = utils.query_filter(hostname)
+
+        if domain:
+            _filter['guests']['domain'] = utils.query_filter(domain)
+
+        if local_disk is not None:
+            _filter['guests']['localDiskFlag'] = (
+                utils.query_filter(bool(local_disk)))
+
+        if nic_speed:
+            _filter['guests']['networkComponents']['maxSpeed'] = (
+                utils.query_filter(nic_speed))
+
+        if public_ip:
+            _filter['guests']['primaryIpAddress'] = (
+                utils.query_filter(public_ip))
+
+        if private_ip:
+            _filter['guests']['primaryBackendIpAddress'] = (
+                utils.query_filter(private_ip))
+
+        kwargs['filter'] = _filter.to_dict()
+        kwargs['iter'] = True
+        return self.host.getGuests(id=host_id, **kwargs)
+
     def list_instances(self, tags=None, cpus=None, memory=None, hostname=None,
                        disk=None, datacenter=None, **kwargs):
         """Retrieve a list of all dedicated hosts on the account
-
-        Example::
 
         :param list tags: filter based on list of tags
         :param integer cpus: filter based on number of CPUS
@@ -61,10 +182,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         :param string disk: filter based on disk
         :param string datacenter: filter based on datacenter
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
-        :returns: Returns a list of dictionaries representing the matching
-                  dedicated host.
-
-
+        :returns: Returns a list of dictionaries representing the matching dedicated host.
 
         """
         if 'mask' not in kwargs:
@@ -113,8 +231,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         """Get details about a dedicated host.
 
         :param integer : the host ID
-        :returns: A dictionary containing a large amount of information about
-                  the specified instance.
+        :returns: A dictionary containing host information.
 
         Example::
 
@@ -260,18 +377,15 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
             capacity,
             keyName,
             itemCategory[categoryCode],
-            bundleItems[capacity, categories[categoryCode]]
+            bundleItems[capacity,keyName,categories[categoryCode],hardwareGenericComponentModel[id,
+            hardwareComponentType[keyName]]]
         ],
         regions[location[location[priceGroups]]]
         '''
 
         package_keyname = 'DEDICATED_HOST'
+        package = self.ordering_manager.get_package_by_key(package_keyname, mask=mask)
 
-        package = self.ordering_manager.get_package_by_key(package_keyname,
-                                                           mask=mask)
-
-        if package is None:
-            raise SoftLayer.SoftLayerError("Ordering package not found")
         return package
 
     def _get_location(self, regions, datacenter):
@@ -281,8 +395,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
             if region['location']['location']['name'] == datacenter:
                 return region
 
-        raise SoftLayer.SoftLayerError("Could not find valid location for: '%s'"
-                                       % datacenter)
+        raise SoftLayer.SoftLayerError("Could not find valid location for: '%s'" % datacenter)
 
     def get_create_options(self):
         """Returns valid options for ordering a dedicated host."""
@@ -304,10 +417,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                     'key': item['keyName'],
                 })
 
-        return {
-            'locations': locations,
-            'dedicated_host': dedicated_host,
-        }
+        return {'locations': locations, 'dedicated_host': dedicated_host}
 
     def _get_price(self, package):
         """Returns valid price for ordering a dedicated host."""
@@ -316,8 +426,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
             if not price.get('locationGroupId'):
                 return price['id']
 
-        raise SoftLayer.SoftLayerError(
-            "Could not find valid price")
+        raise SoftLayer.SoftLayerError("Could not find valid price")
 
     def _get_item(self, package, flavor):
         """Returns the item for ordering a dedicated host."""
@@ -326,8 +435,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
             if item['keyName'] == flavor:
                 return item
 
-        raise SoftLayer.SoftLayerError("Could not find valid item for: '%s'"
-                                       % flavor)
+        raise SoftLayer.SoftLayerError("Could not find valid item for: '%s'" % flavor)
 
     def _get_backend_router(self, locations, item):
         """Returns valid router options for ordering a dedicated host."""
@@ -344,6 +452,32 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                 if category['categoryCode'] == 'dedicated_host_disk':
                     disk_capacity = capacity['capacity']
 
+        for hardwareComponent in item['bundleItems']:
+            if hardwareComponent['keyName'].find("GPU") != -1:
+                hardwareComponentType = hardwareComponent['hardwareGenericComponentModel']['hardwareComponentType']
+                gpuComponents = [
+                    {
+                        'hardwareComponentModel': {
+                            'hardwareGenericComponentModel': {
+                                'id': hardwareComponent['hardwareGenericComponentModel']['id'],
+                                'hardwareComponentType': {
+                                    'keyName': hardwareComponentType['keyName']
+                                }
+                            }
+                        }
+                    },
+                    {
+                        'hardwareComponentModel': {
+                            'hardwareGenericComponentModel': {
+                                'id': hardwareComponent['hardwareGenericComponentModel']['id'],
+                                'hardwareComponentType': {
+                                    'keyName': hardwareComponentType['keyName']
+                                }
+                            }
+                        }
+                    }
+                ]
+
         if locations is not None:
             for location in locations:
                 if location['locationId'] is not None:
@@ -356,6 +490,8 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                             'id': loc_id
                         }
                     }
+                    if item['keyName'].find("GPU") != -1:
+                        host['pciDevices'] = gpuComponents
                     routers = self.host.getAvailableRouters(host, mask=mask)
                     return routers
 
@@ -382,3 +518,13 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         item = self._get_item(package, flavor)
 
         return self._get_backend_router(location['location']['locationPackageDetails'], item)
+
+    def _delete_guest(self, guest_id):
+        """Deletes a guest and returns 'Cancelled' or and Exception message"""
+        msg = 'Cancelled'
+        try:
+            self.guest.deleteObject(id=guest_id)
+        except SoftLayer.SoftLayerAPIError as e:
+            msg = 'Exception: ' + e.faultString
+
+        return msg

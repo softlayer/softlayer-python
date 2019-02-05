@@ -1,6 +1,7 @@
-requests
-click >= 5
-prettytable >= 0.7.0
 six >= 1.7.0
-prompt_toolkit
-urllib3
+ptable >= 0.9.2
+click >= 7
+requests >= 2.20.0
+prompt_toolkit >= 0.53
+pygments >= 2.0.0
+urllib3 >= 1.24

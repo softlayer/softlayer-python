@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 
+# # pylint: disable=bad-continuation
 getPrivateBlockDeviceTemplateGroups = [{
     'accountId': 1234,
     'blockDevices': [],
@@ -315,9 +316,14 @@ getSubnets = [
     {
         'id': '100',
         'networkIdentifier': '10.0.0.1',
+        'cidr': '/24',
+        'networkVlanId': 123,
         'datacenter': {'name': 'dal00'},
         'version': 4,
-        'subnetType': 'PRIMARY'
+        'subnetType': 'PRIMARY',
+        'ipAddressCount': 10,
+        'virtualGuests': [],
+        'hardware': []
     }]
 
 getSshKeys = [{'id': '100', 'label': 'Test 1'},
@@ -553,9 +559,106 @@ getDedicatedHosts = [{
         'name': 'dal05'
     },
     'memoryCapacity': 242,
-    'name': 'khnguyendh',
+    'name': 'test-dedicated',
     'diskCapacity': 1200,
     'guestCount': 1,
     'cpuCount': 56,
-    'id': 44701
+    'id': 12345
+}]
+
+
+getUsers = [
+    {'displayName': 'ChristopherG',
+     'hardwareCount': 138,
+     'id': 11100,
+     'userStatus': {'name': 'Active'},
+     'username': 'SL1234',
+     'virtualGuestCount': 99},
+    {'displayName': 'PulseL',
+     'hardwareCount': 100,
+     'id': 11111,
+     'userStatus': {'name': 'Active'},
+     'username': 'sl1234-abob',
+     'virtualGuestCount': 99}
+]
+
+getReservedCapacityGroups = [
+    {
+        'accountId': 1234,
+        'backendRouterId': 1411193,
+        'createDate': '2018-09-24T16:33:09-06:00',
+        'id': 3103,
+        'modifyDate': '',
+        'name': 'test-capacity',
+        'availableInstanceCount': 1,
+        'instanceCount': 3,
+        'occupiedInstanceCount': 1,
+        'backendRouter': {
+            'accountId': 1,
+            'bareMetalInstanceFlag': 0,
+            'domain': 'softlayer.com',
+            'fullyQualifiedDomainName': 'bcr02a.dal13.softlayer.com',
+            'hardwareStatusId': 5,
+            'hostname': 'bcr02a.dal13',
+            'id': 1411193,
+            'notes': '',
+            'provisionDate': '',
+            'serviceProviderId': 1,
+            'serviceProviderResourceId': '',
+            'primaryIpAddress': '10.0.144.28',
+            'datacenter': {
+                'id': 1854895,
+                'longName': 'Dallas 13',
+                'name': 'dal13',
+                'statusId': 2
+            },
+            'hardwareFunction': {
+                'code': 'ROUTER',
+                'description': 'Router',
+                'id': 1
+            },
+            'topLevelLocation': {
+                'id': 1854895,
+                'longName': 'Dallas 13',
+                'name': 'dal13',
+                'statusId': 2
+            }
+        },
+        'instances': [
+            {
+                'id': 3501,
+                'billingItem': {
+                    'description': 'B1.1x2 (1 Year Term)',
+                    'hourlyRecurringFee': '.032'
+                }
+            },
+            {
+                'id': 3519,
+                'billingItem': {
+                    'description': 'B1.1x2 (1 Year Term)',
+                    'hourlyRecurringFee': '.032'
+                }
+            },
+            {
+                'id': 3519
+            }
+        ]
+    }
+]
+
+
+getPlacementGroups = [{
+    "createDate": "2019-01-18T16:08:44-06:00",
+    "id": 12345,
+    "name": "test01",
+    "guestCount": 0,
+    "backendRouter": {
+        "hostname": "bcr01a.mex01",
+        "id": 329266
+    },
+    "rule": {
+        "id": 1,
+        "keyName": "SPREAD",
+        "name": "SPREAD"
+    }
 }]

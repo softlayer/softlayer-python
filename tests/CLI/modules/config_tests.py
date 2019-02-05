@@ -51,10 +51,12 @@ class TestHelpSetup(testing.TestCase):
         transport = testing.MockableTransport(SoftLayer.FixtureTransport())
         self.env.client = SoftLayer.BaseClient(transport=transport)
 
+    @mock.patch('SoftLayer.Client')
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
     @mock.patch('SoftLayer.CLI.environment.Environment.input')
-    def test_setup(self, mocked_input, getpass, confirm_mock):
+    def test_setup(self, mocked_input, getpass, confirm_mock, client):
+        client.return_value = self.env.client
         if(sys.platform.startswith("win")):
             self.skipTest("Test doesn't work in Windows")
         with tempfile.NamedTemporaryFile() as config_file:
@@ -62,19 +64,16 @@ class TestHelpSetup(testing.TestCase):
             getpass.return_value = 'A' * 64
             mocked_input.side_effect = ['user', 'public', 0]
 
-            result = self.run_command(['--config=%s' % config_file.name,
-                                       'config', 'setup'])
+            result = self.run_command(['--config=%s' % config_file.name, 'config', 'setup'])
 
             self.assert_no_fail(result)
-            self.assertTrue('Configuration Updated Successfully'
-                            in result.output)
+            self.assertTrue('Configuration Updated Successfully' in result.output)
             contents = config_file.read().decode("utf-8")
+
             self.assertTrue('[softlayer]' in contents)
             self.assertTrue('username = user' in contents)
-            self.assertTrue('api_key = AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
-                            'AAAAAAAAAAAAAAAAAAAAAAAAAAAAA' in contents)
-            self.assertTrue('endpoint_url = %s' % consts.API_PUBLIC_ENDPOINT
-                            in contents)
+            self.assertTrue('api_key = AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' in contents)
+            self.assertTrue('endpoint_url = %s' % consts.API_PUBLIC_ENDPOINT in contents)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
@@ -114,6 +113,17 @@ class TestHelpSetup(testing.TestCase):
         _, _, endpoint_url, _ = config.get_user_input(self.env)
 
         self.assertEqual(endpoint_url, 'custom-endpoint')
+
+    @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
+    @mock.patch('SoftLayer.CLI.environment.Environment.input')
+    def test_github_1074(self, mocked_input, getpass):
+        """Tests to make sure directly using an endpoint works"""
+        getpass.return_value = 'A' * 64
+        mocked_input.side_effect = ['user', 'test-endpoint', 0]
+
+        _, _, endpoint_url, _ = config.get_user_input(self.env)
+
+        self.assertEqual(endpoint_url, 'test-endpoint')
 
     @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
     @mock.patch('SoftLayer.CLI.environment.Environment.input')

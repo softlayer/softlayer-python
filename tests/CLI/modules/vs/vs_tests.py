@@ -15,6 +15,127 @@ from SoftLayer import testing
 
 class VirtTests(testing.TestCase):
 
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_rescue_vs(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['vs', 'rescue', '100'])
+
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_rescue_vs_no_confirm(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['vs', 'rescue', '100'])
+
+        self.assertEqual(result.exit_code, 2)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_reboot_vs_default(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'rebootDefault')
+        mock.return_value = 'true'
+        confirm_mock.return_value = True
+        result = self.run_command(['vs', 'reboot', '100'])
+
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_reboot_vs_no_confirm(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'rebootDefault')
+        mock.return_value = 'true'
+        confirm_mock.return_value = False
+        result = self.run_command(['vs', 'reboot', '100'])
+
+        self.assertEqual(result.exit_code, 2)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_reboot_vs_soft(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'rebootSoft')
+        mock.return_value = 'true'
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'reboot', '--soft', '100'])
+
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_reboot_vs_hard(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'rebootHard')
+        mock.return_value = 'true'
+        confirm_mock.return_value = True
+        result = self.run_command(['vs', 'reboot', '--hard', '100'])
+
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_power_vs_off_soft(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'powerOffSoft')
+        mock.return_value = 'true'
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'power-off', '100'])
+
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_power_off_vs_no_confirm(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'powerOffSoft')
+        mock.return_value = 'true'
+        confirm_mock.return_value = False
+
+        result = self.run_command(['vs', 'power-off', '100'])
+
+        self.assertEqual(result.exit_code, 2)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_power_off_vs_hard(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'powerOff')
+        mock.return_value = 'true'
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'power-off', '--hard', '100'])
+
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_power_on_vs(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'powerOn')
+        mock.return_value = 'true'
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'power-on', '100'])
+
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_pause_vs(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'pause')
+        mock.return_value = 'true'
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'pause', '100'])
+
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_pause_vs_no_confirm(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'pause')
+        mock.return_value = 'true'
+        confirm_mock.return_value = False
+
+        result = self.run_command(['vs', 'pause', '100'])
+
+        self.assertEqual(result.exit_code, 2)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_resume_vs(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'resume')
+        mock.return_value = 'true'
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'resume', '100'])
+
+        self.assert_no_fail(result)
+
     def test_list_vs(self):
         result = self.run_command(['vs', 'list', '--tag=tag'])
 
@@ -32,6 +153,54 @@ class VirtTests(testing.TestCase):
                            'action': None,
                            'id': 104,
                            'backend_ip': '10.45.19.35'}])
+
+    @mock.patch('SoftLayer.utils.lookup')
+    def test_detail_vs_empty_billing(self, mock_lookup):
+        def mock_lookup_func(dic, key, *keys):
+            if key == 'billingItem':
+                return []
+            if keys:
+                return mock_lookup_func(dic.get(key, {}), keys[0], *keys[1:])
+            return dic.get(key)
+
+        mock_lookup.side_effect = mock_lookup_func
+
+        result = self.run_command(['vs', 'detail', '100', '--passwords', '--price'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output),
+                         {'active_transaction': None,
+                          'cores': 2,
+                          'created': '2013-08-01 15:23:45',
+                          'datacenter': 'TEST00',
+                          'dedicated_host': 'test-dedicated',
+                          'dedicated_host_id': 37401,
+                          'hostname': 'vs-test1',
+                          'domain': 'test.sftlyr.ws',
+                          'fqdn': 'vs-test1.test.sftlyr.ws',
+                          'id': 100,
+                          'guid': '1a2b3c-1701',
+                          'memory': 1024,
+                          'modified': {},
+                          'os': 'Ubuntu',
+                          'os_version': '12.04-64 Minimal for VSI',
+                          'notes': 'notes',
+                          'price_rate': 0,
+                          'tags': ['production'],
+                          'private_cpu': {},
+                          'private_ip': '10.45.19.37',
+                          'private_only': {},
+                          'ptr': 'test.softlayer.com.',
+                          'public_ip': '172.16.240.2',
+                          'state': 'RUNNING',
+                          'status': 'ACTIVE',
+                          'users': [{'software': 'Ubuntu',
+                                     'password': 'pass',
+                                     'username': 'user'}],
+                          'vlans': [{'type': 'PUBLIC',
+                                     'number': 23,
+                                     'id': 1}],
+                          'owner': None})
 
     def test_detail_vs(self):
         result = self.run_command(['vs', 'detail', '100',
@@ -123,6 +292,7 @@ class VirtTests(testing.TestCase):
                           'flavors (balanced local - ssd)': ['BL2_1X2X100'],
                           'flavors (compute)': ['C1_1X2X25'],
                           'flavors (memory)': ['M1_1X2X100'],
+                          'flavors (GPU)': ['AC1_1X2X100', 'ACL1_1X2X100'],
                           'local disk(0)': ['25', '100'],
                           'memory': [1024, 2048, 3072, 4096],
                           'memory (dedicated host)': [8192, 65536],
@@ -131,227 +301,6 @@ class VirtTests(testing.TestCase):
                           'os (CENTOS)': 'CENTOS_6_64',
                           'os (DEBIAN)': 'DEBIAN_7_64',
                           'os (UBUNTU)': 'UBUNTU_12_64'})
-
-    @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_create(self, confirm_mock):
-        confirm_mock.return_value = True
-        result = self.run_command(['vs', 'create',
-                                   '--cpu=2',
-                                   '--domain=example.com',
-                                   '--hostname=host',
-                                   '--os=UBUNTU_LATEST',
-                                   '--memory=1',
-                                   '--network=100',
-                                   '--billing=hourly',
-                                   '--datacenter=dal05',
-                                   '--tag=dev',
-                                   '--tag=green'])
-
-        self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         {'guid': '1a2b3c-1701',
-                          'id': 100,
-                          'created': '2013-08-01 15:23:45'})
-
-        args = ({'datacenter': {'name': 'dal05'},
-                 'domain': 'example.com',
-                 'hourlyBillingFlag': True,
-                 'localDiskFlag': True,
-                 'maxMemory': 1024,
-                 'hostname': 'host',
-                 'startCpus': 2,
-                 'operatingSystemReferenceCode': 'UBUNTU_LATEST',
-                 'networkComponents': [{'maxSpeed': '100'}]},)
-        self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
-                                args=args)
-
-    @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_create_with_integer_image_id(self, confirm_mock):
-        confirm_mock.return_value = True
-        result = self.run_command(['vs', 'create',
-                                   '--cpu=2',
-                                   '--domain=example.com',
-                                   '--hostname=host',
-                                   '--image=12345',
-                                   '--memory=1',
-                                   '--network=100',
-                                   '--billing=hourly',
-                                   '--datacenter=dal05'])
-
-        self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         {'guid': '1a2b3c-1701',
-                          'id': 100,
-                          'created': '2013-08-01 15:23:45'})
-
-        args = ({
-            'datacenter': {'name': 'dal05'},
-            'domain': 'example.com',
-            'hourlyBillingFlag': True,
-            'localDiskFlag': True,
-            'maxMemory': 1024,
-            'hostname': 'host',
-            'startCpus': 2,
-            'blockDeviceTemplateGroup': {
-                'globalIdentifier': '0B5DEAF4-643D-46CA-A695-CECBE8832C9D',
-            },
-            'networkComponents': [{'maxSpeed': '100'}]
-        },)
-        self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
-                                args=args)
-
-    @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_create_with_flavor(self, confirm_mock):
-        confirm_mock.return_value = True
-        result = self.run_command(['vs', 'create',
-                                   '--domain=example.com',
-                                   '--hostname=host',
-                                   '--os=UBUNTU_LATEST',
-                                   '--network=100',
-                                   '--billing=hourly',
-                                   '--datacenter=dal05',
-                                   '--flavor=B1_1X2X25'])
-
-        self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         {'guid': '1a2b3c-1701',
-                          'id': 100,
-                          'created': '2013-08-01 15:23:45'})
-
-        args = ({'datacenter': {'name': 'dal05'},
-                 'domain': 'example.com',
-                 'hourlyBillingFlag': True,
-                 'hostname': 'host',
-                 'startCpus': None,
-                 'maxMemory': None,
-                 'localDiskFlag': None,
-                 'supplementalCreateObjectOptions': {'flavorKeyName': 'B1_1X2X25'},
-                 'operatingSystemReferenceCode': 'UBUNTU_LATEST',
-                 'networkComponents': [{'maxSpeed': '100'}]},)
-        self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
-                                args=args)
-
-    @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_create_with_host_id(self, confirm_mock):
-        confirm_mock.return_value = True
-        result = self.run_command(['vs', 'create',
-                                   '--cpu=2',
-                                   '--domain=example.com',
-                                   '--hostname=host',
-                                   '--os=UBUNTU_LATEST',
-                                   '--memory=1',
-                                   '--network=100',
-                                   '--billing=hourly',
-                                   '--datacenter=dal05',
-                                   '--dedicated',
-                                   '--host-id=123'])
-
-        self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         {'guid': '1a2b3c-1701',
-                          'id': 100,
-                          'created': '2013-08-01 15:23:45'})
-
-        args = ({'datacenter': {'name': 'dal05'},
-                 'domain': 'example.com',
-                 'hourlyBillingFlag': True,
-                 'localDiskFlag': True,
-                 'maxMemory': 1024,
-                 'hostname': 'host',
-                 'startCpus': 2,
-                 'operatingSystemReferenceCode': 'UBUNTU_LATEST',
-                 'networkComponents': [{'maxSpeed': '100'}],
-                 'dedicatedHost': {'id': 123}},)
-        self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
-                                args=args)
-
-    @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_create_like(self, confirm_mock):
-        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getObject')
-        mock.return_value = {
-            'hostname': 'vs-test-like',
-            'domain': 'test.sftlyr.ws',
-            'maxCpu': 2,
-            'maxMemory': 1024,
-            'datacenter': {'name': 'dal05'},
-            'networkComponents': [{'maxSpeed': 100}],
-            'dedicatedAccountHostOnlyFlag': False,
-            'privateNetworkOnlyFlag': False,
-            'billingItem': {'orderItem': {'preset': {}}},
-            'operatingSystem': {'softwareLicense': {
-                'softwareDescription': {'referenceCode': 'UBUNTU_LATEST'}
-            }},
-            'hourlyBillingFlag': False,
-            'localDiskFlag': True,
-            'userData': {}
-        }
-
-        confirm_mock.return_value = True
-        result = self.run_command(['vs', 'create',
-                                   '--like=123',
-                                   '--san',
-                                   '--billing=hourly'])
-
-        self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         {'guid': '1a2b3c-1701',
-                          'id': 100,
-                          'created': '2013-08-01 15:23:45'})
-
-        args = ({'datacenter': {'name': 'dal05'},
-                 'domain': 'test.sftlyr.ws',
-                 'hourlyBillingFlag': True,
-                 'hostname': 'vs-test-like',
-                 'startCpus': 2,
-                 'maxMemory': 1024,
-                 'localDiskFlag': False,
-                 'operatingSystemReferenceCode': 'UBUNTU_LATEST',
-                 'networkComponents': [{'maxSpeed': 100}]},)
-        self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
-                                args=args)
-
-    @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_create_like_flavor(self, confirm_mock):
-        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getObject')
-        mock.return_value = {
-            'hostname': 'vs-test-like',
-            'domain': 'test.sftlyr.ws',
-            'maxCpu': 2,
-            'maxMemory': 1024,
-            'datacenter': {'name': 'dal05'},
-            'networkComponents': [{'maxSpeed': 100}],
-            'dedicatedAccountHostOnlyFlag': False,
-            'privateNetworkOnlyFlag': False,
-            'billingItem': {'orderItem': {'preset': {'keyName': 'B1_1X2X25'}}},
-            'operatingSystem': {'softwareLicense': {
-                'softwareDescription': {'referenceCode': 'UBUNTU_LATEST'}
-            }},
-            'hourlyBillingFlag': True,
-            'localDiskFlag': False,
-            'userData': {}
-        }
-
-        confirm_mock.return_value = True
-        result = self.run_command(['vs', 'create', '--like=123'])
-
-        self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         {'guid': '1a2b3c-1701',
-                          'id': 100,
-                          'created': '2013-08-01 15:23:45'})
-
-        args = ({'datacenter': {'name': 'dal05'},
-                 'domain': 'test.sftlyr.ws',
-                 'hourlyBillingFlag': True,
-                 'hostname': 'vs-test-like',
-                 'startCpus': None,
-                 'maxMemory': None,
-                 'localDiskFlag': None,
-                 'supplementalCreateObjectOptions': {'flavorKeyName': 'B1_1X2X25'},
-                 'operatingSystemReferenceCode': 'UBUNTU_LATEST',
-                 'networkComponents': [{'maxSpeed': 100}]},)
-        self.assert_called_with('SoftLayer_Virtual_Guest', 'createObject',
-                                args=args)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_both(self, confirm_mock):
@@ -572,6 +521,26 @@ class VirtTests(testing.TestCase):
         self.assertIn({'id': 1122}, order_container['prices'])
         self.assertEqual(order_container['virtualGuests'], [{'id': 100}])
 
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_upgrade_with_flavor(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['vs', 'upgrade', '100', '--flavor=M1_64X512X100'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
+        call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
+        order_container = call.args[0]
+        self.assertEqual(799, order_container['presetId'])
+        self.assertIn({'id': 100}, order_container['virtualGuests'])
+        self.assertEqual(order_container['virtualGuests'], [{'id': 100}])
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_upgrade_with_cpu_memory_and_flavor(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['vs', 'upgrade', '100', '--cpu=4',
+                                   '--memory=1024', '--flavor=M1_64X512X100'])
+        self.assertEqual(result.exit_code, 1)
+        self.assertIsInstance(result.exception, ValueError)
+
     def test_edit(self):
         result = self.run_command(['vs', 'edit',
                                    '--domain=example.com',
@@ -653,3 +622,41 @@ class VirtTests(testing.TestCase):
         result = self.run_command(['vs', 'ready', '100', '--wait=100'])
         self.assert_no_fail(result)
         self.assertEqual(result.output, '"READY"\n')
+
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    def test_reload(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'reloadCurrentOperatingSystemConfguration')
+        confirm_mock.return_value = True
+        mock.return_value = 'true'
+
+        result = self.run_command(['vs', 'reload', '--postinstall', '100', '--key', '100', '--image', '100', '100'])
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    def test_reload_no_confirm(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'reloadCurrentOperatingSystemConfiguration')
+        confirm_mock.return_value = False
+        mock.return_value = 'false'
+
+        result = self.run_command(['vs', 'reload', '--postinstall', '100', '--key', '100', '--image', '100', '100'])
+        self.assertEqual(result.exit_code, 2)
+
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    def test_cancel(self, confirm_mock):
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'cancel', '100'])
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    def test_cancel_no_confirm(self, confirm_mock):
+        confirm_mock.return_value = False
+
+        result = self.run_command(['vs', 'cancel', '100'])
+        self.assertEqual(result.exit_code, 2)
+
+    def test_vs_capture(self):
+
+        result = self.run_command(['vs', 'capture', '100', '--name', 'TestName'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'createArchiveTransaction', identifier=100)

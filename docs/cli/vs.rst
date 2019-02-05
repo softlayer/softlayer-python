@@ -28,87 +28,52 @@ virtual server (VS), we need to know what options are available to us: RAM,
 CPU, operating systems, disk sizes, disk types, datacenters, and so on.
 Luckily, there's a simple command to show all options: `slcli vs create-options`.
 
+*Some values were ommitted for brevity*
+
 ::
 
 	$ slcli vs create-options
-	:.................:...........................................................................................:
-	:            Name : Value                                                                                     :
-	:.................:...........................................................................................:
-	:      datacenter : ams01,dal01,dal05,dal06,dal09,hkg02,hou02,lon02,mel01,par01,sea01,sjc01,sng01,tor01,wdc01 :
-	:  cpus (private) : 1,2,4,8                                                                                   :
-	: cpus (standard) : 1,2,4,8,12,16                                                                             :
-	:          memory : 1024,2048,4096,6144,8192,12288,16384,32768,49152,65536                                    :
-	:     os (CENTOS) : CENTOS_5_32                                                                               :
-	:                 : CENTOS_5_64                                                                               :
-	:                 : CENTOS_6_32                                                                               :
-	:                 : CENTOS_6_64                                                                               :
-	:                 : CENTOS_7_64                                                                               :
-	:                 : CENTOS_LATEST                                                                             :
-	:                 : CENTOS_LATEST_32                                                                          :
-	:                 : CENTOS_LATEST_64                                                                          :
-	: os (CLOUDLINUX) : CLOUDLINUX_5_32                                                                           :
-	:                 : CLOUDLINUX_5_64                                                                           :
-	:                 : CLOUDLINUX_6_32                                                                           :
-	:                 : CLOUDLINUX_6_64                                                                           :
-	:                 : CLOUDLINUX_LATEST                                                                         :
-	:                 : CLOUDLINUX_LATEST_32                                                                      :
-	:                 : CLOUDLINUX_LATEST_64                                                                      :
-	:     os (DEBIAN) : DEBIAN_6_32                                                                               :
-	:                 : DEBIAN_6_64                                                                               :
-	:                 : DEBIAN_7_32                                                                               :
-	:                 : DEBIAN_7_64                                                                               :
-	:                 : DEBIAN_LATEST                                                                             :
-	:                 : DEBIAN_LATEST_32                                                                          :
-	:                 : DEBIAN_LATEST_64                                                                          :
-	:     os (REDHAT) : REDHAT_5_32                                                                               :
-	:                 : REDHAT_5_64                                                                               :
-	:                 : REDHAT_6_32                                                                               :
-	:                 : REDHAT_6_64                                                                               :
-	:                 : REDHAT_LATEST                                                                             :
-	:                 : REDHAT_LATEST_32                                                                          :
-	:                 : REDHAT_LATEST_64                                                                          :
-	:     os (UBUNTU) : UBUNTU_10_32                                                                              :
-	:                 : UBUNTU_10_64                                                                              :
-	:                 : UBUNTU_12_32                                                                              :
-	:                 : UBUNTU_12_64                                                                              :
-	:                 : UBUNTU_14_32                                                                              :
-	:                 : UBUNTU_14_64                                                                              :
-	:                 : UBUNTU_LATEST                                                                             :
-	:                 : UBUNTU_LATEST_32                                                                          :
-	:                 : UBUNTU_LATEST_64                                                                          :
-	:   os (VYATTACE) : VYATTACE_6.5_64                                                                           :
-	:                 : VYATTACE_6.6_64                                                                           :
-	:                 : VYATTACE_LATEST                                                                           :
-	:                 : VYATTACE_LATEST_64                                                                        :
-	:        os (WIN) : WIN_2003-DC-SP2-1_32                                                                      :
-	:                 : WIN_2003-DC-SP2-1_64                                                                      :
-	:                 : WIN_2003-ENT-SP2-5_32                                                                     :
-	:                 : WIN_2003-ENT-SP2-5_64                                                                     :
-	:                 : WIN_2003-STD-SP2-5_32                                                                     :
-	:                 : WIN_2003-STD-SP2-5_64                                                                     :
-	:                 : WIN_2008-DC-R2_64                                                                         :
-	:                 : WIN_2008-DC-SP2_64                                                                        :
-	:                 : WIN_2008-ENT-R2_64                                                                        :
-	:                 : WIN_2008-ENT-SP2_32                                                                       :
-	:                 : WIN_2008-ENT-SP2_64                                                                       :
-	:                 : WIN_2008-STD-R2-SP1_64                                                                    :
-	:                 : WIN_2008-STD-R2_64                                                                        :
-	:                 : WIN_2008-STD-SP2_32                                                                       :
-	:                 : WIN_2008-STD-SP2_64                                                                       :
-	:                 : WIN_2012-DC_64                                                                            :
-	:                 : WIN_2012-STD_64                                                                           :
-	:                 : WIN_LATEST                                                                                :
-	:                 : WIN_LATEST_32                                                                             :
-	:                 : WIN_LATEST_64                                                                             :
-	:   local disk(0) : 25,100                                                                                    :
-	:   local disk(2) : 25,100,150,200,300                                                                        :
-	:     san disk(0) : 25,100                                                                                    :
-	:     san disk(2) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000           :
-	:     san disk(3) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000           :
-	:     san disk(4) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000           :
-	:     san disk(5) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000           :
-	:             nic : 10,100,1000                                                                               :
-	:.................:...........................................................................................:
+	:................................:.................................................................................:
+	:                           name : value                                                                           :
+	:................................:.................................................................................:
+	:                     datacenter : ams01                                                                           :
+	:                                : ams03                                                                           :
+	:                                : wdc07                                                                           :
+	:             flavors (balanced) : B1_1X2X25                                                                       :
+	:                                : B1_1X2X25                                                                       :
+	:                                : B1_1X2X100                                                                      :
+	:                cpus (standard) : 1,2,4,8,12,16,32,56                                                             :
+	:               cpus (dedicated) : 1,2,4,8,16,32,56                                                                :
+	:          cpus (dedicated host) : 1,2,4,8,12,16,32,56                                                             :
+	:                         memory : 1024,2048,4096,6144,8192,12288,16384,32768,49152,65536,131072,247808            :
+	:        memory (dedicated host) : 1024,2048,4096,6144,8192,12288,16384,32768,49152,65536,131072,247808            :
+	:                    os (CENTOS) : CENTOS_5_64                                                                     :
+	:                                : CENTOS_LATEST_64                                                                :
+	:                os (CLOUDLINUX) : CLOUDLINUX_5_64                                                                 :
+	:                                : CLOUDLINUX_6_64                                                                 :
+	:                                : CLOUDLINUX_LATEST                                                               :
+	:                                : CLOUDLINUX_LATEST_64                                                            :
+	:                    os (COREOS) : COREOS_CURRENT_64                                                               :
+	:                                : COREOS_LATEST                                                                   :
+	:                                : COREOS_LATEST_64                                                                :
+	:                    os (DEBIAN) : DEBIAN_6_64                                                                     :
+	:                                : DEBIAN_LATEST_64                                                                :
+	:            os (OTHERUNIXLINUX) : OTHERUNIXLINUX_1_64                                                             :
+	:                                : OTHERUNIXLINUX_LATEST                                                           :
+	:                                : OTHERUNIXLINUX_LATEST_64                                                        :
+	:                    os (REDHAT) : REDHAT_5_64                                                                     :
+	:                                : REDHAT_6_64                                                                     :
+	:                                : REDHAT_7_64                                                                     :
+	:                                : REDHAT_LATEST                                                                   :
+	:                                : REDHAT_LATEST_64                                                                :
+	:                    san disk(0) : 25,100                                                                          :
+	:                    san disk(2) : 10,20,25,30,40,50,75,100,125,150,175,200,250,300,350,400,500,750,1000,1500,2000 :
+	:                  local disk(0) : 25,100                                                                          :
+	:                  local disk(2) : 25,100,150,200,300                                                              :
+	: local (dedicated host) disk(0) : 25,100                                                                          :
+	:           nic (dedicated host) : 100,1000                                                                        :
+	:................................:.................................................................................:
+
 
 Here's the command to create a 2-core virtual server with 1GiB memory, running
 Ubuntu 14.04 LTS, and that is billed on an hourly basis in the San Jose 1
@@ -116,15 +81,33 @@ datacenter using the command `slcli vs create`.
 
 ::
 
-	$ slcli vs create --hostname=example --domain=softlayer.com --cpu 2 --memory 1024 -o UBUNTU_14_64 --datacenter=sjc01 --billing=hourly
+	$ slcli vs create --hostname=example --domain=softlayer.com -f B1_1X2X25 -o DEBIAN_LATEST_64  --datacenter=ams01 --billing=hourly
 	This action will incur charges on your account. Continue? [y/N]: y
-	:.........:......................................:
-	:    name : value                                :
-	:.........:......................................:
-	:      id : 1234567                              :
-	: created : 2013-06-13T08:29:44-06:00            :
-	:    guid : 6e013cde-a863-46ee-8s9a-f806dba97c89 :
-	:.........:......................................:
+        :..........:.................................:......................................:...........................:
+        :    ID    :               FQDN              :                 guid                 :         Order Date        :
+        :..........:.................................:......................................:...........................:
+        : 70112999 : testtesttest.test.com : 1abc7afb-9618-4835-89c9-586f3711d8ea : 2019-01-30T17:16:58-06:00 :
+        :..........:.................................:......................................:...........................:
+        :.........................................................................:
+        :                            OrderId: 12345678                            :
+        :.......:.................................................................:
+        :  Cost : Description                                                     :
+        :.......:.................................................................:
+        :   0.0 : Debian GNU/Linux 9.x Stretch/Stable - Minimal Install (64 bit)  :
+        :   0.0 : 25 GB (SAN)                                                     :
+        :   0.0 : Reboot / Remote Console                                         :
+        :   0.0 : 100 Mbps Public & Private Network Uplinks                       :
+        :   0.0 : 0 GB Bandwidth Allotment                                        :
+        :   0.0 : 1 IP Address                                                    :
+        :   0.0 : Host Ping and TCP Service Monitoring                            :
+        :   0.0 : Email and Ticket                                                :
+        :   0.0 : Automated Reboot from Monitoring                                :
+        :   0.0 : Unlimited SSL VPN Users & 1 PPTP VPN User per account           :
+        :   0.0 : Nessus Vulnerability Assessment & Reporting                     :
+        :   0.0 : 2 GB                                                            :
+        :   0.0 : 1 x 2.0 GHz or higher Core                                      :
+        : 0.000 : Total hourly cost                                               :
+        :.......:.................................................................:
 
 
 After the last command, the virtual server is now being built. It should
@@ -136,7 +119,7 @@ instantly appear in your virtual server list now.
 	:.........:............:.......................:.......:........:................:..............:....................:
 	:    id   : datacenter :          host         : cores : memory :   primary_ip   :  backend_ip  : active_transaction :
 	:.........:............:.......................:.......:........:................:..............:....................:
-	: 1234567 :   sjc01    : example.softlayer.com :   2   :   1G   : 108.168.200.11 : 10.54.80.200 :    Assign Host     :
+	: 1234567 :   ams01    : example.softlayer.com :   2   :   1G   : 108.168.200.11 : 10.54.80.200 :    Assign Host     :
 	:.........:............:.......................:.......:........:................:..............:....................:
 
 Cool. You may ask, "It's creating... but how do I know when it's done?" Well,
@@ -173,12 +156,12 @@ username is 'root' and password is 'ABCDEFGH'.
 	:     hostname : example.softlayer.com     :
 	:       status : Active                    :
 	:        state : Running                   :
-	:   datacenter : sjc01                     :
+	:   datacenter : ams01                     :
 	:        cores : 2                         :
 	:       memory : 1G                        :
 	:    public_ip : 108.168.200.11            :
 	:   private_ip : 10.54.80.200              :
-	:           os : Ubuntu                    :
+	:           os : Debian                    :
 	: private_only : False                     :
 	:  private_cpu : False                     :
 	:      created : 2013-06-13T08:29:44-06:00 :
@@ -220,3 +203,19 @@ use `slcli help vs`.
 	  rescue          Reboot into a rescue image.
 	  resume          Resumes a paused virtual server.
 	  upgrade         Upgrade a virtual server.
+
+
+Reserved Capacity
+-----------------
+.. toctree::
+    :maxdepth: 2
+
+    vs/reserved_capacity
+
+Placement Groups
+----------------
+.. toctree::
+    :maxdepth: 2
+
+    vs/placement_group
+

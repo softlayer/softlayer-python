@@ -14,6 +14,7 @@ from SoftLayer import utils
 
 class Column(object):
     """Column desctribes an attribute and how to fetch/display it."""
+
     def __init__(self, name, path, mask=None):
         self.name = name
         self.path = path
@@ -26,6 +27,7 @@ class Column(object):
 
 class ColumnFormatter(object):
     """Maps each column using a function"""
+
     def __init__(self):
         self.columns = []
         self.column_funcs = []
@@ -55,7 +57,7 @@ class ColumnFormatter(object):
 def get_formatter(columns):
     """This function returns a callback to use with click options.
 
-    The retuend function parses a comma-separated value and returns a new
+    The returned function parses a comma-separated value and returns a new
     ColumnFormatter.
 
     :param columns: a list of Column instances

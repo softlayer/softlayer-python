@@ -72,11 +72,41 @@ class DnsTests(testing.TestCase):
                           'ttl': 7200})
 
     def test_add_record(self):
-        result = self.run_command(['dns', 'record-add', '1234', 'hostname',
-                                   'A', 'd', '--ttl=100'])
+        result = self.run_command(['dns', 'record-add', 'hostname', 'A',
+                                   'data', '--zone=1234', '--ttl=100'])
 
         self.assert_no_fail(result)
-        self.assertEqual(result.output, "")
+        self.assertEqual(str(result.output), 'A record added successfully\n')
+
+    def test_add_record_mx(self):
+        result = self.run_command(['dns', 'record-add', 'hostname', 'MX',
+                                   'data', '--zone=1234', '--ttl=100', '--priority=25'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(str(result.output), 'MX record added successfully\n')
+
+    def test_add_record_srv(self):
+        result = self.run_command(['dns', 'record-add', 'hostname', 'SRV',
+                                   'data', '--zone=1234', '--protocol=udp',
+                                   '--port=88', '--ttl=100', '--weight=5'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(str(result.output), 'SRV record added successfully\n')
+
+    def test_add_record_ptr(self):
+        result = self.run_command(['dns', 'record-add', '192.168.1.1', 'PTR',
+                                   'hostname', '--ttl=100'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(str(result.output), 'PTR record added successfully\n')
+
+    def test_add_record_abort(self):
+        result = self.run_command(['dns', 'record-add', 'hostname', 'A',
+                                   'data', '--ttl=100'])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+        self.assertEqual(result.exception.message, "A isn't a valid record type or zone is missing")
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
     def test_delete_record(self, no_going_back_mock):

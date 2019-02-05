@@ -75,7 +75,8 @@ username and api_key need to be configured. The easiest way to do that is to
 use: 'slcli setup'""",
              cls=CommandLoader,
              context_settings={'help_option_names': ['-h', '--help'],
-                               'auto_envvar_prefix': 'SLCLI'})
+                               'auto_envvar_prefix': 'SLCLI',
+                               'max_content_width': 999})
 @click.option('--format',
               default=DEFAULT_FORMAT,
               show_default=True,
@@ -88,8 +89,7 @@ use: 'slcli setup'""",
               help="Config file location",
               type=click.Path(resolve_path=True))
 @click.option('--verbose', '-v',
-              help="Sets the debug noise level, specify multiple times "
-                   "for more verbosity.",
+              help="Sets the debug noise level, specify multiple times for more verbosity.",
               type=click.IntRange(0, 3, clamp=True),
               count=True)
 @click.option('--proxy',
@@ -115,44 +115,63 @@ def cli(env,
         **kwargs):
     """Main click CLI entry-point."""
 
-    if verbose > 0:
-        logger = logging.getLogger()
-        logger.addHandler(logging.StreamHandler())
-        logger.setLevel(DEBUG_LOGGING_MAP.get(verbose, logging.DEBUG))
-
     # Populate environement with client and set it as the context object
     env.skip_confirmations = really
     env.config_file = config
     env.format = format
     env.ensure_client(config_file=config, is_demo=demo, proxy=proxy)
-
     env.vars['_start'] = time.time()
-    env.vars['_timings'] = SoftLayer.TimingTransport(env.client.transport)
+    logger = logging.getLogger()
+
+    if demo is False:
+        logger.addHandler(logging.StreamHandler())
+    else:
+        # This section is for running CLI tests.
+        logging.getLogger("urllib3").setLevel(logging.WARNING)
+        logger.addHandler(logging.NullHandler())
+
+    logger.setLevel(DEBUG_LOGGING_MAP.get(verbose, logging.DEBUG))
+    env.vars['_timings'] = SoftLayer.DebugTransport(env.client.transport)
     env.client.transport = env.vars['_timings']
 
 
 @cli.resultcallback()
 @environment.pass_env
-def output_diagnostics(env, verbose=0, **kwargs):
+def output_diagnostics(env, result, verbose=0, **kwargs):
     """Output diagnostic information."""
 
     if verbose > 0:
         diagnostic_table = formatting.Table(['name', 'value'])
-        diagnostic_table.add_row(['execution_time',
-                                  '%fs' % (time.time() - START_TIME)])
+        diagnostic_table.add_row(['execution_time', '%fs' % (time.time() - START_TIME)])
 
         api_call_value = []
-        for call, _, duration in env.vars['_timings'].get_last_calls():
-            api_call_value.append(
-                "%s::%s (%fs)" % (call.service, call.method, duration))
+        for call in env.client.transport.get_last_calls():
+            api_call_value.append("%s::%s (%fs)" % (call.service, call.method, call.end_time - call.start_time))
 
         diagnostic_table.add_row(['api_calls', api_call_value])
         diagnostic_table.add_row(['version', consts.USER_AGENT])
         diagnostic_table.add_row(['python_version', sys.version])
-        diagnostic_table.add_row(['library_location',
-                                  os.path.dirname(SoftLayer.__file__)])
+        diagnostic_table.add_row(['library_location', os.path.dirname(SoftLayer.__file__)])
 
         env.err(env.fmt(diagnostic_table))
+
+    if verbose > 1:
+        for call in env.client.transport.get_last_calls():
+            call_table = formatting.Table(['', '{}::{}'.format(call.service, call.method)])
+            nice_mask = ''
+            if call.mask is not None:
+                nice_mask = call.mask
+
+            call_table.add_row(['id', call.identifier])
+            call_table.add_row(['mask', nice_mask])
+            call_table.add_row(['filter', call.filter])
+            call_table.add_row(['limit', call.limit])
+            call_table.add_row(['offset', call.offset])
+            env.err(env.fmt(call_table))
+
+    if verbose > 2:
+        for call in env.client.transport.get_last_calls():
+            env.err(env.client.transport.print_reproduceable(call))
 
 
 def main(reraise_exceptions=False, **kwargs):
@@ -163,8 +182,7 @@ def main(reraise_exceptions=False, **kwargs):
         cli.main(**kwargs)
     except SoftLayer.SoftLayerAPIError as ex:
         if 'invalid api token' in ex.faultString.lower():
-            print("Authentication Failed: To update your credentials,"
-                  " use 'slcli config setup'")
+            print("Authentication Failed: To update your credentials, use 'slcli config setup'")
             exit_status = 1
         else:
             print(str(ex))
@@ -184,6 +202,7 @@ def main(reraise_exceptions=False, **kwargs):
         print(str(traceback.format_exc()))
         print("Feel free to report this error as it is likely a bug:")
         print("    https://github.com/softlayer/softlayer-python/issues")
+        print("The following snippet should be able to reproduce the error")
         exit_status = 1
 
     sys.exit(exit_status)

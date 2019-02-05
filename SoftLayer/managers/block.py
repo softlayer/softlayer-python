@@ -144,7 +144,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                 'hourlySchedule',
                 'dailySchedule',
                 'weeklySchedule'
-                ]
+            ]
 
             kwargs['mask'] = ','.join(items)
 
@@ -408,8 +408,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
 
         :param integer volume_id: The volume ID
         :param string reason: The reason for cancellation
-        :param boolean immediate_flag: Cancel immediately or
-        on anniversary date
+        :param boolean immediate_flag: Cancel immediately or on anniversary date
         """
 
         block_volume = self.get_block_volume_details(
@@ -506,12 +505,15 @@ class BlockStorageManager(utils.IdentifierMixin, object):
 
         :param integer volume_id: The volume ID
         :param string reason: The reason for cancellation
-        :param boolean immediate_flag: Cancel immediately or
-        on anniversary date
+        :param boolean immediate_flag: Cancel immediately or on anniversary date
         """
         block_volume = self.get_block_volume_details(
             volume_id,
             mask='mask[id,billingItem[id,hourlyFlag]]')
+
+        if 'billingItem' not in block_volume:
+            raise exceptions.SoftLayerError("Block Storage was already cancelled")
+
         billing_item_id = block_volume['billingItem']['id']
 
         if utils.lookup(block_volume, 'billingItem', 'hourlyFlag'):

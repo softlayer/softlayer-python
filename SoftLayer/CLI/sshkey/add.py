@@ -6,6 +6,7 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 
 
 @click.command()
@@ -18,6 +19,16 @@ from SoftLayer.CLI import environment
 @environment.pass_env
 def cli(env, label, in_file, key, note):
     """Add a new SSH key."""
+
+    if in_file is None and key is None:
+        raise exceptions.ArgumentError(
+            'Either [-f | --in-file] or [-k | --key] arguments are required to add a key'
+        )
+
+    if in_file and key:
+        raise exceptions.ArgumentError(
+            '[-f | --in-file] is not allowed with [-k | --key]'
+        )
 
     if key:
         key_text = key

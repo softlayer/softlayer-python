@@ -4,6 +4,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+from SoftLayer import exceptions
 from SoftLayer import testing
 
 import json
@@ -94,6 +95,31 @@ class FileTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
                                 args=(False, True, None))
 
+    def test_volume_cancel_with_billing_item(self):
+        result = self.run_command([
+            '--really', 'file', 'volume-cancel', '1234'])
+
+        self.assert_no_fail(result)
+        self.assertEqual('File volume with id 1234 has been marked'
+                         ' for cancellation\n', result.output)
+        self.assert_called_with('SoftLayer_Network_Storage', 'getObject')
+
+    def test_volume_cancel_without_billing_item(self):
+        p_mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        p_mock.return_value = {
+            "accountId": 1234,
+            "capacityGb": 20,
+            "createDate": "2015-04-29T06:55:55-07:00",
+            "id": 11111,
+            "nasType": "NAS",
+            "username": "SL01SEV307608_1"
+        }
+
+        result = self.run_command([
+            '--really', 'file', 'volume-cancel', '1234'])
+
+        self.assertIsInstance(result.exception, exceptions.SoftLayerError)
+
     def test_volume_detail(self):
         result = self.run_command(['file', 'volume-detail', '1234'])
 
@@ -141,13 +167,6 @@ class FileTests(testing.TestCase):
         result = self.run_command(['file', 'volume-order',
                                    '--storage-type=performance', '--size=20',
                                    '--location=dal05'])
-
-        self.assertEqual(2, result.exit_code)
-
-    def test_volume_order_performance_iops_not_multiple_of_100(self):
-        result = self.run_command(['file', 'volume-order',
-                                   '--storage-type=performance', '--size=20',
-                                   '--iops=122', '--location=dal05'])
 
         self.assertEqual(2, result.exit_code)
 
@@ -204,7 +223,7 @@ class FileTests(testing.TestCase):
                     {'description': '0.25 IOPS per GB'},
                     {'description': '20 GB Storage Space'},
                     {'description': '10 GB Storage Space (Snapshot Space)'}]
-                }
+            }
         }
 
         result = self.run_command(['file', 'volume-order',
@@ -401,7 +420,7 @@ class FileTests(testing.TestCase):
                 'items': [{'description':
                            '10 GB Storage Space (Snapshot Space)'}],
                 'status': 'PENDING_APPROVAL',
-                }
+            }
         }
 
         result = self.run_command(['file', 'snapshot-order', '1234',

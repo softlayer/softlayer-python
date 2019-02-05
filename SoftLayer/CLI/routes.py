@@ -30,12 +30,17 @@ ALL_ROUTES = [
     ('virtual:reload', 'SoftLayer.CLI.virt.reload:cli'),
     ('virtual:upgrade', 'SoftLayer.CLI.virt.upgrade:cli'),
     ('virtual:credentials', 'SoftLayer.CLI.virt.credentials:cli'),
+    ('virtual:capacity', 'SoftLayer.CLI.virt.capacity:cli'),
+    ('virtual:placementgroup', 'SoftLayer.CLI.virt.placementgroup:cli'),
 
     ('dedicatedhost', 'SoftLayer.CLI.dedicatedhost'),
     ('dedicatedhost:list', 'SoftLayer.CLI.dedicatedhost.list:cli'),
     ('dedicatedhost:create', 'SoftLayer.CLI.dedicatedhost.create:cli'),
     ('dedicatedhost:create-options', 'SoftLayer.CLI.dedicatedhost.create_options:cli'),
     ('dedicatedhost:detail', 'SoftLayer.CLI.dedicatedhost.detail:cli'),
+    ('dedicatedhost:cancel', 'SoftLayer.CLI.dedicatedhost.cancel:cli'),
+    ('dedicatedhost:cancel-guests', 'SoftLayer.CLI.dedicatedhost.cancel_guests:cli'),
+    ('dedicatedhost:list-guests', 'SoftLayer.CLI.dedicatedhost.list_guests:cli'),
 
     ('cdn', 'SoftLayer.CLI.cdn'),
     ('cdn:detail', 'SoftLayer.CLI.cdn.detail:cli'),
@@ -213,6 +218,8 @@ ALL_ROUTES = [
     ('order:package-list', 'SoftLayer.CLI.order.package_list:cli'),
     ('order:place', 'SoftLayer.CLI.order.place:cli'),
     ('order:preset-list', 'SoftLayer.CLI.order.preset_list:cli'),
+    ('order:package-locations', 'SoftLayer.CLI.order.package_locations:cli'),
+    ('order:place-quote', 'SoftLayer.CLI.order.place_quote:cli'),
 
     ('rwhois', 'SoftLayer.CLI.rwhois'),
     ('rwhois:edit', 'SoftLayer.CLI.rwhois.edit:cli'),
@@ -235,6 +242,7 @@ ALL_ROUTES = [
     ('hardware:update-firmware', 'SoftLayer.CLI.hardware.update_firmware:cli'),
     ('hardware:rescue', 'SoftLayer.CLI.hardware.power:rescue'),
     ('hardware:ready', 'SoftLayer.CLI.hardware.ready:cli'),
+    ('hardware:toggle-ipmi', 'SoftLayer.CLI.hardware.toggle_ipmi:cli'),
 
     ('securitygroup', 'SoftLayer.CLI.securitygroup'),
     ('securitygroup:list', 'SoftLayer.CLI.securitygroup.list:cli'),
@@ -286,6 +294,15 @@ ALL_ROUTES = [
     ('ticket:attach', 'SoftLayer.CLI.ticket.attach:cli'),
     ('ticket:detach', 'SoftLayer.CLI.ticket.detach:cli'),
 
+    ('user', 'SoftLayer.CLI.user'),
+    ('user:list', 'SoftLayer.CLI.user.list:cli'),
+    ('user:detail', 'SoftLayer.CLI.user.detail:cli'),
+    ('user:permissions', 'SoftLayer.CLI.user.permissions:cli'),
+    ('user:edit-permissions', 'SoftLayer.CLI.user.edit_permissions:cli'),
+    ('user:edit-details', 'SoftLayer.CLI.user.edit_details:cli'),
+    ('user:create', 'SoftLayer.CLI.user.create:cli'),
+    ('user:delete', 'SoftLayer.CLI.user.delete:cli'),
+
     ('vlan', 'SoftLayer.CLI.vlan'),
     ('vlan:detail', 'SoftLayer.CLI.vlan.detail:cli'),
     ('vlan:list', 'SoftLayer.CLI.vlan.list:cli'),
@@ -306,4 +323,5 @@ ALL_ALIASES = {
     'vm': 'virtual',
     'vs': 'virtual',
     'dh': 'dedicatedhost',
+    'pg': 'placementgroup',
 }

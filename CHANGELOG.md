@@ -1,7 +1,146 @@
 # Change Log
 
+
+## [5.6.4] - 2018-11-16
+
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.6.3...v5.6.4
+
++ #1041 Dedicated host cancel, cancel-guests, list-guests
++ #1071 added createDate and modifyDate parameters to sg rule-list
++ #1060 Fixed slcli subnet list
++ #1056 Fixed documentation link in image manager
++ #1062 Added description to slcli order 
+
+## [5.6.3] - 2018-11-07
+
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.6.0...v5.6.3
+
++ #1065 Updated urllib3 and requests libraries due to CVE-2018-18074
++ #1070 Fixed an ordering bug
++ Updated release process and fab-file
+
+## [5.6.0] - 2018-10-16
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.5.3...v5.6.0
+
++ #1026 Support for [Reserved Capacity](https://console.bluemix.net/docs/vsi/vsi_about_reserved.html#about-reserved-virtual-servers)
+  * `slcli vs capacity create`
+  * `slcli vs capacity create-guest`
+  * `slcli vs capacity create-options`
+  * `slcli vs capacity detail`
+  * `slcli vs capacity list`
++ #1050 Fix `post_uri` parameter name on docstring
++ #1039 Fixed suspend cloud server order.
++ #1055 Update to use click 7
++ #1053 Add export/import capabilities to/from IBM Cloud Object Storage to the image manager as well as the slcli. 
+
+
+## [5.5.3] - 2018-08-31
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.5.2...v5.5.3
+
++ Added `slcli user delete`
++ #1023 Added `slcli order quote` to let users create a quote from the slcli.
++ #1032 Fixed vs upgrades when using flavors.
++ #1034 Added pagination to ticket list commands
++ #1037 Fixed DNS manager to be more flexible and support more zone types.
++ #1044 Pinned Click library version at >=5 < 7
+
+## [5.5.2] - 2018-08-31
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.5.1...v5.5.2
+
++ #1018 Fixed hardware credentials.
++ #1019 support for ticket priorities
++ #1025 create dedicated host with gpu fixed.
+
+
+## [5.5.1] - 2018-08-06
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.5.0...v5.5.1
+
+- #1006, added paginations to several slcli methods, making them work better with large result sets. 
+- #995, Fixed an issue displaying VLANs.
+- #1011, Fixed an issue displaying some NAS passwords
+- #1014, Ability to delete users
+
+## [5.5.0] - 2018-07-09
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.4...v5.5.0
+
+- Added a warning when ordering legacy storage volumes
+- Added documentation link to volume-order
+- Increased slcli output width limit to 999 characters
+- More unit tests
+- Fixed an issue canceling some block storage volumes
+- Fixed `slcli order` to work with network gateways
+- Fixed an issue showing hardware credentials when they do not exist
+- Fixed an issue showing addressSpace when listing virtual servers
+- Updated ordering class to support baremetal servers with multiple GPU
+- Updated prompt-toolkit as a fix for `slcli shell`
+- Fixed `slcli vlan detail` to not fail when objects don't have a hostname
+- Added user management
+
+
+## [5.4.4] - 2018-04-18
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.3...v5.4.4
+
+- fixed hw list not showing transactions
+- Re-factored RestTransport and XMLRPCTransport, logging is now only done in the DebugTransport
+- Added print_reproduceable to XMLRPCTransport and RestTransport, which should be very useful in printing out pure API calls.
+- Fixed an issue with RestTransport and locationGroupId
+
+
+## [5.4.3] - 2018-03-30
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.2...v5.4.3
+
+- Corrected to current create-options output
+- Allow ordering of account restricted presets
+- Added lookup function for datacenter names and ability to use `slcli order` with short DC names
+- Changed locatoinGroupId to check for None instead of empty string
+- Added a way to try to cancel montly bare metal immediately. THis is done by automatically updating the cancellation request. A human still needs to read the ticket and process it for the reclaim to complete.
+
+## [5.4.2] - 2018-02-22
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.1...v5.4.2
+
+- add GPU to the virtual create-options table
+- Remove 'virtual' from the hardware ready command.
+- Carefully check for the metric tracking id on virtual guests when building a bandwidth report.
+- Do not fail if the source or destination subnet mask does not exist for ipv6 rules.
+
+## [5.4.1] - 2018-02-05
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.0...v5.4.1
+
+- Improve error conditions when adding SSH keys
+- added type filters to package-list, auto-removes bluemix_services on package listing
+- Add boot mode option to virtual guest creation
+- Update documentation for security group rule add
+- Add fix for unsetting of values in edit SG rules
+
+## [5.4.0] - 2018-01-15
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.3.2...v5.4.0
+
+ - Upgraded Requests and Urllib3 library to latest. This allows the library to make use of connection retries, and connection pools. This should prevent the client from crashing if the API gives a connection reset / connection timeout error
+ - reworked wait_for_ready function for virtual, and added to hardware managers. 
+ - fixed block/file iops in the `slcli block|file detail` view
+ - Added sub items to `hw detail --price`, removed reverse PTR entries
+
+### Added to CLI
+- slcli order
+```
+$ ./slcli order
+Usage: slcli order [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  -h, --help  Show this message and exit.
+
+Commands:
+  category-list      List the categories of a package.
+  item-list          List package items used for ordering.
+  package-list       List packages that can be ordered via the...
+  package-locations  List Datacenters a package can be ordered in.
+  place              Place or verify an order.
+  preset-list        List package presets.
+```
+
+
 ## [5.3.2] - 2017-12-18
- - Changes: https://github.com/softlayer/softlayer-python/compare/v5.3.1...master
+ - Changes: https://github.com/softlayer/softlayer-python/compare/v5.3.1...v5.3.2
 
  - Expanded `@retry` useage to a few areas in the hardware manager
  - Added INTERVAL options to block and file replication

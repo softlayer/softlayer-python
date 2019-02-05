@@ -41,33 +41,72 @@ class BlockTests(testing.TestCase):
             identifier=449,
         )
 
+    def test_cancel_block_volume_exception_billing_item_not_found(self):
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        mock.return_value = {
+            'capacityGb': 20,
+            'createDate': '2017-06-20T14:24:21-06:00',
+            'nasType': 'ISCSI',
+            'storageTypeId': '7',
+            'serviceResourceName': 'PerfStor Aggr aggr_staasdal0601_pc01'
+        }
+        exception = self.assertRaises(
+            exceptions.SoftLayerError,
+            self.block.cancel_block_volume,
+            12345,
+            immediate=True
+        )
+        self.assertEqual(
+            'Block Storage was already cancelled',
+            str(exception)
+        )
+
+    def test_cancel_block_volume_billing_item_found(self):
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        mock.return_value = {
+            'capacityGb': 20,
+            'createDate': '2017-06-20T14:24:21-06:00',
+            'nasType': 'ISCSI',
+            'storageTypeId': '7',
+            'serviceResourceName': 'PerfStor Aggr aggr_staasdal0601_pc01',
+            'billingItem': {'hourlyFlag': True, 'id': 449},
+        }
+        self.block.cancel_block_volume(123, immediate=False)
+
+        self.assert_called_with(
+            'SoftLayer_Billing_Item',
+            'cancelItem',
+            args=(True, True, 'No longer needed'),
+            identifier=449,
+        )
+
     def test_get_block_volume_details(self):
         result = self.block.get_block_volume_details(100)
 
         self.assertEqual(fixtures.SoftLayer_Network_Storage.getObject, result)
 
-        expected_mask = 'id,'\
-                        'username,'\
-                        'password,'\
-                        'capacityGb,'\
-                        'snapshotCapacityGb,'\
-                        'parentVolume.snapshotSizeBytes,'\
-                        'storageType.keyName,'\
-                        'serviceResource.datacenter[name],'\
-                        'serviceResourceBackendIpAddress,'\
-                        'storageTierLevel,'\
-                        'provisionedIops,'\
-                        'lunId,'\
-                        'originalVolumeName,'\
-                        'originalSnapshotName,'\
-                        'originalVolumeSize,'\
-                        'activeTransactionCount,'\
-                        'activeTransactions.transactionStatus[friendlyName],'\
-                        'replicationPartnerCount,'\
-                        'replicationStatus,'\
-                        'replicationPartners[id,username,'\
-                        'serviceResourceBackendIpAddress,'\
-                        'serviceResource[datacenter[name]],'\
+        expected_mask = 'id,' \
+                        'username,' \
+                        'password,' \
+                        'capacityGb,' \
+                        'snapshotCapacityGb,' \
+                        'parentVolume.snapshotSizeBytes,' \
+                        'storageType.keyName,' \
+                        'serviceResource.datacenter[name],' \
+                        'serviceResourceBackendIpAddress,' \
+                        'storageTierLevel,' \
+                        'provisionedIops,' \
+                        'lunId,' \
+                        'originalVolumeName,' \
+                        'originalSnapshotName,' \
+                        'originalVolumeSize,' \
+                        'activeTransactionCount,' \
+                        'activeTransactions.transactionStatus[friendlyName],' \
+                        'replicationPartnerCount,' \
+                        'replicationStatus,' \
+                        'replicationPartners[id,username,' \
+                        'serviceResourceBackendIpAddress,' \
+                        'serviceResource[datacenter[name]],' \
                         'replicationSchedule[type[keyname]]]'
 
         self.assert_called_with(
@@ -75,7 +114,7 @@ class BlockTests(testing.TestCase):
             'getObject',
             identifier=100,
             mask='mask[%s]' % expected_mask
-            )
+        )
 
     def test_list_block_volumes(self):
         result = self.block.list_block_volumes()
@@ -96,14 +135,14 @@ class BlockTests(testing.TestCase):
             }
         }
 
-        expected_mask = 'id,'\
-                        'username,'\
-                        'lunId,'\
-                        'capacityGb,'\
-                        'bytesUsed,'\
-                        'serviceResource.datacenter[name],'\
-                        'serviceResourceBackendIpAddress,'\
-                        'activeTransactionCount,'\
+        expected_mask = 'id,' \
+                        'username,' \
+                        'lunId,' \
+                        'capacityGb,' \
+                        'bytesUsed,' \
+                        'serviceResource.datacenter[name],' \
+                        'serviceResourceBackendIpAddress,' \
+                        'activeTransactionCount,' \
                         'replicationPartnerCount'
 
         self.assert_called_with(
@@ -138,14 +177,14 @@ class BlockTests(testing.TestCase):
             }
         }
 
-        expected_mask = 'id,'\
-                        'username,'\
-                        'lunId,'\
-                        'capacityGb,'\
-                        'bytesUsed,'\
-                        'serviceResource.datacenter[name],'\
-                        'serviceResourceBackendIpAddress,'\
-                        'activeTransactionCount,'\
+        expected_mask = 'id,' \
+                        'username,' \
+                        'lunId,' \
+                        'capacityGb,' \
+                        'bytesUsed,' \
+                        'serviceResource.datacenter[name],' \
+                        'serviceResourceBackendIpAddress,' \
+                        'activeTransactionCount,' \
                         'replicationPartnerCount'
 
         self.assert_called_with(
@@ -358,7 +397,7 @@ class BlockTests(testing.TestCase):
             'placeOrder',
             args=({
                 'complexType': 'SoftLayer_Container_Product_Order_'
-                               'Network_Storage_AsAService',
+                'Network_Storage_AsAService',
                 'packageId': 759,
                 'prices': [
                     {'id': 189433},
@@ -402,7 +441,7 @@ class BlockTests(testing.TestCase):
             'placeOrder',
             args=({
                 'complexType': 'SoftLayer_Container_Product_Order_'
-                               'Network_Storage_AsAService',
+                'Network_Storage_AsAService',
                 'packageId': 759,
                 'prices': [
                     {'id': 189433},
@@ -526,7 +565,7 @@ class BlockTests(testing.TestCase):
             'placeOrder',
             args=({
                 'complexType': 'SoftLayer_Container_Product_Order_Network_'
-                               'Storage_Enterprise_SnapshotSpace_Upgrade',
+                'Storage_Enterprise_SnapshotSpace_Upgrade',
                 'packageId': 759,
                 'prices': [
                     {'id': 193853}
@@ -555,7 +594,7 @@ class BlockTests(testing.TestCase):
             'placeOrder',
             args=({
                 'complexType': 'SoftLayer_Container_Product_Order_Network_'
-                               'Storage_Enterprise_SnapshotSpace',
+                'Storage_Enterprise_SnapshotSpace',
                 'packageId': 759,
                 'prices': [
                     {'id': 193613}
@@ -611,7 +650,7 @@ class BlockTests(testing.TestCase):
             'placeOrder',
             args=({
                 'complexType': 'SoftLayer_Container_Product_Order_'
-                               'Network_Storage_AsAService',
+                'Network_Storage_AsAService',
                 'packageId': 759,
                 'prices': [
                     {'id': 189433},
@@ -652,7 +691,7 @@ class BlockTests(testing.TestCase):
             'placeOrder',
             args=({
                 'complexType': 'SoftLayer_Container_Product_Order_'
-                               'Network_Storage_AsAService',
+                'Network_Storage_AsAService',
                 'packageId': 759,
                 'prices': [
                     {'id': 189433},
@@ -710,7 +749,7 @@ class BlockTests(testing.TestCase):
             'placeOrder',
             args=({
                 'complexType': 'SoftLayer_Container_Product_Order_'
-                               'Network_Storage_AsAService',
+                'Network_Storage_AsAService',
                 'packageId': 759,
                 'prices': [
                     {'id': 189433},
@@ -743,7 +782,7 @@ class BlockTests(testing.TestCase):
             duplicate_iops=2000,
             duplicate_tier_level=None,
             duplicate_snapshot_size=10
-            )
+        )
 
         self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
 
@@ -752,7 +791,7 @@ class BlockTests(testing.TestCase):
             'placeOrder',
             args=({
                 'complexType': 'SoftLayer_Container_Product_Order_'
-                               'Network_Storage_AsAService',
+                'Network_Storage_AsAService',
                 'packageId': 759,
                 'prices': [
                     {'id': 189433},
@@ -790,7 +829,7 @@ class BlockTests(testing.TestCase):
             'placeOrder',
             args=({
                 'complexType': 'SoftLayer_Container_Product_Order_'
-                               'Network_Storage_AsAService',
+                'Network_Storage_AsAService',
                 'packageId': 759,
                 'prices': [
                     {'id': 189433},
@@ -821,7 +860,7 @@ class BlockTests(testing.TestCase):
             duplicate_iops=None,
             duplicate_tier_level=4,
             duplicate_snapshot_size=10
-            )
+        )
 
         self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
 
@@ -830,7 +869,7 @@ class BlockTests(testing.TestCase):
             'placeOrder',
             args=({
                 'complexType': 'SoftLayer_Container_Product_Order_'
-                               'Network_Storage_AsAService',
+                'Network_Storage_AsAService',
                 'packageId': 759,
                 'prices': [
                     {'id': 189433},

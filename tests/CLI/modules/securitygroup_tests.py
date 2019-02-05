@@ -123,7 +123,9 @@ class SecurityGroupTests(testing.TestCase):
                            'remoteGroupId': None,
                            'protocol': None,
                            'portRangeMin': None,
-                           'portRangeMax': None}],
+                           'portRangeMax': None,
+                           'createDate': None,
+                           'modifyDate': None}],
                          json.loads(result.output))
 
     def test_securitygroup_rule_add(self):
