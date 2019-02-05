@@ -1,4 +1,4 @@
-"""Get Audit Logs."""
+"""Get Event Logs."""
 # :license: MIT, see LICENSE for more details.
 
 import json
@@ -14,20 +14,20 @@ COLUMNS = ['event', 'label', 'date', 'metadata']
 
 @click.command()
 @click.option('--date-min', '-d',
-              help='The earliest date we want to search for audit logs in mm/dd/yyyy format.')
+              help='The earliest date we want to search for event logs in mm/dd/yyyy format.')
 @click.option('--date-max', '-D',
-              help='The latest date we want to search for audit logs in mm/dd/yyyy format.')
+              help='The latest date we want to search for event logs in mm/dd/yyyy format.')
 @click.option('--obj-event', '-e',
-              help="The event we want to get audit logs for")
+              help="The event we want to get event logs for")
 @click.option('--obj-id', '-i',
-              help="The id of the object we want to get audit logs for")
+              help="The id of the object we want to get event logs for")
 @click.option('--obj-type', '-t',
-              help="The type of the object we want to get audit logs for")
+              help="The type of the object we want to get event logs for")
 @click.option('--utc-offset', '-z',
               help="UTC Offset for searching with dates. The default is -0000")
 @environment.pass_env
 def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset):
-    """Get Audit Logs"""
+    """Get Event Logs"""
     mgr = SoftLayer.EventLogManager(env.client)
 
     request_filter = mgr.build_filter(date_min, date_max, obj_event, obj_id, obj_type, utc_offset)

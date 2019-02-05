@@ -1,4 +1,4 @@
-"""Get Audit Log Types."""
+"""Get Event Log Types."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -13,7 +13,7 @@ COLUMNS = ['types']
 @click.command()
 @environment.pass_env
 def cli(env):
-    """Get Audit Log Types"""
+    """Get Event Log Types"""
     mgr = SoftLayer.EventLogManager(env.client)
 
     event_log_types = mgr.get_event_log_types()

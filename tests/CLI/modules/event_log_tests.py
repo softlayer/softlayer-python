@@ -111,7 +111,7 @@ class EventLogTests(testing.TestCase):
             }
         ]
 
-        result = self.run_command(['audit-log', 'get'])
+        result = self.run_command(['event-log', 'get'])
 
         self.assert_no_fail(result)
         self.assertEqual(expected, json.loads(result.output))
@@ -156,7 +156,7 @@ class EventLogTests(testing.TestCase):
             }
         ]
 
-        result = self.run_command(['audit-log', 'types'])
+        result = self.run_command(['event-log', 'types'])
 
         self.assert_no_fail(result)
         self.assertEqual(expected, json.loads(result.output))

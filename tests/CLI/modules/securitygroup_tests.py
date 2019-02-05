@@ -336,6 +336,6 @@ class SecurityGroupTests(testing.TestCase):
             }
         ]
 
-        result = self.run_command(['sg', 'audit-log', '96c9b47b9e102d2e1d81fba'])
+        result = self.run_command(['sg', 'event-log', '96c9b47b9e102d2e1d81fba'])
 
         self.assertEqual(expected, json.loads(result.output))
