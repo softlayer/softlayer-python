@@ -44,4 +44,3 @@ class PlacementGroupCommands(click.MultiCommand):
 @click.group(cls=PlacementGroupCommands, context_settings=CONTEXT)
 def cli():
     """Base command for all capacity related concerns"""
-    pass
