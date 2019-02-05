@@ -126,39 +126,39 @@ getAllObjects = [
 
 getAllEventObjectNames = [
     {
-      'value': 'CCI'
-    }, 
-    {
-      'value':'Security Group'
-    }
-    {
-      'value': "User"
+        'value': 'CCI'
     },
     {
-      'value': "Bare Metal Instance"
+        'value': 'Security Group'
     },
     {
-      'value': "API Authentication"
+        'value': "User"
     },
     {
-      'value': "Server"
+        'value': "Bare Metal Instance"
     },
     {
-      'value': "CCI"
+        'value': "API Authentication"
     },
     {
-      'value': "Image"
+        'value': "Server"
     },
     {
-      'value': "Bluemix LB"
+        'value': "CCI"
     },
     {
-      'value': "Facility"
+        'value': "Image"
     },
     {
-      'value': "Cloud Object Storage"
+        'value': "Bluemix LB"
     },
     {
-      'value': "Security Group"
+        'value': "Facility"
+    },
+    {
+        'value': "Cloud Object Storage"
+    },
+    {
+        'value': "Security Group"
     }
 ]

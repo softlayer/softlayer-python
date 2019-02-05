@@ -93,7 +93,7 @@ def add(env, securitygroup_id, network_component, server, interface):
     component_id = _get_component_id(env, network_component, server, interface)
 
     ret = mgr.attach_securitygroup_component(securitygroup_id,
-                                                 component_id)
+                                             component_id)
     if not ret:
         raise exceptions.CLIAbort("Could not attach network component")
 
@@ -121,7 +121,7 @@ def remove(env, securitygroup_id, network_component, server, interface):
     component_id = _get_component_id(env, network_component, server, interface)
 
     ret = mgr.detach_securitygroup_component(securitygroup_id,
-                                                 component_id)
+                                             component_id)
     if not ret:
         raise exceptions.CLIAbort("Could not detach network component")
 
