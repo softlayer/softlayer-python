@@ -49,6 +49,8 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
         if metadata:
             try:
                 metadata_data = json.dumps(json.loads(log['metaData']), indent=4, sort_keys=True)
+                if env.format == "table":
+                    metadata_data = metadata_data.strip("{}\n\t")
             except ValueError:
                 metadata_data = log['metaData']
 
