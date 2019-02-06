@@ -9,7 +9,7 @@ import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 
-COLUMNS = ['event', 'label', 'date', 'metadata']
+COLUMNS = ['event', 'label', 'date']
 
 
 @click.command()
@@ -25,23 +25,35 @@ COLUMNS = ['event', 'label', 'date', 'metadata']
               help="The type of the object we want to get event logs for")
 @click.option('--utc-offset', '-z',
               help="UTC Offset for searching with dates. The default is -0000")
+@click.option('--metadata/--no-metadata', default=False,
+               help="Display metadata if present")
 @environment.pass_env
-def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset):
+def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metadata):
     """Get Event Logs"""
     mgr = SoftLayer.EventLogManager(env.client)
-
     request_filter = mgr.build_filter(date_min, date_max, obj_event, obj_id, obj_type, utc_offset)
     logs = mgr.get_event_logs(request_filter)
 
+    if logs == None:
+        env.fout('None available.')
+        return
+
+    if metadata:
+        COLUMNS.append('metadata')
+    
     table = formatting.Table(COLUMNS)
-    table.align['metadata'] = "l"
+    env.out("Table size: " + str(len(table.columns)))
+    if metadata:
+        table.align['metadata'] = "l"
 
     for log in logs:
-        try:
-            metadata = json.dumps(json.loads(log['metaData']), indent=4, sort_keys=True)
-        except ValueError:
-            metadata = log['metaData']
+        if metadata:
+            try:
+                metadata_data = json.dumps(json.loads(log['metaData']), indent=4, sort_keys=True)
+            except ValueError:
+                metadata_data = log['metaData']
 
-        table.add_row([log['eventName'], log['label'], log['eventCreateDate'], metadata])
-
+            table.add_row([log['eventName'], log['label'], log['eventCreateDate'], metadata_data])
+        else:
+            table.add_row([log['eventName'], log['label'], log['eventCreateDate']])
     env.fout(table)
