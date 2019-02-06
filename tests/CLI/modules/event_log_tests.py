@@ -10,7 +10,7 @@ from SoftLayer import testing
 
 
 class EventLogTests(testing.TestCase):
-    def test_get_event_log(self):
+    def test_get_event_log_with_metadata(self):
         expected = [
             {
                 'date': '2017-10-23T14:22:36.221541-05:00',
@@ -111,10 +111,64 @@ class EventLogTests(testing.TestCase):
             }
         ]
 
+        result = self.run_command(['event-log', 'get', '--metadata'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(expected, json.loads(result.output))
+
+    def test_get_event_log_without_metadata(self):
+        expected = [
+            {
+                'date': '2017-10-23T14:22:36.221541-05:00',
+                'event': 'Disable Port',
+                'label': 'test.softlayer.com'
+            },
+            {
+                'date': '2017-10-18T09:40:41.830338-05:00',
+                'event': 'Security Group Rule Added',
+                'label': 'test.softlayer.com'
+            },
+            {
+                'date': '2017-10-18T09:40:32.238869-05:00',
+                'event': 'Security Group Added',
+                'label': 'test.softlayer.com'
+            },
+            {
+                'date': '2017-10-18T10:42:13.089536-05:00',
+                'event': 'Security Group Rule(s) Removed',
+                'label': 'test_SG'
+            },
+            {
+                'date': '2017-10-18T10:42:11.679736-05:00',
+                'event': 'Network Component Removed from Security Group',
+                'label': 'test_SG'
+            },
+            {
+                'date': '2017-10-18T10:41:49.802498-05:00',
+                'event': 'Security Group Rule(s) Added',
+                'label': 'test_SG'
+            },
+            {
+                'date': '2017-10-18T10:41:42.176328-05:00',
+                'event': 'Network Component Added to Security Group',
+                'label': 'test_SG'
+            }
+        ]
+
         result = self.run_command(['event-log', 'get'])
 
         self.assert_no_fail(result)
         self.assertEqual(expected, json.loads(result.output))
+
+    def test_get_event_log_empty(self):
+        mock = self.set_mock('SoftLayer_Event_Log', 'getAllObjects')
+        mock.return_value = None
+
+        result = self.run_command(['event-log', 'get'])
+
+        self.assertEqual(mock.call_count, 1)
+        self.assert_no_fail(result)
+        self.assertEqual('"None available."\n', result.output)
 
     def test_get_event_log_types(self):
         expected = [

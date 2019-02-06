@@ -26,7 +26,7 @@ COLUMNS = ['event', 'label', 'date']
 @click.option('--utc-offset', '-z',
               help="UTC Offset for searching with dates. The default is -0000")
 @click.option('--metadata/--no-metadata', default=False,
-               help="Display metadata if present")
+              help="Display metadata if present")
 @environment.pass_env
 def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metadata):
     """Get Event Logs"""
@@ -34,15 +34,14 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
     request_filter = mgr.build_filter(date_min, date_max, obj_event, obj_id, obj_type, utc_offset)
     logs = mgr.get_event_logs(request_filter)
 
-    if logs == None:
+    if logs is None:
         env.fout('None available.')
         return
 
     if metadata:
         COLUMNS.append('metadata')
-    
+
     table = formatting.Table(COLUMNS)
-    env.out("Table size: " + str(len(table.columns)))
     if metadata:
         table.align['metadata'] = "l"
 
