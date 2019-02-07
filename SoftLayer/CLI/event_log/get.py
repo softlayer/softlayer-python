@@ -9,7 +9,7 @@ import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 
-COLUMNS = ['event', 'label', 'date']
+COLUMNS = ['event', 'object', 'type', 'date', 'username']
 
 
 @click.command()
@@ -31,6 +31,7 @@ COLUMNS = ['event', 'label', 'date']
 def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metadata):
     """Get Event Logs"""
     mgr = SoftLayer.EventLogManager(env.client)
+    usrmgr = SoftLayer.UserManager(env.client)
     request_filter = mgr.build_filter(date_min, date_max, obj_event, obj_id, obj_type, utc_offset)
     logs = mgr.get_event_logs(request_filter)
 
@@ -46,6 +47,9 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
         table.align['metadata'] = "l"
 
     for log in logs:
+        user = log['userType']
+        if user == "CUSTOMER":
+            user = usrmgr.get_user(log['userId'], "mask[username]")['username']
         if metadata:
             try:
                 metadata_data = json.dumps(json.loads(log['metaData']), indent=4, sort_keys=True)
@@ -54,7 +58,9 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
             except ValueError:
                 metadata_data = log['metaData']
 
-            table.add_row([log['eventName'], log['label'], log['eventCreateDate'], metadata_data])
+            table.add_row([log['eventName'], log['label'], log['objectName'],
+                           log['eventCreateDate'], user, metadata_data])
         else:
-            table.add_row([log['eventName'], log['label'], log['eventCreateDate']])
+            table.add_row([log['eventName'], log['label'], log['objectName'],
+                           log['eventCreateDate'], user])
     env.fout(table)

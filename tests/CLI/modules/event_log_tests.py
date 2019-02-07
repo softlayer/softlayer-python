@@ -15,13 +15,17 @@ class EventLogTests(testing.TestCase):
             {
                 'date': '2017-10-23T14:22:36.221541-05:00',
                 'event': 'Disable Port',
-                'label': 'test.softlayer.com',
+                'object': 'test.softlayer.com',
+                'username': 'SYSTEM',
+                'type': 'CCI',
                 'metadata': ''
             },
             {
                 'date': '2017-10-18T09:40:41.830338-05:00',
                 'event': 'Security Group Rule Added',
-                'label': 'test.softlayer.com',
+                'object': 'test.softlayer.com',
+                'username': 'SL12345-test',
+                'type': 'CCI',
                 'metadata': json.dumps(json.loads(
                         '{"networkComponentId":"100",'
                         '"networkInterfaceType":"public",'
@@ -39,7 +43,9 @@ class EventLogTests(testing.TestCase):
             {
                 'date': '2017-10-18T09:40:32.238869-05:00',
                 'event': 'Security Group Added',
-                'label': 'test.softlayer.com',
+                'object': 'test.softlayer.com',
+                'username': 'SL12345-test',
+                'type': 'CCI',
                 'metadata': json.dumps(json.loads(
                         '{"networkComponentId":"100",'
                         '"networkInterfaceType":"public",'
@@ -54,7 +60,9 @@ class EventLogTests(testing.TestCase):
             {
                 'date': '2017-10-18T10:42:13.089536-05:00',
                 'event': 'Security Group Rule(s) Removed',
-                'label': 'test_SG',
+                'object': 'test_SG',
+                'username': 'SL12345-test',
+                'type': 'Security Group',
                 'metadata': json.dumps(json.loads(
                         '{"requestId":"2abda7ca97e5a1444cae0b9",'
                         '"rules":[{"direction":"ingress",'
@@ -69,7 +77,9 @@ class EventLogTests(testing.TestCase):
             {
                 'date': '2017-10-18T10:42:11.679736-05:00',
                 'event': 'Network Component Removed from Security Group',
-                'label': 'test_SG',
+                'object': 'test_SG',
+                'username': 'SL12345-test',
+                'type': 'Security Group',
                 'metadata': json.dumps(json.loads(
                         '{"fullyQualifiedDomainName":"test.softlayer.com",'
                         '"networkComponentId":"100",'
@@ -83,7 +93,9 @@ class EventLogTests(testing.TestCase):
             {
                 'date': '2017-10-18T10:41:49.802498-05:00',
                 'event': 'Security Group Rule(s) Added',
-                'label': 'test_SG',
+                'object': 'test_SG',
+                'username': 'SL12345-test',
+                'type': 'Security Group',
                 'metadata': json.dumps(json.loads(
                         '{"requestId":"0a293c1c3e59e4471da6495",'
                         '"rules":[{"direction":"ingress",'
@@ -98,7 +110,9 @@ class EventLogTests(testing.TestCase):
             {
                 'date': '2017-10-18T10:41:42.176328-05:00',
                 'event': 'Network Component Added to Security Group',
-                'label': 'test_SG',
+                'object': 'test_SG',
+                'username': 'SL12345-test',
+                'type': 'Security Group',
                 'metadata': json.dumps(json.loads(
                         '{"fullyQualifiedDomainName":"test.softlayer.com",'
                         '"networkComponentId":"100",'
@@ -121,37 +135,51 @@ class EventLogTests(testing.TestCase):
             {
                 'date': '2017-10-23T14:22:36.221541-05:00',
                 'event': 'Disable Port',
-                'label': 'test.softlayer.com'
+                'username': 'SYSTEM',
+                'type': 'CCI',
+                'object': 'test.softlayer.com'
             },
             {
                 'date': '2017-10-18T09:40:41.830338-05:00',
                 'event': 'Security Group Rule Added',
-                'label': 'test.softlayer.com'
+                'username': 'SL12345-test',
+                'type': 'CCI',
+                'object': 'test.softlayer.com'
             },
             {
                 'date': '2017-10-18T09:40:32.238869-05:00',
                 'event': 'Security Group Added',
-                'label': 'test.softlayer.com'
+                'username': 'SL12345-test',
+                'type': 'CCI',
+                'object': 'test.softlayer.com'
             },
             {
                 'date': '2017-10-18T10:42:13.089536-05:00',
                 'event': 'Security Group Rule(s) Removed',
-                'label': 'test_SG'
+                'username': 'SL12345-test',
+                'type': 'Security Group',
+                'object': 'test_SG'
             },
             {
                 'date': '2017-10-18T10:42:11.679736-05:00',
                 'event': 'Network Component Removed from Security Group',
-                'label': 'test_SG'
+                'username': 'SL12345-test',
+                'type': 'Security Group',
+                'object': 'test_SG'
             },
             {
                 'date': '2017-10-18T10:41:49.802498-05:00',
                 'event': 'Security Group Rule(s) Added',
-                'label': 'test_SG'
+                'username': 'SL12345-test',
+                'type': 'Security Group',
+                'object': 'test_SG'
             },
             {
                 'date': '2017-10-18T10:41:42.176328-05:00',
                 'event': 'Network Component Added to Security Group',
-                'label': 'test_SG'
+                'username': 'SL12345-test',
+                'type': 'Security Group',
+                'object': 'test_SG'
             }
         ]
 
