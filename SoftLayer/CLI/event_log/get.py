@@ -39,7 +39,7 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
         env.fout('None available.')
         return
 
-    if metadata:
+    if metadata and 'metadata' not in COLUMNS:
         COLUMNS.append('metadata')
 
     table = formatting.Table(COLUMNS)
