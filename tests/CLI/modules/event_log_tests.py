@@ -6,8 +6,9 @@
 
 import json
 
-from SoftLayer import testing
 from SoftLayer.CLI import formatting
+from SoftLayer import testing
+
 
 class EventLogTests(testing.TestCase):
     def test_get_event_log_with_metadata(self):
@@ -304,17 +305,14 @@ class EventLogTests(testing.TestCase):
                 )
             }
         ]
-        
+
         for log in expected:
-            table_fix.add_row([log['event'], log['object'], log['type'], log['date'], log['username'], log['metadata'].strip("{}\n\t")])
+            table_fix.add_row([log['event'], log['object'], log['type'], log['date'],
+                              log['username'], log['metadata'].strip("{}\n\t")])
         expected_output = formatting.format_output(table_fix) + '\n'
 
-        #print("Output: " + expected_output)
-        
         result = self.run_command(args=['event-log', 'get', '--metadata'], fmt='table')
 
-        #print("Result: " + result.output)
-        
         self.assert_no_fail(result)
         self.assertEqual(expected_output, result.output)
 
