@@ -97,6 +97,10 @@ ALL_ROUTES = [
     ('block:volume-order', 'SoftLayer.CLI.block.order:cli'),
     ('block:volume-set-lun-id', 'SoftLayer.CLI.block.lun:cli'),
 
+    ('event-log', 'SoftLayer.CLI.event_log'),
+    ('event-log:get', 'SoftLayer.CLI.event_log.get:cli'),
+    ('event-log:types', 'SoftLayer.CLI.event_log.types:cli'),
+
     ('file', 'SoftLayer.CLI.file'),
     ('file:access-authorize', 'SoftLayer.CLI.file.access.authorize:cli'),
     ('file:access-list', 'SoftLayer.CLI.file.access.list:cli'),
@@ -256,6 +260,7 @@ ALL_ROUTES = [
      'SoftLayer.CLI.securitygroup.interface:add'),
     ('securitygroup:interface-remove',
      'SoftLayer.CLI.securitygroup.interface:remove'),
+    ('securitygroup:event-log', 'SoftLayer.CLI.securitygroup.event_log:get_by_request_id'),
 
     ('sshkey', 'SoftLayer.CLI.sshkey'),
     ('sshkey:add', 'SoftLayer.CLI.sshkey.add:cli'),
