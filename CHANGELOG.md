@@ -1,6 +1,33 @@
 # Change Log
 
 
+## [5.7.0] - 2018-11-16
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.6.4...master
+
++ #1099 Support for security group Ids
++ event-log cli command
++ #1069 Virtual Placement Group Support
+   ```
+      slcli vs placementgroup --help
+    Commands:
+      create          Create a placement group
+      create-options  List options for creating Reserved Capacity
+      delete          Delete a placement group.
+      detail          View details of a placement group.
+      list            List Reserved Capacity groups.
+   ```
++ #962 Rest Transport improvements. Properly handle HTTP exceptions instead of crashing.
++ #1090 removed power_state column option from "slcli server list"
++ #676 - ipv6 support for creating virtual guests
+  * Refactored virtual guest creation to use Product_Order::placeOrder instead of Virtual_Guest::createObject, because createObject doesn't allow adding IPv6
++ #882 Added table which shows the status of each url in object storage
++ #1085 Update provisionedIops reading to handle float-y values
++ #1074 fixed issue with config setup
++ #1081 Fix file volume-cancel
++ #1059 Support for SoftLayer_Hardware_Server::toggleManagementInterface
+  * `slcli hw toggle-ipmi`
+
+
 ## [5.6.4] - 2018-11-16
 
 - Changes: https://github.com/softlayer/softlayer-python/compare/v5.6.3...v5.6.4
