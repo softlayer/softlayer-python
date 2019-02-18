@@ -127,6 +127,70 @@ def query_filter_date(start, end):
     }
 
 
+def format_event_log_date(date_string, utc):
+    """Gets a date in the format that the SoftLayer_EventLog object likes.
+
+    :param string date_string: date in mm/dd/yyyy format
+    :param string utc: utc offset. Defaults to '+0000'
+    """
+    user_date_format = "%m/%d/%Y"
+
+    user_date = datetime.datetime.strptime(date_string, user_date_format)
+    dirty_time = user_date.isoformat()
+
+    if utc is None:
+        utc = "+0000"
+
+    iso_time_zone = utc[:3] + ':' + utc[3:]
+    clean_time = "{}.000000{}".format(dirty_time, iso_time_zone)
+
+    return clean_time
+
+
+def event_log_filter_between_date(start, end, utc):
+    """betweenDate Query filter that SoftLayer_EventLog likes
+
+    :param string start: lower bound date in mm/dd/yyyy format
+    :param string end: upper bound date in mm/dd/yyyy format
+    :param string utc: utc offset. Defaults to '+0000'
+    """
+    return {
+        'operation': 'betweenDate',
+        'options': [
+            {'name': 'startDate', 'value': [format_event_log_date(start, utc)]},
+            {'name': 'endDate', 'value': [format_event_log_date(end, utc)]}
+        ]
+    }
+
+
+def event_log_filter_greater_than_date(date, utc):
+    """greaterThanDate Query filter that SoftLayer_EventLog likes
+
+    :param string date: lower bound date in mm/dd/yyyy format
+    :param string utc: utc offset. Defaults to '+0000'
+    """
+    return {
+        'operation': 'greaterThanDate',
+        'options': [
+            {'name': 'date', 'value': [format_event_log_date(date, utc)]}
+        ]
+    }
+
+
+def event_log_filter_less_than_date(date, utc):
+    """lessThanDate Query filter that SoftLayer_EventLog likes
+
+    :param string date: upper bound date in mm/dd/yyyy format
+    :param string utc: utc offset. Defaults to '+0000'
+    """
+    return {
+        'operation': 'lessThanDate',
+        'options': [
+            {'name': 'date', 'value': [format_event_log_date(date, utc)]}
+        ]
+    }
+
+
 class IdentifierMixin(object):
     """Mixin used to resolve ids from other names of objects.
 
