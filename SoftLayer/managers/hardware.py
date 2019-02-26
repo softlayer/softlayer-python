@@ -620,18 +620,19 @@ class HardwareManager(utils.IdentifierMixin, object):
                         bios=True):
         """Reflash hardware firmware.
 
-        This will cause the server to be unavailable for ~20 minutes.
+        This will cause the server to be unavailable for ~60 minutes.
+        The firmware will not be upgraded but rather reflashed to the version installed.
 
         :param int hardware_id: The ID of the hardware to have its firmware
-                                updated.
-        :param bool ipmi: Update the ipmi firmware.
-        :param bool raid_controller: Update the raid controller firmware.
-        :param bool bios: Update the bios firmware..
+                                reflashed.
+        :param bool ipmi: Reflash the ipmi firmware.
+        :param bool raid_controller: Reflash the raid controller firmware.
+        :param bool bios: Reflash the bios firmware.
 
         Example::
 
             # Check the servers active transactions to see progress
-            result = mgr.update_firmware(hardware_id=1234)
+            result = mgr.reflash_firmware(hardware_id=1234)
         """
 
         return self.hardware.createFirmwareReflashTransaction(
