@@ -240,6 +240,7 @@ ALL_ROUTES = [
     ('hardware:reload', 'SoftLayer.CLI.hardware.reload:cli'),
     ('hardware:credentials', 'SoftLayer.CLI.hardware.credentials:cli'),
     ('hardware:update-firmware', 'SoftLayer.CLI.hardware.update_firmware:cli'),
+    ('hardware:reflash-firmware', 'SoftLayer.CLI.hardware.reflash_firmware:cli'),
     ('hardware:rescue', 'SoftLayer.CLI.hardware.power:rescue'),
     ('hardware:ready', 'SoftLayer.CLI.hardware.ready:cli'),
     ('hardware:toggle-ipmi', 'SoftLayer.CLI.hardware.toggle_ipmi:cli'),

@@ -392,6 +392,24 @@ class HardwareTests(testing.TestCase):
                                 'createFirmwareUpdateTransaction',
                                 identifier=100, args=(0, 1, 1, 0))
 
+    def test_reflash_firmware(self):
+        result = self.hardware.update_firmware(100)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Hardware_Server',
+                                'createFirmwareReflashTransaction',
+                                identifier=100, args=(1, 1, 1))
+
+    def test_reflash_firmware_selective(self):
+        result = self.hardware.update_firmware(100,
+                                               ipmi=False,
+                                               hard_drive=False)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Hardware_Server',
+                                'createFirmwareReflashTransaction',
+                                identifier=100, args=(1, 0, 0))
+
 
 class HardwareHelperTests(testing.TestCase):
     def test_get_extra_price_id_no_items(self):
