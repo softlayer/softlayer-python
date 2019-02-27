@@ -402,8 +402,8 @@ class HardwareTests(testing.TestCase):
 
     def test_reflash_firmware_selective(self):
         result = self.hardware.reflash_firmware(100,
-                                               ipmi=False,
-                                               hard_drive=False)
+                                               raid_controller=False,
+                                               bios=False)
 
         self.assertEqual(result, True)
         self.assert_called_with('SoftLayer_Hardware_Server',
