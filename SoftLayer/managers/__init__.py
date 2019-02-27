@@ -18,7 +18,6 @@ from SoftLayer.managers.hardware import HardwareManager
 from SoftLayer.managers.image import ImageManager
 from SoftLayer.managers.ipsec import IPSECManager
 from SoftLayer.managers.load_balancer import LoadBalancerManager
-from SoftLayer.managers.messaging import MessagingManager
 from SoftLayer.managers.metadata import MetadataManager
 from SoftLayer.managers.network import NetworkManager
 from SoftLayer.managers.object_storage import ObjectStorageManager
@@ -44,7 +43,6 @@ __all__ = [
     'ImageManager',
     'IPSECManager',
     'LoadBalancerManager',
-    'MessagingManager',
     'MetadataManager',
     'NetworkManager',
     'ObjectStorageManager',
