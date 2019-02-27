@@ -614,10 +614,10 @@ class HardwareManager(utils.IdentifierMixin, object):
             bool(ipmi), bool(raid_controller), bool(bios), bool(hard_drive), id=hardware_id)
 
     def reflash_firmware(self,
-                        hardware_id,
-                        ipmi=True,
-                        raid_controller=True,
-                        bios=True):
+                         hardware_id,
+                         ipmi=True,
+                         raid_controller=True,
+                         bios=True):
         """Reflash hardware firmware.
 
         This will cause the server to be unavailable for ~60 minutes.
