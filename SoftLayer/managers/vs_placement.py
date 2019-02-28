@@ -50,13 +50,17 @@ class PlacementManager(utils.IdentifierMixin, object):
     def create(self, placement_object):
         """Creates a placement group
 
-        :param dictionary placement_object: Below are the fields you can specify, taken from
-            https://softlayer.github.io/reference/datatypes/SoftLayer_Virtual_PlacementGroup/
+        A placement_object is defined as::
+
             placement_object = {
                 'backendRouterId': 12345,
                 'name': 'Test Name',
                 'ruleId': 12345
             }
+    
+        -  https://softlayer.github.io/reference/datatypes/SoftLayer_Virtual_PlacementGroup/
+
+        :param dictionary placement_object: 
 
         """
         return self.client.call('SoftLayer_Virtual_PlacementGroup', 'createObject', placement_object)
