@@ -6,6 +6,7 @@
 import json
 
 from SoftLayer import testing
+from SoftLayer.CLI import exceptions
 
 
 class OrderTests(testing.TestCase):
@@ -103,6 +104,13 @@ class OrderTests(testing.TestCase):
                           'status': 'APPROVED'},
                          json.loads(result.output))
 
+    def test_place_extras_parameter_fail(self):
+        result = self.run_command(['-y', 'order', 'place', 'package', 'DALLAS13', 'ITEM1',
+                                   '--extras', '{"device":['])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
     def test_place_quote(self):
         order_date = '2018-04-04 07:39:20'
         expiration_date = '2018-05-04 07:39:20'
@@ -131,6 +139,13 @@ class OrderTests(testing.TestCase):
                           'expires': expiration_date,
                           'status': 'PENDING'},
                          json.loads(result.output))
+
+    def test_place_quote_extras_parameter_fail(self):
+        result = self.run_command(['-y', 'order', 'place-quote', 'package', 'DALLAS13', 'ITEM1',
+                                   '--extras', '{"device":['])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
     def test_verify_hourly(self):
         order_date = '2017-04-04 07:39:20'

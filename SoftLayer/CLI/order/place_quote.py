@@ -6,6 +6,7 @@ import json
 import click
 
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import ordering
 
@@ -68,7 +69,10 @@ def cli(env, package_keyname, location, preset, name, send_email, complex_type,
     manager = ordering.OrderingManager(env.client)
 
     if extras:
-        extras = json.loads(extras)
+        try:
+            extras = json.loads(extras)
+        except ValueError as err:
+            raise exceptions.CLIAbort("There was an error when parsing the --extras value: {}".format(err.message))
 
     args = (package_keyname, location, order_items)
     kwargs = {'preset_keyname': preset,
