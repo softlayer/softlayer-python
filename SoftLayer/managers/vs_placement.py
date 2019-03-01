@@ -57,10 +57,10 @@ class PlacementManager(utils.IdentifierMixin, object):
                 'name': 'Test Name',
                 'ruleId': 12345
             }
-    
+
         -  https://softlayer.github.io/reference/datatypes/SoftLayer_Virtual_PlacementGroup/
 
-        :param dictionary placement_object: 
+        :param dictionary placement_object:
 
         """
         return self.client.call('SoftLayer_Virtual_PlacementGroup', 'createObject', placement_object)
