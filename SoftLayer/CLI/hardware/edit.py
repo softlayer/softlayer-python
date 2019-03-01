@@ -12,18 +12,16 @@ from SoftLayer.CLI import helpers
 @click.command()
 @click.argument('identifier')
 @click.option('--domain', '-D', help="Domain portion of the FQDN")
-@click.option('--userfile', '-F', type=click.Path(exists=True, readable=True, resolve_path=True,
-              help="Read userdata from file"))
+@click.option('--userfile', '-F', type=click.Path(exists=True, readable=True, resolve_path=True),
+              help="Read userdata from file")
 @click.option('--tag', '-g', multiple=True,
               help="Tags to set or empty string to remove all")
 @click.option('--hostname', '-H', help="Host portion of the FQDN")
 @click.option('--userdata', '-u', help="User defined metadata string")
-@click.option('--public-speed', default=None, 
-              type=click.Choice(['0', '10', '100', '1000', '10000', '-1']
-              help="Public port speed. -1 is best speed available"))
-@click.option('--private-speed', default=None,
-              type=click.Choice(['0', '10', '100', '1000', '10000', '-1']
-              help="Private port speed. -1 is best speed available"))
+@click.option('--public-speed', default=None,  type=click.Choice(['0', '10', '100', '1000', '10000', '-1']),
+              help="Public port speed. -1 is best speed available")
+@click.option('--private-speed', default=None, type=click.Choice(['0', '10', '100', '1000', '10000', '-1']),
+              help="Private port speed. -1 is best speed available")
 @environment.pass_env
 def cli(env, identifier, domain, userfile, tag, hostname, userdata, public_speed, private_speed):
     """Edit hardware details."""

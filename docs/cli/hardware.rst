@@ -1,3 +1,11 @@
-.. click:: SoftLayer.CLI.hardware.list:cli
-   :prog: slcli hw list
-   :show-nested:
+.. _cli_hardware:
+
+Interacting with Hardware
+==============================
+
+
+.. toctree::
+    :maxdepth: 1
+    :glob:
+
+    hardware/*
