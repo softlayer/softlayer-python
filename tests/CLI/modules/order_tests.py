@@ -5,8 +5,8 @@
 """
 import json
 
-from SoftLayer import testing
 from SoftLayer.CLI import exceptions
+from SoftLayer import testing
 
 
 class OrderTests(testing.TestCase):

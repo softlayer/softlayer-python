@@ -72,7 +72,7 @@ def cli(env, package_keyname, location, preset, name, send_email, complex_type,
         try:
             extras = json.loads(extras)
         except ValueError as err:
-            raise exceptions.CLIAbort("There was an error when parsing the --extras value: {}".format(err.message))
+            raise exceptions.CLIAbort("There was an error when parsing the --extras value: {}".format(err))
 
     args = (package_keyname, location, order_items)
     kwargs = {'preset_keyname': preset,
