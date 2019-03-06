@@ -10,11 +10,11 @@
    ```
       slcli vs placementgroup --help
     Commands:
-      create          Create a placement group
-      create-options  List options for creating Reserved Capacity
+      create          Create a placement group.
+      create-options  List options for creating a placement group.
       delete          Delete a placement group.
       detail          View details of a placement group.
-      list            List Reserved Capacity groups.
+      list            List placement groups.
    ```
 + #962 Rest Transport improvements. Properly handle HTTP exceptions instead of crashing.
 + #1090 removed power_state column option from "slcli server list"
