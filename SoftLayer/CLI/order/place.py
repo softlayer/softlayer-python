@@ -76,7 +76,10 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
     manager = ordering.OrderingManager(env.client)
 
     if extras:
-        extras = json.loads(extras)
+        try:
+            extras = json.loads(extras)
+        except ValueError as err:
+            raise exceptions.CLIAbort("There was an error when parsing the --extras value: {}".format(err))
 
     args = (package_keyname, location, order_items)
     kwargs = {'preset_keyname': preset,
