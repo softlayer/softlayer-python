@@ -11,6 +11,12 @@ ALL_ROUTES = [
 
     ('call-api', 'SoftLayer.CLI.call_api:cli'),
 
+    ('account', 'SoftLayer.CLI.account'),
+    ('account:invoice-detail', 'SoftLayer.CLI.account.invoice_detail:cli'),
+    ('account:invoice-list', 'SoftLayer.CLI.account.invoice_list:cli'),
+    ('account:maintenance', 'SoftLayer.CLI.account.maintenance:cli'),
+    ('account:summary', 'SoftLayer.CLI.account.summary:cli'),
+
     ('virtual', 'SoftLayer.CLI.virt'),
     ('virtual:cancel', 'SoftLayer.CLI.virt.cancel:cli'),
     ('virtual:capture', 'SoftLayer.CLI.virt.capture:cli'),
