@@ -191,3 +191,33 @@ class UserManagerTests(testing.TestCase):
         result = self.manager.get_current_user(objectmask="mask[id]")
         self.assert_called_with('SoftLayer_Account', 'getCurrentUser', mask="mask[id]")
         self.assertEqual(result['id'], 12345)
+
+    def test_create_user_handle_paas_exception(self):
+        user_template = {"username": "foobar", "email": "foobar@example.com"}
+
+        self.manager.user_service = mock.Mock()
+
+        # FaultCode IS NOT SoftLayer_Exception_User_Customer_DelegateIamIdInvitationToPaas
+        any_error = exceptions.SoftLayerAPIError("SoftLayer_Exception_User_Customer",
+                                                 "This exception indicates an error")
+
+        self.manager.user_service.createObject.side_effect = any_error
+
+        try:
+            self.manager.create_user(user_template, "Pass@123")
+        except exceptions.SoftLayerAPIError as ex:
+            self.assertEqual(ex.faultCode, "SoftLayer_Exception_User_Customer")
+            self.assertEqual(ex.faultString, "This exception indicates an error")
+
+        # FaultCode is SoftLayer_Exception_User_Customer_DelegateIamIdInvitationToPaas
+        paas_error = exceptions.SoftLayerAPIError("SoftLayer_Exception_User_Customer_DelegateIamIdInvitationToPaas",
+                                                  "This exception does NOT indicate an error")
+
+        self.manager.user_service.createObject.side_effect = paas_error
+
+        try:
+            self.manager.create_user(user_template, "Pass@123")
+        except exceptions.SoftLayerError as ex:
+            self.assertEqual(ex.args[0], "Your request for a new user was received, but it needs to be processed by "
+                                         "the Platform Services API first. Barring any errors on the Platform Services "
+                                         "side, your new user should be created shortly.")
