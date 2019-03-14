@@ -1,4 +1,4 @@
-"""Account Maintance manager"""
+"""Summary and acknowledgement of upcoming and ongoing maintenance events"""
 # :license: MIT, see LICENSE for more details.
 from pprint import pprint as pp
 import click
@@ -11,14 +11,20 @@ from SoftLayer.managers.account import AccountManager as AccountManager
 from SoftLayer import utils
 
 @click.command()
-
+@click.option('--ack-all', is_flag=True, default=False,
+              help="Acknowledge every upcoming event. Doing so will turn off the popup in the control portal")
 @environment.pass_env
-def cli(env):
-    """Summary and acknowledgement of upcoming and ongoing maintenance"""
+def cli(env, ack_all):
+    """Summary and acknowledgement of upcoming and ongoing maintenance events"""
 
     # Print a list of all on going maintenance 
     manager = AccountManager(env.client)
     events = manager.get_upcoming_events()
+
+    if ack_all:
+        for event in events:
+            result = manager.ack_event(event['id'])
+            event['acknowledgedFlag'] = result
     env.fout(event_table(events))
     # pp(events)
 

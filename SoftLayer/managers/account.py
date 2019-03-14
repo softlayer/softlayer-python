@@ -59,3 +59,52 @@ class AccountManager(utils.IdentifierMixin, object):
             }
         }
         return self.client.call('Notification_Occurrence_Event', 'getAllObjects', filter=_filter, mask=mask, iter=True)
+
+
+    def ack_event(self, event_id):
+        return self.client.call('Notification_Occurrence_Event', 'acknowledgeNotification', id=event_id)
+
+    def get_event(self, event_id):
+        mask = """mask[
+            acknowledgedFlag,
+            attachments,
+            impactedResources,
+            statusCode,
+            updates,
+            notificationOccurrenceEventType]
+        """
+        return self.client.call('Notification_Occurrence_Event', 'getObject', id=event_id, mask=mask)
+
+    def get_invoices(self, limit, closed=False, get_all=False):
+        mask = "mask[invoiceTotalAmount, itemCount]"
+        _filter = {
+            'invoices': {
+                'createDate' : {
+                    'operation': 'orderBy',
+                    'options': [{
+                        'name': 'sort',
+                        'value': ['DESC']
+                    }]
+                },
+                'statusCode': {'operation': 'OPEN'},
+            }
+        }
+        if closed:
+            del _filter['invoices']['statusCode']
+
+        return self.client.call('Account', 'getInvoices', mask=mask, filter=_filter, iter=get_all, limit=limit)
+
+    def get_billing_items(self, identifier):
+
+        mask = """mask[
+            id, description, hostName, domainName, oneTimeAfterTaxAmount, recurringAfterTaxAmount, createDate,
+            categoryCode, 
+            category[name], 
+            location[name], 
+            children[id, category[name], description, oneTimeAfterTaxAmount, recurringAfterTaxAmount]
+        ]"""
+        return self.client.call('Billing_Invoice', 'getInvoiceTopLevelItems', id=identifier, mask=mask, iter=True, limit=100)
+
+    def get_child_items(self, identifier):
+        mask = "mask[id, description, oneTimeAfterTaxAmount, recurringAfterTaxAmount, category[name], location[name]]"
+        return self.client.call('Billing_Invoice_Item', 'getChildren', id=identifier, mask=mask)
