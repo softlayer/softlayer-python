@@ -241,7 +241,7 @@ def find_saas_endurance_space_price(package, size, tier_level):
     key_name = 'STORAGE_SPACE_FOR_{0}_IOPS_PER_GB'.format(tier_level)
     key_name = key_name.replace(".", "_")
     for item in package['items']:
-        if item['keyName'] != key_name:
+        if key_name not in item['keyName']:
             continue
 
         if 'capacityMinimum' not in item or 'capacityMaximum' not in item:
