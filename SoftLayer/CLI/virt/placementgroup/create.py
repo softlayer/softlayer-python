@@ -15,7 +15,7 @@ from SoftLayer.managers.vs_placement import PlacementManager as PlacementManager
               help="The keyName or Id of the rule to govern this placement group.")
 @environment.pass_env
 def cli(env, **args):
-    """Create a placement group"""
+    """Create a placement group."""
     manager = PlacementManager(env.client)
     backend_router_id = helpers.resolve_id(manager.get_backend_router_id_from_hostname,
                                            args.get('backend_router'),
