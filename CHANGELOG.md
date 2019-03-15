@@ -1,8 +1,13 @@
 # Change Log
 
+## [5.7.1] - 2019-02-26
+- https://github.com/softlayer/softlayer-python/compare/v5.7.0...v5.7.1
 
-## [5.7.0] - 2018-11-16
-- Changes: https://github.com/softlayer/softlayer-python/compare/v5.6.4...master
++ #1089 removed legacy SL message queue commands
++ Support for Hardware reflash firmware CLI/Manager method
+
+## [5.7.0] - 2019-02-15
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.6.4...v5.7.0
 
 + #1099 Support for security group Ids
 + event-log cli command

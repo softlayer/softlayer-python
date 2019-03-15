@@ -428,14 +428,13 @@ class VSManager(utils.IdentifierMixin, object):
         if public_subnet:
             if public_vlan is None:
                 raise exceptions.SoftLayerError("You need to specify a public_vlan with public_subnet")
-            else:
-                parameters['primaryNetworkComponent']['networkVlan']['primarySubnet'] = {'id': int(public_subnet)}
+
+            parameters['primaryNetworkComponent']['networkVlan']['primarySubnet'] = {'id': int(public_subnet)}
         if private_subnet:
             if private_vlan is None:
                 raise exceptions.SoftLayerError("You need to specify a private_vlan with private_subnet")
-            else:
-                parameters['primaryBackendNetworkComponent']['networkVlan']['primarySubnet'] = {
-                    "id": int(private_subnet)}
+
+            parameters['primaryBackendNetworkComponent']['networkVlan']['primarySubnet'] = {'id': int(private_subnet)}
 
         return parameters
 

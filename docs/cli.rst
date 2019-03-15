@@ -14,6 +14,7 @@ functionality not fully documented here.
 
    cli/ipsec
    cli/vs
+   cli/hardware
    cli/ordering
    cli/users
 
@@ -34,7 +35,7 @@ To update the configuration, you can use `slcli setup`.
 	:..............:..................................................................:
 	:     Username : username                                                         :
 	:      API Key : oyVmeipYQCNrjVS4rF9bHWV7D75S6pa1fghFl384v7mwRCbHTfuJ8qRORIqoVnha :
-	: Endpoint URL : https://api.softlayer.com/xmlrpc/v3/                             :
+	: Endpoint URL : https://api.softlayer.com/xmlrpc/v3.1/                           :
 	:..............:..................................................................:
 	Are you sure you want to write settings to "/home/me/.softlayer"? [y/N]: y
 
@@ -47,7 +48,7 @@ To check the configuration, you can use `slcli config show`.
 	:..............:..................................................................:
 	:     Username : username                                                         :
 	:      API Key : oyVmeipYQCNrjVS4rF9bHWV7D75S6pa1fghFl384v7mwRCbHTfuJ8qRORIqoVnha :
-	: Endpoint URL : https://api.softlayer.com/xmlrpc/v3/                             :
+	: Endpoint URL : https://api.softlayer.com/xmlrpc/v3.1/                           :
 	:..............:..................................................................:
 
 
