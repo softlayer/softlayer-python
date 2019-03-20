@@ -115,7 +115,7 @@ class OrderTests(testing.TestCase):
         place_mock.return_value = order
         items_mock.return_value = self._get_order_items()
 
-        result = self.run_command(['-y', 'order', 'place', '--quantity=2','package', 'DALLAS13', 'ITEM1',
+        result = self.run_command(['-y', 'order', 'place', '--quantity=2', 'package', 'DALLAS13', 'ITEM1',
                                    '--complex-type', 'SoftLayer_Container_Product_Order_Thing'])
 
         self.assert_no_fail(result)
