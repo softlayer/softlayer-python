@@ -507,8 +507,7 @@ class OrderingTests(testing.TestCase):
                                               preset_keyname=preset_keyname,
                                               complex_type=complex_type,
                                               extras=extras, quantity=quantity)
-            print("----------------------------------")
-        print(order)
+
         gen_mock.assert_called_once_with(pkg, location, items, hourly=hourly,
                                          preset_keyname=preset_keyname,
                                          complex_type=complex_type,
