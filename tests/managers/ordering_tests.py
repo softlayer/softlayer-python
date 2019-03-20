@@ -370,6 +370,36 @@ class OrderingTests(testing.TestCase):
         mock_get_ids.assert_called_once_with(pkg, items, 8)
         self.assertEqual(expected_order, order)
 
+    def test_generate_order_with_quantity(self):
+        pkg = 'PACKAGE_KEYNAME'
+        quantity = 2
+        items = ['ITEM1', 'ITEM2']
+        extras = {"hardware": [{"hostname": "test01", "domain": "example.com"},
+                               {"hostname": "test02", "domain": "example.com"}]}
+        complex_type = 'My_Type'
+        expected_order = {'orderContainers': [
+            {'complexType': 'My_Type',
+             'hardware': [{'domain': 'example.com',
+                           'hostname': 'test01'},
+                          {'domain': 'example.com',
+                           'hostname': 'test02'}],
+             'location': 1854895,
+             'packageId': 1234,
+             'prices': [{'id': 1111}, {'id': 2222}],
+             'quantity': 2,
+             'useHourlyPricing': True}
+        ]}
+
+        mock_pkg, mock_preset, mock_get_ids = self._patch_for_generate()
+
+        order = self.ordering.generate_order(pkg, 'DALLAS13', items, complex_type=complex_type, quantity=quantity,
+                                             extras=extras)
+
+        mock_pkg.assert_called_once_with(pkg, mask='id')
+        mock_preset.assert_not_called()
+        mock_get_ids.assert_called_once_with(pkg, items, None)
+        self.assertEqual(expected_order, order)
+
     def test_generate_order(self):
         pkg = 'PACKAGE_KEYNAME'
         items = ['ITEM1', 'ITEM2']
@@ -429,6 +459,33 @@ class OrderingTests(testing.TestCase):
         complex_type = 'Complex_Type'
         extras = {'foo': 'bar'}
         quantity = 1
+
+        with mock.patch.object(self.ordering, 'generate_order') as gen_mock:
+            gen_mock.return_value = {'order': {}}
+
+            order = self.ordering.place_order(pkg, location, items, hourly=hourly,
+                                              preset_keyname=preset_keyname,
+                                              complex_type=complex_type,
+                                              extras=extras, quantity=quantity)
+
+        gen_mock.assert_called_once_with(pkg, location, items, hourly=hourly,
+                                         preset_keyname=preset_keyname,
+                                         complex_type=complex_type,
+                                         extras=extras, quantity=quantity)
+        self.assertEqual(ord_mock.return_value, order)
+
+    def test_place_order_with_quantity(self):
+        ord_mock = self.set_mock('SoftLayer_Product_Order', 'placeOrder')
+        ord_mock.return_value = {'id': 1234}
+        pkg = 'PACKAGE_KEYNAME'
+        location = 'DALLAS13'
+        items = ['ITEM1', 'ITEM2']
+        hourly = True
+        preset_keyname = 'PRESET'
+        complex_type = 'Complex_Type'
+        extras = {"hardware": [{"hostname": "test01", "domain": "example.com"},
+                               {"hostname": "test02", "domain": "example.com"}]}
+        quantity = 2
 
         with mock.patch.object(self.ordering, 'generate_order') as gen_mock:
             gen_mock.return_value = {'order': {}}
