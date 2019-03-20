@@ -104,6 +104,27 @@ class OrderTests(testing.TestCase):
                           'status': 'APPROVED'},
                          json.loads(result.output))
 
+    def test_place_quantity(self):
+        order_date = '2017-04-04 07:39:20'
+        order = {'orderId': 1234, 'orderDate': order_date, 'placedOrder': {'status': 'APPROVED'}}
+        verify_mock = self.set_mock('SoftLayer_Product_Order', 'verifyOrder')
+        place_mock = self.set_mock('SoftLayer_Product_Order', 'placeOrder')
+        items_mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
+
+        verify_mock.return_value = self._get_verified_order_return()
+        place_mock.return_value = order
+        items_mock.return_value = self._get_order_items()
+
+        result = self.run_command(['-y', 'order', 'place', '--quantity=2', 'package', 'DALLAS13', 'ITEM1',
+                                   '--complex-type', 'SoftLayer_Container_Product_Order_Thing'])
+
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
+        self.assertEqual({'id': 1234,
+                          'created': order_date,
+                          'status': 'APPROVED'},
+                         json.loads(result.output))
+
     def test_place_extras_parameter_fail(self):
         result = self.run_command(['-y', 'order', 'place', 'package', 'DALLAS13', 'ITEM1',
                                    '--extras', '{"device":['])

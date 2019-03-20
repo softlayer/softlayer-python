@@ -23,6 +23,9 @@ COLUMNS = ['keyName',
 @click.option('--verify',
               is_flag=True,
               help="Flag denoting whether or not to only verify the order, not place it")
+@click.option('--quantity',
+              type=int,
+              help="The quantity of the item being ordered")
 @click.option('--billing',
               type=click.Choice(['hourly', 'monthly']),
               default='hourly',
@@ -35,7 +38,7 @@ COLUMNS = ['keyName',
 @click.argument('order_items', nargs=-1)
 @environment.pass_env
 def cli(env, package_keyname, location, preset, verify, billing, complex_type,
-        extras, order_items):
+        quantity, extras, order_items):
     """Place or verify an order.
 
     This CLI command is used for placing/verifying an order of the specified package in
@@ -84,7 +87,7 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
     args = (package_keyname, location, order_items)
     kwargs = {'preset_keyname': preset,
               'extras': extras,
-              'quantity': 1,
+              'quantity': quantity,
               'complex_type': complex_type,
               'hourly': bool(billing == 'hourly')}
 
