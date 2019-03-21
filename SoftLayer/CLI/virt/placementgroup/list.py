@@ -10,7 +10,7 @@ from SoftLayer.managers.vs_placement import PlacementManager as PlacementManager
 @click.command()
 @environment.pass_env
 def cli(env):
-    """List Reserved Capacity groups."""
+    """List placement groups."""
     manager = PlacementManager(env.client)
     result = manager.list()
     table = formatting.Table(

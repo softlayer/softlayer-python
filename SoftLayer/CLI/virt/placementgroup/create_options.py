@@ -11,7 +11,7 @@ from SoftLayer.managers.vs_placement import PlacementManager as PlacementManager
 @click.command()
 @environment.pass_env
 def cli(env):
-    """List options for creating Reserved Capacity"""
+    """List options for creating a placement group."""
     manager = PlacementManager(env.client)
 
     routers = manager.get_routers()

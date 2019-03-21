@@ -14,6 +14,7 @@ functionality not fully documented here.
 
    cli/ipsec
    cli/vs
+   cli/hardware
    cli/ordering
    cli/users
 
@@ -34,7 +35,7 @@ To update the configuration, you can use `slcli setup`.
 	:..............:..................................................................:
 	:     Username : username                                                         :
 	:      API Key : oyVmeipYQCNrjVS4rF9bHWV7D75S6pa1fghFl384v7mwRCbHTfuJ8qRORIqoVnha :
-	: Endpoint URL : https://api.softlayer.com/xmlrpc/v3/                             :
+	: Endpoint URL : https://api.softlayer.com/xmlrpc/v3.1/                           :
 	:..............:..................................................................:
 	Are you sure you want to write settings to "/home/me/.softlayer"? [y/N]: y
 
@@ -47,7 +48,7 @@ To check the configuration, you can use `slcli config show`.
 	:..............:..................................................................:
 	:     Username : username                                                         :
 	:      API Key : oyVmeipYQCNrjVS4rF9bHWV7D75S6pa1fghFl384v7mwRCbHTfuJ8qRORIqoVnha :
-	: Endpoint URL : https://api.softlayer.com/xmlrpc/v3/                             :
+	: Endpoint URL : https://api.softlayer.com/xmlrpc/v3.1/                           :
 	:..............:..................................................................:
 
 
@@ -60,43 +61,43 @@ Usage Examples
 To discover the available commands, simply type `slcli`.
 ::
 
-	$ slcli
+    $ slcli
         Usage: slcli [OPTIONS] COMMAND [ARGS]...
-        
+
           SoftLayer Command-line Client
-        
+
         Options:
-          --format [table|raw|json|jsonraw]
-                                          Output format  [default: table]
-          -C, --config PATH               Config file location  [default:
-                                          ~/.softlayer]
-          -v, --verbose                   Sets the debug noise level, specify multiple
-                                          times for more verbosity.
-          --proxy TEXT                    HTTP[S] proxy to be use to make API calls
-          -y, --really / --not-really     Confirm all prompt actions
-          --demo / --no-demo              Use demo data instead of actually making API
-                                          calls
-          --version                       Show the version and exit.
-          -h, --help                      Show this message and exit.
-        
+          --format [table|raw|json|jsonraw] Output format  [default: raw]
+          -C, --config PATH                 Config file location  [default: ~\.softlayer]
+          -v, --verbose                     Sets the debug noise level, specify multiple times for more verbosity.
+          --proxy TEXT                      HTTP[S] proxy to be use to make API calls
+          -y, --really / --not-really       Confirm all prompt actions
+          --demo / --no-demo                Use demo data instead of actually making API calls
+          --version                         Show the version and exit.
+          -h, --help                        Show this message and exit.
+
         Commands:
           block           Block Storage.
           call-api        Call arbitrary API endpoints.
           cdn             Content Delivery Network.
           config          CLI configuration.
+          dedicatedhost   Dedicated Host.
           dns             Domain Name System.
+          event-log       Event Logs.
           file            File Storage.
           firewall        Firewalls.
           globalip        Global IP addresses.
           hardware        Hardware servers.
           image           Compute images.
+          ipsec           IPSEC VPN
           loadbal         Load balancers.
-          messaging       Message queue service.
           metadata        Find details about this machine.
           nas             Network Attached Storage.
           object-storage  Object Storage.
+          order           View and order from the catalog.
           report          Reports.
           rwhois          Referral Whois.
+          securitygroup   Network security groups.
           setup           Edit configuration.
           shell           Enters a shell for slcli.
           sshkey          SSH Keys.
@@ -104,9 +105,10 @@ To discover the available commands, simply type `slcli`.
           subnet          Network subnets.
           summary         Account summary.
           ticket          Support tickets.
+          user            Manage Users.
           virtual         Virtual Servers.
           vlan            Network VLANs.
-        
+
           To use most commands your SoftLayer username and api_key need to be
           configured. The easiest way to do that is to use: 'slcli setup'
 
