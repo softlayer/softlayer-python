@@ -415,7 +415,7 @@ class OrderingManager(object):
         return prices
 
     def verify_order(self, package_keyname, location, item_keynames, complex_type=None,
-                     hourly=True, preset_keyname=None, extras=None, quantity=None):
+                     hourly=True, preset_keyname=None, extras=None, quantity=1):
         """Verifies an order with the given package and prices.
 
         This function takes in parameters needed for an order and verifies the order
@@ -446,7 +446,7 @@ class OrderingManager(object):
         return self.order_svc.verifyOrder(order)
 
     def place_order(self, package_keyname, location, item_keynames, complex_type=None,
-                    hourly=True, preset_keyname=None, extras=None, quantity=None):
+                    hourly=True, preset_keyname=None, extras=None, quantity=1):
         """Places an order with the given package and prices.
 
         This function takes in parameters needed for an order and places the order.
@@ -509,7 +509,7 @@ class OrderingManager(object):
         return self.order_svc.placeQuote(order)
 
     def generate_order(self, package_keyname, location, item_keynames, complex_type=None,
-                       hourly=True, preset_keyname=None, extras=None, quantity=None):
+                       hourly=True, preset_keyname=None, extras=None, quantity=1):
         """Generates an order with the given package and prices.
 
         This function takes in parameters needed for an order and generates an order
@@ -545,6 +545,7 @@ class OrderingManager(object):
         #                                    'domain': 'softlayer.com'}]}
         order.update(extras)
         order['packageId'] = package['id']
+        order['quantity'] = quantity
         order['location'] = self.get_location_id(location)
         order['useHourlyPricing'] = hourly
 
@@ -560,11 +561,6 @@ class OrderingManager(object):
         if not complex_type:
             raise exceptions.SoftLayerError("A complex type must be specified with the order")
         order['complexType'] = complex_type
-
-        if not quantity:
-            order['quantity'] = 1
-        else:
-            order['quantity'] = quantity
 
         price_ids = self.get_price_id_list(package_keyname, item_keynames, preset_core)
         order['prices'] = [{'id': price_id} for price_id in price_ids]

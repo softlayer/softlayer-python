@@ -25,6 +25,7 @@ COLUMNS = ['keyName',
               help="Flag denoting whether or not to only verify the order, not place it")
 @click.option('--quantity',
               type=int,
+              default=1,
               help="The quantity of the item being ordered")
 @click.option('--billing',
               type=click.Choice(['hourly', 'monthly']),
