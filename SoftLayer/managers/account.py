@@ -75,7 +75,7 @@ class AccountManager(utils.IdentifierMixin, object):
         """
         return self.client.call('Notification_Occurrence_Event', 'getObject', id=event_id, mask=mask)
 
-    def get_invoices(self, limit, closed=False, get_all=False):
+    def get_invoices(self, limit=50, closed=False, get_all=False):
         mask = "mask[invoiceTotalAmount, itemCount]"
         _filter = {
             'invoices': {
@@ -111,7 +111,3 @@ class AccountManager(utils.IdentifierMixin, object):
             iter=True,
             limit=100
         )
-
-    def get_child_items(self, identifier):
-        mask = "mask[id, description, oneTimeAfterTaxAmount, recurringAfterTaxAmount, category[name], location[name]]"
-        return self.client.call('Billing_Invoice_Item', 'getChildren', id=identifier, mask=mask)
