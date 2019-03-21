@@ -297,5 +297,9 @@ def clean_time(sltime, in_format='%Y-%m-%dT%H:%M:%S%z', out_format='%Y-%m-%d %H:
     :param string in_format: Datetime format for strptime
     :param string out_format: Datetime format for strftime
     """
-    clean = datetime.datetime.strptime(sltime, in_format)
-    return clean.strftime(out_format)
+    try:
+        clean = datetime.datetime.strptime(sltime, in_format)
+        return clean.strftime(out_format)
+    # The %z option only exists with py3.6+
+    except ValueError:
+        return sltime
