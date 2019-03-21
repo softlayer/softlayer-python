@@ -4,9 +4,6 @@
 
 """
 
-import mock
-import SoftLayer
-from SoftLayer import exceptions
 from SoftLayer.managers.account import AccountManager as AccountManager
 from SoftLayer import testing
 

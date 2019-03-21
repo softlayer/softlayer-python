@@ -10,15 +10,20 @@ getObject = {
     'systemTicketId': 76057381,
     'acknowledgedFlag': False,
     'attachments': [],
-    'impactedResources': [],
+    'impactedResources': [{
+        'resourceType': 'Server',
+        'resourceTableId': 12345,
+        'hostname': 'test',
+        'privateIp': '10.0.0.1',
+        'filterLable': 'Server'
+    }],
     'notificationOccurrenceEventType': {'keyName': 'PLANNED'},
     'statusCode': {'keyName': 'PUBLISHED', 'name': 'Published'},
     'updates': [{
         'contents': 'More Blah Blah',
         'createDate': '2019-03-12T13:07:22-06:00',
         'endDate': None, 'startDate': '2019-03-12T13:07:22-06:00'
-    }
-    ]
+    }]
 }
 
 getAllObjects = [getObject]

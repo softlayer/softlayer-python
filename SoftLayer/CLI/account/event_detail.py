@@ -3,9 +3,7 @@
 
 import click
 
-import SoftLayer
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.account import AccountManager as AccountManager
 from SoftLayer import utils
@@ -24,7 +22,7 @@ def cli(env, identifier, ack):
     event = manager.get_event(identifier)
 
     if ack:
-        result = manager.ack_event(identifier)
+        manager.ack_event(identifier)
 
     env.fout(basic_event_table(event))
     env.fout(impacted_table(event))

@@ -1,12 +1,8 @@
 """Account Summary page"""
 # :license: MIT, see LICENSE for more details.
-from pprint import pprint as pp
-
 import click
 
-import SoftLayer
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.account import AccountManager as AccountManager
 from SoftLayer import utils

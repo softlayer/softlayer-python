@@ -3,7 +3,6 @@
 
 import click
 
-import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.account import AccountManager as AccountManager

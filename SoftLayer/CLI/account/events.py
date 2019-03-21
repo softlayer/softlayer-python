@@ -2,7 +2,6 @@
 # :license: MIT, see LICENSE for more details.
 import click
 
-import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.account import AccountManager as AccountManager
@@ -27,6 +26,7 @@ def cli(env, ack_all):
 
 
 def event_table(events):
+    """Formats a table for events"""
     table = formatting.Table([
         "Id",
         "Start Date",

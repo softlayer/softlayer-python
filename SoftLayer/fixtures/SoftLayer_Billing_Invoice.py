@@ -6,6 +6,8 @@ getInvoiceTopLevelItems = [
         'id': 724951323,
         'oneTimeAfterTaxAmount': '0',
         'recurringAfterTaxAmount': '0',
+        'hostName': 'bleg',
+        'domainName': 'beh.com',
         'category': {'name': 'Private (only) Secondary VLAN IP Addresses'},
         'children': [
             {

@@ -7,7 +7,6 @@
 """
 
 import logging
-import SoftLayer
 
 from SoftLayer import utils
 
@@ -80,7 +79,7 @@ class AccountManager(utils.IdentifierMixin, object):
         """Gets details about a maintenance event
 
         :param int event_id: Notification_Occurrence_Event ID
-        :return: Notification_Occurrence_Event  
+        :return: Notification_Occurrence_Event
         """
         mask = """mask[
             acknowledgedFlag,
@@ -120,16 +119,16 @@ class AccountManager(utils.IdentifierMixin, object):
 
     def get_billing_items(self, identifier):
         """Gets all topLevelBillingItems from a specific invoice
-        
+
         :param int identifier: Invoice Id
         :return: Billing_Invoice_Item
         """
 
         mask = """mask[
             id, description, hostName, domainName, oneTimeAfterTaxAmount, recurringAfterTaxAmount, createDate,
-            categoryCode, 
-            category[name], 
-            location[name], 
+            categoryCode,
+            category[name],
+            location[name],
             children[id, category[name], description, oneTimeAfterTaxAmount, recurringAfterTaxAmount]
         ]"""
         return self.client.call(

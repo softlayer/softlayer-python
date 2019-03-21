@@ -142,9 +142,9 @@ def format_event_log_date(date_string, utc):
         utc = "+0000"
 
     iso_time_zone = utc[:3] + ':' + utc[3:]
-    clean_time = "{}.000000{}".format(dirty_time, iso_time_zone)
+    cleaned_time = "{}.000000{}".format(dirty_time, iso_time_zone)
 
-    return clean_time
+    return cleaned_time
 
 
 def event_log_filter_between_date(start, end, utc):
