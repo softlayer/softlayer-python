@@ -545,8 +545,8 @@ class OrderingManager(object):
         #                                    'domain': 'softlayer.com'}]}
         order.update(extras)
         order['packageId'] = package['id']
-        order['location'] = self.get_location_id(location)
         order['quantity'] = quantity
+        order['location'] = self.get_location_id(location)
         order['useHourlyPricing'] = hourly
 
         preset_core = None
