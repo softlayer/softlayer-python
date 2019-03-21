@@ -27,6 +27,10 @@ class AccountManager(utils.IdentifierMixin, object):
         self.client = client
 
     def get_summary(self):
+        """Gets some basic account information
+
+        :return: Account object
+        """
         mask = """mask[
             nextInvoiceTotalAmount,
             pendingInvoice[invoiceTotalAmount],
@@ -45,6 +49,10 @@ class AccountManager(utils.IdentifierMixin, object):
         return self.client.call('Account', 'getObject', mask=mask)
 
     def get_upcoming_events(self):
+        """Retreives a list of Notification_Occurrence_Events that have not ended yet
+
+        :return: SoftLayer_Notification_Occurrence_Event
+        """
         mask = "mask[id, subject, startDate, endDate, statusCode, acknowledgedFlag, impactedResourceCount, updateCount]"
         _filter = {
             'endDate': {
@@ -61,9 +69,19 @@ class AccountManager(utils.IdentifierMixin, object):
         return self.client.call('Notification_Occurrence_Event', 'getAllObjects', filter=_filter, mask=mask, iter=True)
 
     def ack_event(self, event_id):
+        """Acknowledge an event. This mostly prevents it from appearing as a notification in the control portal.
+
+        :param int event_id: Notification_Occurrence_Event ID you want to ack
+        :return: True on success, Exception otherwise.
+        """
         return self.client.call('Notification_Occurrence_Event', 'acknowledgeNotification', id=event_id)
 
     def get_event(self, event_id):
+        """Gets details about a maintenance event
+
+        :param int event_id: Notification_Occurrence_Event ID
+        :return: Notification_Occurrence_Event  
+        """
         mask = """mask[
             acknowledgedFlag,
             attachments,
@@ -75,6 +93,13 @@ class AccountManager(utils.IdentifierMixin, object):
         return self.client.call('Notification_Occurrence_Event', 'getObject', id=event_id, mask=mask)
 
     def get_invoices(self, limit=50, closed=False, get_all=False):
+        """Gets an accounts invoices.
+
+        :param int limit: Number of invoices to get back in a single call.
+        :param bool closed: If True, will also get CLOSED invoices
+        :param bool get_all: If True, will paginate through invoices until all have been retrieved.
+        :return: Billing_Invoice
+        """
         mask = "mask[invoiceTotalAmount, itemCount]"
         _filter = {
             'invoices': {
@@ -94,6 +119,11 @@ class AccountManager(utils.IdentifierMixin, object):
         return self.client.call('Account', 'getInvoices', mask=mask, filter=_filter, iter=get_all, limit=limit)
 
     def get_billing_items(self, identifier):
+        """Gets all topLevelBillingItems from a specific invoice
+        
+        :param int identifier: Invoice Id
+        :return: Billing_Invoice_Item
+        """
 
         mask = """mask[
             id, description, hostName, domainName, oneTimeAfterTaxAmount, recurringAfterTaxAmount, createDate,

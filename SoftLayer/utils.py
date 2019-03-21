@@ -291,6 +291,11 @@ def clean_string(string):
 
 
 def clean_time(sltime, in_format='%Y-%m-%dT%H:%M:%S%z', out_format='%Y-%m-%d %H:%M'):
+    """Easy way to format time strings
 
+    :param string sltime: A softlayer formatted time string
+    :param string in_format: Datetime format for strptime
+    :param string out_format: Datetime format for strftime
+    """
     clean = datetime.datetime.strptime(sltime, in_format)
     return clean.strftime(out_format)

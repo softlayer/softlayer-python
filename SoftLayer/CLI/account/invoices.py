@@ -21,8 +21,6 @@ from SoftLayer import utils
 def cli(env, limit, closed=False, get_all=False):
     """Invoices and all that mess"""
 
-    # List invoices
-
     manager = AccountManager(env.client)
     invoices = manager.get_invoices(limit, closed, get_all)
 

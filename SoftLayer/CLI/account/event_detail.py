@@ -32,6 +32,7 @@ def cli(env, identifier, ack):
 
 
 def basic_event_table(event):
+    """Formats a basic event table"""
     table = formatting.Table(["Id", "Status", "Type", "Start", "End"], title=event.get('subject'))
 
     table.add_row([
@@ -46,6 +47,7 @@ def basic_event_table(event):
 
 
 def impacted_table(event):
+    """Formats a basic impacted resources table"""
     table = formatting.Table([
         "Type", "Id", "hostname", "privateIp", "Label"
     ])
@@ -61,6 +63,7 @@ def impacted_table(event):
 
 
 def update_table(event):
+    """Formats a basic event update table"""
     update_number = 0
     for update in event.get('updates', []):
         header = "======= Update #%s on %s =======" % (update_number, utils.clean_time(update.get('startDate')))

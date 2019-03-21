@@ -5,11 +5,9 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.account import AccountManager as AccountManager
 from SoftLayer import utils
-from pprint import pprint as pp
 
 
 @click.command()
@@ -60,4 +58,5 @@ def cli(env, identifier, details):
 
 
 def nice_string(ugly_string, limit=100):
+    """Format and trims strings"""
     return (ugly_string[:limit] + '..') if len(ugly_string) > limit else ugly_string

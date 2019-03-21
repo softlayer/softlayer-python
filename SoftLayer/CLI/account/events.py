@@ -1,11 +1,9 @@
 """Summary and acknowledgement of upcoming and ongoing maintenance events"""
 # :license: MIT, see LICENSE for more details.
-from pprint import pprint as pp
 import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.account import AccountManager as AccountManager
 from SoftLayer import utils
@@ -18,7 +16,6 @@ from SoftLayer import utils
 def cli(env, ack_all):
     """Summary and acknowledgement of upcoming and ongoing maintenance events"""
 
-    # Print a list of all on going maintenance
     manager = AccountManager(env.client)
     events = manager.get_upcoming_events()
 
@@ -27,9 +24,6 @@ def cli(env, ack_all):
             result = manager.ack_event(event['id'])
             event['acknowledgedFlag'] = result
     env.fout(event_table(events))
-    # pp(events)
-
-    # Allow ack all, or ack specific maintenance
 
 
 def event_table(events):
