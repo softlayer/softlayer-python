@@ -10,6 +10,7 @@ from SoftLayer import exceptions
 from SoftLayer.managers.account import AccountManager as AccountManager
 from SoftLayer import testing
 
+
 class AccountManagerTests(testing.TestCase):
 
     def set_up(self):
@@ -40,7 +41,7 @@ class AccountManagerTests(testing.TestCase):
         self.manager.get_invoices(closed=True)
         _filter = {
             'invoices': {
-                'createDate' : {
+                'createDate': {
                     'operation': 'orderBy',
                     'options': [{
                         'name': 'sort',

@@ -60,7 +60,6 @@ class AccountManager(utils.IdentifierMixin, object):
         }
         return self.client.call('Notification_Occurrence_Event', 'getAllObjects', filter=_filter, mask=mask, iter=True)
 
-
     def ack_event(self, event_id):
         return self.client.call('Notification_Occurrence_Event', 'acknowledgeNotification', id=event_id)
 
@@ -79,7 +78,7 @@ class AccountManager(utils.IdentifierMixin, object):
         mask = "mask[invoiceTotalAmount, itemCount]"
         _filter = {
             'invoices': {
-                'createDate' : {
+                'createDate': {
                     'operation': 'orderBy',
                     'options': [{
                         'name': 'sort',

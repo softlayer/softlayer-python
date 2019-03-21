@@ -9,6 +9,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer.managers.account import AccountManager as AccountManager
 from SoftLayer import utils
 
+
 @click.command()
 @click.option('--limit', default=50, show_default=True,
               help="How many invoices to get back.")

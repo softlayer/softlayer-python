@@ -11,6 +11,7 @@ from SoftLayer.managers.account import AccountManager as AccountManager
 from SoftLayer import utils
 from pprint import pprint as pp
 
+
 @click.command()
 @click.argument('identifier')
 @click.option('--details', is_flag=True, default=False, show_default=True,
@@ -23,7 +24,8 @@ def cli(env, identifier, details):
     top_items = manager.get_billing_items(identifier)
 
     title = "Invoice %s" % identifier
-    table = formatting.Table(["Item Id", "category", "description", "Single", "Monthly", "Create Date", "Location"], title=title)
+    table = formatting.Table(["Item Id", "category", "description", "Single",
+                              "Monthly", "Create Date", "Location"], title=title)
     table.align['category'] = 'l'
     table.align['description'] = 'l'
     for item in top_items:
@@ -43,7 +45,7 @@ def cli(env, identifier, details):
             utils.lookup(item, 'location', 'name')
         ])
         if details:
-            for child in item.get('children',[]):
+            for child in item.get('children', []):
                 table.add_row([
                     '>>>',
                     utils.lookup(child, 'category', 'name'),
@@ -55,6 +57,7 @@ def cli(env, identifier, details):
                 ])
 
     env.fout(table)
+
 
 def nice_string(ugly_string, limit=100):
     return (ugly_string[:limit] + '..') if len(ugly_string) > limit else ugly_string

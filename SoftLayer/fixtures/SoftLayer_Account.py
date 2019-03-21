@@ -673,7 +673,7 @@ getInvoices = [
         'typeCode': 'RECURRING',
         'itemCount': 3317,
         'invoiceTotalAmount': '6230.66'
-    }, 
+    },
     {
         'id': 12345667,
         'modifyDate': '2019-03-05T00:17:42-06:00',

@@ -41,8 +41,8 @@ class AccountCLITests(testing.TestCase):
         self.assert_called_with(self.SLNOE, 'getAllObjects')
         self.assert_called_with(self.SLNOE, 'acknowledgeNotification', identifier=1234)
 
-
     #### slcli account invoice-detail ####
+
     def test_invoice_detail(self):
         result = self.run_command(['account', 'invoice-detail', '1234'])
         self.assert_no_fail(result)
@@ -67,7 +67,7 @@ class AccountCLITests(testing.TestCase):
     def test_invoices_closed(self):
         _filter = {
             'invoices': {
-                'createDate' : {
+                'createDate': {
                     'operation': 'orderBy',
                     'options': [{
                         'name': 'sort',
@@ -89,5 +89,3 @@ class AccountCLITests(testing.TestCase):
         result = self.run_command(['account', 'summary'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account', 'getObject')
-
-

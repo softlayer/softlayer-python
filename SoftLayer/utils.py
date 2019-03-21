@@ -288,10 +288,9 @@ def clean_string(string):
         return ''
     else:
         return " ".join(string.split())
+
+
 def clean_time(sltime, in_format='%Y-%m-%dT%H:%M:%S%z', out_format='%Y-%m-%d %H:%M'):
 
     clean = datetime.datetime.strptime(sltime, in_format)
     return clean.strftime(out_format)
-
-
-

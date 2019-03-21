@@ -10,6 +10,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer.managers.account import AccountManager as AccountManager
 from SoftLayer import utils
 
+
 @click.command()
 @click.argument('identifier')
 @click.option('--ack', is_flag=True, default=False,
@@ -18,7 +19,7 @@ from SoftLayer import utils
 def cli(env, identifier, ack):
     """Details of a specific event, and ability to acknowledge event."""
 
-    # Print a list of all on going maintenance 
+    # Print a list of all on going maintenance
     manager = AccountManager(env.client)
     event = manager.get_event(identifier)
 
@@ -28,6 +29,7 @@ def cli(env, identifier, ack):
     env.fout(basic_event_table(event))
     env.fout(impacted_table(event))
     env.fout(update_table(event))
+
 
 def basic_event_table(event):
     table = formatting.Table(["Id", "Status", "Type", "Start", "End"], title=event.get('subject'))
@@ -42,6 +44,7 @@ def basic_event_table(event):
 
     return table
 
+
 def impacted_table(event):
     table = formatting.Table([
         "Type", "Id", "hostname", "privateIp", "Label"
@@ -55,6 +58,7 @@ def impacted_table(event):
             item.get('filterLabel')
         ])
     return table
+
 
 def update_table(event):
     update_number = 0

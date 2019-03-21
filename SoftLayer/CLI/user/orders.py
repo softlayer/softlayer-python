@@ -10,7 +10,6 @@ from SoftLayer.CLI import formatting
 
 
 @click.command()
-
 @environment.pass_env
 def cli(env):
     """Lists each user and the servers they ordered"""

@@ -11,8 +11,8 @@ from SoftLayer.CLI import formatting
 from SoftLayer.managers.account import AccountManager as AccountManager
 from SoftLayer import utils
 
-@click.command()
 
+@click.command()
 @environment.pass_env
 def cli(env):
     """Prints some various bits of information about an account"""

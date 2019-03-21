@@ -10,6 +10,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer.managers.account import AccountManager as AccountManager
 from SoftLayer import utils
 
+
 @click.command()
 @click.option('--ack-all', is_flag=True, default=False,
               help="Acknowledge every upcoming event. Doing so will turn off the popup in the control portal")
@@ -17,7 +18,7 @@ from SoftLayer import utils
 def cli(env, ack_all):
     """Summary and acknowledgement of upcoming and ongoing maintenance events"""
 
-    # Print a list of all on going maintenance 
+    # Print a list of all on going maintenance
     manager = AccountManager(env.client)
     events = manager.get_upcoming_events()
 
@@ -29,6 +30,7 @@ def cli(env, ack_all):
     # pp(events)
 
     # Allow ack all, or ack specific maintenance
+
 
 def event_table(events):
     table = formatting.Table([
