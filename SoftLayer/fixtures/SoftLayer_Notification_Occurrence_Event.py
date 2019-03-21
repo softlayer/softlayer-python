@@ -1,6 +1,6 @@
 getObject = {
     'endDate': '2019-03-18T17:00:00-06:00', 
-    'id': 174093, 
+    'id': 1234, 
     'lastImpactedUserCount': 417756, 
     'modifyDate': '2019-03-12T15:32:48-06:00', 
     'recoveryTime': None, 
@@ -20,3 +20,7 @@ getObject = {
         }
     ]
 }
+
+getAllObjects = [getObject]
+
+acknowledgeNotification = True

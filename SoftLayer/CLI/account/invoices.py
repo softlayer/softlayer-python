@@ -5,16 +5,13 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.account import AccountManager as AccountManager
 from SoftLayer import utils
-from pprint import pprint as pp
-
 
 @click.command()
 @click.option('--limit', default=50, show_default=True,
-              help="How many invoices to get back. ALL for EVERY invoice on your account")
+              help="How many invoices to get back.")
 @click.option('--closed', is_flag=True, default=False, show_default=True,
               help="Include invoices with a CLOSED status.")
 @click.option('--all', 'get_all', is_flag=True, default=False, show_default=True,

@@ -40,5 +40,4 @@ def get_snapshot_table(account):
     table.add_row(['Network Vlans', account.get('networkVlanCount', '-')])
     table.add_row(['Subnets', account.get('subnetCount', '-')])
     table.add_row(['Users', account.get('userCount', '-')])
-    # table.add_row(['', account.get('', '-')])
     return table

@@ -103,7 +103,14 @@ class AccountManager(utils.IdentifierMixin, object):
             location[name], 
             children[id, category[name], description, oneTimeAfterTaxAmount, recurringAfterTaxAmount]
         ]"""
-        return self.client.call('Billing_Invoice', 'getInvoiceTopLevelItems', id=identifier, mask=mask, iter=True, limit=100)
+        return self.client.call(
+            'Billing_Invoice',
+            'getInvoiceTopLevelItems',
+            id=identifier,
+            mask=mask,
+            iter=True,
+            limit=100
+        )
 
     def get_child_items(self, identifier):
         mask = "mask[id, description, oneTimeAfterTaxAmount, recurringAfterTaxAmount, category[name], location[name]]"
