@@ -340,7 +340,8 @@ class OrderingManager(object):
         items = self.list_items(package_keyname, mask=mask)
 
         prices = []
-        gpu_number = -1
+        category_dict = {"gpu0": -1, "pcie_slot0": -1}
+
         for item_keyname in item_keynames:
             try:
                 # Need to find the item in the package that has a matching
@@ -356,15 +357,17 @@ class OrderingManager(object):
             # because that is the most generic price. verifyOrder/placeOrder
             # can take that ID and create the proper price for us in the location
             # in which the order is made
-            if matching_item['itemCategory']['categoryCode'] != "gpu0":
+            item_category = matching_item['itemCategory']['categoryCode']
+            if item_category not in category_dict:
                 price_id = self.get_item_price_id(core, matching_item['prices'])
             else:
-                # GPU items has two generic prices and they are added to the list
-                # according to the number of gpu items added in the order.
-                gpu_number += 1
+                # GPU and PCIe items has two generic prices and they are added to the list
+                # according to the number of items in the order.
+                category_dict[item_category] += 1
+                category_code = item_category[:-1] + str(category_dict[item_category])
                 price_id = [p['id'] for p in matching_item['prices']
                             if not p['locationGroupId']
-                            and p['categories'][0]['categoryCode'] == "gpu" + str(gpu_number)][0]
+                            and p['categories'][0]['categoryCode'] == category_code][0]
 
             prices.append(price_id)
 
