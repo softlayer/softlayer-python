@@ -31,7 +31,8 @@ def cli(env, identifier, ack):
 
 def basic_event_table(event):
     """Formats a basic event table"""
-    table = formatting.Table(["Id", "Status", "Type", "Start", "End"], title=event.get('subject'))
+    table = formatting.Table(["Id", "Status", "Type", "Start", "End"],
+                             title=utils.clean_splitlines(event.get('subject')))
 
     table.add_row([
         event.get('id'),
@@ -47,7 +48,7 @@ def basic_event_table(event):
 def impacted_table(event):
     """Formats a basic impacted resources table"""
     table = formatting.Table([
-        "Type", "Id", "hostname", "privateIp", "Label"
+        "Type", "Id", "Hostname", "PrivateIp", "Label"
     ])
     for item in event.get('impactedResources', []):
         table.add_row([
@@ -69,4 +70,4 @@ def update_table(event):
         update_number = update_number + 1
         text = update.get('contents')
         # deals with all the \r\n from the API
-        click.secho("\n".join(text.splitlines()))
+        click.secho(utils.clean_splitlines(text))

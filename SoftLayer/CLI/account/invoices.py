@@ -30,6 +30,8 @@ def cli(env, limit, closed=False, get_all=False):
     table.align['Ending Balance'] = 'l'
     table.align['Invoice Amount'] = 'l'
     table.align['Items'] = 'l'
+    if isinstance(invoices, dict):
+        invoices = [invoices]
     for invoice in invoices:
         table.add_row([
             invoice.get('id'),

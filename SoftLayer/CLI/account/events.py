@@ -44,7 +44,8 @@ def event_table(events):
             event.get('id'),
             utils.clean_time(event.get('startDate')),
             utils.clean_time(event.get('endDate')),
-            event.get('subject'),
+            # Some subjects can have \r\n for some reason.
+            utils.clean_splitlines(event.get('subject')),
             utils.lookup(event, 'statusCode', 'name'),
             event.get('acknowledgedFlag'),
             event.get('updateCount'),

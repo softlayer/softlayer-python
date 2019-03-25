@@ -21,7 +21,7 @@ def cli(env, identifier, details):
     top_items = manager.get_billing_items(identifier)
 
     title = "Invoice %s" % identifier
-    table = formatting.Table(["Item Id", "category", "description", "Single",
+    table = formatting.Table(["Item Id", "Category", "Description", "Single",
                               "Monthly", "Create Date", "Location"], title=title)
     table.align['category'] = 'l'
     table.align['description'] = 'l'

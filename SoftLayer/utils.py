@@ -290,6 +290,14 @@ def clean_string(string):
         return " ".join(string.split())
 
 
+def clean_splitlines(string):
+    """Returns a string where \r\n is replaced with \n"""
+    if string is None:
+        return ''
+    else:
+        return "\n".join(string.splitlines())
+
+
 def clean_time(sltime, in_format='%Y-%m-%dT%H:%M:%S%z', out_format='%Y-%m-%d %H:%M'):
     """Easy way to format time strings
 

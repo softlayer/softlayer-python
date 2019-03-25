@@ -4,6 +4,7 @@
 
     Tests for the user cli command
 """
+from SoftLayer.fixtures import SoftLayer_Account as SoftLayer_Account
 from SoftLayer import testing
 
 
@@ -79,6 +80,13 @@ class AccountCLITests(testing.TestCase):
         result = self.run_command(['account', 'invoices', '--all'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account', 'getInvoices', limit=50)
+
+    def test_single_invoice(self):
+        amock = self.set_mock('SoftLayer_Account', 'getInvoices')
+        amock.return_value = SoftLayer_Account.getInvoices[0]
+        result = self.run_command(['account', 'invoices', '--limit=1'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getInvoices', limit=1)
 
     # slcli account summary
     def test_account_summary(self):
