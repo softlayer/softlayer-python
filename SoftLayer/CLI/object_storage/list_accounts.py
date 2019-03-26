@@ -17,9 +17,9 @@ def cli(env):
     accounts = mgr.list_accounts()
     table = formatting.Table(['id', 'name', 'apiType'])
     table.sortby = 'id'
-    global api_type
+    api_type = None
     for account in accounts:
-        if 'vendorName' in account and 'Swift' == account['vendorName']:
+        if 'vendorName' in account and account['vendorName'] == 'Swift':
             api_type = 'Swift'
         elif 'Cleversafe' in account['serviceResource']['name']:
             api_type = 'S3'
