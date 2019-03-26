@@ -15,12 +15,19 @@ def cli(env):
 
     mgr = SoftLayer.ObjectStorageManager(env.client)
     accounts = mgr.list_accounts()
-    table = formatting.Table(['id', 'name'])
+    table = formatting.Table(['id', 'name', 'apiType'])
     table.sortby = 'id'
+    global api_type
     for account in accounts:
+        if 'vendorName' in account and 'Swift' == account['vendorName']:
+            api_type = 'Swift'
+        elif 'Cleversafe' in account['serviceResource']['name']:
+            api_type = 'S3'
+
         table.add_row([
             account['id'],
             account['username'],
+            api_type,
         ])
 
     env.fout(table)

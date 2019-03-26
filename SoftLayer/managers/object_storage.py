@@ -6,8 +6,8 @@
     :license: MIT, see LICENSE for more details.
 """
 
-LIST_ACCOUNTS_MASK = '''mask(SoftLayer_Network_Storage_Hub_Swift)[
-    id,username,notes
+LIST_ACCOUNTS_MASK = '''mask[
+    id,username,notes,vendorName,serviceResource
 ]'''
 
 ENDPOINT_MASK = '''mask(SoftLayer_Network_Storage_Hub_Swift)[
@@ -29,12 +29,8 @@ class ObjectStorageManager(object):
 
     def list_accounts(self):
         """Lists your object storage accounts."""
-        _filter = {
-            'hubNetworkStorage': {'vendorName': {'operation': 'Swift'}},
-        }
         return self.client.call('Account', 'getHubNetworkStorage',
-                                mask=LIST_ACCOUNTS_MASK,
-                                filter=_filter)
+                                mask=LIST_ACCOUNTS_MASK)
 
     def list_endpoints(self):
         """Lists the known object storage endpoints."""

@@ -16,8 +16,9 @@ class ObjectStorageTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
-                         [{'id': 12345, 'name': 'SLOS12345-1'},
-                          {'id': 12346, 'name': 'SLOS12345-2'}])
+                         [{'apiType': 'S3', 'id': 12345, 'name': 'SLOS12345-1'},
+                          {'apiType': 'Swift', 'id': 12346, 'name': 'SLOS12345-2'}]
+                         )
 
     def test_list_endpoints(self):
         accounts = self.set_mock('SoftLayer_Account', 'getHubNetworkStorage')
