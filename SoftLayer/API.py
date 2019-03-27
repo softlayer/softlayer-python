@@ -296,12 +296,15 @@ class BaseClient(object):
                 if isinstance(results, list):
                     # Close enough, this makes testing a lot easier
                     results = transports.SoftLayerListResult(results, len(results))
+                elif results is None:
+                    yield results, 0
+                    return
                 else:
-                    yield results
+                    yield results, 1
                     return
 
             for item in results:
-                yield item
+                yield item, results.total_count
                 result_count += 1
 
             # Got less results than requested, we are at the end
