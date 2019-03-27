@@ -19,13 +19,13 @@ class EventLogManager(object):
     def __init__(self, client):
         self.event_log = client['Event_Log']
 
-    def get_event_logs(self, request_filter):
+    def get_event_logs(self, request_filter, log_limit=10):
         """Returns a list of event logs
 
         :param dict request_filter: filter dict
         :returns: List of event logs
         """
-        results = self.event_log.getAllObjects(filter=request_filter)
+        results = self.event_log.getAllObjects(filter=request_filter, limit=log_limit)
         return results
 
     def get_event_log_types(self):

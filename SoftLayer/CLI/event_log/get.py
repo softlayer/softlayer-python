@@ -27,13 +27,16 @@ COLUMNS = ['event', 'object', 'type', 'date', 'username']
               help="UTC Offset for searching with dates. The default is -0000")
 @click.option('--metadata/--no-metadata', default=False,
               help="Display metadata if present")
+@click.option('--limit', '-l', default=30,
+              help="How many results to get in one api call, default is 30.")
 @environment.pass_env
-def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metadata):
+def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metadata, limit):
     """Get Event Logs"""
+
     mgr = SoftLayer.EventLogManager(env.client)
     usrmgr = SoftLayer.UserManager(env.client)
     request_filter = mgr.build_filter(date_min, date_max, obj_event, obj_id, obj_type, utc_offset)
-    logs = mgr.get_event_logs(request_filter)
+    logs = mgr.get_event_logs(request_filter, log_limit=limit)
 
     if logs is None:
         env.fout('None available.')
@@ -43,11 +46,19 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
         COLUMNS.append('metadata')
 
     table = formatting.Table(COLUMNS)
+
     if metadata:
         table.align['metadata'] = "l"
 
     for log in logs:
         user = log['userType']
+        label = ''
+
+        try:
+            label = log['label']
+        except KeyError:
+            pass  # label is already at default value.
+
         if user == "CUSTOMER":
             user = usrmgr.get_user(log['userId'], "mask[username]")['username']
         if metadata:
@@ -58,9 +69,9 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
             except ValueError:
                 metadata_data = log['metaData']
 
-            table.add_row([log['eventName'], log['label'], log['objectName'],
+            table.add_row([log['eventName'], label, log['objectName'],
                            log['eventCreateDate'], user, metadata_data])
         else:
-            table.add_row([log['eventName'], log['label'], log['objectName'],
+            table.add_row([log['eventName'], label, log['objectName'],
                            log['eventCreateDate'], user])
     env.fout(table)
