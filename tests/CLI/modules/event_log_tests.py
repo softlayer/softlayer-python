@@ -36,7 +36,7 @@ class EventLogTests(testing.TestCase):
                         '"portRangeMax":2001,"portRangeMin":2000,"protocol":"tcp",'
                         '"remoteGroupId":null,"remoteIp":null,"ruleId":"100"}],"securityGroupId":"200",'
                         '"securityGroupName":"test_SG"}'
-                    ),
+                ),
                     indent=4,
                     sort_keys=True
                 )
@@ -53,7 +53,7 @@ class EventLogTests(testing.TestCase):
                         '"requestId":"96c9b47b9e102d2e1d81fba",'
                         '"securityGroupId":"200",'
                         '"securityGroupName":"test_SG"}'
-                    ),
+                ),
                     indent=4,
                     sort_keys=True
                 )
@@ -70,7 +70,7 @@ class EventLogTests(testing.TestCase):
                         '"ethertype":"IPv4",'
                         '"portRangeMax":2001,"portRangeMin":2000,"protocol":"tcp",'
                         '"remoteGroupId":null,"remoteIp":null,"ruleId":"800"}]}'
-                    ),
+                ),
                     indent=4,
                     sort_keys=True
                 )
@@ -86,7 +86,7 @@ class EventLogTests(testing.TestCase):
                         '"networkComponentId":"100",'
                         '"networkInterfaceType":"public",'
                         '"requestId":"6b9a87a9ab8ac9a22e87a00"}'
-                    ),
+                ),
                     indent=4,
                     sort_keys=True
                 )
@@ -103,7 +103,7 @@ class EventLogTests(testing.TestCase):
                         '"ethertype":"IPv4",'
                         '"portRangeMax":2001,"portRangeMin":2000,"protocol":"tcp",'
                         '"remoteGroupId":null,"remoteIp":null,"ruleId":"800"}]}'
-                    ),
+                ),
                     indent=4,
                     sort_keys=True
                 )
@@ -119,7 +119,7 @@ class EventLogTests(testing.TestCase):
                         '"networkComponentId":"100",'
                         '"networkInterfaceType":"public",'
                         '"requestId":"4709e02ad42c83f80345904"}'
-                    ),
+                ),
                     indent=4,
                     sort_keys=True
                 )
@@ -216,7 +216,7 @@ class EventLogTests(testing.TestCase):
                         '"portRangeMax":2001,"portRangeMin":2000,"protocol":"tcp",'
                         '"remoteGroupId":null,"remoteIp":null,"ruleId":"100"}],"securityGroupId":"200",'
                         '"securityGroupName":"test_SG"}'
-                    ),
+                ),
                     indent=4,
                     sort_keys=True
                 )
@@ -233,7 +233,7 @@ class EventLogTests(testing.TestCase):
                         '"requestId":"96c9b47b9e102d2e1d81fba",'
                         '"securityGroupId":"200",'
                         '"securityGroupName":"test_SG"}'
-                    ),
+                ),
                     indent=4,
                     sort_keys=True
                 )
@@ -250,7 +250,7 @@ class EventLogTests(testing.TestCase):
                         '"ethertype":"IPv4",'
                         '"portRangeMax":2001,"portRangeMin":2000,"protocol":"tcp",'
                         '"remoteGroupId":null,"remoteIp":null,"ruleId":"800"}]}'
-                    ),
+                ),
                     indent=4,
                     sort_keys=True
                 )
@@ -266,7 +266,7 @@ class EventLogTests(testing.TestCase):
                         '"networkComponentId":"100",'
                         '"networkInterfaceType":"public",'
                         '"requestId":"6b9a87a9ab8ac9a22e87a00"}'
-                    ),
+                ),
                     indent=4,
                     sort_keys=True
                 )
@@ -283,7 +283,7 @@ class EventLogTests(testing.TestCase):
                         '"ethertype":"IPv4",'
                         '"portRangeMax":2001,"portRangeMin":2000,"protocol":"tcp",'
                         '"remoteGroupId":null,"remoteIp":null,"ruleId":"800"}]}'
-                    ),
+                ),
                     indent=4,
                     sort_keys=True
                 )
@@ -299,7 +299,7 @@ class EventLogTests(testing.TestCase):
                         '"networkComponentId":"100",'
                         '"networkInterfaceType":"public",'
                         '"requestId":"4709e02ad42c83f80345904"}'
-                    ),
+                ),
                     indent=4,
                     sort_keys=True
                 )
@@ -308,7 +308,7 @@ class EventLogTests(testing.TestCase):
 
         for log in expected:
             table_fix.add_row([log['event'], log['object'], log['type'], log['date'],
-                              log['username'], log['metadata'].strip("{}\n\t")])
+                               log['username'], log['metadata'].strip("{}\n\t")])
         expected_output = formatting.format_output(table_fix) + '\n'
 
         result = self.run_command(args=['event-log', 'get', '--metadata'], fmt='table')

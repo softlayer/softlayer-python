@@ -142,9 +142,9 @@ def format_event_log_date(date_string, utc):
         utc = "+0000"
 
     iso_time_zone = utc[:3] + ':' + utc[3:]
-    clean_time = "{}.000000{}".format(dirty_time, iso_time_zone)
+    cleaned_time = "{}.000000{}".format(dirty_time, iso_time_zone)
 
-    return clean_time
+    return cleaned_time
 
 
 def event_log_filter_between_date(start, end, utc):
@@ -288,3 +288,26 @@ def clean_string(string):
         return ''
     else:
         return " ".join(string.split())
+
+
+def clean_splitlines(string):
+    """Returns a string where \r\n is replaced with \n"""
+    if string is None:
+        return ''
+    else:
+        return "\n".join(string.splitlines())
+
+
+def clean_time(sltime, in_format='%Y-%m-%dT%H:%M:%S%z', out_format='%Y-%m-%d %H:%M'):
+    """Easy way to format time strings
+
+    :param string sltime: A softlayer formatted time string
+    :param string in_format: Datetime format for strptime
+    :param string out_format: Datetime format for strftime
+    """
+    try:
+        clean = datetime.datetime.strptime(sltime, in_format)
+        return clean.strftime(out_format)
+    # The %z option only exists with py3.6+
+    except ValueError:
+        return sltime

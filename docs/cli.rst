@@ -12,12 +12,12 @@ functionality not fully documented here.
 .. toctree::
    :maxdepth: 2
 
-   cli/ipsec
+   cli/account
    cli/vs
    cli/hardware
    cli/ordering
    cli/users
-
+   cli/ipsec
 
 .. _config_setup:
 

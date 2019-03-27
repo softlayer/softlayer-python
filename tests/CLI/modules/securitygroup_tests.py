@@ -310,7 +310,7 @@ class SecurityGroupTests(testing.TestCase):
                         '"requestId": "96c9b47b9e102d2e1d81fba",'
                         '"securityGroupId": "200",'
                         '"securityGroupName": "test_SG"}'
-                    ),
+                ),
                     indent=4,
                     sort_keys=True
                 )
@@ -329,7 +329,7 @@ class SecurityGroupTests(testing.TestCase):
                         '"remoteGroupId": null,'
                         '"remoteIp": null,'
                         '"ruleId": "800"}]}'
-                    ),
+                ),
                     indent=4,
                     sort_keys=True
                 )
