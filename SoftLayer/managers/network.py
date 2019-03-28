@@ -575,14 +575,16 @@ class NetworkManager(object):
         event_log_mgr = event_log.EventLogManager(self.client)
 
         # Get CCI Event Logs
-        return event_log_mgr.get_event_logs_by_type('CCI')
+        _filter = event_log_mgr.build_filter(obj_type='CCI')
+        return event_log_mgr.get_event_logs(request_filter=_filter)
 
     def _get_security_group_event_logs(self):
         # Load the event log manager
         event_log_mgr = event_log.EventLogManager(self.client)
 
         # Get CCI Event Logs
-        return event_log_mgr.get_event_logs_by_type('Security Group')
+        _filter = event_log_mgr.build_filter(obj_type='Security Group')
+        return event_log_mgr.get_event_logs(request_filter=_filter)
 
     def resolve_global_ip_ids(self, identifier):
         """Resolve global ip ids."""

@@ -6,7 +6,9 @@
     :license: MIT, see LICENSE for more details.
 """
 # pylint: disable=invalid-name
+from __future__ import generators
 import warnings
+
 
 from SoftLayer import auth as slauth
 from SoftLayer import config
@@ -296,15 +298,12 @@ class BaseClient(object):
                 if isinstance(results, list):
                     # Close enough, this makes testing a lot easier
                     results = transports.SoftLayerListResult(results, len(results))
-                elif results is None:
-                    yield results, 0
-                    return
                 else:
-                    yield results, 1
+                    yield results
                     return
 
             for item in results:
-                yield item, results.total_count
+                yield item
                 result_count += 1
 
             # Got less results than requested, we are at the end

@@ -20,20 +20,19 @@ class EventLogManager(object):
         self.client = client
         self.event_log = client['Event_Log']
 
-    def get_event_logs(self, request_filter={}, log_limit=50, iter=True):
+    def get_event_logs(self, request_filter=None, log_limit=20, iterator=True):
         """Returns a list of event logs
 
         :param dict request_filter: filter dict
         :param int log_limit: number of results to get in one API call
-        :param bool iter: False will only make one API call for log_limit results. 
+        :param bool iterator: False will only make one API call for log_limit results.
             True will keep making API calls until all logs have been retreived. There may be a lot of these.
         :returns: List of event logs
         """
-        if iter:
+        if iterator:
             # Call iter_call directly as this returns the actual generator
             return self.client.iter_call('Event_Log', 'getAllObjects', filter=request_filter, limit=log_limit)
         return self.client.call('Event_Log', 'getAllObjects', filter=request_filter, limit=log_limit)
-
 
     def get_event_log_types(self):
         """Returns a list of event log types
@@ -44,7 +43,7 @@ class EventLogManager(object):
         return results
 
     @staticmethod
-    def build_filter(date_min, date_max, obj_event, obj_id, obj_type, utc_offset):
+    def build_filter(date_min=None, date_max=None, obj_event=None, obj_id=None, obj_type=None, utc_offset=None):
         """Returns a query filter that can be passed into EventLogManager.get_event_logs
 
         :param string date_min: Lower bound date in MM/DD/YYYY format

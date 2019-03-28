@@ -1,15 +1,11 @@
 """Get Event Logs."""
 # :license: MIT, see LICENSE for more details.
 
-import json
-
 import click
 
 import SoftLayer
-from SoftLayer import utils
 from SoftLayer.CLI import environment
-
-COLUMNS = ['event', 'object', 'type', 'date', 'username']
+from SoftLayer import utils
 
 
 @click.command()
@@ -32,6 +28,7 @@ COLUMNS = ['event', 'object', 'type', 'date', 'username']
 @environment.pass_env
 def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metadata, limit):
     """Get Event Logs"""
+    columns = ['Event', 'Object', 'Type', 'Date', 'Username']
 
     event_mgr = SoftLayer.EventLogManager(env.client)
     user_mgr = SoftLayer.UserManager(env.client)
@@ -40,20 +37,15 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
     log_time = "%Y-%m-%dT%H:%M:%S.%f%z"
     user_data = {}
 
-    if metadata and 'metadata' not in COLUMNS:
-        COLUMNS.append('metadata')
+    if metadata:
+        columns.append('Metadata')
 
     row_count = 0
-    for log, rows in logs:
+    click.secho(", ".join(columns))
+    for log in logs:
         if log is None:
             click.secho('No logs available for filter %s.' % request_filter, fg='red')
             return
-
-        if row_count == 0:
-            if limit < 0:
-                limit = rows
-            click.secho("Number of records: %s" % rows, fg='red')
-            click.secho(", ".join(COLUMNS))
 
         user = log['userType']
         label = log.get('label', '')
@@ -65,31 +57,23 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
             user = username
 
         if metadata:
-            try:
-                metadata_data = json.dumps(json.loads(log['metaData']), indent=4, sort_keys=True)
-                if env.format == "table":
-                    metadata_data = metadata_data.strip("{}\n\t")
-            except ValueError:
-                metadata_data = log['metaData']
+            metadata_data = log['metaData'].strip("\n\t")
 
-            click.secho('"{0}","{1}","{2}","{3}","{4}","{5}"'.format(
-                         log['eventName'],
-                         label,
-                         log['objectName'], 
-                         utils.clean_time(log['eventCreateDate'], in_format=log_time), 
-                         user, 
-                         metadata_data)
-            )
+            click.secho("'{0}','{1}','{2}','{3}','{4}','{5}'".format(
+                log['eventName'],
+                label,
+                log['objectName'],
+                utils.clean_time(log['eventCreateDate'], in_format=log_time),
+                user,
+                metadata_data))
         else:
-            click.secho('"{0}","{1}","{2}","{3}","{4}"'.format(
-                         log['eventName'],
-                         label,
-                         log['objectName'], 
-                         utils.clean_time(log['eventCreateDate'], in_format=log_time),
-                         user)
-            )
+            click.secho("'{0}','{1}','{2}','{3}','{4}'".format(
+                log['eventName'],
+                label,
+                log['objectName'],
+                utils.clean_time(log['eventCreateDate'], in_format=log_time),
+                user))
 
         row_count = row_count + 1
         if row_count >= limit:
             return
-
