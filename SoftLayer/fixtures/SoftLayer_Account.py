@@ -525,8 +525,8 @@ getBalance = 40
 
 getNextInvoiceTotalAmount = 2
 
-getHubNetworkStorage = [{'id': 12345, 'username': 'SLOS12345-1'},
-                        {'id': 12346, 'username': 'SLOS12345-2'}]
+getHubNetworkStorage = [{'id': 12345, 'username': 'SLOS12345-1', 'serviceResource': {'name': 'Cleversafe - US Region'}},
+                        {'id': 12346, 'username': 'SLOS12345-2', 'vendorName': 'Swift'}]
 
 getIscsiNetworkStorage = [{
     'accountId': 1234,
