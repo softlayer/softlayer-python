@@ -11,13 +11,9 @@ functionality not fully documented here.
 
 .. toctree::
    :maxdepth: 2
+   :glob:
 
-   cli/account
-   cli/vs
-   cli/hardware
-   cli/ordering
-   cli/users
-   cli/ipsec
+   cli/*
 
 .. _config_setup:
 
@@ -179,3 +175,4 @@ Most commands will take in additional options/arguments. To see all available ac
 	  --tags TEXT                     Show instances that have one of these comma-
 	                                  separated tags
 	  --help                          Show this message and exit.
+

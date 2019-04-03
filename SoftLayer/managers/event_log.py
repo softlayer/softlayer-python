@@ -1,6 +1,6 @@
 """
     SoftLayer.event_log
-    ~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~
     Network Manager/helpers
 
     :license: MIT, see LICENSE for more details.
@@ -23,11 +23,20 @@ class EventLogManager(object):
     def get_event_logs(self, request_filter=None, log_limit=20, iterator=True):
         """Returns a list of event logs
 
+        Example::
+
+            event_mgr = SoftLayer.EventLogManager(env.client)
+            request_filter = event_mgr.build_filter(date_min="01/01/2019", date_max="02/01/2019")
+            logs = event_mgr.get_event_logs(request_filter)
+            for log in logs:
+                print("Event Name: {}".format(log['eventName']))
+
+
         :param dict request_filter: filter dict
         :param int log_limit: number of results to get in one API call
         :param bool iterator: False will only make one API call for log_limit results.
             True will keep making API calls until all logs have been retreived. There may be a lot of these.
-        :returns: List of event logs
+        :returns: List of event logs. If iterator=True, will return a python generator object instead.
         """
         if iterator:
             # Call iter_call directly as this returns the actual generator

@@ -27,7 +27,11 @@ from SoftLayer import utils
               help="Total number of result to return. -1 to return ALL, there may be a LOT of these.")
 @environment.pass_env
 def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metadata, limit):
-    """Get Event Logs"""
+    """Get Event Logs
+
+    Example:
+        slcli event-log get -d 01/01/2019 -D 02/01/2019 -t User -l 10
+    """
     columns = ['Event', 'Object', 'Type', 'Date', 'Username']
 
     event_mgr = SoftLayer.EventLogManager(env.client)
