@@ -4,9 +4,10 @@
 import click
 
 import SoftLayer
-from SoftLayer.CLI import environment, helpers
+from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 
 
 @click.command(short_help="Usage information of a virtual server.")
