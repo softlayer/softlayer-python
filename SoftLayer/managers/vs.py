@@ -51,6 +51,7 @@ class VSManager(utils.IdentifierMixin, object):
         self.account = client['Account']
         self.guest = client['Virtual_Guest']
         self.package_svc = client['Product_Package']
+        self.metric_tracking_object = client['Metric_Tracking_Object']
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
         if ordering_manager is None:
             self.ordering_manager = ordering.OrderingManager(client)
@@ -1001,6 +1002,25 @@ class VSManager(utils.IdentifierMixin, object):
                         return price.get('id')
                 else:
                     return price.get('id')
+
+    def get_summary_data_usage(self, instance_id, start_date=None, end_date=None, valid_type=None, summary_period=None):
+        """Retrieve the usage information of a virtual server.
+
+        :param string instance_id: a string identifier used to resolve ids
+        :param string start_date: the start data to retrieve the vs usage information
+        :param string end_date: the start data to retrieve the vs usage information
+        :param string string valid_type: the Metric_Data_Type keyName.
+        :param int summary_period: summary period.
+        """
+        valid_types = [
+            {
+                "keyName": valid_type,
+                "summaryType": "max"
+            }
+        ]
+
+        return self.metric_tracking_object.getSummaryData(start_date, end_date, valid_types, summary_period,
+                                                          id=instance_id)
 
     # pylint: disable=inconsistent-return-statements
     def _get_price_id_for_upgrade(self, package_items, option, value, public=True):

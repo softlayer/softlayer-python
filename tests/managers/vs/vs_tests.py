@@ -830,3 +830,13 @@ class VSTests(testing.TestCase):
                                 'createArchiveTransaction',
                                 args=args,
                                 identifier=1)
+
+    def test_usage_vs(self):
+        result = self.vs.get_summary_data_usage('100',
+                                                start_date='2019-3-4',
+                                                end_date='2019-4-2',
+                                                valid_type='CPU0',
+                                                summary_period=300)
+
+        self.assertEqual(result, [{'counter': 1.44, 'dateTime': '2019-03-04T00:00:00-06:00', 'type': 'cpu0'},
+                                  {'counter': 1.53, 'dateTime': '2019-03-04T00:05:00-06:00', 'type': 'cpu0'}])

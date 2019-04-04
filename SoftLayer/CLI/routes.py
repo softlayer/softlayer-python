@@ -36,6 +36,7 @@ ALL_ROUTES = [
     ('virtual:reboot', 'SoftLayer.CLI.virt.power:reboot'),
     ('virtual:reload', 'SoftLayer.CLI.virt.reload:cli'),
     ('virtual:upgrade', 'SoftLayer.CLI.virt.upgrade:cli'),
+    ('virtual:usage', 'SoftLayer.CLI.virt.usage:cli'),
     ('virtual:credentials', 'SoftLayer.CLI.virt.credentials:cli'),
     ('virtual:capacity', 'SoftLayer.CLI.virt.capacity:cli'),
     ('virtual:placementgroup', 'SoftLayer.CLI.virt.placementgroup:cli'),
