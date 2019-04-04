@@ -85,3 +85,9 @@ class EventLogTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assertEqual(expected, json.loads(result.output))
+
+    def test_get_unlimited_events(self):
+        result = self.run_command(['event-log', 'get', '-l -1'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Event_Log', 'getAllObjects')
+        self.assertEqual(8, result.output.count("\n"))

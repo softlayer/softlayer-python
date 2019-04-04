@@ -79,5 +79,5 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
                 user))
 
         row_count = row_count + 1
-        if row_count >= limit:
+        if row_count >= limit and limit != -1:
             return
