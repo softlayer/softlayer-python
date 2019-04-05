@@ -200,7 +200,7 @@ def cli(env, start, end, sortby):
 
     table = formatting.Table([
         'type',
-        'name',
+        'hostname',
         'public_in',
         'public_out',
         'private_in',
