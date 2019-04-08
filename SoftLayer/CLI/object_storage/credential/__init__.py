@@ -11,7 +11,7 @@ CONTEXT = {'help_option_names': ['-h', '--help'],
 
 
 class CapacityCommands(click.MultiCommand):
-    """Loads module for credentials related commands."""
+    """Loads module for object storage S3 credentials related commands."""
 
     def __init__(self, **attrs):
         click.MultiCommand.__init__(self, **attrs)
