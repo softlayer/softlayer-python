@@ -37,3 +37,48 @@ class ObjectStorageTests(testing.TestCase):
                          [{'datacenter': 'dal05',
                            'private': 'https://dal05/auth/v1.0/',
                            'public': 'https://dal05/auth/v1.0/'}])
+
+    def test_delete_credential(self):
+        accounts = self.set_mock('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'credentialDelete')
+        accounts.return_value = True
+
+        result = self.run_command(['object-storage', 'credential', 'delete', '-id=100', '100'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output),
+                         'The credential was deleted successful'
+                         )
+
+    def test_limit_credential(self):
+        accounts = self.set_mock('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'getCredentialLimit')
+        accounts.return_value = 2
+
+        result = self.run_command(['object-storage', 'credential', 'limit', '100'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output), [{'limit': 2}])
+
+    def test_list_credential(self):
+        accounts = self.set_mock('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'getCredentials')
+        accounts.return_value = [{'id': 1103123,
+                                  'password': 'nwUEUsx6PiEoN0B1Xe9z9hUCyXM',
+                                  'type': {'name': 'S3 Compatible Signature'},
+                                  'username': 'XfHhBNBPlPdlWya'},
+                                 {'id': 1103333,
+                                  'password': 'nwUEUsx6PiEoN0B1Xe9z9',
+                                  'type': {'name': 'S3 Compatible Signature'},
+                                  'username': 'XfHhBNBPlPd'}]
+
+        result = self.run_command(['object-storage', 'credential', 'list', '100'])
+
+        self.assert_no_fail(result)
+        print(json.loads(result.output))
+        self.assertEqual(json.loads(result.output),
+                         [{'id': 1103123,
+                           'password': 'nwUEUsx6PiEoN0B1Xe9z9hUCyXM',
+                           'type_name': 'S3 Compatible Signature',
+                           'username': 'XfHhBNBPlPdlWya'},
+                          {'id': 1103333,
+                           'password': 'nwUEUsx6PiEoN0B1Xe9z9',
+                           'type_name': 'S3 Compatible Signature',
+                           'username': 'XfHhBNBPlPd'}])
