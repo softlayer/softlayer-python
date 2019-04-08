@@ -1,4 +1,4 @@
-"""Manages Reserved Capacity."""
+"""Manages Object Storage S3 Credentials."""
 # :license: MIT, see LICENSE for more details.
 
 import importlib
