@@ -13,7 +13,7 @@ from SoftLayer.CLI import formatting
 @click.argument('network', type=click.Choice(['public', 'private']))
 @click.argument('quantity', type=click.INT)
 @click.argument('vlan-id')
-@click.option('--v6', '--ipv6', is_flag=True, help="Order IPv6 Addresses")
+@click.option('--ipv6', '--v6', is_flag=True, help="Order IPv6 Addresses")
 @click.option('--test',
               is_flag=True,
               help="Do not order the subnet; just get a quote")
