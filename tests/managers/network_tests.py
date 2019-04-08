@@ -5,6 +5,8 @@
     :license: MIT, see LICENSE for more details.
 """
 import mock
+import sys
+import unittest
 
 import SoftLayer
 from SoftLayer import fixtures
@@ -609,60 +611,20 @@ class NetworkTests(testing.TestCase):
 
         self.assertEqual(expected, result)
 
+    @unittest.skipIf(sys.version_info < (3, 6), "__next__ doesn't work in python 2")
     def test_get_security_group_event_logs(self):
-        expected = [
-            {
-                'accountId': 100,
-                'eventCreateDate': '2017-10-18T10:42:13.089536-05:00',
-                'eventName': 'Security Group Rule(s) Removed',
-                'ipAddress': '192.168.0.1',
-                'label': 'test_SG',
-                'metaData': '{"requestId":"96c9b47b9e102d2e1d81fba",'
-                            '"rules":[{"ruleId":"800",'
-                            '"remoteIp":null,"remoteGroupId":null,"direction":"ingress",'
-                            '"ethertype":"IPv4",'
-                            '"portRangeMin":2000,"portRangeMax":2001,"protocol":"tcp"}]}',
-                'objectId': 700,
-                'objectName': 'Security Group',
-                'traceId': '59e7765515e28',
-                'userId': 400,
-                'userType': 'CUSTOMER',
-                'username': 'user'
-            }
-        ]
-
-        mock = self.set_mock('SoftLayer_Event_Log', 'getAllObjects')
-        mock.return_value = expected
-
         result = self.network._get_security_group_event_logs()
+        # Event log now returns a generator, so you have to get a result for it to make an API call
+        log = result.__next__()
+        _filter = {'objectName': {'operation': 'Security Group'}}
+        self.assert_called_with('SoftLayer_Event_Log', 'getAllObjects', filter=_filter)
+        self.assertEqual(100, log['accountId'])
 
-        self.assertEqual(expected, result)
-
+    @unittest.skipIf(sys.version_info < (3, 6), "__next__ doesn't work in python 2")
     def test_get_cci_event_logs(self):
-        expected = [
-            {
-                'accountId': 100,
-                'eventCreateDate': '2017-10-18T09:40:32.238869-05:00',
-                'eventName': 'Security Group Added',
-                'ipAddress': '192.168.0.1',
-                'label': 'test.softlayer.com',
-                'metaData': '{"securityGroupId":"200",'
-                            '"securityGroupName":"test_SG",'
-                            '"networkComponentId":"100",'
-                            '"networkInterfaceType":"public",'
-                            '"requestId":"96c9b47b9e102d2e1d81fba"}',
-                'objectId': 300,
-                'objectName': 'CCI',
-                'traceId': '59e767e03a57e',
-                'userId': 400,
-                'userType': 'CUSTOMER',
-                'username': 'user'
-            }
-        ]
-
-        mock = self.set_mock('SoftLayer_Event_Log', 'getAllObjects')
-        mock.return_value = expected
-
         result = self.network._get_cci_event_logs()
-
-        self.assertEqual(expected, result)
+        # Event log now returns a generator, so you have to get a result for it to make an API call
+        log = result.__next__()
+        _filter = {'objectName': {'operation': 'CCI'}}
+        self.assert_called_with('SoftLayer_Event_Log', 'getAllObjects', filter=_filter)
+        self.assertEqual(100, log['accountId'])

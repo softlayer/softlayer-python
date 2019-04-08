@@ -87,19 +87,19 @@ def cli(env, service, method, parameters, _id, _filters, mask, limit, offset,
         output_python=False):
     """Call arbitrary API endpoints with the given SERVICE and METHOD.
 
-    \b
-    Examples:
-    slcli call-api Account getObject
-    slcli call-api Account getVirtualGuests --limit=10 --mask=id,hostname
-    slcli call-api Virtual_Guest getObject --id=12345
-    slcli call-api Metric_Tracking_Object getBandwidthData --id=1234 \\
-        "2015-01-01 00:00:00" "2015-01-1 12:00:00" public
-    slcli call-api Account getVirtualGuests \\
-        -f 'virtualGuests.datacenter.name=dal05' \\
-        -f 'virtualGuests.maxCpu=4' \\
-        --mask=id,hostname,datacenter.name,maxCpu
-    slcli call-api Account getVirtualGuests \\
-        -f 'virtualGuests.datacenter.name IN dal05,sng01'
+    Example::
+
+        slcli call-api Account getObject
+        slcli call-api Account getVirtualGuests --limit=10 --mask=id,hostname
+        slcli call-api Virtual_Guest getObject --id=12345
+        slcli call-api Metric_Tracking_Object getBandwidthData --id=1234 \\
+            "2015-01-01 00:00:00" "2015-01-1 12:00:00" public
+        slcli call-api Account getVirtualGuests \\
+            -f 'virtualGuests.datacenter.name=dal05' \\
+            -f 'virtualGuests.maxCpu=4' \\
+            --mask=id,hostname,datacenter.name,maxCpu
+        slcli call-api Account getVirtualGuests \\
+            -f 'virtualGuests.datacenter.name IN dal05,sng01'
     """
 
     args = [service, method] + list(parameters)
