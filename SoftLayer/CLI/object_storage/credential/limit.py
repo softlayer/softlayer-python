@@ -15,10 +15,10 @@ def cli(env, identifier):
     """Credential limits for this IBM Cloud Object Storage account."""
 
     mgr = SoftLayer.ObjectStorageManager(env.client)
-    limit = mgr.limit_credential(identifier)
+    credential_limit = mgr.limit_credential(identifier)
     table = formatting.Table(['limit'])
     table.add_row([
-        limit,
+        credential_limit,
     ])
 
     env.fout(table)
