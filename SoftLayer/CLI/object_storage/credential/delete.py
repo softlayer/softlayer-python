@@ -4,7 +4,7 @@
 import click
 
 import SoftLayer
-from SoftLayer.CLI import environment, exceptions
+from SoftLayer.CLI import environment
 
 
 @click.command()

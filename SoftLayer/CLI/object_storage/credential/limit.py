@@ -12,7 +12,7 @@ from SoftLayer.CLI import formatting
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """ Credential limits for this IBM Cloud Object Storage account."""
+    """Credential limits for this IBM Cloud Object Storage account."""
 
     mgr = SoftLayer.ObjectStorageManager(env.client)
     limit = mgr.limit_credential(identifier)
