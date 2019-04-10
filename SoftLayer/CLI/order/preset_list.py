@@ -20,19 +20,15 @@ COLUMNS = ['name',
 def cli(env, package_keyname, keyword):
     """List package presets.
 
-    Package keynames can be retrieved from `slcli order package-list`.
-    Some packages do not have presets.
+    .. Note:: 
+        Presets are set CPU / RAM / Disk allotments. You still need to specify required items.
+        Some packages do not have presets.
 
-    \b
-    Example:
+    ::
+
         # List the presets for Bare Metal servers
         slcli order preset-list BARE_METAL_SERVER
 
-    The --keyword option can also be used for additional filtering on
-    the returned presets.
-
-    \b
-    Example:
         # List the Bare Metal server presets that include a GPU
         slcli order preset-list BARE_METAL_SERVER --keyword gpu
 

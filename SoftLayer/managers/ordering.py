@@ -11,6 +11,7 @@ from re import match
 
 from SoftLayer import exceptions
 
+
 CATEGORY_MASK = '''id,
                    isRequired,
                    itemCategory[id, name, categoryCode]
@@ -136,8 +137,8 @@ class OrderingManager(object):
 
         :returns: a list of SoftLayer_Billing_Order_Quote
         """
-
-        quotes = self.client['Account'].getActiveQuotes()
+        mask = "mask[order[id,items[id,package[id,keyName]]]]"
+        quotes = self.client['Account'].getActiveQuotes(mask=mask)
         return quotes
 
     def get_quote_details(self, quote_id):
@@ -146,7 +147,8 @@ class OrderingManager(object):
         :param quote_id: ID number of target quote
         """
 
-        quote = self.client['Billing_Order_Quote'].getObject(id=quote_id)
+        mask = "mask[order[id,items[package[id,keyName]]]]"
+        quote = self.client['Billing_Order_Quote'].getObject(id=quote_id, mask=mask)
         return quote
 
     def get_order_container(self, quote_id):
@@ -157,62 +159,62 @@ class OrderingManager(object):
 
         quote = self.client['Billing_Order_Quote']
         container = quote.getRecalculatedOrderContainer(id=quote_id)
-        return container['orderContainers'][0]
+        return container
 
-    def generate_order_template(self, quote_id, extra, quantity=1):
+    def generate_order_template(self, quote_id, extra):
         """Generate a complete order template.
 
         :param int quote_id: ID of target quote
-        :param list extra: List of dictionaries that have extra details about
-                           the order such as hostname or domain names for
-                           virtual servers or hardware nodes
-        :param int quantity: Number of ~things~ to order
+        :param dictionary extra: Overrides for the defaults of SoftLayer_Container_Product_Order
         """
 
         container = self.get_order_container(quote_id)
-        container['quantity'] = quantity
 
-        # NOTE(kmcdonald): This will only work with virtualGuests and hardware.
-        #                  There has to be a better way, since this is based on
-        #                  an existing quote that supposedly knows about this
-        #                  detail
-        if container['packageId'] == 46:
-            product_type = 'virtualGuests'
-        else:
-            product_type = 'hardware'
+        for key in extra.keys():
+            container[key] = extra[key]
 
-        if len(extra) != quantity:
-            raise ValueError("You must specify extra for each server in the quote")
-
-        container[product_type] = []
-        for extra_details in extra:
-            container[product_type].append(extra_details)
-        container['presetId'] = None
         return container
 
-    def verify_quote(self, quote_id, extra, quantity=1):
+    def verify_quote(self, quote_id, extra):
         """Verifies that a quote order is valid.
 
+        ::
+
+            extras = {
+                'hardware': {'hostname': 'test', 'domain': 'testing.com'},
+                'quantity': 2
+            }
+            manager = ordering.OrderingManager(env.client)
+            result = manager.verify_quote(12345, extras)
+
+
         :param int quote_id: ID for the target quote
-        :param list hostnames: hostnames of the servers
-        :param string domain: domain of the new servers
+        :param dictionary extra: Overrides for the defaults of SoftLayer_Container_Product_Order
         :param int quantity: Quantity to override default
         """
+        container = self.generate_order_template(quote_id, extra)
 
-        container = self.generate_order_template(quote_id, extra, quantity=quantity)
-        return self.order_svc.verifyOrder(container)
+        return self.client.call('SoftLayer_Billing_Order_Quote', 'verifyOrder', container, id=quote_id)
 
-    def order_quote(self, quote_id, extra, quantity=1):
+    def order_quote(self, quote_id, extra):
         """Places an order using a quote
 
+        ::
+
+            extras = {
+                'hardware': {'hostname': 'test', 'domain': 'testing.com'},
+                'quantity': 2
+            }
+            manager = ordering.OrderingManager(env.client)
+            result = manager.order_quote(12345, extras)
+
         :param int quote_id: ID for the target quote
-        :param list hostnames: hostnames of the servers
-        :param string domain: domain of the new server
+        :param dictionary extra: Overrides for the defaults of SoftLayer_Container_Product_Order
         :param int quantity: Quantity to override default
         """
 
-        container = self.generate_order_template(quote_id, extra, quantity=quantity)
-        return self.order_svc.placeOrder(container)
+        container = self.generate_order_template(quote_id, extra)
+        return self.client.call('SoftLayer_Billing_Order_Quote','placeOrder', container, id=quote_id)
 
     def get_package_by_key(self, package_keyname, mask=None):
         """Get a single package with a given key.
