@@ -59,8 +59,7 @@ class SubnetTests(testing.TestCase):
         self.assert_no_fail(result)
 
         output = [
-            {'Item': 'this is a thing', 'cost': '2.00'},
-            {'Item': 'Total monthly cost', 'cost': '2.00'}
+            {'Item': 'Total monthly cost', 'cost': '0.00'}
         ]
 
         self.assertEqual(output, json.loads(result.output))
@@ -72,8 +71,8 @@ class SubnetTests(testing.TestCase):
         item_mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
         item_mock.return_value = SoftLayer_Product_Package.getItems
 
-        place_mock = self.set_mock('SoftLayer_Product_Order', 'placeOrder')
-        place_mock.return_value = SoftLayer_Product_Order.placeOrder
+        place_mock = self.set_mock('SoftLayer_Product_Order', 'verifyOrder')
+        place_mock.return_value = SoftLayer_Product_Order.verifyOrder
 
         result = self.run_command(['subnet', 'create', '--v6', 'public', '64', '12346', '--test'])
         self.assert_no_fail(result)
