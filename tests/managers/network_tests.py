@@ -24,9 +24,6 @@ class NetworkTests(testing.TestCase):
                                 'getByIpAddress',
                                 args=('10.0.1.37',))
 
-    def test_add_subnet_raises_exception_on_failure(self):
-        self.assertRaises(TypeError, self.network.add_subnet, ('bad'))
-
     def test_add_global_ip(self):
         # Test a global IPv4 order
         result = self.network.add_global_ip(test_order=True)
