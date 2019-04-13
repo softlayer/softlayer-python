@@ -166,6 +166,7 @@ class ImageTests(testing.TestCase):
                    'operatingSystemReferenceCode': 'UBUNTU_LATEST',
                    'uri': 'cos://some_uri',
                    'ibmApiKey': 'some_ibm_key',
+                   'crkCrn': 'some_root_key_crn',
                    'wrappedDek': 'some_dek',
                    'cloudInit': False,
                    'byol': False,
