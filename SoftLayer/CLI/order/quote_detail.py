@@ -5,7 +5,7 @@ import click
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import ordering
-from SoftLayer.utils import lookup, clean_time
+from SoftLayer.utils import lookup
 
 
 @click.command()
@@ -36,5 +36,3 @@ def cli(env, quote):
         ])
 
     env.fout(table)
-
-

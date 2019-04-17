@@ -1,4 +1,4 @@
-"""List Quotes on an account."""
+"""List active quotes on an account."""
 # :license: MIT, see LICENSE for more details.
 import click
 
@@ -7,15 +7,11 @@ from SoftLayer.CLI import formatting
 from SoftLayer.managers import ordering
 from SoftLayer.utils import clean_time
 
-from pprint import pprint as pp
 
 @click.command()
-# @click.argument('package_keyname')
-@click.option('--all', is_flag=True, default=False,
-              help="Show ALL quotes, by default only saved and pending quotes are shown")
 @environment.pass_env
-def cli(env, all):
-    """List all quotes on an account"""
+def cli(env):
+    """List all active quotes on an account"""
     table = formatting.Table([
         'Id', 'Name', 'Created', 'Expiration', 'Status', 'Package Name', 'Package Id'
     ])
@@ -25,7 +21,6 @@ def cli(env, all):
 
     manager = ordering.OrderingManager(env.client)
     items = manager.get_quotes()
-
 
     for item in items:
         package = item['order']['items'][0]['package']
@@ -39,5 +34,3 @@ def cli(env, all):
             package.get('id')
         ])
     env.fout(table)
-
-

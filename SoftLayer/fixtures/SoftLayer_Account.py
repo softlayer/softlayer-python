@@ -489,9 +489,38 @@ getNasNetworkStorage = [{
 }]
 
 getActiveQuotes = [{
+    'accountId': 1234,
     'id': 1234,
     'name': 'TestQuote1234',
     'quoteKey': '1234test4321',
+    'createDate': '2019-04-10T14:26:03-06:00',
+    'modifyDate': '2019-04-10T14:26:03-06:00',
+    'order': {
+        'id': 37623333,
+        'items': [
+            {
+                'categoryCode': 'guest_core',
+                'description': '4 x 2.0 GHz or higher Cores',
+                'id': 468394713,
+                'itemId': 859,
+                'itemPriceId': '1642',
+                'oneTimeAfterTaxAmount': '0',
+                'oneTimeFee': '0',
+                'oneTimeFeeTaxRate': '0',
+                'oneTimeTaxAmount': '0',
+                'quantity': 1,
+                'recurringAfterTaxAmount': '0',
+                'recurringFee': '0',
+                'recurringTaxAmount': '0',
+                'setupAfterTaxAmount': '0',
+                'setupFee': '0',
+                'setupFeeDeferralMonths': None,
+                'setupFeeTaxRate': '0',
+                'setupTaxAmount': '0',
+                'package': {'id': 46, 'keyName': 'CLOUD_SERVER'}
+            },
+        ]
+    }
 }]
 
 getOrders = [{

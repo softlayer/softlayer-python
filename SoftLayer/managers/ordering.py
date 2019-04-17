@@ -161,15 +161,20 @@ class OrderingManager(object):
         container = quote.getRecalculatedOrderContainer(id=quote_id)
         return container
 
-    def generate_order_template(self, quote_id, extra):
+    def generate_order_template(self, quote_id, extra, quantity=1):
         """Generate a complete order template.
 
         :param int quote_id: ID of target quote
         :param dictionary extra: Overrides for the defaults of SoftLayer_Container_Product_Order
+        :param int quantity: Number of items to order.
         """
+
+        if not isinstance(extra, dict):
+            raise ValueError("extra is not formatted properly")
 
         container = self.get_order_container(quote_id)
 
+        container['quantity'] = quantity
         for key in extra.keys():
             container[key] = extra[key]
 
@@ -214,7 +219,7 @@ class OrderingManager(object):
         """
 
         container = self.generate_order_template(quote_id, extra)
-        return self.client.call('SoftLayer_Billing_Order_Quote','placeOrder', container, id=quote_id)
+        return self.client.call('SoftLayer_Billing_Order_Quote', 'placeOrder', container, id=quote_id)
 
     def get_package_by_key(self, package_keyname, mask=None):
         """Get a single package with a given key.

@@ -21,7 +21,7 @@ from SoftLayer.managers import ordering
 @click.option('--send-email',
               is_flag=True,
               help="The quote will be sent to the email address associated with your user.")
-@click.option('--complex-type', 
+@click.option('--complex-type',
               help="The complex type of the order. Starts with 'SoftLayer_Container_Product_Order'.")
 @click.option('--extras',
               help="JSON string denoting extra data that needs to be sent with the order")

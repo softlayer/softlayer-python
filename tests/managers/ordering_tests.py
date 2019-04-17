@@ -90,9 +90,8 @@ class OrderingTests(testing.TestCase):
 
     def test_get_order_container(self):
         container = self.ordering.get_order_container(1234)
-        quote = self.ordering.client['Billing_Order_Quote']
-        container_fixture = quote.getRecalculatedOrderContainer(id=1234)
-        self.assertEqual(container, container_fixture['orderContainers'][0])
+        self.assertEqual(1, container['quantity'])
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'getRecalculatedOrderContainer')
 
     def test_get_quotes(self):
         quotes = self.ordering.get_quotes()
@@ -106,13 +105,16 @@ class OrderingTests(testing.TestCase):
         self.assertEqual(quote, quote_fixture)
 
     def test_verify_quote(self):
-        result = self.ordering.verify_quote(1234,
-                                            [{'hostname': 'test1',
-                                              'domain': 'example.com'}],
-                                            quantity=1)
+        extras = {
+            'hardware': [{
+                'hostname': 'test1',
+                'domain': 'example.com'
+            }]
+        }
+        result = self.ordering.verify_quote(1234, extras)
 
-        self.assertEqual(result, fixtures.SoftLayer_Product_Order.verifyOrder)
-        self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder')
+        self.assertEqual(result, fixtures.SoftLayer_Billing_Order_Quote.verifyOrder)
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'verifyOrder')
 
     def test_order_quote_virtual_guest(self):
         guest_quote = {
@@ -126,21 +128,24 @@ class OrderingTests(testing.TestCase):
                 'useHourlyPricing': '',
             }],
         }
-
+        extras = {
+            'hardware': [{
+                'hostname': 'test1',
+                'domain': 'example.com'
+            }]
+        }
         mock = self.set_mock('SoftLayer_Billing_Order_Quote', 'getRecalculatedOrderContainer')
         mock.return_value = guest_quote
-        result = self.ordering.order_quote(1234,
-                                           [{'hostname': 'test1',
-                                             'domain': 'example.com'}],
-                                           quantity=1)
+        result = self.ordering.order_quote(1234, extras)
 
-        self.assertEqual(result, fixtures.SoftLayer_Product_Order.placeOrder)
-        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
+        self.assertEqual(result, fixtures.SoftLayer_Billing_Order_Quote.placeOrder)
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'placeOrder')
 
     def test_generate_order_template(self):
-        result = self.ordering.generate_order_template(
-            1234, [{'hostname': 'test1', 'domain': 'example.com'}], quantity=1)
-        self.assertEqual(result, {'presetId': None,
+        extras = {'hardware': [{'hostname': 'test1', 'domain': 'example.com'}]}
+
+        result = self.ordering.generate_order_template(1234, extras, quantity=1)
+        self.assertEqual(result, {'presetId': '',
                                   'hardware': [{'domain': 'example.com',
                                                 'hostname': 'test1'}],
                                   'useHourlyPricing': '',
@@ -149,15 +154,22 @@ class OrderingTests(testing.TestCase):
                                   'quantity': 1})
 
     def test_generate_order_template_virtual(self):
-        result = self.ordering.generate_order_template(
-            1234, [{'hostname': 'test1', 'domain': 'example.com'}], quantity=1)
-        self.assertEqual(result, {'presetId': None,
+        extras = {
+            'hardware': [{
+                'hostname': 'test1',
+                'domain': 'example.com'
+            }],
+            'testProperty': 100
+        }
+        result = self.ordering.generate_order_template(1234, extras, quantity=1)
+        self.assertEqual(result, {'presetId': '',
                                   'hardware': [{'domain': 'example.com',
                                                 'hostname': 'test1'}],
                                   'useHourlyPricing': '',
                                   'packageId': 50,
                                   'prices': [{'id': 1921}],
-                                  'quantity': 1})
+                                  'quantity': 1,
+                                  'testProperty': 100})
 
     def test_generate_order_template_extra_quantity(self):
         self.assertRaises(ValueError,

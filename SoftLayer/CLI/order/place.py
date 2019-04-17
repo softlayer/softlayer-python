@@ -32,7 +32,7 @@ COLUMNS = ['keyName',
               default='hourly',
               show_default=True,
               help="Billing rate")
-@click.option('--complex-type', 
+@click.option('--complex-type',
               help=("The complex type of the order. Starts with 'SoftLayer_Container_Product_Order'."))
 @click.option('--extras',
               help="JSON string denoting extra data that needs to be sent with the order")
@@ -57,7 +57,7 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
 
 
     Example::
-    
+
         # Order an hourly VSI with 4 CPU, 16 GB RAM, 100 GB SAN disk,
         # Ubuntu 16.04, and 1 Gbps public & private uplink in dal13
         slcli order place --billing hourly CLOUD_SERVER DALLAS13 \\

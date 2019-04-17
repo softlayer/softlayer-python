@@ -20,7 +20,7 @@ COLUMNS = ['name',
 def cli(env, package_keyname, keyword):
     """List package presets.
 
-    .. Note:: 
+    .. Note::
         Presets are set CPU / RAM / Disk allotments. You still need to specify required items.
         Some packages do not have presets.
 

@@ -1,18 +1,13 @@
 """View and Order a quote"""
 # :license: MIT, see LICENSE for more details.
 import click
-import json
 
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
+from SoftLayer.managers import ImageManager as ImageManager
 from SoftLayer.managers import ordering
-from SoftLayer.utils import lookup, clean_time
-
-
-
-from pprint import pprint as pp
+from SoftLayer.managers import SshKeyManager as SshKeyManager
 
 
 def _parse_create_args(client, args):
@@ -38,27 +33,30 @@ def _parse_create_args(client, args):
 
     if args.get('image'):
         if args.get('image').isdigit():
-            image_mgr = SoftLayer.ImageManager(client)
+            image_mgr = ImageManager(client)
             image_details = image_mgr.get_image(args.get('image'), mask="id,globalIdentifier")
-            data['image_id'] = image_details['globalIdentifier']
+            data['imageTemplateGlobalIdentifier'] = image_details['globalIdentifier']
         else:
-            data['image_id'] = args['image']
+            data['imageTemplateGlobalIdentifier'] = args['image']
 
+    userdata = None
     if args.get('userdata'):
-        data['userdata'] = args['userdata']
+        userdata = args['userdata']
     elif args.get('userfile'):
         with open(args['userfile'], 'r') as userfile:
-            data['userdata'] = userfile.read()
+            userdata = userfile.read()
+    if userdata:
+        for hardware in data['hardware']:
+            hardware['userData'] = [{'value': userdata}]
 
     # Get the SSH keys
     if args.get('key'):
         keys = []
         for key in args.get('key'):
-            resolver = SoftLayer.SshKeyManager(client).resolve_ids
+            resolver = SshKeyManager(client).resolve_ids
             key_id = helpers.resolve_id(resolver, key, 'SshKey')
             keys.append(key_id)
-        data['ssh_keys'] = keys
-
+        data['sshKeys'] = keys
 
     return data
 
@@ -113,8 +111,5 @@ def cli(env, quote, **args):
         table.align['value'] = 'l'
         table.add_row(['id', result['orderId']])
         table.add_row(['created', result['orderDate']])
-        table.add_row(['status', result ['placedOrder']['status']])
+        table.add_row(['status', result['placedOrder']['status']])
         env.fout(table)
-
-
-
