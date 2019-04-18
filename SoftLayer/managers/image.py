@@ -121,8 +121,8 @@ class ImageManager(utils.IdentifierMixin, object):
         return bool(name or note or tag)
 
     def import_image_from_uri(self, name, uri, os_code=None, note=None,
-                              ibm_api_key=None, root_key_id=None,
-                              wrapped_dek=None, kp_id=None, cloud_init=False,
+                              ibm_api_key=None, root_key_crn=None,
+                              wrapped_dek=None, cloud_init=False,
                               byol=False, is_encrypted=False):
         """Import a new image from object storage.
 
@@ -136,11 +136,14 @@ class ImageManager(utils.IdentifierMixin, object):
         :param string os_code: The reference code of the operating system
         :param string note: Note to add to the image
         :param string ibm_api_key: Ibm Api Key needed to communicate with ICOS
-            and Key Protect
-        :param string root_key_id: ID of the root key in Key Protect
+            and your KMS
+        :param string root_key_crn: CRN of the root key in your KMS. Go to your
+            KMS (Key Protect or Hyper Protect) provider to get the CRN for your
+            root key.  An example CRN:
+            crn:v1:bluemix:public:hs-crypto:us-south:acctID:serviceID:key:keyID'
+            Used only when is_encrypted is True.
         :param string wrapped_dek: Wrapped Data Encryption Key provided by
-            IBM KeyProtect
-        :param string kp_id: ID of the IBM Key Protect Instance
+            your KMS. Used only when is_encrypted is True.
         :param boolean cloud_init: Specifies if image is cloud-init
         :param boolean byol: Specifies if image is bring your own license
         :param boolean is_encrypted: Specifies if image is encrypted
@@ -152,9 +155,8 @@ class ImageManager(utils.IdentifierMixin, object):
                 'operatingSystemReferenceCode': os_code,
                 'uri': uri,
                 'ibmApiKey': ibm_api_key,
-                'rootKeyId': root_key_id,
+                'crkCrn': root_key_crn,
                 'wrappedDek': wrapped_dek,
-                'keyProtectId': kp_id,
                 'cloudInit': cloud_init,
                 'byol': byol,
                 'isEncrypted': is_encrypted
