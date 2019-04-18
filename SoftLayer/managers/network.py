@@ -153,10 +153,6 @@ class NetworkManager(object):
                 price_id = item['prices'][0]['id']
                 break
 
-        if not price_id:
-            raise TypeError('Invalid combination specified for ordering a'
-                            ' subnet.')
-
         order = {
             'packageId': 0,
             'prices': [{'id': price_id}],
