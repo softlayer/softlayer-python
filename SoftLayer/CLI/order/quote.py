@@ -81,6 +81,7 @@ def _parse_create_args(client, args):
 def cli(env, quote, **args):
     """View and Order a quote
 
+    \f
     :note:
         The hostname and domain are split out from the fully qualified domain name.
 
