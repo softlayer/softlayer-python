@@ -133,7 +133,7 @@ class OrderingManager(object):
             raise ValueError("No package found for type: " + package_type)
 
     def get_quotes(self):
-        """Retrieve a list of quotes.
+        """Retrieve a list of active quotes.
 
         :returns: a list of SoftLayer_Billing_Order_Quote
         """

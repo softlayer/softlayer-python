@@ -86,9 +86,9 @@ offsets, and retrieving objects by id. The following section assumes you have
 an initialized client named 'client'.
 
 The best way to test our setup is to call the
-`getObject <http://developer.softlayer.com/reference/services/SoftLayer_Account/getObject>`_
+`getObject <https://sldn.softlayer.com/reference/services/SoftLayer_Account/getObject>`_
 method on the
-`SoftLayer_Account <http://developer.softlayer.com/reference/services/SoftLayer_Account>`_
+`SoftLayer_Account <https://sldn.softlayer.com/reference/services/SoftLayer_Account>`_
 service.
 ::
 
@@ -97,7 +97,7 @@ service.
 For a more complex example we'll retrieve a support ticket with id 123456 along
 with the ticket's updates, the user it's assigned to, the servers attached to
 it, and the datacenter those servers are in. To retrieve our extra information
-using an `object mask <http://developer.softlayer.com/article/Extended-Object-Masks>`_.
+using an `object mask <https://sldn.softlayer.com/article/object-masks/>`_.
 
 Retrieve a ticket using object masks.
 ::
@@ -106,22 +106,28 @@ Retrieve a ticket using object masks.
         id=123456, mask="updates, assignedUser, attachedHardware.datacenter")
 
 
-Now add an update to the ticket with
-`Ticket.addUpdate <http://developer.softlayer.com/reference/services/SoftLayer_Ticket/addUpdate>`_.
+Now add an update to the ticket with `Ticket.addUpdate <https://sldn.softlayer.com/reference/services/SoftLayer_Ticket/addUpdate>`_.
 This uses a parameter, which translate to positional arguments in the order
 that they appear in the API docs.
+
+
 ::
 
     update = client.call('Ticket', 'addUpdate', {'entry' : 'Hello!'}, id=123456)
 
 Let's get a listing of virtual guests using the domain example.com
+
+
 ::
 
     client.call('Account', 'getVirtualGuests',
         filter={'virtualGuests': {'domain': {'operation': 'example.com'}}})
 
-This call gets tickets created between the beginning of March 1, 2013 and
-March 15, 2013.
+This call gets tickets created between the beginning of March 1, 2013 and March 15, 2013.
+More information on `Object Filters <https://sldn.softlayer.com/article/object-filters/>`_.
+
+:NOTE: The `value` field for startDate and endDate is in `[]`, if you do not put the date in brackets the filter will not work.
+
 ::
 
     client.call('Account', 'getTickets',
@@ -141,14 +147,24 @@ March 15, 2013.
 SoftLayer's XML-RPC API also allows for pagination.
 ::
 
-    client.call('Account', 'getVirtualGuests', limit=10, offset=0)  # Page 1
-    client.call('Account', 'getVirtualGuests', limit=10, offset=10)  # Page 2
+    from pprint import pprint
 
-    #Automatic Pagination (v5.5.3+)
-    client.call('Account', 'getVirtualGuests', iter=True)  # Page 2
+    page1 = client.call('Account', 'getVirtualGuests', limit=10, offset=0)  # Page 1
+    page2 = client.call('Account', 'getVirtualGuests', limit=10, offset=10)  # Page 2
+
+    #Automatic Pagination (v5.5.3+), default limit is 100
+    result = client.call('Account', 'getVirtualGuests', iter=True, limit=10)
+    pprint(result)
+
+    # Using a python generator, default limit is 100
+    results = client.iter_call('Account', 'getVirtualGuests', limit=10)
+    for result in results:
+        pprint(result)
+
+:NOTE: `client.call(iter=True)` will pull all results, then return. `client.iter_call()` will return a generator, and only make API calls as you iterate over the results. 
 
 Here's how to create a new Cloud Compute Instance using
-`SoftLayer_Virtual_Guest.createObject <http://developer.softlayer.com/reference/services/SoftLayer_Virtual_Guest/createObject>`_.
+`SoftLayer_Virtual_Guest.createObject <https://sldn.softlayer.com/reference/services/SoftLayer_Virtual_Guest/createObject>`_.
 Be warned, this call actually creates an hourly virtual server so this will
 have billing implications.
 ::

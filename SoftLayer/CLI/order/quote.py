@@ -79,7 +79,21 @@ def _parse_create_args(client, args):
 @click.option('--image', help="Image ID. See: 'slcli image list' for reference")
 @environment.pass_env
 def cli(env, quote, **args):
-    """View and Order a quote"""
+    """View and Order a quote
+
+    :note:
+        The hostname and domain are split out from the fully qualified domain name.
+
+        If you want to order multiple servers, you need to specify each FQDN. Postinstall, userdata, and
+        sshkeys are applied to all servers in an order.
+
+    ::
+
+        slcli order quote 12345 --fqdn testing.tester.com \\
+            --complex-type SoftLayer_Container_Product_Order_Virtual_Guest -k sshKeyNameLabel\\
+            -i https://domain.com/runthis.sh --userdata DataGoesHere
+
+    """
     table = formatting.Table([
         'Id', 'Name', 'Created', 'Expiration', 'Status'
     ])

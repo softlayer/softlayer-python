@@ -1,7 +1,7 @@
 .. _cli_order:
 
 Ordering
-==========
+========
 The Order :ref:`cli` commands can be used to build an order for any product in the SoftLayer catalog.
 
 The basic flow for ordering goes something like this...
@@ -116,8 +116,20 @@ order place <Virtual Server>
         --complex-type SoftLayer_Container_Product_Order_Virtual_Guest
 
 
+
+Quotes
+======
+.. click:: SoftLayer.CLI.order.quote:cli
+    :prog: order quote
+    :show-nested:
+
+
 .. click:: SoftLayer.CLI.order.quote_list:cli
     :prog: order quote-list
+    :show-nested:
+
+.. click:: SoftLayer.CLI.order.quote_detail:cli
+    :prog: order quote-detail
     :show-nested:
 
 .. click:: SoftLayer.CLI.order.place_quote:cli
