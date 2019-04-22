@@ -656,9 +656,7 @@ class OrderingTests(testing.TestCase):
         result = self.ordering.get_price_id_list(package, item_keynames, None)
         self.assertIn(201161, result)
 
-
     def test_clean_quote_verify(self):
-        from pprint import pprint as pp 
         extras = {
             'hardware': [{
                 'hostname': 'test1',
@@ -674,4 +672,3 @@ class OrderingTests(testing.TestCase):
         order_container = call.args[0]
         self.assertNotIn('testProperty', order_container)
         self.assertNotIn('reservedCapacityId', order_container)
-
