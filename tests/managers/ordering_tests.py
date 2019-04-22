@@ -145,13 +145,8 @@ class OrderingTests(testing.TestCase):
         extras = {'hardware': [{'hostname': 'test1', 'domain': 'example.com'}]}
 
         result = self.ordering.generate_order_template(1234, extras, quantity=1)
-        self.assertEqual(result, {'presetId': '',
-                                  'hardware': [{'domain': 'example.com',
-                                                'hostname': 'test1'}],
-                                  'useHourlyPricing': '',
-                                  'packageId': 50,
-                                  'prices': [{'id': 1921}],
-                                  'quantity': 1})
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'getRecalculatedOrderContainer')
+        self.assertEqual(result['hardware'][0]['domain'], 'example.com')
 
     def test_generate_order_template_virtual(self):
         extras = {
@@ -162,14 +157,8 @@ class OrderingTests(testing.TestCase):
             'testProperty': 100
         }
         result = self.ordering.generate_order_template(1234, extras, quantity=1)
-        self.assertEqual(result, {'presetId': '',
-                                  'hardware': [{'domain': 'example.com',
-                                                'hostname': 'test1'}],
-                                  'useHourlyPricing': '',
-                                  'packageId': 50,
-                                  'prices': [{'id': 1921}],
-                                  'quantity': 1,
-                                  'testProperty': 100})
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'getRecalculatedOrderContainer')
+        self.assertEqual(result['testProperty'], 100)
 
     def test_generate_order_template_extra_quantity(self):
         self.assertRaises(ValueError,
@@ -666,3 +655,23 @@ class OrderingTests(testing.TestCase):
         package = 'DUAL_INTEL_XEON_PROCESSOR_SCALABLE_FAMILY_4_DRIVES'
         result = self.ordering.get_price_id_list(package, item_keynames, None)
         self.assertIn(201161, result)
+
+
+    def test_clean_quote_verify(self):
+        from pprint import pprint as pp 
+        extras = {
+            'hardware': [{
+                'hostname': 'test1',
+                'domain': 'example.com'
+            }],
+            'testProperty': ''
+        }
+        result = self.ordering.verify_quote(1234, extras)
+
+        self.assertEqual(result, fixtures.SoftLayer_Billing_Order_Quote.verifyOrder)
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'verifyOrder')
+        call = self.calls('SoftLayer_Billing_Order_Quote', 'verifyOrder')[0]
+        order_container = call.args[0]
+        self.assertNotIn('testProperty', order_container)
+        self.assertNotIn('reservedCapacityId', order_container)
+

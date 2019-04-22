@@ -39,6 +39,7 @@ getRecalculatedOrderContainer = {
     'quantity': 1,
     'packageId': 50,
     'useHourlyPricing': '',
+    'reservedCapacityId': '',
 
 }
 

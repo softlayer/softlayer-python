@@ -198,8 +198,16 @@ class OrderingManager(object):
         :param int quantity: Quantity to override default
         """
         container = self.generate_order_template(quote_id, extra)
+        clean_container = {}
 
-        return self.client.call('SoftLayer_Billing_Order_Quote', 'verifyOrder', container, id=quote_id)
+        # There are a few fields that wil cause exceptions in the XML endpoing if you send in ''
+        # reservedCapacityId and hostId specifically. But we clean all just to be safe.
+        # This for some reason is only a problem on verify_quote.
+        for key in container.keys():
+            if container.get(key) != '':
+                clean_container[key] = container[key]
+
+        return self.client.call('SoftLayer_Billing_Order_Quote', 'verifyOrder', clean_container, id=quote_id)
 
     def order_quote(self, quote_id, extra):
         """Places an order using a quote
