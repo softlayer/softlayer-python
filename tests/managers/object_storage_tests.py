@@ -66,7 +66,7 @@ class ObjectStorageTests(testing.TestCase):
 
     def test_delete_credential(self):
         accounts = self.set_mock('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'credentialDelete')
-        accounts.return_value = 'The credential was deleted successful'
+        accounts.return_value = True
 
         credential = self.object_storage.delete_credential(100)
         self.assertEqual(credential, True)
