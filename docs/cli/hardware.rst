@@ -86,9 +86,6 @@ This function updates the firmware of a server. If already at the latest version
    :show-nested:
 
 
-   :show-nested:
-
-
 .. click:: SoftLayer.CLI.hardware.ready:cli
    :prog: hw ready
    :show-nested:
