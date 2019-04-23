@@ -67,12 +67,10 @@ class ObjectStorageTests(testing.TestCase):
         accounts = self.set_mock('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'credentialDelete')
         accounts.return_value = True
 
-        result = self.run_command(['object-storage', 'credential', 'delete', '-id=100', '100'])
+        result = self.run_command(['object-storage', 'credential', 'delete', '-c=100', '100'])
 
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         'The credential was deleted successful'
-                         )
+        self.assertEqual(json.loads(result.output), True)
 
     def test_limit_credential(self):
         accounts = self.set_mock('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'getCredentialLimit')
