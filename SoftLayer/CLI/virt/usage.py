@@ -42,7 +42,7 @@ def cli(env, identifier, start_date, end_date, valid_type, summary_period):
         counter = counter + float(data['counter'])
         count = count + 1
 
-    if type == "MEMORY_USAGE":
+    if valid_type == "MEMORY_USAGE":
         average = (counter / count) / 2 ** 30
     else:
         average = counter / count
