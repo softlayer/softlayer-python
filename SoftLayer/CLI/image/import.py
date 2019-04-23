@@ -25,17 +25,14 @@ from SoftLayer.CLI import formatting
                    "creating this key see https://console.bluemix.net/docs/"
                    "services/cloud-object-storage/iam/users-serviceids.html"
                    "#serviceidapikeys")
-@click.option('--root-key-id',
+@click.option('--root-key-crn',
               default=None,
-              help="ID of the root key in Key Protect")
+              help="CRN of the root key in your KMS instance")
 @click.option('--wrapped-dek',
               default=None,
               help="Wrapped Data Encryption Key provided by IBM KeyProtect. "
                    "For more info see https://console.bluemix.net/docs/"
                    "services/key-protect/wrap-keys.html#wrap-keys")
-@click.option('--kp-id',
-              default=None,
-              help="ID of the IBM Key Protect Instance")
 @click.option('--cloud-init',
               is_flag=True,
               help="Specifies if image is cloud-init")
@@ -46,8 +43,8 @@ from SoftLayer.CLI import formatting
               is_flag=True,
               help="Specifies if image is encrypted")
 @environment.pass_env
-def cli(env, name, note, os_code, uri, ibm_api_key, root_key_id, wrapped_dek,
-        kp_id, cloud_init, byol, is_encrypted):
+def cli(env, name, note, os_code, uri, ibm_api_key, root_key_crn, wrapped_dek,
+        cloud_init, byol, is_encrypted):
     """Import an image.
 
     The URI for an object storage object (.vhd/.iso file) of the format:
@@ -63,9 +60,8 @@ def cli(env, name, note, os_code, uri, ibm_api_key, root_key_id, wrapped_dek,
         os_code=os_code,
         uri=uri,
         ibm_api_key=ibm_api_key,
-        root_key_id=root_key_id,
+        root_key_crn=root_key_crn,
         wrapped_dek=wrapped_dek,
-        kp_id=kp_id,
         cloud_init=cloud_init,
         byol=byol,
         is_encrypted=is_encrypted
