@@ -681,9 +681,18 @@ class VirtTests(testing.TestCase):
         self.assert_no_fail(result)
 
     def test_usage_vs_memory(self):
-
         result = self.run_command(
             ['vs', 'usage', '100', '--start_date=2019-3-4', '--end_date=2019-4-2', '--valid_type=MEMORY_USAGE',
              '--summary_period=300'])
 
         self.assert_no_fail(result)
+
+    def test_usage_metric_data_empty(self):
+        usage_vs = self.set_mock('SoftLayer_Metric_Tracking_Object', 'getSummaryData')
+        test_usage = []
+        usage_vs.return_value = test_usage
+        result = self.run_command(
+            ['vs', 'usage', '100', '--start_date=2019-3-4', '--end_date=2019-4-2', '--valid_type=CPU0',
+             '--summary_period=300'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
