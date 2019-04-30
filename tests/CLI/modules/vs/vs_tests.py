@@ -660,3 +660,39 @@ class VirtTests(testing.TestCase):
         result = self.run_command(['vs', 'capture', '100', '--name', 'TestName'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'createArchiveTransaction', identifier=100)
+
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    def test_usage_no_confirm(self, confirm_mock):
+        confirm_mock.return_value = False
+
+        result = self.run_command(['vs', 'usage', '100'])
+        self.assertEqual(result.exit_code, 2)
+
+    def test_usage_vs(self):
+        result = self.run_command(
+            ['vs', 'usage', '100'])
+        self.assertEqual(result.exit_code, 2)
+
+    def test_usage_vs_cpu(self):
+        result = self.run_command(
+            ['vs', 'usage', '100', '--start_date=2019-3-4', '--end_date=2019-4-2', '--valid_type=CPU0',
+             '--summary_period=300'])
+
+        self.assert_no_fail(result)
+
+    def test_usage_vs_memory(self):
+        result = self.run_command(
+            ['vs', 'usage', '100', '--start_date=2019-3-4', '--end_date=2019-4-2', '--valid_type=MEMORY_USAGE',
+             '--summary_period=300'])
+
+        self.assert_no_fail(result)
+
+    def test_usage_metric_data_empty(self):
+        usage_vs = self.set_mock('SoftLayer_Metric_Tracking_Object', 'getSummaryData')
+        test_usage = []
+        usage_vs.return_value = test_usage
+        result = self.run_command(
+            ['vs', 'usage', '100', '--start_date=2019-3-4', '--end_date=2019-4-2', '--valid_type=CPU0',
+             '--summary_period=300'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)

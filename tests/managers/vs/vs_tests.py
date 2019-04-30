@@ -830,3 +830,31 @@ class VSTests(testing.TestCase):
                                 'createArchiveTransaction',
                                 args=args,
                                 identifier=1)
+
+    def test_usage_vs_cpu(self):
+        result = self.vs.get_summary_data_usage('100',
+                                                start_date='2019-3-4',
+                                                end_date='2019-4-2',
+                                                valid_type='CPU0',
+                                                summary_period=300)
+
+        expected = fixtures.SoftLayer_Metric_Tracking_Object.getSummaryData
+        self.assertEqual(result, expected)
+
+        args = ('2019-3-4', '2019-4-2', [{"keyName": "CPU0", "summaryType": "max"}], 300)
+
+        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', args=args, identifier=1000)
+
+    def test_usage_vs_memory(self):
+        result = self.vs.get_summary_data_usage('100',
+                                                start_date='2019-3-4',
+                                                end_date='2019-4-2',
+                                                valid_type='MEMORY_USAGE',
+                                                summary_period=300)
+
+        expected = fixtures.SoftLayer_Metric_Tracking_Object.getSummaryData
+        self.assertEqual(result, expected)
+
+        args = ('2019-3-4', '2019-4-2', [{"keyName": "MEMORY_USAGE", "summaryType": "max"}], 300)
+
+        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', args=args, identifier=1000)
