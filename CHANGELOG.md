@@ -1,5 +1,38 @@
 # Change Log
 
+
+## [5.7.2] - 2019-05-03
+- https://github.com/softlayer/softlayer-python/compare/v5.7.1...v5.7.2
+
++ #1107 Added exception to handle json parsing error when ordering 
++ #1068 Support for -1 when changing port speed 
++ #1109 Fixed docs about placement groups
++ #1112 File storage endurance iops upgrade 
++ #1101 Handle the new user creation exceptions 
++ #1116 Fix order place quantity option
++ #1002 Invoice commands
+    * account invoices
+    * account invoice-detail
+    * account summary
++ #1004 Event Notification Management commands
+    * account events
+    * account event-detail
++ #1117 Two PCIe items can be added at order time 
++ #1121 Fix object storage apiType for S3 and Swift.
++ #1100 Event Log performance improvements. 
++ #872 column 'name' was renamed to 'hostname'
++ #1127 Fix object storage credentials.
++ #1129 Fixed unexpected errors in slcli subnet create
++ #1134 Change encrypt parameters for importing of images. Adds root-key-crn
++ #208 Quote ordering commands
+    * order quote
+    * order quote-detail
+    * order quote-list
++ #1113 VS usage information command
+    * virtual usage 
++ #1131 made sure config_tests dont actually make api calls.
+
+
 ## [5.7.1] - 2019-02-26
 - https://github.com/softlayer/softlayer-python/compare/v5.7.0...v5.7.1
 
