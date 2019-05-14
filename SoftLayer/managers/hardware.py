@@ -664,6 +664,22 @@ class HardwareManager(utils.IdentifierMixin, object):
         LOGGER.info("Waiting for %d expired.", instance_id)
         return False
 
+    def get_tracking_id(self, instance_id):
+        """Returns the Metric Tracking Object Id for a hardware server
+
+        :param int instance_id: Id of the hardware server
+        """
+        return self.hardware.getMetricTrackingObjectId(id=instance_id)
+
+    def get_bandwidth_data(self, instance_id, start_date=None, end_date=None, direction='both', rollup=3600):
+        """Gets bandwidth data for a server
+
+        """
+        tracking_id = self.get_tracking_id(instance_id)
+        data = self.client.call('Metric_Tracking_Object', 'getBandwidthData', start_date, end_date, None, rollup,
+                                 id=tracking_id)
+        return data
+
 
 def _get_extra_price_id(items, key_name, hourly, location):
     """Returns a price id attached to item with the given key_name."""

@@ -213,6 +213,7 @@ ALL_ROUTES = [
     ('rwhois:show', 'SoftLayer.CLI.rwhois.show:cli'),
 
     ('hardware', 'SoftLayer.CLI.hardware'),
+    ('hardware:bandwidth', 'SoftLayer.CLI.hardware.bandwidth:cli'),
     ('hardware:cancel', 'SoftLayer.CLI.hardware.cancel:cli'),
     ('hardware:cancel-reasons', 'SoftLayer.CLI.hardware.cancel_reasons:cli'),
     ('hardware:create', 'SoftLayer.CLI.hardware.create:cli'),
