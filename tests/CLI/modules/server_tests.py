@@ -482,6 +482,17 @@ class ServerCLITests(testing.TestCase):
                                 'createFirmwareUpdateTransaction',
                                 args=((1, 1, 1, 1)), identifier=1000)
 
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_reflash_firmware(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['server', 'reflash-firmware', '1000'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.output, "")
+        self.assert_called_with('SoftLayer_Hardware_Server',
+                                'createFirmwareReflashTransaction',
+                                args=((1, 1, 1)), identifier=1000)
+
     def test_edit(self):
         result = self.run_command(['server', 'edit',
                                    '--domain=example.com',

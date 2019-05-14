@@ -613,6 +613,31 @@ class HardwareManager(utils.IdentifierMixin, object):
         return self.hardware.createFirmwareUpdateTransaction(
             bool(ipmi), bool(raid_controller), bool(bios), bool(hard_drive), id=hardware_id)
 
+    def reflash_firmware(self,
+                         hardware_id,
+                         ipmi=True,
+                         raid_controller=True,
+                         bios=True):
+        """Reflash hardware firmware.
+
+        This will cause the server to be unavailable for ~60 minutes.
+        The firmware will not be upgraded but rather reflashed to the version installed.
+
+        :param int hardware_id: The ID of the hardware to have its firmware
+                                reflashed.
+        :param bool ipmi: Reflash the ipmi firmware.
+        :param bool raid_controller: Reflash the raid controller firmware.
+        :param bool bios: Reflash the bios firmware.
+
+        Example::
+
+            # Check the servers active transactions to see progress
+            result = mgr.reflash_firmware(hardware_id=1234)
+        """
+
+        return self.hardware.createFirmwareReflashTransaction(
+            bool(ipmi), bool(raid_controller), bool(bios), id=hardware_id)
+
     def wait_for_ready(self, instance_id, limit=14400, delay=10, pending=False):
         """Determine if a Server is ready.
 

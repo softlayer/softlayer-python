@@ -4,6 +4,10 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import mock
+import sys
+import unittest
+
 import SoftLayer
 from SoftLayer import fixtures
 from SoftLayer.managers import network
@@ -23,9 +27,6 @@ class NetworkTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Network_Subnet_IpAddress',
                                 'getByIpAddress',
                                 args=('10.0.1.37',))
-
-    def test_add_subnet_raises_exception_on_failure(self):
-        self.assertRaises(TypeError, self.network.add_subnet, ('bad'))
 
     def test_add_global_ip(self):
         # Test a global IPv4 order
@@ -466,3 +467,161 @@ class NetworkTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Network_Subnet_IpAddress_Global',
                                 'unroute',
                                 identifier=9876)
+
+    def test_get_event_logs_by_request_id(self):
+        expected = [
+            {
+                'accountId': 100,
+                'eventCreateDate': '2017-10-18T09:40:32.238869-05:00',
+                'eventName': 'Security Group Added',
+                'ipAddress': '192.168.0.1',
+                'label': 'test.softlayer.com',
+                'metaData': '{"securityGroupId":"200",'
+                            '"securityGroupName":"test_SG",'
+                            '"networkComponentId":"100",'
+                            '"networkInterfaceType":"public",'
+                            '"requestId":"96c9b47b9e102d2e1d81fba"}',
+                'objectId': 300,
+                'objectName': 'CCI',
+                'traceId': '59e767e03a57e',
+                'userId': 400,
+                'userType': 'CUSTOMER',
+                'username': 'user'
+            },
+            {
+                'accountId': 100,
+                'eventCreateDate': '2017-10-18T10:42:13.089536-05:00',
+                'eventName': 'Security Group Rule(s) Removed',
+                'ipAddress': '192.168.0.1',
+                'label': 'test_SG',
+                'metaData': '{"requestId":"96c9b47b9e102d2e1d81fba",'
+                            '"rules":[{"ruleId":"800",'
+                            '"remoteIp":null,"remoteGroupId":null,"direction":"ingress",'
+                            '"ethertype":"IPv4",'
+                            '"portRangeMin":2000,"portRangeMax":2001,"protocol":"tcp"}]}',
+                'objectId': 700,
+                'objectName': 'Security Group',
+                'traceId': '59e7765515e28',
+                'userId': 400,
+                'userType': 'CUSTOMER',
+                'username': 'user'
+            }
+        ]
+
+        with mock.patch.object(self.network, '_get_cci_event_logs') as cci_mock:
+            with mock.patch.object(self.network, '_get_security_group_event_logs') as sg_mock:
+                cci_mock.return_value = [
+                    {
+                        'accountId': 100,
+                        'eventCreateDate': '2017-10-18T09:40:32.238869-05:00',
+                        'eventName': 'Security Group Added',
+                        'ipAddress': '192.168.0.1',
+                        'label': 'test.softlayer.com',
+                        'metaData': '{"securityGroupId":"200",'
+                                    '"securityGroupName":"test_SG",'
+                                    '"networkComponentId":"100",'
+                                    '"networkInterfaceType":"public",'
+                                    '"requestId":"96c9b47b9e102d2e1d81fba"}',
+                        'objectId': 300,
+                        'objectName': 'CCI',
+                        'traceId': '59e767e03a57e',
+                        'userId': 400,
+                        'userType': 'CUSTOMER',
+                        'username': 'user'
+                    },
+                    {
+                        'accountId': 100,
+                        'eventCreateDate': '2017-10-23T14:22:36.221541-05:00',
+                        'eventName': 'Disable Port',
+                        'ipAddress': '192.168.0.1',
+                        'label': 'test.softlayer.com',
+                        'metaData': '',
+                        'objectId': 300,
+                        'objectName': 'CCI',
+                        'traceId': '100',
+                        'userId': '',
+                        'userType': 'SYSTEM'
+                    },
+                    {
+                        'accountId': 100,
+                        'eventCreateDate': '2017-10-18T09:40:41.830338-05:00',
+                        'eventName': 'Security Group Rule Added',
+                        'ipAddress': '192.168.0.1',
+                        'label': 'test.softlayer.com',
+                        'metaData': '{"securityGroupId":"200",'
+                                    '"securityGroupName":"test_SG",'
+                                    '"networkComponentId":"100",'
+                                    '"networkInterfaceType":"public",'
+                                    '"requestId":"53d0b91d392864e062f4958",'
+                                    '"rules":[{"ruleId":"100",'
+                                    '"remoteIp":null,"remoteGroupId":null,"direction":"ingress",'
+                                    '"ethertype":"IPv4",'
+                                    '"portRangeMin":2000,"portRangeMax":2001,"protocol":"tcp"}]}',
+                        'objectId': 300,
+                        'objectName': 'CCI',
+                        'traceId': '59e767e9c2184',
+                        'userId': 400,
+                        'userType': 'CUSTOMER',
+                        'username': 'user'
+                    }
+                ]
+
+                sg_mock.return_value = [
+                    {
+                        'accountId': 100,
+                        'eventCreateDate': '2017-10-18T10:42:13.089536-05:00',
+                        'eventName': 'Security Group Rule(s) Removed',
+                        'ipAddress': '192.168.0.1',
+                        'label': 'test_SG',
+                        'metaData': '{"requestId":"96c9b47b9e102d2e1d81fba",'
+                                    '"rules":[{"ruleId":"800",'
+                                    '"remoteIp":null,"remoteGroupId":null,"direction":"ingress",'
+                                    '"ethertype":"IPv4",'
+                                    '"portRangeMin":2000,"portRangeMax":2001,"protocol":"tcp"}]}',
+                        'objectId': 700,
+                        'objectName': 'Security Group',
+                        'traceId': '59e7765515e28',
+                        'userId': 400,
+                        'userType': 'CUSTOMER',
+                        'username': 'user'
+                    },
+                    {
+                        'accountId': 100,
+                        'eventCreateDate': '2017-10-18T10:42:11.679736-05:00',
+                        'eventName': 'Network Component Removed from Security Group',
+                        'ipAddress': '192.168.0.1',
+                        'label': 'test_SG',
+                        'metaData': '{"requestId":"6b9a87a9ab8ac9a22e87a00",'
+                                    '"fullyQualifiedDomainName":"test.softlayer.com",'
+                                    '"networkComponentId":"100",'
+                                    '"networkInterfaceType":"public"}',
+                        'objectId': 700,
+                        'objectName': 'Security Group',
+                        'traceId': '59e77653a1e5f',
+                        'userId': 400,
+                        'userType': 'CUSTOMER',
+                        'username': 'user'
+                    }
+                ]
+
+                result = self.network.get_event_logs_by_request_id('96c9b47b9e102d2e1d81fba')
+
+        self.assertEqual(expected, result)
+
+    @unittest.skipIf(sys.version_info < (3, 6), "__next__ doesn't work in python 2")
+    def test_get_security_group_event_logs(self):
+        result = self.network._get_security_group_event_logs()
+        # Event log now returns a generator, so you have to get a result for it to make an API call
+        log = result.__next__()
+        _filter = {'objectName': {'operation': 'Security Group'}}
+        self.assert_called_with('SoftLayer_Event_Log', 'getAllObjects', filter=_filter)
+        self.assertEqual(100, log['accountId'])
+
+    @unittest.skipIf(sys.version_info < (3, 6), "__next__ doesn't work in python 2")
+    def test_get_cci_event_logs(self):
+        result = self.network._get_cci_event_logs()
+        # Event log now returns a generator, so you have to get a result for it to make an API call
+        log = result.__next__()
+        _filter = {'objectName': {'operation': 'CCI'}}
+        self.assert_called_with('SoftLayer_Event_Log', 'getAllObjects', filter=_filter)
+        self.assertEqual(100, log['accountId'])

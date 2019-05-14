@@ -6,7 +6,9 @@
     :license: MIT, see LICENSE for more details.
 """
 # pylint: disable=invalid-name
+from __future__ import generators
 import warnings
+
 
 from SoftLayer import auth as slauth
 from SoftLayer import config

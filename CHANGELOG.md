@@ -1,6 +1,71 @@
 # Change Log
 
 
+## [5.7.2] - 2019-05-03
+- https://github.com/softlayer/softlayer-python/compare/v5.7.1...v5.7.2
+
++ #1107 Added exception to handle json parsing error when ordering 
++ #1068 Support for -1 when changing port speed 
++ #1109 Fixed docs about placement groups
++ #1112 File storage endurance iops upgrade 
++ #1101 Handle the new user creation exceptions 
++ #1116 Fix order place quantity option
++ #1002 Invoice commands
+    * account invoices
+    * account invoice-detail
+    * account summary
++ #1004 Event Notification Management commands
+    * account events
+    * account event-detail
++ #1117 Two PCIe items can be added at order time 
++ #1121 Fix object storage apiType for S3 and Swift.
++ #1100 Event Log performance improvements. 
++ #872 column 'name' was renamed to 'hostname'
++ #1127 Fix object storage credentials.
++ #1129 Fixed unexpected errors in slcli subnet create
++ #1134 Change encrypt parameters for importing of images. Adds root-key-crn
++ #208 Quote ordering commands
+    * order quote
+    * order quote-detail
+    * order quote-list
++ #1113 VS usage information command
+    * virtual usage 
++ #1131 made sure config_tests dont actually make api calls.
+
+
+## [5.7.1] - 2019-02-26
+- https://github.com/softlayer/softlayer-python/compare/v5.7.0...v5.7.1
+
++ #1089 removed legacy SL message queue commands
++ Support for Hardware reflash firmware CLI/Manager method
+
+## [5.7.0] - 2019-02-15
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.6.4...v5.7.0
+
++ #1099 Support for security group Ids
++ event-log cli command
++ #1069 Virtual Placement Group Support
+   ```
+      slcli vs placementgroup --help
+    Commands:
+      create          Create a placement group.
+      create-options  List options for creating a placement group.
+      delete          Delete a placement group.
+      detail          View details of a placement group.
+      list            List placement groups.
+   ```
++ #962 Rest Transport improvements. Properly handle HTTP exceptions instead of crashing.
++ #1090 removed power_state column option from "slcli server list"
++ #676 - ipv6 support for creating virtual guests
+  * Refactored virtual guest creation to use Product_Order::placeOrder instead of Virtual_Guest::createObject, because createObject doesn't allow adding IPv6
++ #882 Added table which shows the status of each url in object storage
++ #1085 Update provisionedIops reading to handle float-y values
++ #1074 fixed issue with config setup
++ #1081 Fix file volume-cancel
++ #1059 Support for SoftLayer_Hardware_Server::toggleManagementInterface
+  * `slcli hw toggle-ipmi`
+
+
 ## [5.6.4] - 2018-11-16
 
 - Changes: https://github.com/softlayer/softlayer-python/compare/v5.6.3...v5.6.4

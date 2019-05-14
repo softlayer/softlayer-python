@@ -604,12 +604,12 @@ class VirtCreateTests(testing.TestCase):
                                    '--userdata', 'This is my user data ok'])
         self.assert_no_fail(result)
         expected_guest = [
-                {
-                    'domain': 'test.local',
-                    'hostname': 'test',
-                    'userData': [{'value': 'This is my user data ok'}]
-                }
-            ]
+            {
+                'domain': 'test.local',
+                'hostname': 'test',
+                'userData': [{'value': 'This is my user data ok'}]
+            }
+        ]
         # Returns a list of API calls that hit SL_Product_Order::placeOrder
         api_call = self.calls('SoftLayer_Product_Order', 'placeOrder')
         # Doing this because the placeOrder args are huge and mostly not needed to test

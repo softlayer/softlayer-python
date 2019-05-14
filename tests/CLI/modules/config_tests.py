@@ -75,10 +75,12 @@ class TestHelpSetup(testing.TestCase):
             self.assertTrue('api_key = AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' in contents)
             self.assertTrue('endpoint_url = %s' % consts.API_PUBLIC_ENDPOINT in contents)
 
+    @mock.patch('SoftLayer.Client')
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
     @mock.patch('SoftLayer.CLI.environment.Environment.input')
-    def test_setup_cancel(self, mocked_input, getpass, confirm_mock):
+    def test_setup_cancel(self, mocked_input, getpass, confirm_mock, client):
+        client.return_value = self.env.client
         with tempfile.NamedTemporaryFile() as config_file:
             confirm_mock.return_value = False
             getpass.return_value = 'A' * 64

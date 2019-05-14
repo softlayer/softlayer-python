@@ -151,9 +151,8 @@ class ImageTests(testing.TestCase):
                                          uri='cos://some_uri',
                                          os_code='UBUNTU_LATEST',
                                          ibm_api_key='some_ibm_key',
-                                         root_key_id='some_root_key_id',
+                                         root_key_crn='some_root_key_crn',
                                          wrapped_dek='some_dek',
-                                         kp_id='some_id',
                                          cloud_init=False,
                                          byol=False,
                                          is_encrypted=False
@@ -167,9 +166,8 @@ class ImageTests(testing.TestCase):
                    'operatingSystemReferenceCode': 'UBUNTU_LATEST',
                    'uri': 'cos://some_uri',
                    'ibmApiKey': 'some_ibm_key',
-                   'rootKeyId': 'some_root_key_id',
+                   'crkCrn': 'some_root_key_crn',
                    'wrappedDek': 'some_dek',
-                   'keyProtectId': 'some_id',
                    'cloudInit': False,
                    'byol': False,
                    'isEncrypted': False

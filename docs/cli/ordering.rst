@@ -1,7 +1,7 @@
 .. _cli_order:
 
 Ordering
-==========
+========
 The Order :ref:`cli` commands can be used to build an order for any product in the SoftLayer catalog.
 
 The basic flow for ordering goes something like this...
@@ -11,11 +11,14 @@ The basic flow for ordering goes something like this...
 #. item-list <package key name>
 #. place <package key name> <item key names> <location>
 
-.. _cli_ordering_package_list:
 
-order package-list
-------------------
-This command will list all of the packages that are available to be ordered. This is the starting point for placing any order. Find the package keyName you want to order, and use it for the next steps.
+
+
+
+.. click:: SoftLayer.CLI.order.package_list:cli
+    :prog: order package-list
+    :show-nested:
+
 
 .. note::
     * CLOUD_SERVER: These are Virtual Servers
@@ -27,10 +30,15 @@ This command will list all of the packages that are available to be ordered. Thi
 
     Bluemix services listed here may still need to be ordered through the Bluemix CLI/Portal
 
-.. _cli_ordering_category_list:
 
-order category-list
--------------------
+.. click:: SoftLayer.CLI.order.package_locations:cli
+    :prog: order package-locations
+    :show-nested:
+
+.. click:: SoftLayer.CLI.order.category_list:cli
+    :prog: order category-list
+    :show-nested:
+
 Shows all the available categories for a certain package, useful in finding the required categories. Categories that are required will need to have a corresponding item included with any orders
 
 These are all the required categories for ``BARE_METAL_SERVER``
@@ -52,23 +60,22 @@ These are all the required categories for ``BARE_METAL_SERVER``
     :    VPN Management - Private Network    :     vpn_management    :     Y      :
     :........................................:.......................:............:
 
-.. _cli_ordering_item_list:
+.. click:: SoftLayer.CLI.order.item_list:cli
+    :prog: order item-list
+    :show-nested:
 
-order item-list
----------------
 Shows all the prices for a given package. Collect all the items you want included on your server. Don't forget to include the required category items. If forgotten, ``order place`` will tell you about it.
 
-.. _cli_ordering_preset_list:
+.. click:: SoftLayer.CLI.order.preset_list:cli
+    :prog: order preset-list
+    :show-nested:
 
-order preset-list
------------------
 
-Some packages have presets which makes ordering significantly simpler.  These will have set CPU / RAM / Disk allotments. You still need to specify required items
 
-.. _cli_ordering_place:
+.. click:: SoftLayer.CLI.order.place:cli
+    :prog: order place
+    :show-nested:
 
-order place
------------
 Now that you have the package you want, the prices needed, and found a location, it is time to place an order.
 
 order place <preset>
@@ -84,6 +91,7 @@ order place <preset>
         UNLIMITED_SSL_VPN_USERS_1_PPTP_VPN_USER_PER_ACCOUNT \
         --extras '{"hardware": [{"hostname" : "testOrder", "domain": "cgallo.com"}]}' \
         --complex-type SoftLayer_Container_Product_Order_Hardware_Server
+
 
 order place <Virtual Server>
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -106,3 +114,24 @@ order place <Virtual Server>
         NESSUS_VULNERABILITY_ASSESSMENT_REPORTING \
         --extras '{"virtualGuests": [{"hostname": "test", "domain": "softlayer.com"}]}' \
         --complex-type SoftLayer_Container_Product_Order_Virtual_Guest
+
+
+
+Quotes
+======
+.. click:: SoftLayer.CLI.order.quote:cli
+    :prog: order quote
+    :show-nested:
+
+
+.. click:: SoftLayer.CLI.order.quote_list:cli
+    :prog: order quote-list
+    :show-nested:
+
+.. click:: SoftLayer.CLI.order.quote_detail:cli
+    :prog: order quote-detail
+    :show-nested:
+
+.. click:: SoftLayer.CLI.order.place_quote:cli
+    :prog: order place-quote
+    :show-nested:

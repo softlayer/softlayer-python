@@ -626,3 +626,5 @@ DEDICATED_GET_UPGRADE_ITEM_PRICES = [
         }
     },
 ]
+
+getMetricTrackingObjectId = 1000

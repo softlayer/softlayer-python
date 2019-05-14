@@ -81,6 +81,7 @@ rebootSoft = True
 rebootDefault = True
 rebootHard = True
 createFirmwareUpdateTransaction = True
+createFirmwareReflashTransaction = True
 setUserMetadata = ['meta']
 reloadOperatingSystem = 'OK'
 getReverseDomainRecords = [

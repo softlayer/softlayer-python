@@ -428,14 +428,13 @@ class VSManager(utils.IdentifierMixin, object):
         if public_subnet:
             if public_vlan is None:
                 raise exceptions.SoftLayerError("You need to specify a public_vlan with public_subnet")
-            else:
-                parameters['primaryNetworkComponent']['networkVlan']['primarySubnet'] = {'id': int(public_subnet)}
+
+            parameters['primaryNetworkComponent']['networkVlan']['primarySubnet'] = {'id': int(public_subnet)}
         if private_subnet:
             if private_vlan is None:
                 raise exceptions.SoftLayerError("You need to specify a private_vlan with private_subnet")
-            else:
-                parameters['primaryBackendNetworkComponent']['networkVlan']['primarySubnet'] = {
-                    "id": int(private_subnet)}
+
+            parameters['primaryBackendNetworkComponent']['networkVlan']['primarySubnet'] = {'id': int(private_subnet)}
 
         return parameters
 
@@ -1002,6 +1001,27 @@ class VSManager(utils.IdentifierMixin, object):
                         return price.get('id')
                 else:
                     return price.get('id')
+
+    def get_summary_data_usage(self, instance_id, start_date=None, end_date=None, valid_type=None, summary_period=None):
+        """Retrieve the usage information of a virtual server.
+
+        :param string instance_id: a string identifier used to resolve ids
+        :param string start_date: the start data to retrieve the vs usage information
+        :param string end_date: the start data to retrieve the vs usage information
+        :param string string valid_type: the Metric_Data_Type keyName.
+        :param int summary_period: summary period.
+        """
+        valid_types = [
+            {
+                "keyName": valid_type,
+                "summaryType": "max"
+            }
+        ]
+
+        metric_tracking_id = self.guest.getMetricTrackingObjectId(id=instance_id)
+
+        return self.client.call('Metric_Tracking_Object', 'getSummaryData', start_date, end_date, valid_types,
+                                summary_period, id=metric_tracking_id, iter=True)
 
     # pylint: disable=inconsistent-return-statements
     def _get_price_id_for_upgrade(self, package_items, option, value, public=True):

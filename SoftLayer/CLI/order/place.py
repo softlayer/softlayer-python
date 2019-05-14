@@ -23,19 +23,23 @@ COLUMNS = ['keyName',
 @click.option('--verify',
               is_flag=True,
               help="Flag denoting whether or not to only verify the order, not place it")
+@click.option('--quantity',
+              type=int,
+              default=1,
+              help="The quantity of the item being ordered")
 @click.option('--billing',
               type=click.Choice(['hourly', 'monthly']),
               default='hourly',
               show_default=True,
               help="Billing rate")
-@click.option('--complex-type', help=("The complex type of the order. This typically begins"
-                                      " with 'SoftLayer_Container_Product_Order_'."))
+@click.option('--complex-type',
+              help=("The complex type of the order. Starts with 'SoftLayer_Container_Product_Order'."))
 @click.option('--extras',
               help="JSON string denoting extra data that needs to be sent with the order")
 @click.argument('order_items', nargs=-1)
 @environment.pass_env
 def cli(env, package_keyname, location, preset, verify, billing, complex_type,
-        extras, order_items):
+        quantity, extras, order_items):
     """Place or verify an order.
 
     This CLI command is used for placing/verifying an order of the specified package in
@@ -51,8 +55,9 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
     items for the order, use `slcli order category-list`, and then provide the
     --category option for each category code in `slcli order item-list`.
 
-    \b
-    Example:
+
+    Example::
+
         # Order an hourly VSI with 4 CPU, 16 GB RAM, 100 GB SAN disk,
         # Ubuntu 16.04, and 1 Gbps public & private uplink in dal13
         slcli order place --billing hourly CLOUD_SERVER DALLAS13 \\
@@ -76,12 +81,15 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
     manager = ordering.OrderingManager(env.client)
 
     if extras:
-        extras = json.loads(extras)
+        try:
+            extras = json.loads(extras)
+        except ValueError as err:
+            raise exceptions.CLIAbort("There was an error when parsing the --extras value: {}".format(err))
 
     args = (package_keyname, location, order_items)
     kwargs = {'preset_keyname': preset,
               'extras': extras,
-              'quantity': 1,
+              'quantity': quantity,
               'complex_type': complex_type,
               'hourly': bool(billing == 'hourly')}
 

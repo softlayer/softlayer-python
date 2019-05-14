@@ -489,9 +489,38 @@ getNasNetworkStorage = [{
 }]
 
 getActiveQuotes = [{
+    'accountId': 1234,
     'id': 1234,
     'name': 'TestQuote1234',
     'quoteKey': '1234test4321',
+    'createDate': '2019-04-10T14:26:03-06:00',
+    'modifyDate': '2019-04-10T14:26:03-06:00',
+    'order': {
+        'id': 37623333,
+        'items': [
+            {
+                'categoryCode': 'guest_core',
+                'description': '4 x 2.0 GHz or higher Cores',
+                'id': 468394713,
+                'itemId': 859,
+                'itemPriceId': '1642',
+                'oneTimeAfterTaxAmount': '0',
+                'oneTimeFee': '0',
+                'oneTimeFeeTaxRate': '0',
+                'oneTimeTaxAmount': '0',
+                'quantity': 1,
+                'recurringAfterTaxAmount': '0',
+                'recurringFee': '0',
+                'recurringTaxAmount': '0',
+                'setupAfterTaxAmount': '0',
+                'setupFee': '0',
+                'setupFeeDeferralMonths': None,
+                'setupFeeTaxRate': '0',
+                'setupTaxAmount': '0',
+                'package': {'id': 46, 'keyName': 'CLOUD_SERVER'}
+            },
+        ]
+    }
 }]
 
 getOrders = [{
@@ -525,8 +554,8 @@ getBalance = 40
 
 getNextInvoiceTotalAmount = 2
 
-getHubNetworkStorage = [{'id': 12345, 'username': 'SLOS12345-1'},
-                        {'id': 12346, 'username': 'SLOS12345-2'}]
+getHubNetworkStorage = [{'id': 12345, 'username': 'SLOS12345-1', 'serviceResource': {'name': 'Cleversafe - US Region'}},
+                        {'id': 12346, 'username': 'SLOS12345-2', 'vendorName': 'Swift'}]
 
 getIscsiNetworkStorage = [{
     'accountId': 1234,
@@ -662,3 +691,27 @@ getPlacementGroups = [{
         "name": "SPREAD"
     }
 }]
+
+getInvoices = [
+    {
+        'id': 33816665,
+        'modifyDate': '2019-03-04T00:17:42-06:00',
+        'createDate': '2019-03-04T00:17:42-06:00',
+        'startingBalance': '129251.73',
+        'statusCode': 'OPEN',
+        'typeCode': 'RECURRING',
+        'itemCount': 3317,
+        'invoiceTotalAmount': '6230.66'
+    },
+    {
+        'id': 12345667,
+        'modifyDate': '2019-03-05T00:17:42-06:00',
+        'createDate': '2019-03-04T00:17:42-06:00',
+        'startingBalance': '129251.73',
+        'statusCode': 'OPEN',
+        'typeCode': 'RECURRING',
+        'itemCount': 12,
+        'invoiceTotalAmount': '6230.66',
+        'endingBalance': '12345.55'
+    }
+]

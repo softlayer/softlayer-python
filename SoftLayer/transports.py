@@ -402,8 +402,8 @@ class RestTransport(object):
             except ValueError as json_ex:
                 if ex.response.text == "":
                     raise exceptions.SoftLayerAPIError(resp.status_code, "Empty response.")
-                else:
-                    raise exceptions.SoftLayerAPIError(resp.status_code, str(json_ex))
+
+                raise exceptions.SoftLayerAPIError(resp.status_code, str(json_ex))
 
             raise exceptions.SoftLayerAPIError(ex.response.status_code, message)
         except requests.RequestException as ex:
