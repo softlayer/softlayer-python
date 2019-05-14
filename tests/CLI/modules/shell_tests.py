@@ -16,7 +16,7 @@ class ShellTests(testing.TestCase):
         with tempfile.NamedTemporaryFile() as stdin:
             stdin.write(b'exit\n')
             stdin.seek(0)
-            result = self.run_command(['shell'], input=stdin)
+            result = self.run_command(['shell'], stdin=stdin)
             self.assertEqual(result.exit_code, 0)
 
     def test_shell_help(self):
@@ -24,6 +24,6 @@ class ShellTests(testing.TestCase):
         with tempfile.NamedTemporaryFile() as stdin:
             stdin.write(b'help\nexit\n')
             stdin.seek(0)
-            result = self.run_command(['shell'], input=stdin)
+            result = self.run_command(['shell'], stdin=stdin)
             self.assertIn('Welcome to the SoftLayer shell.', result.output)
             self.assertEqual(result.exit_code, 0)
