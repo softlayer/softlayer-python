@@ -28,6 +28,8 @@ def cli(env, identifier, passwords, price):
     result = hardware.get_hardware(hardware_id)
     result = utils.NestedDict(result)
 
+    bandwidth = hardware.get_bandwidth_allocation(hardware_id)
+
     operating_system = utils.lookup(result, 'operatingSystem', 'softwareLicense', 'softwareDescription') or {}
     memory = formatting.gb(result.get('memoryCapacity', 0))
     owner = None
@@ -56,6 +58,18 @@ def cli(env, identifier, passwords, price):
         vlan_table.add_row([vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
 
     table.add_row(['vlans', vlan_table])
+
+    bw_table = formatting.Table(['Type', 'In GB', 'Out GB', 'Allotment'])
+    for bw in bandwidth.get('useage'):
+        bw_type = 'Private'
+        allotment = 'N/A'
+        if bw['type']['alias'] == 'PUBLIC_SERVER_BW':
+            bw_type = 'Public'
+            allotment = bandwidth['allotment'].get('amount', '-')
+
+
+        bw_table.add_row([bw_type, bw['amountIn'], bw['amountOut'], allotment])
+    table.add_row(['Bandwidth', bw_table])
 
     if result.get('notes'):
         table.add_row(['notes', result['notes']])

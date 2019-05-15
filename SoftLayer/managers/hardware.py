@@ -690,6 +690,14 @@ class HardwareManager(utils.IdentifierMixin, object):
                                  id=tracking_id)
         return data
 
+    def get_bandwidth_allocation(self, instance_id):
+        """Combines getBandwidthAllotmentDetail() and getBillingCycleBandwidthUsage() """
+        a_mask="mask[allocation[amount]]"
+        allotment = self.client.call('Hardware_Server', 'getBandwidthAllotmentDetail', id=instance_id, mask=a_mask)
+        u_mask="mask[amountIn,amountOut,type]"
+        useage = self.client.call('Hardware_Server', 'getBillingCycleBandwidthUsage', id=instance_id, mask=u_mask)
+        return {'allotment': allotment['allocation'], 'useage': useage}
+
 
 def _get_extra_price_id(items, key_name, hourly, location):
     """Returns a price id attached to item with the given key_name."""
