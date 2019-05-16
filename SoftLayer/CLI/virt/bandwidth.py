@@ -31,15 +31,16 @@ def cli(env, identifier, start_date, end_date, summary_period, quite_summary):
 
         slcli hw bandwidth 1234 -s 2019-05-01T00:01 -e 2019-05-02T00:00:01.00000-12:00
     """
-    hardware = SoftLayer.HardwareManager(env.client)
-    hardware_id = helpers.resolve_id(hardware.resolve_ids, identifier, 'hardware')
-    data = hardware.get_bandwidth_data(hardware_id, start_date, end_date, None, summary_period)
+    vsi = SoftLayer.VSManager(env.client)
+    vsi_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
+    data = vsi.get_bandwidth_data(vsi_id, start_date, end_date, None, summary_period)
 
     formatted_data = {}
     for point in data:
         key = utils.clean_time(point['dateTime'])
         data_type = point['type']
-        value = round(point['counter'] / 2 ** 30,4)
+        # conversion from byte to megabyte
+        value = round(point['counter'] / 2 ** 20,4)
         if formatted_data.get(key) is None:
             formatted_data[key] = {}
         formatted_data[key][data_type] = value
@@ -55,6 +56,9 @@ def cli(env, identifier, start_date, end_date, summary_period, quite_summary):
         {'keyName': 'privateIn_net_octet',  'sum': 0, 'max': 0, 'name': 'Pri In'},
         {'keyName': 'privateOut_net_octet', 'sum': 0, 'max': 0, 'name': 'Pri Out'},
     ]
+    from pprint import pprint as pp 
+
+
     for point in formatted_data:
         new_row = [point]
         for bw_type in bw_totals:

@@ -1018,10 +1018,44 @@ class VSManager(utils.IdentifierMixin, object):
             }
         ]
 
-        metric_tracking_id = self.guest.getMetricTrackingObjectId(id=instance_id)
+        metric_tracking_id = self.get_tracking_id(instance_id)
 
         return self.client.call('Metric_Tracking_Object', 'getSummaryData', start_date, end_date, valid_types,
                                 summary_period, id=metric_tracking_id, iter=True)
+
+    def get_tracking_id(self, instance_id):
+        """Returns the Metric Tracking Object Id for a hardware server
+
+        :param int instance_id: Id of the hardware server
+        """
+        return self.guest.getMetricTrackingObjectId(id=instance_id)
+
+    def get_bandwidth_data(self, instance_id, start_date=None, end_date=None, direction=None, rollup=3600):
+        """Gets bandwidth data for a server
+
+        Will get averaged bandwidth data for a given time period. If you use a rollup over 3600 be aware
+        that the API will bump your start/end date to align with how data is stored. For example if you
+        have a rollup of 86400 your start_date will be bumped to 00:00. If you are not using a time in the
+        start/end date fields, this won't really matter.
+
+        :param int instance_id: Hardware Id to get data for
+        :param date start_date: Date to start pulling data for.
+        :param date end_date: Date to finish pulling data for
+        :param string direction: Can be either 'public', 'private', or None for both.
+        :param int rollup: 300, 600, 1800, 3600, 43200 or 86400 seconds to average data over. 
+        """
+        tracking_id = self.get_tracking_id(instance_id)
+        data = self.client.call('Metric_Tracking_Object', 'getBandwidthData', start_date, end_date, None,
+                                rollup, id=tracking_id, iter=True)
+        return data
+
+    def get_bandwidth_allocation(self, instance_id):
+        """Combines getBandwidthAllotmentDetail() and getBillingCycleBandwidthUsage() """
+        a_mask="mask[allocation[amount]]"
+        allotment = self.client.call('Virtual_Guest', 'getBandwidthAllotmentDetail', id=instance_id, mask=a_mask)
+        u_mask="mask[amountIn,amountOut,type]"
+        useage = self.client.call('Virtual_Guest', 'getBillingCycleBandwidthUsage', id=instance_id, mask=u_mask)
+        return {'allotment': allotment['allocation'], 'useage': useage}
 
     # pylint: disable=inconsistent-return-statements
     def _get_price_id_for_upgrade(self, package_items, option, value, public=True):

@@ -82,6 +82,19 @@ def cli(env, identifier, passwords=False, price=False):
             vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
     table.add_row(['vlans', vlan_table])
 
+    bandwidth = vsi.get_bandwidth_allocation(vs_id)
+    bw_table = formatting.Table(['Type', 'In GB', 'Out GB', 'Allotment'])
+    for bw in bandwidth.get('useage'):
+        bw_type = 'Private'
+        allotment = 'N/A'
+        if bw['type']['alias'] == 'PUBLIC_SERVER_BW':
+            bw_type = 'Public'
+            allotment = bandwidth['allotment'].get('amount', '-')
+
+        bw_table.add_row([bw_type, bw['amountIn'], bw['amountOut'], allotment])
+    table.add_row(['Bandwidth', bw_table])
+
+
     if result.get('networkComponents'):
         secgroup_table = formatting.Table(['interface', 'id', 'name'])
         has_secgroups = False

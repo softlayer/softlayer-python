@@ -686,8 +686,8 @@ class HardwareManager(utils.IdentifierMixin, object):
         :param int rollup: 300, 600, 1800, 3600, 43200 or 86400 seconds to average data over. 
         """
         tracking_id = self.get_tracking_id(instance_id)
-        data = self.client.call('Metric_Tracking_Object', 'getBandwidthData', start_date, end_date, None, rollup,
-                                 id=tracking_id)
+        data = self.client.call('Metric_Tracking_Object', 'getBandwidthData', start_date, end_date, None,
+                                rollup, id=tracking_id, iter=True)
         return data
 
     def get_bandwidth_allocation(self, instance_id):
