@@ -8,7 +8,7 @@ and executing XML-RPC calls against the SoftLayer API. Below are some links
 that will help to use the SoftLayer API.
 
 
-* `SoftLayer API Documentation <http://developer.softlayer.com/reference/softlayerapi>`_
+* `SoftLayer API Documentation <https://softlayer.github.io/reference/softlayerapi/>`_
 * `Source on GitHub <https://github.com/softlayer/softlayer-python>`_
 
 ::
