@@ -31,9 +31,9 @@ http://softlayer.github.io/softlayer-python/.
 Additional API documentation can be found on the SoftLayer Development Network:
 
 * `SoftLayer API reference
-  <http://developer.softlayer.com/reference/softlayerapi>`_
+  <https://sldn.softlayer.com/reference/softlayerapi>`_
 * `Object mask information and examples
-  <http://developer.softlayer.com/article/Object-Masks>`_
+  <https://sldn.softlayer.com/article/object-masks>`_
 * `Code Examples
   <https://softlayer.github.io/python/>`_
 
