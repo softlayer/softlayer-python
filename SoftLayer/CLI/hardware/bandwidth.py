@@ -14,7 +14,7 @@ from SoftLayer import utils
 @click.argument('identifier')
 @click.option('--start_date', '-s', type=click.STRING, required=True,
               help="Start Date YYYY-MM-DD, YYYY-MM-DDTHH:mm:ss,")
-@click.option('--end_date', '-e', type=click.STRING, required=True, 
+@click.option('--end_date', '-e', type=click.STRING, required=True,
               help="End Date YYYY-MM-DD, YYYY-MM-DDTHH:mm:ss")
 @click.option('--summary_period', '-p', type=click.INT, default=3600, show_default=True,
               help="300, 600, 1800, 3600, 43200 or 86400 seconds")
@@ -23,7 +23,7 @@ from SoftLayer import utils
 @environment.pass_env
 def cli(env, identifier, start_date, end_date, summary_period, quite_summary):
     """Bandwidth data over date range. Bandwidth is listed in GB
-    
+
     Using just a date might get you times off by 1 hour, use T00:01 to get just the specific days data
     Timezones can also be included with the YYYY-MM-DDTHH:mm:ss.00000-HH:mm format.
 
@@ -39,7 +39,7 @@ def cli(env, identifier, start_date, end_date, summary_period, quite_summary):
     for point in data:
         key = utils.clean_time(point['dateTime'])
         data_type = point['type']
-        value = round(point['counter'] / 2 ** 30,4)
+        value = round(point['counter'] / 2 ** 30, 4)
         if formatted_data.get(key) is None:
             formatted_data[key] = {}
         formatted_data[key][data_type] = value
@@ -47,12 +47,12 @@ def cli(env, identifier, start_date, end_date, summary_period, quite_summary):
     table = formatting.Table(['Date', 'Pub In', 'Pub Out', 'Pri In', 'Pri Out'],
                              title="Bandwidth Report: %s - %s" % (start_date, end_date))
 
-    sum_table = formatting.Table(['Type','Sum GB', 'Average MBps', 'Max GB', 'Max Date'], title="Summary")
+    sum_table = formatting.Table(['Type', 'Sum GB', 'Average MBps', 'Max GB', 'Max Date'], title="Summary")
 
     bw_totals = [
-        {'keyName': 'publicIn_net_octet',   'sum': 0, 'max': 0, 'name': 'Pub In'},
-        {'keyName': 'publicOut_net_octet',  'sum': 0, 'max': 0, 'name': 'Pub Out'},
-        {'keyName': 'privateIn_net_octet',  'sum': 0, 'max': 0, 'name': 'Pri In'},
+        {'keyName': 'publicIn_net_octet', 'sum': 0, 'max': 0, 'name': 'Pub In'},
+        {'keyName': 'publicOut_net_octet', 'sum': 0, 'max': 0, 'name': 'Pub Out'},
+        {'keyName': 'privateIn_net_octet', 'sum': 0, 'max': 0, 'name': 'Pri In'},
         {'keyName': 'privateOut_net_octet', 'sum': 0, 'max': 0, 'name': 'Pri Out'},
     ]
     for point in formatted_data:
@@ -70,7 +70,7 @@ def cli(env, identifier, start_date, end_date, summary_period, quite_summary):
         total = bw_type.get('sum', 0)
         average = 0
         if total > 0:
-            average = round(total / len(formatted_data) / summary_period,4)
+            average = round(total / len(formatted_data) / summary_period, 4)
         sum_table.add_row([
             bw_type.get('name'),
             mb_to_gb(total),
@@ -84,5 +84,6 @@ def cli(env, identifier, start_date, end_date, summary_period, quite_summary):
         env.fout(table)
 
 
-def mb_to_gb(x):
-    return round(x / 2 ** 10, 4)
+def mb_to_gb(mbytes):
+    """Converts a MegaByte int to GigaByte. mbytes/2^10"""
+    return round(mbytes / 2 ** 10, 4)

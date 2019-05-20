@@ -1042,18 +1042,18 @@ class VSManager(utils.IdentifierMixin, object):
         :param date start_date: Date to start pulling data for.
         :param date end_date: Date to finish pulling data for
         :param string direction: Can be either 'public', 'private', or None for both.
-        :param int rollup: 300, 600, 1800, 3600, 43200 or 86400 seconds to average data over. 
+        :param int rollup: 300, 600, 1800, 3600, 43200 or 86400 seconds to average data over.
         """
         tracking_id = self.get_tracking_id(instance_id)
-        data = self.client.call('Metric_Tracking_Object', 'getBandwidthData', start_date, end_date, None,
+        data = self.client.call('Metric_Tracking_Object', 'getBandwidthData', start_date, end_date, direction,
                                 rollup, id=tracking_id, iter=True)
         return data
 
     def get_bandwidth_allocation(self, instance_id):
         """Combines getBandwidthAllotmentDetail() and getBillingCycleBandwidthUsage() """
-        a_mask="mask[allocation[amount]]"
+        a_mask = "mask[allocation[amount]]"
         allotment = self.client.call('Virtual_Guest', 'getBandwidthAllotmentDetail', id=instance_id, mask=a_mask)
-        u_mask="mask[amountIn,amountOut,type]"
+        u_mask = "mask[amountIn,amountOut,type]"
         useage = self.client.call('Virtual_Guest', 'getBillingCycleBandwidthUsage', id=instance_id, mask=u_mask)
         return {'allotment': allotment['allocation'], 'useage': useage}
 
