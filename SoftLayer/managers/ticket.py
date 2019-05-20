@@ -68,7 +68,6 @@ class TicketManager(utils.IdentifierMixin, object):
         current_user = self.account.getCurrentUser()
         new_ticket = {
             'subjectId': subject,
-            'contents': body,
             'assignedUserId': current_user['id'],
             'title': title,
         }
