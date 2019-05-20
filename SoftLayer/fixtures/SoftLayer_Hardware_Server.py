@@ -118,3 +118,32 @@ getFrontendNetworkComponents = [
         }
     }
 ]
+
+getBandwidthAllotmentDetail = {
+    'allocationId': 25465663,
+    'bandwidthAllotmentId': 138442,
+    'effectiveDate': '2019-04-03T23:00:00-06:00',
+    'endEffectiveDate': None,
+    'id': 25888247,
+    'serviceProviderId': 1,
+    'allocation': {
+        'amount': '250'
+    }
+}
+
+getBillingCycleBandwidthUsage = [
+    {
+        'amountIn': '.448',
+        'amountOut': '.52157',
+        'type': {
+            'alias': 'PUBLIC_SERVER_BW'
+        }
+    },
+    {
+        'amountIn': '.03842',
+        'amountOut': '.01822',
+        'type': {
+            'alias': 'PRIVATE_SERVER_BW'
+        }
+    }
+]

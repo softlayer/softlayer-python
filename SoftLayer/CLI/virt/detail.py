@@ -170,7 +170,7 @@ def _get_vlan_table(result):
     for vlan in result['networkVlans']:
         vlan_table.add_row([
             vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
-    return vlan_table
+    return ['vlans', vlan_table]
 
 
 def _get_security_table(result):

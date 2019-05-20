@@ -96,37 +96,18 @@ class ServerCLITests(testing.TestCase):
         )
 
     def test_server_details(self):
-        result = self.run_command(['server', 'detail', '1234',
-                                   '--passwords', '--price'])
-        expected = {
-            'cores': 2,
-            'created': '2013-08-01 15:23:45',
-            'datacenter': 'TEST00',
-            'guid': '1a2b3c-1701',
-            'domain': 'test.sftlyr.ws',
-            'hostname': 'hardware-test1',
-            'fqdn': 'hardware-test1.test.sftlyr.ws',
-            'id': 1000,
-            'ipmi_ip': '10.1.0.3',
-            'memory': 2048,
-            'notes': 'These are test notes.',
-            'os': 'Ubuntu',
-            'os_version': 'Ubuntu 12.04 LTS',
-            'owner': 'chechu',
-            'prices': [{'Item': 'Total', 'Recurring Price': 16.08},
-                       {'Item': 'test', 'Recurring Price': 1}],
-            'private_ip': '10.1.0.2',
-            'public_ip': '172.16.1.100',
-            'remote users': [{'password': 'abc123', 'ipmi_username': 'root'}],
-            'status': 'ACTIVE',
-            'tags': ['test_tag'],
-            'users': [{'password': 'abc123', 'username': 'root'}],
-            'vlans': [{'id': 9653, 'number': 1800, 'type': 'PRIVATE'},
-                      {'id': 19082, 'number': 3672, 'type': 'PUBLIC'}]
-        }
+        result = self.run_command(['server', 'detail', '1234', '--passwords', '--price'])
 
         self.assert_no_fail(result)
-        self.assertEqual(expected, json.loads(result.output))
+        output = json.loads(result.output)
+        self.assertEqual(output['notes'], 'These are test notes.')
+        self.assertEqual(output['prices'][0]['Recurring Price'], 16.08)
+        self.assertEqual(output['remote users'][0]['password'], 'abc123')
+        self.assertEqual(output['users'][0]['username'], 'root')
+        self.assertEqual(output['vlans'][0]['number'], 1800)
+        self.assertEqual(output['owner'], 'chechu')
+        self.assertEqual(output['Bandwidth'][0]['Allotment'], '250')
+
 
     def test_detail_vs_empty_tag(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')

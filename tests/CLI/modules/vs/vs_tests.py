@@ -168,78 +168,20 @@ class VirtTests(testing.TestCase):
         result = self.run_command(['vs', 'detail', '100', '--passwords', '--price'])
 
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         {'active_transaction': None,
-                          'cores': 2,
-                          'created': '2013-08-01 15:23:45',
-                          'datacenter': 'TEST00',
-                          'dedicated_host': 'test-dedicated',
-                          'dedicated_host_id': 37401,
-                          'hostname': 'vs-test1',
-                          'domain': 'test.sftlyr.ws',
-                          'fqdn': 'vs-test1.test.sftlyr.ws',
-                          'id': 100,
-                          'guid': '1a2b3c-1701',
-                          'memory': 1024,
-                          'modified': {},
-                          'os': 'Ubuntu',
-                          'os_version': '12.04-64 Minimal for VSI',
-                          'notes': 'notes',
-                          'price_rate': 0,
-                          'tags': ['production'],
-                          'private_cpu': {},
-                          'private_ip': '10.45.19.37',
-                          'private_only': {},
-                          'ptr': 'test.softlayer.com.',
-                          'public_ip': '172.16.240.2',
-                          'state': 'RUNNING',
-                          'status': 'ACTIVE',
-                          'users': [{'software': 'Ubuntu',
-                                     'password': 'pass',
-                                     'username': 'user'}],
-                          'vlans': [{'type': 'PUBLIC',
-                                     'number': 23,
-                                     'id': 1}],
-                          'owner': None})
+        output = json.loads(result.output)
+        self.assertEqual(output['owner'], None)
 
     def test_detail_vs(self):
-        result = self.run_command(['vs', 'detail', '100',
-                                   '--passwords', '--price'])
+        result = self.run_command(['vs', 'detail', '100', '--passwords', '--price'])
 
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         {'active_transaction': None,
-                          'cores': 2,
-                          'created': '2013-08-01 15:23:45',
-                          'datacenter': 'TEST00',
-                          'dedicated_host': 'test-dedicated',
-                          'dedicated_host_id': 37401,
-                          'hostname': 'vs-test1',
-                          'domain': 'test.sftlyr.ws',
-                          'fqdn': 'vs-test1.test.sftlyr.ws',
-                          'id': 100,
-                          'guid': '1a2b3c-1701',
-                          'memory': 1024,
-                          'modified': {},
-                          'os': 'Ubuntu',
-                          'os_version': '12.04-64 Minimal for VSI',
-                          'notes': 'notes',
-                          'price_rate': 6.54,
-                          'tags': ['production'],
-                          'private_cpu': {},
-                          'private_ip': '10.45.19.37',
-                          'private_only': {},
-                          'ptr': 'test.softlayer.com.',
-                          'public_ip': '172.16.240.2',
-                          'state': 'RUNNING',
-                          'status': 'ACTIVE',
-                          'users': [{'software': 'Ubuntu',
-                                     'password': 'pass',
-                                     'username': 'user'}],
-                          'vlans': [{'type': 'PUBLIC',
-                                     'number': 23,
-                                     'id': 1}],
-                          'owner': 'chechu'})
+        output = json.loads(result.output)
+        self.assertEqual(output['notes'], 'notes')
+        self.assertEqual(output['price_rate'], 6.54)
+        self.assertEqual(output['users'][0]['username'], 'user')
+        self.assertEqual(output['vlans'][0]['number'], 23)
+        self.assertEqual(output['owner'], 'chechu')
+        self.assertEqual(output['Bandwidth'][0]['Allotment'], '250')
 
     def test_detail_vs_empty_tag(self):
         mock = self.set_mock('SoftLayer_Virtual_Guest', 'getObject')
