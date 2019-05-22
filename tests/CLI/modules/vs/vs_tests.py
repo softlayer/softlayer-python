@@ -9,6 +9,7 @@ import json
 import mock
 
 from SoftLayer.CLI import exceptions
+from SoftLayer.fixtures import SoftLayer_Virtual_Guest as SoftLayer_Virtual_Guest
 from SoftLayer import SoftLayerAPIError
 from SoftLayer import testing
 
@@ -219,6 +220,49 @@ class VirtTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output)['dedicated_host_id'], 37401)
         self.assertIsNone(json.loads(result.output)['dedicated_host'])
+
+    def test_detail_vs_security_group(self):
+        vg_return = SoftLayer_Virtual_Guest.getObject
+        sec_group = [
+            {
+                'id': 35386715,
+                'name': 'eth',
+                'port': 0,
+                'speed': 100,
+                'status': 'ACTIVE',
+                'primaryIpAddress': '10.175.106.149',
+                'securityGroupBindings': [
+                    {
+                        'id': 1620971,
+                        'networkComponentId': 35386715,
+                        'securityGroupId': 128321,
+                        'securityGroup': {
+                            'id': 128321,
+                            'name': 'allow_all'
+                        }
+                    }
+                ]
+            }
+        ]
+
+        vg_return['networkComponents'] = sec_group
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getObject')
+        mock.return_value = vg_return
+        result = self.run_command(['vs', 'detail', '100'])
+        self.assert_no_fail(result)
+        output = json.loads(result.output)
+        self.assertEqual(output['security_groups'][0]['id'], 128321)
+        self.assertEqual(output['security_groups'][0]['name'], 'allow_all')
+        self.assertEqual(output['security_groups'][0]['interface'], 'PRIVATE')
+
+    def test_detail_vs_ptr_error(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getReverseDomainRecords')
+        mock.side_effect = SoftLayerAPIError("SoftLayer_Exception", "Not Found")
+        result = self.run_command(['vs', 'detail', '100'])
+        self.assert_no_fail(result)
+        output = json.loads(result.output)
+        self.assertEqual(output.get('ptr', None), None)   
+
 
     def test_create_options(self):
         result = self.run_command(['vs', 'create-options'])
@@ -638,3 +682,37 @@ class VirtTests(testing.TestCase):
              '--summary_period=300'])
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    def test_bandwidth_vs(self):
+        result = self.run_command(['vs', 'bandwidth', '100', '--start_date=2019-01-01', '--end_date=2019-02-01'])
+        self.assert_no_fail(result)
+
+        # Since this is 2 tables, it gets returned as invalid json like "[{}][{}]"" instead of "[[{}],[{}]]"
+        # so we just do some hacky string substitution to pull out the respective arrays that can be jsonifyied
+
+        from pprint import pprint as pp
+        pp(result.output)
+        print("FUCK")
+        pp(result.output[0:-157])
+
+        output_summary = json.loads(result.output[0:-157])
+        output_list = json.loads(result.output[-158:])
+
+        self.assertEqual(output_summary[0]['Average MBps'], 0.3841)
+        self.assertEqual(output_summary[1]['Max Date'], '2019-05-20 23:00')
+        self.assertEqual(output_summary[2]['Max GB'], 0.1172)
+        self.assertEqual(output_summary[3]['Sum GB'], 0.0009)
+
+        self.assertEqual(output_list[0]['Date'], '2019-05-20 23:00')
+        self.assertEqual(output_list[0]['Pub In'], 1.3503)
+
+    def test_bandwidth_vs_quite(self):
+        result = self.run_command(['vs', 'bandwidth', '100', '--start_date=2019-01-01', '--end_date=2019-02-01', '-q'])
+        self.assert_no_fail(result)
+        output_summary = json.loads(result.output)
+
+        self.assertEqual(output_summary[0]['Average MBps'], 0.3841)
+        self.assertEqual(output_summary[1]['Max Date'], '2019-05-20 23:00')
+        self.assertEqual(output_summary[2]['Max GB'], 0.1172)
+        self.assertEqual(output_summary[3]['Sum GB'], 0.0009)
+

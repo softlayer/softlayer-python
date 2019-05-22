@@ -584,3 +584,35 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['server', 'toggle-ipmi', '--disable', '12345'])
         self.assert_no_fail(result)
         self.assertEqual(result.output, 'True\n')
+
+    def test_bandwidth_hw(self):
+        result = self.run_command(['server', 'bandwidth', '100', '--start_date=2019-01-01', '--end_date=2019-02-01'])
+        self.assert_no_fail(result)
+
+        # Since this is 2 tables, it gets returned as invalid json like "[{}][{}]"" instead of "[[{}],[{}]]"
+        # so we just do some hacky string substitution to pull out the respective arrays that can be jsonifyied
+        from pprint import pprint as pp
+        pp(result.output)
+        print("FUCK")
+        pp(result.output[0:-157])
+        output_summary = json.loads(result.output[0:-157])
+        output_list = json.loads(result.output[-158:])
+
+        self.assertEqual(output_summary[0]['Average MBps'], 0.3841)
+        self.assertEqual(output_summary[1]['Max Date'], '2019-05-20 23:00')
+        self.assertEqual(output_summary[2]['Max GB'], 0.1172)
+        self.assertEqual(output_summary[3]['Sum GB'], 0.0009)
+
+        self.assertEqual(output_list[0]['Date'], '2019-05-20 23:00')
+        self.assertEqual(output_list[0]['Pub In'], 1.3503)
+
+    def test_bandwidth_hw_quite(self):
+        result = self.run_command(['server', 'bandwidth', '100', '--start_date=2019-01-01', '--end_date=2019-02-01', '-q'])
+        self.assert_no_fail(result)
+        output_summary = json.loads(result.output)
+
+        self.assertEqual(output_summary[0]['Average MBps'], 0.3841)
+        self.assertEqual(output_summary[1]['Max Date'], '2019-05-20 23:00')
+        self.assertEqual(output_summary[2]['Max GB'], 0.1172)
+        self.assertEqual(output_summary[3]['Sum GB'], 0.0009)
+

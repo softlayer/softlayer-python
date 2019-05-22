@@ -147,3 +147,5 @@ getBillingCycleBandwidthUsage = [
         }
     }
 ]
+
+getMetricTrackingObjectId = 1000

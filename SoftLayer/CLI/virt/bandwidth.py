@@ -35,6 +35,17 @@ def cli(env, identifier, start_date, end_date, summary_period, quite_summary):
     vsi_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
     data = vsi.get_bandwidth_data(vsi_id, start_date, end_date, None, summary_period)
 
+    title = "Bandwidth Report: %s - %s" % (start_date, end_date)
+    table, sum_table = create_bandwidth_table(data, summary_period, title)
+
+
+    env.fout(sum_table)
+    if not quite_summary:
+        env.fout(table)
+
+def create_bandwidth_table(data, summary_period, title="Bandwidth Report"):
+    """Create 2 tables, bandwidth and sumamry. Used here and in hw bandwidth command"""
+
     formatted_data = {}
     for point in data:
         key = utils.clean_time(point['dateTime'])
@@ -45,11 +56,11 @@ def cli(env, identifier, start_date, end_date, summary_period, quite_summary):
             formatted_data[key] = {}
         formatted_data[key][data_type] = value
 
-    table = formatting.Table(['Date', 'Pub In', 'Pub Out', 'Pri In', 'Pri Out'],
-                             title="Bandwidth Report: %s - %s" % (start_date, end_date))
+    table = formatting.Table(['Date', 'Pub In', 'Pub Out', 'Pri In', 'Pri Out'], title=title)
 
     sum_table = formatting.Table(['Type', 'Sum GB', 'Average MBps', 'Max GB', 'Max Date'], title="Summary")
 
+    # Required to specify keyName because getBandwidthTotals returns other counter types for some reason.
     bw_totals = [
         {'keyName': 'publicIn_net_octet', 'sum': 0, 'max': 0, 'name': 'Pub In'},
         {'keyName': 'publicOut_net_octet', 'sum': 0, 'max': 0, 'name': 'Pub Out'},
@@ -81,10 +92,7 @@ def cli(env, identifier, start_date, end_date, summary_period, quite_summary):
             bw_type.get('maxDate')
         ])
 
-    env.fout(sum_table)
-    if not quite_summary:
-        env.fout(table)
-
+    return table, sum_table
 
 def mb_to_gb(mbytes):
     """Converts a MegaByte int to GigaByte. mbytes/2^10"""

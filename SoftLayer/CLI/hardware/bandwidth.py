@@ -7,6 +7,7 @@ import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
+from SoftLayer.CLI.virt.bandwidth import create_bandwidth_table
 from SoftLayer import utils
 
 
@@ -35,49 +36,8 @@ def cli(env, identifier, start_date, end_date, summary_period, quite_summary):
     hardware_id = helpers.resolve_id(hardware.resolve_ids, identifier, 'hardware')
     data = hardware.get_bandwidth_data(hardware_id, start_date, end_date, None, summary_period)
 
-    formatted_data = {}
-    for point in data:
-        key = utils.clean_time(point['dateTime'])
-        data_type = point['type']
-        value = round(point['counter'] / 2 ** 30, 4)
-        if formatted_data.get(key) is None:
-            formatted_data[key] = {}
-        formatted_data[key][data_type] = value
-
-    table = formatting.Table(['Date', 'Pub In', 'Pub Out', 'Pri In', 'Pri Out'],
-                             title="Bandwidth Report: %s - %s" % (start_date, end_date))
-
-    sum_table = formatting.Table(['Type', 'Sum GB', 'Average MBps', 'Max GB', 'Max Date'], title="Summary")
-
-    bw_totals = [
-        {'keyName': 'publicIn_net_octet', 'sum': 0, 'max': 0, 'name': 'Pub In'},
-        {'keyName': 'publicOut_net_octet', 'sum': 0, 'max': 0, 'name': 'Pub Out'},
-        {'keyName': 'privateIn_net_octet', 'sum': 0, 'max': 0, 'name': 'Pri In'},
-        {'keyName': 'privateOut_net_octet', 'sum': 0, 'max': 0, 'name': 'Pri Out'},
-    ]
-    for point in formatted_data:
-        new_row = [point]
-        for bw_type in bw_totals:
-            counter = formatted_data[point].get(bw_type['keyName'], 0)
-            new_row.append(mb_to_gb(counter))
-            bw_type['sum'] = bw_type['sum'] + counter
-            if counter > bw_type['max']:
-                bw_type['max'] = counter
-                bw_type['maxDate'] = point
-        table.add_row(new_row)
-
-    for bw_type in bw_totals:
-        total = bw_type.get('sum', 0)
-        average = 0
-        if total > 0:
-            average = round(total / len(formatted_data) / summary_period, 4)
-        sum_table.add_row([
-            bw_type.get('name'),
-            mb_to_gb(total),
-            average,
-            mb_to_gb(bw_type.get('max')),
-            bw_type.get('maxDate')
-        ])
+    title = "Bandwidth Report: %s - %s" % (start_date, end_date)
+    table, sum_table = create_bandwidth_table(data, summary_period, title)
 
     env.fout(sum_table)
     if not quite_summary:
