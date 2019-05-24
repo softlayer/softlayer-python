@@ -140,14 +140,14 @@ class VSOrderTests(testing.TestCase):
                                                      option='cpus',
                                                      value='4',
                                                      public=False)
-        self.assertEqual(1007, price_id)        
+        self.assertEqual(1007, price_id)
 
     def test_upgrade_mem_and_preset_exception(self):
         self.assertRaises(
             ValueError,
             self.vs.upgrade,
-            1234, 
-            memory=10, 
+            1234,
+            memory=10,
             preset="M1_64X512X100"
         )
 
@@ -155,8 +155,8 @@ class VSOrderTests(testing.TestCase):
         self.assertRaises(
             ValueError,
             self.vs.upgrade,
-            1234, 
-            cpus=10, 
+            1234,
+            cpus=10,
             preset="M1_64X512X100"
         )
 
@@ -221,23 +221,23 @@ class VSOrderTests(testing.TestCase):
         upgrade_prices = [
             {'categories': None, 'item': None},
             {'categories': [{'categoryCode': 'ram'}], 'item': None},
-            {'categories': None, 'item': {'capacity':1}},
+            {'categories': None, 'item': {'capacity': 1}},
         ]
-        result = self.vs._get_price_id_for_upgrade_option(upgrade_prices,'memory',1)
-        self.assertEqual(None,result)
+        result = self.vs._get_price_id_for_upgrade_option(upgrade_prices, 'memory', 1)
+        self.assertEqual(None, result)
 
     def test_get_price_id_memory_capacity(self):
         upgrade_prices = [
-            {'categories': [{'categoryCode': 'ram'}], 'item': {'capacity':1},'id':99}
+            {'categories': [{'categoryCode': 'ram'}], 'item': {'capacity': 1}, 'id': 99}
         ]
-        result = self.vs._get_price_id_for_upgrade_option(upgrade_prices,'memory',1)
-        self.assertEqual(99,result)
+        result = self.vs._get_price_id_for_upgrade_option(upgrade_prices, 'memory', 1)
+        self.assertEqual(99, result)
 
     def test_get_price_id_mismatch_capacity(self):
         upgrade_prices = [
-            {'categories': [{'categoryCode': 'ram1'}], 'item': {'capacity':1},'id':90},
-            {'categories': [{'categoryCode': 'ram'}], 'item': {'capacity':2},'id':91},
-            {'categories': [{'categoryCode': 'ram'}], 'item': {'capacity':1},'id':92},
+            {'categories': [{'categoryCode': 'ram1'}], 'item': {'capacity': 1}, 'id': 90},
+            {'categories': [{'categoryCode': 'ram'}], 'item': {'capacity': 2}, 'id': 91},
+            {'categories': [{'categoryCode': 'ram'}], 'item': {'capacity': 1}, 'id': 92},
         ]
-        result = self.vs._get_price_id_for_upgrade_option(upgrade_prices,'memory',1)
-        self.assertEqual(92,result)
+        result = self.vs._get_price_id_for_upgrade_option(upgrade_prices, 'memory', 1)
+        self.assertEqual(92, result)

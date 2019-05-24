@@ -38,10 +38,10 @@ def cli(env, identifier, start_date, end_date, summary_period, quite_summary):
     title = "Bandwidth Report: %s - %s" % (start_date, end_date)
     table, sum_table = create_bandwidth_table(data, summary_period, title)
 
-
     env.fout(sum_table)
     if not quite_summary:
         env.fout(table)
+
 
 def create_bandwidth_table(data, summary_period, title="Bandwidth Report"):
     """Create 2 tables, bandwidth and sumamry. Used here and in hw bandwidth command"""
@@ -51,10 +51,10 @@ def create_bandwidth_table(data, summary_period, title="Bandwidth Report"):
         key = utils.clean_time(point['dateTime'])
         data_type = point['type']
         # conversion from byte to megabyte
-        value = round(point['counter'] / 2 ** 20, 4)
+        value = round(float(point['counter']) / 2 ** 20, 4)
         if formatted_data.get(key) is None:
             formatted_data[key] = {}
-        formatted_data[key][data_type] = value
+        formatted_data[key][data_type] = float(value)
 
     table = formatting.Table(['Date', 'Pub In', 'Pub Out', 'Pri In', 'Pri Out'], title=title)
 
@@ -62,10 +62,10 @@ def create_bandwidth_table(data, summary_period, title="Bandwidth Report"):
 
     # Required to specify keyName because getBandwidthTotals returns other counter types for some reason.
     bw_totals = [
-        {'keyName': 'publicIn_net_octet', 'sum': 0, 'max': 0, 'name': 'Pub In'},
-        {'keyName': 'publicOut_net_octet', 'sum': 0, 'max': 0, 'name': 'Pub Out'},
-        {'keyName': 'privateIn_net_octet', 'sum': 0, 'max': 0, 'name': 'Pri In'},
-        {'keyName': 'privateOut_net_octet', 'sum': 0, 'max': 0, 'name': 'Pri Out'},
+        {'keyName': 'publicIn_net_octet', 'sum': 0.0, 'max': 0, 'name': 'Pub In'},
+        {'keyName': 'publicOut_net_octet', 'sum': 0.0, 'max': 0, 'name': 'Pub Out'},
+        {'keyName': 'privateIn_net_octet', 'sum': 0.0, 'max': 0, 'name': 'Pri In'},
+        {'keyName': 'privateOut_net_octet', 'sum': 0.0, 'max': 0, 'name': 'Pri Out'},
     ]
 
     for point in formatted_data:
@@ -80,7 +80,7 @@ def create_bandwidth_table(data, summary_period, title="Bandwidth Report"):
         table.add_row(new_row)
 
     for bw_type in bw_totals:
-        total = bw_type.get('sum', 0)
+        total = bw_type.get('sum', 0.0)
         average = 0
         if total > 0:
             average = round(total / len(formatted_data) / summary_period, 4)
@@ -93,6 +93,7 @@ def create_bandwidth_table(data, summary_period, title="Bandwidth Report"):
         ])
 
     return table, sum_table
+
 
 def mb_to_gb(mbytes):
     """Converts a MegaByte int to GigaByte. mbytes/2^10"""

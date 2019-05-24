@@ -13,7 +13,7 @@ getSummaryData = [
 
 
 # Using counter > 32bit int causes unit tests to fail.
-getBandwidthData =[
+getBandwidthData = [
     {
         'counter': 37.21,
         'dateTime': '2019-05-20T23:00:00-06:00',

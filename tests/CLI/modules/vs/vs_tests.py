@@ -5,6 +5,7 @@
     :license: MIT, see LICENSE for more details.
 """
 import json
+import sys
 
 import mock
 
@@ -261,8 +262,7 @@ class VirtTests(testing.TestCase):
         result = self.run_command(['vs', 'detail', '100'])
         self.assert_no_fail(result)
         output = json.loads(result.output)
-        self.assertEqual(output.get('ptr', None), None)   
-
+        self.assertEqual(output.get('ptr', None), None)
 
     def test_create_options(self):
         result = self.run_command(['vs', 'create-options'])
@@ -683,30 +683,49 @@ class VirtTests(testing.TestCase):
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
+
     def test_bandwidth_vs(self):
+        if sys.version_info < (3, 6):
+            self.skipTest("Test requires python 3.6+")
+
         result = self.run_command(['vs', 'bandwidth', '100', '--start_date=2019-01-01', '--end_date=2019-02-01'])
         self.assert_no_fail(result)
 
+
+        date = '2019-05-20 23:00'
+        # number of characters from the end of output to break so json can parse properly
+        pivot = 157
+        # only pyhon 3.7 supports the timezone format slapi uses
+        if sys.version_info < (3, 7):
+            date = '2019-05-20T23:00:00-06:00'
+            pivot = 166
         # Since this is 2 tables, it gets returned as invalid json like "[{}][{}]"" instead of "[[{}],[{}]]"
         # so we just do some hacky string substitution to pull out the respective arrays that can be jsonifyied
-        output_summary = json.loads(result.output[0:-157])
-        output_list = json.loads(result.output[-158:])
+
+        output_summary = json.loads(result.output[0:-pivot])
+        output_list = json.loads(result.output[-pivot:])
 
         self.assertEqual(output_summary[0]['Average MBps'], 0.3841)
-        self.assertEqual(output_summary[1]['Max Date'], '2019-05-20 23:00')
+        self.assertEqual(output_summary[1]['Max Date'], date)
         self.assertEqual(output_summary[2]['Max GB'], 0.1172)
         self.assertEqual(output_summary[3]['Sum GB'], 0.0009)
 
-        self.assertEqual(output_list[0]['Date'], '2019-05-20 23:00')
+        self.assertEqual(output_list[0]['Date'], date)
         self.assertEqual(output_list[0]['Pub In'], 1.3503)
 
     def test_bandwidth_vs_quite(self):
         result = self.run_command(['vs', 'bandwidth', '100', '--start_date=2019-01-01', '--end_date=2019-02-01', '-q'])
         self.assert_no_fail(result)
+
+        date = '2019-05-20 23:00'
+
+        # only pyhon 3.7 supports the timezone format slapi uses
+        if sys.version_info < (3, 7):
+            date = '2019-05-20T23:00:00-06:00'
+
         output_summary = json.loads(result.output)
 
         self.assertEqual(output_summary[0]['Average MBps'], 0.3841)
-        self.assertEqual(output_summary[1]['Max Date'], '2019-05-20 23:00')
+        self.assertEqual(output_summary[1]['Max Date'], date)
         self.assertEqual(output_summary[2]['Max GB'], 0.1172)
         self.assertEqual(output_summary[3]['Sum GB'], 0.0009)
-

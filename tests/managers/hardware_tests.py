@@ -327,7 +327,7 @@ class HardwareTests(testing.TestCase):
                              'activeTransaction': {'id': 4567}}
         self.assertRaises(SoftLayer.SoftLayerError,
                           self.hardware.cancel_hardware,
-                          12345)        
+                          12345)
 
     def test_change_port_speed_public(self):
         self.hardware.change_port_speed(2, True, 100)
@@ -426,8 +426,10 @@ class HardwareTests(testing.TestCase):
 
     def test_get_bandwidth_data(self):
         result = self.hardware.get_bandwidth_data(1234, '2019-01-01', '2019-02-01', 'public', 1000)
-        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getBandwidthData', args=('2019-01-01', '2019-02-01',
-                                'public', 1000), identifier=1000)
+        self.assert_called_with('SoftLayer_Metric_Tracking_Object',
+                                'getBandwidthData',
+                                args=('2019-01-01', '2019-02-01', 'public', 1000),
+                                identifier=1000)
         self.assertEqual(result[0]['type'], 'cpu0')
 
     def test_get_bandwidth_allocation(self):
@@ -447,9 +449,9 @@ class HardwareHelperTests(testing.TestCase):
 
     def test_get_extra_price_mismatched(self):
         items = [
-            {'keyName': 'TEST', 'prices':[{'id':1, 'locationGroupId': None, 'recurringFee':99}]},
-            {'keyName': 'TEST', 'prices':[{'id':2, 'locationGroupId': 55, 'hourlyRecurringFee':99}]},
-            {'keyName': 'TEST', 'prices':[{'id':3, 'locationGroupId': None, 'hourlyRecurringFee':99}]},
+            {'keyName': 'TEST', 'prices': [{'id': 1, 'locationGroupId': None, 'recurringFee': 99}]},
+            {'keyName': 'TEST', 'prices': [{'id': 2, 'locationGroupId': 55, 'hourlyRecurringFee': 99}]},
+            {'keyName': 'TEST', 'prices': [{'id': 3, 'locationGroupId': None, 'hourlyRecurringFee': 99}]},
         ]
         location = {
             'location': {
@@ -466,18 +468,18 @@ class HardwareHelperTests(testing.TestCase):
 
     def test_get_bandwidth_price_mismatched(self):
         items = [
-            {'itemCategory': {'categoryCode':'bandwidth'}, 
-             'capacity': 100, 
-             'prices':[{'id':1, 'locationGroupId': None, 'hourlyRecurringFee':99}]
-            },
-            {'itemCategory': {'categoryCode':'bandwidth'}, 
-             'capacity': 100, 
-             'prices':[{'id':2, 'locationGroupId': 55, 'recurringFee':99}]
-            },
-            {'itemCategory': {'categoryCode':'bandwidth'}, 
-             'capacity': 100, 
-             'prices':[{'id':3, 'locationGroupId': None, 'recurringFee':99}]
-            },
+            {'itemCategory': {'categoryCode': 'bandwidth'},
+             'capacity': 100,
+             'prices': [{'id': 1, 'locationGroupId': None, 'hourlyRecurringFee': 99}]
+             },
+            {'itemCategory': {'categoryCode': 'bandwidth'},
+             'capacity': 100,
+             'prices': [{'id': 2, 'locationGroupId': 55, 'recurringFee': 99}]
+             },
+            {'itemCategory': {'categoryCode': 'bandwidth'},
+             'capacity': 100,
+             'prices': [{'id': 3, 'locationGroupId': None, 'recurringFee': 99}]
+             },
         ]
         location = {
             'location': {
@@ -494,14 +496,14 @@ class HardwareHelperTests(testing.TestCase):
 
     def test_get_os_price_mismatched(self):
         items = [
-            {'itemCategory': {'categoryCode':'os'}, 
-             'softwareDescription': {'referenceCode': 'TEST_OS'}, 
-             'prices':[{'id':2, 'locationGroupId': 55, 'recurringFee':99}]
-            },
-            {'itemCategory': {'categoryCode':'os'}, 
-             'softwareDescription': {'referenceCode': 'TEST_OS'}, 
-             'prices':[{'id':3, 'locationGroupId': None, 'recurringFee':99}]
-            },
+            {'itemCategory': {'categoryCode': 'os'},
+             'softwareDescription': {'referenceCode': 'TEST_OS'},
+             'prices': [{'id': 2, 'locationGroupId': 55, 'recurringFee': 99}]
+             },
+            {'itemCategory': {'categoryCode': 'os'},
+             'softwareDescription': {'referenceCode': 'TEST_OS'},
+             'prices': [{'id': 3, 'locationGroupId': None, 'recurringFee': 99}]
+             },
         ]
         location = {
             'location': {
@@ -514,7 +516,7 @@ class HardwareHelperTests(testing.TestCase):
             }
         }
         result = managers.hardware._get_os_price_id(items, 'TEST_OS', location)
-        self.assertEqual(3, result)        
+        self.assertEqual(3, result)
 
     def test_get_default_price_id_item_not_first(self):
         items = [{
@@ -557,31 +559,31 @@ class HardwareHelperTests(testing.TestCase):
 
     def test_get_port_speed_price_id_mismatch(self):
         items = [
-            {'itemCategory': {'categoryCode':'port_speed'}, 
-             'capacity':101,
-             'attributes':[{'attributeTypeKeyName': 'IS_PRIVATE_NETWORK_ONLY'}],
-             'prices':[{'id':1, 'locationGroupId': None, 'recurringFee':99}]
-            },
-            {'itemCategory': {'categoryCode':'port_speed'}, 
-             'capacity':100,
-             'attributes':[{'attributeTypeKeyName': 'IS_NOT_PRIVATE_NETWORK_ONLY'}],
-             'prices':[{'id':2, 'locationGroupId': 55, 'recurringFee':99}]
-            },
-            {'itemCategory': {'categoryCode':'port_speed'}, 
-             'capacity':100,
-             'attributes':[{'attributeTypeKeyName': 'IS_PRIVATE_NETWORK_ONLY'}, {'attributeTypeKeyName': 'NON_LACP'}],
-             'prices':[{'id':3, 'locationGroupId': 55, 'recurringFee':99}]
-            },
-            {'itemCategory': {'categoryCode':'port_speed'}, 
-             'capacity':100,
-             'attributes':[{'attributeTypeKeyName': 'IS_PRIVATE_NETWORK_ONLY'}],
-             'prices':[{'id':4, 'locationGroupId': 12, 'recurringFee':99}]
-            },
-            {'itemCategory': {'categoryCode':'port_speed'}, 
-             'capacity':100,
-             'attributes':[{'attributeTypeKeyName': 'IS_PRIVATE_NETWORK_ONLY'}],
-             'prices':[{'id':5, 'locationGroupId': None, 'recurringFee':99}]
-            },
+            {'itemCategory': {'categoryCode': 'port_speed'},
+             'capacity': 101,
+             'attributes': [{'attributeTypeKeyName': 'IS_PRIVATE_NETWORK_ONLY'}],
+             'prices': [{'id': 1, 'locationGroupId': None, 'recurringFee': 99}]
+             },
+            {'itemCategory': {'categoryCode': 'port_speed'},
+             'capacity': 100,
+             'attributes': [{'attributeTypeKeyName': 'IS_NOT_PRIVATE_NETWORK_ONLY'}],
+             'prices': [{'id': 2, 'locationGroupId': 55, 'recurringFee': 99}]
+             },
+            {'itemCategory': {'categoryCode': 'port_speed'},
+             'capacity': 100,
+             'attributes': [{'attributeTypeKeyName': 'IS_PRIVATE_NETWORK_ONLY'}, {'attributeTypeKeyName': 'NON_LACP'}],
+             'prices': [{'id': 3, 'locationGroupId': 55, 'recurringFee': 99}]
+             },
+            {'itemCategory': {'categoryCode': 'port_speed'},
+             'capacity': 100,
+             'attributes': [{'attributeTypeKeyName': 'IS_PRIVATE_NETWORK_ONLY'}],
+             'prices': [{'id': 4, 'locationGroupId': 12, 'recurringFee': 99}]
+             },
+            {'itemCategory': {'categoryCode': 'port_speed'},
+             'capacity': 100,
+             'attributes': [{'attributeTypeKeyName': 'IS_PRIVATE_NETWORK_ONLY'}],
+             'prices': [{'id': 5, 'locationGroupId': None, 'recurringFee': 99}]
+             },
         ]
         location = {
             'location': {
@@ -594,10 +596,10 @@ class HardwareHelperTests(testing.TestCase):
             }
         }
         result = managers.hardware._get_port_speed_price_id(items, 100, True, location)
-        self.assertEqual(5, result)    
+        self.assertEqual(5, result)
 
     def test_matches_location(self):
-        price = {'id':1, 'locationGroupId': 51, 'recurringFee':99}
+        price = {'id': 1, 'locationGroupId': 51, 'recurringFee': 99}
         location = {
             'location': {
                 'location': {
@@ -609,5 +611,4 @@ class HardwareHelperTests(testing.TestCase):
             }
         }
         result = managers.hardware._matches_location(price, location)
-        self.assertTrue(result)   
-
+        self.assertTrue(result)

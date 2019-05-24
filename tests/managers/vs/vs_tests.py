@@ -484,8 +484,8 @@ class VSTests(testing.TestCase):
             hostname='test',
             domain='test.com',
             os_code="OS",
-            public_security_groups=[1,2,3],
-            private_security_groups=[4,5,6]
+            public_security_groups=[1, 2, 3],
+            private_security_groups=[4, 5, 6]
         )
 
         pub_sec_binding = data['primaryNetworkComponent']['securityGroupBindings']
@@ -865,7 +865,8 @@ class VSTests(testing.TestCase):
 
         args = ('2019-3-4', '2019-4-2', [{"keyName": "CPU0", "summaryType": "max"}], 300)
 
-        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', args=args, identifier=1000)
+        self.assert_called_with('SoftLayer_Metric_Tracking_Object',
+                                'getSummaryData', args=args, identifier=1000)
 
     def test_usage_vs_memory(self):
         result = self.vs.get_summary_data_usage('100',
@@ -888,8 +889,10 @@ class VSTests(testing.TestCase):
 
     def test_get_bandwidth_data(self):
         result = self.vs.get_bandwidth_data(1234, '2019-01-01', '2019-02-01', 'public', 1000)
-        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getBandwidthData', args=('2019-01-01', '2019-02-01',
-                                'public', 1000), identifier=1000)
+        self.assert_called_with('SoftLayer_Metric_Tracking_Object',
+                                'getBandwidthData',
+                                args=('2019-01-01', '2019-02-01', 'public', 1000),
+                                identifier=1000)
         self.assertEqual(result[0]['type'], 'cpu0')
 
     def test_get_bandwidth_allocation(self):
@@ -898,4 +901,3 @@ class VSTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Virtual_Guest', 'getBillingCycleBandwidthUsage', identifier=1234)
         self.assertEqual(result['allotment']['amount'], '250')
         self.assertEqual(result['useage'][0]['amountIn'], '.448')
-

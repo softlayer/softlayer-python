@@ -5,10 +5,8 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 from SoftLayer.CLI.virt.bandwidth import create_bandwidth_table
-from SoftLayer import utils
 
 
 @click.command()
