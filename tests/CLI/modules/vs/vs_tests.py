@@ -683,14 +683,12 @@ class VirtTests(testing.TestCase):
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
-
     def test_bandwidth_vs(self):
         if sys.version_info < (3, 6):
             self.skipTest("Test requires python 3.6+")
 
         result = self.run_command(['vs', 'bandwidth', '100', '--start_date=2019-01-01', '--end_date=2019-02-01'])
         self.assert_no_fail(result)
-
 
         date = '2019-05-20 23:00'
         # number of characters from the end of output to break so json can parse properly
