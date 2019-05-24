@@ -81,7 +81,7 @@ class NetworkTests(testing.TestCase):
         # Test a four public address IPv4 order
         result = self.network.add_subnet('public',
                                          quantity=4,
-                                         vlan_id=1234,
+                                         endpoint_id=1234,
                                          version=4,
                                          test_order=True)
 
@@ -89,7 +89,7 @@ class NetworkTests(testing.TestCase):
 
         result = self.network.add_subnet('public',
                                          quantity=4,
-                                         vlan_id=1234,
+                                         endpoint_id=1234,
                                          version=4,
                                          test_order=False)
 
@@ -104,7 +104,7 @@ class NetworkTests(testing.TestCase):
         # Test a public IPv6 order
         result = self.network.add_subnet('public',
                                          quantity=64,
-                                         vlan_id=45678,
+                                         endpoint_id=45678,
                                          version=6,
                                          test_order=True)
 
