@@ -591,10 +591,6 @@ class ServerCLITests(testing.TestCase):
 
         # Since this is 2 tables, it gets returned as invalid json like "[{}][{}]"" instead of "[[{}],[{}]]"
         # so we just do some hacky string substitution to pull out the respective arrays that can be jsonifyied
-        from pprint import pprint as pp
-        pp(result.output)
-        print("FUCK")
-        pp(result.output[0:-157])
         output_summary = json.loads(result.output[0:-157])
         output_list = json.loads(result.output[-158:])
 

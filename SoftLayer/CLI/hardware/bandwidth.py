@@ -42,8 +42,3 @@ def cli(env, identifier, start_date, end_date, summary_period, quite_summary):
     env.fout(sum_table)
     if not quite_summary:
         env.fout(table)
-
-
-def mb_to_gb(mbytes):
-    """Converts a MegaByte int to GigaByte. mbytes/2^10"""
-    return round(mbytes / 2 ** 10, 4)
