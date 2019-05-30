@@ -176,3 +176,74 @@ Most commands will take in additional options/arguments. To see all available ac
 	                                  separated tags
 	  --help                          Show this message and exit.
 
+
+
+Debugging
+=========
+To see exactly what API call is being made by the SLCLI, you can use the verbose option. 
+
+A single `-v` will show a simple version of the API call, along with some statistics
+
+::
+
+    slcli -v vs detail 74397127
+    Calling: SoftLayer_Virtual_Guest::getObject(id=74397127, mask='id,globalIdentifier,fullyQualifiedDomainName,hostname,domain', filter='None', args=(), limit=None, offset=None))
+    Calling: SoftLayer_Virtual_Guest::getReverseDomainRecords(id=77460683, mask='', filter='None', args=(), limit=None, offset=None))
+    :..................:..............................................................:
+    :       name       :                            value                             :
+    :..................:..............................................................:
+    :  execution_time  :                          2.020334s                           :
+    :    api_calls     :        SoftLayer_Virtual_Guest::getObject (1.515583s)        :
+    :                  : SoftLayer_Virtual_Guest::getReverseDomainRecords (0.494480s) :
+    :     version      :                   softlayer-python/v5.7.2                    :
+    :  python_version  :           3.7.3 (default, Mar 27 2019, 09:23:15)             :
+    :                  :              [Clang 10.0.1 (clang-1001.0.46.3)]              :
+    : library_location : /Users/chris/Code/py3/lib/python3.7/site-packages/SoftLayer  :
+    :..................:..............................................................:
+
+
+Using `-vv` will print out some API call details in the summary as well.
+
+::
+
+    slcli -vv account summary
+    Calling: SoftLayer_Account::getObject(id=None, mask='mask[ nextInvoiceTotalAmount, pendingInvoice[invoiceTotalAmount], blockDeviceTemplateGroupCount, dedicatedHostCount, domainCount, hardwareCount, networkStorageCount, openTicketCount, networkVlanCount, subnetCount, userCount, virtualGuestCount ]', filter='None', args=(), limit=None, offset=None))
+    :..................:.............................................................:
+    :       name       :                            value                            :
+    :..................:.............................................................:
+    :  execution_time  :                          0.921271s                          :
+    :    api_calls     :           SoftLayer_Account::getObject (0.911208s)          :
+    :     version      :                   softlayer-python/v5.7.2                   :
+    :  python_version  :           3.7.3 (default, Mar 27 2019, 09:23:15)            :
+    :                  :              [Clang 10.0.1 (clang-1001.0.46.3)]             :
+    : library_location : /Users/chris/Code/py3/lib/python3.7/site-packages/SoftLayer :
+    :..................:.............................................................:
+    :........:.................................................:
+    :        :           SoftLayer_Account::getObject          :
+    :........:.................................................:
+    :   id   :                       None                      :
+    :  mask  :                      mask[                      :
+    :        :                   nextInvoiceTotalAmount,       :
+    :        :             pendingInvoice[invoiceTotalAmount], :
+    :        :                blockDeviceTemplateGroupCount,   :
+    :        :                     dedicatedHostCount,         :
+    :        :                         domainCount,            :
+    :        :                        hardwareCount,           :
+    :        :                     networkStorageCount,        :
+    :        :                       openTicketCount,          :
+    :        :                      networkVlanCount,          :
+    :        :                         subnetCount,            :
+    :        :                          userCount,             :
+    :        :                      virtualGuestCount          :
+    :        :                              ]                  :
+    : filter :                       None                      :
+    : limit  :                       None                      :
+    : offset :                       None                      :
+    :........:.................................................:
+
+Using `-vvv` will print out the exact API that can be used without the softlayer-python framework, A simple python code snippet for XML-RPC, a curl call for REST API calls. This is dependant on the endpoint you are using in the config file.
+
+::
+
+    slcli -vvv account summary
+    curl -u $SL_USER:$SL_APIKEY -X GET -H "Accept: */*" -H "Accept-Encoding: gzip, deflate, compress"  'https://api.softlayer.com/rest/v3.1/SoftLayer_Account/getObject.json?objectMask=mask%5B%0A++++++++++++nextInvoiceTotalAmount%2C%0A++++++++++++pendingInvoice%5BinvoiceTotalAmount%5D%2C%0A++++++++++++blockDeviceTemplateGroupCount%2C%0A++++++++++++dedicatedHostCount%2C%0A++++++++++++domainCount%2C%0A++++++++++++hardwareCount%2C%0A++++++++++++networkStorageCount%2C%0A++++++++++++openTicketCount%2C%0A++++++++++++networkVlanCount%2C%0A++++++++++++subnetCount%2C%0A++++++++++++userCount%2C%0A++++++++++++virtualGuestCount%0A++++++++++++%5D'
