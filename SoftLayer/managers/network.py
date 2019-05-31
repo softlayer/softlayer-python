@@ -148,15 +148,9 @@ class NetworkManager(object):
         # item description.
         price_id = None
         quantity_str = str(quantity)
-        # package_items = package.getItems(id=0, mask='itemCategory')
         package_items = package.getItems(id=0)
         for item in package_items:
             category_code = utils.lookup(item, 'itemCategory', 'categoryCode')
-            # if (category_code == category
-            #         and item.get('capacity') == quantity_str
-            #         and (version == 4 or (version == 6 and desc in item['description']))):
-            #     price_id = item['prices'][0]['id']
-            #     break
             if all([category_code == category,
                     item.get('capacity') == quantity_str,
                     version == 4 or (version == 6 and
