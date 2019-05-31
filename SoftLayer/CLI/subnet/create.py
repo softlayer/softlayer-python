@@ -22,21 +22,21 @@ def cli(env, network, quantity, endpoint_id, ipv6, test):
     """Add a new subnet to your account. Valid quantities vary by type.
 
     \b
-    Type    - Valid Quantities (IPv4)
+    IPv4
     static  - 1, 2, 4, 8, 16, 32, 64, 128, 256
     public  - 4, 8, 16, 32, 64, 128, 256
     private - 4, 8, 16, 32, 64, 128, 256
 
     \b
-    Type    - Valid Quantities (IPv6)
+    IPv6
     static  - 64
     public  - 64
 
     \b
-    Type    - endpoint-id
-    static  - IP address identifier.
-    public  - VLAN identifier
-    private - VLAN identifier
+    endpoint-id
+    static  - Network_Subnet_IpAddress identifier.
+    public  - Network_Vlan identifier
+    private - Network_Vlan identifier
 """
 
     mgr = SoftLayer.NetworkManager(env.client)
