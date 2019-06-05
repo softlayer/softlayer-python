@@ -26,8 +26,8 @@ def cli(env, identifier, start_date, end_date, summary_period, quite_summary):
     Using just a date might get you times off by 1 hour, use T00:01 to get just the specific days data
     Timezones can also be included with the YYYY-MM-DDTHH:mm:ss.00000-HH:mm format.
 
-    Due to some rounding and date alignment details, results here might be slightly different than 
-    results in the control portal. 
+    Due to some rounding and date alignment details, results here might be slightly different than
+    results in the control portal.
 
     Example::
 
