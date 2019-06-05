@@ -151,7 +151,7 @@ class VSWaitReadyGoTests(testing.TestCase):
         _dsleep.return_value = False
 
         self.guestObject.side_effect = [
-            exceptions.TransportError(104, "Its broken"),
+            exceptions.ServerError(504, "Its broken"),
             {'activeTransaction': {'id': 1}},
             {'provisionDate': 'aaa'}
         ]

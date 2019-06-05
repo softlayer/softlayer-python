@@ -477,6 +477,28 @@ class VSTests(testing.TestCase):
 
         self.assertEqual(data, assert_data)
 
+    def test_generate_sec_group(self):
+        data = self.vs._generate_create_dict(
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='test.com',
+            os_code="OS",
+            public_security_groups=[1, 2, 3],
+            private_security_groups=[4, 5, 6]
+        )
+
+        pub_sec_binding = data['primaryNetworkComponent']['securityGroupBindings']
+        prv_sec_binding = data['primaryBackendNetworkComponent']['securityGroupBindings']
+        # Public
+        self.assertEqual(pub_sec_binding[0]['securityGroup']['id'], 1)
+        self.assertEqual(pub_sec_binding[1]['securityGroup']['id'], 2)
+        self.assertEqual(pub_sec_binding[2]['securityGroup']['id'], 3)
+        # Private
+        self.assertEqual(prv_sec_binding[0]['securityGroup']['id'], 4)
+        self.assertEqual(prv_sec_binding[1]['securityGroup']['id'], 5)
+        self.assertEqual(prv_sec_binding[2]['securityGroup']['id'], 6)
+
     def test_create_network_components_vlan_subnet_private_vlan_subnet_public(self):
         data = self.vs._create_network_components(
             private_vlan=1,
@@ -843,7 +865,8 @@ class VSTests(testing.TestCase):
 
         args = ('2019-3-4', '2019-4-2', [{"keyName": "CPU0", "summaryType": "max"}], 300)
 
-        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', args=args, identifier=1000)
+        self.assert_called_with('SoftLayer_Metric_Tracking_Object',
+                                'getSummaryData', args=args, identifier=1000)
 
     def test_usage_vs_memory(self):
         result = self.vs.get_summary_data_usage('100',
@@ -858,3 +881,23 @@ class VSTests(testing.TestCase):
         args = ('2019-3-4', '2019-4-2', [{"keyName": "MEMORY_USAGE", "summaryType": "max"}], 300)
 
         self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', args=args, identifier=1000)
+
+    def test_get_tracking_id(self):
+        result = self.vs.get_tracking_id(1234)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'getMetricTrackingObjectId')
+        self.assertEqual(result, 1000)
+
+    def test_get_bandwidth_data(self):
+        result = self.vs.get_bandwidth_data(1234, '2019-01-01', '2019-02-01', 'public', 1000)
+        self.assert_called_with('SoftLayer_Metric_Tracking_Object',
+                                'getBandwidthData',
+                                args=('2019-01-01', '2019-02-01', 'public', 1000),
+                                identifier=1000)
+        self.assertEqual(result[0]['type'], 'cpu0')
+
+    def test_get_bandwidth_allocation(self):
+        result = self.vs.get_bandwidth_allocation(1234)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'getBandwidthAllotmentDetail', identifier=1234)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'getBillingCycleBandwidthUsage', identifier=1234)
+        self.assertEqual(result['allotment']['amount'], '250')
+        self.assertEqual(result['useage'][0]['amountIn'], '.448')

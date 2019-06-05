@@ -4,6 +4,10 @@ Interacting with Hardware
 ==============================
 
 
+.. click:: SoftLayer.CLI.hardware.bandwidth:cli
+   :prog: hw bandwidth
+   :show-nested:
+
 .. click:: SoftLayer.CLI.hardware.cancel_reasons:cli
    :prog: hw cancel-reasons
    :show-nested:

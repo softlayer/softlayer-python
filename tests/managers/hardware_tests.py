@@ -10,6 +10,7 @@ import mock
 
 
 import SoftLayer
+
 from SoftLayer import fixtures
 from SoftLayer import managers
 from SoftLayer import testing
@@ -320,6 +321,14 @@ class HardwareTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
                                 identifier=6327, args=(False, False, 'No longer needed', ''))
 
+    def test_cancel_running_transaction(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        mock.return_value = {'id': 987, 'billingItem': {'id': 6327},
+                             'activeTransaction': {'id': 4567}}
+        self.assertRaises(SoftLayer.SoftLayerError,
+                          self.hardware.cancel_hardware,
+                          12345)
+
     def test_change_port_speed_public(self):
         self.hardware.change_port_speed(2, True, 100)
 
@@ -410,14 +419,104 @@ class HardwareTests(testing.TestCase):
                                 'createFirmwareReflashTransaction',
                                 identifier=100, args=(1, 0, 0))
 
+    def test_get_tracking_id(self):
+        result = self.hardware.get_tracking_id(1234)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getMetricTrackingObjectId')
+        self.assertEqual(result, 1000)
+
+    def test_get_bandwidth_data(self):
+        result = self.hardware.get_bandwidth_data(1234, '2019-01-01', '2019-02-01', 'public', 1000)
+        self.assert_called_with('SoftLayer_Metric_Tracking_Object',
+                                'getBandwidthData',
+                                args=('2019-01-01', '2019-02-01', 'public', 1000),
+                                identifier=1000)
+        self.assertEqual(result[0]['type'], 'cpu0')
+
+    def test_get_bandwidth_allocation(self):
+        result = self.hardware.get_bandwidth_allocation(1234)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getBandwidthAllotmentDetail', identifier=1234)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getBillingCycleBandwidthUsage', identifier=1234)
+        self.assertEqual(result['allotment']['amount'], '250')
+        self.assertEqual(result['useage'][0]['amountIn'], '.448')
+
 
 class HardwareHelperTests(testing.TestCase):
     def test_get_extra_price_id_no_items(self):
         ex = self.assertRaises(SoftLayer.SoftLayerError,
                                managers.hardware._get_extra_price_id,
                                [], 'test', True, None)
-        self.assertEqual("Could not find valid price for extra option, 'test'",
-                         str(ex))
+        self.assertEqual("Could not find valid price for extra option, 'test'", str(ex))
+
+    def test_get_extra_price_mismatched(self):
+        items = [
+            {'keyName': 'TEST', 'prices': [{'id': 1, 'locationGroupId': None, 'recurringFee': 99}]},
+            {'keyName': 'TEST', 'prices': [{'id': 2, 'locationGroupId': 55, 'hourlyRecurringFee': 99}]},
+            {'keyName': 'TEST', 'prices': [{'id': 3, 'locationGroupId': None, 'hourlyRecurringFee': 99}]},
+        ]
+        location = {
+            'location': {
+                'location': {
+                    'priceGroups': [
+                        {'id': 50},
+                        {'id': 51}
+                    ]
+                }
+            }
+        }
+        result = managers.hardware._get_extra_price_id(items, 'TEST', True, location)
+        self.assertEqual(3, result)
+
+    def test_get_bandwidth_price_mismatched(self):
+        items = [
+            {'itemCategory': {'categoryCode': 'bandwidth'},
+             'capacity': 100,
+             'prices': [{'id': 1, 'locationGroupId': None, 'hourlyRecurringFee': 99}]
+             },
+            {'itemCategory': {'categoryCode': 'bandwidth'},
+             'capacity': 100,
+             'prices': [{'id': 2, 'locationGroupId': 55, 'recurringFee': 99}]
+             },
+            {'itemCategory': {'categoryCode': 'bandwidth'},
+             'capacity': 100,
+             'prices': [{'id': 3, 'locationGroupId': None, 'recurringFee': 99}]
+             },
+        ]
+        location = {
+            'location': {
+                'location': {
+                    'priceGroups': [
+                        {'id': 50},
+                        {'id': 51}
+                    ]
+                }
+            }
+        }
+        result = managers.hardware._get_bandwidth_price_id(items, False, False, location)
+        self.assertEqual(3, result)
+
+    def test_get_os_price_mismatched(self):
+        items = [
+            {'itemCategory': {'categoryCode': 'os'},
+             'softwareDescription': {'referenceCode': 'TEST_OS'},
+             'prices': [{'id': 2, 'locationGroupId': 55, 'recurringFee': 99}]
+             },
+            {'itemCategory': {'categoryCode': 'os'},
+             'softwareDescription': {'referenceCode': 'TEST_OS'},
+             'prices': [{'id': 3, 'locationGroupId': None, 'recurringFee': 99}]
+             },
+        ]
+        location = {
+            'location': {
+                'location': {
+                    'priceGroups': [
+                        {'id': 50},
+                        {'id': 51}
+                    ]
+                }
+            }
+        }
+        result = managers.hardware._get_os_price_id(items, 'TEST_OS', location)
+        self.assertEqual(3, result)
 
     def test_get_default_price_id_item_not_first(self):
         items = [{
@@ -432,33 +531,84 @@ class HardwareHelperTests(testing.TestCase):
         ex = self.assertRaises(SoftLayer.SoftLayerError,
                                managers.hardware._get_default_price_id,
                                items, 'unknown', True, None)
-        self.assertEqual("Could not find valid price for 'unknown' option",
-                         str(ex))
+        self.assertEqual("Could not find valid price for 'unknown' option", str(ex))
 
     def test_get_default_price_id_no_items(self):
         ex = self.assertRaises(SoftLayer.SoftLayerError,
                                managers.hardware._get_default_price_id,
                                [], 'test', True, None)
-        self.assertEqual("Could not find valid price for 'test' option",
-                         str(ex))
+        self.assertEqual("Could not find valid price for 'test' option", str(ex))
 
     def test_get_bandwidth_price_id_no_items(self):
         ex = self.assertRaises(SoftLayer.SoftLayerError,
                                managers.hardware._get_bandwidth_price_id,
                                [], hourly=True, no_public=False)
-        self.assertEqual("Could not find valid price for bandwidth option",
-                         str(ex))
+        self.assertEqual("Could not find valid price for bandwidth option", str(ex))
 
     def test_get_os_price_id_no_items(self):
         ex = self.assertRaises(SoftLayer.SoftLayerError,
                                managers.hardware._get_os_price_id,
                                [], 'UBUNTU_14_64', None)
-        self.assertEqual("Could not find valid price for os: 'UBUNTU_14_64'",
-                         str(ex))
+        self.assertEqual("Could not find valid price for os: 'UBUNTU_14_64'", str(ex))
 
     def test_get_port_speed_price_id_no_items(self):
         ex = self.assertRaises(SoftLayer.SoftLayerError,
                                managers.hardware._get_port_speed_price_id,
                                [], 10, True, None)
-        self.assertEqual("Could not find valid price for port speed: '10'",
-                         str(ex))
+        self.assertEqual("Could not find valid price for port speed: '10'", str(ex))
+
+    def test_get_port_speed_price_id_mismatch(self):
+        items = [
+            {'itemCategory': {'categoryCode': 'port_speed'},
+             'capacity': 101,
+             'attributes': [{'attributeTypeKeyName': 'IS_PRIVATE_NETWORK_ONLY'}],
+             'prices': [{'id': 1, 'locationGroupId': None, 'recurringFee': 99}]
+             },
+            {'itemCategory': {'categoryCode': 'port_speed'},
+             'capacity': 100,
+             'attributes': [{'attributeTypeKeyName': 'IS_NOT_PRIVATE_NETWORK_ONLY'}],
+             'prices': [{'id': 2, 'locationGroupId': 55, 'recurringFee': 99}]
+             },
+            {'itemCategory': {'categoryCode': 'port_speed'},
+             'capacity': 100,
+             'attributes': [{'attributeTypeKeyName': 'IS_PRIVATE_NETWORK_ONLY'}, {'attributeTypeKeyName': 'NON_LACP'}],
+             'prices': [{'id': 3, 'locationGroupId': 55, 'recurringFee': 99}]
+             },
+            {'itemCategory': {'categoryCode': 'port_speed'},
+             'capacity': 100,
+             'attributes': [{'attributeTypeKeyName': 'IS_PRIVATE_NETWORK_ONLY'}],
+             'prices': [{'id': 4, 'locationGroupId': 12, 'recurringFee': 99}]
+             },
+            {'itemCategory': {'categoryCode': 'port_speed'},
+             'capacity': 100,
+             'attributes': [{'attributeTypeKeyName': 'IS_PRIVATE_NETWORK_ONLY'}],
+             'prices': [{'id': 5, 'locationGroupId': None, 'recurringFee': 99}]
+             },
+        ]
+        location = {
+            'location': {
+                'location': {
+                    'priceGroups': [
+                        {'id': 50},
+                        {'id': 51}
+                    ]
+                }
+            }
+        }
+        result = managers.hardware._get_port_speed_price_id(items, 100, True, location)
+        self.assertEqual(5, result)
+
+    def test_matches_location(self):
+        price = {'id': 1, 'locationGroupId': 51, 'recurringFee': 99}
+        location = {
+            'location': {
+                'location': {
+                    'priceGroups': [
+                        {'id': 50},
+                        {'id': 51}
+                    ]
+                }
+            }
+        }
+        result = managers.hardware._matches_location(price, location)
+        self.assertTrue(result)

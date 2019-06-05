@@ -17,7 +17,7 @@ from SoftLayer.utils import clean_time
 @click.option('--end_date', '-e', type=click.STRING, required=True, help="End Date e.g. 2019-4-2 (yyyy-MM-dd)")
 @click.option('--valid_type', '-t', type=click.STRING, required=True,
               help="Metric_Data_Type keyName e.g. CPU0, CPU1, MEMORY_USAGE, etc.")
-@click.option('--summary_period', '-p', type=click.INT, default=1800,
+@click.option('--summary_period', '-p', type=click.INT, default=3600,
               help="300, 600, 1800, 3600, 43200 or 86400 seconds")
 @environment.pass_env
 def cli(env, identifier, start_date, end_date, valid_type, summary_period):

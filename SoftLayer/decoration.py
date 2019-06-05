@@ -15,7 +15,6 @@ RETRIABLE = (
     exceptions.ServerError,
     exceptions.ApplicationError,
     exceptions.RemoteSystemError,
-    exceptions.TransportError
 )
 
 
