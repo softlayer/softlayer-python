@@ -327,11 +327,12 @@ def timestamp(date):
 
 
 def days_to_datetime(days):
-    """ Returns the datetime value of last N days.
+    """Returns the datetime value of last N days.
 
     :param int days: From 0 to N days
     :returns int: The datetime of last N days or datetime.now() if days <= 0.
     """
+
     date = datetime.datetime.now()
 
     if days > 0:
