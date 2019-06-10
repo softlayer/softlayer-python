@@ -14,7 +14,7 @@ else:
 
 setup(
     name='SoftLayer',
-    version='5.7.1',
+    version='5.7.2',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     author='SoftLayer Technologies, Inc.',
@@ -34,7 +34,7 @@ setup(
         'ptable >= 0.9.2',
         'click >= 7',
         'requests >= 2.20.0',
-        'prompt_toolkit >= 0.53',
+        'prompt_toolkit >= 2',
         'pygments >= 2.0.0',
         'urllib3 >= 1.24'
     ],

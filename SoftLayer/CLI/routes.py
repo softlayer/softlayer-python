@@ -19,6 +19,7 @@ ALL_ROUTES = [
     ('account:summary', 'SoftLayer.CLI.account.summary:cli'),
 
     ('virtual', 'SoftLayer.CLI.virt'),
+    ('virtual:bandwidth', 'SoftLayer.CLI.virt.bandwidth:cli'),
     ('virtual:cancel', 'SoftLayer.CLI.virt.cancel:cli'),
     ('virtual:capture', 'SoftLayer.CLI.virt.capture:cli'),
     ('virtual:create', 'SoftLayer.CLI.virt.create:cli'),
@@ -36,6 +37,7 @@ ALL_ROUTES = [
     ('virtual:reboot', 'SoftLayer.CLI.virt.power:reboot'),
     ('virtual:reload', 'SoftLayer.CLI.virt.reload:cli'),
     ('virtual:upgrade', 'SoftLayer.CLI.virt.upgrade:cli'),
+    ('virtual:usage', 'SoftLayer.CLI.virt.usage:cli'),
     ('virtual:credentials', 'SoftLayer.CLI.virt.credentials:cli'),
     ('virtual:capacity', 'SoftLayer.CLI.virt.capacity:cli'),
     ('virtual:placementgroup', 'SoftLayer.CLI.virt.placementgroup:cli'),
@@ -212,6 +214,7 @@ ALL_ROUTES = [
     ('rwhois:show', 'SoftLayer.CLI.rwhois.show:cli'),
 
     ('hardware', 'SoftLayer.CLI.hardware'),
+    ('hardware:bandwidth', 'SoftLayer.CLI.hardware.bandwidth:cli'),
     ('hardware:cancel', 'SoftLayer.CLI.hardware.cancel:cli'),
     ('hardware:cancel-reasons', 'SoftLayer.CLI.hardware.cancel_reasons:cli'),
     ('hardware:create', 'SoftLayer.CLI.hardware.create:cli'),

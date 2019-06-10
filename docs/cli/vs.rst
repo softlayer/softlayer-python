@@ -170,39 +170,81 @@ username is 'root' and password is 'ABCDEFGH'.
 	:..............:...........................:
 
 
-There are many other commands to help manage virtual servers. To see them all,
-use `slcli help vs`.
 
-::
+.. click:: SoftLayer.CLI.virt.bandwidth:cli
+   :prog: vs bandwidth
+   :show-nested:
 
-	$ slcli vs
-	Usage: slcli vs [OPTIONS] COMMAND [ARGS]...
+If no timezone is specified, IMS local time (CST) will be assumed, which might not match your user's selected timezone.
 
-	  Virtual Servers.
 
-	Options:
-	  --help  Show this message and exit.
+.. click:: SoftLayer.CLI.virt.cancel:cli
+   :prog: vs cancel
+   :show-nested:
 
-	Commands:
-	  cancel          Cancel virtual servers.
-	  capture         Capture SoftLayer image.
-	  create          Order/create virtual servers.
-	  create-options  Virtual server order options.
-	  credentials     List virtual server credentials.
-	  detail          Get details for a virtual server.
-	  dns-sync        Sync DNS records.
-	  edit            Edit a virtual server's details.
-	  list            List virtual servers.
-	  network         Manage network settings.
-	  pause           Pauses an active virtual server.
-	  power_off       Power off an active virtual server.
-	  power_on        Power on a virtual server.
-	  ready           Check if a virtual server is ready.
-	  reboot          Reboot an active virtual server.
-	  reload          Reload operating system on a virtual server.
-	  rescue          Reboot into a rescue image.
-	  resume          Resumes a paused virtual server.
-	  upgrade         Upgrade a virtual server.
+.. click:: SoftLayer.CLI.virt.capture:cli
+   :prog: vs capture
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.create:cli
+   :prog: vs create
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.create_options:cli
+   :prog: vs create-options
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.dns:cli
+   :prog: vs dns-sync
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.edit:cli
+   :prog: vs edit
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.list:cli
+   :prog: vs list
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.power:pause
+   :prog: vs pause
+   :show-nested:
+
+
+.. click:: SoftLayer.CLI.virt.power:power_on
+   :prog: vs power-on
+   :show-nested:
+
+
+.. click:: SoftLayer.CLI.virt.power:power_off
+   :prog: vs power-off
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.power:resume
+   :prog: vs resume
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.power:rescue
+   :prog: vs rescue
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.power:reboot
+   :prog: vs reboot
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.ready:cli
+   :prog: vs ready
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.upgrade:cli
+   :prog: vs upgrade
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.usage:cli
+   :prog: vs usage
+   :show-nested:
+
+
 
 
 Reserved Capacity

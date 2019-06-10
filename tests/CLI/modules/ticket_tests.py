@@ -55,7 +55,6 @@ class TicketTests(testing.TestCase):
         self.assert_no_fail(result)
 
         args = ({'subjectId': 1000,
-                 'contents': 'ticket body',
                  'assignedUserId': 12345,
                  'title': 'Test'}, 'ticket body')
 
@@ -70,7 +69,6 @@ class TicketTests(testing.TestCase):
         self.assert_no_fail(result)
 
         args = ({'subjectId': 1000,
-                 'contents': 'ticket body',
                  'assignedUserId': 12345,
                  'title': 'Test',
                  'priority': 1}, 'ticket body')
@@ -87,7 +85,6 @@ class TicketTests(testing.TestCase):
         self.assert_no_fail(result)
 
         args = ({'subjectId': 1000,
-                 'contents': 'ticket body',
                  'assignedUserId': 12345,
                  'title': 'Test'}, 'ticket body')
 
@@ -108,7 +105,6 @@ class TicketTests(testing.TestCase):
         self.assert_no_fail(result)
 
         args = ({'subjectId': 1000,
-                 'contents': 'ticket body',
                  'assignedUserId': 12345,
                  'title': 'Test'}, 'ticket body')
 

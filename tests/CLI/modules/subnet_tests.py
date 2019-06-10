@@ -94,4 +94,43 @@ class SubnetTests(testing.TestCase):
         result = self.run_command(['subnet', 'create', '--v6', 'public', '32', '12346', '--test'])
 
         self.assertRaises(SoftLayer.SoftLayerAPIError, verify_mock)
-        self.assertEqual(result.exception.message, 'There is no price id for 32 public ipv6')
+        self.assertIn('Unable to order 32 public ipv6', result.exception.message, )
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_create_subnet_static(self, confirm_mock):
+        confirm_mock.return_value = True
+
+        item_mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
+        item_mock.return_value = SoftLayer_Product_Package.getItems
+
+        place_mock = self.set_mock('SoftLayer_Product_Order', 'placeOrder')
+        place_mock.return_value = SoftLayer_Product_Order.placeOrder
+
+        result = self.run_command(['subnet', 'create', 'static', '2', '12346'])
+        self.assert_no_fail(result)
+
+        output = [
+            {'Item': 'Total monthly cost', 'cost': '0.00'}
+        ]
+
+        self.assertEqual(output, json.loads(result.output))
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_create_subnet_static_ipv6(self, confirm_mock):
+        confirm_mock.return_value = True
+
+        item_mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
+        item_mock.return_value = SoftLayer_Product_Package.getItems
+
+        place_mock = self.set_mock('SoftLayer_Product_Order', 'verifyOrder')
+        place_mock.return_value = SoftLayer_Product_Order.verifyOrder
+
+        result = self.run_command(['subnet', 'create', '--v6', 'static', '64', '12346', '--test'])
+        self.assert_no_fail(result)
+
+        output = [
+            {'Item': 'this is a thing', 'cost': '2.00'},
+            {'Item': 'Total monthly cost', 'cost': '2.00'}
+        ]
+
+        self.assertEqual(output, json.loads(result.output))

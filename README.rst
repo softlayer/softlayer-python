@@ -31,9 +31,9 @@ http://softlayer.github.io/softlayer-python/.
 Additional API documentation can be found on the SoftLayer Development Network:
 
 * `SoftLayer API reference
-  <http://developer.softlayer.com/reference/softlayerapi>`_
+  <https://sldn.softlayer.com/reference/softlayerapi>`_
 * `Object mask information and examples
-  <http://developer.softlayer.com/article/Object-Masks>`_
+  <https://sldn.softlayer.com/article/object-masks>`_
 * `Code Examples
   <https://softlayer.github.io/python/>`_
 
@@ -132,12 +132,12 @@ System Requirements
 Python Packages
 ---------------
 * six >= 1.7.0
-* prettytable >= 0.7.0
-* click >= 5, < 7
-* requests >= 2.18.4
-* prompt_toolkit >= 0.53
+* ptable >= 0.9.2
+* click >= 7
+* requests >= 2.20.0
+* prompt_toolkit >= 2
 * pygments >= 2.0.0
-* urllib3 >= 1.22
+* urllib3 >= 1.24
 
 Copyright
 ---------

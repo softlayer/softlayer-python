@@ -5,10 +5,12 @@
     :license: MIT, see LICENSE for more details.
 """
 import json
+import sys
 
 import mock
 
 from SoftLayer.CLI import exceptions
+from SoftLayer.fixtures import SoftLayer_Virtual_Guest as SoftLayer_Virtual_Guest
 from SoftLayer import SoftLayerAPIError
 from SoftLayer import testing
 
@@ -168,78 +170,20 @@ class VirtTests(testing.TestCase):
         result = self.run_command(['vs', 'detail', '100', '--passwords', '--price'])
 
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         {'active_transaction': None,
-                          'cores': 2,
-                          'created': '2013-08-01 15:23:45',
-                          'datacenter': 'TEST00',
-                          'dedicated_host': 'test-dedicated',
-                          'dedicated_host_id': 37401,
-                          'hostname': 'vs-test1',
-                          'domain': 'test.sftlyr.ws',
-                          'fqdn': 'vs-test1.test.sftlyr.ws',
-                          'id': 100,
-                          'guid': '1a2b3c-1701',
-                          'memory': 1024,
-                          'modified': {},
-                          'os': 'Ubuntu',
-                          'os_version': '12.04-64 Minimal for VSI',
-                          'notes': 'notes',
-                          'price_rate': 0,
-                          'tags': ['production'],
-                          'private_cpu': {},
-                          'private_ip': '10.45.19.37',
-                          'private_only': {},
-                          'ptr': 'test.softlayer.com.',
-                          'public_ip': '172.16.240.2',
-                          'state': 'RUNNING',
-                          'status': 'ACTIVE',
-                          'users': [{'software': 'Ubuntu',
-                                     'password': 'pass',
-                                     'username': 'user'}],
-                          'vlans': [{'type': 'PUBLIC',
-                                     'number': 23,
-                                     'id': 1}],
-                          'owner': None})
+        output = json.loads(result.output)
+        self.assertEqual(output['owner'], None)
 
     def test_detail_vs(self):
-        result = self.run_command(['vs', 'detail', '100',
-                                   '--passwords', '--price'])
+        result = self.run_command(['vs', 'detail', '100', '--passwords', '--price'])
 
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         {'active_transaction': None,
-                          'cores': 2,
-                          'created': '2013-08-01 15:23:45',
-                          'datacenter': 'TEST00',
-                          'dedicated_host': 'test-dedicated',
-                          'dedicated_host_id': 37401,
-                          'hostname': 'vs-test1',
-                          'domain': 'test.sftlyr.ws',
-                          'fqdn': 'vs-test1.test.sftlyr.ws',
-                          'id': 100,
-                          'guid': '1a2b3c-1701',
-                          'memory': 1024,
-                          'modified': {},
-                          'os': 'Ubuntu',
-                          'os_version': '12.04-64 Minimal for VSI',
-                          'notes': 'notes',
-                          'price_rate': 6.54,
-                          'tags': ['production'],
-                          'private_cpu': {},
-                          'private_ip': '10.45.19.37',
-                          'private_only': {},
-                          'ptr': 'test.softlayer.com.',
-                          'public_ip': '172.16.240.2',
-                          'state': 'RUNNING',
-                          'status': 'ACTIVE',
-                          'users': [{'software': 'Ubuntu',
-                                     'password': 'pass',
-                                     'username': 'user'}],
-                          'vlans': [{'type': 'PUBLIC',
-                                     'number': 23,
-                                     'id': 1}],
-                          'owner': 'chechu'})
+        output = json.loads(result.output)
+        self.assertEqual(output['notes'], 'notes')
+        self.assertEqual(output['price_rate'], 6.54)
+        self.assertEqual(output['users'][0]['username'], 'user')
+        self.assertEqual(output['vlans'][0]['number'], 23)
+        self.assertEqual(output['owner'], 'chechu')
+        self.assertEqual(output['Bandwidth'][0]['Allotment'], '250')
 
     def test_detail_vs_empty_tag(self):
         mock = self.set_mock('SoftLayer_Virtual_Guest', 'getObject')
@@ -277,6 +221,48 @@ class VirtTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output)['dedicated_host_id'], 37401)
         self.assertIsNone(json.loads(result.output)['dedicated_host'])
+
+    def test_detail_vs_security_group(self):
+        vg_return = SoftLayer_Virtual_Guest.getObject
+        sec_group = [
+            {
+                'id': 35386715,
+                'name': 'eth',
+                'port': 0,
+                'speed': 100,
+                'status': 'ACTIVE',
+                'primaryIpAddress': '10.175.106.149',
+                'securityGroupBindings': [
+                    {
+                        'id': 1620971,
+                        'networkComponentId': 35386715,
+                        'securityGroupId': 128321,
+                        'securityGroup': {
+                            'id': 128321,
+                            'name': 'allow_all'
+                        }
+                    }
+                ]
+            }
+        ]
+
+        vg_return['networkComponents'] = sec_group
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getObject')
+        mock.return_value = vg_return
+        result = self.run_command(['vs', 'detail', '100'])
+        self.assert_no_fail(result)
+        output = json.loads(result.output)
+        self.assertEqual(output['security_groups'][0]['id'], 128321)
+        self.assertEqual(output['security_groups'][0]['name'], 'allow_all')
+        self.assertEqual(output['security_groups'][0]['interface'], 'PRIVATE')
+
+    def test_detail_vs_ptr_error(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getReverseDomainRecords')
+        mock.side_effect = SoftLayerAPIError("SoftLayer_Exception", "Not Found")
+        result = self.run_command(['vs', 'detail', '100'])
+        self.assert_no_fail(result)
+        output = json.loads(result.output)
+        self.assertEqual(output.get('ptr', None), None)
 
     def test_create_options(self):
         result = self.run_command(['vs', 'create-options'])
@@ -660,3 +646,84 @@ class VirtTests(testing.TestCase):
         result = self.run_command(['vs', 'capture', '100', '--name', 'TestName'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'createArchiveTransaction', identifier=100)
+
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    def test_usage_no_confirm(self, confirm_mock):
+        confirm_mock.return_value = False
+
+        result = self.run_command(['vs', 'usage', '100'])
+        self.assertEqual(result.exit_code, 2)
+
+    def test_usage_vs(self):
+        result = self.run_command(
+            ['vs', 'usage', '100'])
+        self.assertEqual(result.exit_code, 2)
+
+    def test_usage_vs_cpu(self):
+        result = self.run_command(
+            ['vs', 'usage', '100', '--start_date=2019-3-4', '--end_date=2019-4-2', '--valid_type=CPU0',
+             '--summary_period=300'])
+
+        self.assert_no_fail(result)
+
+    def test_usage_vs_memory(self):
+        result = self.run_command(
+            ['vs', 'usage', '100', '--start_date=2019-3-4', '--end_date=2019-4-2', '--valid_type=MEMORY_USAGE',
+             '--summary_period=300'])
+
+        self.assert_no_fail(result)
+
+    def test_usage_metric_data_empty(self):
+        usage_vs = self.set_mock('SoftLayer_Metric_Tracking_Object', 'getSummaryData')
+        test_usage = []
+        usage_vs.return_value = test_usage
+        result = self.run_command(
+            ['vs', 'usage', '100', '--start_date=2019-3-4', '--end_date=2019-4-2', '--valid_type=CPU0',
+             '--summary_period=300'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    def test_bandwidth_vs(self):
+        if sys.version_info < (3, 6):
+            self.skipTest("Test requires python 3.6+")
+
+        result = self.run_command(['vs', 'bandwidth', '100', '--start_date=2019-01-01', '--end_date=2019-02-01'])
+        self.assert_no_fail(result)
+
+        date = '2019-05-20 23:00'
+        # number of characters from the end of output to break so json can parse properly
+        pivot = 157
+        # only pyhon 3.7 supports the timezone format slapi uses
+        if sys.version_info < (3, 7):
+            date = '2019-05-20T23:00:00-06:00'
+            pivot = 166
+        # Since this is 2 tables, it gets returned as invalid json like "[{}][{}]"" instead of "[[{}],[{}]]"
+        # so we just do some hacky string substitution to pull out the respective arrays that can be jsonifyied
+
+        output_summary = json.loads(result.output[0:-pivot])
+        output_list = json.loads(result.output[-pivot:])
+
+        self.assertEqual(output_summary[0]['Average MBps'], 0.3841)
+        self.assertEqual(output_summary[1]['Max Date'], date)
+        self.assertEqual(output_summary[2]['Max GB'], 0.1172)
+        self.assertEqual(output_summary[3]['Sum GB'], 0.0009)
+
+        self.assertEqual(output_list[0]['Date'], date)
+        self.assertEqual(output_list[0]['Pub In'], 1.3503)
+
+    def test_bandwidth_vs_quite(self):
+        result = self.run_command(['vs', 'bandwidth', '100', '--start_date=2019-01-01', '--end_date=2019-02-01', '-q'])
+        self.assert_no_fail(result)
+
+        date = '2019-05-20 23:00'
+
+        # only pyhon 3.7 supports the timezone format slapi uses
+        if sys.version_info < (3, 7):
+            date = '2019-05-20T23:00:00-06:00'
+
+        output_summary = json.loads(result.output)
+
+        self.assertEqual(output_summary[0]['Average MBps'], 0.3841)
+        self.assertEqual(output_summary[1]['Max Date'], date)
+        self.assertEqual(output_summary[2]['Max GB'], 0.1172)
+        self.assertEqual(output_summary[3]['Sum GB'], 0.0009)

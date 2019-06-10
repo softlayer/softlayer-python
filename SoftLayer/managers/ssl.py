@@ -61,7 +61,7 @@ class SSLManager(object):
 
         :param dict certificate: A dictionary representing the parts of the
                                  certificate.
-                                 See developer.softlayer.com for more info.
+                                 See sldn.softlayer.com for more info.
 
         Example::
 
