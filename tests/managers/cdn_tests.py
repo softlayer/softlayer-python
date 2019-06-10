@@ -5,9 +5,9 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from SoftLayer.managers import cdn
 from SoftLayer import testing
 from SoftLayer import utils
+from SoftLayer.managers import cdn
 
 
 class CDNTests(testing.TestCase):
@@ -63,6 +63,28 @@ class CDNTests(testing.TestCase):
                     'header': 'test.example.com',
                     'httpPort': 80,
                     'protocol': 'HTTP',
+                    'performanceConfiguration': 'General web delivery',
+                    'cacheKeyQueryRule': "include all"
+                },)
+        self.assert_called_with('SoftLayer_Network_CdnMarketplace_Configuration_Mapping_Path',
+                                'createOriginPath',
+                                args=args)
+
+    def test_add_origin_with_bucket_and_file_extension(self):
+        self.cdn_client.add_origin("12345", "10.10.10.1", "/example/videos", origin_type="storage",
+                                   bucket_name="test-bucket", file_extensions="jpg", header="test.example.com", port=80,
+                                   protocol='http', optimize_for="web", cache_query="include all")
+
+        args = ({
+                    'uniqueId': "12345",
+                    'origin': '10.10.10.1',
+                    'path': '/example/videos',
+                    'originType': 'OBJECT_STORAGE',
+                    'header': 'test.example.com',
+                    'httpPort': 80,
+                    'protocol': 'HTTP',
+                    'bucketName': 'test-bucket',
+                    'fileExtension': 'jpg',
                     'performanceConfiguration': 'General web delivery',
                     'cacheKeyQueryRule': "include all"
                 },)

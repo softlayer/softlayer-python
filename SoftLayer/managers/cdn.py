@@ -96,7 +96,7 @@ class CDNManager(utils.IdentifierMixin, object):
             'uniqueId': unique_id,
             'path': path,
             'origin': origin,
-            'originType': types.get(origin_type, 'HOST_SERVER'),
+            'originType': types.get(origin_type),
             'httpPort': port,
             'protocol': protocol.upper(),
             'performanceConfiguration': performance_config.get(optimize_for, 'General web delivery'),
@@ -109,8 +109,6 @@ class CDNManager(utils.IdentifierMixin, object):
         if types.get(origin_type) == 'OBJECT_STORAGE':
             if bucket_name:
                 new_origin['bucketName'] = bucket_name
-            else:
-                raise exceptions.SoftLayerError("Bucket name is required when the origin type is OBJECT_STORAGE")
 
             if file_extensions:
                 new_origin['fileExtension'] = file_extensions

@@ -28,6 +28,8 @@ createOriginPath = [
         "originType": "HOST_SERVER",
         "path": "/example",
         "status": "RUNNING",
+        "bucketName": "test-bucket",
+        'fileExtension': 'jpg',
         "performanceConfiguration": "General web delivery"
     }
 ]

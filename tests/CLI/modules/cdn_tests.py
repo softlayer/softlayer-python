@@ -7,6 +7,7 @@
 import json
 
 from SoftLayer import testing
+from SoftLayer.CLI import exceptions
 
 
 class CdnTests(testing.TestCase):
@@ -61,9 +62,30 @@ class CdnTests(testing.TestCase):
                                                       'Path': '/example1',
                                                       'Status': 'RUNNING'}])
 
-    def test_add_origin(self):
-        result = self.run_command(['cdn', 'origin-add', '-H=test.example.com', '-p', 80, '-o', 'web', '-c=include-all',
-                                   '1234', '10.10.10.1', '/example/videos2'])
+    def test_add_origin_server(self):
+        result = self.run_command(
+            ['cdn', 'origin-add', '-t', 'server', '-H=test.example.com', '-p', 80, '-o', 'web', '-c=include-all',
+             '1234', '10.10.10.1', '/example/videos2'])
+
+        self.assert_no_fail(result)
+
+    def test_add_origin_storage(self):
+        result = self.run_command(['cdn', 'origin-add', '-t', 'storage', '-b=test-bucket', '-H=test.example.com',
+                                   '-p', 80, '-o', 'web', '-c=include-all', '1234', '10.10.10.1', '/example/videos2'])
+
+        self.assert_no_fail(result)
+
+    def test_add_origin_without_storage(self):
+        result = self.run_command(['cdn', 'origin-add', '-t', 'storage', '-H=test.example.com', '-p', 80,
+                                   '-o', 'web', '-c=include-all', '1234', '10.10.10.1', '/example/videos2'])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.ArgumentError)
+
+    def test_add_origin_storage_with_file_extensions(self):
+        result = self.run_command(
+            ['cdn', 'origin-add', '-t', 'storage', '-b=test-bucket', '-e', 'jpg', '-H=test.example.com', '-p', 80,
+             '-o', 'web', '-c=include-all', '1234', '10.10.10.1', '/example/videos2'])
 
         self.assert_no_fail(result)
 
