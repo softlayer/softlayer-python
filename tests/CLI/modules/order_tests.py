@@ -4,6 +4,8 @@
     :license: MIT, see LICENSE for more details.
 """
 import json
+import sys
+import tempfile
 
 from SoftLayer.CLI import exceptions
 from SoftLayer import testing
@@ -252,6 +254,12 @@ class OrderTests(testing.TestCase):
                            'description': 'description3'}],
                          json.loads(result.output))
 
+    def test_preset_list_keywork(self):
+        result = self.run_command(['order', 'preset-list', 'package', '--keyword', 'testKeyWord'])
+        _filter = {'activePresets': {'name': {'operation': '*= testKeyWord'}}}
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Product_Package', 'getActivePresets', filter=_filter)
+
     def test_location_list(self):
         result = self.run_command(['order', 'package-locations', 'package'])
         self.assert_no_fail(result)
@@ -261,6 +269,102 @@ class OrderTests(testing.TestCase):
         print("FUCK")
         print(result.output)
         self.assertEqual(expected_results, json.loads(result.output))
+
+    def test_quote_verify(self):
+        result = self.run_command([
+            'order', 'quote', '12345', '--verify', '--fqdn', 'test01.test.com',
+            '--complex-type', 'SoftLayer_Container_Product_Order_Virtual_Guest'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'verifyOrder', identifier='12345')
+
+    def test_quote_verify_image(self):
+        result = self.run_command([
+            'order', 'quote', '12345', '--verify', '--fqdn', 'test01.test.com', '--image', '1234',
+            '--complex-type', 'SoftLayer_Container_Product_Order_Virtual_Guest'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Virtual_Guest_Block_Device_Template_Group', 'getObject', identifier='1234')
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'verifyOrder', identifier='12345')
+        verify_call = self.calls('SoftLayer_Billing_Order_Quote', 'verifyOrder')
+        verify_args = getattr(verify_call[0], 'args')[0]
+        self.assertEqual('0B5DEAF4-643D-46CA-A695-CECBE8832C9D', verify_args['imageTemplateGlobalIdentifier'])
+
+    def test_quote_verify_image_guid(self):
+        result = self.run_command([
+            'order', 'quote', '12345', '--verify', '--fqdn', 'test01.test.com', '--image',
+            '0B5DEAF4-643D-46CA-A695-CECBE8832C9D',
+            '--complex-type', 'SoftLayer_Container_Product_Order_Virtual_Guest'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'verifyOrder', identifier='12345')
+        verify_call = self.calls('SoftLayer_Billing_Order_Quote', 'verifyOrder')
+        verify_args = getattr(verify_call[0], 'args')[0]
+        self.assertEqual('0B5DEAF4-643D-46CA-A695-CECBE8832C9D', verify_args['imageTemplateGlobalIdentifier'])
+
+    def test_quote_verify_userdata(self):
+        result = self.run_command([
+            'order', 'quote', '12345', '--verify', '--fqdn', 'test01.test.com', '--userdata', 'aaaa1234',
+            '--complex-type', 'SoftLayer_Container_Product_Order_Virtual_Guest'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'verifyOrder', identifier='12345')
+        verify_call = self.calls('SoftLayer_Billing_Order_Quote', 'verifyOrder')
+        verify_args = getattr(verify_call[0], 'args')[0]
+        self.assertEqual([{'value': 'aaaa1234'}], verify_args['hardware'][0]['userData'])
+
+    def test_quote_verify_userdata_file(self):
+        if (sys.platform.startswith("win")):
+            self.skipTest("TempFile tests doesn't work in Windows")
+        with tempfile.NamedTemporaryFile() as userfile:
+            userfile.write(b"some data")
+            userfile.flush()
+            result = self.run_command([
+                'order', 'quote', '12345', '--verify', '--fqdn', 'test01.test.com', '--userfile', userfile.name,
+                '--complex-type', 'SoftLayer_Container_Product_Order_Virtual_Guest'])
+            self.assert_no_fail(result)
+            self.assert_called_with('SoftLayer_Billing_Order_Quote', 'verifyOrder', identifier='12345')
+            verify_call = self.calls('SoftLayer_Billing_Order_Quote', 'verifyOrder')
+            verify_args = getattr(verify_call[0], 'args')[0]
+            self.assertEqual([{'value': 'some data'}], verify_args['hardware'][0]['userData'])
+
+    def test_quote_verify_sshkey(self):
+        result = self.run_command([
+            'order', 'quote', '12345', '--verify', '--fqdn', 'test01.test.com', '--key', 'Test 1',
+            '--complex-type', 'SoftLayer_Container_Product_Order_Virtual_Guest'])
+        self.assert_no_fail(result)
+
+        self.assert_called_with('SoftLayer_Account', 'getSshKeys')
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'verifyOrder', identifier='12345')
+        verify_call = self.calls('SoftLayer_Billing_Order_Quote', 'verifyOrder')
+        verify_args = getattr(verify_call[0], 'args')[0]
+        self.assertEqual(['100'], verify_args['sshKeys'])
+
+    def test_quote_verify_postinstall_others(self):
+        result = self.run_command([
+            'order', 'quote', '12345', '--verify', '--fqdn', 'test01.test.com', '--quantity', '2',
+            '--postinstall', 'https://127.0.0.1/test.sh',
+            '--complex-type', 'SoftLayer_Container_Product_Order_Virtual_Guest'])
+        self.assert_no_fail(result)
+
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'verifyOrder', identifier='12345')
+        verify_call = self.calls('SoftLayer_Billing_Order_Quote', 'verifyOrder')
+        verify_args = getattr(verify_call[0], 'args')[0]
+        self.assertEqual(['https://127.0.0.1/test.sh'], verify_args['provisionScripts'])
+        self.assertEqual(2, verify_args['quantity'])
+
+    def test_quote_place(self):
+        result = self.run_command([
+            'order', 'quote', '12345', '--fqdn', 'test01.test.com',
+            '--complex-type', 'SoftLayer_Container_Product_Order_Virtual_Guest'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'placeOrder', identifier='12345')
+
+    def test_quote_detail(self):
+        result = self.run_command(['order', 'quote-detail', '12345'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'getObject', identifier='12345')
+
+    def test_quote_list(self):
+        result = self.run_command(['order', 'quote-list'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getActiveQuotes')
 
     def _get_order_items(self):
         item1 = {'keyName': 'ITEM1', 'description': 'description1',

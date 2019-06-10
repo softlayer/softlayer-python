@@ -4,12 +4,12 @@
 import click
 
 import SoftLayer
-from SoftLayer.CLI import environment, exceptions
+from SoftLayer.CLI import environment
 
 
 @click.command()
 @click.argument('identifier')
-@click.option('--credential_id', '-id', type=click.INT,
+@click.option('--credential_id', '-c', type=click.INT,
               help="This is the credential id associated with the volume")
 @environment.pass_env
 def cli(env, identifier, credential_id):
@@ -18,5 +18,4 @@ def cli(env, identifier, credential_id):
     mgr = SoftLayer.ObjectStorageManager(env.client)
     credential = mgr.delete_credential(identifier, credential_id=credential_id)
 
-    if credential:
-        env.fout("The credential was deleted successful")
+    env.fout(credential)

@@ -20,9 +20,9 @@ from SoftLayer.managers import ordering
               help="A custom name to be assigned to the quote (optional)")
 @click.option('--send-email',
               is_flag=True,
-              help="The quote will be sent to the email address associated.")
-@click.option('--complex-type', help=("The complex type of the order. This typically begins"
-                                      " with 'SoftLayer_Container_Product_Order_'."))
+              help="The quote will be sent to the email address associated with your user.")
+@click.option('--complex-type',
+              help="The complex type of the order. Starts with 'SoftLayer_Container_Product_Order'.")
 @click.option('--extras',
               help="JSON string denoting extra data that needs to be sent with the order")
 @click.argument('order_items', nargs=-1)
@@ -31,7 +31,7 @@ def cli(env, package_keyname, location, preset, name, send_email, complex_type,
         extras, order_items):
     """Place a quote.
 
-    This CLI command is used for placing a quote of the specified package in
+    This CLI command is used for creating  a quote of the specified package in
     the given location (denoted by a datacenter's long name). Orders made via the CLI
     can then be converted to be made programmatically by calling
     SoftLayer.OrderingManager.place_quote() with the same keynames.
@@ -44,8 +44,9 @@ def cli(env, package_keyname, location, preset, name, send_email, complex_type,
     items for the order, use `slcli order category-list`, and then provide the
     --category option for each category code in `slcli order item-list`.
 
-    \b
-    Example:
+
+    Example::
+
         # Place quote a VSI with 4 CPU, 16 GB RAM, 100 GB SAN disk,
         # Ubuntu 16.04, and 1 Gbps public & private uplink in dal13
         slcli order place-quote --name "foobar" --send-email CLOUD_SERVER DALLAS13 \\
