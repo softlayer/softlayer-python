@@ -6,8 +6,8 @@
 """
 import json
 
-from SoftLayer import testing
 from SoftLayer.CLI import exceptions
+from SoftLayer import testing
 
 
 class CdnTests(testing.TestCase):

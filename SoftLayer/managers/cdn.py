@@ -6,7 +6,6 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from SoftLayer import exceptions
 from SoftLayer import utils
 
 

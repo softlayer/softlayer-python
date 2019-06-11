@@ -5,9 +5,9 @@
     :license: MIT, see LICENSE for more details.
 """
 
+from SoftLayer.managers import cdn
 from SoftLayer import testing
 from SoftLayer import utils
-from SoftLayer.managers import cdn
 
 
 class CDNTests(testing.TestCase):
