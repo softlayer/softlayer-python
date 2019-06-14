@@ -51,7 +51,11 @@ from SoftLayer.CLI import formatting
 @environment.pass_env
 def cli(env, unique_id, origin, path, origin_type, header,
         bucket_name, port, protocol, optimize_for, extensions, cache_query):
-    """Create an origin path for an existing CDN mapping."""
+    """Create an origin path for an existing CDN mapping.
+
+    For more information see the following documentation: \n
+    https://cloud.ibm.com/docs/infrastructure/CDN?topic=CDN-manage-your-cdn#adding-origin-path-details
+    """
 
     manager = SoftLayer.CDNManager(env.client)
 

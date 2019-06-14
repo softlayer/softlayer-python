@@ -29,7 +29,7 @@ class CDNTests(testing.TestCase):
                                 args=args)
 
     def test_detail_usage_metric(self):
-        self.cdn_client.get_usage_metrics(12345, days=30, frequency="aggregate")
+        self.cdn_client.get_usage_metrics(12345, history=30, frequency="aggregate")
 
         _start = utils.days_to_datetime(30)
         _end = utils.days_to_datetime(0)

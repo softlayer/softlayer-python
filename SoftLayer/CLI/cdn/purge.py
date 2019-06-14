@@ -17,6 +17,9 @@ def cli(env, unique_id, path):
 
         Example:
              slcli cdn purge 9779455 /article/file.txt
+
+        For more information see the following documentation: \n
+        https://cloud.ibm.com/docs/infrastructure/CDN?topic=CDN-manage-your-cdn#purging-cached-content
     """
 
     manager = SoftLayer.CDNManager(env.client)

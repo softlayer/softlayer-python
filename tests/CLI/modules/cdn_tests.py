@@ -26,7 +26,7 @@ class CdnTests(testing.TestCase):
                          )
 
     def test_detail_account(self):
-        result = self.run_command(['cdn', 'detail', '--last_days=30', '1245'])
+        result = self.run_command(['cdn', 'detail', '--history=30', '1245'])
 
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),

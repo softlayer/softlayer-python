@@ -137,18 +137,18 @@ class CDNManager(utils.IdentifierMixin, object):
 
         return self.cdn_purge.createPurge(unique_id, path)
 
-    def get_usage_metrics(self, unique_id, days=30, frequency="aggregate"):
+    def get_usage_metrics(self, unique_id, history=30, frequency="aggregate"):
         """Retrieves the cdn usage metrics.
 
         It uses the 'days' argument if start_date and end_date are None.
 
         :param int unique_id: The CDN uniqueId from which the usage metrics will be obtained.
-        :param int days: Last N days, default days is 30.
+        :param int history: Last N days, default days is 30.
         :param str frequency: It can be day, week, month and aggregate. The default is "aggregate".
         :returns: A Container_Network_CdnMarketplace_Metrics object
         """
 
-        _start = utils.days_to_datetime(days)
+        _start = utils.days_to_datetime(history)
         _end = utils.days_to_datetime(0)
 
         _start_date = utils.timestamp(_start)
