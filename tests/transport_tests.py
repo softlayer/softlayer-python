@@ -78,7 +78,8 @@ class TestXmlRpcAPICall(testing.TestCase):
                                    data=data,
                                    timeout=None,
                                    cert=None,
-                                   verify=True)
+                                   verify=True,
+                                   auth=None)
         self.assertEqual(resp, [])
         self.assertIsInstance(resp, transports.SoftLayerListResult)
         self.assertEqual(resp.total_count, 10)
@@ -114,7 +115,8 @@ class TestXmlRpcAPICall(testing.TestCase):
             headers=mock.ANY,
             timeout=None,
             cert=None,
-            verify=True)
+            verify=True,
+            auth=None)
 
     @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_identifier(self, request):
@@ -264,6 +266,50 @@ class TestXmlRpcAPICall(testing.TestCase):
         output_text = self.transport.print_reproduceable(req)
         self.assertIn("https://test.com", output_text)
 
+    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('requests.auth.HTTPBasicAuth')
+    def test_ibm_id_call(self, auth, request):
+        request.return_value = self.response
+
+        data = '''<?xml version='1.0'?>
+<methodCall>
+<methodName>getObject</methodName>
+<params>
+<param>
+<value><struct>
+<member>
+<name>headers</name>
+<value><struct>
+</struct></value>
+</member>
+</struct></value>
+</param>
+</params>
+</methodCall>
+'''
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        req.transport_user = 'apikey'
+        req.transport_password = '1234567890qweasdzxc'
+        resp = self.transport(req)
+
+        auth.assert_called_with('apikey', '1234567890qweasdzxc')
+        request.assert_called_with('POST',
+                                   'http://something.com/SoftLayer_Service',
+                                   headers={'Content-Type': 'application/xml',
+                                            'User-Agent': consts.USER_AGENT},
+                                   proxies=None,
+                                   data=data,
+                                   timeout=None,
+                                   cert=None,
+                                   verify=True,
+                                   auth=mock.ANY)
+        self.assertEqual(resp, [])
+        self.assertIsInstance(resp, transports.SoftLayerListResult)
+        self.assertEqual(resp.total_count, 10)
+
 
 @mock.patch('SoftLayer.transports.requests.Session.request')
 @pytest.mark.parametrize(
@@ -311,7 +357,8 @@ def test_verify(request,
                                cert=mock.ANY,
                                proxies=mock.ANY,
                                timeout=mock.ANY,
-                               verify=expected)
+                               verify=expected,
+                               auth=None)
 
 
 class TestRestAPICall(testing.TestCase):
