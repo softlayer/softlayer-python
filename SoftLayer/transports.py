@@ -170,6 +170,10 @@ class XmlRpcTransport(object):
         largs = list(request.args)
         headers = request.headers
 
+        auth = None
+        if request.transport_user:
+            auth = requests.auth.HTTPBasicAuth(request.transport_user, request.transport_password)
+
         if request.identifier is not None:
             header_name = request.service + 'InitParameters'
             headers[header_name] = {'id': request.identifier}
@@ -208,6 +212,7 @@ class XmlRpcTransport(object):
         try:
             resp = self.client.request('POST', request.url,
                                        data=request.payload,
+                                       auth=auth,
                                        headers=request.transport_headers,
                                        timeout=self.timeout,
                                        verify=request.verify,
@@ -253,6 +258,7 @@ class XmlRpcTransport(object):
         from string import Template
         output = Template('''============= testing.py =============
 import requests
+from requests.auth import HTTPBasicAuth
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from xml.etree import ElementTree
@@ -261,6 +267,9 @@ client.headers.update({'Content-Type': 'application/json', 'User-Agent': 'softla
 retry = Retry(connect=3, backoff_factor=3)
 adapter = HTTPAdapter(max_retries=retry)
 client.mount('https://', adapter)
+# This is only needed if you are using an cloud.ibm.com api key
+#auth=HTTPBasicAuth('apikey', YOUR_CLOUD_API_KEY)
+auth=None
 url = '$url'
 payload = """$payload"""
 transport_headers = $transport_headers
@@ -269,7 +278,7 @@ verify = $verify
 cert = $cert
 proxy = $proxy
 response = client.request('POST', url, data=payload, headers=transport_headers, timeout=timeout,
-               verify=verify, cert=cert, proxies=proxy)
+               verify=verify, cert=cert, proxies=proxy, auth=auth)
 xml = ElementTree.fromstring(response.content)
 ElementTree.dump(xml)
 ==========================''')

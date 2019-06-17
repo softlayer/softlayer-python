@@ -1,4 +1,4 @@
-"""Get details for a hardware device."""
+"""GBandwidth data over date range. Bandwidth is listed in GB"""
 # :license: MIT, see LICENSE for more details.
 
 import click

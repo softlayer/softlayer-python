@@ -19,7 +19,7 @@ def get_api_key(client, username, secret):
     """
 
     # Try to use a client with username/api key
-    if len(secret) == 64:
+    if len(secret) == 64 or username == 'apikey':
         try:
             client['Account'].getCurrentUser()
             return secret
@@ -40,7 +40,10 @@ def get_api_key(client, username, secret):
 @click.command()
 @environment.pass_env
 def cli(env):
-    """Edit configuration."""
+    """Setup the ~/.softlayer file with username and apikey.
+
+    Set the username to 'apikey' for cloud.ibm.com accounts.
+    """
 
     username, secret, endpoint_url, timeout = get_user_input(env)
     new_client = SoftLayer.Client(username=username, api_key=secret, endpoint_url=endpoint_url, timeout=timeout)

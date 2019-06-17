@@ -48,6 +48,8 @@ To check the configuration, you can use `slcli config show`.
 	:..............:..................................................................:
 
 
+If you are using an account created from the https://cloud.ibm.com portal, your username will be literally `apikey`, and use the key provided. `How to create an IBM apikey <https://cloud.ibm.com/docs/iam?topic=iam-userapikey#create_user_key>`_
+
 To see more about the config file format, see :ref:`config_file`.
 
 .. _usage-examples:
