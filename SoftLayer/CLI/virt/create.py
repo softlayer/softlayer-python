@@ -33,6 +33,7 @@ def _update_with_like_args(ctx, _, value):
         'dedicated': like_details['dedicatedAccountHostOnlyFlag'],
         'private': like_details['privateNetworkOnlyFlag'],
         'placement_id': like_details.get('placementGroupId', None),
+        'transient': like_details['transientGuestFlag'] or None,
     }
 
     like_args['flavor'] = utils.lookup(like_details,
@@ -83,6 +84,7 @@ def _parse_create_args(client, args):
         "domain": args.get('domain', None),
         "host_id": args.get('host_id', None),
         "private": args.get('private', None),
+        "transient": args.get('transient', None),
         "hostname": args.get('hostname', None),
         "nic_speed": args.get('network', None),
         "boot_mode": args.get('boot_mode', None),
@@ -105,7 +107,8 @@ def _parse_create_args(client, args):
     if args.get('image'):
         if args.get('image').isdigit():
             image_mgr = SoftLayer.ImageManager(client)
-            image_details = image_mgr.get_image(args.get('image'), mask="id,globalIdentifier")
+            image_details = image_mgr.get_image(args.get('image'),
+                                                mask="id,globalIdentifier")
             data['image_id'] = image_details['globalIdentifier']
         else:
             data['image_id'] = args['image']
@@ -198,6 +201,8 @@ def _parse_create_args(client, args):
 @click.option('--placementgroup',
               help="Placement Group name or Id to order this guest on. See: slcli vs placementgroup list")
 @click.option('--ipv6', is_flag=True, help="Adds an IPv6 address to this guest")
+@click.option('--transient', is_flag=True,
+              help="Provisions the VS to be transient")
 @environment.pass_env
 def cli(env, **args):
     """Order/create virtual servers."""
@@ -288,6 +293,10 @@ def _validate_args(env, args):
     if all([args['host_id'], args['flavor']]):
         raise exceptions.ArgumentError(
             '[-h | --host-id] not allowed with [-f | --flavor]')
+
+    if all([args['dedicated'], args['transient']]):
+        raise exceptions.ArgumentError(
+            '[--dedicated | --public] not allowed with [--transient]')
 
     if all([args['userdata'], args['userfile']]):
         raise exceptions.ArgumentError(

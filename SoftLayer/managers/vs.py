@@ -312,7 +312,7 @@ class VSManager(utils.IdentifierMixin, object):
             private_subnet=None, public_subnet=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
             private=False, ssh_keys=None, public_security_groups=None,
-            private_security_groups=None, boot_mode=None, **kwargs):
+            private_security_groups=None, boot_mode=None, transient=False, **kwargs):
         """Returns a dict appropriate to pass into Virtual_Guest::createObject
 
             See :func:`create_instance` for a list of available options.
@@ -505,6 +505,7 @@ class VSManager(utils.IdentifierMixin, object):
                 'flavor': 'BL1_1X2X100'
                 'dedicated': False,
                 'private': False,
+                'transient': False,
                 'os_code' : u'UBUNTU_LATEST',
                 'hourly': True,
                 'ssh_keys': [1234],
@@ -883,6 +884,7 @@ class VSManager(utils.IdentifierMixin, object):
                 'flavor': 'BL1_1X2X100'
                 'dedicated': False,
                 'private': False,
+                'transient': False,
                 'os_code' : u'UBUNTU_LATEST',
                 'hourly': True,
                 'ssh_keys': [1234],
