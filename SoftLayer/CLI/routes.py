@@ -54,7 +54,6 @@ ALL_ROUTES = [
     ('cdn', 'SoftLayer.CLI.cdn'),
     ('cdn:detail', 'SoftLayer.CLI.cdn.detail:cli'),
     ('cdn:list', 'SoftLayer.CLI.cdn.list:cli'),
-    ('cdn:load', 'SoftLayer.CLI.cdn.load:cli'),
     ('cdn:origin-add', 'SoftLayer.CLI.cdn.origin_add:cli'),
     ('cdn:origin-list', 'SoftLayer.CLI.cdn.origin_list:cli'),
     ('cdn:origin-remove', 'SoftLayer.CLI.cdn.origin_remove:cli'),

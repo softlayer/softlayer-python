@@ -4,12 +4,10 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import math
-import mock
 
-from SoftLayer import fixtures
 from SoftLayer.managers import cdn
 from SoftLayer import testing
+from SoftLayer import utils
 
 
 class CDNTests(testing.TestCase):
@@ -18,123 +16,96 @@ class CDNTests(testing.TestCase):
         self.cdn_client = cdn.CDNManager(self.client)
 
     def test_list_accounts(self):
-        accounts = self.cdn_client.list_accounts()
-        self.assertEqual(accounts, fixtures.SoftLayer_Account.getCdnAccounts)
+        self.cdn_client.list_cdn()
+        self.assert_called_with('SoftLayer_Network_CdnMarketplace_Configuration_Mapping',
+                                'listDomainMappings')
 
-    def test_get_account(self):
-        account = self.cdn_client.get_account(12345)
-        self.assertEqual(
-            account,
-            fixtures.SoftLayer_Network_ContentDelivery_Account.getObject)
+    def test_detail_cdn(self):
+        self.cdn_client.get_cdn("12345")
+
+        args = ("12345",)
+        self.assert_called_with('SoftLayer_Network_CdnMarketplace_Configuration_Mapping',
+                                'listDomainMappingByUniqueId',
+                                args=args)
+
+    def test_detail_usage_metric(self):
+        self.cdn_client.get_usage_metrics(12345, history=30, frequency="aggregate")
+
+        _start = utils.days_to_datetime(30)
+        _end = utils.days_to_datetime(0)
+
+        _start_date = utils.timestamp(_start)
+        _end_date = utils.timestamp(_end)
+
+        args = (12345,
+                _start_date,
+                _end_date,
+                "aggregate")
+        self.assert_called_with('SoftLayer_Network_CdnMarketplace_Metrics',
+                                'getMappingUsageMetrics',
+                                args=args)
 
     def test_get_origins(self):
-        origins = self.cdn_client.get_origins(12345)
-        self.assertEqual(
-            origins,
-            fixtures.SoftLayer_Network_ContentDelivery_Account.
-            getOriginPullMappingInformation)
+        self.cdn_client.get_origins("12345")
+        self.assert_called_with('SoftLayer_Network_CdnMarketplace_Configuration_Mapping_Path',
+                                'listOriginPath')
 
     def test_add_origin(self):
-        self.cdn_client.add_origin(12345,
-                                   'http',
-                                   'http://localhost/',
-                                   'self.local',
-                                   False)
+        self.cdn_client.add_origin("12345", "10.10.10.1", "/example/videos", origin_type="server",
+                                   header="test.example.com", port=80, protocol='http', optimize_for="web",
+                                   cache_query="include all")
 
         args = ({
-            'mediaType': 'http',
-            'originUrl': 'http://localhost/',
-            'cname': 'self.local',
-            'isSecureContent': False
-        },)
-        self.assert_called_with('SoftLayer_Network_ContentDelivery_Account',
-                                'createOriginPullMapping',
-                                args=args,
-                                identifier=12345)
+                    'uniqueId': "12345",
+                    'origin': '10.10.10.1',
+                    'path': '/example/videos',
+                    'originType': 'HOST_SERVER',
+                    'header': 'test.example.com',
+                    'httpPort': 80,
+                    'protocol': 'HTTP',
+                    'performanceConfiguration': 'General web delivery',
+                    'cacheKeyQueryRule': "include all"
+                },)
+        self.assert_called_with('SoftLayer_Network_CdnMarketplace_Configuration_Mapping_Path',
+                                'createOriginPath',
+                                args=args)
+
+    def test_add_origin_with_bucket_and_file_extension(self):
+        self.cdn_client.add_origin("12345", "10.10.10.1", "/example/videos", origin_type="storage",
+                                   bucket_name="test-bucket", file_extensions="jpg", header="test.example.com", port=80,
+                                   protocol='http', optimize_for="web", cache_query="include all")
+
+        args = ({
+                    'uniqueId': "12345",
+                    'origin': '10.10.10.1',
+                    'path': '/example/videos',
+                    'originType': 'OBJECT_STORAGE',
+                    'header': 'test.example.com',
+                    'httpPort': 80,
+                    'protocol': 'HTTP',
+                    'bucketName': 'test-bucket',
+                    'fileExtension': 'jpg',
+                    'performanceConfiguration': 'General web delivery',
+                    'cacheKeyQueryRule': "include all"
+                },)
+        self.assert_called_with('SoftLayer_Network_CdnMarketplace_Configuration_Mapping_Path',
+                                'createOriginPath',
+                                args=args)
 
     def test_remove_origin(self):
-        self.cdn_client.remove_origin(12345, 12345)
-        self.assert_called_with('SoftLayer_Network_ContentDelivery_Account',
-                                'deleteOriginPullRule',
-                                args=(12345,),
-                                identifier=12345)
+        self.cdn_client.remove_origin("12345", "/example1")
 
-    def test_load_content(self):
-        urls = ['http://a/img/0x001.png',
-                'http://b/img/0x002.png',
-                'http://c/img/0x004.png',
-                'http://d/img/0x008.png',
-                'http://e/img/0x010.png',
-                'http://e/img/0x020.png']
-
-        self.cdn_client.load_content(12345, urls)
-        calls = self.calls('SoftLayer_Network_ContentDelivery_Account',
-                           'loadContent')
-        self.assertEqual(len(calls),
-                         math.ceil(len(urls) / float(cdn.MAX_URLS_PER_LOAD)))
-
-    def test_load_content_single(self):
-        url = 'http://geocities.com/Area51/Meteor/12345/under_construction.gif'
-        self.cdn_client.load_content(12345, url)
-
-        self.assert_called_with('SoftLayer_Network_ContentDelivery_Account',
-                                'loadContent',
-                                args=([url],),
-                                identifier=12345)
-
-    def test_load_content_failure(self):
-        urls = ['http://z/img/0x004.png',
-                'http://y/img/0x002.png',
-                'http://x/img/0x001.png']
-
-        service = self.client['SoftLayer_Network_ContentDelivery_Account']
-        service.loadContent.return_value = False
-
-        self.cdn_client.load_content(12345, urls)
-        calls = self.calls('SoftLayer_Network_ContentDelivery_Account',
-                           'loadContent')
-        self.assertEqual(len(calls),
-                         math.ceil(len(urls) / float(cdn.MAX_URLS_PER_LOAD)))
+        args = ("12345",
+                "/example1")
+        self.assert_called_with('SoftLayer_Network_CdnMarketplace_Configuration_Mapping_Path',
+                                'deleteOriginPath',
+                                args=args)
 
     def test_purge_content(self):
-        urls = ['http://z/img/0x020.png',
-                'http://y/img/0x010.png',
-                'http://x/img/0x008.png',
-                'http://w/img/0x004.png',
-                'http://v/img/0x002.png',
-                'http://u/img/0x001.png']
+        self.cdn_client.purge_content("12345", "/example1")
 
-        self.cdn_client.purge_content(12345, urls)
-        calls = self.calls('SoftLayer_Network_ContentDelivery_Account',
-                           'purgeCache')
-        self.assertEqual(len(calls),
-                         math.ceil(len(urls) / float(cdn.MAX_URLS_PER_PURGE)))
-
-    def test_purge_content_failure(self):
-        urls = ['http://',
-                'http://y/img/0x002.png',
-                'http://x/img/0x001.png']
-
-        contents = [
-            {'url': urls[0], 'statusCode': 'INVALID_URL'},
-            {'url': urls[1], 'statusCode': 'FAILED'},
-            {'url': urls[2], 'statusCode': 'FAILED'}
-        ]
-
-        self.cdn_client.account = mock.Mock()
-        self.cdn_client.account.purgeCache.return_value = contents
-
-        result = self.cdn_client.purge_content(12345, urls)
-
-        self.assertEqual(contents, result)
-
-    def test_purge_content_single(self):
-        url = 'http://geocities.com/Area51/Meteor/12345/under_construction.gif'
-        self.cdn_client.account = mock.Mock()
-        self.cdn_client.account.purgeCache.return_value = [{'url': url, 'statusCode': 'SUCCESS'}]
-
-        expected = [{'url': url, 'statusCode': 'SUCCESS'}]
-
-        result = self.cdn_client.purge_content(12345, url)
-
-        self.assertEqual(expected, result)
+        args = ("12345",
+                "/example1")
+        self.assert_called_with('SoftLayer_Network_CdnMarketplace_Configuration_Cache_Purge',
+                                'createPurge',
+                                args=args)
