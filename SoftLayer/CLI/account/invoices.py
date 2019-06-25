@@ -18,7 +18,7 @@ from SoftLayer import utils
               help="Return ALL invoices. There may be a lot of these.")
 @environment.pass_env
 def cli(env, limit, closed=False, get_all=False):
-    """Invoices and all that mess"""
+    """List invoices"""
 
     manager = AccountManager(env.client)
     invoices = manager.get_invoices(limit, closed, get_all)

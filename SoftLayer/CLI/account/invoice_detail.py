@@ -15,7 +15,7 @@ from SoftLayer import utils
               help="Shows a very detailed list of charges")
 @environment.pass_env
 def cli(env, identifier, details):
-    """Invoices and all that mess"""
+    """Invoice details"""
 
     manager = AccountManager(env.client)
     top_items = manager.get_billing_items(identifier)

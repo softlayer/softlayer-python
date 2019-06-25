@@ -73,10 +73,17 @@ class BasicAuthentication(AuthenticationBase):
 
     def get_request(self, request):
         """Sets token-based auth headers."""
-        request.headers['authenticate'] = {
-            'username': self.username,
-            'apiKey': self.api_key,
-        }
+
+        # See https://cloud.ibm.com/docs/iam?topic=iam-iamapikeysforservices for why this is the way it is
+        if self.username == 'apikey':
+            request.transport_user = self.username
+            request.transport_password = self.api_key
+        else:
+            request.headers['authenticate'] = {
+                'username': self.username,
+                'apiKey': self.api_key,
+            }
+
         return request
 
     def __repr__(self):
