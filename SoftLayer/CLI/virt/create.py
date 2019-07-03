@@ -142,6 +142,10 @@ def _parse_create_args(client, args):
     if args.get('host_id'):
         data['host_id'] = args['host_id']
 
+    if args.get('transient') and not args.get('billing'):
+        # No billing type specified and transient, so default to hourly
+        data['hourly'] = True
+
     if args.get('placementgroup'):
         resolver = SoftLayer.managers.PlacementManager(client).resolve_ids
         data['placement_id'] = helpers.resolve_id(resolver, args.get('placementgroup'), 'PlacementGroup')
@@ -296,7 +300,11 @@ def _validate_args(env, args):
 
     if all([args['dedicated'], args['transient']]):
         raise exceptions.ArgumentError(
-            '[--dedicated | --public] not allowed with [--transient]')
+            '[--dedicated] not allowed with [--transient]')
+
+    if args['transient'] and not args['hourly']:
+        raise exceptions.ArgumentError(
+            '[--transient] not allowed with [--billing monthly]')
 
     if all([args['userdata'], args['userfile']]):
         raise exceptions.ArgumentError(
