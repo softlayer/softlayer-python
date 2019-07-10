@@ -11,7 +11,7 @@ from SoftLayer import utils
 class LoadBalancerManager(utils.IdentifierMixin, object):
     """Manages SoftLayer load balancers.
 
-    See product information here: http://www.softlayer.com/load-balancing
+    See product information here: https://www.ibm.com/cloud/load-balancer
 
     :param SoftLayer.API.BaseClient client: the client instance
 
@@ -21,8 +21,56 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         self.client = client
         self.account = self.client['Account']
         self.prod_pkg = self.client['Product_Package']
-        self.lb_svc = self.client['Network_Application_Delivery_Controller_'
-                                  'LoadBalancer_VirtualIpAddress']
+        # Citrix Netscalers
+        self.adc = self.client['Network_Application_Delivery_Controller']
+        # IBM CLoud LB
+        self.lbaas = self.client['Network_LBaaS_LoadBalancer']
+
+    def get_adcs(self, mask=None):
+        """Returns a list of all netscalers.
+
+        :returns: SoftLayer_Network_Application_Delivery_Controller[].
+        """
+        if mask is None:
+            mask = 'mask[managementIpAddress,outboundPublicBandwidthUsage,primaryIpAddress,datacenter]'
+        return self.account.getApplicationDeliveryControllers(mask=mask)
+
+    def get_adc(self, identifier, mask=None):
+        """Returns a netscaler object.
+
+        :returns: SoftLayer_Network_Application_Delivery_Controller.
+        """
+        if mask is None:
+            mask = "mask[networkVlans, password, managementIpAddress, primaryIpAddress, subnets, tagReferences, " \
+                   "licenseExpirationDate, datacenter]"
+        return self.adc.getObject(id=identifier, mask=mask)
+
+    def get_lbaas(self, mask=None):
+        """Returns a list of IBM Cloud Loadbalancers
+
+        :returns: SoftLayer_Network_LBaaS_LoadBalancer[]
+        """
+        if mask is None:
+            mask = "mask[datacenter,listenerCount,memberCount]"
+        lb = self.lbaas.getAllObjects(mask=mask)
+
+        return lb
+
+    def get_lb(self, identifier, mask=None):
+        """Returns a IBM Cloud LoadBalancer
+
+        :returns: SoftLayer_Network_LBaaS_LoadBalancer
+        """
+        if mask is None:
+            mask = "mask[healthMonitors, l7Pools, listeners[defaultPool[healthMonitor, members, sessionAffinity],l7Policies], members, sslCiphers]"
+        
+        lb = self.lbaas.getObject(id=identifier, mask=mask)
+        health = self.lbaas.getLoadBalancerMemberHealth(lb.get('uuid'))
+
+        lb['health'] = health
+        return lb
+
+# Old things below this line
 
     def get_lb_pkgs(self):
         """Retrieves the local load balancer packages.
@@ -114,14 +162,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         }
         return self.client['Product_Order'].placeOrder(product_order)
 
-    def get_local_lbs(self):
-        """Returns a list of all local load balancers on the account.
 
-        :returns: A list of all local load balancers on the current account.
-        """
-
-        mask = 'loadBalancerHardware[datacenter],ipAddress'
-        return self.account.getAdcLoadBalancers(mask=mask)
 
     def get_local_lb(self, loadbal_id, **kwargs):
         """Returns a specified local load balancer given the id.

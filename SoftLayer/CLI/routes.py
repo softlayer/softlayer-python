@@ -167,22 +167,13 @@ ALL_ROUTES = [
     ('ipsec:update', 'SoftLayer.CLI.vpn.ipsec.update:cli'),
 
     ('loadbal', 'SoftLayer.CLI.loadbal'),
-    ('loadbal:cancel', 'SoftLayer.CLI.loadbal.cancel:cli'),
-    ('loadbal:create', 'SoftLayer.CLI.loadbal.create:cli'),
-    ('loadbal:create-options', 'SoftLayer.CLI.loadbal.create_options:cli'),
     ('loadbal:detail', 'SoftLayer.CLI.loadbal.detail:cli'),
-    ('loadbal:group-add', 'SoftLayer.CLI.loadbal.group_add:cli'),
-    ('loadbal:group-delete', 'SoftLayer.CLI.loadbal.group_delete:cli'),
-    ('loadbal:group-edit', 'SoftLayer.CLI.loadbal.group_edit:cli'),
-    ('loadbal:group-reset', 'SoftLayer.CLI.loadbal.group_reset:cli'),
-    ('loadbal:health-checks', 'SoftLayer.CLI.loadbal.health_checks:cli'),
     ('loadbal:list', 'SoftLayer.CLI.loadbal.list:cli'),
-    ('loadbal:routing-methods', 'SoftLayer.CLI.loadbal.routing_methods:cli'),
-    ('loadbal:routing-types', 'SoftLayer.CLI.loadbal.routing_types:cli'),
-    ('loadbal:service-add', 'SoftLayer.CLI.loadbal.service_add:cli'),
-    ('loadbal:service-delete', 'SoftLayer.CLI.loadbal.service_delete:cli'),
-    ('loadbal:service-edit', 'SoftLayer.CLI.loadbal.service_edit:cli'),
-    ('loadbal:service-toggle', 'SoftLayer.CLI.loadbal.service_toggle:cli'),
+    ('loadbal:health', 'SoftLayer.CLI.loadbal.health:cli'),
+
+    ('loadbal:ns-detail', 'SoftLayer.CLI.loadbal.ns_detail:cli'),
+    ('loadbal:ns-list', 'SoftLayer.CLI.loadbal.ns_list:cli'),
+
 
     ('metadata', 'SoftLayer.CLI.metadata:cli'),
 

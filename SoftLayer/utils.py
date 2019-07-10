@@ -306,6 +306,8 @@ def clean_time(sltime, in_format='%Y-%m-%dT%H:%M:%S%z', out_format='%Y-%m-%d %H:
     :param string in_format: Datetime format for strptime
     :param string out_format: Datetime format for strftime
     """
+    if sltime is None:
+        return None
     try:
         clean = datetime.datetime.strptime(sltime, in_format)
         return clean.strftime(out_format)
