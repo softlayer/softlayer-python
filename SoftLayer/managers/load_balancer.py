@@ -26,6 +26,8 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         # IBM CLoud LB
         self.lbaas = self.client['Network_LBaaS_LoadBalancer']
 
+
+
     def get_adcs(self, mask=None):
         """Returns a list of all netscalers.
 
@@ -62,13 +64,45 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :returns: SoftLayer_Network_LBaaS_LoadBalancer
         """
         if mask is None:
-            mask = "mask[healthMonitors, l7Pools, listeners[defaultPool[healthMonitor, members, sessionAffinity],l7Policies], members, sslCiphers]"
+            mask = "mask[healthMonitors, l7Pools,  members, sslCiphers, " \
+                   "listeners[defaultPool[healthMonitor, members, sessionAffinity],l7Policies]]"
         
         lb = self.lbaas.getObject(id=identifier, mask=mask)
         health = self.lbaas.getLoadBalancerMemberHealth(lb.get('uuid'))
 
         lb['health'] = health
         return lb
+
+    def get_lb_monitors(self, identifier, mask=None):
+        health = self.lbaas.getHealthMonitors(id=identifier)
+        return health
+
+    def updateLoadBalancerHealthMonitors(self, uuid, checks):
+        """calls SoftLayer_Network_LBaaS_HealthMonitor::updateLoadBalancerHealthMonitors()
+        
+        https://sldn.softlayer.com/reference/services/SoftLayer_Network_LBaaS_HealthMonitor/updateLoadBalancerHealthMonitors/
+        https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_LoadBalancerHealthMonitorConfiguration/
+        :param uuid: loadBalancerUuid
+        :param checks list: SoftLayer_Network_LBaaS_LoadBalancerHealthMonitorConfiguration[]
+        """
+
+        # return self.lbaas.updateLoadBalancerHealthMonitors(uuid, checks)
+        return self.client.call('SoftLayer_Network_LBaaS_HealthMonitor', 'updateLoadBalancerHealthMonitors',
+                                uuid, checks)
+
+    def get_lbaas_uuid_id(self, identifier):
+        """Gets a LBaaS uuid, id. Since sometimes you need one or the other.
+
+        :param identifier: either the LB Id, or UUID, this function will return both.
+        :return (uuid, id):
+        """
+        if len(identifier) == 36:
+            lb = self.lbaas.getLoadBalancer(id=identifier, mask="mask[id,uuid]")
+            return identifier
+        else:
+            print("Finding out %s" % identifier)
+            lb = self.lbaas.getObject(id=identifier, mask="mask[id,uuid]")
+        return lb['uuid'], lb['id']
 
 # Old things below this line
 
