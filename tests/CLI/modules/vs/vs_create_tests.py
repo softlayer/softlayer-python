@@ -485,7 +485,6 @@ class VirtCreateTests(testing.TestCase):
                  'networkComponents': [{'maxSpeed': 100}]},)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=args)
 
-
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_like_transient(self, confirm_mock):
         mock = self.set_mock('SoftLayer_Virtual_Guest', 'getObject')
