@@ -485,6 +485,49 @@ class VirtCreateTests(testing.TestCase):
                  'networkComponents': [{'maxSpeed': 100}]},)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=args)
 
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_create_like_transient(self, confirm_mock):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getObject')
+        mock.return_value = {
+            'hostname': 'vs-test-like',
+            'domain': 'test.sftlyr.ws',
+            'datacenter': {'name': 'dal05'},
+            'networkComponents': [{'maxSpeed': 100}],
+            'dedicatedAccountHostOnlyFlag': False,
+            'privateNetworkOnlyFlag': False,
+            'billingItem': {'orderItem': {'preset': {'keyName': 'B1_1X2X25'}}},
+            'operatingSystem': {'softwareLicense': {
+                'softwareDescription': {'referenceCode': 'UBUNTU_LATEST'}
+            }},
+            'hourlyBillingFlag': True,
+            'localDiskFlag': False,
+            'transientGuestFlag': True,
+            'userData': {}
+        }
+
+        confirm_mock.return_value = True
+        result = self.run_command(['vs', 'create', '--like=123'])
+
+        self.assert_no_fail(result)
+        self.assertIn('"guid": "1a2b3c-1701"', result.output)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
+
+        args = ({'datacenter': {'name': 'dal05'},
+                 'domain': 'test.sftlyr.ws',
+                 'hourlyBillingFlag': True,
+                 'hostname': 'vs-test-like',
+                 'startCpus': None,
+                 'maxMemory': None,
+                 'localDiskFlag': None,
+                 'transientGuestFlag': True,
+                 'supplementalCreateObjectOptions': {
+                     'bootMode': None,
+                     'flavorKeyName': 'B1_1X2X25'},
+                 'operatingSystemReferenceCode': 'UBUNTU_LATEST',
+                 'networkComponents': [{'maxSpeed': 100}]},)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=args)
+
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_vs_test(self, confirm_mock):
         confirm_mock.return_value = True
@@ -511,9 +554,39 @@ class VirtCreateTests(testing.TestCase):
         result = self.run_command(['vs', 'create', '--hostname', 'TEST',
                                    '--domain', 'TESTING', '--cpu', '1',
                                    '--memory', '2034MB', '--flavor',
-                                   'UBUNTU', '--datacenter', 'TEST00'])
+                                   'B1_2X8X25', '--datacenter', 'TEST00'])
 
-        self.assertEqual(result.exit_code, 2)
+        self.assertEqual(2, result.exit_code)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_create_vs_transient(self, confirm_mock):
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'create', '--hostname', 'TEST',
+                                   '--domain', 'TESTING', '--flavor',
+                                   'B1_2X8X25', '--datacenter', 'TEST00',
+                                   '--transient', '--os', 'UBUNTU_LATEST'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(0, result.exit_code)
+
+    def test_create_vs_bad_transient_monthly(self):
+        result = self.run_command(['vs', 'create', '--hostname', 'TEST',
+                                   '--domain', 'TESTING', '--flavor',
+                                   'B1_2X8X25', '--datacenter', 'TEST00',
+                                   '--transient', '--billing', 'monthly',
+                                   '--os', 'UBUNTU_LATEST'])
+
+        self.assertEqual(2, result.exit_code)
+
+    def test_create_vs_bad_transient_dedicated(self):
+        result = self.run_command(['vs', 'create', '--hostname', 'TEST',
+                                   '--domain', 'TESTING', '--flavor',
+                                   'B1_2X8X25', '--datacenter', 'TEST00',
+                                   '--transient', '--dedicated',
+                                   '--os', 'UBUNTU_LATEST'])
+
+        self.assertEqual(2, result.exit_code)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_with_ipv6(self, confirm_mock):

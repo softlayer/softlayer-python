@@ -60,6 +60,7 @@ class VSTests(testing.TestCase):
             nic_speed=100,
             public_ip='1.2.3.4',
             private_ip='4.3.2.1',
+            transient=False,
         )
 
         _filter = {
@@ -78,7 +79,8 @@ class VSTests(testing.TestCase):
                 'hostname': {'operation': '_= hostname'},
                 'networkComponents': {'maxSpeed': {'operation': 100}},
                 'primaryIpAddress': {'operation': '_= 1.2.3.4'},
-                'primaryBackendIpAddress': {'operation': '_= 4.3.2.1'}
+                'primaryBackendIpAddress': {'operation': '_= 4.3.2.1'},
+                'transientGuestFlag': {'operation': False},
             }
         }
         self.assert_called_with('SoftLayer_Account', 'getVirtualGuests',

@@ -33,7 +33,7 @@ def _update_with_like_args(ctx, _, value):
         'dedicated': like_details['dedicatedAccountHostOnlyFlag'],
         'private': like_details['privateNetworkOnlyFlag'],
         'placement_id': like_details.get('placementGroupId', None),
-        'transient': like_details['transientGuestFlag'] or None,
+        'transient': like_details.get('transientGuestFlag', None),
     }
 
     like_args['flavor'] = utils.lookup(like_details,
@@ -144,7 +144,7 @@ def _parse_create_args(client, args):
 
     if args.get('transient') and not args.get('billing'):
         # No billing type specified and transient, so default to hourly
-        data['hourly'] = True
+        data['billing'] = 'hourly'
 
     if args.get('placementgroup'):
         resolver = SoftLayer.managers.PlacementManager(client).resolve_ids
@@ -206,7 +206,7 @@ def _parse_create_args(client, args):
               help="Placement Group name or Id to order this guest on. See: slcli vs placementgroup list")
 @click.option('--ipv6', is_flag=True, help="Adds an IPv6 address to this guest")
 @click.option('--transient', is_flag=True,
-              help="Provisions the VS to be transient")
+              help="Create a transient virtual server")
 @environment.pass_env
 def cli(env, **args):
     """Order/create virtual servers."""
@@ -302,7 +302,7 @@ def _validate_args(env, args):
         raise exceptions.ArgumentError(
             '[--dedicated] not allowed with [--transient]')
 
-    if args['transient'] and not args['hourly']:
+    if args['transient'] and args['billing'] == 'monthly':
         raise exceptions.ArgumentError(
             '[--transient] not allowed with [--billing monthly]')
 

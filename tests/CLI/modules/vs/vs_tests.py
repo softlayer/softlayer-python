@@ -268,8 +268,7 @@ class VirtTests(testing.TestCase):
         result = self.run_command(['vs', 'create-options'])
 
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         {'cpus (dedicated host)': [4, 56],
+        self.assertEqual({'cpus (dedicated host)': [4, 56],
                           'cpus (dedicated)': [1],
                           'cpus (standard)': [1, 2, 3, 4],
                           'datacenter': ['ams01', 'dal05'],
@@ -279,6 +278,7 @@ class VirtTests(testing.TestCase):
                           'flavors (compute)': ['C1_1X2X25'],
                           'flavors (memory)': ['M1_1X2X100'],
                           'flavors (GPU)': ['AC1_1X2X100', 'ACL1_1X2X100'],
+                          'flavors (transient)': ['B1_1X2X25_TRANSIENT'],
                           'local disk(0)': ['25', '100'],
                           'memory': [1024, 2048, 3072, 4096],
                           'memory (dedicated host)': [8192, 65536],
@@ -286,7 +286,8 @@ class VirtTests(testing.TestCase):
                           'nic (dedicated host)': ['1000'],
                           'os (CENTOS)': 'CENTOS_6_64',
                           'os (DEBIAN)': 'DEBIAN_7_64',
-                          'os (UBUNTU)': 'UBUNTU_12_64'})
+                          'os (UBUNTU)': 'UBUNTU_12_64'},
+                         json.loads(result.output))
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_both(self, confirm_mock):

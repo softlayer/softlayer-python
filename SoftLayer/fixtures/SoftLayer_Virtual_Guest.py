@@ -49,6 +49,7 @@ getObject = {
                       'vlanNumber': 23,
                       'id': 1}],
     'dedicatedHost': {'id': 37401},
+    'transientGuestFlag': False,
     'operatingSystem': {
         'passwords': [{'username': 'user', 'password': 'pass'}],
         'softwareLicense': {
@@ -73,6 +74,17 @@ getCreateObjectOptions = {
                 'supplementalCreateObjectOptions': {
                     'flavorKeyName': 'B1_1X2X25'
                 }
+            }
+        },
+        {
+            'flavor': {
+                'keyName': 'B1_1X2X25_TRANSIENT'
+            },
+            'template': {
+                'supplementalCreateObjectOptions': {
+                    'flavorKeyName': 'B1_1X2X25_TRANSIENT'
+                },
+                'transientGuestFlag': True
             }
         },
         {

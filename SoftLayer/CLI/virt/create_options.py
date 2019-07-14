@@ -12,7 +12,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer import utils
 
 
-@click.command()
+@click.command(short_help="Get options to use for creating virtual servers.")
 @environment.pass_env
 def cli(env):
     """Virtual server order options."""
@@ -32,27 +32,7 @@ def cli(env):
     table.add_row(['datacenter',
                    formatting.listing(datacenters, separator='\n')])
 
-    def _add_flavor_rows(flavor_key, flavor_label, flavor_options):
-        flavors = []
-
-        for flavor_option in flavor_options:
-            flavor_key_name = utils.lookup(flavor_option, 'flavor', 'keyName')
-            if not flavor_key_name.startswith(flavor_key):
-                continue
-
-            flavors.append(flavor_key_name)
-
-        if len(flavors) > 0:
-            table.add_row(['flavors (%s)' % flavor_label,
-                           formatting.listing(flavors, separator='\n')])
-
-    if result.get('flavors', None):
-        _add_flavor_rows('B1', 'balanced', result['flavors'])
-        _add_flavor_rows('BL1', 'balanced local - hdd', result['flavors'])
-        _add_flavor_rows('BL2', 'balanced local - ssd', result['flavors'])
-        _add_flavor_rows('C1', 'compute', result['flavors'])
-        _add_flavor_rows('M1', 'memory', result['flavors'])
-        _add_flavor_rows('AC', 'GPU', result['flavors'])
+    _add_flavors_to_table(result, table)
 
     # CPUs
     standard_cpus = [int(x['template']['startCpus']) for x in result['processors']
@@ -167,3 +147,36 @@ def cli(env):
                    formatting.listing(ded_host_speeds, separator=',')])
 
     env.fout(table)
+
+
+def _add_flavors_to_table(result, table):
+    grouping = {
+        'balanced': {'key_starts_with': 'B1', 'flavors': []},
+        'balanced local - hdd': {'key_starts_with': 'BL1', 'flavors': []},
+        'balanced local - ssd': {'key_starts_with': 'BL2', 'flavors': []},
+        'compute': {'key_starts_with': 'C1', 'flavors': []},
+        'memory': {'key_starts_with': 'M1', 'flavors': []},
+        'GPU': {'key_starts_with': 'AC', 'flavors': []},
+        'transient': {'transient': True, 'flavors': []},
+    }
+
+    if result.get('flavors', None) is None:
+        return
+
+    for flavor_option in result['flavors']:
+        flavor_key_name = utils.lookup(flavor_option, 'flavor', 'keyName')
+
+        for name, group in grouping.items():
+            if utils.lookup(flavor_option, 'template', 'transientGuestFlag') is True:
+                if utils.lookup(group, 'transient') is True:
+                    group['flavors'].append(flavor_key_name)
+                    break
+
+            elif utils.lookup(group, 'key_starts_with') is not None \
+                    and flavor_key_name.startswith(group['key_starts_with']):
+                group['flavors'].append(flavor_key_name)
+                break
+
+    for name, group in grouping.items():
+        if len(group['flavors']) > 0:
+            table.add_row(['flavors (%s)' % name, formatting.listing(group['flavors'], separator='\n')])
