@@ -142,10 +142,6 @@ def _parse_create_args(client, args):
     if args.get('host_id'):
         data['host_id'] = args['host_id']
 
-    if args.get('transient') and not args.get('billing'):
-        # No billing type specified and transient, so default to hourly
-        data['billing'] = 'hourly'
-
     if args.get('placementgroup'):
         resolver = SoftLayer.managers.PlacementManager(client).resolve_ids
         data['placement_id'] = helpers.resolve_id(resolver, args.get('placementgroup'), 'PlacementGroup')
@@ -290,6 +286,10 @@ def _validate_args(env, args):
         raise exceptions.ArgumentError(
             '[-m | --memory] not allowed with [-f | --flavor]')
 
+    if all([args['dedicated'], args['transient']]):
+        raise exceptions.ArgumentError(
+            '[--dedicated] not allowed with [--transient]')
+
     if all([args['dedicated'], args['flavor']]):
         raise exceptions.ArgumentError(
             '[-d | --dedicated] not allowed with [-f | --flavor]')
@@ -297,10 +297,6 @@ def _validate_args(env, args):
     if all([args['host_id'], args['flavor']]):
         raise exceptions.ArgumentError(
             '[-h | --host-id] not allowed with [-f | --flavor]')
-
-    if all([args['dedicated'], args['transient']]):
-        raise exceptions.ArgumentError(
-            '[--dedicated] not allowed with [--transient]')
 
     if args['transient'] and args['billing'] == 'monthly':
         raise exceptions.ArgumentError(
