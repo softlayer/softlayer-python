@@ -37,6 +37,7 @@ def generate_lbaas_table(lbaas):
     table.align['Description'] = 'l'
     table.align['Location'] = 'l'
     for lb in sorted(lbaas,key=location_sort):
+        print("PUBLIC: {}".format(lb.get('isPublic')))
         table.add_row([
             lb.get('id'),
             utils.lookup(lb, 'datacenter', 'longName'),

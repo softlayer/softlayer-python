@@ -13,9 +13,12 @@ from pprint import pprint as pp
 def cli(env, identifier):
     """Get Load Balancer as a Service details."""
     mgr = SoftLayer.LoadBalancerManager(env.client)
-
-    lb = mgr.get_lb(identifier)
-    pp(lb)
+    uuid, lbid = mgr.get_lbaas_uuid_id(identifier)
+    lb = mgr.get_lb(lbid)
+    # pp(lb)
+    if lb.get('previousErrorText'):
+        print("THERE WAS AN ERROR")
+        print(lb.get('previousErrorText'))
     table = lbaas_table(lb)
 
     env.fout(table)

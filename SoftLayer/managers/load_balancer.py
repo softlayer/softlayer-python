@@ -97,12 +97,34 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :return (uuid, id):
         """
         if len(identifier) == 36:
-            lb = self.lbaas.getLoadBalancer(id=identifier, mask="mask[id,uuid]")
-            return identifier
+            lb = self.lbaas.getLoadBalancer(identifier, mask="mask[id,uuid]")
         else:
-            print("Finding out %s" % identifier)
             lb = self.lbaas.getObject(id=identifier, mask="mask[id,uuid]")
         return lb['uuid'], lb['id']
+
+    def delete_lb_member(self, identifier, member_id):
+        """Removes a member from a LBaaS instance
+
+        https://sldn.softlayer.com/reference/services/SoftLayer_Network_LBaaS_Member/deleteLoadBalancerMembers/
+        :param identifier: UUID of the LBaaS instance
+        :param member_id: Member UUID to remove. 
+        """
+        result = self.client.call('SoftLayer_Network_LBaaS_Member', 'deleteLoadBalancerMembers', 
+                                  identifier, [member_id])
+        return result
+
+    def add_lb_member(self, identifier, member_id):
+        """Removes a member from a LBaaS instance
+
+        https://sldn.softlayer.com/reference/services/SoftLayer_Network_LBaaS_Member/deleteLoadBalancerMembers/
+        :param identifier: UUID of the LBaaS instance
+        :param member_id: Member UUID to remove. 
+        """
+
+        result = self.client.call('SoftLayer_Network_LBaaS_Member', 'addLoadBalancerMembers', 
+                                  identifier, [member_id])
+
+        return result
 
 # Old things below this line
 
