@@ -172,6 +172,9 @@ ALL_ROUTES = [
     ('loadbal:health', 'SoftLayer.CLI.loadbal.health:cli'),
     ('loadbal:member-add', 'SoftLayer.CLI.loadbal.members:add'),
     ('loadbal:member-del', 'SoftLayer.CLI.loadbal.members:remove'),
+    ('loadbal:pool-add', 'SoftLayer.CLI.loadbal.pools:add'),
+    ('loadbal:pool-edit', 'SoftLayer.CLI.loadbal.pools:edit'),
+    ('loadbal:pool-del', 'SoftLayer.CLI.loadbal.pools:delete'),
 
     ('loadbal:ns-detail', 'SoftLayer.CLI.loadbal.ns_detail:cli'),
     ('loadbal:ns-list', 'SoftLayer.CLI.loadbal.ns_list:cli'),

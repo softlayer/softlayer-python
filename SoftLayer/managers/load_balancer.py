@@ -126,6 +126,32 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
         return result
 
+    def add_lb_listener(self, identifier, listener):
+        """Adds or update a listener to a LBaaS instance
+
+        When using this to update a listener, just include the 'listenerUuid' in the listener object
+        See the following for listener configuration options
+        https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_LoadBalancerProtocolConfiguration/
+
+        :param identifier: UUID of the LBaaS instance
+        :param listener: Object with all listener configurations
+        """
+
+        result = self.client.call('SoftLayer_Network_LBaaS_Listener', 'updateLoadBalancerProtocols',
+                                  identifier, [listener])
+        return result
+
+    def remove_lb_listener(self, identifier, listener):
+        """Removes a listener to a LBaaS instance
+
+        :param identifier: UUID of the LBaaS instance
+        :param listener: UUID of the Listner to be removed.
+        """
+
+        result = self.client.call('SoftLayer_Network_LBaaS_Listener', 'deleteLoadBalancerProtocols',
+                                  identifier, [listener])
+        return result
+
 # Old things below this line
 
     def get_lb_pkgs(self):
