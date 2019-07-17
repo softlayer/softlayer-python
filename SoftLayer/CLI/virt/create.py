@@ -147,6 +147,10 @@ def _parse_create_args(client, args):
         resolver = SoftLayer.managers.PlacementManager(client).resolve_ids
         data['placement_id'] = helpers.resolve_id(resolver, args.get('placementgroup'), 'PlacementGroup')
 
+    if args.get('placementgroup'):
+        resolver = SoftLayer.managers.PlacementManager(client).resolve_ids
+        data['placement_id'] = helpers.resolve_id(resolver, args.get('placementgroup'), 'PlacementGroup')
+
     return data
 
 

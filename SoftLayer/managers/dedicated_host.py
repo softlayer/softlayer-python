@@ -38,7 +38,6 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         if ordering_manager is None:
             self.ordering_manager = ordering.OrderingManager(client)
 
-
     def edit(self, host_id, userdata=None, hostname=None, domain=None,
              notes=None, tags=None):
         """Edit hostname, domain name, notes, user data of the dedicated host.
@@ -82,6 +81,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
             return True
 
         return self.host.editObject(obj, id=host_id)
+
     def cancel_host(self, host_id):
         """Cancel a dedicated host immediately, it fails if there are still guests in the host.
 
@@ -602,6 +602,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         Just calls guest.setTags, but if it fails from an APIError will retry
         """
         self.host.setTags(tags, id=host_id)
+        
     def _delete_guest(self, guest_id):
         """Deletes a guest and returns 'Cancelled' or and Exception message"""
         msg = 'Cancelled'
