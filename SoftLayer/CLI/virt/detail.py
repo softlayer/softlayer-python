@@ -61,6 +61,7 @@ def cli(env, identifier, passwords=False, price=False):
     table.add_row(['private_ip', result.get('primaryBackendIpAddress', '-')])
     table.add_row(['private_only', result['privateNetworkOnlyFlag']])
     table.add_row(['private_cpu', result['dedicatedAccountHostOnlyFlag']])
+    table.add_row(['transient', result.get('transientGuestFlag', False)])
     table.add_row(['created', result['createDate']])
     table.add_row(['modified', result['modifyDate']])
 

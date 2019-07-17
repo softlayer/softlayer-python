@@ -61,7 +61,7 @@ class VSManager(utils.IdentifierMixin, object):
     def list_instances(self, hourly=True, monthly=True, tags=None, cpus=None,
                        memory=None, hostname=None, domain=None,
                        local_disk=None, datacenter=None, nic_speed=None,
-                       public_ip=None, private_ip=None, **kwargs):
+                       public_ip=None, private_ip=None, transient=None, **kwargs):
         """Retrieve a list of all virtual servers on the account.
 
         Example::
@@ -88,6 +88,7 @@ class VSManager(utils.IdentifierMixin, object):
         :param integer nic_speed: filter based on network speed (in MBPS)
         :param string public_ip: filter based on public ip address
         :param string private_ip: filter based on private ip address
+        :param boolean transient: filter on transient or non-transient instances
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         :returns: Returns a list of dictionaries representing the matching
                   virtual servers
@@ -157,6 +158,11 @@ class VSManager(utils.IdentifierMixin, object):
             _filter['virtualGuests']['primaryBackendIpAddress'] = (
                 utils.query_filter(private_ip))
 
+        if transient is not None:
+            _filter['virtualGuests']['transientGuestFlag'] = (
+                utils.query_filter(bool(transient))
+            )
+
         kwargs['filter'] = _filter.to_dict()
         kwargs['iter'] = True
         return self.client.call('Account', call, **kwargs)
@@ -194,6 +200,7 @@ class VSManager(utils.IdentifierMixin, object):
                 'provisionDate,'
                 'notes,'
                 'dedicatedAccountHostOnlyFlag,'
+                'transientGuestFlag,'
                 'privateNetworkOnlyFlag,'
                 'primaryBackendIpAddress,'
                 'primaryIpAddress,'
@@ -312,7 +319,7 @@ class VSManager(utils.IdentifierMixin, object):
             private_subnet=None, public_subnet=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
             private=False, ssh_keys=None, public_security_groups=None,
-            private_security_groups=None, boot_mode=None, **kwargs):
+            private_security_groups=None, boot_mode=None, transient=False, **kwargs):
         """Returns a dict appropriate to pass into Virtual_Guest::createObject
 
             See :func:`create_instance` for a list of available options.
@@ -361,6 +368,9 @@ class VSManager(utils.IdentifierMixin, object):
 
         if private:
             data['privateNetworkOnlyFlag'] = private
+
+        if transient:
+            data['transientGuestFlag'] = transient
 
         if image_id:
             data["blockDeviceTemplateGroup"] = {"globalIdentifier": image_id}
@@ -505,6 +515,7 @@ class VSManager(utils.IdentifierMixin, object):
                 'flavor': 'BL1_1X2X100'
                 'dedicated': False,
                 'private': False,
+                'transient': False,
                 'os_code' : u'UBUNTU_LATEST',
                 'hourly': True,
                 'ssh_keys': [1234],
@@ -883,6 +894,7 @@ class VSManager(utils.IdentifierMixin, object):
                 'flavor': 'BL1_1X2X100'
                 'dedicated': False,
                 'private': False,
+                'transient': False,
                 'os_code' : u'UBUNTU_LATEST',
                 'hourly': True,
                 'ssh_keys': [1234],

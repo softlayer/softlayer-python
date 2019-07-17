@@ -42,7 +42,7 @@ DEFAULT_COLUMNS = [
 ]
 
 
-@click.command()
+@click.command(short_help="List virtual servers.")
 @click.option('--cpu', '-c', help='Number of CPU cores', type=click.INT)
 @click.option('--domain', '-D', help='Domain portion of the FQDN')
 @click.option('--datacenter', '-d', help='Datacenter shortname')
@@ -51,6 +51,7 @@ DEFAULT_COLUMNS = [
 @click.option('--network', '-n', help='Network port speed in Mbps')
 @click.option('--hourly', is_flag=True, help='Show only hourly instances')
 @click.option('--monthly', is_flag=True, help='Show only monthly instances')
+@click.option('--transient', help='Filter by transient instances', type=click.BOOL)
 @helpers.multi_option('--tag', help='Filter by tags')
 @click.option('--sortby',
               help='Column to sort by',
@@ -68,7 +69,7 @@ DEFAULT_COLUMNS = [
               show_default=True)
 @environment.pass_env
 def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
-        hourly, monthly, tag, columns, limit):
+        hourly, monthly, tag, columns, limit, transient):
     """List virtual servers."""
 
     vsi = SoftLayer.VSManager(env.client)
@@ -80,6 +81,7 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
                                 memory=memory,
                                 datacenter=datacenter,
                                 nic_speed=network,
+                                transient=transient,
                                 tags=tag,
                                 mask=columns.mask(),
                                 limit=limit)
