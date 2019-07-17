@@ -22,7 +22,6 @@ COLUMNS = [
         'action',
         lambda server: formatting.active_txn(server),
         mask='activeTransaction[id, transactionStatus[name, friendlyName]]'),
-    column_helper.Column('power_state', ('powerState', 'name')),
     column_helper.Column(
         'created_by',
         ('billingItem', 'orderItem', 'order', 'userRecord', 'username')),

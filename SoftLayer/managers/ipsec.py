@@ -227,10 +227,6 @@ class IPSECManager(utils.IdentifierMixin, object):
             translation.pop('customerIpAddressId', None)
         if notes is not None:
             translation['notes'] = notes
-        # todo: Update this signature to return the updated translation
-        #       once internal and customer IP addresses can be fetched
-        #       and set on the translation object, i.e. that which is
-        #       currently being handled in get_translations
         self.context.editAddressTranslation(translation, id=context_id)
         return True
 

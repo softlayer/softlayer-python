@@ -96,11 +96,9 @@ class TestCase(testtools.TestCase):
 
     def set_up(self):
         """Aliased from setUp."""
-        pass
 
     def tear_down(self):
         """Aliased from tearDown."""
-        pass
 
     def setUp(self):  # NOQA
         testtools.TestCase.setUp(self)
@@ -159,7 +157,7 @@ class TestCase(testtools.TestCase):
         """Set and return mock on the current client."""
         return self.mocks.set_mock(service, method)
 
-    def run_command(self, args=None, env=None, fixtures=True, fmt='json'):
+    def run_command(self, args=None, env=None, fixtures=True, fmt='json', stdin=None):
         """A helper that runs a SoftLayer CLI command.
 
         This returns a click.testing.Result object.
@@ -171,7 +169,7 @@ class TestCase(testtools.TestCase):
         args.insert(0, '--format=%s' % fmt)
 
         runner = testing.CliRunner()
-        return runner.invoke(core.cli, args=args, obj=env or self.env)
+        return runner.invoke(core.cli, args=args, input=stdin, obj=env or self.env)
 
 
 def call_has_props(call, props):

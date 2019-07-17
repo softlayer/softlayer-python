@@ -5,7 +5,6 @@ import os.path
 import click
 
 import SoftLayer
-from SoftLayer import auth
 from SoftLayer.CLI import config
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
@@ -20,9 +19,8 @@ def get_api_key(client, username, secret):
     """
 
     # Try to use a client with username/api key
-    if len(secret) == 64:
+    if len(secret) == 64 or username == 'apikey':
         try:
-            client.auth = auth.BasicAuthentication(username, secret)
             client['Account'].getCurrentUser()
             return secret
         except SoftLayer.SoftLayerAPIError as ex:
@@ -32,24 +30,24 @@ def get_api_key(client, username, secret):
         # Try to use a client with username/password
         client.authenticate_with_password(username, secret)
 
-        user_record = client['Account'].getCurrentUser(
-            mask='id, apiAuthenticationKeys')
+        user_record = client['Account'].getCurrentUser(mask='id, apiAuthenticationKeys')
         api_keys = user_record['apiAuthenticationKeys']
         if len(api_keys) == 0:
-            return client['User_Customer'].addApiAuthenticationKey(
-                id=user_record['id'])
+            return client['User_Customer'].addApiAuthenticationKey(id=user_record['id'])
         return api_keys[0]['authenticationKey']
 
 
 @click.command()
 @environment.pass_env
 def cli(env):
-    """Edit configuration."""
+    """Setup the ~/.softlayer file with username and apikey.
+
+    Set the username to 'apikey' for cloud.ibm.com accounts.
+    """
 
     username, secret, endpoint_url, timeout = get_user_input(env)
-
-    env.client.transport.transport.endpoint_url = endpoint_url
-    api_key = get_api_key(env.client, username, secret)
+    new_client = SoftLayer.Client(username=username, api_key=secret, endpoint_url=endpoint_url, timeout=timeout)
+    api_key = get_api_key(new_client, username, secret)
 
     path = '~/.softlayer'
     if env.config_file:
@@ -103,17 +101,20 @@ def get_user_input(env):
     secret = env.getpass('API Key or Password', default=defaults['api_key'])
 
     # Ask for which endpoint they want to use
+    endpoint = defaults.get('endpoint_url', 'public')
     endpoint_type = env.input(
-        'Endpoint (public|private|custom)', default='public')
+        'Endpoint (public|private|custom)', default=endpoint)
     endpoint_type = endpoint_type.lower()
 
-    if endpoint_type == 'custom':
-        endpoint_url = env.input('Endpoint URL',
-                                 default=defaults['endpoint_url'])
+    if endpoint_type == 'public':
+        endpoint_url = SoftLayer.API_PUBLIC_ENDPOINT
     elif endpoint_type == 'private':
         endpoint_url = SoftLayer.API_PRIVATE_ENDPOINT
     else:
-        endpoint_url = SoftLayer.API_PUBLIC_ENDPOINT
+        if endpoint_type == 'custom':
+            endpoint_url = env.input('Endpoint URL', default=endpoint)
+        else:
+            endpoint_url = endpoint_type
 
     # Ask for timeout
     timeout = env.input('Timeout', default=defaults['timeout'] or 0)

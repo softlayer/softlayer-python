@@ -14,6 +14,10 @@ getObject = {
             {'nextInvoiceTotalRecurringAmount': 1},
             {'nextInvoiceTotalRecurringAmount': 1},
         ],
+        'package': {
+            "id": 835,
+            "keyName": "PUBLIC_CLOUD_SERVER"
+        },
         'orderItem': {
             'order': {
                 'userRecord': {
@@ -419,11 +423,126 @@ setPrivateNetworkInterfaceSpeed = True
 setPublicNetworkInterfaceSpeed = True
 createObject = getObject
 createObjects = [getObject]
-generateOrderTemplate = {}
+generateOrderTemplate = {
+    "imageTemplateId": None,
+    "location": "1854895",
+    "packageId": 835,
+    "presetId": 405,
+    "prices": [
+        {
+            "hourlyRecurringFee": "0",
+            "id": 45466,
+            "recurringFee": "0",
+            "item": {
+                "description": "CentOS 7.x - Minimal Install (64 bit)"
+            }
+        },
+        {
+            "hourlyRecurringFee": "0",
+            "id": 2202,
+            "recurringFee": "0",
+            "item": {
+                "description": "25 GB (SAN)"
+            }
+        },
+        {
+            "hourlyRecurringFee": "0",
+            "id": 905,
+            "recurringFee": "0",
+            "item": {
+                "description": "Reboot / Remote Console"
+            }
+        },
+        {
+            "hourlyRecurringFee": ".02",
+            "id": 899,
+            "recurringFee": "10",
+            "item": {
+                "description": "1 Gbps Private Network Uplink"
+            }
+        },
+        {
+            "hourlyRecurringFee": "0",
+            "id": 1800,
+            "item": {
+                "description": "0 GB Bandwidth Allotment"
+            }
+        },
+        {
+            "hourlyRecurringFee": "0",
+            "id": 21,
+            "recurringFee": "0",
+            "item": {
+                "description": "1 IP Address"
+            }
+        },
+        {
+            "hourlyRecurringFee": "0",
+            "id": 55,
+            "recurringFee": "0",
+            "item": {
+                "description": "Host Ping"
+            }
+        },
+        {
+            "hourlyRecurringFee": "0",
+            "id": 57,
+            "recurringFee": "0",
+            "item": {
+                "description": "Email and Ticket"
+            }
+        },
+        {
+            "hourlyRecurringFee": "0",
+            "id": 58,
+            "recurringFee": "0",
+            "item": {
+                "description": "Automated Notification"
+            }
+        },
+        {
+            "hourlyRecurringFee": "0",
+            "id": 420,
+            "recurringFee": "0",
+            "item": {
+                "description": "Unlimited SSL VPN Users & 1 PPTP VPN User per account"
+            }
+        },
+        {
+            "hourlyRecurringFee": "0",
+            "id": 418,
+            "recurringFee": "0",
+            "item": {
+                "description": "Nessus Vulnerability Assessment & Reporting"
+            }
+        }
+    ],
+    "quantity": 1,
+    "sourceVirtualGuestId": None,
+    "sshKeys": [],
+    "useHourlyPricing": True,
+    "virtualGuests": [
+        {
+            "domain": "test.local",
+            "hostname": "test"
+        }
+    ],
+    "complexType": "SoftLayer_Container_Product_Order_Virtual_Guest"
+}
+
 setUserMetadata = ['meta']
 reloadOperatingSystem = 'OK'
 setTags = True
-createArchiveTransaction = {}
+createArchiveTransaction = {
+    'createDate': '2018-12-10T17:29:18-06:00',
+    'elapsedSeconds': 0,
+    'guestId': 12345678,
+    'hardwareId': None,
+    'id': 12345,
+    'modifyDate': '2018-12-10T17:29:18-06:00',
+    'statusChangeDate': '2018-12-10T17:29:18-06:00'
+}
+
 executeRescueLayer = True
 
 getUpgradeItemPrices = [
@@ -506,4 +625,36 @@ DEDICATED_GET_UPGRADE_ITEM_PRICES = [
             'description': 'Computing Instance (Dedicated Host)',
         }
     },
+]
+
+getMetricTrackingObjectId = 1000
+
+
+getBandwidthAllotmentDetail = {
+    'allocationId': 25465663,
+    'bandwidthAllotmentId': 138442,
+    'effectiveDate': '2019-04-03T23:00:00-06:00',
+    'endEffectiveDate': None,
+    'id': 25888247,
+    'serviceProviderId': 1,
+    'allocation': {
+        'amount': '250'
+    }
+}
+
+getBillingCycleBandwidthUsage = [
+    {
+        'amountIn': '.448',
+        'amountOut': '.52157',
+        'type': {
+            'alias': 'PUBLIC_SERVER_BW'
+        }
+    },
+    {
+        'amountIn': '.03842',
+        'amountOut': '.01822',
+        'type': {
+            'alias': 'PRIVATE_SERVER_BW'
+        }
+    }
 ]

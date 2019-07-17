@@ -19,7 +19,7 @@ class SshKeyTests(testing.TestCase):
                             notes='My notes')
 
         args = ({
-            'key':  'pretend this is a public SSH key',
+            'key': 'pretend this is a public SSH key',
             'label': 'Test label',
             'notes': 'My notes',
         },)

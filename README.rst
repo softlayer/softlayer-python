@@ -12,9 +12,12 @@ SoftLayer API Python Client
 .. image:: https://coveralls.io/repos/github/softlayer/softlayer-python/badge.svg?branch=master
     :target: https://coveralls.io/github/softlayer/softlayer-python?branch=master
 
+.. image:: https://build.snapcraft.io/badge/softlayer/softlayer-python.svg
+    :target: https://build.snapcraft.io/user/softlayer/softlayer-python
+
 
 This library provides a simple Python client to interact with `SoftLayer's
-XML-RPC API <http://developer.softlayer.com/reference/softlayerapi>`_. 
+XML-RPC API <https://softlayer.github.io/reference/softlayerapi>`_.
 
 A command-line interface is also included and can be used to manage various
 SoftLayer products and services.
@@ -28,9 +31,9 @@ http://softlayer.github.io/softlayer-python/.
 Additional API documentation can be found on the SoftLayer Development Network:
 
 * `SoftLayer API reference
-  <http://developer.softlayer.com/reference/softlayerapi>`_
+  <https://sldn.softlayer.com/reference/softlayerapi>`_
 * `Object mask information and examples
-  <http://developer.softlayer.com/article/Object-Masks>`_
+  <https://sldn.softlayer.com/article/object-masks>`_
 * `Code Examples
   <https://softlayer.github.io/python/>`_
 
@@ -85,12 +88,14 @@ To get the exact API call that this library makes, you can do the following.
 For the CLI, just use the -vvv option. If you are using the REST endpoint, this will print out a curl command that you can use, if using XML, this will print the minimal python code to make the request without the softlayer library.
 
 .. code-block:: bash
+
   $ slcli -vvv vs list
 
 
 If you are using the library directly in python, you can do something like this.
 
 .. code-bock:: python
+
   import SoftLayer
   import logging
 
@@ -115,9 +120,11 @@ If you are using the library directly in python, you can do something like this.
       main.main()
       main.debug()
 
+
+
 System Requirements
 -------------------
-* Python 2.7, 3.3, 3.4, 3.5 or 3.6.
+* Python 2.7, 3.3, 3.4, 3.5, 3.6, or 3.7.
 * A valid SoftLayer API username and key.
 * A connection to SoftLayer's private network is required to use
   our private network API endpoints.
@@ -125,12 +132,12 @@ System Requirements
 Python Packages
 ---------------
 * six >= 1.7.0
-* prettytable >= 0.7.0
-* click >= 5
-* requests >= 2.18.4
-* prompt_toolkit >= 0.53
+* ptable >= 0.9.2
+* click >= 7
+* requests >= 2.20.0
+* prompt_toolkit >= 2
 * pygments >= 2.0.0
-* urllib3 >= 1.22
+* urllib3 >= 1.24
 
 Copyright
 ---------

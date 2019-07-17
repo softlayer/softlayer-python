@@ -6,9 +6,12 @@
     :license: MIT, see LICENSE for more details.
 """
 import collections
+import json
 
 from SoftLayer import exceptions
 from SoftLayer import utils
+
+from SoftLayer.managers import event_log
 
 DEFAULT_SUBNET_MASK = ','.join(['hardware',
                                 'datacenter',
@@ -107,13 +110,13 @@ class NetworkManager(object):
             raise TypeError("The rules provided must be a list of dictionaries")
         return self.security_group.addRules(rules, id=group_id)
 
-    def add_subnet(self, subnet_type, quantity=None, vlan_id=None, version=4,
+    def add_subnet(self, subnet_type, quantity=None, endpoint_id=None, version=4,
                    test_order=False):
         """Orders a new subnet
 
-        :param str subnet_type: Type of subnet to add: private, public, global
+        :param str subnet_type: Type of subnet to add: private, public, global,static
         :param int quantity: Number of IPs in the subnet
-        :param int vlan_id: VLAN id for the subnet to be placed into
+        :param int endpoint_id: id for the subnet to be placed into
         :param int version: 4 for IPv4, 6 for IPv6
         :param bool test_order: If true, this will only verify the order.
         """
@@ -123,9 +126,11 @@ class NetworkManager(object):
         if version == 4:
             if subnet_type == 'global':
                 quantity = 0
-                category = 'global_ipv4'
+                category = "global_ipv4"
             elif subnet_type == 'public':
-                category = 'sov_sec_ip_addresses_pub'
+                category = "sov_sec_ip_addresses_pub"
+            elif subnet_type == 'static':
+                category = "static_sec_ip_addresses"
         else:
             category = 'static_ipv6_addresses'
             if subnet_type == 'global':
@@ -134,6 +139,8 @@ class NetworkManager(object):
                 desc = 'Global'
             elif subnet_type == 'public':
                 desc = 'Portable'
+            elif subnet_type == 'static':
+                desc = 'Static'
 
         # In the API, every non-server item is contained within package ID 0.
         # This means that we need to get all of the items and loop through them
@@ -141,7 +148,8 @@ class NetworkManager(object):
         # item description.
         price_id = None
         quantity_str = str(quantity)
-        for item in package.getItems(id=0, mask='itemCategory'):
+        package_items = package.getItems(id=0)
+        for item in package_items:
             category_code = utils.lookup(item, 'itemCategory', 'categoryCode')
             if all([category_code == category,
                     item.get('capacity') == quantity_str,
@@ -149,10 +157,6 @@ class NetworkManager(object):
                                      desc in item['description'])]):
                 price_id = item['prices'][0]['id']
                 break
-
-        if not price_id:
-            raise TypeError('Invalid combination specified for ordering a'
-                            ' subnet.')
 
         order = {
             'packageId': 0,
@@ -162,9 +166,10 @@ class NetworkManager(object):
             # correct order container
             'complexType': 'SoftLayer_Container_Product_Order_Network_Subnet',
         }
-
-        if subnet_type != 'global':
-            order['endPointVlanId'] = vlan_id
+        if subnet_type == 'static':
+            order['endPointIpAddressId'] = endpoint_id
+        elif subnet_type != 'global' and subnet_type != 'static':
+            order['endPointVlanId'] = endpoint_id
 
         if test_order:
             return self.client['Product_Order'].verifyOrder(order)
@@ -372,7 +377,7 @@ class NetworkManager(object):
                 'description,'
                 '''rules[id, remoteIp, remoteGroupId,
                          direction, ethertype, portRangeMin,
-                         portRangeMax, protocol],'''
+                         portRangeMax, protocol, createDate, modifyDate],'''
                 '''networkComponentBindings[
                     networkComponent[
                         id,
@@ -543,6 +548,45 @@ class NetworkManager(object):
         :param list rules: The list of IDs to remove
         """
         return self.security_group.removeRules(rules, id=group_id)
+
+    def get_event_logs_by_request_id(self, request_id):
+        """Gets all event logs by the given request id
+
+        :param string request_id: The request id we want to filter on
+        """
+
+        # Get all relevant event logs
+        unfiltered_logs = self._get_cci_event_logs() + self._get_security_group_event_logs()
+
+        # Grab only those that have the specific request id
+        filtered_logs = []
+
+        for unfiltered_log in unfiltered_logs:
+            try:
+                metadata = json.loads(unfiltered_log['metaData'])
+                if 'requestId' in metadata:
+                    if metadata['requestId'] == request_id:
+                        filtered_logs.append(unfiltered_log)
+            except ValueError:
+                continue
+
+        return filtered_logs
+
+    def _get_cci_event_logs(self):
+        # Load the event log manager
+        event_log_mgr = event_log.EventLogManager(self.client)
+
+        # Get CCI Event Logs
+        _filter = event_log_mgr.build_filter(obj_type='CCI')
+        return event_log_mgr.get_event_logs(request_filter=_filter)
+
+    def _get_security_group_event_logs(self):
+        # Load the event log manager
+        event_log_mgr = event_log.EventLogManager(self.client)
+
+        # Get CCI Event Logs
+        _filter = event_log_mgr.build_filter(obj_type='Security Group')
+        return event_log_mgr.get_event_logs(request_filter=_filter)
 
     def resolve_global_ip_ids(self, identifier):
         """Resolve global ip ids."""

@@ -11,12 +11,13 @@ from re import match
 
 from SoftLayer import exceptions
 
+
 CATEGORY_MASK = '''id,
                    isRequired,
                    itemCategory[id, name, categoryCode]
                 '''
 
-ITEM_MASK = '''id, keyName, description, itemCategory, categories'''
+ITEM_MASK = '''id, keyName, description, itemCategory, categories, prices'''
 
 PACKAGE_MASK = '''id, name, keyName, isActive, type'''
 
@@ -34,6 +35,7 @@ class OrderingManager(object):
         self.package_svc = client['Product_Package']
         self.order_svc = client['Product_Order']
         self.billing_svc = client['Billing_Order']
+        self.package_preset = client['Product_Package_Preset']
 
     def get_packages_of_type(self, package_types, mask=None):
         """Get packages that match a certain type.
@@ -131,12 +133,12 @@ class OrderingManager(object):
             raise ValueError("No package found for type: " + package_type)
 
     def get_quotes(self):
-        """Retrieve a list of quotes.
+        """Retrieve a list of active quotes.
 
         :returns: a list of SoftLayer_Billing_Order_Quote
         """
-
-        quotes = self.client['Account'].getActiveQuotes()
+        mask = "mask[order[id,items[id,package[id,keyName]]]]"
+        quotes = self.client['Account'].getActiveQuotes(mask=mask)
         return quotes
 
     def get_quote_details(self, quote_id):
@@ -145,7 +147,8 @@ class OrderingManager(object):
         :param quote_id: ID number of target quote
         """
 
-        quote = self.client['Billing_Order_Quote'].getObject(id=quote_id)
+        mask = "mask[order[id,items[package[id,keyName]]]]"
+        quote = self.client['Billing_Order_Quote'].getObject(id=quote_id, mask=mask)
         return quote
 
     def get_order_container(self, quote_id):
@@ -156,62 +159,75 @@ class OrderingManager(object):
 
         quote = self.client['Billing_Order_Quote']
         container = quote.getRecalculatedOrderContainer(id=quote_id)
-        return container['orderContainers'][0]
+        return container
 
     def generate_order_template(self, quote_id, extra, quantity=1):
         """Generate a complete order template.
 
         :param int quote_id: ID of target quote
-        :param list extra: List of dictionaries that have extra details about
-                           the order such as hostname or domain names for
-                           virtual servers or hardware nodes
-        :param int quantity: Number of ~things~ to order
+        :param dictionary extra: Overrides for the defaults of SoftLayer_Container_Product_Order
+        :param int quantity: Number of items to order.
         """
+
+        if not isinstance(extra, dict):
+            raise ValueError("extra is not formatted properly")
 
         container = self.get_order_container(quote_id)
+
         container['quantity'] = quantity
+        for key in extra.keys():
+            container[key] = extra[key]
 
-        # NOTE(kmcdonald): This will only work with virtualGuests and hardware.
-        #                  There has to be a better way, since this is based on
-        #                  an existing quote that supposedly knows about this
-        #                  detail
-        if container['packageId'] == 46:
-            product_type = 'virtualGuests'
-        else:
-            product_type = 'hardware'
-
-        if len(extra) != quantity:
-            raise ValueError("You must specify extra for each server in the quote")
-
-        container[product_type] = []
-        for extra_details in extra:
-            container[product_type].append(extra_details)
-        container['presetId'] = None
         return container
 
-    def verify_quote(self, quote_id, extra, quantity=1):
+    def verify_quote(self, quote_id, extra):
         """Verifies that a quote order is valid.
 
+        ::
+
+            extras = {
+                'hardware': {'hostname': 'test', 'domain': 'testing.com'},
+                'quantity': 2
+            }
+            manager = ordering.OrderingManager(env.client)
+            result = manager.verify_quote(12345, extras)
+
+
         :param int quote_id: ID for the target quote
-        :param list hostnames: hostnames of the servers
-        :param string domain: domain of the new servers
+        :param dictionary extra: Overrides for the defaults of SoftLayer_Container_Product_Order
         :param int quantity: Quantity to override default
         """
+        container = self.generate_order_template(quote_id, extra)
+        clean_container = {}
 
-        container = self.generate_order_template(quote_id, extra, quantity=quantity)
-        return self.order_svc.verifyOrder(container)
+        # There are a few fields that wil cause exceptions in the XML endpoing if you send in ''
+        # reservedCapacityId and hostId specifically. But we clean all just to be safe.
+        # This for some reason is only a problem on verify_quote.
+        for key in container.keys():
+            if container.get(key) != '':
+                clean_container[key] = container[key]
 
-    def order_quote(self, quote_id, extra, quantity=1):
+        return self.client.call('SoftLayer_Billing_Order_Quote', 'verifyOrder', clean_container, id=quote_id)
+
+    def order_quote(self, quote_id, extra):
         """Places an order using a quote
 
+        ::
+
+            extras = {
+                'hardware': {'hostname': 'test', 'domain': 'testing.com'},
+                'quantity': 2
+            }
+            manager = ordering.OrderingManager(env.client)
+            result = manager.order_quote(12345, extras)
+
         :param int quote_id: ID for the target quote
-        :param list hostnames: hostnames of the servers
-        :param string domain: domain of the new server
+        :param dictionary extra: Overrides for the defaults of SoftLayer_Container_Product_Order
         :param int quantity: Quantity to override default
         """
 
-        container = self.generate_order_template(quote_id, extra, quantity=quantity)
-        return self.order_svc.placeOrder(container)
+        container = self.generate_order_template(quote_id, extra)
+        return self.client.call('SoftLayer_Billing_Order_Quote', 'placeOrder', container, id=quote_id)
 
     def get_package_by_key(self, package_keyname, mask=None):
         """Get a single package with a given key.
@@ -321,7 +337,7 @@ class OrderingManager(object):
 
         return presets[0]
 
-    def get_price_id_list(self, package_keyname, item_keynames):
+    def get_price_id_list(self, package_keyname, item_keynames, core=None):
         """Converts a list of item keynames to a list of price IDs.
 
         This function is used to convert a list of item keynames into
@@ -330,6 +346,7 @@ class OrderingManager(object):
 
         :param str package_keyname: The package associated with the prices
         :param list item_keynames: A list of item keyname strings
+        :param str core: preset guest core capacity.
         :returns: A list of price IDs associated with the given item
                   keynames in the given package
 
@@ -338,7 +355,8 @@ class OrderingManager(object):
         items = self.list_items(package_keyname, mask=mask)
 
         prices = []
-        gpu_number = -1
+        category_dict = {"gpu0": -1, "pcie_slot0": -1}
+
         for item_keyname in item_keynames:
             try:
                 # Need to find the item in the package that has a matching
@@ -354,19 +372,64 @@ class OrderingManager(object):
             # because that is the most generic price. verifyOrder/placeOrder
             # can take that ID and create the proper price for us in the location
             # in which the order is made
-            if matching_item['itemCategory']['categoryCode'] != "gpu0":
-                price_id = [p['id'] for p in matching_item['prices']
-                            if not p['locationGroupId']][0]
+            item_category = matching_item['itemCategory']['categoryCode']
+            if item_category not in category_dict:
+                price_id = self.get_item_price_id(core, matching_item['prices'])
             else:
-                # GPU items has two generic prices and they are added to the list
-                # according to the number of gpu items added in the order.
-                gpu_number += 1
+                # GPU and PCIe items has two generic prices and they are added to the list
+                # according to the number of items in the order.
+                category_dict[item_category] += 1
+                category_code = item_category[:-1] + str(category_dict[item_category])
                 price_id = [p['id'] for p in matching_item['prices']
                             if not p['locationGroupId']
-                            and p['categories'][0]['categoryCode'] == "gpu" + str(gpu_number)][0]
+                            and p['categories'][0]['categoryCode'] == category_code][0]
 
             prices.append(price_id)
 
+        return prices
+
+    @staticmethod
+    def get_item_price_id(core, prices):
+        """get item price id"""
+        price_id = None
+        for price in prices:
+            if not price['locationGroupId']:
+                capacity_min = int(price.get('capacityRestrictionMinimum', -1))
+                capacity_max = int(price.get('capacityRestrictionMaximum', -1))
+                # return first match if no restirction, or no core to check
+                if capacity_min == -1 or core is None:
+                    price_id = price['id']
+                # this check is mostly to work nicely with preset configs
+                elif capacity_min <= int(core) <= capacity_max:
+                    price_id = price['id']
+        return price_id
+
+    def get_preset_prices(self, preset):
+        """Get preset item prices.
+
+        Retrieve a SoftLayer_Product_Package_Preset record.
+
+        :param int preset: preset identifier.
+        :returns: A list of price IDs associated with the given preset_id.
+
+        """
+        mask = 'mask[prices[item]]'
+
+        prices = self.package_preset.getObject(id=preset, mask=mask)
+        return prices
+
+    def get_item_prices(self, package_id):
+        """Get item prices.
+
+        Retrieve a SoftLayer_Product_Package item prices record.
+
+        :param int package_id: package identifier.
+        :returns: A list of price IDs associated with the given package.
+
+        """
+        mask = 'mask[pricingLocationGroup[locations]]'
+
+        prices = self.package_svc.getItemPrices(id=package_id, mask=mask)
         return prices
 
     def verify_order(self, package_keyname, location, item_keynames, complex_type=None,
@@ -430,6 +493,39 @@ class OrderingManager(object):
                                     extras=extras, quantity=quantity)
         return self.order_svc.placeOrder(order)
 
+    def place_quote(self, package_keyname, location, item_keynames, complex_type=None,
+                    preset_keyname=None, extras=None, quantity=1, quote_name=None, send_email=False):
+        """Place a quote with the given package and prices.
+
+        This function takes in parameters needed for an order and places the quote.
+
+        :param str package_keyname: The keyname for the package being ordered
+        :param str location: The datacenter location string for ordering (Ex: DALLAS13)
+        :param list item_keynames: The list of item keyname strings to order. To see list of
+                                   possible keynames for a package, use list_items()
+                                   (or `slcli order item-list`)
+        :param str complex_type: The complex type to send with the order. Typically begins
+                                 with `SoftLayer_Container_Product_Order_`.
+        :param string preset_keyname: If needed, specifies a preset to use for that package.
+                                      To see a list of possible keynames for a package, use
+                                      list_preset() (or `slcli order preset-list`)
+        :param dict extras: The extra data for the order in dictionary format.
+                            Example: A VSI order requires hostname and domain to be set, so
+                            extras will look like the following:
+                            {'virtualGuests': [{'hostname': 'test', domain': 'softlayer.com'}]}
+        :param int quantity: The number of resources to order
+        :param string quote_name: A custom name to be assigned to the quote (optional).
+        :param bool send_email: This flag indicates that the quote should be sent to the email
+                                address associated with the account or order.
+        """
+        order = self.generate_order(package_keyname, location, item_keynames, complex_type=complex_type,
+                                    hourly=False, preset_keyname=preset_keyname, extras=extras, quantity=quantity)
+
+        order['quoteName'] = quote_name
+        order['sendQuoteEmailFlag'] = send_email
+
+        return self.order_svc.placeQuote(order)
+
     def generate_order(self, package_keyname, location, item_keynames, complex_type=None,
                        hourly=True, preset_keyname=None, extras=None, quantity=1):
         """Generates an order with the given package and prices.
@@ -467,19 +563,24 @@ class OrderingManager(object):
         #                                    'domain': 'softlayer.com'}]}
         order.update(extras)
         order['packageId'] = package['id']
-        order['location'] = self.get_location_id(location)
         order['quantity'] = quantity
+        order['location'] = self.get_location_id(location)
         order['useHourlyPricing'] = hourly
 
+        preset_core = None
         if preset_keyname:
             preset_id = self.get_preset_by_key(package_keyname, preset_keyname)['id']
+            preset_items = self.get_preset_prices(preset_id)
+            for item in preset_items['prices']:
+                if item['item']['itemCategory']['categoryCode'] == "guest_core":
+                    preset_core = item['item']['capacity']
             order['presetId'] = preset_id
 
         if not complex_type:
             raise exceptions.SoftLayerError("A complex type must be specified with the order")
         order['complexType'] = complex_type
 
-        price_ids = self.get_price_id_list(package_keyname, item_keynames)
+        price_ids = self.get_price_id_list(package_keyname, item_keynames, preset_core)
         order['prices'] = [{'id': price_id} for price_id in price_ids]
 
         container['orderContainers'] = [order]

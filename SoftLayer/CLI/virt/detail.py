@@ -63,65 +63,42 @@ def cli(env, identifier, passwords=False, price=False, output_json=False,
     table.add_row(['domain', result['domain']])
     table.add_row(['fqdn', result['fullyQualifiedDomainName']])
     table.add_row(['status', formatting.FormattedItem(
-        result['status']['keyName'] or formatting.blank(),
-        result['status']['name'] or formatting.blank()
+        result['status']['keyName'],
+        result['status']['name']
     )])
     table.add_row(['state', formatting.FormattedItem(
         utils.lookup(result, 'powerState', 'keyName'),
         utils.lookup(result, 'powerState', 'name'),
     )])
     table.add_row(['active_transaction', formatting.active_txn(result)])
-    table.add_row(['datacenter',
-                   result['datacenter']['name'] or formatting.blank()])
+    table.add_row(['datacenter', result['datacenter']['name'] or formatting.blank()])
     _cli_helper_dedicated_host(env, result, table)
     operating_system = utils.lookup(result,
                                     'operatingSystem',
                                     'softwareLicense',
                                     'softwareDescription') or {}
-    table.add_row(['os', operating_system.get('name') or formatting.blank()])
-    table.add_row(['os_version',
-                   operating_system.get('version') or formatting.blank()])
+    table.add_row(['os', operating_system.get('name', '-')])
+    table.add_row(['os_version', operating_system.get('version', '-')])
     table.add_row(['cores', result['maxCpu']])
     table.add_row(['memory', formatting.mb_to_gb(result['maxMemory'])])
-    table.add_row(['public_ip',
-                   result['primaryIpAddress'] or formatting.blank()])
-    table.add_row(['private_ip',
-                   result['primaryBackendIpAddress'] or formatting.blank()])
+    table.add_row(['public_ip', result.get('primaryIpAddress', '-')])
+    table.add_row(['private_ip', result.get('primaryBackendIpAddress', '-')])
     table.add_row(['private_only', result['privateNetworkOnlyFlag']])
     table.add_row(['private_cpu', result['dedicatedAccountHostOnlyFlag']])
     table.add_row(['created', result['createDate']])
     table.add_row(['modified', result['modifyDate']])
-    if utils.lookup(result, 'billingItem') != []:
-        table.add_row(['owner', formatting.FormattedItem(
-            utils.lookup(result, 'billingItem', 'orderItem',
-                         'order', 'userRecord',
-                         'username') or formatting.blank(),
-        )])
-    else:
-        table.add_row(['owner', formatting.blank()])
 
-    vlan_table = formatting.Table(['type', 'number', 'id'])
-    for vlan in result['networkVlans']:
-        vlan_table.add_row([
-            vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
-    table.add_row(['vlans', vlan_table])
+    table.add_row(_get_owner_row(result))
+    table.add_row(_get_vlan_table(result))
 
-    if result.get('networkComponents'):
-        secgroup_table = formatting.Table(['interface', 'id', 'name'])
-        has_secgroups = False
-        for comp in result.get('networkComponents'):
-            interface = 'PRIVATE' if comp['port'] == 0 else 'PUBLIC'
-            for binding in comp['securityGroupBindings']:
-                has_secgroups = True
-                secgroup = binding['securityGroup']
-                secgroup_table.add_row([
-                    interface, secgroup['id'],
-                    secgroup.get('name') or formatting.blank()])
-        if has_secgroups:
-            table.add_row(['security_groups', secgroup_table])
+    bandwidth = vsi.get_bandwidth_allocation(vs_id)
+    table.add_row(['Bandwidth', _bw_table(bandwidth)])
 
-    if result.get('notes'):
-        table.add_row(['notes', result['notes']])
+    security_table = _get_security_table(result)
+    if security_table is not None:
+        table.add_row(['security_groups', security_table])
+
+    table.add_row(['notes', result.get('notes', '-')])
 
     if price:
         total_price = utils.lookup(result,
@@ -169,6 +146,20 @@ def cli(env, identifier, passwords=False, price=False, output_json=False,
     env.fout(table)
 
 
+def _bw_table(bw_data):
+    """Generates a bandwidth useage table"""
+    table = formatting.Table(['Type', 'In GB', 'Out GB', 'Allotment'])
+    for bw_point in bw_data.get('useage'):
+        bw_type = 'Private'
+        allotment = 'N/A'
+        if bw_point['type']['alias'] == 'PUBLIC_SERVER_BW':
+            bw_type = 'Public'
+            allotment = bw_data['allotment'].get('amount', '-')
+
+        table.add_row([bw_type, bw_point['amountIn'], bw_point['amountOut'], allotment])
+    return table
+
+
 def _cli_helper_dedicated_host(env, result, table):
     """Get details on dedicated host for a virtual server."""
 
@@ -184,3 +175,40 @@ def _cli_helper_dedicated_host(env, result, table):
             dedicated_host = {}
         table.add_row(['dedicated_host',
                        dedicated_host.get('name') or formatting.blank()])
+
+
+def _get_owner_row(result):
+    """Formats and resturns the Owner row"""
+
+    if utils.lookup(result, 'billingItem') != []:
+        owner = utils.lookup(result, 'billingItem', 'orderItem', 'order', 'userRecord', 'username')
+    else:
+        owner = formatting.blank()
+    return(['owner', owner])
+
+
+def _get_vlan_table(result):
+    """Formats and resturns a vlan table"""
+
+    vlan_table = formatting.Table(['type', 'number', 'id'])
+    for vlan in result['networkVlans']:
+        vlan_table.add_row([
+            vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
+    return ['vlans', vlan_table]
+
+
+def _get_security_table(result):
+    secgroup_table = formatting.Table(['interface', 'id', 'name'])
+    has_secgroups = False
+
+    if result.get('networkComponents'):
+        for comp in result.get('networkComponents'):
+            interface = 'PRIVATE' if comp['port'] == 0 else 'PUBLIC'
+            for binding in comp['securityGroupBindings']:
+                has_secgroups = True
+                secgroup = binding['securityGroup']
+                secgroup_table.add_row([interface, secgroup['id'], secgroup.get('name', '-')])
+    if has_secgroups:
+        return secgroup_table
+    else:
+        return None

@@ -23,7 +23,7 @@ from SoftLayer import utils
 @click.option('--logins', '-l', is_flag=True, default=False,
               help="Show login history of this user for the last 30 days")
 @click.option('--events', '-e', is_flag=True, default=False,
-              help="Show audit log for this user.")
+              help="Show event log for this user.")
 @environment.pass_env
 def cli(env, identifier, keys, permissions, hardware, virtual, logins, events):
     """User details."""

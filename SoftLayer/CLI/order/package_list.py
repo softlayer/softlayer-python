@@ -7,7 +7,8 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import ordering
 
-COLUMNS = ['name',
+COLUMNS = ['id',
+           'name',
            'keyName',
            'type']
 
@@ -19,23 +20,16 @@ COLUMNS = ['name',
 def cli(env, keyword, package_type):
     """List packages that can be ordered via the placeOrder API.
 
-    \b
-    Example:
+
+    ::
+
         # List out all packages for ordering
         slcli order package-list
 
-
-    Keywords can also be used for some simple filtering functionality
-    to help find a package easier.
-
-    \b
-    Example:
         # List out all packages with "server" in the name
         slcli order package-list --keyword server
 
-    Package types can be used to remove unwanted packages
-    \b
-    Example:
+        # Select only specifict package types
         slcli order package-list --package_type BARE_METAL_CPU
     """
     manager = ordering.OrderingManager(env.client)
@@ -51,6 +45,7 @@ def cli(env, keyword, package_type):
 
     for package in packages:
         table.add_row([
+            package['id'],
             package['name'],
             package['keyName'],
             package['type']['keyName']

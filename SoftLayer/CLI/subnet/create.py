@@ -10,25 +10,33 @@ from SoftLayer.CLI import formatting
 
 
 @click.command(short_help="Add a new subnet to your account")
-@click.argument('network', type=click.Choice(['public', 'private']))
+@click.argument('network', type=click.Choice(['static', 'public', 'private']))
 @click.argument('quantity', type=click.INT)
-@click.argument('vlan-id')
-@click.option('--v6', '--ipv6', is_flag=True, help="Order IPv6 Addresses")
+@click.argument('endpoint-id', type=click.INT)
+@click.option('--ipv6', '--v6', is_flag=True, help="Order IPv6 Addresses")
 @click.option('--test',
               is_flag=True,
               help="Do not order the subnet; just get a quote")
 @environment.pass_env
-def cli(env, network, quantity, vlan_id, ipv6, test):
+def cli(env, network, quantity, endpoint_id, ipv6, test):
     """Add a new subnet to your account. Valid quantities vary by type.
 
     \b
-    Type    - Valid Quantities (IPv4)
-    public  - 4, 8, 16, 32
-    private - 4, 8, 16, 32, 64
+    IPv4
+    static  - 1, 2, 4, 8, 16, 32, 64, 128, 256
+    public  - 4, 8, 16, 32, 64, 128, 256
+    private - 4, 8, 16, 32, 64, 128, 256
 
     \b
-    Type    - Valid Quantities (IPv6)
+    IPv6
+    static  - 64
     public  - 64
+
+    \b
+    endpoint-id
+    static  - Network_Subnet_IpAddress identifier.
+    public  - Network_Vlan identifier
+    private - Network_Vlan identifier
 """
 
     mgr = SoftLayer.NetworkManager(env.client)
@@ -42,14 +50,14 @@ def cli(env, network, quantity, vlan_id, ipv6, test):
     if ipv6:
         version = 6
 
-    result = mgr.add_subnet(network,
-                            quantity=quantity,
-                            vlan_id=vlan_id,
-                            version=version,
-                            test_order=test)
-    if not result:
-        raise exceptions.CLIAbort(
-            'Unable to place order: No valid price IDs found.')
+    try:
+        result = mgr.add_subnet(network, quantity=quantity, endpoint_id=endpoint_id, version=version, test_order=test)
+
+    except SoftLayer.SoftLayerAPIError as error:
+        raise exceptions.CLIAbort('Unable to order {} {} ipv{} , error: {}'.format(quantity,
+                                                                                   network,
+                                                                                   version,
+                                                                                   error.faultString))
 
     table = formatting.Table(['Item', 'cost'])
     table.align['Item'] = 'r'

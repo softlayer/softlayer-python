@@ -7,7 +7,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer.managers import ordering
 from SoftLayer.utils import lookup
 
-COLUMNS = ['category', 'keyName', 'description']
+COLUMNS = ['category', 'keyName', 'description', 'priceId']
 
 
 @click.command()
@@ -18,29 +18,18 @@ COLUMNS = ['category', 'keyName', 'description']
 def cli(env, package_keyname, keyword, category):
     """List package items used for ordering.
 
-    The items listed can be used with `slcli order place` to specify
+    The item keyNames listed can be used with `slcli order place` to specify
     the items that are being ordered in the package.
 
-    Package keynames can be retrieved using `slcli order package-list`
-
-    \b
-    Note:
+    .. Note::
         Items with a numbered category, like disk0 or gpu0, can be included
         multiple times in an order to match how many of the item you want to order.
 
-    \b
-    Example:
+    ::
+
         # List all items in the VSI package
         slcli order item-list CLOUD_SERVER
 
-    The --keyword option is used to filter items by name.
-
-    The --category option is used to filter items by category.
-
-    Both --keyword and --category can be used together.
-
-    \b
-    Example:
         # List Ubuntu OSes from the os category of the Bare Metal package
         slcli order item-list BARE_METAL_SERVER --category os --keyword ubuntu
 
@@ -60,7 +49,7 @@ def cli(env, package_keyname, keyword, category):
     categories = sorted_items.keys()
     for catname in sorted(categories):
         for item in sorted_items[catname]:
-            table.add_row([catname, item['keyName'], item['description']])
+            table.add_row([catname, item['keyName'], item['description'], get_price(item)])
     env.fout(table)
 
 
@@ -75,3 +64,12 @@ def sort_items(items):
         sorted_items[category].append(item)
 
     return sorted_items
+
+
+def get_price(item):
+    """Given an SoftLayer_Product_Item, returns its default price id"""
+
+    for price in item.get('prices', []):
+        if not price.get('locationGroupId'):
+            return price.get('id')
+    return 0

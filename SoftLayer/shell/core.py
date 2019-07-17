@@ -13,8 +13,8 @@ import sys
 import traceback
 
 import click
-from prompt_toolkit import auto_suggest as p_auto_suggest
-from prompt_toolkit import shortcuts as p_shortcuts
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit import PromptSession
 
 from SoftLayer.CLI import core
 from SoftLayer.CLI import environment
@@ -26,7 +26,6 @@ from SoftLayer.shell import routes
 
 class ShellExit(Exception):
     """Exception raised to quit the shell."""
-    pass
 
 
 @click.command()
@@ -49,12 +48,14 @@ def cli(ctx, env):
         os.makedirs(app_path)
     complete = completer.ShellCompleter(core.cli)
 
+    session = PromptSession()
+
     while True:
         try:
-            line = p_shortcuts.prompt(
+            line = session.prompt(
                 completer=complete,
                 complete_while_typing=True,
-                auto_suggest=p_auto_suggest.AutoSuggestFromHistory(),
+                auto_suggest=AutoSuggestFromHistory(),
             )
 
             # Parse arguments

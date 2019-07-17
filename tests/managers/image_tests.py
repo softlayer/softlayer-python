@@ -145,6 +145,34 @@ class ImageTests(testing.TestCase):
                    'uri': 'someuri',
                    'operatingSystemReferenceCode': 'UBUNTU_LATEST'},))
 
+    def test_import_image_cos(self):
+        self.image.import_image_from_uri(name='test_image',
+                                         note='testimage',
+                                         uri='cos://some_uri',
+                                         os_code='UBUNTU_LATEST',
+                                         ibm_api_key='some_ibm_key',
+                                         root_key_crn='some_root_key_crn',
+                                         wrapped_dek='some_dek',
+                                         cloud_init=False,
+                                         byol=False,
+                                         is_encrypted=False
+                                         )
+
+        self.assert_called_with(
+            IMAGE_SERVICE,
+            'createFromIcos',
+            args=({'name': 'test_image',
+                   'note': 'testimage',
+                   'operatingSystemReferenceCode': 'UBUNTU_LATEST',
+                   'uri': 'cos://some_uri',
+                   'ibmApiKey': 'some_ibm_key',
+                   'crkCrn': 'some_root_key_crn',
+                   'wrappedDek': 'some_dek',
+                   'cloudInit': False,
+                   'byol': False,
+                   'isEncrypted': False
+                   },))
+
     def test_export_image(self):
         self.image.export_image_to_uri(1234, 'someuri')
 
@@ -152,4 +180,15 @@ class ImageTests(testing.TestCase):
             IMAGE_SERVICE,
             'copyToExternalSource',
             args=({'uri': 'someuri'},),
+            identifier=1234)
+
+    def test_export_image_cos(self):
+        self.image.export_image_to_uri(1234,
+                                       'cos://someuri',
+                                       ibm_api_key='someApiKey')
+
+        self.assert_called_with(
+            IMAGE_SERVICE,
+            'copyToIcos',
+            args=({'uri': 'cos://someuri', 'ibmApiKey': 'someApiKey'},),
             identifier=1234)

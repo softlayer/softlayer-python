@@ -96,7 +96,7 @@ class ReportTests(testing.TestCase):
         stripped_output = '[' + result.output.split('[', 1)[1]
         self.assertEqual([
             {
-                'name': 'pool1',
+                'hostname': 'pool1',
                 'pool': None,
                 'private_in': 30,
                 'private_out': 40,
@@ -104,7 +104,7 @@ class ReportTests(testing.TestCase):
                 'public_out': 20,
                 'type': 'pool',
             }, {
-                'name': 'pool3',
+                'hostname': 'pool3',
                 'pool': None,
                 'private_in': 30,
                 'private_out': 40,
@@ -112,7 +112,7 @@ class ReportTests(testing.TestCase):
                 'public_out': 20,
                 'type': 'pool',
             }, {
-                'name': 'host1',
+                'hostname': 'host1',
                 'pool': None,
                 'private_in': 30,
                 'private_out': 40,
@@ -120,7 +120,7 @@ class ReportTests(testing.TestCase):
                 'public_out': 20,
                 'type': 'virtual',
             }, {
-                'name': 'host3',
+                'hostname': 'host3',
                 'pool': 2,
                 'private_in': 30,
                 'private_out': 40,
@@ -128,7 +128,7 @@ class ReportTests(testing.TestCase):
                 'public_out': 20,
                 'type': 'virtual',
             }, {
-                'name': 'host1',
+                'hostname': 'host1',
                 'pool': None,
                 'private_in': 30,
                 'private_out': 40,
@@ -136,7 +136,7 @@ class ReportTests(testing.TestCase):
                 'public_out': 20,
                 'type': 'hardware',
             }, {
-                'name': 'host3',
+                'hostname': 'host3',
                 'pool': None,
                 'private_in': 30,
                 'private_out': 40,

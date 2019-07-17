@@ -16,7 +16,7 @@ class ImageManager(utils.IdentifierMixin, object):
     """Manages SoftLayer server images.
 
     See product information here:
-    https://knowledgelayer.softlayer.com/topic/image-templates
+    https://console.bluemix.net/docs/infrastructure/image-templates/image_index.html
 
     :param SoftLayer.API.BaseClient client: the client instance
     """
@@ -120,28 +120,70 @@ class ImageManager(utils.IdentifierMixin, object):
 
         return bool(name or note or tag)
 
-    def import_image_from_uri(self, name, uri, os_code=None, note=None):
+    def import_image_from_uri(self, name, uri, os_code=None, note=None,
+                              ibm_api_key=None, root_key_crn=None,
+                              wrapped_dek=None, cloud_init=False,
+                              byol=False, is_encrypted=False):
         """Import a new image from object storage.
 
         :param string name: Name of the new image
         :param string uri: The URI for an object storage object
             (.vhd/.iso file) of the format:
             swift://<objectStorageAccount>@<cluster>/<container>/<objectPath>
+            or (.vhd/.iso/.raw file) of the format:
+            cos://<regionName>/<bucketName>/<objectPath> if using IBM Cloud
+            Object Storage
         :param string os_code: The reference code of the operating system
         :param string note: Note to add to the image
+        :param string ibm_api_key: Ibm Api Key needed to communicate with ICOS
+            and your KMS
+        :param string root_key_crn: CRN of the root key in your KMS. Go to your
+            KMS (Key Protect or Hyper Protect) provider to get the CRN for your
+            root key.  An example CRN:
+            crn:v1:bluemix:public:hs-crypto:us-south:acctID:serviceID:key:keyID'
+            Used only when is_encrypted is True.
+        :param string wrapped_dek: Wrapped Data Encryption Key provided by
+            your KMS. Used only when is_encrypted is True.
+        :param boolean cloud_init: Specifies if image is cloud-init
+        :param boolean byol: Specifies if image is bring your own license
+        :param boolean is_encrypted: Specifies if image is encrypted
         """
-        return self.vgbdtg.createFromExternalSource({
-            'name': name,
-            'note': note,
-            'operatingSystemReferenceCode': os_code,
-            'uri': uri,
-        })
+        if 'cos://' in uri:
+            return self.vgbdtg.createFromIcos({
+                'name': name,
+                'note': note,
+                'operatingSystemReferenceCode': os_code,
+                'uri': uri,
+                'ibmApiKey': ibm_api_key,
+                'crkCrn': root_key_crn,
+                'wrappedDek': wrapped_dek,
+                'cloudInit': cloud_init,
+                'byol': byol,
+                'isEncrypted': is_encrypted
+            })
+        else:
+            return self.vgbdtg.createFromExternalSource({
+                'name': name,
+                'note': note,
+                'operatingSystemReferenceCode': os_code,
+                'uri': uri,
+            })
 
-    def export_image_to_uri(self, image_id, uri):
+    def export_image_to_uri(self, image_id, uri, ibm_api_key=None):
         """Export image into the given object storage
 
         :param int image_id: The ID of the image
         :param string uri: The URI for object storage of the format
             swift://<objectStorageAccount>@<cluster>/<container>/<objectPath>
+            or cos://<regionName>/<bucketName>/<objectPath> if using IBM Cloud
+            Object Storage
+        :param string ibm_api_key: Ibm Api Key needed to communicate with IBM
+            Cloud Object Storage
         """
-        return self.vgbdtg.copyToExternalSource({'uri': uri}, id=image_id)
+        if 'cos://' in uri:
+            return self.vgbdtg.copyToIcos({
+                'uri': uri,
+                'ibmApiKey': ibm_api_key
+            }, id=image_id)
+        else:
+            return self.vgbdtg.copyToExternalSource({'uri': uri}, id=image_id)

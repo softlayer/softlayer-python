@@ -96,37 +96,17 @@ class ServerCLITests(testing.TestCase):
         )
 
     def test_server_details(self):
-        result = self.run_command(['server', 'detail', '1234',
-                                   '--passwords', '--price'])
-        expected = {
-            'cores': 2,
-            'created': '2013-08-01 15:23:45',
-            'datacenter': 'TEST00',
-            'guid': '1a2b3c-1701',
-            'domain': 'test.sftlyr.ws',
-            'hostname': 'hardware-test1',
-            'fqdn': 'hardware-test1.test.sftlyr.ws',
-            'id': 1000,
-            'ipmi_ip': '10.1.0.3',
-            'memory': 2048,
-            'notes': 'These are test notes.',
-            'os': 'Ubuntu',
-            'os_version': 'Ubuntu 12.04 LTS',
-            'owner': 'chechu',
-            'prices': [{'Item': 'Total', 'Recurring Price': 16.08},
-                       {'Item': 'test', 'Recurring Price': 1}],
-            'private_ip': '10.1.0.2',
-            'public_ip': '172.16.1.100',
-            'remote users': [{'password': 'abc123', 'ipmi_username': 'root'}],
-            'status': 'ACTIVE',
-            'tags': ['test_tag'],
-            'users': [{'password': 'abc123', 'username': 'root'}],
-            'vlans': [{'id': 9653, 'number': 1800, 'type': 'PRIVATE'},
-                      {'id': 19082, 'number': 3672, 'type': 'PUBLIC'}]
-        }
+        result = self.run_command(['server', 'detail', '1234', '--passwords', '--price'])
 
         self.assert_no_fail(result)
-        self.assertEqual(expected, json.loads(result.output))
+        output = json.loads(result.output)
+        self.assertEqual(output['notes'], 'These are test notes.')
+        self.assertEqual(output['prices'][0]['Recurring Price'], 16.08)
+        self.assertEqual(output['remote users'][0]['password'], 'abc123')
+        self.assertEqual(output['users'][0]['username'], 'root')
+        self.assertEqual(output['vlans'][0]['number'], 1800)
+        self.assertEqual(output['owner'], 'chechu')
+        self.assertEqual(output['Bandwidth'][0]['Allotment'], '250')
 
     def test_detail_vs_empty_tag(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
@@ -482,6 +462,17 @@ class ServerCLITests(testing.TestCase):
                                 'createFirmwareUpdateTransaction',
                                 args=((1, 1, 1, 1)), identifier=1000)
 
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_reflash_firmware(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['server', 'reflash-firmware', '1000'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.output, "")
+        self.assert_called_with('SoftLayer_Hardware_Server',
+                                'createFirmwareReflashTransaction',
+                                args=((1, 1, 1)), identifier=1000)
+
     def test_edit(self):
         result = self.run_command(['server', 'edit',
                                    '--domain=example.com',
@@ -580,3 +571,59 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['hw', 'ready', '100', '--wait=100'])
         self.assert_no_fail(result)
         self.assertEqual(result.output, '"READY"\n')
+
+    def test_toggle_ipmi_on(self):
+        mock.return_value = True
+        result = self.run_command(['server', 'toggle-ipmi', '--enable', '12345'])
+        self.assert_no_fail(result)
+        self.assertEqual(result.output, 'True\n')
+
+    def test_toggle_ipmi_off(self):
+        mock.return_value = True
+        result = self.run_command(['server', 'toggle-ipmi', '--disable', '12345'])
+        self.assert_no_fail(result)
+        self.assertEqual(result.output, 'True\n')
+
+    def test_bandwidth_hw(self):
+        if sys.version_info < (3, 6):
+            self.skipTest("Test requires python 3.6+")
+        result = self.run_command(['server', 'bandwidth', '100', '--start_date=2019-01-01', '--end_date=2019-02-01'])
+        self.assert_no_fail(result)
+
+        date = '2019-05-20 23:00'
+        # number of characters from the end of output to break so json can parse properly
+        pivot = 157
+        # only pyhon 3.7 supports the timezone format slapi uses
+        if sys.version_info < (3, 7):
+            date = '2019-05-20T23:00:00-06:00'
+            pivot = 166
+        # Since this is 2 tables, it gets returned as invalid json like "[{}][{}]"" instead of "[[{}],[{}]]"
+        # so we just do some hacky string substitution to pull out the respective arrays that can be jsonifyied
+
+        output_summary = json.loads(result.output[0:-pivot])
+        output_list = json.loads(result.output[-pivot:])
+
+        self.assertEqual(output_summary[0]['Average MBps'], 0.3841)
+        self.assertEqual(output_summary[1]['Max Date'], date)
+        self.assertEqual(output_summary[2]['Max GB'], 0.1172)
+        self.assertEqual(output_summary[3]['Sum GB'], 0.0009)
+
+        self.assertEqual(output_list[0]['Date'], date)
+        self.assertEqual(output_list[0]['Pub In'], 1.3503)
+
+    def test_bandwidth_hw_quite(self):
+        result = self.run_command(['server', 'bandwidth', '100', '--start_date=2019-01-01',
+                                   '--end_date=2019-02-01', '-q'])
+        self.assert_no_fail(result)
+        date = '2019-05-20 23:00'
+
+        # only pyhon 3.7 supports the timezone format slapi uses
+        if sys.version_info < (3, 7):
+            date = '2019-05-20T23:00:00-06:00'
+
+        output_summary = json.loads(result.output)
+
+        self.assertEqual(output_summary[0]['Average MBps'], 0.3841)
+        self.assertEqual(output_summary[1]['Max Date'], date)
+        self.assertEqual(output_summary[2]['Max GB'], 0.1172)
+        self.assertEqual(output_summary[3]['Sum GB'], 0.0009)

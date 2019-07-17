@@ -15,7 +15,12 @@ COLUMNS = ['id',
            'ethertype',
            'portRangeMin',
            'portRangeMax',
-           'protocol']
+           'protocol',
+           'createDate',
+           'modifyDate']
+
+REQUEST_BOOL_COLUMNS = ['requestId', 'response']
+REQUEST_RULES_COLUMNS = ['requestId', 'rules']
 
 
 @click.command()
@@ -49,7 +54,9 @@ def rule_list(env, securitygroup_id, sortby):
             rule.get('ethertype') or formatting.blank(),
             port_min,
             port_max,
-            rule.get('protocol') or formatting.blank()
+            rule.get('protocol') or formatting.blank(),
+            rule.get('createDate') or formatting.blank(),
+            rule.get('modifyDate') or formatting.blank()
         ])
 
     env.fout(table)
@@ -105,6 +112,11 @@ def add(env, securitygroup_id, remote_ip, remote_group,
     if not ret:
         raise exceptions.CLIAbort("Failed to add security group rule")
 
+    table = formatting.Table(REQUEST_RULES_COLUMNS)
+    table.add_row([ret['requestId'], str(ret['rules'])])
+
+    env.fout(table)
+
 
 @click.command()
 @click.argument('securitygroup_id')
@@ -145,8 +157,15 @@ def edit(env, securitygroup_id, rule_id, remote_ip, remote_group,
     if protocol:
         data['protocol'] = protocol
 
-    if not mgr.edit_securitygroup_rule(securitygroup_id, rule_id, **data):
+    ret = mgr.edit_securitygroup_rule(securitygroup_id, rule_id, **data)
+
+    if not ret:
         raise exceptions.CLIAbort("Failed to edit security group rule")
+
+    table = formatting.Table(REQUEST_BOOL_COLUMNS)
+    table.add_row([ret['requestId']])
+
+    env.fout(table)
 
 
 @click.command()
@@ -156,5 +175,13 @@ def edit(env, securitygroup_id, rule_id, remote_ip, remote_group,
 def remove(env, securitygroup_id, rule_id):
     """Remove a rule from a security group."""
     mgr = SoftLayer.NetworkManager(env.client)
-    if not mgr.remove_securitygroup_rule(securitygroup_id, rule_id):
+
+    ret = mgr.remove_securitygroup_rule(securitygroup_id, rule_id)
+
+    if not ret:
         raise exceptions.CLIAbort("Failed to remove security group rule")
+
+    table = formatting.Table(REQUEST_BOOL_COLUMNS)
+    table.add_row([ret['requestId']])
+
+    env.fout(table)

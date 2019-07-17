@@ -14,6 +14,8 @@ COLUMNS = ['networkComponentId',
            'interface',
            'ipAddress', ]
 
+REQUEST_COLUMNS = ['requestId']
+
 
 @click.command()
 @click.argument('securitygroup_id')
@@ -90,10 +92,15 @@ def add(env, securitygroup_id, network_component, server, interface):
     mgr = SoftLayer.NetworkManager(env.client)
     component_id = _get_component_id(env, network_component, server, interface)
 
-    success = mgr.attach_securitygroup_component(securitygroup_id,
-                                                 component_id)
-    if not success:
+    ret = mgr.attach_securitygroup_component(securitygroup_id,
+                                             component_id)
+    if not ret:
         raise exceptions.CLIAbort("Could not attach network component")
+
+    table = formatting.Table(REQUEST_COLUMNS)
+    table.add_row([ret['requestId']])
+
+    env.fout(table)
 
 
 @click.command()
@@ -113,10 +120,15 @@ def remove(env, securitygroup_id, network_component, server, interface):
     mgr = SoftLayer.NetworkManager(env.client)
     component_id = _get_component_id(env, network_component, server, interface)
 
-    success = mgr.detach_securitygroup_component(securitygroup_id,
-                                                 component_id)
-    if not success:
+    ret = mgr.detach_securitygroup_component(securitygroup_id,
+                                             component_id)
+    if not ret:
         raise exceptions.CLIAbort("Could not detach network component")
+
+    table = formatting.Table(REQUEST_COLUMNS)
+    table.add_row([ret['requestId']])
+
+    env.fout(table)
 
 
 def _validate_args(network_component, server, interface):

@@ -666,7 +666,6 @@ SAAS_PACKAGE = {
     ]
 }
 
-
 SAAS_REST_PACKAGE = {
     'categories': [
         {'categoryCode': 'storage_as_a_service'}
@@ -790,134 +789,155 @@ getAllObjects = [{
 getItems = [
     {
         'id': 1234,
+        'keyName': 'KeyName01',
         'capacity': '1000',
         'description': 'Public & Private Networks',
         'itemCategory': {'categoryCode': 'Uplink Port Speeds'},
         'prices': [{'id': 1122,
+                    'hourlyRecurringFee': 0.0,
                     'categories': [{'id': 26,
                                     'name': 'Uplink Port Speeds',
                                     'categoryCode': 'port_speed'}]}],
     },
     {
         'id': 2233,
+        'keyName': 'KeyName02',
         'capacity': '1000',
         'description': 'Public & Private Networks',
         'itemCategory': {'categoryCode': 'Uplink Port Speeds'},
         'prices': [{'id': 4477,
+                    'hourlyRecurringFee': 0.0,
                     'categories': [{'id': 26,
                                     'name': 'Uplink Port Speeds',
                                     'categoryCode': 'port_speed'}]}],
     },
     {
         'id': 1239,
+        'keyName': 'KeyName03',
         'capacity': '2',
         'description': 'RAM',
         'itemCategory': {'categoryCode': 'RAM'},
         'prices': [{'id': 1133,
+                    'hourlyRecurringFee': 0.0,
                     'categories': [{'id': 3,
                                     'name': 'RAM',
                                     'categoryCode': 'ram'}]}],
     },
     {
         'id': 1240,
+        'keyName': 'KeyName014',
         'capacity': '4',
         'units': 'PRIVATE_CORE',
         'description': 'Computing Instance (Dedicated)',
         'itemCategory': {'categoryCode': 'Computing Instance'},
         'prices': [{'id': 1007,
+                    'hourlyRecurringFee': 0.0,
                     'categories': [{'id': 80,
                                     'name': 'Computing Instance',
                                     'categoryCode': 'guest_core'}]}],
     },
     {
         'id': 1250,
+        'keyName': 'KeyName015',
         'capacity': '4',
         'units': 'CORE',
         'description': 'Computing Instance',
         'itemCategory': {'categoryCode': 'Computing Instance'},
         'prices': [{'id': 1144,
                     'locationGroupId': None,
+                    'hourlyRecurringFee': 0.0,
                     'categories': [{'id': 80,
                                     'name': 'Computing Instance',
                                     'categoryCode': 'guest_core'}]}],
     },
     {
         'id': 112233,
+        'keyName': 'KeyName016',
         'capacity': '55',
         'units': 'CORE',
         'description': 'Computing Instance',
         'itemCategory': {'categoryCode': 'Computing Instance'},
         'prices': [{'id': 332211,
                     'locationGroupId': 1,
+                    'hourlyRecurringFee': 0.0,
                     'categories': [{'id': 80,
                                     'name': 'Computing Instance',
                                     'categoryCode': 'guest_core'}]}],
     },
     {
         'id': 4439,
+        'keyName': 'KeyName017',
         'capacity': '1',
         'description': '1 GB iSCSI Storage',
         'itemCategory': {'categoryCode': 'iscsi'},
-        'prices': [{'id': 2222}],
+        'prices': [{'id': 2222, 'hourlyRecurringFee': 0.0}],
     },
     {
         'id': 1121,
+        'keyName': 'KeyName081',
         'capacity': '20',
         'description': '20 GB iSCSI snapshot',
         'itemCategory': {'categoryCode': 'iscsi_snapshot_space'},
-        'prices': [{'id': 2014}],
+        'prices': [{'id': 2014, 'hourlyRecurringFee': 0.0}],
     },
     {
         'id': 4440,
+        'keyName': 'KeyName019',
         'capacity': '4',
         'description': '4 Portable Public IP Addresses',
         'itemCategory': {'categoryCode': 'sov_sec_ip_addresses_pub'},
-        'prices': [{'id': 4444}],
+        'prices': [{'id': 4444, 'hourlyRecurringFee': 0.0}],
     },
     {
         'id': 8880,
+        'keyName': 'KeyName0199',
         'capacity': '8',
         'description': '8 Portable Public IP Addresses',
         'itemCategory': {'categoryCode': 'sov_sec_ip_addresses_pub'},
-        'prices': [{'id': 8888}],
+        'prices': [{'id': 8888, 'hourlyRecurringFee': 0.0}],
     },
     {
         'id': 44400,
+        'keyName': 'KeyName0155',
         'capacity': '4',
         'description': '4 Portable Private IP Addresses',
         'itemCategory': {'categoryCode': 'sov_sec_ip_addresses_priv'},
-        'prices': [{'id': 44441}],
+        'prices': [{'id': 44441, 'hourlyRecurringFee': 0.0}],
     },
     {
         'id': 88800,
+        'keyName': 'KeyName0144',
         'capacity': '8',
         'description': '8 Portable Private IP Addresses',
         'itemCategory': {'categoryCode': 'sov_sec_ip_addresses_priv'},
-        'prices': [{'id': 88881}],
+        'prices': [{'id': 88881, 'hourlyRecurringFee': 0.0}],
     },
     {
         'id': 10,
+        'keyName': 'KeyName0341',
         'capacity': '0',
         'description': 'Global IPv4',
         'itemCategory': {'categoryCode': 'global_ipv4'},
-        'prices': [{'id': 11}],
+        'prices': [{'id': 11, 'hourlyRecurringFee': 0.0}],
     },
     {
         'id': 66464,
+        'keyName': 'KeyName0211',
         'capacity': '64',
         'description': '/64 Block Portable Public IPv6 Addresses',
         'itemCategory': {'categoryCode': 'static_ipv6_addresses'},
-        'prices': [{'id': 664641}],
+        'prices': [{'id': 664641, 'hourlyRecurringFee': 0.0}],
     },
     {
         'id': 610,
+        'keyName': 'KeyName031',
         'capacity': '0',
         'description': 'Global IPv6',
         'itemCategory': {'categoryCode': 'global_ipv6'},
-        'prices': [{'id': 611}],
+        'prices': [{'id': 611, 'hourlyRecurringFee': 0.0}],
     }]
 
-getItemPrices = [
+getItemPricesISCSI = [
     {
         'currentPriceFlag': '',
         'id': 2152,
@@ -1133,12 +1153,14 @@ getAllObjectsDH = [{
         "bundleItems": [
             {
                 "capacity": "1200",
+                "keyName": "1_4_TB_LOCAL_STORAGE_DEDICATED_HOST_CAPACITY",
                 "categories": [{
                     "categoryCode": "dedicated_host_disk"
                 }]
             },
             {
                 "capacity": "242",
+                "keyName": "242_GB_RAM",
                 "categories": [{
                     "categoryCode": "dedicated_host_ram"
                 }]
@@ -1218,6 +1240,110 @@ getAllObjectsDH = [{
     "description": "Dedicated Host"
 }]
 
+getAllObjectsDHGpu = [{
+    "subDescription": "Dedicated Host",
+    "name": "Dedicated Host",
+    "items": [{
+        "capacity": "56",
+        "description": "56 Cores x 360 RAM x 1.2 TB x 2 GPU P100 [encryption enabled]",
+        "bundleItems": [
+            {
+                "capacity": "1200",
+                "keyName": "1.2 TB Local Storage (Dedicated Host Capacity)",
+                "categories": [{
+                    "categoryCode": "dedicated_host_disk"
+                }]
+            },
+            {
+                "capacity": "242",
+                "keyName": "2_GPU_P100_DEDICATED",
+                "hardwareGenericComponentModel": {
+                    "capacity": "16",
+                    "id": 849,
+                    "hardwareComponentType": {
+                        "id": 20,
+                        "keyName": "GPU"
+                    }
+                },
+                "categories": [{
+                    "categoryCode": "dedicated_host_ram"
+                }]
+            }
+        ],
+        "prices": [
+            {
+                "itemId": 10195,
+                "setupFee": "0",
+                "recurringFee": "2099",
+                "tierMinimumThreshold": "",
+                "hourlyRecurringFee": "3.164",
+                "oneTimeFee": "0",
+                "currentPriceFlag": "",
+                "id": 200269,
+                "sort": 0,
+                "onSaleFlag": "",
+                "laborFee": "0",
+                "locationGroupId": "",
+                "quantity": ""
+            },
+            {
+                "itemId": 10195,
+                "setupFee": "0",
+                "recurringFee": "2161.97",
+                "tierMinimumThreshold": "",
+                "hourlyRecurringFee": "3.258",
+                "oneTimeFee": "0",
+                "currentPriceFlag": "",
+                "id": 200271,
+                "sort": 0,
+                "onSaleFlag": "",
+                "laborFee": "0",
+                "locationGroupId": 503,
+                "quantity": ""
+            }
+        ],
+        "keyName": "56_CORES_X_484_RAM_X_1_5_TB_X_2_GPU_P100",
+        "id": 10195,
+        "itemCategory": {
+            "categoryCode": "dedicated_virtual_hosts"
+        }
+    }],
+    "keyName": "DEDICATED_HOST",
+    "unitSize": "",
+    "regions": [{
+        "location": {
+            "locationPackageDetails": [{
+                "isAvailable": 1,
+                "locationId": 138124,
+                "packageId": 813
+            }],
+            "location": {
+                "statusId": 2,
+                "priceGroups": [{
+                    "locationGroupTypeId": 82,
+                    "description": "CDN - North America - Akamai",
+                    "locationGroupType": {
+                        "name": "PRICING"
+                    },
+                    "securityLevelId": "",
+                    "id": 1463,
+                    "name": "NORTH-AMERICA-AKAMAI"
+                }],
+                "id": 138124,
+                "name": "dal05",
+                "longName": "Dallas 5"
+            }
+        },
+        "keyname": "DALLAS05",
+        "description": "DAL05 - Dallas",
+        "sortOrder": 12
+    }],
+    "firstOrderStepId": "",
+    "id": 813,
+    "isActive": 1,
+    "description": "Dedicated Host"
+}]
+
 getRegions = [{
     "description": "WDC07 - Washington, DC",
     "keyname": "WASHINGTON07",
@@ -1235,3 +1361,292 @@ getRegions = [{
         }]
     }]
 }]
+
+getItemPrices = [
+    {
+        "hourlyRecurringFee": ".093",
+        "id": 204015,
+        "recurringFee": "62",
+        "categories": [
+            {
+                "categoryCode": "guest_core"
+            }
+        ],
+        "item": {
+            "description": "4 x 2.0 GHz or higher Cores",
+            "id": 859,
+            "keyName": "GUEST_CORES_4",
+        },
+        "pricingLocationGroup": {
+            "id": 503,
+            "locations": [
+                {
+                    "id": 449610,
+                    "longName": "Montreal 1",
+                    "name": "mon01",
+                    "statusId": 2
+                },
+                {
+                    "id": 449618,
+                    "longName": "Montreal 2",
+                    "name": "mon02",
+                    "statusId": 2
+                },
+                {
+                    "id": 448994,
+                    "longName": "Toronto 1",
+                    "name": "tor01",
+                    "statusId": 2
+                },
+                {
+                    "id": 350993,
+                    "longName": "Toronto 2",
+                    "name": "tor02",
+                    "statusId": 2
+                },
+                {
+                    "id": 221894,
+                    "longName": "Amsterdam 2",
+                    "name": "ams02",
+                    "statusId": 2
+                },
+                {
+                    "id": 265592,
+                    "longName": "Amsterdam 1",
+                    "name": "ams01",
+                    "statusId": 2
+                },
+                {
+                    "id": 814994,
+                    "longName": "Amsterdam 3",
+                    "name": "ams03",
+                    "statusId": 2
+                }
+            ]
+        }
+    },
+    {
+        "hourlyRecurringFee": ".006",
+        "id": 204663,
+        "recurringFee": "4.1",
+        "item": {
+            "description": "100 GB (LOCAL)",
+            "id": 3899,
+            "keyName": "GUEST_DISK_100_GB_LOCAL_3",
+        },
+        "pricingLocationGroup": {
+            "id": 503,
+            "locations": [
+                {
+                    "id": 449610,
+                    "longName": "Montreal 1",
+                    "name": "mon01",
+                    "statusId": 2
+                },
+                {
+                    "id": 449618,
+                    "longName": "Montreal 2",
+                    "name": "mon02",
+                    "statusId": 2
+                },
+                {
+                    "id": 448994,
+                    "longName": "Toronto 1",
+                    "name": "tor01",
+                    "statusId": 2
+                },
+                {
+                    "id": 350993,
+                    "longName": "Toronto 2",
+                    "name": "tor02",
+                    "statusId": 2
+                },
+                {
+                    "id": 221894,
+                    "longName": "Amsterdam 2",
+                    "name": "ams02",
+                    "statusId": 2
+                },
+                {
+                    "id": 265592,
+                    "longName": "Amsterdam 1",
+                    "name": "ams01",
+                    "statusId": 2
+                },
+                {
+                    "id": 814994,
+                    "longName": "Amsterdam 3",
+                    "name": "ams03",
+                    "statusId": 2
+                }
+            ]
+        }
+    },
+    {
+        "hourlyRecurringFee": ".217",
+        "id": 204255,
+        "recurringFee": "144",
+        "item": {
+            "description": "16 GB ",
+            "id": 1017,
+            "keyName": "RAM_16_GB",
+        },
+        "pricingLocationGroup": {
+            "id": 503,
+            "locations": [
+                {
+                    "id": 449610,
+                    "longName": "Montreal 1",
+                    "name": "mon01",
+                    "statusId": 2
+                },
+                {
+                    "id": 449618,
+                    "longName": "Montreal 2",
+                    "name": "mon02",
+                    "statusId": 2
+                },
+                {
+                    "id": 448994,
+                    "longName": "Toronto 1",
+                    "name": "tor01",
+                    "statusId": 2
+                },
+                {
+                    "id": 350993,
+                    "longName": "Toronto 2",
+                    "name": "tor02",
+                    "statusId": 2
+                },
+                {
+                    "id": 221894,
+                    "longName": "Amsterdam 2",
+                    "name": "ams02",
+                    "statusId": 2
+                },
+                {
+                    "id": 265592,
+                    "longName": "Amsterdam 1",
+                    "name": "ams01",
+                    "statusId": 2
+                },
+                {
+                    "id": 814994,
+                    "longName": "Amsterdam 3",
+                    "name": "ams03",
+                    "statusId": 2
+                }
+            ]
+        }
+    }
+]
+getActivePresets = [
+    {
+        "description": "M1.64x512x25",
+        "id": 799,
+        "isActive": "1",
+        "keyName": "M1_64X512X25",
+        "name": "M1.64x512x25",
+        "packageId": 835
+    },
+    {
+        "description": "M1.56x448x100",
+        "id": 797,
+        "isActive": "1",
+        "keyName": "M1_56X448X100",
+        "name": "M1.56x448x100",
+        "packageId": 835
+    },
+    {
+        "description": "M1.64x512x100",
+        "id": 801,
+        "isActive": "1",
+        "keyName": "M1_64X512X100",
+        "name": "M1.64x512x100",
+        "packageId": 835
+    }
+]
+
+getAccountRestrictedActivePresets = []
+
+RESERVED_CAPACITY = [{"id": 1059}]
+getItems_RESERVED_CAPACITY = [
+    {
+        'id': 12273,
+        'keyName': 'B1_1X2_1_YEAR_TERM',
+        'description': 'B1 1x2 1 year term',
+        'capacity': 12,
+        'itemCategory': {
+            'categoryCode': 'reserved_capacity',
+            'id': 2060,
+            'name': 'Reserved Capacity',
+            'quantityLimit': 20,
+            'sortOrder': ''
+        },
+        'prices': [
+            {
+                'currentPriceFlag': '',
+                'hourlyRecurringFee': '.032',
+                'id': 217561,
+                'itemId': 12273,
+                'laborFee': '0',
+                'locationGroupId': '',
+                'onSaleFlag': '',
+                'oneTimeFee': '0',
+                'quantity': '',
+                'setupFee': '0',
+                'sort': 0,
+                'tierMinimumThreshold': '',
+                'categories': [
+                    {
+                        'categoryCode': 'reserved_capacity',
+                        'id': 2060,
+                        'name': 'Reserved Capacity',
+                        'quantityLimit': 20,
+                        'sortOrder': ''
+                    }
+                ]
+            }
+        ]
+    }
+]
+
+getItems_1_IPV6_ADDRESS = [
+    {
+        'id': 4097,
+        'keyName': '1_IPV6_ADDRESS',
+        'itemCategory': {
+            'categoryCode': 'pri_ipv6_addresses',
+            'id': 325,
+            'name': 'Primary IPv6 Addresses',
+            'quantityLimit': 0,
+            'sortOrder': 34
+        },
+        'prices': [
+            {
+                'currentPriceFlag': '',
+                'hourlyRecurringFee': '0',
+                'id': 17129,
+                'itemId': 4097,
+                'laborFee': '0',
+                'locationGroupId': '',
+                'onSaleFlag': '',
+                'oneTimeFee': '0',
+                'quantity': '',
+                'recurringFee': '0',
+                'setupFee': '0',
+                'sort': 0,
+                'tierMinimumThreshold': '',
+                'categories': [
+                    {
+                        'categoryCode': 'pri_ipv6_addresses',
+                        'id': 325,
+                        'name': 'Primary IPv6 Addresses',
+                        'quantityLimit': 0,
+                        'sortOrder': 34
+                    }
+                ]
+            }
+        ]
+    }
+]

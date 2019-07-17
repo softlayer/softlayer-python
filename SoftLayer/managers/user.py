@@ -243,7 +243,15 @@ class UserManager(utils.IdentifierMixin, object):
         :param dictionary user_object: https://softlayer.github.io/reference/datatypes/SoftLayer_User_Customer/
         """
         LOGGER.warning("Creating User %s", user_object['username'])
-        return self.user_service.createObject(user_object, password, None)
+
+        try:
+            return self.user_service.createObject(user_object, password, None)
+        except exceptions.SoftLayerAPIError as ex:
+            if ex.faultCode == "SoftLayer_Exception_User_Customer_DelegateIamIdInvitationToPaas":
+                raise exceptions.SoftLayerError("Your request for a new user was received, but it needs to be "
+                                                "processed by the Platform Services API first. Barring any errors on "
+                                                "the Platform Services side, your new user should be created shortly.")
+            raise
 
     def edit_user(self, user_id, user_object):
         """Blindly sends user_object to SoftLayer_User_Customer::editObject

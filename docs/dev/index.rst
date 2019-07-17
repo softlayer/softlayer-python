@@ -87,6 +87,33 @@ is:
   py.test tests
 
 
+Fixtures
+~~~~~~~~
+
+Testing of this project relies quite heavily on fixtures to simulate API calls. When running the unit tests, we use the FixtureTransport class, which instead of making actual API calls, loads data from `/fixtures/SoftLayer_Service_Name.py` and tries to find a variable that matches the method you are calling.
+
+When adding new Fixtures you should try to sanitize the data of any account identifiying results, such as account ids, username, and that sort of thing. It is ok to leave the id in place for things like datacenter ids, price ids. 
+
+To Overwrite a fixture, you can use a mock object to do so. Like either of these two methods:
+
+::
+
+    # From tests/CLI/modules/vs_capacity_tests.py
+    from SoftLayer.fixtures import SoftLayer_Product_Package
+
+    def test_create_test(self):
+        item_mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
+        item_mock.return_value = SoftLayer_Product_Package.getItems_RESERVED_CAPACITY
+
+    def test_detail_pending(self):
+        capacity_mock = self.set_mock('SoftLayer_Virtual_ReservedCapacityGroup', 'getObject')
+        get_object = {
+            'name': 'test-capacity',
+            'instances': []
+        }
+        capacity_mock.return_value = get_object
+
+
 Documentation
 -------------
 The project is documented in
@@ -106,6 +133,7 @@ fabric, use the following commands.
 
   cd docs
   make html
+  sphinx-build -b html ./  ./html
 
 The primary docs are built at
 `Read the Docs <http://softlayer-python.readthedocs.org/>`_.
@@ -120,6 +148,17 @@ Flake8, with project-specific exceptions, can be run by using tox:
 ::
 
   tox -e analysis
+
+Autopep8 can fix a lot of the simple flake8 errors about whitespace and indention. 
+
+::
+
+  autopep8 -r  -a -v -i --max-line-length 119
+
+
+
+
+
 
 
 Contributing

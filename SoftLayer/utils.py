@@ -7,6 +7,7 @@
 """
 import datetime
 import re
+import time
 
 import six
 
@@ -121,8 +122,72 @@ def query_filter_date(start, end):
     return {
         'operation': 'betweenDate',
         'options': [
-            {'name': 'startDate', 'value': [startdate+' 0:0:0']},
-            {'name': 'endDate', 'value': [enddate+' 0:0:0']}
+            {'name': 'startDate', 'value': [startdate + ' 0:0:0']},
+            {'name': 'endDate', 'value': [enddate + ' 0:0:0']}
+        ]
+    }
+
+
+def format_event_log_date(date_string, utc):
+    """Gets a date in the format that the SoftLayer_EventLog object likes.
+
+    :param string date_string: date in mm/dd/yyyy format
+    :param string utc: utc offset. Defaults to '+0000'
+    """
+    user_date_format = "%m/%d/%Y"
+
+    user_date = datetime.datetime.strptime(date_string, user_date_format)
+    dirty_time = user_date.isoformat()
+
+    if utc is None:
+        utc = "+0000"
+
+    iso_time_zone = utc[:3] + ':' + utc[3:]
+    cleaned_time = "{}.000000{}".format(dirty_time, iso_time_zone)
+
+    return cleaned_time
+
+
+def event_log_filter_between_date(start, end, utc):
+    """betweenDate Query filter that SoftLayer_EventLog likes
+
+    :param string start: lower bound date in mm/dd/yyyy format
+    :param string end: upper bound date in mm/dd/yyyy format
+    :param string utc: utc offset. Defaults to '+0000'
+    """
+    return {
+        'operation': 'betweenDate',
+        'options': [
+            {'name': 'startDate', 'value': [format_event_log_date(start, utc)]},
+            {'name': 'endDate', 'value': [format_event_log_date(end, utc)]}
+        ]
+    }
+
+
+def event_log_filter_greater_than_date(date, utc):
+    """greaterThanDate Query filter that SoftLayer_EventLog likes
+
+    :param string date: lower bound date in mm/dd/yyyy format
+    :param string utc: utc offset. Defaults to '+0000'
+    """
+    return {
+        'operation': 'greaterThanDate',
+        'options': [
+            {'name': 'date', 'value': [format_event_log_date(date, utc)]}
+        ]
+    }
+
+
+def event_log_filter_less_than_date(date, utc):
+    """lessThanDate Query filter that SoftLayer_EventLog likes
+
+    :param string date: upper bound date in mm/dd/yyyy format
+    :param string utc: utc offset. Defaults to '+0000'
+    """
+    return {
+        'operation': 'lessThanDate',
+        'options': [
+            {'name': 'date', 'value': [format_event_log_date(date, utc)]}
         ]
     }
 
@@ -224,3 +289,53 @@ def clean_string(string):
         return ''
     else:
         return " ".join(string.split())
+
+
+def clean_splitlines(string):
+    """Returns a string where \r\n is replaced with \n"""
+    if string is None:
+        return ''
+    else:
+        return "\n".join(string.splitlines())
+
+
+def clean_time(sltime, in_format='%Y-%m-%dT%H:%M:%S%z', out_format='%Y-%m-%d %H:%M'):
+    """Easy way to format time strings
+
+    :param string sltime: A softlayer formatted time string
+    :param string in_format: Datetime format for strptime
+    :param string out_format: Datetime format for strftime
+    """
+    try:
+        clean = datetime.datetime.strptime(sltime, in_format)
+        return clean.strftime(out_format)
+    # The %z option only exists with py3.6+
+    except ValueError:
+        return sltime
+
+
+def timestamp(date):
+    """Converts a datetime to timestamp
+
+    :param datetime date:
+    :returns int: The timestamp of date.
+    """
+
+    _timestamp = time.mktime(date.timetuple())
+
+    return int(_timestamp)
+
+
+def days_to_datetime(days):
+    """Returns the datetime value of last N days.
+
+    :param int days: From 0 to N days
+    :returns int: The datetime of last N days or datetime.now() if days <= 0.
+    """
+
+    date = datetime.datetime.now()
+
+    if days > 0:
+        date -= datetime.timedelta(days=days)
+
+    return date

@@ -40,7 +40,7 @@ class TicketManager(utils.IdentifierMixin, object):
             else:
                 raise ValueError("open_status and closed_status cannot both be False")
 
-        return self.client.call('Account', call, mask=mask)
+        return self.client.call('Account', call, mask=mask, iter=True)
 
     def list_subjects(self):
         """List all ticket subjects."""
@@ -68,7 +68,6 @@ class TicketManager(utils.IdentifierMixin, object):
         current_user = self.account.getCurrentUser()
         new_ticket = {
             'subjectId': subject,
-            'contents': body,
             'assignedUserId': current_user['id'],
             'title': title,
         }

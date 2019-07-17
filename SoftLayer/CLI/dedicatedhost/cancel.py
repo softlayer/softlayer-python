@@ -1,4 +1,4 @@
-"""Cancel a dedicated server."""
+"""Cancel a dedicated host."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -12,17 +12,17 @@ from SoftLayer.CLI import helpers
 
 @click.command()
 @click.argument('identifier')
-@click.option('--immediate',
-              is_flag=True,
-              default=True,
-              help="Cancels the server immediately (instead of on the billing anniversary)")
-@click.option('--comment',
-              help="An optional comment to add to the cancellation ticket")
-@click.option('--reason',
-              help="An optional cancellation reason. See cancel-reasons for a list of available options")
 @environment.pass_env
-def cli(env, identifier, immediate, comment, reason):
-    """Cancel a dedicated server."""
-    immediate = True  # Enforce immediate cancellation
+def cli(env, identifier):
+    """Cancel a dedicated host server immediately"""
+
     mgr = SoftLayer.DedicatedHostManager(env.client)
-    mgr.cancel_host(identifier, reason, comment, immediate)
+
+    host_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'dedicated host')
+
+    if not (env.skip_confirmations or formatting.no_going_back(host_id)):
+        raise exceptions.CLIAbort('Aborted')
+
+    mgr.cancel_host(host_id)
+
+    click.secho('Dedicated Host %s was cancelled' % host_id, fg='green')

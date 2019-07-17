@@ -11,12 +11,10 @@ from SoftLayer.CLI import environment
 
 @click.command()
 @click.argument('context_id', type=int)
-# todo: Update to utilize custom IP address type
 @click.option('-s',
               '--static-ip',
               required=True,
               help='Static IP address value')
-# todo: Update to utilize custom IP address type
 @click.option('-r',
               '--remote-ip',
               required=True,

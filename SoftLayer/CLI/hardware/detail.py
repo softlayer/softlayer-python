@@ -80,6 +80,10 @@ def cli(env, identifier, passwords, price, output_json, verbose):
 
     table.add_row(['vlans', vlan_table])
 
+    bandwidth = hardware.get_bandwidth_allocation(hardware_id)
+    bw_table = _bw_table(bandwidth)
+    table.add_row(['Bandwidth', bw_table])
+
     if result.get('notes'):
         table.add_row(['notes', result['notes']])
 
@@ -108,3 +112,17 @@ def cli(env, identifier, passwords, price, output_json, verbose):
     table.add_row(['tags', formatting.tags(result['tagReferences'])])
 
     env.fout(table)
+
+
+def _bw_table(bw_data):
+    """Generates a bandwidth useage table"""
+    table = formatting.Table(['Type', 'In GB', 'Out GB', 'Allotment'])
+    for bw_point in bw_data.get('useage'):
+        bw_type = 'Private'
+        allotment = 'N/A'
+        if bw_point['type']['alias'] == 'PUBLIC_SERVER_BW':
+            bw_type = 'Public'
+            allotment = bw_data['allotment'].get('amount', '-')
+
+        table.add_row([bw_type, bw_point['amountIn'], bw_point['amountOut'], allotment])
+    return table

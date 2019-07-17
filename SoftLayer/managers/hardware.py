@@ -92,7 +92,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         billing_id = hw_billing['billingItem']['id']
 
         if immediate and not hw_billing['hourlyBillingFlag']:
-            LOGGER.warning("Immediate cancelation of montly servers is not guaranteed. " +
+            LOGGER.warning("Immediate cancelation of montly servers is not guaranteed."
                            "Please check the cancelation ticket for updates.")
 
             result = self.client.call('Billing_Item', 'cancelItem',
@@ -268,7 +268,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         """Perform an OS reload of a server with its current configuration.
 
         :param integer hardware_id: the instance ID to reload
-        :param string post_url: The URI of the post-install script to run
+        :param string post_uri: The URI of the post-install script to run
                                 after reload
         :param list ssh_keys: The SSH keys to add to the root user
         """
@@ -658,6 +658,31 @@ class HardwareManager(utils.IdentifierMixin, object):
         return self.hardware.createFirmwareUpdateTransaction(
             bool(ipmi), bool(raid_controller), bool(bios), bool(hard_drive), id=hardware_id)
 
+    def reflash_firmware(self,
+                         hardware_id,
+                         ipmi=True,
+                         raid_controller=True,
+                         bios=True):
+        """Reflash hardware firmware.
+
+        This will cause the server to be unavailable for ~60 minutes.
+        The firmware will not be upgraded but rather reflashed to the version installed.
+
+        :param int hardware_id: The ID of the hardware to have its firmware
+                                reflashed.
+        :param bool ipmi: Reflash the ipmi firmware.
+        :param bool raid_controller: Reflash the raid controller firmware.
+        :param bool bios: Reflash the bios firmware.
+
+        Example::
+
+            # Check the servers active transactions to see progress
+            result = mgr.reflash_firmware(hardware_id=1234)
+        """
+
+        return self.hardware.createFirmwareReflashTransaction(
+            bool(ipmi), bool(raid_controller), bool(bios), id=hardware_id)
+
     def wait_for_ready(self, instance_id, limit=14400, delay=10, pending=False):
         """Determine if a Server is ready.
 
@@ -683,6 +708,40 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         LOGGER.info("Waiting for %d expired.", instance_id)
         return False
+
+    def get_tracking_id(self, instance_id):
+        """Returns the Metric Tracking Object Id for a hardware server
+
+        :param int instance_id: Id of the hardware server
+        """
+        return self.hardware.getMetricTrackingObjectId(id=instance_id)
+
+    def get_bandwidth_data(self, instance_id, start_date=None, end_date=None, direction=None, rollup=3600):
+        """Gets bandwidth data for a server
+
+        Will get averaged bandwidth data for a given time period. If you use a rollup over 3600 be aware
+        that the API will bump your start/end date to align with how data is stored. For example if you
+        have a rollup of 86400 your start_date will be bumped to 00:00. If you are not using a time in the
+        start/end date fields, this won't really matter.
+
+        :param int instance_id: Hardware Id to get data for
+        :param date start_date: Date to start pulling data for.
+        :param date end_date: Date to finish pulling data for
+        :param string direction: Can be either 'public', 'private', or None for both.
+        :param int rollup: 300, 600, 1800, 3600, 43200 or 86400 seconds to average data over.
+        """
+        tracking_id = self.get_tracking_id(instance_id)
+        data = self.client.call('Metric_Tracking_Object', 'getBandwidthData', start_date, end_date, direction,
+                                rollup, id=tracking_id, iter=True)
+        return data
+
+    def get_bandwidth_allocation(self, instance_id):
+        """Combines getBandwidthAllotmentDetail() and getBillingCycleBandwidthUsage() """
+        a_mask = "mask[allocation[amount]]"
+        allotment = self.client.call('Hardware_Server', 'getBandwidthAllotmentDetail', id=instance_id, mask=a_mask)
+        u_mask = "mask[amountIn,amountOut,type]"
+        useage = self.client.call('Hardware_Server', 'getBillingCycleBandwidthUsage', id=instance_id, mask=u_mask)
+        return {'allotment': allotment['allocation'], 'useage': useage}
 
 
 def _get_extra_price_id(items, key_name, hourly, location):
