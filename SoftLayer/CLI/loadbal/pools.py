@@ -2,7 +2,7 @@
 import click
 
 import SoftLayer
-from SoftLayer.CLI import environment, formatting, helpers
+from SoftLayer.CLI import environment, formatting, helpers, exceptions
 from SoftLayer.exceptions import SoftLayerAPIError
 from SoftLayer import utils
 from pprint import pprint as pp 
@@ -25,6 +25,7 @@ def sticky_option(ctx, param, value):
               type=click.Choice(['ROUNDROBIN', 'LEASTCONNECTION', 'WEIGHTED_RR']))
 @click.option('--connections', '-c', type=int, help="Maximum number of connections to allow.")
 @click.option('--sticky', '-s', is_flag=True, callback=sticky_option, help="Make sessions sticky based on source_ip.")
+@click.option('--sslCert', '-x', help="SSL certificate ID. See `slcli ssl list`")
 @environment.pass_env
 def add(env, identifier,  **args):
     """Adds a listener to the identifier LB"""
@@ -40,7 +41,7 @@ def add(env, identifier,  **args):
         'loadBalancingMethod': args.get('method'),
         'maxConn': args.get('connections', None),
         'sessionType': args.get('sticky'),
-        'tlsCertificateId': None
+        'tlsCertificateId': args.get('sslcert')
     }
 
     try:
@@ -63,6 +64,7 @@ def add(env, identifier,  **args):
               type=click.Choice(['ROUNDROBIN', 'LEASTCONNECTION', 'WEIGHTED_RR']))
 @click.option('--connections', '-c', type=int, help="Maximum number of connections to allow.")
 @click.option('--sticky', '-s', is_flag=True, callback=sticky_option, help="Make sessions sticky based on source_ip.")
+@click.option('--sslCert', '-x', help="SSL certificate ID. See `slcli ssl list`")
 @environment.pass_env
 def edit(env, identifier, listener, **args):
     """Updates a listener's configuration. 
@@ -117,3 +119,80 @@ def delete(env, identifier, listener):
         click.secho("Success", fg='green')
     except SoftLayerAPIError as e:
         click.secho("ERROR: {}".format(e.faultString), fg='red')
+
+def parse_server(ctx, param, values):
+    """Splits out the IP, Port, Weight from the --server argument for l7pools"""
+    servers = []
+    for server in values:
+        splitout = server.split(':')
+        if len(splitout) != 3:
+            raise exceptions.ArgumentError("--server needs a port and a weight. {} improperly formatted".format(server))
+        server = {
+            'address': splitout[0],
+            'port': splitout[1],
+            'weight': splitout[2]
+        }
+        servers.append(server)
+
+    return servers
+
+@click.command()
+@click.argument('identifier')
+# https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_L7Pool/
+@click.option('--name', '-n', required=True, help="Name for this L7 pool.")
+@click.option('--method', '-m', help="Balancing Method.", default='ROUNDROBIN', show_default=True,
+              type=click.Choice(['ROUNDROBIN', 'LEASTCONNECTION', 'WEIGHTED_RR']))
+@click.option('--protocol', '-P', type=click.Choice(['HTTP', 'HTTPS']), default='HTTP',
+              show_default=True, help="Protocol type to use for incoming connections")
+# https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_L7Member/
+@helpers.multi_option('--server', '-S', callback=parse_server, required=True,
+                      help="Backend servers that are part of this pool. Format is colon deliminated. " \
+                           "BACKEND_IP:PORT:WEIGHT. eg. 10.0.0.1:80:50")
+# https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_L7HealthMonitor/
+@click.option('--healthPath', default='/', show_default=True, help="Health check path.")
+@click.option('--healthInterval', default=5, type=int, show_default=True, help="Health check interval between checks.")
+@click.option('--healthRetry', default=2, type=int, show_default=True,
+              help="Health check number of times before marking as DOWN.")
+@click.option('--healthTimeout', default=2, type=int, show_default=True, help="Health check timeout.")
+# https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_L7SessionAffinity/
+@click.option('--sticky', '-s', is_flag=True, callback=sticky_option, help="Make sessions sticky based on source_ip.")
+@environment.pass_env
+def l7pool_add(env, identifier, **args):
+    """Adds a new l7 pool
+
+    https://sldn.softlayer.com/reference/services/SoftLayer_Network_LBaaS_L7Pool/createL7Pool/
+
+    -S is in : deliminated format to make grouping IP:port:weight a bit easier.
+    """
+
+    mgr = SoftLayer.LoadBalancerManager(env.client)
+    uuid, lbid = mgr.get_lbaas_uuid_id(identifier)
+
+    pool_main = {
+        'name': args.get('name'),
+        'loadBalancingAlgorithm': args.get('method'),
+        'protocol': args.get('protocol')
+    }
+
+    pool_members = [member for member in args.get('server')]
+
+    pool_health = {
+        'interval': args.get('healthinterval'),
+        'timeout': args.get('healthtimeout'),
+        'maxRetries': args.get('healthretry'),
+        'urlPath': args.get('healthpath')
+    }
+
+    pool_sticky = {
+        'type': args.get('sticky')
+    }
+
+    try:
+        result = mgr.add_lb_l7_pool(uuid, pool_main, pool_members, pool_health, None)
+        pp(result)
+        click.secho("Success", fg='green')
+    except SoftLayerAPIError as e:
+        click.secho("ERROR: {}".format(e.faultString), fg='red')
+
+
+

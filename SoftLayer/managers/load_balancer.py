@@ -141,6 +141,60 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
                                   identifier, [listener])
         return result
 
+    def add_lb_l7_pool(self, identifier, pool, members, health, session):
+        """Creates a new l7 pool for a LBaaS instance
+
+        https://sldn.softlayer.com/reference/services/SoftLayer_Network_LBaaS_L7Pool/createL7Pool/
+        https://cloud.ibm.com/docs/infrastructure/loadbalancer-service?topic=loadbalancer-service-api-reference
+
+        :param identifier: UUID of the LBaaS instance
+        :param pool SoftLayer_Network_LBaaS_L7Pool: Description of the pool
+        :param members SoftLayer_Network_LBaaS_L7Member[]: Array of servers with their address, port, weight
+        :param monitor SoftLayer_Network_LBaaS_L7HealthMonitor: A health monitor
+        :param session  SoftLayer_Network_LBaaS_L7SessionAffinity: Weather to use affinity
+        """
+
+        l7Members = [
+            {
+                'address': '10.131.11.60',
+                'port': 82,
+                'weight': 10
+            },
+            {
+                'address': '10.131.11.46',
+                'port': 83,
+                'weight': 11
+            }
+        ]
+
+        l7Pool = {
+            'name': 'image112_pool',
+            'protocol': 'HTTP',  # only supports HTTP
+            'loadBalancingAlgorithm': 'ROUNDROBIN'
+        }
+
+        l7HealthMonitor = {
+            'interval': 10,
+            'timeout': 5,
+            'maxRetries': 3,
+            'urlPath': '/'
+        }
+
+        # Layer 7 session affinity to be added. Only supports SOURCE_IP as of now
+        l7SessionAffinity = {
+            'type': 'SOURCE_IP'
+        }
+
+        # result = self.client.call('SoftLayer_Network_LBaaS_L7Pool', 'createL7Pool',
+        #                           identifier, pool, members, health, session)
+        result = self.client.call('SoftLayer_Network_LBaaS_L7Pool', 'createL7Pool',
+                                  identifier, l7Pool, l7Members, l7HealthMonitor, l7SessionAffinity)
+
+
+        # string, member, monitor, affinity
+
+        return result
+
     def remove_lb_listener(self, identifier, listener):
         """Removes a listener to a LBaaS instance
 

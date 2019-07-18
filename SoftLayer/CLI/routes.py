@@ -175,6 +175,7 @@ ALL_ROUTES = [
     ('loadbal:pool-add', 'SoftLayer.CLI.loadbal.pools:add'),
     ('loadbal:pool-edit', 'SoftLayer.CLI.loadbal.pools:edit'),
     ('loadbal:pool-del', 'SoftLayer.CLI.loadbal.pools:delete'),
+    ('loadbal:l7pool-add', 'SoftLayer.CLI.loadbal.pools:l7pool_add'),
 
     ('loadbal:ns-detail', 'SoftLayer.CLI.loadbal.ns_detail:cli'),
     ('loadbal:ns-list', 'SoftLayer.CLI.loadbal.ns_list:cli'),
