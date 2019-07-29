@@ -25,6 +25,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         self.adc = self.client['Network_Application_Delivery_Controller']
         # IBM CLoud LB
         self.lbaas = self.client['Network_LBaaS_LoadBalancer']
+        self.package_keyname = 'LBAAS'
 
 
 
@@ -154,46 +155,19 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :param session  SoftLayer_Network_LBaaS_L7SessionAffinity: Weather to use affinity
         """
 
-        l7Members = [
-            {
-                'address': '10.131.11.60',
-                'port': 82,
-                'weight': 10
-            },
-            {
-                'address': '10.131.11.46',
-                'port': 83,
-                'weight': 11
-            }
-        ]
-
-        l7Pool = {
-            'name': 'image112_pool',
-            'protocol': 'HTTP',  # only supports HTTP
-            'loadBalancingAlgorithm': 'ROUNDROBIN'
-        }
-
-        l7HealthMonitor = {
-            'interval': 10,
-            'timeout': 5,
-            'maxRetries': 3,
-            'urlPath': '/'
-        }
-
-        # Layer 7 session affinity to be added. Only supports SOURCE_IP as of now
-        l7SessionAffinity = {
-            'type': 'SOURCE_IP'
-        }
-
-        # result = self.client.call('SoftLayer_Network_LBaaS_L7Pool', 'createL7Pool',
-        #                           identifier, pool, members, health, session)
         result = self.client.call('SoftLayer_Network_LBaaS_L7Pool', 'createL7Pool',
-                                  identifier, l7Pool, l7Members, l7HealthMonitor, l7SessionAffinity)
-
-
-        # string, member, monitor, affinity
+                                  identifier, pool, members, health, session)
 
         return result
+
+    def del_lb_l7_pool(self, identifier):
+        """Deletes a l7 pool
+
+        :param identifier: Id of the L7Pool
+        """
+        result = self.client.call('SoftLayer_Network_LBaaS_L7Pool', 'deleteObject', id=identifier)
+        return result
+
 
     def remove_lb_listener(self, identifier, listener):
         """Removes a listener to a LBaaS instance
@@ -205,6 +179,53 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         result = self.client.call('SoftLayer_Network_LBaaS_Listener', 'deleteLoadBalancerProtocols',
                                   identifier, [listener])
         return result
+
+    def order_lbaas(self, datacenter, name, desc, protocols, subnet_id=None, public=False, verify=False):
+        """Allows to order a Load Balancer
+
+
+        """
+
+        pkg_name = 'Load Balancer As A Service (LBaaS)'
+        package_id = self.get_package_id(pkg_name)
+        prices = self.get_item_prices(package_id)
+
+        # Find and select a subnet id if it was not specified.
+        if subnet_id is None:
+            subnet_id = self.get_subnet_id(datacenter)
+
+        # Build the configuration of the order
+        orderData = {
+            'complexType': 'SoftLayer_Container_Product_Order_Network_LoadBalancer_AsAService',
+            'name': name,
+            'description': desc,
+            'location': datacenter,
+            'packageId': package_id,
+            'useHourlyPricing': True,       # Required since LBaaS is an hourly service            
+            'prices': [{'id': price_id} for price_id in prices],
+            'protocolConfigurations': protocols,
+            'subnets': [{'id': subnet_id}]
+        }
+
+        try:
+            # If verify=True it will check your order for errors.
+            # It will order the lbaas if False.
+            if verify:
+                response = self.client['Product_Order'].verifyOrder(orderData)
+            else:
+                response = self.client['Product_Order'].placeOrder(orderData)
+
+            return response
+        except SoftLayer.SoftLayerAPIError as e:            
+            print("Unable to place the order: %s, %s" % (e.faultCode, e.faultString))
+
+
+    def lbaas_order_options(self):
+        _filter = {'keyName': {'operation': self.package_keyname}}
+        mask = "mask[id,keyName,name,items[prices],regions[location[location[groups]]]]"
+        package = self.client.call('SoftLayer_Product_Package', 'getAllObjects', filter=_filter, mask=mask)
+        return package.pop()
+
 
 # Old things below this line
 

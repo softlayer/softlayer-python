@@ -52,9 +52,10 @@ def lbaas_table(lb):
     table.add_row(['Checks', hp_table])
 
     # https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_L7Pool/
-    l7_table = formatting.Table(['UUID', 'Balancer', 'Name', 'Protocol', 'Modify', 'Active' ])
+    l7_table = formatting.Table(['Id', 'UUID', 'Balancer', 'Name', 'Protocol', 'Modify', 'Active' ])
     for l7 in lb.get('l7Pools', []):
         l7_table.add_row([
+            l7.get('id'),
             l7.get('uuid'),
             l7.get('loadBalancingAlgorithm'),
             l7.get('name'),

@@ -160,9 +160,7 @@ def parse_server(ctx, param, values):
 def l7pool_add(env, identifier, **args):
     """Adds a new l7 pool
 
-    https://sldn.softlayer.com/reference/services/SoftLayer_Network_LBaaS_L7Pool/createL7Pool/
-
-    -S is in : deliminated format to make grouping IP:port:weight a bit easier.
+    -S is in colon deliminated format to make grouping IP:port:weight a bit easier.
     """
 
     mgr = SoftLayer.LoadBalancerManager(env.client)
@@ -188,11 +186,24 @@ def l7pool_add(env, identifier, **args):
     }
 
     try:
-        result = mgr.add_lb_l7_pool(uuid, pool_main, pool_members, pool_health, None)
-        pp(result)
+        result = mgr.add_lb_l7_pool(uuid, pool_main, pool_members, pool_health, pool_sticky)
         click.secho("Success", fg='green')
     except SoftLayerAPIError as e:
         click.secho("ERROR: {}".format(e.faultString), fg='red')
 
 
 
+@click.command()
+@click.argument('identifier')
+@environment.pass_env
+def l7pool_del(env, identifier):
+    """Deletes the identified pool
+    
+    Identifier is L7Pool Id. NOT the UUID
+    """
+    mgr = SoftLayer.LoadBalancerManager(env.client)
+    try:
+        result = mgr.del_lb_l7_pool(identifier)
+        click.secho("Success", fg='green')
+    except SoftLayerAPIError as e:
+        click.secho("ERROR: {}".format(e.faultString), fg='red')
