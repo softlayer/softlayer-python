@@ -13,7 +13,8 @@ getObject = {
     'isMasterUserFlag': False,
     'lastName': 'Testerson',
     'openIdConnectUserName': 'test@us.ibm.com',
-    'parent': {'id': 167758, 'username': 'SL12345'},
+    'parent': {
+        'id': 167758, 'username': 'SL12345'},
     'parentId': 167758,
     'postalCode': '77002',
     'sslVpnAllowedFlag': True,

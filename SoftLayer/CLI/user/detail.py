@@ -80,7 +80,8 @@ def basic_info(user, keys):
     table.add_row(['Phone Number', user.get('officePhone')])
     if user.get('parentId', False):
         table.add_row(['Parent User', utils.lookup(user, 'parent', 'username')])
-    table.add_row(['Status', utils.lookup(user, 'userStatus', 'name')])
+    table.add_row(
+        ['Status', utils.lookup(user, 'userStatus', 'name')])
     table.add_row(['SSL VPN', user.get('sslVpnAllowedFlag', 'No')])
     for login in user.get('unsuccessfulLogins', {}):
         login_string = "%s From: %s" % (login.get('createDate'), login.get('ipAddress'))
