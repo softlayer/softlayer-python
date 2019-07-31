@@ -5,7 +5,9 @@
 
     :license: MIT, see LICENSE for more details.
 """
+from SoftLayer import exceptions
 from SoftLayer import utils
+from SoftLayer.managers import ordering
 
 
 class LoadBalancerManager(utils.IdentifierMixin, object):
@@ -180,19 +182,26 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
                                   identifier, [listener])
         return result
 
-    def order_lbaas(self, datacenter, name, desc, protocols, subnet_id=None, public=False, verify=False):
+    def order_lbaas(self, datacenter, name, desc, protocols, subnet_id, public=False, verify=False):
         """Allows to order a Load Balancer
 
-
+        :param datacenter: Shortname for the SoftLayer datacenter to order in.
+        :param name: Identifier for the new LB.
+        :param desc: Optional description for the lb.
+        :param protocols:  https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_Listener/
+        :param subnet_id: Id of the subnet for this new LB to live on.
+        :param public: Use Public side for the backend.
+        :param verify: Don't actually order if True.
         """
+        order_mgr = ordering.OrderingManager(self.client)
 
         pkg_name = 'Load Balancer As A Service (LBaaS)'
-        package_id = self.get_package_id(pkg_name)
-        prices = self.get_item_prices(package_id)
+        package = order_mgr.get_package_by_key(self.package_keyname, mask='mask[id,keyName,itemPrices]')
 
-        # Find and select a subnet id if it was not specified.
-        if subnet_id is None:
-            subnet_id = self.get_subnet_id(datacenter)
+        prices = []
+        for price in package.get('itemPrices'):
+            if not price.get('locationGroupId', False):
+                prices.append(price.get('id'))
 
         # Build the configuration of the order
         orderData = {
@@ -200,24 +209,19 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
             'name': name,
             'description': desc,
             'location': datacenter,
-            'packageId': package_id,
+            'packageId': package.get('id'),
             'useHourlyPricing': True,       # Required since LBaaS is an hourly service            
             'prices': [{'id': price_id} for price_id in prices],
             'protocolConfigurations': protocols,
             'subnets': [{'id': subnet_id}]
         }
 
-        try:
-            # If verify=True it will check your order for errors.
-            # It will order the lbaas if False.
-            if verify:
-                response = self.client['Product_Order'].verifyOrder(orderData)
-            else:
-                response = self.client['Product_Order'].placeOrder(orderData)
 
-            return response
-        except SoftLayer.SoftLayerAPIError as e:            
-            print("Unable to place the order: %s, %s" % (e.faultCode, e.faultString))
+        if verify:
+            response = self.client['Product_Order'].verifyOrder(orderData)
+        else:
+            response = self.client['Product_Order'].placeOrder(orderData)
+        return response
 
 
     def lbaas_order_options(self):

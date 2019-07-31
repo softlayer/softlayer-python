@@ -9,36 +9,74 @@ from pprint import pprint as pp
 
 
 
+def parse_proto(ctx, param, value):
+    proto = {'protocol': 'HTTP', 'port': 80}
+    splitout = value.split(':')
+    if len(splitout) != 2:
+        raise exceptions.ArgumentError("{}={} is not properly formatted.".format(param, value))
+    proto['protocol'] = splitout[0]
+    proto['port'] = int(splitout[1])
+    return proto
+
+
 
 @click.command()
-@click.argument('identifier')
+@click.option('--name', '-n', help='Label for this loadbalancer.', required=True)
+@click.option('--datacenter', '-d', help='Datacenter shortname (dal13).', required=True)
+@click.option('--label', '-l', help='A descriptive label for this loadbalancer.')
+@click.option('--frontend', '-f', required=True, default='HTTP:80', show_default=True, callback=parse_proto,
+              help='PROTOCOL:PORT string for incoming internet connections.')
+@click.option('--backend', '-b', required=True, default='HTTP:80', show_default=True, callback=parse_proto,
+              help='PROTOCOL:PORT string for connecting to backend servers.')
+@click.option('--method', '-m', help="Balancing Method.", default='ROUNDROBIN', show_default=True,
+              type=click.Choice(['ROUNDROBIN', 'LEASTCONNECTION', 'WEIGHTED_RR']))
+@click.option('--subnet', '-s', required=True,
+              help="Private subnet Id to order the LB on. See `slcli lb order-options`")
+@click.option('--public', is_flag=True, default=False, show_default=True, help="Use a Public to Public loadbalancer.")
+@click.option('--verify', is_flag=True, default=False, show_default=True,
+              help="Only verify an order, dont actually create one.")
 @environment.pass_env
-def order(env, identifier):
-    """Creates a LB"""
-    print("Nothing yet")
+def order(env, **args):
+    """Creates a LB. Protocols supported are TCP, HTTP, and HTTPS."""
+
     mgr = SoftLayer.LoadBalancerManager(env.client)
-    package_name = 'Load Balancer As A Service (LBaaS)'
-    location = 'MEXICO'
-    name = 'My-LBaaS-name'
-    description = 'A description sample'
 
-    # Set False for private network
-    is_public = True
+    location = args.get('datacenter')
+    name = args.get('name')
+    description = args.get('label', None)
 
+
+    backend = args.get('backend')
+    frontend = args.get('frontend')
     protocols = [        
         {
-            "backendPort": 80,
-            "backendProtocol": "HTTP",
-            "frontendPort": 8080,
-            "frontendProtocol": "HTTP",
-            "loadBalancingMethod": "ROUNDROBIN",    # ROUNDROBIN, LEASTCONNECTION, WEIGHTED_RR
+            "backendPort": backend.get('port'),
+            "backendProtocol": backend.get('protocol'),
+            "frontendPort": frontend.get('port'),
+            "frontendProtocol": frontend.get('protocol'),
+            "loadBalancingMethod": args.get('method'),
             "maxConn": 1000
         }
     ]
 
     # remove verify=True to place the order
-    receipt = lbaas.order_lbaas(package_name, location, name, description,
-                                protocols, public=is_public, verify=True)
+    receipt = mgr.order_lbaas(location, name, description, protocols, args.get('subnet'), 
+                              public=args.get('public'), verify=args.get('verify'))
+    table = parse_receipt(receipt)
+    env.fout(table)
+    
+
+def parse_receipt(receipt):
+    table = formatting.KeyValueTable(['Item', 'Cost'], title="Order: {}".format(receipt.get('orderId', 'Quote')))
+    if receipt.get('prices'):
+        for price in receipt.get('prices'):
+            table.add_row([price['item']['description'], price['hourlyRecurringFee']])
+    elif receipt.get('orderDetails'):
+        for price in receipt['orderDetails']['prices']:
+            table.add_row([price['item']['description'], price['hourlyRecurringFee']])
+
+    return table
+
 
 
 @click.command()
@@ -87,7 +125,7 @@ def order_options(env, datacenter):
         # Vlan/Subnet Lookups
         mask = "mask[networkVlan,podName,addressSpace]"
         subnets = net_mgr.list_subnets(datacenter=dc_name, network_space='PRIVATE', mask=mask)
-        subnet_table = formatting.KeyValueTable(['Subnet', 'Vlan'])
+        subnet_table = formatting.Table(['Id', 'Subnet', 'Vlan'])
 
         for subnet in subnets:
             # Only show these types, easier to filter here than in an API call.
@@ -95,7 +133,7 @@ def order_options(env, datacenter):
                 continue
             space = "{}/{}".format(subnet.get('networkIdentifier'), subnet.get('cidr'))
             vlan = "{}.{}".format(subnet['podName'], subnet['networkVlan']['vlanNumber'])
-            subnet_table.add_row([space, vlan])
+            subnet_table.add_row([subnet.get('id'), space, vlan])
         this_table.add_row([price_table, subnet_table])
 
         env.fout(this_table)  
