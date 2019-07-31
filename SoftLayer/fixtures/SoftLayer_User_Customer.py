@@ -16,7 +16,6 @@ getObject = {
     'parent': {'id': 167758, 'username': 'SL12345'},
     'parentId': 167758,
     'postalCode': '77002',
-    'pptpVpnAllowedFlag': False,
     'sslVpnAllowedFlag': True,
     'state': 'TX',
     'statusDate': None,
