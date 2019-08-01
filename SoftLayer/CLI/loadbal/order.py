@@ -140,6 +140,17 @@ def order_options(env, datacenter):
 
 
 @click.command()
+@click.argument('identifier')
 @environment.pass_env
-def cancel(env, identifier,  **args):
-    print("Nothing yet")
+def cancel(env, identifier):
+    """Cancels a LBaaS instance"""
+
+    mgr = SoftLayer.LoadBalancerManager(env.client)
+    uuid, lbid = mgr.get_lbaas_uuid_id(identifier)
+
+
+    try:
+        result = mgr.cancel_lbaas(uuid)
+        click.secho("LB {} canceled succesfully.".format(identifier), fg='green')
+    except SoftLayerAPIError as e:
+        click.secho("ERROR: {}".format(e.faultString), fg='red')
