@@ -21,9 +21,10 @@ def cli(env):
         env.fout("No Netscalers")
 
 
-def location_sort(x):
+def location_sort(location):
     """Quick function that just returns the datacenter longName for sorting"""
-    return utils.lookup(x, 'datacenter', 'longName')
+    return utils.lookup(location, 'datacenter', 'longName')
+
 
 def generate_netscaler_table(netscalers):
     """Tales a list of SoftLayer_Network_Application_Delivery_Controller and makes a table"""
@@ -38,9 +39,7 @@ def generate_netscaler_table(netscalers):
             adc.get('description'),
             adc.get('primaryIpAddress'),
             adc.get('managementIpAddress'),
-            adc.get('outboundPublicBandwidthUsage',0),
+            adc.get('outboundPublicBandwidthUsage', 0),
             utils.clean_time(adc.get('createDate'))
         ])
     return table
-
-

@@ -4,27 +4,26 @@ import click
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
-from SoftLayer.CLI import formatting
-from SoftLayer.CLI import helpers
 from SoftLayer import utils
-from pprint import pprint as pp 
+
 
 @click.command()
 @click.argument('identifier')
 @click.option('--uuid', required=True, help="Health check UUID to modify.")
-@click.option('--interval', '-i', type=click.IntRange(2, 60),  help="Seconds between checks. [2-60]")
+@click.option('--interval', '-i', type=click.IntRange(2, 60), help="Seconds between checks. [2-60]")
 @click.option('--retry', '-r', type=click.IntRange(1, 10), help="Number of times before marking as DOWN. [1-10]")
 @click.option('--timeout', '-t', type=click.IntRange(1, 59), help="Seconds to wait for a connection. [1-59]")
 @click.option('--url', '-u', help="Url path for HTTP/HTTPS checks.")
 @environment.pass_env
-def cli(env, identifier,  uuid, interval, retry, timeout, url):
+def cli(env, identifier, uuid, interval, retry, timeout, url):
     """Manage LBaaS health checks."""
 
     if not any([interval, retry, timeout, url]):
         raise exceptions.ArgumentError("Specify either interval, retry, timeout, url")
 
     # map parameters to expected API names
-    template = {'healthMonitorUuid': uuid, 'interval': interval, 'maxRetries': retry, 'timeout': timeout, 'urlPath': url}
+    template = {'healthMonitorUuid': uuid, 'interval': interval,
+                'maxRetries': retry, 'timeout': timeout, 'urlPath': url}
     # Removes those empty values
     clean_template = {k: v for k, v in template.items() if v is not None}
 
@@ -49,7 +48,6 @@ def cli(env, identifier,  uuid, interval, retry, timeout, url):
             check['timeout'] = utils.lookup(listener, 'defaultPool', 'healthMonitor', 'timeout')
             check['urlPath'] = utils.lookup(listener, 'defaultPool', 'healthMonitor', 'urlPath')
 
-
     if url and check['backendProtocol'] == 'TCP':
         raise exceptions.ArgumentError('--url cannot be used with TCP checks')
 
@@ -57,12 +55,9 @@ def cli(env, identifier,  uuid, interval, retry, timeout, url):
     for key in clean_template.keys():
         check[key] = clean_template[key]
 
-    result = mgr.updateLoadBalancerHealthMonitors(lb_uuid, [check])
+    result = mgr.update_lb_health_monitors(lb_uuid, [check])
 
     if result:
         click.secho('Health Check {} updated successfully'.format(uuid), fg='green')
     else:
         click.secho('ERROR: Failed to update {}'.format(uuid), fg='red')
-
-
-

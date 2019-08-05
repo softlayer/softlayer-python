@@ -2,14 +2,16 @@
 import click
 
 import SoftLayer
-from SoftLayer.CLI import environment, formatting, helpers, exceptions
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 from SoftLayer.exceptions import SoftLayerAPIError
 from SoftLayer import utils
-from pprint import pprint as pp 
 
 
-
+# pylint: disable=unused-argument
 def parse_proto(ctx, param, value):
+    """Parses the frontend and backend cli options"""
     proto = {'protocol': 'HTTP', 'port': 80}
     splitout = value.split(':')
     if len(splitout) != 2:
@@ -17,7 +19,6 @@ def parse_proto(ctx, param, value):
     proto['protocol'] = splitout[0]
     proto['port'] = int(splitout[1])
     return proto
-
 
 
 @click.command()
@@ -45,10 +46,9 @@ def order(env, **args):
     name = args.get('name')
     description = args.get('label', None)
 
-
     backend = args.get('backend')
     frontend = args.get('frontend')
-    protocols = [        
+    protocols = [
         {
             "backendPort": backend.get('port'),
             "backendProtocol": backend.get('protocol'),
@@ -60,13 +60,14 @@ def order(env, **args):
     ]
 
     # remove verify=True to place the order
-    receipt = mgr.order_lbaas(location, name, description, protocols, args.get('subnet'), 
+    receipt = mgr.order_lbaas(location, name, description, protocols, args.get('subnet'),
                               public=args.get('public'), verify=args.get('verify'))
     table = parse_receipt(receipt)
     env.fout(table)
-    
+
 
 def parse_receipt(receipt):
+    """Takes an order receipt and nicely formats it for cli output"""
     table = formatting.KeyValueTable(['Item', 'Cost'], title="Order: {}".format(receipt.get('orderId', 'Quote')))
     if receipt.get('prices'):
         for price in receipt.get('prices'):
@@ -76,7 +77,6 @@ def parse_receipt(receipt):
             table.add_row([price['item']['description'], price['hourlyRecurringFee']])
 
     return table
-
 
 
 @click.command()
@@ -89,7 +89,6 @@ def order_options(env, datacenter):
     net_mgr = SoftLayer.NetworkManager(env.client)
     package = mgr.lbaas_order_options()
 
-    tables = []
     for region in package['regions']:
         dc_name = utils.lookup(region, 'location', 'location', 'name')
 
@@ -136,7 +135,7 @@ def order_options(env, datacenter):
             subnet_table.add_row([subnet.get('id'), space, vlan])
         this_table.add_row([price_table, subnet_table])
 
-        env.fout(this_table)  
+        env.fout(this_table)
 
 
 @click.command()
@@ -146,11 +145,10 @@ def cancel(env, identifier):
     """Cancels a LBaaS instance"""
 
     mgr = SoftLayer.LoadBalancerManager(env.client)
-    uuid, lbid = mgr.get_lbaas_uuid_id(identifier)
-
+    uuid, _ = mgr.get_lbaas_uuid_id(identifier)
 
     try:
-        result = mgr.cancel_lbaas(uuid)
+        mgr.cancel_lbaas(uuid)
         click.secho("LB {} canceled succesfully.".format(identifier), fg='green')
-    except SoftLayerAPIError as e:
-        click.secho("ERROR: {}".format(e.faultString), fg='red')
+    except SoftLayerAPIError as exception:
+        click.secho("ERROR: {}".format(exception.faultString), fg='red')

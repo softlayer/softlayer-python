@@ -5,9 +5,8 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import exceptions
-from SoftLayer import utils
 from SoftLayer.managers import ordering
+from SoftLayer import utils
 
 
 class LoadBalancerManager(utils.IdentifierMixin, object):
@@ -28,8 +27,6 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         # IBM CLoud LB
         self.lbaas = self.client['Network_LBaaS_LoadBalancer']
         self.package_keyname = 'LBAAS'
-
-
 
     def get_adcs(self, mask=None):
         """Returns a list of all netscalers.
@@ -57,9 +54,9 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         """
         if mask is None:
             mask = "mask[datacenter,listenerCount,memberCount]"
-        lb = self.lbaas.getAllObjects(mask=mask)
+        this_lb = self.lbaas.getAllObjects(mask=mask)
 
-        return lb
+        return this_lb
 
     def get_lb(self, identifier, mask=None):
         """Returns a IBM Cloud LoadBalancer
@@ -69,24 +66,25 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         if mask is None:
             mask = "mask[healthMonitors, l7Pools,  members, sslCiphers, " \
                    "listeners[defaultPool[healthMonitor, members, sessionAffinity],l7Policies]]"
-        
-        lb = self.lbaas.getObject(id=identifier, mask=mask)
-        health = self.lbaas.getLoadBalancerMemberHealth(lb.get('uuid'))
 
-        lb['health'] = health
-        return lb
+        this_lb = self.lbaas.getObject(id=identifier, mask=mask)
+        health = self.lbaas.getLoadBalancerMemberHealth(this_lb.get('uuid'))
+
+        this_lb['health'] = health
+        return this_lb
 
     def get_lb_monitors(self, identifier):
         """Get a LBaaS instance's health checks
-        
+
+
         :param identifier: Id of the LBaaS instance (not UUID)
         """
         health = self.lbaas.getHealthMonitors(id=identifier)
         return health
 
-    def updateLoadBalancerHealthMonitors(self, uuid, checks):
+    def update_lb_health_monitors(self, uuid, checks):
         """calls SoftLayer_Network_LBaaS_HealthMonitor::updateLoadBalancerHealthMonitors()
-        
+
         https://sldn.softlayer.com/reference/services/SoftLayer_Network_LBaaS_HealthMonitor/updateLoadBalancerHealthMonitors/
         https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_LoadBalancerHealthMonitorConfiguration/
         :param uuid: loadBalancerUuid
@@ -104,19 +102,19 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :return (uuid, id):
         """
         if len(identifier) == 36:
-            lb = self.lbaas.getLoadBalancer(identifier, mask="mask[id,uuid]")
+            this_lb = self.lbaas.getLoadBalancer(identifier, mask="mask[id,uuid]")
         else:
-            lb = self.lbaas.getObject(id=identifier, mask="mask[id,uuid]")
-        return lb['uuid'], lb['id']
+            this_lb = self.lbaas.getObject(id=identifier, mask="mask[id,uuid]")
+        return this_lb['uuid'], this_lb['id']
 
     def delete_lb_member(self, identifier, member_id):
         """Removes a member from a LBaaS instance
 
         https://sldn.softlayer.com/reference/services/SoftLayer_Network_LBaaS_Member/deleteLoadBalancerMembers/
         :param identifier: UUID of the LBaaS instance
-        :param member_id: Member UUID to remove. 
+        :param member_id: Member UUID to remove.
         """
-        result = self.client.call('SoftLayer_Network_LBaaS_Member', 'deleteLoadBalancerMembers', 
+        result = self.client.call('SoftLayer_Network_LBaaS_Member', 'deleteLoadBalancerMembers',
                                   identifier, [member_id])
         return result
 
@@ -125,10 +123,10 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
         https://sldn.softlayer.com/reference/services/SoftLayer_Network_LBaaS_Member/deleteLoadBalancerMembers/
         :param identifier: UUID of the LBaaS instance
-        :param member_id: Member UUID to remove. 
+        :param member_id: Member UUID to remove.
         """
 
-        result = self.client.call('SoftLayer_Network_LBaaS_Member', 'addLoadBalancerMembers', 
+        result = self.client.call('SoftLayer_Network_LBaaS_Member', 'addLoadBalancerMembers',
                                   identifier, [member_id])
 
         return result
@@ -174,7 +172,6 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         result = self.client.call('SoftLayer_Network_LBaaS_L7Pool', 'deleteObject', id=identifier)
         return result
 
-
     def remove_lb_listener(self, identifier, listener):
         """Removes a listener to a LBaaS instance
 
@@ -207,25 +204,24 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
                 prices.append(price.get('id'))
 
         # Build the configuration of the order
-        orderData = {
+        order_data = {
             'complexType': 'SoftLayer_Container_Product_Order_Network_LoadBalancer_AsAService',
             'name': name,
             'description': desc,
             'location': datacenter,
             'packageId': package.get('id'),
-            'useHourlyPricing': True,       # Required since LBaaS is an hourly service            
+            'useHourlyPricing': True,       # Required since LBaaS is an hourly service
             'prices': [{'id': price_id} for price_id in prices],
             'protocolConfigurations': protocols,
-            'subnets': [{'id': subnet_id}]
+            'subnets': [{'id': subnet_id}],
+            'isPublic': public
         }
 
-
         if verify:
-            response = self.client['Product_Order'].verifyOrder(orderData)
+            response = self.client['Product_Order'].verifyOrder(order_data)
         else:
-            response = self.client['Product_Order'].placeOrder(orderData)
+            response = self.client['Product_Order'].placeOrder(order_data)
         return response
-
 
     def lbaas_order_options(self):
         """Gets the options to order a LBaaS instance."""
@@ -236,10 +232,9 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
     def cancel_lbaas(self, uuid):
         """Cancels a LBaaS instance.
-        
+
         https://sldn.softlayer.com/reference/services/SoftLayer_Network_LBaaS_LoadBalancer/cancelLoadBalancer/
         :param uuid string: UUID of the LBaaS instance to cancel
         """
 
         return self.lbaas.cancelLoadBalancer(uuid)
-

@@ -5,7 +5,7 @@ import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer import utils
-from pprint import pprint as pp 
+
 
 @click.command()
 @environment.pass_env
@@ -22,9 +22,9 @@ def cli(env):
         env.fout("No LBaaS devices found")
 
 
-def location_sort(x):
+def location_sort(location):
     """Quick function that just returns the datacenter longName for sorting"""
-    return utils.lookup(x, 'datacenter', 'longName')
+    return utils.lookup(location, 'datacenter', 'longName')
 
 
 def generate_lbaas_table(lbaas):
@@ -36,19 +36,17 @@ def generate_lbaas_table(lbaas):
     table.align['Address'] = 'l'
     table.align['Description'] = 'l'
     table.align['Location'] = 'l'
-    for lb in sorted(lbaas,key=location_sort):
-        print("PUBLIC: {}".format(lb.get('isPublic')))
+    for this_lb in sorted(lbaas, key=location_sort):
         table.add_row([
-            lb.get('id'),
-            utils.lookup(lb, 'datacenter', 'longName'),
-            lb.get('address'),
-            lb.get('description'),
-            'Yes' if lb.get('isPublic', 1) == 1 else 'No',
-            utils.clean_time(lb.get('createDate')),
-            lb.get('memberCount', 0),
-            lb.get('listenerCount', 0)
+            this_lb.get('id'),
+            utils.lookup(this_lb, 'datacenter', 'longName'),
+            this_lb.get('address'),
+            this_lb.get('description'),
+            'Yes' if this_lb.get('isPublic', 1) == 1 else 'No',
+            utils.clean_time(this_lb.get('createDate')),
+            this_lb.get('memberCount', 0),
+            this_lb.get('listenerCount', 0)
 
 
         ])
     return table
-
