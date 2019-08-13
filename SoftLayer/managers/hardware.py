@@ -9,7 +9,6 @@ import logging
 import socket
 import time
 
-
 import SoftLayer
 from SoftLayer.decoration import retry
 from SoftLayer.managers import ordering
@@ -86,14 +85,17 @@ class HardwareManager(utils.IdentifierMixin, object):
             raise SoftLayer.SoftLayerError("Unable to cancel hardware with running transaction")
 
         if 'billingItem' not in hw_billing:
-            raise SoftLayer.SoftLayerError("Ticket #%s already exists for this server" %
-                                           hw_billing['openCancellationTicket']['id'])
+            if utils.lookup(hw_billing, 'openCancellationTicket', 'id'):
+                raise SoftLayer.SoftLayerError("Ticket #%s already exists for this server" %
+                                               hw_billing['openCancellationTicket']['id'])
+            raise SoftLayer.SoftLayerError("Cannot locate billing for the server. "
+                                           "The server may already be cancelled.")
 
         billing_id = hw_billing['billingItem']['id']
 
         if immediate and not hw_billing['hourlyBillingFlag']:
-            LOGGER.warning("Immediate cancelation of montly servers is not guaranteed."
-                           "Please check the cancelation ticket for updates.")
+            LOGGER.warning("Immediate cancellation of monthly servers is not guaranteed."
+                           "Please check the cancellation ticket for updates.")
 
             result = self.client.call('Billing_Item', 'cancelItem',
                                       False, False, cancel_reason, comment, id=billing_id)
