@@ -903,3 +903,11 @@ class VSTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Virtual_Guest', 'getBillingCycleBandwidthUsage', identifier=1234)
         self.assertEqual(result['allotment']['amount'], '250')
         self.assertEqual(result['useage'][0]['amountIn'], '.448')
+
+    def test_get_bandwidth_allocation_no_allotment(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getBandwidthAllotmentDetail')
+        mock.return_value = {}
+
+        result = self.vs.get_bandwidth_allocation(1234)
+
+        self.assertEqual(None, result['allotment'])

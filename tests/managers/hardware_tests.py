@@ -448,6 +448,14 @@ class HardwareTests(testing.TestCase):
         self.assertEqual(result['allotment']['amount'], '250')
         self.assertEqual(result['useage'][0]['amountIn'], '.448')
 
+    def test_get_bandwidth_allocation_no_allotment(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getBandwidthAllotmentDetail')
+        mock.return_value = {}
+
+        result = self.hardware.get_bandwidth_allocation(1234)
+
+        self.assertEqual(None, result['allotment'])
+
 
 class HardwareHelperTests(testing.TestCase):
     def test_get_extra_price_id_no_items(self):
