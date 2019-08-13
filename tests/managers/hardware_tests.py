@@ -291,6 +291,15 @@ class HardwareTests(testing.TestCase):
                                6327)
         self.assertEqual("Ticket #1234 already exists for this server", str(ex))
 
+    def test_cancel_hardwareno_billing_item_or_ticket(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        mock.return_value = {'id': 987}
+
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               self.hardware.cancel_hardware,
+                               6327)
+        self.assertEqual("Cannot locate billing for the server. The server may already be cancelled.", str(ex))
+
     def test_cancel_hardware_monthly_now(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
         mock.return_value = {'id': 987, 'billingItem': {'id': 1234},
