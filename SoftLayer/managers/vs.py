@@ -1067,7 +1067,7 @@ class VSManager(utils.IdentifierMixin, object):
         allotment = self.client.call('Virtual_Guest', 'getBandwidthAllotmentDetail', id=instance_id, mask=a_mask)
         u_mask = "mask[amountIn,amountOut,type]"
         useage = self.client.call('Virtual_Guest', 'getBillingCycleBandwidthUsage', id=instance_id, mask=u_mask)
-        return {'allotment': allotment['allocation'], 'useage': useage}
+        return {'allotment': allotment.get('allocation'), 'useage': useage}
 
     # pylint: disable=inconsistent-return-statements
     def _get_price_id_for_upgrade(self, package_items, option, value, public=True):
