@@ -73,15 +73,6 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         this_lb['health'] = health
         return this_lb
 
-    def get_lb_monitors(self, identifier):
-        """Get a LBaaS instance's health checks
-
-
-        :param identifier: Id of the LBaaS instance (not UUID)
-        """
-        health = self.lbaas.getHealthMonitors(id=identifier)
-        return health
-
     def update_lb_health_monitors(self, uuid, checks):
         """calls SoftLayer_Network_LBaaS_HealthMonitor::updateLoadBalancerHealthMonitors()
 
