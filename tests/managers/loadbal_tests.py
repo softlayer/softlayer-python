@@ -65,7 +65,7 @@ class LoadBalancerTests(testing.TestCase):
     def test_get_lbaas_uuid_id_uuid(self):
         uuid = '1a1aa111-4474-4e16-9f02-4de959229b85'
         my_id = 1111111
-        lb_uuid,lb_id = self.lb_mgr.get_lbaas_uuid_id(uuid)
+        lb_uuid, lb_id = self.lb_mgr.get_lbaas_uuid_id(uuid)
         self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getLoadBalancer', args=(uuid,))
         self.assertEqual(lb_uuid, uuid)
         self.assertEqual(lb_id, my_id)
@@ -73,7 +73,7 @@ class LoadBalancerTests(testing.TestCase):
     def test_get_lbaas_uuid_id_id(self):
         uuid = '1a1aa111-4474-4e16-9f02-4de959229b85'
         my_id = 1111111
-        lb_uuid,lb_id = self.lb_mgr.get_lbaas_uuid_id(my_id)
+        lb_uuid, lb_id = self.lb_mgr.get_lbaas_uuid_id(my_id)
         self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getObject', identifier=my_id)
         self.assertEqual(lb_uuid, uuid)
         self.assertEqual(lb_id, my_id)
@@ -121,7 +121,7 @@ class LoadBalancerTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Network_LBaaS_Listener', 'deleteLoadBalancerProtocols',
                                 args=(uuid, [listener]))
 
-    def order_lbaas(self):
+    def test_order_lbaas(self):
         datacenter = 'tes01'
         name = 'test-lb'
         desc = 'my lb'
@@ -129,8 +129,41 @@ class LoadBalancerTests(testing.TestCase):
         subnet_id = 12345
         public = True
         verify = False
+        package = [
+            {
+                'id': 805,
+                'keyNake': 'LBAAS',
+                'itemPrices': [
+                    {
+                        'id': 1,
+                        'name': 'A test price',
+                        'locationGroupId': None
+                    },
+                    {
+                        'id': 2,
+                        'name': 'A test price 2',
+                        'locationGroupId': 123
+                    }
+                ]
+            }
+        ]
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = package
+        order_data = {
+            'complexType': 'SoftLayer_Container_Product_Order_Network_LoadBalancer_AsAService',
+            'name': name,
+            'description': desc,
+            'location': datacenter,
+            'packageId': package[0]['id'],
+            'useHourlyPricing': True,       # Required since LBaaS is an hourly service
+            'prices': [{'id': package[0]['itemPrices'][0]['id']}],
+            'protocolConfigurations': protocols,
+            'subnets': [{'id': subnet_id}],
+            'isPublic': public
+        }
         self.lb_mgr.order_lbaas(datacenter, name, desc, protocols, subnet_id, public, verify)
-        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder', args=(order_data,))
+        self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects')
         verify = True
         self.lb_mgr.order_lbaas(datacenter, name, desc, protocols, subnet_id, public, verify)
         self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder')
@@ -143,4 +176,3 @@ class LoadBalancerTests(testing.TestCase):
         uuid = 'aa-bb-cc'
         self.lb_mgr.cancel_lbaas(uuid)
         self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'cancelLoadBalancer', args=(uuid,))
-

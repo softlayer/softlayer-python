@@ -107,8 +107,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :param member_id: Member UUID to remove.
         """
         return self.client.call('SoftLayer_Network_LBaaS_Member', 'deleteLoadBalancerMembers',
-                                 identifier, [member_id])
-
+                                identifier, [member_id])
 
     def add_lb_member(self, identifier, service_info):
         """Adds a member to a LBaaS instance
@@ -119,8 +118,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         """
 
         return self.client.call('SoftLayer_Network_LBaaS_Member', 'addLoadBalancerMembers',
-                                 identifier, [service_info])
-
+                                identifier, [service_info])
 
     def add_lb_listener(self, identifier, listener):
         """Adds or update a listener to a LBaaS instance
@@ -134,7 +132,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         """
 
         return self.client.call('SoftLayer_Network_LBaaS_Listener', 'updateLoadBalancerProtocols',
-                                 identifier, [listener])
+                                identifier, [listener])
 
     def add_lb_l7_pool(self, identifier, pool, members, health, session):
         """Creates a new l7 pool for a LBaaS instance
@@ -150,7 +148,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         """
 
         return self.client.call('SoftLayer_Network_LBaaS_L7Pool', 'createL7Pool',
-                                 identifier, pool, members, health, session)
+                                identifier, pool, members, health, session)
 
     def del_lb_l7_pool(self, identifier):
         """Deletes a l7 pool
@@ -167,7 +165,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         """
 
         return self.client.call('SoftLayer_Network_LBaaS_Listener', 'deleteLoadBalancerProtocols',
-                                 identifier, [listener])
+                                identifier, [listener])
 
     def order_lbaas(self, datacenter, name, desc, protocols, subnet_id, public=False, verify=False):
         """Allows to order a Load Balancer
