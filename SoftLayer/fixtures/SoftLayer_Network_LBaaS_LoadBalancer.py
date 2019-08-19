@@ -37,3 +37,6 @@ getLoadBalancerMemberHealth = [
 ]
 
 getHealthMonitors = {}
+
+getLoadBalancer = getObject
+cancelLoadBalancer = getObject

@@ -1,0 +1,2 @@
+createL7Pool = {}
+deleteObject = {}

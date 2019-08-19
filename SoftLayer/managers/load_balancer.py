@@ -92,7 +92,8 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :param identifier: either the LB Id, or UUID, this function will return both.
         :return (uuid, id):
         """
-        if len(identifier) == 36:
+        # int objects don't have a len property.
+        if not isinstance(identifier, int) and len(identifier) == 36:
             this_lb = self.lbaas.getLoadBalancer(identifier, mask="mask[id,uuid]")
         else:
             this_lb = self.lbaas.getObject(id=identifier, mask="mask[id,uuid]")
@@ -105,22 +106,21 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :param identifier: UUID of the LBaaS instance
         :param member_id: Member UUID to remove.
         """
-        result = self.client.call('SoftLayer_Network_LBaaS_Member', 'deleteLoadBalancerMembers',
-                                  identifier, [member_id])
-        return result
+        return self.client.call('SoftLayer_Network_LBaaS_Member', 'deleteLoadBalancerMembers',
+                                 identifier, [member_id])
 
-    def add_lb_member(self, identifier, member_id):
-        """Removes a member from a LBaaS instance
+
+    def add_lb_member(self, identifier, service_info):
+        """Adds a member to a LBaaS instance
 
         https://sldn.softlayer.com/reference/services/SoftLayer_Network_LBaaS_Member/deleteLoadBalancerMembers/
         :param identifier: UUID of the LBaaS instance
-        :param member_id: Member UUID to remove.
+        :param service_info: datatypes/SoftLayer_Network_LBaaS_LoadBalancerServerInstanceInfo
         """
 
-        result = self.client.call('SoftLayer_Network_LBaaS_Member', 'addLoadBalancerMembers',
-                                  identifier, [member_id])
+        return self.client.call('SoftLayer_Network_LBaaS_Member', 'addLoadBalancerMembers',
+                                 identifier, [service_info])
 
-        return result
 
     def add_lb_listener(self, identifier, listener):
         """Adds or update a listener to a LBaaS instance
@@ -133,9 +133,8 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :param listener: Object with all listener configurations
         """
 
-        result = self.client.call('SoftLayer_Network_LBaaS_Listener', 'updateLoadBalancerProtocols',
-                                  identifier, [listener])
-        return result
+        return self.client.call('SoftLayer_Network_LBaaS_Listener', 'updateLoadBalancerProtocols',
+                                 identifier, [listener])
 
     def add_lb_l7_pool(self, identifier, pool, members, health, session):
         """Creates a new l7 pool for a LBaaS instance
@@ -150,18 +149,15 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :param session  SoftLayer_Network_LBaaS_L7SessionAffinity: Weather to use affinity
         """
 
-        result = self.client.call('SoftLayer_Network_LBaaS_L7Pool', 'createL7Pool',
-                                  identifier, pool, members, health, session)
-
-        return result
+        return self.client.call('SoftLayer_Network_LBaaS_L7Pool', 'createL7Pool',
+                                 identifier, pool, members, health, session)
 
     def del_lb_l7_pool(self, identifier):
         """Deletes a l7 pool
 
         :param identifier: Id of the L7Pool
         """
-        result = self.client.call('SoftLayer_Network_LBaaS_L7Pool', 'deleteObject', id=identifier)
-        return result
+        return self.client.call('SoftLayer_Network_LBaaS_L7Pool', 'deleteObject', id=identifier)
 
     def remove_lb_listener(self, identifier, listener):
         """Removes a listener to a LBaaS instance
@@ -170,9 +166,8 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :param listener: UUID of the Listner to be removed.
         """
 
-        result = self.client.call('SoftLayer_Network_LBaaS_Listener', 'deleteLoadBalancerProtocols',
-                                  identifier, [listener])
-        return result
+        return self.client.call('SoftLayer_Network_LBaaS_Listener', 'deleteLoadBalancerProtocols',
+                                 identifier, [listener])
 
     def order_lbaas(self, datacenter, name, desc, protocols, subnet_id, public=False, verify=False):
         """Allows to order a Load Balancer

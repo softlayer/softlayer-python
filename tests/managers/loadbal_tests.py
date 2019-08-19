@@ -3,6 +3,9 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :license: MIT, see LICENSE for more details.
+
+    A lot of these tests will use junk data because the manager just passes
+    them directly to the API.
 """
 import SoftLayer
 from SoftLayer import testing
@@ -51,4 +54,93 @@ class LoadBalancerTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getLoadBalancerMemberHealth',
                                 args=(lb.get('uuid'),))
         self.assertIsNotNone(lb['health'])
+
+    def test_updated_lb_health(self):
+        uuid = '1234'
+        check = {'backendPort': '80'}
+        self.lb_mgr.update_lb_health_monitors(uuid, check)
+        self.assert_called_with('SoftLayer_Network_LBaaS_HealthMonitor', 'updateLoadBalancerHealthMonitors',
+                                args=(uuid, check))
+
+    def test_get_lbaas_uuid_id_uuid(self):
+        uuid = '1a1aa111-4474-4e16-9f02-4de959229b85'
+        my_id = 1111111
+        lb_uuid,lb_id = self.lb_mgr.get_lbaas_uuid_id(uuid)
+        self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getLoadBalancer', args=(uuid,))
+        self.assertEqual(lb_uuid, uuid)
+        self.assertEqual(lb_id, my_id)
+
+    def test_get_lbaas_uuid_id_id(self):
+        uuid = '1a1aa111-4474-4e16-9f02-4de959229b85'
+        my_id = 1111111
+        lb_uuid,lb_id = self.lb_mgr.get_lbaas_uuid_id(my_id)
+        self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getObject', identifier=my_id)
+        self.assertEqual(lb_uuid, uuid)
+        self.assertEqual(lb_id, my_id)
+
+    def test_delete_lb_member(self):
+        uuid = 'aa-bb-cc'
+        member_id = 'dd-ee-ff'
+        self.lb_mgr.delete_lb_member(uuid, member_id)
+        self.assert_called_with('SoftLayer_Network_LBaaS_Member', 'deleteLoadBalancerMembers',
+                                args=(uuid, [member_id]))
+
+    def test_add_lb_member(self):
+        uuid = 'aa-bb-cc'
+        member = {'privateIpAddress': '1.2.3.4'}
+        self.lb_mgr.add_lb_member(uuid, member)
+        self.assert_called_with('SoftLayer_Network_LBaaS_Member', 'addLoadBalancerMembers',
+                                args=(uuid, [member]))
+
+    def test_add_lb_listener(self):
+        uuid = 'aa-bb-cc'
+        listener = {'id': 1}
+        self.lb_mgr.add_lb_listener(uuid, listener)
+        self.assert_called_with('SoftLayer_Network_LBaaS_Listener', 'updateLoadBalancerProtocols',
+                                args=(uuid, [listener]))
+
+    def test_add_lb_l7_pool(self):
+        uuid = 'aa-bb-cc'
+        pool = {'id': 1}
+        members = {'id': 1}
+        health = {'id': 1}
+        session = {'id': 1}
+        self.lb_mgr.add_lb_l7_pool(uuid, pool, members, health, session)
+        self.assert_called_with('SoftLayer_Network_LBaaS_L7Pool', 'createL7Pool',
+                                args=(uuid, pool, members, health, session))
+
+    def test_del_lb_l7_pool(self):
+        uuid = 'aa-bb-cc'
+        self.lb_mgr.del_lb_l7_pool(uuid)
+        self.assert_called_with('SoftLayer_Network_LBaaS_L7Pool', 'deleteObject', identifier=uuid)
+
+    def test_remove_lb_listener(self):
+        uuid = 'aa-bb-cc'
+        listener = 'dd-ee-ff'
+        self.lb_mgr.remove_lb_listener(uuid, listener)
+        self.assert_called_with('SoftLayer_Network_LBaaS_Listener', 'deleteLoadBalancerProtocols',
+                                args=(uuid, [listener]))
+
+    def order_lbaas(self):
+        datacenter = 'tes01'
+        name = 'test-lb'
+        desc = 'my lb'
+        protocols = {'frontendPort': 80, 'frontendProtocol': 'HTTP'}
+        subnet_id = 12345
+        public = True
+        verify = False
+        self.lb_mgr.order_lbaas(datacenter, name, desc, protocols, subnet_id, public, verify)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
+        verify = True
+        self.lb_mgr.order_lbaas(datacenter, name, desc, protocols, subnet_id, public, verify)
+        self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder')
+
+    def test_lbaas_order_options(self):
+        self.lb_mgr.lbaas_order_options()
+        self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects')
+
+    def test_cancel_lbaas(self):
+        uuid = 'aa-bb-cc'
+        self.lb_mgr.cancel_lbaas(uuid)
+        self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'cancelLoadBalancer', args=(uuid,))
 
