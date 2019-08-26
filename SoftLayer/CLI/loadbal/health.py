@@ -4,6 +4,7 @@ import click
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
+from SoftLayer.exceptions import SoftLayerAPIError
 from SoftLayer import utils
 
 
@@ -55,9 +56,9 @@ def cli(env, identifier, uuid, interval, retry, timeout, url):
     for key in clean_template.keys():
         check[key] = clean_template[key]
 
-    result = mgr.update_lb_health_monitors(lb_uuid, [check])
-
-    if result:
+    try:
+        mgr.update_lb_health_monitors(lb_uuid, [check])
         click.secho('Health Check {} updated successfully'.format(uuid), fg='green')
-    else:
-        click.secho('ERROR: Failed to update {}'.format(uuid), fg='red')
+    except SoftLayerAPIError as exception:
+        click.secho('Failed to update {}'.format(uuid), fg='red')
+        click.secho("ERROR: {}".format(exception.faultString), fg='red')
