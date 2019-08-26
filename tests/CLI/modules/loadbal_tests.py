@@ -119,6 +119,7 @@ class LoadBalancerTests(testing.TestCase):
     def test_del_7p_fail(self, del_lb_17_pool):
         del_lb_17_pool.side_effect = SoftLayer.exceptions.SoftLayerAPIError(mock.ANY, mock)
         result = self.run_command(['loadbal', 'l7pool-del', '123456'])
+        self.assert_no_fail(result)
 
     @mock.patch('SoftLayer.CLI.loadbal.members.click')
     def test_lb_member_add_private(self, click):
