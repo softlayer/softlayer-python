@@ -7,8 +7,8 @@
 from mock import mock
 
 import SoftLayer
-from SoftLayer import testing
 from SoftLayer.CLI.exceptions import ArgumentError
+from SoftLayer import testing
 
 
 class LoadBalancerTests(testing.TestCase):
