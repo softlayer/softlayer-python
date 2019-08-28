@@ -8,8 +8,8 @@ import mock
 import SoftLayer
 from SoftLayer.CLI.exceptions import ArgumentError
 from SoftLayer import exceptions
-from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer.fixtures import SoftLayer_Network_LBaaS_LoadBalancer
+from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer import testing
 
 
