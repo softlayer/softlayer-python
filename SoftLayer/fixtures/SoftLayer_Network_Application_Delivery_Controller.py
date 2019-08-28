@@ -13,11 +13,27 @@ getObject = {
         'longName': 'Dallas 9',
         'name': 'dal09',
     },
+    "networkVlans": [
+        {
+            "accountId": 11111,
+            "id": 33333,
+            "modifyDate": "2019-07-17T01:09:38+08:00",
+            "name": "FirewallTesting",
+            "primarySubnetId": 91111,
+            "vlanNumber": 1711
+        },
+        {
+            "accountId": 11111,
+            "id": 862222,
+            "modifyDate": "2019-07-17T01:09:42+08:00",
+            "primarySubnetId": 502211,
+            "vlanNumber": 722
+        }
+    ],
     'password': {
         'password': 'aaaaa',
         'username': 'root'
     },
-    "primaryIpAddress": "159.122.22.222",
     "subnets": [
         {
             "broadcastAddress": "",
