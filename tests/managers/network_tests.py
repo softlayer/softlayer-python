@@ -435,7 +435,7 @@ class NetworkTests(testing.TestCase):
 
     def test_resolve_subnet_ids(self):
         _id = self.network.resolve_subnet_ids('10.0.0.1/29')
-        self.assertEqual(_id, ['100'])
+        self.assertEqual(_id, ['100', '111'])
 
     def test_resolve_subnet_ids_no_results(self):
         mock = self.set_mock('SoftLayer_Account', 'getSubnets')
