@@ -116,6 +116,26 @@ getObject = {
     ],
 }
 getAllObjects = [getObject]
+
+getLoadBalancer = {
+    "accountId": 3071234,
+    "createDate": "2019-08-12T21:49:43+08:00",
+    "id": 81234,
+    "isPublic": 0,
+    "locationId": 265592,
+    "modifyDate": "2019-08-14T06:26:06+08:00",
+    "name": "dcabero-01",
+    "uuid": "0a2da082-4474-4e16-9f02-4de11111",
+    "datacenter": {
+        "id": 265592,
+        "longName": "Amsterdam 1",
+        "name": "ams01",
+        "statusId": 2
+    }
+}
+
+cancelLoadBalancer = True
+
 getLoadBalancerMemberHealth = [
     {
         'poolUuid': '1c5f3ba6-ec7d-4cf8-8815-9bb174224a76',
