@@ -74,11 +74,11 @@ class CDNManager(utils.IdentifierMixin, object):
         :param str protocol: the protocol of the origin (default: HTTP)
         :param str bucket_name: name of the available resource
         :param str file_extensions: file extensions that can be stored in the CDN, e.g. "jpg,png"
-        :param str optimize_for: performance configuration, available options: web, video, and file
-                                 where:
-                                    'web'   --> 'General web delivery'
-                                    'video' --> 'Video on demand optimization'
-                                    'file'  --> 'Large file optimization'
+        :param str optimize_for: performance configuration, available options: web, video, and file where:
+
+                                    - 'web' = 'General web delivery'
+                                    - 'video' = 'Video on demand optimization'
+                                    - 'file' = 'Large file optimization'
         :param str cache_query: rules with the following formats: 'include-all', 'ignore-all',
                                'include: space separated query-names',
                                'ignore: space separated query-names'.'

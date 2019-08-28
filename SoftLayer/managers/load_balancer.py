@@ -76,8 +76,11 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
     def update_lb_health_monitors(self, uuid, checks):
         """calls SoftLayer_Network_LBaaS_HealthMonitor::updateLoadBalancerHealthMonitors()
 
-        https://sldn.softlayer.com/reference/services/SoftLayer_Network_LBaaS_HealthMonitor/updateLoadBalancerHealthMonitors/
-        https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_LoadBalancerHealthMonitorConfiguration/
+        - `updateLoadBalancerHealthMonitors <https://sldn.softlayer.com/reference/services/SoftLayer_Network_LBaaS_\
+            HealthMonitor/updateLoadBalancerHealthMonitors/>`_
+        - `SoftLayer_Network_LBaaS_LoadBalancerHealthMonitorConfiguration <https://sldn.softlayer.com/reference/\
+            datatypes/SoftLayer_Network_LBaaS_LoadBalancerHealthMonitorConfiguration/>`_
+
         :param uuid: loadBalancerUuid
         :param checks list: SoftLayer_Network_LBaaS_LoadBalancerHealthMonitorConfiguration[]
         """
@@ -137,8 +140,8 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
     def add_lb_l7_pool(self, identifier, pool, members, health, session):
         """Creates a new l7 pool for a LBaaS instance
 
-        https://sldn.softlayer.com/reference/services/SoftLayer_Network_LBaaS_L7Pool/createL7Pool/
-        https://cloud.ibm.com/docs/infrastructure/loadbalancer-service?topic=loadbalancer-service-api-reference
+        - https://sldn.softlayer.com/reference/services/SoftLayer_Network_LBaaS_L7Pool/createL7Pool/
+        - https://cloud.ibm.com/docs/infrastructure/loadbalancer-service?topic=loadbalancer-service-api-reference
 
         :param identifier: UUID of the LBaaS instance
         :param pool SoftLayer_Network_LBaaS_L7Pool: Description of the pool
