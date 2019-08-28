@@ -17,6 +17,25 @@ getObject = {
         'password': 'aaaaa',
         'username': 'root'
     },
+    "primaryIpAddress": "159.122.22.222",
+    "subnets": [
+        {
+            "broadcastAddress": "",
+            "cidr": 32,
+            "gateway": "",
+            "id": 74222,
+            "modifyDate": "2016-10-26T23:39:12+08:00",
+            "netmask": "255.255.255.255",
+            "networkIdentifier": "159.253.111.111",
+            "networkVlanId": 3611111,
+            "sortOrder": "4",
+            "subnetType": "STATIC_IP_ROUTED",
+            "totalIpAddresses": "2",
+            "usableIpAddressCount": "2",
+            "version": 4,
+            "addressSpace": "PUBLIC"
+        }
+    ],
     'type': {
         'keyName': 'NETSCALER_VPX',
         'name': 'NetScaler VPX'

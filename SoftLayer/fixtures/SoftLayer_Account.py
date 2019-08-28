@@ -323,8 +323,32 @@ getSubnets = [
         'subnetType': 'PRIMARY',
         'ipAddressCount': 10,
         'virtualGuests': [],
-        'hardware': []
-    }]
+        'hardware': [],
+        "podName": "dal05.pod04",
+        "networkVlan": {
+            "accountId": 123,
+            "id": 2581232,
+            "modifyDate": "2019-07-17T01:09:51+08:00",
+            "vlanNumber": 795
+        }
+    },
+    {
+        "gateway": "5.111.11.111",
+        "id": '111',
+        "modifyDate": "2018-07-24T17:14:57+08:00",
+        'networkIdentifier': '10.0.0.1',
+        'ipAddressCount': 10,
+        'cidr': '/24',
+        'virtualGuests': [],
+        'hardware': [],
+        "networkVlanId": 22222,
+        "sortOrder": "2",
+        "subnetType": "SECONDARY_ON_VLAN",
+        "totalIpAddresses": "8",
+        "usableIpAddressCount": "5",
+        "version": 4
+    }
+]
 
 getSshKeys = [{'id': '100', 'label': 'Test 1'},
               {'id': '101', 'label': 'Test 2',
