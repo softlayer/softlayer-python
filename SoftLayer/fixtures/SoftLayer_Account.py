@@ -323,8 +323,32 @@ getSubnets = [
         'subnetType': 'PRIMARY',
         'ipAddressCount': 10,
         'virtualGuests': [],
-        'hardware': []
-    }]
+        'hardware': [],
+        "podName": "dal05.pod04",
+        "networkVlan": {
+            "accountId": 123,
+            "id": 2581232,
+            "modifyDate": "2019-07-17T01:09:51+08:00",
+            "vlanNumber": 795
+        }
+    },
+    {
+        "gateway": "5.111.11.111",
+        "id": '111',
+        "modifyDate": "2018-07-24T17:14:57+08:00",
+        'networkIdentifier': '10.0.0.1',
+        'ipAddressCount': 10,
+        'cidr': '/24',
+        'virtualGuests': [],
+        'hardware': [],
+        "networkVlanId": 22222,
+        "sortOrder": "2",
+        "subnetType": "SECONDARY_ON_VLAN",
+        "totalIpAddresses": "8",
+        "usableIpAddressCount": "5",
+        "version": 4
+    }
+]
 
 getSshKeys = [{'id': '100', 'label': 'Test 1'},
               {'id': '101', 'label': 'Test 2',
@@ -713,5 +737,32 @@ getInvoices = [
         'itemCount': 12,
         'invoiceTotalAmount': '6230.66',
         'endingBalance': '12345.55'
+    }
+]
+
+getApplicationDeliveryControllers = [
+    {
+        'accountId': 307608,
+        'createDate': '2015-05-05T16:23:52-06:00',
+        'id': 11449,
+        'modifyDate': '2015-05-05T16:24:09-06:00',
+        'name': 'SLADC307608-1',
+        'typeId': 2,
+        'description': 'Citrix NetScaler VPX 10.5 10Mbps Standard',
+        'managementIpAddress': '10.11.11.112',
+        'outboundPublicBandwidthUsage': '.00365',
+        'primaryIpAddress': '19.4.24.16',
+        'datacenter': {
+            'longName': 'Dallas 9',
+            'name': 'dal09',
+        },
+        'password': {
+            'password': 'aaaaa',
+            'username': 'root'
+        },
+        'type': {
+            'keyName': 'NETSCALER_VPX',
+            'name': 'NetScaler VPX'
+        }
     }
 ]

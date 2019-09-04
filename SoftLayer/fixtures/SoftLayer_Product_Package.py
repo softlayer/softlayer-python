@@ -784,6 +784,44 @@ getAllObjects = [{
                  'sortOrder': 10}],
     'subDescription': 'Bare Metal Server',
     'unitSize': 1,
+    "itemPrices": [
+        {
+            "hourlyRecurringFee": ".027",
+            "id": 205911,
+            "laborFee": "0",
+            "locationGroupId": 505,
+            "item": {
+                "capacity": "0",
+                "description": "Load Balancer Uptime",
+                "id": 10785,
+                "keyName": "LOAD_BALANCER_UPTIME",
+            }
+        },
+        {
+            "hourlyRecurringFee": "0",
+            "id": 199467,
+            "laborFee": "0",
+            "locationGroupId": '',
+            "recurringFee": "0",
+            "item": {
+                "capacity": "0",
+                "description": "Load Balancer Bandwidth",
+                "id": 10051,
+                "keyName": "LOAD_BALANCER_BANDWIDTH",
+            }
+        },
+        {
+            "hourlyRecurringFee": ".028",
+            "id": 205913,
+            "laborFee": "0",
+            "locationGroupId": 507,
+            "item": {
+                "capacity": "0",
+                "description": "Load Balancer Uptime",
+                "id": 10785,
+                "keyName": "LOAD_BALANCER_UPTIME",
+            }
+        }]
 }]
 
 getItems = [
@@ -1143,6 +1181,91 @@ verifyOrderDH = {
     'totalSetupTax': '0',
     'quantity': 1
 }
+
+itemsLoadbal = [
+    {
+        "capacity": "0",
+        "description": "Load Balancer as a Service",
+        "id": 10043,
+        "keyName": "LOAD_BALANCER_AS_A_SERVICE",
+        "itemCategory": {
+            "categoryCode": "load_balancer_as_a_service",
+            "id": 1116,
+            "name": "Load Balancer As A Service",
+        },
+        "prices": [
+            {
+                "hourlyRecurringFee": "0",
+                "id": 199447,
+                "locationGroupId": '',
+                "recurringFee": "0",
+            }
+        ]
+    },
+    {
+        "capacity": "0",
+        "description": "Load Balancer Uptime",
+        "id": 10785,
+        "keyName": "LOAD_BALANCER_UPTIME",
+        "itemCategory": {
+            "categoryCode": "load_balancer_uptime",
+            "id": 1119,
+            "name": "Load Balancer Uptime",
+        },
+        "prices": [
+            {
+                "hourlyRecurringFee": ".028",
+                "id": 205913,
+                "locationGroupId": 507,
+            }]}
+]
+
+regionsLoadbal = [{'description': 'WDC01 - Washington, DC - East Coast U.S.',
+                   'keyname': 'WASHINGTON_DC',
+                   'location': {'location': {'id': 37473,
+                                             'longName': 'Washington 1',
+                                             'name': 'wdc01',
+                                             "groups": [
+                                                 {
+                                                     "description": "Location Group 4",
+                                                     "id": 507,
+                                                     "locationGroupTypeId": 82,
+                                                     "name": "Location Group 4",
+                                                     "locationGroupType": {
+                                                         "name": "PRICING"
+                                                     }
+                                                 },
+                                                 {
+                                                     "description": "COS Cross Region - EU",
+                                                     "id": 1303,
+                                                     "locationGroupTypeId": 82,
+                                                     "name": "eu",
+                                                     "locationGroupType": {
+                                                         "name": "PRICING"
+                                                     }
+                                                 },
+                                                 {
+                                                     "description": "COS Regional Frankfurt",
+                                                     "id": 1783,
+                                                     "locationGroupTypeId": 82,
+                                                     "name": "eu-de",
+                                                     "locationGroupType": {
+                                                         "name": "PRICING"
+                                                     }
+                                                 }
+                                             ]
+                                             }},
+                   'sortOrder': 10}]
+
+getAllObjectsLoadbal = [
+    {
+        "id": 805,
+        "keyName": "LBAAS",
+        "name": "Load Balancer As A Service (LBaaS)",
+        "items": itemsLoadbal,
+        "regions": regionsLoadbal
+    }
+]
 
 getAllObjectsDH = [{
     "subDescription": "Dedicated Host",
