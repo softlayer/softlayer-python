@@ -1,6 +1,42 @@
 # Change Log
 
 
+
+## [5.8.0] - 2019-09-04
+- https://github.com/softlayer/softlayer-python/compare/v5.7.2...v5.8.0
+
++ #1143 Upgrade to prompt_toolkit >= 2
++ #1003 Bandwidth Feature
+    * slcli summary
+    * slcli report bandwidth
+    * slcli vs bandwidth
+    * slcli hw bandwidth
+    * Added bandwidth to VS and HW details page
++ #1146 DOCS: replace 'developer' with 'sldn' links
++ #1147 property 'contents' is not valid for 'SoftLayer_Ticket' when creating a ticket
++ #1139 cannot create static subnet with slcli
++ #1145 Refactor cdn network.
++ #1152 IBMID auth support
++ #1153, #1052 Transient VSI support
++ #1167 Removed legacy LoadBalancer command, added Citrix and IBM LBaaS commands.
+    * slcli lb cancel
+    * slcli lb detail
+    * slcli lb health
+    * slcli lb l7pool-add
+    * slcli lb l7pool-del
+    * slcli lb list
+    * slcli lb member-add
+    * slcli lb member-del
+    * slcli lb ns-detail
+    * slcli lb ns-list
+    * slcli lb order
+    * slcli lb order-options
+    * slcli lb pool-add
+    * slcli lb pool-del
+    * slcli lb pool-edit
++ #1157 Remove VpnAllowedFlag.
++ #1160 Improve hardware cancellation to deal with additional cases
+
 ## [5.7.2] - 2019-05-03
 - https://github.com/softlayer/softlayer-python/compare/v5.7.1...v5.7.2
 
