@@ -9,17 +9,10 @@ import datetime
 import re
 import time
 
-import six
-
 # pylint: disable=no-member, invalid-name
 
 UUID_RE = re.compile(r'^[0-9a-f\-]{36}$', re.I)
 KNOWN_OPERATIONS = ['<=', '>=', '<', '>', '~', '!~', '*=', '^=', '$=', '_=']
-
-configparser = six.moves.configparser
-string_types = six.string_types
-StringIO = six.StringIO
-xmlrpc_client = six.moves.xmlrpc_client
 
 
 def lookup(dic, key, *keys):
@@ -91,7 +84,7 @@ def query_filter(query):
     except ValueError:
         pass
 
-    if isinstance(query, string_types):
+    if isinstance(query, str):
         query = query.strip()
         for operation in KNOWN_OPERATIONS:
             if query.startswith(operation):

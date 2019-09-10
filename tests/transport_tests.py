@@ -10,7 +10,6 @@ import warnings
 import mock
 import pytest
 import requests
-import six
 
 import SoftLayer
 from SoftLayer import consts
@@ -20,7 +19,7 @@ from SoftLayer import transports
 
 def get_xmlrpc_response():
     response = requests.Response()
-    list_body = six.b('''<?xml version="1.0" encoding="utf-8"?>
+    list_body = b'''<?xml version="1.0" encoding="utf-8"?>
 <params>
 <param>
 <value>
@@ -29,7 +28,7 @@ def get_xmlrpc_response():
 </array>
 </value>
 </param>
-</params>''')
+</params>'''
     response.raw = io.BytesIO(list_body)
     response.headers['SoftLayer-Total-Items'] = 10
     response.status_code = 200

@@ -6,7 +6,6 @@
 """
 # Disable pylint import error and too many methods error
 # pylint: disable=invalid-name
-from __future__ import print_function
 import logging
 import os.path
 
@@ -79,7 +78,7 @@ def _mock_key(service, method):
 
 
 class TestCase(testtools.TestCase):
-    """Testcase class with PEP-8 compatable method names."""
+    """Testcase class with PEP-8 compatible method names."""
 
     @classmethod
     def setUpClass(cls):

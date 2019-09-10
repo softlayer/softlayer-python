@@ -5,7 +5,6 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from __future__ import print_function
 import copy
 import os
 import shlex

@@ -1,5 +1,4 @@
 """Metric Utilities"""
-from __future__ import print_function
 import datetime
 import itertools
 import sys

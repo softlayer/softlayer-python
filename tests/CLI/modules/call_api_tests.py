@@ -94,11 +94,7 @@ class CallCliTests(testing.TestCase):
                                    '--output-python'])
 
         self.assert_no_fail(result)
-        # NOTE(kmcdonald): Python 3 no longer inserts 'u' before unicode
-        # string literals but python 2 does. These are stripped out to make
-        # this test pass on both python versions.
-        stripped_output = result.output.replace("u'", "'")
-        self.assertIsNotNone(stripped_output, """import SoftLayer
+        self.assertIsNotNone(result.output, """import SoftLayer
 
 client = SoftLayer.create_client_from_env()
 result = client.call(u'Service',

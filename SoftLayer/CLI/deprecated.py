@@ -4,7 +4,6 @@
     Handles usage of the deprecated command name, 'sl'.
     :license: MIT, see LICENSE for more details.
 """
-from __future__ import print_function
 import sys
 
 

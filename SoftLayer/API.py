@@ -6,7 +6,6 @@
     :license: MIT, see LICENSE for more details.
 """
 # pylint: disable=invalid-name
-from __future__ import generators
 import warnings
 
 

@@ -9,9 +9,9 @@
 """
 
 # pylint: disable=redefined-argument-from-local
+import configparser
+import io
 import os.path
-
-from SoftLayer import utils
 
 
 class TemplateCallback(object):
@@ -24,10 +24,10 @@ class TemplateCallback(object):
         if value is None:
             return
 
-        config = utils.configparser.ConfigParser()
+        config = configparser.ConfigParser()
         ini_str = '[settings]\n' + open(
             os.path.expanduser(value), 'r').read()
-        ini_fp = utils.StringIO(ini_str)
+        ini_fp = io.StringIO(ini_str)
         config.readfp(ini_fp)
 
         # Merge template options with the options passed in

@@ -10,6 +10,7 @@ import json
 import logging
 import re
 import time
+import xmlrpc.client
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -200,9 +201,9 @@ class XmlRpcTransport(object):
         request.transport_headers.setdefault('User-Agent', self.user_agent)
 
         request.url = '/'.join([self.endpoint_url, request.service])
-        request.payload = utils.xmlrpc_client.dumps(tuple(largs),
-                                                    methodname=request.method,
-                                                    allow_none=True)
+        request.payload = xmlrpc.client.dumps(tuple(largs),
+                                              methodname=request.method,
+                                              allow_none=True)
 
         # Prefer the request setting, if it's not None
         verify = request.verify
@@ -220,13 +221,13 @@ class XmlRpcTransport(object):
                                        proxies=_proxies_dict(self.proxy))
 
             resp.raise_for_status()
-            result = utils.xmlrpc_client.loads(resp.content)[0][0]
+            result = xmlrpc.client.loads(resp.content)[0][0]
             if isinstance(result, list):
                 return SoftLayerListResult(
                     result, int(resp.headers.get('softlayer-total-items', 0)))
             else:
                 return result
-        except utils.xmlrpc_client.Fault as ex:
+        except xmlrpc.client.Fault as ex:
             # These exceptions are formed from the XML-RPC spec
             # http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
             error_mapping = {
