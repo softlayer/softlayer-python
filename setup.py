@@ -29,7 +29,7 @@ setup(
             'sl = SoftLayer.CLI.deprecated:main',
         ],
     },
-    python_requires='>=3.3',
+    python_requires='>=3.5',
     install_requires=[
         'ptable >= 0.9.2',
         'click >= 7',
