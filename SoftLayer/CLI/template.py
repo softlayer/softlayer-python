@@ -28,7 +28,7 @@ class TemplateCallback(object):
         ini_str = '[settings]\n' + open(
             os.path.expanduser(value), 'r').read()
         ini_fp = io.StringIO(ini_str)
-        config.readfp(ini_fp)
+        config.read_file(ini_fp)
 
         # Merge template options with the options passed in
         args = {}
