@@ -36,7 +36,7 @@ createStandardTicket = {
 edit = True
 addUpdate = {}
 
-list = getObject
+gatList = getObject
 
 addAttachedHardware = {
     "id": 123,
