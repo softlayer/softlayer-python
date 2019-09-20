@@ -777,8 +777,7 @@ def _get_os_price_id(items, os, location):
                              'itemCategory',
                              'categoryCode') != 'os',
                 utils.lookup(item,
-                             'softwareDescription',
-                             'referenceCode') != os]):
+                             'keyName') != os]):
             continue
 
         for price in item['prices']:
