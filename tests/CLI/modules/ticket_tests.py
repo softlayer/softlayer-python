@@ -21,6 +21,7 @@ class TicketTests(testing.TestCase):
 
         expected = [{
             'assigned_user': 'John Smith',
+            'Case_Number': 'CS123456',
             'id': 102,
             'last_edited': '2013-08-01T14:16:47-07:00',
             'priority': 0,
@@ -34,6 +35,7 @@ class TicketTests(testing.TestCase):
         result = self.run_command(['ticket', 'detail', '1'])
 
         expected = {
+            'Case_Number': 'CS123456',
             'created': '2013-08-01T14:14:04-07:00',
             'edited': '2013-08-01T14:16:47-07:00',
             'id': 100,
@@ -235,6 +237,7 @@ class TicketTests(testing.TestCase):
     def test_init_ticket_results_asigned_user(self):
         mock = self.set_mock('SoftLayer_Ticket', 'getObject')
         mock.return_value = {
+            "serviceProviderResourceId": "CS12345",
             "id": 100,
             "title": "Simple Title",
             "priority": 1,

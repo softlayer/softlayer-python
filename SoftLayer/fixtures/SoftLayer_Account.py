@@ -340,6 +340,7 @@ getValidSecurityCertificates = getSecurityCertificates
 getTickets = [
     {
         "accountId": 1234,
+        "serviceProviderResourceId": "CS123456",
         "assignedUserId": 12345,
         "createDate": "2013-08-01T14:14:04-07:00",
         "id": 100,
@@ -355,6 +356,7 @@ getTickets = [
     },
     {
         "accountId": 1234,
+        "serviceProviderResourceId": "CS123456",
         "assignedUserId": 12345,
         "createDate": "2013-08-01T14:14:04-07:00",
         "id": 101,
@@ -370,6 +372,7 @@ getTickets = [
     },
     {
         "accountId": 1234,
+        "serviceProviderResourceId": "CS123456",
         "assignedUserId": 12345,
         "createDate": "2014-03-03T09:44:01-08:00",
         "id": 102,
