@@ -300,3 +300,4 @@ class TicketTests(testing.TestCase):
         result = self.run_command(['ticket', 'update', '100'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Ticket', 'addUpdate', args=({'entry': 'Testing1'},), identifier=100)
+		
