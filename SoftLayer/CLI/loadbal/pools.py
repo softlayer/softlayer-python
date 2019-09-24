@@ -177,7 +177,7 @@ def l7pool_add(env, identifier, **args):
         'protocol': args.get('protocol')
     }
 
-    pool_members = [member for member in args.get('server')]
+    pool_members = list(args.get('server'))
 
     pool_health = {
         'interval': args.get('healthinterval'),
