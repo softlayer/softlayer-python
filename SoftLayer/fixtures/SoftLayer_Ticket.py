@@ -1,6 +1,7 @@
 createCancelServerTicket = {'id': 1234, 'title': 'Server Cancellation Request'}
 getObject = {
     "accountId": 1234,
+    "serviceProviderResourceId": "CS123456",
     "assignedUserId": 12345,
     "createDate": "2013-08-01T14:14:04-07:00",
     "id": 100,
@@ -26,6 +27,7 @@ getObject = {
 
 createStandardTicket = {
     "assignedUserId": 12345,
+    "serviceProviderResourceId": "CS123456",
     "id": 100,
     "contents": "body",
     "subjectId": 1004,
@@ -33,6 +35,8 @@ createStandardTicket = {
 }
 edit = True
 addUpdate = {}
+
+gatList = getObject
 
 addAttachedHardware = {
     "id": 123,
