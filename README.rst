@@ -124,14 +124,13 @@ If you are using the library directly in python, you can do something like this.
 
 System Requirements
 -------------------
-* Python 2.7, 3.3, 3.4, 3.5, 3.6, or 3.7.
+* Python 3.5, 3.6, or 3.7.
 * A valid SoftLayer API username and key.
 * A connection to SoftLayer's private network is required to use
   our private network API endpoints.
 
 Python Packages
 ---------------
-* six >= 1.7.0
 * ptable >= 0.9.2
 * click >= 7
 * requests >= 2.20.0

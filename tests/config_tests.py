@@ -69,7 +69,7 @@ class TestGetClientSettingsEnv(testing.TestCase):
 
 class TestGetClientSettingsConfigFile(testing.TestCase):
 
-    @mock.patch('six.moves.configparser.RawConfigParser')
+    @mock.patch('configparser.RawConfigParser')
     def test_username_api_key(self, config_parser):
         result = config.get_client_settings_config_file()
 
@@ -79,7 +79,7 @@ class TestGetClientSettingsConfigFile(testing.TestCase):
         self.assertEqual(result['username'], config_parser().get())
         self.assertEqual(result['api_key'], config_parser().get())
 
-    @mock.patch('six.moves.configparser.RawConfigParser')
+    @mock.patch('configparser.RawConfigParser')
     def test_no_section(self, config_parser):
         config_parser().has_section.return_value = False
         result = config.get_client_settings_config_file()
@@ -87,7 +87,7 @@ class TestGetClientSettingsConfigFile(testing.TestCase):
         self.assertIsNone(result)
 
 
-@mock.patch('six.moves.configparser.RawConfigParser')
+@mock.patch('configparser.RawConfigParser')
 def test_config_file(config_parser):
     config.get_client_settings_config_file(config_file='path/to/config')
     config_parser().read.assert_called_with([mock.ANY,

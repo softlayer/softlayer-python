@@ -1,5 +1,6 @@
 """Setup CLI configuration."""
 # :license: MIT, see LICENSE for more details.
+import configparser
 import os.path
 
 import click
@@ -9,7 +10,6 @@ from SoftLayer.CLI import config
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
-from SoftLayer import utils
 
 
 def get_api_key(client, username, secret):
@@ -65,11 +65,11 @@ def cli(env):
 
     # Persist the config file. Read the target config file in before
     # setting the values to avoid clobbering settings
-    parsed_config = utils.configparser.RawConfigParser()
+    parsed_config = configparser.RawConfigParser()
     parsed_config.read(config_path)
     try:
         parsed_config.add_section('softlayer')
-    except utils.configparser.DuplicateSectionError:
+    except configparser.DuplicateSectionError:
         pass
 
     parsed_config.set('softlayer', 'username', username)
