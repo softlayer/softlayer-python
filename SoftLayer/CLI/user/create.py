@@ -91,7 +91,7 @@ def cli(env, username, email, password, from_user, template, api_key):
 def generate_password():
     """Returns a 23 character random string, with 3 special characters at the end"""
     if sys.version_info > (3, 6):
-        import secrets  # pylint: disable=import-error
+        import secrets  # pylint: disable=import-error,import-outside-toplevel
         alphabet = string.ascii_letters + string.digits
         password = ''.join(secrets.choice(alphabet) for i in range(20))
         special = ''.join(secrets.choice(string.punctuation) for i in range(3))

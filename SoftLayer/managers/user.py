@@ -132,8 +132,7 @@ class UserManager(utils.IdentifierMixin, object):
             # If permission does not exist for from_user_id add it to the list to be removed
             if _keyname_search(from_permissions, permission['keyName']):
                 continue
-            else:
-                remove_permissions.append({'keyName': permission['keyName']})
+            remove_permissions.append({'keyName': permission['keyName']})
 
         self.remove_permissions(user_id, remove_permissions)
         return True

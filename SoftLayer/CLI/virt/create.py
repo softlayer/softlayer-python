@@ -130,11 +130,11 @@ def _parse_create_args(client, args):
 
     if args.get('public_security_group'):
         pub_groups = args.get('public_security_group')
-        data['public_security_groups'] = [group for group in pub_groups]
+        data['public_security_groups'] = list(pub_groups)
 
     if args.get('private_security_group'):
         priv_groups = args.get('private_security_group')
-        data['private_security_groups'] = [group for group in priv_groups]
+        data['private_security_groups'] = list(priv_groups)
 
     if args.get('tag', False):
         data['tags'] = ','.join(args['tag'])
