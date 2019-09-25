@@ -123,7 +123,7 @@ class HardwareTests(testing.TestCase):
         expected = {
             'extras': [{'key': '1_IPV6_ADDRESS', 'name': '1 IPv6 Address'}],
             'locations': [{'key': 'wdc01', 'name': 'Washington 1'}],
-            'operating_systems': [{'key': 'UBUNTU_14_64',
+            'operating_systems': [{'key': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
                                    'name': 'Ubuntu / 14.04-64'}],
             'port_speeds': [{
                 'key': '10',
@@ -180,7 +180,7 @@ class HardwareTests(testing.TestCase):
             'hostname': 'unicorn',
             'domain': 'giggles.woo',
             'location': 'wdc01',
-            'os': 'UBUNTU_14_64',
+            'os': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
             'port_speed': 10,
         }
 
@@ -194,7 +194,7 @@ class HardwareTests(testing.TestCase):
             'hostname': 'unicorn',
             'domain': 'giggles.woo',
             'location': 'wdc01',
-            'os': 'UBUNTU_14_64',
+            'os': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
             'port_speed': 10,
             'hourly': True,
             'extras': ['1_IPV6_ADDRESS'],
@@ -514,11 +514,11 @@ class HardwareHelperTests(testing.TestCase):
     def test_get_os_price_mismatched(self):
         items = [
             {'itemCategory': {'categoryCode': 'os'},
-             'softwareDescription': {'referenceCode': 'TEST_OS'},
+             'keyName': 'OS_TEST',
              'prices': [{'id': 2, 'locationGroupId': 55, 'recurringFee': 99}]
              },
             {'itemCategory': {'categoryCode': 'os'},
-             'softwareDescription': {'referenceCode': 'TEST_OS'},
+             'keyName': 'OS_TEST',
              'prices': [{'id': 3, 'locationGroupId': None, 'recurringFee': 99}]
              },
         ]
@@ -532,7 +532,7 @@ class HardwareHelperTests(testing.TestCase):
                 }
             }
         }
-        result = managers.hardware._get_os_price_id(items, 'TEST_OS', location)
+        result = managers.hardware._get_os_price_id(items, 'OS_TEST', location)
         self.assertEqual(3, result)
 
     def test_get_default_price_id_item_not_first(self):

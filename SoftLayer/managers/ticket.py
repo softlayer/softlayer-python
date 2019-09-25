@@ -28,7 +28,7 @@ class TicketManager(utils.IdentifierMixin, object):
         :param boolean open_status: include open tickets
         :param boolean closed_status: include closed tickets
         """
-        mask = """mask[id, title, assignedUser[firstName, lastName], priority,
+        mask = """mask[id, serviceProviderResourceId, title, assignedUser[firstName, lastName], priority,
                   createDate, lastEditDate, accountId, status, updateCount]"""
 
         call = 'getTickets'
@@ -39,7 +39,6 @@ class TicketManager(utils.IdentifierMixin, object):
                 call = 'getClosedTickets'
             else:
                 raise ValueError("open_status and closed_status cannot both be False")
-
         return self.client.call('Account', call, mask=mask, iter=True)
 
     def list_subjects(self):
@@ -53,7 +52,7 @@ class TicketManager(utils.IdentifierMixin, object):
         :returns: dict -- information about the specified ticket
 
         """
-        mask = """mask[id, title, assignedUser[firstName, lastName],status,
+        mask = """mask[id, serviceProviderResourceId, title, assignedUser[firstName, lastName],status,
                   createDate,lastEditDate,updates[entry,editor],updateCount, priority]"""
         return self.ticket.getObject(id=ticket_id, mask=mask)
 

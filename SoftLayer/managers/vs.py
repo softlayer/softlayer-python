@@ -303,7 +303,7 @@ class VSManager(utils.IdentifierMixin, object):
             config['customProvisionScriptUri'] = post_uri
 
         if ssh_keys:
-            config['sshKeyIds'] = [key_id for key_id in ssh_keys]
+            config['sshKeyIds'] = list(ssh_keys)
 
         if image_id:
             config['imageTemplateId'] = image_id

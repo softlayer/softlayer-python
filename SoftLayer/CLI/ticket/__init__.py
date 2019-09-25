@@ -32,6 +32,7 @@ def get_ticket_results(mgr, ticket_id, update_count=1):
     table.align['value'] = 'l'
 
     table.add_row(['id', ticket['id']])
+    table.add_row(['Case_Number', ticket['serviceProviderResourceId']])
     table.add_row(['title', ticket['title']])
     table.add_row(['priority', PRIORITY_MAP[ticket.get('priority', 0)]])
     if ticket.get('assignedUser'):

@@ -317,7 +317,7 @@ class ServerCLITests(testing.TestCase):
              {'size': 'Dual Xeon Gold, 384GB Ram, 4x960GB SSD, RAID 10',
               'value': 'DGOLD_6140_384GB_4X960GB_SSD_SED_RAID_10'}],
             [{'operating_system': 'Ubuntu / 14.04-64',
-              'value': 'UBUNTU_14_64'}],
+              'value': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT'}],
             [{'port_speed': '10 Mbps Public & Private Network Uplinks',
               'value': '10'}],
             [{'extras': '1 IPv6 Address', 'value': '1_IPV6_ADDRESS'}]]
@@ -336,7 +336,7 @@ class ServerCLITests(testing.TestCase):
                                    '--domain=example.com',
                                    '--datacenter=TEST00',
                                    '--port-speed=100',
-                                   '--os=UBUNTU_12_64',
+                                   '--os=OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
                                    '--no-public',
                                    '--key=10',
                                    ])
