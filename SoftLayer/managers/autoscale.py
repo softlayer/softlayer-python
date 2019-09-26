@@ -22,7 +22,17 @@ class AutoScaleManager(object):
 
     def details(self, identifier, mask=None):
         if not mask:
-            mask = """mask[virtualGuestMembers, terminationPolicy, policies, virtualGuestMemberCount,
+            mask = """mask[virtualGuestMembers[id,virtualGuest[hostname,domain,provisionDate]], terminationPolicy,
+                   virtualGuestMemberCount, virtualGuestMemberTemplate[sshKeys],
+                   policies[id,name,createDate,cooldown,actions,triggers,scaleActions],
                    networkVlans[networkVlanId,networkVlan[networkSpace,primaryRouter[hostname]]],
                    loadBalancers, regionalGroup[locations]]"""
         return self.client.call('SoftLayer_Scale_Group', 'getObject', id=identifier, mask=mask)
+
+    def get_policy(self, identifier, mask=None):
+        if not mask:
+            mask = """mask[cooldown, createDate, id, name, actions, triggers[type]
+
+            ]"""
+
+        return self.client.call('SoftLayer_Scale_Policy', 'getObject', id=identifier, mask=mask)
