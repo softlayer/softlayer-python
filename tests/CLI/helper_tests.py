@@ -10,10 +10,8 @@ import os
 import sys
 import tempfile
 
-
 import click
 import mock
-import six
 
 from SoftLayer.CLI import core
 from SoftLayer.CLI import exceptions
@@ -97,13 +95,6 @@ class FormattedItemTests(testing.TestCase):
         self.assertEqual('test', item.original)
         self.assertEqual('test', item.formatted)
         self.assertEqual('test', str(item))
-
-    def test_unicode(self):
-        if six.PY2:
-            item = formatting.FormattedItem(u'\u32423', u'\u32423')
-            self.assertEqual(u'\u32423', item.original)
-            self.assertEqual(u'\u32423', item.formatted)
-            self.assertEqual('invalid', str(item))
 
     def test_mb_to_gb(self):
         item = formatting.mb_to_gb(1024)

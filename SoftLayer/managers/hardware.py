@@ -281,7 +281,7 @@ class HardwareManager(utils.IdentifierMixin, object):
             config['customProvisionScriptUri'] = post_uri
 
         if ssh_keys:
-            config['sshKeyIds'] = [key_id for key_id in ssh_keys]
+            config['sshKeyIds'] = list(ssh_keys)
 
         return self.hardware.reloadOperatingSystem('FORCE', config,
                                                    id=hardware_id)
@@ -403,7 +403,7 @@ class HardwareManager(utils.IdentifierMixin, object):
             if item['itemCategory']['categoryCode'] == 'os':
                 operating_systems.append({
                     'name': item['softwareDescription']['longDescription'],
-                    'key': item['softwareDescription']['referenceCode'],
+                    'key': item['keyName']
                 })
 
         # Port speeds
@@ -777,8 +777,7 @@ def _get_os_price_id(items, os, location):
                              'itemCategory',
                              'categoryCode') != 'os',
                 utils.lookup(item,
-                             'softwareDescription',
-                             'referenceCode') != os]):
+                             'keyName') != os]):
             continue
 
         for price in item['prices']:

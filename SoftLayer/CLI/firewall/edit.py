@@ -154,11 +154,9 @@ def cli(env, identifier):
             try:
                 rules = parse_rules(edited_rules)
                 if firewall_type == 'vlan':
-                    rules = mgr.edit_dedicated_fwl_rules(firewall_id,
-                                                         rules)
+                    mgr.edit_dedicated_fwl_rules(firewall_id, rules)
                 else:
-                    rules = mgr.edit_standard_fwl_rules(firewall_id,
-                                                        rules)
+                    mgr.edit_standard_fwl_rules(firewall_id, rules)
                 break
             except (SoftLayer.SoftLayerError, ValueError) as error:
                 env.out("Unexpected error({%s})" % (error))
@@ -169,10 +167,8 @@ def cli(env, identifier):
                     if formatting.confirm("Would you like to submit the "
                                           "rules. Continue?"):
                         continue
-                    else:
-                        raise exceptions.CLIAbort('Aborted.')
-                else:
                     raise exceptions.CLIAbort('Aborted.')
-                env.fout('Firewall updated!')
+                raise exceptions.CLIAbort('Aborted.')
+        env.fout('Firewall updated!')
     else:
         raise exceptions.CLIAbort('Aborted.')

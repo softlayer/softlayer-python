@@ -5,11 +5,11 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from __future__ import print_function
 import logging
 import os
 import sys
 import time
+import traceback
 import types
 
 import click
@@ -197,7 +197,6 @@ def main(reraise_exceptions=False, **kwargs):
         if reraise_exceptions:
             raise
 
-        import traceback
         print("An unexpected error has occured:")
         print(str(traceback.format_exc()))
         print("Feel free to report this error as it is likely a bug:")

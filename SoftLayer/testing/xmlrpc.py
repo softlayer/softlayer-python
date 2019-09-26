@@ -5,10 +5,10 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import http.server
 import logging
 import threading
-
-import six
+import xmlrpc.client
 
 import SoftLayer
 from SoftLayer import transports
@@ -17,15 +17,15 @@ from SoftLayer import utils
 # pylint: disable=invalid-name, broad-except, arguments-differ
 
 
-class TestServer(six.moves.BaseHTTPServer.HTTPServer):
+class TestServer(http.server.HTTPServer):
     """Test HTTP server which holds a given transport."""
 
     def __init__(self, transport, *args, **kw):
-        six.moves.BaseHTTPServer.HTTPServer.__init__(self, *args, **kw)
+        http.server.HTTPServer.__init__(self, *args, **kw)
         self.transport = transport
 
 
-class TestHandler(six.moves.BaseHTTPServer.BaseHTTPRequestHandler):
+class TestHandler(http.server.BaseHTTPRequestHandler):
     """Test XML-RPC Handler which converts XML-RPC to transport requests."""
 
     def do_POST(self):
@@ -33,7 +33,7 @@ class TestHandler(six.moves.BaseHTTPServer.BaseHTTPRequestHandler):
         try:
             length = int(self.headers['Content-Length'])
             data = self.rfile.read(length).decode('utf-8')
-            args, method = utils.xmlrpc_client.loads(data)
+            args, method = xmlrpc.client.loads(data)
             headers = args[0].get('headers', {})
 
             # Form Request for the transport
@@ -54,9 +54,9 @@ class TestHandler(six.moves.BaseHTTPServer.BaseHTTPRequestHandler):
             # Get response
             response = self.server.transport(req)
 
-            response_body = utils.xmlrpc_client.dumps((response,),
-                                                      allow_none=True,
-                                                      methodresponse=True)
+            response_body = xmlrpc.client.dumps((response,),
+                                                allow_none=True,
+                                                methodresponse=True)
 
             self.send_response(200)
             self.send_header("Content-type", "application/xml; charset=UTF-8")
@@ -69,10 +69,10 @@ class TestHandler(six.moves.BaseHTTPServer.BaseHTTPRequestHandler):
         except SoftLayer.SoftLayerAPIError as ex:
             self.send_response(200)
             self.end_headers()
-            response = utils.xmlrpc_client.Fault(ex.faultCode, str(ex.reason))
-            response_body = utils.xmlrpc_client.dumps(response,
-                                                      allow_none=True,
-                                                      methodresponse=True)
+            response = xmlrpc.client.Fault(ex.faultCode, str(ex.reason))
+            response_body = xmlrpc.client.dumps(response,
+                                                allow_none=True,
+                                                methodresponse=True)
             self.wfile.write(response_body.encode('utf-8'))
         except Exception as ex:
             self.send_response(500)

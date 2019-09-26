@@ -30,7 +30,7 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
                  SequentialOutput
     :param string fmt (optional): One of: table, raw, json, python
     """
-    if isinstance(data, utils.string_types):
+    if isinstance(data, str):
         if fmt in ('json', 'jsonraw'):
             return json.dumps(data)
         return data

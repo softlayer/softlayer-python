@@ -4,16 +4,16 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import io
 import logging
+
+import click
+import mock
 
 import SoftLayer
 from SoftLayer.CLI import core
 from SoftLayer.CLI import environment
 from SoftLayer import testing
-from SoftLayer import utils
-
-import click
-import mock
 
 
 class CoreTests(testing.TestCase):
@@ -56,7 +56,7 @@ class CoreTests(testing.TestCase):
 class CoreMainTests(testing.TestCase):
 
     @mock.patch('SoftLayer.CLI.core.cli.main')
-    @mock.patch('sys.stdout', new_callable=utils.StringIO)
+    @mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_unexpected_error(self, stdoutmock, climock):
         climock.side_effect = AttributeError('Attribute foo does not exist')
 
@@ -70,7 +70,7 @@ class CoreMainTests(testing.TestCase):
                       stdoutmock.getvalue())
 
     @mock.patch('SoftLayer.CLI.core.cli.main')
-    @mock.patch('sys.stdout', new_callable=utils.StringIO)
+    @mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_sl_error(self, stdoutmock, climock):
         ex = SoftLayer.SoftLayerAPIError('SoftLayer_Exception', 'Not found')
         climock.side_effect = ex
@@ -81,7 +81,7 @@ class CoreMainTests(testing.TestCase):
                       stdoutmock.getvalue())
 
     @mock.patch('SoftLayer.CLI.core.cli.main')
-    @mock.patch('sys.stdout', new_callable=utils.StringIO)
+    @mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_auth_error(self, stdoutmock, climock):
         ex = SoftLayer.SoftLayerAPIError('SoftLayer_Exception',
                                          'Invalid API token.')
