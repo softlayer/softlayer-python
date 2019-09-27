@@ -1,28 +1,23 @@
-"""List Autoscale groups."""
+"""Get details of an Autoscale groups."""
 # :license: MIT, see LICENSE for more details.
 
 import click
 
 import SoftLayer
-from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-from SoftLayer.CLI import helpers
 from SoftLayer.managers.autoscale import AutoScaleManager
 from SoftLayer import utils
 
-from pprint import pprint as pp 
 
 @click.command()
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """List AutoScale Groups."""
+    """Get details of an Autoscale groups."""
 
     autoscale = AutoScaleManager(env.client)
     group = autoscale.details(identifier)
-    # print(groups)
-    # pp(group)
 
     # Group Config Table
     table = formatting.KeyValueTable(["Group", "Value"])
@@ -45,7 +40,6 @@ def cli(env, identifier):
         table.add_row([network_type, vlan_name])
 
     env.fout(table)
-
 
     # Template Config Table
     config_table = formatting.KeyValueTable(["Template", "Value"])
@@ -75,24 +69,13 @@ def cli(env, identifier):
 
     env.fout(config_table)
 
-
     # Policy Config Table
     policy_table = formatting.KeyValueTable(["Policy", "Cooldown"])
     policies = group.get('policies')
-    # pp(policies)
     for policy in policies:
         policy_table.add_row([policy.get('name'), policy.get('cooldown') or group.get('cooldown')])
-        # full_policy = autoscale.get_policy(policy.get('id'))
-        # pp(full_policy)
 
     env.fout(policy_table)
-
-    # LB Config Table
-    # Not sure if this still still a thing?
-    # lb_table = formatting.KeyValueTable(["Load Balancer", "Value"])
-    # loadbal = group.get('loadBalancers')
-
-    # env.fout(lb_table)
 
     # Active Guests
     member_table = formatting.Table(['Id', 'Hostname', 'Created'], title="Active Guests")

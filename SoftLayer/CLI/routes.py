@@ -306,6 +306,7 @@ ALL_ROUTES = [
     ('autoscale', 'SoftLayer.CLI.autoscale'),
     ('autoscale:list', 'SoftLayer.CLI.autoscale.list:cli'),
     ('autoscale:detail', 'SoftLayer.CLI.autoscale.detail:cli'),
+    ('autoscale:scale', 'SoftLayer.CLI.autoscale.scale:cli'),
 ]
 
 ALL_ALIASES = {

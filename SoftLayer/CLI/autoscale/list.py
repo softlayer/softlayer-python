@@ -4,14 +4,11 @@
 import click
 
 import SoftLayer
-from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-from SoftLayer.CLI import helpers
 from SoftLayer.managers.autoscale import AutoScaleManager
 from SoftLayer import utils
 
-from pprint import pprint as pp 
 
 @click.command()
 @environment.pass_env
