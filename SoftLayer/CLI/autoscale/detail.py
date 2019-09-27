@@ -21,6 +21,8 @@ def cli(env, identifier):
 
     # Group Config Table
     table = formatting.KeyValueTable(["Group", "Value"])
+    table.align['Group'] = 'l'
+    table.align['Value'] = 'l'
 
     table.add_row(['Id', group.get('id')])
     # Ideally we would use regionalGroup->preferredDatacenter, but that generates an error.
@@ -31,7 +33,7 @@ def cli(env, identifier):
     table.add_row(['Current Members', group.get('virtualGuestMemberCount')])
     table.add_row(['Cooldown', "{} seconds".format(group.get('cooldown'))])
     table.add_row(['Last Action', utils.clean_time(group.get('lastActionDate'))])
-    
+
     for network in group.get('networkVlans'):
         network_type = utils.lookup(network, 'networkVlan', 'networkSpace')
         router = utils.lookup(network, 'networkVlan', 'primaryRouter', 'hostname')
@@ -43,8 +45,11 @@ def cli(env, identifier):
 
     # Template Config Table
     config_table = formatting.KeyValueTable(["Template", "Value"])
+    config_table.align['Template'] = 'l'
+    config_table.align['Value'] = 'l'
+
     template = group.get('virtualGuestMemberTemplate')
-    
+
     config_table.add_row(['Hostname', template.get('hostname')])
     config_table.add_row(['Domain', template.get('domain')])
     config_table.add_row(['Core', template.get('startCpus')])

@@ -7,12 +7,11 @@
 """
 
 
-
 class AutoScaleManager(object):
+    """Manager for interacting with Autoscale instances."""
 
     def __init__(self, client):
         self.client = client
-
 
     def list(self, mask=None):
         """Calls SoftLayer_Account getScaleGroups()_
@@ -72,3 +71,14 @@ class AutoScaleManager(object):
         .. _scaleTo(): https://sldn.softlayer.com/reference/services/SoftLayer_Scale_Group/scaleTo/
         """
         return self.client.call('SoftLayer_Scale_Group', 'scaleTo', amount, id=identifier)
+
+    def get_logs(self, identifier, mask=None, object_filter=None):
+        """Calls SoftLayer_Scale_Group getLogs()_
+
+        :param identifier: SoftLayer_Scale_Group Id
+        :param mask: optional SoftLayer_Scale_Group_Log objectMask
+        :param object_filter: optional SoftLayer_Scale_Group_Log objectFilter
+        .. getLogs(): https://sldn.softlayer.com/reference/services/SoftLayer_Scale_Group/getLogs/
+        """
+        return self.client.call('SoftLayer_Scale_Group', 'getLogs', id=identifier, mask=mask, filter=object_filter,
+                                iter=True)
