@@ -18,7 +18,7 @@ class AutoScaleManager(object):
 
         :param mask: optional SoftLayer_Scale_Group objectMask
 
-        .. _SoftLayer_Account::getScaleGroups(): 
+        .. _SoftLayer_Account::getScaleGroups():
             https://sldn.softlayer.com/reference/services/SoftLayer_Account/getScaleGroups/
         """
         if not mask:
@@ -32,7 +32,7 @@ class AutoScaleManager(object):
         :param identifier: SoftLayer_Scale_Group id
         :param mask: optional SoftLayer_Scale_Group objectMask
 
-        .. _SoftLayer_Scale_Group::getObject(): 
+        .. _SoftLayer_Scale_Group::getObject():
             https://sldn.softlayer.com/reference/services/SoftLayer_Scale_Group/getObject/
         """
         if not mask:
@@ -49,7 +49,7 @@ class AutoScaleManager(object):
         :param identifier: SoftLayer_Scale_Policy id
         :param mask: optional SoftLayer_Scale_Policy objectMask
 
-        .. _SoftLayer_Scale_Policy::getObject(): 
+        .. _SoftLayer_Scale_Policy::getObject():
             https://sldn.softlayer.com/reference/services/SoftLayer_Scale_Policy/getObject/
         """
         if not mask:
@@ -65,7 +65,7 @@ class AutoScaleManager(object):
         :param identifier: SoftLayer_Scale_Group Id
         :param amount: positive or negative number to scale the group by
 
-        .. _SoftLayer_Scale_Group::scale(): 
+        .. _SoftLayer_Scale_Group::scale():
             https://sldn.softlayer.com/reference/services/SoftLayer_Scale_Group/scale/
         """
         return self.client.call('SoftLayer_Scale_Group', 'scale', amount, id=identifier)
@@ -76,7 +76,7 @@ class AutoScaleManager(object):
         :param identifier: SoftLayer_Scale_Group Id
         :param amount: number to scale the group to.
 
-        .. _SoftLayer_Scale_Group::scaleTo(): 
+        .. _SoftLayer_Scale_Group::scaleTo():
             https://sldn.softlayer.com/reference/services/SoftLayer_Scale_Group/scaleTo/
         """
         return self.client.call('SoftLayer_Scale_Group', 'scaleTo', amount, id=identifier)
@@ -88,7 +88,7 @@ class AutoScaleManager(object):
         :param mask: optional SoftLayer_Scale_Group_Log objectMask
         :param object_filter: optional SoftLayer_Scale_Group_Log objectFilter
 
-        .. _SoftLayer_Scale_Group::getLogs(): 
+        .. _SoftLayer_Scale_Group::getLogs():
             https://sldn.softlayer.com/reference/services/SoftLayer_Scale_Group/getLogs/
         """
         return self.client.call('SoftLayer_Scale_Group', 'getLogs', id=identifier, mask=mask, filter=object_filter,
