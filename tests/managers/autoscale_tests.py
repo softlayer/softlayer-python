@@ -5,8 +5,8 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from SoftLayer import testing
 from SoftLayer.managers.autoscale import AutoScaleManager
+from SoftLayer import testing
 
 
 class AutoScaleTests(testing.TestCase):
