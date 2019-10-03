@@ -47,17 +47,13 @@ scale = [
         "cooldown": 1800,
         "createDate": "2016-10-25T01:48:34+08:00",
         "id": 12222222,
-        "lastActionDate": "2016-10-25T01:48:34+08:00",
         "maximumMemberCount": 5,
         "minimumMemberCount": 0,
         "name": "tests",
-        "regionalGroupId": 663,
         "virtualGuestMemberTemplate": {
             "accountId": 31111,
             "domain": "sodg.com",
             "hostname": "testing",
-            "id": None,
-            "maxCpu": None,
             "maxMemory": 32768,
             "startCpus": 32,
             "blockDevices": [
@@ -89,12 +85,10 @@ scale = [
         "cooldown": 1800,
         "createDate": "2018-04-24T04:22:00+08:00",
         "id": 224533333,
-        "lastActionDate": "2019-01-19T04:53:18+08:00",
         "maximumMemberCount": 10,
         "minimumMemberCount": 0,
         "modifyDate": "2019-01-19T04:53:21+08:00",
         "name": "test-ajcb",
-        "regionalGroupId": 1025,
         "virtualGuestMemberTemplate": {
             "accountId": 31111,
             "domain": "test.local",
@@ -148,14 +142,6 @@ scaleTo = [
             "maxCpu": None,
             "maxMemory": 32768,
             "startCpus": 32,
-            "blockDevices": [
-                {
-                    "device": "0",
-                    "diskImage": {
-                        "capacity": 25,
-                    }
-                }
-            ],
             "datacenter": {
                 "name": "sao01",
             },

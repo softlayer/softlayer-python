@@ -802,7 +802,6 @@ getScaleGroups = [
             },
             "hourlyBillingFlag": True,
             "operatingSystemReferenceCode": "CENTOS_LATEST",
-            "privateNetworkOnlyFlag": True
         },
         "virtualGuestMemberCount": 0,
         "status": {
@@ -810,8 +809,6 @@ getScaleGroups = [
             "keyName": "ACTIVE",
             "name": "Active"
         },
-        "virtualGuestAssets": [],
-        "virtualGuestMembers": []
     },
     {
         "accountId": 31111,
@@ -852,8 +849,6 @@ getScaleGroups = [
             "id": 1,
             "keyName": "ACTIVE",
             "name": "Active"
-        },
-        "virtualGuestAssets": [],
-        "virtualGuestMembers": []
-    },
+        }
+    }
 ]
