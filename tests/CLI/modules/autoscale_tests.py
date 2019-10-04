@@ -33,8 +33,9 @@ class AutoscaleTests(testing.TestCase):
         result = self.run_command(['autoscale', 'scale', '789654123', '--by', '--down', '--amount', '-1'])
         self.assert_no_fail(result)
 
-    def test_scale_ca(self):
+    def test_scale_cancel(self):
         result = self.run_command(['autoscale', 'scale', '789654123', '--by', '--down', '--amount', '1'])
+        self.assert_no_fail(result)
 
     def test_autoscale_list(self):
         result = self.run_command(['autoscale', 'list'])
