@@ -44,3 +44,11 @@ class AutoscaleTests(testing.TestCase):
     def test_autoscale_detail(self):
         result = self.run_command(['autoscale', 'detail', '12222222'])
         self.assert_no_fail(result)
+
+    def test_autoscale_tag(self):
+        result = self.run_command(['autoscale', 'tag', '12345'])
+        self.assert_no_fail(result)
+
+    def test_autoscale_edit(self):
+        result = self.run_command(['autoscale', 'edit', '12345'])
+        self.assert_no_fail(result)

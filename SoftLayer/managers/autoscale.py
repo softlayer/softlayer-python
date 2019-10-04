@@ -36,7 +36,7 @@ class AutoScaleManager(object):
             https://sldn.softlayer.com/reference/services/SoftLayer_Scale_Group/getObject/
         """
         if not mask:
-            mask = """mask[virtualGuestMembers[id,virtualGuest[hostname,domain,provisionDate]], terminationPolicy,
+            mask = """mask[virtualGuestMembers[id,virtualGuest[id,hostname,domain,provisionDate]], terminationPolicy,
                    virtualGuestMemberCount, virtualGuestMemberTemplate[sshKeys],
                    policies[id,name,createDate,cooldown,actions,triggers,scaleActions],
                    networkVlans[networkVlanId,networkVlan[networkSpace,primaryRouter[hostname]]],
@@ -93,3 +93,13 @@ class AutoScaleManager(object):
         """
         return self.client.call('SoftLayer_Scale_Group', 'getLogs', id=identifier, mask=mask, filter=object_filter,
                                 iter=True)
+
+    def get_virtual_guests(self, identifier, mask=None):
+        """Calls `SoftLayer_Scale_Group::getVirtualGuestMembers()`_
+
+        :param identifier: SoftLayer_Scale_Group Id
+        :param mask: optional SoftLayer_Scale_Member objectMask
+        .. _SoftLayer_Scale_Group::getVirtualGuestMembers():
+            https://sldn.softlayer.com/reference/services/SoftLayer_Scale_Group/getVirtualGuestMembers/
+        """
+        return self.client.call('SoftLayer_Scale_Group', 'getVirtualGuestMembers', id=identifier, mask=mask, iter=True)

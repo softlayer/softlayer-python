@@ -93,3 +93,24 @@ class AutoScaleTests(testing.TestCase):
             'getLogs',
             identifier=11111
         )
+
+    def test_autoscale_get_virtual_guests(self):
+        self.autoscale.get_virtual_guests(11111)
+
+        self.assert_called_with(
+            'SoftLayer_Scale_Group',
+            'getVirtualGuestMembers',
+            identifier=11111,
+            mask=None
+        )
+
+    def test_autoscale_get_virtual_guests_mask(self):
+        test_mask = "mask[id]"
+        self.autoscale.get_virtual_guests(11111, mask=test_mask)
+
+        self.assert_called_with(
+            'SoftLayer_Scale_Group',
+            'getVirtualGuestMembers',
+            identifier=11111,
+            mask=test_mask
+        )

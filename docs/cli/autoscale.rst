@@ -26,6 +26,13 @@ For making changes to the triggers or the autoscale group itself, see the `Autos
     :prog: autoscale logs
     :show-nested:
 
+.. click:: SoftLayer.CLI.autoscale.tag:cli
+    :prog: autoscale tag
+    :show-nested:
+
+.. click:: SoftLayer.CLI.autoscale.edit:cli
+    :prog: autoscale edit
+    :show-nested:
 
 
 .. _Autoscale Portal: https://cloud.ibm.com/classic/autoscale

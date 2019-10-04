@@ -198,6 +198,8 @@ getObject = {
     ]
 }
 
+getVirtualGuestMembers = getObject['virtualGuestMembers']
+
 scale = [
     {
         "accountId": 31111,

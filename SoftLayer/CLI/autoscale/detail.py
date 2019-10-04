@@ -87,6 +87,6 @@ def cli(env, identifier):
     for guest in guests:
         real_guest = guest.get('virtualGuest')
         member_table.add_row([
-            guest.get('id'), real_guest.get('hostname'), utils.clean_time(real_guest.get('provisionDate'))
+            real_guest.get('id'), real_guest.get('hostname'), utils.clean_time(real_guest.get('provisionDate'))
         ])
     env.fout(member_table)
