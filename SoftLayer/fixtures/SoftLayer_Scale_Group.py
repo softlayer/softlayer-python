@@ -50,6 +50,12 @@ scale = [
         "maximumMemberCount": 5,
         "minimumMemberCount": 0,
         "name": "tests",
+        "virtualGuest": {
+            "accountId": 31111,
+            "createDate": "2019-10-02T15:24:54-06:00",
+            "billingItem": {
+                "cancellationDate": "2019-10-02T08:34:21-06:00"}
+        },
         "virtualGuestMemberTemplate": {
             "accountId": 31111,
             "domain": "sodg.com",
@@ -89,6 +95,12 @@ scale = [
         "minimumMemberCount": 0,
         "modifyDate": "2019-01-19T04:53:21+08:00",
         "name": "test-ajcb",
+        "virtualGuest": {
+            "accountId": 31111,
+            "createDate": "2019-10-02T15:24:54-06:00",
+            "billingItem": {
+                "cancellationDate": "2019-10-02T08:34:21-06:00"}
+        },
         "virtualGuestMemberTemplate": {
             "accountId": 31111,
             "domain": "test.local",
@@ -120,7 +132,7 @@ scale = [
         },
         "virtualGuestAssets": [],
         "virtualGuestMembers": []
-    },
+    }
 ]
 
 scaleTo = [
@@ -134,6 +146,8 @@ scaleTo = [
         "minimumMemberCount": 0,
         "name": "tests",
         "regionalGroupId": 663,
+        "virtualGuest": {
+        },
         "virtualGuestMemberTemplate": {
             "accountId": 31111,
             "domain": "sodg.com",
@@ -169,6 +183,12 @@ scaleTo = [
         "modifyDate": "2019-01-19T04:53:21+08:00",
         "name": "test-ajcb",
         "regionalGroupId": 1025,
+        "virtualGuest": {
+            "accountId": 31111,
+            "createDate": "2019-10-02T15:24:54-06:00",
+            "billingItem": {
+                "cancellationDate": "2019-10-02T08:34:21-06:00"}
+        },
         "virtualGuestMemberTemplate": {
             "accountId": 31111,
             "domain": "test.local",
