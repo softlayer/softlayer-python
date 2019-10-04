@@ -28,19 +28,20 @@ getObject = {
         }
     ],
     'policies': [
-        {'actions': [
-            {
-                'amount': 1,
-                'createDate': '2019-09-26T18:30:22-04:00',
-                'deleteFlag': None,
-                'id': 611111,
-                'modifyDate': None,
-                'scalePolicy': None,
-                'scalePolicyId': 681111,
-                'scaleType': 'RELATIVE',
-                'typeId': 1
-            }
-        ],
+        {
+            'actions': [
+                {
+                    'amount': 1,
+                    'createDate': '2019-09-26T18:30:22-04:00',
+                    'deleteFlag': None,
+                    'id': 611111,
+                    'modifyDate': None,
+                    'scalePolicy': None,
+                    'scalePolicyId': 681111,
+                    'scaleType': 'RELATIVE',
+                    'typeId': 1
+                }
+            ],
             'cooldown': None,
             'createDate': '2019-09-26T18:30:14-04:00',
             'id': 680000,
