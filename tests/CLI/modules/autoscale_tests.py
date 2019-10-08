@@ -8,9 +8,11 @@
     Tests for the autoscale cli command
 """
 import mock
-import tempfile
+
 from SoftLayer import fixtures
 from SoftLayer import testing
+
+import tempfile
 
 
 class AutoscaleTests(testing.TestCase):

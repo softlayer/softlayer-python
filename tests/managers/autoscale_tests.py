@@ -116,7 +116,7 @@ class AutoScaleTests(testing.TestCase):
         )
 
     def test_edit_object(self):
-        template =  {'name': 'test'}
+        template = {'name': 'test'}
         self.autoscale.edit(12345, template)
         self.assert_called_with(
             'SoftLayer_Scale_Group',

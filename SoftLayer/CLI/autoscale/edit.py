@@ -30,10 +30,10 @@ def cli(env, identifier, name, minimum, maximum, userdata, userfile, cpu, memory
     template['maximumMemberCount'] = maximum
     virt_template = {}
     if userdata:
-        virt_template['userData'] = [{"value":userdata}]
+        virt_template['userData'] = [{"value": userdata}]
     elif userfile:
         with open(userfile, 'r') as userfile_obj:
-            virt_template['userData'] = [{"value":userfile_obj.read()}]
+            virt_template['userData'] = [{"value": userfile_obj.read()}]
     virt_template['startCpus'] = cpu
     virt_template['maxMemory'] = memory
 
@@ -48,7 +48,7 @@ def cli(env, identifier, name, minimum, maximum, userdata, userfile, cpu, memory
             group['virtualGuestMemberTemplate'][key] = value
         clean_template['virtualGuestMemberTemplate'] = group['virtualGuestMemberTemplate']
 
-    result = autoscale.edit(identifier, clean_template)
+    autoscale.edit(identifier, clean_template)
     click.echo("Done")
 
 

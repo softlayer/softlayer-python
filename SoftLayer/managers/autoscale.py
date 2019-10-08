@@ -113,6 +113,4 @@ class AutoScaleManager(object):
             https://sldn.softlayer.com/reference/services/SoftLayer_Scale_Group/editObject/
         .. _SoftLayer_Scale_Group: https://sldn.softlayer.com/reference/datatypes/SoftLayer_Scale_Group/
         """
-
-        
         return self.client.call('SoftLayer_Scale_Group', 'editObject', template, id=identifier)
