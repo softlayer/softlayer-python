@@ -31,4 +31,3 @@ def cli(env, identifier, tags):
         click.echo("Setting tags for {}".format(real_guest.get('hostname')))
         vsmanager.set_tags(tags, real_guest.get('id'),)
     click.echo("Done")
-    # pp(guests)
