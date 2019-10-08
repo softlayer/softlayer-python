@@ -7,6 +7,9 @@
 
     Tests for the autoscale cli command
 """
+import mock
+import tempfile
+from SoftLayer import fixtures
 from SoftLayer import testing
 
 
@@ -49,6 +52,33 @@ class AutoscaleTests(testing.TestCase):
         result = self.run_command(['autoscale', 'tag', '12345'])
         self.assert_no_fail(result)
 
-    def test_autoscale_edit(self):
-        result = self.run_command(['autoscale', 'edit', '12345'])
+    @mock.patch('SoftLayer.managers.autoscale.AutoScaleManager.edit')
+    def test_autoscale_edit(self, manager):
+        result = self.run_command(['autoscale', 'edit', '12345', '--name', 'test'])
         self.assert_no_fail(result)
+        manager.assert_called_with('12345', {'name': 'test'})
+
+    @mock.patch('SoftLayer.managers.autoscale.AutoScaleManager.edit')
+    def test_autoscale_edit_userdata(self, manager):
+        group = fixtures.SoftLayer_Scale_Group.getObject
+        template = {
+            'virtualGuestMemberTemplate': group['virtualGuestMemberTemplate']
+        }
+        template['virtualGuestMemberTemplate']['userData'] = [{'value': 'test'}]
+
+        result = self.run_command(['autoscale', 'edit', '12345', '--userdata', 'test'])
+        self.assert_no_fail(result)
+        manager.assert_called_with('12345', template)
+
+    @mock.patch('SoftLayer.managers.autoscale.AutoScaleManager.edit')
+    def test_autoscale_edit_userfile(self, manager):
+        group = fixtures.SoftLayer_Scale_Group.getObject
+        template = {
+            'virtualGuestMemberTemplate': group['virtualGuestMemberTemplate']
+        }
+        template['virtualGuestMemberTemplate']['userData'] = [{'value': ''}]
+
+        with tempfile.NamedTemporaryFile() as userfile:
+            result = self.run_command(['autoscale', 'edit', '12345', '--userfile', userfile.name])
+        self.assert_no_fail(result)
+        manager.assert_called_with('12345', template)

@@ -453,3 +453,5 @@ getLogs = [
         }
     },
 ]
+
+editObject = True

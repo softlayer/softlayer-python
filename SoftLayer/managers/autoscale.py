@@ -103,3 +103,16 @@ class AutoScaleManager(object):
             https://sldn.softlayer.com/reference/services/SoftLayer_Scale_Group/getVirtualGuestMembers/
         """
         return self.client.call('SoftLayer_Scale_Group', 'getVirtualGuestMembers', id=identifier, mask=mask, iter=True)
+
+    def edit(self, identifier, template):
+        """Calls `SoftLayer_Scale_Group::editObject()`_
+
+        :param identifier: SoftLayer_Scale_Group id
+        :param template: `SoftLayer_Scale_Group`_
+        .. _SoftLayer_Scale_Group::editObject():
+            https://sldn.softlayer.com/reference/services/SoftLayer_Scale_Group/editObject/
+        .. _SoftLayer_Scale_Group: https://sldn.softlayer.com/reference/datatypes/SoftLayer_Scale_Group/
+        """
+
+        
+        return self.client.call('SoftLayer_Scale_Group', 'editObject', template, id=identifier)
