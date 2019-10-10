@@ -94,7 +94,7 @@ For the CLI, just use the -vvv option. If you are using the REST endpoint, this 
 
 If you are using the library directly in python, you can do something like this.
 
-.. code-bock:: python
+.. code-block:: python
 
   import SoftLayer
   import logging

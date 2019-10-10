@@ -302,6 +302,14 @@ ALL_ROUTES = [
 
     ('report', 'SoftLayer.CLI.report'),
     ('report:bandwidth', 'SoftLayer.CLI.report.bandwidth:cli'),
+
+    ('autoscale', 'SoftLayer.CLI.autoscale'),
+    ('autoscale:list', 'SoftLayer.CLI.autoscale.list:cli'),
+    ('autoscale:detail', 'SoftLayer.CLI.autoscale.detail:cli'),
+    ('autoscale:scale', 'SoftLayer.CLI.autoscale.scale:cli'),
+    ('autoscale:logs', 'SoftLayer.CLI.autoscale.logs:cli'),
+    ('autoscale:tag', 'SoftLayer.CLI.autoscale.tag:cli'),
+    ('autoscale:edit', 'SoftLayer.CLI.autoscale.edit:cli')
 ]
 
 ALL_ALIASES = {
