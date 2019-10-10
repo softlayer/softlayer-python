@@ -8,6 +8,7 @@ import json
 
 from SoftLayer.CLI import call_api
 from SoftLayer.CLI import exceptions
+from SoftLayer import SoftLayerAPIError
 from SoftLayer import testing
 
 import pytest
@@ -229,3 +230,37 @@ result = client.call(u'Service',
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Service', 'method',
                                 args=('arg1', '1234'))
+
+    def test_fixture_not_implemented(self):
+        service = 'SoftLayer_Test'
+        method = 'getTest'
+        result = self.run_command(['call-api', service, method])
+        self.assertEqual(result.exit_code, 1)
+        self.assert_called_with(service, method)
+        self.assertIsInstance(result.exception, SoftLayerAPIError)
+        output = '{} fixture is not implemented'.format(service)
+        self.assertIn(output, result.exception.faultString)
+
+    def test_fixture_not_implemented_method(self):
+        call_service = 'SoftLayer_Account'
+        call_method = 'getTest'
+        result = self.run_command(['call-api', call_service, call_method])
+        self.assertEqual(result.exit_code, 1)
+        self.assert_called_with(call_service, call_method)
+        self.assertIsInstance(result.exception, SoftLayerAPIError)
+        output = '%s::%s fixture is not implemented' % (call_service, call_method)
+        self.assertIn(output, result.exception.faultString)
+
+    def test_fixture_exception(self):
+        call_service = 'SoftLayer_Account'
+        call_method = 'getTest'
+        result = self.run_command(['call-api', call_service, call_method])
+        try:
+            self.assert_no_fail(result)
+        except Exception as ex:
+            print(ex)
+        self.assertEqual(result.exit_code, 1)
+        self.assert_called_with(call_service, call_method)
+        self.assertIsInstance(result.exception, SoftLayerAPIError)
+        output = '%s::%s fixture is not implemented' % (call_service, call_method)
+        self.assertIn(output, result.exception.faultString)

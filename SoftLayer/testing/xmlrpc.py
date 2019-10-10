@@ -66,6 +66,15 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             except UnicodeDecodeError:
                 self.wfile.write(response_body)
 
+        except NotImplementedError as ex:
+            self.send_response(200)
+            self.end_headers()
+            response = xmlrpc.client.Fault(404, str(ex))
+            response_body = xmlrpc.client.dumps(response,
+                                                allow_none=True,
+                                                methodresponse=True)
+            self.wfile.write(response_body.encode('utf-8'))
+
         except SoftLayer.SoftLayerAPIError as ex:
             self.send_response(200)
             self.end_headers()
