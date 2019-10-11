@@ -1,6 +1,19 @@
 # Change Log
 
 
+## [5.8.1] - 2019-10-11
+- https://github.com/softlayer/softlayer-python/compare/v5.8.0...v5.8.1
+
++ #1169 Drop python 2.7 support
++ #1170 Added CS# to ticket listing
++ #1162 Fixed issue looking up OS keyName instead of referenceCode
++ #627 Autoscale support
+    * slcli autoscale detail
+    * slcli autoscale edit
+    * slcli autoscale list
+    * slcli autoscale logs
+    * slcli autoscale scale
+    * slcli autoscale tag
 
 ## [5.8.0] - 2019-09-04
 - https://github.com/softlayer/softlayer-python/compare/v5.7.2...v5.8.0
