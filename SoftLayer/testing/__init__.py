@@ -147,7 +147,7 @@ class TestCase(testtools.TestCase):
     def assert_no_fail(self, result):
         """Fail when a failing click result has an error"""
         if result.exception:
-            print(result.output)
+            print(result.exception)
             raise result.exception
 
         self.assertEqual(result.exit_code, 0)
