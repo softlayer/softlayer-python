@@ -131,7 +131,7 @@ System Requirements
 
 Pyhton 2.7 Support
 ------------------
-As of version 5.8.0 SoftLayer-Python will no longer support python2.7, which is _`End Of Life as of 2020 <https://www.python.org/dev/peps/pep-0373/>`_. 
+As of version 5.8.0 SoftLayer-Python will no longer support python2.7, which is `End Of Life as of 2020 <https://www.python.org/dev/peps/pep-0373/>`_ .
 If you cannot install python 3.6+ for some reason, you will need to use a version of softlayer-python <= 5.7.2
 
 
