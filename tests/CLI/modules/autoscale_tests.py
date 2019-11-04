@@ -8,6 +8,7 @@
     Tests for the autoscale cli command
 """
 import mock
+import sys
 
 from SoftLayer import fixtures
 from SoftLayer import testing
