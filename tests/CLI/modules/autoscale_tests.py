@@ -8,6 +8,7 @@
     Tests for the autoscale cli command
 """
 import mock
+import sys
 
 from SoftLayer import fixtures
 from SoftLayer import testing
@@ -74,6 +75,9 @@ class AutoscaleTests(testing.TestCase):
 
     @mock.patch('SoftLayer.managers.autoscale.AutoScaleManager.edit')
     def test_autoscale_edit_userfile(self, manager):
+        # On windows, python cannot edit a NamedTemporaryFile.
+        if(sys.platform.startswith("win")):
+            self.skipTest("Test doesn't work in Windows")
         group = fixtures.SoftLayer_Scale_Group.getObject
         template = {
             'virtualGuestMemberTemplate': group['virtualGuestMemberTemplate']

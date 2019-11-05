@@ -9,6 +9,7 @@ import importlib
 import json
 import logging
 import re
+from string import Template
 import time
 import xmlrpc.client
 
@@ -256,7 +257,6 @@ class XmlRpcTransport(object):
 
         :param request request: Request object
         """
-        from string import Template
         output = Template('''============= testing.py =============
 import requests
 from requests.auth import HTTPBasicAuth
