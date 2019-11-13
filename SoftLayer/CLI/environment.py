@@ -46,14 +46,20 @@ class Environment(object):
         """Outputs an error string to the console (stderr)."""
         click.echo(output, nl=newline, err=True)
 
-    def fmt(self, output):
+    def fmt(self, output, fmt=None):
         """Format output based on current the environment format."""
-        return formatting.format_output(output, fmt=self.format)
+        if fmt is None:
+            fmt = self.format
+        return formatting.format_output(output, fmt)
 
     def fout(self, output, newline=True):
         """Format the input and output to the console (stdout)."""
         if output is not None:
-            self.out(self.fmt(output), newline=newline)
+            try:
+                self.out(self.fmt(output), newline=newline)
+            except UnicodeEncodeError:
+                # If we hit an undecodeable entry, just try outputting as json.
+                self.out(self.fmt(output, 'json'), newline=newline)
 
     def input(self, prompt, default=None, show_default=True):
         """Provide a command prompt."""
