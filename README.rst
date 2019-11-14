@@ -129,7 +129,7 @@ System Requirements
 * A connection to SoftLayer's private network is required to use
   our private network API endpoints.
 
-Pyhton 2.7 Support
+Python 2.7 Support
 ------------------
 As of version 5.8.0 SoftLayer-Python will no longer support python2.7, which is `End Of Life as of 2020 <https://www.python.org/dev/peps/pep-0373/>`_ .
 If you cannot install python 3.6+ for some reason, you will need to use a version of softlayer-python <= 5.7.2
@@ -147,6 +147,6 @@ Python Packages
 
 Copyright
 ---------
-This software is Copyright (c) 2016-2018 SoftLayer Technologies, Inc.
+This software is Copyright (c) 2016-2019 SoftLayer Technologies, Inc.
 
 See the bundled LICENSE file for more information.
