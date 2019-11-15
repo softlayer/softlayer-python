@@ -161,8 +161,10 @@ class CDNManager(utils.IdentifierMixin, object):
         # The method getMappingUsageMetrics() returns an array but there is only 1 object
         return usage[0]
 
-    def get_start_data(self):
+    @property
+    def start_data(self):
         return self._start_date
 
-    def get_end_date(self):
+    @property
+    def end_date(self):
         return self._end_date
