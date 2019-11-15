@@ -163,8 +163,10 @@ class CDNManager(utils.IdentifierMixin, object):
 
     @property
     def start_data(self):
+        """Retrieve the cdn usage metric start date."""
         return self._start_date
 
     @property
     def end_date(self):
+        """Retrieve the cdn usage metric end date."""
         return self._end_date
