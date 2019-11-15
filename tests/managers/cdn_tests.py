@@ -7,7 +7,6 @@
 
 from SoftLayer.managers import cdn
 from SoftLayer import testing
-from SoftLayer import utils
 
 
 class CDNTests(testing.TestCase):
@@ -31,15 +30,9 @@ class CDNTests(testing.TestCase):
     def test_detail_usage_metric(self):
         self.cdn_client.get_usage_metrics(12345, history=30, frequency="aggregate")
 
-        _start = utils.days_to_datetime(30)
-        _end = utils.days_to_datetime(0)
-
-        _start_date = utils.timestamp(_start)
-        _end_date = utils.timestamp(_end)
-
         args = (12345,
-                _start_date,
-                _end_date,
+                self.cdn_client.start_data,
+                self.cdn_client.end_date,
                 "aggregate")
         self.assert_called_with('SoftLayer_Network_CdnMarketplace_Metrics',
                                 'getMappingUsageMetrics',
