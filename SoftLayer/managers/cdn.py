@@ -21,6 +21,8 @@ class CDNManager(utils.IdentifierMixin, object):
 
     def __init__(self, client):
         self.client = client
+        self._start_date = None
+        self._end_date = None
         self.cdn_configuration = self.client['Network_CdnMarketplace_Configuration_Mapping']
         self.cdn_path = self.client['SoftLayer_Network_CdnMarketplace_Configuration_Mapping_Path']
         self.cdn_metrics = self.client['Network_CdnMarketplace_Metrics']
@@ -151,10 +153,16 @@ class CDNManager(utils.IdentifierMixin, object):
         _start = utils.days_to_datetime(history)
         _end = utils.days_to_datetime(0)
 
-        _start_date = utils.timestamp(_start)
-        _end_date = utils.timestamp(_end)
+        self._start_date = utils.timestamp(_start)
+        self._end_date = utils.timestamp(_end)
 
-        usage = self.cdn_metrics.getMappingUsageMetrics(unique_id, _start_date, _end_date, frequency)
+        usage = self.cdn_metrics.getMappingUsageMetrics(unique_id, self._start_date, self._end_date, frequency)
 
         # The method getMappingUsageMetrics() returns an array but there is only 1 object
         return usage[0]
+
+    def get_start_data(self):
+        return self._start_date
+
+    def get_end_date(self):
+        return self._end_date
