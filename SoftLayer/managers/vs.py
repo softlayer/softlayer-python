@@ -429,7 +429,6 @@ class VSManager(utils.IdentifierMixin, object):
     def _create_network_components(
             self, public_vlan=None, private_vlan=None,
             private_subnet=None, public_subnet=None):
-
         parameters = {}
         if private_vlan:
             parameters['primaryBackendNetworkComponent'] = {"networkVlan": {"id": int(private_vlan)}}
@@ -532,7 +531,16 @@ class VSManager(utils.IdentifierMixin, object):
         """
         kwargs.pop('tags', None)
         create_options = self._generate_create_dict(**kwargs)
-        return self.guest.generateOrderTemplate(create_options)
+        template = self.guest.generateOrderTemplate(create_options)
+        if 'private_subnet' in kwargs or 'public_subnet' in kwargs:
+            vsi = template['virtualGuests'][0]
+            network_components = self._create_network_components(kwargs.get('public_vlan', None),
+                                                                 kwargs.get('private_vlan', None),
+                                                                 kwargs.get('private_subnet', None),
+                                                                 kwargs.get('public_subnet', None))
+            vsi.update(network_components)
+
+        return template
 
     def create_instance(self, **kwargs):
         """Creates a new virtual server instance.
