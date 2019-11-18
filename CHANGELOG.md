@@ -1,6 +1,16 @@
 # Change Log
 
 
+## [5.8.2] - 2019-11-15
+- https://github.com/softlayer/softlayer-python/compare/v5.8.1...v5.8.2
+
+
++ #1186 Fixed a unit test that could fail if the test took too long to run.
++ #1183 Added a check to ensure subnet and vlan options are properly added to the order for virtual servers.
++ #1184 Fixed a readme misspelling.
++ #1182 Fixed vs reboot unable to resolve vs names.
++ #1095 Handle missing Fixtures better for unit tests.
+
 ## [5.8.1] - 2019-10-11
 - https://github.com/softlayer/softlayer-python/compare/v5.8.0...v5.8.1
 
