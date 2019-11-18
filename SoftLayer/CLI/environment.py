@@ -59,7 +59,6 @@ class Environment(object):
                 self.out(self.fmt(output), newline=newline)
             except UnicodeEncodeError:
                 # If we hit an undecodeable entry, just try outputting as json.
-                self.out("UnicodeEncodeError detected, printing as JSON.")
                 self.out(self.fmt(output, 'json'), newline=newline)
 
     def input(self, prompt, default=None, show_default=True):
