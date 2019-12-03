@@ -409,14 +409,7 @@ class OrderingManager(object):
         return price_id
 
     def get_item_capacity(self, items, item_keynames):
-        """Get item capacity.
-        This function is used to get the item capacity data
-
-        :param items: items data.
-        :param item_keynames list.
-        :returns: An item id.
-
-        """
+        """Get item capacity."""
         item_capacity = None
         for item_keyname in item_keynames:
             for item in items:
