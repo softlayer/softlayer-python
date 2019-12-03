@@ -309,7 +309,26 @@ class OrderingTests(testing.TestCase):
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], "8")
 
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, capacity, itemCategory, keyName, '
+                                                                  'prices[categories]')
+        self.assertEqual([price1['id'], price2['id']], prices)
+
+    def test_get_price_id_list_no_core(self):
+        category1 = {'categoryCode': 'cat1'}
+        price1 = {'id': 1234, 'locationGroupId': None, 'categories': [{"categoryCode": "guest_core"}],
+                  'itemCategory': [category1]}
+        item1 = {'id': 1111, 'keyName': 'ITEM1', 'itemCategory': category1, 'prices': [price1]}
+        category2 = {'categoryCode': 'cat2'}
+        price2 = {'id': 5678, 'locationGroupId': None, 'categories': [category2]}
+        item2 = {'id': 2222, 'keyName': 'ITEM2', 'itemCategory': category2, 'prices': [price2]}
+
+        with mock.patch.object(self.ordering, 'list_items') as list_mock:
+            list_mock.return_value = [item1, item2]
+
+            prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], None)
+
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, capacity, itemCategory, keyName, '
+                                                                  'prices[categories]')
         self.assertEqual([price1['id'], price2['id']], prices)
 
     def test_get_price_id_list_item_not_found(self):
@@ -323,7 +342,8 @@ class OrderingTests(testing.TestCase):
             exc = self.assertRaises(exceptions.SoftLayerError,
                                     self.ordering.get_price_id_list,
                                     'PACKAGE_KEYNAME', ['ITEM2'], "8")
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, capacity, itemCategory, keyName, '
+                                                                  'prices[categories]')
         self.assertEqual("Item ITEM2 does not exist for package PACKAGE_KEYNAME", str(exc))
 
     def test_get_price_id_list_gpu_items_with_two_categories(self):
@@ -337,7 +357,8 @@ class OrderingTests(testing.TestCase):
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM1'], "8")
 
-            list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
+            list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, capacity, itemCategory, keyName, '
+                                                                      'prices[categories]')
             self.assertEqual([price2['id'], price1['id']], prices)
 
     def test_generate_no_complex_type(self):
@@ -587,7 +608,8 @@ class OrderingTests(testing.TestCase):
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], "8")
 
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, capacity, itemCategory, keyName, '
+                                                                  'prices[categories]')
         self.assertEqual([price1['id'], price2['id']], prices)
 
     def test_location_groud_id_empty(self):
@@ -604,7 +626,8 @@ class OrderingTests(testing.TestCase):
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], "8")
 
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, capacity, itemCategory, keyName, '
+                                                                  'prices[categories]')
         self.assertEqual([price1['id'], price2['id']], prices)
 
     def test_get_item_price_id_without_capacity_restriction(self):
@@ -672,3 +695,20 @@ class OrderingTests(testing.TestCase):
         order_container = call.args[0]
         self.assertNotIn('testProperty', order_container)
         self.assertNotIn('reservedCapacityId', order_container)
+
+    def test_get_item_capacity(self):
+
+        items = [{
+            "capacity": "1",
+            "id": 6131,
+            "keyName": "OS_RHEL_7_X_LAMP_64_BIT",
+        },
+            {
+                "capacity": "1",
+                "id": 10201,
+                "keyName": "GUEST_CORE_1_DEDICATED",
+            }]
+
+        item_capacity = self.ordering.get_item_capacity(items, ['GUEST_CORE_1_DEDICATED', 'OS_RHEL_7_X_LAMP_64_BIT'])
+
+        self.assertEqual(1, int(item_capacity))
