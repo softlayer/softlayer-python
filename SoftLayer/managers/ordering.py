@@ -351,8 +351,9 @@ class OrderingManager(object):
                   keynames in the given package
 
         """
-        mask = 'id, itemCategory, keyName, prices[categories]'
+        mask = 'id, capacity, itemCategory, keyName, prices[categories]'
         items = self.list_items(package_keyname, mask=mask)
+        item_capacity = self.get_item_capacity(items, item_keynames)
 
         prices = []
         category_dict = {"gpu0": -1, "pcie_slot0": -1}
@@ -374,7 +375,10 @@ class OrderingManager(object):
             # in which the order is made
             item_category = matching_item['itemCategory']['categoryCode']
             if item_category not in category_dict:
-                price_id = self.get_item_price_id(core, matching_item['prices'])
+                if core is None:
+                    price_id = self.get_item_price_id(item_capacity, matching_item['prices'])
+                else:
+                    price_id = self.get_item_price_id(core, matching_item['prices'])
             else:
                 # GPU and PCIe items has two generic prices and they are added to the list
                 # according to the number of items in the order.
@@ -403,6 +407,17 @@ class OrderingManager(object):
                 elif capacity_min <= int(core) <= capacity_max:
                     price_id = price['id']
         return price_id
+
+    def get_item_capacity(self, items, item_keynames):
+        """Get item capacity."""
+        item_capacity = None
+        for item_keyname in item_keynames:
+            for item in items:
+                if item['keyName'] == item_keyname:
+                    if "GUEST_CORE" in item["keyName"]:
+                        item_capacity = item['capacity']
+                        break
+        return item_capacity
 
     def get_preset_prices(self, preset):
         """Get preset item prices.
