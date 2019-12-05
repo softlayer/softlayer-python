@@ -446,11 +446,19 @@ class HardwareTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Hardware_Server', 'getBandwidthAllotmentDetail', identifier=1234)
         self.assert_called_with('SoftLayer_Hardware_Server', 'getBillingCycleBandwidthUsage', identifier=1234)
         self.assertEqual(result['allotment']['amount'], '250')
-        self.assertEqual(result['useage'][0]['amountIn'], '.448')
+        self.assertEqual(result['usage'][0]['amountIn'], '.448')
 
     def test_get_bandwidth_allocation_no_allotment(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getBandwidthAllotmentDetail')
         mock.return_value = {}
+
+        result = self.hardware.get_bandwidth_allocation(1234)
+
+        self.assertEqual(None, result['allotment'])
+
+    def test_get_bandwidth_allocation_empty_allotment(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getBandwidthAllotmentDetail')
+        mock.return_value = ""
 
         result = self.hardware.get_bandwidth_allocation(1234)
 
