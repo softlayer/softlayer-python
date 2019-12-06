@@ -698,10 +698,9 @@ class HardwareManager(utils.IdentifierMixin, object):
         allotment = self.client.call('Hardware_Server', 'getBandwidthAllotmentDetail', id=instance_id, mask=a_mask)
         u_mask = "mask[amountIn,amountOut,type]"
         usage = self.client.call('Hardware_Server', 'getBillingCycleBandwidthUsage', id=instance_id, mask=u_mask)
-        allotment_bandwidth = None
-        if allotment is not "":
-            allotment_bandwidth = allotment.get('allocation')
-        return {'allotment': allotment_bandwidth, 'usage': usage}
+        if allotment:
+            return {'allotment': allotment.get('allocation'), 'usage': usage}
+        return {'allotment': allotment, 'usage': usage}
 
 
 def _get_extra_price_id(items, key_name, hourly, location):

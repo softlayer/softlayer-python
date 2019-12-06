@@ -99,12 +99,10 @@ def _bw_table(bw_data):
         allotment = 'N/A'
         if bw_point['type']['alias'] == 'PUBLIC_SERVER_BW':
             bw_type = 'Public'
-            if bw_data.get('allotment') is None:
+            if not bw_data.get('allotment'):
                 allotment = '-'
             else:
                 allotment = utils.lookup(bw_data, 'allotment', 'amount')
-                if allotment is None:
-                    allotment = '-'
 
         table.add_row([bw_type, bw_point['amountIn'], bw_point['amountOut'], allotment])
     return table

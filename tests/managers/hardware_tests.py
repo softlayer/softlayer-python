@@ -8,13 +8,10 @@ import copy
 
 import mock
 
-
 import SoftLayer
-
 from SoftLayer import fixtures
 from SoftLayer import managers
 from SoftLayer import testing
-
 
 MINIMAL_TEST_CREATE_ARGS = {
     'size': 'S1270_8GB_2X1TBSATA_NORAID',
@@ -448,17 +445,23 @@ class HardwareTests(testing.TestCase):
         self.assertEqual(result['allotment']['amount'], '250')
         self.assertEqual(result['usage'][0]['amountIn'], '.448')
 
-    def test_get_bandwidth_allocation_no_allotment(self):
+    def test_get_bandwidth_allocation_with_allotment(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getBandwidthAllotmentDetail')
-        mock.return_value = {}
+        mock.return_value = {
+            "allocationId": 11111,
+            "id": 22222,
+            "allocation": {
+                "amount": "2000"
+            }
+        }
 
         result = self.hardware.get_bandwidth_allocation(1234)
 
-        self.assertEqual(None, result['allotment'])
+        self.assertEqual(2000, int(result['allotment']['amount']))
 
-    def test_get_bandwidth_allocation_empty_allotment(self):
+    def test_get_bandwidth_allocation_no_allotment(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getBandwidthAllotmentDetail')
-        mock.return_value = ""
+        mock.return_value = None
 
         result = self.hardware.get_bandwidth_allocation(1234)
 
