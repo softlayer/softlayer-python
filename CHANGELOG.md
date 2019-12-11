@@ -1,6 +1,15 @@
 # Change Log
 
 
+## [5.8.3] - 2019-12-11
+https://github.com/softlayer/softlayer-python/compare/v5.8.2...v5.8.3
+
+- #771 Fixed unicode errors in image list (for windows)
+- #1191 Fixed ordering virtual server dedicated from the CLI
+- #1155 Fixed capacity restriction when ordering storage quotes
+- #1192 Fixed hardware detail bandwidth allocation errors. 
+
+
 ## [5.8.2] - 2019-11-15
 - https://github.com/softlayer/softlayer-python/compare/v5.8.1...v5.8.2
 
