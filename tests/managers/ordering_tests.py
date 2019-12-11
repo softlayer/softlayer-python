@@ -640,12 +640,27 @@ class OrderingTests(testing.TestCase):
 
         self.assertEqual(1234, price_id)
 
-    def test_get_item_price_id_with_capacity_restriction(self):
+    def test_get_item_price_id_core_with_capacity_restriction(self):
         category1 = {'categoryCode': 'cat1'}
         price1 = [{'id': 1234, 'locationGroupId': '', "capacityRestrictionMaximum": "16",
-                   "capacityRestrictionMinimum": "1", 'categories': [category1]},
+                   "capacityRestrictionMinimum": "1", "capacityRestrictionType": "CORE",
+                   'categories': [category1]},
                   {'id': 2222, 'locationGroupId': '', "capacityRestrictionMaximum": "56",
-                   "capacityRestrictionMinimum": "36", 'categories': [category1]}]
+                   "capacityRestrictionMinimum": "36", "capacityRestrictionType": "CORE",
+                   'categories': [category1]}]
+
+        price_id = self.ordering.get_item_price_id("8", price1)
+
+        self.assertEqual(1234, price_id)
+
+    def test_get_item_price_id_storage_with_capacity_restriction(self):
+        category1 = {'categoryCode': 'cat1'}
+        price1 = [{'id': 1234, 'locationGroupId': '', "capacityRestrictionMaximum": "16",
+                   "capacityRestrictionMinimum": "1", "capacityRestrictionType": "STORAGE_SPACE",
+                   'categories': [category1]},
+                  {'id': 2222, 'locationGroupId': '', "capacityRestrictionMaximum": "56",
+                   "capacityRestrictionMinimum": "36", "capacityRestrictionType": "STORAGE_SPACE",
+                   'categories': [category1]}]
 
         price_id = self.ordering.get_item_price_id("8", price1)
 
