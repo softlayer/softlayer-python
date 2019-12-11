@@ -405,7 +405,9 @@ class OrderingManager(object):
                     price_id = price['id']
                 # this check is mostly to work nicely with preset configs
                 elif capacity_min <= int(core) <= capacity_max:
-                    price_id = price['id']
+                    if "STORAGE" in price.get("capacityRestrictionType") or "CORE" in price.get(
+                            "capacityRestrictionType"):
+                        price_id = price['id']
         return price_id
 
     def get_item_capacity(self, items, item_keynames):
@@ -415,6 +417,9 @@ class OrderingManager(object):
             for item in items:
                 if item['keyName'] == item_keyname:
                     if "GUEST_CORE" in item["keyName"]:
+                        item_capacity = item['capacity']
+                        break
+                    if "TIER" in item["keyName"]:
                         item_capacity = item['capacity']
                         break
         return item_capacity
