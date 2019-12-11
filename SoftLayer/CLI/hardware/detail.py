@@ -92,16 +92,17 @@ def cli(env, identifier, passwords, price):
 
 
 def _bw_table(bw_data):
-    """Generates a bandwidth useage table"""
+    """Generates a bandwidth usage table"""
     table = formatting.Table(['Type', 'In GB', 'Out GB', 'Allotment'])
-    for bw_point in bw_data.get('useage'):
+    for bw_point in bw_data.get('usage'):
         bw_type = 'Private'
         allotment = 'N/A'
         if bw_point['type']['alias'] == 'PUBLIC_SERVER_BW':
             bw_type = 'Public'
-            allotment = utils.lookup(bw_data, 'allotment', 'amount')
-            if allotment is None:
+            if not bw_data.get('allotment'):
                 allotment = '-'
+            else:
+                allotment = utils.lookup(bw_data, 'allotment', 'amount')
 
         table.add_row([bw_type, bw_point['amountIn'], bw_point['amountOut'], allotment])
     return table

@@ -127,6 +127,17 @@ class ServerCLITests(testing.TestCase):
             ['example-tag'],
         )
 
+    def test_detail_empty_allotment(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getBandwidthAllotmentDetail')
+        mock.return_value = None
+        result = self.run_command(['server', 'detail', '100'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(
+            json.loads(result.output)['Bandwidth'][0]['Allotment'],
+            '-',
+        )
+
     def test_list_servers(self):
         result = self.run_command(['server', 'list', '--tag=openstack'])
 
