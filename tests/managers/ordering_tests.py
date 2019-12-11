@@ -711,7 +711,7 @@ class OrderingTests(testing.TestCase):
         self.assertNotIn('testProperty', order_container)
         self.assertNotIn('reservedCapacityId', order_container)
 
-    def test_get_item_capacity(self):
+    def test_get_item_capacity_core(self):
 
         items = [{
             "capacity": "1",
@@ -725,5 +725,22 @@ class OrderingTests(testing.TestCase):
             }]
 
         item_capacity = self.ordering.get_item_capacity(items, ['GUEST_CORE_1_DEDICATED', 'OS_RHEL_7_X_LAMP_64_BIT'])
+
+        self.assertEqual(1, int(item_capacity))
+
+    def test_get_item_capacity_storage(self):
+
+        items = [{
+            "capacity": "1",
+            "id": 6131,
+            "keyName": "STORAGE_SPACE_FOR_2_IOPS_PER_GB",
+        },
+            {
+                "capacity": "1",
+                "id": 10201,
+                "keyName": "READHEAVY_TIER",
+            }]
+
+        item_capacity = self.ordering.get_item_capacity(items, ['READHEAVY_TIER', 'STORAGE_SPACE_FOR_2_IOPS_PER_GB'])
 
         self.assertEqual(1, int(item_capacity))
