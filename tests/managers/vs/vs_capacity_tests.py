@@ -132,7 +132,6 @@ class VSManagerCapacityTests(testing.TestCase):
             'maxMemory': None,
             'hostname': 'A1538172419',
             'domain': 'test.com',
-            'localDiskFlag': None,
             'hourlyBillingFlag': True,
             'supplementalCreateObjectOptions': {
                 'bootMode': None,

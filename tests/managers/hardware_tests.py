@@ -281,8 +281,7 @@ class HardwareTests(testing.TestCase):
 
     def test_cancel_hardware_no_billing_item(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
-        mock.return_value = {'id': 987, 'openCancellationTicket': {'id': 1234},
-                             'openCancellationTicket': {'id': 1234}}
+        mock.return_value = {'id': 987, 'openCancellationTicket': {'id': 1234}}
 
         ex = self.assertRaises(SoftLayer.SoftLayerError,
                                self.hardware.cancel_hardware,

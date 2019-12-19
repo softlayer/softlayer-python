@@ -83,7 +83,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                                                 allow_none=True,
                                                 methodresponse=True)
             self.wfile.write(response_body.encode('utf-8'))
-        except Exception as ex:
+        except Exception:
             self.send_response(500)
             logging.exception("Error while handling request")
 

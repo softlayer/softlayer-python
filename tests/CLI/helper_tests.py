@@ -154,29 +154,29 @@ class FormattedItemTests(testing.TestCase):
 
 class FormattedListTests(testing.TestCase):
     def test_init(self):
-        l = formatting.listing([1, 'two'], separator=':')
-        self.assertEqual([1, 'two'], list(l))
-        self.assertEqual(':', l.separator)
+        listing = formatting.listing([1, 'two'], separator=':')
+        self.assertEqual([1, 'two'], list(listing))
+        self.assertEqual(':', listing.separator)
 
-        l = formatting.listing([])
-        self.assertEqual(',', l.separator)
+        listing = formatting.listing([])
+        self.assertEqual(',', listing.separator)
 
     def test_to_python(self):
-        l = formatting.listing([1, 'two'])
-        result = l.to_python()
+        listing = formatting.listing([1, 'two'])
+        result = listing.to_python()
         self.assertEqual([1, 'two'], result)
 
-        l = formatting.listing(x for x in [1, 'two'])
-        result = l.to_python()
+        listing = formatting.listing(x for x in [1, 'two'])
+        result = listing.to_python()
         self.assertEqual([1, 'two'], result)
 
     def test_str(self):
-        l = formatting.listing([1, 'two'])
-        result = str(l)
+        listing = formatting.listing([1, 'two'])
+        result = str(listing)
         self.assertEqual('1,two', result)
 
-        l = formatting.listing((x for x in [1, 'two']), separator=':')
-        result = str(l)
+        listing = formatting.listing((x for x in [1, 'two']), separator=':')
+        result = str(listing)
         self.assertEqual('1:two', result)
 
 
