@@ -29,7 +29,7 @@ __version__ = consts.VERSION
 __author__ = 'SoftLayer Technologies, Inc.'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2016 SoftLayer Technologies, Inc.'
-__all__ = [
+__all__ = [   # noqa: F405
     'BaseClient',
     'create_client_from_env',
     'Client',

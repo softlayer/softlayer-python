@@ -81,7 +81,7 @@ def cli(ctx, env):
                 return
             except ShellExit:
                 return
-            except Exception as ex:
+            except Exception:
                 env.vars['last_exit_code'] = 1
                 traceback.print_exc(file=sys.stderr)
 
