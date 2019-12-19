@@ -226,6 +226,7 @@ class DNSManager(utils.IdentifierMixin, object):
         :param dict record: the record to update
 
         """
+        record.pop('isGatewayAddress', None)
         self.record.editObject(record, id=record['id'])
 
     def dump_zone(self, zone_id):
