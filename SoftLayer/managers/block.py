@@ -525,28 +525,25 @@ class BlockStorageManager(utils.IdentifierMixin, object):
             reason,
             id=billing_item_id)
 
-    def failover_to_replicant(self, volume_id, replicant_id, immediate=False):
+    def failover_to_replicant(self, volume_id, replicant_id):
         """Failover to a volume replicant.
 
         :param integer volume_id: The id of the volume
         :param integer replicant_id: ID of replicant to failover to
-        :param boolean immediate: Flag indicating if failover is immediate
         :return: Returns whether failover was successful or not
         """
 
         return self.client.call('Network_Storage', 'failoverToReplicant',
-                                replicant_id, immediate, id=volume_id)
+                                replicant_id, id=volume_id)
 
-    def failback_from_replicant(self, volume_id, replicant_id):
+    def failback_from_replicant(self, volume_id):
         """Failback from a volume replicant.
 
         :param integer volume_id: The id of the volume
-        :param integer replicant_id: ID of replicant to failback from
         :return: Returns whether failback was successful or not
         """
 
-        return self.client.call('Network_Storage', 'failbackFromReplicant',
-                                replicant_id, id=volume_id)
+        return self.client.call('Network_Storage', 'failbackFromReplicant', id=volume_id)
 
     def set_credential_password(self, access_id, password):
         """Sets the password for an access host
