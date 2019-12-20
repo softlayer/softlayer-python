@@ -638,3 +638,191 @@ class ServerCLITests(testing.TestCase):
         self.assertEqual(output_summary[1]['Max Date'], date)
         self.assertEqual(output_summary[2]['Max GB'], 0.1172)
         self.assertEqual(output_summary[3]['Sum GB'], 0.0009)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_dns_sync_both(self, confirm_mock):
+        confirm_mock.return_value = True
+        getReverseDomainRecords = self.set_mock('SoftLayer_Hardware_Server',
+                                                'getReverseDomainRecords')
+        getReverseDomainRecords.return_value = [{
+            'networkAddress': '172.16.1.100',
+            'name': '2.240.16.172.in-addr.arpa',
+            'resourceRecords': [{'data': 'test.softlayer.com.',
+                                 'id': 100,
+                                 'host': '12'}],
+            'updateDate': '2013-09-11T14:36:57-07:00',
+            'serial': 1234665663,
+            'id': 123456,
+        }]
+        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain',
+                                           'getResourceRecords')
+        getResourceRecords.return_value = []
+        createAargs = ({
+            'type': 'a',
+            'host': 'hardware-test1',
+            'domainId': 98765,
+            'data': '172.16.1.100',
+            'ttl': 7200
+        },)
+        createPTRargs = ({
+            'type': 'ptr',
+            'host': '100',
+            'domainId': 123456,
+            'data': 'hardware-test1.test.sftlyr.ws',
+            'ttl': 7200
+        },)
+
+        result = self.run_command(['hw', 'dns-sync', '1000'])
+
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Dns_Domain', 'getResourceRecords')
+        self.assert_called_with('SoftLayer_Hardware_Server',
+                                'getReverseDomainRecords')
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
+                                'createObject',
+                                args=createAargs)
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
+                                'createObject',
+                                args=createPTRargs)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_dns_sync_v6(self, confirm_mock):
+        confirm_mock.return_value = True
+        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain',
+                                           'getResourceRecords')
+        getResourceRecords.return_value = []
+        server = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        test_server = {
+            'id': 1000,
+            'hostname': 'hardware-test1',
+            'domain': 'sftlyr.ws',
+            'primaryIpAddress': '172.16.1.100',
+            'fullyQualifiedDomainName': 'hw-test1.sftlyr.ws',
+            "primaryNetworkComponent": {}
+        }
+        server.return_value = test_server
+
+        result = self.run_command(['hw', 'dns-sync', '--aaaa-record', '1000'])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+        test_server['primaryNetworkComponent'] = {
+            'primaryVersion6IpAddressRecord': {
+                'ipAddress': '2607:f0d0:1b01:0023:0000:0000:0000:0004'
+            }
+        }
+        createV6args = ({
+            'type': 'aaaa',
+            'host': 'hardware-test1',
+            'domainId': 98765,
+            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
+            'ttl': 7200
+        },)
+        server.return_value = test_server
+        result = self.run_command(['hw', 'dns-sync', '--aaaa-record', '1000'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
+                                'createObject',
+                                args=createV6args)
+
+        v6Record = {
+            'id': 1,
+            'ttl': 7200,
+            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
+            'host': 'hardware-test1',
+            'type': 'aaaa'
+        }
+
+        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain',
+                                           'getResourceRecords')
+        getResourceRecords.return_value = [v6Record]
+        editArgs = (v6Record,)
+        result = self.run_command(['hw', 'dns-sync', '--aaaa-record', '1000'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
+                                'editObject',
+                                args=editArgs)
+
+        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain',
+                                           'getResourceRecords')
+        getResourceRecords.return_value = [v6Record, v6Record]
+        result = self.run_command(['hw', 'dns-sync', '--aaaa-record', '1000'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_dns_sync_edit_a(self, confirm_mock):
+        confirm_mock.return_value = True
+        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain',
+                                           'getResourceRecords')
+        getResourceRecords.return_value = [
+            {'id': 1, 'ttl': 7200, 'data': '1.1.1.1',
+             'host': 'hardware-test1', 'type': 'a'}
+        ]
+        editArgs = (
+            {'type': 'a', 'host': 'hardware-test1', 'data': '172.16.1.100',
+             'id': 1, 'ttl': 7200},
+        )
+        result = self.run_command(['hw', 'dns-sync', '-a', '1000'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
+                                'editObject',
+                                args=editArgs)
+
+        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain',
+                                           'getResourceRecords')
+        getResourceRecords.return_value = [
+            {'id': 1, 'ttl': 7200, 'data': '1.1.1.1',
+             'host': 'hardware-test1', 'type': 'a'},
+            {'id': 2, 'ttl': 7200, 'data': '1.1.1.1',
+             'host': 'hardware-test1', 'type': 'a'}
+        ]
+        result = self.run_command(['hw', 'dns-sync', '-a', '1000'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_dns_sync_edit_ptr(self, confirm_mock):
+        confirm_mock.return_value = True
+        getReverseDomainRecords = self.set_mock('SoftLayer_Hardware_Server',
+                                                'getReverseDomainRecords')
+        getReverseDomainRecords.return_value = [{
+            'networkAddress': '172.16.1.100',
+            'name': '2.240.16.172.in-addr.arpa',
+            'resourceRecords': [{'data': 'test.softlayer.com.',
+                                 'id': 123,
+                                 'host': '100'}],
+            'updateDate': '2013-09-11T14:36:57-07:00',
+            'serial': 1234665663,
+            'id': 123456,
+        }]
+        editArgs = ({'host': '100', 'data': 'hardware-test1.test.sftlyr.ws',
+                     'id': 123, 'ttl': 7200},)
+        result = self.run_command(['hw', 'dns-sync', '--ptr', '1000'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
+                                'editObject',
+                                args=editArgs)
+
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_dns_sync_misc_exception(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['hw', 'dns-sync', '-a', '1000'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+        guest = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        test_guest = {
+            'id': 1000,
+            'primaryIpAddress': '',
+            'hostname': 'hardware-test1',
+            'domain': 'sftlyr.ws',
+            'fullyQualifiedDomainName': 'hardware-test1.sftlyr.ws',
+            "primaryNetworkComponent": {}
+        }
+        guest.return_value = test_guest
+        result = self.run_command(['hw', 'dns-sync', '-a', '1000'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
