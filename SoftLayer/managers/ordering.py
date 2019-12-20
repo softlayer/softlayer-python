@@ -416,7 +416,7 @@ class OrderingManager(object):
         for item_keyname in item_keynames:
             for item in items:
                 if item['keyName'] == item_keyname:
-                    if "GUEST_CORE" in item["keyName"]:
+                    if "CORE" in item["keyName"]:
                         item_capacity = item['capacity']
                         break
                     if "TIER" in item["keyName"]:
