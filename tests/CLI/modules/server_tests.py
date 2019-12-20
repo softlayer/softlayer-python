@@ -805,7 +805,6 @@ class ServerCLITests(testing.TestCase):
                                 'editObject',
                                 args=editArgs)
 
-
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_misc_exception(self, confirm_mock):
         confirm_mock.return_value = False
