@@ -444,7 +444,7 @@ class FileTests(testing.TestCase):
 
     def test_replicant_failover(self):
         result = self.run_command(['file', 'replica-failover', '12345678',
-                                   '--replicant-id=5678', '--immediate'])
+                                   '--replicant-id=5678'])
 
         self.assert_no_fail(result)
         self.assertEqual('Failover to replicant is now in progress.\n',
@@ -461,8 +461,7 @@ class FileTests(testing.TestCase):
                          result.output)
 
     def test_replicant_failback(self):
-        result = self.run_command(['file', 'replica-failback', '12345678',
-                                   '--replicant-id=5678'])
+        result = self.run_command(['file', 'replica-failback', '12345678'])
 
         self.assert_no_fail(result)
         self.assertEqual('Failback from replicant is now in progress.\n',
@@ -472,8 +471,7 @@ class FileTests(testing.TestCase):
     def test_replicant_failback_unsuccessful(self, failback_mock):
         failback_mock.return_value = False
 
-        result = self.run_command(['file', 'replica-failback', '12345678',
-                                   '--replicant-id=5678'])
+        result = self.run_command(['file', 'replica-failback', '12345678'])
 
         self.assertEqual('Failback operation could not be initiated.\n',
                          result.output)
