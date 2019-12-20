@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.8.5] - 2019-12-20
+https://github.com/softlayer/softlayer-python/compare/v5.8.3...v5.8.4
+
+- #1199 Fix block storage failback and failover.
+- #1202 Order a virtual server private. 
+
+
 ## [5.8.3] - 2019-12-11
 https://github.com/softlayer/softlayer-python/compare/v5.8.2...v5.8.3
 
