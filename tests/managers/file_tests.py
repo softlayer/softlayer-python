@@ -274,26 +274,25 @@ class FileTests(testing.TestCase):
         )
 
     def test_replicant_failover(self):
-        result = self.file.failover_to_replicant(1234, 5678, immediate=True)
+        result = self.file.failover_to_replicant(1234, 5678)
 
         self.assertEqual(
             fixtures.SoftLayer_Network_Storage.failoverToReplicant, result)
         self.assert_called_with(
             'SoftLayer_Network_Storage',
             'failoverToReplicant',
-            args=(5678, True),
+            args=(5678,),
             identifier=1234,
         )
 
     def test_replicant_failback(self):
-        result = self.file.failback_from_replicant(1234, 5678)
+        result = self.file.failback_from_replicant(1234)
 
         self.assertEqual(
             fixtures.SoftLayer_Network_Storage.failbackFromReplicant, result)
         self.assert_called_with(
             'SoftLayer_Network_Storage',
             'failbackFromReplicant',
-            args=(5678,),
             identifier=1234,
         )
 
