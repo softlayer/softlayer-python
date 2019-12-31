@@ -115,7 +115,7 @@ def cli(env,
         **kwargs):
     """Main click CLI entry-point."""
 
-    # Populate environement with client and set it as the context object
+    # Populate environment with client and set it as the context object
     env.skip_confirmations = really
     env.config_file = config
     env.format = format
