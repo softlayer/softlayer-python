@@ -12,6 +12,7 @@ import mock
 import sys
 
 from SoftLayer.CLI import exceptions
+from SoftLayer import SoftLayerError
 from SoftLayer import testing
 
 import json
@@ -660,7 +661,7 @@ class ServerCLITests(testing.TestCase):
         createAargs = ({
             'type': 'a',
             'host': 'hardware-test1',
-            'domainId': 98765,
+            'domainId': 12345,  # from SoftLayer_Account::getDomains
             'data': '172.16.1.100',
             'ttl': 7200
         },)
@@ -715,7 +716,7 @@ class ServerCLITests(testing.TestCase):
         createV6args = ({
             'type': 'aaaa',
             'host': 'hardware-test1',
-            'domainId': 98765,
+            'domainId': 12345,  # from SoftLayer_Account::getDomains
             'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
             'ttl': 7200
         },)
@@ -748,8 +749,8 @@ class ServerCLITests(testing.TestCase):
                                            'getResourceRecords')
         getResourceRecords.return_value = [v6Record, v6Record]
         result = self.run_command(['hw', 'dns-sync', '--aaaa-record', '1000'])
-        self.assertEqual(result.exit_code, 2)
-        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIsInstance(result.exception, SoftLayerError)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_edit_a(self, confirm_mock):
@@ -779,8 +780,8 @@ class ServerCLITests(testing.TestCase):
              'host': 'hardware-test1', 'type': 'a'}
         ]
         result = self.run_command(['hw', 'dns-sync', '-a', '1000'])
-        self.assertEqual(result.exit_code, 2)
-        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIsInstance(result.exception, SoftLayerError)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_edit_ptr(self, confirm_mock):
@@ -789,7 +790,7 @@ class ServerCLITests(testing.TestCase):
                                                 'getReverseDomainRecords')
         getReverseDomainRecords.return_value = [{
             'networkAddress': '172.16.1.100',
-            'name': '2.240.16.172.in-addr.arpa',
+            'name': '100.1.16.172.in-addr.arpa',
             'resourceRecords': [{'data': 'test.softlayer.com.',
                                  'id': 123,
                                  'host': '100'}],

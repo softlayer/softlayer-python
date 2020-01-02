@@ -12,6 +12,7 @@ import mock
 from SoftLayer.CLI import exceptions
 from SoftLayer.fixtures import SoftLayer_Virtual_Guest as SoftLayer_Virtual_Guest
 from SoftLayer import SoftLayerAPIError
+from SoftLayer import SoftLayerError
 from SoftLayer import testing
 
 
@@ -310,7 +311,7 @@ class VirtTests(testing.TestCase):
         createAargs = ({
             'type': 'a',
             'host': 'vs-test1',
-            'domainId': 98765,
+            'domainId': 12345,  # from SoftLayer_Account::getDomains
             'data': '172.16.240.2',
             'ttl': 7200
         },)
@@ -365,7 +366,7 @@ class VirtTests(testing.TestCase):
         createV6args = ({
             'type': 'aaaa',
             'host': 'vs-test1',
-            'domainId': 98765,
+            'domainId': 12345,
             'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
             'ttl': 7200
         },)
@@ -398,8 +399,8 @@ class VirtTests(testing.TestCase):
                                            'getResourceRecords')
         getResourceRecords.return_value = [v6Record, v6Record]
         result = self.run_command(['vs', 'dns-sync', '--aaaa-record', '100'])
-        self.assertEqual(result.exit_code, 2)
-        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIsInstance(result.exception, SoftLayerError)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_edit_a(self, confirm_mock):
@@ -429,8 +430,8 @@ class VirtTests(testing.TestCase):
              'host': 'vs-test1', 'type': 'a'}
         ]
         result = self.run_command(['vs', 'dns-sync', '-a', '100'])
-        self.assertEqual(result.exit_code, 2)
-        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIsInstance(result.exception, SoftLayerError)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_edit_ptr(self, confirm_mock):

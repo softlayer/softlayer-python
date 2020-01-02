@@ -269,7 +269,7 @@ class DNSManager(utils.IdentifierMixin, object):
         host_rec = ip_address.split('.')[-1]
         edit_ptr = None
         for ptr in ptr_domains['resourceRecords']:
-            if ptr['host'] == host_rec:
+            if ptr.get('host', '') == host_rec:
                 ptr['ttl'] = ttl
                 edit_ptr = ptr
                 break

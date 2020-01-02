@@ -52,7 +52,7 @@ def cli(env, identifier, a_record, aaaa_record, ptr, ttl):
 
     if both or ptr:
         # getReverseDomainRecords returns a list of 1 element, so just get the top.
-        ptr_domains = env.client['Virtual_Guest'].getReverseDomainRecords(id=instance['id']).pop()
+        ptr_domains = env.client['Hardware_Server'].getReverseDomainRecords(id=instance['id']).pop()
         dns.sync_ptr_record(ptr_domains, instance['primaryIpAddress'], instance['fullyQualifiedDomainName'], ttl)
 
     if aaaa_record:
