@@ -94,3 +94,6 @@ This function updates the firmware of a server. If already at the latest version
    :prog: hw ready
    :show-nested:
 
+.. click:: SoftLayer.CLI.hardware.dns-sync:cli
+   :prog: hw dns-sync
+   :show-nested:
