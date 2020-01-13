@@ -674,5 +674,5 @@ class FileTests(testing.TestCase):
                 'maximumAvailableCount': 300,
                 'provisionedCount': 100
             }]
-        result = self.run_command(['file', 'volume-limit'])
+        result = self.run_command(['file', 'volume-limits'])
         self.assert_no_fail(result)

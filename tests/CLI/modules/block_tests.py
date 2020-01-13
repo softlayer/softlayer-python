@@ -675,5 +675,5 @@ class BlockTests(testing.TestCase):
                 "provisionedCount": 100
             }]
 
-        result = self.run_command(['block', 'volume-limit'])
+        result = self.run_command(['block', 'volume-limits'])
         self.assert_no_fail(result)
