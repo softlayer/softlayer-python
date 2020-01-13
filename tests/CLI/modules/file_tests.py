@@ -665,3 +665,14 @@ class FileTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assertEqual('Order #24602 placed successfully!\n > Storage as a Service\n > 1000 GBs\n > 4 IOPS per GB\n',
                          result.output)
+
+    @mock.patch('SoftLayer.FileStorageManager.list_file_volume_limit')
+    def test_volume_limit(self, list_mock):
+        list_mock.return_value = [
+            {
+                'datacenterName': 'global',
+                'maximumAvailableCount': 300,
+                'provisionedCount': 100
+            }]
+        result = self.run_command(['file', 'volume-limits'])
+        self.assert_no_fail(result)

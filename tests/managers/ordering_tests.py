@@ -722,7 +722,7 @@ class OrderingTests(testing.TestCase):
                 "capacity": "1",
                 "id": 10201,
                 "keyName": "GUEST_CORE_1_DEDICATED",
-            }]
+        }]
 
         item_capacity = self.ordering.get_item_capacity(items, ['GUEST_CORE_1_DEDICATED', 'OS_RHEL_7_X_LAMP_64_BIT'])
 
@@ -739,7 +739,7 @@ class OrderingTests(testing.TestCase):
                 "capacity": "1",
                 "id": 10201,
                 "keyName": "READHEAVY_TIER",
-            }]
+        }]
 
         item_capacity = self.ordering.get_item_capacity(items, ['READHEAVY_TIER', 'STORAGE_SPACE_FOR_2_IOPS_PER_GB'])
 

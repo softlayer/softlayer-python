@@ -24,6 +24,13 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         self.configuration = {}
         self.client = client
 
+    def list_block_volume_limit(self):
+        """Returns a list of block volume count limit.
+
+        :return: Returns a list of block volume count limit.
+        """
+        return self.client.call('Network_Storage', 'getVolumeCountLimits')
+
     def list_block_volumes(self, datacenter=None, username=None,
                            storage_type=None, **kwargs):
         """Returns a list of block volumes.

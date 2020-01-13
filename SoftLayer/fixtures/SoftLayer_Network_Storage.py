@@ -226,3 +226,9 @@ createSnapshot = {
 
 enableSnapshots = True
 disableSnapshots = True
+
+getVolumeCountLimits = {
+    'datacenterName': 'global',
+    'maximumAvailableCount': 300,
+    'provisionedCount': 100
+}

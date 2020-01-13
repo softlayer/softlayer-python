@@ -19,6 +19,13 @@ class FileStorageManager(utils.IdentifierMixin, object):
         self.configuration = {}
         self.client = client
 
+    def list_file_volume_limit(self):
+        """Returns a list of file volume count limit.
+
+        :return: Returns a list of file volume count limit.
+        """
+        return self.client.call('Network_Storage', 'getVolumeCountLimits')
+
     def list_file_volumes(self, datacenter=None, username=None,
                           storage_type=None, **kwargs):
         """Returns a list of file volumes.

@@ -936,3 +936,7 @@ class BlockTests(testing.TestCase):
         result = self.block.set_credential_password(access_id=102, password='AAAaaa')
         self.assertEqual(True, result)
         self.assert_called_with('SoftLayer_Network_Storage_Allowed_Host', 'setCredentialPassword')
+
+    def test_list_block_volume_limit(self):
+        result = self.block.list_block_volume_limit()
+        self.assertEqual(fixtures.SoftLayer_Network_Storage.getVolumeCountLimits, result)
