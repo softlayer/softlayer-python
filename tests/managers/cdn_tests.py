@@ -49,16 +49,16 @@ class CDNTests(testing.TestCase):
                                    cache_query="include all")
 
         args = ({
-                    'uniqueId': "12345",
-                    'origin': '10.10.10.1',
-                    'path': '/example/videos',
+            'uniqueId': "12345",
+            'origin': '10.10.10.1',
+            'path': '/example/videos',
                     'originType': 'HOST_SERVER',
                     'header': 'test.example.com',
                     'httpPort': 80,
                     'protocol': 'HTTP',
                     'performanceConfiguration': 'General web delivery',
                     'cacheKeyQueryRule': "include all"
-                },)
+        },)
         self.assert_called_with('SoftLayer_Network_CdnMarketplace_Configuration_Mapping_Path',
                                 'createOriginPath',
                                 args=args)
@@ -69,9 +69,9 @@ class CDNTests(testing.TestCase):
                                    protocol='http', optimize_for="web", cache_query="include all")
 
         args = ({
-                    'uniqueId': "12345",
-                    'origin': '10.10.10.1',
-                    'path': '/example/videos',
+            'uniqueId': "12345",
+            'origin': '10.10.10.1',
+            'path': '/example/videos',
                     'originType': 'OBJECT_STORAGE',
                     'header': 'test.example.com',
                     'httpPort': 80,
@@ -80,7 +80,7 @@ class CDNTests(testing.TestCase):
                     'fileExtension': 'jpg',
                     'performanceConfiguration': 'General web delivery',
                     'cacheKeyQueryRule': "include all"
-                },)
+        },)
         self.assert_called_with('SoftLayer_Network_CdnMarketplace_Configuration_Mapping_Path',
                                 'createOriginPath',
                                 args=args)

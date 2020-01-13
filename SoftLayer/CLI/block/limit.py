@@ -14,10 +14,9 @@ DEFAULT_COLUMNS = [
 
 
 @click.command()
-@click.option('--datacenter', '-d', help='Datacenter shortname')
 @click.option('--sortby', help='Column to sort by', default='Datacenter')
 @environment.pass_env
-def cli(env, sortby, datacenter):
+def cli(env, sortby):
     """List number of block storage volumes limit per datacenter."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
     block_volumes = block_manager.list_block_volume_limit()

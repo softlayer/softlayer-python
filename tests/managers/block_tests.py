@@ -939,4 +939,4 @@ class BlockTests(testing.TestCase):
 
     def test_list_block_volume_limit(self):
         result = self.block.list_block_volume_limit()
-        self.assertEqual(fixtures.SoftLayer_Network_Storage.getVolumeCountLimits,result)
+        self.assertEqual(fixtures.SoftLayer_Network_Storage.getVolumeCountLimits, result)

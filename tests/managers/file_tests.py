@@ -668,7 +668,6 @@ class FileTests(testing.TestCase):
     def test_order_file_duplicate_performance(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
-
         mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
         mock_volume['storageType']['keyName'] = 'PERFORMANCE_FILE_STORAGE'
         mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
