@@ -829,3 +829,7 @@ class FileTests(testing.TestCase):
                    'volume': {'id': 102},
                    'volumeSize': 1000},)
         )
+
+    def test_list_file_volume_limit(self):
+        result = self.file.list_file_volume_limit()
+        self.assertEqual(fixtures.SoftLayer_Network_Storage.getVolumeCountLimits, result)
