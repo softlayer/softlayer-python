@@ -29,14 +29,14 @@ def cli(env, identifier, a_record, aaaa_record, ptr, ttl):
               primaryBackendIpAddress,primaryIpAddress,
               primaryNetworkComponent[id,primaryIpAddress,primaryVersion6IpAddressRecord[ipAddress]]]"""
     dns = SoftLayer.DNSManager(env.client)
-    server = SoftLayer.VSManager(env.client)
+    server = SoftLayer.HardwareManager(env.client)
 
     server_id = helpers.resolve_id(server.resolve_ids, identifier, 'VS')
-    instance = server.get_instance(server_id, mask=mask)
+    instance = server.get_hardware(server_id, mask=mask)
     zone_id = helpers.resolve_id(dns.resolve_ids, instance['domain'], name='zone')
 
     if not instance['primaryIpAddress']:
-        raise exceptions.CLIAbort('No primary IP address associated with this VS')
+        raise exceptions.CLIAbort('No primary IP address associated with this hardware')
 
     go_for_it = env.skip_confirmations or formatting.confirm(
         "Attempt to update DNS records for %s" % instance['fullyQualifiedDomainName'])
@@ -52,7 +52,7 @@ def cli(env, identifier, a_record, aaaa_record, ptr, ttl):
 
     if both or ptr:
         # getReverseDomainRecords returns a list of 1 element, so just get the top.
-        ptr_domains = env.client['Virtual_Guest'].getReverseDomainRecords(id=instance['id']).pop()
+        ptr_domains = env.client['Hardware_Server'].getReverseDomainRecords(id=instance['id']).pop()
         dns.sync_ptr_record(ptr_domains, instance['primaryIpAddress'], instance['fullyQualifiedDomainName'], ttl)
 
     if aaaa_record:
