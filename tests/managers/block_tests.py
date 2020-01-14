@@ -486,6 +486,43 @@ class BlockTests(testing.TestCase):
             'removeAccessFromHostList',
             identifier=50)
 
+    def test_assign_subnets_to_acl(self):
+        result = self.block.assign_subnets_to_acl(
+            12345,
+            subnets_id=[12345678])
+
+        self.assertEqual(fixtures.SoftLayer_Network_Storage_Allowed_Host.
+                         assignSubnetsToAcl, result)
+
+        self.assert_called_with(
+            'SoftLayer_Network_Storage_Allowed_Host',
+            'assignSubnetsToAcl',
+            identifier=12345)
+
+    def test_remove_subnets_from_acl(self):
+        result = self.block.remove_subnets_from_acl(
+            12345,
+            subnets_id=[12345678])
+
+        self.assertEqual(fixtures.SoftLayer_Network_Storage_Allowed_Host.
+                         removeSubnetsFromAcl, result)
+
+        self.assert_called_with(
+            'SoftLayer_Network_Storage_Allowed_Host',
+            'removeSubnetsFromAcl',
+            identifier=12345)
+
+    def test_get_subnets_in_acl(self):
+        result = self.block.get_subnets_in_acl(12345)
+
+        self.assertEqual(fixtures.SoftLayer_Network_Storage_Allowed_Host.
+                         getSubnetsInAcl, result)
+
+        self.assert_called_with(
+            'SoftLayer_Network_Storage_Allowed_Host',
+            'getSubnetsInAcl',
+            identifier=12345)
+
     def test_create_snapshot(self):
         result = self.block.create_snapshot(123, 'hello world')
 
