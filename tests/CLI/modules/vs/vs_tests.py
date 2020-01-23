@@ -205,6 +205,17 @@ class VirtTests(testing.TestCase):
             ['example-tag'],
         )
 
+    def test_detail_vs_empty_allotment(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getBandwidthAllotmentDetail')
+        mock.return_value = None
+        result = self.run_command(['vs', 'detail', '100'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(
+            json.loads(result.output)['Bandwidth'][0]['Allotment'],
+            '-',
+        )
+
     def test_detail_vs_dedicated_host_not_found(self):
         ex = SoftLayerAPIError('SoftLayer_Exception', 'Not found')
         mock = self.set_mock('SoftLayer_Virtual_DedicatedHost', 'getObject')
