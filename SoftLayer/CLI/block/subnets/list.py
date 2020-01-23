@@ -16,23 +16,29 @@ COLUMNS = [
 
 
 @click.command()
-@click.argument('access_id')
+@click.argument('access_id', type=int)
 @environment.pass_env
 def cli(env, access_id):
     """List block storage assigned subnets for the given host id.
 
-    access_id is the allowed_host_id from slcli block access-list
+    access_id is the host_id obtained by: slcli block access-list <volume_id>
     """
 
-    block_manager = SoftLayer.BlockStorageManager(env.client)
-    subnets = block_manager.get_subnets_in_acl(access_id)
+    try:
+        block_manager = SoftLayer.BlockStorageManager(env.client)
+        subnets = block_manager.get_subnets_in_acl(access_id)
 
-    table = formatting.Table(COLUMNS)
-    for subnet in subnets:
-        row = ["{0}".format(subnet['id']),
-               "{0}".format(subnet['createDate']),
-               "{0}".format(subnet['networkIdentifier']),
-               "{0}".format(subnet['cidr'])]
-        table.add_row(row)
+        table = formatting.Table(COLUMNS)
+        for subnet in subnets:
+            row = ["{0}".format(subnet['id']),
+                   "{0}".format(subnet['createDate']),
+                   "{0}".format(subnet['networkIdentifier']),
+                   "{0}".format(subnet['cidr'])]
+            table.add_row(row)
 
-    env.fout(table)
+        env.fout(table)
+
+    except SoftLayer.SoftLayerAPIError as ex:
+        message = "{0}".format("Unable to list assigned subnets for access-id: " +
+                               str(access_id) + ".\nReason: " + ex.faultString)
+        click.echo(message)

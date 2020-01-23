@@ -489,7 +489,7 @@ class BlockTests(testing.TestCase):
     def test_assign_subnets_to_acl(self):
         result = self.block.assign_subnets_to_acl(
             12345,
-            subnets_id=[12345678])
+            subnet_ids=[12345678])
 
         self.assertEqual(fixtures.SoftLayer_Network_Storage_Allowed_Host.
                          assignSubnetsToAcl, result)
@@ -502,7 +502,7 @@ class BlockTests(testing.TestCase):
     def test_remove_subnets_from_acl(self):
         result = self.block.remove_subnets_from_acl(
             12345,
-            subnets_id=[12345678])
+            subnet_ids=[12345678])
 
         self.assertEqual(fixtures.SoftLayer_Network_Storage_Allowed_Host.
                          removeSubnetsFromAcl, result)
