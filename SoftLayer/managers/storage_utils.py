@@ -660,14 +660,14 @@ def prepare_replicant_order_object(manager, snapshot_schedule, location,
     """
     # Ensure the primary volume and snapshot space are not set for cancellation
     if 'billingItem' not in volume\
-            or volume['billingItem']['cancellationDate'] != '':
+            or volume['billingItem'].get('cancellationDate'):
         raise exceptions.SoftLayerError(
             'This volume is set for cancellation; '
             'unable to order replicant volume')
 
     for child in volume['billingItem']['activeChildren']:
         if child['categoryCode'] == 'storage_snapshot_space'\
-                and child['cancellationDate'] != '':
+                and child.get('cancellationDate'):
             raise exceptions.SoftLayerError(
                 'The snapshot space for this volume is set for '
                 'cancellation; unable to order replicant volume')
