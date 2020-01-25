@@ -133,3 +133,38 @@ When a confirmation fails, you probably want to stop execution and give a non-ze
 ::
 
     raise CLIAbort("Aborting. Failed confirmation")
+
+
+
+Documenting Commands
+--------------------
+
+All commands should be documented, luckily there is a sphinx module that makes this pretty easy.
+
+If you were adding a summary command to `slcli account` you would find the documentation in `docs/cli/account.rst` and you would just need to add this for your command
+
+```
+.. click:: SoftLayer.CLI.account.summary:cli
+    :prog: account summary
+    :show-nested:
+```
+
+
+The following REGEX can take the route entry and turn it into a document entry.
+
+```
+s/^\('([a-z]*):([a-z-]*)', '([a-zA-Z\.:_]*)'\),$/.. click:: $3\n    :prog: $1 $2\n    :show-nested:\n/
+```
+
+FIND:
+```
+^\('([a-z]*):([a-z-]*)', '([a-zA-Z\.:_]*)'\),$
+```
+
+REPLACE:
+```
+.. click:: $3
+    :prog: $1 $2
+    :show-nested:
+
+```
