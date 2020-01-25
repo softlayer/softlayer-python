@@ -168,3 +168,7 @@ REPLACE:
     :show-nested:
 
 ```
+
+
+I tried to get sphinx-click to auto document the ENTIRE slcli, but the results were all on one page, and required a few changes to sphinx-click itself to work. This is due to the fact that most commands in SLCLI use the function name "cli", and some hacks would have to be put inplace to use the path name instead.
+
