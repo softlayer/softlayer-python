@@ -39,6 +39,5 @@ def cli(env, access_id):
         env.fout(table)
 
     except SoftLayer.SoftLayerAPIError as ex:
-        message = "{0}".format("Unable to list assigned subnets for access-id: " +
-                               str(access_id) + ".\nReason: " + ex.faultString)
+        message = "Unable to list assigned subnets for access-id: {}.\nReason: {}".format(access_id, ex.faultString)
         click.echo(message)

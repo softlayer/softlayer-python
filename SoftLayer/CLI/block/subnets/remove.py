@@ -15,6 +15,8 @@ def cli(env, access_id, subnet_id):
     """Remove block storage subnets for the given host id.
 
     access_id is the host_id obtained by: slcli block access-list <volume_id>
+
+    SoftLayer_Account::iscsiisolationdisabled must be False to use this command
     """
     try:
         subnet_ids = list(subnet_id)
@@ -22,16 +24,14 @@ def cli(env, access_id, subnet_id):
         removed_subnets = block_manager.remove_subnets_from_acl(access_id, subnet_ids)
 
         for subnet in removed_subnets:
-            message = "{0}".format("Successfully removed subnet id: " + str(subnet) +
-                                   ' for allowed host id: ' + str(access_id) + '.')
+            message = "Successfully removed subnet id: {} for allowed host id: {}".format(subnet, access_id)
             click.echo(message)
 
         failed_to_remove_subnets = list(set(subnet_ids) - set(removed_subnets))
         for subnet in failed_to_remove_subnets:
-            message = "{0}".format("Failed to remove subnet id: " + str(subnet) +
-                                   ' for allowed host id: ' + str(access_id) + '.')
+            message = "Failed to remove subnet id: {} for allowed host id: {}".format(subnet, access_id)
             click.echo(message)
 
     except SoftLayer.SoftLayerAPIError as ex:
-        message = "{0}".format("Unable to remove subnets.\nReason: " + ex.faultString)
+        message = "Unable to remove subnets.\nReason: {}".format(ex.faultString)
         click.echo(message)
