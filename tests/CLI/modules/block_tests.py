@@ -438,6 +438,23 @@ class BlockTests(testing.TestCase):
 
         self.assert_no_fail(result)
 
+    def test_assign_subnets_to_acl(self):
+        result = self.run_command(['block', 'subnets-assign', '12345',
+                                   '--subnet-id=12345678'])
+
+        self.assert_no_fail(result)
+
+    def test_remove_subnets_from_acl(self):
+        result = self.run_command(['block', 'subnets-remove', '12345',
+                                   '--subnet-id=12345678'])
+
+        self.assert_no_fail(result)
+
+    def test_get_subnets_in_acl(self):
+        result = self.run_command(['block', 'subnets-list', '12345'])
+
+        self.assert_no_fail(result)
+
     def test_replicant_failover(self):
         result = self.run_command(['block', 'replica-failover', '12345678',
                                    '--replicant-id=5678'])
