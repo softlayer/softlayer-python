@@ -110,3 +110,16 @@ Block Commands
 .. click:: SoftLayer.CLI.block.limit:cli
     :prog: block volume-limits
     :show-nested:
+
+
+.. click:: SoftLayer.CLI.block.subnets.list:cli
+    :prog: block subnets-list
+    :show-nested:
+
+.. click:: SoftLayer.CLI.block.subnets.assign:cli
+    :prog: block subnets-assign
+    :show-nested:
+
+.. click:: SoftLayer.CLI.block.subnets.remove:cli
+    :prog: block subnets-remove
+    :show-nested:
