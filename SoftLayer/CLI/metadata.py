@@ -28,16 +28,13 @@ META_MAPPING = {
     'ip': 'primary_ip',
 }
 
-HELP = """Find details about this machine
+HELP = """Find details about the machine making these API calls.
 
-\b
-PROP Choices
-%s
-\b
-Examples :
-%s
-""" % ('*' + '\n*'.join(META_CHOICES),
-       'slcli metadata ' + '\nslcli metadata '.join(META_CHOICES))
+.. csv-table:: Choices
+
+    {choices}
+
+""".format(choices="\n    ".join(META_CHOICES))
 
 
 @click.command(help=HELP,

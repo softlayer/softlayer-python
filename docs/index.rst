@@ -21,6 +21,7 @@ in order to manage SoftLayer services.
    config_file
    api/*
    cli
+   cli_directory
 
 
 Contributing

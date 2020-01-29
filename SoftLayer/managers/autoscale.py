@@ -99,6 +99,7 @@ class AutoScaleManager(object):
 
         :param identifier: SoftLayer_Scale_Group Id
         :param mask: optional SoftLayer_Scale_Member objectMask
+
         .. _SoftLayer_Scale_Group::getVirtualGuestMembers():
             https://sldn.softlayer.com/reference/services/SoftLayer_Scale_Group/getVirtualGuestMembers/
         """
@@ -109,6 +110,7 @@ class AutoScaleManager(object):
 
         :param identifier: SoftLayer_Scale_Group id
         :param template: `SoftLayer_Scale_Group`_
+
         .. _SoftLayer_Scale_Group::editObject():
             https://sldn.softlayer.com/reference/services/SoftLayer_Scale_Group/editObject/
         .. _SoftLayer_Scale_Group: https://sldn.softlayer.com/reference/datatypes/SoftLayer_Scale_Group/

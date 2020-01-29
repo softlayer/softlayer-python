@@ -9,43 +9,39 @@ SoftLayer API bindings for python and how to efficiently make API calls. See
 the :ref:`usage-examples` section to see how to discover all of the
 functionality not fully documented here.
 
-.. toctree::
-   :maxdepth: 2
-   :glob:
-
-   cli/*
-
 .. _config_setup:
 
 Configuration Setup
 -------------------
 To update the configuration, you can use `slcli setup`.
+
 ::
 
-	$ slcli setup
-	Username []: username
-	API Key or Password []:
-	Endpoint (public|private|custom): public
-	:..............:..................................................................:
-	:         Name : Value                                                            :
-	:..............:..................................................................:
-	:     Username : username                                                         :
-	:      API Key : oyVmeipYQCNrjVS4rF9bHWV7D75S6pa1fghFl384v7mwRCbHTfuJ8qRORIqoVnha :
-	: Endpoint URL : https://api.softlayer.com/xmlrpc/v3.1/                           :
-	:..............:..................................................................:
-	Are you sure you want to write settings to "/home/me/.softlayer"? [y/N]: y
+    $ slcli setup
+    Username []: username
+    API Key or Password []:
+    Endpoint (public|private|custom): public
+    :..............:..................................................................:
+    :         Name : Value                                                            :
+    :..............:..................................................................:
+    :     Username : username                                                         :
+    :      API Key : oyVmeipYQCNrjVS4rF9bHWV7D75S6pa1fghFl384v7mwRCbHTfuJ8qRORIqoVnha :
+    : Endpoint URL : https://api.softlayer.com/xmlrpc/v3.1/                           :
+    :..............:..................................................................:
+    Are you sure you want to write settings to "/home/me/.softlayer"? [y/N]: y
 
 To check the configuration, you can use `slcli config show`.
+
 ::
 
-	$ slcli config show
-	:..............:..................................................................:
-	:         Name : Value                                                            :
-	:..............:..................................................................:
-	:     Username : username                                                         :
-	:      API Key : oyVmeipYQCNrjVS4rF9bHWV7D75S6pa1fghFl384v7mwRCbHTfuJ8qRORIqoVnha :
-	: Endpoint URL : https://api.softlayer.com/xmlrpc/v3.1/                           :
-	:..............:..................................................................:
+    $ slcli config show
+    :..............:..................................................................:
+    :         Name : Value                                                            :
+    :..............:..................................................................:
+    :     Username : username                                                         :
+    :      API Key : oyVmeipYQCNrjVS4rF9bHWV7D75S6pa1fghFl384v7mwRCbHTfuJ8qRORIqoVnha :
+    : Endpoint URL : https://api.softlayer.com/xmlrpc/v3.1/                           :
+    :..............:..................................................................:
 
 
 If you are using an account created from the https://cloud.ibm.com portal, your username will be literally `apikey`, and use the key provided. `How to create an IBM apikey <https://cloud.ibm.com/docs/iam?topic=iam-userapikey#create_user_key>`_
@@ -57,6 +53,8 @@ To see more about the config file format, see :ref:`config_file`.
 Usage Examples
 --------------
 To discover the available commands, simply type `slcli`.
+
+
 ::
 
     $ slcli
@@ -112,71 +110,76 @@ To discover the available commands, simply type `slcli`.
 
 As you can see, there are a number of commands/sections. To look at the list of
 subcommands for virtual servers type `slcli vs`. For example:
-::
 
-	$ slcli vs
-	Usage: slcli vs [OPTIONS] COMMAND [ARGS]...
-
-	  Virtual Servers.
-
-	Options:
-	  --help  Show this message and exit.
-
-	Commands:
-	  cancel          Cancel virtual servers.
-	  capture         Capture SoftLayer image.
-	  create          Order/create virtual servers.
-	  create-options  Virtual server order options.
-	  credentials     List virtual server credentials.
-	  detail          Get details for a virtual server.
-	  dns-sync        Sync DNS records.
-	  edit            Edit a virtual server's details.
-	  list            List virtual servers.
-	  network         Manage network settings.
-	  pause           Pauses an active virtual server.
-	  power_off       Power off an active virtual server.
-	  power_on        Power on a virtual server.
-	  ready           Check if a virtual server is ready.
-	  reboot          Reboot an active virtual server.
-	  reload          Reload operating system on a virtual server.
-	  rescue          Reboot into a rescue image.
-	  resume          Resumes a paused virtual server.
-	  upgrade         Upgrade a virtual server.
-
-Finally, we can make an actual call. Let's list out the virtual servers on our
-account by using `slcli vs list`.
 
 ::
 
-	$ slcli vs list
-	:.........:............:....................:.......:........:................:..............:....................:
-	:    id   : datacenter :       host         : cores : memory :   primary_ip   :  backend_ip  : active_transaction :
-	:.........:............:....................:.......:........:................:..............:....................:
-	: 1234567 :   sjc01    :  test.example.com  :   4   :   4G   :    12.34.56    :   65.43.21   :         -          :
-	:.........:............:....................:.......:........:................:..............:....................:
+    $ slcli vs
+    Usage: slcli vs [OPTIONS] COMMAND [ARGS]...
+
+      Virtual Servers.
+
+    Options:
+      --help  Show this message and exit.
+
+    Commands:
+      cancel          Cancel virtual servers.
+      capture         Capture SoftLayer image.
+      create          Order/create virtual servers.
+      create-options  Virtual server order options.
+      credentials     List virtual server credentials.
+      detail          Get details for a virtual server.
+      dns-sync        Sync DNS records.
+      edit            Edit a virtual server's details.
+      list            List virtual servers.
+      network         Manage network settings.
+      pause           Pauses an active virtual server.
+      power_off       Power off an active virtual server.
+      power_on        Power on a virtual server.
+      ready           Check if a virtual server is ready.
+      reboot          Reboot an active virtual server.
+      reload          Reload operating system on a virtual server.
+      rescue          Reboot into a rescue image.
+      resume          Resumes a paused virtual server.
+      upgrade         Upgrade a virtual server.
+
+
+Finally, we can make an actual call. Let's list out the virtual servers on our account by using `slcli vs list`.
+
+
+Example::
+
+    $ slcli vs list
+    :.........:............:....................:.......:........:................:..............:....................:
+    :    id   : datacenter :       host         : cores : memory :   primary_ip   :  backend_ip  : active_transaction :
+    :.........:............:....................:.......:........:................:..............:....................:
+    : 1234567 :   sjc01    :  test.example.com  :   4   :   4G   :    12.34.56    :   65.43.21   :         -          :
+    :.........:............:....................:.......:........:................:..............:....................:
 
 Most commands will take in additional options/arguments. To see all available actions, use `--help`.
+
+
 ::
 
-	$ slcli vs list --help
-	Usage: slcli vs list [OPTIONS]
+    $ slcli vs list --help
+    Usage: slcli vs list [OPTIONS]
 
-	  List virtual servers.
+      List virtual servers.
 
-	Options:
-	  --sortby [guid|hostname|primary_ip|backend_ip|datacenter]
-	                                  Column to sort by
-	  -c, --cpu INTEGER               Number of CPU cores
-	  -D, --domain TEXT               Domain portion of the FQDN
-	  -d, --datacenter TEXT           Datacenter shortname
-	  -H, --hostname TEXT             Host portion of the FQDN
-	  -m, --memory INTEGER            Memory in mebibytes
-	  -n, --network TEXT              Network port speed in Mbps
-	  --hourly                        Show only hourly instances
-	  --monthly                       Show only monthly instances
-	  --tags TEXT                     Show instances that have one of these comma-
-	                                  separated tags
-	  --help                          Show this message and exit.
+    Options:
+      --sortby [guid|hostname|primary_ip|backend_ip|datacenter]
+                                      Column to sort by
+      -c, --cpu INTEGER               Number of CPU cores
+      -D, --domain TEXT               Domain portion of the FQDN
+      -d, --datacenter TEXT           Datacenter shortname
+      -H, --hostname TEXT             Host portion of the FQDN
+      -m, --memory INTEGER            Memory in mebibytes
+      -n, --network TEXT              Network port speed in Mbps
+      --hourly                        Show only hourly instances
+      --monthly                       Show only monthly instances
+      --tags TEXT                     Show instances that have one of these comma-
+                                      separated tags
+      --help                          Show this message and exit.
 
 
 

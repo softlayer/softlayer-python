@@ -23,7 +23,7 @@ LBaaS Commands
    :prog: loadbal member-add
    :show-nested:
 .. click:: SoftLayer.CLI.loadbal.members:remove
-   :prog: loadbal member-remote
+   :prog: loadbal member-remove
    :show-nested:
 .. click:: SoftLayer.CLI.loadbal.pools:add
    :prog: loadbal pool-add
