@@ -1,7 +1,25 @@
 # Change Log
 
 
-## [5.8.5] - 2019-12-20
+## [5.8.5] - 2012-01-29
+https://github.com/softlayer/softlayer-python/compare/v5.8.4...v5.8.5
+
+-  #1195 Fixed an issue with `slcli vs dns-sync --ptr`. Added `slcli hw dns-sync`
+-  #1199 Fix File Storage failback and failover.
+-  #1198 Fix issue where the summary command fails due to None being provided as the datacenter name.
+-  #1208 Added The following commands:
+    - `slcli block volume-limits` 
+    - `slcli file  volume-limits`
+- #1209  Add testing/CI for python 3.8.
+- #1212 Fix vs detail erroring on servers pending cancellation.
+- #1210 support subnet ACL management through cli
+    + `slcli block subnets-list`
+    + `slcli block subnets-assign`
+    + `slcli block subnets-remove`
+- #1215 Added documentation for all SLCLI commands.
+
+
+## [5.8.4] - 2019-12-20
 https://github.com/softlayer/softlayer-python/compare/v5.8.3...v5.8.4
 
 - #1199 Fix block storage failback and failover.
