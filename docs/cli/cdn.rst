@@ -1,7 +1,7 @@
 .. _cli_cdn:
 
 Interacting with CDN
-==============================
+=====================
 
 
 .. click:: SoftLayer.CLI.cdn.detail:cli

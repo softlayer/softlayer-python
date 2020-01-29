@@ -17,6 +17,7 @@ def cli(env, identifier):
     and will eventually be fully removed from the account by an automated internal process.
 
     Example: slcli user delete userId
+
     """
 
     mgr = SoftLayer.UserManager(env.client)

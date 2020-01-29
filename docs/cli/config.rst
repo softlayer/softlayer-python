@@ -1,7 +1,7 @@
 .. _cli_config:
 
 Config
-========
+======
 
 `Creating an IBMID apikey <https://cloud.ibm.com/docs/iam?topic=iam-userapikey#create_user_key>`_
 `IBMid for services <https://cloud.ibm.com/docs/iam?topic=iam-iamapikeysforservices>`_
@@ -15,4 +15,9 @@ Config
 
 .. click:: SoftLayer.CLI.config.show:cli
     :prog: config show
+    :show-nested:
+
+
+.. click:: SoftLayer.CLI.config.setup:cli
+    :prog: setup
     :show-nested:

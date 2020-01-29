@@ -34,10 +34,13 @@ from SoftLayer.CLI import helpers
 def cli(env, username, email, password, from_user, template, api_key):
     """Creates a user Users.
 
-    :Example: slcli user create my@email.com -e my@email.com -p generate -a
-    -t '{"firstName": "Test", "lastName": "Testerson"}'
-
     Remember to set the permissions and access for this new user.
+
+    Example::
+
+        slcli user create my@email.com -e my@email.com -p generate -a
+        -t '{"firstName": "Test", "lastName": "Testerson"}'
+
     """
 
     mgr = SoftLayer.UserManager(env.client)
