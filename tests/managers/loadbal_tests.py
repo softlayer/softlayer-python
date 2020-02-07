@@ -8,8 +8,8 @@
     them directly to the API.
 """
 import SoftLayer
+from SoftLayer.fixtures import SoftLayer_Network_LBaaS_LoadBalancer
 from SoftLayer import testing
-from SoftLayer.fixtures import  SoftLayer_Network_LBaaS_LoadBalancer
 
 
 class LoadBalancerTests(testing.TestCase):
@@ -156,7 +156,7 @@ class LoadBalancerTests(testing.TestCase):
             'description': desc,
             'location': datacenter,
             'packageId': package[0]['id'],
-            'useHourlyPricing': True,       # Required since LBaaS is an hourly service
+            'useHourlyPricing': True,  # Required since LBaaS is an hourly service
             'prices': [{'id': package[0]['itemPrices'][0]['id']}],
             'protocolConfigurations': protocols,
             'subnets': [{'id': subnet_id}],
