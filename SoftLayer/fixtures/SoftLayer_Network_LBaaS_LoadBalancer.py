@@ -1,6 +1,6 @@
 getObject = {
     'accountId': 1234,
-    'address': '01-307608-ams01.clb.appdomain.cloud',
+    'address': 'test-01-307608-ams01.clb.appdomain.cloud  ',
     'createDate': '2019-08-12T07:49:43-06:00',
     'id': 1111111,
     'isPublic': 0,

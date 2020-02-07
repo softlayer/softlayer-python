@@ -7,6 +7,7 @@ import mock
 
 import SoftLayer
 from SoftLayer.CLI.exceptions import ArgumentError
+from SoftLayer.CLI.exceptions import CLIAbort
 from SoftLayer import exceptions
 from SoftLayer.fixtures import SoftLayer_Network_LBaaS_LoadBalancer
 from SoftLayer.fixtures import SoftLayer_Product_Package
@@ -215,6 +216,16 @@ class LoadBalancerTests(testing.TestCase):
     def test_lb_detail(self):
         result = self.run_command(['lb', 'detail', '1111111'])
         self.assert_no_fail(result)
+
+    def test_lb_detail_by_address(self):
+        address = SoftLayer_Network_LBaaS_LoadBalancer.getObject.get('address')
+        result = self.run_command(['lb', 'detail', address])
+        self.assert_no_fail(result)
+
+    def test_lb_detail_address_not_found(self):
+        address = 'test-01-ams01.clb.appdomain.cloud'
+        result = self.run_command(['lb', 'detail', address])
+        self.assertIsInstance(result.exception, CLIAbort)
 
     def test_order(self):
         result = self.run_command(['loadbal', 'order', '--name', 'test', '--datacenter', 'par01', '--label',
