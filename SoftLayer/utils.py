@@ -13,6 +13,16 @@ import time
 
 UUID_RE = re.compile(r'^[0-9a-f\-]{36}$', re.I)
 KNOWN_OPERATIONS = ['<=', '>=', '<', '>', '~', '!~', '*=', '^=', '$=', '_=']
+DOMAIN_RE = re.compile(r'[-a-zA-Z0-9.]{1,40}\.')
+
+
+def valid_domain(domain_name):
+    """Return whether or not given value is a valid domain.
+
+    :param domain_name: domain string to validate.
+
+    """
+    return DOMAIN_RE.match(domain_name)
 
 
 def lookup(dic, key, *keys):

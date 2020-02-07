@@ -3,6 +3,7 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer import utils
 
@@ -13,8 +14,15 @@ from SoftLayer import utils
 def cli(env, identifier):
     """Get Load Balancer as a Service details."""
     mgr = SoftLayer.LoadBalancerManager(env.client)
-    _, lbid = mgr.get_lbaas_uuid_id(identifier)
-    this_lb = mgr.get_lb(lbid)
+
+    if utils.valid_domain(identifier):
+        lbaas = mgr.get_lbaas_by_address(identifier)
+        if not lbaas:
+            raise exceptions.CLIAbort("{} address not found".format(identifier))
+        this_lb = mgr.get_lb(lbaas.get('id'))
+    else:
+        _, lbid = mgr.get_lbaas_uuid_id(identifier)
+        this_lb = mgr.get_lb(lbid)
     if this_lb.get('previousErrorText'):
         print(this_lb.get('previousErrorText'))
     table = lbaas_table(this_lb)
