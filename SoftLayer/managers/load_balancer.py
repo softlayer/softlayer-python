@@ -100,7 +100,20 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
             this_lb = self.lbaas.getLoadBalancer(identifier, mask="mask[id,uuid]")
         else:
             this_lb = self.lbaas.getObject(id=identifier, mask="mask[id,uuid]")
-        return this_lb['uuid'], this_lb['id']
+        return this_lb.get('uuid'), this_lb.get('id')
+
+    def get_lbaas_by_address(self, address):
+        """Gets a LBaaS by address.
+
+        :param address: Address of the LBaaS instance
+        """
+        this_lb = {}
+        this_lbs = self.lbaas.getAllObjects()
+        for lbaas in this_lbs:
+            if lbaas.get('address') == address:
+                this_lb = lbaas
+                break
+        return this_lb
 
     def delete_lb_member(self, identifier, member_id):
         """Removes a member from a LBaaS instance
