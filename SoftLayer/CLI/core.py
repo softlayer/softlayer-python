@@ -5,12 +5,14 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import json
 import logging
 import os
 import sys
 import time
 import traceback
 import types
+import urllib3
 
 import click
 
@@ -69,6 +71,26 @@ class CommandLoader(click.MultiCommand):
             return module
 
 
+def get_latest_version():
+    """Gets the latest version of the Softlayer library."""
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    http = urllib3.PoolManager()
+    try:
+        str_result = http.request('GET', 'https://pypi.python.org/pypi/softlayer/json')
+        dic_result = json.loads(str_result.data.decode('utf-8'))
+        latest = dic_result['info']['version']
+    except Exception:
+        latest = '%(version)s'
+    return latest
+
+
+def get_version_message():
+    """Gets current and latest release versions message."""
+    message = 'Current:  %(prog)s %(version)s \n'
+    latest = get_latest_version()
+    return message + 'Latest:   %(prog)s ' + latest
+
+
 @click.group(help="SoftLayer Command-line Client",
              epilog="""To use most commands your SoftLayer
 username and api_key need to be configured. The easiest way to do that is to
@@ -103,7 +125,8 @@ use: 'slcli setup'""",
               is_flag=True,
               required=False,
               help="Use demo data instead of actually making API calls")
-@click.version_option(prog_name="slcli (SoftLayer Command-line)")
+@click.version_option(prog_name="slcli (SoftLayer Command-line)",
+                      message=get_version_message())
 @environment.pass_env
 def cli(env,
         format='table',
