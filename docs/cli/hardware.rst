@@ -43,6 +43,7 @@ Provides some basic functionality to order a server. `slcli order` has a more fu
 
 When setting port speed, use "-1" to indicate best possible configuration. Using 10/100/1000/10000 on a server with a redundant interface may result the interface entering a degraded state. See `setPublicNetworkInterfaceSpeed <http://sldn.softlayer.com/reference/services/SoftLayer_Hardware_Server/setPublicNetworkInterfaceSpeed/>`_ for more information.
 
+**Note :** Using multiple colon symbols can cause an error.
 
 .. click:: SoftLayer.CLI.hardware.list:cli
    :prog: hw list
