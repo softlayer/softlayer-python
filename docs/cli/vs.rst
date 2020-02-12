@@ -203,8 +203,6 @@ If no timezone is specified, IMS local time (CST) will be assumed, which might n
    :prog: vs edit
    :show-nested:
 
-**Note :** Using multiple colon symbols can cause an error.
-
 .. click:: SoftLayer.CLI.virt.list:cli
    :prog: vs list
    :show-nested:
