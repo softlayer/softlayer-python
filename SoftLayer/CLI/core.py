@@ -5,17 +5,16 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import json
 import logging
 import os
 import sys
 import time
 import traceback
 import types
-import urllib3
 
 import click
 
+import requests
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
@@ -33,6 +32,7 @@ DEBUG_LOGGING_MAP = {
     3: logging.DEBUG
 }
 
+PROG_NAME = "slcli (SoftLayer Command-line)"
 VALID_FORMATS = ['table', 'raw', 'json', 'jsonraw']
 DEFAULT_FORMAT = 'raw'
 if sys.stdout.isatty():
@@ -73,22 +73,24 @@ class CommandLoader(click.MultiCommand):
 
 def get_latest_version():
     """Gets the latest version of the Softlayer library."""
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-    http = urllib3.PoolManager()
     try:
-        str_result = http.request('GET', 'https://pypi.python.org/pypi/softlayer/json')
-        dic_result = json.loads(str_result.data.decode('utf-8'))
-        latest = dic_result['info']['version']
+        result = requests.get('https://pypi.org/pypi/SoftLayer/json')
+        json_result = result.json()
+        latest = 'v{}'.format(json_result['info']['version'])
     except Exception:
-        latest = '%(version)s'
+        latest = "Unable to get version from pypi."
     return latest
 
 
-def get_version_message():
+def get_version_message(ctx, param, value):
     """Gets current and latest release versions message."""
-    message = 'Current:  %(prog)s %(version)s \n'
+    if not value or ctx.resilient_parsing:
+        return
+    current = SoftLayer.consts.VERSION
     latest = get_latest_version()
-    return message + 'Latest:   %(prog)s ' + latest
+    click.secho("Current: {prog} {current}\nLatest:  {prog} {latest}".format(
+        prog=PROG_NAME, current=current, latest=latest))
+    ctx.exit()
 
 
 @click.group(help="SoftLayer Command-line Client",
@@ -125,8 +127,8 @@ use: 'slcli setup'""",
               is_flag=True,
               required=False,
               help="Use demo data instead of actually making API calls")
-@click.version_option(prog_name="slcli (SoftLayer Command-line)",
-                      message=get_version_message())
+@click.option('--version', is_flag=True, expose_value=False, is_eager=True, callback=get_version_message,
+              help="Show version information.")
 @environment.pass_env
 def cli(env,
         format='table',
