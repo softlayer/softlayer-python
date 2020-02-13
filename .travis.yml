@@ -1,5 +1,5 @@
 # https://docs.travis-ci.com/user/languages/python/#python-37-and-higher
-dist: xenial
+dist: bionic
 language: python
 sudo: false
 matrix:
@@ -12,7 +12,7 @@ matrix:
       env: TOX_ENV=py37
     - python: "3.8"
       env: TOX_ENV=py38
-    - python: "pypy3.5"
+    - python: "pypy3"
       env: TOX_ENV=pypy3
     - python: "3.6"
       env: TOX_ENV=analysis
