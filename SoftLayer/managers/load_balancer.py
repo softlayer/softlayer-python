@@ -92,28 +92,30 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
     def get_lbaas_uuid_id(self, identifier):
         """Gets a LBaaS uuid, id. Since sometimes you need one or the other.
 
-        :param identifier: either the LB Id, or UUID, this function will return both.
+        :param identifier: either the LB Id, UUID or Name, this function will return UUI and LB Id.
         :return (uuid, id):
         """
-        # int objects don't have a len property.
-        if not isinstance(identifier, int) and len(identifier) == 36:
-            this_lb = self.lbaas.getLoadBalancer(identifier, mask="mask[id,uuid]")
+        mask = "mask[id,uuid]"
+        if isinstance(identifier, int):
+            this_lb = self.lbaas.getObject(id=identifier, mask=mask)
+        elif len(identifier) == 36 and utils.UUID_RE.match(identifier):
+            this_lb = self.lbaas.getLoadBalancer(identifier, mask=mask)
         else:
-            this_lb = self.lbaas.getObject(id=identifier, mask="mask[id,uuid]")
+            this_lb = self.get_lbaas_by_name(identifier, mask=mask)
+
         return this_lb.get('uuid'), this_lb.get('id')
 
-    def get_lbaas_by_address(self, address):
-        """Gets a LBaaS by address.
+    def get_lbaas_by_name(self, name, mask=None):
+        """Gets a LBaaS by name.
 
-        :param address: Address of the LBaaS instance
+        :param name: Name of the LBaaS instance
+        :param mask:
+        :returns: SoftLayer_Network_LBaaS_LoadBalancer or an empty dictionary if the name is not found.
         """
-        this_lb = {}
-        this_lbs = self.lbaas.getAllObjects()
-        for lbaas in this_lbs:
-            if lbaas.get('address') == address:
-                this_lb = lbaas
-                break
-        return this_lb
+        object_filter = {'name': {'operation': name}}
+        this_lbs = self.lbaas.getAllObjects(filter=object_filter, mask=mask)
+
+        return this_lbs[0] if this_lbs else {}
 
     def delete_lb_member(self, identifier, member_id):
         """Removes a member from a LBaaS instance
@@ -210,7 +212,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
             'description': desc,
             'location': datacenter,
             'packageId': package.get('id'),
-            'useHourlyPricing': True,       # Required since LBaaS is an hourly service
+            'useHourlyPricing': True,  # Required since LBaaS is an hourly service
             'prices': [{'id': price_id} for price_id in prices],
             'protocolConfigurations': protocols,
             'subnets': [{'id': subnet_id}],

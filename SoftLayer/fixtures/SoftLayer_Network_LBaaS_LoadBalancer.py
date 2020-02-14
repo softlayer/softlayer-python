@@ -6,7 +6,7 @@ getObject = {
     'isPublic': 0,
     'locationId': 265592,
     'modifyDate': '2019-08-13T16:26:06-06:00',
-    'name': 'dcabero-01',
+    'name': 'test-01',
     'operatingStatus': 'ONLINE',
     'provisioningStatus': 'ACTIVE',
     'type': 0,

@@ -79,6 +79,15 @@ class LoadBalancerTests(testing.TestCase):
         self.assertEqual(lb_uuid, uuid)
         self.assertEqual(lb_id, my_id)
 
+    def test_get_lbaas_uuid_id_name(self):
+        uuid = '1a1aa111-4474-4e16-9f02-4de959229b85'
+        my_id = 1111111
+        name = 'test-01'
+        lb_uuid, lb_id = self.lb_mgr.get_lbaas_uuid_id(name)
+        self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getAllObjects')
+        self.assertEqual(lb_uuid, uuid)
+        self.assertEqual(lb_id, my_id)
+
     def test_delete_lb_member(self):
         uuid = 'aa-bb-cc'
         member_id = 'dd-ee-ff'
@@ -178,8 +187,8 @@ class LoadBalancerTests(testing.TestCase):
         self.lb_mgr.cancel_lbaas(uuid)
         self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'cancelLoadBalancer', args=(uuid,))
 
-    def test_get_lbaas_by_address(self):
-        address = SoftLayer_Network_LBaaS_LoadBalancer.getObject.get('address')
-        load_bal = self.lb_mgr.get_lbaas_by_address(address)
+    def test_get_lbaas_by_name(self):
+        name = SoftLayer_Network_LBaaS_LoadBalancer.getObject.get('name')
+        load_bal = self.lb_mgr.get_lbaas_by_name(name)
         self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getAllObjects')
         self.assertIsNotNone(load_bal)
