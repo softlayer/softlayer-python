@@ -54,9 +54,15 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
               type=click.Choice(['hourly', 'monthly']),
               default='monthly',
               help="Optional parameter for Billing rate (default to monthly)")
+@click.option('--dependent-duplicate',
+              type=click.BOOL,
+              default=False,
+              help='Whether or not this duplicate will be a dependent duplicate '
+                    'of the origin volume (default to false)')
 @environment.pass_env
 def cli(env, origin_volume_id, origin_snapshot_id, duplicate_size,
-        duplicate_iops, duplicate_tier, duplicate_snapshot_size, billing):
+        duplicate_iops, duplicate_tier, duplicate_snapshot_size, billing,
+        dependent_duplicate):
     """Order a duplicate block storage volume."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
 
@@ -75,7 +81,8 @@ def cli(env, origin_volume_id, origin_snapshot_id, duplicate_size,
             duplicate_iops=duplicate_iops,
             duplicate_tier_level=duplicate_tier,
             duplicate_snapshot_size=duplicate_snapshot_size,
-            hourly_billing_flag=hourly_billing_flag
+            hourly_billing_flag=hourly_billing_flag,
+            dependent_duplicate=dependent_duplicate
         )
     except ValueError as ex:
         raise exceptions.ArgumentError(str(ex))
