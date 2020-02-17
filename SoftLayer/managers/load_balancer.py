@@ -96,7 +96,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :return (uuid, id):
         """
         mask = "mask[id,uuid]"
-        if isinstance(identifier, int):
+        if isinstance(identifier, int) or identifier.isdigit():
             this_lb = self.lbaas.getObject(id=identifier, mask=mask)
         elif len(identifier) == 36 and utils.UUID_RE.match(identifier):
             this_lb = self.lbaas.getLoadBalancer(identifier, mask=mask)
