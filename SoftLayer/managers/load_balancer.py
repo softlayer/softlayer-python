@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+from SoftLayer import exceptions
 from SoftLayer.managers import ordering
 from SoftLayer import utils
 
@@ -110,12 +111,14 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
         :param name: Name of the LBaaS instance
         :param mask:
-        :returns: SoftLayer_Network_LBaaS_LoadBalancer or an empty dictionary if the name is not found.
+        :returns: SoftLayer_Network_LBaaS_LoadBalancer.
         """
         object_filter = {'name': {'operation': name}}
         this_lbs = self.lbaas.getAllObjects(filter=object_filter, mask=mask)
+        if not this_lbs:
+            raise exceptions.SoftLayerError("Unable to find LBaaS with name: {}".format(name))
 
-        return this_lbs[0] if this_lbs else {}
+        return this_lbs[0]
 
     def delete_lb_member(self, identifier, member_id):
         """Removes a member from a LBaaS instance

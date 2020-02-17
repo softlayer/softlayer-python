@@ -8,6 +8,7 @@
     them directly to the API.
 """
 import SoftLayer
+from SoftLayer import exceptions
 from SoftLayer.fixtures import SoftLayer_Network_LBaaS_LoadBalancer
 from SoftLayer import testing
 
@@ -192,3 +193,9 @@ class LoadBalancerTests(testing.TestCase):
         load_bal = self.lb_mgr.get_lbaas_by_name(name)
         self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getAllObjects')
         self.assertIsNotNone(load_bal)
+
+    def test_get_lbaas_by_name_fails(self):
+        load_bal_mock = self.set_mock('SoftLayer_Network_LBaaS_LoadBalancer', 'getAllObjects')
+        load_bal_mock.return_value = []
+        name = 'test'
+        self.assertRaises(exceptions.SoftLayerError, self.lb_mgr.get_lbaas_by_name, name)
