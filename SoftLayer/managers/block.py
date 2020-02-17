@@ -322,8 +322,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         :param duplicate_snapshot_size: Snapshot space size for the duplicate
         :param hourly_billing_flag: Billing type, monthly (False)
             or hourly (True), default to monthly.
-        :param dependent_duplicate: Duplicate type, normal (False) or dependent
-            duplicate (True)
+        :param dependent_duplicate: Duplicate type, normal (False) or dependent duplicate (True)
         :return: Returns a SoftLayer_Container_Product_Order_Receipt
         """
 
