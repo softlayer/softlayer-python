@@ -800,7 +800,7 @@ def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
     :param duplicate_snapshot_size: The size for the duplicate snapshot space
     :param volume_type: The type of the origin volume ('file' or 'block')
     :param hourly_billing_flag: Billing type, monthly (False) or hourly (True)
-    :param dependent_duplicate: Duplicate type, normal (False) or dependent 
+    :param dependent_duplicate: Duplicate type, normal (False) or dependent
         duplicate (True)
     :return: Returns the order object to be passed to the
              placeOrder() method of the Product_Order service
