@@ -55,8 +55,9 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 @click.option('--dependent-duplicate',
               type=click.BOOL,
               default=False,
+              show_default=True,
               help='Whether or not this duplicate will be a dependent duplicate'
-                   'of the origin volume (default to false)')
+                   'of the origin volume.')
 @environment.pass_env
 def cli(env, origin_volume_id, origin_snapshot_id, duplicate_size,
         duplicate_iops, duplicate_tier, duplicate_snapshot_size, billing,
