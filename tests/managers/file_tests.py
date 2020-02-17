@@ -786,7 +786,6 @@ class FileTests(testing.TestCase):
                 'isDependentDuplicateFlag': 1
             },))
 
-
     def test_order_file_duplicate_endurance(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]

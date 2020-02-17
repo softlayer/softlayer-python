@@ -892,7 +892,6 @@ class BlockTests(testing.TestCase):
                 'isDependentDuplicateFlag': 1
             },))
 
-
     def test_order_block_duplicate_endurance_no_duplicate_snapshot(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
