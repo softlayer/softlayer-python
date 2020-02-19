@@ -742,6 +742,50 @@ class FileTests(testing.TestCase):
                 'useHourlyPricing': False
             },))
 
+    def test_order_file_duplicate_depdupe(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume['storageType']['keyName'] = 'ENDURANCE_FILE_STORAGE'
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        mock.return_value = mock_volume
+
+        result = self.file.order_duplicate_volume(
+            102,
+            origin_snapshot_id=470,
+            duplicate_size=1000,
+            duplicate_iops=None,
+            duplicate_tier_level=4,
+            duplicate_snapshot_size=10,
+            dependent_duplicate=True
+        )
+
+        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+
+        self.assert_called_with(
+            'SoftLayer_Product_Order',
+            'placeOrder',
+            args=({
+                'complexType': 'SoftLayer_Container_Product_Order_'
+                               'Network_Storage_AsAService',
+                'packageId': 759,
+                'prices': [
+                    {'id': 189433},
+                    {'id': 189453},
+                    {'id': 194763},
+                    {'id': 194703},
+                    {'id': 194943}
+                ],
+                'volumeSize': 1000,
+                'quantity': 1,
+                'location': 449500,
+                'duplicateOriginVolumeId': 102,
+                'duplicateOriginSnapshotId': 470,
+                'useHourlyPricing': False,
+                'isDependentDuplicateFlag': 1
+            },))
+
     def test_order_file_duplicate_endurance(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]

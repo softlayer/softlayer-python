@@ -846,6 +846,52 @@ class BlockTests(testing.TestCase):
                 'useHourlyPricing': False
             },))
 
+    def test_order_block_duplicate_depdupe(self):
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+
+        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume['storageType']['keyName'] = 'PERFORMANCE_BLOCK_STORAGE'
+        mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        mock.return_value = mock_volume
+
+        result = self.block.order_duplicate_volume(
+            102,
+            origin_snapshot_id=470,
+            duplicate_size=1000,
+            duplicate_iops=2000,
+            duplicate_tier_level=None,
+            duplicate_snapshot_size=10,
+            dependent_duplicate=True
+        )
+
+        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+
+        self.assert_called_with(
+            'SoftLayer_Product_Order',
+            'placeOrder',
+            args=({
+                'complexType': 'SoftLayer_Container_Product_Order_'
+                'Network_Storage_AsAService',
+                'packageId': 759,
+                'prices': [
+                    {'id': 189433},
+                    {'id': 189443},
+                    {'id': 190113},
+                    {'id': 190173},
+                    {'id': 191193}
+                ],
+                'volumeSize': 1000,
+                'quantity': 1,
+                'location': 449500,
+                'duplicateOriginVolumeId': 102,
+                'osFormatType': {'keyName': 'LINUX'},
+                'duplicateOriginSnapshotId': 470,
+                'iops': 2000,
+                'useHourlyPricing': False,
+                'isDependentDuplicateFlag': 1
+            },))
+
     def test_order_block_duplicate_endurance_no_duplicate_snapshot(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
         mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]

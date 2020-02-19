@@ -310,7 +310,8 @@ class BlockStorageManager(utils.IdentifierMixin, object):
                                duplicate_size=None, duplicate_iops=None,
                                duplicate_tier_level=None,
                                duplicate_snapshot_size=None,
-                               hourly_billing_flag=False):
+                               hourly_billing_flag=False,
+                               dependent_duplicate=False):
         """Places an order for a duplicate block volume.
 
         :param origin_volume_id: The ID of the origin volume to be duplicated
@@ -321,6 +322,7 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         :param duplicate_snapshot_size: Snapshot space size for the duplicate
         :param hourly_billing_flag: Billing type, monthly (False)
             or hourly (True), default to monthly.
+        :param dependent_duplicate: Duplicate type, normal (False) or dependent duplicate (True)
         :return: Returns a SoftLayer_Container_Product_Order_Receipt
         """
 
@@ -347,6 +349,9 @@ class BlockStorageManager(utils.IdentifierMixin, object):
 
         if origin_snapshot_id is not None:
             order['duplicateOriginSnapshotId'] = origin_snapshot_id
+
+        if dependent_duplicate:
+            order['isDependentDuplicateFlag'] = 1
 
         return self.client.call('Product_Order', 'placeOrder', order)
 

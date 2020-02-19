@@ -642,7 +642,8 @@ class BlockTests(testing.TestCase):
                                       duplicate_size=250, duplicate_iops=None,
                                       duplicate_tier_level=2,
                                       duplicate_snapshot_size=20,
-                                      hourly_billing_flag=True)
+                                      hourly_billing_flag=True,
+                                      dependent_duplicate=False)
         self.assert_no_fail(result)
         self.assertEqual(result.output,
                          'Order #24602 placed successfully!\n'
