@@ -527,3 +527,20 @@ class FileStorageManager(utils.IdentifierMixin, object):
         """
 
         return self.client.call('Network_Storage', 'failbackFromReplicant', id=volume_id)
+
+    def refresh_dep_dupe(self, volume_id, snapshot_id):
+        """"Refresh a dependent duplicate volume with a snapshot from its parent.
+
+        :param integer volume_id: The id of the volume
+        :param integer snapshot_id: The id of the snapshot
+        """
+        return self.client.call('Network_Storage', 'refreshDependentDuplicate',
+                                snapshot_id, id=volume_id)
+
+    def convert_dep_dupe(self, volume_id):
+        """Convert a dependent duplicate volume to an indepdent volume.
+
+        :param integer volume_id: The id of the volume.
+        """
+        return self.client.call('Network_Storage', 'convertCloneDependentToIndependent',
+                                id=volume_id)

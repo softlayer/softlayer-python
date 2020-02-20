@@ -111,6 +111,13 @@ Block Commands
     :prog: block volume-limits
     :show-nested:
 
+.. click:: SoftLayer.CLI.block.refresh:cli
+   :prog block volume-refresh
+   :show-nested:
+
+.. click:: SoftLayer.CLI.block.convert:cli
+   :prog block volume-convert
+   :show-nested:
 
 .. click:: SoftLayer.CLI.block.subnets.list:cli
     :prog: block subnets-list
