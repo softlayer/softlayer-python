@@ -10,6 +10,12 @@ from SoftLayer import utils
 
 
 def get_block_volume_id(volume_id, block_manager):
+    """Returns the volume id.
+
+    :param volume_id: ID of volume.
+    :param block_manager: Block Storage Manager.
+    :return: Returns the volume id.
+    """
     storage_list = block_manager.list_block_volumes()
     for storage in storage_list:
         if volume_id == storage['username']:
