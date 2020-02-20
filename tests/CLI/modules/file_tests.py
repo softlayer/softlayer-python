@@ -163,6 +163,49 @@ class FileTests(testing.TestCase):
             ]
         }, json.loads(result.output))
 
+    def test_volume_detail_name_identifier(self):
+        result = self.run_command(['file', 'volume-detail', 'user'])
+
+        self.assert_no_fail(result)
+        self.assertEqual({
+            'Username': 'username',
+            'Used Space': '0B',
+            'Endurance Tier': 'READHEAVY_TIER',
+            'IOPs': 1000,
+            'Mount Address': '127.0.0.1:/TEST',
+            'Snapshot Capacity (GB)': '10',
+            'Snapshot Used (Bytes)': 1024,
+            'Capacity (GB)': '20GB',
+            'Target IP': '10.1.2.3',
+            'Data Center': 'dal05',
+            'Type': 'ENDURANCE',
+            'ID': 100,
+            '# of Active Transactions': '1',
+            'Ongoing Transaction': 'This is a buffer time in which the customer may cancel the server',
+            'Replicant Count': '1',
+            'Replication Status': 'Replicant Volume Provisioning '
+                                  'has completed.',
+            'Replicant Volumes': [[
+                {'Replicant ID': 'Volume Name', '1784': 'TEST_REP_1'},
+                {'Replicant ID': 'Target IP', '1784': '10.3.174.79'},
+                {'Replicant ID': 'Data Center', '1784': 'wdc01'},
+                {'Replicant ID': 'Schedule', '1784': 'REPLICATION_HOURLY'},
+            ], [
+                {'Replicant ID': 'Volume Name', '1785': 'TEST_REP_2'},
+                {'Replicant ID': 'Target IP', '1785': '10.3.177.84'},
+                {'Replicant ID': 'Data Center', '1785': 'dal01'},
+                {'Replicant ID': 'Schedule', '1785': 'REPLICATION_DAILY'},
+            ]],
+            'Original Volume Properties': [
+                {'Property': 'Original Volume Size',
+                 'Value': '20'},
+                {'Property': 'Original Volume Name',
+                 'Value': 'test-original-volume-name'},
+                {'Property': 'Original Snapshot Name',
+                 'Value': 'test-original-snapshot-name'}
+            ]
+        }, json.loads(result.output))
+
     def test_volume_order_performance_iops_not_given(self):
         result = self.run_command(['file', 'volume-order',
                                    '--storage-type=performance', '--size=20',
