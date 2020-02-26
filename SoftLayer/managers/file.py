@@ -5,9 +5,8 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import exceptions
-from SoftLayer.managers import storage_utils
 from SoftLayer.managers.storage import StorageManager
+from SoftLayer.managers import storage_utils
 from SoftLayer import utils
 
 # pylint: disable=too-many-public-methods
@@ -125,7 +124,6 @@ class FileStorageManager(StorageManager):
         """
         return self.get_volume_snapshot_list(volume_id, **kwargs)
 
-
     def order_file_volume(self, storage_type, location, size,
                           iops=None, tier_level=None, snapshot_size=None,
                           service_offering='storage_as_a_service',
@@ -159,5 +157,3 @@ class FileStorageManager(StorageManager):
         :param boolean immediate: Cancel immediately or on anniversary date
         """
         return self.cancel_volume(volume_id, reason, immediate)
-
-

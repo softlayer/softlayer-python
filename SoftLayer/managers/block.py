@@ -5,10 +5,8 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import exceptions
-from SoftLayer.managers import storage_utils
 from SoftLayer.managers.storage import StorageManager
-
+from SoftLayer.managers import storage_utils
 from SoftLayer import utils
 
 # pylint: disable=too-many-public-methods
@@ -81,7 +79,6 @@ class BlockStorageManager(StorageManager):
         """
         return self.get_volume_details(volume_id, **kwargs)
 
-
     def get_block_volume_access_list(self, volume_id, **kwargs):
         """Returns a list of authorized hosts for a specified volume.
 
@@ -99,7 +96,6 @@ class BlockStorageManager(StorageManager):
         :return: Returns a list of snapshots for the specified volume.
         """
         return self.get_volume_snapshot_list(volume_id, **kwargs)
-
 
     def assign_subnets_to_acl(self, access_id, subnet_ids):
         """Assigns subnet records to ACL for the access host.

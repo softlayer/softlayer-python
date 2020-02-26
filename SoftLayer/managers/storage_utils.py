@@ -985,6 +985,7 @@ def prepare_modify_order_object(manager, volume, new_iops, new_tier, new_size):
 
     return modify_order
 
+
 def block_or_file(storage_type_keyname):
     """returns either 'block' or 'file'
 
@@ -992,6 +993,7 @@ def block_or_file(storage_type_keyname):
     :returns: 'block' or 'file'
     """
     return 'block' if 'BLOCK_STORAGE' in storage_type_keyname else 'file'
+
 
 def _has_category(categories, category_code):
     return any(
@@ -1022,4 +1024,3 @@ def _find_price_id(prices, category, restriction_type=None, restriction_value=No
             continue
 
         return {'id': price['id']}
-

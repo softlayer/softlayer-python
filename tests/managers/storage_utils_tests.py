@@ -23,30 +23,20 @@ class StorageUtilsTests(testing.TestCase):
     # Tests for populate_host_templates()
     # ---------------------------------------------------------------------
     def test_populate_host_templates_no_ids_given(self):
-        host_templates = []
-
-        storage_utils.populate_host_templates(host_templates)
-
+        host_templates = storage_utils.populate_host_templates()
         self.assertEqual([], host_templates)
 
     def test_populate_host_templates_empty_arrays_given(self):
-        host_templates = []
-
-        storage_utils.populate_host_templates(
-            host_templates,
+        host_templates = storage_utils.populate_host_templates(
             hardware_ids=[],
             virtual_guest_ids=[],
             ip_address_ids=[],
             subnet_ids=[]
         )
-
         self.assertEqual([], host_templates)
 
     def test_populate_host_templates(self):
-        host_templates = []
-
-        storage_utils.populate_host_templates(
-            host_templates,
+        host_templates = storage_utils.populate_host_templates(
             hardware_ids=[1111],
             virtual_guest_ids=[2222],
             ip_address_ids=[3333],

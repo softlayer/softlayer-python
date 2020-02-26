@@ -9,10 +9,10 @@ import copy
 import SoftLayer
 from SoftLayer import exceptions
 from SoftLayer.fixtures import SoftLayer_Account
-from SoftLayer.fixtures import SoftLayer_Product_Package
-from SoftLayer.fixtures import SoftLayer_Product_Order
 from SoftLayer.fixtures import SoftLayer_Network_Storage
 from SoftLayer.fixtures import SoftLayer_Network_Storage_Allowed_Host
+from SoftLayer.fixtures import SoftLayer_Product_Order
+from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer import testing
 
 

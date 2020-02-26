@@ -139,8 +139,8 @@ class StorageManager(utils.IdentifierMixin, object):
         :return: Returns an array of SoftLayer_Network_Storage_Allowed_Host objects
                 which have access to the given File volume
         """
-        host_templates =  storage_utils.populate_host_templates(hardware_ids, virtual_guest_ids,
-                                                                ip_address_ids, subnet_ids)
+        host_templates = storage_utils.populate_host_templates(hardware_ids, virtual_guest_ids,
+                                                               ip_address_ids, subnet_ids)
 
         return self.client.call('Network_Storage', 'removeAccessFromHostList', host_templates, id=volume_id)
 
@@ -182,8 +182,8 @@ class StorageManager(utils.IdentifierMixin, object):
         storage_class = storage_utils.block_or_file(block_volume['storageType']['keyName'])
 
         order = storage_utils.prepare_replicant_order_object(
-                self, snapshot_schedule, location, tier, block_volume, storage_class
-            )
+            self, snapshot_schedule, location, tier, block_volume, storage_class
+        )
 
         if storage_class == 'block':
             if os_type is None:
@@ -219,7 +219,6 @@ class StorageManager(utils.IdentifierMixin, object):
         origin_volume = self.get_volume_details(origin_volume_id, mask=block_mask)
         storage_class = storage_utils.block_or_file(origin_volume['storageType']['keyName'])
 
-
         order = storage_utils.prepare_duplicate_order_object(
             self, origin_volume, duplicate_iops, duplicate_tier_level,
             duplicate_size, duplicate_snapshot_size, storage_class, hourly_billing_flag
@@ -237,7 +236,6 @@ class StorageManager(utils.IdentifierMixin, object):
             order['duplicateOriginSnapshotId'] = origin_snapshot_id
 
         return self.client.call('Product_Order', 'placeOrder', order)
-
 
     def order_modified_volume(self, volume_id, new_size=None, new_iops=None, new_tier_level=None):
         """Places an order for modifying an existing block volume.
@@ -268,7 +266,6 @@ class StorageManager(utils.IdentifierMixin, object):
 
         return self.client.call('Product_Order', 'placeOrder', order)
 
-
     def delete_snapshot(self, snapshot_id):
         """Deletes the specified snapshot object.
 
@@ -297,7 +294,7 @@ class StorageManager(utils.IdentifierMixin, object):
         object_mask = 'id,billingItem[location,hourlyFlag],'\
             'storageType[keyName],storageTierLevel,provisionedIops,'\
             'staasVersion,hasEncryptionAtRest'
-        volume = self.get_volume_details(volume_id, mask=object_mask,  **kwargs)
+        volume = self.get_volume_details(volume_id, mask=object_mask, **kwargs)
 
         order = storage_utils.prepare_snapshot_order_object(self, volume, capacity, tier, upgrade)
 
