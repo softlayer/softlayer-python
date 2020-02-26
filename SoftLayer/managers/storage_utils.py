@@ -19,19 +19,19 @@ ENDURANCE_TIERS = {
 }
 
 
-def populate_host_templates(host_templates,
-                            hardware_ids=None,
+def populate_host_templates(hardware_ids=None,
                             virtual_guest_ids=None,
                             ip_address_ids=None,
                             subnet_ids=None):
-    """Populate the given host_templates array with the IDs provided
+    """Returns a populated array with the IDs provided
 
-    :param host_templates: The array to which host templates will be added
     :param hardware_ids: A List of SoftLayer_Hardware ids
     :param virtual_guest_ids: A List of SoftLayer_Virtual_Guest ids
     :param ip_address_ids: A List of SoftLayer_Network_Subnet_IpAddress ids
     :param subnet_ids: A List of SoftLayer_Network_Subnet ids
+    :return: array of objects formatted for allowAccessFromHostList
     """
+    host_templates = []
     if hardware_ids is not None:
         for hardware_id in hardware_ids:
             host_templates.append({
@@ -59,6 +59,7 @@ def populate_host_templates(host_templates,
                 'objectType': 'SoftLayer_Network_Subnet',
                 'id': subnet_id
             })
+    return host_templates
 
 
 def get_package(manager, category_code):
@@ -984,6 +985,13 @@ def prepare_modify_order_object(manager, volume, new_iops, new_tier, new_size):
 
     return modify_order
 
+def block_or_file(storage_type_keyname):
+    """returns either 'block' or 'file'
+
+    :param storage_type_keyname: the Network_Storage['storageType']['keyName']
+    :returns: 'block' or 'file'
+    """
+    return 'block' if 'BLOCK_STORAGE' in storage_type_keyname else 'file'
 
 def _has_category(categories, category_code):
     return any(
@@ -1014,3 +1022,4 @@ def _find_price_id(prices, category, restriction_type=None, restriction_value=No
             continue
 
         return {'id': price['id']}
+
