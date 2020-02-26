@@ -163,4 +163,4 @@ class FileStorageManager(StorageManager):
         results = self.list_file_volumes(username=username, mask=object_mask)
         if results:
             return [result['id'] for result in results]
-
+        return []

@@ -190,4 +190,4 @@ class BlockStorageManager(StorageManager):
         results = self.list_block_volumes(username=username, mask=object_mask)
         if results:
             return [result['id'] for result in results]
-
+        return []

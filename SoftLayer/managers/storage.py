@@ -25,9 +25,6 @@ class StorageManager(utils.IdentifierMixin, object):
         self.client = client
         self.resolvers = [self._get_ids_from_username]
 
-    def _get_ids_from_username(self, username):
-        raise exceptions.SoftLayerError("Not Implemented.")
-
     def get_volume_count_limits(self):
         """Returns a list of block volume count limit.
 

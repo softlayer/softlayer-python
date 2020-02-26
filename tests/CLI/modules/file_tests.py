@@ -171,16 +171,15 @@ class FileTests(testing.TestCase):
                     'type': {
                         'type': {'operation': '!~ NAS'}
                     }
-                }, 
+                },
                 'storageType': {
                     'keyName': {'operation': '*= FILE_STORAGE'}
-                }, 
+                },
                 'username': {'operation': '_= SL-12345'}}}
 
         self.assert_called_with('SoftLayer_Account', 'getNasNetworkStorage', filter=expected_filter)
         self.assert_called_with('SoftLayer_Network_Storage', 'getObject', identifier=1)
         self.assert_no_fail(result)
-
 
     def test_volume_order_performance_iops_not_given(self):
         result = self.run_command(['file', 'volume-order',

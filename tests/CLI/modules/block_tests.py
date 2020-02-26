@@ -107,10 +107,10 @@ class BlockTests(testing.TestCase):
                     'type': {
                         'type': {'operation': '!~ ISCSI'}
                     }
-                }, 
+                },
                 'storageType': {
                     'keyName': {'operation': '*= BLOCK_STORAGE'}
-                }, 
+                },
                 'username': {'operation': '_= SL-12345'}}}
 
         self.assert_called_with('SoftLayer_Account', 'getIscsiNetworkStorage', filter=expected_filter)
