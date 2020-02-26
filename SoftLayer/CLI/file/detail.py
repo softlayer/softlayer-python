@@ -5,7 +5,24 @@ import click
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 from SoftLayer import utils
+
+
+def get_file_volume_id(volume_id, file_manager):
+    """Returns the volume id.
+
+    :param volume_id: ID of volume.
+    :param block_manager: Block Storage Manager.
+    :return: Returns the volume id.
+    """
+    storage_list = file_manager.list_file_volumes()
+    for storage in storage_list:
+        if volume_id == storage['username']:
+            volume_id = storage['id']
+            break
+
+    return volume_id
 
 
 @click.command()
@@ -14,7 +31,9 @@ from SoftLayer import utils
 def cli(env, volume_id):
     """Display details for a specified volume."""
     file_manager = SoftLayer.FileStorageManager(env.client)
-    file_volume = file_manager.get_file_volume_details(volume_id)
+    volume_id = get_file_volume_id(volume_id, file_manager)
+    file_volume_id = helpers.resolve_id(file_manager.resolve_ids, volume_id, 'File Storage')
+    file_volume = file_manager.get_file_volume_details(file_volume_id)
     file_volume = utils.NestedDict(file_volume)
 
     table = formatting.KeyValueTable(['Name', 'Value'])
