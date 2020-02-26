@@ -747,9 +747,9 @@ class FileTests(testing.TestCase):
 
     def test_order_file_duplicate_depdupe(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+        mock.return_value = [SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume = copy.deepcopy(SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
         mock_volume['storageType']['keyName'] = 'ENDURANCE_FILE_STORAGE'
         mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
         mock.return_value = mock_volume
@@ -764,7 +764,7 @@ class FileTests(testing.TestCase):
             dependent_duplicate=True
         )
 
-        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+        self.assertEqual(SoftLayer_Product_Order.placeOrder, result)
 
         self.assert_called_with(
             'SoftLayer_Product_Order',

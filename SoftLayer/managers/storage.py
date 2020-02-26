@@ -197,9 +197,9 @@ class StorageManager(utils.IdentifierMixin, object):
 
         return self.client.call('Product_Order', 'placeOrder', order)
 
-    def order_duplicate_volume(self, origin_volume_id, origin_snapshot_id=None,
-                               duplicate_size=None, duplicate_iops=None, duplicate_tier_level=None,
-                               duplicate_snapshot_size=None, hourly_billing_flag=False):
+    def order_duplicate_volume(self, origin_volume_id, origin_snapshot_id=None, duplicate_size=None,
+                               duplicate_iops=None, duplicate_tier_level=None, duplicate_snapshot_size=None,
+                               hourly_billing_flag=False, dependent_duplicate=False):
         """Places an order for a duplicate volume.
 
         :param origin_volume_id: The ID of the origin volume to be duplicated
@@ -234,6 +234,9 @@ class StorageManager(utils.IdentifierMixin, object):
 
         if origin_snapshot_id is not None:
             order['duplicateOriginSnapshotId'] = origin_snapshot_id
+        if dependent_duplicate:
+            # if isDependentDuplicateFlag is set to ANYTHING, it is considered dependent.
+            order['isDependentDuplicateFlag'] = 1
 
         return self.client.call('Product_Order', 'placeOrder', order)
 
