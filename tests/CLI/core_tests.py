@@ -10,6 +10,7 @@ import logging
 import click
 import mock
 
+from requests.models import Response
 import SoftLayer
 from SoftLayer.CLI import core
 from SoftLayer.CLI import environment
@@ -51,6 +52,28 @@ class CoreTests(testing.TestCase):
         self.assertIn('"version"', result.output)
         self.assertIn('"python_version"', result.output)
         self.assertIn('"library_location"', result.output)
+
+    @mock.patch('requests.get')
+    def test_get_latest_version(self, request_get):
+        response = Response()
+        response.status_code = 200
+        response.json = mock.MagicMock(return_value={"info": {"version": "1.1.1"}})
+        request_get.return_value = response
+        version = core.get_latest_version()
+        self.assertIn('1.1.1', version)
+
+    @mock.patch('requests.get')
+    def test_unable_get_latest_version(self, request_get):
+        request_get.side_effect = Exception
+        version = core.get_latest_version()
+        self.assertIn('Unable', version)
+
+    @mock.patch('SoftLayer.CLI.core.get_latest_version')
+    def test_get_version_message(self, get_latest_version_mock):
+        get_latest_version_mock.return_value = '1.1.1'
+        env = environment.Environment()
+        result = self.run_command(['--version'], env=env)
+        self.assert_no_fail(result)
 
 
 class CoreMainTests(testing.TestCase):

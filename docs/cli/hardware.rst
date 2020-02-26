@@ -41,8 +41,16 @@ Provides some basic functionality to order a server. `slcli order` has a more fu
    :prog: hw edit
    :show-nested:
 
-When setting port speed, use "-1" to indicate best possible configuration. Using 10/100/1000/10000 on a server with a redundant interface may result the interface entering a degraded state. See `setPublicNetworkInterfaceSpeed <http://sldn.softlayer.com/reference/services/SoftLayer_Hardware_Server/setPublicNetworkInterfaceSpeed/>`_ for more information.
+**Note :** Using multiple ' **:** ' can cause an error.
 
+     $ slcli hw edit 123456 --tag "cloud:service:db2whoc, cloud:svcplan:flex, cloud:svcenv:prod, cloud:bmixenv:fra"
+
+         TransportError(0): ('Connection aborted.',
+
+         RemoteDisconnected('Remote end closed connection without response',))
+
+
+When setting port speed, use "-1" to indicate best possible configuration. Using 10/100/1000/10000 on a server with a redundant interface may result the interface entering a degraded state. See `setPublicNetworkInterfaceSpeed <http://sldn.softlayer.com/reference/services/SoftLayer_Hardware_Server/setPublicNetworkInterfaceSpeed/>`_ for more information.
 
 .. click:: SoftLayer.CLI.hardware.list:cli
    :prog: hw list
