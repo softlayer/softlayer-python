@@ -184,3 +184,10 @@ class BlockStorageManager(StorageManager):
         :return: a SoftLayer_Network_Storage_Property object
         """
         return self.client.call('Network_Storage', 'createOrUpdateLunId', lun_id, id=volume_id)
+
+    def _get_ids_from_username(self, username):
+        object_mask = "mask[id]"
+        results = self.list_block_volumes(username=username, mask=object_mask)
+        if results:
+            return [result['id'] for result in results]
+

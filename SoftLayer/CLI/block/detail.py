@@ -9,29 +9,12 @@ from SoftLayer.CLI import helpers
 from SoftLayer import utils
 
 
-def get_block_volume_id(volume_id, block_manager):
-    """Returns the volume id.
-
-    :param volume_id: ID of volume.
-    :param block_manager: Block Storage Manager.
-    :return: Returns the volume id.
-    """
-    storage_list = block_manager.list_block_volumes()
-    for storage in storage_list:
-        if volume_id == storage['username']:
-            volume_id = storage['id']
-            break
-
-    return volume_id
-
-
 @click.command()
 @click.argument('volume_id')
 @environment.pass_env
 def cli(env, volume_id):
     """Display details for a specified volume."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
-    volume_id = get_block_volume_id(volume_id, block_manager)
     block_volume_id = helpers.resolve_id(block_manager.resolve_ids, volume_id, 'Block Volume')
     block_volume = block_manager.get_block_volume_details(block_volume_id)
     block_volume = utils.NestedDict(block_volume)

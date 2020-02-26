@@ -157,3 +157,10 @@ class FileStorageManager(StorageManager):
         :param boolean immediate: Cancel immediately or on anniversary date
         """
         return self.cancel_volume(volume_id, reason, immediate)
+
+    def _get_ids_from_username(self, username):
+        object_mask = "mask[id]"
+        results = self.list_file_volumes(username=username, mask=object_mask)
+        if results:
+            return [result['id'] for result in results]
+
