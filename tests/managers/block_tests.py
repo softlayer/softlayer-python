@@ -1030,3 +1030,15 @@ class BlockTests(testing.TestCase):
     def test_list_block_volume_limit(self):
         result = self.block.list_block_volume_limit()
         self.assertEqual(SoftLayer_Network_Storage.getVolumeCountLimits, result)
+
+    def test_get_ids_from_username(self):
+        result = self.block._get_ids_from_username("test")
+        self.assert_called_with('SoftLayer_Account', 'getIscsiNetworkStorage')
+        self.assertEqual([100], result)
+
+    def test_get_ids_from_username_empty(self):
+        mock = self.set_mock('SoftLayer_Account', 'getIscsiNetworkStorage')
+        mock.return_value = []
+        result = self.block._get_ids_from_username("test")
+        self.assert_called_with('SoftLayer_Account', 'getIscsiNetworkStorage')
+        self.assertEqual([], result)

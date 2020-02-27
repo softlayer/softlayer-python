@@ -879,3 +879,15 @@ class FileTests(testing.TestCase):
     def test_list_file_volume_limit(self):
         result = self.file.list_file_volume_limit()
         self.assertEqual(SoftLayer_Network_Storage.getVolumeCountLimits, result)
+
+    def test_get_ids_from_username(self):
+        result = self.file._get_ids_from_username("test")
+        self.assert_called_with('SoftLayer_Account', 'getNasNetworkStorage')
+        self.assertEqual([1], result)
+
+    def test_get_ids_from_username_empty(self):
+        mock = self.set_mock('SoftLayer_Account', 'getNasNetworkStorage')
+        mock.return_value = []
+        result = self.file._get_ids_from_username("test")
+        self.assert_called_with('SoftLayer_Account', 'getNasNetworkStorage')
+        self.assertEqual([], result)

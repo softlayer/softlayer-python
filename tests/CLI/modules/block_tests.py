@@ -111,7 +111,9 @@ class BlockTests(testing.TestCase):
                 'storageType': {
                     'keyName': {'operation': '*= BLOCK_STORAGE'}
                 },
-                'username': {'operation': '_= SL-12345'}}}
+                'username': {'operation': '_= SL-12345'}
+                }
+        }
 
         self.assert_called_with('SoftLayer_Account', 'getIscsiNetworkStorage', filter=expected_filter)
         self.assert_called_with('SoftLayer_Network_Storage', 'getObject', identifier=100)
