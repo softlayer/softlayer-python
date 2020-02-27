@@ -8,6 +8,8 @@
     them directly to the API.
 """
 import SoftLayer
+from SoftLayer import exceptions
+from SoftLayer.fixtures import SoftLayer_Network_LBaaS_LoadBalancer
 from SoftLayer import testing
 
 
@@ -75,6 +77,15 @@ class LoadBalancerTests(testing.TestCase):
         my_id = 1111111
         lb_uuid, lb_id = self.lb_mgr.get_lbaas_uuid_id(my_id)
         self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getObject', identifier=my_id)
+        self.assertEqual(lb_uuid, uuid)
+        self.assertEqual(lb_id, my_id)
+
+    def test_get_lbaas_uuid_id_name(self):
+        uuid = '1a1aa111-4474-4e16-9f02-4de959229b85'
+        my_id = 1111111
+        name = 'test-01'
+        lb_uuid, lb_id = self.lb_mgr.get_lbaas_uuid_id(name)
+        self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getAllObjects')
         self.assertEqual(lb_uuid, uuid)
         self.assertEqual(lb_id, my_id)
 
@@ -155,7 +166,7 @@ class LoadBalancerTests(testing.TestCase):
             'description': desc,
             'location': datacenter,
             'packageId': package[0]['id'],
-            'useHourlyPricing': True,       # Required since LBaaS is an hourly service
+            'useHourlyPricing': True,  # Required since LBaaS is an hourly service
             'prices': [{'id': package[0]['itemPrices'][0]['id']}],
             'protocolConfigurations': protocols,
             'subnets': [{'id': subnet_id}],
@@ -176,3 +187,15 @@ class LoadBalancerTests(testing.TestCase):
         uuid = 'aa-bb-cc'
         self.lb_mgr.cancel_lbaas(uuid)
         self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'cancelLoadBalancer', args=(uuid,))
+
+    def test_get_lbaas_by_name(self):
+        name = SoftLayer_Network_LBaaS_LoadBalancer.getObject.get('name')
+        load_bal = self.lb_mgr.get_lbaas_by_name(name)
+        self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getAllObjects')
+        self.assertIsNotNone(load_bal)
+
+    def test_get_lbaas_by_name_fails(self):
+        load_bal_mock = self.set_mock('SoftLayer_Network_LBaaS_LoadBalancer', 'getAllObjects')
+        load_bal_mock.return_value = []
+        name = 'test'
+        self.assertRaises(exceptions.SoftLayerError, self.lb_mgr.get_lbaas_by_name, name)

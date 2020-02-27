@@ -216,6 +216,16 @@ class LoadBalancerTests(testing.TestCase):
         result = self.run_command(['lb', 'detail', '1111111'])
         self.assert_no_fail(result)
 
+    def test_lb_detail_by_name(self):
+        name = SoftLayer_Network_LBaaS_LoadBalancer.getObject.get('name')
+        result = self.run_command(['lb', 'detail', name])
+        self.assert_no_fail(result)
+
+    def test_lb_detail_uuid(self):
+        uuid = SoftLayer_Network_LBaaS_LoadBalancer.getObject.get('uuid')
+        result = self.run_command(['lb', 'detail', uuid])
+        self.assert_no_fail(result)
+
     def test_order(self):
         result = self.run_command(['loadbal', 'order', '--name', 'test', '--datacenter', 'par01', '--label',
                                    'labeltest', '--subnet', '759282'])

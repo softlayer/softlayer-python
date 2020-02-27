@@ -11,7 +11,7 @@ import time
 
 # pylint: disable=no-member, invalid-name
 
-UUID_RE = re.compile(r'^[0-9a-f\-]{36}$', re.I)
+UUID_RE = re.compile(r'^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$', re.I)
 KNOWN_OPERATIONS = ['<=', '>=', '<', '>', '~', '!~', '*=', '^=', '$=', '_=']
 
 

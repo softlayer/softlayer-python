@@ -30,17 +30,17 @@ def location_sort(location):
 def generate_lbaas_table(lbaas):
     """Takes a list of SoftLayer_Network_LBaaS_LoadBalancer and makes a table"""
     table = formatting.Table([
-        'Id', 'Location', 'Address', 'Description', 'Public', 'Create Date', 'Members', 'Listeners'
+        'Id', 'Location', 'Name', 'Description', 'Public', 'Create Date', 'Members', 'Listeners'
     ], title="IBM Cloud LoadBalancer")
 
-    table.align['Address'] = 'l'
+    table.align['Name'] = 'l'
     table.align['Description'] = 'l'
     table.align['Location'] = 'l'
     for this_lb in sorted(lbaas, key=location_sort):
         table.add_row([
             this_lb.get('id'),
             utils.lookup(this_lb, 'datacenter', 'longName'),
-            this_lb.get('address'),
+            this_lb.get('name'),
             this_lb.get('description'),
             'Yes' if this_lb.get('isPublic', 1) == 1 else 'No',
             utils.clean_time(this_lb.get('createDate')),
