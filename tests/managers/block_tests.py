@@ -1042,3 +1042,23 @@ class BlockTests(testing.TestCase):
         result = self.block._get_ids_from_username("test")
         self.assert_called_with('SoftLayer_Account', 'getIscsiNetworkStorage')
         self.assertEqual([], result)
+
+    def test_refresh_block_depdupe(self):
+        result = self.block.refresh_dep_dupe(123, snapshot_id=321)
+        self.assertEqual(SoftLayer_Network_Storage.refreshDependentDuplicate, result)
+
+        self.assert_called_with(
+            'SoftLayer_Network_Storage',
+            'refreshDependentDuplicate',
+            identifier=123
+        )
+
+    def test_convert_block_depdupe(self):
+        result = self.block.convert_dep_dupe(123)
+        self.assertEqual(SoftLayer_Network_Storage.convertCloneDependentToIndependent, result)
+
+        self.assert_called_with(
+            'SoftLayer_Network_Storage',
+            'convertCloneDependentToIndependent',
+            identifier=123
+        )

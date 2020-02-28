@@ -891,3 +891,23 @@ class FileTests(testing.TestCase):
         result = self.file._get_ids_from_username("test")
         self.assert_called_with('SoftLayer_Account', 'getNasNetworkStorage')
         self.assertEqual([], result)
+
+    def test_refresh_file_depdupe(self):
+        result = self.file.refresh_dep_dupe(123, snapshot_id=321)
+        self.assertEqual(SoftLayer_Network_Storage.refreshDependentDuplicate, result)
+
+        self.assert_called_with(
+            'SoftLayer_Network_Storage',
+            'refreshDependentDuplicate',
+            identifier=123
+        )
+
+    def test_convert_file_depdupe(self):
+        result = self.file.convert_dep_dupe(123)
+        self.assertEqual(SoftLayer_Network_Storage.convertCloneDependentToIndependent, result)
+
+        self.assert_called_with(
+            'SoftLayer_Network_Storage',
+            'convertCloneDependentToIndependent',
+            identifier=123
+        )

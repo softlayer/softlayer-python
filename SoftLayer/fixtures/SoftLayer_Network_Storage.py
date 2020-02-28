@@ -157,6 +157,7 @@ getObject = {
     'storageTierLevel': 'READHEAVY_TIER',
     'storageType': {'keyName': 'ENDURANCE_STORAGE'},
     'username': 'username',
+    'dependentDuplicate': 1,
 }
 
 getSnapshots = [{
@@ -231,4 +232,12 @@ getVolumeCountLimits = {
     'datacenterName': 'global',
     'maximumAvailableCount': 300,
     'provisionedCount': 100
+}
+
+refreshDependentDuplicate = {
+    'dependentDuplicate': 1
+}
+
+convertCloneDependentToIndependent = {
+    'dependentDuplicate': 1
 }
