@@ -5,6 +5,7 @@ import click
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 from SoftLayer import utils
 
 
@@ -14,7 +15,8 @@ from SoftLayer import utils
 def cli(env, volume_id):
     """Display details for a specified volume."""
     file_manager = SoftLayer.FileStorageManager(env.client)
-    file_volume = file_manager.get_file_volume_details(volume_id)
+    file_volume_id = helpers.resolve_id(file_manager.resolve_ids, volume_id, 'File Storage')
+    file_volume = file_manager.get_file_volume_details(file_volume_id)
     file_volume = utils.NestedDict(file_volume)
 
     table = formatting.KeyValueTable(['Name', 'Value'])
