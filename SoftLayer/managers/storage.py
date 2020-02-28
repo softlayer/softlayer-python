@@ -424,7 +424,7 @@ class StorageManager(utils.IdentifierMixin, object):
         return self.client.call('Network_Storage', 'refreshDependentDuplicate', snapshot_id, id=volume_id)
 
     def convert_dep_dupe(self, volume_id):
-        """Convert a dependent duplicate volume to an indepdent volume.
+        """Convert a dependent duplicate volume to an independent volume.
 
         :param integer volume_id: The id of the volume.
         """
