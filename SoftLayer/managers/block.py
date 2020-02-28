@@ -623,13 +623,11 @@ class BlockStorageManager(utils.IdentifierMixin, object):
         :param integer volume_id: The id of the volume
         :param integer snapshot_id: The id of the snapshot
         """
-        return self.client.call('Network_Storage', 'refreshDependentDuplicate',
-                                snapshot_id, id=volume_id)
+        return self.client.call('Network_Storage', 'refreshDependentDuplicate', snapshot_id, id=volume_id)
 
     def convert_dep_dupe(self, volume_id):
         """Convert a dependent duplicate volume to an indepdent volume.
 
         :param integer volume_id: The id of the volume.
         """
-        return self.client.call('Network_Storage', 'convertCloneDependentToIndependent',
-                                id=volume_id)
+        return self.client.call('Network_Storage', 'convertCloneDependentToIndependent', id=volume_id)
