@@ -60,6 +60,7 @@ class BlockTests(testing.TestCase):
 
         self.assert_no_fail(result)
         isinstance(json.loads(result.output)['IOPs'], float)
+        self.assert_called_with('SoftLayer_Network_Storage', 'getObject', identifier=1234)
         self.assertEqual({
             'Username': 'username',
             'LUN Id': '2',
@@ -97,6 +98,26 @@ class BlockTests(testing.TestCase):
                  'Value': 'test-original-snapshot-name'}
             ]
         }, json.loads(result.output))
+
+    def test_volume_detail_name_identifier(self):
+        result = self.run_command(['block', 'volume-detail', 'SL-12345'])
+        expected_filter = {
+            'iscsiNetworkStorage': {
+                'serviceResource': {
+                    'type': {
+                        'type': {'operation': '!~ ISCSI'}
+                    }
+                },
+                'storageType': {
+                    'keyName': {'operation': '*= BLOCK_STORAGE'}
+                },
+                'username': {'operation': '_= SL-12345'}
+                }
+        }
+
+        self.assert_called_with('SoftLayer_Account', 'getIscsiNetworkStorage', filter=expected_filter)
+        self.assert_called_with('SoftLayer_Network_Storage', 'getObject', identifier=100)
+        self.assert_no_fail(result)
 
     def test_volume_list(self):
         result = self.run_command(['block', 'volume-list'])

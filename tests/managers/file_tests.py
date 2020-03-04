@@ -8,7 +8,10 @@
 import copy
 import SoftLayer
 from SoftLayer import exceptions
-from SoftLayer import fixtures
+from SoftLayer.fixtures import SoftLayer_Account
+from SoftLayer.fixtures import SoftLayer_Network_Storage
+from SoftLayer.fixtures import SoftLayer_Product_Order
+from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer import testing
 
 
@@ -49,7 +52,7 @@ class FileTests(testing.TestCase):
             ip_address_ids=[300],
             subnet_ids=[400])
 
-        self.assertEqual(fixtures.SoftLayer_Network_Storage.
+        self.assertEqual(SoftLayer_Network_Storage.
                          allowAccessFromHostList, result)
 
         self.assert_called_with(
@@ -65,7 +68,7 @@ class FileTests(testing.TestCase):
             ip_address_ids=[300],
             subnet_ids=[400])
 
-        self.assertEqual(fixtures.SoftLayer_Network_Storage.
+        self.assertEqual(SoftLayer_Network_Storage.
                          removeAccessFromHostList, result)
 
         self.assert_called_with(
@@ -84,7 +87,7 @@ class FileTests(testing.TestCase):
         result = self.file.enable_snapshots(12345678, 'WEEKLY', 10,
                                             47, 16, 'FRIDAY')
 
-        self.assertEqual(fixtures.SoftLayer_Network_Storage.enableSnapshots,
+        self.assertEqual(SoftLayer_Network_Storage.enableSnapshots,
                          result)
 
         self.assert_called_with(
@@ -95,7 +98,7 @@ class FileTests(testing.TestCase):
     def test_disable_snapshots(self):
         result = self.file.disable_snapshots(12345678, 'HOURLY')
 
-        self.assertEqual(fixtures.SoftLayer_Network_Storage.disableSnapshots,
+        self.assertEqual(SoftLayer_Network_Storage.disableSnapshots,
                          result)
         self.assert_called_with(
             'SoftLayer_Network_Storage',
@@ -106,7 +109,7 @@ class FileTests(testing.TestCase):
         result = self.file.restore_from_snapshot(12345678, 87654321)
 
         self.assertEqual(
-            fixtures.SoftLayer_Network_Storage.restoreFromSnapshot,
+            SoftLayer_Network_Storage.restoreFromSnapshot,
             result)
         self.assert_called_with(
             'SoftLayer_Network_Storage',
@@ -116,7 +119,7 @@ class FileTests(testing.TestCase):
     def test_get_file_volume_details(self):
         result = self.file.get_file_volume_details(100)
 
-        self.assertEqual(fixtures.SoftLayer_Network_Storage.getObject, result)
+        self.assertEqual(SoftLayer_Network_Storage.getObject, result)
 
         expected_mask = 'id,'\
                         'username,'\
@@ -153,7 +156,7 @@ class FileTests(testing.TestCase):
     def test_get_file_volume_snapshot_list(self):
         result = self.file.get_file_volume_snapshot_list(100)
 
-        self.assertEqual(fixtures.SoftLayer_Network_Storage.getSnapshots,
+        self.assertEqual(SoftLayer_Network_Storage.getSnapshots,
                          result)
 
         self.assert_called_with(
@@ -164,7 +167,7 @@ class FileTests(testing.TestCase):
     def test_create_snapshot(self):
         result = self.file.create_snapshot(123, 'hello world')
 
-        self.assertEqual(fixtures.SoftLayer_Network_Storage.createSnapshot,
+        self.assertEqual(SoftLayer_Network_Storage.createSnapshot,
                          result)
 
         self.assert_called_with(
@@ -277,7 +280,7 @@ class FileTests(testing.TestCase):
         result = self.file.failover_to_replicant(1234, 5678)
 
         self.assertEqual(
-            fixtures.SoftLayer_Network_Storage.failoverToReplicant, result)
+            SoftLayer_Network_Storage.failoverToReplicant, result)
         self.assert_called_with(
             'SoftLayer_Network_Storage',
             'failoverToReplicant',
@@ -289,7 +292,7 @@ class FileTests(testing.TestCase):
         result = self.file.failback_from_replicant(1234)
 
         self.assertEqual(
-            fixtures.SoftLayer_Network_Storage.failbackFromReplicant, result)
+            SoftLayer_Network_Storage.failbackFromReplicant, result)
         self.assert_called_with(
             'SoftLayer_Network_Storage',
             'failbackFromReplicant',
@@ -317,7 +320,7 @@ class FileTests(testing.TestCase):
     def test_delete_snapshot(self):
         result = self.file.delete_snapshot(100)
 
-        self.assertEqual(fixtures.SoftLayer_Network_Storage.deleteObject,
+        self.assertEqual(SoftLayer_Network_Storage.deleteObject,
                          result)
 
         self.assert_called_with(
@@ -328,7 +331,7 @@ class FileTests(testing.TestCase):
     def test_list_file_volumes(self):
         result = self.file.list_file_volumes()
 
-        self.assertEqual(fixtures.SoftLayer_Account.getNasNetworkStorage,
+        self.assertEqual(SoftLayer_Account.getNasNetworkStorage,
                          result)
 
         expected_filter = {
@@ -366,7 +369,7 @@ class FileTests(testing.TestCase):
                                              storage_type="Endurance",
                                              username="username")
 
-        self.assertEqual(fixtures.SoftLayer_Account.getNasNetworkStorage,
+        self.assertEqual(SoftLayer_Account.getNasNetworkStorage,
                          result)
 
         expected_filter = {
@@ -408,9 +411,9 @@ class FileTests(testing.TestCase):
         mock.return_value = [{'id': 449494, 'name': 'dal09'}]
 
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+        mock.return_value = [SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume = copy.deepcopy(SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
         mock_volume['storageType']['keyName'] = 'PERFORMANCE_FILE_STORAGE'
         mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
         mock.return_value = mock_volume
@@ -423,7 +426,7 @@ class FileTests(testing.TestCase):
             service_offering='storage_as_a_service'
         )
 
-        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+        self.assertEqual(SoftLayer_Product_Order.placeOrder, result)
 
         self.assert_called_with(
             'SoftLayer_Product_Order',
@@ -451,9 +454,9 @@ class FileTests(testing.TestCase):
         mock.return_value = [{'id': 449494, 'name': 'dal09'}]
 
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+        mock.return_value = [SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume = copy.deepcopy(SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
         mock_volume['storageType']['keyName'] = 'ENDURANCE_FILE_STORAGE'
         mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
         mock.return_value = mock_volume
@@ -466,7 +469,7 @@ class FileTests(testing.TestCase):
             service_offering='storage_as_a_service'
         )
 
-        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+        self.assertEqual(SoftLayer_Product_Order.placeOrder, result)
 
         self.assert_called_with(
             'SoftLayer_Product_Order',
@@ -490,16 +493,16 @@ class FileTests(testing.TestCase):
 
     def test_order_file_snapshot_space_upgrade(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+        mock.return_value = [SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume = copy.deepcopy(SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
         mock_volume['storageType']['keyName'] = 'ENDURANCE_FILE_STORAGE'
         mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
         mock.return_value = mock_volume
 
         result = self.file.order_snapshot_space(102, 20, None, True)
 
-        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+        self.assertEqual(SoftLayer_Product_Order.placeOrder, result)
 
         self.assert_called_with(
             'SoftLayer_Product_Order',
@@ -520,16 +523,16 @@ class FileTests(testing.TestCase):
 
     def test_order_file_snapshot_space(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+        mock.return_value = [SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume = copy.deepcopy(SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
         mock_volume['storageType']['keyName'] = 'ENDURANCE_FILE_STORAGE'
         mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
         mock.return_value = mock_volume
 
         result = self.file.order_snapshot_space(102, 10, None, False)
 
-        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+        self.assertEqual(SoftLayer_Product_Order.placeOrder, result)
 
         self.assert_called_with(
             'SoftLayer_Product_Order',
@@ -553,16 +556,16 @@ class FileTests(testing.TestCase):
         mock.return_value = [{'id': 449494, 'name': 'dal09'}]
 
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+        mock.return_value = [SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume = copy.deepcopy(SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
         mock_volume['storageType']['keyName'] = 'PERFORMANCE_FILE_STORAGE'
         mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
         mock.return_value = mock_volume
 
         result = self.file.order_replicant_volume(102, 'WEEKLY', 'dal09')
 
-        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+        self.assertEqual(SoftLayer_Product_Order.placeOrder, result)
 
         self.assert_called_with(
             'SoftLayer_Product_Order',
@@ -594,16 +597,16 @@ class FileTests(testing.TestCase):
         mock.return_value = [{'id': 449494, 'name': 'dal09'}]
 
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+        mock.return_value = [SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume = copy.deepcopy(SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
         mock_volume['storageType']['keyName'] = 'ENDURANCE_FILE_STORAGE'
         mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
         mock.return_value = mock_volume
 
         result = self.file.order_replicant_volume(102, 'WEEKLY', 'dal09')
 
-        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+        self.assertEqual(SoftLayer_Product_Order.placeOrder, result)
 
         self.assert_called_with(
             'SoftLayer_Product_Order',
@@ -631,9 +634,9 @@ class FileTests(testing.TestCase):
 
     def test_order_file_duplicate_performance_no_duplicate_snapshot(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+        mock.return_value = [SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume = copy.deepcopy(SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
         mock_volume['storageType']['keyName'] = 'PERFORMANCE_FILE_STORAGE'
         mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
         mock.return_value = mock_volume
@@ -642,7 +645,7 @@ class FileTests(testing.TestCase):
             102,
             duplicate_snapshot_size=0)
 
-        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+        self.assertEqual(SoftLayer_Product_Order.placeOrder, result)
 
         self.assert_called_with(
             'SoftLayer_Product_Order',
@@ -667,8 +670,8 @@ class FileTests(testing.TestCase):
 
     def test_order_file_duplicate_performance(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
-        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock.return_value = [SoftLayer_Product_Package.SAAS_PACKAGE]
+        mock_volume = copy.deepcopy(SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
         mock_volume['storageType']['keyName'] = 'PERFORMANCE_FILE_STORAGE'
         mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
         mock.return_value = mock_volume
@@ -682,7 +685,7 @@ class FileTests(testing.TestCase):
             duplicate_snapshot_size=10
         )
 
-        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+        self.assertEqual(SoftLayer_Product_Order.placeOrder, result)
 
         self.assert_called_with(
             'SoftLayer_Product_Order',
@@ -709,9 +712,9 @@ class FileTests(testing.TestCase):
 
     def test_order_file_duplicate_endurance_no_duplicate_snapshot(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+        mock.return_value = [SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume = copy.deepcopy(SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
         mock_volume['storageType']['keyName'] = 'ENDURANCE_FILE_STORAGE'
         mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
         mock.return_value = mock_volume
@@ -720,7 +723,7 @@ class FileTests(testing.TestCase):
             102,
             duplicate_snapshot_size=0)
 
-        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+        self.assertEqual(SoftLayer_Product_Order.placeOrder, result)
 
         self.assert_called_with(
             'SoftLayer_Product_Order',
@@ -744,9 +747,9 @@ class FileTests(testing.TestCase):
 
     def test_order_file_duplicate_depdupe(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+        mock.return_value = [SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume = copy.deepcopy(SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
         mock_volume['storageType']['keyName'] = 'ENDURANCE_FILE_STORAGE'
         mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
         mock.return_value = mock_volume
@@ -761,7 +764,7 @@ class FileTests(testing.TestCase):
             dependent_duplicate=True
         )
 
-        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+        self.assertEqual(SoftLayer_Product_Order.placeOrder, result)
 
         self.assert_called_with(
             'SoftLayer_Product_Order',
@@ -788,9 +791,9 @@ class FileTests(testing.TestCase):
 
     def test_order_file_duplicate_endurance(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+        mock.return_value = [SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume = copy.deepcopy(SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
         mock_volume['storageType']['keyName'] = 'ENDURANCE_FILE_STORAGE'
         mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
         mock.return_value = mock_volume
@@ -804,7 +807,7 @@ class FileTests(testing.TestCase):
             duplicate_snapshot_size=10
         )
 
-        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+        self.assertEqual(SoftLayer_Product_Order.placeOrder, result)
 
         self.assert_called_with(
             'SoftLayer_Product_Order',
@@ -830,16 +833,16 @@ class FileTests(testing.TestCase):
 
     def test_order_file_modified_performance(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+        mock.return_value = [SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume = copy.deepcopy(SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
         mock_volume['storageType']['keyName'] = 'PERFORMANCE_FILE_STORAGE'
         mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
         mock.return_value = mock_volume
 
         result = self.file.order_modified_volume(102, new_size=1000, new_iops=2000, new_tier_level=None)
 
-        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+        self.assertEqual(SoftLayer_Product_Order.placeOrder, result)
         self.assert_called_with(
             'SoftLayer_Product_Order',
             'placeOrder',
@@ -853,16 +856,16 @@ class FileTests(testing.TestCase):
 
     def test_order_file_modified_endurance(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        mock.return_value = [fixtures.SoftLayer_Product_Package.SAAS_PACKAGE]
+        mock.return_value = [SoftLayer_Product_Package.SAAS_PACKAGE]
 
-        mock_volume = copy.deepcopy(fixtures.SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
+        mock_volume = copy.deepcopy(SoftLayer_Network_Storage.STAAS_TEST_VOLUME)
         mock_volume['storageType']['keyName'] = 'ENDURANCE_FILE_STORAGE'
         mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
         mock.return_value = mock_volume
 
         result = self.file.order_modified_volume(102, new_size=1000, new_iops=None, new_tier_level=4)
 
-        self.assertEqual(fixtures.SoftLayer_Product_Order.placeOrder, result)
+        self.assertEqual(SoftLayer_Product_Order.placeOrder, result)
         self.assert_called_with(
             'SoftLayer_Product_Order',
             'placeOrder',
@@ -875,4 +878,16 @@ class FileTests(testing.TestCase):
 
     def test_list_file_volume_limit(self):
         result = self.file.list_file_volume_limit()
-        self.assertEqual(fixtures.SoftLayer_Network_Storage.getVolumeCountLimits, result)
+        self.assertEqual(SoftLayer_Network_Storage.getVolumeCountLimits, result)
+
+    def test_get_ids_from_username(self):
+        result = self.file._get_ids_from_username("test")
+        self.assert_called_with('SoftLayer_Account', 'getNasNetworkStorage')
+        self.assertEqual([1], result)
+
+    def test_get_ids_from_username_empty(self):
+        mock = self.set_mock('SoftLayer_Account', 'getNasNetworkStorage')
+        mock.return_value = []
+        result = self.file._get_ids_from_username("test")
+        self.assert_called_with('SoftLayer_Account', 'getNasNetworkStorage')
+        self.assertEqual([], result)
