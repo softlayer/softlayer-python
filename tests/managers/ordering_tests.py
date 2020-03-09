@@ -309,7 +309,7 @@ class OrderingTests(testing.TestCase):
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], "8")
 
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, capacity, itemCategory, keyName, '
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, keyName, '
                                                                   'prices[categories]')
         self.assertEqual([price1['id'], price2['id']], prices)
 
@@ -327,7 +327,7 @@ class OrderingTests(testing.TestCase):
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], None)
 
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, capacity, itemCategory, keyName, '
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, keyName, '
                                                                   'prices[categories]')
         self.assertEqual([price1['id'], price2['id']], prices)
 
@@ -342,7 +342,7 @@ class OrderingTests(testing.TestCase):
             exc = self.assertRaises(exceptions.SoftLayerError,
                                     self.ordering.get_price_id_list,
                                     'PACKAGE_KEYNAME', ['ITEM2'], "8")
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, capacity, itemCategory, keyName, '
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, keyName, '
                                                                   'prices[categories]')
         self.assertEqual("Item ITEM2 does not exist for package PACKAGE_KEYNAME", str(exc))
 
@@ -357,7 +357,7 @@ class OrderingTests(testing.TestCase):
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM1'], "8")
 
-            list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, capacity, itemCategory, keyName, '
+            list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, keyName, '
                                                                       'prices[categories]')
             self.assertEqual([price2['id'], price1['id']], prices)
 
@@ -608,7 +608,7 @@ class OrderingTests(testing.TestCase):
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], "8")
 
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, capacity, itemCategory, keyName, '
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, keyName, '
                                                                   'prices[categories]')
         self.assertEqual([price1['id'], price2['id']], prices)
 
@@ -626,7 +626,7 @@ class OrderingTests(testing.TestCase):
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], "8")
 
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, capacity, itemCategory, keyName, '
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, keyName, '
                                                                   'prices[categories]')
         self.assertEqual([price1['id'], price2['id']], prices)
 
@@ -673,11 +673,10 @@ class OrderingTests(testing.TestCase):
             {
                 'id': 10453,
                 'itemCategory': {'categoryCode': 'server'},
+                "description": "Dual Intel Xeon Silver 4110 (16 Cores, 2.10 GHz)",
                 'keyName': 'INTEL_INTEL_XEON_4110_2_10',
                 'prices': [
                     {
-                        'capacityRestrictionMaximum': '2',
-                        'capacityRestrictionMinimum': '2',
                         'capacityRestrictionType': 'PROCESSOR',
                         'categories': [{'categoryCode': 'os'}],
                         'id': 201161,
@@ -744,3 +743,21 @@ class OrderingTests(testing.TestCase):
         item_capacity = self.ordering.get_item_capacity(items, ['READHEAVY_TIER', 'STORAGE_SPACE_FOR_2_IOPS_PER_GB'])
 
         self.assertEqual(1, int(item_capacity))
+
+    def test_get_item_capacity_intel(self):
+
+        items = [{
+            "capacity": "1",
+            "id": 6131,
+            "description": "Dual Intel Xeon E5-2690 v3 (24 Cores, 2.60 GHz)",
+            "keyName": "INTEL_XEON_2690_2_60",
+        },
+            {
+                "capacity": "1",
+                "id": 10201,
+                "keyName": "GUEST_CORE_1_DEDICATED",
+        }]
+
+        item_capacity = self.ordering.get_item_capacity(items, ['INTEL_XEON_2690_2_60', 'BANDWIDTH_20000_GB'])
+
+        self.assertEqual(24, int(item_capacity))
