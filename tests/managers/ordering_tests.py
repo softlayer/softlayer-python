@@ -357,8 +357,8 @@ class OrderingTests(testing.TestCase):
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM1'], "8")
 
-            list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, keyName, '
-                                                                      'prices[categories]')
+            list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, '
+                                                                      'keyName, ' 'prices[categories]')
             self.assertEqual([price2['id'], price1['id']], prices)
 
     def test_generate_no_complex_type(self):
