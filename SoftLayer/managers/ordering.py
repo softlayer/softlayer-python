@@ -351,7 +351,7 @@ class OrderingManager(object):
                   keynames in the given package
 
         """
-        mask = 'id, capacity, itemCategory, keyName, prices[categories]'
+        mask = 'id, description, capacity, itemCategory, keyName, prices[categories]'
         items = self.list_items(package_keyname, mask=mask)
         item_capacity = self.get_item_capacity(items, item_keynames)
 
@@ -421,6 +421,11 @@ class OrderingManager(object):
                         break
                     if "TIER" in item["keyName"]:
                         item_capacity = item['capacity']
+                        break
+                    if "INTEL" in item["keyName"]:
+                        item_split = item['description'].split("(")
+                        item_core = item_split[1].split(" ")
+                        item_capacity = item_core[0]
                         break
         return item_capacity
 
