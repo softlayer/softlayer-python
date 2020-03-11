@@ -1,6 +1,7 @@
 """Call arbitrary API endpoints."""
-import click
 import json
+
+import click
 
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
@@ -28,7 +29,7 @@ def _build_filters(_filters):
             if len(top_parts) == 2:
                 break
         else:
-            raise exceptions.CLIAbort('Failed to find valid operation for: %s'  % _filter)
+            raise exceptions.CLIAbort('Failed to find valid operation for: %s' % _filter)
 
         key, value = top_parts
         current = root
@@ -67,36 +68,39 @@ def _build_python_example(args, kwargs):
 
     return call_str
 
-def _validate_filter(ctx, param, value):
+
+def _validate_filter(ctx, param, value):  # pylint: disable=unused-argument
     """Validates a JSON style object filter"""
     _filter = None
-
+    # print("VALUE: {}".format(value))
     if value:
         try:
             _filter = json.loads(value)
             if not isinstance(_filter, dict):
                 raise exceptions.CLIAbort("\"{}\" should be a JSON object, but is a {} instead.".
                                           format(_filter, type(_filter)))
-        except json.JSONDecodeError as e:
-            raise exceptions.CLIAbort("\"{}\" is not valid JSON. {}".format(value, e))
+        except json.JSONDecodeError as error:
+            raise exceptions.CLIAbort("\"{}\" is not valid JSON. {}".format(value, error))
 
     return _filter
 
-def _validate_parameters(ctx, param, value):
+
+def _validate_parameters(ctx, param, value):  # pylint: disable=unused-argument
     """Checks if value is a JSON string, and converts it to a datastructure if that is true"""
 
     validated_values = []
-    for i, parameter in enumerate(value):
+    for parameter in value:
         if isinstance(parameter, str):
             # looks like a JSON string...
             if '{' in parameter or '[' in parameter:
                 try:
                     parameter = json.loads(parameter)
-                except json.JSONDecodeError as e:
-                    click.secho("{} looked like json, but wasn't valid, passing to API as is. {}".format(parameter, e),
-                                fg='red')
+                except json.JSONDecodeError as error:
+                    click.secho("{} looked like json, but was invalid, passing to API as is. {}".
+                                format(parameter, error), fg='red')
         validated_values.append(parameter)
     return validated_values
+
 
 @click.command('call', short_help="Call arbitrary API endpoints.")
 @click.argument('service')
@@ -138,6 +142,7 @@ def cli(env, service, method, parameters, _id, _filters, mask, limit, offset,
         slcli -v call-api SoftLayer_User_Customer addBulkPortalPermission --id=1234567 \\
             '[{"keyName": "NETWORK_MESSAGE_DELIVERY_MANAGE"}]'
     """
+
     if _filters and json_filter:
         raise exceptions.CLIAbort("--filter and --json-filter cannot be used together.")
 
