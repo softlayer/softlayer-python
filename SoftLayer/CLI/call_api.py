@@ -72,7 +72,6 @@ def _build_python_example(args, kwargs):
 def _validate_filter(ctx, param, value):  # pylint: disable=unused-argument
     """Validates a JSON style object filter"""
     _filter = None
-    # print("VALUE: {}".format(value))
     if value:
         try:
             _filter = json.loads(value)
