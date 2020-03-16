@@ -158,8 +158,7 @@ result = client.call(u'Service',
                              'None': None,
                              'Bool': True}
 
-        result = self.run_command(['call-api', 'Service', 'method'],
-                                  fmt='table')
+        result = self.run_command(['call-api', 'Service', 'method'], fmt='table')
 
         self.assert_no_fail(result)
         # NOTE(kmcdonald): Order is not guaranteed
@@ -179,8 +178,7 @@ result = client.call(u'Service',
         result = self.run_command(['call-api', 'Service', 'method'])
 
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         {'this': {'is': [{'pretty': 'nested'}]}})
+        self.assertEqual(json.loads(result.output),  {'this': {'is': [{'pretty': 'nested'}]}})
 
     def test_list(self):
         mock = self.set_mock('SoftLayer_Service', 'method')
@@ -208,8 +206,7 @@ result = client.call(u'Service',
                               'None': None,
                               'Bool': True}]
 
-        result = self.run_command(['call-api', 'Service', 'method'],
-                                  fmt='table')
+        result = self.run_command(['call-api', 'Service', 'method'], fmt='table')
 
         self.assert_no_fail(result)
         self.assertEqual(result.output,
@@ -224,12 +221,10 @@ result = client.call(u'Service',
         mock = self.set_mock('SoftLayer_Service', 'method')
         mock.return_value = {}
 
-        result = self.run_command(['call-api', 'Service', 'method',
-                                   'arg1', '1234'])
+        result = self.run_command(['call-api', 'Service', 'method', 'arg1', '1234'])
 
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Service', 'method',
-                                args=('arg1', '1234'))
+        self.assert_called_with('SoftLayer_Service', 'method', args=('arg1', '1234'))
 
     def test_fixture_not_implemented(self):
         service = 'SoftLayer_Test'
@@ -264,3 +259,42 @@ result = client.call(u'Service',
         self.assertIsInstance(result.exception, SoftLayerAPIError)
         output = '%s::%s fixture is not implemented' % (call_service, call_method)
         self.assertIn(output, result.exception.faultString)
+
+    def test_json_filter_validation(self):
+        json_filter = '{"test":"something"}'
+        result = call_api._validate_filter(None, None, json_filter)
+        self.assertEqual(result['test'], 'something')
+
+        # Valid JSON, but we expect objects, not simple types
+        with pytest.raises(exceptions.CLIAbort):
+            call_api._validate_filter(None, None, '"test"')
+
+        # Invalid JSON
+        with pytest.raises(exceptions.CLIAbort):
+            call_api._validate_filter(None, None, 'test')
+
+        # Empty Request
+        result = call_api._validate_filter(None, None, None)
+        self.assertEqual(None, result)
+
+    def test_json_parameters_validation(self):
+        json_params = ('{"test":"something"}', 'String', 1234, '[{"a":"b"}]', '{funky non [ Json')
+        result = call_api._validate_parameters(None, None, json_params)
+        self.assertEqual(result[0], {"test": "something"})
+        self.assertEqual(result[1], "String")
+        self.assertEqual(result[2], 1234)
+        self.assertEqual(result[3], [{"a": "b"}])
+        self.assertEqual(result[4], "{funky non [ Json")
+
+    def test_filter_with_filter(self):
+        result = self.run_command(['call-api', 'Account', 'getObject', '--filter=nested.property=5432',
+                                   '--json-filter={"test":"something"}'])
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual(result.exception.message, "--filter and --json-filter cannot be used together.")
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    def test_json_filter(self):
+        pass
+        result = self.run_command(['call-api', 'Account', 'getObject', '--json-filter={"test":"something"}'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getObject', filter={"test": "something"})

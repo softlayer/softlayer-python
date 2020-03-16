@@ -1,4 +1,6 @@
 """Call arbitrary API endpoints."""
+import json
+
 import click
 
 from SoftLayer.CLI import environment
@@ -27,8 +29,7 @@ def _build_filters(_filters):
             if len(top_parts) == 2:
                 break
         else:
-            raise exceptions.CLIAbort('Failed to find valid operation for: %s'
-                                      % _filter)
+            raise exceptions.CLIAbort('Failed to find valid operation for: %s' % _filter)
 
         key, value = top_parts
         current = root
@@ -68,25 +69,60 @@ def _build_python_example(args, kwargs):
     return call_str
 
 
+def _validate_filter(ctx, param, value):  # pylint: disable=unused-argument
+    """Validates a JSON style object filter"""
+    _filter = None
+    if value:
+        try:
+            _filter = json.loads(value)
+            if not isinstance(_filter, dict):
+                raise exceptions.CLIAbort("\"{}\" should be a JSON object, but is a {} instead.".
+                                          format(_filter, type(_filter)))
+        except json.JSONDecodeError as error:
+            raise exceptions.CLIAbort("\"{}\" is not valid JSON. {}".format(value, error))
+
+    return _filter
+
+
+def _validate_parameters(ctx, param, value):  # pylint: disable=unused-argument
+    """Checks if value is a JSON string, and converts it to a datastructure if that is true"""
+
+    validated_values = []
+    for parameter in value:
+        if isinstance(parameter, str):
+            # looks like a JSON string...
+            if '{' in parameter or '[' in parameter:
+                try:
+                    parameter = json.loads(parameter)
+                except json.JSONDecodeError as error:
+                    click.secho("{} looked like json, but was invalid, passing to API as is. {}".
+                                format(parameter, error), fg='red')
+        validated_values.append(parameter)
+    return validated_values
+
+
 @click.command('call', short_help="Call arbitrary API endpoints.")
 @click.argument('service')
 @click.argument('method')
-@click.argument('parameters', nargs=-1)
+@click.argument('parameters', nargs=-1, callback=_validate_parameters)
 @click.option('--id', '_id', help="Init parameter")
 @helpers.multi_option('--filter', '-f', '_filters',
-                      help="Object filters. This should be of the form: "
-                      "'property=value' or 'nested.property=value'. Complex "
-                      "filters like betweenDate are not currently supported.")
+                      help="Object filters. This should be of the form: 'property=value' or 'nested.property=value'."
+                           "Complex filters should use --json-filter.")
 @click.option('--mask', help="String-based object mask")
 @click.option('--limit', type=click.INT, help="Result limit")
 @click.option('--offset', type=click.INT, help="Result offset")
 @click.option('--output-python / --no-output-python',
               help="Show python example code instead of executing the call")
+@click.option('--json-filter', callback=_validate_filter,
+              help="A JSON string to be passed in as the object filter to the API call."
+                   "Remember to use double quotes (\") for variable names. Can NOT be used with --filter.")
 @environment.pass_env
 def cli(env, service, method, parameters, _id, _filters, mask, limit, offset,
-        output_python=False):
+        output_python=False, json_filter=None):
     """Call arbitrary API endpoints with the given SERVICE and METHOD.
 
+    For parameters that require a datatype, use a JSON string for that parameter.
     Example::
 
         slcli call-api Account getObject
@@ -100,12 +136,23 @@ def cli(env, service, method, parameters, _id, _filters, mask, limit, offset,
             --mask=id,hostname,datacenter.name,maxCpu
         slcli call-api Account getVirtualGuests \\
             -f 'virtualGuests.datacenter.name IN dal05,sng01'
+        slcli call-api Account getVirtualGuests \\
+            --json-filter  '{"virtualGuests":{"hostname": {"operation": "^= test"}}}' --limit=10
+        slcli -v call-api SoftLayer_User_Customer addBulkPortalPermission --id=1234567 \\
+            '[{"keyName": "NETWORK_MESSAGE_DELIVERY_MANAGE"}]'
     """
+
+    if _filters and json_filter:
+        raise exceptions.CLIAbort("--filter and --json-filter cannot be used together.")
+
+    object_filter = _build_filters(_filters)
+    if json_filter:
+        object_filter.update(json_filter)
 
     args = [service, method] + list(parameters)
     kwargs = {
         'id': _id,
-        'filter': _build_filters(_filters),
+        'filter': object_filter,
         'mask': mask,
         'limit': limit,
         'offset': offset,
