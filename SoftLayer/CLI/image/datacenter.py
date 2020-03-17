@@ -5,7 +5,6 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import helpers
 
 
@@ -20,7 +19,7 @@ def cli(env, identifier, add, locations):
     """Add/Remove datacenter of an image."""
 
     image_mgr = SoftLayer.ImageManager(env.client)
-    image_id = helpers.resolve_id(image_mgr.resolve_ids, identifier, 'Image template')
+    image_id = helpers.resolve_id(image_mgr.resolve_ids, identifier, 'image')
 
     if add:
         result = image_mgr.add_locations(image_id, locations)
