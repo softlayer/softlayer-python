@@ -8,10 +8,10 @@
 # pylint: disable=invalid-name
 import logging
 import os.path
+import unittest
 
 from click import testing
 import mock
-import testtools
 
 import SoftLayer
 from SoftLayer.CLI import core
@@ -68,8 +68,7 @@ class MockableTransport(object):
                      'offset']:
             details.append('%s=%r' % (prop, getattr(call, prop)))
 
-        logging.info('%s::%s called; %s',
-                     call.service, call.method, '; '.join(details))
+        logging.info('%s::%s called; %s', call.service, call.method, '; '.join(details))
 
 
 def _mock_key(service, method):
@@ -77,7 +76,7 @@ def _mock_key(service, method):
     return '%s::%s' % (service, method)
 
 
-class TestCase(testtools.TestCase):
+class TestCase(unittest.TestCase):
     """Testcase class with PEP-8 compatible method names."""
 
     @classmethod
@@ -100,7 +99,7 @@ class TestCase(testtools.TestCase):
         """Aliased from tearDown."""
 
     def setUp(self):  # NOQA
-        testtools.TestCase.setUp(self)
+        unittest.TestCase.setUp(self)
 
         self.mocks.clear()
 
@@ -114,7 +113,7 @@ class TestCase(testtools.TestCase):
         self.set_up()
 
     def tearDown(self):  # NOQA
-        testtools.TestCase.tearDown(self)
+        super(TestCase, self).tearDown()
         self.tear_down()
         self.mocks.clear()
 
@@ -141,8 +140,7 @@ class TestCase(testtools.TestCase):
         if self.calls(service, method, **props):
             return
 
-        raise AssertionError('%s::%s was not called with given properties: %s'
-                             % (service, method, props))
+        raise AssertionError('%s::%s was not called with given properties: %s' % (service, method, props))
 
     def assert_no_fail(self, result):
         """Fail when a failing click result has an error"""
@@ -169,6 +167,17 @@ class TestCase(testtools.TestCase):
 
         runner = testing.CliRunner()
         return runner.invoke(core.cli, args=args, input=stdin, obj=env or self.env)
+
+    def assertRaises(self, exception, function_callable, *args, **kwds):  # pylint: disable=arguments-differ
+        """Converts testtools.assertRaises to unittest.assertRaises calls.
+
+        testtools==2.4.0 require unittest2, which breaks pytest>=5.4.1 on skipTest.
+        But switching to just using unittest breaks assertRaises because the format is slightly different.
+        This basically just reformats the call so I don't have to re-write a bunch of tests.
+        """
+        with super(TestCase, self).assertRaises(exception) as cm:
+            function_callable(*args, **kwds)
+        return cm.exception
 
 
 def call_has_props(call, props):

@@ -115,8 +115,9 @@ def _validate_parameters(ctx, param, value):  # pylint: disable=unused-argument
 @click.option('--output-python / --no-output-python',
               help="Show python example code instead of executing the call")
 @click.option('--json-filter', callback=_validate_filter,
-              help="A JSON string to be passed in as the object filter to the API call."
-                   "Remember to use double quotes (\") for variable names. Can NOT be used with --filter.")
+              help="A JSON string to be passed in as the object filter to the API call. "
+                   "Remember to use double quotes (\") for variable names. Can NOT be used with --filter. "
+                   "Dont use whitespace outside of strings, or the slcli might have trouble parsing it.")
 @environment.pass_env
 def cli(env, service, method, parameters, _id, _filters, mask, limit, offset,
         output_python=False, json_filter=None):
@@ -137,7 +138,7 @@ def cli(env, service, method, parameters, _id, _filters, mask, limit, offset,
         slcli call-api Account getVirtualGuests \\
             -f 'virtualGuests.datacenter.name IN dal05,sng01'
         slcli call-api Account getVirtualGuests \\
-            --json-filter  '{"virtualGuests":{"hostname": {"operation": "^= test"}}}' --limit=10
+            --json-filter  '{"virtualGuests":{"hostname":{"operation":"^= test"}}}' --limit=10
         slcli -v call-api SoftLayer_User_Customer addBulkPortalPermission --id=1234567 \\
             '[{"keyName": "NETWORK_MESSAGE_DELIVERY_MANAGE"}]'
     """
