@@ -13,7 +13,7 @@ from SoftLayer.CLI import helpers
 @click.option('--add/--remove',
               default=False,
               help="To add or remove Datacenter")
-@click.argument('locations', nargs=-1)
+@click.argument('locations', nargs=-1, required=True)
 @environment.pass_env
 def cli(env, identifier, add, locations):
     """Add/Remove datacenter of an image."""

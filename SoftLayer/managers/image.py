@@ -6,8 +6,8 @@
     :license: MIT, see LICENSE for more details.
 """
 
+from SoftLayer import exceptions
 from SoftLayer import utils
-from SoftLayer.CLI import exceptions
 
 IMAGE_MASK = ('id,accountId,name,globalIdentifier,blockDevices,parentId,'
               'createDate,transaction')
@@ -227,17 +227,18 @@ class ImageManager(utils.IdentifierMixin, object):
         locations = self.get_storage_locations(image_id)
         locations_ids = []
         matching_location = {}
+        output_error = "Location {} does not exist for available locations for image {}"
 
         for location_name in location_names:
-            try:
-                for location in locations:
-                    if location_name == location.get('name'):
-                        matching_location = location
-                        break
-            except IndexError:
+            for location in locations:
+                if location_name == location.get('name'):
+                    matching_location = location
+                    break
+            if matching_location.get('id') is None:
                 raise exceptions.SoftLayerError(
-                    "Location {} does not exist for available locations for image {}".format(location_name,
-                                                                                             image_id))
+                    output_error.format(location_name, image_id)
+                )
+
             locations_ids.append(matching_location.get('id'))
 
         return locations_ids

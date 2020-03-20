@@ -4,12 +4,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import json
-import os.path
 
-import mock
-
-from SoftLayer.CLI import exceptions
 from SoftLayer import testing
 
 
@@ -48,9 +43,13 @@ class ImageTests(testing.TestCase):
         self.assert_no_fail(result)
 
     def test_datacenter_add(self):
-        result = self.run_command(['image', 'datacenter', '100', '--add', 'test'])
+        result = self.run_command(['image', 'datacenter', '100', '--add', 'ams01'])
         self.assert_no_fail(result)
 
-    # def test_datacenter_remove(self):
-    #     result = self.run_command(['image', 'datacenter', '--remove', 'test'])
-    #     self.assert_no_fail(result)
+    def test_datacenter_remove(self):
+        result = self.run_command(['image', 'datacenter', '100', '--remove', 'ams01'])
+        self.assert_no_fail(result)
+
+    def test_datacenter_remove_fails(self):
+        result = self.run_command(['image', 'datacenter', '100', '--remove'])
+        self.assertEqual(2, result.exit_code)

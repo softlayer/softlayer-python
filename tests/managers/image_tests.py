@@ -6,6 +6,7 @@
 """
 
 import SoftLayer
+from SoftLayer import exceptions
 from SoftLayer import testing
 
 IMAGE_SERVICE = 'SoftLayer_Virtual_Guest_Block_Device_Template_Group'
@@ -192,3 +193,33 @@ class ImageTests(testing.TestCase):
             'copyToIcos',
             args=({'uri': 'cos://someuri', 'ibmApiKey': 'someApiKey'},),
             identifier=1234)
+
+    def test_add_locations_image(self):
+        locations = ['ams01']
+        self.image.add_locations(100, locations)
+
+        self.assert_called_with(IMAGE_SERVICE, 'addLocations', identifier=100)
+
+    def test_add_locations_fail(self):
+        locations = ['test']
+        self.assertRaises(
+            exceptions.SoftLayerError,
+            self.image.add_locations,
+            100,
+            locations
+        )
+
+    def test_remove_locations_image(self):
+        locations = ['ams01']
+        self.image.remove_locations(100, locations)
+
+        self.assert_called_with(IMAGE_SERVICE, 'removeLocations', identifier=100)
+
+    def test_get_locations_id_fails(self):
+        locations = ['test']
+        self.assertRaises(
+            exceptions.SoftLayerError,
+            self.image.get_locations_id_list,
+            100,
+            locations
+        )
