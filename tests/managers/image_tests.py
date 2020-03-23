@@ -219,7 +219,7 @@ class ImageTests(testing.TestCase):
         locations = ['test']
         self.assertRaises(
             exceptions.SoftLayerError,
-            self.image.get_locations_id_list,
+            self.image.get_locations_list,
             100,
             locations
         )

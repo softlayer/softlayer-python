@@ -195,9 +195,8 @@ class ImageManager(utils.IdentifierMixin, object):
         :param int image_id: The ID of the image
         :param location_names: Locations for the Image.
         """
-        locations = self.get_locations_id_list(image_id, location_names)
-        locations_ids = [{'id': location_id} for location_id in locations]
-        return self.vgbdtg.addLocations(locations_ids, id=image_id)
+        locations = self.get_locations_list(image_id, location_names)
+        return self.vgbdtg.addLocations(locations, id=image_id)
 
     def remove_locations(self, image_id, location_names):
         """Remove available locations from an archive image template.
@@ -205,9 +204,8 @@ class ImageManager(utils.IdentifierMixin, object):
         :param int image_id: The ID of the image
         :param location_names: Locations for the Image.
         """
-        locations = self.get_locations_id_list(image_id, location_names)
-        locations_ids = [{'id': location_id} for location_id in locations]
-        return self.vgbdtg.removeLocations(locations_ids, id=image_id)
+        locations = self.get_locations_list(image_id, location_names)
+        return self.vgbdtg.removeLocations(locations, id=image_id)
 
     def get_storage_locations(self, image_id):
         """Get available locations for public image storage.
@@ -216,13 +214,12 @@ class ImageManager(utils.IdentifierMixin, object):
         """
         return self.vgbdtg.getStorageLocations(id=image_id)
 
-    def get_locations_id_list(self, image_id, location_names):
-        """Converts a list of location names to a list of location IDs.
+    def get_locations_list(self, image_id, location_names):
+        """Converts a list of location names to a list of locations.
 
         :param int image_id: The ID of the image.
         :param list location_names: A list of location names strings.
-        :returns: A list of locations IDs associated with the given location
-                  keynames in the image id.
+        :returns: A list of locations associated with the given location names in the image.
         """
         locations = self.get_storage_locations(image_id)
         locations_ids = []
@@ -235,10 +232,8 @@ class ImageManager(utils.IdentifierMixin, object):
                     matching_location = location
                     break
             if matching_location.get('id') is None:
-                raise exceptions.SoftLayerError(
-                    output_error.format(location_name, image_id)
-                )
+                raise exceptions.SoftLayerError(output_error.format(location_name, image_id))
 
-            locations_ids.append(matching_location.get('id'))
+            locations_ids.append(matching_location)
 
         return locations_ids
