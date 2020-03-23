@@ -10,8 +10,7 @@ from SoftLayer.CLI import helpers
 
 @click.command()
 @click.argument('identifier')
-@click.option('--add/--remove',
-              default=False,
+@click.option('--add/--remove', default=True,
               help="To add or remove Datacenter")
 @click.argument('locations', nargs=-1, required=True)
 @environment.pass_env
