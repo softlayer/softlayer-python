@@ -42,8 +42,8 @@ class TicketTests(testing.TestCase):
             'status': 'Closed',
             'title': 'Cloud Instance Cancellation - 08/01/13',
             'update 1': 'a bot says something',
-            'update 2': 'By John Smith\nuser says something',
-            'update 3': 'By emp1 (Employee)\nemployee says something',
+            'update 2': 'By John Smith user says something',
+            'update 3': 'By emp1 (Employee) employee says something',
         }
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output), expected)
@@ -225,7 +225,7 @@ class TicketTests(testing.TestCase):
 
     def test_init_ticket_results(self):
         ticket_mgr = TicketManager(self.client)
-        ticket_table = ticket.get_ticket_results(ticket_mgr, 100)
+        ticket_table = ticket.get_ticket_results(ticket_mgr, False,100)
         self.assert_called_with('SoftLayer_Ticket', 'getObject', identifier=100)
         self.assertIsInstance(ticket_table, formatting.KeyValueTable)
 
@@ -253,7 +253,7 @@ class TicketTests(testing.TestCase):
         }
 
         ticket_mgr = TicketManager(self.client)
-        ticket_table = ticket.get_ticket_results(ticket_mgr, 100)
+        ticket_table = ticket.get_ticket_results(ticket_mgr, False, 100)
         self.assert_called_with('SoftLayer_Ticket', 'getObject', identifier=100)
         self.assertIsInstance(ticket_table, formatting.KeyValueTable)
 
