@@ -1,13 +1,15 @@
 """
     SoftLayer.tests.CLI.modules.ticket_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     :license: MIT, see LICENSE for more details.
 """
 import json
 import mock
 
 from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
+from SoftLayer.CLI import ticket
+from SoftLayer.managers import TicketManager
 from SoftLayer import testing
 
 
@@ -40,8 +42,8 @@ class TicketTests(testing.TestCase):
             'status': 'Closed',
             'title': 'Cloud Instance Cancellation - 08/01/13',
             'update 1': 'a bot says something',
-            'update 2': 'By John Smith user says something',
-            'update 3': 'By emp1 (Employee) employee says something',
+            'update 2': 'By John Smith\nuser says something',
+            'update 3': 'By emp1 (Employee)\nemployee says something',
         }
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output), expected)
@@ -208,6 +210,95 @@ class TicketTests(testing.TestCase):
                                 args=({"filename": "attachment_upload",
                                        "data": b"ticket attached data"},),
                                 identifier=1)
+
+    def test_ticket_upload(self):
+        result = self.run_command(['ticket', 'upload', '1',
+                                   '--path=tests/resources/attachment_upload',
+                                   '--name=a_file_name'])
+
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Ticket',
+                                'addAttachedFile',
+                                args=({"filename": "a_file_name",
+                                       "data": b"ticket attached data"},),
+                                identifier=1)
+
+    def test_init_ticket_results(self):
+        ticket_mgr = TicketManager(self.client)
+        ticket_table = ticket.get_ticket_results(ticket_mgr, 100)
+        self.assert_called_with('SoftLayer_Ticket', 'getObject', identifier=100)
+        self.assertIsInstance(ticket_table, formatting.KeyValueTable)
+
+        ticket_object = ticket_table.to_python()
+        self.assertEqual('No Priority', ticket_object['priority'])
+        self.assertEqual(100, ticket_object['id'])
+
+    def test_init_ticket_results_asigned_user(self):
+        mock = self.set_mock('SoftLayer_Ticket', 'getObject')
+        mock.return_value = {
+            "serviceProviderResourceId": "CS12345",
+            "id": 100,
+            "title": "Simple Title",
+            "priority": 1,
+            "assignedUser": {
+                "firstName": "Test",
+                "lastName": "User"
+            },
+            "status": {
+                "name": "Closed"
+            },
+            "createDate": "2013-08-01T14:14:04-07:00",
+            "lastEditDate": "2013-08-01T14:16:47-07:00",
+            "updates": [{'entry': 'a bot says something'}]
+        }
+
+        ticket_mgr = TicketManager(self.client)
+        ticket_table = ticket.get_ticket_results(ticket_mgr, 100)
+        self.assert_called_with('SoftLayer_Ticket', 'getObject', identifier=100)
+        self.assertIsInstance(ticket_table, formatting.KeyValueTable)
+
+        ticket_object = ticket_table.to_python()
+        self.assertEqual('Severity 1 - Critical Impact / Service Down', ticket_object['priority'])
+        self.assertEqual('Test User', ticket_object['user'])
+
+    def test_ticket_summary(self):
+        mock = self.set_mock('SoftLayer_Account', 'getObject')
+        mock.return_value = {
+            'openTicketCount': 1,
+            'closedTicketCount': 2,
+            'openBillingTicketCount': 3,
+            'openOtherTicketCount': 4,
+            'openSalesTicketCount': 5,
+            'openSupportTicketCount': 6,
+            'openAccountingTicketCount': 7
+        }
+        expected = [
+            {'Status': 'Open',
+             'count': [
+                 {'Type': 'Accounting', 'count': 7},
+                 {'Type': 'Billing', 'count': 3},
+                 {'Type': 'Sales', 'count': 5},
+                 {'Type': 'Support', 'count': 6},
+                 {'Type': 'Other', 'count': 4},
+                 {'Type': 'Total', 'count': 1}]},
+            {'Status': 'Closed', 'count': 2}
+        ]
+        result = self.run_command(['ticket', 'summary'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getObject')
+        self.assertEqual(expected, json.loads(result.output))
+
+    def test_ticket_update(self):
+        result = self.run_command(['ticket', 'update', '100', '--body=Testing'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Ticket', 'addUpdate', args=({'entry': 'Testing'},), identifier=100)
+
+    @mock.patch('click.edit')
+    def test_ticket_update_no_body(self, edit_mock):
+        edit_mock.return_value = 'Testing1'
+        result = self.run_command(['ticket', 'update', '100'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Ticket', 'addUpdate', args=({'entry': 'Testing1'},), identifier=100)
 
     def test_ticket_json(self):
         result = self.run_command(['--format=json', 'ticket', 'detail', '1'])
