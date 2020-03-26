@@ -13,8 +13,8 @@ from SoftLayer.CLI import helpers
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """Get storage details for a virtual server.
-    """
+    """Get storage details for a virtual server."""
+
     vsi = SoftLayer.VSManager(env.client)
     vsi_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
     iscsi_storage_data = vsi.get_storage_details(vsi_id, "ISCSI")

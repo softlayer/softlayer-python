@@ -10,9 +10,9 @@ import socket
 import time
 
 import SoftLayer
-from SoftLayer import utils
 from SoftLayer.decoration import retry
 from SoftLayer.managers import ordering
+from SoftLayer import utils
 
 LOGGER = logging.getLogger(__name__)
 

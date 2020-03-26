@@ -13,8 +13,8 @@ from SoftLayer.CLI import helpers
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """Get storage details for a hardware server.
-    """
+    """Get storage details for a hardware server."""
+
     hardware = SoftLayer.HardwareManager(env.client)
     hardware_id = helpers.resolve_id(hardware.resolve_ids, identifier, 'hardware')
     iscsi_storage_data = hardware.get_storage_details(hardware_id, "ISCSI")
