@@ -738,3 +738,32 @@ getAllowedHost = {
         "username": "SL02SU11111-V62941551"
     }
 }
+
+getBlockDevices = [
+    {
+        "createDate": "2018-10-06T04:27:35-06:00",
+        "device": "0",
+        "id": 11111,
+        "mountType": "Disk",
+        "diskImage": {
+            "capacity": 100,
+            "description": "adns.vmware.com",
+            "id": 72222,
+            "name": "adns.vmware.com",
+            "units": "GB",
+        }
+    },
+    {
+        "device": "1",
+        "id": 22222,
+        "mountType": "Disk",
+        "statusId": 1,
+        "diskImage": {
+            "capacity": 2,
+            "description": "6211111-SWAP",
+            "id": 33333,
+            "name": "6211111-SWAP",
+            "units": "GB",
+        }
+    }
+]

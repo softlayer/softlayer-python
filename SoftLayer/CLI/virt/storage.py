@@ -21,6 +21,7 @@ def cli(env, identifier):
     nas_storage_data = vsi.get_storage_details(vsi_id, "NAS")
     storage_credentials = vsi.get_storage_credentials(vsi_id)
     portable_storage = vsi.get_portable_storage(vsi_id)
+    local_disks = vsi.get_local_disks(vsi_id)
 
     table_credentials = formatting.Table(['Username', 'Password', 'IQN'], title="Block Storage Details \n iSCSI")
     if storage_credentials:
@@ -47,7 +48,26 @@ def cli(env, identifier):
                            nas['allowedVirtualGuests'][0]['datacenter']['longName'],
                            nas.get('notes', None)])
 
+    table_local_disks = formatting.Table(['Type', 'Name', 'Capacity'], title="Other storage details")
+    for disks in local_disks:
+        if 'diskImage' in disks:
+            table_local_disks.add_row([get_local_type(disks), disks['mountType'],
+                                       str(disks['diskImage']['capacity']) + " " + str(disks['diskImage']['units'])])
+
     env.fout(table_credentials)
     env.fout(table_iscsi)
     env.fout(table_portable)
     env.fout(table_nas)
+    env.fout(table_local_disks)
+
+
+def get_local_type(disks):
+    """Returns the virtual server local disk type.
+
+    :param disks: virtual serve local disks.
+    """
+    disk_type = 'System'
+    if 'SWAP' in disks['diskImage']['description']:
+        disk_type = 'Swap'
+
+    return disk_type

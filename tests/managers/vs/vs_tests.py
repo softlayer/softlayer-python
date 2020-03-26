@@ -1052,3 +1052,83 @@ class VSTests(testing.TestCase):
         result = self.vs.get_portable_storage(1234)
 
         self.assertEqual([], result)
+
+    def test_get_local_disks_system(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getBlockDevices')
+        mock.return_value = [
+            {
+                "createDate": "2018-10-06T04:27:35-06:00",
+                "device": "0",
+                "id": 11111,
+                "mountType": "Disk",
+                "diskImage": {
+                    "capacity": 100,
+                    "description": "adns.vmware.com",
+                    "id": 72222,
+                    "name": "adns.vmware.com",
+                    "units": "GB",
+                }
+            }
+        ]
+
+        result = self.vs.get_local_disks(1234)
+
+        self.assertEqual([
+            {
+                "createDate": "2018-10-06T04:27:35-06:00",
+                "device": "0",
+                "id": 11111,
+                "mountType": "Disk",
+                "diskImage": {
+                    "capacity": 100,
+                    "description": "adns.vmware.com",
+                    "id": 72222,
+                    "name": "adns.vmware.com",
+                    "units": "GB",
+                }
+            }
+        ], result)
+
+    def test_get_local_disks_empty(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getBlockDevices')
+        mock.return_value = []
+
+        result = self.vs.get_local_disks(1234)
+
+        self.assertEqual([], result)
+
+    def test_get_local_disks_swap(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getBlockDevices')
+        mock.return_value = [
+            {
+                "device": "1",
+                "id": 22222,
+                "mountType": "Disk",
+                "statusId": 1,
+                "diskImage": {
+                    "capacity": 2,
+                    "description": "6211111-SWAP",
+                    "id": 33333,
+                    "name": "6211111-SWAP",
+                    "units": "GB",
+                }
+            }
+        ]
+
+        result = self.vs.get_local_disks(1234)
+
+        self.assertEqual([
+            {
+                "device": "1",
+                "id": 22222,
+                "mountType": "Disk",
+                "statusId": 1,
+                "diskImage": {
+                    "capacity": 2,
+                    "description": "6211111-SWAP",
+                    "id": 33333,
+                    "name": "6211111-SWAP",
+                    "units": "GB",
+                }
+            }
+        ], result)

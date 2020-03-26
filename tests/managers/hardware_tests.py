@@ -564,6 +564,68 @@ class HardwareTests(testing.TestCase):
 
         self.assertEqual(None, result)
 
+    def test_get_hard_drives(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getHardDrives')
+        mock.return_value = [
+            {
+                "id": 11111,
+                "serialNumber": "z1w4sdf",
+                "serviceProviderId": 1,
+                "hardwareComponentModel": {
+                    "capacity": "1000",
+                    "description": "SATAIII:2000:8300:Constellation",
+                    "id": 111,
+                    "manufacturer": "Seagate",
+                    "name": "Constellation ES",
+                    "hardwareGenericComponentModel": {
+                        "capacity": "1000",
+                        "units": "GB",
+                        "hardwareComponentType": {
+                            "id": 1,
+                            "keyName": "HARD_DRIVE",
+                            "type": "Hard Drive",
+                            "typeParentId": 5
+                        }
+                    }
+                }
+            }
+        ]
+
+        result = self.hardware.get_hard_drives(1234)
+
+        self.assertEqual([
+            {
+                "id": 11111,
+                "serialNumber": "z1w4sdf",
+                "serviceProviderId": 1,
+                "hardwareComponentModel": {
+                    "capacity": "1000",
+                    "description": "SATAIII:2000:8300:Constellation",
+                    "id": 111,
+                    "manufacturer": "Seagate",
+                    "name": "Constellation ES",
+                    "hardwareGenericComponentModel": {
+                        "capacity": "1000",
+                        "units": "GB",
+                        "hardwareComponentType": {
+                            "id": 1,
+                            "keyName": "HARD_DRIVE",
+                            "type": "Hard Drive",
+                            "typeParentId": 5
+                        }
+                    }
+                }
+            }
+        ], result)
+
+    def test_get_hard_drive_empty(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getHardDrives')
+        mock.return_value = []
+
+        result = self.hardware.get_hard_drives(1234)
+
+        self.assertEqual([], result)
+
 
 class HardwareHelperTests(testing.TestCase):
     def test_get_extra_price_id_no_items(self):

@@ -217,3 +217,28 @@ getAllowedHost = {
         "username": "SL02SU11111-V62941551"
     }
 }
+
+getHardDrives = [
+    {
+        "id": 11111,
+        "serialNumber": "z1w4sdf",
+        "serviceProviderId": 1,
+        "hardwareComponentModel": {
+            "capacity": "1000",
+            "description": "SATAIII:2000:8300:Constellation",
+            "id": 111,
+            "manufacturer": "Seagate",
+            "name": "Constellation ES",
+            "hardwareGenericComponentModel": {
+                "capacity": "1000",
+                "units": "GB",
+                "hardwareComponentType": {
+                    "id": 1,
+                    "keyName": "HARD_DRIVE",
+                    "type": "Hard Drive",
+                    "typeParentId": 5
+                }
+            }
+        }
+    }
+]

@@ -20,6 +20,7 @@ def cli(env, identifier):
     iscsi_storage_data = hardware.get_storage_details(hardware_id, "ISCSI")
     nas_storage_data = hardware.get_storage_details(hardware_id, "NAS")
     storage_credentials = hardware.get_storage_credentials(hardware_id)
+    hard_drives = hardware.get_hard_drives(hardware_id)
 
     table_credentials = formatting.Table(['Username', 'Password', 'IQN'], title="Block Storage Details \n iSCSI")
     if storage_credentials:
@@ -42,6 +43,16 @@ def cli(env, identifier):
                            nas['allowedHardware'][0]['datacenter']['longName'],
                            nas.get('notes', None)])
 
+    table_hard_drives = formatting.Table(['Type', 'Name', 'Capacity', 'Serial #'], title="Other storage details")
+    for drives in hard_drives:
+        table_hard_drives.add_row([drives['hardwareComponentModel']['hardwareGenericComponentModel']
+                                   ['hardwareComponentType']['type'], drives['hardwareComponentModel']
+                                   ['manufacturer'] + " " + drives['hardwareComponentModel']['name'],
+                                   str(drives['hardwareComponentModel']['hardwareGenericComponentModel']['capacity'])
+                                   + " " + str(drives['hardwareComponentModel']['hardwareGenericComponentModel']
+                                               ['units']), drives['serialNumber']])
+
     env.fout(table_credentials)
     env.fout(table_iscsi)
     env.fout(table_nas)
+    env.fout(table_hard_drives)

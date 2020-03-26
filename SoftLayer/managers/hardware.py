@@ -721,6 +721,13 @@ class HardwareManager(utils.IdentifierMixin, object):
         mask = 'mask[credential]'
         return self.hardware.getAllowedHost(mask=mask, id=instance_id)
 
+    def get_hard_drives(self, instance_id):
+        """Returns the hardware server hard drives.
+
+        :param int instance_id: Id of the hardware server
+        """
+        return self.hardware.getHardDrives(id=instance_id)
+
 
 def _get_extra_price_id(items, key_name, hourly, location):
     """Returns a price id attached to item with the given key_name."""

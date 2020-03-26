@@ -1145,9 +1145,17 @@ class VSManager(utils.IdentifierMixin, object):
         return self.guest.getAllowedHost(mask=mask, id=instance_id)
 
     def get_portable_storage(self, instance_id):
-        """Returns the virtual server storage credentials.
+        """Returns the virtual server portable storage.
 
         :param int instance_id: Id of the virtual server
         """
         object_filter = {"portableStorageVolumes": {"blockDevices": {"guest": {"id": {"operation": instance_id}}}}}
         return self.account.getPortableStorageVolumes(filter=object_filter)
+
+    def get_local_disks(self, instance_id):
+        """Returns the virtual server local disks.
+
+        :param int instance_id: Id of the virtual server
+        """
+        mask = 'mask[diskImage]'
+        return self.guest.getBlockDevices(mask=mask, id=instance_id)
