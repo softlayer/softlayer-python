@@ -1,6 +1,6 @@
 # Change Log
 
-## [5.8.6] - 2012-03-26
+## [5.8.6] - 2020-03-26
 https://github.com/softlayer/softlayer-python/compare/v5.8.5...v5.8.6
 
 - #1222 Get load balancer (LBaaS) by name
@@ -14,7 +14,7 @@ https://github.com/softlayer/softlayer-python/compare/v5.8.5...v5.8.6
 - #1234 Added ability to change which datacenters an image template was stored in
 
 
-## [5.8.5] - 2012-01-29
+## [5.8.5] - 2020-01-29
 https://github.com/softlayer/softlayer-python/compare/v5.8.4...v5.8.5
 
 -  #1195 Fixed an issue with `slcli vs dns-sync --ptr`. Added `slcli hw dns-sync`
