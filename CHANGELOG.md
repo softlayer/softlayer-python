@@ -1,7 +1,7 @@
 # Change Log
 
-## [5.8.6] - 2020-03-26
-https://github.com/softlayer/softlayer-python/compare/v5.8.5...v5.8.6
+## [5.8.7] - 2020-03-26
+https://github.com/softlayer/softlayer-python/compare/v5.8.5...v5.8.7
 
 - #1222 Get load balancer (LBaaS) by name
 - #1221 Added version checker
@@ -13,6 +13,7 @@ https://github.com/softlayer/softlayer-python/compare/v5.8.5...v5.8.6
 - #801 Added support for JSON styled parameters and object filters
 - #1234 Added ability to change which datacenters an image template was stored in
 
+## [5.8.6] - Skipped
 
 ## [5.8.5] - 2020-01-29
 https://github.com/softlayer/softlayer-python/compare/v5.8.4...v5.8.5
@@ -33,7 +34,7 @@ https://github.com/softlayer/softlayer-python/compare/v5.8.4...v5.8.5
 
 
 ## [5.8.4] - 2019-12-20
-https://github.com/softlayer/softlayer-python/compare/v5.8.3...v5.8.4
+https://github.com/softlayer/softlayer-python/compare/v5.8.3...5vhttps://pypi.org/help/#file-name-reuse.8.4
 
 - #1199 Fix block storage failback and failover.
 - #1202 Order a virtual server private. 
