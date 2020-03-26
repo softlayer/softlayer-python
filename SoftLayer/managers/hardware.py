@@ -708,7 +708,6 @@ class HardwareManager(utils.IdentifierMixin, object):
         :param int instance_id: Id of the hardware server
         :param nas_type: storage type.
         """
-        nas_type = nas_type
         mask = 'mask[id,username,capacityGb,notes,serviceResourceBackendIpAddress,' \
                'allowedHardware[id,datacenter]]'
         return self.hardware.getAttachedNetworkStorages(nas_type, mask=mask, id=instance_id)
