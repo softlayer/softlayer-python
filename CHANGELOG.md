@@ -1,7 +1,20 @@
 # Change Log
 
+## [5.8.6] - 2020-03-26
+https://github.com/softlayer/softlayer-python/compare/v5.8.5...v5.8.6
 
-## [5.8.5] - 2012-01-29
+- #1222 Get load balancer (LBaaS) by name
+- #1221 Added version checker
+- #1227 Updated unit test suite for TravisCI to run properly
+- #1225 Add note about using multiple colon symbols not working when setting tags.
+- #1228 Support ordering [Dependent Duplicate Volumes](https://cloud.ibm.com/docs/BlockStorage?topic=BlockStorage-dependentduplicate)
+- #1233 Refactored File/Block managers to reduce duplicated code.
+- #1231 Added Refresh functions for Dependent Duplicate Volumes
+- #801 Added support for JSON styled parameters and object filters
+- #1234 Added ability to change which datacenters an image template was stored in
+
+
+## [5.8.5] - 2020-01-29
 https://github.com/softlayer/softlayer-python/compare/v5.8.4...v5.8.5
 
 -  #1195 Fixed an issue with `slcli vs dns-sync --ptr`. Added `slcli hw dns-sync`
