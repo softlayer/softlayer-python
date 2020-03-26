@@ -740,3 +740,9 @@ class VirtTests(testing.TestCase):
         self.assertEqual(output_summary[1]['Max Date'], date)
         self.assertEqual(output_summary[2]['Max GB'], 0.1172)
         self.assertEqual(output_summary[3]['Sum GB'], 0.0009)
+
+    def test_vs_storage(self):
+        result = self.run_command(
+            ['vs', 'storage', '100'])
+
+        self.assert_no_fail(result)
