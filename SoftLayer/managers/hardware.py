@@ -10,9 +10,9 @@ import socket
 import time
 
 import SoftLayer
+from SoftLayer import utils
 from SoftLayer.decoration import retry
 from SoftLayer.managers import ordering
-from SoftLayer import utils
 
 LOGGER = logging.getLogger(__name__)
 
@@ -701,6 +701,25 @@ class HardwareManager(utils.IdentifierMixin, object):
         if allotment:
             return {'allotment': allotment.get('allocation'), 'usage': usage}
         return {'allotment': allotment, 'usage': usage}
+
+    def get_storage_details(self, instance_id, nas_type):
+        """Returns the hardware server attached network storage.
+
+        :param int instance_id: Id of the hardware server
+        :param nas_type: storage type.
+        """
+        nas_type = nas_type
+        mask = 'mask[id,username,capacityGb,notes,serviceResourceBackendIpAddress,' \
+               'allowedHardware[id,datacenter]]'
+        return self.hardware.getAttachedNetworkStorages(nas_type, mask=mask, id=instance_id)
+
+    def get_storage_credentials(self, instance_id):
+        """Returns the hardware server storage credentials.
+
+        :param int instance_id: Id of the hardware server
+        """
+        mask = 'mask[credential]'
+        return self.hardware.getAllowedHost(mask=mask, id=instance_id)
 
 
 def _get_extra_price_id(items, key_name, hourly, location):

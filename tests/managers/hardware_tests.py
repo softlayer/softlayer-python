@@ -9,7 +9,6 @@ import copy
 import mock
 
 import SoftLayer
-
 from SoftLayer import fixtures
 from SoftLayer import managers
 from SoftLayer import testing
@@ -466,6 +465,104 @@ class HardwareTests(testing.TestCase):
         result = self.hardware.get_bandwidth_allocation(1234)
 
         self.assertEqual(None, result['allotment'])
+
+    def test_get_storage_iscsi_details(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getAttachedNetworkStorages')
+        mock.return_value = [
+            {
+                "accountId": 11111,
+                "capacityGb": 12000,
+                "id": 3777123,
+                "nasType": "ISCSI",
+                "username": "SL02SEL31111-9",
+            }
+        ]
+
+        result = self.hardware.get_storage_details(1234, 'ISCSI')
+
+        self.assertEqual([{
+            "accountId": 11111,
+            "capacityGb": 12000,
+            "id": 3777123,
+            "nasType": "ISCSI",
+            "username": "SL02SEL31111-9",
+        }], result)
+
+    def test_get_storage_iscsi_empty_details(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getAttachedNetworkStorages')
+        mock.return_value = []
+
+        result = self.hardware.get_storage_details(1234, 'ISCSI')
+
+        self.assertEqual([], result)
+
+    def test_get_storage_nas_details(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getAttachedNetworkStorages')
+        mock.return_value = [
+            {
+                "accountId": 11111,
+                "capacityGb": 12000,
+                "id": 3777111,
+                "nasType": "NAS",
+                "username": "SL02SEL32222-9",
+            }
+        ]
+
+        result = self.hardware.get_storage_details(1234, 'NAS')
+
+        self.assertEqual([{
+            "accountId": 11111,
+            "capacityGb": 12000,
+            "id": 3777111,
+            "nasType": "NAS",
+            "username": "SL02SEL32222-9",
+        }], result)
+
+    def test_get_storage_nas_empty_details(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getAttachedNetworkStorages')
+        mock.return_value = []
+
+        result = self.hardware.get_storage_details(1234, 'NAS')
+
+        self.assertEqual([], result)
+
+    def test_get_storage_credentials(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getAllowedHost')
+        mock.return_value = {
+            "accountId": 11111,
+            "id": 33333,
+            "name": "iqn.2020-03.com.ibm:sl02su11111-v62941551",
+            "resourceTableName": "HARDWARE",
+            "credential": {
+                "accountId": "11111",
+                "id": 44444,
+                "password": "SjFDCpHrjskfj",
+                "username": "SL02SU11111-V62941551"
+            }
+        }
+
+        result = self.hardware.get_storage_credentials(1234)
+
+        self.assertEqual({
+            "accountId": 11111,
+            "id": 33333,
+            "name": "iqn.2020-03.com.ibm:sl02su11111-v62941551",
+            "resourceTableName": "HARDWARE",
+            "credential": {
+                "accountId": "11111",
+                "id": 44444,
+                "password": "SjFDCpHrjskfj",
+                "username": "SL02SU11111-V62941551"
+            }
+        }, result)
+
+    def test_get_none_storage_credentials(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getAllowedHost')
+        mock.return_value = None
+
+        result = self.hardware.get_storage_credentials(1234)
+
+        self.assertEqual(None, result)
 
 
 class HardwareHelperTests(testing.TestCase):

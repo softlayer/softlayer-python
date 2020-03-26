@@ -826,3 +826,9 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['hw', 'dns-sync', '-a', '1000'])
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    def test_hardware_storage(self):
+        result = self.run_command(
+            ['hw', 'storage', '100'])
+
+        self.assert_no_fail(result)
