@@ -14,7 +14,6 @@ from SoftLayer import testing
 
 
 class UserCLITests(testing.TestCase):
-
     """User list tests"""
 
     def test_user_list(self):
@@ -153,6 +152,7 @@ class UserCLITests(testing.TestCase):
         self.assert_called_with('SoftLayer_User_Customer', 'addBulkPortalPermission', identifier=11100)
 
     """User create tests"""
+
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_user(self, confirm_mock):
         confirm_mock.return_value = True
@@ -228,6 +228,7 @@ class UserCLITests(testing.TestCase):
         self.assert_called_with('SoftLayer_User_Customer', 'getObject', identifier=1234)
 
     """User edit-details tests"""
+
     @mock.patch('SoftLayer.CLI.user.edit_details.click')
     def test_edit_details(self, click):
         result = self.run_command(['user', 'edit-details', '1234', '-t', '{"firstName":"Supermand"}'])
@@ -252,6 +253,7 @@ class UserCLITests(testing.TestCase):
         self.assertEqual(result.exit_code, 2)
 
     """User delete tests"""
+
     @mock.patch('SoftLayer.CLI.user.delete.click')
     def test_delete(self, click):
         result = self.run_command(['user', 'delete', '12345'])
@@ -269,3 +271,17 @@ class UserCLITests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_User_Customer', 'editObject',
                                 args=({'userStatusId': 1021},), identifier=12345)
+
+    """User vpn manual config tests"""
+
+    @mock.patch('SoftLayer.CLI.user.vpn_manual.click')
+    def test_vpn_manual(self, click):
+        result = self.run_command(['user', 'vpn-manual', '12345', '--enable'])
+        click.secho.assert_called_with('12345 vpn manual config enable', fg='green')
+        self.assert_no_fail(result)
+
+    def test_vpn_manual_fail(self):
+        mock = self.set_mock('SoftLayer_User_Customer', 'editObject')
+        mock.return_value = False
+        result = self.run_command(['user', 'vpn-manual', '12345', '--enable'])
+        self.assert_no_fail(result)

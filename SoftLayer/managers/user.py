@@ -267,6 +267,15 @@ class UserManager(utils.IdentifierMixin, object):
         """
         return self.user_service.addApiAuthenticationKey(id=user_id)
 
+    def vpn_manual(self, user_id, value):
+        """Set vpnManualConfig flag
+
+        :param int user_id: User to edit
+        :param bool value: Value for vpnManualConfig flag
+        """
+        user_object = {'vpnManualConfig': value}
+        return self.edit_user(user_id, user_object)
+
 
 def _keyname_search(haystack, needle):
     for item in haystack:
