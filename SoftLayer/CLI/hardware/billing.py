@@ -23,9 +23,9 @@ def cli(env, identifier):
     table.align['name'] = 'r'
     table.align['value'] = 'l'
 
-    table.add_row(['hardwareId', identifier])
+    table.add_row(['Id', identifier])
 
-    table.add_row(['BillingIttem', utils.lookup(result, 'billingItem', 'id')])
+    table.add_row(['Billing Item Id', utils.lookup(result, 'billingItem', 'id')])
     table.add_row(['recurringFee', utils.lookup(result, 'billingItem', 'recurringFee')])
     table.add_row(['Total', utils.lookup(result, 'billingItem', 'nextInvoiceTotalRecurringAmount')])
     table.add_row(['provisionDate', utils.lookup(result, 'billingItem', 'provisionDate')])
