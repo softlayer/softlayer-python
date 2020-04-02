@@ -216,6 +216,56 @@ class VirtTests(testing.TestCase):
             '-',
         )
 
+    def test_detail_drives_system(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getBlockDevices')
+        mock.return_value = [
+            {
+                "createDate": "2018-10-06T04:27:35-06:00",
+                "device": "0",
+                "id": 11111,
+                "mountType": "Disk",
+                "diskImage": {
+                    "capacity": 100,
+                    "description": "adns.vmware.com",
+                    "id": 72222,
+                    "name": "adns.vmware.com",
+                    "units": "GB",
+                }
+            }
+        ]
+        result = self.run_command(['vs', 'detail', '100'])
+
+        self.assert_no_fail(result)
+        output = json.loads(result.output)
+        self.assertEqual(output['drives'][0]['Capacity'], '100 GB')
+        self.assertEqual(output['drives'][0]['Name'], 'Disk')
+        self.assertEqual(output['drives'][0]['Type'], 'System')
+
+    def test_detail_drives_swap(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getBlockDevices')
+        mock.return_value = [
+            {
+                "device": "1",
+                "id": 22222,
+                "mountType": "Disk",
+                "statusId": 1,
+                "diskImage": {
+                    "capacity": 2,
+                    "description": "6211111-SWAP",
+                    "id": 33333,
+                    "name": "6211111-SWAP",
+                    "units": "GB",
+                }
+            }
+        ]
+        result = self.run_command(['vs', 'detail', '100'])
+
+        self.assert_no_fail(result)
+        output = json.loads(result.output)
+        self.assertEqual(output['drives'][0]['Capacity'], '2 GB')
+        self.assertEqual(output['drives'][0]['Name'], 'Disk')
+        self.assertEqual(output['drives'][0]['Type'], 'Swap')
+
     def test_detail_vs_dedicated_host_not_found(self):
         ex = SoftLayerAPIError('SoftLayer_Exception', 'Not found')
         mock = self.set_mock('SoftLayer_Virtual_DedicatedHost', 'getObject')
