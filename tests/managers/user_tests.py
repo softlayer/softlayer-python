@@ -9,7 +9,6 @@ import SoftLayer
 from SoftLayer import exceptions
 from SoftLayer import testing
 
-
 real_datetime_class = datetime.datetime
 
 
@@ -18,6 +17,7 @@ def mock_datetime(target, datetime_module):
 
     https://solidgeargroup.com/mocking-the-time
     """
+
     class DatetimeSubclassMeta(type):
         @classmethod
         def __instancecheck__(mcs, obj):
@@ -106,7 +106,6 @@ class UserManagerTests(testing.TestCase):
     def test_get_events_default(self):
         target = datetime.datetime(2018, 5, 15)
         with mock_datetime(target, datetime):
-
             self.manager.get_events(1234)
             expected_filter = {
                 'userId': {
@@ -221,3 +220,20 @@ class UserManagerTests(testing.TestCase):
             self.assertEqual(ex.args[0], "Your request for a new user was received, but it needs to be processed by "
                                          "the Platform Services API first. Barring any errors on the Platform Services "
                                          "side, your new user should be created shortly.")
+
+    # def test_list_user_filter(self):
+    #     test_filter = {'id': {'operation': 1234}}
+    #     self.manager.list_users(objectfilter=test_filter)
+    #     self.assert_called_with('SoftLayer_Account', 'getUsers', filter=test_filter)
+
+    def test_vpn_manual(self):
+        self.manager.vpn_manual(1234, True)
+        self.assert_called_with('SoftLayer_User_Customer', 'editObject', identifier=1234)
+
+    def test_vpn_subnet_add(self):
+        self.manager.vpn_subnet_add(1234, [1234])
+        self.assert_called_with('SoftLayer_Network_Service_Vpn_Overrides', 'createObjects')
+
+    def test_vpn_subnet_remove(self):
+        self.manager.vpn_subnet_remove(1234, [1234])
+        self.assert_called_with('SoftLayer_Network_Service_Vpn_Overrides', 'deleteObjects')

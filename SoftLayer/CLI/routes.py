@@ -191,10 +191,8 @@ ALL_ROUTES = [
     ('loadbal:order-options', 'SoftLayer.CLI.loadbal.order:order_options'),
     ('loadbal:cancel', 'SoftLayer.CLI.loadbal.order:cancel'),
 
-
     ('loadbal:ns-detail', 'SoftLayer.CLI.loadbal.ns_detail:cli'),
     ('loadbal:ns-list', 'SoftLayer.CLI.loadbal.ns_list:cli'),
-
 
     ('metadata', 'SoftLayer.CLI.metadata:cli'),
 
@@ -305,6 +303,7 @@ ALL_ROUTES = [
     ('user:create', 'SoftLayer.CLI.user.create:cli'),
     ('user:delete', 'SoftLayer.CLI.user.delete:cli'),
     ('user:vpn-manual', 'SoftLayer.CLI.user.vpn_manual:cli'),
+    ('user:vpn-subnet', 'SoftLayer.CLI.user.vpn_subnet:cli'),
 
     ('vlan', 'SoftLayer.CLI.vlan'),
     ('vlan:detail', 'SoftLayer.CLI.vlan.detail:cli'),

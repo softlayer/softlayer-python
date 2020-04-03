@@ -285,3 +285,23 @@ class UserCLITests(testing.TestCase):
         mock.return_value = False
         result = self.run_command(['user', 'vpn-manual', '12345', '--enable'])
         self.assert_no_fail(result)
+
+    """User vpn subnet tests"""
+
+    @mock.patch('SoftLayer.CLI.user.vpn_subnet.click')
+    def test_vpn_subnet_add(self, click):
+        result = self.run_command(['user', 'vpn-subnet', '12345', '--add', '1234'])
+        click.secho.assert_called_with('12345 updated successfully', fg='green')
+        self.assert_no_fail(result)
+
+    def test_vpn_subnet_add_fail(self):
+        mock = self.set_mock('SoftLayer_Network_Service_Vpn_Overrides', 'createObjects')
+        mock.return_value = False
+        result = self.run_command(['user', 'vpn-subnet', '12345', '--add', '1234'])
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.user.vpn_subnet.click')
+    def test_vpn_subnet_remove(self, click):
+        result = self.run_command(['user', 'vpn-subnet', '12345', '--remove', '1234'])
+        click.secho.assert_called_with('12345 updated successfully', fg='green')
+        self.assert_no_fail(result)
