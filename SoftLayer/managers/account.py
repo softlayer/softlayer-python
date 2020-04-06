@@ -139,3 +139,61 @@ class AccountManager(utils.IdentifierMixin, object):
             iter=True,
             limit=100
         )
+
+    def get_account_billing_items(self, mask=None):
+        """Gets all the topLevelBillingItems currently active on the account
+
+        :param string mask: Object Mask
+        :return: Billing_Item
+        """
+
+        if mask is None:
+            mask = """mask[
+                orderItem[id,order[id,userRecord[id,email,displayName,userStatus]]],
+                nextInvoiceTotalRecurringAmount,
+                location, hourlyFlag
+            ]"""
+
+        object_filter = {
+            "allTopLevelBillingItems": {
+                "cancellationDate": {
+                    "operation": "is null"
+                },
+                "createDate": utils.query_filter_orderby()
+            }
+        }
+
+        return self.client.call('Account', 'getAllTopLevelBillingItems',
+                                mask=mask, filter=object_filter, iter=True, limit=100)
+
+    def get_billing_item(self, identifier, mask=None):
+        """Gets details about a billing item
+
+        :param int identifier Billing_Item id
+        :param string mask: Object mask to use.
+        :return: Billing_Item
+        """
+
+        if mask is None:
+            mask = """mask[
+                orderItem[id,order[id,userRecord[id,email,displayName,userStatus]]],
+                nextInvoiceTotalRecurringAmount,
+                location, hourlyFlag, children
+            ]"""
+
+        return self.client.call('Billing_Item', 'getObject', id=identifier, mask=mask)
+
+    def cancel_item(self, identifier, reason="No longer needed", note=None):
+        """Cancels a specific billing item with a reason
+
+        :param int identifier: Billing_Item id
+        :param string reason: A cancellation reason
+        :param string note: Custom note to set when cancelling. Defaults to information about who canceled the item.
+        :return: bool
+        """
+
+        if note is None:
+            user = self.client.call('Account', 'getCurrentUser', mask="mask[id,displayName,email,username]")
+            note = "Cancelled by {} with the SLCLI".format(user.get('username'))
+
+        return self.client.call('Billing_Item', 'cancelItem', False, True, reason, note, id=identifier)
