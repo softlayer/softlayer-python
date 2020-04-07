@@ -226,7 +226,6 @@ ALL_ROUTES = [
     ('rwhois', 'SoftLayer.CLI.rwhois'),
     ('rwhois:edit', 'SoftLayer.CLI.rwhois.edit:cli'),
     ('rwhois:show', 'SoftLayer.CLI.rwhois.show:cli'),
-    ('rwhois:sho1w', 'SoftLayer.CLI.rwhois.show1:cli'),
 
     ('hardware', 'SoftLayer.CLI.hardware'),
     ('hardware:bandwidth', 'SoftLayer.CLI.hardware.bandwidth:cli'),
