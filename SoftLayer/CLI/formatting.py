@@ -62,7 +62,6 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
 
     # responds to .separator
     if hasattr(data, 'separator'):
-        print("THERE IS A SEPARATOR |{}|".format(data.separator))
         output = [format_output(d, fmt=fmt) for d in data if d]
         return str(SequentialOutput(data.separator, output))
 
