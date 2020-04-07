@@ -26,3 +26,7 @@ Disk Image Commands
 .. click:: SoftLayer.CLI.image.export:cli
     :prog: image export
     :show-nested:
+
+.. click:: SoftLayer.CLI.image.datacenter:cli
+    :prog: image datacenter
+    :show-nested:
