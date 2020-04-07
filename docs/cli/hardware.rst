@@ -36,6 +36,10 @@ Provides some basic functionality to order a server. `slcli order` has a more fu
    :prog: hw detail
    :show-nested:
 
+.. click:: SoftLayer.CLI.hardware.billing:cli
+   :prog: hw billing
+   :show-nested:
+
 
 .. click:: SoftLayer.CLI.hardware.edit:cli
    :prog: hw edit
