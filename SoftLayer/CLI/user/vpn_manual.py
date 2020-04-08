@@ -1,4 +1,4 @@
-"""List Users."""
+"""Enable or Disable vpn subnets manual config for a user."""
 # :license: MIT, see LICENSE for more details.
 
 
@@ -12,7 +12,7 @@ from SoftLayer.CLI import helpers
 @click.command()
 @click.argument('user')
 @click.option('--enable/--disable', default=True,
-              help="Whether enable or disable vpnManualConfig flag.")
+              help="Enable or disable vpn subnets manual config.")
 @environment.pass_env
 def cli(env, user, enable):
     """Enable or disable user vpn subnets manual config"""

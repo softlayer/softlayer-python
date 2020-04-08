@@ -1,4 +1,4 @@
-"""List Users."""
+"""Add or remove specific subnets access for a user."""
 # :license: MIT, see LICENSE for more details.
 
 
