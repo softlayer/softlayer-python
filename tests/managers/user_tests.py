@@ -221,19 +221,28 @@ class UserManagerTests(testing.TestCase):
                                          "the Platform Services API first. Barring any errors on the Platform Services "
                                          "side, your new user should be created shortly.")
 
-    # def test_list_user_filter(self):
-    #     test_filter = {'id': {'operation': 1234}}
-    #     self.manager.list_users(objectfilter=test_filter)
-    #     self.assert_called_with('SoftLayer_Account', 'getUsers', filter=test_filter)
-
     def test_vpn_manual(self):
-        self.manager.vpn_manual(1234, True)
-        self.assert_called_with('SoftLayer_User_Customer', 'editObject', identifier=1234)
+        user_id = 1234
+        self.manager.vpn_manual(user_id, True)
+        self.assert_called_with('SoftLayer_User_Customer', 'editObject', identifier=user_id)
 
     def test_vpn_subnet_add(self):
-        self.manager.vpn_subnet_add(1234, [1234])
-        self.assert_called_with('SoftLayer_Network_Service_Vpn_Overrides', 'createObjects')
+        user_id = 1234
+        subnet_id = 1234
+        expected_args = (
+            [{"userId": user_id, "subnetId": subnet_id}],
+            )
+        self.manager.vpn_subnet_add(user_id, [subnet_id])
+        self.assert_called_with('SoftLayer_Network_Service_Vpn_Overrides', 'createObjects', args=expected_args)
+        self.assert_called_with('SoftLayer_User_Customer', 'updateVpnUser', identifier=user_id)
 
     def test_vpn_subnet_remove(self):
-        self.manager.vpn_subnet_remove(1234, [1234])
-        self.assert_called_with('SoftLayer_Network_Service_Vpn_Overrides', 'deleteObjects')
+        user_id = 1234
+        subnet_id = 1234
+        overrides = [{'id': 3661234, 'subnetId': subnet_id}]
+        expected_args = (
+            overrides,
+            )
+        self.manager.vpn_subnet_remove(user_id, [subnet_id])
+        self.assert_called_with('SoftLayer_Network_Service_Vpn_Overrides', 'deleteObjects', args=expected_args)
+        self.assert_called_with('SoftLayer_User_Customer', 'updateVpnUser', identifier=user_id)
