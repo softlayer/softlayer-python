@@ -744,15 +744,18 @@ class VirtTests(testing.TestCase):
     def test_billing(self):
         result = self.run_command(['vs', 'billing', '123456'])
         vir_billing = {
-            "BillingIttem": 6327,
-            "Total": 1.54,
-            "VirtuallId": "123456",
-            "prices": [{"Recurring Price": 1},
-                       {"Recurring Price": 1},
-                       {"Recurring Price": 1},
-                       {"Recurring Price": 1},
-                       {"Recurring Price": 1}],
-            "provisionDate": None,
-            "recurringFee": None}
+            'Billing Item Id': 6327,
+            'Id': '123456',
+            'Provision Date': None,
+            'Recurring Fee': None,
+            'Total': 1.54,
+            'prices': [
+                {'Recurring Price': 1},
+                {'Recurring Price': 1},
+                {'Recurring Price': 1},
+                {'Recurring Price': 1},
+                {'Recurring Price': 1}
+            ]
+        }
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output), vir_billing)

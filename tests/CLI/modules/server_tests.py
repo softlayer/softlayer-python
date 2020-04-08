@@ -830,18 +830,15 @@ class ServerCLITests(testing.TestCase):
     def test_billing(self):
         result = self.run_command(['hw', 'billing', '123456'])
         billing_json = {
-            "hardwareId": "123456",
-            "BillingIttem": 6327,
-            "recurringFee": 1.54,
-            "Total": 16.08,
-            "provisionDate": None,
-            "prices": [
-                {
-                    "Item": "test",
-                    "Recurring Price": 1
-                }
-            ]
+            'Billing Item Id': 6327,
+            'Id': '123456',
+            'Provision Date': None,
+            'Recurring Fee': 1.54,
+            'Total': 16.08,
+            'prices': [{
+                'Item': 'test',
+                'Recurring Price': 1
+            }]
         }
-
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output), billing_json)
