@@ -285,7 +285,10 @@ class UserManager(utils.IdentifierMixin, object):
         """
         overrides = [{"userId": user_id, "subnetId": subnet_id} for subnet_id in subnet_ids]
         return_value = self.override_service.createObjects(overrides)
-        return return_value and self.user_service.updateVpnUser(id=user_id)
+        update_success = self.user_service.updateVpnUser(id=user_id)
+        if not update_success:
+            raise exceptions.SoftLayerAPIError("Overrides created, but unable to update VPN user")
+        return return_value
 
     def vpn_subnet_remove(self, user_id, subnet_ids):
         """Remove subnets for a user.
@@ -295,7 +298,10 @@ class UserManager(utils.IdentifierMixin, object):
         """
         overrides = self.get_overrides_list(user_id, subnet_ids)
         return_value = self.override_service.deleteObjects(overrides)
-        return return_value and self.user_service.updateVpnUser(id=user_id)
+        update_success = self.user_service.updateVpnUser(id=user_id)
+        if not update_success:
+            raise exceptions.SoftLayerAPIError("Overrides deleted, but unable to update VPN user")
+        return return_value
 
     def get_overrides_list(self, user_id, subnet_ids):
         """Converts a list of subnets to a list of overrides.
