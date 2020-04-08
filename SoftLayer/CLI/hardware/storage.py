@@ -45,13 +45,13 @@ def cli(env, identifier):
 
     table_hard_drives = formatting.Table(['Type', 'Name', 'Capacity', 'Serial #'], title="Other storage details")
     for drives in hard_drives:
-        type = drives['hardwareComponentModel']['hardwareGenericComponentModel']['hardwareComponentType']['type']
+        type_drive = drives['hardwareComponentModel']['hardwareGenericComponentModel']['hardwareComponentType']['type']
         name = drives['hardwareComponentModel']['manufacturer'] + " " + drives['hardwareComponentModel']['name']
         capacity = str(drives['hardwareComponentModel']['hardwareGenericComponentModel']['capacity']) + " " + str(
             drives['hardwareComponentModel']['hardwareGenericComponentModel']['units'])
         serial = drives['serialNumber']
 
-        table_hard_drives.add_row([type, name, capacity, serial])
+        table_hard_drives.add_row([type_drive, name, capacity, serial])
 
     env.fout(table_credentials)
     env.fout(table_iscsi)
