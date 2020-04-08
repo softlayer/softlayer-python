@@ -245,6 +245,9 @@ If no timezone is specified, IMS local time (CST) will be assumed, which might n
    :prog: vs usage
    :show-nested:
 
+.. click:: SoftLayer.CLI.virt.storage:cli
+   :prog: vs storage
+   :show-nested:
 
 
 
