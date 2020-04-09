@@ -34,6 +34,7 @@ class UserManager(utils.IdentifierMixin, object):
     def __init__(self, client):
         self.client = client
         self.user_service = self.client['SoftLayer_User_Customer']
+        self.override_service = self.client['Network_Service_Vpn_Overrides']
         self.account_service = self.client['SoftLayer_Account']
         self.resolvers = [self._get_id_from_username]
         self.all_permissions = None
@@ -266,6 +267,66 @@ class UserManager(utils.IdentifierMixin, object):
         :param int user_id: User to add API key to
         """
         return self.user_service.addApiAuthenticationKey(id=user_id)
+
+    def vpn_manual(self, user_id, value):
+        """Enable or disable the manual config of subnets.
+
+        :param int user_id: User to edit.
+        :param bool value: Value for vpnManualConfig flag.
+        """
+        user_object = {'vpnManualConfig': value}
+        return self.edit_user(user_id, user_object)
+
+    def vpn_subnet_add(self, user_id, subnet_ids):
+        """Add subnets for a user.
+
+        :param int user_id: User to edit.
+        :param list subnet_ids: list of subnet Ids.
+        """
+        overrides = [{"userId": user_id, "subnetId": subnet_id} for subnet_id in subnet_ids]
+        return_value = self.override_service.createObjects(overrides)
+        update_success = self.user_service.updateVpnUser(id=user_id)
+        if not update_success:
+            raise exceptions.SoftLayerAPIError("Overrides created, but unable to update VPN user")
+        return return_value
+
+    def vpn_subnet_remove(self, user_id, subnet_ids):
+        """Remove subnets for a user.
+
+        :param int user_id: User to edit.
+        :param list subnet_ids: list of subnet Ids.
+        """
+        overrides = self.get_overrides_list(user_id, subnet_ids)
+        return_value = self.override_service.deleteObjects(overrides)
+        update_success = self.user_service.updateVpnUser(id=user_id)
+        if not update_success:
+            raise exceptions.SoftLayerAPIError("Overrides deleted, but unable to update VPN user")
+        return return_value
+
+    def get_overrides_list(self, user_id, subnet_ids):
+        """Converts a list of subnets to a list of overrides.
+
+        :param int user_id: The ID of the user.
+        :param list subnet_ids: A list of subnets.
+        :returns: A list of overrides associated with the given subnets.
+        """
+
+        overrides_list = []
+        matching_overrides = {}
+        output_error = "Subnet {} does not exist in the subnets assigned for user {}"
+        _mask = 'mask[id,subnetId]'
+        overrides = self.user_service.getOverrides(id=user_id, mask=_mask)
+        for subnet in subnet_ids:
+            for override in overrides:
+                if int(subnet) == override.get('subnetId'):
+                    matching_overrides = override
+                    break
+            if matching_overrides.get('subnetId') is None:
+                raise exceptions.SoftLayerError(output_error.format(subnet, user_id))
+
+            overrides_list.append(matching_overrides)
+
+        return overrides_list
 
 
 def _keyname_search(haystack, needle):
