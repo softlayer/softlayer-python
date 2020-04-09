@@ -245,6 +245,10 @@ If no timezone is specified, IMS local time (CST) will be assumed, which might n
    :prog: virtual usage
    :show-nested:
 
+.. click:: SoftLayer.CLI.virt.billing:cli
+   :prog: vs billing
+   :show-nested:
+
 
 .. click:: SoftLayer.CLI.virt.detail:cli
    :prog: virtual detail

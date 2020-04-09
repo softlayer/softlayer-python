@@ -23,6 +23,7 @@ ALL_ROUTES = [
 
     ('virtual', 'SoftLayer.CLI.virt'),
     ('virtual:bandwidth', 'SoftLayer.CLI.virt.bandwidth:cli'),
+    ('virtual:billing', 'SoftLayer.CLI.virt.billing:cli'),
     ('virtual:cancel', 'SoftLayer.CLI.virt.cancel:cli'),
     ('virtual:capture', 'SoftLayer.CLI.virt.capture:cli'),
     ('virtual:create', 'SoftLayer.CLI.virt.create:cli'),
@@ -232,6 +233,7 @@ ALL_ROUTES = [
     ('hardware:create', 'SoftLayer.CLI.hardware.create:cli'),
     ('hardware:create-options', 'SoftLayer.CLI.hardware.create_options:cli'),
     ('hardware:detail', 'SoftLayer.CLI.hardware.detail:cli'),
+    ('hardware:billing', 'SoftLayer.CLI.hardware.billing:cli'),
     ('hardware:edit', 'SoftLayer.CLI.hardware.edit:cli'),
     ('hardware:list', 'SoftLayer.CLI.hardware.list:cli'),
     ('hardware:power-cycle', 'SoftLayer.CLI.hardware.power:power_cycle'),
