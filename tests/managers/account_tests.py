@@ -52,3 +52,43 @@ class AccountManagerTests(testing.TestCase):
     def test_get_billing_items(self):
         self.manager.get_billing_items(12345)
         self.assert_called_with('SoftLayer_Billing_Invoice', 'getInvoiceTopLevelItems')
+
+    def test_get_account_billing_items(self):
+        self.manager.get_account_billing_items()
+        object_filter = {
+            "allTopLevelBillingItems": {
+                "cancellationDate": {
+                    "operation": "is null"
+                },
+                "createDate": {
+                    'operation': 'orderBy',
+                    'options': [{
+                        'name': 'sort',
+                        'value': ['ASC']
+                    }]
+                }
+            }
+        }
+
+        self.assert_called_with('SoftLayer_Account', 'getAllTopLevelBillingItems',
+                                offset=0, limit=100, filter=object_filter)
+        self.manager.get_account_billing_items(mask="id")
+        self.assert_called_with('SoftLayer_Account', 'getAllTopLevelBillingItems', mask="mask[id]")
+
+    def test_get_billing_item(self):
+        self.manager.get_billing_item(12345)
+        self.assert_called_with('SoftLayer_Billing_Item', 'getObject', identifier=12345)
+        self.manager.get_billing_item(12345, mask="id")
+        self.assert_called_with('SoftLayer_Billing_Item', 'getObject', identifier=12345, mask="mask[id]")
+
+    def test_cancel_item(self):
+        self.manager.cancel_item(12345)
+        reason = "No longer needed"
+        note = "Cancelled by testAccount with the SLCLI"
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
+                                args=(False, True, reason, note), identifier=12345)
+        reason = "TEST"
+        note = "note test"
+        self.manager.cancel_item(12345, reason, note)
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
+                                args=(False, True, reason, note), identifier=12345)

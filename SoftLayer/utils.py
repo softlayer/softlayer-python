@@ -121,6 +121,21 @@ def query_filter_date(start, end):
     }
 
 
+def query_filter_orderby(sort="ASC"):
+    """Returns an object filter operation for sorting
+
+    :param string sort: either ASC or DESC
+    """
+    _filter = {
+        "operation": "orderBy",
+        "options": [{
+            "name": "sort",
+            "value": [sort]
+        }]
+    }
+    return _filter
+
+
 def format_event_log_date(date_string, utc):
     """Gets a date in the format that the SoftLayer_EventLog object likes.
 
@@ -305,7 +320,12 @@ def clean_time(sltime, in_format='%Y-%m-%dT%H:%M:%S%z', out_format='%Y-%m-%d %H:
         clean = datetime.datetime.strptime(sltime, in_format)
         return clean.strftime(out_format)
     # The %z option only exists with py3.6+
-    except ValueError:
+    except ValueError as e:
+        # Just ignore data that in_format didn't process.
+        ulr = len(e.args[0].partition('unconverted data remains: ')[2])
+        if ulr:
+            clean = datetime.datetime.strptime(sltime[:-ulr], in_format)
+            return clean.strftime(out_format)
         return sltime
 
 
@@ -334,3 +354,17 @@ def days_to_datetime(days):
         date -= datetime.timedelta(days=days)
 
     return date
+
+
+def trim_to(string, length=80, tail="..."):
+    """Returns a string that is length long. tail added if trimmed
+
+    :param string string: String you want to trim
+    :param int length: max length for the string
+    :param string tail: appended to strings that were trimmed.
+    """
+
+    if len(string) > length:
+        return string[:length] + tail
+    else:
+        return string

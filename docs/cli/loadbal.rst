@@ -23,7 +23,7 @@ LBaaS Commands
    :prog: loadbal member-add
    :show-nested:
 .. click:: SoftLayer.CLI.loadbal.members:remove
-   :prog: loadbal member-remove
+   :prog: loadbal member-del
    :show-nested:
 .. click:: SoftLayer.CLI.loadbal.pools:add
    :prog: loadbal pool-add
@@ -32,7 +32,7 @@ LBaaS Commands
    :prog: loadbal pool-edit
    :show-nested:
 .. click:: SoftLayer.CLI.loadbal.pools:delete
-   :prog: loadbal pool-delete
+   :prog: loadbal pool-del
    :show-nested:
 .. click:: SoftLayer.CLI.loadbal.pools:l7pool_add
    :prog: loadbal l7pool-add

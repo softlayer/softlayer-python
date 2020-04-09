@@ -130,3 +130,11 @@ Block Commands
 .. click:: SoftLayer.CLI.block.subnets.remove:cli
     :prog: block subnets-remove
     :show-nested:
+
+.. click:: SoftLayer.CLI.block.refresh:cli
+    :prog: block volume-refresh
+    :show-nested:
+
+.. click:: SoftLayer.CLI.block.convert:cli
+    :prog: block volume-convert
+    :show-nested:
