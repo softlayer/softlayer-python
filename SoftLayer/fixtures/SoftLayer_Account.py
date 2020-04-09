@@ -853,6 +853,22 @@ getScaleGroups = [
     }
 ]
 
+
+getPortableStorageVolumes = [
+    {
+        "capacity": 200,
+        "createDate": "2018-10-06T04:27:59-06:00",
+        "description": "Disk 2",
+        "id": 11111,
+        "modifyDate": "",
+        "name": "Disk 2",
+        "parentId": "",
+        "storageRepositoryId": 22222,
+        "typeId": 241,
+        "units": "GB",
+        "uuid": "fd477feb-bf32-408e-882f-02540gghgh111"
+    }
+]
 getAllTopLevelBillingItems = [
     {
         "allowCancellationFlag": 1,

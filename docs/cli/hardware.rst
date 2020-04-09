@@ -109,3 +109,7 @@ This function updates the firmware of a server. If already at the latest version
 .. click:: SoftLayer.CLI.hardware.dns:cli
    :prog: hardware dns-sync
    :show-nested:
+
+.. click:: SoftLayer.CLI.hardware.storage:cli
+   :prog: hw storage
+   :show-nested:

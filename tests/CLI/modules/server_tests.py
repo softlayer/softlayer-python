@@ -139,6 +139,39 @@ class ServerCLITests(testing.TestCase):
             '-',
         )
 
+    def test_detail_drives(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getHardDrives')
+        mock.return_value = [
+            {
+                "id": 11111,
+                "serialNumber": "z1w4sdf",
+                "hardwareComponentModel": {
+                    "capacity": "1000",
+                    "description": "SATAIII:2000:8300:Constellation",
+                    "id": 111,
+                    "manufacturer": "Seagate",
+                    "name": "Constellation ES",
+                    "hardwareGenericComponentModel": {
+                        "capacity": "1000",
+                        "units": "GB",
+                        "hardwareComponentType": {
+                            "id": 1,
+                            "keyName": "HARD_DRIVE",
+                            "type": "Hard Drive",
+                            "typeParentId": 5
+                        }
+                    }
+                }
+            }
+        ]
+        result = self.run_command(['server', 'detail', '100'])
+
+        self.assert_no_fail(result)
+        output = json.loads(result.output)
+        self.assertEqual(output['drives'][0]['Capacity'], '1000 GB')
+        self.assertEqual(output['drives'][0]['Name'], 'Seagate Constellation ES')
+        self.assertEqual(output['drives'][0]['Serial #'], 'z1w4sdf')
+
     def test_list_servers(self):
         result = self.run_command(['server', 'list', '--tag=openstack'])
 
@@ -826,6 +859,12 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['hw', 'dns-sync', '-a', '1000'])
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    def test_hardware_storage(self):
+        result = self.run_command(
+            ['hw', 'storage', '100'])
+
+        self.assert_no_fail(result)
 
     def test_billing(self):
         result = self.run_command(['hw', 'billing', '123456'])

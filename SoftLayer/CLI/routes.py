@@ -40,6 +40,7 @@ ALL_ROUTES = [
     ('virtual:ready', 'SoftLayer.CLI.virt.ready:cli'),
     ('virtual:reboot', 'SoftLayer.CLI.virt.power:reboot'),
     ('virtual:reload', 'SoftLayer.CLI.virt.reload:cli'),
+    ('virtual:storage', 'SoftLayer.CLI.virt.storage:cli'),
     ('virtual:upgrade', 'SoftLayer.CLI.virt.upgrade:cli'),
     ('virtual:usage', 'SoftLayer.CLI.virt.usage:cli'),
     ('virtual:credentials', 'SoftLayer.CLI.virt.credentials:cli'),
@@ -248,6 +249,7 @@ ALL_ROUTES = [
     ('hardware:ready', 'SoftLayer.CLI.hardware.ready:cli'),
     ('hardware:toggle-ipmi', 'SoftLayer.CLI.hardware.toggle_ipmi:cli'),
     ('hardware:dns-sync', 'SoftLayer.CLI.hardware.dns:cli'),
+    ('hardware:storage', 'SoftLayer.CLI.hardware.storage:cli'),
 
     ('securitygroup', 'SoftLayer.CLI.securitygroup'),
     ('securitygroup:list', 'SoftLayer.CLI.securitygroup.list:cli'),

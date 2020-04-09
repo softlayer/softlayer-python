@@ -702,6 +702,31 @@ class HardwareManager(utils.IdentifierMixin, object):
             return {'allotment': allotment.get('allocation'), 'usage': usage}
         return {'allotment': allotment, 'usage': usage}
 
+    def get_storage_details(self, instance_id, nas_type):
+        """Returns the hardware server attached network storage.
+
+        :param int instance_id: Id of the hardware server
+        :param nas_type: storage type.
+        """
+        mask = 'mask[id,username,capacityGb,notes,serviceResourceBackendIpAddress,' \
+               'allowedHardware[id,datacenter]]'
+        return self.hardware.getAttachedNetworkStorages(nas_type, mask=mask, id=instance_id)
+
+    def get_storage_credentials(self, instance_id):
+        """Returns the hardware server storage credentials.
+
+        :param int instance_id: Id of the hardware server
+        """
+        mask = 'mask[credential]'
+        return self.hardware.getAllowedHost(mask=mask, id=instance_id)
+
+    def get_hard_drives(self, instance_id):
+        """Returns the hardware server hard drives.
+
+        :param int instance_id: Id of the hardware server
+        """
+        return self.hardware.getHardDrives(id=instance_id)
+
 
 def _get_extra_price_id(items, key_name, hourly, location):
     """Returns a price id attached to item with the given key_name."""
