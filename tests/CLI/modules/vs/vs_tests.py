@@ -370,19 +370,19 @@ class VirtTests(testing.TestCase):
                                            'getResourceRecords')
         getResourceRecords.return_value = []
         createAargs = ({
-            'type': 'a',
-            'host': 'vs-test1',
-            'domainId': 12345,  # from SoftLayer_Account::getDomains
-            'data': '172.16.240.2',
-            'ttl': 7200
-        },)
+                           'type': 'a',
+                           'host': 'vs-test1',
+                           'domainId': 12345,  # from SoftLayer_Account::getDomains
+                           'data': '172.16.240.2',
+                           'ttl': 7200
+                       },)
         createPTRargs = ({
-            'type': 'ptr',
-            'host': '2',
-            'domainId': 123456,
-            'data': 'vs-test1.test.sftlyr.ws',
-            'ttl': 7200
-        },)
+                             'type': 'ptr',
+                             'host': '2',
+                             'domainId': 123456,
+                             'data': 'vs-test1.test.sftlyr.ws',
+                             'ttl': 7200
+                         },)
 
         result = self.run_command(['vs', 'dns-sync', '100'])
 
@@ -425,12 +425,12 @@ class VirtTests(testing.TestCase):
             }
         }
         createV6args = ({
-            'type': 'aaaa',
-            'host': 'vs-test1',
-            'domainId': 12345,
-            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
-            'ttl': 7200
-        },)
+                            'type': 'aaaa',
+                            'host': 'vs-test1',
+                            'domainId': 12345,
+                            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
+                            'ttl': 7200
+                        },)
         guest.return_value = test_guest
         result = self.run_command(['vs', 'dns-sync', '--aaaa-record', '100'])
         self.assert_no_fail(result)
@@ -796,3 +796,22 @@ class VirtTests(testing.TestCase):
             ['vs', 'storage', '100'])
 
         self.assert_no_fail(result)
+
+    def test_billing(self):
+        result = self.run_command(['vs', 'billing', '123456'])
+        vir_billing = {
+            'Billing Item Id': 6327,
+            'Id': '123456',
+            'Provision Date': None,
+            'Recurring Fee': None,
+            'Total': 1.54,
+            'prices': [
+                {'Recurring Price': 1},
+                {'Recurring Price': 1},
+                {'Recurring Price': 1},
+                {'Recurring Price': 1},
+                {'Recurring Price': 1}
+            ]
+        }
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output), vir_billing)

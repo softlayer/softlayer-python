@@ -417,7 +417,7 @@ getOpenTickets = [ticket for ticket in getTickets
 getClosedTickets = [ticket for ticket in getTickets
                     if ticket['statusId'] == 1002]
 
-getCurrentUser = {'id': 12345,
+getCurrentUser = {'id': 12345, 'username': 'testAccount',
                   'apiAuthenticationKeys': [{'authenticationKey': 'A' * 64}]}
 
 getCdnAccounts = [
@@ -853,6 +853,7 @@ getScaleGroups = [
     }
 ]
 
+
 getPortableStorageVolumes = [
     {
         "capacity": 200,
@@ -866,5 +867,92 @@ getPortableStorageVolumes = [
         "typeId": 241,
         "units": "GB",
         "uuid": "fd477feb-bf32-408e-882f-02540gghgh111"
+    }
+]
+getAllTopLevelBillingItems = [
+    {
+        "allowCancellationFlag": 1,
+        "cancellationDate": "None",
+        "categoryCode": "server",
+        "createDate": "2015-05-28T09:53:41-06:00",
+        "cycleStartDate": "2020-04-03T23:12:04-06:00",
+        "description": "Dual E5-2690 v3 (12 Cores, 2.60 GHz)",
+        "domainName": "sl-netbase.com",
+        "hostName": "testsangeles101",
+        "id": 53891943,
+        "lastBillDate": "2020-04-03T23:12:04-06:00",
+        "modifyDate": "2020-04-03T23:12:07-06:00",
+        "nextBillDate": "2020-05-03T23:00:00-06:00",
+        "orderItemId": 68626055,
+        "parentId": "None",
+        "recurringFee": "1000",
+        "recurringFeeTaxRate": "0",
+        "recurringMonths": 1,
+        "hourlyFlag": False,
+        "location": {
+            "id": 265592,
+            "longName": "Amsterdam 1",
+            "name": "ams01",
+            "statusId": 2
+        },
+        "nextInvoiceTotalRecurringAmount": 0,
+        "orderItem": {
+            "id": 68626055,
+            "order": {
+                "id": 4544893,
+                "userRecord": {
+                    "displayName": "TEst",
+                    "email": "test@us.ibm.com",
+                    "id": 167758,
+                    "userStatus": {
+                        "id": 1001,
+                        "keyName": "CANCEL_PENDING",
+                        "name": "Cancel Pending"
+                    }
+                }
+            }
+        },
+        "resourceTableId": 544444
+    },
+    {
+        "allowCancellationFlag": 1,
+        "cancellationDate": "None",
+        "categoryCode": "server",
+        "createDate": "2015-05-28T09:56:44-06:00",
+        "cycleStartDate": "2020-04-03T23:12:05-06:00",
+        "description": "Dual E5-2690 v3 (12 Cores, 2.60 GHz)",
+        "domainName": "sl-netbase.com",
+        "hostName": "testsangeles101",
+        "id": 53892197,
+        "lastBillDate": "2020-04-03T23:12:05-06:00",
+        "modifyDate": "2020-04-03T23:12:07-06:00",
+        "nextBillDate": "2020-05-03T23:00:00-06:00",
+        "orderItemId": 68626801,
+        "recurringFee": "22220",
+        "hourlyFlag": False,
+        "location": {
+            "id": 265592,
+            "longName": "Amsterdam 1",
+            "name": "ams01",
+            "statusId": 2
+        },
+        "nextInvoiceTotalRecurringAmount": 0,
+        "orderItem": {
+            "id": 68626801,
+            "order": {
+                "id": 4545911,
+                "userRecord": {
+                    "displayName": "Test",
+                    "email": "test@us.ibm.com",
+                    "id": 167758,
+                    "userStatus": {
+                        "id": 1001,
+                        "keyName": "ACTIVE",
+                        "name": "Active"
+                    }
+                }
+            }
+        },
+        "resourceTableId": 777777
     }
 ]
