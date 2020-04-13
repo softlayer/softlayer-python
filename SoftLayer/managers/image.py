@@ -6,6 +6,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
+from SoftLayer import exceptions
 from SoftLayer import utils
 
 IMAGE_MASK = ('id,accountId,name,globalIdentifier,blockDevices,parentId,'
@@ -187,3 +188,52 @@ class ImageManager(utils.IdentifierMixin, object):
             }, id=image_id)
         else:
             return self.vgbdtg.copyToExternalSource({'uri': uri}, id=image_id)
+
+    def add_locations(self, image_id, location_names):
+        """Add available locations to an archive image template.
+
+        :param int image_id: The ID of the image
+        :param location_names: Locations for the Image.
+        """
+        locations = self.get_locations_list(image_id, location_names)
+        return self.vgbdtg.addLocations(locations, id=image_id)
+
+    def remove_locations(self, image_id, location_names):
+        """Remove available locations from an archive image template.
+
+        :param int image_id: The ID of the image
+        :param location_names: Locations for the Image.
+        """
+        locations = self.get_locations_list(image_id, location_names)
+        return self.vgbdtg.removeLocations(locations, id=image_id)
+
+    def get_storage_locations(self, image_id):
+        """Get available locations for public image storage.
+
+        :param int image_id: The ID of the image
+        """
+        return self.vgbdtg.getStorageLocations(id=image_id)
+
+    def get_locations_list(self, image_id, location_names):
+        """Converts a list of location names to a list of locations.
+
+        :param int image_id: The ID of the image.
+        :param list location_names: A list of location names strings.
+        :returns: A list of locations associated with the given location names in the image.
+        """
+        locations = self.get_storage_locations(image_id)
+        locations_ids = []
+        matching_location = {}
+        output_error = "Location {} does not exist for available locations for image {}"
+
+        for location_name in location_names:
+            for location in locations:
+                if location_name == location.get('name'):
+                    matching_location = location
+                    break
+            if matching_location.get('id') is None:
+                raise exceptions.SoftLayerError(output_error.format(location_name, image_id))
+
+            locations_ids.append(matching_location)
+
+        return locations_ids

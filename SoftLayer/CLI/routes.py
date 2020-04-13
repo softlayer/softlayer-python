@@ -17,9 +17,13 @@ ALL_ROUTES = [
     ('account:events', 'SoftLayer.CLI.account.events:cli'),
     ('account:event-detail', 'SoftLayer.CLI.account.event_detail:cli'),
     ('account:summary', 'SoftLayer.CLI.account.summary:cli'),
+    ('account:billing-items', 'SoftLayer.CLI.account.billing_items:cli'),
+    ('account:item-detail', 'SoftLayer.CLI.account.item_detail:cli'),
+    ('account:cancel-item', 'SoftLayer.CLI.account.cancel_item:cli'),
 
     ('virtual', 'SoftLayer.CLI.virt'),
     ('virtual:bandwidth', 'SoftLayer.CLI.virt.bandwidth:cli'),
+    ('virtual:billing', 'SoftLayer.CLI.virt.billing:cli'),
     ('virtual:cancel', 'SoftLayer.CLI.virt.cancel:cli'),
     ('virtual:capture', 'SoftLayer.CLI.virt.capture:cli'),
     ('virtual:create', 'SoftLayer.CLI.virt.create:cli'),
@@ -36,6 +40,7 @@ ALL_ROUTES = [
     ('virtual:ready', 'SoftLayer.CLI.virt.ready:cli'),
     ('virtual:reboot', 'SoftLayer.CLI.virt.power:reboot'),
     ('virtual:reload', 'SoftLayer.CLI.virt.reload:cli'),
+    ('virtual:storage', 'SoftLayer.CLI.virt.storage:cli'),
     ('virtual:upgrade', 'SoftLayer.CLI.virt.upgrade:cli'),
     ('virtual:usage', 'SoftLayer.CLI.virt.usage:cli'),
     ('virtual:credentials', 'SoftLayer.CLI.virt.credentials:cli'),
@@ -163,6 +168,7 @@ ALL_ROUTES = [
     ('image:list', 'SoftLayer.CLI.image.list:cli'),
     ('image:import', 'SoftLayer.CLI.image.import:cli'),
     ('image:export', 'SoftLayer.CLI.image.export:cli'),
+    ('image:datacenter', 'SoftLayer.CLI.image.datacenter:cli'),
 
     ('ipsec', 'SoftLayer.CLI.vpn.ipsec'),
     ('ipsec:configure', 'SoftLayer.CLI.vpn.ipsec.configure:cli'),
@@ -190,10 +196,8 @@ ALL_ROUTES = [
     ('loadbal:order-options', 'SoftLayer.CLI.loadbal.order:order_options'),
     ('loadbal:cancel', 'SoftLayer.CLI.loadbal.order:cancel'),
 
-
     ('loadbal:ns-detail', 'SoftLayer.CLI.loadbal.ns_detail:cli'),
     ('loadbal:ns-list', 'SoftLayer.CLI.loadbal.ns_list:cli'),
-
 
     ('metadata', 'SoftLayer.CLI.metadata:cli'),
 
@@ -230,6 +234,7 @@ ALL_ROUTES = [
     ('hardware:create', 'SoftLayer.CLI.hardware.create:cli'),
     ('hardware:create-options', 'SoftLayer.CLI.hardware.create_options:cli'),
     ('hardware:detail', 'SoftLayer.CLI.hardware.detail:cli'),
+    ('hardware:billing', 'SoftLayer.CLI.hardware.billing:cli'),
     ('hardware:edit', 'SoftLayer.CLI.hardware.edit:cli'),
     ('hardware:list', 'SoftLayer.CLI.hardware.list:cli'),
     ('hardware:power-cycle', 'SoftLayer.CLI.hardware.power:power_cycle'),
@@ -244,6 +249,7 @@ ALL_ROUTES = [
     ('hardware:ready', 'SoftLayer.CLI.hardware.ready:cli'),
     ('hardware:toggle-ipmi', 'SoftLayer.CLI.hardware.toggle_ipmi:cli'),
     ('hardware:dns-sync', 'SoftLayer.CLI.hardware.dns:cli'),
+    ('hardware:storage', 'SoftLayer.CLI.hardware.storage:cli'),
 
     ('securitygroup', 'SoftLayer.CLI.securitygroup'),
     ('securitygroup:list', 'SoftLayer.CLI.securitygroup.list:cli'),
@@ -303,6 +309,8 @@ ALL_ROUTES = [
     ('user:edit-details', 'SoftLayer.CLI.user.edit_details:cli'),
     ('user:create', 'SoftLayer.CLI.user.create:cli'),
     ('user:delete', 'SoftLayer.CLI.user.delete:cli'),
+    ('user:vpn-manual', 'SoftLayer.CLI.user.vpn_manual:cli'),
+    ('user:vpn-subnet', 'SoftLayer.CLI.user.vpn_subnet:cli'),
 
     ('vlan', 'SoftLayer.CLI.vlan'),
     ('vlan:detail', 'SoftLayer.CLI.vlan.detail:cli'),

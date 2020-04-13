@@ -149,3 +149,96 @@ getBillingCycleBandwidthUsage = [
 ]
 
 getMetricTrackingObjectId = 1000
+
+getAttachedNetworkStorages = [
+    {
+        "accountId": 11111,
+        "capacityGb": 20,
+        "createDate": "2018-04-05T05:15:49-06:00",
+        "id": 22222,
+        "nasType": "NAS",
+        "serviceProviderId": 1,
+        "storageTypeId": "13",
+        "username": "SL02SEV311111_11",
+        "allowedHardware": [
+            {
+                "id": 12345,
+                "datacenter": {
+                    "id": 449506,
+                    "longName": "Frankfurt 2",
+                    "name": "fra02",
+                    "statusId": 2
+                }
+            }
+        ],
+        "serviceResourceBackendIpAddress": "fsn-fra0201a-fz.service.softlayer.com",
+        "serviceResourceName": "Storage Type 02 File Aggregate stfm-fra0201a"
+    },
+    {
+        "accountId": 11111,
+        "capacityGb": 12000,
+        "createDate": "2018-01-28T04:57:30-06:00",
+        "id": 3777111,
+        "nasType": "ISCSI",
+        "notes": "BlockStorage12T",
+        "password": "",
+        "serviceProviderId": 1,
+        "storageTypeId": "7",
+        "username": "SL02SEL32222-9",
+        "allowedHardware": [
+            {
+                "id": 629222,
+                "datacenter": {
+                    "id": 449506,
+                    "longName": "Frankfurt 2",
+                    "name": "fra02",
+                    "statusId": 2
+                }
+            }
+        ],
+        "serviceResourceBackendIpAddress": "10.31.95.152",
+        "serviceResourceName": "Storage Type 02 Block Aggregate stbm-fra0201a"
+    }
+]
+
+getAllowedHost = {
+    "accountId": 11111,
+    "credentialId": 22222,
+    "id": 33333,
+    "name": "iqn.2020-03.com.ibm:sl02su11111-v62941551",
+    "resourceTableId": 6291111,
+    "resourceTableName": "VIRTUAL_GUEST",
+    "credential": {
+        "accountId": "11111",
+        "createDate": "2020-03-20T13:35:47-06:00",
+        "id": 44444,
+        "nasCredentialTypeId": 2,
+        "password": "SjFDCpHrjskfj",
+        "username": "SL02SU11111-V62941551"
+    }
+}
+
+getHardDrives = [
+    {
+        "id": 11111,
+        "serialNumber": "z1w4sdf",
+        "serviceProviderId": 1,
+        "hardwareComponentModel": {
+            "capacity": "1000",
+            "description": "SATAIII:2000:8300:Constellation",
+            "id": 111,
+            "manufacturer": "Seagate",
+            "name": "Constellation ES",
+            "hardwareGenericComponentModel": {
+                "capacity": "1000",
+                "units": "GB",
+                "hardwareComponentType": {
+                    "id": 1,
+                    "keyName": "HARD_DRIVE",
+                    "type": "Hard Drive",
+                    "typeParentId": 5
+                }
+            }
+        }
+    }
+]

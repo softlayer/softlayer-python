@@ -32,6 +32,13 @@ def cli(env, identifier, passwords=False, price=False):
     vs_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
     result = vsi.get_instance(vs_id)
     result = utils.NestedDict(result)
+    local_disks = vsi.get_local_disks(vs_id)
+
+    table_local_disks = formatting.Table(['Type', 'Name', 'Capacity'])
+    for disks in local_disks:
+        if 'diskImage' in disks:
+            table_local_disks.add_row([get_local_type(disks), disks['mountType'],
+                                       str(disks['diskImage']['capacity']) + " " + str(disks['diskImage']['units'])])
 
     table.add_row(['id', result['id']])
     table.add_row(['guid', result['globalIdentifier']])
@@ -57,6 +64,7 @@ def cli(env, identifier, passwords=False, price=False):
     table.add_row(['os_version', operating_system.get('version', '-')])
     table.add_row(['cores', result['maxCpu']])
     table.add_row(['memory', formatting.mb_to_gb(result['maxMemory'])])
+    table.add_row(['drives', table_local_disks])
     table.add_row(['public_ip', result.get('primaryIpAddress', '-')])
     table.add_row(['private_ip', result.get('primaryBackendIpAddress', '-')])
     table.add_row(['private_only', result['privateNetworkOnlyFlag']])
@@ -192,3 +200,15 @@ def _get_security_table(result):
         return secgroup_table
     else:
         return None
+
+
+def get_local_type(disks):
+    """Returns the virtual server local disk type.
+
+    :param disks: virtual serve local disks.
+    """
+    disk_type = 'System'
+    if 'SWAP' in disks['diskImage']['description']:
+        disk_type = 'Swap'
+
+    return disk_type

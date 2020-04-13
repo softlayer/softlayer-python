@@ -925,3 +925,210 @@ class VSTests(testing.TestCase):
         result = self.vs.get_bandwidth_allocation(1234)
 
         self.assertEqual(2000, int(result['allotment']['amount']))
+
+    def test_get_storage_iscsi_details(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getAttachedNetworkStorages')
+        mock.return_value = [
+            {
+                "accountId": 11111,
+                "capacityGb": 12000,
+                "id": 3777123,
+                "nasType": "ISCSI",
+                "username": "SL02SEL31111-9",
+            }
+        ]
+
+        result = self.vs.get_storage_details(1234, 'ISCSI')
+
+        self.assertEqual([{
+            "accountId": 11111,
+            "capacityGb": 12000,
+            "id": 3777123,
+            "nasType": "ISCSI",
+            "username": "SL02SEL31111-9",
+        }], result)
+
+    def test_get_storage_iscsi_empty_details(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getAttachedNetworkStorages')
+        mock.return_value = []
+
+        result = self.vs.get_storage_details(1234, 'ISCSI')
+
+        self.assertEqual([], result)
+
+    def test_get_storage_nas_details(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getAttachedNetworkStorages')
+        mock.return_value = [
+            {
+                "accountId": 11111,
+                "capacityGb": 12000,
+                "id": 3777111,
+                "nasType": "NAS",
+                "username": "SL02SEL32222-9",
+            }
+        ]
+
+        result = self.vs.get_storage_details(1234, 'NAS')
+
+        self.assertEqual([{
+            "accountId": 11111,
+            "capacityGb": 12000,
+            "id": 3777111,
+            "nasType": "NAS",
+            "username": "SL02SEL32222-9",
+        }], result)
+
+    def test_get_storage_nas_empty_details(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getAttachedNetworkStorages')
+        mock.return_value = []
+
+        result = self.vs.get_storage_details(1234, 'NAS')
+
+        self.assertEqual([], result)
+
+    def test_get_storage_credentials(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getAllowedHost')
+        mock.return_value = {
+            "accountId": 11111,
+            "id": 33333,
+            "name": "iqn.2020-03.com.ibm:sl02su11111-v62941551",
+            "resourceTableName": "VIRTUAL_GUEST",
+            "credential": {
+                "accountId": "11111",
+                "id": 44444,
+                "password": "SjFDCpHrjskfj",
+                "username": "SL02SU11111-V62941551"
+            }
+        }
+
+        result = self.vs.get_storage_credentials(1234)
+
+        self.assertEqual({
+            "accountId": 11111,
+            "id": 33333,
+            "name": "iqn.2020-03.com.ibm:sl02su11111-v62941551",
+            "resourceTableName": "VIRTUAL_GUEST",
+            "credential": {
+                "accountId": "11111",
+                "id": 44444,
+                "password": "SjFDCpHrjskfj",
+                "username": "SL02SU11111-V62941551"
+            }
+        }, result)
+
+    def test_get_none_storage_credentials(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getAllowedHost')
+        mock.return_value = None
+
+        result = self.vs.get_storage_credentials(1234)
+
+        self.assertEqual(None, result)
+
+    def test_get_portable_storage(self):
+        result = self.vs.get_portable_storage(1234)
+        self.assert_called_with('SoftLayer_Account',
+                                'getPortableStorageVolumes')
+
+        self.assertEqual([
+            {
+                "capacity": 200,
+                "createDate": "2018-10-06T04:27:59-06:00",
+                "description": "Disk 2",
+                "id": 11111,
+                "modifyDate": "",
+                "name": "Disk 2",
+                "parentId": "",
+                "storageRepositoryId": 22222,
+                "typeId": 241,
+                "units": "GB",
+                "uuid": "fd477feb-bf32-408e-882f-02540gghgh111"
+            }
+        ], result)
+
+    def test_get_portable_storage_empty(self):
+        mock = self.set_mock('SoftLayer_Account', 'getPortableStorageVolumes')
+        mock.return_value = []
+
+        result = self.vs.get_portable_storage(1234)
+
+        self.assertEqual([], result)
+
+    def test_get_local_disks_system(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getBlockDevices')
+        mock.return_value = [
+            {
+                "createDate": "2018-10-06T04:27:35-06:00",
+                "device": "0",
+                "id": 11111,
+                "mountType": "Disk",
+                "diskImage": {
+                    "capacity": 100,
+                    "description": "adns.vmware.com",
+                    "id": 72222,
+                    "name": "adns.vmware.com",
+                    "units": "GB",
+                }
+            }
+        ]
+
+        result = self.vs.get_local_disks(1234)
+
+        self.assertEqual([
+            {
+                "createDate": "2018-10-06T04:27:35-06:00",
+                "device": "0",
+                "id": 11111,
+                "mountType": "Disk",
+                "diskImage": {
+                    "capacity": 100,
+                    "description": "adns.vmware.com",
+                    "id": 72222,
+                    "name": "adns.vmware.com",
+                    "units": "GB",
+                }
+            }
+        ], result)
+
+    def test_get_local_disks_empty(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getBlockDevices')
+        mock.return_value = []
+
+        result = self.vs.get_local_disks(1234)
+
+        self.assertEqual([], result)
+
+    def test_get_local_disks_swap(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getBlockDevices')
+        mock.return_value = [
+            {
+                "device": "1",
+                "id": 22222,
+                "mountType": "Disk",
+                "statusId": 1,
+                "diskImage": {
+                    "capacity": 2,
+                    "description": "6211111-SWAP",
+                    "id": 33333,
+                    "name": "6211111-SWAP",
+                    "units": "GB",
+                }
+            }
+        ]
+
+        result = self.vs.get_local_disks(1234)
+
+        self.assertEqual([
+            {
+                "device": "1",
+                "id": 22222,
+                "mountType": "Disk",
+                "statusId": 1,
+                "diskImage": {
+                    "capacity": 2,
+                    "description": "6211111-SWAP",
+                    "id": 33333,
+                    "name": "6211111-SWAP",
+                    "units": "GB",
+                }
+            }
+        ], result)

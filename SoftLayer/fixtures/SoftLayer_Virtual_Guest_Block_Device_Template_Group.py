@@ -7,6 +7,11 @@ IMAGES = [{
     'name': 'test_image',
     'parentId': '',
     'publicFlag': True,
+    'children': [{
+        'datacenter': {
+            'name': 'ams01'
+        }
+    }],
 }, {
     'accountId': 1234,
     'blockDevices': [],
@@ -16,6 +21,11 @@ IMAGES = [{
     'name': 'test_image2',
     'parentId': '',
     'publicFlag': True,
+    'children': [{
+        'datacenter': {
+            'name': 'ams01'
+        }
+    }],
 }]
 
 getObject = IMAGES[0]
@@ -23,17 +33,23 @@ getPublicImages = IMAGES
 deleteObject = {}
 editObject = True
 setTags = True
-createFromExternalSource = [{
+createFromExternalSource = {
     'createDate': '2013-12-05T21:53:03-06:00',
     'globalIdentifier': '0B5DEAF4-643D-46CA-A695-CECBE8832C9D',
     'id': 100,
     'name': 'test_image',
-}]
-createFromIcos = [{
+}
+createFromIcos = {
     'createDate': '2013-12-05T21:53:03-06:00',
     'globalIdentifier': '0B5DEAF4-643D-46CA-A695-CECBE8832C9D',
     'id': 100,
     'name': 'test_image',
-}]
+}
 copyToExternalSource = True
 copyToIcos = True
+addLocations = True
+removeLocations = True
+getStorageLocations = [
+    {'id': 265592, 'longName': 'Amsterdam 1', 'name': 'ams01', 'statusId': 2},
+    {'id': 814994, 'longName': 'Amsterdam 3', 'name': 'ams03', 'statusId': 2},
+]

@@ -51,6 +51,7 @@ class VSManager(utils.IdentifierMixin, object):
         self.account = client['Account']
         self.guest = client['Virtual_Guest']
         self.package_svc = client['Product_Package']
+        self.storage_iscsi = client['SoftLayer_Network_Storage_Iscsi']
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
         if ordering_manager is None:
             self.ordering_manager = ordering.OrderingManager(client)
@@ -1123,3 +1124,37 @@ class VSManager(utils.IdentifierMixin, object):
                             return price['id']
                     else:
                         return price['id']
+
+    def get_storage_details(self, instance_id, nas_type):
+        """Returns the virtual server attached network storage.
+
+        :param int instance_id: Id of the virtual server
+        :param nas_type: storage type.
+        """
+        mask = 'mask[id,username,capacityGb,notes,serviceResourceBackendIpAddress,' \
+               'allowedVirtualGuests[id,datacenter]]'
+        return self.guest.getAttachedNetworkStorages(nas_type, mask=mask, id=instance_id)
+
+    def get_storage_credentials(self, instance_id):
+        """Returns the virtual server storage credentials.
+
+        :param int instance_id: Id of the virtual server
+        """
+        mask = 'mask[credential]'
+        return self.guest.getAllowedHost(mask=mask, id=instance_id)
+
+    def get_portable_storage(self, instance_id):
+        """Returns the virtual server portable storage.
+
+        :param int instance_id: Id of the virtual server
+        """
+        object_filter = {"portableStorageVolumes": {"blockDevices": {"guest": {"id": {"operation": instance_id}}}}}
+        return self.account.getPortableStorageVolumes(filter=object_filter)
+
+    def get_local_disks(self, instance_id):
+        """Returns the virtual server local disks.
+
+        :param int instance_id: Id of the virtual server
+        """
+        mask = 'mask[diskImage]'
+        return self.guest.getBlockDevices(mask=mask, id=instance_id)

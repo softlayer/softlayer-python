@@ -173,79 +173,96 @@ username is 'root' and password is 'ABCDEFGH'.
 
 
 .. click:: SoftLayer.CLI.virt.bandwidth:cli
-   :prog: vs bandwidth
+   :prog: virtual bandwidth
    :show-nested:
 
 If no timezone is specified, IMS local time (CST) will be assumed, which might not match your user's selected timezone.
 
 
 .. click:: SoftLayer.CLI.virt.cancel:cli
-   :prog: vs cancel
+   :prog: virtual cancel
    :show-nested:
 
 .. click:: SoftLayer.CLI.virt.capture:cli
-   :prog: vs capture
+   :prog: virtual capture
    :show-nested:
 
 .. click:: SoftLayer.CLI.virt.create:cli
-   :prog: vs create
+   :prog: virtual create
    :show-nested:
 
 .. click:: SoftLayer.CLI.virt.create_options:cli
-   :prog: vs create-options
+   :prog: virtual create-options
    :show-nested:
 
 .. click:: SoftLayer.CLI.virt.dns:cli
-   :prog: vs dns-sync
+   :prog: virtual dns-sync
    :show-nested:
 
 .. click:: SoftLayer.CLI.virt.edit:cli
-   :prog: vs edit
+   :prog: virtual edit
    :show-nested:
 
 .. click:: SoftLayer.CLI.virt.list:cli
-   :prog: vs list
+   :prog: virtual list
    :show-nested:
 
 .. click:: SoftLayer.CLI.virt.power:pause
-   :prog: vs pause
+   :prog: virtual pause
    :show-nested:
 
 
 .. click:: SoftLayer.CLI.virt.power:power_on
-   :prog: vs power-on
+   :prog: virtual power-on
    :show-nested:
 
 
 .. click:: SoftLayer.CLI.virt.power:power_off
-   :prog: vs power-off
+   :prog: virtual power-off
    :show-nested:
 
 .. click:: SoftLayer.CLI.virt.power:resume
-   :prog: vs resume
+   :prog: virtual resume
    :show-nested:
 
 .. click:: SoftLayer.CLI.virt.power:rescue
-   :prog: vs rescue
+   :prog: virtual rescue
    :show-nested:
 
 .. click:: SoftLayer.CLI.virt.power:reboot
-   :prog: vs reboot
+   :prog: virtual reboot
    :show-nested:
 
 .. click:: SoftLayer.CLI.virt.ready:cli
-   :prog: vs ready
+   :prog: virtual ready
    :show-nested:
 
 .. click:: SoftLayer.CLI.virt.upgrade:cli
-   :prog: vs upgrade
+   :prog: virtual upgrade
    :show-nested:
 
 .. click:: SoftLayer.CLI.virt.usage:cli
-   :prog: vs usage
+   :prog: virtual usage
    :show-nested:
 
+.. click:: SoftLayer.CLI.virt.storage:cli
+   :prog: virtual storage
 
+.. click:: SoftLayer.CLI.virt.billing:cli
+   :prog: virtual billing
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.detail:cli
+   :prog: virtual detail
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.reload:cli
+   :prog: virtual reload
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.credentials:cli
+   :prog: virtual credentials
+   :show-nested:
 
 
 Reserved Capacity

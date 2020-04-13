@@ -1,4 +1,5 @@
 tox
+coveralls
 pytest
 pytest-cov
 mock
