@@ -225,7 +225,7 @@ class TicketTests(testing.TestCase):
 
     def test_init_ticket_results(self):
         ticket_mgr = TicketManager(self.client)
-        ticket_table = ticket.get_ticket_results(ticket_mgr, False,100)
+        ticket_table = ticket.get_ticket_results(ticket_mgr, 100)
         self.assert_called_with('SoftLayer_Ticket', 'getObject', identifier=100)
         self.assertIsInstance(ticket_table, formatting.KeyValueTable)
 
@@ -253,7 +253,7 @@ class TicketTests(testing.TestCase):
         }
 
         ticket_mgr = TicketManager(self.client)
-        ticket_table = ticket.get_ticket_results(ticket_mgr, False, 100)
+        ticket_table = ticket.get_ticket_results(ticket_mgr, 100)
         self.assert_called_with('SoftLayer_Ticket', 'getObject', identifier=100)
         self.assertIsInstance(ticket_table, formatting.KeyValueTable)
 
