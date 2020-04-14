@@ -45,4 +45,4 @@ def cli(env, title, subject_id, body, hardware_identifier, virtual_identifier, p
         vs_id = helpers.resolve_id(vs_mgr.resolve_ids, virtual_identifier, 'VS')
         ticket_mgr.attach_virtual_server(created_ticket['id'], vs_id)
 
-    env.fout(ticket.get_ticket_results(ticket_mgr, created_ticket['id']))
+    env.fout(ticket.get_ticket_results(ticket_mgr, False, created_ticket['id']))

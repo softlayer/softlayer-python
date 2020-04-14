@@ -37,7 +37,7 @@ Provides some basic functionality to order a server. `slcli order` has a more fu
    :show-nested:
 
 .. click:: SoftLayer.CLI.hardware.billing:cli
-   :prog: hw billing
+   :prog: hardware billing
    :show-nested:
 
 
@@ -111,5 +111,5 @@ This function updates the firmware of a server. If already at the latest version
    :show-nested:
 
 .. click:: SoftLayer.CLI.hardware.storage:cli
-   :prog: hw storage
+   :prog: hardware storage
    :show-nested:

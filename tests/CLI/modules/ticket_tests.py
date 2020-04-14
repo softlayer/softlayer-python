@@ -1,7 +1,6 @@
 """
     SoftLayer.tests.CLI.modules.ticket_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     :license: MIT, see LICENSE for more details.
 """
 import json
@@ -43,8 +42,8 @@ class TicketTests(testing.TestCase):
             'status': 'Closed',
             'title': 'Cloud Instance Cancellation - 08/01/13',
             'update 1': 'a bot says something',
-            'update 2': 'By John Smith\nuser says something',
-            'update 3': 'By emp1 (Employee)\nemployee says something',
+            'update 2': 'By John Smith user says something',
+            'update 3': 'By emp1 (Employee) employee says something',
         }
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output), expected)
@@ -300,3 +299,18 @@ class TicketTests(testing.TestCase):
         result = self.run_command(['ticket', 'update', '100'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Ticket', 'addUpdate', args=({'entry': 'Testing1'},), identifier=100)
+
+    def test_ticket_json(self):
+        result = self.run_command(['--format=json', 'ticket', 'detail', '1'])
+        expected = {'Case_Number': 'CS123456',
+                    'created': '2013-08-01T14:14:04-07:00',
+                    'edited': '2013-08-01T14:16:47-07:00',
+                    'id': 100,
+                    'priority': 'No Priority',
+                    'status': 'Closed',
+                    'title': 'Cloud Instance Cancellation - 08/01/13',
+                    'update 1': 'a bot says something',
+                    'update 2': 'By John Smith user says something',
+                    'update 3': 'By emp1 (Employee) employee says something'}
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output), expected)
