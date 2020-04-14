@@ -21,7 +21,7 @@ def cli(env, identifier, count):
     """Get details for a ticket."""
 
     is_json = False
-    if (env.format == 'json'):
+    if env.format == 'json':
         is_json = True
     mgr = SoftLayer.TicketManager(env.client)
 

@@ -1,7 +1,7 @@
 """Support tickets."""
+import re
 
 import click
-import re
 
 from SoftLayer.CLI import formatting
 
@@ -17,7 +17,7 @@ PRIORITY_MAP = [
 ]
 
 
-def get_ticket_results(mgr, ticket_id, is_json = False, update_count=1):
+def get_ticket_results(mgr, ticket_id, is_json=False, update_count=1):
     """Get output about a ticket.
 
     :param integer id: the ticket ID
