@@ -22,7 +22,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r tools/test-requirements.txt
-    - name: Tox
+    - name: Tox Test
       run: tox -e py
   coverage:
     runs-on: ubuntu-latest
@@ -36,7 +36,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r tools/test-requirements.txt
-    - name: Tox
+    - name: Tox Coverage
       run: tox -e coverage
   analysis:
     runs-on: ubuntu-latest
@@ -50,5 +50,5 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r tools/test-requirements.txt
-    - name: Tox
+    - name: Tox Analysis
       run: tox -e analysis
