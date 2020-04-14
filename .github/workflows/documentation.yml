@@ -1,4 +1,4 @@
-name: softlayer
+name: documentation
 
 on:
   push:
