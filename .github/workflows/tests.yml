@@ -23,7 +23,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r tools/test-requirements.txt
     - name: Tox
-      run: tox -e 
+      run: tox -e py
   coverage:
     runs-on: ubuntu-latest
     steps:
