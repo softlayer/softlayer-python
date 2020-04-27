@@ -22,8 +22,8 @@ from SoftLayer.CLI import helpers
               help="Public port speed. -1 is best speed available")
 @click.option('--private-speed', default=None, type=click.Choice(['0', '10', '100', '1000', '10000', '-1']),
               help="Private port speed. -1 is best speed available")
-@click.option('--rebundant', is_flag=True,default=False, help="The desired state of redundancy for the interface(s)")
-@click.option('--degraded', is_flag=True,default=False, help="The desired state of degraded for the interface(s)")
+@click.option('--rebundant', is_flag=True, default=False, help="The desired state of redundancy for the interface(s)")
+@click.option('--degraded', is_flag=True, default=False, help="The desired state of degraded for the interface(s)")
 @environment.pass_env
 def cli(env, identifier, domain, userfile, tag, hostname, userdata, public_speed, private_speed, rebundant, degraded):
     """Edit hardware details."""
