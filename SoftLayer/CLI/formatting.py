@@ -416,11 +416,13 @@ def _format_list(result):
     if not result:
         return result
 
-    if isinstance(result[0], dict):
-        return _format_list_objects(result)
+    new_result = [item for item in result if item]
+
+    if isinstance(new_result[0], dict):
+        return _format_list_objects(new_result)
 
     table = Table(['value'])
-    for item in result:
+    for item in new_result:
         table.add_row([iter_to_table(item)])
     return table
 
@@ -430,12 +432,15 @@ def _format_list_objects(result):
 
     all_keys = set()
     for item in result:
-        all_keys = all_keys.union(item.keys())
+        if isinstance(item, dict):
+            all_keys = all_keys.union(item.keys())
 
     all_keys = sorted(all_keys)
     table = Table(all_keys)
 
     for item in result:
+        if not item:
+            continue
         values = []
         for key in all_keys:
             value = iter_to_table(item.get(key))

@@ -439,11 +439,10 @@ class TestTemplateArgs(testing.TestCase):
 class TestExportToTemplate(testing.TestCase):
 
     def test_export_to_template(self):
-        if(sys.platform.startswith("win")):
+        if (sys.platform.startswith("win")):
             self.skipTest("Test doesn't work in Windows")
         # Tempfile creation is wonky on windows
         with tempfile.NamedTemporaryFile() as tmp:
-
             template.export_to_template(tmp.name, {
                 'os': None,
                 'datacenter': 'ams01',
@@ -487,3 +486,9 @@ class IterToTableTests(testing.TestCase):
         self.assertIsInstance(result, formatting.Table)
         self.assertEqual(result.columns, ['value'])
         self.assertEqual(result.rows, [['a'], ['b'], ['c']])
+
+    def test_format_api_list_with_none_value(self):
+        result = formatting._format_list([{'key': [None, 'value']}, None])
+
+        self.assertIsInstance(result, formatting.Table)
+        self.assertEqual(result.columns, ['key'])
