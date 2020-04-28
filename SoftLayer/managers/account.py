@@ -47,25 +47,61 @@ class AccountManager(utils.IdentifierMixin, object):
         """
         return self.client.call('Account', 'getObject', mask=mask)
 
-    def get_upcoming_events(self):
-        """Retreives a list of Notification_Occurrence_Events that have not ended yet
+    def get_upcoming_events(self, event_type):
+        """Retrieves a list of Notification_Occurrence_Events that have not ended yet
 
+        :param: String event_type: notification event type.
         :return: SoftLayer_Notification_Occurrence_Event
         """
-        mask = "mask[id, subject, startDate, endDate, statusCode, acknowledgedFlag, impactedResourceCount, updateCount]"
+        mask = "mask[id, subject, startDate, endDate, modifyDate, statusCode, acknowledgedFlag, " \
+               "impactedResourceCount, updateCount, systemTicketId, notificationOccurrenceEventType[keyName]]"
+
         _filter = {
-            'endDate': {
-                'operation': '> sysdate'
-            },
-            'startDate': {
+            'notificationOccurrenceEventType': {
+                'keyName': {
+                    'operation': event_type
+                }
+            }
+        }
+
+        self.add_event_filter(_filter, event_type)
+
+        return self.client.call('Notification_Occurrence_Event', 'getAllObjects', filter=_filter, mask=mask, iter=True)
+
+    @staticmethod
+    def add_event_filter(_filter, event_type):
+        """Add data to the object filter.
+
+        :param: _filter: event filter.
+        :param: string event_type: event type.
+        """
+        if event_type == 'PLANNED':
+            _filter['endDate'] = {
+                'operation': '> sysdate - 2'
+            }
+            _filter['startDate'] = {
                 'operation': 'orderBy',
                 'options': [{
                     'name': 'sort',
-                    'value': ['ASC']
+                    'value': ['DESC']
                 }]
             }
-        }
-        return self.client.call('Notification_Occurrence_Event', 'getAllObjects', filter=_filter, mask=mask, iter=True)
+
+        if event_type == 'UNPLANNED_INCIDENT':
+            _filter['modifyDate'] = {
+                'operation': '> sysdate - 2'
+            }
+
+        if event_type == 'ANNOUNCEMENT':
+            _filter['statusCode'] = {
+                'keyName': {
+                    'operation': 'in',
+                    'options': [{
+                        'name': 'data',
+                        'value': ['PUBLISHED']
+                    }]
+                }
+            }
 
     def ack_event(self, event_id):
         """Acknowledge an event. This mostly prevents it from appearing as a notification in the control portal.
