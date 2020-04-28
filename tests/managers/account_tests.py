@@ -18,9 +18,50 @@ class AccountManagerTests(testing.TestCase):
         self.manager.get_summary()
         self.assert_called_with('SoftLayer_Account', 'getObject')
 
-    def test_get_upcoming_events(self):
-        self.manager.get_upcoming_events()
+    def test_get_planned_upcoming_events(self):
+        self.manager.get_upcoming_events("PLANNED")
         self.assert_called_with(self.SLNOE, 'getAllObjects')
+
+    def test_get_unplanned_upcoming_events(self):
+        self.manager.get_upcoming_events("UNPLANNED_INCIDENT")
+        self.assert_called_with(self.SLNOE, 'getAllObjects')
+
+    def test_get_announcement_upcoming_events(self):
+        self.manager.get_upcoming_events("ANNOUNCEMENT")
+        self.assert_called_with(self.SLNOE, 'getAllObjects')
+
+    def test_add_planned_event_filter(self):
+        event_type = 'PLANNED'
+        _filter = {
+            'notificationOccurrenceEventType': {
+                'keyName': {
+                    'operation': event_type
+                }
+            }
+        }
+        self.manager.add_event_filter(_filter, event_type)
+
+    def test_add_unplanned_event_filter(self):
+        event_type = 'UNPLANNED_INCIDENT'
+        _filter = {
+            'notificationOccurrenceEventType': {
+                'keyName': {
+                    'operation': event_type
+                }
+            }
+        }
+        self.manager.add_event_filter(_filter, event_type)
+
+    def test_add_announcement_event_filter(self):
+        event_type = 'ANNOUNCEMENT'
+        _filter = {
+            'notificationOccurrenceEventType': {
+                'keyName': {
+                    'operation': event_type
+                }
+            }
+        }
+        self.manager.add_event_filter(_filter, event_type)
 
     def test_ack_event(self):
         self.manager.ack_event(12345)
