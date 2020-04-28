@@ -7,8 +7,9 @@
 """
 
 import logging
-import SoftLayer
 
+from SoftLayer.exceptions import SoftLayerAPIError
+from SoftLayer.exceptions import SoftLayerError
 from SoftLayer.managers import ordering
 from SoftLayer import utils
 
@@ -395,7 +396,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
             if region['location']['location']['name'] == datacenter:
                 return region
 
-        raise SoftLayer.SoftLayerError("Could not find valid location for: '%s'" % datacenter)
+        raise SoftLayerError("Could not find valid location for: '%s'" % datacenter)
 
     def get_create_options(self):
         """Returns valid options for ordering a dedicated host."""
@@ -426,7 +427,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
             if not price.get('locationGroupId'):
                 return price['id']
 
-        raise SoftLayer.SoftLayerError("Could not find valid price")
+        raise SoftLayerError("Could not find valid price")
 
     def _get_item(self, package, flavor):
         """Returns the item for ordering a dedicated host."""
@@ -435,7 +436,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
             if item['keyName'] == flavor:
                 return item
 
-        raise SoftLayer.SoftLayerError("Could not find valid item for: '%s'" % flavor)
+        raise SoftLayerError("Could not find valid item for: '%s'" % flavor)
 
     def _get_backend_router(self, locations, item):
         """Returns valid router options for ordering a dedicated host."""
@@ -495,7 +496,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                     routers = self.host.getAvailableRouters(host, mask=mask)
                     return routers
 
-        raise SoftLayer.SoftLayerError("Could not find available routers")
+        raise SoftLayerError("Could not find available routers")
 
     def _get_default_router(self, routers, router_name=None):
         """Returns the default router for ordering a dedicated host."""
@@ -508,7 +509,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                 if router['hostname'] == router_name:
                     return router['id']
 
-        raise SoftLayer.SoftLayerError("Could not find valid default router")
+        raise SoftLayerError("Could not find valid default router")
 
     def get_router_options(self, datacenter=None, flavor=None):
         """Returns available backend routers for the dedicated host."""
@@ -524,7 +525,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         msg = 'Cancelled'
         try:
             self.guest.deleteObject(id=guest_id)
-        except SoftLayer.SoftLayerAPIError as e:
+        except SoftLayerAPIError as e:
             msg = 'Exception: ' + e.faultString
 
         return msg

@@ -9,9 +9,10 @@ import logging
 import socket
 import time
 
-import SoftLayer
 from SoftLayer.decoration import retry
+from SoftLayer.exceptions import SoftLayerError
 from SoftLayer.managers import ordering
+from SoftLayer.managers.ticket import TicketManager
 from SoftLayer import utils
 
 LOGGER = logging.getLogger(__name__)
@@ -77,19 +78,18 @@ class HardwareManager(utils.IdentifierMixin, object):
         # Get cancel reason
         reasons = self.get_cancellation_reasons()
         cancel_reason = reasons.get(reason, reasons['unneeded'])
-        ticket_mgr = SoftLayer.TicketManager(self.client)
+        ticket_mgr = TicketManager(self.client)
         mask = 'mask[id, hourlyBillingFlag, billingItem[id], openCancellationTicket[id], activeTransaction]'
         hw_billing = self.get_hardware(hardware_id, mask=mask)
 
         if 'activeTransaction' in hw_billing:
-            raise SoftLayer.SoftLayerError("Unable to cancel hardware with running transaction")
+            raise SoftLayerError("Unable to cancel hardware with running transaction")
 
         if 'billingItem' not in hw_billing:
             if utils.lookup(hw_billing, 'openCancellationTicket', 'id'):
-                raise SoftLayer.SoftLayerError("Ticket #%s already exists for this server" %
-                                               hw_billing['openCancellationTicket']['id'])
-            raise SoftLayer.SoftLayerError("Cannot locate billing for the server. "
-                                           "The server may already be cancelled.")
+                raise SoftLayerError("Ticket #%s already exists for this server" %
+                                     hw_billing['openCancellationTicket']['id'])
+            raise SoftLayerError("Cannot locate billing for the server. The server may already be cancelled.")
 
         billing_id = hw_billing['billingItem']['id']
 
@@ -744,7 +744,7 @@ def _get_extra_price_id(items, key_name, hourly, location):
 
             return price['id']
 
-    raise SoftLayer.SoftLayerError(
+    raise SoftLayerError(
         "Could not find valid price for extra option, '%s'" % key_name)
 
 
@@ -762,7 +762,7 @@ def _get_default_price_id(items, option, hourly, location):
                     _matches_location(price, location)]):
                 return price['id']
 
-    raise SoftLayer.SoftLayerError(
+    raise SoftLayerError(
         "Could not find valid price for '%s' option" % option)
 
 
@@ -792,7 +792,7 @@ def _get_bandwidth_price_id(items,
 
             return price['id']
 
-    raise SoftLayer.SoftLayerError(
+    raise SoftLayerError(
         "Could not find valid price for bandwidth option")
 
 
@@ -800,11 +800,8 @@ def _get_os_price_id(items, os, location):
     """Returns the price id matching."""
 
     for item in items:
-        if any([utils.lookup(item,
-                             'itemCategory',
-                             'categoryCode') != 'os',
-                utils.lookup(item,
-                             'keyName') != os]):
+        if any([utils.lookup(item, 'itemCategory', 'categoryCode') != 'os',
+                utils.lookup(item, 'keyName') != os]):
             continue
 
         for price in item['prices']:
@@ -813,17 +810,14 @@ def _get_os_price_id(items, os, location):
 
             return price['id']
 
-    raise SoftLayer.SoftLayerError("Could not find valid price for os: '%s'" %
-                                   os)
+    raise SoftLayerError("Could not find valid price for os: '%s'" % os)
 
 
 def _get_port_speed_price_id(items, port_speed, no_public, location):
     """Choose a valid price id for port speed."""
 
     for item in items:
-        if utils.lookup(item,
-                        'itemCategory',
-                        'categoryCode') != 'port_speed':
+        if utils.lookup(item, 'itemCategory', 'categoryCode') != 'port_speed':
             continue
 
         # Check for correct capacity and if the item matches private only
@@ -838,7 +832,7 @@ def _get_port_speed_price_id(items, port_speed, no_public, location):
 
             return price['id']
 
-    raise SoftLayer.SoftLayerError(
+    raise SoftLayerError(
         "Could not find valid price for port speed: '%s'" % port_speed)
 
 
@@ -887,7 +881,7 @@ def _get_location(package, location):
         if region['location']['location']['name'] == location:
             return region
 
-    raise SoftLayer.SoftLayerError("Could not find valid location for: '%s'" % location)
+    raise SoftLayerError("Could not find valid location for: '%s'" % location)
 
 
 def _get_preset_id(package, size):
@@ -896,4 +890,4 @@ def _get_preset_id(package, size):
         if preset['keyName'] == size or preset['id'] == size:
             return preset['id']
 
-    raise SoftLayer.SoftLayerError("Could not find valid size for: '%s'" % size)
+    raise SoftLayerError("Could not find valid size for: '%s'" % size)

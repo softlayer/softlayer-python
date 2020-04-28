@@ -7,8 +7,9 @@
 """
 
 import logging
-import SoftLayer
+# import SoftLayer
 
+from SoftLayer.exceptions import SoftLayerError
 from SoftLayer.managers import ordering
 from SoftLayer.managers.vs import VSManager
 from SoftLayer import utils
@@ -144,7 +145,7 @@ instances[id, billingItem[description, hourlyRecurringFee]], instanceCount, back
             capacity_flavor = capacity['instances'][0]['billingItem']['item']['keyName']
             flavor = _flavor_string(capacity_flavor, guest_object['primary_disk'])
         except KeyError:
-            raise SoftLayer.SoftLayerError("Unable to find capacity Flavor.")
+            raise SoftLayerError("Unable to find capacity Flavor.")
 
         guest_object['flavor'] = flavor
         guest_object['datacenter'] = capacity['backendRouter']['datacenter']['name']
