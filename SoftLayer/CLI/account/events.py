@@ -31,6 +31,7 @@ def cli(env, ack_all):
 
 
 def add_ack_flag(events, manager, ack_all):
+    """Add acknowledgedFlag to the event"""
     if ack_all:
         for event in events:
             result = manager.ack_event(event['id'])
