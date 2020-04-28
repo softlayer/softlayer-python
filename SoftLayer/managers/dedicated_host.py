@@ -5,7 +5,6 @@
 
     :license: MIT, see License for more details.
 """
-
 import logging
 
 from SoftLayer.exceptions import SoftLayerAPIError

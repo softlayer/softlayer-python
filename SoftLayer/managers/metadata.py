@@ -5,7 +5,6 @@
 
     :license: MIT, see LICENSE for more details.
 """
-# import SoftLayer
 from SoftLayer.API import BaseClient
 from SoftLayer import consts
 from SoftLayer import exceptions

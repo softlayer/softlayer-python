@@ -7,7 +7,6 @@
 """
 
 import logging
-# import SoftLayer
 
 from SoftLayer.exceptions import SoftLayerError
 from SoftLayer.managers import ordering
