@@ -251,14 +251,13 @@ class OrderingManager(object):
         :param str package_keyname: The package for which to get the categories.
         :returns: List of categories associated with the package
         """
-        get_kwargs = {}
-        get_kwargs['mask'] = kwargs.get('mask', CATEGORY_MASK)
+        kwargs['mask'] = kwargs.get('mask', CATEGORY_MASK)
 
         if 'filter' in kwargs:
-            get_kwargs['filter'] = kwargs['filter']
+            kwargs['filter'] = kwargs['filter']
 
         package = self.get_package_by_key(package_keyname, mask='id')
-        categories = self.package_svc.getConfiguration(id=package['id'], **get_kwargs)
+        categories = self.package_svc.getConfiguration(id=package['id'], **kwargs)
         return categories
 
     def list_items(self, package_keyname, **kwargs):
@@ -268,14 +267,11 @@ class OrderingManager(object):
         :returns: List of items in the package
 
         """
-        get_kwargs = {}
-        get_kwargs['mask'] = kwargs.get('mask', ITEM_MASK)
-
-        if 'filter' in kwargs:
-            get_kwargs['filter'] = kwargs['filter']
+        if 'mask' not in kwargs:
+            kwargs['mask'] = ITEM_MASK
 
         package = self.get_package_by_key(package_keyname, mask='id')
-        items = self.package_svc.getItems(id=package['id'], **get_kwargs)
+        items = self.package_svc.getItems(id=package['id'], **kwargs)
         return items
 
     def list_packages(self, **kwargs):
@@ -284,13 +280,12 @@ class OrderingManager(object):
         :returns: List of active packages.
 
         """
-        get_kwargs = {}
-        get_kwargs['mask'] = kwargs.get('mask', PACKAGE_MASK)
+        kwargs['mask'] = kwargs.get('mask', PACKAGE_MASK)
 
         if 'filter' in kwargs:
-            get_kwargs['filter'] = kwargs['filter']
+            kwargs['filter'] = kwargs['filter']
 
-        packages = self.package_svc.getAllObjects(**get_kwargs)
+        packages = self.package_svc.getAllObjects(**kwargs)
 
         return [package for package in packages if package['isActive']]
 
@@ -301,15 +296,15 @@ class OrderingManager(object):
         :returns: A list of package presets that can be used for ordering
 
         """
-        get_kwargs = {}
-        get_kwargs['mask'] = kwargs.get('mask', PRESET_MASK)
+
+        kwargs['mask'] = kwargs.get('mask', PRESET_MASK)
 
         if 'filter' in kwargs:
-            get_kwargs['filter'] = kwargs['filter']
+            kwargs['filter'] = kwargs['filter']
 
         package = self.get_package_by_key(package_keyname, mask='id')
-        acc_presets = self.package_svc.getAccountRestrictedActivePresets(id=package['id'], **get_kwargs)
-        active_presets = self.package_svc.getActivePresets(id=package['id'], **get_kwargs)
+        acc_presets = self.package_svc.getAccountRestrictedActivePresets(id=package['id'], **kwargs)
+        active_presets = self.package_svc.getActivePresets(id=package['id'], **kwargs)
         return active_presets + acc_presets
 
     def get_preset_by_key(self, package_keyname, preset_keyname, mask=None):
