@@ -5,6 +5,9 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import base64
+from json import dumps
+
 from SoftLayer import utils
 
 
@@ -92,9 +95,11 @@ class TicketManager(utils.IdentifierMixin, object):
         :param string file_name: The name of the attachment shown in the ticket
         :returns: dict -- The uploaded attachment
         """
-        file_content = None
         with open(file_path, 'rb') as attached_file:
-            file_content = attached_file.read()
+            base64_bytes = base64.b64encode(attached_file.read())
+            base64_string = base64_bytes.decode('utf-8')
+            raw_data = {file_path: base64_string}
+            file_content = dumps(raw_data, indent=2)
 
         file_object = {
             "filename": file_name,

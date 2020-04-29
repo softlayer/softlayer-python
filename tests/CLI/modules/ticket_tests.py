@@ -208,7 +208,8 @@ class TicketTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Ticket',
                                 'addAttachedFile',
                                 args=({"filename": "attachment_upload",
-                                       "data": b"ticket attached data"},),
+                                       "data": '{\n  "tests/resources/attachment_upload": '
+                                               '"dGlja2V0IGF0dGFjaGVkIGRhdGE="\n}'},),
                                 identifier=1)
 
     def test_ticket_upload(self):
@@ -220,7 +221,8 @@ class TicketTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Ticket',
                                 'addAttachedFile',
                                 args=({"filename": "a_file_name",
-                                       "data": b"ticket attached data"},),
+                                       "data": '{\n  "tests/resources/attachment_upload": '
+                                               '"dGlja2V0IGF0dGFjaGVkIGRhdGE="\n}'},),
                                 identifier=1)
 
     def test_init_ticket_results(self):
