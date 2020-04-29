@@ -526,7 +526,7 @@ class ServerCLITests(testing.TestCase):
                                    '--tag=dev',
                                    '--tag=green',
                                    '--public-speed=10',
-                                   '--rebundant',
+                                   '--redundant',
                                    '--private-speed=100',
                                    '--degraded',
                                    '100'])
@@ -546,12 +546,12 @@ class ServerCLITests(testing.TestCase):
         )
         self.assert_called_with(
             'SoftLayer_Hardware_Server', 'setPublicNetworkInterfaceSpeed',
-            args=(['rebundant', 10],),
+            args=([10, 'redundant'],),
             identifier=100,
         )
         self.assert_called_with(
             'SoftLayer_Hardware_Server', 'setPrivateNetworkInterfaceSpeed',
-            args=(['degraded', 100],),
+            args=([100, 'degraded'],),
             identifier=100,
         )
 

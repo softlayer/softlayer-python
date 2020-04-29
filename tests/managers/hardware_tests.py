@@ -343,12 +343,12 @@ class HardwareTests(testing.TestCase):
                                 args=(['degraded', 100],))
 
     def test_change_port_speed_private(self):
-        self.hardware.change_port_speed(2, False, 10, 'rebundant')
+        self.hardware.change_port_speed(2, False, 10, 'redundant')
 
         self.assert_called_with('SoftLayer_Hardware_Server',
                                 'setPrivateNetworkInterfaceSpeed',
                                 identifier=2,
-                                args=(['rebundant', 10],))
+                                args=([10,'redundant'],))
 
     def test_edit_meta(self):
         # Test editing user data
