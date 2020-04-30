@@ -528,7 +528,6 @@ class TestRestAPICall(testing.TestCase):
             proxies=None,
             timeout=None)
 
-
     @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_with_args_bytes(self, request):
         request().text = '{}'
@@ -702,7 +701,7 @@ class TestRestAPICall(testing.TestCase):
 
     def test_complex_encoder_bytes(self):
         to_encode = {
-            'test' : ['array', 0, 1, False],
+            'test': ['array', 0, 1, False],
             'bytes': b'ASDASDASD'
         }
         result = json.dumps(to_encode, cls=transports.ComplexEncoder)

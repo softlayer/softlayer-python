@@ -568,11 +568,16 @@ def _format_object_mask(objectmask):
         objectmask = "mask[%s]" % objectmask
     return objectmask
 
+
 class ComplexEncoder(json.JSONEncoder):
-    def default(self, obj):
+    """ComplexEncoder helps jsonencoder deal with byte strings"""
+
+    def default(self, o):
+        """Encodes o as JSON"""
+
         # Base64 encode bytes type objects.
-        if isinstance(obj, bytes):
-            base64_bytes = base64.b64encode(obj)
+        if isinstance(o, bytes):
+            base64_bytes = base64.b64encode(o)
             return base64_bytes.decode("utf-8")
         # Let the base class default method raise the TypeError
-        return json.JSONEncoder.default(self, obj)
+        return json.JSONEncoder.default(self, o)
