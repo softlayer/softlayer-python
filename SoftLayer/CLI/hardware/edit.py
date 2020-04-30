@@ -22,8 +22,10 @@ from SoftLayer.CLI import helpers
               help="Public port speed. -1 is best speed available")
 @click.option('--private-speed', default=None, type=click.Choice(['0', '10', '100', '1000', '10000', '-1']),
               help="Private port speed. -1 is best speed available")
+@click.option('--redundant', is_flag=True, default=False, help="The desired state of redundancy for the interface(s)")
+@click.option('--degraded', is_flag=True, default=False, help="The desired state of degraded for the interface(s)")
 @environment.pass_env
-def cli(env, identifier, domain, userfile, tag, hostname, userdata, public_speed, private_speed):
+def cli(env, identifier, domain, userfile, tag, hostname, userdata, public_speed, private_speed, redundant, degraded):
     """Edit hardware details."""
 
     if userdata and userfile:
@@ -51,7 +53,17 @@ def cli(env, identifier, domain, userfile, tag, hostname, userdata, public_speed
         raise exceptions.CLIAbort("Failed to update hardware")
 
     if public_speed is not None:
-        mgr.change_port_speed(hw_id, True, int(public_speed))
+        if redundant:
+            mgr.change_port_speed(hw_id, True, int(public_speed), 'redundant')
+        if degraded:
+            mgr.change_port_speed(hw_id, True, int(public_speed), 'degraded')
+        if not redundant and not degraded:
+            raise exceptions.CLIAbort("Failed to update hardwar")
 
     if private_speed is not None:
-        mgr.change_port_speed(hw_id, False, int(private_speed))
+        if redundant:
+            mgr.change_port_speed(hw_id, False, int(private_speed), 'redundant')
+        if degraded:
+            mgr.change_port_speed(hw_id, False, int(private_speed), 'degraded')
+        if not redundant and not degraded:
+            raise exceptions.CLIAbort("Failed to update hardware")

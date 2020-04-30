@@ -335,20 +335,20 @@ class HardwareTests(testing.TestCase):
                           12345)
 
     def test_change_port_speed_public(self):
-        self.hardware.change_port_speed(2, True, 100)
+        self.hardware.change_port_speed(2, True, 100, 'degraded')
 
         self.assert_called_with('SoftLayer_Hardware_Server',
                                 'setPublicNetworkInterfaceSpeed',
                                 identifier=2,
-                                args=(100,))
+                                args=([100, 'degraded'],))
 
     def test_change_port_speed_private(self):
-        self.hardware.change_port_speed(2, False, 10)
+        self.hardware.change_port_speed(2, False, 10, 'redundant')
 
         self.assert_called_with('SoftLayer_Hardware_Server',
                                 'setPrivateNetworkInterfaceSpeed',
                                 identifier=2,
-                                args=(10,))
+                                args=([10, 'redundant'],))
 
     def test_edit_meta(self):
         # Test editing user data
@@ -374,10 +374,10 @@ class HardwareTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Hardware_Server',
                                 'editObject',
                                 args=({
-                                    'hostname': 'new-host',
-                                    'domain': 'new.sftlyr.ws',
-                                    'notes': 'random notes',
-                                },),
+                                          'hostname': 'new-host',
+                                          'domain': 'new.sftlyr.ws',
+                                          'notes': 'random notes',
+                                      },),
                                 identifier=100)
 
     def test_rescue(self):

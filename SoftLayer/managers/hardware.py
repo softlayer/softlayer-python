@@ -297,7 +297,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         """
         return self.hardware.bootToRescueLayer(id=hardware_id)
 
-    def change_port_speed(self, hardware_id, public, speed):
+    def change_port_speed(self, hardware_id, public, speed, redundant=None):
         """Allows you to change the port speed of a server's NICs.
 
         :param int hardware_id: The ID of the server
@@ -319,11 +319,11 @@ class HardwareManager(utils.IdentifierMixin, object):
         if public:
             return self.client.call('Hardware_Server',
                                     'setPublicNetworkInterfaceSpeed',
-                                    speed, id=hardware_id)
+                                    [speed, redundant], id=hardware_id)
         else:
             return self.client.call('Hardware_Server',
                                     'setPrivateNetworkInterfaceSpeed',
-                                    speed, id=hardware_id)
+                                    [speed, redundant], id=hardware_id)
 
     def place_order(self, **kwargs):
         """Places an order for a piece of hardware.
