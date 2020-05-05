@@ -7,6 +7,7 @@
 import io
 import warnings
 
+import json
 import mock
 import pytest
 import requests
@@ -528,6 +529,30 @@ class TestRestAPICall(testing.TestCase):
             timeout=None)
 
     @mock.patch('SoftLayer.transports.requests.Session.request')
+    def test_with_args_bytes(self, request):
+        request().text = '{}'
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        req.args = ('test', b'asdf')
+
+        resp = self.transport(req)
+
+        self.assertEqual(resp, {})
+        request.assert_called_with(
+            'POST',
+            'http://something.com/SoftLayer_Service/getObject.json',
+            headers=mock.ANY,
+            auth=None,
+            data='{"parameters": ["test", "YXNkZg=="]}',
+            params={},
+            verify=True,
+            cert=None,
+            proxies=None,
+            timeout=None)
+
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_with_filter(self, request):
         request().text = '{}'
 
@@ -673,6 +698,16 @@ class TestRestAPICall(testing.TestCase):
         req.transport_headers = {"test-headers": 'aaaa'}
         output_text = self.transport.print_reproduceable(req)
         self.assertIn("https://test.com", output_text)
+
+    def test_complex_encoder_bytes(self):
+        to_encode = {
+            'test': ['array', 0, 1, False],
+            'bytes': b'ASDASDASD'
+        }
+        result = json.dumps(to_encode, cls=transports.ComplexEncoder)
+        # result = '{"test": ["array", 0, 1, false], "bytes": "QVNEQVNEQVNE"}'
+        # encode doesn't always encode in the same order, so testing exact match SOMETIMES breaks.
+        self.assertIn("QVNEQVNEQVNE", result)
 
 
 class TestFixtureTransport(testing.TestCase):

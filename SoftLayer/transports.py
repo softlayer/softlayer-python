@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import base64
 import importlib
 import json
 import logging
@@ -359,7 +360,7 @@ class RestTransport(object):
             body['parameters'] = request.args
 
         if body:
-            request.payload = json.dumps(body)
+            request.payload = json.dumps(body, cls=ComplexEncoder)
 
         url_parts = [self.endpoint_url, request.service]
         if request.identifier is not None:
@@ -566,3 +567,17 @@ def _format_object_mask(objectmask):
             not objectmask.startswith('[')):
         objectmask = "mask[%s]" % objectmask
     return objectmask
+
+
+class ComplexEncoder(json.JSONEncoder):
+    """ComplexEncoder helps jsonencoder deal with byte strings"""
+
+    def default(self, o):
+        """Encodes o as JSON"""
+
+        # Base64 encode bytes type objects.
+        if isinstance(o, bytes):
+            base64_bytes = base64.b64encode(o)
+            return base64_bytes.decode("utf-8")
+        # Let the base class default method raise the TypeError
+        return json.JSONEncoder.default(self, o)
