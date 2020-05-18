@@ -1,5 +1,22 @@
 # Change Log
 
+
+## [5.8.8] - 2020-05-18
+https://github.com/softlayer/softlayer-python/compare/v5.8.7...v5.8.8
+
+- #1266 Fixed ticket upload with REST endpoint
+- #1263 add the redundant/degraded option to hardware
+- #1262 Added `iter` option for ordering manager functions
+- #1264 Add Account planned, unplanned and announcement events
+- #1265 fixed pylint 2.5.0 errors 
+- #1261 Fix AttributeError: 'NoneType' object has no attribute 'keys 
+- #1256 Adding more github action tests, removing travis CI tests 
+- #887 fix Response shows additional new lines (\n) in ticket details
+- #1241 Storage feature for virtual and hardware servers 
+- #1242 Hardware and Virtual billing info
+- #1239 VPN subnet access to a use
+- #1254 added account billing-items/item-details/cancel-item commands
+
 ## [5.8.7] - 2020-03-26
 https://github.com/softlayer/softlayer-python/compare/v5.8.5...v5.8.7
 
