@@ -1,0 +1,23 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: ['armhf','amd64','arm64','ppc64el','s390x','i386']
+  steps:
+    - name: Install Snapcraft
+      uses: samuelmeuli/action-snapcraft@v1.1.1
+      with:
+        snapcraft_token: ${{ secrets.snapcraft_token }}
+    - name: Push to stable
+      run: |
+        VERSION=`snapcraft list-revisions slcli --arch ${{ matrix.arch }} | grep "edge\*" | awk '{print $1}'`
+        echo Publishing $VERSION on ${{ matrix.arch }}
+        snapcraft release slcli $VERSION stable
+
