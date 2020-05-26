@@ -1,5 +1,5 @@
 name: slcli # check to see if it's available
-version: '5.8.1+git' # check versioning
+version: 'git' # will be replaced by a `git describe` based version string
 summary: Python based SoftLayer API Tool. # 79 char long summary
 description: |
     A command-line interface is also included and can be used to manage various SoftLayer products and services.
