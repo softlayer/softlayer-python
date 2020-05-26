@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         arch: ['armhf','amd64','arm64','ppc64el','s390x','i386']
-  steps:
+    steps:
     - name: Install Snapcraft
       uses: samuelmeuli/action-snapcraft@v1.1.1
       with:
