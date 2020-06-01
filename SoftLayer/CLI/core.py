@@ -35,6 +35,7 @@ DEBUG_LOGGING_MAP = {
 PROG_NAME = "slcli (SoftLayer Command-line)"
 VALID_FORMATS = ['table', 'raw', 'json', 'jsonraw']
 DEFAULT_FORMAT = 'raw'
+
 if sys.stdout.isatty():
     DEFAULT_FORMAT = 'table'
 

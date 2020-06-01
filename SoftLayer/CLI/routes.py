@@ -290,6 +290,9 @@ ALL_ROUTES = [
     ('subnet:list', 'SoftLayer.CLI.subnet.list:cli'),
     ('subnet:lookup', 'SoftLayer.CLI.subnet.lookup:cli'),
 
+    ('tags', 'SoftLayer.CLI.tags'),
+    ('tags:list', 'SoftLayer.CLI.tags.list:cli'),
+
     ('ticket', 'SoftLayer.CLI.ticket'),
     ('ticket:create', 'SoftLayer.CLI.ticket.create:cli'),
     ('ticket:detail', 'SoftLayer.CLI.ticket.detail:cli'),
