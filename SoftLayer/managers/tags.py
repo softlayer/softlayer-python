@@ -9,6 +9,7 @@ import re
 
 from SoftLayer.exceptions import SoftLayerAPIError
 
+
 class TagManager(object):
     """Manager for Tag functions."""
 
@@ -49,7 +50,7 @@ class TagManager(object):
         :params string mask: Mask to use.
         """
         if mask is None:
-            mask="mask[tagType]"
+            mask = "mask[tagType]"
         return self.client.call('SoftLayer_Tag', 'getReferences', id=tag_id, mask=mask, iter=True)
 
     def reference_lookup(self, resource_table_id, tag_type):
@@ -77,7 +78,7 @@ class TagManager(object):
         if tag_type in ['ACCOUNT_DOCUMENT', 'CONTRACT']:
             raise SoftLayerAPIError(404, "Unable to lookup {} types".format(tag_type))
 
-        if tag_type == 'APPLICATION_DELIVERY_CONTROLLER' :
+        if tag_type == 'APPLICATION_DELIVERY_CONTROLLER':
             service = 'Network_Application_Delivery_Controller'
         elif tag_type == 'GUEST':
             service = 'Virtual_Guest'
@@ -92,6 +93,3 @@ class TagManager(object):
 
         # return {}
         return self.client.call(service, 'getObject', id=resource_table_id)
-
-
-

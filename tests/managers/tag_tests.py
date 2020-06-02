@@ -69,47 +69,48 @@ class TagTests(testing.TestCase):
 
     def test_reference_lookup_hardware(self):
         resource_id = 12345
-        tag_type =  'HARDWARE'
+        tag_type = 'HARDWARE'
 
         result = self.tag_manager.reference_lookup(resource_id, tag_type)
         self.assert_called_with('SoftLayer_Hardware', 'getObject', identifier=resource_id)
 
     def test_reference_lookup_hardware(self):
         resource_id = 12345
-        tag_type =  'HARDWARE'
+        tag_type = 'HARDWARE'
 
         result = self.tag_manager.reference_lookup(resource_id, tag_type)
         self.assert_called_with('SoftLayer_Hardware', 'getObject', identifier=resource_id)
 
     def test_reference_lookup_guest(self):
         resource_id = 12345
-        tag_type =  'GUEST'
+        tag_type = 'GUEST'
 
         result = self.tag_manager.reference_lookup(resource_id, tag_type)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'getObject', identifier=resource_id)
 
     def test_reference_lookup_app_delivery(self):
         resource_id = 12345
-        tag_type =  'APPLICATION_DELIVERY_CONTROLLER'
+        tag_type = 'APPLICATION_DELIVERY_CONTROLLER'
 
         result = self.tag_manager.reference_lookup(resource_id, tag_type)
-        self.assert_called_with('SoftLayer_Network_Application_Delivery_Controller', 'getObject', identifier=resource_id)
+        self.assert_called_with('SoftLayer_Network_Application_Delivery_Controller',
+                                'getObject', identifier=resource_id)
 
     def test_reference_lookup_dedicated(self):
         resource_id = 12345
-        tag_type =  'DEDICATED_HOST'
+        tag_type = 'DEDICATED_HOST'
 
         result = self.tag_manager.reference_lookup(resource_id, tag_type)
         self.assert_called_with('SoftLayer_Virtual_DedicatedHost', 'getObject', identifier=resource_id)
 
     def test_reference_lookup_document(self):
         resource_id = 12345
-        tag_type =  'ACCOUNT_DOCUMENT'
+        tag_type = 'ACCOUNT_DOCUMENT'
 
         exception = self.assertRaises(
             SoftLayerAPIError,
             self.tag_manager.reference_lookup,
-            resource_id, 
+            resource_id,
             tag_type
         )
         self.assertEqual(exception.faultCode, 404)

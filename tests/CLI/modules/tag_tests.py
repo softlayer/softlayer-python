@@ -20,7 +20,7 @@ class TagCLITests(testing.TestCase):
     def test_list_detail(self):
         result = self.run_command(['tags', 'list', '-d'])
         self.assert_no_fail(result)
-        self.assertIn('"vs-test1.test.sftlyr.ws', result.output) # From fixtures/virutal_guest.getObject
+        self.assertIn('"vs-test1.test.sftlyr.ws', result.output)  # From fixtures/virutal_guest.getObject
         # self.assert_called_with('SoftLayer_Tag', 'getUnattachedTagsForCurrentUser')
         self.assert_called_with('SoftLayer_Tag', 'getAttachedTagsForCurrentUser')
         self.assert_called_with('SoftLayer_Tag', 'getReferences', identifier=1286571)
