@@ -32,22 +32,22 @@ TEST_ALLOWED_HOST = {
 getObject = TEST_ALLOWED_HOST
 
 getSubnetsInAcl = [{
-        'id': 12345678,
-        'accountId': 1234,
-        'networkIdentifier': '10.11.12.13',
-        'cidr': '14',
-        'billingRecordId': None,
-        'parentId': None,
-        'networkVlanId': None,
-        'createDate': '2020-01-02 00:00:01',
-        'modifyDate': None,
-        'subnetType': 'SECONDARY_ON_VLAN',
-        'restrictAllocationFlag': 0,
-        'leafFlag': 1,
-        'ownerId': 1,
-        'ipAddressBegin': 129123,
-        'ipAddressEnd': 129145,
-        'purgeFlag': 0
+    'id': 12345678,
+    'accountId': 1234,
+    'networkIdentifier': '10.11.12.13',
+    'cidr': '14',
+    'billingRecordId': None,
+    'parentId': None,
+    'networkVlanId': None,
+    'createDate': '2020-01-02 00:00:01',
+    'modifyDate': None,
+    'subnetType': 'SECONDARY_ON_VLAN',
+    'restrictAllocationFlag': 0,
+    'leafFlag': 1,
+    'ownerId': 1,
+    'ipAddressBegin': 129123,
+    'ipAddressEnd': 129145,
+    'purgeFlag': 0
 }]
 
 assignSubnetsToAcl = [

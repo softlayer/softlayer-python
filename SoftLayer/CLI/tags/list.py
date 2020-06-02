@@ -3,15 +3,14 @@
 
 import click
 
-from SoftLayer.exceptions import SoftLayerAPIError
-from SoftLayer.managers.tags import TagManager
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer.exceptions import SoftLayerAPIError
+from SoftLayer.managers.tags import TagManager
 from SoftLayer import utils
 
 # pylint: disable=unnecessary-lambda
 
-from pprint import pprint as pp
 
 @click.command()
 @click.option('--detail', '-d', is_flag=True, default=False,
@@ -21,7 +20,7 @@ def cli(env, detail):
     """List Tags."""
 
     tag_manager = TagManager(env.client)
-    
+
     if detail:
         tables = detailed_table(tag_manager)
         for table in tables:
@@ -33,7 +32,9 @@ def cli(env, detail):
 
 
 def tag_row(tag):
-    return [tag.get('id'), tag.get('name'), tag.get('referenceCount',0)]
+    """Format a tag table row"""
+    return [tag.get('id'), tag.get('name'), tag.get('referenceCount', 0)]
+
 
 def detailed_table(tag_manager):
     """Creates a table for each tag, with details about resources using it"""
@@ -52,6 +53,7 @@ def detailed_table(tag_manager):
 
     return tables
 
+
 def simple_table(tag_manager):
     """Just tags and how many resources on each"""
     tags = tag_manager.list_tags()
@@ -62,6 +64,7 @@ def simple_table(tag_manager):
         table.add_row(tag_row(tag))
     return table
 
+
 def get_resource_name(tag_manager, resource_id, tag_type):
     """Returns a string to identify a resource"""
     try:
@@ -70,6 +73,6 @@ def get_resource_name(tag_manager, resource_id, tag_type):
             resource_row = resource.get('primaryIpAddress')
         else:
             resource_row = resource.get('fullyQualifiedDomainName')
-    except SoftLayerAPIError as e:
-        resource_row = "{}".format(e.reason)
+    except SoftLayerAPIError as exception:
+        resource_row = "{}".format(exception.reason)
     return resource_row

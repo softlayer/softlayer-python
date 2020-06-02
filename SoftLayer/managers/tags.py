@@ -9,6 +9,7 @@ import re
 
 from SoftLayer.exceptions import SoftLayerAPIError
 
+
 class TagManager(object):
     """Manager for Tag functions."""
 
@@ -25,21 +26,31 @@ class TagManager(object):
         unattached = self.get_unattached_tags(mask)
         attached = self.get_attached_tags(mask)
         return {'attached': attached, 'unattached': unattached}
-        # return [unattached, attached]
 
     def get_unattached_tags(self, mask=None):
-        """Calls SoftLayer_Tag::getUnattachedTagsForCurrentUser()"""
+        """Calls SoftLayer_Tag::getUnattachedTagsForCurrentUser()
+
+        :params string mask: Mask to use.
+        """
         return self.client.call('SoftLayer_Tag', 'getUnattachedTagsForCurrentUser',
                                 mask=mask, iter=True)
 
     def get_attached_tags(self, mask=None):
-        """Calls SoftLayer_Tag::getAttachedTagsForCurrentUser()"""
+        """Calls SoftLayer_Tag::getAttachedTagsForCurrentUser()
+
+        :params string mask: Mask to use.
+        """
         return self.client.call('SoftLayer_Tag', 'getAttachedTagsForCurrentUser',
                                 mask=mask, iter=True)
 
     def get_tag_references(self, tag_id, mask=None):
+        """Calls SoftLayer_Tag::getReferences(id=tag_id)
+
+        :params int tag_id: Tag id to get references from
+        :params string mask: Mask to use.
+        """
         if mask is None:
-            mask="mask[tagType]"
+            mask = "mask[tagType]"
         return self.client.call('SoftLayer_Tag', 'getReferences', id=tag_id, mask=mask, iter=True)
 
     def reference_lookup(self, resource_table_id, tag_type):
@@ -50,8 +61,8 @@ class TagManager(object):
 
         From  SoftLayer_Tag::getAllTagTypes()
 
-        |Type                             |Service | 
-        | -----------------------------   | ------ | 
+        |Type                             |Service |
+        | -----------------------------   | ------ |
         |Hardware                         |HARDWARE|
         |CCI                              |GUEST|
         |Account Document                 |ACCOUNT_DOCUMENT|
@@ -67,7 +78,7 @@ class TagManager(object):
         if tag_type in ['ACCOUNT_DOCUMENT', 'CONTRACT']:
             raise SoftLayerAPIError(404, "Unable to lookup {} types".format(tag_type))
 
-        if tag_type == 'APPLICATION_DELIVERY_CONTROLLER' :
+        if tag_type == 'APPLICATION_DELIVERY_CONTROLLER':
             service = 'Network_Application_Delivery_Controller'
         elif tag_type == 'GUEST':
             service = 'Virtual_Guest'
@@ -82,6 +93,3 @@ class TagManager(object):
 
         # return {}
         return self.client.call(service, 'getObject', id=resource_table_id)
-
-
-
