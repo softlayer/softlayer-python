@@ -61,8 +61,8 @@ class TagManager(object):
 
         From  SoftLayer_Tag::getAllTagTypes()
 
-        |Type                             |Service | 
-        | -----------------------------   | ------ | 
+        |Type                             |Service |
+        | -----------------------------   | ------ |
         |Hardware                         |HARDWARE|
         |CCI                              |GUEST|
         |Account Document                 |ACCOUNT_DOCUMENT|

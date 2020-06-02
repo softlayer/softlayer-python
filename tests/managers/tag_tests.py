@@ -4,12 +4,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import mock
-import sys
-import unittest
 
-import SoftLayer
-from SoftLayer import fixtures
 from SoftLayer.exceptions import SoftLayerAPIError
 from SoftLayer.managers import tags
 from SoftLayer import testing
@@ -18,7 +13,7 @@ from SoftLayer import testing
 class TagTests(testing.TestCase):
 
     def set_up(self):
-        self.tag_manager = SoftLayer.TagManager(self.client)
+        self.tag_manager = tags.TagManager(self.client)
         self.test_mask = "mask[id]"
 
     def test_list_tags(self):
@@ -71,28 +66,21 @@ class TagTests(testing.TestCase):
         resource_id = 12345
         tag_type = 'HARDWARE'
 
-        result = self.tag_manager.reference_lookup(resource_id, tag_type)
-        self.assert_called_with('SoftLayer_Hardware', 'getObject', identifier=resource_id)
-
-    def test_reference_lookup_hardware(self):
-        resource_id = 12345
-        tag_type = 'HARDWARE'
-
-        result = self.tag_manager.reference_lookup(resource_id, tag_type)
+        self.tag_manager.reference_lookup(resource_id, tag_type)
         self.assert_called_with('SoftLayer_Hardware', 'getObject', identifier=resource_id)
 
     def test_reference_lookup_guest(self):
         resource_id = 12345
         tag_type = 'GUEST'
 
-        result = self.tag_manager.reference_lookup(resource_id, tag_type)
+        self.tag_manager.reference_lookup(resource_id, tag_type)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'getObject', identifier=resource_id)
 
     def test_reference_lookup_app_delivery(self):
         resource_id = 12345
         tag_type = 'APPLICATION_DELIVERY_CONTROLLER'
 
-        result = self.tag_manager.reference_lookup(resource_id, tag_type)
+        self.tag_manager.reference_lookup(resource_id, tag_type)
         self.assert_called_with('SoftLayer_Network_Application_Delivery_Controller',
                                 'getObject', identifier=resource_id)
 
@@ -100,7 +88,7 @@ class TagTests(testing.TestCase):
         resource_id = 12345
         tag_type = 'DEDICATED_HOST'
 
-        result = self.tag_manager.reference_lookup(resource_id, tag_type)
+        self.tag_manager.reference_lookup(resource_id, tag_type)
         self.assert_called_with('SoftLayer_Virtual_DedicatedHost', 'getObject', identifier=resource_id)
 
     def test_reference_lookup_document(self):

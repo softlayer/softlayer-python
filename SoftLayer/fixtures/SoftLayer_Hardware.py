@@ -1,8 +1,8 @@
 getObject = {
-    'id': 1000,
-    'globalIdentifier': '1a2b3c-1701',
-    'datacenter': {'id': 50, 'name': 'TEST00',
-                   'description': 'Test Data Center'},
+    'id': 1234,
+    'globalIdentifier': 'xxxxc-asd',
+    'datacenter': {'id': 12, 'name': 'DALLAS21',
+                   'description': 'Dallas 21'},
     'billingItem': {
         'id': 6327,
         'recurringFee': 1.54,
@@ -13,59 +13,47 @@ getObject = {
         'orderItem': {
             'order': {
                 'userRecord': {
-                    'username': 'chechu',
+                    'username': 'bob',
                 }
             }
         }
     },
-    'primaryIpAddress': '172.16.1.100',
-    'hostname': 'hardware-test1',
+    'primaryIpAddress': '4.4.4.4',
+    'hostname': 'testtest1',
     'domain': 'test.sftlyr.ws',
     'bareMetalInstanceFlag': True,
-    'fullyQualifiedDomainName': 'hardware-test1.test.sftlyr.ws',
-    'processorPhysicalCoreAmount': 2,
-    'memoryCapacity': 2,
-    'primaryBackendIpAddress': '10.1.0.2',
-    'networkManagementIpAddress': '10.1.0.3',
+    'fullyQualifiedDomainName': 'testtest1.test.sftlyr.ws',
+    'processorPhysicalCoreAmount': 4,
+    'memoryCapacity': 4,
+    'primaryBackendIpAddress': '10.4.4.4',
+    'networkManagementIpAddress': '10.4.4.4',
     'hardwareStatus': {'status': 'ACTIVE'},
-    'primaryNetworkComponent': {'maxSpeed': 10, 'speed': 10},
-    'provisionDate': '2013-08-01 15:23:45',
-    'notes': 'These are test notes.',
+    'primaryNetworkComponent': {'maxSpeed': 1000, 'speed': 1000},
+    'provisionDate': '2020-08-01 15:23:45',
+    'notes': 'NOTES NOTES NOTES',
     'operatingSystem': {
         'softwareLicense': {
             'softwareDescription': {
-                'referenceCode': 'UBUNTU_12_64',
+                'referenceCode': 'UBUNTU_20_64',
                 'name': 'Ubuntu',
-                'version': 'Ubuntu 12.04 LTS',
+                'version': 'Ubuntu 20.04 LTS',
             }
         },
         'passwords': [
-            {'username': 'root', 'password': 'abc123'}
+            {'username': 'root', 'password': 'xxxxxxxxxxxx'}
         ],
     },
     'remoteManagementAccounts': [
-        {'username': 'root', 'password': 'abc123'}
+        {'username': 'root', 'password': 'zzzzzzzzzzzzzz'}
     ],
     'networkVlans': [
         {
             'networkSpace': 'PRIVATE',
-            'vlanNumber': 1800,
-            'id': 9653
-        },
-        {
-            'networkSpace': 'PUBLIC',
-            'vlanNumber': 3672,
-            'id': 19082
+            'vlanNumber': 1234,
+            'id': 11111
         },
     ],
     'tagReferences': [
-        {'tag': {'name': 'test_tag'}}
+        {'tag': {'name': 'a tag'}}
     ],
-    'activeTransaction': {
-        'transactionStatus': {
-            'name': 'TXN_NAME',
-            'friendlyName': 'Friendly Transaction Name',
-            'id': 6660
-        }
-    }
 }

@@ -4,7 +4,6 @@
 
     Tests for the user cli command
 """
-from SoftLayer.fixtures import SoftLayer_Account as SoftLayer_Account
 from SoftLayer import testing
 
 

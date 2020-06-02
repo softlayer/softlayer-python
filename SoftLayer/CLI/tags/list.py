@@ -3,15 +3,13 @@
 
 import click
 
-from SoftLayer.exceptions import SoftLayerAPIError
-from SoftLayer.managers.tags import TagManager
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer.exceptions import SoftLayerAPIError
+from SoftLayer.managers.tags import TagManager
 from SoftLayer import utils
 
 # pylint: disable=unnecessary-lambda
-
-from pprint import pprint as pp
 
 
 @click.command()
@@ -34,6 +32,7 @@ def cli(env, detail):
 
 
 def tag_row(tag):
+    """Format a tag table row"""
     return [tag.get('id'), tag.get('name'), tag.get('referenceCount', 0)]
 
 
@@ -74,6 +73,6 @@ def get_resource_name(tag_manager, resource_id, tag_type):
             resource_row = resource.get('primaryIpAddress')
         else:
             resource_row = resource.get('fullyQualifiedDomainName')
-    except SoftLayerAPIError as e:
-        resource_row = "{}".format(e.reason)
+    except SoftLayerAPIError as exception:
+        resource_row = "{}".format(exception.reason)
     return resource_row
