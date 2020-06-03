@@ -14,3 +14,5 @@ getReferences = [
         'usrRecordId': 6625205
     }
 ]
+
+setTags = True

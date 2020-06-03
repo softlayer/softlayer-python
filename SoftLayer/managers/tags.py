@@ -93,3 +93,12 @@ class TagManager(object):
 
         # return {}
         return self.client.call(service, 'getObject', id=resource_table_id)
+
+    def set_tags(self, tags, key_name, resource_id):
+        """Calls SoftLayer_Tag::setTags()
+
+        :param string tags: List of tags.
+        :param string key_name: Key name of a tag type.
+        :param int resource_id: ID of the object being tagged.
+        """
+        return self.client.call('SoftLayer_Tag', 'setTags', tags, key_name, resource_id)

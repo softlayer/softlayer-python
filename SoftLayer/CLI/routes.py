@@ -292,6 +292,7 @@ ALL_ROUTES = [
 
     ('tags', 'SoftLayer.CLI.tags'),
     ('tags:list', 'SoftLayer.CLI.tags.list:cli'),
+    ('tags:set', 'SoftLayer.CLI.tags.set:cli'),
 
     ('ticket', 'SoftLayer.CLI.ticket'),
     ('ticket:create', 'SoftLayer.CLI.ticket.create:cli'),
