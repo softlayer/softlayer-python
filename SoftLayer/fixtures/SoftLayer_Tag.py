@@ -16,3 +16,7 @@ getReferences = [
 ]
 
 setTags = True
+
+getObject = getAttachedTagsForCurrentUser[0]
+
+getTagByTagName = getAttachedTagsForCurrentUser
