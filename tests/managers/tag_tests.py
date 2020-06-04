@@ -103,3 +103,11 @@ class TagTests(testing.TestCase):
         )
         self.assertEqual(exception.faultCode, 404)
         self.assertEqual(exception.reason, "Unable to lookup ACCOUNT_DOCUMENT types")
+
+    def test_set_tags(self):
+        tags = "tag1,tag2"
+        key_name = "GUEST"
+        resource_id = 100
+
+        self.tag_manager.set_tags(tags, key_name, resource_id)
+        self.assert_called_with('SoftLayer_Tag', 'setTags')

@@ -4,6 +4,8 @@
 
     Tests for the user cli command
 """
+import mock
+
 from SoftLayer import testing
 
 
@@ -24,3 +26,21 @@ class TagCLITests(testing.TestCase):
         self.assert_called_with('SoftLayer_Tag', 'getAttachedTagsForCurrentUser')
         self.assert_called_with('SoftLayer_Tag', 'getReferences', identifier=1286571)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'getObject', identifier=33488921)
+
+    @mock.patch('SoftLayer.CLI.tags.set.click')
+    def test_set_tags(self, click):
+        result = self.run_command(['tags', 'set', '--tags=tag1,tag2', '--key-name=GUEST', '--resource-id=100'])
+        click.secho.assert_called_with('Set tags successfully', fg='green')
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Tag', 'setTags',
+                                args=("tag1,tag2", "GUEST", 100),)
+
+    @mock.patch('SoftLayer.CLI.tags.set.click')
+    def test_set_tags_failure(self, click):
+        mock = self.set_mock('SoftLayer_Tag', 'setTags')
+        mock.return_value = False
+        result = self.run_command(['tags', 'set', '--tags=tag1,tag2', '--key-name=GUEST', '--resource-id=100'])
+        click.secho.assert_called_with('Failed to set tags', fg='red')
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Tag', 'setTags',
+                                args=("tag1,tag2", "GUEST", 100),)
