@@ -7,6 +7,7 @@
 import mock
 
 from SoftLayer import testing
+from SoftLayer.managers.tags import TagManager
 
 
 class TagCLITests(testing.TestCase):
@@ -56,3 +57,11 @@ class TagCLITests(testing.TestCase):
         result = self.run_command(['tags', 'details', tag_id])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Tag', 'getObject', identifier=tag_id)
+
+    def test_deleteTags_by_name(self):
+        result = self.run_command(['tags', 'delete', '--name="test"'])
+        self.assert_no_fail(result)
+
+    def test_deleteTags_by_id(self):
+        result = self.run_command(['tags', 'delete', '-id=123456'])
+        self.assert_no_fail(result)
