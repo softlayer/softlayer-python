@@ -33,7 +33,7 @@ class TagCLITests(testing.TestCase):
         click.secho.assert_called_with('Set tags successfully', fg='green')
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Tag', 'setTags',
-                                args=("tag1,tag2", "GUEST", 100),)
+                                args=("tag1,tag2", "GUEST", 100), )
 
     @mock.patch('SoftLayer.CLI.tags.set.click')
     def test_set_tags_failure(self, click):
@@ -43,4 +43,16 @@ class TagCLITests(testing.TestCase):
         click.secho.assert_called_with('Failed to set tags', fg='red')
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Tag', 'setTags',
-                                args=("tag1,tag2", "GUEST", 100),)
+                                args=("tag1,tag2", "GUEST", 100), )
+
+    def test_details_by_name(self):
+        tag_name = 'bs_test_instance'
+        result = self.run_command(['tags', 'details', tag_name])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Tag', 'getTagByTagName', args=(tag_name,))
+
+    def test_details_by_id(self):
+        tag_id = '1286571'
+        result = self.run_command(['tags', 'details', tag_id])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Tag', 'getObject', identifier=tag_id)

@@ -111,3 +111,29 @@ class TagTests(testing.TestCase):
 
         self.tag_manager.set_tags(tags, key_name, resource_id)
         self.assert_called_with('SoftLayer_Tag', 'setTags')
+
+    def test_get_tag(self):
+        tag_id = 1286571
+        result = self.tag_manager.get_tag(tag_id)
+        self.assertEqual(tag_id, result.get('id'))
+        self.assert_called_with('SoftLayer_Tag', 'getObject', identifier=tag_id)
+
+    def test_get_tag_mask(self):
+        tag_id = 1286571
+        result = self.tag_manager.get_tag(tag_id, mask=self.test_mask)
+        self.assertEqual(tag_id, result.get('id'))
+        self.assert_called_with('SoftLayer_Tag', 'getObject', identifier=tag_id, mask=self.test_mask)
+
+    def test_get_tag_by_name(self):
+        tag_name = 'bs_test_instance'
+        result = self.tag_manager.get_tag_by_name(tag_name)
+        args = (tag_name,)
+        self.assertEqual(tag_name, result[0].get('name'))
+        self.assert_called_with('SoftLayer_Tag', 'getTagByTagName', args=args)
+
+    def test_get_tag_by_name_mask(self):
+        tag_name = 'bs_test_instance'
+        result = self.tag_manager.get_tag_by_name(tag_name, mask=self.test_mask)
+        args = (tag_name,)
+        self.assertEqual(tag_name, result[0].get('name'))
+        self.assert_called_with('SoftLayer_Tag', 'getTagByTagName', mask=self.test_mask, args=args)

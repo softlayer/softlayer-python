@@ -53,6 +53,28 @@ class TagManager(object):
             mask = "mask[tagType]"
         return self.client.call('SoftLayer_Tag', 'getReferences', id=tag_id, mask=mask, iter=True)
 
+    def get_tag(self, tag_id, mask=None):
+        """Calls SoftLayer_Tag::getObject(id=tag_id)
+
+        :params int tag_id: Tag id to get object from
+        :params string mask: Mask to use.
+        """
+        if mask is None:
+            mask = "mask[id,name]"
+        result = self.client.call('SoftLayer_Tag', 'getObject', id=tag_id, mask=mask)
+        return result
+
+    def get_tag_by_name(self, tag_name, mask=None):
+        """Calls SoftLayer_Tag::getTagByTagName(tag_name)
+
+        :params string tag_name: Tag name to get object from
+        :params string mask: Mask to use.
+        """
+        if mask is None:
+            mask = "mask[id,name]"
+        result = self.client.call('SoftLayer_Tag', 'getTagByTagName', tag_name, mask=mask)
+        return result
+
     def reference_lookup(self, resource_table_id, tag_type):
         """Returns the SoftLayer Service for the corresponding type
 

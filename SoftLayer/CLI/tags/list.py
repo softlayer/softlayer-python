@@ -22,7 +22,7 @@ def cli(env, detail):
     tag_manager = TagManager(env.client)
 
     if detail:
-        tables = detailed_table(tag_manager)
+        tables = detailed_table(tag_manager, tag_manager.get_attached_tags())
         for table in tables:
             env.fout(table)
     else:
@@ -36,9 +36,8 @@ def tag_row(tag):
     return [tag.get('id'), tag.get('name'), tag.get('referenceCount', 0)]
 
 
-def detailed_table(tag_manager):
+def detailed_table(tag_manager, tags):
     """Creates a table for each tag, with details about resources using it"""
-    tags = tag_manager.get_attached_tags()
     tables = []
     for tag in tags:
         references = tag_manager.get_tag_references(tag.get('id'))
@@ -76,3 +75,4 @@ def get_resource_name(tag_manager, resource_id, tag_type):
     except SoftLayerAPIError as exception:
         resource_row = "{}".format(exception.reason)
     return resource_row
+
