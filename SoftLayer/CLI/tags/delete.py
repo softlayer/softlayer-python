@@ -1,30 +1,31 @@
-"""List Tags."""
+"""Delete Tags."""
 # :license: MIT, see LICENSE for more details.
 
 import click
 
-from SoftLayer.exceptions import SoftLayerAPIError
+from SoftLayer.CLI.exceptions import ArgumentError
 from SoftLayer.managers.tags import TagManager
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import formatting
-from SoftLayer import utils
-
-# pylint: disable=unnecessary-lambda
-
-from pprint import pprint as pp
 
 
 @click.command()
-@click.option('-id', required=False, show_default=False, type=int, help='identifier')
-@click.option('--name', required=False, default=False, type=str, show_default=False, help='tag name')
+@click.argument('identifier')
+@click.option('--name', required=False, default=False, is_flag=True, show_default=False,
+              help='Assume identifier is a tag name. Useful if your tag name is a number.')
 @environment.pass_env
-def cli(env, id, name):
-    """delete Tag."""
+def cli(env, identifier, name):
+    """Delete a Tag. Tag names that contain spaces need to be encased in quotes"""
 
     tag_manager = TagManager(env.client)
+    tag_name = identifier
+    # If the identifier is a int, and user didn't tell us it was a name.
+    if str.isdigit(identifier) and not name:
+        tag = tag_manager.get_tag(tag_id)
+        tag_name = tag.get('name', None)
 
-    if not name and id is not None:
-        tag_name = tag_manager.get_tag(id)
-        tag_manager.delete_tag(tag_name['name'])
-    if name and id is None:
-        tag_manager.delete_tag(name)
+    
+    result = tag_manager.delete_tag(tag_name)
+    if result:
+        click.secho("Tag {} has been removed".format(tag_name), fg='green')
+    else:
+        click.secho("Failed to remove tag {}".format(tag_name), fg='red')
