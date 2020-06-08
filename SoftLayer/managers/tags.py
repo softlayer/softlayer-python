@@ -116,6 +116,9 @@ class TagManager(object):
         # return {}
         return self.client.call(service, 'getObject', id=resource_table_id)
 
+    def delete_tag(self, name):
+        return self.client.call('SoftLayer_Tag', 'deleteTag', name)
+
     def set_tags(self, tags, key_name, resource_id):
         """Calls SoftLayer_Tag::setTags()
 

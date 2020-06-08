@@ -15,6 +15,8 @@ getReferences = [
     }
 ]
 
+deleteTag = True
+
 setTags = True
 
 getObject = getAttachedTagsForCurrentUser[0]
