@@ -22,3 +22,10 @@ setTags = True
 getObject = getAttachedTagsForCurrentUser[0]
 
 getTagByTagName = getAttachedTagsForCurrentUser
+
+getAllTagTypes = [
+    {
+        "description": "Hardware",
+        "keyName": "HARDWARE"
+    }
+]

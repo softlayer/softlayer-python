@@ -3,12 +3,10 @@
 
 import click
 
-from SoftLayer.CLI.exceptions import ArgumentError
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.tags import TagManager
 from SoftLayer.CLI import environment
 
-from pprint import pprint as pp 
 @click.command()
 @environment.pass_env
 def cli(env):

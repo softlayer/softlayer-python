@@ -20,7 +20,7 @@ def cli(env, identifier, name):
     tag_name = identifier
     # If the identifier is a int, and user didn't tell us it was a name.
     if str.isdigit(identifier) and not name:
-        tag = tag_manager.get_tag(tag_id)
+        tag = tag_manager.get_tag(identifier)
         tag_name = tag.get('name', None)
 
     
