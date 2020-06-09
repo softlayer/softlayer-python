@@ -291,6 +291,7 @@ ALL_ROUTES = [
     ('subnet:lookup', 'SoftLayer.CLI.subnet.lookup:cli'),
 
     ('tags', 'SoftLayer.CLI.tags'),
+    ('tags:cleanup', 'SoftLayer.CLI.tags.cleanup:cli'),
     ('tags:list', 'SoftLayer.CLI.tags.list:cli'),
     ('tags:set', 'SoftLayer.CLI.tags.set:cli'),
     ('tags:details', 'SoftLayer.CLI.tags.details:cli'),

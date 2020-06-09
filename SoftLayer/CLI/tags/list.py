@@ -66,13 +66,11 @@ def simple_table(tag_manager):
 
 def get_resource_name(tag_manager, resource_id, tag_type):
     """Returns a string to identify a resource"""
+    name = None
     try:
         resource = tag_manager.reference_lookup(resource_id, tag_type)
-        if tag_type == 'NETWORK_VLAN_FIREWALL':
-            resource_row = resource.get('primaryIpAddress')
-        else:
-            resource_row = resource.get('fullyQualifiedDomainName')
+        name = tag_manager.get_resource_name(resource, tag_type)
     except SoftLayerAPIError as exception:
-        resource_row = "{}".format(exception.reason)
-    return resource_row
+        name = "{}".format(exception.reason)
+    return name
 

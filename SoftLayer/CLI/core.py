@@ -158,6 +158,7 @@ def cli(env,
 
     logger.setLevel(DEBUG_LOGGING_MAP.get(verbose, logging.DEBUG))
     env.vars['_timings'] = SoftLayer.DebugTransport(env.client.transport)
+    env.vars['verbose'] = verbose
     env.client.transport = env.vars['_timings']
 
 

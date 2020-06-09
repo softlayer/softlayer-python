@@ -99,7 +99,6 @@ class TagManager(object):
         service = self.type_to_service(tag_type)
         if service is None:
             raise SoftLayerAPIError(404, "Unable to lookup {} types".format(tag_type))
-        # return {}
         return self.client.call(service, 'getObject', id=resource_table_id)
 
     def delete_tag(self, name):
@@ -181,6 +180,26 @@ class TagManager(object):
             # HARDWARE -> Hardware, NETWORK_VLAN -> Network_Vlan for example.
             service = re.sub(r'(^[a-z]|\_[a-z])', lambda x: x.group().upper(), tag_type)
         return service
+
+    @staticmethod
+    def get_resource_name(resource, tag_type):
+        """Returns a string that names a resource
+
+        :param dict resource: A SoftLayer datatype for the given tag_type
+        :param string tag_type: Key name for the tag_type
+        """
+        if tag_type == 'NETWORK_VLAN_FIREWALL':
+            return resource.get('primaryIpAddress')
+        elif tag_type == 'NETWORK_VLAN':
+            return "{} ({})".format(resource.get('vlanNumber'), resource.get('name'))
+        elif tag_type == 'IMAGE_TEMPLATE' or tag_type == 'APPLICATION_DELIVERY_CONTROLLER':
+            return resource.get('name')
+        elif tag_type == 'TICKET':
+            return resource.get('subjet')
+        elif tag_type == 'NETWORK_SUBNET':
+            return resource.get('networkIdentifier')
+        else:
+            return resource.get('fullyQualifiedDomainName')
 
     # @staticmethod
     # def type_to_datatype(tag_type):
