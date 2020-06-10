@@ -24,3 +24,7 @@ These commands will allow you to interact with the **IMS** provier tagging servi
 .. click:: SoftLayer.CLI.tags.taggable:cli
     :prog: tags taggable
     :show-nested:
+
+.. click:: SoftLayer.CLI.tags.cleanup:cli
+    :prog: tags cleanup
+    :show-nested:
