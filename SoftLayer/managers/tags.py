@@ -120,7 +120,7 @@ class TagManager(object):
     def get_all_tag_types(self):
         """Calls SoftLayer_Tag::getAllTagTypes()"""
         types = self.client.call('SoftLayer_Tag', 'getAllTagTypes')
-        useable_types  = []
+        useable_types = []
         for tag_type in types:
             service = self.type_to_service(tag_type['keyName'])
             # Mostly just to remove the types that are not user taggable.
@@ -146,14 +146,14 @@ class TagManager(object):
             to_return = []
             # Fake search result output
             for resource in resources:
-                to_return.append({'resourceType':service, 'resource':resource})
+                to_return.append({'resourceType': service, 'resource': resource})
             return to_return
         elif tag_type == 'NETWORK_SUBNET':
             resources = self.client.call('SoftLayer_Account', 'getSubnets', iter=True)
             to_return = []
             # Fake search result output
             for resource in resources:
-                to_return.append({'resourceType':service, 'resource':resource})
+                to_return.append({'resourceType': service, 'resource': resource})
             return to_return
         resources = self.client.call('SoftLayer_Search', 'advancedSearch', search_term, iter=True)
         return resources
@@ -228,4 +228,3 @@ class TagManager(object):
     #         datatye = 'blockDeviceTemplateGroups'
 
     #     return datatye
-

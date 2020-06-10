@@ -3,9 +3,8 @@
 
 import click
 
-from SoftLayer.CLI.exceptions import ArgumentError
-from SoftLayer.managers.tags import TagManager
 from SoftLayer.CLI import environment
+from SoftLayer.managers.tags import TagManager
 
 
 @click.command()
@@ -23,7 +22,6 @@ def cli(env, identifier, name):
         tag = tag_manager.get_tag(identifier)
         tag_name = tag.get('name', None)
 
-    
     result = tag_manager.delete_tag(tag_name)
     if result:
         click.secho("Tag {} has been removed".format(tag_name), fg='green')

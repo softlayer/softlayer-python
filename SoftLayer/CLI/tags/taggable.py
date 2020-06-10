@@ -3,9 +3,10 @@
 
 import click
 
+from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.tags import TagManager
-from SoftLayer.CLI import environment
+
 
 @click.command()
 @environment.pass_env

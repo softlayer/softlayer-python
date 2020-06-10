@@ -4,13 +4,7 @@
 import click
 
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import formatting
-from SoftLayer.exceptions import SoftLayerAPIError
 from SoftLayer.managers.tags import TagManager
-from SoftLayer import utils
-
-from pprint import pprint as pp
-# pylint: disable=unnecessary-lambda
 
 
 @click.command()
@@ -22,7 +16,7 @@ def cli(env, dry_run):
 
     tag_manager = TagManager(env.client)
     empty_tags = tag_manager.get_unattached_tags()
-    
+
     for tag in empty_tags:
         if dry_run:
             click.secho("(Dry Run) Removing {}".format(tag.get('name')), fg='yellow')
@@ -30,4 +24,3 @@ def cli(env, dry_run):
             result = tag_manager.delete_tag(tag.get('name'))
             color = 'green' if result else 'red'
             click.secho("Removing {}".format(tag.get('name')), fg=color)
-

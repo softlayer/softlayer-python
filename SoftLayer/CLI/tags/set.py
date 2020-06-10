@@ -8,7 +8,7 @@ from SoftLayer.managers.tags import TagManager
 
 
 @click.command()
-@click.option('--tags', '-t',  type=click.STRING, required=True,
+@click.option('--tags', '-t', type=click.STRING, required=True,
               help='Comma seperated list of tags, enclosed in quotes. "tag1, tag2"')
 @click.option('--key-name', '-k', type=click.STRING, required=True,
               help="Key name of a tag type e.g. GUEST, HARDWARE. See slcli tags taggable output.")
