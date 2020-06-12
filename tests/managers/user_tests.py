@@ -231,7 +231,7 @@ class UserManagerTests(testing.TestCase):
         subnet_id = 1234
         expected_args = (
             [{"userId": user_id, "subnetId": subnet_id}],
-            )
+        )
         self.manager.vpn_subnet_add(user_id, [subnet_id])
         self.assert_called_with('SoftLayer_Network_Service_Vpn_Overrides', 'createObjects', args=expected_args)
         self.assert_called_with('SoftLayer_User_Customer', 'updateVpnUser', identifier=user_id)
@@ -242,7 +242,7 @@ class UserManagerTests(testing.TestCase):
         overrides = [{'id': 3661234, 'subnetId': subnet_id}]
         expected_args = (
             overrides,
-            )
+        )
         self.manager.vpn_subnet_remove(user_id, [subnet_id])
         self.assert_called_with('SoftLayer_Network_Service_Vpn_Overrides', 'deleteObjects', args=expected_args)
         self.assert_called_with('SoftLayer_User_Customer', 'updateVpnUser', identifier=user_id)

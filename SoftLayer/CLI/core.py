@@ -35,6 +35,7 @@ DEBUG_LOGGING_MAP = {
 PROG_NAME = "slcli (SoftLayer Command-line)"
 VALID_FORMATS = ['table', 'raw', 'json', 'jsonraw']
 DEFAULT_FORMAT = 'raw'
+
 if sys.stdout.isatty():
     DEFAULT_FORMAT = 'table'
 
@@ -157,6 +158,7 @@ def cli(env,
 
     logger.setLevel(DEBUG_LOGGING_MAP.get(verbose, logging.DEBUG))
     env.vars['_timings'] = SoftLayer.DebugTransport(env.client.transport)
+    env.vars['verbose'] = verbose
     env.client.transport = env.vars['_timings']
 
 

@@ -374,10 +374,10 @@ class HardwareTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Hardware_Server',
                                 'editObject',
                                 args=({
-                                          'hostname': 'new-host',
-                                          'domain': 'new.sftlyr.ws',
-                                          'notes': 'random notes',
-                                      },),
+                                    'hostname': 'new-host',
+                                    'domain': 'new.sftlyr.ws',
+                                    'notes': 'random notes',
+                                },),
                                 identifier=100)
 
     def test_rescue(self):
