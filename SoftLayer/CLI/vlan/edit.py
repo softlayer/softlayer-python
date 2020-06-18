@@ -4,8 +4,7 @@
 import click
 
 import SoftLayer
-from SoftLayer.CLI import environment, exceptions
-from SoftLayer.CLI import formatting
+from SoftLayer.CLI import environment
 from SoftLayer.CLI import helpers
 
 
