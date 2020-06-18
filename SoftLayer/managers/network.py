@@ -18,6 +18,8 @@ from SoftLayer.managers import event_log
 
 LOGGER = logging.getLogger(__name__)
 
+# pylint: disable=no-self-use,too-many-lines
+
 DEFAULT_SUBNET_MASK = ','.join(['hardware',
                                 'datacenter',
                                 'ipAddressCount',
