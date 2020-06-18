@@ -625,3 +625,12 @@ class NetworkTests(testing.TestCase):
         _filter = {'objectName': {'operation': 'CCI'}}
         self.assert_called_with('SoftLayer_Event_Log', 'getAllObjects', filter=_filter)
         self.assertEqual(100, log['accountId'])
+
+    def test_vlan_edit(self):
+        vlan_id = 100
+        name = "test"
+        note = "test note"
+        tags = "tag1,tag2"
+
+        self.network.edit(vlan_id, name, note, tags)
+        self.assert_called_with('SoftLayer_Network_Vlan', 'editObject')

@@ -7,3 +7,6 @@ getObject = {
     'vlanNumber': 4444,
     'firewallInterfaces': None
 }
+
+editObject = True
+setTags = True
