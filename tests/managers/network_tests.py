@@ -158,6 +158,26 @@ class NetworkTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Billing_Item', 'cancelService',
                                 identifier=1056)
 
+    def test_set_tags_subnet(self):
+        subnet_id = 1234
+        tags = 'tags1,tag2'
+        result = self.network.set_tags_subnet(subnet_id, tags)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Network_Subnet', 'setTags',
+                                identifier=subnet_id,
+                                args=(tags,))
+
+    def test_edit_note_subnet(self):
+        subnet_id = 1234
+        note = 'test note'
+        result = self.network.edit_note_subnet(subnet_id, note)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Network_Subnet', 'editNote',
+                                identifier=subnet_id,
+                                args=(note,))
+
     def test_create_securitygroup(self):
         result = self.network.create_securitygroup(name='foo',
                                                    description='bar')

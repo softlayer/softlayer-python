@@ -25,5 +25,16 @@ getObject = {
         }
     ],
     'hardware': [],
-    'usableIpAddressCount': 22
+    'usableIpAddressCount': 22,
+    'note': 'test note',
+    'tagReferences': [
+        {'id': 1000123,
+         'resourceTableId': 1234,
+         'tag': {'id': 100123,
+                 'name': 'subnet: test tag'},
+         }
+    ]
 }
+
+editNote = True
+setTags = True
