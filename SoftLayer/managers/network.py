@@ -24,6 +24,15 @@ DEFAULT_SUBNET_MASK = ','.join(['hardware',
                                 'datacenter',
                                 'ipAddressCount',
                                 'virtualGuests',
+                                'id',
+                                'networkIdentifier',
+                                'cidr',
+                                'subnetType',
+                                'gateway',
+                                'broadcastAddress',
+                                'usableIpAddressCount',
+                                'note',
+                                'tagReferences[tag]',
                                 'networkVlan[id,networkSpace]'])
 DEFAULT_VLAN_MASK = ','.join([
     'firewallInterfaces',
@@ -232,6 +241,20 @@ class NetworkManager(object):
                                             " " % subnet_id)
         billing_id = subnet['billingItem']['id']
         return self.client['Billing_Item'].cancelService(id=billing_id)
+
+    def set_tags_subnet(self, subnet_id, tags):
+        """Tag a subnet by passing in one or more tags separated by a comma.
+
+        :param int subnet_id: The ID of the subnet.
+        """
+        return self.subnet.setTags(tags, id=subnet_id)
+
+    def edit_note_subnet(self, subnet_id, note):
+        """Edit the note for this subnet.
+
+        :param int subnet_id: The ID of the subnet.
+        """
+        return self.subnet.editNote(note, id=subnet_id)
 
     def create_securitygroup(self, name=None, description=None):
         """Creates a security group.
