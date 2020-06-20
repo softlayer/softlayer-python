@@ -50,9 +50,9 @@ def cli(env, identifier, no_vs, no_hardware):
 
     ip_address = subnet.get('ipAddresses')
 
-    ip_table = formatting.KeyValueTable(['ipAddress','value'])
+    ip_table = formatting.KeyValueTable(['ipAddress', 'value'])
     for address in ip_address:
-        ip_table.add_row([address.get('id'),address.get('ipAddress')])
+        ip_table.add_row([address.get('id'), address.get('ipAddress')])
 
     table.add_row(['ipAddresses', ip_table])
 
