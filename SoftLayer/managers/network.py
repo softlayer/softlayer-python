@@ -685,3 +685,8 @@ class NetworkManager(object):
         """
         result = self.network_storage.getObject(id=identifier, **kwargs)
         return result
+
+    def set_subnet_ipddress_note(self, identifier, note):
+        """Set the ip address note of the subnet"""
+        result = self.client.call('SoftLayer_Network_Subnet_IpAddress','editObject', note, id=identifier)
+        return result
