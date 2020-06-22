@@ -8,4 +8,4 @@ getByIpAddress = {
     'subnetId': 5678,
 }
 
-editObject= True
+editObject = True

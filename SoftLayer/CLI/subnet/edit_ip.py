@@ -9,11 +9,11 @@ from SoftLayer.CLI import environment
 
 @click.command()
 @click.argument('identifier')
-@click.option('--ip', required=True,
+@click.option('--ip-address', required=True,
               help='Assume the ipAddress to set the note.')
 @click.option('--note', help="set ip address note of subnet")
 @environment.pass_env
-def cli(env, identifier, ip, note):
+def cli(env, identifier, ip_address, note):
     """Set the note of the ipAddress subnet"""
 
     data = {
@@ -23,5 +23,5 @@ def cli(env, identifier, ip, note):
     ips = mgr.get_subnet(identifier, mask='id,ipAddresses[id,ipAddress]').get('ipAddresses')
 
     for address in ips:
-        if ip == address.get('ipAddress'):
+        if ip_address == address.get('ipAddress'):
             mgr.set_subnet_ipddress_note(address.get('id'), data)

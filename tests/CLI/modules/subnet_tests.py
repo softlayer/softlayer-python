@@ -36,9 +36,9 @@ class SubnetTests(testing.TestCase):
                         'private_ip': '10.0.1.2'
                     }
                 ],
-                 'ipAddresses': {
-                     '123456': '16.26.26.25',
-                     '123457': '16.26.26.26'},
+                'ipAddresses': {
+                    '123456': '16.26.26.25',
+                    '123457': '16.26.26.26'},
                 'hardware': 'none',
                 'usable ips': 22
             },
@@ -139,6 +139,6 @@ class SubnetTests(testing.TestCase):
         self.assertEqual(output, json.loads(result.output))
 
     def test_editrou_Ip(self):
-        result = self.run_command(['subnet', 'edit-ip', '123456', '--ip=16.26.26.26', '--note=test'])
+        result = self.run_command(['subnet', 'edit-ip', '123456', '--ip-address=16.26.26.26', '--note=test'])
         self.assert_no_fail(result)
         self.assertTrue(result)
