@@ -13,6 +13,8 @@ from SoftLayer import utils
 
 from SoftLayer.managers import event_log
 
+# pylint: disable=too-many-public-methods
+
 DEFAULT_SUBNET_MASK = ','.join(['hardware',
                                 'datacenter',
                                 'ipAddressCount',
