@@ -698,7 +698,7 @@ class NetworkManager(object):
 
         :param integer instance_id: the instance ID to edit.
         :param string name: valid name.
-        :param string note: note about this particular v;am.
+        :param string note: note about this particular vlan.
         :param string tags: tags to set on the vlan as a comma separated list.
                             Use the empty string to remove all tags.
         :returns: bool -- True or an Exception

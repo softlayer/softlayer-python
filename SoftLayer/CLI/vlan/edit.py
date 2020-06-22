@@ -22,17 +22,14 @@ from SoftLayer.CLI import helpers
 def cli(env, identifier, name, note, tags):
     """Edit a vlan's details."""
 
-    data = {
-        'name': name,
-        'note': note
-    }
+    new_tags = None
 
     if tags:
-        data['tags'] = ','.join(tags)
+        new_tags = ','.join(tags)
 
     mgr = SoftLayer.NetworkManager(env.client)
     vlan_id = helpers.resolve_id(mgr.resolve_vlan_ids, identifier, 'VLAN')
-    vlan = mgr.edit(vlan_id, **data)
+    vlan = mgr.edit(vlan_id, name=name, note=note, tags=new_tags)
 
     if vlan:
         click.secho("Vlan edited successfully", fg='green')
