@@ -322,6 +322,7 @@ ALL_ROUTES = [
 
     ('vlan', 'SoftLayer.CLI.vlan'),
     ('vlan:detail', 'SoftLayer.CLI.vlan.detail:cli'),
+    ('vlan:edit', 'SoftLayer.CLI.vlan.edit:cli'),
     ('vlan:list', 'SoftLayer.CLI.vlan.list:cli'),
 
     ('summary', 'SoftLayer.CLI.summary:cli'),

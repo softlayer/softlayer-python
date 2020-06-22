@@ -7,6 +7,10 @@ VLANs
     :prog: vlan detail
     :show-nested:
 
+.. click:: SoftLayer.CLI.vlan.edit:cli
+    :prog: vlan edit
+    :show-nested:
+
 .. click:: SoftLayer.CLI.vlan.list:cli
     :prog: vlan list
     :show-nested:
