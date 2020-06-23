@@ -246,6 +246,7 @@ class NetworkManager(object):
         """Tag a subnet by passing in one or more tags separated by a comma.
 
         :param int subnet_id: The ID of the subnet.
+        :param string tags:	Comma separated list of tags.
         """
         return self.subnet.setTags(tags, id=subnet_id)
 
@@ -253,6 +254,7 @@ class NetworkManager(object):
         """Edit the note for this subnet.
 
         :param int subnet_id: The ID of the subnet.
+        :param string note:	The note.
         """
         return self.subnet.editNote(note, id=subnet_id)
 
