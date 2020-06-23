@@ -7,11 +7,16 @@
 """
 import collections
 import json
+import logging
+
+from SoftLayer.decoration import retry
 
 from SoftLayer import exceptions
 from SoftLayer import utils
 
 from SoftLayer.managers import event_log
+
+LOGGER = logging.getLogger(__name__)
 
 # pylint: disable=too-many-public-methods
 
@@ -688,7 +693,53 @@ class NetworkManager(object):
         result = self.network_storage.getObject(id=identifier, **kwargs)
         return result
 
+    def edit(self, instance_id, name=None, note=None, tags=None):
+        """Edit a vlan.
+
+        :param integer instance_id: the instance ID to edit.
+        :param string name: valid name.
+        :param string note: note about this particular vlan.
+        :param string tags: tags to set on the vlan as a comma separated list.
+                            Use the empty string to remove all tags.
+        :returns: bool -- True or an Exception
+        """
+
+        obj = {}
+
+        if tags is not None:
+            self.set_tags(tags, vlan_id=instance_id)
+
+        if name:
+            obj['name'] = name
+
+        if note:
+            obj['note'] = note
+
+        if not obj:
+            return True
+
+        return self.vlan.editObject(obj, id=instance_id)
+
+    @retry(logger=LOGGER)
+    def set_tags(self, tags, vlan_id):
+        """Sets tags on a vlan with a retry decorator
+
+        Just calls vlan.setTags, but if it fails from an APIError will retry.
+        """
+        self.vlan.setTags(tags, id=vlan_id)
+
+    def get_ip_by_address(self, ip_address):
+        """get the ip address object
+
+         :param string ip_address: the ip address to edit.
+         """
+        return self.client.call('SoftLayer_Network_Subnet_IpAddress', 'getByIpAddress', ip_address)
+
     def set_subnet_ipddress_note(self, identifier, note):
-        """Set the ip address note of the subnet"""
+        """Set the ip address note of the subnet
+
+         :param integer identifier: the ip address ID to edit.
+          :param json note: the note to edit.
+        """
         result = self.client.call('SoftLayer_Network_Subnet_IpAddress', 'editObject', note, id=identifier)
         return result

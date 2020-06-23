@@ -139,6 +139,11 @@ class SubnetTests(testing.TestCase):
         self.assertEqual(output, json.loads(result.output))
 
     def test_editrou_Ip(self):
-        result = self.run_command(['subnet', 'edit-ip', '123456', '--ip-address=16.26.26.26', '--note=test'])
+        result = self.run_command(['subnet', 'edit-ip', '16.26.26.26', '--note=test'])
+        self.assert_no_fail(result)
+        self.assertTrue(result)
+
+    def test_editrou_Id(self):
+        result = self.run_command(['subnet', 'edit-ip', '123456', '--note=test'])
         self.assert_no_fail(result)
         self.assertTrue(result)
