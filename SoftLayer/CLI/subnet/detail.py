@@ -47,6 +47,10 @@ def cli(env, identifier, no_vs, no_hardware):
     table.add_row(['datacenter', subnet['datacenter']['name']])
     table.add_row(['usable ips',
                    subnet.get('usableIpAddressCount', formatting.blank())])
+    table.add_row(['note',
+                   subnet.get('note', formatting.blank())])
+    table.add_row(['tags',
+                   formatting.tags(subnet.get('tagReferences'))])
 
     ip_address = subnet.get('ipAddresses')
 
@@ -66,7 +70,7 @@ def cli(env, identifier, no_vs, no_hardware):
                                   vsi.get('primaryBackendIpAddress')])
             table.add_row(['vs', vs_table])
         else:
-            table.add_row(['vs', 'none'])
+            table.add_row(['vs', formatting.blank()])
 
     if not no_hardware:
         if subnet['hardware']:
@@ -78,6 +82,6 @@ def cli(env, identifier, no_vs, no_hardware):
                                   hardware.get('primaryBackendIpAddress')])
             table.add_row(['hardware', hw_table])
         else:
-            table.add_row(['hardware', 'none'])
+            table.add_row(['hardware', formatting.blank()])
 
     env.fout(table)

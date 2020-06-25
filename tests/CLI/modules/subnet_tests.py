@@ -17,32 +17,10 @@ class SubnetTests(testing.TestCase):
 
     def test_detail(self):
         result = self.run_command(['subnet', 'detail', '1234'])
-
+        subnet = json.loads(result.output)
         self.assert_no_fail(result)
-        self.assertEqual(
-            {
-                'id': 1234,
-                'identifier': '1.2.3.4/26',
-                'subnet type': 'ADDITIONAL_PRIMARY',
-                'network space': 'PUBLIC',
-                'gateway': '1.2.3.254',
-                'broadcast': '1.2.3.255',
-                'datacenter': 'dal10',
-                'vs': [
-                    {
-                        'hostname': 'hostname0',
-                        'domain': 'sl.test',
-                        'public_ip': '1.2.3.10',
-                        'private_ip': '10.0.1.2'
-                    }
-                ],
-                'ipAddresses': {
-                    '123456': '16.26.26.25',
-                    '123457': '16.26.26.26'},
-                'hardware': 'none',
-                'usable ips': 22
-            },
-            json.loads(result.output))
+        self.assertEqual(subnet.get('id'), 1234)
+        self.assertEqual(subnet.get('identifier'), '1.2.3.4/26')
 
     def test_list(self):
         result = self.run_command(['subnet', 'list'])
@@ -137,6 +115,38 @@ class SubnetTests(testing.TestCase):
         ]
 
         self.assertEqual(output, json.loads(result.output))
+
+    @mock.patch('SoftLayer.CLI.subnet.edit.click')
+    def test_subnet_set_tags(self, click):
+        result = self.run_command(['subnet', 'edit', '1234', '--tags=tag1,tag2'])
+        click.secho.assert_called_with('Set tags successfully', fg='green')
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Network_Subnet', 'setTags', identifier=1234, args=("tag1,tag2",))
+
+    @mock.patch('SoftLayer.CLI.subnet.edit.click')
+    def test_subnet_edit_note(self, click):
+        result = self.run_command(['subnet', 'edit', '1234', '--note=test'])
+        click.secho.assert_called_with('Edit note successfully', fg='green')
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Network_Subnet', 'editNote', identifier=1234, args=("test",))
+
+    @mock.patch('SoftLayer.CLI.subnet.edit.click')
+    def test_subnet_set_tags_failure(self, click):
+        mock = self.set_mock('SoftLayer_Network_Subnet', 'setTags')
+        mock.return_value = False
+        result = self.run_command(['subnet', 'edit', '1234', '--tags=tag1,tag2'])
+        click.secho.assert_called_with('Failed to set tags', fg='red')
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Network_Subnet', 'setTags', identifier=1234, args=("tag1,tag2",))
+
+    @mock.patch('SoftLayer.CLI.subnet.edit.click')
+    def test_edit_note_failure(self, click):
+        mock = self.set_mock('SoftLayer_Network_Subnet', 'editNote')
+        mock.return_value = False
+        result = self.run_command(['subnet', 'edit', '1234', '--note=test'])
+        click.secho.assert_called_with('Failed to edit note', fg='red')
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Network_Subnet', 'editNote', identifier=1234, args=("test",))
 
     def test_editrou_Ip(self):
         result = self.run_command(['subnet', 'edit-ip', '16.26.26.26', '--note=test'])

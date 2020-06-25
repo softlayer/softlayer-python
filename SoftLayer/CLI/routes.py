@@ -286,6 +286,7 @@ ALL_ROUTES = [
     ('subnet', 'SoftLayer.CLI.subnet'),
     ('subnet:cancel', 'SoftLayer.CLI.subnet.cancel:cli'),
     ('subnet:create', 'SoftLayer.CLI.subnet.create:cli'),
+    ('subnet:edit', 'SoftLayer.CLI.subnet.edit:cli'),
     ('subnet:detail', 'SoftLayer.CLI.subnet.detail:cli'),
     ('subnet:list', 'SoftLayer.CLI.subnet.list:cli'),
     ('subnet:lookup', 'SoftLayer.CLI.subnet.lookup:cli'),

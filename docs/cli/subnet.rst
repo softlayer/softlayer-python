@@ -15,6 +15,10 @@ Subnets
     :prog: subnet detail
     :show-nested:
 
+.. click:: SoftLayer.CLI.subnet.edit:cli
+    :prog: subnet edit
+    :show-nested:
+
 .. click:: SoftLayer.CLI.subnet.list:cli
     :prog: subnet list
     :show-nested:
