@@ -20,7 +20,7 @@ class SubnetTests(testing.TestCase):
         subnet = json.loads(result.output)
         self.assert_no_fail(result)
         self.assertEqual(subnet.get('id'), 1234)
-        self.assertEqual(subnet.get('identifier'),'1.2.3.4/26')
+        self.assertEqual(subnet.get('identifier'), '1.2.3.4/26')
 
     def test_list(self):
         result = self.run_command(['subnet', 'list'])
