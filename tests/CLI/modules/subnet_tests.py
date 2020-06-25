@@ -17,38 +17,10 @@ class SubnetTests(testing.TestCase):
 
     def test_detail(self):
         result = self.run_command(['subnet', 'detail', '1234'])
-
+        subnet = json.loads(result.output)
         self.assert_no_fail(result)
-        self.assertEqual(
-            {
-                'id': 1234,
-                'identifier': '1.2.3.4/26',
-                'subnet type': 'ADDITIONAL_PRIMARY',
-                'network space': 'PUBLIC',
-                'gateway': '1.2.3.254',
-                'broadcast': '1.2.3.255',
-                'datacenter': 'dal10',
-                'vs': [
-                    {
-                        'hostname': 'hostname0',
-                        'domain': 'sl.test',
-                        'public_ip': '1.2.3.10',
-                        'private_ip': '10.0.1.2'
-                    }
-                ],
-                'hardware': None,
-                'usable ips': 22,
-                'note': 'test note',
-                'tags': [
-                    'subnet: test tag'
-                ],
-                'ipAddresses': {
-                    '123456': '16.26.26.25',
-                    '123457': '16.26.26.26'},
-                'hardware': 'none',
-                'usable ips': 22
-            },
-            json.loads(result.output))
+        self.assertEqual(subnet.get('id'), 1234)
+        self.assertEqual(subnet.get('identifier'),'1.2.3.4/26')
 
     def test_list(self):
         result = self.run_command(['subnet', 'list'])
