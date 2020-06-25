@@ -42,6 +42,11 @@ class SubnetTests(testing.TestCase):
                 'tags': [
                     'subnet: test tag'
                 ],
+                'ipAddresses': {
+                    '123456': '16.26.26.25',
+                    '123457': '16.26.26.26'},
+                'hardware': 'none',
+                'usable ips': 22
             },
             json.loads(result.output))
 
@@ -170,3 +175,13 @@ class SubnetTests(testing.TestCase):
         click.secho.assert_called_with('Failed to edit note', fg='red')
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Network_Subnet', 'editNote', identifier=1234, args=("test",))
+
+    def test_editrou_Ip(self):
+        result = self.run_command(['subnet', 'edit-ip', '16.26.26.26', '--note=test'])
+        self.assert_no_fail(result)
+        self.assertTrue(result)
+
+    def test_editrou_Id(self):
+        result = self.run_command(['subnet', 'edit-ip', '123456', '--note=test'])
+        self.assert_no_fail(result)
+        self.assertTrue(result)

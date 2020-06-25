@@ -7,3 +7,5 @@ getByIpAddress = {
     'isReserved': False,
     'subnetId': 5678,
 }
+
+editObject = True

@@ -34,6 +34,11 @@ getObject = {
                  'name': 'subnet: test tag'},
          }
     ]
+    'ipAddresses': [
+        {'id': 123456,
+         'ipAddress': '16.26.26.25'},
+        {'id': 123457,
+         'ipAddress': '16.26.26.26'}]
 }
 
 editNote = True

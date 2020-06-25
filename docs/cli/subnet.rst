@@ -26,3 +26,7 @@ Subnets
 .. click:: SoftLayer.CLI.subnet.lookup:cli
     :prog: subnet lookup
     :show-nested:
+
+.. click:: SoftLayer.CLI.subnet.edit_ip:cli
+    :prog: subnet edit-ip
+    :show-nested:

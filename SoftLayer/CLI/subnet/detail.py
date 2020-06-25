@@ -25,7 +25,10 @@ def cli(env, identifier, no_vs, no_hardware):
     mgr = SoftLayer.NetworkManager(env.client)
     subnet_id = helpers.resolve_id(mgr.resolve_subnet_ids, identifier,
                                    name='subnet')
-    subnet = mgr.get_subnet(subnet_id)
+
+    mask = 'mask[ipAddresses[id, ipAddress,note], datacenter, virtualGuests, hardware]'
+
+    subnet = mgr.get_subnet(subnet_id, mask=mask)
 
     table = formatting.KeyValueTable(['name', 'value'])
     table.align['name'] = 'r'
@@ -48,6 +51,14 @@ def cli(env, identifier, no_vs, no_hardware):
                    subnet.get('note', formatting.blank())])
     table.add_row(['tags',
                    formatting.tags(subnet.get('tagReferences'))])
+
+    ip_address = subnet.get('ipAddresses')
+
+    ip_table = formatting.KeyValueTable(['id', 'ip', 'note'])
+    for address in ip_address:
+        ip_table.add_row([address.get('id'), address.get('ipAddress'), address.get('note')])
+
+    table.add_row(['ipAddresses', ip_table])
 
     if not no_vs:
         if subnet['virtualGuests']:
