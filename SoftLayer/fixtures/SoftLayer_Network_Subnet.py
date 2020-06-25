@@ -33,7 +33,7 @@ getObject = {
          'tag': {'id': 100123,
                  'name': 'subnet: test tag'},
          }
-    ]
+    ],
     'ipAddresses': [
         {'id': 123456,
          'ipAddress': '16.26.26.25'},
