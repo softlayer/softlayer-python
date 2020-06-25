@@ -727,3 +727,19 @@ class NetworkManager(object):
         Just calls vlan.setTags, but if it fails from an APIError will retry.
         """
         self.vlan.setTags(tags, id=vlan_id)
+
+    def get_ip_by_address(self, ip_address):
+        """get the ip address object
+
+         :param string ip_address: the ip address to edit.
+         """
+        return self.client.call('SoftLayer_Network_Subnet_IpAddress', 'getByIpAddress', ip_address)
+
+    def set_subnet_ipddress_note(self, identifier, note):
+        """Set the ip address note of the subnet
+
+         :param integer identifier: the ip address ID to edit.
+          :param json note: the note to edit.
+        """
+        result = self.client.call('SoftLayer_Network_Subnet_IpAddress', 'editObject', note, id=identifier)
+        return result
