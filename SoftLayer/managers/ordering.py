@@ -396,7 +396,7 @@ class OrderingManager(object):
                 capacity_min = int(price.get('capacityRestrictionMinimum', -1))
                 capacity_max = int(price.get('capacityRestrictionMaximum', -1))
                 # return first match if no restirction, or no core to check
-                if capacity_min == -1 or core is None:
+                if capacity_min == -1 or core is None or "PROCESSOR" in price.get("capacityRestrictionType"):
                     price_id = price['id']
                 # this check is mostly to work nicely with preset configs
                 elif capacity_min <= int(core) <= capacity_max:
