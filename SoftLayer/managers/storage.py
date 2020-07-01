@@ -396,7 +396,7 @@ class StorageManager(utils.IdentifierMixin, object):
         return self.client.call('Network_Storage', 'failbackFromReplicant', id=volume_id)
 
     def cancel_volume(self, volume_id, reason='No longer needed', immediate=False):
-        """Cancels the given block storage volume.
+        """Cancels the given storage volume.
 
         :param integer volume_id: The volume ID
         :param string reason: The reason for cancellation
@@ -406,7 +406,7 @@ class StorageManager(utils.IdentifierMixin, object):
         volume = self.get_volume_details(volume_id, mask=object_mask)
 
         if 'billingItem' not in volume:
-            raise exceptions.SoftLayerError("Block Storage was already cancelled")
+            raise exceptions.SoftLayerError("Storage Volume was already cancelled")
 
         billing_item_id = volume['billingItem']['id']
 
