@@ -61,7 +61,7 @@ class BlockTests(testing.TestCase):
             immediate=True
         )
         self.assertEqual(
-            'Block Storage was already cancelled',
+            'Storage Volume was already cancelled',
             str(exception)
         )
 
