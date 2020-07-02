@@ -393,16 +393,23 @@ class OrderingManager(object):
         price_id = None
         for price in prices:
             if not price['locationGroupId']:
-                capacity_min = int(price.get('capacityRestrictionMinimum', -1))
-                capacity_max = int(price.get('capacityRestrictionMaximum', -1))
-                # return first match if no restirction, or no core to check
-                if capacity_min == -1 or core is None or "PROCESSOR" in price.get("capacityRestrictionType"):
-                    price_id = price['id']
-                # this check is mostly to work nicely with preset configs
-                elif capacity_min <= int(core) <= capacity_max:
-                    if "STORAGE" in price.get("capacityRestrictionType") or "CORE" in price.get(
-                            "capacityRestrictionType"):
+                restriction = price.get('capacityRestrictionType', False)
+                # There is a price restriction. Make sure the price is within the restriction
+                if restriction and core is not None:
+                    capacity_min = int(price.get('capacityRestrictionMinimum', -1))
+                    capacity_max = int(price.get('capacityRestrictionMaximum', -1))
+                    if "STORAGE" in restriction:
+                        if capacity_min <= int(core) <= capacity_max:
+                            price_id = price['id']
+                    if "CORE" in restriction:
+                        if capacity_min <= int(core) <= capacity_max:
+                            price_id = price['id']
+                    if "PROCESSOR" in restriction:
                         price_id = price['id']
+                # No price restrictions
+                else:
+                    price_id = price['id']
+
         return price_id
 
     def get_item_capacity(self, items, item_keynames):
