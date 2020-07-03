@@ -362,7 +362,8 @@ class ServerCLITests(testing.TestCase):
              {'size': 'Dual Xeon Gold, 384GB Ram, 4x960GB SSD, RAID 10',
               'value': 'DGOLD_6140_384GB_4X960GB_SSD_SED_RAID_10'}],
             [{'operating_system': 'Ubuntu / 14.04-64',
-              'value': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT'}],
+              'value': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
+              'operatingSystemReferenceCode ': 'UBUNTU_14_64'}],
             [{'port_speed': '10 Mbps Public & Private Network Uplinks',
               'value': '10'}],
             [{'extras': '1 IPv6 Address', 'value': '1_IPV6_ADDRESS'}]]
@@ -694,19 +695,19 @@ class ServerCLITests(testing.TestCase):
                                            'getResourceRecords')
         getResourceRecords.return_value = []
         createAargs = ({
-            'type': 'a',
-            'host': 'hardware-test1',
-            'domainId': 12345,  # from SoftLayer_Account::getDomains
-            'data': '172.16.1.100',
-            'ttl': 7200
-        },)
+                           'type': 'a',
+                           'host': 'hardware-test1',
+                           'domainId': 12345,  # from SoftLayer_Account::getDomains
+                           'data': '172.16.1.100',
+                           'ttl': 7200
+                       },)
         createPTRargs = ({
-            'type': 'ptr',
-            'host': '100',
-            'domainId': 123456,
-            'data': 'hardware-test1.test.sftlyr.ws',
-            'ttl': 7200
-        },)
+                             'type': 'ptr',
+                             'host': '100',
+                             'domainId': 123456,
+                             'data': 'hardware-test1.test.sftlyr.ws',
+                             'ttl': 7200
+                         },)
 
         result = self.run_command(['hw', 'dns-sync', '1000'])
 
@@ -749,12 +750,12 @@ class ServerCLITests(testing.TestCase):
             }
         }
         createV6args = ({
-            'type': 'aaaa',
-            'host': 'hardware-test1',
-            'domainId': 12345,  # from SoftLayer_Account::getDomains
-            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
-            'ttl': 7200
-        },)
+                            'type': 'aaaa',
+                            'host': 'hardware-test1',
+                            'domainId': 12345,  # from SoftLayer_Account::getDomains
+                            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
+                            'ttl': 7200
+                        },)
         server.return_value = test_server
         result = self.run_command(['hw', 'dns-sync', '--aaaa-record', '1000'])
         self.assert_no_fail(result)

@@ -33,10 +33,10 @@ def cli(env):
     tables.append(preset_table)
 
     # Operating systems
-    os_table = formatting.Table(['operating_system', 'value'])
+    os_table = formatting.Table(['operating_system', 'value', 'operatingSystemReferenceCode '])
     os_table.sortby = 'value'
     for operating_system in options['operating_systems']:
-        os_table.add_row([operating_system['name'], operating_system['key']])
+        os_table.add_row([operating_system['name'], operating_system['key'], operating_system['referenceCode']])
     tables.append(os_table)
 
     # Port speed
