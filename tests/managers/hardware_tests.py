@@ -121,7 +121,8 @@ class HardwareTests(testing.TestCase):
             'extras': [{'key': '1_IPV6_ADDRESS', 'name': '1 IPv6 Address'}],
             'locations': [{'key': 'wdc01', 'name': 'Washington 1'}],
             'operating_systems': [{'key': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
-                                   'name': 'Ubuntu / 14.04-64'}],
+                                   'name': 'Ubuntu / 14.04-64',
+                                   'referenceCode': 'UBUNTU_14_64'}],
             'port_speeds': [{
                 'key': '10',
                 'name': '10 Mbps Public & Private Network Uplinks'
@@ -374,10 +375,10 @@ class HardwareTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Hardware_Server',
                                 'editObject',
                                 args=({
-                                    'hostname': 'new-host',
-                                    'domain': 'new.sftlyr.ws',
-                                    'notes': 'random notes',
-                                },),
+                                          'hostname': 'new-host',
+                                          'domain': 'new.sftlyr.ws',
+                                          'notes': 'random notes',
+                                      },),
                                 identifier=100)
 
     def test_rescue(self):

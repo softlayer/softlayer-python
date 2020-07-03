@@ -403,7 +403,8 @@ class HardwareManager(utils.IdentifierMixin, object):
             if item['itemCategory']['categoryCode'] == 'os':
                 operating_systems.append({
                     'name': item['softwareDescription']['longDescription'],
-                    'key': item['keyName']
+                    'key': item['keyName'],
+                    'referenceCode': item['softwareDescription']['referenceCode']
                 })
 
         # Port speeds
