@@ -666,6 +666,16 @@ class OrderingTests(testing.TestCase):
 
         self.assertEqual(1234, price_id)
 
+    def test_get_item_price_id_processor_with_capacity_restriction(self):
+        category1 = {'categoryCode': 'cat1'}
+        price1 = [{'id': 1234, 'locationGroupId': '', "capacityRestrictionMaximum": "1",
+                   "capacityRestrictionMinimum": "1", "capacityRestrictionType": "PROCESSOR",
+                   'categories': [category1]}]
+
+        price_id = self.ordering.get_item_price_id("8", price1)
+
+        self.assertEqual(1234, price_id)
+
     def test_issues1067(self):
         # https://github.com/softlayer/softlayer-python/issues/1067
         item_mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
