@@ -1,6 +1,23 @@
 # Change Log
 
 
+## [5.8.9] - 2020-07-06 
+https://github.com/softlayer/softlayer-python/compare/v5.8.8...v5.8.9
+
+- #1252 Automated Snap publisher
+- #1230 Tag Management
+    + slcli tags cleanup
+    + slcli tags delete
+    + slcli tags details
+    + slcli tags list
+    + slcli tags set
+    + slcli tags taggable
+- #1285 Vlan editing functionality
+- #1287 Edit IP note and add ipAddress table in detail view
+- #1283 Subnet Tagging
+- #1291 Storage documentation updates
+- #1293 add system operation referenceCode in create-option
+
 ## [5.8.8] - 2020-05-18
 https://github.com/softlayer/softlayer-python/compare/v5.8.7...v5.8.8
 
