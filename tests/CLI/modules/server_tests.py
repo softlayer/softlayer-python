@@ -355,19 +355,10 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['server', 'create-options'])
 
         self.assert_no_fail(result)
-        expected = [
-            [{'datacenter': 'Washington 1', 'value': 'wdc01'}],
-            [{'size': 'Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID',
-              'value': 'S1270_8GB_2X1TBSATA_NORAID'},
-             {'size': 'Dual Xeon Gold, 384GB Ram, 4x960GB SSD, RAID 10',
-              'value': 'DGOLD_6140_384GB_4X960GB_SSD_SED_RAID_10'}],
-            [{'operating_system': 'Ubuntu / 14.04-64',
-              'value': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
-              'operatingSystemReferenceCode ': 'UBUNTU_14_64'}],
-            [{'port_speed': '10 Mbps Public & Private Network Uplinks',
-              'value': '10'}],
-            [{'extras': '1 IPv6 Address', 'value': '1_IPV6_ADDRESS'}]]
-        self.assertEqual(json.loads(result.output), expected)
+        output = json.loads(result.output)
+        self.assertEqual(output[0][0]['Value'], 'wdc01')
+        self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects')
+
 
     @mock.patch('SoftLayer.HardwareManager.place_order')
     def test_create_server(self, order_mock):
@@ -390,21 +381,6 @@ class ServerCLITests(testing.TestCase):
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          {'id': 98765, 'created': '2013-08-02 15:23:47'})
-
-    def test_create_server_missing_required(self):
-
-        # This is missing a required argument
-        result = self.run_command(['server', 'create',
-                                   # Note: no chassis id
-                                   '--hostname=test',
-                                   '--domain=example.com',
-                                   '--datacenter=TEST00',
-                                   '--network=100',
-                                   '--os=UBUNTU_12_64_MINIMAL',
-                                   ])
-
-        self.assertEqual(result.exit_code, 2)
-        self.assertIsInstance(result.exception, SystemExit)
 
     @mock.patch('SoftLayer.CLI.template.export_to_template')
     def test_create_server_with_export(self, export_mock):

@@ -301,8 +301,13 @@ class Table(object):
             else:
                 msg = "Column (%s) doesn't exist to sort by" % self.sortby
                 raise exceptions.CLIAbort(msg)
-        for a_col, alignment in self.align.items():
-            table.align[a_col] = alignment
+
+        if isinstance(self.align, str):
+            table.align = self.align
+        else:
+            # Required because PrettyTable has a strict setter function for alignment
+            for a_col, alignment in self.align.items():
+                table.align[a_col] = alignment
 
         if self.title:
             table.title = self.title

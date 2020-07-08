@@ -7,6 +7,7 @@
 import copy
 
 import mock
+from pprint import pprint as pp 
 
 import SoftLayer
 from SoftLayer import fixtures
@@ -117,29 +118,29 @@ class HardwareTests(testing.TestCase):
     def test_get_create_options(self):
         options = self.hardware.get_create_options()
 
-        expected = {
-            'extras': [{'key': '1_IPV6_ADDRESS', 'name': '1 IPv6 Address'}],
-            'locations': [{'key': 'wdc01', 'name': 'Washington 1'}],
-            'operating_systems': [{'key': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
-                                   'name': 'Ubuntu / 14.04-64',
-                                   'referenceCode': 'UBUNTU_14_64'}],
-            'port_speeds': [{
-                'key': '10',
-                'name': '10 Mbps Public & Private Network Uplinks'
-            }],
-            'sizes': [
-                {
-                    'key': 'S1270_8GB_2X1TBSATA_NORAID',
-                    'name': 'Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID'
-                },
-                {
-                    'key': 'DGOLD_6140_384GB_4X960GB_SSD_SED_RAID_10',
-                    'name': 'Dual Xeon Gold, 384GB Ram, 4x960GB SSD, RAID 10'
-                }
-            ]
+        extras =  {'key': '1_IPV6_ADDRESS', 'name': '1 IPv6 Address'}
+        locations = {'key': 'wdc01', 'name': 'Washington 1'}
+        operating_systems = {
+            'key': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
+            'name': 'Ubuntu / 14.04-64',
+            'referenceCode': 'UBUNTU_14_64'
         }
 
-        self.assertEqual(options, expected)
+        port_speeds = {
+            'key': '10',
+            'name': '10 Mbps Public & Private Network Uplinks'
+        }
+        sizes = {
+            'key': 'S1270_8GB_2X1TBSATA_NORAID',
+            'name': 'Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID'
+        }
+
+        self.assertEqual(options['extras'][0], extras)
+        self.assertEqual(options['locations'][0], locations)
+        self.assertEqual(options['operating_systems'][0], operating_systems)
+        self.assertEqual(options['port_speeds'][0]['name'], port_speeds['name'])
+        self.assertEqual(options['sizes'][0], sizes)
+
 
     def test_get_create_options_package_missing(self):
         packages = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
@@ -147,18 +148,6 @@ class HardwareTests(testing.TestCase):
 
         ex = self.assertRaises(SoftLayer.SoftLayerError, self.hardware.get_create_options)
         self.assertEqual("Package BARE_METAL_SERVER does not exist", str(ex))
-
-    def test_generate_create_dict_no_items(self):
-        packages = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        packages_copy = copy.deepcopy(
-            fixtures.SoftLayer_Product_Package.getAllObjects)
-        packages_copy[0]['items'] = []
-        packages.return_value = packages_copy
-
-        ex = self.assertRaises(SoftLayer.SoftLayerError,
-                               self.hardware._generate_create_dict,
-                               location="wdc01")
-        self.assertIn("Could not find valid price", str(ex))
 
     def test_generate_create_dict_no_regions(self):
         packages = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
@@ -171,20 +160,6 @@ class HardwareTests(testing.TestCase):
                                self.hardware._generate_create_dict,
                                **MINIMAL_TEST_CREATE_ARGS)
         self.assertIn("Could not find valid location for: 'wdc01'", str(ex))
-
-    def test_generate_create_dict_invalid_size(self):
-        args = {
-            'size': 'UNKNOWN_SIZE',
-            'hostname': 'unicorn',
-            'domain': 'giggles.woo',
-            'location': 'wdc01',
-            'os': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
-            'port_speed': 10,
-        }
-
-        ex = self.assertRaises(SoftLayer.SoftLayerError,
-                               self.hardware._generate_create_dict, **args)
-        self.assertIn("Could not find valid size for: 'UNKNOWN_SIZE'", str(ex))
 
     def test_generate_create_dict(self):
         args = {
@@ -199,51 +174,59 @@ class HardwareTests(testing.TestCase):
             'post_uri': 'http://example.com/script.php',
             'ssh_keys': [10],
         }
-
-        expected = {
+        
+        package = 'BARE_METAL_SERVER'
+        location = 'wdc01'
+        item_keynames = [
+            '1_IP_ADDRESS',
+            'UNLIMITED_SSL_VPN_USERS_1_PPTP_VPN_USER_PER_ACCOUNT',
+            'REBOOT_KVM_OVER_IP',
+            'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
+            'BANDWIDTH_0_GB_2',
+            '10_MBPS_PUBLIC_PRIVATE_NETWORK_UPLINKS',
+            '1_IPV6_ADDRESS'
+        ]
+        hourly = True
+        preset_keyname = 'S1270_8GB_2X1TBSATA_NORAID'
+        extras = {
             'hardware': [{
                 'domain': 'giggles.woo',
                 'hostname': 'unicorn',
             }],
-            'location': 'WASHINGTON_DC',
-            'packageId': 200,
-            'presetId': 64,
-            'prices': [{'id': 21},
-                       {'id': 420},
-                       {'id': 906},
-                       {'id': 37650},
-                       {'id': 1800},
-                       {'id': 272},
-                       {'id': 17129}],
-            'useHourlyPricing': True,
             'provisionScripts': ['http://example.com/script.php'],
-            'sshKeys': [{'sshKeyIds': [10]}],
+            'sshKeys' : [{'sshKeyIds': [10]}]
         }
 
         data = self.hardware._generate_create_dict(**args)
 
-        self.assertEqual(expected, data)
+        self.assertEqual(package, data['package_keyname'])
+        self.assertEqual(location, data['location'])
+        for keyname in item_keynames:
+            self.assertIn(keyname, data['item_keynames'])
+        self.assertEqual(extras, data['extras'])
 
-    @mock.patch('SoftLayer.managers.hardware.HardwareManager'
-                '._generate_create_dict')
-    def test_verify_order(self, create_dict):
+
+    @mock.patch('SoftLayer.managers.ordering.OrderingManager.verify_order')
+    @mock.patch('SoftLayer.managers.hardware.HardwareManager._generate_create_dict')
+    def test_verify_order(self, create_dict, verify_order):
         create_dict.return_value = {'test': 1, 'verify': 1}
+        verify_order.return_value = {'test': 2}
 
-        self.hardware.verify_order(test=1, verify=1)
+        result = self.hardware.verify_order(test=1, verify=1)
+        self.assertEqual(2, result['test'])
 
         create_dict.assert_called_once_with(test=1, verify=1)
-        self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder',
-                                args=({'test': 1, 'verify': 1},))
+        verify_order.assert_called_once_with(test=1, verify=1)
 
-    @mock.patch('SoftLayer.managers.hardware.HardwareManager'
-                '._generate_create_dict')
-    def test_place_order(self, create_dict):
+    @mock.patch('SoftLayer.managers.ordering.OrderingManager.place_order')
+    @mock.patch('SoftLayer.managers.hardware.HardwareManager._generate_create_dict')
+    def test_place_order(self, create_dict, place_order):
         create_dict.return_value = {'test': 1, 'verify': 1}
-        self.hardware.place_order(test=1, verify=1)
-
+        place_order.return_value = {'test': 1}
+        result = self.hardware.place_order(test=1, verify=1)
+        self.assertEqual(1, result['test'])
         create_dict.assert_called_once_with(test=1, verify=1)
-        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder',
-                                args=({'test': 1, 'verify': 1},))
+        place_order.assert_called_once_with(test=1, verify=1)
 
     def test_cancel_hardware_without_reason(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
@@ -629,162 +612,6 @@ class HardwareTests(testing.TestCase):
 
 
 class HardwareHelperTests(testing.TestCase):
-    def test_get_extra_price_id_no_items(self):
-        ex = self.assertRaises(SoftLayer.SoftLayerError,
-                               managers.hardware._get_extra_price_id,
-                               [], 'test', True, None)
-        self.assertEqual("Could not find valid price for extra option, 'test'", str(ex))
-
-    def test_get_extra_price_mismatched(self):
-        items = [
-            {'keyName': 'TEST', 'prices': [{'id': 1, 'locationGroupId': None, 'recurringFee': 99}]},
-            {'keyName': 'TEST', 'prices': [{'id': 2, 'locationGroupId': 55, 'hourlyRecurringFee': 99}]},
-            {'keyName': 'TEST', 'prices': [{'id': 3, 'locationGroupId': None, 'hourlyRecurringFee': 99}]},
-        ]
-        location = {
-            'location': {
-                'location': {
-                    'priceGroups': [
-                        {'id': 50},
-                        {'id': 51}
-                    ]
-                }
-            }
-        }
-        result = managers.hardware._get_extra_price_id(items, 'TEST', True, location)
-        self.assertEqual(3, result)
-
-    def test_get_bandwidth_price_mismatched(self):
-        items = [
-            {'itemCategory': {'categoryCode': 'bandwidth'},
-             'capacity': 100,
-             'prices': [{'id': 1, 'locationGroupId': None, 'hourlyRecurringFee': 99}]
-             },
-            {'itemCategory': {'categoryCode': 'bandwidth'},
-             'capacity': 100,
-             'prices': [{'id': 2, 'locationGroupId': 55, 'recurringFee': 99}]
-             },
-            {'itemCategory': {'categoryCode': 'bandwidth'},
-             'capacity': 100,
-             'prices': [{'id': 3, 'locationGroupId': None, 'recurringFee': 99}]
-             },
-        ]
-        location = {
-            'location': {
-                'location': {
-                    'priceGroups': [
-                        {'id': 50},
-                        {'id': 51}
-                    ]
-                }
-            }
-        }
-        result = managers.hardware._get_bandwidth_price_id(items, False, False, location)
-        self.assertEqual(3, result)
-
-    def test_get_os_price_mismatched(self):
-        items = [
-            {'itemCategory': {'categoryCode': 'os'},
-             'keyName': 'OS_TEST',
-             'prices': [{'id': 2, 'locationGroupId': 55, 'recurringFee': 99}]
-             },
-            {'itemCategory': {'categoryCode': 'os'},
-             'keyName': 'OS_TEST',
-             'prices': [{'id': 3, 'locationGroupId': None, 'recurringFee': 99}]
-             },
-        ]
-        location = {
-            'location': {
-                'location': {
-                    'priceGroups': [
-                        {'id': 50},
-                        {'id': 51}
-                    ]
-                }
-            }
-        }
-        result = managers.hardware._get_os_price_id(items, 'OS_TEST', location)
-        self.assertEqual(3, result)
-
-    def test_get_default_price_id_item_not_first(self):
-        items = [{
-            'itemCategory': {'categoryCode': 'unknown', 'id': 325},
-            'keyName': 'UNKNOWN',
-            'prices': [{'accountRestrictions': [],
-                        'currentPriceFlag': '',
-                        'hourlyRecurringFee': '10.0',
-                        'id': 1245172,
-                        'recurringFee': '1.0'}],
-        }]
-        ex = self.assertRaises(SoftLayer.SoftLayerError,
-                               managers.hardware._get_default_price_id,
-                               items, 'unknown', True, None)
-        self.assertEqual("Could not find valid price for 'unknown' option", str(ex))
-
-    def test_get_default_price_id_no_items(self):
-        ex = self.assertRaises(SoftLayer.SoftLayerError,
-                               managers.hardware._get_default_price_id,
-                               [], 'test', True, None)
-        self.assertEqual("Could not find valid price for 'test' option", str(ex))
-
-    def test_get_bandwidth_price_id_no_items(self):
-        ex = self.assertRaises(SoftLayer.SoftLayerError,
-                               managers.hardware._get_bandwidth_price_id,
-                               [], hourly=True, no_public=False)
-        self.assertEqual("Could not find valid price for bandwidth option", str(ex))
-
-    def test_get_os_price_id_no_items(self):
-        ex = self.assertRaises(SoftLayer.SoftLayerError,
-                               managers.hardware._get_os_price_id,
-                               [], 'UBUNTU_14_64', None)
-        self.assertEqual("Could not find valid price for os: 'UBUNTU_14_64'", str(ex))
-
-    def test_get_port_speed_price_id_no_items(self):
-        ex = self.assertRaises(SoftLayer.SoftLayerError,
-                               managers.hardware._get_port_speed_price_id,
-                               [], 10, True, None)
-        self.assertEqual("Could not find valid price for port speed: '10'", str(ex))
-
-    def test_get_port_speed_price_id_mismatch(self):
-        items = [
-            {'itemCategory': {'categoryCode': 'port_speed'},
-             'capacity': 101,
-             'attributes': [{'attributeTypeKeyName': 'IS_PRIVATE_NETWORK_ONLY'}],
-             'prices': [{'id': 1, 'locationGroupId': None, 'recurringFee': 99}]
-             },
-            {'itemCategory': {'categoryCode': 'port_speed'},
-             'capacity': 100,
-             'attributes': [{'attributeTypeKeyName': 'IS_NOT_PRIVATE_NETWORK_ONLY'}],
-             'prices': [{'id': 2, 'locationGroupId': 55, 'recurringFee': 99}]
-             },
-            {'itemCategory': {'categoryCode': 'port_speed'},
-             'capacity': 100,
-             'attributes': [{'attributeTypeKeyName': 'IS_PRIVATE_NETWORK_ONLY'}, {'attributeTypeKeyName': 'NON_LACP'}],
-             'prices': [{'id': 3, 'locationGroupId': 55, 'recurringFee': 99}]
-             },
-            {'itemCategory': {'categoryCode': 'port_speed'},
-             'capacity': 100,
-             'attributes': [{'attributeTypeKeyName': 'IS_PRIVATE_NETWORK_ONLY'}],
-             'prices': [{'id': 4, 'locationGroupId': 12, 'recurringFee': 99}]
-             },
-            {'itemCategory': {'categoryCode': 'port_speed'},
-             'capacity': 100,
-             'attributes': [{'attributeTypeKeyName': 'IS_PRIVATE_NETWORK_ONLY'}],
-             'prices': [{'id': 5, 'locationGroupId': None, 'recurringFee': 99}]
-             },
-        ]
-        location = {
-            'location': {
-                'location': {
-                    'priceGroups': [
-                        {'id': 50},
-                        {'id': 51}
-                    ]
-                }
-            }
-        }
-        result = managers.hardware._get_port_speed_price_id(items, 100, True, location)
-        self.assertEqual(5, result)
 
     def test_matches_location(self):
         price = {'id': 1, 'locationGroupId': 51, 'recurringFee': 99}
