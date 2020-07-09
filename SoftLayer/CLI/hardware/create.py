@@ -12,38 +12,25 @@ from SoftLayer.CLI import template
 
 
 @click.command(epilog="See 'slcli server create-options' for valid options.")
-@click.option('--hostname', '-H', required=True, prompt=True,
-              help="Host portion of the FQDN")
-@click.option('--domain', '-D', required=True, prompt=True,
-              help="Domain portion of the FQDN")
-@click.option('--size', '-s', required=True, prompt=True,
-              help="Hardware size")
-@click.option('--os', '-o', required=True, prompt=True,
-              help="OS Key value")
-@click.option('--datacenter', '-d', required=True, prompt=True,
-              help="Datacenter shortname")
-@click.option('--port-speed', type=click.INT, required=True, prompt=True,
-              help="Port speeds. DEPRECATED, use --network")
-@click.option('--no-public', is_flag=True,
-              help="Private network only. DEPRECATED, use --network.")
-@click.option('--network',
-              help="Network Option Key.")
-@click.option('--billing', default='hourly', show_default=True,
-              type=click.Choice(['hourly', 'monthly']),
+@click.option('--hostname', '-H', required=True, prompt=True, help="Host portion of the FQDN")
+@click.option('--domain', '-D', required=True, prompt=True, help="Domain portion of the FQDN")
+@click.option('--size', '-s', required=True, prompt=True, help="Hardware size")
+@click.option('--os', '-o', required=True, prompt=True, help="OS Key value")
+@click.option('--datacenter', '-d', required=True, prompt=True, help="Datacenter shortname")
+@click.option('--port-speed', type=click.INT, help="Port speeds. DEPRECATED, use --network")
+@click.option('--no-public', is_flag=True, help="Private network only. DEPRECATED, use --network.")
+@click.option('--network', help="Network Option Key. Use instead of port-speed option")
+@click.option('--billing', default='hourly', show_default=True, type=click.Choice(['hourly', 'monthly']),
               help="Billing rate")
-@click.option('--postinstall', '-i',
-              help="Post-install script. Should be a HTTPS URL.")
-@click.option('--test', is_flag=True,
-              help="Do not actually create the server")
-@click.option('--template', '-t', is_eager=True,
+@click.option('--postinstall', '-i', help="Post-install script. Should be a HTTPS URL.")
+@click.option('--test', is_flag=True, help="Do not actually create the server")
+@click.option('--template', '-t', is_eager=True, type=click.Path(exists=True, readable=True, resolve_path=True),
               callback=template.TemplateCallback(list_args=['key']),
-              help="A template file that defaults the command-line options",
-              type=click.Path(exists=True, readable=True, resolve_path=True))
+              help="A template file that defaults the command-line options")
 @click.option('--export', type=click.Path(writable=True, resolve_path=True),
               help="Exports options to a template file")
 @click.option('--wait', type=click.INT,
-              help="Wait until the server is finished provisioning for up to "
-                   "X seconds before returning")
+              help="Wait until the server is finished provisioning for up to X seconds before returning")
 @helpers.multi_option('--key', '-k', help="SSH keys to add to the root user")
 @helpers.multi_option('--extra', '-e', help="Extra option Key Names")
 @environment.pass_env
@@ -101,15 +88,13 @@ def cli(env, **args):
 
     if args['export']:
         export_file = args.pop('export')
-        template.export_to_template(export_file, args,
-                                    exclude=['wait', 'test'])
+        template.export_to_template(export_file, args, exclude=['wait', 'test'])
         env.fout('Successfully exported options to a template file.')
         return
 
     if do_create:
         if not (env.skip_confirmations or formatting.confirm(
-                "This action will incur charges on your account. "
-                "Continue?")):
+                "This action will incur charges on your account. Continue?")):
             raise exceptions.CLIAbort('Aborting dedicated server order.')
 
         result = mgr.place_order(**order)

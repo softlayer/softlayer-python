@@ -359,7 +359,6 @@ class ServerCLITests(testing.TestCase):
         self.assertEqual(output[0][0]['Value'], 'wdc01')
         self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects')
 
-
     @mock.patch('SoftLayer.HardwareManager.place_order')
     def test_create_server(self, order_mock):
         order_mock.return_value = {
@@ -860,3 +859,27 @@ class ServerCLITests(testing.TestCase):
         }
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output), billing_json)
+
+    def test_create_hw_export(self):
+        if(sys.platform.startswith("win")):
+            self.skipTest("Temp files do not work properly in Windows.")
+        with tempfile.NamedTemporaryFile() as config_file:
+            result = self.run_command(['hw', 'create', '--hostname=test', '--export', config_file.name,
+                                       '--domain=example.com', '--datacenter=TEST00',
+                                       '--network=TEST_NETWORK', '--os=UBUNTU_12_64',
+                                       '--size=S1270_8GB_2X1TBSATA_NORAID'])
+            self.assert_no_fail(result)
+            self.assertTrue('Successfully exported options to a template file.' in result.output)
+            contents = config_file.read().decode("utf-8")
+            self.assertIn('hostname=TEST', contents)
+            self.assertIn('size=S1270_8GB_2X1TBSATA_NORAID', contents)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_create_hw_no_confirm(self, confirm_mock):
+        confirm_mock.return_value = False
+
+        result = self.run_command(['hw', 'create', '--hostname=test', '--size=S1270_8GB_2X1TBSATA_NORAID',
+                                   '--domain=example.com', '--datacenter=TEST00',
+                                   '--network=TEST_NETWORK', '--os=UBUNTU_12_64'])
+
+        self.assertEqual(result.exit_code, 2)
