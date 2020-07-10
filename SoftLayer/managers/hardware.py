@@ -729,25 +729,6 @@ class HardwareManager(utils.IdentifierMixin, object):
         return self.hardware.getHardDrives(id=instance_id)
 
 
-# def _get_extra_price_id(items, key_name, hourly, location):
-#     """Returns a price id attached to item with the given key_name."""
-
-#     for item in items:
-#         if utils.lookup(item, 'keyName') != key_name:
-#             continue
-
-#         for price in item['prices']:
-#             if not _matches_billing(price, hourly):
-#                 continue
-
-#             if not _matches_location(price, location):
-#                 continue
-
-#             return price['id']
-
-#     raise SoftLayerError("Could not find valid price for extra option, '%s'" % key_name)
-
-
 def _get_bandwidth_key(items, hourly=True, no_public=False, location=None):
     """Picks a valid Bandwidth Item, returns the KeyName"""
 
