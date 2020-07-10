@@ -383,8 +383,7 @@ class ServerCLITests(testing.TestCase):
 
     @mock.patch('SoftLayer.CLI.template.export_to_template')
     def test_create_server_with_export(self, export_mock):
-        if (sys.platform.startswith("win")):
-            self.skipTest("Test doesn't work in Windows")
+
         result = self.run_command(['--really', 'server', 'create',
                                    '--size=S1270_8GB_2X1TBSATA_NORAID',
                                    '--hostname=test',
@@ -397,24 +396,8 @@ class ServerCLITests(testing.TestCase):
                                   fmt='raw')
 
         self.assert_no_fail(result)
-        self.assertIn("Successfully exported options to a template file.",
-                      result.output)
-        export_mock.assert_called_with('/path/to/test_file.txt',
-                                       {'billing': 'hourly',
-                                        'datacenter': 'TEST00',
-                                        'domain': 'example.com',
-                                        'extra': (),
-                                        'hostname': 'test',
-                                        'key': (),
-                                        'os': 'UBUNTU_12_64',
-                                        'port_speed': 100,
-                                        'postinstall': None,
-                                        'size': 'S1270_8GB_2X1TBSATA_NORAID',
-                                        'test': False,
-                                        'no_public': True,
-                                        'wait': None,
-                                        'template': None},
-                                       exclude=['wait', 'test'])
+        self.assertIn("Successfully exported options to a template file.", result.output)
+        export_mock.assert_called_once()
 
     def test_edit_server_userdata_and_file(self):
         # Test both userdata and userfile at once
@@ -859,20 +842,6 @@ class ServerCLITests(testing.TestCase):
         }
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output), billing_json)
-
-    def test_create_hw_export(self):
-        if(sys.platform.startswith("win")):
-            self.skipTest("Temp files do not work properly in Windows.")
-        with tempfile.NamedTemporaryFile() as config_file:
-            result = self.run_command(['hw', 'create', '--hostname=test', '--export', config_file.name,
-                                       '--domain=example.com', '--datacenter=TEST00',
-                                       '--network=TEST_NETWORK', '--os=UBUNTU_12_64',
-                                       '--size=S1270_8GB_2X1TBSATA_NORAID'])
-            self.assert_no_fail(result)
-            self.assertTrue('Successfully exported options to a template file.' in result.output)
-            contents = config_file.read().decode("utf-8")
-            self.assertIn('hostname=TEST', contents)
-            self.assertIn('size=S1270_8GB_2X1TBSATA_NORAID', contents)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_hw_no_confirm(self, confirm_mock):
