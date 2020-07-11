@@ -12,8 +12,16 @@ Version 5.6.0 introduces the ability to interact with user accounts from the cli
     :prog: user detail
     :show-nested:
 
+.. click:: SoftLayer.CLI.user.notifications:cli
+    :prog: user notifications
+    :show-nested:
+
 .. click:: SoftLayer.CLI.user.permissions:cli
     :prog: user permissions
+    :show-nested:
+
+.. click:: SoftLayer.CLI.user.edit_notifications:cli
+    :prog: user edit-notifications
     :show-nested:
 
 .. click:: SoftLayer.CLI.user.edit_permissions:cli
