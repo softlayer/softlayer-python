@@ -109,9 +109,7 @@ class UserManager(utils.IdentifierMixin, object):
         for notification in notifications:
             notification_id = notification.get('id')
             result = self.subscription_service.enable(id=notification_id)
-            if result:
-                continue
-            else:
+            if not result:
                 return False
         return result
 
@@ -130,9 +128,7 @@ class UserManager(utils.IdentifierMixin, object):
         for notification in notifications:
             notification_id = notification.get('id')
             result = self.subscription_service.disable(id=notification_id)
-            if result:
-                continue
-            else:
+            if not result:
                 return False
         return result
 
