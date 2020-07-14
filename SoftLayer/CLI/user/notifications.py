@@ -9,7 +9,7 @@ from SoftLayer.CLI import formatting
 @click.command()
 @environment.pass_env
 def cli(env):
-    """User Notifications."""
+    """My Notifications."""
 
     mgr = SoftLayer.UserManager(env.client)
 

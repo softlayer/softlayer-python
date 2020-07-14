@@ -13,7 +13,8 @@ from SoftLayer.CLI import environment
 @click.argument('notification', nargs=-1, required=True)
 @environment.pass_env
 def cli(env, enable, notification):
-    """Enable or Disable specific notifications.
+    """Enable or Disable specific notifications for the active user.
+    Notification names should be enclosed in quotation marks.
 
     Example::
 
