@@ -27,6 +27,8 @@ Interacting with Hardware
 
 Provides some basic functionality to order a server. `slcli order` has a more full featured method of ordering servers. This command only supports the FAST_PROVISION type.
 
+As of v5.9.0 please use the `--network` option for specifying port speed, as that allows a bit more granularity for choosing your networking type.
+
 .. click:: SoftLayer.CLI.hardware.credentials:cli
    :prog: hardware credentials
    :show-nested:
