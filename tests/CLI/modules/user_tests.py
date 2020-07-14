@@ -305,3 +305,35 @@ class UserCLITests(testing.TestCase):
         result = self.run_command(['user', 'vpn-subnet', '12345', '--remove', '1234'])
         click.secho.assert_called_with('12345 updated successfully', fg='green')
         self.assert_no_fail(result)
+
+    """User notification tests"""
+
+    def test_notificacions_list(self):
+        result = self.run_command(['user', 'notifications'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Email_Subscription', 'getAllObjects', mask='mask[enabled]')
+
+    """User edit-notification tests"""
+
+    def test_edit_notification_on(self):
+        result = self.run_command(['user', 'edit-notifications', '--enable', 'Test notification'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Email_Subscription', 'enable', identifier=111)
+
+    def test_edit_notification_on_bad(self):
+        result = self.run_command(['user', 'edit-notifications', '--enable', 'Test not exist'])
+        self.assertEqual(result.exit_code, 1)
+
+    def test_edit_notifications_off(self):
+        result = self.run_command(['user', 'edit-notifications', '--disable', 'Test notification'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Email_Subscription', 'disable', identifier=111)
+
+    @mock.patch('SoftLayer.CLI.user.edit_notifications.click')
+    def test_edit_notification_off_failure(self, click):
+        notification = self.set_mock('SoftLayer_Email_Subscription', 'disable')
+        notification.return_value = False
+        result = self.run_command(['user', 'edit-notifications', '--disable', 'Test notification'])
+        click.secho.assert_called_with('Failed to update notifications: Test notification', fg='red')
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Email_Subscription', 'disable', identifier=111)
