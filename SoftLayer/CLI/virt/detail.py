@@ -9,6 +9,7 @@ import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
+from SoftLayer.CLI.virt.storage import get_local_type
 from SoftLayer import utils
 
 LOGGER = logging.getLogger(__name__)
@@ -200,15 +201,3 @@ def _get_security_table(result):
         return secgroup_table
     else:
         return None
-
-
-def get_local_type(disks):
-    """Returns the virtual server local disk type.
-
-    :param disks: virtual serve local disks.
-    """
-    disk_type = 'System'
-    if 'SWAP' in disks['diskImage']['description']:
-        disk_type = 'Swap'
-
-    return disk_type
