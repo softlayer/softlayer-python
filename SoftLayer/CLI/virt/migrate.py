@@ -61,7 +61,7 @@ def cli(env, guest, migrate_all, host):
     elif migrate_all:
         require_migration = vsi.list_instances(filter=pending_filter, mask="mask[id]")
         for vsi_object in require_migration:
-            migrate(vsi, guest)
+            migrate(vsi, vsi_object['id'])
     # Just migrate based on the options
     else:
         migrate(vsi, guest, host)

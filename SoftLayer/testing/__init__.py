@@ -142,6 +142,16 @@ class TestCase(unittest.TestCase):
 
         raise AssertionError('%s::%s was not called with given properties: %s' % (service, method, props))
 
+    def assert_not_called_with(self, service, method, **props):
+        """Used to assert that API calls were NOT called with given properties.
+
+        Props are properties of the given transport.Request object.
+        """
+
+        if self.calls(service, method, **props):
+            raise AssertionError('%s::%s was called with given properties: %s' % (service, method, props))
+
+
     def assert_no_fail(self, result):
         """Fail when a failing click result has an error"""
         if result.exception:
