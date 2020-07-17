@@ -823,9 +823,18 @@ class VirtTests(testing.TestCase):
         self.assert_not_called_with('SoftLayer_Virtual_Guest', 'migrate')
         self.assert_not_called_with('SoftLayer_Virtual_Guest', 'migrateDedicatedHost')
 
+    def test_vs_migrate_list_empty(self):
+        mock = self.set_mock('SoftLayer_Account', 'getVirtualGuests')
+        mock.return_value = []
+        result = self.run_command(['vs', 'migrate'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getVirtualGuests')
+        self.assert_not_called_with('SoftLayer_Virtual_Guest', 'migrate')
+        self.assert_not_called_with('SoftLayer_Virtual_Guest', 'migrateDedicatedHost')
+        self.assertIn("No guests require migration at this time", result.output)
+
     def test_vs_migrate_guest(self):
         result = self.run_command(['vs', 'migrate', '-g', '100'])
-        
         self.assert_no_fail(result)
         self.assertIn('Started a migration on', result.output)
         self.assert_not_called_with('SoftLayer_Account', 'getVirtualGuests')

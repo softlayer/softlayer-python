@@ -151,7 +151,6 @@ class TestCase(unittest.TestCase):
         if self.calls(service, method, **props):
             raise AssertionError('%s::%s was called with given properties: %s' % (service, method, props))
 
-
     def assert_no_fail(self, result):
         """Fail when a failing click result has an error"""
         if result.exception:
