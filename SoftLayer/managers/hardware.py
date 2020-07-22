@@ -9,11 +9,11 @@ import logging
 import socket
 import time
 
+from SoftLayer import utils
 from SoftLayer.decoration import retry
 from SoftLayer.exceptions import SoftLayerError
 from SoftLayer.managers import ordering
 from SoftLayer.managers.ticket import TicketManager
-from SoftLayer import utils
 
 LOGGER = logging.getLogger(__name__)
 
@@ -727,6 +727,18 @@ class HardwareManager(utils.IdentifierMixin, object):
         :param int instance_id: Id of the hardware server
         """
         return self.hardware.getHardDrives(id=instance_id)
+
+    def get_hardware_guests(self, instance_id):
+        """Returns the hardware server guests.
+
+        :param int instance_id: Id of the hardware server.
+        """
+        mask = "mask[id]"
+        virtual_host = self.hardware.getVirtualHost(mask=mask, id=instance_id)
+        if virtual_host:
+            return self.client.call('SoftLayer_Virtual_Host', 'getGuests', mask='mask[powerState]',
+                                    id=virtual_host['id'])
+        return virtual_host
 
 
 def _get_bandwidth_key(items, hourly=True, no_public=False, location=None):

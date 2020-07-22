@@ -4,11 +4,11 @@
 import click
 
 import SoftLayer
+from SoftLayer import utils
 from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
-
 
 # pylint: disable=unnecessary-lambda
 
@@ -93,3 +93,23 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
                        for value in columns.row(guest)])
 
     env.fout(table)
+
+    hardware_guests = vsi.get_hardware_guests()
+    for hardware in hardware_guests:
+        if 'virtualHost' in hardware and hardware['virtualHost']['guests']:
+            table_hardware_guest = formatting.Table(['id', 'hostname', 'CPU', 'Memory', 'Start Date', 'Status',
+                                                     'powerState'], title="Hardware(id = {hardwareId}) guests "
+                                                                          "associated".format(hardwareId=hardware['id'])
+                                                    )
+            table_hardware_guest.sortby = 'hostname'
+            for guest in hardware['virtualHost']['guests']:
+                table_hardware_guest.add_row([
+                    guest['id'],
+                    guest['hostname'],
+                    '%i %s' % (guest['maxCpu'], guest['maxCpuUnits']),
+                    guest['maxMemory'],
+                    utils.clean_time(guest['createDate']),
+                    guest['status']['keyName'],
+                    guest['powerState']['keyName']
+                ])
+            env.fout(table_hardware_guest)
