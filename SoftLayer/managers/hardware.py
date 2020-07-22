@@ -9,11 +9,11 @@ import logging
 import socket
 import time
 
-from SoftLayer import utils
 from SoftLayer.decoration import retry
 from SoftLayer.exceptions import SoftLayerError
 from SoftLayer.managers import ordering
 from SoftLayer.managers.ticket import TicketManager
+from SoftLayer import utils
 
 LOGGER = logging.getLogger(__name__)
 

@@ -4,9 +4,11 @@
 import click
 
 import SoftLayer
-from SoftLayer import utils
-from SoftLayer.CLI import environment, formatting, exceptions
+from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
+from SoftLayer import utils
 
 
 @click.command()
