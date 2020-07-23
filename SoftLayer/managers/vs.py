@@ -1160,10 +1160,10 @@ class VSManager(utils.IdentifierMixin, object):
         return self.guest.getBlockDevices(mask=mask, id=instance_id)
 
     def get_hardware_guests(self):
-        """Returns the hardware server vs associated.
+        """Returns all virtualHost capable hardware objects and their guests.
 
         :return SoftLayer_Hardware[].
         """
-        object_filter = {"hardware": {"networkGatewayMemberFlag": {"operation": 0}}}
-        mask = "mask[networkGatewayMemberFlag,virtualHost[guests[powerState]]]"
+        object_filter = {"hardware": {"virtualHost": {"id": {"operation": "not null"}}}}
+        mask = "mask[virtualHost[guests[powerState]]]"
         return self.client.call('SoftLayer_Account', 'getHardware', mask=mask, filter=object_filter)

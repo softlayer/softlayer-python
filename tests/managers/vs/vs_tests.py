@@ -1164,29 +1164,4 @@ class VSTests(testing.TestCase):
 
         result = self.vs.get_hardware_guests()
 
-        self.assertEqual([{
-            "accountId": 11111,
-            "domain": "vmware.chechu.com",
-            "hostname": "host14",
-            "id": 22222,
-            "virtualHost": {
-                "accountId": 11111,
-                "id": 33333,
-                "name": "host14.vmware.chechu.com",
-                "guests": [
-                    {
-                        "accountId": 11111,
-                        "hostname": "NSX-T Manager",
-                        "id": 44444,
-                        "maxCpu": 16,
-                        "maxCpuUnits": "CORE",
-                        "maxMemory": 49152,
-                        "powerState": {
-                            "keyName": "RUNNING",
-                            "name": "Running"
-                        },
-                        "status": {
-                            "keyName": "ACTIVE",
-                            "name": "Active"
-                        }
-                    }]}}], result)
+        self.assertEqual("NSX-T Manager", result[0]['virtualHost']['guests'][0]['hostname'])

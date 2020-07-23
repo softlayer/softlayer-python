@@ -1,4 +1,4 @@
-"""List the Hardware server associated virtual guests."""
+"""Lists the Virtual Guests running on this server."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -15,14 +15,14 @@ from SoftLayer import utils
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """List the Hardware server associated virtual guests."""
+    """Lists the Virtual Guests running on this server."""
 
     mgr = SoftLayer.HardwareManager(env.client)
     hw_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'hardware')
     hw_guests = mgr.get_hardware_guests(hw_id)
 
     if not hw_guests:
-        raise exceptions.CLIAbort("The hardware server does not has associated virtual guests.")
+        raise exceptions.CLIAbort("No Virtual Guests found.")
 
     table = formatting.Table(['id', 'hostname', 'CPU', 'Memory', 'Start Date', 'Status', 'powerState'])
     table.sortby = 'hostname'

@@ -96,11 +96,10 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
 
     hardware_guests = vsi.get_hardware_guests()
     for hardware in hardware_guests:
-        if 'virtualHost' in hardware and hardware['virtualHost']['guests']:
+        if hardware['virtualHost']['guests']:
+            title = "Hardware(id = {hardwareId}) guests associated".format(hardwareId=hardware['id'])
             table_hardware_guest = formatting.Table(['id', 'hostname', 'CPU', 'Memory', 'Start Date', 'Status',
-                                                     'powerState'], title="Hardware(id = {hardwareId}) guests "
-                                                                          "associated".format(hardwareId=hardware['id'])
-                                                    )
+                                                     'powerState'], title=title)
             table_hardware_guest.sortby = 'hostname'
             for guest in hardware['virtualHost']['guests']:
                 table_hardware_guest.add_row([

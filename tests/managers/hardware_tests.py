@@ -656,23 +656,7 @@ class HardwareTests(testing.TestCase):
 
         result = self.hardware.get_hardware_guests(1234)
 
-        self.assertEqual([
-            {
-                "accountId": 11111,
-                "hostname": "NSX-T Manager",
-                "id": 22222,
-                "maxCpu": 16,
-                "maxCpuUnits": "CORE",
-                "maxMemory": 49152,
-                "powerState": {
-                    "keyName": "RUNNING",
-                    "name": "Running"
-                },
-                "status": {
-                    "keyName": "ACTIVE",
-                    "name": "Active"
-                }
-            }], result)
+        self.assertEqual("NSX-T Manager", result[0]['hostname'])
 
 
 class HardwareHelperTests(testing.TestCase):
