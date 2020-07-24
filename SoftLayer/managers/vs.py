@@ -1033,7 +1033,12 @@ class VSManager(utils.IdentifierMixin, object):
                           or product.get('units') == 'DEDICATED_CORE')
 
             for category in price.get('categories'):
-                if not (category_code == (''.join([i for i in category.get('categoryCode') if not i.isdigit()]))
+                if option == 'disk':
+                    if not (category_code == (''.join([i for i in category.get('categoryCode') if not i.isdigit()]))
+                            and str(product.get('capacity')) == str(value)):
+                        return price.get('id')
+
+                if not (category.get('categoryCode') == category_code
                         and str(product.get('capacity')) == str(value)):
                     continue
 
