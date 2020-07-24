@@ -107,12 +107,14 @@ class HardwareTests(testing.TestCase):
         result = self.hardware.reload(1, post_uri=post_uri, ssh_keys=[1701])
 
         self.assertEqual(result, 'OK')
-        self.assert_called_with('SoftLayer_Hardware_Server',
-                                'reloadOperatingSystem',
-                                args=('FORCE',
-                                      {'customProvisionScriptUri': post_uri,
-                                       'sshKeyIds': [1701]}),
+        self.assert_called_with('SoftLayer_Hardware_Server', 'reloadOperatingSystem',
+                                args=('FORCE', {'customProvisionScriptUri': post_uri, 'sshKeyIds': [1701]}),
                                 identifier=1)
+
+        result = self.hardware.reload(100, lvm=True)
+        self.assertEqual(result, 'OK')
+        self.assert_called_with('SoftLayer_Hardware_Server', 'reloadOperatingSystem',
+                                args=('FORCE', {'lvmFlag': True}), identifier=100)
 
     def test_get_create_options(self):
         options = self.hardware.get_create_options()
@@ -625,6 +627,38 @@ class HardwareTests(testing.TestCase):
         result = self.hardware.get_hard_drives(1234)
 
         self.assertEqual([], result)
+
+    def test_get_hardware_guests_empty_virtualHost(self):
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getVirtualHost')
+        mock.return_value = None
+
+        result = self.hardware.get_hardware_guests(1234)
+
+        self.assertEqual(None, result)
+
+    def test_get_hardware_guests(self):
+        mock = self.set_mock('SoftLayer_Virtual_Host', 'getGuests')
+        mock.return_value = [
+            {
+                "accountId": 11111,
+                "hostname": "NSX-T Manager",
+                "id": 22222,
+                "maxCpu": 16,
+                "maxCpuUnits": "CORE",
+                "maxMemory": 49152,
+                "powerState": {
+                    "keyName": "RUNNING",
+                    "name": "Running"
+                },
+                "status": {
+                    "keyName": "ACTIVE",
+                    "name": "Active"
+                }
+            }]
+
+        result = self.hardware.get_hardware_guests(1234)
+
+        self.assertEqual("NSX-T Manager", result[0]['hostname'])
 
 
 class HardwareHelperTests(testing.TestCase):

@@ -269,13 +269,14 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         return self.hardware.getObject(id=hardware_id, **kwargs)
 
-    def reload(self, hardware_id, post_uri=None, ssh_keys=None):
+    def reload(self, hardware_id, post_uri=None, ssh_keys=None, lvm=False):
         """Perform an OS reload of a server with its current configuration.
 
+        https://sldn.softlayer.com/reference/datatypes/SoftLayer_Container_Hardware_Server_Configuration/
         :param integer hardware_id: the instance ID to reload
-        :param string post_uri: The URI of the post-install script to run
-                                after reload
+        :param string post_uri: The URI of the post-install script to run after reload
         :param list ssh_keys: The SSH keys to add to the root user
+        :param bool lvm: A flag indicating that the provision should use LVM for all logical drives.
         """
 
         config = {}
@@ -285,9 +286,10 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         if ssh_keys:
             config['sshKeyIds'] = list(ssh_keys)
+        if lvm:
+            config['lvmFlag'] = lvm
 
-        return self.hardware.reloadOperatingSystem('FORCE', config,
-                                                   id=hardware_id)
+        return self.hardware.reloadOperatingSystem('FORCE', config, id=hardware_id)
 
     def rescue(self, hardware_id):
         """Reboot a server into the a recsue kernel.
@@ -727,6 +729,18 @@ class HardwareManager(utils.IdentifierMixin, object):
         :param int instance_id: Id of the hardware server
         """
         return self.hardware.getHardDrives(id=instance_id)
+
+    def get_hardware_guests(self, instance_id):
+        """Returns the hardware server guests.
+
+        :param int instance_id: Id of the hardware server.
+        """
+        mask = "mask[id]"
+        virtual_host = self.hardware.getVirtualHost(mask=mask, id=instance_id)
+        if virtual_host:
+            return self.client.call('SoftLayer_Virtual_Host', 'getGuests', mask='mask[powerState]',
+                                    id=virtual_host['id'])
+        return virtual_host
 
 
 def _get_bandwidth_key(items, hourly=True, no_public=False, location=None):

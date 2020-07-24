@@ -1178,3 +1178,12 @@ class VSManager(utils.IdentifierMixin, object):
         :param int instance_id: Id of the virtual server
         """
         return self.guest.migrateDedicatedHost(host_id, id=instance_id)
+
+    def get_hardware_guests(self):
+        """Returns all virtualHost capable hardware objects and their guests.
+
+        :return SoftLayer_Hardware[].
+        """
+        object_filter = {"hardware": {"virtualHost": {"id": {"operation": "not null"}}}}
+        mask = "mask[virtualHost[guests[powerState]]]"
+        return self.client.call('SoftLayer_Account', 'getHardware', mask=mask, filter=object_filter)
