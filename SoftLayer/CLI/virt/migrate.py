@@ -20,7 +20,7 @@ def cli(env, guest, migrate_all, host):
 
     vsi = SoftLayer.VSManager(env.client)
     pending_filter = {'virtualGuests': {'pendingMigrationFlag': {'operation': 1}}}
-    dedicated_filer = {'virtualGuests': {'dedicatedHost': {'id': {'operation': 'not null'}}}}
+    dedicated_filter = {'virtualGuests': {'dedicatedHost': {'id': {'operation': 'not null'}}}}
     mask = """mask[
                 id, hostname, domain, datacenter, pendingMigrationFlag, powerState,
                 primaryIpAddress,primaryBackendIpAddress, dedicatedHost
@@ -44,7 +44,7 @@ def cli(env, guest, migrate_all, host):
         else:
             click.secho("No guests require migration at this time", fg='green')
 
-        migrateable = vsi.list_instances(filter=dedicated_filer, mask=mask)
+        migrateable = vsi.list_instances(filter=dedicated_filter, mask=mask)
         migrateable_table = formatting.Table(['id', 'hostname', 'domain', 'datacenter', 'Host Name', 'Host Id'],
                                              title="Dedicated Guests")
         for vsi_object in migrateable:
