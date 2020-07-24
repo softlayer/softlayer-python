@@ -22,7 +22,9 @@ LOGGER = logging.getLogger(__name__)
 
 EXTRA_CATEGORIES = ['pri_ipv6_addresses',
                     'static_ipv6_addresses',
-                    'sec_ip_addresses']
+                    'sec_ip_addresses',
+                    'trusted_platform_module',
+                    'software_guard_extensions']
 
 
 class HardwareManager(utils.IdentifierMixin, object):
@@ -53,6 +55,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         self.hardware = self.client['Hardware_Server']
         self.account = self.client['Account']
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
+        self.package_keyname = 'BARE_METAL_SERVER'
         if ordering_manager is None:
             self.ordering_manager = ordering.OrderingManager(client)
         else:
@@ -337,16 +340,14 @@ class HardwareManager(utils.IdentifierMixin, object):
         :param string os: operating system name
         :param int port_speed: Port speed in Mbps
         :param list ssh_keys: list of ssh key ids
-        :param string post_uri: The URI of the post-install script to run
-                                after reload
-        :param boolean hourly: True if using hourly pricing (default).
-                               False for monthly.
-        :param boolean no_public: True if this server should only have private
-                                  interfaces
+        :param string post_uri: The URI of the post-install script to run after reload
+        :param boolean hourly: True if using hourly pricing (default). False for monthly.
+        :param boolean no_public: True if this server should only have private interfaces
         :param list extras: List of extra feature names
         """
         create_options = self._generate_create_dict(**kwargs)
-        return self.client['Product_Order'].placeOrder(create_options)
+        return self.ordering_manager.place_order(**create_options)
+        # return self.client['Product_Order'].placeOrder(create_options)
 
     def verify_order(self, **kwargs):
         """Verifies an order for a piece of hardware.
@@ -354,7 +355,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         See :func:`place_order` for a list of available options.
         """
         create_options = self._generate_create_dict(**kwargs)
-        return self.client['Product_Order'].verifyOrder(create_options)
+        return self.ordering_manager.verify_order(**create_options)
 
     def get_cancellation_reasons(self):
         """Returns a dictionary of valid cancellation reasons.
@@ -397,33 +398,27 @@ class HardwareManager(utils.IdentifierMixin, object):
                 'key': preset['keyName']
             })
 
-        # Operating systems
         operating_systems = []
+        port_speeds = []
+        extras = []
         for item in package['items']:
-            if item['itemCategory']['categoryCode'] == 'os':
+            category = item['itemCategory']['categoryCode']
+            # Operating systems
+            if category == 'os':
                 operating_systems.append({
                     'name': item['softwareDescription']['longDescription'],
                     'key': item['keyName'],
                     'referenceCode': item['softwareDescription']['referenceCode']
                 })
-
-        # Port speeds
-        port_speeds = []
-        for item in package['items']:
-            if all([item['itemCategory']['categoryCode'] == 'port_speed',
-                    # Hide private options
-                    not _is_private_port_speed_item(item),
-                    # Hide unbonded options
-                    _is_bonded(item)]):
+            # Port speeds
+            elif category == 'port_speed':
                 port_speeds.append({
                     'name': item['description'],
-                    'key': item['capacity'],
+                    'speed': item['capacity'],
+                    'key': item['keyName']
                 })
-
-        # Extras
-        extras = []
-        for item in package['items']:
-            if item['itemCategory']['categoryCode'] in EXTRA_CATEGORIES:
+            # Extras
+            elif category in EXTRA_CATEGORIES:
                 extras.append({
                     'name': item['description'],
                     'key': item['keyName']
@@ -454,9 +449,7 @@ class HardwareManager(utils.IdentifierMixin, object):
             accountRestrictedActivePresets,
             regions[location[location[priceGroups]]]
             '''
-
-        package_keyname = 'BARE_METAL_SERVER'
-        package = self.ordering_manager.get_package_by_key(package_keyname, mask=mask)
+        package = self.ordering_manager.get_package_by_key(self.package_keyname, mask=mask)
         return package
 
     def _generate_create_dict(self,
@@ -470,59 +463,66 @@ class HardwareManager(utils.IdentifierMixin, object):
                               post_uri=None,
                               hourly=True,
                               no_public=False,
-                              extras=None):
+                              extras=None,
+                              network=None):
         """Translates arguments into a dictionary for creating a server."""
 
         extras = extras or []
 
         package = self._get_package()
-        location = _get_location(package, location)
+        items = package.get('items', {})
+        location_id = _get_location(package, location)
 
-        prices = []
-        for category in ['pri_ip_addresses',
-                         'vpn_management',
-                         'remote_management']:
-            prices.append(_get_default_price_id(package['items'],
-                                                option=category,
-                                                hourly=hourly,
-                                                location=location))
+        key_names = [
+            '1_IP_ADDRESS',
+            'UNLIMITED_SSL_VPN_USERS_1_PPTP_VPN_USER_PER_ACCOUNT',
+            'REBOOT_KVM_OVER_IP'
+        ]
 
-        prices.append(_get_os_price_id(package['items'], os,
-                                       location=location))
-        prices.append(_get_bandwidth_price_id(package['items'],
-                                              hourly=hourly,
-                                              no_public=no_public,
-                                              location=location))
-        prices.append(_get_port_speed_price_id(package['items'],
-                                               port_speed,
-                                               no_public,
-                                               location=location))
+        # Operating System
+        key_names.append(os)
 
+        # Bandwidth Options
+        key_names.append(
+            _get_bandwidth_key(items, hourly=hourly, no_public=no_public, location=location_id)
+        )
+
+        # Port Speed Options
+        # New option in v5.9.0
+        if network:
+            key_names.append(network)
+        # Legacy Option, doesn't support bonded/redundant
+        else:
+            key_names.append(
+                _get_port_speed_key(items, port_speed, no_public, location=location_id)
+            )
+
+        # Extras
         for extra in extras:
-            prices.append(_get_extra_price_id(package['items'],
-                                              extra, hourly,
-                                              location=location))
+            key_names.append(extra)
 
-        hardware = {
-            'hostname': hostname,
-            'domain': domain,
+        extras = {
+            'hardware': [{
+                'hostname': hostname,
+                'domain': domain,
+            }]
         }
-
-        order = {
-            'hardware': [hardware],
-            'location': location['keyname'],
-            'prices': [{'id': price} for price in prices],
-            'packageId': package['id'],
-            'presetId': _get_preset_id(package, size),
-            'useHourlyPricing': hourly,
-        }
-
         if post_uri:
-            order['provisionScripts'] = [post_uri]
+            extras['provisionScripts'] = [post_uri]
 
         if ssh_keys:
-            order['sshKeys'] = [{'sshKeyIds': ssh_keys}]
+            extras['sshKeys'] = [{'sshKeyIds': ssh_keys}]
 
+        order = {
+            'package_keyname': self.package_keyname,
+            'location': location,
+            'item_keynames': key_names,
+            'complex_type': 'SoftLayer_Container_Product_Order_Hardware_Server',
+            'hourly': hourly,
+            'preset_keyname': size,
+            'extras': extras,
+            'quantity': 1,
+        }
         return order
 
     def _get_ids_from_hostname(self, hostname):
@@ -729,94 +729,35 @@ class HardwareManager(utils.IdentifierMixin, object):
         return self.hardware.getHardDrives(id=instance_id)
 
 
-def _get_extra_price_id(items, key_name, hourly, location):
-    """Returns a price id attached to item with the given key_name."""
+def _get_bandwidth_key(items, hourly=True, no_public=False, location=None):
+    """Picks a valid Bandwidth Item, returns the KeyName"""
 
-    for item in items:
-        if utils.lookup(item, 'keyName') != key_name:
-            continue
-
-        for price in item['prices']:
-            if not _matches_billing(price, hourly):
-                continue
-
-            if not _matches_location(price, location):
-                continue
-
-            return price['id']
-
-    raise SoftLayerError(
-        "Could not find valid price for extra option, '%s'" % key_name)
-
-
-def _get_default_price_id(items, option, hourly, location):
-    """Returns a 'free' price id given an option."""
-
-    for item in items:
-        if utils.lookup(item, 'itemCategory', 'categoryCode') != option:
-            continue
-
-        for price in item['prices']:
-            if all([float(price.get('hourlyRecurringFee', 0)) == 0.0,
-                    float(price.get('recurringFee', 0)) == 0.0,
-                    _matches_billing(price, hourly),
-                    _matches_location(price, location)]):
-                return price['id']
-
-    raise SoftLayerError(
-        "Could not find valid price for '%s' option" % option)
-
-
-def _get_bandwidth_price_id(items,
-                            hourly=True,
-                            no_public=False,
-                            location=None):
-    """Choose a valid price id for bandwidth."""
-
+    keyName = None
     # Prefer pay-for-use data transfer with hourly
     for item in items:
 
         capacity = float(item.get('capacity', 0))
         # Hourly and private only do pay-as-you-go bandwidth
-        if any([utils.lookup(item,
-                             'itemCategory',
-                             'categoryCode') != 'bandwidth',
+        if any([utils.lookup(item, 'itemCategory', 'categoryCode') != 'bandwidth',
                 (hourly or no_public) and capacity != 0.0,
                 not (hourly or no_public) and capacity == 0.0]):
             continue
 
+        keyName = item['keyName']
         for price in item['prices']:
             if not _matches_billing(price, hourly):
                 continue
             if not _matches_location(price, location):
                 continue
+            return keyName
 
-            return price['id']
-
-    raise SoftLayerError(
-        "Could not find valid price for bandwidth option")
+    raise SoftLayerError("Could not find valid price for bandwidth option")
 
 
-def _get_os_price_id(items, os, location):
-    """Returns the price id matching."""
-
-    for item in items:
-        if any([utils.lookup(item, 'itemCategory', 'categoryCode') != 'os',
-                utils.lookup(item, 'keyName') != os]):
-            continue
-
-        for price in item['prices']:
-            if not _matches_location(price, location):
-                continue
-
-            return price['id']
-
-    raise SoftLayerError("Could not find valid price for os: '%s'" % os)
-
-
-def _get_port_speed_price_id(items, port_speed, no_public, location):
+def _get_port_speed_key(items, port_speed, no_public, location):
     """Choose a valid price id for port speed."""
 
+    keyName = None
     for item in items:
         if utils.lookup(item, 'itemCategory', 'categoryCode') != 'port_speed':
             continue
@@ -826,15 +767,14 @@ def _get_port_speed_price_id(items, port_speed, no_public, location):
                 _is_private_port_speed_item(item) != no_public,
                 not _is_bonded(item)]):
             continue
-
+        keyName = item['keyName']
         for price in item['prices']:
             if not _matches_location(price, location):
                 continue
 
-            return price['id']
+            return keyName
 
-    raise SoftLayerError(
-        "Could not find valid price for port speed: '%s'" % port_speed)
+    raise SoftLayerError("Could not find valid price for port speed: '%s'" % port_speed)
 
 
 def _matches_billing(price, hourly):
@@ -883,12 +823,3 @@ def _get_location(package, location):
             return region
 
     raise SoftLayerError("Could not find valid location for: '%s'" % location)
-
-
-def _get_preset_id(package, size):
-    """Get the preset id given the keyName of the preset."""
-    for preset in package['activePresets'] + package['accountRestrictedActivePresets']:
-        if preset['keyName'] == size or preset['id'] == size:
-            return preset['id']
-
-    raise SoftLayerError("Could not find valid size for: '%s'" % size)

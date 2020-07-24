@@ -4,7 +4,9 @@
 
 """
 import datetime
+
 import mock
+
 import SoftLayer
 from SoftLayer import exceptions
 from SoftLayer import testing
@@ -246,3 +248,49 @@ class UserManagerTests(testing.TestCase):
         self.manager.vpn_subnet_remove(user_id, [subnet_id])
         self.assert_called_with('SoftLayer_Network_Service_Vpn_Overrides', 'deleteObjects', args=expected_args)
         self.assert_called_with('SoftLayer_User_Customer', 'updateVpnUser', identifier=user_id)
+
+    def test_get_all_notifications(self):
+        self.manager.get_all_notifications()
+        self.assert_called_with('SoftLayer_Email_Subscription', 'getAllObjects')
+
+    def test_enable_notifications(self):
+        self.manager.enable_notifications(['Test notification'])
+        self.assert_called_with('SoftLayer_Email_Subscription', 'enable', identifier=111)
+
+    def test_disable_notifications(self):
+        self.manager.disable_notifications(['Test notification'])
+        self.assert_called_with('SoftLayer_Email_Subscription', 'disable', identifier=111)
+
+    def test_enable_notifications_fail(self):
+        notification = self.set_mock('SoftLayer_Email_Subscription', 'enable')
+        notification.return_value = False
+        result = self.manager.enable_notifications(['Test notification'])
+        self.assert_called_with('SoftLayer_Email_Subscription', 'enable', identifier=111)
+        self.assertFalse(result)
+
+    def test_disable_notifications_fail(self):
+        notification = self.set_mock('SoftLayer_Email_Subscription', 'disable')
+        notification.return_value = False
+        result = self.manager.disable_notifications(['Test notification'])
+        self.assert_called_with('SoftLayer_Email_Subscription', 'disable', identifier=111)
+        self.assertFalse(result)
+
+    def test_gather_notifications(self):
+        expected_result = [
+            {'description': 'Testing description.',
+             'enabled': True,
+             'id': 111,
+             'name': 'Test notification'
+             }
+        ]
+        result = self.manager.gather_notifications(['Test notification'])
+        self.assert_called_with('SoftLayer_Email_Subscription',
+                                'getAllObjects',
+                                mask='mask[enabled]')
+        self.assertEqual(result, expected_result)
+
+    def test_gather_notifications_fail(self):
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               self.manager.gather_notifications,
+                               ['Test not exit'])
+        self.assertEqual("Test not exit is not a valid notification name", str(ex))

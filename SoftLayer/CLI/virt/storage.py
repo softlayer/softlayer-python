@@ -67,7 +67,7 @@ def get_local_type(disks):
     :param disks: virtual serve local disks.
     """
     disk_type = 'System'
-    if 'SWAP' in disks['diskImage']['description']:
+    if 'SWAP' in disks.get('diskImage', {}).get('description', []):
         disk_type = 'Swap'
 
     return disk_type
