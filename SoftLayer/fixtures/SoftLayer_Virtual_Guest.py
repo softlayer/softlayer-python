@@ -8,11 +8,16 @@ getObject = {
         'id': 6327,
         'nextInvoiceTotalRecurringAmount': 1.54,
         'children': [
-            {'nextInvoiceTotalRecurringAmount': 1},
-            {'nextInvoiceTotalRecurringAmount': 1},
-            {'nextInvoiceTotalRecurringAmount': 1},
-            {'nextInvoiceTotalRecurringAmount': 1},
-            {'nextInvoiceTotalRecurringAmount': 1},
+            {'categoryCode': 'port_speed',
+             'nextInvoiceTotalRecurringAmount': 1},
+            {'categoryCode': 'guest_core',
+             'nextInvoiceTotalRecurringAmount': 1},
+            {'categoryCode': 'ram',
+             'nextInvoiceTotalRecurringAmount': 1},
+            {'categoryCode': 'guest_core',
+             'nextInvoiceTotalRecurringAmount': 1},
+            {'categoryCode': 'guest_disk1',
+             'nextInvoiceTotalRecurringAmount': 1},
         ],
         'package': {
             "id": 835,
@@ -622,7 +627,35 @@ getUpgradeItemPrices = [
             'capacity': '2',
             'description': 'RAM',
         }
-    },
+    }, {
+        "id": 2255,
+        "categories": [
+            {
+                "categoryCode": "guest_disk1",
+                "id": 82,
+                "name": "Second Disk"
+            },
+            {
+                "categoryCode": "guest_disk2",
+                "id": 92,
+                "name": "Third Disk"
+            },
+            {
+                "categoryCode": "guest_disk3",
+                "id": 93,
+                "name": "Fourth Disk"
+            },
+            {
+                "categoryCode": "guest_disk4",
+                "id": 116,
+                "name": "Fifth Disk"
+            }
+        ],
+        "item": {
+            "capacity": "10",
+            "description": "10 GB (SAN)"
+        }
+    }
 ]
 
 DEDICATED_GET_UPGRADE_ITEM_PRICES = [
@@ -640,7 +673,6 @@ DEDICATED_GET_UPGRADE_ITEM_PRICES = [
 ]
 
 getMetricTrackingObjectId = 1000
-
 
 getBandwidthAllotmentDetail = {
     'allocationId': 25465663,

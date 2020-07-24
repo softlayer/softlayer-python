@@ -2,6 +2,7 @@
 # :license: MIT, see LICENSE for more details.
 
 import click
+import json
 
 import SoftLayer
 from SoftLayer.CLI import environment
@@ -20,15 +21,17 @@ completed. However for Network, no reboot is required.""")
               help="CPU core will be on a dedicated host server.")
 @click.option('--memory', type=virt.MEM_TYPE, help="Memory in megabytes")
 @click.option('--network', type=click.INT, help="Network port speed in Mbps")
+@click.option('--add', type=click.INT, required=False, help="add Hard disk in GB")
+@click.option('--disk', nargs=1, help="update the number and capacity in GB Hard disk, E.G {'number':2,'capacity':100}")
 @click.option('--flavor', type=click.STRING,
               help="Flavor keyName\nDo not use --memory, --cpu or --private, if you are using flavors")
 @environment.pass_env
-def cli(env, identifier, cpu, private, memory, network, flavor):
+def cli(env, identifier, cpu, private, memory, network, flavor, disk, add):
     """Upgrade a virtual server."""
 
     vsi = SoftLayer.VSManager(env.client)
 
-    if not any([cpu, memory, network, flavor]):
+    if not any([cpu, memory, network, flavor, disk, add]):
         raise exceptions.ArgumentError("Must provide [--cpu], [--memory], [--network], or [--flavor] to upgrade")
 
     if private and not cpu:
@@ -40,6 +43,9 @@ def cli(env, identifier, cpu, private, memory, network, flavor):
 
     if memory:
         memory = int(memory / 1024)
+    if disk is not None:
+        disk = json.loads(disk)
 
-    if not vsi.upgrade(vs_id, cpus=cpu, memory=memory, nic_speed=network, public=not private, preset=flavor):
+    if not vsi.upgrade(vs_id, cpus=cpu, memory=memory, nic_speed=network, public=not private, preset=flavor,
+                       disk=disk, add=add):
         raise exceptions.CLIAbort('VS Upgrade Failed')

@@ -571,6 +571,19 @@ class VirtTests(testing.TestCase):
         self.assertEqual(order_container['virtualGuests'], [{'id': 100}])
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_upgrade_disk(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['vs', 'upgrade', '100', '--flavor=M1_64X512X100',
+                                   '--disk={"number":1,"capacity":10}'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
+        call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
+        order_container = call.args[0]
+        self.assertEqual(799, order_container['presetId'])
+        self.assertIn({'id': 100}, order_container['virtualGuests'])
+        self.assertEqual(order_container['virtualGuests'], [{'id': 100}])
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_upgrade_with_flavor(self, confirm_mock):
         confirm_mock.return_value = True
         result = self.run_command(['vs', 'upgrade', '100', '--flavor=M1_64X512X100'])
@@ -579,6 +592,17 @@ class VirtTests(testing.TestCase):
         call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
         order_container = call.args[0]
         self.assertEqual(799, order_container['presetId'])
+        self.assertIn({'id': 100}, order_container['virtualGuests'])
+        self.assertEqual(order_container['virtualGuests'], [{'id': 100}])
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_upgrade_with_add_disk(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['vs', 'upgrade', '100', '--add=10'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
+        call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
+        order_container = call.args[0]
         self.assertIn({'id': 100}, order_container['virtualGuests'])
         self.assertEqual(order_container['virtualGuests'], [{'id': 100}])
 
