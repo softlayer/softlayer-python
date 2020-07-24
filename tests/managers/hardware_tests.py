@@ -107,12 +107,14 @@ class HardwareTests(testing.TestCase):
         result = self.hardware.reload(1, post_uri=post_uri, ssh_keys=[1701])
 
         self.assertEqual(result, 'OK')
-        self.assert_called_with('SoftLayer_Hardware_Server',
-                                'reloadOperatingSystem',
-                                args=('FORCE',
-                                      {'customProvisionScriptUri': post_uri,
-                                       'sshKeyIds': [1701]}),
+        self.assert_called_with('SoftLayer_Hardware_Server', 'reloadOperatingSystem',
+                                args=('FORCE', {'customProvisionScriptUri': post_uri, 'sshKeyIds': [1701]}),
                                 identifier=1)
+
+        result = self.hardware.reload(100, lvm=True)
+        self.assertEqual(result, 'OK')
+        self.assert_called_with('SoftLayer_Hardware_Server', 'reloadOperatingSystem',
+                                args=('FORCE', {'lvmFlag': True}), identifier=100)
 
     def test_get_create_options(self):
         options = self.hardware.get_create_options()

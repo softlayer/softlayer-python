@@ -219,11 +219,15 @@ class ServerCLITests(testing.TestCase):
         ngb_mock.return_value = False
 
         # Check the positive case
-        result = self.run_command(['--really', 'server', 'reload', '12345',
-                                   '--key=4567'])
+        result = self.run_command(['--really', 'server', 'reload', '12345', '--key=4567'])
 
         self.assert_no_fail(result)
-        reload_mock.assert_called_with(12345, None, [4567])
+        reload_mock.assert_called_with(12345, None, [4567], False)
+
+        # LVM switch
+        result = self.run_command(['--really', 'server', 'reload', '12345', '--lvm'])
+        self.assert_no_fail(result)
+        reload_mock.assert_called_with(12345, None, [], True)
 
         # Now check to make sure we properly call CLIAbort in the negative case
         result = self.run_command(['server', 'reload', '12345'])
