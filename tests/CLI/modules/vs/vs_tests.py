@@ -315,45 +315,13 @@ class VirtTests(testing.TestCase):
 
     def test_create_options(self):
         result = self.run_command(['vs', 'create-options'])
-        expected_json_result = [
-            [
-                {"datacenter": "ams01"},
-                {"datacenter": "dal05"}
-            ],
-            [
-                {"flavor": "balanced", "value": ["B1_1X2X25", "B1_1X2X100"]},
-                {"flavor": "balanced local - hdd", "value": ["BL1_1X2X100"]},
-                {"flavor": "balanced local - ssd", "value": ["BL2_1X2X100"]},
-                {"flavor": "compute", "value": ["C1_1X2X25"]},
-                {"flavor": "memory", "value": ["M1_1X2X100"]},
-                {"flavor": "GPU", "value": ["AC1_1X2X100", "ACL1_1X2X100"]},
-                {"flavor": "transient", "value": ["B1_1X2X25_TRANSIENT"]}
-            ],
-            [
-                {"cpu": "standard", "value": [1, 2, 3, 4]},
-                {"cpu": "dedicated", "value": [1]},
-                {"cpu": "dedicated host", "value": [4, 56]}
-            ],
-            [
-                {"memory": "standard", "value": [1024, 2048, 3072, 4096]},
-                {"memory": "dedicated host", "value": [8192, 65536]}
-            ],
-            [
-                {"os": "CENTOS", "value": "CENTOS_6_64"},
-                {"os": "DEBIAN", "value": "DEBIAN_7_64"},
-                {"os": "UBUNTU", "value": "UBUNTU_12_64"}
-            ],
-            [
-                {"disk": "local disk(0)", "value": ["25", "100"]}
-            ],
-            [
-                {"network": "nic", "value": ["10", "100", "1000"]},
-                {"network": "nic (dedicated host)", "value": ["1000"]}
-            ]
-        ]
-        self.maxDiff = None
         self.assert_no_fail(result)
-        self.assertEqual(expected_json_result, json.loads(result.output))
+        self.assertIn('datacenter', result.output)
+        self.assertIn('flavor', result.output)
+        self.assertIn('memory', result.output)
+        self.assertIn('cpu', result.output)
+        self.assertIn('OS', result.output)
+        self.assertIn('network', result.output)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_both(self, confirm_mock):
