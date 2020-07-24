@@ -1,9 +1,6 @@
 """Virtual server order options."""
 # :license: MIT, see LICENSE for more details.
 # pylint: disable=too-many-statements
-import os
-import os.path
-
 import click
 
 import SoftLayer
@@ -128,23 +125,21 @@ def _get_memory_table(create_options):
 
 
 def _get_os_table(create_options):
-    os_table = formatting.Table(['os', 'value'], title='Operating Systems')
-    os_table.sortby = 'os'
+    os_table = formatting.Table(['KeyName', 'Description'], title='Operating Systems')
+    os_table.sortby = 'KeyName'
     os_table.align = 'l'
-    op_sys = [o['template']['operatingSystemReferenceCode'] for o in
-              create_options['operatingSystems']]
-
-    op_sys = sorted(op_sys)
-    os_summary = set()
+    op_sys = []
+    for operating_system in create_options['operatingSystems']:
+        os_option = {
+            'referenceCode': operating_system['template']['operatingSystemReferenceCode'],
+            'description': operating_system['itemPrice']['item']['description']
+        }
+        op_sys.append(os_option)
 
     for operating_system in op_sys:
-        os_summary.add(operating_system[0:operating_system.find('_')])
-
-    for summary in sorted(os_summary):
         os_table.add_row([
-            summary,
-            os.linesep.join(sorted([x for x in op_sys
-                                    if x[0:len(summary)] == summary]))
+            operating_system['referenceCode'],
+            operating_system['description']
         ])
     return os_table
 
