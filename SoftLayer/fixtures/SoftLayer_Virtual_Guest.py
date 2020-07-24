@@ -767,3 +767,6 @@ getBlockDevices = [
         }
     }
 ]
+
+migrate = True
+migrateDedicatedHost = True

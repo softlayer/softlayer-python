@@ -1159,6 +1159,26 @@ class VSManager(utils.IdentifierMixin, object):
         mask = 'mask[diskImage]'
         return self.guest.getBlockDevices(mask=mask, id=instance_id)
 
+    def migrate(self, instance_id):
+        """Calls SoftLayer_Virtual_Guest::migrate
+
+        Only actually does anything if the virtual server requires a migration.
+        Will return an exception otherwise.
+
+        :param int instance_id: Id of the virtual server
+        """
+        return self.guest.migrate(id=instance_id)
+
+    def migrate_dedicated(self, instance_id, host_id):
+        """Calls SoftLayer_Virtual_Guest::migrate
+
+        Only actually does anything if the virtual server requires a migration.
+        Will return an exception otherwise.
+
+        :param int instance_id: Id of the virtual server
+        """
+        return self.guest.migrateDedicatedHost(host_id, id=instance_id)
+
     def get_hardware_guests(self):
         """Returns all virtualHost capable hardware objects and their guests.
 

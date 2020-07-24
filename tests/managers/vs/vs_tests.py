@@ -1133,6 +1133,16 @@ class VSTests(testing.TestCase):
             }
         ], result)
 
+    def test_migrate(self):
+        result = self.vs.migrate(1234)
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'migrate', identifier=1234)
+
+    def test_migrate_dedicated(self):
+        result = self.vs.migrate_dedicated(1234, 5555)
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'migrateDedicatedHost', args=(5555,), identifier=1234)
+
     def test_get_hardware_guests(self):
         mock = self.set_mock('SoftLayer_Account', 'getHardware')
         mock.return_value = [{
@@ -1163,5 +1173,4 @@ class VSTests(testing.TestCase):
                     }]}}]
 
         result = self.vs.get_hardware_guests()
-
         self.assertEqual("NSX-T Manager", result[0]['virtualHost']['guests'][0]['hostname'])
