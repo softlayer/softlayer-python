@@ -317,8 +317,8 @@ class VirtTests(testing.TestCase):
         result = self.run_command(['vs', 'create-options'])
         expected_json_result = [
             [
-                {"Datacenter": "ams01"},
-                {"Datacenter": "dal05"}
+                {"datacenter": "ams01"},
+                {"datacenter": "dal05"}
             ],
             [
                 {"flavor": "balanced", "value": ["B1_1X2X25", "B1_1X2X100"]},
