@@ -351,7 +351,7 @@ class VirtTests(testing.TestCase):
                 {"network": "nic (dedicated host)", "value": ["1000"]}
             ]
         ]
-
+        self.maxDiff = None
         self.assert_no_fail(result)
         self.assertEqual(expected_json_result, json.loads(result.output))
 

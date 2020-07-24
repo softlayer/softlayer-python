@@ -62,7 +62,7 @@ def _get_flavors_table(create_options):
     }
 
     if create_options.get('flavors', None) is None:
-        return
+        return flavor_table
 
     for flavor_option in create_options['flavors']:
         flavor_key_name = utils.lookup(flavor_option, 'flavor', 'keyName')
