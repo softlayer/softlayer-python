@@ -60,6 +60,8 @@ def cli(env, guest, migrate_all, host):
     # Migrate all guests with pendingMigrationFlag=True
     elif migrate_all:
         require_migration = vsi.list_instances(filter=pending_filter, mask="mask[id]")
+        if not require_migration:
+            click.secho("No guests require migration at this time", fg='green')
         for vsi_object in require_migration:
             migrate(vsi, vsi_object['id'])
     # Just migrate based on the options
