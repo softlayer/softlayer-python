@@ -43,8 +43,8 @@ def cli(env, package_keyname, keyword):
 
     for preset in presets:
         table.add_row([
-            preset['name'],
-            preset['keyName'],
-            preset['description']
+            str(preset['name']).strip(),
+            str(preset['keyName']).strip(),
+            str(preset['description']).strip()
         ])
     env.fout(table)
