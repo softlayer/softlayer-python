@@ -1,8 +1,9 @@
 """Upgrade a virtual server."""
 # :license: MIT, see LICENSE for more details.
 
-import click
 import json
+
+import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
