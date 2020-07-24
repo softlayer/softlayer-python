@@ -146,6 +146,28 @@ getHardware = [{
             'id': 6660
         }
     },
+    "virtualHost": {
+        "accountId": 11111,
+        "id": 22222,
+        "name": "vmware.chechu.com",
+        "guests": [
+            {
+                "accountId": 11111,
+                "createDate": "2019-09-05T17:03:42-06:00",
+                "hostname": "NSX-T Manager",
+                "id": 33333,
+                "maxCpu": 16,
+                "maxCpuUnits": "CORE",
+                "maxMemory": 49152,
+                "powerState": {
+                    "keyName": "RUNNING",
+                    "name": "Running"
+                },
+                "status": {
+                    "keyName": "ACTIVE",
+                    "name": "Active"
+                }
+            }]}
 }, {
     'id': 1001,
     'metricTrackingObject': {'id': 4},
@@ -190,7 +212,13 @@ getHardware = [{
             'vlanNumber': 3672,
             'id': 19082
         },
-    ]
+    ],
+    "virtualHost": {
+        "accountId": 11111,
+        "id": 22222,
+        "name": "host14.vmware.chechu.com",
+        "guests": []
+    }
 }, {
     'id': 1002,
     'metricTrackingObject': {'id': 5},
@@ -234,9 +262,21 @@ getHardware = [{
             'vlanNumber': 3672,
             'id': 19082
         },
-    ]
+    ],
+    "virtualHost": {
+        "accountId": 11111,
+        "id": 22222,
+        "name": "host14.vmware.chechu.com",
+        "guests": []
+    }
 }, {
     'id': 1003,
+    "virtualHost": {
+        "accountId": 11111,
+        "id": 22222,
+        "name": "host14.vmware.chechu.com",
+        "guests": []
+    }
 }]
 getDomains = [{'name': 'example.com',
                'id': 12345,

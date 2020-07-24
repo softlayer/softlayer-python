@@ -143,19 +143,6 @@ class VirtTests(testing.TestCase):
         result = self.run_command(['vs', 'list', '--tag=tag'])
 
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         [{'datacenter': 'TEST00',
-                           'primary_ip': '172.16.240.2',
-                           'hostname': 'vs-test1',
-                           'action': None,
-                           'id': 100,
-                           'backend_ip': '10.45.19.37'},
-                          {'datacenter': 'TEST00',
-                           'primary_ip': '172.16.240.7',
-                           'hostname': 'vs-test2',
-                           'action': None,
-                           'id': 104,
-                           'backend_ip': '10.45.19.35'}])
 
     @mock.patch('SoftLayer.utils.lookup')
     def test_detail_vs_empty_billing(self, mock_lookup):

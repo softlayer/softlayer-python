@@ -242,3 +242,23 @@ getHardDrives = [
         }
     }
 ]
+
+getVirtualHost = {
+    "accountId": 11111,
+    "createDate": "2018-10-08T10:54:48-06:00",
+    "description": "host16.vmware.chechu.com",
+    "hardwareId": 22222,
+    "id": 33333,
+    "name": "host16.vmware.chechu.com",
+    "uuid": "00000000-0000-0000-0000-0cc11111",
+    "hardware": {
+        "accountId": 11111,
+        "domain": "chechu.com",
+        "hostname": "host16.vmware",
+        "id": 22222,
+        "hardwareStatus": {
+            "id": 5,
+            "status": "ACTIVE"
+        }
+    }
+}
