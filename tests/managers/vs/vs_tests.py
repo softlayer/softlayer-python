@@ -1133,7 +1133,6 @@ class VSTests(testing.TestCase):
             }
         ], result)
 
-
     def test_migrate(self):
         result = self.vs.migrate(1234)
         self.assertTrue(result)
@@ -1175,4 +1174,3 @@ class VSTests(testing.TestCase):
 
         result = self.vs.get_hardware_guests()
         self.assertEqual("NSX-T Manager", result[0]['virtualHost']['guests'][0]['hostname'])
-
