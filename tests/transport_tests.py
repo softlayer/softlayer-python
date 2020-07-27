@@ -229,6 +229,22 @@ class TestXmlRpcAPICall(testing.TestCase):
             kwargs['data'])
 
     @mock.patch('SoftLayer.transports.requests.Session.request')
+    def test_mask_call_filteredMask(self, request):
+        request.return_value = self.response
+
+        req = transports.Request()
+        req.endpoint = "http://something.com"
+        req.service = "SoftLayer_Service"
+        req.method = "getObject"
+        req.mask = "filteredMask[something[nested]]"
+        self.transport(req)
+
+        args, kwargs = request.call_args
+        self.assertIn(
+            "<value><string>filteredMask[something[nested]]</string></value>",
+            kwargs['data'])
+
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_mask_call_v2_dot(self, request):
         request.return_value = self.response
 

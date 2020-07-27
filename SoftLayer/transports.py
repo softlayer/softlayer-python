@@ -564,7 +564,8 @@ def _format_object_mask(objectmask):
     objectmask = objectmask.strip()
 
     if (not objectmask.startswith('mask') and
-            not objectmask.startswith('[')):
+            not objectmask.startswith('[') and
+            not objectmask.startswith('filteredMask')):
         objectmask = "mask[%s]" % objectmask
     return objectmask
 
