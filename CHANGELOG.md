@@ -228,7 +228,7 @@ https://github.com/softlayer/softlayer-python/compare/v5.8.2...v5.8.3
 ## [5.6.0] - 2018-10-16
 - Changes: https://github.com/softlayer/softlayer-python/compare/v5.5.3...v5.6.0
 
-+ #1026 Support for [Reserved Capacity](https://console.bluemix.net/docs/vsi/vsi_about_reserved.html#about-reserved-virtual-servers)
++ #1026 Support for [Reserved Capacity](https://cloud.ibm.com/docs/virtual-servers?topic=virtual-servers-about-reserved-virtual-servers)
   * `slcli vs capacity create`
   * `slcli vs capacity create-guest`
   * `slcli vs capacity create-options`
