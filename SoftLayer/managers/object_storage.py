@@ -18,7 +18,7 @@ ENDPOINT_MASK = '''mask(SoftLayer_Network_Storage_Hub_Swift)[
 class ObjectStorageManager(object):
     """Manager for SoftLayer Object Storage accounts.
 
-    See product information here: http://www.softlayer.com/object-storage
+    See product information here: https://www.ibm.com/cloud/object-storage
 
     :param SoftLayer.API.BaseClient client: the client instance
 

@@ -24,7 +24,7 @@ LOGGER = logging.getLogger(__name__)
 class VSManager(utils.IdentifierMixin, object):
     """Manages SoftLayer Virtual Servers.
 
-    See product information here: http://www.softlayer.com/virtual-servers
+    See product information here: https://www.ibm.com/cloud/virtual-servers
 
     Example::
 
