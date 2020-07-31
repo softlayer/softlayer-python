@@ -24,7 +24,7 @@ class CapacityManager(utils.IdentifierMixin, object):
 
         Product Information
 
-        - https://console.bluemix.net/docs/vsi/vsi_about_reserved.html
+        - https://cloud.ibm.com/docs/virtual-servers?topic=virtual-servers-about-reserved-virtual-servers
         - https://softlayer.github.io/reference/services/SoftLayer_Virtual_ReservedCapacityGroup/
         - https://softlayer.github.io/reference/services/SoftLayer_Virtual_ReservedCapacityGroup_Instance/
 

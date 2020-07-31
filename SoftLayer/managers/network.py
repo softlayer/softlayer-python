@@ -57,7 +57,7 @@ DEFAULT_GET_VLAN_MASK = ','.join([
 class NetworkManager(object):
     """Manage SoftLayer network objects: VLANs, subnets, IPs and rwhois
 
-    See product information here: http://www.softlayer.com/networking
+    See product information here: https://www.ibm.com/cloud/network
 
     :param SoftLayer.API.BaseClient client: the client instance
 

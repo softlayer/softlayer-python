@@ -11,7 +11,7 @@ from SoftLayer import utils
 class TicketManager(utils.IdentifierMixin, object):
     """Manages SoftLayer support tickets.
 
-    See product information here: http://www.softlayer.com/support
+    See product information here: https://www.ibm.com/cloud/support
 
     :param SoftLayer.API.BaseClient client: the client instance
 

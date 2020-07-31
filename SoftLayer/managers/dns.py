@@ -14,7 +14,7 @@ from SoftLayer import utils
 class DNSManager(utils.IdentifierMixin, object):
     """Manage SoftLayer DNS.
 
-    See product information here: http://www.softlayer.com/DOMAIN-SERVICES
+    See product information here: https://www.ibm.com/cloud/dns
 
     :param SoftLayer.API.BaseClient client: the client instance
 

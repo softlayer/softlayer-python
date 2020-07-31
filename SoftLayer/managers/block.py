@@ -15,7 +15,7 @@ from SoftLayer import utils
 class BlockStorageManager(StorageManager):
     """Manages SoftLayer Block Storage volumes.
 
-    See product information here: http://www.softlayer.com/block-storage
+    See product information here: https://www.ibm.com/cloud/block-storage
     """
 
     def list_block_volume_limit(self):
