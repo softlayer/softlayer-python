@@ -315,28 +315,13 @@ class VirtTests(testing.TestCase):
 
     def test_create_options(self):
         result = self.run_command(['vs', 'create-options'])
-
         self.assert_no_fail(result)
-        self.assertEqual({'cpus (dedicated host)': [4, 56],
-                          'cpus (dedicated)': [1],
-                          'cpus (standard)': [1, 2, 3, 4],
-                          'datacenter': ['ams01', 'dal05'],
-                          'flavors (balanced)': ['B1_1X2X25', 'B1_1X2X100'],
-                          'flavors (balanced local - hdd)': ['BL1_1X2X100'],
-                          'flavors (balanced local - ssd)': ['BL2_1X2X100'],
-                          'flavors (compute)': ['C1_1X2X25'],
-                          'flavors (memory)': ['M1_1X2X100'],
-                          'flavors (GPU)': ['AC1_1X2X100', 'ACL1_1X2X100'],
-                          'flavors (transient)': ['B1_1X2X25_TRANSIENT'],
-                          'local disk(0)': ['25', '100'],
-                          'memory': [1024, 2048, 3072, 4096],
-                          'memory (dedicated host)': [8192, 65536],
-                          'nic': ['10', '100', '1000'],
-                          'nic (dedicated host)': ['1000'],
-                          'os (CENTOS)': 'CENTOS_6_64',
-                          'os (DEBIAN)': 'DEBIAN_7_64',
-                          'os (UBUNTU)': 'UBUNTU_12_64'},
-                         json.loads(result.output))
+        self.assertIn('datacenter', result.output)
+        self.assertIn('flavor', result.output)
+        self.assertIn('memory', result.output)
+        self.assertIn('cpu', result.output)
+        self.assertIn('OS', result.output)
+        self.assertIn('network', result.output)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_both(self, confirm_mock):
@@ -357,19 +342,19 @@ class VirtTests(testing.TestCase):
                                            'getResourceRecords')
         getResourceRecords.return_value = []
         createAargs = ({
-            'type': 'a',
-            'host': 'vs-test1',
-            'domainId': 12345,  # from SoftLayer_Account::getDomains
-            'data': '172.16.240.2',
-            'ttl': 7200
-        },)
+                           'type': 'a',
+                           'host': 'vs-test1',
+                           'domainId': 12345,  # from SoftLayer_Account::getDomains
+                           'data': '172.16.240.2',
+                           'ttl': 7200
+                       },)
         createPTRargs = ({
-            'type': 'ptr',
-            'host': '2',
-            'domainId': 123456,
-            'data': 'vs-test1.test.sftlyr.ws',
-            'ttl': 7200
-        },)
+                             'type': 'ptr',
+                             'host': '2',
+                             'domainId': 123456,
+                             'data': 'vs-test1.test.sftlyr.ws',
+                             'ttl': 7200
+                         },)
 
         result = self.run_command(['vs', 'dns-sync', '100'])
 
@@ -412,12 +397,12 @@ class VirtTests(testing.TestCase):
             }
         }
         createV6args = ({
-            'type': 'aaaa',
-            'host': 'vs-test1',
-            'domainId': 12345,
-            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
-            'ttl': 7200
-        },)
+                            'type': 'aaaa',
+                            'host': 'vs-test1',
+                            'domainId': 12345,
+                            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
+                            'ttl': 7200
+                        },)
         guest.return_value = test_guest
         result = self.run_command(['vs', 'dns-sync', '--aaaa-record', '100'])
         self.assert_no_fail(result)
