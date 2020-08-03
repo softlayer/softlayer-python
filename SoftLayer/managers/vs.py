@@ -819,8 +819,7 @@ class VSManager(utils.IdentifierMixin, object):
         return self.guest.createArchiveTransaction(
             name, disks_to_capture, notes, id=instance_id)
 
-    def upgrade(self, instance_id, cpus=None, memory=None, nic_speed=None, public=True, preset=None,
-                disk=None, add=None):
+    def upgrade(self, instance_id, cpus=None, memory=None, nic_speed=None, public=True, preset=None, disk=None):
         """Upgrades a VS instance.
 
         Example::
@@ -853,10 +852,7 @@ class VSManager(utils.IdentifierMixin, object):
         if memory is not None and preset is not None:
             raise ValueError("Do not use memory, private or cpu if you are using flavors")
         data['memory'] = memory
-        if disk is not None:
-            data['disk'] = disk.get('capacity')
-        elif add is not None:
-            data['disk'] = add
+
         maintenance_window = datetime.datetime.now(utils.UTC())
         order = {
             'complexType': 'SoftLayer_Container_Product_Order_Virtual_Guest_Upgrade',
@@ -866,6 +862,35 @@ class VSManager(utils.IdentifierMixin, object):
             }],
             'virtualGuests': [{'id': int(instance_id)}],
         }
+
+        if disk:
+            disk_number = 0
+            vsi_disk = self.get_instance(instance_id)
+            for item in vsi_disk.get('billingItem').get('children'):
+                if item.get('categoryCode').__contains__('guest_disk'):
+                    if disk_number < int("".join(filter(str.isdigit, item.get('categoryCode')))):
+                        disk_number = int("".join(filter(str.isdigit, item.get('categoryCode'))))
+            for disk_guest in disk:
+                if disk_guest.get('number') > 0:
+                    price_id = self._get_price_id_for_upgrade_option(upgrade_prices, 'disk',
+                                                                     disk_guest.get('capacity'),
+                                                                     public)
+                    disk_number = disk_guest.get('number')
+
+                else:
+                    price_id = self._get_price_id_for_upgrade_option(upgrade_prices, 'disk',
+                                                                     disk_guest.get('capacity'),
+                                                                     public)
+                    disk_number = disk_number + 1
+
+                category = {'categories': [{
+                    'categoryCode': 'guest_disk' + str(disk_number),
+                    'complexType': "SoftLayer_Product_Item_Category"}],
+                            'complexType': 'SoftLayer_Product_Item_Price',
+                            'id': price_id}
+
+                prices.append(category)
+            order['prices'] = prices
 
         for option, value in data.items():
             if not value:
@@ -879,28 +904,7 @@ class VSManager(utils.IdentifierMixin, object):
                 raise exceptions.SoftLayerError(
                     "Unable to find %s option with value %s" % (option, value))
 
-            if disk is not None:
-                category = {'categories': [{
-                    'categoryCode': 'guest_disk' + str(disk.get('number')),
-                    'complexType': "SoftLayer_Product_Item_Category"
-                }], 'complexType': 'SoftLayer_Product_Item_Price'}
-                prices.append(category)
-                prices[0]['id'] = price_id
-            elif add:
-                vsi_disk = self.get_instance(instance_id)
-                disk_number = 0
-                for item in vsi_disk.get('billingItem').get('children'):
-                    if item.get('categoryCode').__contains__('guest_disk'):
-                        if disk_number < int("".join(filter(str.isdigit, item.get('categoryCode')))):
-                            disk_number = int("".join(filter(str.isdigit, item.get('categoryCode'))))
-                category = {'categories': [{
-                    'categoryCode': 'guest_disk' + str(disk_number + 1),
-                    'complexType': "SoftLayer_Product_Item_Category"
-                }], 'complexType': 'SoftLayer_Product_Item_Price'}
-                prices.append(category)
-                prices[0]['id'] = price_id
-            else:
-                prices.append({'id': price_id})
+            prices.append({'id': price_id})
 
             order['prices'] = prices
         if preset is not None:
@@ -1024,6 +1028,7 @@ class VSManager(utils.IdentifierMixin, object):
             'disk': 'guest_disk'
         }
         category_code = option_category.get(option)
+
         for price in upgrade_prices:
             if price.get('categories') is None or price.get('item') is None:
                 continue
@@ -1034,7 +1039,7 @@ class VSManager(utils.IdentifierMixin, object):
 
             for category in price.get('categories'):
                 if option == 'disk':
-                    if not (category_code == (''.join([i for i in category.get('categoryCode') if not i.isdigit()]))
+                    if (category_code == (''.join([i for i in category.get('categoryCode') if not i.isdigit()]))
                             and str(product.get('capacity')) == str(value)):
                         return price.get('id')
 
@@ -1052,8 +1057,6 @@ class VSManager(utils.IdentifierMixin, object):
                 elif option == 'nic_speed':
                     if 'Public' in product.get('description'):
                         return price.get('id')
-                elif option == 'disk':
-                    return price.get('id')
                 else:
                     return price.get('id')
 

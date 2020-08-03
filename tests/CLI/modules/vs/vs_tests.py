@@ -370,19 +370,19 @@ class VirtTests(testing.TestCase):
                                            'getResourceRecords')
         getResourceRecords.return_value = []
         createAargs = ({
-            'type': 'a',
-            'host': 'vs-test1',
-            'domainId': 12345,  # from SoftLayer_Account::getDomains
-            'data': '172.16.240.2',
-            'ttl': 7200
-        },)
+                           'type': 'a',
+                           'host': 'vs-test1',
+                           'domainId': 12345,  # from SoftLayer_Account::getDomains
+                           'data': '172.16.240.2',
+                           'ttl': 7200
+                       },)
         createPTRargs = ({
-            'type': 'ptr',
-            'host': '2',
-            'domainId': 123456,
-            'data': 'vs-test1.test.sftlyr.ws',
-            'ttl': 7200
-        },)
+                             'type': 'ptr',
+                             'host': '2',
+                             'domainId': 123456,
+                             'data': 'vs-test1.test.sftlyr.ws',
+                             'ttl': 7200
+                         },)
 
         result = self.run_command(['vs', 'dns-sync', '100'])
 
@@ -425,12 +425,12 @@ class VirtTests(testing.TestCase):
             }
         }
         createV6args = ({
-            'type': 'aaaa',
-            'host': 'vs-test1',
-            'domainId': 12345,
-            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
-            'ttl': 7200
-        },)
+                            'type': 'aaaa',
+                            'host': 'vs-test1',
+                            'domainId': 12345,
+                            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
+                            'ttl': 7200
+                        },)
         guest.return_value = test_guest
         result = self.run_command(['vs', 'dns-sync', '--aaaa-record', '100'])
         self.assert_no_fail(result)
@@ -574,7 +574,7 @@ class VirtTests(testing.TestCase):
     def test_upgrade_disk(self, confirm_mock):
         confirm_mock.return_value = True
         result = self.run_command(['vs', 'upgrade', '100', '--flavor=M1_64X512X100',
-                                   '--disk={"number":1,"capacity":10}'])
+                                   '--resize-disk=10', '1', '--resize-disk=10', '2'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
         call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
@@ -598,7 +598,7 @@ class VirtTests(testing.TestCase):
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_upgrade_with_add_disk(self, confirm_mock):
         confirm_mock.return_value = True
-        result = self.run_command(['vs', 'upgrade', '100', '--add=10'])
+        result = self.run_command(['vs', 'upgrade', '100', '--add-disk=10', '--add-disk=10'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
         call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]

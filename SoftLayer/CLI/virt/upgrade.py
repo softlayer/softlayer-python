@@ -1,8 +1,6 @@
 """Upgrade a virtual server."""
 # :license: MIT, see LICENSE for more details.
 
-import json
-
 import click
 
 import SoftLayer
@@ -22,18 +20,20 @@ completed. However for Network, no reboot is required.""")
               help="CPU core will be on a dedicated host server.")
 @click.option('--memory', type=virt.MEM_TYPE, help="Memory in megabytes")
 @click.option('--network', type=click.INT, help="Network port speed in Mbps")
-@click.option('--add', type=click.INT, required=False, help="add Hard disk in GB")
-@click.option('--disk', nargs=1, help="update the number and capacity in GB Hard disk, E.G {'number':2,'capacity':100}")
+@click.option('--add-disk', type=click.INT, multiple=True, required=False, help="add Hard disk in GB")
+@click.option('--resize-disk', nargs=2, multiple=True, type=(int, int),
+              help="Update disk number to size in GB. --resize-disk 250 2 ")
 @click.option('--flavor', type=click.STRING,
               help="Flavor keyName\nDo not use --memory, --cpu or --private, if you are using flavors")
 @environment.pass_env
-def cli(env, identifier, cpu, private, memory, network, flavor, disk, add):
+def cli(env, identifier, cpu, private, memory, network, flavor, add_disk, resize_disk):
     """Upgrade a virtual server."""
 
     vsi = SoftLayer.VSManager(env.client)
 
-    if not any([cpu, memory, network, flavor, disk, add]):
-        raise exceptions.ArgumentError("Must provide [--cpu], [--memory], [--network], or [--flavor] to upgrade")
+    if not any([cpu, memory, network, flavor, resize_disk, add_disk]):
+        raise exceptions.ArgumentError("Must provide [--cpu],"
+                                       " [--memory], [--network], [--flavor], [--resize-disk], or [--add] to upgrade")
 
     if private and not cpu:
         raise exceptions.ArgumentError("Must specify [--cpu] when using [--private]")
@@ -44,9 +44,18 @@ def cli(env, identifier, cpu, private, memory, network, flavor, disk, add):
 
     if memory:
         memory = int(memory / 1024)
-    if disk is not None:
-        disk = json.loads(disk)
+    if resize_disk:
+        disk_json = list()
+        for guest_disk in resize_disk:
+            disks = {'capacity': guest_disk[0], 'number': guest_disk[1]}
+            disk_json.append(disks)
+
+    elif add_disk:
+        disk_json = list()
+        for guest_disk in add_disk:
+            disks = {'capacity': guest_disk, 'number': -1}
+            disk_json.append(disks)
 
     if not vsi.upgrade(vs_id, cpus=cpu, memory=memory, nic_speed=network, public=not private, preset=flavor,
-                       disk=disk, add=add):
+                       disk=disk_json):
         raise exceptions.CLIAbort('VS Upgrade Failed')
