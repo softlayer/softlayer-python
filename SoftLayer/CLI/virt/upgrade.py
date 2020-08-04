@@ -42,16 +42,15 @@ def cli(env, identifier, cpu, private, memory, network, flavor, add_disk, resize
     if not (env.skip_confirmations or formatting.confirm("This action will incur charges on your account. Continue?")):
         raise exceptions.CLIAbort('Aborted')
 
+    disk_json = list()
     if memory:
         memory = int(memory / 1024)
     if resize_disk:
-        disk_json = list()
         for guest_disk in resize_disk:
             disks = {'capacity': guest_disk[0], 'number': guest_disk[1]}
             disk_json.append(disks)
 
     elif add_disk:
-        disk_json = list()
         for guest_disk in add_disk:
             disks = {'capacity': guest_disk, 'number': -1}
             disk_json.append(disks)
