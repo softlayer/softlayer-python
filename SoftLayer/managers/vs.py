@@ -883,6 +883,11 @@ class VSManager(utils.IdentifierMixin, object):
                                                                      public)
                     disk_number = disk_number + 1
 
+                if price_id is None:
+                    raise exceptions.SoftLayerAPIError(500,
+                                                       'Unable to find %s option with value %s' % (
+                                                           ('disk', disk_guest.get('capacity'))))
+
                 category = {'categories': [{
                     'categoryCode': 'guest_disk' + str(disk_number),
                     'complexType': "SoftLayer_Product_Item_Category"}],

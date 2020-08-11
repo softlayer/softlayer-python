@@ -584,6 +584,14 @@ class VirtTests(testing.TestCase):
         self.assertEqual(order_container['virtualGuests'], [{'id': 100}])
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_upgrade_disk_error(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['vs', 'upgrade', '100', '--flavor=M1_64X512X100',
+                                   '--resize-disk=1000', '1', '--resize-disk=10', '2'])
+        self.assertEqual(result.exit_code, 1)
+        self.assertIsInstance(result.exception, SoftLayerAPIError)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_upgrade_with_flavor(self, confirm_mock):
         confirm_mock.return_value = True
         result = self.run_command(['vs', 'upgrade', '100', '--flavor=M1_64X512X100'])
