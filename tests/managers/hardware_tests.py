@@ -133,14 +133,106 @@ class HardwareTests(testing.TestCase):
         }
         sizes = {
             'key': 'S1270_8GB_2X1TBSATA_NORAID',
-            'name': 'Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID'
+            'name': 'Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID',
+            'hourlyRecurringFee': 1.18,
+            'recurringFee': 780.0
         }
 
-        self.assertEqual(options['extras'][0], extras)
+        self.assertEqual(options['extras'][0]['key'], extras['key'])
         self.assertEqual(options['locations'][0], locations)
-        self.assertEqual(options['operating_systems'][0], operating_systems)
+        self.assertEqual(options['operating_systems'][0]['referenceCode'],
+                         operating_systems['referenceCode'])
         self.assertEqual(options['port_speeds'][0]['name'], port_speeds['name'])
         self.assertEqual(options['sizes'][0], sizes)
+
+    def test_get_create_options_prices(self):
+        options = self.hardware.get_create_options()
+
+        extras = {'key': '1_IPV6_ADDRESS', 'name': '1 IPv6 Address',
+                  'prices': [
+                      {
+                          'hourlyRecurringFee': '0',
+                          'id': 272,
+                          'locationGroupId': '',
+                          'recurringFee': '0',
+                      }
+                  ]
+                  }
+        locations = {'key': 'wdc01', 'name': 'Washington 1'}
+        operating_systems = {
+            'key': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
+            'name': 'Ubuntu / 14.04-64',
+            'referenceCode': 'UBUNTU_14_64',
+            'prices': [
+                {
+                    'hourlyRecurringFee': '0',
+                    'id': 272,
+                    'locationGroupId': '',
+                    'recurringFee': '0',
+                }
+            ]
+        }
+
+        port_speeds = {
+            'key': '10',
+            'name': '10 Mbps Public & Private Network Uplinks',
+            'prices': [
+                {
+                    'hourlyRecurringFee': '0',
+                    'id': 272,
+                    'locationGroupId': '',
+                    'recurringFee': '0',
+                }
+            ]
+        }
+        sizes = {
+            'key': 'S1270_8GB_2X1TBSATA_NORAID',
+            'name': 'Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID',
+            'hourlyRecurringFee': 1.18,
+            'recurringFee': 780.0
+        }
+
+        self.assertEqual(options['extras'][0]['prices'][0]['hourlyRecurringFee'],
+                         extras['prices'][0]['hourlyRecurringFee'])
+        self.assertEqual(options['locations'][0], locations)
+        self.assertEqual(options['operating_systems'][0]['prices'][0]['locationGroupId'],
+                         operating_systems['prices'][0]['locationGroupId'])
+        self.assertEqual(options['port_speeds'][0]['prices'][0]['id'], port_speeds['prices'][0]['id'])
+        self.assertEqual(options['sizes'][0], sizes)
+
+    def test_get_hardware_item_prices(self):
+        options = self.hardware.get_hardware_item_prices("MONTREAL")
+        item_prices = [
+            {
+                "hourlyRecurringFee": ".093",
+                "id": 204015,
+                "recurringFee": "62",
+                "item": {
+                    "description": "4 x 2.0 GHz or higher Cores",
+                    "id": 859,
+                    "keyName": "GUEST_CORES_4",
+                },
+                "pricingLocationGroup": {
+                    "id": 503,
+                    "locations": [
+                        {
+                            "id": 449610,
+                            "longName": "Montreal 1",
+                            "name": "mon01",
+                            "regions": [
+                                {
+                                    "description": "MON01 - Montreal",
+                                    "keyname": "MONTREAL",
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ]
+
+        self.assertEqual(options[0]['item']['keyName'], item_prices[0]['item']['keyName'])
+        self.assertEqual(options[0]['hourlyRecurringFee'], item_prices[0]['hourlyRecurringFee'])
 
     def test_get_create_options_package_missing(self):
         packages = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')

@@ -9,11 +9,11 @@ import logging
 import socket
 import time
 
+from SoftLayer import utils
 from SoftLayer.decoration import retry
 from SoftLayer.exceptions import SoftLayerError
 from SoftLayer.managers import ordering
 from SoftLayer.managers.ticket import TicketManager
-from SoftLayer import utils
 
 LOGGER = logging.getLogger(__name__)
 
@@ -397,7 +397,9 @@ class HardwareManager(utils.IdentifierMixin, object):
         for preset in package['activePresets'] + package['accountRestrictedActivePresets']:
             sizes.append({
                 'name': preset['description'],
-                'key': preset['keyName']
+                'key': preset['keyName'],
+                'hourlyRecurringFee': _get_preset_cost(preset['prices'], 'hourly'),
+                'recurringFee': _get_preset_cost(preset['prices'], 'monthly')
             })
 
         operating_systems = []
@@ -410,20 +412,23 @@ class HardwareManager(utils.IdentifierMixin, object):
                 operating_systems.append({
                     'name': item['softwareDescription']['longDescription'],
                     'key': item['keyName'],
-                    'referenceCode': item['softwareDescription']['referenceCode']
+                    'referenceCode': item['softwareDescription']['referenceCode'],
+                    'prices': get_item_price(item['prices'])
                 })
             # Port speeds
             elif category == 'port_speed':
                 port_speeds.append({
                     'name': item['description'],
                     'speed': item['capacity'],
-                    'key': item['keyName']
+                    'key': item['keyName'],
+                    'prices': get_item_price(item['prices'])
                 })
             # Extras
             elif category in EXTRA_CATEGORIES:
                 extras.append({
                     'name': item['description'],
-                    'key': item['keyName']
+                    'key': item['keyName'],
+                    'prices': get_item_price(item['prices'])
                 })
 
         return {
@@ -447,8 +452,8 @@ class HardwareManager(utils.IdentifierMixin, object):
                 softwareDescription[id,referenceCode,longDescription],
                 prices
             ],
-            activePresets,
-            accountRestrictedActivePresets,
+            activePresets[prices],
+            accountRestrictedActivePresets[prices],
             regions[location[location[priceGroups]]]
             '''
         package = self.ordering_manager.get_package_by_key(self.package_keyname, mask=mask)
@@ -742,6 +747,18 @@ class HardwareManager(utils.IdentifierMixin, object):
                                     id=virtual_host['id'])
         return virtual_host
 
+    def get_hardware_item_prices(self, location):
+        """Returns the hardware server item prices by location.
+
+        :param string location: location to get the item prices.
+        """
+        object_mask = "filteredMask[pricingLocationGroup[locations[regions]]]"
+        object_filter = {
+            "itemPrices": {"pricingLocationGroup": {"locations": {"regions": {"keyname": {"operation": location}}}}}}
+        package = self.ordering_manager.get_package_by_key(self.package_keyname)
+        return self.client.call('SoftLayer_Product_Package', 'getItemPrices', mask=object_mask, filter=object_filter,
+                                id=package['id'])
+
 
 def _get_bandwidth_key(items, hourly=True, no_public=False, location=None):
     """Picks a valid Bandwidth Item, returns the KeyName"""
@@ -837,3 +854,23 @@ def _get_location(package, location):
             return region
 
     raise SoftLayerError("Could not find valid location for: '%s'" % location)
+
+
+def _get_preset_cost(prices, type_cost):
+    """Get the preset cost."""
+    item_cost = 0.00
+    for price in prices:
+        if type_cost is 'hourly':
+            item_cost += float(price['hourlyRecurringFee'])
+        else:
+            item_cost += float(price['recurringFee'])
+    return item_cost
+
+
+def get_item_price(prices):
+    """Get item prices"""
+    prices_list = []
+    for price in prices:
+        if not price['locationGroupId']:
+            prices_list.append(price)
+    return prices_list

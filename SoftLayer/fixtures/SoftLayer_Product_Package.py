@@ -8,6 +8,7 @@ HARDWARE_ITEMS = [
                  'currentPriceFlag': '',
                  'hourlyRecurringFee': '0',
                  'id': 1245172,
+                 "locationGroupId": '',
                  'itemId': 935954,
                  'laborFee': '0',
                  'onSaleFlag': '',
@@ -26,6 +27,7 @@ HARDWARE_ITEMS = [
                  'currentPriceFlag': '',
                  'hourlyRecurringFee': '0',
                  'id': 17129,
+                 "locationGroupId": '',
                  'itemId': 4097,
                  'laborFee': '0',
                  'onSaleFlag': '',
@@ -43,6 +45,7 @@ HARDWARE_ITEMS = [
                  'currentPriceFlag': '',
                  'hourlyRecurringFee': '0',
                  'id': 272,
+                 "locationGroupId": '',
                  'itemId': 186,
                  'laborFee': '0',
                  'onSaleFlag': '',
@@ -60,6 +63,7 @@ HARDWARE_ITEMS = [
                  'currentPriceFlag': '',
                  'hourlyRecurringFee': '0',
                  'id': 37650,
+                 "locationGroupId": '',
                  'itemId': 4702,
                  'laborFee': '0',
                  'onSaleFlag': '',
@@ -80,6 +84,7 @@ HARDWARE_ITEMS = [
                  'currentPriceFlag': '',
                  'hourlyRecurringFee': '0',
                  'id': 21,
+                 "locationGroupId": '',
                  'itemId': 15,
                  'laborFee': '0',
                  'onSaleFlag': '',
@@ -97,6 +102,7 @@ HARDWARE_ITEMS = [
                  'currentPriceFlag': '',
                  'hourlyRecurringFee': '0',
                  'id': 420,
+                 "locationGroupId": '',
                  'itemId': 309,
                  'laborFee': '0',
                  'onSaleFlag': '',
@@ -114,6 +120,7 @@ HARDWARE_ITEMS = [
                  'currentPriceFlag': '',
                  'hourlyRecurringFee': '0',
                  'id': 906,
+                 "locationGroupId": '',
                  'itemId': 504,
                  'laborFee': '0',
                  'onSaleFlag': '',
@@ -130,6 +137,7 @@ HARDWARE_ITEMS = [
      'prices': [{'accountRestrictions': [],
                  'currentPriceFlag': '',
                  'id': 22505,
+                 "locationGroupId": '',
                  'itemId': 4481,
                  'laborFee': '0',
                  'onSaleFlag': '',
@@ -147,6 +155,7 @@ HARDWARE_ITEMS = [
                  'currentPriceFlag': '',
                  'hourlyRecurringFee': '0',
                  'id': 1800,
+                 "locationGroupId": '',
                  'itemId': 439,
                  'laborFee': '0',
                  'onSaleFlag': '',
@@ -755,7 +764,15 @@ activePreset1 = {
     'isActive': '1',
     'keyName': 'S1270_8GB_2X1TBSATA_NORAID',
     'name': 'S1270 8GB 2X1TBSATA NORAID',
-    'packageId': 200
+    'packageId': 200,
+    'prices': [
+        {
+            "hourlyRecurringFee": "1.18",
+            "id": 165711,
+            "locationGroupId": '',
+            "recurringFee": "780",
+        }
+    ]
 }
 
 activePreset2 = {
@@ -764,7 +781,15 @@ activePreset2 = {
     'isActive': '1',
     'keyName': 'DGOLD_6140_384GB_4X960GB_SSD_SED_RAID_10',
     'name': 'DGOLD 6140 384GB 4X960GB SSD SED RAID 10',
-    'packageId': 200
+    'packageId': 200,
+    'prices': [
+        {
+            "hourlyRecurringFee": "1.18",
+            "id": 165711,
+            "locationGroupId": '',
+            "recurringFee": "780",
+        }
+    ]
 }
 
 getAllObjects = [{
@@ -790,6 +815,9 @@ getAllObjects = [{
             "id": 205911,
             "laborFee": "0",
             "locationGroupId": 505,
+            "capacityRestrictionMaximum": "40",
+            "capacityRestrictionMinimum": "40",
+            "capacityRestrictionType": "CORE",
             "item": {
                 "capacity": "0",
                 "description": "Load Balancer Uptime",
@@ -1507,7 +1535,14 @@ getItemPrices = [
                     "id": 449610,
                     "longName": "Montreal 1",
                     "name": "mon01",
-                    "statusId": 2
+                    "statusId": 2,
+                    "regions": [
+                        {
+                            "description": "MON01 - Montreal",
+                            "keyname": "MONTREAL",
+                            "sortOrder": 94
+                        }
+                    ]
                 },
                 {
                     "id": 449618,
@@ -1531,7 +1566,14 @@ getItemPrices = [
                     "id": 221894,
                     "longName": "Amsterdam 2",
                     "name": "ams02",
-                    "statusId": 2
+                    "statusId": 2,
+                    "regions": [
+                        {
+                            "description": "AMS02 POP - Amsterdam",
+                            "keyname": "AMSTERDAM02",
+                            "sortOrder": 12
+                        }
+                    ]
                 },
                 {
                     "id": 265592,
