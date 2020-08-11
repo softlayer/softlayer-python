@@ -9,11 +9,11 @@ import logging
 import socket
 import time
 
-from SoftLayer import utils
 from SoftLayer.decoration import retry
 from SoftLayer.exceptions import SoftLayerError
 from SoftLayer.managers import ordering
 from SoftLayer.managers.ticket import TicketManager
+from SoftLayer import utils
 
 LOGGER = logging.getLogger(__name__)
 
@@ -860,7 +860,7 @@ def _get_preset_cost(prices, type_cost):
     """Get the preset cost."""
     item_cost = 0.00
     for price in prices:
-        if type_cost is 'hourly':
+        if type_cost == 'hourly':
             item_cost += float(price['hourlyRecurringFee'])
         else:
             item_cost += float(price['recurringFee'])
