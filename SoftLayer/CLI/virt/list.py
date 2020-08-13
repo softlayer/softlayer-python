@@ -53,7 +53,7 @@ DEFAULT_COLUMNS = [
 @click.option('--monthly', is_flag=True, help='Show only monthly instances')
 @click.option('--transient', help='Filter by transient instances', type=click.BOOL)
 @click.option('--hardware', is_flag=True, default=False, help='Show the all VSI related to hardware')
-@click.option('--all', is_flag=True, default=False, help='Show the all VSI and hardware VSIs')
+@click.option('--all-guests', is_flag=True, default=False, help='Show the all VSI and hardware VSIs')
 @helpers.multi_option('--tag', help='Filter by tags')
 @click.option('--sortby',
               help='Column to sort by',
@@ -71,7 +71,7 @@ DEFAULT_COLUMNS = [
               show_default=True)
 @environment.pass_env
 def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
-        hourly, monthly, tag, columns, limit, transient, all, hardware):
+        hourly, monthly, tag, columns, limit, transient, hardware, all_guests):
     """List virtual servers."""
 
     vsi = SoftLayer.VSManager(env.client)
@@ -90,22 +90,22 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
 
     table = formatting.Table(columns.columns)
     table.sortby = sortby
-    if not hardware or all:
+    if not hardware or all_guests:
         for guest in guests:
             table.add_row([value or formatting.blank()
                            for value in columns.row(guest)])
 
         env.fout(table)
 
-    if hardware or all:
+    if hardware or all_guests:
         hardware_guests = vsi.get_hardware_guests()
-        for hardware in hardware_guests:
-            if hardware['virtualHost']['guests']:
-                title = "Hardware(id = {hardwareId}) guests associated".format(hardwareId=hardware['id'])
+        for hd_guest in hardware_guests:
+            if hd_guest['virtualHost']['guests']:
+                title = "Hardware(id = {hardwareId}) guests associated".format(hardwareId=hd_guest['id'])
                 table_hardware_guest = formatting.Table(['id', 'hostname', 'CPU', 'Memory', 'Start Date', 'Status',
                                                          'powerState'], title=title)
                 table_hardware_guest.sortby = 'hostname'
-                for guest in hardware['virtualHost']['guests']:
+                for guest in hd_guest['virtualHost']['guests']:
                     table_hardware_guest.add_row([
                         guest['id'],
                         guest['hostname'],
