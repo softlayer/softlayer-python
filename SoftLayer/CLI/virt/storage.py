@@ -48,11 +48,8 @@ def cli(env, identifier):
                            nas['allowedVirtualGuests'][0]['datacenter']['longName'],
                            nas.get('notes', None)])
 
-    table_local_disks = formatting.Table(['Type', 'Name', 'Capacity'], title="Other storage details")
-    for disks in local_disks:
-        if 'diskImage' in disks:
-            table_local_disks.add_row([get_local_type(disks), disks['mountType'],
-                                       str(disks['diskImage']['capacity']) + " " + str(disks['diskImage']['units'])])
+    table_local_disks = get_local_storage_table(local_disks)
+    table_local_disks.title = "Other storage details"
 
     env.fout(table_credentials)
     env.fout(table_iscsi)
@@ -64,10 +61,28 @@ def cli(env, identifier):
 def get_local_type(disks):
     """Returns the virtual server local disk type.
 
-    :param disks: virtual serve local disks.
+    :param disks: virtual server local disks.
     """
     disk_type = 'System'
     if 'SWAP' in disks.get('diskImage', {}).get('description', []):
         disk_type = 'Swap'
 
     return disk_type
+
+
+def get_local_storage_table(local_disks):
+    """Returns a formatting local disk table
+
+      :param local_disks: virtual server local disks.
+      """
+    table_local_disks = formatting.Table(['Type', 'Name', 'Drive', 'Capacity'])
+    for disk in local_disks:
+        if 'diskImage' in disk:
+            table_local_disks.add_row([
+                get_local_type(disk),
+                disk['mountType'],
+                disk['device'],
+                "{capacity} {unit}".format(capacity=disk['diskImage']['capacity'],
+                                           unit=disk['diskImage']['units'])
+            ])
+    return table_local_disks
