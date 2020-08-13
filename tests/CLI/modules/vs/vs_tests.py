@@ -878,3 +878,7 @@ class VirtTests(testing.TestCase):
         self.assert_not_called_with('SoftLayer_Account', 'getVirtualGuests')
         self.assert_called_with('SoftLayer_Virtual_Guest', 'migrate', identifier=100)
         self.assert_not_called_with('SoftLayer_Virtual_Guest', 'migrateDedicatedHost', args=(999), identifier=100)
+
+    def test_list_vsi(self):
+        result = self.run_command(['vs', 'list', '--hardware'])
+        self.assert_no_fail(result)
