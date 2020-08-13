@@ -18,6 +18,7 @@ from SoftLayer import utils
 
 LOGGER = logging.getLogger(__name__)
 
+
 # pylint: disable=no-self-use,too-many-lines
 
 
@@ -818,7 +819,7 @@ class VSManager(utils.IdentifierMixin, object):
         return self.guest.createArchiveTransaction(
             name, disks_to_capture, notes, id=instance_id)
 
-    def upgrade(self, instance_id, cpus=None, memory=None, nic_speed=None, public=True, preset=None):
+    def upgrade(self, instance_id, cpus=None, memory=None, nic_speed=None, public=True, preset=None, disk=None):
         """Upgrades a VS instance.
 
         Example::
@@ -862,6 +863,40 @@ class VSManager(utils.IdentifierMixin, object):
             'virtualGuests': [{'id': int(instance_id)}],
         }
 
+        if disk:
+            disk_number = 0
+            vsi_disk = self.get_instance(instance_id)
+            for item in vsi_disk.get('billingItem').get('children'):
+                if item.get('categoryCode').__contains__('guest_disk'):
+                    if disk_number < int("".join(filter(str.isdigit, item.get('categoryCode')))):
+                        disk_number = int("".join(filter(str.isdigit, item.get('categoryCode'))))
+            for disk_guest in disk:
+                if disk_guest.get('number') > 0:
+                    price_id = self._get_price_id_for_upgrade_option(upgrade_prices, 'disk',
+                                                                     disk_guest.get('capacity'),
+                                                                     public)
+                    disk_number = disk_guest.get('number')
+
+                else:
+                    price_id = self._get_price_id_for_upgrade_option(upgrade_prices, 'disk',
+                                                                     disk_guest.get('capacity'),
+                                                                     public)
+                    disk_number = disk_number + 1
+
+                if price_id is None:
+                    raise exceptions.SoftLayerAPIError(500,
+                                                       'Unable to find %s option with value %s' % (
+                                                           ('disk', disk_guest.get('capacity'))))
+
+                category = {'categories': [{
+                    'categoryCode': 'guest_disk' + str(disk_number),
+                    'complexType': "SoftLayer_Product_Item_Category"}],
+                            'complexType': 'SoftLayer_Product_Item_Price',
+                            'id': price_id}
+
+                prices.append(category)
+            order['prices'] = prices
+
         for option, value in data.items():
             if not value:
                 continue
@@ -875,8 +910,8 @@ class VSManager(utils.IdentifierMixin, object):
                     "Unable to find %s option with value %s" % (option, value))
 
             prices.append({'id': price_id})
-        order['prices'] = prices
 
+            order['prices'] = prices
         if preset is not None:
             vs_object = self.get_instance(instance_id)['billingItem']['package']
             order['presetId'] = self.ordering_manager.get_preset_by_key(vs_object['keyName'], preset)['id']
@@ -994,9 +1029,11 @@ class VSManager(utils.IdentifierMixin, object):
         option_category = {
             'memory': 'ram',
             'cpus': 'guest_core',
-            'nic_speed': 'port_speed'
+            'nic_speed': 'port_speed',
+            'disk': 'guest_disk'
         }
         category_code = option_category.get(option)
+
         for price in upgrade_prices:
             if price.get('categories') is None or price.get('item') is None:
                 continue
@@ -1006,6 +1043,11 @@ class VSManager(utils.IdentifierMixin, object):
                           or product.get('units') == 'DEDICATED_CORE')
 
             for category in price.get('categories'):
+                if option == 'disk':
+                    if (category_code == (''.join([i for i in category.get('categoryCode') if not i.isdigit()]))
+                            and str(product.get('capacity')) == str(value)):
+                        return price.get('id')
+
                 if not (category.get('categoryCode') == category_code
                         and str(product.get('capacity')) == str(value)):
                     continue
