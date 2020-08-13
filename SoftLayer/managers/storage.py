@@ -415,13 +415,15 @@ class StorageManager(utils.IdentifierMixin, object):
 
         return self.client.call('SoftLayer_Billing_Item', 'cancelItem', immediate, True, reason, id=billing_item_id)
 
-    def refresh_dep_dupe(self, volume_id, snapshot_id):
-        """"Refresh a dependent duplicate volume with a snapshot from its parent.
+    def refresh_dupe(self, volume_id, snapshot_id):                                                  #remove dep
+        """"Refresh a duplicate volume with a snapshot from its parent.
 
         :param integer volume_id: The id of the volume
         :param integer snapshot_id: The id of the snapshot
         """
-        return self.client.call('Network_Storage', 'refreshDependentDuplicate', snapshot_id, id=volume_id)
+        return self.client.call('Network_Storage', 'refreshDuplicate', snapshot_id, id=volume_id)   #remove Dependent
+
+
 
     def convert_dep_dupe(self, volume_id):
         """Convert a dependent duplicate volume to an independent volume.

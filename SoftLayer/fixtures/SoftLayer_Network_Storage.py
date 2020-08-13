@@ -234,8 +234,8 @@ getVolumeCountLimits = {
     'provisionedCount': 100
 }
 
-refreshDependentDuplicate = {
-    'dependentDuplicate': 1
+refreshDuplicate = {                            #remove Dependent from refreshDependentDuplicate
+     'DependentDuplicate': 1
 }
 
 convertCloneDependentToIndependent = {

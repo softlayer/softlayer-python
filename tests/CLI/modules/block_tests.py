@@ -717,7 +717,7 @@ class BlockTests(testing.TestCase):
         result = self.run_command(['block', 'volume-limits'])
         self.assert_no_fail(result)
 
-    def test_dep_dupe_refresh(self):
+    def test_dupe_refresh(self):                                            #remove _dep in test_dep_dupe_refresh
         result = self.run_command(['block', 'volume-refresh', '102', '103'])
 
         self.assert_no_fail(result)
