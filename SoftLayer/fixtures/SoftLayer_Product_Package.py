@@ -833,6 +833,7 @@ getItems = [
         'itemCategory': {'categoryCode': 'Uplink Port Speeds'},
         'prices': [{'id': 1122,
                     'hourlyRecurringFee': 0.0,
+                    'recurringFee': 0.0,
                     'categories': [{'id': 26,
                                     'name': 'Uplink Port Speeds',
                                     'categoryCode': 'port_speed'}]}],
@@ -845,6 +846,7 @@ getItems = [
         'itemCategory': {'categoryCode': 'Uplink Port Speeds'},
         'prices': [{'id': 4477,
                     'hourlyRecurringFee': 0.0,
+                    'recurringFee': 0.0,
                     'categories': [{'id': 26,
                                     'name': 'Uplink Port Speeds',
                                     'categoryCode': 'port_speed'}]}],
@@ -857,6 +859,7 @@ getItems = [
         'itemCategory': {'categoryCode': 'RAM'},
         'prices': [{'id': 1133,
                     'hourlyRecurringFee': 0.0,
+                    'recurringFee': 0.0,
                     'categories': [{'id': 3,
                                     'name': 'RAM',
                                     'categoryCode': 'ram'}]}],
@@ -870,6 +873,7 @@ getItems = [
         'itemCategory': {'categoryCode': 'Computing Instance'},
         'prices': [{'id': 1007,
                     'hourlyRecurringFee': 0.0,
+                    'recurringFee': 0.0,
                     'categories': [{'id': 80,
                                     'name': 'Computing Instance',
                                     'categoryCode': 'guest_core'}]}],
@@ -884,6 +888,7 @@ getItems = [
         'prices': [{'id': 1144,
                     'locationGroupId': None,
                     'hourlyRecurringFee': 0.0,
+                    'recurringFee': 0.0,
                     'categories': [{'id': 80,
                                     'name': 'Computing Instance',
                                     'categoryCode': 'guest_core'}]}],
@@ -898,6 +903,7 @@ getItems = [
         'prices': [{'id': 332211,
                     'locationGroupId': 1,
                     'hourlyRecurringFee': 0.0,
+                    'recurringFee': 0.0,
                     'categories': [{'id': 80,
                                     'name': 'Computing Instance',
                                     'categoryCode': 'guest_core'}]}],
@@ -908,7 +914,7 @@ getItems = [
         'capacity': '1',
         'description': '1 GB iSCSI Storage',
         'itemCategory': {'categoryCode': 'iscsi'},
-        'prices': [{'id': 2222, 'hourlyRecurringFee': 0.0}],
+        'prices': [{'id': 2222, 'hourlyRecurringFee': 0.0, 'recurringFee': 0.0}],
     },
     {
         'id': 1121,
@@ -924,7 +930,7 @@ getItems = [
         'capacity': '4',
         'description': '4 Portable Public IP Addresses',
         'itemCategory': {'categoryCode': 'sov_sec_ip_addresses_pub'},
-        'prices': [{'id': 4444, 'hourlyRecurringFee': 0.0}],
+        'prices': [{'id': 4444, 'hourlyRecurringFee': 0.0, 'recurringFee': 0.0}],
     },
     {
         'id': 8880,
@@ -932,7 +938,7 @@ getItems = [
         'capacity': '8',
         'description': '8 Portable Public IP Addresses',
         'itemCategory': {'categoryCode': 'sov_sec_ip_addresses_pub'},
-        'prices': [{'id': 8888, 'hourlyRecurringFee': 0.0}],
+        'prices': [{'id': 8888, 'hourlyRecurringFee': 0.0, 'recurringFee': 0.0}],
     },
     {
         'id': 44400,
@@ -940,7 +946,7 @@ getItems = [
         'capacity': '4',
         'description': '4 Portable Private IP Addresses',
         'itemCategory': {'categoryCode': 'sov_sec_ip_addresses_priv'},
-        'prices': [{'id': 44441, 'hourlyRecurringFee': 0.0}],
+        'prices': [{'id': 44441, 'hourlyRecurringFee': 0.0, 'recurringFee': 0.0}],
     },
     {
         'id': 88800,
@@ -948,7 +954,7 @@ getItems = [
         'capacity': '8',
         'description': '8 Portable Private IP Addresses',
         'itemCategory': {'categoryCode': 'sov_sec_ip_addresses_priv'},
-        'prices': [{'id': 88881, 'hourlyRecurringFee': 0.0}],
+        'prices': [{'id': 88881, 'hourlyRecurringFee': 0.0, 'recurringFee': 0.0}],
     },
     {
         'id': 10,
@@ -956,7 +962,7 @@ getItems = [
         'capacity': '0',
         'description': 'Global IPv4',
         'itemCategory': {'categoryCode': 'global_ipv4'},
-        'prices': [{'id': 11, 'hourlyRecurringFee': 0.0}],
+        'prices': [{'id': 11, 'hourlyRecurringFee': 0.0, 'recurringFee': 0.0}],
     },
     {
         'id': 66464,
@@ -964,7 +970,7 @@ getItems = [
         'capacity': '64',
         'description': '/64 Block Portable Public IPv6 Addresses',
         'itemCategory': {'categoryCode': 'static_ipv6_addresses'},
-        'prices': [{'id': 664641, 'hourlyRecurringFee': 0.0}],
+        'prices': [{'id': 664641, 'hourlyRecurringFee': 0.0, 'recurringFee': 0.0}],
     },
     {
         'id': 610,
@@ -972,7 +978,7 @@ getItems = [
         'capacity': '0',
         'description': 'Global IPv6',
         'itemCategory': {'categoryCode': 'global_ipv6'},
-        'prices': [{'id': 611, 'hourlyRecurringFee': 0.0}],
+        'prices': [{'id': 611, 'hourlyRecurringFee': 0.0, 'recurringFee': 0.0}],
     }]
 
 getItemPricesISCSI = [
