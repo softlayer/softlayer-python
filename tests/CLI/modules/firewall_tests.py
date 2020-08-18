@@ -7,8 +7,6 @@
 import json
 from unittest import mock
 
-from SoftLayer.CLI import exceptions
-
 from SoftLayer import testing
 
 
