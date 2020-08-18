@@ -13,6 +13,22 @@ from SoftLayer.managers import TicketManager
 from SoftLayer import testing
 
 
+class FakeTTY():
+    """A fake object to fake STD input"""
+    def __init__(self, isatty=False, read="Default Output"):
+        """Sets isatty and read"""
+        self._isatty = isatty
+        self._read = read
+
+    def isatty(self):
+        """returns self.isatty"""
+        return self._isatty
+
+    def read(self):
+        """returns self.read"""
+        return self._read
+
+
 class TicketTests(testing.TestCase):
 
     def test_list(self):
@@ -99,18 +115,33 @@ class TicketTests(testing.TestCase):
                                 identifier=100)
 
     @mock.patch('click.edit')
-    def test_create_no_body(self, edit_mock):
+    @mock.patch('click.get_text_stream')
+    def test_create_no_body(self, isatty_mock, edit_mock):
+        fake_tty = FakeTTY(True, "TEST")
+        isatty_mock.return_value = fake_tty
         edit_mock.return_value = 'ticket body'
-        result = self.run_command(['ticket', 'create', '--title=Test',
-                                   '--subject-id=1000'])
+        result = self.run_command(['ticket', 'create', '--title=Test', '--subject-id=1000'])
         self.assert_no_fail(result)
 
         args = ({'subjectId': 1000,
                  'assignedUserId': 12345,
                  'title': 'Test'}, 'ticket body')
 
-        self.assert_called_with('SoftLayer_Ticket', 'createStandardTicket',
-                                args=args)
+        self.assert_called_with('SoftLayer_Ticket', 'createStandardTicket', args=args)
+
+    @mock.patch('click.get_text_stream')
+    def test_create_no_body_stdin(self, isatty_mock):
+        fake_tty = FakeTTY(False, "TEST TICKET BODY")
+        isatty_mock.return_value = fake_tty
+        result = self.run_command(['ticket', 'create', '--title=Test', '--subject-id=1000'])
+        print(result.output)
+        self.assert_no_fail(result)
+
+        args = ({'subjectId': 1000,
+                 'assignedUserId': 12345,
+                 'title': 'Test'}, 'TEST TICKET BODY')
+
+        self.assert_called_with('SoftLayer_Ticket', 'createStandardTicket', args=args)
 
     def test_subjects(self):
         list_expected_ids = [1001, 1002, 1003, 1004, 1005]
@@ -294,11 +325,23 @@ class TicketTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Ticket', 'addUpdate', args=({'entry': 'Testing'},), identifier=100)
 
     @mock.patch('click.edit')
-    def test_ticket_update_no_body(self, edit_mock):
+    @mock.patch('click.get_text_stream')
+    def test_ticket_update_no_body(self, isatty_mock, edit_mock):
+        fake_tty = FakeTTY(True, "TEST TICKET BODY")
+        isatty_mock.return_value = fake_tty
         edit_mock.return_value = 'Testing1'
         result = self.run_command(['ticket', 'update', '100'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Ticket', 'addUpdate', args=({'entry': 'Testing1'},), identifier=100)
+
+    @mock.patch('click.get_text_stream')
+    def test_ticket_update_no_body_stdin(self, isatty_mock):
+        fake_tty = FakeTTY(False, "TEST TICKET BODY")
+        isatty_mock.return_value = fake_tty
+        result = self.run_command(['ticket', 'update', '100'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Ticket', 'addUpdate',
+                                args=({'entry': 'TEST TICKET BODY'},), identifier=100)
 
     def test_ticket_json(self):
         result = self.run_command(['--format=json', 'ticket', 'detail', '1'])
