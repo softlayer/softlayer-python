@@ -52,8 +52,3 @@ class FirewallTests(testing.TestCase):
         result = self.run_command(['firewall', 'add', '1000', '--firewall-type=server'])
         self.assert_no_fail(result)
         self.assertIn("Firewall is being created!", result.output)
-
-    def test_add_server_fail(self):
-        result = self.run_command(['firewall', 'add', '1000', '--firewall-type=server'])
-        self.assertEqual(result.exit_code, 2)
-        self.assertIsInstance(result.exception, exceptions.CLIAbort)
