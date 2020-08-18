@@ -20,6 +20,9 @@ https://github.com/softlayer/softlayer-python/compare/v5.8.9...v5.9.0
 - #1313 Added support for filteredMask
 - #1305 Update docs links
 - #1302 Fix lots of whitespace slcli vs create-options
+- #900 Support for STDIN on creating and updating tickets.
+- #1318 add Drive number in guest drives details using the device number
+- #1323 add vs list hardware and all option
 
 ## [5.8.9] - 2020-07-06 
 https://github.com/softlayer/softlayer-python/compare/v5.8.8...v5.8.9
