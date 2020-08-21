@@ -222,7 +222,7 @@ class BaseClient(object):
             raise TypeError(
                 'Invalid keyword arguments: %s' % ','.join(invalid_kwargs))
 
-        prefixes = (self._prefix, 'BluePages_Search', 'IntegratedOfferingTeam_Region') 
+        prefixes = (self._prefix, 'BluePages_Search', 'IntegratedOfferingTeam_Region')
         if self._prefix and not service.startswith(prefixes):
             service = self._prefix + service
 
