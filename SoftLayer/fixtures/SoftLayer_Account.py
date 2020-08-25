@@ -1,6 +1,3 @@
-# -*- coding: UTF-8 -*-
-
-# # pylint: disable=bad-continuation
 getPrivateBlockDeviceTemplateGroups = [{
     'accountId': 1234,
     'blockDevices': [],

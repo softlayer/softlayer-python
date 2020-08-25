@@ -533,10 +533,9 @@ def prepare_volume_order_object(manager, storage_type, location, size,
     # Find the ID for the requested location
     try:
         location_id = get_location_id(manager, location)
-    except ValueError:
-        raise exceptions.SoftLayerError(
-            "Invalid datacenter name specified. "
-            "Please provide the lower case short name (e.g.: dal09)")
+    except ValueError as ex:
+        message = "Invalid datacenter name specified. Please provide the lower case short name (e.g.: dal09)"
+        raise exceptions.SoftLayerError(message) from ex
 
     # Determine the category code to use for the order (and product package)
     order_type_is_saas, order_category_code = _get_order_type_and_category(
@@ -676,10 +675,9 @@ def prepare_replicant_order_object(manager, snapshot_schedule, location,
     # Find the ID for the requested location
     try:
         location_id = get_location_id(manager, location)
-    except ValueError:
-        raise exceptions.SoftLayerError(
-            "Invalid datacenter name specified. "
-            "Please provide the lower case short name (e.g.: dal09)")
+    except ValueError as ex:
+        message = "Invalid datacenter name specified. Please provide the lower case short name (e.g.: dal09)"
+        raise exceptions.SoftLayerError(message) from ex
 
     # Get sizes and properties needed for the order
     volume_size = int(volume['capacityGb'])

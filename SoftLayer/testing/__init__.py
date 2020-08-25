@@ -113,7 +113,7 @@ class TestCase(unittest.TestCase):
         self.set_up()
 
     def tearDown(self):  # NOQA
-        super(TestCase, self).tearDown()
+        super().tearDown()
         self.tear_down()
         self.mocks.clear()
 
@@ -184,7 +184,7 @@ class TestCase(unittest.TestCase):
         But switching to just using unittest breaks assertRaises because the format is slightly different.
         This basically just reformats the call so I don't have to re-write a bunch of tests.
         """
-        with super(TestCase, self).assertRaises(exception) as cm:
+        with super().assertRaises(exception) as cm:
             function_callable(*args, **kwds)
         return cm.exception
 
