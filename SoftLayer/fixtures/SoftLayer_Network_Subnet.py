@@ -43,3 +43,4 @@ getObject = {
 
 editNote = True
 setTags = True
+cancel = True

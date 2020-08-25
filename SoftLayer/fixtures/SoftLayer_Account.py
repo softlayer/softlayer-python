@@ -394,7 +394,8 @@ getSshKeys = [{'id': '100', 'label': 'Test 1'},
 
 getSecurityCertificates = [{'certificate': '1234',
                             'commonName': 'cert',
-                            'id': 1234}]
+                            'id': 1234,
+                            'validityDays': 0, }]
 getExpiredSecurityCertificates = getSecurityCertificates
 getValidSecurityCertificates = getSecurityCertificates
 
@@ -487,6 +488,7 @@ getNetworkVlans = [{
     'networkSpace': 'PRIVATE',
     'hardwareCount': 0,
     'hardware': [],
+    'vlanNumber': 12,
     'networkComponents': [],
     'primaryRouter': {
         'datacenter': {'name': 'dal00'}
@@ -499,13 +501,26 @@ getNetworkVlans = [{
     'totalPrimaryIpAddressCount': 1,
     'subnetCount': 0,
     'subnets': [],
+    'firewallInterfaces': [
+        {
+            'id': 1,
+            'name': 'outside'
+        },
+        {
+            'id': 12,
+            'name': 'inside'
+        }
+    ]
 }, {
     'id': 2,
     'networkSpace': 'PRIVATE',
     'totalPrimaryIpAddressCount': 2,
     'dedicatedFirewallFlag': False,
+    'highAvailabilityFirewallFlag': True,
+    'networkVlanFirewall': {'id': 7896},
     'hardwareCount': 0,
     'hardware': [],
+    'vlanNumber': 13,
     'networkComponents': [],
     'primaryRouter': {
         'datacenter': {'name': 'dal00'}
@@ -520,6 +535,8 @@ getNetworkVlans = [{
         'id': 1234,
         'networkComponent': {'downlinkComponent': {'hardwareId': 1}},
         'status': 'ok'}],
+    'firewallInterfaces': [],
+
     'subnetCount': 0,
     'subnets': [],
 }, {
@@ -527,11 +544,20 @@ getNetworkVlans = [{
     'networkSpace': 'PRIVATE',
     'name': 'dal00',
     'hardwareCount': 1,
+    'dedicatedFirewallFlag': True,
+    'highAvailabilityFirewallFlag': True,
+    'networkVlanFirewall': {'id': 23456},
+    'vlanNumber': 14,
     'hardware': [{'id': 1}],
     'networkComponents': [{'id': 2}],
     'primaryRouter': {
         'datacenter': {'name': 'dal00'}
     },
+    'firewallInterfaces': [
+        {
+            'id': 31,
+            'name': 'outside'
+        }],
     'totalPrimaryIpAddressCount': 3,
     'subnetCount': 0,
     'subnets': [],
@@ -659,7 +685,6 @@ getDedicatedHosts = [{
     'id': 12345
 }]
 
-
 getUsers = [
     {'displayName': 'ChristopherG',
      'hardwareCount': 138,
@@ -738,7 +763,6 @@ getReservedCapacityGroups = [
         ]
     }
 ]
-
 
 getPlacementGroups = [{
     "createDate": "2019-01-18T16:08:44-06:00",
@@ -889,7 +913,6 @@ getScaleGroups = [
         }
     }
 ]
-
 
 getPortableStorageVolumes = [
     {

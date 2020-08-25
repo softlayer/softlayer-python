@@ -94,3 +94,8 @@ class VlanTests(testing.TestCase):
         click.secho.assert_called_with('Failed to edit the vlan', fg='red')
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Network_Vlan', 'editObject', identifier=100)
+
+    def test_vlan_list(self):
+        result = self.run_command(['vlan', 'list'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getNetworkVlans')

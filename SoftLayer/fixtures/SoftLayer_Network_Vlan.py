@@ -10,3 +10,4 @@ getObject = {
 
 editObject = True
 setTags = True
+getList = [getObject]

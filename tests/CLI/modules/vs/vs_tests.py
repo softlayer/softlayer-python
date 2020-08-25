@@ -882,3 +882,11 @@ class VirtTests(testing.TestCase):
     def test_list_vsi(self):
         result = self.run_command(['vs', 'list', '--hardware'])
         self.assert_no_fail(result)
+
+    def test_credentail(self):
+        result = self.run_command(['vs', 'credentials', '100'])
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output), [{
+                                                    "username": "user",
+                                                    "password": "pass"
+        }])
