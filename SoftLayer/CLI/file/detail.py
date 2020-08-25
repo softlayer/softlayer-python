@@ -29,7 +29,7 @@ def cli(env, volume_id):
     table.add_row(['Type', storage_type])
     table.add_row(['Capacity (GB)', "%iGB" % file_volume['capacityGb']])
 
-    used_space = int(file_volume['bytesUsed'])\
+    used_space = int(file_volume['bytesUsed']) \
         if file_volume['bytesUsed'] else 0
     if used_space < (1 << 10):
         table.add_row(['Used Space', "%dB" % used_space])
@@ -125,5 +125,8 @@ def cli(env, volume_id):
         if file_volume.get('originalSnapshotName'):
             original_volume_info.add_row(['Original Snapshot Name', file_volume['originalSnapshotName']])
         table.add_row(['Original Volume Properties', original_volume_info])
+
+    notes = '{}'.format(file_volume.get('notes', ''))
+    table.add_row(['Notes', notes])
 
     env.fout(table)
