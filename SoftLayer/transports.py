@@ -142,7 +142,7 @@ class SoftLayerListResult(list):
         #: total count of items that exist on the server. This is useful when
         #: paginating through a large list of objects.
         self.total_count = total_count
-        super(SoftLayerListResult, self).__init__(items)
+        super().__init__(items)
 
 
 class XmlRpcTransport(object):
@@ -245,7 +245,7 @@ class XmlRpcTransport(object):
                 '-32300': exceptions.TransportError,
             }
             _ex = error_mapping.get(ex.faultCode, exceptions.SoftLayerAPIError)
-            raise _ex(ex.faultCode, ex.faultString)
+            raise _ex(ex.faultCode, ex.faultString) from ex
         except requests.HTTPError as ex:
             raise exceptions.TransportError(ex.response.status_code, str(ex))
         except requests.RequestException as ex:
@@ -533,12 +533,14 @@ class FixtureTransport(object):
         try:
             module_path = 'SoftLayer.fixtures.%s' % call.service
             module = importlib.import_module(module_path)
-        except ImportError:
-            raise NotImplementedError('%s fixture is not implemented' % call.service)
+        except ImportError as ex:
+            message = '{} fixture is not implemented'.format(call.service)
+            raise NotImplementedError(message) from ex
         try:
             return getattr(module, call.method)
-        except AttributeError:
-            raise NotImplementedError('%s::%s fixture is not implemented' % (call.service, call.method))
+        except AttributeError as ex:
+            message = '{}::{} fixture is not implemented'.format(call.service, call.method)
+            raise NotImplementedError(message) from ex
 
     def print_reproduceable(self, call):
         """Not Implemented"""
