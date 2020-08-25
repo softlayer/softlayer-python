@@ -77,7 +77,7 @@ def cli(env, sortby, columns, datacenter, username, storage_type):
     table = formatting.Table(columns.columns)
     table.sortby = sortby
 
-    reduce_notes(file_volumes)
+    _reduce_notes(file_volumes)
 
     for file_volume in file_volumes:
         table.add_row([value or formatting.blank()
@@ -86,7 +86,11 @@ def cli(env, sortby, columns, datacenter, username, storage_type):
     env.fout(table)
 
 
-def reduce_notes(file_volumes):
+def _reduce_notes(file_volumes):
+    """Reduces the size of the notes in a volume list.
+
+    :param file_volumes: An list of file volumes
+    """
     for file_volume in file_volumes:
         if len(file_volume.get('notes', '')) > DEFAULT_NOTES_SIZE:
             shortened_notes = file_volume['notes'][:DEFAULT_NOTES_SIZE]
