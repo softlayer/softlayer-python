@@ -50,6 +50,7 @@ class FileTests(testing.TestCase):
                 'username': 'user',
                 'active_transactions': None,
                 'mount_addr': '127.0.0.1:/TEST',
+                'notes': None,
                 'rep_partner_count': None
             }],
             json.loads(result.output))
@@ -137,6 +138,7 @@ class FileTests(testing.TestCase):
             'Data Center': 'dal05',
             'Type': 'ENDURANCE',
             'ID': 100,
+            'Notes': "{'status': 'available'}",
             '# of Active Transactions': '1',
             'Ongoing Transaction': 'This is a buffer time in which the customer may cancel the server',
             'Replicant Count': '1',
@@ -705,3 +707,21 @@ class FileTests(testing.TestCase):
         result = self.run_command(['file', 'volume-convert', '102'])
 
         self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.FileStorageManager.volume_set_note')
+    def test_volume_set_note(self, set_note):
+        set_note.return_value = True
+
+        result = self.run_command(['file', 'volume-set-note', '102', '--note=testing'])
+
+        self.assert_no_fail(result)
+        self.assertIn("successfully!", result.output)
+
+    @mock.patch('SoftLayer.FileStorageManager.volume_set_note')
+    def test_volume_not_set_note(self, set_note):
+        set_note.return_value = False
+
+        result = self.run_command(['file', 'volume-set-note', '102', '--note=testing'])
+
+        self.assert_no_fail(result)
+        self.assertIn("Note could not be set!", result.output)
