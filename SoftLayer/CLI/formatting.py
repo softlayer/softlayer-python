@@ -235,7 +235,7 @@ class SequentialOutput(list):
 
     def __init__(self, separator=os.linesep, *args, **kwargs):
         self.separator = separator
-        super(SequentialOutput, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def to_python(self):
         """returns itself, since it itself is a list."""
@@ -252,7 +252,7 @@ class CLIJSONEncoder(json.JSONEncoder):
         """Encode object if it implements to_python()."""
         if hasattr(obj, 'to_python'):
             return obj.to_python()
-        return super(CLIJSONEncoder, self).default(obj)
+        return super().default(obj)
 
 
 class Table(object):

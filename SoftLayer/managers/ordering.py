@@ -12,10 +12,7 @@ from re import match
 from SoftLayer import exceptions
 
 
-CATEGORY_MASK = '''id,
-                   isRequired,
-                   itemCategory[id, name, categoryCode]
-                '''
+CATEGORY_MASK = '''id, isRequired, itemCategory[id, name, categoryCode]'''
 
 ITEM_MASK = '''id, keyName, description, itemCategory, categories, prices'''
 
@@ -359,10 +356,10 @@ class OrderingManager(object):
                 # keyName with the current item we are searching for
                 matching_item = [i for i in items
                                  if i['keyName'] == item_keyname][0]
-            except IndexError:
-                raise exceptions.SoftLayerError(
-                    "Item {} does not exist for package {}".format(item_keyname,
-                                                                   package_keyname))
+            except IndexError as ex:
+                message = "Item {} does not exist for package {}".format(item_keyname,
+                                                                         package_keyname)
+                raise exceptions.SoftLayerError(message) from ex
 
             # we want to get the price ID that has no location attached to it,
             # because that is the most generic price. verifyOrder/placeOrder
