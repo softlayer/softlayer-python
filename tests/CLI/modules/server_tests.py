@@ -364,17 +364,18 @@ class ServerCLITests(testing.TestCase):
         self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects')
 
     def test_create_options_prices(self):
-        result = self.run_command(['server', 'create-options', '--prices=true'])
+        result = self.run_command(['server', 'create-options', '--prices'])
 
         self.assert_no_fail(result)
         output = json.loads(result.output)
+        print(output[3][0])
         self.assertEqual(output[1][0]['Hourly'], 1.18)
         self.assertEqual(output[2][0]['OS Key'], 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT')
-        self.assertEqual(output[3][0]['capacityRestrictionMaximum'], '-')
+        self.assertEqual(output[3][0]['Monthly'], '0')
         self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects')
 
     def test_create_options_location(self):
-        result = self.run_command(['server', 'create-options', '--location=AMSTERDAM02'])
+        result = self.run_command(['server', 'create-options', '--prices', 'AMSTERDAM02'])
 
         self.assert_no_fail(result)
         output = json.loads(result.output)
@@ -382,12 +383,6 @@ class ServerCLITests(testing.TestCase):
         self.assertEqual(output[1][0]['Hourly'], 1.18)
         self.assertEqual(output[1][0]['Value'], 'S1270_8GB_2X1TBSATA_NORAID')
         self.assert_called_with('SoftLayer_Product_Package', 'getItemPrices')
-
-    def test_create_options_prices_location(self):
-        result = self.run_command(['server', 'create-options', '--prices=true', '--location=AMSTERDAM02'])
-
-        self.assertEqual(result.exit_code, 2)
-        self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
     @mock.patch('SoftLayer.HardwareManager.place_order')
     def test_create_server(self, order_mock):
