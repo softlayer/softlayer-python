@@ -54,11 +54,10 @@ def cli(env, prop):
 
         meta_prop = META_MAPPING.get(prop) or prop
         env.fout(SoftLayer.MetadataManager().get(meta_prop))
-    except SoftLayer.TransportError:
-        raise exceptions.CLIAbort(
-            'Cannot connect to the backend service address. Make sure '
-            'this command is being ran from a device on the backend '
-            'network.')
+    except SoftLayer.TransportError as ex:
+        message = 'Cannot connect to the backend service address. Make sure '\
+                  'this command is being ran from a device on the backend network.'
+        raise exceptions.CLIAbort(message) from ex
 
 
 def get_network():
