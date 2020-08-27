@@ -15,8 +15,8 @@ def cli(env):
     """List all zones."""
 
     manager = SoftLayer.DNSManager(env.client)
-    objectMask = "mask[id,name,serial,updateDate,resourceRecordCount]"
-    zones = manager.list_zones(mask=objectMask)
+    object_mask = "mask[id,name,serial,updateDate,resourceRecordCount]"
+    zones = manager.list_zones(mask=object_mask)
     table = formatting.Table(['id', 'zone', 'serial', 'updated', 'records'])
     table.align = 'l'
     for zone in zones:

@@ -209,9 +209,9 @@ class DNSManager(utils.IdentifierMixin, object):
         if record_type:
             _filter['resourceRecords']['type'] = utils.query_filter(record_type.lower())
 
-        objectMask = 'id,expire,domainId,host,minimum,refresh,retry,mxPriority,ttl,type,data,responsiblePerson'
+        object_mask = 'id,expire,domainId,host,minimum,refresh,retry,mxPriority,ttl,type,data,responsiblePerson'
         results = self.client.call('SoftLayer_Dns_Domain', 'getResourceRecords', id=zone_id,
-                                    mask=objectMask, filter=_filter.to_dict(), iter=True)
+                                   mask=object_mask, filter=_filter.to_dict(), iter=True)
         return results
 
     def edit_record(self, record):
