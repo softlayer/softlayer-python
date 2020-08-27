@@ -46,30 +46,24 @@ class OrderTests(testing.TestCase):
         self.assertIn('item2', result.output)
 
     def test_item_list_prices(self):
-        result = self.run_command(['order', 'item-list', '--prices=true', 'package'])
+        result = self.run_command(['order', 'item-list', '--prices', 'package'])
 
         self.assert_no_fail(result)
         output = json.loads(result.output)
-        self.assertEqual(output[0]['Hourly'], 0.0)
-        self.assertEqual(output[1]['CRMim'], '-')
-        self.assertEqual(output[1]['keyName'], 'KeyName015')
+        self.assertEqual(output[0][0]['priceId'], 1007)
+        self.assertEqual(output[0][1]['Restriction'], '- - - -')
+        self.assertEqual(output[0][1]['keyName'], 'KeyName015')
         self.assert_called_with('SoftLayer_Product_Package', 'getItems')
 
     def test_item_list_location(self):
-        result = self.run_command(['order', 'item-list', '--location=AMSTERDAM02', 'package'])
+        result = self.run_command(['order', 'item-list', '--prices', 'AMSTERDAM02', 'package'])
 
         self.assert_no_fail(result)
         output = json.loads(result.output)
-        self.assertEqual(output[0]['Hourly'], '.093')
-        self.assertEqual(output[1]['keyName'], 'GUEST_DISK_100_GB_LOCAL_3')
-        self.assertEqual(output[1]['CRMax'], '-')
+        self.assertEqual(output[0][0]['Hourly'], 0.0)
+        self.assertEqual(output[0][1]['keyName'], 'KeyName015')
+        self.assertEqual(output[0][1]['Monthly'], '-')
         self.assert_called_with('SoftLayer_Product_Package', 'getItemPrices')
-
-    def test_item_list_prices_location(self):
-        result = self.run_command(['order', 'item-list', '--prices=true', '--location=AMSTERDAM02', 'package'])
-
-        self.assertEqual(result.exit_code, 2)
-        self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
     def test_package_list(self):
         p_mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')

@@ -12,7 +12,7 @@ from SoftLayer.managers import hardware
 @click.argument('location', required=False)
 @click.option('--prices', '-p', is_flag=True, help='Use --prices to list the server item prices, and '
                                                    'to list the Item Prices by location, add it to the '
-                                                   '--prices option, e.g. --prices AMSTERDAM02')
+                                                   '--prices option using location KeyName, e.g. --prices AMSTERDAM02')
 @environment.pass_env
 def cli(env, prices, location=None):
     """Server order options for a given chassis."""
