@@ -62,7 +62,7 @@ class OrderTests(testing.TestCase):
         output = json.loads(result.output)
         self.assertEqual(output[0][0]['Hourly'], 0.0)
         self.assertEqual(output[0][1]['keyName'], 'KeyName015')
-        self.assertEqual(output[0][1]['Monthly'], '-')
+        self.assertEqual(output[0][1]['priceId'], 1144)
         self.assert_called_with('SoftLayer_Product_Package', 'getItemPrices')
 
     def test_package_list(self):
