@@ -215,6 +215,7 @@ listVolumeSchedules = [
 ]
 
 deleteObject = True
+editObject = True
 allowAccessFromHostList = True
 removeAccessFromHostList = True
 failoverToReplicant = True

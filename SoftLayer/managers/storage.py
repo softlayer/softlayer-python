@@ -9,6 +9,7 @@ from SoftLayer import exceptions
 from SoftLayer.managers import storage_utils
 from SoftLayer import utils
 
+
 # pylint: disable=too-many-public-methods
 
 
@@ -65,6 +66,7 @@ class StorageManager(utils.IdentifierMixin, object):
                 'serviceResourceBackendIpAddress,'
                 'serviceResource[datacenter[name]],'
                 'replicationSchedule[type[keyname]]]',
+                'notes',
             ]
             kwargs['mask'] = ','.join(items)
         return self.client.call('Network_Storage', 'getObject', id=volume_id, **kwargs)
@@ -173,10 +175,10 @@ class StorageManager(utils.IdentifierMixin, object):
         :return: Returns a SoftLayer_Container_Product_Order_Receipt
         """
 
-        block_mask = 'billingItem[activeChildren,hourlyFlag],'\
-                     'storageTierLevel,osType,staasVersion,'\
-                     'hasEncryptionAtRest,snapshotCapacityGb,schedules,'\
-                     'intervalSchedule,hourlySchedule,dailySchedule,'\
+        block_mask = 'billingItem[activeChildren,hourlyFlag],' \
+                     'storageTierLevel,osType,staasVersion,' \
+                     'hasEncryptionAtRest,snapshotCapacityGb,schedules,' \
+                     'intervalSchedule,hourlySchedule,dailySchedule,' \
                      'weeklySchedule,storageType[keyName],provisionedIops'
         block_volume = self.get_volume_details(volume_id, mask=block_mask)
 
@@ -213,9 +215,9 @@ class StorageManager(utils.IdentifierMixin, object):
         :return: Returns a SoftLayer_Container_Product_Order_Receipt
         """
 
-        block_mask = 'id,billingItem[location,hourlyFlag],snapshotCapacityGb,'\
-                     'storageType[keyName],capacityGb,originalVolumeSize,'\
-                     'provisionedIops,storageTierLevel,osType[keyName],'\
+        block_mask = 'id,billingItem[location,hourlyFlag],snapshotCapacityGb,' \
+                     'storageType[keyName],capacityGb,originalVolumeSize,' \
+                     'provisionedIops,storageTierLevel,osType[keyName],' \
                      'staasVersion,hasEncryptionAtRest'
         origin_volume = self.get_volume_details(origin_volume_id, mask=block_mask)
         storage_class = storage_utils.block_or_file(origin_volume['storageType']['keyName'])
@@ -270,6 +272,16 @@ class StorageManager(utils.IdentifierMixin, object):
 
         return self.client.call('Product_Order', 'placeOrder', order)
 
+    def volume_set_note(self, volume_id, note):
+        """Set the notes for an existing block volume.
+
+        :param volume_id: The ID of the volume to be modified
+        :param note: the note
+        :return: Returns true if success
+        """
+        template = {'notes': note}
+        return self.client.call('SoftLayer_Network_Storage', 'editObject', template, id=volume_id)
+
     def delete_snapshot(self, snapshot_id):
         """Deletes the specified snapshot object.
 
@@ -295,9 +307,9 @@ class StorageManager(utils.IdentifierMixin, object):
         :param boolean upgrade: Flag to indicate if this order is an upgrade
         :return: Returns a SoftLayer_Container_Product_Order_Receipt
         """
-        object_mask = 'id,billingItem[location,hourlyFlag],'\
-            'storageType[keyName],storageTierLevel,provisionedIops,'\
-            'staasVersion,hasEncryptionAtRest'
+        object_mask = 'id,billingItem[location,hourlyFlag],' \
+                      'storageType[keyName],storageTierLevel,provisionedIops,' \
+                      'staasVersion,hasEncryptionAtRest'
         volume = self.get_volume_details(volume_id, mask=object_mask, **kwargs)
 
         order = storage_utils.prepare_snapshot_order_object(self, volume, capacity, tier, upgrade)

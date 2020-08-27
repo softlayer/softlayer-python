@@ -118,3 +118,7 @@ File Commands
 .. click:: SoftLayer.CLI.file.convert:cli
     :prog: file volume-convert
     :show-nested:
+
+.. click:: SoftLayer.CLI.file.set_note:cli
+    :prog: file volume-set-note
+    :show-nested:
