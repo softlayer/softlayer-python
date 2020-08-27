@@ -6,6 +6,7 @@
 """
 import json
 import os.path
+import sys
 
 import mock
 
@@ -281,6 +282,7 @@ spf  IN TXT "v=spf1 ip4:192.0.2.0/24 ip4:198.51.100.123 a"
         self.assertEqual(actual_output['record'], '')
 
     def test_list_zones_no_update(self):
+        pyversion = sys.version_info
         fake_zones = [
             {
                 'name': 'example.com',
@@ -294,4 +296,7 @@ spf  IN TXT "v=spf1 ip4:192.0.2.0/24 ip4:198.51.100.123 a"
 
         self.assert_no_fail(result)
         actual_output = json.loads(result.output)
-        self.assertEqual(actual_output[0]['updated'], '2014-03-07 00:00')
+        if pyversion.major >= 3 and pyversion.minor >= 7:
+            self.assertEqual(actual_output[0]['updated'], '2014-03-07 00:00')
+        else:
+            self.assertEqual(actual_output[0]['updated'], '2014-03-07T00:00:00-06:00')
