@@ -39,7 +39,10 @@ class DNSManager(utils.IdentifierMixin, object):
         :returns: A list of dictionaries representing the matching zones.
 
         """
-        return self.client['Account'].getDomains(**kwargs)
+        if kwargs.get('iter') is None:
+            kwargs['iter'] = True
+        return self.client.call('SoftLayer_Account', 'getDomains', **kwargs)
+        # return self.client['Account'].getDomains(**kwargs)
 
     def get_zone(self, zone_id, records=True):
         """Get a zone and its records.
@@ -181,8 +184,7 @@ class DNSManager(utils.IdentifierMixin, object):
         """
         return self.record.getObject(id=record_id)
 
-    def get_records(self, zone_id, ttl=None, data=None, host=None,
-                    record_type=None):
+    def get_records(self, zone_id, ttl=None, data=None, host=None, record_type=None):
         """List, and optionally filter, records within a zone.
 
         :param zone: the zone name in which to search.
@@ -191,8 +193,7 @@ class DNSManager(utils.IdentifierMixin, object):
         :param str host: record's host
         :param str record_type: the type of record
 
-        :returns: A list of dictionaries representing the matching records
-                  within the specified zone.
+        :returns: A list of dictionaries representing the matching records within the specified zone.
         """
         _filter = utils.NestedDict()
 
@@ -208,12 +209,9 @@ class DNSManager(utils.IdentifierMixin, object):
         if record_type:
             _filter['resourceRecords']['type'] = utils.query_filter(record_type.lower())
 
-        results = self.service.getResourceRecords(
-            id=zone_id,
-            mask='id,expire,domainId,host,minimum,refresh,retry,mxPriority,ttl,type,data,responsiblePerson',
-            filter=_filter.to_dict(),
-        )
-
+        object_mask = 'id,expire,domainId,host,minimum,refresh,retry,mxPriority,ttl,type,data,responsiblePerson'
+        results = self.client.call('SoftLayer_Dns_Domain', 'getResourceRecords', id=zone_id,
+                                   mask=object_mask, filter=_filter.to_dict(), iter=True)
         return results
 
     def edit_record(self, record):

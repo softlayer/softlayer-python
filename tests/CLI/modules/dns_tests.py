@@ -6,6 +6,7 @@
 """
 import json
 import os.path
+import sys
 
 import mock
 
@@ -54,11 +55,8 @@ class DnsTests(testing.TestCase):
         result = self.run_command(['dns', 'zone-list'])
 
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         [{'serial': 2014030728,
-                           'updated': '2014-03-07T13:52:31-06:00',
-                           'id': 12345,
-                           'zone': 'example.com'}])
+        actual_output = json.loads(result.output)
+        self.assertEqual(actual_output[0]['zone'], 'example.com')
 
     def test_list_records(self):
         result = self.run_command(['dns', 'record-list', '1234'])
@@ -261,3 +259,44 @@ spf  IN TXT "v=spf1 ip4:192.0.2.0/24 ip4:198.51.100.123 a"
             self.assertEqual(call.args[0], expected_call)
 
         self.assertIn("Finished", result.output)
+
+    def test_issues_999(self):
+        """Makes sure certain zones with a None host record are pritable"""
+
+        # SRV records can have a None `host` record, or just a plain missing one.
+        fake_records = [
+            {
+                'data': '1.2.3.4',
+                'id': 137416416,
+                'ttl': 900,
+                'type': 'srv'
+            }
+        ]
+        record_mock = self.set_mock('SoftLayer_Dns_Domain', 'getResourceRecords')
+        record_mock.return_value = fake_records
+        result = self.run_command(['dns', 'record-list', '1234'])
+
+        self.assert_no_fail(result)
+        actual_output = json.loads(result.output)[0]
+        self.assertEqual(actual_output['id'], 137416416)
+        self.assertEqual(actual_output['record'], '')
+
+    def test_list_zones_no_update(self):
+        pyversion = sys.version_info
+        fake_zones = [
+            {
+                'name': 'example.com',
+                'id': 12345,
+                'serial': 2014030728,
+                'updateDate': None}
+        ]
+        domains_mock = self.set_mock('SoftLayer_Account', 'getDomains')
+        domains_mock.return_value = fake_zones
+        result = self.run_command(['dns', 'zone-list'])
+
+        self.assert_no_fail(result)
+        actual_output = json.loads(result.output)
+        if pyversion.major >= 3 and pyversion.minor >= 7:
+            self.assertEqual(actual_output[0]['updated'], '2014-03-07 00:00')
+        else:
+            self.assertEqual(actual_output[0]['updated'], '2014-03-07T00:00:00-06:00')
