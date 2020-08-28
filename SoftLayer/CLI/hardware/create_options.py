@@ -84,7 +84,8 @@ def _preset_prices_table(sizes, tables):
     preset_prices_table.sortby = 'Value'
     preset_prices_table.align = 'l'
     for size in sizes:
-        preset_prices_table.add_row([size['name'], size['key'], size['hourlyRecurringFee'], size['recurringFee']])
+        preset_prices_table.add_row([size['name'], size['key'], "%.4f" % size['hourlyRecurringFee'],
+                                     "%.4f" % size['recurringFee']])
     tables.append(preset_prices_table)
 
 

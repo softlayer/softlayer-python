@@ -368,8 +368,7 @@ class ServerCLITests(testing.TestCase):
 
         self.assert_no_fail(result)
         output = json.loads(result.output)
-        print(output[3][0])
-        self.assertEqual(output[1][0]['Hourly'], 1.18)
+        self.assertEqual(output[1][0]['Hourly'], "%.4f" % 1.18)
         self.assertEqual(output[2][0]['OS Key'], 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT')
         self.assertEqual(output[3][0]['Monthly'], '0')
         self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects')
@@ -379,8 +378,8 @@ class ServerCLITests(testing.TestCase):
 
         self.assert_no_fail(result)
         output = json.loads(result.output)
-        self.assertEqual(output[1][0]['Monthly'], 780.0)
-        self.assertEqual(output[1][0]['Hourly'], 1.18)
+        self.assertEqual(output[1][0]['Monthly'], "%.4f" % 780.0)
+        self.assertEqual(output[1][0]['Hourly'], "%.4f" % 1.18)
         self.assertEqual(output[1][0]['Value'], 'S1270_8GB_2X1TBSATA_NORAID')
         self.assert_called_with('SoftLayer_Product_Package', 'getItemPrices')
 
