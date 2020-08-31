@@ -771,3 +771,37 @@ class OrderingTests(testing.TestCase):
         item_capacity = self.ordering.get_item_capacity(items, ['INTEL_XEON_2690_2_60', 'BANDWIDTH_20000_GB'])
 
         self.assertEqual(24, int(item_capacity))
+
+    def test_get_item_prices_by_location(self):
+        options = self.ordering.get_item_prices_by_location("MONTREAL", "MONTREAL")
+        item_prices = [
+            {
+                "hourlyRecurringFee": ".093",
+                "id": 204015,
+                "recurringFee": "62",
+                "item": {
+                    "description": "4 x 2.0 GHz or higher Cores",
+                    "id": 859,
+                    "keyName": "GUEST_CORES_4",
+                },
+                "pricingLocationGroup": {
+                    "id": 503,
+                    "locations": [
+                        {
+                            "id": 449610,
+                            "longName": "Montreal 1",
+                            "name": "mon01",
+                            "regions": [
+                                {
+                                    "description": "MON01 - Montreal",
+                                    "keyname": "MONTREAL",
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ]
+
+        self.assertEqual(options[0]['item']['keyName'], item_prices[0]['item']['keyName'])
+        self.assertEqual(options[0]['hourlyRecurringFee'], item_prices[0]['hourlyRecurringFee'])

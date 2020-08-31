@@ -643,3 +643,16 @@ class OrderingManager(object):
         if len(datacenter) != 1:
             raise exceptions.SoftLayerError("Unable to find location: %s" % location)
         return datacenter[0]['id']
+
+    def get_item_prices_by_location(self, location, package_keyname):
+        """Returns the hardware server item prices by location.
+
+        :param string package_keyname: The package for which to get the items.
+        :param string location: location to get the item prices.
+        """
+        object_mask = "filteredMask[pricingLocationGroup[locations[regions]]]"
+        object_filter = {
+            "itemPrices": {"pricingLocationGroup": {"locations": {"regions": {"keyname": {"operation": location}}}}}}
+        package = self.get_package_by_key(package_keyname)
+        return self.client.call('SoftLayer_Product_Package', 'getItemPrices', mask=object_mask, filter=object_filter,
+                                id=package['id'])
