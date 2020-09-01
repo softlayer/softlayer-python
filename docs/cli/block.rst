@@ -138,3 +138,7 @@ Block Commands
 .. click:: SoftLayer.CLI.block.convert:cli
     :prog: block volume-convert
     :show-nested:
+
+.. click:: SoftLayer.CLI.block.set_note:cli
+    :prog: block volume-set-note
+    :show-nested:

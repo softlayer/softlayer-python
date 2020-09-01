@@ -145,7 +145,8 @@ class FileTests(testing.TestCase):
                         'replicationPartners[id,username,'\
                         'serviceResourceBackendIpAddress,'\
                         'serviceResource[datacenter[name]],'\
-                        'replicationSchedule[type[keyname]]]'
+                        'replicationSchedule[type[keyname]]],' \
+                        'notes'
 
         self.assert_called_with(
             'SoftLayer_Network_Storage',

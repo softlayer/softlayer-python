@@ -34,6 +34,7 @@ COLUMNS = [
     column_helper.Column(
         'created_by',
         ('billingItem', 'orderItem', 'order', 'userRecord', 'username')),
+    column_helper.Column('notes', ('notes',), mask="notes"),
 ]
 
 DEFAULT_COLUMNS = [
@@ -47,8 +48,11 @@ DEFAULT_COLUMNS = [
     'ip_addr',
     'lunId',
     'active_transactions',
-    'rep_partner_count'
+    'rep_partner_count',
+    'notes'
 ]
+
+DEFAULT_NOTES_SIZE = 20
 
 
 @click.command()
@@ -75,8 +79,21 @@ def cli(env, sortby, columns, datacenter, username, storage_type):
     table = formatting.Table(columns.columns)
     table.sortby = sortby
 
+    _reduce_notes(block_volumes)
+
     for block_volume in block_volumes:
         table.add_row([value or formatting.blank()
                        for value in columns.row(block_volume)])
 
     env.fout(table)
+
+
+def _reduce_notes(block_volumes):
+    """Reduces the size of the notes in a volume list.
+
+    :param block_volumes: An list of block volumes
+    """
+    for block_volume in block_volumes:
+        if len(block_volume.get('notes', '')) > DEFAULT_NOTES_SIZE:
+            shortened_notes = block_volume['notes'][:DEFAULT_NOTES_SIZE]
+            block_volume['notes'] = shortened_notes

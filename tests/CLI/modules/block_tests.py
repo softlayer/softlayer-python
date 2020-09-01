@@ -64,6 +64,7 @@ class BlockTests(testing.TestCase):
         self.assertEqual({
             'Username': 'username',
             'LUN Id': '2',
+            'Notes': "{'status': 'available'}",
             'Endurance Tier': 'READHEAVY_TIER',
             'IOPs': 1000,
             'Snapshot Capacity (GB)': '10',
@@ -132,6 +133,7 @@ class BlockTests(testing.TestCase):
                 'iops': None,
                 'ip_addr': '10.1.2.3',
                 'lunId': None,
+                'notes': "{'status': 'availabl",
                 'rep_partner_count': None,
                 'storage_type': 'ENDURANCE',
                 'username': 'username',
@@ -726,3 +728,21 @@ class BlockTests(testing.TestCase):
         result = self.run_command(['block', 'volume-convert', '102'])
 
         self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.BlockStorageManager.volume_set_note')
+    def test_volume_set_note(self, set_note):
+        set_note.return_value = True
+
+        result = self.run_command(['block', 'volume-set-note', '102', '--note=testing'])
+
+        self.assert_no_fail(result)
+        self.assertIn("successfully!", result.output)
+
+    @mock.patch('SoftLayer.BlockStorageManager.volume_set_note')
+    def test_volume_not_set_note(self, set_note):
+        set_note.return_value = False
+
+        result = self.run_command(['block', 'volume-set-note', '102', '--note=testing'])
+
+        self.assert_no_fail(result)
+        self.assertIn("Note could not be set!", result.output)

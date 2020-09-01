@@ -110,4 +110,7 @@ def cli(env, volume_id):
             original_volume_info.add_row(['Original Snapshot Name', block_volume['originalSnapshotName']])
         table.add_row(['Original Volume Properties', original_volume_info])
 
+    notes = '{}'.format(block_volume.get('notes', ''))
+    table.add_row(['Notes', notes])
+
     env.fout(table)

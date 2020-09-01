@@ -102,6 +102,7 @@ class FileStorageManager(StorageManager):
                 'serviceResourceBackendIpAddress,'
                 'serviceResource[datacenter[name]],'
                 'replicationSchedule[type[keyname]]]',
+                'notes',
             ]
             kwargs['mask'] = ','.join(items)
         return self.get_volume_details(volume_id, **kwargs)
