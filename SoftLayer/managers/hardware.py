@@ -379,18 +379,38 @@ class HardwareManager(utils.IdentifierMixin, object):
         }
 
     @retry(logger=LOGGER)
-    def get_create_options(self):
-        """Returns valid options for ordering hardware."""
+    def get_create_options(self, datacenter=None):
+        """Returns valid options for ordering hardware.
 
+        :param string datacenter: short name, like dal09
+        """
+        
         package = self._get_package()
+
+        location_group_id = None
+        if datacenter:
+            _filter = {"name":{"operation":datacenter}}
+            _mask = "mask[priceGroups]"
+            dc_details = self.client.call('SoftLayer_Location', 'getDatacenters',
+                                           mask=_mask, filter=_filter, limit=1)
+            if not dc_details:
+                raise SoftLayerError("Unable to find a datacenter named {}".format(datacenter))
+            # A DC will have several price groups, no good way to deal with this other than checking each.
+            # An item should only belong to one type of price group.
+            for group in dc_details[0].get('priceGroups', []):
+                # We only care about SOME of the priceGroups, which all SHOULD start with `Location Group X`
+                # Hopefully this never changes....
+                if group.get('description').startswith('Location'):
+                    location_group_id = group.get('id')
 
         # Locations
         locations = []
         for region in package['regions']:
-            locations.append({
-                'name': region['location']['location']['longName'],
-                'key': region['location']['location']['name'],
-            })
+            if datacenter is None or datacenter == region['location']['location']['name']:
+                locations.append({
+                    'name': region['location']['location']['longName'],
+                    'key': region['location']['location']['name'],
+                })
 
         # Sizes
         sizes = []
@@ -398,8 +418,8 @@ class HardwareManager(utils.IdentifierMixin, object):
             sizes.append({
                 'name': preset['description'],
                 'key': preset['keyName'],
-                'hourlyRecurringFee': _get_preset_cost(preset['prices'], 'hourly'),
-                'recurringFee': _get_preset_cost(preset['prices'], 'monthly')
+                'hourlyRecurringFee': _get_preset_cost(preset, package['items'], 'hourly', location_group_id),
+                'recurringFee': _get_preset_cost(preset, package['items'], 'monthly', location_group_id)
             })
 
         operating_systems = []
@@ -413,7 +433,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                     'name': item['softwareDescription']['longDescription'],
                     'key': item['keyName'],
                     'referenceCode': item['softwareDescription']['referenceCode'],
-                    'prices': get_item_price(item['prices'])
+                    'prices': get_item_price(item['prices'], location_group_id)
                 })
             # Port speeds
             elif category == 'port_speed':
@@ -421,14 +441,14 @@ class HardwareManager(utils.IdentifierMixin, object):
                     'name': item['description'],
                     'speed': item['capacity'],
                     'key': item['keyName'],
-                    'prices': get_item_price(item['prices'])
+                    'prices': get_item_price(item['prices'], location_group_id)
                 })
             # Extras
             elif category in EXTRA_CATEGORIES:
                 extras.append({
                     'name': item['description'],
                     'key': item['keyName'],
-                    'prices': get_item_price(item['prices'])
+                    'prices': get_item_price(item['prices'], location_group_id)
                 })
 
         return {
@@ -442,21 +462,25 @@ class HardwareManager(utils.IdentifierMixin, object):
     @retry(logger=LOGGER)
     def _get_package(self):
         """Get the package related to simple hardware ordering."""
-        mask = '''
-            items[
-                keyName,
-                capacity,
-                description,
-                attributes[id,attributeTypeKeyName],
-                itemCategory[id,categoryCode],
-                softwareDescription[id,referenceCode,longDescription],
-                prices
-            ],
-            activePresets[prices],
-            accountRestrictedActivePresets[prices],
-            regions[location[location[priceGroups]]]
-            '''
-        package = self.ordering_manager.get_package_by_key(self.package_keyname, mask=mask)
+        from pprint import pprint as pp
+        items_mask = 'mask[id,keyName,capacity,description,attributes[id,attributeTypeKeyName],' \
+                     'itemCategory[id,categoryCode],softwareDescription[id,referenceCode,longDescription],' \
+                     'prices]'
+        # The preset prices list will only have default prices. The prices->item->prices will have location specific
+        presets_mask = 'mask[prices]'
+        region_mask = 'location[location[priceGroups]]'
+        package = {'items': None,'activePresets': None, 'accountRestrictedActivePresets': None, 'regions': None}
+        package_info = self.ordering_manager.get_package_by_key(self.package_keyname, mask="mask[id]")
+
+        package['items'] = self.client.call('SoftLayer_Product_Package', 'getItems',
+                                            id=package_info.get('id'), mask=items_mask)
+        package['activePresets'] = self.client.call('SoftLayer_Product_Package', 'getActivePresets',
+                                                    id=package_info.get('id'), mask=presets_mask)
+        package['accountRestrictedActivePresets'] = self.client.call('SoftLayer_Product_Package',
+                                                                     'getAccountRestrictedActivePresets',
+                                                                     id=package_info.get('id'), mask=presets_mask)
+        package['regions'] = self.client.call('SoftLayer_Product_Package', 'getRegions',
+                                              id=package_info.get('id'), mask=region_mask)
         return package
 
     def _generate_create_dict(self,
@@ -856,21 +880,65 @@ def _get_location(package, location):
     raise SoftLayerError("Could not find valid location for: '%s'" % location)
 
 
-def _get_preset_cost(prices, type_cost):
-    """Get the preset cost."""
+def _get_preset_cost(preset, items, type_cost, location_group_id=None):
+    """Get the preset cost.
+    
+    :param preset list: SoftLayer_Product_Package_Preset[]
+    :param items list: SoftLayer_Product_Item[]
+    :param type_cost string: 'hourly' or 'monthly'
+    :param location_group_id int: locationGroupId's to get price for.
+    """
+
+    # Location based pricing on presets is a huge pain. Requires a few steps
+    # 1. Get the presets prices, which are only ever the default prices
+    # 2. Get that prices item ID, and use that to match the packages item
+    # 3. find the package item, THEN find that items prices
+    # 4. from those item prices, find the one that matches your locationGroupId
+
     item_cost = 0.00
-    for price in prices:
-        if type_cost == 'hourly':
-            item_cost += float(price['hourlyRecurringFee'])
+    if type_cost == 'hourly':
+        cost_key = 'hourlyRecurringFee'
+    else:
+        cost_key = 'recurringFee'
+    for price in preset.get('prices', []):
+        # Need to find the location specific price
+        if location_group_id:
+            # Find the item in the packages item list
+            for item in items:
+                # Same item as the price's item
+                if item.get('id') == price.get('itemId'):
+                    # Find the items location specific price.
+                    for location_price in item.get('prices', []):
+                        if location_price.get('locationGroupId', 0) == location_group_id:
+                            item_cost += float(location_price.get(cost_key))
         else:
-            item_cost += float(price['recurringFee'])
+            item_cost += float(price.get(cost_key))
     return item_cost
 
 
-def get_item_price(prices):
-    """Get item prices"""
+def get_item_price(prices, location_group_id=None):
+    """Get item prices, optionally for a specific location.
+
+    Will return the default pricing information if there isn't any location specific pricing.
+
+    :param prices list: SoftLayer_Product_Item_Price[]
+    :param location_group_id int: locationGroupId's to get price for.
+    """
     prices_list = []
+    location_price = []
     for price in prices:
+        # Only look up location prices if we need to
+        if location_group_id:
+            if price['locationGroupId'] == location_group_id:
+                location_price.append(price)
+        # Always keep track of default prices
         if not price['locationGroupId']:
             prices_list.append(price)
+
+    # If this item has location specific pricing, return that
+    if location_price:
+        return location_price
+
+    # Otherwise reutrn the default price list.
     return prices_list
+ 
