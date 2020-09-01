@@ -13,7 +13,7 @@ from SoftLayer.CLI import environment
 def cli(env, volume_id, snapshot_id):
     """"Refresh a duplicate volume with a snapshot from its parent."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
-    resp = block_manager.refresh_dupe(volume_id, snapshot_id)               #remove dep_ in refresh_dep_dupe
+    resp = block_manager.refresh_dupe(volume_id, snapshot_id)
 
     click.echo(resp)
 

@@ -696,7 +696,7 @@ class FileTests(testing.TestCase):
         result = self.run_command(['file', 'volume-limits'])
         self.assert_no_fail(result)
 
-    def test_dep_dupe_refresh(self):
+    def test_dupe_refresh(self):
         result = self.run_command(['file', 'volume-refresh', '102', '103'])
 
         self.assert_no_fail(result)
