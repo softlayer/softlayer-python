@@ -10,7 +10,7 @@
 class SSLManager(object):
     """Manages SSL certificates in SoftLayer.
 
-    See product information here: http://www.softlayer.com/ssl-certificates
+    See product information here: https://www.ibm.com/cloud/ssl-certificates
 
     Example::
 

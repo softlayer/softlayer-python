@@ -52,7 +52,7 @@ def cli(env, storage_type, size, iops, tier,
     """Order a file storage volume.
 
     Valid size and iops options can be found here:
-    https://console.bluemix.net/docs/infrastructure/FileStorage/index.html#provisioning
+    https://cloud.ibm.com/docs/FileStorage/index.html#provisioning-considerations
     """
     file_manager = SoftLayer.FileStorageManager(env.client)
     storage_type = storage_type.lower()

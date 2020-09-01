@@ -24,7 +24,7 @@ class CapacityManager(utils.IdentifierMixin, object):
 
         Product Information
 
-        - https://console.bluemix.net/docs/vsi/vsi_about_reserved.html
+        - https://cloud.ibm.com/docs/virtual-servers?topic=virtual-servers-about-reserved-virtual-servers
         - https://softlayer.github.io/reference/services/SoftLayer_Virtual_ReservedCapacityGroup/
         - https://softlayer.github.io/reference/services/SoftLayer_Virtual_ReservedCapacityGroup_Instance/
 
@@ -143,8 +143,8 @@ instances[id, billingItem[description, hourlyRecurringFee]], instanceCount, back
         try:
             capacity_flavor = capacity['instances'][0]['billingItem']['item']['keyName']
             flavor = _flavor_string(capacity_flavor, guest_object['primary_disk'])
-        except KeyError:
-            raise SoftLayerError("Unable to find capacity Flavor.")
+        except KeyError as ex:
+            raise SoftLayerError("Unable to find capacity Flavor.") from ex
 
         guest_object['flavor'] = flavor
         guest_object['datacenter'] = capacity['backendRouter']['datacenter']['name']

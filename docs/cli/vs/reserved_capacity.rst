@@ -5,8 +5,8 @@ Working with Reserved Capacity
 There are two main concepts for Reserved Capacity. The `Reserved Capacity Group <https://softlayer.github.io/reference/services/SoftLayer_Virtual_ReservedCapacityGroup/>`_ and the `Reserved Capacity Instance <https://softlayer.github.io/reference/services/SoftLayer_Virtual_ReservedCapacityGroup_Instance/>`_
 The Reserved Capacity Group, is a set block of capacity set aside for you at the time of the order. It will contain a set number of Instances which are all the same size. Instances can be ordered like normal VSIs, with the exception that you need to include the reservedCapacityGroupId, and it must be the same size as the group you are ordering the instance in. 
 
-- `About Reserved Capacity <https://console.bluemix.net/docs/vsi/vsi_about_reserved.html>`_
-- `Reserved Capacity FAQ <https://console.bluemix.net/docs/docs/vsi/vsi_faqs_reserved.html>`_
+- `About Reserved Capacity <https://cloud.ibm.com/docs/virtual-servers?topic=virtual-servers-about-reserved-virtual-servers>`_
+- `Reserved Capacity FAQ <https://cloud.ibm.com/docs/virtual-servers?topic=virtual-servers-faqs-reserved-capacity-and-instances#faqs-reserved-capacity-and-instances>`_
 
 The SLCLI supports some basic Reserved Capacity Features.
 

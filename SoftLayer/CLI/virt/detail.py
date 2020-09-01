@@ -9,7 +9,7 @@ import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
-from SoftLayer.CLI.virt.storage import get_local_type
+from SoftLayer.CLI.virt.storage import get_local_storage_table
 from SoftLayer import utils
 
 LOGGER = logging.getLogger(__name__)
@@ -35,11 +35,7 @@ def cli(env, identifier, passwords=False, price=False):
     result = utils.NestedDict(result)
     local_disks = vsi.get_local_disks(vs_id)
 
-    table_local_disks = formatting.Table(['Type', 'Name', 'Capacity'])
-    for disks in local_disks:
-        if 'diskImage' in disks:
-            table_local_disks.add_row([get_local_type(disks), disks['mountType'],
-                                       str(disks['diskImage']['capacity']) + " " + str(disks['diskImage']['units'])])
+    table_local_disks = get_local_storage_table(local_disks)
 
     table.add_row(['id', result['id']])
     table.add_row(['guid', result['globalIdentifier']])
@@ -173,7 +169,7 @@ def _get_owner_row(result):
         owner = utils.lookup(result, 'billingItem', 'orderItem', 'order', 'userRecord', 'username')
     else:
         owner = formatting.blank()
-    return(['owner', owner])
+    return (['owner', owner])
 
 
 def _get_vlan_table(result):

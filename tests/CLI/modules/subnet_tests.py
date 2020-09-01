@@ -157,3 +157,30 @@ class SubnetTests(testing.TestCase):
         result = self.run_command(['subnet', 'edit-ip', '123456', '--note=test'])
         self.assert_no_fail(result)
         self.assertTrue(result)
+
+    def test_lookup(self):
+        result = self.run_command(['subnet', 'lookup', '1.2.3.10'])
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output), {'device': {
+            'id': 12856,
+            'name': 'unit.test.com',
+            'type': 'server'},
+            "id": 12345,
+            "ip": "10.0.1.37",
+            "subnet": {
+                "id": 258369,
+                "identifier": "10.0.1.38/26",
+                "netmask": "255.255.255.192",
+                "gateway": "10.47.16.129",
+                "type": "PRIMARY"
+            }})
+
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    def test_cancel(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['subnet', 'cancel', '1234'])
+        self.assert_no_fail(result)
+
+    def test_cancel_fail(self):
+        result = self.run_command(['subnet', 'cancel', '1234'])
+        self.assertEqual(result.exit_code, 2)

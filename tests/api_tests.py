@@ -259,6 +259,11 @@ class APIClient(testing.TestCase):
         headers = calls[0].transport_headers
         self.assertEqual(headers.get('accept-encoding'), 'gzip')
 
+    def test_special_services(self):
+        # Tests for the special classes that don't need to start with SoftLayer_
+        self.client.call('BluePages_Search', 'findBluePagesProfile')
+        self.assert_called_with('BluePages_Search', 'findBluePagesProfile')
+
 
 class UnauthenticatedAPIClient(testing.TestCase):
     def set_up(self):

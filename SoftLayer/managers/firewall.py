@@ -32,7 +32,7 @@ def has_firewall(vlan):
 class FirewallManager(utils.IdentifierMixin, object):
     """Manages SoftLayer firewalls
 
-    See product information here: http://www.softlayer.com/firewalls
+    See product information here: https://www.ibm.com/cloud/network-security
 
     :param SoftLayer.API.BaseClient client: the client instance
 

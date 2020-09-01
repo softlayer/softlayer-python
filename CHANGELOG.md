@@ -1,5 +1,28 @@
 # Change Log
 
+## [5.9.0] - 2020-08-03
+https://github.com/softlayer/softlayer-python/compare/v5.8.9...v5.9.0
+
+- #1280 Notification Management
+  + slcli user notifications
+  + slcli user edit-notifications
+- #828 Added networking options to slcli hw create-options
+  + Refactored slcli hw create to use the ordering manager
+  + Added --network option to slcli hw create for more granular network choices.
+  + Deprecated --port-speed and --no-public . They still work for now, but will be removed in a future release.
+- #1298 Fix Unhandled exception in CLI - vs detail
+- #1309 Fix the empty lines in slcli vs create-options
+- #1301 Ability to list VirtualHost capable guests
+  + slcli hardware guests
+  + slcli vs list will show guests on VirtualHost servers
+- #875 added option to reload bare metal servers with LVM enabled
+- #874 Added Migrate command
+- #1313 Added support for filteredMask
+- #1305 Update docs links
+- #1302 Fix lots of whitespace slcli vs create-options
+- #900 Support for STDIN on creating and updating tickets.
+- #1318 add Drive number in guest drives details using the device number
+- #1323 add vs list hardware and all option
 
 ## [5.8.9] - 2020-07-06 
 https://github.com/softlayer/softlayer-python/compare/v5.8.8...v5.8.9
@@ -228,7 +251,7 @@ https://github.com/softlayer/softlayer-python/compare/v5.8.2...v5.8.3
 ## [5.6.0] - 2018-10-16
 - Changes: https://github.com/softlayer/softlayer-python/compare/v5.5.3...v5.6.0
 
-+ #1026 Support for [Reserved Capacity](https://console.bluemix.net/docs/vsi/vsi_about_reserved.html#about-reserved-virtual-servers)
++ #1026 Support for [Reserved Capacity](https://cloud.ibm.com/docs/virtual-servers?topic=virtual-servers-about-reserved-virtual-servers)
   * `slcli vs capacity create`
   * `slcli vs capacity create-guest`
   * `slcli vs capacity create-options`

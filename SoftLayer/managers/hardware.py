@@ -41,7 +41,7 @@ class HardwareManager(utils.IdentifierMixin, object):
        client = SoftLayer.Client()
        mgr = SoftLayer.HardwareManager(client)
 
-    See product information here: http://www.softlayer.com/bare-metal-servers
+    See product information here: https://www.ibm.com/cloud/bare-metal-servers
 
     :param SoftLayer.API.BaseClient client: the client instance
     :param SoftLayer.managers.OrderingManager ordering_manager: an optional

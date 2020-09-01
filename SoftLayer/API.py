@@ -162,8 +162,7 @@ class BaseClient(object):
         :param string username: your SoftLayer username
         :param string password: your SoftLayer password
         :param int security_question_id: The security question id to answer
-        :param string security_question_answer: The answer to the security
-                                                question
+        :param string security_question_answer: The answer to the security question
 
         """
         self.auth = None
@@ -202,8 +201,7 @@ class BaseClient(object):
         :param dict raw_headers: (optional) HTTP transport headers
         :param int limit: (optional) return at most this many results
         :param int offset: (optional) offset results by this many
-        :param boolean iter: (optional) if True, returns a generator with the
-                             results
+        :param boolean iter: (optional) if True, returns a generator with the results
         :param bool verify: verify SSL cert
         :param cert: client certificate path
 
@@ -224,7 +222,8 @@ class BaseClient(object):
             raise TypeError(
                 'Invalid keyword arguments: %s' % ','.join(invalid_kwargs))
 
-        if self._prefix and not service.startswith(self._prefix):
+        prefixes = (self._prefix, 'BluePages_Search', 'IntegratedOfferingTeam_Region')
+        if self._prefix and not service.startswith(prefixes):
             service = self._prefix + service
 
         http_headers = {'Accept': '*/*'}

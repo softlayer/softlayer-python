@@ -114,6 +114,7 @@ ALL_ROUTES = [
     ('block:volume-limits', 'SoftLayer.CLI.block.limit:cli'),
     ('block:volume-refresh', 'SoftLayer.CLI.block.refresh:cli'),
     ('block:volume-convert', 'SoftLayer.CLI.block.convert:cli'),
+    ('block:volume-set-note', 'SoftLayer.CLI.block.set_note:cli'),
 
     ('event-log', 'SoftLayer.CLI.event_log'),
     ('event-log:get', 'SoftLayer.CLI.event_log.get:cli'),
@@ -147,6 +148,7 @@ ALL_ROUTES = [
     ('file:volume-limits', 'SoftLayer.CLI.file.limit:cli'),
     ('file:volume-refresh', 'SoftLayer.CLI.file.refresh:cli'),
     ('file:volume-convert', 'SoftLayer.CLI.file.convert:cli'),
+    ('file:volume-set-note', 'SoftLayer.CLI.file.set_note:cli'),
 
     ('firewall', 'SoftLayer.CLI.firewall'),
     ('firewall:add', 'SoftLayer.CLI.firewall.add:cli'),
