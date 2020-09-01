@@ -249,7 +249,7 @@ class VSManager(utils.IdentifierMixin, object):
         return self.guest.getObject(id=instance_id, **kwargs)
 
     @retry(logger=LOGGER)
-    def get_create_options(self):
+    def get_create_options(self, vsi_type):
         """Retrieves the available options for creating a VS.
 
         :returns: A dictionary of creation options.
@@ -260,7 +260,94 @@ class VSManager(utils.IdentifierMixin, object):
             options = mgr.get_create_options()
             print(options)
         """
-        return self.guest.getCreateObjectOptions()
+
+        # TRANSIENT_CLOUD_SERVER
+        # SUSPEND_CLOUD_SERVER
+        package = self._get_package(vsi_type)
+
+        # Locations
+        locations = []
+        for region in package['regions']:
+            locations.append({
+                'name': region['location']['location']['longName'],
+                'key': region['location']['location']['name'],
+            })
+
+        operating_systems = []
+        database = []
+        port_speeds = []
+        guest_core = []
+        local_disk = []
+        ram = []
+        for item in package['items']:
+            category = item['itemCategory']['categoryCode']
+            # Operating systems
+            if category == 'os':
+                operating_systems.append({
+                    'name': item['softwareDescription']['longDescription'],
+                    'key': item['keyName'],
+                    'referenceCode': item['softwareDescription']['referenceCode']
+                })
+            # database
+            elif category == 'database':
+                database.append({
+                    'name': item['description'],
+                    'key': item['keyName']
+                })
+
+            elif category == 'port_speed':
+                port_speeds.append({
+                    'name': item['description'],
+                    'key': item['keyName']
+                })
+
+            elif category == 'guest_core':
+                guest_core.append({
+                    'name': item['description'],
+                    'capacity': item['capacity'],
+                    'key': item['keyName']
+                })
+
+            elif category == 'ram':
+                ram.append({
+                    'name': item['description'],
+                    'capacity': item['capacity'],
+                    'key': item['keyName']
+                })
+
+            elif category.__contains__('guest_disk'):
+                local_disk.append({
+                    'name': item['description'],
+                    'capacity': item['capacity'],
+                    'key': item['keyName'],
+                    'disk': category
+                })
+            # Extras
+
+        return {
+            'locations': locations,
+            'ram': ram,
+            'database': database,
+            'operating_systems': operating_systems,
+            'guest_core': guest_core,
+            'port_speed': port_speeds,
+            'guest_disk': local_disk,
+            'flavors': self.guest.getCreateObjectOptions()['flavors']
+        }
+
+    @retry(logger=LOGGER)
+    def _get_package(self, package_keyname):
+        """Get the package related to simple hardware ordering."""
+        mask = '''
+            items[
+                description, keyName, capacity,
+                attributes[id,attributeTypeKeyName],
+                itemCategory[ id, categoryCode],
+                softwareDescription[id,referenceCode,longDescription],prices],
+                 regions[location[location[priceGroups]]]
+            '''
+        package = self.ordering_manager.get_package_by_key(package_keyname, mask=mask)
+        return package
 
     def cancel_instance(self, instance_id):
         """Cancel an instance immediately, deleting all its data.
