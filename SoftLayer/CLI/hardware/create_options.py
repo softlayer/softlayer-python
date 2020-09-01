@@ -7,18 +7,17 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import hardware
 
-
 @click.command()
 @click.argument('location', required=False)
-@click.option('--prices', '-p', is_flag=True, help='Use --prices to list the server item prices, and '
-                                                   'to list the Item Prices by location, add it to the '
-                                                   '--prices option using location KeyName, e.g. --prices AMSTERDAM02')
+@click.option('--prices', '-p', is_flag=True,
+              help='Use --prices to list the server item prices, and to list the Item Prices by location,'
+                   'add it to the --prices option using location short name, e.g. --prices dal13')
 @environment.pass_env
 def cli(env, prices, location=None):
     """Server order options for a given chassis."""
 
     hardware_manager = hardware.HardwareManager(env.client)
-    options = hardware_manager.get_create_options()
+    options = hardware_manager.get_create_options(location)
 
     tables = []
 
@@ -35,9 +34,6 @@ def cli(env, prices, location=None):
         _os_prices_table(options['operating_systems'], tables)
         _port_speed_prices_table(options['port_speeds'], tables)
         _extras_prices_table(options['extras'], tables)
-        if location:
-            location_prices = hardware_manager.get_hardware_item_prices(location)
-            _location_item_prices(location_prices, tables)
     else:
         # Presets
         preset_table = formatting.Table(['Size', 'Value'], title="Sizes")
