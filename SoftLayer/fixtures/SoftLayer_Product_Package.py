@@ -1138,6 +1138,53 @@ getItemPricesISCSI = [
         'sort': 0
     }]
 
+getItemsVS = [
+    {
+        'id': 1234,
+        'keyName': 'KeyName01',
+        'capacity': '1000',
+        'description': 'Public & Private Networks',
+        'itemCategory': {'categoryCode': 'Uplink Port Speeds'},
+        'softwareDescription': {
+            'id': 1228,
+            'longDescription': 'Redhat EL 5.10-64',
+            'referenceCode': 'REDHAT_5_64'
+        },
+        'prices': [{'id': 1122,
+                    'hourlyRecurringFee': 0.0,
+                    'recurringFee': 0.0,
+                    'categories': [{'id': 26,
+                                    'name': 'Uplink Port Speeds',
+                                    'categoryCode': 'port_speed'}]}],
+    },
+    {
+        'id': 2233,
+        'keyName': 'KeyName02',
+        'capacity': '1000',
+        'description': 'Public & Private Networks',
+        'itemCategory': {'categoryCode': 'Uplink Port Speeds'},
+        'prices': [{'id': 4477,
+                    'hourlyRecurringFee': 0.0,
+                    'recurringFee': 0.0,
+                    'categories': [{'id': 26,
+                                    'name': 'Uplink Port Speeds',
+                                    'categoryCode': 'port_speed'}]}],
+    },
+    {
+        'id': 1239,
+        'keyName': 'KeyName03',
+        'capacity': '2',
+        'description': 'RAM',
+        'itemCategory': {'categoryCode': 'RAM'},
+        'prices': [{'id': 1133,
+                    'hourlyRecurringFee': 0.0,
+                    'recurringFee': 0.0,
+                    'categories': [{'id': 3,
+                                    'name': 'RAM',
+                                    'categoryCode': 'ram'}]}],
+    }
+]
+
 verifyOrderDH = {
     'preTaxSetup': '0',
     'storageGroups': [],
