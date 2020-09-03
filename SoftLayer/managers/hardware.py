@@ -389,7 +389,7 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         location_group_id = None
         if datacenter:
-            _filter = {"name":{"operation":datacenter}}
+            _filter = {"name": {"operation": datacenter}}
             _mask = "mask[priceGroups]"
             dc_details = self.client.call('SoftLayer_Location', 'getDatacenters',
                                            mask=_mask, filter=_filter, limit=1)
@@ -462,14 +462,13 @@ class HardwareManager(utils.IdentifierMixin, object):
     @retry(logger=LOGGER)
     def _get_package(self):
         """Get the package related to simple hardware ordering."""
-        from pprint import pprint as pp
         items_mask = 'mask[id,keyName,capacity,description,attributes[id,attributeTypeKeyName],' \
                      'itemCategory[id,categoryCode],softwareDescription[id,referenceCode,longDescription],' \
-                     'prices]'
+                     'prices[categories]]'
         # The preset prices list will only have default prices. The prices->item->prices will have location specific
         presets_mask = 'mask[prices]'
         region_mask = 'location[location[priceGroups]]'
-        package = {'items': None,'activePresets': None, 'accountRestrictedActivePresets': None, 'regions': None}
+        package = {'items': None, 'activePresets': None, 'accountRestrictedActivePresets': None, 'regions': None}
         package_info = self.ordering_manager.get_package_by_key(self.package_keyname, mask="mask[id]")
 
         package['items'] = self.client.call('SoftLayer_Product_Package', 'getItems',
@@ -941,4 +940,3 @@ def get_item_price(prices, location_group_id=None):
 
     # Otherwise reutrn the default price list.
     return prices_list
- 

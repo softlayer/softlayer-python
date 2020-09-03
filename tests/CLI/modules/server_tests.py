@@ -360,28 +360,27 @@ class ServerCLITests(testing.TestCase):
 
         self.assert_no_fail(result)
         output = json.loads(result.output)
-        self.assertEqual(output[0][0]['Value'], 'wdc01')
-        self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects')
+        self.assertEqual(output[0][0]['Value'], 'wdc07')
 
     def test_create_options_prices(self):
         result = self.run_command(['server', 'create-options', '--prices'])
 
+        print("-----------------")
+        print(result.output)
         self.assert_no_fail(result)
         output = json.loads(result.output)
-        self.assertEqual(output[1][0]['Hourly'], "%.4f" % 1.18)
-        self.assertEqual(output[2][0]['OS Key'], 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT')
-        self.assertEqual(output[3][0]['Monthly'], '0')
-        self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects')
+        self.assertEqual(output[1][0]['Hourly'], "%.4f" % 0.0)
+        self.assertEqual(output[1][0]['Value'], 'M1_64X512X25')
+        self.assertEqual(output[1][0]['Size'], 'M1.64x512x25')
 
     def test_create_options_location(self):
-        result = self.run_command(['server', 'create-options', '--prices', 'AMSTERDAM02'])
+        result = self.run_command(['server', 'create-options', '--prices', 'dal13'])
 
         self.assert_no_fail(result)
         output = json.loads(result.output)
-        self.assertEqual(output[1][0]['Monthly'], "%.4f" % 780.0)
-        self.assertEqual(output[1][0]['Hourly'], "%.4f" % 1.18)
-        self.assertEqual(output[1][0]['Value'], 'S1270_8GB_2X1TBSATA_NORAID')
-        self.assert_called_with('SoftLayer_Product_Package', 'getItemPrices')
+        self.assertEqual(output[1][0]['Monthly'], "%.4f" % 0.0)
+        self.assertEqual(output[1][0]['Hourly'], "%.4f" % 0.0)
+        self.assertEqual(output[1][0]['Value'], 'M1_64X512X25')
 
     @mock.patch('SoftLayer.HardwareManager.place_order')
     def test_create_server(self, order_mock):

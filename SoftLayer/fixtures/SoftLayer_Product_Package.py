@@ -859,6 +859,11 @@ getItems = [
         'capacity': '1000',
         'description': 'Public & Private Networks',
         'itemCategory': {'categoryCode': 'Uplink Port Speeds'},
+        'softwareDescription': {
+            'id': 1228,
+            'longDescription': 'Redhat EL 5.10-64',
+            'referenceCode': 'REDHAT_5_64'
+        },
         'prices': [{'id': 1122,
                     'hourlyRecurringFee': 0.0,
                     'recurringFee': 0.0,
@@ -994,11 +999,11 @@ getItems = [
     },
     {
         'id': 66464,
-        'keyName': 'KeyName0211',
+        'keyName': '1_IPV6_ADDRESS',
         'capacity': '64',
         'description': '/64 Block Portable Public IPv6 Addresses',
         'itemCategory': {'categoryCode': 'static_ipv6_addresses'},
-        'prices': [{'id': 664641, 'hourlyRecurringFee': 0.0, 'recurringFee': 0.0}],
+        'prices': [{'id': 664641, 'hourlyRecurringFee': '0', 'locationGroupId': '', 'recurringFee': '0'}],
     },
     {
         'id': 610,
@@ -1007,7 +1012,64 @@ getItems = [
         'description': 'Global IPv6',
         'itemCategory': {'categoryCode': 'global_ipv6'},
         'prices': [{'id': 611, 'hourlyRecurringFee': 0.0, 'recurringFee': 0.0}],
-    }]
+    },
+    {'attributes': [],
+     'capacity': '0',
+     'description': '0 GB Bandwidth',
+     'itemCategory': {'categoryCode': 'bandwidth', 'id': 10},
+     'keyName': 'BANDWIDTH_0_GB_2',
+     'prices': [{'accountRestrictions': [],
+                 'currentPriceFlag': '',
+                 'hourlyRecurringFee': '0',
+                 'id': 1800,
+                 "locationGroupId": '',
+                 'itemId': 439,
+                 'laborFee': '0',
+                 'onSaleFlag': '',
+                 'oneTimeFee': '0',
+                 'quantity': '',
+                 'setupFee': '0',
+                 'sort': 99}]},
+    {'attributes': [],
+     'capacity': '10',
+     'description': '10 Mbps Public & Private Network Uplinks',
+     'itemCategory': {'categoryCode': 'port_speed', 'id': 26},
+     'keyName': '10_MBPS_PUBLIC_PRIVATE_NETWORK_UPLINKS',
+     'prices': [{'accountRestrictions': [],
+                 'currentPriceFlag': '',
+                 'hourlyRecurringFee': '0',
+                 'id': 272,
+                 "locationGroupId": '',
+                 'itemId': 186,
+                 'laborFee': '0',
+                 'onSaleFlag': '',
+                 'oneTimeFee': '0',
+                 'quantity': '',
+                 'recurringFee': '0',
+                 'setupFee': '0',
+                 'sort': 5}]},
+    {'attributes': [],
+     'capacity': '0',
+     'description': 'Ubuntu Linux 14.04 LTS Trusty Tahr (64 bit)',
+     'itemCategory': {'categoryCode': 'os', 'id': 12},
+     'keyName': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
+     'prices': [{'accountRestrictions': [],
+                 'currentPriceFlag': '',
+                 'hourlyRecurringFee': '0',
+                 'id': 37650,
+                 "locationGroupId": '',
+                 'itemId': 4702,
+                 'laborFee': '0',
+                 'onSaleFlag': '',
+                 'oneTimeFee': '0',
+                 'quantity': '',
+                 'recurringFee': '0',
+                 'setupFee': '0',
+                 'sort': 9}],
+     'softwareDescription': {'id': 1362,
+                             'longDescription': 'Ubuntu / 14.04-64',
+                             'referenceCode': 'UBUNTU_14_64'}}
+]
 
 getItemPricesISCSI = [
     {
@@ -1504,6 +1566,25 @@ getAllObjectsDHGpu = [{
 getRegions = [{
     "description": "WDC07 - Washington, DC",
     "keyname": "WASHINGTON07",
+    "location": {
+        "locationId": 2017603,
+        "location": {
+            "id": 2017603,
+            "longName": "Washington 7",
+            "name": "wdc07",
+            "priceGroups": [
+                {
+                    "description": "COS Regional - US East",
+                    "id": 1305,
+                    "locationGroupTypeId": 82,
+                    "name": "us-east",
+                    "locationGroupType": {
+                        "name": "PRICING"
+                    }
+                }
+            ]
+        }
+    },
     "locations": [{
         "location": {
             "euCompliantFlag": False,
