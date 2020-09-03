@@ -5,6 +5,7 @@
 """
 
 from SoftLayer.managers.account import AccountManager as AccountManager
+from SoftLayer import SoftLayerAPIError
 from SoftLayer import testing
 
 
@@ -133,3 +134,18 @@ class AccountManagerTests(testing.TestCase):
         self.manager.cancel_item(12345, reason, note)
         self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
                                 args=(False, True, reason, note), identifier=12345)
+
+    def test_get_billing_item_from_invoice(self):
+        self.manager.get_billing_item_from_invoice(12345)
+        self.assert_called_with('SoftLayer_Billing_Invoice_Item', 'getBillingItem', identifier=12345)
+
+    def test_get_item_details_with_billing_item_id(self):
+        self.manager.get_item_detail(12345)
+        self.assert_called_with('SoftLayer_Billing_Item', 'getObject', identifier=12345)
+
+    def test_get_item_details_with_invoice_item_id(self):
+        mock = self.set_mock('SoftLayer_Billing_Item', 'getObject')
+        mock.side_effect = SoftLayerAPIError(404, "Unable to find object with id of '123456'.")
+        self.manager.get_item_detail(123456)
+        self.assert_called_with('SoftLayer_Billing_Item', 'getObject', identifier=123456)
+        self.assert_called_with('SoftLayer_Billing_Invoice_Item', 'getBillingItem', identifier=123456)

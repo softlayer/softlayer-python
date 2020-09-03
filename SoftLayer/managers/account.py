@@ -8,6 +8,7 @@
 
 import logging
 
+from SoftLayer import SoftLayerAPIError
 from SoftLayer import utils
 
 # Invalid names are ignored due to long method names and short argument names
@@ -205,7 +206,7 @@ class AccountManager(utils.IdentifierMixin, object):
     def get_billing_item(self, identifier, mask=None):
         """Gets details about a billing item
 
-        :param int identifier Billing_Item id
+        :param int identifier: Billing_Item id
         :param string mask: Object mask to use.
         :return: Billing_Item
         """
@@ -218,6 +219,28 @@ class AccountManager(utils.IdentifierMixin, object):
             ]"""
 
         return self.client.call('Billing_Item', 'getObject', id=identifier, mask=mask)
+
+    def get_billing_item_from_invoice(self, identifier):
+        """Gets details about a billing item of a billing invoice item
+
+        :param int identifier: Billing_Invoice_Item id
+        :return: Billing_Item
+        """
+        return self.client.call('Billing_Invoice_Item', 'getBillingItem', id=identifier)
+
+    def get_item_detail(self, identifier):
+        """Gets details about a billing item
+
+        :param int identifier: Billing_Item id or Billing_Invoice_Item
+        :return: Billing_Item
+        """
+
+        try:
+            return self.get_billing_item(identifier)
+        except SoftLayerAPIError as exception:
+            if exception.faultCode == 404:
+                return self.get_billing_item_from_invoice(identifier)
+            raise
 
     def cancel_item(self, identifier, reason="No longer needed", note=None):
         """Cancels a specific billing item with a reason

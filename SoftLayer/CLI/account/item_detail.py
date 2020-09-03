@@ -14,7 +14,7 @@ from SoftLayer import utils
 def cli(env, identifier):
     """Gets detailed information about a billing item."""
     manager = AccountManager(env.client)
-    item = manager.get_billing_item(identifier)
+    item = manager.get_item_detail(identifier)
     env.fout(item_table(item))
 
 
