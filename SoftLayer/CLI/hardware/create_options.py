@@ -7,6 +7,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import hardware
 
+
 @click.command()
 @click.argument('location', required=False)
 @click.option('--prices', '-p', is_flag=True,

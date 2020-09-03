@@ -384,15 +384,14 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         :param string datacenter: short name, like dal09
         """
-        
+
         package = self._get_package()
 
         location_group_id = None
         if datacenter:
             _filter = {"name": {"operation": datacenter}}
             _mask = "mask[priceGroups]"
-            dc_details = self.client.call('SoftLayer_Location', 'getDatacenters',
-                                           mask=_mask, filter=_filter, limit=1)
+            dc_details = self.client.call('SoftLayer_Location', 'getDatacenters', mask=_mask, filter=_filter, limit=1)
             if not dc_details:
                 raise SoftLayerError("Unable to find a datacenter named {}".format(datacenter))
             # A DC will have several price groups, no good way to deal with this other than checking each.
@@ -881,7 +880,7 @@ def _get_location(package, location):
 
 def _get_preset_cost(preset, items, type_cost, location_group_id=None):
     """Get the preset cost.
-    
+
     :param preset list: SoftLayer_Product_Package_Preset[]
     :param items list: SoftLayer_Product_Item[]
     :param type_cost string: 'hourly' or 'monthly'
