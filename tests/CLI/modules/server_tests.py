@@ -365,8 +365,6 @@ class ServerCLITests(testing.TestCase):
     def test_create_options_prices(self):
         result = self.run_command(['server', 'create-options', '--prices'])
 
-        print("-----------------")
-        print(result.output)
         self.assert_no_fail(result)
         output = json.loads(result.output)
         self.assertEqual(output[1][0]['Hourly'], "%.4f" % 0.0)

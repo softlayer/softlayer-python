@@ -410,7 +410,6 @@ class HardwareManager(utils.IdentifierMixin, object):
                     'name': region['location']['location']['longName'],
                     'key': region['location']['location']['name'],
                 })
-
         # Sizes
         sizes = []
         for preset in package['activePresets'] + package['accountRestrictedActivePresets']:
@@ -467,7 +466,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         # The preset prices list will only have default prices. The prices->item->prices will have location specific
         presets_mask = 'mask[prices]'
         region_mask = 'location[location[priceGroups]]'
-        package = {'items': None, 'activePresets': None, 'accountRestrictedActivePresets': None, 'regions': None}
+        package = {'items': [], 'activePresets': [], 'accountRestrictedActivePresets': [], 'regions': []}
         package_info = self.ordering_manager.get_package_by_key(self.package_keyname, mask="mask[id]")
 
         package['items'] = self.client.call('SoftLayer_Product_Package', 'getItems',
@@ -902,15 +901,30 @@ def _get_preset_cost(preset, items, type_cost, location_group_id=None):
         # Need to find the location specific price
         if location_group_id:
             # Find the item in the packages item list
-            for item in items:
-                # Same item as the price's item
-                if item.get('id') == price.get('itemId'):
-                    # Find the items location specific price.
-                    for location_price in item.get('prices', []):
-                        if location_price.get('locationGroupId', 0) == location_group_id:
-                            item_cost += float(location_price.get(cost_key))
+            item_cost = find_item_in_package(cost_key, items, location_group_id, price)
         else:
             item_cost += float(price.get(cost_key))
+    return item_cost
+
+
+def find_item_in_package(cost_key, items, location_group_id, price):
+    """Find the item in the packages item list.
+
+    Will return the item cost.
+
+    :param string cost_key: item cost key hourlyRecurringFee or recurringFee.
+    :param list items: items list.
+    :param int location_group_id: locationGroupId's to get price for.
+    :param price: price data.
+    """
+    item_cost = 0.00
+    for item in items:
+        # Same item as the price's item
+        if item.get('id') == price.get('itemId'):
+            # Find the items location specific price.
+            for location_price in item.get('prices', []):
+                if location_price.get('locationGroupId', 0) == location_group_id:
+                    item_cost += float(location_price.get(cost_key))
     return item_cost
 
 
