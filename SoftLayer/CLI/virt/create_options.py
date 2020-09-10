@@ -9,15 +9,14 @@ from SoftLayer.CLI import formatting
 
 
 @click.command(short_help="Get options to use for creating virtual servers.")
-@click.option('--vsi-type', required=False, type=click.Choice(['TRANSIENT', 'SUSPEND']),
-              help="Billing rate")
+@click.option('--vsi-type', required=False, show_default=True, default='PUBLIC_CLOUD_SERVER',
+              type=click.Choice(['TRANSIENT_CLOUD_SERVER', 'SUSPEND_CLOUD_SERVER', 'PUBLIC_CLOUD_SERVER']),
+              help="Display options for a specific virtual server packages, for default is PUBLIC_CLOUD_SERVER, "
+                   "choose between TRANSIENT_CLOUD_SERVER, SUSPEND_CLOUD_SERVER, PUBLIC_CLOUD_SERVER")
 @environment.pass_env
 def cli(env, vsi_type):
     """Virtual server order options."""
-    if vsi_type is None:
-        vsi_type = 'PUBLIC'
 
-    vsi_type = vsi_type + '_CLOUD_SERVER'
     vsi = SoftLayer.VSManager(env.client)
     options = vsi.get_create_options(vsi_type)
 
@@ -41,13 +40,14 @@ def cli(env, vsi_type):
         os_table.add_row([operating_system['name'], operating_system['key'], operating_system['referenceCode']])
     tables.append(os_table)
 
-    flavors_table = formatting.Table(['flavor', 'Name'], title="Flavors")
-    flavors_table.sortby = 'Name'
-    flavors_table.align = 'l'
+    # Sizes
+    preset_table = formatting.Table(['Size', 'Value'], title="Sizes")
+    preset_table.sortby = 'Value'
+    preset_table.align = 'l'
 
-    for flavor in options['flavors']:
-        flavors_table.add_row([flavor['flavor']['keyName'], flavor['flavor']['name']])
-    tables.append(flavors_table)
+    for size in options['sizes']:
+        preset_table.add_row([size['name'], size['key']])
+    tables.append(preset_table)
 
     #  RAM
     ram_table = formatting.Table(['memory', 'Value'], title="RAM")

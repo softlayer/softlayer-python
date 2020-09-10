@@ -249,7 +249,7 @@ class VSManager(utils.IdentifierMixin, object):
         return self.guest.getObject(id=instance_id, **kwargs)
 
     @retry(logger=LOGGER)
-    def get_create_options(self, vsi_type):
+    def get_create_options(self, vsi_type="PUBLIC_CLOUD_SERVER"):
         """Retrieves the available options for creating a VS.
 
         :returns: A dictionary of creation options.
@@ -279,6 +279,14 @@ class VSManager(utils.IdentifierMixin, object):
         guest_core = []
         local_disk = []
         ram = []
+
+        sizes = []
+        for preset in package['activePresets'] + package['accountRestrictedActivePresets']:
+            sizes.append({
+                'name': preset['description'],
+                'key': preset['keyName']
+            })
+
         for item in package['items']:
             category = item['itemCategory']['categoryCode']
             # Operating systems
@@ -332,21 +340,22 @@ class VSManager(utils.IdentifierMixin, object):
             'guest_core': guest_core,
             'port_speed': port_speeds,
             'guest_disk': local_disk,
-            'flavors': self.guest.getCreateObjectOptions()['flavors']
+            'sizes': sizes
         }
 
     @retry(logger=LOGGER)
     def _get_package(self, package_keyname):
         """Get the package related to simple hardware ordering."""
         mask = '''
-            items[
-                description, keyName, capacity,
-                attributes[id,attributeTypeKeyName],
-                itemCategory[ id, categoryCode],
-                softwareDescription[id,referenceCode,longDescription],prices],
-                 regions[location[location[priceGroups]]]
-            '''
-        package = self.ordering_manager.get_package_by_key(package_keyname, mask=mask)
+           activePresets, accountRestrictedActivePresets,
+           items[description, keyName, capacity,
+           attributes[id, attributeTypeKeyName],
+           itemCategory[id, categoryCode],
+           softwareDescription[id, referenceCode, longDescription], prices],
+           regions[location[location[priceGroups]]]'''
+
+        package_id = self.ordering_manager.get_package_by_key(package_keyname, mask="mask[id]")['id']
+        package = self.client.call('Product_Package', 'getObject', id=package_id, mask=mask)
         return package
 
     def cancel_instance(self, instance_id):
