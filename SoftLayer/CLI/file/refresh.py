@@ -11,7 +11,7 @@ from SoftLayer.CLI import environment
 @click.argument('snapshot_id')
 @environment.pass_env
 def cli(env, volume_id, snapshot_id):
-    """"Refresh a duplicate volume with a snapshot from its parent."""
+    """Refresh a duplicate volume with a snapshot from its parent."""
     file_manager = SoftLayer.FileStorageManager(env.client)
     resp = file_manager.refresh_dupe(volume_id, snapshot_id)
 
