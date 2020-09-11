@@ -16,4 +16,3 @@ def cli(env, volume_id, snapshot_id):
     resp = block_manager.refresh_dupe(volume_id, snapshot_id)
 
     click.echo(resp)
-
