@@ -22,6 +22,11 @@ class AccountManager(utils.IdentifierMixin, object):
 
     :param SoftLayer.API.BaseClient client: the client instance
     """
+    _DEFAULT_BILLING_ITEM_MASK = """mask[
+                    orderItem[id,order[id,userRecord[id,email,displayName,userStatus]]],
+                    nextInvoiceTotalRecurringAmount,
+                    location, hourlyFlag, children
+                ]"""
 
     def __init__(self, client):
         self.client = client
@@ -212,21 +217,20 @@ class AccountManager(utils.IdentifierMixin, object):
         """
 
         if mask is None:
-            mask = """mask[
-                orderItem[id,order[id,userRecord[id,email,displayName,userStatus]]],
-                nextInvoiceTotalRecurringAmount,
-                location, hourlyFlag, children
-            ]"""
+            mask = self._DEFAULT_BILLING_ITEM_MASK
 
         return self.client.call('Billing_Item', 'getObject', id=identifier, mask=mask)
 
-    def get_billing_item_from_invoice(self, identifier):
+    def get_billing_item_from_invoice(self, identifier, mask=None):
         """Gets details about a billing item of a billing invoice item
 
         :param int identifier: Billing_Invoice_Item id
+        :param mask: Object mask to use.
         :return: Billing_Item
         """
-        return self.client.call('Billing_Invoice_Item', 'getBillingItem', id=identifier)
+        if mask is None:
+            mask = self._DEFAULT_BILLING_ITEM_MASK
+        return self.client.call('Billing_Invoice_Item', 'getBillingItem', id=identifier, mask=mask)
 
     def get_item_detail(self, identifier):
         """Gets details about a billing item
