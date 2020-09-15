@@ -314,10 +314,8 @@ class VirtTests(testing.TestCase):
         self.assertEqual(output.get('ptr', None), None)
 
     def test_create_options(self):
-        result = self.run_command(['vs', 'create-options', '--vsi-type', 'TRANSIENT'])
+        result = self.run_command(['vs', 'create-options', '--vsi-type', 'TRANSIENT_CLOUD_SERVER'])
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects')
-        self.assert_called_with('SoftLayer_Virtual_Guest', 'getCreateObjectOptions')
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_both(self, confirm_mock):

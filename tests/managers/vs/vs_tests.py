@@ -116,9 +116,9 @@ class VSTests(testing.TestCase):
                                 identifier=100)
 
     def test_get_create_options(self):
-        self.vs.get_create_options('PUBLIC_CLOUD_SERVER')
-        self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects')
-        self.assert_called_with('SoftLayer_Virtual_Guest', 'getCreateObjectOptions')
+        self.vs.get_create_options()
+        self.assert_called_with('SoftLayer_Product_Package', 'getObject',
+                                identifier=200)
 
     def test_cancel_instance(self):
         result = self.vs.cancel_instance(1)
