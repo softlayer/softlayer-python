@@ -360,8 +360,25 @@ class ServerCLITests(testing.TestCase):
 
         self.assert_no_fail(result)
         output = json.loads(result.output)
-        self.assertEqual(output[0][0]['Value'], 'wdc01')
-        self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects')
+        self.assertEqual(output[0][0]['Value'], 'wdc07')
+
+    def test_create_options_prices(self):
+        result = self.run_command(['server', 'create-options', '--prices'])
+
+        self.assert_no_fail(result)
+        output = json.loads(result.output)
+        self.assertEqual(output[1][0]['Hourly'], "%.4f" % 0.0)
+        self.assertEqual(output[1][0]['Value'], 'M1_64X512X25')
+        self.assertEqual(output[1][0]['Size'], 'M1.64x512x25')
+
+    def test_create_options_location(self):
+        result = self.run_command(['server', 'create-options', '--prices', 'dal13'])
+
+        self.assert_no_fail(result)
+        output = json.loads(result.output)
+        self.assertEqual(output[1][0]['Monthly'], "%.4f" % 0.0)
+        self.assertEqual(output[1][0]['Hourly'], "%.4f" % 0.0)
+        self.assertEqual(output[1][0]['Value'], 'M1_64X512X25')
 
     @mock.patch('SoftLayer.HardwareManager.place_order')
     def test_create_server(self, order_mock):

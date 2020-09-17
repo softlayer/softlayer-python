@@ -639,6 +639,9 @@ class VirtCreateTests(testing.TestCase):
         Since its hard to test if the price ids gets added to placeOrder call,
         this test juse makes sure that code block isn't being skipped
         """
+        confirm_mock.return_value = True
+        amock = self.set_mock('SoftLayer_Product_Package', 'getItems')
+        amock.return_value = SoftLayer_Product_Package.getItemsVS
         result = self.run_command(['vs', 'create', '--test', '--hostname', 'TEST',
                                    '--domain', 'TESTING', '--flavor', 'B1_2X8X25',
                                    '--datacenter', 'TEST00', '--os', 'UBUNTU_LATEST',
