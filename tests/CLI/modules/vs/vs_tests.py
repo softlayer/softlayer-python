@@ -314,14 +314,8 @@ class VirtTests(testing.TestCase):
         self.assertEqual(output.get('ptr', None), None)
 
     def test_create_options(self):
-        result = self.run_command(['vs', 'create-options'])
+        result = self.run_command(['vs', 'create-options', '--vsi-type', 'TRANSIENT_CLOUD_SERVER'])
         self.assert_no_fail(result)
-        self.assertIn('datacenter', result.output)
-        self.assertIn('flavor', result.output)
-        self.assertIn('memory', result.output)
-        self.assertIn('cpu', result.output)
-        self.assertIn('OS', result.output)
-        self.assertIn('network', result.output)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_both(self, confirm_mock):
@@ -887,6 +881,6 @@ class VirtTests(testing.TestCase):
         result = self.run_command(['vs', 'credentials', '100'])
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output), [{
-                                                    "username": "user",
-                                                    "password": "pass"
+            "username": "user",
+            "password": "pass"
         }])

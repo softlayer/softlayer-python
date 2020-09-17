@@ -116,10 +116,9 @@ class VSTests(testing.TestCase):
                                 identifier=100)
 
     def test_get_create_options(self):
-        results = self.vs.get_create_options()
-
-        self.assertEqual(
-            fixtures.SoftLayer_Virtual_Guest.getCreateObjectOptions, results)
+        self.vs.get_create_options()
+        self.assert_called_with('SoftLayer_Product_Package', 'getObject',
+                                identifier=200)
 
     def test_cancel_instance(self):
         result = self.vs.cancel_instance(1)

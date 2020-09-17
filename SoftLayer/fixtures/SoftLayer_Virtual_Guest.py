@@ -68,12 +68,12 @@ getObject = {
     }],
     'tagReferences': [{'tag': {'name': 'production'}}],
 }
-
 getCreateObjectOptions = {
     'flavors': [
         {
             'flavor': {
-                'keyName': 'B1_1X2X25'
+                'keyName': 'B1_1X2X25',
+                'name': 'B1-1X2X25'
             },
             'template': {
                 'supplementalCreateObjectOptions': {
@@ -83,7 +83,8 @@ getCreateObjectOptions = {
         },
         {
             'flavor': {
-                'keyName': 'B1_1X2X25_TRANSIENT'
+                'keyName': 'B1_1X2X25_TRANSIENT',
+                'name': 'B1-1X2X25_TRANSIENT'
             },
             'template': {
                 'supplementalCreateObjectOptions': {
@@ -94,7 +95,8 @@ getCreateObjectOptions = {
         },
         {
             'flavor': {
-                'keyName': 'B1_1X2X100'
+                'keyName': 'B1_1X2X100',
+                'name': 'B1-1X2X100'
             },
             'template': {
                 'supplementalCreateObjectOptions': {
@@ -104,7 +106,8 @@ getCreateObjectOptions = {
         },
         {
             'flavor': {
-                'keyName': 'BL1_1X2X100'
+                'keyName': 'BL1_1X2X100',
+                'name': 'BL1_1X2X100'
             },
             'template': {
                 'supplementalCreateObjectOptions': {
@@ -114,7 +117,8 @@ getCreateObjectOptions = {
         },
         {
             'flavor': {
-                'keyName': 'BL2_1X2X100'
+                'keyName': 'BL2_1X2X100',
+                'name': 'BL2-1X2X100'
             },
             'template': {
                 'supplementalCreateObjectOptions': {
@@ -124,7 +128,8 @@ getCreateObjectOptions = {
         },
         {
             'flavor': {
-                'keyName': 'C1_1X2X25'
+                'keyName': 'C1_1X2X25',
+                'name': 'C1-1X2X25'
             },
             'template': {
                 'supplementalCreateObjectOptions': {
@@ -134,7 +139,8 @@ getCreateObjectOptions = {
         },
         {
             'flavor': {
-                'keyName': 'M1_1X2X100'
+                'keyName': 'M1_1X2X100',
+                'name': 'M1_1X2X100'
             },
             'template': {
                 'supplementalCreateObjectOptions': {
@@ -144,7 +150,8 @@ getCreateObjectOptions = {
         },
         {
             'flavor': {
-                'keyName': 'AC1_1X2X100'
+                'keyName': 'AC1_1X2X100',
+                'name': 'AC1_1X2X100'
             },
             'template': {
                 'supplementalCreateObjectOptions': {
@@ -154,7 +161,8 @@ getCreateObjectOptions = {
         },
         {
             'flavor': {
-                'keyName': 'ACL1_1X2X100'
+                'keyName': 'ACL1_1X2X100',
+                'name': 'ACL1_1X2X100'
             },
             'template': {
                 'supplementalCreateObjectOptions': {
@@ -245,6 +253,12 @@ getCreateObjectOptions = {
     ],
     'memory': [
         {
+            "description": "1 GB ",
+            "attributes": [],
+            "itemCategory": {
+                "categoryCode": "ram",
+                "id": 4
+            },
             'itemPrice': {
                 'item': {'description': '1 GB'},
                 'hourlyRecurringFee': '.03',
@@ -253,14 +267,27 @@ getCreateObjectOptions = {
             'template': {'maxMemory': 1024}
         },
         {
-            'itemPrice': {
-                'item': {'description': '2 GB'},
-                'hourlyRecurringFee': '.06',
-                'recurringFee': '42'
+            "description": "2 GB ",
+            "attributes": [],
+            "itemCategory": {
+                "categoryCode": "ram",
+                "id": 5
             },
+            'itemPrice':
+                {
+                    'item': {'description': '2 GB'},
+                    'hourlyRecurringFee': '.06',
+                    'recurringFee': '42'
+                },
             'template': {'maxMemory': 2048}
         },
         {
+            "description": "3 GB",
+            "attributes": [],
+            "itemCategory": {
+                "categoryCode": "ram",
+                "id": 65
+            },
             'itemPrice': {
                 'item': {'description': '3 GB'},
                 'hourlyRecurringFee': '.085',
@@ -268,6 +295,12 @@ getCreateObjectOptions = {
             'template': {'maxMemory': 3072}
         },
         {
+            "description": "4 GB",
+            "attributes": [],
+            "itemCategory": {
+                "categoryCode": "ram",
+                "id": 35
+            },
             'itemPrice': {
                 'item': {'description': '4 GB'},
                 'hourlyRecurringFee': '.11',
@@ -276,6 +309,12 @@ getCreateObjectOptions = {
             'template': {'maxMemory': 4096}
         },
         {
+            "description": "64 GB (Dedicated Host)",
+            "attributes": [],
+            "itemCategory": {
+                "categoryCode": "ram",
+                "id": 3
+            },
             'itemPrice': {
                 'hourlyRecurringFee': '0',
                 'recurringFee': '0',
@@ -289,6 +328,12 @@ getCreateObjectOptions = {
             }
         },
         {
+            "description": "8 GB (Dedicated Host)",
+            "attributes": [],
+            "itemCategory": {
+                "categoryCode": "ram",
+                "id": 36
+            },
             'itemPrice': {
                 'hourlyRecurringFee': '0',
                 'recurringFee': '0',
@@ -423,6 +468,42 @@ getCreateObjectOptions = {
         {'template': {'datacenter': {'name': 'ams01'}}},
         {'template': {'datacenter': {'name': 'dal05'}}},
     ],
+    'guest_disk': [{
+        "description": "25 GB (SAN)",
+        "attributes": [
+            {
+                "id": 197,
+                "attributeTypeKeyName": "SAN_DISK"
+            }
+        ],
+        "itemCategory": {
+            "categoryCode": "guest_disk0",
+            "id": 81
+        }}, {
+            "description": "250 GB (SAN)",
+            "attributes": [
+                {
+                    "id": 198,
+                    "attributeTypeKeyName": "SAN_DISK"
+                }],
+            "itemCategory": {
+                "categoryCode": "guest_disk0",
+                "id": 89
+            }}],
+    'guest_core': [{
+        "description": "4 x 2.0 GHz or higher Cores (Dedicated)",
+        "attributes": [],
+        "itemCategory": {
+            "categoryCode": "guest_core",
+            "id": 80
+        }},
+                   {
+                       "description": "8 x 2.0 GHz or higher Cores",
+                       "attributes": [],
+                       "itemCategory": {
+                           "categoryCode": "guest_core",
+                           "id": 90
+                       }}]
 }
 
 getReverseDomainRecords = [{

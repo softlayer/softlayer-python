@@ -1949,3 +1949,108 @@ getItems_1_IPV6_ADDRESS = [
         ]
     }
 ]
+
+getObject = {
+    'id': 200,
+    'regions': [{'description': 'WDC01 - Washington, DC - East Coast U.S.',
+                 'keyname': 'WASHINGTON_DC',
+                 'location': {'location': {'id': 37473,
+                                           'longName': 'Washington 1',
+                                           'name': 'wdc01'}},
+                 'sortOrder': 10}],
+    'accountRestrictedActivePresets': [],
+    'activePresets': [
+        {
+            'description': 'AC2.8x60x25',
+            'id': 861,
+            'isActive': '1',
+            'keyName': 'AC2_8X60X25',
+            'name': 'AC2.8x60x25',
+            'packageId': 835
+        },
+        {
+            'description': 'AC2.8x60x100',
+            'id': 863,
+            'isActive': '1',
+            'keyName': 'AC2_8X60X100',
+            'name': 'AC2.8x60x100',
+            'packageId': 835
+        }],
+    "items": [{
+        "capacity": "56",
+        "description": "56 Cores x 360 RAM x 1.2 TB x 2 GPU P100 [encryption enabled]",
+        "bundleItems": [
+            {
+                "capacity": "1200",
+                "keyName": "1.2 TB Local Storage (Dedicated Host Capacity)",
+                "categories": [{
+                    "categoryCode": "dedicated_host_disk"
+                }]
+            },
+            {
+                "capacity": "242",
+                "keyName": "2_GPU_P100_DEDICATED",
+                "hardwareGenericComponentModel": {
+                    "capacity": "16",
+                    "id": 849,
+                    "hardwareComponentType": {
+                        "id": 20,
+                        "keyName": "GPU"
+                    }
+                },
+                "categories": [{
+                    "categoryCode": "dedicated_host_ram"
+                }, {
+                    "capacity": "2",
+                    "description": "2 x 2.0 GHz or higher Cores",
+                    "keyName": "GUEST_CORES_2",
+                    "attributes": [
+                        {
+                            "id": 8261,
+                            "attributeTypeKeyName": "ORDER_SAVES_USAGE_FEES"
+                        }
+                    ],
+                    "itemCategory": {
+                        "categoryCode": "guest_core",
+                        "id": 80
+                    }}]
+            }
+        ],
+        "prices": [
+            {
+                "itemId": 10195,
+                "setupFee": "0",
+                "recurringFee": "2099",
+                "tierMinimumThreshold": "",
+                "hourlyRecurringFee": "3.164",
+                "oneTimeFee": "0",
+                "currentPriceFlag": "",
+                "id": 200269,
+                "sort": 0,
+                "onSaleFlag": "",
+                "laborFee": "0",
+                "locationGroupId": "",
+                "quantity": ""
+            },
+            {
+                "itemId": 10195,
+                "setupFee": "0",
+                "recurringFee": "2161.97",
+                "tierMinimumThreshold": "",
+                "hourlyRecurringFee": "3.258",
+                "oneTimeFee": "0",
+                "currentPriceFlag": "",
+                "id": 200271,
+                "sort": 0,
+                "onSaleFlag": "",
+                "laborFee": "0",
+                "locationGroupId": 503,
+                "quantity": ""
+            }
+        ],
+        "keyName": "56_CORES_X_484_RAM_X_1_5_TB_X_2_GPU_P100",
+        "id": 10195,
+        "itemCategory": {
+            "categoryCode": "dedicated_virtual_hosts"
+        }
+    }]}
