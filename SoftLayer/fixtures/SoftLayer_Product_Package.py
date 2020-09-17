@@ -1,3 +1,4 @@
+# pylint: skip-file
 HARDWARE_ITEMS = [
     {'attributes': [],
      'capacity': '999',
