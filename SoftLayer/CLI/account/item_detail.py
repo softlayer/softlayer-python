@@ -27,6 +27,7 @@ def item_table(item):
     table.add_row(['cycleStartDate', utils.clean_time(item.get('cycleStartDate'), date_format, date_format)])
     table.add_row(['cancellationDate', utils.clean_time(item.get('cancellationDate'), date_format, date_format)])
     table.add_row(['description', item.get('description')])
+    table.align = 'l'
     fqdn = "{}.{}".format(item.get('hostName'), item.get('domain'))
     if fqdn != ".":
         table.add_row(['FQDN', fqdn])
