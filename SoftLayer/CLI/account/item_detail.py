@@ -22,7 +22,7 @@ def item_table(item):
     """Formats a table for billing items"""
 
     date_format = '%Y-%m-%d'
-    table = formatting.KeyValueTable(["Key", "Value"], title="{}".format(item.get('description', 'Billing Item')))
+    table = formatting.Table(["Key", "Value"], title="{}".format(item.get('description', 'Billing Item')))
     table.add_row(['createDate', utils.clean_time(item.get('createDate'), date_format, date_format)])
     table.add_row(['cycleStartDate', utils.clean_time(item.get('cycleStartDate'), date_format, date_format)])
     table.add_row(['cancellationDate', utils.clean_time(item.get('cancellationDate'), date_format, date_format)])
