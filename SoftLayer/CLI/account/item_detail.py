@@ -14,7 +14,7 @@ from SoftLayer import utils
 def cli(env, identifier):
     """Gets detailed information about a billing item."""
     manager = AccountManager(env.client)
-    item = manager.get_billing_item(identifier)
+    item = manager.get_item_detail(identifier)
     env.fout(item_table(item))
 
 
@@ -22,11 +22,12 @@ def item_table(item):
     """Formats a table for billing items"""
 
     date_format = '%Y-%m-%d'
-    table = formatting.KeyValueTable(["Key", "Value"], title="{}".format(item.get('description', 'Billing Item')))
+    table = formatting.Table(["Key", "Value"], title="{}".format(item.get('description', 'Billing Item')))
     table.add_row(['createDate', utils.clean_time(item.get('createDate'), date_format, date_format)])
     table.add_row(['cycleStartDate', utils.clean_time(item.get('cycleStartDate'), date_format, date_format)])
     table.add_row(['cancellationDate', utils.clean_time(item.get('cancellationDate'), date_format, date_format)])
     table.add_row(['description', item.get('description')])
+    table.align = 'l'
     fqdn = "{}.{}".format(item.get('hostName'), item.get('domain'))
     if fqdn != ".":
         table.add_row(['FQDN', fqdn])
