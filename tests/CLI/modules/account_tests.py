@@ -110,4 +110,9 @@ class AccountCLITests(testing.TestCase):
     def test_account_cancel_item(self):
         result = self.run_command(['account', 'cancel-item', '12345'])
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',  identifier='12345')
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem', identifier='12345')
+
+    def test_acccount_order(self):
+        result = self.run_command(['account', 'orders'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Billing_Order', 'getAllObjects')
