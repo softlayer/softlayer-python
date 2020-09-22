@@ -116,9 +116,88 @@ class VSTests(testing.TestCase):
                                 identifier=100)
 
     def test_get_create_options(self):
-        self.vs.get_create_options()
-        self.assert_called_with('SoftLayer_Product_Package', 'getObject',
-                                identifier=200)
+        options = self.vs.get_create_options()
+
+        extras = {'key': '1_IPV6_ADDRESS', 'name': '1 IPv6 Address'}
+        locations = {'key': 'wdc07', 'name': 'Washington 7'}
+        operating_systems = {
+            'key': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
+            'name': 'Ubuntu / 14.04-64',
+            'referenceCode': 'UBUNTU_14_64'
+        }
+
+        port_speeds = {
+            'key': '10',
+            'name': '10 Mbps Public & Private Network Uplinks'
+        }
+        sizes = {
+            'key': 'M1_64X512X25',
+            'name': 'M1.64x512x25',
+            'hourlyRecurringFee': 0.0,
+            'recurringFee': 0.0
+        }
+
+        self.assertEqual(options['extras'][0]['key'], extras['key'])
+        self.assertEqual(options['locations'][0], locations)
+        self.assertEqual(options['operating_systems'][0]['referenceCode'],
+                         operating_systems['referenceCode'])
+        self.assertEqual(options['port_speed'][0]['name'], port_speeds['name'])
+        self.assertEqual(options['sizes'][0], sizes)
+
+    def test_get_create_options_prices_by_location(self):
+        options = self.vs.get_create_options('wdc07')
+
+        extras = {'key': '1_IPV6_ADDRESS', 'name': '1 IPv6 Address',
+                  'prices': [
+                      {
+                          'hourlyRecurringFee': '0',
+                          'id': 272,
+                          'locationGroupId': '',
+                          'recurringFee': '0',
+                      }
+                  ]
+                  }
+        locations = {'key': 'wdc07', 'name': 'Washington 7'}
+        operating_systems = {
+            'key': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
+            'name': 'Ubuntu / 14.04-64',
+            'referenceCode': 'UBUNTU_14_64',
+            'prices': [
+                {
+                    'hourlyRecurringFee': '0',
+                    'id': 272,
+                    'locationGroupId': '',
+                    'recurringFee': '0',
+                }
+            ]
+        }
+
+        port_speeds = {
+            'key': '10',
+            'name': '10 Mbps Public & Private Network Uplinks',
+            'prices': [
+                {
+                    'hourlyRecurringFee': '0',
+                    'id': 272,
+                    'locationGroupId': '',
+                    'recurringFee': '0',
+                }
+            ]
+        }
+        sizes = {
+            'key': 'M1_64X512X25',
+            'name': 'M1.64x512x25',
+            'hourlyRecurringFee': 0.0,
+            'recurringFee': 0.0
+        }
+
+        self.assertEqual(options['extras'][0]['prices'][0]['hourlyRecurringFee'],
+                         extras['prices'][0]['hourlyRecurringFee'])
+        self.assertEqual(options['locations'][0], locations)
+        self.assertEqual(options['operating_systems'][0]['prices'][0]['locationGroupId'],
+                         operating_systems['prices'][0]['locationGroupId'])
+        self.assertEqual(options['port_speed'][0]['prices'][0]['id'], port_speeds['prices'][0]['id'])
+        self.assertEqual(options['sizes'][0], sizes)
 
     def test_cancel_instance(self):
         result = self.vs.cancel_instance(1)

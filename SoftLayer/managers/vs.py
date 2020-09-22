@@ -13,10 +13,19 @@ import warnings
 
 from SoftLayer.decoration import retry
 from SoftLayer import exceptions
+from SoftLayer.exceptions import SoftLayerError
+from SoftLayer.managers.hardware import _get_preset_cost
+from SoftLayer.managers.hardware import get_item_price
 from SoftLayer.managers import ordering
 from SoftLayer import utils
 
 LOGGER = logging.getLogger(__name__)
+
+EXTRA_CATEGORIES = ['pri_ipv6_addresses',
+                    'static_ipv6_addresses',
+                    'sec_ip_addresses',
+                    'trusted_platform_module',
+                    'software_guard_extensions']
 
 
 # pylint: disable=no-self-use,too-many-lines
@@ -249,9 +258,11 @@ class VSManager(utils.IdentifierMixin, object):
         return self.guest.getObject(id=instance_id, **kwargs)
 
     @retry(logger=LOGGER)
-    def get_create_options(self, vsi_type="PUBLIC_CLOUD_SERVER"):
+    def get_create_options(self, vsi_type="PUBLIC_CLOUD_SERVER", datacenter=None):
         """Retrieves the available options for creating a VS.
 
+        :param string vsi_type: vs keyName.
+        :param string datacenter: short name, like dal09
         :returns: A dictionary of creation options.
 
         Example::
@@ -265,26 +276,45 @@ class VSManager(utils.IdentifierMixin, object):
         # SUSPEND_CLOUD_SERVER
         package = self._get_package(vsi_type)
 
+        location_group_id = None
+        if datacenter:
+            _filter = {"name": {"operation": datacenter}}
+            _mask = "mask[priceGroups]"
+            dc_details = self.client.call('SoftLayer_Location', 'getDatacenters', mask=_mask, filter=_filter, limit=1)
+            if not dc_details:
+                raise SoftLayerError("Unable to find a datacenter named {}".format(datacenter))
+            # A DC will have several price groups, no good way to deal with this other than checking each.
+            # An item should only belong to one type of price group.
+            for group in dc_details[0].get('priceGroups', []):
+                # We only care about SOME of the priceGroups, which all SHOULD start with `Location Group X`
+                # Hopefully this never changes....
+                if group.get('description').startswith('Location'):
+                    location_group_id = group.get('id')
+
         # Locations
         locations = []
         for region in package['regions']:
-            locations.append({
-                'name': region['location']['location']['longName'],
-                'key': region['location']['location']['name'],
-            })
+            if datacenter is None or datacenter == region['location']['location']['name']:
+                locations.append({
+                    'name': region['location']['location']['longName'],
+                    'key': region['location']['location']['name'],
+                })
 
         operating_systems = []
         database = []
         port_speeds = []
         guest_core = []
         local_disk = []
+        extras = []
         ram = []
 
         sizes = []
         for preset in package['activePresets'] + package['accountRestrictedActivePresets']:
             sizes.append({
                 'name': preset['description'],
-                'key': preset['keyName']
+                'key': preset['keyName'],
+                'hourlyRecurringFee': _get_preset_cost(preset, package['items'], 'hourly', location_group_id),
+                'recurringFee': _get_preset_cost(preset, package['items'], 'monthly', location_group_id)
             })
 
         for item in package['items']:
@@ -294,33 +324,39 @@ class VSManager(utils.IdentifierMixin, object):
                 operating_systems.append({
                     'name': item['softwareDescription']['longDescription'],
                     'key': item['keyName'],
-                    'referenceCode': item['softwareDescription']['referenceCode']
+                    'referenceCode': item['softwareDescription']['referenceCode'],
+                    'prices': get_item_price(item['prices'], location_group_id)
                 })
             # database
             elif category == 'database':
                 database.append({
                     'name': item['description'],
-                    'key': item['keyName']
+                    'key': item['keyName'],
+                    'prices': get_item_price(item['prices'], location_group_id)
                 })
 
             elif category == 'port_speed':
                 port_speeds.append({
                     'name': item['description'],
-                    'key': item['keyName']
+                    'speed': item['capacity'],
+                    'key': item['keyName'],
+                    'prices': get_item_price(item['prices'], location_group_id)
                 })
 
             elif category == 'guest_core':
                 guest_core.append({
                     'name': item['description'],
                     'capacity': item['capacity'],
-                    'key': item['keyName']
+                    'key': item['keyName'],
+                    'prices': get_item_price(item['prices'], location_group_id)
                 })
 
             elif category == 'ram':
                 ram.append({
                     'name': item['description'],
                     'capacity': item['capacity'],
-                    'key': item['keyName']
+                    'key': item['keyName'],
+                    'prices': get_item_price(item['prices'], location_group_id)
                 })
 
             elif category.__contains__('guest_disk'):
@@ -328,9 +364,16 @@ class VSManager(utils.IdentifierMixin, object):
                     'name': item['description'],
                     'capacity': item['capacity'],
                     'key': item['keyName'],
-                    'disk': category
+                    'disk': category,
+                    'prices': get_item_price(item['prices'], location_group_id)
                 })
             # Extras
+            elif category in EXTRA_CATEGORIES:
+                extras.append({
+                    'name': item['description'],
+                    'key': item['keyName'],
+                    'prices': get_item_price(item['prices'], location_group_id)
+                })
 
         return {
             'locations': locations,
@@ -340,22 +383,34 @@ class VSManager(utils.IdentifierMixin, object):
             'guest_core': guest_core,
             'port_speed': port_speeds,
             'guest_disk': local_disk,
-            'sizes': sizes
+            'sizes': sizes,
+            'extras': extras,
         }
 
     @retry(logger=LOGGER)
     def _get_package(self, package_keyname):
-        """Get the package related to simple hardware ordering."""
-        mask = '''
-           activePresets, accountRestrictedActivePresets,
-           items[description, keyName, capacity,
-           attributes[id, attributeTypeKeyName],
-           itemCategory[id, categoryCode],
-           softwareDescription[id, referenceCode, longDescription], prices],
-           regions[location[location[priceGroups]]]'''
+        """Get the package related to simple vs ordering.
 
-        package_id = self.ordering_manager.get_package_by_key(package_keyname, mask="mask[id]")['id']
-        package = self.client.call('Product_Package', 'getObject', id=package_id, mask=mask)
+        :param string package_keyname: Virtual Server package keyName.
+        """
+        items_mask = 'mask[id,keyName,capacity,description,attributes[id,attributeTypeKeyName],' \
+                     'itemCategory[id,categoryCode],softwareDescription[id,referenceCode,longDescription],' \
+                     'prices[categories]]'
+        # The preset prices list will only have default prices. The prices->item->prices will have location specific
+        presets_mask = 'mask[prices]'
+        region_mask = 'location[location[priceGroups]]'
+        package = {'items': [], 'activePresets': [], 'accountRestrictedActivePresets': [], 'regions': []}
+        package_info = self.ordering_manager.get_package_by_key(package_keyname, mask="mask[id]")
+
+        package['items'] = self.client.call('SoftLayer_Product_Package', 'getItems',
+                                            id=package_info.get('id'), mask=items_mask)
+        package['activePresets'] = self.client.call('SoftLayer_Product_Package', 'getActivePresets',
+                                                    id=package_info.get('id'), mask=presets_mask)
+        package['accountRestrictedActivePresets'] = self.client.call('SoftLayer_Product_Package',
+                                                                     'getAccountRestrictedActivePresets',
+                                                                     id=package_info.get('id'), mask=presets_mask)
+        package['regions'] = self.client.call('SoftLayer_Product_Package', 'getRegions',
+                                              id=package_info.get('id'), mask=region_mask)
         return package
 
     def cancel_instance(self, instance_id):

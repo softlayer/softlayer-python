@@ -247,9 +247,6 @@ class HardwareTests(testing.TestCase):
             'recurringFee': 0.0
         }
 
-        print("---------")
-        print(options)
-
         self.assertEqual(options['extras'][0]['prices'][0]['hourlyRecurringFee'],
                          extras['prices'][0]['hourlyRecurringFee'])
         self.assertEqual(options['locations'][0], locations)
