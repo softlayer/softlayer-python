@@ -55,6 +55,26 @@ class FileTests(testing.TestCase):
             }],
             json.loads(result.output))
 
+    def test_volume_list_order(self):
+        result = self.run_command(['file', 'volume-list', '--order=1234567'])
+
+        self.assert_no_fail(result)
+        self.assertEqual([
+            {
+                'bytes_used': None,
+                'capacity_gb': 10,
+                'datacenter': 'Dallas',
+                'id': 1,
+                'ip_addr': '127.0.0.1',
+                'storage_type': 'ENDURANCE',
+                'username': 'user',
+                'active_transactions': None,
+                'mount_addr': '127.0.0.1:/TEST',
+                'notes': None,
+                'rep_partner_count': None
+            }],
+            json.loads(result.output))
+
     @mock.patch('SoftLayer.FileStorageManager.list_file_volumes')
     def test_volume_count(self, list_mock):
         list_mock.return_value = [

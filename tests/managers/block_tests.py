@@ -157,6 +157,46 @@ class BlockTests(testing.TestCase):
             mask='mask[%s]' % expected_mask
         )
 
+    def test_list_block_volumes_additional_filter_order(self):
+        result = self.block.list_block_volumes(order=1234567)
+
+        self.assertEqual(SoftLayer_Account.getIscsiNetworkStorage,
+                         result)
+
+        expected_filter = {
+            'iscsiNetworkStorage': {
+                'storageType': {
+                    'keyName': {'operation': '*= BLOCK_STORAGE'}
+                },
+                'serviceResource': {
+                    'type': {
+                        'type': {'operation': '!~ ISCSI'}
+                    }
+                },
+                'billingItem': {
+                    'orderItem': {
+                        'order': {
+                            'id': {'operation': 1234567}}}}
+            }
+        }
+
+        expected_mask = 'id,' \
+                        'username,' \
+                        'lunId,' \
+                        'capacityGb,' \
+                        'bytesUsed,' \
+                        'serviceResource.datacenter[name],' \
+                        'serviceResourceBackendIpAddress,' \
+                        'activeTransactionCount,' \
+                        'replicationPartnerCount'
+
+        self.assert_called_with(
+            'SoftLayer_Account',
+            'getIscsiNetworkStorage',
+            filter=expected_filter,
+            mask='mask[%s]' % expected_mask
+        )
+
     def test_list_block_volumes_with_additional_filters(self):
         result = self.block.list_block_volumes(datacenter="dal09",
                                                storage_type="Endurance",

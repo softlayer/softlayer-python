@@ -56,6 +56,7 @@ DEFAULT_NOTES_SIZE = 20
 @click.command()
 @click.option('--username', '-u', help='Volume username')
 @click.option('--datacenter', '-d', help='Datacenter shortname')
+@click.option('--order', '-o', help='Filter by ID of the order that purchased the block storage')
 @click.option('--storage-type',
               help='Type of storage volume',
               type=click.Choice(['performance', 'endurance']))
@@ -66,11 +67,12 @@ DEFAULT_NOTES_SIZE = 20
                   ', '.join(column.name for column in COLUMNS)),
               default=','.join(DEFAULT_COLUMNS))
 @environment.pass_env
-def cli(env, sortby, columns, datacenter, username, storage_type):
+def cli(env, sortby, columns, datacenter, username, order, storage_type):
     """List file storage."""
     file_manager = SoftLayer.FileStorageManager(env.client)
     file_volumes = file_manager.list_file_volumes(datacenter=datacenter,
                                                   username=username,
+                                                  order=order,
                                                   storage_type=storage_type,
                                                   mask=columns.mask())
 

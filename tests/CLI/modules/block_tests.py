@@ -141,6 +141,27 @@ class BlockTests(testing.TestCase):
             }],
             json.loads(result.output))
 
+    def test_volume_list_order(self):
+        result = self.run_command(['block', 'volume-list', '--order=1234567'])
+
+        self.assert_no_fail(result)
+        self.assertEqual([
+            {
+                'bytes_used': None,
+                'capacity_gb': 20,
+                'datacenter': 'dal05',
+                'id': 100,
+                'iops': None,
+                'ip_addr': '10.1.2.3',
+                'lunId': None,
+                'notes': "{'status': 'availabl",
+                'rep_partner_count': None,
+                'storage_type': 'ENDURANCE',
+                'username': 'username',
+                'active_transactions': None
+            }],
+            json.loads(result.output))
+
     @mock.patch('SoftLayer.BlockStorageManager.list_block_volumes')
     def test_volume_count(self, list_mock):
         list_mock.return_value = [

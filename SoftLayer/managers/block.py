@@ -25,9 +25,10 @@ class BlockStorageManager(StorageManager):
         """
         return self.get_volume_count_limits()
 
-    def list_block_volumes(self, datacenter=None, username=None, storage_type=None, **kwargs):
+    def list_block_volumes(self, datacenter=None, username=None, order=None, storage_type=None, **kwargs):
         """Returns a list of block volumes.
 
+        :param order: Volume order id.
         :param datacenter: Datacenter short name (e.g.: dal09)
         :param username: Name of volume.
         :param storage_type: Type of volume: Endurance or Performance
@@ -66,6 +67,10 @@ class BlockStorageManager(StorageManager):
         if username:
             _filter['iscsiNetworkStorage']['username'] = \
                 (utils.query_filter(username))
+
+        if order:
+            _filter['iscsiNetworkStorage']['billingItem']['orderItem'][
+                'order']['id'] = (utils.query_filter(order))
 
         kwargs['filter'] = _filter.to_dict()
         return self.client.call('Account', 'getIscsiNetworkStorage', **kwargs)
