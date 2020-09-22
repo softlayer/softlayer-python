@@ -35,3 +35,7 @@ Account Commands
 .. click:: SoftLayer.CLI.account.cancel_item:cli
     :prog: account cancel-item
     :show-nested:
+
+.. click:: SoftLayer.CLI.account.orders:cli
+    :prog: account orders
+    :show-nested:
