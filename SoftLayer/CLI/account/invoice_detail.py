@@ -19,6 +19,22 @@ def cli(env, identifier, details):
 
     manager = AccountManager(env.client)
     top_items = manager.get_billing_items(identifier)
+    table = get_invoice_table(identifier, top_items, details)
+    env.fout(table)
+
+
+def nice_string(ugly_string, limit=100):
+    """Format and trims strings"""
+    return (ugly_string[:limit] + '..') if len(ugly_string) > limit else ugly_string
+
+
+def get_invoice_table(identifier, top_items, details):
+    """Formats a table for invoice top level items.
+
+     :param int identifier: Invoice identifier.
+     :param list top_items: invoiceTopLevelItems.
+     :param bool details: To add very detailed list of charges.
+      """
 
     title = "Invoice %s" % identifier
     table = formatting.Table(["Item Id", "Category", "Description", "Single",
@@ -52,10 +68,4 @@ def cli(env, identifier, details):
                     '---',
                     '---'
                 ])
-
-    env.fout(table)
-
-
-def nice_string(ugly_string, limit=100):
-    """Format and trims strings"""
-    return (ugly_string[:limit] + '..') if len(ugly_string) > limit else ugly_string
+    return table

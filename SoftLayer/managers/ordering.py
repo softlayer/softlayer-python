@@ -11,7 +11,6 @@ from re import match
 
 from SoftLayer import exceptions
 
-
 CATEGORY_MASK = '''id, isRequired, itemCategory[id, name, categoryCode]'''
 
 ITEM_MASK = '''id, keyName, description, itemCategory, categories, prices'''
@@ -60,6 +59,28 @@ class OrderingManager(object):
         packages = self.package_svc.getAllObjects(mask=mask, filter=_filter)
         packages = self.filter_outlet_packages(packages)
         return packages
+
+    def get_order_detail(self, order_id, mask=None):
+        """Get order details.
+
+        :param int order_id: to specify the order that we want to retrieve.
+        :param string mask: Mask to specify the properties we want to retrieve.
+        """
+        _default_mask = (
+            'mask[orderTotalAmount,orderApprovalDate,'
+            'initialInvoice[id,amount,invoiceTotalAmount,'
+            'invoiceTopLevelItems[id, description, hostName, domainName, oneTimeAfterTaxAmount,'
+            'recurringAfterTaxAmount, createDate,'
+            'categoryCode,'
+            'category[name],'
+            'location[name],'
+            'children[id, category[name], description, oneTimeAfterTaxAmount,recurringAfterTaxAmount]]],'
+            'items[description],userRecord[displayName,userStatus]]')
+
+        mask = _default_mask if mask is None else mask
+
+        order = self.billing_svc.getObject(mask=mask, id=order_id)
+        return order
 
     @staticmethod
     def filter_outlet_packages(packages):
