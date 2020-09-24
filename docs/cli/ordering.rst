@@ -135,3 +135,9 @@ Quotes
 .. click:: SoftLayer.CLI.order.place_quote:cli
     :prog: order place-quote
     :show-nested:
+
+Lookup
+======
+.. click:: SoftLayer.CLI.order.lookup:cli
+    :prog: order lookup
+    :show-nested:
