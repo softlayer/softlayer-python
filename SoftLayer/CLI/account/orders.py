@@ -11,7 +11,7 @@ from SoftLayer import utils
 
 @click.command()
 @click.option('--limit', '-l',
-              help='How many results to get in one api call, default is 100',
+              help='How many results to get in one api call',
               default=100,
               show_default=True)
 @environment.pass_env
@@ -22,7 +22,6 @@ def cli(env, limit):
 
     order_table = formatting.Table(['Id', 'State', 'User', 'Date', 'Amount', 'Item'],
                                    title="orders")
-    order_table.sortby = 'Amount'
     order_table.align = 'l'
 
     for order in orders:

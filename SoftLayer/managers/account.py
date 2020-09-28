@@ -247,6 +247,5 @@ class AccountManager(utils.IdentifierMixin, object):
                   initialInvoice[id,amount,invoiceTotalAmount],
                   items[description]
                """
-        print(limit)
         return self.client.call('Billing_Order', 'getAllObjects',
                                 limit=limit, mask=mask)
