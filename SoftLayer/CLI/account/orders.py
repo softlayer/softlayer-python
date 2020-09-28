@@ -20,10 +20,9 @@ def cli(env, limit):
     manager = AccountManager(env.client)
     orders = manager.get_account_all_billing_orders(limit)
 
-    table = []
-    order_table = formatting.Table(['id', 'State', 'user', 'PurchaseDate', 'orderTotalAmount', 'Items'],
+    order_table = formatting.Table(['Id', 'State', 'User', 'Date', 'Amount', 'Item'],
                                    title="orders")
-    order_table.sortby = 'orderTotalAmount'
+    order_table.sortby = 'Amount'
     order_table.align = 'l'
 
     for order in orders:
@@ -34,5 +33,4 @@ def cli(env, limit):
 
         order_table.add_row([order['id'], order['status'], order['userRecord']['username'], create_date,
                              order['orderTotalAmount'], utils.trim_to(' '.join(map(str, items)), 50)])
-    table.append(order_table)
-    env.fout(formatting.listing(table, separator='\n'))
+    env.fout(order_table)

@@ -234,7 +234,7 @@ class AccountManager(utils.IdentifierMixin, object):
 
         return self.client.call('Billing_Item', 'cancelItem', False, True, reason, note, id=identifier)
 
-    def get_account_all_billing_orders(self, limit, mask=None):
+    def get_account_all_billing_orders(self, limit=100, mask=None):
         """Gets all the topLevelBillingItems currently active on the account
 
         :param string mask: Object Mask
@@ -247,14 +247,6 @@ class AccountManager(utils.IdentifierMixin, object):
                   initialInvoice[id,amount,invoiceTotalAmount],
                   items[description]
                """
-        object_filter = {
-            'createDate': {
-                'operation': 'orderBy',
-                'options': [{
-                    'name': 'sort',
-                    'value': ['DESC']
-                }]}
-            }
-
+        print(limit)
         return self.client.call('Billing_Order', 'getAllObjects',
-                                limit=limit, mask=mask, filter=object_filter)
+                                limit=limit, mask=mask)
