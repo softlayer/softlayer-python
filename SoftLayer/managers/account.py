@@ -260,3 +260,19 @@ class AccountManager(utils.IdentifierMixin, object):
             note = "Cancelled by {} with the SLCLI".format(user.get('username'))
 
         return self.client.call('Billing_Item', 'cancelItem', False, True, reason, note, id=identifier)
+
+    def get_account_all_billing_orders(self, limit=100, mask=None):
+        """Gets all the topLevelBillingItems currently active on the account
+
+        :param string mask: Object Mask
+        :return: Billing_Item
+        """
+
+        if mask is None:
+            mask = """
+                  orderTotalAmount, userRecord,
+                  initialInvoice[id,amount,invoiceTotalAmount],
+                  items[description]
+               """
+        return self.client.call('Billing_Order', 'getAllObjects',
+                                limit=limit, mask=mask)
