@@ -81,7 +81,7 @@ def _preset_prices_table(sizes, tables):
     preset_prices_table.sortby = 'Value'
     preset_prices_table.align = 'l'
     for size in sizes:
-        if ("%.4f" % size['hourlyRecurringFee'] != '0.0000') or ("%.4f" % size['recurringFee'] != '0.0000'):
+        if (_verify_prices("%.4f" % size['hourlyRecurringFee'])) or (_verify_prices("%.4f" % size['recurringFee'])):
             preset_prices_table.add_row([size['name'], size['key'], "%.4f" % size['hourlyRecurringFee'],
                                          "%.4f" % size['recurringFee']])
     tables.append(preset_prices_table)
@@ -99,8 +99,8 @@ def _os_prices_table(operating_systems, tables):
     os_prices_table.align = 'l'
     for operating_system in operating_systems:
         for price in operating_system['prices']:
-            if (_get_price_data(price, 'hourlyRecurringFee') != '0') or (
-                    _get_price_data(price, 'recurringFee') != '0'):
+            if (_verify_prices(_get_price_data(price, 'hourlyRecurringFee'))) or (
+                    _verify_prices(_get_price_data(price, 'recurringFee'))):
                 cr_max = _get_price_data(price, 'capacityRestrictionMaximum')
                 cr_min = _get_price_data(price, 'capacityRestrictionMinimum')
                 cr_type = _get_price_data(price, 'capacityRestrictionType')
@@ -124,8 +124,8 @@ def _port_speed_prices_table(port_speeds, tables):
     port_speed_prices_table.align = 'l'
     for speed in port_speeds:
         for price in speed['prices']:
-            if (_get_price_data(price, 'hourlyRecurringFee') != '0') or (
-                    _get_price_data(price, 'recurringFee') != '0'):
+            if (_verify_prices(_get_price_data(price, 'hourlyRecurringFee'))) or (
+                    _verify_prices(_get_price_data(price, 'recurringFee'))):
                 cr_max = _get_price_data(price, 'capacityRestrictionMaximum')
                 cr_min = _get_price_data(price, 'capacityRestrictionMinimum')
                 cr_type = _get_price_data(price, 'capacityRestrictionType')
@@ -135,6 +135,19 @@ def _port_speed_prices_table(port_speeds, tables):
                      _get_price_data(price, 'recurringFee'),
                      "%s - %s %s" % (cr_min, cr_max, cr_type)])
     tables.append(port_speed_prices_table)
+
+
+def _verify_prices(prices):
+    """Verify the prices is higher to zero(0) or is '-'.
+
+    param prices:  value to verify.
+    Returns: true false.
+
+    """
+    if prices == '-':
+        return True
+    else:
+        return float(prices) > 0
 
 
 def _extras_prices_table(extras, tables):
@@ -148,8 +161,8 @@ def _extras_prices_table(extras, tables):
     extras_prices_table.align = 'l'
     for extra in extras:
         for price in extra['prices']:
-            if (_get_price_data(price, 'hourlyRecurringFee') != '0') or (
-                    _get_price_data(price, 'recurringFee') != '0'):
+            if (_verify_prices(_get_price_data(price, 'hourlyRecurringFee'))) or (
+                    _verify_prices(_get_price_data(price, 'recurringFee'))):
                 cr_max = _get_price_data(price, 'capacityRestrictionMaximum')
                 cr_min = _get_price_data(price, 'capacityRestrictionMinimum')
                 cr_type = _get_price_data(price, 'capacityRestrictionType')
@@ -183,7 +196,8 @@ def _location_item_prices(location_prices, tables):
     location_prices_table.sortby = 'keyName'
     location_prices_table.align = 'l'
     for price in location_prices:
-        if (_get_price_data(price, 'hourlyRecurringFee') != '0') or (_get_price_data(price, 'recurringFee') != '0'):
+        if (_verify_prices(_get_price_data(price, 'hourlyRecurringFee'))) or (
+                _verify_prices(_get_price_data(price, 'recurringFee'))):
             cr_max = _get_price_data(price, 'capacityRestrictionMaximum')
             cr_min = _get_price_data(price, 'capacityRestrictionMinimum')
             cr_type = _get_price_data(price, 'capacityRestrictionType')
