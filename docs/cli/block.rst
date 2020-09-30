@@ -112,11 +112,11 @@ Block Commands
     :show-nested:
 
 .. click:: SoftLayer.CLI.block.refresh:cli
-   :prog block volume-refresh
+   :prog: block volume-refresh
    :show-nested:
 
 .. click:: SoftLayer.CLI.block.convert:cli
-   :prog block volume-convert
+   :prog: block volume-convert
    :show-nested:
 
 .. click:: SoftLayer.CLI.block.subnets.list:cli

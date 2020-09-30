@@ -100,11 +100,11 @@ File Commands
     :show-nested:
 
 .. click:: SoftLayer.CLI.file.refresh:cli
-    :prog file volume-refresh
+    :prog: file volume-refresh
     :show-nested:
 
 .. click:: SoftLayer.CLI.file.convert:cli
-    :prog file volume-convert
+    :prog: file volume-convert
     :show-nested:
 
 .. click:: SoftLayer.CLI.file.snapshot.schedule_list:cli

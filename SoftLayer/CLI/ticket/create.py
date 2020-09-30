@@ -25,19 +25,18 @@ from SoftLayer.CLI import ticket
 def cli(env, title, subject_id, body, hardware_identifier, virtual_identifier, priority):
     """Create a Infrastructure support ticket.
 
-    Example::
-
-    Will create the ticket with `Some text`.
+    Will create the ticket with `Some text`.::
 
         slcli ticket create --body="Some text" --subject-id 1522 --hardware 12345 --title "My New Ticket"
 
-    Will create the ticket with text from STDIN
+    Will create the ticket with text from STDIN::
 
         cat sometfile.txt | slcli ticket create --subject-id 1003 --virtual 111111 --title "Reboot Me"
 
-    Will open the default text editor, and once closed, use that text to create the ticket
+    Will open the default text editor, and once closed, use that text to create the ticket::
 
         slcli ticket create --subject-id 1482 --title "Vyatta Questions..."
+
     """
     ticket_mgr = SoftLayer.TicketManager(env.client)
     if body is None:
