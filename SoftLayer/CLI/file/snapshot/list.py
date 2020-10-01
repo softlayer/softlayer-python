@@ -8,7 +8,6 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
-
 COLUMNS = [
     column_helper.Column('id', ('id',), mask='id'),
     column_helper.Column('name', ('notes',), mask='notes'),
