@@ -186,8 +186,7 @@ def database_prices_table(database_list, prices=False):
     :param [] database_list: List of Virtual Server database.
     :param prices: Include pricing information or not.
     """
-    database_price_table = formatting.Table(['Key', 'Hourly', 'Monthly', 'Restriction'],
-                                      title="Data Base Prices")
+    database_price_table = formatting.Table(['Key', 'Hourly', 'Monthly', 'Restriction'], title="Data Base Prices")
     database_price_table.sortby = 'Key'
     database_price_table.align = 'l'
 
