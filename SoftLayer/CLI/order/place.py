@@ -43,7 +43,7 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
     """Place or verify an order.
 
 \b
-1. Find the package keyName from `slcli order package-list` 
+1. Find the package keyName from `slcli order package-list`
 2. Find the location from `slcli order package-locations PUBLIC_CLOUD_SERVER`
   If the package does not require a location, use 'NONE' instead.
 3. Find the needed items `slcli order item-list PUBLIC_CLOUD_SERVER`
@@ -53,7 +53,7 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
 
     Example::
 
-        slcli order place --verify --preset B1_2X8X100 --billing hourly 
+        slcli order place --verify --preset B1_2X8X100 --billing hourly
         --complex-type SoftLayer_Container_Product_Order_Virtual_Guest
         --extras '{"virtualGuests": [{"hostname": "test", "domain": "ibm.com"}]}'
         PUBLIC_CLOUD_SERVER DALLAS13
@@ -104,4 +104,3 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
         table.add_row(['created', order['orderDate']])
         table.add_row(['status', order['placedOrder']['status']])
     env.fout(table)
-
