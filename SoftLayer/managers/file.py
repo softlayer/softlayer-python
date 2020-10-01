@@ -22,13 +22,13 @@ class FileStorageManager(StorageManager):
         """
         return self.get_volume_count_limits()
 
-    def list_file_volumes(self, datacenter=None, username=None, order=None, storage_type=None, **kwargs):
+    def list_file_volumes(self, datacenter=None, username=None, storage_type=None, order=None, **kwargs):
         """Returns a list of file volumes.
 
-        :param order: Volume order id.
         :param datacenter: Datacenter short name (e.g.: dal09)
         :param username: Name of volume.
         :param storage_type: Type of volume: Endurance or Performance
+        :param order: Volume order id.
         :param kwargs:
         :return: Returns a list of file volumes.
         """

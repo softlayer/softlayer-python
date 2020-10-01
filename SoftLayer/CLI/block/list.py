@@ -58,7 +58,7 @@ DEFAULT_NOTES_SIZE = 20
 @click.command()
 @click.option('--username', '-u', help='Volume username')
 @click.option('--datacenter', '-d', help='Datacenter shortname')
-@click.option('--order', '-o', help='Filter by ID of the order that purchased the block storage')
+@click.option('--order', '-o', type=int, help='Filter by ID of the order that purchased the block storage')
 @click.option('--storage-type',
               help='Type of storage volume',
               type=click.Choice(['performance', 'endurance']))
@@ -74,8 +74,8 @@ def cli(env, sortby, columns, datacenter, username, storage_type, order):
     block_manager = SoftLayer.BlockStorageManager(env.client)
     block_volumes = block_manager.list_block_volumes(datacenter=datacenter,
                                                      username=username,
-                                                     order=order,
                                                      storage_type=storage_type,
+                                                     order=order,
                                                      mask=columns.mask())
 
     table = formatting.Table(columns.columns)
