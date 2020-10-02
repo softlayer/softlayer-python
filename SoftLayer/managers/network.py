@@ -171,7 +171,10 @@ class NetworkManager(object):
                     item.get('capacity') == quantity_str,
                     version == 4 or (version == 6 and
                                      desc in item['description'])]):
-                price_id = item['prices'][0]['id']
+                if version == 4 and subnet_type == 'static':
+                    price_id = item['prices'][1]['id']
+                else:
+                    price_id = item['prices'][0]['id']
                 break
 
         order = {

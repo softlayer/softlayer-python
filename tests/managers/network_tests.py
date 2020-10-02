@@ -100,6 +100,14 @@ class NetworkTests(testing.TestCase):
 
         self.assertEqual(fixtures.SoftLayer_Product_Order.verifyOrder, result)
 
+        result = self.network.add_subnet('static',
+                                         quantity=8,
+                                         endpoint_id=1234,
+                                         version=4,
+                                         test_order=True)
+
+        self.assertEqual(fixtures.SoftLayer_Product_Order.verifyOrder, result)
+
     def test_add_subnet_for_ipv6(self):
         # Test a public IPv6 order
         result = self.network.add_subnet('public',
