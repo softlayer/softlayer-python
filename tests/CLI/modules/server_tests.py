@@ -368,16 +368,15 @@ class ServerCLITests(testing.TestCase):
         self.assert_no_fail(result)
         output = json.loads(result.output)
         self.assertEqual(output[2][0]['Monthly'], str(0.1))
-        self.assertEqual(output[2][0]['OS Key'], 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT')
+        self.assertEqual(output[2][0]['Key'], 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT')
 
     def test_create_options_location(self):
         result = self.run_command(['server', 'create-options', '--prices', 'dal13'])
 
         self.assert_no_fail(result)
         output = json.loads(result.output)
-        print(output)
         self.assertEqual(output[2][0]['Monthly'], str(0.1))
-        self.assertEqual(output[2][0]['OS Key'], 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT')
+        self.assertEqual(output[2][0]['Key'], 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT')
 
     @mock.patch('SoftLayer.HardwareManager.place_order')
     def test_create_server(self, order_mock):
