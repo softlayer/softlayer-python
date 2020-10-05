@@ -141,6 +141,13 @@ class BlockTests(testing.TestCase):
             }],
             json.loads(result.output))
 
+    def test_volume_list_order(self):
+        result = self.run_command(['block', 'volume-list', '--order=1234567'])
+
+        self.assert_no_fail(result)
+        json_result = json.loads(result.output)
+        self.assertEqual(json_result[0]['id'], 100)
+
     @mock.patch('SoftLayer.BlockStorageManager.list_block_volumes')
     def test_volume_count(self, list_mock):
         list_mock.return_value = [
@@ -199,7 +206,9 @@ class BlockTests(testing.TestCase):
                          'Order #478 placed successfully!\n'
                          ' > Performance Storage\n > Block Storage\n'
                          ' > 0.25 IOPS per GB\n > 20 GB Storage Space\n'
-                         ' > 10 GB Storage Space (Snapshot Space)\n')
+                         ' > 10 GB Storage Space (Snapshot Space)\n'
+                         '\nYou may run "slcli block volume-list --order 478" to find this block volume '
+                         'after it is ready.\n')
 
     def test_volume_order_endurance_tier_not_given(self):
         result = self.run_command(['block', 'volume-order',
@@ -232,7 +241,9 @@ class BlockTests(testing.TestCase):
                          'Order #478 placed successfully!\n'
                          ' > Endurance Storage\n > Block Storage\n'
                          ' > 0.25 IOPS per GB\n > 20 GB Storage Space\n'
-                         ' > 10 GB Storage Space (Snapshot Space)\n')
+                         ' > 10 GB Storage Space (Snapshot Space)\n'
+                         '\nYou may run "slcli block volume-list --order 478" to find this block volume '
+                         'after it is ready.\n')
 
     @mock.patch('SoftLayer.BlockStorageManager.order_block_volume')
     def test_volume_order_order_not_placed(self, order_mock):
@@ -281,7 +292,9 @@ class BlockTests(testing.TestCase):
                          ' > Storage as a Service\n'
                          ' > Block Storage\n'
                          ' > 20 GB Storage Space\n'
-                         ' > 200 IOPS\n')
+                         ' > 200 IOPS\n'
+                         '\nYou may run "slcli block volume-list --order 10983647" to find this block volume '
+                         'after it is ready.\n')
 
     @mock.patch('SoftLayer.BlockStorageManager.order_block_volume')
     def test_volume_order_performance_manager_error(self, order_mock):
