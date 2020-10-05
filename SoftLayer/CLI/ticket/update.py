@@ -16,17 +16,15 @@ from SoftLayer.CLI import ticket
 def cli(env, identifier, body):
     """Adds an update to an existing ticket.
 
-    Example::
-
-    Will update the ticket with `Some text`.
+Will update the ticket with `Some text`.::
 
         slcli ticket update 123456 --body="Some text"
 
-    Will update the ticket with text from STDIN
+Will update the ticket with text from STDIN::
 
         cat sometfile.txt | slcli ticket update 123456
 
-    Will open the default text editor, and once closed, use that text to update the ticket
+Will open the default text editor, and once closed, use that text to update the ticket::
 
         slcli ticket update 123456
     """

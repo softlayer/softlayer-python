@@ -594,6 +594,10 @@ class OrderingTests(testing.TestCase):
         dc_id = self.ordering.get_location_id(1234)
         self.assertEqual(1234, dc_id)
 
+    def test_get_location_id_NONE(self):
+        dc_id = self.ordering.get_location_id("NONE")
+        self.assertEqual(0, dc_id)
+
     def test_location_group_id_none(self):
         # RestTransport uses None for empty locationGroupId
         category1 = {'categoryCode': 'cat1'}

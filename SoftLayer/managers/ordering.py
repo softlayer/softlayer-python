@@ -634,6 +634,9 @@ class OrderingManager(object):
 
         if isinstance(location, int):
             return location
+        # Some orders dont require a location, just use 0
+        if location.upper() == "NONE":
+            return 0
         mask = "mask[id,name,regions[keyname]]"
         if match(r'[a-zA-Z]{3}[0-9]{2}', location) is not None:
             search = {'name': {'operation': location}}
