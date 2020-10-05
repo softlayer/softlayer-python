@@ -5,6 +5,7 @@ import click
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 
 
 COLUMNS = [
@@ -26,7 +27,8 @@ def cli(env, access_id):
 
     try:
         block_manager = SoftLayer.BlockStorageManager(env.client)
-        subnets = block_manager.get_subnets_in_acl(access_id)
+        resolved_id = helpers.resolve_id(block_manager.resolve_ids, access_id, 'Volume Id')
+        subnets = block_manager.get_subnets_in_acl(resolved_id)
 
         table = formatting.Table(COLUMNS)
         for subnet in subnets:
