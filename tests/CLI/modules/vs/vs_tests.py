@@ -317,6 +317,14 @@ class VirtTests(testing.TestCase):
         result = self.run_command(['vs', 'create-options', '--vsi-type', 'TRANSIENT_CLOUD_SERVER'])
         self.assert_no_fail(result)
 
+    def test_create_options_prices(self):
+        result = self.run_command(['vs', 'create-options', '--prices', '--vsi-type', 'TRANSIENT_CLOUD_SERVER'])
+        self.assert_no_fail(result)
+
+    def test_create_options_prices_location(self):
+        result = self.run_command(['vs', 'create-options', '--prices', 'dal13', '--vsi-type', 'TRANSIENT_CLOUD_SERVER'])
+        self.assert_no_fail(result)
+
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_both(self, confirm_mock):
         confirm_mock.return_value = True
