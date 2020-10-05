@@ -22,12 +22,13 @@ class FileStorageManager(StorageManager):
         """
         return self.get_volume_count_limits()
 
-    def list_file_volumes(self, datacenter=None, username=None, storage_type=None, **kwargs):
+    def list_file_volumes(self, datacenter=None, username=None, storage_type=None, order=None, **kwargs):
         """Returns a list of file volumes.
 
         :param datacenter: Datacenter short name (e.g.: dal09)
         :param username: Name of volume.
         :param storage_type: Type of volume: Endurance or Performance
+        :param order: Volume order id.
         :param kwargs:
         :return: Returns a list of file volumes.
         """
@@ -63,6 +64,10 @@ class FileStorageManager(StorageManager):
         if username:
             _filter['nasNetworkStorage']['username'] = \
                 (utils.query_filter(username))
+
+        if order:
+            _filter['nasNetworkStorage']['billingItem']['orderItem'][
+                'order']['id'] = (utils.query_filter(order))
 
         kwargs['filter'] = _filter.to_dict()
         return self.client.call('Account', 'getNasNetworkStorage', **kwargs)

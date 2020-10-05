@@ -115,5 +115,8 @@ def cli(env, storage_type, size, iops, tier,
             order['placedOrder']['id']))
         for item in order['placedOrder']['items']:
             click.echo(" > %s" % item['description'])
+        click.echo(
+            '\nYou may run "slcli file volume-list --order {0}" to find this file volume after it '
+            'is ready.'.format(order['placedOrder']['id']))
     else:
         click.echo("Order could not be placed! Please verify your options and try again.")

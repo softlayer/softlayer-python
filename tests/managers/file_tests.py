@@ -365,6 +365,46 @@ class FileTests(testing.TestCase):
             mask='mask[%s]' % expected_mask
         )
 
+    def test_list_file_volumes_additional_filter_order(self):
+        result = self.file.list_file_volumes(order=1234567)
+
+        self.assertEqual(SoftLayer_Account.getNasNetworkStorage,
+                         result)
+
+        expected_filter = {
+            'nasNetworkStorage': {
+                'storageType': {
+                    'keyName': {'operation': '*= FILE_STORAGE'}
+                },
+                'serviceResource': {
+                    'type': {
+                        'type': {'operation': '!~ NAS'}
+                    }
+                },
+                'billingItem': {
+                    'orderItem': {
+                        'order': {
+                            'id': {'operation': 1234567}}}}
+            }
+        }
+
+        expected_mask = 'id,'\
+                        'username,'\
+                        'capacityGb,'\
+                        'bytesUsed,'\
+                        'serviceResource.datacenter[name],'\
+                        'serviceResourceBackendIpAddress,'\
+                        'activeTransactionCount,'\
+                        'fileNetworkMountAddress,'\
+                        'replicationPartnerCount'
+
+        self.assert_called_with(
+            'SoftLayer_Account',
+            'getNasNetworkStorage',
+            filter=expected_filter,
+            mask='mask[%s]' % expected_mask
+        )
+
     def test_list_file_volumes_with_additional_filters(self):
         result = self.file.list_file_volumes(datacenter="dal09",
                                              storage_type="Endurance",

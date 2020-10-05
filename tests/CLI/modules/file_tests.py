@@ -55,6 +55,13 @@ class FileTests(testing.TestCase):
             }],
             json.loads(result.output))
 
+    def test_volume_list_order(self):
+        result = self.run_command(['file', 'volume-list', '--order=1234567'])
+
+        self.assert_no_fail(result)
+        json_result = json.loads(result.output)
+        self.assertEqual(json_result[0]['id'], 1)
+
     @mock.patch('SoftLayer.FileStorageManager.list_file_volumes')
     def test_volume_count(self, list_mock):
         list_mock.return_value = [
@@ -223,7 +230,9 @@ class FileTests(testing.TestCase):
                          'Order #478 placed successfully!\n'
                          ' > Performance Storage\n > File Storage\n'
                          ' > 0.25 IOPS per GB\n > 20 GB Storage Space\n'
-                         ' > 10 GB Storage Space (Snapshot Space)\n')
+                         ' > 10 GB Storage Space (Snapshot Space)\n'
+                         '\nYou may run "slcli file volume-list --order 478" to find this file volume after it is '
+                         'ready.\n')
 
     def test_volume_order_endurance_tier_not_given(self):
         result = self.run_command(['file', 'volume-order',
@@ -256,7 +265,9 @@ class FileTests(testing.TestCase):
                          'Order #478 placed successfully!\n'
                          ' > Endurance Storage\n > File Storage\n'
                          ' > 0.25 IOPS per GB\n > 20 GB Storage Space\n'
-                         ' > 10 GB Storage Space (Snapshot Space)\n')
+                         ' > 10 GB Storage Space (Snapshot Space)\n'
+                         '\nYou may run "slcli file volume-list --order 478" to find this file volume after it is '
+                         'ready.\n')
 
     @mock.patch('SoftLayer.FileStorageManager.order_file_volume')
     def test_volume_order_order_not_placed(self, order_mock):
@@ -307,7 +318,9 @@ class FileTests(testing.TestCase):
                          ' > File Storage\n'
                          ' > 20 GB Storage Space\n'
                          ' > 0.25 IOPS per GB\n'
-                         ' > 10 GB Storage Space (Snapshot Space)\n')
+                         ' > 10 GB Storage Space (Snapshot Space)\n'
+                         '\nYou may run "slcli file volume-list --order 479" to find this file volume after it is '
+                         'ready.\n')
 
     @mock.patch('SoftLayer.FileStorageManager.order_file_volume')
     def test_volume_order_performance_manager_error(self, order_mock):
