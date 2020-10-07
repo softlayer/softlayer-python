@@ -50,7 +50,7 @@ def get_order_table(order):
     table.add_row(['Create Date', utils.clean_time(order.get('createDate'), date_format, date_format)])
     table.add_row(['Modify Date', utils.clean_time(order.get('modifyDate'), date_format, date_format)])
     table.add_row(['Order Approval Date', utils.clean_time(order.get('orderApprovalDate'), date_format, date_format)])
-    table.add_row(['status', order.get('status')])
+    table.add_row(['Status', order.get('status')])
     table.add_row(['Order Total Amount', "{price:.2f}".format(price=float(order.get('orderTotalAmount', '0')))])
     table.add_row(['Invoice Total Amount', "{price:.2f}".
                   format(price=float(order.get('initialInvoice', {}).get('invoiceTotalAmount', '0')))])
@@ -62,6 +62,6 @@ def get_order_table(order):
     for item in items:
         item_table.add_row([item.get('description')])
 
-    table.add_row(['items', item_table])
+    table.add_row(['Items', item_table])
 
     return table
