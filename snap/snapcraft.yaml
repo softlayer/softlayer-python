@@ -1,10 +1,14 @@
-name: slcli # check to see if it's available
-version: '5.5.1+git' # check versioning
-summary: Python based SoftLayer API Tool. # 79 char long summary
+name: slcli
+adopt-info: slcli
+summary: Python based SoftLayer API Tool. 
 description: |
     A command-line interface is also included and can be used to manage various SoftLayer products and services.
-grade: stable # must be 'stable' to release into candidate/stable channels
-confinement: strict # use 'strict' once you have the right plugs
+
+license: MIT
+
+base: core18
+grade: stable 
+confinement: strict
 
 apps:
   slcli:
@@ -17,11 +21,14 @@ apps:
       - network-bind
      
 parts: 
-  my-part:
+  slcli:
     source: https://github.com/softlayer/softlayer-python
     source-type: git
     plugin: python
     python-version: python3
+    override-pull: |
+      snapcraftctl pull
+      snapcraftctl set-version "$(git describe --tags | sed 's/^v//')"
     
     build-packages:
       - python3
