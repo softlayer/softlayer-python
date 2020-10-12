@@ -735,7 +735,7 @@ class OrderingTests(testing.TestCase):
                 "capacity": "1",
                 "id": 10201,
                 "keyName": "GUEST_CORE_1_DEDICATED",
-        }]
+            }]
 
         item_capacity = self.ordering.get_item_capacity(items, ['GUEST_CORE_1_DEDICATED', 'OS_RHEL_7_X_LAMP_64_BIT'])
 
@@ -752,7 +752,7 @@ class OrderingTests(testing.TestCase):
                 "capacity": "1",
                 "id": 10201,
                 "keyName": "READHEAVY_TIER",
-        }]
+            }]
 
         item_capacity = self.ordering.get_item_capacity(items, ['READHEAVY_TIER', 'STORAGE_SPACE_FOR_2_IOPS_PER_GB'])
 
@@ -770,7 +770,7 @@ class OrderingTests(testing.TestCase):
                 "capacity": "1",
                 "id": 10201,
                 "keyName": "GUEST_CORE_1_DEDICATED",
-        }]
+            }]
 
         item_capacity = self.ordering.get_item_capacity(items, ['INTEL_XEON_2690_2_60', 'BANDWIDTH_20000_GB'])
 
@@ -809,3 +809,24 @@ class OrderingTests(testing.TestCase):
 
         self.assertEqual(options[0]['item']['keyName'], item_prices[0]['item']['keyName'])
         self.assertEqual(options[0]['hourlyRecurringFee'], item_prices[0]['hourlyRecurringFee'])
+
+    def test_get_oder_detail_mask(self):
+        order_id = 12345
+        test_mask = 'mask[id]'
+        self.ordering.get_order_detail(order_id, mask=test_mask)
+        self.assert_called_with('SoftLayer_Billing_Order', 'getObject', identifier=order_id, mask=test_mask)
+
+    def test_get_oder_detail_default_mask(self):
+        order_id = 12345
+        _default_mask = (
+            'mask[orderTotalAmount,orderApprovalDate,'
+            'initialInvoice[id,amount,invoiceTotalAmount,'
+            'invoiceTopLevelItems[id, description, hostName, domainName, oneTimeAfterTaxAmount,'
+            'recurringAfterTaxAmount, createDate,'
+            'categoryCode,'
+            'category[name],'
+            'location[name],'
+            'children[id, category[name], description, oneTimeAfterTaxAmount,recurringAfterTaxAmount]]],'
+            'items[description],userRecord[displayName,userStatus]]')
+        self.ordering.get_order_detail(order_id)
+        self.assert_called_with('SoftLayer_Billing_Order', 'getObject', identifier=order_id, mask=_default_mask)

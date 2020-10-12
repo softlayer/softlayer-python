@@ -1,4 +1,4 @@
-"""Order list account"""
+"""Lists account orders."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -16,7 +16,7 @@ from SoftLayer import utils
               show_default=True)
 @environment.pass_env
 def cli(env, limit):
-    """Order list account."""
+    """Lists account orders. Use `slcli order lookup <ID>` to find more details about a specific order."""
     manager = AccountManager(env.client)
     orders = manager.get_account_all_billing_orders(limit)
 

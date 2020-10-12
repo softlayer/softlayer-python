@@ -406,6 +406,13 @@ class OrderTests(testing.TestCase):
                   'recurringFee': '150'}
         return {'orderContainers': [{'prices': [price1, price2]}]}
 
+    def test_order_lookup(self):
+        result = self.run_command(['order', 'lookup', '12345'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Billing_Order', 'getObject', identifier='12345')
+        self.assertIn('Ordered By', result.output)
+        self.assertIn('Initial Invoice', result.output)
+
 
 def _get_all_packages():
     package_type = {'keyName': 'BARE_METAL_CPU'}

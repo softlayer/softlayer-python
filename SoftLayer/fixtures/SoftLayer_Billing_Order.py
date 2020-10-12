@@ -45,3 +45,28 @@ getAllObjects = [{
         'orderApprovalDate': '2019-09-15T13:13:13-06:00',
         'orderTotalAmount': '0'
     }]
+
+getObject = {
+    'accountId': 1234,
+    'createDate': '2020-09-23T16:22:30-06:00',
+    'id': 6543210,
+    'impersonatingUserRecordId': None,
+    'initialInvoice': {
+        'amount': '0',
+        'id': 60012345,
+        'invoiceTotalAmount': '0'
+    },
+    'items': [{
+        'description': 'Dual Intel Xeon Silver 4210 (20 Cores, 2.20 GHz)'
+    }],
+    'modifyDate': '2020-09-23T16:22:32-06:00',
+    'orderQuoteId': None,
+    'orderTypeId': 11,
+    'presaleEventId': None,
+    'privateCloudOrderFlag': False,
+    'status': 'APPROVED',
+    'userRecord': {
+        'displayName': 'testUser'
+    },
+    'userRecordId': 7654321,
+}
