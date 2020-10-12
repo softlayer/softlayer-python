@@ -164,14 +164,14 @@ class NetworkManager(object):
         # item description.
         price_id = None
         quantity_str = str(quantity)
-        package_items = package.getItems(id=0)
+        package_items = package.getItems(id=0, mask='mask[prices[packageReferences[package[keyName]]]]')
         for item in package_items:
             category_code = utils.lookup(item, 'itemCategory', 'categoryCode')
             if all([category_code == category,
                     item.get('capacity') == quantity_str,
                     version == 4 or (version == 6 and
                                      desc in item['description'])]):
-                price_id = item['prices'][0]['id']
+                price_id = self.get_subnet_item_price(item, subnet_type, version)
                 break
 
         order = {
@@ -191,6 +191,24 @@ class NetworkManager(object):
             return self.client['Product_Order'].verifyOrder(order)
         else:
             return self.client['Product_Order'].placeOrder(order)
+
+    @staticmethod
+    def get_subnet_item_price(item, subnet_type, version):
+        """Get the subnet specific item price id.
+
+        :param version: 4 for IPv4, 6 for IPv6.
+        :param subnet_type: Type of subnet to add: private, public, global,static.
+        :param item: Subnet item.
+        """
+        price_id = None
+        if version == 4 and subnet_type == 'static':
+            for item_price in item['prices']:
+                for package_reference in item_price['packageReferences']:
+                    if subnet_type.upper() in package_reference['package']['keyName']:
+                        price_id = item_price['id']
+        else:
+            price_id = item['prices'][0]['id']
+        return price_id
 
     def assign_global_ip(self, global_ip_id, target):
         """Assigns a global IP address to a specified target.
