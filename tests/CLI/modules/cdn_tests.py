@@ -4,9 +4,10 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import testing
-
 import json
+
+from SoftLayer.CLI import exceptions
+from SoftLayer import testing
 
 
 class CdnTests(testing.TestCase):
@@ -16,67 +17,81 @@ class CdnTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
-                         [{'notes': None,
-                           'created': '2012-06-25T14:05:28-07:00',
-                           'type': 'ORIGIN_PULL',
-                           'id': 1234,
-                           'account_name': '1234a'},
-                          {'notes': None,
-                           'created': '2012-07-24T13:34:25-07:00',
-                           'type': 'POP_PULL',
-                           'id': 1234,
-                           'account_name': '1234a'}])
+                         [{'cname': 'cdnakauuiet7s6u6.cdnedge.bluemix.net',
+                           'domain': 'test.example.com',
+                           'origin': '1.1.1.1',
+                           'status': 'CNAME_CONFIGURATION',
+                           'unique_id': '9934111111111',
+                           'vendor': 'akamai'}]
+                         )
 
     def test_detail_account(self):
-        result = self.run_command(['cdn', 'detail', '1245'])
+        result = self.run_command(['cdn', 'detail', '--history=30', '1245'])
 
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
-                         {'notes': None,
-                          'created': '2012-06-25T14:05:28-07:00',
-                          'type': 'ORIGIN_PULL',
-                          'status': 'ACTIVE',
-                          'id': 1234,
-                          'account_name': '1234a'})
-
-    def test_load_content(self):
-        result = self.run_command(['cdn', 'load', '1234',
-                                   'http://example.com'])
-
-        self.assert_no_fail(result)
-        self.assertEqual(result.output, "")
+                         {'hit_radio': '0.0 %',
+                          'hostname': 'test.example.com',
+                          'origin': '1.1.1.1',
+                          'origin_type': 'HOST_SERVER',
+                          'path': '/',
+                          'protocol': 'HTTP',
+                          'provider': 'akamai',
+                          'status': 'CNAME_CONFIGURATION',
+                          'total_bandwidth': '0.0 GB',
+                          'total_hits': '0',
+                          'unique_id': '9934111111111'}
+                         )
 
     def test_purge_content(self):
         result = self.run_command(['cdn', 'purge', '1234',
-                                   'http://example.com'])
+                                   '/article/file.txt'])
 
         self.assert_no_fail(result)
-        self.assertEqual(result.output, "")
 
     def test_list_origins(self):
         result = self.run_command(['cdn', 'origin-list', '1234'])
 
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output), [
-            {'media_type': 'FLASH',
-             'origin_url': 'http://ams01.objectstorage.softlayer.net:80',
-             'cname': None,
-             'id': '12345'},
-            {'media_type': 'FLASH',
-             'origin_url': 'http://sng01.objectstorage.softlayer.net:80',
-             'cname': None,
-             'id': '12345'}])
+        self.assertEqual(json.loads(result.output), [{'HTTP Port': 80,
+                                                      'Origin': '10.10.10.1',
+                                                      'Path': '/example',
+                                                      'Status': 'RUNNING'},
+                                                     {'HTTP Port': 80,
+                                                      'Origin': '10.10.10.1',
+                                                      'Path': '/example1',
+                                                      'Status': 'RUNNING'}])
 
-    def test_add_origin(self):
-        result = self.run_command(['cdn', 'origin-add', '1234',
-                                   'http://example.com'])
+    def test_add_origin_server(self):
+        result = self.run_command(
+            ['cdn', 'origin-add', '-t', 'server', '-H=test.example.com', '-p', 80, '-o', 'web', '-c=include-all',
+             '1234', '10.10.10.1', '/example/videos2'])
 
         self.assert_no_fail(result)
-        self.assertEqual(result.output, "")
+
+    def test_add_origin_storage(self):
+        result = self.run_command(['cdn', 'origin-add', '-t', 'storage', '-b=test-bucket', '-H=test.example.com',
+                                   '-p', 80, '-o', 'web', '-c=include-all', '1234', '10.10.10.1', '/example/videos2'])
+
+        self.assert_no_fail(result)
+
+    def test_add_origin_without_storage(self):
+        result = self.run_command(['cdn', 'origin-add', '-t', 'storage', '-H=test.example.com', '-p', 80,
+                                   '-o', 'web', '-c=include-all', '1234', '10.10.10.1', '/example/videos2'])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.ArgumentError)
+
+    def test_add_origin_storage_with_file_extensions(self):
+        result = self.run_command(
+            ['cdn', 'origin-add', '-t', 'storage', '-b=test-bucket', '-e', 'jpg', '-H=test.example.com', '-p', 80,
+             '-o', 'web', '-c=include-all', '1234', '10.10.10.1', '/example/videos2'])
+
+        self.assert_no_fail(result)
 
     def test_remove_origin(self):
         result = self.run_command(['cdn', 'origin-remove', '1234',
-                                   'http://example.com'])
+                                   '/example1'])
 
         self.assert_no_fail(result)
-        self.assertEqual(result.output, "")
+        self.assertEqual(result.output, "Origin with path /example1 has been deleted\n")

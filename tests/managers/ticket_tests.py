@@ -43,6 +43,14 @@ class TicketTests(testing.TestCase):
             self.assertIn(result['id'], [100, 101])
         self.assert_called_with('SoftLayer_Account', 'getClosedTickets')
 
+    def test_list_tickets_false(self):
+        exception = self.assertRaises(ValueError,
+                                      self.ticket.list_tickets,
+                                      open_status=False,
+                                      closed_status=False)
+
+        self.assertEqual('open_status and closed_status cannot both be False', str(exception))
+
     def test_list_subjects(self):
         list_expected_ids = [1001, 1002, 1003, 1004, 1005]
 
@@ -64,7 +72,6 @@ class TicketTests(testing.TestCase):
             subject=1004)
 
         args = ({"assignedUserId": 12345,
-                 "contents": "body",
                  "subjectId": 1004,
                  "title": "Cloud Instance Cancellation - 08/01/13"},
                 "body")

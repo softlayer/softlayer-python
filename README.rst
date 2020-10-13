@@ -1,7 +1,10 @@
 SoftLayer API Python Client
 ===========================
-.. image:: https://travis-ci.org/softlayer/softlayer-python.svg?branch=master
-    :target: https://travis-ci.org/softlayer/softlayer-python
+.. image:: https://github.com/softlayer/softlayer-python/workflows/Tests/badge.svg
+    :target: https://github.com/softlayer/softlayer-python/actions?query=workflow%3ATests
+
+.. image:: https://github.com/softlayer/softlayer-python/workflows/documentation/badge.svg
+    :target: https://github.com/softlayer/softlayer-python/actions?query=workflow%3Adocumentation
 
 .. image:: https://landscape.io/github/softlayer/softlayer-python/master/landscape.svg
     :target: https://landscape.io/github/softlayer/softlayer-python/master
@@ -12,9 +15,12 @@ SoftLayer API Python Client
 .. image:: https://coveralls.io/repos/github/softlayer/softlayer-python/badge.svg?branch=master
     :target: https://coveralls.io/github/softlayer/softlayer-python?branch=master
 
+.. image:: https://snapcraft.io//slcli/badge.svg
+    :target: https://snapcraft.io/slcli
+
 
 This library provides a simple Python client to interact with `SoftLayer's
-XML-RPC API <http://developer.softlayer.com/reference/softlayerapi>`_. 
+XML-RPC API <https://softlayer.github.io/reference/softlayerapi>`_.
 
 A command-line interface is also included and can be used to manage various
 SoftLayer products and services.
@@ -28,9 +34,9 @@ http://softlayer.github.io/softlayer-python/.
 Additional API documentation can be found on the SoftLayer Development Network:
 
 * `SoftLayer API reference
-  <http://developer.softlayer.com/reference/softlayerapi>`_
+  <https://sldn.softlayer.com/reference/softlayerapi>`_
 * `Object mask information and examples
-  <http://developer.softlayer.com/article/Object-Masks>`_
+  <https://sldn.softlayer.com/article/object-masks>`_
 * `Code Examples
   <https://softlayer.github.io/python/>`_
 
@@ -72,25 +78,78 @@ Bugs and feature requests about this library should have a `GitHub issue <https:
 
 Issues with the Softlayer API itself should be addressed by opening a ticket.
 
+
+Examples
+--------
+
+A curated list of examples on how to use this library can be found at `softlayer.github.io <https://softlayer.github.io/python/>`_
+
+Debugging
+---------
+To get the exact API call that this library makes, you can do the following.
+
+For the CLI, just use the -vvv option. If you are using the REST endpoint, this will print out a curl command that you can use, if using XML, this will print the minimal python code to make the request without the softlayer library.
+
+.. code-block:: bash
+
+  $ slcli -vvv vs list
+
+
+If you are using the library directly in python, you can do something like this.
+
+.. code-block:: python
+
+  import SoftLayer
+  import logging
+
+  class invoices():
+
+      def __init__(self):
+          self.client = SoftLayer.Client()
+          debugger = SoftLayer.DebugTransport(self.client.transport)
+          self.client.transport = debugger
+
+      def main(self):
+          mask = "mask[id]"
+          account = self.client.call('Account', 'getObject', mask=mask);
+          print("AccountID: %s" % account['id'])
+
+      def debug(self):
+          for call in self.client.transport.get_last_calls():
+              print(self.client.transport.print_reproduceable(call))
+
+  if __name__ == "__main__":
+      main = example()
+      main.main()
+      main.debug()
+
+
+
 System Requirements
 -------------------
-* Python 2.7, 3.3, 3.4, 3.5 or 3.6.
+* Python 3.5, 3.6, 3.7, or 3.8.
 * A valid SoftLayer API username and key.
 * A connection to SoftLayer's private network is required to use
   our private network API endpoints.
 
+Python 2.7 Support
+------------------
+As of version 5.8.0 SoftLayer-Python will no longer support python2.7, which is `End Of Life as of 2020 <https://www.python.org/dev/peps/pep-0373/>`_ .
+If you cannot install python 3.6+ for some reason, you will need to use a version of softlayer-python <= 5.7.2
+
+
+
 Python Packages
 ---------------
-* six >= 1.7.0
-* prettytable >= 0.7.0
-* click >= 5
-* requests >= 2.18.4
-* prompt_toolkit >= 0.53
+* ptable >= 0.9.2
+* click >= 7
+* requests >= 2.20.0
+* prompt_toolkit >= 2
 * pygments >= 2.0.0
-* urllib3 >= 1.22
+* urllib3 >= 1.24
 
 Copyright
 ---------
-This software is Copyright (c) 2016-2018 SoftLayer Technologies, Inc.
+This software is Copyright (c) 2016-2019 SoftLayer Technologies, Inc.
 
 See the bundled LICENSE file for more information.

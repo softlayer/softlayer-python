@@ -6,6 +6,7 @@
 """
 
 import SoftLayer
+from SoftLayer import exceptions
 from SoftLayer import testing
 
 IMAGE_SERVICE = 'SoftLayer_Virtual_Guest_Block_Device_Template_Group'
@@ -145,6 +146,34 @@ class ImageTests(testing.TestCase):
                    'uri': 'someuri',
                    'operatingSystemReferenceCode': 'UBUNTU_LATEST'},))
 
+    def test_import_image_cos(self):
+        self.image.import_image_from_uri(name='test_image',
+                                         note='testimage',
+                                         uri='cos://some_uri',
+                                         os_code='UBUNTU_LATEST',
+                                         ibm_api_key='some_ibm_key',
+                                         root_key_crn='some_root_key_crn',
+                                         wrapped_dek='some_dek',
+                                         cloud_init=False,
+                                         byol=False,
+                                         is_encrypted=False
+                                         )
+
+        self.assert_called_with(
+            IMAGE_SERVICE,
+            'createFromIcos',
+            args=({'name': 'test_image',
+                   'note': 'testimage',
+                   'operatingSystemReferenceCode': 'UBUNTU_LATEST',
+                   'uri': 'cos://some_uri',
+                   'ibmApiKey': 'some_ibm_key',
+                   'crkCrn': 'some_root_key_crn',
+                   'wrappedDek': 'some_dek',
+                   'cloudInit': False,
+                   'byol': False,
+                   'isEncrypted': False
+                   },))
+
     def test_export_image(self):
         self.image.export_image_to_uri(1234, 'someuri')
 
@@ -153,3 +182,44 @@ class ImageTests(testing.TestCase):
             'copyToExternalSource',
             args=({'uri': 'someuri'},),
             identifier=1234)
+
+    def test_export_image_cos(self):
+        self.image.export_image_to_uri(1234,
+                                       'cos://someuri',
+                                       ibm_api_key='someApiKey')
+
+        self.assert_called_with(
+            IMAGE_SERVICE,
+            'copyToIcos',
+            args=({'uri': 'cos://someuri', 'ibmApiKey': 'someApiKey'},),
+            identifier=1234)
+
+    def test_add_locations_image(self):
+        locations = ['ams01']
+        self.image.add_locations(100, locations)
+
+        self.assert_called_with(IMAGE_SERVICE, 'addLocations', identifier=100)
+
+    def test_add_locations_fail(self):
+        locations = ['test']
+        self.assertRaises(
+            exceptions.SoftLayerError,
+            self.image.add_locations,
+            100,
+            locations
+        )
+
+    def test_remove_locations_image(self):
+        locations = ['ams01']
+        self.image.remove_locations(100, locations)
+
+        self.assert_called_with(IMAGE_SERVICE, 'removeLocations', identifier=100)
+
+    def test_get_locations_id_fails(self):
+        locations = ['test']
+        self.assertRaises(
+            exceptions.SoftLayerError,
+            self.image.get_locations_list,
+            100,
+            locations
+        )

@@ -23,72 +23,66 @@ COLUMNS = ['keyName',
 @click.option('--verify',
               is_flag=True,
               help="Flag denoting whether or not to only verify the order, not place it")
+@click.option('--quantity',
+              type=int,
+              default=1,
+              help="The quantity of the item being ordered")
 @click.option('--billing',
               type=click.Choice(['hourly', 'monthly']),
               default='hourly',
               show_default=True,
               help="Billing rate")
-@click.option('--complex-type', help=("The complex type of the order. This typically begins"
-                                      " with 'SoftLayer_Container_Product_Order_'."))
+@click.option('--complex-type',
+              help=("The complex type of the order. Starts with 'SoftLayer_Container_Product_Order'."))
 @click.option('--extras',
               help="JSON string denoting extra data that needs to be sent with the order")
 @click.argument('order_items', nargs=-1)
 @environment.pass_env
 def cli(env, package_keyname, location, preset, verify, billing, complex_type,
-        extras, order_items):
+        quantity, extras, order_items):
     """Place or verify an order.
 
-    This CLI command is used for placing/verifying an order of the specified package in
-    the given location (denoted by a datacenter's long name). Orders made via the CLI
-    can then be converted to be made programmatically by calling
-    SoftLayer.OrderingManager.place_order() with the same keynames.
+\b
+1. Find the package keyName from `slcli order package-list`
+2. Find the location from `slcli order package-locations PUBLIC_CLOUD_SERVER`
+  If the package does not require a location, use 'NONE' instead.
+3. Find the needed items `slcli order item-list PUBLIC_CLOUD_SERVER`
+  Some packages, like PUBLIC_CLOUD_SERVER need presets, `slcli order preset-list PUBLIC_CLOUD_SERVER`
+4. Find the complex type from https://sldn.softlayer.com/reference
+5. Use that complex type to fill out any --extras
 
-    Packages for ordering can be retrived from `slcli order package-list`
-    Presets for ordering can be retrieved from `slcli order preset-list` (not all packages
-    have presets)
+    Example::
 
-    Items can be retrieved from `slcli order item-list`. In order to find required
-    items for the order, use `slcli order category-list`, and then provide the
-    --category option for each category code in `slcli order item-list`.
-
-    \b
-    Example:
-        # Order an hourly VSI with 4 CPU, 16 GB RAM, 100 GB SAN disk,
-        # Ubuntu 16.04, and 1 Gbps public & private uplink in dal13
-        slcli order place --billing hourly CLOUD_SERVER DALLAS13 \\
-            GUEST_CORES_4 \\
-            RAM_16_GB \\
-            REBOOT_REMOTE_CONSOLE \\
-            1_GBPS_PUBLIC_PRIVATE_NETWORK_UPLINKS \\
-            BANDWIDTH_0_GB_2 \\
-            1_IP_ADDRESS \\
-            GUEST_DISK_100_GB_SAN \\
-            OS_UBUNTU_16_04_LTS_XENIAL_XERUS_MINIMAL_64_BIT_FOR_VSI \\
-            MONITORING_HOST_PING \\
-            NOTIFICATION_EMAIL_AND_TICKET \\
-            AUTOMATED_NOTIFICATION \\
-            UNLIMITED_SSL_VPN_USERS_1_PPTP_VPN_USER_PER_ACCOUNT \\
-            NESSUS_VULNERABILITY_ASSESSMENT_REPORTING \\
-            --extras '{"virtualGuests": [{"hostname": "test", "domain": "softlayer.com"}]}' \\
-            --complex-type SoftLayer_Container_Product_Order_Virtual_Guest
+        slcli order place --verify --preset B1_2X8X100 --billing hourly
+        --complex-type SoftLayer_Container_Product_Order_Virtual_Guest
+        --extras '{"virtualGuests": [{"hostname": "test", "domain": "ibm.com"}]}'
+        PUBLIC_CLOUD_SERVER DALLAS13
+        BANDWIDTH_0_GB_2 MONITORING_HOST_PING NOTIFICATION_EMAIL_AND_TICKET
+        OS_DEBIAN_9_X_STRETCH_LAMP_64_BIT 1_IP_ADDRESS 1_IPV6_ADDRESS
+        1_GBPS_PUBLIC_PRIVATE_NETWORK_UPLINKS REBOOT_REMOTE_CONSOLE
+        AUTOMATED_NOTIFICATION UNLIMITED_SSL_VPN_USERS_1_PPTP_VPN_USER_PER_ACCOUNT
+        NESSUS_VULNERABILITY_ASSESSMENT_REPORTING
 
     """
     manager = ordering.OrderingManager(env.client)
 
     if extras:
-        extras = json.loads(extras)
+        try:
+            extras = json.loads(extras)
+        except ValueError as err:
+            raise exceptions.CLIAbort("There was an error when parsing the --extras value: {}".format(err))
 
     args = (package_keyname, location, order_items)
     kwargs = {'preset_keyname': preset,
               'extras': extras,
-              'quantity': 1,
+              'quantity': quantity,
               'complex_type': complex_type,
-              'hourly': True if billing == 'hourly' else False}
+              'hourly': bool(billing == 'hourly')}
 
     if verify:
         table = formatting.Table(COLUMNS)
         order_to_place = manager.verify_order(*args, **kwargs)
-        for price in order_to_place['prices']:
+        for price in order_to_place['orderContainers'][0]['prices']:
             cost_key = 'hourlyRecurringFee' if billing == 'hourly' else 'recurringFee'
             table.add_row([
                 price['item']['keyName'],

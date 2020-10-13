@@ -1,5 +1,4 @@
 """Metric Utilities"""
-from __future__ import print_function
 import datetime
 import itertools
 import sys
@@ -20,9 +19,9 @@ def _validate_datetime(ctx, param, value):
 
     try:
         return datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
-    except (ValueError, TypeError):
-        raise click.BadParameter(
-            "not in the format 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS'")
+    except (ValueError, TypeError) as ex:
+        message = "not in the format 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS'"
+        raise click.BadParameter(message) from ex
 
 
 def _get_pooled_bandwidth(env, start, end):
@@ -200,7 +199,7 @@ def cli(env, start, end, sortby):
 
     table = formatting.Table([
         'type',
-        'name',
+        'hostname',
         'public_in',
         'public_out',
         'private_in',

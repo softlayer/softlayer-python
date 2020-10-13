@@ -14,7 +14,7 @@ else:
 
 setup(
     name='SoftLayer',
-    version='5.4.4',
+    version='5.9.1',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     author='SoftLayer Technologies, Inc.',
@@ -29,16 +29,16 @@ setup(
             'sl = SoftLayer.CLI.deprecated:main',
         ],
     },
+    python_requires='>=3.5',
     install_requires=[
-        'six >= 1.7.0',
-        'prettytable >= 0.7.0',
-        'click >= 5',
-        'requests >= 2.18.4',
-        'prompt_toolkit >= 0.53',
+        'ptable >= 0.9.2',
+        'click >= 7',
+        'requests >= 2.20.0',
+        'prompt_toolkit >= 2',
         'pygments >= 2.0.0',
-        'urllib3 >= 1.22'
+        'urllib3 >= 1.24'
     ],
-    keywords=['softlayer', 'cloud'],
+    keywords=['softlayer', 'cloud', 'slcli'],
     classifiers=[
         'Environment :: Console',
         'Environment :: Web Environment',
@@ -48,11 +48,10 @@ setup(
         'Operating System :: OS Independent',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],

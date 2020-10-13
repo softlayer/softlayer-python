@@ -63,7 +63,7 @@ def cli(env, volume_id):
             file_schedule_type,
             replication,
             schedule.get('createDate', '')
-            ]
+        ]
         table_row.extend(schedule_properties)
         table.add_row(table_row)
 

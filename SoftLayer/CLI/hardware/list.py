@@ -21,7 +21,6 @@ COLUMNS = [
         'action',
         lambda server: formatting.active_txn(server),
         mask='activeTransaction[id, transactionStatus[name, friendlyName]]'),
-    column_helper.Column('power_state', ('powerState', 'name')),
     column_helper.Column(
         'created_by',
         ('billingItem', 'orderItem', 'order', 'userRecord', 'username')),
@@ -55,8 +54,12 @@ DEFAULT_COLUMNS = [
               help='Columns to display. [options: %s]' % ', '.join(column.name for column in COLUMNS),
               default=','.join(DEFAULT_COLUMNS),
               show_default=True)
+@click.option('--limit', '-l',
+              help='How many results to get in one api call, default is 100',
+              default=100,
+              show_default=True)
 @environment.pass_env
-def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag, columns):
+def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag, columns, limit):
     """List hardware servers."""
 
     manager = SoftLayer.HardwareManager(env.client)
@@ -67,7 +70,8 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag, co
                                     datacenter=datacenter,
                                     nic_speed=network,
                                     tags=tag,
-                                    mask="mask(SoftLayer_Hardware_Server)[%s]" % columns.mask())
+                                    mask="mask(SoftLayer_Hardware_Server)[%s]" % columns.mask(),
+                                    limit=limit)
 
     table = formatting.Table(columns.columns)
     table.sortby = sortby

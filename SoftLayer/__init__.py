@@ -14,7 +14,8 @@
 
     :license: MIT, see LICENSE for more details.
 """
-# pylint: disable=w0401,invalid-name
+# pylint: disable=r0401,invalid-name,wildcard-import
+# NOQA appears to no longer be working. The code might have been upgraded.
 from SoftLayer import consts
 
 from SoftLayer.API import *  # NOQA
@@ -28,7 +29,7 @@ __version__ = consts.VERSION
 __author__ = 'SoftLayer Technologies, Inc.'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2016 SoftLayer Technologies, Inc.'
-__all__ = [
+__all__ = [   # noqa: F405
     'BaseClient',
     'create_client_from_env',
     'Client',

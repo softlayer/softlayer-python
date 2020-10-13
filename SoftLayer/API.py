@@ -8,6 +8,7 @@
 # pylint: disable=invalid-name
 import warnings
 
+
 from SoftLayer import auth as slauth
 from SoftLayer import config
 from SoftLayer import consts
@@ -161,8 +162,7 @@ class BaseClient(object):
         :param string username: your SoftLayer username
         :param string password: your SoftLayer password
         :param int security_question_id: The security question id to answer
-        :param string security_question_answer: The answer to the security
-                                                question
+        :param string security_question_answer: The answer to the security question
 
         """
         self.auth = None
@@ -201,8 +201,7 @@ class BaseClient(object):
         :param dict raw_headers: (optional) HTTP transport headers
         :param int limit: (optional) return at most this many results
         :param int offset: (optional) offset results by this many
-        :param boolean iter: (optional) if True, returns a generator with the
-                             results
+        :param boolean iter: (optional) if True, returns a generator with the results
         :param bool verify: verify SSL cert
         :param cert: client certificate path
 
@@ -214,14 +213,17 @@ class BaseClient(object):
 
         """
         if kwargs.pop('iter', False):
-            return self.iter_call(service, method, *args, **kwargs)
+            # Most of the codebase assumes a non-generator will be returned, so casting to list
+            # keeps those sections working
+            return list(self.iter_call(service, method, *args, **kwargs))
 
         invalid_kwargs = set(kwargs.keys()) - VALID_CALL_ARGS
         if invalid_kwargs:
             raise TypeError(
                 'Invalid keyword arguments: %s' % ','.join(invalid_kwargs))
 
-        if self._prefix and not service.startswith(self._prefix):
+        prefixes = (self._prefix, 'BluePages_Search', 'IntegratedOfferingTeam_Region')
+        if self._prefix and not service.startswith(prefixes):
             service = self._prefix + service
 
         http_headers = {'Accept': '*/*'}
@@ -267,55 +269,49 @@ class BaseClient(object):
 
         :param service: the name of the SoftLayer API service
         :param method: the method to call on the service
-        :param integer chunk: result size for each API call (defaults to 100)
+        :param integer limit: result size for each API call (defaults to 100)
         :param \\*args: same optional arguments that ``Service.call`` takes
-        :param \\*\\*kwargs: same optional keyword arguments that
-                           ``Service.call`` takes
+        :param \\*\\*kwargs: same optional keyword arguments that ``Service.call`` takes
 
         """
-        chunk = kwargs.pop('chunk', 100)
-        limit = kwargs.pop('limit', None)
+
+        limit = kwargs.pop('limit', 100)
         offset = kwargs.pop('offset', 0)
 
-        if chunk <= 0:
-            raise AttributeError("Chunk size should be greater than zero.")
+        if limit <= 0:
+            raise AttributeError("Limit size should be greater than zero.")
 
-        if limit:
-            chunk = min(chunk, limit)
-
-        result_count = 0
+        # Set to make unit tests, which call this function directly, play nice.
         kwargs['iter'] = False
-        while True:
-            if limit:
-                # We've reached the end of the results
-                if result_count >= limit:
-                    break
+        result_count = 0
+        keep_looping = True
 
-                # Don't over-fetch past the given limit
-                if chunk + result_count > limit:
-                    chunk = limit - result_count
-
-            results = self.call(service, method,
-                                offset=offset, limit=chunk, *args, **kwargs)
-
-            # It looks like we ran out results
-            if not results:
-                break
+        while keep_looping:
+            # Get the next results
+            results = self.call(service, method, offset=offset, limit=limit, *args, **kwargs)
 
             # Apparently this method doesn't return a list.
             # Why are you even iterating over this?
-            if not isinstance(results, list):
-                yield results
-                break
+            if not isinstance(results, transports.SoftLayerListResult):
+                if isinstance(results, list):
+                    # Close enough, this makes testing a lot easier
+                    results = transports.SoftLayerListResult(results, len(results))
+                else:
+                    yield results
+                    return
 
             for item in results:
                 yield item
                 result_count += 1
 
-            offset += chunk
+            # Got less results than requested, we are at the end
+            if len(results) < limit:
+                keep_looping = False
+            # Got all the needed items
+            if result_count >= results.total_count:
+                keep_looping = False
 
-            if len(results) < chunk:
-                break
+            offset += limit
 
     def __repr__(self):
         return "Client(transport=%r, auth=%r)" % (self.transport, self.auth)
@@ -333,6 +329,7 @@ class Service(object):
         :param name str: The service name
 
     """
+
     def __init__(self, client, name):
         self.client = client
         self.name = name

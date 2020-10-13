@@ -59,9 +59,12 @@ class BlockTests(testing.TestCase):
         result = self.run_command(['block', 'volume-detail', '1234'])
 
         self.assert_no_fail(result)
+        isinstance(json.loads(result.output)['IOPs'], float)
+        self.assert_called_with('SoftLayer_Network_Storage', 'getObject', identifier=1234)
         self.assertEqual({
             'Username': 'username',
             'LUN Id': '2',
+            'Notes': "{'status': 'available'}",
             'Endurance Tier': 'READHEAVY_TIER',
             'IOPs': 1000,
             'Snapshot Capacity (GB)': '10',
@@ -97,6 +100,26 @@ class BlockTests(testing.TestCase):
             ]
         }, json.loads(result.output))
 
+    def test_volume_detail_name_identifier(self):
+        result = self.run_command(['block', 'volume-detail', 'SL-12345'])
+        expected_filter = {
+            'iscsiNetworkStorage': {
+                'serviceResource': {
+                    'type': {
+                        'type': {'operation': '!~ ISCSI'}
+                    }
+                },
+                'storageType': {
+                    'keyName': {'operation': '*= BLOCK_STORAGE'}
+                },
+                'username': {'operation': '_= SL-12345'}
+            }
+        }
+
+        self.assert_called_with('SoftLayer_Account', 'getIscsiNetworkStorage', filter=expected_filter)
+        self.assert_called_with('SoftLayer_Network_Storage', 'getObject', identifier=100)
+        self.assert_no_fail(result)
+
     def test_volume_list(self):
         result = self.run_command(['block', 'volume-list'])
 
@@ -107,14 +130,23 @@ class BlockTests(testing.TestCase):
                 'capacity_gb': 20,
                 'datacenter': 'dal05',
                 'id': 100,
+                'iops': None,
                 'ip_addr': '10.1.2.3',
                 'lunId': None,
+                'notes': "{'status': 'availabl",
                 'rep_partner_count': None,
                 'storage_type': 'ENDURANCE',
                 'username': 'username',
                 'active_transactions': None
             }],
             json.loads(result.output))
+
+    def test_volume_list_order(self):
+        result = self.run_command(['block', 'volume-list', '--order=1234567'])
+
+        self.assert_no_fail(result)
+        json_result = json.loads(result.output)
+        self.assertEqual(json_result[0]['id'], 100)
 
     @mock.patch('SoftLayer.BlockStorageManager.list_block_volumes')
     def test_volume_count(self, list_mock):
@@ -138,14 +170,6 @@ class BlockTests(testing.TestCase):
         result = self.run_command(['block', 'volume-order',
                                    '--storage-type=performance', '--size=20',
                                    '--os-type=linux', '--location=dal05'])
-
-        self.assertEqual(2, result.exit_code)
-
-    def test_volume_order_performance_iops_not_multiple_of_100(self):
-        result = self.run_command(['block', 'volume-order',
-                                   '--storage-type=performance', '--size=20',
-                                   '--iops=122', '--os-type=linux',
-                                   '--location=dal05'])
 
         self.assertEqual(2, result.exit_code)
 
@@ -182,7 +206,9 @@ class BlockTests(testing.TestCase):
                          'Order #478 placed successfully!\n'
                          ' > Performance Storage\n > Block Storage\n'
                          ' > 0.25 IOPS per GB\n > 20 GB Storage Space\n'
-                         ' > 10 GB Storage Space (Snapshot Space)\n')
+                         ' > 10 GB Storage Space (Snapshot Space)\n'
+                         '\nYou may run "slcli block volume-list --order 478" to find this block volume '
+                         'after it is ready.\n')
 
     def test_volume_order_endurance_tier_not_given(self):
         result = self.run_command(['block', 'volume-order',
@@ -202,7 +228,7 @@ class BlockTests(testing.TestCase):
                     {'description': '0.25 IOPS per GB'},
                     {'description': '20 GB Storage Space'},
                     {'description': '10 GB Storage Space (Snapshot Space)'}]
-                }
+            }
         }
 
         result = self.run_command(['block', 'volume-order',
@@ -215,7 +241,9 @@ class BlockTests(testing.TestCase):
                          'Order #478 placed successfully!\n'
                          ' > Endurance Storage\n > Block Storage\n'
                          ' > 0.25 IOPS per GB\n > 20 GB Storage Space\n'
-                         ' > 10 GB Storage Space (Snapshot Space)\n')
+                         ' > 10 GB Storage Space (Snapshot Space)\n'
+                         '\nYou may run "slcli block volume-list --order 478" to find this block volume '
+                         'after it is ready.\n')
 
     @mock.patch('SoftLayer.BlockStorageManager.order_block_volume')
     def test_volume_order_order_not_placed(self, order_mock):
@@ -250,7 +278,7 @@ class BlockTests(testing.TestCase):
                     {'description': 'Block Storage'},
                     {'description': '20 GB Storage Space'},
                     {'description': '200 IOPS'}]
-                }
+            }
         }
 
         result = self.run_command(['block', 'volume-order',
@@ -264,7 +292,9 @@ class BlockTests(testing.TestCase):
                          ' > Storage as a Service\n'
                          ' > Block Storage\n'
                          ' > 20 GB Storage Space\n'
-                         ' > 200 IOPS\n')
+                         ' > 200 IOPS\n'
+                         '\nYou may run "slcli block volume-list --order 10983647" to find this block volume '
+                         'after it is ready.\n')
 
     @mock.patch('SoftLayer.BlockStorageManager.order_block_volume')
     def test_volume_order_performance_manager_error(self, order_mock):
@@ -416,7 +446,7 @@ class BlockTests(testing.TestCase):
                 'items': [{'description':
                            '10 GB Storage Space (Snapshot Space)'}],
                 'status': 'PENDING_APPROVAL',
-                }
+            }
         }
 
         result = self.run_command(['block', 'snapshot-order', '1234',
@@ -444,9 +474,26 @@ class BlockTests(testing.TestCase):
 
         self.assert_no_fail(result)
 
+    def test_assign_subnets_to_acl(self):
+        result = self.run_command(['block', 'subnets-assign', '12345',
+                                   '--subnet-id=12345678'])
+
+        self.assert_no_fail(result)
+
+    def test_remove_subnets_from_acl(self):
+        result = self.run_command(['block', 'subnets-remove', '12345',
+                                   '--subnet-id=12345678'])
+
+        self.assert_no_fail(result)
+
+    def test_get_subnets_in_acl(self):
+        result = self.run_command(['block', 'subnets-list', '12345'])
+
+        self.assert_no_fail(result)
+
     def test_replicant_failover(self):
         result = self.run_command(['block', 'replica-failover', '12345678',
-                                   '--replicant-id=5678', '--immediate'])
+                                   '--replicant-id=5678'])
 
         self.assert_no_fail(result)
         self.assertEqual('Failover to replicant is now in progress.\n',
@@ -512,8 +559,7 @@ class BlockTests(testing.TestCase):
                          result.output)
 
     def test_replicant_failback(self):
-        result = self.run_command(['block', 'replica-failback', '12345678',
-                                   '--replicant-id=5678'])
+        result = self.run_command(['block', 'replica-failback', '12345678'])
 
         self.assert_no_fail(result)
         self.assertEqual('Failback from replicant is now in progress.\n',
@@ -523,8 +569,7 @@ class BlockTests(testing.TestCase):
     def test_replicant_failback_unsuccessful(self, failback_mock):
         failback_mock.return_value = False
 
-        result = self.run_command(['block', 'replica-failback', '12345678',
-                                   '--replicant-id=5678'])
+        result = self.run_command(['block', 'replica-failback', '12345678'])
 
         self.assertEqual('Failback operation could not be initiated.\n',
                          result.output)
@@ -633,7 +678,8 @@ class BlockTests(testing.TestCase):
                                       duplicate_size=250, duplicate_iops=None,
                                       duplicate_tier_level=2,
                                       duplicate_snapshot_size=20,
-                                      hourly_billing_flag=True)
+                                      hourly_billing_flag=True,
+                                      dependent_duplicate=False)
         self.assert_no_fail(result)
         self.assertEqual(result.output,
                          'Order #24602 placed successfully!\n'
@@ -673,3 +719,43 @@ class BlockTests(testing.TestCase):
     def test_set_password(self):
         result = self.run_command(['block', 'access-password', '1234', '--password=AAAAA'])
         self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.BlockStorageManager.list_block_volume_limit')
+    def test_volume_limit(self, list_mock):
+        list_mock.return_value = [
+            {
+                "datacenterName": "global",
+                "maximumAvailableCount": 300,
+                "provisionedCount": 100
+            }]
+
+        result = self.run_command(['block', 'volume-limits'])
+        self.assert_no_fail(result)
+
+    def test_dupe_refresh(self):
+        result = self.run_command(['block', 'volume-refresh', '102', '103'])
+
+        self.assert_no_fail(result)
+
+    def test_dep_dupe_convert(self):
+        result = self.run_command(['block', 'volume-convert', '102'])
+
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.BlockStorageManager.volume_set_note')
+    def test_volume_set_note(self, set_note):
+        set_note.return_value = True
+
+        result = self.run_command(['block', 'volume-set-note', '102', '--note=testing'])
+
+        self.assert_no_fail(result)
+        self.assertIn("successfully!", result.output)
+
+    @mock.patch('SoftLayer.BlockStorageManager.volume_set_note')
+    def test_volume_not_set_note(self, set_note):
+        set_note.return_value = False
+
+        result = self.run_command(['block', 'volume-set-note', '102', '--note=testing'])
+
+        self.assert_no_fail(result)
+        self.assertIn("Note could not be set!", result.output)

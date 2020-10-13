@@ -13,18 +13,28 @@ import warnings
 
 from SoftLayer.decoration import retry
 from SoftLayer import exceptions
+from SoftLayer.exceptions import SoftLayerError
+from SoftLayer.managers.hardware import _get_preset_cost
+from SoftLayer.managers.hardware import get_item_price
 from SoftLayer.managers import ordering
 from SoftLayer import utils
 
-
 LOGGER = logging.getLogger(__name__)
-# pylint: disable=no-self-use
+
+EXTRA_CATEGORIES = ['pri_ipv6_addresses',
+                    'static_ipv6_addresses',
+                    'sec_ip_addresses',
+                    'trusted_platform_module',
+                    'software_guard_extensions']
+
+
+# pylint: disable=no-self-use,too-many-lines
 
 
 class VSManager(utils.IdentifierMixin, object):
     """Manages SoftLayer Virtual Servers.
 
-    See product information here: http://www.softlayer.com/virtual-servers
+    See product information here: https://www.ibm.com/cloud/virtual-servers
 
     Example::
 
@@ -50,6 +60,8 @@ class VSManager(utils.IdentifierMixin, object):
         self.client = client
         self.account = client['Account']
         self.guest = client['Virtual_Guest']
+        self.package_svc = client['Product_Package']
+        self.storage_iscsi = client['SoftLayer_Network_Storage_Iscsi']
         self.resolvers = [self._get_ids_from_ip, self._get_ids_from_hostname]
         if ordering_manager is None:
             self.ordering_manager = ordering.OrderingManager(client)
@@ -60,7 +72,7 @@ class VSManager(utils.IdentifierMixin, object):
     def list_instances(self, hourly=True, monthly=True, tags=None, cpus=None,
                        memory=None, hostname=None, domain=None,
                        local_disk=None, datacenter=None, nic_speed=None,
-                       public_ip=None, private_ip=None, **kwargs):
+                       public_ip=None, private_ip=None, transient=None, **kwargs):
         """Retrieve a list of all virtual servers on the account.
 
         Example::
@@ -87,6 +99,7 @@ class VSManager(utils.IdentifierMixin, object):
         :param integer nic_speed: filter based on network speed (in MBPS)
         :param string public_ip: filter based on public ip address
         :param string private_ip: filter based on private ip address
+        :param boolean transient: filter on transient or non-transient instances
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         :returns: Returns a list of dictionaries representing the matching
                   virtual servers
@@ -156,9 +169,14 @@ class VSManager(utils.IdentifierMixin, object):
             _filter['virtualGuests']['primaryBackendIpAddress'] = (
                 utils.query_filter(private_ip))
 
+        if transient is not None:
+            _filter['virtualGuests']['transientGuestFlag'] = (
+                utils.query_filter(bool(transient))
+            )
+
         kwargs['filter'] = _filter.to_dict()
-        func = getattr(self.account, call)
-        return func(**kwargs)
+        kwargs['iter'] = True
+        return self.client.call('Account', call, **kwargs)
 
     @retry(logger=LOGGER)
     def get_instance(self, instance_id, **kwargs):
@@ -193,12 +211,13 @@ class VSManager(utils.IdentifierMixin, object):
                 'provisionDate,'
                 'notes,'
                 'dedicatedAccountHostOnlyFlag,'
+                'transientGuestFlag,'
                 'privateNetworkOnlyFlag,'
                 'primaryBackendIpAddress,'
                 'primaryIpAddress,'
                 '''networkComponents[id, status, speed, maxSpeed, name,
                                      macAddress, primaryIpAddress, port,
-                                     primarySubnet,
+                                     primarySubnet[addressSpace],
                                      securityGroupBindings[
                                         securityGroup[id, name]]],'''
                 'lastKnownPowerState.name,'
@@ -208,6 +227,7 @@ class VSManager(utils.IdentifierMixin, object):
                 'maxMemory,'
                 'datacenter,'
                 'activeTransaction[id, transactionStatus[friendlyName,name]],'
+                'lastTransaction[transactionStatus],'
                 'lastOperatingSystemReload.id,'
                 'blockDevices,'
                 'blockDeviceTemplateGroup[id, name, globalIdentifier],'
@@ -224,21 +244,25 @@ class VSManager(utils.IdentifierMixin, object):
                 'hourlyBillingFlag,'
                 'userData,'
                 '''billingItem[id,nextInvoiceTotalRecurringAmount,
+                               package[id,keyName],
                                children[categoryCode,nextInvoiceTotalRecurringAmount],
                                orderItem[id,
                                          order.userRecord[username],
                                          preset.keyName]],'''
                 'tagReferences[id,tag[name,id]],'
                 'networkVlans[id,vlanNumber,networkSpace],'
-                'dedicatedHost.id'
+                'dedicatedHost.id,'
+                'placementGroupId'
             )
 
         return self.guest.getObject(id=instance_id, **kwargs)
 
     @retry(logger=LOGGER)
-    def get_create_options(self):
+    def get_create_options(self, vsi_type="PUBLIC_CLOUD_SERVER", datacenter=None):
         """Retrieves the available options for creating a VS.
 
+        :param string vsi_type: vs keyName.
+        :param string datacenter: short name, like dal09
         :returns: A dictionary of creation options.
 
         Example::
@@ -247,7 +271,147 @@ class VSManager(utils.IdentifierMixin, object):
             options = mgr.get_create_options()
             print(options)
         """
-        return self.guest.getCreateObjectOptions()
+
+        # TRANSIENT_CLOUD_SERVER
+        # SUSPEND_CLOUD_SERVER
+        package = self._get_package(vsi_type)
+
+        location_group_id = None
+        if datacenter:
+            _filter = {"name": {"operation": datacenter}}
+            _mask = "mask[priceGroups]"
+            dc_details = self.client.call('SoftLayer_Location', 'getDatacenters', mask=_mask, filter=_filter, limit=1)
+            if not dc_details:
+                raise SoftLayerError("Unable to find a datacenter named {}".format(datacenter))
+            # A DC will have several price groups, no good way to deal with this other than checking each.
+            # An item should only belong to one type of price group.
+            for group in dc_details[0].get('priceGroups', []):
+                # We only care about SOME of the priceGroups, which all SHOULD start with `Location Group X`
+                # Hopefully this never changes....
+                if group.get('description').startswith('Location'):
+                    location_group_id = group.get('id')
+
+        # Locations
+        locations = []
+        for region in package['regions']:
+            if datacenter is None or datacenter == region['location']['location']['name']:
+                locations.append({
+                    'name': region['location']['location']['longName'],
+                    'key': region['location']['location']['name'],
+                })
+
+        operating_systems = []
+        database = []
+        port_speeds = []
+        guest_core = []
+        local_disk = []
+        extras = []
+        ram = []
+
+        sizes = []
+        for preset in package['activePresets'] + package['accountRestrictedActivePresets']:
+            sizes.append({
+                'name': preset['description'],
+                'key': preset['keyName'],
+                'hourlyRecurringFee': _get_preset_cost(preset, package['items'], 'hourly', location_group_id),
+                'recurringFee': _get_preset_cost(preset, package['items'], 'monthly', location_group_id)
+            })
+
+        for item in package['items']:
+            category = item['itemCategory']['categoryCode']
+            # Operating systems
+            if category == 'os':
+                operating_systems.append({
+                    'name': item['softwareDescription']['longDescription'],
+                    'key': item['keyName'],
+                    'referenceCode': item['softwareDescription']['referenceCode'],
+                    'prices': get_item_price(item['prices'], location_group_id)
+                })
+            # database
+            elif category == 'database':
+                database.append({
+                    'name': item['description'],
+                    'key': item['keyName'],
+                    'prices': get_item_price(item['prices'], location_group_id)
+                })
+
+            elif category == 'port_speed':
+                port_speeds.append({
+                    'name': item['description'],
+                    'speed': item['capacity'],
+                    'key': item['keyName'],
+                    'prices': get_item_price(item['prices'], location_group_id)
+                })
+
+            elif category == 'guest_core':
+                guest_core.append({
+                    'name': item['description'],
+                    'capacity': item['capacity'],
+                    'key': item['keyName'],
+                    'prices': get_item_price(item['prices'], location_group_id)
+                })
+
+            elif category == 'ram':
+                ram.append({
+                    'name': item['description'],
+                    'capacity': item['capacity'],
+                    'key': item['keyName'],
+                    'prices': get_item_price(item['prices'], location_group_id)
+                })
+
+            elif category.__contains__('guest_disk'):
+                local_disk.append({
+                    'name': item['description'],
+                    'capacity': item['capacity'],
+                    'key': item['keyName'],
+                    'disk': category,
+                    'prices': get_item_price(item['prices'], location_group_id)
+                })
+            # Extras
+            elif category in EXTRA_CATEGORIES:
+                extras.append({
+                    'name': item['description'],
+                    'key': item['keyName'],
+                    'prices': get_item_price(item['prices'], location_group_id)
+                })
+
+        return {
+            'locations': locations,
+            'ram': ram,
+            'database': database,
+            'operating_systems': operating_systems,
+            'guest_core': guest_core,
+            'port_speed': port_speeds,
+            'guest_disk': local_disk,
+            'sizes': sizes,
+            'extras': extras,
+        }
+
+    @retry(logger=LOGGER)
+    def _get_package(self, package_keyname):
+        """Get the package related to simple vs ordering.
+
+        :param string package_keyname: Virtual Server package keyName.
+        """
+        items_mask = 'mask[id,keyName,capacity,description,attributes[id,attributeTypeKeyName],' \
+                     'itemCategory[id,categoryCode],softwareDescription[id,referenceCode,longDescription],' \
+                     'prices[categories]]'
+        # The preset prices list will only have default prices. The prices->item->prices will have location specific
+        presets_mask = 'mask[prices]'
+        region_mask = 'location[location[priceGroups]]'
+        package = {'items': [], 'activePresets': [], 'accountRestrictedActivePresets': [], 'regions': []}
+        package_info = self.ordering_manager.get_package_by_key(package_keyname, mask="mask[id]")
+
+        package['items'] = self.client.call('SoftLayer_Product_Package', 'getItems',
+                                            id=package_info.get('id'), mask=items_mask)
+        package['activePresets'] = self.client.call('SoftLayer_Product_Package', 'getActivePresets',
+                                                    id=package_info.get('id'), mask=presets_mask)
+        package['accountRestrictedActivePresets'] = self.client.call('SoftLayer_Product_Package',
+                                                                     'getAccountRestrictedActivePresets',
+                                                                     id=package_info.get('id'), mask=presets_mask)
+        package['regions'] = self.client.call('SoftLayer_Product_Package', 'getRegions',
+                                              id=package_info.get('id'), mask=region_mask)
+        return package
 
     def cancel_instance(self, instance_id):
         """Cancel an instance immediately, deleting all its data.
@@ -292,7 +456,7 @@ class VSManager(utils.IdentifierMixin, object):
             config['customProvisionScriptUri'] = post_uri
 
         if ssh_keys:
-            config['sshKeyIds'] = [key_id for key_id in ssh_keys]
+            config['sshKeyIds'] = list(ssh_keys)
 
         if image_id:
             config['imageTemplateId'] = image_id
@@ -305,9 +469,10 @@ class VSManager(utils.IdentifierMixin, object):
             hostname=None, domain=None, local_disk=True,
             datacenter=None, os_code=None, image_id=None,
             dedicated=False, public_vlan=None, private_vlan=None,
+            private_subnet=None, public_subnet=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
             private=False, ssh_keys=None, public_security_groups=None,
-            private_security_groups=None, boot_mode=None, **kwargs):
+            private_security_groups=None, boot_mode=None, transient=False, **kwargs):
         """Returns a dict appropriate to pass into Virtual_Guest::createObject
 
             See :func:`create_instance` for a list of available options.
@@ -357,6 +522,9 @@ class VSManager(utils.IdentifierMixin, object):
         if private:
             data['privateNetworkOnlyFlag'] = private
 
+        if transient:
+            data['transientGuestFlag'] = transient
+
         if image_id:
             data["blockDeviceTemplateGroup"] = {"globalIdentifier": image_id}
         elif os_code:
@@ -365,14 +533,10 @@ class VSManager(utils.IdentifierMixin, object):
         if datacenter:
             data["datacenter"] = {"name": datacenter}
 
-        if public_vlan:
-            data.update({
-                'primaryNetworkComponent': {
-                    "networkVlan": {"id": int(public_vlan)}}})
-        if private_vlan:
-            data.update({
-                "primaryBackendNetworkComponent": {
-                    "networkVlan": {"id": int(private_vlan)}}})
+        if private_vlan or public_vlan or private_subnet or public_subnet:
+            network_components = self._create_network_components(public_vlan, private_vlan,
+                                                                 private_subnet, public_subnet)
+            data.update(network_components)
 
         if public_security_groups:
             secgroups = [{'securityGroup': {'id': int(sg)}}
@@ -414,6 +578,27 @@ class VSManager(utils.IdentifierMixin, object):
             data['sshKeys'] = [{'id': key_id} for key_id in ssh_keys]
 
         return data
+
+    def _create_network_components(
+            self, public_vlan=None, private_vlan=None,
+            private_subnet=None, public_subnet=None):
+        parameters = {}
+        if private_vlan:
+            parameters['primaryBackendNetworkComponent'] = {"networkVlan": {"id": int(private_vlan)}}
+        if public_vlan:
+            parameters['primaryNetworkComponent'] = {"networkVlan": {"id": int(public_vlan)}}
+        if public_subnet:
+            if public_vlan is None:
+                raise exceptions.SoftLayerError("You need to specify a public_vlan with public_subnet")
+
+            parameters['primaryNetworkComponent']['networkVlan']['primarySubnet'] = {'id': int(public_subnet)}
+        if private_subnet:
+            if private_vlan is None:
+                raise exceptions.SoftLayerError("You need to specify a private_vlan with private_subnet")
+
+            parameters['primaryBackendNetworkComponent']['networkVlan']['primarySubnet'] = {'id': int(private_subnet)}
+
+        return parameters
 
     @retry(logger=LOGGER)
     def wait_for_transaction(self, instance_id, limit, delay=10):
@@ -479,15 +664,17 @@ class VSManager(utils.IdentifierMixin, object):
                 'domain': u'test01.labs.sftlyr.ws',
                 'hostname': u'minion05',
                 'datacenter': u'hkg02',
+                'flavor': 'BL1_1X2X100'
                 'dedicated': False,
                 'private': False,
-                'cpus': 1,
+                'transient': False,
                 'os_code' : u'UBUNTU_LATEST',
                 'hourly': True,
                 'ssh_keys': [1234],
                 'disks': ('100','25'),
                 'local_disk': True,
-                'memory': 1024
+                'tags': 'test, pleaseCancel',
+                'public_security_groups': [12, 15]
             }
 
             vsi = mgr.verify_create_instance(**new_vsi)
@@ -497,7 +684,16 @@ class VSManager(utils.IdentifierMixin, object):
         """
         kwargs.pop('tags', None)
         create_options = self._generate_create_dict(**kwargs)
-        return self.guest.generateOrderTemplate(create_options)
+        template = self.guest.generateOrderTemplate(create_options)
+        if 'private_subnet' in kwargs or 'public_subnet' in kwargs:
+            vsi = template['virtualGuests'][0]
+            network_components = self._create_network_components(kwargs.get('public_vlan', None),
+                                                                 kwargs.get('private_vlan', None),
+                                                                 kwargs.get('private_subnet', None),
+                                                                 kwargs.get('public_subnet', None))
+            vsi.update(network_components)
+
+        return template
 
     def create_instance(self, **kwargs):
         """Creates a new virtual server instance.
@@ -512,15 +708,14 @@ class VSManager(utils.IdentifierMixin, object):
                 'domain': u'test01.labs.sftlyr.ws',
                 'hostname': u'minion05',
                 'datacenter': u'hkg02',
+                'flavor': 'BL1_1X2X100'
                 'dedicated': False,
                 'private': False,
-                'cpus': 1,
                 'os_code' : u'UBUNTU_LATEST',
                 'hourly': True,
                 'ssh_keys': [1234],
                 'disks': ('100','25'),
                 'local_disk': True,
-                'memory': 1024,
                 'tags': 'test, pleaseCancel',
                 'public_security_groups': [12, 15]
             }
@@ -583,17 +778,16 @@ class VSManager(utils.IdentifierMixin, object):
             # Define the instance we want to create.
             new_vsi = {
                 'domain': u'test01.labs.sftlyr.ws',
-                'hostname': u'multi-test',
+                'hostname': u'minion05',
                 'datacenter': u'hkg02',
+                'flavor': 'BL1_1X2X100'
                 'dedicated': False,
                 'private': False,
-                'cpus': 1,
                 'os_code' : u'UBUNTU_LATEST',
                 'hourly': True,
-                'ssh_keys': [87634],
+                'ssh_keys': [1234],
                 'disks': ('100','25'),
                 'local_disk': True,
-                'memory': 1024,
                 'tags': 'test, pleaseCancel',
                 'public_security_groups': [12, 15]
             }
@@ -641,12 +835,10 @@ class VSManager(utils.IdentifierMixin, object):
             A port speed of 0 will disable the interface.
         """
         if public:
-            return self.client.call('Virtual_Guest',
-                                    'setPublicNetworkInterfaceSpeed',
+            return self.client.call('Virtual_Guest', 'setPublicNetworkInterfaceSpeed',
                                     speed, id=instance_id)
         else:
-            return self.client.call('Virtual_Guest',
-                                    'setPrivateNetworkInterfaceSpeed',
+            return self.client.call('Virtual_Guest', 'setPrivateNetworkInterfaceSpeed',
                                     speed, id=instance_id)
 
     def _get_ids_from_hostname(self, hostname):
@@ -761,10 +953,7 @@ class VSManager(utils.IdentifierMixin, object):
                 continue
 
             # We never want swap devices
-            type_name = utils.lookup(block_device,
-                                     'diskImage',
-                                     'type',
-                                     'keyName')
+            type_name = utils.lookup(block_device, 'diskImage', 'type', 'keyName')
             if type_name == 'SWAP':
                 continue
 
@@ -781,8 +970,7 @@ class VSManager(utils.IdentifierMixin, object):
         return self.guest.createArchiveTransaction(
             name, disks_to_capture, notes, id=instance_id)
 
-    def upgrade(self, instance_id, cpus=None, memory=None,
-                nic_speed=None, public=True):
+    def upgrade(self, instance_id, cpus=None, memory=None, nic_speed=None, public=True, preset=None, disk=None):
         """Upgrades a VS instance.
 
         Example::
@@ -796,6 +984,7 @@ class VSManager(utils.IdentifierMixin, object):
         :param int instance_id: Instance id of the VS to be upgraded
         :param int cpus: The number of virtual CPUs to upgrade to
                             of a VS instance.
+        :param string preset: preset assigned to the vsi
         :param int memory: RAM of the VS to be upgraded to.
         :param int nic_speed: The port speed to set
         :param bool public: CPU will be in Private/Public Node.
@@ -805,9 +994,61 @@ class VSManager(utils.IdentifierMixin, object):
         upgrade_prices = self._get_upgrade_prices(instance_id)
         prices = []
 
-        for option, value in {'cpus': cpus,
-                              'memory': memory,
-                              'nic_speed': nic_speed}.items():
+        data = {'nic_speed': nic_speed}
+
+        if cpus is not None and preset is not None:
+            raise ValueError("Do not use cpu, private and memory if you are using flavors")
+        data['cpus'] = cpus
+
+        if memory is not None and preset is not None:
+            raise ValueError("Do not use memory, private or cpu if you are using flavors")
+        data['memory'] = memory
+
+        maintenance_window = datetime.datetime.now(utils.UTC())
+        order = {
+            'complexType': 'SoftLayer_Container_Product_Order_Virtual_Guest_Upgrade',
+            'properties': [{
+                'name': 'MAINTENANCE_WINDOW',
+                'value': maintenance_window.strftime("%Y-%m-%d %H:%M:%S%z")
+            }],
+            'virtualGuests': [{'id': int(instance_id)}],
+        }
+
+        if disk:
+            disk_number = 0
+            vsi_disk = self.get_instance(instance_id)
+            for item in vsi_disk.get('billingItem').get('children'):
+                if item.get('categoryCode').__contains__('guest_disk'):
+                    if disk_number < int("".join(filter(str.isdigit, item.get('categoryCode')))):
+                        disk_number = int("".join(filter(str.isdigit, item.get('categoryCode'))))
+            for disk_guest in disk:
+                if disk_guest.get('number') > 0:
+                    price_id = self._get_price_id_for_upgrade_option(upgrade_prices, 'disk',
+                                                                     disk_guest.get('capacity'),
+                                                                     public)
+                    disk_number = disk_guest.get('number')
+
+                else:
+                    price_id = self._get_price_id_for_upgrade_option(upgrade_prices, 'disk',
+                                                                     disk_guest.get('capacity'),
+                                                                     public)
+                    disk_number = disk_number + 1
+
+                if price_id is None:
+                    raise exceptions.SoftLayerAPIError(500,
+                                                       'Unable to find %s option with value %s' % (
+                                                           ('disk', disk_guest.get('capacity'))))
+
+                category = {'categories': [{
+                    'categoryCode': 'guest_disk' + str(disk_number),
+                    'complexType': "SoftLayer_Product_Item_Category"}],
+                            'complexType': 'SoftLayer_Product_Item_Price',
+                            'id': price_id}
+
+                prices.append(category)
+            order['prices'] = prices
+
+        for option, value in data.items():
             if not value:
                 continue
             price_id = self._get_price_id_for_upgrade_option(upgrade_prices,
@@ -821,21 +1062,74 @@ class VSManager(utils.IdentifierMixin, object):
 
             prices.append({'id': price_id})
 
-        maintenance_window = datetime.datetime.now(utils.UTC())
-        order = {
-            'complexType': 'SoftLayer_Container_Product_Order_Virtual_Guest_'
-                           'Upgrade',
-            'prices': prices,
-            'properties': [{
-                'name': 'MAINTENANCE_WINDOW',
-                'value': maintenance_window.strftime("%Y-%m-%d %H:%M:%S%z")
-            }],
-            'virtualGuests': [{'id': int(instance_id)}],
-        }
-        if prices:
+            order['prices'] = prices
+        if preset is not None:
+            vs_object = self.get_instance(instance_id)['billingItem']['package']
+            order['presetId'] = self.ordering_manager.get_preset_by_key(vs_object['keyName'], preset)['id']
+
+        if prices or preset:
             self.client['Product_Order'].placeOrder(order)
             return True
         return False
+
+    def order_guest(self, guest_object, test=False):
+        """Uses Product_Order::placeOrder to create a virtual guest.
+
+        Useful when creating a virtual guest with options not supported by Virtual_Guest::createObject
+        specifically ipv6 support.
+
+        :param dictionary guest_object: See SoftLayer.CLI.virt.create._parse_create_args
+
+        Example::
+
+            new_vsi = {
+                'domain': u'test01.labs.sftlyr.ws',
+                'hostname': u'minion05',
+                'datacenter': u'hkg02',
+                'flavor': 'BL1_1X2X100'
+                'dedicated': False,
+                'private': False,
+                'transient': False,
+                'os_code' : u'UBUNTU_LATEST',
+                'hourly': True,
+                'ssh_keys': [1234],
+                'disks': ('100','25'),
+                'local_disk': True,
+                'tags': 'test, pleaseCancel',
+                'public_security_groups': [12, 15],
+                'ipv6': True
+            }
+
+            vsi = mgr.order_guest(new_vsi)
+            # vsi will have the newly created vsi receipt.
+            # vsi['orderDetails']['virtualGuests'] will be an array of created Guests
+            print vsi
+        """
+        tags = guest_object.pop('tags', None)
+        template = self.verify_create_instance(**guest_object)
+
+        if guest_object.get('ipv6'):
+            ipv6_price = self.ordering_manager.get_price_id_list('PUBLIC_CLOUD_SERVER', ['1_IPV6_ADDRESS'])
+            template['prices'].append({'id': ipv6_price[0]})
+
+        # Notice this is `userdata` from the cli, but we send it in as `userData`
+        if guest_object.get('userdata'):
+            # SL_Virtual_Guest::generateOrderTemplate() doesn't respect userData, so we need to add it ourself
+            template['virtualGuests'][0]['userData'] = [{"value": guest_object.get('userdata')}]
+        if guest_object.get('host_id'):
+            template['hostId'] = guest_object.get('host_id')
+        if guest_object.get('placement_id'):
+            template['virtualGuests'][0]['placementGroupId'] = guest_object.get('placement_id')
+
+        if test:
+            result = self.client.call('Product_Order', 'verifyOrder', template)
+        else:
+            result = self.client.call('Product_Order', 'placeOrder', template)
+            if tags is not None:
+                virtual_guests = utils.lookup(result, 'orderDetails', 'virtualGuests')
+                for guest in virtual_guests:
+                    self.set_tags(tags, guest_id=guest['id'])
+        return result
 
     def _get_package_items(self):
         """Following Method gets all the item ids related to VS.
@@ -886,9 +1180,11 @@ class VSManager(utils.IdentifierMixin, object):
         option_category = {
             'memory': 'ram',
             'cpus': 'guest_core',
-            'nic_speed': 'port_speed'
+            'nic_speed': 'port_speed',
+            'disk': 'guest_disk'
         }
         category_code = option_category.get(option)
+
         for price in upgrade_prices:
             if price.get('categories') is None or price.get('item') is None:
                 continue
@@ -898,6 +1194,11 @@ class VSManager(utils.IdentifierMixin, object):
                           or product.get('units') == 'DEDICATED_CORE')
 
             for category in price.get('categories'):
+                if option == 'disk':
+                    if (category_code == (''.join([i for i in category.get('categoryCode') if not i.isdigit()]))
+                            and str(product.get('capacity')) == str(value)):
+                        return price.get('id')
+
                 if not (category.get('categoryCode') == category_code
                         and str(product.get('capacity')) == str(value)):
                     continue
@@ -914,6 +1215,63 @@ class VSManager(utils.IdentifierMixin, object):
                         return price.get('id')
                 else:
                     return price.get('id')
+
+    def get_summary_data_usage(self, instance_id, start_date=None, end_date=None, valid_type=None, summary_period=None):
+        """Retrieve the usage information of a virtual server.
+
+        :param string instance_id: a string identifier used to resolve ids
+        :param string start_date: the start data to retrieve the vs usage information
+        :param string end_date: the start data to retrieve the vs usage information
+        :param string string valid_type: the Metric_Data_Type keyName.
+        :param int summary_period: summary period.
+        """
+        valid_types = [
+            {
+                "keyName": valid_type,
+                "summaryType": "max"
+            }
+        ]
+
+        metric_tracking_id = self.get_tracking_id(instance_id)
+
+        return self.client.call('Metric_Tracking_Object', 'getSummaryData', start_date, end_date, valid_types,
+                                summary_period, id=metric_tracking_id, iter=True)
+
+    def get_tracking_id(self, instance_id):
+        """Returns the Metric Tracking Object Id for a hardware server
+
+        :param int instance_id: Id of the hardware server
+        """
+        return self.guest.getMetricTrackingObjectId(id=instance_id)
+
+    def get_bandwidth_data(self, instance_id, start_date=None, end_date=None, direction=None, rollup=3600):
+        """Gets bandwidth data for a server
+
+        Will get averaged bandwidth data for a given time period. If you use a rollup over 3600 be aware
+        that the API will bump your start/end date to align with how data is stored. For example if you
+        have a rollup of 86400 your start_date will be bumped to 00:00. If you are not using a time in the
+        start/end date fields, this won't really matter.
+
+        :param int instance_id: Hardware Id to get data for
+        :param date start_date: Date to start pulling data for.
+        :param date end_date: Date to finish pulling data for
+        :param string direction: Can be either 'public', 'private', or None for both.
+        :param int rollup: 300, 600, 1800, 3600, 43200 or 86400 seconds to average data over.
+        """
+        tracking_id = self.get_tracking_id(instance_id)
+        data = self.client.call('Metric_Tracking_Object', 'getBandwidthData', start_date, end_date, direction,
+                                rollup, id=tracking_id, iter=True)
+        return data
+
+    def get_bandwidth_allocation(self, instance_id):
+        """Combines getBandwidthAllotmentDetail() and getBillingCycleBandwidthUsage() """
+        a_mask = "mask[allocation[amount]]"
+        allotment = self.client.call('Virtual_Guest', 'getBandwidthAllotmentDetail', id=instance_id, mask=a_mask)
+        u_mask = "mask[amountIn,amountOut,type]"
+        usage = self.client.call('Virtual_Guest', 'getBillingCycleBandwidthUsage', id=instance_id, mask=u_mask)
+        if allotment:
+            return {'allotment': allotment.get('allocation'), 'usage': usage}
+        return {'allotment': allotment, 'usage': usage}
 
     # pylint: disable=inconsistent-return-statements
     def _get_price_id_for_upgrade(self, package_items, option, value, public=True):
@@ -959,3 +1317,66 @@ class VSManager(utils.IdentifierMixin, object):
                             return price['id']
                     else:
                         return price['id']
+
+    def get_storage_details(self, instance_id, nas_type):
+        """Returns the virtual server attached network storage.
+
+        :param int instance_id: Id of the virtual server
+        :param nas_type: storage type.
+        """
+        mask = 'mask[id,username,capacityGb,notes,serviceResourceBackendIpAddress,' \
+               'allowedVirtualGuests[id,datacenter]]'
+        return self.guest.getAttachedNetworkStorages(nas_type, mask=mask, id=instance_id)
+
+    def get_storage_credentials(self, instance_id):
+        """Returns the virtual server storage credentials.
+
+        :param int instance_id: Id of the virtual server
+        """
+        mask = 'mask[credential]'
+        return self.guest.getAllowedHost(mask=mask, id=instance_id)
+
+    def get_portable_storage(self, instance_id):
+        """Returns the virtual server portable storage.
+
+        :param int instance_id: Id of the virtual server
+        """
+        object_filter = {"portableStorageVolumes": {"blockDevices": {"guest": {"id": {"operation": instance_id}}}}}
+        return self.account.getPortableStorageVolumes(filter=object_filter)
+
+    def get_local_disks(self, instance_id):
+        """Returns the virtual server local disks.
+
+        :param int instance_id: Id of the virtual server
+        """
+        mask = 'mask[diskImage]'
+        return self.guest.getBlockDevices(mask=mask, id=instance_id)
+
+    def migrate(self, instance_id):
+        """Calls SoftLayer_Virtual_Guest::migrate
+
+        Only actually does anything if the virtual server requires a migration.
+        Will return an exception otherwise.
+
+        :param int instance_id: Id of the virtual server
+        """
+        return self.guest.migrate(id=instance_id)
+
+    def migrate_dedicated(self, instance_id, host_id):
+        """Calls SoftLayer_Virtual_Guest::migrate
+
+        Only actually does anything if the virtual server requires a migration.
+        Will return an exception otherwise.
+
+        :param int instance_id: Id of the virtual server
+        """
+        return self.guest.migrateDedicatedHost(host_id, id=instance_id)
+
+    def get_hardware_guests(self):
+        """Returns all virtualHost capable hardware objects and their guests.
+
+        :return SoftLayer_Hardware[].
+        """
+        object_filter = {"hardware": {"virtualHost": {"id": {"operation": "not null"}}}}
+        mask = "mask[virtualHost[guests[powerState]]]"
+        return self.client.call('SoftLayer_Account', 'getHardware', mask=mask, filter=object_filter)

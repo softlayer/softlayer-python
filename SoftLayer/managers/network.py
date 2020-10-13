@@ -6,14 +6,33 @@
     :license: MIT, see LICENSE for more details.
 """
 import collections
+import json
+import logging
+
+from SoftLayer.decoration import retry
 
 from SoftLayer import exceptions
 from SoftLayer import utils
+
+from SoftLayer.managers import event_log
+
+LOGGER = logging.getLogger(__name__)
+
+# pylint: disable=too-many-public-methods
 
 DEFAULT_SUBNET_MASK = ','.join(['hardware',
                                 'datacenter',
                                 'ipAddressCount',
                                 'virtualGuests',
+                                'id',
+                                'networkIdentifier',
+                                'cidr',
+                                'subnetType',
+                                'gateway',
+                                'broadcastAddress',
+                                'usableIpAddressCount',
+                                'note',
+                                'tagReferences[tag]',
                                 'networkVlan[id,networkSpace]'])
 DEFAULT_VLAN_MASK = ','.join([
     'firewallInterfaces',
@@ -38,11 +57,12 @@ DEFAULT_GET_VLAN_MASK = ','.join([
 class NetworkManager(object):
     """Manage SoftLayer network objects: VLANs, subnets, IPs and rwhois
 
-    See product information here: http://www.softlayer.com/networking
+    See product information here: https://www.ibm.com/cloud/network
 
     :param SoftLayer.API.BaseClient client: the client instance
 
     """
+
     def __init__(self, client):
         self.client = client
         self.account = client['Account']
@@ -106,13 +126,13 @@ class NetworkManager(object):
             raise TypeError("The rules provided must be a list of dictionaries")
         return self.security_group.addRules(rules, id=group_id)
 
-    def add_subnet(self, subnet_type, quantity=None, vlan_id=None, version=4,
+    def add_subnet(self, subnet_type, quantity=None, endpoint_id=None, version=4,
                    test_order=False):
         """Orders a new subnet
 
-        :param str subnet_type: Type of subnet to add: private, public, global
+        :param str subnet_type: Type of subnet to add: private, public, global,static
         :param int quantity: Number of IPs in the subnet
-        :param int vlan_id: VLAN id for the subnet to be placed into
+        :param int endpoint_id: id for the subnet to be placed into
         :param int version: 4 for IPv4, 6 for IPv6
         :param bool test_order: If true, this will only verify the order.
         """
@@ -122,9 +142,11 @@ class NetworkManager(object):
         if version == 4:
             if subnet_type == 'global':
                 quantity = 0
-                category = 'global_ipv4'
+                category = "global_ipv4"
             elif subnet_type == 'public':
-                category = 'sov_sec_ip_addresses_pub'
+                category = "sov_sec_ip_addresses_pub"
+            elif subnet_type == 'static':
+                category = "static_sec_ip_addresses"
         else:
             category = 'static_ipv6_addresses'
             if subnet_type == 'global':
@@ -133,6 +155,8 @@ class NetworkManager(object):
                 desc = 'Global'
             elif subnet_type == 'public':
                 desc = 'Portable'
+            elif subnet_type == 'static':
+                desc = 'Static'
 
         # In the API, every non-server item is contained within package ID 0.
         # This means that we need to get all of the items and loop through them
@@ -140,18 +164,15 @@ class NetworkManager(object):
         # item description.
         price_id = None
         quantity_str = str(quantity)
-        for item in package.getItems(id=0, mask='itemCategory'):
+        package_items = package.getItems(id=0, mask='mask[prices[packageReferences[package[keyName]]]]')
+        for item in package_items:
             category_code = utils.lookup(item, 'itemCategory', 'categoryCode')
             if all([category_code == category,
                     item.get('capacity') == quantity_str,
                     version == 4 or (version == 6 and
                                      desc in item['description'])]):
-                price_id = item['prices'][0]['id']
+                price_id = self.get_subnet_item_price(item, subnet_type, version)
                 break
-
-        if not price_id:
-            raise TypeError('Invalid combination specified for ordering a'
-                            ' subnet.')
 
         order = {
             'packageId': 0,
@@ -161,14 +182,33 @@ class NetworkManager(object):
             # correct order container
             'complexType': 'SoftLayer_Container_Product_Order_Network_Subnet',
         }
-
-        if subnet_type != 'global':
-            order['endPointVlanId'] = vlan_id
+        if subnet_type == 'static':
+            order['endPointIpAddressId'] = endpoint_id
+        elif subnet_type != 'global' and subnet_type != 'static':
+            order['endPointVlanId'] = endpoint_id
 
         if test_order:
             return self.client['Product_Order'].verifyOrder(order)
         else:
             return self.client['Product_Order'].placeOrder(order)
+
+    @staticmethod
+    def get_subnet_item_price(item, subnet_type, version):
+        """Get the subnet specific item price id.
+
+        :param version: 4 for IPv4, 6 for IPv6.
+        :param subnet_type: Type of subnet to add: private, public, global,static.
+        :param item: Subnet item.
+        """
+        price_id = None
+        if version == 4 and subnet_type == 'static':
+            for item_price in item['prices']:
+                for package_reference in item_price['packageReferences']:
+                    if subnet_type.upper() in package_reference['package']['keyName']:
+                        price_id = item_price['id']
+        else:
+            price_id = item['prices'][0]['id']
+        return price_id
 
     def assign_global_ip(self, global_ip_id, target):
         """Assigns a global IP address to a specified target.
@@ -219,6 +259,22 @@ class NetworkManager(object):
                                             " " % subnet_id)
         billing_id = subnet['billingItem']['id']
         return self.client['Billing_Item'].cancelService(id=billing_id)
+
+    def set_tags_subnet(self, subnet_id, tags):
+        """Tag a subnet by passing in one or more tags separated by a comma.
+
+        :param int subnet_id: The ID of the subnet.
+        :param string tags:	Comma separated list of tags.
+        """
+        return self.subnet.setTags(tags, id=subnet_id)
+
+    def edit_note_subnet(self, subnet_id, note):
+        """Edit the note for this subnet.
+
+        :param int subnet_id: The ID of the subnet.
+        :param string note:	The note.
+        """
+        return self.subnet.editNote(note, id=subnet_id)
 
     def create_securitygroup(self, name=None, description=None):
         """Creates a security group.
@@ -371,7 +427,7 @@ class NetworkManager(object):
                 'description,'
                 '''rules[id, remoteIp, remoteGroupId,
                          direction, ethertype, portRangeMin,
-                         portRangeMax, protocol],'''
+                         portRangeMax, protocol, createDate, modifyDate],'''
                 '''networkComponentBindings[
                     networkComponent[
                         id,
@@ -476,11 +532,10 @@ class NetworkManager(object):
                 utils.query_filter(network_space))
 
         kwargs['filter'] = _filter.to_dict()
+        kwargs['iter'] = True
+        return self.client.call('Account', 'getSubnets', **kwargs)
 
-        return self.account.getSubnets(**kwargs)
-
-    def list_vlans(self, datacenter=None, vlan_number=None, name=None,
-                   **kwargs):
+    def list_vlans(self, datacenter=None, vlan_number=None, name=None, **kwargs):
         """Display a list of all VLANs on the account.
 
         This provides a quick overview of all VLANs including information about
@@ -513,10 +568,12 @@ class NetworkManager(object):
         if 'mask' not in kwargs:
             kwargs['mask'] = DEFAULT_VLAN_MASK
 
+        kwargs['iter'] = True
         return self.account.getNetworkVlans(**kwargs)
 
     def list_securitygroups(self, **kwargs):
         """List security groups."""
+        kwargs['iter'] = True
         return self.security_group.getAllObjects(**kwargs)
 
     def list_securitygroup_rules(self, group_id):
@@ -524,7 +581,7 @@ class NetworkManager(object):
 
         :param int group_id: The security group to list rules for
         """
-        return self.security_group.getRules(id=group_id)
+        return self.security_group.getRules(id=group_id, iter=True)
 
     def remove_securitygroup_rule(self, group_id, rule_id):
         """Remove a rule from a security group.
@@ -541,6 +598,45 @@ class NetworkManager(object):
         :param list rules: The list of IDs to remove
         """
         return self.security_group.removeRules(rules, id=group_id)
+
+    def get_event_logs_by_request_id(self, request_id):
+        """Gets all event logs by the given request id
+
+        :param string request_id: The request id we want to filter on
+        """
+
+        # Get all relevant event logs
+        unfiltered_logs = self._get_cci_event_logs() + self._get_security_group_event_logs()
+
+        # Grab only those that have the specific request id
+        filtered_logs = []
+
+        for unfiltered_log in unfiltered_logs:
+            try:
+                metadata = json.loads(unfiltered_log['metaData'])
+                if 'requestId' in metadata:
+                    if metadata['requestId'] == request_id:
+                        filtered_logs.append(unfiltered_log)
+            except ValueError:
+                continue
+
+        return filtered_logs
+
+    def _get_cci_event_logs(self):
+        # Load the event log manager
+        event_log_mgr = event_log.EventLogManager(self.client)
+
+        # Get CCI Event Logs
+        _filter = event_log_mgr.build_filter(obj_type='CCI')
+        return event_log_mgr.get_event_logs(request_filter=_filter)
+
+    def _get_security_group_event_logs(self):
+        # Load the event log manager
+        event_log_mgr = event_log.EventLogManager(self.client)
+
+        # Get CCI Event Logs
+        _filter = event_log_mgr.build_filter(obj_type='Security Group')
+        return event_log_mgr.get_event_logs(request_filter=_filter)
 
     def resolve_global_ip_ids(self, identifier):
         """Resolve global ip ids."""
@@ -638,4 +734,55 @@ class NetworkManager(object):
                   the specified instance.
         """
         result = self.network_storage.getObject(id=identifier, **kwargs)
+        return result
+
+    def edit(self, instance_id, name=None, note=None, tags=None):
+        """Edit a vlan.
+
+        :param integer instance_id: the instance ID to edit.
+        :param string name: valid name.
+        :param string note: note about this particular vlan.
+        :param string tags: tags to set on the vlan as a comma separated list.
+                            Use the empty string to remove all tags.
+        :returns: bool -- True or an Exception
+        """
+
+        obj = {}
+
+        if tags is not None:
+            self.set_tags(tags, vlan_id=instance_id)
+
+        if name:
+            obj['name'] = name
+
+        if note:
+            obj['note'] = note
+
+        if not obj:
+            return True
+
+        return self.vlan.editObject(obj, id=instance_id)
+
+    @retry(logger=LOGGER)
+    def set_tags(self, tags, vlan_id):
+        """Sets tags on a vlan with a retry decorator
+
+        Just calls vlan.setTags, but if it fails from an APIError will retry.
+        """
+        self.vlan.setTags(tags, id=vlan_id)
+
+    def get_ip_by_address(self, ip_address):
+        """get the ip address object
+
+         :param string ip_address: the ip address to edit.
+         """
+        return self.client.call('SoftLayer_Network_Subnet_IpAddress', 'getByIpAddress', ip_address)
+
+    def set_subnet_ipddress_note(self, identifier, note):
+        """Set the ip address note of the subnet
+
+         :param integer identifier: the ip address ID to edit.
+          :param json note: the note to edit.
+        """
+        result = self.client.call('SoftLayer_Network_Subnet_IpAddress', 'editObject', note, id=identifier)
         return result

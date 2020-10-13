@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 getPrivateBlockDeviceTemplateGroups = [{
     'accountId': 1234,
     'blockDevices': [],
@@ -145,6 +143,28 @@ getHardware = [{
             'id': 6660
         }
     },
+    "virtualHost": {
+        "accountId": 11111,
+        "id": 22222,
+        "name": "vmware.chechu.com",
+        "guests": [
+            {
+                "accountId": 11111,
+                "createDate": "2019-09-05T17:03:42-06:00",
+                "hostname": "NSX-T Manager",
+                "id": 33333,
+                "maxCpu": 16,
+                "maxCpuUnits": "CORE",
+                "maxMemory": 49152,
+                "powerState": {
+                    "keyName": "RUNNING",
+                    "name": "Running"
+                },
+                "status": {
+                    "keyName": "ACTIVE",
+                    "name": "Active"
+                }
+            }]}
 }, {
     'id': 1001,
     'metricTrackingObject': {'id': 4},
@@ -189,7 +209,13 @@ getHardware = [{
             'vlanNumber': 3672,
             'id': 19082
         },
-    ]
+    ],
+    "virtualHost": {
+        "accountId": 11111,
+        "id": 22222,
+        "name": "host14.vmware.chechu.com",
+        "guests": []
+    }
 }, {
     'id': 1002,
     'metricTrackingObject': {'id': 5},
@@ -233,9 +259,21 @@ getHardware = [{
             'vlanNumber': 3672,
             'id': 19082
         },
-    ]
+    ],
+    "virtualHost": {
+        "accountId": 11111,
+        "id": 22222,
+        "name": "host14.vmware.chechu.com",
+        "guests": []
+    }
 }, {
     'id': 1003,
+    "virtualHost": {
+        "accountId": 11111,
+        "id": 22222,
+        "name": "host14.vmware.chechu.com",
+        "guests": []
+    }
 }]
 getDomains = [{'name': 'example.com',
                'id': 12345,
@@ -315,10 +353,39 @@ getSubnets = [
     {
         'id': '100',
         'networkIdentifier': '10.0.0.1',
+        'cidr': '/24',
+        'networkVlanId': 123,
         'datacenter': {'name': 'dal00'},
         'version': 4,
-        'subnetType': 'PRIMARY'
-    }]
+        'subnetType': 'PRIMARY',
+        'ipAddressCount': 10,
+        'virtualGuests': [],
+        'hardware': [],
+        "podName": "dal05.pod04",
+        "networkVlan": {
+            "accountId": 123,
+            "id": 2581232,
+            "modifyDate": "2019-07-17T01:09:51+08:00",
+            "vlanNumber": 795
+        }
+    },
+    {
+        "gateway": "5.111.11.111",
+        "id": '111',
+        "modifyDate": "2018-07-24T17:14:57+08:00",
+        'networkIdentifier': '10.0.0.1',
+        'ipAddressCount': 10,
+        'cidr': '/24',
+        'virtualGuests': [],
+        'hardware': [],
+        "networkVlanId": 22222,
+        "sortOrder": "2",
+        "subnetType": "SECONDARY_ON_VLAN",
+        "totalIpAddresses": "8",
+        "usableIpAddressCount": "5",
+        "version": 4
+    }
+]
 
 getSshKeys = [{'id': '100', 'label': 'Test 1'},
               {'id': '101', 'label': 'Test 2',
@@ -327,13 +394,15 @@ getSshKeys = [{'id': '100', 'label': 'Test 1'},
 
 getSecurityCertificates = [{'certificate': '1234',
                             'commonName': 'cert',
-                            'id': 1234}]
+                            'id': 1234,
+                            'validityDays': 0, }]
 getExpiredSecurityCertificates = getSecurityCertificates
 getValidSecurityCertificates = getSecurityCertificates
 
 getTickets = [
     {
         "accountId": 1234,
+        "serviceProviderResourceId": "CS123456",
         "assignedUserId": 12345,
         "createDate": "2013-08-01T14:14:04-07:00",
         "id": 100,
@@ -349,6 +418,7 @@ getTickets = [
     },
     {
         "accountId": 1234,
+        "serviceProviderResourceId": "CS123456",
         "assignedUserId": 12345,
         "createDate": "2013-08-01T14:14:04-07:00",
         "id": 101,
@@ -364,6 +434,7 @@ getTickets = [
     },
     {
         "accountId": 1234,
+        "serviceProviderResourceId": "CS123456",
         "assignedUserId": 12345,
         "createDate": "2014-03-03T09:44:01-08:00",
         "id": 102,
@@ -384,7 +455,7 @@ getOpenTickets = [ticket for ticket in getTickets
 getClosedTickets = [ticket for ticket in getTickets
                     if ticket['statusId'] == 1002]
 
-getCurrentUser = {'id': 12345,
+getCurrentUser = {'id': 12345, 'username': 'testAccount',
                   'apiAuthenticationKeys': [{'authenticationKey': 'A' * 64}]}
 
 getCdnAccounts = [
@@ -417,6 +488,7 @@ getNetworkVlans = [{
     'networkSpace': 'PRIVATE',
     'hardwareCount': 0,
     'hardware': [],
+    'vlanNumber': 12,
     'networkComponents': [],
     'primaryRouter': {
         'datacenter': {'name': 'dal00'}
@@ -429,13 +501,26 @@ getNetworkVlans = [{
     'totalPrimaryIpAddressCount': 1,
     'subnetCount': 0,
     'subnets': [],
+    'firewallInterfaces': [
+        {
+            'id': 1,
+            'name': 'outside'
+        },
+        {
+            'id': 12,
+            'name': 'inside'
+        }
+    ]
 }, {
     'id': 2,
     'networkSpace': 'PRIVATE',
     'totalPrimaryIpAddressCount': 2,
     'dedicatedFirewallFlag': False,
+    'highAvailabilityFirewallFlag': True,
+    'networkVlanFirewall': {'id': 7896},
     'hardwareCount': 0,
     'hardware': [],
+    'vlanNumber': 13,
     'networkComponents': [],
     'primaryRouter': {
         'datacenter': {'name': 'dal00'}
@@ -450,6 +535,8 @@ getNetworkVlans = [{
         'id': 1234,
         'networkComponent': {'downlinkComponent': {'hardwareId': 1}},
         'status': 'ok'}],
+    'firewallInterfaces': [],
+
     'subnetCount': 0,
     'subnets': [],
 }, {
@@ -457,11 +544,20 @@ getNetworkVlans = [{
     'networkSpace': 'PRIVATE',
     'name': 'dal00',
     'hardwareCount': 1,
+    'dedicatedFirewallFlag': True,
+    'highAvailabilityFirewallFlag': True,
+    'networkVlanFirewall': {'id': 23456},
+    'vlanNumber': 14,
     'hardware': [{'id': 1}],
     'networkComponents': [{'id': 2}],
     'primaryRouter': {
         'datacenter': {'name': 'dal00'}
     },
+    'firewallInterfaces': [
+        {
+            'id': 31,
+            'name': 'outside'
+        }],
     'totalPrimaryIpAddressCount': 3,
     'subnetCount': 0,
     'subnets': [],
@@ -483,9 +579,38 @@ getNasNetworkStorage = [{
 }]
 
 getActiveQuotes = [{
+    'accountId': 1234,
     'id': 1234,
     'name': 'TestQuote1234',
     'quoteKey': '1234test4321',
+    'createDate': '2019-04-10T14:26:03-06:00',
+    'modifyDate': '2019-04-10T14:26:03-06:00',
+    'order': {
+        'id': 37623333,
+        'items': [
+            {
+                'categoryCode': 'guest_core',
+                'description': '4 x 2.0 GHz or higher Cores',
+                'id': 468394713,
+                'itemId': 859,
+                'itemPriceId': '1642',
+                'oneTimeAfterTaxAmount': '0',
+                'oneTimeFee': '0',
+                'oneTimeFeeTaxRate': '0',
+                'oneTimeTaxAmount': '0',
+                'quantity': 1,
+                'recurringAfterTaxAmount': '0',
+                'recurringFee': '0',
+                'recurringTaxAmount': '0',
+                'setupAfterTaxAmount': '0',
+                'setupFee': '0',
+                'setupFeeDeferralMonths': None,
+                'setupFeeTaxRate': '0',
+                'setupTaxAmount': '0',
+                'package': {'id': 46, 'keyName': 'CLOUD_SERVER'}
+            },
+        ]
+    }
 }]
 
 getOrders = [{
@@ -519,8 +644,8 @@ getBalance = 40
 
 getNextInvoiceTotalAmount = 2
 
-getHubNetworkStorage = [{'id': 12345, 'username': 'SLOS12345-1'},
-                        {'id': 12346, 'username': 'SLOS12345-2'}]
+getHubNetworkStorage = [{'id': 12345, 'username': 'SLOS12345-1', 'serviceResource': {'name': 'Cleversafe - US Region'}},
+                        {'id': 12346, 'username': 'SLOS12345-2', 'vendorName': 'Swift'}]
 
 getIscsiNetworkStorage = [{
     'accountId': 1234,
@@ -553,9 +678,341 @@ getDedicatedHosts = [{
         'name': 'dal05'
     },
     'memoryCapacity': 242,
-    'name': 'khnguyendh',
+    'name': 'test-dedicated',
     'diskCapacity': 1200,
     'guestCount': 1,
     'cpuCount': 56,
-    'id': 44701
+    'id': 12345
 }]
+
+getUsers = [
+    {'displayName': 'ChristopherG',
+     'hardwareCount': 138,
+     'id': 11100,
+     'userStatus': {'name': 'Active'},
+     'username': 'SL1234',
+     'virtualGuestCount': 99},
+    {'displayName': 'PulseL',
+     'hardwareCount': 100,
+     'id': 11111,
+     'userStatus': {'name': 'Active'},
+     'username': 'sl1234-abob',
+     'virtualGuestCount': 99}
+]
+
+getReservedCapacityGroups = [
+    {
+        'accountId': 1234,
+        'backendRouterId': 1411193,
+        'createDate': '2018-09-24T16:33:09-06:00',
+        'id': 3103,
+        'modifyDate': '',
+        'name': 'test-capacity',
+        'availableInstanceCount': 1,
+        'instanceCount': 3,
+        'occupiedInstanceCount': 1,
+        'backendRouter': {
+            'accountId': 1,
+            'bareMetalInstanceFlag': 0,
+            'domain': 'softlayer.com',
+            'fullyQualifiedDomainName': 'bcr02a.dal13.softlayer.com',
+            'hardwareStatusId': 5,
+            'hostname': 'bcr02a.dal13',
+            'id': 1411193,
+            'notes': '',
+            'provisionDate': '',
+            'serviceProviderId': 1,
+            'serviceProviderResourceId': '',
+            'primaryIpAddress': '10.0.144.28',
+            'datacenter': {
+                'id': 1854895,
+                'longName': 'Dallas 13',
+                'name': 'dal13',
+                'statusId': 2
+            },
+            'hardwareFunction': {
+                'code': 'ROUTER',
+                'description': 'Router',
+                'id': 1
+            },
+            'topLevelLocation': {
+                'id': 1854895,
+                'longName': 'Dallas 13',
+                'name': 'dal13',
+                'statusId': 2
+            }
+        },
+        'instances': [
+            {
+                'id': 3501,
+                'billingItem': {
+                    'description': 'B1.1x2 (1 Year Term)',
+                    'hourlyRecurringFee': '.032'
+                }
+            },
+            {
+                'id': 3519,
+                'billingItem': {
+                    'description': 'B1.1x2 (1 Year Term)',
+                    'hourlyRecurringFee': '.032'
+                }
+            },
+            {
+                'id': 3519
+            }
+        ]
+    }
+]
+
+getPlacementGroups = [{
+    "createDate": "2019-01-18T16:08:44-06:00",
+    "id": 12345,
+    "name": "test01",
+    "guestCount": 0,
+    "backendRouter": {
+        "hostname": "bcr01a.mex01",
+        "id": 329266
+    },
+    "rule": {
+        "id": 1,
+        "keyName": "SPREAD",
+        "name": "SPREAD"
+    }
+}]
+
+getInvoices = [
+    {
+        'id': 33816665,
+        'modifyDate': '2019-03-04T00:17:42-06:00',
+        'createDate': '2019-03-04T00:17:42-06:00',
+        'startingBalance': '129251.73',
+        'statusCode': 'OPEN',
+        'typeCode': 'RECURRING',
+        'itemCount': 3317,
+        'invoiceTotalAmount': '6230.66'
+    },
+    {
+        'id': 12345667,
+        'modifyDate': '2019-03-05T00:17:42-06:00',
+        'createDate': '2019-03-04T00:17:42-06:00',
+        'startingBalance': '129251.73',
+        'statusCode': 'OPEN',
+        'typeCode': 'RECURRING',
+        'itemCount': 12,
+        'invoiceTotalAmount': '6230.66',
+        'endingBalance': '12345.55'
+    }
+]
+
+getApplicationDeliveryControllers = [
+    {
+        'accountId': 307608,
+        'createDate': '2015-05-05T16:23:52-06:00',
+        'id': 11449,
+        'modifyDate': '2015-05-05T16:24:09-06:00',
+        'name': 'SLADC307608-1',
+        'typeId': 2,
+        'description': 'Citrix NetScaler VPX 10.5 10Mbps Standard',
+        'managementIpAddress': '10.11.11.112',
+        'outboundPublicBandwidthUsage': '.00365',
+        'primaryIpAddress': '19.4.24.16',
+        'datacenter': {
+            'longName': 'Dallas 9',
+            'name': 'dal09',
+        },
+        'password': {
+            'password': 'aaaaa',
+            'username': 'root'
+        },
+        'type': {
+            'keyName': 'NETSCALER_VPX',
+            'name': 'NetScaler VPX'
+        }
+    }
+]
+
+getScaleGroups = [
+    {
+        "accountId": 31111,
+        "cooldown": 1800,
+        "createDate": "2016-10-25T01:48:34+08:00",
+        "id": 12222222,
+        "lastActionDate": "2016-10-25T01:48:34+08:00",
+        "maximumMemberCount": 5,
+        "minimumMemberCount": 0,
+        "name": "tests",
+        "regionalGroupId": 663,
+        "virtualGuestMemberTemplate": {
+            "accountId": 31111,
+            "domain": "sodg.com",
+            "hostname": "testing",
+            "id": None,
+            "maxCpu": None,
+            "maxMemory": 32768,
+            "startCpus": 32,
+            "blockDevices": [
+                {
+                    "device": "0",
+                    "diskImage": {
+                        "capacity": 25,
+                    }
+                }
+            ],
+            "datacenter": {
+                "name": "sao01",
+            },
+            "hourlyBillingFlag": True,
+            "operatingSystemReferenceCode": "CENTOS_LATEST",
+        },
+        "virtualGuestMemberCount": 0,
+        "status": {
+            "id": 1,
+            "keyName": "ACTIVE",
+            "name": "Active"
+        },
+    },
+    {
+        "accountId": 31111,
+        "cooldown": 1800,
+        "createDate": "2018-04-24T04:22:00+08:00",
+        "id": 224533333,
+        "lastActionDate": "2019-01-19T04:53:18+08:00",
+        "maximumMemberCount": 10,
+        "minimumMemberCount": 0,
+        "modifyDate": "2019-01-19T04:53:21+08:00",
+        "name": "test-ajcb",
+        "regionalGroupId": 1025,
+        "virtualGuestMemberTemplate": {
+            "accountId": 31111,
+            "domain": "test.local",
+            "hostname": "autoscale-ajcb01",
+            "id": None,
+            "maxCpu": None,
+            "maxMemory": 1024,
+            "postInstallScriptUri": "http://test.com",
+            "startCpus": 1,
+            "blockDevices": [
+                {
+                    "device": "0",
+                    "diskImage": {
+                        "capacity": 25,
+                    }
+                }
+            ],
+            "datacenter": {
+                "name": "seo01",
+            },
+            "hourlyBillingFlag": True,
+            "operatingSystemReferenceCode": "CENTOS_7_64",
+        },
+        "virtualGuestMemberCount": 0,
+        "status": {
+            "id": 1,
+            "keyName": "ACTIVE",
+            "name": "Active"
+        }
+    }
+]
+
+getPortableStorageVolumes = [
+    {
+        "capacity": 200,
+        "createDate": "2018-10-06T04:27:59-06:00",
+        "description": "Disk 2",
+        "id": 11111,
+        "modifyDate": "",
+        "name": "Disk 2",
+        "parentId": "",
+        "storageRepositoryId": 22222,
+        "typeId": 241,
+        "units": "GB",
+        "uuid": "fd477feb-bf32-408e-882f-02540gghgh111"
+    }
+]
+getAllTopLevelBillingItems = [
+    {
+        "allowCancellationFlag": 1,
+        "cancellationDate": "None",
+        "categoryCode": "server",
+        "createDate": "2015-05-28T09:53:41-06:00",
+        "cycleStartDate": "2020-04-03T23:12:04-06:00",
+        "description": "Dual E5-2690 v3 (12 Cores, 2.60 GHz)",
+        "domainName": "sl-netbase.com",
+        "hostName": "testsangeles101",
+        "id": 53891943,
+        "lastBillDate": "2020-04-03T23:12:04-06:00",
+        "modifyDate": "2020-04-03T23:12:07-06:00",
+        "nextBillDate": "2020-05-03T23:00:00-06:00",
+        "orderItemId": 68626055,
+        "parentId": "None",
+        "recurringFee": "1000",
+        "recurringFeeTaxRate": "0",
+        "recurringMonths": 1,
+        "hourlyFlag": False,
+        "location": {
+            "id": 265592,
+            "longName": "Amsterdam 1",
+            "name": "ams01",
+            "statusId": 2
+        },
+        "nextInvoiceTotalRecurringAmount": 0,
+        "orderItem": {
+            "id": 68626055,
+            "order": {
+                "id": 4544893,
+                "userRecord": {
+                    "displayName": "TEst",
+                    "email": "test@us.ibm.com",
+                    "id": 167758,
+                    "userStatus": {
+                        "id": 1001,
+                        "keyName": "CANCEL_PENDING",
+                        "name": "Cancel Pending"
+                    }
+                }
+            }
+        },
+        "resourceTableId": 544444
+    },
+    {
+        "allowCancellationFlag": 1,
+        "cancellationDate": "None",
+        "categoryCode": "server",
+        "createDate": "2015-05-28T09:56:44-06:00",
+        "cycleStartDate": "2020-04-03T23:12:05-06:00",
+        "description": "Dual E5-2690 v3 (12 Cores, 2.60 GHz)",
+        "domainName": "sl-netbase.com",
+        "hostName": "testsangeles101",
+        "id": 53892197,
+        "lastBillDate": "2020-04-03T23:12:05-06:00",
+        "modifyDate": "2020-04-03T23:12:07-06:00",
+        "nextBillDate": "2020-05-03T23:00:00-06:00",
+        "orderItemId": 68626801,
+        "recurringFee": "22220",
+        "hourlyFlag": False,
+        "location": {
+            "id": 265592,
+            "longName": "Amsterdam 1",
+            "name": "ams01",
+            "statusId": 2
+        },
+        "nextInvoiceTotalRecurringAmount": 0,
+        "orderItem": {
+            "id": 68626801,
+            "order": {
+                "id": 4545911,
+                "userRecord": {
+                    "displayName": "Test",
+                    "email": "test@us.ibm.com",
+                    "id": 167758,
+                    "userStatus": {
+                        "id": 1001,
+                        "keyName": "ACTIVE",
+                        "name": "Active"
+                    }
+                }
+            }
+        },
+        "resourceTableId": 777777
+    }
+]

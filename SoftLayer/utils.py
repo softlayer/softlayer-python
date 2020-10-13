@@ -7,18 +7,12 @@
 """
 import datetime
 import re
-
-import six
+import time
 
 # pylint: disable=no-member, invalid-name
 
-UUID_RE = re.compile(r'^[0-9a-f\-]{36}$', re.I)
+UUID_RE = re.compile(r'^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$', re.I)
 KNOWN_OPERATIONS = ['<=', '>=', '<', '>', '~', '!~', '*=', '^=', '$=', '_=']
-
-configparser = six.moves.configparser
-string_types = six.string_types
-StringIO = six.StringIO
-xmlrpc_client = six.moves.xmlrpc_client
 
 
 def lookup(dic, key, *keys):
@@ -90,7 +84,7 @@ def query_filter(query):
     except ValueError:
         pass
 
-    if isinstance(query, string_types):
+    if isinstance(query, str):
         query = query.strip()
         for operation in KNOWN_OPERATIONS:
             if query.startswith(operation):
@@ -121,8 +115,87 @@ def query_filter_date(start, end):
     return {
         'operation': 'betweenDate',
         'options': [
-            {'name': 'startDate', 'value': [startdate+' 0:0:0']},
-            {'name': 'endDate', 'value': [enddate+' 0:0:0']}
+            {'name': 'startDate', 'value': [startdate + ' 0:0:0']},
+            {'name': 'endDate', 'value': [enddate + ' 0:0:0']}
+        ]
+    }
+
+
+def query_filter_orderby(sort="ASC"):
+    """Returns an object filter operation for sorting
+
+    :param string sort: either ASC or DESC
+    """
+    _filter = {
+        "operation": "orderBy",
+        "options": [{
+            "name": "sort",
+            "value": [sort]
+        }]
+    }
+    return _filter
+
+
+def format_event_log_date(date_string, utc):
+    """Gets a date in the format that the SoftLayer_EventLog object likes.
+
+    :param string date_string: date in mm/dd/yyyy format
+    :param string utc: utc offset. Defaults to '+0000'
+    """
+    user_date_format = "%m/%d/%Y"
+
+    user_date = datetime.datetime.strptime(date_string, user_date_format)
+    dirty_time = user_date.isoformat()
+
+    if utc is None:
+        utc = "+0000"
+
+    iso_time_zone = utc[:3] + ':' + utc[3:]
+    cleaned_time = "{}.000000{}".format(dirty_time, iso_time_zone)
+
+    return cleaned_time
+
+
+def event_log_filter_between_date(start, end, utc):
+    """betweenDate Query filter that SoftLayer_EventLog likes
+
+    :param string start: lower bound date in mm/dd/yyyy format
+    :param string end: upper bound date in mm/dd/yyyy format
+    :param string utc: utc offset. Defaults to '+0000'
+    """
+    return {
+        'operation': 'betweenDate',
+        'options': [
+            {'name': 'startDate', 'value': [format_event_log_date(start, utc)]},
+            {'name': 'endDate', 'value': [format_event_log_date(end, utc)]}
+        ]
+    }
+
+
+def event_log_filter_greater_than_date(date, utc):
+    """greaterThanDate Query filter that SoftLayer_EventLog likes
+
+    :param string date: lower bound date in mm/dd/yyyy format
+    :param string utc: utc offset. Defaults to '+0000'
+    """
+    return {
+        'operation': 'greaterThanDate',
+        'options': [
+            {'name': 'date', 'value': [format_event_log_date(date, utc)]}
+        ]
+    }
+
+
+def event_log_filter_less_than_date(date, utc):
+    """lessThanDate Query filter that SoftLayer_EventLog likes
+
+    :param string date: upper bound date in mm/dd/yyyy format
+    :param string utc: utc offset. Defaults to '+0000'
+    """
+    return {
+        'operation': 'lessThanDate',
+        'options': [
+            {'name': 'date', 'value': [format_event_log_date(date, utc)]}
         ]
     }
 
@@ -209,3 +282,89 @@ def is_ready(instance, pending=False):
     if instance.get('provisionDate') and not reloading and not outstanding:
         return True
     return False
+
+
+def clean_string(string):
+    """Returns a string with all newline and other whitespace garbage removed.
+
+    Mostly this method is used to print out objectMasks that have a lot of extra whitespace
+    in them because making compact masks in python means they don't look nice in the IDE.
+
+    :param string: The string to clean.
+    :returns string: A string without extra whitespace.
+    """
+    if string is None:
+        return ''
+    else:
+        return " ".join(string.split())
+
+
+def clean_splitlines(string):
+    """Returns a string where \r\n is replaced with \n"""
+    if string is None:
+        return ''
+    else:
+        return "\n".join(string.splitlines())
+
+
+def clean_time(sltime, in_format='%Y-%m-%dT%H:%M:%S%z', out_format='%Y-%m-%d %H:%M'):
+    """Easy way to format time strings
+
+    :param string sltime: A softlayer formatted time string
+    :param string in_format: Datetime format for strptime
+    :param string out_format: Datetime format for strftime
+    """
+    if sltime is None:
+        return None
+    try:
+        clean = datetime.datetime.strptime(sltime, in_format)
+        return clean.strftime(out_format)
+    # The %z option only exists with py3.6+
+    except ValueError as e:
+        # Just ignore data that in_format didn't process.
+        ulr = len(e.args[0].partition('unconverted data remains: ')[2])
+        if ulr:
+            clean = datetime.datetime.strptime(sltime[:-ulr], in_format)
+            return clean.strftime(out_format)
+        return sltime
+
+
+def timestamp(date):
+    """Converts a datetime to timestamp
+
+    :param datetime date:
+    :returns int: The timestamp of date.
+    """
+
+    _timestamp = time.mktime(date.timetuple())
+
+    return int(_timestamp)
+
+
+def days_to_datetime(days):
+    """Returns the datetime value of last N days.
+
+    :param int days: From 0 to N days
+    :returns int: The datetime of last N days or datetime.now() if days <= 0.
+    """
+
+    date = datetime.datetime.now()
+
+    if days > 0:
+        date -= datetime.timedelta(days=days)
+
+    return date
+
+
+def trim_to(string, length=80, tail="..."):
+    """Returns a string that is length long. tail added if trimmed
+
+    :param string string: String you want to trim
+    :param int length: max length for the string
+    :param string tail: appended to strings that were trimmed.
+    """
+
+    if len(string) > length:
+        return string[:length] + tail
+    else:
+        return string

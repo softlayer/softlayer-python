@@ -1,8 +1,326 @@
 # Change Log
 
+## [5.9.1] - 2020-09-15
+https://github.com/softlayer/softlayer-python/compare/v5.9.0...v5.9.1
+
+- Fix the ha option for firewalls, add and implement unit test #1327
+- BluePages_Search and IntegratedOfferingTeam_Region don't need SoftLayer_ prefix #972
+- Fix new TOX issues #1330
+- Add more unit test coverage #1331
+- Set notes for network storage #1322
+- Some improvements to the dns commands #999
+  + dns zone-list: added resourceRecordCount, added automatic pagination for large zones
+  + dns record-list: fixed an issue where a record (like SRV types) that don't have a host would cause the command to fail
+- Renamed managers.storage.refresh_dep_dupe to  SoftLayer.managers.storage.refresh_dupe #1342 to support the new API method. CLI commands now use this method.
+
+## [5.9.0] - 2020-08-03
+https://github.com/softlayer/softlayer-python/compare/v5.8.9...v5.9.0
+
+- #1280 Notification Management
+  + slcli user notifications
+  + slcli user edit-notifications
+- #828 Added networking options to slcli hw create-options
+  + Refactored slcli hw create to use the ordering manager
+  + Added --network option to slcli hw create for more granular network choices.
+  + Deprecated --port-speed and --no-public . They still work for now, but will be removed in a future release.
+- #1298 Fix Unhandled exception in CLI - vs detail
+- #1309 Fix the empty lines in slcli vs create-options
+- #1301 Ability to list VirtualHost capable guests
+  + slcli hardware guests
+  + slcli vs list will show guests on VirtualHost servers
+- #875 added option to reload bare metal servers with LVM enabled
+- #874 Added Migrate command
+- #1313 Added support for filteredMask
+- #1305 Update docs links
+- #1302 Fix lots of whitespace slcli vs create-options
+- #900 Support for STDIN on creating and updating tickets.
+- #1318 add Drive number in guest drives details using the device number
+- #1323 add vs list hardware and all option
+
+## [5.8.9] - 2020-07-06 
+https://github.com/softlayer/softlayer-python/compare/v5.8.8...v5.8.9
+
+- #1252 Automated Snap publisher
+- #1230 Tag Management
+    + slcli tags cleanup
+    + slcli tags delete
+    + slcli tags details
+    + slcli tags list
+    + slcli tags set
+    + slcli tags taggable
+- #1285 Vlan editing functionality
+- #1287 Edit IP note and add ipAddress table in detail view
+- #1283 Subnet Tagging
+- #1291 Storage documentation updates
+- #1293 add system operation referenceCode in create-option
+
+## [5.8.8] - 2020-05-18
+https://github.com/softlayer/softlayer-python/compare/v5.8.7...v5.8.8
+
+- #1266 Fixed ticket upload with REST endpoint
+- #1263 add the redundant/degraded option to hardware
+- #1262 Added `iter` option for ordering manager functions
+- #1264 Add Account planned, unplanned and announcement events
+- #1265 fixed pylint 2.5.0 errors 
+- #1261 Fix AttributeError: 'NoneType' object has no attribute 'keys 
+- #1256 Adding more github action tests, removing travis CI tests 
+- #887 fix Response shows additional new lines (\n) in ticket details
+- #1241 Storage feature for virtual and hardware servers 
+- #1242 Hardware and Virtual billing info
+- #1239 VPN subnet access to a use
+- #1254 added account billing-items/item-details/cancel-item commands
+
+## [5.8.7] - 2020-03-26
+https://github.com/softlayer/softlayer-python/compare/v5.8.5...v5.8.7
+
+- #1222 Get load balancer (LBaaS) by name
+- #1221 Added version checker
+- #1227 Updated unit test suite for TravisCI to run properly
+- #1225 Add note about using multiple colon symbols not working when setting tags.
+- #1228 Support ordering [Dependent Duplicate Volumes](https://cloud.ibm.com/docs/BlockStorage?topic=BlockStorage-dependentduplicate)
+- #1233 Refactored File/Block managers to reduce duplicated code.
+- #1231 Added Refresh functions for Dependent Duplicate Volumes
+- #801 Added support for JSON styled parameters and object filters
+- #1234 Added ability to change which datacenters an image template was stored in
+
+## [5.8.6] - Skipped
+
+## [5.8.5] - 2020-01-29
+https://github.com/softlayer/softlayer-python/compare/v5.8.4...v5.8.5
+
+-  #1195 Fixed an issue with `slcli vs dns-sync --ptr`. Added `slcli hw dns-sync`
+-  #1199 Fix File Storage failback and failover.
+-  #1198 Fix issue where the summary command fails due to None being provided as the datacenter name.
+-  #1208 Added The following commands:
+    - `slcli block volume-limits` 
+    - `slcli file  volume-limits`
+- #1209  Add testing/CI for python 3.8.
+- #1212 Fix vs detail erroring on servers pending cancellation.
+- #1210 support subnet ACL management through cli
+    + `slcli block subnets-list`
+    + `slcli block subnets-assign`
+    + `slcli block subnets-remove`
+- #1215 Added documentation for all SLCLI commands.
+
+
+## [5.8.4] - 2019-12-20
+https://github.com/softlayer/softlayer-python/compare/v5.8.3...v5.8.4
+
+- #1199 Fix block storage failback and failover.
+- #1202 Order a virtual server private. 
+
+
+## [5.8.3] - 2019-12-11
+https://github.com/softlayer/softlayer-python/compare/v5.8.2...v5.8.3
+
+- #771 Fixed unicode errors in image list (for windows)
+- #1191 Fixed ordering virtual server dedicated from the CLI
+- #1155 Fixed capacity restriction when ordering storage quotes
+- #1192 Fixed hardware detail bandwidth allocation errors. 
+
+
+## [5.8.2] - 2019-11-15
+- https://github.com/softlayer/softlayer-python/compare/v5.8.1...v5.8.2
+
+
++ #1186 Fixed a unit test that could fail if the test took too long to run.
++ #1183 Added a check to ensure subnet and vlan options are properly added to the order for virtual servers.
++ #1184 Fixed a readme misspelling.
++ #1182 Fixed vs reboot unable to resolve vs names.
++ #1095 Handle missing Fixtures better for unit tests.
+
+## [5.8.1] - 2019-10-11
+- https://github.com/softlayer/softlayer-python/compare/v5.8.0...v5.8.1
+
++ #1169 Drop python 2.7 support
++ #1170 Added CS# to ticket listing
++ #1162 Fixed issue looking up OS keyName instead of referenceCode
++ #627 Autoscale support
+    * slcli autoscale detail
+    * slcli autoscale edit
+    * slcli autoscale list
+    * slcli autoscale logs
+    * slcli autoscale scale
+    * slcli autoscale tag
+
+## [5.8.0] - 2019-09-04
+- https://github.com/softlayer/softlayer-python/compare/v5.7.2...v5.8.0
+
++ #1143 Upgrade to prompt_toolkit >= 2
++ #1003 Bandwidth Feature
+    * slcli summary
+    * slcli report bandwidth
+    * slcli vs bandwidth
+    * slcli hw bandwidth
+    * Added bandwidth to VS and HW details page
++ #1146 DOCS: replace 'developer' with 'sldn' links
++ #1147 property 'contents' is not valid for 'SoftLayer_Ticket' when creating a ticket
++ #1139 cannot create static subnet with slcli
++ #1145 Refactor cdn network.
++ #1152 IBMID auth support
++ #1153, #1052 Transient VSI support
++ #1167 Removed legacy LoadBalancer command, added Citrix and IBM LBaaS commands.
+    * slcli lb cancel
+    * slcli lb detail
+    * slcli lb health
+    * slcli lb l7pool-add
+    * slcli lb l7pool-del
+    * slcli lb list
+    * slcli lb member-add
+    * slcli lb member-del
+    * slcli lb ns-detail
+    * slcli lb ns-list
+    * slcli lb order
+    * slcli lb order-options
+    * slcli lb pool-add
+    * slcli lb pool-del
+    * slcli lb pool-edit
++ #1157 Remove VpnAllowedFlag.
++ #1160 Improve hardware cancellation to deal with additional cases
+
+## [5.7.2] - 2019-05-03
+- https://github.com/softlayer/softlayer-python/compare/v5.7.1...v5.7.2
+
++ #1107 Added exception to handle json parsing error when ordering 
++ #1068 Support for -1 when changing port speed 
++ #1109 Fixed docs about placement groups
++ #1112 File storage endurance iops upgrade 
++ #1101 Handle the new user creation exceptions 
++ #1116 Fix order place quantity option
++ #1002 Invoice commands
+    * account invoices
+    * account invoice-detail
+    * account summary
++ #1004 Event Notification Management commands
+    * account events
+    * account event-detail
++ #1117 Two PCIe items can be added at order time 
++ #1121 Fix object storage apiType for S3 and Swift.
++ #1100 Event Log performance improvements. 
++ #872 column 'name' was renamed to 'hostname'
++ #1127 Fix object storage credentials.
++ #1129 Fixed unexpected errors in slcli subnet create
++ #1134 Change encrypt parameters for importing of images. Adds root-key-crn
++ #208 Quote ordering commands
+    * order quote
+    * order quote-detail
+    * order quote-list
++ #1113 VS usage information command
+    * virtual usage 
++ #1131 made sure config_tests dont actually make api calls.
+
+
+## [5.7.1] - 2019-02-26
+- https://github.com/softlayer/softlayer-python/compare/v5.7.0...v5.7.1
+
++ #1089 removed legacy SL message queue commands
++ Support for Hardware reflash firmware CLI/Manager method
+
+## [5.7.0] - 2019-02-15
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.6.4...v5.7.0
+
++ #1099 Support for security group Ids
++ event-log cli command
++ #1069 Virtual Placement Group Support
+   ```
+      slcli vs placementgroup --help
+    Commands:
+      create          Create a placement group.
+      create-options  List options for creating a placement group.
+      delete          Delete a placement group.
+      detail          View details of a placement group.
+      list            List placement groups.
+   ```
++ #962 Rest Transport improvements. Properly handle HTTP exceptions instead of crashing.
++ #1090 removed power_state column option from "slcli server list"
++ #676 - ipv6 support for creating virtual guests
+  * Refactored virtual guest creation to use Product_Order::placeOrder instead of Virtual_Guest::createObject, because createObject doesn't allow adding IPv6
++ #882 Added table which shows the status of each url in object storage
++ #1085 Update provisionedIops reading to handle float-y values
++ #1074 fixed issue with config setup
++ #1081 Fix file volume-cancel
++ #1059 Support for SoftLayer_Hardware_Server::toggleManagementInterface
+  * `slcli hw toggle-ipmi`
+
+
+## [5.6.4] - 2018-11-16
+
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.6.3...v5.6.4
+
++ #1041 Dedicated host cancel, cancel-guests, list-guests
++ #1071 added createDate and modifyDate parameters to sg rule-list
++ #1060 Fixed slcli subnet list
++ #1056 Fixed documentation link in image manager
++ #1062 Added description to slcli order 
+
+## [5.6.3] - 2018-11-07
+
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.6.0...v5.6.3
+
++ #1065 Updated urllib3 and requests libraries due to CVE-2018-18074
++ #1070 Fixed an ordering bug
++ Updated release process and fab-file
+
+## [5.6.0] - 2018-10-16
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.5.3...v5.6.0
+
++ #1026 Support for [Reserved Capacity](https://cloud.ibm.com/docs/virtual-servers?topic=virtual-servers-about-reserved-virtual-servers)
+  * `slcli vs capacity create`
+  * `slcli vs capacity create-guest`
+  * `slcli vs capacity create-options`
+  * `slcli vs capacity detail`
+  * `slcli vs capacity list`
++ #1050 Fix `post_uri` parameter name on docstring
++ #1039 Fixed suspend cloud server order.
++ #1055 Update to use click 7
++ #1053 Add export/import capabilities to/from IBM Cloud Object Storage to the image manager as well as the slcli. 
+
+
+## [5.5.3] - 2018-08-31
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.5.2...v5.5.3
+
++ Added `slcli user delete`
++ #1023 Added `slcli order quote` to let users create a quote from the slcli.
++ #1032 Fixed vs upgrades when using flavors.
++ #1034 Added pagination to ticket list commands
++ #1037 Fixed DNS manager to be more flexible and support more zone types.
++ #1044 Pinned Click library version at >=5 < 7
+
+## [5.5.2] - 2018-08-31
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.5.1...v5.5.2
+
++ #1018 Fixed hardware credentials.
++ #1019 support for ticket priorities
++ #1025 create dedicated host with gpu fixed.
+
+
+## [5.5.1] - 2018-08-06
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.5.0...v5.5.1
+
+- #1006, added paginations to several slcli methods, making them work better with large result sets. 
+- #995, Fixed an issue displaying VLANs.
+- #1011, Fixed an issue displaying some NAS passwords
+- #1014, Ability to delete users
+
+## [5.5.0] - 2018-07-09
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.4...v5.5.0
+
+- Added a warning when ordering legacy storage volumes
+- Added documentation link to volume-order
+- Increased slcli output width limit to 999 characters
+- More unit tests
+- Fixed an issue canceling some block storage volumes
+- Fixed `slcli order` to work with network gateways
+- Fixed an issue showing hardware credentials when they do not exist
+- Fixed an issue showing addressSpace when listing virtual servers
+- Updated ordering class to support baremetal servers with multiple GPU
+- Updated prompt-toolkit as a fix for `slcli shell`
+- Fixed `slcli vlan detail` to not fail when objects don't have a hostname
+- Added user management
+
 
 ## [5.4.4] - 2018-04-18
-- Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.3...master
+- Changes: https://github.com/softlayer/softlayer-python/compare/v5.4.3...v5.4.4
 
 - fixed hw list not showing transactions
 - Re-factored RestTransport and XMLRPCTransport, logging is now only done in the DebugTransport

@@ -1,14 +1,23 @@
 """Support tickets."""
+import re
 
 import click
 
 from SoftLayer.CLI import formatting
 
-
 TEMPLATE_MSG = "***** SoftLayer Ticket Content ******"
 
+# https://softlayer.github.io/reference/services/SoftLayer_Ticket_Priority/getPriorities/
+PRIORITY_MAP = [
+    'No Priority',
+    'Severity 1 - Critical Impact / Service Down',
+    'Severity 2 - Significant Business Impact',
+    'Severity 3 - Minor Business Impact',
+    'Severity 4 - Minimal Business Impact'
+]
 
-def get_ticket_results(mgr, ticket_id, update_count=1):
+
+def get_ticket_results(mgr, ticket_id, is_json=False, update_count=1):
     """Get output about a ticket.
 
     :param integer id: the ticket ID
@@ -23,7 +32,9 @@ def get_ticket_results(mgr, ticket_id, update_count=1):
     table.align['value'] = 'l'
 
     table.add_row(['id', ticket['id']])
+    table.add_row(['Case_Number', ticket['serviceProviderResourceId']])
     table.add_row(['title', ticket['title']])
+    table.add_row(['priority', PRIORITY_MAP[ticket.get('priority', 0)]])
     if ticket.get('assignedUser'):
         user = ticket['assignedUser']
         table.add_row([
@@ -53,6 +64,7 @@ def get_ticket_results(mgr, ticket_id, update_count=1):
 
         # NOTE(kmcdonald): Windows new-line characters need to be stripped out
         wrapped_entry += click.wrap_text(update['entry'].replace('\r', ''))
+        if is_json and '\n' in wrapped_entry:
+            wrapped_entry = re.sub(r"(?<!\\)\n", " ", wrapped_entry)
         table.add_row(['update %s' % (count_offset + i,), wrapped_entry])
-
     return table

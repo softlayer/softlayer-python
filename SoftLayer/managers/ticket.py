@@ -5,14 +5,13 @@
 
     :license: MIT, see LICENSE for more details.
 """
-
 from SoftLayer import utils
 
 
 class TicketManager(utils.IdentifierMixin, object):
     """Manages SoftLayer support tickets.
 
-    See product information here: http://www.softlayer.com/support
+    See product information here: https://www.ibm.com/cloud/support
 
     :param SoftLayer.API.BaseClient client: the client instance
 
@@ -29,8 +28,8 @@ class TicketManager(utils.IdentifierMixin, object):
         :param boolean open_status: include open tickets
         :param boolean closed_status: include closed tickets
         """
-        mask = ('id, title, assignedUser[firstName, lastName],'
-                'createDate,lastEditDate,accountId,status')
+        mask = """mask[id, serviceProviderResourceId, title, assignedUser[firstName, lastName], priority,
+                  createDate, lastEditDate, accountId, status, updateCount]"""
 
         call = 'getTickets'
         if not all([open_status, closed_status]):
@@ -38,8 +37,9 @@ class TicketManager(utils.IdentifierMixin, object):
                 call = 'getOpenTickets'
             elif closed_status:
                 call = 'getClosedTickets'
-
-        return self.client.call('Account', call, mask=mask)
+            else:
+                raise ValueError("open_status and closed_status cannot both be False")
+        return self.client.call('Account', call, mask=mask, iter=True)
 
     def list_subjects(self):
         """List all ticket subjects."""
@@ -52,25 +52,27 @@ class TicketManager(utils.IdentifierMixin, object):
         :returns: dict -- information about the specified ticket
 
         """
-        mask = ('id, title, assignedUser[firstName, lastName],status,'
-                'createDate,lastEditDate,updates[entry,editor],updateCount')
+        mask = """mask[id, serviceProviderResourceId, title, assignedUser[firstName, lastName],status,
+                  createDate,lastEditDate,updates[entry,editor],updateCount, priority]"""
         return self.ticket.getObject(id=ticket_id, mask=mask)
 
-    def create_ticket(self, title=None, body=None, subject=None):
+    def create_ticket(self, title=None, body=None, subject=None, priority=None):
         """Create a new ticket.
 
         :param string title: title for the new ticket
         :param string body: body for the new ticket
         :param integer subject: id of the subject to be assigned to the ticket
+        :param integer priority: Value from 1 (highest) to 4 (lowest)
         """
-
         current_user = self.account.getCurrentUser()
         new_ticket = {
             'subjectId': subject,
-            'contents': body,
             'assignedUserId': current_user['id'],
             'title': title,
         }
+        if priority is not None:
+            new_ticket['priority'] = int(priority)
+
         created_ticket = self.ticket.createStandardTicket(new_ticket, body)
         return created_ticket
 
@@ -82,18 +84,12 @@ class TicketManager(utils.IdentifierMixin, object):
         """
         return self.ticket.addUpdate({'entry': body}, id=ticket_id)
 
-    def upload_attachment(self, ticket_id=None, file_path=None,
-                          file_name=None):
+    def upload_attachment(self, ticket_id=None, file_path=None, file_name=None):
         """Upload an attachment to a ticket.
 
-        :param integer ticket_id: the id of the ticket to
-                                  upload the attachment to
-        :param string file_path:
-                                  The path of the attachment to be uploaded
-        :param string file_name:
-                                  The name of the attachment shown
-                                  in the ticket
-
+        :param integer ticket_id: the id of the ticket to upload the attachment to
+        :param string file_path: The path of the attachment to be uploaded
+        :param string file_name: The name of the attachment shown in the ticket
         :returns: dict -- The uploaded attachment
         """
         file_content = None

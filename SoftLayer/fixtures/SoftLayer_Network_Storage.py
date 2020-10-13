@@ -157,6 +157,7 @@ getObject = {
     'storageTierLevel': 'READHEAVY_TIER',
     'storageType': {'keyName': 'ENDURANCE_STORAGE'},
     'username': 'username',
+    'dependentDuplicate': 1,
 }
 
 getSnapshots = [{
@@ -214,6 +215,7 @@ listVolumeSchedules = [
 ]
 
 deleteObject = True
+editObject = True
 allowAccessFromHostList = True
 removeAccessFromHostList = True
 failoverToReplicant = True
@@ -226,3 +228,17 @@ createSnapshot = {
 
 enableSnapshots = True
 disableSnapshots = True
+
+getVolumeCountLimits = {
+    'datacenterName': 'global',
+    'maximumAvailableCount': 300,
+    'provisionedCount': 100
+}
+
+refreshDuplicate = {
+     'dependentDuplicate': 1
+}
+
+convertCloneDependentToIndependent = {
+    'dependentDuplicate': 1
+}

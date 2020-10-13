@@ -5,11 +5,14 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import base64
 import importlib
 import json
 import logging
 import re
+from string import Template
 import time
+import xmlrpc.client
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -34,7 +37,7 @@ __all__ = [
 ]
 
 REST_SPECIAL_METHODS = {
-    'deleteObject': 'DELETE',
+    # 'deleteObject': 'DELETE',
     'createObject': 'POST',
     'createObjects': 'POST',
     'editObject': 'PUT',
@@ -120,21 +123,31 @@ class Request(object):
         #: Exception any exceptions that got caught
         self.exception = None
 
+    def __repr__(self):
+        """Prints out what this call is all about"""
+        pretty_mask = utils.clean_string(self.mask)
+        pretty_filter = self.filter
+        param_string = "id={id}, mask='{mask}', filter='{filter}', args={args}, limit={limit}, offset={offset}".format(
+            id=self.identifier, mask=pretty_mask, filter=pretty_filter,
+            args=self.args, limit=self.limit, offset=self.offset)
+        return "{service}::{method}({params})".format(
+            service=self.service, method=self.method, params=param_string)
+
 
 class SoftLayerListResult(list):
     """A SoftLayer API list result."""
 
-    def __init__(self, items, total_count):
+    def __init__(self, items=None, total_count=0):
 
         #: total count of items that exist on the server. This is useful when
         #: paginating through a large list of objects.
         self.total_count = total_count
-
-        super(SoftLayerListResult, self).__init__(items)
+        super().__init__(items)
 
 
 class XmlRpcTransport(object):
     """XML-RPC transport."""
+
     def __init__(self, endpoint_url=None, timeout=None, proxy=None, user_agent=None, verify=True):
 
         self.endpoint_url = (endpoint_url or consts.API_PUBLIC_ENDPOINT).rstrip('/')
@@ -159,6 +172,10 @@ class XmlRpcTransport(object):
         """
         largs = list(request.args)
         headers = request.headers
+
+        auth = None
+        if request.transport_user:
+            auth = requests.auth.HTTPBasicAuth(request.transport_user, request.transport_password)
 
         if request.identifier is not None:
             header_name = request.service + 'InitParameters'
@@ -186,9 +203,9 @@ class XmlRpcTransport(object):
         request.transport_headers.setdefault('User-Agent', self.user_agent)
 
         request.url = '/'.join([self.endpoint_url, request.service])
-        request.payload = utils.xmlrpc_client.dumps(tuple(largs),
-                                                    methodname=request.method,
-                                                    allow_none=True)
+        request.payload = xmlrpc.client.dumps(tuple(largs),
+                                              methodname=request.method,
+                                              allow_none=True)
 
         # Prefer the request setting, if it's not None
         verify = request.verify
@@ -198,6 +215,7 @@ class XmlRpcTransport(object):
         try:
             resp = self.client.request('POST', request.url,
                                        data=request.payload,
+                                       auth=auth,
                                        headers=request.transport_headers,
                                        timeout=self.timeout,
                                        verify=request.verify,
@@ -205,13 +223,13 @@ class XmlRpcTransport(object):
                                        proxies=_proxies_dict(self.proxy))
 
             resp.raise_for_status()
-            result = utils.xmlrpc_client.loads(resp.content)[0][0]
+            result = xmlrpc.client.loads(resp.content)[0][0]
             if isinstance(result, list):
                 return SoftLayerListResult(
                     result, int(resp.headers.get('softlayer-total-items', 0)))
             else:
                 return result
-        except utils.xmlrpc_client.Fault as ex:
+        except xmlrpc.client.Fault as ex:
             # These exceptions are formed from the XML-RPC spec
             # http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
             error_mapping = {
@@ -227,7 +245,7 @@ class XmlRpcTransport(object):
                 '-32300': exceptions.TransportError,
             }
             _ex = error_mapping.get(ex.faultCode, exceptions.SoftLayerAPIError)
-            raise _ex(ex.faultCode, ex.faultString)
+            raise _ex(ex.faultCode, ex.faultString) from ex
         except requests.HTTPError as ex:
             raise exceptions.TransportError(ex.response.status_code, str(ex))
         except requests.RequestException as ex:
@@ -240,9 +258,9 @@ class XmlRpcTransport(object):
 
         :param request request: Request object
         """
-        from string import Template
         output = Template('''============= testing.py =============
 import requests
+from requests.auth import HTTPBasicAuth
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from xml.etree import ElementTree
@@ -251,6 +269,9 @@ client.headers.update({'Content-Type': 'application/json', 'User-Agent': 'softla
 retry = Retry(connect=3, backoff_factor=3)
 adapter = HTTPAdapter(max_retries=retry)
 client.mount('https://', adapter)
+# This is only needed if you are using an cloud.ibm.com api key
+#auth=HTTPBasicAuth('apikey', YOUR_CLOUD_API_KEY)
+auth=None
 url = '$url'
 payload = """$payload"""
 transport_headers = $transport_headers
@@ -259,7 +280,7 @@ verify = $verify
 cert = $cert
 proxy = $proxy
 response = client.request('POST', url, data=payload, headers=transport_headers, timeout=timeout,
-               verify=verify, cert=cert, proxies=proxy)
+               verify=verify, cert=cert, proxies=proxy, auth=auth)
 xml = ElementTree.fromstring(response.content)
 ElementTree.dump(xml)
 ==========================''')
@@ -339,7 +360,7 @@ class RestTransport(object):
             body['parameters'] = request.args
 
         if body:
-            request.payload = json.dumps(body)
+            request.payload = json.dumps(body, cls=ComplexEncoder)
 
         url_parts = [self.endpoint_url, request.service]
         if request.identifier is not None:
@@ -369,7 +390,15 @@ class RestTransport(object):
             request.url = resp.url
 
             resp.raise_for_status()
-            result = json.loads(resp.text)
+
+            if resp.text != "":
+                try:
+                    result = json.loads(resp.text)
+                except ValueError as json_ex:
+                    raise exceptions.SoftLayerAPIError(resp.status_code, str(json_ex))
+            else:
+                raise exceptions.SoftLayerAPIError(resp.status_code, "Empty response.")
+
             request.result = result
 
             if isinstance(result, list):
@@ -378,8 +407,15 @@ class RestTransport(object):
             else:
                 return result
         except requests.HTTPError as ex:
-            message = json.loads(ex.response.text)['error']
-            request.url = ex.response.url
+            try:
+                message = json.loads(ex.response.text)['error']
+                request.url = ex.response.url
+            except ValueError as json_ex:
+                if ex.response.text == "":
+                    raise exceptions.SoftLayerAPIError(resp.status_code, "Empty response.")
+
+                raise exceptions.SoftLayerAPIError(resp.status_code, str(json_ex))
+
             raise exceptions.SoftLayerAPIError(ex.response.status_code, message)
         except requests.RequestException as ex:
             raise exceptions.TransportError(0, str(ex))
@@ -433,13 +469,14 @@ class DebugTransport(object):
         self.requests.append(call)
 
         if call.exception is not None:
+            LOGGER.debug(self.print_reproduceable(call))
             raise call.exception
 
         return call.result
 
     def pre_transport_log(self, call):
         """Prints a warning before calling the API """
-        output = "Calling: {}::{}(id={})".format(call.service, call.method, call.identifier)
+        output = "Calling: {})".format(call)
         LOGGER.warning(output)
 
     def post_transport_log(self, call):
@@ -490,17 +527,20 @@ class TimingTransport(object):
 
 class FixtureTransport(object):
     """Implements a transport which returns fixtures."""
+
     def __call__(self, call):
         """Load fixture from the default fixture path."""
         try:
             module_path = 'SoftLayer.fixtures.%s' % call.service
             module = importlib.import_module(module_path)
-        except ImportError:
-            raise NotImplementedError('%s fixture is not implemented' % call.service)
+        except ImportError as ex:
+            message = '{} fixture is not implemented'.format(call.service)
+            raise NotImplementedError(message) from ex
         try:
             return getattr(module, call.method)
-        except AttributeError:
-            raise NotImplementedError('%s::%s fixture is not implemented' % (call.service, call.method))
+        except AttributeError as ex:
+            message = '{}::{} fixture is not implemented'.format(call.service, call.method)
+            raise NotImplementedError(message) from ex
 
     def print_reproduceable(self, call):
         """Not Implemented"""
@@ -526,6 +566,21 @@ def _format_object_mask(objectmask):
     objectmask = objectmask.strip()
 
     if (not objectmask.startswith('mask') and
-            not objectmask.startswith('[')):
+            not objectmask.startswith('[') and
+            not objectmask.startswith('filteredMask')):
         objectmask = "mask[%s]" % objectmask
     return objectmask
+
+
+class ComplexEncoder(json.JSONEncoder):
+    """ComplexEncoder helps jsonencoder deal with byte strings"""
+
+    def default(self, o):
+        """Encodes o as JSON"""
+
+        # Base64 encode bytes type objects.
+        if isinstance(o, bytes):
+            base64_bytes = base64.b64encode(o)
+            return base64_bytes.decode("utf-8")
+        # Let the base class default method raise the TypeError
+        return json.JSONEncoder.default(self, o)

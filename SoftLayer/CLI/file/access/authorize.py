@@ -33,11 +33,9 @@ def cli(env, volume_id, hardware_id, virtual_id, ip_address_id,
         for ip_address_value in ip_address:
             ip_address_object = network_manager.ip_lookup(ip_address_value)
             if ip_address_object == "":
-                click.echo("IP Address not found on your account.  " +
-                           "Please confirm IP and try again.")
+                click.echo("IP Address not found on your account. Please confirm IP and try again.")
                 raise exceptions.ArgumentError('Incorrect IP Address')
-            else:
-                ip_address_id_list.append(ip_address_object['id'])
+            ip_address_id_list.append(ip_address_object['id'])
 
     file_manager.authorize_host_to_volume(volume_id,
                                           hardware_id,

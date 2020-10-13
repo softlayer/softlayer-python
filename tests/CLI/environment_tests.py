@@ -62,3 +62,14 @@ class EnvironmentTests(testing.TestCase):
 
         r = self.env.resolve_alias('realname')
         self.assertEqual(r, 'realname')
+
+    @mock.patch('click.echo')
+    def test_print_unicode(self, echo):
+        output = "\u3010TEST\u3011 image"
+        # https://docs.python.org/3.6/library/exceptions.html#UnicodeError
+        echo.side_effect = [
+            UnicodeEncodeError('utf8', output, 0, 1, "Test Exception"),
+            output
+        ]
+        self.env.fout(output)
+        self.assertEqual(2, echo.call_count)

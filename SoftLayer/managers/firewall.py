@@ -32,7 +32,7 @@ def has_firewall(vlan):
 class FirewallManager(utils.IdentifierMixin, object):
     """Manages SoftLayer firewalls
 
-    See product information here: http://www.softlayer.com/firewalls
+    See product information here: https://www.ibm.com/cloud/network-security
 
     :param SoftLayer.API.BaseClient client: the client instance
 
@@ -282,7 +282,8 @@ class FirewallManager(utils.IdentifierMixin, object):
         """Edit the rules for standard firewall.
 
         :param integer firewall_id: the instance ID of the standard firewall
-        :param dict rules: the rules to be pushed on the firewall
+        :param list rules: the rules to be pushed on the firewall as defined by
+                           SoftLayer_Network_Firewall_Update_Request_Rule
         """
 
         rule_svc = self.client['Network_Firewall_Update_Request']

@@ -42,6 +42,7 @@ class TokenAuthentication(AuthenticationBase):
         :param auth_token str: a user's auth token, attained through
                                User_Customer::getPortalLoginToken
     """
+
     def __init__(self, user_id, auth_token):
         self.user_id = user_id
         self.auth_token = auth_token
@@ -65,16 +66,24 @@ class BasicAuthentication(AuthenticationBase):
         :param username str: a user's username
         :param api_key str: a user's API key
     """
+
     def __init__(self, username, api_key):
         self.username = username
         self.api_key = api_key
 
     def get_request(self, request):
         """Sets token-based auth headers."""
-        request.headers['authenticate'] = {
-            'username': self.username,
-            'apiKey': self.api_key,
-        }
+
+        # See https://cloud.ibm.com/docs/iam?topic=iam-iamapikeysforservices for why this is the way it is
+        if self.username == 'apikey':
+            request.transport_user = self.username
+            request.transport_password = self.api_key
+        else:
+            request.headers['authenticate'] = {
+                'username': self.username,
+                'apiKey': self.api_key,
+            }
+
         return request
 
     def __repr__(self):
@@ -87,6 +96,7 @@ class BasicHTTPAuthentication(AuthenticationBase):
         :param username str: a user's username
         :param api_key str: a user's API key
     """
+
     def __init__(self, username, api_key):
         self.username = username
         self.api_key = api_key

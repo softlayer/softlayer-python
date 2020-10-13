@@ -6,7 +6,6 @@ import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 
-
 CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 
 
@@ -17,17 +16,14 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
               required=True)
 @click.option('--size',
               type=int,
-              help='Size of block storage volume in GB. Permitted Sizes:\n'
-                   '20, 40, 80, 100, 250, 500, 1000, 2000, 4000, 8000, 12000',
+              help='Size of block storage volume in GB.',
               required=True)
 @click.option('--iops',
               type=int,
-              help='Performance Storage IOPs,'
-              ' between 100 and 6000 in multiples of 100'
-              '  [required for storage-type performance]')
+              help="""Performance Storage IOPs. Options vary based on storage size.
+[required for storage-type performance]""")
 @click.option('--tier',
-              help='Endurance Storage Tier (IOP per GB)'
-              '  [required for storage-type endurance]',
+              help='Endurance Storage Tier (IOP per GB) [required for storage-type endurance]',
               type=click.Choice(['0.25', '2', '4', '10']))
 @click.option('--os-type',
               help='Operating System',
@@ -49,8 +45,8 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
               'space along with endurance block storage; specifies '
               'the size (in GB) of snapshot space to order')
 @click.option('--service-offering',
-              help='The service offering package to use for placing '
-              'the order [optional, default is \'storage_as_a_service\']',
+              help="""The service offering package to use for placing the order.
+[optional, default is \'storage_as_a_service\']. enterprise and performance are depreciated""",
               default='storage_as_a_service',
               type=click.Choice([
                   'storage_as_a_service',
@@ -63,7 +59,11 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 @environment.pass_env
 def cli(env, storage_type, size, iops, tier, os_type,
         location, snapshot_size, service_offering, billing):
-    """Order a block storage volume."""
+    """Order a block storage volume.
+
+    Valid size and iops options can be found here:
+    https://cloud.ibm.com/docs/BlockStorage/index.html#provisioning-considerations
+    """
     block_manager = SoftLayer.BlockStorageManager(env.client)
     storage_type = storage_type.lower()
 
@@ -71,26 +71,21 @@ def cli(env, storage_type, size, iops, tier, os_type,
     if billing.lower() == "hourly":
         hourly_billing_flag = True
 
-    if hourly_billing_flag and service_offering != 'storage_as_a_service':
-        raise exceptions.CLIAbort(
-            'Hourly billing is only available for the storage_as_a_service '
-            'service offering'
-        )
+    if service_offering != 'storage_as_a_service':
+        click.secho('{} is a legacy storage offering'.format(service_offering), fg='red')
+        if hourly_billing_flag:
+            raise exceptions.CLIAbort(
+                'Hourly billing is only available for the storage_as_a_service service offering'
+            )
 
     if storage_type == 'performance':
         if iops is None:
-            raise exceptions.CLIAbort(
-                'Option --iops required with Performance')
-
-        if iops % 100 != 0:
-            raise exceptions.CLIAbort(
-                'Option --iops must be a multiple of 100'
-            )
+            raise exceptions.CLIAbort('Option --iops required with Performance')
 
         if service_offering == 'performance' and snapshot_size is not None:
             raise exceptions.CLIAbort(
-                '--snapshot-size is not available for performance volumes '
-                'ordered with the \'performance\' service offering option'
+                '--snapshot-size is not available for performance service offerings. '
+                'Use --service-offering storage_as_a_service'
             )
 
         try:
@@ -110,8 +105,7 @@ def cli(env, storage_type, size, iops, tier, os_type,
     if storage_type == 'endurance':
         if tier is None:
             raise exceptions.CLIAbort(
-                'Option --tier required with Endurance in IOPS/GB '
-                '[0.25,2,4,10]'
+                'Option --tier required with Endurance in IOPS/GB [0.25,2,4,10]'
             )
 
         try:
@@ -133,6 +127,8 @@ def cli(env, storage_type, size, iops, tier, os_type,
             order['placedOrder']['id']))
         for item in order['placedOrder']['items']:
             click.echo(" > %s" % item['description'])
+        click.echo(
+            '\nYou may run "slcli block volume-list --order {0}" to find this block volume after it '
+            'is ready.'.format(order['placedOrder']['id']))
     else:
-        click.echo("Order could not be placed! Please verify your options " +
-                   "and try again.")
+        click.echo("Order could not be placed! Please verify your options and try again.")

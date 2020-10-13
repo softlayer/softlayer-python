@@ -1,10 +1,8 @@
 """
     SoftLayer.formatting
     ~~~~~~~~~~~~~~~~~~~~
-    Provider classes and helper functions to display output onto a
-    command-line.
+    Provider classes and helper functions to display output onto a command-line.
 
-    :license: MIT, see LICENSE for more details.
 """
 # pylint: disable=E0202, consider-merging-isinstance, arguments-differ, keyword-arg-before-vararg
 import collections
@@ -12,7 +10,12 @@ import json
 import os
 
 import click
-import prettytable
+
+# If both PTable and prettytable are installed, its impossible to use the new version
+try:
+    from prettytable import prettytable
+except ImportError:
+    import prettytable
 
 from SoftLayer.CLI import exceptions
 from SoftLayer import utils
@@ -27,7 +30,7 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
                  SequentialOutput
     :param string fmt (optional): One of: table, raw, json, python
     """
-    if isinstance(data, utils.string_types):
+    if isinstance(data, str):
         if fmt in ('json', 'jsonraw'):
             return json.dumps(data)
         return data
@@ -229,9 +232,10 @@ class SequentialOutput(list):
 
     :param separator str: string to use as a default separator
     """
+
     def __init__(self, separator=os.linesep, *args, **kwargs):
         self.separator = separator
-        super(SequentialOutput, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def to_python(self):
         """returns itself, since it itself is a list."""
@@ -243,11 +247,12 @@ class SequentialOutput(list):
 
 class CLIJSONEncoder(json.JSONEncoder):
     """A JSON encoder which is able to use a .to_python() method on objects."""
+
     def default(self, obj):
         """Encode object if it implements to_python()."""
         if hasattr(obj, 'to_python'):
             return obj.to_python()
-        return super(CLIJSONEncoder, self).default(obj)
+        return super().default(obj)
 
 
 class Table(object):
@@ -255,7 +260,8 @@ class Table(object):
 
     :param list columns: a list of column names
     """
-    def __init__(self, columns):
+
+    def __init__(self, columns, title=None):
         duplicated_cols = [col for col, count
                            in collections.Counter(columns).items()
                            if count > 1]
@@ -267,6 +273,7 @@ class Table(object):
         self.rows = []
         self.align = {}
         self.sortby = None
+        self.title = title
 
     def add_row(self, row):
         """Add a row to the table.
@@ -287,15 +294,23 @@ class Table(object):
     def prettytable(self):
         """Returns a new prettytable instance."""
         table = prettytable.PrettyTable(self.columns)
+
         if self.sortby:
             if self.sortby in self.columns:
                 table.sortby = self.sortby
             else:
                 msg = "Column (%s) doesn't exist to sort by" % self.sortby
                 raise exceptions.CLIAbort(msg)
-        for a_col, alignment in self.align.items():
-            table.align[a_col] = alignment
 
+        if isinstance(self.align, str):
+            table.align = self.align
+        else:
+            # Required because PrettyTable has a strict setter function for alignment
+            for a_col, alignment in self.align.items():
+                table.align[a_col] = alignment
+
+        if self.title:
+            table.title = self.title
         # Adding rows
         for row in self.rows:
             table.add_row(row)
@@ -304,6 +319,7 @@ class Table(object):
 
 class KeyValueTable(Table):
     """A table that is oriented towards key-value pairs."""
+
     def to_python(self):
         """Decode this KeyValueTable object to standard Python types."""
         mapping = {}
@@ -318,6 +334,7 @@ class FormattedItem(object):
         :param original: raw (machine-readable) value
         :param string formatted: human-readable value
     """
+
     def __init__(self, original, formatted=None):
         self.original = original
         if formatted is not None:
@@ -404,11 +421,13 @@ def _format_list(result):
     if not result:
         return result
 
-    if isinstance(result[0], dict):
-        return _format_list_objects(result)
+    new_result = [item for item in result if item]
+
+    if isinstance(new_result[0], dict):
+        return _format_list_objects(new_result)
 
     table = Table(['value'])
-    for item in result:
+    for item in new_result:
         table.add_row([iter_to_table(item)])
     return table
 
@@ -418,12 +437,15 @@ def _format_list_objects(result):
 
     all_keys = set()
     for item in result:
-        all_keys = all_keys.union(item.keys())
+        if isinstance(item, dict):
+            all_keys = all_keys.union(item.keys())
 
     all_keys = sorted(all_keys)
     table = Table(all_keys)
 
     for item in result:
+        if not item:
+            continue
         values = []
         for key in all_keys:
             value = iter_to_table(item.get(key))

@@ -1,0 +1,4 @@
+sphinx
+sphinx-click
+click
+prettytable

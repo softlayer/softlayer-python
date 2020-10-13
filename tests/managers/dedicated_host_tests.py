@@ -90,7 +90,7 @@ class DedicatedHostTests(testing.TestCase):
                 {
                     'primaryBackendNetworkComponent': {
                         'router': {
-                            'id': 51218
+                            'id': 12345
                         }
                     },
                     'domain': u'test.com',
@@ -103,7 +103,7 @@ class DedicatedHostTests(testing.TestCase):
             'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
             'prices': [
                 {
-                    'id': 200269
+                    'id': 12345
                 }
             ],
             'quantity': 1
@@ -133,6 +133,57 @@ class DedicatedHostTests(testing.TestCase):
                                 'placeOrder',
                                 args=(values,))
 
+    def test_place_order_with_gpu(self):
+        create_dict = self.dedicated_host._generate_create_dict = mock.Mock()
+
+        values = {
+            'hardware': [
+                {
+                    'primaryBackendNetworkComponent': {
+                        'router': {
+                            'id': 12345
+                        }
+                    },
+                    'domain': u'test.com',
+                    'hostname': u'test'
+                }
+            ],
+            'useHourlyPricing': True,
+            'location': 'AMSTERDAM',
+            'packageId': 813,
+            'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
+            'prices': [
+                {
+                    'id': 12345
+                }
+            ],
+            'quantity': 1
+        }
+        create_dict.return_value = values
+
+        location = 'dal05'
+        hostname = 'test'
+        domain = 'test.com'
+        hourly = True
+        flavor = '56_CORES_X_484_RAM_X_1_5_TB_X_2_GPU_P100'
+
+        self.dedicated_host.place_order(hostname=hostname,
+                                        domain=domain,
+                                        location=location,
+                                        flavor=flavor,
+                                        hourly=hourly)
+
+        create_dict.assert_called_once_with(hostname=hostname,
+                                            router=None,
+                                            domain=domain,
+                                            datacenter=location,
+                                            flavor=flavor,
+                                            hourly=True)
+
+        self.assert_called_with('SoftLayer_Product_Order',
+                                'placeOrder',
+                                args=(values,))
+
     def test_verify_order(self):
         create_dict = self.dedicated_host._generate_create_dict = mock.Mock()
 
@@ -141,7 +192,7 @@ class DedicatedHostTests(testing.TestCase):
                 {
                     'primaryBackendNetworkComponent': {
                         'router': {
-                            'id': 51218
+                            'id': 12345
                         }
                     },
                     'domain': 'test.com',
@@ -154,7 +205,7 @@ class DedicatedHostTests(testing.TestCase):
             'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
             'prices': [
                 {
-                    'id': 200269
+                    'id': 12345
                 }
             ],
             'quantity': 1
@@ -208,7 +259,7 @@ class DedicatedHostTests(testing.TestCase):
                 {
                     'primaryBackendNetworkComponent': {
                         'router': {
-                            'id': 51218
+                            'id': 12345
                         }
                     },
                     'domain': 'test.com',
@@ -221,7 +272,7 @@ class DedicatedHostTests(testing.TestCase):
             'complexType': 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
             'prices': [
                 {
-                    'id': 200269
+                    'id': 12345
                 }
             ],
             'quantity': 1
@@ -233,10 +284,10 @@ class DedicatedHostTests(testing.TestCase):
         self.dedicated_host._get_package = mock.MagicMock()
         self.dedicated_host._get_package.return_value = self._get_package()
         self.dedicated_host._get_default_router = mock.Mock()
-        self.dedicated_host._get_default_router.return_value = 51218
+        self.dedicated_host._get_default_router.return_value = 12345
 
         location = 'dal05'
-        router = 51218
+        router = 12345
         hostname = 'test'
         domain = 'test.com'
         hourly = True
@@ -255,7 +306,7 @@ class DedicatedHostTests(testing.TestCase):
                 {
                     'primaryBackendNetworkComponent': {
                         'router': {
-                            'id': 51218
+                            'id': 12345
                         }
                     },
                     'domain': 'test.com',
@@ -269,7 +320,7 @@ class DedicatedHostTests(testing.TestCase):
                 'SoftLayer_Container_Product_Order_Virtual_DedicatedHost',
             'prices': [
                 {
-                    'id': 200269
+                    'id': 12345
                 }
             ],
             'quantity': 1
@@ -286,7 +337,8 @@ class DedicatedHostTests(testing.TestCase):
             capacity,
             keyName,
             itemCategory[categoryCode],
-            bundleItems[capacity, categories[categoryCode]]
+            bundleItems[capacity,keyName,categories[categoryCode],hardwareGenericComponentModel[id,
+            hardwareComponentType[keyName]]]
         ],
         regions[location[location[priceGroups]]]
         '''
@@ -369,7 +421,7 @@ class DedicatedHostTests(testing.TestCase):
     def test_get_price(self):
         package = self._get_package()
         item = package['items'][0]
-        price_id = 200269
+        price_id = 12345
 
         self.assertEqual(self.dedicated_host._get_price(item), price_id)
 
@@ -388,27 +440,29 @@ class DedicatedHostTests(testing.TestCase):
         item = {
             'bundleItems': [{
                 'capacity': '1200',
+                'keyName': '1_4_TB_LOCAL_STORAGE_DEDICATED_HOST_CAPACITY',
                 'categories': [{
                     'categoryCode': 'dedicated_host_disk'
                 }]
             },
                 {
                     'capacity': '242',
+                    'keyName': '242_GB_RAM',
                     'categories': [{
                         'categoryCode': 'dedicated_host_ram'
                     }]
-                }],
+            }],
             'capacity': '56',
             'description': '56 Cores X 242 RAM X 1.2 TB',
-            'id': 10195,
+            'id': 12345,
             'itemCategory': {
                 'categoryCode': 'dedicated_virtual_hosts'
             },
             'keyName': '56_CORES_X_242_RAM_X_1_4_TB',
             'prices': [{
                 'hourlyRecurringFee': '3.164',
-                'id': 200269,
-                'itemId': 10195,
+                'id': 12345,
+                'itemId': 12345,
                 'recurringFee': '2099',
             }]
         }
@@ -427,7 +481,7 @@ class DedicatedHostTests(testing.TestCase):
         location = [
             {
                 'isAvailable': 1,
-                'locationId': 138124,
+                'locationId': 12345,
                 'packageId': 813
             }
         ]
@@ -474,7 +528,7 @@ class DedicatedHostTests(testing.TestCase):
     def test_get_default_router(self):
         routers = self._get_routers_sample()
 
-        router = 51218
+        router = 12345
 
         router_test = self.dedicated_host._get_default_router(routers, 'bcr01a.dal05')
 
@@ -486,23 +540,64 @@ class DedicatedHostTests(testing.TestCase):
         self.assertRaises(exceptions.SoftLayerError,
                           self.dedicated_host._get_default_router, routers, 'notFound')
 
+    def test_cancel_host(self):
+        result = self.dedicated_host.cancel_host(789)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Virtual_DedicatedHost', 'deleteObject', identifier=789)
+
+    def test_cancel_guests(self):
+        vs1 = {'id': 987, 'fullyQualifiedDomainName': 'foobar.example.com'}
+        vs2 = {'id': 654, 'fullyQualifiedDomainName': 'wombat.example.com'}
+        self.dedicated_host.host = mock.Mock()
+        self.dedicated_host.host.getGuests.return_value = [vs1, vs2]
+
+        # Expected result
+        vs_status1 = {'id': 987, 'fqdn': 'foobar.example.com', 'status': 'Cancelled'}
+        vs_status2 = {'id': 654, 'fqdn': 'wombat.example.com', 'status': 'Cancelled'}
+        delete_status = [vs_status1, vs_status2]
+
+        result = self.dedicated_host.cancel_guests(789)
+
+        self.assertEqual(result, delete_status)
+
+    def test_cancel_guests_empty_list(self):
+        self.dedicated_host.host = mock.Mock()
+        self.dedicated_host.host.getGuests.return_value = []
+
+        result = self.dedicated_host.cancel_guests(789)
+
+        self.assertEqual(result, [])
+
+    def test_delete_guest(self):
+        result = self.dedicated_host._delete_guest(123)
+        self.assertEqual(result, 'Cancelled')
+
+        # delete_guest should return the exception message in case it fails
+        error_raised = SoftLayer.SoftLayerAPIError('SL Exception', 'SL message')
+        self.dedicated_host.guest = mock.Mock()
+        self.dedicated_host.guest.deleteObject.side_effect = error_raised
+
+        result = self.dedicated_host._delete_guest(369)
+        self.assertEqual(result, 'Exception: SL message')
+
     def _get_routers_sample(self):
         routers = [
             {
                 'hostname': 'bcr01a.dal05',
-                'id': 51218
+                'id': 12345
             },
             {
                 'hostname': 'bcr02a.dal05',
-                'id': 83361
+                'id': 12346
             },
             {
                 'hostname': 'bcr03a.dal05',
-                'id': 122762
+                'id': 12347
             },
             {
                 'hostname': 'bcr04a.dal05',
-                'id': 147566
+                'id': 12348
             }
         ]
 
@@ -517,6 +612,7 @@ class DedicatedHostTests(testing.TestCase):
                     "bundleItems": [
                         {
                             "capacity": "1200",
+                            "keyName": "1_4_TB_LOCAL_STORAGE_DEDICATED_HOST_CAPACITY",
                             "categories": [
                                 {
                                     "categoryCode": "dedicated_host_disk"
@@ -525,6 +621,7 @@ class DedicatedHostTests(testing.TestCase):
                         },
                         {
                             "capacity": "242",
+                            "keyName": "242_GB_RAM",
                             "categories": [
                                 {
                                     "categoryCode": "dedicated_host_ram"
@@ -534,14 +631,14 @@ class DedicatedHostTests(testing.TestCase):
                     ],
                     "prices": [
                         {
-                            "itemId": 10195,
+                            "itemId": 12345,
                             "recurringFee": "2099",
                             "hourlyRecurringFee": "3.164",
-                            "id": 200269,
+                            "id": 12345,
                         }
                     ],
                     "keyName": "56_CORES_X_242_RAM_X_1_4_TB",
-                    "id": 10195,
+                    "id": 12345,
                     "itemCategory": {
                         "categoryCode": "dedicated_virtual_hosts"
                     },
@@ -552,12 +649,12 @@ class DedicatedHostTests(testing.TestCase):
                     "location": {
                         "locationPackageDetails": [
                             {
-                                "locationId": 265592,
+                                "locationId": 12345,
                                 "packageId": 813
                             }
                         ],
                         "location": {
-                            "id": 265592,
+                            "id": 12345,
                             "name": "ams01",
                             "longName": "Amsterdam 1"
                         }
@@ -571,12 +668,12 @@ class DedicatedHostTests(testing.TestCase):
                         "locationPackageDetails": [
                             {
                                 "isAvailable": 1,
-                                "locationId": 138124,
+                                "locationId": 12345,
                                 "packageId": 813
                             }
                         ],
                         "location": {
-                            "id": 138124,
+                            "id": 12345,
                             "name": "dal05",
                             "longName": "Dallas 5"
                         }
@@ -591,3 +688,34 @@ class DedicatedHostTests(testing.TestCase):
         }
 
         return package
+
+    def test_list_guests(self):
+        results = self.dedicated_host.list_guests(12345)
+
+        for result in results:
+            self.assertIn(result['id'], [200, 202])
+        self.assert_called_with('SoftLayer_Virtual_DedicatedHost', 'getGuests', identifier=12345)
+
+    def test_list_guests_with_filters(self):
+        self.dedicated_host.list_guests(12345, tags=['tag1', 'tag2'], cpus=2, memory=1024,
+                                        hostname='hostname', domain='example.com', nic_speed=100,
+                                        public_ip='1.2.3.4', private_ip='4.3.2.1')
+
+        _filter = {
+            'guests': {
+                'domain': {'operation': '_= example.com'},
+                'tagReferences': {
+                    'tag': {'name': {
+                        'operation': 'in',
+                        'options': [{
+                            'name': 'data', 'value': ['tag1', 'tag2']}]}}},
+                'maxCpu': {'operation': 2},
+                'maxMemory': {'operation': 1024},
+                'hostname': {'operation': '_= hostname'},
+                'networkComponents': {'maxSpeed': {'operation': 100}},
+                'primaryIpAddress': {'operation': '_= 1.2.3.4'},
+                'primaryBackendIpAddress': {'operation': '_= 4.3.2.1'}
+            }
+        }
+        self.assert_called_with('SoftLayer_Virtual_DedicatedHost', 'getGuests',
+                                identifier=12345, filter=_filter)

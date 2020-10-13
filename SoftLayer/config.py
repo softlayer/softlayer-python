@@ -5,10 +5,9 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import configparser
 import os
 import os.path
-
-from SoftLayer import utils
 
 
 def get_client_settings_args(**kwargs):
@@ -51,7 +50,7 @@ def get_client_settings_config_file(**kwargs):  # pylint: disable=inconsistent-r
     if kwargs.get('config_file'):
         config_files.append(kwargs.get('config_file'))
     config_files = [os.path.expanduser(f) for f in config_files]
-    config = utils.configparser.RawConfigParser({
+    config = configparser.RawConfigParser({
         'username': '',
         'api_key': '',
         'endpoint_url': '',

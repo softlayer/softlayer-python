@@ -14,6 +14,12 @@ To see more information about the IPSEC tunnel context module and API internacti
 
 ipsec list
 ----------
+
+
+.. click:: SoftLayer.CLI.vpn.ipsec.list:cli
+    :prog: ipsec list
+    :show-nested:
+
 A list of all IPSEC tunnel contexts associated with the current user's account can be retrieved via the ``ipsec list`` command. This provides a brief overview of all tunnel contexts and can be used to retrieve an individual context's identifier, which all other CLI commands require.
 ::
 
@@ -28,6 +34,12 @@ A list of all IPSEC tunnel contexts associated with the current user's account c
 
 ipsec detail
 ------------
+
+.. click:: SoftLayer.CLI.vpn.ipsec.detail:cli
+    :prog: ipsec detail
+    :show-nested:
+
+
 More detailed information can be retrieved for an individual context using the ``ipsec detail`` command. Using the detail command, information about associated internal subnets, remote subnets, static subnets, service subnets and address translations may also be retrieved using multiple instances of the ``-i|--include`` option.
 ::
 
@@ -91,6 +103,12 @@ More detailed information can be retrieved for an individual context using the `
 
 ipsec update
 ------------
+
+.. click:: SoftLayer.CLI.vpn.ipsec.update:cli
+    :prog: ipsec update
+    :show-nested:
+
+
 Most values listed in the tunnel context detail printout can be modified using the ``ipsec update`` command. The following is given when executing with the ``-h|--help`` option and highlights all properties that may be modified.
 ::
 
@@ -134,6 +152,12 @@ Most values listed in the tunnel context detail printout can be modified using t
 
 ipsec configure
 ---------------
+
+.. click:: SoftLayer.CLI.vpn.ipsec.configure:cli
+    :prog: ipsec configure
+    :show-nested:
+
+
 A request to configure SoftLayer network devices for a given tunnel context can be issued using the ``ipsec configure`` command.
 
 .. note::
@@ -144,6 +168,12 @@ A request to configure SoftLayer network devices for a given tunnel context can 
 
 ipsec subnet-add
 ----------------
+
+.. click:: SoftLayer.CLI.vpn.ipsec.subnet.add:cli
+    :prog: ipsec subnet-add
+    :show-nested:
+
+
 Internal, remote and service subnets can be associated to an IPSEC tunnel context using the ``ipsec subnet-add`` command. Additionally, remote subnets can be created using this same command, which will then be associated to the targeted tunnel context.
 
 .. note::
@@ -167,6 +197,13 @@ The following is an example of creating and associating a remote subnet to a tun
 
 ipsec subnet-remove
 -------------------
+
+.. click:: SoftLayer.CLI.vpn.ipsec.subnet.remove:cli
+    :prog: ipsec subnet-remove
+    :show-nested:
+
+
+
 Internal, remote and service subnets can be disassociated from an IPSEC tunnel context via the ``ipsec subnet-remove`` command.
 
 .. note::
@@ -183,6 +220,12 @@ The following is an example of disassociating an internal subnet from a tunnel c
 
 ipsec translation-add
 ---------------------
+
+.. click:: SoftLayer.CLI.vpn.ipsec.translation.add:cli
+    :prog: ipsec translation-add
+    :show-nested:
+
+
 Address translation entries can be added to a tunnel context to provide NAT functionality from a statically routed subnet associated with the tunnel context to a remote subnet. This action is performed with the ``ipsec translation-add`` command.
 
 .. note::
@@ -199,6 +242,12 @@ The following is an example of adding a new address translation entry.
 
 ipsec translation-remove
 ------------------------
+
+.. click:: SoftLayer.CLI.vpn.ipsec.translation.remove:cli
+    :prog: ipsec translation-remove
+    :show-nested:
+
+
 Address translation entries can be removed using the ``ipsec translation-remove`` command.
 
 The following is an example of removing an address translation entry.
@@ -211,6 +260,11 @@ The following is an example of removing an address translation entry.
 
 ipsec translation-update
 ------------------------
+
+.. click:: SoftLayer.CLI.vpn.ipsec.translation.update:cli 
+    :prog: ipsec translation-update
+    :show-nested:
+
 Address translation entries may also be modified using the ``ipsec translation-update`` command.
 
 The following is an example of updating an existing address translation entry.

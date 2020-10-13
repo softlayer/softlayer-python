@@ -14,6 +14,7 @@ from prompt_toolkit import completion as completion
 
 class ShellCompleter(completion.Completer):
     """Completer for the shell."""
+
     def __init__(self, click_root):
         self.root = click_root
 
@@ -23,18 +24,17 @@ class ShellCompleter(completion.Completer):
         return _click_autocomplete(self.root, document.text_before_cursor)
 
 
-# pylint: disable=stop-iteration-return
 def _click_autocomplete(root, text):
     """Completer generator for click applications."""
     try:
         parts = shlex.split(text)
     except ValueError:
-        raise StopIteration
+        return
 
     location, incomplete = _click_resolve_command(root, parts)
 
     if not text.endswith(' ') and not incomplete and text:
-        raise StopIteration
+        return
 
     if incomplete and not incomplete[0:2].isalnum():
         for param in location.params:

@@ -27,12 +27,22 @@ def cli(env, identifier, passwords, price):
     hardware_id = helpers.resolve_id(hardware.resolve_ids, identifier, 'hardware')
     result = hardware.get_hardware(hardware_id)
     result = utils.NestedDict(result)
+    hard_drives = hardware.get_hard_drives(hardware_id)
 
     operating_system = utils.lookup(result, 'operatingSystem', 'softwareLicense', 'softwareDescription') or {}
     memory = formatting.gb(result.get('memoryCapacity', 0))
     owner = None
     if utils.lookup(result, 'billingItem') != []:
         owner = utils.lookup(result, 'billingItem', 'orderItem', 'order', 'userRecord', 'username')
+
+    table_hard_drives = formatting.Table(['Name', 'Capacity', 'Serial #'])
+    for drives in hard_drives:
+        name = drives['hardwareComponentModel']['manufacturer'] + " " + drives['hardwareComponentModel']['name']
+        capacity = str(drives['hardwareComponentModel']['hardwareGenericComponentModel']['capacity']) + " " + str(
+            drives['hardwareComponentModel']['hardwareGenericComponentModel']['units'])
+        serial = drives['serialNumber']
+
+        table_hard_drives.add_row([name, capacity, serial])
 
     table.add_row(['id', result['id']])
     table.add_row(['guid', result['globalIdentifier'] or formatting.blank()])
@@ -43,6 +53,7 @@ def cli(env, identifier, passwords, price):
     table.add_row(['datacenter', result['datacenter']['name'] or formatting.blank()])
     table.add_row(['cores', result['processorPhysicalCoreAmount']])
     table.add_row(['memory', memory])
+    table.add_row(['drives', table_hard_drives])
     table.add_row(['public_ip', result['primaryIpAddress'] or formatting.blank()])
     table.add_row(['private_ip', result['primaryBackendIpAddress'] or formatting.blank()])
     table.add_row(['ipmi_ip', result['networkManagementIpAddress'] or formatting.blank()])
@@ -56,6 +67,10 @@ def cli(env, identifier, passwords, price):
         vlan_table.add_row([vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
 
     table.add_row(['vlans', vlan_table])
+
+    bandwidth = hardware.get_bandwidth_allocation(hardware_id)
+    bw_table = _bw_table(bandwidth)
+    table.add_row(['Bandwidth', bw_table])
 
     if result.get('notes'):
         table.add_row(['notes', result['notes']])
@@ -85,3 +100,20 @@ def cli(env, identifier, passwords, price):
     table.add_row(['tags', formatting.tags(result['tagReferences'])])
 
     env.fout(table)
+
+
+def _bw_table(bw_data):
+    """Generates a bandwidth usage table"""
+    table = formatting.Table(['Type', 'In GB', 'Out GB', 'Allotment'])
+    for bw_point in bw_data.get('usage'):
+        bw_type = 'Private'
+        allotment = 'N/A'
+        if bw_point['type']['alias'] == 'PUBLIC_SERVER_BW':
+            bw_type = 'Public'
+            if not bw_data.get('allotment'):
+                allotment = '-'
+            else:
+                allotment = utils.lookup(bw_data, 'allotment', 'amount')
+
+        table.add_row([bw_type, bw_point['amountIn'], bw_point['amountOut'], allotment])
+    return table
