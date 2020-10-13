@@ -1,6 +1,5 @@
 name: slcli
 adopt-info: slcli
-version: 'git' # will be replaced by a `git describe` based version string
 description: |
     A command-line interface is also included and can be used to manage various SoftLayer products and services.
 
