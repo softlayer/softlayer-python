@@ -1,4 +1,6 @@
 name: slcli
+summary: A CLI tool to interact with the SoftLayer API.
+version: 'git'
 adopt-info: slcli
 description: |
     A command-line interface is also included and can be used to manage various SoftLayer products and services.
@@ -23,13 +25,9 @@ parts:
   slcli:
     source: https://github.com/softlayer/softlayer-python
     source-type: git
-    summary: A CLI tool to interact with the SoftLayer API.
     plugin: python
     python-version: python3
-    override-pull: |
-      snapcraftctl pull
-      snapcraftctl set-version "$(git describe --tags | sed 's/^v//')"
-    
+   
     build-packages:
       - python3
       
