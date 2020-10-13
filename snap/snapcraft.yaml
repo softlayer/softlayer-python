@@ -23,6 +23,7 @@ parts:
   slcli:
     source: https://github.com/softlayer/softlayer-python
     source-type: git
+    summary: A CLI tool to interact with the SoftLayer API.
     plugin: python
     python-version: python3
     override-pull: |
