@@ -1,6 +1,6 @@
 name: slcli # check to see if it's available
 version: 'git' # will be replaced by a `git describe` based version string
-summary: Python based SoftLayer API Tool.
+summary: A CLI tool to interact with the SoftLayer API.
 description: |
     A command-line interface is also included and can be used to manage various SoftLayer products and services.
 grade: stable
@@ -24,9 +24,7 @@ parts:
     source-type: git
     plugin: python
     python-version: python3
-    
     build-packages:
-      - python3
-      
+      - python3  
     stage-packages:
       - python3
