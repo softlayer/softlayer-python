@@ -1,6 +1,6 @@
 name: slcli
 adopt-info: slcli
-summary: A snap for slcli for SoftLayer products and services
+summary: A CLI tool to interact with the SoftLayer API.
 description: |
     A command-line interface is also included and can be used to manage various SoftLayer products and services.
 
