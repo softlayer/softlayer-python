@@ -776,40 +776,6 @@ class OrderingTests(testing.TestCase):
 
         self.assertEqual(24, int(item_capacity))
 
-    def test_get_item_prices_by_location(self):
-        options = self.ordering.get_item_prices_by_location("MONTREAL", "MONTREAL")
-        item_prices = [
-            {
-                "hourlyRecurringFee": ".093",
-                "id": 204015,
-                "recurringFee": "62",
-                "item": {
-                    "description": "4 x 2.0 GHz or higher Cores",
-                    "id": 859,
-                    "keyName": "GUEST_CORES_4",
-                },
-                "pricingLocationGroup": {
-                    "id": 503,
-                    "locations": [
-                        {
-                            "id": 449610,
-                            "longName": "Montreal 1",
-                            "name": "mon01",
-                            "regions": [
-                                {
-                                    "description": "MON01 - Montreal",
-                                    "keyname": "MONTREAL",
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-
-        self.assertEqual(options[0]['item']['keyName'], item_prices[0]['item']['keyName'])
-        self.assertEqual(options[0]['hourlyRecurringFee'], item_prices[0]['hourlyRecurringFee'])
-
     def test_get_oder_detail_mask(self):
         order_id = 12345
         test_mask = 'mask[id]'
@@ -830,3 +796,49 @@ class OrderingTests(testing.TestCase):
             'items[description],userRecord[displayName,userStatus]]')
         self.ordering.get_order_detail(order_id)
         self.assert_called_with('SoftLayer_Billing_Order', 'getObject', identifier=order_id, mask=_default_mask)
+
+    def test_get_item_prices_by_location_name(self):
+        object_mask = "filteredMask[pricingLocationGroup[locations]]"
+        object_filter = {
+            "itemPrices": {"pricingLocationGroup": {"locations": {"name": {"operation": 'dal13'}}}}}
+        self.ordering.get_item_prices_by_location('dal13', 'TEST')
+
+        self.assert_called_with('SoftLayer_Product_Package', 'getItemPrices', mask=object_mask, filter=object_filter)
+
+    def test_get_item_prices_by_location_keyname(self):
+        object_mask = "filteredMask[pricingLocationGroup[locations]]"
+        object_filter = {
+            "itemPrices": {"pricingLocationGroup": {"locations": {"name": {"operation": 'dal13'}}}}}
+        self.ordering.get_item_prices_by_location('DALLAS13', 'TEST')
+
+        self.assert_called_with('SoftLayer_Product_Package', 'getItemPrices', mask=object_mask, filter=object_filter)
+
+    def test_resolve_location_name(self):
+        location_name_expected = 'dal13'
+        object_mask = "mask[regions]"
+        location_name = self.ordering.resolve_location_name('DALLAS13')
+        self.assertEqual(location_name, location_name_expected)
+        self.assert_called_with('SoftLayer_Location', 'getDatacenters', mask=object_mask)
+
+    def test_resolve_location_name_by_keyname(self):
+        location_name_expected = 'dal13'
+        object_mask = "mask[regions]"
+        location_name = self.ordering.resolve_location_name('DALLAS13')
+        self.assertEqual(location_name, location_name_expected)
+        self.assert_called_with('SoftLayer_Location', 'getDatacenters', mask=object_mask)
+
+    def test_resolve_location_name_by_name(self):
+        location_name_expected = 'dal13'
+        object_mask = "mask[regions]"
+        location_name = self.ordering.resolve_location_name('dal13')
+        self.assertEqual(location_name, location_name_expected)
+        self.assert_called_with('SoftLayer_Location', 'getDatacenters', mask=object_mask)
+
+    def test_resolve_location_name_invalid(self):
+        exc = self.assertRaises(exceptions.SoftLayerError, self.ordering.resolve_location_name, None)
+        self.assertIn("Invalid location", str(exc))
+
+    def test_resolve_location_name_not_exist(self):
+        exc = self.assertRaises(exceptions.SoftLayerError, self.ordering.resolve_location_name, "UNKNOWN_LOCATION_TEST")
+        self.assertIn("does not exist", str(exc))
+

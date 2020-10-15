@@ -46,7 +46,7 @@ class OrderTests(testing.TestCase):
         self.assertIn('item2', result.output)
 
     def test_item_list_prices(self):
-        result = self.run_command(['order', 'item-list', '--prices', 'package'])
+        result = self.run_command(['order', 'item-list', 'package', '--prices'])
 
         self.assert_no_fail(result)
         output = json.loads(result.output)
@@ -55,8 +55,28 @@ class OrderTests(testing.TestCase):
         self.assertEqual(output[0][1]['keyName'], 'KeyName015')
         self.assert_called_with('SoftLayer_Product_Package', 'getItems')
 
-    def test_item_list_location(self):
-        result = self.run_command(['order', 'item-list', '--prices', 'AMSTERDAM02', 'package'])
+    def test_item_list_location_keyname(self):
+        result = self.run_command(['order', 'item-list', 'package', '--prices', 'DALLAS13', ])
+
+        self.assert_no_fail(result)
+        output = json.loads(result.output)
+        self.assertEqual(output[0][0]['Hourly'], 0.0)
+        self.assertEqual(output[0][1]['keyName'], 'KeyName015')
+        self.assertEqual(output[0][1]['priceId'], 1144)
+        self.assert_called_with('SoftLayer_Product_Package', 'getItemPrices')
+
+    def test_item_list_location_name(self):
+        result = self.run_command(['order', 'item-list', 'package', '--prices', 'dal13', ])
+
+        self.assert_no_fail(result)
+        output = json.loads(result.output)
+        self.assertEqual(output[0][0]['Hourly'], 0.0)
+        self.assertEqual(output[0][1]['keyName'], 'KeyName015')
+        self.assertEqual(output[0][1]['priceId'], 1144)
+        self.assert_called_with('SoftLayer_Product_Package', 'getItemPrices')
+
+    def test_item_list_category_keyword(self):
+        result = self.run_command(['order', 'item-list', 'package', '--prices', 'dal13', '-c', 'os', '-k' 'test'])
 
         self.assert_no_fail(result)
         output = json.loads(result.output)
