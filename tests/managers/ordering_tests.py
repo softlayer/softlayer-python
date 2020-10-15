@@ -841,4 +841,3 @@ class OrderingTests(testing.TestCase):
     def test_resolve_location_name_not_exist(self):
         exc = self.assertRaises(exceptions.SoftLayerError, self.ordering.resolve_location_name, "UNKNOWN_LOCATION_TEST")
         self.assertIn("does not exist", str(exc))
-
