@@ -202,6 +202,42 @@ If you ever need to figure out what exact API call the client is making, you can
         print(client.transport.print_reproduceable(call))
 
 
+Dealing with KeyError Exceptions
+--------------------------------
+
+One of the pain points in dealing with the SoftLayer API can be handling issues where you expected a property to be returned, but none was.
+
+The hostname property of a `SoftLayer_Billing_Item <https://sldn.softlayer.com/reference/datatypes/SoftLayer_Billing_Item/#hostname>`_ is a good example of this.
+
+For example.
+
+::
+    
+    # Uses default username and apikey from ~/.softlayer
+    client = SoftLayer.create_client_from_env()
+    # iter_call returns a python generator, and only makes another API call when the loop runs out of items.
+    result = client.iter_call('Account', 'getAllBillingItems', iter=True, mask="mask[id,hostName]")
+    print("Id, hostname")
+    for item in result:
+        # will throw a KeyError: 'hostName' exception on certain billing items that do not have a hostName
+        print("{}, {}".format(item['id'], item['hostName']))
+
+The Solution
+^^^^^^^^^^^^
+
+Using the python dictionary's `.get() <https://docs.python.org/3/library/stdtypes.html#dict.get>`_ is great for non-nested items.
+
+::
+    print("{}, {}".format(item.get('id'), item.get('hostName')))
+
+Otherwise, this SDK provides a util function to do something similar. Each additional argument passed into `utils.lookup` will go one level deeper into the nested dictionary to find the item requested, returning `None` if a KeyError shows up.
+
+::
+    itemId = SoftLayer.utils.lookup(item, 'id')
+    itemHostname = SoftLayer.utils.lookup(item, 'hostName')
+    print("{}, {}".format(itemId, itemHostname))
+
+
 API Reference
 -------------
 
