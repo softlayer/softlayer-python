@@ -12,6 +12,7 @@ https://github.com/softlayer/softlayer-python/compare/v5.9.0...v5.9.1
   + dns zone-list: added resourceRecordCount, added automatic pagination for large zones
   + dns record-list: fixed an issue where a record (like SRV types) that don't have a host would cause the command to fail
 - Renamed managers.storage.refresh_dep_dupe to  SoftLayer.managers.storage.refresh_dupe #1342 to support the new API method. CLI commands now use this method.
+- #1295 added disk upgrade options for virtual guests
 
 ## [5.9.0] - 2020-08-03
 https://github.com/softlayer/softlayer-python/compare/v5.8.9...v5.9.0
