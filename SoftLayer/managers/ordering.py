@@ -669,14 +669,39 @@ class OrderingManager(object):
         return datacenter[0]['id']
 
     def get_item_prices_by_location(self, location, package_keyname):
-        """Returns the hardware server item prices by location.
+        """Returns the item prices by location.
 
         :param string package_keyname: The package for which to get the items.
-        :param string location: location to get the item prices.
+        :param string location: location name or keyname to get the item prices.
         """
-        object_mask = "filteredMask[pricingLocationGroup[locations[regions]]]"
+        object_mask = "filteredMask[pricingLocationGroup[locations]]"
+        location_name = self.resolve_location_name(location)
         object_filter = {
-            "itemPrices": {"pricingLocationGroup": {"locations": {"regions": {"keyname": {"operation": location}}}}}}
+            "itemPrices": {"pricingLocationGroup": {"locations": {"name": {"operation": location_name}}}}}
         package = self.get_package_by_key(package_keyname)
+
         return self.client.call('SoftLayer_Product_Package', 'getItemPrices', mask=object_mask, filter=object_filter,
                                 id=package['id'])
+
+    def resolve_location_name(self, location_key):
+        """Resolves a location name using a string location key.
+
+        :param string location_key: A string location used to resolve the location name.
+        :return: An location name.
+        """
+
+        default_region_keyname = 'unknown'
+        if not location_key or location_key == default_region_keyname:
+            raise exceptions.SoftLayerError("Invalid location {}".format(location_key))
+
+        default_regions = [{'keyname': default_region_keyname}]
+        index_first = 0
+        object_mask = "mask[regions]"
+        locations = self.client.call('SoftLayer_Location', 'getDatacenters', mask=object_mask)
+        for location in locations:
+            location_name = location.get('name')
+            if location_name == location_key:
+                return location_key
+            if location.get('regions', default_regions)[index_first].get('keyname') == location_key:
+                return location_name
+        raise exceptions.SoftLayerError("Location {} does not exist".format(location_key))
