@@ -606,14 +606,6 @@ generateOrderTemplate = {
                 "description": "Unlimited SSL VPN Users & 1 PPTP VPN User per account"
             }
         },
-        {
-            "hourlyRecurringFee": "0",
-            "id": 418,
-            "recurringFee": "0",
-            "item": {
-                "description": "Nessus Vulnerability Assessment & Reporting"
-            }
-        }
     ],
     "quantity": 1,
     "sourceVirtualGuestId": None,

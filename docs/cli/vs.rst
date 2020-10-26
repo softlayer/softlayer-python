@@ -104,7 +104,6 @@ datacenter using the command `slcli vs create`.
         :   0.0 : Email and Ticket                                                :
         :   0.0 : Automated Reboot from Monitoring                                :
         :   0.0 : Unlimited SSL VPN Users & 1 PPTP VPN User per account           :
-        :   0.0 : Nessus Vulnerability Assessment & Reporting                     :
         :   0.0 : 2 GB                                                            :
         :   0.0 : 1 x 2.0 GHz or higher Core                                      :
         : 0.000 : Total hourly cost                                               :
