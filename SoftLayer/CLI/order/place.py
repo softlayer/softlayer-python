@@ -61,7 +61,6 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
         OS_DEBIAN_9_X_STRETCH_LAMP_64_BIT 1_IP_ADDRESS 1_IPV6_ADDRESS
         1_GBPS_PUBLIC_PRIVATE_NETWORK_UPLINKS REBOOT_REMOTE_CONSOLE
         AUTOMATED_NOTIFICATION UNLIMITED_SSL_VPN_USERS_1_PPTP_VPN_USER_PER_ACCOUNT
-        NESSUS_VULNERABILITY_ASSESSMENT_REPORTING
 
     """
     manager = ordering.OrderingManager(env.client)
