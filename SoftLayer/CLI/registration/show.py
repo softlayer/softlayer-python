@@ -7,8 +7,6 @@ import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer import utils
-from SoftLayer.utils import clean_string
-from SoftLayer.utils import clean_splitlines
 
 
 @click.command()
@@ -17,13 +15,13 @@ def cli(env):
     """Display the RWhois information for your account."""
 
     mgr = SoftLayer.NetworkManager(env.client)
-    result = mgr.get_rwhois()
+    result = mgr.get_registrations()
     table = formatting.KeyValueTable(['id', 'createDate', 'networkIdentifier',
-                                      'type','regionalInternet','status'])
-    table.align['networkIdentifier']='l'
-    table.align['regionalInternet']='l'
+                                      'type', 'regionalInternet', 'status'])
+    table.align['networkIdentifier'] = 'l'
+    table.align['regionalInternet'] = 'l'
     for test in result:
-        table.add_row([test['id'],test['createDate'],
+        table.add_row([test['id'], utils.clean_time(test['createDate']),
                        test['networkIdentifier'],
                        test['networkDetail']['detailType']['keyName'],
                        test['regionalInternetRegistry']['keyName'],

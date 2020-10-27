@@ -92,7 +92,7 @@ To discover the available commands, simply type `slcli`.
           object-storage  Object Storage.
           order           View and order from the catalog.
           report          Reports.
-          rwhois          Referral Whois.
+          registration    Referral subnet registration.
           securitygroup   Network security groups.
           setup           Edit configuration.
           shell           Enters a shell for slcli.
