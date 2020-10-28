@@ -1,14 +1,14 @@
 """
     SoftLayer.subnet_registration
-    ~~~~~~~~~~~~~~~~~~~~~~~
-    Registration manager
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Regional Internet Registry (RIR) Manager
 
     :license: MIT, see License for more details.
 """
 
 
 class RegistrationManager(object):
-    """Manage SoftLayer Subnet registrationnn objects: registration and registration detail
+    """Manage SoftLayer Subnet registrations with Regional Internet Registry (RIR)c
 
     :param SoftLayer.API.BaseClient client: the client instance
 

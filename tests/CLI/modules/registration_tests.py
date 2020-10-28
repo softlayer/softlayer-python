@@ -16,10 +16,15 @@ class RegistrationTests(testing.TestCase):
             "AccountId": 1472588,
             "email": "testExample@us.ibm.com",
             "officePhone": "256325874579",
-            "address1": "4567 street Rd",
+            "address": "4567 street Rd",
             "networkIdentifier": "5.153.30.24",
             "cidr": 31,
             "detailType": "DEFAULT_PERSON",
             "networkDetail": "NETWORK",
             "status": 5
         })
+
+    def test_show(self):
+        result = self.run_command(['registration', 'show'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getSubnetRegistrations')

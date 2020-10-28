@@ -92,7 +92,7 @@ To discover the available commands, simply type `slcli`.
           object-storage  Object Storage.
           order           View and order from the catalog.
           report          Reports.
-          registration    Referral subnet registration.
+          registration    Manage Regional Internet Registry(RIR) registrations
           securitygroup   Network security groups.
           setup           Edit configuration.
           shell           Enters a shell for slcli.

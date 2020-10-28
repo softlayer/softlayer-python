@@ -1,7 +1,7 @@
 .. _cli_registration:
 
-Reverse registration Commands
-======================
+Regional Internet Registry(RIR) Commands
+========================================
 
 .. click:: SoftLayer.CLI.registration.detail:cli
     :prog: registration detail
