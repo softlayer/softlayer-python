@@ -325,6 +325,111 @@ getRwhoisData = {
     'privateResidenceFlag': True,
 }
 
+getSubnetRegistrations = [
+    {
+        "accountId": 147258,
+        "cidr": 27,
+        "createDate": "2015-05-27T18:24:25-06:00",
+        "id": 25369,
+        "modifyDate": "2015-05-27T18:26:59-06:00",
+        "networkHandle": "159.122.23.224 - 159.122.23.255",
+        "networkIdentifier": "159.122.23.224",
+        "regionalInternetRegistryHandleId": 428289,
+        "regionalInternetRegistryId": 4,
+        "statusId": 3,
+        "networkDetail": {
+            "accountId": 147258,
+            "createDate": "2015-05-27T18:24:25-06:00",
+            "detailTypeId": 1,
+            "id": 403563,
+            "detailType": {
+                "id": 1,
+                "keyName": "NETWORK",
+                "name": "Network"
+            }
+        },
+        "personDetail": {
+            "accountId": 147258,
+            "createDate": "2014-03-18T16:26:55-06:00",
+            "detailTypeId": 3,
+            "id": 51990,
+            "detailType": {
+                "id": 3,
+                "keyName": "PERSON",
+                "name": "Person"
+            }
+        },
+        "regionalInternetRegistry": {
+            "id": 4,
+            "keyName": "RIPE",
+            "name": "RIPE"
+        },
+        "status": {
+            "id": 3,
+            "keyName": "REGISTRATION_COMPLETE",
+            "name": "Registration Complete"
+        },
+        "subnet": {
+            "broadcastAddress": "159.122.23.255",
+            "cidr": 27,
+            "gateway": "159.122.23.225",
+            "id": 12345,
+            "modifyDate": "2017-06-14T11:55:55-06:00",
+            "netmask": "255.255.255.224",
+            "networkIdentifier": "159.122.23.224",
+            "networkVlanId": 361652,
+            "sortOrder": "4",
+            "subnetType": "PRIMARY",
+            "totalIpAddresses": "32",
+            "usableIpAddressCount": "29",
+            "version": 4,
+            "addressSpace": "PUBLIC"
+        }
+    },
+    {
+        "accountId": 147258,
+        "cidr": 32,
+        "createDate": "2015-05-05T16:24:12-06:00",
+        "id": 236589,
+        "modifyDate": "2020-03-16T11:18:03-06:00",
+        "networkIdentifier": "169.54.216.149",
+        "regionalInternetRegistryId": 4,
+        "statusId": 5,
+        "networkDetail": {
+            "accountId": 147258,
+            "createDate": "2015-05-05T16:24:12-06:00",
+            "detailTypeId": 1,
+            "id": 366623,
+            "detailType": {
+                "id": 1,
+                "keyName": "NETWORK",
+                "name": "Network"
+            }
+        },
+        "personDetail": {
+            "accountId": 147258,
+            "createDate": "2014-03-18T16:26:55-06:00",
+            "detailTypeId": 3,
+            "id": 51990,
+            "detailType": {
+                "id": 3,
+                "keyName": "PERSON",
+                "name": "Person"
+            }
+        },
+        "regionalInternetRegistry": {
+            "id": 4,
+            "keyName": "RIPE",
+            "name": "RIPE"
+        },
+        "status": {
+            "id": 5,
+            "keyName": "DELETED",
+            "name": "Deleted"
+        }
+    }
+]
+
 getGlobalIpRecords = [{
     'id': '200',
     'ipAddress': {

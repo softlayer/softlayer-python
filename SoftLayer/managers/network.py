@@ -310,34 +310,6 @@ class NetworkManager(object):
         return self.security_group.detachNetworkComponents(component_ids,
                                                            id=group_id)
 
-    def edit_rwhois(self, abuse_email=None, address1=None, address2=None,
-                    city=None, company_name=None, country=None,
-                    first_name=None, last_name=None, postal_code=None,
-                    private_residence=None, state=None):
-        """Edit rwhois record."""
-        update = {}
-        for key, value in [('abuseEmail', abuse_email),
-                           ('address1', address1),
-                           ('address2', address2),
-                           ('city', city),
-                           ('companyName', company_name),
-                           ('country', country),
-                           ('firstName', first_name),
-                           ('lastName', last_name),
-                           ('privateResidenceFlag', private_residence),
-                           ('state', state),
-                           ('postalCode', postal_code)]:
-            if value is not None:
-                update[key] = value
-
-        # If there's anything to update, update it
-        if update:
-            rwhois = self.get_rwhois()
-            return self.client['Network_Subnet_Rwhois_Data'].editObject(
-                update, id=rwhois['id'])
-
-        return True
-
     def edit_securitygroup(self, group_id, name=None, description=None):
         """Edit security group details.
 
@@ -407,12 +379,14 @@ class NetworkManager(object):
         obj = self.client['Network_Subnet_IpAddress']
         return obj.getByIpAddress(ip_address, mask='hardware, virtualGuest')
 
-    def get_rwhois(self):
+    def get_registrations(self):
         """Returns the RWhois information about the current account.
 
         :returns: A dictionary containing the account's RWhois information.
         """
-        return self.account.getRwhoisData()
+        mask = 'personDetail,status,regionalInternetRegistry,networkDetail'
+
+        return self.account.getSubnetRegistrations(mask=mask)
 
     def get_securitygroup(self, group_id, **kwargs):
         """Returns the information about the given security group.

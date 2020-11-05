@@ -222,39 +222,6 @@ class NetworkTests(testing.TestCase):
                                 'detachNetworkComponents',
                                 identifier=100, args=([500, 600],))
 
-    def test_edit_rwhois(self):
-        result = self.network.edit_rwhois(
-            abuse_email='abuse@test.foo',
-            address1='123 Test Street',
-            address2='Apt. #31',
-            city='Anywhere',
-            company_name='TestLayer',
-            country='US',
-            first_name='Bob',
-            last_name='Bobinson',
-            postal_code='9ba62',
-            private_residence=False,
-            state='TX')
-
-        self.assertEqual(result, True)
-        expected = {
-            'abuseEmail': 'abuse@test.foo',
-            'address1': '123 Test Street',
-            'address2': 'Apt. #31',
-            'city': 'Anywhere',
-            'companyName': 'TestLayer',
-            'country': 'US',
-            'firstName': 'Bob',
-            'lastName': 'Bobinson',
-            'postalCode': '9ba62',
-            'privateResidenceFlag': False,
-            'state': 'TX',
-        }
-        self.assert_called_with('SoftLayer_Network_Subnet_Rwhois_Data',
-                                'editObject',
-                                identifier='id',
-                                args=(expected,))
-
     def test_edit_securitygroup(self):
         result = self.network.edit_securitygroup(100, name='foobar')
 
@@ -289,12 +256,6 @@ class NetworkTests(testing.TestCase):
                                 args=([{'id': 500, 'protocol': '',
                                         'portRangeMin': -1, 'portRangeMax': -1,
                                         'ethertype': '', 'remoteIp': ''}],))
-
-    def test_get_rwhois(self):
-        result = self.network.get_rwhois()
-
-        self.assertEqual(result, fixtures.SoftLayer_Account.getRwhoisData)
-        self.assert_called_with('SoftLayer_Account', 'getRwhoisData')
 
     def test_get_securitygroup(self):
         result = self.network.get_securitygroup(100)
