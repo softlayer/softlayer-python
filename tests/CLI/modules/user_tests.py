@@ -194,9 +194,8 @@ class UserCLITests(testing.TestCase):
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_user_and_apikey(self, confirm_mock):
         confirm_mock.return_value = True
-        result = self.run_command(['user', 'create', 'test', '-e', 'test@us.ibm.com', '-a'])
+        result = self.run_command(['user', 'create', 'test', '-e', 'test@us.ibm.com'])
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_User_Customer', 'addApiAuthenticationKey')
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_user_with_template(self, confirm_mock):
