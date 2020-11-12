@@ -28,3 +28,8 @@ class RegistrationTests(testing.TestCase):
         result = self.run_command(['registration', 'show'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account', 'getSubnetRegistrations')
+
+    def test_contacts(self):
+        result = self.run_command(['registration', 'contacts'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getSubnetRegistrationDetails')
