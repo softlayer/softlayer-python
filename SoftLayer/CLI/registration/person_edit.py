@@ -4,7 +4,6 @@
 import click
 
 from SoftLayer.CLI import environment
-from SoftLayer.exceptions import SoftLayerAPIError
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.registration import RegistrationManager
 
@@ -56,13 +55,11 @@ def options_from_dict(options):
 @environment.pass_env
 def cli(env, *args, **kwargs):
     """Edit a Person's contact information. Any unspecified option remains unchanged."""
-    from pprint import pprint as pp
+
     register_client = RegistrationManager(env.client)
-    # pp(kwargs)
 
     # Get information about the person so we can check existing properties.
     person = register_client.get_registration_detail_object(kwargs['identifier'])
-    pp(person)
 
     # Properties that don't exist need to be created, so we split out what needs to be done.
     to_edit = []
@@ -91,16 +88,11 @@ def cli(env, *args, **kwargs):
                     'sequencePosition': 0 
                 })
 
-    try:
-        if to_edit:
-            register_client.edit_properties(to_edit)
-            click.echo("Successfully edited properties.")
-    except SoftLayerAPIError as ex:
-        click.echo("Unable to edit properties: {}".format(ex))
+    if to_edit:
+        register_client.edit_properties(to_edit)
+        click.echo("Successfully edited properties.")
 
-    try:
-        if to_create:
-            register_client.create_properties(to_create)
-            click.echo("Successfully created properties.")
-    except SoftLayerAPIError as ex:
-        click.echo("Unable to create new properties: {}".format(ex))
+    if to_create:
+        register_client.create_properties(to_create)
+        click.echo("Successfully created properties.")
+

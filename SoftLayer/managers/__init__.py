@@ -22,6 +22,7 @@ from SoftLayer.managers.metadata import MetadataManager
 from SoftLayer.managers.network import NetworkManager
 from SoftLayer.managers.object_storage import ObjectStorageManager
 from SoftLayer.managers.ordering import OrderingManager
+from SoftLayer.managers.registration import RegistrationManager
 from SoftLayer.managers.sshkey import SshKeyManager
 from SoftLayer.managers.ssl import SSLManager
 from SoftLayer.managers.tags import TagManager
@@ -49,6 +50,7 @@ __all__ = [
     'ObjectStorageManager',
     'OrderingManager',
     'PlacementManager',
+    'RegistrationManager',
     'SshKeyManager',
     'SSLManager',
     'TagManager',
