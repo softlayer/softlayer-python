@@ -22,6 +22,7 @@ LOGGER = logging.getLogger(__name__)
 
 DEFAULT_SUBNET_MASK = ','.join(['hardware',
                                 'datacenter',
+                                'networkVlanId',
                                 'ipAddressCount',
                                 'virtualGuests',
                                 'id',
