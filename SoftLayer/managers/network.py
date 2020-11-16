@@ -388,17 +388,6 @@ class NetworkManager(object):
 
         return self.account.getSubnetRegistrations(mask=mask)
 
-    def get_registration_details(self):
-        """Returns the RWhois information about the current account.
-
-        :returns: A dictionary containing the account's RWhois information.
-        """
-        mask = 'detailType,properties[id,propertyType[keyName,id],value]'
-
-        filter_object = {'subnetRegistrationDetails': {'detailTypeId': {'operation': 3}}}
-
-        return self.account.getSubnetRegistrationDetails(mask=mask, filter=filter_object)
-
     def get_securitygroup(self, group_id, **kwargs):
         """Returns the information about the given security group.
 
