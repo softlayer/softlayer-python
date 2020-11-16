@@ -1,5 +1,5 @@
 """
-    SoftLayer.subnet_registration
+    SoftLayer.managers.registration
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Regional Internet Registry (RIR) Manager
 
@@ -8,7 +8,7 @@
 
 
 class RegistrationManager(object):
-    """Manage SoftLayer Subnet registrations with Regional Internet Registry (RIR)c
+    """Manage SoftLayer Subnet registrations with Regional Internet Registry (RIR)
 
     :param SoftLayer.API.BaseClient client: the client instance
 
@@ -16,13 +16,14 @@ class RegistrationManager(object):
 
     def __init__(self, client):
         self.client = client
+        self.account = client['Account']
         self.registration = self.client['Network_Subnet_Registration']
+        self.PERSON = 3 # a person has a detailTypeId == 3
 
     def detail(self, identifier):
         """Gets subnet registration information
 
         :return: subnet registration object
-
         """
 
         mask = 'account,personDetail,networkDetail'
@@ -34,6 +35,7 @@ class RegistrationManager(object):
         :param identifier int: Account_Regional_Registry_Detail id
         :return dict: Account_Regional_Registry_Detail
         """
+
         if mask is None:
             mask = "mask[properties[propertyType]]"
 
@@ -57,3 +59,16 @@ class RegistrationManager(object):
         """
 
         return self.client.call('Account_Regional_Registry_Detail_Property', 'createObjects', properties)
+
+    def get_registration_details(self, mask=None):
+        """Returns the Contact Person information about the current account.
+
+        :returns: A dictionary containing the account's RWhois information.
+        """
+
+        if mask is None:
+            mask = 'detailType,properties[id,propertyType[keyName,id],value]'
+
+        filter_object = {'subnetRegistrationDetails': {'detailTypeId': {'operation': self.PERSON}}}
+
+        return self.account.getSubnetRegistrationDetails(mask=mask, filter=filter_object)

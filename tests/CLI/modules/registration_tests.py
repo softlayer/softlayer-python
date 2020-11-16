@@ -18,6 +18,7 @@ class RegistrationTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account', 'getSubnetRegistrations')
 
+
     def test_person_edit_basic(self):
         result = self.run_command(['registration', 'person-edit', '12345', '--first_name', 'TestGuy'])
         expected_edit = [{"id": 85644, "value": "TestGuy", "propertyType": {"keyName": "FIRST_NAME"}}]
@@ -73,3 +74,9 @@ class RegistrationTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Account_Regional_Registry_Detail', 'getObject', identifier='12345')
         self.assert_called_with('SoftLayer_Account_Regional_Registry_Detail_Property', 'editObjects',
                                 args=(expected_edit,))
+
+    def test_contacts(self):
+        result = self.run_command(['registration', 'contacts'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getSubnetRegistrationDetails')
+

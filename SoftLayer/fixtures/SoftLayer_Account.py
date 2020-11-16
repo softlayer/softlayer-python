@@ -1121,3 +1121,165 @@ getAllTopLevelBillingItems = [
         "resourceTableId": 777777
     }
 ]
+
+getSubnetRegistrationDetails = [
+    {
+        "accountId": 123456,
+        "createDate": "2014-03-18T15:26:55-07:00",
+        "detailTypeId": 3,
+        "id": 1122334455,
+        "detailType": {
+            "id": 3,
+            "keyName": "PERSON",
+            "name": "Person"
+        },
+        "properties": [
+            {
+                "value": "test",
+                "propertyType": {
+                    "id": 2,
+                    "keyName": "FIRST_NAME"
+                }
+            },
+            {
+                "value": "registration",
+                "propertyType": {
+                    "id": 3,
+                    "keyName": "LAST_NAME"
+                }
+            },
+            {
+                "value": "4849 street One",
+                "propertyType": {
+                    "id": 4,
+                    "keyName": "ADDRESS"
+                }
+            },
+            {
+                "value": "Dallas",
+                "propertyType": {
+                    "id": 5,
+                    "keyName": "CITY"
+                }
+            },
+            {
+                "value": "TX",
+                "propertyType": {
+                    "id": 6,
+                    "keyName": "STATE"
+                }
+            },
+            {
+                "value": "12345",
+                "propertyType": {
+                    "id": 7,
+                    "keyName": "POSTAL_CODE"
+                }
+            },
+            {
+                "value": "US",
+                "propertyType": {
+                    "id": 8,
+                    "keyName": "COUNTRY"
+                }
+            },
+            {
+                "value": "123.69.65.25",
+                "propertyType": {
+                    "id": 9,
+                    "keyName": "PHONE"
+                }
+            }
+        ]
+    },
+    {
+        "accountId": 123456,
+        "createDate": "2018-02-08T06:47:42-06:00",
+        "detailTypeId": 3,
+        "id": 9874566,
+        "detailType": {
+            "id": 3,
+            "keyName": "PERSON",
+            "name": "Person"
+        },
+        "properties": [
+            {
+                "value": "test company",
+                "propertyType": {
+                    "id": 61,
+                    "keyName": "INTERNAL_LABEL"
+                }
+            },
+            {
+                "value": "testsupport@ibm.com",
+                "propertyType": {
+                    "id": 11,
+                    "keyName": "EMAIL_ADDRESS"
+                }
+            },
+            {
+                "value": "unit",
+                "propertyType": {
+                    "id": 2,
+                    "keyName": "FIRST_NAME"
+                }
+            },
+            {
+                "value": "test",
+                "propertyType": {
+                    "id": 3,
+                    "keyName": "LAST_NAME"
+                }
+            },
+            {
+                "value": "Avenida Cristobal Colon",
+                "propertyType": {
+                    "id": 4,
+                    "keyName": "ADDRESS"
+                }
+            },
+            {
+                "value": "Barcelona",
+                "propertyType": {
+                    "id": 5,
+                    "keyName": "CITY"
+                }
+            },
+            {
+                "value": "OT",
+                "propertyType": {
+                    "id": 6,
+                    "keyName": "STATE"
+                }
+            },
+            {
+                "value": "369852",
+                "propertyType": {
+                    "id": 7,
+                    "keyName": "POSTAL_CODE"
+                }
+            },
+            {
+                "value": "ES",
+                "propertyType": {
+                    "id": 8,
+                    "keyName": "COUNTRY"
+                }
+            },
+            {
+                "value": "test@test.net",
+                "propertyType": {
+                    "id": 14,
+                    "keyName": "ABUSE_EMAIL"
+                }
+            },
+            {
+                "value": "23456789",
+                "propertyType": {
+                    "id": 9,
+                    "keyName": "PHONE"
+                }
+            }
+        ]
+    }
+]
