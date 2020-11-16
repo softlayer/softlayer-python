@@ -19,6 +19,7 @@ class RegistrationManager(object):
         self.account = client['Account']
         self.registration = self.client['Network_Subnet_Registration']
         self.PERSON = 3 # a person has a detailTypeId == 3
+        self.regional_register = self.client['Account_Regional_Registry_Detail']
 
     def detail(self, identifier):
         """Gets subnet registration information
@@ -72,3 +73,24 @@ class RegistrationManager(object):
         filter_object = {'subnetRegistrationDetails': {'detailTypeId': {'operation': self.PERSON}}}
 
         return self.account.getSubnetRegistrationDetails(mask=mask, filter=filter_object)
+
+    def get_contact_properties(self, identifier):
+        """Gets contact properties information.
+
+        :return: A list of contact properties information.
+
+        """
+        mask = 'mask[propertyType]'
+        return self.regional_register.getProperties(mask=mask, id=identifier, iter=True)
+
+    def get_registration_details(self, identifier):
+        """Gets registration details.
+
+        :return: A list of registration details.
+
+        """
+        mask = "mask[registration[status]]"
+        object_filter = {"details": {"registration": {"status": {"keyName": {"operation": "REGISTRATION_COMPLETE"}}}}}
+
+        return self.regional_register.getDetails(mask=mask, filter=object_filter, id=identifier, iter=True)
+
