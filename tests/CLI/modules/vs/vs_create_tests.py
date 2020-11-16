@@ -666,8 +666,7 @@ class VirtCreateTests(testing.TestCase):
                                        '--domain', 'TESTING', '--flavor', 'B1_2X8X25',
                                        '--datacenter', 'TEST00', '--os', 'UBUNTU_LATEST'])
             self.assert_no_fail(result)
-            self.assertTrue('Successfully exported options to a template file.'
-                            in result.output)
+            self.assertIn('Successfully exported options to a template file.', result.output)
             contents = config_file.read().decode("utf-8")
             self.assertIn('hostname=TEST', contents)
             self.assertIn('flavor=B1_2X8X25', contents)
