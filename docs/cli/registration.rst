@@ -10,3 +10,7 @@ Regional Internet Registry(RIR) Commands
 .. click:: SoftLayer.CLI.registration.show:cli
     :prog: registration show
     :show-nested:
+
+.. click:: SoftLayer.CLI.registration.contacts:cli
+    :prog: registration contacts
+    :show-nested:
