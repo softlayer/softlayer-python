@@ -67,13 +67,13 @@ class TestHelpSetup(testing.TestCase):
             result = self.run_command(['--config=%s' % config_file.name, 'config', 'setup'])
 
             self.assert_no_fail(result)
-            self.assertTrue('Configuration Updated Successfully' in result.output)
+            self.assertIn('Configuration Updated Successfully', result.output)
             contents = config_file.read().decode("utf-8")
 
-            self.assertTrue('[softlayer]' in contents)
-            self.assertTrue('username = user' in contents)
-            self.assertTrue('api_key = AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' in contents)
-            self.assertTrue('endpoint_url = %s' % consts.API_PUBLIC_ENDPOINT in contents)
+            self.assertIn('[softlayer]', contents)
+            self.assertIn('username = user', contents)
+            self.assertIn('api_key = AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', contents)
+            self.assertIn('endpoint_url = %s' % consts.API_PUBLIC_ENDPOINT, contents)
 
     @mock.patch('SoftLayer.Client')
     @mock.patch('SoftLayer.CLI.formatting.confirm')
