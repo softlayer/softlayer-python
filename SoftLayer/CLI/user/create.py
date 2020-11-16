@@ -29,9 +29,8 @@ from SoftLayer.CLI import helpers
                    "supersedes this template.")
 @click.option('--template', '-t', default=None,
               help="A json string describing https://softlayer.github.io/reference/datatypes/SoftLayer_User_Customer/")
-@click.option('--api-key', '-a', default=False, is_flag=True, help="Create an API key for this user.")
 @environment.pass_env
-def cli(env, username, email, password, from_user, template, api_key):
+def cli(env, username, email, password, from_user, template):
     """Creates a user Users.
 
     Remember to set the permissions and access for this new user.
@@ -81,13 +80,9 @@ def cli(env, username, email, password, from_user, template, api_key):
             raise exceptions.CLIAbort("Canceling creation!")
 
     result = mgr.create_user(user_template, password)
-    new_api_key = None
-    if api_key:
-        click.secho("Adding API key...", fg='green')
-        new_api_key = mgr.add_api_authentication_key(result['id'])
 
-    table = formatting.Table(['Username', 'Email', 'Password', 'API Key'])
-    table.add_row([result['username'], result['email'], password, new_api_key])
+    table = formatting.Table(['Username', 'Email', 'Password'])
+    table.add_row([result['username'], result['email'], password])
     env.fout(table)
 
 
