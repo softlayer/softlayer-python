@@ -16,7 +16,6 @@ class RegistrationTests(testing.TestCase):
     def set_up(self):
         self.registration_mgr = RegistrationManager(self.client)
 
-
     def test_detail(self):
         result = self.registration_mgr.detail(1536487)
         self.assertEqual(result['id'], 1536487)
@@ -44,6 +43,7 @@ class RegistrationTests(testing.TestCase):
         result = self.registration_mgr.create_properties(to_edit)
         self.assertTrue(result)
         self.assert_called_with('SoftLayer_Account_Regional_Registry_Detail_Property', 'createObjects', args=(to_edit,))
+
     def test_get_detail(self):
         identifier = 12345
         self.registration_mgr.detail(identifier)

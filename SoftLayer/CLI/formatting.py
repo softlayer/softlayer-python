@@ -26,8 +26,7 @@ FALSE_VALUES = ['0', 'false', 'FALSE', 'no', 'False']
 def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
     """Given some data, will format it for console output.
 
-    :param data: One of: String, Table, FormattedItem, List, Tuple,
-                 SequentialOutput
+    :param data: One of: String, Table, FormattedItem, List, Tuple, SequentialOutput
     :param string fmt (optional): One of: table, raw, json, python
     """
     if isinstance(data, str):
@@ -138,6 +137,11 @@ def gb(gigabytes):  # pylint: disable=C0103
 def blank():
     """Returns a blank FormattedItem."""
     return FormattedItem(None, '-')
+
+
+def trim(item, length=120):
+    """Returns a FormattedItem with a max length set"""
+    return FormattedItem(item, length=length)
 
 
 def listing(items, separator=','):
@@ -333,14 +337,23 @@ class FormattedItem(object):
 
         :param original: raw (machine-readable) value
         :param string formatted: human-readable value
+        :param int length: how long the output should be for this item. Trimmed strings end with ...
     """
 
-    def __init__(self, original, formatted=None):
+    def __init__(self, original='NULL', formatted=None, length=None):
         self.original = original
-        if formatted is not None:
-            self.formatted = formatted
-        else:
+        self.length = length
+        self.formatted = formatted
+
+        if original is None:
+            self.original = 'NULL'
+        if formatted is None:
             self.formatted = self.original
+
+        # Sets the formatted items length if needed.
+        if self.length:
+            if len(self.formatted) > self.length:
+                self.formatted = self.formatted[0:self.length] + "..."
 
     def to_python(self):
         """returns the original (raw) value."""
@@ -351,7 +364,6 @@ class FormattedItem(object):
         # If the original value is None, represent this as 'NULL'
         if self.original is None:
             return 'NULL'
-
         try:
             return str(self.original)
         except UnicodeError:

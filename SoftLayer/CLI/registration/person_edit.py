@@ -4,7 +4,6 @@
 import click
 
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import formatting
 from SoftLayer.managers.registration import RegistrationManager
 
 # From SoftLayer_Account_Regional_Registry_Detail_Property_Type::getAllObjects()
@@ -37,15 +36,17 @@ PROPERTY_TYPES = {
     "INTERNAL_LABEL": 61,
 }
 
+
 # Thanks https://stackoverflow.com/questions/50499340/specify-options-and-arguments-dynamically
 def options_from_dict(options):
-    def decorator(f):
+    """Turns PROPERTY_TYPES into options for the CLI"""
+    def decorator(deco_f):
         for opt_params in options.keys():
             opt_name = str.lower(opt_params)
             param_decls = ('--' + opt_name, opt_name)
             attrs = dict(required=False, type=str)
-            click.option(*param_decls, **attrs)(f)
-        return f
+            click.option(*param_decls, **attrs)(deco_f)
+        return deco_f
     return decorator
 
 
@@ -53,7 +54,7 @@ def options_from_dict(options):
 @click.argument('identifier')
 @options_from_dict(PROPERTY_TYPES)
 @environment.pass_env
-def cli(env, *args, **kwargs):
+def cli(env, **kwargs):
     """Edit a Person's contact information. Any unspecified option remains unchanged."""
 
     register_client = RegistrationManager(env.client)
@@ -85,7 +86,7 @@ def cli(env, *args, **kwargs):
                     'value': kwargs.get(option),
                     'propertyTypeId': PROPERTY_TYPES[sl_option],
                     'registrationDetailId': kwargs.get('identifier'),
-                    'sequencePosition': 0 
+                    'sequencePosition': 0
                 })
 
     if to_edit:
@@ -95,4 +96,3 @@ def cli(env, *args, **kwargs):
     if to_create:
         register_client.create_properties(to_create)
         click.echo("Successfully created properties.")
-

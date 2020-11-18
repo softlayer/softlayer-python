@@ -229,11 +229,11 @@ ALL_ROUTES = [
     ('order:lookup', 'SoftLayer.CLI.order.lookup:cli'),
 
     ('registration', 'SoftLayer.CLI.registration'),
-    ('registration:detail', 'SoftLayer.CLI.registration.detail:cli'),
+    ('registration:subnet-detail', 'SoftLayer.CLI.registration.subnet_detail:cli'),
     ('registration:show', 'SoftLayer.CLI.registration.show:cli'),
     ('registration:person-edit', 'SoftLayer.CLI.registration.person_edit:cli'),
     ('registration:contacts', 'SoftLayer.CLI.registration.contacts:cli'),
-    ('registration:person-detail', 'SoftLayer.CLI.registration.person_detail:cli'),
+    ('registration:person-detail', 'SoftLayer.CLI.registration.person_history:cli'),
 
     ('hardware', 'SoftLayer.CLI.hardware'),
     ('hardware:bandwidth', 'SoftLayer.CLI.hardware.bandwidth:cli'),
@@ -363,4 +363,5 @@ ALL_ALIASES = {
     'vs': 'virtual',
     'dh': 'dedicatedhost',
     'pg': 'placementgroup',
+    'reg': 'registration',
 }
