@@ -1,4 +1,4 @@
-"""Get details for the RIR Contact information."""
+"""Shows the contact information for a person."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -13,9 +13,7 @@ from SoftLayer.managers.registration import RegistrationManager
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """Display the RIR Contact information.
-
-    """
+    """Shows the contact information for a person."""
 
     tables = []
     registration_manager = RegistrationManager(env.client)
