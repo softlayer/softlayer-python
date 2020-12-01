@@ -96,7 +96,11 @@ class RegistrationManager(object):
 
 
 class ContactPerson(object):
-    """Turns a SoftLayer_Account_Regional_Registry_Detail into a useable datastructure"""
+    """Turns a SoftLayer_Account_Regional_Registry_Detail into a useable datastructure
+
+    Make sure to cast to a str() before putting this in a Table.
+    `TypeError: 'NoneType' object is not iterable` Will result otherwise.
+    """
 
     def __init__(self, registry_detail):
         """Sets up the person, populated with data from the SoftLayer API
