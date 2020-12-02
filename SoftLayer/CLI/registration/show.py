@@ -31,7 +31,7 @@ def cli(env, sortby, datacenter, subnet, ipv4, ipv6):
     mask = """mask[id,networkIdentifier,cidr,subnetType,datacenter[name],note,
               registrations[status,personDetail[properties[propertyType]]],regionalInternetRegistry]"""
 
-    table = formatting.Table(['Id', 'Subnet', 'Status', 'Datacenter', 'RIR', 'Contact', 'Notes'])
+    table = formatting.Table(['Id', 'Subnet', 'Status', 'Datacenter', 'RIR', 'Contact', 'Subnet Notes'])
     table.sortby = sortby
     table.align = 'l'
 
