@@ -18,7 +18,7 @@ class RegistrationManager(object):
         self.client = client
         self.account = client['Account']
         self.registration = self.client['Network_Subnet_Registration']
-        self.PERSON = 3 # a person has a detailTypeId == 3
+        self.person_type_id = 3  # a person has a detailTypeId == 3
         self.regional_register = self.client['Account_Regional_Registry_Detail']
 
     def detail(self, identifier):
@@ -54,25 +54,25 @@ class RegistrationManager(object):
     def create_properties(self, properties):
         """Calls SoftLayer_Account_Regional_Registry_Detail_Property::createObjects(properties)
 
-        :param properties list: SoftLayer_Account_Regional_Registry_Detail_Property. 
+        :param properties list: SoftLayer_Account_Regional_Registry_Detail_Property.
                                 Needs propertyType->keyName and value.
         :return list: SoftLayer_Account_Regional_Registry_Detail_Property[]
         """
 
         return self.client.call('Account_Regional_Registry_Detail_Property', 'createObjects', properties)
 
-    def get_registration_details(self, mask=None):
-        """Returns the Contact Person information about the current account.
+    def get_account_contacts(self, mask=None):
+        """Gets the Registry Details that pertain to the Person/Contact type.
 
-        :returns: A dictionary containing the account's RWhois information.
+        :returns list: SoftLayer_Account_Regional_Registry_Detail[]
         """
 
         if mask is None:
             mask = 'detailType,properties[id,propertyType[keyName,id],value]'
 
-        filter_object = {'subnetRegistrationDetails': {'detailTypeId': {'operation': self.PERSON}}}
+        filter_object = {'subnetRegistrationDetails': {'detailTypeId': {'operation': self.person_type_id}}}
 
-        return self.account.getSubnetRegistrationDetails(mask=mask, filter=filter_object)
+        return self.client.call('Account', 'getSubnetRegistrationDetails', mask=mask, filter=filter_object)
 
     def get_contact_properties(self, identifier):
         """Gets contact properties information.
@@ -94,3 +94,38 @@ class RegistrationManager(object):
 
         return self.regional_register.getDetails(mask=mask, filter=object_filter, id=identifier, iter=True)
 
+
+class ContactPerson(object):
+    """Turns a SoftLayer_Account_Regional_Registry_Detail into a useable datastructure
+
+    Make sure to cast to a str() before putting this in a Table.
+    `TypeError: 'NoneType' object is not iterable` Will result otherwise.
+    """
+
+    def __init__(self, registry_detail):
+        """Sets up the person, populated with data from the SoftLayer API
+
+        :param registry_detail: A SoftLayer_Account_Regional_Registry_Detail object.
+        """
+        self.properties = registry_detail.get('properties', [])
+        self.id = registry_detail.get('id')  # pylint: disable=invalid-name
+        for property_contact in self.properties:
+            setattr(self, property_contact['propertyType']['keyName'], property_contact.get('value'))
+
+    def __repr__(self):
+        """Prints out First + Last name"""
+        return "{} {}".format(self.FIRST_NAME, self.LAST_NAME)
+
+    def __getattr__(self, attr):
+        """To handle some cases where attributes don't exist nicely. Only called when objects do not exist.
+
+        https://docs.python.org/3/reference/datamodel.html#object.__getattr__
+        """
+        return None
+
+    def get(self, attr, default='None'):
+        """To mimic the dictionaries .get() method"""
+        value = getattr(self, attr)
+        if value is None:
+            return default
+        return value

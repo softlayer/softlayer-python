@@ -70,4 +70,3 @@ getDetails = [{
     },
     'registrationId': 222222
 }]
-

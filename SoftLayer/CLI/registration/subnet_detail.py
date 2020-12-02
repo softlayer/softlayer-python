@@ -12,9 +12,7 @@ from SoftLayer.managers.registration import RegistrationManager
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """Display the RIR information for your account.
-
-    """
+    """Get details for a subnet registration."""
 
     env.registerClient = RegistrationManager(env.client)
     registration = env.registerClient.detail(identifier)

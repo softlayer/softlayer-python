@@ -7,7 +7,7 @@ from SoftLayer import testing
 class RegistrationTests(testing.TestCase):
 
     def test_detail(self):
-        result = self.run_command(['registration', 'detail', '1536487'])
+        result = self.run_command(['registration', 'subnet-detail', '1536487'])
         self.assert_no_fail(result)
         result_output = json.loads(result.output)
         self.assertEqual(result_output['id'], 1536487)
@@ -16,7 +16,7 @@ class RegistrationTests(testing.TestCase):
     def test_show(self):
         result = self.run_command(['registration', 'show'])
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Account', 'getSubnetRegistrations')
+        self.assert_called_with('SoftLayer_Account', 'getSubnets')
 
     def test_person_edit_basic(self):
         result = self.run_command(['registration', 'person-edit', '12345', '--first_name', 'TestGuy'])
@@ -31,7 +31,7 @@ class RegistrationTests(testing.TestCase):
         result = self.run_command(['registration', 'person-edit', '12345', '--last_name', 'TestGuy'])
         expected_edit = [
             {
-                "propertyTypeId": 3, # From PROPERTY_TYPES in SoftLayer/CLI/registration/person_edit.py
+                "propertyTypeId": 3,  # From PROPERTY_TYPES in SoftLayer/CLI/registration/person_edit.py
                 "value": "TestGuy",
                 "registrationDetailId": '12345',
                 'sequencePosition': 0
@@ -49,7 +49,7 @@ class RegistrationTests(testing.TestCase):
         result = self.run_command(['registration', 'person-edit', '12345', '--last_name', 'TestGuy'])
         expected_edit = [
             {
-                "propertyTypeId": 3, # From PROPERTY_TYPES in SoftLayer/CLI/registration/person_edit.py
+                "propertyTypeId": 3,  # From PROPERTY_TYPES in SoftLayer/CLI/registration/person_edit.py
                 "value": "TestGuy",
                 "registrationDetailId": '12345',
                 'sequencePosition': 0

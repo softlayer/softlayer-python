@@ -128,7 +128,7 @@ class FormattedItemTests(testing.TestCase):
         item = formatting.blank()
         self.assertEqual(None, item.original)
         self.assertEqual('-', item.formatted)
-        self.assertEqual('NULL', str(item))
+        self.assertEqual('None', str(item))
 
     def test_sort_mixed(self):
         blank = formatting.blank()
@@ -183,7 +183,7 @@ class FormattedListTests(testing.TestCase):
 class FormattedTxnTests(testing.TestCase):
     def test_active_txn_empty(self):
         result = formatting.active_txn({})
-        self.assertEqual(str(result), 'NULL')
+        self.assertEqual(str(result), 'None')
 
     def test_active_txn(self):
         result = formatting.active_txn({
