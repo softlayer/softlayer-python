@@ -340,13 +340,13 @@ class FormattedItem(object):
         :param int length: how long the output should be for this item. Trimmed strings end with ...
     """
 
-    def __init__(self, original='NULL', formatted=None, length=None):
+    def __init__(self, original='None', formatted=None, length=None):
         self.original = original
         self.length = length
         self.formatted = formatted
 
         if original is None:
-            self.original = 'NULL'
+            self.original = 'None'
         if formatted is None:
             self.formatted = self.original
 
@@ -361,9 +361,9 @@ class FormattedItem(object):
 
     def __str__(self):
         """returns the formatted value."""
-        # If the original value is None, represent this as 'NULL'
+        # If the original value is None, represent this as 'None'
         if self.original is None:
-            return 'NULL'
+            return 'None'
         try:
             return str(self.original)
         except UnicodeError:
