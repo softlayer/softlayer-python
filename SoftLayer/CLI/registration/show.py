@@ -18,8 +18,6 @@ from SoftLayer import utils
 @click.option('--subnet', help="Filter by subnet")
 @click.option('--ipv4', '--v4', is_flag=True, help="Display only IPv4 subnets")
 @click.option('--ipv6', '--v6', is_flag=True, help="Display only IPv6 subnets")
-# TODO(CGALLO): Filter by Contact (might require post query filtering)
-# TODO(CGALLO): Filter by Status, Show Complete / Unregistered / Maybe in progress if that is a thing
 @environment.pass_env
 def cli(env, sortby, datacenter, subnet, ipv4, ipv6):
     """Lists subnets and their registration status.

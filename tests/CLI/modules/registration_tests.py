@@ -16,7 +16,7 @@ class RegistrationTests(testing.TestCase):
     def test_show(self):
         result = self.run_command(['registration', 'show'])
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Account', 'getSubnetRegistrations')
+        self.assert_called_with('SoftLayer_Account', 'getSubnets')
 
     def test_person_edit_basic(self):
         result = self.run_command(['registration', 'person-edit', '12345', '--first_name', 'TestGuy'])

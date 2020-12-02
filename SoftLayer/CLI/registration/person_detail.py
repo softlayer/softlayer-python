@@ -44,7 +44,7 @@ def get_registered_subnets_table(subnet_details, registration_details):
     """Formats the Subnets Table"""
     table = formatting.KeyValueTable(['Subnet', 'Person', 'Status', 'Notes'])
     table.title = 'Registered Subnets'
-    person = ContactPerson({'properties':registration_details})
+    person = ContactPerson({'properties': registration_details})
     for subnet_detail in subnet_details:
         cidr = subnet_detail.get('registration', {}).get('cidr')
         network = subnet_detail.get('registration', {}).get('networkIdentifier')

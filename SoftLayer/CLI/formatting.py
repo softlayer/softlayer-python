@@ -340,18 +340,16 @@ class FormattedItem(object):
         :param int length: how long the output should be for this item. Trimmed strings end with ...
     """
 
-    def __init__(self, original='None', formatted=None, length=None):
+    def __init__(self, original=None, formatted=None, length=None):
         self.original = original
         self.length = length
         self.formatted = formatted
 
-        if original is None:
-            self.original = 'None'
         if formatted is None:
             self.formatted = self.original
 
         # Sets the formatted items length if needed.
-        if self.length:
+        if self.formatted and self.length:
             if len(self.formatted) > self.length:
                 self.formatted = self.formatted[0:self.length] + "..."
 
