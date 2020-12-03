@@ -4,8 +4,8 @@
 import click
 
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import formatting
 from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 from SoftLayer.managers.registration import RegistrationManager
 
 
