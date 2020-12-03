@@ -64,3 +64,65 @@ getObject = {
     "regionalInternetRegistryId": 4,
     "statusId": 5
 }
+
+createObject = getObject
+editRegistrationAttachedDetails = True
+
+getDetailReferences = [
+    {
+        "createDate": "2018-03-18T19:25:00-07:00",
+        "detail": {
+            "detailTypeId": 3,
+            "id": 51990,
+            "detailType": {
+                "id": 3,
+                "keyName": "PERSON",
+                "name": "Person"
+            }
+        },
+        "detailId": 51990,
+        "id": 2971611,
+        "modifyDate": "2020-12-03T15:33:05-06:00",
+        "registration": {
+            "accountId": 12345,
+            "cidr": 29,
+            "createDate": "2018-03-18T19:25:00-07:00",
+            "id": 1731535,
+            "modifyDate": "2020-12-03T15:33:12-06:00",
+            "networkHandle": "169.46.48.104 - 169.46.48.111",
+            "networkIdentifier": "169.46.48.104",
+            "regionalInternetRegistryHandleId": 2020168,
+            "regionalInternetRegistryId": 4,
+            "statusId": 3,
+        },
+        "registrationId": 1731535
+    },
+    {
+        "createDate": "2018-03-18T19:25:00-07:00",
+        "detail": {
+            "detailTypeId": 1,
+            "id": 1672055,
+            "detailType": {
+                "id": 1,
+                "keyName": "NETWORK",
+                "name": "Network"
+            }
+        },
+        "detailId": 1672055,
+        "id": 2971613,
+        "modifyDate": "",
+        "registration": {
+            "accountId": 307608,
+            "cidr": 29,
+            "createDate": "2018-03-18T19:25:00-07:00",
+            "id": 1731535,
+            "modifyDate": "2020-12-03T15:33:12-06:00",
+            "networkHandle": "169.46.48.104 - 169.46.48.111",
+            "networkIdentifier": "169.46.48.104",
+            "regionalInternetRegistryHandleId": 2020168,
+            "regionalInternetRegistryId": 4,
+            "statusId": 3,
+        },
+        "registrationId": 1731535
+    }
+]

@@ -84,3 +84,9 @@ class RegistrationTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account_Regional_Registry_Detail', 'getProperties')
         self.assert_called_with('SoftLayer_Account_Regional_Registry_Detail', 'getDetails')
+
+    def test_subnet_register(self):
+        result = self.run_command(['registration', 'subnet-register', '12345', '9999'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Network_Subnet_Registration', 'createObject')
+        self.assert_called_with('SoftLayer_Network_Subnet', 'getObject', identifier='12345')
