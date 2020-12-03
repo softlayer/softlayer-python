@@ -3,7 +3,7 @@
 ## [5.9.2] - 2020-12-03
 https://github.com/softlayer/softlayer-python/compare/v5.9.1...v5.9.2
 
-## New Commands
+#### New Commands
 -  `slcli account orders` #1349
 -  `slcli order lookup` #1354
 
@@ -25,7 +25,7 @@ https://github.com/softlayer/softlayer-python/compare/v5.9.1...v5.9.2
 - Fixed analysis/flake8 tests #1381
 - Remove the `-a` option from `slcli user create`. Only the user themselves can create an API key now. #1377
 
-#### [5.9.1] - 2020-09-15
+## [5.9.1] - 2020-09-15
 https://github.com/softlayer/softlayer-python/compare/v5.9.0...v5.9.1
 
 - Fix the ha option for firewalls, add and implement unit test #1327
