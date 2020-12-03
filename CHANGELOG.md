@@ -1,5 +1,30 @@
 # Change Log
 
+## [5.9.2] - 2020-12-03
+https://github.com/softlayer/softlayer-python/compare/v5.9.1...v5.9.2
+
+## New Commands
+-  `slcli account orders` #1349
+-  `slcli order lookup` #1354
+
+## Improvements
+- Ordering price information improvements. #1319
+- refactor vsi create-option #1337
+- Add Invoice Item id as parameter in `slcli account item-detail` command
+- Added order lookup command to block and file orders. #1350
+- Add prices to vs create-options. #1351
+- Allow orders without a location if needed #1356
+- Refactor file and block commands to use the username resolver #1357
+- Fix create subnet static for ipv4 price. #1358
+- moved snapcraft readme #1363
+- Update snapcraft.yaml #1365
+- Updated documentation on how to deal with KeyError #1366
+- Fix order item-list --prices location #1360
+- Removed Nessus scanner from docs and examples #1368
+- Fix subnet list. #1379
+- Fixed analysis/flake8 tests #1381
+- Remove the `-a` option from `slcli user create`. Only the user themselves can create an API key now. #1377
+
 ## [5.9.1] - 2020-09-15
 https://github.com/softlayer/softlayer-python/compare/v5.9.0...v5.9.1
 
