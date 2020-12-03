@@ -7,7 +7,7 @@ https://github.com/softlayer/softlayer-python/compare/v5.9.1...v5.9.2
 -  `slcli account orders` #1349
 -  `slcli order lookup` #1354
 
-## Improvements
+#### Improvements
 - Ordering price information improvements. #1319
 - refactor vsi create-option #1337
 - Add Invoice Item id as parameter in `slcli account item-detail` command
@@ -25,7 +25,7 @@ https://github.com/softlayer/softlayer-python/compare/v5.9.1...v5.9.2
 - Fixed analysis/flake8 tests #1381
 - Remove the `-a` option from `slcli user create`. Only the user themselves can create an API key now. #1377
 
-## [5.9.1] - 2020-09-15
+#### [5.9.1] - 2020-09-15
 https://github.com/softlayer/softlayer-python/compare/v5.9.0...v5.9.1
 
 - Fix the ha option for firewalls, add and implement unit test #1327
