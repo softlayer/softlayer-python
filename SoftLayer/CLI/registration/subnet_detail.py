@@ -5,6 +5,7 @@ import click
 
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer.CLI import exceptions
 from SoftLayer.managers.registration import RegistrationManager
 
 
@@ -16,6 +17,11 @@ def cli(env, identifier):
 
     env.registerClient = RegistrationManager(env.client)
     registration = env.registerClient.detail(identifier)
+
+    if not registration:
+        raise exceptions.CLIAbort(
+            'No Active Registration found for this Subnet'
+        )
 
     table = formatting.KeyValueTable(['name', 'value'])
     table.align['name'] = 'r'
