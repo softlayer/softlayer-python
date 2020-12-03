@@ -4,7 +4,6 @@
 import click
 
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import formatting
 from SoftLayer.managers.registration import RegistrationManager
 
 
@@ -18,11 +17,8 @@ def cli(env, subnet, person):
     See `slcli registration contacts` for a list of Contact Ids\n
     See `slcli registration show` for a list of Subnet ids
     """
-    from pprint import pprint as pp
-    registerClient = RegistrationManager(env.client)
+    register_client = RegistrationManager(env.client)
 
     # If there are any failures, this will throw an exception
-    registration = registerClient.register(subnet, person)
-    
+    register_client.register(subnet, person)
     click.secho("Successfully registered subnet {} to {}".format(subnet, person))
-    

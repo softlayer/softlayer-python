@@ -70,7 +70,7 @@ class RegistrationTests(testing.TestCase):
     def test_register_new(self):
         subnet_id = 12345
         contact_id = 55555
-        result = self.registration_mgr.register(subnet_id, contact_id)
+        self.registration_mgr.register(subnet_id, contact_id)
         new_registration = {
             'networkIdentifier': '1.2.3.4',
             'cidr': '26',
@@ -95,9 +95,9 @@ class RegistrationTests(testing.TestCase):
         subnet_mock.return_value = fake_subnet
         subnet_id = 12345
         contact_id = 55555
-        result = self.registration_mgr.register(subnet_id, contact_id)
+        self.registration_mgr.register(subnet_id, contact_id)
         person_param = {
-            'detailId':contact_id,
+            'detailId': contact_id,
             'id': 2971611,  # from getDetailReferences fixture
             'registrationId': registration_id
         }

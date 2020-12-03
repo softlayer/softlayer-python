@@ -1,17 +1,17 @@
 """
     SoftLayer.managers.registration
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Regional Internet Registry (RIR) Manager
 
     :license: MIT, see License for more details.
 """
 from SoftLayer import utils
 
+
 class RegistrationManager(object):
     """Manage SoftLayer Subnet registrations with Regional Internet Registry (RIR)
 
     :param SoftLayer.API.BaseClient client: the client instance
-
     """
 
     def __init__(self, client):
@@ -114,7 +114,7 @@ class RegistrationManager(object):
                                        id=registration_id, mask="mask[detail[detailType]]")
 
             person_param = {
-                'detailId':contact_id,
+                'detailId': contact_id,
                 'id': None,
                 'registrationId': registration_id
             }
@@ -135,14 +135,12 @@ class RegistrationManager(object):
         else:
             new_registration = {
                 'networkIdentifier': subnet.get('networkIdentifier'),
-                'cidr':subnet.get('cidr') ,
+                'cidr': subnet.get('cidr'),
                 'detailReferences': [
                     {'detailId': contact_id}
                 ],
             }
             return self.client.call('SoftLayer_Network_Subnet_Registration', 'createObject', new_registration)
-
-
 
 
 class ContactPerson(object):
