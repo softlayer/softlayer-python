@@ -41,6 +41,17 @@ getObject = {
          'ipAddress': '16.26.26.26'}]
 }
 
+getActiveRegistration = {
+    "accountId": 307213,
+    "createDate": "2020-12-02T14:35:57-06:00",
+    "id": 1926123,
+    "statusId": 3,
+    "status": {
+        "id": 3,
+        "keyName": "REGISTRATION_COMPLETE",
+    }
+}
+
 editNote = True
 setTags = True
 cancel = True
