@@ -1,4 +1,4 @@
-"""Lists subnets and their registration status."""
+"""Display the RWhois information for your account."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -18,8 +18,12 @@ from SoftLayer import utils
 @click.option('--subnet', help="Filter by subnet")
 @click.option('--ipv4', '--v4', is_flag=True, help="Display only IPv4 subnets")
 @click.option('--ipv6', '--v6', is_flag=True, help="Display only IPv6 subnets")
+@click.option('--username', '-u', required=False, help='RIR username')
+@click.option('--status', '-s', required=False,
+              type=click.Choice(['Complete', 'Unregistered', 'in progress']),
+              help='RIR status Complete, Unregistered, in progress')
 @environment.pass_env
-def cli(env, sortby, datacenter, subnet, ipv4, ipv6):
+def cli(env, sortby, datacenter, subnet, ipv4, ipv6, username, status):
     """Lists subnets and their registration status.
 
     Similar to the https://cloud.ibm.com/classic/network/rir page.
@@ -51,18 +55,23 @@ def cli(env, sortby, datacenter, subnet, ipv4, ipv6):
         # Get the last registration, which hopefully is the most current.
         subnet_registration = subnet_record.get('registrations')
         person = "None"
-        status = "None"
+        rir_status = "None"
         if subnet_registration:
             latest_registration = subnet_registration.pop()
             person = ContactPerson(latest_registration.get('personDetail'))
-            status = utils.lookup(latest_registration, 'status', 'name')
-            if status == "Registration Complete":
-                status = "Complete"  # shorten it for readability.
+            rir_status = utils.lookup(latest_registration, 'status', 'name')
+            if rir_status == "Registration Complete":
+                rir_status = "Complete"  # shorten it for readability.
+
+        if username is not None and username != str(person):
+            continue
+        if status is not None and status != rir_status:
+            continue
 
         table.add_row([
             subnet_record['id'],
             "{}/{}".format(subnet_record['networkIdentifier'], str(subnet_record['cidr'])),
-            status,
+            rir_status,
             utils.lookup(subnet_record, 'datacenter', 'name'),
             utils.lookup(subnet_record, 'regionalInternetRegistry', 'name'),
             str(person),
