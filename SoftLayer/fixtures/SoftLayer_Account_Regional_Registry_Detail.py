@@ -70,3 +70,5 @@ getDetails = [{
     },
     'registrationId': 222222
 }]
+
+createObject = getObject

@@ -1,5 +1,7 @@
 import json
 
+import mock
+
 from SoftLayer import exceptions
 from SoftLayer import testing
 
@@ -84,3 +86,35 @@ class RegistrationTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account_Regional_Registry_Detail', 'getProperties')
         self.assert_called_with('SoftLayer_Account_Regional_Registry_Detail', 'getDetails')
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_person_create(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['registration', 'person-create', '--organization', 'Organization Test',
+                                   '--first_name', 'TestName', '--last_name', 'TestLastName',
+                                   '--address', '1234 Alpha Rd', '--city', 'Dallas', '--country', 'US',
+                                   '--state', 'Texas', '--postal_code', '4521-4123', '--email_address', 'test@ibm.com',
+                                   '--abuse_email', 'test2@ibm.com', '--phone', '2717874571'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account_Regional_Registry_Detail', 'createObject', args=mock.ANY)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_person_create_no_confirm(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['registration', 'person-create', '--organization', 'Organization Test',
+                                   '--first_name', 'TestName', '--last_name', 'TestLastName',
+                                   '--address', '1234 Alpha Rd', '--city', 'Dallas', '--country', 'US',
+                                   '--state', 'Texas', '--postal_code', '4521-4123', '--email_address', 'test@ibm.com',
+                                   '--abuse_email', 'test2@ibm.com', '--phone', '2717874571'])
+        self.assertEqual(result.exit_code, 2)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_person_create_with_no_confirm(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['registration', 'person-create', '--organization', 'Organization Test',
+                                   '--first_name', 'TestName', '--last_name', 'TestLastName',
+                                   '--address', '1234 Alpha Rd', '--city', 'Dallas', '--country', 'US',
+                                   '--state', 'Texas', '--postal_code', '4521-4123', '--email_address', 'test@ibm.com',
+                                   '--abuse_email', 'test2@ibm.com', '--phone', '2717874571'])
+        self.assertIn("Canceling creation!", result.exception.message)
+        self.assertEqual(result.exit_code, 2)
