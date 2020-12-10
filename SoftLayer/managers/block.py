@@ -73,7 +73,7 @@ class BlockStorageManager(StorageManager):
                 'order']['id'] = (utils.query_filter(order))
 
         kwargs['filter'] = _filter.to_dict()
-        return self.client.call('Account', 'getIscsiNetworkStorage', **kwargs)
+        return self.client.call('Account', 'getIscsiNetworkStorage', iter=True, **kwargs)
 
     def get_block_volume_details(self, volume_id, **kwargs):
         """Returns details about the specified volume.
