@@ -20,6 +20,16 @@ class RegistrationTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account', 'getSubnets')
 
+    def test_show_username(self):
+        result = self.run_command(['registration', 'show', '--username', 'test'])
+        self.assert_no_fail(result)
+        self.assertTrue(result.output, [])
+
+    def test_show_status(self):
+        result = self.run_command(['registration', 'show', '--status', 'Complete'])
+        self.assert_no_fail(result)
+        self.assertTrue(result.output, [])
+
     def test_person_edit_basic(self):
         result = self.run_command(['registration', 'person-edit', '12345', '--first_name', 'TestGuy'])
         expected_edit = [{"id": 85644, "value": "TestGuy", "propertyType": {"keyName": "FIRST_NAME"}}]

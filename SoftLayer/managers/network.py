@@ -380,14 +380,28 @@ class NetworkManager(object):
         obj = self.client['Network_Subnet_IpAddress']
         return obj.getByIpAddress(ip_address, mask='hardware, virtualGuest')
 
-    def get_registrations(self):
+    def get_registrations(self, username=None, status=None, **kwargs):
         """Returns the RWhois information about the current account.
 
         :returns: A dictionary containing the account's RWhois information.
         """
-        mask = 'personDetail,status,regionalInternetRegistry,networkDetail'
+        if 'mask' not in kwargs:
+            items = [
+                'account,personDetail,status,regionalInternetRegistry,networkDetail']
+            kwargs['mask'] = ','.join(items)
 
-        return self.account.getSubnetRegistrations(mask=mask)
+        _filter = utils.NestedDict(kwargs.get('filter') or {})
+
+        if username:
+            _filter['subnetRegistrations']['account']['email'] = \
+                (utils.query_filter(username))
+
+        if status:
+            _filter['subnetRegistrations']['status']['keyName'] = \
+                (utils.query_filter(status.upper()))
+
+        kwargs['filter'] = _filter.to_dict()
+        return self.account.getSubnetRegistrations(**kwargs)
 
     def get_securitygroup(self, group_id, **kwargs):
         """Returns the information about the given security group.
