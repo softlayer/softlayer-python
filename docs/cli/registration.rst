@@ -16,6 +16,10 @@ They allow you to configure a Person/Contact that can be used to configure the W
     :prog: registration show
     :show-nested:
 
+.. click:: SoftLayer.CLI.registration.person_create:cli
+    :prog: registration person-create
+    :show-nested:
+
 .. click:: SoftLayer.CLI.registration.person_edit:cli
     :prog: registration person-edit
     :show-nested:
