@@ -1,4 +1,4 @@
-"""Display the RWhois information for your account."""
+"""Lists subnets and their registration status."""
 # :license: MIT, see LICENSE for more details.
 
 import click
