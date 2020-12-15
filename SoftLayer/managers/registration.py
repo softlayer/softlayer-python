@@ -98,6 +98,15 @@ class RegistrationManager(object):
 
         return self.regional_register.getDetails(mask=mask, filter=object_filter, id=identifier, iter=True)
 
+    def create_person_record(self, template):
+        """Create a person record.
+
+        :return: person created record.
+
+        """
+
+        return self.regional_register.createObject(template)
+
 
 class ContactPerson(object):
     """Turns a SoftLayer_Account_Regional_Registry_Detail into a useable datastructure

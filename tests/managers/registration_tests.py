@@ -7,8 +7,8 @@
     A lot of these tests will use junk data because the manager just passes
     them directly to the API.
 """
-from SoftLayer.managers.registration import RegistrationManager
 from SoftLayer import testing
+from SoftLayer.managers.registration import RegistrationManager
 
 
 class RegistrationTests(testing.TestCase):
@@ -66,3 +66,20 @@ class RegistrationTests(testing.TestCase):
         self.assertIsInstance(result, list)
         self.assert_called_with('SoftLayer_Account_Regional_Registry_Detail', 'getDetails',
                                 filter=object_filter, identifier=identifier, mask=mask)
+
+    def test_create_person_record(self):
+        template_object = {
+            'detailTypeId': 3,
+            'properties': [
+                {
+                    "propertyTypeId": 3,
+                    "value": "TestGuy",
+                    "registrationDetailId": '12345',
+                    'sequencePosition': 0
+                }
+            ]
+        }
+
+        result = self.registration_mgr.create_person_record(template_object)
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Account_Regional_Registry_Detail', 'createObject', args=(template_object,))
