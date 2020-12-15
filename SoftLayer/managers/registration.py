@@ -17,6 +17,7 @@ class RegistrationManager(object):
     def __init__(self, client):
         self.client = client
         self.account = client['Account']
+        self.subnet = client['SoftLayer_Network_Subnet']
         self.registration = self.client['Network_Subnet_Registration']
         self.person_type_id = 3  # a person has a detailTypeId == 3
         # 4 is a DETAULT_PERSON
@@ -28,9 +29,12 @@ class RegistrationManager(object):
 
         :return: subnet registration object
         """
-
         mask = 'account,personDetail,networkDetail'
-        return self.registration.getObject(mask=mask, id=identifier)
+        registration = self.subnet.getActiveRegistration(id=identifier)
+
+        if registration:
+            return self.registration.getObject(mask=mask, id=registration['id'])
+        return None
 
     def get_registration_detail_object(self, identifier, mask=None):
         """Calls SoftLayer_Account_Regional_Registry_Detail::getObject()
@@ -140,7 +144,16 @@ class RegistrationManager(object):
                     {'detailId': contact_id}
                 ],
             }
-            return self.client.call('SoftLayer_Network_Subnet_Registration', 'createObject', new_registration)
+        return self.client.call('SoftLayer_Network_Subnet_Registration', 'createObject', new_registration)
+
+    def create_person_record(self, template):
+        """Create a person record.
+
+        :return: person created record.
+
+        """
+
+        return self.regional_register.createObject(template)
 
 
 class ContactPerson(object):

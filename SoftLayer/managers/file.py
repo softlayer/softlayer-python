@@ -70,7 +70,7 @@ class FileStorageManager(StorageManager):
                 'order']['id'] = (utils.query_filter(order))
 
         kwargs['filter'] = _filter.to_dict()
-        return self.client.call('Account', 'getNasNetworkStorage', **kwargs)
+        return self.client.call('Account', 'getNasNetworkStorage', iter=True, **kwargs)
 
     def get_file_volume_details(self, volume_id, **kwargs):
         """Returns details about the specified volume.

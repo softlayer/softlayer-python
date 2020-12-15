@@ -7,8 +7,8 @@
     A lot of these tests will use junk data because the manager just passes
     them directly to the API.
 """
-from SoftLayer.managers.registration import RegistrationManager
 from SoftLayer import testing
+from SoftLayer.managers.registration import RegistrationManager
 
 
 class RegistrationTests(testing.TestCase):
@@ -19,7 +19,7 @@ class RegistrationTests(testing.TestCase):
     def test_detail(self):
         result = self.registration_mgr.detail(1536487)
         self.assertEqual(result['id'], 1536487)
-        self.assert_called_with('SoftLayer_Network_Subnet_Registration', 'getObject', identifier=1536487)
+        self.assert_called_with('SoftLayer_Network_Subnet', 'getActiveRegistration', identifier=1536487)
 
     def test_get_registration_detail_object(self):
         result = self.registration_mgr.get_registration_detail_object(51990)
@@ -47,8 +47,8 @@ class RegistrationTests(testing.TestCase):
     def test_get_detail(self):
         identifier = 12345
         self.registration_mgr.detail(identifier)
-        self.assert_called_with('SoftLayer_Network_Subnet_Registration',
-                                'getObject', identifier=identifier)
+        self.assert_called_with('SoftLayer_Network_Subnet',
+                                'getActiveRegistration', identifier=identifier)
 
     def test_get_contact_properties(self):
         identifier = 12345
@@ -111,3 +111,20 @@ class RegistrationTests(testing.TestCase):
                                 args=(person_param, network_param))
         self.assert_called_with('SoftLayer_Network_Subnet_Registration', 'getDetailReferences',
                                 identifier=registration_id)
+
+    def test_create_person_record(self):
+        template_object = {
+            'detailTypeId': 3,
+            'properties': [
+                {
+                    "propertyTypeId": 3,
+                    "value": "TestGuy",
+                    "registrationDetailId": '12345',
+                    'sequencePosition': 0
+                }
+            ]
+        }
+
+        result = self.registration_mgr.create_person_record(template_object)
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Account_Regional_Registry_Detail', 'createObject', args=(template_object,))
