@@ -330,18 +330,19 @@ class NetworkTests(testing.TestCase):
         _filter = {
             'subnets': {
                 'networkIdentifier': {'operation': '_= 10.0.0.1'},
-                'datacenter': {
-                    'name': {'operation': '_= dal00'}
-                },
+                'datacenter': {'name': {'operation': '_= dal00'}},
                 'version': {'operation': 4},
                 'subnetType': {'operation': '_= PRIMARY'},
-                'networkVlan': {'networkSpace': {'operation': '_= PUBLIC'}},
             }
         }
 
-        self.assert_called_with('SoftLayer_Account', 'getSubnets',
+        self.assert_called_with('SoftLayer_Account', 'getPublicSubnets',
                                 mask='mask[%s]' % network.DEFAULT_SUBNET_MASK,
                                 filter=_filter)
+
+    def test_list_subnets_private(self):
+        self.network.list_subnets(network_space='Private')
+        self.assert_called_with('SoftLayer_Account', 'getPrivateSubnets')
 
     def test_list_vlans_default(self):
         result = self.network.list_vlans()

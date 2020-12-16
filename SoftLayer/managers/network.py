@@ -487,19 +487,18 @@ class NetworkManager(object):
         This provides a quick overview of all subnets including information
         about data center residence and the number of devices attached.
 
-        :param string identifier: If specified, the list will only contain the
-                                    subnet matching this network identifier.
-        :param string datacenter: If specified, the list will only contain
-                                    subnets in the specified data center.
+        :param string identifier: Filter for subnets matching this network identifier.
+        :param string datacenter: Will only return subnets in the specified data center.
         :param int version: Only returns subnets of this version (4 or 6).
-        :param string subnet_type: If specified, it will only returns subnets
-                                     of this type.
-        :param string network_space: If specified, it will only returns subnets
-                                       with the given address space label.
+        :param string subnet_type: Will only return subnets of this type.
+                                   https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_Subnet/#subnettype
+        :param string network_space: 'Public' or 'Private'
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         """
         if 'mask' not in kwargs:
             kwargs['mask'] = DEFAULT_SUBNET_MASK
+
+        method = 'getSubnets'
 
         _filter = utils.NestedDict(kwargs.get('filter') or {})
 
@@ -517,12 +516,14 @@ class NetworkManager(object):
             # This filters out global IPs from the subnet listing.
             _filter['subnets']['subnetType'] = {'operation': '!= GLOBAL_IP'}
         if network_space:
-            _filter['subnets']['networkVlan']['networkSpace'] = (
-                utils.query_filter(network_space))
+            if network_space.lower() == "public":
+                method = "getPublicSubnets"
+            elif network_space.lower() == "private":
+                method = "getPrivateSubnets"
 
         kwargs['filter'] = _filter.to_dict()
         kwargs['iter'] = True
-        return self.client.call('Account', 'getSubnets', **kwargs)
+        return self.client.call('Account', method, **kwargs)
 
     def list_vlans(self, datacenter=None, vlan_number=None, name=None, **kwargs):
         """Display a list of all VLANs on the account.
