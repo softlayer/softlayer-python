@@ -465,7 +465,7 @@ class VSManager(utils.IdentifierMixin, object):
                                 'FORCE', config, id=instance_id)
 
     def _generate_create_dict(
-            self, cpus=None, memory=None, useHourlyPricing=True,
+            self, cpus=None, memory=None, use_hourly_pricing=True,
             hostname=None, domain=None, local_disk=True,
             datacenter=None, os_code=None, image_id=None,
             dedicated=False, public_vlan=None, private_vlan=None,
@@ -504,7 +504,7 @@ class VSManager(utils.IdentifierMixin, object):
             "hostname": hostname,
             "domain": domain,
             "localDiskFlag": local_disk,
-            "useHourlyPricing": useHourlyPricing,
+            "useHourlyPricing": use_hourly_pricing,
             "supplementalCreateObjectOptions": {
                 "bootMode": boot_mode
             }

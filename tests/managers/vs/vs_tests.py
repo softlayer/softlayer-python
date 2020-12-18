@@ -313,7 +313,7 @@ class VSTests(testing.TestCase):
             hostname='test',
             domain='example.com',
             os_code="STRING",
-            useHourlyPricing=False,
+            use_hourly_pricing=False,
         )
 
         assert_data = {
