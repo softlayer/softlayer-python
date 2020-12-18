@@ -35,7 +35,7 @@ class VirtCreateTests(testing.TestCase):
 
         args = ({'datacenter': {'name': 'dal05'},
                  'domain': 'example.com',
-                 'hourlyBillingFlag': True,
+                 'useHourlyPricing': True,
                  'localDiskFlag': True,
                  'maxMemory': 1024,
                  'hostname': 'host',
@@ -73,7 +73,7 @@ class VirtCreateTests(testing.TestCase):
             'hostname': 'host',
             'domain': 'example.com',
             'localDiskFlag': True,
-            'hourlyBillingFlag': True,
+            'useHourlyPricing': True,
             'supplementalCreateObjectOptions': {'bootMode': None},
             'operatingSystemReferenceCode': 'UBUNTU_LATEST',
             'datacenter': {'name': 'dal05'},
@@ -177,7 +177,7 @@ class VirtCreateTests(testing.TestCase):
             'hostname': 'host',
             'domain': 'example.com',
             'localDiskFlag': True,
-            'hourlyBillingFlag': True,
+            'useHourlyPricing': True,
             'supplementalCreateObjectOptions': {'bootMode': None},
             'blockDeviceTemplateGroup': {'globalIdentifier': 'aaaa1111bbbb2222'},
             'datacenter': {'name': 'dal05'},
@@ -204,7 +204,7 @@ class VirtCreateTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
         args = ({'datacenter': {'name': 'dal05'},
                  'domain': 'example.com',
-                 'hourlyBillingFlag': True,
+                 'useHourlyPricing': True,
                  'hostname': 'host',
                  'startCpus': None,
                  'maxMemory': None,
@@ -306,7 +306,7 @@ class VirtCreateTests(testing.TestCase):
             'hostname': 'host',
             'domain': 'example.com',
             'localDiskFlag': True,
-            'hourlyBillingFlag': True,
+            'useHourlyPricing': True,
             'supplementalCreateObjectOptions': {
                 'bootMode': None
             },
@@ -359,7 +359,7 @@ class VirtCreateTests(testing.TestCase):
 
         args = ({'datacenter': {'name': 'dal05'},
                  'domain': 'test.sftlyr.ws',
-                 'hourlyBillingFlag': True,
+                 'useHourlyPricing': True,
                  'hostname': 'vs-test-like',
                  'startCpus': 2,
                  'maxMemory': 1024,
@@ -433,7 +433,7 @@ class VirtCreateTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
         args = ({'datacenter': {'name': 'dal05'},
                  'domain': 'test.sftlyr.ws',
-                 'hourlyBillingFlag': True,
+                 'useHourlyPricing': True,
                  'hostname': 'vs-test-like',
                  'startCpus': 2,
                  'maxMemory': 1024,
@@ -473,7 +473,7 @@ class VirtCreateTests(testing.TestCase):
 
         args = ({'datacenter': {'name': 'dal05'},
                  'domain': 'test.sftlyr.ws',
-                 'hourlyBillingFlag': True,
+                 'useHourlyPricing': True,
                  'hostname': 'vs-test-like',
                  'startCpus': None,
                  'maxMemory': None,
@@ -514,7 +514,7 @@ class VirtCreateTests(testing.TestCase):
 
         args = ({'datacenter': {'name': 'dal05'},
                  'domain': 'test.sftlyr.ws',
-                 'hourlyBillingFlag': True,
+                 'useHourlyPricing': True,
                  'hostname': 'vs-test-like',
                  'startCpus': None,
                  'maxMemory': None,
@@ -604,7 +604,7 @@ class VirtCreateTests(testing.TestCase):
             'hostname': 'TEST',
             'domain': 'TESTING',
             'localDiskFlag': None,
-            'hourlyBillingFlag': True,
+            'useHourlyPricing': True,
             'supplementalCreateObjectOptions': {
                 'bootMode': None,
                 'flavorKeyName': 'B1_2X8X25'

@@ -90,3 +90,11 @@ class VSCapacityTests(testing.TestCase):
         result = self.run_command(['vs', 'capacity', 'create-guest', '--capacity-id=3103', '--primary-disk=25',
                                    '-H ABCDEFG', '-D test_list.com', '-o UBUNTU_LATEST_64', '-kTest 1'])
         self.assert_no_fail(result)
+
+    def test_create_guest_reserved(self):
+        order_mock = self.set_mock('SoftLayer_Product_Order', 'placeOrder')
+        order_mock.return_value = SoftLayer_Product_Order.rsi_placeOrder
+        result = self.run_command(['vs', 'capacity', 'create-guest', '--capacity-id=3103',
+                                   '-H ABCDEFG', '-D test_list.com', '-o UBUNTU_LATEST_64'])
+
+        self.assert_no_fail(result)

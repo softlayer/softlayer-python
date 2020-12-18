@@ -256,7 +256,7 @@ class VSTests(testing.TestCase):
                                    'tags': 'dev,green'}])
 
         args = ([{'domain': 'example.com',
-                  'hourlyBillingFlag': True,
+                  'useHourlyPricing': True,
                   'localDiskFlag': True,
                   'maxMemory': 1024,
                   'hostname': 'server',
@@ -300,8 +300,8 @@ class VSTests(testing.TestCase):
             'domain': 'example.com',
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
-            'hourlyBillingFlag': True,
-            'supplementalCreateObjectOptions': {'bootMode': None},
+            'useHourlyPricing': True,
+            'supplementalCreateObjectOptions': {'bootMode': None}
         }
 
         self.assertEqual(data, assert_data)
@@ -313,18 +313,18 @@ class VSTests(testing.TestCase):
             hostname='test',
             domain='example.com',
             os_code="STRING",
-            hourly=False,
+            useHourlyPricing=False,
         )
 
         assert_data = {
-            'hourlyBillingFlag': False,
+            'useHourlyPricing': False,
             'startCpus': 1,
             'maxMemory': 1,
             'hostname': 'test',
             'domain': 'example.com',
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
-            'supplementalCreateObjectOptions': {'bootMode': None},
+            'supplementalCreateObjectOptions': {'bootMode': None}
         }
 
         self.assertEqual(data, assert_data)
@@ -345,8 +345,9 @@ class VSTests(testing.TestCase):
             'domain': 'example.com',
             'localDiskFlag': True,
             'blockDeviceTemplateGroup': {"globalIdentifier": "45"},
-            'hourlyBillingFlag': True,
+            'useHourlyPricing': True,
             'supplementalCreateObjectOptions': {'bootMode': None},
+
         }
 
         self.assertEqual(data, assert_data)
@@ -368,7 +369,7 @@ class VSTests(testing.TestCase):
             'domain': 'example.com',
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
-            'hourlyBillingFlag': True,
+            'useHourlyPricing': True,
             'dedicatedAccountHostOnlyFlag': True,
             'supplementalCreateObjectOptions': {'bootMode': None},
         }
@@ -392,9 +393,9 @@ class VSTests(testing.TestCase):
             'domain': 'example.com',
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
-            'hourlyBillingFlag': True,
+            'useHourlyPricing': True,
             'datacenter': {"name": 'sng01'},
-            'supplementalCreateObjectOptions': {'bootMode': None},
+            'supplementalCreateObjectOptions': {'bootMode': None}
         }
 
         self.assertEqual(data, assert_data)
@@ -416,9 +417,9 @@ class VSTests(testing.TestCase):
             'domain': 'example.com',
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
-            'hourlyBillingFlag': True,
+            'useHourlyPricing': True,
             'primaryNetworkComponent': {"networkVlan": {"id": 1}},
-            'supplementalCreateObjectOptions': {'bootMode': None},
+            'supplementalCreateObjectOptions': {'bootMode': None}
         }
 
         self.assertEqual(data, assert_data)
@@ -441,10 +442,10 @@ class VSTests(testing.TestCase):
             'domain': 'example.com',
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
-            'hourlyBillingFlag': True,
+            'useHourlyPricing': True,
             'primaryNetworkComponent': {'networkVlan': {'id': 1,
                                                         'primarySubnet': {'id': 1}}},
-            'supplementalCreateObjectOptions': {'bootMode': None},
+            'supplementalCreateObjectOptions': {'bootMode': None}
         }
 
         self.assertEqual(data, assert_data)
@@ -467,10 +468,10 @@ class VSTests(testing.TestCase):
             'domain': 'example.com',
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
-            'hourlyBillingFlag': True,
+            'useHourlyPricing': True,
             'primaryBackendNetworkComponent': {'networkVlan': {'id': 1,
                                                                'primarySubnet': {'id': 1}}},
-            'supplementalCreateObjectOptions': {'bootMode': None},
+            'supplementalCreateObjectOptions': {'bootMode': None}
         }
 
         self.assertEqual(data, assert_data)
@@ -495,12 +496,12 @@ class VSTests(testing.TestCase):
             'domain': 'example.com',
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
-            'hourlyBillingFlag': True,
+            'useHourlyPricing': True,
             'primaryBackendNetworkComponent': {'networkVlan': {'id': 1,
                                                                'primarySubnet': {'id': 1}}},
             'primaryNetworkComponent': {'networkVlan': {'id': 1,
                                                         'primarySubnet': {'id': 1}}},
-            'supplementalCreateObjectOptions': {'bootMode': None},
+            'supplementalCreateObjectOptions': {'bootMode': None}
         }
 
         self.assertEqual(data, assert_data)
@@ -550,9 +551,9 @@ class VSTests(testing.TestCase):
             'domain': 'example.com',
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
-            'hourlyBillingFlag': True,
+            'useHourlyPricing': True,
             'primaryBackendNetworkComponent': {'networkVlan': {'id': 1}},
-            'supplementalCreateObjectOptions': {'bootMode': None},
+            'supplementalCreateObjectOptions': {'bootMode': None}
         }
 
         self.assertEqual(data, assert_data)
@@ -657,7 +658,7 @@ class VSTests(testing.TestCase):
             'domain': 'example.com',
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
-            'hourlyBillingFlag': True,
+            'useHourlyPricing': True,
             'userData': [{'value': "ICANHAZVSI"}],
             'supplementalCreateObjectOptions': {'bootMode': None},
         }
@@ -681,7 +682,7 @@ class VSTests(testing.TestCase):
             'domain': 'example.com',
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
-            'hourlyBillingFlag': True,
+            'useHourlyPricing': True,
             'networkComponents': [{'maxSpeed': 9001}],
             'supplementalCreateObjectOptions': {'bootMode': None},
         }
@@ -707,9 +708,9 @@ class VSTests(testing.TestCase):
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
             'privateNetworkOnlyFlag': True,
-            'hourlyBillingFlag': True,
+            'useHourlyPricing': True,
             'networkComponents': [{'maxSpeed': 9001}],
-            'supplementalCreateObjectOptions': {'bootMode': None},
+            'supplementalCreateObjectOptions': {'bootMode': None}
         }
 
         self.assertEqual(data, assert_data)
@@ -731,7 +732,7 @@ class VSTests(testing.TestCase):
             'domain': 'example.com',
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
-            'hourlyBillingFlag': True,
+            'useHourlyPricing': True,
             'postInstallScriptUri': 'https://example.com/boostrap.sh',
             'supplementalCreateObjectOptions': {'bootMode': None},
         }
@@ -755,7 +756,7 @@ class VSTests(testing.TestCase):
             'domain': 'example.com',
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
-            'hourlyBillingFlag': True,
+            'useHourlyPricing': True,
             'sshKeys': [{'id': 543}],
             'supplementalCreateObjectOptions': {'bootMode': None},
         }
@@ -828,8 +829,8 @@ class VSTests(testing.TestCase):
             'domain': 'example.com',
             'localDiskFlag': True,
             'operatingSystemReferenceCode': "STRING",
-            'hourlyBillingFlag': True,
-            'supplementalCreateObjectOptions': {'bootMode': 'HVM'},
+            'useHourlyPricing': True,
+            'supplementalCreateObjectOptions': {'bootMode': 'HVM'}
         }
 
         self.assertEqual(data, assert_data)

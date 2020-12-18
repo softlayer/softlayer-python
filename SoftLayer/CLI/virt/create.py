@@ -74,7 +74,7 @@ def _parse_create_args(client, args):
     :param dict args: CLI arguments
     """
     data = {
-        "hourly": args.get('billing', 'hourly') == 'hourly',
+        "useHourlyPricing": args.get('billing', 'hourly') == 'hourly',
         "cpus": args.get('cpu', None),
         "ipv6": args.get('ipv6', None),
         "disks": args.get('disk', None),
