@@ -229,6 +229,7 @@ ALL_ROUTES = [
     ('order:lookup', 'SoftLayer.CLI.order.lookup:cli'),
 
     ('registration', 'SoftLayer.CLI.registration'),
+    ('registration:subnet-clear', 'SoftLayer.CLI.registration.subnet_clear:cli'),
     ('registration:subnet-detail', 'SoftLayer.CLI.registration.subnet_detail:cli'),
     ('registration:show', 'SoftLayer.CLI.registration.show:cli'),
     ('registration:person-create', 'SoftLayer.CLI.registration.person_create:cli'),
