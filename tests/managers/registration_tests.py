@@ -7,8 +7,8 @@
     A lot of these tests will use junk data because the manager just passes
     them directly to the API.
 """
-from SoftLayer import testing
 from SoftLayer.managers.registration import RegistrationManager
+from SoftLayer import testing
 
 
 class RegistrationTests(testing.TestCase):
