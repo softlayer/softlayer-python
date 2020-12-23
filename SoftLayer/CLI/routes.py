@@ -237,6 +237,7 @@ ALL_ROUTES = [
     ('registration:person-edit', 'SoftLayer.CLI.registration.person_edit:cli'),
     ('registration:contacts', 'SoftLayer.CLI.registration.contacts:cli'),
     ('registration:person-detail', 'SoftLayer.CLI.registration.person_detail:cli'),
+    ('registration:update-all', 'SoftLayer.CLI.registration.update_all:cli'),
 
     ('hardware', 'SoftLayer.CLI.hardware'),
     ('hardware:bandwidth', 'SoftLayer.CLI.hardware.bandwidth:cli'),
