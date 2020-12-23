@@ -155,6 +155,17 @@ class RegistrationManager(object):
 
         return self.regional_register.createObject(template)
 
+    def clear(self, identifier):
+        """Clear an existing subnet registration.
+
+        :return: boolean value.
+        """
+        registration = self.subnet.getActiveRegistration(id=identifier)
+
+        if registration:
+            return self.registration.clearRegistration(id=registration['id'])
+        return None
+
 
 class ContactPerson(object):
     """Turns a SoftLayer_Account_Regional_Registry_Detail into a useable datastructure

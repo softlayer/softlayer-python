@@ -65,6 +65,7 @@ getObject = {
     "statusId": 5
 }
 
+
 createObject = getObject
 editRegistrationAttachedDetails = True
 
@@ -126,3 +127,6 @@ getDetailReferences = [
         "registrationId": 1731535
     }
 ]
+
+clearRegistration = True
+

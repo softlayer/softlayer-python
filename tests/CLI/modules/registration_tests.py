@@ -134,3 +134,25 @@ class RegistrationTests(testing.TestCase):
                                    '--abuse_email', 'test2@ibm.com', '--phone', '2717874571'])
         self.assertIn("Canceling creation!", result.exception.message)
         self.assertEqual(result.exit_code, 2)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_subnet_clear_True(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['--really', 'registration', 'subnet-clear', '1234'])
+        self.assert_no_fail(result)
+        self.assertEqual('The subnet registration with id 1234 was successfully cleared\n', result.output)
+        self.assert_called_with('SoftLayer_Network_Subnet_Registration', 'clearRegistration', args=mock.ANY)
+
+    @mock.patch('SoftLayer.RegistrationManager.clear')
+    def test_subnet_clear_False(self, clear_mock):
+        clear_mock.return_value = False
+        result = self.run_command(['--really', 'registration', 'subnet-clear', '1234'])
+        self.assert_no_fail(result)
+        self.assertEqual('Unable to clear the subnet registration with id 1234\n', result.output)
+
+    @mock.patch('SoftLayer.RegistrationManager.clear')
+    def test_subnet_clear_no_registration(self, clear_mock):
+        clear_mock.return_value = None
+        result = self.run_command(['--really', 'registration', 'subnet-clear', '1234'])
+        self.assertIn("Could not clear the subnet", result.exception.message)
+        self.assertEqual(result.exit_code, 2)
