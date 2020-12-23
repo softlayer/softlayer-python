@@ -64,3 +64,5 @@ getObject = {
     "regionalInternetRegistryId": 4,
     "statusId": 5
 }
+
+clearRegistration = True

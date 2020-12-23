@@ -32,3 +32,11 @@ They allow you to configure a Person/Contact that can be used to configure the W
 .. click:: SoftLayer.CLI.registration.subnet_detail:cli
     :prog: registration subnet-detail
     :show-nested:
+
+.. click:: SoftLayer.CLI.registration.person_create:cli
+    :prog: registration person-create
+    :show-nested:
+
+.. click:: SoftLayer.CLI.registration.subnet_clear:cli
+    :prog: registration subnet-clear
+    :show-nested:
