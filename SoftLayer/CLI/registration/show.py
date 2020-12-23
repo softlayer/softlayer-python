@@ -31,7 +31,7 @@ def cli(env, sortby, datacenter, subnet, ipv4, ipv6, username, status):
 
     mgr = SoftLayer.NetworkManager(env.client)
     mask = """mask[id,networkIdentifier,cidr,subnetType,datacenter[name],note,
-              registrations[status,personDetail[properties[propertyType]]],regionalInternetRegistry]"""
+              activeRegistration[status,personDetail[properties[propertyType]]],regionalInternetRegistry]"""
 
     table = formatting.Table(['Id', 'Subnet', 'Status', 'Datacenter', 'RIR', 'Contact', 'Subnet Notes'])
     table.sortby = sortby
@@ -53,13 +53,12 @@ def cli(env, sortby, datacenter, subnet, ipv4, ipv6, username, status):
 
     for subnet_record in subnets:
         # Get the last registration, which hopefully is the most current.
-        subnet_registration = subnet_record.get('registrations')
+        subnet_registration = subnet_record.get('activeRegistration')
         person = "None"
         rir_status = "None"
         if subnet_registration:
-            latest_registration = subnet_registration.pop()
-            person = ContactPerson(latest_registration.get('personDetail'))
-            rir_status = utils.lookup(latest_registration, 'status', 'name')
+            person = ContactPerson(subnet_registration.get('personDetail'))
+            rir_status = utils.lookup(subnet_registration, 'status', 'name')
             if rir_status == "Registration Complete":
                 rir_status = "Complete"  # shorten it for readability.
 

@@ -491,6 +491,8 @@ getSubnets = [
         "version": 4
     }
 ]
+getPrivateSubnets = getSubnets
+getPublicSubnets = getSubnets
 
 getSshKeys = [{'id': '100', 'label': 'Test 1'},
               {'id': '101', 'label': 'Test 2',
