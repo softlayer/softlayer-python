@@ -36,6 +36,92 @@ class RegistrationManager(object):
             return self.registration.getObject(mask=mask, id=registration['id'])
         return None
 
+    def update_all(self, contact_id, skip_subnets=None):
+        """Updates every subnet to contact
+
+        :param list skip_subnets: A list of subnets ids to skip
+        :param int contact_id: Id of a Account_Regional_Registry_Detail that is a person
+        :return:A list of subnet registrations
+        """
+        skip_subnets = [] if skip_subnets is None else skip_subnets
+        subnets = self.get_public_subnets()
+        subnets = [subnet for subnet in subnets if subnet.get('id') not in skip_subnets]
+        new_subnets_registration = [subnet for subnet in subnets if subnet.get('activeRegistration') is None]
+        subnets_to_update = [subnet for subnet in subnets if subnet not in new_subnets_registration]
+        result = []
+        if new_subnets_registration:
+            templates = []
+            for subnet in new_subnets_registration:
+                new_registration = self.get_registration_template(contact_id, subnet)
+                templates.append(new_registration)
+            result = self.registration.createObjects(templates)
+
+        if subnets_to_update:
+            for subnet in subnets_to_update:
+                result.append(self.register_subnet(subnet, contact_id))
+
+        return result
+
+    def get_registration_template(self, contact_id, subnet):
+        """Gets registration template
+
+        :param int contact_id: Id of a Account_Regional_Registry_Detail that is a person
+        :param dict subnet: A subnet
+        :return:A registration template
+        """
+        return {
+            'networkIdentifier': subnet.get('networkIdentifier'),
+            'cidr': subnet.get('cidr'),
+            'detailReferences': [
+                {'detailId': contact_id}
+            ],
+        }
+
+    def get_public_subnets(self):
+        """Gets public subnets"""
+
+        mask = 'mask[id,networkIdentifier,activeRegistration,regionalInternetRegistry,cidr]'
+        subnets = self.account.getPublicSubnets(mask=mask)
+        return subnets
+
+    def register_subnet(self, subnet, contact_id):
+        """Registers subnet to contact
+
+        :param  dict subnet: A Network_Subnet
+        :param int contact_id: Id of a Account_Regional_Registry_Detail that is a person
+        """
+        active_registration = subnet.get('activeRegistration')
+        #  Active registration need to be edited.
+        if active_registration:
+            #  SoftLayer_Network_Subnet_Registration::editObject() just doesn't seem to work.
+            #  This is how the portal edits a registration, so copying that workflow.
+            registration_id = active_registration.get('id')
+            details = self.client.call('SoftLayer_Network_Subnet_Registration', 'getDetailReferences',
+                                       id=registration_id, mask="mask[detail[detailType]]")
+
+            person_param = {
+                'detailId': contact_id,
+                'id': None,
+                'registrationId': registration_id
+            }
+            network_param = {
+                'detailId': None,
+                'id': None,
+                'registrationId': registration_id
+            }
+            for detail in details:
+                if utils.lookup(detail, 'detail', 'detailType', 'keyName') == "NETWORK":
+                    network_param['id'] = detail.get('id')
+                    network_param['detailId'] = utils.lookup(detail, 'detail', 'id')
+                else:
+                    person_param['id'] = detail.get('id')
+            return self.client.call('SoftLayer_Network_Subnet_Registration', 'editRegistrationAttachedDetails',
+                                    person_param, network_param, id=registration_id)
+
+        else:
+            new_registration = self.get_registration_template(contact_id, subnet)
+            return self.client.call('SoftLayer_Network_Subnet_Registration', 'createObject', new_registration)
+
     def get_registration_detail_object(self, identifier, mask=None):
         """Calls SoftLayer_Account_Regional_Registry_Detail::getObject()
 
