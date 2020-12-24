@@ -156,3 +156,7 @@ class RegistrationTests(testing.TestCase):
         result = self.run_command(['--really', 'registration', 'subnet-clear', '1234'])
         self.assertIn("Could not clear the subnet", result.exception.message)
         self.assertEqual(result.exit_code, 2)
+
+    def test_update_all(self):
+        result = self.run_command(['registration', 'update-all', '1234'])
+        self.assert_no_fail(result)

@@ -135,3 +135,39 @@ class RegistrationTests(testing.TestCase):
         self.assertEqual(result, True)
         self.assert_called_with('SoftLayer_Network_Subnet_Registration',
                                 'clearRegistration')
+
+    def test_update_all_new(self):
+        contact_id = 55555
+        self.registration_mgr.update_all(contact_id)
+        self.assert_called_with('SoftLayer_Account', 'getPublicSubnets')
+        self.assert_called_with('SoftLayer_Network_Subnet_Registration', 'createObjects')
+
+    def test_update_all_with_active_registration(self):
+        registration_id = 665544
+        fake_subnets = [{
+            'id': 12345,
+            'networkIdentifier': '1.2.3.4',
+            'cidr': '26',
+            'activeRegistration': {
+                'id': registration_id
+            }
+        }]
+        subnet_mock = self.set_mock('SoftLayer_Account', 'getPublicSubnets')
+        subnet_mock.return_value = fake_subnets
+        contact_id = 55555
+        self.registration_mgr.update_all(contact_id)
+        person_param = {
+            'detailId': contact_id,
+            'id': 2971611,  # from getDetailReferences fixture
+            'registrationId': registration_id
+        }
+        network_param = {
+            'detailId': 1672055,  # from getDetailReferences fixture
+            'id': 2971613,  # from getDetailReferences fixture
+            'registrationId': registration_id
+        }
+        self.assert_called_with('SoftLayer_Account', 'getPublicSubnets')
+        self.assert_called_with('SoftLayer_Network_Subnet_Registration', 'editRegistrationAttachedDetails',
+                                args=(person_param, network_param))
+        self.assert_called_with('SoftLayer_Network_Subnet_Registration', 'getDetailReferences',
+                                identifier=registration_id)

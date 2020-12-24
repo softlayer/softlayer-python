@@ -130,3 +130,4 @@ getDetailReferences = [
 
 clearRegistration = True
 
+createObjects = [getObject]
