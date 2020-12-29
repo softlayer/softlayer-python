@@ -194,43 +194,7 @@ class RegistrationManager(object):
         """
         subnet_mask = "mask[id,networkIdentifier,cidr,activeRegistration]"
         subnet = self.client.call('Network_Subnet', 'getObject', id=subnet_id, mask=subnet_mask)
-        active_registration = subnet.get('activeRegistration')
-        #  Active registration need to be edited.
-        if active_registration:
-            #  SoftLayer_Network_Subnet_Registration::editObject() just doesn't seem to work.
-            #  This is how the portal edits a registration, so copying that workflow.
-            registration_id = active_registration.get('id')
-            details = self.client.call('SoftLayer_Network_Subnet_Registration', 'getDetailReferences',
-                                       id=registration_id, mask="mask[detail[detailType]]")
-
-            person_param = {
-                'detailId': contact_id,
-                'id': None,
-                'registrationId': registration_id
-            }
-            network_param = {
-                'detailId': None,
-                'id': None,
-                'registrationId': registration_id
-            }
-            for detail in details:
-                if utils.lookup(detail, 'detail', 'detailType', 'keyName') == "NETWORK":
-                    network_param['id'] = detail.get('id')
-                    network_param['detailId'] = utils.lookup(detail, 'detail', 'id')
-                else:
-                    person_param['id'] = detail.get('id')
-            return self.client.call('SoftLayer_Network_Subnet_Registration', 'editRegistrationAttachedDetails',
-                                    person_param, network_param, id=registration_id)
-
-        else:
-            new_registration = {
-                'networkIdentifier': subnet.get('networkIdentifier'),
-                'cidr': subnet.get('cidr'),
-                'detailReferences': [
-                    {'detailId': contact_id}
-                ],
-            }
-        return self.client.call('SoftLayer_Network_Subnet_Registration', 'createObject', new_registration)
+        return self.register_subnet(subnet, contact_id)
 
     def create_person_record(self, template):
         """Create a person record.
