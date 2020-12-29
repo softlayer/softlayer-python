@@ -36,14 +36,14 @@ class RegistrationManager(object):
             return self.registration.getObject(mask=mask, id=registration['id'])
         return None
 
-    def update_all(self, contact_id, skip_subnets=None):
+    def update_all(self, contact_id, skip_subnets=[]):
         """Updates every subnet to contact
 
         :param list skip_subnets: A list of subnets ids to skip
         :param int contact_id: Id of a Account_Regional_Registry_Detail that is a person
         :return:A list of subnet registrations
         """
-        skip_subnets = [] if skip_subnets is None else skip_subnets
+
         subnets = self.get_public_subnets()
         subnets = [subnet for subnet in subnets if subnet.get('id') not in skip_subnets]
         new_subnets_registration = [subnet for subnet in subnets if subnet.get('activeRegistration') is None]
