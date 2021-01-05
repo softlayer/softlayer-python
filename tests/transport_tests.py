@@ -326,6 +326,40 @@ class TestXmlRpcAPICall(testing.TestCase):
         self.assertIsInstance(resp, transports.SoftLayerListResult)
         self.assertEqual(resp.total_count, 10)
 
+    @mock.patch('SoftLayer.transports.requests.Session.request')
+    def test_call_large_number_response(self, request):
+        response = requests.Response()
+        body = b'''<?xml version="1.0" encoding="utf-8"?>
+<params>
+<param>
+ <value>
+  <array>
+   <data>
+    <value>
+     <struct>
+      <member>
+       <name>bytesUsed</name>
+       <value><int>2666148982056</int></value>
+      </member>
+     </struct>
+    </value>
+   </data>
+  </array>
+ </value>
+</param>
+</params>
+        '''
+        response.raw = io.BytesIO(body)
+        response.headers['SoftLayer-Total-Items'] = 1
+        response.status_code = 200
+        request.return_value = response
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        resp = self.transport(req)
+        self.assertEqual(resp[0]['bytesUsed'], 2666148982056)
+
 
 @mock.patch('SoftLayer.transports.requests.Session.request')
 @pytest.mark.parametrize(

@@ -37,3 +37,12 @@ getCredentials = [
         }
     }
 ]
+
+getBuckets = [
+    {
+        "bytesUsed": 40540117,
+        "name": "normal-bucket",
+        "objectCount": 4,
+        "storageLocation": "us-standard"
+    }
+]
