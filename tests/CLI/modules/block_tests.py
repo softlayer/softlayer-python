@@ -572,18 +572,6 @@ class BlockTests(testing.TestCase):
                          result.output)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
-    @mock.patch('SoftLayer.BlockStorageManager.disaster_recovery_failover_to_replicant')
-    def test_disaster_recovery_failover_unsuccesful(self, disaster_recovery_failover_mock, confirm_mock):
-        confirm_mock.return_value = True
-        disaster_recovery_failover_mock.return_value = False
-
-        result = self.run_command(['block', 'disaster-recovery-failover', '12345678',
-                                   '--replicant-id=5678'])
-
-        self.assertIn('Disaster Recovery Failover operation could not be initiated.\n',
-                         result.output)
-
-    @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_disaster_recovery_failover_aborted(self, confirm_mock):
         confirm_mock.return_value = False
 

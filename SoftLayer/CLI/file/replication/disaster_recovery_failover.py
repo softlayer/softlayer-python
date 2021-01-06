@@ -24,11 +24,9 @@ def cli(env, volume_id, replicant_id):
     if not (formatting.confirm('Are you sure you want to continue?')):
         raise exceptions.CLIAbort('Aborted.')
 
-    success = file_storage_manager.disaster_recovery_failover_to_replicant(
+    file_storage_manager.disaster_recovery_failover_to_replicant(
         volume_id,
         replicant_id
     )
-    if success:
-        click.echo("Disaster Recovery Failover to replicant is now in progress.")
-    else:
-        click.echo("Disaster Recovery Failover operation could not be initiated.")
+    
+    click.echo("Disaster Recovery Failover to replicant is now in progress.")
