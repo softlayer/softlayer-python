@@ -142,3 +142,7 @@ Block Commands
 .. click:: SoftLayer.CLI.block.set_note:cli
     :prog: block volume-set-note
     :show-nested:
+
+.. click:: SoftLayer.CLI.block.replication.disaster_recovery_failover:cli
+    :prog: block disaster-recovery-failover
+    :show-nested:

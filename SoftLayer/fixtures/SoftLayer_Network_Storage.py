@@ -221,6 +221,7 @@ removeAccessFromHostList = True
 failoverToReplicant = True
 failbackFromReplicant = True
 restoreFromSnapshot = True
+disasterRecoveryFailoverToReplicant = True
 
 createSnapshot = {
     'id': 449
