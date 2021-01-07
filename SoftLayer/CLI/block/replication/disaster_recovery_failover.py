@@ -8,7 +8,10 @@ from SoftLayer.CLI import formatting
 from SoftLayer.CLI import exceptions
 
 
-@click.command()
+@click.command(epilog="""Failover an inaccessible block/file volume to its available replicant volume.
+If a volume (with replication) becomes inaccessible due to a disaster event, this method can be used to immediately failover to an available replica in another location.
+This method does not allow for fail back via the API. To fail back to the original volume after using this method, open a support ticket.
+To test failover, use SoftLayer_Network_Storage::failoverToReplicant instead.""")
 @click.argument('volume-id')
 @click.option('--replicant-id', help="ID of the replicant volume")
 @environment.pass_env
@@ -16,10 +19,11 @@ def cli(env, volume_id, replicant_id):
     """Failover an inaccessible file volume to its available replicant volume."""
     block_storage_manager = SoftLayer.BlockStorageManager(env.client)
 
-    click.secho("""WARNING:Disaster Recovery Failover a block volume to the given replicant volume.\n"""
-                """* This action cannot be undone\n"""
-                """* You will not be able to perform failback to the original\n"""
-                """* You cannot failover without replica""",fg = 'red' )
+    click.secho("""WARNING : Failover an inaccessible block/file volume to its available replicant volume."""
+                """If a volume (with replication) becomes inaccessible due to a disaster event, this method can be used to immediately failover to an available replica in another location."""
+                """This method does not allow for fail back via the API."""
+                """To fail back to the original volume after using this method, open a support ticket."""
+                """To test failover, use SoftLayer_Network_Storage::failoverToReplicant instead.""",fg = 'red' )
    
     if not (formatting.confirm('Are you sure you want to continue?')):
         raise exceptions.CLIAbort('Aborted.')
