@@ -16,7 +16,9 @@ COLUMNS = [
     column_helper.Column('displayName', ('displayName',)),
     column_helper.Column('status', ('userStatus', 'name')),
     column_helper.Column('hardwareCount', ('hardwareCount',)),
-    column_helper.Column('virtualGuestCount', ('virtualGuestCount',))
+    column_helper.Column('virtualGuestCount', ('virtualGuestCount',)),
+    column_helper.Column('2FAs', ('externalBindingCount',)),
+    column_helper.Column('classicAPIKeys', ('apiAuthenticationKeyCount',))
 ]
 
 DEFAULT_COLUMNS = [
