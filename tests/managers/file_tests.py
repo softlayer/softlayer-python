@@ -290,16 +290,16 @@ class FileTests(testing.TestCase):
         )
 
     def test_disaster_recovery_failover(self):
-            result = self.file.disaster_recovery_failover_to_replicant(1234, 5678)
+        result = self.file.disaster_recovery_failover_to_replicant(1234, 5678)
 
-            self.assertEqual(
-                SoftLayer_Network_Storage.disasterRecoveryFailoverToReplicant, result)
-            self.assert_called_with(
-                'SoftLayer_Network_Storage',
-                'disasterRecoveryFailoverToReplicant',
-                args=(5678,),
-                identifier=1234,
-            )
+        self.assertEqual(
+            SoftLayer_Network_Storage.disasterRecoveryFailoverToReplicant, result)
+        self.assert_called_with(
+            'SoftLayer_Network_Storage',
+            'disasterRecoveryFailoverToReplicant',
+            args=(5678,),
+            identifier=1234,
+        )
 
     def test_replicant_failback(self):
         result = self.file.failback_from_replicant(1234)

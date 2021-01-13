@@ -405,7 +405,7 @@ class StorageManager(utils.IdentifierMixin, object):
         :param integer replicant: ID of replicant to failover to
         :return: Returns whether failover to successful or not
         """
-        return self.client.call('Network_Storage', 'disasterRecoveryFailoverToReplicant', replicant_id, id=volume_id)    
+        return self.client.call('Network_Storage', 'disasterRecoveryFailoverToReplicant', replicant_id, id=volume_id)
 
     def failback_from_replicant(self, volume_id):
         """Failback from a volume replicant.
@@ -413,7 +413,6 @@ class StorageManager(utils.IdentifierMixin, object):
         :param integer volume_id: The id of the volume
         :return: Returns whether failback was successful or not
         """
-        
         return self.client.call('Network_Storage', 'failbackFromReplicant', id=volume_id)
 
     def cancel_volume(self, volume_id, reason='No longer needed', immediate=False):

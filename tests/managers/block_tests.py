@@ -394,7 +394,7 @@ class BlockTests(testing.TestCase):
             'disasterRecoveryFailoverToReplicant',
             args=(5678,),
             identifier=1234,
-        )        
+        )
 
     def test_replicant_failback(self):
         result = self.block.failback_from_replicant(1234)

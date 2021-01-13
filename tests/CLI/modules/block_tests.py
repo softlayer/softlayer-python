@@ -4,9 +4,10 @@
 
     :license: MIT, see LICENSE for more details.
 """
+from SoftLayer.CLI import exceptions
 from SoftLayer import SoftLayerAPIError
 from SoftLayer import testing
-from SoftLayer.CLI import exceptions
+
 
 import json
 import mock
@@ -497,9 +498,8 @@ class BlockTests(testing.TestCase):
                                    '--replicant-id=5678'])
 
         self.assert_no_fail(result)
-        self.assertEqual('Failover to replicant is now in progress.\n',
-                         result.output)
-    
+        self.assertEqual('Failover to replicant is now in progress.\n', result.output)
+
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     @mock.patch('SoftLayer.BlockStorageManager.disaster_recovery_failover_to_replicant')
     def test_disaster_recovery_failover(self, disaster_recovery_failover_mock, confirm_mock):
@@ -509,8 +509,7 @@ class BlockTests(testing.TestCase):
                                    '--replicant-id=5678'])
 
         self.assert_no_fail(result)
-        self.assertIn('Disaster Recovery Failover to replicant is now in progress.\n',
-                         result.output)
+        self.assertIn('Disaster Recovery Failover to replicant is now in progress.\n', result.output)
 
     def test_replication_locations(self):
         result = self.run_command(['block', 'replica-locations', '1234'])
@@ -579,7 +578,7 @@ class BlockTests(testing.TestCase):
                                    '--replicant-id=5678'])
 
         self.assertEqual(result.exit_code, 2)
-        self.assertIsInstance(result.exception, exceptions.CLIAbort)    
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
     def test_replicant_failback(self):
         result = self.run_command(['block', 'replica-failback', '12345678'])
