@@ -151,6 +151,8 @@ instances[id, billingItem[description, hourlyRecurringFee]], instanceCount, back
 
         # Reserved capacity only supports SAN as of 20181008
         guest_object['local_disk'] = False
+        guest_object['use_hourly_pricing'] = False
+
         template = vs_manager.verify_create_instance(**guest_object)
         template['reservedCapacityId'] = capacity_id
         if guest_object.get('ipv6'):

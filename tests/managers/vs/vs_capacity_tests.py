@@ -116,7 +116,7 @@ class VSManagerCapacityTests(testing.TestCase):
             'disks': (),
             'domain': 'test.com',
             'hostname': 'A1538172419',
-            'hourly': True,
+            'hourly': False,
             'ipv6': True,
             'local_disk': None,
             'os_code': 'UBUNTU_LATEST_64',
@@ -132,7 +132,7 @@ class VSManagerCapacityTests(testing.TestCase):
             'maxMemory': None,
             'hostname': 'A1538172419',
             'domain': 'test.com',
-            'useHourlyPricing': True,
+            'useHourlyPricing': False,
             'supplementalCreateObjectOptions': {
                 'bootMode': None,
                 'flavorKeyName': 'B1_1X2X25'
