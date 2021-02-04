@@ -470,6 +470,7 @@ class VSManager(utils.IdentifierMixin, object):
             datacenter=None, os_code=None, image_id=None,
             dedicated=False, public_vlan=None, private_vlan=None,
             private_subnet=None, public_subnet=None,
+            public_router=None, private_router=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
             private=False, ssh_keys=None, public_security_groups=None,
             private_security_groups=None, boot_mode=None, transient=False, **kwargs):
@@ -533,6 +534,15 @@ class VSManager(utils.IdentifierMixin, object):
         if datacenter:
             data["datacenter"] = {"name": datacenter}
 
+        if private_router or public_router:
+            if private_vlan or public_vlan or private_subnet or public_subnet:
+                raise exceptions.SoftLayerError("You have to select network vlan or network vlan with a subnet or "
+                                                "only router, not all options")
+            network_components = self._create_network_components(public_vlan, private_vlan,
+                                                                 private_subnet, public_subnet,
+                                                                 private_router, public_router)
+            data.update(network_components)
+
         if private_vlan or public_vlan or private_subnet or public_subnet:
             network_components = self._create_network_components(public_vlan, private_vlan,
                                                                  private_subnet, public_subnet)
@@ -581,7 +591,8 @@ class VSManager(utils.IdentifierMixin, object):
 
     def _create_network_components(
             self, public_vlan=None, private_vlan=None,
-            private_subnet=None, public_subnet=None):
+            private_subnet=None, public_subnet=None,
+            private_router=None, public_router=None):
         parameters = {}
         if private_vlan:
             parameters['primaryBackendNetworkComponent'] = {"networkVlan": {"id": int(private_vlan)}}
@@ -597,6 +608,12 @@ class VSManager(utils.IdentifierMixin, object):
                 raise exceptions.SoftLayerError("You need to specify a private_vlan with private_subnet")
 
             parameters['primaryBackendNetworkComponent']['networkVlan']['primarySubnet'] = {'id': int(private_subnet)}
+
+        if private_router:
+            parameters['primaryBackendNetworkComponent'] = {"router": {"id": int(private_router)}}
+
+        if public_router:
+            parameters['primaryNetworkComponent'] = {"router": {"id": int(public_router)}}
 
         return parameters
 
@@ -685,13 +702,30 @@ class VSManager(utils.IdentifierMixin, object):
         kwargs.pop('tags', None)
         create_options = self._generate_create_dict(**kwargs)
         template = self.guest.generateOrderTemplate(create_options)
-        if 'private_subnet' in kwargs or 'public_subnet' in kwargs:
+        if kwargs.get('public_router') or kwargs.get('private_router'):
+            if kwargs.get('private_vlan') or kwargs.get('public_vlan') or kwargs.get('private_subnet') \
+                    or kwargs.get('public_subnet'):
+                raise exceptions.SoftLayerError("You have to select network vlan or network vlan with a subnet or "
+                                                "only router, not all options")
+            vsi = template['virtualGuests'][0]
+            network_components = self._create_network_components(kwargs.get('public_vlan', None),
+                                                                 kwargs.get('private_vlan', None),
+                                                                 kwargs.get('private_subnet', None),
+                                                                 kwargs.get('public_subnet', None),
+                                                                 kwargs.get('private_router', None),
+                                                                 kwargs.get('public_router', None))
+            vsi.update(network_components)
+
+        if kwargs.get('private_subnet') or kwargs.get('public_subnet'):
             vsi = template['virtualGuests'][0]
             network_components = self._create_network_components(kwargs.get('public_vlan', None),
                                                                  kwargs.get('private_vlan', None),
                                                                  kwargs.get('private_subnet', None),
                                                                  kwargs.get('public_subnet', None))
             vsi.update(network_components)
+
+        print("template")
+        print(template)
 
         return template
 
@@ -1121,6 +1155,7 @@ class VSManager(utils.IdentifierMixin, object):
         if guest_object.get('placement_id'):
             template['virtualGuests'][0]['placementGroupId'] = guest_object.get('placement_id')
 
+        print(template)
         if test:
             result = self.client.call('Product_Order', 'verifyOrder', template)
         else:
