@@ -5,6 +5,7 @@
     :license: MIT, see LICENSE for more details.
 """
 import json
+from unittest import mock
 
 from SoftLayer import testing
 
@@ -82,25 +83,11 @@ class ObjectStorageTests(testing.TestCase):
         self.assertEqual(json.loads(result.output), [{'limit': 2}])
 
     def test_list_credential(self):
-        accounts = self.set_mock('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'getCredentials')
-        accounts.return_value = [{'id': 1103123,
-                                  'password': 'nwUEUsx6PiEoN0B1Xe9z9hUCyXM',
-                                  'type': {'name': 'S3 Compatible Signature'},
-                                  'username': 'XfHhBNBPlPdlWya'},
-                                 {'id': 1103333,
-                                  'password': 'nwUEUsx6PiEoN0B1Xe9z9',
-                                  'type': {'name': 'S3 Compatible Signature'},
-                                  'username': 'XfHhBNBPlPd'}]
-
         result = self.run_command(['object-storage', 'credential', 'list', '100'])
-
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         [{'id': 1103123,
-                           'password': 'nwUEUsx6PiEoN0B1Xe9z9hUCyXM',
-                           'type_name': 'S3 Compatible Signature',
-                           'username': 'XfHhBNBPlPdlWya'},
-                          {'id': 1103333,
-                           'password': 'nwUEUsx6PiEoN0B1Xe9z9',
-                           'type_name': 'S3 Compatible Signature',
-                           'username': 'XfHhBNBPlPd'}])
+
+    @mock.patch('SoftLayer.CLI.helpers.resolve_id')
+    def test_list_credential_by_username(self, resolve_id_mock):
+        resolve_id_mock.return_value = 100
+        result = self.run_command(['object-storage', 'credential', 'list', 'test'])
+        self.assert_no_fail(result)
