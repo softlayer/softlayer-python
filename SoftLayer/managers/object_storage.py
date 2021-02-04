@@ -27,10 +27,10 @@ class ObjectStorageManager(object):
     def __init__(self, client):
         self.client = client
 
-    def list_accounts(self):
+    def list_accounts(self, limit=10):
         """Lists your object storage accounts."""
         return self.client.call('Account', 'getHubNetworkStorage',
-                                mask=LIST_ACCOUNTS_MASK)
+                                mask=LIST_ACCOUNTS_MASK, iter=True, limit=limit)
 
     def list_endpoints(self):
         """Lists the known object storage endpoints."""
