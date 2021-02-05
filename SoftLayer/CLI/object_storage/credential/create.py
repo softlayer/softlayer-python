@@ -6,6 +6,7 @@ import click
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 
 
 @click.command()
@@ -15,14 +16,15 @@ def cli(env, identifier):
     """Create credentials for an IBM Cloud Object Storage Account"""
 
     mgr = SoftLayer.ObjectStorageManager(env.client)
-    credential = mgr.create_credential(identifier)
+    storage_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'Object Storage')
+    credential = mgr.create_credential(storage_id)
     table = formatting.Table(['id', 'password', 'username', 'type_name'])
     table.sortby = 'id'
     table.add_row([
-        credential['id'],
-        credential['password'],
-        credential['username'],
-        credential['type']['name']
+        credential.get('id'),
+        credential.get('password'),
+        credential.get('username'),
+        credential.get('type', {}).get('name')
     ])
 
     env.fout(table)
