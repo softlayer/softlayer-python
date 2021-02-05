@@ -6,6 +6,7 @@
 """
 import SoftLayer
 from SoftLayer import fixtures
+from SoftLayer import SoftLayerError
 from SoftLayer import testing
 
 
@@ -91,3 +92,14 @@ class ObjectStorageTests(testing.TestCase):
         identifier = self.object_storage.resolve_ids('test')
         self.assertEqual(identifier, [12345])
         self.assert_called_with('SoftLayer_Account', 'getHubNetworkStorage')
+
+    def test_resolve_ids_fail_multiple(self):
+        accounts = self.set_mock('SoftLayer_Account', 'getHubNetworkStorage')
+        accounts.return_value = [{'id': 12345, 'username': 'test'},
+                                 {'id': 12345, 'username': 'test'}]
+        self.assertRaises(SoftLayerError, self.object_storage.resolve_ids, 'test')
+
+    def test_resolve_ids_fail_no_found(self):
+        accounts = self.set_mock('SoftLayer_Account', 'getHubNetworkStorage')
+        accounts.return_value = []
+        self.assertRaises(SoftLayerError, self.object_storage.resolve_ids, 'test')
