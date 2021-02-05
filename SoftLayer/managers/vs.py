@@ -470,7 +470,6 @@ class VSManager(utils.IdentifierMixin, object):
             datacenter=None, os_code=None, image_id=None,
             dedicated=False, public_vlan=None, private_vlan=None,
             private_subnet=None, public_subnet=None,
-            public_router=None, private_router=None,
             userdata=None, nic_speed=None, disks=None, post_uri=None,
             private=False, ssh_keys=None, public_security_groups=None,
             private_security_groups=None, boot_mode=None, transient=False, **kwargs):
@@ -534,13 +533,14 @@ class VSManager(utils.IdentifierMixin, object):
         if datacenter:
             data["datacenter"] = {"name": datacenter}
 
-        if private_router or public_router:
+        if kwargs.get('private_router') or kwargs.get('public_router'):
             if private_vlan or public_vlan or private_subnet or public_subnet:
                 raise exceptions.SoftLayerError("You have to select network vlan or network vlan with a subnet or "
                                                 "only router, not all options")
             network_components = self._create_network_components(public_vlan, private_vlan,
                                                                  private_subnet, public_subnet,
-                                                                 private_router, public_router)
+                                                                 kwargs.get('private_router'),
+                                                                 kwargs.get('public_router'))
             data.update(network_components)
 
         if private_vlan or public_vlan or private_subnet or public_subnet:
