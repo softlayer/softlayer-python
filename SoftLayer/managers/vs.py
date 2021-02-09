@@ -533,7 +533,11 @@ class VSManager(utils.IdentifierMixin, object):
         if datacenter:
             data["datacenter"] = {"name": datacenter}
 
-        self.get_network_components(data, kwargs, private_subnet, private_vlan, public_subnet, public_vlan)
+        network_components = self._create_network_components(public_vlan, private_vlan,
+                                                             private_subnet, public_subnet,
+                                                             kwargs.get('private_router'),
+                                                             kwargs.get('public_router'))
+        data.update(network_components)
 
         if public_security_groups:
             secgroups = [{'securityGroup': {'id': int(sg)}}
@@ -576,35 +580,19 @@ class VSManager(utils.IdentifierMixin, object):
 
         return data
 
-    def get_network_components(self, data, kwargs, private_subnet, private_vlan, public_subnet, public_vlan):
-        """Get the network components structure.
-
-        :param data: Array variable to add the network structure.
-        :param kwargs: Vs item list.
-        :param int private_subnet: Private subnet id.
-        :param int private_vlan: Private vlan id.
-        :param int public_subnet: Public subnet id.
-        :param int public_vlan: Public vlan id.
-        """
-        if kwargs.get('private_router') or kwargs.get('public_router'):
-            if private_vlan or public_vlan or private_subnet or public_subnet:
-                raise exceptions.SoftLayerError("You have to select network vlan or network vlan with a subnet or "
-                                                "only router, not all options")
-            network_components = self._create_network_components(public_vlan, private_vlan,
-                                                                 private_subnet, public_subnet,
-                                                                 kwargs.get('private_router'),
-                                                                 kwargs.get('public_router'))
-            data.update(network_components)
-        if private_vlan or public_vlan or private_subnet or public_subnet:
-            network_components = self._create_network_components(public_vlan, private_vlan,
-                                                                 private_subnet, public_subnet)
-            data.update(network_components)
-
     def _create_network_components(
             self, public_vlan=None, private_vlan=None,
             private_subnet=None, public_subnet=None,
             private_router=None, public_router=None):
         parameters = {}
+        if any([private_router, public_router]) and any([private_vlan, public_vlan, private_subnet, public_subnet]):
+            raise exceptions.SoftLayerError("You have to select network vlan or network vlan with a subnet or "
+                                            "only router, not all options")
+
+        if private_router:
+            parameters['primaryBackendNetworkComponent'] = {"router": {"id": int(private_router)}}
+        if public_router:
+            parameters['primaryNetworkComponent'] = {"router": {"id": int(public_router)}}
         if private_vlan:
             parameters['primaryBackendNetworkComponent'] = {"networkVlan": {"id": int(private_vlan)}}
         if public_vlan:
@@ -619,12 +607,6 @@ class VSManager(utils.IdentifierMixin, object):
                 raise exceptions.SoftLayerError("You need to specify a private_vlan with private_subnet")
 
             parameters['primaryBackendNetworkComponent']['networkVlan']['primarySubnet'] = {'id': int(private_subnet)}
-
-        if private_router:
-            parameters['primaryBackendNetworkComponent'] = {"router": {"id": int(private_router)}}
-
-        if public_router:
-            parameters['primaryNetworkComponent'] = {"router": {"id": int(public_router)}}
 
         return parameters
 

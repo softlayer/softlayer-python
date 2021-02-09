@@ -641,6 +641,18 @@ class VSTests(testing.TestCase):
 
         self.assertEqual(data, assert_data)
 
+    def test_create_network_components_by_routers_and_vlan(self):
+        actual = self.assertRaises(
+            exceptions.SoftLayerError,
+            self.vs._create_network_components,
+            private_router=1,
+            public_router=1,
+            private_vlan=1
+        )
+
+        self.assertEqual(str(actual), "You have to select network vlan or network vlan with a subnet or only router, "
+                                      "not all options")
+
     def test_create_network_components_vlan_subnet_private(self):
         data = self.vs._create_network_components(
             private_vlan=1,
