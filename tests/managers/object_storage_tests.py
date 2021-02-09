@@ -6,6 +6,7 @@
 """
 import SoftLayer
 from SoftLayer import fixtures
+from SoftLayer import SoftLayerError
 from SoftLayer import testing
 
 
@@ -79,43 +80,26 @@ class ObjectStorageTests(testing.TestCase):
         self.assertEqual(credential, 2)
 
     def test_list_credential(self):
-        accounts = self.set_mock('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'getCredentials')
-        accounts.return_value = [
-            {
-                "id": 1103123,
-                "password": "nwUEUsx6PiEoN0B1Xe9z9hUCyXsf4sf",
-                "username": "XfHhBNBPlPdlWyaP3fsd",
-                "type": {
-                    "name": "S3 Compatible Signature"
-                }
-            },
-            {
-                "id": 1102341,
-                "password": "nwUEUsx6PiEoN0B1Xe9z9hUCyXMkAF",
-                "username": "XfHhBNBPlPdlWyaP",
-                "type": {
-                    "name": "S3 Compatible Signature"
-                }
-            }
-        ]
-        credential = self.object_storage.list_credential(100)
-        self.assertEqual(credential,
-                         [
-                             {
-                                 "id": 1103123,
-                                 "password": "nwUEUsx6PiEoN0B1Xe9z9hUCyXsf4sf",
-                                 "username": "XfHhBNBPlPdlWyaP3fsd",
-                                 "type": {
-                                     "name": "S3 Compatible Signature"
-                                 }
-                             },
-                             {
-                                 "id": 1102341,
-                                 "password": "nwUEUsx6PiEoN0B1Xe9z9hUCyXMkAF",
-                                 "username": "XfHhBNBPlPdlWyaP",
-                                 "type": {
-                                     "name": "S3 Compatible Signature"
-                                 }
-                             }
-                         ]
-                         )
+        credentials = self.object_storage.list_credential(100)
+        self.assertIsInstance(credentials, list)
+        self.assert_called_with('SoftLayer_Network_Storage_Hub_Cleversafe_Account',
+                                'getCredentials',
+                                identifier=100)
+
+    def test_resolve_ids(self):
+        accounts = self.set_mock('SoftLayer_Account', 'getHubNetworkStorage')
+        accounts.return_value = [{'id': 12345, 'username': 'test'}]
+        identifier = self.object_storage.resolve_ids('test')
+        self.assertEqual(identifier, [12345])
+        self.assert_called_with('SoftLayer_Account', 'getHubNetworkStorage')
+
+    def test_resolve_ids_fail_multiple(self):
+        accounts = self.set_mock('SoftLayer_Account', 'getHubNetworkStorage')
+        accounts.return_value = [{'id': 12345, 'username': 'test'},
+                                 {'id': 12345, 'username': 'test'}]
+        self.assertRaises(SoftLayerError, self.object_storage.resolve_ids, 'test')
+
+    def test_resolve_ids_fail_no_found(self):
+        accounts = self.set_mock('SoftLayer_Account', 'getHubNetworkStorage')
+        accounts.return_value = []
+        self.assertRaises(SoftLayerError, self.object_storage.resolve_ids, 'test')

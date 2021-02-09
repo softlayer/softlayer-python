@@ -46,3 +46,7 @@ getBuckets = [
         "storageLocation": "us-standard"
     }
 ]
+
+getCredentialLimit = 2
+
+credentialDelete = True
