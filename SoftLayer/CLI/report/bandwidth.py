@@ -176,7 +176,7 @@ def _get_virtual_bandwidth(env, start, end):
     '--start',
     callback=_validate_datetime,
     default=(
-        datetime.datetime.now() - datetime.timedelta(days=30)
+            datetime.datetime.now() - datetime.timedelta(days=30)
     ).strftime('%Y-%m-%d'),
     help="datetime in the format 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS'")
 @click.option(
@@ -187,8 +187,12 @@ def _get_virtual_bandwidth(env, start, end):
 @click.option('--sortby', help='Column to sort by',
               default='hostname',
               show_default=True)
+@click.option('--virtual', is_flag=True, help='show the all bandwidth summary virtual',
+              default=False)
+@click.option('--server', is_flag=True, help='show the all bandwidth summary bare metal',
+              default=False)
 @environment.pass_env
-def cli(env, start, end, sortby):
+def cli(env, start, end, sortby, virtual, server):
     """Bandwidth report for every pool/server.
 
     This reports on the total data transfered for each virtual sever, hardware
@@ -213,24 +217,46 @@ def cli(env, start, end, sortby):
         return (result['counter'] for result in results
                 if result['type'] == key)
 
-    try:
+    def _input_to_table(item):
+        "Input metric data to table"
+        pub_in = int(sum(f_type('publicIn_net_octet', item['data'])))
+        pub_out = int(sum(f_type('publicOut_net_octet', item['data'])))
+        pri_in = int(sum(f_type('privateIn_net_octet', item['data'])))
+        pri_out = int(sum(f_type('privateOut_net_octet', item['data'])))
+        table.add_row([
+            item['type'],
+            item['name'],
+            formatting.b_to_gb(pub_in),
+            formatting.b_to_gb(pub_out),
+            formatting.b_to_gb(pri_in),
+            formatting.b_to_gb(pri_out),
+            item.get('pool') or formatting.blank(),
+        ])
+
+    if virtual:
         for item in itertools.chain(_get_pooled_bandwidth(env, start, end),
-                                    _get_virtual_bandwidth(env, start, end),
-                                    _get_hardware_bandwidth(env, start, end)):
-            pub_in = int(sum(f_type('publicIn_net_octet', item['data'])))
-            pub_out = int(sum(f_type('publicOut_net_octet', item['data'])))
-            pri_in = int(sum(f_type('privateIn_net_octet', item['data'])))
-            pri_out = int(sum(f_type('privateOut_net_octet', item['data'])))
-            table.add_row([
-                item['type'],
-                item['name'],
-                formatting.b_to_gb(pub_in),
-                formatting.b_to_gb(pub_out),
-                formatting.b_to_gb(pri_in),
-                formatting.b_to_gb(pri_out),
-                item.get('pool') or formatting.blank(),
-            ])
-    except KeyboardInterrupt:
-        env.err("Printing collected results and then aborting.")
+                                    _get_virtual_bandwidth(env, start, end)):
+            _input_to_table(item)
+        try:
+            pass
+        except KeyboardInterrupt:
+            env.err("Printing virtual collected results and then aborting.")
+
+    elif server:
+        try:
+            for item in itertools.chain(_get_pooled_bandwidth(env, start, end),
+                                        _get_hardware_bandwidth(env, start, end)):
+                _input_to_table(item)
+        except KeyboardInterrupt:
+            env.err("Printing server collected results and then aborting.")
+    else:
+        for item in itertools.chain(_get_pooled_bandwidth(env, start, end),
+                                    _get_hardware_bandwidth(env, start, end),
+                                    _get_virtual_bandwidth(env, start, end)):
+            _input_to_table(item)
+        try:
+            pass
+        except KeyboardInterrupt:
+            env.err("Printing collected results and then aborting.")
 
     env.out(env.fmt(table))
