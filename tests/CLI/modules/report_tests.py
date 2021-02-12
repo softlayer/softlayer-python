@@ -102,7 +102,7 @@ class ReportTests(testing.TestCase):
                 'private_out': 40,
                 'public_in': 10,
                 'public_out': 20,
-                'type': 'pool',
+                'type': 'pool'
             }, {
                 'hostname': 'pool3',
                 'pool': None,
@@ -110,7 +110,7 @@ class ReportTests(testing.TestCase):
                 'private_out': 40,
                 'public_in': 10,
                 'public_out': 20,
-                'type': 'pool',
+                'type': 'pool'
             }, {
                 'hostname': 'host1',
                 'pool': None,
@@ -118,7 +118,23 @@ class ReportTests(testing.TestCase):
                 'private_out': 40,
                 'public_in': 10,
                 'public_out': 20,
-                'type': 'virtual',
+                'type': 'hardware'
+            }, {
+                'hostname': 'host3',
+                'pool': None,
+                'private_in': 30,
+                'private_out': 40,
+                'public_in': 10,
+                'public_out': 20,
+                'type': 'hardware'
+            }, {
+                'hostname': 'host1',
+                'pool': None,
+                'private_in': 30,
+                'private_out': 40,
+                'public_in': 10,
+                'public_out': 20,
+                'type': 'virtual'
             }, {
                 'hostname': 'host3',
                 'pool': 2,
@@ -126,24 +142,7 @@ class ReportTests(testing.TestCase):
                 'private_out': 40,
                 'public_in': 10,
                 'public_out': 20,
-                'type': 'virtual',
-            }, {
-                'hostname': 'host1',
-                'pool': None,
-                'private_in': 30,
-                'private_out': 40,
-                'public_in': 10,
-                'public_out': 20,
-                'type': 'hardware',
-            }, {
-                'hostname': 'host3',
-                'pool': None,
-                'private_in': 30,
-                'private_out': 40,
-                'public_in': 10,
-                'public_out': 20,
-                'type': 'hardware',
-            }],
+                'type': 'virtual'}],
             json.loads(stripped_output),
         )
         self.assertEqual(
