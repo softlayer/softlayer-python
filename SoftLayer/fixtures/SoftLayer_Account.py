@@ -691,13 +691,17 @@ getUsers = [
      'id': 11100,
      'userStatus': {'name': 'Active'},
      'username': 'SL1234',
-     'virtualGuestCount': 99},
+     'virtualGuestCount': 99,
+     'externalBindingCount': 1,
+     'apiAuthenticationKeyCount': 1,
+     },
     {'displayName': 'PulseL',
      'hardwareCount': 100,
      'id': 11111,
      'userStatus': {'name': 'Active'},
      'username': 'sl1234-abob',
-     'virtualGuestCount': 99}
+     'virtualGuestCount': 99,
+     }
 ]
 
 getReservedCapacityGroups = [
