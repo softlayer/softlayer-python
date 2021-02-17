@@ -318,6 +318,52 @@ class HardwareTests(testing.TestCase):
             'port_speed': 10,
             'hourly': True,
             'extras': ['1_IPV6_ADDRESS'],
+            'post_uri': 'http://example.com/script.php',
+            'ssh_keys': [10],
+        }
+
+        package = 'BARE_METAL_SERVER'
+        location = 'wdc07'
+        item_keynames = [
+            '1_IP_ADDRESS',
+            'UNLIMITED_SSL_VPN_USERS_1_PPTP_VPN_USER_PER_ACCOUNT',
+            'REBOOT_KVM_OVER_IP',
+            'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
+            'BANDWIDTH_0_GB_2',
+            '10_MBPS_PUBLIC_PRIVATE_NETWORK_UPLINKS',
+            '1_IPV6_ADDRESS'
+        ]
+        hourly = True
+        preset_keyname = 'S1270_8GB_2X1TBSATA_NORAID'
+        extras = {
+            'hardware': [{
+                'domain': 'giggles.woo',
+                'hostname': 'unicorn',
+            }],
+            'provisionScripts': ['http://example.com/script.php'],
+            'sshKeys': [{'sshKeyIds': [10]}]
+        }
+
+        data = self.hardware._generate_create_dict(**args)
+
+        self.assertEqual(package, data['package_keyname'])
+        self.assertEqual(location, data['location'])
+        for keyname in item_keynames:
+            self.assertIn(keyname, data['item_keynames'])
+        self.assertEqual(extras, data['extras'])
+        self.assertEqual(preset_keyname, data['preset_keyname'])
+        self.assertEqual(hourly, data['hourly'])
+
+    def test_generate_create_dict_by_router_network_component(self):
+        args = {
+            'size': 'S1270_8GB_2X1TBSATA_NORAID',
+            'hostname': 'unicorn',
+            'domain': 'giggles.woo',
+            'location': 'wdc07',
+            'os': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
+            'port_speed': 10,
+            'hourly': True,
+            'extras': ['1_IPV6_ADDRESS'],
             'public_router': 1111,
             'private_router': 1234
         }
