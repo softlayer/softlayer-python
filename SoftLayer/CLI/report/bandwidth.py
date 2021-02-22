@@ -187,9 +187,9 @@ def _get_virtual_bandwidth(env, start, end):
 @click.option('--sortby', help='Column to sort by',
               default='hostname',
               show_default=True)
-@click.option('--virtual', is_flag=True, help='show the all bandwidth summary virtual',
+@click.option('--virtual', is_flag=True, help='Show the all bandwidth summary for each virtual server',
               default=False)
-@click.option('--server', is_flag=True, help='show the all bandwidth summary bare metal',
+@click.option('--server', is_flag=True, help='show the all bandwidth summary for each hardware server',
               default=False)
 @environment.pass_env
 def cli(env, start, end, sortby, virtual, server):
@@ -233,30 +233,21 @@ def cli(env, start, end, sortby, virtual, server):
             item.get('pool') or formatting.blank(),
         ])
 
-    if virtual:
-        for item in itertools.chain(_get_pooled_bandwidth(env, start, end),
-                                    _get_virtual_bandwidth(env, start, end)):
-            _input_to_table(item)
-        try:
-            pass
-        except KeyboardInterrupt:
-            env.err("Printing virtual collected results and then aborting.")
-
-    elif server:
-        try:
+    try:
+        if virtual:
+            for item in itertools.chain(_get_pooled_bandwidth(env, start, end),
+                                        _get_virtual_bandwidth(env, start, end)):
+                _input_to_table(item)
+        elif server:
             for item in itertools.chain(_get_pooled_bandwidth(env, start, end),
                                         _get_hardware_bandwidth(env, start, end)):
                 _input_to_table(item)
-        except KeyboardInterrupt:
-            env.err("Printing server collected results and then aborting.")
-    else:
-        for item in itertools.chain(_get_pooled_bandwidth(env, start, end),
-                                    _get_hardware_bandwidth(env, start, end),
-                                    _get_virtual_bandwidth(env, start, end)):
-            _input_to_table(item)
-        try:
-            pass
-        except KeyboardInterrupt:
-            env.err("Printing collected results and then aborting.")
+        else:
+            for item in itertools.chain(_get_pooled_bandwidth(env, start, end),
+                                        _get_hardware_bandwidth(env, start, end),
+                                        _get_virtual_bandwidth(env, start, end)):
+                _input_to_table(item)
+    except KeyboardInterrupt:
+        env.err("Printing collected results and then aborting.")
 
     env.out(env.fmt(table))
