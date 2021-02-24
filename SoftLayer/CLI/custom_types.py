@@ -9,6 +9,7 @@
 import click
 
 
+# pylint: disable=inconsistent-return-statements
 class NetworkParamType(click.ParamType):
     """Validates a network parameter type and converts to a tuple.
 
@@ -18,7 +19,7 @@ class NetworkParamType(click.ParamType):
     """
     name = 'network'
 
-    def convert(self, value, param, ctx):  # pylint: disable=inconsistent-return-statements
+    def convert(self, value, param, ctx):
         try:
             # Inlined from python standard ipaddress module
             # https://docs.python.org/3/library/ipaddress.html

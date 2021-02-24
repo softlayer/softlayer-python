@@ -175,9 +175,8 @@ def _get_virtual_bandwidth(env, start, end):
 @click.option(
     '--start',
     callback=_validate_datetime,
-    default=(
-            datetime.datetime.now() - datetime.timedelta(days=30)
-    ).strftime('%Y-%m-%d'),
+    default=(datetime.datetime.now() - datetime.timedelta(days=30)
+             ).strftime('%Y-%m-%d'),
     help="datetime in the format 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS'")
 @click.option(
     '--end',
@@ -187,9 +186,11 @@ def _get_virtual_bandwidth(env, start, end):
 @click.option('--sortby', help='Column to sort by',
               default='hostname',
               show_default=True)
-@click.option('--virtual', is_flag=True, help='Show the all bandwidth summary for each virtual server',
+@click.option('--virtual', is_flag=True,
+              help='Show the all bandwidth summary for each virtual server',
               default=False)
-@click.option('--server', is_flag=True, help='show the all bandwidth summary for each hardware server',
+@click.option('--server', is_flag=True,
+              help='show the all bandwidth summary for each hardware server',
               default=False)
 @environment.pass_env
 def cli(env, start, end, sortby, virtual, server):
