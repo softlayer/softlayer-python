@@ -4,6 +4,8 @@ import os
 
 from setuptools import setup, find_packages
 
+# pylint: disable=inconsistent-return-statements
+
 DESCRIPTION = "A library for SoftLayer's API"
 
 if os.path.exists('README.rst'):
@@ -55,4 +57,4 @@ setup(
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
-) # pylint: disable=inconsistent-return-statements
+)
