@@ -18,7 +18,7 @@ class NetworkParamType(click.ParamType):
     """
     name = 'network'
 
-    def convert(self, value, param, ctx):
+    def convert(self, value, param, ctx):  # pylint: disable=inconsistent-return-statements
         try:
             # Inlined from python standard ipaddress module
             # https://docs.python.org/3/library/ipaddress.html

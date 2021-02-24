@@ -11,7 +11,7 @@ if os.path.exists('README.rst'):
         LONG_DESCRIPTION = readme_file.read()
 else:
     LONG_DESCRIPTION = DESCRIPTION
-
+# pylint: disable=inconsistent-return-statements
 setup(
     name='SoftLayer',
     version='5.9.2',
