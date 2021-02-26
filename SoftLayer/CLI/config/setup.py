@@ -12,7 +12,7 @@ from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 
 
-def get_api_key(client, username, secret):
+def get_api_key(client, username, secret):  # pylint: disable=inconsistent-return-statements
     """Attempts API-Key and password auth to get an API key.
 
     This will also generate an API key if one doesn't exist

@@ -31,6 +31,10 @@ from SoftLayer.CLI import template
               help="Exports options to a template file")
 @click.option('--wait', type=click.INT,
               help="Wait until the server is finished provisioning for up to X seconds before returning")
+@click.option('--router-public', type=click.INT,
+              help="The ID of the public ROUTER on which you want the virtual server placed")
+@click.option('--router-private', type=click.INT,
+              help="The ID of the private ROUTER on which you want the virtual server placed")
 @helpers.multi_option('--key', '-k', help="SSH keys to add to the root user")
 @helpers.multi_option('--extra', '-e', help="Extra option Key Names")
 @environment.pass_env
@@ -57,7 +61,9 @@ def cli(env, **args):
         'port_speed': args.get('port_speed'),
         'no_public': args.get('no_public') or False,
         'extras': args.get('extra'),
-        'network': args.get('network')
+        'network': args.get('network'),
+        'public_router': args.get('router_public', None),
+        'private_router': args.get('router_private', None)
     }
 
     # Do not create hardware server with --test or --export

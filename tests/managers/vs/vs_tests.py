@@ -557,6 +557,38 @@ class VSTests(testing.TestCase):
 
         self.assertEqual(data, assert_data)
 
+    def test_generate_by_router_and_vlan(self):
+        actual = self.assertRaises(
+            exceptions.SoftLayerError,
+            self.vs._generate_create_dict,
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='example.com',
+            os_code="STRING",
+            private_router=1,
+            private_vlan=1
+        )
+
+        self.assertEqual(str(actual), "You have to select network vlan or network vlan with a subnet or only router, "
+                                      "not all options")
+
+    def test_generate_by_router_and_subnet(self):
+        actual = self.assertRaises(
+            exceptions.SoftLayerError,
+            self.vs._generate_create_dict,
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='example.com',
+            os_code="STRING",
+            private_router=1,
+            private_subnet=1
+        )
+
+        self.assertEqual(str(actual), "You have to select network vlan or network vlan with a subnet or only router, "
+                                      "not all options")
+
     def test_generate_sec_group(self):
         data = self.vs._generate_create_dict(
             cpus=1,
@@ -595,6 +627,31 @@ class VSTests(testing.TestCase):
         }
 
         self.assertEqual(data, assert_data)
+
+    def test_create_network_components_by_routers(self):
+        data = self.vs._create_network_components(
+            private_router=1,
+            public_router=1
+        )
+
+        assert_data = {
+            'primaryBackendNetworkComponent': {'router': {'id': 1}},
+            'primaryNetworkComponent': {'router': {'id': 1}},
+        }
+
+        self.assertEqual(data, assert_data)
+
+    def test_create_network_components_by_routers_and_vlan(self):
+        actual = self.assertRaises(
+            exceptions.SoftLayerError,
+            self.vs._create_network_components,
+            private_router=1,
+            public_router=1,
+            private_vlan=1
+        )
+
+        self.assertEqual(str(actual), "You have to select network vlan or network vlan with a subnet or only router, "
+                                      "not all options")
 
     def test_create_network_components_vlan_subnet_private(self):
         data = self.vs._create_network_components(
