@@ -354,6 +354,40 @@ class HardwareTests(testing.TestCase):
         self.assertEqual(preset_keyname, data['preset_keyname'])
         self.assertEqual(hourly, data['hourly'])
 
+    def test_generate_create_dict_by_router_network_component(self):
+        args = {
+            'size': 'S1270_8GB_2X1TBSATA_NORAID',
+            'hostname': 'unicorn',
+            'domain': 'giggles.woo',
+            'location': 'wdc07',
+            'os': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
+            'port_speed': 10,
+            'hourly': True,
+            'extras': ['1_IPV6_ADDRESS'],
+            'public_router': 1111,
+            'private_router': 1234
+        }
+
+        extras = {
+            'hardware': [{
+                'domain': 'giggles.woo',
+                'hostname': 'unicorn',
+                'primaryNetworkComponent': {
+                    "router": {
+                        "id": 1111
+                    }
+                },
+                'primaryBackendNetworkComponent': {
+                    "router": {
+                        "id": 1234
+                    }
+                }
+            }]
+        }
+
+        data = self.hardware._generate_create_dict(**args)
+        self.assertEqual(extras, data['extras'])
+
     def test_generate_create_dict_network_key(self):
         args = {
             'size': 'S1270_8GB_2X1TBSATA_NORAID',

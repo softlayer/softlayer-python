@@ -418,6 +418,26 @@ class ServerCLITests(testing.TestCase):
         self.assertIn("Successfully exported options to a template file.", result.output)
         export_mock.assert_called_once()
 
+    @mock.patch('SoftLayer.HardwareManager.place_order')
+    def test_create_server_with_router(self, order_mock):
+        order_mock.return_value = {
+            'orderId': 98765,
+            'orderDate': '2013-08-02 15:23:47'
+        }
+
+        result = self.run_command(['--really', 'server', 'create',
+                                   '--size=S1270_8GB_2X1TBSATA_NORAID',
+                                   '--hostname=test',
+                                   '--domain=example.com',
+                                   '--datacenter=TEST00',
+                                   '--port-speed=100',
+                                   '--os=OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
+                                   '--router-private=123',
+                                   '--router-public=1234'
+                                   ])
+
+        self.assert_no_fail(result)
+
     def test_edit_server_userdata_and_file(self):
         # Test both userdata and userfile at once
         with tempfile.NamedTemporaryFile() as userfile:

@@ -492,7 +492,9 @@ class HardwareManager(utils.IdentifierMixin, object):
                               hourly=True,
                               no_public=False,
                               extras=None,
-                              network=None):
+                              network=None,
+                              public_router=None,
+                              private_router=None):
         """Translates arguments into a dictionary for creating a server."""
 
         extras = extras or []
@@ -535,6 +537,10 @@ class HardwareManager(utils.IdentifierMixin, object):
                 'domain': domain,
             }]
         }
+        if private_router:
+            extras['hardware'][0]['primaryBackendNetworkComponent'] = {"router": {"id": int(private_router)}}
+        if public_router:
+            extras['hardware'][0]['primaryNetworkComponent'] = {"router": {"id": int(public_router)}}
         if post_uri:
             extras['provisionScripts'] = [post_uri]
 
