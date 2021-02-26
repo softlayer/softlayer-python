@@ -49,7 +49,7 @@ class LoadBalancerTests(testing.TestCase):
 
     def test_edit_pool(self):
         result = self.run_command(['loadbal', 'pool-edit', '111111', '370a9f12-b3be-47b3-bfa5-8e460010000', '-f 510',
-                                   '-b 256', '-c 5'])
+                                   '-b 256', '-c 5', '-t 10'])
         self.assert_no_fail(result)
 
     def test_add_7p(self):

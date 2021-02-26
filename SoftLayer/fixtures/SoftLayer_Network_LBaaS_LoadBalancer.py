@@ -48,6 +48,7 @@ getObject = {
     ],
     'listeners': [
         {
+            'clientTimeout': 15,
             'defaultPool': {
                 'healthMonitor': {
                     'uuid': '222222ab-bbcc-4f32-9b31-1b6d3a1959c8'
@@ -97,6 +98,7 @@ getObject = {
          'protocolPort': 110,
          'provisioningStatus': 'ACTIVE',
          'tlsCertificateId': None,
+         'clientTimeout': 30,
          'uuid': 'a509723d-a3cb-4ae4-bc5b-5ecf04f890ff'}
     ],
     'members': [

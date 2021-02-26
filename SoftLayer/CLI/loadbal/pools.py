@@ -84,6 +84,8 @@ def add(env, identifier, **args):
 @click.option('--method', '-m', help="Balancing Method",
               type=click.Choice(['ROUNDROBIN', 'LEASTCONNECTION', 'WEIGHTED_RR']))
 @click.option('--connections', '-c', type=int, help="Maximum number of connections to allow.")
+@click.option('--clientTimeout', '-t', type=int,
+              help="maximum idle time in seconds(Range: 1 to 7200).")
 @click.option('--sticky', '-s', is_flag=True, callback=sticky_option, help="Make sessions sticky based on source_ip.")
 @click.option('--sslCert', '-x', help="SSL certificate ID. See `slcli ssl list`")
 @environment.pass_env
@@ -108,6 +110,7 @@ def edit(env, identifier, listener, **args):
         'method': 'loadBalancingMethod',
         'connections': 'maxConn',
         'sticky': 'sessionType',
+        'clienttimeout': 'clientTimeout',
         'sslcert': 'tlsCertificateId'
     }
 
