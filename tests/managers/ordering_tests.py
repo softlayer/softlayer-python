@@ -847,11 +847,11 @@ class OrderingTests(testing.TestCase):
     def test_issues1425_zeroterm(self):
         category1 = {'categoryCode': 'cat1'}
         price1 = {'id': 1234, 'locationGroupId': '', "capacityRestrictionMaximum": "16",
-                   "capacityRestrictionMinimum": "1", "capacityRestrictionType": "STORAGE_SPACE",
-                   'categories': [category1], 'termLength': 36}
+                  "capacityRestrictionMinimum": "1", "capacityRestrictionType": "STORAGE_SPACE",
+                  'categories': [category1], 'termLength': 36}
         price2 = {'id': 45678, 'locationGroupId': '', "capacityRestrictionMaximum": "16",
-                   "capacityRestrictionMinimum": "1", "capacityRestrictionType": "STORAGE_SPACE",
-                   'categories': [category1], 'termLength': 0}
+                  "capacityRestrictionMinimum": "1", "capacityRestrictionType": "STORAGE_SPACE",
+                  'categories': [category1], 'termLength': 0}
 
         # Test 0 termLength
         price_id = self.ordering.get_item_price_id("8", [price2, price1])
@@ -870,11 +870,11 @@ class OrderingTests(testing.TestCase):
     def test_issues1425_nonzeroterm(self):
         category1 = {'categoryCode': 'cat1'}
         price1 = {'id': 1234, 'locationGroupId': '', "capacityRestrictionMaximum": "16",
-                   "capacityRestrictionMinimum": "1", "capacityRestrictionType": "STORAGE_SPACE",
-                   'categories': [category1], 'termLength': 36}
+                  "capacityRestrictionMinimum": "1", "capacityRestrictionType": "STORAGE_SPACE",
+                  'categories': [category1], 'termLength': 36}
         price2 = {'id': 45678, 'locationGroupId': '', "capacityRestrictionMaximum": "16",
-                   "capacityRestrictionMinimum": "1", "capacityRestrictionType": "STORAGE_SPACE",
-                   'categories': [category1], 'termLength': 0}
+                  "capacityRestrictionMinimum": "1", "capacityRestrictionType": "STORAGE_SPACE",
+                  'categories': [category1], 'termLength': 0}
 
         # Test 36 termLength
         price_id = self.ordering.get_item_price_id("8", [price2, price1], 36)
