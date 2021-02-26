@@ -98,7 +98,7 @@ getObject = {
          'protocolPort': 110,
          'provisioningStatus': 'ACTIVE',
          'tlsCertificateId': None,
-         'clientTimeout': 25,
+         'clientTimeout': 30,
          'uuid': 'a509723d-a3cb-4ae4-bc5b-5ecf04f890ff'}
     ],
     'members': [
