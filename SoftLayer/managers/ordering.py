@@ -406,11 +406,16 @@ class OrderingManager(object):
         return prices
 
     @staticmethod
-    def get_item_price_id(core, prices):
-        """get item price id"""
+    def get_item_price_id(core, prices, term=0):
+        """get item price id
+
+        core: None or a number to match against capacityRestrictionType
+        prices: list of SoftLayer_Product_Item_Price
+        term: int to match against SoftLayer_Product_Item_Price.termLength
+        """
         price_id = None
         for price in prices:
-            if not price['locationGroupId']:
+            if not price['locationGroupId'] and price.get('termLength', 0) in {term, '', None}:
                 restriction = price.get('capacityRestrictionType', False)
                 # There is a price restriction. Make sure the price is within the restriction
                 if restriction and core is not None:
