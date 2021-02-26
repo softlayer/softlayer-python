@@ -94,6 +94,49 @@ class VirtCreateTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=args)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_create_by_router(self, confirm_mock):
+        confirm_mock.return_value = True
+
+        result = self.run_command(['vs', 'create',
+                                   '--cpu=2',
+                                   '--domain=example.com',
+                                   '--hostname=host',
+                                   '--os=UBUNTU_LATEST',
+                                   '--memory=1',
+                                   '--billing=hourly',
+                                   '--datacenter=dal05',
+                                   '--router-private=577940',
+                                   '--router-public=1639255',
+                                   '--tag=dev',
+                                   '--tag=green'])
+
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
+        args = ({
+                    'startCpus': 2,
+                    'maxMemory': 1024,
+                    'hostname': 'host',
+                    'domain': 'example.com',
+                    'localDiskFlag': True,
+                    'hourlyBillingFlag': True,
+                    'supplementalCreateObjectOptions': {'bootMode': None},
+                    'operatingSystemReferenceCode': 'UBUNTU_LATEST',
+                    'datacenter': {'name': 'dal05'},
+                    'primaryBackendNetworkComponent': {
+                        'router': {
+                            'id': 577940
+                        }
+                    },
+                    'primaryNetworkComponent': {
+                        'router': {
+                            'id': 1639255
+                        }
+                    }
+                },)
+
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=args)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_with_wait_ready(self, confirm_mock):
         mock = self.set_mock('SoftLayer_Virtual_Guest', 'getObject')
         mock.return_value = {

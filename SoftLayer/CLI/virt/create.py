@@ -95,6 +95,8 @@ def _parse_create_args(client, args):
         "private_vlan": args.get('vlan_private', None),
         "public_subnet": args.get('subnet_public', None),
         "private_subnet": args.get('subnet_private', None),
+        "public_router": args.get('router_public', None),
+        "private_router": args.get('router_private', None),
     }
 
     # The primary disk is included in the flavor and the local_disk flag is not needed
@@ -192,6 +194,10 @@ def _parse_create_args(client, args):
               help="The ID of the public SUBNET on which you want the virtual server placed")
 @click.option('--subnet-private', type=click.INT,
               help="The ID of the private SUBNET on which you want the virtual server placed")
+@click.option('--router-public', type=click.INT,
+              help="The ID of the public ROUTER on which you want the virtual server placed")
+@click.option('--router-private', type=click.INT,
+              help="The ID of the private ROUTER on which you want the virtual server placed")
 @helpers.multi_option('--public-security-group', '-S',
                       help=('Security group ID to associate with the public interface'))
 @helpers.multi_option('--private-security-group', '-s',
