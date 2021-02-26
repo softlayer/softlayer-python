@@ -9,6 +9,7 @@
 import click
 
 
+# pylint: disable=inconsistent-return-statements
 class NetworkParamType(click.ParamType):
     """Validates a network parameter type and converts to a tuple.
 
