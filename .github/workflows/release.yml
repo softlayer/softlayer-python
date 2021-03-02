@@ -6,13 +6,13 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
         arch: ['armhf','amd64','arm64','ppc64el','s390x','i386']
     steps:
       - name: Install Snapcraft
-        uses: samuelmeuli/action-snapcraft@v1.1.1
+        uses: samuelmeuli/action-snapcraft@v1.2.0
         with:
           snapcraft_token: ${{ secrets.snapcraft_token }}
       - name: Push to stable

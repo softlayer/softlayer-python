@@ -127,7 +127,7 @@ If you are using the library directly in python, you can do something like this.
 
 System Requirements
 -------------------
-* Python 3.5, 3.6, 3.7, or 3.8.
+* Python 3.5, 3.6, 3.7, 3.8, or 3.9.
 * A valid SoftLayer API username and key.
 * A connection to SoftLayer's private network is required to use
   our private network API endpoints.
@@ -150,6 +150,6 @@ Python Packages
 
 Copyright
 ---------
-This software is Copyright (c) 2016-2019 SoftLayer Technologies, Inc.
+This software is Copyright (c) 2016-2021 SoftLayer Technologies, Inc.
 
 See the bundled LICENSE file for more information.
