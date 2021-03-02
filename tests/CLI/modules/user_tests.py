@@ -6,6 +6,7 @@
 """
 import json
 import sys
+import unittest
 
 import mock
 
@@ -167,12 +168,10 @@ class UserCLITests(testing.TestCase):
         result = self.run_command(['user', 'create', 'test', '-e', 'test@us.ibm.com', '-p', 'testword'])
         self.assertEqual(result.exit_code, 2)
 
+    @unittest.SkipIf(sys.version_info < (3, 6), "Secrets module only exists in version 3.6+")
     @mock.patch('secrets.choice')
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_user_generate_password_36(self, confirm_mock, secrets):
-        if sys.version_info < (3, 6):
-            self.skipTest("Secrets module only exists in version 3.6+")
-
         secrets.return_value = 'Q'
         confirm_mock.return_value = True
         result = self.run_command(['user', 'create', 'test', '-e', 'test@us.ibm.com', '-p', 'generate'])
