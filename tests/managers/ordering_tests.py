@@ -713,7 +713,8 @@ class OrderingTests(testing.TestCase):
                 'hostname': 'test1',
                 'domain': 'example.com'
             }],
-            'testProperty': ''
+            'testPropertyEmpty': '',
+            'testPropertyNone': None
         }
         result = self.ordering.verify_quote(1234, extras)
 
@@ -721,7 +722,8 @@ class OrderingTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Billing_Order_Quote', 'verifyOrder')
         call = self.calls('SoftLayer_Billing_Order_Quote', 'verifyOrder')[0]
         order_container = call.args[0]
-        self.assertNotIn('testProperty', order_container)
+        self.assertNotIn('testPropertyEmpty', order_container)
+        self.assertNotIn('testPropertyNone', order_container)
         self.assertNotIn('reservedCapacityId', order_container)
 
     def test_get_item_capacity_core(self):
