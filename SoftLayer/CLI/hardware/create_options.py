@@ -5,6 +5,7 @@ import click
 
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer.managers import account
 from SoftLayer.managers import hardware
 
 
@@ -18,8 +19,18 @@ def cli(env, prices, location=None):
     """Server order options for a given chassis."""
 
     hardware_manager = hardware.HardwareManager(env.client)
+    account_manager = account.AccountManager(env.client)
     options = hardware_manager.get_create_options(location)
 
+    _filter = ''
+    if location:
+        _filter = {
+            'routers': {
+                'topLevelLocation': {'name': {'operation': location}}
+            }
+        }
+
+    routers = account_manager.get_routers(_filter)
     tables = []
 
     # Datacenters
@@ -34,6 +45,7 @@ def cli(env, prices, location=None):
     tables.append(_os_prices_table(options['operating_systems'], prices))
     tables.append(_port_speed_prices_table(options['port_speeds'], prices))
     tables.append(_extras_prices_table(options['extras'], prices))
+    tables.append(_get_routers(routers))
 
     # since this is multiple tables, this is required for a valid JSON object to be rendered.
     env.fout(formatting.listing(tables, separator='\n'))
@@ -50,7 +62,7 @@ def _preset_prices_table(sizes, prices=False):
         for size in sizes:
             if size.get('hourlyRecurringFee', 0) + size.get('recurringFee', 0) + 1 > 0:
                 table.add_row([size['name'], size['key'], "%.4f" % size['hourlyRecurringFee'],
-                              "%.4f" % size['recurringFee']])
+                               "%.4f" % size['recurringFee']])
     else:
         table = formatting.Table(['Size', 'Value'], title="Sizes")
         for size in sizes:
@@ -146,3 +158,18 @@ def _get_price_data(price, item):
     if item in price:
         result = price[item]
     return result
+
+
+def _get_routers(routers):
+    """Get all routers information
+
+    :param routers: Routers data
+    """
+
+    table = formatting.Table(["id", "hostname", "name"], title='Routers')
+    for router in routers:
+        table.add_row([router['id'],
+                       router['hostname'],
+                       router['topLevelLocation']['longName'], ])
+    table.align = 'l'
+    return table

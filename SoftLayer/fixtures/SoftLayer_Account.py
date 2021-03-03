@@ -1020,3 +1020,21 @@ getAllTopLevelBillingItems = [
         "resourceTableId": 777777
     }
 ]
+
+getRouters = [
+    {
+        "accountId": 1,
+        "bareMetalInstanceFlag": 0,
+        "domain": "softlayer.com",
+        "fullyQualifiedDomainName": "fcr01a.ams01.softlayer.com",
+        "hardwareStatusId": 5,
+        "hostname": "fcr01a.ams01",
+        "id": 123456,
+        "serviceProviderId": 1,
+        "topLevelLocation": {
+            "id": 265592,
+            "longName": "Amsterdam 1",
+            "name": "ams01",
+            "statusId": 2
+        }
+    }]

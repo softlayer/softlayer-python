@@ -276,3 +276,13 @@ class AccountManager(utils.IdentifierMixin, object):
                """
         return self.client.call('Billing_Order', 'getAllObjects',
                                 limit=limit, mask=mask)
+
+    def get_routers(self, mask=None, _filter=None):
+        """Gets all the routers currently active on the account
+
+        :param string mask: Object Mask
+        :param string _filter: Object filter
+        :returns: Routers
+        """
+
+        return self.client['SoftLayer_Account'].getRouters(filter=_filter, mask=mask)
