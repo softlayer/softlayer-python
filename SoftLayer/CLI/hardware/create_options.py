@@ -22,15 +22,9 @@ def cli(env, prices, location=None):
     account_manager = account.AccountManager(env.client)
     options = hardware_manager.get_create_options(location)
 
-    _filter = ''
-    if location:
-        _filter = {
-            'routers': {
-                'topLevelLocation': {'name': {'operation': location}}
-            }
-        }
 
-    routers = account_manager.get_routers(_filter)
+
+    routers = account_manager.get_routers(location)
     tables = []
 
     # Datacenters

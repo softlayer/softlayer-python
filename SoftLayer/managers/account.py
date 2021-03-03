@@ -277,12 +277,19 @@ class AccountManager(utils.IdentifierMixin, object):
         return self.client.call('Billing_Order', 'getAllObjects',
                                 limit=limit, mask=mask)
 
-    def get_routers(self, mask=None, _filter=None):
+    def get_routers(self, mask=None, location=None):
         """Gets all the routers currently active on the account
 
         :param string mask: Object Mask
-        :param string _filter: Object filter
+        :param string location: location string
         :returns: Routers
         """
+        object_filter = ''
+        if location:
+            object_filter = {
+                'routers': {
+                    'topLevelLocation': {'name': {'operation': location}}
+                }
+            }
 
-        return self.client['SoftLayer_Account'].getRouters(filter=_filter, mask=mask)
+        return self.client['SoftLayer_Account'].getRouters(filter=object_filter, mask=mask)
