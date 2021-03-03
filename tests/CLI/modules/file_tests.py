@@ -4,7 +4,8 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import exceptions
+from SoftLayer.CLI import exceptions
+from SoftLayer import SoftLayerError
 from SoftLayer import testing
 
 import json
@@ -126,7 +127,7 @@ class FileTests(testing.TestCase):
         result = self.run_command([
             '--really', 'file', 'volume-cancel', '1234'])
 
-        self.assertIsInstance(result.exception, exceptions.SoftLayerError)
+        self.assertIsInstance(result.exception, SoftLayerError)
 
     def test_volume_detail(self):
         result = self.run_command(['file', 'volume-detail', '1234'])
@@ -492,6 +493,26 @@ class FileTests(testing.TestCase):
 
         self.assertEqual('Failover operation could not be initiated.\n',
                          result.output)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    @mock.patch('SoftLayer.FileStorageManager.disaster_recovery_failover_to_replicant')
+    def test_disaster_recovery_failover(self, disaster_recovery_failover_mock, confirm_mock):
+        confirm_mock.return_value = True
+        disaster_recovery_failover_mock.return_value = True
+        result = self.run_command(['file', 'disaster-recovery-failover', '12345678', '--replicant-id=5678'])
+
+        self.assert_no_fail(result)
+        self.assertIn('Disaster Recovery Failover to replicant is now in progress.\n', result.output)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_disaster_recovery_failover_aborted(self, confirm_mock):
+        confirm_mock.return_value = False
+
+        result = self.run_command(['file', 'disaster-recovery-failover', '12345678',
+                                   '--replicant-id=5678'])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
     def test_replicant_failback(self):
         result = self.run_command(['file', 'replica-failback', '12345678'])

@@ -4,8 +4,10 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from SoftLayer import exceptions
+from SoftLayer.CLI import exceptions
+from SoftLayer import SoftLayerAPIError
 from SoftLayer import testing
+
 
 import json
 import mock
@@ -48,7 +50,7 @@ class BlockTests(testing.TestCase):
     def test_volume_set_lun_id_not_in_range(self):
         value = '-1'
         lun_mock = self.set_mock('SoftLayer_Network_Storage', 'createOrUpdateLunId')
-        lun_mock.side_effect = exceptions.SoftLayerAPIError(
+        lun_mock.side_effect = SoftLayerAPIError(
             'SoftLayer_Exception_Network_Storage_Iscsi_InvalidLunId',
             'The LUN ID specified is out of the valid range: %s [min: 0 max: 4095]' % (value))
         result = self.run_command('block volume-set-lun-id 1234 42'.split())
@@ -496,8 +498,18 @@ class BlockTests(testing.TestCase):
                                    '--replicant-id=5678'])
 
         self.assert_no_fail(result)
-        self.assertEqual('Failover to replicant is now in progress.\n',
-                         result.output)
+        self.assertEqual('Failover to replicant is now in progress.\n', result.output)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    @mock.patch('SoftLayer.BlockStorageManager.disaster_recovery_failover_to_replicant')
+    def test_disaster_recovery_failover(self, disaster_recovery_failover_mock, confirm_mock):
+        confirm_mock.return_value = True
+        disaster_recovery_failover_mock.return_value = True
+        result = self.run_command(['block', 'disaster-recovery-failover', '12345678',
+                                   '--replicant-id=5678'])
+
+        self.assert_no_fail(result)
+        self.assertIn('Disaster Recovery Failover to replicant is now in progress.\n', result.output)
 
     def test_replication_locations(self):
         result = self.run_command(['block', 'replica-locations', '1234'])
@@ -557,6 +569,16 @@ class BlockTests(testing.TestCase):
 
         self.assertEqual('Failover operation could not be initiated.\n',
                          result.output)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_disaster_recovery_failover_aborted(self, confirm_mock):
+        confirm_mock.return_value = False
+
+        result = self.run_command(['block', 'disaster-recovery-failover', '12345678',
+                                   '--replicant-id=5678'])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
     def test_replicant_failback(self):
         result = self.run_command(['block', 'replica-failback', '12345678'])
