@@ -841,3 +841,45 @@ class OrderingTests(testing.TestCase):
     def test_resolve_location_name_not_exist(self):
         exc = self.assertRaises(exceptions.SoftLayerError, self.ordering.resolve_location_name, "UNKNOWN_LOCATION_TEST")
         self.assertIn("does not exist", str(exc))
+
+    # https://github.com/softlayer/softlayer-python/issues/1425
+    # Issues relating to checking prices based of the price.term relationship
+    def test_issues1425_zeroterm(self):
+        category1 = {'categoryCode': 'cat1'}
+        price1 = {'id': 1234, 'locationGroupId': '', "capacityRestrictionMaximum": "16",
+                  "capacityRestrictionMinimum": "1", "capacityRestrictionType": "STORAGE_SPACE",
+                  'categories': [category1], 'termLength': 36}
+        price2 = {'id': 45678, 'locationGroupId': '', "capacityRestrictionMaximum": "16",
+                  "capacityRestrictionMinimum": "1", "capacityRestrictionType": "STORAGE_SPACE",
+                  'categories': [category1], 'termLength': 0}
+
+        # Test 0 termLength
+        price_id = self.ordering.get_item_price_id("8", [price2, price1])
+        self.assertEqual(45678, price_id)
+
+        # Test None termLength
+        price2['termLength'] = None
+        price_id = self.ordering.get_item_price_id("8", [price2, price1])
+        self.assertEqual(45678, price_id)
+
+        # Test '' termLength
+        price2['termLength'] = ''
+        price_id = self.ordering.get_item_price_id("8", [price2, price1])
+        self.assertEqual(45678, price_id)
+
+    def test_issues1425_nonzeroterm(self):
+        category1 = {'categoryCode': 'cat1'}
+        price1 = {'id': 1234, 'locationGroupId': '', "capacityRestrictionMaximum": "16",
+                  "capacityRestrictionMinimum": "1", "capacityRestrictionType": "STORAGE_SPACE",
+                  'categories': [category1], 'termLength': 36}
+        price2 = {'id': 45678, 'locationGroupId': '', "capacityRestrictionMaximum": "16",
+                  "capacityRestrictionMinimum": "1", "capacityRestrictionType": "STORAGE_SPACE",
+                  'categories': [category1], 'termLength': 0}
+
+        # Test 36 termLength
+        price_id = self.ordering.get_item_price_id("8", [price2, price1], 36)
+        self.assertEqual(1234, price_id)
+
+        # Test None-existing price for term
+        price_id = self.ordering.get_item_price_id("8", [price2, price1], 37)
+        self.assertEqual(None, price_id)
