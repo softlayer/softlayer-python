@@ -1,5 +1,27 @@
 # Change Log
 
+
+## [5.9.3] - 2021-03-03
+https://github.com/softlayer/softlayer-python/compare/v5.9.2...v5.9.3
+
+#### New Commands
+- `slcli file|block disaster-recovery-failover` #1407
+
+#### Improvements
+- Unit testing for large integers #1403
+- Add Multi factor authentication to users list #1408
+- Add pagination to object storage list accounts. #1411
+- Add username lookup to slcli object-storage credential #1415
+- Add IOPs data to slcli block volume-list. #1418
+- Add 2FA and classic APIKeys fields to slcli user list as default values #1421
+- Add a flags in the report bandwidth #1420
+- Add the option network component by router to slcli hw create. #1422
+- Add slcli vs create by router data. #1414
+- Add testing and support for python 3.9. #1429
+- Checking for TermLength on prices #1428
+
+
+
 ## [5.9.2] - 2020-12-03
 https://github.com/softlayer/softlayer-python/compare/v5.9.1...v5.9.2
 
