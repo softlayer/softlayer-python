@@ -28,7 +28,8 @@ getObject = {
                 'userRecord': {
                     'username': 'chechu',
                 }
-            }
+            },
+            'preset': {'keyName': 'B1_8X16X100'}
         }
     },
     'datacenter': {'id': 50, 'name': 'TEST00',
@@ -480,16 +481,16 @@ getCreateObjectOptions = {
             "categoryCode": "guest_disk0",
             "id": 81
         }}, {
-            "description": "250 GB (SAN)",
-            "attributes": [
-                {
-                    "id": 198,
-                    "attributeTypeKeyName": "SAN_DISK"
-                }],
-            "itemCategory": {
-                "categoryCode": "guest_disk0",
-                "id": 89
-            }}],
+        "description": "250 GB (SAN)",
+        "attributes": [
+            {
+                "id": 198,
+                "attributeTypeKeyName": "SAN_DISK"
+            }],
+        "itemCategory": {
+            "categoryCode": "guest_disk0",
+            "id": 89
+        }}],
     'guest_core': [{
         "description": "4 x 2.0 GHz or higher Cores (Dedicated)",
         "attributes": [],
@@ -497,13 +498,13 @@ getCreateObjectOptions = {
             "categoryCode": "guest_core",
             "id": 80
         }},
-                   {
-                       "description": "8 x 2.0 GHz or higher Cores",
-                       "attributes": [],
-                       "itemCategory": {
-                           "categoryCode": "guest_core",
-                           "id": 90
-                       }}]
+        {
+            "description": "8 x 2.0 GHz or higher Cores",
+            "attributes": [],
+            "itemCategory": {
+                "categoryCode": "guest_core",
+                "id": 90
+            }}]
 }
 
 getReverseDomainRecords = [{
