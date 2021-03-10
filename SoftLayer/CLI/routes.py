@@ -256,6 +256,7 @@ ALL_ROUTES = [
     ('hardware:toggle-ipmi', 'SoftLayer.CLI.hardware.toggle_ipmi:cli'),
     ('hardware:dns-sync', 'SoftLayer.CLI.hardware.dns:cli'),
     ('hardware:storage', 'SoftLayer.CLI.hardware.storage:cli'),
+    ('hardware:upgrade', 'SoftLayer.CLI.hardware.upgrade:cli'),
 
     ('securitygroup', 'SoftLayer.CLI.securitygroup'),
     ('securitygroup:list', 'SoftLayer.CLI.securitygroup.list:cli'),
