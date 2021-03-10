@@ -788,10 +788,10 @@ class HardwareManager(utils.IdentifierMixin, object):
         """Upgrades a hardware server instance.
 
         :param int instance_id: Instance id of the hardware server to be upgraded.
-        :param string memory: Memory size.
+        :param int memory: Memory size.
         :param string nic_speed: Network Port Speed data.
         :param string drive_controller: Drive Controller data.
-        :param string public_bandwidth: Public keyName data.
+        :param int public_bandwidth: Public keyName data.
         :param bool test: Test option to verify the request.
 
         :returns: bool
