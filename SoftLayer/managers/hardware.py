@@ -880,7 +880,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         :param list upgrade_prices: Contains all the prices related to a
         hardware server upgrade.
         :param string option: Describes type of parameter to be upgraded
-        :param value: The value of the parameter to be upgraded
+        :param value value: The value of the parameter to be upgraded
 
         :returns: int
         """
