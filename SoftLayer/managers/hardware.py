@@ -881,9 +881,9 @@ class HardwareManager(utils.IdentifierMixin, object):
         hardware server upgrade.
         :param string option: Describes type of parameter to be upgraded
 
-        :returns: int
+        :returns: A item price id.
         """
-
+        price_id = None
         option_category = {
             'memory': 'ram',
             'nic_speed': 'port_speed',
@@ -903,22 +903,24 @@ class HardwareManager(utils.IdentifierMixin, object):
 
                 if option == 'disk_controller':
                     if value == product.get('description'):
-                        return price.get('id')
+                        price_id = price.get('id')
                 elif option == 'nic_speed':
                     if value.isdigit():
                         if str(product.get('capacity')) == str(value):
-                            return price.get('id')
+                            price_id = price.get('id')
                     else:
                         split_nic_speed = value.split(" ")
                         if str(product.get('capacity')) == str(split_nic_speed[0]) and \
                                 split_nic_speed[1] in product.get("description"):
-                            return price.get('id')
+                            price_id = price.get('id')
                 elif option == 'bandwidth':
                     if str(product.get('capacity')) == str(value):
-                        return price.get('id')
+                        price_id = price.get('id')
                 else:
                     if str(product.get('capacity')) == str(value):
-                        return price.get('id')
+                        price_id = price.get('id')
+
+        return price_id
 
 
 def _get_bandwidth_key(items, hourly=True, no_public=False, location=None):
