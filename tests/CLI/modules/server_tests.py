@@ -909,4 +909,3 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['hw', 'upgrade', '100', '--memory=32', '--public-bandwidth=500',
                                    '--drive-controller=RAID', '--network=10000 Redundant'])
         self.assert_no_fail(result)
-

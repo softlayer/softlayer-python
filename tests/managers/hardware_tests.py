@@ -846,7 +846,10 @@ class HardwareTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
         call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
         order_container = call.args[0]
-        self.assertEqual([{'id': 209391}, {'id': 21525}, {'id': 22482}, {'id': 50357}], order_container['prices'])
+        self.assertIn({'id': 209391}, order_container['prices'])
+        self.assertIn({'id': 21525}, order_container['prices'])
+        self.assertIn({'id': 22482}, order_container['prices'])
+        self.assertIn({'id': 50357}, order_container['prices'])
 
 
 class HardwareHelperTests(testing.TestCase):
