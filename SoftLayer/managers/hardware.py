@@ -881,7 +881,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         hardware server upgrade.
         :param string option: Describes type of parameter to be upgraded
 
-        :returns: A item price id.
+        :return: int.
         """
         price_id = None
         option_category = {
