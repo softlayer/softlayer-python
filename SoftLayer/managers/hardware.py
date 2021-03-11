@@ -20,7 +20,7 @@ from SoftLayer import utils
 LOGGER = logging.getLogger(__name__)
 
 # Invalid names are ignored due to long method names and short argument names
-# pylint: disable=invalid-name, no-self-use
+# pylint: disable=invalid-name, no-self-use, too-many-lines
 
 EXTRA_CATEGORIES = ['pri_ipv6_addresses',
                     'static_ipv6_addresses',
@@ -881,6 +881,8 @@ class HardwareManager(utils.IdentifierMixin, object):
         hardware server upgrade.
         :param string option: Describes type of parameter to be upgraded
         :param value: The value of the parameter to be upgraded
+
+        :returns: int
         """
 
         option_category = {
@@ -897,7 +899,7 @@ class HardwareManager(utils.IdentifierMixin, object):
 
             product = price.get('item')
             for category in price.get('categories'):
-                if not (category.get('categoryCode') == category_code):
+                if not category.get('categoryCode') == category_code:
                     continue
 
                 if option == 'disk_controller':
