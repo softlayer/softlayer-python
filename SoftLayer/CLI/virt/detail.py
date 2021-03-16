@@ -72,7 +72,7 @@ def cli(env, identifier, passwords=False, price=False):
     table.add_row(['preset', utils.lookup(result, 'billingItem',
                                           'orderItem',
                                           'preset',
-                                          'keyName') or {}])
+                                          'keyName') or '-'])
 
     table.add_row(_get_owner_row(result))
     table.add_row(_get_vlan_table(result))
