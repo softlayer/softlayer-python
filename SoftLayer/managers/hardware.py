@@ -786,6 +786,30 @@ class HardwareManager(utils.IdentifierMixin, object):
         return self.client.call('SoftLayer_Product_Package', 'getItemPrices', mask=object_mask, filter=object_filter,
                                 id=package['id'])
 
+    def authorize_storage(self, hardware_id, username_storage):
+        """Authorize File or Block Storage to a Hardware Server.
+
+        :param int hardware_id: Hardware server id.
+        :param string username_storage: Storage username.
+
+        :return: bool.
+        """
+        _filter = {"networkStorage": {"username": {"operation": username_storage}}}
+
+        storage_result = self.client.call('Account', 'getNetworkStorage', filter=_filter)
+
+        storage_template = [
+            {
+                "id": storage_result[0]['id'],
+                "username": username_storage
+            }
+        ]
+
+        result = self.client.call('Hardware', 'allowAccessToNetworkStorageList',
+                                  storage_template, id=hardware_id)
+
+        return result
+
 
 def _get_bandwidth_key(items, hourly=True, no_public=False, location=None):
     """Picks a valid Bandwidth Item, returns the KeyName"""

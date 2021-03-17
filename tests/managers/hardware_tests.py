@@ -841,6 +841,11 @@ class HardwareTests(testing.TestCase):
 
         self.assertEqual("NSX-T Manager", result[0]['hostname'])
 
+    def test_authorize_storage(self):
+        options = self.hardware.authorize_storage(1234, "SL01SEL301234-11")
+
+        self.assertEqual(True, options)
+
 
 class HardwareHelperTests(testing.TestCase):
 

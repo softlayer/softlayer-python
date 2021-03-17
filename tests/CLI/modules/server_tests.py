@@ -903,3 +903,14 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['hw', 'guests', '123456'])
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_authorize_hw_no_confirm(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['hw', 'authorize-storage', '-u', '1234'])
+
+        self.assertEqual(result.exit_code, 2)
+
+    def test_authorize_hw(self):
+        result = self.run_command(['hw', 'authorize-storage', '--username-storage=SL01SEL301234-11', '1234'])
+        self.assert_no_fail(result)

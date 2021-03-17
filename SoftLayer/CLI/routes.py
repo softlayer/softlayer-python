@@ -256,6 +256,7 @@ ALL_ROUTES = [
     ('hardware:rescue', 'SoftLayer.CLI.hardware.power:rescue'),
     ('hardware:ready', 'SoftLayer.CLI.hardware.ready:cli'),
     ('hardware:toggle-ipmi', 'SoftLayer.CLI.hardware.toggle_ipmi:cli'),
+    ('hardware:authorize-storage', 'SoftLayer.CLI.hardware.authorize_storage:cli'),
     ('hardware:dns-sync', 'SoftLayer.CLI.hardware.dns:cli'),
     ('hardware:storage', 'SoftLayer.CLI.hardware.storage:cli'),
 
