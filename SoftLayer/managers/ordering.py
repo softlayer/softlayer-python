@@ -218,11 +218,11 @@ class OrderingManager(object):
         container = self.generate_order_template(quote_id, extra)
         clean_container = {}
 
-        # There are a few fields that wil cause exceptions in the XML endpoing if you send in ''
-        # reservedCapacityId and hostId specifically. But we clean all just to be safe.
+        # There are a few fields that wil cause exceptions in the XML endpoint if you send in '',
+        # or None in Rest endpoint (e.g. reservedCapacityId, hostId). But we clean all just to be safe.
         # This for some reason is only a problem on verify_quote.
         for key in container.keys():
-            if container.get(key) != '':
+            if container.get(key):
                 clean_container[key] = container[key]
 
         return self.client.call('SoftLayer_Billing_Order_Quote', 'verifyOrder', clean_container, id=quote_id)

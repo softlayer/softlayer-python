@@ -149,3 +149,7 @@ class AccountManagerTests(testing.TestCase):
         self.manager.get_item_detail(123456)
         self.assert_called_with('SoftLayer_Billing_Item', 'getObject', identifier=123456)
         self.assert_called_with('SoftLayer_Billing_Invoice_Item', 'getBillingItem', identifier=123456)
+
+    def test_get_routers(self):
+        self.manager.get_routers()
+        self.assert_called_with("SoftLayer_Account", "getRouters")
