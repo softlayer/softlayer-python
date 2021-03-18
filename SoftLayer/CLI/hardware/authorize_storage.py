@@ -15,8 +15,7 @@ from SoftLayer.CLI import helpers
               help="The storage username to be added to the hardware server")
 @environment.pass_env
 def cli(env, identifier, username_storage):
-    """Authorize File or Block Storage to a Hardware Server.
-    """
+    """Authorize File or Block Storage to a Hardware Server."""
     hardware = SoftLayer.HardwareManager(env.client)
     hardware_id = helpers.resolve_id(hardware.resolve_ids, identifier, 'hardware')
 
