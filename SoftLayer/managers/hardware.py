@@ -858,9 +858,9 @@ class HardwareManager(utils.IdentifierMixin, object):
         return self.hardware.getObject(id=instance_id, mask=mask)
 
     def _get_upgrade_prices(self, instance_id, include_downgrade_options=True):
-        """Following Method gets all the price ids related to upgrading a VS.
+        """Following Method gets all the price ids related to upgrading a Hardware Server.
 
-        :param int instance_id: Instance id of the VS to be upgraded
+        :param int instance_id: Instance id of the Hardware Server to be upgraded.
 
         :returns: list
         """
