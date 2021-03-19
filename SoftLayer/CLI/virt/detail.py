@@ -69,6 +69,10 @@ def cli(env, identifier, passwords=False, price=False):
     table.add_row(['transient', result.get('transientGuestFlag', False)])
     table.add_row(['created', result['createDate']])
     table.add_row(['modified', result['modifyDate']])
+    table.add_row(['preset', utils.lookup(result, 'billingItem',
+                                          'orderItem',
+                                          'preset',
+                                          'keyName') or '-'])
 
     table.add_row(_get_owner_row(result))
     table.add_row(_get_vlan_table(result))
