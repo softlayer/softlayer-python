@@ -910,7 +910,7 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['hw', 'authorize-storage', '-u', '1234'])
 
         self.assertEqual(result.exit_code, 2)
-    
+
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_authorize_hw_empty(self, confirm_mock):
         confirm_mock.return_value = True

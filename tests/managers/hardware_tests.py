@@ -845,7 +845,7 @@ class HardwareTests(testing.TestCase):
         options = self.hardware.authorize_storage(1234, "SL01SEL301234-11")
 
         self.assertEqual(True, options)
-    
+
     def test_authorize_storage_empty(self):
         mock = self.set_mock('SoftLayer_Account', 'getNetworkStorage')
         mock.return_value = []
