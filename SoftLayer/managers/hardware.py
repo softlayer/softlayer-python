@@ -797,6 +797,10 @@ class HardwareManager(utils.IdentifierMixin, object):
         _filter = {"networkStorage": {"username": {"operation": username_storage}}}
 
         storage_result = self.client.call('Account', 'getNetworkStorage', filter=_filter)
+        
+        if len(storage_result) == 0:
+            raise SoftLayerError("The Storage with username: %s was not found, please"
+                                 " enter a valid storage username" % username_storage)
 
         storage_template = [
             {
