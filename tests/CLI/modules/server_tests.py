@@ -910,6 +910,16 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['hw', 'authorize-storage', '-u', '1234'])
 
         self.assertEqual(result.exit_code, 2)
+    
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_authorize_hw_empty(self, confirm_mock):
+        confirm_mock.return_value = True
+        storage_result = self.set_mock('SoftLayer_Account', 'getNetworkStorage')
+        storage_result.return_value = []
+        result = self.run_command(['hw', 'authorize-storage', '--username-storage=#', '1234'])
+
+        self.assertEqual(str(result.exception), "The Storage with username: # was not found, "
+                                                "please enter a valid storage username")
 
     def test_authorize_hw(self):
         result = self.run_command(['hw', 'authorize-storage', '--username-storage=SL01SEL301234-11', '1234'])
