@@ -956,6 +956,7 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         return price_id
 
+
 def _get_bandwidth_key(items, hourly=True, no_public=False, location=None):
     """Picks a valid Bandwidth Item, returns the KeyName"""
 

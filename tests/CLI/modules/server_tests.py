@@ -923,6 +923,7 @@ class ServerCLITests(testing.TestCase):
 
     def test_authorize_hw(self):
         result = self.run_command(['hw', 'authorize-storage', '--username-storage=SL01SEL301234-11', '1234'])
+        self.assert_no_fail(result)
 
     def test_upgrade_no_options(self, ):
         result = self.run_command(['hw', 'upgrade', '100'])
