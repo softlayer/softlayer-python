@@ -853,6 +853,50 @@ class HardwareTests(testing.TestCase):
                           self.hardware.authorize_storage,
                           1234, "#")
 
+    def test_get_price_id_memory_capacity(self):
+        upgrade_prices = [
+            {'categories': [{'categoryCode': 'ram'}], 'item': {'capacity': 1}, 'id': 99}
+        ]
+        result = self.hardware._get_prices_for_upgrade_option(upgrade_prices, 'memory', 1)
+        self.assertEqual(99, result)
+
+    def test_get_price_id_mismatch_capacity(self):
+        upgrade_prices = [
+            {'categories': [{'categoryCode': 'ram1'}], 'item': {'capacity': 1}, 'id': 90},
+            {'categories': [{'categoryCode': 'ram'}], 'item': {'capacity': 2}, 'id': 91},
+            {'categories': [{'categoryCode': 'ram'}], 'item': {'capacity': 1}, 'id': 92},
+        ]
+        result = self.hardware._get_prices_for_upgrade_option(upgrade_prices, 'memory', 1)
+        self.assertEqual(92, result)
+
+    def test_upgrade(self):
+        result = self.hardware.upgrade(1, memory=32)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
+        call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
+        order_container = call.args[0]
+        self.assertEqual(order_container['prices'], [{'id': 209391}])
+
+    def test_upgrade_blank(self):
+        result = self.hardware.upgrade(1)
+
+        self.assertEqual(result, False)
+        self.assertEqual(self.calls('SoftLayer_Product_Order', 'placeOrder'), [])
+
+    def test_upgrade_full(self):
+        result = self.hardware.upgrade(1, memory=32, nic_speed="10000 Redundant", drive_controller="RAID",
+                                       public_bandwidth=500, test=False)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
+        call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
+        order_container = call.args[0]
+        self.assertIn({'id': 209391}, order_container['prices'])
+        self.assertIn({'id': 21525}, order_container['prices'])
+        self.assertIn({'id': 22482}, order_container['prices'])
+        self.assertIn({'id': 50357}, order_container['prices'])
+
 
 class HardwareHelperTests(testing.TestCase):
 

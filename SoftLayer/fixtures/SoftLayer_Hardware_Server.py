@@ -6,6 +6,9 @@ getObject = {
     'billingItem': {
         'id': 6327,
         'recurringFee': 1.54,
+        'package': {
+            'id': 911
+        },
         'nextInvoiceTotalRecurringAmount': 16.08,
         'children': [
             {'description': 'test', 'nextInvoiceTotalRecurringAmount': 1},
@@ -262,3 +265,76 @@ getVirtualHost = {
         }
     }
 }
+
+getUpgradeItemPrices = [
+    {
+        "id": 21525,
+        "recurringFee": "0",
+        "categories": [
+            {
+                "categoryCode": "port_speed",
+                "id": 26,
+                "name": "Uplink Port Speeds",
+            }
+        ],
+        "item": {
+            "capacity": "10000",
+            "description": "10 Gbps Redundant Public & Private Network Uplinks",
+            "id": 4342,
+            "keyName": "10_GBPS_REDUNDANT_PUBLIC_PRIVATE_NETWORK_UPLINKS"
+        }
+    },
+    {
+        "hourlyRecurringFee": ".247",
+        "id": 209391,
+        "recurringFee": "164",
+        "categories": [
+            {
+                "categoryCode": "ram",
+                "id": 3,
+                "name": "RAM"
+            }
+        ],
+        "item": {
+            "capacity": "32",
+            "description": "32 GB RAM",
+            "id": 11291,
+            "keyName": "RAM_32_GB_DDR4_2133_ECC_NON_REG"
+        }
+    },
+    {
+        "hourlyRecurringFee": ".068",
+        "id": 22482,
+        "recurringFee": "50",
+        "categories": [
+            {
+                "categoryCode": "disk_controller",
+                "id": 11,
+                "name": "Disk Controller",
+            }
+        ],
+        "item": {
+            "capacity": "0",
+            "description": "RAID",
+            "id": 4478,
+            "keyName": "DISK_CONTROLLER_RAID",
+        }
+    },
+    {
+        "id": 50357,
+        "recurringFee": "0",
+        "categories": [
+            {
+                "categoryCode": "bandwidth",
+                "id": 10,
+                "name": "Public Bandwidth",
+            }
+        ],
+        "item": {
+            "capacity": "500",
+            "description": "500 GB Bandwidth Allotment",
+            "id": 6177,
+            "keyName": "BANDWIDTH_500_GB"
+        }
+    }
+]

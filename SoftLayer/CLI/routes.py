@@ -259,6 +259,7 @@ ALL_ROUTES = [
     ('hardware:authorize-storage', 'SoftLayer.CLI.hardware.authorize_storage:cli'),
     ('hardware:dns-sync', 'SoftLayer.CLI.hardware.dns:cli'),
     ('hardware:storage', 'SoftLayer.CLI.hardware.storage:cli'),
+    ('hardware:upgrade', 'SoftLayer.CLI.hardware.upgrade:cli'),
 
     ('securitygroup', 'SoftLayer.CLI.securitygroup'),
     ('securitygroup:list', 'SoftLayer.CLI.securitygroup.list:cli'),

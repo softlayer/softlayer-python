@@ -5,11 +5,13 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import datetime
 import logging
 import socket
 import time
 
 from SoftLayer.decoration import retry
+from SoftLayer import exceptions
 from SoftLayer.exceptions import SoftLayerError
 from SoftLayer.managers import ordering
 from SoftLayer.managers.ticket import TicketManager
@@ -18,7 +20,7 @@ from SoftLayer import utils
 LOGGER = logging.getLogger(__name__)
 
 # Invalid names are ignored due to long method names and short argument names
-# pylint: disable=invalid-name, no-self-use
+# pylint: disable=invalid-name, no-self-use, too-many-lines
 
 EXTRA_CATEGORIES = ['pri_ipv6_addresses',
                     'static_ipv6_addresses',
@@ -814,6 +816,145 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         return result
 
+    def upgrade(self, instance_id, memory=None,
+                nic_speed=None, drive_controller=None,
+                public_bandwidth=None, test=False):
+        """Upgrades a hardware server instance.
+
+        :param int instance_id: Instance id of the hardware server to be upgraded.
+        :param int memory: Memory size.
+        :param string nic_speed: Network Port Speed data.
+        :param string drive_controller: Drive Controller data.
+        :param int public_bandwidth: Public keyName data.
+        :param bool test: Test option to verify the request.
+
+        :returns: bool
+        """
+        upgrade_prices = self._get_upgrade_prices(instance_id)
+        prices = []
+        data = {}
+
+        if memory:
+            data['memory'] = memory
+        if nic_speed:
+            data['nic_speed'] = nic_speed
+        if drive_controller:
+            data['disk_controller'] = drive_controller
+        if public_bandwidth:
+            data['bandwidth'] = public_bandwidth
+
+        server_response = self.get_instance(instance_id)
+        package_id = server_response['billingItem']['package']['id']
+
+        maintenance_window = datetime.datetime.now(utils.UTC())
+        order = {
+            'complexType': 'SoftLayer_Container_Product_Order_Hardware_Server_Upgrade',
+            'properties': [{
+                'name': 'MAINTENANCE_WINDOW',
+                'value': maintenance_window.strftime("%Y-%m-%d %H:%M:%S%z")
+            }],
+            'hardware': [{'id': int(instance_id)}],
+            'packageId': package_id
+        }
+
+        for option, value in data.items():
+            price_id = self._get_prices_for_upgrade_option(upgrade_prices, option, value)
+            if not price_id:
+                # Every option provided is expected to have a price
+                raise exceptions.SoftLayerError(
+                    "Unable to find %s option with value %s" % (option, value))
+
+            prices.append({'id': price_id})
+
+            order['prices'] = prices
+
+        if prices:
+            if test:
+                self.client['Product_Order'].verifyOrder(order)
+            else:
+                self.client['Product_Order'].placeOrder(order)
+            return True
+        return False
+
+    @retry(logger=LOGGER)
+    def get_instance(self, instance_id):
+        """Get details about a hardware server instance.
+
+        :param int instance_id: the instance ID
+        :returns: A dictionary containing a large amount of information about
+                  the specified instance.
+        """
+        mask = [
+            'billingItem[id,package[id,keyName]]'
+        ]
+        mask = "mask[%s]" % ','.join(mask)
+
+        return self.hardware.getObject(id=instance_id, mask=mask)
+
+    def _get_upgrade_prices(self, instance_id, include_downgrade_options=True):
+        """Following Method gets all the price ids related to upgrading a Hardware Server.
+
+        :param int instance_id: Instance id of the Hardware Server to be upgraded.
+
+        :returns: list
+        """
+        mask = [
+            'id',
+            'locationGroupId',
+            'categories[name,id,categoryCode]',
+            'item[keyName,description,capacity,units]'
+        ]
+        mask = "mask[%s]" % ','.join(mask)
+        return self.hardware.getUpgradeItemPrices(include_downgrade_options, id=instance_id, mask=mask)
+
+    @staticmethod
+    def _get_prices_for_upgrade_option(upgrade_prices, option, value):
+        """Find the price id for the option and value to upgrade. This
+
+        :param list upgrade_prices: Contains all the prices related to a
+        hardware server upgrade.
+        :param string option: Describes type of parameter to be upgraded
+
+        :return: int.
+        """
+        price_id = None
+        option_category = {
+            'memory': 'ram',
+            'nic_speed': 'port_speed',
+            'disk_controller': 'disk_controller',
+            'bandwidth': 'bandwidth'
+        }
+        category_code = option_category.get(option)
+
+        for price in upgrade_prices:
+            if price.get('categories') is None or price.get('item') is None:
+                continue
+
+            product = price.get('item')
+            for category in price.get('categories'):
+                if not category.get('categoryCode') == category_code:
+                    continue
+
+                if option == 'disk_controller':
+                    if value == product.get('description'):
+                        price_id = price.get('id')
+                elif option == 'nic_speed':
+                    if value.isdigit():
+                        if str(product.get('capacity')) == str(value):
+                            price_id = price.get('id')
+                    else:
+                        split_nic_speed = value.split(" ")
+                        if str(product.get('capacity')) == str(split_nic_speed[0]) and \
+                                split_nic_speed[1] in product.get("description"):
+                            price_id = price.get('id')
+                elif option == 'bandwidth':
+                    if str(product.get('capacity')) == str(value):
+                        price_id = price.get('id')
+                else:
+                    if str(product.get('capacity')) == str(value):
+                        price_id = price.get('id')
+
+        return price_id
 
 def _get_bandwidth_key(items, hourly=True, no_public=False, location=None):
     """Picks a valid Bandwidth Item, returns the KeyName"""
