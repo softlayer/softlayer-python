@@ -1404,3 +1404,45 @@ class VSManager(utils.IdentifierMixin, object):
         object_filter = {"hardware": {"virtualHost": {"id": {"operation": "not null"}}}}
         mask = "mask[virtualHost[guests[powerState]]]"
         return self.client.call('SoftLayer_Account', 'getHardware', mask=mask, filter=object_filter)
+
+    def authorize_storage(self, vs_id, username_storage):
+        """Authorize File or Block Storage to a Virtual Server.
+
+        :param int vs_id: Virtual server id.
+        :param string username_storage: Storage username.
+
+        :return: bool.
+        """
+        _filter = {"networkStorage": {"username": {"operation": username_storage}}}
+
+        storage_result = self.client.call('Account', 'getNetworkStorage', filter=_filter)
+
+        if len(storage_result) == 0:
+            raise SoftLayerError("The Storage with username: %s was not found, please"
+                                 " enter a valid storage username" % username_storage)
+
+        storage_template = [
+            {
+                "id": storage_result[0]['id'],
+                "username": username_storage
+            }
+        ]
+
+        result = self.client.call('SoftLayer_Virtual_Guest', 'allowAccessToNetworkStorageList',
+                                  storage_template, id=vs_id)
+
+        return result
+
+    def attach_portable_storage(self, vs_id, portable_id):
+        """Attach portal storage to a Virtual Server.
+
+        :param int vs_id: Virtual server id.
+        :param int portable_id: Portal storage id.
+
+        :return: SoftLayer_Provisioning_Version1_Transaction.
+        """
+        disk_id = portable_id
+        result = self.client.call('SoftLayer_Virtual_Guest', 'attachDiskImage',
+                                  disk_id, id=vs_id)
+
+        return result

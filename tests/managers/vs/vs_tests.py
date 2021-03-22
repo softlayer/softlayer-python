@@ -1309,3 +1309,19 @@ class VSTests(testing.TestCase):
 
         result = self.vs.get_hardware_guests()
         self.assertEqual("NSX-T Manager", result[0]['virtualHost']['guests'][0]['hostname'])
+
+    def test_authorize_storage(self):
+        options = self.vs.authorize_storage(1234, "SL01SEL301234-11")
+
+        self.assertEqual(True, options)
+
+    def test_authorize_storage_empty(self):
+        mock = self.set_mock('SoftLayer_Account', 'getNetworkStorage')
+        mock.return_value = []
+        self.assertRaises(SoftLayer.exceptions.SoftLayerError,
+                          self.vs.authorize_storage,
+                          1234, "#")
+
+    def test_authorize_portable_storage(self):
+        options = self.vs.attach_portable_storage(1234, 1234567)
+        self.assertEqual(1234567, options['id'])
