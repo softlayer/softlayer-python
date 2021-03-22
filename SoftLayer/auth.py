@@ -7,6 +7,8 @@
 """
 # pylint: disable=no-self-use
 
+from SoftLayer import config
+
 __all__ = [
     'BasicAuthentication',
     'TokenAuthentication',
@@ -109,3 +111,30 @@ class BasicHTTPAuthentication(AuthenticationBase):
 
     def __repr__(self):
         return "BasicHTTPAuthentication(username=%r)" % self.username
+
+class BearerAuthentication(AuthenticationBase):
+    """Bearer Token authentication class.
+
+        :param username str: a user's username, not really needed but all the others use it.
+        :param api_key str: a user's IAM Token
+    """
+
+    def __init__(self, username, token, r_token=None):
+        """For using IBM IAM authentication
+        
+        :param username str: Not really needed, will be set to their current username though for logging
+        :param token str: the IAM Token
+        :param r_token str: The refresh Token, optional
+        """
+        self.username = username
+        self.api_key = token
+        self.r_token = r_token
+
+    def get_request(self, request):
+        """Sets token-based auth headers."""
+        request.transport_headers['Authorization'] = 'Bearer {}'.format(self.api_key)
+        request.transport_user = self.username
+        return request
+
+    def __repr__(self):
+        return "BearerAuthentication(username={}, token={})".format(self.username, self.api_key)

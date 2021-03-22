@@ -6,16 +6,24 @@
     :license: MIT, see LICENSE for more details.
 """
 # pylint: disable=invalid-name
+import json
+import logging
+import requests
 import warnings
 
 
 from SoftLayer import auth as slauth
 from SoftLayer import config
 from SoftLayer import consts
+from SoftLayer import exceptions
 from SoftLayer import transports
 
+
+LOGGER = logging.getLogger(__name__)
 API_PUBLIC_ENDPOINT = consts.API_PUBLIC_ENDPOINT
 API_PRIVATE_ENDPOINT = consts.API_PRIVATE_ENDPOINT
+CONFIG_FILE = consts.CONFIG_FILE
+
 __all__ = [
     'create_client_from_env',
     'Client',
@@ -80,6 +88,8 @@ def create_client_from_env(username=None,
         'Your Company'
 
     """
+    if config_file is None:
+        config_file = CONFIG_FILE
     settings = config.get_client_settings(username=username,
                                           api_key=api_key,
                                           endpoint_url=endpoint_url,
@@ -127,7 +137,7 @@ def create_client_from_env(username=None,
                 settings.get('api_key'),
             )
 
-    return BaseClient(auth=auth, transport=transport)
+    return BaseClient(auth=auth, transport=transport, config_file=config_file)
 
 
 def Client(**kwargs):
@@ -150,9 +160,35 @@ class BaseClient(object):
 
     _prefix = "SoftLayer_"
 
-    def __init__(self, auth=None, transport=None):
+    def __init__(self, auth=None, transport=None, config_file=None):
+        if config_file is None:
+            config_file = CONFIG_FILE
         self.auth = auth
-        self.transport = transport
+        self.config_file = config_file
+        self.settings = config.get_config(self.config_file)
+
+        if transport is None:
+            url = self.settings['softlayer'].get('endpoint_url')
+            if url is not None and '/rest' in url:
+                # If this looks like a rest endpoint, use the rest transport
+                transport = transports.RestTransport(
+                    endpoint_url=url,
+                    proxy=self.settings['softlayer'].get('proxy'),
+                    timeout=self.settings['softlayer'].getint('timeout'),
+                    user_agent=consts.USER_AGENT,
+                    verify=self.settings['softlayer'].getboolean('verify'),
+                )
+            else:
+                # Default the transport to use XMLRPC
+                transport = transports.XmlRpcTransport(
+                    endpoint_url=url,
+                    proxy=self.settings['softlayer'].get('proxy'),
+                    timeout=self.settings['softlayer'].getint('timeout'),
+                    user_agent=consts.USER_AGENT,
+                    verify=self.settings['softlayer'].getboolean('verify'),
+                )
+
+        self.transport = transport  
 
     def authenticate_with_password(self, username, password,
                                    security_question_id=None,
@@ -320,6 +356,127 @@ class BaseClient(object):
 
     def __len__(self):
         return 0
+
+class IAMClient(BaseClient):
+    """IBM ID Client for using IAM authentication
+
+    :param auth: auth driver that looks like SoftLayer.auth.AuthenticationBase
+    :param transport: An object that's callable with this signature: transport(SoftLayer.transports.Request)
+    """
+
+
+    def authenticate_with_password(self, username, password):
+        """Performs IBM IAM Username/Password Authentication
+
+        :param string username: your IBMid username
+        :param string password: your IBMid password
+        """
+
+        iam_client = requests.Session()
+
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'User-Agent': consts.USER_AGENT,
+            'Accept': 'application/json'
+        }
+        data = {
+            'grant_type': 'password',
+            'password': password,
+            'response_type': 'cloud_iam',
+            'username': username
+        }
+
+        response = iam_client.request(
+            'POST',
+            'https://iam.cloud.ibm.com/identity/token',
+            data=data,
+            headers=headers,
+            auth=requests.auth.HTTPBasicAuth('bx', 'bx')
+        )
+        if response.status_code != 200:
+            LOGGER.error("Unable to login: {}".format(response.text))
+
+        response.raise_for_status()
+
+        tokens = json.loads(response.text)
+        self.settings['softlayer']['access_token'] = tokens['access_token']
+        self.settings['softlayer']['refresh_token'] = tokens['refresh_token']
+        
+        config.write_config(self.settings)
+        self.auth = slauth.BearerAuthentication('', tokens['access_token'], tokens['refresh_token'])
+        return tokens
+
+    def authenticate_with_iam_token(self, a_token, r_token):
+        """Authenticates to the SL API  with an IAM Token
+
+        :param string a_token: Access token
+        :param string r_token: Refresh Token, to be used if Access token is expired.
+        """
+        self.auth = slauth.BearerAuthentication('', a_token)
+        user = None
+        try:
+            user = self.call('Account', 'getCurrentUser')
+        except exceptions.SoftLayerAPIError as ex:
+            if ex.faultCode == 401:
+                LOGGER.warning("Token has expired, trying to refresh.")
+                # self.refresh_iam_token(r_token)
+            else:
+                raise ex
+        return user
+
+    def refresh_iam_token(self, r_token):
+        iam_client = requests.Session()
+
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'User-Agent': consts.USER_AGENT,
+            'Accept': 'application/json'
+        }
+        data = {
+            'grant_type': 'refresh_token',
+            'refresh_token': r_token,
+            'response_type': 'cloud_iam'
+        }
+
+        config = self.settings.get('softlayer')
+        if config.get('account', False):
+            data['account'] = account
+        if config.get('ims_account', False):
+            data['ims_account'] = ims_account
+
+        response = iam_client.request(
+            'POST',
+            'https://iam.cloud.ibm.com/identity/token',
+            data=data,
+            headers=headers,
+            auth=requests.auth.HTTPBasicAuth('bx', 'bx')
+        )
+        response.raise_for_status()
+
+        LOGGER.warning("Successfully refreshed Tokens, saving to config")
+        tokens = json.loads(response.text)
+        self.settings['softlayer']['access_token'] = tokens['access_token']
+        self.settings['softlayer']['refresh_token'] = tokens['refresh_token']
+        config.write_config(self.settings)
+        return tokens
+    
+
+
+    def call(self, service, method, *args, **kwargs):
+        """Handles refreshing IAM tokens in case of a HTTP 401 error"""
+        try:
+            return super().call(service, method, *args, **kwargs)
+        except exceptions.SoftLayerAPIError as ex:
+            if ex.faultCode == 401:
+                LOGGER.warning("Token has expired, trying to refresh.")
+                self.refresh_iam_token(r_token)
+                return super().call(service, method, *args, **kwargs)
+            else:
+                raise ex
+
+    
+    def __repr__(self):
+        return "IAMClient(transport=%r, auth=%r)" % (self.transport, self.auth)
 
 
 class Service(object):

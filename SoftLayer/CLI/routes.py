@@ -70,6 +70,7 @@ ALL_ROUTES = [
     ('config:setup', 'SoftLayer.CLI.config.setup:cli'),
     ('config:show', 'SoftLayer.CLI.config.show:cli'),
     ('setup', 'SoftLayer.CLI.config.setup:cli'),
+    ('login', 'SoftLayer.CLI.config.login:cli'),
 
     ('dns', 'SoftLayer.CLI.dns'),
     ('dns:import', 'SoftLayer.CLI.dns.zone_import:cli'),
