@@ -19,19 +19,19 @@ from SoftLayer.CLI import helpers
 @environment.pass_env
 def cli(env, identifier, username_storage, portable_id):
     """Authorize File, Block and Portable Storage to a Virtual Server."""
-    vs = SoftLayer.VSManager(env.client)
-    vs_id = helpers.resolve_id(vs.resolve_ids, identifier, 'vs')
+    virtual = SoftLayer.VSManager(env.client)
+    virtual_id = helpers.resolve_id(virtual.resolve_ids, identifier, 'virtual')
     table = formatting.KeyValueTable(['name', 'value'], title="Portable Storage Detail")
     table.align['name'] = 'r'
     table.align['value'] = 'l'
 
     if username_storage:
-        if not vs.authorize_storage(vs_id, username_storage):
+        if not virtual.authorize_storage(virtual_id, username_storage):
             raise exceptions.CLIAbort('Authorize Volume Failed')
         env.fout('Successfully Volume: %s was Added.' % username_storage)
     if portable_id:
-        portable_id = helpers.resolve_id(vs.resolve_ids, portable_id, 'storage')
-        portable_result = vs.attach_portable_storage(vs_id, portable_id)
+        portable_id = helpers.resolve_id(virtual.resolve_ids, portable_id, 'storage')
+        portable_result = virtual.attach_portable_storage(virtual_id, portable_id)
 
         env.fout('Successfully Portable Storage: %i was Added.' % portable_id)
 
