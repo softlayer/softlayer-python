@@ -18,8 +18,7 @@ from SoftLayer.CLI import helpers
               help="The portable storage id to be added to the virtual server")
 @environment.pass_env
 def cli(env, identifier, username_storage, portable_id):
-    """Authorize File, Block and Portable Storage to a Virtual Server.
-    """
+    """Authorize File, Block and Portable Storage to a Virtual Server."""
     vs = SoftLayer.VSManager(env.client)
     vs_id = helpers.resolve_id(vs.resolve_ids, identifier, 'vs')
     table = formatting.KeyValueTable(['name', 'value'], title="Portable Storage Detail")
