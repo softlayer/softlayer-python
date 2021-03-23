@@ -78,11 +78,13 @@ def cli(env, identifier, passwords, price):
     if price:
         total_price = utils.lookup(result, 'billingItem', 'nextInvoiceTotalRecurringAmount') or 0
 
-        price_table = formatting.Table(['Item', 'Recurring Price'])
-        price_table.add_row(['Total', total_price])
+        price_table = formatting.Table(['Item', 'CategoryCode', 'Recurring Price'])
+        price_table.align['Item'] = 'l'
 
-        for item in utils.lookup(result, 'billingItem', 'children') or []:
-            price_table.add_row([item['description'], item['nextInvoiceTotalRecurringAmount']])
+        price_table.add_row(['Total', '-', total_price])
+
+        for item in utils.lookup(result, 'billingItem', 'nextInvoiceChildren') or []:
+            price_table.add_row([item['description'], item['categoryCode'], item['nextInvoiceTotalRecurringAmount']])
 
         table.add_row(['prices', price_table])
 
