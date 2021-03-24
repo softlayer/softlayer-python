@@ -10,7 +10,7 @@ import json
 import logging
 import requests
 import warnings
-
+import time
 
 from SoftLayer import auth as slauth
 from SoftLayer import config
@@ -18,7 +18,7 @@ from SoftLayer import consts
 from SoftLayer import exceptions
 from SoftLayer import transports
 
-
+from pprint import pprint as pp
 LOGGER = logging.getLogger(__name__)
 API_PUBLIC_ENDPOINT = consts.API_PUBLIC_ENDPOINT
 API_PRIVATE_ENDPOINT = consts.API_PRIVATE_ENDPOINT
@@ -402,29 +402,63 @@ class IAMClient(BaseClient):
         self.settings['softlayer']['access_token'] = tokens['access_token']
         self.settings['softlayer']['refresh_token'] = tokens['refresh_token']
         
-        config.write_config(self.settings)
+        config.write_config(self.settings, self.config_file)
         self.auth = slauth.BearerAuthentication('', tokens['access_token'], tokens['refresh_token'])
+
         return tokens
 
-    def authenticate_with_iam_token(self, a_token, r_token):
+    def authenticate_with_passcode(self, passcode):
+        """Performs IBM IAM SSO Authentication
+
+        :param string passcode: your IBMid password
+        """
+
+        iam_client = requests.Session()
+
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'User-Agent': consts.USER_AGENT,
+            'Accept': 'application/json'
+        }
+        data = {
+            'grant_type': 'urn:ibm:params:oauth:grant-type:passcode',
+            'passcode': passcode,
+            'response_type': 'cloud_iam'
+        }
+
+        response = iam_client.request(
+            'POST',
+            'https://iam.cloud.ibm.com/identity/token',
+            data=data,
+            headers=headers,
+            auth=requests.auth.HTTPBasicAuth('bx', 'bx')
+        )
+        if response.status_code != 200:
+            LOGGER.error("Unable to login: {}".format(response.text))
+
+        response.raise_for_status()
+
+        tokens = json.loads(response.text)
+        self.settings['softlayer']['access_token'] = tokens['access_token']
+        self.settings['softlayer']['refresh_token'] = tokens['refresh_token']
+        a_expire = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tokens['expiration']))
+        r_expire = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tokens['refresh_token_expiration']))
+        LOGGER.warning("Tokens retrieved, expires at {}, Refresh expires at {}".format(a_expire, r_expire))
+        config.write_config(self.settings, self.config_file)
+        self.auth = slauth.BearerAuthentication('', tokens['access_token'], tokens['refresh_token'])
+
+        return tokens
+
+    def authenticate_with_iam_token(self, a_token, r_token=None):
         """Authenticates to the SL API  with an IAM Token
 
         :param string a_token: Access token
         :param string r_token: Refresh Token, to be used if Access token is expired.
         """
-        self.auth = slauth.BearerAuthentication('', a_token)
-        user = None
-        try:
-            user = self.call('Account', 'getCurrentUser')
-        except exceptions.SoftLayerAPIError as ex:
-            if ex.faultCode == 401:
-                LOGGER.warning("Token has expired, trying to refresh.")
-                # self.refresh_iam_token(r_token)
-            else:
-                raise ex
-        return user
+        self.auth = slauth.BearerAuthentication('', a_token, r_token)
 
-    def refresh_iam_token(self, r_token):
+    def refresh_iam_token(self, r_token, account_id=None, ims_account=None):
+        """Refreshes the IAM Token, will default to values in the config file"""
         iam_client = requests.Session()
 
         headers = {
@@ -438,11 +472,15 @@ class IAMClient(BaseClient):
             'response_type': 'cloud_iam'
         }
 
-        config = self.settings.get('softlayer')
-        if config.get('account', False):
-            data['account'] = account
-        if config.get('ims_account', False):
-            data['ims_account'] = ims_account
+        sl_config = self.settings['softlayer']
+
+        if account_id is None and sl_config.get('account_id', False):
+            account_id = sl_config.get('account_id')
+        if ims_account is None and sl_config.get('ims_account', False):
+            ims_account = sl_config.get('ims_account')
+
+        data['account'] = account_id
+        data['ims_account'] = ims_account
 
         response = iam_client.request(
             'POST',
@@ -451,30 +489,37 @@ class IAMClient(BaseClient):
             headers=headers,
             auth=requests.auth.HTTPBasicAuth('bx', 'bx')
         )
+        
+        if response.status_code != 200:
+            LOGGER.warning("Unable to refresh IAM Token. {}".format(response.text))
+        
         response.raise_for_status()
-
-        LOGGER.warning("Successfully refreshed Tokens, saving to config")
+       
         tokens = json.loads(response.text)
+        a_expire = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tokens['expiration']))
+        r_expire = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tokens['refresh_token_expiration']))
+        LOGGER.warning("Successfully refreshed Tokens. Expires at {}, Refresh expires at {}".format(a_expire, r_expire))
+
         self.settings['softlayer']['access_token'] = tokens['access_token']
         self.settings['softlayer']['refresh_token'] = tokens['refresh_token']
-        config.write_config(self.settings)
+        config.write_config(self.settings, self.config_file)
+        self.auth = slauth.BearerAuthentication('', tokens['access_token'])
         return tokens
-    
-
 
     def call(self, service, method, *args, **kwargs):
         """Handles refreshing IAM tokens in case of a HTTP 401 error"""
         try:
             return super().call(service, method, *args, **kwargs)
         except exceptions.SoftLayerAPIError as ex:
+
             if ex.faultCode == 401:
-                LOGGER.warning("Token has expired, trying to refresh.")
-                self.refresh_iam_token(r_token)
-                return super().call(service, method, *args, **kwargs)
+                LOGGER.warning("Token has expired, trying to refresh. {}".format(ex.faultString))
+                # self.refresh_iam_token(r_token)
+                # return super().call(service, method, *args, **kwargs)
+                return ex
             else:
                 raise ex
 
-    
     def __repr__(self):
         return "IAMClient(transport=%r, auth=%r)" % (self.transport, self.auth)
 
