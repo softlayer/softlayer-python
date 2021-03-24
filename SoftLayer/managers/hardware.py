@@ -263,6 +263,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                 'children[nextInvoiceTotalRecurringAmount],'
                 'orderItem.order.userRecord[username]'
                 '],'
+                'lastTransaction[transactionGroup[name]],'
                 'hourlyBillingFlag,'
                 'tagReferences[id,tag[name,id]],'
                 'networkVlans[id,vlanNumber,networkSpace],'
