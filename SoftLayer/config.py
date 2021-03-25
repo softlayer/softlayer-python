@@ -12,6 +12,7 @@ import os.path
 
 LOGGER = logging.getLogger(__name__)
 
+
 def get_client_settings_args(**kwargs):
     """Retrieve client settings from user-supplied arguments.
 
@@ -96,16 +97,18 @@ def get_client_settings(**kwargs):
 
 
 def get_config(config_file=None):
+    """Returns a parsed config object"""
     if config_file is None:
         config_file = '~/.softlayer'
     config = configparser.ConfigParser()
     config.read(os.path.expanduser(config_file))
     return config
 
+
 def write_config(configuration, config_file=None):
+    """Writes a configuration to config_file"""
     if config_file is None:
         config_file = '~/.softlayer'
     config_file = os.path.expanduser(config_file)
-    LOGGER.warning("Updating config file {} with new access tokens".format(config_file))
     with open(config_file, 'w') as file:
         configuration.write(file)

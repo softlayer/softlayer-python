@@ -22,9 +22,7 @@ from SoftLayer import transports
 class TestHelpShow(testing.TestCase):
 
     def set_up(self):
-        transport = transports.XmlRpcTransport(
-            endpoint_url='http://endpoint-url',
-        )
+        transport = transports.XmlRpcTransport(endpoint_url='http://endpoint-url',)
         self.env.client = SoftLayer.BaseClient(
             transport=transport,
             auth=auth.BasicAuthentication('username', 'api-key'))
@@ -50,6 +48,7 @@ class TestHelpSetup(testing.TestCase):
         # used.
         transport = testing.MockableTransport(SoftLayer.FixtureTransport())
         self.env.client = SoftLayer.BaseClient(transport=transport)
+        self.config_file = "./test_config_file"
 
     @mock.patch('SoftLayer.Client')
     @mock.patch('SoftLayer.CLI.formatting.confirm')
@@ -62,7 +61,7 @@ class TestHelpSetup(testing.TestCase):
         with tempfile.NamedTemporaryFile() as config_file:
             confirm_mock.return_value = True
             getpass.return_value = 'A' * 64
-            mocked_input.side_effect = ['user', 'public', 0]
+            mocked_input.side_effect = ['public', 'user', 0]
 
             result = self.run_command(['--config=%s' % config_file.name, 'config', 'setup'])
 
@@ -84,55 +83,38 @@ class TestHelpSetup(testing.TestCase):
         with tempfile.NamedTemporaryFile() as config_file:
             confirm_mock.return_value = False
             getpass.return_value = 'A' * 64
-            mocked_input.side_effect = ['user', 'public', 0]
+            mocked_input.side_effect = ['public', 'user', 0]
 
-            result = self.run_command(['--config=%s' % config_file.name,
-                                       'config', 'setup'])
-
+            result = self.run_command(['--config=%s' % config_file.name, 'config', 'setup'])
             self.assertEqual(result.exit_code, 2)
             self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
     @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
     @mock.patch('SoftLayer.CLI.environment.Environment.input')
-    def test_get_user_input_private(self, mocked_input, getpass):
-        getpass.return_value = 'A' * 64
-        mocked_input.side_effect = ['user', 'private', 0]
-
-        username, secret, endpoint_url, timeout = (
-            config.get_user_input(self.env))
-
-        self.assertEqual(username, 'user')
-        self.assertEqual(secret, 'A' * 64)
-        self.assertEqual(endpoint_url, consts.API_PRIVATE_ENDPOINT)
-        self.assertEqual(timeout, 0)
-
-    @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
-    @mock.patch('SoftLayer.CLI.environment.Environment.input')
-    def test_get_user_input_custom(self, mocked_input, getpass):
-        getpass.return_value = 'A' * 64
-        mocked_input.side_effect = ['user', 'custom', 'custom-endpoint', 0]
-
-        _, _, endpoint_url, _ = config.get_user_input(self.env)
-
-        self.assertEqual(endpoint_url, 'custom-endpoint')
-
-    @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
-    @mock.patch('SoftLayer.CLI.environment.Environment.input')
     def test_github_1074(self, mocked_input, getpass):
         """Tests to make sure directly using an endpoint works"""
-        getpass.return_value = 'A' * 64
-        mocked_input.side_effect = ['user', 'test-endpoint', 0]
-
-        _, _, endpoint_url, _ = config.get_user_input(self.env)
-
+        mocked_input.side_effect = ['test-endpoint']
+        endpoint_url = config.get_endpoint_url(self.env)
         self.assertEqual(endpoint_url, 'test-endpoint')
 
     @mock.patch('SoftLayer.CLI.environment.Environment.getpass')
     @mock.patch('SoftLayer.CLI.environment.Environment.input')
-    def test_get_user_input_default(self, mocked_input, getpass):
-        self.env.getpass.return_value = 'A' * 64
-        mocked_input.side_effect = ['user', 'public', 0]
+    def test_get_endpoint(self, mocked_input, getpass):
+        """Tests to make sure directly using an endpoint works"""
+        mocked_input.side_effect = ['private', 'custom', 'test.com', 'public', 'test-endpoint']
 
-        _, _, endpoint_url, _ = config.get_user_input(self.env)
+        # private
+        endpoint_url = config.get_endpoint_url(self.env)
+        self.assertEqual(endpoint_url, consts.API_PRIVATE_ENDPOINT)
 
+        # custom - test.com
+        endpoint_url = config.get_endpoint_url(self.env)
+        self.assertEqual(endpoint_url, 'test.com')
+
+        # public
+        endpoint_url = config.get_endpoint_url(self.env)
         self.assertEqual(endpoint_url, consts.API_PUBLIC_ENDPOINT)
+
+        # test-endpoint
+        endpoint_url = config.get_endpoint_url(self.env)
+        self.assertEqual(endpoint_url, 'test-endpoint')

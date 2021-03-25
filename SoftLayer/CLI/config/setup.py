@@ -1,10 +1,11 @@
 """Setup CLI configuration."""
 # :license: MIT, see LICENSE for more details.
+import webbrowser
+
 import configparser
 import json
-import requests
 import os.path
-import webbrowser
+import requests
 
 import click
 
@@ -13,11 +14,9 @@ from SoftLayer.CLI import config
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
-from SoftLayer import config as base_config
 from SoftLayer.consts import USER_AGENT
 from SoftLayer import utils
 
-from pprint import pprint as pp
 
 def get_api_key(client, username, secret):  # pylint: disable=inconsistent-return-statements
     """Attempts API-Key and password auth to get an API key.
@@ -66,31 +65,26 @@ def cli(env, auth):
     """
     username = None
     api_key = None
-    
+
     timeout = 0
     defaults = config.get_settings_from_client(env.client)
-    endpoint_url =  defaults.get('endpoint_url', 'public')
-    # endpoint_url = get_endpoint_url(env, defaults.get('endpoint_url', 'public'))
+    endpoint_url = get_endpoint_url(env, defaults.get('endpoint_url', 'public'))
     # Get ths username and API key
     if auth == 'ibmid':
-        print("Logging in with IBMid")
         username, api_key = ibmid_login(env)
-        
+
     elif auth == 'cloud_key':
         username = 'apikey'
-        secret = env.input('Classic Infrastructue API Key', default=defaults['api_key'])
+        secret = env.getpass('Classic Infrastructue API Key', default=defaults['api_key'])
         new_client = SoftLayer.Client(username=username, api_key=secret, endpoint_url=endpoint_url, timeout=timeout)
         api_key = get_api_key(new_client, username, secret)
 
-    elif auth =='sso':
-        print("Using SSO for login")
+    elif auth == 'sso':
         username, api_key = sso_login(env)
+
     else:
-        print("Using a Classic Infrastructure API key")
-
         username = env.input('Classic Infrastructue Username', default=defaults['username'])
-        secret = env.input('Classic Infrastructue API Key', default=defaults['api_key'])
-
+        secret = env.getpass('Classic Infrastructue API Key', default=defaults['api_key'])
         new_client = SoftLayer.Client(username=username, api_key=secret, endpoint_url=endpoint_url, timeout=timeout)
         api_key = get_api_key(new_client, username, secret)
 
@@ -148,32 +142,26 @@ def get_endpoint_url(env, endpoint='public'):
             endpoint_url = env.input('Endpoint URL', default=endpoint)
         else:
             endpoint_url = endpoint_type
-
-
     return endpoint_url
+
 
 def ibmid_login(env):
     """Uses an IBMid and Password to get an access token, and that access token to get an API key"""
     email = env.input("Email").strip()
     password = env.getpass("Password").strip()
 
-    account_id = ''
-    ims_id = ''
-    sl_config = base_config.get_config(env.config_file)
-    # tokens = {'access_token': sl_config['softlayer']['access_token'], 'refresh_token': sl_config['softlayer']['refresh_token']}
     client = SoftLayer.API.IAMClient(config_file=env.config_file)
-    
+
     # STEP 1: Get the base IAM Token with a username/password
     tokens = client.authenticate_with_password(email, password)
 
     # STEP 2: Figure out which account we want to use
     account = get_accounts(env, tokens['access_token'])
-    
+
     # STEP 3: Refresh Token, using a specific account this time.
     tokens = client.refresh_iam_token(tokens['refresh_token'], account['account_id'], account['ims_id'])
 
     # STEP 4: Get or create the Classic Infrastructure API key
-    # client.authenticate_with_iam_token(tokens['access_token'])
     user = client.call('SoftLayer_Account', 'getCurrentUser', mask="mask[id,username,apiAuthenticationKeys]")
 
     if len(user.get('apiAuthenticationKeys', [])) == 0:
@@ -220,11 +208,10 @@ def get_accounts(env, a_token):
                 ims_id = "Unlinked"
             env.fout("{}: {} ({})".format(counter, utils.lookup(selected, 'entity', 'name'), ims_id))
             counter = counter + 1
-        ims_id = None # Reset ims_id to avoid any mix-match or something.
+        ims_id = None  # Reset ims_id to avoid any mix-match or something.
         choice = click.prompt('Enter a number', type=int)
         # Test to make sure choice is not out of bounds...
         selected = accounts['resources'][choice - 1]
-
 
     account_id = utils.lookup(selected, 'metadata', 'guid')
     links = utils.lookup(selected, 'metadata', 'linked_accounts') or []
@@ -256,11 +243,9 @@ def get_sso_url():
     data = json.loads(response.text)
     return data.get('passcode_endpoint')
 
+
 def sso_login(env):
     """Uses a SSO token to get a SL apikey"""
-    account_id = ''
-    ims_id = ''
-
     passcode_url = get_sso_url()
     env.fout("Get a one-time code from {} to proceed.".format(passcode_url))
     open_browser = env.input("Open the URL in the default browser? [Y/n]", default='Y')

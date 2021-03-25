@@ -6,11 +6,13 @@
     :license: MIT, see LICENSE for more details.
 """
 # pylint: disable=invalid-name
+import time
+import warnings
+
 import json
 import logging
 import requests
-import warnings
-import time
+
 
 from SoftLayer import auth as slauth
 from SoftLayer import config
@@ -18,7 +20,6 @@ from SoftLayer import consts
 from SoftLayer import exceptions
 from SoftLayer import transports
 
-from pprint import pprint as pp
 LOGGER = logging.getLogger(__name__)
 API_PUBLIC_ENDPOINT = consts.API_PUBLIC_ENDPOINT
 API_PRIVATE_ENDPOINT = consts.API_PRIVATE_ENDPOINT
@@ -188,7 +189,7 @@ class BaseClient(object):
                     verify=self.settings['softlayer'].getboolean('verify'),
                 )
 
-        self.transport = transport  
+        self.transport = transport
 
     def authenticate_with_password(self, username, password,
                                    security_question_id=None,
@@ -357,6 +358,7 @@ class BaseClient(object):
     def __len__(self):
         return 0
 
+
 class IAMClient(BaseClient):
     """IBM ID Client for using IAM authentication
 
@@ -364,8 +366,7 @@ class IAMClient(BaseClient):
     :param transport: An object that's callable with this signature: transport(SoftLayer.transports.Request)
     """
 
-
-    def authenticate_with_password(self, username, password):
+    def authenticate_with_password(self, username, password, security_question_id=None, security_question_answer=None):
         """Performs IBM IAM Username/Password Authentication
 
         :param string username: your IBMid username
@@ -394,14 +395,14 @@ class IAMClient(BaseClient):
             auth=requests.auth.HTTPBasicAuth('bx', 'bx')
         )
         if response.status_code != 200:
-            LOGGER.error("Unable to login: {}".format(response.text))
+            LOGGER.error("Unable to login: %s", response.text)
 
         response.raise_for_status()
 
         tokens = json.loads(response.text)
         self.settings['softlayer']['access_token'] = tokens['access_token']
         self.settings['softlayer']['refresh_token'] = tokens['refresh_token']
-        
+
         config.write_config(self.settings, self.config_file)
         self.auth = slauth.BearerAuthentication('', tokens['access_token'], tokens['refresh_token'])
 
@@ -434,7 +435,7 @@ class IAMClient(BaseClient):
             auth=requests.auth.HTTPBasicAuth('bx', 'bx')
         )
         if response.status_code != 200:
-            LOGGER.error("Unable to login: {}".format(response.text))
+            LOGGER.error("Unable to login: %s", response.text)
 
         response.raise_for_status()
 
@@ -443,7 +444,7 @@ class IAMClient(BaseClient):
         self.settings['softlayer']['refresh_token'] = tokens['refresh_token']
         a_expire = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tokens['expiration']))
         r_expire = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tokens['refresh_token_expiration']))
-        LOGGER.warning("Tokens retrieved, expires at {}, Refresh expires at {}".format(a_expire, r_expire))
+        LOGGER.warning("Tokens retrieved, expires at %s, Refresh expires at %s", a_expire, r_expire)
         config.write_config(self.settings, self.config_file)
         self.auth = slauth.BearerAuthentication('', tokens['access_token'], tokens['refresh_token'])
 
@@ -489,16 +490,16 @@ class IAMClient(BaseClient):
             headers=headers,
             auth=requests.auth.HTTPBasicAuth('bx', 'bx')
         )
-        
+
         if response.status_code != 200:
-            LOGGER.warning("Unable to refresh IAM Token. {}".format(response.text))
-        
+            LOGGER.warning("Unable to refresh IAM Token. %s", response.text)
+
         response.raise_for_status()
-       
+
         tokens = json.loads(response.text)
         a_expire = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tokens['expiration']))
         r_expire = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tokens['refresh_token_expiration']))
-        LOGGER.warning("Successfully refreshed Tokens. Expires at {}, Refresh expires at {}".format(a_expire, r_expire))
+        LOGGER.warning("Tokens retrieved, expires at %s, Refresh expires at %s", a_expire, r_expire)
 
         self.settings['softlayer']['access_token'] = tokens['access_token']
         self.settings['softlayer']['refresh_token'] = tokens['refresh_token']
@@ -513,9 +514,7 @@ class IAMClient(BaseClient):
         except exceptions.SoftLayerAPIError as ex:
 
             if ex.faultCode == 401:
-                LOGGER.warning("Token has expired, trying to refresh. {}".format(ex.faultString))
-                # self.refresh_iam_token(r_token)
-                # return super().call(service, method, *args, **kwargs)
+                LOGGER.warning("Token has expired, trying to refresh. %s", ex.faultString)
                 return ex
             else:
                 raise ex
