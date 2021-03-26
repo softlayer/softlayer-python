@@ -227,6 +227,7 @@ ALL_ROUTES = [
     ('order:place-quote', 'SoftLayer.CLI.order.place_quote:cli'),
     ('order:quote-list', 'SoftLayer.CLI.order.quote_list:cli'),
     ('order:quote-detail', 'SoftLayer.CLI.order.quote_detail:cli'),
+    ('order:quote-save', 'SoftLayer.CLI.order.quote_save:cli'),
     ('order:quote', 'SoftLayer.CLI.order.quote:cli'),
     ('order:lookup', 'SoftLayer.CLI.order.lookup:cli'),
 

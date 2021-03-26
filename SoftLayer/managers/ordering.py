@@ -169,6 +169,13 @@ class OrderingManager(object):
         quote = self.client['Billing_Order_Quote'].getObject(id=quote_id, mask=mask)
         return quote
 
+    def save_quote(self, quote_id):
+        """Save a quote.
+
+        :param quote_id: ID number of target quote
+        """
+        return self.client['Billing_Order_Quote'].saveQuote(id=quote_id)
+
     def get_order_container(self, quote_id):
         """Generate an order container from a quote object.
 
