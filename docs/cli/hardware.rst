@@ -120,6 +120,10 @@ This function updates the firmware of a server. If already at the latest version
    :prog: hardware guests
    :show-nested:
 
+.. click:: SoftLayer.CLI.hardware.authorize_storage:cli
+   :prog: hardware authorize-storage
+   :show-nested:
+
 .. click:: SoftLayer.CLI.hardware.upgrade:cli
    :prog: hardware upgrade
    :show-nested:

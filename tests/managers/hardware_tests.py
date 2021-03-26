@@ -841,6 +841,18 @@ class HardwareTests(testing.TestCase):
 
         self.assertEqual("NSX-T Manager", result[0]['hostname'])
 
+    def test_authorize_storage(self):
+        options = self.hardware.authorize_storage(1234, "SL01SEL301234-11")
+
+        self.assertEqual(True, options)
+
+    def test_authorize_storage_empty(self):
+        mock = self.set_mock('SoftLayer_Account', 'getNetworkStorage')
+        mock.return_value = []
+        self.assertRaises(SoftLayer.exceptions.SoftLayerError,
+                          self.hardware.authorize_storage,
+                          1234, "#")
+
     def test_get_price_id_memory_capacity(self):
         upgrade_prices = [
             {'categories': [{'categoryCode': 'ram'}], 'item': {'capacity': 1}, 'id': 99}

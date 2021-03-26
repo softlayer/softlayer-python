@@ -57,3 +57,5 @@ getObject = {
         {'tag': {'name': 'a tag'}}
     ],
 }
+
+allowAccessToNetworkStorageList = True
