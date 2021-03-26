@@ -1057,3 +1057,22 @@ getRouters = [
             "statusId": 2
         }
     }]
+
+getNetworkStorage = [
+    {
+        "accountId": 1111111,
+        "capacityGb": 20,
+        "createDate": "2016-01-21T12:11:07-06:00",
+        "id": 1234567,
+        "nasType": "ISCSI",
+        "username": "SL01SEL301234-11",
+    },
+    {
+        "accountId": 1111111,
+        "capacityGb": 20,
+        "createDate": "2015-04-29T07:55:55-06:00",
+        "id": 4917123,
+        "nasType": "NAS",
+        "username": "SL01SEV1234567_111"
+    }
+]

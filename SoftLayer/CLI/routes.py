@@ -45,6 +45,7 @@ ALL_ROUTES = [
     ('virtual:upgrade', 'SoftLayer.CLI.virt.upgrade:cli'),
     ('virtual:usage', 'SoftLayer.CLI.virt.usage:cli'),
     ('virtual:credentials', 'SoftLayer.CLI.virt.credentials:cli'),
+    ('virtual:authorize-storage', 'SoftLayer.CLI.virt.authorize_storage:cli'),
     ('virtual:capacity', 'SoftLayer.CLI.virt.capacity:cli'),
     ('virtual:placementgroup', 'SoftLayer.CLI.virt.placementgroup:cli'),
     ('virtual:migrate', 'SoftLayer.CLI.virt.migrate:cli'),
