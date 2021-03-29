@@ -15,6 +15,7 @@ class SoftLayerError(Exception):
 class Unauthenticated(SoftLayerError):
     """Unauthenticated."""
 
+
 class IAMError(SoftLayerError):
     """Errors from iam.cloud.ibm.com"""
 

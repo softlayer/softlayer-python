@@ -165,12 +165,11 @@ class TestHelpSetup(testing.TestCase):
         token.return_value = {"access_token": "zzzzzz", "refresh_token": "fffffff"}
         test_key = "zz112233"
         user_object_1 = {
-            "apiAuthenticationKeys": [{"authenticationKey":test_key}],
-            "username":"testerson",
-            "id":99}
+            "apiAuthenticationKeys": [{"authenticationKey": test_key}],
+            "username": "testerson",
+            "id": 99}
         api_call.side_effect = [user_object_1]
 
         user, apikey = config.sso_login(self.env)
         self.assertEqual("testerson", user)
         self.assertEqual(test_key, apikey)
-        

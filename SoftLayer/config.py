@@ -102,6 +102,14 @@ def get_config(config_file=None):
         config_file = '~/.softlayer'
     config = configparser.ConfigParser()
     config.read(os.path.expanduser(config_file))
+    # No configuration file found.
+    if not config.has_section('softlayer'):
+        config.add_section('softlayer')
+        config['softlayer']['username'] = ''
+        config['softlayer']['endpoint_url'] = ''
+        config['softlayer']['api_key'] = ''
+        config['softlayer']['timeout'] = 0
+
     return config
 
 

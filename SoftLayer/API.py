@@ -405,7 +405,7 @@ class IAMClient(BaseClient):
             error = json.loads(response.text)
             raise exceptions.IAMError(response.status_code,
                                       error.get('errorMessage'),
-                                      'https://iam.cloud.ibm.com/identity/token')
+                                      'https://iam.cloud.ibm.com/identity/token') from ex
 
         self.settings['softlayer']['access_token'] = tokens['access_token']
         self.settings['softlayer']['refresh_token'] = tokens['refresh_token']
@@ -452,7 +452,7 @@ class IAMClient(BaseClient):
             error = json.loads(response.text)
             raise exceptions.IAMError(response.status_code,
                                       error.get('errorMessage'),
-                                      'https://iam.cloud.ibm.com/identity/token')
+                                      'https://iam.cloud.ibm.com/identity/token') from ex
 
         self.settings['softlayer']['access_token'] = tokens['access_token']
         self.settings['softlayer']['refresh_token'] = tokens['refresh_token']
@@ -516,7 +516,7 @@ class IAMClient(BaseClient):
             error = json.loads(response.text)
             raise exceptions.IAMError(response.status_code,
                                       error.get('errorMessage'),
-                                      'https://iam.cloud.ibm.com/identity/token')
+                                      'https://iam.cloud.ibm.com/identity/token') from ex
 
         a_expire = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tokens['expiration']))
         r_expire = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tokens['refresh_token_expiration']))
