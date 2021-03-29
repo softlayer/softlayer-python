@@ -239,6 +239,8 @@ class HardwareManager(utils.IdentifierMixin, object):
                 'primaryIpAddress,'
                 'networkManagementIpAddress,'
                 'userData,'
+                'activeComponents[id,hardwareComponentModel['
+                'hardwareGenericComponentModel[id,hardwareComponentType[keyName]]]],'
                 'datacenter,'
                 '''networkComponents[id, status, speed, maxSpeed, name,
                    ipmiMacAddress, ipmiIpAddress, macAddress, primaryIpAddress,

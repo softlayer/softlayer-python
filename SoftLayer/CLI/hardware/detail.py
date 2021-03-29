@@ -71,6 +71,8 @@ def cli(env, identifier, passwords, price):
     bandwidth = hardware.get_bandwidth_allocation(hardware_id)
     bw_table = _bw_table(bandwidth)
     table.add_row(['Bandwidth', bw_table])
+    system_table = _system_table(result['activeComponents'])
+    table.add_row(['System_data', system_table])
 
     if result.get('notes'):
         table.add_row(['notes', result['notes']])
@@ -116,4 +118,14 @@ def _bw_table(bw_data):
                 allotment = utils.lookup(bw_data, 'allotment', 'amount')
 
         table.add_row([bw_type, bw_point['amountIn'], bw_point['amountOut'], allotment])
+    return table
+
+
+def _system_table(system_data):
+    table = formatting.Table(['Type', 'name'])
+    for system in system_data:
+        table.add_row([utils.lookup(system, 'hardwareComponentModel',
+                                    'hardwareGenericComponentModel',
+                                    'hardwareComponentType', 'keyName'),
+                       utils.lookup(system, 'hardwareComponentModel', 'longDescription')])
     return table
