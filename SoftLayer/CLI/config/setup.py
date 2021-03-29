@@ -88,8 +88,8 @@ def cli(env, auth):
         new_client = SoftLayer.Client(username=username, api_key=secret, endpoint_url=endpoint_url, timeout=timeout)
         api_key = get_api_key(new_client, username, secret)
 
-    # Ask for timeout
-    timeout = env.input('Timeout', default=defaults['timeout'] or 0)
+    # Ask for timeout, convert to float, then to int
+    timeout = int(float(env.input('Timeout', default=defaults['timeout'] or 0)))
 
     path = '~/.softlayer'
     if env.config_file:

@@ -175,7 +175,8 @@ class BaseClient(object):
                 transport = transports.RestTransport(
                     endpoint_url=url,
                     proxy=self.settings['softlayer'].get('proxy'),
-                    timeout=self.settings['softlayer'].getint('timeout'),
+                    # prevents an exception incase timeout is a float number.
+                    timeout=int(self.settings['softlayer'].getfloat('timeout')),
                     user_agent=consts.USER_AGENT,
                     verify=self.settings['softlayer'].getboolean('verify'),
                 )
@@ -184,7 +185,7 @@ class BaseClient(object):
                 transport = transports.XmlRpcTransport(
                     endpoint_url=url,
                     proxy=self.settings['softlayer'].get('proxy'),
-                    timeout=self.settings['softlayer'].getint('timeout'),
+                    timeout=int(self.settings['softlayer'].getfloat('timeout')),
                     user_agent=consts.USER_AGENT,
                     verify=self.settings['softlayer'].getboolean('verify'),
                 )
@@ -387,19 +388,25 @@ class IAMClient(BaseClient):
             'username': username
         }
 
-        response = iam_client.request(
-            'POST',
-            'https://iam.cloud.ibm.com/identity/token',
-            data=data,
-            headers=headers,
-            auth=requests.auth.HTTPBasicAuth('bx', 'bx')
-        )
-        if response.status_code != 200:
-            LOGGER.error("Unable to login: %s", response.text)
+        try:
+            response = iam_client.request(
+                'POST',
+                'https://iam.cloud.ibm.com/identity/token',
+                data=data,
+                headers=headers,
+                auth=requests.auth.HTTPBasicAuth('bx', 'bx')
+            )
+            if response.status_code != 200:
+                LOGGER.error("Unable to login: %s", response.text)
 
-        response.raise_for_status()
+            response.raise_for_status()
+            tokens = json.loads(response.text)
+        except requests.HTTPError as ex:
+            error = json.loads(response.text)
+            raise exceptions.IAMError(response.status_code,
+                                      error.get('errorMessage'),
+                                      'https://iam.cloud.ibm.com/identity/token')
 
-        tokens = json.loads(response.text)
         self.settings['softlayer']['access_token'] = tokens['access_token']
         self.settings['softlayer']['refresh_token'] = tokens['refresh_token']
 
@@ -427,19 +434,26 @@ class IAMClient(BaseClient):
             'response_type': 'cloud_iam'
         }
 
-        response = iam_client.request(
-            'POST',
-            'https://iam.cloud.ibm.com/identity/token',
-            data=data,
-            headers=headers,
-            auth=requests.auth.HTTPBasicAuth('bx', 'bx')
-        )
-        if response.status_code != 200:
-            LOGGER.error("Unable to login: %s", response.text)
+        try:
+            response = iam_client.request(
+                'POST',
+                'https://iam.cloud.ibm.com/identity/token',
+                data=data,
+                headers=headers,
+                auth=requests.auth.HTTPBasicAuth('bx', 'bx')
+            )
+            if response.status_code != 200:
+                LOGGER.error("Unable to login: %s", response.text)
 
-        response.raise_for_status()
+            response.raise_for_status()
+            tokens = json.loads(response.text)
 
-        tokens = json.loads(response.text)
+        except requests.HTTPError as ex:
+            error = json.loads(response.text)
+            raise exceptions.IAMError(response.status_code,
+                                      error.get('errorMessage'),
+                                      'https://iam.cloud.ibm.com/identity/token')
+
         self.settings['softlayer']['access_token'] = tokens['access_token']
         self.settings['softlayer']['refresh_token'] = tokens['refresh_token']
         a_expire = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tokens['expiration']))
@@ -483,20 +497,27 @@ class IAMClient(BaseClient):
         data['account'] = account_id
         data['ims_account'] = ims_account
 
-        response = iam_client.request(
-            'POST',
-            'https://iam.cloud.ibm.com/identity/token',
-            data=data,
-            headers=headers,
-            auth=requests.auth.HTTPBasicAuth('bx', 'bx')
-        )
+        try:
+            response = iam_client.request(
+                'POST',
+                'https://iam.cloud.ibm.com/identity/token',
+                data=data,
+                headers=headers,
+                auth=requests.auth.HTTPBasicAuth('bx', 'bx')
+            )
 
-        if response.status_code != 200:
-            LOGGER.warning("Unable to refresh IAM Token. %s", response.text)
+            if response.status_code != 200:
+                LOGGER.warning("Unable to refresh IAM Token. %s", response.text)
 
-        response.raise_for_status()
+            response.raise_for_status()
+            tokens = json.loads(response.text)
 
-        tokens = json.loads(response.text)
+        except requests.HTTPError as ex:
+            error = json.loads(response.text)
+            raise exceptions.IAMError(response.status_code,
+                                      error.get('errorMessage'),
+                                      'https://iam.cloud.ibm.com/identity/token')
+
         a_expire = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tokens['expiration']))
         r_expire = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tokens['refresh_token_expiration']))
         LOGGER.warning("Tokens retrieved, expires at %s, Refresh expires at %s", a_expire, r_expire)
