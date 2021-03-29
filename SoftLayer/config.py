@@ -108,7 +108,7 @@ def get_config(config_file=None):
         config['softlayer']['username'] = ''
         config['softlayer']['endpoint_url'] = ''
         config['softlayer']['api_key'] = ''
-        config['softlayer']['timeout'] = 0
+        config['softlayer']['timeout'] = '0'
 
     return config
 
