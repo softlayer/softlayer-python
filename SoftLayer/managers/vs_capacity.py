@@ -151,6 +151,9 @@ instances[id, billingItem[description, hourlyRecurringFee]], instanceCount, back
 
         # Reserved capacity only supports SAN as of 20181008
         guest_object['local_disk'] = False
+        # Reserved capacity only supports monthly ordering via Virtual_Guest::generateOrderTemplate
+        # Hourly ordering would require building out the order manually.
+        guest_object['hourly'] = False
         template = vs_manager.verify_create_instance(**guest_object)
         template['reservedCapacityId'] = capacity_id
         if guest_object.get('ipv6'):
