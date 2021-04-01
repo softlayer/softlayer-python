@@ -818,7 +818,7 @@ class HardwareManager(utils.IdentifierMixin, object):
 
     def upgrade(self, instance_id, memory=None,
                 nic_speed=None, drive_controller=None,
-                public_bandwidth=None, test=False):
+                public_bandwidth=None, disk=None, test=False):
         """Upgrades a hardware server instance.
 
         :param int instance_id: Instance id of the hardware server to be upgraded.
@@ -826,6 +826,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         :param string nic_speed: Network Port Speed data.
         :param string drive_controller: Drive Controller data.
         :param int public_bandwidth: Public keyName data.
+        :param list disk: List of disks to add or upgrade Hardware Server.
         :param bool test: Test option to verify the request.
 
         :returns: bool
@@ -857,6 +858,10 @@ class HardwareManager(utils.IdentifierMixin, object):
             'packageId': package_id
         }
 
+        if disk:
+            prices = self._get_disk_price_list(instance_id, disk)
+            order['prices'] = prices
+
         for option, value in data.items():
             price_id = self._get_prices_for_upgrade_option(upgrade_prices, option, value)
             if not price_id:
@@ -885,7 +890,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                   the specified instance.
         """
         mask = [
-            'billingItem[id,package[id,keyName]]'
+            'billingItem[id,package[id,keyName],nextInvoiceChildren]'
         ]
         mask = "mask[%s]" % ','.join(mask)
 
@@ -924,7 +929,10 @@ class HardwareManager(utils.IdentifierMixin, object):
             'disk_controller': 'disk_controller',
             'bandwidth': 'bandwidth'
         }
-        category_code = option_category.get(option)
+        if 'disk' in option:
+            category_code = option
+        else:
+            category_code = option_category.get(option)
 
         for price in upgrade_prices:
             if price.get('categories') is None or price.get('item') is None:
@@ -950,11 +958,72 @@ class HardwareManager(utils.IdentifierMixin, object):
                 elif option == 'bandwidth':
                     if str(product.get('capacity')) == str(value):
                         price_id = price.get('id')
+                elif 'disk' in option:
+                    if str(product.get('capacity')) == str(value):
+                        price_id = price
                 else:
                     if str(product.get('capacity')) == str(value):
                         price_id = price.get('id')
 
         return price_id
+
+    def _get_disk_price_list(self, instance_id, disk):
+        """Get the disks prices to be added or upgraded.
+
+        :param int instance_id: Hardware Server instance id.
+        :param list disk: List of disks to be added o upgraded to the HW.
+
+        :return list.
+        """
+        prices = []
+        disk_exist = False
+        upgrade_prices = self._get_upgrade_prices(instance_id)
+        server_response = self.get_instance(instance_id)
+        for disk_data in disk:
+            disk_channel = 'disk' + str(disk_data.get('number'))
+            for item in utils.lookup(server_response, 'billingItem', 'nextInvoiceChildren'):
+                if disk_channel == item['categoryCode']:
+                    disk_exist = True
+                    break
+            if disk_exist:
+                disk_price_detail = self._get_disk_price_detail(disk_data, upgrade_prices, disk_channel, 'add_disk')
+                prices.append(disk_price_detail)
+            else:
+                disk_price_detail = self._get_disk_price_detail(disk_data, upgrade_prices, disk_channel, 'resize_disk')
+                prices.append(disk_price_detail)
+
+        return prices
+
+    def _get_disk_price_detail(self, disk_data, upgrade_prices, disk_channel, disk_type):
+        """Get the disk price detail.
+
+        :param disk_data: List of disks to be added or upgraded.
+        :param list upgrade_prices: List of item prices.
+        :param String disk_channel: Disk position.
+        :param String disk_type: Disk type.
+
+        """
+        if disk_data.get('description') == disk_type:
+            raise SoftLayerError("Unable to add the disk because this already exists."
+                                 if "add" in disk_type else "Unable to resize the disk because this does not exists.")
+        else:
+            price_id = self._get_prices_for_upgrade_option(upgrade_prices, disk_channel,
+                                                           disk_data.get('capacity'))
+            if not price_id:
+                raise SoftLayerError("The item price was not found for %s with 'capacity:' %i" %
+                                     (disk_channel, disk_data.get('capacity')))
+
+            disk_price = {
+                "id": price_id.get('id'),
+                "categories": [
+                    {
+                        "categoryCode": price_id['categories'][0]['categoryCode'],
+                        "id": price_id['categories'][0]['id']
+                    }
+                ]
+            }
+
+        return disk_price
 
 
 def _get_bandwidth_key(items, hourly=True, no_public=False, location=None):

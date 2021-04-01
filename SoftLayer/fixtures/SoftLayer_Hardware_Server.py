@@ -13,6 +13,10 @@ getObject = {
         'children': [
             {'description': 'test', 'nextInvoiceTotalRecurringAmount': 1},
         ],
+        'nextInvoiceChildren': [
+            {'description': 'test', 'nextInvoiceTotalRecurringAmount': 1, 'categoryCode': 'disk1'},
+            {'description': 'test2', 'nextInvoiceTotalRecurringAmount': 2, 'categoryCode': 'disk3'}
+        ],
         'orderItem': {
             'order': {
                 'userRecord': {
@@ -335,6 +339,41 @@ getUpgradeItemPrices = [
             "description": "500 GB Bandwidth Allotment",
             "id": 6177,
             "keyName": "BANDWIDTH_500_GB"
+        }
+    },
+    {
+        "hourlyRecurringFee": ".023",
+        "id": 49759,
+        "recurringFee": "15",
+        "categories": [
+            {
+                "categoryCode": "disk2",
+                "id": 6,
+                "name": "Third Hard Drive"
+            }
+        ],
+        "item": {
+            "capacity": "1000",
+            "description": "1.00 TB SATA",
+            "id": 6159,
+            "keyName": "HARD_DRIVE_1_00_TB_SATA_2",
+        }
+    },
+    {
+        "id": 49759,
+        "recurringFee": "0",
+        "categories": [
+            {
+                "categoryCode": "disk1",
+                "id": 5,
+                "name": "Second Hard Drive"
+            }
+        ],
+        "item": {
+            "capacity": "1000",
+            "description": "1.00 TB SATA",
+            "id": 6159,
+            "keyName": "HARD_DRIVE_1_00_TB_SATA_2"
         }
     }
 ]
