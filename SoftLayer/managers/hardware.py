@@ -1004,8 +1004,12 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         """
         if disk_data.get('description') == disk_type:
-            raise SoftLayerError("Unable to add the disk because this already exists."
-                                 if "add" in disk_type else "Unable to resize the disk because this does not exists.")
+            if "add" in disk_type:
+                disk_type_description = "Unable to add the disk because this already exists."
+            else:
+                disk_type_description = "Unable to resize the disk because this does not exists."
+
+            raise SoftLayerError(disk_type_description)
         else:
             price_id = self._get_prices_for_upgrade_option(upgrade_prices, disk_channel,
                                                            disk_data.get('capacity'))
