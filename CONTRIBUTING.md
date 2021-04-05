@@ -3,13 +3,21 @@
 We are happy to accept contributions to softlayer-python.  Please follow the
 guidelines below.  
 
-* Sign our contributor agreement (CLA) You can find the [CLA here](./docs/dev/cla-individual.md).
+## Procedural
 
-* If you're contributing on behalf of your employer we'll need a signed copy of our corporate contributor agreement (CCLA) as well.  You can find the [CCLA here](./docs/dev/cla-corporate.md).
-    
-* Fork the repo, make your changes, and open a pull request.
+1. All code changes require a corresponding issue. [Open an issue here](https://github.com/softlayer/softlayer-python/issues). 
+2. Fork the [softlayer-python](https://github.com/softlayer/softlayer-python) repository.
+3. Make any changes required, commit messages should reference the issue number (include #1234 if the message if your issue is number 1234 for example).
+4. Make a pull request from your fork/branch to origin/master
+5. Requires 1 approval for merging
 
 * Additional infomration can be found in our [contribution guide](http://softlayer-python.readthedocs.org/en/latest/dev/index.html)
+
+## Legal
+
+* See our [Contributor License Agreement](./docs/dev/cla-individual.md). Opening a pull request is acceptance of this agreement.
+
+* If you're contributing on behalf of your employer we'll need a signed copy of our corporate contributor agreement (CCLA) as well.  You can find the [CCLA here](./docs/dev/cla-corporate.md).
 
 
 ## Code style
@@ -102,3 +110,47 @@ order_args = getattr(order_call[0], 'args')[0]
 # Test our specific argument value
 self.assertEqual(123, order_args['hostId'])
 ```
+
+
+## Project Management
+
+### Issues
+
+* ~~Title~~: Should contain quick highlight of the issue is about
+* ~~Body~~: All the technical information goes here
+* ~~Assignee~~: Should be the person who is actively working on an issue.
+* ~~Label~~: All issues should have at least 1 Label.
+* ~~Projects~~: Should be added to the quarerly Softlayer project when being worked on
+* ~~Milestones~~: Not really used, can be left blank
+* ~~Linked Pull Request~~: Should be linked to the relavent pull request when it is opened.
+
+### Pull Requests
+
+* ~~Title~~: Should be similar to the title of the issue it is fixing, or otherwise descibe what is chaning in the pull request
+* ~~Body~~: Should have "Fixes #1234" at least, with some notes about the specific pull request if needed. Most technical information should still be in the github issue.
+* ~~Reviewers~~: 1 Reviewer is required
+* ~~Assignee~~: Should be the person who opened the pull request
+* ~~Labels~~: Should match the issue
+* ~~Projects~~: Should match the issue
+* ~~Milestones~~: Not really used, can be left blank
+* ~~Linked issues~~: If you put "Fixes #<Issue number>" in the body, this should be automatically filled in, otherwise link manually.
+
+### Code Reviews
+All issues should be reviewed by at least 1 member of the SLDN team that is not the person opening the pull request. Time permitting, all members of the SLDN team should review the request.
+
+#### Things to look for while doing a review
+
+As a reviewer, these are some guidelines when doing a review, but not hard rules. 
+
+* Code Style: Generally `tox -e analysis` will pick up most style violations, but anything that is wildly different from the normal code patters in this project should be changed to match, unless there is a strong reason to not do so.
+* API Calls: Close attention should be made to any new API calls, to make sure they will work as expected, and errors are handled if needed.
+* DocBlock comments: CLI and manager methods need to be documented well enough for users to easily understand what they do.
+* Easy to read code: Code should generally be easy enough to understand at a glance. Confusing code is a sign that it should either be better documented, or refactored a bit to be clearer in design.
+
+
+### Testing
+
+When doing testing of a code change, indicate this with a comment on the pull request like 
+
+:heavy_check: `slcli vs list --new-feature` 
+:x: `slcli vs list --broken-feature`
