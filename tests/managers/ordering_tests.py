@@ -104,6 +104,13 @@ class OrderingTests(testing.TestCase):
         quote_fixture = quote_service.getObject(id=1234)
         self.assertEqual(quote, quote_fixture)
 
+    def test_save_quote(self):
+        saved_quote = self.ordering.save_quote(1234)
+        quote_service = self.ordering.client['Billing_Order_Quote']
+        quote_fixture = quote_service.getObject(id=1234)
+        self.assertEqual(saved_quote, quote_fixture)
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'saveQuote', identifier=1234)
+
     def test_verify_quote(self):
         extras = {
             'hardware': [{

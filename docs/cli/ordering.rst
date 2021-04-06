@@ -131,6 +131,10 @@ Quotes
     :prog: order quote-detail
     :show-nested:
 
+.. click:: SoftLayer.CLI.order.quote_save:cli
+    :prog: order quote-save
+    :show-nested:
+
 .. click:: SoftLayer.CLI.order.place_quote:cli
     :prog: order place-quote
     :show-nested:

@@ -401,6 +401,11 @@ class OrderTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Billing_Order_Quote', 'getObject', identifier='12345')
 
+    def test_quote_save(self):
+        result = self.run_command(['order', 'quote-save', '12345'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'saveQuote', identifier='12345')
+
     def test_quote_list(self):
         result = self.run_command(['order', 'quote-list'])
         self.assert_no_fail(result)
