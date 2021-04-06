@@ -31,6 +31,7 @@ __license__ = 'MIT'
 __copyright__ = 'Copyright 2016 SoftLayer Technologies, Inc.'
 __all__ = [   # noqa: F405
     'BaseClient',
+    'IAMClient',
     'create_client_from_env',
     'Client',
     'BasicAuthentication',
