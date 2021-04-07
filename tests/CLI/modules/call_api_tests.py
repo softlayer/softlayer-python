@@ -298,3 +298,17 @@ result = client.call(u'Service',
         result = self.run_command(['call-api', 'Account', 'getObject', '--json-filter={"test":"something"}'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account', 'getObject', filter={"test": "something"})
+
+    def test_call_api_orderBy(self):
+        result = self.run_command(['call-api', 'Account', 'getVirtualGuests',
+                                   '--orderBy', 'virtualGuests.id=DESC'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account',
+                                'getVirtualGuests',
+                                filter={
+                                    'virtualGuests':
+                                        {'id': {
+                                            'operation': 'orderBy',
+                                            'options': [{
+                                                'name': 'sort',
+                                                'value': ['DESC']}]}}})

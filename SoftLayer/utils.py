@@ -200,6 +200,22 @@ def event_log_filter_less_than_date(date, utc):
     }
 
 
+def build_filter_orderby(orderby):
+    _filters = {}
+    aux = list(reversed(str(orderby).split('.')))
+    for split in aux:
+        _aux_filter = {}
+        if str(split).__contains__('='):
+            _aux_filter[str(split).split('=')[0]] = query_filter_orderby(str(split).split('=')[1])
+            _filters = _aux_filter
+        elif split == list(aux)[0]:
+            _aux_filter[split] = query_filter_orderby('DESC')
+        else:
+            _aux_filter[split] = _filters
+        _filters = _aux_filter
+    return _filters
+
+
 class IdentifierMixin(object):
     """Mixin used to resolve ids from other names of objects.
 
