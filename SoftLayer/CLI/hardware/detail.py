@@ -61,8 +61,11 @@ def cli(env, identifier, passwords, price):
     table.add_row(['os_version', operating_system.get('version') or formatting.blank()])
     table.add_row(['created', result['provisionDate'] or formatting.blank()])
     table.add_row(['owner', owner or formatting.blank()])
-    table.add_row(['last_transaction',
-                   utils.lookup(result, 'lastTransaction', 'transactionGroup', 'name')])
+
+    last_transaction = "{} ({})".format(utils.lookup(result, 'lastTransaction', 'transactionGroup', 'name'),
+                                        utils.clean_time(utils.lookup(result, 'lastTransaction', 'modifyDate')))
+
+    table.add_row(['last_transaction', last_transaction])
     table.add_row(['billing', 'Hourly' if result['hourlyBillingFlag'] else'Monthly'])
 
     vlan_table = formatting.Table(['type', 'number', 'id'])
