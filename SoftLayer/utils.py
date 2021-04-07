@@ -201,6 +201,12 @@ def event_log_filter_less_than_date(date, utc):
 
 
 def build_filter_orderby(orderby):
+    """
+       Builds filters using the filter options passed into the CLI.
+
+        only support fot create filter option orderBy, default value is DESC
+
+    """
     _filters = {}
     aux = list(reversed(str(orderby).split('.')))
     for split in aux:
