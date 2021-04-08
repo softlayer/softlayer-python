@@ -77,6 +77,7 @@ class Environment(object):
         # https://stackoverflow.com/questions/101128/how-do-i-read-text-from-the-clipboard
         if password == 'àR':
             # tkinter is a built in python gui, but it has clipboard reading functions.
+            # pylint: disable=import-outside-toplevel
             from tkinter import Tk
             tk_manager = Tk()
             password = tk_manager.clipboard_get()
