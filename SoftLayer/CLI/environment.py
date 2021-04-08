@@ -67,7 +67,22 @@ class Environment(object):
 
     def getpass(self, prompt, default=None):
         """Provide a password prompt."""
-        return click.prompt(prompt, hide_input=True, default=default)
+        password = click.prompt(prompt, hide_input=True, default=default)
+
+        # https://github.com/softlayer/softlayer-python/issues/1436
+        # click.prompt uses python's getpass() in the background
+        # https://github.com/python/cpython/blob/3.9/Lib/getpass.py#L97
+        # In windows, shift+insert actually inputs the below 2 characters
+        # If we detect those 2 characters, need to manually read from the clipbaord instead
+        # https://stackoverflow.com/questions/101128/how-do-i-read-text-from-the-clipboard
+        if password == 'àR':
+            # tkinter is a built in python gui, but it has clipboard reading functions.
+            from tkinter import Tk
+            tk_manager = Tk()
+            password = tk_manager.clipboard_get()
+            # keep the window from showing
+            tk_manager.withdraw()
+        return password
 
     # Command loading methods
     def list_commands(self, *path):
