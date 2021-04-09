@@ -896,7 +896,7 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         return self.hardware.getObject(id=instance_id, mask=mask)
 
-    def _get_upgrade_prices(self, instance_id, include_downgrade_options=True):
+    def _get_upgrade_prices(self, instance_id):
         """Following Method gets all the price ids related to upgrading a Hardware Server.
 
         :param int instance_id: Instance id of the Hardware Server to be upgraded.
@@ -910,7 +910,7 @@ class HardwareManager(utils.IdentifierMixin, object):
             'item[keyName,description,capacity,units]'
         ]
         mask = "mask[%s]" % ','.join(mask)
-        return self.hardware.getUpgradeItemPrices(include_downgrade_options, id=instance_id, mask=mask)
+        return self.hardware.getUpgradeItemPrices(id=instance_id, mask=mask)
 
     @staticmethod
     def _get_prices_for_upgrade_option(upgrade_prices, option, value):
