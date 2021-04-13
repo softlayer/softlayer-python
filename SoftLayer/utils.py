@@ -59,18 +59,20 @@ class NestedDict(dict):
 
 
 def dict_merge(dct1, dct2):
-    """Recursively merges dct2 into dct1, ideal for merging objectFilter together.
+    """Recursively merges dct2 and dct1, ideal for merging objectFilter together.
 
-    :param dct1: dict onto which the merge is executed
-    :param dct2: dct merged into dct
-    :return: None
+    :param dct1: A dictionary
+    :param dct2: A dictionary
+    :return: dct1 + dct2
     """
 
+    dct = dct1.copy()
     for k, v in dct2.items():
         if (k in dct1 and isinstance(dct1[k], dict) and isinstance(dct2[k], collections.Mapping)):
-            dict_merge(dct1[k], dct2[k])
+            dct[k] = dict_merge(dct1[k], dct2[k])
         else:
-            dct1[k] = dct2[k]
+            dct[k] = dct2[k]
+    return dct
 
 
 def query_filter(query):
