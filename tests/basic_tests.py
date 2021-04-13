@@ -80,15 +80,13 @@ class TestUtils(testing.TestCase):
         self.assertEqual(datetime.timedelta(0), time.utcoffset())
 
     def test_dict_merge(self):
-        filter1 = {"virtualGuests":{"hostname":{"operation":"etst"}}}
-        filter2 = {"virtualGuests":{"id":{"operation":"orderBy","options":[{"name":"sort","value":["DESC"]}]}}}
+        filter1 = {"virtualGuests": {"hostname": {"operation": "etst"}}}
+        filter2 = {"virtualGuests": {"id": {"operation": "orderBy", "options": [{"name": "sort", "value": ["DESC"]}]}}}
         result = SoftLayer.utils.dict_merge(filter1, filter2)
 
         self.assertEqual(result['virtualGuests']['id']['operation'], 'orderBy')
         self.assertNotIn('id', filter1['virtualGuests'])
         self.assertEqual(result['virtualGuests']['hostname']['operation'], 'etst')
-
-
 
 
 class TestNestedDict(testing.TestCase):

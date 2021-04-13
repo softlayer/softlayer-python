@@ -67,7 +67,7 @@ def dict_merge(dct1, dct2):
     """
 
     dct = dct1.copy()
-    for k, v in dct2.items():
+    for k, _ in dct2.items():
         if (k in dct1 and isinstance(dct1[k], dict) and isinstance(dct2[k], collections.Mapping)):
             dct[k] = dict_merge(dct1[k], dct2[k])
         else:
