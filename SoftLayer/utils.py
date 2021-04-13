@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import collections
 import datetime
 import re
 import time
@@ -55,6 +56,21 @@ class NestedDict(dict):
         """
         return {key: val.to_dict() if isinstance(val, NestedDict) else val
                 for key, val in self.items()}
+
+
+def dict_merge(dct1, dct2):
+    """Recursively merges dct2 into dct1, ideal for merging objectFilter together.
+
+    :param dct1: dict onto which the merge is executed
+    :param dct2: dct merged into dct
+    :return: None
+    """
+
+    for k, v in dct2.items():
+        if (k in dct1 and isinstance(dct1[k], dict) and isinstance(dct2[k], collections.Mapping)):
+            dict_merge(dct1[k], dct2[k])
+        else:
+            dct1[k] = dct2[k]
 
 
 def query_filter(query):
