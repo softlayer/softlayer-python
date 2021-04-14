@@ -28,8 +28,7 @@ SoftLayer products and services.
 
 Documentation
 -------------
-Documentation for the Python client is available at
-http://softlayer.github.io/softlayer-python/.
+Documentation for the Python client is available at `Read the Docs <https://softlayer-python.readthedocs.io/en/latest/index.html>`_ .
 
 Additional API documentation can be found on the SoftLayer Development Network:
 
@@ -38,7 +37,7 @@ Additional API documentation can be found on the SoftLayer Development Network:
 * `Object mask information and examples
   <https://sldn.softlayer.com/article/object-masks>`_
 * `Code Examples
-  <https://softlayer.github.io/python/>`_
+  <https://sldn.softlayer.com/python/>`_
 
 Installation
 ------------
@@ -82,7 +81,7 @@ Issues with the Softlayer API itself should be addressed by opening a ticket.
 Examples
 --------
 
-A curated list of examples on how to use this library can be found at `softlayer.github.io <https://softlayer.github.io/python/>`_
+A curated list of examples on how to use this library can be found at `SLDN <https://softlayer.github.io/python/>`_
 
 Debugging
 ---------
