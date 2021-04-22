@@ -16,6 +16,22 @@ class Unauthenticated(SoftLayerError):
     """Unauthenticated."""
 
 
+class IAMError(SoftLayerError):
+    """Errors from iam.cloud.ibm.com"""
+
+    def __init__(self, fault_code, fault_string, url=None):
+        SoftLayerError.__init__(self, fault_string)
+        self.faultCode = fault_code
+        self.faultString = fault_string
+        self.url = url
+
+    def __repr__(self):
+        return "{} ({}): {}".format(self.url, self.faultCode, self.faultString)
+
+    def __str__(self):
+        return "{} ({}): {}".format(self.url, self.faultCode, self.faultString)
+
+
 class SoftLayerAPIError(SoftLayerError):
     """SoftLayerAPIError is an exception raised during API errors.
 

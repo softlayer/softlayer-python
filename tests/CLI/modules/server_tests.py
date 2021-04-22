@@ -904,6 +904,27 @@ class ServerCLITests(testing.TestCase):
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_authorize_hw_no_confirm(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['hw', 'authorize-storage', '-u', '1234'])
+
+        self.assertEqual(result.exit_code, 2)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_authorize_hw_empty(self, confirm_mock):
+        confirm_mock.return_value = True
+        storage_result = self.set_mock('SoftLayer_Account', 'getNetworkStorage')
+        storage_result.return_value = []
+        result = self.run_command(['hw', 'authorize-storage', '--username-storage=#', '1234'])
+
+        self.assertEqual(str(result.exception), "The Storage with username: # was not found, "
+                                                "please enter a valid storage username")
+
+    def test_authorize_hw(self):
+        result = self.run_command(['hw', 'authorize-storage', '--username-storage=SL01SEL301234-11', '1234'])
+        self.assert_no_fail(result)
+
     def test_upgrade_no_options(self, ):
         result = self.run_command(['hw', 'upgrade', '100'])
         self.assertEqual(result.exit_code, 2)
@@ -924,8 +945,44 @@ class ServerCLITests(testing.TestCase):
         self.assert_no_fail(result)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_upgrade_add_disk(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['hw', 'upgrade', '100', '--add-disk=1000', '2'])
+
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_upgrade_resize_disk(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['hw', 'upgrade', '100', '--resize-disk=1000', '1'])
+
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_upgrade_disk_not_price_found(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['hw', 'upgrade', '100', '--add-disk=1000', '3'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_upgrade_disk_already_exist(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['hw', 'upgrade', '100', '--add-disk=1000', '1'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_upgrade_disk_does_not_exist(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['hw', 'upgrade', '100', '--resize-disk=1000', '3'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_upgrade(self, confirm_mock):
         confirm_mock.return_value = True
         result = self.run_command(['hw', 'upgrade', '100', '--memory=32', '--public-bandwidth=500',
                                    '--drive-controller=RAID', '--network=10000 Redundant'])
+
         self.assert_no_fail(result)

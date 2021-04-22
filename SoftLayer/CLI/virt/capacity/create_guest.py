@@ -34,7 +34,10 @@ from SoftLayer.managers.vs_capacity import CapacityManager as CapacityManager
               help="Test order, will return the order container, but not actually order a server.")
 @environment.pass_env
 def cli(env, **args):
-    """Allows for creating a virtual guest in a reserved capacity."""
+    """Allows for creating a virtual guest in a reserved capacity. Only MONTHLY guests are supported at this time.
+
+    If you would like support for hourly reserved capacity guests, please open an issue on the softlayer-python github.
+    """
     create_args = _parse_create_args(env.client, args)
 
     create_args['primary_disk'] = args.get('primary_disk')

@@ -892,3 +892,38 @@ class VirtTests(testing.TestCase):
             "username": "user",
             "password": "pass"
         }])
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_authorize_storage_vs_no_confirm(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['vs', 'authorize-storage', '-u', '1234'])
+
+        self.assertEqual(result.exit_code, 2)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_authorize_vs_empty(self, confirm_mock):
+        confirm_mock.return_value = True
+        storage_result = self.set_mock('SoftLayer_Account', 'getNetworkStorage')
+        storage_result.return_value = []
+        result = self.run_command(['vs', 'authorize-storage', '--username-storage=#', '1234'])
+
+        self.assertEqual(str(result.exception), "The Storage with username: # was not found, "
+                                                "please enter a valid storage username")
+
+    def test_authorize_storage_vs(self):
+        result = self.run_command(['vs', 'authorize-storage', '--username-storage=SL01SEL301234-11', '1234'])
+        self.assert_no_fail(result)
+
+    def test_authorize_portable_storage_vs(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'attachDiskImage')
+        mock.return_value = {
+            "createDate": "2021-03-22T13:15:31-06:00",
+            "id": 1234567
+        }
+        result = self.run_command(['vs', 'authorize-storage', '--portable-id=12345', '1234'])
+        self.assert_no_fail(result)
+
+    def test_authorize_volume_and_portable_storage_vs(self):
+        result = self.run_command(['vs', 'authorize-storage', '--username-storage=SL01SEL301234-11',
+                                   '--portable-id=12345', '1234'])
+        self.assert_no_fail(result)

@@ -876,3 +876,9 @@ getBlockDevices = [
 
 migrate = True
 migrateDedicatedHost = True
+allowAccessToNetworkStorageList = True
+
+attachDiskImage = {
+            "createDate": "2021-03-22T13:15:31-06:00",
+            "id": 1234567
+        }
