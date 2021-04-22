@@ -19,12 +19,24 @@ def cli(env, identifier):
     mgr = SoftLayer.FirewallManager(env.client)
 
     firewall_type, firewall_id = firewall.parse_id(identifier)
+    result = mgr.get_instance(firewall_id)
+
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
+
+    table.add_row(['id', result['id']])
+    table.add_row(['primaryIpAddress', result['primaryIpAddress']])
+    table.add_row(['datacenter', result['datacenter']['longName']])
+    table.add_row(['networkVlan', result['networkVlan']['name']])
+    table.add_row(['networkVlaniD', result['networkVlan']['id']])
+
     if firewall_type == 'vlan':
         rules = mgr.get_dedicated_fwl_rules(firewall_id)
     else:
         rules = mgr.get_standard_fwl_rules(firewall_id)
-
-    env.fout(get_rules_table(rules))
+    table.add_row(['rules', get_rules_table(rules)])
+    env.fout(table)
 
 
 def get_rules_table(rules):
