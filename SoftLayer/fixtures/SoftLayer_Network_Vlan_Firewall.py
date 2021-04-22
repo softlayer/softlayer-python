@@ -7,10 +7,17 @@ getObject = {
     },
     "id": 3130,
     "primaryIpAddress": "192.155.239.146",
+    "datacenter": {
+        "id": 265592,
+        "longName": "Amsterdam 1",
+        "name": "ams01",
+        "statusId": 2
+    },
     "networkVlan": {
         "accountId": 307608,
         "id": 371028,
         "primarySubnetId": 536252,
+        "name": 'testvlan',
         "vlanNumber": 1489,
         "firewallInterfaces": [
             {
