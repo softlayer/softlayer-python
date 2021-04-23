@@ -173,7 +173,7 @@ class SubnetTests(testing.TestCase):
                 "netmask": "255.255.255.192",
                 "gateway": "10.47.16.129",
                 "type": "PRIMARY"
-            }})
+        }})
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
     def test_cancel(self, confirm_mock):

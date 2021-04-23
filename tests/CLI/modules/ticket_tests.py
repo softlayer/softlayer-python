@@ -15,6 +15,7 @@ from SoftLayer import testing
 
 class FakeTTY():
     """A fake object to fake STD input"""
+
     def __init__(self, isatty=False, read="Default Output"):
         """Sets isatty and read"""
         self._isatty = isatty

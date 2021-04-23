@@ -113,26 +113,26 @@ class VirtCreateTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
         args = ({
-                    'startCpus': 2,
-                    'maxMemory': 1024,
-                    'hostname': 'host',
-                    'domain': 'example.com',
-                    'localDiskFlag': True,
-                    'hourlyBillingFlag': True,
-                    'supplementalCreateObjectOptions': {'bootMode': None},
-                    'operatingSystemReferenceCode': 'UBUNTU_LATEST',
-                    'datacenter': {'name': 'dal05'},
-                    'primaryBackendNetworkComponent': {
+            'startCpus': 2,
+            'maxMemory': 1024,
+            'hostname': 'host',
+            'domain': 'example.com',
+            'localDiskFlag': True,
+            'hourlyBillingFlag': True,
+            'supplementalCreateObjectOptions': {'bootMode': None},
+            'operatingSystemReferenceCode': 'UBUNTU_LATEST',
+            'datacenter': {'name': 'dal05'},
+            'primaryBackendNetworkComponent': {
                         'router': {
                             'id': 577940
                         }
-                    },
-                    'primaryNetworkComponent': {
-                        'router': {
-                            'id': 1639255
-                        }
-                    }
-                },)
+            },
+            'primaryNetworkComponent': {
+                'router': {
+                    'id': 1639255
+                }
+            }
+        },)
 
         self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=args)
 

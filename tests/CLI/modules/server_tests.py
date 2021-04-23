@@ -692,19 +692,19 @@ class ServerCLITests(testing.TestCase):
                                            'getResourceRecords')
         getResourceRecords.return_value = []
         createAargs = ({
-                           'type': 'a',
-                           'host': 'hardware-test1',
-                           'domainId': 12345,  # from SoftLayer_Account::getDomains
-                           'data': '172.16.1.100',
-                           'ttl': 7200
-                       },)
+            'type': 'a',
+            'host': 'hardware-test1',
+            'domainId': 12345,  # from SoftLayer_Account::getDomains
+            'data': '172.16.1.100',
+            'ttl': 7200
+        },)
         createPTRargs = ({
-                             'type': 'ptr',
-                             'host': '100',
-                             'domainId': 123456,
-                             'data': 'hardware-test1.test.sftlyr.ws',
-                             'ttl': 7200
-                         },)
+            'type': 'ptr',
+            'host': '100',
+            'domainId': 123456,
+            'data': 'hardware-test1.test.sftlyr.ws',
+            'ttl': 7200
+        },)
 
         result = self.run_command(['hw', 'dns-sync', '1000'])
 
@@ -747,12 +747,12 @@ class ServerCLITests(testing.TestCase):
             }
         }
         createV6args = ({
-                            'type': 'aaaa',
-                            'host': 'hardware-test1',
-                            'domainId': 12345,  # from SoftLayer_Account::getDomains
-                            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
-                            'ttl': 7200
-                        },)
+            'type': 'aaaa',
+            'host': 'hardware-test1',
+            'domainId': 12345,  # from SoftLayer_Account::getDomains
+            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
+            'ttl': 7200
+        },)
         server.return_value = test_server
         result = self.run_command(['hw', 'dns-sync', '--aaaa-record', '1000'])
         self.assert_no_fail(result)
