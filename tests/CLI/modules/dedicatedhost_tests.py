@@ -6,8 +6,8 @@
 """
 import json
 from unittest import mock as mock
-import SoftLayer
 
+import SoftLayer
 from SoftLayer.CLI import exceptions
 from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer.fixtures import SoftLayer_Virtual_DedicatedHost

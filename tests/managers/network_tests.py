@@ -4,9 +4,10 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from unittest import mock as mock
+
 import sys
 import unittest
+from unittest import mock as mock
 
 import SoftLayer
 from SoftLayer import fixtures

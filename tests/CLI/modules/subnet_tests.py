@@ -4,13 +4,13 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import json
+from unittest import mock as mock
+
+import SoftLayer
 from SoftLayer.fixtures import SoftLayer_Product_Order
 from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer import testing
-
-import json
-from unittest import mock as mock
-import SoftLayer
 
 
 class SubnetTests(testing.TestCase):

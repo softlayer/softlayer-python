@@ -8,15 +8,14 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from unittest import mock as mock
+import json
 import sys
+import tempfile
+from unittest import mock as mock
 
 from SoftLayer.CLI import exceptions
 from SoftLayer import SoftLayerError
 from SoftLayer import testing
-
-import json
-import tempfile
 
 
 class ServerCLITests(testing.TestCase):

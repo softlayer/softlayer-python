@@ -4,9 +4,10 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from unittest import mock as mock
+
 import sys
 import tempfile
+from unittest import mock as mock
 
 from SoftLayer.fixtures import SoftLayer_Product_Package as SoftLayer_Product_Package
 from SoftLayer import testing

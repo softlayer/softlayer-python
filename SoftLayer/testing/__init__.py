@@ -9,9 +9,9 @@
 import logging
 import os.path
 import unittest
+from unittest import mock as mock
 
 from click import testing
-from unittest import mock as mock
 
 import SoftLayer
 from SoftLayer.CLI import core
