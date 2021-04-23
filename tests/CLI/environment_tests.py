@@ -55,6 +55,14 @@ class EnvironmentTests(testing.TestCase):
         prompt_mock.assert_called_with('input', default=None, hide_input=True)
         self.assertEqual(prompt_mock(), r)
 
+    @mock.patch('click.prompt')
+    @mock.patch('tkinter.Tk')
+    def test_getpass_issues1436(self, tk, prompt_mock):
+        prompt_mock.return_value = 'àR'
+        self.env.getpass('input')
+        prompt_mock.assert_called_with('input', default=None, hide_input=True)
+        tk.assert_called_with()
+
     def test_resolve_alias(self):
         self.env.aliases = {'aliasname': 'realname'}
         r = self.env.resolve_alias('aliasname')

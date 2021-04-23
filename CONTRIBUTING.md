@@ -116,24 +116,24 @@ self.assertEqual(123, order_args['hostId'])
 
 ### Issues
 
-* ~~Title~~: Should contain quick highlight of the issue is about
-* ~~Body~~: All the technical information goes here
-* ~~Assignee~~: Should be the person who is actively working on an issue.
-* ~~Label~~: All issues should have at least 1 Label.
-* ~~Projects~~: Should be added to the quarerly Softlayer project when being worked on
-* ~~Milestones~~: Not really used, can be left blank
-* ~~Linked Pull Request~~: Should be linked to the relavent pull request when it is opened.
+* _Title_: Should contain quick highlight of the issue is about
+* _Body_: All the technical information goes here
+* _Assignee_: Should be the person who is actively working on an issue.
+* _Label_: All issues should have at least 1 Label.
+* _Projects_: Should be added to the quarerly Softlayer project when being worked on
+* _Milestones_: Not really used, can be left blank
+* _Linked Pull Request_: Should be linked to the relavent pull request when it is opened.
 
 ### Pull Requests
 
-* ~~Title~~: Should be similar to the title of the issue it is fixing, or otherwise descibe what is chaning in the pull request
-* ~~Body~~: Should have "Fixes #1234" at least, with some notes about the specific pull request if needed. Most technical information should still be in the github issue.
-* ~~Reviewers~~: 1 Reviewer is required
-* ~~Assignee~~: Should be the person who opened the pull request
-* ~~Labels~~: Should match the issue
-* ~~Projects~~: Should match the issue
-* ~~Milestones~~: Not really used, can be left blank
-* ~~Linked issues~~: If you put "Fixes #<Issue number>" in the body, this should be automatically filled in, otherwise link manually.
+* _Title_: Should be similar to the title of the issue it is fixing, or otherwise descibe what is chaning in the pull request
+* _Body_: Should have "Fixes #1234" at least, with some notes about the specific pull request if needed. Most technical information should still be in the github issue.
+* _Reviewers_: 1 Reviewer is required
+* _Assignee_: Should be the person who opened the pull request
+* _Labels_: Should match the issue
+* _Projects_: Should match the issue
+* _Milestones_: Not really used, can be left blank
+* _Linked issues_: If you put "Fixes #<Issue number>" in the body, this should be automatically filled in, otherwise link manually.
 
 ### Code Reviews
 All issues should be reviewed by at least 1 member of the SLDN team that is not the person opening the pull request. Time permitting, all members of the SLDN team should review the request.
