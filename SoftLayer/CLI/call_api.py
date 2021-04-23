@@ -112,9 +112,12 @@ def _validate_parameters(ctx, param, value):  # pylint: disable=unused-argument
 @click.option('--mask', help="String-based object mask")
 @click.option('--limit', type=click.INT, help="Result limit")
 @click.option('--offset', type=click.INT, help="Result offset")
-@click.option('--orderBy', type=click.STRING, help="an object filter that adds an order by clause"
-                                                   "E.G --orderBy subnets.id default DESC"
-                                                   "    --orderBy subnets.id=ASC")
+@click.option('--orderBy', type=click.STRING,
+              help="To set the sort direction, ASC or DESC can be provided."
+                   "This should be of the form: '--orderBy nested.property' default DESC or "
+                   "'--orderBy nested.property=ASC', e.g. "
+                   " --orderBy subnets.id default DESC"
+                   " --orderBy subnets.id=ASC")
 @click.option('--output-python / --no-output-python',
               help="Show python example code instead of executing the call")
 @click.option('--json-filter', callback=_validate_filter,
@@ -144,6 +147,8 @@ def cli(env, service, method, parameters, _id, _filters, mask, limit, offset, or
             --json-filter  '{"virtualGuests":{"hostname":{"operation":"^= test"}}}' --limit=10
         slcli -v call-api SoftLayer_User_Customer addBulkPortalPermission --id=1234567 \\
             '[{"keyName": "NETWORK_MESSAGE_DELIVERY_MANAGE"}]'
+        slcli call-api Account getVirtualGuests \\
+            --orderBy virttualguests.id=ASC
     """
 
     if _filters and json_filter:
@@ -151,10 +156,10 @@ def cli(env, service, method, parameters, _id, _filters, mask, limit, offset, or
 
     object_filter = _build_filters(_filters)
     if orderby:
-        _filters = utils.build_filter_orderby(orderby)
-        object_filter.update(_filters)
+        orderby = utils.build_filter_orderby(orderby)
+        object_filter = utils.dict_merge(object_filter, orderby)
     if json_filter:
-        object_filter.update(json_filter)
+        object_filter = utils.dict_merge(json_filter, object_filter)
 
     args = [service, method] + list(parameters)
     kwargs = {

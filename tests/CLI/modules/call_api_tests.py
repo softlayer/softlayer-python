@@ -301,7 +301,9 @@ result = client.call(u'Service',
 
     def test_call_api_orderBy(self):
         result = self.run_command(['call-api', 'Account', 'getVirtualGuests',
-                                   '--orderBy', 'virtualGuests.id=DESC'])
+                                   '--orderBy', 'virtualGuests.id=DESC',
+                                   '--mask=virtualGuests.typeId,maxCpu',
+                                   '-f', 'virtualGuests.typeId=1'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account',
                                 'getVirtualGuests',
@@ -311,4 +313,6 @@ result = client.call(u'Service',
                                             'operation': 'orderBy',
                                             'options': [{
                                                 'name': 'sort',
-                                                'value': ['DESC']}]}}})
+                                                'value': ['DESC']}]},
+                                            'typeId': {'operation': 1}}
+                                })
