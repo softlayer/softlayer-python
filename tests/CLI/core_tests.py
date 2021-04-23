@@ -8,7 +8,7 @@ import io
 import logging
 
 import click
-import mock
+from unittest import mock as mock
 
 from requests.models import Response
 import SoftLayer

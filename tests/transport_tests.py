@@ -8,7 +8,7 @@ import io
 import warnings
 
 import json
-import mock
+from unittest import mock as mock
 import pytest
 import requests
 

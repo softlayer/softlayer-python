@@ -9,7 +9,7 @@ from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer import testing
 
 import json
-import mock
+from unittest import mock as mock
 import SoftLayer
 
 

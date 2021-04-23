@@ -9,7 +9,7 @@ from SoftLayer import SoftLayerError
 from SoftLayer import testing
 
 import json
-import mock
+from unittest import mock as mock
 
 
 class FileTests(testing.TestCase):

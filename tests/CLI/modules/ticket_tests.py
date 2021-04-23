@@ -4,7 +4,7 @@
     :license: MIT, see LICENSE for more details.
 """
 import json
-import mock
+from unittest import mock as mock
 
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting

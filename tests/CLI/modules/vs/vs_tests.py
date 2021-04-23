@@ -7,7 +7,7 @@
 import json
 import sys
 
-import mock
+from unittest import mock as mock
 
 from SoftLayer.CLI import exceptions
 from SoftLayer.fixtures import SoftLayer_Virtual_Guest as SoftLayer_Virtual_Guest

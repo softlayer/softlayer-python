@@ -9,7 +9,7 @@ import os
 import sys
 import tempfile
 
-import mock
+from unittest import mock as mock
 
 import SoftLayer
 from SoftLayer import auth

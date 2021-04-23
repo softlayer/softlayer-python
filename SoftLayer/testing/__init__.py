@@ -11,7 +11,7 @@ import os.path
 import unittest
 
 from click import testing
-import mock
+from unittest import mock as mock
 
 import SoftLayer
 from SoftLayer.CLI import core

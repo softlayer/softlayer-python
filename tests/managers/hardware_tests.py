@@ -6,7 +6,7 @@
 """
 import copy
 
-import mock
+from unittest import mock as mock
 
 import SoftLayer
 from SoftLayer import fixtures

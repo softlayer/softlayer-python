@@ -6,7 +6,7 @@
     :license: MIT, see LICENSE for more details.
 
 """
-import mock
+from unittest import mock as mock
 
 import SoftLayer
 from SoftLayer import exceptions
