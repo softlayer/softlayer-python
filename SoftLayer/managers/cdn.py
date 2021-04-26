@@ -5,140 +5,168 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import six
 
 from SoftLayer import utils
 
 
-MAX_URLS_PER_LOAD = 5
-MAX_URLS_PER_PURGE = 5
-
-
 class CDNManager(utils.IdentifierMixin, object):
-    """Manage CDN accounts and content.
+    """Manage Content Delivery Networks in the account.
 
     See product information here:
-    http://www.softlayer.com/content-delivery-network
+    https://www.ibm.com/cloud/cdn
+    https://cloud.ibm.com/docs/infrastructure/CDN?topic=CDN-about-content-delivery-networks-cdn-
 
     :param SoftLayer.API.BaseClient client: the client instance
     """
 
     def __init__(self, client):
         self.client = client
-        self.account = self.client['Network_ContentDelivery_Account']
+        self._start_date = None
+        self._end_date = None
+        self.cdn_configuration = self.client['Network_CdnMarketplace_Configuration_Mapping']
+        self.cdn_path = self.client['SoftLayer_Network_CdnMarketplace_Configuration_Mapping_Path']
+        self.cdn_metrics = self.client['Network_CdnMarketplace_Metrics']
+        self.cdn_purge = self.client['SoftLayer_Network_CdnMarketplace_Configuration_Cache_Purge']
 
-    def list_accounts(self):
-        """Lists CDN accounts for the active user."""
+    def list_cdn(self, **kwargs):
+        """Lists Content Delivery Networks for the active user.
 
-        account = self.client['Account']
-        mask = 'cdnAccounts[%s]' % ', '.join(['id',
-                                              'createDate',
-                                              'cdnAccountName',
-                                              'cdnSolutionName',
-                                              'cdnAccountNote',
-                                              'status'])
-        return account.getObject(mask=mask).get('cdnAccounts', [])
-
-    def get_account(self, account_id, **kwargs):
-        """Retrieves a CDN account with the specified account ID.
-
-        :param account_id int: the numeric ID associated with the CDN account.
-        :param dict \\*\\*kwargs: additional arguments to include in the object
-                                mask.
+        :param dict \\*\\*kwargs: header-level options (mask, limit, etc.)
+        :returns: The list of CDN objects in the account
         """
 
-        if 'mask' not in kwargs:
-            kwargs['mask'] = 'status'
+        return self.cdn_configuration.listDomainMappings(**kwargs)
 
-        return self.account.getObject(id=account_id, **kwargs)
+    def get_cdn(self, unique_id, **kwargs):
+        """Retrieves the information about the CDN account object.
 
-    def get_origins(self, account_id, **kwargs):
+        :param str unique_id: The unique ID associated with the CDN.
+        :param dict \\*\\*kwargs: header-level option (mask)
+        :returns: The CDN object
+        """
+
+        cdn_list = self.cdn_configuration.listDomainMappingByUniqueId(unique_id, **kwargs)
+
+        # The method listDomainMappingByUniqueId() returns an array but there is only 1 object
+        return cdn_list[0]
+
+    def get_origins(self, unique_id, **kwargs):
         """Retrieves list of origin pull mappings for a specified CDN account.
 
-        :param account_id int: the numeric ID associated with the CDN account.
-        :param dict \\*\\*kwargs: additional arguments to include in the object
-                                mask.
+        :param str unique_id: The unique ID associated with the CDN.
+        :param dict \\*\\*kwargs: header-level options (mask, limit, etc.)
+        :returns: The list of origin paths in the CDN object.
         """
 
-        return self.account.getOriginPullMappingInformation(id=account_id,
-                                                            **kwargs)
+        return self.cdn_path.listOriginPath(unique_id, **kwargs)
 
-    def add_origin(self, account_id, media_type, origin_url, cname=None,
-                   secure=False):
-        """Adds an original pull mapping to an origin-pull.
+    def add_origin(self, unique_id, origin, path, origin_type="server", header=None,
+                   port=80, protocol='http', bucket_name=None, file_extensions=None,
+                   optimize_for="web", cache_query="include all"):
+        """Creates an origin path for an existing CDN.
 
-        :param int account_id: the numeric ID associated with the CDN account.
-        :param string media_type: the media type/protocol associated with this
-                                  origin pull mapping; valid values are HTTP,
-                                  FLASH, and WM.
-        :param string origin_url: the base URL from which content should be
-                                  pulled.
-        :param string cname: an optional CNAME that should be associated with
-                             this origin pull rule; only the hostname should be
-                             included (i.e., no 'http://', directories, etc.).
-        :param boolean secure: specifies whether this is an SSL origin pull
-                               rule, if SSL is enabled on your account
-                               (defaults to false).
+        :param str unique_id: The unique ID associated with the CDN.
+        :param str path: relative path to the domain provided, e.g. "/articles/video"
+        :param str origin: ip address or hostname if origin_type=server, API endpoint for
+                           your S3 object storage if origin_type=storage
+        :param str origin_type: it can be 'server' or 'storage' types.
+        :param str header: the edge server uses the host header to communicate with the origin.
+                           It defaults to hostname. (optional)
+        :param int port: the http port number (default: 80)
+        :param str protocol: the protocol of the origin (default: HTTP)
+        :param str bucket_name: name of the available resource
+        :param str file_extensions: file extensions that can be stored in the CDN, e.g. "jpg,png"
+        :param str optimize_for: performance configuration, available options: web, video, and file where:
+
+                                    - 'web' = 'General web delivery'
+                                    - 'video' = 'Video on demand optimization'
+                                    - 'file' = 'Large file optimization'
+        :param str cache_query: rules with the following formats: 'include-all', 'ignore-all',
+                               'include: space separated query-names',
+                               'ignore: space separated query-names'.'
+        :return: a CDN origin path object
         """
+        types = {'server': 'HOST_SERVER', 'storage': 'OBJECT_STORAGE'}
+        performance_config = {
+            'web': 'General web delivery',
+            'video': 'Video on demand optimization',
+            'file': 'Large file optimization'
+        }
 
-        config = {'mediaType': media_type,
-                  'originUrl': origin_url,
-                  'isSecureContent': secure}
+        new_origin = {
+            'uniqueId': unique_id,
+            'path': path,
+            'origin': origin,
+            'originType': types.get(origin_type),
+            'httpPort': port,
+            'protocol': protocol.upper(),
+            'performanceConfiguration': performance_config.get(optimize_for, 'General web delivery'),
+            'cacheKeyQueryRule': cache_query
+        }
 
-        if cname:
-            config['cname'] = cname
+        if header:
+            new_origin['header'] = header
 
-        return self.account.createOriginPullMapping(config, id=account_id)
+        if types.get(origin_type) == 'OBJECT_STORAGE':
+            if bucket_name:
+                new_origin['bucketName'] = bucket_name
 
-    def remove_origin(self, account_id, origin_id):
+            if file_extensions:
+                new_origin['fileExtension'] = file_extensions
+
+        origin = self.cdn_path.createOriginPath(new_origin)
+
+        # The method createOriginPath() returns an array but there is only 1 object
+        return origin[0]
+
+    def remove_origin(self, unique_id, path):
         """Removes an origin pull mapping with the given origin pull ID.
 
-        :param int account_id: the CDN account ID from which the mapping should
-                               be deleted.
-        :param int origin_id: the origin pull mapping ID to delete.
+        :param str unique_id: The unique ID associated with the CDN.
+        :param str path: The origin path to delete.
+        :returns: A string value
         """
 
-        return self.account.deleteOriginPullRule(origin_id, id=account_id)
+        return self.cdn_path.deleteOriginPath(unique_id, path)
 
-    def load_content(self, account_id, urls):
-        """Prefetches one or more URLs to the CDN edge nodes.
+    def purge_content(self, unique_id, path):
+        """Purges a URL or path from the CDN.
 
-        :param int account_id: the CDN account ID into which content should be
-                               preloaded.
-        :param urls: a string or a list of strings representing the CDN URLs
-                     that should be pre-loaded.
-        :returns: true if all load requests were successfully submitted;
-                  otherwise, returns the first error encountered.
+        :param str unique_id: The unique ID associated with the CDN.
+        :param str path: A string of url or path that should be purged.
+        :returns: A Container_Network_CdnMarketplace_Configuration_Cache_Purge array object
         """
 
-        if isinstance(urls, six.string_types):
-            urls = [urls]
+        return self.cdn_purge.createPurge(unique_id, path)
 
-        for i in range(0, len(urls), MAX_URLS_PER_LOAD):
-            result = self.account.loadContent(urls[i:i + MAX_URLS_PER_LOAD],
-                                              id=account_id)
-            if not result:
-                return result
+    def get_usage_metrics(self, unique_id, history=30, frequency="aggregate"):
+        """Retrieves the cdn usage metrics.
 
-        return True
+        It uses the 'days' argument if start_date and end_date are None.
 
-    def purge_content(self, account_id, urls):
-        """Purges one or more URLs from the CDN edge nodes.
-
-        :param int account_id: the CDN account ID from which content should
-                               be purged.
-        :param urls: a string or a list of strings representing the CDN URLs
-                     that should be purged.
-        :returns: a list of SoftLayer_Container_Network_ContentDelivery_PurgeService_Response objects
-                  which indicates if the purge for each url was SUCCESS, FAILED or INVALID_URL.
+        :param int unique_id: The CDN uniqueId from which the usage metrics will be obtained.
+        :param int history: Last N days, default days is 30.
+        :param str frequency: It can be day, week, month and aggregate. The default is "aggregate".
+        :returns: A Container_Network_CdnMarketplace_Metrics object
         """
 
-        if isinstance(urls, six.string_types):
-            urls = [urls]
+        _start = utils.days_to_datetime(history)
+        _end = utils.days_to_datetime(0)
 
-        content_list = []
-        for i in range(0, len(urls), MAX_URLS_PER_PURGE):
-            content = self.account.purgeCache(urls[i:i + MAX_URLS_PER_PURGE], id=account_id)
-            content_list.extend(content)
+        self._start_date = utils.timestamp(_start)
+        self._end_date = utils.timestamp(_end)
 
-        return content_list
+        usage = self.cdn_metrics.getMappingUsageMetrics(unique_id, self._start_date, self._end_date, frequency)
+
+        # The method getMappingUsageMetrics() returns an array but there is only 1 object
+        return usage[0]
+
+    @property
+    def start_data(self):
+        """Retrieve the cdn usage metric start date."""
+        return self._start_date
+
+    @property
+    def end_date(self):
+        """Retrieve the cdn usage metric end date."""
+        return self._end_date

@@ -25,7 +25,10 @@ def cli(env, identifier, no_vs, no_hardware):
     mgr = SoftLayer.NetworkManager(env.client)
     subnet_id = helpers.resolve_id(mgr.resolve_subnet_ids, identifier,
                                    name='subnet')
-    subnet = mgr.get_subnet(subnet_id)
+
+    mask = 'mask[ipAddresses[id, ipAddress,note], datacenter, virtualGuests, hardware]'
+
+    subnet = mgr.get_subnet(subnet_id, mask=mask)
 
     table = formatting.KeyValueTable(['name', 'value'])
     table.align['name'] = 'r'
@@ -44,6 +47,18 @@ def cli(env, identifier, no_vs, no_hardware):
     table.add_row(['datacenter', subnet['datacenter']['name']])
     table.add_row(['usable ips',
                    subnet.get('usableIpAddressCount', formatting.blank())])
+    table.add_row(['note',
+                   subnet.get('note', formatting.blank())])
+    table.add_row(['tags',
+                   formatting.tags(subnet.get('tagReferences'))])
+
+    ip_address = subnet.get('ipAddresses')
+
+    ip_table = formatting.KeyValueTable(['id', 'ip', 'note'])
+    for address in ip_address:
+        ip_table.add_row([address.get('id'), address.get('ipAddress'), address.get('note')])
+
+    table.add_row(['ipAddresses', ip_table])
 
     if not no_vs:
         if subnet['virtualGuests']:
@@ -55,7 +70,7 @@ def cli(env, identifier, no_vs, no_hardware):
                                   vsi.get('primaryBackendIpAddress')])
             table.add_row(['vs', vs_table])
         else:
-            table.add_row(['vs', 'none'])
+            table.add_row(['vs', formatting.blank()])
 
     if not no_hardware:
         if subnet['hardware']:
@@ -67,6 +82,6 @@ def cli(env, identifier, no_vs, no_hardware):
                                   hardware.get('primaryBackendIpAddress')])
             table.add_row(['hardware', hw_table])
         else:
-            table.add_row(['hardware', 'none'])
+            table.add_row(['hardware', formatting.blank()])
 
     env.fout(table)

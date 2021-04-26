@@ -19,7 +19,7 @@ LOGGER = logging.getLogger(__name__)
 @click.option('--guests', is_flag=True, help='Show guests on dedicated host')
 @environment.pass_env
 def cli(env, identifier, price=False, guests=False):
-    """Get details for a virtual server."""
+    """Get details for a dedicated host."""
     dhost = SoftLayer.DedicatedHostManager(env.client)
 
     table = formatting.KeyValueTable(['name', 'value'])

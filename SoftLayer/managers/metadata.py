@@ -5,7 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import SoftLayer
+from SoftLayer.API import BaseClient
 from SoftLayer import consts
 from SoftLayer import exceptions
 from SoftLayer import transports
@@ -66,7 +66,7 @@ class MetadataManager(object):
                 timeout=timeout,
                 endpoint_url=consts.API_PRIVATE_ENDPOINT_REST,
             )
-            client = SoftLayer.BaseClient(transport=transport)
+            client = BaseClient(transport=transport)
 
         self.client = client
 

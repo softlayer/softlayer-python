@@ -20,7 +20,10 @@ from SoftLayer.CLI import ticket
 def cli(env, identifier, count):
     """Get details for a ticket."""
 
+    is_json = False
+    if env.format == 'json':
+        is_json = True
     mgr = SoftLayer.TicketManager(env.client)
 
     ticket_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'ticket')
-    env.fout(ticket.get_ticket_results(mgr, ticket_id, update_count=count))
+    env.fout(ticket.get_ticket_results(mgr, ticket_id, is_json, update_count=count))

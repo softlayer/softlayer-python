@@ -5,6 +5,7 @@ import click
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 from SoftLayer import utils
 
 
@@ -14,7 +15,8 @@ from SoftLayer import utils
 def cli(env, volume_id):
     """Display details for a specified volume."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
-    block_volume = block_manager.get_block_volume_details(volume_id)
+    block_volume_id = helpers.resolve_id(block_manager.resolve_ids, volume_id, 'Block Volume')
+    block_volume = block_manager.get_block_volume_details(block_volume_id)
     block_volume = utils.NestedDict(block_volume)
 
     table = formatting.KeyValueTable(['Name', 'Value'])
@@ -107,5 +109,8 @@ def cli(env, volume_id):
         if block_volume.get('originalSnapshotName'):
             original_volume_info.add_row(['Original Snapshot Name', block_volume['originalSnapshotName']])
         table.add_row(['Original Volume Properties', original_volume_info])
+
+    notes = '{}'.format(block_volume.get('notes', ''))
+    table.add_row(['Notes', notes])
 
     env.fout(table)

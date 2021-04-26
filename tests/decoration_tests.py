@@ -6,7 +6,7 @@
 """
 
 import logging
-import mock
+from unittest import mock as mock
 
 from SoftLayer.decoration import retry
 from SoftLayer import exceptions

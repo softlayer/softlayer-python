@@ -6,7 +6,7 @@ import SoftLayer
 from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-
+from SoftLayer.CLI import helpers
 
 COLUMNS = [
     column_helper.Column('id', ('id',), mask='id'),
@@ -38,8 +38,9 @@ DEFAULT_COLUMNS = [
 def cli(env, volume_id, sortby, columns):
     """List file storage snapshots."""
     file_manager = SoftLayer.FileStorageManager(env.client)
+    resolved_id = helpers.resolve_id(file_manager.resolve_ids, volume_id, 'Volume Id')
     snapshots = file_manager.get_file_volume_snapshot_list(
-        volume_id,
+        resolved_id,
         mask=columns.mask()
     )
 

@@ -4,9 +4,10 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import mock
+
 import sys
 import unittest
+from unittest import mock as mock
 
 import SoftLayer
 from SoftLayer import fixtures
@@ -81,7 +82,7 @@ class NetworkTests(testing.TestCase):
         # Test a four public address IPv4 order
         result = self.network.add_subnet('public',
                                          quantity=4,
-                                         vlan_id=1234,
+                                         endpoint_id=1234,
                                          version=4,
                                          test_order=True)
 
@@ -89,7 +90,7 @@ class NetworkTests(testing.TestCase):
 
         result = self.network.add_subnet('public',
                                          quantity=4,
-                                         vlan_id=1234,
+                                         endpoint_id=1234,
                                          version=4,
                                          test_order=False)
 
@@ -100,11 +101,19 @@ class NetworkTests(testing.TestCase):
 
         self.assertEqual(fixtures.SoftLayer_Product_Order.verifyOrder, result)
 
+        result = self.network.add_subnet('static',
+                                         quantity=8,
+                                         endpoint_id=1234,
+                                         version=4,
+                                         test_order=True)
+
+        self.assertEqual(fixtures.SoftLayer_Product_Order.verifyOrder, result)
+
     def test_add_subnet_for_ipv6(self):
         # Test a public IPv6 order
         result = self.network.add_subnet('public',
                                          quantity=64,
-                                         vlan_id=45678,
+                                         endpoint_id=45678,
                                          version=6,
                                          test_order=True)
 
@@ -158,6 +167,26 @@ class NetworkTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Billing_Item', 'cancelService',
                                 identifier=1056)
 
+    def test_set_tags_subnet(self):
+        subnet_id = 1234
+        tags = 'tags1,tag2'
+        result = self.network.set_tags_subnet(subnet_id, tags)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Network_Subnet', 'setTags',
+                                identifier=subnet_id,
+                                args=(tags,))
+
+    def test_edit_note_subnet(self):
+        subnet_id = 1234
+        note = 'test note'
+        result = self.network.edit_note_subnet(subnet_id, note)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Network_Subnet', 'editNote',
+                                identifier=subnet_id,
+                                args=(note,))
+
     def test_create_securitygroup(self):
         result = self.network.create_securitygroup(name='foo',
                                                    description='bar')
@@ -194,39 +223,6 @@ class NetworkTests(testing.TestCase):
                                 'detachNetworkComponents',
                                 identifier=100, args=([500, 600],))
 
-    def test_edit_rwhois(self):
-        result = self.network.edit_rwhois(
-            abuse_email='abuse@test.foo',
-            address1='123 Test Street',
-            address2='Apt. #31',
-            city='Anywhere',
-            company_name='TestLayer',
-            country='US',
-            first_name='Bob',
-            last_name='Bobinson',
-            postal_code='9ba62',
-            private_residence=False,
-            state='TX')
-
-        self.assertEqual(result, True)
-        expected = {
-            'abuseEmail': 'abuse@test.foo',
-            'address1': '123 Test Street',
-            'address2': 'Apt. #31',
-            'city': 'Anywhere',
-            'companyName': 'TestLayer',
-            'country': 'US',
-            'firstName': 'Bob',
-            'lastName': 'Bobinson',
-            'postalCode': '9ba62',
-            'privateResidenceFlag': False,
-            'state': 'TX',
-        }
-        self.assert_called_with('SoftLayer_Network_Subnet_Rwhois_Data',
-                                'editObject',
-                                identifier='id',
-                                args=(expected,))
-
     def test_edit_securitygroup(self):
         result = self.network.edit_securitygroup(100, name='foobar')
 
@@ -261,12 +257,6 @@ class NetworkTests(testing.TestCase):
                                 args=([{'id': 500, 'protocol': '',
                                         'portRangeMin': -1, 'portRangeMax': -1,
                                         'ethertype': '', 'remoteIp': ''}],))
-
-    def test_get_rwhois(self):
-        result = self.network.get_rwhois()
-
-        self.assertEqual(result, fixtures.SoftLayer_Account.getRwhoisData)
-        self.assert_called_with('SoftLayer_Account', 'getRwhoisData')
 
     def test_get_securitygroup(self):
         result = self.network.get_securitygroup(100)
@@ -435,7 +425,7 @@ class NetworkTests(testing.TestCase):
 
     def test_resolve_subnet_ids(self):
         _id = self.network.resolve_subnet_ids('10.0.0.1/29')
-        self.assertEqual(_id, ['100'])
+        self.assertEqual(_id, ['100', '111'])
 
     def test_resolve_subnet_ids_no_results(self):
         mock = self.set_mock('SoftLayer_Account', 'getSubnets')
@@ -625,3 +615,12 @@ class NetworkTests(testing.TestCase):
         _filter = {'objectName': {'operation': 'CCI'}}
         self.assert_called_with('SoftLayer_Event_Log', 'getAllObjects', filter=_filter)
         self.assertEqual(100, log['accountId'])
+
+    def test_vlan_edit(self):
+        vlan_id = 100
+        name = "test"
+        note = "test note"
+        tags = "tag1,tag2"
+
+        self.network.edit(vlan_id, name, note, tags)
+        self.assert_called_with('SoftLayer_Network_Vlan', 'editObject')

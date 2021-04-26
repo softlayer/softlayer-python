@@ -4,7 +4,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import mock
+from unittest import mock as mock
 
 from SoftLayer.CLI import exceptions
 from SoftLayer import testing
@@ -66,3 +66,22 @@ class DnsTests(testing.TestCase):
                            'id': '201',
                            'ip': '127.0.0.1',
                            'target': '127.0.0.1 (example.com)'}])
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_create(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['globalip', 'create', '-v6'])
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output), [{
+            "item": "this is a thing",
+            "cost": "2.00"
+        },
+            {
+                "item": "Total monthly cost",
+                "cost": "2.00"
+        }])
+
+    def test_ip_unassign(self):
+        result = self.run_command(['globalip', 'unassign', '1'])
+        self.assert_no_fail(result)
+        self.assertEqual(result.output, "")

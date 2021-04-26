@@ -11,11 +11,7 @@ from re import match
 
 from SoftLayer import exceptions
 
-
-CATEGORY_MASK = '''id,
-                   isRequired,
-                   itemCategory[id, name, categoryCode]
-                '''
+CATEGORY_MASK = '''id, isRequired, itemCategory[id, name, categoryCode]'''
 
 ITEM_MASK = '''id, keyName, description, itemCategory, categories, prices'''
 
@@ -63,6 +59,28 @@ class OrderingManager(object):
         packages = self.package_svc.getAllObjects(mask=mask, filter=_filter)
         packages = self.filter_outlet_packages(packages)
         return packages
+
+    def get_order_detail(self, order_id, mask=None):
+        """Get order details.
+
+        :param int order_id: to specify the order that we want to retrieve.
+        :param string mask: Mask to specify the properties we want to retrieve.
+        """
+        _default_mask = (
+            'mask[orderTotalAmount,orderApprovalDate,'
+            'initialInvoice[id,amount,invoiceTotalAmount,'
+            'invoiceTopLevelItems[id, description, hostName, domainName, oneTimeAfterTaxAmount,'
+            'recurringAfterTaxAmount, createDate,'
+            'categoryCode,'
+            'category[name],'
+            'location[name],'
+            'children[id, category[name], description, oneTimeAfterTaxAmount,recurringAfterTaxAmount]]],'
+            'items[description],userRecord[displayName,userStatus]]')
+
+        mask = _default_mask if mask is None else mask
+
+        order = self.billing_svc.getObject(mask=mask, id=order_id)
+        return order
 
     @staticmethod
     def filter_outlet_packages(packages):
@@ -151,6 +169,13 @@ class OrderingManager(object):
         quote = self.client['Billing_Order_Quote'].getObject(id=quote_id, mask=mask)
         return quote
 
+    def save_quote(self, quote_id):
+        """Save a quote.
+
+        :param quote_id: ID number of target quote
+        """
+        return self.client['Billing_Order_Quote'].saveQuote(id=quote_id)
+
     def get_order_container(self, quote_id):
         """Generate an order container from a quote object.
 
@@ -200,11 +225,11 @@ class OrderingManager(object):
         container = self.generate_order_template(quote_id, extra)
         clean_container = {}
 
-        # There are a few fields that wil cause exceptions in the XML endpoing if you send in ''
-        # reservedCapacityId and hostId specifically. But we clean all just to be safe.
+        # There are a few fields that wil cause exceptions in the XML endpoint if you send in '',
+        # or None in Rest endpoint (e.g. reservedCapacityId, hostId). But we clean all just to be safe.
         # This for some reason is only a problem on verify_quote.
         for key in container.keys():
-            if container.get(key) != '':
+            if container.get(key):
                 clean_container[key] = container[key]
 
         return self.client.call('SoftLayer_Billing_Order_Quote', 'verifyOrder', clean_container, id=quote_id)
@@ -251,14 +276,13 @@ class OrderingManager(object):
         :param str package_keyname: The package for which to get the categories.
         :returns: List of categories associated with the package
         """
-        get_kwargs = {}
-        get_kwargs['mask'] = kwargs.get('mask', CATEGORY_MASK)
+        kwargs['mask'] = kwargs.get('mask', CATEGORY_MASK)
 
         if 'filter' in kwargs:
-            get_kwargs['filter'] = kwargs['filter']
+            kwargs['filter'] = kwargs['filter']
 
         package = self.get_package_by_key(package_keyname, mask='id')
-        categories = self.package_svc.getConfiguration(id=package['id'], **get_kwargs)
+        categories = self.package_svc.getConfiguration(id=package['id'], **kwargs)
         return categories
 
     def list_items(self, package_keyname, **kwargs):
@@ -268,14 +292,11 @@ class OrderingManager(object):
         :returns: List of items in the package
 
         """
-        get_kwargs = {}
-        get_kwargs['mask'] = kwargs.get('mask', ITEM_MASK)
-
-        if 'filter' in kwargs:
-            get_kwargs['filter'] = kwargs['filter']
+        if 'mask' not in kwargs:
+            kwargs['mask'] = ITEM_MASK
 
         package = self.get_package_by_key(package_keyname, mask='id')
-        items = self.package_svc.getItems(id=package['id'], **get_kwargs)
+        items = self.package_svc.getItems(id=package['id'], **kwargs)
         return items
 
     def list_packages(self, **kwargs):
@@ -284,13 +305,12 @@ class OrderingManager(object):
         :returns: List of active packages.
 
         """
-        get_kwargs = {}
-        get_kwargs['mask'] = kwargs.get('mask', PACKAGE_MASK)
+        kwargs['mask'] = kwargs.get('mask', PACKAGE_MASK)
 
         if 'filter' in kwargs:
-            get_kwargs['filter'] = kwargs['filter']
+            kwargs['filter'] = kwargs['filter']
 
-        packages = self.package_svc.getAllObjects(**get_kwargs)
+        packages = self.package_svc.getAllObjects(**kwargs)
 
         return [package for package in packages if package['isActive']]
 
@@ -301,15 +321,15 @@ class OrderingManager(object):
         :returns: A list of package presets that can be used for ordering
 
         """
-        get_kwargs = {}
-        get_kwargs['mask'] = kwargs.get('mask', PRESET_MASK)
+
+        kwargs['mask'] = kwargs.get('mask', PRESET_MASK)
 
         if 'filter' in kwargs:
-            get_kwargs['filter'] = kwargs['filter']
+            kwargs['filter'] = kwargs['filter']
 
         package = self.get_package_by_key(package_keyname, mask='id')
-        acc_presets = self.package_svc.getAccountRestrictedActivePresets(id=package['id'], **get_kwargs)
-        active_presets = self.package_svc.getActivePresets(id=package['id'], **get_kwargs)
+        acc_presets = self.package_svc.getAccountRestrictedActivePresets(id=package['id'], **kwargs)
+        active_presets = self.package_svc.getActivePresets(id=package['id'], **kwargs)
         return active_presets + acc_presets
 
     def get_preset_by_key(self, package_keyname, preset_keyname, mask=None):
@@ -351,8 +371,9 @@ class OrderingManager(object):
                   keynames in the given package
 
         """
-        mask = 'id, itemCategory, keyName, prices[categories]'
+        mask = 'id, description, capacity, itemCategory, keyName, prices[categories]'
         items = self.list_items(package_keyname, mask=mask)
+        item_capacity = self.get_item_capacity(items, item_keynames)
 
         prices = []
         category_dict = {"gpu0": -1, "pcie_slot0": -1}
@@ -363,10 +384,10 @@ class OrderingManager(object):
                 # keyName with the current item we are searching for
                 matching_item = [i for i in items
                                  if i['keyName'] == item_keyname][0]
-            except IndexError:
-                raise exceptions.SoftLayerError(
-                    "Item {} does not exist for package {}".format(item_keyname,
-                                                                   package_keyname))
+            except IndexError as ex:
+                message = "Item {} does not exist for package {}".format(item_keyname,
+                                                                         package_keyname)
+                raise exceptions.SoftLayerError(message) from ex
 
             # we want to get the price ID that has no location attached to it,
             # because that is the most generic price. verifyOrder/placeOrder
@@ -374,7 +395,10 @@ class OrderingManager(object):
             # in which the order is made
             item_category = matching_item['itemCategory']['categoryCode']
             if item_category not in category_dict:
-                price_id = self.get_item_price_id(core, matching_item['prices'])
+                if core is None:
+                    price_id = self.get_item_price_id(item_capacity, matching_item['prices'])
+                else:
+                    price_id = self.get_item_price_id(core, matching_item['prices'])
             else:
                 # GPU and PCIe items has two generic prices and they are added to the list
                 # according to the number of items in the order.
@@ -389,20 +413,53 @@ class OrderingManager(object):
         return prices
 
     @staticmethod
-    def get_item_price_id(core, prices):
-        """get item price id"""
+    def get_item_price_id(core, prices, term=0):
+        """get item price id
+
+        core: None or a number to match against capacityRestrictionType
+        prices: list of SoftLayer_Product_Item_Price
+        term: int to match against SoftLayer_Product_Item_Price.termLength
+        """
         price_id = None
         for price in prices:
-            if not price['locationGroupId']:
-                capacity_min = int(price.get('capacityRestrictionMinimum', -1))
-                capacity_max = int(price.get('capacityRestrictionMaximum', -1))
-                # return first match if no restirction, or no core to check
-                if capacity_min == -1 or core is None:
+            if not price['locationGroupId'] and price.get('termLength', 0) in {term, '', None}:
+                restriction = price.get('capacityRestrictionType', False)
+                # There is a price restriction. Make sure the price is within the restriction
+                if restriction and core is not None:
+                    capacity_min = int(price.get('capacityRestrictionMinimum', -1))
+                    capacity_max = int(price.get('capacityRestrictionMaximum', -1))
+                    if "STORAGE" in restriction:
+                        if capacity_min <= int(core) <= capacity_max:
+                            price_id = price['id']
+                    if "CORE" in restriction:
+                        if capacity_min <= int(core) <= capacity_max:
+                            price_id = price['id']
+                    if "PROCESSOR" in restriction:
+                        price_id = price['id']
+                # No price restrictions
+                else:
                     price_id = price['id']
-                # this check is mostly to work nicely with preset configs
-                elif capacity_min <= int(core) <= capacity_max:
-                    price_id = price['id']
+
         return price_id
+
+    def get_item_capacity(self, items, item_keynames):
+        """Get item capacity."""
+        item_capacity = None
+        for item_keyname in item_keynames:
+            for item in items:
+                if item['keyName'] == item_keyname:
+                    if "CORE" in item["keyName"]:
+                        item_capacity = item['capacity']
+                        break
+                    if "TIER" in item["keyName"]:
+                        item_capacity = item['capacity']
+                        break
+                    if "INTEL" in item["keyName"]:
+                        item_split = item['description'].split("(")
+                        item_core = item_split[1].split(" ")
+                        item_capacity = item_core[0]
+                        break
+        return item_capacity
 
     def get_preset_prices(self, preset):
         """Get preset item prices.
@@ -610,6 +667,9 @@ class OrderingManager(object):
 
         if isinstance(location, int):
             return location
+        # Some orders dont require a location, just use 0
+        if location.upper() == "NONE":
+            return 0
         mask = "mask[id,name,regions[keyname]]"
         if match(r'[a-zA-Z]{3}[0-9]{2}', location) is not None:
             search = {'name': {'operation': location}}
@@ -619,3 +679,41 @@ class OrderingManager(object):
         if len(datacenter) != 1:
             raise exceptions.SoftLayerError("Unable to find location: %s" % location)
         return datacenter[0]['id']
+
+    def get_item_prices_by_location(self, location, package_keyname):
+        """Returns the item prices by location.
+
+        :param string package_keyname: The package for which to get the items.
+        :param string location: location name or keyname to get the item prices.
+        """
+        object_mask = "filteredMask[pricingLocationGroup[locations]]"
+        location_name = self.resolve_location_name(location)
+        object_filter = {
+            "itemPrices": {"pricingLocationGroup": {"locations": {"name": {"operation": location_name}}}}}
+        package = self.get_package_by_key(package_keyname)
+
+        return self.client.call('SoftLayer_Product_Package', 'getItemPrices', mask=object_mask, filter=object_filter,
+                                id=package['id'])
+
+    def resolve_location_name(self, location_key):
+        """Resolves a location name using a string location key.
+
+        :param string location_key: A string location used to resolve the location name.
+        :return: An location name.
+        """
+
+        default_region_keyname = 'unknown'
+        if not location_key or location_key == default_region_keyname:
+            raise exceptions.SoftLayerError("Invalid location {}".format(location_key))
+
+        default_regions = [{'keyname': default_region_keyname}]
+        index_first = 0
+        object_mask = "mask[regions]"
+        locations = self.client.call('SoftLayer_Location', 'getDatacenters', mask=object_mask)
+        for location in locations:
+            location_name = location.get('name')
+            if location_name == location_key:
+                return location_key
+            if location.get('regions', default_regions)[index_first].get('keyname') == location_key:
+                return location_name
+        raise exceptions.SoftLayerError("Location {} does not exist".format(location_key))

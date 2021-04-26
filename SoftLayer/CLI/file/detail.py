@@ -5,6 +5,7 @@ import click
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 from SoftLayer import utils
 
 
@@ -14,7 +15,8 @@ from SoftLayer import utils
 def cli(env, volume_id):
     """Display details for a specified volume."""
     file_manager = SoftLayer.FileStorageManager(env.client)
-    file_volume = file_manager.get_file_volume_details(volume_id)
+    file_volume_id = helpers.resolve_id(file_manager.resolve_ids, volume_id, 'File Storage')
+    file_volume = file_manager.get_file_volume_details(file_volume_id)
     file_volume = utils.NestedDict(file_volume)
 
     table = formatting.KeyValueTable(['Name', 'Value'])
@@ -27,7 +29,7 @@ def cli(env, volume_id):
     table.add_row(['Type', storage_type])
     table.add_row(['Capacity (GB)', "%iGB" % file_volume['capacityGb']])
 
-    used_space = int(file_volume['bytesUsed'])\
+    used_space = int(file_volume['bytesUsed']) \
         if file_volume['bytesUsed'] else 0
     if used_space < (1 << 10):
         table.add_row(['Used Space', "%dB" % used_space])
@@ -123,5 +125,8 @@ def cli(env, volume_id):
         if file_volume.get('originalSnapshotName'):
             original_volume_info.add_row(['Original Snapshot Name', file_volume['originalSnapshotName']])
         table.add_row(['Original Volume Properties', original_volume_info])
+
+    notes = '{}'.format(file_volume.get('notes', ''))
+    table.add_row(['Notes', notes])
 
     env.fout(table)

@@ -35,7 +35,7 @@ def reboot(env, identifier, hard):
     """Reboot an active virtual server."""
 
     virtual_guest = env.client['Virtual_Guest']
-    mgr = SoftLayer.HardwareManager(env.client)
+    mgr = SoftLayer.VSManager(env.client)
     vs_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'VS')
     if not (env.skip_confirmations or
             formatting.confirm('This will reboot the VS with id %s. '

@@ -62,7 +62,6 @@ def cli(env, package_keyname, location, preset, name, send_email, complex_type,
             NOTIFICATION_EMAIL_AND_TICKET \\
             AUTOMATED_NOTIFICATION \\
             UNLIMITED_SSL_VPN_USERS_1_PPTP_VPN_USER_PER_ACCOUNT \\
-            NESSUS_VULNERABILITY_ASSESSMENT_REPORTING \\
             --extras '{"virtualGuests": [{"hostname": "test", "domain": "softlayer.com"}]}' \\
             --complex-type SoftLayer_Container_Product_Order_Virtual_Guest
 

@@ -9,20 +9,20 @@ from SoftLayer.CLI import formatting
 
 
 @click.command()
-@click.argument('account_id')
+@click.argument('unique_id')
 @environment.pass_env
-def cli(env, account_id):
-    """List origin pull mappings."""
+def cli(env, unique_id):
+    """List origin path for an existing CDN mapping."""
 
     manager = SoftLayer.CDNManager(env.client)
-    origins = manager.get_origins(account_id)
+    origins = manager.get_origins(unique_id)
 
-    table = formatting.Table(['id', 'media_type', 'cname', 'origin_url'])
+    table = formatting.Table(['Path', 'Origin', 'HTTP Port', 'Status'])
 
     for origin in origins:
-        table.add_row([origin['id'],
-                       origin['mediaType'],
-                       origin.get('cname', formatting.blank()),
-                       origin['originUrl']])
+        table.add_row([origin['path'],
+                       origin['origin'],
+                       origin['httpPort'],
+                       origin['status']])
 
     env.fout(table)

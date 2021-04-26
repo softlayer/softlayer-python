@@ -9,19 +9,14 @@ from SoftLayer.CLI import environment
 @click.command()
 @click.argument('volume-id')
 @click.option('--replicant-id', help="ID of the replicant volume")
-@click.option('--immediate',
-              is_flag=True,
-              default=False,
-              help="Failover to replicant immediately.")
 @environment.pass_env
-def cli(env, volume_id, replicant_id, immediate):
+def cli(env, volume_id, replicant_id):
     """Failover a file volume to the given replicant volume."""
     file_storage_manager = SoftLayer.FileStorageManager(env.client)
 
     success = file_storage_manager.failover_to_replicant(
         volume_id,
-        replicant_id,
-        immediate
+        replicant_id
     )
 
     if success:

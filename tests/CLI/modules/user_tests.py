@@ -6,15 +6,14 @@
 """
 import json
 import sys
+import unittest
 
-import mock
-import testtools
+from unittest import mock as mock
 
 from SoftLayer import testing
 
 
 class UserCLITests(testing.TestCase):
-
     """User list tests"""
 
     def test_user_list(self):
@@ -153,6 +152,7 @@ class UserCLITests(testing.TestCase):
         self.assert_called_with('SoftLayer_User_Customer', 'addBulkPortalPermission', identifier=11100)
 
     """User create tests"""
+
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_user(self, confirm_mock):
         confirm_mock.return_value = True
@@ -168,7 +168,7 @@ class UserCLITests(testing.TestCase):
         result = self.run_command(['user', 'create', 'test', '-e', 'test@us.ibm.com', '-p', 'testword'])
         self.assertEqual(result.exit_code, 2)
 
-    @testtools.skipIf(sys.version_info < (3, 6), "Secrets module only exists in version 3.6+")
+    @unittest.skipIf(sys.version_info < (3, 6), "Secrets module only exists in version 3.6+")
     @mock.patch('secrets.choice')
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_user_generate_password_36(self, confirm_mock, secrets):
@@ -194,9 +194,8 @@ class UserCLITests(testing.TestCase):
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_user_and_apikey(self, confirm_mock):
         confirm_mock.return_value = True
-        result = self.run_command(['user', 'create', 'test', '-e', 'test@us.ibm.com', '-a'])
+        result = self.run_command(['user', 'create', 'test', '-e', 'test@us.ibm.com'])
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_User_Customer', 'addApiAuthenticationKey')
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_user_with_template(self, confirm_mock):
@@ -228,6 +227,7 @@ class UserCLITests(testing.TestCase):
         self.assert_called_with('SoftLayer_User_Customer', 'getObject', identifier=1234)
 
     """User edit-details tests"""
+
     @mock.patch('SoftLayer.CLI.user.edit_details.click')
     def test_edit_details(self, click):
         result = self.run_command(['user', 'edit-details', '1234', '-t', '{"firstName":"Supermand"}'])
@@ -252,6 +252,7 @@ class UserCLITests(testing.TestCase):
         self.assertEqual(result.exit_code, 2)
 
     """User delete tests"""
+
     @mock.patch('SoftLayer.CLI.user.delete.click')
     def test_delete(self, click):
         result = self.run_command(['user', 'delete', '12345'])
@@ -269,3 +270,69 @@ class UserCLITests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_User_Customer', 'editObject',
                                 args=({'userStatusId': 1021},), identifier=12345)
+
+    """User vpn manual config tests"""
+
+    @mock.patch('SoftLayer.CLI.user.vpn_manual.click')
+    def test_vpn_manual(self, click):
+        result = self.run_command(['user', 'vpn-manual', '12345', '--enable'])
+        click.secho.assert_called_with('12345 vpn manual config enable', fg='green')
+        self.assert_no_fail(result)
+
+    def test_vpn_manual_fail(self):
+        mock = self.set_mock('SoftLayer_User_Customer', 'editObject')
+        mock.return_value = False
+        result = self.run_command(['user', 'vpn-manual', '12345', '--enable'])
+        self.assert_no_fail(result)
+
+    """User vpn subnet tests"""
+
+    @mock.patch('SoftLayer.CLI.user.vpn_subnet.click')
+    def test_vpn_subnet_add(self, click):
+        result = self.run_command(['user', 'vpn-subnet', '12345', '--add', '1234'])
+        click.secho.assert_called_with('12345 updated successfully', fg='green')
+        self.assert_no_fail(result)
+
+    def test_vpn_subnet_add_fail(self):
+        mock = self.set_mock('SoftLayer_Network_Service_Vpn_Overrides', 'createObjects')
+        mock.return_value = False
+        result = self.run_command(['user', 'vpn-subnet', '12345', '--add', '1234'])
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.user.vpn_subnet.click')
+    def test_vpn_subnet_remove(self, click):
+        result = self.run_command(['user', 'vpn-subnet', '12345', '--remove', '1234'])
+        click.secho.assert_called_with('12345 updated successfully', fg='green')
+        self.assert_no_fail(result)
+
+    """User notification tests"""
+
+    def test_notificacions_list(self):
+        result = self.run_command(['user', 'notifications'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Email_Subscription', 'getAllObjects', mask='mask[enabled]')
+
+    """User edit-notification tests"""
+
+    def test_edit_notification_on(self):
+        result = self.run_command(['user', 'edit-notifications', '--enable', 'Test notification'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Email_Subscription', 'enable', identifier=111)
+
+    def test_edit_notification_on_bad(self):
+        result = self.run_command(['user', 'edit-notifications', '--enable', 'Test not exist'])
+        self.assertEqual(result.exit_code, 1)
+
+    def test_edit_notifications_off(self):
+        result = self.run_command(['user', 'edit-notifications', '--disable', 'Test notification'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Email_Subscription', 'disable', identifier=111)
+
+    @mock.patch('SoftLayer.CLI.user.edit_notifications.click')
+    def test_edit_notification_off_failure(self, click):
+        notification = self.set_mock('SoftLayer_Email_Subscription', 'disable')
+        notification.return_value = False
+        result = self.run_command(['user', 'edit-notifications', '--disable', 'Test notification'])
+        click.secho.assert_called_with('Failed to update notifications: Test notification', fg='red')
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Email_Subscription', 'disable', identifier=111)

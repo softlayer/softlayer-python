@@ -6,6 +6,7 @@ import SoftLayer
 from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 from SoftLayer.CLI import storage_utils
 
 
@@ -21,8 +22,9 @@ from SoftLayer.CLI import storage_utils
 def cli(env, columns, sortby, volume_id):
     """List ACLs."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
+    resolved_id = helpers.resolve_id(block_manager.resolve_ids, volume_id, 'Volume Id')
     access_list = block_manager.get_block_volume_access_list(
-        volume_id=volume_id)
+        volume_id=resolved_id)
     table = formatting.Table(columns.columns)
     table.sortby = sortby
 

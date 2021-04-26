@@ -4,7 +4,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import mock
+from unittest import mock as mock
 
 import SoftLayer
 from SoftLayer import exceptions
@@ -103,6 +103,13 @@ class OrderingTests(testing.TestCase):
         quote_service = self.ordering.client['Billing_Order_Quote']
         quote_fixture = quote_service.getObject(id=1234)
         self.assertEqual(quote, quote_fixture)
+
+    def test_save_quote(self):
+        saved_quote = self.ordering.save_quote(1234)
+        quote_service = self.ordering.client['Billing_Order_Quote']
+        quote_fixture = quote_service.getObject(id=1234)
+        self.assertEqual(saved_quote, quote_fixture)
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'saveQuote', identifier=1234)
 
     def test_verify_quote(self):
         extras = {
@@ -309,7 +316,26 @@ class OrderingTests(testing.TestCase):
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], "8")
 
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, keyName, '
+                                                                  'prices[categories]')
+        self.assertEqual([price1['id'], price2['id']], prices)
+
+    def test_get_price_id_list_no_core(self):
+        category1 = {'categoryCode': 'cat1'}
+        price1 = {'id': 1234, 'locationGroupId': None, 'categories': [{"categoryCode": "guest_core"}],
+                  'itemCategory': [category1]}
+        item1 = {'id': 1111, 'keyName': 'ITEM1', 'itemCategory': category1, 'prices': [price1]}
+        category2 = {'categoryCode': 'cat2'}
+        price2 = {'id': 5678, 'locationGroupId': None, 'categories': [category2]}
+        item2 = {'id': 2222, 'keyName': 'ITEM2', 'itemCategory': category2, 'prices': [price2]}
+
+        with mock.patch.object(self.ordering, 'list_items') as list_mock:
+            list_mock.return_value = [item1, item2]
+
+            prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], None)
+
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, keyName, '
+                                                                  'prices[categories]')
         self.assertEqual([price1['id'], price2['id']], prices)
 
     def test_get_price_id_list_item_not_found(self):
@@ -323,7 +349,8 @@ class OrderingTests(testing.TestCase):
             exc = self.assertRaises(exceptions.SoftLayerError,
                                     self.ordering.get_price_id_list,
                                     'PACKAGE_KEYNAME', ['ITEM2'], "8")
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, keyName, '
+                                                                  'prices[categories]')
         self.assertEqual("Item ITEM2 does not exist for package PACKAGE_KEYNAME", str(exc))
 
     def test_get_price_id_list_gpu_items_with_two_categories(self):
@@ -337,7 +364,8 @@ class OrderingTests(testing.TestCase):
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM1'], "8")
 
-            list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
+            list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, '
+                                                                      'keyName, ' 'prices[categories]')
             self.assertEqual([price2['id'], price1['id']], prices)
 
     def test_generate_no_complex_type(self):
@@ -573,6 +601,10 @@ class OrderingTests(testing.TestCase):
         dc_id = self.ordering.get_location_id(1234)
         self.assertEqual(1234, dc_id)
 
+    def test_get_location_id_NONE(self):
+        dc_id = self.ordering.get_location_id("NONE")
+        self.assertEqual(0, dc_id)
+
     def test_location_group_id_none(self):
         # RestTransport uses None for empty locationGroupId
         category1 = {'categoryCode': 'cat1'}
@@ -587,7 +619,8 @@ class OrderingTests(testing.TestCase):
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], "8")
 
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, keyName, '
+                                                                  'prices[categories]')
         self.assertEqual([price1['id'], price2['id']], prices)
 
     def test_location_groud_id_empty(self):
@@ -604,7 +637,8 @@ class OrderingTests(testing.TestCase):
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], "8")
 
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, itemCategory, keyName, prices[categories]')
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, keyName, '
+                                                                  'prices[categories]')
         self.assertEqual([price1['id'], price2['id']], prices)
 
     def test_get_item_price_id_without_capacity_restriction(self):
@@ -617,12 +651,37 @@ class OrderingTests(testing.TestCase):
 
         self.assertEqual(1234, price_id)
 
-    def test_get_item_price_id_with_capacity_restriction(self):
+    def test_get_item_price_id_core_with_capacity_restriction(self):
         category1 = {'categoryCode': 'cat1'}
         price1 = [{'id': 1234, 'locationGroupId': '', "capacityRestrictionMaximum": "16",
-                   "capacityRestrictionMinimum": "1", 'categories': [category1]},
+                   "capacityRestrictionMinimum": "1", "capacityRestrictionType": "CORE",
+                   'categories': [category1]},
                   {'id': 2222, 'locationGroupId': '', "capacityRestrictionMaximum": "56",
-                   "capacityRestrictionMinimum": "36", 'categories': [category1]}]
+                   "capacityRestrictionMinimum": "36", "capacityRestrictionType": "CORE",
+                   'categories': [category1]}]
+
+        price_id = self.ordering.get_item_price_id("8", price1)
+
+        self.assertEqual(1234, price_id)
+
+    def test_get_item_price_id_storage_with_capacity_restriction(self):
+        category1 = {'categoryCode': 'cat1'}
+        price1 = [{'id': 1234, 'locationGroupId': '', "capacityRestrictionMaximum": "16",
+                   "capacityRestrictionMinimum": "1", "capacityRestrictionType": "STORAGE_SPACE",
+                   'categories': [category1]},
+                  {'id': 2222, 'locationGroupId': '', "capacityRestrictionMaximum": "56",
+                   "capacityRestrictionMinimum": "36", "capacityRestrictionType": "STORAGE_SPACE",
+                   'categories': [category1]}]
+
+        price_id = self.ordering.get_item_price_id("8", price1)
+
+        self.assertEqual(1234, price_id)
+
+    def test_get_item_price_id_processor_with_capacity_restriction(self):
+        category1 = {'categoryCode': 'cat1'}
+        price1 = [{'id': 1234, 'locationGroupId': '', "capacityRestrictionMaximum": "1",
+                   "capacityRestrictionMinimum": "1", "capacityRestrictionType": "PROCESSOR",
+                   'categories': [category1]}]
 
         price_id = self.ordering.get_item_price_id("8", price1)
 
@@ -635,11 +694,10 @@ class OrderingTests(testing.TestCase):
             {
                 'id': 10453,
                 'itemCategory': {'categoryCode': 'server'},
+                "description": "Dual Intel Xeon Silver 4110 (16 Cores, 2.10 GHz)",
                 'keyName': 'INTEL_INTEL_XEON_4110_2_10',
                 'prices': [
                     {
-                        'capacityRestrictionMaximum': '2',
-                        'capacityRestrictionMinimum': '2',
                         'capacityRestrictionType': 'PROCESSOR',
                         'categories': [{'categoryCode': 'os'}],
                         'id': 201161,
@@ -662,7 +720,8 @@ class OrderingTests(testing.TestCase):
                 'hostname': 'test1',
                 'domain': 'example.com'
             }],
-            'testProperty': ''
+            'testPropertyEmpty': '',
+            'testPropertyNone': None
         }
         result = self.ordering.verify_quote(1234, extras)
 
@@ -670,5 +729,167 @@ class OrderingTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Billing_Order_Quote', 'verifyOrder')
         call = self.calls('SoftLayer_Billing_Order_Quote', 'verifyOrder')[0]
         order_container = call.args[0]
-        self.assertNotIn('testProperty', order_container)
+        self.assertNotIn('testPropertyEmpty', order_container)
+        self.assertNotIn('testPropertyNone', order_container)
         self.assertNotIn('reservedCapacityId', order_container)
+
+    def test_get_item_capacity_core(self):
+
+        items = [{
+            "capacity": "1",
+            "id": 6131,
+            "keyName": "OS_RHEL_7_X_LAMP_64_BIT",
+        },
+            {
+                "capacity": "1",
+                "id": 10201,
+                "keyName": "GUEST_CORE_1_DEDICATED",
+        }]
+
+        item_capacity = self.ordering.get_item_capacity(items, ['GUEST_CORE_1_DEDICATED', 'OS_RHEL_7_X_LAMP_64_BIT'])
+
+        self.assertEqual(1, int(item_capacity))
+
+    def test_get_item_capacity_storage(self):
+
+        items = [{
+            "capacity": "1",
+            "id": 6131,
+            "keyName": "STORAGE_SPACE_FOR_2_IOPS_PER_GB",
+        },
+            {
+                "capacity": "1",
+                "id": 10201,
+                "keyName": "READHEAVY_TIER",
+        }]
+
+        item_capacity = self.ordering.get_item_capacity(items, ['READHEAVY_TIER', 'STORAGE_SPACE_FOR_2_IOPS_PER_GB'])
+
+        self.assertEqual(1, int(item_capacity))
+
+    def test_get_item_capacity_intel(self):
+
+        items = [{
+            "capacity": "1",
+            "id": 6131,
+            "description": "Dual Intel Xeon E5-2690 v3 (24 Cores, 2.60 GHz)",
+            "keyName": "INTEL_XEON_2690_2_60",
+        },
+            {
+                "capacity": "1",
+                "id": 10201,
+                "keyName": "GUEST_CORE_1_DEDICATED",
+        }]
+
+        item_capacity = self.ordering.get_item_capacity(items, ['INTEL_XEON_2690_2_60', 'BANDWIDTH_20000_GB'])
+
+        self.assertEqual(24, int(item_capacity))
+
+    def test_get_oder_detail_mask(self):
+        order_id = 12345
+        test_mask = 'mask[id]'
+        self.ordering.get_order_detail(order_id, mask=test_mask)
+        self.assert_called_with('SoftLayer_Billing_Order', 'getObject', identifier=order_id, mask=test_mask)
+
+    def test_get_oder_detail_default_mask(self):
+        order_id = 12345
+        _default_mask = (
+            'mask[orderTotalAmount,orderApprovalDate,'
+            'initialInvoice[id,amount,invoiceTotalAmount,'
+            'invoiceTopLevelItems[id, description, hostName, domainName, oneTimeAfterTaxAmount,'
+            'recurringAfterTaxAmount, createDate,'
+            'categoryCode,'
+            'category[name],'
+            'location[name],'
+            'children[id, category[name], description, oneTimeAfterTaxAmount,recurringAfterTaxAmount]]],'
+            'items[description],userRecord[displayName,userStatus]]')
+        self.ordering.get_order_detail(order_id)
+        self.assert_called_with('SoftLayer_Billing_Order', 'getObject', identifier=order_id, mask=_default_mask)
+
+    def test_get_item_prices_by_location_name(self):
+        object_mask = "filteredMask[pricingLocationGroup[locations]]"
+        object_filter = {
+            "itemPrices": {"pricingLocationGroup": {"locations": {"name": {"operation": 'dal13'}}}}}
+        self.ordering.get_item_prices_by_location('dal13', 'TEST')
+
+        self.assert_called_with('SoftLayer_Product_Package', 'getItemPrices', mask=object_mask, filter=object_filter)
+
+    def test_get_item_prices_by_location_keyname(self):
+        object_mask = "filteredMask[pricingLocationGroup[locations]]"
+        object_filter = {
+            "itemPrices": {"pricingLocationGroup": {"locations": {"name": {"operation": 'dal13'}}}}}
+        self.ordering.get_item_prices_by_location('DALLAS13', 'TEST')
+
+        self.assert_called_with('SoftLayer_Product_Package', 'getItemPrices', mask=object_mask, filter=object_filter)
+
+    def test_resolve_location_name(self):
+        location_name_expected = 'dal13'
+        object_mask = "mask[regions]"
+        location_name = self.ordering.resolve_location_name('DALLAS13')
+        self.assertEqual(location_name, location_name_expected)
+        self.assert_called_with('SoftLayer_Location', 'getDatacenters', mask=object_mask)
+
+    def test_resolve_location_name_by_keyname(self):
+        location_name_expected = 'dal13'
+        object_mask = "mask[regions]"
+        location_name = self.ordering.resolve_location_name('DALLAS13')
+        self.assertEqual(location_name, location_name_expected)
+        self.assert_called_with('SoftLayer_Location', 'getDatacenters', mask=object_mask)
+
+    def test_resolve_location_name_by_name(self):
+        location_name_expected = 'dal13'
+        object_mask = "mask[regions]"
+        location_name = self.ordering.resolve_location_name('dal13')
+        self.assertEqual(location_name, location_name_expected)
+        self.assert_called_with('SoftLayer_Location', 'getDatacenters', mask=object_mask)
+
+    def test_resolve_location_name_invalid(self):
+        exc = self.assertRaises(exceptions.SoftLayerError, self.ordering.resolve_location_name, None)
+        self.assertIn("Invalid location", str(exc))
+
+    def test_resolve_location_name_not_exist(self):
+        exc = self.assertRaises(exceptions.SoftLayerError,
+                                self.ordering.resolve_location_name, "UNKNOWN_LOCATION_TEST")
+        self.assertIn("does not exist", str(exc))
+
+    # https://github.com/softlayer/softlayer-python/issues/1425
+    # Issues relating to checking prices based of the price.term relationship
+    def test_issues1425_zeroterm(self):
+        category1 = {'categoryCode': 'cat1'}
+        price1 = {'id': 1234, 'locationGroupId': '', "capacityRestrictionMaximum": "16",
+                  "capacityRestrictionMinimum": "1", "capacityRestrictionType": "STORAGE_SPACE",
+                  'categories': [category1], 'termLength': 36}
+        price2 = {'id': 45678, 'locationGroupId': '', "capacityRestrictionMaximum": "16",
+                  "capacityRestrictionMinimum": "1", "capacityRestrictionType": "STORAGE_SPACE",
+                  'categories': [category1], 'termLength': 0}
+
+        # Test 0 termLength
+        price_id = self.ordering.get_item_price_id("8", [price2, price1])
+        self.assertEqual(45678, price_id)
+
+        # Test None termLength
+        price2['termLength'] = None
+        price_id = self.ordering.get_item_price_id("8", [price2, price1])
+        self.assertEqual(45678, price_id)
+
+        # Test '' termLength
+        price2['termLength'] = ''
+        price_id = self.ordering.get_item_price_id("8", [price2, price1])
+        self.assertEqual(45678, price_id)
+
+    def test_issues1425_nonzeroterm(self):
+        category1 = {'categoryCode': 'cat1'}
+        price1 = {'id': 1234, 'locationGroupId': '', "capacityRestrictionMaximum": "16",
+                  "capacityRestrictionMinimum": "1", "capacityRestrictionType": "STORAGE_SPACE",
+                  'categories': [category1], 'termLength': 36}
+        price2 = {'id': 45678, 'locationGroupId': '', "capacityRestrictionMaximum": "16",
+                  "capacityRestrictionMinimum": "1", "capacityRestrictionType": "STORAGE_SPACE",
+                  'categories': [category1], 'termLength': 0}
+
+        # Test 36 termLength
+        price_id = self.ordering.get_item_price_id("8", [price2, price1], 36)
+        self.assertEqual(1234, price_id)
+
+        # Test None-existing price for term
+        price_id = self.ordering.get_item_price_id("8", [price2, price1], 37)
+        self.assertEqual(None, price_id)

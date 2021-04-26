@@ -1,49 +1,52 @@
-"""List active load balancers."""
-# :license: MIT, see LICENSE for more details.
-
+"""List active Load Balancer as a Service devices."""
 import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer import utils
 
 
 @click.command()
 @environment.pass_env
 def cli(env):
-    """List active load balancers."""
+    """List active Load Balancer as a Service devices."""
     mgr = SoftLayer.LoadBalancerManager(env.client)
 
-    load_balancers = mgr.get_local_lbs()
+    lbaas = mgr.get_lbaas()
+    if lbaas:
+        lbaas_table = generate_lbaas_table(lbaas)
+        env.fout(lbaas_table)
 
-    table = formatting.Table(['ID',
-                              'VIP Address',
-                              'Location',
-                              'SSL Offload',
-                              'Connections/second',
-                              'Type'])
+    else:
+        env.fout("No LBaaS devices found")
 
-    table.align['Connections/second'] = 'r'
 
-    for load_balancer in load_balancers:
-        ssl_support = 'Not Supported'
-        if load_balancer['sslEnabledFlag']:
-            if load_balancer['sslActiveFlag']:
-                ssl_support = 'On'
-            else:
-                ssl_support = 'Off'
-        lb_type = 'Standard'
-        if load_balancer['dedicatedFlag']:
-            lb_type = 'Dedicated'
-        elif load_balancer['highAvailabilityFlag']:
-            lb_type = 'HA'
+def location_sort(location):
+    """Quick function that just returns the datacenter longName for sorting"""
+    return utils.lookup(location, 'datacenter', 'longName')
+
+
+def generate_lbaas_table(lbaas):
+    """Takes a list of SoftLayer_Network_LBaaS_LoadBalancer and makes a table"""
+    table = formatting.Table([
+        'Id', 'Location', 'Name', 'Description', 'Public', 'Create Date', 'Members', 'Listeners'
+    ], title="IBM Cloud LoadBalancer")
+
+    table.align['Name'] = 'l'
+    table.align['Description'] = 'l'
+    table.align['Location'] = 'l'
+    for this_lb in sorted(lbaas, key=location_sort):
         table.add_row([
-            'local:%s' % load_balancer['id'],
-            load_balancer['ipAddress']['ipAddress'],
-            load_balancer['loadBalancerHardware'][0]['datacenter']['name'],
-            ssl_support,
-            load_balancer['connectionLimit'],
-            lb_type
-        ])
+            this_lb.get('id'),
+            utils.lookup(this_lb, 'datacenter', 'longName'),
+            this_lb.get('name'),
+            this_lb.get('description'),
+            'Yes' if this_lb.get('isPublic', 1) == 1 else 'No',
+            utils.clean_time(this_lb.get('createDate')),
+            this_lb.get('memberCount', 0),
+            this_lb.get('listenerCount', 0)
 
-    env.fout(table)
+
+        ])
+    return table

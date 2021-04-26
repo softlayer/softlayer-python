@@ -5,12 +5,12 @@
     :license: MIT, see LICENSE for more details.
 """
 import io
+import json
+from unittest import mock as mock
 import warnings
 
-import mock
 import pytest
 import requests
-import six
 
 import SoftLayer
 from SoftLayer import consts
@@ -20,7 +20,7 @@ from SoftLayer import transports
 
 def get_xmlrpc_response():
     response = requests.Response()
-    list_body = six.b('''<?xml version="1.0" encoding="utf-8"?>
+    list_body = b'''<?xml version="1.0" encoding="utf-8"?>
 <params>
 <param>
 <value>
@@ -29,7 +29,7 @@ def get_xmlrpc_response():
 </array>
 </value>
 </param>
-</params>''')
+</params>'''
     response.raw = io.BytesIO(list_body)
     response.headers['SoftLayer-Total-Items'] = 10
     response.status_code = 200
@@ -78,7 +78,8 @@ class TestXmlRpcAPICall(testing.TestCase):
                                    data=data,
                                    timeout=None,
                                    cert=None,
-                                   verify=True)
+                                   verify=True,
+                                   auth=None)
         self.assertEqual(resp, [])
         self.assertIsInstance(resp, transports.SoftLayerListResult)
         self.assertEqual(resp.total_count, 10)
@@ -114,7 +115,8 @@ class TestXmlRpcAPICall(testing.TestCase):
             headers=mock.ANY,
             timeout=None,
             cert=None,
-            verify=True)
+            verify=True,
+            auth=None)
 
     @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_identifier(self, request):
@@ -227,6 +229,22 @@ class TestXmlRpcAPICall(testing.TestCase):
             kwargs['data'])
 
     @mock.patch('SoftLayer.transports.requests.Session.request')
+    def test_mask_call_filteredMask(self, request):
+        request.return_value = self.response
+
+        req = transports.Request()
+        req.endpoint = "http://something.com"
+        req.service = "SoftLayer_Service"
+        req.method = "getObject"
+        req.mask = "filteredMask[something[nested]]"
+        self.transport(req)
+
+        args, kwargs = request.call_args
+        self.assertIn(
+            "<value><string>filteredMask[something[nested]]</string></value>",
+            kwargs['data'])
+
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_mask_call_v2_dot(self, request):
         request.return_value = self.response
 
@@ -263,6 +281,84 @@ class TestXmlRpcAPICall(testing.TestCase):
         req.transport_headers = {"test-headers": 'aaaa'}
         output_text = self.transport.print_reproduceable(req)
         self.assertIn("https://test.com", output_text)
+
+    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('requests.auth.HTTPBasicAuth')
+    def test_ibm_id_call(self, auth, request):
+        request.return_value = self.response
+
+        data = '''<?xml version='1.0'?>
+<methodCall>
+<methodName>getObject</methodName>
+<params>
+<param>
+<value><struct>
+<member>
+<name>headers</name>
+<value><struct>
+</struct></value>
+</member>
+</struct></value>
+</param>
+</params>
+</methodCall>
+'''
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        req.transport_user = 'apikey'
+        req.transport_password = '1234567890qweasdzxc'
+        resp = self.transport(req)
+
+        auth.assert_called_with('apikey', '1234567890qweasdzxc')
+        request.assert_called_with('POST',
+                                   'http://something.com/SoftLayer_Service',
+                                   headers={'Content-Type': 'application/xml',
+                                            'User-Agent': consts.USER_AGENT},
+                                   proxies=None,
+                                   data=data,
+                                   timeout=None,
+                                   cert=None,
+                                   verify=True,
+                                   auth=mock.ANY)
+        self.assertEqual(resp, [])
+        self.assertIsInstance(resp, transports.SoftLayerListResult)
+        self.assertEqual(resp.total_count, 10)
+
+    @mock.patch('SoftLayer.transports.requests.Session.request')
+    def test_call_large_number_response(self, request):
+        response = requests.Response()
+        body = b'''<?xml version="1.0" encoding="utf-8"?>
+<params>
+<param>
+ <value>
+  <array>
+   <data>
+    <value>
+     <struct>
+      <member>
+       <name>bytesUsed</name>
+       <value><int>2666148982056</int></value>
+      </member>
+     </struct>
+    </value>
+   </data>
+  </array>
+ </value>
+</param>
+</params>
+        '''
+        response.raw = io.BytesIO(body)
+        response.headers['SoftLayer-Total-Items'] = 1
+        response.status_code = 200
+        request.return_value = response
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        resp = self.transport(req)
+        self.assertEqual(resp[0]['bytesUsed'], 2666148982056)
 
 
 @mock.patch('SoftLayer.transports.requests.Session.request')
@@ -311,7 +407,8 @@ def test_verify(request,
                                cert=mock.ANY,
                                proxies=mock.ANY,
                                timeout=mock.ANY,
-                               verify=expected)
+                               verify=expected,
+                               auth=None)
 
 
 class TestRestAPICall(testing.TestCase):
@@ -482,6 +579,30 @@ class TestRestAPICall(testing.TestCase):
             timeout=None)
 
     @mock.patch('SoftLayer.transports.requests.Session.request')
+    def test_with_args_bytes(self, request):
+        request().text = '{}'
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        req.args = ('test', b'asdf')
+
+        resp = self.transport(req)
+
+        self.assertEqual(resp, {})
+        request.assert_called_with(
+            'POST',
+            'http://something.com/SoftLayer_Service/getObject.json',
+            headers=mock.ANY,
+            auth=None,
+            data='{"parameters": ["test", "YXNkZg=="]}',
+            params={},
+            verify=True,
+            cert=None,
+            proxies=None,
+            timeout=None)
+
+    @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_with_filter(self, request):
         request().text = '{}'
 
@@ -627,6 +748,16 @@ class TestRestAPICall(testing.TestCase):
         req.transport_headers = {"test-headers": 'aaaa'}
         output_text = self.transport.print_reproduceable(req)
         self.assertIn("https://test.com", output_text)
+
+    def test_complex_encoder_bytes(self):
+        to_encode = {
+            'test': ['array', 0, 1, False],
+            'bytes': b'ASDASDASD'
+        }
+        result = json.dumps(to_encode, cls=transports.ComplexEncoder)
+        # result = '{"test": ["array", 0, 1, false], "bytes": "QVNEQVNEQVNE"}'
+        # encode doesn't always encode in the same order, so testing exact match SOMETIMES breaks.
+        self.assertIn("QVNEQVNEQVNE", result)
 
 
 class TestFixtureTransport(testing.TestCase):

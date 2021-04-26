@@ -52,7 +52,7 @@ def cli(env, storage_type, size, iops, tier,
     """Order a file storage volume.
 
     Valid size and iops options can be found here:
-    https://console.bluemix.net/docs/infrastructure/FileStorage/index.html#provisioning
+    https://cloud.ibm.com/docs/FileStorage/index.html#provisioning-considerations
     """
     file_manager = SoftLayer.FileStorageManager(env.client)
     storage_type = storage_type.lower()
@@ -115,5 +115,8 @@ def cli(env, storage_type, size, iops, tier,
             order['placedOrder']['id']))
         for item in order['placedOrder']['items']:
             click.echo(" > %s" % item['description'])
+        click.echo(
+            '\nYou may run "slcli file volume-list --order {0}" to find this file volume after it '
+            'is ready.'.format(order['placedOrder']['id']))
     else:
         click.echo("Order could not be placed! Please verify your options and try again.")

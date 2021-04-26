@@ -48,6 +48,7 @@ Then we need to register it so that `slcli table-example` will know to route to 
     ...
 
 Which gives us
+
 ::
 
   $ slcli table-example
@@ -133,3 +134,56 @@ When a confirmation fails, you probably want to stop execution and give a non-ze
 ::
 
     raise CLIAbort("Aborting. Failed confirmation")
+
+
+
+Documenting Commands
+--------------------
+
+All commands should be documented, luckily there is a sphinx module that makes this pretty easy.
+
+If you were adding a summary command to `slcli account` you would find the documentation in `docs/cli/account.rst` and you would just need to add this for your command
+
+::
+
+    .. click:: SoftLayer.CLI.account.summary:cli
+        :prog: account summary
+        :show-nested:
+
+
+The following REGEX can take the route entry and turn it into a document entry.
+
+::
+
+    s/^\('([a-z]*):([a-z-]*)', '([a-zA-Z\.:_]*)'\),$/.. click:: $3\n    :prog: $1 $2\n    :show-nested:\n/
+
+
+Find::
+
+    ^\('([a-z]*):([a-z-]*)', '([a-zA-Z\.:_]*)'\),$
+
+
+REPLACE::
+
+    .. click:: $3
+        :prog: $1 $2
+        :show-nested:
+
+
+I tried to get sphinx-click to auto document the ENTIRE slcli, but the results were all on one page, and required a few changes to sphinx-click itself to work. This is due to the fact that most commands in SLCLI use the function name "cli", and some hacks would have to be put inplace to use the path name instead.
+
+
+
+Architecture
+------------
+
+*SLCLI* is the base command, and it starts at *SoftLayer\CLI\core.py*. Commands are loaded from the *SoftLayer\CLI\routes.py* file. How Click figures this out is defined by the *CommandLoader* class in core.py, which is an example of a `MultiCommand <https://click.palletsprojects.com/en/7.x/api/#click.MultiCommand>`_. 
+
+There are a few examples of commands that are three levels deep, that use a bit more graceful command loader. 
+
+- *SoftLayer\CLI\virt\capacity\__init__.py*
+- *SoftLayer\CLI\virt\placementgroup\__init__.py*
+- *SoftLayer\CLI\object_storage\credential\__init__.py*
+
+These commands are not directly listed in the routes file, because the autoloader doesn't have the ability to parse multiple commands like that. For now it was easier to make the rare thrid level commands have their own special loader than re-write the base command loader to be able to look deeper into the project for commands.
+

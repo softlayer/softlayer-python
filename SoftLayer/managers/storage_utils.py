@@ -19,19 +19,19 @@ ENDURANCE_TIERS = {
 }
 
 
-def populate_host_templates(host_templates,
-                            hardware_ids=None,
+def populate_host_templates(hardware_ids=None,
                             virtual_guest_ids=None,
                             ip_address_ids=None,
                             subnet_ids=None):
-    """Populate the given host_templates array with the IDs provided
+    """Returns a populated array with the IDs provided
 
-    :param host_templates: The array to which host templates will be added
     :param hardware_ids: A List of SoftLayer_Hardware ids
     :param virtual_guest_ids: A List of SoftLayer_Virtual_Guest ids
     :param ip_address_ids: A List of SoftLayer_Network_Subnet_IpAddress ids
     :param subnet_ids: A List of SoftLayer_Network_Subnet ids
+    :return: array of objects formatted for allowAccessFromHostList
     """
+    host_templates = []
     if hardware_ids is not None:
         for hardware_id in hardware_ids:
             host_templates.append({
@@ -59,6 +59,7 @@ def populate_host_templates(host_templates,
                 'objectType': 'SoftLayer_Network_Subnet',
                 'id': subnet_id
             })
+    return host_templates
 
 
 def get_package(manager, category_code):
@@ -532,10 +533,9 @@ def prepare_volume_order_object(manager, storage_type, location, size,
     # Find the ID for the requested location
     try:
         location_id = get_location_id(manager, location)
-    except ValueError:
-        raise exceptions.SoftLayerError(
-            "Invalid datacenter name specified. "
-            "Please provide the lower case short name (e.g.: dal09)")
+    except ValueError as ex:
+        message = "Invalid datacenter name specified. Please provide the lower case short name (e.g.: dal09)"
+        raise exceptions.SoftLayerError(message) from ex
 
     # Determine the category code to use for the order (and product package)
     order_type_is_saas, order_category_code = _get_order_type_and_category(
@@ -660,14 +660,14 @@ def prepare_replicant_order_object(manager, snapshot_schedule, location,
     """
     # Ensure the primary volume and snapshot space are not set for cancellation
     if 'billingItem' not in volume\
-            or volume['billingItem']['cancellationDate'] != '':
+            or volume['billingItem'].get('cancellationDate'):
         raise exceptions.SoftLayerError(
             'This volume is set for cancellation; '
             'unable to order replicant volume')
 
     for child in volume['billingItem']['activeChildren']:
         if child['categoryCode'] == 'storage_snapshot_space'\
-                and child['cancellationDate'] != '':
+                and child.get('cancellationDate'):
             raise exceptions.SoftLayerError(
                 'The snapshot space for this volume is set for '
                 'cancellation; unable to order replicant volume')
@@ -675,10 +675,9 @@ def prepare_replicant_order_object(manager, snapshot_schedule, location,
     # Find the ID for the requested location
     try:
         location_id = get_location_id(manager, location)
-    except ValueError:
-        raise exceptions.SoftLayerError(
-            "Invalid datacenter name specified. "
-            "Please provide the lower case short name (e.g.: dal09)")
+    except ValueError as ex:
+        message = "Invalid datacenter name specified. Please provide the lower case short name (e.g.: dal09)"
+        raise exceptions.SoftLayerError(message) from ex
 
     # Get sizes and properties needed for the order
     volume_size = int(volume['capacityGb'])
@@ -788,7 +787,8 @@ def prepare_replicant_order_object(manager, snapshot_schedule, location,
 
 def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
                                    duplicate_size, duplicate_snapshot_size,
-                                   volume_type, hourly_billing_flag=False):
+                                   volume_type, hourly_billing_flag=False,
+                                   dependent_duplicate=False):
     """Prepare the duplicate order to submit to SoftLayer_Product::placeOrder()
 
     :param manager: The File or Block manager calling this function
@@ -799,6 +799,8 @@ def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
     :param duplicate_snapshot_size: The size for the duplicate snapshot space
     :param volume_type: The type of the origin volume ('file' or 'block')
     :param hourly_billing_flag: Billing type, monthly (False) or hourly (True)
+    :param dependent_duplicate: Duplicate type, normal (False) or dependent
+        duplicate (True)
     :return: Returns the order object to be passed to the
              placeOrder() method of the Product_Order service
     """
@@ -903,6 +905,9 @@ def prepare_duplicate_order_object(manager, origin_volume, iops, tier,
     if volume_is_performance:
         duplicate_order['iops'] = iops
 
+    if dependent_duplicate:
+        duplicate_order['isDependentDuplicateFlag'] = 1
+
     return duplicate_order
 
 
@@ -983,6 +988,15 @@ def prepare_modify_order_object(manager, volume, new_iops, new_tier, new_size):
         modify_order['iops'] = new_iops
 
     return modify_order
+
+
+def block_or_file(storage_type_keyname):
+    """returns either 'block' or 'file'
+
+    :param storage_type_keyname: the Network_Storage['storageType']['keyName']
+    :returns: 'block' or 'file'
+    """
+    return 'block' if 'BLOCK_STORAGE' in storage_type_keyname else 'file'
 
 
 def _has_category(categories, category_code):

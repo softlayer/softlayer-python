@@ -5,15 +5,16 @@
 
     :license: MIT, see LICENSE for more details.
 """
-from __future__ import print_function
 import logging
 import os
 import sys
 import time
+import traceback
 import types
 
 import click
 
+import requests
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
@@ -31,8 +32,10 @@ DEBUG_LOGGING_MAP = {
     3: logging.DEBUG
 }
 
+PROG_NAME = "slcli (SoftLayer Command-line)"
 VALID_FORMATS = ['table', 'raw', 'json', 'jsonraw']
 DEFAULT_FORMAT = 'raw'
+
 if sys.stdout.isatty():
     DEFAULT_FORMAT = 'table'
 
@@ -69,6 +72,28 @@ class CommandLoader(click.MultiCommand):
             return module
 
 
+def get_latest_version():
+    """Gets the latest version of the Softlayer library."""
+    try:
+        result = requests.get('https://pypi.org/pypi/SoftLayer/json')
+        json_result = result.json()
+        latest = 'v{}'.format(json_result['info']['version'])
+    except Exception:
+        latest = "Unable to get version from pypi."
+    return latest
+
+
+def get_version_message(ctx, param, value):
+    """Gets current and latest release versions message."""
+    if not value or ctx.resilient_parsing:
+        return
+    current = SoftLayer.consts.VERSION
+    latest = get_latest_version()
+    click.secho("Current: {prog} {current}\nLatest:  {prog} {latest}".format(
+        prog=PROG_NAME, current=current, latest=latest))
+    ctx.exit()
+
+
 @click.group(help="SoftLayer Command-line Client",
              epilog="""To use most commands your SoftLayer
 username and api_key need to be configured. The easiest way to do that is to
@@ -103,7 +128,8 @@ use: 'slcli setup'""",
               is_flag=True,
               required=False,
               help="Use demo data instead of actually making API calls")
-@click.version_option(prog_name="slcli (SoftLayer Command-line)")
+@click.option('--version', is_flag=True, expose_value=False, is_eager=True, callback=get_version_message,
+              help="Show version information.")
 @environment.pass_env
 def cli(env,
         format='table',
@@ -115,7 +141,7 @@ def cli(env,
         **kwargs):
     """Main click CLI entry-point."""
 
-    # Populate environement with client and set it as the context object
+    # Populate environment with client and set it as the context object
     env.skip_confirmations = really
     env.config_file = config
     env.format = format
@@ -132,6 +158,7 @@ def cli(env,
 
     logger.setLevel(DEBUG_LOGGING_MAP.get(verbose, logging.DEBUG))
     env.vars['_timings'] = SoftLayer.DebugTransport(env.client.transport)
+    env.vars['verbose'] = verbose
     env.client.transport = env.vars['_timings']
 
 
@@ -197,7 +224,6 @@ def main(reraise_exceptions=False, **kwargs):
         if reraise_exceptions:
             raise
 
-        import traceback
         print("An unexpected error has occured:")
         print(str(traceback.format_exc()))
         print("Feel free to report this error as it is likely a bug:")

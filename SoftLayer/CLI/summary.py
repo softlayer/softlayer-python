@@ -33,12 +33,12 @@ def cli(env, sortby):
 
     for name, datacenter in datacenters.items():
         table.add_row([
-            name,
-            datacenter['hardware_count'],
-            datacenter['virtual_guest_count'],
-            datacenter['vlan_count'],
-            datacenter['subnet_count'],
-            datacenter['public_ip_count'],
+            name or formatting.blank(),
+            datacenter.get('hardware_count', formatting.blank()),
+            datacenter.get('virtual_guest_count', formatting.blank()),
+            datacenter.get('vlan_count', formatting.blank()),
+            datacenter.get('subnet_count', formatting.blank()),
+            datacenter.get('public_ip_count', formatting.blank()),
         ])
 
     env.fout(table)
