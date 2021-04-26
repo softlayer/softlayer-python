@@ -2,12 +2,10 @@
 # :license: MIT, see LICENSE for more details.
 
 import click
-from click import INT, STRING
+from click import STRING
 
 import SoftLayer
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
-from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
 
@@ -26,4 +24,3 @@ def cli(env, identifier, name):
         click.secho("The Reserved Capacity %s was edited successfully" % identifier, fg='green')
     else:
         click.secho("Failed to edit the Reserved Capacity %s" % identifier, fg='red')
-
