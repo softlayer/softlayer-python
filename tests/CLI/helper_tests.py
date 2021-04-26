@@ -11,7 +11,7 @@ import sys
 import tempfile
 
 import click
-import mock
+from unittest import mock as mock
 
 from SoftLayer.CLI import core
 from SoftLayer.CLI import exceptions

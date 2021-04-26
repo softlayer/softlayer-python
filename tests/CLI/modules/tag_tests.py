@@ -4,7 +4,7 @@
 
     Tests for the user cli command
 """
-import mock
+from unittest import mock as mock
 
 from SoftLayer.exceptions import SoftLayerAPIError
 from SoftLayer import testing

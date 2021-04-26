@@ -5,7 +5,7 @@
     :license: MIT, see LICENSE for more details.
 
 """
-import mock
+from unittest import mock as mock
 
 from SoftLayer.managers.vs_placement import PlacementManager
 from SoftLayer import testing

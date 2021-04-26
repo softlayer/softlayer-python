@@ -8,15 +8,14 @@
     :license: MIT, see LICENSE for more details.
 """
 
-import mock
+import json
 import sys
+import tempfile
+from unittest import mock as mock
 
 from SoftLayer.CLI import exceptions
 from SoftLayer import SoftLayerError
 from SoftLayer import testing
-
-import json
-import tempfile
 
 
 class ServerCLITests(testing.TestCase):
@@ -692,19 +691,19 @@ class ServerCLITests(testing.TestCase):
                                            'getResourceRecords')
         getResourceRecords.return_value = []
         createAargs = ({
-                           'type': 'a',
-                           'host': 'hardware-test1',
-                           'domainId': 12345,  # from SoftLayer_Account::getDomains
-                           'data': '172.16.1.100',
-                           'ttl': 7200
-                       },)
+            'type': 'a',
+            'host': 'hardware-test1',
+            'domainId': 12345,  # from SoftLayer_Account::getDomains
+            'data': '172.16.1.100',
+            'ttl': 7200
+        },)
         createPTRargs = ({
-                             'type': 'ptr',
-                             'host': '100',
-                             'domainId': 123456,
-                             'data': 'hardware-test1.test.sftlyr.ws',
-                             'ttl': 7200
-                         },)
+            'type': 'ptr',
+            'host': '100',
+            'domainId': 123456,
+            'data': 'hardware-test1.test.sftlyr.ws',
+            'ttl': 7200
+        },)
 
         result = self.run_command(['hw', 'dns-sync', '1000'])
 
@@ -747,12 +746,12 @@ class ServerCLITests(testing.TestCase):
             }
         }
         createV6args = ({
-                            'type': 'aaaa',
-                            'host': 'hardware-test1',
-                            'domainId': 12345,  # from SoftLayer_Account::getDomains
-                            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
-                            'ttl': 7200
-                        },)
+            'type': 'aaaa',
+            'host': 'hardware-test1',
+            'domainId': 12345,  # from SoftLayer_Account::getDomains
+            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
+            'ttl': 7200
+        },)
         server.return_value = test_server
         result = self.run_command(['hw', 'dns-sync', '--aaaa-record', '1000'])
         self.assert_no_fail(result)
@@ -943,6 +942,41 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['hw', 'upgrade', '100', '--test', '--memory=32', '--public-bandwidth=500',
                                    '--drive-controller=RAID', '--network=10000 Redundant'])
         self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_upgrade_add_disk(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['hw', 'upgrade', '100', '--add-disk=1000', '2'])
+
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_upgrade_resize_disk(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['hw', 'upgrade', '100', '--resize-disk=1000', '1'])
+
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_upgrade_disk_not_price_found(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['hw', 'upgrade', '100', '--add-disk=1000', '3'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_upgrade_disk_already_exist(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['hw', 'upgrade', '100', '--add-disk=1000', '1'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_upgrade_disk_does_not_exist(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['hw', 'upgrade', '100', '--resize-disk=1000', '3'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_upgrade(self, confirm_mock):

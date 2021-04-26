@@ -227,7 +227,7 @@ class VSManager(utils.IdentifierMixin, object):
                 'maxMemory,'
                 'datacenter,'
                 'activeTransaction[id, transactionStatus[friendlyName,name]],'
-                'lastTransaction[transactionStatus],'
+                'lastTransaction[transactionStatus,modifyDate,transactionGroup[name]],'
                 'lastOperatingSystemReload.id,'
                 'blockDevices,'
                 'blockDeviceTemplateGroup[id, name, globalIdentifier],'

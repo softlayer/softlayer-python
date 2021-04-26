@@ -4,13 +4,13 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import json
+from unittest import mock as mock
+
+import SoftLayer
 from SoftLayer.fixtures import SoftLayer_Product_Order
 from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer import testing
-
-import json
-import mock
-import SoftLayer
 
 
 class SubnetTests(testing.TestCase):
@@ -173,7 +173,7 @@ class SubnetTests(testing.TestCase):
                 "netmask": "255.255.255.192",
                 "gateway": "10.47.16.129",
                 "type": "PRIMARY"
-            }})
+        }})
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
     def test_cancel(self, confirm_mock):

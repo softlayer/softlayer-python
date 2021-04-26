@@ -6,7 +6,7 @@
 """
 import copy
 
-import mock
+from unittest import mock as mock
 
 import SoftLayer
 from SoftLayer import fixtures
@@ -557,10 +557,10 @@ class HardwareTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Hardware_Server',
                                 'editObject',
                                 args=({
-                                          'hostname': 'new-host',
-                                          'domain': 'new.sftlyr.ws',
-                                          'notes': 'random notes',
-                                      },),
+                                    'hostname': 'new-host',
+                                    'domain': 'new.sftlyr.ws',
+                                    'notes': 'random notes',
+                                },),
                                 identifier=100)
 
     def test_rescue(self):
@@ -869,6 +869,13 @@ class HardwareTests(testing.TestCase):
         result = self.hardware._get_prices_for_upgrade_option(upgrade_prices, 'memory', 1)
         self.assertEqual(92, result)
 
+    def test_get_price_id_disk_capacity(self):
+        upgrade_prices = [
+            {'categories': [{'categoryCode': 'disk1'}], 'item': {'capacity': 1}, 'id': 99}
+        ]
+        result = self.hardware._get_prices_for_upgrade_option(upgrade_prices, 'disk1', 1)
+        self.assertEqual(99, result['id'])
+
     def test_upgrade(self):
         result = self.hardware.upgrade(1, memory=32)
 
@@ -877,6 +884,30 @@ class HardwareTests(testing.TestCase):
         call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
         order_container = call.args[0]
         self.assertEqual(order_container['prices'], [{'id': 209391}])
+
+    def test_upgrade_add_disk(self):
+        disk_list = list()
+        disks = {'description': 'add_disk', 'capacity': 1000, 'number': 2}
+        disk_list.append(disks)
+        result = self.hardware.upgrade(1, disk=disk_list)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
+        call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
+        order_container = call.args[0]
+        self.assertEqual(order_container['prices'][0]['id'], 49759)
+
+    def test_upgrade_resize_disk(self):
+        disk_list = list()
+        disks = {'description': 'resize_disk', 'capacity': 1000, 'number': 1}
+        disk_list.append(disks)
+        result = self.hardware.upgrade(1, disk=disk_list)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
+        call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
+        order_container = call.args[0]
+        self.assertEqual(order_container['prices'][0]['id'], 49759)
 
     def test_upgrade_blank(self):
         result = self.hardware.upgrade(1)
