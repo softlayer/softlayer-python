@@ -33,9 +33,9 @@ def cli(env, label, in_file, key, note):
     if key:
         key_text = key
     else:
-        key_file = open(path.expanduser(in_file), 'rU')
-        key_text = key_file.read().strip()
-        key_file.close()
+        with open(path.expanduser(in_file), 'rU') as key_file:
+            key_text = key_file.read().strip()
+            key_file.close()
 
     mgr = SoftLayer.SshKeyManager(env.client)
     result = mgr.add_key(key_text, label, note)
